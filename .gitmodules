@@ -1,0 +1,11 @@
+[submodule "enmapbox/qgispluginsupport"]
+	path = enmapbox/qgispluginsupport
+	url = https://github.com/EnMAP-Box/qgispluginsupport.git
+	pushurl = git@github.com:EnMAP-Box/qgispluginsupport.git
+	branch = master
+[submodule "enmapbox/apps/lmuapps"]
+	path = enmapbox/apps/lmuapps
+	url = https://bitbucket.org/ecstagriculture/enmap-box-lmu-vegetation-apps.git
+    pushurl = git@bitbucket.org:ecstagriculture/enmap-box-lmu-vegetation-apps.git
+    branch = master
+

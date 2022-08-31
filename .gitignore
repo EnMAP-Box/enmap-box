@@ -1,0 +1,47 @@
+# Untracked directories
+.idea/
+deploy/
+build/
+tmp/
+*/tmp/
+doc/build/
+*/build/
+test-reports/
+test-outputs/
+qgisresources
+qgisresources/
+qgisresources.zip
+hubdc/test/output_core
+
+symbology-style.db
+enmapbox/exampledata/*.gpkg
+
+
+# we do not like to have compiled qt resource files in our repository!
+*_rc.py
+
+enmapboxtestdata.zip
+
+user-history.db
+
+.coverage
+
+# Untrack compiled files
+*.pyc 
+*.pyd
+
+#are changed all the time, should be commited explicitely
+*.aux.xml
+*bsq.aux.xml
+*.cache/
+*.cache/*
+/documentation/build/doctrees/
+/enmapbox/gui/ui/tmp.ui
+doc/build
+/.gitignore
+/tests/test-*/
+/test-reports/
+hubdc/gis/
+*.gpkg-shm
+*.gpkg-wal
+enmapbox/enmapboxexampledata.zip
