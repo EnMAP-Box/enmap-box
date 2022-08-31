@@ -489,8 +489,8 @@ def installTestData(overwrite_existing: bool = False, ask: bool = True):
 
     app = QgsApplication.instance()
     if app is None:
-        from enmapbox.testing import initQgisApplication
-        app = initQgisApplication()
+        from enmapbox.testing import start_app
+        app = start_app()
     from enmapbox import URL_TESTDATA
     from enmapbox import DIR_EXAMPLEDATA
     if ask is True:
@@ -535,7 +535,7 @@ def installTestData(overwrite_existing: bool = False, ask: bool = True):
 
         for pathRel in subPaths:
             pathDst = targetDir.parent / pathRel
-            # create directory if doesn't exist
+            # create directory if it doesn't exist
             os.makedirs(pathDst.parent, exist_ok=True)
 
             with open(pathDst, 'wb') as outfile:
