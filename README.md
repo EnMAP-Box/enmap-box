@@ -41,8 +41,10 @@ git clone --recurse-submodules git@github.com:EnMAP-Box/enmap-box.git
 cd enmap-box
 git config --local include.path ../.gitconfig
 
-# download additional QGIS resource files and compile the EnMAP-Box resource files
+# compile the EnMAP-Box resource files and download QGIS resource files to display icons  
 python scripts/setup_repository.py
+
+# start the EnMAP-Box
 python enmapbox
 ````
 
