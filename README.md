@@ -33,13 +33,15 @@ Use the following commands to clone the EnMAP-Box and update its submodules:
 ### TL;DR:
 
 ````bash
-# developers should access the remote 
+
 git clone --recurse-submodules git@github.com:EnMAP-Box/enmap-box.git
 # alternatively, but not recommended, you can use https as well:
 # git clone --recurse-submodules https://github.org:EnMAP-Box/enmap-box.git
 
 cd enmap-box
 git config --local include.path ../.gitconfig
+
+# download additional QGIS resource files and compile the EnMAP-Box resource files
 python scripts/setup_repository.py
 python enmapbox
 ````
