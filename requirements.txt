@@ -1,0 +1,26 @@
+# this file lists packages that are required to run the EnMAP-Box
+# depending on your system it might be necessary to install required package with package installers others than pip
+# see https://pip.pypa.io/en/stable/reference/pip_install/#requirements-file-format
+# see https://www.python.org/dev/peps/pep-0440/#version-specifiers
+###### Requirements ######
+
+# should be already part of a standard QGIS installation
+numpy>=1.15
+matplotlib>=3.0
+pip>=20.0
+dataclasses # ; python_version < '3.7'
+scipy>=1.1
+# PyQt5-sip  # commented out; caused "Unable to import PyQt5-sip" issue, see #718
+
+# required by parts of EnMAP-Box Core
+scikit-learn>=0.24
+astropy # required for convolution
+PyOpenGL # required by ImageCube app
+xgboost # required by XGBoost classifier/regressor, see #960
+lightgbm # required by LightGBM classifier/regressor, see #960
+catboost # required by CatBoost classifier/regressor, see #960
+
+# required by parts of EnMAP-Box Applications
+numba # <=0.47 ; platform_system != "Linux" # required by EnSoMAP, causes problems on Linux (miniconda)
+netCDF4 # required by ONNS
+enpt-enmapboxapp # required by EnPT

@@ -1,0 +1,76 @@
+spectra names,level_1,level_2,level_3
+red clay tile 1,impervious,impervious,roof
+red clay tile 2,impervious,impervious,roof
+red clay tile 3,impervious,impervious,roof
+red clay tile 4,impervious,impervious,roof
+red cement tile 1,impervious,impervious,roof
+red cement tile 2,impervious,impervious,roof
+red cement tile 3,impervious,impervious,roof
+bitumen 1,impervious,impervious,roof
+bitumen 2,impervious,impervious,roof
+bitumen 3,impervious,impervious,roof
+bitumen 4,impervious,impervious,roof
+bitumen 5,impervious,impervious,roof
+brown tile,impervious,impervious,roof
+black tile,impervious,impervious,roof
+brown shingle,impervious,impervious,roof
+white roof material (polyethylene),impervious,impervious,roof
+white roof material (unknown) 1,impervious,impervious,roof
+white roof material (unknown) 2,impervious,impervious,roof
+white roof material (unknown) 3,impervious,impervious,roof
+white roof material (unknown) 4,impervious,impervious,roof
+greenish roof material (unknown),impervious,impervious,roof
+light gray roof material (unknown),impervious,impervious,roof
+zinc,impervious,impervious,roof
+asphalt 1,impervious,impervious,pavement
+asphalt 2,impervious,impervious,pavement
+asphalt 3,impervious,impervious,pavement
+asphalt 4,impervious,impervious,pavement
+concrete 1,impervious,impervious,pavement
+concrete 2,impervious,impervious,pavement
+concrete 3,impervious,impervious,pavement
+grass (intensively manicured) 1,vegetation,low vegetation,low vegetation
+grass (intensively manicured) 2,vegetation,low vegetation,low vegetation
+grass (extensively manicured),vegetation,low vegetation,low vegetation
+grass (agricultural grassland) 1,vegetation,low vegetation,low vegetation
+grass (agricultural grassland) 2,vegetation,low vegetation,low vegetation
+grass (agricultural grassland)3,vegetation,low vegetation,low vegetation
+grass (meadow clover) 1,vegetation,low vegetation,low vegetation
+grass (meadow clover) 2,vegetation,low vegetation,low vegetation
+grass (meadow alfalfa/lucerne),vegetation,low vegetation,low vegetation
+grass (dry) 1,vegetation,low vegetation,low vegetation
+grass (dry) 2,vegetation,low vegetation,low vegetation
+grass (dry agricultural grassland),vegetation,low vegetation,low vegetation
+sunflower,vegetation,low vegetation,low vegetation
+corn,vegetation,low vegetation,low vegetation
+sorghum,vegetation,low vegetation,low vegetation
+sugarbeet 1,vegetation,low vegetation,low vegetation
+sugarbeet 2,vegetation,low vegetation,low vegetation
+potatoes,vegetation,low vegetation,low vegetation
+deciduous tree 1,vegetation,tree,tree
+deciduous tree 2,vegetation,tree,tree
+deciduous tree 3,vegetation,tree,tree
+deciduous tree 4,vegetation,tree,tree
+deciduous tree 5,vegetation,tree,tree
+deciduous tree 6,vegetation,tree,tree
+deciduous tree 7,vegetation,tree,tree
+deciduous tree 8,vegetation,tree,tree
+deciduous tree 9,vegetation,tree,tree
+deciduous tree 10,vegetation,tree,tree
+deciduous tree 11,vegetation,tree,tree
+coniferous tree 1,vegetation,tree,tree
+coniferous tree 2,vegetation,tree,tree
+bare soil 1,soil,soil,soil
+bare soil 2,soil,soil,soil
+sand (playground) 1,soil,soil,soil
+sand (playground) 2,soil,soil,soil
+red sand (cinder field),impervious,impervious,pavement
+red sand (cinder court) 1,impervious,impervious,pavement
+red sand (cinder court) 2,impervious,impervious,pavement
+railtrack 1,impervious,impervious,pavement
+railtrack 2,impervious,impervious,pavement
+artificial turf 1,impervious,impervious,pavement
+artificial turf 2,impervious,impervious,pavement
+tartan (sports ground),impervious,impervious,pavement
+water1,water,water,water
+water 2,water,water,water

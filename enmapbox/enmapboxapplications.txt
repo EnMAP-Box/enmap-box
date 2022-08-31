@@ -1,0 +1,6 @@
+# this file describes additional locations of EnMAP-Box applications folder
+# Syntax:
+# path/to/app/directory
+# e.g.
+# folder/myapp
+# if there is a file folder/myapp/__init__.py containing the "def enmapboxApplicationFactory(enmapBox):" definition

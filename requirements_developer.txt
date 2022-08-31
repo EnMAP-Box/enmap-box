@@ -1,0 +1,27 @@
+# this file lists packages that are required to run the EnMAP-Box
+# depending on your system it might be necessary to install required package with package installers others than pip
+# see https://pip.pypa.io/en/stable/reference/pip_install/#requirements-file-format
+# see https://www.python.org/dev/peps/pep-0440/#version-specifiers
+###### Requirements ######
+
+# required to build the EnMAP-Box
+gitpython
+
+# required to build the documentation
+
+recommonmark
+sphinx
+sphinx-argparse
+sphinx-markdown
+sphinx-rtd-theme
+sphinx-autobuild
+docutils
+coverage
+xmlrunner
+urlchecker
+
+# optionals
+git-lfs
+
+#standard requirements
+-r requirements.txt

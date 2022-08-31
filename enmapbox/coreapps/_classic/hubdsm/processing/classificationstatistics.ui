@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>568</width>
+    <height>247</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Classification Statistics</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,2,1">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,1,1">
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Unit</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="mUnitUnknown">
+        <item>
+         <property name="text">
+          <string>Pixel</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Percentage</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="mUnitStandard">
+        <item>
+         <property name="text">
+          <string>Pixel</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Percentage</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Square Meters</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Hectares</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Square Kilometers</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Square Feet</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Square Yards</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Acres</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Square Miles</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="mUnitGeographic">
+        <item>
+         <property name="text">
+          <string>Pixel</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Percentage</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Square Degrees </string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="PlotWidget" name="mPlot">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>50</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QgsCollapsibleGroupBox" name="mGroupBox">
+      <property name="title">
+       <string>Class Legend</string>
+      </property>
+      <property name="collapsed">
+       <bool>false</bool>
+      </property>
+      <property name="saveCollapsedState">
+       <bool>false</bool>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QPlainTextEdit" name="mLegend"/>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsCollapsibleGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>qgscollapsiblegroupbox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PlotWidget</class>
+   <extends>QGraphicsView</extends>
+   <header>enmapboxapplications.imagestatistics.core</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

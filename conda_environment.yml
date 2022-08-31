@@ -1,0 +1,26 @@
+# run: conda env create --file conda_environment.yml
+# see also https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
+name: qgis
+channels:
+  - conda-forge
+dependencies:
+  - qgis>=3.18
+  - pip
+  - numpy
+  - scipy
+  - scikit-learn
+  - matplotlib
+  - astropy
+  - numba
+  - pyopengl
+  - netcdf4
+  - h5py
+  - gitpython
+  - git-lfs
+  - sphinx=1.8.5
+  - recommonmark
+  - pip:
+    - sphinx-rtd-theme
+    - enpt-enmapboxapp
+variables:
+  QT_MAC_WANTS_LAYER: 1

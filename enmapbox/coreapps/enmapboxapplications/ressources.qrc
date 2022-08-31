@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="imageMath">
+    <file>imagemathapp/icons/numpy.png</file>
+  </qresource>
+</RCC>

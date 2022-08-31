@@ -1,0 +1,4 @@
+This folder (enmapbox/apps) should never become a python package!
+Please do not add any __init__.py into it!
+
+

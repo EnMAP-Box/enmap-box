@@ -1,0 +1,98 @@
+{
+  "SpectralIndices": {
+      "NDMI": {
+      "bands": [
+        "N",
+        "S1",
+        "S2"
+      ],
+      "formula": "(N - S1) / (N + S1)",
+      "long_name": "Normalized Difference Moisture Index",
+      "reference": "https://doi.org/10.1016/S0034-4257(96)00067-3",
+      "short_name": "NDMI",
+      "type": "other"
+    },
+    "NDSI": {
+      "bands": [
+        "G",
+        "S1"
+      ],
+      "formula": "(G - S1) / (G + S1)",
+      "long_name": "Normalized Difference Snow Index",
+      "reference": "https://doi.org/10.1016/0034-4257(95)00137-P",
+      "short_name": "NDSI",
+      "type": "other"
+    },
+    "NDTI": {
+      "bands": [
+        "S1",
+        "S2"
+      ],
+      "formula": "(S1 - S2) / (S1 + S2)",
+      "long_name": "Normalized Difference Tillage Index",
+      "reference": "https://www.jswconline.org/content/56/2/91",
+      "short_name": "NDTI",
+      "type": "other"
+    },
+    "TCB": {
+      "bands": [
+        "B",
+        "G",
+        "R",
+        "N",
+        "S1",
+        "S2"
+      ],
+      "formula": "0.2043*B + 0.4158*G + 0.5524*R + 0.5741*N + 0.3124*S1 + 0.2303*S2",
+      "long_name": "Tasseled Cap Brightness",
+      "reference": "https://doi.org/10.1016/0034-4257(85)90102-6",
+      "short_name": "TCB",
+      "type": "other"
+    },
+    "TCG": {
+      "bands": [
+        "B",
+        "G",
+        "R",
+        "N",
+        "S1",
+        "S2"
+      ],
+      "formula": "-0.1603*B - 0.2819*G - 0.4934*R + 0.7940*N - 0.0002*S1 - 0.1446*S2",
+      "long_name": "Tasseled Cap Greeness",
+      "reference": "https://doi.org/10.1016/0034-4257(85)90102-6",
+      "short_name": "TCG",
+      "type": "other"
+    },
+    "TCW": {
+      "bands": [
+        "B",
+        "G",
+        "R",
+        "N",
+        "S1",
+        "S2"
+      ],
+      "formula": "0.0315*B + 0.2021*G + 0.3102*R + 0.1594*N - 0.6806*S1 - 0.6109*S2",
+      "long_name": "Tasseled Cap Wetness",
+      "reference": "https://doi.org/10.1016/0034-4257(85)90102-6",
+      "short_name": "TCW",
+      "type": "other"
+    },
+    "TCDI": {
+      "bands": [
+        "B",
+        "G",
+        "R",
+        "N",
+        "S1",
+        "S2"
+      ],
+      "formula": "(0.2043*B + 0.4158*G + 0.5524*R + 0.5741*N + 0.3124*S1 + 0.2303*S2) - ((-0.1603*B - 0.2819*G - 0.4934*R + 0.7940*N - 0.0002*S1 - 0.1446*S2) + (0.0315*B + 0.2021*G + 0.3102*R + 0.1594*N - 0.6806*S1 - 0.6109*S2))",
+      "long_name": "Tasseled Cap Disturbance Index",
+      "reference": "Healey et al. 1995",
+      "short_name": "TCDI",
+      "type": "other"
+    }
+  }
+}

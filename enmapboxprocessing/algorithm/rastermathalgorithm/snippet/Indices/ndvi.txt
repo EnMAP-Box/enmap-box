@@ -1,0 +1,20 @@
+{'raster': QgsRasterLayer}
+
+# find bands
+red = {raster}@655nm
+nir = {raster}@865nm
+
+# calculate NDVI
+ndvi = (nir - red) / (nir + red)
+
+# mask no data region
+noDataValue = -9999
+ndvi[~{raster}Mask@655nm] = noDataValue
+ndvi[~{raster}Mask@865nm] = noDataValue
+
+# set no data value and band name
+ndvi.setNoDataValue(noDataValue)
+ndvi.setBandName('NDVI', bandNo=1)
+
+# clean up temp variables
+del red, nir

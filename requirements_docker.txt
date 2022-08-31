@@ -1,0 +1,37 @@
+# this file lists packages that are required to run the EnMAP-Box
+# depending on your system it might be necessary to install required package with package installers others than pip
+# see https://pip.pypa.io/en/stable/reference/pip_install/#requirements-file-format
+# see https://www.python.org/dev/peps/pep-0440/#version-specifiers
+###### Requirements ######
+
+# these should already part of a standard QGIS installation
+numpy<1.21,>=1.17
+matplotlib>=3.0
+pip>=20.0
+dataclasses>=0.6
+scipy>=1.1
+# PyQt5-sip  # commented out; caused "Unable to import PyQt5-sip" issue, see #718
+
+# required by parts of EnMAP-Box Core
+scikit-learn>=0.24
+astropy>=4.3.1
+PyOpenGL # required by ImageCube app
+
+# required by parts of EnMAP-Box Applications
+numba>=0.54.1
+netCDF4>=1.5.7
+enpt-enmapboxapp # required by EnPT
+
+# automatically flagged as missing imports form IDE
+mock>=4.0.3
+PyQt5>=5.10
+xmlrunner>=1.7.7
+urlchecker>=0.0.22
+requests>=2.22.0
+GDAL>=3.0.4
+joblib>=1.1.0
+colorama>=0.4.3
+Pillow>=7.0.0
+sip>=4.19.21
+setuptools>=45.2.0
+urllib3>=1.25.8

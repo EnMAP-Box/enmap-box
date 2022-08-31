@@ -1,0 +1,3 @@
+# this file describes other locations of EnMAP-Box applications
+# just give the PATH relative to the root directory
+

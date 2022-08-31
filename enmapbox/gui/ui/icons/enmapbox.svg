@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="24mm"
+   height="24mm"
+   viewBox="0 0 85.03937 85.03937"
+   id="svg2"
+   version="1.1"
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
+   sodipodi:docname="enmapbox.svg"
+   inkscape:export-filename="C:\Users\geo_beja\Repositories\enmap-box\enmapbox\gui\ui\icons\enmapbox256px.png"
+   inkscape:export-xdpi="270.92999"
+   inkscape:export-ydpi="270.92999">
+  <title
+     id="title907">EnMAP-Box icon</title>
+  <defs
+     id="defs4">
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath108">
+      <path
+         d="M 1150.2,1379.2 1601.07,189.34 C 1678.68,99.6016 1720.55,25.0586 1732.32,3.39063 L 1157.51,1379.51 l -7.31,-0.31 m -7.3,-0.31 -7.29,-0.3 287.57,-1020.801 c 23.18,-17.898 44.95,-36.059 65.35,-54.238 L 1142.9,1378.89 1505.12,288.48 c 27.9,-25.781 53.1,-51.429 75.64,-76.23 l -430.56,1166.95 -7.3,-0.31 m -14.6,-0.61 219.5,-966.85 c 21.08,-13.821 41.23,-27.95 60.45,-42.321 l -272.64,1009.481 -7.31,-0.31 m -7.29,-0.3 154.6,-922.902 c 20.08,-11.18 39.45,-22.707 58.08,-34.539 l -205.39,957.741 -7.29,-0.3 m -7.3,-0.31 90.92,-886.158 c 19.72,-9.282 38.77,-18.973 57.29,-28.953 l -140.91,915.421 -7.3,-0.31 m -7.29,-0.31 26.86,-855.161 c 19.8,-7.758 39.01,-15.937 57.72,-24.449 l -77.29,879.92 -7.29,-0.31 m -7.3,-0.3 -38.7,-829.021 c 20.26,-6.43 39.77,-13.32 59.01,-20.578 l -13.01,849.899 -7.3,-0.3 m -7.28,-0.31 -107.879,-807.129 c 2.5,-0.641 5,-1.371 7.488,-2.031 18.501,-4.692 36.761,-9.559 54.491,-14.942 l 53.18,824.412 -7.28,-0.31 m -7.29,-0.3 -7.3,-0.31 -7.66,-0.03 -364.66,-769.758 0.25,-0.063 c 13.429,-0.348 26.66,-0.961 39.8,-1.668 16.879,-0.652 33.782,-2.101 50.75,-3.543 L 1077.25,1376.14 814.691,599.289 c 24.602,-2.828 47.02,-5.769 71.239,-9.488 L 1084.55,1376.45 903.223,586.73 c 21.91,-3.98 43.328,-8.16 65.218,-13.449 l 123.399,803.469 -7.29,-0.3"
+         id="path106" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath114">
+      <path
+         d="M 704.93,1379.51 H 1732.32 V 3.39063 H 704.93 Z"
+         id="path112" />
+    </clipPath>
+    <linearGradient
+       x1="0"
+       y1="0"
+       x2="1"
+       y2="0"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1027.39,0,0,1027.39,704.931,691.45)"
+       spreadMethod="pad"
+       id="linearGradient132">
+      <stop
+         style="stop-opacity:1;stop-color:#ed1c24"
+         offset="0"
+         id="stop116" />
+      <stop
+         style="stop-opacity:1;stop-color:#f68712"
+         offset="0.164671"
+         id="stop118" />
+      <stop
+         style="stop-opacity:1;stop-color:#fabc09"
+         offset="0.305389"
+         id="stop120" />
+      <stop
+         style="stop-opacity:1;stop-color:#7fcc28"
+         offset="0.476048"
+         id="stop122" />
+      <stop
+         style="stop-opacity:1;stop-color:#00adef"
+         offset="0.625749"
+         id="stop124" />
+      <stop
+         style="stop-opacity:1;stop-color:#176fc0"
+         offset="0.80538899"
+         id="stop126" />
+      <stop
+         style="stop-opacity:1;stop-color:#5e2590"
+         offset="0.997006"
+         id="stop128" />
+      <stop
+         style="stop-opacity:1;stop-color:#5e2590"
+         offset="1"
+         id="stop130" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="8"
+     inkscape:cx="35.029526"
+     inkscape:cy="47.2515"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1137"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:measure-start="54.5688,53.6296"
+     inkscape:measure-end="53.3203,54.1489"
+     inkscape:document-rotation="0"
+     objecttolerance="20"
+     inkscape:snap-grids="false"
+     inkscape:snap-to-guides="false"
+     inkscape:snap-global="false" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>EnMAP-Box icon</dc:title>
+        <cc:license
+           rdf:resource="" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-967.32283)"
+     style="display:inline">
+    <g
+       style="display:inline"
+       id="g3425"
+       transform="matrix(0.20215868,0,0,0.20215868,-23.677639,967.18032)"
+       inkscape:label="Gradient" />
+    <g
+       id="g104"
+       clip-path="url(#clipPath108)"
+       transform="matrix(0.06166077,0,0,-0.06166077,-30.919324,1052.61)">
+      <g
+         id="g110"
+         clip-path="url(#clipPath114)">
+        <path
+           id="path134"
+           style="fill:url(#linearGradient132);fill-opacity:1;fill-rule:nonzero;stroke:none"
+           d="m 1732.2561,3.3825391 c 0,0 -41.1501,72.5916979 -68.281,107.6311009 -20.4455,26.40508 -62.7243,78.12077 -62.7243,78.12077 L 1150.564,1377.9442 C 1290.2206,995.09945 1581,212 1581,212 c 0,0 -25.3793,27.91181 -38.7079,41.24894 -11.9919,11.99954 -37.0898,34.84958 -37.0898,34.84958 l -361.8589,1089.56198 345.1741,-1074.41927 -65.2843,54.32669 -287.255,1019.63828 272.2542,-1008.03562 -60.4914,42.2654 -219.097,965.37172 205.1413,-956.2196 -58.1527,34.33523 -154.366,921.08297 140.7818,-913.61081 -57.4127,29.06938 -90.76,884.51983 77.1745,-878.27564 -57.7227,24.4124 -26.8861,853.62884 13.0469,-848.40915 -58.995,20.45708 38.5095,827.78677 L 1046,552.6823 983.99833,569.47996 1091.5593,1375.4021 968.48827,573.17058 903.25586,586.6823 1084.1513,1374.923 885.93969,589.75877 l -71.25133,9.56775 262.09374,775.20478 -281.01186,-773.4305 -90.89085,5.17551 364.60311,769.87939 88.048,3.2613 z"
+           sodipodi:nodetypes="cscccscccccccccccccccccccccccccccccccccc" />
+      </g>
+    </g>
+  </g>
+</svg>
