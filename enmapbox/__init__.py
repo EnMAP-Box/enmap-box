@@ -43,7 +43,7 @@ from qgis.gui import QgisInterface, QgsMapLayerConfigWidgetFactory
 from .qgispluginsupport.qps.pyqtgraph import pyqtgraph
 
 # true version is added from .plugin.ini during plugin build process
-__version__ = 'master'
+__version__ = 'dev'
 # commit this version refers to. will be replaced during plugin build process
 __version_sha__ = ''
 # note that the exampledata folder is part of the repo,
