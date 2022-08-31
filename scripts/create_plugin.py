@@ -124,7 +124,7 @@ def create_enmapbox_plugin(include_testdata: bool = False,
 
     VERSION_SHA = '<unknown>'
     timestamp = re.split(r'[.+]', datetime.datetime.now().isoformat())[0]
-    currentBranch = 'master'  # Allows proper plugin creation for a release without setting up git.
+    currentBranch = 'main'  # Allows proper plugin creation for a release without setting up git.
     try:
         import git
         REPO = git.Repo(DIR_REPO)
