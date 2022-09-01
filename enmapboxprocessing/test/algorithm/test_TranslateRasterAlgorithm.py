@@ -385,7 +385,22 @@ class TestTranslateAlgorithm(TestCase):
         reader = RasterReader(parameters[alg.P_OUTPUT_RASTER])
         print(reader.metadata())
 
-    def test_debug_issue1348(self):
+    def test_debug_issue1348_case1(self):
+
+        alg = TranslateRasterAlgorithm()
+        parameters = {
+            alg.P_RASTER: r'D:\data\issues\903\PRISMA_DESTRIPPED_AOIvAL\PRISMA_DESTRIPPED_AOIvAL.bsq',
+            alg.P_COPY_METADATA: True,
+            alg.P_WRITE_ENVI_HEADER: True,
+            alg.P_EXCLUDE_BAD_BANDS: False,
+            alg.P_OUTPUT_RASTER: self.filename('case1.tif'),
+        }
+        self.runalg(alg, parameters)
+        reader = RasterReader(parameters[alg.P_OUTPUT_RASTER])
+        bbl = [reader.badBandMultiplier(bandNo) for bandNo in reader.bandNumbers()]
+        self.assertEqual(169, sum(bbl))
+
+    def test_debug_issue1348_case2(self):
 
         alg = TranslateRasterAlgorithm()
         parameters = {
@@ -393,8 +408,8 @@ class TestTranslateAlgorithm(TestCase):
             alg.P_COPY_METADATA: True,
             alg.P_WRITE_ENVI_HEADER: True,
             alg.P_EXCLUDE_BAD_BANDS: True,
-            alg.P_OUTPUT_RASTER: self.filename('copy.tif'),
+            alg.P_OUTPUT_RASTER: self.filename('case2.tif'),
         }
         self.runalg(alg, parameters)
         reader = RasterReader(parameters[alg.P_OUTPUT_RASTER])
-        print(reader.metadata())
+        self.assertEqual(169, reader.bandCount())

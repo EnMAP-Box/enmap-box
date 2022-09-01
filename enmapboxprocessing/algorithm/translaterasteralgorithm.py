@@ -322,10 +322,19 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                 metadata = reader.metadata()
                 writer.setMetadata(metadata)
                 for dstBandNo, srcBandNo in enumerate(bandList, 1):
+                    # general metadata
                     metadata = reader.metadata(srcBandNo)
                     writer.setMetadata(metadata, dstBandNo)
+                    # band name
                     bandName = reader.bandName(srcBandNo)
                     writer.setBandName(bandName, dstBandNo)
+                    # spectral info
+                    wavelength = reader.wavelength(srcBandNo)
+                    writer.setWavelength(wavelength, dstBandNo)
+                    fwhm = reader.fwhm(srcBandNo)
+                    writer.setFwhm(fwhm, dstBandNo)
+                    badBandMultiplier = reader.badBandMultiplier(srcBandNo)
+                    writer.setBadBandMultiplier(badBandMultiplier, dstBandNo)
 
             # clean up ENVI metadata domain (see #1098)
             metadata = reader.metadataDomain('ENVI')
