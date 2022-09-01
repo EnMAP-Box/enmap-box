@@ -32,6 +32,8 @@ Use the following commands to clone the EnMAP-Box and update its submodules:
 
 ### TL;DR:
 
+Open a shell that allows to run git and python with PyQGIS, then run:
+
 ````bash
 
 git clone --recurse-submodules git@github.com:EnMAP-Box/enmap-box.git
@@ -114,12 +116,15 @@ Replace it with your own EnMAP-Box fork from which you can create pull requests.
     git commit -m "added submodule updates"
     git push
     ````
-5. Compile resource files and download the test data:
+5. Ensure that PyQGIS is [available to your python enviroment](https://docs.qgis.org/3.22/en/docs/pyqgis_developer_cookbook/intro.html#running-custom-applications).
+   (This means you can start a python shell and `import qgis`)
+   
+6. Compile resource files and download the test data. 
     ````bash
     python scripts/setup_repository.py
     ````
-
-6. Now you can start the EnMAP-Box from shell by:
+   
+7. Now you can start the EnMAP-Box from shell by:
     ````bash
     python enmapbox
     ````
