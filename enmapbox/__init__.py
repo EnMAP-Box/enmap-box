@@ -32,7 +32,6 @@ import sys
 import traceback
 import typing
 import warnings
-
 from osgeo import gdal
 
 from qgis.PyQt.QtCore import QSettings
@@ -96,7 +95,7 @@ DIR_SITEPACKAGES = os.path.join(DIR_REPO, 'site-packages')
 DIR_UIFILES = os.path.join(DIR_ENMAPBOX, *['gui', 'ui'])
 DIR_ICONS = os.path.join(DIR_ENMAPBOX, *['gui', 'ui', 'icons'])
 DIR_EXAMPLEDATA = (pathlib.Path(DIR_REPO) / 'enmapbox' / 'exampledata').as_posix()
-
+DIR_REPO_TMP = (pathlib.Path(DIR_REPO) / 'tmp').as_posix()
 DIR_UNITTESTS = os.path.join(DIR_REPO, 'enmapboxtesting')
 
 ENMAP_BOX_KEY = 'EnMAP-Box'
