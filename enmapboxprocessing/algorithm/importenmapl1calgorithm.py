@@ -3,6 +3,8 @@ from typing import Dict, Any, List, Tuple
 from xml.etree import ElementTree
 
 from osgeo import gdal
+
+from enmapboxprocessing.algorithm.importenmapl1balgorithm import ImportEnmapL1BAlgorithm
 from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
@@ -75,7 +77,9 @@ class ImportEnmapL1CAlgorithm(EnMAPProcessingAlgorithm):
             offsets = [item.text for item in root.findall('specific/bandCharacterisation/bandID/OffsetOfBand')]
 
             # create VRTs
-            ds = gdal.Open(xmlFilename.replace('-METADATA.XML', '-SPECTRAL_IMAGE.TIF'))
+            ds = gdal.Open(ImportEnmapL1BAlgorithm.findFilename(
+                xmlFilename.replace('-METADATA.XML', '-SPECTRAL_IMAGE'))
+            )
             options = gdal.TranslateOptions(format='VRT')
             ds: gdal.Dataset = gdal.Translate(destName=filename, srcDS=ds, options=options)
             ds.SetMetadataItem('wavelength', '{' + ', '.join(wavelength[:ds.RasterCount]) + '}', 'ENVI')

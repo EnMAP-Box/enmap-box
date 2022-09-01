@@ -1,4 +1,4 @@
-from os.path import basename
+from os.path import basename, exists
 from typing import Dict, Any, List, Tuple
 from xml.etree import ElementTree
 
@@ -79,14 +79,14 @@ class ImportEnmapL1BAlgorithm(EnMAPProcessingAlgorithm):
             offsets = [item.text for item in root.findall('specific/bandCharacterisation/bandID/OffsetOfBand')]
 
             # create VRTs
-            ds = gdal.Open(xmlFilename.replace('-METADATA.XML', '-SPECTRAL_IMAGE_VNIR.TIF'))
+            ds = gdal.Open(self.findFilename(xmlFilename.replace('-METADATA.XML', '-SPECTRAL_IMAGE_VNIR')))
             options = gdal.TranslateOptions(format='VRT')
             dsVnir: gdal.Dataset = gdal.Translate(destName=filename1, srcDS=ds, options=options)
             dsVnir.SetMetadataItem('wavelength', '{' + ', '.join(wavelength[:dsVnir.RasterCount]) + '}', 'ENVI')
             dsVnir.SetMetadataItem('wavelength_units', 'nanometers', 'ENVI')
             dsVnir.SetMetadataItem('fwhm', '{' + ', '.join(fwhm[:dsVnir.RasterCount]) + '}', 'ENVI')
 
-            ds = gdal.Open(xmlFilename.replace('-METADATA.XML', '-SPECTRAL_IMAGE_SWIR.TIF'))
+            ds = gdal.Open(self.findFilename(xmlFilename.replace('-METADATA.XML', '-SPECTRAL_IMAGE_SWIR')))
             options = gdal.TranslateOptions(format='VRT')
             dsSwir: gdal.Dataset = gdal.Translate(destName=filename2, srcDS=ds, options=options)
             dsSwir.SetMetadataItem('wavelength', '{' + ', '.join(wavelength[dsVnir.RasterCount:]) + '}', 'ENVI')
@@ -115,3 +115,12 @@ class ImportEnmapL1BAlgorithm(EnMAPProcessingAlgorithm):
             self.toc(feedback, result)
 
         return result
+
+    @staticmethod
+    def findFilename(basename: str):
+        extensions = ['.TIF', '.GEOTIFF', '.BSQ', '.BIL', '.BIP', 'JPEG2000', '.JP2', '.jp2']  # see issue #1421
+        for extention in extensions:
+            filename = basename + extention
+            if exists(filename):
+                return filename
+        raise QgsProcessingException(f'Spectral cube not found: {basename}')
