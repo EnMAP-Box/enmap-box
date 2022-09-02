@@ -14,4 +14,12 @@ class TestRasterLayerZonalAggregationAlgorithm(TestCase):
             alg.P_OUTPUT_TABLE: self.filename('table.csv'),
         }
         result = self.runalg(alg, parameters)
-        # self.assertEqual(6286415, np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array()))
+
+    def test_issue1406(self):
+        alg = RasterLayerZonalAggregationAlgorithm()
+        parameters = {
+            alg.P_RASTER: enmap,
+            alg.P_CATEGORIZED_RASTER: landcover_map_l3,
+            alg.P_OUTPUT_TABLE: self.filename('table.gpkg'),
+        }
+        result = self.runalg(alg, parameters)

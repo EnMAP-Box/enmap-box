@@ -2,7 +2,7 @@ from math import ceil
 from typing import List, Tuple, Dict, Any
 
 import numpy as np
-from qgis._core import Qgis, QgsProcessingContext, QgsProcessingFeedback
+from qgis._core import Qgis, QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer
 
 from enmapboxprocessing.enmapalgorithm import Group, EnMAPProcessingAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
@@ -84,9 +84,15 @@ class RasterLayerZonalAggregationAlgorithm(EnMAPProcessingAlgorithm):
                     row.append(categorySum[(category.value, bandNo)] / categoryN[(category.value, bandNo)])
                 table.append(row)
 
-            with open(filename, 'w') as file:
+            # we always create a CSV file
+            tmpFilename = Utils.tmpFilename(filename, 'result.csv')
+            with open(tmpFilename, 'w') as file:
                 for row in table:
                     file.write(';'.join(map(str, row)) + '\n')
+
+            # finally translate it into the format selected by the user
+            parameters = {"INPUT": tmpFilename, "OUTPUT": filename}
+            self.runAlg("native:savefeatures", parameters, None, feedback, context, True)
 
             result = {self.P_OUTPUT_TABLE: filename}
 
