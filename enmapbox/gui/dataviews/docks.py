@@ -374,7 +374,13 @@ class DockLabel(pgDockLabel):
                  fontSize: int = 8):
         if title is None:
             title = self.dock.title()
-        super(DockLabel, self).__init__(title, dock, showClosebutton, fontSize)
+
+        try:
+            super(DockLabel, self).__init__(title, dock, showClosebutton, fontSize)
+        except:
+            super(DockLabel, self).__init__(title, showClosebutton, fontSize)
+            self.dock = dock
+
 
         self.mButtons = list()  # think from right to left
 
