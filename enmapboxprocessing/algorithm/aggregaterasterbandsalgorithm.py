@@ -74,6 +74,7 @@ class AggregateRasterBandsAlgorithm(EnMAPProcessingAlgorithm):
             for block in reader.walkGrid(blockSizeX, blockSizeY, feedback):
                 array = np.array(reader.arrayFromBlock(block), dtype=np.float32)
                 mask = reader.maskArray(array)
+                invalid = np.logical_not(np.any(mask, axis=0))  # whole pixel is no data (see  #1424)
                 array[np.logical_not(mask)] = nan
 
                 if (self.AnyTrueFunction in functionIndices) or self.AllTrueFunction in functionIndices:
@@ -134,9 +135,17 @@ class AggregateRasterBandsAlgorithm(EnMAPProcessingAlgorithm):
                     else:
                         raise ValueError()
 
+                    # replace nan values by no data values
                     assert outarray.dtype == np.float32, self.O_FUNCTION[functionIndex]
                     outarray[np.isnan(outarray)] = noDataValue
+
+                    # explicitely mask pixel with all-no-data (see #1424)
+                    outarray[invalid] = noDataValue
+
+                    # write result
                     writer.writeArray2d(outarray, bandNo, xOffset=block.xOffset, yOffset=block.yOffset)
+
+
 
             for bandNo, functionIndex in enumerate(functionIndices, 1):
                 bandName = self.O_FUNCTION[functionIndex]
