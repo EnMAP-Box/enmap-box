@@ -1,3 +1,4 @@
+import warnings
 from os.path import join, abspath
 import re
 from typing import List
@@ -7,13 +8,15 @@ baselink = 'https://enmap-box.readthedocs.io/en/latest/general/glossary.html'
 
 # parse glossary from glossary.rst
 glossary = dict()
-with open(filename) as file:
-    for line in file.readlines():
-        if line[:4] == '    ' and line[4] not in ' .:':
-            line = line.strip()
-            glossary[line] = f'{baselink}#term-{line.replace(" ", "-").lower()}'  # term-* anchor needs to be lower case
-            glossary[line + 's'] = glossary[line]  # handle generic plural
-
+try:
+    with open(filename) as file:
+        for line in file.readlines():
+            if line[:4] == '    ' and line[4] not in ' .:':
+                line = line.strip()
+                glossary[line] = f'{baselink}#term-{line.replace(" ", "-").lower()}'  # term-* anchor needs to be lower case
+                glossary[line + 's'] = glossary[line]  # handle generic plural
+except:
+    warnings.warn('can not parse glossary.rst; see GitHub issue #1')
 
 # the whole injection process is implemented quit clumsy, but it works for now
 def injectGlossaryLinks(text: str):
