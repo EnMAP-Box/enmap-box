@@ -1,4 +1,6 @@
 import numpy as np
+from PyQt5.QtCore import QDateTime
+
 from qgis._core import QgsRasterRange, QgsRasterLayer, QgsProcessing
 
 import processing
@@ -80,6 +82,11 @@ class TestRasterMetadataReader(TestCase):
         self.assertEqual(5.8, reader.fwhm(1))
         self.assertEqual(5.8, reader.fwhm(1, reader.Nanometers))
         self.assertEqual(0.0058, reader.fwhm(1, reader.Micrometers))
+
+    def test_issue9(self):
+        reader = RasterReader(r'D:\data\software\force\1984-2021_060-319_HL_TSA_LNDLG_NDV_TSI.tif')
+        self.assertEqual(QDateTime(1984, 3, 1, 0, 0), reader.startTime(1))
+        self.assertEqual(QDateTime(1984, 3, 1, 0, 0), reader.centerTime(1))
 
 
 class TestQgisPam(TestCase):

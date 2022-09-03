@@ -567,11 +567,15 @@ class RasterReader(object):
     def startTime(self, bandNo: int = None) -> Optional[QDateTime]:
         """Return raster / band start time."""
 
-        # check band-level domain
         if bandNo is not None:
+            # check band-level default-domain
             dateTime = self.metadataItem('start_time', '', bandNo)
             if dateTime == 'None':
                 return None
+
+            # check band-level FORCE-domain (see GitHub-issue #9)
+            dateTime = self.metadataItem('Date', 'FORCE', bandNo)
+
             if dateTime is not None:
                 return Utils.parseDateTime(dateTime)
 
