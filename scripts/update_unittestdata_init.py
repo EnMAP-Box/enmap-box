@@ -3,34 +3,31 @@ import pathlib
 import re
 import site
 
-site.addsitedir(pathlib.Path(__file__).parents[1])
-from enmapbox import DIR_REPO
-from enmapbox.gui.utils import file_search
-
-DIR_REPO = pathlib.Path(DIR_REPO)
-
+DIR_REPO = pathlib.Path(__file__).parents[1]
 DIR_TESTS = DIR_REPO / 'tests'
 DIR_UNITTESTDATA = DIR_TESTS / 'testdata'
-PATH_TEST_INIT = DIR_UNITTESTDATA / '____init__.py'
+PATH_TEST_INIT = DIR_UNITTESTDATA / '__init__.py'
+assert DIR_UNITTESTDATA.is_dir()
 
 
 def update_unittest_init(
         use_pathlib: bool = True,
         overwrite: bool = False):
-    assert DIR_UNITTESTDATA.is_dir()
+    site.addsitedir(pathlib.Path(__file__).parents[1])
+    from enmapbox.gui.utils import file_search
 
     if not overwrite and PATH_TEST_INIT.is_file():
         raise Exception(f'File already exists: {PATH_TEST_INIT}.\nRun with option -o --overwrite')
 
     rx = re.compile(r'.*\.(tif|gpkg|qml|csv|pkl|json)$')
-    FILES = dict()
 
     FILES = dict()
     for file in file_search(DIR_UNITTESTDATA, rx, recursive=True):
         path = pathlib.Path(file)
-        part = path.relative_to(DIR_UNITTESTDATA)
+        part = path.relative_to(DIR_UNITTESTDATA).as_posix()
+        varname = re.sub(r'[/\-*?.]', '_', part)
+        part = "' / '".join(part.split('/'))
 
-        varname = re.sub(r'[/\-*?.]', '_', part.as_posix())
         if use_pathlib:
             FILES[path] = f"{varname} = root / '{part}'"
         else:
@@ -42,10 +39,16 @@ def update_unittest_init(
              f'root = pathlib.Path(__file__).parent',
              f'']
     for file in FILES.values():
+
         lines.append(file)
 
     with open(PATH_TEST_INIT, 'w', encoding='utf-8') as f:
         f.write('\n'.join(lines))
+
+    site.addsitedir(PATH_TEST_INIT.parents[1])
+    from testdata import root
+    assert isinstance(root, pathlib.Path)
+    assert root.is_dir()
 
 
 if __name__ == "__main__":
