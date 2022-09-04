@@ -1,10 +1,10 @@
 """
 This example shows how to initialize and run QGIS + EnMAP-Box processing algorithms
 """
+
 import os
 import pathlib
-
-from numpy import nan
+from math import nan
 
 import processing
 from enmapbox import DIR_REPO
