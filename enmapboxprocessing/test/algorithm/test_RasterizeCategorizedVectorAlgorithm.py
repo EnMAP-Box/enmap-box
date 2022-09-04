@@ -1,5 +1,5 @@
 import numpy as np
-from qgis._core import QgsRasterLayer, QgsVectorLayer, QgsPalettedRasterRenderer
+from qgis._core import QgsRasterLayer, QgsVectorLayer, QgsPalettedRasterRenderer, QgsCategorizedSymbolRenderer
 
 from enmapbox.exampledata import enmap, landcover_polygons
 from enmapboxprocessing.algorithm.rasterizecategorizedvectoralgorithm import RasterizeCategorizedVectorAlgorithm
@@ -84,3 +84,27 @@ class TestRasterizeCategorizedVectorAlgorithm(TestCase):
 
         result = self.runalg(alg, parameters)
         self.assertEqual(3816, np.sum(RasterReader(result[alg.P_OUTPUT_CATEGORIZED_RASTER]).array()))
+
+    def test_issue1420(self):
+
+        # change categories
+        vector = QgsVectorLayer(landcover_polygons)
+        renderer = vector.renderer()
+        assert isinstance(renderer, QgsCategorizedSymbolRenderer)
+        categories = Utils.categoriesFromRenderer(vector.renderer())
+        categories = categories[:2]
+        renderer = Utils.categorizedSymbolRendererFromCategories(renderer.classAttribute(), categories)
+        vector.setRenderer(renderer)
+
+        alg = RasterizeCategorizedVectorAlgorithm()
+        alg.initAlgorithm()
+        parameters = {
+            alg.P_CATEGORIZED_VECTOR: vector,
+            alg.P_GRID: QgsRasterLayer(enmap),
+            alg.P_OUTPUT_CATEGORIZED_RASTER: self.filename('classification.tif')
+        }
+
+        result = self.runalg(alg, parameters)
+        raster = QgsRasterLayer(result[alg.P_OUTPUT_CATEGORIZED_RASTER])
+        categories = Utils.categoriesFromRenderer(raster.renderer())
+        self.assertEqual(2, len(categories))
