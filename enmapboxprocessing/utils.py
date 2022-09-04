@@ -6,6 +6,7 @@ from os import makedirs, mkdir
 from os.path import join, dirname, basename, exists, splitext
 from random import randint
 from typing import Tuple, Optional, Callable, Any, Dict, Union, List
+from warnings import warn
 
 import numpy as np
 from PyQt5.QtCore import QDateTime, QDate
@@ -607,7 +608,7 @@ class Utils(object):
         return ''.join([sub(c) for c in string])
 
     @classmethod
-    def wavelengthUnitsShortName(cls, units: str) -> str:
+    def wavelengthUnitsShortName(cls, units: str) -> Optional[str]:
         if units.lower() in ['nm', 'nanometers']:
             return 'nm'
         elif units.lower() in ['μm', 'um', 'micrometers']:
@@ -619,10 +620,11 @@ class Utils(object):
         elif units.lower() in ['m', 'meters']:
             return 'm'
         else:
-            raise ValueError(f'unknown wavelength unit: {units}')
+            warn(f'unknown wavelength unit: {units}')
+            return None
 
     @classmethod
-    def wavelengthUnitsLongName(cls, units: str) -> str:
+    def wavelengthUnitsLongName(cls, units: str) -> Optional[str]:
         if units.lower() in ['nm', 'nanometers']:
             return 'Nanometers'
         elif units.lower() in ['μm', 'um', 'micrometers']:
@@ -634,7 +636,8 @@ class Utils(object):
         elif units.lower() in ['m', 'meters']:
             return 'Meters'
         else:
-            raise ValueError(f'unknown wavelength unit: {units}')
+            warn(f'unknown wavelength unit: {units}')
+            return None
 
     @classmethod
     def wavelengthUnitsConversionFactor(cls, srcUnits: str, dstUnits: str) -> float:

@@ -88,6 +88,9 @@ class TestRasterMetadataReader(TestCase):
         self.assertEqual(QDateTime(1984, 3, 1, 0, 0), reader.startTime(1))
         self.assertEqual(QDateTime(1984, 3, 1, 0, 0), reader.centerTime(1))
 
+        self.assertIsNone(reader.wavelength(1))
+        self.assertIsNone(reader.wavelengthUnits(1))
+
 
 class TestQgisPam(TestCase):
     # test QGIS PAM metadata handling (see #898)
