@@ -1,6 +1,6 @@
 from enmapbox.testing import EnMAPBoxTestCase, TestObjects
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
-from qgis._core import QgsProject, QgsProcessingContext, QgsProcessingFeedback, QgsProcessingAlgorithm, \
+from qgis.core import QgsProject, QgsProcessingContext, QgsProcessingFeedback, QgsProcessingAlgorithm, \
     QgsProcessingParameterVectorLayer
 
 

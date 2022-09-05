@@ -43,4 +43,3 @@ for iB, b in enumerate(bandList):
 
 dsDst.FlushCache()
 del dsDst
-

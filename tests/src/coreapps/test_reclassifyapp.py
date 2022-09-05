@@ -1,19 +1,23 @@
-import unittest
 import os
 import re
+import unittest
 
-from PyQt5.QtCore import QSortFilterProxyModel
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QTableView
 from osgeo import gdal
-from qgis.core import QgsProject, QgsRasterLayer, QgsPalettedRasterRenderer
-
-import _classic
-from enmapbox import DIR_ENMAPBOX, initPythonPaths
-from enmapbox.testing import TestObjects, EnMAPBoxTestCase
+try:
+    from reclassifyapp.reclassify import ReclassifyTableView, ReclassifyTableModel, ReclassifyTableViewDelegate, \
+        ReclassifyDialog, reclassify
+except ModuleNotFoundError as ex:
+    if ex.name == 'reclassifyapp':
+        raise unittest.SkipTest('Failed to import reclassifyapp')
+    else:
+        raise ex
+from enmapbox import initPythonPaths
 from enmapbox.qgispluginsupport.qps.classification.classificationscheme import ClassificationScheme
-from reclassifyapp.reclassify import ReclassifyTableView, ReclassifyTableModel, ReclassifyTableViewDelegate, \
-    ReclassifyDialog, reclassify
+from enmapbox.testing import TestObjects, EnMAPBoxTestCase
+from qgis.PyQt.QtCore import QSortFilterProxyModel
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWidgets import QTableView
+from qgis.core import QgsProject, QgsRasterLayer, QgsPalettedRasterRenderer
 
 initPythonPaths()
 

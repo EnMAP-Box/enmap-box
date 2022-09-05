@@ -30,28 +30,29 @@ from qgis.PyQt.QtCore import *
 
 from enmapbox.gui.applications import EnMAPBoxApplication
 
-
 VERSION = '0.0.1'
 LICENSE = 'GNU GPL-3'
 APP_DIR = os.path.dirname(__file__)
 
 APP_NAME = 'My First EnMAPBox App'
 
+
 class AnacondaExampleEnMAPBoxApp(EnMAPBoxApplication):
     """
     This Class inherits from an EnMAPBoxApplication
     """
+
     def __init__(self, enmapBox, parent=None):
         super(AnacondaExampleEnMAPBoxApp, self).__init__(enmapBox, parent=parent)
 
-        #specify the name of this app
+        # specify the name of this app
         self.name = APP_NAME
 
-        #specify a version string
+        # specify a version string
 
         self.version = VERSION
 
-        #specify a licence under which you distribute this application
+        # specify a licence under which you distribute this application
         self.licence = LICENSE
 
     def icon(self):
@@ -79,8 +80,8 @@ class AnacondaExampleEnMAPBoxApp(EnMAPBoxApplication):
         menu = appMenu.addMenu('Example Anaconda App')
         menu.setIcon(self.icon())
 
-        #add a QAction that starts a process of your application.
-        #In this case it will open your GUI.
+        # add a QAction that starts a process of your application.
+        # In this case it will open your GUI.
         a = menu.addAction('Show Anaconda App Parameterization GUI')
         assert isinstance(a, QAction)
         a.triggered.connect(self.startGUI)
@@ -112,7 +113,6 @@ class AnacondaCallingGUI(QWidget):
     A minimal graphical user interface
     """
 
-
     def __init__(self, parent=None):
         super(AnacondaCallingGUI, self).__init__(parent)
         self.setWindowTitle(APP_NAME)
@@ -126,7 +126,6 @@ class AnacondaCallingGUI(QWidget):
         self.mAnacondaRoot.setStorageMode(QgsFileWidget.GetDirectory)
         self.mAnacondaRoot.fileChanged.connect(self.setAnacondaRoot)
 
-
         self.settings = QFrame()
         settingsGrid = QGridLayout()
         self.settings.setLayout(settingsGrid)
@@ -137,9 +136,9 @@ class AnacondaCallingGUI(QWidget):
         self.mAnacondaScript.setStorageMode(QgsFileWidget.GetFile)
         self.mAnacondaScript.setFilePath(os.path.join(APP_DIR, *['conda_code', 'condacodeexamples.py']))
 
-        settingsGrid.addWidget(QLabel('Parameter1'),0,0)
+        settingsGrid.addWidget(QLabel('Parameter1'), 0, 0)
         settingsGrid.addWidget(self.mParameter1, 0, 1)
-        settingsGrid.addWidget(QLabel('Script'), 1,0)
+        settingsGrid.addWidget(QLabel('Script'), 1, 0)
         settingsGrid.addWidget(self.mAnacondaScript, 1, 1)
 
         self.mProcess = None
@@ -172,10 +171,10 @@ class AnacondaCallingGUI(QWidget):
             self.mAnacondaRoot.setFilePath(path)
 
         if AnacondaEnvironmentInfo.isAnacondaEnvironment(path):
-            #enable other setting
+            # enable other setting
             self.settings.setEnabled(True)
         else:
-            #disable other settings
+            # disable other settings
             self.settings.setEnabled(False)
 
     def anacondaRoot(self):
@@ -228,7 +227,6 @@ class AnacondaEnvironmentInfo(object):
             return None
         return os.path.join(self.scriptFolder(), 'activate.bat')
 
-
     def isValid(self):
         """
         Returns True if the given root folder is the root of a valida Anaconda Environment
@@ -247,7 +245,6 @@ class AnacondaEnvironmentInfo(object):
 class AnacondaCallingGeoAlgorithm(QgsProcessingAlgorithm):
 
     def __init__(self):
-
         super(AnacondaCallingGeoAlgorithm, self).__init__()
         s = ""
 
@@ -261,7 +258,6 @@ class AnacondaCallingGeoAlgorithm(QgsProcessingAlgorithm):
         return 'Example Algorithm'
 
     def groupId(self):
-
         return 'exampleapp'
 
     def group(self):
@@ -269,11 +265,12 @@ class AnacondaCallingGeoAlgorithm(QgsProcessingAlgorithm):
 
     def initAlgorithm(self, configuration=None):
         self.addParameter(QgsProcessingParameterRasterLayer('pathInput', 'The Input Dataset'))
-        self.addParameter(QgsProcessingParameterNumber('value','The value', QgsProcessingParameterNumber.Double, 1, False, 0.00, 999999.99))
+        self.addParameter(
+            QgsProcessingParameterNumber('value', 'The value', QgsProcessingParameterNumber.Double, 1, False, 0.00,
+                                         999999.99))
         self.addParameter(QgsProcessingParameterRasterDestination('pathOutput', 'The Output Dataset'))
 
     def processAlgorithm(self, parameters, context, feedback):
-
         assert isinstance(parameters, dict)
         assert isinstance(context, QgsProcessingContext)
         assert isinstance(feedback, QgsProcessingFeedback)
@@ -282,24 +279,20 @@ class AnacondaCallingGeoAlgorithm(QgsProcessingAlgorithm):
         return outputs
 
 
-
 if __name__ == '__main__':
-
 
     from enmapbox.testing import initQgisApplication
 
-    #this will initialize the QApplication/QgsApplication which runs in the background
-    #see https://qgis.org/api/classQgsApplication.html for details
+    # this will initialize the QApplication/QgsApplication which runs in the background
+    # see https://qgis.org/api/classQgsApplication.html for details
     qgsApp = initQgisApplication()
 
     rootAnaconda = r'C:\Users\geo_beja\AppData\Local\Continuum\miniconda3'
     AI = AnacondaEnvironmentInfo(rootAnaconda)
 
-
-    p  =QProcess()
+    p = QProcess()
 
     from enmapbox.gui.mimedata import textFromByteArray, textToByteArray
-
 
 
     def readStdOut(p):
@@ -310,6 +303,7 @@ if __name__ == '__main__':
 
         print(s)
 
+
     def readStdErr(p):
         assert isinstance(p, QProcess)
 
@@ -318,19 +312,20 @@ if __name__ == '__main__':
         import sys
         print(s, file=sys.stderr)
 
+
     pathPythonScript = os.path.join(APP_DIR, *['conda_code', 'condacodeexamples.py'])
     assert os.path.isfile(pathPythonScript)
     startScripts = [
-        #'set path=',
+        # 'set path=',
         'set pythonpath=',
         'echo change dir',
         'cd {}'.format(os.path.dirname(AI.activateScript())),
         'call activate.bat ',
         'call python -c "import sys;print(\'\\n\'.join(sys.path))"'
-        #'call python.exe {}'.format(pathPythonScript)
+        # 'call python.exe {}'.format(pathPythonScript)
 
     ]
-    pathStartScript = os.path.normpath(os.path.join(APP_DIR, *['conda_code','runconda.bat']))
+    pathStartScript = os.path.normpath(os.path.join(APP_DIR, *['conda_code', 'runconda.bat']))
 
     file = open(pathStartScript, 'w', encoding='UTF-8')
     file.write('\n'.join(startScripts))
@@ -340,19 +335,18 @@ if __name__ == '__main__':
     from subprocess import run, PIPE, Popen
 
     import subprocess
+
     r = subprocess.check_output(pathStartScript, shell=True)
     print(r.decode('ascii'))
 
-
     p.readyReadStandardError.connect(lambda p=p: readStdErr(p))
     p.readyReadStandardOutput.connect(lambda p=p: readStdOut(p))
-    p.started.connect(lambda : print('started'))
-    p.finished.connect(lambda : print('finished'))
+    p.started.connect(lambda: print('started'))
+    p.finished.connect(lambda: print('finished'))
     p.start(pathStartScript)
     assert p.startDetached(pathStartScript)
 
-
-    if True: #test GUI without EnMAP-Box
+    if True:  # test GUI without EnMAP-Box
         w = AnacondaCallingGUI()
         w.setAnacondaRoot(rootAnaconda)
         w.show()
@@ -366,5 +360,5 @@ if __name__ == '__main__':
         app = ExampleEnMAPBoxApp(EB)
         EB.addApplication(app)
 
-    #start the GUI thread
+    # start the GUI thread
     qgsApp.exec_()

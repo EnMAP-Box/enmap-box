@@ -1,21 +1,18 @@
 import pathlib
-import unittest
 import site
+import unittest
 
-from qgis.PyQt.QtWidgets import QDialogButtonBox
-from qgis.core import QgsVectorLayer, QgsProcessingRegistry, QgsProcessingAlgorithm
-
+from enmapbox import DIR_ENMAPBOX
+from enmapbox import EnMAPBox
 from enmapbox.qgispluginsupport.qps.speclib.core import profile_field_list
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibraryrasterdataprovider import registerDataProvider
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import SpectralSetting
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprocessingdialog import SpectralProcessingDialog
-from qgis.core import QgsApplication
 from enmapbox.testing import EnMAPBoxTestCase, TestObjects
-from enmapbox import EnMAPBox, EnMAPBoxApplication
-
-from enmapbox import DIR_ENMAPBOX
-from qgis.PyQt.QtWidgets import QWidget
+from qgis.PyQt.QtWidgets import QDialogButtonBox
+from qgis.core import QgsApplication
+from qgis.core import QgsVectorLayer, QgsProcessingRegistry, QgsProcessingAlgorithm
 
 site.addsitedir(pathlib.Path(DIR_ENMAPBOX) / 'coreapps')
 

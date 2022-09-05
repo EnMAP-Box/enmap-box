@@ -19,19 +19,20 @@
 ***************************************************************************
 """
 
-
 from unittest import TestCase
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtCore import *
 
+from enmapbox import EnMAPBoxApplication
 from enmapbox.testing import initQgisApplication
-from minimumexample.exampleapp import *
+from minimumexample.exampleapp import exampleAlgorithm, ExampleProcessingAlgorithm, ExampleApplicationGUI, \
+    ExampleApplication
+from qgis.core import QgsProcessingAlgorithm, QgsProcessingContext, QgsProcessingFeedback, QgsProcessingProvider
 
-#initialize the QGIS API + several background states
+# initialize the QGIS API + several background states
 APP = initQgisApplication()
 
-#set on True to show widgets and wait until a user closes them.
+# set on True to show widgets and wait until a user closes them.
 SHOW_GUI = True
+
 
 class TestExampleEnMAPBoxApp(TestCase):
 
@@ -57,11 +58,9 @@ class TestExampleEnMAPBoxApp(TestCase):
         alg2 = alg.createInstance()
         self.assertIsInstance(alg2, QgsProcessingAlgorithm)
 
-        outputs = alg.processAlgorithm({'foo':'bar'}, QgsProcessingContext(), QgsProcessingFeedback())
+        outputs = alg.processAlgorithm({'foo': 'bar'}, QgsProcessingContext(), QgsProcessingFeedback())
         self.assertIsInstance(outputs, dict)
-        self.assertTrue(outputs['args'] == ({'foo':'bar'},))
-
-
+        self.assertTrue(outputs['args'] == ({'foo': 'bar'},))
 
     def test_dialog(self):
         """
@@ -73,13 +72,12 @@ class TestExampleEnMAPBoxApp(TestCase):
         self.assertIsInstance(g.numberOfClicks(), int)
         self.assertEqual(g.numberOfClicks(), 0)
 
-        #click the button programmatically
+        # click the button programmatically
         g.btn.click()
         self.assertEqual(g.numberOfClicks(), 1)
 
         if SHOW_GUI:
             APP.exec_()
-
 
     def test_with_EnMAPBox(self):
         """
@@ -99,13 +97,12 @@ class TestExampleEnMAPBoxApp(TestCase):
         for name in ['examplealgorithm', 'examplealgorithmwithmanywidgets']:
             self.assertTrue(name in algorithmNames)
 
-
         if SHOW_GUI:
             APP.exec_()
 
 
 if __name__ == "__main__":
     import unittest
+
     SHOW_GUI = False
     unittest.main()
-

@@ -1,14 +1,13 @@
 import os
 import unittest
 
-from qgis._core import QgsField, QgsMapLayer
-from qgis.core import QgsProject, QgsVectorLayerExporter, QgsVectorLayer
-from qgis.gui import QgsEditorWidgetRegistry, QgsGui
-
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
-from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils, SpectralLibrary
+from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
+from qgis.core import QgsField, QgsMapLayer
+from qgis.core import QgsProject, QgsVectorLayerExporter, QgsVectorLayer
+from qgis.gui import QgsEditorWidgetRegistry, QgsGui
 
 
 class TestIssue724(EnMAPBoxTestCase):

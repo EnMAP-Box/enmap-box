@@ -1,18 +1,19 @@
 import datetime
-import time
 import os
 import pathlib
 import re
 import shutil
+import time
 from typing import List, Match
-from qgis.PyQt.QtCore import QDateTime
 
-from enmapbox.testing import start_app
-from osgeo import gdal, ogr
+from osgeo import gdal
+
 from enmapbox.qgispluginsupport.qps.utils import file_search
-from qgis._core import QgsCoordinateTransform, QgsFeatureRequest, Qgis
-from qgis.core import QgsVectorLayer, QgsFeature, QgsPointXY, QgsGeometry, QgsCoordinateReferenceSystem, \
-    QgsVectorFileWriter, QgsCoordinateTransformContext
+from enmapbox.testing import start_app
+from qgis.PyQt.QtCore import QDateTime
+from qgis.core import QgsCoordinateTransform, QgsFeatureRequest, Qgis
+from qgis.core import QgsVectorLayer, QgsFeature, QgsPointXY, QgsGeometry, QgsVectorFileWriter, \
+    QgsCoordinateTransformContext
 
 app = start_app()
 
@@ -48,7 +49,6 @@ uri = "point?crs=epsg:4326&" \
       "field=mirror:string(1)&" \
       "field=path_rel:string&" \
       "index=yes"
-
 
 lyr = QgsVectorLayer(uri, 'GPS Locations', 'memory')
 lyr.startEditing()
@@ -133,13 +133,15 @@ for i, file in enumerate(candidate_images):
     if not (isinstance(exif_lat, Match) and isinstance(exif_lon, Match)):
         raise Exception('Unable to extract degrees, seconds and minutes')
 
-    exif_lat = float(exif_lat.group('deg')) + \
-               float(exif_lat.group('min')) / 60 + \
-               float(exif_lat.group('sec')) / 3600
+    exif_lat = \
+        float(exif_lat.group('deg')) + \
+        float(exif_lat.group('min')) / 60 + \
+        float(exif_lat.group('sec')) / 3600
 
-    exif_lon = float(exif_lon.group('deg')) + \
-               float(exif_lon.group('min')) / 60 + \
-               float(exif_lon.group('sec')) / 3600
+    exif_lon = \
+        float(exif_lon.group('deg')) + \
+        float(exif_lon.group('min')) / 60 + \
+        float(exif_lon.group('sec')) / 3600
 
     image_id = (exif_datetime, exif_lon, exif_lat)
 
@@ -223,8 +225,8 @@ assert lyr.commitChanges()
 print(f'Write memory layer to {PATH_VECTOR}')
 ogrDataSourceOptions = []
 ogrLayerOptions = [
-    f'IDENTIFIER=Pictures',
-    f'DESCRIPTION=Picture coordinates']
+    'IDENTIFIER=Pictures',
+    'DESCRIPTION=Picture coordinates']
 
 options = QgsVectorFileWriter.SaveVectorOptions()
 options.actionOnExistingFile = QgsVectorFileWriter.ActionOnExistingFile.CreateOrOverwriteFile

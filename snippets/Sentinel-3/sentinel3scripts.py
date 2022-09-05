@@ -1,19 +1,21 @@
-############ CONFIG SECTION ################
+import os
+import pathlib
+import re
+from osgeo import gdal
+from qgis.core import QgsApplication
 
+#  ########### CONFIG SECTION ################
 # Ordner mit entpacken Sentinel-3 L1 Datensätzen:
 dirS3_L1 = r'D:\Temp\Sentinel-3\S3A_OL_1_EFR____20201008T234915_20201008T235215_20201010T044927_0179_063_344_1980_LN1_O_NT_002.SEN3'
 
-#############################################
-from osgeo import gdal
-import pathlib, re, os, datetime, sys
+#  ############################################
+
 dirS3_L1 = pathlib.Path(dirS3_L1)
 assert dirS3_L1.is_dir(), f'Ordner existiert nicht: {dirS3_L1}'
-
 
 pathXML = dirS3_L1 / 'geo_coordinates.nc'
 
 ds = gdal.Open(pathXML.as_posix())
-
 
 # wavelength:
 S3_OLCI_Wavelengths = [
@@ -24,16 +26,13 @@ regex = re.compile(r'\d{2}_radiance\.nc$')
 radiance_bands = [p.path for p in os.scandir(dirS3_L1) if regex.search(p.name)]
 radiance_bands = sorted(radiance_bands)
 
-
-
 pathVRT = dirS3_L1 / 'all_radiance_bands.vrt'
 options = gdal.BuildVRTOptions(separate=True)
 dsVRT: gdal.Dataset = gdal.BuildVRT(pathVRT.as_posix(), radiance_bands, options=options)
 
-
 assert dsVRT.RasterCount == len(S3_OLCI_Wavelengths)
 
-dsVRT.SetGeoTransform([0.0, 1.0, 0.0, float(dsVRT.RasterYSize), 0.0, -1.0]) # let the image look north-up
+dsVRT.SetGeoTransform([0.0, 1.0, 0.0, float(dsVRT.RasterYSize), 0.0, -1.0])  # let the image look north-up
 dsVRT.SetMetadataItem('wavelength', ','.join([f'{v}' for v in S3_OLCI_Wavelengths]))
 dsVRT.SetMetadataItem('wavelength units', 'nm')
 
@@ -43,11 +42,9 @@ for b, path in enumerate(radiance_bands):
 
 dsVRT.FlushCache()
 
-try:
+if QgsApplication.instance():
     # open in QGIS
     from qgis.core import QgsProject, QgsRasterLayer
+
     lyr = QgsRasterLayer(pathVRT.as_posix(), pathVRT.name)
     QgsProject.instance().addMapLayer(lyr)
-except:
-    pass
-

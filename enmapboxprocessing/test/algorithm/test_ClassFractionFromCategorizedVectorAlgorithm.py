@@ -1,15 +1,12 @@
 import numpy as np
-from qgis._core import QgsRasterLayer, QgsVectorLayer, QgsPalettedRasterRenderer
+from enmapboxtestdata import (landcover_polygons_3classes_id)
 
 from enmapbox.exampledata import enmap, landcover_polygons
 from enmapboxprocessing.algorithm.classfractionfromcategorizedvectoralgorithm import \
     ClassFractionFromCategorizedVectorAlgorithm
-from enmapboxprocessing.algorithm.rasterizecategorizedvectoralgorithm import RasterizeCategorizedVectorAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import (landcover_polygons_3classes_epsg4326, landcover_polygons_3classes_id,
-                              landcover_points_multipart_epsg3035)
+from qgis.core import QgsRasterLayer, QgsVectorLayer
 
 
 class TestClassFractionFromCategorizedVectorAlgorithm(TestCase):
@@ -58,4 +55,3 @@ class TestClassFractionFromCategorizedVectorAlgorithm(TestCase):
             [reader.bandName(bandNo) for bandNo in reader.bandNumbers()]
         )
         self.assertAlmostEqual(247.589, np.mean(reader.array()), 3)
-

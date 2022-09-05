@@ -3,11 +3,14 @@ from PyQt5.QtWidgets import QApplication
 from enmapbox.testing import TestObjects, start_app
 from qgis._gui import QgsMapCanvas
 from qgis.core import QgsProject
+
 app = start_app()
 lyr = TestObjects.createRasterLayer()
 
+
 def onWillBeDeleted():
     print('Warning: Will be deleted')
+
 
 lyr.willBeDeleted.connect(onWillBeDeleted)
 
@@ -20,7 +23,6 @@ B.setTitle('P2')
 c = QgsMapCanvas()
 c.setLayers([lyr])
 c.zoomToFullExtent()
-
 
 assert lyr.project() is None
 A.addMapLayer(lyr, False)
@@ -50,5 +52,3 @@ c.show()
 QApplication.processEvents()
 app.exec_()
 print('Done')
-
-

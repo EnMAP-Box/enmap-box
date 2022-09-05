@@ -3,15 +3,16 @@
 __author__ = 'benjamin.jakimow@geo.hu-berlin.de'
 
 import unittest
-from qgis import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+import os
 from enmapbox.testing import initQgisApplication
+from examplecondaapp.exampleapp import AnacondaEnvironmentInfo
+
 QGIS_APP = initQgisApplication()
 
 ANACONDA_ROOT = r'C:\Users\geo_beja\AppData\Local\Continuum\miniconda3'
-assert os.path.isdir(ANACONDA_ROOT), 'This test required to specify a locan Anaconda Environment'
-from examplecondaapp.exampleapp import AnacondaEnvironmentInfo
+assert os.path.isdir(ANACONDA_ROOT), 'This test requires to specify a local Anaconda Environment'
+
+
 class AnacondaEnvironmentInfoTests(unittest.TestCase):
 
     def test_initialisation(self):
@@ -26,6 +27,3 @@ class AnacondaEnvironmentInfoTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-
-

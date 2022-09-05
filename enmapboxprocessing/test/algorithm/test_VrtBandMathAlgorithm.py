@@ -32,4 +32,3 @@ class TestVrtBandMathAlgorithm(TestCase):
 
     def test_overlap(self):
         pass  # todo
-

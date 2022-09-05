@@ -23,18 +23,17 @@
 
 # imports
 import unittest
-from qgis.core import *
-from qgis.gui import *
-from qgis.PyQt.QtWidgets import *
-from qgis.PyQt.QtGui import *
 
-# create a QgsApplication instance which emulate the QGIS Desktop Application
-from enmapbox.testing import initQgisApplication
-qgsApp = initQgisApplication()
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QMainWindow, QTextEdit, QToolBar, QAction
+from qgis.core import QgsFeature, QgsRasterLayer, QgsCoordinateReferenceSystem, QgsPointXY, QgsRectangle
+from qgis.gui import QgsMapCanvas
+from enmapbox.testing import start_app
+
+qgsApp = start_app()
 
 
 class Examples(unittest.TestCase):
-
 
     def test_Ex1_StartEnMAPBox(self):
 
@@ -57,7 +56,6 @@ class Examples(unittest.TestCase):
 
         qgsApp.exec_()
 
-
     def test_Ex2_DataSources(self):
 
         from enmapbox import EnMAPBox
@@ -68,9 +66,7 @@ class Examples(unittest.TestCase):
         # add some data sources
         from enmapbox.exampledata import enmap as pathRasterSource
         from enmapbox.exampledata import landcover_polygons as pathVectorSource
-        from enmapbox.exampledata import library as pathSpectralLibrary
-
-
+        from enmapbox.exampledata import library_sli as pathSpectralLibrary
 
         # add a single source
         enmapBox.addSource(pathRasterSource)
@@ -84,18 +80,16 @@ class Examples(unittest.TestCase):
         enmapBox.addSource(wmsUri, name="Open Street Map")
         enmapBox.addSource(wfsUri, name='Berlin PLZ')
 
-
         # be informed over new data sources
-        def onDataSourceAdded(dataSource:str):
+        def onDataSourceAdded(dataSource: str):
             print('DataSource added: {}'.format(dataSource))
 
         enmapBox.sigDataSourcesAdded.connect(onDataSourceAdded)
 
-        def onDataSourceRemoved(dataSource:str):
+        def onDataSourceRemoved(dataSource: str):
             print('DataSource removed: {}'.format(dataSource))
+
         enmapBox.sigDataSourcesRemoved.connect(onDataSourceRemoved)
-
-
 
         # print all sources
         for source in enmapBox.dataSources():
@@ -105,13 +99,11 @@ class Examples(unittest.TestCase):
         for source in enmapBox.dataSources('RASTER'):
             print(source)
 
-
         # remove all data sources
         allSources = enmapBox.dataSources()
         enmapBox.removeSources(allSources)
 
         # pro tip: access the DataSource objects directly
-
 
         qgsApp.exec_()
 
@@ -130,11 +122,10 @@ class Examples(unittest.TestCase):
 
     def test_Ex2_DataSource_Versions(self):
 
-
         from enmapbox import EnMAPBox
 
         enmapBox = EnMAPBox(None)
-        enmapBox.sigDataSourcesAdded.connect(lambda uri:print('DataSource added: {}'.format(uri)))
+        enmapBox.sigDataSourcesAdded.connect(lambda uri: print('DataSource added: {}'.format(uri)))
         enmapBox.sigDataSourcesRemoved.connect(lambda uri: print('DataSource removed: {}'.format(uri)))
 
         import tempfile, os, time
@@ -157,9 +148,6 @@ class Examples(unittest.TestCase):
         enmapBox.addSource(pathFile)
         assert len(enmapBox.dataSources()) == 1
 
-
-
-
     def test_Ex3_Docks(self):
         """
         Add new dock windows to view data
@@ -167,12 +155,10 @@ class Examples(unittest.TestCase):
         from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapBox = EnMAPBox(None)
 
-        #enmapBox.createDock('MAP')  # a spatial map
-        #enmapBox.createDock('SPECLIB') # a spectral library
-        #enmapBox.createDock('TEXT') # a text editor
-        #enmapBox.createDock('MIME') # a window to drop mime data
-
-
+        # enmapBox.createDock('MAP')  # a spatial map
+        # enmapBox.createDock('SPECLIB') # a spectral library
+        # enmapBox.createDock('TEXT') # a text editor
+        # enmapBox.createDock('MIME') # a window to drop mime data
 
         # modify dock properties
         mapDock1 = enmapBox.createDock('MAP')  # two spatial maps
@@ -186,7 +172,6 @@ class Examples(unittest.TestCase):
 
         mapDock2.float()
         mapDock3.setVisible(False)
-
 
         # list all docks
         from enmapbox.gui.dataviews.docks import Dock
@@ -206,42 +191,37 @@ class Examples(unittest.TestCase):
 
         qgsApp.exec_()
 
-
     def test_Ex4_MapTools(self):
 
         from enmapbox import EnMAPBox
         enmapBox = EnMAPBox(None)
-        enmapBox.loadExampleData() # this opens a map dock as well
+        enmapBox.loadExampleData()  # this opens a map dock as well
 
         from enmapbox.gui import MapTools, SpatialPoint, SpectralProfile
 
-        def printLocation(spatialPoint:SpatialPoint):
+        def printLocation(spatialPoint: SpatialPoint):
             print('Mouse clicked on {}'.format(spatialPoint))
 
         enmapBox.sigCurrentLocationChanged.connect(printLocation)
         enmapBox.setMapTool(MapTools.CursorLocation)
 
-        def printLocationAndCanvas(spatialPoint: SpatialPoint, canvas:QgsMapCanvas):
+        def printLocationAndCanvas(spatialPoint: SpatialPoint, canvas: QgsMapCanvas):
             print('Mouse clicked on {} in {}'.format(spatialPoint, canvas))
 
         enmapBox.sigCurrentLocationChanged[SpatialPoint, QgsMapCanvas].connect(printLocationAndCanvas)
 
-
-        def printSpectralProfiles(currentSpectra:list):
-
+        def printSpectralProfiles(currentSpectra: list):
             print('{} SpectralProfiles collected'.format(len(currentSpectra)))
             for i, p in enumerate(currentSpectra):
                 assert isinstance(p, QgsFeature)
                 p = SpectralProfile.fromSpecLibFeature(p)
                 assert isinstance(p, SpectralProfile)
-                print('{}: {}'.format(i+1, p.values()['y']))
+                print('{}: {}'.format(i + 1, p.values()['y']))
 
         enmapBox.sigCurrentSpectraChanged.connect(printSpectralProfiles)
 
         print('Last location: {}'.format(enmapBox.currentLocation()))
         print('Last SpectralProfile: {}'.format(enmapBox.currentSpectra()))
-
-
 
         lastPosition = enmapBox.currentLocation()
 
@@ -255,10 +235,9 @@ class Examples(unittest.TestCase):
 
         from enmapbox.gui import SpectralProfile
 
-
         class MyApp(QMainWindow):
 
-            def __init__(self, enmapbox:EnMAPBox, *args, **kwds):
+            def __init__(self, enmapbox: EnMAPBox, *args, **kwds):
                 super(MyApp, self).__init__(*args, **kwds)
                 self.setWindowTitle('My Application Window')
 
@@ -278,7 +257,6 @@ class Examples(unittest.TestCase):
                 self.mActionGetProfiles.setText('Click to collect spectral profile from the EnMAP-Box')
                 self.mActionGetProfiles.triggered.connect(self.onActivateProfileCollection)
                 self.mToolBar.addAction(self.mActionGetProfiles)
-
 
             def onActivateProfileCollection(self):
 
@@ -300,7 +278,6 @@ class Examples(unittest.TestCase):
         myApp.show()
 
         qgsApp.exec_()
-
 
     def test_Ex5_PointsAndExtents(self):
 
@@ -333,8 +310,5 @@ class Examples(unittest.TestCase):
         print('SpatialExtent: {}\n'.format(extentTargetCRS))
 
 
-
 if __name__ == "__main__":
     unittest.main()
-
-

@@ -1,9 +1,11 @@
 # describes a Test Case for https://github.com/qgis/QGIS/issues/48598
-
+import pathlib
 from qgis.core import QgsProcessingContext, QgsProcessingParameterFile, QgsProcessingUtils
 from qgis.testing import start_app
+
 app = start_app()
-import pathlib
+
+
 context = QgsProcessingContext()
 parameter = QgsProcessingParameterFile('file', fileFilter='Any file (*.*)')
 path = QgsProcessingUtils.generateTempFilename('tempfile.txt')
@@ -14,4 +16,3 @@ assert parameter.checkValueIsAcceptable(path, context)
 print(f'asString={parameter.valueAsString(path, context)}')
 print(f'asPythonString={parameter.valueAsPythonString(path, context)}')
 print(f'asJsonObject={parameter.valueAsJsonObject(path, context)}')
-

@@ -7,6 +7,9 @@
 # required to build the EnMAP-Box
 gitpython
 
+# clean code
+flake8-qgis
+
 # required to build the documentation
 
 recommonmark
@@ -19,6 +22,7 @@ docutils
 coverage
 xmlrunner
 urlchecker
+
 
 # optionals
 git-lfs

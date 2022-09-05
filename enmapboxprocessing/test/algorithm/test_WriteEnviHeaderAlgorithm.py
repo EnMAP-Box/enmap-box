@@ -22,7 +22,7 @@ class TestWriteEnviHeaderAlgorithm(TestCase):
 
         writer.setMetadata(reader.metadata())
         for i in range(ds1.RasterCount):
-            writer.setMetadata(reader.metadata(i+1), i+1)
+            writer.setMetadata(reader.metadata(i + 1), i + 1)
         del ds1, ds2, reader, writer
 
         alg = WriteEnviHeaderAlgorithm()
