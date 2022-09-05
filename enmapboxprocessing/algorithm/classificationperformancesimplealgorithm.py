@@ -1,7 +1,7 @@
 import webbrowser
 from typing import Dict, Any, List, Tuple
 
-from qgis._core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer
+from qgis._core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsMapLayer
 
 from enmapboxprocessing.algorithm.classificationperformancestratifiedalgorithm import \
     ClassificationPerformanceStratifiedAlgorithm
@@ -74,7 +74,7 @@ class ClassificationPerformanceSimpleAlgorithm(EnMAPProcessingAlgorithm):
             categories = [Category(1, 'Stratum 1', '#FF0000')]
             renderer = Utils.palettedRasterRendererFromCategories(stratification.dataProvider(), 1, categories)
             stratification.setRenderer(renderer)
-            stratification.saveDefaultStyle()
+            stratification.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
 
             # run stratified version
             alg = ClassificationPerformanceStratifiedAlgorithm()

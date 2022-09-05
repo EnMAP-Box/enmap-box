@@ -4,7 +4,8 @@ from PyQt5.QtCore import QVariant
 from osgeo import gdal
 from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsRectangle,
                         QgsCoordinateReferenceSystem, QgsVectorFileWriter,
-                        QgsProject, QgsField, QgsCoordinateTransform, QgsRasterLayer, QgsProcessingException)
+                        QgsProject, QgsField, QgsCoordinateTransform, QgsRasterLayer, QgsProcessingException,
+                        QgsMapLayer)
 
 import processing
 from enmapboxprocessing.algorithm.creategridalgorithm import CreateGridAlgorithm
@@ -175,7 +176,7 @@ class RasterizeCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
             categories = [Category(value, label, color) for value, (label, color) in enumerate(zip(names, colors), 1)]
             renderer = Utils.palettedRasterRendererFromCategories(layer.dataProvider(), 1, categories)
             layer.setRenderer(renderer)
-            message, success = layer.saveDefaultStyle()
+            message, success = layer.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
             if not success:
                 raise QgsProcessingException(message)
 

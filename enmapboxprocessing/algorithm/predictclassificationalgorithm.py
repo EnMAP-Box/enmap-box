@@ -9,7 +9,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
 from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer,
-                        QgsProcessingException)
+                        QgsProcessingException, QgsMapLayer)
 from typeguard import typechecked
 
 
@@ -106,7 +106,7 @@ class PredictClassificationAlgorithm(EnMAPProcessingAlgorithm):
             outraster = QgsRasterLayer(filename)
             renderer = Utils.palettedRasterRendererFromCategories(outraster.dataProvider(), 1, dump.categories)
             outraster.setRenderer(renderer)
-            outraster.saveDefaultStyle()
+            outraster.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
 
             result = {self.P_OUTPUT_CLASSIFICATION: filename}
             self.toc(feedback, result)

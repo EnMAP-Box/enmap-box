@@ -11,7 +11,7 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
-from qgis._core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, Qgis
+from qgis._core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, Qgis, QgsMapLayer
 from typeguard import typechecked
 
 
@@ -77,7 +77,7 @@ class ClassificationFromClassProbabilityAlgorithm(EnMAPProcessingAlgorithm):
             outraster = QgsRasterLayer(filename)
             renderer = Utils.palettedRasterRendererFromCategories(outraster.dataProvider(), 1, categories)
             outraster.setRenderer(renderer)
-            outraster.saveDefaultStyle()
+            outraster.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
 
             result = {self.P_OUTPUT_CLASSIFICATION: filename}
             self.toc(feedback, result)

@@ -12,7 +12,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
+from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsMapLayer)
 from typeguard import typechecked
 
 
@@ -353,7 +353,7 @@ class ImportPrismaL1Algorithm(EnMAPProcessingAlgorithm):
         ]
         renderer = Utils.palettedRasterRendererFromCategories(reader.provider, 1, categories)
         reader.layer.setRenderer(renderer)
-        reader.layer.saveDefaultStyle()
+        reader.layer.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
 
     def writeLandCoverMask(self, filenameLandCoverMask, he5Filename):
         if filenameLandCoverMask is None:
@@ -379,7 +379,7 @@ class ImportPrismaL1Algorithm(EnMAPProcessingAlgorithm):
         ]
         renderer = Utils.palettedRasterRendererFromCategories(reader.provider, 1, categories)
         reader.layer.setRenderer(renderer)
-        reader.layer.saveDefaultStyle()
+        reader.layer.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
 
     def writeSinGlintMask(self, filenameSunGlintMask, he5Filename):
         if filenameSunGlintMask is None:
@@ -401,7 +401,7 @@ class ImportPrismaL1Algorithm(EnMAPProcessingAlgorithm):
         ]
         renderer = Utils.palettedRasterRendererFromCategories(reader.provider, 1, categories)
         reader.layer.setRenderer(renderer)
-        reader.layer.saveDefaultStyle()
+        reader.layer.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
 
 
 def utilsReadAsArray(dataset: gdal.Dataset, filename, key: str, feedback: QgsProcessingFeedback):

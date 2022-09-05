@@ -176,7 +176,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             result = self.runAlg('native:savefeatures', parameters, None, feedback, context, True)
             layer = QgsVectorLayer(result['OUTPUT'], layer.name())
             layer.setRenderer(renderer)
-            layer.saveDefaultStyle()
+            layer.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
 
         # if parameter is given as filename, we need to manually load the default style
         if isinstance(parameters.get(name), str) or layer.renderer() is None:

@@ -1,6 +1,6 @@
 from typing import Dict, Any, List, Tuple
 
-from qgis._core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer
+from qgis._core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsMapLayer
 
 from enmapboxprocessing.algorithm.randompointsfromcategorizedrasteralgorithm import \
     RandomPointsFromCategorizedRasterAlgorithm
@@ -77,7 +77,7 @@ class RandomPointsFromMaskRasterAlgorithm(EnMAPProcessingAlgorithm):
             categories = [Category(1, 'mask', '#FF0000')]
             renderer = Utils.palettedRasterRendererFromCategories(stratification.dataProvider(), 1, categories)
             stratification.setRenderer(renderer)
-            stratification.saveDefaultStyle()
+            stratification.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
 
             # draw ponts
             alg = RandomPointsFromCategorizedRasterAlgorithm()

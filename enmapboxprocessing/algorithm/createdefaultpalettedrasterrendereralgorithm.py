@@ -4,7 +4,7 @@ import numpy as np
 from osgeo import gdal
 from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessing,
                         QgsProcessingException, QgsPalettedRasterRenderer, QgsProcessingParameterColor,
-                        QgsProcessingParameterLimitedDataTypes)
+                        QgsProcessingParameterLimitedDataTypes, QgsMapLayer)
 
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.driver import Driver
@@ -64,7 +64,7 @@ class CreateDefaultPalettedRasterRendererAlgorithm(EnMAPProcessingAlgorithm):
 
             renderer = Utils.palettedRasterRendererFromCategories(raster.dataProvider(), band, categories)
             raster.setRenderer(renderer)
-            raster.saveDefaultStyle()
+            raster.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
 
             result = {}
             self.toc(feedback, result)
