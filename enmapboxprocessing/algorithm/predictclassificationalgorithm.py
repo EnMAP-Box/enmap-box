@@ -98,6 +98,11 @@ class PredictClassificationAlgorithm(EnMAPProcessingAlgorithm):
                 for a in arrayX:
                     X.append(a[valid])
                 y = dump.classifier.predict(np.transpose(X))
+
+                # classifier may return 2d array (e.g. CatBoostClassifier) -> need to flatten data
+                if y.ndim == 2 and y.shape[1] == 1:
+                    y = y.flatten()
+
                 arrayY = np.zeros_like(valid, Utils.qgisDataTypeToNumpyDataType(dataType))
                 arrayY[valid] = y
                 writer.writeArray2d(arrayY, 1, xOffset=block.xOffset, yOffset=block.yOffset)
