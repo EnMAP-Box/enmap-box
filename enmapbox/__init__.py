@@ -55,9 +55,9 @@ ISSUE_TRACKER = 'https://github.com/EnMAP-Box/enmap-box/issues'
 CREATE_ISSUE = 'https://github.com/EnMAP-Box/enmap-box/issues/new'
 DEPENDENCIES = ['numpy', 'scipy', 'osgeo.gdal', 'PyQt5', 'sklearn', 'matplotlib']
 DOCUMENTATION = 'https://enmap-box.readthedocs.io/'
-URL_TESTDATA = fr'https://bitbucket.org/hu-geomatics/enmap-box/downloads/exampledata.{__version_exampledata__}.zip'
+URL_TESTDATA = fr'https://github.com/hu-geomatics/enmap-box/downloads/exampledata.{__version_exampledata__}.zip'
 URL_INSTALLATION = r'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html#install-required-python-packages'
-URL_QGIS_RESOURCES = r'https://bitbucket.org/hu-geomatics/enmap-box/downloads/qgisresources.zip'
+URL_QGIS_RESOURCES = r'https://github.com/hu-geomatics/enmap-box/downloads/qgisresources.zip'
 
 MIN_VERSION_QGIS = '3.24'
 

@@ -135,7 +135,7 @@ class EnMAPBoxProcessingProvider(QgsProcessingProvider):
         return ID
 
     def helpid(self) -> str:
-        return 'https://bitbucket.org/hu-geomatics/enmap-box/wiki/Home'
+        return 'https://github.com/hu-geomatics/enmap-box/wiki/Home'
 
     def icon(self) -> QIcon:
         """

@@ -5,7 +5,7 @@
     vrtbuilderapp
 
     An EnMAP-Box Application to start the Virtual Raster Builder QGIS Plugin
-    see https://bitbucket.org/jakimowb/virtual-raster-builder for details
+    see https://github.com/jakimowb/virtual-raster-builder for details
     ---------------------
     Date                 : October 2017
     Copyright            : (C) 2017 by Benjamin Jakimow

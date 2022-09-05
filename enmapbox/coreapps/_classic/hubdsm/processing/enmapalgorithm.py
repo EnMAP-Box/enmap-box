@@ -117,7 +117,7 @@ class EnMAPAlgorithm(QgisAlgorithm):
         return self.shortHelpString()
 
     def helpUrl(self, *args, **kwargs):
-        return 'https://bitbucket.org/hu-geomatics/enmap-box-geoalgorithmsprovider/overview'
+        return 'https://github.com/hu-geomatics/enmap-box-geoalgorithmsprovider/overview'
 
     def checkParameterValues(self, parameters: Dict, context: QgsProcessingContext):
         ok, msg = super().checkParameterValues(parameters, context)

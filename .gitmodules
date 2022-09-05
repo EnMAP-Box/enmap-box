@@ -5,7 +5,7 @@
 	branch = master
 [submodule "enmapbox/apps/lmuapps"]
 	path = enmapbox/apps/lmuapps
-	url = https://bitbucket.org/ecstagriculture/enmap-box-lmu-vegetation-apps.git
-    pushurl = git@bitbucket.org:ecstagriculture/enmap-box-lmu-vegetation-apps.git
+	url = https://github.com/ecstagriculture/enmap-box-lmu-vegetation-apps.git
+    pushurl = git@github.com:ecstagriculture/enmap-box-lmu-vegetation-apps.git
     branch = master
 
