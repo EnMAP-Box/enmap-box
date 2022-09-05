@@ -240,7 +240,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
             return
 
         layer: QgsRasterLayer = self.mLayer.currentLayer()
-        if not isinstance(layer, QgsRasterLayer):
+        if not isinstance(layer, QgsRasterLayer) or layer.dataProvider().name() in ['wms']:
             self.disableGui()
             return
 
