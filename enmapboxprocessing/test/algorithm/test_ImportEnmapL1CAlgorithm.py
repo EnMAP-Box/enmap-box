@@ -8,7 +8,7 @@ from enmapboxprocessing.test.algorithm.testcase import TestCase
 class TestImportEnmapL1CAlgorithm(TestCase):
 
     def test(self):
-        if not self.sensorProductsFolderExists():
+        if not self.additionalDataFolderExists():
             return
 
         alg = ImportEnmapL1CAlgorithm()

@@ -9,7 +9,7 @@ from enmapboxprocessing.test.algorithm.testcase import TestCase
 class TestImportPrismaL2DAlgorithm(TestCase):
 
     def test(self):
-        if not self.sensorProductsFolderExists():
+        if not self.additionalDataFolderExists():
             return
 
         alg = ImportPrismaL2DAlgorithm()
@@ -48,7 +48,7 @@ class TestImportPrismaL2DAlgorithm(TestCase):
         self.assertAlmostEqual(0.003, np.mean(RasterReader(result[alg.P_OUTPUT_PAN_ERROR]).array()), 3)
 
     def test_badBandThresholding1(self):
-        if not self.sensorProductsFolderExists():
+        if not self.additionalDataFolderExists():
             return
 
         alg = ImportPrismaL2DAlgorithm()
@@ -65,7 +65,7 @@ class TestImportPrismaL2DAlgorithm(TestCase):
         self.assertEqual(215, sum(bbl))
 
     def test_badBandThresholding2(self):
-        if not self.sensorProductsFolderExists():
+        if not self.additionalDataFolderExists():
             return
 
         alg = ImportPrismaL2DAlgorithm()
@@ -83,7 +83,7 @@ class TestImportPrismaL2DAlgorithm(TestCase):
         self.assertEqual(212, sum(bbl))
 
     def test_issue1318(self):
-        if not self.sensorProductsFolderExists():
+        if not self.additionalDataFolderExists():
             return
 
         alg = ImportPrismaL2DAlgorithm()

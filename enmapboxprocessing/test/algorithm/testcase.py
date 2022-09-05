@@ -34,5 +34,5 @@ class TestCase(unittest.TestCase):
         import enmapbox
         return join(dirname(dirname(enmapbox.__file__)), 'test-outputs', basename)
 
-    def sensorProductsFolderExists(self):
-        return exists(r'D:\data\sensors')
+    def additionalDataFolderExists(self):
+        return exists(r'D:\data')
