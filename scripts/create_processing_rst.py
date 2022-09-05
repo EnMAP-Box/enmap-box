@@ -11,17 +11,26 @@ from enmapboxprocessing.algorithm.algorithms import algorithms
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.glossary import injectGlossaryLinks
 
+import enmapbox
+import enmapboxdocumentation
+
 dryRun = False  # a fast way to check if all parameters are documented
 
 def generateRST():
-    # create folder
-    root = abspath(join(dirname(__file__), '..', 'doc', 'source', 'usr_section', 'usr_manual', 'processing_algorithms'))
-    print(root)
 
-    if exists(root):
+    # create folder
+    rootCodeRepo = abspath(join(dirname(enmapbox.__file__), '..'))
+    rootDocRepo = abspath(join(dirname(enmapboxdocumentation.__file__), '..'))
+    print(rootCodeRepo)
+    print(rootDocRepo)
+
+    rootRst = join(rootDocRepo, 'source', 'usr_section', 'usr_manual', 'processing_algorithms')
+    print(rootRst)
+
+    if exists(rootRst):
         print('Delete root folder')
-        rmtree(root)
-    makedirs(root)
+        rmtree(rootRst)
+    makedirs(rootRst)
 
     groups = dict()
 
@@ -54,7 +63,7 @@ def generateRST():
         groupId = gkey.lower()
         for c in ' ,*':
             groupId = groupId.replace(c, '_')
-        groupFolder = join(root, groupId)
+        groupFolder = join(rootRst, groupId)
         makedirs(groupFolder)
 
         textProcessingAlgorithmsRst += '\n    {}/index.rst'.format(basename(groupFolder))
@@ -103,7 +112,7 @@ def generateRST():
             with open(filename, mode='w', encoding='utf-8') as f:
                 f.write(text)
 
-    filename = join(root, 'processing_algorithms.rst')
+    filename = join(rootRst, 'processing_algorithms.rst')
     with open(filename, mode='w', encoding='utf-8') as f:
         f.write(textProcessingAlgorithmsRst)
     print('created RST file: ', filename)
