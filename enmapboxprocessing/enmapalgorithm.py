@@ -19,7 +19,7 @@ from qgis._core import (QgsProcessingAlgorithm, QgsProcessingParameterRasterLaye
                         QgsProcessingParameterFileDestination, QgsProcessingParameterFile, QgsProcessingParameterRange,
                         QgsProcessingParameterCrs, QgsProcessingParameterVectorDestination, QgsProcessing,
                         QgsProcessingUtils, QgsProcessingParameterMultipleLayers, QgsProcessingException,
-                        QgsProcessingParameterFolderDestination)
+                        QgsProcessingParameterFolderDestination, QgsProject)
 
 import processing
 from enmapboxprocessing.glossary import injectGlossaryLinks
@@ -164,6 +164,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext, convertFromMemoryToOgr=False
     ) -> Optional[QgsVectorLayer]:
         layer = super().parameterAsVectorLayer(parameters, name, context)
+
         if layer is None:
             return None
 
@@ -177,9 +178,12 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             layer.setRenderer(renderer)
             layer.saveDefaultStyle()
 
-        # if layer is given by URI string or renderer is undefined, we need to manually load the default style
+        # if parameter is given as filename, we need to manually load the default style
         if isinstance(parameters.get(name), str) or layer.renderer() is None:
-            layer.loadDefaultStyle()
+            if QgsProject.instance().mapLayer(parameters.get(name)) is not None:
+                pass  # do nothing in case of a valid layer ID
+            else:
+                layer.loadDefaultStyle()
 
         return layer
 

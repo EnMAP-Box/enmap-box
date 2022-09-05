@@ -87,8 +87,8 @@ class TestRasterMetadataReader(TestCase):
         self.assertEqual(QDateTime(1984, 3, 1, 0, 0), reader.startTime(1))
         self.assertEqual(QDateTime(1984, 3, 1, 0, 0), reader.centerTime(1))
 
-        # this may return None or NaN instead of a crash
-        # reader.wavelength(1)
+        self.assertIsNone(reader.wavelength(1))
+        self.assertIsNone(reader.wavelengthUnits(1))
 
 
 class TestQgisPam(TestCase):
