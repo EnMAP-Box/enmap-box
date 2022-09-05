@@ -113,15 +113,25 @@ class ConvexHullAlgorithm(EnMAPProcessingAlgorithm):
                             arrayConvexHull[:, yi, xi] = convexHullValues
                             arrayContinuumRemoved[:, yi, xi] = continuumRemovedValues
 
-                writerConvexHull.writeArray(arrayConvexHull, xOffset=block.xOffset, yOffset=block.yOffset)
-                writerContinuumRemoved.writeArray(arrayContinuumRemoved, xOffset=block.xOffset, yOffset=block.yOffset)
+                if filenameConvexHull is not None:
+                    writerConvexHull.writeArray(arrayConvexHull, xOffset=block.xOffset, yOffset=block.yOffset)
+                if filenameContinuumRemoved is not None:
+                    writerContinuumRemoved.writeArray(
+                        arrayContinuumRemoved, xOffset=block.xOffset, yOffset=block.yOffset
+                    )
 
             for i, bandNo in enumerate(bandList):
                 bandName = reader.bandName(bandNo)
                 wavelength = reader.wavelength(bandNo)
-                for writer in [writerConvexHull, writerContinuumRemoved]:
-                    writer.setBandName(bandName, i + 1)
-                    writer.setWavelength(wavelength, i + 1)
+                fwhm = reader.fwhm(bandNo)
+                if filenameConvexHull is not None:
+                    writerConvexHull.setBandName(bandName, i + 1)
+                    writerConvexHull.setWavelength(wavelength, i + 1)
+                    writerConvexHull.setFwhm(fwhm, i + 1)
+                if filenameContinuumRemoved is not None:
+                    writerContinuumRemoved.setBandName(bandName, i + 1)
+                    writerContinuumRemoved.setWavelength(wavelength, i + 1)
+                    writerContinuumRemoved.setFwhm(fwhm, i + 1)
 
             self.toc(feedback, result)
 
