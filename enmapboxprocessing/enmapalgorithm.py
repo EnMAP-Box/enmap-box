@@ -63,7 +63,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     DefaultGTiffCreationOptions = Driver.DefaultGTiffCreationOptions
     DefaultGTiffCreationProfile = GTiffFormat + ' ' + ' '.join(DefaultGTiffCreationOptions)
     EnviFormat = Driver.EnviFormat
-    DefaultEnviCreationOptions = Driver.DefaultEnviCreationOptions
+    DefaultEnviCreationOptions = Driver.DefaultEnviBsqCreationOptions
     DefaultEnviCreationProfile = EnviFormat + ' ' + ' '.join(DefaultEnviCreationOptions)
 
     def icon(self):
