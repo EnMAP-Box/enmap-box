@@ -11,27 +11,28 @@ import re
 
 from enmapbox.qgispluginsupport.qps.utils import file_search
 
-RX_QGS101 = re.compile(r'from qgis\._(core|gui) import')
-RX_QGS102 = re.compile(r'import qgis\._(core|gui)')
-RX_QGS103 = re.compile(r'from PyQt5\.(Qt[^. ]+) import')
-RX_QGS104 = re.compile(r'import PyQt5\.(Qt[^. ]+)')
+RX_QGS101 = re.compile(r'^(\W*)from qgis\._(core|gui) import', re.M)
+RX_QGS102 = re.compile(r'^(\W*)import qgis\._(core|gui)', re.M)
+RX_QGS103 = re.compile(r'^(\W*)from PyQt5\.(Qt[^. ]+) import', re.M)
+RX_QGS104 = re.compile(r'^(\W*)import PyQt5\.(Qt[^. ]+)', re.M)
 
+RX_PY = re.compile(r'.*\.py$')
 
 def repairString(text) -> str:
-    text = RX_QGS101.sub(r'from qgis.\1 import', text)
-    text = RX_QGS102.sub(r'import qgis.\1', text)
-    text = RX_QGS103.sub(r'from qgis.PyQt.\1 import', text)
-    text = RX_QGS104.sub(r'import qgis.PyQt.\1', text)
+    text = RX_QGS101.sub(r'\1from qgis.\2 import', text)
+    text = RX_QGS102.sub(r'\1import qgis.\2', text)
+    text = RX_QGS103.sub(r'\1from qgis.PyQt.\2 import', text)
+    text = RX_QGS104.sub(r'\1import qgis.PyQt.\2', text)
     return text
 
 
 def test_repairString():
     EXAMPLES = [
-        ('from qgis._core import QgsMapLayer, QgsVectorLayer', 'from qgis.core import QgsMapLayer, QgsVectorLayer'),
-        ('from qgis._core import QgsApplication', 'from qgis.core import QgsApplication'),
-        ('import qgis._core.QgsVectorLayer as QgsVectorLayer', 'import qgis.core.QgsVectorLayer as QgsVectorLayer'),
-        ('from PyQt5.QtCore import pyqtSignal', 'from qgis.PyQt.QtCore import pyqtSignal'),
-        ('import PyQt5.QtCore.pyqtSignal as pyqtSignal', 'import qgis.PyQt.QtCore.pyqtSignal as pyqtSignal'),
+        ('from qgis.core import QgsMapLayer, QgsVectorLayer', 'from qgis.core import QgsMapLayer, QgsVectorLayer'),
+        ('from qgis.core import QgsApplication', 'from qgis.core import QgsApplication'),
+        ('import qgis.core.QgsVectorLayer as QgsVectorLayer', 'import qgis.core.QgsVectorLayer as QgsVectorLayer'),
+        ('from qgis.PyQt.QtCore import pyqtSignal', 'from qgis.PyQt.QtCore import pyqtSignal'),
+        ('import qgis.PyQt.QtCore.pyqtSignal as pyqtSignal', 'import qgis.PyQt.QtCore.pyqtSignal as pyqtSignal'),
     ]
 
     for (bad, good) in EXAMPLES:
@@ -56,9 +57,9 @@ def repairFile(path, check_only=True):
                 f.write(textGood)
 
 
-def repairRepositoryFiles(dry_run: bool = True):
-    DIR_REPO = pathlib.Path(__file__).parents[1]
-    for path in file_search(DIR_REPO, re.compile('.*\.py$')):
+def repairFolder(folder, dry_run: bool = True, recursive:bool=False):
+    folder = pathlib.Path(folder)
+    for path in file_search(folder, RX_PY, recursive=recursive):
         repairFile(path, check_only=dry_run)
 
 
@@ -84,6 +85,12 @@ if __name__ == "__main__":
     if args.t is True:
         test_repairString()
     else:
-        if args.r is True:
-            args.d = False
-        repairRepositoryFiles(dry_run=args.d)
+        if args.repair is True:
+            args.dry_run = False
+
+        # todo: allow to add folders as arguments
+        DIR_REPO = pathlib.Path(__file__).parents[1]
+
+        #
+        # DIR_REPO = DIR_REPO / 'snippets'
+        repairFolder(DIR_REPO, dry_run=args.dry_run, recursive=True)
