@@ -4,7 +4,7 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 from osgeo import gdal
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 
 from enmapboxprocessing.algorithm.importprismal1algorithm import utilsReadAsArray, utilsDeleteCopy
 from enmapboxprocessing.driver import Driver

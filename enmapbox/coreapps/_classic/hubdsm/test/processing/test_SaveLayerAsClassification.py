@@ -2,7 +2,7 @@ from collections import OrderedDict
 from os.path import join, dirname
 
 import numpy as np
-from qgis._core import QgsRasterLayer, QgsVectorLayer
+from qgis.core import QgsRasterLayer, QgsVectorLayer
 
 from enmapbox.exampledata import landcover_points, enmap
 from _classic.hubdsm.algorithm.uniquebandvaluecounts import uniqueBandValueCounts

@@ -2,9 +2,9 @@ import pathlib
 from os.path import exists
 from warnings import warn
 
-from PyQt5.QtCore import QMimeData, QUrl, QPoint, Qt
-from PyQt5.QtGui import QDropEvent
-from PyQt5.QtWidgets import QApplication
+from qgis.PyQt.QtCore import QMimeData, QUrl, QPoint, Qt
+from qgis.PyQt.QtGui import QDropEvent
+from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import QgsProject, QgsRasterLayer
 
 from enmapbox import EnMAPBox

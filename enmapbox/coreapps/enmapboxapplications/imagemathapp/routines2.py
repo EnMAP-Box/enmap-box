@@ -3,9 +3,9 @@ from os.path import dirname, join
 
 import numpy
 from collections import OrderedDict
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from qgis.PyQt.QtCore import *
+from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.QtGui import *
 from enmapboxapplications.imagemathapp.routines import *
 
 def routinesDictionary():

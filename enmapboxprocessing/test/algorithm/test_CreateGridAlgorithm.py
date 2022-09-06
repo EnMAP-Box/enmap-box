@@ -1,4 +1,4 @@
-from qgis._core import QgsRasterLayer, QgsProcessingContext, QgsCoordinateReferenceSystem
+from qgis.core import QgsRasterLayer, QgsProcessingContext, QgsCoordinateReferenceSystem
 
 import processing
 from enmapbox.exampledata import enmap

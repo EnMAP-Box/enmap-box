@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from qgis._gui import QgsMessageBar
+from qgis.gui import QgsMessageBar
 
 import ee
 from geetimeseriesexplorerapp.tasks.queryavailableimagestask import QueryAvailableImagesTask

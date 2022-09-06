@@ -3,7 +3,7 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 from osgeo import gdal
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
 
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group

@@ -1,8 +1,8 @@
 import webbrowser
 
 from PyQt5.Qsci import QsciScintilla, QsciLexerPython
-from PyQt5.QtGui import QFont, QFontMetrics, QColor
-from PyQt5.QtWidgets import QSizePolicy, QWidget, QLineEdit, QComboBox, QToolButton
+from qgis.PyQt.QtGui import QFont, QFontMetrics, QColor
+from qgis.PyQt.QtWidgets import QSizePolicy, QWidget, QLineEdit, QComboBox, QToolButton
 from PyQt5.uic import loadUi
 
 from processing.gui.wrappers import WidgetWrapper, DIALOG_MODELER, DIALOG_BATCH

@@ -1,7 +1,7 @@
 from math import inf, nan
 from typing import Dict, List, Tuple
 
-from PyQt5.QtCore import QDate, QDateTime
+from qgis.PyQt.QtCore import QDate, QDateTime
 
 from typeguard import typechecked
 

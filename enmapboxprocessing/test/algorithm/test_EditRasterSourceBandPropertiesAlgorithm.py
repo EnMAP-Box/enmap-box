@@ -1,6 +1,6 @@
 from time import sleep
 
-from PyQt5.QtCore import QDateTime
+from qgis.PyQt.QtCore import QDateTime
 from osgeo import gdal
 
 from enmapbox.exampledata import enmap

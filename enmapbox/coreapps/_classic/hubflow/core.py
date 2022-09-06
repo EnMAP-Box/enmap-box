@@ -14,7 +14,7 @@ try:
 except Exception as error:
     warn(str(error))
 
-from PyQt5.QtGui import QColor
+from qgis.PyQt.QtGui import QColor
 
 from _classic.hubdc.progressbar import ProgressBar
 from _classic.hubdc.core import *

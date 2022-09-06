@@ -9,14 +9,14 @@ from typing import Tuple, Optional, Callable, Any, Dict, Union, List
 from warnings import warn
 
 import numpy as np
-from PyQt5.QtCore import QDateTime, QDate
-from PyQt5.QtGui import QColor
-from PyQt5.QtXml import QDomDocument
+from qgis.PyQt.QtCore import QDateTime, QDate
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtXml import QDomDocument
 from osgeo import gdal
 
 from enmapboxprocessing.typing import (NumpyDataType, MetadataValue, GdalDataType, QgisDataType,
                                        GdalResamplingAlgorithm, Categories, Category, Targets, Target)
-from qgis._core import (QgsRasterBlock, QgsProcessingFeedback, QgsPalettedRasterRenderer,
+from qgis.core import (QgsRasterBlock, QgsProcessingFeedback, QgsPalettedRasterRenderer,
                         QgsCategorizedSymbolRenderer, QgsRendererCategory, QgsRectangle, QgsRasterLayer,
                         QgsRasterDataProvider, QgsPointXY, QgsPoint, Qgis, QgsWkbTypes, QgsSymbol, QgsVectorLayer,
                         QgsFeature, QgsRasterRenderer, QgsFeatureRenderer, QgsMapLayer, QgsCoordinateTransform,
@@ -26,7 +26,7 @@ from qgis._core import (QgsRasterBlock, QgsProcessingFeedback, QgsPalettedRaster
                         QgsDiagramRenderer, QgsSingleCategoryDiagramRenderer, QgsGraduatedSymbolRenderer,
                         QgsProcessingUtils
                         )
-from qgis._gui import QgsMapCanvas
+from qgis.gui import QgsMapCanvas
 from typeguard import typechecked
 
 

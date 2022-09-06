@@ -3,7 +3,7 @@ from os import makedirs
 from os.path import join, exists, dirname
 from typing import Dict, Any, List, Tuple
 
-from PyQt5.QtGui import QColor
+from qgis.PyQt.QtGui import QColor
 from osgeo import gdal
 
 from enmapboxprocessing.algorithm.aggregaterasterbandsalgorithm import AggregateRasterBandsAlgorithm
@@ -18,7 +18,7 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 from typeguard import typechecked
 
 

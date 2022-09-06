@@ -1,7 +1,7 @@
 from typing import List, Tuple
 
-from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QComboBox, QLabel, QVBoxLayout, QLineEdit
-from qgis._core import QgsRasterLayer
+from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QComboBox, QLabel, QVBoxLayout, QLineEdit
+from qgis.core import QgsRasterLayer
 
 from enmapboxprocessing.parameter.processingparametercodeeditwidget import CodeEditWidget
 from enmapboxprocessing.utils import Utils

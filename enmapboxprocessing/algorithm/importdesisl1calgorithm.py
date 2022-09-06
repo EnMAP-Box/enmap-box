@@ -2,7 +2,7 @@ from os.path import basename
 from typing import Dict, Any, List, Tuple
 
 from osgeo import gdal
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from typeguard import typechecked

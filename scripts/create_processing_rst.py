@@ -5,7 +5,7 @@ from os.path import abspath, join, dirname, exists, basename
 from shutil import rmtree
 from typing import List
 
-from qgis._core import QgsProcessingParameterDefinition, QgsProcessingDestinationParameter
+from qgis.core import QgsProcessingParameterDefinition, QgsProcessingDestinationParameter
 
 from enmapboxprocessing.algorithm.algorithms import algorithms
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group

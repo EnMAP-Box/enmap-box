@@ -1,5 +1,5 @@
-from PyQt5.QtCore import QSize, QSizeF, Qt
-from qgis._core import QgsRasterLayer, QgsRasterDataProvider, QgsRectangle, QgsProcessingFeedback
+from qgis.PyQt.QtCore import QSize, QSizeF, Qt
+from qgis.core import QgsRasterLayer, QgsRasterDataProvider, QgsRectangle, QgsProcessingFeedback
 
 from typeguard import typechecked
 

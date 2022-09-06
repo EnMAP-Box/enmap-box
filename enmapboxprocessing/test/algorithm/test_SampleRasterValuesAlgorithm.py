@@ -1,4 +1,4 @@
-from qgis._core import (QgsRasterLayer, QgsVectorLayer)
+from qgis.core import (QgsRasterLayer, QgsVectorLayer)
 
 from enmapbox.exampledata import enmap, landcover_polygons
 from enmapboxprocessing.algorithm.samplerastervaluesalgorithm import SampleRasterValuesAlgorithm

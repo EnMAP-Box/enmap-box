@@ -3,9 +3,9 @@
 # Copyright © 2018 Stephane Guillaso
 # Licensed under the terms of 
 # (see ../LICENSE.md for details)
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from qgis.PyQt.QtCore import *
+from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.QtGui import *
 import os
 import time
 import numpy as np

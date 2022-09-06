@@ -1,5 +1,5 @@
 import numpy as np
-from qgis._core import QgsRasterLayer
+from qgis.core import QgsRasterLayer
 
 from _classic.hubdsm.core.category import Category
 from _classic.hubdsm.core.color import Color

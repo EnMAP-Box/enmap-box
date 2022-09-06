@@ -1,7 +1,7 @@
 import numpy as np
 
 from enmapboxprocessing.driver import Driver
-from qgis._core import QgsRasterLayer
+from qgis.core import QgsRasterLayer
 
 from enmapbox.exampledata import enmap, hires
 from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm

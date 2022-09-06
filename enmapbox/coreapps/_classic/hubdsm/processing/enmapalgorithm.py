@@ -4,7 +4,7 @@ from enum import Enum
 from typing import List, Union, Any, Dict, Iterable
 
 from processing.algs.qgis.QgisAlgorithm import QgisAlgorithm
-from qgis._core import *
+from qgis.core import *
 
 
 class EnMAPAlgorithm(QgisAlgorithm):

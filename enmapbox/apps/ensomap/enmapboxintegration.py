@@ -33,7 +33,7 @@ import hys
 # from ensomap_ui import ENSOMAP_UI
 
 from PyQt5.QtCore    import *
-from PyQt5.QtWidgets import *
+from qgis.PyQt.QtWidgets import *
 from PyQt5.QtGui     import *
 
 import numpy as np

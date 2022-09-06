@@ -2,7 +2,7 @@ from copy import deepcopy
 from typing import List
 
 import numpy as np
-from qgis._core import QgsRasterRenderer, QgsRasterInterface, QgsRectangle, QgsRasterBlockFeedback, Qgis
+from qgis.core import QgsRasterRenderer, QgsRasterInterface, QgsRectangle, QgsRasterBlockFeedback, Qgis
 
 try:
     from sklearn.decomposition import PCA

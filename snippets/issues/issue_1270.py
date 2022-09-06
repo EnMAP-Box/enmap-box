@@ -3,7 +3,7 @@ import numpy as np
 from enmapbox import EnMAPBox
 from enmapbox.testing import start_app
 from enmapboxprocessing.driver import Driver
-from qgis._core import QgsRasterLayer
+from qgis.core import QgsRasterLayer
 
 qgsApp = start_app()
 enmapBox = EnMAPBox(load_other_apps=False)

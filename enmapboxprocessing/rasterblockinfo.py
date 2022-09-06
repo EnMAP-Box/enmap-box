@@ -1,7 +1,7 @@
 from typing import NamedTuple
 
 import numpy as np
-from qgis._core import QgsRectangle
+from qgis.core import QgsRectangle
 
 
 class RasterBlockInfo(NamedTuple):

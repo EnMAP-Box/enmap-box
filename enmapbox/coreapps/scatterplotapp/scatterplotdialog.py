@@ -6,9 +6,9 @@ from typing import Optional, Tuple, Dict
 
 
 import numpy as np
-from PyQt5.QtCore import QRectF, QPointF, Qt
-from PyQt5.QtGui import QMouseEvent, QColor
-from PyQt5.QtWidgets import QToolButton, QMainWindow, QComboBox, QCheckBox, QDoubleSpinBox, QPlainTextEdit, QSpinBox
+from qgis.PyQt.QtCore import QRectF, QPointF, Qt
+from qgis.PyQt.QtGui import QMouseEvent, QColor
+from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QComboBox, QCheckBox, QDoubleSpinBox, QPlainTextEdit, QSpinBox
 from PyQt5.uic import loadUi
 from osgeo import gdal
 from scipy.stats import binned_statistic_2d, pearsonr
@@ -21,9 +21,9 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
 from processing import AlgorithmDialog
-from qgis._core import QgsMapLayerProxyModel, QgsRasterLayer, QgsMapSettings, QgsStyle, QgsColorRamp, \
+from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsMapSettings, QgsStyle, QgsColorRamp, \
     QgsFieldProxyModel, QgsMapLayer
-from qgis._gui import QgsMapLayerComboBox, QgsMapCanvas, QgsRasterBandComboBox, QgsColorButton, QgsColorRampButton, \
+from qgis.gui import QgsMapLayerComboBox, QgsMapCanvas, QgsRasterBandComboBox, QgsColorButton, QgsColorRampButton, \
     QgsFilterLineEdit, QgsFieldComboBox
 from typeguard import typechecked
 

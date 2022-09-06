@@ -1,6 +1,6 @@
 from PyQt5.uic import loadUi
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
+from qgis.PyQt.QtCore import *
+from qgis.PyQt.QtWidgets import *
 
 from enmapbox.gui.datasources.datasources import VectorDataSource
 from enmapbox.gui.enmapboxgui import EnMAPBox

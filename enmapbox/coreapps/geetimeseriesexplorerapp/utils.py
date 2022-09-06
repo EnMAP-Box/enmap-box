@@ -1,6 +1,6 @@
 import os
 
-from PyQt5.QtCore import QDateTime, QDate
+from qgis.PyQt.QtCore import QDateTime, QDate
 
 from typeguard import typechecked
 

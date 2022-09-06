@@ -2,8 +2,8 @@ from collections import OrderedDict
 from os.path import join, dirname
 from unittest import TestCase
 
-from PyQt5.QtGui import QColor
-from qgis._core import QgsRasterLayer, QgsPalettedRasterRenderer, QgsSingleBandGrayRenderer
+from qgis.PyQt.QtGui import QColor
+from qgis.core import QgsRasterLayer, QgsPalettedRasterRenderer, QgsSingleBandGrayRenderer
 
 import numpy as np
 

@@ -1,6 +1,6 @@
 from processing.gui.wrappers import WidgetWrapper
-from qgis._core import QgsProcessingParameterFile, QgsProcessingAlgorithm
-from qgis._gui import QgsFileWidget
+from qgis.core import QgsProcessingParameterFile, QgsProcessingAlgorithm
+from qgis.gui import QgsFileWidget
 
 
 class MyAlgorithm(QgsProcessingAlgorithm):

@@ -1,6 +1,6 @@
 from typing import Dict, Any, List, Tuple
 
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer)
 
 from enmapboxprocessing.algorithm.layertomaskalgorithm import LayerToMaskAlgorithm
 from enmapboxprocessing.driver import Driver

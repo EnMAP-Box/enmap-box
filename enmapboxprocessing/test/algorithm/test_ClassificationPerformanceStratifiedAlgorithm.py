@@ -1,5 +1,5 @@
 import numpy as np
-from qgis._core import QgsRasterLayer, QgsVectorLayer
+from qgis.core import QgsRasterLayer, QgsVectorLayer
 
 from enmapbox.exampledata import landcover_polygons
 from enmapboxprocessing.algorithm.classificationperformancestratifiedalgorithm import (

@@ -1,4 +1,4 @@
-from qgis._core import QgsRasterLayer
+from qgis.core import QgsRasterLayer
 
 from decorrelationstretchapp import DecorrelationStretchDialog
 from enmapbox import EnMAPBox, initAll

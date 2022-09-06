@@ -1,6 +1,6 @@
 from typing import Dict, Any, List, Tuple
 
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
 from enmapboxprocessing.algorithm.spectralresamplingtocustomsensoralgorithm import \
     SpectralResamplingToCustomSensorAlgorithm

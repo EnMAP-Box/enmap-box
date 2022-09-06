@@ -3,7 +3,7 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 from osgeo import gdal
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessingParameterField,
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessingParameterField,
                         QgsCategorizedSymbolRenderer, QgsProcessingException)
 
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedrasteralgorithm import \

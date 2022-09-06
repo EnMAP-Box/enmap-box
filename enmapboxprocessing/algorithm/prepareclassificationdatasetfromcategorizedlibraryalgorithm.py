@@ -2,7 +2,7 @@ import traceback
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsCategorizedSymbolRenderer,
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCategorizedSymbolRenderer,
                         QgsProcessingParameterField, QgsProcessingException)
 
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibrary, FIELD_VALUES, SpectralLibraryUtils

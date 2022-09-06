@@ -1,7 +1,7 @@
 from os.path import basename, join
 
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import (QMainWindow, QTableWidget, QTableWidgetItem, QLabel, QToolButton, QMessageBox, QComboBox,
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWidgets import (QMainWindow, QTableWidget, QTableWidgetItem, QLabel, QToolButton, QMessageBox, QComboBox,
                              QSpinBox, QDialog)
 from PyQt5.uic import loadUi
 
@@ -11,7 +11,7 @@ from enmapboxprocessing.parameter.processingparameterpicklefileregressiondataset
     ProcessingParameterPickleFileRegressionDatasetWidget
 from enmapboxprocessing.typing import Category, RegressorDump, Target
 from enmapboxprocessing.utils import Utils
-from qgis._gui import QgsColorButton, QgsDoubleSpinBox, QgsSpinBox
+from qgis.gui import QgsColorButton, QgsDoubleSpinBox, QgsSpinBox
 from typeguard import typechecked
 
 

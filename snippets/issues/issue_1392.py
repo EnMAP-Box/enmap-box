@@ -1,7 +1,7 @@
 import unittest
 
 from enmapbox.testing import EnMAPBoxTestCase, TestObjects
-from qgis._gui import QgsMapCanvas, QgsRasterLayerProperties
+from qgis.gui import QgsMapCanvas, QgsRasterLayerProperties
 
 
 class Issue1392Tests(EnMAPBoxTestCase):

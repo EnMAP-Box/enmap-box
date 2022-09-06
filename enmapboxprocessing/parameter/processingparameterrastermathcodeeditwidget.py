@@ -8,12 +8,12 @@ from os.path import splitext, basename, exists, join, dirname
 from time import time
 from typing import Dict, Union
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QWidget, QTreeWidget, QTreeWidgetItem, QPushButton, \
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QWidget, QTreeWidget, QTreeWidgetItem, QPushButton, \
     QInputDialog, QMenu, QAction, QComboBox, QListWidget, QToolButton, QFileDialog
 from PyQt5.uic import loadUi
-from qgis._core import QgsProject, QgsRasterLayer, QgsVectorLayer, QgsFields, QgsField, QgsCoordinateReferenceSystem
+from qgis.core import QgsProject, QgsRasterLayer, QgsVectorLayer, QgsFields, QgsField, QgsCoordinateReferenceSystem
 
 from enmapboxprocessing.algorithm.rastermathalgorithm.snippetinsertdialog import SnippetInsertDialog
 from enmapboxprocessing.algorithm.rastermathalgorithm.snippetsaveasdialog import SnippetSaveAsDialog

@@ -1,6 +1,6 @@
 import numpy as np
-from PyQt5.QtGui import QColor
-from qgis._core import QgsRasterLayer, QgsPalettedRasterRenderer
+from qgis.PyQt.QtGui import QColor
+from qgis.core import QgsRasterLayer, QgsPalettedRasterRenderer
 
 from _classic.hubdsm.core.category import Category  # needed for eval
 from _classic.hubdsm.core.color import Color  # needed for eval

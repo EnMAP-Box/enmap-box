@@ -18,9 +18,9 @@ from geetimeseriesexplorerapp.tasks.queryavailableimagestask import QueryAvailab
 from geetimeseriesexplorerapp.utils import utilsMsecToDateTime
 
 from PyQt5 import QtGui
-from PyQt5.QtCore import Qt, QLocale, QDate, pyqtSignal, QModelIndex, QDateTime
-from PyQt5.QtGui import QPixmap, QColor, QIcon
-from PyQt5.QtWidgets import (QToolButton, QApplication, QComboBox, QLineEdit,
+from qgis.PyQt.QtCore import Qt, QLocale, QDate, pyqtSignal, QModelIndex, QDateTime
+from qgis.PyQt.QtGui import QPixmap, QColor, QIcon
+from qgis.PyQt.QtWidgets import (QToolButton, QApplication, QComboBox, QLineEdit,
                              QTableWidget, QDateEdit, QRadioButton, QListWidget, QCheckBox, QTableWidgetItem,
                              QPlainTextEdit, QTreeWidget, QTreeWidgetItem, QTabWidget, QLabel, QMainWindow,
                              QListWidgetItem, QProgressBar, QFrame)
@@ -29,9 +29,9 @@ from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp.codeeditwidget import CodeEditWidget
 from geetimeseriesexplorerapp.externals.ee_plugin.provider import GeetseEarthEngineRasterDataProvider
 from qgis.PyQt import uic
-from qgis._core import QgsRasterLayer, QgsCoordinateReferenceSystem, QgsMapLayer, QgsMapSettings, \
+from qgis.core import QgsRasterLayer, QgsCoordinateReferenceSystem, QgsMapLayer, QgsMapSettings, \
     QgsColorRamp, QgsDateTimeRange, QgsApplication, QgsMessageLog, Qgis
-from qgis._gui import (QgsDockWidget, QgsMessageBar, QgsColorRampButton, QgsSpinBox, QgsMapCanvas,
+from qgis.gui import (QgsDockWidget, QgsMessageBar, QgsColorRampButton, QgsSpinBox, QgsMapCanvas,
                        QgsDateTimeEdit, QgisInterface)
 from typeguard import typechecked
 

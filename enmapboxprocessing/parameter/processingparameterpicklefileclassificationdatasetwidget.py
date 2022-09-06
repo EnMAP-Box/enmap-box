@@ -1,7 +1,7 @@
 from os.path import basename, join, dirname
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QWidget, QToolButton, QMenu, QMessageBox
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QWidget, QToolButton, QMenu, QMessageBox
 from PyQt5.uic import loadUi
 
 from enmapbox import EnMAPBox
@@ -23,7 +23,7 @@ from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
 from processing import AlgorithmDialog
 from processing.gui.wrappers import WidgetWrapper
-from qgis._gui import QgsFileWidget
+from qgis.gui import QgsFileWidget
 
 
 class ProcessingParameterPickleFileClassificationDatasetWidget(QWidget):

@@ -1,8 +1,8 @@
 from collections import OrderedDict
 from typing import NamedTuple, Any, Dict
 
-from PyQt5.QtGui import QColor
-from qgis._core import QgsVectorLayer, QgsCategorizedSymbolRenderer, QgsRendererCategory, QgsSymbol
+from qgis.PyQt.QtGui import QColor
+from qgis.core import QgsVectorLayer, QgsCategorizedSymbolRenderer, QgsRendererCategory, QgsSymbol
 
 from _classic.hubdsm.core.category import Category
 from _classic.hubdsm.core.color import Color

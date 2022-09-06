@@ -1,12 +1,12 @@
 from typing import Optional
 
-from PyQt5.QtGui import QMouseEvent, QColor
-from PyQt5.QtWidgets import QToolButton, QMainWindow, QTableWidget, QComboBox, QCheckBox, \
+from qgis.PyQt.QtGui import QMouseEvent, QColor
+from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QTableWidget, QComboBox, QCheckBox, \
     QLabel
 from PyQt5.uic import loadUi
-from qgis._core import QgsMapLayerProxyModel, QgsRasterLayer, QgsRasterDataProvider, QgsRasterBandStats, \
+from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsRasterDataProvider, QgsRasterBandStats, \
     QgsRasterHistogram, QgsMapSettings, QgsRasterRenderer
-from qgis._gui import QgsRasterBandComboBox, QgsMapLayerComboBox, QgsFilterLineEdit, QgsSpinBox, QgsMapCanvas
+from qgis.gui import QgsRasterBandComboBox, QgsMapLayerComboBox, QgsFilterLineEdit, QgsSpinBox, QgsMapCanvas
 
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent

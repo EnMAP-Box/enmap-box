@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from PyQt5.QtGui import QColor
-from qgis._core import QgsVectorLayer
+from qgis.PyQt.QtGui import QColor
+from qgis.core import QgsVectorLayer
 
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils

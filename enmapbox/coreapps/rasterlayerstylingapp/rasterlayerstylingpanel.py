@@ -1,12 +1,12 @@
 from math import nan
 from typing import Optional
 
-from PyQt5.QtWidgets import QDoubleSpinBox, QComboBox, QCheckBox, QToolButton, QLabel, QTabWidget, \
+from qgis.PyQt.QtWidgets import QDoubleSpinBox, QComboBox, QCheckBox, QToolButton, QLabel, QTabWidget, \
     QLineEdit, QTableWidget
-from qgis._core import QgsRasterLayer, QgsSingleBandGrayRenderer, QgsRectangle, \
+from qgis.core import QgsRasterLayer, QgsSingleBandGrayRenderer, QgsRectangle, \
     QgsContrastEnhancement, QgsRasterRenderer, QgsMultiBandColorRenderer, QgsSingleBandPseudoColorRenderer, \
     QgsMapLayerProxyModel, QgsRasterDataProvider, QgsRasterShader
-from qgis._gui import (QgsDockWidget, QgsMapLayerComboBox, QgsCollapsibleGroupBox,
+from qgis.gui import (QgsDockWidget, QgsMapLayerComboBox, QgsCollapsibleGroupBox,
                        QgsColorRampButton)
 
 from enmapbox import EnMAPBox

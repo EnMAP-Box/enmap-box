@@ -6,10 +6,10 @@ from time import time
 from typing import Any, Dict, Iterable, Optional, List, Tuple, TextIO
 
 import numpy as np
-from PyQt5.QtGui import QIcon
+from qgis.PyQt.QtGui import QIcon
 from osgeo import gdal
 
-from qgis._core import (QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer, QgsProcessingParameterVectorLayer,
+from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer, QgsProcessingParameterVectorLayer,
                         QgsProcessingContext, QgsProcessingFeedback,
                         QgsRasterLayer, QgsVectorLayer, QgsProcessingParameterNumber, QgsProcessingParameterDefinition,
                         QgsProcessingParameterField, QgsProcessingParameterBoolean, QgsProcessingParameterEnum, Qgis,

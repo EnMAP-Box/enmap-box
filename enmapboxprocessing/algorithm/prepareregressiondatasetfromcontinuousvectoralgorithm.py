@@ -2,7 +2,7 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 from osgeo import gdal
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessingParameterField,
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessingParameterField,
                         QgsProcessingException)
 
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousrasteralgorithm import \

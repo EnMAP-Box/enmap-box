@@ -2,7 +2,7 @@ from collections import OrderedDict
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsProcessing)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsProcessing)
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClassifierDump

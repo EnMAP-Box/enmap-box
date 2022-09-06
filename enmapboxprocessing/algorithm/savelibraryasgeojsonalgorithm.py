@@ -1,6 +1,6 @@
 from typing import Dict, Any, List, Tuple
 
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsField, QgsFeature)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsField, QgsFeature)
 
 from enmapbox.qgispluginsupport.qps.speclib.core import profile_field_list
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import SpectralProfile

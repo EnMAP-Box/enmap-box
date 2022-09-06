@@ -1,7 +1,7 @@
-from PyQt5.QtWidgets import QApplication
+from qgis.PyQt.QtWidgets import QApplication
 
 from enmapbox.testing import TestObjects, start_app
-from qgis._gui import QgsMapCanvas
+from qgis.gui import QgsMapCanvas
 from qgis.core import QgsProject
 
 app = start_app()

@@ -2,7 +2,7 @@ import inspect
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClassifierDump

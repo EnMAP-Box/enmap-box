@@ -1,5 +1,5 @@
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMenu, QAction
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QMenu, QAction
 
 from colorspaceexplorerapp.colorspaceexplorerdialog import ColorSpaceExplorerDialog
 from enmapbox.gui.applications import EnMAPBoxApplication

@@ -1,5 +1,5 @@
-from PyQt5.QtCore import QSizeF, QSize
-from qgis._core import QgsRectangle
+from qgis.PyQt.QtCore import QSizeF, QSize
+from qgis.core import QgsRectangle
 
 from enmapboxprocessing.extentwalker import ExtentWalker
 from enmapboxprocessing.gridwalker import GridWalker

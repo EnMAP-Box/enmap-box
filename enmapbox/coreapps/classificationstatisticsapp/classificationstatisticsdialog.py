@@ -2,16 +2,16 @@ from math import ceil, sqrt
 from typing import Optional, List
 
 import numpy as np
-from PyQt5.QtCore import Qt, QRectF
-from PyQt5.QtGui import QMouseEvent, QColor, QPicture, QPainter
-from PyQt5.QtWidgets import QToolButton, QMainWindow, QTableWidget, QComboBox, QCheckBox, \
+from qgis.PyQt.QtCore import Qt, QRectF
+from qgis.PyQt.QtGui import QMouseEvent, QColor, QPicture, QPainter
+from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QTableWidget, QComboBox, QCheckBox, \
     QTableWidgetItem
 from PyQt5.uic import loadUi
 from osgeo import gdal
-from qgis._core import QgsMapLayerProxyModel, QgsRasterLayer, QgsMapSettings, QgsPalettedRasterRenderer, QgsProject, \
+from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsMapSettings, QgsPalettedRasterRenderer, QgsProject, \
     QgsRasterRange, QgsRectangle, QgsFeature, QgsCoordinateTransform, \
     QgsVectorLayer, QgsVectorFileWriter, QgsUnitTypes
-from qgis._gui import QgsMapLayerComboBox, QgsMapCanvas, QgsFieldComboBox, QgsFeaturePickerWidget
+from qgis.gui import QgsMapLayerComboBox, QgsMapCanvas, QgsFieldComboBox, QgsFeaturePickerWidget
 
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget, GraphicsObject, mkBrush, mkPen
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent

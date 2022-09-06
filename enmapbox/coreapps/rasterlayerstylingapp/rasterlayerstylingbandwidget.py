@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QSlider, QSpinBox
-from qgis._gui import QgsRasterBandComboBox
+from qgis.PyQt.QtWidgets import QWidget, QLabel, QLineEdit, QSlider, QSpinBox
+from qgis.gui import QgsRasterBandComboBox
 
 from qgis.PyQt import uic
 from typeguard import typechecked

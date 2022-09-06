@@ -5,7 +5,7 @@ import numpy as np
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 from typeguard import typechecked
 
 

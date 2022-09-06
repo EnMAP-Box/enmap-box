@@ -2,7 +2,7 @@ from collections import OrderedDict
 from typing import Dict, Any, List, Tuple, Optional
 
 from osgeo import gdal
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException,
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException,
                         QgsRasterLayer)
 
 from enmapboxprocessing.algorithm.vrtbandmathalgorithm import VrtBandMathAlgorithm

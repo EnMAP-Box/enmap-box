@@ -2,13 +2,13 @@ import traceback
 from random import randint
 from typing import Optional, List
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QMouseEvent, QColor
-from PyQt5.QtWidgets import QToolButton, QMainWindow, QCheckBox, QTableWidget, QSpinBox, QComboBox, QApplication, \
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QMouseEvent, QColor
+from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QCheckBox, QTableWidget, QSpinBox, QComboBox, QApplication, \
     QMessageBox
 from PyQt5.uic import loadUi
-from qgis._core import QgsRasterLayer, QgsRasterDataProvider, QgsRasterHistogram, QgsMapLayerProxyModel, QgsMapSettings
-from qgis._gui import QgsMapCanvas, QgsMapLayerComboBox, QgsColorButton
+from qgis.core import QgsRasterLayer, QgsRasterDataProvider, QgsRasterHistogram, QgsMapLayerProxyModel, QgsMapSettings
+from qgis.gui import QgsMapCanvas, QgsMapLayerComboBox, QgsColorButton
 
 from classfractionstatisticsapp.classfractionrenderer import ClassFractionRenderer
 from enmapbox.qgispluginsupport.qps.layerproperties import rendererFromXml

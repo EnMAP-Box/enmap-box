@@ -1,10 +1,10 @@
 from typing import List, Optional
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QLineEdit, QToolButton, QListWidget, QListWidgetItem, QDialog
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QWidget, QLineEdit, QToolButton, QListWidget, QListWidgetItem, QDialog
 from PyQt5.uic import loadUi
-from qgis._core import QgsMapLayer, QgsProject, QgsCoordinateReferenceSystem, QgsRasterLayer, QgsVectorLayer
-from qgis._gui import QgsMapLayerComboBox
+from qgis.core import QgsMapLayer, QgsProject, QgsCoordinateReferenceSystem, QgsRasterLayer, QgsVectorLayer
+from qgis.gui import QgsMapLayerComboBox
 
 from typeguard import typechecked
 

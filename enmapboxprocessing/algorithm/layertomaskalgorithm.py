@@ -1,6 +1,6 @@
 from typing import Tuple, List, Dict, Any
 
-from qgis._core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessingException, \
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessingException, \
     QgsVectorLayer
 
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm

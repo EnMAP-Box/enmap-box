@@ -1,7 +1,7 @@
 from typing import Dict, Any, List, Tuple
 
 from processing.core.Processing import Processing
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer)
 
 from enmapboxprocessing.algorithm.creategridalgorithm import CreateGridAlgorithm
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm

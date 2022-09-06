@@ -1,4 +1,4 @@
-from qgis._core import QgsProject, QgsVectorLayer, QgsRasterLayer
+from qgis.core import QgsProject, QgsVectorLayer, QgsRasterLayer
 
 from classificationworkflowapp.classificationworkflowgui import ClassificationWorkflowGui
 from enmapbox import EnMAPBox

@@ -1,7 +1,7 @@
 from time import time
 from unittest import TestCase
 
-from qgis._core import QgsVectorLayer
+from qgis.core import QgsVectorLayer
 
 from geetimeseriesexplorerapp.geetemporalprofiledockwidget import DownloadTask
 from tests.testdata import landcover_berlin_point_singlepart_3035_gpkg

@@ -1,7 +1,7 @@
 from typing import Dict, Any, List, Tuple
 
-from PyQt5.QtCore import QVariant
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsProcessingParameterField, Qgis,
+from qgis.PyQt.QtCore import QVariant
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsProcessingParameterField, Qgis,
                         QgsVectorFileWriter,
                         QgsProject, QgsCoordinateTransform, QgsField)
 

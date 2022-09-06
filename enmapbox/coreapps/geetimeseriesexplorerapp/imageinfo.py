@@ -1,7 +1,7 @@
 from typing import Dict, List, Union, Tuple
 
 import numpy as np
-from PyQt5.QtGui import QColor
+from qgis.PyQt.QtGui import QColor
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapboxprocessing.utils import Utils

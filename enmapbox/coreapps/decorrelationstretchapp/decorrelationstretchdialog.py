@@ -2,11 +2,11 @@ from math import sqrt
 from typing import Optional
 
 import numpy as np
-from PyQt5.QtWidgets import QWidget, QToolButton, QCheckBox, \
+from qgis.PyQt.QtWidgets import QWidget, QToolButton, QCheckBox, \
     QMainWindow, QComboBox
 from PyQt5.uic import loadUi
-from qgis._core import QgsRasterLayer, QgsMultiBandColorRenderer, QgsMapLayerProxyModel, QgsMapSettings
-from qgis._gui import QgsMapCanvas, QgsRasterBandComboBox, QgsDoubleSpinBox, QgsMapLayerComboBox
+from qgis.core import QgsRasterLayer, QgsMultiBandColorRenderer, QgsMapLayerProxyModel, QgsMapSettings
+from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsDoubleSpinBox, QgsMapLayerComboBox
 
 from decorrelationstretchapp.decorrelationstretchrenderer import DecorrelationStretchRenderer
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent

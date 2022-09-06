@@ -1,12 +1,12 @@
 from os.path import basename, join, dirname
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QWidget, QToolButton, QMenu
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QWidget, QToolButton, QMenu
 from PyQt5.uic import loadUi
 
 from enmapbox import EnMAPBox
 from processing.gui.wrappers import WidgetWrapper
-from qgis._gui import QgsFileWidget
+from qgis.gui import QgsFileWidget
 
 
 class ProcessingParameterPickleFileWidget(QWidget):

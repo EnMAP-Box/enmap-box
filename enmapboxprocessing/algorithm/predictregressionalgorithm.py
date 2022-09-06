@@ -2,8 +2,8 @@ from math import ceil
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from PyQt5.QtGui import QColor
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, Qgis, QgsProcessingException)
+from qgis.PyQt.QtGui import QColor
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis, QgsProcessingException)
 
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group

@@ -1,5 +1,5 @@
 from osgeo import gdal
-from qgis._core import QgsProcessingException
+from qgis.core import QgsProcessingException
 
 from enmapbox.exampledata import enmap
 from enmapboxprocessing.algorithm.writeenviheaderalgorithm import WriteEnviHeaderAlgorithm

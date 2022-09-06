@@ -4,7 +4,7 @@ from enmapboxprocessing.algorithm.fitgenericregressoralgorithm import FitGeneric
 from enmapboxprocessing.algorithm.predictregressionalgorithm import PredictRegressionAlgorithm
 from enmapboxprocessing.algorithm.regressorperformancealgorithm import RegressorPerformanceAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 from typeguard import typechecked
 
 

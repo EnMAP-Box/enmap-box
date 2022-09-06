@@ -3,7 +3,7 @@ from typing import Dict, Any, List, Tuple
 from xml.etree import ElementTree
 
 from osgeo import gdal
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 

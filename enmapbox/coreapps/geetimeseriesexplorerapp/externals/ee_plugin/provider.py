@@ -15,7 +15,7 @@ import numpy as np
 
 from enmapbox.utils import importEarthEngine
 from enmapboxprocessing.utils import Utils
-from qgis._core import QgsRectangle
+from qgis.core import QgsRectangle
 from qgis.core import (
     QgsRasterDataProvider, QgsRasterIdentifyResult, QgsProviderRegistry,
     QgsProviderMetadata, QgsMessageLog, Qgis, QgsRaster, QgsRasterInterface,

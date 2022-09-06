@@ -6,10 +6,10 @@ from tempfile import gettempdir
 from typing import Tuple, Dict, Optional
 
 import numpy as np
-from PyQt5.QtCore import QUrl
-from PyQt5.QtGui import QFont, QColor, QTextCursor
-from PyQt5.QtWebKitWidgets import QWebView
-from PyQt5.QtWidgets import (QMainWindow, QToolButton, QProgressBar, QComboBox, QPlainTextEdit, QCheckBox, QDialog,
+from qgis.PyQt.QtCore import QUrl
+from qgis.PyQt.QtGui import QFont, QColor, QTextCursor
+from qgis.PyQt.QtWebKitWidgets import QWebView
+from qgis.PyQt.QtWidgets import (QMainWindow, QToolButton, QProgressBar, QComboBox, QPlainTextEdit, QCheckBox, QDialog,
                              QHBoxLayout, QPushButton, QTableWidget, QTableWidgetItem, QLabel, QRadioButton, QTextEdit,
                              QWidget)
 from PyQt5.uic import loadUi
@@ -54,8 +54,8 @@ from enmapboxprocessing.parameter.processingparameterpicklefilewidget import Pro
 from enmapboxprocessing.typing import ClassifierDump, Category
 from enmapboxprocessing.utils import Utils
 from processing.gui.AlgorithmDialog import AlgorithmDialog
-from qgis._core import QgsMapLayerProxyModel, Qgis, QgsProcessingFeedback, QgsRasterLayer, QgsProcessing
-from qgis._gui import QgsFileWidget, QgsMapLayerComboBox, QgsSpinBox, QgsMessageBar, QgsColorButton, QgsDoubleSpinBox
+from qgis.core import QgsMapLayerProxyModel, Qgis, QgsProcessingFeedback, QgsRasterLayer, QgsProcessing
+from qgis.gui import QgsFileWidget, QgsMapLayerComboBox, QgsSpinBox, QgsMessageBar, QgsColorButton, QgsDoubleSpinBox
 from typeguard import typechecked
 
 

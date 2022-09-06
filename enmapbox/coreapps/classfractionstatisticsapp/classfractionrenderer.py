@@ -2,8 +2,8 @@ from copy import deepcopy
 from typing import List, Optional
 
 import numpy as np
-from PyQt5.QtGui import QColor
-from qgis._core import QgsRasterRenderer, QgsRasterInterface, QgsRectangle, QgsRasterBlockFeedback, QgsRasterBlock, \
+from qgis.PyQt.QtGui import QColor
+from qgis.core import QgsRasterRenderer, QgsRasterInterface, QgsRectangle, QgsRasterBlockFeedback, QgsRasterBlock, \
     Qgis
 
 from enmapboxprocessing.utils import Utils

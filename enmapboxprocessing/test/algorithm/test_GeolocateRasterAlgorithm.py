@@ -1,5 +1,5 @@
 import numpy as np
-from qgis._core import QgsRasterLayer, QgsRectangle, QgsCoordinateReferenceSystem
+from qgis.core import QgsRasterLayer, QgsRectangle, QgsCoordinateReferenceSystem
 
 from enmapboxprocessing.algorithm.geolocaterasteralgorithm import GeolocateRasterAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader

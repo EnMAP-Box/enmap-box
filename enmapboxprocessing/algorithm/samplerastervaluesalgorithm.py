@@ -1,8 +1,8 @@
 from typing import Dict, Any, List, Tuple
 
 import processing
-from PyQt5.QtCore import QVariant
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsRasterLayer,
+from qgis.PyQt.QtCore import QVariant
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsRasterLayer,
                         QgsFeature, QgsField, QgsProcessingFeatureSourceDefinition, QgsApplication,
                         QgsVectorDataProvider, QgsRasterDataProvider, QgsPoint)
 from qgis.core.additions.edit import edit

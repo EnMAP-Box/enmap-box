@@ -7,13 +7,13 @@ from osgeo import gdal
 import numpy
 from qgis.core import *
 from qgis.gui import *
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from qgis.PyQt.QtCore import *
+from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.QtGui import *
 from PyQt5.Qsci import *
-# from PyQt5.QtWebKitWidgets import QWebView
-# from PyQt5.QtWebKit import QWebSettings
-# from PyQt5.QtWebEngineWidgets import QWebEngineView as QWebView
+# from qgis.PyQt.QtWebKitWidgets import QWebView
+# from qgis.PyQt.QtWebKit import QWebSettings
+# from qgis.PyQt.QtWebEngineWidgets import QWebEngineView as QWebView
 
 from .calculator import (Calulator, CodeExecutionError, ApplierInputRaster, ApplierInputVector, ApplierOutputRaster,
                          ApplierOptions, ApplierControls)

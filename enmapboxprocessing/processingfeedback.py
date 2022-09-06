@@ -1,6 +1,6 @@
 from typing import TextIO, Dict
 
-from qgis._core import QgsProcessingFeedback
+from qgis.core import QgsProcessingFeedback
 from typeguard import typechecked
 
 

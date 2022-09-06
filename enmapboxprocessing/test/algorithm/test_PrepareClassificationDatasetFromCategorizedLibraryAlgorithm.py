@@ -1,4 +1,4 @@
-from qgis._core import QgsProcessingException
+from qgis.core import QgsProcessingException
 
 from enmapbox.exampledata import library_gpkg
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedlibraryalgorithm import \

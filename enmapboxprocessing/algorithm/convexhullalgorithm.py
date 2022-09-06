@@ -2,7 +2,7 @@ from math import ceil, isnan
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
 from scipy import interpolate
 from scipy.spatial import ConvexHull
 

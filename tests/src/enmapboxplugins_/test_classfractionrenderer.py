@@ -1,7 +1,7 @@
-from PyQt5.QtGui import QColor
+from qgis.PyQt.QtGui import QColor
 
 from classfractionstatisticsapp.classfractionrenderer import ClassFractionRenderer
-from qgis._core import QgsRasterLayer, Qgis
+from qgis.core import QgsRasterLayer, Qgis
 import numpy as np
 
 

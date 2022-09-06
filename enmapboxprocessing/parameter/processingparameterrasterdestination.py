@@ -1,6 +1,6 @@
 from os.path import splitext
 
-from qgis._core import QgsProcessingParameterRasterDestination, QgsProcessingParameters
+from qgis.core import QgsProcessingParameterRasterDestination, QgsProcessingParameters
 
 
 class ProcessingParameterRasterDestination(QgsProcessingParameterRasterDestination):

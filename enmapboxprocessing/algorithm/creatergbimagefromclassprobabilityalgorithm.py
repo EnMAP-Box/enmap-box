@@ -2,9 +2,9 @@ from math import ceil
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from PyQt5.QtGui import QColor
+from qgis.PyQt.QtGui import QColor
 from osgeo import gdal
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsRasterLayer, Qgis,
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsRasterLayer, Qgis,
                         QgsProcessingException)
 
 from enmapboxprocessing.driver import Driver

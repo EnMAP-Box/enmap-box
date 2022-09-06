@@ -39,8 +39,8 @@ non-working placeholders for a future development.
 
 import os
 
-from PyQt5.QtCore import QObject, pyqtSignal, QRunnable, pyqtSlot, QThreadPool, Qt
-from PyQt5.QtWidgets import QFileDialog, QDialog, QMessageBox
+from qgis.PyQt.QtCore import QObject, pyqtSignal, QRunnable, pyqtSlot, QThreadPool, Qt
+from qgis.PyQt.QtWidgets import QFileDialog, QDialog, QMessageBox
 
 from engeomap import APP_DIR
 from enmapbox.gui.utils import loadUIFormClass

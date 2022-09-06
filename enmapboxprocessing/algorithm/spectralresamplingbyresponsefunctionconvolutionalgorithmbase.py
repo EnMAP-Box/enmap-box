@@ -6,7 +6,7 @@ from warnings import warn
 
 import numpy as np
 from osgeo import gdal
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsVectorFileWriter)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsVectorFileWriter)
 
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibrary, SpectralLibraryUtils
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import SpectralProfile

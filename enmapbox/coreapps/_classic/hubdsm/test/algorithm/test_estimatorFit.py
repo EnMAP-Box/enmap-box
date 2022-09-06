@@ -2,7 +2,7 @@ from os.path import join, dirname
 from unittest import TestCase
 
 from sklearn.ensemble import RandomForestClassifier
-from qgis._core import QgsVectorLayer, QgsRasterLayer
+from qgis.core import QgsVectorLayer, QgsRasterLayer
 
 from enmapbox.qgispluginsupport.qps.speclib.core import SpectralLibrary
 from enmapbox.exampledata import enmap, landcover_points

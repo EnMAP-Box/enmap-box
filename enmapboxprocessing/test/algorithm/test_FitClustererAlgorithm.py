@@ -13,7 +13,7 @@ from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClustererDump
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import classifierDumpPkl
-from qgis._core import Qgis
+from qgis.core import Qgis
 
 
 class FitTestClustererAlgorithm(FitClustererAlgorithmBase):

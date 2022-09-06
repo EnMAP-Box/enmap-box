@@ -1,6 +1,6 @@
 from tempfile import gettempdir
 
-from qgis._core import QgsVectorLayer
+from qgis.core import QgsVectorLayer
 
 from enmapbox import EnMAPBox, initAll
 from enmapbox.testing import start_app

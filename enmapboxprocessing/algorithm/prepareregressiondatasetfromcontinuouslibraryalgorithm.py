@@ -1,7 +1,7 @@
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterField,
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterField,
                         QgsProcessingException)
 
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import FIELD_VALUES, SpectralLibraryUtils

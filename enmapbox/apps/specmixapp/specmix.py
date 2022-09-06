@@ -3,7 +3,7 @@ import math
 import collections
 import enum
 
-from qgis._core import QgsVectorLayer
+from qgis.core import QgsVectorLayer
 
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
 from qgis.PyQt.QtWidgets import *

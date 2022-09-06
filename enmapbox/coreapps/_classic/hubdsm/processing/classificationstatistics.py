@@ -1,7 +1,7 @@
 from os.path import dirname, join
 
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QMainWindow, QComboBox, QPlainTextEdit
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWidgets import QMainWindow, QComboBox, QPlainTextEdit
 from PyQt5.uic import loadUi
 
 from _classic.hubdsm.core.size import Size

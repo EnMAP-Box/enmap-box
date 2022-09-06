@@ -1,7 +1,7 @@
 from os.path import join, dirname
 from unittest import TestCase
 
-from qgis._core import QgsVectorLayer
+from qgis.core import QgsVectorLayer
 
 from enmapbox.exampledata import landcover_points
 from _classic.hubdsm.core.qgsvectorclassificationscheme import QgsVectorClassificationScheme

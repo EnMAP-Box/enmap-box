@@ -9,7 +9,7 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, Qgis, QgsProcessingException)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis, QgsProcessingException)
 from typeguard import typechecked
 
 

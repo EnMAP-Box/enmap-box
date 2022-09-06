@@ -1,8 +1,8 @@
 from typing import Optional
 
-from PyQt5.QtGui import QColor
+from qgis.PyQt.QtGui import QColor
 from osgeo import gdal, ogr
-from qgis._core import QgsPalettedRasterRenderer, QgsRendererCategory, QgsSymbol
+from qgis.core import QgsPalettedRasterRenderer, QgsRendererCategory, QgsSymbol
 
 from _classic.hubdsm.algorithm.importenmapl1b import importEnmapL1B
 from _classic.hubdsm.algorithm.remaprastervalues import remapRasterValues

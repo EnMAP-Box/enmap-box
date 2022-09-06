@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QObject, pyqtSignal
+from qgis.PyQt.QtCore import QObject, pyqtSignal
 
 class _Signals(QObject):
     fileCreated = pyqtSignal(str)

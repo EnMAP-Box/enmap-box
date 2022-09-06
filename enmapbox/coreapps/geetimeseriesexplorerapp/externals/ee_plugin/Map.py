@@ -5,7 +5,7 @@ functions to use GEE within Qgis python script
 from enmapbox.utils import importEarthEngine
 
 eeImported, ee = importEarthEngine(False)
-from qgis._core import QgsRasterLayer
+from qgis.core import QgsRasterLayer
 
 
 def addLayer(eeObject, visParams, name, mapCanvas, shown=True, opacity=1.0) -> QgsRasterLayer:

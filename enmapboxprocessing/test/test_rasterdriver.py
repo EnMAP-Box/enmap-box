@@ -1,6 +1,6 @@
 import numpy as np
 from osgeo import gdal
-from qgis._core import QgsCoordinateReferenceSystem, Qgis, QgsRasterLayer
+from qgis.core import QgsCoordinateReferenceSystem, Qgis, QgsRasterLayer
 
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader

@@ -4,7 +4,7 @@ import numpy as np
 
 from enmapboxprocessing.algorithm.randomsamplesfromclassificationdatasetalgorithm import \
     RandomSamplesFromClassificationDatasetAlgorithm
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClassifierDump, Category, RegressorDump

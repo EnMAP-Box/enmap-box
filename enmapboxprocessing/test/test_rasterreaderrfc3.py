@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QDateTime
+from qgis.PyQt.QtCore import QDateTime
 
 import processing
 from enmapbox.exampledata import enmap

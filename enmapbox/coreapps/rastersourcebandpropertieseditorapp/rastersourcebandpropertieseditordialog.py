@@ -2,7 +2,7 @@ from math import nan
 from os.path import normcase
 from typing import Dict, Optional
 
-from PyQt5.QtWidgets import QToolButton, QMainWindow, QTableWidget, QComboBox, QCheckBox, \
+from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QTableWidget, QComboBox, QCheckBox, \
     QLineEdit, QAbstractSpinBox, QMessageBox
 from PyQt5.uic import loadUi
 from osgeo import gdal
@@ -11,8 +11,8 @@ from enmapbox.qgispluginsupport.qps.speclib.io.envi import readENVIHeader
 from enmapboxprocessing.algorithm.editrastersourcebandpropertiesalgorithm import EditRasterSourceBandPropertiesAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
-from qgis._core import QgsRasterLayer, QgsProject
-from qgis._gui import QgsFilterLineEdit, QgsDateTimeEdit, QgsCollapsibleGroupBox
+from qgis.core import QgsRasterLayer, QgsProject
+from qgis.gui import QgsFilterLineEdit, QgsDateTimeEdit, QgsCollapsibleGroupBox
 from typeguard import typechecked
 
 

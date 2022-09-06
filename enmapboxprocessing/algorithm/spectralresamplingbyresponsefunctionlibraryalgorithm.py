@@ -2,7 +2,7 @@ import traceback
 from collections import OrderedDict
 from typing import Dict, Any, List, Tuple
 
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException,
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException,
                         QgsProcessingParameterField)
 
 from enmapbox.qgispluginsupport.qps.speclib import FIELD_VALUES

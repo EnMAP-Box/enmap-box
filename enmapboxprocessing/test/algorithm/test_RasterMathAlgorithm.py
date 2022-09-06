@@ -1,7 +1,7 @@
 from os.path import normpath
 
 import numpy as np
-from qgis._core import Qgis
+from qgis.core import Qgis
 
 from enmapbox.exampledata import enmap, hires, landcover_polygons
 from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import RasterMathAlgorithm

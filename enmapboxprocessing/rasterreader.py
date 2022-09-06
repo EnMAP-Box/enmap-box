@@ -2,10 +2,10 @@ from math import isnan
 from typing import Iterable, List, Union, Optional, Tuple, Dict
 
 import numpy as np
-from PyQt5.QtCore import QSizeF, QDateTime
-from PyQt5.QtGui import QColor
+from qgis.PyQt.QtCore import QSizeF, QDateTime
+from qgis.PyQt.QtGui import QColor
 from osgeo import gdal
-from qgis._core import (QgsRasterLayer, QgsRasterDataProvider, QgsCoordinateReferenceSystem, QgsRectangle,
+from qgis.core import (QgsRasterLayer, QgsRasterDataProvider, QgsCoordinateReferenceSystem, QgsRectangle,
                         QgsRasterRange, QgsPoint, QgsRasterBlockFeedback, QgsRasterBlock, QgsPointXY,
                         QgsProcessingFeedback, QgsProject, QgsRasterBandStats)
 

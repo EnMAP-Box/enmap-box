@@ -22,9 +22,9 @@
 
 import os
 
-from PyQt5.QtCore import QProcess, QProcessEnvironment
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMenu, QAction, QWidget, QVBoxLayout, QFrame, QGridLayout, QLineEdit, QLabel, QHBoxLayout, \
+from qgis.PyQt.QtCore import QProcess, QProcessEnvironment
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QMenu, QAction, QWidget, QVBoxLayout, QFrame, QGridLayout, QLineEdit, QLabel, QHBoxLayout, \
     QDialogButtonBox
 
 from enmapbox.gui.applications import EnMAPBoxApplication

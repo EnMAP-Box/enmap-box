@@ -4,7 +4,7 @@ from os.path import basename
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 from scipy.cluster import hierarchy
 from scipy.stats import spearmanr
 

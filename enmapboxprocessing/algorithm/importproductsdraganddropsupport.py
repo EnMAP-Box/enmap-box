@@ -2,7 +2,7 @@ import traceback
 from os.path import exists, basename
 from typing import List
 
-from qgis._core import QgsRasterLayer, QgsMapLayer
+from qgis.core import QgsRasterLayer, QgsMapLayer
 
 from enmapboxprocessing.algorithm.importdesisl1balgorithm import ImportDesisL1BAlgorithm
 from enmapboxprocessing.algorithm.importdesisl1calgorithm import ImportDesisL1CAlgorithm

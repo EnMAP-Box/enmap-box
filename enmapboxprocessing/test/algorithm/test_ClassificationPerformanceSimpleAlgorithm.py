@@ -1,7 +1,7 @@
 from math import isnan
 import numpy as np
 
-from qgis._core import QgsProcessingException, QgsRasterLayer
+from qgis.core import QgsProcessingException, QgsRasterLayer
 
 from enmapbox.exampledata import landcover_polygons, enmap
 from enmapboxprocessing.algorithm.classificationperformancesimplealgorithm import \

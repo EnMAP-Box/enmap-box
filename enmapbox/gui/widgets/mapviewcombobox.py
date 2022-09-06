@@ -1,6 +1,6 @@
 from typing import Optional
 
-from PyQt5.QtWidgets import QComboBox
+from qgis.PyQt.QtWidgets import QComboBox
 
 from enmapbox.gui.dataviews.docks import MapDock, DockTypes
 from typeguard import typechecked

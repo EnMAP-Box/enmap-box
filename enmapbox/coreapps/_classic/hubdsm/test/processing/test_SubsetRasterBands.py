@@ -1,5 +1,5 @@
 import numpy as np
-from qgis._core import QgsRasterLayer
+from qgis.core import QgsRasterLayer
 
 from enmapbox.exampledata import enmap
 from _classic.hubdsm.core.gdaldriver import MEM_DRIVER

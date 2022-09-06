@@ -2,8 +2,8 @@ from typing import List, Optional
 
 from enmapbox.utils import importEarthEngine
 from geetimeseriesexplorerapp.utils import utilsMsecToDateTime
-from qgis._core import QgsTask
-from qgis._gui import QgsMessageBar
+from qgis.core import QgsTask
+from qgis.gui import QgsMessageBar
 from typeguard import typechecked
 
 

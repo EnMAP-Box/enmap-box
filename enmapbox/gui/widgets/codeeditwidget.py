@@ -1,5 +1,5 @@
 from PyQt5.Qsci import QsciScintilla, QsciLexerPython
-from PyQt5.QtGui import QFont, QFontMetrics, QColor
+from qgis.PyQt.QtGui import QFont, QFontMetrics, QColor
 
 
 class CodeEditWidget(QsciScintilla):

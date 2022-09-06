@@ -1,4 +1,4 @@
-from qgis._core import QgsRasterLayer, QgsVectorLayer
+from qgis.core import QgsRasterLayer, QgsVectorLayer
 
 from classificationstatisticsapp.classificationstatisticsdialog import ClassificationStatisticsDialog
 from enmapbox import EnMAPBox, initAll

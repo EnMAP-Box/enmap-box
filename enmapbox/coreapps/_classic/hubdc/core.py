@@ -2942,8 +2942,8 @@ class MapViewer():
         # self.canvas.wheelEvent = self.wheelEvent # ()keyPressed.connect(self.onKeyPressed)
 
     def onKeyPressed(self, e):
-        from PyQt5.QtGui import QKeyEvent
-        from PyQt5.QtCore import Qt
+        from qgis.PyQt.QtGui import QKeyEvent
+        from qgis.PyQt.QtCore import Qt
         assert isinstance(e, QKeyEvent)
         print(e.key())
         print(e.modifiers())
@@ -3054,7 +3054,7 @@ class MapViewer():
 
         self._prepareShowOrSave()
 
-        from PyQt5.QtGui import QImage, QPainter, QColor
+        from qgis.PyQt.QtGui import QImage, QPainter, QColor
         from qgis.core import QgsMapRendererCustomPainterJob
         size = self.canvas.size()
         image = QImage(size, QImage.Format_RGB32)

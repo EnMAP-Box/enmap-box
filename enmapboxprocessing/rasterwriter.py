@@ -1,7 +1,7 @@
 from typing import List, Union, Optional
 
-from PyQt5.QtCore import QDateTime
-from PyQt5.QtGui import QColor
+from qgis.PyQt.QtCore import QDateTime
+from qgis.PyQt.QtGui import QColor
 from osgeo import gdal
 
 from enmapboxprocessing.typing import Array3d, Array2d, MetadataValue, MetadataDomain, Metadata, QgisDataType, Number

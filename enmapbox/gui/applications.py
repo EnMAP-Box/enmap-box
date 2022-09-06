@@ -28,7 +28,7 @@ import traceback
 import typing
 from typing import Optional
 
-from PyQt5.QtWidgets import QAction
+from qgis.PyQt.QtWidgets import QAction
 
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.PyQt.QtGui import QIcon

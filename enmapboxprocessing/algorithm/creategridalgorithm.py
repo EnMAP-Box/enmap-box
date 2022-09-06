@@ -1,6 +1,6 @@
 from typing import Dict, Any, List, Tuple
 
-from qgis._core import QgsProcessingContext, QgsProcessingFeedback, Qgis
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, Qgis
 
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group

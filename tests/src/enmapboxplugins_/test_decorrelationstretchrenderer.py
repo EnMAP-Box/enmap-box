@@ -1,7 +1,7 @@
 import numpy as np
 
 from decorrelationstretchapp.decorrelationstretchrenderer import DecorrelationStretchRenderer
-from qgis._core import QgsRasterLayer, Qgis
+from qgis.core import QgsRasterLayer, Qgis
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import RobustScaler, MinMaxScaler
 

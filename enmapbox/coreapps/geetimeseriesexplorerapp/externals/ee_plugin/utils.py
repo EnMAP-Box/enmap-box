@@ -6,7 +6,7 @@ import json
 
 from enmapbox.gui.mapcanvas import MapCanvas
 from enmapbox.utils import importEarthEngine
-from qgis._gui import QgsMapCanvas
+from qgis.gui import QgsMapCanvas
 from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform
 from qgis.core import QgsPointXY, QgsRectangle
 from qgis.core import QgsProject

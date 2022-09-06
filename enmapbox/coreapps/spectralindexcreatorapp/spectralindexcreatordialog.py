@@ -1,12 +1,12 @@
 from math import inf
 from typing import Optional
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QToolButton, QMainWindow, QTableWidget, QListWidget, \
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QTableWidget, QListWidget, \
     QListWidgetItem, QLabel, QCheckBox, QLineEdit
 from PyQt5.uic import loadUi
-from qgis._core import QgsMapLayerProxyModel, QgsRasterLayer, QgsProcessing, QgsRasterBandStats
-from qgis._gui import QgsRasterBandComboBox, QgsMapLayerComboBox, QgsFilterLineEdit, QgsDoubleSpinBox, QgsFileWidget
+from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsProcessing, QgsRasterBandStats
+from qgis.gui import QgsRasterBandComboBox, QgsMapLayerComboBox, QgsFilterLineEdit, QgsDoubleSpinBox, QgsFileWidget
 
 import processing
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm

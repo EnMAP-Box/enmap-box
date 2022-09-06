@@ -2,7 +2,7 @@ from math import ceil
 from typing import List, Tuple, Dict, Any
 
 import numpy as np
-from qgis._core import Qgis, QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer
+from qgis.core import Qgis, QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer
 
 from enmapboxprocessing.enmapalgorithm import Group, EnMAPProcessingAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader

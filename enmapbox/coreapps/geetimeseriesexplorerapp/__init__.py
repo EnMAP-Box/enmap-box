@@ -1,8 +1,8 @@
 from typing import Optional
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QAction
 
 from enmapbox import EnMAPBox
 from enmapbox.gui.applications import EnMAPBoxApplication
@@ -13,8 +13,8 @@ from geetimeseriesexplorerapp.externals.ee_plugin.provider import register_data_
 from geetimeseriesexplorerapp.geetemporalprofiledockwidget import GeeTemporalProfileDockWidget
 from geetimeseriesexplorerapp.geetimeseriesexplorerdockwidget import GeeTimeseriesExplorerDockWidget
 from geetimeseriesexplorerapp.maptool import MapTool
-from qgis._core import QgsRasterLayer, QgsRectangle
-from qgis._gui import QgisInterface
+from qgis.core import QgsRasterLayer, QgsRectangle
+from qgis.gui import QgisInterface
 from typeguard import typechecked
 
 

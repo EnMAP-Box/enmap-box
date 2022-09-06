@@ -6,7 +6,7 @@ from typing import List, Optional
 from osgeo import gdal
 
 from enmapboxprocessing.rasterwriter import RasterWriter
-from qgis._core import QgsTask, QgsMessageLog, Qgis
+from qgis.core import QgsTask, QgsMessageLog, Qgis
 from typeguard import typechecked
 
 

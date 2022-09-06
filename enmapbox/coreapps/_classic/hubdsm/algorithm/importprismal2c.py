@@ -3,7 +3,7 @@ from os.path import basename, exists
 import numpy as np
 
 from osgeo import gdal
-from qgis._core import QgsRasterLayer, QgsRectangle, QgsCoordinateReferenceSystem
+from qgis.core import QgsRasterLayer, QgsRectangle, QgsCoordinateReferenceSystem
 
 from _classic.hubdsm.core.extent import Extent
 from _classic.hubdsm.core.grid import Grid

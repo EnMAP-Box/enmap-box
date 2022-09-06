@@ -5,7 +5,7 @@ from osgeo import gdal
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessing, QgsRasterLayer)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessing, QgsRasterLayer)
 
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group

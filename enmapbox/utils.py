@@ -1,7 +1,7 @@
 from typing import Optional, Tuple
 
-from PyQt5.QtCore import QObject
-from PyQt5.QtWidgets import QMessageBox
+from qgis.PyQt.QtCore import QObject
+from qgis.PyQt.QtWidgets import QMessageBox
 
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from qgis.core import QgsRasterLayer

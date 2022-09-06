@@ -8,7 +8,7 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer,
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer,
                         QgsProcessingException, QgsMapLayer)
 from typeguard import typechecked
 

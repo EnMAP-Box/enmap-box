@@ -4,7 +4,7 @@ from typing import Union, List, Dict, Optional, Any
 import numpy as np
 from osgeo import gdal
 
-from qgis._core import QgsRasterDataProvider, QgsRasterLayer
+from qgis.core import QgsRasterDataProvider, QgsRasterLayer
 
 try:  # scikit-learn is optional
     from sklearn.base import ClassifierMixin, RegressorMixin, TransformerMixin, ClusterMixin

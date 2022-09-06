@@ -10,7 +10,7 @@ import numpy
 import numpy as np
 from unittest.mock import Mock
 from osgeo import gdal
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsProcessing,
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsProcessing,
                         QgsProcessingParameterString, QgsProject, QgsRasterLayer, Qgis, QgsVectorLayer, QgsFields)
 
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm

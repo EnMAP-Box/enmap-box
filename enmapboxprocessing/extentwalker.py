@@ -1,7 +1,7 @@
 import math
 
-from PyQt5.QtCore import QSizeF, QRectF
-from qgis._core import QgsRectangle, QgsPointXY, QgsProcessingFeedback, QgsProcessingException
+from qgis.PyQt.QtCore import QSizeF, QRectF
+from qgis.core import QgsRectangle, QgsPointXY, QgsProcessingFeedback, QgsProcessingException
 
 from typeguard import typechecked
 

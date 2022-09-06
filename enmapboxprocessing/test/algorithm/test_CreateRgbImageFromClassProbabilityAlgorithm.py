@@ -1,5 +1,5 @@
 import numpy as np
-from qgis._core import QgsProcessingException
+from qgis.core import QgsProcessingException
 from sklearn.base import ClassifierMixin
 
 from enmapbox.exampledata import enmap

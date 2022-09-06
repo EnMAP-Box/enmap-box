@@ -1,6 +1,6 @@
 from sklearn.base import TransformerMixin
 
-from qgis._core import QgsProcessingException
+from qgis.core import QgsProcessingException
 from enmapbox.exampledata import enmap
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.algorithm.fitfactoranalysisalgorithm import FitFactorAnalysisAlgorithm

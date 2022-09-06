@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QComboBox, QTextBrowser
+from qgis.PyQt.QtWidgets import QWidget, QComboBox, QTextBrowser
 from PyQt5.uic import loadUi
 
 from enmapboxprocessing.algorithm.algorithms import algorithms

@@ -1,7 +1,7 @@
 import webbrowser
 from typing import Dict, Any, List, Tuple
 
-from qgis._core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsMapLayer
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsMapLayer
 
 from enmapboxprocessing.algorithm.classificationperformancestratifiedalgorithm import \
     ClassificationPerformanceStratifiedAlgorithm

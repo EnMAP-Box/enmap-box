@@ -2,7 +2,7 @@ from os.path import join
 
 import numpy as np
 
-from qgis._core import QgsVectorLayer, QgsRasterLayer
+from qgis.core import QgsVectorLayer, QgsRasterLayer
 
 from enmapbox.qgispluginsupport.qps.speclib.core import SpectralLibrary
 from _classic.classificationapp.script import classificationWorkflow

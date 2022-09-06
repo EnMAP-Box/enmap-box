@@ -1,8 +1,8 @@
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QCursor, QColor
-from PyQt5.QtWidgets import QAction
+from qgis.PyQt.QtCore import Qt, pyqtSignal
+from qgis.PyQt.QtGui import QCursor, QColor
+from qgis.PyQt.QtWidgets import QAction
 
-from qgis._gui import QgsMapTool, QgsMapMouseEvent, QgsMapCanvas, QgsVertexMarker
+from qgis.gui import QgsMapTool, QgsMapMouseEvent, QgsMapCanvas, QgsVertexMarker
 from typeguard import typechecked
 
 

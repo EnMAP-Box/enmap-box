@@ -21,7 +21,7 @@
 
 import os
 
-from PyQt5.QtWidgets import QDialog
+from qgis.PyQt.QtWidgets import QDialog
 
 from enmapbox.qgispluginsupport.qps.utils import loadUi
 from examples.exampleapp import APP_DIR

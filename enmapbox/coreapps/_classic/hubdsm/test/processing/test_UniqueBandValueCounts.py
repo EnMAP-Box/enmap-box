@@ -1,5 +1,5 @@
 import numpy as np
-from qgis._core import QgsRasterLayer
+from qgis.core import QgsRasterLayer
 
 from _classic.hubdsm.core.gdaldriver import ENVI_DRIVER
 from _classic.hubdsm.processing.uniquebandvaluecounts import UniqueBandValueCounts

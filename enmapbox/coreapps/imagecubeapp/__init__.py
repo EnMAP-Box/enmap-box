@@ -31,7 +31,7 @@ class ImageCubeApplication(EnMAPBoxApplication):
     def openglAvailable(self) -> bool:
         try:
             import OpenGL
-            import PyQt5.QtOpenGL
+            import qgis.PyQt.QtOpenGL
             self.mErrorMessage = None
             return True
         except Exception as ex:

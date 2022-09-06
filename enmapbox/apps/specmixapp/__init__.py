@@ -23,7 +23,7 @@ import os
 import typing
 import pathlib
 
-from qgis._core import QgsVectorLayer
+from qgis.core import QgsVectorLayer
 
 from qgis.PyQt.QtGui import *
 from qgis.PyQt.QtWidgets import *

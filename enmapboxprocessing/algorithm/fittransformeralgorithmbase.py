@@ -8,7 +8,7 @@ from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromrasteralgorithm 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
-from qgis._core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException
 from typeguard import typechecked
 
 

@@ -2,17 +2,17 @@ from random import randint
 from random import randint
 from typing import Optional, List, Tuple
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QMouseEvent, QColor
-from PyQt5.QtWidgets import QToolButton, QMainWindow, QCheckBox, QTableWidget, QComboBox
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QMouseEvent, QColor
+from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QCheckBox, QTableWidget, QComboBox
 from PyQt5.uic import loadUi
 
 from enhancedmultibandcolorapp.enhancedmultibandcolorrenderer import EnhancedMultiBandColorRenderer
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from enmapboxprocessing.rasterreader import RasterReader
-from qgis._core import QgsRasterLayer, QgsRasterDataProvider, QgsRasterHistogram, QgsMapLayerProxyModel, QgsMapSettings
-from qgis._gui import QgsMapCanvas, QgsMapLayerComboBox, QgsColorButton, QgsDoubleSpinBox
+from qgis.core import QgsRasterLayer, QgsRasterDataProvider, QgsRasterHistogram, QgsMapLayerProxyModel, QgsMapSettings
+from qgis.gui import QgsMapCanvas, QgsMapLayerComboBox, QgsColorButton, QgsDoubleSpinBox
 from typeguard import typechecked
 
 

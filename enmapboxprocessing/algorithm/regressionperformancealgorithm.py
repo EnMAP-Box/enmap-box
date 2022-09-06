@@ -7,7 +7,7 @@ from os.path import exists, dirname
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from PyQt5.QtGui import QColor
+from qgis.PyQt.QtGui import QColor
 from osgeo import gdal
 
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
@@ -17,7 +17,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.reportwriter import MultiReportWriter, HtmlReportWriter, CsvReportWriter
 from enmapboxprocessing.utils import Utils
-from qgis._core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer, \
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer, \
     QgsProcessingException
 from typeguard import typechecked
 

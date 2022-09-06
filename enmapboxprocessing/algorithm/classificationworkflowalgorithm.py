@@ -7,7 +7,7 @@ from enmapboxprocessing.algorithm.predictclassprobabilityalgorithm import Predic
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.utils import Utils
 from processing import getTempFilename
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 from typeguard import typechecked
 
 

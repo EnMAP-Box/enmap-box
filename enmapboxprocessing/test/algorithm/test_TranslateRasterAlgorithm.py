@@ -1,7 +1,7 @@
 from os.path import exists
 
 import numpy as np
-from qgis._core import QgsRasterLayer, QgsRasterRenderer, Qgis
+from qgis.core import QgsRasterLayer, QgsRasterRenderer, Qgis
 
 from enmapbox.exampledata import enmap, hires
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm

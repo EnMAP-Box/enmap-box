@@ -60,7 +60,7 @@ class TestExampleEnMAPBoxApp(TestCase):
     def test_dialog(self):
 
         from exampleapp.userinterfaces import ExampleGUI
-        from PyQt5.QtCore import QCoreApplication
+        from qgis.PyQt.QtCore import QCoreApplication
 
         g = ExampleGUI()
         g.show()

@@ -1,5 +1,5 @@
 import numpy as np
-from qgis._core import QgsRasterLayer, QgsVectorLayer, QgsPalettedRasterRenderer, QgsCategorizedSymbolRenderer
+from qgis.core import QgsRasterLayer, QgsVectorLayer, QgsPalettedRasterRenderer, QgsCategorizedSymbolRenderer
 
 from enmapbox.exampledata import enmap, landcover_polygons
 from enmapboxprocessing.algorithm.rasterizecategorizedvectoralgorithm import RasterizeCategorizedVectorAlgorithm

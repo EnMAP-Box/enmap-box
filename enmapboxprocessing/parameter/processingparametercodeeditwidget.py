@@ -1,6 +1,6 @@
 from PyQt5.Qsci import QsciScintilla, QsciLexerPython
-from PyQt5.QtGui import QFont, QFontMetrics, QColor, QWheelEvent
-from PyQt5.QtWidgets import QWidget
+from qgis.PyQt.QtGui import QFont, QFontMetrics, QColor, QWheelEvent
+from qgis.PyQt.QtWidgets import QWidget
 from PyQt5.uic import loadUi
 
 from processing.gui.wrappers import WidgetWrapper, DIALOG_MODELER, DIALOG_BATCH

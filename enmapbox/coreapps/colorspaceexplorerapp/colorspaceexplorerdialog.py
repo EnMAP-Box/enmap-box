@@ -1,12 +1,12 @@
 from random import randint
 from typing import Optional
 
-from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import QWidget, QToolButton, QCheckBox, QMainWindow, QSpinBox, QGridLayout, QLayoutItem
+from qgis.PyQt.QtCore import QTimer
+from qgis.PyQt.QtWidgets import QWidget, QToolButton, QCheckBox, QMainWindow, QSpinBox, QGridLayout, QLayoutItem
 from PyQt5.uic import loadUi
-from qgis._core import QgsRasterLayer, QgsMultiBandColorRenderer, QgsContrastEnhancement, QgsRasterMinMaxOrigin, \
+from qgis.core import QgsRasterLayer, QgsMultiBandColorRenderer, QgsContrastEnhancement, QgsRasterMinMaxOrigin, \
     QgsMapLayerProxyModel
-from qgis._gui import QgsMapCanvas, QgsRasterBandComboBox, QgsMapLayerComboBox
+from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsMapLayerComboBox
 
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from typeguard import typechecked

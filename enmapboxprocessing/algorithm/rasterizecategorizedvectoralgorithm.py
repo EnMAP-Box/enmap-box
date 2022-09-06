@@ -1,8 +1,8 @@
 from typing import Dict, Any, List, Tuple
 
-from PyQt5.QtCore import QVariant
+from qgis.PyQt.QtCore import QVariant
 from osgeo import gdal
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsRectangle,
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsRectangle,
                         QgsCoordinateReferenceSystem, QgsVectorFileWriter,
                         QgsProject, QgsField, QgsCoordinateTransform, QgsRasterLayer, QgsProcessingException,
                         QgsMapLayer)

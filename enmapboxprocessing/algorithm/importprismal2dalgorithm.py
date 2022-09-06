@@ -5,7 +5,7 @@ import numpy as np
 from osgeo import gdal
 
 from enmapboxprocessing.algorithm.importprismal1algorithm import utilsReadAsArray, utilsDeleteCopy
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRectangle,
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRectangle,
                         QgsCoordinateReferenceSystem)
 
 from enmapboxprocessing.driver import Driver

@@ -1,5 +1,5 @@
 import numpy as np
-from qgis._core import QgsRasterLayer
+from qgis.core import QgsRasterLayer
 
 from enmapboxprocessing.algorithm.createdefaultpalettedrasterrendereralgorithm import \
     CreateDefaultPalettedRasterRendererAlgorithm

@@ -1,8 +1,8 @@
 from typing import List
 
-from PyQt5.QtGui import QColor
+from qgis.PyQt.QtGui import QColor
 from dataclasses import dataclass
-from qgis._core import QgsPalettedRasterRenderer, QgsCategorizedSymbolRenderer
+from qgis.core import QgsPalettedRasterRenderer, QgsCategorizedSymbolRenderer
 
 from _classic.hubdsm.core.color import Color
 

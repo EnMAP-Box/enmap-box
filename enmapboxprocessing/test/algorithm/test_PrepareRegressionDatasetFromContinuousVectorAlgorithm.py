@@ -1,4 +1,4 @@
-from qgis._core import QgsProcessingException
+from qgis.core import QgsProcessingException
 
 from enmapbox.exampledata import enmap, landcover_polygons, landcover_points
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedvectoralgorithm import \

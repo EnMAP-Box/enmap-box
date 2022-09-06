@@ -9,9 +9,9 @@ from typing import Optional, List, Tuple, Dict
 
 import numpy as np
 from PyQt5 import QtGui
-from PyQt5.QtCore import Qt, QDateTime, QDate, QModelIndex, QRectF, QStandardPaths, pyqtSignal, QCoreApplication
-from PyQt5.QtGui import QColor, QPen, QBrush, QIcon, QPixmap
-from PyQt5.QtWidgets import (QToolButton, QListWidget, QApplication, QSpinBox,
+from qgis.PyQt.QtCore import Qt, QDateTime, QDate, QModelIndex, QRectF, QStandardPaths, pyqtSignal, QCoreApplication
+from qgis.PyQt.QtGui import QColor, QPen, QBrush, QIcon, QPixmap
+from qgis.PyQt.QtWidgets import (QToolButton, QListWidget, QApplication, QSpinBox,
                              QColorDialog, QComboBox, QCheckBox, QLineEdit,
                              QFileDialog, QListWidgetItem, QSlider, QTableWidget, QProgressBar,
                              QTableWidgetItem, QMessageBox)
@@ -25,9 +25,9 @@ from geetimeseriesexplorerapp.tasks.buildimagechipvrtstask import BuildImageChip
 from geetimeseriesexplorerapp.tasks.downloadimagechiptask import DownloadImageChipTask, DownloadImageChipBandTask
 from geetimeseriesexplorerapp.tasks.downloadprofiletask import DownloadProfileTask
 from qgis.PyQt import uic
-from qgis._core import (QgsProject, QgsCoordinateReferenceSystem, QgsPointXY, QgsCoordinateTransform, QgsGeometry,
+from qgis.core import (QgsProject, QgsCoordinateReferenceSystem, QgsPointXY, QgsCoordinateTransform, QgsGeometry,
                         QgsFeature, QgsVectorLayer, QgsMapLayerProxyModel, QgsFields, QgsApplication)
-from qgis._gui import (QgsDockWidget, QgsFeaturePickerWidget,
+from qgis.gui import (QgsDockWidget, QgsFeaturePickerWidget,
                        QgsMapLayerComboBox, QgsFieldComboBox, QgsMessageBar, QgsColorButton, QgsFileWidget,
                        QgsCheckableComboBox, QgsMapMouseEvent)
 from typeguard import typechecked
