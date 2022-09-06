@@ -2,16 +2,17 @@ import pathlib
 import site
 import unittest
 
-from qgis.PyQt.QtWidgets import QWidget
 from enmapbox import DIR_ENMAPBOX
-from enmapbox.testing import TestObjects, EnMAPBoxTestCase
-from qgis.core import QgsRasterLayer, QgsPalettedRasterRenderer, QgsProject
+from enmapbox import EnMAPBox, EnMAPBoxApplication
+from enmapbox.testing import EnMAPBoxTestCase
+from qgis.PyQt.QtWidgets import QWidget
 
 site.addsitedir(pathlib.Path(DIR_ENMAPBOX) / 'coreapps')
 
-from vrtbuilderapp import vrtBuilderPluginInstalled, VRTBuilderApp
-
-from enmapbox import EnMAPBox, EnMAPBoxApplication
+try:
+    from vrtbuilderapp import vrtBuilderPluginInstalled, VRTBuilderApp
+except ModuleNotFoundError as ex:
+    unittest.skip(f'Module not found: {ex}')
 
 
 class TestVRTBuilderApp(EnMAPBoxTestCase):
@@ -35,5 +36,4 @@ class TestVRTBuilderApp(EnMAPBoxTestCase):
 
 
 if __name__ == "__main__":
-
     unittest.main(buffer=False)

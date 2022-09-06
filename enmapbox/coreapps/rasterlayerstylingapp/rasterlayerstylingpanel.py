@@ -65,7 +65,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
         QgsDockWidget.__init__(self, parent)
         uic.loadUi(__file__.replace('.py', '.ui'), self)
         self.enmapBox = enmapBox
-        self.defaultRenderer: Optional[QgsRasterRenderer] = None
+        self.originalRenderer: Optional[QgsRasterRenderer] = None
         self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
         self.cache = dict()
 
@@ -240,11 +240,11 @@ class RasterLayerStylingPanel(QgsDockWidget):
             return
 
         layer: QgsRasterLayer = self.mLayer.currentLayer()
-        if not isinstance(layer, QgsRasterLayer):
+        if not isinstance(layer, QgsRasterLayer) or layer.dataProvider().name() in ['wms']:
             self.disableGui()
             return
 
-        self.defaultRenderer = layer.renderer().clone()
+        self.originalRenderer = layer.renderer().clone()
 
         with BlockSignals(self.mRenderer):
             renderer = layer.renderer()
@@ -276,7 +276,10 @@ class RasterLayerStylingPanel(QgsDockWidget):
 
             renderer: QgsMultiBandColorRenderer = layer.renderer()
             if not isinstance(layer.renderer(), QgsMultiBandColorRenderer):
-                renderer = Utils.multiBandColorRenderer(layer.dataProvider(), [1] * 3, [nan] * 3, [nan] * 3)
+                if isinstance(self.originalRenderer, QgsMultiBandColorRenderer):
+                    renderer = self.originalRenderer.clone()
+                else:
+                    renderer = Utils.multiBandColorRenderer(layer.dataProvider(), [1] * 3, [nan] * 3, [nan] * 3)
                 layer.setRenderer(renderer)
 
             for mBand, ce, bandNo in [
@@ -295,7 +298,10 @@ class RasterLayerStylingPanel(QgsDockWidget):
 
             renderer: QgsSingleBandGrayRenderer = layer.renderer()
             if not isinstance(layer.renderer(), QgsSingleBandGrayRenderer):
-                renderer = Utils.singleBandGrayRenderer(layer.dataProvider(), 1, nan, nan)
+                if isinstance(self.originalRenderer, QgsSingleBandGrayRenderer):
+                    renderer = self.originalRenderer.clone()
+                else:
+                    renderer = Utils.singleBandGrayRenderer(layer.dataProvider(), 1, nan, nan)
                 layer.setRenderer(renderer)
             ce: QgsContrastEnhancement = renderer.contrastEnhancement()
 
@@ -310,18 +316,20 @@ class RasterLayerStylingPanel(QgsDockWidget):
 
             renderer: QgsSingleBandPseudoColorRenderer = layer.renderer()
             if not isinstance(layer.renderer(), QgsSingleBandPseudoColorRenderer):
-                renderer = Utils.singleBandPseudoColorRenderer(layer.dataProvider(), 1, nan, nan, None)
+                if isinstance(self.originalRenderer, QgsSingleBandPseudoColorRenderer):
+                    renderer = self.originalRenderer.clone()
+                else:
+                    renderer = Utils.singleBandPseudoColorRenderer(layer.dataProvider(), 1, nan, nan, None)
                 layer.setRenderer(renderer)
             shader: QgsRasterShader = renderer.shader()
 
             with BlockSignals(self.mPseudoBand.mMin, self.mPseudoBand.mMax, self.mPseudoBand.mBandNo):
                 self.mPseudoBand.mMin.setText(str(shader.minimumValue()))
-                print(renderer.band())
                 self.mPseudoBand.mMax.setText(str(shader.maximumValue()))
                 self.mPseudoBand.mBandNo.setBand(renderer.band())
 
         elif self.mRenderer.currentIndex() == self.DefaultRendererTab:
-            layer.setRenderer(self.defaultRenderer.clone())
+            layer.setRenderer(self.originalRenderer.clone())
         elif self.mRenderer.currentIndex() == self.SpectralLinkingTab:
             pass
         else:

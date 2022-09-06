@@ -9,7 +9,7 @@ from enmapboxprocessing.test.algorithm.testcase import TestCase
 class TestImportSentinel2L2AAlgorithm(TestCase):
 
     def test(self):
-        if not self.sensorProductsFolderExists():
+        if not self.additionalDataFolderExists():
             return
 
         alg = ImportSentinel2L2AAlgorithm()

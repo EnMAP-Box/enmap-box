@@ -80,7 +80,9 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
         linkMaintainer = EnMAPProcessingAlgorithm.htmlLink('https://github.com/davemlz', 'David Montero Loaiza')
         return f'Create a stack of {self.linkAwesomeSpectralIndices} and/or custom indices.\n' \
                f'Credits: the Awesome Spectral Indices project provides a ready-to-use curated list ' \
-               f'of Spectral Indices for Remote Sensing applications, maintained by {linkMaintainer}.'
+               f'of Spectral Indices for Remote Sensing applications, maintained by {linkMaintainer}. \n' \
+               f'Note that the list of available indices was last updated on 2021-11-15. ' \
+               f'Should you need other indices added after this date, please file an issue.'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         helpParameters = [

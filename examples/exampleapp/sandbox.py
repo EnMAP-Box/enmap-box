@@ -18,13 +18,12 @@
 *                                                                         *
 ***************************************************************************
 """
-import enmapbox
 
 """
 This sandbox can be used to run your EnMAP-Box Application without starting a (heavy) QGIS Instance.
 """
 
-import qgis
+
 def sandboxShowAppInEnMapBox(loadPF=True):
     """
     A minimum example that shows how to load the EnMAP-Box
@@ -33,19 +32,15 @@ def sandboxShowAppInEnMapBox(loadPF=True):
     """
     """Minimum example to the this application"""
 
-    import enmapbox.gui
-
-
     from enmapbox.gui.enmapboxgui import EnMAPBox
     EB = EnMAPBox(None)
     EB.run()
     EB.openExampleData(mapWindows=2)
 
-    #now load your App into the EnMAP-Box
+    # now load your App into the EnMAP-Box
     import os
     appDir = os.path.dirname(__file__)
     EB.addApplication(appDir)
-
 
 
 def sandboxShowAppGuiOnly():
@@ -57,13 +52,13 @@ def sandboxShowAppGuiOnly():
     ui1 = ExampleGUI()
     ui1.show()
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
 
     from enmapbox.testing import initQgisApplication
 
-    #this will initialize the QApplication/QgsApplication which runs in the background
-    #see https://qgis.org/api/classQgsApplication.html for details
+    # this will initialize the QApplication/QgsApplication which runs in the background
+    # see https://qgis.org/api/classQgsApplication.html for details
     qgsApp = initQgisApplication()
 
     if False:
@@ -71,6 +66,5 @@ if __name__ == '__main__':
     else:
         sandboxShowAppInEnMapBox(True)
 
-    #start the GUI thread
+    # start the GUI thread
     qgsApp.exec_()
-

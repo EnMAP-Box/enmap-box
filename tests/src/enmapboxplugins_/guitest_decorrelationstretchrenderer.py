@@ -1,21 +1,18 @@
-from qgis._core import QgsRasterLayer
+from enmapbox.coreapps.decorrelationstretchapp.decorrelationstretchrenderer import DecorrelationStretchRenderer
+from qgis.core import QgsRasterLayer
 import numpy as np
 
 from enmapbox.exampledata import enmap
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxplugins.mapviewplugins.decorrelationstretchrenderer import DecorrelationStretchRenderer
 from enmapbox import EnMAPBox, initAll
 from enmapbox.testing import start_app
-
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import RobustScaler, MinMaxScaler
 
 layer = QgsRasterLayer(enmap, 'enmap_berlin.bsq')
 reader = RasterReader(layer)
 
-
 bandList = [38, 23, 5]
-
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import RobustScaler, MinMaxScaler
 
 # todo read only a subset of the data
 array = reader.array(bandList=bandList)

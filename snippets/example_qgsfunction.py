@@ -1,5 +1,6 @@
 from qgis.core import QgsExpressionFunction, QgsExpressionContext, QgsExpression
 
+
 class MyFunction(QgsExpressionFunction):
 
     def __init__(self):
@@ -8,6 +9,7 @@ class MyFunction(QgsExpressionFunction):
     def func(self, values, context: QgsExpressionContext, parent, node):
         print(context.feature().isValid())
         return 42
+
 
 # register function
 func = MyFunction()

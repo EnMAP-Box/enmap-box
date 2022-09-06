@@ -1,6 +1,4 @@
 from osgeo import gdal
-
-from enmapbox import EnMAPBox, initAll
 from enmapbox.exampledata import enmap
 from enmapbox.testing import start_app
 from enmapboxprocessing.rasterwriter import RasterWriter
@@ -23,6 +21,7 @@ if True:
     from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog
     showLayerPropertiesDialog(layer)
 else:
+    from enmapbox import EnMAPBox
     enmapBox = EnMAPBox(load_other_apps=False)
     enmapBox.onDataDropped([layer])
 qgsApp.exec_()

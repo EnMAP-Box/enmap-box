@@ -11,15 +11,15 @@ start_app()
 
 crs = QgsCoordinateReferenceSystem('EPSG:4326')
 assert crs.isValid()
-createOptions= []
+createOptions = []
 DP, v = QgsRasterDataProvider.create('gdal',
-                                  'empty',
-                                  'MEM',
-                                  3,
-                                  Qgis.DataType.Int16,
-                                  20,
-                                  50,
-                                  crs,
-                                  createOptions)
+                                     'empty',
+                                     'MEM',
+                                     3,
+                                     Qgis.DataType.Int16,
+                                     20,
+                                     50,
+                                     crs,
+                                     createOptions)
 
 s = ""

@@ -9,7 +9,7 @@ class TestImportDesisL1CAlgorithm(TestCase):
 
     def test(self):
 
-        if not self.sensorProductsFolderExists():
+        if not self.additionalDataFolderExists():
             return
 
         alg = ImportDesisL1CAlgorithm()

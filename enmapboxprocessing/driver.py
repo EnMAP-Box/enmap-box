@@ -21,7 +21,9 @@ class Driver(object):
     GTiffFormat = 'GTiff'
     DefaultGTiffCreationOptions = 'INTERLEAVE=BAND COMPRESS=LZW TILED=YES BIGTIFF=YES'.split()
     EnviFormat = 'ENVI'
-    DefaultEnviCreationOptions = 'INTERLEAVE=BSQ'.split()
+    DefaultEnviBsqCreationOptions = 'INTERLEAVE=BSQ'.split()
+    DefaultEnviBilCreationOptions = 'INTERLEAVE=BIL'.split()
+    DefaultEnviBipCreationOptions = 'INTERLEAVE=BIP'.split()
 
     def __init__(
             self, filename: str, format: str = None, options: CreationOptions = None,
@@ -31,7 +33,8 @@ class Driver(object):
         if format is None:
             format = self.defaultFormat(filename)
         if options is None:
-            options = self.defaultCreationOptions(format)
+            extension = splitext(filename)[1].lower()
+            options = self.defaultCreationOptions(format, extension)
         self.filename = filename
         self.format = format
         self.options = options
@@ -112,9 +115,14 @@ class Driver(object):
         return format
 
     @classmethod
-    def defaultCreationOptions(cls, format: str) -> List[str]:
+    def defaultCreationOptions(cls, format: str, extension: str) -> List[str]:
         if format == cls.EnviFormat:
-            options = cls.DefaultEnviCreationOptions
+            if extension == '.bil':
+                options = cls.DefaultEnviBilCreationOptions
+            elif extension == '.bip':
+                options = cls.DefaultEnviBipCreationOptions
+            else:
+                options = cls.DefaultEnviBsqCreationOptions
         elif format == cls.GTiffFormat:
             options = cls.DefaultGTiffCreationOptions
         elif format == cls.VrtFormat:

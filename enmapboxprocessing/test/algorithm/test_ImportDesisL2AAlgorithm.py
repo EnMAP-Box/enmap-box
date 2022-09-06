@@ -8,7 +8,7 @@ from enmapboxprocessing.test.algorithm.testcase import TestCase
 class TestImportDesisL2AAlgorithm(TestCase):
 
     def test(self):
-        if not self.sensorProductsFolderExists():
+        if not self.additionalDataFolderExists():
             return
 
         alg = ImportDesisL2AAlgorithm()

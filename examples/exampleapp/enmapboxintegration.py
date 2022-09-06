@@ -29,22 +29,24 @@ from enmapbox.gui.applications import EnMAPBoxApplication
 
 from exampleapp import APP_DIR
 
+
 class ExampleEnMAPBoxApp(EnMAPBoxApplication):
     """
     This Class derived from an EnMAPBoxApplication.
 
     """
+
     def __init__(self, enmapBox, parent=None):
         super(ExampleEnMAPBoxApp, self).__init__(enmapBox, parent=parent)
 
-        #specify the name of this app
+        # specify the name of this app
         self.name = 'My EnMAPBox App'
 
-        #specify a version string
+        # specify a version string
         from exampleapp import VERSION
         self.version = VERSION
 
-        #specify a licence under which you distribute this application
+        # specify a licence under which you distribute this application
         self.licence = 'BSD-3'
 
     def icon(self):
@@ -73,8 +75,8 @@ class ExampleEnMAPBoxApp(EnMAPBoxApplication):
         menu = appMenu.addMenu('Example App')
         menu.setIcon(self.icon())
 
-        #add a QAction that starts a process of your application.
-        #In this case it will open your GUI.
+        # add a QAction that starts a process of your application.
+        # In this case it will open your GUI.
         a = menu.addAction('Show ExampleApp GUI')
         a.triggered.connect(self.startGUI)
 
@@ -87,7 +89,7 @@ class ExampleEnMAPBoxApp(EnMAPBoxApplication):
         This function returns the QGIS Processing Framework GeoAlgorithms specified by your application
         :return: [list-of-GeoAlgorithms]
         """
-        #return [] #remove this line to load geoAlgorithms
+        # return [] #remove this line to load geoAlgorithms
         from algorithms import MyEnMAPBoxAppProcessingAlgorithm
         return [MyEnMAPBoxAppProcessingAlgorithm()]
 
@@ -95,7 +97,3 @@ class ExampleEnMAPBoxApp(EnMAPBoxApplication):
         from exampleapp.userinterfaces import ExampleGUI
         ui = ExampleGUI(self.enmapbox.ui)
         ui.show()
-
-
-
-

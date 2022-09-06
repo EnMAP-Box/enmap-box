@@ -1978,8 +1978,12 @@ class DockPanelUI(QgsDockWidget):
     def onRasterLayerStylingToggled(self):
         from rasterlayerstylingapp import RasterLayerStylingApp
         panel = RasterLayerStylingApp.panel()
-        if panel:
+        if panel is not None:
             panel.setUserVisible(self.mRasterLayerStyling.isChecked())
+        if panel.isUserVisible():
+            from enmapbox import EnMAPBox
+            enmapBox = EnMAPBox.instance()
+            panel.mLayer.setLayer(enmapBox.currentLayer())
 
     def onRemoveSelected(self):
         tv: DockTreeView = self.dockTreeView

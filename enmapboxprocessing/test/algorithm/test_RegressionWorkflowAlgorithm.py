@@ -4,6 +4,8 @@ from enmapbox.exampledata import enmap
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 from enmapboxprocessing.algorithm.regressionworkflowalgorithm import RegressionWorkflowAlgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
+from enmapboxprocessing.typing import RegressorDump
+from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import (classifierDumpPkl, regressorDumpPkl)
 
 openReport = True

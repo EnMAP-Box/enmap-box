@@ -2,7 +2,7 @@ import webbrowser
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer)
+from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsMapLayer)
 
 from enmapboxprocessing.algorithm.classificationperformancesimplealgorithm import \
     ClassificationPerformanceSimpleAlgorithm
@@ -76,12 +76,12 @@ class ClassifierPerformanceAlgorithm(EnMAPProcessingAlgorithm):
                 reference = QgsRasterLayer(reference.source())
                 renderer = Utils.palettedRasterRendererFromCategories(reference.dataProvider(), 1, sample.categories)
                 reference.setRenderer(renderer)
-                reference.saveDefaultStyle()
+                reference.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
                 prediction.close()
                 prediction = QgsRasterLayer(prediction.source())
                 renderer = Utils.palettedRasterRendererFromCategories(prediction.dataProvider(), 1, sample.categories)
                 prediction.setRenderer(renderer)
-                prediction.saveDefaultStyle()
+                prediction.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
                 # eval
                 alg = ClassificationPerformanceSimpleAlgorithm()
                 alg.initAlgorithm()
@@ -104,12 +104,12 @@ class ClassifierPerformanceAlgorithm(EnMAPProcessingAlgorithm):
                 reference = QgsRasterLayer(reference.source())
                 renderer = Utils.palettedRasterRendererFromCategories(reference.dataProvider(), 1, sample.categories)
                 reference.setRenderer(renderer)
-                reference.saveDefaultStyle()
+                reference.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
                 prediction.close()
                 prediction = QgsRasterLayer(prediction.source())
                 renderer = Utils.palettedRasterRendererFromCategories(prediction.dataProvider(), 1, sample.categories)
                 prediction.setRenderer(renderer)
-                prediction.saveDefaultStyle()
+                prediction.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
                 # eval
                 alg = ClassificationPerformanceSimpleAlgorithm()
                 alg.initAlgorithm()

@@ -1,4 +1,3 @@
-import multiprocessing, os
 import numpy as np
 
 
@@ -14,7 +13,9 @@ def ufunc():
         arrays.append(array)
     return arrays
 
+
 t0 = np.datetime64('now')
+
 
 def callbackTest():
     global t0
@@ -22,13 +23,13 @@ def callbackTest():
 
     def checkpoint(msg):
         global t0
-        dt = np.datetime64('now')-t0
+        dt = np.datetime64('now') - t0
         print('{}:{}'.format(msg, dt.astype(str)))
         t0 = np.datetime64('now')
 
     def callback(*args):
         print('callback called')
-        #print(args)
+        # print(args)
 
     checkpoint('Start')
     ufunc()
@@ -50,6 +51,6 @@ def callbackTest():
     pool.join()
     checkpoint('duration {}x ufunc with callback')
 
+
 if __name__ == '__main__':
     callbackTest()
-

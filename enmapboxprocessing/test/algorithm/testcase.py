@@ -10,14 +10,15 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
 
 qgsApp = start_app()
 
+
 class ProcessingFeedback(QgsProcessingFeedback):
     def setProgress(self, progress):
         print('\r', round(progress, 5), end='%', flush=True)
         if progress == 100:
             print('\r', end='')
 
-class TestCase(unittest.TestCase):
 
+class TestCase(unittest.TestCase):
     openReport = True
 
     @staticmethod
@@ -26,7 +27,7 @@ class TestCase(unittest.TestCase):
         if isinstance(alg, EnMAPProcessingAlgorithm):
             alg.initAlgorithm(configuration=None)
             print(alg.__class__.__name__,
-                '({} -> {}), {}, {}'.format(alg.group(), alg.displayName(), alg.groupId(), alg.name()))
+                  '({} -> {}), {}, {}'.format(alg.group(), alg.displayName(), alg.groupId(), alg.name()))
             print('parameters = {}'.format(repr(parameters)))
         return Processing.runAlgorithm(alg, parameters=parameters, feedback=ProcessingFeedback())
 
@@ -34,5 +35,5 @@ class TestCase(unittest.TestCase):
         import enmapbox
         return join(dirname(dirname(enmapbox.__file__)), 'test-outputs', basename)
 
-    def sensorProductsFolderExists(self):
-        return exists(r'D:\data\sensors')
+    def additionalDataFolderExists(self):
+        return exists(r'D:\data')

@@ -123,6 +123,11 @@ class ProcessingParameterPickleFileRegressionDatasetWidget(QWidget):
                     self_.close()
 
         alg = self.sender().alg
+
+        if enmapBox is None:
+            QMessageBox.information(self, 'Information', 'EnMAP-Box not running.')
+            return
+
         enmapBox.showProcessingAlgorithmDialog(alg, modal=True, wrapper=AlgorithmDialogWrapper, parent=self)
 
     def onFilenameClicked(self):

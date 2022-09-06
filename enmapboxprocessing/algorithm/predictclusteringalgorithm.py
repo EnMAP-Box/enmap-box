@@ -11,7 +11,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import ClustererDump, Category
 from enmapboxprocessing.utils import Utils
 from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer,
-                        QgsProcessingException, Qgis)
+                        QgsProcessingException, Qgis, QgsMapLayer)
 from typeguard import typechecked
 
 
@@ -112,7 +112,7 @@ class PredictClusteringAlgorithm(EnMAPProcessingAlgorithm):
                           for i in range(dump.clusterCount)]
             renderer = Utils.palettedRasterRendererFromCategories(classification.dataProvider(), 1, categories)
             classification.setRenderer(renderer)
-            classification.saveDefaultStyle()
+            classification.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
 
             result = {self.P_OUTPUT_CLASSIFICATION: filename}
             self.toc(feedback, result)

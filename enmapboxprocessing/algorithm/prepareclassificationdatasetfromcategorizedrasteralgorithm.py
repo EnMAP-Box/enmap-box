@@ -3,7 +3,8 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 from osgeo import gdal
-from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsPalettedRasterRenderer)
+from qgis._core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsPalettedRasterRenderer,
+                        QgsMapLayer)
 
 from enmapboxprocessing.algorithm.translatecategorizedrasteralgorithm import TranslateCategorizedRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
@@ -104,7 +105,7 @@ class PrepareClassificationDatasetFromCategorizedRasterAlgorithm(EnMAPProcessing
             classification = QgsRasterLayer(parameters[alg.P_OUTPUT_CATEGORIZED_RASTER])
             renderer = Utils.palettedRasterRendererFromCategories(classification.dataProvider(), 1, categories)
             classification.setRenderer(renderer)
-            classification.saveDefaultStyle()
+            classification.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
 
             X, y = self.sampleData(raster, classification, classBandNo, categories, feedback2)
             features = [RasterReader(raster).bandName(i + 1) for i in range(raster.bandCount())]

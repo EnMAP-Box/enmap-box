@@ -84,7 +84,7 @@ class TestIssue711(EnMAPBoxTestCase):
                         TestObjects.createRasterLayer(),
                         TestObjects.createRasterLayer(),
                         TestObjects.createVectorLayer()
-                       ]
+                        ]
             layers.extend(sources)
             dSources = EMB.addSources(sources)
 
@@ -111,8 +111,6 @@ class TestIssue711(EnMAPBoxTestCase):
 
         view = TreeView()
         view.setModel(model)
-
-
 
         groupNodes = list()
         subnodes = list()

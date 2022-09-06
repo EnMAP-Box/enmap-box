@@ -20,6 +20,7 @@ except ModuleNotFoundError as ex:
     else:
         raise ex
 
+
 class ImageCubeTests(EnMAPBoxTestCase):
 
     def createImageCube(self, nb=10, ns=20, nl=30, crs='EPSG.32633') -> QgsRasterLayer:
@@ -36,7 +37,7 @@ class ImageCubeTests(EnMAPBoxTestCase):
         if isinstance(crs, str):
             c = QgsCoordinateReferenceSystem(crs)
             ds.SetProjection(c.toWkt())
-        ds.SetGeoTransform([0, 1.0, 0, \
+        ds.SetGeoTransform([0, 1.0, 0,
                             0, 0, -1.0])
 
         assert isinstance(ds, gdal.Dataset)

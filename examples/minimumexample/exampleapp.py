@@ -24,8 +24,12 @@ import os
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu, QAction, QWidget, QHBoxLayout, QLabel, QPushButton
 from enmapbox.gui.applications import EnMAPBoxApplication
-from qgis.core import *
-
+from qgis.core import QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer, QgsProcessingParameterNumber, \
+    QgsProcessingParameterRasterDestination, QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterBand, \
+    QgsProcessingParameterVectorLayer, QgsProcessingParameterField, QgsProcessingParameterMapLayer, \
+    QgsProcessingParameterFile, QgsProcessingParameterString, QgsProcessingParameterBoolean, QgsProcessingParameterEnum, \
+    QgsProcessingParameterVectorDestination, QgsProcessingParameterFileDestination, \
+    QgsProcessingParameterFolderDestination
 
 VERSION = '0.0.1'
 LICENSE = 'GNU GPL-3'
@@ -34,31 +38,33 @@ APP_DIR = os.path.dirname(__file__)
 APP_NAME = 'My First EnMAPBox App'
 GROUP_ID = 'mininmumexampleapp'
 
+
 class ExampleApplication(EnMAPBoxApplication):
     """
     This Class inherits from an EnMAPBoxApplication
     """
+
     def __init__(self, enmapBox, parent=None):
         super(ExampleApplication, self).__init__(enmapBox, parent=parent)
 
-        #specify the name of this app
+        # specify the name of this app
         self.name = APP_NAME
 
-        #specify a version string
+        # specify a version string
 
         self.version = VERSION
 
-        #specify a licence under which you distribute this application
+        # specify a licence under which you distribute this application
         self.licence = LICENSE
 
-    def icon(self)->QIcon:
+    def icon(self) -> QIcon:
         """
         This function returns the QIcon of your Application
         :return: QIcon()
         """
         return QIcon(os.path.join(APP_DIR, 'icon.png'))
 
-    def menu(self, appMenu)->QMenu:
+    def menu(self, appMenu) -> QMenu:
         """
         Returns a QMenu that will be added to the parent `appMenu`
         :param appMenu:
@@ -70,14 +76,14 @@ class ExampleApplication(EnMAPBoxApplication):
         :return: the QMenu or QAction to be added to the "Applications" menu.
         """
 
-        # this way you can add your QMenu/QAction to an other menu entry, e.g. 'Tools'
+        # this way you can add your QMenu/QAction to another menu entry, e.g. 'Tools'
         # appMenu = self.enmapbox.menu('Tools')
 
         menu = appMenu.addMenu('Mininum Example App')
         menu.setIcon(self.icon())
 
-        #add a QAction that starts a process of your application.
-        #In this case it will open your GUI.
+        # add a QAction that starts a process of your application.
+        # In this case it will open your GUI.
         a = menu.addAction('Show Minimum Example GUI')
         assert isinstance(a, QAction)
         a.triggered.connect(self.startGUI)
@@ -85,7 +91,7 @@ class ExampleApplication(EnMAPBoxApplication):
 
         return menu
 
-    def processingAlgorithms(self)->list:
+    def processingAlgorithms(self) -> list:
         """
         This function returns the QGIS Processing Framework algorithms specified by your application
         :return: [list-of-QgsProcessingAlgorithms]
@@ -109,23 +115,24 @@ class ExampleApplicationGUI(QWidget):
     """
     A minimal graphical user interface
     """
+
     def __init__(self, parent=None):
         super(ExampleApplicationGUI, self).__init__(parent)
         self.setWindowTitle(APP_NAME)
         self.setWindowIcon(QIcon(os.path.join(APP_DIR, 'icon.png')))
         self.setMinimumWidth(400)
-        l = QHBoxLayout()
-        l.addWidget(QLabel('Hello World'))
+        layout = QHBoxLayout()
+        layout.addWidget(QLabel('Hello World'))
         self.btn = QPushButton('Click me')
 
-        #clicking the button will print "Hello World" to the python CLI
+        # clicking the button will print "Hello World" to the python CLI
 
         self.mNumberOfClicks = 0
 
         self.btn.clicked.connect(self.exampleSlot)
-        self.btn.clicked.connect(lambda : print('Lambda functions are great to write less code!'))
-        l.addWidget(self.btn)
-        self.setLayout(l)
+        self.btn.clicked.connect(lambda: print('Lambda functions are great to write less code!'))
+        layout.addWidget(self.btn)
+        self.setLayout(layout)
 
     def exampleSlot(self, *args):
         """
@@ -134,14 +141,15 @@ class ExampleApplicationGUI(QWidget):
         self.mNumberOfClicks += 1
         print('Hello World ({})'.format(self.mNumberOfClicks))
 
-    def numberOfClicks(self)->int:
+    def numberOfClicks(self) -> int:
         """
         A method to return something.
         :return: int
         """
         return self.mNumberOfClicks
 
-def exampleAlgorithm(*args, **kwds)->list:
+
+def exampleAlgorithm(*args, **kwds) -> list:
     """
     An dummy algorithm that prints the provided arguments and keywords and returns its inputs.
     """
@@ -149,7 +157,7 @@ def exampleAlgorithm(*args, **kwds)->list:
 
     text = ['Arguments: {}'.format(len(args))]
     for i, a in enumerate(args):
-        text.append('Argument {} = {}'.format(i+1, str(a)))
+        text.append('Argument {} = {}'.format(i + 1, str(a)))
 
     text.append('Keywords: {}'.format(len(kwds)))
     for key, parameter in kwds.items():
@@ -165,46 +173,49 @@ class ExampleProcessingAlgorithm(QgsProcessingAlgorithm):
     Exemplary implementation of a QgsProcessingAlgorithm.
     See https://qgis.org/api/classQgsProcessingAlgorithm.html for API documentation
     """
+
     def __init__(self):
         super(ExampleProcessingAlgorithm, self).__init__()
 
-    def createInstance(self)->QgsProcessingAlgorithm:
+    def createInstance(self) -> QgsProcessingAlgorithm:
         """
         Creates a new instance of the algorithm class.
         :return: QgsProcessingAlgorithm
         """
         return ExampleProcessingAlgorithm()
 
-    def name(self)->str:
+    def name(self) -> str:
         return 'examplealgorithm'
 
     def displayName(self):
         return 'Minimal Example Algorithm'
 
-    def groupId(self)->str:
+    def groupId(self) -> str:
         """
         Returns the unique ID of the group this algorithm belongs to.
         :return: str
         """
         return GROUP_ID
 
-    def group(self)->str:
+    def group(self) -> str:
         """
         Returns the name of the group this algorithm belongs to.
         :return: str
         """
         return APP_NAME
 
-    def initAlgorithm(self, configuration:dict=None):
+    def initAlgorithm(self, configuration: dict = None):
         """
         Initializes the algorithm using the specified configuration.
         :param configuration: dict
         """
         self.addParameter(QgsProcessingParameterRasterLayer('pathInput', 'The Input Dataset'))
-        self.addParameter(QgsProcessingParameterNumber('value','The value', QgsProcessingParameterNumber.Double, 1, False, 0.00, 999999.99))
+        self.addParameter(
+            QgsProcessingParameterNumber('value', 'The value', QgsProcessingParameterNumber.Double, 1, False, 0.00,
+                                         999999.99))
         self.addParameter(QgsProcessingParameterRasterDestination('pathOutput', 'The Output Dataset'))
 
-    def processAlgorithm(self, parameters:dict, context:QgsProcessingContext, feedback:QgsProcessingFeedback):
+    def processAlgorithm(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback):
         """
         Runs the algorithm using the specified parameters.
         :param parameters: dict
@@ -216,15 +227,13 @@ class ExampleProcessingAlgorithm(QgsProcessingAlgorithm):
         assert isinstance(context, QgsProcessingContext)
         assert isinstance(feedback, QgsProcessingFeedback)
 
-        args, kwds  = exampleAlgorithm(parameters)
+        args, kwds = exampleAlgorithm(parameters)
 
-        outputs = {'args' : args, 'kwds': kwds}
+        outputs = {'args': args, 'kwds': kwds}
         return outputs
 
 
-
 class ExampleProcessingAlgorithmWithManyWidgets(QgsProcessingAlgorithm):
-
     P_RASTER = 'raster'
     P_RASTER_BAND = 'raster_band'
     P_VECTOR = 'vector'
@@ -235,38 +244,37 @@ class ExampleProcessingAlgorithmWithManyWidgets(QgsProcessingAlgorithm):
     P_INTEGER = 'integer'
     P_FLOAT = 'float'
     P_STRING = 'string'
-    P_BOOLEAN= 'boolean'
+    P_BOOLEAN = 'boolean'
     P_ENUM = 'enum'
     P_OUTPUT_RASTER = 'outraster'
     P_OUTPUT_VECTOR = 'outvector'
     P_OUTPUT_FILE = 'outfile'
     P_OUTPUT_FOLDER = 'outfolder'
 
-    def group(self)->str:
+    def group(self) -> str:
         """
         Returns the name of the group this algorithm belongs to.
         :return: str
         """
         return APP_NAME
 
-    def groupId(self)->str:
+    def groupId(self) -> str:
         """
         Returns the unique ID of the group this algorithm belongs to.
         :return: str
         """
         return GROUP_ID
 
-    def name(self)->str:
+    def name(self) -> str:
         return 'examplealgorithmwithmanywidgets'
 
-    def displayName(self)->str:
+    def displayName(self) -> str:
         return 'Example Algorithm with many Widgets'
 
     def createInstance(self, *args, **kwargs):
         return type(self)()
 
     def initAlgorithm(self, configuration=None):
-
         # some example widgets that can be used; for full list see https://qgis.org/api/annotated.html
 
         # - different input widgets
@@ -321,7 +329,7 @@ class ExampleProcessingAlgorithmWithManyWidgets(QgsProcessingAlgorithm):
         self.addParameter(QgsProcessingParameterRasterDestination(name=self.P_OUTPUT_RASTER,
                                                                   description='Output Raster'))
         self.addParameter(QgsProcessingParameterVectorDestination(name=self.P_OUTPUT_VECTOR,
-                                                            description='Output Vector'))
+                                                                  description='Output Vector'))
         self.addParameter(QgsProcessingParameterFileDestination(name=self.P_OUTPUT_FILE,
                                                                 description='Output File',
                                                                 fileFilter='txt'))
@@ -343,9 +351,12 @@ class ExampleProcessingAlgorithmWithManyWidgets(QgsProcessingAlgorithm):
         fileFilename = parameters[self.P_OUTPUT_FILE]
         folderFilename = parameters[self.P_OUTPUT_FOLDER]
         # - here comes your fancy processing algorithm!!!
-        with open(rasterFilename, 'w'): pass # is not really a raster file :-)
-        with open(vectorFilename, 'w'): pass # is not really a vector file :-)
-        with open(fileFilename, 'w'): pass
+        with open(rasterFilename, 'w'):
+            pass  # is not really a raster file :-)
+        with open(vectorFilename, 'w'):
+            pass  # is not really a vector file :-)
+        with open(fileFilename, 'w'):
+            pass
         os.makedirs(folderFilename)
 
         # return outputs
@@ -355,8 +366,8 @@ class ExampleProcessingAlgorithmWithManyWidgets(QgsProcessingAlgorithm):
                 self.P_OUTPUT_FOLDER: parameters[self.P_OUTPUT_RASTER]}
 
     def shortHelpString(self, *args, **kwargs):
-        text = '<p>Here comes the HTML documentation.</p>'\
-               '<h3>With Headers...</h3>'\
+        text = '<p>Here comes the HTML documentation.</p>' \
+               '<h3>With Headers...</h3>' \
                '<p>and Hyperlinks: <a href="www.google.de">Google</a></p>'
 
         return text
@@ -366,4 +377,3 @@ class ExampleProcessingAlgorithmWithManyWidgets(QgsProcessingAlgorithm):
 
     def helpUrl(self, *args, **kwargs):
         return 'www.google.de'
-

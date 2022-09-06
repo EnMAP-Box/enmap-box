@@ -8,7 +8,7 @@ from enmapboxprocessing.test.algorithm.testcase import TestCase
 class TestImportPrismaL2CAlgorithm(TestCase):
 
     def test(self):
-        if not self.sensorProductsFolderExists():
+        if not self.additionalDataFolderExists():
             return
 
         alg = ImportPrismaL2CAlgorithm()

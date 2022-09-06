@@ -1,4 +1,5 @@
 import traceback
+import warnings
 from collections import OrderedDict, defaultdict
 from math import ceil
 from os.path import basename, splitext, join, dirname
@@ -328,7 +329,14 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
                 newFilename = filename
             else:
                 newFilename = join(dirname(filename), name + '.tif')
-            dataType = Utils.numpyDataTypeToQgisDataType(result.dtype)
+
+            try:
+                dataType = Utils.numpyDataTypeToQgisDataType(result.dtype)
+            except:
+                warnings.warn(f'unsupported data type: {result.dtype}; will be written as float64 instead')
+                dataType = Qgis.DataType.Float64
+                result = result.astype(np.float64)
+
             bandCount = len(result)
             driver = Driver(newFilename, feedback=feedback)
             writer = driver.createLike(grid, dataType, bandCount)

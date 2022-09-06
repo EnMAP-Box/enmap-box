@@ -11,7 +11,7 @@ class TestImportLandsatL2Algorithm(TestCase):
         pass  # Lansat 9 is not available in Collection 1 format (I guess)
 
     def test_L9_C2(self):
-        if not self.sensorProductsFolderExists():
+        if not self.additionalDataFolderExists():
             return
 
         alg = ImportLandsatL2Algorithm()
@@ -24,7 +24,7 @@ class TestImportLandsatL2Algorithm(TestCase):
         self.assertEqual(25984874883, round(np.sum(array, dtype=float)))
 
     def test_L8_C1(self):
-        if not self.sensorProductsFolderExists():
+        if not self.additionalDataFolderExists():
             return
 
         alg = ImportLandsatL2Algorithm()
@@ -37,7 +37,7 @@ class TestImportLandsatL2Algorithm(TestCase):
         self.assertEqual(-139807431228.0, np.sum(array, dtype=float))
 
     def test_L8_C2(self):
-        if not self.sensorProductsFolderExists():
+        if not self.additionalDataFolderExists():
             return
 
         alg = ImportLandsatL2Algorithm()
@@ -50,7 +50,7 @@ class TestImportLandsatL2Algorithm(TestCase):
         self.assertEqual(25984874883, round(np.sum(array, dtype=float)))
 
     def test_L7_C1(self):
-        if not self.sensorProductsFolderExists():
+        if not self.additionalDataFolderExists():
             return
 
         alg = ImportLandsatL2Algorithm()
@@ -63,7 +63,7 @@ class TestImportLandsatL2Algorithm(TestCase):
         self.assertEqual(-34939854393.0, np.sum(array, dtype=float))
 
     def test_L7_C2(self):
-        if not self.sensorProductsFolderExists():
+        if not self.additionalDataFolderExists():
             return
 
         alg = ImportLandsatL2Algorithm()
@@ -76,7 +76,7 @@ class TestImportLandsatL2Algorithm(TestCase):
         self.assertEqual(14003330657, round(np.sum(array, dtype=float)))
 
     def test_L5_C1(self):
-        if not self.sensorProductsFolderExists():
+        if not self.additionalDataFolderExists():
             return
 
         alg = ImportLandsatL2Algorithm()
@@ -89,7 +89,7 @@ class TestImportLandsatL2Algorithm(TestCase):
         self.assertEqual(199183395583.0, np.sum(array, dtype=float))
 
     def test_L5_C2(self):
-        if not self.sensorProductsFolderExists():
+        if not self.additionalDataFolderExists():
             return
 
         alg = ImportLandsatL2Algorithm()

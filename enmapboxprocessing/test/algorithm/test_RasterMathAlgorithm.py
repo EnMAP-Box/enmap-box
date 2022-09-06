@@ -252,3 +252,14 @@ class TestRasterMathAlgorithm(TestCase):
         }
         result = self.runalg(alg, parameters)
         self.assertEqual(Qgis.Int16, RasterReader(result[alg.P_OUTPUT_RASTER]).dataType(1))
+
+    def test_debug_issue1245(self):
+        alg = RasterMathAlgorithm()
+        parameters = {
+            alg.P_R1: enmap,
+            alg.P_CODE: 'raster=R1.astype(np.int64)',
+            alg.P_FLOAT_INPUT: False,
+            alg.P_OUTPUT_RASTER: self.filename('raster.tif')
+        }
+        result = self.runalg(alg, parameters)
+        self.assertEqual(Qgis.DataType.Float64, RasterReader(result[alg.P_OUTPUT_RASTER]).dataType(1))

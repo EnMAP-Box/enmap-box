@@ -18,6 +18,7 @@
 *                                                                         *
 ***************************************************************************
 """
+from qgis.core import QgsProcessingAlgorithm, QgsProcessingParameterFile, QgsProcessingOutputFile
 
 
 def dummyAlgorithm(*args, **kwds):
@@ -46,22 +47,17 @@ def dummyAlgorithm(*args, **kwds):
     return '\n'.join(info)
 
 
-### Interfaces to use algorithms in algorithms.py within
-### QGIS Processing Framework
+# ## Interfaces to use algorithms in algorithms.py within
+# ## QGIS Processing Framework
 
-from processing.core.GeoAlgorithm import GeoAlgorithm
-from processing.core.parameters import ParameterRaster
-from processing.core.outputs import OutputRaster
-
-
-class MyEnMAPBoxAppProcessingAlgorithm(GeoAlgorithm):
+class MyEnMAPBoxAppProcessingAlgorithm(QgsProcessingAlgorithm):
 
     def defineCharacteristics(self):
         self.name = 'Example Algorithm'
         self.group = 'My Example App'
 
-        self.addParameter(ParameterRaster('infile', 'Example Input Image'))
-        self.addOutput(OutputRaster('outfile', 'Example Output Image'))
+        self.addParameter(QgsProcessingParameterFile('infile', 'Example Input Image'))
+        self.addOutput(QgsProcessingOutputFile('outfile', 'Example Output Image'))
 
     def processAlgorithm(self, progress):
         # map processing framework parameters to that of you algorithm

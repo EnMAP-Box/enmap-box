@@ -96,7 +96,13 @@ class ClassifierDump(object):
         check_type('features', self.features, Optional[List[str]])
         check_type('X', self.X, Optional[SampleX])
         check_type('y', self.y, Optional[SampleY])
-        check_type('classifier', self.classifier, Optional[Union[ClassifierMixin, Pipeline]])
+        try:
+            check_type('classifier', self.classifier, Optional[Union[ClassifierMixin, Pipeline]])
+        except:
+            from sklearn.base import is_classifier
+            if not is_classifier(self.classifier):
+                raise TypeError('classifier is not a valid scikit-learn classifier')
+
 
     @staticmethod
     def fromDict(d: Dict):
@@ -112,6 +118,18 @@ class RegressorDump(object):
     X: Optional[SampleX]
     y: Optional[SampleY]
     regressor: Optional[Union[RegressorMixin, Pipeline]] = None
+
+    def __post_init__(self):
+        check_type('targets', self.targets, Optional[Targets])
+        check_type('features', self.features, Optional[List[str]])
+        check_type('X', self.X, Optional[SampleX])
+        check_type('y', self.y, Optional[SampleY])
+        try:
+            check_type('regressor', self.regressor, Optional[Union[RegressorMixin, Pipeline]])
+        except:
+            from sklearn.base import is_regressor
+            if not is_regressor(self.regressor):
+                raise TypeError('regressor is not a valid scikit-learn regressor')
 
     @staticmethod
     def fromDict(d: Dict):
