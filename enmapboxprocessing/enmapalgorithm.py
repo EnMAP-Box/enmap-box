@@ -584,7 +584,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         return self.shortHelpString()
 
     def helpUrl(self, *args, **kwargs):
-        return 'https://bitbucket.org/EnMAP-Box/enmap-box-geoalgorithmsprovider/overview'
+        return 'https://bitbucket.org/hu-geomatics/enmap-box-geoalgorithmsprovider/overview'
 
     def addParameterClassificationDataset(
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
