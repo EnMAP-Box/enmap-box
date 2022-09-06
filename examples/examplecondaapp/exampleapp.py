@@ -21,14 +21,16 @@
 """
 
 import os
-from qgis.core import *
-from qgis.gui import *
-from qgis.gui import QgsFileWidget
-from qgis.PyQt.QtWidgets import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtCore import *
+
+from PyQt5.QtCore import QProcess, QProcessEnvironment
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QMenu, QAction, QWidget, QVBoxLayout, QFrame, QGridLayout, QLineEdit, QLabel, QHBoxLayout, \
+    QDialogButtonBox
 
 from enmapbox.gui.applications import EnMAPBoxApplication
+from qgis.core import QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer, QgsProcessingParameterNumber, \
+    QgsProcessingParameterRasterDestination, QgsProcessingContext, QgsProcessingFeedback
+from qgis.gui import QgsFileWidget
 
 VERSION = '0.0.1'
 LICENSE = 'GNU GPL-3'
@@ -74,7 +76,7 @@ class AnacondaExampleEnMAPBoxApp(EnMAPBoxApplication):
         :return: the QMenu or QAction to be added to the "Applications" menu.
         """
 
-        # this way you can add your QMenu/QAction to an other menu entry, e.g. 'Tools'
+        # this way you can add your QMenu/QAction to another menu entry, e.g. 'Tools'
         # appMenu = self.enmapbox.menu('Tools')
 
         menu = appMenu.addMenu('Example Anaconda App')
@@ -292,7 +294,7 @@ if __name__ == '__main__':
 
     p = QProcess()
 
-    from enmapbox.gui.mimedata import textFromByteArray, textToByteArray
+    from enmapbox.gui.mimedata import textFromByteArray
 
 
     def readStdOut(p):
@@ -331,8 +333,6 @@ if __name__ == '__main__':
     file.write('\n'.join(startScripts))
     file.flush()
     file.close()
-
-    from subprocess import run, PIPE, Popen
 
     import subprocess
 
