@@ -1,3 +1,4 @@
+import warnings
 from math import isnan
 from typing import Iterable, List, Union, Optional, Tuple
 
@@ -453,7 +454,7 @@ class RasterReader(object):
 
         return bandNos[np.argmin(distances)]
 
-    def wavelengthUnits(self, bandNo: int) -> Optional[str]:
+    def wavelengthUnits(self, bandNo: int, guess=True) -> Optional[str]:
         """Return wavelength units."""
 
         for key in [
@@ -472,19 +473,33 @@ class RasterReader(object):
                 if units is not None:
                     return Utils.wavelengthUnitsLongName(units)
 
+            # finally, we try to guess the units from the actual value
+            if guess:
+                wavelength = self.wavelength(bandNo, raw=True)
+                if wavelength is not None:
+                    if wavelength < 100:
+                        warnings.warn('wavelength units missing, assuming Micrometers')
+                        return 'Micrometers'
+                    else:
+                        warnings.warn('wavelength units missing, assuming Nanometers')
+                        return 'Nanometers'
+
         return None
 
-    def wavelength(self, bandNo: int, units: str = None) -> Optional[float]:
+    def wavelength(self, bandNo: int, units: str = None, raw=False) -> Optional[float]:
         """Return band center wavelength in nanometers. Optionally, specify destination units."""
 
-        if units is None:
-            units = self.Nanometers
+        if raw:
+            conversionFactor = 1.
+        else:
+            if units is None:
+                units = self.Nanometers
 
-        wavelength_units = self.wavelengthUnits(bandNo)
-        if wavelength_units is None:
-            return None
+            wavelength_units = self.wavelengthUnits(bandNo)
+            if wavelength_units is None:
+                return None
 
-        conversionFactor = Utils.wavelengthUnitsConversionFactor(wavelength_units, units)
+            conversionFactor = Utils.wavelengthUnitsConversionFactor(wavelength_units, units)
 
         for key in [
             'wavelength',
