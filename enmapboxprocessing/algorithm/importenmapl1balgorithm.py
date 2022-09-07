@@ -3,11 +3,11 @@ from typing import Dict, Any, List, Tuple
 from xml.etree import ElementTree
 
 from osgeo import gdal
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 from typeguard import typechecked
+
 
 @typechecked
 class ImportEnmapL1BAlgorithm(EnMAPProcessingAlgorithm):
@@ -45,11 +45,11 @@ class ImportEnmapL1BAlgorithm(EnMAPProcessingAlgorithm):
                basename(file).endswith('METADATA.XML') & \
                ('L1B' in basename(file))
 
-    def  defaultParameters(self, xmlFilename: str):
+    def defaultParameters(self, xmlFilename: str):
         return {
-                    self.P_FILE: xmlFilename,
-                    self.P_OUTPUT_VNIR_RASTER: xmlFilename.replace('METADATA.XML', 'SPECTRAL_IMAGE_VNIR.vrt'),
-                    self.P_OUTPUT_SWIR_RASTER: xmlFilename.replace('METADATA.XML', 'SPECTRAL_IMAGE_SWIR.vrt'),
+            self.P_FILE: xmlFilename,
+            self.P_OUTPUT_VNIR_RASTER: xmlFilename.replace('METADATA.XML', 'SPECTRAL_IMAGE_VNIR.vrt'),
+            self.P_OUTPUT_SWIR_RASTER: xmlFilename.replace('METADATA.XML', 'SPECTRAL_IMAGE_SWIR.vrt'),
         }
 
     def processAlgorithm(

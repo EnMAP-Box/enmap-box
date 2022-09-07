@@ -2,12 +2,12 @@ from random import randint
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.PyQt.QtGui import QColor
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import Category, ClassifierDump
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtGui import QColor
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 from typeguard import typechecked
 
 

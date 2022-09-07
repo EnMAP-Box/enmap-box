@@ -1,11 +1,11 @@
 from typing import Dict, Any, List, Tuple
 
 from osgeo import gdal
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterString)
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.parameter.processingparametercodeeditwidget import ProcessingParameterCodeEditWidgetWrapper
 from enmapboxprocessing.rasterwriter import RasterWriter
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterString)
 from typeguard import typechecked
 
 

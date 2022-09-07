@@ -13,7 +13,7 @@ class SpatialGaussianGradientMagnitudeAlgorithm(SpatialFilterFunctionAlgorithmBa
         return Group.Test.value + Group.ConvolutionMorphologyAndFiltering.value
 
     def shortDescription(self) -> str:
-        return f'Spatial Gaussian Gradient Magnitude filter.'
+        return 'Spatial Gaussian Gradient Magnitude filter.'
 
     def helpParameterCode(self) -> str:
         links = ', '.join([

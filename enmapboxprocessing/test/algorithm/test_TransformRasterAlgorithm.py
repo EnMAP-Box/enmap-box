@@ -7,7 +7,7 @@ from enmapboxprocessing.algorithm.inversetransformrasteralgorithm import Inverse
 from enmapboxprocessing.algorithm.transformrasteralgorithm import TransformRasterAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapboxtestdata import classifierDumpPkl
+from testdata import classifier_pkl
 
 
 class FitTestTransformerAlgorithm(FitTransformerAlgorithmBase):
@@ -33,7 +33,7 @@ class TestTransformRasterAlgorithm(TestCase):
         algFit = FitTestTransformerAlgorithm()
         algFit.initAlgorithm()
         parametersFit = {
-            algFit.P_DATASET: classifierDumpPkl,
+            algFit.P_DATASET: classifier_pkl,
             algFit.P_TRANSFORMER: algFit.defaultCodeAsString(),
             algFit.P_OUTPUT_TRANSFORMER: self.filename('transformer.pkl'),
         }

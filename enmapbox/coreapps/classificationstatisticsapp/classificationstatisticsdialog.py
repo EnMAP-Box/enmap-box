@@ -6,7 +6,7 @@ from qgis.PyQt.QtCore import Qt, QRectF
 from qgis.PyQt.QtGui import QMouseEvent, QColor, QPicture, QPainter
 from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QTableWidget, QComboBox, QCheckBox, \
     QTableWidgetItem
-from PyQt5.uic import loadUi
+from qgis.PyQt.uic import loadUi
 from osgeo import gdal
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsMapSettings, QgsPalettedRasterRenderer, QgsProject, \
     QgsRasterRange, QgsRectangle, QgsFeature, QgsCoordinateTransform, \
@@ -122,7 +122,7 @@ class ClassificationStatisticsDialog(QMainWindow):
         if self.mMapCanvas is not None:
             try:
                 self.mMapCanvas.extentsChanged.disconnect(self.onMapCanvasExtentsChanged)
-            except:
+            except Exception:
                 pass
 
         # connect new map canvas

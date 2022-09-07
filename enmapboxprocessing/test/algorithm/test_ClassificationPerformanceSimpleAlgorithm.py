@@ -1,7 +1,6 @@
 from math import isnan
-import numpy as np
 
-from qgis.core import QgsProcessingException, QgsRasterLayer
+import numpy as np
 
 from enmapbox.exampledata import landcover_polygons, enmap
 from enmapboxprocessing.algorithm.classificationperformancesimplealgorithm import \
@@ -10,7 +9,8 @@ from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import landcover_map_l3
+from qgis.core import QgsProcessingException, QgsRasterLayer
+from testdata import landcover_map_l3
 
 writeToDisk = True
 
@@ -87,7 +87,6 @@ class TestClassificationPerformanceSimpleAlgorithm(TestCase):
 
         renderer = Utils.palettedRasterRendererFromCategories(observed.dataProvider(), 1, categories)
         observed.setRenderer(renderer)
-
 
         parameters = {
             alg.P_CLASSIFICATION: predicted,

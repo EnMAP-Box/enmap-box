@@ -1,12 +1,13 @@
 import numpy as np
-from qgis.core import QgsRasterLayer, QgsVectorLayer
 
 from enmapbox.exampledata import landcover_polygons
 from enmapboxprocessing.algorithm.classificationperformancestratifiedalgorithm import (
     stratifiedAccuracyAssessment, ClassificationPerformanceStratifiedAlgorithm
 )
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapboxtestdata import landcover_map_l3
+from qgis.core import QgsRasterLayer, QgsVectorLayer
+from testdata import landcover_map_l3
+
 
 class Test_aa_stratified(TestCase):
 
@@ -21,10 +22,10 @@ class Test_aa_stratified(TestCase):
         h = ['1', '2', '3', '4']
         N_h = [40000, 30000, 20000, 10000]
 
-        #debug
-        #stratum = ['1'] * len(stratum)
-        #h = ['1']
-        #N_h = [40000]
+        # debug
+        # stratum = ['1'] * len(stratum)
+        # h = ['1']
+        # N_h = [40000]
 
         classValues = ['A', 'B', 'C', 'D']
         classNames = ['Class A', 'Class B', 'Class C', 'Class D']
@@ -110,4 +111,3 @@ class TestClassificationPerformanceAlgorithm(TestCase):
             alg.P_OUTPUT_REPORT: self.filename('report.html'),
         }
         result = self.runalg(alg, parameters)
-

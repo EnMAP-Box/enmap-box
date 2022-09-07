@@ -1,13 +1,11 @@
-from random import randint
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.PyQt.QtGui import QColor
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-from enmapboxprocessing.typing import Category, ClassifierDump, Target, RegressorDump
+from enmapboxprocessing.typing import Target, RegressorDump
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 from typeguard import typechecked
 
 
@@ -76,7 +74,7 @@ class PrepareRegressionDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
             y = np.array(y, dtype=np.float32)
 
             # prepare targets
-            targets = [Target(f'variable {i+1}', None) for i in range(y.shape[1])]
+            targets = [Target(f'variable {i + 1}', None) for i in range(y.shape[1])]
 
             dump = RegressorDump(targets, features, X, y)
             Utils.pickleDump(dump.__dict__, filename)

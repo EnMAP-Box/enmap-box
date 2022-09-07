@@ -62,7 +62,7 @@ class TestReclassify(EnMAPBoxTestCase):
 
             pathDst = tmpDir / 'testclasstiff{}.{}'.format(i, ext)
             pathDst = pathDst.as_posix()
-            classification = Classification(pathSrc)
+            classification = _classic.hubflow.core.Classification(pathSrc)
             oldDef = classification.classDefinition()
             self.assertEqual(oldDef.names(), classNamesOld[1:])
 
@@ -70,12 +70,12 @@ class TestReclassify(EnMAPBoxTestCase):
             newColors = [QColor('black'), QColor('yellow'), QColor('brown')]
 
             # this works
-            c = Color(QColor('black'))
+            c = _classic.hubflow.core.Color(QColor('black'))
 
-            # but this doesn't
+            # but this does'nt
             # newDef = _classic.hubflow.core.ClassDefinition(names=newNames[1:], colors=newColors[1:])
 
-            newDef = ClassDefinition(names=newNames[1:], colors=[c.name() for c in newColors[1:]])
+            newDef = _classic.hubflow.core.ClassDefinition(names=newNames[1:], colors=[c.name() for c in newColors[1:]])
             newDef.setNoDataNameAndColor(newNames[0], QColor('yellow'))
 
             # driver = guessRasterDriver(pathDst)

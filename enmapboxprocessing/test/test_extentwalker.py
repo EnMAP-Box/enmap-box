@@ -1,8 +1,6 @@
-from qgis.PyQt.QtCore import QSizeF
-from qgis.core import QgsRectangle
-
 from enmapboxprocessing.extentwalker import ExtentWalker
 from enmapboxprocessing.test.testcase import TestCase
+from qgis.core import QgsRectangle
 
 
 class TestExtentWalker(TestCase):
@@ -14,7 +12,7 @@ class TestExtentWalker(TestCase):
         sizey = 5
         extent = QgsRectangle(0, 0, nx * sizex, ny * sizey)
         blockSizeX, blockSizeY = 4, 5
-        extentWalker = ExtentWalker(extent, blockSizeX,blockSizeY)
+        extentWalker = ExtentWalker(extent, blockSizeX, blockSizeY)
         self.assertEqual(extentWalker.nBlocksX(), nx)
         self.assertEqual(extentWalker.nBlocksY(), ny)
 

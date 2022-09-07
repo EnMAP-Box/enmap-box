@@ -24,11 +24,11 @@
 # imports
 import unittest
 
+from enmapbox.testing import start_app
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMainWindow, QTextEdit, QToolBar, QAction
 from qgis.core import QgsFeature, QgsRasterLayer, QgsCoordinateReferenceSystem, QgsPointXY, QgsRectangle
 from qgis.gui import QgsMapCanvas
-from enmapbox.testing import start_app
 
 qgsApp = start_app()
 
@@ -128,7 +128,9 @@ class Examples(unittest.TestCase):
         enmapBox.sigDataSourcesAdded.connect(lambda uri: print('DataSource added: {}'.format(uri)))
         enmapBox.sigDataSourcesRemoved.connect(lambda uri: print('DataSource removed: {}'.format(uri)))
 
-        import tempfile, os, time
+        import tempfile
+        import os
+        import time
         tempDir = tempfile.mkdtemp()
         pathFile = os.path.join(tempDir, 'testfile.txt')
 

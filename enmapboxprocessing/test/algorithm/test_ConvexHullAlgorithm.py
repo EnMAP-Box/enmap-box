@@ -1,18 +1,16 @@
 import numpy as np
-from qgis.core import QgsRasterLayer, QgsRectangle, QgsCoordinateReferenceSystem
 
+from enmapbox.exampledata import enmap
 from enmapboxprocessing.algorithm.convexhullalgorithm import ConvexHullAlgorithm
-from enmapboxprocessing.algorithm.geolocaterasteralgorithm import GeolocateRasterAlgorithm
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapbox.exampledata import enmap
+from qgis.core import QgsRectangle
 
 
 class TestTranslateAlgorithm(TestCase):
 
     def test_prisma(self):
-
         alg = TranslateRasterAlgorithm()
         parameters = {
             alg.P_RASTER: enmap,
@@ -33,4 +31,3 @@ class TestTranslateAlgorithm(TestCase):
 
         self.assertEqual(48631695, np.sum(RasterReader(result[alg.P_OUTPUT_CONVEX_HULL]).array()))
         self.assertEqual(22883, round(np.sum(RasterReader(result[alg.P_OUTPUT_CONTINUUM_REMOVED]).array())))
-

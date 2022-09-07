@@ -1,5 +1,3 @@
-from qgis.core import QgsRasterLayer
-
 from enmapbox.exampledata import enmap
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedrasteralgorithm import \
     PrepareClassificationDatasetFromCategorizedRasterAlgorithm
@@ -7,6 +5,7 @@ from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import landcover_raster_30m
+from qgis.core import QgsRasterLayer
 
 
 class TestPrepareClassificationSampleFromCategorizedRaster(TestCase):

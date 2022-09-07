@@ -4,7 +4,7 @@ from typing import Optional
 import numpy as np
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QCheckBox, \
     QMainWindow, QComboBox
-from PyQt5.uic import loadUi
+from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer, QgsMultiBandColorRenderer, QgsMapLayerProxyModel, QgsMapSettings
 from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsDoubleSpinBox, QgsMapLayerComboBox
 

@@ -13,7 +13,7 @@ class SpatialMorphologicalBinaryPropagationAlgorithm(SpatialFilterFunctionAlgori
         return Group.Test.value + Group.ConvolutionMorphologyAndFiltering.value
 
     def shortDescription(self) -> str:
-        return f'Spatial morphological Binary Propagation filter.'
+        return 'Spatial morphological Binary Propagation filter.'
 
     def helpParameterCode(self) -> str:
         links = ', '.join([

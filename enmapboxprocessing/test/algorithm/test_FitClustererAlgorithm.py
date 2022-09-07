@@ -1,4 +1,3 @@
-import numpy as np
 from sklearn.base import ClusterMixin, TransformerMixin
 
 from enmapbox.exampledata import enmap
@@ -12,8 +11,8 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClustererDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import classifierDumpPkl
 from qgis.core import Qgis
+from testdata import classifier_pkl
 
 
 class FitTestClustererAlgorithm(FitClustererAlgorithmBase):
@@ -38,7 +37,7 @@ class TestFitClustererAlgorithm(TestCase):
     def test_fitted(self):
         alg = FitTestClustererAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifier_pkl,
             alg.P_CLUSTERER: alg.defaultCodeAsString(),
             alg.P_OUTPUT_CLUSTERER: self.filename('clusterer.pkl')
         }
@@ -52,7 +51,7 @@ class TestFitClustererAlgorithm(TestCase):
     def test_fit_and_predict(self):
         alg = FitKMeansAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifier_pkl,
             alg.P_CLUSTERER: alg.defaultCodeAsString(),
             alg.P_OUTPUT_CLUSTERER: self.filename('clusterer.pkl')
         }
@@ -93,7 +92,7 @@ class TestFitClustererAlgorithm(TestCase):
             alg.initAlgorithm()
             alg.shortHelpString()
             parameters = {
-                alg.P_DATASET: classifierDumpPkl,
+                alg.P_DATASET: classifier_pkl,
                 alg.P_CLUSTERER: alg.defaultCodeAsString(),
                 alg.P_OUTPUT_CLUSTERER: self.filename('clusterer.pkl')
             }

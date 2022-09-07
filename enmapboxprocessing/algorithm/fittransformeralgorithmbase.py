@@ -76,7 +76,7 @@ class FitTransformerAlgorithmBase(EnMAPProcessingAlgorithm):
         # check code
         try:
             self.parameterAsTransformer(parameters, self.P_TRANSFORMER, context)
-        except:
+        except Exception:
             return False, traceback.format_exc()
         return True, ''
 

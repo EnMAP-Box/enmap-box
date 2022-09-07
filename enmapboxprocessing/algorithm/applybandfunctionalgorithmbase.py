@@ -2,13 +2,11 @@ import inspect
 from inspect import signature
 from typing import Dict, Any, List, Tuple, Optional
 
-import numpy as np
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
-
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import QgisDataType
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
 from typeguard import typechecked
 
 
@@ -20,7 +18,7 @@ class ApplyBandFunctionAlgorithmBase(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._RASTER, f'Raster layer to be processed band-wise.'),
+            (self._RASTER, 'Raster layer to be processed band-wise.'),
             (self._FUNCTION, self.helpParameterCode()),
             (self._OUTPUT_RASTER, self.RasterFileDestination)
         ]

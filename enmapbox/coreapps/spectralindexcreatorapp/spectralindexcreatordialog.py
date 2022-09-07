@@ -4,7 +4,7 @@ from typing import Optional
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QTableWidget, QListWidget, \
     QListWidgetItem, QLabel, QCheckBox, QLineEdit
-from PyQt5.uic import loadUi
+from qgis.PyQt.uic import loadUi
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsProcessing, QgsRasterBandStats
 from qgis.gui import QgsRasterBandComboBox, QgsMapLayerComboBox, QgsFilterLineEdit, QgsDoubleSpinBox, QgsFileWidget
 
@@ -229,7 +229,7 @@ class SpectralIndexCreatorDialog(QMainWindow):
         if self.mUseReflectanceScaleFactor.isChecked():
             try:
                 reflectanceScaleFactor = float(self.mReflectanceScaleFactor.text())
-            except:
+            except Exception:
                 reflectanceScaleFactor = None
                 self.mReflectanceScaleFactor.setText('')
         else:

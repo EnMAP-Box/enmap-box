@@ -1,12 +1,11 @@
 from typing import Dict, Any, List, Tuple
 
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer)
-
 from enmapboxprocessing.algorithm.layertomaskalgorithm import LayerToMaskAlgorithm
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer)
 from typeguard import typechecked
 
 

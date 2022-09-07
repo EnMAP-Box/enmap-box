@@ -3,15 +3,15 @@ from random import randint
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.PyQt.QtGui import QColor
 
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import ClustererDump, Category
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtGui import QColor
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer,
-                        QgsProcessingException, Qgis, QgsMapLayer)
+                       QgsProcessingException, QgsMapLayer)
 from typeguard import typechecked
 
 
@@ -108,7 +108,7 @@ class PredictClusteringAlgorithm(EnMAPProcessingAlgorithm):
 
             # create default style
             classification = QgsRasterLayer(filename)
-            categories = [Category(i+1, f'cluster {i + 1}', QColor(randint(0, 2**(24) - 1)).name())
+            categories = [Category(i + 1, f'cluster {i + 1}', QColor(randint(0, 2 ** (24) - 1)).name())
                           for i in range(dump.clusterCount)]
             renderer = Utils.palettedRasterRendererFromCategories(classification.dataProvider(), 1, categories)
             classification.setRenderer(renderer)

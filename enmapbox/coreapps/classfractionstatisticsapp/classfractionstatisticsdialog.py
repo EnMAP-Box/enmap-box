@@ -6,7 +6,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QMouseEvent, QColor
 from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QCheckBox, QTableWidget, QSpinBox, QComboBox, QApplication, \
     QMessageBox
-from PyQt5.uic import loadUi
+from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer, QgsRasterDataProvider, QgsRasterHistogram, QgsMapLayerProxyModel, QgsMapSettings
 from qgis.gui import QgsMapCanvas, QgsMapLayerComboBox, QgsColorButton
 
@@ -62,7 +62,7 @@ class ClassFractionStatisticsDialog(QMainWindow):
         if self.mMapCanvas is not None:
             try:
                 self.mMapCanvas.extentsChanged.disconnect(self.onMapCanvasExtentsChanged)
-            except:
+            except Exception:
                 pass
 
         # connect new map canvas
@@ -156,7 +156,7 @@ class ClassFractionStatisticsDialog(QMainWindow):
             mimeData = QApplication.clipboard().mimeData()
             renderer = rendererFromXml(mimeData)
             categories = Utils.categoriesFromRenderer(renderer)
-        except:
+        except Exception:
             traceback.print_exc()
             QMessageBox.warning(
                 self, 'Paste Style', 'Unable to derive categories from clipboard content. '

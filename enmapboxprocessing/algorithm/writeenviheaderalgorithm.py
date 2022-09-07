@@ -2,11 +2,11 @@ from os.path import exists
 from typing import Dict, Any, List, Tuple
 
 from osgeo import gdal
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 
+from enmapbox.qgispluginsupport.qps.speclib.io.envi import findENVIHeader, readENVIHeader
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapbox.qgispluginsupport.qps.speclib.io.envi import findENVIHeader, readENVIHeader
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 from typeguard import typechecked
 
 

@@ -1,5 +1,6 @@
 import numpy as np
 
+from enmapbox.exampledata import enmap
 from enmapboxprocessing.algorithm.spectralresamplingtodesisalgorithm import SpectralResamplingToDesisAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtoenmapalgorithm import SpectralResamplingToEnmapAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtolandsat5algorithm import SpectralResamplingToLandsat5Algorithm
@@ -9,7 +10,6 @@ from enmapboxprocessing.algorithm.spectralresamplingtoprismaalgorithm import Spe
 from enmapboxprocessing.algorithm.spectralresamplingtosentinel2algorithm import SpectralResamplingToSentinel2Algorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapbox.exampledata import enmap
 
 
 class TestSpectralResamplingByResponseFunctionConvolutionAlgorithmBase(TestCase):

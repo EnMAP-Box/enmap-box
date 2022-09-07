@@ -1,13 +1,11 @@
-from random import randint
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.PyQt.QtGui import QColor
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsFeature, QgsProcessingParameterField)
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-from enmapboxprocessing.typing import checkSampleShape, ClassifierDump, Category
+from enmapboxprocessing.typing import checkSampleShape, ClassifierDump
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsFeature, QgsProcessingParameterField)
 from typeguard import typechecked
 
 
@@ -26,7 +24,7 @@ class PrepareClassificationDatasetFromTableAlgorithm(EnMAPProcessingAlgorithm):
 
     def shortDescription(self) -> str:
         return 'Create a classification dataset from attribute table rows that match the given categories ' \
-               'and store the result as a pickle file. \n' \
+               'and store the result as a pickle file. \n'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
@@ -86,7 +84,7 @@ class PrepareClassificationDatasetFromTableAlgorithm(EnMAPProcessingAlgorithm):
                 feedback.setProgress(i / n * 100)
                 yi = valueLookup.get(feature.attribute(classField), None)
                 if yi is None:  # if category is not of interest ...
-                    continue    # ... skip the profile
+                    continue  # ... skip the profile
                 y[i, 0] = yi
                 for k, featureField in enumerate(featureFields):
                     Xik = feature.attribute(featureField)

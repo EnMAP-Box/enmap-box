@@ -2,11 +2,11 @@ from math import ceil
 from typing import List, Tuple, Dict, Any
 
 import numpy as np
-from qgis.core import Qgis, QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer
 
 from enmapboxprocessing.enmapalgorithm import Group, EnMAPProcessingAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+from qgis.core import Qgis, QgsProcessingContext, QgsProcessingFeedback
 from typeguard import typechecked
 
 
@@ -23,7 +23,7 @@ class RasterLayerZonalAggregationAlgorithm(EnMAPProcessingAlgorithm):
         return Group.Test.value + Group.RasterAnalysis.value
 
     def shortDescription(self) -> str:
-        return f'Aggregates raster layer pixel profiles by categories.'
+        return 'Aggregates raster layer pixel profiles by categories.'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [

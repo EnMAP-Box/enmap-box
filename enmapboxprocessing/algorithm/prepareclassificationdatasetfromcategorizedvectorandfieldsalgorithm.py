@@ -1,12 +1,12 @@
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCategorizedSymbolRenderer,
-                        QgsFeature, QgsProcessingParameterField, QgsVectorLayer)
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-from enmapboxprocessing.typing import checkSampleShape, ClassifierDump, Categories, SampleX, SampleY, Category
+from enmapboxprocessing.typing import checkSampleShape, ClassifierDump, Categories, SampleX, SampleY
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCategorizedSymbolRenderer,
+                       QgsFeature, QgsProcessingParameterField, QgsVectorLayer)
 from typeguard import typechecked
 
 
@@ -34,7 +34,7 @@ class PrepareClassificationDatasetFromCategorizedVectorAndFieldsAlgorithm(EnMAPP
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
             (self._CATEGORIZED_VECTOR,
-             f'Categorized vector layer specifying feature data X and target data y.'),
+             'Categorized vector layer specifying feature data X and target data y.'),
             (self._FEATURE_FIELDS, 'Fields with values used as feature data X.'),
             (self._CATEGORY_FIELD, 'Field with class values used as target data y. '
                                    'If not selected, the field defined by the renderer is used. '
@@ -111,7 +111,7 @@ class PrepareClassificationDatasetFromCategorizedVectorAndFieldsAlgorithm(EnMAPP
             feedback.setProgress(i / n * 100)
             yi = valueLookup.get(feature.attribute(yField), None)
             if yi is None:  # if category is not of interest ...
-                continue    # ... we skip the sample silently
+                continue  # ... we skip the sample silently
             y.append(yi)
             for k, field in enumerate(xFields):
                 Xik = feature.attribute(field)

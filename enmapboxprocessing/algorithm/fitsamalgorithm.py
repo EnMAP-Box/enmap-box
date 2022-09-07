@@ -22,7 +22,7 @@ class FitSamAlgorithm(FitClassifierAlgorithmBase):
                '<a href="' \
                'https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.Normalizer.html' \
                '">Normalizer</a>, ' \
-                '<a href="' \
+               '<a href="' \
                'https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html' \
                '">KNeighborsClassifier</a> for information on different parameters.'
 

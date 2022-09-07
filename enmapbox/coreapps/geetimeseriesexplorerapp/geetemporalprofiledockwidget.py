@@ -8,13 +8,6 @@ from tempfile import gettempdir
 from typing import Optional, List, Tuple, Dict
 
 import numpy as np
-from PyQt5 import QtGui
-from qgis.PyQt.QtCore import Qt, QDateTime, QDate, QModelIndex, QRectF, QStandardPaths, pyqtSignal, QCoreApplication
-from qgis.PyQt.QtGui import QColor, QPen, QBrush, QIcon, QPixmap
-from qgis.PyQt.QtWidgets import (QToolButton, QListWidget, QApplication, QSpinBox,
-                             QColorDialog, QComboBox, QCheckBox, QLineEdit,
-                             QFileDialog, QListWidgetItem, QSlider, QTableWidget, QProgressBar,
-                             QTableWidgetItem, QMessageBox)
 
 import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
@@ -24,12 +17,22 @@ from geetimeseriesexplorerapp.geetimeseriesexplorerdockwidget import GeeTimeseri
 from geetimeseriesexplorerapp.tasks.buildimagechipvrtstask import BuildImageChipVrtsTask
 from geetimeseriesexplorerapp.tasks.downloadimagechiptask import DownloadImageChipTask, DownloadImageChipBandTask
 from geetimeseriesexplorerapp.tasks.downloadprofiletask import DownloadProfileTask
+from qgis.PyQt import QtGui
 from qgis.PyQt import uic
-from qgis.core import (QgsProject, QgsCoordinateReferenceSystem, QgsPointXY, QgsCoordinateTransform, QgsGeometry,
-                        QgsFeature, QgsVectorLayer, QgsMapLayerProxyModel, QgsFields, QgsApplication)
-from qgis.gui import (QgsDockWidget, QgsFeaturePickerWidget,
-                       QgsMapLayerComboBox, QgsFieldComboBox, QgsMessageBar, QgsColorButton, QgsFileWidget,
-                       QgsCheckableComboBox, QgsMapMouseEvent)
+from qgis.PyQt.QtCore import Qt, QDateTime, QDate, QModelIndex, QRectF, QStandardPaths, pyqtSignal, QCoreApplication
+from qgis.PyQt.QtGui import QColor, QPen, QBrush, QIcon, QPixmap
+from qgis.PyQt.QtWidgets import (QToolButton, QListWidget, QApplication, QSpinBox,
+                                 QColorDialog, QComboBox, QCheckBox, QLineEdit,
+                                 QFileDialog, QListWidgetItem, QSlider, QTableWidget, QProgressBar,
+                                 QTableWidgetItem, QMessageBox)
+from qgis.core import (
+    QgsProject, QgsCoordinateReferenceSystem, QgsPointXY, QgsCoordinateTransform, QgsGeometry, QgsFeature,
+    QgsVectorLayer, QgsMapLayerProxyModel, QgsFields, QgsApplication
+)
+from qgis.gui import (
+    QgsDockWidget, QgsFeaturePickerWidget, QgsMapLayerComboBox, QgsFieldComboBox, QgsMessageBar, QgsColorButton,
+    QgsFileWidget, QgsCheckableComboBox, QgsMapMouseEvent
+)
 from typeguard import typechecked
 
 
@@ -449,7 +452,7 @@ class GeeTemporalProfileDockWidget(QgsDockWidget):
 
         self.infoLabelLine.setPos(x)
 
-        text = f"<span style='font-size: 8pt'>"
+        text = "<span style='font-size: 8pt'>"
 
         # add datetime
         if self.mShowDateTime.isChecked():
@@ -902,7 +905,7 @@ class GeeTemporalProfileDockWidget(QgsDockWidget):
         }
         try:
             imageCollectionInfo['filterMetadataValue'] = evalType(self.mFilterMetadataValue.text())
-        except:
+        except Exception:
             imageCollectionInfo['filterMetadataValue'] = None
 
         dirnameOutput = QFileDialog.getExistingDirectory(parent=self, directory=gettempdir())
@@ -1043,7 +1046,7 @@ class GeeTemporalProfileDockWidget(QgsDockWidget):
     def currentLocation(self) -> SpatialPoint:
         try:
             point = SpatialPoint(self.mainDock.crsEpsg4326, QgsPointXY(*map(float, self.mLocation.text().split(','))))
-        except:
+        except Exception:
             mapCenter = self.mainDock.currentMapCanvas().center()
             point = SpatialPoint(self.mainDock.crsEpsg4326, mapCenter)
         return point
@@ -1272,7 +1275,7 @@ class GeeTemporalProfileDockWidget(QgsDockWidget):
                     C = 2 ** self.mSvrParameters.cellWidget(1, 1).value()
                     try:
                         epsilon = float(self.mSvrParameters.cellWidget(2, 1).text())
-                    except:
+                    except Exception:
                         epsilon = 0
 
                     from sklearn.svm import SVR

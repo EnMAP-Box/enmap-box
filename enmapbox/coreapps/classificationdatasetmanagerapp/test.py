@@ -15,5 +15,3 @@ widget = ClassificationDatasetManagerGui(enmapBox.ui)
 widget.show()
 
 qgsApp.exec_()
-
-

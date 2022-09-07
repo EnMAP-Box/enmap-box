@@ -6,29 +6,28 @@ from time import time
 from typing import Any, Dict, Iterable, Optional, List, Tuple, TextIO
 
 import numpy as np
-from qgis.PyQt.QtGui import QIcon
 from osgeo import gdal
 
-from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer, QgsProcessingParameterVectorLayer,
-                        QgsProcessingContext, QgsProcessingFeedback,
-                        QgsRasterLayer, QgsVectorLayer, QgsProcessingParameterNumber, QgsProcessingParameterDefinition,
-                        QgsProcessingParameterField, QgsProcessingParameterBoolean, QgsProcessingParameterEnum, Qgis,
-                        QgsProcessingParameterString, QgsProcessingParameterBand, QgsCategorizedSymbolRenderer,
-                        QgsPalettedRasterRenderer, QgsProcessingParameterMapLayer, QgsMapLayer,
-                        QgsProcessingParameterExtent, QgsCoordinateReferenceSystem, QgsRectangle,
-                        QgsProcessingParameterFileDestination, QgsProcessingParameterFile, QgsProcessingParameterRange,
-                        QgsProcessingParameterCrs, QgsProcessingParameterVectorDestination, QgsProcessing,
-                        QgsProcessingUtils, QgsProcessingParameterMultipleLayers, QgsProcessingException,
-                        QgsProcessingParameterFolderDestination, QgsProject)
-
 import processing
+from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.glossary import injectGlossaryLinks
 from enmapboxprocessing.parameter.processingparameterrasterdestination import ProcessingParameterRasterDestination
-from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.processingfeedback import ProcessingFeedback
 from enmapboxprocessing.typing import QgisDataType, CreationOptions, GdalResamplingAlgorithm, ClassifierDump, \
     TransformerDump, RegressorDump, ClustererDump
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtGui import QIcon
+from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer, QgsProcessingParameterVectorLayer,
+                       QgsProcessingContext, QgsProcessingFeedback,
+                       QgsRasterLayer, QgsVectorLayer, QgsProcessingParameterNumber, QgsProcessingParameterDefinition,
+                       QgsProcessingParameterField, QgsProcessingParameterBoolean, QgsProcessingParameterEnum, Qgis,
+                       QgsProcessingParameterString, QgsProcessingParameterBand, QgsCategorizedSymbolRenderer,
+                       QgsPalettedRasterRenderer, QgsProcessingParameterMapLayer, QgsMapLayer,
+                       QgsProcessingParameterExtent, QgsCoordinateReferenceSystem, QgsRectangle,
+                       QgsProcessingParameterFileDestination, QgsProcessingParameterFile, QgsProcessingParameterRange,
+                       QgsProcessingParameterCrs, QgsProcessingParameterVectorDestination, QgsProcessing,
+                       QgsProcessingUtils, QgsProcessingParameterMultipleLayers, QgsProcessingException,
+                       QgsProcessingParameterFolderDestination, QgsProject)
 from typeguard import typechecked
 
 
@@ -231,7 +230,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         dump = Utils.pickleLoad(filename)
         try:
             dump = RegressorDump.fromDict(dump)
-        except:
+        except Exception:
             raise QgsProcessingException(
                 f'Wrong or missing parameter value: {self.parameterDefinition(name).description()}'
             )

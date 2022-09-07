@@ -5,13 +5,11 @@ from math import ceil
 from os.path import basename, splitext, join, dirname
 from re import finditer, Match
 from typing import Dict, Any, List, Tuple, Union
+from unittest.mock import Mock
 
 import numpy
 import numpy as np
-from unittest.mock import Mock
 from osgeo import gdal
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsProcessing,
-                        QgsProcessingParameterString, QgsProject, QgsRasterLayer, Qgis, QgsVectorLayer, QgsFields)
 
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
@@ -24,6 +22,8 @@ from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsProcessing,
+                       QgsProcessingParameterString, QgsProject, QgsRasterLayer, Qgis, QgsVectorLayer, QgsFields)
 from typeguard import typechecked
 
 
@@ -72,32 +72,32 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
                f'See the {self.linkRecipe} for detailed usage instructions.'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
-        return [
-                   (self._CODE, 'The mathematical calculation to be performed on the selected input arrays.\n'
-                                'Select inputs in the available data sources section or '
-                                'use the raster layer R1, ..., R10 and vector layer V1, ..., V10.\n'
-                                'In the code snippets section you can find some prepdefined code snippets ready to use.\n'
-                                f'See the {self.linkRecipe} for detailed usage instructions.'),
-                   (self._GRID, 'The destination grid. If not specified, the grid of the first raster layer is used.'),
-                   (self._FLOAT_INPUT, 'Whether to  cast inputs to 32-bit floating point.'),
-                   (self._OVERLAP, 'The number of columns and rows to read from the neighbouring blocks. '
-                                   'Needs to be specified only when performing spatial operations, '
-                                   'to avoid artifacts at block borders.'),
-                   (self._MONOLITHIC,
-                    'Whether to read all data for the full extent at once, instead of block-wise processing. '
-                    'This may be useful for some spatially unbound operations, '
-                    'like segmentation or region growing, when calculating global statistics, '
-                    'or if RAM is not an issue at all.'),
-                   ('Raster layer mapped to R1, ..., R10', 'Additional raster layers mapped to Ri.'),
-                   ('Vector layer mapped to V1, ..., V10', 'Additional vector layers mapped to Vi.'),
-                   (self._RS, 'Additional list of raster layers mapped to a list variable RS.'),
-                   (self._OUTPUT_RASTER, 'Raster file destination for writing the default output variable. '
-                                         'Additional outputs are written into the same directory. '
-                                         f'See the {self.linkRecipe} for detailed usage instructions.'),
-               ] + (
-                       [(f'Raster layer mapped to R{i}', '') for i in range(1, 11)] +  # just silince those
-                       [(f'Vector layer mapped to V{i}', '') for i in range(1, 11)]    # just silince those
-               )
+        text = [
+            (self._CODE, 'The mathematical calculation to be performed on the selected input arrays.\n'
+                         'Select inputs in the available data sources section or '
+                         'use the raster layer R1, ..., R10 and vector layer V1, ..., V10.\n'
+                         'In the code snippets section you can find some prepdefined code snippets ready to use.\n'
+                         f'See the {self.linkRecipe} for detailed usage instructions.'),
+            (self._GRID, 'The destination grid. If not specified, the grid of the first raster layer is used.'),
+            (self._FLOAT_INPUT, 'Whether to  cast inputs to 32-bit floating point.'),
+            (self._OVERLAP, 'The number of columns and rows to read from the neighbouring blocks. '
+                            'Needs to be specified only when performing spatial operations, '
+                            'to avoid artifacts at block borders.'),
+            (self._MONOLITHIC,
+             'Whether to read all data for the full extent at once, instead of block-wise processing. '
+             'This may be useful for some spatially unbound operations, '
+             'like segmentation or region growing, when calculating global statistics, '
+             'or if RAM is not an issue at all.'),
+            ('Raster layer mapped to R1, ..., R10', 'Additional raster layers mapped to Ri.'),
+            ('Vector layer mapped to V1, ..., V10', 'Additional vector layers mapped to Vi.'),
+            (self._RS, 'Additional list of raster layers mapped to a list variable RS.'),
+            (self._OUTPUT_RASTER, 'Raster file destination for writing the default output variable. '
+                                  'Additional outputs are written into the same directory. '
+                                  f'See the {self.linkRecipe} for detailed usage instructions.'),
+        ]
+
+        text.extend([(f'Raster layer mapped to R{i}', '') for i in range(1, 11)])  # just silince those
+        text.extend([(f'Vector layer mapped to V{i}', '') for i in range(1, 11)])  # just silince those
 
     def group(self):
         return Group.Test.value + Group.RasterAnalysis.value
@@ -332,7 +332,7 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
 
             try:
                 dataType = Utils.numpyDataTypeToQgisDataType(result.dtype)
-            except:
+            except ValueError:
                 warnings.warn(f'unsupported data type: {result.dtype}; will be written as float64 instead')
                 dataType = Qgis.DataType.Float64
                 result = result.astype(np.float64)

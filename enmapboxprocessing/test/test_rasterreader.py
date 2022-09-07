@@ -1,5 +1,4 @@
 import numpy as np
-from qgis.PyQt.QtCore import QDateTime
 
 import processing
 from enmapbox.exampledata import enmap
@@ -9,6 +8,7 @@ from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRaste
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.testcase import TestCase
+from qgis.PyQt.QtCore import QDateTime
 from qgis.core import QgsRasterRange, QgsRasterLayer
 
 

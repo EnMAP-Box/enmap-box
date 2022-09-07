@@ -1,11 +1,9 @@
 import webbrowser
 
-from PyQt5.Qsci import QsciScintilla, QsciLexerPython
-from qgis.PyQt.QtGui import QFont, QFontMetrics, QColor
-from qgis.PyQt.QtWidgets import QSizePolicy, QWidget, QLineEdit, QComboBox, QToolButton
-from PyQt5.uic import loadUi
+from qgis.PyQt.uic import loadUi
 
-from processing.gui.wrappers import WidgetWrapper, DIALOG_MODELER, DIALOG_BATCH
+from processing.gui.wrappers import WidgetWrapper
+from qgis.PyQt.QtWidgets import QWidget, QLineEdit, QComboBox, QToolButton
 
 
 class ProcessingParameterCreationProfileWidget(QWidget):
@@ -23,7 +21,7 @@ class ProcessingParameterCreationProfileWidget(QWidget):
         ('ENVI BIL', 'ENVI INTERLEAVE=BIL'),
         ('ENVI BIP', 'ENVI INTERLEAVE=BIP'),
         ('Virtual Raster', 'VRT')
-         ]
+    ]
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
@@ -46,31 +44,32 @@ class ProcessingParameterCreationProfileWidget(QWidget):
         if value.startswith('VRT'):
             webbrowser.open_new_tab('https://gdal.org/drivers/raster/vrt.html')
 
+
 class ProcessingParameterCreationProfileWidgetWrapper(WidgetWrapper):
     # adopted from C:\source\QGIS3-master\python\plugins\processing\algs\gdal\ui\RasterOptionsWidget.py
 
     widget: ProcessingParameterCreationProfileWidget
 
     def createWidget(self):
-        #if self.dialogType == DIALOG_MODELER:
+        # if self.dialogType == DIALOG_MODELER:
         #    raise NotImplementedError()
-        #elif self.dialogType == DIALOG_BATCH:
+        # elif self.dialogType == DIALOG_BATCH:
         #    raise NotImplementedError()
-        #else:
+        # else:
         return ProcessingParameterCreationProfileWidget()
 
     def setValue(self, value: str):
-        #if self.dialogType == DIALOG_MODELER:
+        # if self.dialogType == DIALOG_MODELER:
         #    raise NotImplementedError()
-        #elif self.dialogType == DIALOG_BATCH:
+        # elif self.dialogType == DIALOG_BATCH:
         #    raise NotImplementedError()
-        #else:
+        # else:
         self.widget.mOptions.setText(value)
 
     def value(self):
-        #if self.dialogType == DIALOG_MODELER:
+        # if self.dialogType == DIALOG_MODELER:
         #    raise NotImplementedError()
-        #elif self.dialogType == DIALOG_BATCH:
+        # elif self.dialogType == DIALOG_BATCH:
         #    raise NotImplementedError()
-        #else:
+        # else:
         return self.widget.mOptions.text()

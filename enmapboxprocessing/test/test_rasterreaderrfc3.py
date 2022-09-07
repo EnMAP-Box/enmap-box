@@ -1,10 +1,9 @@
-from qgis.PyQt.QtCore import QDateTime
-
 import processing
 from enmapbox.exampledata import enmap
 from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.testcase import TestCase
+from qgis.PyQt.QtCore import QDateTime
 
 
 class TestRasterReaderRfc3(TestCase):
@@ -58,4 +57,3 @@ class TestRasterReaderRfc3(TestCase):
         reader.setTime(None, None, 42)
         self.assertIsNone(reader.startTime(42))
         self.assertIsNone(reader.endTime(42))
-

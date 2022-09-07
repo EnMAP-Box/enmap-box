@@ -4,11 +4,10 @@ import numpy as np
 
 from enmapboxprocessing.algorithm.randomsamplesfromclassificationdatasetalgorithm import \
     RandomSamplesFromClassificationDatasetAlgorithm
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
-
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClassifierDump, Category, RegressorDump
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 from typeguard import typechecked
 
 
@@ -31,7 +30,7 @@ class RandomSamplesFromRegressionDatasetAlgorithm(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._DATASET, f'Regression dataset pickle file with feature data X and target data y to draw from.'),
+            (self._DATASET, 'Regression dataset pickle file with feature data X and target data y to draw from.'),
             (self._BINS, 'Number of bins used to stratify the target range.'),
             (self._N,
              'Number of samples to draw from each bin. '
@@ -84,12 +83,12 @@ class RandomSamplesFromRegressionDatasetAlgorithm(EnMAPProcessingAlgorithm):
 
             # draw samples
             indices = list()
-            categories = [Category(i, f'Bin {i+1}', None) for i in range(bins)]
+            categories = [Category(i, f'Bin {i + 1}', None) for i in range(bins)]
             for i, target in enumerate(dump.targets):
                 feedback.pushInfo(f'Target: {target.name}')
                 ymin = np.min(dump.y[:, i])
                 ymax = np.max(dump.y[:, i])
-                y = np.array([int(round(v)) for v in (dump.y[:, i] - ymin) / ymax * (bins -1)])
+                y = np.array([int(round(v)) for v in (dump.y[:, i] - ymin) / ymax * (bins - 1)])
                 dump2 = ClassifierDump(categories, dump.features, dump.X, y)
                 indices_, _ = RandomSamplesFromClassificationDatasetAlgorithm.drawSamples(
                     N, dump2, proportional, replace, feedback

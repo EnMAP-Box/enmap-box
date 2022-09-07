@@ -1,14 +1,8 @@
-from os.path import join
-
 from enmapbox.exampledata import enmap
 from enmapboxprocessing.algorithm.fitrandomforestregressoralgorithm import FitRandomForestRegressorAlgorithm
-from enmapboxprocessing.algorithm.prepareregressiondatasetfromsynthmixalgorithm import \
-    PrepareRegressionDatasetFromSynthMixAlgorithm
 from enmapboxprocessing.algorithm.regressionbasedunmixingalgorithm import RegressionBasedUnmixingAlgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapboxprocessing.typing import ClassifierDump, RegressorDump
-from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import (classifierDumpPkl)
+from testdata import classifier_pkl
 
 
 class TestFitClassifierAlgorithm(TestCase):
@@ -16,7 +10,7 @@ class TestFitClassifierAlgorithm(TestCase):
     def test(self):
         alg = RegressionBasedUnmixingAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifier_pkl,
             alg.P_RASTER: enmap,
             alg.P_REGRESSOR: FitRandomForestRegressorAlgorithm().defaultCodeAsString(),
             alg.P_N: 10,

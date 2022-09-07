@@ -1,11 +1,10 @@
 from unittest import TestCase
 
-from qgis.PyQt.QtGui import QColor
-from qgis.core import QgsVectorLayer
-
+from enmapbox.exampledata import landcover_polygons
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
-from enmapbox.exampledata import landcover_polygons
+from qgis.PyQt.QtGui import QColor
+from qgis.core import QgsVectorLayer
 
 
 class TestUtils(TestCase):
@@ -35,7 +34,6 @@ class TestUtils(TestCase):
         self.assertEqual(white, Utils.parseColor('255, 255, 255'))
 
     def test_prepareCategories(self):
-
         # remove last if empty
         categories, valueLookup = Utils.prepareCategories(
             [Category(42, 'A', '#000000'), Category(0, '', '#000000')],

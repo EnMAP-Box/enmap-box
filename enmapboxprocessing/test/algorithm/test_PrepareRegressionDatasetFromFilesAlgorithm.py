@@ -1,11 +1,9 @@
-from enmapboxprocessing.algorithm.prepareclassificationdatasetfromfilesalgorithm import \
-    PrepareClassificationDatasetFromFilesAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromfilesalgorithm import \
     PrepareRegressionDatasetFromFilesAlgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapboxprocessing.typing import ClassifierDump, RegressorDump
+from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import classificationSampleAsCsv
+from testdata import classification_dataset_csv
 
 
 class TestPrepareRegressionDatasetFromFilesAlgorithm(TestCase):
@@ -13,8 +11,8 @@ class TestPrepareRegressionDatasetFromFilesAlgorithm(TestCase):
     def test(self):
         alg = PrepareRegressionDatasetFromFilesAlgorithm()
         parameters = {
-            alg.P_FEATURE_FILE: classificationSampleAsCsv[0],
-            alg.P_VALUE_FILE: classificationSampleAsCsv[1],
+            alg.P_FEATURE_FILE: classification_dataset_csv[0],
+            alg.P_VALUE_FILE: classification_dataset_csv[1],
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
         }
         self.runalg(alg, parameters)

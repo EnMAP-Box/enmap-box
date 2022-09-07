@@ -5,7 +5,7 @@ from enmapboxprocessing.algorithm.classificationworkflowalgorithm import Classif
 from enmapboxprocessing.algorithm.fitcatboostclassifieralgorithm import FitCatBoostClassifierAlgorithm
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapboxtestdata import (classifierDumpPkl)
+from testdata import (classifier_pkl)
 
 openReport = True
 
@@ -32,7 +32,7 @@ class TestClassificationAlgorithm(TestCase):
     def test(self):
         alg = ClassificationWorkflowAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifier_pkl,
             alg.P_CLASSIFIER: FitTestClassifierAlgorithm().defaultCodeAsString(),
             alg.P_RASTER: enmap,
             alg.P_NFOLD: 10,
@@ -47,7 +47,7 @@ class TestClassificationAlgorithm(TestCase):
     def test_debug_issue1140(self):
         alg = ClassificationWorkflowAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifier_pkl,
             alg.P_CLASSIFIER: FitCatBoostClassifierAlgorithm().defaultCodeAsString(),
             alg.P_RASTER: enmap,
             alg.P_OPEN_REPORT: openReport,
@@ -56,4 +56,3 @@ class TestClassificationAlgorithm(TestCase):
             alg.P_OUTPUT_PROBABILITY: self.filename('probability.tif'),
         }
         self.runalg(alg, parameters)
-

@@ -1,12 +1,12 @@
 from os.path import normpath
 
 import numpy as np
-from qgis.core import Qgis
 
 from enmapbox.exampledata import enmap, hires, landcover_polygons
 from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import RasterMathAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
+from qgis.core import Qgis
 
 
 class TestRasterMathAlgorithm(TestCase):

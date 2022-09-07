@@ -1,10 +1,9 @@
 from typing import Dict, Any, List, Tuple
 
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
-
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 from typeguard import typechecked
 
 
@@ -16,7 +15,7 @@ class SelectFeaturesFromDatasetAlgorithm(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._DATASET, f'Dataset pickle file to select features from.'),
+            (self._DATASET, 'Dataset pickle file to select features from.'),
             (self._FEATURE_LIST,
              'Comma separated list of feature names or positions. '
              "E.g. use <code>1, 'Feature 2', 3</code> to select the first three features."),
@@ -55,7 +54,7 @@ class SelectFeaturesFromDatasetAlgorithm(EnMAPProcessingAlgorithm):
             indices = list()
             for value in values:
                 if isinstance(value, str):
-                    if not value in dump.features:
+                    if value not in dump.features:
                         raise QgsProcessingException(f"Feature '{value}' not found in sample.")
                     value = dump.features.index(value) + 1
                 if not isinstance(value, int):

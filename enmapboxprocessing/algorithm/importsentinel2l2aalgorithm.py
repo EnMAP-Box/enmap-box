@@ -1,12 +1,11 @@
 from os.path import basename, dirname, join
 from typing import Dict, Any, List, Tuple
-from xml.etree import ElementTree
 
 from osgeo import gdal
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 from typeguard import typechecked
 
 

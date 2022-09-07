@@ -4,14 +4,12 @@ from typing import Dict, Any, List, Tuple
 import numpy as np
 from osgeo import gdal
 
-from enmapboxprocessing.algorithm.layertomaskalgorithm import LayerToMaskAlgorithm
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer,
-                        Qgis, QgsProcessingException, QgsMapLayer)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis, QgsProcessingException)
 from typeguard import typechecked
 
 

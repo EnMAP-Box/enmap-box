@@ -1,8 +1,6 @@
 import math
 
-from qgis.PyQt.QtCore import QSizeF, QRectF
-from qgis.core import QgsRectangle, QgsPointXY, QgsProcessingFeedback, QgsProcessingException
-
+from qgis.core import QgsRectangle, QgsProcessingFeedback, QgsProcessingException
 from typeguard import typechecked
 
 

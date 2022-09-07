@@ -1,9 +1,8 @@
 from typing import List
 
+from enmapboxprocessing.parameter.processingparametercodeeditwidget import CodeEditWidget
 from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QComboBox, QLabel, QVBoxLayout
 from qgis.core import QgsRasterLayer
-
-from enmapboxprocessing.parameter.processingparametercodeeditwidget import CodeEditWidget
 from typeguard import typechecked
 
 
@@ -21,7 +20,7 @@ class DialogUi(object):
             vbox.addWidget(comboBox)
             dialog.sources.append((comboBox, placeholder))
 
-        vbox.addWidget(QLabel(f'Code snippet preview'))
+        vbox.addWidget(QLabel('Code snippet preview'))
         self.mCode = CodeEditWidget()
         self.mCode.setText(dialog.code)
         self.mCode.setReadOnly(True)

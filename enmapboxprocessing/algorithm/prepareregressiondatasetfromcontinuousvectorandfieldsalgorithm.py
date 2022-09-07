@@ -1,13 +1,13 @@
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCategorizedSymbolRenderer,
-                        QgsFeature, QgsProcessingParameterField, QgsVectorLayer, QgsProcessingException)
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-from enmapboxprocessing.typing import checkSampleShape, ClassifierDump, Categories, SampleX, SampleY, Category, Target, \
+from enmapboxprocessing.typing import checkSampleShape, SampleX, SampleY, Target, \
     RegressorDump
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsFeature, QgsProcessingParameterField,
+                       QgsVectorLayer, QgsProcessingException)
 from typeguard import typechecked
 
 
@@ -29,7 +29,7 @@ class PrepareRegressionDatasetFromContinuousVectorAndFieldsAlgorithm(EnMAPProces
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
             (self._CONTINUOUS_VECTOR,
-             f'Continuous-valued vector layer specifying feature data X and target data y.'),
+             'Continuous-valued vector layer specifying feature data X and target data y.'),
             (self._FEATURE_FIELDS, 'Fields with values used as feature data X.'),
             (self._TARGET_FIELDS, 'Fields with values used as used as target data y. '
                                   'If not selected, the fields defined by the renderer are used. '

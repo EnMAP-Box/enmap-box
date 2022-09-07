@@ -1,5 +1,4 @@
-from qgis.PyQt.QtWidgets import QWidget, QComboBox, QTextBrowser
-from PyQt5.uic import loadUi
+from qgis.PyQt.uic import loadUi
 
 from enmapboxprocessing.algorithm.algorithms import algorithms
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
@@ -8,6 +7,7 @@ from enmapboxprocessing.algorithm.fitrandomforestregressoralgorithm import FitRa
 from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
 from enmapboxprocessing.parameter.processingparametercodeeditwidget import CodeEditWidget
 from processing.gui.wrappers import WidgetWrapper
+from qgis.PyQt.QtWidgets import QWidget, QComboBox, QTextBrowser
 from typeguard import typechecked
 
 

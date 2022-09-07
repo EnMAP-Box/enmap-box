@@ -1,7 +1,5 @@
 from typing import TextIO, List, Tuple, Union
-import numpy as np
 
-from enmapbox.qgispluginsupport.qps.pyqtgraph import pyqtgraph
 from typeguard import typechecked
 
 

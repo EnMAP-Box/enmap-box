@@ -3,7 +3,7 @@ from typing import Optional
 from qgis.PyQt.QtGui import QMouseEvent, QColor
 from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QTableWidget, QComboBox, QCheckBox, \
     QLabel
-from PyQt5.uic import loadUi
+from qgis.PyQt.uic import loadUi
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsRasterDataProvider, QgsRasterBandStats, \
     QgsRasterHistogram, QgsMapSettings, QgsRasterRenderer
 from qgis.gui import QgsRasterBandComboBox, QgsMapLayerComboBox, QgsFilterLineEdit, QgsSpinBox, QgsMapCanvas
@@ -96,7 +96,7 @@ class BandStatisticsDialog(QMainWindow):
         if self.mMapCanvas is not None:
             try:
                 self.mMapCanvas.extentsChanged.disconnect(self.onMapCanvasExtentsChanged)
-            except:
+            except Exception:
                 pass
 
         # connect new map canvas
@@ -206,7 +206,7 @@ class BandStatisticsDialog(QMainWindow):
             else:
                 try:
                     minimum = float(self.mHistogramMinimum.text())
-                except:
+                except Exception:
                     self.mHistogramMinimum.setText(stats.minimumValue)
                     minimum = stats.minimumValue
 
@@ -215,7 +215,7 @@ class BandStatisticsDialog(QMainWindow):
             else:
                 try:
                     maximum = float(self.mHistogramMaximum.text())
-                except:
+                except Exception:
                     self.mHistogramMaximum.setText(stats.maximumValue)
                     maximum = stats.maximumValue
 

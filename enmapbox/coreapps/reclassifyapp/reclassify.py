@@ -256,7 +256,7 @@ class ReclassifyTableModel(QAbstractTableModel):
             try:
                 self.mDst.sigClassesRemoved.disconnect(self.onDestinationClassesRemoved)
                 self.mDst.dataChanged.disconnect(self.onDestinationDataChanged)
-            except:
+            except Exception:
                 pass
 
         self.mDst = cs
@@ -285,7 +285,7 @@ class ReclassifyTableModel(QAbstractTableModel):
             try:
                 oldSrc.sigClassesRemoved.disconnect(self.onSourceClassesRemoved)
                 self.mSrc.dataChanged.disconnect(self.onSourceDataChanged)
-            except:
+            except Exception:
                 pass
         self.mSrc.sigClassesRemoved.connect(self.onSourceClassesRemoved)
         self.mSrc.dataChanged.connect(self.onSourceDataChanged)

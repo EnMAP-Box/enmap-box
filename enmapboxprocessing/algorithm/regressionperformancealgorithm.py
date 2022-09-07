@@ -7,7 +7,6 @@ from os.path import exists, dirname
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.PyQt.QtGui import QColor
 from osgeo import gdal
 
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
@@ -17,6 +16,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.reportwriter import MultiReportWriter, HtmlReportWriter, CsvReportWriter
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer, \
     QgsProcessingException
 from typeguard import typechecked
@@ -124,7 +124,7 @@ class RegressionPerformanceAlgorithm(EnMAPProcessingAlgorithm):
                     }
                     self.runAlg(alg, parameters, None, feedback2, context, True)
                     filenames.append(parameters[alg.P_OUTPUT_RASTER])
-                ds = gdal.BuildVRT(Utils.tmpFilename(filename, f'observation.vrt'), filenames, separate=True)
+                ds = gdal.BuildVRT(Utils.tmpFilename(filename, 'observation.vrt'), filenames, separate=True)
                 writer = RasterWriter(ds)
                 writer.setNoDataValue(noDataValue)
                 for bandNo, target in enumerate(targetsReference, 1):

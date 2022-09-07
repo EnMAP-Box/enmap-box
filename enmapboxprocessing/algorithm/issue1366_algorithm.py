@@ -24,7 +24,6 @@ class MyAlgorithm(QgsProcessingAlgorithm):
         return type(self)()
 
     def initAlgorithm(self, configuration):
-
         # add a normal parameter
         self.addParameter(QgsProcessingParameterFile('file1', 'Normal File'))
 

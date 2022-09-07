@@ -16,7 +16,7 @@ except Exception as error:
     ClusterMixin = Any
     Pipeline = Any
 
-from typeguard import typechecked, check_argument_types, check_type
+from typeguard import typechecked, check_type
 
 GdalDataType = int
 GdalResamplingAlgorithm = int
@@ -98,11 +98,10 @@ class ClassifierDump(object):
         check_type('y', self.y, Optional[SampleY])
         try:
             check_type('classifier', self.classifier, Optional[Union[ClassifierMixin, Pipeline]])
-        except:
+        except Exception:
             from sklearn.base import is_classifier
             if not is_classifier(self.classifier):
                 raise TypeError('classifier is not a valid scikit-learn classifier')
-
 
     @staticmethod
     def fromDict(d: Dict):
@@ -126,7 +125,7 @@ class RegressorDump(object):
         check_type('y', self.y, Optional[SampleY])
         try:
             check_type('regressor', self.regressor, Optional[Union[RegressorMixin, Pipeline]])
-        except:
+        except Exception:
             from sklearn.base import is_regressor
             if not is_regressor(self.regressor):
                 raise TypeError('regressor is not a valid scikit-learn regressor')

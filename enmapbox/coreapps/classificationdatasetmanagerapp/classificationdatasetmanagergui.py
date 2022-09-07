@@ -1,10 +1,6 @@
 from os.path import basename, join
 
 import numpy as np
-from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import (QMainWindow, QTableWidget, QTableWidgetItem, QLabel, QToolButton, QMessageBox, QComboBox,
-                             QSpinBox, QDialog)
-from PyQt5.uic import loadUi
 
 from enmapboxprocessing.algorithm.randomsamplesfromclassificationdatasetalgorithm import \
     RandomSamplesFromClassificationDatasetAlgorithm
@@ -12,6 +8,11 @@ from enmapboxprocessing.parameter.processingparameterpicklefileclassificationdat
     ProcessingParameterPickleFileClassificationDatasetWidget
 from enmapboxprocessing.typing import ClassifierDump, Category
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWidgets import (
+    QMainWindow, QTableWidget, QTableWidgetItem, QLabel, QToolButton, QMessageBox, QComboBox, QSpinBox, QDialog
+)
+from qgis.PyQt.uic import loadUi
 from qgis.gui import QgsColorButton, QgsDoubleSpinBox, QgsSpinBox
 from typeguard import typechecked
 
@@ -50,7 +51,7 @@ class ClassificationDatasetManagerGui(QDialog):
         filename = self.mDataset.mFile.filePath()
         try:
             dump = ClassifierDump.fromDict(Utils.pickleLoad(filename))
-        except:
+        except Exception:
             return
 
         sizes = list()
@@ -84,7 +85,7 @@ class ClassificationDatasetManagerGui(QDialog):
         filename = self.mDataset.mFile.filePath()
         try:
             dump = ClassifierDump.fromDict(Utils.pickleLoad(filename))
-        except:
+        except Exception:
             return
 
         if question:
@@ -105,7 +106,7 @@ class ClassificationDatasetManagerGui(QDialog):
         filename = self.mDataset.mFile.filePath()
         try:
             dump = ClassifierDump.fromDict(Utils.pickleLoad(filename))
-        except:
+        except Exception:
             self.mCategoryTable.setRowCount(0)
             return
 
@@ -161,7 +162,7 @@ class ClassificationDatasetManagerGui(QDialog):
         filename = self.mDataset.mFile.filePath()
         try:
             dump = ClassifierDump.fromDict(Utils.pickleLoad(filename))
-        except:
+        except Exception:
             self.mCategoryTable.setRowCount(0)
             return
 

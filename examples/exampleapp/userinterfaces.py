@@ -20,19 +20,15 @@
 """
 
 import os
-
-from qgis.PyQt.QtWidgets import QDialog
-
 from enmapbox.qgispluginsupport.qps.utils import loadUi
 from examples.exampleapp import APP_DIR
+from qgis.PyQt.QtWidgets import QDialog
 
-""""
-Use the QtDesigner to open the example.ui file.  
+"""
+Use the QtDesigner to open the example.ui file.
 The example.ui can get compiled and loaded at runtime.
-"""""
-from enmapbox.gui.utils import loadUIFormClass
+"""
 
-# path to the *.ui file that was created/edited in the QDesigner
 pathUi = os.path.join(APP_DIR, 'example.ui')
 
 

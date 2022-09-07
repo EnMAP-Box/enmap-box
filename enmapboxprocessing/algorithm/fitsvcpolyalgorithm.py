@@ -36,7 +36,7 @@ class FitSvcPolyAlgorithm(FitClassifierAlgorithmBase):
         svc = SVC(probability=False)
         param_grid = {'kernel': ['poly'],
                       'coef0': [0],
-                      'degree' : [3],
+                      'degree': [3],
                       'gamma': [0.001, 0.01, 0.1, 1, 10, 100, 1000],
                       'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000]}
         tunedSVC = GridSearchCV(cv=3, estimator=svc, scoring='f1_macro', param_grid=param_grid)

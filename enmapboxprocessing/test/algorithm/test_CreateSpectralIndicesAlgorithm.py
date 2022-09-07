@@ -1,9 +1,8 @@
-from qgis.core import QgsProcessingException
-
 from enmapbox.exampledata import enmap
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
+from qgis.core import QgsProcessingException
 
 
 class TestCreateSpectralIndicesAlgorithm(TestCase):

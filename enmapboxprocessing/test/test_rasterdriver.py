@@ -1,11 +1,11 @@
 import numpy as np
 from osgeo import gdal
-from qgis.core import QgsCoordinateReferenceSystem, Qgis, QgsRasterLayer
 
+from enmapbox.exampledata import enmap
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.testcase import TestCase
-from enmapbox.exampledata import enmap
+from qgis.core import QgsCoordinateReferenceSystem, Qgis, QgsRasterLayer
 
 
 class TestDriver(TestCase):

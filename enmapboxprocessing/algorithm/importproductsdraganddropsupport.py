@@ -2,8 +2,6 @@ import traceback
 from os.path import exists, basename
 from typing import List
 
-from qgis.core import QgsRasterLayer, QgsMapLayer
-
 from enmapboxprocessing.algorithm.importdesisl1balgorithm import ImportDesisL1BAlgorithm
 from enmapboxprocessing.algorithm.importdesisl1calgorithm import ImportDesisL1CAlgorithm
 from enmapboxprocessing.algorithm.importdesisl2aalgorithm import ImportDesisL2AAlgorithm
@@ -15,6 +13,7 @@ from enmapboxprocessing.algorithm.importprismal1algorithm import ImportPrismaL1A
 from enmapboxprocessing.algorithm.importprismal2dalgorithm import ImportPrismaL2DAlgorithm
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
 from processing import AlgorithmDialog
+from qgis.core import QgsRasterLayer, QgsMapLayer
 
 
 class AlgorithmDialogWrapper(AlgorithmDialog):
@@ -73,6 +72,6 @@ def tryToImportSensorProducts(filename: str) -> List[QgsMapLayer]:
                     layer = QgsRasterLayer(parameters[key], basename(value))
                     mapLayers.append(layer)
         return mapLayers
-    except:
+    except Exception:
         traceback.print_exc()
         return []

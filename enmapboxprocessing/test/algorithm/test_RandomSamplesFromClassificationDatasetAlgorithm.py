@@ -2,7 +2,7 @@ from enmapboxprocessing.algorithm.randomsamplesfromclassificationdatasetalgorith
     RandomSamplesFromClassificationDatasetAlgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import (classifierDumpPkl)
+from testdata import (classifier_pkl)
 
 
 class TestRandomSamplesFromClassificationDatasetAlgorithm(TestCase):
@@ -11,7 +11,7 @@ class TestRandomSamplesFromClassificationDatasetAlgorithm(TestCase):
         alg = RandomSamplesFromClassificationDatasetAlgorithm()
         alg.initAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifier_pkl,
             alg.P_N: 10,
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl'),
             alg.P_OUTPUT_COMPLEMENT: self.filename('sample2.pkl')
@@ -24,7 +24,7 @@ class TestRandomSamplesFromClassificationDatasetAlgorithm(TestCase):
         alg = RandomSamplesFromClassificationDatasetAlgorithm()
         alg.initAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifier_pkl,
             alg.P_N: str([3]),
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl'),
             alg.P_OUTPUT_COMPLEMENT: self.filename('sample2.pkl')
@@ -36,7 +36,7 @@ class TestRandomSamplesFromClassificationDatasetAlgorithm(TestCase):
         alg = RandomSamplesFromClassificationDatasetAlgorithm()
         alg.initAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifier_pkl,
             alg.P_N: 100,
             alg.P_REPLACE: True,
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl'),
@@ -49,7 +49,7 @@ class TestRandomSamplesFromClassificationDatasetAlgorithm(TestCase):
         alg = RandomSamplesFromClassificationDatasetAlgorithm()
         alg.initAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifier_pkl,
             alg.P_N: 10,
             alg.P_PROPORTIONAL: True,
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl'),

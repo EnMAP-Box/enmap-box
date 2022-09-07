@@ -1,16 +1,15 @@
 from math import ceil
-from math import ceil
 from random import randint
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.PyQt.QtGui import QColor
 
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, Qgis, QgsMapLayer
 from typeguard import typechecked
 
@@ -55,7 +54,7 @@ class ClassificationFromClassProbabilityAlgorithm(EnMAPProcessingAlgorithm):
             categories = list()
             for bandNo, target in enumerate(targets, 1):
                 if target.color is None:
-                    color = QColor(randint(0,255), randint(0,255), randint(0,255)).name()
+                    color = QColor(randint(0, 255), randint(0, 255), randint(0, 255)).name()
                 else:
                     color = target.color
                 categories.append(Category(bandNo, target.name, color))

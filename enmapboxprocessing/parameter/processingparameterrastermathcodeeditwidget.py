@@ -8,19 +8,18 @@ from os.path import splitext, basename, exists, join, dirname
 from time import time
 from typing import Dict, Union
 
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QWidget, QTreeWidget, QTreeWidgetItem, QPushButton, \
-    QInputDialog, QMenu, QAction, QComboBox, QListWidget, QToolButton, QFileDialog
-from PyQt5.uic import loadUi
-from qgis.core import QgsProject, QgsRasterLayer, QgsVectorLayer, QgsFields, QgsField, QgsCoordinateReferenceSystem
-
 from enmapboxprocessing.algorithm.rastermathalgorithm.snippetinsertdialog import SnippetInsertDialog
 from enmapboxprocessing.algorithm.rastermathalgorithm.snippetsaveasdialog import SnippetSaveAsDialog
 from enmapboxprocessing.parameter.processingparametercodeeditwidget import CodeEditWidget
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
-from processing.gui.wrappers import WidgetWrapper, DIALOG_MODELER, DIALOG_BATCH
+from processing.gui.wrappers import WidgetWrapper
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QWidget, QTreeWidget, QTreeWidgetItem, QPushButton, \
+    QInputDialog, QMenu, QAction, QComboBox, QToolButton, QFileDialog
+from qgis.PyQt.uic import loadUi
+from qgis.core import QgsProject, QgsRasterLayer, QgsVectorLayer, QgsFields, QgsField, QgsCoordinateReferenceSystem
 
 
 class ProcessingParameterRasterMathCodeEdit(QWidget):
@@ -122,7 +121,7 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
         root = join(dirname(rastermathalgorithm.__file__), 'snippet')
         # taken from https://stackoverflow.com/questions/1795111/is-there-a-cross-platform-way-to-open-a-file-browser-in-python
         if sys.platform == 'win32':
-            #subprocess.Popen(['start', root], shell=True)
+            # subprocess.Popen(['start', root], shell=True)
             webbrowser.open(root)
 
         elif sys.platform == 'darwin':
@@ -253,7 +252,6 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
             action.triggered.connect(partial(self.insertIdentifier, identifier))
 
             menu.addAction(action)
-
 
         menu.exec_(self.mSourcesTree.viewport().mapToGlobal(pos))
 
@@ -445,7 +443,7 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
         code = self.mCode.text()
         text = ''
         for identifier, registryName in self.getSources().items():
-            if not identifier in code:
+            if identifier not in code:
                 continue
             layer = QgsProject.instance().mapLayer(registryName)
             if isinstance(layer, QgsRasterLayer):
@@ -456,60 +454,67 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
         text += self.mCode.value()
         return text
 
+
 class ProcessingParameterRasterMathCodeEditWidgetWrapper(WidgetWrapper):
     # adopted from C:\source\QGIS3-master\python\plugins\processing\algs\gdal\ui\RasterOptionsWidget.py
 
     widget: ProcessingParameterRasterMathCodeEdit
 
     def createWidget(self):
-        #if self.dialogType == DIALOG_MODELER:
+        # if self.dialogType == DIALOG_MODELER:
         #    raise NotImplementedError()
-        #elif self.dialogType == DIALOG_BATCH:
+        # elif self.dialogType == DIALOG_BATCH:
         #    raise NotImplementedError()
-        #else:
+        # else:
         return ProcessingParameterRasterMathCodeEdit()
 
     def setValue(self, value):
-        #if self.dialogType == DIALOG_MODELER:
+        # if self.dialogType == DIALOG_MODELER:
         #    raise NotImplementedError()
-        #elif self.dialogType == DIALOG_BATCH:
+        # elif self.dialogType == DIALOG_BATCH:
         #    raise NotImplementedError()
-        #else:
+        # else:
         self.widget.mCode.setText(value)
 
     def value(self):
-        #if self.dialogType == DIALOG_MODELER:
+        # if self.dialogType == DIALOG_MODELER:
         #    raise NotImplementedError()
-        #elif self.dialogType == DIALOG_BATCH:
+        # elif self.dialogType == DIALOG_BATCH:
         #    raise NotImplementedError()
-        #else:
+        # else:
         return self.widget.value()
 
 
 class LayerItem(QTreeWidgetItem):
     registryName: str
 
+
 class RasterItem(LayerItem):
     layer: QgsRasterLayer
 
+
 class VectorItem(LayerItem):
     layer: QgsVectorLayer
+
 
 class BandItem(QTreeWidgetItem):
     layerItem: LayerItem
     pass
 
+
 class RasterBandItem(BandItem):
     layer: QgsRasterLayer
     bandNo: Union[int, float]  # int for actual bands and float for band by center wavelength
+
 
 class VectorBandItem(BandItem):
     layer: QgsVectorLayer
     field: str
 
+
 class FolderItem(QTreeWidgetItem):
     pass
 
+
 class DerivedRasterBandItem(RasterBandItem):
     pass
-

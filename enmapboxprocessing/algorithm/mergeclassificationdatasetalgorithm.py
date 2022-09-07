@@ -2,11 +2,11 @@ from collections import OrderedDict
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsProcessing)
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsProcessing)
 from typeguard import typechecked
 
 
@@ -23,7 +23,7 @@ class MergeClassificationDatasetsAlgorithm(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._DATASETS, f'Classification datasets to be merged.'),
+            (self._DATASETS, 'Classification datasets to be merged.'),
             (self._OUTPUT_DATASET, self.PickleFileDestination)
         ]
 
@@ -49,7 +49,7 @@ class MergeClassificationDatasetsAlgorithm(EnMAPProcessingAlgorithm):
             for pklFilename in pklFilenames:
                 try:
                     dumps.append(ClassifierDump.fromDict(Utils.pickleLoad(pklFilename)))
-                except:
+                except Exception:
                     raise QgsProcessingException(f'invalid classification dataset: {pklFilename}')
 
             # Check if each dataset contains the same category names.

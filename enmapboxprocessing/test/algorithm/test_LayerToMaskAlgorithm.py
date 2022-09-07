@@ -1,9 +1,9 @@
 import numpy as np
 
+from enmapbox.exampledata import enmap, landcover_polygons
 from enmapboxprocessing.algorithm.layertomaskalgorithm import LayerToMaskAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapbox.exampledata import enmap, landcover_polygons
 
 
 class TestLayerToMaskAlgorithm(TestCase):

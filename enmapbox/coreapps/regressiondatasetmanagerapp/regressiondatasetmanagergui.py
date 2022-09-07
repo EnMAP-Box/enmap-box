@@ -1,17 +1,17 @@
 from os.path import basename, join
 
-from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import (QMainWindow, QTableWidget, QTableWidgetItem, QLabel, QToolButton, QMessageBox, QComboBox,
-                             QSpinBox, QDialog)
-from PyQt5.uic import loadUi
-
 from enmapboxprocessing.algorithm.randomsamplesfromregressiondatasetalgorithm import \
     RandomSamplesFromRegressionDatasetAlgorithm
 from enmapboxprocessing.parameter.processingparameterpicklefileregressiondatasetwidget import \
     ProcessingParameterPickleFileRegressionDatasetWidget
-from enmapboxprocessing.typing import Category, RegressorDump, Target
+from enmapboxprocessing.typing import RegressorDump, Target
 from enmapboxprocessing.utils import Utils
-from qgis.gui import QgsColorButton, QgsDoubleSpinBox, QgsSpinBox
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWidgets import (QMainWindow, QTableWidget, QTableWidgetItem, QLabel, QToolButton, QMessageBox,
+                                 QComboBox,
+                                 QDialog)
+from qgis.PyQt.uic import loadUi
+from qgis.gui import QgsColorButton
 from typeguard import typechecked
 
 
@@ -45,7 +45,7 @@ class RegressionDatasetManagerGui(QDialog):
         filename = self.mDataset.mFile.filePath()
         try:
             dump = RegressorDump.fromDict(Utils.pickleLoad(filename))
-        except:
+        except Exception:
             return
 
         sizes = list()
@@ -75,7 +75,7 @@ class RegressionDatasetManagerGui(QDialog):
         filename = self.mDataset.mFile.filePath()
         try:
             dump = RegressorDump.fromDict(Utils.pickleLoad(filename))
-        except:
+        except Exception:
             return
 
         if question:
@@ -96,7 +96,7 @@ class RegressionDatasetManagerGui(QDialog):
         filename = self.mDataset.mFile.filePath()
         try:
             dump = RegressorDump.fromDict(Utils.pickleLoad(filename))
-        except:
+        except Exception:
             self.mTargetTable.setRowCount(0)
             return
 
@@ -130,7 +130,7 @@ class RegressionDatasetManagerGui(QDialog):
         filename = self.mDataset.mFile.filePath()
         try:
             dump = RegressorDump.fromDict(Utils.pickleLoad(filename))
-        except:
+        except Exception:
             self.mTargetTable.setRowCount(0)
             return
 

@@ -8,7 +8,7 @@ from enmapboxprocessing.algorithm.fitplsegressionalgorithm import FitPLSRegressi
 from enmapboxprocessing.algorithm.fitrandomforestregressoralgorithm import FitRandomForestRegressorAlgorithm
 from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapboxtestdata import regressorDumpPkl, regressorDumpSingleTargetPkl
+from testdata import regressorDumpPkl, regressorDumpSingleTargetPkl
 
 
 class FitTestRegressorAlgorithm(FitRegressorAlgorithmBase):

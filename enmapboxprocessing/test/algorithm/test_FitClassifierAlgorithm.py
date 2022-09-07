@@ -8,7 +8,7 @@ from enmapboxprocessing.algorithm.fitrandomforestclassifieralgorithm import FitR
 from enmapboxprocessing.algorithm.fitsvcpolyalgorithm import FitSvcPolyAlgorithm
 from enmapboxprocessing.algorithm.fitsvcrbfalgorithm import FitSvcRbfAlgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapboxtestdata import (classifierDumpPkl)
+from testdata import (classifier_pkl)
 
 
 class FitTestClassifierAlgorithm(FitClassifierAlgorithmBase):
@@ -33,7 +33,7 @@ class TestFitClassifierAlgorithm(TestCase):
     def test_fitted(self):
         alg = FitTestClassifierAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifier_pkl,
             alg.P_CLASSIFIER: alg.defaultCodeAsString(),
             alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl')
         }
@@ -42,7 +42,7 @@ class TestFitClassifierAlgorithm(TestCase):
     def test_fit_and_predict(self):
         alg = FitTestClassifierAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifier_pkl,
             alg.P_CLASSIFIER: alg.defaultCodeAsString(),
             alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl')
         }
@@ -61,7 +61,7 @@ class TestFitClassifierAlgorithm(TestCase):
         parameters = {
             alg.P_CLASSIFIER: 'from sklearn.linear_model import LogisticRegression\n'
                               'classifier = LogisticRegression(max_iter=1000)',
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifier_pkl,
             alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl')
         }
         self.runalg(alg, parameters)
@@ -76,7 +76,7 @@ class TestFitClassifierAlgorithm(TestCase):
             alg.initAlgorithm()
             alg.shortHelpString()
             parameters = {
-                alg.P_DATASET: classifierDumpPkl,
+                alg.P_DATASET: classifier_pkl,
                 alg.P_CLASSIFIER: alg.defaultCodeAsString(),
                 alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl')
             }

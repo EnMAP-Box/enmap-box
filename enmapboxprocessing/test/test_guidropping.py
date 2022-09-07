@@ -2,14 +2,13 @@ import pathlib
 from os.path import exists
 from warnings import warn
 
+from enmapbox import EnMAPBox
+from enmapbox.gui.dataviews.docks import MapDock
+from enmapbox.testing import EnMAPBoxTestCase
 from qgis.PyQt.QtCore import QMimeData, QUrl, QPoint, Qt
 from qgis.PyQt.QtGui import QDropEvent
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import QgsProject, QgsRasterLayer
-
-from enmapbox import EnMAPBox
-from enmapbox.gui.dataviews.docks import MapDock
-from enmapbox.testing import EnMAPBoxTestCase
 
 
 class TestGuiDropping(EnMAPBoxTestCase):
@@ -39,7 +38,6 @@ class TestGuiDropping(EnMAPBoxTestCase):
         print('Drop {}'.format(path.name))
         self._mdref = md
         return QDropEvent(QPoint(0, 0), Qt.CopyAction, md, Qt.LeftButton, Qt.NoModifier)
-
 
     def test_dropping_external_products_on_empty_dockarea(self):
         filenames = [

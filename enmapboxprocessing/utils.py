@@ -9,23 +9,23 @@ from typing import Tuple, Optional, Callable, Any, Dict, Union, List
 from warnings import warn
 
 import numpy as np
-from qgis.PyQt.QtCore import QDateTime, QDate
-from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtXml import QDomDocument
 from osgeo import gdal
 
 from enmapboxprocessing.typing import (NumpyDataType, MetadataValue, GdalDataType, QgisDataType,
                                        GdalResamplingAlgorithm, Categories, Category, Targets, Target)
+from qgis.PyQt.QtCore import QDateTime, QDate
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import (QgsRasterBlock, QgsProcessingFeedback, QgsPalettedRasterRenderer,
-                        QgsCategorizedSymbolRenderer, QgsRendererCategory, QgsRectangle, QgsRasterLayer,
-                        QgsRasterDataProvider, QgsPointXY, QgsPoint, Qgis, QgsWkbTypes, QgsSymbol, QgsVectorLayer,
-                        QgsFeature, QgsRasterRenderer, QgsFeatureRenderer, QgsMapLayer, QgsCoordinateTransform,
-                        QgsProject, QgsCoordinateReferenceSystem, QgsUnitTypes, QgsReadWriteContext,
-                        QgsMultiBandColorRenderer, QgsContrastEnhancement, QgsSingleBandPseudoColorRenderer,
-                        QgsRasterShader, QgsColorRampShader, QgsColorRamp, QgsSingleBandGrayRenderer,
-                        QgsDiagramRenderer, QgsSingleCategoryDiagramRenderer, QgsGraduatedSymbolRenderer,
-                        QgsProcessingUtils
-                        )
+                       QgsCategorizedSymbolRenderer, QgsRendererCategory, QgsRectangle, QgsRasterLayer,
+                       QgsRasterDataProvider, QgsPointXY, QgsPoint, Qgis, QgsWkbTypes, QgsSymbol, QgsVectorLayer,
+                       QgsFeature, QgsRasterRenderer, QgsFeatureRenderer, QgsMapLayer, QgsCoordinateTransform,
+                       QgsProject, QgsCoordinateReferenceSystem, QgsUnitTypes, QgsReadWriteContext,
+                       QgsMultiBandColorRenderer, QgsContrastEnhancement, QgsSingleBandPseudoColorRenderer,
+                       QgsRasterShader, QgsColorRampShader, QgsColorRamp, QgsSingleBandGrayRenderer,
+                       QgsSingleCategoryDiagramRenderer, QgsGraduatedSymbolRenderer,
+                       QgsProcessingUtils
+                       )
 from qgis.gui import QgsMapCanvas
 from typeguard import typechecked
 
@@ -135,7 +135,7 @@ class Utils(object):
         elif dataType == np.uint32:
             return Qgis.DataType.UInt32
         else:
-            raise Exception(f'unsupported data type: {dataType}')
+            raise ValueError(f'unsupported data type: {dataType}')
 
     @classmethod
     def qgsRasterBlockToNumpyArray(cls, block: QgsRasterBlock) -> np.ndarray:
@@ -195,7 +195,6 @@ class Utils(object):
                     from enmapboxprocessing.enmapalgorithm import AlgorithmCanceledException
                     raise AlgorithmCanceledException()
         return callback
-
 
     @classmethod
     def palettedRasterRendererFromCategories(
@@ -409,7 +408,7 @@ class Utils(object):
                 return QColor(obj)
             try:  # try to evaluate ...
                 obj = eval(obj)
-            except:
+            except Exception:
                 raise ValueError(f'invalid color: {obj}')
 
         if isinstance(obj, int):
@@ -676,28 +675,16 @@ class Utils(object):
         groundSamplingDistance = layer.rasterUnitsPerPixelX()
         layerMapUnits = layer.crs().mapUnits()
         canvasMapUnits = mapCanvas.mapUnits()
-        if (
-                layerMapUnits == QgsUnitTypes.DistanceMeters and
-                canvasMapUnits == QgsUnitTypes.DistanceMeters
-        ):
+        if (layerMapUnits == QgsUnitTypes.DistanceMeters and canvasMapUnits == QgsUnitTypes.DistanceMeters):
             scaleAtOneMeter = 3779.527553725215
             scaleAtNativeResolution = scaleAtOneMeter * groundSamplingDistance
-        elif (
-                layerMapUnits == QgsUnitTypes.DistanceMeters and
-                canvasMapUnits == QgsUnitTypes.DistanceDegrees
-        ):
+        elif (layerMapUnits == QgsUnitTypes.DistanceMeters and canvasMapUnits == QgsUnitTypes.DistanceDegrees):
             scaleAtOneMeter = 1902.7474863952016
             scaleAtNativeResolution = scaleAtOneMeter * groundSamplingDistance
-        elif (
-                layerMapUnits == QgsUnitTypes.DistanceDegrees and
-                canvasMapUnits == QgsUnitTypes.DistanceDegrees
-        ):
+        elif (layerMapUnits == QgsUnitTypes.DistanceDegrees and canvasMapUnits == QgsUnitTypes.DistanceDegrees):
             scaleAtOneDegree = 176453049.4014574
             scaleAtNativeResolution = scaleAtOneDegree * groundSamplingDistance
-        elif (
-                layerMapUnits == QgsUnitTypes.DistanceDegrees and
-                canvasMapUnits == QgsUnitTypes.DistanceMeters
-        ):
+        elif (layerMapUnits == QgsUnitTypes.DistanceDegrees and canvasMapUnits == QgsUnitTypes.DistanceMeters):
             scaleAtOneDegree = 311289235.5551121
             scaleAtNativeResolution = scaleAtOneDegree * groundSamplingDistance
         else:
@@ -710,14 +697,14 @@ class Utils(object):
         argsort = np.argsort(by, )
         if reverse:
             argsort = list(reversed(argsort))
-        return [list(np.array(l)[argsort]) for l in lists]
+        return [list(np.array(list_)[argsort]) for list_ in lists]
 
     @classmethod
     def defaultNoDataValue(cls, numpyDataType) -> float:
         try:
             noDataValue = np.finfo(numpyDataType).min
             noDataValue = float(max(np.finfo(np.float32).min, noDataValue))  # always use float32.min for float types
-        except:
+        except Exception:
             noDataValue = int(np.iinfo(numpyDataType).min)  # use min for int types
             if noDataValue == 0:
                 noDataValue = int(np.iinfo(numpyDataType).max)  # use max for uint types

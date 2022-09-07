@@ -2,9 +2,9 @@ from os.path import basename
 from typing import Dict, Any, List, Tuple
 
 from osgeo import gdal
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 from typeguard import typechecked
 
 
@@ -41,11 +41,11 @@ class ImportLandsatL2Algorithm(EnMAPProcessingAlgorithm):
         return basename(mtlFilename).startswith('L') & \
                mtlFilename.endswith('MTL.txt')
 
-    def  defaultParameters(self, mtlFilename: str):
+    def defaultParameters(self, mtlFilename: str):
         return {
-                    self.P_FILE: mtlFilename,
-                    self.P_OUTPUT_RASTER: mtlFilename.replace('MTL.txt', 'SR.vrt'),
-                }
+            self.P_FILE: mtlFilename,
+            self.P_OUTPUT_RASTER: mtlFilename.replace('MTL.txt', 'SR.vrt'),
+        }
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback

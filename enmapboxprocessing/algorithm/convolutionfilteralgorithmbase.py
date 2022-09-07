@@ -4,12 +4,12 @@ from math import ceil
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
 
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
 from typeguard import typechecked
 
 
@@ -23,12 +23,12 @@ class ConvolutionFilterAlgorithmBase(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._RASTER, f'Raster layer to be filtered.'),
+            (self._RASTER, 'Raster layer to be filtered.'),
             (self._KERNEL, self.helpParameterCode()),
             (self._NORMALIZE, 'Whether to normalize the kernel to have a sum of one.'),
             (self._INTERPOLATE, 'Whether to interpolate no data pixel. '
-                                      'Will result in renormalization of the kernel at each position ignoring '
-                                      'pixels with no data values.'),
+                                'Will result in renormalization of the kernel at each position ignoring '
+                                'pixels with no data values.'),
             (self._OUTPUT_RASTER, self.RasterFileDestination)
         ]
 
@@ -79,7 +79,7 @@ class ConvolutionFilterAlgorithmBase(EnMAPProcessingAlgorithm):
             kernel = self.parameterAsKernel(parameters, self.P_KERNEL, context)
             assert isinstance(kernel, Kernel)
             assert 1 <= kernel.dimension <= 3
-        except:
+        except Exception:
             return False, traceback.format_exc()
         return True, ''
 

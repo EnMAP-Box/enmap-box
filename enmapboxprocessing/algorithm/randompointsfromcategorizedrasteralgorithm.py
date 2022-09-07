@@ -2,13 +2,13 @@ from math import ceil
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-import processing
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback
 
+import processing
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback
 from typeguard import typechecked
 
 
@@ -150,8 +150,10 @@ class RandomPointsFromCategorizedRasterAlgorithm(EnMAPProcessingAlgorithm):
                     arrayStrata[y, x] = category.value
 
                     # apply mask kernel
-                    mask[y + kernelStratumY1:y + kernelStratumY2,
-                    x + kernelStratumX1:x + kernelStratumX2] *= kernelStratum
+                    mask[
+                        y + kernelStratumY1:y + kernelStratumY2,
+                        x + kernelStratumX1:x + kernelStratumX2
+                    ] *= kernelStratum
                     for m in masks:
                         m[y + kernelGlobalY1:y + kernelGlobalY2, x + kernelGlobalX1:x + kernelGlobalX2] *= kernelGlobal
 

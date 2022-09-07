@@ -1,9 +1,9 @@
-from PyQt5.Qsci import QsciScintilla, QsciLexerPython
-from qgis.PyQt.QtGui import QFont, QFontMetrics, QColor, QWheelEvent
-from qgis.PyQt.QtWidgets import QWidget
-from PyQt5.uic import loadUi
+from qgis.PyQt.Qsci import QsciScintilla, QsciLexerPython
+from qgis.PyQt.uic import loadUi
 
-from processing.gui.wrappers import WidgetWrapper, DIALOG_MODELER, DIALOG_BATCH
+from processing.gui.wrappers import WidgetWrapper
+from qgis.PyQt.QtGui import QFont, QFontMetrics, QColor
+from qgis.PyQt.QtWidgets import QWidget
 
 
 class CodeEditWidget(QsciScintilla):
@@ -27,7 +27,7 @@ class CodeEditWidget(QsciScintilla):
         self.setMarginLineNumbers(0, True)
         self.setMarginsBackgroundColor(QColor("#e3e3e3"))
 
-#        self.setMinimumSize(0, 300)
+    #        self.setMinimumSize(0, 300)
 
     def setToolTip(self, *args, **kwargs):
         pass
@@ -51,25 +51,25 @@ class ProcessingParameterCodeEditWidgetWrapper(WidgetWrapper):
     widget: ProcessingParameterCodeEdit
 
     def createWidget(self):
-        #if self.dialogType == DIALOG_MODELER:
+        # if self.dialogType == DIALOG_MODELER:
         #    return ProcessingParameterCodeEdit()
-        #elif self.dialogType == DIALOG_BATCH:
+        # elif self.dialogType == DIALOG_BATCH:
         #    raise NotImplementedError()
-        #else:
+        # else:
         return ProcessingParameterCodeEdit()
 
     def setValue(self, value):
-        #if self.dialogType == DIALOG_MODELER:
+        # if self.dialogType == DIALOG_MODELER:
         #    raise NotImplementedError()
-        #elif self.dialogType == DIALOG_BATCH:
+        # elif self.dialogType == DIALOG_BATCH:
         #    raise NotImplementedError()
-        #else:
+        # else:
         self.widget.codeEdit.setText(value)
 
     def value(self):
-        #if self.dialogType == DIALOG_MODELER:
+        # if self.dialogType == DIALOG_MODELER:
         #    raise NotImplementedError()
-        #elif self.dialogType == DIALOG_BATCH:
+        # elif self.dialogType == DIALOG_BATCH:
         #    raise NotImplementedError()
-        #else:
+        # else:
         return self.widget.codeEdit.value()

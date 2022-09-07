@@ -4,7 +4,7 @@ from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousrasteral
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import RegressionDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import fraction_polygons_l3
+from testdata import fraction_polygons_l3
 
 
 class TestPrepareRegressionDatasetFromContinuousRasterAlgorithm(TestCase):

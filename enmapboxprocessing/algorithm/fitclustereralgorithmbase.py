@@ -1,7 +1,8 @@
-import numpy as np
 import inspect
 import traceback
 from typing import Dict, Any, List, Tuple
+
+import numpy as np
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClustererDump
@@ -18,8 +19,8 @@ class FitClustererAlgorithmBase(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._DATASET, f'Training dataset pickle file used for fitting the clusterer. '
-                            f'If not specified, an unfitted clusterer is created.'),
+            (self._DATASET, 'Training dataset pickle file used for fitting the clusterer. '
+                            'If not specified, an unfitted clusterer is created.'),
             (self._CLUSTERER, self.helpParameterCode()),
             (self._OUTPUT_CLUSTERER, self.PickleFileDestination)
         ]
@@ -65,7 +66,7 @@ class FitClustererAlgorithmBase(EnMAPProcessingAlgorithm):
         # check code
         try:
             self.parameterAsClusterer(parameters, self.P_CLUSTERER, context)
-        except:
+        except Exception:
             return False, traceback.format_exc()
         return True, ''
 

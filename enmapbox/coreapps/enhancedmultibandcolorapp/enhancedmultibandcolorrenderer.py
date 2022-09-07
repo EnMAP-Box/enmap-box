@@ -2,17 +2,16 @@ from copy import deepcopy
 from typing import List, Optional, Tuple
 
 import numpy as np
+
+from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsRasterRenderer, QgsRasterInterface, QgsRectangle, QgsRasterBlockFeedback, QgsRasterBlock, \
     Qgis
-
-from enmapboxprocessing.utils import Utils
 from typeguard import typechecked
 
 
 @typechecked
 class EnhancedMultiBandColorRenderer(QgsRasterRenderer):
-
     colors: Optional[List[QColor]]
     minMaxValues: Optional[List[Tuple[float, float]]]
 
@@ -70,7 +69,7 @@ class EnhancedMultiBandColorRenderer(QgsRasterRenderer):
                 array /= (vmax - vmin)
                 np.clip(array, 0, 1, out=array)
 
-                #print(color.redF(), color.greenF(), color.blueF())
+                # print(color.redF(), color.greenF(), color.blueF())
 
                 r += color.red() * array
                 g += color.green() * array
@@ -98,17 +97,17 @@ class EnhancedMultiBandColorRenderer(QgsRasterRenderer):
 
                 if 1:
                     # enhance contrast
-                    values = np.array([r,g,b])
+                    values = np.array([r, g, b])
                     values = values[np.isfinite(values)]
                     vmin, vmax = np.percentile(values, [2, 98])
-                    #vmin, vmax = np.percentile(r, [2, 98])
+                    # vmin, vmax = np.percentile(r, [2, 98])
                     r -= vmin
                     r /= (vmax - vmin) / 255
                     print(vmin, vmax, r.min(), r.max())
-                    #vmin, vmax = np.percentile(g, [2, 98])
+                    # vmin, vmax = np.percentile(g, [2, 98])
                     g -= vmin
                     g /= (vmax - vmin) / 255
-                    #vmin, vmax = np.percentile(b, [2, 98])
+                    # vmin, vmax = np.percentile(b, [2, 98])
                     b -= vmin
                     b /= (vmax - vmin) / 255
 

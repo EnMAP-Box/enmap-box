@@ -1,5 +1,4 @@
 import json
-import pathlib
 import warnings
 import webbrowser
 from collections import OrderedDict
@@ -10,29 +9,29 @@ from traceback import print_exc
 from typing import Optional, Dict, List, Tuple
 
 from enmapbox import EnMAPBox
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
 from enmapbox.utils import importEarthEngine
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
+from enmapboxprocessing.utils import Utils
+from geetimeseriesexplorerapp.codeeditwidget import CodeEditWidget
 from geetimeseriesexplorerapp.collectioninfo import CollectionInfo
+from geetimeseriesexplorerapp.externals.ee_plugin.provider import GeetseEarthEngineRasterDataProvider
 from geetimeseriesexplorerapp.imageinfo import ImageInfo
 from geetimeseriesexplorerapp.tasks.queryavailableimagestask import QueryAvailableImagesTask
 from geetimeseriesexplorerapp.utils import utilsMsecToDateTime
-
-from PyQt5 import QtGui
+from qgis.PyQt import QtGui
+from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt, QLocale, QDate, pyqtSignal, QModelIndex, QDateTime
 from qgis.PyQt.QtGui import QPixmap, QColor, QIcon
 from qgis.PyQt.QtWidgets import (QToolButton, QApplication, QComboBox, QLineEdit,
-                             QTableWidget, QDateEdit, QRadioButton, QListWidget, QCheckBox, QTableWidgetItem,
-                             QPlainTextEdit, QTreeWidget, QTreeWidgetItem, QTabWidget, QLabel, QMainWindow,
-                             QListWidgetItem, QProgressBar, QFrame)
-from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
-from enmapboxprocessing.utils import Utils
-from geetimeseriesexplorerapp.codeeditwidget import CodeEditWidget
-from geetimeseriesexplorerapp.externals.ee_plugin.provider import GeetseEarthEngineRasterDataProvider
-from qgis.PyQt import uic
+                                 QTableWidget, QDateEdit, QRadioButton, QListWidget, QCheckBox, QTableWidgetItem,
+                                 QPlainTextEdit, QTreeWidget, QTreeWidgetItem, QTabWidget, QLabel, QMainWindow,
+                                 QListWidgetItem, QProgressBar, QFrame)
 from qgis.core import QgsRasterLayer, QgsCoordinateReferenceSystem, QgsMapLayer, QgsMapSettings, \
     QgsColorRamp, QgsDateTimeRange, QgsApplication, QgsMessageLog, Qgis
-from qgis.gui import (QgsDockWidget, QgsMessageBar, QgsColorRampButton, QgsSpinBox, QgsMapCanvas,
-                       QgsDateTimeEdit, QgisInterface)
+from qgis.gui import (
+    QgsDockWidget, QgsMessageBar, QgsColorRampButton, QgsSpinBox, QgsMapCanvas, QgsDateTimeEdit, QgisInterface
+)
 from typeguard import typechecked
 
 
@@ -291,10 +290,9 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
             mList.itemChanged.connect(self.onSpectralIndexChecked)
 
     def updateSpectralIndices(self):
-        availableAsiBands = set(
-            list(self.eeFullCollectionInfo.wavebandMapping.keys()) +
-            list(CreateSpectralIndicesAlgorithm.ConstantMapping.keys())
-        )
+        availableAsiBands = list(self.eeFullCollectionInfo.wavebandMapping.keys())
+        availableAsiBands.extend(list(CreateSpectralIndicesAlgorithm.ConstantMapping.keys()))
+        availableAsiBands = set(availableAsiBands)
 
         mLists = [self.mAsiVegatation, self.mAsiBurn, self.mAsiWater, self.mAsiSnow, self.mAsiDrought, self.mAsiUrban,
                   self.mAsiOther]
@@ -1472,7 +1470,7 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
 def tofloat(obj, default=0, ndigits=None):
     try:
         value = float(obj)
-    except:
+    except Exception:
         value = default
     if ndigits is not None:
         value = round(value, ndigits)

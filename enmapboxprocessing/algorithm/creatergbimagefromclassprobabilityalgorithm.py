@@ -2,16 +2,16 @@ from math import ceil
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.PyQt.QtGui import QColor
 from osgeo import gdal
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsRasterLayer, Qgis,
-                        QgsProcessingException)
 
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtGui import QColor
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsRasterLayer, Qgis,
+                       QgsProcessingException)
 from typeguard import typechecked
 
 
@@ -37,9 +37,10 @@ class CreateRgbImageFromClassProbabilityAlgorithm(EnMAPProcessingAlgorithm):
         return [
             (self._PROBABILITY, 'A class fraction layer or class probability layer used as weights for calculating '
                                 'final pixel colors.'),
-            (self._COLORS, "Comma separated list of hex-color strings (e.g. '#FF0000' for red) representing (pure) category colors, "
-                           'one color for each band in the given class probability/fraction layer. '
-                           'If not specified, colors have to be specified by a categorized layer (Colors from categorized layer).'),
+            (self._COLORS,
+             "Comma separated list of hex-color strings (e.g. '#FF0000' for red) representing (pure) category colors, "
+             'one color for each band in the given class probability/fraction layer. '
+             'If not specified, colors have to be specified by a categorized layer (Colors from categorized layer).'),
             (self._COLORS_LAYER, 'A categorized layer with (pure) category colors, '
                                  'one category for each band in the given class probability/fraction layer. '
                                  'If not specified, colors have to be specified by list (Colors).'),

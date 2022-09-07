@@ -3,11 +3,12 @@ from os.path import basename
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
+
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.reportwriter import MultiReportWriter, HtmlReportWriter, CsvReportWriter
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 from typeguard import typechecked
 
 
@@ -45,8 +46,8 @@ class ClassifierFeatureRankingPermutationImportanceAlgorithm(EnMAPProcessingAlgo
             (self._TEST_DATASET, 'Test dataset pickle file used for performance evaluation. '
                                  'If skipped, the training dataset is used.'),
             (self._EVALUATION_METRIC,
-             f'An evaluation metric to use. '
-             f'See Metrics and scoring: quantifying the quality of predictions for further information.'),
+             'An evaluation metric to use. '
+             'See Metrics and scoring: quantifying the quality of predictions for further information.'),
             (self._REPEATS, 'Number of times to permute a feature.'),
             (self._SEED, 'The seed for the random generator can be provided.'),
             (self._OPEN_REPORT, self.ReportOpen),
@@ -57,7 +58,8 @@ class ClassifierFeatureRankingPermutationImportanceAlgorithm(EnMAPProcessingAlgo
         return [
             ('Metrics and scoring: quantifying the quality of predictions',
              'https://scikit-learn.org/stable/modules/model_evaluation.html#scoring-parameter'),
-            ('Permutation feature importance', 'https://scikit-learn.org/stable/modules/permutation_importance.html#permutation-importance')
+            ('Permutation feature importance',
+             'https://scikit-learn.org/stable/modules/permutation_importance.html#permutation-importance')
         ]
 
     def group(self):
@@ -112,7 +114,7 @@ class ClassifierFeatureRankingPermutationImportanceAlgorithm(EnMAPProcessingAlgo
                 dump = ClassifierDump(**Utils.pickleLoad(filenameTrainSample))
                 X, y, features = dump.X, dump.y, dump.features
                 feedback.pushInfo(f'Load training dataset: X=array{list(X.shape)} y=array{list(dump.y.shape)}')
-                feedback.pushInfo(f'Fit classifier')
+                feedback.pushInfo('Fit classifier')
                 classifier.fit(X, y)
 
             # load test sample
@@ -133,8 +135,8 @@ class ClassifierFeatureRankingPermutationImportanceAlgorithm(EnMAPProcessingAlgo
             fig, ax = plt.subplots(figsize=(figsizeX, figsizeY))
             plt.xlabel(f'decrease in {scoring} score')
             ax.boxplot(r.importances[ordered].T,
-                vert=False, labels=np.array(features)[ordered]
-            )
+                       vert=False, labels=np.array(features)[ordered]
+                       )
             ax.set_title("Permutation Importances")
             fig.tight_layout()
             filenameFig = filename + '.fig.png'

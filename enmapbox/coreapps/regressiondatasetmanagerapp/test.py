@@ -1,4 +1,3 @@
-from classificationdatasetmanagerapp import ClassificationDatasetManagerGui
 from enmapbox import EnMAPBox
 from enmapbox.testing import initQgisApplication
 from enmapboxprocessing.utils import Utils
@@ -16,5 +15,3 @@ widget = RegressionDatasetManagerGui(enmapBox.ui)
 widget.show()
 
 qgsApp.exec_()
-
-

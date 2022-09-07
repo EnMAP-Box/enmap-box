@@ -4,12 +4,8 @@ from os.path import join, exists
 from random import getrandbits
 from typing import Optional, Tuple, Dict
 
-
 import numpy as np
-from qgis.PyQt.QtCore import QRectF, QPointF, Qt
-from qgis.PyQt.QtGui import QMouseEvent, QColor
-from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QComboBox, QCheckBox, QDoubleSpinBox, QPlainTextEdit, QSpinBox
-from PyQt5.uic import loadUi
+from qgis.PyQt.uic import loadUi
 from osgeo import gdal
 from scipy.stats import binned_statistic_2d, pearsonr
 
@@ -21,6 +17,9 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
 from processing import AlgorithmDialog
+from qgis.PyQt.QtCore import QRectF, QPointF, Qt
+from qgis.PyQt.QtGui import QMouseEvent, QColor
+from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QComboBox, QCheckBox, QDoubleSpinBox, QPlainTextEdit, QSpinBox
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsMapSettings, QgsStyle, QgsColorRamp, \
     QgsFieldProxyModel, QgsMapLayer
 from qgis.gui import QgsMapLayerComboBox, QgsMapCanvas, QgsRasterBandComboBox, QgsColorButton, QgsColorRampButton, \
@@ -200,7 +199,7 @@ class ScatterPlotDialog(QMainWindow):
         def tofloat(text: str) -> Optional[float]:
             try:
                 return float(text)
-            except:
+            except Exception:
                 return None
 
         lower = tofloat(textLower)
@@ -227,7 +226,7 @@ class ScatterPlotDialog(QMainWindow):
         if self.mMapCanvas is not None:
             try:
                 self.mMapCanvas.extentsChanged.disconnect(self.onMapCanvasExtentsChanged)
-            except:
+            except Exception:
                 pass
 
         # connect new map canvas
@@ -402,7 +401,7 @@ class ScatterPlotDialog(QMainWindow):
 
         try:  # use try-except to resolve issue #1408
             counts, x_edge, y_edge, binnumber = binned_statistic_2d(x, y, x, 'count', bins, range, True)
-        except:
+        except Exception:
             self.mScatterPlot.clear()
             return
 
@@ -460,7 +459,7 @@ class ScatterPlotDialog(QMainWindow):
 
         # analytics
         if self.mOneToOneLine.isChecked():
-            plotItem = self.mScatterPlot.plot([xmin, xmax],[xmin, xmax])
+            plotItem = self.mScatterPlot.plot([xmin, xmax], [xmin, xmax])
             plotItem.setPen(mkPen(color=self.mOneToOneLineColor.color(), style=Qt.SolidLine))
 
         if self.mFittedLine.isChecked():
@@ -471,13 +470,12 @@ class ScatterPlotDialog(QMainWindow):
             plotItem = self.mScatterPlot.plot(x_, y_)
             plotItem.setPen(mkPen(color=self.mFittedLineColor.color(), style=Qt.SolidLine))
 
-            r2 = round(pearsonr(x, y)[0]**2, 4)
-            rmse = round(np.sqrt(np.mean((x-y)**2)), 4)
+            r2 = round(pearsonr(x, y)[0] ** 2, 4)
+            rmse = round(np.sqrt(np.mean((x - y) ** 2)), 4)
             text = f'f(x) = {str(p).strip()} | r^2 = {r2} | rmse = {rmse}'
             self.mFittedLineReport.setPlainText(text)
 
         self.mScatterPlot.autoRange()
-
 
     def onLiveUpdate(self):
         if not self.mLiveUpdate.isChecked():

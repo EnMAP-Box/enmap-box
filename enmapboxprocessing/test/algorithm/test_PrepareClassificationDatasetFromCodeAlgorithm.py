@@ -1,10 +1,11 @@
+import numpy as np
+
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcodealgorithm import \
     PrepareClassificationDatasetFromCodeAlgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClassifierDump, Category
 from enmapboxprocessing.utils import Utils
 
-import numpy as np
 
 class TestPrepareClassificationDatasetFromCodeAlgorithm(TestCase):
 

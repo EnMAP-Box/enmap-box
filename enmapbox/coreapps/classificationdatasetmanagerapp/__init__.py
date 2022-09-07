@@ -1,11 +1,12 @@
+from classificationdatasetmanagerapp.classificationdatasetmanagergui import ClassificationDatasetManagerGui
+from enmapbox.gui.applications import EnMAPBoxApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu, QAction
 
-from classificationdatasetmanagerapp.classificationdatasetmanagergui import ClassificationDatasetManagerGui
-from enmapbox.gui.applications import EnMAPBoxApplication
 
 def enmapboxApplicationFactory(enmapBox):
     return [ClassificationDatasetManagerApp(enmapBox)]
+
 
 class ClassificationDatasetManagerApp(EnMAPBoxApplication):
     def __init__(self, enmapBox, parent=None):
@@ -32,4 +33,3 @@ class ClassificationDatasetManagerApp(EnMAPBoxApplication):
     def startGUI(self, *args):
         w = ClassificationDatasetManagerGui(parent=self.enmapbox.ui)
         w.show()
-

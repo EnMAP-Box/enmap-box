@@ -2,11 +2,10 @@ import unittest
 from os.path import dirname, join, exists
 from typing import Dict
 
-from qgis.core import QgsProcessingFeedback
-
-from processing.core.Processing import Processing
 from enmapbox.testing import start_app
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
+from processing.core.Processing import Processing
+from qgis.core import QgsProcessingFeedback
 
 qgsApp = start_app()
 

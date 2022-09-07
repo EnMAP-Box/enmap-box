@@ -6,8 +6,9 @@ from qgis.PyQt.QtWidgets import QDoubleSpinBox, QComboBox, QCheckBox, QToolButto
 from qgis.core import QgsRasterLayer, QgsSingleBandGrayRenderer, QgsRectangle, \
     QgsContrastEnhancement, QgsRasterRenderer, QgsMultiBandColorRenderer, QgsSingleBandPseudoColorRenderer, \
     QgsMapLayerProxyModel, QgsRasterDataProvider, QgsRasterShader
-from qgis.gui import (QgsDockWidget, QgsMapLayerComboBox, QgsCollapsibleGroupBox,
-                       QgsColorRampButton)
+from qgis.gui import (
+    QgsDockWidget, QgsMapLayerComboBox, QgsCollapsibleGroupBox, QgsColorRampButton
+)
 
 from enmapbox import EnMAPBox
 from enmapbox.gui.mapcanvas import MapCanvas
@@ -181,7 +182,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
 
             # let's cache the broad band matching, because it takes a second
             cacheKey = layer.source(), sname
-            if not cacheKey in self.cache:
+            if cacheKey not in self.cache:
                 bandNo = CreateSpectralIndicesAlgorithm.findBroadBand(layer, sname, strict=True)
                 isWaveband = bandNo is not None
                 self.cache[cacheKey] = isWaveband, bandNo
@@ -734,5 +735,5 @@ class RasterLayerStylingPanel(QgsDockWidget):
 def tofloat(text: str) -> float:
     try:
         return float(text)
-    except:
+    except Exception:
         return nan

@@ -131,7 +131,7 @@ class GeetseEarthEngineRasterDataProvider(QgsRasterDataProvider):
                 bandCount = len(self.ee_info['bands'])
             else:
                 bandCount = 1  # fall back to default if ee_object is not set
-        except:
+        except Exception:
             bandCount = 1
 
         return bandCount
@@ -145,13 +145,13 @@ class GeetseEarthEngineRasterDataProvider(QgsRasterDataProvider):
     def generateBandName(self, band_no):
         try:
             return self.ee_info['bands'][band_no - 1]['id']
-        except:
+        except Exception:
             return ''
 
     def sourceDataType(self, band_no):
         try:
             return BAND_TYPES[self.ee_info['bands'][band_no - 1]['data_type']['precision']]
-        except:
+        except Exception:
             return Qgis.UnknownDataType
 
     def identify(self, point, format, boundingBox=None, width=None, height=None, dpi=None) -> QgsRasterIdentifyResult:
@@ -202,7 +202,7 @@ class GeetseEarthEngineRasterDataProvider(QgsRasterDataProvider):
             try:
                 sample = eeImage.sampleRectangle(eeRectangle, properties, defaultValue).getInfo()
                 array = np.array(list(sample['properties'].values()))[0]
-            except:
+            except Exception:
                 traceback.print_exc()
                 array = np.zeros((height, width))
 
@@ -228,7 +228,7 @@ class GeetseEarthEngineRasterDataProvider(QgsRasterDataProvider):
             return int(
                 (self.extent().xMaximum() - self.extent().xMinimum()) / self.collectionJson.groundSamplingDistance()
             )
-        except:
+        except Exception:
             return 0
 
     def ySize(self):
@@ -236,7 +236,7 @@ class GeetseEarthEngineRasterDataProvider(QgsRasterDataProvider):
             return int(
                 (self.extent().yMaximum() - self.extent().yMinimum()) / self.collectionJson.groundSamplingDistance()
             )
-        except:
+        except Exception:
             return 0
 
 

@@ -1,4 +1,4 @@
-from typing import TextIO, Dict
+from typing import TextIO
 
 from qgis.core import QgsProcessingFeedback
 from typeguard import typechecked
@@ -8,10 +8,11 @@ from typeguard import typechecked
 class ProcessingFeedback(QgsProcessingFeedback):
 
     def __init__(self,
-            feedback: QgsProcessingFeedback, pushInfo=True, pushWarning=True, pushDebugInfo=True, pushConsoleInfo=True,
-            pushCommandInfo=True, pushVersionInfo=True, setProgress=True, silenced=False, logfile: TextIO = None,
-            isChildFeedback=False
-    ):
+                 feedback: QgsProcessingFeedback, pushInfo=True, pushWarning=True, pushDebugInfo=True,
+                 pushConsoleInfo=True,
+                 pushCommandInfo=True, pushVersionInfo=True, setProgress=True, silenced=False, logfile: TextIO = None,
+                 isChildFeedback=False
+                 ):
         super().__init__()
         self.feedback = feedback
         self._pushInfo = pushInfo and not silenced

@@ -1,8 +1,6 @@
 from os.path import basename, join, dirname
 
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QWidget, QToolButton, QMenu, QMessageBox
-from PyQt5.uic import loadUi
+from qgis.PyQt.uic import loadUi
 
 from enmapbox import EnMAPBox
 from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromcodealgorithm import \
@@ -19,6 +17,8 @@ from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
 from processing import AlgorithmDialog
 from processing.gui.wrappers import WidgetWrapper
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QWidget, QToolButton, QMenu, QMessageBox
 from qgis.gui import QgsFileWidget
 
 
@@ -63,7 +63,7 @@ class ProcessingParameterPickleFileUnsupervisedDatasetWidget(QWidget):
                 try:
                     dump = TransformerDump(**Utils.pickleLoad(filename))
                     samples, features = dump.X.shape
-                except:
+                except Exception:
                     continue
 
                 action = self.menu.addAction('')

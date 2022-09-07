@@ -25,6 +25,7 @@ def onFinish(algorithm, context, feedback):
     print('\n'.join(feedback.htmlLog().split('<br/>')))
     print(f'Finished {algorithm.id()}')
 
+
 DIR_TMP = pathlib.Path(DIR_REPO) / 'tmp'
 os.makedirs(DIR_TMP, exist_ok=True)
 
