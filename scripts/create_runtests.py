@@ -1,13 +1,13 @@
 import pathlib
 import re
 import site
+
 site.addsitedir(pathlib.Path(__file__).parents[1])
 
-from enmapbox.gui.utils import file_search
+from enmapbox.gui import file_search
 
 
 def create_runtests():
-
     DIR_SCRIPTS = pathlib.Path(__file__).resolve().parent
     DIR_REPO = DIR_SCRIPTS.parent
 
@@ -23,8 +23,7 @@ def create_runtests():
     PATH_RUNTESTS_SH = DIR_SCRIPTS / 'runtests.sh'
     PATH_YAML = DIR_REPO / 'bitbucket-pipelines.yml'
 
-    PREFACE_BAT = \
-"""
+    PREFACE_BAT = """
 :: use this script to run unit tests locally
 ::
 @echo off
@@ -43,8 +42,7 @@ set PYTHON=python
 ::start %PYTHON% scripts/setup_repository.py
 """
 
-    PREFACE_SH = \
-"""#!/bin/bash
+    PREFACE_SH = r"""#!/bin/bash
 QT_QPA_PLATFORM=offscreen
 export QT_QPA_PLATFORM
 CI=True
@@ -55,13 +53,12 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd):/usr/share/qgis/python/plugins"
 # python3 scripts/setup_repository.py
 """
 
-
-    #dirOut = 'test-reports/today'
+    # dirOut = 'test-reports/today'
     linesBat = [PREFACE_BAT]
     linesSh = [PREFACE_SH]
     linesYAML = []
-    #linesBat.append('mkdir {}'.format(dirOut.replace('/', '\\')))
-    #linesSh.append('mkdir {}'.format(dirOut))
+    # linesBat.append('mkdir {}'.format(dirOut.replace('/', '\\')))
+    # linesSh.append('mkdir {}'.format(dirOut))
 
     n = 0
     if True:
@@ -95,7 +92,7 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd):/usr/share/qgis/python/plugins"
     with open(PATH_RUNTESTS_SH, 'w', encoding='utf-8', newline='\n') as f:
         f.write('\n'.join(linesSh))
 
-    yamlLines = ['- {}\n'.format(l) for l in linesYAML]
+    yamlLines = ['- {}\n'.format(line) for line in linesYAML]
     print(''.join(yamlLines))
 
     if False:
@@ -116,8 +113,8 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd):/usr/share/qgis/python/plugins"
 
         for (i0, ie) in zip(startLines, endLines):
             prefix = re.search(r'^.*(?=# START UNITTESTS)', linesYAML[i0]).group()
-            inplace = ['{}- {}\n'.format(prefix, l) for l in linesYAML]
-            linesYAML[i0+1:ie-1] = inplace
+            inplace = ['{}- {}\n'.format(prefix, line) for line in linesYAML]
+            linesYAML[i0 + 1:ie - 1] = inplace
         print('Update {}...'.format(PATH_YAML))
         with open(PATH_YAML, 'w', encoding='utf-8', newline='\n') as f:
             f.write(''.join(linesYAML))

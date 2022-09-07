@@ -5,7 +5,6 @@ See https://github.com/GispoCoding/flake8-qgis for bad and good examples
 
 """
 import argparse
-import os
 import pathlib
 import re
 
@@ -17,6 +16,7 @@ RX_QGS103 = re.compile(r'^(\W*)from PyQt5\.(Qt[^. ]+) import', re.M)
 RX_QGS104 = re.compile(r'^(\W*)import PyQt5\.(Qt[^. ]+)', re.M)
 
 RX_PY = re.compile(r'.*\.py$')
+
 
 def repairString(text) -> str:
     text = RX_QGS101.sub(r'\1from qgis.\2 import', text)
@@ -57,14 +57,15 @@ def repairFile(path, check_only=True):
                 f.write(textGood)
 
 
-def repairFolder(folder, dry_run: bool = True, recursive:bool=False):
+def repairFolder(folder, dry_run: bool = True, recursive: bool = False):
     folder = pathlib.Path(folder)
     for path in file_search(folder, RX_PY, recursive=recursive):
         repairFile(path, check_only=dry_run)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Repair Flake8 QGIS issues', formatter_class=argparse.RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(description='Repair Flake8 QGIS issues',
+                                     formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-t',
                         required=False,
                         default=False,

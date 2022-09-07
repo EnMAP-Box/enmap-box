@@ -133,7 +133,7 @@ def create_enmapbox_plugin(include_testdata: bool = False,
         lastCommitDate = REPO.active_branch.commit.authored_datetime
         timestamp = re.split(r'[.+]', lastCommitDate.isoformat())[0]
     except ImportError as ex:
-        print(f'Unable to import "git". Please install gitpython (pip install gitpython)', file=sys.stderr)
+        print('Unable to import "git". Please install gitpython (pip install gitpython)', file=sys.stderr)
         print(f'{ex}\nUnable to find git repo and current branch. \nSet currentBranch to "{currentBranch}"',
               file=sys.stderr)
     else:

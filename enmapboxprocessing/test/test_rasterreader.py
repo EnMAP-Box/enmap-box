@@ -97,7 +97,6 @@ class TestRasterMetadataReader(TestCase):
         self.assertIsNone(reader.wavelengthUnits(1))
 
 
-
 class TestQgisPam(TestCase):
     # test QGIS PAM metadata handling (see #898)
 

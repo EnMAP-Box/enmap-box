@@ -12,12 +12,16 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.glossary import injectGlossaryLinks
 
 import enmapbox
-import enmapboxdocumentation
+
+try:
+    enmapboxdocumentation = __import__('enmapboxdocumentation')
+except ModuleNotFoundError as ex:
+    raise ex
 
 dryRun = False  # a fast way to check if all parameters are documented
 
-def generateRST():
 
+def generateRST():
     # create folder
     rootCodeRepo = abspath(join(dirname(enmapbox.__file__), '..'))
     rootDocRepo = abspath(join(dirname(enmapboxdocumentation.__file__), '..'))
@@ -36,8 +40,8 @@ def generateRST():
 
     nalg = 0
     algs = algorithms()
-    #from enmapboxprocessing.algorithm.rasterlayerzonalaggregationalgorithm import RasterLayerZonalAggregationAlgorithm
-    #algs = [RasterLayerZonalAggregationAlgorithm()]
+    # from enmapboxprocessing.algorithm.rasterlayerzonalaggregationalgorithm import RasterLayerZonalAggregationAlgorithm
+    # algs = [RasterLayerZonalAggregationAlgorithm()]
     for alg in algs:
         # print(alg.displayName())
         if Group.Experimental.name in alg.group():
@@ -51,10 +55,10 @@ def generateRST():
 
     textProcessingAlgorithmsRst = '''Processing Algorithms
 *********************
-    
+
 .. toctree::
     :maxdepth: 1
-       
+
 '''
 
     for gkey in sorted(groups.keys()):
@@ -121,7 +125,7 @@ def generateRST():
 def v3(alg: EnMAPProcessingAlgorithm, text):
     try:
         helpParameters = {k: v for k, v in alg.helpParameters()}
-    except:
+    except Exception:
         assert 0
 
     text += injectGlossaryLinks(alg.shortDescription()) + '\n\n'

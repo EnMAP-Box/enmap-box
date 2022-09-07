@@ -7,8 +7,6 @@
      (at your option) any later version.
 
 """
-import enmapbox
-
 __author__ = 'benjamin.jakimow@geo.hu-berlin.de'
 __date__ = '2017-07-17'
 __copyright__ = 'Copyright 2017, Benjamin Jakimow'
@@ -16,6 +14,7 @@ __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 import unittest
 from enmapbox import EnMAPBox, initPythonPaths
 from enmapbox.testing import EnMAPBoxTestCase
+
 initPythonPaths()
 
 try:
@@ -26,12 +25,12 @@ except ModuleNotFoundError as ex:
     else:
         raise ex
 
+
 class EnPTTestCases(EnMAPBoxTestCase):
 
     def test_application(self):
         EB = EnMAPBox()
 
-        from enpt_enmapboxapp.enpt_enmapboxapp import EnPTEnMAPBoxApp
         app = [a for a in EB.applicationRegistry.applications() if isinstance(a, EnPTEnMAPBoxApp)]
         self.assertTrue(len(app) == 1, msg='EnPTEnMAPBoxApp was not loaded during EnMAP-Box startup')
 

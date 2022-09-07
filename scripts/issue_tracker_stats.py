@@ -1,10 +1,10 @@
-import os
-import re
-import typing
-import pathlib
-import json
-import datetime
 import csv
+import datetime
+import json
+import os
+import pathlib
+import re
+
 from xlsxwriter.workbook import Workbook
 
 # import pandas as pd
@@ -12,7 +12,7 @@ from xlsxwriter.workbook import Workbook
 Syntax github issue request:
 https://docs.github.com/en/search-github/searching-on-github/searching-issues-and-pull-requests
 
-author:jakimowb type:issue created:>=2022-07-01 created:<=2022-12-31 
+author:jakimowb type:issue created:>=2022-07-01 created:<=2022-12-31
 
 """
 # 1. open bitbucket,
@@ -31,7 +31,6 @@ assert start_date < end_date
 
 def csv2xlsx(path_csv):
     path_csv = pathlib.Path(path_csv)
-    from xlsxwriter.workbook import Workbook
     path_xlsx = path_csv.parent / f'{os.path.splitext(path_csv.name)[0]}.xlsx'
     workbook = Workbook(path_xlsx)
     # float_format = workbook.add_format({'num_format': ''})

@@ -1,5 +1,6 @@
 
 # import QPS modules
+from ..qgispluginsupport.qps.utils import file_search
 from ..qgispluginsupport.qps.crosshair.crosshair import CrosshairStyle, CrosshairWidget, CrosshairMapCanvasItem, \
     CrosshairDialog, getCrosshairStyle
 from ..qgispluginsupport.qps.plotstyling.plotstyling import PlotStyle, PlotStyleDialog, PlotStyleButton, PlotStyleWidget
