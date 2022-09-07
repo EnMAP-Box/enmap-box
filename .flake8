@@ -63,3 +63,6 @@ per-file-ignores =
     enmapbox/__main__.py: E402
     enmapbox/gui/__init__.py: F401
     enmapbox/gui/utils.py: F401
+    # does not work: from qgis.PyQt.Qsci import QsciScintilla, QsciLexerPython'
+    # instead of 'from PyQt5.Qsci import QsciScintilla, QsciLexerPython'
+    enmapbox/gui/widgets/codeeditwidget.py: QGS103
