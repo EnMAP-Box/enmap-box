@@ -15,30 +15,39 @@
 *                                                                         *
 ***************************************************************************
 """
-import re, copy
-from osgeo import gdal, ogr
-from qgis.core import *
-from qgis.PyQt.QtCore import QDate
-from enmapbox.gui import ClassificationScheme
+import copy
+import re
+
 import numpy as np
+from osgeo import gdal, ogr
+
+from enmapbox.gui import ClassificationScheme
+from qgis.PyQt.QtCore import QDate
+from qgis._core import QgsCoordinateReferenceSystem
+
 IMMUTABLE_DOMAINS = ['IMAGE_STRUCTURE', 'SUBDATASETS', 'DERIVED_SUBDATASETS']
 
 
 def getKwds(valueType=None, valueMin=None, valueMax=None,
             isImmutable=None, options=None, tooltip=None):
-
     kwds = {}
-    if valueType: kwds['valueType'] = valueType
-    if valueMin: kwds['valueMin'] = valueMin
-    if valueMax: kwds['valueMax'] = valueMax
-    if isImmutable: kwds['isImmutable'] = isImmutable
-    if options: kwds['options'] = options
-    if tooltip: kwds['tooltip'] = tooltip
+    if valueType:
+        kwds['valueType'] = valueType
+    if valueMin:
+        kwds['valueMin'] = valueMin
+    if valueMax:
+        kwds['valueMax'] = valueMax
+    if isImmutable:
+        kwds['isImmutable'] = isImmutable
+    if options:
+        kwds['options'] = options
+    if tooltip:
+        kwds['tooltip'] = tooltip
     return kwds
 
 
-
 regexIsOLI = re.compile(r'(gdal\.(Dataset|Band_[1-9]\d*))|ogr\.(DataSource|Layer_\d+)')
+
 
 class MDKeyAbstract(object):
 
@@ -51,7 +60,7 @@ class MDKeyAbstract(object):
         :return: str
         """
 
-        if obj == None or not (isinstance(obj, gdal.MajorObject) or isinstance(obj, ogr.MajorObject)):
+        if obj is None or not (isinstance(obj, gdal.MajorObject) or isinstance(obj, ogr.MajorObject)):
             return None
 
         if isinstance(obj, gdal.Dataset):
@@ -120,8 +129,6 @@ class MDKeyAbstract(object):
         else:
             raise NotImplementedError()
         raise Exception()
-
-
 
     """
     A MDKey is an internal representation of a metadata item.
@@ -209,7 +216,6 @@ class MDKeyAbstract(object):
         """
         raise NotImplementedError('Abstract class')
 
-
     def writeValueToSource(self, obj):
         """
         Converts `value` into something gdal/ogr can write to the gdal/ogr object `obj`.
@@ -236,7 +242,7 @@ class MDKeyDomainString(MDKeyAbstract):
     """
 
     @staticmethod
-    def fromDomain(obj, domain:str, name:str, **kwds):
+    def fromDomain(obj, domain: str, name: str, **kwds):
         assert isinstance(domain, str)
         assert isinstance(name, str)
 
@@ -252,7 +258,7 @@ class MDKeyDomainString(MDKeyAbstract):
             raise NotImplementedError()
 
     @staticmethod
-    def fromVectorDomain(obj, domain:str, name:str):
+    def fromVectorDomain(obj, domain: str, name: str):
 
         # OGR Default Domain
         if domain == '':
@@ -262,13 +268,12 @@ class MDKeyDomainString(MDKeyAbstract):
             else:
                 return MDKeyDomainString(obj, domain, name)
         else:
-            #default behavior: return a string
+            # default behavior: return a string
             return MDKeyDomainString(obj, domain, name)
-            #raise NotImplementedError()
-
+            # raise NotImplementedError()
 
     @staticmethod
-    def fromRasterDomain(obj, domain:str, name:str, **kwds):
+    def fromRasterDomain(obj, domain: str, name: str, **kwds):
 
         # GDAL Default Domain
         if domain == '':
@@ -296,31 +301,31 @@ class MDKeyDomainString(MDKeyAbstract):
 
             if name == 'bands':
                 return MDKeyDomainString(obj, domain, name,
-                        valueType=int, valueMin=1, isImmutable=True, **kwds)
+                                         valueType=int, valueMin=1, isImmutable=True, **kwds)
 
             if name == 'sample':
                 return MDKeyDomainString(obj, domain, name,
-                        valueType=int, valueMin=1, isImmutable=True, **kwds)
+                                         valueType=int, valueMin=1, isImmutable=True, **kwds)
 
             if name == 'lines':
                 return MDKeyDomainString(obj, domain, name,
-                        valueType=int, valueMin=1, isImmutable=True, **kwds)
+                                         valueType=int, valueMin=1, isImmutable=True, **kwds)
 
             if name == 'header_offset':
                 return MDKeyDomainString(obj, domain, name,
-                        valueType=int, valueMin=0, **kwds)
+                                         valueType=int, valueMin=0, **kwds)
 
             if name == 'data_type':
                 return MDKeyDomainString(obj, domain, name,
-                        valueType=int, valueMin=1, valueMax=16, isImmutable=True, **kwds)
+                                         valueType=int, valueMin=1, valueMax=16, isImmutable=True, **kwds)
 
             if name == 'data_type':
                 return MDKeyDomainString(obj, domain, name,
-                        valueType=int, valueMin=1, valueMax=16, isImmutable=True, **kwds)
+                                         valueType=int, valueMin=1, valueMax=16, isImmutable=True, **kwds)
 
             if name == 'interleave':
                 return MDKeyDomainString(obj, domain, name,
-                        options=['bsq', 'bil', 'bip'], isImmutable=True, **kwds)
+                                         options=['bsq', 'bil', 'bip'], isImmutable=True, **kwds)
 
             if name == 'band_names':
                 return MDKeyDomainString(obj, domain, name, listLength='nb', **kwds)
@@ -336,8 +341,10 @@ class MDKeyDomainString(MDKeyAbstract):
             if name == 'wavelength_units':
                 return MDKeyDomainString(obj, domain, name,
                                          options=[
-                'Micrometers', 'um', 'Nanometers', 'nm', 'Millimeters', 'mm', 'Centimeters', 'cm',
-                'Meters', 'm', 'Wavenumber', 'Angstroms', 'GHz', 'MHz', 'Index', 'Unknown'],
+                                             'Micrometers', 'um', 'Nanometers', 'nm', 'Millimeters', 'mm',
+                                             'Centimeters', 'cm',
+                                             'Meters', 'm', 'Wavenumber', 'Angstroms', 'GHz', 'MHz', 'Index',
+                                             'Unknown'],
                                          **kwds)
 
             if name == 'cloud_cover':
@@ -352,22 +359,19 @@ class MDKeyDomainString(MDKeyAbstract):
             if domain == 'ENVI' and name == 'byte_order':
                 s = ""
             if value is not None and len(value) > 0:
-                for t in [int,float, np.datetime64, str]:
+                for t in [int, float, np.datetime64, str]:
                     try:
                         v = t(value)
                         break
-                    except:
+                    except Exception:
                         pass
-                key = MDKeyDomainString(obj, domain,name, valueType=t, **kwds)
+                key = MDKeyDomainString(obj, domain, name, valueType=t, **kwds)
                 key.setValue(v)
                 return key
 
         return MDKeyDomainString(obj, domain, name, **kwds)
 
-
-
-
-    def __init__(self,  obj, domain, name, valueMin=None, valueMax=None,
+    def __init__(self, obj, domain, name, valueMin=None, valueMax=None,
                  listLength=None, **kwargs):
         """
 
@@ -399,7 +403,7 @@ class MDKeyDomainString(MDKeyAbstract):
         if self.mListLength not in [-1, 'nb', 'nl']:
             return
 
-        if self.mListLength in ['nb','nl']:
+        if self.mListLength in ['nb', 'nl']:
             if isinstance(obj, gdal.Dataset):
                 self.mListLength = obj.RasterCount
             elif isinstance(obj, gdal.Dataset):
@@ -425,7 +429,7 @@ class MDKeyDomainString(MDKeyAbstract):
             if isinstance(value, np.ndarray):
                 value = list(value)
 
-            assert isinstance(value, list) and len(value) == self.mListLength , \
+            assert isinstance(value, list) and len(value) == self.mListLength, \
                 'setValue(value): `value` needs to be a list of {} elements'.format(self.mListLength)
 
             value = [convertOrFail(v) for v in value]
@@ -433,7 +437,6 @@ class MDKeyDomainString(MDKeyAbstract):
         else:
             value = convertOrFail(value)
         super(MDKeyDomainString, self).setValue(value)
-
 
     def setListLength(self, listLength):
         self.mListLength = listLength
@@ -449,17 +452,17 @@ class MDKeyDomainString(MDKeyAbstract):
             valueString = obj.GetMetadataItem(self.mName, self.mDomain)
 
             self.initListLength(obj, valueString)
-            if self.mListLength != None:
-                #convert the string values into a list
+            if self.mListLength is not None:
+                # convert the string values into a list
                 parts = re.split('[,{}]', valueString)
                 parts = [p.strip() for p in parts]
                 parts = [p for p in parts if p != '']
                 parts = [self.mType(p) for p in parts]
 
                 if len(parts) != self.mListLength:
-                    s  = ""
+                    s = ""
 
-                #try to convert to target type
+                # try to convert to target type
                 try:
                     parts2 = [self.mType(p) for p in parts]
                 except Exception as ex:
@@ -474,7 +477,6 @@ class MDKeyDomainString(MDKeyAbstract):
                 self.setValue(self.mType(valueString))
         else:
             raise NotImplementedError()
-
 
     def writeValueToSource(self, obj):
         """
@@ -492,12 +494,13 @@ class MDKeyDomainString(MDKeyAbstract):
             value = ', '.join(value)
 
             if self.mDomain == 'ENVI':
-                value = '{'+value+'}'
+                value = '{' + value + '}'
         else:
             value = str(value)
 
-        #in all cases, write a string
+        # in all cases, write a string
         obj.SetMetadataItem(self.mName, value, domain=self.mDomain)
+
 
 class MDKeyCoordinateReferenceSystem(MDKeyAbstract):
     def __init__(self, obj, **kwds):
@@ -515,7 +518,7 @@ class MDKeyCoordinateReferenceSystem(MDKeyAbstract):
             crs = self.readValueFromSource(obj.GetDataset())
 
         elif isinstance(obj, ogr.Layer):
-            wkt =  obj.GetSpatialRef().ExportToWkt()
+            wkt = obj.GetSpatialRef().ExportToWkt()
             crs = QgsCoordinateReferenceSystem(wkt)
         elif isinstance(obj, ogr.DataSource):
             crs = self.readValueFromSource(obj.GetLayer(0))
@@ -537,7 +540,6 @@ class MDKeyCoordinateReferenceSystem(MDKeyAbstract):
             pass
         else:
             raise NotImplementedError()
-
 
         return error
 
@@ -565,7 +567,6 @@ class MDKeyClassification(MDKeyAbstract):
     def __init__(self, obj):
         super(MDKeyClassification, self).__init__(obj, 'Classification')
 
-
     def setValue(self, value):
         assert value is None or isinstance(value, ClassificationScheme)
         if not self.mValue0Initialized:
@@ -588,7 +589,6 @@ class MDKeyClassification(MDKeyAbstract):
 
         self.setValue(classScheme)
 
-
     def writeValueToSource(self, obj):
 
         if isinstance(obj, gdal.Dataset):
@@ -601,7 +601,7 @@ class MDKeyClassification(MDKeyAbstract):
                 obj.SetCategoryNames(classNames)
                 obj.SetColorTable(ct)
 
-            else: #remove the class information
+            else:  # remove the class information
                 obj.SetCategories([])
                 obj.SetColorTable(gdal.ColorTable())
 
@@ -614,8 +614,8 @@ if __name__ == '__main__':
     from enmapbox.exampledata import enmap, landcover
     from enmapbox.testing import initQgisApplication
 
-    #this will initialize the QApplication/QgsApplication which runs in the background
-    #see https://qgis.org/api/classQgsApplication.html for details
+    # this will initialize the QApplication/QgsApplication which runs in the background
+    # see https://qgis.org/api/classQgsApplication.html for details
     qgsApp = initQgisApplication()
 
     dsR = gdal.Open(enmap)
@@ -634,6 +634,5 @@ if __name__ == '__main__':
         except Exception as ex:
             s = ""
         s = ""
-
 
     qgsApp.exec_()

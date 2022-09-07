@@ -10,4 +10,3 @@ from qgis.core import QgsApplication, Qgis
 pkg = pathlib.Path(QgsApplication.pkgDataPath())
 print(f'QGIS Version:{Qgis.version()}\nRevision: {Qgis.devVersion()}')
 print(f'PKGDATAPATH={pkg}')
-

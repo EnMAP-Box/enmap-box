@@ -55,11 +55,11 @@ def importEarthEngine(showMessage=True, parent=None) -> Tuple[bool, object]:
     if isEarthEngineModuleInstalled():
         import ee
 
-        ### debugging
-        #import traceback
-        #traceback.print_stack()
-        #QMessageBox.information(parent, 'DEBUG', 'Just imported the "ee" module!')
-        ###
+        # ## debugging
+        # import traceback
+        # traceback.print_stack()
+        # QMessageBox.information(parent, 'DEBUG', 'Just imported the "ee" module!')
+        # ##
 
         return True, ee
     else:

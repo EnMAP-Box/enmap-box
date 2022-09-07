@@ -25,6 +25,9 @@ import re
 import typing
 from difflib import SequenceMatcher
 
+from qgis.PyQt.QtCore import QAbstractTableModel, Qt, QModelIndex, QSortFilterProxyModel
+from qgis.PyQt.QtGui import QColor, QContextMenuEvent, QIcon
+from qgis.PyQt.QtWidgets import QFileDialog, QTableView, QMenu, QStyledItemDelegate, QDialog, QDialogButtonBox, QAction
 from osgeo import gdal
 
 from enmapbox import enmapboxSettings
@@ -33,9 +36,6 @@ from enmapbox.qgispluginsupport.qps.classification.classificationscheme import \
     ClassificationMapLayerComboBox, ClassInfo, ClassificationScheme, ClassificationSchemeComboBox, \
     ClassificationSchemeWidget
 from enmapbox.qgispluginsupport.qps.utils import loadUi
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
 from qgis.core import QgsProviderRegistry, QgsRasterLayer, QgsProject, QgsMapLayerProxyModel
 from qgis.gui import QgsFileWidget, QgsRasterFormatSaveOptionsWidget, QgsMapLayerComboBox
 from . import APP_DIR
@@ -98,11 +98,11 @@ def reclassify(pathSrc: str, pathDst: str, dstClassScheme: ClassificationScheme,
     names = []
     colors = []
     labels = []
-    for l in sorted(list(MAP2HUBFLOW.keys())):
-        classInfo: ClassInfo = MAP2HUBFLOW[l]
+    for label in sorted(list(MAP2HUBFLOW.keys())):
+        classInfo: ClassInfo = MAP2HUBFLOW[label]
         names.append(classInfo.name())
         colors.append(classInfo.color().name())
-        labels.append(l)
+        labels.append(label)
 
     if len(names) == 0:
         return
@@ -185,16 +185,16 @@ class ReclassifyTableModel(QAbstractTableModel):
         assert isinstance(path, pathlib.Path) and path.is_file()
 
         allowedSrcNames = self.mSrc.classNames()
-        allowedSrcLabels = [str(l) for l in self.mSrc.classLabels()]
+        allowedSrcLabels = [str(label) for label in self.mSrc.classLabels()]
 
         allowedDstNames = self.mDst.classNames()
-        allowedDstLabels = [str(l) for l in self.mDst.classLabels()]
+        allowedDstLabels = [str(label) for label in self.mDst.classLabels()]
 
         if reset:
             self.resetMapping()
 
         with open(path, 'r', encoding='utf-8') as f:
-            lines = [l.strip() for l in f.readlines()]
+            lines = [line.strip() for line in f.readlines()]
             rx = re.compile(r'^(?P<src>[^#;]+);(?P<dst>[^#;]+)$')
             rxInt = re.compile(r'^\d+$')
 
@@ -377,7 +377,7 @@ class ReclassifyTableModel(QAbstractTableModel):
             if role == Qt.DisplayRole:
                 return self.classDisplayName(c)
             elif role == Qt.ToolTipRole:
-                return f'Source Class\n' + self.classToolTip(c)
+                return 'Source Class\n' + self.classToolTip(c)
             elif role == Qt.DecorationRole:
                 return c.icon()
 
@@ -388,7 +388,7 @@ class ReclassifyTableModel(QAbstractTableModel):
                 if role == Qt.DisplayRole:
                     return self.classDisplayName(dstClass)
                 elif role == Qt.ToolTipRole:
-                    return f'Destination Class\n' + self.classToolTip(dstClass)
+                    return 'Destination Class\n' + self.classToolTip(dstClass)
 
                 elif role == Qt.DecorationRole:
                     return dstClass.icon()

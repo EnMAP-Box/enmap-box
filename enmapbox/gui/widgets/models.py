@@ -18,18 +18,11 @@
 # noinspection PyPep8Naming
 
 
-import os, pickle, copy
+import copy
 
-from collections import OrderedDict
-
-from qgis.core import *
-from qgis.gui import *
-
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
-
-from osgeo import gdal, osr
+from qgis.PyQt.QtCore import Qt, QObject, pyqtSignal, QModelIndex, QAbstractListModel, QAbstractItemModel
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QComboBox, QTreeView
 
 
 def currentComboBoxValue(comboBox):
@@ -39,7 +32,8 @@ def currentComboBoxValue(comboBox):
         assert isinstance(o, Option)
         return o.mValue
     else:
-        return cb.currentData()
+        return comboBox.currentData()
+
 
 def setCurrentComboBoxValue(comboBox, value):
     """
@@ -99,7 +93,6 @@ class Option(object):
             return other.mValue == self.mValue
 
 
-
 class OptionListModel(QAbstractListModel):
     def __init__(self, options=None, parent=None):
         super(OptionListModel, self).__init__(parent)
@@ -119,6 +112,7 @@ class OptionListModel(QAbstractListModel):
         self.insertOptions(options)
 
     sigOptionsInserted = pyqtSignal(list)
+
     def insertOptions(self, options, i=None):
         if options is None:
             return
@@ -130,8 +124,8 @@ class OptionListModel(QAbstractListModel):
 
         options = [o for o in options if o not in self.mOptions]
 
-        l = len(options)
-        if l > 0:
+        nOptions = len(options)
+        if nOptions > 0:
             if i is None:
                 i = len(self.mOptions)
             self.beginInsertRows(QModelIndex(), i, i + len(options) - 1)
@@ -142,25 +136,25 @@ class OptionListModel(QAbstractListModel):
 
             self.sigOptionsInserted.emit(options)
 
-
-    def o2o(self,  value):
+    def o2o(self, value):
         if not isinstance(value, Option):
             value = Option(value, '{}'.format(value))
         return value
 
-    def options(self)->list:
+    def options(self) -> list:
         """
         :return: [list-of-Options]
         """
         return self.mOptions[:]
 
-    def optionValues(self)->list:
+    def optionValues(self) -> list:
         """
         :return: [list-str-of-Option-Values]
         """
         return [o.mValue for o in self.options()]
 
     sigOptionsRemoved = pyqtSignal(list)
+
     def removeOptions(self, options):
         """
         Removes a list of options from this Options list.
@@ -183,7 +177,7 @@ class OptionListModel(QAbstractListModel):
     def clear(self):
         self.removeOptions(self.mOptions)
 
-    def rowCount(self, parent=None, *args, **kwargs)->int:
+    def rowCount(self, parent=None, *args, **kwargs) -> int:
         return len(self.mOptions)
 
     def columnCount(self, QModelIndex_parent=None, *args, **kwargs):
@@ -206,15 +200,8 @@ class OptionListModel(QAbstractListModel):
                 break
         return idx
 
-
     def optionNames(self):
         return [o.mName for o in self.mOptions]
-
-    def optionValues(self):
-        return [o.mValue for o in self.mOptions]
-
-
-
 
     def data(self, index, role=Qt.DisplayRole):
         if not index.isValid():
@@ -233,9 +220,8 @@ class OptionListModel(QAbstractListModel):
         elif role == Qt.DecorationRole:
             result = option.mIcon
         elif role == Qt.UserRole:
-            result =  option
+            result = option
         return result
-
 
 
 class TreeNode(QObject):
@@ -266,7 +252,6 @@ class TreeNode(QObject):
 
         s = ""
 
-
     def clone(self, parent=None):
 
         n = TreeNode(parent)
@@ -279,8 +264,6 @@ class TreeNode(QObject):
             assert isinstance(childNode, TreeNode)
             childNode.clone(parent=n)
         return n
-
-
 
     def nodeIndex(self):
         return self.mParent.mChildren.index(self)
@@ -316,10 +299,10 @@ class TreeNode(QObject):
         if isinstance(listOfChildNodes, TreeNode):
             listOfChildNodes = [listOfChildNodes]
         assert isinstance(listOfChildNodes, list)
-        listOfChildNodes = [l for l in listOfChildNodes if l not in self.mChildren]
+        listOfChildNodes = [c for c in listOfChildNodes if c not in self.mChildren]
 
-        l = len(listOfChildNodes)
-        idxLast = index + l - 1
+        nChildNodes = len(listOfChildNodes)
+        idxLast = index + nChildNodes - 1
         self.sigWillAddChildren.emit(self, index, idxLast)
         for i, node in enumerate(listOfChildNodes):
             assert isinstance(node, TreeNode)
@@ -431,7 +414,6 @@ class TreeModel(QAbstractItemModel):
     def rootNode(self):
         return self.mRootNode
 
-
     def nodeWillAddChildren(self, node, idx1, idxL):
         idxNode = self.node2idx(node)
         self.beginInsertRows(idxNode, idx1, idxL)
@@ -439,7 +421,6 @@ class TreeModel(QAbstractItemModel):
     def nodeAddedChildren(self, *args):
         self.endInsertRows()
         # for i in range(idx1, idxL+1):
-
 
     def nodeWillRemoveChildren(self, node, idx1, idxL):
         idxNode = self.node2idx(node)
@@ -496,7 +477,7 @@ class TreeModel(QAbstractItemModel):
     def columnNames(self):
         return self.mColumnNames
 
-    def columnCount(self, index= QModelIndex()):
+    def columnCount(self, index=QModelIndex()):
 
         return len(self.mColumnNames)
 
@@ -607,56 +588,6 @@ class TreeModel(QAbstractItemModel):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
 
-
 class TreeView(QTreeView):
     def __init__(self, *args, **kwds):
         super(TreeView, self).__init__(*args, **kwds)
-
-
-if __name__ == '__main__':
-    from enmapbox.testing import initQgisApplication
-
-
-    app =  initQgisApplication()
-
-    for k in sorted(os.environ.keys()): print('{}={}'.format(k, os.environ[k]))
-
-    def printModelSubclasses(model, modelIndex=QModelIndex()):
-        assert isinstance(model, QAbstractItemModel)
-        print('index(0,0) {}'.format(model.index(0,0)))
-        print('parent() {}'.format(model.parent(modelIndex)))
-        print('rowCount() {}'.format(model.rowCount(modelIndex)))
-        print('columnCount() {}'.format(model.columnCount(modelIndex)))
-
-
-
-
-    treeModel = TreeModel()
-    cbModel = OptionListModel()
-    for k in sorted(os.environ.keys()):
-        v = os.environ[k]
-        cbModel.addOption(Option(v, k, tooltip=v))
-
-    cb = QComboBox()
-    cb.setModel(cbModel)
-    cb.show()
-    printModelSubclasses(treeModel)
-
-
-    tv = QTreeView(None)
-    tv.show()
-    tv.setModel(treeModel)
-
-    rn = treeModel.rootNode()
-    n1 = TreeNode(None, 'Node1')
-    rn.appendChildNodes([n1])
-    rn.appendChildNodes([TreeNode(rn, 'Node2')])
-    n3 = TreeNode(None, 'Node3')
-    n4 = TreeNode(None, 'Node4')
-    n1.appendChildNodes([n3])
-    n1.appendChildNodes(n4)
-
-
-
-    print('DONE')
-    app.exec_()

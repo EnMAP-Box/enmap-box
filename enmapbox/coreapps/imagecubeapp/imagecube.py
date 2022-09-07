@@ -10,8 +10,10 @@ import sys
 import time
 import typing
 import numpy as np
-from OpenGL.GL import *
+from OpenGL.GL import glEnd, glVertex3f, glColor4f, glLineWidth, GL_LINE_SMOOTH, GL_LINE_SMOOTH_HINT, GL_NICEST, \
+    glEnable, glHint, glBegin, GL_LINES
 
+from enmapbox.qgispluginsupport.qps.utils import loadUi, SpatialExtent
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtGui import QColor, QVector3D, QMatrix4x4
 from qgis.PyQt.QtWidgets import QMainWindow, QApplication, QCheckBox, QLineEdit
@@ -26,7 +28,7 @@ import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.opengl as gl
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem, GLOptions
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.opengl.GLViewWidget import GLViewWidget
 from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog, rendererFromXml, rendererToXml
-from enmapbox.gui.utils import loadUi, SpatialExtent
+from . import NAME, VERSION
 
 KEY_GL_ITEM_GROUP = 'CUBEVIEW/GL_ITEM_GROUP'
 KEY_DEFAULT_TRANSFORM = 'CUBEVIEW/DEFAULT_TRANSFORM'
@@ -41,8 +43,6 @@ QGIS2NUMPY_DATA_TYPES = {Qgis.Byte: np.byte,
                          Qgis.CFloat64: np.complex64,
                          Qgis.ARGB32: np.uint32,
                          Qgis.ARGB32_Premultiplied: np.uint32}
-
-from . import NAME, VERSION
 
 
 class TaskMock(QgsTask):
@@ -156,13 +156,13 @@ def samplingGrid(layer: QgsRasterLayer, extent: QgsRectangle, ncb: int = 1, max_
                 nnl = MAX_SIZE / (nns * ncb * 4)
         Eq. 2.  eW / eH = nns / nnl
                 nns = eW / eH * nnl
-        
+
         Eq. 2 in 1
-                nnl = MAX_SIZE * eH  
+                nnl = MAX_SIZE * eH
                       eW * nnl * ncb * 4
-                
+
                 nnl^2 = MAX_SIZE * eH / (eW * ncb * 4)
-                
+
                 nnl = sqrt(MAX_SIZE * eH / (eW * ncb * 4))
         """
 
@@ -233,6 +233,7 @@ def renderImageData(task: QgsTask, dump):
                     nonlocal lyr
                     renderer = QgsPalettedRasterRenderer(lyr.dataProvider(), b, renderer.classes())
                     lyr.setRenderer(renderer)
+
                 setBand = onSetBand
 
             else:

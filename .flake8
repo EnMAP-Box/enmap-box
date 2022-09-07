@@ -52,3 +52,5 @@ per-file-ignores =
     # script should run immediately which site.addsitedir(REPO) before other imports
     scripts/*.py : E402
     enmapbox/__main__.py: E402
+    enmapbox/gui/__init__.py: F401
+    enmapbox/gui/utils.py: F401

@@ -22,7 +22,7 @@ import os
 import pathlib
 from qgis.PyQt.QtWidgets import QDialog
 from enmapbox import DIR_REPO, ABOUT
-from enmapbox.gui.utils import loadUi
+from enmapbox.gui import loadUi
 
 
 class AboutDialog(QDialog):

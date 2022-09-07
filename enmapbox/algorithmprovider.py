@@ -19,13 +19,12 @@
 
 import os
 import pathlib
-import sys
 import site
-import qgis
 
-from enmapbox import __version__, messageLog
-from qgis.core import QgsProcessingProvider, QgsProcessingAlgorithm, QgsApplication, QgsRuntimeProfiler
+import qgis
+from enmapbox import __version__
 from qgis.PyQt.QtGui import QIcon
+from qgis.core import QgsProcessingProvider, QgsProcessingAlgorithm, QgsApplication, QgsRuntimeProfiler
 
 try:
     from processing.core.ProcessingConfig import ProcessingConfig, Setting
@@ -80,9 +79,9 @@ class EnMAPBoxProcessingProvider(QgsProcessingProvider):
 
         return True
 
-    def unload(self):
-        ProcessingConfig.removeSetting(EnMAPBoxProcessingProviderKeys.ACTIVATE)
-        ProcessingConfig.removeSetting(EnMAPBoxProcessingProviderKeys.OUTPUTFOLDER)
+    # def unload(self):
+    #    ProcessingConfig.removeSetting(EnMAPBoxProcessingProviderKeys.ACTIVATE)
+    #    ProcessingConfig.removeSetting(EnMAPBoxProcessingProviderKeys.OUTPUTFOLDER)
 
     def isActive(self):
         return ProcessingConfig.getSetting(EnMAPBoxProcessingProviderKeys.ACTIVATE)
@@ -196,12 +195,8 @@ class EnMAPBoxProcessingProvider(QgsProcessingProvider):
         # del ProcessingConfig.settingIcons[self.name()]
         # ProcessingConfig.removeSetting(GdalUtils.GDAL_HELP_PATH)
 
-    def isActive(self) -> bool:
-        """Return True if the provider is activated and ready to run algorithms"""
-        return True
-
-    def setActive(self, active):
-        ProcessingConfig.setSettingValue(self.mSettingsPrefix, active)
+    # def setActive(self, active):
+    #    ProcessingConfig.setSettingValue(self.mSettingsPrefix, active)
 
     def addAlgorithm(self, algorithm: QgsProcessingAlgorithm, _emitUpdated=True):
         """

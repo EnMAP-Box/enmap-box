@@ -11,7 +11,6 @@ APP_DIR = os.path.dirname(__file__)
 
 
 class ImageCubeApplication(EnMAPBoxApplication):
-
     mActionStartGUI: QAction
 
     def __init__(self, enmapBox: EnMAPBox, parent=None):
@@ -22,7 +21,7 @@ class ImageCubeApplication(EnMAPBoxApplication):
         self.version = VERSION
         self.licence = 'GNU GPL-3'
         self.mErrorMessage = None
-        #self.mImageCubeWidget: QWidget = None
+        # self.mImageCubeWidget: QWidget = None
         self.mIcon = enmapBox.icon()
 
     def icon(self):
@@ -30,11 +29,11 @@ class ImageCubeApplication(EnMAPBoxApplication):
 
     def openglAvailable(self) -> bool:
         try:
-            import OpenGL
-            import qgis.PyQt.QtOpenGL
+            __import__('OpenGL')
+            __import__('qgis.PyQt.QtOpenGL')
             self.mErrorMessage = None
             return True
-        except Exception as ex:
+        except (ImportError, ModuleNotFoundError) as ex:
             self.mErrorMessage = ex
             return False
 
@@ -52,7 +51,7 @@ class ImageCubeApplication(EnMAPBoxApplication):
 
         if self.openglAvailable():
             from imagecubeapp.imagecube import ImageCubeWidget
-            #if not isinstance(self.mImageCubeWidget, ImageCubeWidget):
+            # if not isinstance(self.mImageCubeWidget, ImageCubeWidget):
             mImageCubeWidget = ImageCubeWidget()
             mImageCubeWidget.setWindowTitle(self.name)
             mImageCubeWidget.setWindowIcon(self.icon())

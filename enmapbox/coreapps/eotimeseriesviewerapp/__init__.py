@@ -19,15 +19,18 @@
 ***************************************************************************
 """
 
-import os, sys, importlib
+import importlib
+import os
+
 import qgis.utils
+from enmapbox.gui.applications import EnMAPBoxApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMessageBox
-from enmapbox.gui.applications import EnMAPBoxApplication
 
 APP_DIR = os.path.dirname(__file__)
 
-def qgisPluginInstalled()->bool:
+
+def qgisPluginInstalled() -> bool:
     """
     Returns True if the EO Time Series Viewer QGIS Plugin is installed
     :return: bool
@@ -37,7 +40,6 @@ def qgisPluginInstalled()->bool:
 
 
 class EOTimeSeriesViewerApp(EnMAPBoxApplication):
-
 
     def __init__(self, enmapBox, parent=None):
 
@@ -69,7 +71,6 @@ class EOTimeSeriesViewerApp(EnMAPBoxApplication):
         a.triggered.connect(self.startGUI)
         return a
 
-
     def startGUI(self, *args):
         if qgisPluginInstalled():
             from eotimeseriesviewer.main import TimeSeriesViewer
@@ -88,7 +89,6 @@ class EOTimeSeriesViewerApp(EnMAPBoxApplication):
 
     def onTimeSeriesViewerClosed(self, *args, **kwds):
         self.mTSVInstance = None
-
 
 
 def enmapboxApplicationFactory(enmapBox):

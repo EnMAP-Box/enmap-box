@@ -28,18 +28,15 @@ import traceback
 import typing
 from typing import Optional
 
-from qgis.PyQt.QtWidgets import QAction
-
-from qgis.PyQt.QtCore import QObject, pyqtSignal
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu
-from qgis.core import QgsProcessingAlgorithm
-from qgis.gui import QgisInterface
-
 from enmapbox import messageLog
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
 from enmapbox.gui.enmapboxgui import EnMAPBox
-from typeguard import typechecked
+from qgis.PyQt.QtCore import QObject, pyqtSignal
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QAction
+from qgis.PyQt.QtWidgets import QMenu
+from qgis.core import QgsProcessingAlgorithm
+from qgis.gui import QgisInterface
 
 DEBUG = False  # set this on True to not hide external-app errors
 
@@ -73,7 +70,7 @@ class EnMAPBoxApplication(QObject):
 
     def __init__(
             self,
-            enmapBox = Optional[EnMAPBox],  # make it optional to allow QGIS stand-alone apps like GEE TSE
+            enmapBox=Optional[EnMAPBox],  # make it optional to allow QGIS stand-alone apps like GEE TSE
             parent=None
     ):
         super(EnMAPBoxApplication, self).__init__(parent)

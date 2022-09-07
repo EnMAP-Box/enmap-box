@@ -39,6 +39,7 @@ APP_DIR = os.path.dirname(__file__)
 MIN_VERSION = '0.9'
 INSTALLED_VERSION = ''
 
+
 def vrtBuilderPluginInstalled() -> bool:
     """
     Returns True if the Virtual Raster Builder QGIS Plugin is installed
@@ -50,6 +51,7 @@ def vrtBuilderPluginInstalled() -> bool:
 
 if vrtBuilderPluginInstalled():
     import vrtbuilder
+
     if hasattr(vrtbuilder, '__version__'):
         INSTALLED_VERSION = vrtbuilder.__version__
     elif hasattr(vrtbuilder, 'VERSION'):
@@ -102,7 +104,7 @@ class VRTBuilderApp(EnMAPBoxApplication):
 
             if MIN_VERSION > INSTALLED_VERSION:
                 QMessageBox.information(None, 'Outdated Version',
-                                f'Please update the Virtual Raster Builder QGIS Plugin\nto version >= {MIN_VERSION}')
+                                        f'Please update the Virtual Raster Builder QGIS Plugin\nto version >= {MIN_VERSION}')
                 return None
             else:
                 from vrtbuilder.widgets import VRTBuilderWidget
@@ -117,11 +119,11 @@ class VRTBuilderApp(EnMAPBoxApplication):
                 w.sigRasterCreated.connect(self.enmapbox.addSource)
 
                 w.sigAboutCreateCurrentMapTools.connect(self.onSetWidgetMapTool)
-                if False:
-                    dstv: DataSourceTreeView = self.enmapbox.dataSourceTreeView()
-                    dstv.sigPopulateContextMenu.connect(lambda m, widget=w: self.onPopulateDataSourceContextMenu(m, w))
-                    dotv: DockTreeView = self.enmapbox.dockTreeView()
-                    dotv.sigPopulateContextMenu.connect(lambda m, widget=w: self.onPopulateDockTreeContextMenu(m, w))
+                # if False:
+                #    dstv: DataSourceTreeView = self.enmapbox.dataSourceTreeView()
+                #    dstv.sigPopulateContextMenu.connect(lambda m, widget=w: self.onPopulateDataSourceContextMenu(m, w))
+                #    dotv: DockTreeView = self.enmapbox.dockTreeView()
+                #    dotv.sigPopulateContextMenu.connect(lambda m, widget=w: self.onPopulateDockTreeContextMenu(m, w))
                 w.show()
                 return w
         else:
@@ -159,7 +161,7 @@ class VRTBuilderApp(EnMAPBoxApplication):
             a = m.addAction('Create in memory mosaic')
             a.triggered.connect(lambda *args, ww=w, i=inputs: self.openVRT(i, None, mosaic=True))
 
-    def openVRT(self, inputs, builder, mosaic: bool=False):
+    def openVRT(self, inputs, builder, mosaic: bool = False):
         from vrtbuilder.widgets import VRTBuilderWidget
         from vrtbuilder.virtualrasters import VRTRaster, VRTRasterBand, VRTRasterInputSourceBand
         source_bands: typing.List[VRTRasterInputSourceBand] = []
@@ -171,7 +173,7 @@ class VRTBuilderApp(EnMAPBoxApplication):
 
             elif isinstance(src, QgsRasterRenderer):
                 for b in src.usesBands():
-                    source_bands.append(VRTRasterInputSourceBand(src.source(), b-1))
+                    source_bands.append(VRTRasterInputSourceBand(src.source(), b - 1))
 
             elif isinstance(src, RasterBandTreeNode):
                 path = src.mDataSource.uri()

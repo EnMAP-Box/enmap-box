@@ -1,11 +1,10 @@
 from typing import List, Optional
 
+from qgis.PyQt.uic import loadUi
+
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QWidget, QLineEdit, QToolButton, QListWidget, QListWidgetItem, QDialog
-from PyQt5.uic import loadUi
 from qgis.core import QgsMapLayer, QgsProject, QgsCoordinateReferenceSystem, QgsRasterLayer, QgsVectorLayer
-from qgis.gui import QgsMapLayerComboBox
-
 from typeguard import typechecked
 
 
@@ -51,6 +50,7 @@ class MultipleMapLayerSelectionWidget(QWidget):
         self.mLayers = list(QgsProject.instance().mapLayers().values())
         self.updateInfo()
 
+
 @typechecked
 class MultipleMapLayerSelectionDialog(QDialog):
     mList: QListWidget
@@ -67,7 +67,7 @@ class MultipleMapLayerSelectionDialog(QDialog):
         loadUi(__file__.replace('widget.py', 'dialog.ui'), self)
         self.accepted = False
 
-        #self.mLayers = list()
+        # self.mLayers = list()
         layer: QgsMapLayer
         for layer in QgsProject.instance().mapLayers().values():
             if isinstance(layer, QgsRasterLayer) and not allowRaster:
@@ -82,7 +82,7 @@ class MultipleMapLayerSelectionDialog(QDialog):
             else:
                 item.setCheckState(Qt.Unchecked)
             self.mList.addItem(item)
-            #self.mLayers.append(layer)
+            # self.mLayers.append(layer)
 
         self.mOk.clicked.connect(self.onOkClicked)
         self.mCancel.clicked.connect(self.close)
@@ -133,41 +133,3 @@ class MultipleMapLayerSelectionDialog(QDialog):
             return w.currentLayers()
         else:
             return None
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

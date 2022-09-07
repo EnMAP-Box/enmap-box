@@ -20,10 +20,8 @@
 import pathlib
 import re
 
-from ..qgispluginsupport.qps.utils import loadUi, SpatialExtent, SpatialPoint, findParent, \
-    file_search, appendItemsToMenu, zipdir, loadUIFormClass
-
 from qgis.core import Qgis
+from ..qgispluginsupport.qps.utils import loadUi
 
 QGIS_DATATYPE_INFO = {
     Qgis.UnknownDataType: ('UnknownDataType', 'Unknown or unspecified type'),
