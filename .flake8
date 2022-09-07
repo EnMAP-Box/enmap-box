@@ -42,12 +42,8 @@ exclude =
     enmapbox/coreapps/geetimeseriesexplorerapp/standard_collections
 
     # uncomment those to hide Benjamins corr apps
-    enmapbox/coreapps/vrtbuilderapp
-    enmapbox/coreapps/metadataeditorapp
-    enmapbox/coreapps/imagecubeapp
-    enmapbox/coreapps/eotimeseriesviewerapp
-    enmapbox/coreapps/reclassifyapp
-
+    # enmapbox/coreapps/vrtbuilderapp enmapbox/coreapps/metadataeditorapp enmapbox/coreapps/imagecubeapp
+    # enmapbox/coreapps/eotimeseriesviewerapp enmapbox/coreapps/reclassifyapp
 
 
 per-file-ignores =
