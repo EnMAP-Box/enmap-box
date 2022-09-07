@@ -1,19 +1,19 @@
 from math import isnan
-from typing import Iterable, List, Union, Optional, Tuple, Dict
+from typing import Iterable, List, Union, Optional, Tuple
 
 import numpy as np
-from qgis.PyQt.QtCore import QSizeF, QDateTime
-from qgis.PyQt.QtGui import QColor
 from osgeo import gdal
-from qgis.core import (QgsRasterLayer, QgsRasterDataProvider, QgsCoordinateReferenceSystem, QgsRectangle,
-                        QgsRasterRange, QgsPoint, QgsRasterBlockFeedback, QgsRasterBlock, QgsPointXY,
-                        QgsProcessingFeedback, QgsProject, QgsRasterBandStats)
 
 from enmapboxprocessing.gridwalker import GridWalker
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.typing import (QgisDataType, RasterSource, Array3d, Metadata, MetadataValue,
                                        MetadataDomain)
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtCore import QSizeF, QDateTime
+from qgis.PyQt.QtGui import QColor
+from qgis.core import (QgsRasterLayer, QgsRasterDataProvider, QgsCoordinateReferenceSystem, QgsRectangle,
+                       QgsRasterRange, QgsPoint, QgsRasterBlockFeedback, QgsRasterBlock, QgsPointXY,
+                       QgsProcessingFeedback, QgsRasterBandStats)
 from typeguard import typechecked
 
 
@@ -374,7 +374,7 @@ class RasterReader(object):
         return metadata
 
     def metadata(self, bandNo: int = None) -> Metadata:
-        #domains = self._gdalObject(bandNo).GetMetadataDomainList()
+        # domains = self._gdalObject(bandNo).GetMetadataDomainList()
         domains = self.metadataDomainKeys(bandNo)
         return {domain: self.metadataDomain(domain, bandNo) for domain in domains}
 

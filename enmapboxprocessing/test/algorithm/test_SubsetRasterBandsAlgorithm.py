@@ -23,7 +23,6 @@ class TestSubsetRasterBandsAlgorithm(TestCase):
         self.assertEqual(np.sum(gold), np.sum(lead))
 
     def test_issue1349(self):
-
         filename = self.filename('rasterWithBadBands.tif')
         writer = Driver(filename).createFromArray(np.zeros((2, 10, 10)))
         writer.setBandName('a', 1)
@@ -43,7 +42,6 @@ class TestSubsetRasterBandsAlgorithm(TestCase):
         self.assertEqual(reader.bandName(1), 'b')
 
     def test_issue1349_2(self):
-
         alg = SubsetRasterBandsAlgorithm()
         parameters = {
             alg.P_RASTER: r'C:\Users\Andreas\Downloads\PRISMA_DESTRIPPED_AOI\PRISMA_DESTRIPPED_AOI.tif',

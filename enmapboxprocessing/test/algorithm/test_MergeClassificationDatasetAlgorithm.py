@@ -1,8 +1,9 @@
-from testdata import (classifier_pkl)
+from enmapboxprocessing.algorithm.mergeclassificationdatasetalgorithm import MergeClassificationDatasetsAlgorithm
+from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
-from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapboxprocessing.algorithm.mergeclassificationdatasetalgorithm import MergeClassificationDatasetsAlgorithm
+from testdata import (classifier_pkl)
+
 
 class TestMergeClassificationDatasetsAlgorithm(TestCase):
 

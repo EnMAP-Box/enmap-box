@@ -1,21 +1,19 @@
 import warnings
 from os.path import splitext
-from typing import Union, List
+from typing import List
 
 from osgeo import gdal
-from qgis.core import QgsRectangle, QgsCoordinateReferenceSystem, QgsProcessingFeedback, QgsRasterLayer
 
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import Array3d, QgisDataType, CreationOptions
-from typeguard import typechecked
-
 from enmapboxprocessing.utils import Utils
+from qgis.core import QgsRectangle, QgsCoordinateReferenceSystem, QgsProcessingFeedback
+from typeguard import typechecked
 
 
 @typechecked
 class Driver(object):
-
     VrtFormat = 'VRT'
     DefaultVrtCreationOptions = ''.split()
     GTiffFormat = 'GTiff'
@@ -59,7 +57,8 @@ class Driver(object):
 
         gdalDriver: gdal.Driver = gdal.GetDriverByName(self.format)
         try:
-            gdalDataset: gdal.Dataset = gdalDriver.Create(self.filename, width, height, nBands, gdalDataType, self.options)
+            gdalDataset: gdal.Dataset = gdalDriver.Create(self.filename, width, height, nBands, gdalDataType,
+                                                          self.options)
         except RuntimeError as error:
             warnings.warn(f'Unable to create file: {self.filename}')
             raise error

@@ -2,7 +2,6 @@ from math import ceil, isnan
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
 from scipy import interpolate
 from scipy.spatial import ConvexHull
 
@@ -10,6 +9,7 @@ from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
 from typeguard import typechecked
 
 

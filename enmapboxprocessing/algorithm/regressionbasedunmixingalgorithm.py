@@ -3,7 +3,6 @@ from os import makedirs
 from os.path import join, exists, dirname
 from typing import Dict, Any, List, Tuple
 
-from qgis.PyQt.QtGui import QColor
 from osgeo import gdal
 
 from enmapboxprocessing.algorithm.aggregaterasterbandsalgorithm import AggregateRasterBandsAlgorithm
@@ -18,6 +17,7 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtGui import QColor
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 from typeguard import typechecked
 
@@ -59,11 +59,11 @@ class RegressionBasedUnmixingAlgorithm(EnMAPProcessingAlgorithm):
             (self._BACKGROUND, 'Proportion of background mixtures.'),
             (self._INCLUDE_ENDMEMBER, 'Whether to include the original library spectra into the dataset.'),
             (self._MIXING_PROBABILITIES, 'A list of probabilities for using 2, 3, 4, ... endmember mixing models. '
-                                       'Trailing 0 probabilities can be skipped. The default values of 0.5, 0.5,'
-                                       'results in 50% 2-endmember and 50% 3-endmember models.'),
+                                         'Trailing 0 probabilities can be skipped. The default values of 0.5, 0.5,'
+                                         'results in 50% 2-endmember and 50% 3-endmember models.'),
             (self._ALLOW_WITHINCLASS_MIXTURES, 'Whether to allow mixtures with profiles belonging to the same class.'),
             (self._CLASS_PROBABILITIES, 'A list of probabilities for drawing profiles from each class. '
-                                      'If not specified, class probabilities are proportional to the class size.'),
+                                        'If not specified, class probabilities are proportional to the class size.'),
             (self._ENSEMBLE_SIZE, 'Number of individual runs/predictions.'),
             (self._ROBUST_FUSION, 'Whether to use median and IQR (interquartile range) aggregation for ensemble '
                                   'decicion fusion. The default is to use mean and standard deviation.'),

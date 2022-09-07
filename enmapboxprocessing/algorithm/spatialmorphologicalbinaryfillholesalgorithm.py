@@ -13,7 +13,7 @@ class SpatialMorphologicalBinaryFillHolesAlgorithm(SpatialFilterFunctionAlgorith
         return Group.Test.value + Group.ConvolutionMorphologyAndFiltering.value
 
     def shortDescription(self) -> str:
-        return f'Spatial morphological Binary Fill Holes filter.'
+        return 'Spatial morphological Binary Fill Holes filter.'
 
     def helpParameterCode(self) -> str:
         links = ', '.join([

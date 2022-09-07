@@ -2,15 +2,15 @@ from math import nan
 from os.path import normcase
 from typing import Dict, Optional
 
-from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QTableWidget, QComboBox, QCheckBox, \
-    QLineEdit, QAbstractSpinBox, QMessageBox
-from PyQt5.uic import loadUi
 from osgeo import gdal
 
 from enmapbox.qgispluginsupport.qps.speclib.io.envi import readENVIHeader
 from enmapboxprocessing.algorithm.editrastersourcebandpropertiesalgorithm import EditRasterSourceBandPropertiesAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QTableWidget, QComboBox, QCheckBox, \
+    QLineEdit, QAbstractSpinBox, QMessageBox
+from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer, QgsProject
 from qgis.gui import QgsFilterLineEdit, QgsDateTimeEdit, QgsCollapsibleGroupBox
 from typeguard import typechecked
@@ -208,7 +208,7 @@ class RasterSourceBandPropertiesEditorDialog(QMainWindow):
         # special ENVI file handling
         gdalDriver: gdal.Driver = reader.gdalDataset.GetDriver()
         if gdalDriver.ShortName == 'ENVI':
-            metadata = {k.lower():v for k, v in readENVIHeader(source).items()}
+            metadata = {k.lower(): v for k, v in readENVIHeader(source).items()}
 
             key = 'acquisition time'
             if key in metadata:
@@ -259,7 +259,6 @@ class RasterSourceBandPropertiesEditorDialog(QMainWindow):
             self.mEnviGroupBox.show()
         else:
             self.mEnviGroupBox.hide()
-
 
     def onCodeChanged(self):
         source = self.currentSource()
@@ -340,7 +339,7 @@ class RasterSourceBandPropertiesEditorDialog(QMainWindow):
         def tofloat(text: str, default: Optional[float]):
             try:
                 return float(text)
-            except:
+            except Exception:
                 return default
 
         reader = RasterReader(source)
@@ -403,7 +402,7 @@ class RasterSourceBandPropertiesEditorDialog(QMainWindow):
         self.onSourceChanged()
 
     def onSetAcquisitionTimeClicked(self):
-        dateTime  = Utils.parseDateTime(self.mAcquisitionTime.text())
+        dateTime = Utils.parseDateTime(self.mAcquisitionTime.text())
         for row in range(self.mTable.rowCount()):
             widget: QgsDateTimeEdit = self.mTable.cellWidget(row, 4)
             widget.setDateTime(dateTime)

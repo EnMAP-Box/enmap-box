@@ -28,8 +28,8 @@ class RegressorPerformanceAlgorithm(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._REGRESSOR, f'Regressor pickle file.'),
-            (self._DATASET, f'Test dataset pickle file used for assessing the regressor performance.'),
+            (self._REGRESSOR, 'Regressor pickle file.'),
+            (self._DATASET, 'Test dataset pickle file used for assessing the regressor performance.'),
             (self._NFOLD, 'The number of folds used for assessing cross-validation performance. '
                           'If not specified (default), simple test performance is assessed.'),
             (self._OPEN_REPORT, self.ReportOpen),

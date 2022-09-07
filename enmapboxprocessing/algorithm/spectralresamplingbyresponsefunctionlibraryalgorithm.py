@@ -2,17 +2,15 @@ import traceback
 from collections import OrderedDict
 from typing import Dict, Any, List, Tuple
 
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException,
-                        QgsProcessingParameterField)
-
 from enmapbox.qgispluginsupport.qps.speclib import FIELD_VALUES
-from enmapbox.qgispluginsupport.qps.speclib.core import profile_field_names, is_profile_field
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibrary
 from enmapboxprocessing.algorithm.spectralresamplingbyresponsefunctionconvolutionalgorithmbase import \
     RESPONSE_CUTOFF_VALUE, RESPONSE_CUTOFF_DIGITS
 from enmapboxprocessing.algorithm.spectralresamplingtocustomsensoralgorithm import \
     SpectralResamplingToCustomSensorAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException,
+                       QgsProcessingParameterField)
 from typeguard import typechecked
 
 

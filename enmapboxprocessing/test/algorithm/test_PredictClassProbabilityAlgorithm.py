@@ -1,11 +1,11 @@
 import numpy as np
 from sklearn.base import ClassifierMixin
 
+from enmapbox.exampledata import enmap, landcover_polygons
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 from enmapboxprocessing.algorithm.predictclassprobabilityalgorithm import PredictClassPropabilityAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapbox.exampledata import enmap, landcover_polygons
 from testdata import landcover_raster_30m_tif, classifier_pkl
 
 writeToDisk = True

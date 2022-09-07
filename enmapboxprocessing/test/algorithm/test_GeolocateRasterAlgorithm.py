@@ -1,10 +1,10 @@
 import numpy as np
-from qgis.core import QgsRasterLayer, QgsRectangle, QgsCoordinateReferenceSystem
 
+from enmapbox.exampledata import enmap
 from enmapboxprocessing.algorithm.geolocaterasteralgorithm import GeolocateRasterAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapbox.exampledata import enmap
+from qgis.core import QgsRasterLayer, QgsRectangle, QgsCoordinateReferenceSystem
 
 
 class TestTranslateAlgorithm(TestCase):

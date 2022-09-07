@@ -1,11 +1,10 @@
-from qgis.core import QgsProcessingException
-
 from enmapbox.exampledata import library_gpkg
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedlibraryalgorithm import \
     PrepareClassificationDatasetFromCategorizedLibraryAlgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
+from qgis.core import QgsProcessingException
 
 
 class TestPrepareClassificationDatasetFromCategorizedLibrary(TestCase):

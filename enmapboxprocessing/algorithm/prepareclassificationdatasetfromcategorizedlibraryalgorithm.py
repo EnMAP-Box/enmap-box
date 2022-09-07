@@ -1,14 +1,14 @@
-import traceback
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCategorizedSymbolRenderer,
-                        QgsProcessingParameterField, QgsProcessingException)
 
-from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibrary, FIELD_VALUES, SpectralLibraryUtils
+from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import FIELD_VALUES, \
+    SpectralLibraryUtils
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import checkSampleShape, ClassifierDump
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCategorizedSymbolRenderer,
+                       QgsProcessingParameterField, QgsProcessingException)
 from typeguard import typechecked
 
 

@@ -1,6 +1,5 @@
 from time import sleep
 
-from qgis.PyQt.QtCore import QDateTime
 from osgeo import gdal
 
 from enmapbox.exampledata import enmap
@@ -8,6 +7,7 @@ from enmapboxprocessing.algorithm.editrastersourcebandpropertiesalgorithm import
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
+from qgis.PyQt.QtCore import QDateTime
 
 
 class TestEditRasterSourceBandPropertiesAlgorithm(TestCase):
@@ -22,7 +22,6 @@ class TestEditRasterSourceBandPropertiesAlgorithm(TestCase):
             alg.P_OUTPUT_RASTER: self.filename('enmap1.tif')
         }
         self.runalg(alg, parameters)
-
 
         sleep(1)
         return parameters[alg.P_OUTPUT_RASTER]
@@ -135,9 +134,9 @@ class TestEditRasterSourceBandPropertiesAlgorithm(TestCase):
         self.assertListEqual([-1234] * 177, [reader.noDataValue(bandNo) for bandNo in reader.bandNumbers()])
 
     def test_offset(self):
-        #filename = self.copyEnmap()
+        # filename = self.copyEnmap()
         filename = self.filename('enmap_uncompressed.tif')
-        values = list(range(10000, 177+10000))
+        values = list(range(10000, 177 + 10000))
         alg = EditRasterSourceBandPropertiesAlgorithm()
         parameters = {
             alg.P_SOURCE: filename,
@@ -149,7 +148,7 @@ class TestEditRasterSourceBandPropertiesAlgorithm(TestCase):
 
     def test_scale(self):
         filename = self.copyEnmap()
-        #filename = self.filename('enmap_uncompressed.tif')
+        # filename = self.filename('enmap_uncompressed.tif')
         values = [1.2345] * 177
         alg = EditRasterSourceBandPropertiesAlgorithm()
         parameters = {
@@ -177,7 +176,7 @@ class TestEditRasterSourceBandPropertiesAlgorithm(TestCase):
 
         for i in range(1, 4):
             # reopen raster and check value
-            #ds.FlushCache()
+            # ds.FlushCache()
             del ds
             ds = gdal.Open(filename)
             rb = ds.GetRasterBand(i)

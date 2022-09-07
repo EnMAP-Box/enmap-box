@@ -13,7 +13,7 @@ class SpatialPercentileAlgorithm(SpatialFilterFunctionAlgorithmBase):
         return Group.Test.value + Group.ConvolutionMorphologyAndFiltering.value
 
     def shortDescription(self) -> str:
-        return f'Spatial Percentile filter.'
+        return 'Spatial Percentile filter.'
 
     def helpParameterCode(self) -> str:
         links = ', '.join([

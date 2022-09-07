@@ -56,4 +56,3 @@ class TestClassificationAlgorithm(TestCase):
             alg.P_OUTPUT_PROBABILITY: self.filename('probability.tif'),
         }
         self.runalg(alg, parameters)
-

@@ -7,7 +7,7 @@ qgsApp = start_app()
 initAll()
 
 enmapBox = EnMAPBox(None)
-#layer = QgsRasterLayer(r'C:\Users\Andreas\Downloads\enmap_vi.tif', 'enmap_vi.tif')
+# layer = QgsRasterLayer(r'C:\Users\Andreas\Downloads\enmap_vi.tif', 'enmap_vi.tif')
 layer = QgsRasterLayer(r'C:\Users\Andreas\Downloads\LMUvegetationApps\stack.vrt', 'stack.vrt')
 
 mapDock = enmapBox.onDataDropped([layer])

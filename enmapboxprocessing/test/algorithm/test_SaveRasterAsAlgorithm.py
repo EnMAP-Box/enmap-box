@@ -1,10 +1,10 @@
 import numpy as np
-from qgis.core import QgsRasterLayer
 
 from enmapbox.exampledata import enmap, hires
 from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
+from qgis.core import QgsRasterLayer
 
 
 class TestTranslateAlgorithm(TestCase):

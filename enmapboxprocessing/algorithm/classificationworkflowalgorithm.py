@@ -1,13 +1,12 @@
 from typing import Dict, Any, List, Tuple
 
-from typeguard import typechecked
-
 from enmapboxprocessing.algorithm.classifierperformancealgorithm import ClassifierPerformanceAlgorithm
 from enmapboxprocessing.algorithm.fitgenericclassifieralgorithm import FitGenericClassifierAlgorithm
 from enmapboxprocessing.algorithm.predictclassificationalgorithm import PredictClassificationAlgorithm
 from enmapboxprocessing.algorithm.predictclassprobabilityalgorithm import PredictClassPropabilityAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
+from typeguard import typechecked
 
 
 @typechecked
@@ -30,7 +29,7 @@ class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._DATASET, f'Training dataset pickle file used for fitting the classifier.'),
+            (self._DATASET, 'Training dataset pickle file used for fitting the classifier.'),
             (self._CLASSIFIER, 'Scikit-Learn Python code specifying a classifier.'),
             (self._RASTER, 'A raster layer with bands used as features.'),
             (self._NFOLD, 'The number of folds used for assessing cross-validation performance.'),

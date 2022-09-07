@@ -5,10 +5,8 @@ from xml.etree import ElementTree
 from osgeo import gdal
 
 from enmapboxprocessing.algorithm.importenmapl1balgorithm import ImportEnmapL1BAlgorithm
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
-
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 from typeguard import typechecked
 
 
@@ -45,10 +43,10 @@ class ImportEnmapL1CAlgorithm(EnMAPProcessingAlgorithm):
                basename(file).endswith('METADATA.XML') & \
                ('L1C' in basename(file))
 
-    def  defaultParameters(self, xmlFilename: str):
+    def defaultParameters(self, xmlFilename: str):
         return {
-                    self.P_FILE: xmlFilename,
-                    self.P_OUTPUT_RASTER: xmlFilename.replace('METADATA.XML', 'SPECTRAL_IMAGE.vrt'),
+            self.P_FILE: xmlFilename,
+            self.P_OUTPUT_RASTER: xmlFilename.replace('METADATA.XML', 'SPECTRAL_IMAGE.vrt'),
         }
 
     def processAlgorithm(

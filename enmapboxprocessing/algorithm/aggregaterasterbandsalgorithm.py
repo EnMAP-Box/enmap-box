@@ -3,13 +3,13 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 from osgeo import gdal
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
 
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.numpyutils import NumpyUtils
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
 from typeguard import typechecked
 
 
@@ -144,8 +144,6 @@ class AggregateRasterBandsAlgorithm(EnMAPProcessingAlgorithm):
 
                     # write result
                     writer.writeArray2d(outarray, bandNo, xOffset=block.xOffset, yOffset=block.yOffset)
-
-
 
             for bandNo, functionIndex in enumerate(functionIndices, 1):
                 bandName = self.O_FUNCTION[functionIndex]

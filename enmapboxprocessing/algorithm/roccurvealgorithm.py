@@ -183,7 +183,7 @@ class RocCurveAlgorithm(EnMAPProcessingAlgorithm):
         return result
 
     @classmethod
-    def writeReport(cls, filename: str, rocCurves: Dict[str, 'RocCurveResult'],  detCurves: Dict[str, 'DetCurveResult'],
+    def writeReport(cls, filename: str, rocCurves: Dict[str, 'RocCurveResult'], detCurves: Dict[str, 'DetCurveResult'],
                     categories: Categories):
 
         def smartRound(obj, ndigits):
@@ -228,7 +228,7 @@ class RocCurveAlgorithm(EnMAPProcessingAlgorithm):
             pyplot.plot([0, 1], [0, 1], 'k--')
             pyplot.legend(loc="lower right")
             fig.tight_layout()
-            filenameFig = filename + f'.roc_curves.png'
+            filenameFig = filename + '.roc_curves.png'
             fig.savefig(filenameFig, format='png')
             pyplot.close()
             report.writeImage(filenameFig)
@@ -243,11 +243,10 @@ class RocCurveAlgorithm(EnMAPProcessingAlgorithm):
             ax.set_ylabel('False Negative Rate')
             pyplot.legend(loc="upper right")
             fig.tight_layout()
-            filenameFig = filename + f'.det_curves.png'
+            filenameFig = filename + '.det_curves.png'
             fig.savefig(filenameFig, format='png')
             pyplot.close()
             report.writeImage(filenameFig)
-
 
 
 @typechecked

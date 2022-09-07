@@ -1,12 +1,11 @@
 from typing import Dict, Any, List, Tuple
 
-from processing.core.Processing import Processing
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer)
-
 from enmapboxprocessing.algorithm.creategridalgorithm import CreateGridAlgorithm
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.utils import Utils
+from processing.core.Processing import Processing
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer)
 from typeguard import typechecked
 
 

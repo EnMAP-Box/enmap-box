@@ -1,9 +1,7 @@
-from qgis.core import QgsRasterLayer, QgsProcessingContext, QgsCoordinateReferenceSystem
-
-import processing
 from enmapbox.exampledata import enmap
 from enmapboxprocessing.algorithm.creategridalgorithm import CreateGridAlgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
+from qgis.core import QgsRasterLayer
 
 
 class TestCreateGridAlgorithm(TestCase):

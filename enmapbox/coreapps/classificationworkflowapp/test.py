@@ -1,8 +1,7 @@
-from qgis.core import QgsProject, QgsVectorLayer, QgsRasterLayer
-
 from classificationworkflowapp.classificationworkflowgui import ClassificationWorkflowGui
 from enmapbox import EnMAPBox
 from enmapbox.testing import initQgisApplication
+from qgis.core import QgsProject, QgsVectorLayer, QgsRasterLayer
 
 if __name__ == '__main__':
 
@@ -27,12 +26,12 @@ if __name__ == '__main__':
     try:
         widget = ClassificationWorkflowGui(enmapBox.ui)
         widget.show()
-        #widget.mFileClassifierFitted.setFilePath(classifierDumpPkl)
-        #widget.mFileDataset.setFilePath(classifierDumpPkl)
-        #widget.onDatasetChanged()
+        # widget.mFileClassifierFitted.setFilePath(classifierDumpPkl)
+        # widget.mFileDataset.setFilePath(classifierDumpPkl)
+        # widget.onDatasetChanged()
         qgsApp.exec_()
         qgsApp.exitQgis()
-    except:
+    except Exception:
         import traceback
 
         traceback.print_exc()

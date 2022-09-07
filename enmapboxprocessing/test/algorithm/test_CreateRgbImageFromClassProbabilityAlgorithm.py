@@ -1,5 +1,4 @@
 import numpy as np
-from qgis.core import QgsProcessingException
 from sklearn.base import ClassifierMixin
 
 from enmapbox.exampledata import enmap
@@ -12,6 +11,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
+from qgis.core import QgsProcessingException
 from testdata import classifier_pkl
 
 

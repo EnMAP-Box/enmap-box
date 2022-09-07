@@ -2,7 +2,6 @@ import webbrowser
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsMapLayer)
 
 from enmapboxprocessing.algorithm.classificationperformancesimplealgorithm import \
     ClassificationPerformanceSimpleAlgorithm
@@ -10,6 +9,7 @@ from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsMapLayer)
 from typeguard import typechecked
 
 
@@ -29,8 +29,8 @@ class ClassifierPerformanceAlgorithm(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._CLASSIFIER, f'Classifier pickle file.'),
-            (self._DATASET, f'Test dataset pickle file used for assessing the classifier performance.'),
+            (self._CLASSIFIER, 'Classifier pickle file.'),
+            (self._DATASET, 'Test dataset pickle file used for assessing the classifier performance.'),
             (self._NFOLD, 'The number of folds used for assessing cross-validation performance. '
                           'If not specified (default), simple test performance is assessed.'),
             (self._OPEN_REPORT, self.ReportOpen),

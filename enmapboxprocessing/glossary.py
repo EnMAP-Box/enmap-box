@@ -1,6 +1,6 @@
+import re
 import warnings
 from os.path import join, abspath
-import re
 from typing import List
 
 filename = abspath(join(__file__, '../glossary.rst'))

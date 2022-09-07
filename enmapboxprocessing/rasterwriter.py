@@ -1,11 +1,11 @@
 from typing import List, Union, Optional
 
-from qgis.PyQt.QtCore import QDateTime
-from qgis.PyQt.QtGui import QColor
 from osgeo import gdal
 
 from enmapboxprocessing.typing import Array3d, Array2d, MetadataValue, MetadataDomain, Metadata, QgisDataType, Number
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtCore import QDateTime
+from qgis.PyQt.QtGui import QColor
 from typeguard import typechecked
 
 
@@ -46,7 +46,7 @@ class RasterWriter(object):
         else:
             self.gdalBand(bandNo).SetNoDataValue(noDataValue)
 
-    def deleteNoDataValue(self,bandNo: int = None):
+    def deleteNoDataValue(self, bandNo: int = None):
         if bandNo is None:
             for bandNo in range(1, self.bandCount() + 1):
                 self.deleteNoDataValue(bandNo)
@@ -61,7 +61,6 @@ class RasterWriter(object):
                 self.setOffset(offset, bandNo)
         else:
             self.gdalBand(bandNo).SetOffset(offset)
-
 
     def setScale(self, scale: float = None, bandNo: int = None):
         if scale is None:

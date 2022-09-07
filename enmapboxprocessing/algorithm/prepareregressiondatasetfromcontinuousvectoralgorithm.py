@@ -2,8 +2,6 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 from osgeo import gdal
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessingParameterField,
-                        QgsProcessingException)
 
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousrasteralgorithm import \
     PrepareRegressionDatasetFromContinuousRasterAlgorithm
@@ -14,6 +12,8 @@ from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import RegressorDump, \
     Target
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessingParameterField,
+                       QgsProcessingException)
 from typeguard import typechecked
 
 
@@ -34,8 +34,8 @@ class PrepareRegressionDatasetFromContinuousVectorAlgorithm(EnMAPProcessingAlgor
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
             (self._CONTINUOUS_VECTOR,
-             f'Continuous-valued vector layer specifying sample locations and target data y. '
-             f'If required, the layer is reprojected and rasterized internally to match the feature raster grid.'),
+             'Continuous-valued vector layer specifying sample locations and target data y. '
+             'If required, the layer is reprojected and rasterized internally to match the feature raster grid.'),
             (self._FEATURE_RASTER, 'Raster layer used for sampling feature data X.'),
             (self._TARGET_FIELDS, 'Fields used as target data y. '
                                   'If not selected, the fields defined by the renderer are used. '

@@ -1,13 +1,12 @@
-from os.path import splitext
 from typing import Dict, Any, List, Tuple
 
 from osgeo import gdal
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCoordinateReferenceSystem)
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCoordinateReferenceSystem)
 from typeguard import typechecked
 
 
@@ -121,7 +120,7 @@ class GeolocateRasterAlgorithm(EnMAPProcessingAlgorithm):
             ds = None
 
             # apply geolocations by warping
-            #ds = gdal.Warp(filename, zfilename, geoloc=True, dstSRS=crs.toWkt(), xRes=0.0001, yRes=0.0001)
+            # ds = gdal.Warp(filename, zfilename, geoloc=True, dstSRS=crs.toWkt(), xRes=0.0001, yRes=0.0001)
             if grid is None:
                 ds = gdal.Warp(filename, zfilename, geoloc=True, srcSRS=crs.toWkt(), dstSRS=crs.toWkt())
             else:

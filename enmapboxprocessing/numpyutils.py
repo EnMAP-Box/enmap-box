@@ -1,7 +1,9 @@
 from typing import List, Tuple
 
 import numpy as np
+
 from typeguard import typechecked
+
 
 @typechecked
 class NumpyUtils(object):

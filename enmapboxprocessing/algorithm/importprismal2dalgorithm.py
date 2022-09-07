@@ -5,12 +5,11 @@ import numpy as np
 from osgeo import gdal
 
 from enmapboxprocessing.algorithm.importprismal1algorithm import utilsReadAsArray, utilsDeleteCopy
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRectangle,
-                        QgsCoordinateReferenceSystem)
-
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterwriter import RasterWriter
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRectangle,
+                       QgsCoordinateReferenceSystem)
 from typeguard import typechecked
 
 
@@ -65,10 +64,10 @@ class ImportPrismaL2DAlgorithm(EnMAPProcessingAlgorithm):
                          'the EnMAP-Box map view area.'),
             (self._SPECTRAL_REGION, 'Spectral region to be imported.'),
             (self._BAD_BAND_THRESHOLD, 'If the proportion of erroneous pixels in the VNIR/SWIR Pixel Error Matrix,'
-                                        'exceeds the bad band threshold (a value between 0 and 1), '
-                                        'the band is marked as a bad band.\n'
-                                        'If specified, Output VNIR/SWIR Error Matrix raster layer needs to be '
-                                        'specified as well.'),
+                                       'exceeds the bad band threshold (a value between 0 and 1), '
+                                       'the band is marked as a bad band.\n'
+                                       'If specified, Output VNIR/SWIR Error Matrix raster layer needs to be '
+                                       'specified as well.'),
             (self._BAD_PIXEL_TYPE, 'Pixels concidered to be erroneous.'),
             (self._OUTPUT_SPECTRAL_CUBE, 'VNIR/SWIR Cube GTiff raster file destination. '
                                          'The surface spectral reflectance Coregistersed Hyperspectral Cube '

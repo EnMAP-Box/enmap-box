@@ -95,4 +95,3 @@ class TestImportPrismaL2DAlgorithm(TestCase):
         reader = RasterReader(result[alg.P_OUTPUT_SPECTRAL_CUBE])
         driver: gdal.Driver = reader.gdalDataset.GetDriver()
         self.assertEqual('ENVI', driver.ShortName)
-

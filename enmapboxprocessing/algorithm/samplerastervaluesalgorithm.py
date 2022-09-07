@@ -1,12 +1,6 @@
 from typing import Dict, Any, List, Tuple
 
 import processing
-from qgis.PyQt.QtCore import QVariant
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsRasterLayer,
-                        QgsFeature, QgsField, QgsProcessingFeatureSourceDefinition, QgsApplication,
-                        QgsVectorDataProvider, QgsRasterDataProvider, QgsPoint)
-from qgis.core.additions.edit import edit
-
 from enmapboxprocessing.algorithm.creategridalgorithm import CreateGridAlgorithm
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.driver import Driver
@@ -14,6 +8,11 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group, A
 from enmapboxprocessing.processingfeedback import ProcessingFeedback
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtCore import QVariant
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsRasterLayer,
+                       QgsFeature, QgsField, QgsProcessingFeatureSourceDefinition, QgsApplication,
+                       QgsVectorDataProvider, QgsRasterDataProvider, QgsPoint)
+from qgis.core.additions.edit import edit
 from typeguard import typechecked
 
 

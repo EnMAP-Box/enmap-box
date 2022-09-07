@@ -27,7 +27,7 @@ class RandomSamplesFromClassificationDatasetAlgorithm(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._DATASET, f'Classification dataset pickle file with feature data X and target data y to draw from.'),
+            (self._DATASET, 'Classification dataset pickle file with feature data X and target data y to draw from.'),
             (self._N,
              'Number of samples to draw from each category. '
              'Set a single value N to draw N samples for each category. '

@@ -7,7 +7,6 @@ from qgis.gui import QgsMessageBar
 from typeguard import typechecked
 
 
-
 @typechecked
 class QueryAvailableImagesTask(QgsTask):
     """Query available images at location."""

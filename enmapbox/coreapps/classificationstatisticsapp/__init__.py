@@ -1,8 +1,7 @@
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QAction
-
 from classificationstatisticsapp.classificationstatisticsdialog import ClassificationStatisticsDialog
 from enmapbox.gui.applications import EnMAPBoxApplication
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QMenu, QAction
 from typeguard import typechecked
 
 
@@ -29,7 +28,7 @@ class ClassificationStatisticsApp(EnMAPBoxApplication):
 
     def menu(self, appMenu: QMenu):
         appMenu: QMenu = self.enmapbox.menu('Tools')
-        a = self.utilsAddActionInAlphanumericOrder(appMenu,'Classification Statistics')
+        a = self.utilsAddActionInAlphanumericOrder(appMenu, 'Classification Statistics')
         assert isinstance(a, QAction)
         a.setIcon(self.icon())
         a.triggered.connect(self.startGUI)

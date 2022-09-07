@@ -2,15 +2,14 @@ from math import ceil
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from osgeo import gdal
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsPalettedRasterRenderer,
-                        QgsMapLayer)
 
 from enmapboxprocessing.algorithm.translatecategorizedrasteralgorithm import TranslateCategorizedRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import SampleX, SampleY, Categories, checkSampleShape, ClassifierDump
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsPalettedRasterRenderer,
+                       QgsMapLayer)
 from typeguard import typechecked
 
 
@@ -38,8 +37,8 @@ class PrepareClassificationDatasetFromCategorizedRasterAlgorithm(EnMAPProcessing
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
             (self._CATEGORIZED_RASTER,
-             f'Categorized raster layer specifying sample locations and target data y. '
-             f'If required, the layer is reprojected and resampled internally to match the feature raster grid.\n'),
+             'Categorized raster layer specifying sample locations and target data y. '
+             'If required, the layer is reprojected and resampled internally to match the feature raster grid.\n'),
             (self._FEATURE_RASTER, 'Raster layer used for sampling feature data X.'),
             (self._CATEGORY_BAND, 'Band with class values. '
                                   'If not selected, the band defined by the renderer is used. '

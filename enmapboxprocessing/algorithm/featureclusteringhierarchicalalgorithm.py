@@ -4,13 +4,13 @@ from os.path import basename
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 from scipy.cluster import hierarchy
 from scipy.stats import spearmanr
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.reportwriter import MultiReportWriter, HtmlReportWriter, CsvReportWriter
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 from typeguard import typechecked
 
 
@@ -169,12 +169,12 @@ class FeatureClusteringHierarchicalAlgorithm(EnMAPProcessingAlgorithm):
                 figsizeY = len(features) * 0.15 + 1
                 fig, ax = plt.subplots(figsize=(figsizeX, figsizeY))
                 plt.title('Inter-cluster correlation distribution')
-                plt.xlabel(f'squared Spearman rank-order correlation')
-                plt.ylabel(f'number of clusters')
+                plt.xlabel('squared Spearman rank-order correlation')
+                plt.ylabel('number of clusters')
                 ax.boxplot(inter_cluster_correlation,
-                    vert=False, sym='',
-                    labels=[f'n={i + 1}' for i in range(len(features) - 1)],
-                )
+                           vert=False, sym='',
+                           labels=[f'n={i + 1}' for i in range(len(features) - 1)],
+                           )
                 fig.tight_layout()
                 filenameFig3 = filename + '.fig3.svg'
                 fig.savefig(filenameFig3, format='svg')
@@ -188,12 +188,12 @@ class FeatureClusteringHierarchicalAlgorithm(EnMAPProcessingAlgorithm):
                 figsizeY = len(features) * 0.15 + 1
                 fig, ax = plt.subplots(figsize=(figsizeX, figsizeY))
                 plt.title('Intra-cluster correlation distribution')
-                plt.xlabel(f'squared Spearman rank-order correlation')
-                plt.ylabel(f'number of clusters')
+                plt.xlabel('squared Spearman rank-order correlation')
+                plt.ylabel('number of clusters')
                 ax.boxplot(intra_cluster_correlation,
-                    vert=False, sym='',
-                    labels=[f'n={i + 1}' for i in range(len(features) - 1)],
-                )
+                           vert=False, sym='',
+                           labels=[f'n={i + 1}' for i in range(len(features) - 1)],
+                           )
                 fig.tight_layout()
                 filenameFig4 = filename + '.fig4.svg'
                 fig.savefig(filenameFig4, format='svg')
@@ -224,7 +224,7 @@ class FeatureClusteringHierarchicalAlgorithm(EnMAPProcessingAlgorithm):
                 rowHeaders[0] = 'n=1'
                 report.writeTable(
                     values,
-                    f'Selected features (zero-based indices)',
+                    'Selected features (zero-based indices)',
                     None,
                     rowHeaders,
                 )

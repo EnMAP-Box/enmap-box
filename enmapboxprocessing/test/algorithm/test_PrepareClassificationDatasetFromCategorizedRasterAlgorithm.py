@@ -1,12 +1,11 @@
-from qgis.core import QgsRasterLayer
-
 from enmapbox.exampledata import enmap
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedrasteralgorithm import \
     PrepareClassificationDatasetFromCategorizedRasterAlgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
-from testdata import landcover_raster_30m
+from enmapboxtestdata import landcover_raster_30m
+from qgis.core import QgsRasterLayer
 
 
 class TestPrepareClassificationSampleFromCategorizedRaster(TestCase):
@@ -15,7 +14,7 @@ class TestPrepareClassificationSampleFromCategorizedRaster(TestCase):
         alg = PrepareClassificationDatasetFromCategorizedRasterAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
-            alg.P_CATEGORIZED_RASTER: landcover_raster_30m_tif,
+            alg.P_CATEGORIZED_RASTER: landcover_raster_30m,
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
         }
         self.runalg(alg, parameters)
@@ -33,7 +32,7 @@ class TestPrepareClassificationSampleFromCategorizedRaster(TestCase):
         alg = PrepareClassificationDatasetFromCategorizedRasterAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
-            alg.P_CATEGORIZED_RASTER: landcover_raster_30m_tif,
+            alg.P_CATEGORIZED_RASTER: landcover_raster_30m,
             alg.P_CATEGORY_BAND: 0,
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
         }

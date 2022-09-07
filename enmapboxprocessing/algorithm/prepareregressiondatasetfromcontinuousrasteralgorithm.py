@@ -2,7 +2,6 @@ from math import ceil
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer)
 
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
@@ -10,6 +9,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import SampleX, SampleY, checkSampleShape, RegressorDump, \
     Target
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer)
 from typeguard import typechecked
 
 
@@ -30,8 +30,8 @@ class PrepareRegressionDatasetFromContinuousRasterAlgorithm(EnMAPProcessingAlgor
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
             (self._CONTINUOUS_RASTER,
-             f'Continuous-valued raster layer specifying sample locations and target data Y.'
-             f'If required, the layer is reprojected and resampled internally to match the feature raster grid.\n'),
+             'Continuous-valued raster layer specifying sample locations and target data Y.'
+             'If required, the layer is reprojected and resampled internally to match the feature raster grid.\n'),
             (self._FEATURE_RASTER, 'Raster layer used for sampling feature data X.'),
             (self._TARGETS, 'Bands with continuous-valued variables used as targets. '
                             'An empty selection defaults to all bands in native order.'),

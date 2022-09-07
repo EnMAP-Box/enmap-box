@@ -1,11 +1,11 @@
 from os.path import basename, join, dirname
 
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QWidget, QToolButton, QMenu
-from PyQt5.uic import loadUi
+from qgis.PyQt.uic import loadUi
 
 from enmapbox import EnMAPBox
 from processing.gui.wrappers import WidgetWrapper
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QWidget, QToolButton, QMenu
 from qgis.gui import QgsFileWidget
 
 

@@ -1,5 +1,5 @@
-from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.algorithm.classifierperformancealgorithm import ClassifierPerformanceAlgorithm
+from enmapboxprocessing.test.algorithm.testcase import TestCase
 from testdata import (classifier_pkl)
 
 

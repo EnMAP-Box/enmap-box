@@ -1,11 +1,12 @@
+from classificationworkflowapp.classificationworkflowgui import ClassificationWorkflowGui
+from enmapbox.gui.applications import EnMAPBoxApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu, QAction
 
-from classificationworkflowapp.classificationworkflowgui import ClassificationWorkflowGui
-from enmapbox.gui.applications import EnMAPBoxApplication
 
 def enmapboxApplicationFactory(enmapBox):
     return [ClassificationWorkflowApp(enmapBox)]
+
 
 class ClassificationWorkflowApp(EnMAPBoxApplication):
     def __init__(self, enmapBox, parent=None):
@@ -32,4 +33,3 @@ class ClassificationWorkflowApp(EnMAPBoxApplication):
     def startGUI(self, *args):
         w = ClassificationWorkflowGui(parent=self.enmapbox.ui)
         w.show()
-

@@ -1,7 +1,6 @@
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer)
 
 import processing
 from enmapboxprocessing.algorithm.creategridalgorithm import CreateGridAlgorithm
@@ -11,6 +10,7 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.numpyutils import NumpyUtils
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer)
 from typeguard import typechecked
 
 

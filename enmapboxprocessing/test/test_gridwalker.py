@@ -1,9 +1,7 @@
-from qgis.PyQt.QtCore import QSizeF, QSize
-from qgis.core import QgsRectangle
-
-from enmapboxprocessing.extentwalker import ExtentWalker
 from enmapboxprocessing.gridwalker import GridWalker
 from enmapboxprocessing.test.testcase import TestCase
+from qgis.PyQt.QtCore import QSize
+from qgis.core import QgsRectangle
 
 
 class TestExtentWalker(TestCase):

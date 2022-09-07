@@ -1,11 +1,10 @@
-from testdata import points_in_no_data_region_gpkg
-
 from enmapbox.exampledata import enmap, landcover_polygons, landcover_points
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedvectoralgorithm import \
     PrepareClassificationDatasetFromCategorizedVectorAlgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
+from testdata import points_in_no_data_region_gpkg
 
 
 class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
@@ -95,7 +94,6 @@ class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
         self.assertEqual((1, 1), dump.y.shape)
 
     def test_issue1323(self):
-
         if not self.additionalDataFolderExists():
             return
 

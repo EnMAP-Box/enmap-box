@@ -1,9 +1,9 @@
 import numpy as np
-from qgis.core import QgsRasterLayer, QgsVectorLayer
 
 from enmapboxprocessing.algorithm.randompointsfromcategorizedrasteralgorithm import \
     RandomPointsFromCategorizedRasterAlgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
+from qgis.core import QgsRasterLayer, QgsVectorLayer
 from testdata import landcover_map_l3
 
 

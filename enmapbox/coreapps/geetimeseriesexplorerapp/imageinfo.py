@@ -1,11 +1,9 @@
 from typing import Dict, List, Union, Tuple
 
-import numpy as np
-from qgis.PyQt.QtGui import QColor
-
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp.externals.ee_plugin.provider import BAND_TYPES
+from qgis.PyQt.QtGui import QColor
 from typeguard import typechecked
 
 
@@ -22,7 +20,8 @@ class ImageInfo():
         self.epsgs = [band['crs'] for band in self.info['bands']]
         self.bandNames = [band['id'] for band in self.info['bands']]
         self.bandCount = len(self.bandNames)
-        self.dataTypeRanges = [(band['data_type'].get('min', 0), band['data_type'].get('max', 0)) for band in self.info['bands']]
+        self.dataTypeRanges = [(band['data_type'].get('min', 0), band['data_type'].get('max', 0)) for band in
+                               self.info['bands']]
         self.qgisDataTypes = [BAND_TYPES[band['data_type']['precision']] for band in self.info['bands']]
         self.numpyDataTypes = [Utils.qgisDataTypeToNumpyDataType(dt) for dt in self.qgisDataTypes]
         self.gdalDataTypes = [Utils.qgisDataTypeToGdalDataType(dt) for dt in self.qgisDataTypes]

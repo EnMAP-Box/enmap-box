@@ -1,18 +1,14 @@
-from math import ceil
 from typing import Dict, Any, List, Tuple
-
-import numpy as np
-from osgeo import gdal
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessingParameterField,
-                        QgsCategorizedSymbolRenderer, QgsProcessingException)
 
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedrasteralgorithm import \
     PrepareClassificationDatasetFromCategorizedRasterAlgorithm
 from enmapboxprocessing.algorithm.rasterizecategorizedvectoralgorithm import RasterizeCategorizedVectorAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxprocessing.typing import SampleX, SampleY, Categories, checkSampleShape, ClassifierDump
+from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessingParameterField,
+                       QgsCategorizedSymbolRenderer, QgsProcessingException)
 from typeguard import typechecked
 
 
@@ -42,8 +38,8 @@ class PrepareClassificationDatasetFromCategorizedVectorAlgorithm(EnMAPProcessing
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
             (self._CATEGORIZED_VECTOR,
-             f'Categorized vector layer specifying sample locations and target data y. '
-             f'If required, the layer is reprojected and rasterized internally to match the feature raster grid.'),
+             'Categorized vector layer specifying sample locations and target data y. '
+             'If required, the layer is reprojected and rasterized internally to match the feature raster grid.'),
             (self._FEATURE_RASTER, 'Raster layer used for sampling feature data X.'),
             (self._CATEGORY_FIELD, 'Field with class values used as target data y. '
                                    'If not selected, the field defined by the renderer is used. '

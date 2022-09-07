@@ -20,7 +20,9 @@
 """
 
 import os
+
 APP_DIR = os.path.dirname(__file__)
+
 
 def enmapboxApplicationFactory(enmapBox):
     """
@@ -31,5 +33,5 @@ def enmapboxApplicationFactory(enmapBox):
     s = ""
 
     from reclassifyapp.reclassify import ReclassifyTool
-    #returns a list of EnMAPBoxApplications
+    # returns a list of EnMAPBoxApplications
     return []  # ReclassifyTool(enmapBox)]  deactivated for now; see #15

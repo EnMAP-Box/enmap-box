@@ -6,14 +6,14 @@ from warnings import warn
 
 import numpy as np
 from osgeo import gdal
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsVectorFileWriter)
 
-from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibrary, SpectralLibraryUtils
+from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibrary
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import SpectralProfile
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import Array3d, Number
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 from typeguard import typechecked
 
 RESPONSE_CUTOFF_VALUE = 0.001
@@ -102,10 +102,10 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
                         weights.append(fx)
                         xs.append(x)
                     weights = np.divide(weights, np.max(weights))  # scale to 0-1 range
-    #                responses2[f'Band {i + 1} ({k} Nanometers)'] = [(x, round(w, RESPONSE_CUTOFF_DIGITS)) for x, w in
-    #                                                                zip(xs, weights)]
+                    #                responses2[f'Band {i + 1} ({k} Nanometers)'] = [(x, round(w, RESPONSE_CUTOFF_DIGITS)) for x, w in
+                    #                                                                zip(xs, weights)]
                     responses2[f'band {i + 1}'] = [(x, round(w, RESPONSE_CUTOFF_DIGITS)) for x, w in
-                                                                zip(xs, weights)]
+                                                   zip(xs, weights)]
 
                 else:
                     responses2[k] = v

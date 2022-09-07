@@ -1,13 +1,12 @@
 from typing import Dict, Any, List, Tuple
 
-from qgis.PyQt.QtCore import QVariant
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsProcessingParameterField, Qgis,
-                        QgsVectorFileWriter,
-                        QgsProject, QgsCoordinateTransform, QgsField)
-
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtCore import QVariant
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsProcessingParameterField,
+                       QgsVectorFileWriter,
+                       QgsProject, QgsCoordinateTransform, QgsField)
 from typeguard import typechecked
 
 

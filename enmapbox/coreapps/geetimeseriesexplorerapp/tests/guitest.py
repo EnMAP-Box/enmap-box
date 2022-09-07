@@ -1,16 +1,11 @@
-from tempfile import gettempdir
-
-from qgis.core import QgsVectorLayer
-
+import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.examples
 from enmapbox import EnMAPBox, initAll
 from enmapbox.testing import start_app
 from geetimeseriesexplorerapp import GeeTimeseriesExplorerApp
-
-
-import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.examples
-enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.examples.run()
-exit(0)
+from qgis.core import QgsVectorLayer
 from tests.testdata import landcover_berlin_point_singlepart_3035_gpkg
+
+enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.examples.run()
 
 qgsApp = start_app()
 initAll()
@@ -29,13 +24,12 @@ app.mainDock.mLANDSAT_LC08_C02_T1_L2.clicked.emit()
 app.profileDock.mLayer.setLayer(locations)
 app.profileDock.mDownloadFolder.setFilePath(r'C:\Users\Andreas\Downloads\Profiles')
 
-#app.mainDock.mCOPERNICUS_S1_GRD.clicked.emit()
+# app.mainDock.mCOPERNICUS_S1_GRD.clicked.emit()
 
-#app.dockWidget.mCompositeDateStart.setDate(QDate(2020, 8, 1))
-#app.dockWidget.mCompositeDateEnd.setDate(QDate(2020, 8, 2))
-#app.dockWidget.mCreateComposite.clicked.emit()
+# app.dockWidget.mCompositeDateStart.setDate(QDate(2020, 8, 1))
+# app.dockWidget.mCompositeDateEnd.setDate(QDate(2020, 8, 2))
+# app.dockWidget.mCreateComposite.clicked.emit()
 qgsApp.exec_()
-
 
 # use this code for the QGIS version!!!
 """class EventFilter(QObject):
@@ -52,7 +46,6 @@ qgsApp.exec_()
 eventFilter = EventFilter()
 iface.mapCanvas().installEventFilter(eventFilter)"""
 
-
 # TASKS
 """"
 # class Task(QgsTask):
@@ -60,7 +53,6 @@ iface.mapCanvas().installEventFilter(eventFilter)"""
     def run(self):
         from time import sleep
         sleep(3)
-      
         return True
 
 tasks = [Task() for i in range(1000)]

@@ -1,11 +1,6 @@
 from typing import Dict, Any, List, Tuple
 
-from qgis.PyQt.QtCore import QVariant
 from osgeo import gdal
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsRectangle,
-                        QgsCoordinateReferenceSystem, QgsVectorFileWriter,
-                        QgsProject, QgsField, QgsCoordinateTransform, QgsRasterLayer, QgsProcessingException,
-                        QgsMapLayer)
 
 import processing
 from enmapboxprocessing.algorithm.creategridalgorithm import CreateGridAlgorithm
@@ -16,6 +11,11 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import HexColor, Category
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtCore import QVariant
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsRectangle,
+                       QgsCoordinateReferenceSystem, QgsVectorFileWriter,
+                       QgsProject, QgsField, QgsCoordinateTransform, QgsRasterLayer, QgsProcessingException,
+                       QgsMapLayer)
 from qgis.core import edit
 from typeguard import typechecked
 

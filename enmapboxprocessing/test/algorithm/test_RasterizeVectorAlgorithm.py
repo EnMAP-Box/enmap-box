@@ -1,9 +1,8 @@
-from qgis.core import Qgis
-
 from enmapbox.exampledata import enmap, landcover_polygons
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
+from qgis.core import Qgis
 from testdata import landcover_berlin_polygon_3classes_EPSG4326_gpkg
 
 

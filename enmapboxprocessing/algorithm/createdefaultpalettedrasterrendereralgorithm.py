@@ -1,17 +1,9 @@
 from typing import Dict, Any, List, Tuple
 
-import numpy as np
-from osgeo import gdal
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessing,
-                        QgsProcessingException, QgsPalettedRasterRenderer, QgsProcessingParameterColor,
-                        QgsProcessingParameterLimitedDataTypes, QgsMapLayer)
-
-from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
-from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsMapLayer)
 from typeguard import typechecked
 
 
@@ -57,7 +49,7 @@ class CreateDefaultPalettedRasterRendererAlgorithm(EnMAPProcessingAlgorithm):
 
             try:
                 categories = [Category(*category) for category in categories]
-            except:
+            except Exception:
                 message = 'Unable to parse categories.'
                 feedback.reportError(message, fatalError=True)
                 raise QgsProcessingException(message)

@@ -13,7 +13,7 @@ class SpatialGenericAlgorithm(SpatialFilterFunctionAlgorithmBase):
         return Group.Test.value + Group.ConvolutionMorphologyAndFiltering.value
 
     def shortDescription(self) -> str:
-        return f'Spatial generic (user-defined) filter.'
+        return 'Spatial generic (user-defined) filter.'
 
     def helpParameterCode(self) -> str:
         links = ', '.join([

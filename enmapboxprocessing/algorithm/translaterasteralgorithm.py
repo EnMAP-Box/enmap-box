@@ -3,14 +3,14 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 from osgeo import gdal
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRectangle, QgsRasterLayer,
-                        QgsRasterDataProvider, QgsPoint, QgsPointXY, QgsMapLayer)
 
 from enmapboxprocessing.algorithm.writeenviheaderalgorithm import WriteEnviHeaderAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRectangle, QgsRasterLayer,
+                       QgsRasterDataProvider, QgsPoint, QgsPointXY, QgsMapLayer)
 from typeguard import typechecked
 
 
@@ -252,7 +252,7 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                 rasterSource = Utils.tmpFilename(filename, 'workingRaster.tif')
                 gdal.Translate(
                     rasterSource, raster.source(),
-                    options = gdal.TranslateOptions(outputType=Utils.qgisDataTypeToGdalDataType(workingDataType))
+                    options=gdal.TranslateOptions(outputType=Utils.qgisDataTypeToGdalDataType(workingDataType))
                 )
 
             gdalDataset = gdal.Open(rasterSource)
@@ -261,9 +261,7 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
             callback = Utils.qgisFeedbackToGdalCallback(feedback)
             resampleAlgSupportedByGdalTranslate = resampleAlg not in [gdal.GRA_Min, gdal.GRA_Q1, gdal.GRA_Med,
                                                                       gdal.GRA_Q3, gdal.GRA_Max]
-            useGdalTranslate = raster.crs() == crs and \
-                               resampleAlgSupportedByGdalTranslate and \
-                               dstNoDataValue is None
+            useGdalTranslate = raster.crs() == crs and resampleAlgSupportedByGdalTranslate and dstNoDataValue is None
             if useGdalTranslate:
                 feedback.pushInfo('Translate raster' + infoTail)
 

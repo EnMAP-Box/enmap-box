@@ -1,7 +1,7 @@
 import shutil
 import traceback
 from os.path import basename, exists
-from typing import Dict, Any, List, Tuple, Optional
+from typing import Dict, Any, List, Tuple
 
 import numpy as np
 from osgeo import gdal
@@ -368,12 +368,12 @@ class ImportPrismaL1Algorithm(EnMAPProcessingAlgorithm):
 
         reader = RasterReader(filenameLandCoverMask)
         categories = [
-            Category(0, 'water', '#0064ff'), Category(1, 'snow', '#fffafa')
-            , Category(2, 'not-vegetated land pixel / bare soil', '#a87000')
-            , Category(3, 'crop and rangeland', '#98e600')
-            , Category(4, 'forst ', '#267300')
-            , Category(5, 'wetland', '#41cdc5')
-            , Category(6, 'not-vegetated land pixel / urban component', '#e60000'),
+            Category(0, 'water', '#0064ff'), Category(1, 'snow', '#fffafa'),
+            Category(2, 'not-vegetated land pixel / bare soil', '#a87000'),
+            Category(3, 'crop and rangeland', '#98e600'),
+            Category(4, 'forst ', '#267300'),
+            Category(5, 'wetland', '#41cdc5'),
+            Category(6, 'not-vegetated land pixel / urban component', '#e60000'),
             Category(10, 'not of all previous classification', '#ffff00'),
             Category(255, 'error', '#ff1dce'),
         ]
@@ -417,7 +417,7 @@ def utilsReadAsArray(dataset: gdal.Dataset, filename, key: str, feedback: QgsPro
         feedback.pushInfo(f'Reading data with h5py (v{h5py.__version__}) API: {key}')
         with h5py.File(filename2, 'r') as file:
             array = file[key][()]
-    except:
+    except Exception:
         traceback.print_exc()
         feedback.pushWarning(
             'Reading data with h5py API failed. Fall back to GDAL API, which is very slow on PRISMA BIP '
@@ -435,6 +435,6 @@ def utilsDeleteCopy(filename):
         filename2 = filename + '.copy.he5'
         if exists(filename2):
             os.remove(filename2)
-    except:
+    except Exception:
         traceback.print_exc()
         pass

@@ -2,11 +2,10 @@ import inspect
 import traceback
 from typing import Dict, Any, List, Tuple
 
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback
-
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback
 from typeguard import typechecked
 
 
@@ -18,8 +17,8 @@ class FitClassifierAlgorithmBase(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._DATASET, f'Training dataset pickle file used for fitting the classifier. '
-                            f'If not specified, an unfitted classifier is created.'),
+            (self._DATASET, 'Training dataset pickle file used for fitting the classifier. '
+                            'If not specified, an unfitted classifier is created.'),
             (self._CLASSIFIER, self.helpParameterCode()),
             (self._OUTPUT_CLASSIFIER, self.PickleFileDestination)
         ]
@@ -65,7 +64,7 @@ class FitClassifierAlgorithmBase(EnMAPProcessingAlgorithm):
         # check code
         try:
             self.parameterAsClassifier(parameters, self.P_CLASSIFIER, context)
-        except:
+        except Exception:
             return False, traceback.format_exc()
         return True, ''
 

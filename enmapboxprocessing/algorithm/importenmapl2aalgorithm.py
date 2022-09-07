@@ -5,9 +5,8 @@ from xml.etree import ElementTree
 from osgeo import gdal
 
 from enmapboxprocessing.algorithm.importenmapl1balgorithm import ImportEnmapL1BAlgorithm
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
-
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 from typeguard import typechecked
 
 

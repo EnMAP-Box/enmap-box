@@ -1,5 +1,4 @@
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
-from qgis.core import QgsProcessingAlgorithm
 from typeguard import typechecked
 
 

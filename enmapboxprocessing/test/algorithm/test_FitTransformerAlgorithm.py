@@ -1,8 +1,6 @@
 from sklearn.base import TransformerMixin
 
-from qgis.core import QgsProcessingException
 from enmapbox.exampledata import enmap
-from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.algorithm.fitfactoranalysisalgorithm import FitFactorAnalysisAlgorithm
 from enmapboxprocessing.algorithm.fitfasticaalgorithm import FitFastIcaAlgorithm
 from enmapboxprocessing.algorithm.fitfeatureagglomerationalgorithm import FitFeatureAgglomerationAlgorithm
@@ -15,9 +13,10 @@ from enmapboxprocessing.algorithm.fitquantiletransformeralgorithm import FitQuan
 from enmapboxprocessing.algorithm.fitrobustscaleralgorithm import FitRobustScalerAlgorithm
 from enmapboxprocessing.algorithm.fitstandardscaleralgorithm import FitStandardScalerAlgorithm
 from enmapboxprocessing.algorithm.fittransformeralgorithmbase import FitTransformerAlgorithmBase
-
+from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
+from qgis.core import QgsProcessingException
 from testdata import classifier_pkl
 
 

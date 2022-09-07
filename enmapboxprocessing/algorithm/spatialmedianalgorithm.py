@@ -13,7 +13,7 @@ class SpatialMedianAlgorithm(SpatialFilterFunctionAlgorithmBase):
         return Group.Test.value + Group.ConvolutionMorphologyAndFiltering.value
 
     def shortDescription(self) -> str:
-        return f'Spatial Median filter.'
+        return 'Spatial Median filter.'
 
     def helpParameterCode(self) -> str:
         links = ', '.join([

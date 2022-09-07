@@ -1,9 +1,8 @@
 from typing import Dict, Any, List, Tuple
 
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback, Qgis
-
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, Qgis
 from typeguard import typechecked
 
 
@@ -29,10 +28,10 @@ class CreateGridAlgorithm(EnMAPProcessingAlgorithm):
             (self._CRS, 'Destination coordinate reference system.'),
             (self._EXTENT, 'Destination extent.'),
             (self._UNIT, 'Units to use when defining target raster size/resolution.'),
-            (self._WIDTH, f'Target width if size units is "Pixels", '
-                          f'or horizontal resolution if size units is "Georeferenced units".'),
-            (self._HEIGHT, f'Target height if size units is "Pixels", '
-                           f'or vertical resolution if size units is "Georeferenced units".'),
+            (self._WIDTH, 'Target width if size units is "Pixels", '
+                          'or horizontal resolution if size units is "Georeferenced units".'),
+            (self._HEIGHT, 'Target height if size units is "Pixels", '
+                           'or vertical resolution if size units is "Georeferenced units".'),
             (self._OUTPUT_GRID, self.RasterFileDestination)
         ]
 

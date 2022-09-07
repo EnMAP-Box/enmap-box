@@ -3,9 +3,9 @@
 functions to use GEE within Qgis python script
 """
 from enmapbox.utils import importEarthEngine
+from qgis.core import QgsRasterLayer
 
 eeImported, ee = importEarthEngine(False)
-from qgis.core import QgsRasterLayer
 
 
 def addLayer(eeObject, visParams, name, mapCanvas, shown=True, opacity=1.0) -> QgsRasterLayer:
@@ -31,4 +31,3 @@ def getBounds(asGeoJSON=False):
     crs = enmapBox.currentMapCanvas().mapSettings().destinationCrs().authid()
 
     return ee.Geometry.Rectangle([xmin, ymin, xmax, ymax], crs, False)
-

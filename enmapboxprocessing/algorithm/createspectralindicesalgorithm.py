@@ -2,14 +2,14 @@ from collections import OrderedDict
 from typing import Dict, Any, List, Tuple, Optional
 
 from osgeo import gdal
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException,
-                        QgsRasterLayer)
 
 from enmapboxprocessing.algorithm.vrtbandmathalgorithm import VrtBandMathAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException,
+                       QgsRasterLayer)
 from typeguard import typechecked
 
 
@@ -170,7 +170,7 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
                     bandName = short_name
                 else:  # predefined index
                     short_name = item.strip()
-                    if not short_name in self.IndexDatabase:
+                    if short_name not in self.IndexDatabase:
                         raise QgsProcessingException(f'unknown index: {short_name}')
                     formula = self.IndexDatabase[short_name]['formula']
                     bands = self.IndexDatabase[short_name]['bands']
@@ -234,7 +234,7 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
         # add ufunc
         if extraNewLine:
             code += '\n'
-        code += f'def ufunc(in_ar, out_ar, *args, **kwargs):\n'
+        code += 'def ufunc(in_ar, out_ar, *args, **kwargs):\n'
 
         # prepare input band variables; use the same identifier as in the formulas; also cast to Float32
         for i, name in enumerate(bands):
@@ -278,7 +278,7 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
         # https://github.com/sandroklippel/qgis_gee_data_catalog/blob/master/datasets.py
 
         mapping = {
-            'Natural color':  ('B4', 'B3', 'B2'),
+            'Natural color': ('B4', 'B3', 'B2'),
             'False color': ('B4', 'B8', 'B3'),
             'Color infrared': ('B8', 'B4', 'B3'),
             'Shortwave infrared 1': ('B12', 'B8', 'B4'),
@@ -293,7 +293,7 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
             'Healthy vegetation': ('B8', 'B11', 'B2'),
             'Vegetation analysis 1': ('B8', 'B11', 'B4'),
             'Vegetation analysis 2': ('B11', 'B8', 'B4'),
-            'Forestry / Recent harvest areas':  ('B12', 'B8', 'B3')
+            'Forestry / Recent harvest areas': ('B12', 'B8', 'B3')
         }
 
         mapping2 = {name: tuple(cls.translateSentinel2Band(bandName) for bandName in bandNames)

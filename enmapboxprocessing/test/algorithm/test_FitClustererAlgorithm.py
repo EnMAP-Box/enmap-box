@@ -1,4 +1,3 @@
-import numpy as np
 from sklearn.base import ClusterMixin, TransformerMixin
 
 from enmapbox.exampledata import enmap
@@ -12,8 +11,8 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClustererDump
 from enmapboxprocessing.utils import Utils
-from testdata import classifier_pkl
 from qgis.core import Qgis
+from testdata import classifier_pkl
 
 
 class FitTestClustererAlgorithm(FitClustererAlgorithmBase):

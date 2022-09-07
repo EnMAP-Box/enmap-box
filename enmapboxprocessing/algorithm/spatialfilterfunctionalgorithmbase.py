@@ -1,8 +1,8 @@
 import numpy as np
-from qgis.core import (Qgis)
 
 from enmapboxprocessing.algorithm.applybandfunctionalgorithmbase import ApplyBandFunctionAlgorithmBase
 from enmapboxprocessing.typing import QgisDataType
+from qgis.core import (Qgis)
 from typeguard import typechecked
 
 

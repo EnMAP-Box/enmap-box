@@ -1,16 +1,14 @@
 from random import randint
-from random import randint
 from typing import Optional, List, Tuple
-
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import QMouseEvent, QColor
-from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QCheckBox, QTableWidget, QComboBox
-from PyQt5.uic import loadUi
 
 from enhancedmultibandcolorapp.enhancedmultibandcolorrenderer import EnhancedMultiBandColorRenderer
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from enmapboxprocessing.rasterreader import RasterReader
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QMouseEvent, QColor
+from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QCheckBox, QTableWidget, QComboBox
+from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer, QgsRasterDataProvider, QgsRasterHistogram, QgsMapLayerProxyModel, QgsMapSettings
 from qgis.gui import QgsMapCanvas, QgsMapLayerComboBox, QgsColorButton, QgsDoubleSpinBox
 from typeguard import typechecked
@@ -61,7 +59,7 @@ class EnhancedMultiBandColorDialog(QMainWindow):
         if self.mMapCanvas is not None:
             try:
                 self.mMapCanvas.extentsChanged.disconnect(self.onMapCanvasExtentsChanged)
-            except:
+            except Exception:
                 pass
 
         # connect new map canvas

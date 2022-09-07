@@ -1,4 +1,3 @@
-from testdata import fraction_points_gpkg, fraction_points_singletarget_gpkg
 from enmapbox.exampledata import enmap, landcover_polygons
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousvectoralgorithm import \
     PrepareRegressionDatasetFromContinuousVectorAlgorithm
@@ -6,6 +5,7 @@ from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingException
+from testdata import fraction_points_gpkg, fraction_points_singletarget_gpkg
 
 
 class TestPrepareRegressionDatasetFromCategorizedVectorAlgorithm(TestCase):

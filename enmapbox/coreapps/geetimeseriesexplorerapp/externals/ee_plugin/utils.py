@@ -82,9 +82,9 @@ def update_ee_image_layer(image, layer, mapCanvas, shown=True, opacity=1.0):
 def get_layer_by_name(name):
     layers = QgsProject.instance().mapLayers().values()
 
-    for l in layers:
-        if l.name() == name:
-            return l
+    for layer in layers:
+        if layer.name() == name:
+            return layer
 
     return None
 

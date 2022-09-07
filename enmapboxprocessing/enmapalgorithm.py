@@ -6,9 +6,17 @@ from time import time
 from typing import Any, Dict, Iterable, Optional, List, Tuple, TextIO
 
 import numpy as np
-from qgis.PyQt.QtGui import QIcon
 from osgeo import gdal
 
+import processing
+from enmapboxprocessing.driver import Driver
+from enmapboxprocessing.glossary import injectGlossaryLinks
+from enmapboxprocessing.parameter.processingparameterrasterdestination import ProcessingParameterRasterDestination
+from enmapboxprocessing.processingfeedback import ProcessingFeedback
+from enmapboxprocessing.typing import QgisDataType, CreationOptions, GdalResamplingAlgorithm, ClassifierDump, \
+    TransformerDump, RegressorDump, ClustererDump
+from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtGui import QIcon
 from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer, QgsProcessingParameterVectorLayer,
                        QgsProcessingContext, QgsProcessingFeedback,
                        QgsRasterLayer, QgsVectorLayer, QgsProcessingParameterNumber, QgsProcessingParameterDefinition,
@@ -20,15 +28,6 @@ from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer
                        QgsProcessingParameterCrs, QgsProcessingParameterVectorDestination, QgsProcessing,
                        QgsProcessingUtils, QgsProcessingParameterMultipleLayers, QgsProcessingException,
                        QgsProcessingParameterFolderDestination, QgsProject)
-
-import processing
-from enmapboxprocessing.glossary import injectGlossaryLinks
-from enmapboxprocessing.parameter.processingparameterrasterdestination import ProcessingParameterRasterDestination
-from enmapboxprocessing.driver import Driver
-from enmapboxprocessing.processingfeedback import ProcessingFeedback
-from enmapboxprocessing.typing import QgisDataType, CreationOptions, GdalResamplingAlgorithm, ClassifierDump, \
-    TransformerDump, RegressorDump, ClustererDump
-from enmapboxprocessing.utils import Utils
 from typeguard import typechecked
 
 
@@ -40,8 +39,8 @@ class AlgorithmCanceledException(Exception):
 class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     O_RESAMPLE_ALG = 'NearestNeighbour Bilinear Cubic CubicSpline Lanczos Average Mode Min Q1 Med Q3 Max'.split()
     NearestNeighbourResampleAlg, BilinearResampleAlg, CubicResampleAlg, CubicSplineResampleAlg, LanczosResampleAlg, \
-        AverageResampleAlg, ModeResampleAlg, MinResampleAlg, Q1ResampleAlg, MedResampleAlg, Q3ResampleAlg, \
-        MaxResampleAlg = range(12)
+    AverageResampleAlg, ModeResampleAlg, MinResampleAlg, Q1ResampleAlg, MedResampleAlg, Q3ResampleAlg, \
+    MaxResampleAlg = range(12)
     O_DATA_TYPE = 'Byte Int16 UInt16 UInt32 Int32 Float32 Float64'.split()
     Byte, Int16, UInt16, Int32, UInt32, Float32, Float64 = range(len(O_DATA_TYPE))
     PickleFileFilter = 'Pickle (*.pkl)'

@@ -12,7 +12,7 @@ class TestCase(unittest.case.TestCase):
     def assertArrayEqual(self, array1: Union[Array2d, Array3d], array2: Union[Array2d, Array3d]):
         array1 = np.array(array1)
         array2 = np.array(array2)
-        self.assertTrue(np.all(array1==array2))
+        self.assertTrue(np.all(array1 == array2))
 
     def filename(self, basename: str):
         import enmapbox

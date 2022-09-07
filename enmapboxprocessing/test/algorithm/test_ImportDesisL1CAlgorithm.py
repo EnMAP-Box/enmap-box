@@ -8,7 +8,6 @@ from enmapboxprocessing.test.algorithm.testcase import TestCase
 class TestImportDesisL1CAlgorithm(TestCase):
 
     def test(self):
-
         if not self.additionalDataFolderExists():
             return
 

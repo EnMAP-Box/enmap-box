@@ -1,5 +1,4 @@
 import numpy as np
-from testdata import (landcover_berlin_polygon_3classes_id_gpkg)
 
 from enmapbox.exampledata import enmap, landcover_polygons
 from enmapboxprocessing.algorithm.classfractionfromcategorizedvectoralgorithm import \
@@ -7,6 +6,7 @@ from enmapboxprocessing.algorithm.classfractionfromcategorizedvectoralgorithm im
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from qgis.core import QgsRasterLayer, QgsVectorLayer
+from testdata import (landcover_berlin_polygon_3classes_id_gpkg)
 
 
 class TestClassFractionFromCategorizedVectorAlgorithm(TestCase):
