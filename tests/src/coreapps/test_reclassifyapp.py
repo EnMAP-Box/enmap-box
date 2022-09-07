@@ -3,6 +3,9 @@ import re
 import unittest
 
 from osgeo import gdal
+
+from _classic.hubflow.core import Classification, Color, ClassDefinition
+
 try:
     from reclassifyapp.reclassify import ReclassifyTableView, ReclassifyTableModel, ReclassifyTableViewDelegate, \
         ReclassifyDialog, reclassify
@@ -59,7 +62,7 @@ class TestReclassify(EnMAPBoxTestCase):
 
             pathDst = tmpDir / 'testclasstiff{}.{}'.format(i, ext)
             pathDst = pathDst.as_posix()
-            classification = _classic.hubflow.core.Classification(pathSrc)
+            classification = Classification(pathSrc)
             oldDef = classification.classDefinition()
             self.assertEqual(oldDef.names(), classNamesOld[1:])
 
@@ -67,12 +70,12 @@ class TestReclassify(EnMAPBoxTestCase):
             newColors = [QColor('black'), QColor('yellow'), QColor('brown')]
 
             # this works
-            c = _classic.hubflow.core.Color(QColor('black'))
+            c = Color(QColor('black'))
 
-            # but this does'nt
+            # but this doesn't
             # newDef = _classic.hubflow.core.ClassDefinition(names=newNames[1:], colors=newColors[1:])
 
-            newDef = _classic.hubflow.core.ClassDefinition(names=newNames[1:], colors=[c.name() for c in newColors[1:]])
+            newDef = ClassDefinition(names=newNames[1:], colors=[c.name() for c in newColors[1:]])
             newDef.setNoDataNameAndColor(newNames[0], QColor('yellow'))
 
             # driver = guessRasterDriver(pathDst)

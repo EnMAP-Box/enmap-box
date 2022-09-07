@@ -16,12 +16,14 @@ import unittest
 
 from enmapbox import EnMAPBox, initPythonPaths
 from enmapbox.testing import EnMAPBoxTestCase
+
 initPythonPaths()
+
 
 class test_applications(EnMAPBoxTestCase):
 
     def test_MainUiFunc(self):
-        from lmuvegetationapps.IVVRM.IVVRM_GUI import MainUiFunc
+        from lmuapps.lmuvegetationapps.IVVRM.IVVRM_GUI import MainUiFunc
 
         m = MainUiFunc()
         self.showGui(m)
@@ -32,7 +34,7 @@ class test_applications(EnMAPBoxTestCase):
             EB = EnMAPBox()
         EB.ui.hide()
 
-        from lmuvegetationapps.IVVRM.IVVRM_GUI import IVVRM_GUI
+        from lmuapps.lmuvegetationapps.IVVRM.IVVRM_GUI import IVVRM_GUI
 
         w = IVVRM_GUI()
         self.showGui(w)
