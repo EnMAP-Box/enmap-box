@@ -16,12 +16,12 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2.3.1
         with:
-          python-version: 3.7
+          python-version: 3.9
           architecture: x64
       - name: Checkout
         uses: actions/checkout@v2
       - name: Run flake8
-        uses: julianwachholz/flake8-action@v2.0.2
+        uses: julianwachholz/flake8-action@v2
         with:
           checkName: 'Python Lint'
           plugins: flake8-qgis
