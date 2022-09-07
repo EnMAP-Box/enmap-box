@@ -23,7 +23,7 @@ from osgeo import gdal, ogr
 
 from enmapbox.gui import ClassificationScheme
 from qgis.PyQt.QtCore import QDate
-from qgis._core import QgsCoordinateReferenceSystem
+from qgis.core import QgsCoordinateReferenceSystem
 
 IMMUTABLE_DOMAINS = ['IMAGE_STRUCTURE', 'SUBDATASETS', 'DERIVED_SUBDATASETS']
 
