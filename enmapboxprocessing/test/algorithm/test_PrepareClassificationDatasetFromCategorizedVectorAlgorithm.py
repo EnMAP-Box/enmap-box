@@ -1,13 +1,11 @@
-from os.path import exists
+from testdata import points_in_no_data_region_gpkg
 
 from enmapbox.exampledata import enmap, landcover_polygons, landcover_points
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedvectoralgorithm import \
     PrepareClassificationDatasetFromCategorizedVectorAlgorithm
-from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import points_in_no_data_region
 
 
 class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
@@ -88,7 +86,7 @@ class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
         alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
-            alg.P_CATEGORIZED_VECTOR: points_in_no_data_region,
+            alg.P_CATEGORIZED_VECTOR: points_in_no_data_region_gpkg,
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
         }
         self.runalg(alg, parameters)

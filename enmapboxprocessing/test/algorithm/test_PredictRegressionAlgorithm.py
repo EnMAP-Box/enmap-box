@@ -2,7 +2,7 @@ from enmapbox.exampledata import enmap
 from enmapboxprocessing.algorithm.predictregressionalgorithm import PredictRegressionAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapboxtestdata import regressorDumpPkl, regressorDumpSingleTargetPkl
+from testdata import regressorDumpPkl, regressorDumpSingleTargetPkl
 
 
 class TestPredictRegressionAlgorithm(TestCase):

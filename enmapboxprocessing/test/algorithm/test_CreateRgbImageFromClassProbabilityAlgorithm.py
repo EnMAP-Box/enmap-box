@@ -12,7 +12,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import classifierDumpPkl
+from testdata import classifier_pkl
 
 
 class FitTestClassifierAlgorithm(FitClassifierAlgorithmBase):
@@ -39,7 +39,7 @@ class TestCreateRgbImageFromClassProbabilityAlgorithm(TestCase):
         algFit = FitTestClassifierAlgorithm()
         algFit.initAlgorithm()
         parametersFit = {
-            algFit.P_DATASET: classifierDumpPkl,
+            algFit.P_DATASET: classifier_pkl,
             algFit.P_CLASSIFIER: algFit.defaultCodeAsString(),
             algFit.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl')
         }
@@ -75,7 +75,7 @@ class TestCreateRgbImageFromClassProbabilityAlgorithm(TestCase):
         self.assertEqual(16826968, np.sum(RasterReader(result[alg.P_OUTPUT_RGB]).array()))
 
         # test colors from list
-        colors = str([c.color for c in ClassifierDump(**Utils.pickleLoad(classifierDumpPkl)).categories])
+        colors = str([c.color for c in ClassifierDump(**Utils.pickleLoad(classifier_pkl)).categories])
         parameters = {
             alg.P_PROBABILITY: parametersPredict2[algPredict2.P_OUTPUT_PROBABILITY],
             alg.P_COLORS: colors,

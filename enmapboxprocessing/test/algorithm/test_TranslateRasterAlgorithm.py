@@ -7,7 +7,7 @@ from enmapbox.exampledata import enmap, hires
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapboxtestdata import landcover_raster_30m_epsg3035, water_mask_30m, grid_300m
+from testdata import landcover_raster_30m_epsg3035, water_mask_30m, grid_300m
 
 
 class TestTranslateAlgorithm(TestCase):

@@ -1,12 +1,8 @@
-
-
-from qgis.PyQt.QtWidgets import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtCore import *
+from qgis.PyQt.QtWidgets import QApplication, QMenu, QWidget, QVBoxLayout, QLabel, QPushButton
 
 if __name__ == '__main__':
-
     app = QApplication([])
+
     # minimal example of a QMenu with a QAction
 
     def myFunctionA():
@@ -20,15 +16,12 @@ if __name__ == '__main__':
     a.triggered.connect(myFunctionA)
 
     a = menu.addAction('Do that')
-    a.triggered.connect(lambda :myFunctionB(0,8,15))
-
+    a.triggered.connect(lambda: myFunctionB(0, 8, 15))
 
     menu.show()
 
-
     def onButtonClicked():
         print('Button was pressed')
-
 
     w = QWidget()
     w.setLayout(QVBoxLayout())
@@ -41,4 +34,3 @@ if __name__ == '__main__':
     w.show()
 
     app.exec_()
-

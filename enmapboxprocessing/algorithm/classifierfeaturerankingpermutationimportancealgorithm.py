@@ -45,8 +45,8 @@ class ClassifierFeatureRankingPermutationImportanceAlgorithm(EnMAPProcessingAlgo
             (self._TEST_DATASET, 'Test dataset pickle file used for performance evaluation. '
                                  'If skipped, the training dataset is used.'),
             (self._EVALUATION_METRIC,
-             f'An evaluation metric to use. '
-             f'See Metrics and scoring: quantifying the quality of predictions for further information.'),
+             'An evaluation metric to use. '
+             'See Metrics and scoring: quantifying the quality of predictions for further information.'),
             (self._REPEATS, 'Number of times to permute a feature.'),
             (self._SEED, 'The seed for the random generator can be provided.'),
             (self._OPEN_REPORT, self.ReportOpen),

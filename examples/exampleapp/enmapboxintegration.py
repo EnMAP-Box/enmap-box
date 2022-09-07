@@ -21,13 +21,12 @@
 """
 
 import os
-import pathlib
-import site
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QAction
-from enmapbox.gui.applications import EnMAPBoxApplication
 
 from exampleapp import APP_DIR
+
+from enmapbox.gui.applications import EnMAPBoxApplication
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QMenu
 
 
 class ExampleEnMAPBoxApp(EnMAPBoxApplication):

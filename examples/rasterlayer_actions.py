@@ -1,12 +1,16 @@
-
 """
 How to load raster and vector data into a QgsMapCanvas and make a screenshot from
 """
 
 import os
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
-from enmapbox.testing import initQgisApplication
+
+from qgis.PyQt.QtWidgets import QWidget, QApplication
+from enmapbox.exampledata import enmap, landcover_polygons
+from enmapbox.testing import start_app
+import time
+
+from qgis.core import QgsRasterLayer, QgsMultiBandColorRenderer, QgsVectorLayer, QgsProject
+from qgis.gui import QgsMapCanvas
 
 
 def widgetScreenshot(widget, path):
@@ -17,11 +21,7 @@ def widgetScreenshot(widget, path):
     pixmap.save(path, quality=100)
 
 
-
-APP = initQgisApplication()
-from qgis.gui import *
-from qgis.core import *
-from enmapbox.exampledata import enmap, landcover_polygons
+APP = start_app()
 
 lyr1 = QgsRasterLayer(enmap)
 
@@ -40,14 +40,11 @@ assert lyr2.isValid()
 layers = [lyr1, lyr2]
 QgsProject.instance().addMapLayers(layers)
 
-
-
 canvas = QgsMapCanvas()
 canvas.setLayers(layers)
 canvas.setExtent(canvas.fullExtent())
 canvas.setDestinationCrs(lyr1.crs())
 canvas.waitWhileRendering()
-
 
 print('Completed')
 dn = os.path.dirname(__file__)
@@ -57,8 +54,4 @@ QApplication.processEvents()
 canvas.saveAsImage(filepath1)
 widgetScreenshot(canvas, filepath2)
 
-import time
 time.sleep(5)
-
-
-#APP.exec_()

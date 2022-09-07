@@ -6,7 +6,7 @@ from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifie
 from enmapboxprocessing.algorithm.predictclassificationalgorithm import PredictClassificationAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapboxtestdata import landcover_raster_30m, classifierDumpPkl
+from testdata import landcover_raster_30m_tif, classifier_pkl
 
 
 class FitTestClassifierAlgorithm(FitClassifierAlgorithmBase):
@@ -32,7 +32,7 @@ class TestPredictClassificationAlgorithm(TestCase):
         algFit = FitTestClassifierAlgorithm()
         algFit.initAlgorithm()
         parametersFit = {
-            algFit.P_DATASET: classifierDumpPkl,
+            algFit.P_DATASET: classifier_pkl,
             algFit.P_CLASSIFIER: algFit.defaultCodeAsString(),
             algFit.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl')
         }
@@ -52,7 +52,7 @@ class TestPredictClassificationAlgorithm(TestCase):
         algFit = FitTestClassifierAlgorithm()
         algFit.initAlgorithm()
         parametersFit = {
-            algFit.P_DATASET: classifierDumpPkl,
+            algFit.P_DATASET: classifier_pkl,
             algFit.P_CLASSIFIER: algFit.defaultCodeAsString(),
             algFit.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl')
         }
@@ -63,7 +63,7 @@ class TestPredictClassificationAlgorithm(TestCase):
         parameters = {
             alg.P_RASTER: enmap,
             alg.P_CLASSIFIER: parametersFit[algFit.P_OUTPUT_CLASSIFIER],
-            alg.P_MASK: landcover_raster_30m,
+            alg.P_MASK: landcover_raster_30m_tif,
             alg.P_OUTPUT_CLASSIFICATION: self.filename('classification.tif')
         }
         result = self.runalg(alg, parameters)
@@ -73,7 +73,7 @@ class TestPredictClassificationAlgorithm(TestCase):
         algFit = FitTestClassifierAlgorithm()
         algFit.initAlgorithm()
         parametersFit = {
-            algFit.P_DATASET: classifierDumpPkl,
+            algFit.P_DATASET: classifier_pkl,
             algFit.P_CLASSIFIER: algFit.defaultCodeAsString(),
             algFit.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl')
         }

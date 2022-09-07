@@ -10,7 +10,7 @@ from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import landcover_map_l3
+from testdata import landcover_map_l3
 
 writeToDisk = True
 

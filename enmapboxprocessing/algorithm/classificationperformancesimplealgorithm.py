@@ -93,7 +93,4 @@ class ClassificationPerformanceSimpleAlgorithm(EnMAPProcessingAlgorithm):
 
             self.toc(feedback, result)
 
-
-
         return result
-

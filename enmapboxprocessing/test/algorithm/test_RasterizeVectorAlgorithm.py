@@ -4,7 +4,7 @@ from enmapbox.exampledata import enmap, landcover_polygons
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapboxtestdata import landcover_polygons_3classes_epsg4326
+from testdata import landcover_berlin_polygon_3classes_EPSG4326_gpkg
 
 
 class TestRasterizeAlgorithm(TestCase):
@@ -24,7 +24,7 @@ class TestRasterizeAlgorithm(TestCase):
         alg = RasterizeVectorAlgorithm()
         parameters = {
             alg.P_GRID: enmap,
-            alg.P_VECTOR: landcover_polygons_3classes_epsg4326,
+            alg.P_VECTOR: landcover_berlin_polygon_3classes_EPSG4326_gpkg,
             alg.P_OUTPUT_RASTER: self.filename('mask.tif')
         }
         result = self.runalg(alg, parameters)

@@ -1,5 +1,3 @@
-from enmapboxprocessing.algorithm.prepareregressiondatasetfromcodealgorithm import \
-    PrepareRegressionDatasetFromCodeAlgorithm
 import numpy as np
 
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcodealgorithm import \

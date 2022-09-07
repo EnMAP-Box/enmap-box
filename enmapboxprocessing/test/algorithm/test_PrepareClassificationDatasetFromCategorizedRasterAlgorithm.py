@@ -6,7 +6,7 @@ from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedras
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import landcover_raster_30m
+from testdata import landcover_raster_30m
 
 
 class TestPrepareClassificationSampleFromCategorizedRaster(TestCase):
@@ -15,7 +15,7 @@ class TestPrepareClassificationSampleFromCategorizedRaster(TestCase):
         alg = PrepareClassificationDatasetFromCategorizedRasterAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
-            alg.P_CATEGORIZED_RASTER: landcover_raster_30m,
+            alg.P_CATEGORIZED_RASTER: landcover_raster_30m_tif,
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
         }
         self.runalg(alg, parameters)
@@ -33,7 +33,7 @@ class TestPrepareClassificationSampleFromCategorizedRaster(TestCase):
         alg = PrepareClassificationDatasetFromCategorizedRasterAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
-            alg.P_CATEGORIZED_RASTER: landcover_raster_30m,
+            alg.P_CATEGORIZED_RASTER: landcover_raster_30m_tif,
             alg.P_CATEGORY_BAND: 0,
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
         }

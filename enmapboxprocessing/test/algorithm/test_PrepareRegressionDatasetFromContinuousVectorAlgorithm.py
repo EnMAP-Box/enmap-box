@@ -1,14 +1,11 @@
-from qgis.core import QgsProcessingException
-
-from enmapbox.exampledata import enmap, landcover_polygons, landcover_points
-from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedvectoralgorithm import \
-    PrepareClassificationDatasetFromCategorizedVectorAlgorithm
+from testdata import fraction_points_gpkg, fraction_points_singletarget_gpkg
+from enmapbox.exampledata import enmap, landcover_polygons
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousvectoralgorithm import \
     PrepareRegressionDatasetFromContinuousVectorAlgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapboxprocessing.typing import ClassifierDump, RegressorDump
+from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import points_in_no_data_region, fraction_points, fraction_points_singletarget
+from qgis.core import QgsProcessingException
 
 
 class TestPrepareRegressionDatasetFromCategorizedVectorAlgorithm(TestCase):
@@ -17,7 +14,7 @@ class TestPrepareRegressionDatasetFromCategorizedVectorAlgorithm(TestCase):
         alg = PrepareRegressionDatasetFromContinuousVectorAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
-            alg.P_CONTINUOUS_VECTOR: fraction_points,
+            alg.P_CONTINUOUS_VECTOR: fraction_points_gpkg,
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
         }
         self.runalg(alg, parameters)
@@ -34,7 +31,7 @@ class TestPrepareRegressionDatasetFromCategorizedVectorAlgorithm(TestCase):
         alg = PrepareRegressionDatasetFromContinuousVectorAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
-            alg.P_CONTINUOUS_VECTOR: fraction_points_singletarget,
+            alg.P_CONTINUOUS_VECTOR: fraction_points_singletarget_gpkg,
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
         }
         self.runalg(alg, parameters)

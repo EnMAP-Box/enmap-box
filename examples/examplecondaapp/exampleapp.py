@@ -22,6 +22,7 @@
 
 import os
 
+from examples.exampleapp.enmapboxintegration import ExampleEnMAPBoxApp
 from qgis.PyQt.QtCore import QProcess, QProcessEnvironment
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu, QAction, QWidget, QVBoxLayout, QFrame, QGridLayout, QLineEdit, QLabel, QHBoxLayout, \
@@ -120,8 +121,8 @@ class AnacondaCallingGUI(QWidget):
         self.setWindowTitle(APP_NAME)
         self.setWindowIcon(QIcon(os.path.join(APP_DIR, 'icon.png')))
         self.setMinimumWidth(400)
-        l = QVBoxLayout()
-        self.setLayout(l)
+        layout = QVBoxLayout()
+        self.setLayout(layout)
 
         self.mAnacondaRoot = QgsFileWidget(parent=self)
         self.mAnacondaRoot.setFileWidgetButtonVisible(True)
@@ -147,12 +148,12 @@ class AnacondaCallingGUI(QWidget):
         ll = QHBoxLayout()
         ll.addWidget(QLabel('Anaconda'))
         ll.addWidget(self.mAnacondaRoot)
-        l.addLayout(ll)
+        layout.addLayout(ll)
         bbox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Close)
         bbox.button(QDialogButtonBox.Ok).clicked.connect(self.runAnacondaCode)
         bbox.button(QDialogButtonBox.Close).clicked.connect(self.close)
-        l.addWidget(self.settings)
-        l.addWidget(bbox)
+        layout.addWidget(self.settings)
+        layout.addWidget(bbox)
 
     def runAnacondaCode(self, *args):
 
@@ -296,7 +297,6 @@ if __name__ == '__main__':
 
     from enmapbox.gui.mimedata import textFromByteArray
 
-
     def readStdOut(p):
         assert isinstance(p, QProcess)
 
@@ -305,15 +305,13 @@ if __name__ == '__main__':
 
         print(s)
 
+    def readStdErr(process):
+        assert isinstance(process, QProcess)
 
-    def readStdErr(p):
-        assert isinstance(p, QProcess)
-
-        ba = p.readAllStandardError()
+        ba = process.readAllStandardError()
         s = str(textFromByteArray(ba)).strip()
         import sys
         print(s, file=sys.stderr)
-
 
     pathPythonScript = os.path.join(APP_DIR, *['conda_code', 'condacodeexamples.py'])
     assert os.path.isfile(pathPythonScript)

@@ -10,16 +10,16 @@ from qgis.PyQt.QtGui import QIcon
 from osgeo import gdal
 
 from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer, QgsProcessingParameterVectorLayer,
-                        QgsProcessingContext, QgsProcessingFeedback,
-                        QgsRasterLayer, QgsVectorLayer, QgsProcessingParameterNumber, QgsProcessingParameterDefinition,
-                        QgsProcessingParameterField, QgsProcessingParameterBoolean, QgsProcessingParameterEnum, Qgis,
-                        QgsProcessingParameterString, QgsProcessingParameterBand, QgsCategorizedSymbolRenderer,
-                        QgsPalettedRasterRenderer, QgsProcessingParameterMapLayer, QgsMapLayer,
-                        QgsProcessingParameterExtent, QgsCoordinateReferenceSystem, QgsRectangle,
-                        QgsProcessingParameterFileDestination, QgsProcessingParameterFile, QgsProcessingParameterRange,
-                        QgsProcessingParameterCrs, QgsProcessingParameterVectorDestination, QgsProcessing,
-                        QgsProcessingUtils, QgsProcessingParameterMultipleLayers, QgsProcessingException,
-                        QgsProcessingParameterFolderDestination, QgsProject)
+                       QgsProcessingContext, QgsProcessingFeedback,
+                       QgsRasterLayer, QgsVectorLayer, QgsProcessingParameterNumber, QgsProcessingParameterDefinition,
+                       QgsProcessingParameterField, QgsProcessingParameterBoolean, QgsProcessingParameterEnum, Qgis,
+                       QgsProcessingParameterString, QgsProcessingParameterBand, QgsCategorizedSymbolRenderer,
+                       QgsPalettedRasterRenderer, QgsProcessingParameterMapLayer, QgsMapLayer,
+                       QgsProcessingParameterExtent, QgsCoordinateReferenceSystem, QgsRectangle,
+                       QgsProcessingParameterFileDestination, QgsProcessingParameterFile, QgsProcessingParameterRange,
+                       QgsProcessingParameterCrs, QgsProcessingParameterVectorDestination, QgsProcessing,
+                       QgsProcessingUtils, QgsProcessingParameterMultipleLayers, QgsProcessingException,
+                       QgsProcessingParameterFolderDestination, QgsProject)
 
 import processing
 from enmapboxprocessing.glossary import injectGlossaryLinks
@@ -40,8 +40,8 @@ class AlgorithmCanceledException(Exception):
 class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     O_RESAMPLE_ALG = 'NearestNeighbour Bilinear Cubic CubicSpline Lanczos Average Mode Min Q1 Med Q3 Max'.split()
     NearestNeighbourResampleAlg, BilinearResampleAlg, CubicResampleAlg, CubicSplineResampleAlg, LanczosResampleAlg, \
-    AverageResampleAlg, ModeResampleAlg, MinResampleAlg, Q1ResampleAlg, MedResampleAlg, Q3ResampleAlg, \
-    MaxResampleAlg = range(12)
+        AverageResampleAlg, ModeResampleAlg, MinResampleAlg, Q1ResampleAlg, MedResampleAlg, Q3ResampleAlg, \
+        MaxResampleAlg = range(12)
     O_DATA_TYPE = 'Byte Int16 UInt16 UInt32 Int32 Float32 Float64'.split()
     Byte, Int16, UInt16, Int32, UInt32, Float32, Float64 = range(len(O_DATA_TYPE))
     PickleFileFilter = 'Pickle (*.pkl)'
@@ -231,7 +231,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         dump = Utils.pickleLoad(filename)
         try:
             dump = RegressorDump.fromDict(dump)
-        except:
+        except Exception:
             raise QgsProcessingException(
                 f'Wrong or missing parameter value: {self.parameterDefinition(name).description()}'
             )

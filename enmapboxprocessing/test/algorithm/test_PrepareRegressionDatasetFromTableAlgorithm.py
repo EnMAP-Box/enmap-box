@@ -3,7 +3,7 @@ from enmapboxprocessing.algorithm.prepareregressiondatasetfromtablealgorithm imp
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import classificationDatasetAsCsv
+from testdata import classificationDatasetAsCsv
 
 
 class TestPrepareRegressionDatasetFromTableAlgorithm(TestCase):

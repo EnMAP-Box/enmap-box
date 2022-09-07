@@ -1,4 +1,4 @@
-from enmapboxtestdata import (classifierDumpPkl)
+from testdata import (classifier_pkl)
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
 from enmapboxprocessing.test.algorithm.testcase import TestCase
@@ -9,7 +9,7 @@ class TestMergeClassificationDatasetsAlgorithm(TestCase):
     def test_fitted(self):
         alg = MergeClassificationDatasetsAlgorithm()
         parameters = {
-            alg.P_DATASETS: [classifierDumpPkl, classifierDumpPkl],
+            alg.P_DATASETS: [classifier_pkl, classifier_pkl],
             alg.P_OUTPUT_DATASET: self.filename('dataset.pkl')
         }
         self.runalg(alg, parameters)

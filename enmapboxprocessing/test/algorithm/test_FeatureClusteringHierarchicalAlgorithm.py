@@ -1,6 +1,6 @@
 from enmapboxprocessing.algorithm.featureclusteringhierarchicalalgorithm import FeatureClusteringHierarchicalAlgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapboxtestdata import classifierDumpPkl
+from testdata import classifier_pkl
 
 
 class TestFeatureClusteringHierarchicalAlgorithm(TestCase):
@@ -9,7 +9,7 @@ class TestFeatureClusteringHierarchicalAlgorithm(TestCase):
         alg = FeatureClusteringHierarchicalAlgorithm()
         alg.initAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifier_pkl,
             alg.P_OPEN_REPORT: False,
             alg.P_OUTPUT_REPORT: self.filename('report.html')
         }

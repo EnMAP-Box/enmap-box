@@ -6,7 +6,7 @@ from enmapboxprocessing.algorithm.classificationperformancestratifiedalgorithm i
     stratifiedAccuracyAssessment, ClassificationPerformanceStratifiedAlgorithm
 )
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapboxtestdata import landcover_map_l3
+from testdata import landcover_map_l3
 
 class Test_aa_stratified(TestCase):
 

@@ -27,15 +27,19 @@
 *                                                                         *
 ***************************************************************************
 """
+from qgis.PyQt.QtCore import QVariant, QSize
+from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QCheckBox
 
-from qgis.gui import *
-from qgis.core import *
-from enmapbox.testing import initQgisApplication
-#read https://github.com/qgis/QGIS/blob/master/tests/src/python/test_qgsactionmanager.py
+from enmapbox.testing import start_app
+from qgis.core import QgsPythonRunner, QgsFeature, QgsField, QgsVectorLayer, QgsAttributeTableConfig, QgsActionManager, \
+    QgsAction, QgsProject
+from qgis.gui import QgsMapCanvas, QgsDualView
+
+# read https://github.com/qgis/QGIS/blob/master/tests/src/python/test_qgsactionmanager.py
 
 
-APP = initQgisApplication() #this instantiates a QGIS environment.
-assert QgsPythonRunner.isValid() #this! is important to run QgsAction of type QgsAction.GenericPython
+APP = start_app()  # this instantiates a QGIS environment.
+assert QgsPythonRunner.isValid()  # this! is important to run QgsAction of type QgsAction.GenericPython
 
 
 def create_vectordataset() -> QgsVectorLayer:
@@ -50,7 +54,7 @@ def create_vectordataset() -> QgsVectorLayer:
     return vl
 
 
-#create a small GUI
+# create a small GUI
 canvas = QgsMapCanvas()
 myWidget = QWidget()
 myWidget.setWindowTitle('Layer Action Example')
@@ -61,11 +65,13 @@ dualView.setView(QgsDualView.AttributeTable)
 checkBox = QCheckBox()
 checkBox.setText('Show Form View')
 
+
 def onClicked(b: bool):
     if b:
         dualView.setView(QgsDualView.AttributeEditor)
     else:
         dualView.setView(QgsDualView.AttributeTable)
+
 
 checkBox.clicked.connect(onClicked)
 myWidget.layout().addWidget(dualView)
@@ -73,19 +79,19 @@ myWidget.layout().addWidget(checkBox)
 myWidget.show()
 myWidget.resize(QSize(300, 250))
 
-#get a QgsVectorLayer
+# get a QgsVectorLayer
 layer = create_vectordataset()
-#fill some testdata
+# fill some testdata
 layer.startEditing()
 for i in range(5):
     f = QgsFeature(layer.fields())
     f.setAttribute('fInt', i)
-    f.setAttribute('fString', 'Name: {}'.format(i+1))
+    f.setAttribute('fString', 'Name: {}'.format(i + 1))
     layer.addFeature(f)
 layer.commitChanges()
 
-#we like to see the "Action
-columns =  layer.attributeTableConfig().columns()
+# we like to see the "Action
+columns = layer.attributeTableConfig().columns()
 columns = [columns[-1]] + columns[:-1]
 conf = QgsAttributeTableConfig()
 conf.setColumns(columns)
@@ -112,7 +118,7 @@ if not b:
     layer.commitChanges()
 """
 
-action = QgsAction(QgsAction.GenericPython, 'Remove this feature',pythonCode, iconPath, True,
+action = QgsAction(QgsAction.GenericPython, 'Remove this feature', pythonCode, iconPath, True,
                    notificationMessage='msgDelete',
                    actionScopes={'Feature'})
 actionManager.addAction(action)
@@ -121,7 +127,5 @@ canvas.setLayers([layer])
 dualView.init(layer, canvas)
 dualView.setAttributeTableConfig(layer.attributeTableConfig())
 layer.startEditing()
-
-#dualView.organizeColumns()
 
 APP.exec_()

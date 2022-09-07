@@ -6,6 +6,7 @@ from enmapboxprocessing.utils import Utils
 
 import numpy as np
 
+
 class TestPrepareClassificationDatasetFromCodeAlgorithm(TestCase):
 
     def test(self):

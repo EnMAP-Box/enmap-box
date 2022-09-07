@@ -4,7 +4,7 @@ from qgis.core import QgsRasterLayer, QgsVectorLayer
 from enmapboxprocessing.algorithm.randompointsfromcategorizedrasteralgorithm import \
     RandomPointsFromCategorizedRasterAlgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapboxtestdata import landcover_map_l3
+from testdata import landcover_map_l3
 
 
 class TestRandomPointsFromCategorizedRasterAlgorithm(TestCase):

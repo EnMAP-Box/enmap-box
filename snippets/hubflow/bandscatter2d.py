@@ -1,8 +1,8 @@
-import enmapboxtestdata
-from _classic.hubflow.core import *
+import enmapbox.exampledata
+from enmapbox.coreapps._classic.hubflow.core import Raster, Vector
 
-enmap = Raster(filename=enmapboxtestdata.enmap)
-mask = Vector(filename=enmapboxtestdata.landcover)
+enmap = Raster(filename=enmapbox.exampledata.enmap)
+mask = Vector(filename=enmapbox.exampledata.landcover_polygons)
 bandIndicies = 0, 1
 
 statistics = enmap.statistics(bandIndicies=bandIndicies, mask=mask)
