@@ -88,7 +88,6 @@ class FeatureClusteringHierarchicalAlgorithm(EnMAPProcessingAlgorithm):
             n = len(corr_linkage)
             for i, t in enumerate(reversed(corr_linkage[:, 2]), 1):
                 feedback.setProgress(i / n * 100)
-                # print(round(i/n*100,1), end='%..', flush=True)
 
                 # cluster hierarchy
                 fcluster = hierarchy.fcluster(corr_linkage, t, criterion='distance')

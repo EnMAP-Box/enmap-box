@@ -128,7 +128,7 @@ class PrepareRegressionDatasetFromSynthMixAlgorithm(EnMAPProcessingAlgorithm):
             complexity = np.random.choice(list(mixingComplexities.keys()), p=list(mixingComplexities.values()))
 
             isBackground = self.background >= randint(1, 100)
-            print(isBackground)
+
             if isBackground:
                 drawnLabels = list(
                     np.random.choice(

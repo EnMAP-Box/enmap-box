@@ -35,7 +35,7 @@ class FitSvrPolyAlgorithm(FitRegressorAlgorithmBase):
 
         svr = SVR()
         param_grid = {'kernel': ['poly'],
-                      'epsilon': 0.,
+                      'epsilon': [0.],
                       'coef0': [0],
                       'degree': [3],
                       'gamma': [0.001, 0.01, 0.1, 1, 10, 100, 1000],

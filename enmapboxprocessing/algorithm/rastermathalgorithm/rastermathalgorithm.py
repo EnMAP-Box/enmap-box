@@ -142,7 +142,6 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> bool:
         self.mapLayers = {k: v for k, v in QgsProject.instance().mapLayers().items() if k in parameters[self.P_CODE]}
-        print('###', self.mapLayers)
         return True
 
     def processAlgorithm(

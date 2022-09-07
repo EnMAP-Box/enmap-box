@@ -35,7 +35,7 @@ class FitSvrRbfAlgorithm(FitRegressorAlgorithmBase):
 
         svr = SVR()
         param_grid = {'kernel': ['rbf'],
-                      'epsilon': 0.,
+                      'epsilon': [0.],
                       'gamma': [0.001, 0.01, 0.1, 1, 10, 100, 1000],
                       'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000]}
         tunedSVR = GridSearchCV(cv=3, estimator=svr, scoring='neg_mean_absolute_error', param_grid=param_grid)

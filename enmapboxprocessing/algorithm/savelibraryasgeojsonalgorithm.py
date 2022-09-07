@@ -38,8 +38,6 @@ class SaveLibraryAsGeoJsonAlgorithm(EnMAPProcessingAlgorithm):
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         library = self.parameterAsVectorLayer(parameters, self.P_LIBRARY, context)
-        print(library, library.id())
-
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_FILE, context)
 
         with open(filename + '.log', 'w') as logfile:
