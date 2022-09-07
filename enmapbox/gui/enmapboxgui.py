@@ -80,9 +80,9 @@ from .datasources.datasources import DataSource, RasterDataSource, VectorDataSou
 from .dataviews.docks import DockTypes
 from .mapcanvas import MapCanvas
 from .utils import enmapboxUiPath
-from ..qgispluginsupport.qps.speclib.core import is_spectral_library
-from ..qgispluginsupport.qps.subdatasets import SubDatasetSelectionDialog
-from ..qgispluginsupport.qps.utils import SpatialPoint, loadUi, SpatialExtent, file_search
+from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
+from enmapbox.qgispluginsupport.qps.subdatasets import SubDatasetSelectionDialog
+from enmapbox.gui import SpatialPoint, loadUi, SpatialExtent, file_search
 
 MAX_MISSING_DEPENDENCY_WARNINGS = 3
 KEY_MISSING_DEPENDENCY_VERSION = 'MISSING_PACKAGE_WARNING_VERSION'
