@@ -20,16 +20,17 @@
 import enum
 import os
 
-from PyQt5.QtCore import Qt, QSettings, QAbstractTableModel, QModelIndex
-from PyQt5.QtWidgets import QStyledItemDelegate, QTableView, QColorDialog, QDialog, QAbstractItemView, QDialogButtonBox
-from PyQt5.QtXml import QDomElement
+from qgis.PyQt.QtCore import Qt, QSettings, QAbstractTableModel, QModelIndex
+from qgis.PyQt.QtWidgets import QStyledItemDelegate, QTableView, QColorDialog, QDialog, QAbstractItemView, \
+    QDialogButtonBox
+from qgis.PyQt.QtXml import QDomElement
 
 from enmapbox import enmapboxSettings
 from enmapbox.gui.utils import enmapboxUiPath
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.examples.syntax import QColor
 from enmapbox.qgispluginsupport.qps.utils import loadUi
-from qgis._core import QgsSettings, QgsProject
-from qgis._gui import QgsColorButton
+from qgis.core import QgsSettings, QgsProject
+from qgis.gui import QgsColorButton
 
 
 class SettingsKey(enum.Enum):

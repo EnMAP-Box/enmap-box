@@ -1,14 +1,23 @@
 [flake8]
+# see https://flake8.pycqa.org/en/latest/user/configuration.html
 ignore =
-    C901  # allow complex functions
-    D203
-    E122  # continuation line missing indentation or outdented
-    E126, # allow continuation line over-indented for hanging indent
-    E501
-    E731  # allow lambda functions
-    F841  # allow unused local variables
-    QGS105  # Do not pass iface (QgisInterface) as an argument, instead import it: 'from qgis.utils import iface'
-    W503 # allow line break before binary operator
+    #
+    # allow complex functions
+    C901,
+    D203,
+    # continuation line missing indentation or outdented
+    E122,
+    E126,
+    # allow continuation line over-indented for hanging indent
+    E501,
+    # allow lambda functions
+    E731,
+    # allow unused local variables
+    F841,
+    # Do not pass iface (QgisInterface) as an argument, instead import it: 'from qgis.utils import iface'
+    QGS105,
+    # allow line break before binary operator
+    W503
 
 
 max-line-length=120
