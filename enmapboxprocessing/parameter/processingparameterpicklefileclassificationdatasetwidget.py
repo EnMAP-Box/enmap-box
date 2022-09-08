@@ -1,5 +1,7 @@
 from os.path import basename, join, dirname
 
+from enmapboxprocessing.algorithm.prepareclassificationdatasetfromjsonalgorithm import \
+    PrepareClassificationDatasetFromJsonAlgorithm
 from qgis.PyQt.uic import loadUi
 
 from enmapbox import EnMAPBox
@@ -59,6 +61,9 @@ class ProcessingParameterPickleFileClassificationDatasetWidget(QWidget):
 
             (PrepareClassificationDatasetFromFilesAlgorithm(),
              QIcon(':/images/themes/default/mIconFile.svg')),
+
+            (PrepareClassificationDatasetFromJsonAlgorithm(),
+             QIcon(':/images/themes/default/mIconFieldJson.svg'))
         ]:
             action = self.menu.addAction(alg.displayName())
             action.setIcon(icon)
