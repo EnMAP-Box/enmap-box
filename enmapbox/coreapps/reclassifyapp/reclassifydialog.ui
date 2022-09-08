@@ -43,7 +43,7 @@
          <property name="title">
           <string>Classification Files</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout" columnstretch="0,2,0">
+         <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0">
           <property name="leftMargin">
            <number>2</number>
           </property>
@@ -56,65 +56,14 @@
           <property name="bottomMargin">
            <number>2</number>
           </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Input</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1" colspan="2">
-           <widget class="QgsFileWidget" name="dstFileWidget">
+          <item row="0" column="1">
+           <widget class="ClassificationMapLayerComboBox" name="mapLayerComboBox">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="dialogTitle">
-             <string>Specify output classification path</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>Output</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1" colspan="2">
-           <widget class="QgsCollapsibleGroupBox" name="gbOutputOptions">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>1</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="title">
-             <string>Options</string>
-            </property>
-            <property name="collapsed">
-             <bool>true</bool>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_3">
-             <item>
-              <widget class="QgsRasterFormatSaveOptionsWidget" name="widgetOutputOptions" native="true">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>1</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>10</width>
-                 <height>100</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-            </layout>
            </widget>
           </item>
           <item row="0" column="2">
@@ -123,13 +72,23 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../../../../../QGIS/images/images.qrc">
+             <iconset>
               <normaloff>:/images/themes/default/mActionAddRasterLayer.svg</normaloff>:/images/themes/default/mActionAddRasterLayer.svg</iconset>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="ClassificationMapLayerComboBox" name="mapLayerComboBox"/>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Input</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -248,7 +207,7 @@
                <string>...</string>
               </property>
               <property name="icon">
-               <iconset resource="../../../../../QGIS/images/images.qrc">
+               <iconset>
                 <normaloff>:/images/themes/default/mActionFileOpen.svg</normaloff>:/images/themes/default/mActionFileOpen.svg</iconset>
               </property>
               <property name="autoRaise">
@@ -325,7 +284,7 @@
   </layout>
   <action name="actionAddRasterSource">
    <property name="icon">
-    <iconset resource="../../../../../QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionAddRasterLayer.svg</normaloff>:/images/themes/default/mActionAddRasterLayer.svg</iconset>
    </property>
    <property name="text">
@@ -334,7 +293,7 @@
   </action>
   <action name="actionLoadClassMapping">
    <property name="icon">
-    <iconset resource="../../../../../QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionFileOpen.svg</normaloff>:/images/themes/default/mActionFileOpen.svg</iconset>
    </property>
    <property name="text">
@@ -346,7 +305,7 @@
   </action>
   <action name="actionSaveClassMapping">
    <property name="icon">
-    <iconset resource="../../../../../QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionFileSaveAs.svg</normaloff>:/images/themes/default/mActionFileSaveAs.svg</iconset>
    </property>
    <property name="text">
@@ -365,20 +324,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QgsFileWidget</class>
-   <extends>QWidget</extends>
-   <header>qgsfilewidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>ClassificationSchemeWidget</class>
    <extends>QWidget</extends>
    <header>qps.classification.classificationscheme</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QgsRasterFormatSaveOptionsWidget</class>
-   <extends>QWidget</extends>
-   <header>qgis.gui</header>
    <container>1</container>
   </customwidget>
   <customwidget>

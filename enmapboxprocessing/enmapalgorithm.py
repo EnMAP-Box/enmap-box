@@ -380,6 +380,21 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def parameterAsBoolean(self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext) -> bool:
         return super().parameterAsBoolean(parameters, name, context)
 
+    def parameterAsObject(
+            self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext
+    ) -> Optional[Any]:
+        string = self.parameterAsString(parameters, name, context)
+        if string is None:
+            return None
+        if string == '':
+            return None
+        try:
+            value = eval(string, {'nan': nan})
+        except Exception:
+            raise QgsProcessingException(f'Invalid value: {self.parameterDefinition(name).description()}')
+
+        return value
+
     def parameterAsFileOutput(
             self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext
     ) -> Optional[str]:

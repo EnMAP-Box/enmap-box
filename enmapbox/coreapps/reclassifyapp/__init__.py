@@ -34,4 +34,5 @@ def enmapboxApplicationFactory(enmapBox):
 
     # from reclassifyapp.reclassify import ReclassifyTool
     # returns a list of EnMAPBoxApplications
-    return []  # ReclassifyTool(enmapBox)]  deactivated for now; see #15
+    from reclassifyapp.reclassify import ReclassifyTool
+    return [ReclassifyTool(enmapBox)]

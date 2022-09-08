@@ -135,6 +135,7 @@ from enmapboxprocessing.algorithm.rasterizecategorizedvectoralgorithm import Ras
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.algorithm.rasterlayerzonalaggregationalgorithm import RasterLayerZonalAggregationAlgorithm
 from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import RasterMathAlgorithm
+from enmapboxprocessing.algorithm.reclassifyrasteralgorithm import ReclassifyRasterAlgorithm
 from enmapboxprocessing.algorithm.regressionbasedunmixingalgorithm import RegressionBasedUnmixingAlgorithm
 from enmapboxprocessing.algorithm.regressionperformancealgorithm import RegressionPerformanceAlgorithm
 from enmapboxprocessing.algorithm.regressionworkflowalgorithm import RegressionWorkflowAlgorithm
@@ -223,7 +224,6 @@ from enmapboxprocessing.algorithm.writeenviheaderalgorithm import WriteEnviHeade
 def algorithms():
     algos = [
         AggregateRasterBandsAlgorithm(),
-        WriteEnviHeaderAlgorithm(),
         ApplyMaskAlgorithm(),
         ClassFractionFromCategorizedVectorAlgorithm(),
         CreateSpectralIndicesAlgorithm(),
@@ -327,6 +327,7 @@ def algorithms():
         RasterizeVectorAlgorithm(),
         RasterLayerZonalAggregationAlgorithm(),
         RasterMathAlgorithm(),
+        ReclassifyRasterAlgorithm(),
         RegressionBasedUnmixingAlgorithm(),
         RegressionPerformanceAlgorithm(),
         RegressionWorkflowAlgorithm(),
@@ -389,7 +390,8 @@ def algorithms():
         TranslateCategorizedRasterAlgorithm(),
         TranslateRasterAlgorithm(),
         TransformRasterAlgorithm(),
-        VrtBandMathAlgorithm()
+        VrtBandMathAlgorithm(),
+        WriteEnviHeaderAlgorithm()
     ]
 
     algos.append(MyAlgorithm())
