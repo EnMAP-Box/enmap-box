@@ -37,7 +37,7 @@ from enmapboxprocessing.algorithm.reclassifyrasteralgorithm import ReclassifyRas
 from qgis.PyQt.QtCore import QAbstractTableModel, Qt, QModelIndex, QSortFilterProxyModel
 from qgis.PyQt.QtGui import QColor, QContextMenuEvent, QIcon
 from qgis.PyQt.QtWidgets import QFileDialog, QTableView, QMenu, QStyledItemDelegate, QDialog, QDialogButtonBox, QAction
-from qgis._core import QgsProcessing
+from qgis.core import QgsProcessing
 from qgis.core import QgsProviderRegistry, QgsRasterLayer, QgsProject, QgsMapLayerProxyModel
 from qgis.gui import QgsMapLayerComboBox
 from typeguard import typechecked

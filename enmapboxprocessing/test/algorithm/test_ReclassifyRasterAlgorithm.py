@@ -6,7 +6,7 @@ from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import landcover_raster_30m
-from qgis._core import QgsRasterLayer
+from qgis.core import QgsRasterLayer
 
 
 class TestReclassifyRasterAlgorithm(TestCase):
