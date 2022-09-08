@@ -3,24 +3,24 @@ from typing import Dict, Any, List, Tuple
 import numpy as np
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-from enmapboxprocessing.typing import ClassifierDump, Category
+from enmapboxprocessing.typing import RegressorDump, Target
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 from typeguard import typechecked
 
 
 @typechecked
-class PrepareClassificationDatasetFromJsonAlgorithm(EnMAPProcessingAlgorithm):
+class PrepareRegressionDatasetFromJsonAlgorithm(EnMAPProcessingAlgorithm):
     P_JSON_FILE, _JSON_FILE = 'jsonFile', 'JSON file'
-    P_OUTPUT_DATASET, _OUTPUT_DATASET = 'outputClassificationDataset', 'Output dataset'
+    P_OUTPUT_DATASET, _OUTPUT_DATASET = 'outputRegressionDataset', 'Output dataset'
 
     @classmethod
     def displayName(cls) -> str:
-        return 'Create classification dataset (from JSON file)'
+        return 'Create regression dataset (from JSON file)'
 
     def shortDescription(self) -> str:
-        return 'Create a classification dataset from a JSON file and store the result as a pickle file. \n' \
-               'Example file (classifier.pkl.json) can be found in the EnMAP-Box testdata folder).'
+        return 'Create a regression dataset from a JSON file and store the result as a pickle file. \n' \
+               'Example file (regressor.pkl.json) can be found in the EnMAP-Box testdata folder).'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
@@ -46,11 +46,11 @@ class PrepareClassificationDatasetFromJsonAlgorithm(EnMAPProcessingAlgorithm):
             self.tic(feedback, parameters, context)
 
             json = Utils.jsonLoad(filenameJson)
-            json['categories'] = [Category(**values) for values in json['categories']]
+            json['targets'] = [Target(**values) for values in json['targets']]
             json['X'] = np.array(json['X'])
             json['y'] = np.array(json['y'])
-            json['classifier'] = None
-            dump = ClassifierDump.fromDict(json)
+            json['regressor'] = None
+            dump = RegressorDump.fromDict(json)
             Utils.pickleDump(dump.__dict__, filename)
 
             result = {self.P_OUTPUT_DATASET: filename}

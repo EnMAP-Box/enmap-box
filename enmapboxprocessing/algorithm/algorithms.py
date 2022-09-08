@@ -112,6 +112,8 @@ from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousvectoran
     PrepareRegressionDatasetFromContinuousVectorAndFieldsAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromfilesalgorithm import \
     PrepareRegressionDatasetFromFilesAlgorithm
+from enmapboxprocessing.algorithm.prepareregressiondatasetfromjsonalgorithm import \
+    PrepareRegressionDatasetFromJsonAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromsynthmixalgorithm import \
     PrepareRegressionDatasetFromSynthMixAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromtablealgorithm import \
@@ -120,6 +122,8 @@ from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromcodealgorithm im
     PrepareUnsupervisedDatasetFromCodeAlgorithm
 from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromfilealgorithm import \
     PrepareUnsupervisedDatasetFromFileAlgorithm
+from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromjsonalgorithm import \
+    PrepareUnsupervisedDatasetFromJsonAlgorithm
 from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromlibraryalgorithm import \
     PrepareUnsupervisedDatasetFromLibraryAlgorithm
 from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromrasteralgorithm import \
@@ -316,12 +320,14 @@ def algorithms():
         PrepareRegressionDatasetFromContinuousVectorAlgorithm(),
         PrepareRegressionDatasetFromContinuousVectorAndFieldsAlgorithm(),
         PrepareRegressionDatasetFromFilesAlgorithm(),
+        PrepareRegressionDatasetFromJsonAlgorithm(),
         PrepareRegressionDatasetFromTableAlgorithm(),
         PrepareUnsupervisedDatasetFromCodeAlgorithm(),
         PrepareUnsupervisedDatasetFromLibraryAlgorithm(),
         PrepareUnsupervisedDatasetFromRasterAlgorithm(),
         PrepareUnsupervisedDatasetFromFileAlgorithm(),
         PrepareUnsupervisedDatasetFromVectorAndFieldsAlgorithm(),
+        PrepareUnsupervisedDatasetFromJsonAlgorithm(),
         RandomPointsFromMaskRasterAlgorithm(),
         RandomPointsFromCategorizedRasterAlgorithm(),
         RandomSamplesFromClassificationDatasetAlgorithm(),

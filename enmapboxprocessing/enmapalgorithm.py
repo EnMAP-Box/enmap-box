@@ -47,6 +47,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     PickleFileExtension = 'pkl'
     PickleFileDestination = 'Destination pickle file.'
     JsonFileFilter = 'JSON (*.json)'
+    JsonFileExtension = 'json'
     JsonFileDestination = 'Destination JSON file.'
     RasterFileDestination = 'Raster file destination.'
     VectorFileDestination = 'Vector file destination.'

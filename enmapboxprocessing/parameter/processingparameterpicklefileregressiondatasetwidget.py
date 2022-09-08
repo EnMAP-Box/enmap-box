@@ -1,5 +1,7 @@
 from os.path import basename, join, dirname
 
+from enmapboxprocessing.algorithm.prepareregressiondatasetfromjsonalgorithm import \
+    PrepareRegressionDatasetFromJsonAlgorithm
 from qgis.PyQt.uic import loadUi
 
 from enmapbox import EnMAPBox
@@ -59,6 +61,9 @@ class ProcessingParameterPickleFileRegressionDatasetWidget(QWidget):
 
             (PrepareRegressionDatasetFromFilesAlgorithm(),
              QIcon(':/images/themes/default/mIconFile.svg')),
+
+            (PrepareRegressionDatasetFromJsonAlgorithm(),
+             QIcon(':/images/themes/default/mIconFieldJson.svg'))
         ]:
             action = self.menu.addAction(alg.displayName())
             action.setIcon(icon)

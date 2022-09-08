@@ -40,6 +40,7 @@ classificationDatasetAsForceFile = (join(root, 'force_features.csv'), join(root,
 
 # todo: regressionDatasetAsVector = join(root, 'classification_dataset.gpkg')
 # todo: regressionDatasetAsCsv = join(root, 'classification_dataset.csv')
+regressionDatasetAsJsonFile = join(root, 'regressor.pkl.json')
 regressionDatasetAsPkl = join(root, 'regression_dataset.pkl')
 
 # learner and dataset (X, y) as dump
