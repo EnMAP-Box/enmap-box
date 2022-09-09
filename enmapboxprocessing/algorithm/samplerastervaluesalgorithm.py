@@ -72,8 +72,8 @@ class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
                 self.samplePoints(filename, raster, vector, selectedFeaturesOnly, feedback, feedback2, context)
             else:
                 self.samplePolygons(
-                    filename, raster, vector, selectedFeaturesOnly, coverageMin, coverageMax, feedback, feedback2,
-                    context
+                    filename, raster, vector, selectedFeaturesOnly, int(coverageMin), int(coverageMax), feedback,
+                    feedback2, context
                 )
             result = {self.P_OUTPUT_POINTS: filename}
             self.toc(feedback, result)
