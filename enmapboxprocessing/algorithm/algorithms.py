@@ -205,6 +205,7 @@ from enmapboxprocessing.algorithm.spectralconvolutionrickerwavelet1dalgorithm im
 from enmapboxprocessing.algorithm.spectralconvolutionsavitskygolay1dalgorithm import \
     SpectralConvolutionSavitskyGolay1DAlgorithm
 from enmapboxprocessing.algorithm.spectralconvolutiontrapezoid1dalgorithm import SpectralConvolutionTrapezoid1DAlgorithm
+from enmapboxprocessing.algorithm.spectralindexoptimizeralgorithm import SpectralIndexOptimizerAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingbyresponsefunctionlibraryalgorithm import \
     SpectralResamplingByResponseFunctionLibraryAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingbyspectralrasterwavelengthandfwhmalgorithm import \
@@ -383,6 +384,7 @@ def algorithms():
         SpectralConvolutionRickerWavelet1DAlgorithm(),
         SpectralConvolutionSavitskyGolay1DAlgorithm(),
         SpectralConvolutionTrapezoid1DAlgorithm(),
+        SpectralIndexOptimizerAlgorithm(),
         SpectralResamplingByResponseFunctionLibraryAlgorithm(),
         SpectralResamplingBySpectralRasterWavelengthAndFwhmAlgorithm(),
         SpectralResamplingToCustomSensorAlgorithm(),
