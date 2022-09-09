@@ -20,7 +20,7 @@ class PrepareClassificationDatasetFromJsonAlgorithm(EnMAPProcessingAlgorithm):
 
     def shortDescription(self) -> str:
         return 'Create a classification dataset from a JSON file and store the result as a pickle file. \n' \
-               f'Example file (classifier.pkl.json) can be found in the EnMAP-Box testdata folder).'
+               'Example file (classifier.pkl.json) can be found in the EnMAP-Box testdata folder).'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
