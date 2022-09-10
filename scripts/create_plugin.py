@@ -42,7 +42,7 @@ app = start_app()
 import enmapbox
 from enmapbox import DIR_REPO
 from enmapbox.qgispluginsupport.qps.make.deploy import QGISMetadataFileWriter, userProfileManager
-from enmapbox.gui.utils import zipdir
+from enmapbox.qgispluginsupport.qps.utils import zipdir
 from qgis.core import QgsFileUtils
 
 
