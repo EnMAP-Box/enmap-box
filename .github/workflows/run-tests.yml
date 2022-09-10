@@ -1,0 +1,33 @@
+name: 🧪 EnMAP-Box Tests
+
+on:
+  push:
+    branches:
+      - main
+      - release-**
+
+  pull_request:
+    branches:
+      - main
+      - release-**
+  release:
+    types: [published]
+
+jobs:
+  # Run EnMAP-Box tests
+  test:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        qgis_version: [latest, release-3_24]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Test on QGIS
+        run: |
+          ls -la .docker/
+          chmod +x .docker/run_docker_tests.sh
+          chmod +x runtests.sh
+          docker-compose -f .docker/docker-compose.gh.yml run qgis ./usr/src/.docker/run_docker_tests.sh
