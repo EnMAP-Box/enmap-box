@@ -539,7 +539,7 @@ class DataSourceManagerTreeView(TreeView):
 
             elif isinstance(node, VectorDataSource):
 
-                if node.wkbType() not in [QgsWkbTypes.NoGeometry, QgsWkbTypes.Unknown, QgsWkbTypes.UnknownGeometry]:
+                if node.geometryType() not in [QgsWkbTypes.NullGeometry, QgsWkbTypes.UnknownGeometry]:
                     a = m.addAction('Open in new map')
                     a.triggered.connect(lambda *args, s=node: self.openInMap(s, None))
 
