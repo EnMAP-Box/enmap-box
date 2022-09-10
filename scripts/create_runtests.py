@@ -19,28 +19,7 @@ def create_runtests():
     assert DIR_REPO.is_dir()
     assert (DIR_REPO / '.git').is_dir()
 
-    PATH_RUNTESTS_BAT = DIR_SCRIPTS / 'runtests.bat'
     PATH_RUNTESTS_SH = DIR_SCRIPTS / 'runtests.sh'
-    PATH_YAML = DIR_REPO / 'bitbucket-pipelines.yml'
-
-    PREFACE_BAT = """
-:: use this script to run unit tests locally
-::
-@echo off
-set CI=True
-set PYTHONPATH=%~dp0/..;%PYTHONPATH%
-set PYTHONPATH
-set PYTHON=python
-::WHERE python3 >nul 2>&1 && (
-::    echo Found "python3" command
-::    set PYTHON=python3
-::) || (
-::    echo Did not found "python3" command. use "python" instead
-::    set PYTHON=python
-::)
-
-::start %PYTHON% scripts/setup_repository.py
-"""
 
     PREFACE_SH = r"""#!/bin/bash
 QT_QPA_PLATFORM=offscreen
@@ -53,12 +32,7 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd):/usr/share/qgis/python/plugins"
 # python3 scripts/setup_repository.py
 """
 
-    # dirOut = 'test-reports/today'
-    linesBat = [PREFACE_BAT]
     linesSh = [PREFACE_SH]
-    linesYAML = []
-    # linesBat.append('mkdir {}'.format(dirOut.replace('/', '\\')))
-    # linesSh.append('mkdir {}'.format(dirOut))
 
     n = 0
     if True:
@@ -67,11 +41,9 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd):/usr/share/qgis/python/plugins"
                 file = pathlib.Path(file)
                 do_append = '' if n == 0 else '--append'
                 pathTest = file.relative_to(DIR_REPO).as_posix()
-                lineBat = '%PYTHON% -m coverage run --rcfile=.coveragec {}  {}'.format(do_append, pathTest)
-                lineSh = 'python3 -m coverage run --rcfile=.coveragec {}  {}'.format(do_append, pathTest)
-                linesBat.append(lineBat)
+                # lineSh = 'python3 -m coverage run --rcfile=.coveragec {}  {}'.format(do_append, pathTest)
+                lineSh = f'python3 -m {pathTest}'
                 linesSh.append(lineSh)
-                linesYAML.append(lineSh)
                 n += 1
     else:
         lineBat = '%PYTHON% -m coverage run -m unittest discover -s enmapboxtesting'
