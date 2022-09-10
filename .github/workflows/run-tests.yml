@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - release-**
+      - 14-setup-gh-actions**
 
   pull_request:
     branches:
