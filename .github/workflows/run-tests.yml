@@ -3,8 +3,8 @@ name: 🧪 EnMAP-Box Tests
 on:
   push:
     branches:
-      - main
-      - release-**
+      #- main
+      #- release-**
       - 14-setup-gh-actions**
 
   pull_request:
