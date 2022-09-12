@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from math import nan
 from typing import Dict, Any, List, Tuple
 
@@ -134,7 +133,7 @@ class SpectralIndexOptimizerAlgorithm(EnMAPProcessingAlgorithm):
                     a, b = np.unravel_index(np.nanargmax(arr), arr.shape)
                 else:
                     a, b = np.unravel_index(np.nanargmin(arr), arr.shape)
-                feedback.pushInfo(f'{bandName}: {arr[a,b]}; {features[a]}, {features[b]}')
+                feedback.pushInfo(f'{bandName}: {arr[a, b]}; {features[a]}, {features[b]}')
                 writer.setMetadataItem(bandName, f'{arr[a, b]}; {features[a]}, {features[b]}')
 
             for bandNo, bandName in enumerate(bandNames, 1):
