@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from math import nan
 from typing import Dict, Any, List, Tuple
 
@@ -98,7 +99,6 @@ class SpectralIndexOptimizerAlgorithm(EnMAPProcessingAlgorithm):
             olsr = LinearRegression()
             nbands = ntargets * 3
             scores = np.full((nbands, nfeatures, nfeatures), nan)
-            feedback.pushInfo('Scores (A, B): RMSE, MAE, R2')
             for ai in range(nfeatures):
                 feedback.setProgress(ai / nfeatures * 100)
                 A = X[:, ai]
@@ -126,6 +126,17 @@ class SpectralIndexOptimizerAlgorithm(EnMAPProcessingAlgorithm):
                     bandNames.append(f'{target.name} - {scoreName}')
 
             writer = Driver(filename).createFromArray(scores)
+
+            # report best scores
+            feedback.pushInfo('Best feature combinations:')
+            for arr, bandName in zip(scores, bandNames):
+                if 'R^2' in bandName:
+                    a, b = np.unravel_index(np.nanargmax(arr), arr.shape)
+                else:
+                    a, b = np.unravel_index(np.nanargmin(arr), arr.shape)
+                feedback.pushInfo(f'{bandName}: {arr[a,b]}; {features[a]}, {features[b]}')
+                writer.setMetadataItem(bandName, f'{arr[a, b]}; {features[a]}, {features[b]}')
+
             for bandNo, bandName in enumerate(bandNames, 1):
                 writer.setBandName(bandName, bandNo)
             writer.setNoDataValue(nan)
