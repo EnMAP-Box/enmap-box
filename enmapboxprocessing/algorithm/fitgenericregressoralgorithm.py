@@ -17,5 +17,5 @@ class FitGenericRegressorAlgorithm(FitRegressorAlgorithmBase):
     def code(cls):
         from sklearn.dummy import DummyRegressor
 
-        classifier = DummyRegressor()
-        return classifier
+        regressor = DummyRegressor()
+        return regressor
