@@ -31,11 +31,13 @@ import sys
 import time
 import typing
 from difflib import SequenceMatcher
+from typing import List
 
 import requests
 
 from enmapbox import debugLog
 from enmapbox.qgispluginsupport.qps.utils import qgisAppQgisInterface
+from enmapbox.settings import Settings
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import \
     pyqtSignal, pyqtSlot, Qt, \
@@ -110,6 +112,7 @@ class PIPPackage(object):
         self.mLatestVersion = '<unknown>'
         self.mInstalledVersion = ''
         self.mImportError = ''
+
         try:
             __import__(self.pyPkgName)
             self.mInstalledVersion = '<installed>'
@@ -124,6 +127,14 @@ class PIPPackage(object):
 
     def updateAvailable(self) -> bool:
         return self.mInstalledVersion < self.mLatestVersion
+
+    def warnIfNotInstalled(self) -> bool:
+        key = f'PIPInstaller.Warn.{self.pyPkgName}'
+        return Settings.entryValue(key, True)
+
+    def setWarnIfNotInstalled(self, b: bool = True):
+        key = f'PIPInstaller.Warn.{self.pyPkgName}'
+        Settings.setEntryValue(key, b is True)
 
     def __str__(self):
         return '{}'.format(self.pyPkgName)
@@ -593,24 +604,54 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
         self.cnInstalledVersion = 'Installed'
         self.cnLatestVersion = 'Latest'
         self.cnCommand = 'Installation Command'
-        self.mColumnNames = [self.cnPkg, self.cnInstalledVersion, self.cnLatestVersion, self.cnCommand]
+        self.mColumnNames = [self.cnPkg,
+                             self.cnInstalledVersion,
+                             self.cnLatestVersion,
+                             self.cnCommand]
         self.mColumnToolTips = ['Python package name',
-                                'Installed version',
+                                'Installed version. <br>' +
+                                'Uncheck missing packages to hide warnings during EnMAP-Box startup',
                                 'Latest version',
                                 'Command to install/update the package from your command line interface']
-        self.mPackages = []
+        self.mPackages: List[PIPPackage] = []
         self.mWarned = False
         self.mUser = True
 
         self.mAnimatedIcon = QgsAnimatedIcon(QgsApplication.iconPath("/mIconLoading.gif"), self)
-        # self.mAnimatedIcon.connectFrameChanged(self, 'onFrameChange')
-        # self.mAnimatedIcon.frameChanged.connect(self.onFrameChange)
+
+    def flags(self, index: QModelIndex):
+        if not index.isValid():
+            return Qt.NoItemFlags
+
+        cn = self.mColumnNames[index.column()]
+        flags = Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        if cn == self.cnInstalledVersion:
+            flags = flags | Qt.ItemIsUserCheckable
+        return flags
 
     @pyqtSlot()
     def onFrameChange(self):
 
         s = ""
 
+    def setData(self, index: QModelIndex, value, role=None):
+        if not index.isValid():
+            return None
+
+        pkg = self.mPackages[index.row()]
+
+        assert isinstance(pkg, PIPPackage)
+        cn = self.mColumnNames[index.column()]
+
+        changed = False
+        if role == Qt.CheckStateRole:
+            if cn == self.cnInstalledVersion:
+                pkg.setWarnIfNotInstalled(value == Qt.Checked)
+                changed = True
+
+        if changed:
+            self.dataChanged.emit(index, index, [role])
+        return changed
     def setUser(self, b: bool):
         self.mUser = b is True
         self.dataChanged.emit(self.createIndex(0, 0), self.createIndex(self.rowCount() - 1, self.columnCount() - 1))
@@ -724,6 +765,10 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
                 if 'git+' in pkg.installCommand():
                     info += '\nThis command requires having git (https://www.git-scm.com) installed!'
                 return info
+
+        if role == Qt.CheckStateRole:
+            if cn == self.cnInstalledVersion:
+                return Qt.Checked if pkg.warnIfNotInstalled() else Qt.Unchecked
 
         if role == Qt.DecorationRole and index.column() == 0:
             if pkg.mLatestVersion == '<unknown>':

@@ -1244,8 +1244,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             lambda: self.ui.processingPanel.setVisible(self.ui.processingPanel.isHidden()))
         from enmapbox.gui.about import AboutDialog
         self.ui.mActionAbout.triggered.connect(lambda: AboutDialog(parent=self.ui).show())
-        from enmapbox.gui.settings import showSettingsDialog
-        self.ui.mActionProjectSettings.triggered.connect(lambda: showSettingsDialog(self.ui))
+        # from enmapbox.gui.settings import showSettingsDialog
+        # self.ui.mActionProjectSettings.triggered.connect(lambda: showSettingsDialog(self.ui))
         self.ui.mActionExit.triggered.connect(self.exit)
 
         import webbrowser
@@ -1616,7 +1616,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             self.applicationRegistry.addApplicationListing(p)
 
         # find other app-folders or listing files folders
-        from enmapbox.gui.settings import enmapboxSettings
+        from enmapbox.settings import enmapboxSettings
         settings = enmapboxSettings()
         for appPath in re.split('[;\n]', settings.value('EMB_APPLICATION_PATH', '')):
             if os.path.isdir(appPath):
