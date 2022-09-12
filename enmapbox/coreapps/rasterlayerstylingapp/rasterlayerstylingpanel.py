@@ -1,8 +1,12 @@
 from math import nan
 from typing import Optional
 
+from osgeo import gdal
+
+from enmapboxprocessing.rasterwriter import RasterWriter
 from qgis.PyQt.QtWidgets import QDoubleSpinBox, QComboBox, QCheckBox, QToolButton, QLabel, QTabWidget, \
     QLineEdit, QTableWidget
+from qgis._core import QgsProject
 from qgis.core import QgsRasterLayer, QgsSingleBandGrayRenderer, QgsRectangle, \
     QgsContrastEnhancement, QgsRasterRenderer, QgsMultiBandColorRenderer, QgsSingleBandPseudoColorRenderer, \
     QgsMapLayerProxyModel, QgsRasterDataProvider, QgsRasterShader
@@ -92,6 +96,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
             mBand.mSlider.valueChanged.connect(mBand.mBandNo.setBand)
             mBand.mBandNo.bandChanged.connect(mBand.mSlider.setValue)
             mBand.mBandNo.bandChanged.connect(self.onBandChanged)
+            mBand.mIsBadBand.toggled.connect(self.onIsBadBandToggled)
 
             # waveband buttons
             for sname in CreateSpectralIndicesAlgorithm.ShortNames:
@@ -206,6 +211,10 @@ class RasterLayerStylingPanel(QgsDockWidget):
         # update wavelength info
         for mBand in [self.mRedBand, self.mGreenBand, self.mBlueBand, self.mGrayBand, self.mPseudoBand]:
             self.updateWavelengthInfo(mBand)
+
+        # update is bad band
+        for mBand in [self.mRedBand, self.mGreenBand, self.mBlueBand, self.mGrayBand, self.mPseudoBand]:
+            self.updateIsBadBand(mBand)
 
     def onVisualizationChanged(self):
         if self.mVisualization.currentText() == '':
@@ -336,6 +345,10 @@ class RasterLayerStylingPanel(QgsDockWidget):
         else:
             raise ValueError()
 
+        # update is bad band
+        for mBand in [self.mRedBand, self.mGreenBand, self.mBlueBand, self.mGrayBand, self.mPseudoBand]:
+            self.updateIsBadBand(mBand)
+
         if self.mRenderer.currentIndex() < self.DefaultRendererTab:
             self.mGroupBoxMinMax.show()
         else:
@@ -383,8 +396,53 @@ class RasterLayerStylingPanel(QgsDockWidget):
             raise ValueError()
 
         self.updateWavelengthInfo(mBand)
+        self.updateIsBadBand(mBand)
         self.updateMinMax()
         self.updateRenderer()
+
+    def onIsBadBandToggled(self):
+        layer: QgsRasterLayer = self.mLayer.currentLayer()
+        if layer is None:
+            return
+
+        mIsBadBand: QCheckBox = self.sender()
+        mBand: RasterLayerStylingBandWidget = mIsBadBand.parent()
+        bandNo = mBand.mBandNo.currentBand()
+        if bandNo == -1:
+            return
+
+        if mIsBadBand.isChecked():
+            badBandMultiplier = 0
+        else:
+            badBandMultiplier = 1
+
+        source = layer.source()
+
+        # find all layers with same source
+        layers = list()
+        for layerId in QgsProject.instance().mapLayers():
+            aLayer = QgsProject.instance().mapLayer(layerId)
+            if not isinstance(aLayer, QgsRasterLayer):
+                continue
+            if aLayer.dataProvider().name() != 'gdal':
+                continue
+            if source.replace(r'\/', '') == aLayer.source().replace(r'\/', ''):
+                layers.append(aLayer)
+
+        # flush sources
+        for aLayer in layers:
+            Utils.setLayerDataSource(aLayer, 'gdal', source)
+
+        # set metadata
+        ds: gdal.Dataset = gdal.Open(source)
+        writer = RasterWriter(ds)
+        writer.setBadBandMultiplier(badBandMultiplier, bandNo)
+        writer.close()
+        del ds
+
+        # reconnect sources
+        for aLayer in layers:
+            Utils.setLayerDataSource(aLayer, 'gdal', source)
 
     def updateWavelengthInfo(self, mBand: RasterLayerStylingBandWidget):
         layer: QgsRasterLayer = self.mLayer.currentLayer()
@@ -402,6 +460,20 @@ class RasterLayerStylingPanel(QgsDockWidget):
         else:
             mBand.mWavelength.show()
             mBand.mWavelength.setValue(int(wavelength))
+
+    def updateIsBadBand(self, mBand: RasterLayerStylingBandWidget):
+        layer: QgsRasterLayer = self.mLayer.currentLayer()
+        if layer is None:
+            return
+        bandNo = mBand.mBandNo.currentBand()
+        if bandNo == -1:
+            mBand.mIsBadBand.hide()
+        else:
+            mBand.mIsBadBand.show()
+            if RasterReader(layer).badBandMultiplier(bandNo) == 0:
+                mBand.mIsBadBand.setChecked(True)
+            else:
+                mBand.mIsBadBand.setChecked(False)
 
     def updateMinMax(self):
         layer: QgsRasterLayer = self.mLayer.currentLayer()
