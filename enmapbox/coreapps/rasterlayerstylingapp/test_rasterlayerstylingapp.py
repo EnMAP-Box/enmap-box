@@ -7,7 +7,7 @@ from enmapbox.testing import start_app
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.testcase import TestCase
-from qgis._core import QgsRasterLayer
+from qgis.core import QgsRasterLayer
 from rasterlayerstylingapp import RasterLayerStylingApp
 
 

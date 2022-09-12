@@ -1,9 +1,7 @@
-from PyQt5.QtWidgets import QCheckBox
-
+from qgis.PyQt import uic
+from qgis.PyQt.QtWidgets import QCheckBox
 from qgis.PyQt.QtWidgets import QWidget, QLabel, QLineEdit, QSlider, QSpinBox
 from qgis.gui import QgsRasterBandComboBox
-
-from qgis.PyQt import uic
 from typeguard import typechecked
 
 

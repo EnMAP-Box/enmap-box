@@ -3,25 +3,24 @@ from typing import Optional
 
 from osgeo import gdal
 
-from enmapboxprocessing.rasterwriter import RasterWriter
-from qgis.PyQt.QtWidgets import QDoubleSpinBox, QComboBox, QCheckBox, QToolButton, QLabel, QTabWidget, \
-    QLineEdit, QTableWidget
-from qgis._core import QgsProject
-from qgis.core import QgsRasterLayer, QgsSingleBandGrayRenderer, QgsRectangle, \
-    QgsContrastEnhancement, QgsRasterRenderer, QgsMultiBandColorRenderer, QgsSingleBandPseudoColorRenderer, \
-    QgsMapLayerProxyModel, QgsRasterDataProvider, QgsRasterShader
-from qgis.gui import (
-    QgsDockWidget, QgsMapLayerComboBox, QgsCollapsibleGroupBox, QgsColorRampButton
-)
-
 from enmapbox import EnMAPBox
 from enmapbox.gui.mapcanvas import MapCanvas
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from enmapbox.utils import BlockSignals
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt import uic
+from qgis.PyQt.QtWidgets import QDoubleSpinBox, QComboBox, QCheckBox, QToolButton, QLabel, QTabWidget, \
+    QLineEdit, QTableWidget
+from qgis.core import QgsProject
+from qgis.core import QgsRasterLayer, QgsSingleBandGrayRenderer, QgsRectangle, \
+    QgsContrastEnhancement, QgsRasterRenderer, QgsMultiBandColorRenderer, QgsSingleBandPseudoColorRenderer, \
+    QgsMapLayerProxyModel, QgsRasterDataProvider, QgsRasterShader
+from qgis.gui import (
+    QgsDockWidget, QgsMapLayerComboBox, QgsCollapsibleGroupBox, QgsColorRampButton
+)
 from rasterlayerstylingapp.rasterlayerstylingbandwidget import RasterLayerStylingBandWidget
 from rasterlayerstylingapp.rasterlayerstylingpercentileswidget import RasterLayerStylingPercentilesWidget
 from typeguard import typechecked
