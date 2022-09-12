@@ -25,7 +25,7 @@ class StackRasterLayersAlgorithm(EnMAPProcessingAlgorithm):
         return 'Stack raster layers and store the result as a VRT file.' \
                'This is a slimmed down version of the more powerful/complicated GDAL "Build virtual raster" ' \
                'algorithm.\n' \
-               'If you also want to delete or rearrange individually bands, just use the "Subset raster layer bands" ' \
+               'If you also want to delete or rearrange individual bands, just use the "Subset raster layer bands" ' \
                'algorithm afterwards.'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
