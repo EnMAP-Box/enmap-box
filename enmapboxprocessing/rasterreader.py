@@ -141,6 +141,8 @@ class RasterReader(object):
             yOffset = int(round((extent.yMaximum() - blockExtent.yMaximum()) / pixelSizeY))
             width = min(blockSizeX, int(round((blockExtent.xMaximum() - blockExtent.xMinimum()) / pixelSizeX)))
             height = min(blockSizeY, int(round((blockExtent.yMaximum() - blockExtent.yMinimum()) / pixelSizeY)))
+            if width == 0 or height == 0:
+                continue  # empty blocks may occure, but can just skip over
             yield RasterBlockInfo(blockExtent, xOffset, yOffset, width, height)
 
     def arrayFromBlock(

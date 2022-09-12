@@ -1,4 +1,5 @@
 import unittest
+import warnings
 from os.path import dirname, join, exists
 from typing import Dict
 
@@ -34,5 +35,9 @@ class TestCase(unittest.TestCase):
         import enmapbox
         return join(dirname(dirname(enmapbox.__file__)), 'test-outputs', basename)
 
-    def additionalDataFolderExists(self):
-        return exists(r'D:\data')
+    def fileExists(self, filename):
+        if exists(filename):
+            return True
+        else:
+            warnings.warn(f'Skipping test using local file: {filename}')
+            return False
