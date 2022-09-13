@@ -473,6 +473,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
         else:
             raise ValueError()
 
+        layer.rendererChanged.emit()
         layer.triggerRepaint()
         self.updateLinkedLayerRenderer()
 
@@ -693,6 +694,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
             else:
                 raise ValueError()
 
+            layer.rendererChanged.emit()
             layer2.triggerRepaint()
 
     def currentExtent(self, layer: QgsRasterLayer, statisticsType: int) -> QgsRectangle:
