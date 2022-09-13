@@ -294,6 +294,22 @@
        <item>
         <widget class="QgsRasterBandComboBox" name="mBandNo"/>
        </item>
+       <item>
+        <widget class="QCheckBox" name="mIsBadBand">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mark the band as a bad band.&lt;/p&gt;&lt;p&gt;Note that this will alter the metadata inside the source.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>is bad</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
     </layout>
