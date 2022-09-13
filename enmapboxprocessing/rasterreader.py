@@ -5,6 +5,7 @@ from typing import Iterable, List, Union, Optional, Tuple
 import numpy as np
 from osgeo import gdal
 
+from enmapbox import messageLog
 from enmapboxprocessing.gridwalker import GridWalker
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.typing import (QgisDataType, RasterSource, Array3d, Metadata, MetadataValue,
@@ -480,12 +481,13 @@ class RasterReader(object):
                 wavelength = self.wavelength(bandNo, raw=True)
                 if wavelength is not None:
                     if wavelength < 100:
-                        warnings.warn('wavelength units missing, assuming Micrometers')
+                        msg = 'wavelength units missing, assuming Micrometers'
                         return 'Micrometers'
                     else:
-                        warnings.warn('wavelength units missing, assuming Nanometers')
+                        msg = 'wavelength units missing, assuming Nanometers'
                         return 'Nanometers'
-
+                    warnings.warn(msg)
+                    messageLog(msg, level=Qgis.Warning)
         return None
 
     def wavelength(self, bandNo: int, units: str = None, raw=False) -> Optional[float]:
