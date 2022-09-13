@@ -16,6 +16,7 @@ set -e
 pushd /usr/src
 DEFAULT_PARAMS='-x -v'
 cd /usr/src
+ls -l
 export QT_QPA_PLATFORM=offscreen
 export CI=True
 export PYTHONPATH="${PYTHONPATH}:$(pwd)"
