@@ -64,8 +64,8 @@ initQgisApplication = start_app
 class EnMAPBoxTestCase(TestCase):
     @classmethod
     def setUpClass(cls, resources=[]):
-        tmpDir = cls.tempDir(cls, subdir=cls.__name__)
-        os.chdir(tmpDir)
+        # tmpDir = cls.tempDir(cls, subdir=cls.__name__)
+        # os.chdir(tmpDir)
         super().setUpClass(resources=resources)
 
         # add test-dir as site lib
@@ -99,7 +99,7 @@ class EnMAPBoxTestCase(TestCase):
         p = pathlib.Path(DIR_REPO) / 'test-outputs' / foldername
         if isinstance(subdir, str):
             p = p / subdir
-        if p.exists() and p.is_dir():
+        if cleanup and p.exists() and p.is_dir():
             shutil.rmtree(p)
         os.makedirs(p, exist_ok=True)
         return p
