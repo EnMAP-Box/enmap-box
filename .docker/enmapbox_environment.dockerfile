@@ -10,7 +10,7 @@ RUN apt-get update
 
 COPY ./requirements.txt /tmp/
 RUN pip3 install -r /tmp/requirements.txt
-
+RUN python3 scripts/setup_repository.py
 
 # Avoid sqlcmd termination due to locale -- see https://github.com/Microsoft/mssql-docker/issues/163
 # RUN echo "nb_NO.UTF-8 UTF-8" > /etc/locale.gen
