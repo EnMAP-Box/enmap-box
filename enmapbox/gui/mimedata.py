@@ -1,10 +1,10 @@
 import pickle
 import typing
 import uuid
+from os.path import basename
 from typing import List
 
 from enmapbox import debugLog
-from enmapboxprocessing.algorithm.importproductsdraganddropsupport import tryToImportSensorProducts
 from qgis.PyQt.QtCore import QMimeData, QUrl, QByteArray
 from qgis.PyQt.QtXml import QDomNamedNodeMap, QDomDocument
 from qgis.core import QgsLayerItem
@@ -207,7 +207,12 @@ def extractMapLayers(mimeData: QMimeData,
 
     elif MDF_URILIST in mimeData.formats():
         for url in mimeData.urls():
-            dataSources = DataSourceFactory.create(url)
+
+            if basename(url.url()) == 'MTD_MSIL2A.xml':  # resolves GitHub issue #42
+                dataSources = [None]
+            else:
+                dataSources = DataSourceFactory.create(url)
+
             for dataSource in dataSources:
                 if isinstance(dataSource, SpatialDataSource):
                     lyr = dataSource.asMapLayer()
@@ -218,6 +223,7 @@ def extractMapLayers(mimeData: QMimeData,
                 else:
                     # check if URL is associated with an external product,
                     # if so, the product is created by running the appropriate processing algorithm
+                    from enmapboxprocessing.algorithm.importproductsdraganddropsupport import tryToImportSensorProducts
                     filename = url.toLocalFile()
                     mapLayers = tryToImportSensorProducts(filename)
                     newMapLayers.extend(mapLayers)

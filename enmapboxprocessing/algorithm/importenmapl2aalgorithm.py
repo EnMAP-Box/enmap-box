@@ -32,7 +32,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.ImportData.value
+        return Group.ImportData.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterFile(self.P_FILE, self._FILE, extension='xml')
@@ -54,7 +54,6 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
     ) -> Dict[str, Any]:
         xmlFilename = self.parameterAsFile(parameters, self.P_FILE, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_RASTER, context)
-
         with open(filename + '.log', 'w') as logfile:
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)

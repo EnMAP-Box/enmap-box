@@ -100,7 +100,7 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
         text.extend([(f'Vector layer mapped to V{i}', '') for i in range(1, 11)])  # just silince those
 
     def group(self):
-        return Group.Test.value + Group.RasterAnalysis.value
+        return Group.RasterAnalysis.value
 
     def addParameterMathCode(
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False

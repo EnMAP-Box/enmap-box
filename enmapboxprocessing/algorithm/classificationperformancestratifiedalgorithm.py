@@ -48,7 +48,7 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.Classification.value
+        return Group.Classification.value
 
     def checkCategories(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
         classification = self.parameterAsRasterLayer(parameters, self.P_CLASSIFICATION, context)

@@ -245,7 +245,7 @@
            <property name="value">
             <double>70.000000000000000</double>
            </property>
-           <property name="showClearButton">
+           <property name="showClearButton" stdset="0">
             <bool>false</bool>
            </property>
           </widget>
@@ -286,7 +286,7 @@
            <property name="maximum">
             <number>999999999</number>
            </property>
-           <property name="showClearButton">
+           <property name="showClearButton" stdset="0">
             <bool>false</bool>
            </property>
           </widget>
@@ -419,5 +419,22 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>mSampleType</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>stackedWidget</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>224</x>
+     <y>304</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>344</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

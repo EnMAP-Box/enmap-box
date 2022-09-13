@@ -50,7 +50,7 @@ class VrtBandMathAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.RasterAnalysis.value
+        return Group.RasterAnalysis.value
 
     def addParameterMathCode(
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False

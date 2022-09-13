@@ -34,7 +34,7 @@ class ImportDesisL1CAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.ImportData.value
+        return Group.ImportData.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterFile(self.P_FILE, self._FILE, extension='xml')

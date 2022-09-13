@@ -38,7 +38,7 @@ class FitClustererAlgorithmBase(EnMAPProcessingAlgorithm):
         raise NotImplementedError()
 
     def group(self):
-        return Group.Test.value + Group.Clustering.value
+        return Group.Clustering.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterCode(self.P_CLUSTERER, self._CLUSTERER, self.defaultCodeAsString())

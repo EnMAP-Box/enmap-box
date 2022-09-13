@@ -47,7 +47,7 @@ class PrepareClassificationDatasetFromCategorizedRasterAlgorithm(EnMAPProcessing
         ]
 
     def group(self):
-        return Group.Test.value + Group.DatasetCreation.value
+        return Group.DatasetCreation.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_CATEGORIZED_RASTER, self._CATEGORIZED_RASTER)

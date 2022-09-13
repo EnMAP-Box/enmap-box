@@ -39,7 +39,7 @@ class PrepareRegressionDatasetFromContinuousRasterAlgorithm(EnMAPProcessingAlgor
         ]
 
     def group(self):
-        return Group.Test.value + Group.DatasetCreation.value
+        return Group.DatasetCreation.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_CONTINUOUS_RASTER, self._CONTINUOUS_RASTER)

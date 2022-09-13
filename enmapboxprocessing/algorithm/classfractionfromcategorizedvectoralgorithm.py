@@ -37,7 +37,7 @@ class ClassFractionFromCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.Classification.value
+        return Group.Classification.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterVectorLayer(self.P_CATEGORIZED_VECTOR, self._CATEGORIZED_VECTOR)

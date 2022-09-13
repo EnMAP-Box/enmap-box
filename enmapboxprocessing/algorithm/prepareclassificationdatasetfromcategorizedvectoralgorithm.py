@@ -52,7 +52,7 @@ class PrepareClassificationDatasetFromCategorizedVectorAlgorithm(EnMAPProcessing
         ]
 
     def group(self):
-        return Group.Test.value + Group.DatasetCreation.value
+        return Group.DatasetCreation.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterVectorLayer(self.P_CATEGORIZED_VECTOR, self._CATEGORIZED_VECTOR)

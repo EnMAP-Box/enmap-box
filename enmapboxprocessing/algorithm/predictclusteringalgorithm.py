@@ -40,7 +40,7 @@ class PredictClusteringAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.Clustering.value
+        return Group.Clustering.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)

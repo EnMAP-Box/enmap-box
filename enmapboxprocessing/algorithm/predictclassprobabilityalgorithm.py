@@ -34,7 +34,7 @@ class PredictClassPropabilityAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.Classification.value
+        return Group.Classification.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)

@@ -10,7 +10,7 @@ class SpatialMorphologicalGreyDilationAlgorithm(SpatialFilterFunctionAlgorithmBa
         return 'Spatial morphological Grey Dilation filter'
 
     def group(self):
-        return Group.Test.value + Group.ConvolutionMorphologyAndFiltering.value
+        return Group.ConvolutionMorphologyAndFiltering.value
 
     def shortDescription(self) -> str:
         link = self.htmlLink('https://en.wikipedia.org/wiki/Dilation_(morphology)', 'Wikipedia')

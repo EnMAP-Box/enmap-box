@@ -10,7 +10,7 @@ class SpatialMorphologicalGreyOpeningAlgorithm(SpatialFilterFunctionAlgorithmBas
         return 'Spatial morphological Grey Opening filter'
 
     def group(self):
-        return Group.Test.value + Group.ConvolutionMorphologyAndFiltering.value
+        return Group.ConvolutionMorphologyAndFiltering.value
 
     def shortDescription(self) -> str:
         link = self.htmlLink('https://en.wikipedia.org/wiki/Opening_(morphology)', 'Wikipedia')

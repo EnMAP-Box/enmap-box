@@ -28,7 +28,7 @@ class SaveLibraryAsGeoJsonAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.ExportData.value
+        return Group.ExportData.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterVectorLayer(self.P_LIBRARY, self._LIBRARY)

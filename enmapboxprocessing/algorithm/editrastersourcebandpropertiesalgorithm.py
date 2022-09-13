@@ -32,7 +32,7 @@ class EditRasterSourceBandPropertiesAlgorithm(EnMAPProcessingAlgorithm):
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
             (self._SOURCE, 'GDAL raster source.'),
-            (self._NAMES, 'List of band name strings (e.g".'),
+            (self._NAMES, 'List of band name strings (e.g).'),
             (self._WAVELENGTHS, 'List of band center wavelength values in nanometers. '
                                 'Use nan value to unset property.'),
             (self._FWHMS, 'List of band FWHM values in nanometers. '
@@ -49,7 +49,7 @@ class EditRasterSourceBandPropertiesAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.RasterMiscellaneous.value
+        return Group.RasterMiscellaneous.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterFile(self.P_SOURCE, self._SOURCE)

@@ -41,7 +41,7 @@ class PrepareUnsupervisedDatasetFromRasterAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.DatasetCreation.value
+        return Group.DatasetCreation.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_FEATURE_RASTER, self._FEATURE_RASTER)

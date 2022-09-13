@@ -41,7 +41,7 @@ class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.Classification.value
+        return Group.Classification.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterClassificationDataset(self.P_DATASET, self._DATASET)

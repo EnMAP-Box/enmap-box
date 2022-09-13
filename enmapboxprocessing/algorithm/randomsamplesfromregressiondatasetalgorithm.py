@@ -45,7 +45,7 @@ class RandomSamplesFromRegressionDatasetAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.DatasetCreation.value
+        return Group.DatasetCreation.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRegressionDataset(self.P_DATASET, self._DATASET)

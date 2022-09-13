@@ -46,7 +46,7 @@ class RandomPointsFromCategorizedRasterAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.VectorCreation.value
+        return Group.VectorCreation.value
 
     def checkN(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
         stratification = self.parameterAsRasterLayer(parameters, self.P_STRATIFICATION, context)

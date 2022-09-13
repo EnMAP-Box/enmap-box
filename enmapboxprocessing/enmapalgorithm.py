@@ -970,11 +970,11 @@ class Group(Enum):
     Preprocessing = 'Pre-processing'
     # Postprocessing = 'Post-processing'
     SpectralResampling = 'Spectral resampling'
-    Regression = 'Regression'
     Sampling = 'Sampling'
-    Test = ''
+    Regression = 'Regression'
     Testdata = 'Testdata'
     Transformation = 'Transformation'
+    Unmixing = 'Unmixing'
 
 
 class CookbookUrls(object):

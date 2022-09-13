@@ -45,7 +45,7 @@ class RegressionWorkflowAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.Regression.value
+        return Group.Regression.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRegressionDataset(self.P_DATASET, self._DATASET)

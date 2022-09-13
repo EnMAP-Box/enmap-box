@@ -10,7 +10,7 @@ class SpatialMorphologicalBlackTophatAlgorithm(SpatialFilterFunctionAlgorithmBas
         return 'Spatial morphological Black Top-Hat filter'
 
     def group(self):
-        return Group.Test.value + Group.ConvolutionMorphologyAndFiltering.value
+        return Group.ConvolutionMorphologyAndFiltering.value
 
     def shortDescription(self) -> str:
         link = self.htmlLink('https://en.wikipedia.org/wiki/Top-hat_transform', 'Wikipedia')

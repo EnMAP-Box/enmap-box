@@ -36,7 +36,7 @@ class CreateGridAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.RasterMiscellaneous.value
+        return Group.RasterMiscellaneous.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterCrs(self.P_CRS, self._CRS)

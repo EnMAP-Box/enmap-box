@@ -34,7 +34,7 @@ class SpectralResamplingBySpectralRasterWavelengthAndFwhmAlgorithm(EnMAPProcessi
         ]
 
     def group(self):
-        return Group.Test.value + Group.SpectralResampling.value
+        return Group.SpectralResampling.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
