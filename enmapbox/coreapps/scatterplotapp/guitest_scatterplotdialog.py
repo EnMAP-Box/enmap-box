@@ -1,10 +1,9 @@
 import numpy as np
 
-from qgis.core import QgsRasterLayer
-
 from enmapbox import EnMAPBox, initAll
-from enmapboxprocessing.driver import Driver
 from enmapbox.testing import start_app
+from enmapboxprocessing.driver import Driver
+from qgis.core import QgsRasterLayer
 from scatterplotapp.scatterplotdialog import ScatterPlotDialog
 
 qgsApp = start_app()
@@ -19,7 +18,9 @@ layer = QgsRasterLayer(
 
 # issue #1407
 filename = r'D:\source\QGISPlugIns\enmap-box\test-outputs\test3.tif'
-Driver(filename).createFromArray(np.array([[[1,2,3,4,5], [11,12,13,14,15], [21,22,23,24,25], [31,32,33,34,35]]]))
+Driver(filename).createFromArray(
+    np.array([[[1, 2, 3, 4, 5], [11, 12, 13, 14, 15], [21, 22, 23, 24, 25], [31, 32, 33, 34, 35]]])
+)
 layer = QgsRasterLayer(filename)
 
 mapDock = enmapBox.onDataDropped([layer])
