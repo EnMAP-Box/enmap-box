@@ -32,11 +32,11 @@ jobs:
         run: |
           # ls -la .docker/
           # ls -la
-          ls -la ~
-          
-          ls -la /usr/bin
-          # chmod +x .docker/run_docker_tests.sh
-          
-          # docker -h
+          # ls -la ~
+          # ls -la /usr/bin
+          docker --version
       - name: Test EnMAP-Box on QGIS
-        run: docker-compose -f .docker/docker-compose.gh.yml run qgis /usr/src/.docker/run_docker_tests.sh
+        run: | 
+          chmod +x .docker/run_docker_tests.sh
+          ls -la .docker/
+          docker compose -f .docker/docker-compose.gh.yml run qgis /usr/src/.docker/run_docker_tests.sh
