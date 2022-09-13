@@ -7,9 +7,9 @@ fi
 
 cd $(dirname $0)/..
 export GITHUB_WORKSPACE=$PWD # only for local execution
-
-docker-compose --verbose -f .docker/docker-compose.gh.yml run qgis /usr/src/.docker/run-docker-tests.sh $@
-docker-compose --verbose -f .docker/docker-compose.gh.yml rm -s -f
+ls -l /usr/src
+docker-compose -f .docker/docker-compose.gh.yml run qgis /usr/src/.docker/run-docker-tests.sh $@
+docker-compose -f .docker/docker-compose.gh.yml rm -s -f
 # requires that https://github.com/nektos/act is installed
 # cd ..
 # ~/bin/act -j test
