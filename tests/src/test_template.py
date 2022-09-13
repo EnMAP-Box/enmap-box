@@ -21,6 +21,9 @@ class EnMAPBoxTestCaseExample(EnMAPBoxTestCase):
 
         self.assertTrue(EnMAPBox.instance() is None)  # EnMAPBox is not started
 
+        DIR_TEMP = self.tempDir()
+        print(f'Place for temporary outputs: {DIR_TEMP}')
+
     def test_with_enmapbox(self):
         enmapBox = EnMAPBox()
 
