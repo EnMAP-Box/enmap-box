@@ -16,6 +16,7 @@ set -e
 pushd /usr/src
 DEFAULT_PARAMS='-x -v'
 cd /usr/src
+
 ls -l
 export QT_QPA_PLATFORM=offscreen
 export CI=True
@@ -24,5 +25,7 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 # xvfb-run pytest ${@:-`echo $DEFAULT_PARAMS`}
 # python3 scripts/create_runtests.py
 # xvfb-run scripts/runtests.sh
-python3 -m unittest
+pwd
+echo 'start tests'
+python3 -m unittest discover -b -s tests/src/core
 popd
