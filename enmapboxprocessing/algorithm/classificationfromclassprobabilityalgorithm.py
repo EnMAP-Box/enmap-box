@@ -34,7 +34,7 @@ class ClassificationFromClassProbabilityAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.Classification.value
+        return Group.Classification.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_PROBABILITY, self._PROBABILITY)

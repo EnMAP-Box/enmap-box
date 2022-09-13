@@ -10,7 +10,7 @@ class SpatialLaplaceAlgorithm(SpatialFilterFunctionAlgorithmBase):
         return 'Spatial Laplace filter'
 
     def group(self):
-        return Group.Test.value + Group.ConvolutionMorphologyAndFiltering.value
+        return Group.ConvolutionMorphologyAndFiltering.value
 
     def shortDescription(self) -> str:
         link = self.htmlLink('https://en.wikipedia.org/wiki/Discrete_Laplace_operator#Image_Processing', 'Wikipedia')

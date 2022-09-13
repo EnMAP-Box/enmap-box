@@ -49,7 +49,7 @@ class RegressionPerformanceAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.Regression.value
+        return Group.Regression.value
 
     def checkTargets(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
         regression = self.parameterAsRasterLayer(parameters, self.P_REGRESSION, context)

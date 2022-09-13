@@ -73,7 +73,7 @@ class RegressionBasedUnmixingAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.Unmixing.value
+        return Group.Unmixing.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterClassificationDataset(self.P_DATASET, self._DATASET)

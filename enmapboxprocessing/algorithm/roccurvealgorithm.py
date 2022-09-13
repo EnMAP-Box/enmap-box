@@ -50,7 +50,7 @@ class RocCurveAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.Regression.value
+        return Group.Regression.value
 
     def checkTargets(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
         prediction = self.parameterAsRasterLayer(parameters, self.P_PROBABILITY, context)

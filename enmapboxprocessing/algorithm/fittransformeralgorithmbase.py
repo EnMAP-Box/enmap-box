@@ -46,7 +46,7 @@ class FitTransformerAlgorithmBase(EnMAPProcessingAlgorithm):
         raise NotImplementedError()
 
     def group(self):
-        return Group.Test.value + Group.Transformation.value
+        return Group.Transformation.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterCode(self.P_TRANSFORMER, self._TRANSFORMER, self.defaultCodeAsString())

@@ -45,7 +45,7 @@ class ConvolutionFilterAlgorithmBase(EnMAPProcessingAlgorithm):
         raise NotImplementedError()
 
     def group(self):
-        return Group.Test.value + Group.ConvolutionMorphologyAndFiltering.value
+        return Group.ConvolutionMorphologyAndFiltering.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)

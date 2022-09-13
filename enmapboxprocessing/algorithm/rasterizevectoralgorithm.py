@@ -48,7 +48,7 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.VectorConversion.value
+        return Group.VectorConversion.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterVectorLayer(self.P_VECTOR, self._VECTOR)

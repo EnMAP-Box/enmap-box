@@ -28,7 +28,7 @@ class MergeClassificationDatasetsAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.DatasetCreation.value
+        return Group.DatasetCreation.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterMultipleLayers(self.P_DATASETS, self._DATASETS, QgsProcessing.TypeFile, None)

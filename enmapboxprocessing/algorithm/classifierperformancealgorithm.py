@@ -38,7 +38,7 @@ class ClassifierPerformanceAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.Classification.value
+        return Group.Classification.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterPickleFile(self.P_CLASSIFIER, self._CLASSIFIER)

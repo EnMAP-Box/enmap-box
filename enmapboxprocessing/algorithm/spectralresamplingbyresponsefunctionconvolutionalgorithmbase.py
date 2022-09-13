@@ -44,7 +44,7 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
         ]
 
     def group(self):
-        return Group.Test.value + Group.SpectralResampling.value
+        return Group.SpectralResampling.value
 
     def code(self):
         raise NotImplementedError()

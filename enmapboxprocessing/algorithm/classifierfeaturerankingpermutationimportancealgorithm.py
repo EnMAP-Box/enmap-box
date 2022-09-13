@@ -63,7 +63,7 @@ class ClassifierFeatureRankingPermutationImportanceAlgorithm(EnMAPProcessingAlgo
         ]
 
     def group(self):
-        return Group.Test.value + Group.FeatureSelection.value
+        return Group.FeatureSelection.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterFile(self.P_CLASSIFIER, self._CLASSIFIER, extension='pkl')

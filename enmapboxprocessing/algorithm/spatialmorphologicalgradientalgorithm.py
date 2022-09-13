@@ -10,7 +10,7 @@ class SpatialMorphologicalGradientAlgorithm(SpatialFilterFunctionAlgorithmBase):
         return 'Spatial morphological Gradient filter'
 
     def group(self):
-        return Group.Test.value + Group.ConvolutionMorphologyAndFiltering.value
+        return Group.ConvolutionMorphologyAndFiltering.value
 
     def shortDescription(self) -> str:
         link = self.htmlLink('https://en.wikipedia.org/wiki/Morphological_gradient', 'Wikipedia')

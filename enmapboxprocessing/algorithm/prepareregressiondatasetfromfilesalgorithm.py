@@ -41,7 +41,7 @@ class PrepareRegressionDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.DatasetCreation.value
+        return Group.DatasetCreation.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterFile(self.P_FEATURE_FILE, self._FEATURE_FILE)

@@ -20,7 +20,7 @@ class RasterLayerZonalAggregationAlgorithm(EnMAPProcessingAlgorithm):
         return 'Raster layer zonal aggregation'
 
     def group(self):
-        return Group.Test.value + Group.RasterAnalysis.value
+        return Group.RasterAnalysis.value
 
     def shortDescription(self) -> str:
         return 'Aggregates raster layer pixel profiles by categories.'

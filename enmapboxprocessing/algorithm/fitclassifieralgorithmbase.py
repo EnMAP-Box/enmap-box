@@ -36,7 +36,7 @@ class FitClassifierAlgorithmBase(EnMAPProcessingAlgorithm):
         raise NotImplementedError()
 
     def group(self):
-        return Group.Test.value + Group.Classification.value
+        return Group.Classification.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterCode(self.P_CLASSIFIER, self._CLASSIFIER, self.defaultCodeAsString())

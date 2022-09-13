@@ -972,7 +972,6 @@ class Group(Enum):
     SpectralResampling = 'Spectral resampling'
     Sampling = 'Sampling'
     Regression = 'Regression'
-    Test = ''
     Testdata = 'Testdata'
     Transformation = 'Transformation'
     Unmixing = 'Unmixing'

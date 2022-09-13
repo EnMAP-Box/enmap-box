@@ -10,7 +10,7 @@ class SpatialGenericAlgorithm(SpatialFilterFunctionAlgorithmBase):
         return 'Spatial generic filter'
 
     def group(self):
-        return Group.Test.value + Group.ConvolutionMorphologyAndFiltering.value
+        return Group.ConvolutionMorphologyAndFiltering.value
 
     def shortDescription(self) -> str:
         return 'Spatial generic (user-defined) filter.'

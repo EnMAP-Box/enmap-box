@@ -36,7 +36,7 @@ class FitRegressorAlgorithmBase(EnMAPProcessingAlgorithm):
         raise NotImplementedError()
 
     def group(self):
-        return Group.Test.value + Group.Regression.value
+        return Group.Regression.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterCode(self.P_REGRESSOR, self._REGRESSOR, self.defaultCodeAsString())

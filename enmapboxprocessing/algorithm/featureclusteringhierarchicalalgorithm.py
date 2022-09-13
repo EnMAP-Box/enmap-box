@@ -45,7 +45,7 @@ class FeatureClusteringHierarchicalAlgorithm(EnMAPProcessingAlgorithm):
                'For further analysis, all relevant results are also stored as a JSON sidecar file next to the report.'
 
     def group(self):
-        return Group.Test.value + Group.FeatureSelection.value
+        return Group.FeatureSelection.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterFile(self.P_DATASET, self._DATASET, extension=self.PickleFileExtension)

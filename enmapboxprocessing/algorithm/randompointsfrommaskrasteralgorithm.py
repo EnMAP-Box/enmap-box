@@ -39,7 +39,7 @@ class RandomPointsFromMaskRasterAlgorithm(EnMAPProcessingAlgorithm):
         ]
 
     def group(self):
-        return Group.Test.value + Group.VectorCreation.value
+        return Group.VectorCreation.value
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
         return True, ''
