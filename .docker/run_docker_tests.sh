@@ -18,7 +18,7 @@ DEFAULT_PARAMS='-x -v'
 cd /usr/src
 
 ls -l
-export QT_QPA_PLATFORM=offscreen
+# export QT_QPA_PLATFORM=offscreen
 export CI=True
 export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 # python3 -m coverage run -m unittest discover -s tests
