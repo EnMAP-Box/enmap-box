@@ -615,7 +615,7 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
                              self.cnInstalledVersion,
                              self.cnLatestVersion,
                              self.cnCommand]
-        self.mColumnToolTips = ['Python package name. <br>' + \
+        self.mColumnToolTips = ['Python package name. <br>'
                                 'Uncheck packages to hide warnings if they are missed during EnMAP-Box startup',
                                 'Installed version',
                                 'Latest version',
