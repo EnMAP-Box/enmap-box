@@ -26,6 +26,7 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 # python3 scripts/create_runtests.py
 # xvfb-run scripts/runtests.sh
 pwd
+python3 scripts/setup_repository.py
 echo 'start tests'
 python3 -m unittest discover -b -s tests/src/core
 popd
