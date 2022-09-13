@@ -33,5 +33,4 @@ jobs:
           chmod +x .docker/run_docker_tests.sh
           pwd
           docker -h
-          sudo docker-compose version
-        # docker-compose -f .docker/docker-compose.gh.yml run qgis /usr/src/.docker/run_docker_tests.sh
+          docker-compose -f .docker/docker-compose.gh.yml run qgis /usr/src/.docker/run_docker_tests.sh
