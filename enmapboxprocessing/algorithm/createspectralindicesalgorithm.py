@@ -222,7 +222,8 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
         noDataValues = [reader.noDataValue(bandNo) for bandNo in bandList]
 
         # add imports
-        code = 'import numpy as np\n\n'
+        code = 'import numpy as np\n' \
+               'from math import nan\n\n'
 
         # add constants
         extraNewLine = False

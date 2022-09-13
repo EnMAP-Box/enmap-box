@@ -471,24 +471,25 @@ class RasterReader(object):
                     return Utils.wavelengthUnitsLongName(units)
 
             # check dataset-level domains
-            for domain in self.metadataDomainKeys(bandNo):
+            for domain in self.metadataDomainKeys():
                 units = self.metadataItem(key, domain)
                 if units is not None:
                     return Utils.wavelengthUnitsLongName(units)
 
-            # finally, we try to guess the units from the actual value
-            if guess:
-                wavelength = self.wavelength(bandNo, raw=True)
-                if wavelength is not None:
-                    if wavelength < 100:
-                        msg = 'wavelength units missing, assuming Micrometers'
-                        units = 'Micrometers'
-                    else:
-                        msg = 'wavelength units missing, assuming Nanometers'
-                        units = 'Nanometers'
-                    warnings.warn(msg)
-                    messageLog(msg, level=Qgis.MessageLevel.Warning)
-                    return units
+        # finally, we try to guess the units from the actual value
+        if guess:
+            wavelength = self.wavelength(bandNo, raw=True)
+            if wavelength is not None:
+                if wavelength < 100:
+                    msg = 'wavelength units missing, assuming Micrometers'
+                    units = 'Micrometers'
+                else:
+                    msg = 'wavelength units missing, assuming Nanometers'
+                    units = 'Nanometers'
+                warnings.warn(msg)
+                messageLog(msg, level=Qgis.MessageLevel.Warning)
+                return units
+
         return None
 
     def wavelength(self, bandNo: int, units: str = None, raw=False) -> Optional[float]:
