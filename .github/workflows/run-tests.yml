@@ -21,16 +21,22 @@ jobs:
     strategy:
       matrix:
         qgis_version: [latest]
+    env:
+        QGIS_TEST_VERSION: ${{ matrix.qgis_version}}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
           submodules: recursive
-      - name: Test on QGIS
+      - name: Environment Info
         run: |
-          ls -la .docker/
-          ls -la
-          chmod +x .docker/run_docker_tests.sh
-          pwd
-          docker -h
-          docker-compose -f .docker/docker-compose.gh.yml run qgis /usr/src/.docker/run_docker_tests.sh
+          # ls -la .docker/
+          # ls -la
+          ls -la ~
+          
+          ls -la /usr/bin
+          # chmod +x .docker/run_docker_tests.sh
+          
+          # docker -h
+      - name: Test EnMAP-Box on QGIS
+        run: docker-compose -f .docker/docker-compose.gh.yml run qgis /usr/src/.docker/run_docker_tests.sh
