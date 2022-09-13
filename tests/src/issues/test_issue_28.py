@@ -7,11 +7,10 @@ import unittest
 
 import numpy as np
 from osgeo import gdal, gdal_array
-from qgis.PyQt.QtWidgets import QApplication
-from qgis._core import QgsRasterFileWriter, QgsMultiBandColorRenderer
-from qgis.core import QgsApplication, QgsRasterLayer, QgsVectorLayer, StyleCategories
-from enmapbox.testing import EnMAPBoxTestCase, TestObjects
-from enmapbox import EnMAPBox
+
+from enmapbox.testing import EnMAPBoxTestCase
+from qgis.core import QgsMultiBandColorRenderer
+from qgis.core import QgsRasterLayer, StyleCategories
 
 
 class EnMAPBoxTestCaseExample(EnMAPBoxTestCase):
