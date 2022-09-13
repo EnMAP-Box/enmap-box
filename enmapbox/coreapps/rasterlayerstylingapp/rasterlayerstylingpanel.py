@@ -253,8 +253,21 @@ class RasterLayerStylingPanel(QgsDockWidget):
             self.disableGui()
             return
 
+        try:
+            layer.rendererChanged.disconnect(self.onLayerRendererChanged)
+        except Exception:
+            pass
+        layer.rendererChanged.connect(self.onLayerRendererChanged)
+
         self.originalRenderer = layer.renderer().clone()
 
+        self.updateRendererTab(layer)
+        self.onRendererTabChanged()
+
+        self.enableGui()
+        self.updateGui()
+
+    def updateRendererTab(self, layer):
         with BlockSignals(self.mRenderer):
             renderer = layer.renderer()
 
@@ -266,11 +279,6 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 self.mRenderer.setCurrentIndex(2)
             else:
                 self.mRenderer.setCurrentIndex(3)
-
-        self.onRendererTabChanged()
-
-        self.enableGui()
-        self.updateGui()
 
     def onRendererTabChanged(self):
         layer: QgsRasterLayer = self.mLayer.currentLayer()
@@ -344,7 +352,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
         else:
             raise ValueError()
 
-        # update is bad band
+        # update bad band
         for mBand in [self.mRedBand, self.mGreenBand, self.mBlueBand, self.mGrayBand, self.mPseudoBand]:
             self.updateIsBadBand(mBand)
 
@@ -442,6 +450,39 @@ class RasterLayerStylingPanel(QgsDockWidget):
         # reconnect sources
         for aLayer in layers:
             Utils.setLayerDataSource(aLayer, 'gdal', source)
+
+    def onLayerRendererChanged(self):
+        # the renderer of the layer may be changed from outside, so we need to update the settings
+
+        if self.isHidden():  # do nothing if panel is hidden
+            return
+
+        layer: QgsRasterLayer = self.mLayer.currentLayer()
+        if layer is not self.sender():
+            return
+
+        self.updateRendererTab(layer)
+
+        if self.mRenderer.currentIndex() == self.RgbRendererTab:
+            renderer: QgsMultiBandColorRenderer = layer.renderer()
+            with BlockSignals(self.mRedBand, self.mGreenBand, self.mBlueBand):
+                self.mRedBand.mBandNo.setBand(renderer.redBand())
+                self.mGreenBand.mBandNo.setBand(renderer.greenBand())
+                self.mBlueBand.mBandNo.setBand(renderer.blueBand())
+        elif self.mRenderer.currentIndex() == self.GrayRendererTab:
+            renderer: QgsSingleBandGrayRenderer = layer.renderer()
+            with BlockSignals(self.mGrayBand):
+                self.mGrayBand.mBandNo.setBand(renderer.grayBand())
+        elif self.mRenderer.currentIndex() == self.PseudoRendererTab:
+            renderer: QgsSingleBandPseudoColorRenderer = layer.renderer()
+            with BlockSignals(self.mPseudoBand.mBandNo):
+                self.mPseudoBand.mBandNo.setBand(renderer.band())
+        elif self.mRenderer.currentIndex() == self.DefaultRendererTab:
+            pass
+        elif self.mRenderer.currentIndex() == self.SpectralLinkingTab:
+            pass
+        else:
+            raise ValueError()
 
     def updateWavelengthInfo(self, mBand: RasterLayerStylingBandWidget):
         layer: QgsRasterLayer = self.mLayer.currentLayer()
