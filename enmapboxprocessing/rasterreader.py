@@ -15,7 +15,7 @@ from qgis.PyQt.QtCore import QSizeF, QDateTime
 from qgis.PyQt.QtGui import QColor
 from qgis.core import (QgsRasterLayer, QgsRasterDataProvider, QgsCoordinateReferenceSystem, QgsRectangle,
                        QgsRasterRange, QgsPoint, QgsRasterBlockFeedback, QgsRasterBlock, QgsPointXY,
-                       QgsProcessingFeedback, QgsRasterBandStats)
+                       QgsProcessingFeedback, QgsRasterBandStats, Qgis)
 from typeguard import typechecked
 
 
@@ -482,12 +482,13 @@ class RasterReader(object):
                 if wavelength is not None:
                     if wavelength < 100:
                         msg = 'wavelength units missing, assuming Micrometers'
-                        return 'Micrometers'
+                        units = 'Micrometers'
                     else:
                         msg = 'wavelength units missing, assuming Nanometers'
-                        return 'Nanometers'
+                        units = 'Nanometers'
                     warnings.warn(msg)
-                    messageLog(msg, level=Qgis.Warning)
+                    messageLog(msg, level=Qgis.MessageLevel.Warning)
+                    return units
         return None
 
     def wavelength(self, bandNo: int, units: str = None, raw=False) -> Optional[float]:
