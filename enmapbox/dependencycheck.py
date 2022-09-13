@@ -37,7 +37,7 @@ import requests
 
 from enmapbox import debugLog
 from enmapbox.qgispluginsupport.qps.utils import qgisAppQgisInterface
-from enmapbox.settings import Settings
+from enmapbox.settings import EnMAPBoxSettings
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import \
     pyqtSignal, pyqtSlot, Qt, \
@@ -128,13 +128,21 @@ class PIPPackage(object):
     def updateAvailable(self) -> bool:
         return self.mInstalledVersion < self.mLatestVersion
 
+    KEY_SKIP_WARNINGS = 'PIPInstaller/SkipWarnings'
+
+    def packagesWithoutWarning(self) -> List[str]:
+        return EnMAPBoxSettings().value(self.KEY_SKIP_WARNINGS, defaultValue='', type=str).split(',')
+
     def warnIfNotInstalled(self) -> bool:
-        key = f'PIPInstaller.Warn.{self.pyPkgName}'
-        return Settings.entryValue(key, True)
+        return self.pyPkgName not in self.packagesWithoutWarning()
 
     def setWarnIfNotInstalled(self, b: bool = True):
-        key = f'PIPInstaller.Warn.{self.pyPkgName}'
-        Settings.setEntryValue(key, b is True)
+        noWarning = self.packagesWithoutWarning()
+        if b and self.pyPkgName in noWarning:
+            noWarning.remove(self.pyPkgName)
+        elif not b and self.pyPkgName not in noWarning:
+            noWarning.append(self.pyPkgName)
+        EnMAPBoxSettings().setValue(self.KEY_SKIP_WARNINGS, ','.join(noWarning))
 
     def __str__(self):
         return '{}'.format(self.pyPkgName)
@@ -435,7 +443,7 @@ def missingPackages() -> typing.List[PIPPackage]:
     :return: [PIPPackage]
     :rtype:
     """
-    return [p for p in requiredPackages() if not p.isInstalled()]
+    return [p for p in requiredPackages() if not p.isInstalled() and p.warnIfNotInstalled()]
 
 
 def missingPackageInfo(missing_packages: typing.List[PIPPackage], html=True) -> str:
@@ -454,8 +462,7 @@ def missingPackageInfo(missing_packages: typing.List[PIPPackage], html=True) -> 
         return None
 
     from enmapbox import DIR_REPO, URL_INSTALLATION
-    info = ['The following {} package(s) are not installed:'.format(n)]
-    info.append('<ol>')
+    info = ['The following {} package(s) are not installed:'.format(n), '<ol>']
     for i, pkg in enumerate(missing_packages):
         assert isinstance(pkg, PIPPackage)
         info.append('\t<li>{} (install by "{}")</li>'.format(pkg.pyPkgName, pkg.installCommand()))
@@ -608,9 +615,9 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
                              self.cnInstalledVersion,
                              self.cnLatestVersion,
                              self.cnCommand]
-        self.mColumnToolTips = ['Python package name',
-                                'Installed version. <br>' +
-                                'Uncheck missing packages to hide warnings during EnMAP-Box startup',
+        self.mColumnToolTips = ['Python package name. <br>' + \
+                                'Uncheck packages to hide warnings if they are missed during EnMAP-Box startup',
+                                'Installed version',
                                 'Latest version',
                                 'Command to install/update the package from your command line interface']
         self.mPackages: List[PIPPackage] = []
@@ -625,7 +632,7 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
 
         cn = self.mColumnNames[index.column()]
         flags = Qt.ItemIsEnabled | Qt.ItemIsSelectable
-        if cn == self.cnInstalledVersion:
+        if cn == self.cnPkg:
             flags = flags | Qt.ItemIsUserCheckable
         return flags
 
@@ -645,13 +652,16 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
 
         changed = False
         if role == Qt.CheckStateRole:
-            if cn == self.cnInstalledVersion:
+            if cn == self.cnPkg:
                 pkg.setWarnIfNotInstalled(value == Qt.Checked)
                 changed = True
 
         if changed:
-            self.dataChanged.emit(index, index, [role])
+            idx0 = self.index(index.row(), 0, index.parent())
+            idx1 = self.index(index.row(), self.columnCount() - 1, index.parent())
+            self.dataChanged.emit(idx0, idx1, [role, Qt.ForegroundRole])
         return changed
+
     def setUser(self, b: bool):
         self.mUser = b is True
         self.dataChanged.emit(self.createIndex(0, 0), self.createIndex(self.rowCount() - 1, self.columnCount() - 1))
@@ -749,12 +759,13 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
 
         if role == Qt.ForegroundRole:
             if cn == self.cnInstalledVersion:
-                if pkg.mInstalledVersion == '<not installed>':
-                    return QColor('red')
+                if pkg.warnIfNotInstalled():
+                    if pkg.mInstalledVersion == '<not installed>':
+                        return QColor('red')
+                    else:
+                        return QColor('green')
                 elif pkg.mLatestVersion > pkg.mInstalledVersion:
                     return QColor('orange')
-                else:
-                    return QColor('green')
 
         if role == Qt.ToolTipRole:
             if cn == self.cnPkg:
@@ -767,7 +778,7 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
                 return info
 
         if role == Qt.CheckStateRole:
-            if cn == self.cnInstalledVersion:
+            if cn == self.cnPkg:
                 return Qt.Checked if pkg.warnIfNotInstalled() else Qt.Unchecked
 
         if role == Qt.DecorationRole and index.column() == 0:

@@ -1,76 +1,30 @@
-from typing import Any
+from qgis.PyQt.QtGui import QColor
 
-from PyQt5.QtCore import QObject
-
-from qgis.PyQt.QtCore import QSettings
-
-from qgis.core import QgsSettingsEntryBase
-from qgis.core import QgsSettingsEntryBool, QgsApplication
+from qgis.core import QgsSettings
 
 
-def enmapboxSettings() -> QSettings:
-    """
-    Returns the QSettings object for EnMAP-Box Settings
-    :return: QSettings
-    """
-    return QSettings('HU-Berlin', 'EnMAP-Box')
-
-
-class Keys:
+class EnMAPBoxSettings(QgsSettings):
     SHOW_WARNING = 'SHOW_WARNINGS'
+    SHOW_SPLASHSCREEN = 'SHOW_SPLASHSCREEN'
+    MAP_BACKGROUND = 'MAP_BACKGROUND'
 
-class Settings(QObject):
+    def __init__(self):
+        super().__init__('HU-Berlin', 'EnMAP-Box')
 
-    PREFIX = 'plugins/EnMAP-Box/'
+        # init default settings
+        self.setIfUndefined(self.SHOW_WARNING, True)
+        self.setIfUndefined(self.SHOW_SPLASHSCREEN, True)
+        self.setIfUndefined(self.MAP_BACKGROUND, QColor('black'))
 
+    def setIfUndefined(self, key, value):
+        if key not in self.allKeys():
+            self.setValue(key, value)
 
-    @classmethod
-    def setEntry(cls, entry: QgsSettingsEntryBase):
-
-        core = QgsApplication.instance().settingsRegistryCore()
-
-        if not entry.definitionKey().startswith(cls.PREFIX):
-            s = ""
-        core.addSettingsEntry(entry)
-
-    @classmethod
-    def expandKey(cls, key:str):
-        return f'{cls.PREFIX}{key}'
-
-    @classmethod
-    def entry(cls, name: str) -> QgsSettingsEntryBase:
-        core = QgsApplication.instance().settingsRegistryCore()
-        return core.settingsEntry(cls.expandKey(name))
-
-    @classmethod
-    def setEntryValue(cls, name: str, value: Any):
-        e = cls.entry(name)
-        if not isinstance(e, QgsSettingsEntryBase):
-            if value is None:
-                return
-
-            # create new Entry
-            key = name.removeprefix(cls.PREFIX)
-
-            if isinstance(value, bool):
-                e = QgsSettingsEntryBool(key, 'EnMAP-Box')
-                core = QgsApplication.instance().settingsRegistryCore()
-                e.setValue(value)
-                core.addSettingsEntry(e)
-
-            s = ""
-        else:
-            e.setVariantValue(value)
-
-    @classmethod
-    def entryValue(cls, name: str, default: Any = None) -> Any:
-        e = cls.entry(name)
-        if not isinstance(e, QgsSettingsEntryBase):
-            return default
-        value = e.valueAsVariant()
-        if value is None:
-            return default
-        else:
-            return value
+    def print(self):
+        print('EnMAP-Box Settings:')
+        for k in self.allKeys():
+            print(f'{k}={self.value(k)}')
 
 
+def enmapboxSettings() -> EnMAPBoxSettings:
+    return EnMAPBoxSettings()

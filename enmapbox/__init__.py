@@ -113,6 +113,7 @@ def enmapboxSettings() -> QSettings:
     """
     return QSettings('HU-Berlin', ENMAP_BOX_KEY)
 
+
 settings = enmapboxSettings()
 DEBUG = str(os.environ.get('DEBUG', False)).lower() in ['1', 'true']
 site.addsitedir(DIR_SITEPACKAGES)
