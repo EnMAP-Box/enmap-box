@@ -372,10 +372,12 @@ class DockLabel(pgDockLabel):
                  allow_floating: bool = True,
                  showClosebutton: bool = True,
                  fontSize: int = 8):
+        assert isinstance(dock, Dock)
         if title is None:
-            title = self.dock.title()
-        super(DockLabel, self).__init__(title, dock, showClosebutton, fontSize)
+            title = dock.title()
 
+        super(DockLabel, self).__init__(title, closable=showClosebutton, fontSize=fontSize)
+        self.dock: Dock = dock
         self.mButtons = list()  # think from right to left
 
         self.setMinimumSize(26, 26)
@@ -386,14 +388,14 @@ class DockLabel(pgDockLabel):
 
         self.btnFloat = QToolButton(self)
         self.btnFloat.setToolTip('Float window')
-        self.btnFloat.clicked.connect(self.dock.float)
+        self.btnFloat.clicked.connect(dock.float)
         self.btnFloat.setIcon(QApplication.style().standardIcon(QStyle.SP_TitleBarNormalButton))
         self.btnFloat.setVisible(allow_floating)
 
         self.btnUnFloat = QToolButton(self)
         self.btnUnFloat.setText('U')
         self.btnUnFloat.setToolTip('Unfloat window')
-        self.btnUnFloat.clicked.connect(self.dock.unfloat)
+        self.btnUnFloat.clicked.connect(dock.unfloat)
         self.btnUnFloat.setVisible(not allow_floating)
 
         self.mButtons.extend([self.closeButton, self.btnFloat, self.btnUnFloat])
