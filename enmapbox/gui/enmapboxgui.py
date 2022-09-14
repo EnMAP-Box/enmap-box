@@ -24,19 +24,24 @@ import typing
 import warnings
 from typing import Optional, Dict, Union, Any, List
 
+from typeguard import typechecked
+
 import enmapbox
 import enmapbox.gui.datasources.manager
 import qgis.utils
 from enmapbox import messageLog, debugLog, DEBUG
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
+from enmapbox.gui import SpatialPoint, loadUi, SpatialExtent, file_search
 from enmapbox.gui.dataviews.dockmanager import DockManagerTreeModel, MapDockTreeNode
 from enmapbox.gui.dataviews.docks import SpectralLibraryDock, Dock, AttributeTableDock, MapDock
 from enmapbox.qgispluginsupport.qps.cursorlocationvalue import CursorLocationInfoDock
 from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog
 from enmapbox.qgispluginsupport.qps.maptools import QgsMapToolSelectionHandler, MapTools
+from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprofilesources import SpectralProfileSourcePanel, \
     MapCanvasLayerProfileSource
+from enmapbox.qgispluginsupport.qps.subdatasets import SubDatasetSelectionDialog
 from enmapboxprocessing.algorithm.importdesisl1balgorithm import ImportDesisL1BAlgorithm
 from enmapboxprocessing.algorithm.importdesisl1calgorithm import ImportDesisL1CAlgorithm
 from enmapboxprocessing.algorithm.importdesisl2aalgorithm import ImportDesisL2AAlgorithm
@@ -54,7 +59,7 @@ from processing.ProcessingPlugin import ProcessingPlugin
 from processing.gui.AlgorithmDialog import AlgorithmDialog
 from processing.gui.ProcessingToolbox import ProcessingToolbox
 from qgis import utils as qgsUtils
-from qgis.PyQt.QtCore import pyqtSignal, Qt, QObject, QModelIndex, pyqtSlot, QSettings, QEventLoop, QRect, QSize, QFile
+from qgis.PyQt.QtCore import pyqtSignal, Qt, QObject, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
 from qgis.PyQt.QtGui import QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QPixmap, QColor, QIcon, \
     QKeyEvent, \
     QCloseEvent, QGuiApplication
@@ -75,14 +80,11 @@ from qgis.gui import QgsMapCanvas, QgisInterface, QgsMessageBar, QgsMessageViewe
     QgsSymbolWidgetContext
 from qgis.gui import QgsProcessingAlgorithmDialogBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog, \
     QgsNewVectorLayerDialog, QgsProcessingContextGenerator
-from typeguard import typechecked
 from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
 from .dataviews.docks import DockTypes
 from .mapcanvas import MapCanvas
 from .utils import enmapboxUiPath
-from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
-from enmapbox.qgispluginsupport.qps.subdatasets import SubDatasetSelectionDialog
-from enmapbox.gui import SpatialPoint, loadUi, SpatialExtent, file_search
+from ..settings import EnMAPBoxSettings
 
 MAX_MISSING_DEPENDENCY_WARNINGS = 3
 KEY_MISSING_DEPENDENCY_VERSION = 'MISSING_PACKAGE_WARNING_VERSION'
@@ -410,10 +412,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                  load_other_apps: bool = True):
         assert EnMAPBox.instance() is None, 'EnMAPBox already started. Call EnMAPBox.instance() to get a handle to.'
 
-        settings = self.settings()
+        settings: EnMAPBoxSettings = self.settings()
 
         splash = EnMAPBoxSplashScreen(parent=None)
-        if not str(settings.value('EMB_SPLASHSCREEN', True)).lower() in ['0', 'false']:
+        if not settings.value(EnMAPBoxSettings.SHOW_SPLASHSCREEN, defaultValue=True, type=bool):
             splash.show()
 
         splash.showMessage('Load UI')
@@ -570,36 +572,21 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         from ..dependencycheck import requiredPackages
 
-        KEY_CNT = 'MISSING_PACKAGE_WARNING_COUNT'
-        if settings.value(KEY_MISSING_DEPENDENCY_VERSION, None) != self.version():
-            # re-count with each new version
-            settings.setValue(KEY_MISSING_DEPENDENCY_VERSION, self.version())
-            settings.setValue(KEY_CNT, 0)
+        if len([p for p in requiredPackages() if not p.isInstalled() and p.warnIfNotInstalled()]) > 0:
+            title = 'Missing Python Package(s)!'
 
-        if len([p for p in requiredPackages() if not p.isInstalled()]) > 0:
-
-            n_warnings: int = int(settings.value(KEY_CNT, 0))
-            if n_warnings < MAX_MISSING_DEPENDENCY_WARNINGS:
-                # taken from qgsmessagebar.cpp
-                # void QgsMessageBar::pushMessage( const QString &title, const QString &text, const QString &showMore, Qgis::MessageLevel level, int duration )
-
-                title = 'Missing Python Package(s)!'
-
-                a = QAction('Install missing')
-                btn = QToolButton()
-                btn.setStyleSheet("background-color: rgba(255, 255, 255, 0); color: black; text-decoration: underline;")
-                btn.setCursor(Qt.PointingHandCursor)
-                btn.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Preferred)
-                btn.addAction(a)
-                btn.setDefaultAction(a)
-                btn.triggered.connect(self.showPackageInstaller)
-                btn.triggered.connect(btn.deleteLater)
-                self.__btn = btn
-                item = QgsMessageBarItem(title, '', btn, Qgis.Warning, 200)
-                self.messageBar().pushItem(item)
-
-                n_warnings += 1
-                settings.setValue(KEY_CNT, n_warnings)
+            a = QAction('Install missing')
+            btn = QToolButton()
+            btn.setStyleSheet("background-color: rgba(255, 255, 255, 0); color: black; text-decoration: underline;")
+            btn.setCursor(Qt.PointingHandCursor)
+            btn.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Preferred)
+            btn.addAction(a)
+            btn.setDefaultAction(a)
+            btn.triggered.connect(self.showPackageInstaller)
+            btn.triggered.connect(btn.deleteLater)
+            self.__btn = btn
+            item = QgsMessageBarItem(title, '', btn, Qgis.Warning, 200)
+            self.messageBar().pushItem(item)
 
         self.sigMapLayersRemoved.connect(self.syncProjects)
 
@@ -1244,8 +1231,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             lambda: self.ui.processingPanel.setVisible(self.ui.processingPanel.isHidden()))
         from enmapbox.gui.about import AboutDialog
         self.ui.mActionAbout.triggered.connect(lambda: AboutDialog(parent=self.ui).show())
-        from enmapbox.gui.settings import showSettingsDialog
-        self.ui.mActionProjectSettings.triggered.connect(lambda: showSettingsDialog(self.ui))
+        # from enmapbox.gui.settings import showSettingsDialog
+        # self.ui.mActionProjectSettings.triggered.connect(lambda: showSettingsDialog(self.ui))
         self.ui.mActionExit.triggered.connect(self.exit)
 
         import webbrowser
@@ -1575,12 +1562,11 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.ui.optionMoveCenter.setEnabled(b)
         return results
 
-    def settings(self) -> QSettings:
+    def settings(self) -> EnMAPBoxSettings:
         """
         Returns the EnMAP-Box user settings
         """
-        from enmapbox import enmapboxSettings
-        return enmapboxSettings()
+        return EnMAPBoxSettings()
 
     def initEnMAPBoxApplications(self,
                                  load_core_apps: bool = True,
@@ -1616,7 +1602,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             self.applicationRegistry.addApplicationListing(p)
 
         # find other app-folders or listing files folders
-        from enmapbox.gui.settings import enmapboxSettings
+        from enmapbox.settings import enmapboxSettings
         settings = enmapboxSettings()
         for appPath in re.split('[;\n]', settings.value('EMB_APPLICATION_PATH', '')):
             if os.path.isdir(appPath):
