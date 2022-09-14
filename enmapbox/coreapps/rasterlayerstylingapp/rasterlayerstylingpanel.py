@@ -4,6 +4,7 @@ from typing import Optional
 from osgeo import gdal
 
 from enmapbox import EnMAPBox
+from enmapbox.gui.dataviews.dockmanager import DockPanelUI
 from enmapbox.gui.mapcanvas import MapCanvas
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from enmapbox.utils import BlockSignals
@@ -116,7 +117,14 @@ class RasterLayerStylingPanel(QgsDockWidget):
         self.mAddLink.clicked.connect(self.onAddLinkClicked)
         self.mRemoveLink.clicked.connect(self.onRemoveLinkClicked)
 
+        self.openedStateChanged.connect(self.onOpenStateChanged)
+
+        # init GUI
         self.mRenderer.setCurrentIndex(self.DefaultRendererTab)
+
+    def onOpenStateChanged(self, wasOpened: bool):
+        panel: DockPanelUI = self.enmapBox.ui.dockPanel
+        panel.mRasterLayerStyling.setChecked(wasOpened)
 
     def onRemoveLinkClicked(self):
         rows = [index.row() for index in self.mLinkedLayers.selectionModel().selectedRows()]
