@@ -461,8 +461,6 @@ class RasterLayerStylingPanel(QgsDockWidget):
         if layer is not self.sender():
             return
 
-        #self.updateRendererTab(layer)
-
         renderer = layer.renderer()
         if isinstance(renderer, QgsMultiBandColorRenderer):
             with BlockSignals(self.mRedBand, self.mGreenBand, self.mBlueBand):
