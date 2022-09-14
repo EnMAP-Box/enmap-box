@@ -58,7 +58,6 @@ class TestFitClassifierAlgorithm(TestCase):
         self.runalg(alg, parameters)
 
     def test_fit_json(self):
-
         alg = FitTestClassifierAlgorithm()
         parameters = {
             alg.P_DATASET: classifierDumpJson,
@@ -82,4 +81,3 @@ class TestFitClassifierAlgorithm(TestCase):
                 alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl')
             }
             self.runalg(alg, parameters)
-

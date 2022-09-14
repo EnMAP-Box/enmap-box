@@ -1,10 +1,7 @@
 from typing import Dict, Any, List, Tuple
 
-import numpy as np
-
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-from enmapboxprocessing.typing import ClassifierDump, Category
-from enmapboxprocessing.utils import Utils
+from enmapboxprocessing.typing import ClassifierDump
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 from typeguard import typechecked
 
@@ -45,13 +42,8 @@ class PrepareClassificationDatasetFromJsonAlgorithm(EnMAPProcessingAlgorithm):
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)
 
-            json = Utils.jsonLoad(filenameJson)
-            json['categories'] = [Category(**values) for values in json['categories']]
-            json['X'] = np.array(json['X'])
-            json['y'] = np.array(json['y'])
-            json['classifier'] = None
-            dump = ClassifierDump.fromDict(json)
-            Utils.pickleDump(dump.__dict__, filename)
+            dump = ClassifierDump.fromFile(filenameJson)
+            dump.write(filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)

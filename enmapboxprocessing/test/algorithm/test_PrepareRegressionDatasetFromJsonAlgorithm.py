@@ -21,3 +21,17 @@ class TestPrepareRegressionDatasetFromJsonAlgorithm(TestCase):
         self.assertEqual(177, len(dump.features))
         self.assertEqual(6, len(dump.targets))
         self.assertIsNone(dump.regressor)
+
+    def test_saveAsJson(self):
+        alg = PrepareRegressionDatasetFromJsonAlgorithm()
+        parameters = {
+            alg.P_JSON_FILE: regressionDatasetAsJsonFile,
+            alg.P_OUTPUT_DATASET: self.filename('sample.json')
+        }
+        self.runalg(alg, parameters)
+        dump = RegressorDump.fromFile(parameters[alg.P_OUTPUT_DATASET])
+        self.assertEqual((51, 177), dump.X.shape)
+        self.assertEqual((51, 6), dump.y.shape)
+        self.assertEqual(177, len(dump.features))
+        self.assertEqual(6, len(dump.targets))
+        self.assertIsNone(dump.regressor)

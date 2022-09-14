@@ -68,6 +68,30 @@ class TransformerDump(object):
     def fromDict(d: Dict):
         return TransformerDump(d.get('features'), d.get('X'), d.get('transformer'))
 
+    @classmethod
+    def fromFile(cls, filename: str):
+        from enmapboxprocessing.utils import Utils
+        if filename.endswith('.pkl'):
+            d = Utils.pickleLoad(filename)
+        elif filename.endswith('.json'):
+            d = Utils.jsonLoad(filename)
+            d['X'] = np.array(d['X'])
+            d['y'] = np.array(d['y'])
+            d['transformer'] = None
+        else:
+            raise ValueError('wrong file extension, only "pkl" or "json" is supported')
+
+        return cls.fromDict(d)
+
+    def write(self, filename: str):
+        from enmapboxprocessing.utils import Utils
+        if filename.endswith('.pkl'):
+            Utils.pickleDump(self.__dict__, filename)
+        elif filename.endswith('.json'):
+            Utils.jsonDump(self.__dict__, filename)
+        else:
+            raise ValueError('wrong file extension, use "pkl" or "json"')
+
 
 @typechecked
 @dataclass
@@ -80,6 +104,30 @@ class ClustererDump(object):
     @staticmethod
     def fromDict(d: Dict):
         return ClustererDump(d.get('clusterCount'), d.get('features'), d.get('X'), d.get('clusterer'))
+
+    @classmethod
+    def fromFile(cls, filename: str):
+        from enmapboxprocessing.utils import Utils
+        if filename.endswith('.pkl'):
+            d = Utils.pickleLoad(filename)
+        elif filename.endswith('.json'):
+            d = Utils.jsonLoad(filename)
+            d['X'] = np.array(d['X'])
+            d['y'] = np.array(d['y'])
+            d['clusterer'] = None
+        else:
+            raise ValueError('wrong file extension, only "pkl" or "json" is supported')
+
+        return cls.fromDict(d)
+
+    def write(self, filename: str):
+        from enmapboxprocessing.utils import Utils
+        if filename.endswith('.pkl'):
+            Utils.pickleDump(self.__dict__, filename)
+        elif filename.endswith('.json'):
+            Utils.jsonDump(self.__dict__, filename)
+        else:
+            raise ValueError('wrong file extension, use "pkl" or "json"')
 
 
 @typechecked
@@ -103,10 +151,35 @@ class ClassifierDump(object):
             if not is_classifier(self.classifier):
                 raise TypeError('classifier is not a valid scikit-learn classifier')
 
+    def write(self, filename: str):
+        from enmapboxprocessing.utils import Utils
+        if filename.endswith('.pkl'):
+            Utils.pickleDump(self.__dict__, filename)
+        elif filename.endswith('.json'):
+            Utils.jsonDump(self.__dict__, filename)
+        else:
+            raise ValueError('wrong file extension, use "pkl" or "json"')
+
     @staticmethod
     def fromDict(d: Dict):
         return ClassifierDump(
             d.get('categories'), d.get('features'), d.get('X'), d.get('y'), d.get('classifier'))
+
+    @classmethod
+    def fromFile(cls, filename: str):
+        from enmapboxprocessing.utils import Utils
+        if filename.endswith('.pkl'):
+            d = Utils.pickleLoad(filename)
+        elif filename.endswith('.json'):
+            d = Utils.jsonLoad(filename)
+            d['categories'] = [Category(**values) for values in d['categories']]
+            d['X'] = np.array(d['X'])
+            d['y'] = np.array(d['y'])
+            d['classifier'] = None
+        else:
+            raise ValueError('wrong file extension, only "pkl" or "json" is supported')
+
+        return cls.fromDict(d)
 
 
 @typechecked
@@ -134,6 +207,31 @@ class RegressorDump(object):
     def fromDict(d: Dict):
         return RegressorDump(
             d.get('targets'), d.get('features'), d.get('X'), d.get('y'), d.get('regressor'))
+
+    @classmethod
+    def fromFile(cls, filename: str):
+        from enmapboxprocessing.utils import Utils
+        if filename.endswith('.pkl'):
+            d = Utils.pickleLoad(filename)
+        elif filename.endswith('.json'):
+            d = Utils.jsonLoad(filename)
+            d['targets'] = [Target(**values) for values in d['targets']]
+            d['X'] = np.array(d['X'])
+            d['y'] = np.array(d['y'])
+            d['regressor'] = None
+        else:
+            raise ValueError('wrong file extension, only "pkl" or "json" is supported')
+
+        return cls.fromDict(d)
+
+    def write(self, filename: str):
+        from enmapboxprocessing.utils import Utils
+        if filename.endswith('.pkl'):
+            Utils.pickleDump(self.__dict__, filename)
+        elif filename.endswith('.json'):
+            Utils.jsonDump(self.__dict__, filename)
+        else:
+            raise ValueError('wrong file extension, use "pkl" or "json"')
 
 
 @typechecked
