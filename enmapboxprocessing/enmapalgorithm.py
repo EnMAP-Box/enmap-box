@@ -607,8 +607,10 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         from enmapboxprocessing.parameter.processingparameterpicklefileclassificationdatasetwidget import \
             ProcessingParameterPickleFileClassificationDatasetWidgetWrapper
         behavior = QgsProcessingParameterFile.Behavior.File
-        extension = self.PickleFileExtension
-        param = QgsProcessingParameterFile(name, description, behavior, extension, defaultValue, optional)
+        extension = '' # self.PickleFileExtension
+        fileFilter =  'Pickle files (*.pkl);;JSON files (*.json)'
+
+        param = QgsProcessingParameterFile(name, description, behavior, extension, defaultValue, optional, fileFilter)
 
         # fix issue # #1366
         if not bool(self.flags() & self.Flag.FlagHideFromToolbox):

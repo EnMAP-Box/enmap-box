@@ -2,6 +2,8 @@ import inspect
 import traceback
 from typing import Dict, Any, List, Tuple
 
+from enmapboxprocessing.algorithm.prepareclassificationdatasetfromjsonalgorithm import \
+    PrepareClassificationDatasetFromJsonAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
@@ -80,7 +82,16 @@ class FitClassifierAlgorithmBase(EnMAPProcessingAlgorithm):
             self.tic(feedback, parameters, context)
 
             if filenameDataset is not None:
-                dump = ClassifierDump(**Utils.pickleLoad(filenameDataset))
+                if filenameDataset.endswith('.json'):
+                    alg = PrepareClassificationDatasetFromJsonAlgorithm()
+                    parameters = {
+                        alg.P_JSON_FILE: filenameDataset,
+                        alg.P_OUTPUT_DATASET: Utils.tmpFilename(filename, 'dataset.pkl')
+                    }
+                    self.runAlg(alg, parameters, None, feedback2, context, True)
+                    dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+                else:
+                    dump = ClassifierDump(**Utils.pickleLoad(filenameDataset))
                 feedback.pushInfo(
                     f'Load training dataset: X=array{list(dump.X.shape)} y=array{list(dump.y.shape)} categories={[c.name for c in dump.categories]}')
                 feedback.pushInfo('Fit classifier')
