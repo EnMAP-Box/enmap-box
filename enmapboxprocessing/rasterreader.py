@@ -5,7 +5,6 @@ from typing import Iterable, List, Union, Optional, Tuple
 import numpy as np
 from osgeo import gdal
 
-from enmapbox import messageLog
 from enmapboxprocessing.gridwalker import GridWalker
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.typing import (QgisDataType, RasterSource, Array3d, Metadata, MetadataValue,
@@ -487,6 +486,7 @@ class RasterReader(object):
                     msg = 'wavelength units missing, assuming Nanometers'
                     units = 'Nanometers'
                 warnings.warn(msg)
+                from enmapbox import messageLog
                 messageLog(msg, level=Qgis.MessageLevel.Warning)
                 return units
 
