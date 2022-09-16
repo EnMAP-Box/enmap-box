@@ -12,16 +12,20 @@ __author__ = 'benjamin.jakimow@geo.hu-berlin.de'
 __date__ = '2017-07-17'
 __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
+import pathlib
 import unittest
-
-from enmapbox import EnMAPBox, initPythonPaths
+import site
+from enmapbox import EnMAPBox, initPythonPaths, DIR_ENMAPBOX
 from enmapbox.testing import EnMAPBoxTestCase
+
 initPythonPaths()
+site.addsitedir(pathlib.Path(DIR_ENMAPBOX) / 'apps' / 'lmuapps')
+
 
 class test_applications(EnMAPBoxTestCase):
 
     def test_MainUiFunc(self):
-        from lmuvegetationapps.IVVRM.IVVRM_GUI import MainUiFunc
+        from lmuapps.lmuvegetationapps.IVVRM.IVVRM_GUI import MainUiFunc
 
         m = MainUiFunc()
         self.showGui(m)
@@ -32,7 +36,7 @@ class test_applications(EnMAPBoxTestCase):
             EB = EnMAPBox()
         EB.ui.hide()
 
-        from lmuvegetationapps.IVVRM.IVVRM_GUI import IVVRM_GUI
+        from lmuapps.lmuvegetationapps.IVVRM.IVVRM_GUI import IVVRM_GUI
 
         w = IVVRM_GUI()
         self.showGui(w)

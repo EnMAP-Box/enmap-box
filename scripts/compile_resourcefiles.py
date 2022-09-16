@@ -1,8 +1,8 @@
 import pathlib
+from qgis.testing import start_app
 
 DIR_REPO = pathlib.Path(__file__).parents[1]
 
-from qgis.testing import start_app
 
 app = start_app()
 

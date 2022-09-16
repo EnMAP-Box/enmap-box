@@ -38,8 +38,8 @@ class DataSourceSet(TreeNode):
     def dataSources(self) -> typing.List[DataSource]:
         return self.childNodes()
 
-    def removeDataSources(self, dataSources: typing.Union[DataSource, typing.List[DataSource]]) -> typing.List[
-        DataSource]:
+    def removeDataSources(self, dataSources: typing.Union[DataSource, typing.List[DataSource]]) -> \
+            typing.List[DataSource]:
         if isinstance(dataSources, DataSource):
             dataSources = [dataSources]
         owned = self.dataSources()

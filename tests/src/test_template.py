@@ -19,7 +19,7 @@ class EnMAPBoxTestCaseExample(EnMAPBoxTestCase):
         self.assertIsInstance(qgsApp, QgsApplication)
         self.assertTrue(qgsApp == QApplication.instance())
 
-        self.assertTrue(EnMAPBox.instance() == None)  # EnMAPBox is not started
+        self.assertTrue(EnMAPBox.instance() is None)  # EnMAPBox is not started
 
     def test_with_enmapbox(self):
         enmapBox = EnMAPBox()

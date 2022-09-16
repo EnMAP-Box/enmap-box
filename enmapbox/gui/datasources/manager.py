@@ -482,7 +482,7 @@ class DataSourceManagerTreeView(TreeView):
                                    for shortName in shortNames]
                     subAction = subMenu2.addAction(name + f' ({" - ".join(wavelengths)})')
                     subAction.setToolTip(' - '.join(longNames))
-                    subAction.triggered.connect(lambda *args, s=src, t=target: self.openInMap(s, t, rgb=name))
+                    subAction.triggered.connect(lambda *args, s=src, t=target, rgb=name: self.openInMap(s, t, rgb=rgb))
                     subAction.setEnabled(b)
 
             if isinstance(node, RasterDataSource):
@@ -539,7 +539,7 @@ class DataSourceManagerTreeView(TreeView):
 
             elif isinstance(node, VectorDataSource):
 
-                if node.wkbType() not in [QgsWkbTypes.NoGeometry, QgsWkbTypes.Unknown, QgsWkbTypes.UnknownGeometry]:
+                if node.geometryType() not in [QgsWkbTypes.NullGeometry, QgsWkbTypes.UnknownGeometry]:
                     a = m.addAction('Open in new map')
                     a.triggered.connect(lambda *args, s=node: self.openInMap(s, None))
 

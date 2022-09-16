@@ -1,14 +1,14 @@
-from PyQt5.QtGui import QColor
+from qgis.PyQt.QtGui import QColor
 
 from classfractionstatisticsapp.classfractionrenderer import ClassFractionRenderer
-from qgis._core import QgsRasterLayer, Qgis
+from qgis.core import QgsRasterLayer, Qgis
 import numpy as np
 
 
 from enmapboxprocessing.test.testcase import TestCase
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import landcover_map_l3
-from testdata import fraction_map_l3_tif
+from enmapboxtestdata import fraction_map_l3
 
 
 class TestClassFractionRenderer(TestCase):
@@ -18,7 +18,7 @@ class TestClassFractionRenderer(TestCase):
         categories = Utils.categoriesFromPalettedRasterRenderer(classification.renderer())
         colors = [QColor(category.color) for category in categories]
 
-        raster = QgsRasterLayer(fraction_map_l3_tif)
+        raster = QgsRasterLayer(fraction_map_l3)
         renderer = ClassFractionRenderer(raster.dataProvider())
         renderer.setColors(colors)
 

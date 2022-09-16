@@ -30,7 +30,7 @@ from enmapbox.gui.dataviews.docks import MapDock, DockArea, MimeDataDock, TextDo
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.Dock import Dock as pgDock
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
 from enmapbox.testing import EnMAPBoxTestCase, TestObjects
-from testdata import classifier_pkl
+from enmapboxtestdata import classificationDatasetAsPklFile
 
 
 class TestDocksAndDataSources(EnMAPBoxTestCase):
@@ -338,7 +338,7 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
 
     def test_issue_737(self):
         enmapBox = EnMAPBox(load_core_apps=False, load_other_apps=False)
-        enmapBox.addSource(classifier_pkl)
+        enmapBox.addSource(classificationDatasetAsPklFile)
         self.showGui(enmapBox.ui)
         enmapBox.close()
 

@@ -5,6 +5,9 @@ Version 3.10
 ------------
 *This release was tested under QGIS 3.24.1*
 
+*Important Notice: the EnMAP-Box repository moved to https://github.com/EnMAP-Box/enmap-box*
+
+
 **GUI**
 
 * *Project -> Create Data Source* to create new shapefiles, Geopackages or in-memory vector layers
@@ -145,6 +148,8 @@ Spectral Profile plot
 * fixed bug in cursor location value panel in case of failed CRS transformation (#1221)
 * fixed crosshair distance measurements
 * introduces EnMAPBoxProject, a QgsProject to keep EnMAP-Box QgsMapLayer references alive (#1227)
+
+* fixe bug in Spectral Profile import dialog (#
 
 Version 3.9
 -----------

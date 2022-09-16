@@ -31,11 +31,16 @@ points_in_no_data_region = join(root, 'points_in_no_data_region.gpkg')
 library = join(root, 'library.gpkg')
 
 # dataset (X, y)
-classificationDatasetAsVector = join(root, 'classification_dataset.gpkg')
-classificationDatasetAsCsv = join(root, 'classification_dataset.csv')
-classificationDatasetAsPkl = join(root, 'classification_dataset.pkl')
+classificationDatasetAsGpkgVector = join(root, 'classification_dataset.gpkg')
+classificationDatasetAsCsvVector = join(root, 'classification_dataset.csv')
+classificationDatasetAsJsonFile = join(root, 'classifier.pkl.json')
+classificationDatasetAsPklFile = join(root, 'classification_dataset.pkl')
+classificationDatasetAsForceFile = (join(root, 'force_features.csv'), join(root, 'force_labels.csv'))
+
+
 # todo: regressionDatasetAsVector = join(root, 'classification_dataset.gpkg')
 # todo: regressionDatasetAsCsv = join(root, 'classification_dataset.csv')
+regressionDatasetAsJsonFile = join(root, 'regressor.pkl.json')
 regressionDatasetAsPkl = join(root, 'regression_dataset.pkl')
 
 # learner and dataset (X, y) as dump
@@ -47,8 +52,6 @@ regressorDumpMultiTargetPkl = join(root, 'regressor_multitarget.pkl')  #
 
 # todo: regressorDumpJson = join(root, 'classifier.pkl.json')
 
-# classification dataset (X, y) as FORCE text files
-classificationSampleAsCsv = (join(root, 'force_features.csv'), join(root, 'force_labels.csv'))
 
 # spectral response functions
 landsat8_sectralResponseFunctionLibrary = join(root, 'landsat8_srf.gpkg')
