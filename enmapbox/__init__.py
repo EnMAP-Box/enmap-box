@@ -74,11 +74,11 @@ from the upcoming EnMAP sensor
 https://enmap-box.readthedocs.io</span></a></p>
 
 <p align="center">Licenced under the GNU General Public Licence<br/>
-<a href="http://www.gnu.org/licenses/"><span style=" text-decoration: underline; color:#0000ff;">
+<a href="https://www.gnu.org/licenses/"><span style=" text-decoration: underline; color:#0000ff;">
 http://www.gnu.org/licenses/</span></a></p>
 
 <p align="center">Environmental Mapping and Analysis Program (EnMAP)<br/>
-<a href="http://www.enmap.org"><span style=" text-decoration: underline; color:#0000ff;">
+<a href="https://www.enmap.org"><span style=" text-decoration: underline; color:#0000ff;">
 http://www.enmap.org</span></a></p>
 
 <p align="center">
