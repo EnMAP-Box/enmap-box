@@ -21,7 +21,7 @@
 import os
 import pathlib
 from qgis.PyQt.QtWidgets import QDialog
-from enmapbox import DIR_REPO, ABOUT
+from enmapbox import DIR_REPO, ABOUT, REPOSITORY
 from enmapbox.gui.utils import loadUi
 
 
@@ -38,7 +38,7 @@ class AboutDialog(QDialog):
         from enmapbox import __version__, __version_sha__
         info = f'Version {__version__}'
         if __version_sha__ != '':
-            info += f' {__version_sha__[0:7]}'
+            info += f' Code: <a href="{REPOSITORY}/commit/{__version_sha__}">{__version_sha__[0:7]}</a>'
         self.labelVersion.setText(info)
         self.setAboutTitle()
 

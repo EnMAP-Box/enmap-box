@@ -139,9 +139,13 @@ def create_enmapbox_plugin(include_testdata: bool = False,
     else:
         print(f'currentBranch is "{currentBranch}"')
 
-    BUILD_NAME = '{}.{}.{}'.format(config['metadata']['version'], timestamp, currentBranch)
-    BUILD_NAME = re.sub(r'[:-]', '', BUILD_NAME)
-    BUILD_NAME = re.sub(r'[\\/]', '_', BUILD_NAME)
+    if re.search(r'release_\d+\.\d+', currentBranch):
+        BUILD_NAME = '{}'.format(config['metadata']['version'])
+    else:
+        BUILD_NAME = '{}.{}.{}'.format(config['metadata']['version'], timestamp, currentBranch)
+        BUILD_NAME = re.sub(r'[:-]', '', BUILD_NAME)
+        BUILD_NAME = re.sub(r'[\\/]', '_', BUILD_NAME)
+
     PLUGIN_DIR = DIR_DEPLOY_LOCAL / 'enmapboxplugin'
     PLUGIN_ZIP = DIR_DEPLOY_LOCAL / 'enmapboxplugin.{}.zip'.format(BUILD_NAME)
 
