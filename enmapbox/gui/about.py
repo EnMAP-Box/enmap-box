@@ -37,8 +37,9 @@ class AboutDialog(QDialog):
         self.listWidget.currentItemChanged.connect(lambda: self.setAboutTitle())
         from enmapbox import __version__, __version_sha__
         info = f'Version {__version__}'
-        if __version_sha__ != '':
-            info += f' Code: <a href="{REPOSITORY}/commit/{__version_sha__}">{__version_sha__[0:7]}</a>'
+        if len(__version_sha__) > 10:
+            info += f' Code: ' \
+                    f'<a href="{REPOSITORY.replace(".git", "")}/commit/{__version_sha__}">{__version_sha__[0:11]}</a>'
         self.labelVersion.setText(info)
         self.setAboutTitle()
 
