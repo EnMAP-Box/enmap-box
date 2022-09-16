@@ -1,5 +1,6 @@
 import warnings
-from os.path import splitext
+from os import makedirs
+from os.path import splitext, exists, dirname
 from typing import List
 
 from osgeo import gdal
@@ -54,6 +55,9 @@ class Driver(object):
                f' {self.filename}'
         if self.feedback is not None:
             self.feedback.pushInfo(info)
+
+        if not exists(dirname(self.filename)):
+            makedirs(dirname(self.filename))
 
         gdalDriver: gdal.Driver = gdal.GetDriverByName(self.format)
         try:

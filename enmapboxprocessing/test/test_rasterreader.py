@@ -1,14 +1,15 @@
 import numpy as np
+from PyQt5.QtCore import QSizeF
+from osgeo import gdal
 
-import processing
-from enmapbox.exampledata import enmap
-from enmapboxprocessing.algorithm.importlandsatl2algorithm import ImportLandsatL2Algorithm
-from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
-from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
+from enmapbox.exampledata import enmap, google_maps
 from enmapboxprocessing.driver import Driver
+from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.testcase import TestCase
+from enmapboxtestdata import fraction_polygons_l3
 from qgis.PyQt.QtCore import QDateTime
+from qgis._core import Qgis, QgsRectangle
 from qgis.core import QgsRasterRange, QgsRasterLayer
 
 
@@ -19,361 +20,509 @@ class TestRasterReader(TestCase):
         self.provider = self.reader.provider
         self.array = self.reader.gdalDataset.ReadAsArray()
 
-    def test_readFirstPixel(self):
-        lead = self.reader.arrayFromPixelOffsetAndSize(xOffset=0, yOffset=0, width=1, height=1)
-        gold = self.array[:, 0:1, 0:1]
-        self.assertArrayEqual(lead, gold)
+    def test_init(self):
+        layer = QgsRasterLayer(enmap)
+        reader = RasterReader(layer)
+        self.assertTrue(layer is reader.layer)
 
-    def test_readLastPixel(self):
-        lead = self.reader.arrayFromPixelOffsetAndSize(xOffset=3, yOffset=1, width=1, height=1)
-        gold = self.array[:, 1:2, 3:4]
-        self.assertArrayEqual(lead, gold)
+        reader = RasterReader(layer.dataProvider())
+        self.assertTrue(not reader.layer.isValid())
 
-    def test_readAllData(self):
-        lead = self.reader.array()
-        gold = self.array
-        self.assertArrayEqual(lead, gold)
-
-    def test_readAllData_withBoundingBox_andSize(self):
-        array = np.array(self.reader.array(boundingBox=self.provider.extent(), width=22, height=40))
-        self.assertEqual((177, 40, 22), array.shape)
-
-    def test_readAllData_withBoundingBox_atNativeResolution(self):
-        lead = self.reader.array(boundingBox=self.provider.extent())
-        gold = self.array
-        self.assertArrayEqual(lead, gold)
-
-    def test_readAllData_withBoundingBox_atOversampledResolution(self):
-        array = np.array(self.reader.array(boundingBox=self.provider.extent(), width=22, height=40))
-        self.assertEqual((177, 40, 22), array.shape)
-
-    def test_readEveryPixel_oneByOne(self):
-        for xOffset in range(3):
-            for yOffset in range(2):
-                lead = self.reader.arrayFromPixelOffsetAndSize(xOffset, yOffset, width=1, height=1)
-                gold = self.array[:, yOffset:yOffset + 1, xOffset:xOffset + 1]
-                self.assertArrayEqual(lead, gold)
-
-    def test_readWithOverlap(self):
-        lead = self.reader.array(10, 10, self.reader.width() - 20, self.reader.height() - 20, overlap=10)
-        gold = self.array
-        self.assertArrayEqual(lead, gold)
-
-
-class TestRasterMetadataReader(TestCase):
-
-    def test_gdal_dataset_metadata(self):
         reader = RasterReader(enmap)
-        gold = 'Micrometers'
-        self.assertEqual(gold, reader.metadataItem('wavelength_units', 'ENVI'))
-        self.assertEqual(gold, reader.metadataItem('wavelength units', 'ENVI'))
-        self.assertEqual(gold, reader.metadataItem('wavelength_units'.upper(), 'ENVI'.lower()))
-        self.assertEqual(gold, reader.metadataItem('wavelength units'.upper(), 'ENVI'.lower()))
-        self.assertIsNone(reader.metadataItem('abc', 'XYZ'))
+        self.assertTrue(layer is not reader.layer)
+        self.assertEqual(layer.source(), reader.layer.source())
 
-    def test_gdal_band_metadata(self):
+        ds = gdal.Open(enmap)
+        reader = RasterReader(ds)
+        self.assertTrue(layer is not reader.layer)
+        self.assertEqual(layer.source(), reader.layer.source())
+        self.assertTrue(ds is reader.gdalDataset)
+
+        wms = QgsRasterLayer(google_maps)
+        reader = RasterReader(wms, openWithGdal=False)
+        self.assertIsNone(reader.gdalDataset)
+
+    def test_bandCount(self):
+        self.assertEqual(177, RasterReader(enmap).bandCount())
+
+    def test_bandNumbers(self):
+        self.assertListEqual(list(range(1, 178)), list(RasterReader(enmap).bandNumbers()))
+
+    def test_bandName(self):
+        self.assertEqual('band 8 (0.460000 Micrometers)', RasterReader(enmap).bandName(1))
+
+    def test_bandColor(self):
+        self.assertEqual('#e60000', RasterReader(fraction_polygons_l3).bandColor(1).name())
+
+    def test_bandOffset(self):
+        self.assertEqual(0, RasterReader(enmap).bandOffset(1))
+
+    def test_bandScale(self):
+        self.assertEqual(1, RasterReader(enmap).bandScale(1))
+
+    def test_crs(self):
+        self.assertEqual('EPSG:32633', RasterReader(enmap).crs().authid())
+
+    def test_dataType(self):
+        self.assertEqual(Qgis.DataType.Int16, RasterReader(enmap).dataType())
+        self.assertEqual(Qgis.DataType.Int16, RasterReader(enmap).dataType(1))
+
+    def test_dataTypeSize(self):
+        self.assertEqual(2, RasterReader(enmap).dataTypeSize())
+        self.assertEqual(2, RasterReader(enmap).dataTypeSize(1))
+
+    def test_extent(self):
+        self.assertEqual(6600.0, RasterReader(enmap).extent().width())
+
+    def test_noDataValue(self):
+        self.assertEqual(-99, RasterReader(enmap).noDataValue())
+        self.assertEqual(-99, RasterReader(enmap).noDataValue(1))
+        self.assertEqual(-99, RasterReader(enmap).sourceNoDataValue(1))
+        self.assertTrue(RasterReader(enmap).sourceHasNoDataValue(1))
+
+        layer = QgsRasterLayer(enmap)
+        reader = RasterReader(layer)
+        reader.setUseSourceNoDataValue(1, False)
+        self.assertEqual(False, reader.useSourceNoDataValue(1))
+        self.assertEqual(False, reader.useSourceNoDataValue())
+
+        rasterRange = QgsRasterRange(11, 111)
+        reader.setUserNoDataValue(1, [rasterRange])
+        self.assertListEqual([rasterRange], reader.userNoDataValues(1))
+        self.assertListEqual([rasterRange], reader.userNoDataValues())
+
+    def test_sourceHasNoDataValue(self):
+        self.assertTrue(RasterReader(enmap).sourceHasNoDataValue())
+        self.assertTrue(RasterReader(enmap).sourceHasNoDataValue(1))
+
+    def test_source(self):
+        self.assertEqual(enmap, RasterReader(enmap).source())
+
+    def test_size(self):
+        self.assertEqual(220, RasterReader(enmap).width())
+        self.assertEqual(400, RasterReader(enmap).height())
+
+    def test_rasterUnitsPerPixel(self):
+        self.assertEqual(30.0, RasterReader(enmap).rasterUnitsPerPixelX())
+        self.assertEqual(30.0, RasterReader(enmap).rasterUnitsPerPixelY())
+        self.assertEqual(QSizeF(30.0, 30.0), RasterReader(enmap).rasterUnitsPerPixel())
+
+    def test_walkGrid(self):
+        lead = [rasterBlockInfo for rasterBlockInfo in RasterReader(enmap).walkGrid(200, 200)]
+        gold = [
+            RasterBlockInfo(
+                QgsRectangle(
+                    380952.36999999999534339, 5814372.34999999962747097, 386952.36999999999534339,
+                    5820372.34999999962747097
+                ), 0, 0, 200, 200
+            ),
+            RasterBlockInfo(
+                QgsRectangle(
+                    386952.36999999999534339, 5814372.34999999962747097, 387552.36999999999534339,
+                    5820372.34999999962747097
+                ), 200, 0, 20, 200
+            ),
+            RasterBlockInfo(
+                QgsRectangle(
+                    380952.36999999999534339, 5808372.34999999962747097, 386952.36999999999534339,
+                    5814372.34999999962747097
+                ), 0, 200, 200, 200
+            ),
+            RasterBlockInfo(
+                QgsRectangle(
+                    386952.36999999999534339, 5808372.34999999962747097, 387552.36999999999534339,
+                    5814372.34999999962747097
+                ), 200, 200, 20, 200
+            )]
+        self.assertListEqual(gold, lead)
+
+    def test_arrayFromBlock(self):
         reader = RasterReader(enmap)
-        self.assertEqual(reader.Micrometers, reader.wavelengthUnits(1))
-        self.assertEqual(460.0, reader.wavelength(1))
-        self.assertEqual(460.0, reader.wavelength(1, reader.Nanometers))
-        self.assertEqual(0.460, reader.wavelength(1, reader.Micrometers))
-        self.assertEqual(5.8, reader.fwhm(1))
-        self.assertEqual(5.8, reader.fwhm(1, reader.Nanometers))
-        self.assertEqual(0.0058, reader.fwhm(1, reader.Micrometers))
+        gold = reader.gdalDataset.ReadAsArray()
+        block = RasterBlockInfo(reader.extent(), 0, 0, 220, 400)
+        lead = RasterReader(enmap).arrayFromBlock(block)
+        self.assertTrue(np.all(np.equal(gold, lead)))
 
-    def test_issue25(self):
-        reader = RasterReader(r'C:\Users\Andreas\Downloads\Neuer Ordner\test\PRISMA_DESTRIPPED_AOIvAL.bsq')
-        self.assertEqual('Nanometers', reader.wavelengthUnits(1))
-        reader = RasterReader(r'C:\Users\Andreas\Downloads\Neuer Ordner\test\FX17_Test_2022-09-07_12-40-04.raw')
-        self.assertEqual('Nanometers', reader.wavelengthUnits(1))
+    def test_arrayFromBoundingBoxAndSize(self):
+        reader = RasterReader(enmap)
+        gold = reader.gdalDataset.ReadAsArray()
+        lead = reader.arrayFromBoundingBoxAndSize(reader.extent(), 220, 400)
+        self.assertTrue(np.all(np.equal(gold, lead)))
 
-    def test_issue9(self):
-        from testdata import force_1984_2021_060_319_HL_TSA_LNDLG_NDV_TSI_tif
-        reader = RasterReader(force_1984_2021_060_319_HL_TSA_LNDLG_NDV_TSI_tif)
-        self.assertEqual(QDateTime(1984, 3, 1, 0, 0), reader.startTime(1))
-        self.assertEqual(QDateTime(1984, 3, 1, 0, 0), reader.centerTime(1))
+        lead = reader.arrayFromBoundingBoxAndSize(reader.extent(), 110, 200)
+        self.assertTrue(np.all(np.equal(gold[:, 1::2, 1::2], lead)))
 
-        self.assertIsNone(reader.wavelength(1))
-        self.assertIsNone(reader.wavelengthUnits(1))
+        lead = reader.arrayFromBoundingBoxAndSize(reader.extent(), 220, 400, [1])
+        self.assertTrue(np.all(np.equal(gold[0], lead)))
 
+        lead = reader.arrayFromBoundingBoxAndSize(reader.extent(), 220, 400, [1], 10)
+        self.assertEqual((400 + 2 * 10, 220 + 2 * 10), lead[0].shape)
+        self.assertTrue(np.all(np.equal(reader.noDataValue(1), lead[0][:, 0:9])))
+        self.assertTrue(np.all(np.equal(gold[0], lead[0][10:-10, 10:-10])))
+        lead[0][10:-10, 10:-10] = reader.noDataValue(1)
+        self.assertTrue(np.all(np.equal(reader.noDataValue(1), lead)))
 
-class TestQgisPam(TestCase):
-    # test QGIS PAM metadata handling (see #898)
+    def test_arrayFromPixelOffsetAndSize(self):
+        array = np.zeros((1, 5, 5))
+        array[0, 0] = 1
+        writer = self.rasterFromArray(array)
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(5, np.sum(reader.array()))
+        self.assertEqual(3, np.sum(reader.array(xOffset=1, width=3)))
+        self.assertEqual(0, np.sum(reader.array(yOffset=1, height=3)))
 
-    def test_item(self):
-        layer = QgsRasterLayer(enmap)
-        reader = RasterReader(layer)
+    def test_array(self):
+        reader = RasterReader(enmap)
+        gold = reader.gdalDataset.ReadAsArray()
+        self.assertTrue(np.all(np.equal(gold, reader.array())))
+        self.assertTrue(np.all(np.equal(gold, reader.array(0, 0, 220, 400))))
+        self.assertTrue(np.all(np.equal(gold, reader.array(boundingBox=reader.extent()))))
 
-        # make sure wavelength units exist in GDAL PAM
-        key = 'wavelength_units'
-        self.assertEqual('Micrometers', reader.gdalDataset.GetMetadataItem(key))
+    def test_array_withDataScaled(self):
+        # scale only
+        writer = self.rasterFromArray([[[100]]])
+        writer.setScale(1e-2, 1)
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(1, reader.array()[0][0, 0])
 
-        # query wavelength units
-        self.assertEqual('Micrometers', reader.metadataItem(key))
+        # offset only
+        writer = self.rasterFromArray([[[75]]])
+        writer.setOffset(25, 1)
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(100, reader.array()[0][0, 0])
 
-        # shadow GDAL PAM items
-        reader.setMetadataItem(key, 'Nanometers')  # stores item in QGIS PAM
-        self.assertEqual('Nanometers', reader.metadataItem(key))
+        # both only
+        writer = self.rasterFromArray([[[(1 - 0.5) * 100]]])
+        writer.setOffset(0.5, 1)
+        writer.setScale(1e-2, 1)
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(1, reader.array()[0][0, 0])
 
-        # shadow with None to effectively mask existing GDAL items
-        reader.setMetadataItem(key, None)
-        self.assertIsNone(None, reader.metadataItem(key))
+    def test_maskArray(self):
+        reader = RasterReader(enmap)
+        noDataValue = reader.noDataValue(1)
+        gold = reader.gdalDataset.ReadAsArray() != noDataValue
+        self.assertTrue(np.all(np.equal(gold, reader.maskArray(reader.array()))))
 
-        # ignoring QGIS PAM shadowing may be useful in some cases
-        self.assertEqual('Micrometers', reader.metadataItem(key, ignoreQgisPam=True))
+        self.assertTrue(np.all(np.equal(True, reader.maskArray(np.array([[[42]]]), [1]))))
+        self.assertTrue(np.all(np.equal(False, reader.maskArray(np.array([[[noDataValue]]]), [1]))))
 
-        # remove QGIS PAM item
-        reader.removeMetadataItem(key)
-        self.assertEqual('Micrometers', reader.metadataItem(key))  # ignoreQgisPam not required anymore
+        self.assertTrue(np.all(np.equal(False, reader.maskArray(np.array([[[np.nan]]]), [1], maskNotFinite=True))))
+        self.assertTrue(np.all(np.equal(True, reader.maskArray(np.array([[[np.nan]]]), [1], maskNotFinite=False))))
 
-    def test_domain(self):
-        layer = QgsRasterLayer(enmap)
-        reader = RasterReader(layer)
+        reader.setUseSourceNoDataValue(1, False)
+        self.assertTrue(np.all(np.equal(True, reader.maskArray(np.array([[[noDataValue]]]), [1]))))
 
-        # make sure the ENVI domain exists
-        domain = 'ENVI'
-        domainItems = ['bands', 'band_names', 'byte_order', 'coordinate_system_string', 'data_ignore_value',
-                       'data_type', 'default_bands', 'description', 'file_type', 'fwhm', 'header_offset', 'interleave',
-                       'lines', 'samples', 'sensor_type', 'wavelength', 'wavelength_units', 'y_start', 'z_plot_titles']
-        self.assertEqual(domainItems, list(reader.gdalDataset.GetMetadata(domain).keys()))
+        reader = RasterReader(enmap)
+        reader.setUserNoDataValue(1, [QgsRasterRange(1, 3, QgsRasterRange.BoundsType.IncludeMinAndMax)])
+        self.assertTrue(np.all(np.equal(True, reader.maskArray(np.array([[[0, 4]]]), [1]))))
+        self.assertTrue(np.all(np.equal(False, reader.maskArray(np.array([[[1, 2, 3]]]), [1]))))
 
-        # query domain
-        self.assertEqual(
-            domainItems,
-            list(reader.metadataDomain(domain).keys())
-        )
+        reader = RasterReader(enmap)
+        reader.setUserNoDataValue(1, [QgsRasterRange(1, 3, QgsRasterRange.BoundsType.IncludeMin)])
+        self.assertTrue(np.all(np.equal(True, reader.maskArray(np.array([[[0, 3]]]), [1]))))
+        self.assertTrue(np.all(np.equal(False, reader.maskArray(np.array([[[1, 2]]]), [1]))))
 
-        # shadow GDAL PAM item in domain
-        key = 'wavelength_units'
-        reader.setMetadataItem(key, 'TEST', domain)
-        self.assertEqual('TEST', reader.metadataDomain(domain)[key])
+        reader = RasterReader(enmap)
+        reader.setUserNoDataValue(1, [QgsRasterRange(1, 3, QgsRasterRange.BoundsType.IncludeMax)])
+        self.assertTrue(np.all(np.equal(True, reader.maskArray(np.array([[[1, 4]]]), [1]))))
+        self.assertTrue(np.all(np.equal(False, reader.maskArray(np.array([[[2, 3]]]), [1]))))
 
-        # shadow with None to effectively mask existing GDAL items
-        reader.setMetadataItem(key, None, domain)
-        self.assertIsNone(reader.metadataDomain(domain)[key])
+        reader = RasterReader(enmap)
+        reader.setUserNoDataValue(1, [QgsRasterRange(1, 3, QgsRasterRange.BoundsType.Exclusive)])
+        self.assertTrue(np.all(np.equal(True, reader.maskArray(np.array([[[1, 3]]]), [1]))))
+        self.assertTrue(np.all(np.equal(False, reader.maskArray(np.array([[[2]]]), [1]))))
 
-        # ignoring QGIS PAM shadowing may be useful in some cases
-        self.assertEqual('Micrometers', reader.metadataDomain(domain, ignoreQgisPam=True)[key])
+    def test_maskArray_withDefaultNoDataValue(self):
+        writer = self.rasterFromArray([[[1]]])
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertTrue(np.all(reader.maskArray(np.array([[[1]]]))))
+        self.assertTrue(np.all(~reader.maskArray(np.array([[[1]]]), defaultNoDataValue=1)[0]))
 
-        # remove QGIS PAM domain
-        reader.removeMetadataDomain(domain)
-        self.assertEqual('Micrometers', reader.metadataItem(key))  # ignoreQgisPam not required anymore
+    def test_samplingWidthAndHeight(self):
+        reader = RasterReader(enmap)
+        self.assertEqual((220, 400), reader.samplingWidthAndHeight(1))
+        self.assertEqual((220, 400), reader.samplingWidthAndHeight(1, reader.extent()))
+        self.assertEqual((8, 14), reader.samplingWidthAndHeight(1, reader.extent(), 100))
 
-    def test_domainList(self):
-        layer = QgsRasterLayer(enmap)
-        reader = RasterReader(layer)
+    def test_sampleValues(self):
+        reader = RasterReader(enmap)
+        array = reader.array(bandList=[1])[0]
+        noDataValue = reader.noDataValue(1)
+        self.assertEqual(np.sum(array != noDataValue), reader.sampleValues(1).shape)
+        self.assertEqual(np.sum(array[array != noDataValue]), np.sum(reader.sampleValues(1)))
+        self.assertEqual(400*220, len(reader.sampleValues(1, excludeNoDataValues=False)))
 
-        # make sure which GDAL domains exists
-        self.assertEqual(
-            ['IMAGE_STRUCTURE', '', 'ENVI', 'DERIVED_SUBDATASETS'],
-            reader.gdalDataset.GetMetadataDomainList()
-        )
+    def test_uniqueValueCounts(self):
+        writer = self.rasterFromArray([[[1, 1, 1, 2, 2, 3]]])
+        writer.close()
+        reader = RasterReader(writer.source())
+        uniqueValues, counts = reader.uniqueValueCounts(1)
+        self.assertListEqual(uniqueValues, [1, 2, 3])
+        self.assertListEqual(counts, [3, 2, 1])
 
-        # query domain keys
-        self.assertEqual(
-            ['IMAGE_STRUCTURE', '', 'ENVI', 'DERIVED_SUBDATASETS'],
-            reader.metadataDomainKeys()
-        )
+    def test_metadataItem(self):
+        reader = RasterReader(enmap)
+        self.assertEqual('0.460000', reader.metadataItem('wavelength', 'ENVI')[0])
+        self.assertEqual('Micrometers', reader.metadataItem('wavelength units', 'ENVI'))
+        self.assertEqual('0.460000', reader.metadataItem('wavelength', '', 1))
 
-        # add item to a new domain
-        reader.setMetadataItem('KEY', 'VALUE', 'NEW_DOMAIN')
-        self.assertTrue('NEW_DOMAIN' in reader.metadataDomainKeys())
+    def test_metadataDomain(self):
+        reader = RasterReader(enmap)
+        self.assertEqual(20, len(reader.metadataDomain('ENVI')))
 
-        # ignore QGIS PAM to ignore the new domain
-        self.assertFalse('NEW_DOMAIN' in reader.metadataDomainKeys(ignoreQgisPam=True))
+    def test_metadata(self):
+        reader = RasterReader(enmap)
+        self.assertEqual(4, len(reader.metadata()))
+
+    def test_metadataDomainKeys(self):
+        reader = RasterReader(enmap)
+        self.assertEqual(4, len(reader.metadata()))
+
+    def test_isSpectralRasterLayer(self):
+        reader = RasterReader(enmap)
+        self.assertTrue(reader.isSpectralRasterLayer())
+        self.assertTrue(reader.isSpectralRasterLayer(False))
+
+        reader = RasterReader(fraction_polygons_l3)
+        self.assertFalse(reader.isSpectralRasterLayer())
+        self.assertFalse(reader.isSpectralRasterLayer(False))
+
+    def test_findBandName(self):
+        reader = RasterReader(enmap)
+        bandName = reader.bandName(42)
+        self.assertEqual(42, reader.findBandName(bandName))
+        self.assertIsNone(reader.findBandName('dummy'))
+
+    def test_wavelengthUnits(self):
+        # check at band-level
+        writer = self.rasterFromArray(np.zeros((4, 1, 1)))
+        writer.setMetadataItem('wavelength', 500, '', 1)
+        writer.setMetadataItem('wavelength', 0.5, '', 2)
+        writer.setMetadataItem('wavelength_units', 'Nanometers', '', 3)
+        writer.setMetadataItem('wavelength_unit', 'Micrometers', '', 4)
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual('Nanometers', reader.wavelengthUnits(1))  # guessed
+        self.assertEqual('Micrometers', reader.wavelengthUnits(2))  # guessed
+        self.assertIsNone(reader.wavelengthUnits(1, guess=False))
+        self.assertEqual('Nanometers', reader.wavelengthUnits(3))
+        self.assertEqual('Micrometers', reader.wavelengthUnits(4))
+
+        # check at dataset-level
+        writer = self.rasterFromArray(np.zeros((3, 1, 1)))
+        writer.setMetadataItem('wavelength_units', 'Nanometers', '')
+        writer.close()
 
     def test_wavelength(self):
-        layer = QgsRasterLayer(enmap)
-        reader = RasterReader(layer)
+        # check at band-level (no units)
+        writer = self.rasterFromArray(np.zeros((5, 1, 1)))
+        writer.setMetadataItem('wavelength', 1, '', 1)
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(1, reader.wavelength(1, raw=True))  # raw
+        self.assertEqual(1000, reader.wavelength(1))  # in Nanometers
+        self.assertEqual(1, reader.wavelength(1, 'Micrometers'))
 
-        # make sure GDAL PAM wavelength are available
-        wavelengths = [float(reader.gdalBand(bandNo).GetMetadataItem('wavelength'))
-                       for bandNo in range(1, layer.bandCount() + 1)]
-        self.assertEqual(
-            [0.46, 0.465, 0.47, 0.475, 0.479, 0.484, 0.489, 0.494, 0.499, 0.503, 0.508, 0.513, 0.518, 0.523, 0.528,
-             0.533, 0.538, 0.543, 0.549, 0.554, 0.559, 0.565, 0.57, 0.575, 0.581, 0.587, 0.592, 0.598, 0.604, 0.61,
-             0.616, 0.622, 0.628, 0.634, 0.64, 0.646, 0.653, 0.659, 0.665, 0.672, 0.679, 0.685, 0.692, 0.699, 0.706,
-             0.713, 0.72, 0.727, 0.734, 0.741, 0.749, 0.756, 0.763, 0.771, 0.778, 0.786, 0.793, 0.801, 0.809, 0.817,
-             0.824, 0.832, 0.84, 0.848, 0.856, 0.864, 0.872, 0.88, 0.888, 0.896, 0.915, 0.924, 0.934, 0.944, 0.955,
-             0.965, 0.975, 0.986, 0.997, 1.007, 1.018, 1.029, 1.04, 1.051, 1.063, 1.074, 1.086, 1.097, 1.109, 1.12,
-             1.132, 1.144, 1.155, 1.167, 1.179, 1.191, 1.203, 1.215, 1.227, 1.239, 1.251, 1.263, 1.275, 1.287, 1.299,
-             1.311, 1.323, 1.522, 1.534, 1.545, 1.557, 1.568, 1.579, 1.59, 1.601, 1.612, 1.624, 1.634, 1.645, 1.656,
-             1.667, 1.678, 1.689, 1.699, 1.71, 1.721, 1.731, 1.742, 1.752, 1.763, 1.773, 1.783, 2.044, 2.053, 2.062,
-             2.071, 2.08, 2.089, 2.098, 2.107, 2.115, 2.124, 2.133, 2.141, 2.15, 2.159, 2.167, 2.176, 2.184, 2.193,
-             2.201, 2.21, 2.218, 2.226, 2.234, 2.243, 2.251, 2.259, 2.267, 2.275, 2.283, 2.292, 2.3, 2.308, 2.315,
-             2.323, 2.331, 2.339, 2.347, 2.355, 2.363, 2.37, 2.378, 2.386, 2.393, 2.401, 2.409],
-            wavelengths
-        )
+        # check at band-level (with units)
+        writer = self.rasterFromArray(np.zeros((5, 1, 1)))
+        writer.setMetadataItem('wavelength', 0.5, '', 1)
+        writer.setMetadataItem('wavelength_units', 'Micrometers', '', 1)
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(500, reader.wavelength(1))  # in Nanometers
+        self.assertEqual(0.5, reader.wavelength(1, 'Micrometers'))
 
-        # query wavelength via the RasterReader.wavelength
-        wavelength = reader.wavelength(bandNo=42)
-        self.assertEqual(685.0, wavelength)
+        # check at dataset-level
+        writer = self.rasterFromArray(np.zeros((2, 1, 1)))
+        writer.setMetadataItem('wavelength', [0.5, 500], '')
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(500, reader.wavelength(1))
+        self.assertEqual(500, reader.wavelength(2))
 
-        # check that we properly cached the wavelength
-        defaultDomain = ''
-        self.assertEqual(0.685, layer.customProperty(f'QGISPAM/band/42/{defaultDomain}/wavelength'))
-        self.assertEqual('Micrometers', layer.customProperty(f'QGISPAM/band/42/{defaultDomain}/wavelength_units'))
+    def test_findWavelength(self):
+        writer = self.rasterFromArray(np.zeros((5, 1, 1)))
+        writer.setWavelength(100, 1)
+        writer.setWavelength(200, 2)
+        writer.setWavelength(300, 3)
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(2, reader.findWavelength(190))
+        self.assertEqual(2, reader.findWavelength(190, reader.Nanometers))
+        self.assertIsNone(reader.findWavelength(None))
 
+    def test_findWavelength_nonSpectralRaster(self):
+        writer = self.rasterFromArray(np.zeros((5, 1, 1)))
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertIsNone(reader.findWavelength(190))
 
-class TestRasterMaskReader(TestCase):
+    def test_fwhm(self):
+        # check at band-level
+        writer = self.rasterFromArray(np.zeros((1, 1, 1)))
+        writer.setMetadataItem('wavelength_units', 'Nanometers', '', 1)
+        writer.setMetadataItem('fwhm', 10, '', 1)
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(10, reader.fwhm(1))  # in Nanometers
+        self.assertEqual(0.01, reader.fwhm(1, 'Micrometers'))
 
-    def setUp(self):
-        self.array = np.array([[[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]])
-        filename = self.filename('test.bsq')
-        Driver(filename).createFromArray(self.array)
-        self.reader = RasterReader(filename)
-        self.provider = self.reader.provider
+        # check at dataset-level
+        writer = self.rasterFromArray(np.zeros((2, 1, 1)))
+        writer.setMetadataItem('fwhm', [10, 20], '')
+        writer.setMetadataItem('wavelength_units', 'Nanometers', '')
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(10, reader.fwhm(1))
+        self.assertEqual(20, reader.fwhm(2))
 
-    def test_without_noData(self):
-        gold = np.full_like(self.array, True, dtype=bool)
-        lead = self.reader.maskArray(self.array)
-        self.assertArrayEqual(lead, gold)
+        # check non-spectral raster
+        self.assertIsNone(RasterReader(fraction_polygons_l3).fwhm(1))
 
-    def test_withSource_noData(self):
-        self.provider.setNoDataValue(bandNo=1, noDataValue=0)
-        gold = np.full_like(self.array, True, dtype=bool)
-        gold[0, 0, 0] = False
-        lead = self.reader.maskArray(self.array)
-        self.assertArrayEqual(lead, gold)
+    def test_badBandMultiplier(self):
+        # check at band-level
+        writer = self.rasterFromArray(np.zeros((3, 1, 1)))
+        writer.setMetadataItem('bbl', 0, '', 1)
+        writer.setMetadataItem('bbl', 1, '', 2)
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(0, reader.badBandMultiplier(1))
+        self.assertEqual(1, reader.badBandMultiplier(2))
+        self.assertEqual(1, reader.badBandMultiplier(3))
 
-    def test_withUser_noData(self):
-        self.provider.setUserNoDataValue(bandNo=1, noData=[
-            QgsRasterRange(0, 0),  # add 0
-            QgsRasterRange(1, 2, QgsRasterRange.IncludeMin),  # add 1
-            QgsRasterRange(1, 2, QgsRasterRange.IncludeMax),  # add 2
-            QgsRasterRange(2, 4, QgsRasterRange.Exclusive),  # add 3
-        ])
-        gold = np.full_like(self.array, True, dtype=bool)
-        gold[0, 0, 0:4] = False
-        lead = self.reader.maskArray(self.array)
-        self.assertArrayEqual(lead, gold)
+        # check at dataset-level
+        writer = self.rasterFromArray(np.zeros((3, 1, 1)))
+        writer.setMetadataItem('bbl', [0, 1], '')
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(0, reader.badBandMultiplier(1))
+        self.assertEqual(1, reader.badBandMultiplier(2))
 
-    def test_withSourceAndUser_noData(self):
-        self.provider.setNoDataValue(bandNo=1, noDataValue=4)  # add 4
-        self.provider.setUserNoDataValue(bandNo=1, noData=[
-            QgsRasterRange(0, 0),  # add 0
-            QgsRasterRange(1, 2, QgsRasterRange.IncludeMin),  # add 1
-            QgsRasterRange(1, 2, QgsRasterRange.IncludeMax),  # add 2
-            QgsRasterRange(2, 4, QgsRasterRange.Exclusive),  # add 3
-        ])
-        gold = np.full_like(self.array, True, dtype=bool)
-        gold[0, 0, 0:5] = False
-        lead = self.reader.maskArray(self.array)
-        self.assertArrayEqual(lead, gold)
+    def test_startTime(self):
+        # no time set
+        writer = self.rasterFromArray(np.zeros((3, 1, 1)))
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertIsNone(reader.startTime())
+        self.assertIsNone(reader.startTime(1))
 
+        # check at dataset-level
+        # - standard format
+        writer = self.rasterFromArray(np.zeros((3, 1, 1)))
+        writer.setMetadataItem('start_time', '2009-08-20T09:44:50', '')
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(QDateTime(2009, 8, 20, 9, 44, 50), reader.startTime(1))
+        # - GDAL IMAGERY-domain
+        writer = self.rasterFromArray(np.zeros((3, 1, 1)))
+        writer.setMetadataItem('ACQUISITIONDATETIME', '2009-08-20T09:44:50', 'IMAGERY')
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(QDateTime(2009, 8, 20, 9, 44, 50), reader.startTime(1))
+        # - ENVI-domain
+        writer = self.rasterFromArray(np.zeros((3, 1, 1)))
+        writer.setMetadataItem('acquisition_time', '2009-08-20T09:44:50', 'ENVI')
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(QDateTime(2009, 8, 20, 9, 44, 50), reader.startTime(1))
 
-class TestDataScaling(TestCase):
+        # check at dataset-level
+        # - standard format
+        writer = self.rasterFromArray(np.zeros((3, 1, 1)))
+        writer.setMetadataItem('start_time', '2009-08-20T09:44:50', '', 1)
+        writer.setMetadataItem('Date', '2009-08-20T09:44:50', 'FORCE', 2)
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(QDateTime(2009, 8, 20, 9, 44, 50), reader.startTime(1))
+        self.assertEqual(QDateTime(2009, 8, 20, 9, 44, 50), reader.startTime(2))
 
-    def test_toVrt(self):
-        # import Landsat 8 spectral raster VRT which already has data scale and offset values
-        alg = ImportLandsatL2Algorithm()
-        parameters = {
-            alg.P_FILE: r'D:\data\sensors\landsat\C2L2\LC08_L2SP_192023_20210724_20210730_02_T1\LC08_L2SP_192023_20210724_20210730_02_T1_MTL.txt',
-            alg.P_OUTPUT_RASTER: self.filename('landsat8L2C2.vrt')
-        }
-        result = processing.run(alg, parameters)
-        reader = RasterReader(result[alg.P_OUTPUT_RASTER])
-        self.assertEqual(-0.2, reader.bandOffset(1))
-        self.assertEqual(2.75e-05, reader.bandScale(1))
-        sum1 = np.sum(reader.array(bandList=[1]))
+    def test_startTime_bandLevel(self):
+        writer = self.rasterFromArray(np.zeros((3, 1, 1)))
+        writer.setMetadataItem('start_time', '2009-08-20T09:44:50', '', 1)
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(QDateTime(2009, 8, 20, 9, 44, 50), reader.startTime(1))
 
-        # translate to another VRT
-        alg = SaveRasterAsAlgorithm()
-        parameters = {
-            alg.P_RASTER: reader.layer,
-            alg.P_OUTPUT_RASTER: self.filename('landsat8L2C2_copy1.vrt')
-        }
-        result = processing.run(alg, parameters)
-        reader2 = RasterReader(result[alg.P_OUTPUT_RASTER])
-        self.assertEqual(-0.2, reader2.bandOffset(1))
-        self.assertEqual(2.75e-05, reader2.bandScale(1))
-        sum2 = np.sum(reader.array(bandList=[1]))
-        self.assertEqual(sum1, sum2)
+    def test_endTime(self):
+        # no time set
+        writer = self.rasterFromArray(np.zeros((3, 1, 1)))
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertIsNone(reader.endTime())
+        self.assertIsNone(reader.endTime(1))
 
-    def test_toGTiff(self):
-        # import Landsat 8 spectral raster VRT which already has data scale and offset values
-        alg = ImportLandsatL2Algorithm()
-        parameters = {
-            alg.P_FILE: r'D:\data\sensors\landsat\C2L2\LC08_L2SP_192023_20210724_20210730_02_T1\LC08_L2SP_192023_20210724_20210730_02_T1_MTL.txt',
-            alg.P_OUTPUT_RASTER: self.filename('landsat8L2C2.vrt')
-        }
-        result = processing.run(alg, parameters)
-        reader = RasterReader(result[alg.P_OUTPUT_RASTER])
-        self.assertEqual(-0.2, reader.bandOffset(1))
-        self.assertEqual(2.75e-05, reader.bandScale(1))
-        sum1 = np.sum(reader.array(bandList=[1]))
+        # check at dataset-level
+        # - standard format
+        writer = self.rasterFromArray(np.zeros((3, 1, 1)))
+        writer.setMetadataItem('end_time', '2009-08-20T09:44:50', '')
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(QDateTime(2009, 8, 20, 9, 44, 50), reader.endTime(1))
 
-        # translate to another GTiff
-        alg = SaveRasterAsAlgorithm()
-        parameters = {
-            alg.P_RASTER: reader.layer,
-            alg.P_OUTPUT_RASTER: self.filename('landsat8L2C2_copy2.tif')
-        }
-        result = processing.run(alg, parameters)
-        reader2 = RasterReader(result[alg.P_OUTPUT_RASTER])
-        self.assertEqual(2.75e-05, reader2.bandScale(1))  # GDAL Translate hasn't scaled the data!
-        self.assertEqual(-0.2, reader2.bandOffset(1))
-        sum2 = np.sum(reader.array(bandList=[1]))
-        self.assertEqual(sum1, sum2)
+        # check at band-level
+        # - standard format
+        writer = self.rasterFromArray(np.zeros((3, 1, 1)))
+        writer.setMetadataItem('end_time', '2009-08-20T09:44:50', '', 1)
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(QDateTime(2009, 8, 20, 9, 44, 50), reader.endTime(1))
 
-    def test_scaleAnd_toGTiff(self):
-        # import Landsat 8 spectral raster VRT which already has data scale and offset values
-        alg = ImportLandsatL2Algorithm()
-        parameters = {
-            alg.P_FILE: r'D:\data\sensors\landsat\C2L2\LC08_L2SP_192023_20210724_20210730_02_T1\LC08_L2SP_192023_20210724_20210730_02_T1_MTL.txt',
-            alg.P_OUTPUT_RASTER: self.filename('landsat8L2C2.vrt')
-        }
-        result = processing.run(alg, parameters)
-        reader = RasterReader(result[alg.P_OUTPUT_RASTER])
-        self.assertEqual(-0.2, reader.bandOffset(5))
-        self.assertEqual(2.75e-05, reader.bandScale(5))
-        mean1 = np.mean(reader.array(bandList=[5]))
+    def test_centerTime(self):
+        # no start time set
+        writer = self.rasterFromArray(np.zeros((3, 1, 1)))
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertIsNone(reader.centerTime())
+        self.assertIsNone(reader.centerTime(1))
 
-        # set scaling
-        reader.setUserBandScale(100, 5)
-        # reader.setUserBandOffset(123, 5)
+        # no end time, but start time set
+        writer = self.rasterFromArray(np.zeros((3, 1, 1)))
+        writer.setMetadataItem('start_time', '2009-08-20T09:44:50', '')
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(QDateTime(2009, 8, 20, 9, 44, 50), reader.centerTime())
+        self.assertEqual(QDateTime(2009, 8, 20, 9, 44, 50), reader.centerTime(1))
 
-        # translate to another GTiff
-        alg = TranslateRasterAlgorithm()
-        parameters = {
-            alg.P_RASTER: reader.layer,
-            alg.P_BAND_LIST: [5],
-            alg.P_OUTPUT_RASTER: self.filename('landsat8L2C2_copy2.tif')
-        }
-        result = processing.run(alg, parameters)
-        reader2 = RasterReader(result[alg.P_OUTPUT_RASTER])
-        self.assertEqual(2.75e-05 * 100, reader2.bandScale(1))  # GDAL Translate hasn't scaled the data!
-        # self.assertEqual(-0.2 * 100 + 123, reader2.bandOffset(5))
-        mean2 = np.mean(reader2.array())
-        self.assertAlmostEqual(mean1 * 100, mean2, 3)
+        # check both set
+        # - standard format
+        writer = self.rasterFromArray(np.zeros((3, 1, 1)))
+        writer.setMetadataItem('start_time', '2009-08-20T09:44:50', '')
+        writer.setMetadataItem('end_time', '2011-08-20T09:44:50', '')
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(QDateTime(2010, 8, 20, 9, 44, 50), reader.centerTime(1))
 
-    def test_scaleAnd_toVrt(self):
-        # import Landsat 8 spectral raster VRT which already has data scale and offset values
-        alg = ImportLandsatL2Algorithm()
-        parameters = {
-            alg.P_FILE: r'D:\data\sensors\landsat\C2L2\LC08_L2SP_192023_20210724_20210730_02_T1\LC08_L2SP_192023_20210724_20210730_02_T1_MTL.txt',
-            alg.P_OUTPUT_RASTER: self.filename('landsat8L2C2.vrt')
-        }
-        result = processing.run(alg, parameters)
-        reader = RasterReader(result[alg.P_OUTPUT_RASTER])
-        self.assertEqual(-0.2, reader.bandOffset(5))
-        self.assertEqual(2.75e-05, reader.bandScale(5))
-        mean1 = np.mean(reader.array(bandList=[5]))
+    def test_findTime(self):
+        writer = self.rasterFromArray(np.zeros((4, 1, 1)))
+        writer.setStartTime(QDateTime(2000, 1, 1, 0, 0), 1)
+        writer.setStartTime(QDateTime(2010, 1, 1, 0, 0), 2)
+        writer.setStartTime(QDateTime(2020, 1, 1, 0, 0), 3)
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(2, reader.findTime(QDateTime(2009, 1, 1, 0, 0)))
 
-        # set scaling
-        reader.setUserBandScale(100, 5)
-        # reader.setUserBandOffset(123, 5)
+        self.assertIsNone(reader.findTime(None))
 
-        # translate to another GTiff
-        alg = TranslateRasterAlgorithm()
-        parameters = {
-            alg.P_RASTER: reader.layer,
-            alg.P_BAND_LIST: [5],
-            alg.P_OUTPUT_RASTER: self.filename('landsat8L2C2_copy3.vrt')
-        }
-        result = processing.run(alg, parameters)
-        reader2 = RasterReader(result[alg.P_OUTPUT_RASTER])
-        self.assertAlmostEqual(2.75e-05 * 100, reader2.bandScale(1), 3)  # GDAL Translate hasn't scaled the data!
-        # self.assertEqual(-0.2 * 100 + 123, reader2.bandOffset(5))
-        mean2 = np.mean(reader2.array())
-        self.assertAlmostEqual(mean1 * 100, mean2, 3)
+        # non-temporal raster
+        writer = self.rasterFromArray(np.zeros((3, 1, 1)))
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertIsNone(reader.findTime(QDateTime(2009, 1, 1, 0, 0)))
+
+    def test_lineMemoryUsage(self):
+        bandCount = 4
+        xsize = 10
+        dataTypeSize = 4  # np.int32 uses 4 bytes
+        writer = self.rasterFromArray(np.zeros((bandCount, 1, xsize), np.int32))
+        writer.close()
+        reader = RasterReader(writer.source())
+        gold = bandCount * xsize * dataTypeSize
+        self.assertEqual(gold, reader.lineMemoryUsage())
+        self.assertEqual(gold * 2, reader.lineMemoryUsage(nBands=bandCount * 2))
+        self.assertEqual(gold * 2, reader.lineMemoryUsage(dataTypeSize=8))

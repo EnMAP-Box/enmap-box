@@ -1,6 +1,5 @@
-import warnings
 from math import isnan
-from typing import Iterable, List, Union, Optional, Tuple
+from typing import Iterable, List, Union, Optional, Tuple, Iterator
 
 import numpy as np
 from osgeo import gdal
@@ -38,7 +37,7 @@ class RasterReader(object):
             self.layer = QgsRasterLayer(source.GetDescription())
             self.provider: QgsRasterDataProvider = self.layer.dataProvider()
         else:
-            assert 0
+            raise ValueError()
 
         if isinstance(source, gdal.Dataset):
             gdalDataset = source
@@ -50,89 +49,115 @@ class RasterReader(object):
 
         self.gdalDataset = gdalDataset
 
-    def bandCount(self):
+    def bandCount(self) -> int:
+        """Return iterator over all band numbers."""
         return self.provider.bandCount()
 
-    def bandNumbers(self):
+    def bandNumbers(self) -> Iterator[int]:
+        """Return iterator over all band numbers."""
         for bandNo in range(1, self.provider.bandCount() + 1):
             yield bandNo
 
     def bandName(self, bandNo: int) -> str:
+        """Return band name."""
         return ': '.join(self.layer.bandName(bandNo).split(': ')[1:])  # removes the "Band 042: " prefix
 
     def bandColor(self, bandNo: int) -> Optional[QColor]:
+        """Return band color."""
         return Utils.parseColor(self.metadataItem('color', '', bandNo))
 
     def bandOffset(self, bandNo: int) -> float:
+        """Return band offset."""
         return self.provider.bandOffset(bandNo)
 
     def bandScale(self, bandNo: int) -> float:
+        """Return band scale."""
         return self.provider.bandScale(bandNo)
 
     def crs(self) -> QgsCoordinateReferenceSystem:
+        """Return CRS."""
         return self.provider.crs()
 
     def dataType(self, bandNo: int = None) -> QgisDataType:
+        """Return band data type."""
         if bandNo is None:
             bandNo = 1
         return self.provider.dataType(bandNo)
 
     def dataTypeSize(self, bandNo: int = None) -> int:
+        """Return band data type size in bytes."""
         if bandNo is None:
             bandNo = 1
         return self.provider.dataTypeSize(bandNo)
 
     def extent(self) -> QgsRectangle:
+        """Return extent."""
         return self.provider.extent()
 
     def noDataValue(self, bandNo: int = None) -> Optional[float]:
+        """Return no data value."""
         if bandNo is None:
             bandNo = 1
         return self.sourceNoDataValue(bandNo)
 
     def sourceNoDataValue(self, bandNo: int):
+        """Return no data value."""
         return self.provider.sourceNoDataValue(bandNo)
 
-    def setUserNoDataValue(self, bandNo: int, noData: Iterable[QgsRasterRange]):
-        return self.provider.setUserNoDataValue(bandNo, noData)
-
-    def userNoDataValues(self, bandNo: int = None) -> List[QgsRasterRange]:
-        if bandNo is None:
-            bandNo = 1
-        return self.provider.userNoDataValues(bandNo)
-
-    def setUseSourceNoDataValue(self, bandNo: int, use: bool):
-        return self.provider.setUseSourceNoDataValue(bandNo, use)
-
     def sourceHasNoDataValue(self, bandNo: int = None):
+        """Read QGIS docs."""
         if bandNo is None:
             bandNo = 1
         return self.provider.sourceHasNoDataValue(bandNo)
 
     def useSourceNoDataValue(self, bandNo: int = None) -> bool:
+        """Read QGIS docs."""
         if bandNo is None:
             bandNo = 1
         return self.provider.useSourceNoDataValue(bandNo)
 
+    def setUseSourceNoDataValue(self, bandNo: int, use: bool):
+        """Read QGIS docs."""
+        return self.provider.setUseSourceNoDataValue(bandNo, use)
+
+    def setUserNoDataValue(self, bandNo: int, noData: Iterable[QgsRasterRange]):
+        """Read QGIS docs."""
+        return self.provider.setUserNoDataValue(bandNo, noData)
+
+    def userNoDataValues(self, bandNo: int = None) -> List[QgsRasterRange]:
+        """Read QGIS docs."""
+        if bandNo is None:
+            bandNo = 1
+        return self.provider.userNoDataValues(bandNo)
+
     def source(self) -> str:
+        """Return source URI."""
         return self.provider.dataSourceUri()
 
     def width(self) -> int:
+        """Return width in pixel."""
         return self.provider.xSize()
 
     def height(self) -> int:
+        """Return height in pixel."""
         return self.provider.ySize()
 
     def rasterUnitsPerPixelX(self) -> float:
+        """Return pixel resolution in x."""
         return self.provider.extent().width() / self.provider.xSize()
 
     def rasterUnitsPerPixelY(self) -> float:
+        """Return pixel resolution in y."""
         return self.provider.extent().height() / self.provider.ySize()
 
     def rasterUnitsPerPixel(self) -> QSizeF:
+        """Return pixel resolution."""
         return QSizeF(self.rasterUnitsPerPixelX(), self.rasterUnitsPerPixelY())
 
-    def walkGrid(self, blockSizeX: int, blockSizeY: int, feedback: QgsProcessingFeedback = None):
+    def walkGrid(
+            self, blockSizeX: int, blockSizeY: int, feedback: QgsProcessingFeedback = None
+    ) -> Iterator[RasterBlockInfo]:
+        """Iterate block-wise over the raster."""
         pixelSizeX = self.rasterUnitsPerPixelX()
         pixelSizeY = self.rasterUnitsPerPixelY()
         extent = self.extent()
@@ -149,6 +174,7 @@ class RasterReader(object):
             self, block: RasterBlockInfo, bandList: List[int] = None, overlap: int = None,
             feedback: QgsRasterBlockFeedback = None
     ):
+        """Return data for given block."""
         return self.arrayFromBoundingBoxAndSize(
             block.extent, block.width, block.height, bandList, overlap, feedback
         )
@@ -157,6 +183,7 @@ class RasterReader(object):
             self, boundingBox: QgsRectangle, width: int, height: int, bandList: List[int] = None,
             overlap: int = None, feedback: QgsRasterBlockFeedback = None
     ) -> Array3d:
+        """Return data for given bounding box and size."""
         if bandList is None:
             bandList = range(1, self.provider.bandCount() + 1)
         if overlap is not None:
@@ -182,6 +209,7 @@ class RasterReader(object):
             self, xOffset: int, yOffset: int, width: int, height: int, bandList: List[int] = None, overlap: int = None,
             feedback: QgsRasterBlockFeedback = None
     ) -> Array3d:
+        """Return data for given pixel offset and size."""
         if self.crs().isValid():
             p1 = QgsPoint(xOffset, yOffset)
             p2 = QgsPoint(xOffset + width, yOffset + height)
@@ -199,7 +227,7 @@ class RasterReader(object):
             bandList: List[int] = None, boundingBox: QgsRectangle = None, overlap: int = None,
             feedback: QgsRasterBlockFeedback = None
     ) -> Array3d:
-
+        """Return data."""
         if boundingBox is None:
             if xOffset is None and width is None:
                 xOffset = 0
@@ -221,6 +249,7 @@ class RasterReader(object):
     def maskArray(
             self, array: Array3d, bandList: List[int] = None, maskNotFinite=True, defaultNoDataValue: float = None
     ) -> Array3d:
+        """Return mask for given data. No data values evaluate to False, all other to True."""
         if bandList is None:
             bandList = range(1, self.provider.bandCount() + 1)
         assert len(bandList) == len(array)
@@ -237,27 +266,35 @@ class RasterReader(object):
                     m[a == defaultNoDataValue] = False
             rasterRange: QgsRasterRange
             for rasterRange in self.provider.userNoDataValues(bandNo):
-                if rasterRange.bounds() == QgsRasterRange.IncludeMinAndMax:
-                    contained = np.greater_equal(a, rasterRange.min())
-                    np.less_equal(a, rasterRange.max(), out=contained)
-                elif rasterRange.bounds() == QgsRasterRange.IncludeMin:
-                    contained = np.greater_equal(a, rasterRange.min())
-                    np.less(a, rasterRange.max(), out=contained)
-                elif rasterRange.bounds() == QgsRasterRange.IncludeMax:
-                    contained = np.greater(a, rasterRange.min())
-                    np.less_equal(a, rasterRange.max(), out=contained)
-                elif rasterRange.bounds() == QgsRasterRange.Exclusive:
-                    contained = np.greater(a, rasterRange.min())
-                    np.less(a, rasterRange.max(), out=contained)
+                if rasterRange.bounds() == QgsRasterRange.BoundsType.IncludeMinAndMax:
+                    contained = np.logical_and(
+                        np.greater_equal(a, rasterRange.min()), np.less_equal(a, rasterRange.max())
+                    )
+                elif rasterRange.bounds() == QgsRasterRange.BoundsType.IncludeMin:
+                    contained = np.logical_and(
+                        np.greater_equal(a, rasterRange.min()), np.less(a, rasterRange.max())
+                    )
+                elif rasterRange.bounds() == QgsRasterRange.BoundsType.IncludeMax:
+                    contained = np.logical_and(
+                        np.greater(a, rasterRange.min()), np.less_equal(a, rasterRange.max())
+                    )
+                elif rasterRange.bounds() == QgsRasterRange.BoundsType.Exclusive:
+                    contained = np.logical_and(
+                        np.greater(a, rasterRange.min()), np.less(a, rasterRange.max())
+                    )
                 else:
-                    assert 0
+                    raise ValueError()
+
                 m[contained] = False
-                if maskNotFinite:
-                    m[np.logical_not(np.isfinite(a))] = False
+
+            if maskNotFinite:
+                m[np.logical_not(np.isfinite(a))] = False
+
             maskArray.append(m)
         return maskArray
 
     def samplingWidthAndHeight(self, bandNo: int, extent=None, sampleSize: int = 0) -> Tuple[int, int]:
+        """Return number of pixel for width and heigth, that approx. match the given sample size."""
 
         # get sample width and height from empty bandStatistics
         if extent is None:
@@ -270,7 +307,7 @@ class RasterReader(object):
             excludeNoDataValues=True, excludeNotFinite=True, defaultNoDataValue: float = None,
             feedback: QgsRasterBlockFeedback = None
     ) -> np.ndarray:
-
+        """Return sample data."""
         if extent is None:
             extent = self.extent()
         width, height = self.samplingWidthAndHeight(bandNo, extent, sampleSize)
@@ -285,65 +322,18 @@ class RasterReader(object):
     def uniqueValueCounts(
             self, bandNo: int, extent=None, sampleSize: int = 0, excludeNoDataValues=True, excludeNotFinite=True,
             defaultNoDataValue: float = None, feedback: QgsRasterBlockFeedback = None
-    ):
-
+    ) -> Tuple[List[float], List[int]]:
+        """Return unique value counts."""
         values = self.sampleValues(
             bandNo, extent, sampleSize, excludeNoDataValues, excludeNotFinite, defaultNoDataValue, feedback
         )
         uniqueValues, counts = np.unique(values, return_counts=True)
-        return list(uniqueValues), list(counts)
-
-    def propertyKey(self, key: str, domain: str, bandNo: int = None):
-        key = key.replace(' ', '_')
-        if bandNo is None:
-            propertyKey = f'QGISPAM/dataset/{domain}/{key}'
-        else:
-            propertyKey = f'QGISPAM/band/{bandNo}/{domain}/{key}'
-        return propertyKey
-
-    def propertyKeyComponents(self, propertyKey: str) -> Tuple[str, str, Optional[int]]:
-        if propertyKey.startswith('QGISPAM/dataset'):
-            _, _, domain, key = propertyKey.split('/')
-            bandNo = None
-        elif propertyKey.startswith('QGISPAM/band'):
-            _, _, bandNo, domain, key = propertyKey.split('/')
-            bandNo = int(bandNo)
-        else:
-            raise ValueError('invalid QGIS PAM property key')
-        key = key.replace(' ', '_')
-        return key, domain, bandNo
-
-    def setMetadataItem(self, key: str, value: MetadataValue, domain: str = '', bandNo: int = None):
-        """Set metadata item as custom layer property. This shadows GDAL PAM metadata items."""
-        propertyKey = self.propertyKey(key, domain, bandNo)
-        self.layer.setCustomProperty(propertyKey, value)
-
-    def removeMetadataItem(self, key: str, domain: str = '', bandNo: int = None):
-        """Remove metadata item from QGIS PAM. It may still exist in GDAL PAM."""
-        self.layer.removeCustomProperty(self.propertyKey(key, domain, bandNo))
-
-    def removeMetadataDomain(self, domain: str, bandNo: int = None):
-        """Remove metadata domain from QGIS PAM. It may still exist in GDAL PAM."""
-        for propertyKey in self.layer.customPropertyKeys():
-            if not propertyKey.startswith('QGISPAM'):
-                continue
-            _, domain2, _ = self.propertyKeyComponents(propertyKey)
-            if domain == domain2:
-                self.layer.removeCustomProperty(propertyKey)
+        return list(map(float, uniqueValues)), list(map(int, counts))
 
     def metadataItem(
-            self, key: str, domain: str = '', bandNo: int = None, ignoreQgisPam=False
+            self, key: str, domain: str = '', bandNo: int = None
     ) -> Optional[MetadataValue]:
-
-        # check QGIS PAM (i.e. custom layer properties) first
-        if not ignoreQgisPam:
-            if self.layer is not None:
-                propertyKey = self.propertyKey(key, domain, bandNo)
-                if propertyKey in self.layer.customPropertyKeys():
-                    value = self.layer.customProperty(propertyKey)
-                    return value
-
-        # if not found, check GDAL PAM afterwards
+        """Return metadata item."""
         string = self._gdalObject(bandNo).GetMetadataItem(key, domain)
         if string is None:
             string = self._gdalObject(bandNo).GetMetadataItem(key.replace(' ', '_'), domain)
@@ -351,61 +341,29 @@ class RasterReader(object):
             return None
         return Utils.stringToMetadateValue(string)
 
-    def metadataDomain(self, domain: str = '', bandNo: int = None, ignoreQgisPam=False) -> MetadataDomain:
-
-        # get GDAL PAM metadata first
+    def metadataDomain(self, domain: str = '', bandNo: int = None) -> MetadataDomain:
+        """Return domain metadata."""
         metadata = {
             key: Utils.stringToMetadateValue(value)
             for key, value in self._gdalObject(bandNo).GetMetadata(domain).items()
         }
-
-        # overwrite with QGIS PAM afterwards
-        if ignoreQgisPam:
-            return metadata
-
-        for propertyKey in self.layer.customPropertyKeys():
-            if not propertyKey.startswith('QGISPAM'):
-                continue
-
-            key, domain2, bandNo2 = self.propertyKeyComponents(propertyKey)
-
-            if domain != domain2 or bandNo != bandNo2:
-                continue
-
-            metadata[key] = self.layer.customProperty(propertyKey)
-
         return metadata
 
     def metadata(self, bandNo: int = None) -> Metadata:
-        # domains = self._gdalObject(bandNo).GetMetadataDomainList()
+        """Return metadata."""
         domains = self.metadataDomainKeys(bandNo)
         return {domain: self.metadataDomain(domain, bandNo) for domain in domains}
 
-    def metadataDomainKeys(self, bandNo: int = None, ignoreQgisPam=False) -> List[str]:
-
-        # get GDAL PAM domains
+    def metadataDomainKeys(self, bandNo: int = None) -> List[str]:
+        """Return metadata domain names."""
         domains: List = self._gdalObject(bandNo).GetMetadataDomainList()
         if domains is None:
             domains = []
-        if ignoreQgisPam:
-            return domains
-
-        # add QGIS PAM domains
-        for propertyKey in self.layer.customPropertyKeys():
-            if not propertyKey.startswith('QGISPAM'):
-                continue
-
-            _, domain, bandNo2 = self.propertyKeyComponents(propertyKey)
-
-            if bandNo != bandNo2:
-                continue
-
-            if domain not in domains:
-                domains.append(domain)
 
         return domains
 
     def isSpectralRasterLayer(self, quickCheck=True):
+        """Return whether a raster has wavelength information."""
         if quickCheck:
             return self.wavelength(1) is not None
         else:
@@ -414,47 +372,12 @@ class RasterReader(object):
                     return False
             return True
 
-    def findBandName(self, bandName: str) -> int:
+    def findBandName(self, bandName: str) -> Optional[int]:
+        """Find band number by name."""
         for bandNo in range(1, self.bandCount() + 1):
             if self.bandName(bandNo) == bandName:
                 return bandNo
-        raise ValueError(f'unknown band name: {bandName}')
-
-    def findWavelength(self, wavelength: Optional[float], units: str = None) -> Optional[int]:
-        if wavelength is None:
-            return None
-        if units is not None:
-            wavelength = wavelength * Utils.wavelengthUnitsConversionFactor(units, 'nm')
-
-        bandNos = list()
-        distances = list()
-        for bandNo in range(1, self.bandCount() + 1):
-            wavelength_ = self.wavelength(bandNo)
-            if wavelength_ is None:
-                continue
-            bandNos.append(bandNo)
-            distances.append(abs(wavelength_ - wavelength))
-        if len(bandNos) == 0:
-            return None
-
-        return bandNos[np.argmin(distances)]
-
-    def findTime(self, centerTime: Optional[QDateTime]) -> Optional[int]:
-        if centerTime is None:
-            return None
-
-        bandNos = list()
-        distances = list()
-        for bandNo in range(1, self.bandCount() + 1):
-            centerTime_ = self.centerTime(bandNo)
-            if centerTime_ is None:
-                continue
-            bandNos.append(bandNo)
-            distances.append(abs(centerTime_.msecsTo(centerTime)))
-        if len(bandNos) == 0:
-            return None
-
-        return bandNos[np.argmin(distances)]
+        return None
 
     def wavelengthUnits(self, bandNo: int, guess=True) -> Optional[str]:
         """Return wavelength units."""
@@ -485,7 +408,6 @@ class RasterReader(object):
                 else:
                     msg = 'wavelength units missing, assuming Nanometers'
                     units = 'Nanometers'
-                warnings.warn(msg)
                 from enmapbox import messageLog
                 messageLog(msg, level=Qgis.MessageLevel.Warning)
                 return units
@@ -526,16 +448,25 @@ class RasterReader(object):
 
         return None
 
-    def setWavelength(self, wavelength: float, bandNo: int, units: str = None, fwhm: float = None):
+    def findWavelength(self, wavelength: Optional[float], units: str = None) -> Optional[int]:
+        """Find band number by wavelength."""
+        if wavelength is None:
+            return None
+        if units is not None:
+            wavelength = wavelength * Utils.wavelengthUnitsConversionFactor(units, 'nm')
 
-        if units is None:
-            units = self.Nanometers
+        bandNos = list()
+        distances = list()
+        for bandNo in range(1, self.bandCount() + 1):
+            wavelength_ = self.wavelength(bandNo)
+            if wavelength_ is None:
+                continue
+            bandNos.append(bandNo)
+            distances.append(abs(wavelength_ - wavelength))
+        if len(bandNos) == 0:
+            return None
 
-        self.setMetadataItem('wavelength', float(wavelength), '', bandNo)
-        self.setMetadataItem('wavelength_units', units, '', bandNo)
-
-        if fwhm is not None:
-            self.setMetadataItem('fwhm', float(fwhm), '', bandNo)
+        return bandNos[np.argmin(distances)]
 
     def fwhm(self, bandNo: int, units: str = None) -> Optional[float]:
         """Return band FWHM in nanometers. Optionally, specify destination units."""
@@ -582,17 +513,15 @@ class RasterReader(object):
 
         return 1
 
-    def setBadBandMultiplier(self, badBandMultiplier: int, bandNo: int):
-        self.setMetadataItem('bbl', badBandMultiplier, '', bandNo)
-
     def startTime(self, bandNo: int = None) -> Optional[QDateTime]:
         """Return raster / band start time."""
 
         if bandNo is not None:
             # check band-level default-domain
             dateTime = self.metadataItem('start_time', '', bandNo)
-            if dateTime == 'None':
-                return None
+
+            if dateTime is not None:
+                return Utils.parseDateTime(dateTime)
 
             # check band-level FORCE-domain (see GitHub-issue #9)
             dateTime = self.metadataItem('Date', 'FORCE', bandNo)
@@ -623,8 +552,7 @@ class RasterReader(object):
         # check band-level domain
         if bandNo is not None:
             dateTime = self.metadataItem('end_time', '', bandNo)
-            if dateTime == 'None':
-                return None
+
             if dateTime is not None:
                 return Utils.parseDateTime(dateTime)
 
@@ -649,17 +577,26 @@ class RasterReader(object):
         msecs = startTime.msecsTo(endTime)
         return startTime.addMSecs(int(msecs / 2))
 
-    def setTime(self, startTime: Optional[QDateTime], endTime: QDateTime = None, bandNo: int = None):
-        if startTime is None:
-            self.layer.setCustomProperty(self.propertyKey('start_time', '', bandNo), 'None')
-        else:
-            self.setMetadataItem('start_time', startTime.toString('yyyy-MM-ddTHH:mm:ss'), '', bandNo)
-        if endTime is None:
-            self.layer.setCustomProperty(self.propertyKey('end_time', '', bandNo), 'None')
-        else:
-            self.setMetadataItem('end_time', endTime.toString('yyyy-MM-ddTHH:mm:ss'), '', bandNo)
+    def findTime(self, centerTime: Optional[QDateTime]) -> Optional[int]:
+        """Find band number by center time."""
+        if centerTime is None:
+            return None
+
+        bandNos = list()
+        distances = list()
+        for bandNo in range(1, self.bandCount() + 1):
+            centerTime_ = self.centerTime(bandNo)
+            if centerTime_ is None:
+                continue
+            bandNos.append(bandNo)
+            distances.append(abs(centerTime_.msecsTo(centerTime)))
+        if len(bandNos) == 0:
+            return None
+
+        return bandNos[np.argmin(distances)]
 
     def lineMemoryUsage(self, nBands: int = None, dataTypeSize: int = None) -> int:
+        """Returns the memory (in bytes) used to store a single raster line."""
         if nBands is None:
             nBands = self.bandCount()
         if dataTypeSize is None:
@@ -672,6 +609,3 @@ class RasterReader(object):
         else:
             gdalObject = self.gdalDataset.GetRasterBand(bandNo)
         return gdalObject
-
-    def gdalBand(self, bandNo: int) -> gdal.Band:
-        return self.gdalDataset.GetRasterBand(bandNo)

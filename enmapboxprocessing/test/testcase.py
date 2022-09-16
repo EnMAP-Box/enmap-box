@@ -1,12 +1,17 @@
 import unittest.case
-from os.path import join, dirname
+import warnings
+from os.path import join, dirname, exists
 from typing import Union
 
 import numpy as np
 
+from enmapboxprocessing.driver import Driver
+from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import Array2d, Array3d
+from typeguard import typechecked
 
 
+@typechecked
 class TestCase(unittest.case.TestCase):
 
     def assertArrayEqual(self, array1: Union[Array2d, Array3d], array2: Union[Array2d, Array3d]):
@@ -17,3 +22,18 @@ class TestCase(unittest.case.TestCase):
     def filename(self, basename: str):
         import enmapbox
         return join(dirname(dirname(enmapbox.__file__)), 'test-outputs', basename)
+
+    def rasterFromArray(self, array, basename: str = None, ) -> RasterWriter:
+        if basename is None:
+            basename = f'temp/{np.random.randint(0, 999999999)}.tif'
+
+        filename = self.filename(basename)
+        writer = Driver(filename).createFromArray(np.array(array))
+        return writer
+
+    def fileExists(self, filename):
+        if exists(filename):
+            return True
+        else:
+            warnings.warn(f'Skipping test using local file: {filename}')
+            return False
