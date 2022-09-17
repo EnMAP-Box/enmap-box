@@ -55,7 +55,7 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
 
         proj = QgsProject.instance()
         self.assertIsInstance(proj, QgsProject)
-        tmp_path = pathlib.Path(__file__).parents[1] / 'tmp' / 'project.qgs'
+        tmp_path = self.tempDir() / 'project.qgs'
         os.makedirs(tmp_path.parent, exist_ok=True)
 
         box.saveProject(tmp_path)
