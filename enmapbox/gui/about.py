@@ -38,7 +38,7 @@ class AboutDialog(QDialog):
         from enmapbox import __version__, __version_sha__
         info = f'Version {__version__}'
         if len(__version_sha__) > 10:
-            info += f' Code: ' \
+            info += f'\t Code ' \
                     f'<a href="{REPOSITORY.replace(".git", "")}/commit/{__version_sha__}">{__version_sha__[0:11]}</a>'
         self.labelVersion.setText(info)
         self.setAboutTitle()
