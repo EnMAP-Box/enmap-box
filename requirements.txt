@@ -5,11 +5,12 @@
 ###### Requirements ######
 
 # should be already part of a standard QGIS installation
+scipy>=1.1
 numpy>=1.15
 matplotlib>=3.0
 pip>=20.0
 dataclasses # ; python_version < '3.7'
-scipy>=1.1
+
 # PyQt5-sip  # commented out; caused "Unable to import PyQt5-sip" issue, see #718
 
 # required by parts of EnMAP-Box Core

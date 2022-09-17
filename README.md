@@ -60,7 +60,7 @@ Replace it with your own EnMAP-Box fork from which you can create pull requests.
 2. Clone the EnMAP-Box repository.
    
     ````bash
-    git clone git@bitbucket.org:hu-geomatics/enmap-box.git
+    git clone git@github.com:EnMAP-Box/enmap-box.git
     ````
     
    You might also use the url `https://github.com/EnMAP-Box/enmap-box.git` instead. 
@@ -80,7 +80,7 @@ Replace it with your own EnMAP-Box fork from which you can create pull requests.
     Of course cloning and submodule updating can be done in one step:
     ````bash
     
-    git clone --recurse-submodules git@bitbucket.org:hu-geomatics/enmap-box.git
+    git clone --recurse-submodules git@github.com:EnMAP-Box/enmap-box.git
     ````
     
     At any later point, you can pull in submodule updates by

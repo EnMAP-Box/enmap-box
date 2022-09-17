@@ -29,6 +29,7 @@
 # make EnMAP-Box site-packages available
 import sys
 from os.path import dirname, join
+import os
 
 sys.path.append(join(dirname(__file__), 'site-packages'))
 
@@ -39,16 +40,16 @@ def classFactory(iface):
     :param iface:
     :return: enmapboxplugin.EnMAPBoxPlugin(iface)
     """
-    import os, sys
+
     pluginDirectory = os.path.dirname(__file__)
     added = []
-    if not pluginDirectory in sys.path:
+    if pluginDirectory not in sys.path:
         sys.path.append(pluginDirectory)
         added.append(pluginDirectory)
     try:
         from enmapbox.enmapboxplugin import EnMAPBoxPlugin
         plugin = EnMAPBoxPlugin(iface)
-    except Exception as ex:
+    except ModuleNotFoundError as ex:
         for path in added:
             sys.path.remove(path)
         raise ex

@@ -28,6 +28,7 @@ from enmapbox.gui.datasources.datasources import SpatialDataSource, DataSource, 
     FileDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager, DataSourceManagerPanelUI, DataSourceFactory
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
+from enmapboxtestdata import classifierDumpPkl
 
 
 class DataSourceTests(EnMAPBoxTestCase):
@@ -200,8 +201,6 @@ class DataSourceTests(EnMAPBoxTestCase):
 
     def test_DataSourceModel(self):
         from enmapbox.exampledata import enmap, landcover_polygons, library_gpkg, library_sli, enmap_srf_library
-        from testdata import classifier_pkl
-        from testdata.asd import filenames_binary
         sources = [enmap,
                    enmap,
                    landcover_polygons,
@@ -210,10 +209,7 @@ class DataSourceTests(EnMAPBoxTestCase):
                    enmap_srf_library,
                    library_gpkg,
                    library_sli,
-                   classifier_pkl,
-                   classifier_pkl,
-                   filenames_binary[0],
-                   filenames_binary[0]]
+                   classifierDumpPkl]
 
         model = DataSourceManager()
 

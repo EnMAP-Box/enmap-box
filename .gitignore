@@ -13,7 +13,7 @@ qgisresources/
 qgisresources.zip
 
 symbology-style.db
-enmapbox/exampledata/*.gpkg
+# enmapbox/exampledata/*.gpkg
 
 
 # we do not like to have compiled qt resource files in our repository!
