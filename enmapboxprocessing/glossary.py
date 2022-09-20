@@ -114,17 +114,3 @@ def utilsFindWeblinks(text) -> List[str]:
     assert len(starts) == len(ends)
     links = [text[start:end] for start, end in zip(starts, ends)]
     return links
-
-
-def test():
-    text = 'wavelength is a term that is also included in wavelength units. and again wavelength. \n' \
-           'thisisnotawavelength wavelength \n' \
-           'wavelengthNO wavelength. \n' \
-           'Wavelength \n' \
-           'No data valueE \n' \
-           '"No data values"'
-
-    # text = '"No data value"'
-    print(injectGlossaryLinks(text))
-
-# test()

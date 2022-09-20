@@ -21,7 +21,6 @@ from typeguard import typechecked, check_type
 GdalDataType = int
 GdalResamplingAlgorithm = int
 NumpyDataType = Union[type, np.dtype]
-QgisDataType = int
 Number = Union[int, float]
 Array1d = np.ndarray
 Array2d = np.ndarray

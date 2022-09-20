@@ -1,16 +1,13 @@
 import numpy as np
-from PyQt5.QtCore import QSizeF
 from osgeo import gdal
 
 from enmapbox.exampledata import enmap, google_maps
-from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.testcase import TestCase
 from enmapboxtestdata import fraction_polygons_l3
-from qgis.PyQt.QtCore import QDateTime
-from qgis._core import Qgis, QgsRectangle
-from qgis.core import QgsRasterRange, QgsRasterLayer
+from qgis.PyQt.QtCore import QDateTime, QSizeF
+from qgis.core import QgsRasterRange, QgsRasterLayer, Qgis, QgsRectangle
 
 
 class TestRasterReader(TestCase):
@@ -256,7 +253,7 @@ class TestRasterReader(TestCase):
         noDataValue = reader.noDataValue(1)
         self.assertEqual(np.sum(array != noDataValue), reader.sampleValues(1).shape)
         self.assertEqual(np.sum(array[array != noDataValue]), np.sum(reader.sampleValues(1)))
-        self.assertEqual(400*220, len(reader.sampleValues(1, excludeNoDataValues=False)))
+        self.assertEqual(400 * 220, len(reader.sampleValues(1, excludeNoDataValues=False)))
 
     def test_uniqueValueCounts(self):
         writer = self.rasterFromArray([[[1, 1, 1, 2, 2, 3]]])

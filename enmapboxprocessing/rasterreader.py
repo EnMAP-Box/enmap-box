@@ -6,8 +6,7 @@ from osgeo import gdal
 
 from enmapboxprocessing.gridwalker import GridWalker
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
-from enmapboxprocessing.typing import (QgisDataType, RasterSource, Array3d, Metadata, MetadataValue,
-                                       MetadataDomain)
+from enmapboxprocessing.typing import RasterSource, Array3d, Metadata, MetadataValue, MetadataDomain
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtCore import QSizeF, QDateTime
 from qgis.PyQt.QtGui import QColor
@@ -78,7 +77,7 @@ class RasterReader(object):
         """Return CRS."""
         return self.provider.crs()
 
-    def dataType(self, bandNo: int = None) -> QgisDataType:
+    def dataType(self, bandNo: int = None) -> Qgis.DataType:
         """Return band data type."""
         if bandNo is None:
             bandNo = 1

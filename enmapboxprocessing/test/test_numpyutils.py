@@ -23,3 +23,11 @@ class TestNumpyUtils(TestCase):
     def test_nanpercentile4(self):
         a = np.array([nan, nan]).reshape((-1, 1, 1))
         self.assertTrue(np.all(np.isnan(NumpyUtils.nanpercentile(a, q=[0, 50, 100]))))
+
+    def test_rebinMean(self):
+        a = np.array(list(range(16))).reshape(4, 4)
+        self.assertTrue(np.all(np.equal([[2.5, 4.5], [10.5, 12.5]], NumpyUtils.rebinMean(a, (2, 2)))))
+
+    def test_rebinSum(self):
+        a = np.array(list(range(16))).reshape(4, 4)
+        self.assertTrue(np.all(np.equal([[10, 18], [42, 50]], NumpyUtils.rebinSum(a, (2, 2)))))

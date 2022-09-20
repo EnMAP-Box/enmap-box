@@ -13,7 +13,7 @@ from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.glossary import injectGlossaryLinks
 from enmapboxprocessing.parameter.processingparameterrasterdestination import ProcessingParameterRasterDestination
 from enmapboxprocessing.processingfeedback import ProcessingFeedback
-from enmapboxprocessing.typing import QgisDataType, CreationOptions, GdalResamplingAlgorithm, ClassifierDump, \
+from enmapboxprocessing.typing import CreationOptions, GdalResamplingAlgorithm, ClassifierDump, \
     TransformerDump, RegressorDump, ClustererDump
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtGui import QIcon
@@ -452,8 +452,8 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         return super().parameterAsExtent(parameters, name, context, crs)
 
     def parameterAsQgsDataType(
-            self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext, default: QgisDataType = None
-    ) -> Optional[QgisDataType]:
+            self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext, default: Qgis.DataType = None
+    ) -> Optional[Qgis.DataType]:
         if self.parameterIsNone(parameters, name):
             return default
         else:

@@ -8,6 +8,7 @@ import numpy as np
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import Array2d, Array3d
+from qgis.core import QgsRectangle, QgsCoordinateReferenceSystem
 from typeguard import typechecked
 
 
@@ -23,12 +24,14 @@ class TestCase(unittest.case.TestCase):
         import enmapbox
         return join(dirname(dirname(enmapbox.__file__)), 'test-outputs', basename)
 
-    def rasterFromArray(self, array, basename: str = None, ) -> RasterWriter:
+    def rasterFromArray(
+            self, array, basename: str = None, extent: QgsRectangle = None, crs: QgsCoordinateReferenceSystem = None
+    ) -> RasterWriter:
         if basename is None:
             basename = f'temp/{np.random.randint(0, 999999999)}.tif'
 
         filename = self.filename(basename)
-        writer = Driver(filename).createFromArray(np.array(array))
+        writer = Driver(filename).createFromArray(np.array(array), extent, crs)
         return writer
 
     def fileExists(self, filename):

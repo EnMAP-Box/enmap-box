@@ -2,10 +2,11 @@ from typing import List, Union, Optional
 
 from osgeo import gdal
 
-from enmapboxprocessing.typing import Array3d, Array2d, MetadataValue, MetadataDomain, Metadata, QgisDataType, Number
+from enmapboxprocessing.typing import Array3d, Array2d, MetadataValue, MetadataDomain, Metadata, Number
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtCore import QDateTime
 from qgis.PyQt.QtGui import QColor
+from qgis.core import Qgis
 from typeguard import typechecked
 
 
@@ -154,7 +155,7 @@ class RasterWriter(object):
     def source(self) -> str:
         return self._source
 
-    def dataType(self, bandNo: int = None) -> QgisDataType:
+    def dataType(self, bandNo: int = None) -> Qgis.DataType:
         if bandNo is None:
             bandNo = 1
         gdalDataType = self.gdalDataset.GetRasterBand(bandNo).DataType
