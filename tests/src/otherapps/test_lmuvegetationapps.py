@@ -12,12 +12,15 @@ __author__ = 'benjamin.jakimow@geo.hu-berlin.de'
 __date__ = '2017-07-17'
 __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
+import pathlib
 import unittest
-
-from enmapbox import EnMAPBox, initPythonPaths
+import site
+from enmapbox import EnMAPBox, initPythonPaths, DIR_ENMAPBOX
 from enmapbox.testing import EnMAPBoxTestCase
 
 initPythonPaths()
+site.addsitedir(pathlib.Path(DIR_ENMAPBOX) / 'apps' / 'lmuapps')
+
 
 
 class test_applications(EnMAPBoxTestCase):

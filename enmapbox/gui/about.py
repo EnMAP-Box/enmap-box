@@ -21,8 +21,8 @@
 import os
 import pathlib
 from qgis.PyQt.QtWidgets import QDialog
-from enmapbox import DIR_REPO, ABOUT
-from enmapbox.gui import loadUi
+from enmapbox import DIR_REPO, ABOUT, REPOSITORY
+from enmapbox.gui.utils import loadUi
 
 
 class AboutDialog(QDialog):
@@ -37,8 +37,9 @@ class AboutDialog(QDialog):
         self.listWidget.currentItemChanged.connect(lambda: self.setAboutTitle())
         from enmapbox import __version__, __version_sha__
         info = f'Version {__version__}'
-        if __version_sha__ != '':
-            info += f' {__version_sha__[0:7]}'
+        if len(__version_sha__) > 10:
+            info += f'\t Code ' \
+                    f'<a href="{REPOSITORY.replace(".git", "")}/commit/{__version_sha__}">{__version_sha__[0:11]}</a>'
         self.labelVersion.setText(info)
         self.setAboutTitle()
 
