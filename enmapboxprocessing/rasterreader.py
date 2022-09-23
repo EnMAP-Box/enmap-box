@@ -97,6 +97,10 @@ class RasterReader(object):
         """Return no data value."""
         if bandNo is None:
             bandNo = 1
+
+        if not self.sourceHasNoDataValue(bandNo):
+            return None
+
         return self.sourceNoDataValue(bandNo)
 
     def sourceNoDataValue(self, bandNo: int):
@@ -128,6 +132,12 @@ class RasterReader(object):
         if bandNo is None:
             bandNo = 1
         return self.provider.userNoDataValues(bandNo)
+
+    def offset(self, bandNo: int) -> Optional[float]:
+        return self.gdalBand(bandNo).GetOffset()
+
+    def scale(self, bandNo: int) -> Optional[float]:
+        return self.gdalBand(bandNo).GetScale()
 
     def source(self) -> str:
         """Return source URI."""
@@ -608,3 +618,6 @@ class RasterReader(object):
         else:
             gdalObject = self.gdalDataset.GetRasterBand(bandNo)
         return gdalObject
+
+    def gdalBand(self, bandNo: int = None) -> gdal.Band:
+        return self._gdalObject(bandNo)

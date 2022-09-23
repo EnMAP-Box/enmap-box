@@ -2,7 +2,7 @@ from enmapbox.exampledata import enmap
 from enmapboxprocessing.algorithm.fitrandomforestregressoralgorithm import FitRandomForestRegressorAlgorithm
 from enmapboxprocessing.algorithm.regressionbasedunmixingalgorithm import RegressionBasedUnmixingAlgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from testdata import classifier_pkl
+from enmapboxtestdata import classifierDumpPkl
 
 
 class TestFitClassifierAlgorithm(TestCase):
@@ -10,7 +10,7 @@ class TestFitClassifierAlgorithm(TestCase):
     def test(self):
         alg = RegressionBasedUnmixingAlgorithm()
         parameters = {
-            alg.P_DATASET: classifier_pkl,
+            alg.P_DATASET: classifierDumpPkl,
             alg.P_RASTER: enmap,
             alg.P_REGRESSOR: FitRandomForestRegressorAlgorithm().defaultCodeAsString(),
             alg.P_N: 10,

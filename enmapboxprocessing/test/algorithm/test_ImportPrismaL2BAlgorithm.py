@@ -8,9 +8,6 @@ from enmapboxprocessing.test.algorithm.testcase import TestCase
 class TestImportPrismaL2BAlgorithm(TestCase):
 
     def test(self):
-        if not self.additionalDataFolderExists():
-            return
-
         alg = ImportPrismaL2BAlgorithm()
         parameters = {
             alg.P_FILE: r'D:\data\sensors\prisma\PRS_L2B_STD_20201107101404_20201107101408_0001.he5',
@@ -22,6 +19,9 @@ class TestImportPrismaL2BAlgorithm(TestCase):
             alg.P_OUTPUT_PAN_GEOLOCATION: self.filename('prismaL2B_PAN_GEOLOCATION.vrt'),
             alg.P_OUTPUT_PAN_ERROR: self.filename('prismaL2B_PAN_ERROR.vrt'),
         }
+        if not self.fileExists(parameters[alg.P_FILE]):
+            return
+
         result = self.runalg(alg, parameters)
         self.assertEqual(234, RasterReader(result[alg.P_OUTPUT_SPECTRAL_CUBE]).bandCount())
         self.assertAlmostEqual(3077.497, np.mean(RasterReader(result[alg.P_OUTPUT_SPECTRAL_CUBE]).array()), 3)

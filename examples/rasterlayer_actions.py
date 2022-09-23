@@ -5,7 +5,7 @@ How to load raster and vector data into a QgsMapCanvas and make a screenshot fro
 import os
 
 from qgis.PyQt.QtWidgets import QWidget, QApplication
-from enmapbox.exampledata import enmap, landcover_polygons
+from enmapbox.exampledata import enmap, landcover_polygon
 from enmapbox.testing import start_app
 import time
 
@@ -34,7 +34,7 @@ renderer.setGreenBand(3)
 renderer.redContrastEnhancement().setMinimumValue(0)
 renderer.redContrastEnhancement().setMaximumValue(2000)
 
-lyr2 = QgsVectorLayer(landcover_polygons)
+lyr2 = QgsVectorLayer(landcover_polygon)
 assert lyr1.isValid()
 assert lyr2.isValid()
 layers = [lyr1, lyr2]

@@ -42,25 +42,3 @@ class TestAggregateRasterBandsAlgorithm(TestCase):
         result = self.runalg(alg, parameters)
         reader = RasterReader(result[alg.P_OUTPUT_RASTER])
         array = reader.array()
-
-    def test_issue1423(self):
-        alg = AggregateRasterBandsAlgorithm()
-        parameters = {
-            alg.P_RASTER: r'D:\data\issues\1423\BLUE.vrt',
-            alg.P_FUNCTION: list(range(len(alg.O_FUNCTION))),
-            alg.P_OUTPUT_RASTER: self.filename('aggregation_BLUE2.tif')
-        }
-        result = self.runalg(alg, parameters)
-        reader = RasterReader(result[alg.P_OUTPUT_RASTER])
-        array = reader.array()
-
-    def test_issue1424(self):
-        alg = AggregateRasterBandsAlgorithm()
-        parameters = {
-            alg.P_RASTER: r'D:\data\issues\1423\BLUE.vrt',
-            alg.P_FUNCTION: [alg.SumFunction],
-            alg.P_OUTPUT_RASTER: self.filename('aggregation_BLU1.tif')
-        }
-        result = self.runalg(alg, parameters)
-        reader = RasterReader(result[alg.P_OUTPUT_RASTER])
-        array = reader.array()

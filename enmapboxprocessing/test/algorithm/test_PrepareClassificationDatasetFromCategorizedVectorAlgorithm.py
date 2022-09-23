@@ -1,4 +1,4 @@
-from enmapbox.exampledata import enmap, landcover_polygons, landcover_points
+from enmapbox.exampledata import enmap, landcover_polygon, landcover_point
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedvectoralgorithm import \
     PrepareClassificationDatasetFromCategorizedVectorAlgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
@@ -13,7 +13,7 @@ class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
         alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
-            alg.P_CATEGORIZED_VECTOR: landcover_polygons,
+            alg.P_CATEGORIZED_VECTOR: landcover_polygon,
             alg.P_MAJORITY_VOTING: False,
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
         }
@@ -32,7 +32,7 @@ class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
         alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
-            alg.P_CATEGORIZED_VECTOR: landcover_points,
+            alg.P_CATEGORIZED_VECTOR: landcover_point,
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
         }
         self.runalg(alg, parameters)
@@ -50,7 +50,7 @@ class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
         alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
-            alg.P_CATEGORIZED_VECTOR: landcover_polygons,
+            alg.P_CATEGORIZED_VECTOR: landcover_polygon,
             alg.P_CATEGORY_FIELD: 'level_3',
             alg.P_MAJORITY_VOTING: False,
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
@@ -71,7 +71,7 @@ class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
         alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
-            alg.P_CATEGORIZED_VECTOR: landcover_polygons,
+            alg.P_CATEGORIZED_VECTOR: landcover_polygon,
             alg.P_COVERAGE: 100,  # pure pixel only
             alg.P_MAJORITY_VOTING: True,
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
@@ -93,28 +93,11 @@ class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
         self.assertEqual((1, 177), dump.X.shape)
         self.assertEqual((1, 1), dump.y.shape)
 
-    def test_issue1323(self):
-        if not self.additionalDataFolderExists():
-            return
-
-        alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
-        parameters = {
-            alg.P_FEATURE_RASTER: r'D:\data\issues\1323\testing_emb_classification\X0061_Y0048_full_stack.vrt',
-            alg.P_CATEGORIZED_VECTOR: r'D:\data\issues\1323\testing_emb_classification\queried_lucas.gpkg',
-            alg.P_CATEGORY_FIELD: 'lc1',
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
-        }
-
-        self.runalg(alg, parameters)
-        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
-        self.assertEqual((1, 177), dump.X.shape)
-        self.assertEqual((1, 1), dump.y.shape)
-
     def test_saveAsJson(self):
         alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
-            alg.P_CATEGORIZED_VECTOR: landcover_polygons,
+            alg.P_CATEGORIZED_VECTOR: landcover_polygon,
             alg.P_MAJORITY_VOTING: False,
             alg.P_OUTPUT_DATASET: self.filename('sample.json')
         }

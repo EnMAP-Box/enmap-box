@@ -65,7 +65,7 @@ class Examples(unittest.TestCase):
 
         # add some data sources
         from enmapbox.exampledata import enmap as pathRasterSource
-        from enmapbox.exampledata import landcover_polygons as pathVectorSource
+        from enmapbox.exampledata import landcover_polygon as pathVectorSource
         from enmapbox.exampledata import library_sli as pathSpectralLibrary
 
         # add a single source

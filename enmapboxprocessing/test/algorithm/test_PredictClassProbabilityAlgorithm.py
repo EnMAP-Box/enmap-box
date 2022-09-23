@@ -1,12 +1,12 @@
 import numpy as np
 from sklearn.base import ClassifierMixin
 
-from enmapbox.exampledata import enmap, landcover_polygons
+from enmapbox.exampledata import enmap, landcover_polygon
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 from enmapboxprocessing.algorithm.predictclassprobabilityalgorithm import PredictClassPropabilityAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from testdata import landcover_raster_30m_tif, classifier_pkl
+from enmapboxtestdata import classifierDumpPkl, landcover_polygon_30m
 
 writeToDisk = True
 
@@ -34,7 +34,7 @@ class TestPredictClassProbabilityAlgorithm(TestCase):
         algFit = FitTestClassifierAlgorithm()
         algFit.initAlgorithm()
         parametersFit = {
-            algFit.P_DATASET: classifier_pkl,
+            algFit.P_DATASET: classifierDumpPkl,
             algFit.P_CLASSIFIER: algFit.defaultCodeAsString(),
             algFit.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl'),
         }
@@ -54,7 +54,7 @@ class TestPredictClassProbabilityAlgorithm(TestCase):
         algFit = FitTestClassifierAlgorithm()
         algFit.initAlgorithm()
         parametersFit = {
-            algFit.P_DATASET: classifier_pkl,
+            algFit.P_DATASET: classifierDumpPkl,
             algFit.P_CLASSIFIER: algFit.defaultCodeAsString(),
             algFit.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl')
         }
@@ -65,7 +65,7 @@ class TestPredictClassProbabilityAlgorithm(TestCase):
         parameters = {
             alg.P_RASTER: enmap,
             alg.P_CLASSIFIER: parametersFit[algFit.P_OUTPUT_CLASSIFIER],
-            alg.P_MASK: landcover_raster_30m_tif,
+            alg.P_MASK: landcover_polygon_30m,
             alg.P_OUTPUT_PROBABILITY: self.filename('probability2.tif')
         }
         result = self.runalg(alg, parameters)
@@ -75,7 +75,7 @@ class TestPredictClassProbabilityAlgorithm(TestCase):
         algFit = FitTestClassifierAlgorithm()
         algFit.initAlgorithm()
         parametersFit = {
-            algFit.P_DATASET: classifier_pkl,
+            algFit.P_DATASET: classifierDumpPkl,
             algFit.P_CLASSIFIER: algFit.defaultCodeAsString(),
             algFit.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl')
         }
@@ -86,7 +86,7 @@ class TestPredictClassProbabilityAlgorithm(TestCase):
         parameters = {
             alg.P_RASTER: enmap,
             alg.P_CLASSIFIER: parametersFit[algFit.P_OUTPUT_CLASSIFIER],
-            alg.P_MASK: landcover_polygons,
+            alg.P_MASK: landcover_polygon,
             alg.P_OUTPUT_PROBABILITY: self.filename('probability3.tif')
         }
         result = self.runalg(alg, parameters)

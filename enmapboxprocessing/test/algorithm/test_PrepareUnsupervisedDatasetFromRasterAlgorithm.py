@@ -1,10 +1,10 @@
-from enmapbox.exampledata import enmap, landcover_points
+from enmapbox.exampledata import enmap, landcover_point
 from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromrasteralgorithm import \
     PrepareUnsupervisedDatasetFromRasterAlgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import landcover_raster_30m
+from enmapboxtestdata import landcover_polygon_30m
 
 
 class TestPrepareUnsupervisedDatasetFromRasterAlgorithm(TestCase):
@@ -25,7 +25,7 @@ class TestPrepareUnsupervisedDatasetFromRasterAlgorithm(TestCase):
         alg = PrepareUnsupervisedDatasetFromRasterAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
-            alg.P_MASK: landcover_points,
+            alg.P_MASK: landcover_point,
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
         }
         self.runalg(alg, parameters)
@@ -38,7 +38,7 @@ class TestPrepareUnsupervisedDatasetFromRasterAlgorithm(TestCase):
         alg = PrepareUnsupervisedDatasetFromRasterAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
-            alg.P_MASK: landcover_raster_30m,
+            alg.P_MASK: landcover_polygon_30m,
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
         }
         self.runalg(alg, parameters)

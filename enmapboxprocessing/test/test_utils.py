@@ -3,7 +3,7 @@ from os.path import join, dirname, exists
 import numpy as np
 from osgeo import gdal
 
-from enmapbox.exampledata import landcover_polygons, enmap, hires
+from enmapbox.exampledata import landcover_polygon, enmap, hires
 from enmapbox.testing import initQgisApplication
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader
@@ -180,7 +180,7 @@ class TestUtils(TestCase):
         self.assertEqual(colorRamp.count(), len(colorRampShader.colorRampItemList()))
 
     def test_categoriesFromCategorizedSymbolRenderer(self):
-        layer = QgsVectorLayer(landcover_polygons)
+        layer = QgsVectorLayer(landcover_polygon)
         fieldName = layer.renderer().classAttribute()
         categories = Utils.categoriesFromCategorizedSymbolRenderer(layer.renderer())
         self.assertEqual(6, len(categories))
@@ -195,7 +195,7 @@ class TestUtils(TestCase):
         )
 
     def test_categorizedSymbolRendererFromCategories(self):
-        layer = QgsVectorLayer(landcover_polygons)
+        layer = QgsVectorLayer(landcover_polygon)
         fieldName = layer.renderer().classAttribute()
         categories = Utils.categoriesFromCategorizedSymbolRenderer(layer.renderer())
         renderer = Utils.categorizedSymbolRendererFromCategories(fieldName, categories)
@@ -207,7 +207,7 @@ class TestUtils(TestCase):
         categories = Utils.categoriesFromRenderer(layer.renderer())
         self.assertEqual(6, len(categories))
 
-        layer = QgsVectorLayer(landcover_polygons)
+        layer = QgsVectorLayer(landcover_polygon)
         categories = Utils.categoriesFromRenderer(layer.renderer())
         self.assertEqual(6, len(categories))
 
@@ -219,7 +219,7 @@ class TestUtils(TestCase):
         self.assertListEqual(['1', '2', '3', '4', '5', '6'], [category.name for category in categories])
 
     def test_categoriesFromVectorField(self):
-        layer = QgsVectorLayer(landcover_polygons)
+        layer = QgsVectorLayer(landcover_polygon)
         categories = Utils.categoriesFromVectorField(layer, 'level_3_id', 'level_3')
         self.assertEqual(6, len(categories))
         self.assertListEqual([1, 2, 3, 4, 5, 6], [category.value for category in categories])
@@ -229,7 +229,7 @@ class TestUtils(TestCase):
         )
 
     def test_(self):
-        vector = QgsVectorLayer(landcover_polygons)
+        vector = QgsVectorLayer(landcover_polygon)
         categories = Utils.categoriesFromCategorizedSymbolRenderer(renderer=vector.renderer())
         self.assertListEqual(
             [Category(value='roof', name='roof', color='#e60000'),

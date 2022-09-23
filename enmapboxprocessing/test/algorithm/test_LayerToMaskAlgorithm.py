@@ -1,6 +1,6 @@
 import numpy as np
 
-from enmapbox.exampledata import enmap, landcover_polygons
+from enmapbox.exampledata import enmap, landcover_polygon
 from enmapboxprocessing.algorithm.layertomaskalgorithm import LayerToMaskAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
@@ -22,7 +22,7 @@ class TestLayerToMaskAlgorithm(TestCase):
         alg = LayerToMaskAlgorithm()
         alg.initAlgorithm()
         parameters = {
-            alg.P_LAYER: landcover_polygons,
+            alg.P_LAYER: landcover_polygon,
             alg.P_GRID: enmap,
             alg.P_OUTPUT_MASK: self.filename('mask.tif'),
         }

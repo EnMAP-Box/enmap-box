@@ -1,14 +1,13 @@
-from enmapbox.exampledata import enmap, landcover_polygons
+from enmapbox.exampledata import enmap, landcover_polygon
 from enmapboxprocessing.algorithm.samplerastervaluesalgorithm import SampleRasterValuesAlgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapboxtestdata import landcover_points_singlepart_epsg3035, enmap_uncompressed
+from enmapboxtestdata import landcover_points_singlepart_epsg3035
 from qgis.core import (QgsRasterLayer, QgsVectorLayer)
 
 
 class TestSampleRasterValuesAlgorithm(TestCase):
 
     def test_sampleFromVectorPoints(self):
-
         alg = SampleRasterValuesAlgorithm()
         alg.initAlgorithm()
         parameters = {
@@ -19,12 +18,11 @@ class TestSampleRasterValuesAlgorithm(TestCase):
         result = self.runalg(alg, parameters)
 
     def test_sampleFromVectorPolygons(self):
-
         alg = SampleRasterValuesAlgorithm()
         alg.initAlgorithm()
         parameters = {
-            alg.P_RASTER: QgsRasterLayer(enmap_uncompressed),
-            alg.P_VECTOR: QgsVectorLayer(landcover_polygons),
+            alg.P_RASTER: QgsRasterLayer(enmap),
+            alg.P_VECTOR: QgsVectorLayer(landcover_polygon),
             alg.P_OUTPUT_POINTS: self.filename('sample_vectorPolygons.gpkg')
 
         }
@@ -35,7 +33,7 @@ class TestSampleRasterValuesAlgorithm(TestCase):
         alg.initAlgorithm()
         parameters = {
             alg.P_RASTER: enmap,
-            alg.P_VECTOR: landcover_polygons,
+            alg.P_VECTOR: landcover_polygon,
             alg.P_COVERAGE_RANGE: [70, 100],
             alg.P_OUTPUT_POINTS: self.filename('sample_70p_pure.gpkg')
 

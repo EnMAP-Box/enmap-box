@@ -3,7 +3,7 @@ from enmapboxprocessing.algorithm.prepareregressiondatasetfromtablealgorithm imp
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
-from testdata import classificationDatasetAsCsv
+from enmapboxtestdata import classificationDatasetAsCsvVector
 
 
 class TestPrepareRegressionDatasetFromTableAlgorithm(TestCase):
@@ -11,7 +11,7 @@ class TestPrepareRegressionDatasetFromTableAlgorithm(TestCase):
     def test(self):
         alg = PrepareRegressionDatasetFromTableAlgorithm()
         parameters = {
-            alg.P_TABLE: classificationDatasetAsCsv,
+            alg.P_TABLE: classificationDatasetAsCsvVector,
             alg.P_FEATURE_FIELDS: [f'Band_{i + 1}' for i in range(177)],
             alg.P_TARGET_FIELDS: ['level_1_id', 'level_2_id'],
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')

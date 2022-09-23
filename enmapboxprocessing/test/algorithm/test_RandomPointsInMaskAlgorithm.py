@@ -7,7 +7,6 @@ from qgis.core import QgsRasterLayer
 class TestRandomPointsInMaskAlgorithm(TestCase):
 
     def test(self):
-        global c
         alg = RandomPointsFromMaskRasterAlgorithm()
         alg.initAlgorithm()
         parameters = {

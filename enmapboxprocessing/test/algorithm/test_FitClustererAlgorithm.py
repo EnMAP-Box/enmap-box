@@ -11,7 +11,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClustererDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import classifierDumpPkl, classifierDumpJson
+from enmapboxtestdata import classifierDumpPkl, classificationDatasetAsJsonFile
 from qgis.core import Qgis
 
 
@@ -51,7 +51,7 @@ class TestFitClustererAlgorithm(TestCase):
     def test_fit_json(self):
         alg = FitTestClustererAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpJson,
+            alg.P_DATASET: classificationDatasetAsJsonFile,
             alg.P_CLUSTERER: alg.defaultCodeAsString(),
             alg.P_OUTPUT_CLUSTERER: self.filename('clusterer.pkl')
         }

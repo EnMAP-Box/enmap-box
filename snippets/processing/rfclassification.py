@@ -3,7 +3,7 @@ from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifie
 from enmapboxprocessing.algorithm.predictclassificationalgorithm import PredictClassificationAlgorithm
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedvectoralgorithm import \
     PrepareClassificationDatasetFromCategorizedVectorAlgorithm
-from enmapbox.exampledata import enmap, landcover_polygons
+from enmapbox.exampledata import enmap, landcover_polygon
 from processing.core.Processing import Processing
 
 qgsApp = start_app()
@@ -12,7 +12,7 @@ qgsApp = start_app()
 alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
 parameters = {
     alg.P_FEATURE_RASTER: enmap,
-    alg.P_CATEGORIZED_VECTOR: landcover_polygons,
+    alg.P_CATEGORIZED_VECTOR: landcover_polygon,
     alg.P_OUTPUT_DATASET: 'c:/test/dataset.pkl'
 }
 Processing.runAlgorithm(alg, parameters)

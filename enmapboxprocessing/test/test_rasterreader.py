@@ -5,17 +5,12 @@ from enmapbox.exampledata import enmap, google_maps
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.testcase import TestCase
-from enmapboxtestdata import fraction_polygons_l3
+from enmapboxtestdata import fraction_polygon_l3
 from qgis.PyQt.QtCore import QDateTime, QSizeF
 from qgis.core import QgsRasterRange, QgsRasterLayer, Qgis, QgsRectangle
 
 
 class TestRasterReader(TestCase):
-
-    def setUp(self):
-        self.reader = RasterReader(enmap)
-        self.provider = self.reader.provider
-        self.array = self.reader.gdalDataset.ReadAsArray()
 
     def test_init(self):
         layer = QgsRasterLayer(enmap)
@@ -49,7 +44,7 @@ class TestRasterReader(TestCase):
         self.assertEqual('band 8 (0.460000 Micrometers)', RasterReader(enmap).bandName(1))
 
     def test_bandColor(self):
-        self.assertEqual('#e60000', RasterReader(fraction_polygons_l3).bandColor(1).name())
+        self.assertEqual('#e60000', RasterReader(fraction_polygon_l3).bandColor(1).name())
 
     def test_bandOffset(self):
         self.assertEqual(0, RasterReader(enmap).bandOffset(1))
@@ -286,7 +281,7 @@ class TestRasterReader(TestCase):
         self.assertTrue(reader.isSpectralRasterLayer())
         self.assertTrue(reader.isSpectralRasterLayer(False))
 
-        reader = RasterReader(fraction_polygons_l3)
+        reader = RasterReader(fraction_polygon_l3)
         self.assertFalse(reader.isSpectralRasterLayer())
         self.assertFalse(reader.isSpectralRasterLayer(False))
 
@@ -380,7 +375,7 @@ class TestRasterReader(TestCase):
         self.assertEqual(20, reader.fwhm(2))
 
         # check non-spectral raster
-        self.assertIsNone(RasterReader(fraction_polygons_l3).fwhm(1))
+        self.assertIsNone(RasterReader(fraction_polygon_l3).fwhm(1))
 
     def test_badBandMultiplier(self):
         # check at band-level

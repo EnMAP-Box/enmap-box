@@ -2,15 +2,15 @@ from math import isnan
 
 import numpy as np
 
-from enmapbox.exampledata import landcover_polygons, enmap
+from enmapbox.exampledata import landcover_polygon, enmap
 from enmapboxprocessing.algorithm.classificationperformancesimplealgorithm import \
     ClassificationPerformanceSimpleAlgorithm
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
+from enmapboxtestdata import landcover_map_l3
 from qgis.core import QgsProcessingException, QgsRasterLayer
-from testdata import landcover_map_l3
 
 writeToDisk = True
 
@@ -22,7 +22,7 @@ class TestClassificationPerformanceSimpleAlgorithm(TestCase):
         alg.initAlgorithm()
         parameters = {
             alg.P_CLASSIFICATION: landcover_map_l3,
-            alg.P_REFERENCE: landcover_polygons,
+            alg.P_REFERENCE: landcover_polygon,
             alg.P_OPEN_REPORT: True,
             alg.P_OUTPUT_REPORT: self.filename('report.html'),
         }
@@ -69,7 +69,7 @@ class TestClassificationPerformanceSimpleAlgorithm(TestCase):
         except QgsProcessingException as error:
             self.assertEqual(
                 str(error),
-                'Unable to execute algorithm\nInvalid classification, requires paletted/unique values renderer (Observed categorized layer)'
+                'Unable to execute algorithm\nInvalid categorized raster layer, requires paletted/unique values renderer (Observed categorized layer)'
             )
 
     def test_debug(self):

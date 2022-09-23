@@ -23,7 +23,7 @@ class Worker(WorkflowWorker):
         import time
         time.time()
 
-        vector = VectorClassification(filename=enmapboxtestdata.landcover_polygons, classAttribute='level_2_id')
+        vector = VectorClassification(filename=enmapboxtestdata.landcover_polygon, classAttribute='level_2_id')
         Classification.fromClassification(
             filename=r'c:\output\classification{}.bsq'.format(str(time.time())), classification=vector,
             grid=Raster(filename=enmapboxtestdata.enmap).grid().atResolution(10),
