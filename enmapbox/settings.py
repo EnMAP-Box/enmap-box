@@ -9,7 +9,7 @@ class EnMAPBoxSettings(QgsSettings):
     MAP_BACKGROUND = 'MAP_BACKGROUND'
 
     def __init__(self):
-        super().__init__('HU-Berlin', 'EnMAP-Box')
+        super().__init__('EnMAP', 'EnMAP-Box')
 
         # init default settings
         self.setIfUndefined(self.SHOW_WARNING, True)
