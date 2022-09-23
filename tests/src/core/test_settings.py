@@ -15,18 +15,15 @@
 *                                                                         *
 ***************************************************************************
 """
-# noinspection PyPep8Naming
-import pathlib
-import unittest
 import os
-
-from qgis.PyQt.QtGui import QColor
-
-from enmapbox.settings import enmapboxSettings, EnMAPBoxSettings
-from qgis.core import QgsProject
+# noinspection PyPep8Naming
+import unittest
 
 from enmapbox import EnMAPBox
+from enmapbox.settings import enmapboxSettings, EnMAPBoxSettings
 from enmapbox.testing import EnMAPBoxTestCase
+from qgis.PyQt.QtGui import QColor
+from qgis.core import QgsProject
 
 
 class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
