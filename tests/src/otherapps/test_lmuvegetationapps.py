@@ -22,7 +22,6 @@ initPythonPaths()
 site.addsitedir(pathlib.Path(DIR_ENMAPBOX) / 'apps' / 'lmuapps')
 
 
-
 class test_applications(EnMAPBoxTestCase):
 
     def test_MainUiFunc(self):
