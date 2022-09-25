@@ -1,4 +1,3 @@
-from copy import deepcopy
 from typing import List
 
 import numpy as np
@@ -29,7 +28,6 @@ class DualbandPseudocolorRenderer(QgsRasterRenderer):
     band1: int
     band2: int
     colorPlane: np.ndarray
-
 
     def __init__(self, input: QgsRasterInterface = None, type: str = ''):
         super().__init__(input, type)
@@ -67,7 +65,6 @@ class DualbandPseudocolorRenderer(QgsRasterRenderer):
 
     def block(self, band_nr: int, extent: QgsRectangle, width: int, height: int,
               feedback: QgsRasterBlockFeedback = None):
-
         # read data
         reader = RasterReader(self.input())
         array = reader.array(width=width, height=height, bandList=[self.band1, self.band2], boundingBox=extent)
@@ -84,20 +81,11 @@ class DualbandPseudocolorRenderer(QgsRasterRenderer):
 
         # find bin colors
         bins = self.colorPlane.shape[0]
-        #x_edge = np.linspace(self.min1, self.max1, bins + 1)
-        #y_edge = np.linspace(self.min2, self.max2, bins + 1)
-        #counts, x_edge, y_edge, binnumber = binned_statistic_2d(
-        #    values1, values2, values1, 'count', bins - 1, [[self.min1, self.max1], [self.min2, self.max2]], True
-        #)
         counts, x_edge, y_edge, binnumber = binned_statistic_2d(
             values1, values2, values1, 'count', [self.binEdges1, self.binEdges2], None, True
         )
 
         binnumber = np.minimum(binnumber, bins - 1)  # need to trim, seams to be a bug in binned_statistic_2d
-        print(bins)
-        print(x_edge)
-        print(y_edge)
-        print(np.min(binnumber), np.max(binnumber), self.colorPlane.shape)
         colors = self.colorPlane[bins - binnumber[1] - 1, binnumber[0]]
 
         # convert back to spatial block

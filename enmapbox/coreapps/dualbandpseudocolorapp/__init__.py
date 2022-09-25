@@ -1,9 +1,7 @@
 from dualbandpseudocolorapp.dualbandpseudocolordialog import DualbandPseudocolorDialog
+from enmapbox.gui.applications import EnMAPBoxApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu, QAction
-
-from decorrelationstretchapp.decorrelationstretchdialog import DecorrelationStretchDialog
-from enmapbox.gui.applications import EnMAPBoxApplication
 from typeguard import typechecked
 
 
@@ -26,7 +24,7 @@ class DualbandPseudocolorApp(EnMAPBoxApplication):
 
     @classmethod
     def title(cls):
-        return 'Dualband Pseudocolor Renderer'
+        return 'Bivariate Color Raster Renderer'
 
     def menu(self, appMenu: QMenu):
         appMenu: QMenu = self.enmapbox.menu('Tools')
@@ -37,5 +35,5 @@ class DualbandPseudocolorApp(EnMAPBoxApplication):
         return appMenu
 
     def startGUI(self):
-        DualbandPseudocolorDialog(parent=self.enmapbox.ui)
+        w = DualbandPseudocolorDialog(parent=self.enmapbox.ui)
         w.show()

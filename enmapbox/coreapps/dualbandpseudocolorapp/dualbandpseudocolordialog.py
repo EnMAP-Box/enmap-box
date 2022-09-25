@@ -225,8 +225,6 @@ class DualbandPseudocolorDialog(QMainWindow):
             self.mClasses.setEnabled(True)
             classes = self.mClasses.value()
 
-        #self.colorPlane = zoom(colorsEdges, (classes, classes, 1), order=1).astype(np.uint8)#[::2,::2]
-
         x, y = np.meshgrid([1, classes], [1, classes])
         Xnew = np.linspace(1, classes, classes)
         Ynew = np.linspace(1, classes, classes)
@@ -236,7 +234,6 @@ class DualbandPseudocolorDialog(QMainWindow):
         greenPlane = fGreen(Xnew, Ynew)
         fBlue = interp2d(x, y, colorsEdges[:,:,2], kind='linear')
         bluePlane = fBlue(Xnew, Ynew)
-
         self.colorPlane = np.transpose((redPlane, greenPlane, bluePlane), (1,2,0))
 
         self.mPlot.clear()
