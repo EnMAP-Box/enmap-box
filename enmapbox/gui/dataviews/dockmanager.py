@@ -1710,6 +1710,17 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
             action = menu.addAction(ColorSpaceExplorerApp.title())
             action.setIcon(ColorSpaceExplorerApp.icon())
             action.triggered.connect(lambda: self.onColorSpaceExplorerClicked(lyr))
+
+            from cmykcolorrasterrendererapp import CmykColorRasterRendererApp
+            action = menu.addAction(CmykColorRasterRendererApp.title())
+            action.setIcon(CmykColorRasterRendererApp.icon())
+            action.triggered.connect(lambda: self.onCmykColorRasterRendererClicked(lyr))
+
+            from hsvcolorrasterrendererapp import HsvColorRasterRendererApp
+            action = menu.addAction(HsvColorRasterRendererApp.title())
+            action.setIcon(HsvColorRasterRendererApp.icon())
+            action.triggered.connect(lambda: self.onHsvColorRasterRendererClicked(lyr))
+
         if isinstance(lyr.renderer(), QgsPalettedRasterRenderer):
             from classificationstatisticsapp import ClassificationStatisticsApp
             action = menu.addAction(ClassificationStatisticsApp.title())
@@ -1934,6 +1945,20 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         self.bivariateColorRasterRendererDialog = BivariateColorRasterRendererDialog(parent=self.mDockTreeView)
         self.bivariateColorRasterRendererDialog.show()
         self.bivariateColorRasterRendererDialog.mLayer.setLayer(layer)
+
+    @typechecked
+    def onCmykColorRasterRendererClicked(self, layer: QgsRasterLayer):
+        from cmykcolorrasterrendererapp import CmykColorRasterRendererDialog
+        self.cmykColorRasterRendererDialog = CmykColorRasterRendererDialog(parent=self.mDockTreeView)
+        self.cmykColorRasterRendererDialog.show()
+        self.cmykColorRasterRendererDialog.mLayer.setLayer(layer)
+
+    @typechecked
+    def onHsvColorRasterRendererClicked(self, layer: QgsRasterLayer):
+        from hsvcolorrasterrendererapp import HsvColorRasterRendererDialog
+        self.hsvColorRasterRendererDialog = HsvColorRasterRendererDialog(parent=self.mDockTreeView)
+        self.hsvColorRasterRendererDialog.show()
+        self.hsvColorRasterRendererDialog.mLayer.setLayer(layer)
 
     @typechecked
     def onCopyLayerToQgisClicked(self, layer: QgsMapLayer):
