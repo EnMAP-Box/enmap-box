@@ -24,7 +24,7 @@ class CmykColorRasterRendererApp(EnMAPBoxApplication):
 
     @classmethod
     def title(cls):
-        return 'Bivariate Color Raster Renderer'
+        return 'CMYK Color Raster Renderer'
 
     def menu(self, appMenu: QMenu):
         appMenu: QMenu = self.enmapbox.menu('Tools')

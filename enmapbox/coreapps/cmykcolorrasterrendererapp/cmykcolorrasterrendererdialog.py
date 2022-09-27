@@ -5,12 +5,10 @@ import numpy as np
 from cmykcolorrasterrendererapp.cmykcolorrasterrenderer import CmykColorRasterRenderer
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from enmapboxprocessing.rasterreader import RasterReader
-from qgis.PyQt.QtWidgets import QWidget, QToolButton, QCheckBox, QMainWindow, QComboBox, QMenu, QPushButton, \
-    QLineEdit, QRadioButton
+from qgis.PyQt.QtWidgets import QWidget, QToolButton, QCheckBox, QMainWindow, QComboBox, QLineEdit, QRadioButton
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer, QgsMapLayerProxyModel, QgsMapSettings
-from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsDoubleSpinBox, QgsMapLayerComboBox, QgsColorButton, \
-    QgsSpinBox
+from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsDoubleSpinBox, QgsMapLayerComboBox
 from typeguard import typechecked
 
 
@@ -19,6 +17,8 @@ class CmykColorRasterRendererDialog(QMainWindow):
     mLayer: QgsMapLayerComboBox
     mBand1: QgsRasterBandComboBox
     mBand2: QgsRasterBandComboBox
+    mBand3: QgsRasterBandComboBox
+    mBand4: QgsRasterBandComboBox
     mMin1: QLineEdit
     mMin2: QLineEdit
     mMin3: QLineEdit
@@ -180,9 +180,13 @@ class CmykColorRasterRendererDialog(QMainWindow):
         if isinstance(renderer, CmykColorRasterRenderer):
             self.mBand1.setBand(renderer.band1)
             self.mBand2.setBand(renderer.band2)
+            self.mBand3.setBand(renderer.band3)
+            self.mBand4.setBand(renderer.band4)
         else:
             self.mBand1.setBand(1)
             self.mBand2.setBand(min(2, layer.bandCount()))
+            self.mBand3.setBand(min(3, layer.bandCount()))
+            self.mBand4.setBand(min(4, layer.bandCount()))
 
     def onApplyClicked(self):
         layer = self.currentLayer()
@@ -197,17 +201,3 @@ class CmykColorRasterRendererDialog(QMainWindow):
     def onLiveUpdate(self):
         if self.mLiveUpdate.isChecked():
             self.onApplyClicked()
-
-
-@typechecked
-def smartRound(value: float) -> str:
-    if abs(value) < 0.1:
-        return str(round(value, 4))
-    elif abs(value) < 1:
-        return str(round(value, 3))
-    elif abs(value) < 10:
-        return str(round(value, 2))
-    elif abs(value) < 100:
-        return str(round(value, 1))
-    else:
-        return str(int(round(value, 0)))

@@ -4,14 +4,6 @@ import numpy as np
 
 from qgis.core import QgsRasterRenderer, QgsRasterInterface, QgsRectangle, QgsRasterBlockFeedback, Qgis
 
-try:
-    from sklearn.decomposition import PCA
-    from sklearn.preprocessing import RobustScaler, MinMaxScaler
-except ModuleNotFoundError:
-    from unittest.mock import Mock
-
-    RobustScaler = MinMaxScaler = PCA = Mock()
-
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from typeguard import typechecked
@@ -22,7 +14,6 @@ class CmykColorRasterRenderer(QgsRasterRenderer):
     min1: float
     min2: float
     min3: float
-    min4: float
     max1: float
     max2: float
     max3: float
