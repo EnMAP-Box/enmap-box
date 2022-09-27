@@ -1,4 +1,4 @@
-from dualbandpseudocolorapp.dualbandpseudocolordialog import DualbandPseudocolorDialog
+from bivariatecolorrasterrendererapp.bivariatecolorrasterrendererdialog import BivariateColorRasterRendererDialog
 from enmapbox.gui.applications import EnMAPBoxApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu, QAction
@@ -6,15 +6,15 @@ from typeguard import typechecked
 
 
 def enmapboxApplicationFactory(enmapBox):
-    return [DualbandPseudocolorApp(enmapBox)]
+    return [BivariateColorRasterRendererApp(enmapBox)]
 
 
 @typechecked
-class DualbandPseudocolorApp(EnMAPBoxApplication):
+class BivariateColorRasterRendererApp(EnMAPBoxApplication):
     def __init__(self, enmapBox, parent=None):
         super().__init__(enmapBox, parent=parent)
 
-        self.name = DualbandPseudocolorApp.__name__
+        self.name = BivariateColorRasterRendererApp.__name__
         self.version = 'dev'
         self.licence = 'GNU GPL-3'
 
@@ -35,5 +35,5 @@ class DualbandPseudocolorApp(EnMAPBoxApplication):
         return appMenu
 
     def startGUI(self):
-        w = DualbandPseudocolorDialog(parent=self.enmapbox.ui)
+        w = BivariateColorRasterRendererDialog(parent=self.enmapbox.ui)
         w.show()

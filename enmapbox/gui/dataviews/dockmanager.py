@@ -1719,10 +1719,18 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         action: QAction = menu.addAction(ClassFractionStatisticsApp.title())
         action.setIcon(ClassFractionStatisticsApp.icon())
         action.triggered.connect(lambda: self.onClassFractionStatisticsClicked(lyr))
-        from decorrelationstretchapp import DecorrelationStretchApp
-        action: QAction = menu.addAction(DecorrelationStretchApp.title())
-        action.setIcon(DecorrelationStretchApp.icon())
-        action.triggered.connect(lambda: self.onDecorrelationStretchClicked(lyr))
+        if lyr.bandCount() >= 3:
+            from decorrelationstretchapp import DecorrelationStretchApp
+            action: QAction = menu.addAction(DecorrelationStretchApp.title())
+            action.setIcon(DecorrelationStretchApp.icon())
+            action.triggered.connect(lambda: self.onDecorrelationStretchClicked(lyr))
+        if lyr.bandCount() >= 2:
+            from bivariatecolorrasterrendererapp import BivariateColorRasterRendererApp
+            action: QAction = menu.addAction(BivariateColorRasterRendererApp.title())
+            action.setIcon(BivariateColorRasterRendererApp.icon())
+            action.triggered.connect(lambda: self.onBivariateColorRasterRendererClicked(lyr))
+
+
         # add apply model shortcuts
         from enmapbox import EnMAPBox
         enmapBox = EnMAPBox.instance()
@@ -1919,6 +1927,13 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         self.decorrelationStretchDialog = DecorrelationStretchDialog(parent=self.mDockTreeView)
         self.decorrelationStretchDialog.show()
         self.decorrelationStretchDialog.mLayer.setLayer(layer)
+
+    @typechecked
+    def onBivariateColorRasterRendererClicked(self, layer: QgsRasterLayer):
+        from bivariatecolorrasterrendererapp import BivariateColorRasterRendererDialog
+        self.bivariateColorRasterRendererDialog = BivariateColorRasterRendererDialog(parent=self.mDockTreeView)
+        self.bivariateColorRasterRendererDialog.show()
+        self.bivariateColorRasterRendererDialog.mLayer.setLayer(layer)
 
     @typechecked
     def onCopyLayerToQgisClicked(self, layer: QgsMapLayer):

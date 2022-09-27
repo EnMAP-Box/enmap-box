@@ -1,22 +1,19 @@
 from typing import Optional
 
 import numpy as np
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QMenu, QAction, QPushButton
 from scipy.interpolate import interp2d
-from scipy.ndimage.interpolation import zoom
 
-from dualbandpseudocolorapp.dualbandpseudocolorrenderer import DualbandPseudocolorRenderer
+from bivariatecolorrasterrendererapp.bivariatecolorrasterrenderer import BivariateColorRasterRenderer
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget, ImageItem
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapbox.utils import BlockSignals
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtWidgets import QWidget, QToolButton, QCheckBox, QMainWindow, QComboBox
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWidgets import QWidget, QToolButton, QCheckBox, QMainWindow, QComboBox, QMenu, QAction, QPushButton, \
+    QLineEdit, QRadioButton
 from qgis.PyQt.uic import loadUi
-from qgis._gui import QgsColorButton, QgsSpinBox
 from qgis.core import QgsRasterLayer, QgsMapLayerProxyModel, QgsMapSettings
-from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsDoubleSpinBox, QgsMapLayerComboBox
+from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsDoubleSpinBox, QgsMapLayerComboBox, QgsColorButton, \
+    QgsSpinBox
 from typeguard import typechecked
 
 
@@ -28,10 +25,14 @@ class ColorPlanePlotWidget(PlotWidget):
 
 
 @typechecked
-class DualbandPseudocolorDialog(QMainWindow):
+class BivariateColorRasterRendererDialog(QMainWindow):
     mLayer: QgsMapLayerComboBox
     mBand1: QgsRasterBandComboBox
     mBand2: QgsRasterBandComboBox
+    mMin1: QLineEdit
+    mMin2: QLineEdit
+    mMax1: QLineEdit
+    mMax2: QLineEdit
     mColor1: QgsColorButton
     mColor2: QgsColorButton
     mColor3: QgsColorButton
@@ -40,6 +41,8 @@ class DualbandPseudocolorDialog(QMainWindow):
     mMenu: QPushButton
     mMode: QComboBox
     mClasses: QgsSpinBox
+    mMinMaxUser: QRadioButton
+    mMinMaxPercentile: QRadioButton
     mP1: QgsDoubleSpinBox
     mP2: QgsDoubleSpinBox
     mExtent: QComboBox
@@ -71,6 +74,18 @@ class DualbandPseudocolorDialog(QMainWindow):
             'Joshua Stevens 2': ['#be64ac', '#3b4994', '#e8e8e8', '#5ac8c8'],
             'Joshua Stevens 3': ['#73ae80', '#2a5a5b', '#e8e8e8', '#6c83b5'],
             'Joshua Stevens 4': ['#9972af', '#804d36', '#e8e8e8', '#c8b35a'],
+            'ArcMap BrBG': ['#a85e18', '#537440', '#f2f7f5', '#00856f'],
+            'ArcMap BrBu_Dk': ['#c68023', '#463333', '#cccccc', '#5a84bc'],
+            'ArcMap BrBu_Lt': ['#c58225', '#8d866c', '#cccccc', '#5785ba'],
+            'ArcMap BuOr': ['#4a9fc2', '#364f4a', '#f3f3f3', '#f4b100'],
+            'ArcMap PiGn': ['#d4188a', '#8d635a', '#f7f7f7', '#49aa25'],
+            'ArcMap PuGn': ['#793293', '#405164', '#f6f6f6', '#018738'],
+            'ArcMap PuOr': ['#a85e18', '#537440', '#f2f7f5', '#e85f03'],
+            'ArcMap RdBu': ['#c90223', '#683769', '#f7f7f7', '#0470b2'],
+            'ArcMap PiBu': ['#b94a8d', '#4e428b', '#cdc5da', '#0b94c9'],
+            'ArcMap RdGy': ['#cb0022', '#993245', '#ffffff', '#656565'],
+            'ArcMap RdYlBu': ['#d31820', '#85486a', '#feffbf', '#2c7ab8'],
+            'ArcMap RdYlGn': ['#d81b1f', '#77572e', '#feffc1', '#199942']
         }
         menu = QMenu()
         for name in self.predefinedColorPlanes:
@@ -120,7 +135,7 @@ class DualbandPseudocolorDialog(QMainWindow):
         else:
             raise ValueError()
 
-    def currentRenderer(self) -> Optional[DualbandPseudocolorRenderer]:
+    def currentRenderer(self) -> Optional[BivariateColorRasterRenderer]:
         layer = self.currentLayer()
         if layer is None:
             return None
@@ -147,8 +162,18 @@ class DualbandPseudocolorDialog(QMainWindow):
         if len(values1) == 0:
             return None
 
-        min1, max1 = np.percentile(values1, quantile_range)
-        min2, max2 = np.percentile(values2, quantile_range)
+        if self.mMinMaxPercentile.isChecked():
+            min1, max1 = np.percentile(values1, quantile_range)
+            min2, max2 = np.percentile(values2, quantile_range)
+            self.mMin1.setText(str(min1))
+            self.mMin2.setText(str(min2))
+            self.mMax1.setText(str(max1))
+            self.mMax2.setText(str(max2))
+
+        min1 = float(self.mMin1.text())
+        min2 = float(self.mMin2.text())
+        max1 = float(self.mMax1.text())
+        max2 = float(self.mMax2.text())
 
         mode = self.mMode.currentIndex()
         if mode in [self.ContinuouseMode, self.EqualIntervalMode]:
@@ -177,7 +202,7 @@ class DualbandPseudocolorDialog(QMainWindow):
         self.mPlot.setLabel(axis='left', text=reader.bandName(band2))
 
         # make renderer
-        renderer = DualbandPseudocolorRenderer()
+        renderer = BivariateColorRasterRenderer()
         renderer.setRange(min1, min2, max1, max2)
         renderer.setBands(band1, band2)
         renderer.setColorPlane(self.colorPlane)
@@ -205,7 +230,7 @@ class DualbandPseudocolorDialog(QMainWindow):
             return
 
         renderer = layer.renderer()
-        if isinstance(renderer, DualbandPseudocolorRenderer):
+        if isinstance(renderer, BivariateColorRasterRenderer):
             self.mBand1.setBand(renderer.band1)
             self.mBand2.setBand(renderer.band2)
         else:
@@ -228,13 +253,13 @@ class DualbandPseudocolorDialog(QMainWindow):
         x, y = np.meshgrid([1, classes], [1, classes])
         Xnew = np.linspace(1, classes, classes)
         Ynew = np.linspace(1, classes, classes)
-        fRed = interp2d(x, y, colorsEdges[:,:,0], kind='linear')
+        fRed = interp2d(x, y, colorsEdges[:, :, 0], kind='linear')
         redPlane = fRed(Xnew, Ynew)
-        fGreen = interp2d(x, y, colorsEdges[:,:,1], kind='linear')
+        fGreen = interp2d(x, y, colorsEdges[:, :, 1], kind='linear')
         greenPlane = fGreen(Xnew, Ynew)
-        fBlue = interp2d(x, y, colorsEdges[:,:,2], kind='linear')
+        fBlue = interp2d(x, y, colorsEdges[:, :, 2], kind='linear')
         bluePlane = fBlue(Xnew, Ynew)
-        self.colorPlane = np.transpose((redPlane, greenPlane, bluePlane), (1,2,0))
+        self.colorPlane = np.transpose((redPlane, greenPlane, bluePlane), (1, 2, 0))
 
         self.mPlot.clear()
 

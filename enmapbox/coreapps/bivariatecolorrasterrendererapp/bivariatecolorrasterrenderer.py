@@ -19,7 +19,7 @@ from typeguard import typechecked
 
 
 @typechecked
-class DualbandPseudocolorRenderer(QgsRasterRenderer):
+class BivariateColorRasterRenderer(QgsRasterRenderer):
     min1: float
     min2: float
     max1: float
@@ -54,7 +54,6 @@ class DualbandPseudocolorRenderer(QgsRasterRenderer):
     def setBinEdges(self, binEdges1: np.ndarray, binEdges2: np.ndarray):
         self.binEdges1 = binEdges1
         self.binEdges2 = binEdges2
-        print(self.binEdges1, self.binEdges2)
 
     def setBands(self, band1: int, band2: int):
         self.band1 = band1
@@ -72,6 +71,9 @@ class DualbandPseudocolorRenderer(QgsRasterRenderer):
         array1, array2 = array
         values1 = array1[maskArray]
         values2 = array2[maskArray]
+
+        if len(values1) == 0:
+            return
 
         # init result
         r = np.zeros((height, width), dtype=np.uint32)
@@ -101,7 +103,7 @@ class DualbandPseudocolorRenderer(QgsRasterRenderer):
         return Utils.numpyArrayToQgsRasterBlock(outarray, Qgis.ARGB32_Premultiplied)
 
     def clone(self) -> QgsRasterRenderer:
-        renderer = DualbandPseudocolorRenderer()
+        renderer = BivariateColorRasterRenderer()
         renderer.min1 = self.min1
         renderer.min2 = self.min2
         renderer.max1 = self.max1

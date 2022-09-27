@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>541</width>
-    <height>615</height>
+    <height>661</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,24 +50,24 @@
       <item row="1" column="1">
        <widget class="QgsRasterBandComboBox" name="mBand1"/>
       </item>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>Band 2</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
+      <item row="3" column="1">
        <widget class="QgsRasterBandComboBox" name="mBand2"/>
       </item>
-      <item row="3" column="0">
+      <item row="5" column="0">
        <widget class="QLabel" name="label_3">
         <property name="text">
          <string>Color plane</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="5" column="1">
        <layout class="QGridLayout" name="gridLayout">
         <property name="spacing">
          <number>0</number>
@@ -192,7 +192,7 @@
         </item>
        </layout>
       </item>
-      <item row="4" column="1">
+      <item row="6" column="1">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QLabel" name="label_5">
@@ -261,6 +261,78 @@
         </item>
        </layout>
       </item>
+      <item row="2" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="label_35">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Min</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="mMin1"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_36">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Max</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="mMax1"/>
+        </item>
+       </layout>
+      </item>
+      <item row="4" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QLabel" name="label_37">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Min</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="mMin2"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_38">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Max</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="mMax2"/>
+        </item>
+       </layout>
+      </item>
      </layout>
     </item>
     <item>
@@ -271,14 +343,14 @@
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
         <layout class="QFormLayout" name="formLayout_3">
-         <item row="1" column="0">
+         <item row="2" column="0">
           <widget class="QLabel" name="label_12">
            <property name="text">
             <string>Extent</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
+         <item row="2" column="1">
           <widget class="QComboBox" name="mExtent">
            <property name="currentIndex">
             <number>1</number>
@@ -295,14 +367,14 @@
            </item>
           </widget>
          </item>
-         <item row="2" column="0">
+         <item row="3" column="0">
           <widget class="QLabel" name="label_13">
            <property name="text">
             <string>Accuracy</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
+         <item row="3" column="1">
           <widget class="QComboBox" name="mAccuracy">
            <item>
             <property name="text">
@@ -316,15 +388,7 @@
            </item>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_9">
-           <property name="text">
-            <string>Cumulative
-count cut</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
+         <item row="1" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_6">
            <item>
             <widget class="QgsDoubleSpinBox" name="mP1">
@@ -393,7 +457,38 @@ count cut</string>
              </property>
             </widget>
            </item>
+           <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>80</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
           </layout>
+         </item>
+         <item row="1" column="0">
+          <widget class="QRadioButton" name="mMinMaxPercentile">
+           <property name="text">
+            <string>Cumulative
+count cut</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QRadioButton" name="mMinMaxUser">
+           <property name="text">
+            <string>User defined</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -503,7 +598,7 @@ count cut</string>
   <customwidget>
    <class>ColorPlanePlotWidget</class>
    <extends>QWidget</extends>
-   <header>dualbandpseudocolorapp.dualbandpseudocolordialog</header>
+   <header>bivariatecolorrasterrendererapp.bivariatecolorrasterrendererdialog</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

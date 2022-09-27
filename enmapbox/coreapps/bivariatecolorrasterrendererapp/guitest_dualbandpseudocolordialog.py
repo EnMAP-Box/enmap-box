@@ -1,6 +1,6 @@
 from PyQt5.QtGui import QColor
 
-from dualbandpseudocolorapp import DualbandPseudocolorDialog
+from bivariatecolorrasterrendererapp.bivariatecolorrasterrendererdialog import BivariateColorRasterRendererDialog
 from enmapbox import EnMAPBox, initAll
 from enmapbox.testing import start_app
 from qgis.core import QgsRasterLayer
@@ -16,7 +16,7 @@ if case == 1:  # NDFI map from Katja Kowalski
     layer = QgsRasterLayer(r'D:\data\katja_kowalski\NDFI.vrt', 'NDFI')
     mapDock = enmapBox.onDataDropped([layer])
 
-    widget = DualbandPseudocolorDialog()
+    widget = BivariateColorRasterRendererDialog()
     widget.show()
     widget.mLayer.setLayer(layer)
     widget.mBand1.setBand(1)
@@ -25,7 +25,7 @@ elif case == 2:  # Tree and Water fractions
     layer = QgsRasterLayer(r'D:\source\QGISPlugIns\enmap-box\tests\testdata\raster\fraction_map_l3.tif',
                            'fraction_map_l3')
     mapDock = enmapBox.onDataDropped([layer])
-    widget = DualbandPseudocolorDialog()
+    widget = BivariateColorRasterRendererDialog()
     widget.mBand1.setBand(4)
     widget.mBand2.setBand(6)
     widget.mColor3.setColor(QColor(0, 0, 0))
