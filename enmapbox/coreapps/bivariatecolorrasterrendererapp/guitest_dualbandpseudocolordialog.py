@@ -1,4 +1,4 @@
-from PyQt5.QtGui import QColor
+from qgis.PyQt.QtGui import QColor
 
 from bivariatecolorrasterrendererapp.bivariatecolorrasterrendererdialog import BivariateColorRasterRendererDialog
 from enmapbox import EnMAPBox, initAll

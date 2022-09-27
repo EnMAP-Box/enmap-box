@@ -37,6 +37,7 @@ class BivariateColorRasterRendererDialog(QMainWindow):
     mColor2: QgsColorButton
     mColor3: QgsColorButton
     mColor4: QgsColorButton
+    mUseColor2: QCheckBox
     mPlot: ColorPlanePlotWidget
     mMenu: QPushButton
     mMode: QComboBox
@@ -100,6 +101,7 @@ class BivariateColorRasterRendererDialog(QMainWindow):
         self.mColor2.colorChanged.connect(self.onColorChanged)
         self.mColor3.colorChanged.connect(self.onColorChanged)
         self.mColor4.colorChanged.connect(self.onColorChanged)
+        self.mUseColor2.stateChanged.connect(self.onColorChanged)
         self.mMode.currentIndexChanged.connect(self.onColorChanged)
         self.mClasses.valueChanged.connect(self.onColorChanged)
         self.mP1.valueChanged.connect(self.onLiveUpdate)
@@ -241,6 +243,15 @@ class BivariateColorRasterRendererDialog(QMainWindow):
         mode = self.mMode.currentIndex()
 
         colors = [mColor.color() for mColor in [self.mColor1, self.mColor2, self.mColor3, self.mColor4]]
+
+        if not self.mUseColor2.isChecked():
+            color2 = QColor(
+                int((colors[0].red() + colors[3].red()) / 2),
+                int((colors[0].green() + colors[3].green()) / 2),
+                int((colors[0].blue() + colors[3].blue()) / 2),
+            )
+            colors[1] = color2
+
         colorsEdges = np.reshape([np.array([color.red(), color.green(), color.blue()]) for color in colors], (2, 2, 3))
 
         if mode == self.ContinuouseMode:
