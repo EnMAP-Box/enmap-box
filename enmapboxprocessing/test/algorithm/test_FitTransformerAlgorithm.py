@@ -85,7 +85,7 @@ class TestFitClassifierAlgorithm(TestCase):
     def test_error(self):
         alg = FitTestTransformerAlgorithm()
         parameters = {
-            alg.P_DATASET: classifier_pkl,
+            alg.P_DATASET: classifierDumpPkl,
             alg.P_FEATURE_RASTER: enmap,
             alg.P_OUTPUT_TRANSFORMER: self.filename('transformer.pkl')
         }
@@ -116,7 +116,7 @@ class TestFitClassifierAlgorithm(TestCase):
             alg.initAlgorithm()
             alg.shortHelpString()
             parameters = {
-                alg.P_DATASET: classifier_pkl,
+                alg.P_DATASET: classifierDumpPkl,
                 alg.P_TRANSFORMER: alg.defaultCodeAsString(),
                 alg.P_OUTPUT_TRANSFORMER: self.filename('transformer.pkl')
             }

@@ -1,8 +1,7 @@
 import numpy as np
 from osgeo import gdal
 
-from enmapbox.exampledata import enmap, google_maps
-from enmapboxprocessing.driver import Driver
+from enmapbox.exampledata import enmap
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter

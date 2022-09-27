@@ -32,7 +32,7 @@ class TestPrepareClassificationSampleFromCategorizedRaster(TestCase):
         alg = PrepareClassificationDatasetFromCategorizedRasterAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
-            alg.P_CATEGORIZED_RASTER: landcover_raster_30m,
+            alg.P_CATEGORIZED_RASTER: landcover_polygon_30m,
             alg.P_CATEGORY_BAND: 0,
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
         }

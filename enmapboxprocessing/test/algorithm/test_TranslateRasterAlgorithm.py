@@ -7,9 +7,8 @@ from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRaste
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import landcover_polygon_30m_epsg3035, water_mask_30m, enmap_grid_300m
-from qgis._core import QgsRectangle, QgsCoordinateReferenceSystem
-from qgis.core import QgsRasterLayer, QgsRasterRenderer, Qgis
+from enmapboxtestdata import water_mask_30m, enmap_grid_300m
+from qgis.core import QgsRectangle, QgsCoordinateReferenceSystem, QgsRasterLayer, QgsRasterRenderer, Qgis
 
 
 class TestTranslateAlgorithm(TestCase):
@@ -60,7 +59,7 @@ class TestTranslateAlgorithm(TestCase):
         self.runalg(alg, parameters)
         self.assertEqual(
             RasterReader(parameters[alg.P_RASTER]).array()[0][1, 1],
-            RasterReader(parameters[alg.P_OUTPUT_RASTER]).array()[0][0,0],
+            RasterReader(parameters[alg.P_OUTPUT_RASTER]).array()[0][0, 0],
         )
 
     def test_grid_with_differentExtent_and_sameResolutionAndCrs(self):
@@ -78,7 +77,7 @@ class TestTranslateAlgorithm(TestCase):
         self.runalg(alg, parameters)
         self.assertEqual(
             RasterReader(parameters[alg.P_RASTER]).array()[0][1, 1],
-            RasterReader(parameters[alg.P_OUTPUT_RASTER]).array()[0][0,0],
+            RasterReader(parameters[alg.P_OUTPUT_RASTER]).array()[0][0, 0],
         )
 
     def test_grid_with_differentExtentAndCrs(self):
@@ -157,7 +156,6 @@ class TestTranslateAlgorithm(TestCase):
         self.assertIsNone(reader.metadataItem('my key', ''))
         self.assertIsNone(reader.metadataItem('my key', '', 1))
 
-
     def test_dataType(self):
         alg = TranslateRasterAlgorithm()
         parameters = {
@@ -174,24 +172,6 @@ class TestTranslateAlgorithm(TestCase):
             dataType = RasterReader(result[alg.P_OUTPUT_RASTER]).dataType()
             print(name, dataType)
             self.assertEqual(gold[index], dataType)
-
-    def test_bandList(self):
-        alg = TranslateRasterAlgorithm()
-        parameters = {
-            alg.P_RASTER: QgsRasterLayer(enmap),
-            alg.P_OUTPUT_RASTER: self.filename('raster.tif'),
-            alg.P_BAND_LIST: None
-        }
-        result = self.runalg(alg, parameters)
-        self.assertEqual(RasterReader(enmap).bandCount(), RasterReader(result[alg.P_OUTPUT_RASTER]).bandCount())
-
-        parameters[alg.P_BAND_LIST] = []
-        result = self.runalg(alg, parameters)
-        self.assertEqual(RasterReader(enmap).bandCount(), RasterReader(result[alg.P_OUTPUT_RASTER]).bandCount())
-
-        parameters[alg.P_BAND_LIST] = [1, 3, 5]
-        result = self.runalg(alg, parameters)
-        self.assertEqual(3, RasterReader(result[alg.P_OUTPUT_RASTER]).bandCount())
 
     def test_copyMetadata_forEnviSource_bandSubset(self):
         alg = TranslateRasterAlgorithm()
