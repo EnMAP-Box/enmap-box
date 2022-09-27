@@ -20,7 +20,6 @@
 """
 import argparse
 import configparser
-import datetime
 import fnmatch
 import io
 import os
@@ -38,6 +37,7 @@ from qgis.core import QgsUserProfileManager, QgsUserProfile
 site.addsitedir(pathlib.Path(__file__).parents[1])  # noqa
 
 from qgis.testing import start_app
+
 app = start_app()
 import enmapbox
 from enmapbox import DIR_REPO
@@ -111,7 +111,7 @@ def create_enmapbox_plugin(include_testdata: bool = False,
             profileName = copy_to_profile
         else:
             profileName = profileManager.defaultProfileName()
-        assert profileManager.profileExists(profileName),  \
+        assert profileManager.profileExists(profileName), \
             f'QGIS profiles "{profileName}" does not exist in {profileManager.allProfiles()}'
 
         profileManager.setActiveUserProfile(profileName)
@@ -374,13 +374,13 @@ if __name__ == "__main__":
                         default=None,
                         help=textwrap.dedent("""
                             The build name in "enmapboxplugin.<build name>.zip"
-                            Defaults: 
+                            Defaults:
                                 <version> in case of a release.* branch
                                 <version>.<timestamp>.<branch name> in case of any other branch.
                             Can be specified by:
                             -b mytestversion -> enmapboxplugin.mytestversion.zip
                             """
-                        ))
+                                             ))
     parser.add_argument('-p', '--profile',
                         nargs='?',
                         const=True,

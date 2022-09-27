@@ -24,7 +24,7 @@ for name in fieldNames:
         alg.P_OUTPUT_RASTER: rf'D:\data\\country_health_2018\tmp\{name}.tif'
     }
     filenames.append(parameters[alg.P_OUTPUT_RASTER])
-    #alg.runAlg(alg, parameters, None, None, None, False)
+    alg.runAlg(alg, parameters, None, None, None, False)
     ds = gdal.Open(filenames[-1])
     ds.GetRasterBand(1).SetNoDataValue(-9999)
     ds.GetRasterBand(1).SetDescription(name)
