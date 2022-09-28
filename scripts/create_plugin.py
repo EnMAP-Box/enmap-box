@@ -47,10 +47,12 @@ from enmapbox.qgispluginsupport.qps.utils import zipdir
 from qgis.core import QgsFileUtils
 
 # concider default Git location on Windows systems to avaid creating a Start-Up Script
-potentialGitPath = r"C:\Program Files\Git\bin"
-if exists(potentialGitPath):
-    os.environ["PATH"] = os.environ["PATH"] + os.pathsep + potentialGitPath
-import git
+addDefaultGitLocation = True
+if addDefaultGitLocation:
+    potentialGitPath = r"C:\Program Files\Git\bin"
+    if exists(potentialGitPath):
+        os.environ["PATH"] = os.environ["PATH"] + os.pathsep + potentialGitPath
+    import git
 
 DIR_REPO = pathlib.Path(DIR_REPO)
 
