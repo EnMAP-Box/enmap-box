@@ -1,6 +1,34 @@
 CHANGELOG
 =========
 
+Version 3.11
+------------
+*This release was tested under QGIS 3.26.2*
+
+**GUI**
+
+**Spectral Libraries**
+
+**Applications**
+
+* Metadata Viewer revised (#1185, #1329), added more band-specific settings
+
+* included the *GEE Timeseries Explorer* plugin into the EnMAP-Box
+
+  * (slightly) new name *GEE Time Series Explorer* app
+  * can be used inside EnMAP-Box GUI and stand-alone QGIS GUI
+  * overhauled the GUI
+
+**Renderer**
+
+* added custom *Bivariate Color Raster Renderer*: allows to visualize two bands using a 2d color ramp. Find a mapping example here: https://www.joshuastevens.net/cartography/make-a-bivariate-choropleth-map/
+* added custom *CMYK Color Raster Renderer*: allows to visualize four bands using the CMYK (Cyan, Magenta, Yellow, and Key (black)) color model. Find a mapping example here: https://adventuresinmapping.com/2018/10/31/cmyk-vice/
+* added custom *HSV Color Raster Renderer*: allows to visualize three bands using the HSV (Hue, Saturation, Value (black)) color model. Find a mapping example here: https://landmonitoring.earth/portal/ ; select Maps > Global Landcover Dynamics 2016-2020
+
+
+**Processing algorithms**
+
+
 Version 3.10
 ------------
 *This release was tested under QGIS 3.24.1*
