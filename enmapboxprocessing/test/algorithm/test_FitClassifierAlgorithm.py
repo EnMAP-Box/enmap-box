@@ -8,7 +8,7 @@ from enmapboxprocessing.algorithm.fitrandomforestclassifieralgorithm import FitR
 from enmapboxprocessing.algorithm.fitsvcpolyalgorithm import FitSvcPolyAlgorithm
 from enmapboxprocessing.algorithm.fitsvcrbfalgorithm import FitSvcRbfAlgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapboxtestdata import classifierDumpJson, classifierDumpPkl
+from enmapboxtestdata import classifierDumpPkl, classificationDatasetAsJsonFile
 
 
 class FitTestClassifierAlgorithm(FitClassifierAlgorithmBase):
@@ -60,7 +60,7 @@ class TestFitClassifierAlgorithm(TestCase):
     def test_fit_json(self):
         alg = FitTestClassifierAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpJson,
+            alg.P_DATASET: classificationDatasetAsJsonFile,
             alg.P_CLASSIFIER: alg.defaultCodeAsString(),
             alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl')
         }

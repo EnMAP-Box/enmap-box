@@ -1,9 +1,9 @@
-from enmapbox.exampledata import enmap, landcover_polygons
+from enmapbox.exampledata import enmap, landcover_polygon
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
+from enmapboxtestdata import landcover_polygon_3classes_epsg4326
 from qgis.core import Qgis
-from testdata import landcover_berlin_polygon_3classes_EPSG4326_gpkg
 
 
 class TestRasterizeAlgorithm(TestCase):
@@ -12,7 +12,7 @@ class TestRasterizeAlgorithm(TestCase):
         alg = RasterizeVectorAlgorithm()
         parameters = {
             alg.P_GRID: enmap,
-            alg.P_VECTOR: landcover_polygons,
+            alg.P_VECTOR: landcover_polygon,
             alg.P_OUTPUT_RASTER: self.filename('mask.tif')
         }
         result = self.runalg(alg, parameters)
@@ -23,7 +23,7 @@ class TestRasterizeAlgorithm(TestCase):
         alg = RasterizeVectorAlgorithm()
         parameters = {
             alg.P_GRID: enmap,
-            alg.P_VECTOR: landcover_berlin_polygon_3classes_EPSG4326_gpkg,
+            alg.P_VECTOR: landcover_polygon_3classes_epsg4326,
             alg.P_OUTPUT_RASTER: self.filename('mask.tif')
         }
         result = self.runalg(alg, parameters)
@@ -33,7 +33,7 @@ class TestRasterizeAlgorithm(TestCase):
         alg = RasterizeVectorAlgorithm()
         parameters = {
             alg.P_GRID: enmap,
-            alg.P_VECTOR: landcover_polygons,
+            alg.P_VECTOR: landcover_polygon,
             alg.P_INIT_VALUE: 1,
             alg.P_BURN_VALUE: 0,
             alg.P_OUTPUT_RASTER: self.filename('invertedMask.tif')
@@ -45,7 +45,7 @@ class TestRasterizeAlgorithm(TestCase):
         alg = RasterizeVectorAlgorithm()
         parameters = {
             alg.P_GRID: enmap,
-            alg.P_VECTOR: landcover_polygons,
+            alg.P_VECTOR: landcover_polygon,
             alg.P_BURN_ATTRIBUTE: 'level_1_id',
             alg.P_OUTPUT_RASTER: self.filename('classes.tif')
         }
@@ -56,7 +56,7 @@ class TestRasterizeAlgorithm(TestCase):
         alg = RasterizeVectorAlgorithm()
         parameters = {
             alg.P_GRID: enmap,
-            alg.P_VECTOR: landcover_polygons,
+            alg.P_VECTOR: landcover_polygon,
             alg.P_ALL_TOUCHED: True,
             alg.P_DATA_TYPE: alg.Byte,
             alg.P_OUTPUT_RASTER: self.filename('allTouched.tif')
@@ -69,7 +69,7 @@ class TestRasterizeAlgorithm(TestCase):
         alg = RasterizeVectorAlgorithm()
         parameters = {
             alg.P_GRID: enmap,
-            alg.P_VECTOR: landcover_polygons,
+            alg.P_VECTOR: landcover_polygon,
             alg.P_ADD_VALUE: True,
             alg.P_OUTPUT_RASTER: self.filename('addValue.tif')
         }
@@ -80,7 +80,7 @@ class TestRasterizeAlgorithm(TestCase):
         alg = RasterizeVectorAlgorithm()
         parameters = {
             alg.P_GRID: enmap,
-            alg.P_VECTOR: landcover_polygons,
+            alg.P_VECTOR: landcover_polygon,
             alg.P_BURN_FID: True,
             alg.P_OUTPUT_RASTER: self.filename('fid.tif')
         }

@@ -434,7 +434,7 @@ class Utils(object):
                 return dateTime
             elif len(obj) >= 19:  # date, e.g. 2021-12-24T12:30:42.123..
                 return QDateTime.fromString(obj[:19], 'yyyy-MM-ddTHH:mm:ss')
-            elif obj == '':  # invalid date
+            elif obj in ['', 'None']:  # invalid date
                 return QDateTime()
 
         raise ValueError(f'invalid datetime: {obj}')

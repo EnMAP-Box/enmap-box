@@ -9,8 +9,6 @@ from enmapboxprocessing.test.algorithm.testcase import TestCase
 class TestImportPrismaL2DAlgorithm(TestCase):
 
     def test(self):
-        if not self.additionalDataFolderExists():
-            return
 
         alg = ImportPrismaL2DAlgorithm()
         parameters = {
@@ -25,6 +23,9 @@ class TestImportPrismaL2DAlgorithm(TestCase):
             alg.P_OUTPUT_PAN_ERROR: self.filename('prismaL2D_PAN_ERROR.vrt'),
 
         }
+        if not self.fileExists(parameters[alg.P_FILE]):
+            return
+
         result = self.runalg(alg, parameters)
         self.assertEqual(234, RasterReader(result[alg.P_OUTPUT_SPECTRAL_CUBE]).bandCount())
         self.assertAlmostEqual(0.066, np.mean(RasterReader(result[alg.P_OUTPUT_SPECTRAL_CUBE]).array()), 3)
@@ -48,8 +49,6 @@ class TestImportPrismaL2DAlgorithm(TestCase):
         self.assertAlmostEqual(0.003, np.mean(RasterReader(result[alg.P_OUTPUT_PAN_ERROR]).array()), 3)
 
     def test_badBandThresholding1(self):
-        if not self.additionalDataFolderExists():
-            return
 
         alg = ImportPrismaL2DAlgorithm()
         parameters = {
@@ -59,15 +58,15 @@ class TestImportPrismaL2DAlgorithm(TestCase):
             alg.P_OUTPUT_SPECTRAL_CUBE: self.filename('prismaL2D_SPECTRAL.tif'),
             alg.P_OUTPUT_SPECTRAL_ERROR: self.filename('prismaL2D_SPECTRAL_ERROR.tif'),
         }
+        if not self.fileExists(parameters[alg.P_FILE]):
+            return
+
         result = self.runalg(alg, parameters)
         reader = RasterReader(result[alg.P_OUTPUT_SPECTRAL_CUBE])
         bbl = [reader.badBandMultiplier(bandNo) for bandNo in reader.bandNumbers()]
         self.assertEqual(215, sum(bbl))
 
     def test_badBandThresholding2(self):
-        if not self.additionalDataFolderExists():
-            return
-
         alg = ImportPrismaL2DAlgorithm()
         parameters = {
             alg.P_FILE: r'D:\data\sensors\prisma\PRS_L2D_STD_20201107101404_20201107101408_0001.he5',
@@ -77,20 +76,23 @@ class TestImportPrismaL2DAlgorithm(TestCase):
             alg.P_OUTPUT_SPECTRAL_CUBE: self.filename('prismaL2D_SPECTRAL.tif'),
             alg.P_OUTPUT_SPECTRAL_ERROR: self.filename('prismaL2D_SPECTRAL_ERROR.tif'),
         }
+        if not self.fileExists(parameters[alg.P_FILE]):
+            return
+
         result = self.runalg(alg, parameters)
         reader = RasterReader(result[alg.P_OUTPUT_SPECTRAL_CUBE])
         bbl = [reader.badBandMultiplier(bandNo) for bandNo in reader.bandNumbers()]
         self.assertEqual(212, sum(bbl))
 
     def test_issue1318(self):
-        if not self.additionalDataFolderExists():
-            return
-
         alg = ImportPrismaL2DAlgorithm()
         parameters = {
             alg.P_FILE: r'D:\data\sensors\prisma\PRS_L2D_STD_20201107101404_20201107101408_0001.he5',
             alg.P_OUTPUT_SPECTRAL_CUBE: self.filename('prismaL2D_SPECTRAL.bsq')
         }
+        if not self.fileExists(parameters[alg.P_FILE]):
+            return
+
         result = self.runalg(alg, parameters)
         reader = RasterReader(result[alg.P_OUTPUT_SPECTRAL_CUBE])
         driver: gdal.Driver = reader.gdalDataset.GetDriver()

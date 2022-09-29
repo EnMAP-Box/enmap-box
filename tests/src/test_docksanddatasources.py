@@ -21,7 +21,7 @@ from qgis.core import QgsLayerTreeLayer, QgsProject, QgsVectorLayer, QgsRasterLa
 from qgis.gui import QgsMapCanvas, QgsLayerTreeView
 
 from enmapbox import EnMAPBox
-from enmapbox.exampledata import landcover_polygons, library_gpkg, enmap, hires
+from enmapbox.exampledata import landcover_polygon, library_gpkg, enmap, hires
 from enmapbox.gui.datasources.datasources import VectorDataSource, RasterDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager
 from enmapbox.gui.dataviews.dockmanager import DockManager, DockPanelUI, SpeclibDockTreeNode, MapDockTreeNode, \
@@ -58,7 +58,7 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         DSM.sigDataSourcesAdded.connect(onSignal)
 
         DSM.addDataSources(enmap)
-        DSM.addDataSources(landcover_polygons)
+        DSM.addDataSources(landcover_polygon)
         DSM.addDataSources(library_gpkg)
 
         self.assertTrue(len(signalArgs) == 3)
@@ -346,7 +346,7 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         eb = EnMAPBox(load_core_apps=False, load_other_apps=False)
 
         lyrR = QgsRasterLayer(enmap)
-        lyrV = QgsVectorLayer(landcover_polygons)
+        lyrV = QgsVectorLayer(landcover_polygon)
 
         mapDock1 = eb.createDock('MAP')
         self.assertIsInstance(mapDock1, MapDock)

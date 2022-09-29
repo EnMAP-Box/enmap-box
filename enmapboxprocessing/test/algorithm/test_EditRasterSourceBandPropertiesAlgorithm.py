@@ -18,8 +18,8 @@ class TestEditRasterSourceBandPropertiesAlgorithm(TestCase):
         parameters = {
             alg.P_RASTER: enmap,
             alg.P_OFFSET: -9999,
-            alg.P_CREATION_PROFILE: alg.GTiffFormat,
-            alg.P_OUTPUT_RASTER: self.filename('enmap1.tif')
+            alg.P_CREATION_PROFILE: alg.VrtFormat,
+            alg.P_OUTPUT_RASTER: self.filename('enmap.vrt')
         }
         self.runalg(alg, parameters)
 
@@ -102,7 +102,7 @@ class TestEditRasterSourceBandPropertiesAlgorithm(TestCase):
         self.runalg(alg, parameters)
         reader = RasterReader(filename)
         self.assertListEqual(
-            [None] * 177,
+            [QDateTime()] * 177,
             [reader.startTime(bandNo) for bandNo in reader.bandNumbers()]
         )
 
@@ -134,8 +134,7 @@ class TestEditRasterSourceBandPropertiesAlgorithm(TestCase):
         self.assertListEqual([-1234] * 177, [reader.noDataValue(bandNo) for bandNo in reader.bandNumbers()])
 
     def test_offset(self):
-        # filename = self.copyEnmap()
-        filename = self.filename('enmap_uncompressed.tif')
+        filename = self.copyEnmap()
         values = list(range(10000, 177 + 10000))
         alg = EditRasterSourceBandPropertiesAlgorithm()
         parameters = {
@@ -148,7 +147,6 @@ class TestEditRasterSourceBandPropertiesAlgorithm(TestCase):
 
     def test_scale(self):
         filename = self.copyEnmap()
-        # filename = self.filename('enmap_uncompressed.tif')
         values = [1.2345] * 177
         alg = EditRasterSourceBandPropertiesAlgorithm()
         parameters = {

@@ -4,7 +4,7 @@ from enmapbox.exampledata import enmap
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 from enmapboxprocessing.algorithm.regressionworkflowalgorithm import RegressionWorkflowAlgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from testdata import regressor_pkl
+from enmapboxtestdata import regressorDumpMultiTargetPkl
 
 openReport = True
 
@@ -31,7 +31,7 @@ class TestRegressionWorkflowAlgorithm(TestCase):
     def test(self):
         alg = RegressionWorkflowAlgorithm()
         parameters = {
-            alg.P_DATASET: regressor_pkl,
+            alg.P_DATASET: regressorDumpMultiTargetPkl,
             alg.P_REGRESSOR: FitTestRegressorAlgorithm().defaultCodeAsString(),
             alg.P_RASTER: enmap,
             alg.P_NFOLD: 10,

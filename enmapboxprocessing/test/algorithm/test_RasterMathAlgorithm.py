@@ -2,7 +2,7 @@ from os.path import normpath
 
 import numpy as np
 
-from enmapbox.exampledata import enmap, hires, landcover_polygons
+from enmapbox.exampledata import enmap, hires, landcover_polygon
 from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import RasterMathAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
@@ -98,7 +98,7 @@ class TestRasterMathAlgorithm(TestCase):
         alg = RasterMathAlgorithm()
         parameters = {
             alg.P_GRID: enmap,
-            alg.P_V1: landcover_polygons,
+            alg.P_V1: landcover_polygon,
             alg.P_CODE: 'V1',  # use as a 0/1 mask
             alg.P_OUTPUT_RASTER: self.filename('landcover_mask.tif')
         }
@@ -110,7 +110,7 @@ class TestRasterMathAlgorithm(TestCase):
         alg = RasterMathAlgorithm()
         parameters = {
             alg.P_GRID: enmap,
-            alg.P_V1: landcover_polygons,
+            alg.P_V1: landcover_polygon,
             alg.P_CODE: 'vector1 = V1@"None"\n'  # use as a 0/1 mask
                         'vector2 = V1\n'  # The same mask!
                         'vector3 = V1@"level_3_id"',
@@ -210,7 +210,7 @@ class TestRasterMathAlgorithm(TestCase):
     def test_externalVectorLayer_field(self):
         alg = RasterMathAlgorithm()
         parameters = {
-            alg.P_CODE: f"# landcover := QgsVectorLayer('{landcover_polygons}')\n"
+            alg.P_CODE: f"# landcover := QgsVectorLayer('{landcover_polygon}')\n"
                         'landcover@"level_3_id"',
             alg.P_GRID: enmap,
             alg.P_OUTPUT_RASTER: self.filename('dummy.tif')
@@ -222,7 +222,7 @@ class TestRasterMathAlgorithm(TestCase):
     def test_externalVectorLayer_mask(self):
         alg = RasterMathAlgorithm()
         parameters = {
-            alg.P_CODE: f"# landcover := QgsVectorLayer('{landcover_polygons}')\n"
+            alg.P_CODE: f"# landcover := QgsVectorLayer('{landcover_polygon}')\n"
                         'landcover',
             alg.P_GRID: enmap,
             alg.P_OUTPUT_RASTER: self.filename('dummy.tif')

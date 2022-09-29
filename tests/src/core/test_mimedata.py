@@ -26,7 +26,7 @@ from qgis.gui import QgsMapCanvas
 
 import enmapbox.gui.mimedata as mimedata
 from enmapbox import EnMAPBox, DIR_EXAMPLEDATA
-from enmapbox.exampledata import enmap, hires, library_gpkg, landcover_polygons
+from enmapbox.exampledata import enmap, hires, library_gpkg, landcover_polygon
 from enmapbox.testing import EnMAPBoxTestCase
 
 
@@ -67,7 +67,7 @@ class MimeDataTests(EnMAPBoxTestCase):
         from enmapbox.gui.datasources.datasources import DataSource
         from enmapbox.gui.datasources.manager import DataSourceFactory
 
-        dataSources = DataSourceFactory.create([enmap, hires, library_gpkg, landcover_polygons])
+        dataSources = DataSourceFactory.create([enmap, hires, library_gpkg, landcover_polygon])
         dataSourceObjectIDs = [id(ds) for ds in dataSources]
 
         md = mimedata.fromDataSourceList(dataSources)
@@ -86,7 +86,7 @@ class MimeDataTests(EnMAPBoxTestCase):
 
     def test_maplayerhandling(self):
 
-        mapLayers = [QgsRasterLayer(enmap), QgsVectorLayer(landcover_polygons)]
+        mapLayers = [QgsRasterLayer(enmap), QgsVectorLayer(landcover_polygon)]
         md = mimedata.fromLayerList(mapLayers)
 
         self.assertIsInstance(md, QMimeData)

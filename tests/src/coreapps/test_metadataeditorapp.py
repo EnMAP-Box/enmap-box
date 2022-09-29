@@ -22,7 +22,7 @@ import datetime
 import unittest
 from osgeo import gdal, ogr
 from enmapbox import initPythonPaths, EnMAPBox
-from enmapbox.exampledata import landcover_polygons, enmap
+from enmapbox.exampledata import landcover_polygon, enmap
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
 from metadataeditorapp.metadataeditor import MetadataEditorDialog
 from qgis.core import QgsRasterLayer, QgsVectorLayer, QgsProject
@@ -42,7 +42,7 @@ class MetadataEditorTests(EnMAPBoxTestCase):
 
     def setUp(self):
         self.dsR = gdal.Open(enmap)
-        self.dsV = ogr.Open(landcover_polygons)
+        self.dsV = ogr.Open(landcover_polygon)
 
         drv = gdal.GetDriverByName('MEM')
         self.dsRM = drv.CreateCopy('', self.dsR)
@@ -51,7 +51,7 @@ class MetadataEditorTests(EnMAPBoxTestCase):
         self.dsVM = drv.CopyDataSource(self.dsV, '')
 
     def createSupportedSources(self) -> list:
-        from enmapbox.exampledata import enmap, landcover_polygons
+        from enmapbox.exampledata import enmap, landcover_polygon
 
         sources = []
 
@@ -60,7 +60,7 @@ class MetadataEditorTests(EnMAPBoxTestCase):
         gdal.Translate(p1, enmap, options=to)
         sources.append(QgsRasterLayer(p1))
 
-        sources.append(QgsVectorLayer(landcover_polygons))
+        sources.append(QgsVectorLayer(landcover_polygon))
         return sources
 
     def createNotSupportedSources(self) -> list:

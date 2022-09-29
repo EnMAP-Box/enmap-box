@@ -1,13 +1,13 @@
 import numpy as np
 
-from enmapbox.exampledata import enmap, landcover_polygons
+from enmapbox.exampledata import enmap, landcover_polygon
 from enmapboxprocessing.algorithm.rasterizecategorizedvectoralgorithm import RasterizeCategorizedVectorAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import landcover_points_multipart_epsg3035
+from enmapboxtestdata import landcover_points_multipart_epsg3035, landcover_polygon_3classes_id, \
+    landcover_polygon_3classes_epsg4326
 from qgis.core import QgsRasterLayer, QgsVectorLayer, QgsPalettedRasterRenderer, QgsCategorizedSymbolRenderer
-from testdata import landcover_berlin_polygon_3classes_EPSG4326_gpkg, landcover_berlin_polygon_3classes_id_gpkg
 
 
 class TestRasterizeCategorizedVectorAlgorithm(TestCase):
@@ -16,7 +16,7 @@ class TestRasterizeCategorizedVectorAlgorithm(TestCase):
         alg = RasterizeCategorizedVectorAlgorithm()
         alg.initAlgorithm()
         parameters = {
-            alg.P_CATEGORIZED_VECTOR: landcover_berlin_polygon_3classes_id_gpkg,
+            alg.P_CATEGORIZED_VECTOR: landcover_polygon_3classes_id,
             alg.P_GRID: enmap,
             alg.P_OUTPUT_CATEGORIZED_RASTER: self.filename('landcover_polygons.tif')
         }
@@ -36,7 +36,7 @@ class TestRasterizeCategorizedVectorAlgorithm(TestCase):
         alg = RasterizeCategorizedVectorAlgorithm()
         alg.initAlgorithm()
         parameters = {
-            alg.P_CATEGORIZED_VECTOR: QgsVectorLayer(landcover_polygons),
+            alg.P_CATEGORIZED_VECTOR: QgsVectorLayer(landcover_polygon),
             alg.P_GRID: QgsRasterLayer(enmap),
             alg.P_OUTPUT_CATEGORIZED_RASTER: self.filename('landcover_polygons.tif')
         }
@@ -54,7 +54,7 @@ class TestRasterizeCategorizedVectorAlgorithm(TestCase):
         alg = RasterizeCategorizedVectorAlgorithm()
         alg.initAlgorithm()
         parameters = {
-            alg.P_CATEGORIZED_VECTOR: QgsVectorLayer(landcover_berlin_polygon_3classes_EPSG4326_gpkg),
+            alg.P_CATEGORIZED_VECTOR: QgsVectorLayer(landcover_polygon_3classes_epsg4326),
             alg.P_GRID: QgsRasterLayer(enmap),
             alg.P_OUTPUT_CATEGORIZED_RASTER: self.filename('landcover_polygons.tif')
         }
@@ -76,7 +76,7 @@ class TestRasterizeCategorizedVectorAlgorithm(TestCase):
         alg = RasterizeCategorizedVectorAlgorithm()
         alg.initAlgorithm()
         parameters = {
-            alg.P_CATEGORIZED_VECTOR: QgsVectorLayer(landcover_polygons),
+            alg.P_CATEGORIZED_VECTOR: QgsVectorLayer(landcover_polygon),
             alg.P_GRID: QgsRasterLayer(enmap),
             alg.P_COVERAGE: 100,
             alg.P_OUTPUT_CATEGORIZED_RASTER: self.filename('classification_fullcoverage.tif')
@@ -88,7 +88,7 @@ class TestRasterizeCategorizedVectorAlgorithm(TestCase):
     def test_issue1420(self):
 
         # change categories
-        vector = QgsVectorLayer(landcover_polygons)
+        vector = QgsVectorLayer(landcover_polygon)
         renderer = vector.renderer()
         assert isinstance(renderer, QgsCategorizedSymbolRenderer)
         categories = Utils.categoriesFromRenderer(vector.renderer())

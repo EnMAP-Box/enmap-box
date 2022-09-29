@@ -2,9 +2,9 @@ from enmapbox.exampledata import enmap
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousrasteralgorithm import \
     PrepareRegressionDatasetFromContinuousRasterAlgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from enmapboxprocessing.typing import RegressionDump
+from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
-from testdata import fraction_polygons_l3
+from enmapboxtestdata import fraction_polygon_l3
 
 
 class TestPrepareRegressionDatasetFromContinuousRasterAlgorithm(TestCase):
@@ -13,11 +13,11 @@ class TestPrepareRegressionDatasetFromContinuousRasterAlgorithm(TestCase):
         alg = PrepareRegressionDatasetFromContinuousRasterAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
-            alg.P_CONTINUOUS_RASTER: fraction_polygons_l3,
+            alg.P_CONTINUOUS_RASTER: fraction_polygon_l3,
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
         }
         self.runalg(alg, parameters)
-        dump = RegressionDump.fromDict(Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = RegressorDump.fromDict(Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((2559, 177), dump.X.shape)
         self.assertEqual((2559, 6), dump.y.shape)
         self.assertEqual(177, len(dump.features))

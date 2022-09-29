@@ -124,7 +124,7 @@ def test():
     calculator.inputRaster.setRaster(key='classification',
         value=ApplierInputRaster(filename=r"C:\Users\janzandr\Desktop\classification.bsq"))
     calculator.inputVector.setVector(key='landCover',
-        value=ApplierInputVector(filename=enmapboxtestdata.landcover_polygons))
+                                     value=ApplierInputVector(filename=enmapboxtestdata.landcover_polygon))
     calculator.outputRaster.setRaster(key='result', value=ApplierOutputRaster(filename=r'c:\outputs\calcResult.bsq'))
     code = \
 '''

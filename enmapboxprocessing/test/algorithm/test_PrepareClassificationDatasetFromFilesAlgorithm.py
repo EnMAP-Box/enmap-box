@@ -3,7 +3,7 @@ from enmapboxprocessing.algorithm.prepareclassificationdatasetfromfilesalgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
-from testdata import classificationSampleAsCsv
+from enmapboxtestdata import classificationDatasetAsForceFile
 
 
 class TestPrepareClassificationDatasetFromFilesAlgorithm(TestCase):
@@ -11,8 +11,8 @@ class TestPrepareClassificationDatasetFromFilesAlgorithm(TestCase):
     def test(self):
         alg = PrepareClassificationDatasetFromFilesAlgorithm()
         parameters = {
-            alg.P_FEATURE_FILE: classificationSampleAsCsv[0],
-            alg.P_VALUE_FILE: classificationSampleAsCsv[1],
+            alg.P_FEATURE_FILE: classificationDatasetAsForceFile[0],
+            alg.P_VALUE_FILE: classificationDatasetAsForceFile[1],
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
         }
         self.runalg(alg, parameters)

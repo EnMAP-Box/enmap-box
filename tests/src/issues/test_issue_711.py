@@ -66,8 +66,8 @@ class TestIssue711(EnMAPBoxTestCase):
             import enmapbox.exampledata
             sources = []
             sources += [enmapbox.exampledata.enmap,
-                        enmapbox.exampledata.landcover_polygons,
-                        enmapbox.exampledata.landcover_points,
+                        enmapbox.exampledata.landcover_polygon,
+                        enmapbox.exampledata.landcover_point,
                         enmapbox.exampledata.library_gpkg,
                         enmapbox.exampledata.library_sli,
                         enmapbox.exampledata.enmap_srf_library

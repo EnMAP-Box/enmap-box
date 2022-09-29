@@ -3,7 +3,7 @@ from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromvectorandfieldsa
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
-from testdata import classificationDatasetAsVector
+from enmapboxtestdata import classificationDatasetAsGpkgVector
 
 
 class TestPrepareUnsupervisedDatasetFromVectorAndFieldsAlgorithm(TestCase):
@@ -11,7 +11,7 @@ class TestPrepareUnsupervisedDatasetFromVectorAndFieldsAlgorithm(TestCase):
     def test(self):
         alg = PrepareUnsupervisedDatasetFromVectorAndFieldsAlgorithm()
         parameters = {
-            alg.P_VECTOR: classificationDatasetAsVector,
+            alg.P_VECTOR: classificationDatasetAsGpkgVector,
             alg.P_FEATURE_FIELDS: [f'Sample__{i + 1}' for i in range(177)],
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
         }

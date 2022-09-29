@@ -23,22 +23,6 @@ import typing
 import uuid
 from typing import Optional, List, Dict
 
-from qgis.PyQt.QtCore import Qt, QMimeData, QModelIndex, QObject, QTimer, pyqtSignal, QEvent, \
-    QSortFilterProxyModel, QCoreApplication
-from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDropEvent, QDragLeaveEvent
-from qgis.PyQt.QtWidgets import QHeaderView, QMenu, QAbstractItemView, QApplication, QWidget, QToolButton, QAction
-from qgis.PyQt.QtXml import QDomDocument, QDomElement
-from qgis.core import Qgis, QgsCoordinateReferenceSystem, QgsMapLayer, QgsVectorLayer, QgsRasterLayer, \
-    QgsProject, QgsReadWriteContext, \
-    QgsLayerTreeLayer, QgsLayerTreeNode, QgsLayerTreeGroup, \
-    QgsLayerTreeModelLegendNode, QgsLayerTree, QgsLayerTreeModel, QgsLayerTreeUtils, \
-    QgsPalettedRasterRenderer
-from qgis.core import QgsWkbTypes
-from qgis.gui import QgsLayerTreeProxyModel
-from qgis.gui import QgsLayerTreeView, \
-    QgsMapCanvas, QgsLayerTreeViewMenuProvider, QgsLayerTreeMapCanvasBridge, QgsDockWidget, QgsMessageBar
-from typeguard import typechecked
-
 from enmapbox import debugLog
 from enmapbox.gui import \
     SpectralLibrary, SpectralLibraryWidget, SpatialExtent, showLayerPropertiesDialog
@@ -56,6 +40,21 @@ from enmapbox.gui.utils import enmapboxUiPath
 from enmapbox.qgispluginsupport.qps.layerproperties import pasteStyleFromClipboard, pasteStyleToClipboard
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library, profile_field_list
 from enmapbox.qgispluginsupport.qps.utils import loadUi, findParent
+from qgis.PyQt.QtCore import Qt, QMimeData, QModelIndex, QObject, QTimer, pyqtSignal, QEvent, \
+    QSortFilterProxyModel, QCoreApplication
+from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDropEvent, QDragLeaveEvent
+from qgis.PyQt.QtWidgets import QHeaderView, QMenu, QAbstractItemView, QApplication, QWidget, QToolButton, QAction
+from qgis.PyQt.QtXml import QDomDocument, QDomElement
+from qgis.core import Qgis, QgsCoordinateReferenceSystem, QgsMapLayer, QgsVectorLayer, QgsRasterLayer, \
+    QgsProject, QgsReadWriteContext, \
+    QgsLayerTreeLayer, QgsLayerTreeNode, QgsLayerTreeGroup, \
+    QgsLayerTreeModelLegendNode, QgsLayerTree, QgsLayerTreeModel, QgsLayerTreeUtils, \
+    QgsPalettedRasterRenderer
+from qgis.core import QgsWkbTypes
+from qgis.gui import QgsLayerTreeProxyModel
+from qgis.gui import QgsLayerTreeView, \
+    QgsMapCanvas, QgsLayerTreeViewMenuProvider, QgsLayerTreeMapCanvasBridge, QgsDockWidget, QgsMessageBar
+from typeguard import typechecked
 
 
 class LayerTreeNode(QgsLayerTree):
@@ -1710,6 +1709,17 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
             action = menu.addAction(ColorSpaceExplorerApp.title())
             action.setIcon(ColorSpaceExplorerApp.icon())
             action.triggered.connect(lambda: self.onColorSpaceExplorerClicked(lyr))
+
+            from cmykcolorrasterrendererapp import CmykColorRasterRendererApp
+            action = menu.addAction(CmykColorRasterRendererApp.title())
+            action.setIcon(CmykColorRasterRendererApp.icon())
+            action.triggered.connect(lambda: self.onCmykColorRasterRendererClicked(lyr))
+
+            from hsvcolorrasterrendererapp import HsvColorRasterRendererApp
+            action = menu.addAction(HsvColorRasterRendererApp.title())
+            action.setIcon(HsvColorRasterRendererApp.icon())
+            action.triggered.connect(lambda: self.onHsvColorRasterRendererClicked(lyr))
+
         if isinstance(lyr.renderer(), QgsPalettedRasterRenderer):
             from classificationstatisticsapp import ClassificationStatisticsApp
             action = menu.addAction(ClassificationStatisticsApp.title())
@@ -1719,10 +1729,17 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         action: QAction = menu.addAction(ClassFractionStatisticsApp.title())
         action.setIcon(ClassFractionStatisticsApp.icon())
         action.triggered.connect(lambda: self.onClassFractionStatisticsClicked(lyr))
-        from decorrelationstretchapp import DecorrelationStretchApp
-        action: QAction = menu.addAction(DecorrelationStretchApp.title())
-        action.setIcon(DecorrelationStretchApp.icon())
-        action.triggered.connect(lambda: self.onDecorrelationStretchClicked(lyr))
+        if lyr.bandCount() >= 3:
+            from decorrelationstretchapp import DecorrelationStretchApp
+            action: QAction = menu.addAction(DecorrelationStretchApp.title())
+            action.setIcon(DecorrelationStretchApp.icon())
+            action.triggered.connect(lambda: self.onDecorrelationStretchClicked(lyr))
+        if lyr.bandCount() >= 2:
+            from bivariatecolorrasterrendererapp import BivariateColorRasterRendererApp
+            action: QAction = menu.addAction(BivariateColorRasterRendererApp.title())
+            action.setIcon(BivariateColorRasterRendererApp.icon())
+            action.triggered.connect(lambda: self.onBivariateColorRasterRendererClicked(lyr))
+
         # add apply model shortcuts
         from enmapbox import EnMAPBox
         enmapBox = EnMAPBox.instance()
@@ -1919,6 +1936,27 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         self.decorrelationStretchDialog = DecorrelationStretchDialog(parent=self.mDockTreeView)
         self.decorrelationStretchDialog.show()
         self.decorrelationStretchDialog.mLayer.setLayer(layer)
+
+    @typechecked
+    def onBivariateColorRasterRendererClicked(self, layer: QgsRasterLayer):
+        from bivariatecolorrasterrendererapp import BivariateColorRasterRendererDialog
+        self.bivariateColorRasterRendererDialog = BivariateColorRasterRendererDialog(parent=self.mDockTreeView)
+        self.bivariateColorRasterRendererDialog.show()
+        self.bivariateColorRasterRendererDialog.mLayer.setLayer(layer)
+
+    @typechecked
+    def onCmykColorRasterRendererClicked(self, layer: QgsRasterLayer):
+        from cmykcolorrasterrendererapp import CmykColorRasterRendererDialog
+        self.cmykColorRasterRendererDialog = CmykColorRasterRendererDialog(parent=self.mDockTreeView)
+        self.cmykColorRasterRendererDialog.show()
+        self.cmykColorRasterRendererDialog.mLayer.setLayer(layer)
+
+    @typechecked
+    def onHsvColorRasterRendererClicked(self, layer: QgsRasterLayer):
+        from hsvcolorrasterrendererapp import HsvColorRasterRendererDialog
+        self.hsvColorRasterRendererDialog = HsvColorRasterRendererDialog(parent=self.mDockTreeView)
+        self.hsvColorRasterRendererDialog.show()
+        self.hsvColorRasterRendererDialog.mLayer.setLayer(layer)
 
     @typechecked
     def onCopyLayerToQgisClicked(self, layer: QgsMapLayer):

@@ -1,57 +1,83 @@
 from os.path import dirname, join
 
+from enmapbox import exampledata
+
 root = join(dirname(dirname(__file__)), 'testdata')
 
-# raster
-enmap_uncompressed = join(root, 'enmap_uncompressed.tif')
-landcover_raster_1m = join(root, 'landcover_raster_1m.tif')
-landcover_raster_30m = join(root, 'landcover_raster_30m.tif')
-landcover_raster_1m_epsg3035 = join(root, 'landcover_raster_1m_EPSG3035.tif')
-landcover_raster_30m_epsg3035 = join(root, 'landcover_raster_30m_EPSG3035.tif')
-landcover_raster_1m_3classes = join(root, 'landcover_raster_1m_3classes.tif')
-landcover_map_l2 = join(root, 'landcover_map_l2.tif')
-landcover_map_l3 = join(root, 'landcover_map_l3.tif')
-fraction_polygons_l3 = join(root, 'raster', 'fraction_polygons_l3.tif')
-fraction_map_l3 = join(root, 'fraction_map_l3.tif')
-water_mask_30m = join(root, 'water_mask_30m.tif')
-grid_300m = join(root, 'grid_300m.vrt')
+# RASTER
+_subdir = 'raster'
 
-# vector
-landcover_polygons_3classes = join(root, 'landcover_berlin_polygon_3classes.gpkg')
-landcover_polygons_3classes_id = join(root, 'landcover_berlin_polygon_3classes_id.gpkg')
-landcover_polygons_3classes_epsg4326 = join(root, 'landcover_berlin_polygon_3classes_EPSG4326.gpkg')
-landcover_points_singlepart_epsg3035 = join(root, 'landcover_berlin_point_singlepart_3035.gpkg')
-landcover_points_multipart_epsg3035 = join(root, 'landcover_berlin_point_multipart_3035.gpkg')
-fraction_points = join(root, 'fraction_points.gpkg')
-fraction_points_singletarget = join(root, 'fraction_points_singletarget.gpkg')
+# - spectral raster
+enmap = exampledata.enmap
+hires = exampledata.hires
 
-points_in_no_data_region = join(root, 'points_in_no_data_region.gpkg')
+# - rasterized landcover polygons
+landcover_polygon_1m = join(root, _subdir, 'landcover_polygon_1m.tif')
+landcover_polygon_1m_3classes = join(root, _subdir, 'landcover_polygon_1m_3classes.tif')
+landcover_polygon_1m_epsg3035 = join(root, _subdir, 'landcover_polygon_1m_EPSG3035.tif')
+landcover_polygon_30m = join(root, _subdir, 'landcover_polygon_30m.tif')
+landcover_polygon_30m_epsg3035 = join(root, _subdir, 'landcover_polygon_30m_EPSG3035.tif')
 
-# library
-library = join(root, 'library.gpkg')
+# - landcover maps (predicted by RF)
+landcover_map_l2 = join(root, _subdir, 'landcover_map_l2.tif')
+landcover_map_l3 = join(root, _subdir, 'landcover_map_l3.tif')
 
-# dataset (X, y)
-classificationDatasetAsGpkgVector = join(root, 'classification_dataset.gpkg')
-classificationDatasetAsCsvVector = join(root, 'classification_dataset.csv')
-classificationDatasetAsJsonFile = join(root, 'classifier.pkl.json')
-classificationDatasetAsPklFile = join(root, 'classification_dataset.pkl')
-classificationDatasetAsForceFile = (join(root, 'force_features.csv'), join(root, 'force_labels.csv'))
+# - rasterized landcover polygon fractions
+fraction_polygon_l3 = join(root, _subdir, 'raster', 'fraction_polygon_l3.tif')
 
+# - landcover fraction maps (predicted by RF)
+fraction_map_l3 = join(root, _subdir, 'fraction_map_l3.tif')
 
-# todo: regressionDatasetAsVector = join(root, 'classification_dataset.gpkg')
-# todo: regressionDatasetAsCsv = join(root, 'classification_dataset.csv')
-regressionDatasetAsJsonFile = join(root, 'regressor.pkl.json')
-regressionDatasetAsPkl = join(root, 'regression_dataset.pkl')
+# - binary water mask (derived from landcover map)
+water_mask_30m = join(root, _subdir, 'water_mask_30m.tif')
 
-# learner and dataset (X, y) as dump
-classifierDumpPkl = join(root, 'classifier.pkl')
-classifierDumpJson = join(root, 'classifier.pkl.json')
-regressorDumpPkl = join(root, 'regressor.pkl')
-regressorDumpSingleTargetPkl = join(root, 'regressor_singletarget.pkl')
-regressorDumpMultiTargetPkl = join(root, 'regressor_multitarget.pkl')  #
+# - 300m grid (same extent as 30m rasters)
+enmap_grid_300m = join(root, _subdir, 'enmap_grid_300m.vrt')
 
-# todo: regressorDumpJson = join(root, 'classifier.pkl.json')
+# VECTOR
+_subdir = 'vector'
 
+# - landcover polygons
+landcover_polygon = exampledata.landcover_polygon
+landcover_polygon_3classes = join(root, _subdir, 'landcover_polygon_3classes.gpkg')
+landcover_polygon_3classes_id = join(root, _subdir, 'landcover_polygon_3classes_id.gpkg')
+landcover_polygon_3classes_epsg4326 = join(root, _subdir, 'landcover_polygon_3classes_EPSG4326.gpkg')
 
-# spectral response functions
-landsat8_sectralResponseFunctionLibrary = join(root, 'landsat8_srf.gpkg')
+# - landcover points
+landcover_point = exampledata.landcover_point
+landcover_points_singlepart_epsg3035 = join(root, _subdir, 'landcover_point_singlepart_3035.gpkg')
+landcover_points_multipart_epsg3035 = join(root, _subdir, 'landcover_point_multipart_3035.gpkg')
+
+# - landcover fraction points
+fraction_point_multitarget = join(root, _subdir, 'fraction_point_multitarget.gpkg')
+fraction_point_singletarget = join(root, _subdir, 'fraction_point_singletarget.gpkg')
+
+points_in_no_data_region = join(root, _subdir, 'points_in_no_data_region.gpkg')
+
+# LIBRARY
+_subdir = 'library'
+library = join(root, _subdir, 'library.gpkg')
+landsat8_srf = join(root, _subdir, 'landsat8_srf.gpkg')
+
+# DATASET
+_subdir = 'ml'
+
+# - Classifier
+classifierDumpPkl = join(root, _subdir, 'classifier.pkl')
+
+# - Classification dataset
+classificationDatasetAsGpkgVector = join(root, _subdir, 'classification_dataset.gpkg')
+classificationDatasetAsCsvVector = join(root, _subdir, 'classification_dataset.csv')
+classificationDatasetAsJsonFile = join(root, _subdir, 'classification_dataset.json')
+classificationDatasetAsPklFile = join(root, _subdir, 'classification_dataset.pkl')
+classificationDatasetAsForceFile = (
+join(root, _subdir, 'force_classification_features.csv'), join(root, _subdir, 'force_classification_labels.csv'))
+
+# - Regressor
+regressorDumpPkl = join(root, _subdir, 'regressor.pkl')
+regressorDumpSingleTargetPkl = join(root, _subdir, 'regressor_singletarget.pkl')
+regressorDumpMultiTargetPkl = join(root, _subdir, 'regressor_multitarget.pkl')
+
+# - Regression dataset
+regressionDatasetAsJsonFile = join(root, _subdir, 'regression_dataset.json')
+regressionDatasetAsPkl = join(root, _subdir, 'regression_dataset.pkl')

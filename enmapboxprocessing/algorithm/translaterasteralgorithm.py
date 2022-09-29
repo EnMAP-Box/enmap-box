@@ -312,6 +312,9 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                 )
                 assert outGdalDataset is not None
 
+            del outGdalDataset  # close and reopen to write metadata to aux.xml
+            outGdalDataset = gdal.Open(filename)
+
             writer = RasterWriter(outGdalDataset)
             reader = RasterReader(raster)
             if bandList is None:
@@ -333,6 +336,11 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                     writer.setFwhm(fwhm, dstBandNo)
                     badBandMultiplier = reader.badBandMultiplier(srcBandNo)
                     writer.setBadBandMultiplier(badBandMultiplier, dstBandNo)
+            else:
+                pass
+                #writer.removeMetadata()
+                #for bandNo in writer.bandNumbers():
+                #    writer.removeMetadata(bandNo)
 
             # clean up ENVI metadata domain (see #1098)
             metadata = reader.metadataDomain('ENVI')
@@ -356,8 +364,9 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                 outraster.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
                 del outraster
 
-            writer.setOffset(offset)
-            writer.setScale(scale)
+            for bandNo in writer.bandNumbers():
+                writer.setOffset(offset, bandNo)
+                writer.setScale(scale, bandNo)
 
             driverShortName = writer.gdalDataset.GetDriver().ShortName
             del writer, outGdalDataset

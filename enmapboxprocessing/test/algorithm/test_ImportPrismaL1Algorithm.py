@@ -8,9 +8,6 @@ from enmapboxprocessing.test.algorithm.testcase import TestCase
 class TestImportPrismaL1Algorithm(TestCase):
 
     def test(self):
-        if not self.additionalDataFolderExists():
-            return
-
         alg = ImportPrismaL1Algorithm()
         parameters = {
             alg.P_FILE: r'D:\data\sensors\prisma\PRS_L1_STD_OFFL_20201107101404_20201107101408_0001.he5',
@@ -24,6 +21,8 @@ class TestImportPrismaL1Algorithm(TestCase):
             alg.P_OUTPUT_PAN_GEOLOCATION: self.filename('prismaL1_PAN_GEOLOCATION.vrt'),
             alg.P_OUTPUT_PAN_ERROR: self.filename('prismaL1_PAN_ERROR.vrt'),
         }
+        if not self.fileExists(parameters[alg.P_FILE]):
+            return
 
         result = self.runalg(alg, parameters)
 

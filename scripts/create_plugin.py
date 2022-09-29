@@ -20,7 +20,6 @@
 """
 import argparse
 import configparser
-import datetime
 import fnmatch
 import io
 import os
@@ -32,19 +31,28 @@ import sys
 import textwrap
 import typing
 import warnings
+from os.path import exists
 
 from qgis.core import QgsUserProfileManager, QgsUserProfile
 
 site.addsitedir(pathlib.Path(__file__).parents[1])  # noqa
 
 from qgis.testing import start_app
+
 app = start_app()
 import enmapbox
 from enmapbox import DIR_REPO
 from enmapbox.qgispluginsupport.qps.make.deploy import QGISMetadataFileWriter, userProfileManager
 from enmapbox.qgispluginsupport.qps.utils import zipdir
 from qgis.core import QgsFileUtils
-import git
+
+# concider default Git location on Windows systems to avaid creating a Start-Up Script
+addDefaultGitLocation = True
+if addDefaultGitLocation:
+    potentialGitPath = r"C:\Program Files\Git\bin"
+    if exists(potentialGitPath):
+        os.environ["PATH"] = os.environ["PATH"] + os.pathsep + potentialGitPath
+    import git
 
 DIR_REPO = pathlib.Path(DIR_REPO)
 
@@ -111,7 +119,7 @@ def create_enmapbox_plugin(include_testdata: bool = False,
             profileName = copy_to_profile
         else:
             profileName = profileManager.defaultProfileName()
-        assert profileManager.profileExists(profileName),  \
+        assert profileManager.profileExists(profileName), \
             f'QGIS profiles "{profileName}" does not exist in {profileManager.allProfiles()}'
 
         profileManager.setActiveUserProfile(profileName)
@@ -374,13 +382,13 @@ if __name__ == "__main__":
                         default=None,
                         help=textwrap.dedent("""
                             The build name in "enmapboxplugin.<build name>.zip"
-                            Defaults: 
+                            Defaults:
                                 <version> in case of a release.* branch
                                 <version>.<timestamp>.<branch name> in case of any other branch.
                             Can be specified by:
                             -b mytestversion -> enmapboxplugin.mytestversion.zip
                             """
-                        ))
+                                             ))
     parser.add_argument('-p', '--profile',
                         nargs='?',
                         const=True,
