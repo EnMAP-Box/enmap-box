@@ -46,7 +46,7 @@ from enmapbox.qgispluginsupport.qps.make.deploy import QGISMetadataFileWriter, u
 from enmapbox.qgispluginsupport.qps.utils import zipdir
 from qgis.core import QgsFileUtils
 
-# concider default Git location on Windows systems to avaid creating a Start-Up Script
+# consider default Git location on Windows systems to avoid creating a Start-Up Script
 addDefaultGitLocation = True
 if addDefaultGitLocation:
     potentialGitPath = r"C:\Program Files\Git\bin"
