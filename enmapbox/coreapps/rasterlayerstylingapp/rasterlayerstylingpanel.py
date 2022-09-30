@@ -72,6 +72,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
         self.enmapBox = enmapBox
         self.originalRenderer: Optional[QgsRasterRenderer] = None
         self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mLayer.setExcludedProviders(['wms'])
         self.cache = dict()
 
         self.visibilityChanged.connect(self.onPanelVisibilityChanged)
