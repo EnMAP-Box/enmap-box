@@ -55,7 +55,6 @@ class EnhancedMultiBandColorRenderer(QgsRasterRenderer):
             bSum = np.zeros((height, width), dtype=np.float32)
 
             for bandNo, (color, (vmin, vmax)) in enumerate(zip(self.colors, self.minMaxValues), 1):
-                print(vmin, vmax, 'ORIG')
                 if color.alpha() == 0:
                     continue
                 usedBandCount += 1
@@ -68,8 +67,6 @@ class EnhancedMultiBandColorRenderer(QgsRasterRenderer):
                 array -= vmin
                 array /= (vmax - vmin)
                 np.clip(array, 0, 1, out=array)
-
-                # print(color.redF(), color.greenF(), color.blueF())
 
                 r += color.red() * array
                 g += color.green() * array
@@ -103,7 +100,6 @@ class EnhancedMultiBandColorRenderer(QgsRasterRenderer):
                     # vmin, vmax = np.percentile(r, [2, 98])
                     r -= vmin
                     r /= (vmax - vmin) / 255
-                    print(vmin, vmax, r.min(), r.max())
                     # vmin, vmax = np.percentile(g, [2, 98])
                     g -= vmin
                     g /= (vmax - vmin) / 255

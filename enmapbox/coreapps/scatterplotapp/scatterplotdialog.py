@@ -1,11 +1,10 @@
 import warnings
-from math import ceil, sqrt
+from math import ceil, sqrt, floor
 from os.path import join, exists
 from random import getrandbits
 from typing import Optional, Tuple, Dict
 
 import numpy as np
-from qgis.PyQt.uic import loadUi
 from osgeo import gdal
 from scipy.stats import binned_statistic_2d, pearsonr
 
@@ -20,6 +19,7 @@ from processing import AlgorithmDialog
 from qgis.PyQt.QtCore import QRectF, QPointF, Qt
 from qgis.PyQt.QtGui import QMouseEvent, QColor
 from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QComboBox, QCheckBox, QDoubleSpinBox, QPlainTextEdit, QSpinBox
+from qgis.PyQt.uic import loadUi
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsMapSettings, QgsStyle, QgsColorRamp, \
     QgsFieldProxyModel, QgsMapLayer
 from qgis.gui import QgsMapLayerComboBox, QgsMapCanvas, QgsRasterBandComboBox, QgsColorButton, QgsColorRampButton, \
@@ -369,8 +369,9 @@ class ScatterPlotDialog(QMainWindow):
             x, y = y, x
 
         # calculate 2d histogram
-        bins = self.mScatterPlot.size()
-        bins = bins.width(), bins.height()
+        bins = self.mScatterPlot.getPlotItem().getViewBox().size()
+        bins = floor(bins.width() * 0.9), floor(
+            bins.height() * 0.9)  # used slightly coarser binning to avoid rendering artefacts (see issue #1407)
 
         if x.size == 0:
             self.mScatterPlot.clear()
@@ -414,6 +415,9 @@ class ScatterPlotDialog(QMainWindow):
         counts = np.round((counts - lower) * (254 / span))
         counts = np.clip(counts, 0, 254).astype(np.uint8) + 1
         counts[background] = 0
+
+        counts = counts.astype(float)
+        counts[background] = np.nan
 
         # update plot
         self.mScatterPlot.clear()

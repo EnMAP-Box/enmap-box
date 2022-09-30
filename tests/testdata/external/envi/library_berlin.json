@@ -1,0 +1,38 @@
+{
+  "level_1": {
+    "categories":  [
+      [0, "unclassified", [0, 0, 0]],
+      [1, "impervious", [230, 0, 0]],
+      [2, "vegetation", [56, 168, 0]],
+      [3, "soil", [168, 112, 0]],
+      [4, "water", [0,100,255]]
+    ],
+    "no data value": 0,
+    "description": "Classification"
+  },
+  "level_2": {
+    "categories":  [
+      [0, "unclassified", [0, 0, 0]],
+      [1, "impervious", [230, 0, 0]],
+      [2, "low vegetation", [152, 230, 0]],
+      [3, "tree", [38, 115, 0]],
+      [4, "soil", [168, 112, 0]],
+      [5, "water", [0,100,255]]
+    ],
+    "no data value": 0,
+    "description": "Classification"
+  },
+  "level_3": {
+    "categories":  [
+      [0, "unclassified", [0, 0, 0]],
+      [1, "roof", [230, 0, 0]],
+      [2, "pavement", [156, 156, 156]],
+      [3, "low vegetation", [152, 230, 0]],
+      [4, "tree", [38, 115, 0]],
+      [5, "soil", [168, 112, 0]],
+      [6, "water", [0,100,255]]
+    ],
+    "no data value": 0,
+    "description": "Classification"
+  }
+}

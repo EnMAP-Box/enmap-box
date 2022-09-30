@@ -15,22 +15,26 @@
 *                                                                         *
 ***************************************************************************
 """
-# noinspection PyPep8Naming
-import pathlib
-import unittest
 import os
-from qgis.core import QgsProject
+# noinspection PyPep8Naming
+import unittest
 
 from enmapbox import EnMAPBox
-from enmapbox.gui.settings import SettingsDialog
+from enmapbox.settings import enmapboxSettings, EnMAPBoxSettings
 from enmapbox.testing import EnMAPBoxTestCase
+from qgis.PyQt.QtGui import QColor
+from qgis.core import QgsProject
 
 
 class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
 
     def test_loadSettings(self):
-        pass
-        self.showGui()
+        s1 = enmapboxSettings()
+        s2 = EnMAPBoxSettings()
+        self.assertIsInstance(s1, EnMAPBoxSettings)
+        self.assertIsInstance(s2, EnMAPBoxSettings)
+        self.assertIsInstance(s2.value(EnMAPBoxSettings.MAP_BACKGROUND), QColor)
+        print(s1)
 
     def setUp(self):
         emb = EnMAPBox.instance()
@@ -48,7 +52,7 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
 
         proj = QgsProject.instance()
         self.assertIsInstance(proj, QgsProject)
-        tmp_path = pathlib.Path(__file__).parents[1] / 'tmp' / 'project.qgs'
+        tmp_path = self.tempDir() / 'project.qgs'
         os.makedirs(tmp_path.parent, exist_ok=True)
 
         box.saveProject(tmp_path)
@@ -63,12 +67,6 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
         if False:
             self.assertEqual(dataSources, box.dataSources())
             self.assertEqual(n_maps, len(box.mapCanvases()))
-
-    def test_SettingsDialog(self):
-
-        d = SettingsDialog()
-        self.assertIsInstance(d, SettingsDialog)
-        self.showGui(d)
 
 
 if __name__ == '__main__':

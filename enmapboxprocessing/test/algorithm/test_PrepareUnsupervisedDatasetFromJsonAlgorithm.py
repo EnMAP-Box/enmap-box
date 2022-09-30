@@ -19,3 +19,15 @@ class TestPrepareUnsupervisedDatasetFromJsonAlgorithm(TestCase):
         self.assertEqual((51, 177), dump.X.shape)
         self.assertEqual(177, len(dump.features))
         self.assertIsNone(dump.transformer)
+
+    def test_saveAsJson(self):
+        alg = PrepareUnsupervisedDatasetFromJsonAlgorithm()
+        parameters = {
+            alg.P_JSON_FILE: regressionDatasetAsJsonFile,
+            alg.P_OUTPUT_DATASET: self.filename('sample.json')
+        }
+        self.runalg(alg, parameters)
+        dump = TransformerDump.fromFile(parameters[alg.P_OUTPUT_DATASET])
+        self.assertEqual((51, 177), dump.X.shape)
+        self.assertEqual(177, len(dump.features))
+        self.assertIsNone(dump.transformer)

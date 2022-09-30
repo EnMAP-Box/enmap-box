@@ -4,6 +4,7 @@ from typing import Optional
 from osgeo import gdal
 
 from enmapbox import EnMAPBox
+from enmapbox.gui.dataviews.dockmanager import DockPanelUI
 from enmapbox.gui.mapcanvas import MapCanvas
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from enmapbox.utils import BlockSignals
@@ -116,7 +117,14 @@ class RasterLayerStylingPanel(QgsDockWidget):
         self.mAddLink.clicked.connect(self.onAddLinkClicked)
         self.mRemoveLink.clicked.connect(self.onRemoveLinkClicked)
 
+        self.openedStateChanged.connect(self.onOpenStateChanged)
+
+        # init GUI
         self.mRenderer.setCurrentIndex(self.DefaultRendererTab)
+
+    def onOpenStateChanged(self, wasOpened: bool):
+        panel: DockPanelUI = self.enmapBox.ui.dockPanel
+        panel.mRasterLayerStyling.setChecked(wasOpened)
 
     def onRemoveLinkClicked(self):
         rows = [index.row() for index in self.mLinkedLayers.selectionModel().selectedRows()]
@@ -253,8 +261,21 @@ class RasterLayerStylingPanel(QgsDockWidget):
             self.disableGui()
             return
 
+        try:
+            layer.rendererChanged.disconnect(self.onLayerRendererChanged)
+        except Exception:
+            pass
+        layer.rendererChanged.connect(self.onLayerRendererChanged)
+
         self.originalRenderer = layer.renderer().clone()
 
+        self.updateRendererTab(layer)
+        self.onRendererTabChanged()
+
+        self.enableGui()
+        self.updateGui()
+
+    def updateRendererTab(self, layer):
         with BlockSignals(self.mRenderer):
             renderer = layer.renderer()
 
@@ -266,11 +287,6 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 self.mRenderer.setCurrentIndex(2)
             else:
                 self.mRenderer.setCurrentIndex(3)
-
-        self.onRendererTabChanged()
-
-        self.enableGui()
-        self.updateGui()
 
     def onRendererTabChanged(self):
         layer: QgsRasterLayer = self.mLayer.currentLayer()
@@ -344,7 +360,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
         else:
             raise ValueError()
 
-        # update is bad band
+        # update bad band
         for mBand in [self.mRedBand, self.mGreenBand, self.mBlueBand, self.mGrayBand, self.mPseudoBand]:
             self.updateIsBadBand(mBand)
 
@@ -442,6 +458,31 @@ class RasterLayerStylingPanel(QgsDockWidget):
         # reconnect sources
         for aLayer in layers:
             Utils.setLayerDataSource(aLayer, 'gdal', source)
+
+    def onLayerRendererChanged(self):
+        # the renderer of the layer may be changed from outside, so we need to update the settings
+
+        if self.isHidden():  # do nothing if panel is hidden
+            return
+
+        layer: QgsRasterLayer = self.mLayer.currentLayer()
+        if layer is not self.sender():
+            return
+
+        renderer = layer.renderer()
+        if isinstance(renderer, QgsMultiBandColorRenderer):
+            with BlockSignals(self.mRedBand, self.mGreenBand, self.mBlueBand):
+                self.mRedBand.mBandNo.setBand(renderer.redBand())
+                self.mGreenBand.mBandNo.setBand(renderer.greenBand())
+                self.mBlueBand.mBandNo.setBand(renderer.blueBand())
+        elif isinstance(renderer, QgsSingleBandGrayRenderer):
+            with BlockSignals(self.mGrayBand):
+                self.mGrayBand.mBandNo.setBand(renderer.grayBand())
+        elif isinstance(renderer, QgsSingleBandPseudoColorRenderer):
+            with BlockSignals(self.mPseudoBand.mBandNo):
+                self.mPseudoBand.mBandNo.setBand(renderer.band())
+        else:
+            pass
 
     def updateWavelengthInfo(self, mBand: RasterLayerStylingBandWidget):
         layer: QgsRasterLayer = self.mLayer.currentLayer()

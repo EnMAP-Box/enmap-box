@@ -15,7 +15,7 @@ import pathlib
 import unittest
 
 from enmapbox import EnMAPBox
-from enmapbox.exampledata import enmap, hires, landcover_polygons, library_gpkg
+from enmapbox.exampledata import enmap, hires, landcover_polygon, library_gpkg
 from enmapbox.gui.dataviews.dockmanager import MapDockTreeNode, MapCanvasBridge
 from enmapbox.gui.dataviews.docks import MapDock
 from enmapbox.gui.mapcanvas import CanvasLink, MapCanvas, KEY_LAST_CLICKED, LINK_ON_CENTER
@@ -158,8 +158,8 @@ class MapCanvasTests(EnMAPBoxTestCase):
         node = MapDockTreeNode(mapDock)
         bridge = MapCanvasBridge(node, mapDock.mapCanvas())
         mapCanvas = mapDock.mapCanvas()
-        allFiles = [enmap, hires, landcover_polygons, library_gpkg]
-        spatialFiles = [enmap, hires, landcover_polygons]
+        allFiles = [enmap, hires, landcover_polygon, library_gpkg]
+        spatialFiles = [enmap, hires, landcover_polygon]
 
         md = QMimeData()
         md.setUrls([QUrl.fromLocalFile(f) for f in allFiles])

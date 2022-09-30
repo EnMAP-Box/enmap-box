@@ -146,10 +146,14 @@ class EnhancedMultiBandColorDialog(QMainWindow):
             raise ValueError()
 
     def onSelectAllClicked(self):
-        assert 0
+        for row in range(self.mTable.rowCount()):
+            w: QCheckBox = self.mTable.cellWidget(row, 0)
+            w.setChecked(True)
 
     def onClearSelectionClicked(self):
-        assert 0
+        for row in range(self.mTable.rowCount()):
+            w: QCheckBox = self.mTable.cellWidget(row, 0)
+            w.setChecked(False)
 
     def currentItemValues(self):
         for row in range(self.mTable.rowCount()):

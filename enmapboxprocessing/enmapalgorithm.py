@@ -13,7 +13,7 @@ from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.glossary import injectGlossaryLinks
 from enmapboxprocessing.parameter.processingparameterrasterdestination import ProcessingParameterRasterDestination
 from enmapboxprocessing.processingfeedback import ProcessingFeedback
-from enmapboxprocessing.typing import QgisDataType, CreationOptions, GdalResamplingAlgorithm, ClassifierDump, \
+from enmapboxprocessing.typing import CreationOptions, GdalResamplingAlgorithm, ClassifierDump, \
     TransformerDump, RegressorDump, ClustererDump
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtGui import QIcon
@@ -43,17 +43,19 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     MaxResampleAlg = range(12)
     O_DATA_TYPE = 'Byte Int16 UInt16 UInt32 Int32 Float32 Float64'.split()
     Byte, Int16, UInt16, Int32, UInt32, Float32, Float64 = range(len(O_DATA_TYPE))
-    PickleFileFilter = 'Pickle (*.pkl)'
+    PickleFileFilter = 'Pickle files (*.pkl)'
     PickleFileExtension = 'pkl'
-    PickleFileDestination = 'Destination pickle file.'
-    JsonFileFilter = 'JSON (*.json)'
+    PickleFileDestination = 'Pickle file destination.'
+    JsonFileFilter = 'JSON files (*.json)'
     JsonFileExtension = 'json'
-    JsonFileDestination = 'Destination JSON file.'
+    JsonFileDestination = 'JSON file destination .'
+    DatasetFileFilter = PickleFileFilter + ';;' + JsonFileFilter
+    DatasetFileDestination = 'Dataset file destination .'
     RasterFileDestination = 'Raster file destination.'
     VectorFileDestination = 'Vector file destination.'
     TableFileDestination = 'Table file destination.'
-    ReportFileFilter = 'HTML (*.html)'
-    ReportFileDestination = 'Output report file destination.'
+    ReportFileFilter = 'HTML files (*.html)'
+    ReportFileDestination = 'Report file destination.'
     ReportOpen = 'Whether to open the output report in the web browser.'
     FolderDestination = 'Folder destination.'
     VrtFormat = Driver.VrtFormat
@@ -450,8 +452,8 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         return super().parameterAsExtent(parameters, name, context, crs)
 
     def parameterAsQgsDataType(
-            self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext, default: QgisDataType = None
-    ) -> Optional[QgisDataType]:
+            self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext, default: Qgis.DataType = None
+    ) -> Optional[Qgis.DataType]:
         if self.parameterIsNone(parameters, name):
             return default
         else:
@@ -607,8 +609,9 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         from enmapboxprocessing.parameter.processingparameterpicklefileclassificationdatasetwidget import \
             ProcessingParameterPickleFileClassificationDatasetWidgetWrapper
         behavior = QgsProcessingParameterFile.Behavior.File
-        extension = self.PickleFileExtension
-        param = QgsProcessingParameterFile(name, description, behavior, extension, defaultValue, optional)
+        extension = ''
+        fileFilter = 'Pickle files (*.pkl);;JSON files (*.json)'
+        param = QgsProcessingParameterFile(name, description, behavior, extension, defaultValue, optional, fileFilter)
 
         # fix issue # #1366
         if not bool(self.flags() & self.Flag.FlagHideFromToolbox):
@@ -636,8 +639,9 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         from enmapboxprocessing.parameter.processingparameterpicklefileregressiondatasetwidget import \
             ProcessingParameterPickleFileRegressionDatasetWidgetWrapper
         behavior = QgsProcessingParameterFile.Behavior.File
-        extension = self.PickleFileExtension
-        param = QgsProcessingParameterFile(name, description, behavior, extension, defaultValue, optional)
+        extension = ''
+        fileFilter = 'Pickle files (*.pkl);;JSON files (*.json)'
+        param = QgsProcessingParameterFile(name, description, behavior, extension, defaultValue, optional, fileFilter)
         param.setMetadata({'widget_wrapper': {'class': ProcessingParameterPickleFileRegressionDatasetWidgetWrapper}})
         param.setDefaultValue(defaultValue)
         self.addParameter(param)
@@ -660,8 +664,9 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         from enmapboxprocessing.parameter.processingparameterpicklefileunsuperviseddatasetwidget import \
             ProcessingParameterPickleFileUnsupervisedDatasetWidgetWrapper
         behavior = QgsProcessingParameterFile.Behavior.File
-        extension = self.PickleFileExtension
-        param = QgsProcessingParameterFile(name, description, behavior, extension, defaultValue, optional)
+        extension = ''
+        fileFilter = 'Pickle files (*.pkl);;JSON files (*.json)'
+        param = QgsProcessingParameterFile(name, description, behavior, extension, defaultValue, optional, fileFilter)
         param.setMetadata({'widget_wrapper': {'class': ProcessingParameterPickleFileUnsupervisedDatasetWidgetWrapper}})
         param.setDefaultValue(defaultValue)
         self.addParameter(param)

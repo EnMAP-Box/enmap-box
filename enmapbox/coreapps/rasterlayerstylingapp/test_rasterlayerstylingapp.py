@@ -11,7 +11,7 @@ from qgis.core import QgsRasterLayer
 from rasterlayerstylingapp import RasterLayerStylingApp
 
 
-class TestExtentWalker(TestCase):
+class TestRasterLayerStyling(TestCase):
 
     def test_editBadBandMultiplier(self):
         # create a dummy raster

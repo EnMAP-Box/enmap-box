@@ -1,10 +1,8 @@
-import unittest
-import warnings
-from os.path import dirname, join, exists
 from typing import Dict
 
 from enmapbox.testing import start_app
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
+from enmapboxprocessing.test.testcase import TestCase as TestCase_
 from processing.core.Processing import Processing
 from qgis.core import QgsProcessingFeedback
 
@@ -18,7 +16,7 @@ class ProcessingFeedback(QgsProcessingFeedback):
             print('\r', end='')
 
 
-class TestCase(unittest.TestCase):
+class TestCase(TestCase_):
     openReport = True
 
     @staticmethod
@@ -30,14 +28,3 @@ class TestCase(unittest.TestCase):
                   '({} -> {}), {}, {}'.format(alg.group(), alg.displayName(), alg.groupId(), alg.name()))
             print('parameters = {}'.format(repr(parameters)))
         return Processing.runAlgorithm(alg, parameters=parameters, feedback=ProcessingFeedback())
-
-    def filename(self, basename: str):
-        import enmapbox
-        return join(dirname(dirname(enmapbox.__file__)), 'test-outputs', basename)
-
-    def fileExists(self, filename):
-        if exists(filename):
-            return True
-        else:
-            warnings.warn(f'Skipping test using local file: {filename}')
-            return False

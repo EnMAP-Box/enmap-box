@@ -6,97 +6,155 @@ from enmapbox.exampledata import enmap, hires
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from qgis.core import QgsRasterLayer, QgsRasterRenderer, Qgis
-from testdata import landcover_raster_30m_epsg3035, water_mask_30m, grid_300m
+from enmapboxprocessing.utils import Utils
+from enmapboxtestdata import water_mask_30m, enmap_grid_300m
+from qgis.core import QgsRectangle, QgsCoordinateReferenceSystem, QgsRasterLayer, QgsRasterRenderer, Qgis
 
 
 class TestTranslateAlgorithm(TestCase):
 
-    def test_temp(self):
-        alg = TranslateRasterAlgorithm()
-        parameters = {
-            alg.P_RASTER: QgsRasterLayer(enmap),
-            alg.P_OUTPUT_RASTER: 'TEMPORARY_OUTPUT'
-        }
-        result = self.runalg(alg, parameters)
-        gold = RasterReader(enmap).array()
-        lead = RasterReader(result[alg.P_OUTPUT_RASTER]).array()
-        self.assertEqual(gold[0].dtype, lead[0].dtype)
-        self.assertEqual(np.sum(gold), np.sum(lead))
-
-    def test_relpath(self):
-        alg = TranslateRasterAlgorithm()
-        parameters = {
-            alg.P_RASTER: QgsRasterLayer(enmap),
-            alg.P_OUTPUT_RASTER: 'test.tif'
-        }
-        result = self.runalg(alg, parameters)
-        gold = RasterReader(enmap).array()
-        lead = RasterReader(result[alg.P_OUTPUT_RASTER]).array()
-        self.assertEqual(gold[0].dtype, lead[0].dtype)
-        self.assertEqual(np.sum(gold), np.sum(lead))
-
     def test_default(self):
-        alg = TranslateRasterAlgorithm()
-        parameters = {
-            alg.P_RASTER: QgsRasterLayer(enmap),
-            alg.P_OUTPUT_RASTER: self.filename('raster.tif')
-        }
-        result = self.runalg(alg, parameters)
-        gold = RasterReader(enmap).array()
-        lead = RasterReader(result[alg.P_OUTPUT_RASTER]).array()
-        self.assertEqual(gold[0].dtype, lead[0].dtype)
-        self.assertEqual(np.sum(gold), np.sum(lead))
+        writer = self.rasterFromRange((3, 10, 10))
+        writer.close()
 
-    def test_vrt(self):
         alg = TranslateRasterAlgorithm()
         parameters = {
-            alg.P_RASTER: QgsRasterLayer(enmap),
-            alg.P_GRID: QgsRasterLayer(landcover_raster_30m_epsg3035),
-            alg.P_BAND_LIST: [5],
-            alg.P_CREATION_PROFILE: alg.VrtFormat,
+            alg.P_RASTER: writer.source(),
             alg.P_OUTPUT_RASTER: self.filename('raster.vrt')
         }
-        result = self.runalg(alg, parameters)
-        self.assertEqual(28263893, np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array()))
+        self.runalg(alg, parameters)
+        self.assertArrayEqual(
+            RasterReader(parameters[alg.P_RASTER]).array(),
+            RasterReader(parameters[alg.P_OUTPUT_RASTER]).array(),
+        )
 
-    def test_gridWithSameCrs(self):
+    def test_bandList(self):
+        writer = self.rasterFromRange((3, 10, 10))
+        writer.close()
+
         alg = TranslateRasterAlgorithm()
         parameters = {
-            alg.P_RASTER: QgsRasterLayer(hires),
-            alg.P_GRID: QgsRasterLayer(enmap),
+            alg.P_RASTER: writer.source(),
             alg.P_BAND_LIST: [1],
-            alg.P_OUTPUT_RASTER: self.filename('raster.tif')
+            alg.P_OUTPUT_RASTER: self.filename('raster.vrt')
         }
-        result = self.runalg(alg, parameters)
-        grid = RasterReader(enmap)
-        outraster = RasterReader(result[alg.P_OUTPUT_RASTER])
-        self.assertEqual(grid.extent(), outraster.extent())
-        self.assertEqual(2939687, np.sum(outraster.array()))
+        self.runalg(alg, parameters)
+        self.assertArrayEqual(
+            RasterReader(parameters[alg.P_RASTER]).array()[1],
+            RasterReader(parameters[alg.P_OUTPUT_RASTER]).array(),
+        )
 
-    def test_gridWithDifferentCrs(self):
+    def test_grid_with_differentResolution_and_sameExtentAndCrs(self):
+        crs = QgsCoordinateReferenceSystem.fromEpsgId(4326)
+        writerRaster = self.rasterFromRange((1, 3, 3), None, QgsRectangle(0, 0, 3, 3), crs)
+        writerRaster.close()
+        writerGrid = self.rasterFromRange((1, 1, 1), None, QgsRectangle(0, 0, 3, 3), crs)
+        writerGrid.close()
         alg = TranslateRasterAlgorithm()
         parameters = {
-            alg.P_RASTER: QgsRasterLayer(hires),
-            alg.P_GRID: QgsRasterLayer(landcover_raster_30m_epsg3035),
-            # alg.P_BAND_LIST: [1],
-            alg.P_OUTPUT_RASTER: self.filename('raster3035.tif')
+            alg.P_RASTER: writerRaster.source(),
+            alg.P_GRID: writerGrid.source(),
+            alg.P_OUTPUT_RASTER: self.filename('raster.vrt')
         }
-        result = self.runalg(alg, parameters)
-        self.assertEqual(parameters[alg.P_GRID].extent(), RasterReader(result[alg.P_OUTPUT_RASTER]).extent())
-        self.assertEqual(9200302, np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array()))
+        self.runalg(alg, parameters)
+        self.assertEqual(
+            RasterReader(parameters[alg.P_RASTER]).array()[0][1, 1],
+            RasterReader(parameters[alg.P_OUTPUT_RASTER]).array()[0][0, 0],
+        )
 
-    def test_gridWithDifferentCrs_AndBandSubset(self):
+    def test_grid_with_differentExtent_and_sameResolutionAndCrs(self):
+        crs = QgsCoordinateReferenceSystem.fromEpsgId(4326)
+        writerRaster = self.rasterFromRange((1, 3, 3), None, QgsRectangle(0, 0, 3, 3), crs)
+        writerRaster.close()
+        writerGrid = self.rasterFromRange((1, 1, 1), None, QgsRectangle(1, 1, 2, 2), crs)
+        writerGrid.close()
         alg = TranslateRasterAlgorithm()
         parameters = {
-            alg.P_RASTER: QgsRasterLayer(hires),
-            alg.P_GRID: QgsRasterLayer(landcover_raster_30m_epsg3035),
-            alg.P_BAND_LIST: [1],
-            alg.P_OUTPUT_RASTER: self.filename('raster3035_bandSubset.tif')
+            alg.P_RASTER: writerRaster.source(),
+            alg.P_GRID: writerGrid.source(),
+            alg.P_OUTPUT_RASTER: self.filename('raster.vrt')
         }
-        result = self.runalg(alg, parameters)
-        self.assertEqual(parameters[alg.P_GRID].extent(), RasterReader(result[alg.P_OUTPUT_RASTER]).extent())
-        self.assertEqual(2919474, np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array()))
+        self.runalg(alg, parameters)
+        self.assertEqual(
+            RasterReader(parameters[alg.P_RASTER]).array()[0][1, 1],
+            RasterReader(parameters[alg.P_OUTPUT_RASTER]).array()[0][0, 0],
+        )
+
+    def test_grid_with_differentExtentAndCrs(self):
+        crs = QgsCoordinateReferenceSystem.fromEpsgId(4326)
+        extent = QgsRectangle(0, 0, 3, 3)
+        writerRaster = self.rasterFromRange((1, 3, 3), None, extent, crs)
+        writerRaster.close()
+        crs2 = QgsCoordinateReferenceSystem.fromEpsgId(3857)
+        extent2 = Utils.transformExtent(extent, crs, crs2)
+        writerGrid = self.rasterFromRange((1, 3, 3), None, extent2, crs2)
+        writerGrid.close()
+        alg = TranslateRasterAlgorithm()
+        parameters = {
+            alg.P_RASTER: writerRaster.source(),
+            alg.P_GRID: writerGrid.source(),
+            alg.P_OUTPUT_RASTER: self.filename('raster.vrt')
+        }
+        self.runalg(alg, parameters)
+        self.assertEqual(extent2, RasterReader(parameters[alg.P_OUTPUT_RASTER]).extent())
+        self.assertEqual(crs2, RasterReader(parameters[alg.P_OUTPUT_RASTER]).crs())
+        self.assertArrayEqual(
+            RasterReader(parameters[alg.P_RASTER]).array(),
+            RasterReader(parameters[alg.P_OUTPUT_RASTER]).array()
+        )
+
+    def test_grid_with_differentExtentAndCrs_andBandSubset(self):
+        crs = QgsCoordinateReferenceSystem.fromEpsgId(4326)
+        extent = QgsRectangle(0, 0, 3, 3)
+        writerRaster = self.rasterFromRange((3, 3, 3), None, extent, crs)
+        writerRaster.close()
+        crs2 = QgsCoordinateReferenceSystem.fromEpsgId(3857)
+        extent2 = Utils.transformExtent(extent, crs, crs2)
+        writerGrid = self.rasterFromRange((1, 3, 3), None, extent2, crs2)
+        writerGrid.close()
+        alg = TranslateRasterAlgorithm()
+        parameters = {
+            alg.P_RASTER: writerRaster.source(),
+            alg.P_GRID: writerGrid.source(),
+            alg.P_BAND_LIST: [2],
+            alg.P_OUTPUT_RASTER: self.filename('raster.vrt')
+        }
+        self.runalg(alg, parameters)
+        self.assertEqual(extent2, RasterReader(parameters[alg.P_OUTPUT_RASTER]).extent())
+        self.assertEqual(crs2, RasterReader(parameters[alg.P_OUTPUT_RASTER]).crs())
+        self.assertArrayEqual(
+            RasterReader(parameters[alg.P_RASTER]).array()[1],
+            RasterReader(parameters[alg.P_OUTPUT_RASTER]).array()[0]
+        )
+
+    def test_copyMetadata(self):
+        writer = self.rasterFromRange((3, 3, 3))
+        writer.setMetadataItem('my key', 'hello', '')
+        writer.setMetadataItem('my key', 'world', '', 1)
+        writer.close()
+        alg = TranslateRasterAlgorithm()
+        parameters = {
+            alg.P_RASTER: writer.source(),
+            alg.P_COPY_METADATA: False,
+            alg.P_OUTPUT_RASTER: self.filename('raster.vrt')
+        }
+        self.runalg(alg, parameters)
+
+        reader = RasterReader(parameters[alg.P_OUTPUT_RASTER])
+        self.assertEqual('hello', reader.metadataItem('my key', ''))
+        self.assertEqual('world', reader.metadataItem('my key', '', 1))
+
+        # don't copy metadata
+        parameters = {
+            alg.P_RASTER: writer.source(),
+            alg.P_COPY_METADATA: False,
+            alg.P_OUTPUT_RASTER: self.filename('raster2.vrt')
+        }
+        self.runalg(alg, parameters)
+
+        reader = RasterReader(parameters[alg.P_OUTPUT_RASTER])
+        self.assertIsNone(reader.metadataItem('my key', ''))
+        self.assertIsNone(reader.metadataItem('my key', '', 1))
 
     def test_dataType(self):
         alg = TranslateRasterAlgorithm()
@@ -114,24 +172,6 @@ class TestTranslateAlgorithm(TestCase):
             dataType = RasterReader(result[alg.P_OUTPUT_RASTER]).dataType()
             print(name, dataType)
             self.assertEqual(gold[index], dataType)
-
-    def test_bandList(self):
-        alg = TranslateRasterAlgorithm()
-        parameters = {
-            alg.P_RASTER: QgsRasterLayer(enmap),
-            alg.P_OUTPUT_RASTER: self.filename('raster.tif'),
-            alg.P_BAND_LIST: None
-        }
-        result = self.runalg(alg, parameters)
-        self.assertEqual(RasterReader(enmap).bandCount(), RasterReader(result[alg.P_OUTPUT_RASTER]).bandCount())
-
-        parameters[alg.P_BAND_LIST] = []
-        result = self.runalg(alg, parameters)
-        self.assertEqual(RasterReader(enmap).bandCount(), RasterReader(result[alg.P_OUTPUT_RASTER]).bandCount())
-
-        parameters[alg.P_BAND_LIST] = [1, 3, 5]
-        result = self.runalg(alg, parameters)
-        self.assertEqual(3, RasterReader(result[alg.P_OUTPUT_RASTER]).bandCount())
 
     def test_copyMetadata_forEnviSource_bandSubset(self):
         alg = TranslateRasterAlgorithm()
@@ -346,7 +386,7 @@ class TestTranslateAlgorithm(TestCase):
         alg = TranslateRasterAlgorithm()
         parameters = {
             alg.P_RASTER: water_mask_30m,
-            alg.P_GRID: grid_300m,
+            alg.P_GRID: enmap_grid_300m,
             alg.P_RESAMPLE_ALG: alg.AverageResampleAlg,
             alg.P_OUTPUT_RASTER: self.filename('waterFraction1.tif'),
         }
@@ -356,7 +396,7 @@ class TestTranslateAlgorithm(TestCase):
         parameters[alg.P_OUTPUT_RASTER] = self.filename('waterFraction2.tif')
         result = self.runalg(alg, parameters)
         reader = RasterReader(result[alg.P_OUTPUT_RASTER])
-        self.assertEqual(Qgis.Float32, reader.dataType(1))
+        self.assertEqual(Qgis.DataType.Float32, reader.dataType(1))
         self.assertAlmostEqual(0.52, np.max(np.unique(reader.array())))
 
     def test_debug_issue888(self):

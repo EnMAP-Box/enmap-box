@@ -1,10 +1,7 @@
 from typing import Dict, Any, List, Tuple
 
-import numpy as np
-
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-from enmapboxprocessing.typing import RegressorDump, Target
-from enmapboxprocessing.utils import Utils
+from enmapboxprocessing.typing import RegressorDump
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 from typeguard import typechecked
 
@@ -45,13 +42,8 @@ class PrepareRegressionDatasetFromJsonAlgorithm(EnMAPProcessingAlgorithm):
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)
 
-            json = Utils.jsonLoad(filenameJson)
-            json['targets'] = [Target(**values) for values in json['targets']]
-            json['X'] = np.array(json['X'])
-            json['y'] = np.array(json['y'])
-            json['regressor'] = None
-            dump = RegressorDump.fromDict(json)
-            Utils.pickleDump(dump.__dict__, filename)
+            dump = RegressorDump.fromFile(filenameJson)
+            dump.write(filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)

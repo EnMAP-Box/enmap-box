@@ -5,7 +5,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import landcover_raster_30m
+from enmapboxtestdata import landcover_polygon_30m
 from qgis.core import QgsRasterLayer
 
 
@@ -14,7 +14,7 @@ class TestReclassifyRasterAlgorithm(TestCase):
     def test_withCategories(self):
         alg = ReclassifyRasterAlgorithm()
         parameters = {
-            alg.P_RASTER: landcover_raster_30m,
+            alg.P_RASTER: landcover_polygon_30m,
             alg.P_MAPPING: "{1: 1, 2: 1, 3: 2, 4: 2, 6: 3}",
             alg.P_CATEGORIES: "[(1, 'urban', '#e60000'), (2, 'vegetation', '#98e600'), (3, 'water', '#0064ff')]",
             alg.P_OUTPUT_CLASSIFICATION: self.filename('classification.tif')
@@ -31,7 +31,7 @@ class TestReclassifyRasterAlgorithm(TestCase):
     def test_withoutCategories(self):
         alg = ReclassifyRasterAlgorithm()
         parameters = {
-            alg.P_RASTER: landcover_raster_30m,
+            alg.P_RASTER: landcover_polygon_30m,
             alg.P_MAPPING: "{1: 1, 2: 1, 3: 2, 4: 2, 6: 3}",
             alg.P_OUTPUT_CLASSIFICATION: self.filename('classification.tif')
         }

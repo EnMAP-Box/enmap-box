@@ -8,7 +8,7 @@ from enmapboxprocessing.algorithm.fitplsegressionalgorithm import FitPLSRegressi
 from enmapboxprocessing.algorithm.fitrandomforestregressoralgorithm import FitRandomForestRegressorAlgorithm
 from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
 from enmapboxprocessing.test.algorithm.testcase import TestCase
-from testdata import regressorDumpPkl, regressorDumpSingleTargetPkl
+from enmapboxtestdata import regressorDumpSingleTargetPkl, regressorDumpPkl
 
 
 class FitTestRegressorAlgorithm(FitRegressorAlgorithmBase):
@@ -75,3 +75,12 @@ class TestFitRegressorAlgorithm(TestCase):
                 alg.P_OUTPUT_REGRESSOR: self.filename('regressor.pkl')
             }
             self.runalg(alg, parameters)
+
+    def test_debug_issue1116(self):
+        alg = FitLinearSVRAlgorithm()
+        parameters = {
+            alg.P_DATASET: regressorDumpSingleTargetPkl,
+            alg.P_REGRESSOR: alg.defaultCodeAsString(),
+            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.pkl')
+        }
+        self.runalg(alg, parameters)

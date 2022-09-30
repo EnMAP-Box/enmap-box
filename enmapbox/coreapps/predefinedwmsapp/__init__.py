@@ -57,8 +57,8 @@ class PredefinedWmsApp(EnMAPBoxApplication):
                'type=xyz&url=https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/%7Bz%7D/%7By%7D/%7Bx%7D&zmax=13&zmin=0')
         addWms('Esri Topo World',
                'type=xyz&url=http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/%7Bz%7D/%7By%7D/%7Bx%7D&zmax=20&zmin=0')
-        addWms('Esri Transportation',
-               'type=xyz&url=https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/%7Bz%7D/%7By%7D/%7Bx%7D&zmax=20&zmin=0')
+        # addWms('Esri Transportation',  # not working anymore
+        #        'type=xyz&url=https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/%7Bz%7D/%7By%7D/%7Bx%7D&zmax=20&zmin=0')
         addWms('Google Maps',
                'type=xyz&url=https://mt1.google.com/vt/lyrs%3Dm%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D&zmax=19&zmin=0')
         addWms('Google Satellite',
@@ -77,10 +77,10 @@ class PredefinedWmsApp(EnMAPBoxApplication):
                'referer=Map%20tiles%20by%20OpenWeatherMap,%20under%20CC%20BY-SA%204.0&type=xyz&url=http://tile.openweathermap.org/map/wind_new/%7Bz%7D/%7Bx%7D/%7By%7D.png?APPID%3Df9d0069aa69438d52276ae25c1ee9893&zmax=19&zmin=0')
         addWms('OpenStreetMap',
                'type=xyz&url=https://tile.openstreetmap.org/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=19&zmin=0')
-        addWms('OpenStreetMap H.O.T.',
-               'referer=OpenStreetMap%20contributors,%20CC-BY-SA&type=xyz&url=http://tile.openstreetmap.fr/hot/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=19&zmin=0')
-        addWms('OpenStreetMap Monochrome',
-               'referer=OpenStreetMap%20contributors,%20CC-BY-SA&type=xyz&url=http://tiles.wmflabs.org/bw-mapnik/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=19&zmin=0')
+        # addWms('OpenStreetMap H.O.T.',  # not working anymore
+        #        'referer=OpenStreetMap%20contributors,%20CC-BY-SA&type=xyz&url=http://tile.openstreetmap.fr/hot/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=19&zmin=0')
+        # addWms('OpenStreetMap Monochrome',  # not working anymore
+        #        'referer=OpenStreetMap%20contributors,%20CC-BY-SA&type=xyz&url=http://tiles.wmflabs.org/bw-mapnik/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=19&zmin=0')
         addWms('OpenStreetMap Standard',
                'referer=OpenStreetMap%20contributors,%20CC-BY-SA&type=xyz&url=http://tile.openstreetmap.org/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=19&zmin=0')
         addWms('OpenTopoMap',
@@ -97,8 +97,8 @@ class PredefinedWmsApp(EnMAPBoxApplication):
                'referer=OpenStreetMap%20contributors,%20CC-BY-SA&type=xyz&url=https://heatmap-external-b.strava.com/tiles/all/bluered/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=15&zmin=0')
         addWms('Strava Run',
                'referer=OpenStreetMap%20contributors,%20CC-BY-SA&type=xyz&url=https://heatmap-external-b.strava.com/tiles/run/bluered/%7Bz%7D/%7Bx%7D/%7By%7D.png?v%3D19&zmax=15&zmin=0')
-        addWms('Wikimedia Hike Bike Map',
-               'referer=OpenStreetMap%20contributors,%20under%20ODbL&type=xyz&url=http://tiles.wmflabs.org/hikebike/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=17&zmin=1')
+        # addWms('Wikimedia Hike Bike Map',
+        #        'referer=OpenStreetMap%20contributors,%20under%20ODbL&type=xyz&url=http://tiles.wmflabs.org/hikebike/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=17&zmin=1')
         addWms('Wikimedia Map',
                'referer=OpenStreetMap%20contributors,%20under%20ODbL&type=xyz&url=https://maps.wikimedia.org/osm-intl/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=20&zmin=1')
 

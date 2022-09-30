@@ -11,7 +11,7 @@ from warnings import warn
 import numpy as np
 from osgeo import gdal
 
-from enmapboxprocessing.typing import (NumpyDataType, MetadataValue, GdalDataType, QgisDataType,
+from enmapboxprocessing.typing import (NumpyDataType, MetadataValue, GdalDataType,
                                        GdalResamplingAlgorithm, Categories, Category, Targets, Target)
 from qgis.PyQt.QtCore import QDateTime, QDate
 from qgis.PyQt.QtGui import QColor
@@ -20,7 +20,7 @@ from qgis.core import (QgsRasterBlock, QgsProcessingFeedback, QgsPalettedRasterR
                        QgsCategorizedSymbolRenderer, QgsRendererCategory, QgsRectangle, QgsRasterLayer,
                        QgsRasterDataProvider, QgsPointXY, QgsPoint, Qgis, QgsWkbTypes, QgsSymbol, QgsVectorLayer,
                        QgsFeature, QgsRasterRenderer, QgsFeatureRenderer, QgsMapLayer, QgsCoordinateTransform,
-                       QgsProject, QgsCoordinateReferenceSystem, QgsUnitTypes, QgsReadWriteContext,
+                       QgsProject, QgsCoordinateReferenceSystem, QgsReadWriteContext,
                        QgsMultiBandColorRenderer, QgsContrastEnhancement, QgsSingleBandPseudoColorRenderer,
                        QgsRasterShader, QgsColorRampShader, QgsColorRamp, QgsSingleBandGrayRenderer,
                        QgsSingleCategoryDiagramRenderer, QgsGraduatedSymbolRenderer,
@@ -39,7 +39,7 @@ class Utils(object):
         return gdal.GetCacheMax()
 
     @staticmethod
-    def qgisDataTypeToNumpyDataType(dataType: QgisDataType) -> NumpyDataType:
+    def qgisDataTypeToNumpyDataType(dataType: Qgis.DataType) -> NumpyDataType:
         if dataType == Qgis.DataType.Byte:
             return np.uint8
         elif dataType == Qgis.DataType.Float32:
@@ -57,7 +57,7 @@ class Utils(object):
         elif dataType == Qgis.DataType.ARGB32_Premultiplied:
             return np.uint32
         else:
-            raise Exception(f'unsupported data type: {dataType}')
+            raise ValueError(f'unsupported data type: {dataType}')
 
     @staticmethod
     def gdalDataTypeToNumpyDataType(dataType: GdalDataType) -> NumpyDataType:
@@ -65,7 +65,7 @@ class Utils(object):
         return Utils.qgisDataTypeToNumpyDataType(qgisDataType)
 
     @staticmethod
-    def qgisDataTypeToGdalDataType(dataType: Optional[QgisDataType]) -> Optional[int]:
+    def qgisDataTypeToGdalDataType(dataType: Optional[Qgis.DataType]) -> Optional[int]:
         if dataType is None:
             return None
         elif dataType == Qgis.DataType.Byte:
@@ -83,24 +83,21 @@ class Utils(object):
         elif dataType == Qgis.DataType.UInt32:
             return gdal.GDT_UInt32
         else:
-            raise Exception(f'unsupported data type: {dataType}')
+            raise ValueError(f'unsupported data type: {dataType}')
 
     @staticmethod
-    def qgisDataTypeName(dataType: QgisDataType) -> str:
-        for name in ('Byte', 'Float32', 'Float64', 'Int16', 'Int32', 'UInt16', 'UInt32'):
-            if getattr(Qgis, name) == dataType:
-                return name
-        raise Exception(f'unsupported data type: {dataType}')
+    def qgisDataTypeName(dataType: Qgis.DataType) -> str:
+        return str(dataType).split('.')[1]
 
     @staticmethod
     def gdalResampleAlgName(resampleAlg: GdalResamplingAlgorithm) -> str:
         for name in 'NearestNeighbour Bilinear Cubic CubicSpline Lanczos Average Mode Min Q1 Med Q3 Max'.split():
             if getattr(gdal, 'GRA_' + name) == resampleAlg:
                 return name
-        raise Exception(f'unsupported resampling algorithm: {resampleAlg}')
+        raise ValueError(f'unsupported resampling algorithm: {resampleAlg}')
 
     @staticmethod
-    def gdalDataTypeToQgisDataType(dataType: GdalDataType) -> QgisDataType:
+    def gdalDataTypeToQgisDataType(dataType: GdalDataType) -> Qgis.DataType:
         if dataType == gdal.GDT_Byte:
             return Qgis.DataType.Byte
         elif dataType == gdal.GDT_Float32:
@@ -116,7 +113,7 @@ class Utils(object):
         elif dataType == gdal.GDT_UInt32:
             return Qgis.DataType.UInt32
         else:
-            raise Exception(f'unsupported data type: {dataType}')
+            raise ValueError(f'unsupported data type: {dataType}')
 
     @staticmethod
     def numpyDataTypeToQgisDataType(dataType: NumpyDataType) -> Qgis.DataType:
@@ -157,9 +154,9 @@ class Utils(object):
     @classmethod
     def metadateValueToString(cls, value: MetadataValue) -> str:
         if isinstance(value, list):
-            string = '{' + ', '.join([str(v).replace(',', '_') for v in value]) + '}'
+            string = '{' + ', '.join([str(v).replace(',', '_').strip() for v in value]) + '}'
         else:
-            string = str(value).replace(',', '_')
+            string = str(value).replace(',', '_').strip()
         return string
 
     @classmethod
@@ -243,17 +240,18 @@ class Utils(object):
     @classmethod
     def singleBandPseudoColorRenderer(
             cls, provider: QgsRasterDataProvider, bandNo: int, minValue: float, maxValue: float,
-            ramp: Optional[QgsColorRamp]
+            colorRamp: Optional[QgsColorRamp] = None, colorRampType=QgsColorRampShader.Type.Interpolated,
+
     ) -> QgsSingleBandPseudoColorRenderer:
         shader = QgsRasterShader()
         colorRampShader = QgsColorRampShader()
         colorRampShader.setMinimumValue(minValue)
         colorRampShader.setMaximumValue(maxValue)
-        colorRampShader.setColorRampType(QgsColorRampShader.Interpolated)
+        colorRampShader.setColorRampType(colorRampType)
 
         # derive ramp items
-        if ramp is not None:
-            rampItems = cls.deriveColorRampShaderRampItems(minValue, maxValue, ramp)
+        if colorRamp is not None:
+            rampItems = cls.deriveColorRampShaderRampItems(minValue, maxValue, colorRamp)
             colorRampShader.setColorRampItemList(rampItems)
 
         shader.setRasterShaderFunction(colorRampShader)
@@ -267,7 +265,7 @@ class Utils(object):
 
         # derive ramp items
         delta = maxValue - minValue
-        fractionalSteps = [i / ramp.count() for i in range(ramp.count() + 1)]
+        fractionalSteps = [i / (ramp.count() - 1) for i in range(ramp.count())]
         colors = [ramp.color(f) for f in fractionalSteps]
         steps = [minValue + f * delta for f in fractionalSteps]
         rampItems = [QgsColorRampShader.ColorRampItem(step, color, str(step)) for step, color in zip(steps, colors)]
@@ -296,7 +294,7 @@ class Utils(object):
         return categories
 
     @classmethod
-    def categoriesFromRenderer(cls, renderer: Union[QgsFeatureRenderer, QgsRasterRenderer]):
+    def categoriesFromRenderer(cls, renderer: Union[QgsFeatureRenderer, QgsRasterRenderer]) -> Optional[Categories]:
         if isinstance(renderer, QgsPalettedRasterRenderer):
             return Utils.categoriesFromPalettedRasterRenderer(renderer)
         if isinstance(renderer, QgsCategorizedSymbolRenderer):
@@ -431,12 +429,12 @@ class Utils(object):
             if obj.isdecimal():  # milliseconds since 1970
                 return cls.msecToDateTime(int(obj))
             elif len(obj) == 10:  # date, e.g. 2021-12-24
-                dateTime = QDateTime.fromString("2010-10-25", 'yyyy-MM-dd')
-                dateTime.addSecs(12 * 60 * 60)
+                dateTime = QDateTime.fromString(obj, 'yyyy-MM-dd')
+                dateTime = dateTime.addSecs(12 * 60 * 60)
                 return dateTime
             elif len(obj) >= 19:  # date, e.g. 2021-12-24T12:30:42.123..
                 return QDateTime.fromString(obj[:19], 'yyyy-MM-ddTHH:mm:ss')
-            elif obj == '':  # invalid date
+            elif obj in ['', 'None']:  # invalid date
                 return QDateTime()
 
         raise ValueError(f'invalid datetime: {obj}')
@@ -475,7 +473,7 @@ class Utils(object):
         return categories, valueLookup
 
     @classmethod
-    def smallesUIntDataType(cls, value: int) -> QgisDataType:
+    def smallesUIntDataType(cls, value: int) -> Qgis.DataType:
         if 0 <= value < 256:
             return Qgis.DataType.Byte
         elif value < 65536:
@@ -520,24 +518,26 @@ class Utils(object):
             gdal.GRA_Q1: 'q1',
             gdal.GRA_Q3: 'q3'
             # Add sum and rms later, after QGIS updates to required GDAL version
-            #   sum: compute the weighted sum of all non-NODATA contributing pixels (since GDAL 3.1)
+            #   sum: compute the weighted s
+            #   um of all non-NODATA contributing pixels (since GDAL 3.1)
             #   rms: root mean square / quadratic mean of all non-NODATA contributing pixels (GDAL >= 3.3)
         }
         return resampleAlgStrings[resampleAlg]
 
     @classmethod
-    def tmpFilename(cls, filename: str, tail: str):
-        tmpDirname = join(dirname(filename), f'_temp_{basename(filename)}')
+    def tmpFilename(cls, root: str, basename_: str):
+        """Create a temp-filename relative to root."""
+        tmpDirname = join(dirname(root), f'_temp_{basename(root)}')
         if not exists(tmpDirname):
             makedirs(tmpDirname)
-        tmpFilename = join(tmpDirname, tail)
+        tmpFilename = join(tmpDirname, basename_)
         return tmpFilename
 
     @classmethod
-    def sidecarFilename(cls, filename: str, tail: str, replaceExtension=True):
+    def sidecarFilename(cls, filename: str, extention: str, replaceExtension=True):
         if replaceExtension:
             filename = splitext(filename)[0]
-        return filename + tail
+        return filename + extention
 
     @classmethod
     def pickleDump(cls, obj: Any, filename: str):
@@ -550,16 +550,18 @@ class Utils(object):
             return pickle.load(file)
 
     @classmethod
-    def jsonDumps(cls, obj: Any) -> str:
-        def default(obj):
-            if isinstance(obj, np.ndarray):
-                return obj.tolist()
-            elif hasattr(obj, '__dict__'):
-                return obj.__dict__
-            else:
-                return str(obj)
+    def jsonDumps(cls, obj: Any, default=None, indent=2) -> str:
 
-        return json.dumps(obj, default=default, indent=2)
+        if default is None:
+            def default(obj):
+                if isinstance(obj, np.ndarray):
+                    return obj.tolist()
+                elif hasattr(obj, '__dict__'):
+                    return obj.__dict__
+                else:
+                    return str(obj)
+
+        return json.dumps(obj, default=default, indent=indent)
 
     @classmethod
     def jsonDump(cls, obj: Any, filename: str):
@@ -573,11 +575,6 @@ class Utils(object):
             return json.load(file)
 
     @classmethod
-    def fileLoad(cls, filename: str) -> str:
-        with open(filename) as file:
-            return file.read()
-
-    @classmethod
     def isPolygonGeometry(cls, wkbType: int) -> bool:
         types = [value for key, value in QgsWkbTypes.__dict__.items() if 'Polygon' in key]
         return wkbType in types
@@ -589,6 +586,7 @@ class Utils(object):
 
     @classmethod
     def makeIdentifier(cls, string):
+        """Make a valid Python identifier from the given string."""
         s = string.strip()
         s = re.sub('[\\s\\t\\n]+', '_', s)
         s = re.sub('[^0-9a-zA-Z_]', '_', s)
@@ -597,6 +595,8 @@ class Utils(object):
 
     @classmethod
     def makeBasename(cls, string):
+        """Make a valid file basename from the given string."""
+
         def sub(c: str):
             if c.isalnum():
                 return c
@@ -649,48 +649,19 @@ class Utils(object):
         return toNanometers * toDstUnits
 
     @classmethod
-    def layerExtentInMapCanvas(cls, layer: QgsMapLayer, mapCanvas: QgsMapCanvas) -> QgsRectangle:
-        layerCrs = layer.crs()
-        mapCanvasCrs = mapCanvas.mapSettings().destinationCrs()
+    def transformExtent(
+            cls, extent: QgsRectangle, crs: QgsCoordinateReferenceSystem, toCrs: QgsCoordinateReferenceSystem
+    ) -> QgsRectangle:
 
-        if layerCrs == mapCanvasCrs:
-            return mapCanvas.extent()
+        if crs == toCrs:
+            return extent
         else:
-            transform = QgsCoordinateTransform(layerCrs, mapCanvasCrs, QgsProject.instance())
-            extent: QgsRectangle = transform.transformBoundingBox(mapCanvas.extent())
-            extent.intersect(layer.extent())
+            transform = QgsCoordinateTransform(crs, toCrs, QgsProject.instance())
+            return transform.transformBoundingBox(extent)
 
     @classmethod
-    def transformMapCanvasExtent(cls, mapCanvas: QgsMapCanvas, crs: QgsCoordinateReferenceSystem) -> QgsRectangle:
-        mapCanvasCrs = mapCanvas.mapSettings().destinationCrs()
-
-        if crs == mapCanvasCrs:
-            return mapCanvas.extent()
-        else:
-            transform = QgsCoordinateTransform(mapCanvasCrs, crs, QgsProject.instance())
-            return transform.transformBoundingBox(mapCanvas.extent())
-
-    @classmethod
-    def nativeResolutionScale(cls, layer: QgsRasterLayer, mapCanvas: QgsMapCanvas) -> float:
-        groundSamplingDistance = layer.rasterUnitsPerPixelX()
-        layerMapUnits = layer.crs().mapUnits()
-        canvasMapUnits = mapCanvas.mapUnits()
-        if (layerMapUnits == QgsUnitTypes.DistanceMeters and canvasMapUnits == QgsUnitTypes.DistanceMeters):
-            scaleAtOneMeter = 3779.527553725215
-            scaleAtNativeResolution = scaleAtOneMeter * groundSamplingDistance
-        elif (layerMapUnits == QgsUnitTypes.DistanceMeters and canvasMapUnits == QgsUnitTypes.DistanceDegrees):
-            scaleAtOneMeter = 1902.7474863952016
-            scaleAtNativeResolution = scaleAtOneMeter * groundSamplingDistance
-        elif (layerMapUnits == QgsUnitTypes.DistanceDegrees and canvasMapUnits == QgsUnitTypes.DistanceDegrees):
-            scaleAtOneDegree = 176453049.4014574
-            scaleAtNativeResolution = scaleAtOneDegree * groundSamplingDistance
-        elif (layerMapUnits == QgsUnitTypes.DistanceDegrees and canvasMapUnits == QgsUnitTypes.DistanceMeters):
-            scaleAtOneDegree = 311289235.5551121
-            scaleAtNativeResolution = scaleAtOneDegree * groundSamplingDistance
-        else:
-            assert 0  # Which other units are relevant? Nautical miles, anybody? :-)
-
-        return scaleAtNativeResolution
+    def mapCanvasCrs(cls, mapCanvas: QgsMapCanvas) -> QgsCoordinateReferenceSystem:
+        return mapCanvas.mapSettings().destinationCrs()
 
     @classmethod
     def sortedBy(cls, lists: List[List], by: List, reverse=False):

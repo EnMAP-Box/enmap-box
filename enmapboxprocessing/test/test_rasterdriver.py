@@ -69,7 +69,23 @@ class TestDriver(TestCase):
         filename1 = self.filename('raster1.tif')
         filename2 = self.filename('raster2.tif')
         Driver(filename1).createFromArray(np.zeros(shape))
-        Driver(filename2).createLike(RasterReader(filename1), nBands=1, dataType=Qgis.Byte)
+        Driver(filename2).createLike(RasterReader(filename1), nBands=1, dataType=Qgis.DataType.Byte)
         raster2 = RasterReader(filename2)
         self.assertEqual(1, raster2.bandCount())
-        self.assertEqual(Qgis.Byte, raster2.dataType(1))
+        self.assertEqual(Qgis.DataType.Byte, raster2.dataType(1))
+
+    def test_createArray_cutOverlap(self):
+        array = np.ones((3, 15, 15))
+        filename = self.filename('raster.bsq')
+        Driver(filename).createFromArray(array, overlap=5)
+        raster = RasterReader(filename)
+        self.assertEqual(5, raster.width())
+        self.assertEqual(5, raster.height())
+        self.assertEqual(3, raster.bandCount())
+
+    def test_defaultFormat(self):
+        self.assertEqual('GTiff', Driver.formatFromExtension('.tif'))
+        self.assertEqual('VRT', Driver.formatFromExtension('.vrt'))
+        self.assertEqual('ENVI', Driver.formatFromExtension('.bsq'))
+        self.assertEqual('ENVI', Driver.formatFromExtension('.bil'))
+        self.assertEqual('ENVI', Driver.formatFromExtension('.bip'))

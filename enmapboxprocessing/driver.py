@@ -1,14 +1,15 @@
 import warnings
-from os.path import splitext
+from os import makedirs
+from os.path import splitext, exists, dirname
 from typing import List
 
 from osgeo import gdal
 
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
-from enmapboxprocessing.typing import Array3d, QgisDataType, CreationOptions
+from enmapboxprocessing.typing import Array3d, CreationOptions
 from enmapboxprocessing.utils import Utils
-from qgis.core import QgsRectangle, QgsCoordinateReferenceSystem, QgsProcessingFeedback
+from qgis.core import QgsRectangle, QgsCoordinateReferenceSystem, QgsProcessingFeedback, Qgis
 from typeguard import typechecked
 
 
@@ -39,7 +40,7 @@ class Driver(object):
         self.feedback = feedback
 
     def create(
-            self, dataType: QgisDataType, width: int, height: int, nBands: int, extent: QgsRectangle = None,
+            self, dataType: Qgis.DataType, width: int, height: int, nBands: int, extent: QgsRectangle = None,
             crs: QgsCoordinateReferenceSystem = None
     ) -> RasterWriter:
 
@@ -54,6 +55,9 @@ class Driver(object):
                f' {self.filename}'
         if self.feedback is not None:
             self.feedback.pushInfo(info)
+
+        if not exists(dirname(self.filename)):
+            makedirs(dirname(self.filename))
 
         gdalDriver: gdal.Driver = gdal.GetDriverByName(self.format)
         try:
@@ -85,7 +89,7 @@ class Driver(object):
         return raster
 
     def createLike(
-            self, raster: RasterReader, dataType: QgisDataType = None, nBands: int = None
+            self, raster: RasterReader, dataType: Qgis.DataType = None, nBands: int = None
     ) -> RasterWriter:
 
         provider = raster.provider

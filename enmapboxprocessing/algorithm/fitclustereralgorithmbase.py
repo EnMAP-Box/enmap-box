@@ -4,6 +4,8 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
+from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromjsonalgorithm import \
+    PrepareUnsupervisedDatasetFromJsonAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClustererDump
 from enmapboxprocessing.utils import Utils
@@ -82,7 +84,16 @@ class FitClustererAlgorithmBase(EnMAPProcessingAlgorithm):
             self.tic(feedback, parameters, context)
 
             if filenameDataset is not None:
-                dump = ClustererDump.fromDict(Utils.pickleLoad(filenameDataset))
+                if filenameDataset.endswith('.json'):
+                    alg = PrepareUnsupervisedDatasetFromJsonAlgorithm()
+                    parameters = {
+                        alg.P_JSON_FILE: filenameDataset,
+                        alg.P_OUTPUT_DATASET: Utils.tmpFilename(filename, 'dataset.pkl')
+                    }
+                    self.runAlg(alg, parameters, None, feedback2, context, True)
+                    dump = ClustererDump.fromDict(Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+                else:
+                    dump = ClustererDump.fromDict(Utils.pickleLoad(filenameDataset))
                 feedback.pushInfo(
                     f'Load training dataset: X=array{list(dump.X.shape)}')
                 feedback.pushInfo('Fit clusterer')

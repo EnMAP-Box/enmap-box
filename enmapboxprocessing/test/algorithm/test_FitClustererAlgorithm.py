@@ -11,8 +11,8 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClustererDump
 from enmapboxprocessing.utils import Utils
+from enmapboxtestdata import classifierDumpPkl, classificationDatasetAsJsonFile
 from qgis.core import Qgis
-from testdata import classifier_pkl
 
 
 class FitTestClustererAlgorithm(FitClustererAlgorithmBase):
@@ -37,7 +37,21 @@ class TestFitClustererAlgorithm(TestCase):
     def test_fitted(self):
         alg = FitTestClustererAlgorithm()
         parameters = {
-            alg.P_DATASET: classifier_pkl,
+            alg.P_DATASET: classifierDumpPkl,
+            alg.P_CLUSTERER: alg.defaultCodeAsString(),
+            alg.P_OUTPUT_CLUSTERER: self.filename('clusterer.pkl')
+        }
+        self.runalg(alg, parameters)
+        dump = ClustererDump.fromDict(Utils.pickleLoad(parameters[alg.P_OUTPUT_CLUSTERER]))
+        self.assertEqual(['band 8 (0.460000 Micrometers)', 'band 9 (0.465000 Micrometers)'], dump.features[:2])
+        self.assertEqual((58, 177), dump.X.shape)
+        self.assertIsInstance(dump.clusterer, TransformerMixin)
+        self.assertEqual(10, dump.clusterer.n_clusters)
+
+    def test_fit_json(self):
+        alg = FitTestClustererAlgorithm()
+        parameters = {
+            alg.P_DATASET: classificationDatasetAsJsonFile,
             alg.P_CLUSTERER: alg.defaultCodeAsString(),
             alg.P_OUTPUT_CLUSTERER: self.filename('clusterer.pkl')
         }
@@ -51,7 +65,7 @@ class TestFitClustererAlgorithm(TestCase):
     def test_fit_and_predict(self):
         alg = FitKMeansAlgorithm()
         parameters = {
-            alg.P_DATASET: classifier_pkl,
+            alg.P_DATASET: classifierDumpPkl,
             alg.P_CLUSTERER: alg.defaultCodeAsString(),
             alg.P_OUTPUT_CLUSTERER: self.filename('clusterer.pkl')
         }
@@ -92,7 +106,7 @@ class TestFitClustererAlgorithm(TestCase):
             alg.initAlgorithm()
             alg.shortHelpString()
             parameters = {
-                alg.P_DATASET: classifier_pkl,
+                alg.P_DATASET: classifierDumpPkl,
                 alg.P_CLUSTERER: alg.defaultCodeAsString(),
                 alg.P_OUTPUT_CLUSTERER: self.filename('clusterer.pkl')
             }

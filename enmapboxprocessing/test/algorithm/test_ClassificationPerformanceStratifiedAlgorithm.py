@@ -1,12 +1,12 @@
 import numpy as np
 
-from enmapbox.exampledata import landcover_polygons
+from enmapbox.exampledata import landcover_polygon
 from enmapboxprocessing.algorithm.classificationperformancestratifiedalgorithm import (
     stratifiedAccuracyAssessment, ClassificationPerformanceStratifiedAlgorithm
 )
 from enmapboxprocessing.test.algorithm.testcase import TestCase
+from enmapboxtestdata import landcover_map_l3
 from qgis.core import QgsRasterLayer, QgsVectorLayer
-from testdata import landcover_map_l3
 
 
 class Test_aa_stratified(TestCase):
@@ -88,12 +88,11 @@ class Test_aa_stratified(TestCase):
 class TestClassificationPerformanceAlgorithm(TestCase):
 
     def test_withStratification(self):
-        global c
         alg = ClassificationPerformanceStratifiedAlgorithm()
         alg.initAlgorithm()
         parameters = {
             alg.P_CLASSIFICATION: QgsRasterLayer(landcover_map_l3),
-            alg.P_REFERENCE: QgsVectorLayer(landcover_polygons),
+            alg.P_REFERENCE: QgsVectorLayer(landcover_polygon),
             alg.P_STRATIFICATION: QgsRasterLayer(landcover_map_l3),
             alg.P_OPEN_REPORT: self.openReport,
             alg.P_OUTPUT_REPORT: self.filename('report.html'),
@@ -101,12 +100,11 @@ class TestClassificationPerformanceAlgorithm(TestCase):
         self.runalg(alg, parameters)
 
     def test_withoutStratification(self):
-        global c
         alg = ClassificationPerformanceStratifiedAlgorithm()
         alg.initAlgorithm()
         parameters = {
             alg.P_CLASSIFICATION: QgsRasterLayer(landcover_map_l3),
-            alg.P_REFERENCE: QgsVectorLayer(landcover_polygons),
+            alg.P_REFERENCE: QgsVectorLayer(landcover_polygon),
             alg.P_OPEN_REPORT: self.openReport,
             alg.P_OUTPUT_REPORT: self.filename('report.html'),
         }

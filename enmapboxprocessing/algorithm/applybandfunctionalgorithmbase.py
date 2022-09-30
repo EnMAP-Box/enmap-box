@@ -5,7 +5,6 @@ from typing import Dict, Any, List, Tuple, Optional
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxprocessing.typing import QgisDataType
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
 from typeguard import typechecked
 
@@ -95,7 +94,7 @@ class ApplyBandFunctionAlgorithmBase(EnMAPProcessingAlgorithm):
 
         return result
 
-    def outputDataType(self) -> QgisDataType:
+    def outputDataType(self) -> Qgis.DataType:
         return Qgis.Float32
 
     def outputNoDataValue(self) -> Optional[float]:

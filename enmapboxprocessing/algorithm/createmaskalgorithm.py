@@ -2,7 +2,6 @@ from typing import Optional
 
 from enmapboxprocessing.algorithm.applybandfunctionalgorithmbase import ApplyBandFunctionAlgorithmBase
 from enmapboxprocessing.enmapalgorithm import Group
-from enmapboxprocessing.typing import QgisDataType
 from qgis.core import Qgis
 from typeguard import typechecked
 
@@ -44,8 +43,8 @@ class CreateMaskAlgorithm(ApplyBandFunctionAlgorithmBase):
 
         return function
 
-    def outputDataType(self) -> QgisDataType:
-        return Qgis.Byte
+    def outputDataType(self) -> Qgis.DataType:
+        return Qgis.DataType.Byte
 
     def outputNoDataValue(self) -> Optional[float]:
         return None

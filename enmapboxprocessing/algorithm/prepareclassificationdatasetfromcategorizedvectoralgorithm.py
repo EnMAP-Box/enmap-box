@@ -48,7 +48,7 @@ class PrepareClassificationDatasetFromCategorizedVectorAlgorithm(EnMAPProcessing
             (self._MAJORITY_VOTING, 'Whether to use majority voting. '
                                     'Turn off to use simple nearest neighbour resampling, which is much faster, '
                                     'but may result in highly inaccurate class decisions.'),
-            (self._OUTPUT_DATASET, self.PickleFileDestination)
+            (self._OUTPUT_DATASET, self.DatasetFileDestination)
         ]
 
     def group(self):
@@ -63,7 +63,7 @@ class PrepareClassificationDatasetFromCategorizedVectorAlgorithm(EnMAPProcessing
         )
         self.addParameterInt(self.P_COVERAGE, self._COVERAGE, 50, False, 0, 100, advanced=True)
         self.addParameterBoolean(self.P_MAJORITY_VOTING, self._MAJORITY_VOTING, True, False, True)
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.DatasetFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
@@ -121,46 +121,8 @@ class PrepareClassificationDatasetFromCategorizedVectorAlgorithm(EnMAPProcessing
             feedback.pushInfo(f'Sampled data: X=array{list(X.shape)} y=array{list(y.shape)}')
 
             dump = ClassifierDump(categories=categories, features=features, X=X, y=y)
-            dumpDict = dump.__dict__
-
-            Utils.pickleDump(dumpDict, filename)
+            dump.write(filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)
         return result
-
-    # @classmethod
-    # def sampleData(
-    #         cls, raster: QgsRasterLayer, classification: QgsRasterLayer, classBandNo: int, categories: Categories,
-    #         feedback: QgsProcessingFeedback = None
-    # ) -> Tuple[SampleX, SampleY]:
-    #     assert raster.crs() == classification.crs()
-    #     assert raster.extent() == classification.extent()
-    #     assert (raster.width(), raster.height()) == (classification.width(), classification.height())
-    #
-    #     maximumMemoryUsage = gdal.GetCacheMax()
-    #     rasterReader = RasterReader(raster)
-    #     classificationReader = RasterReader(classification)
-    #     lineMemoryUsage = rasterReader.lineMemoryUsage(1)
-    #     lineMemoryUsage += classificationReader.width() * classificationReader.dataTypeSize()
-    #     blockSizeY = min(raster.height(), ceil(maximumMemoryUsage / lineMemoryUsage))
-    #     blockSizeX = raster.width()
-    #
-    #     X = list()
-    #     y = list()
-    #     for block in rasterReader.walkGrid(blockSizeX, blockSizeY, feedback):
-    #         blockClassification = classificationReader.arrayFromBlock(block, [classBandNo])[0]
-    #         labeled = np.full_like(blockClassification, False, bool)
-    #         for c in categories:
-    #             np.logical_or(labeled, blockClassification == c.value, out=labeled)
-    #         blockY = blockClassification[labeled]
-    #         blockX = list()
-    #         for bandNo in range(1, rasterReader.bandCount() + 1):
-    #             blockBand = rasterReader.arrayFromBlock(block, [bandNo])[0]
-    #             blockX.append(blockBand[labeled])
-    #         X.append(blockX)
-    #         y.append(blockY)
-    #     X = np.concatenate(X, axis=1).T
-    #     y = np.expand_dims(np.concatenate(y), 1)
-    #     checkSampleShape(X, y)
-    #     return X, y

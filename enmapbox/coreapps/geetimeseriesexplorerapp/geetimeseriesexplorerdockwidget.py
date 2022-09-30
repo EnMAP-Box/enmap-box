@@ -577,7 +577,8 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
             assert 0
 
         data = self.loadJsonUrlData(jsonUrl)
-        code = Utils.fileLoad(pyFilename)
+        with open(pyFilename) as file:
+            code = file.read()
         code = f'# {basename(pyFilename)} ({pyFilename})\n\n' + code
 
         self.eeFullCollectionJson = CollectionInfo(data)
@@ -1074,7 +1075,11 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
             extentIndex = self.MapViewExtent  # when limiting the collection always use the map extent
 
         if extentIndex == self.MapViewExtent:
-            extent = Utils.transformMapCanvasExtent(self.currentMapCanvas(), self.crsEpsg4326)
+            mapCanvasCrs = Utils.mapCanvasCrs()
+            # extent = Utils.transformMapCanvasExtent(self.currentMapCanvas(), self.crsEpsg4326)
+            extent = Utils.transformExtent(
+                self.currentMapCanvas().extent(), Utils.mapCanvasCrs(self.currentMapCanvas()), self.crsEpsg4326
+            )
             eeExtent = ee.Geometry.Rectangle(
                 [extent.xMinimum(), extent.yMinimum(), extent.xMaximum(), extent.yMaximum()], self.epsg4326, False
             )

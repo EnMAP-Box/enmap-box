@@ -1,11 +1,12 @@
-from typing import List, Union, Optional
+from typing import List, Union, Optional, Iterator
 
 from osgeo import gdal
 
-from enmapboxprocessing.typing import Array3d, Array2d, MetadataValue, MetadataDomain, Metadata, QgisDataType, Number
+from enmapboxprocessing.typing import Array3d, Array2d, MetadataValue, MetadataDomain, Metadata, Number
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtCore import QDateTime
 from qgis.PyQt.QtGui import QColor
+from qgis.core import Qgis
 from typeguard import typechecked
 
 
@@ -29,15 +30,10 @@ class RasterWriter(object):
             array = array[overlap:height - overlap, overlap:width - overlap]
         self.gdalBand(bandNo).WriteArray(array, xOffset, yOffset)
 
-    def fill(self, value: float, bandNo: int = None):
-        if bandNo is None:
-            bands = range(1, self.bandCount() + 1)
-        else:
-            bands = [bandNo]
-        for bandNo in bands:
-            self._gdalObject(bandNo).Fill(value)
+    def fill(self, value: float, bandNo: int):
+        self.gdalBand(bandNo).Fill(value)
 
-    def setNoDataValue(self, noDataValue: float = None, bandNo: int = None):
+    def setNoDataValue(self, noDataValue: Optional[float], bandNo: int = None):
         if noDataValue is None:
             return
         if bandNo is None:
@@ -46,30 +42,18 @@ class RasterWriter(object):
         else:
             self.gdalBand(bandNo).SetNoDataValue(noDataValue)
 
-    def deleteNoDataValue(self, bandNo: int = None):
-        if bandNo is None:
-            for bandNo in range(1, self.bandCount() + 1):
-                self.deleteNoDataValue(bandNo)
-        else:
-            self.gdalBand(bandNo).DeleteNoDataValue()
+    def deleteNoDataValue(self, bandNo: int):
+        self.gdalBand(bandNo).DeleteNoDataValue()
 
-    def setOffset(self, offset: float = None, bandNo: int = None):
+    def setOffset(self, offset: Optional[float], bandNo: int):
         if offset is None:
             return
-        if bandNo is None:
-            for bandNo in range(1, self.bandCount() + 1):
-                self.setOffset(offset, bandNo)
-        else:
-            self.gdalBand(bandNo).SetOffset(offset)
+        self.gdalBand(bandNo).SetOffset(offset)
 
-    def setScale(self, scale: float = None, bandNo: int = None):
+    def setScale(self, scale: Optional[float], bandNo: int):
         if scale is None:
             return
-        if bandNo is None:
-            for bandNo in range(1, self.bandCount() + 1):
-                self.setScale(scale, bandNo)
-        else:
-            self.gdalBand(bandNo).SetScale(scale)
+        self.gdalBand(bandNo).SetScale(scale)
 
     def setMetadataItem(self, key: str, value: MetadataValue, domain: str = '', bandNo: int = None):
         if value is None:
@@ -81,10 +65,15 @@ class RasterWriter(object):
 
     def setMetadataDomain(self, metadata: MetadataDomain, domain: str = '', bandNo: int = None):
         self._gdalObject(bandNo).SetMetadata({}, domain)  # clear existing domain first
-        for key, value in metadata.items():
-            if key.replace(' ', '_') == 'file_compression':
-                continue
-            self.setMetadataItem(key, value, domain, bandNo)
+
+        deleteDomain = len(metadata) == 0
+        if deleteDomain:
+            self._gdalObject(bandNo).SetMetadata({}, domain)
+        else:
+            for key, value in metadata.items():
+                if key.replace(' ', '_') == 'file_compression':
+                    continue
+                self.setMetadataItem(key, value, domain, bandNo)
 
     def setMetadata(self, metadata: Metadata, bandNo: int = None):
         for domain, metadata_ in metadata.items():
@@ -151,10 +140,15 @@ class RasterWriter(object):
     def bandCount(self) -> int:
         return self.gdalDataset.RasterCount
 
+    def bandNumbers(self) -> Iterator[int]:
+        """Return iterator over all band numbers."""
+        for bandNo in range(1, self.bandCount() + 1):
+            yield bandNo
+
     def source(self) -> str:
         return self._source
 
-    def dataType(self, bandNo: int = None) -> QgisDataType:
+    def dataType(self, bandNo: int = None) -> Qgis.DataType:
         if bandNo is None:
             bandNo = 1
         gdalDataType = self.gdalDataset.GetRasterBand(bandNo).DataType

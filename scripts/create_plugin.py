@@ -20,7 +20,6 @@
 """
 import argparse
 import configparser
-import datetime
 import fnmatch
 import io
 import os
@@ -32,12 +31,14 @@ import sys
 import textwrap
 import typing
 import warnings
+from os.path import exists
 
 from qgis.core import QgsUserProfileManager, QgsUserProfile
 
 site.addsitedir(pathlib.Path(__file__).parents[1])  # noqa
 
 from qgis.testing import start_app
+
 app = start_app()
 import enmapbox
 from enmapbox import DIR_REPO
@@ -45,6 +46,13 @@ from enmapbox.qgispluginsupport.qps.make.deploy import QGISMetadataFileWriter, u
 from enmapbox.qgispluginsupport.qps.utils import zipdir
 from qgis.core import QgsFileUtils
 
+# concider default Git location on Windows systems to avaid creating a Start-Up Script
+addDefaultGitLocation = True
+if addDefaultGitLocation:
+    potentialGitPath = r"C:\Program Files\Git\bin"
+    if exists(potentialGitPath):
+        os.environ["PATH"] = os.environ["PATH"] + os.pathsep + potentialGitPath
+    import git
 
 DIR_REPO = pathlib.Path(DIR_REPO)
 
@@ -94,7 +102,8 @@ def fileRegex(root: typing.Optional[str], pattern: str) -> typing.Pattern:
 def create_enmapbox_plugin(include_testdata: bool = False,
                            include_qgisresources: bool = False,
                            create_zip: bool = True,
-                           copy_to_profile: bool = False) -> typing.Optional[pathlib.Path]:
+                           copy_to_profile: bool = False,
+                           build_name: str = None) -> typing.Optional[pathlib.Path]:
     assert (DIR_REPO / '.git').is_dir()
     config = configparser.ConfigParser()
     config.read(PATH_CONFIG_FILE)
@@ -110,7 +119,7 @@ def create_enmapbox_plugin(include_testdata: bool = False,
             profileName = copy_to_profile
         else:
             profileName = profileManager.defaultProfileName()
-        assert profileManager.profileExists(profileName),  \
+        assert profileManager.profileExists(profileName), \
             f'QGIS profiles "{profileName}" does not exist in {profileManager.allProfiles()}'
 
         profileManager.setActiveUserProfile(profileName)
@@ -122,26 +131,31 @@ def create_enmapbox_plugin(include_testdata: bool = False,
             if not DIR_QGIS_USERPROFILE.is_dir():
                 raise f'QGIS profile directory "{profile.name()}" does not exists: {DIR_QGIS_USERPROFILE}'
 
-    VERSION_SHA = '<unknown>'
-    timestamp = re.split(r'[.+]', datetime.datetime.now().isoformat())[0]
-    currentBranch = 'main'  # Allows proper plugin creation for a release without setting up git.
-    try:
-        import git
-        REPO = git.Repo(DIR_REPO)
-        currentBranch = REPO.active_branch.name
-        VERSION_SHA = REPO.active_branch.commit.hexsha
-        lastCommitDate = REPO.active_branch.commit.authored_datetime
-        timestamp = re.split(r'[.+]', lastCommitDate.isoformat())[0]
-    except ImportError as ex:
-        print('Unable to import "git". Please install gitpython (pip install gitpython)', file=sys.stderr)
-        print(f'{ex}\nUnable to find git repo and current branch. \nSet currentBranch to "{currentBranch}"',
-              file=sys.stderr)
-    else:
-        print(f'currentBranch is "{currentBranch}"')
+    REPO = git.Repo(DIR_REPO)
+    active_branch = REPO.active_branch.name
+    VERSION = config['metadata']['version']
+    VERSION_SHA = REPO.active_branch.commit.hexsha
+    lastCommitDate = REPO.active_branch.commit.authored_datetime
+    timestamp = re.split(r'[.+]', lastCommitDate.isoformat())[0]
 
-    BUILD_NAME = '{}.{}.{}'.format(config['metadata']['version'], timestamp, currentBranch)
-    BUILD_NAME = re.sub(r'[:-]', '', BUILD_NAME)
-    BUILD_NAME = re.sub(r'[\\/]', '_', BUILD_NAME)
+    if build_name is None:
+        # we are on release branch
+        if re.search(r'release_\d+\.\d+', active_branch):
+            BUILD_NAME = VERSION
+        else:
+            BUILD_NAME = '{}.{}.{}'.format(VERSION, timestamp, active_branch)
+            BUILD_NAME = re.sub(r'[:-]', '', BUILD_NAME)
+            BUILD_NAME = re.sub(r'[\\/]', '_', BUILD_NAME)
+    else:
+        BUILD_NAME = build_name
+
+    if REPO.is_dirty():
+        if BUILD_NAME == VERSION:
+            raise Exception('Repository has uncommitted changes!\n'
+                            'Commit / rollback them first to ensure a valid VERSION_SHA for release builds!')
+        else:
+            warnings.warn('Repository has uncommitted changes!')
+
     PLUGIN_DIR = DIR_DEPLOY_LOCAL / 'enmapboxplugin'
     PLUGIN_ZIP = DIR_DEPLOY_LOCAL / 'enmapboxplugin.{}.zip'.format(BUILD_NAME)
 
@@ -168,7 +182,7 @@ def create_enmapbox_plugin(include_testdata: bool = False,
     MD.mHasProcessingProvider = True
     MD.mPlugin_dependencies = ['Google Earth Engine']  # the best way to make sure that the 'ee' module is available
 
-    MD.mVersion = BUILD_NAME
+    MD.mVersion = VERSION
     MD.writeMetadataTxt(PATH_METADATAFILE)
 
     # (re)-compile all enmapbox resource files
@@ -226,7 +240,7 @@ def create_enmapbox_plugin(include_testdata: bool = False,
             DEST = PLUGIN_DIR / 'enmapbox' / 'exampledata'
             shutil.copytree(enmapbox.DIR_EXAMPLEDATA, DEST, dirs_exist_ok=True)
 
-    if include_qgisresources and not re.search(currentBranch, 'master', re.I):
+    if include_qgisresources:
         qgisresources = pathlib.Path(DIR_REPO) / 'qgisresources'
         shutil.copytree(qgisresources, PLUGIN_DIR / 'qgisresources')
 
@@ -252,7 +266,7 @@ def create_enmapbox_plugin(include_testdata: bool = False,
             msg = f'{PLUGIN_ZIP.name} ({QgsFileUtils.representFileSize(pluginSize)}) ' + \
                   f'Compressed plugin size exceeds limit of {MAX_PLUGIN_SIZE} MB)'
 
-            if re.search(currentBranch, 'master', re.I):
+            if re.search(active_branch, r'release_.*', re.I):
                 warnings.warn(msg, Warning, stacklevel=2)
             else:
                 print(msg, file=sys.stderr)
@@ -363,6 +377,18 @@ if __name__ == "__main__":
                         default=False,
                         help='Skip zip file creation',
                         action='store_true')
+    parser.add_argument('-b', '--build-name',
+                        required=False,
+                        default=None,
+                        help=textwrap.dedent("""
+                            The build name in "enmapboxplugin.<build name>.zip"
+                            Defaults:
+                                <version> in case of a release.* branch
+                                <version>.<timestamp>.<branch name> in case of any other branch.
+                            Can be specified by:
+                            -b mytestversion -> enmapboxplugin.mytestversion.zip
+                            """
+                                             ))
     parser.add_argument('-p', '--profile',
                         nargs='?',
                         const=True,
@@ -380,7 +406,8 @@ if __name__ == "__main__":
     path = create_enmapbox_plugin(include_testdata=args.testdata,
                                   include_qgisresources=args.qgisresources,
                                   create_zip=not args.skip_zip,
-                                  copy_to_profile=args.profile)
+                                  copy_to_profile=args.profile,
+                                  build_name=args.build_name)
 
     if isinstance(path, pathlib.Path) and re.search(r'\.master\.', path.name):
         message = \

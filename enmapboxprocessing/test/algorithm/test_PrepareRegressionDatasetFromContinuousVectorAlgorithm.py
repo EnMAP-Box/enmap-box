@@ -1,11 +1,11 @@
-from enmapbox.exampledata import enmap, landcover_polygons
+from enmapbox.exampledata import enmap, landcover_polygon
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousvectoralgorithm import \
     PrepareRegressionDatasetFromContinuousVectorAlgorithm
 from enmapboxprocessing.test.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
+from enmapboxtestdata import fraction_point_multitarget, fraction_point_singletarget
 from qgis.core import QgsProcessingException
-from testdata import fraction_points_gpkg, fraction_points_singletarget_gpkg
 
 
 class TestPrepareRegressionDatasetFromCategorizedVectorAlgorithm(TestCase):
@@ -14,7 +14,7 @@ class TestPrepareRegressionDatasetFromCategorizedVectorAlgorithm(TestCase):
         alg = PrepareRegressionDatasetFromContinuousVectorAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
-            alg.P_CONTINUOUS_VECTOR: fraction_points_gpkg,
+            alg.P_CONTINUOUS_VECTOR: fraction_point_multitarget,
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
         }
         self.runalg(alg, parameters)
@@ -31,7 +31,7 @@ class TestPrepareRegressionDatasetFromCategorizedVectorAlgorithm(TestCase):
         alg = PrepareRegressionDatasetFromContinuousVectorAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
-            alg.P_CONTINUOUS_VECTOR: fraction_points_singletarget_gpkg,
+            alg.P_CONTINUOUS_VECTOR: fraction_point_singletarget,
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
         }
         self.runalg(alg, parameters)
@@ -48,7 +48,7 @@ class TestPrepareRegressionDatasetFromCategorizedVectorAlgorithm(TestCase):
         alg = PrepareRegressionDatasetFromContinuousVectorAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
-            alg.P_CONTINUOUS_VECTOR: landcover_polygons,
+            alg.P_CONTINUOUS_VECTOR: landcover_polygon,
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
         }
         try:
