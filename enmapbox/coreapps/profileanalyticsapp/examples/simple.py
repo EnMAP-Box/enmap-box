@@ -1,8 +1,8 @@
 from typing import List
 
 import numpy as np
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QColor
 
 import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyle, MarkerSymbol

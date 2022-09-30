@@ -1,9 +1,5 @@
 from typing import Optional
 
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction
-
 from enmapbox import EnMAPBox
 from enmapbox.gui.applications import EnMAPBoxApplication
 from enmapbox.gui.dataviews.docks import DockTypes, MapDock
@@ -13,6 +9,9 @@ from geetimeseriesexplorerapp.externals.ee_plugin.provider import register_data_
 from geetimeseriesexplorerapp.geetemporalprofiledockwidget import GeeTemporalProfileDockWidget
 from geetimeseriesexplorerapp.geetimeseriesexplorerdockwidget import GeeTimeseriesExplorerDockWidget
 from geetimeseriesexplorerapp.maptool import MapTool
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QAction
 from qgis.core import QgsRasterLayer, QgsRectangle
 from qgis.gui import QgisInterface
 from typeguard import typechecked
@@ -61,17 +60,6 @@ class GeeTimeseriesExplorerApp(EnMAPBoxApplication):
 
     def initEnmapOrQgisGui(self, interface: QgisInterface):
 
-        # add map tool (later we will use this for other apps as well, but for now we just have it here)
-        #if not self.isEnmapInterface:
-        #    self.actionCurrentLocationMapTool = QAction(
-        #        QIcon(':/qps/ui/icons/select_location.svg'), 'Select Current Location'
-        #    )
-        #    self.actionCurrentLocationMapTool.setCheckable(True)
-        #    interface.addToolBarIcon(self.actionCurrentLocationMapTool)
-        #    self.actionCurrentLocationMapTool.toggled.connect(self.onCurrentLocationMapToolClicked)
-        #
-        #    self.currentLocationMapTool = MapTool(self.interface.mapCanvas(), self.actionCurrentLocationMapTool)
-
         # add toolbar button
         self.actionToggleMainDock = QAction(self.icon(), 'GEE Time Series Explorer')
         self.actionToggleMainDock.triggered.connect(self.toggleMainDockVisibility)
@@ -100,12 +88,6 @@ class GeeTimeseriesExplorerApp(EnMAPBoxApplication):
         # connect signals
         if not self.isEnmapInterface:
             self.currentLocationMapTool.sigClicked.connect(self.profileDock.setCurrentLocationFromQgsMapMouseEvent)
-
-    #def onCurrentLocationMapToolClicked(self):
-    #    if self.actionCurrentLocationMapTool.isChecked():
-    #        self.interface.mapCanvas().setMapTool(self.currentLocationMapTool)
-    #    else:
-    #        self.interface.mapCanvas().unsetMapTool(self.currentLocationMapTool)
 
     def toggleMainDockVisibility(self):
 

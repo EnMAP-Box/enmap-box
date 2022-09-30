@@ -4,7 +4,6 @@ from os.path import exists, join, dirname
 from typing import Optional, List
 
 import numpy as np
-from PyQt5.QtWidgets import QComboBox, QTableWidget, QCheckBox, QToolButton, QLineEdit, QWidget
 
 import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
 import processing
@@ -17,12 +16,10 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp import MapTool
 from qgis.PyQt import uic
-from qgis._core import QgsMapLayerProxyModel, QgsRasterLayer, QgsVectorLayer, QgsProcessingFeatureSourceDefinition, \
+from qgis.PyQt.QtWidgets import QComboBox, QTableWidget, QCheckBox, QToolButton, QLineEdit
+from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsVectorLayer, QgsProcessingFeatureSourceDefinition, \
     QgsFeatureRequest, QgsWkbTypes
-from qgis._gui import QgsMapLayerComboBox, QgsFileWidget, QgsRasterBandComboBox
-from qgis.gui import (
-    QgsDockWidget, QgisInterface
-)
+from qgis.gui import QgsMapLayerComboBox, QgsFileWidget, QgsRasterBandComboBox, QgsDockWidget, QgisInterface
 from typeguard import typechecked, check_type
 
 
@@ -287,9 +284,9 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                     parameters = {
                         'INPUT': lineLayer2,
                         'DISTANCE': samplingDistance,
-                        'START_OFFSET':0,
-                        'END_OFFSET':0,
-                        #'OUTPUT': r'C:\Users\Andreas\Downloads\points.gpkg'  # 'TEMPORARY_OUTPUT'
+                        'START_OFFSET': 0,
+                        'END_OFFSET': 0,
+                        # 'OUTPUT': r'C:\Users\Andreas\Downloads\points.gpkg'  # 'TEMPORARY_OUTPUT'
                         'OUTPUT': 'TEMPORARY_OUTPUT'
                     }
                     pointLayer = processing.run(alg, parameters)['OUTPUT']
@@ -310,7 +307,7 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                         'RASTERCOPY': rasterLayer,
                         'COLUMN_PREFIX': 'SAMPLE_',
                         'OUTPUT': 'TEMPORARY_OUTPUT'
-                        #'OUTPUT': r'C:\Users\Andreas\Downloads\sample.gpkg' # 'TEMPORARY_OUTPUT'
+                        # 'OUTPUT': r'C:\Users\Andreas\Downloads\sample.gpkg' # 'TEMPORARY_OUTPUT'
                     }
                     pointLayer2: QgsVectorLayer = processing.run(alg, parameters)['OUTPUT']
                     xValues = [feature['distance'] for feature in pointLayer2.getFeatures()]

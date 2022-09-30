@@ -338,8 +338,8 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                     writer.setBadBandMultiplier(badBandMultiplier, dstBandNo)
             else:
                 pass
-                #writer.removeMetadata()
-                #for bandNo in writer.bandNumbers():
+                # writer.removeMetadata()
+                # for bandNo in writer.bandNumbers():
                 #    writer.removeMetadata(bandNo)
 
             # clean up ENVI metadata domain (see #1098)

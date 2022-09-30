@@ -5,8 +5,6 @@ from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QCursor, QColor
 from qgis.PyQt.QtWidgets import QAction
-from qgis._core import QgsCoordinateReferenceSystem
-
 from qgis.gui import QgsMapTool, QgsMapMouseEvent, QgsMapCanvas, QgsVertexMarker
 from typeguard import typechecked
 
