@@ -4,7 +4,7 @@ services:
   qgis:
     build:
       context: ..
-      dockerfile: ./.docker/enmapbox_environment.dockerfile
+      dockerfile: ./.docker/Dockerfile
       args:
         QGIS_TEST_VERSION: ${QGIS_TEST_VERSION}
     tty: true
