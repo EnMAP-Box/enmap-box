@@ -649,6 +649,25 @@ class Utils(object):
         return toNanometers * toDstUnits
 
     @classmethod
+    def dateTimeToDecimalYear(self, dateTime: Optional[QDateTime]) -> Optional[float]:
+        if dateTime is None:
+            return None
+        date = dateTime.date()
+        secOfYear = QDateTime(QDate(date.year(), 1, 1)).secsTo(dateTime)
+        secsInYear = date.daysInYear() * 24 * 60 * 60
+        return date.year() + secOfYear / secsInYear
+
+    @classmethod
+    def decimalYearToDateTime(self, decimalYear: Optional[float]) -> Optional[QDateTime]:
+        if decimalYear is None:
+            return None
+        year = int(decimalYear)
+        secsInYear = QDate(year, 1, 1).daysInYear() * 24 * 60 * 60
+        secOfYear = int((decimalYear - year) * secsInYear)
+        dateTime = QDateTime(QDate(year, 1, 1)).addSecs(secOfYear)
+        return dateTime
+
+    @classmethod
     def transformExtent(
             cls, extent: QgsRectangle, crs: QgsCoordinateReferenceSystem, toCrs: QgsCoordinateReferenceSystem
     ) -> QgsRectangle:

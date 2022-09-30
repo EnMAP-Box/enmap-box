@@ -19,20 +19,24 @@ from typeguard import typechecked
 
 
 def enmapboxApplicationFactory(enmapBox: EnMAPBox):
-    app = GeeTimeseriesExplorerApp(enmapBox)
+    app = GeeTimeseriesExplorerApp(enmapBox, None, None)
     return [app]
 
 
 @typechecked
 class GeeTimeseriesExplorerApp(EnMAPBoxApplication):
 
-    def __init__(self, enmapBox: Optional[EnMAPBox], interface: QgisInterface = None, parent=None):
+    def __init__(
+            self, enmapBox: Optional[EnMAPBox], interface: Optional[QgisInterface],
+            currentLocationMapTool: Optional[MapTool], parent=None
+    ):
         super().__init__(enmapBox, parent=parent)
 
         if interface is None:
             interface = enmapBox
         self.interface = interface
         self.isEnmapInterface = isinstance(interface, EnMAPBox)
+        self.currentLocationMapTool = currentLocationMapTool
 
         self.name = GeeTimeseriesExplorerApp.__name__
         self.version = 'dev'
@@ -58,15 +62,15 @@ class GeeTimeseriesExplorerApp(EnMAPBoxApplication):
     def initEnmapOrQgisGui(self, interface: QgisInterface):
 
         # add map tool (later we will use this for other apps as well, but for now we just have it here)
-        if not self.isEnmapInterface:
-            self.actionCurrentLocationMapTool = QAction(
-                QIcon(':/qps/ui/icons/select_location.svg'), 'Select Current Location'
-            )
-            self.actionCurrentLocationMapTool.setCheckable(True)
-            interface.addToolBarIcon(self.actionCurrentLocationMapTool)
-            self.actionCurrentLocationMapTool.toggled.connect(self.onCurrentLocationMapToolClicked)
-
-            self.currentLocationMapTool = MapTool(self.interface.mapCanvas(), self.actionCurrentLocationMapTool)
+        #if not self.isEnmapInterface:
+        #    self.actionCurrentLocationMapTool = QAction(
+        #        QIcon(':/qps/ui/icons/select_location.svg'), 'Select Current Location'
+        #    )
+        #    self.actionCurrentLocationMapTool.setCheckable(True)
+        #    interface.addToolBarIcon(self.actionCurrentLocationMapTool)
+        #    self.actionCurrentLocationMapTool.toggled.connect(self.onCurrentLocationMapToolClicked)
+        #
+        #    self.currentLocationMapTool = MapTool(self.interface.mapCanvas(), self.actionCurrentLocationMapTool)
 
         # add toolbar button
         self.actionToggleMainDock = QAction(self.icon(), 'GEE Time Series Explorer')
@@ -97,11 +101,11 @@ class GeeTimeseriesExplorerApp(EnMAPBoxApplication):
         if not self.isEnmapInterface:
             self.currentLocationMapTool.sigClicked.connect(self.profileDock.setCurrentLocationFromQgsMapMouseEvent)
 
-    def onCurrentLocationMapToolClicked(self):
-        if self.actionCurrentLocationMapTool.isChecked():
-            self.interface.mapCanvas().setMapTool(self.currentLocationMapTool)
-        else:
-            self.interface.mapCanvas().unsetMapTool(self.currentLocationMapTool)
+    #def onCurrentLocationMapToolClicked(self):
+    #    if self.actionCurrentLocationMapTool.isChecked():
+    #        self.interface.mapCanvas().setMapTool(self.currentLocationMapTool)
+    #    else:
+    #        self.interface.mapCanvas().unsetMapTool(self.currentLocationMapTool)
 
     def toggleMainDockVisibility(self):
 
