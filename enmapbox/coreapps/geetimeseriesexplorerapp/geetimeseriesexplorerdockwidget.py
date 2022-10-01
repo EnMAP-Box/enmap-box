@@ -239,6 +239,10 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
         self.mProgressBarFrame.hide()
         self.mProgressBar.setRange(0, 0)
 
+        # hide Z-profile related widgets (see #65)
+        self.mReducerTypeLabel.hide()
+        self.mReducerType.hide()
+
     def enmapBoxInterface(self) -> EnMAPBox:
         return self.interface
 

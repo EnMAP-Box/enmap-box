@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>719</width>
-    <height>1181</height>
+    <height>1075</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,7 +19,7 @@
   <property name="minimumSize">
    <size>
     <width>556</width>
-    <height>638</height>
+    <height>719</height>
    </size>
   </property>
   <property name="autoFillBackground">
@@ -240,7 +240,7 @@ QListWidget::item::selected {
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>5</number>
         </property>
         <widget class="QWidget" name="page">
          <layout class="QVBoxLayout" name="verticalLayout_12" stretch="0">
@@ -287,7 +287,7 @@ QListWidget::item::selected {
                    <x>0</x>
                    <y>0</y>
                    <width>597</width>
-                   <height>966</height>
+                   <height>860</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_2">
@@ -1075,8 +1075,8 @@ Surface Reflectance</string>
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>422</width>
-                   <height>843</height>
+                   <width>597</width>
+                   <height>860</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_4">
@@ -1723,8 +1723,8 @@ Terra Surface Reflectance
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>422</width>
-                   <height>396</height>
+                   <width>597</width>
+                   <height>860</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_3">
@@ -2142,8 +2142,8 @@ Full Resolution</string>
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>211</width>
-                   <height>265</height>
+                   <width>597</width>
+                   <height>860</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_5">
@@ -3012,7 +3012,7 @@ Hyperspectral Imager</string>
                <x>0</x>
                <y>0</y>
                <width>621</width>
-               <height>1013</height>
+               <height>907</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_22">
@@ -3958,7 +3958,7 @@ count cut</string>
              </sizepolicy>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <property name="iconSize">
              <size>
@@ -4485,7 +4485,7 @@ count cut</string>
                  </widget>
                 </item>
                 <item row="4" column="0">
-                 <widget class="QLabel" name="mReducerLabelRed">
+                 <widget class="QLabel" name="mReducerTypeLabel">
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
@@ -4569,6 +4569,19 @@ count cut</string>
                    </layout>
                   </widget>
                  </widget>
+                </item>
+                <item row="5" column="1">
+                 <spacer name="verticalSpacer_10">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
                 </item>
                </layout>
               </item>
@@ -4986,6 +4999,12 @@ count cut</string>
    <header>qgsspinbox.h</header>
   </customwidget>
   <customwidget>
+   <class>CodeEditWidget</class>
+   <extends>QWidget</extends>
+   <header>enmapboxprocessing.parameter.processingparametercodeeditwidget</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>QgsMessageBar</class>
    <extends>QFrame</extends>
    <header>qgis.gui</header>
@@ -4995,12 +5014,6 @@ count cut</string>
    <class>QgsColorRampButton</class>
    <extends>QToolButton</extends>
    <header>qgis.gui</header>
-  </customwidget>
-  <customwidget>
-   <class>CodeEditWidget</class>
-   <extends>QWidget</extends>
-   <header>geetimeseriesexplorerapp.codeeditwidget</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
