@@ -52,7 +52,7 @@ set QT_PLUGIN_PATH=^
 %OSGEO4W_ROOT%\apps\%QGIS_ENV%\qtplugins;^
 %OSGEO4W_ROOT%\apps\qt5\plugins
 
-set PYTHONPATH=^
+set PYTHONPATH=%PYTHONPATH%;^
 %OSGEO4W_ROOT%\apps\%QGIS_ENV%\python;^
 %OSGEO4W_ROOT%\apps\%QGIS_ENV%\python\plugins
 
