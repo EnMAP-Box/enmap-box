@@ -5,19 +5,21 @@ Version 3.11
 ------------
 *This release was tested under QGIS 3.26.2*
 
-**GUI**
-
-**Spectral Libraries**
+*Important Notice: the EnMAP-Box repository moved to https://github.com/EnMAP-Box/enmap-box*
 
 **Applications**
 
-* Metadata Viewer revised (#1185, #1329), added more band-specific settings
+* added *Profile Analytics* app:
 
-* included the *GEE Timeseries Explorer* plugin into the EnMAP-Box
+  * allows various profile plot types like spectral profiles, temporal profiles, spatial profiles.
+  * profile data can by analysed by user-defined function; the user-function has access to the plot widget and can draw additional plot items
 
-  * (slightly) new name *GEE Time Series Explorer* app
-  * can be used inside EnMAP-Box GUI and stand-alone QGIS GUI
-  * overhauled the GUI
+* improved *Scatter Plot* app:
+
+  * added support for vector data
+  * added support for simple scatter plots with symbols plotted, instead count density
+  * added support for showing 1:1 line
+  * added support for fitting a line to the data and report goodness of fit measures
 
 **Renderer**
 
@@ -25,16 +27,9 @@ Version 3.11
 * added custom *CMYK Color Raster Renderer*: allows to visualize four bands using the CMYK (Cyan, Magenta, Yellow, and Key (black)) color model. Find a mapping example here: https://adventuresinmapping.com/2018/10/31/cmyk-vice/
 * added custom *HSV Color Raster Renderer*: allows to visualize three bands using the HSV (Hue, Saturation, Value (black)) color model. Find a mapping example here: https://landmonitoring.earth/portal/ ; select Maps > Global Landcover Dynamics 2016-2020
 
-
-**Processing algorithms**
-
-
 Version 3.10
 ------------
 *This release was tested under QGIS 3.24.1*
-
-*Important Notice: the EnMAP-Box repository moved to https://github.com/EnMAP-Box/enmap-box*
-
 
 **GUI**
 
@@ -71,7 +66,7 @@ Data Views
 * new editor to modify single spectral profiles
 * reads profiles from Spectral Evolution .sed files (reference, target, reflectance)
 
-Spectral Profile plot
+**Spectral Profile plot**
 
 * moved plot settings like background and crosshair color from context menu to the visualization settings tree view
 * color and line style of temporary profiles can be defined in spectral profile source panel
