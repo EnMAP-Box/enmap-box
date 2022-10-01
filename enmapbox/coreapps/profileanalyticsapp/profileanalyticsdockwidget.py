@@ -16,7 +16,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp import MapTool
 from qgis.PyQt import uic
-from qgis.PyQt.QtWidgets import QComboBox, QTableWidget, QCheckBox, QToolButton, QLineEdit
+from qgis.PyQt.QtWidgets import QComboBox, QTableWidget, QCheckBox, QToolButton, QLineEdit, QWidget
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsVectorLayer, QgsProcessingFeatureSourceDefinition, \
     QgsFeatureRequest, QgsWkbTypes
 from qgis.gui import QgsMapLayerComboBox, QgsFileWidget, QgsRasterBandComboBox, QgsDockWidget, QgisInterface
@@ -30,6 +30,8 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
     # data tab
     mSourceType: QComboBox
     mRasterProfileType: QComboBox
+    mTip1: QWidget
+    mTip2: QWidget
     mRasterTable: QTableWidget
     mAddRaster: QToolButton
     mRemoveRaster: QToolButton
@@ -60,7 +62,7 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
 
         # connect signals
         self.mSourceType.currentIndexChanged.connect(self.onLiveUpdate)
-        self.mRasterProfileType.currentIndexChanged.connect(self.onLiveUpdate)
+        self.mRasterProfileType.currentIndexChanged.connect(self.onRasterProfileTypeChanged)
         self.mAddRaster.clicked.connect(self.onAddRasterClicked)
         self.mRemoveRaster.clicked.connect(self.onRemoveRasterClicked)
         self.mRemoveAllRaster.clicked.connect(self.onmRemoveAllRasterClicked)
@@ -73,6 +75,7 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
         self.mPlotWidget.addLegend()
         self.mPlotWidget.legend.setOffset((0.3, 0.3))
 
+        self.onRasterProfileTypeChanged()
         self.onAddRasterClicked()
 
     def enmapBoxInterface(self) -> EnMAPBox:
@@ -122,24 +125,30 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
 
         return layer
 
+    def onRasterProfileTypeChanged(self):
+        isLineProfile = self.mRasterProfileType.currentIndex() == self.LineProfileType
+        self.mTip1.setVisible(not isLineProfile)
+        self.mTip2.setVisible(isLineProfile)
+
+        self.onLiveUpdate()
+
     def onCurrentLayerChanged(self):
-        print('TODO')
-        return
+
         # disconnect old layer
         try:
-            self.oldLineLayer.selectionChanged.disconnect(self.onLineLayerSelectionChanged)
+            self.oldLineLayer.selectionChanged.disconnect(self.onLayerSelectionChanged)
         except Exception:
             pass
 
         # connect new layer
-        layer = self.mLineLayer.currentLayer()
+        layer = self.currentLayer()
         if layer is None:
             return
-        layer.selectionChanged.connect(self.onLineLayerSelectionChanged)
+        layer.selectionChanged.connect(self.onLayerSelectionChanged)
 
         self.oldLineLayer = layer
 
-    def onLineLayerSelectionChanged(self):
+    def onLayerSelectionChanged(self):
         self.onLiveUpdate()
 
     def onAddRasterClicked(self):
@@ -212,15 +221,21 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                     continue
 
                 w: QgsRasterBandComboBox = self.mRasterTable.cellWidget(row, 1)
-                bandNo: int = w.currentBand()
 
-                point = self.currentLocation()
-                if point is None and self.mRasterProfileType.currentIndex() != self.LineProfileType:
-                    return
-                else:
+                if self.mRasterProfileType.currentIndex() != self.ZProfileType:
+                    bandNo: int = w.currentBand()
+                    if bandNo == -1:
+                        return
+
+                if self.mRasterProfileType.currentIndex() != self.LineProfileType:
+                    point = self.currentLocation()
+                    if point is None:
+                        return
                     pixel = point.toPixel(layer)
                     if pixel is None:
                         continue
+                else:
+                    pixel = None
 
                 # read data
                 reader = RasterReader(layer)
