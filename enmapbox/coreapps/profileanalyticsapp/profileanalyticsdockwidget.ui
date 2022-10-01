@@ -422,30 +422,6 @@
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="Analytics">
-        <attribute name="icon">
-         <iconset>
-          <normaloff>../geetimeseriesexplorerapp/icons/analytics.svg</normaloff>../geetimeseriesexplorerapp/icons/analytics.svg</iconset>
-        </attribute>
-        <attribute name="title">
-         <string/>
-        </attribute>
-        <attribute name="toolTip">
-         <string>Analytics</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_8">
-         <item>
-          <widget class="CodeEditWidget" name="mCode" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>1</horstretch>
-             <verstretch>1</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
       </widget>
      </widget>
     </item>
@@ -541,12 +517,6 @@
    <class>GraphicsLayoutWidget</class>
    <extends>QGraphicsView</extends>
    <header>enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph</header>
-  </customwidget>
-  <customwidget>
-   <class>CodeEditWidget</class>
-   <extends>QWidget</extends>
-   <header>enmapboxprocessing.parameter.processingparametercodeeditwidget</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
