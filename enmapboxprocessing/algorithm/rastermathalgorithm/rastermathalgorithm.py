@@ -99,6 +99,8 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
         text.extend([(f'Raster layer mapped to R{i}', '') for i in range(1, 11)])  # just silince those
         text.extend([(f'Vector layer mapped to V{i}', '') for i in range(1, 11)])  # just silince those
 
+        return text
+
     def group(self):
         return Group.RasterAnalysis.value
 

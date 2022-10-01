@@ -65,6 +65,8 @@ class ApplyMaskAlgorithm(EnMAPProcessingAlgorithm):
                 feedback.setProgress(i / reader.bandCount() * 100)
                 array = reader.array(bandList=[i + 1])[0]
                 noDataValue = reader.noDataValue(i + 1)
+                if noDataValue is None:
+                    noDataValue = 0
                 array[invalid] = noDataValue
                 writer.writeArray(array[None], bandList=[i + 1])
 
