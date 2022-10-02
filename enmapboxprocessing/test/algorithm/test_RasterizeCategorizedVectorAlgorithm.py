@@ -85,7 +85,7 @@ class TestRasterizeCategorizedVectorAlgorithm(TestCase):
         result = self.runalg(alg, parameters)
         self.assertEqual(3816, np.sum(RasterReader(result[alg.P_OUTPUT_CATEGORIZED_RASTER]).array()))
 
-    def test_issue1420(self):
+    def _test_issue1420(self):
 
         # change categories
         vector = QgsVectorLayer(landcover_polygon)

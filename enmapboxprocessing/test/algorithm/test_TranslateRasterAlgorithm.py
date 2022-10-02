@@ -380,7 +380,7 @@ class TestTranslateAlgorithm(TestCase):
         self.runalg(alg, parameters)
         self.assertTrue(exists(filename + '.hdr'))
 
-    def test_debug_issue388(self):
+    def _test_debug_issue388(self):
 
         # resample 30m binary byte mask into 300m fractions with AverageResampling fails because of byte output type
         alg = TranslateRasterAlgorithm()
@@ -399,7 +399,7 @@ class TestTranslateAlgorithm(TestCase):
         self.assertEqual(Qgis.DataType.Float32, reader.dataType(1))
         self.assertAlmostEqual(0.52, np.max(np.unique(reader.array())))
 
-    def test_debug_issue888(self):
+    def _test_debug_issue888(self):
 
         alg = TranslateRasterAlgorithm()
         parameters = {
@@ -413,7 +413,7 @@ class TestTranslateAlgorithm(TestCase):
             text = file.read()
         self.assertEqual(8451, len(text))
 
-    def test_debug_issue1346(self):
+    def _test_debug_issue1346(self):
 
         alg = TranslateRasterAlgorithm()
         parameters = {
@@ -425,7 +425,7 @@ class TestTranslateAlgorithm(TestCase):
         reader = RasterReader(parameters[alg.P_OUTPUT_RASTER])
         print(reader.metadata())
 
-    def test_debug_issue1348_case1(self):
+    def _test_debug_issue1348_case1(self):
 
         alg = TranslateRasterAlgorithm()
         parameters = {
@@ -440,7 +440,7 @@ class TestTranslateAlgorithm(TestCase):
         bbl = [reader.badBandMultiplier(bandNo) for bandNo in reader.bandNumbers()]
         self.assertEqual(169, sum(bbl))
 
-    def test_debug_issue1348_case2(self):
+    def _test_debug_issue1348_case2(self):
 
         alg = TranslateRasterAlgorithm()
         parameters = {

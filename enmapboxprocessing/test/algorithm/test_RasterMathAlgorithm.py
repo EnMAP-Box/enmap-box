@@ -253,7 +253,7 @@ class TestRasterMathAlgorithm(TestCase):
         result = self.runalg(alg, parameters)
         self.assertEqual(Qgis.Int16, RasterReader(result[alg.P_OUTPUT_RASTER]).dataType(1))
 
-    def test_debug_issue1245(self):
+    def _test_debug_issue1245(self):
         alg = RasterMathAlgorithm()
         parameters = {
             alg.P_R1: enmap,

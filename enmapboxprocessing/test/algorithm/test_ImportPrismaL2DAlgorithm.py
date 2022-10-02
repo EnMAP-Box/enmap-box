@@ -84,7 +84,7 @@ class TestImportPrismaL2DAlgorithm(TestCase):
         bbl = [reader.badBandMultiplier(bandNo) for bandNo in reader.bandNumbers()]
         self.assertEqual(212, sum(bbl))
 
-    def test_issue1318(self):
+    def _test_issue1318(self):
         alg = ImportPrismaL2DAlgorithm()
         parameters = {
             alg.P_FILE: r'D:\data\sensors\prisma\PRS_L2D_STD_20201107101404_20201107101408_0001.he5',

@@ -21,7 +21,7 @@ class TestTranslateAlgorithm(TestCase):
         self.assertEqual(gold[0].dtype, lead[0].dtype)
         self.assertEqual(np.sum(gold), np.sum(lead))
 
-    def test_issue814(self):
+    def _test_issue814(self):
         alg = SaveRasterAsAlgorithm()
         parameters = {
             alg.P_RASTER: QgsRasterLayer(hires),
