@@ -353,7 +353,7 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
         self.mMODIS_006_MOD09A1.clicked.connect(self.onCollectionClicked)
 
         self.mCOPERNICUS_S1_GRD.clicked.connect(self.onCollectionClicked)
-        self.mCOPERNICUS_S2_SR.clicked.connect(self.onCollectionClicked)
+        self.mCOPERNICUS_S2_SR_HARMONIZED.clicked.connect(self.onCollectionClicked)
         self.mCOPERNICUS_S3_OLCI.clicked.connect(self.onCollectionClicked)
 
         self.mEO1_HYPERION.clicked.connect(self.onCollectionClicked)

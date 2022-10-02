@@ -1,12 +1,12 @@
 # Title: Sentinel-2 MSI: MultiSpectral Instrument, Level-2A with aggressive cloud masking
-# ID: COPERNICUS_S2_SR
+# ID: COPERNICUS_S2_SR_HARMONIZED
 #
 # This collection returns the merged Sentinel-2A and -2B L2A (surface reflectance product) archives.
 # It uses an aggressive cloud masking, fully discarding images with >50% cloud cover.
 # Furthermore, the cloud displacement index (CDI; https://doi.org/10.1016/j.rse.2018.04.046 for details) is used to
 # improve cloud masking.
 
-collection = ee.ImageCollection("COPERNICUS/S2_SR")
+collection = ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
 
 # filter cloudy images
 collection = collection.filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 50))
