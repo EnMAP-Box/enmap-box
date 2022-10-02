@@ -69,4 +69,5 @@ class ProfileAnalyticsApp(EnMAPBoxApplication):
             self.interface.mapCanvas().unsetMapTool(self.currentLocationMapTool)
 
     def toggleDockVisibility(self):
-        self.dock.setVisible(not self.dock.isVisible())
+        self.dock.setUserVisible(not self.dock.isUserVisible())
+        self.dock.onApplyClicked()

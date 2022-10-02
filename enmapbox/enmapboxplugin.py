@@ -149,6 +149,7 @@ class EnMAPBoxPlugin(object):
 
         self.initCurrentLocationMapTool()
         self.initGeeTimeseriesExplorerGui()
+        self.initProfileAnalyticsGui()
 
     def initCurrentLocationMapTool(self):
         """
@@ -185,3 +186,13 @@ class EnMAPBoxPlugin(object):
         self.pluginToolbarActions.append(self.geeTimeseriesExplorerApp.actionToggleMainDock)
         self.dockWidgets.append(self.geeTimeseriesExplorerApp.mainDock)
         self.dockWidgets.append(self.geeTimeseriesExplorerApp.profileDock)
+
+    def initProfileAnalyticsGui(self):
+        from qgis.utils import iface
+        from profileanalyticsapp import ProfileAnalyticsApp
+
+        self.profileAnalyticsApp = ProfileAnalyticsApp(None, iface, self.currentLocationMapTool)
+
+        # add items to be removed when unload the plugin
+        self.pluginToolbarActions.append(self.profileAnalyticsApp.actionToggleDock)
+        self.dockWidgets.append(self.profileAnalyticsApp.dock)

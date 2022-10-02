@@ -105,7 +105,7 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
         if self.interfaceType == self.EnmapBoxInterface:
             self.enmapBoxInterface().currentLayerChanged.connect(self.onCurrentLayerChanged)
         elif self.interfaceType == self.QgisInterface:
-            self.qgisInterface().legendInterface().currentLayerChanged.connect(self.onCurrentLayerChanged)
+            self.qgisInterface().currentLayerChanged.connect(self.onCurrentLayerChanged)
         else:
             raise ValueError()
 
@@ -206,6 +206,9 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
     def onApplyClicked(self):
 
         if self.interface is None:  # not yet initialized
+            return
+
+        if not self.isUserVisible():
             return
 
         self.mPlotWidget.clear()
