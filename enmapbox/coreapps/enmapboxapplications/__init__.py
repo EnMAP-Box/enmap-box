@@ -29,7 +29,7 @@ class EnMAPBoxImageMathApp(EnMAPBoxApplication):
 
     def menu(self, appMenu):
         assert isinstance(appMenu, QMenu)
-        a = self.utilsAddActionInAlphanumericOrder(appMenu, 'ImageMath')
+        a = self.utilsAddActionInAlphanumericOrder(appMenu, 'Image Math (deprecated)')
         assert isinstance(a, QAction)
         a.setIcon(self.icon())
         a.triggered.connect(self.startGUI)

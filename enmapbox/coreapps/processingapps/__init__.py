@@ -40,10 +40,7 @@ class ProcessingApps(EnMAPBoxApplication):
         ]
         for alg in algs:
             a = self.utilsAddActionInAlphanumericOrder(appMenu, alg.displayName())
-            if isinstance(alg, RasterMathAlgorithm):
-                a.setIcon(self.numpyIcon())
-            else:
-                a.setIcon(self.processingIcon())
+            a.setIcon(self.processingIcon())
             a.triggered.connect(self.startAlgorithm)
             a.algorithm = alg
 
