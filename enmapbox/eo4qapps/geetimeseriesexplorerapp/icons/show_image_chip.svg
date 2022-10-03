@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="256"
+   height="256"
+   version="1.1"
+   viewBox="0 0 67.733 67.733"
+   id="svg110"
+   sodipodi:docname="show_image_chip.svg"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="2341"
+     inkscape:window-height="1368"
+     id="namedview112"
+     showgrid="false"
+     inkscape:zoom="1.3037281"
+     inkscape:cx="393.04634"
+     inkscape:cy="228.06056"
+     inkscape:window-x="1267"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg110" />
+  <defs
+     id="defs72">
+    <font
+       id="l"
+       horiz-adv-x="1024"
+       horiz-origin-x="0"
+       horiz-origin-y="0"
+       vert-adv-y="90"
+       vert-origin-x="45"
+       vert-origin-y="90">
+      <font-face
+         font-family="SVGFont 1"
+         units-per-em="1024"
+         id="font-face2" />
+      <missing-glyph
+         d="M0,0h1000v1024h-1000z"
+         id="missing-glyph4" />
+    </font>
+    <font
+       id="f"
+       horiz-adv-x="1024"
+       horiz-origin-x="0"
+       horiz-origin-y="0"
+       vert-adv-y="90"
+       vert-origin-x="45"
+       vert-origin-y="90">
+      <font-face
+         font-family="SVGFont 1"
+         units-per-em="1024"
+         id="font-face7" />
+      <missing-glyph
+         d="M0,0h1000v1024h-1000z"
+         id="missing-glyph9" />
+    </font>
+    <font
+       id="k"
+       horiz-adv-x="1024"
+       horiz-origin-x="0"
+       horiz-origin-y="0"
+       vert-adv-y="90"
+       vert-origin-x="45"
+       vert-origin-y="90">
+      <font-face
+         font-family="SVGFont 1"
+         units-per-em="1024"
+         id="font-face12" />
+      <missing-glyph
+         d="M0,0h1000v1024h-1000z"
+         id="missing-glyph14" />
+    </font>
+    <font
+       id="n"
+       horiz-adv-x="1024"
+       horiz-origin-x="0"
+       horiz-origin-y="0"
+       vert-adv-y="90"
+       vert-origin-x="45"
+       vert-origin-y="90">
+      <font-face
+         font-family="SVGFont 1"
+         units-per-em="1024"
+         id="font-face17" />
+      <missing-glyph
+         d="M0,0h1000v1024h-1000z"
+         id="missing-glyph19" />
+    </font>
+    <font
+       id="a"
+       horiz-adv-x="1024"
+       horiz-origin-x="0"
+       horiz-origin-y="0"
+       vert-adv-y="90"
+       vert-origin-x="45"
+       vert-origin-y="90">
+      <font-face
+         font-family="SVGFont 1"
+         units-per-em="1024"
+         id="font-face22" />
+      <missing-glyph
+         d="M0,0h1000v1024h-1000z"
+         id="missing-glyph24" />
+    </font>
+    <font
+       id="i"
+       horiz-adv-x="1024"
+       horiz-origin-x="0"
+       horiz-origin-y="0"
+       vert-adv-y="90"
+       vert-origin-x="45"
+       vert-origin-y="90">
+      <font-face
+         font-family="SVGFont 1"
+         units-per-em="1024"
+         id="font-face27" />
+      <missing-glyph
+         d="M0,0h1000v1024h-1000z"
+         id="missing-glyph29" />
+    </font>
+    <font
+       id="e"
+       horiz-adv-x="1024"
+       horiz-origin-x="0"
+       horiz-origin-y="0"
+       vert-adv-y="90"
+       vert-origin-x="45"
+       vert-origin-y="90">
+      <font-face
+         font-family="SVGFont 1"
+         units-per-em="1024"
+         id="font-face32" />
+      <missing-glyph
+         d="M0,0h1000v1024h-1000z"
+         id="missing-glyph34" />
+    </font>
+    <font
+       id="d"
+       horiz-adv-x="1024"
+       horiz-origin-x="0"
+       horiz-origin-y="0"
+       vert-adv-y="90"
+       vert-origin-x="45"
+       vert-origin-y="90">
+      <font-face
+         font-family="SVGFont 1"
+         units-per-em="1024"
+         id="font-face37" />
+      <missing-glyph
+         d="M0,0h1000v1024h-1000z"
+         id="missing-glyph39" />
+    </font>
+    <font
+       id="c"
+       horiz-adv-x="1024"
+       horiz-origin-x="0"
+       horiz-origin-y="0"
+       vert-adv-y="90"
+       vert-origin-x="45"
+       vert-origin-y="90">
+      <font-face
+         font-family="SVGFont 1"
+         units-per-em="1024"
+         id="font-face42" />
+      <missing-glyph
+         d="M0,0h1000v1024h-1000z"
+         id="missing-glyph44" />
+    </font>
+    <font
+       id="g"
+       horiz-adv-x="1024"
+       horiz-origin-x="0"
+       horiz-origin-y="0"
+       vert-adv-y="90"
+       vert-origin-x="45"
+       vert-origin-y="90">
+      <font-face
+         font-family="SVGFont 1"
+         units-per-em="1024"
+         id="font-face47" />
+      <missing-glyph
+         d="M0,0h1000v1024h-1000z"
+         id="missing-glyph49" />
+    </font>
+    <font
+       id="h"
+       horiz-adv-x="1024"
+       horiz-origin-x="0"
+       horiz-origin-y="0"
+       vert-adv-y="90"
+       vert-origin-x="45"
+       vert-origin-y="90">
+      <font-face
+         font-family="SVGFont 1"
+         units-per-em="1024"
+         id="font-face52" />
+      <missing-glyph
+         d="M0,0h1000v1024h-1000z"
+         id="missing-glyph54" />
+    </font>
+    <font
+       id="b"
+       horiz-adv-x="1024"
+       horiz-origin-x="0"
+       horiz-origin-y="0"
+       vert-adv-y="90"
+       vert-origin-x="45"
+       vert-origin-y="90">
+      <font-face
+         font-family="SVGFont 1"
+         units-per-em="1024"
+         id="font-face57" />
+      <missing-glyph
+         d="M0,0h1000v1024h-1000z"
+         id="missing-glyph59" />
+    </font>
+    <font
+       id="j"
+       horiz-adv-x="1024"
+       horiz-origin-x="0"
+       horiz-origin-y="0"
+       vert-adv-y="90"
+       vert-origin-x="45"
+       vert-origin-y="90">
+      <font-face
+         font-family="SVGFont 1"
+         units-per-em="1024"
+         id="font-face62" />
+      <missing-glyph
+         d="M0,0h1000v1024h-1000z"
+         id="missing-glyph64" />
+    </font>
+    <font
+       id="m"
+       horiz-adv-x="1024"
+       horiz-origin-x="0"
+       horiz-origin-y="0"
+       vert-adv-y="90"
+       vert-origin-x="45"
+       vert-origin-y="90">
+      <font-face
+         font-family="SVGFont 1"
+         units-per-em="1024"
+         id="font-face67" />
+      <missing-glyph
+         d="M0,0h1000v1024h-1000z"
+         id="missing-glyph69" />
+    </font>
+  </defs>
+  <metadata
+     id="metadata74">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <image
+     y="11.645726"
+     x="1.6643641"
+     id="image906"
+     xlink:href="data:image/png;base64,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
+"
+     style="image-rendering:optimizeSpeed"
+     preserveAspectRatio="none"
+     height="53.656948"
+     width="63.740196" />
+  <g
+     id="g896"
+     transform="matrix(0.6215183,0,0,0.53092448,-71.797065,24.355815)">
+    <path
+       style="display:inline;fill:none;fill-rule:evenodd;stroke:#ffff00;stroke-width:3.57890821;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:2;stroke-dasharray:none;stroke-dashoffset:0.89999998;stroke-opacity:1"
+       d="M 169.74389,-23.664426 V 77.141594"
+       id="path5046"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc" />
+    <path
+       sodipodi:nodetypes="cc"
+       inkscape:connector-curvature="0"
+       id="path4210"
+       d="M 220.14692,26.738585 H 119.34071"
+       style="display:inline;fill:none;fill-rule:evenodd;stroke:#ffff00;stroke-width:3.57890821;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:2;stroke-dasharray:none;stroke-dashoffset:0.89999998;stroke-opacity:1" />
+    <rect
+       y="24.842615"
+       x="167.88397"
+       height="3.7919769"
+       width="3.7193146"
+       id="rect4198"
+       style="display:inline;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0.45839661;stroke-linecap:round;stroke-miterlimit:2;stroke-dasharray:none;stroke-opacity:1" />
+  </g>
+  <rect
+     style="fill:none;stroke:#6a6a6a;stroke-width:3.09669995;stroke-linejoin:round"
+     id="rect76"
+     height="64.563004"
+     width="64.563004"
+     y="1.5800061"
+     x="1.5875" />
+  <rect
+     style="fill:#6a6a6a;stroke:#6a6a6a;stroke-width:4.79680014"
+     id="rect78"
+     height="5.5474"
+     width="62.042"
+     y="5.0399976"
+     x="2.8334" />
+  <rect
+     style="fill:#ffffff;stroke:#ffffff;stroke-width:1.75250006"
+     id="rect80"
+     height="5.0110002"
+     width="59.716"
+     y="3.9200025"
+     x="3.8973" />
+  <rect
+     style="fill:none;stroke:#000000;stroke-width:1.41199994;stroke-linecap:round;stroke-linejoin:round"
+     id="rect82"
+     height="65.538002"
+     width="65.628998"
+     y="1.1499982"
+     x="1.1352" />
+  <g
+     style="fill:none;stroke:#000000;stroke-width:2.9000001"
+     id="g88"
+     transform="matrix(0.27836,0,0,0.27836,52.369,17.25)">
+    <path
+       inkscape:connector-curvature="0"
+       id="path84"
+       d="M 19.25,-28.461 39.875,-49.086" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path86"
+       d="m 19.25,-49.711 21.125,21.125" />
+  </g>
+  <g
+     style="fill:#ffffff;stroke:#000000"
+     id="g96"
+     transform="matrix(0.2566,0,0,0.2566,28.961,-47.61)">
+    <g
+       style="stroke:#000000"
+       id="g94"
+       transform="matrix(0.27951,0,0,0.27951,89.744,224.95)">
+      <rect
+         style="fill:#ffffff;fill-rule:evenodd;stroke-width:10.16600037"
+         id="rect90"
+         height="81.139"
+         width="81.139"
+         y="-91.779999"
+         x="-33.07" />
+      <rect
+         style="fill:#000000;stroke-width:8.89669991"
+         id="rect92"
+         height="15.769"
+         width="75.101997"
+         y="-86.140999"
+         x="-29.525" />
+    </g>
+  </g>
+  <rect
+     style="display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:3.57890821;stroke-linecap:round;stroke-miterlimit:2;stroke-dasharray:none;stroke-opacity:1"
+     id="rect4198-0"
+     width="27.977705"
+     height="27.977705"
+     x="264.04269"
+     y="5.2408485" />
+</svg>

@@ -32,6 +32,7 @@ import sys
 import traceback
 import typing
 import warnings
+
 from osgeo import gdal
 
 from qgis.PyQt.QtCore import QSettings
@@ -189,6 +190,7 @@ def initPythonPaths():
     site.addsitedir(ROOT / 'site-packages')
     site.addsitedir(ROOT / 'apps')
     site.addsitedir(ROOT / 'coreapps')
+    site.addsitedir(ROOT / 'eo4qapps')
 
 
 def initEnMAPBoxResources():

@@ -38,6 +38,7 @@ class test_applications(EnMAPBoxTestCase):
 
         from enmapbox import DIR_ENMAPBOX
         site.addsitedir(pathlib.Path(DIR_ENMAPBOX) / 'coreapps')
+        site.addsitedir(pathlib.Path(DIR_ENMAPBOX) / 'eo4qapps')
         site.addsitedir(pathlib.Path(DIR_ENMAPBOX) / 'apps')
         site.addsitedir(pathlib.Path(DIR_ENMAPBOX) / 'apps' / 'lmuapps')
 
@@ -191,6 +192,7 @@ class test_applications(EnMAPBoxTestCase):
     def test_deployed_apps(self):
 
         pathCoreApps = pathlib.Path(DIR_ENMAPBOX) / 'coreapps'
+        pathEo4qApps = pathlib.Path(DIR_ENMAPBOX) / 'eo4qapps'
         pathExternalApps = pathlib.Path(DIR_ENMAPBOX) / 'apps'
         self.assertTrue(os.path.isdir(pathCoreApps))
 
@@ -201,6 +203,10 @@ class test_applications(EnMAPBoxTestCase):
         externalAppDirs = []
 
         for d in os.scandir(pathCoreApps):
+            if d.is_dir():
+                coreAppDirs.append(d.path)
+
+        for d in os.scandir(pathEo4qApps):
             if d.is_dir():
                 coreAppDirs.append(d.path)
 
