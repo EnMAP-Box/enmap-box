@@ -53,6 +53,7 @@ per-file-ignores =
     # just not available in OSGeo4W installations
     # script should run immediately which site.addsitedir(REPO) before other imports
     scripts/*.py : E402
+    enmapbox/eo4qapps/geetimeseriesexplorerapp/*.py : F821
     enmapbox/__main__.py: E402
     enmapbox/gui/__init__.py: F401
     enmapbox/gui/utils.py: F401
