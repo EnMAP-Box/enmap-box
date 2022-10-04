@@ -5,6 +5,7 @@ from enmapbox.exampledata import enmap, google_maps
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.test.testcase import TestCase
+from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import fraction_polygon_l3
 from qgis.PyQt.QtCore import QDateTime, QSizeF
 from qgis.core import QgsRasterRange, QgsRasterLayer, Qgis, QgsRectangle
@@ -489,6 +490,16 @@ class TestRasterReader(TestCase):
         writer.close()
         reader = RasterReader(writer.source())
         self.assertEqual(QDateTime(2010, 8, 20, 9, 44, 50), reader.centerTime(1))
+
+    def test_centerTime_ForceTSIFormat_v1_2(self):  # see #111
+        writer = self.rasterFromArray(np.zeros((1, 1, 1)))
+        writer.setMetadataItem('wavelength', 2015.003, '', 1)
+        writer.setMetadataItem('description', '{FORCE v. 1.2_beta Time Series Analysis}', 'ENVI')
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertIsNone(reader.wavelength(1))
+        self.assertEqual(Utils.decimalYearToDateTime(2015.003), reader.centerTime(1))
+        self.assertIsNone(reader.wavelengthUnits(1))
 
     def test_findTime(self):
         writer = self.rasterFromArray(np.zeros((4, 1, 1)))
