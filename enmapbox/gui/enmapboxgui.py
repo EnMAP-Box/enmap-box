@@ -31,7 +31,7 @@ import enmapbox.gui.datasources.manager
 import qgis.utils
 from enmapbox import messageLog, debugLog, DEBUG
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
-from enmapbox.gui import SpatialPoint, loadUi, SpatialExtent, file_search
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, loadUi, SpatialExtent, file_search
 from enmapbox.gui.dataviews.dockmanager import DockManagerTreeModel, MapDockTreeNode
 from enmapbox.gui.dataviews.docks import SpectralLibraryDock, Dock, AttributeTableDock, MapDock
 from enmapbox.qgispluginsupport.qps.cursorlocationvalue import CursorLocationInfoDock
@@ -1844,10 +1844,15 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
     def restoreProject(self):
         raise NotImplementedError()
 
-    def setCurrentLocation(self, spatialPoint: SpatialPoint, mapCanvas: QgsMapCanvas = None, emitSignal=True):
+    def setCurrentLocation(self,
+                           spatialPoint: SpatialPoint,
+                           mapCanvas: QgsMapCanvas = None,
+                           emitSignal: bool = True):
         """
         Sets the current "last selected" location, for which different properties might get derived,
         like cursor location values and SpectraProfiles.
+        :param emitSignal:
+        :type emitSignal:
         :param spatialPoint: SpatialPoint
         :param mapCanvas: QgsMapCanvas (optional), the canvas on which the location got selected
         """
