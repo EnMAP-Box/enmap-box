@@ -15,6 +15,8 @@ class EnMAPBoxTestCaseExample(unittest.TestCase):
         for a in module.__dict__.keys():
             if a.startswith('__'):
                 continue
+            if a == 'google_maps':
+                continue
             filepath = getattr(module, a)
             if isinstance(filepath, (str, pathlib.Path)):
                 self.assertTrue(exists(filepath), msg=f'Path does not exist: {filepath}')

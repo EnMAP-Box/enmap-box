@@ -23,7 +23,7 @@ landcover_map_l2 = join(root, _subdir, 'landcover_map_l2.tif')
 landcover_map_l3 = join(root, _subdir, 'landcover_map_l3.tif')
 
 # - rasterized landcover polygon fractions
-fraction_polygon_l3 = join(root, _subdir, 'raster', 'fraction_polygon_l3.tif')
+fraction_polygon_l3 = join(root, _subdir, 'fraction_polygon_l3.tif')
 
 # - landcover fraction maps (predicted by RF)
 fraction_map_l3 = join(root, _subdir, 'fraction_map_l3.tif')
