@@ -18,17 +18,15 @@ DEFAULT_PARAMS='-x -v'
 cd /usr/src
 
 ls -l
-# export QT_QPA_PLATFORM=offscreen
+export QT_QPA_PLATFORM=offscreen
 export CI=True
 export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 # python3 -m coverage run -m unittest discover -s tests
 # xvfb-run pytest ${@:-`echo $DEFAULT_PARAMS`}
 # python3 scripts/create_runtests.py
 # xvfb-run scripts/runtests.sh
-pwd
 python3 scripts/setup_repository.py
-echo 'start tests'
-# python3 -m unittest discover -b -s tests/src/core
-# xvfb-run scripts/runtests.sh
-xvfb-run python3 -m unittests discover -s tests/src/core
+python3 scripts/create_runtests.py
+chmod +x scripts/runtests.sh
+xvfb-run scripts/runtests.sh
 popd

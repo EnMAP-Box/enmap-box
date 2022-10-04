@@ -5,9 +5,10 @@ MAINTAINER Benjamin Jakimow <benjamin.jakimow@geo.hu-berlin.de>
 LABEL Description="Docker container with QGIS + EnMAP-Box" Vendor="QGIS.org"
 
 RUN apt-get update && \
-    python3-pip \
+    apt-get -y install python3-pip wget unzip \
     && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update
 
 COPY ./requirements.txt /tmp/
 COPY ./requirements_developer.txt /tmp/
