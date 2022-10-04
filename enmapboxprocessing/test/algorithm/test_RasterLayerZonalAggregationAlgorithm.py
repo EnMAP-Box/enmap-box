@@ -15,7 +15,7 @@ class TestRasterLayerZonalAggregationAlgorithm(TestCase):
         }
         result = self.runalg(alg, parameters)
 
-    def test_issue1406(self):
+    def _test_issue1406(self):
         alg = RasterLayerZonalAggregationAlgorithm()
         parameters = {
             alg.P_RASTER: enmap,

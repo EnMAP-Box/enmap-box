@@ -1,0 +1,4 @@
+This folder should never become a python package!
+Please do not add any __init__.py to it.
+
+

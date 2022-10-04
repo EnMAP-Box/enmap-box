@@ -147,16 +147,52 @@ class EnMAPBoxPlugin(object):
         Note that an app can't do this on it's own, because apps only get initialized on box startup.
         """
 
+        self.initCurrentLocationMapTool()
         self.initGeeTimeseriesExplorerGui()
+        self.initProfileAnalyticsGui()
+
+    def initCurrentLocationMapTool(self):
+        """
+        This map tool can be used by all stand-alone apps, that need to select a location inside the QGIS map canvas.
+        """
+        from qgis.utils import iface
+        from geetimeseriesexplorerapp import MapTool
+
+        self.actionCurrentLocationMapTool = QAction(
+            QIcon(':/qps/ui/icons/select_location.svg'), 'Select Current Location'
+        )
+        self.actionCurrentLocationMapTool.setCheckable(True)
+        iface.addToolBarIcon(self.actionCurrentLocationMapTool)
+        self.actionCurrentLocationMapTool.toggled.connect(self.onCurrentLocationMapToolClicked)
+        self.currentLocationMapTool = MapTool(iface.mapCanvas(), self.actionCurrentLocationMapTool)
+
+        # add items to be removed when unload the plugin
+        self.pluginToolbarActions.append(self.actionCurrentLocationMapTool)
+
+    def onCurrentLocationMapToolClicked(self):
+        from qgis.utils import iface
+        if self.actionCurrentLocationMapTool.isChecked():
+            iface.mapCanvas().setMapTool(self.currentLocationMapTool)
+        else:
+            iface.mapCanvas().unsetMapTool(self.currentLocationMapTool)
 
     def initGeeTimeseriesExplorerGui(self):
         from qgis.utils import iface
         from geetimeseriesexplorerapp import GeeTimeseriesExplorerApp
 
-        self.geeTimeseriesExplorerApp = GeeTimeseriesExplorerApp(None, iface)
+        self.geeTimeseriesExplorerApp = GeeTimeseriesExplorerApp(None, iface, self.currentLocationMapTool)
 
         # add items to be removed when unload the plugin
         self.pluginToolbarActions.append(self.geeTimeseriesExplorerApp.actionToggleMainDock)
-        self.pluginToolbarActions.append(self.geeTimeseriesExplorerApp.actionCurrentLocationMapTool)
         self.dockWidgets.append(self.geeTimeseriesExplorerApp.mainDock)
         self.dockWidgets.append(self.geeTimeseriesExplorerApp.profileDock)
+
+    def initProfileAnalyticsGui(self):
+        from qgis.utils import iface
+        from profileanalyticsapp import ProfileAnalyticsApp
+
+        self.profileAnalyticsApp = ProfileAnalyticsApp(None, iface, self.currentLocationMapTool)
+
+        # add items to be removed when unload the plugin
+        self.pluginToolbarActions.append(self.profileAnalyticsApp.actionToggleDock)
+        self.dockWidgets.append(self.profileAnalyticsApp.dock)

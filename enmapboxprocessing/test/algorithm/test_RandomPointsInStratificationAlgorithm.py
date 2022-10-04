@@ -36,7 +36,7 @@ class TestRandomPointsFromCategorizedRasterAlgorithm(TestCase):
             [[0, 0, 0], [0, 0, 0], [0, 0, 0]], RandomPointsFromCategorizedRasterAlgorithm.makeKernel(30, 30, 45)
         )))
 
-    def test_debug874(self):
+    def _test_debug874(self):
         alg = RandomPointsFromCategorizedRasterAlgorithm()
         alg.initAlgorithm()
         parameters = {

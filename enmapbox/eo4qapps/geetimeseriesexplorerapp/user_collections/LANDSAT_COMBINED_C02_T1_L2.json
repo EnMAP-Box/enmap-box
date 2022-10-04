@@ -1,0 +1,272 @@
+{
+  "id": "LANDSAT_COMBINED_C02_T1_L2",
+  "title": "USGS Landsat 4-9 combined, Collection 2, Tier 1",
+  "description": "This dataset contains atmospherically corrected surface reflectance for the Landsat 4-9 sensors.",
+  "providers": [
+    {
+      "name": "Google Earth Engine",
+      "url": "https://developers.google.com/earth-engine/datasets/catalog/landsat"
+    }
+  ],
+  "extent": {
+    "temporal": {
+      "interval": [
+        [
+          "1982-08-22T00:00:00Z",
+          null
+        ]
+      ]
+    }
+  },
+  "summaries": {
+    "gsd": [
+      30.0
+    ],
+    "eo:bands": [
+      {
+        "name": "BLUE",
+        "description": "Blue band surface reflectance",
+        "center_wavelength": 0.482,
+        "gee:scale": 0.0000275,
+        "gee:offset": -0.2,
+        "gee:wavelength": "0.482 &mu;m"
+      },
+      {
+        "name": "GREEN",
+        "description": "Green band surface reflectance",
+        "center_wavelength": 0.562,
+        "gee:scale": 0.0000275,
+        "gee:offset": -0.2,
+        "gee:wavelength": "0.562 &mu;m"
+      },
+      {
+        "name": "RED",
+        "description": "Red band surface reflectance",
+        "center_wavelength": 0.655,
+        "gee:scale": 0.0000275,
+        "gee:offset": -0.2,
+        "gee:wavelength": "0.655 &mu;m"
+      },
+      {
+        "name": "NIR",
+        "description": "Near infrared band surface reflectance",
+        "center_wavelength": 0.865,
+        "gee:scale": 0.0000275,
+        "gee:offset": -0.2,
+        "gee:wavelength": "0.865 &mu;m"
+      },
+      {
+        "name": "SWIR1",
+        "description": "Shortwave infrared 2 band surface reflectance",
+        "center_wavelength": 1.609,
+        "gee:scale": 0.0000275,
+        "gee:offset": -0.2,
+        "gee:wavelength": "1.609 &mu;m"
+      },
+      {
+        "name": "SWIR2",
+        "description": "Shortwave infrared 2 band surface reflectance",
+        "center_wavelength": 2.201,
+        "gee:scale": 0.0000275,
+        "gee:offset": -0.2,
+        "gee:wavelength": "2.201 &mu;m"
+      },
+      {
+        "name": "QA_PIXEL",
+        "description": "Pixel quality attributes generated from the CFMASK algorithm.",
+        "gee:bitmask": {
+          "bitmask_parts": [
+            {
+              "description": "Fill",
+              "bit_count": 1,
+              "first_bit": 0,
+              "values": []
+            },
+            {
+              "description": "Dilated Cloud",
+              "first_bit": 1,
+              "bit_count": 1,
+              "values": []
+            },
+            {
+              "description": "Cirrus (high confidence)",
+              "first_bit": 2,
+              "bit_count": 1,
+              "values": []
+            },
+            {
+              "description": "Cloud",
+              "first_bit": 3,
+              "bit_count": 1,
+              "values": []
+            },
+            {
+              "description": "Cloud Shadow",
+              "first_bit": 4,
+              "bit_count": 1,
+              "values": []
+            },
+            {
+              "description": "Snow",
+              "first_bit": 5,
+              "bit_count": 1,
+              "values": []
+            },
+            {
+              "description": "Clear",
+              "first_bit": 6,
+              "bit_count": 1,
+              "values": [
+                {
+                  "description": "Cloud or Dilated Cloud bits are set",
+                  "value": 0
+                },
+                {
+                  "value": 1,
+                  "description": "Cloud and Dilated Cloud bits are not set"
+                }
+              ]
+            },
+            {
+              "description": "Water",
+              "first_bit": 7,
+              "bit_count": 1,
+              "values": []
+            },
+            {
+              "description": "Cloud Confidence",
+              "first_bit": 8,
+              "bit_count": 2,
+              "values": [
+                {
+                  "description": "None",
+                  "value": 0
+                },
+                {
+                  "value": 1,
+                  "description": "Low"
+                },
+                {
+                  "value": 2,
+                  "description": "Medium"
+                },
+                {
+                  "value": 3,
+                  "description": "High"
+                }
+              ]
+            },
+            {
+              "description": "Cloud Shadow Confidence",
+              "first_bit": 10,
+              "bit_count": 2,
+              "values": [
+                {
+                  "description": "None",
+                  "value": 0
+                },
+                {
+                  "value": 1,
+                  "description": "Low"
+                },
+                {
+                  "value": 2,
+                  "description": "Medium"
+                },
+                {
+                  "value": 3,
+                  "description": "High"
+                }
+              ]
+            },
+            {
+              "description": "Snow/Ice Confidence",
+              "first_bit": 12,
+              "bit_count": 2,
+              "values": [
+                {
+                  "description": "None",
+                  "value": 0
+                },
+                {
+                  "value": 1,
+                  "description": "Low"
+                },
+                {
+                  "value": 2,
+                  "description": "Medium"
+                },
+                {
+                  "value": 3,
+                  "description": "High"
+                }
+              ]
+            },
+            {
+              "description": "Cirrus Confidence",
+              "first_bit": 14,
+              "bit_count": 2,
+              "values": [
+                {
+                  "description": "None",
+                  "value": 0
+                },
+                {
+                  "value": 1,
+                  "description": "Low"
+                },
+                {
+                  "value": 2,
+                  "description": "Medium"
+                },
+                {
+                  "value": 3,
+                  "description": "High"
+                }
+              ]
+            }
+          ],
+          "total_bit_count": 16
+        }
+      }
+    ],
+    "gee:visualizations": [
+      {
+        "display_name": "True Color",
+        "image_visualization": {
+          "band_vis": {
+            "bands": [
+              "RED",
+              "GREEN",
+              "BLUE"
+            ]
+          }
+        }
+      },
+      {
+        "display_name": "Near Infrared",
+        "image_visualization": {
+          "band_vis": {
+            "bands": [
+              "NIR",
+              "RED",
+              "GREEN"
+            ]
+          }
+        }
+      },
+      {
+        "display_name": "Shortwave Infrared",
+        "image_visualization": {
+          "band_vis": {
+            "bands": [
+              "SWIR2",
+              "NIR",
+              "GREEN"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

@@ -15,6 +15,7 @@ from qgis.core import QgsApplication
 from qgis.core import QgsVectorLayer, QgsProcessingRegistry, QgsProcessingAlgorithm
 
 site.addsitedir(pathlib.Path(DIR_ENMAPBOX) / 'coreapps')
+site.addsitedir(pathlib.Path(DIR_ENMAPBOX) / 'eo4qapps')
 
 
 class TestEnMAPBoxApplications(EnMAPBoxTestCase):

@@ -72,7 +72,7 @@ class TestClassificationPerformanceSimpleAlgorithm(TestCase):
                 'Unable to execute algorithm\nInvalid categorized raster layer, requires paletted/unique values renderer (Observed categorized layer)'
             )
 
-    def test_debug(self):
+    def _test_debug(self):
         alg = ClassificationPerformanceSimpleAlgorithm()
 
         categories = [Category(1, 'A', '#ff0000'), Category(2, 'B', '#ff0000'), Category(3, 'C', '#ff0000')]
@@ -96,7 +96,7 @@ class TestClassificationPerformanceSimpleAlgorithm(TestCase):
         }
         self.runalg(alg, parameters)
 
-    def _test_debug(self):
+    def _test_debug2(self):
         alg = ClassificationPerformanceSimpleAlgorithm()
         alg.initAlgorithm()
         parameters = {

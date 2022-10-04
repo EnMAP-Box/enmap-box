@@ -76,7 +76,7 @@ class TestFitRegressorAlgorithm(TestCase):
             }
             self.runalg(alg, parameters)
 
-    def test_debug_issue1116(self):
+    def _test_debug_issue1116(self):
         alg = FitLinearSVRAlgorithm()
         parameters = {
             alg.P_DATASET: regressorDumpSingleTargetPkl,

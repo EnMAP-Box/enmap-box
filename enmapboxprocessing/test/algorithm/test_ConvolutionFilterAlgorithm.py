@@ -95,7 +95,7 @@ class TestConvolutionFilterAlgorithm(TestCase):
             }
             self.runalg(alg, parameters)
 
-    def test_debug_issue_1319(self):
+    def _test_debug_issue_1319(self):
         alg = SpatialConvolutionGaussian2DAlgorithm()
         parameters = {
             alg.P_RASTER: r'D:\data\issues\bitbucket\1319\01_11_water_binary_2020.tif',

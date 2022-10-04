@@ -44,7 +44,7 @@ class TestClassificationAlgorithm(TestCase):
         }
         self.runalg(alg, parameters)
 
-    def test_debug_issue1140(self):
+    def _test_debug_issue1140(self):
         alg = ClassificationWorkflowAlgorithm()
         parameters = {
             alg.P_DATASET: classifierDumpPkl,
