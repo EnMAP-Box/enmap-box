@@ -17,6 +17,7 @@ python3 -m unittest tests/src/core/test_enmapbox.py
 python3 -m unittest tests/src/core/test_enmapboxplugin.py
 python3 -m unittest tests/src/core/test_enmapboxprocessingprovider.py
 python3 -m unittest tests/src/core/test_enmapbox_utils.py
+python3 -m unittest tests/src/core/test_exampledata.py
 python3 -m unittest tests/src/core/test_mapcanvas.py
 python3 -m unittest tests/src/core/test_mimedata.py
 python3 -m unittest tests/src/core/test_processing_framework.py
