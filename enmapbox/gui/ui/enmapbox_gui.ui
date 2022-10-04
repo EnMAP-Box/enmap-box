@@ -129,7 +129,7 @@
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>../../coreapps/geetimeseriesexplorerapp/icons/sensor.png</normaloff>../../coreapps/geetimeseriesexplorerapp/icons/sensor.png</iconset>
+       <normaloff>../../eo4qapps/geetimeseriesexplorerapp/icons/sensor.png</normaloff>../../eo4qapps/geetimeseriesexplorerapp/icons/sensor.png</iconset>
      </property>
      <property name="toolTipsVisible">
       <bool>false</bool>
