@@ -1,14 +1,12 @@
 """
-This is a template to create an EnMAP-Box test
+Tests to ensure that module testfiles exist
 """
 import pathlib
 import unittest
 from os.path import exists
 
-from enmapbox.testing import EnMAPBoxTestCase
 
-
-class EnMAPBoxTestCaseExample(EnMAPBoxTestCase):
+class EnMAPBoxTestCaseExample(unittest.TestCase):
     """
     Tests to ensure that module testfiles exist
     """
