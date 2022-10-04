@@ -2,7 +2,7 @@ import pathlib
 import re
 import typing
 import unittest
-import warnings
+
 from enmapbox.qgispluginsupport.qps.utils import file_search, loadUi
 from enmapbox.testing import TestCase
 
