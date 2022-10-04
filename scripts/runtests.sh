@@ -8,148 +8,147 @@ find . -name "*.pyc" -exec rm -f {} \;
 export PYTHONPATH="${PYTHONPATH}:$(pwd):/usr/share/qgis/python/plugins"
 # python3 scripts/setup_repository.py
 
-python3 -m coverage run --rcfile=.coveragec   tests/src/core/test_applications.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/core/test_crosshair.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/core/test_cursorlocationsvalues.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/core/test_datasources.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/core/test_dependencycheck.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/core/test_enmapbox.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/core/test_enmapboxplugin.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/core/test_enmapboxprocessingprovider.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/core/test_enmapbox_utils.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/core/test_mapcanvas.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/core/test_mimedata.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/core/test_processing_framework.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/core/test_settings.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/core/test_speclibs.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/core/test_spectral_processing.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/core/test_splashscreen.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/core/test_testing.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/core/test_utils.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/core/test_vectorlayertools.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/coreapps/test_enmapboxapplications.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/coreapps/test_imagecube.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/coreapps/test_metadataeditorapp.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/coreapps/test_reclassifyapp.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/coreapps/test_vrtbuilderapp.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/enmapboxplugins_/test_classfractionrenderer.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/enmapboxplugins_/test_decorrelationstretchrenderer.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/issues/test_issue_1089.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/issues/test_issue_1330_QGIS.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/issues/test_issue_1386.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/issues/test_issue_478.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/issues/test_issue_711.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/issues/test_issue_724.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/issues/test_issue_737.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/otherapps/test_enpt_enmapboxapp.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/otherapps/test_ensomap.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/otherapps/test_lmuvegetationapps.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/test_docksanddatasources.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/test_repo.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/test_template.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/widgets_/test_CodeEditWidget.py
-python3 -m coverage run --rcfile=.coveragec --append  tests/src/widgets_/test_MultipleMapLayerSelectionWidget.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_AggregateRasterBandsAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_ApplyMaskAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_ClassFractionFromCategorizedVectorAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_ClassificationFromClassProbabilityAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_ClassificationPerformanceSimpleAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_ClassificationPerformanceStratifiedAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_ClassificationWorkflowAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_ClassifierPerformanceAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_ClassifierPermutationFeatureImportanceAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_ConvexHullAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_ConvolutionFilterAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_CreateDefaultPalettedRasterRendererAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_CreateGridAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_CreateMaskAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_CreateRgbImageFromClassProbabilityAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_CreateSpectralIndicesAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_EditRasterSourceBandPropertiesAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_FeatureClusteringHierarchicalAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_FitClassifierAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_FitClustererAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_FitRegressorAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_FitTransformerAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_GeolocateRasterAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_ImportDesisL1BAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_ImportDesisL1CAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_ImportDesisL2AAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_ImportEnmapL1BAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_ImportEnmapL1CAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_ImportEnmapL2AAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_ImportLandsatL2Algorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_ImportPrismaL1Algorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_ImportPrismaL2BAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_ImportPrismaL2CAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_ImportPrismaL2DAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_ImportSentinel2L2AAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_LayerToMaskAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_MergeClassificationDatasetAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PredictClassificationAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PredictClassProbabilityAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PredictRegressionAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PrepareClassificationDatasetFromCategorizedLibraryAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PrepareClassificationDatasetFromCategorizedRasterAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PrepareClassificationDatasetFromCategorizedVectorAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PrepareClassificationDatasetFromCategorizedVectorAndFieldsAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PrepareClassificationDatasetFromCodeAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PrepareClassificationDatasetFromFilesAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PrepareClassificationDatasetFromTableAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PrepareRegressionDatasetFromCodeAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PrepareRegressionDatasetFromContinuousLibraryAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PrepareRegressionDatasetFromContinuousRasterAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PrepareRegressionDatasetFromContinuousVectorAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PrepareRegressionDatasetFromContinuousVectorAndFieldsAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PrepareRegressionDatasetFromFilesAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PrepareRegressionDatasetFromSynthMixAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PrepareRegressionDatasetFromTableAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PrepareUnsupervisedDatasetFromCodeAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PrepareUnsupervisedDatasetFromFileAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PrepareUnsupervisedDatasetFromLibraryAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PrepareUnsupervisedDatasetFromRasterAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_PrepareUnsupervisedDatasetFromVectorAndFieldsAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_RandomPointsInMaskAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_RandomPointsInStratificationAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_RandomSamplesFromClassificationDatasetAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_RandomSamplesFromRegressionDatasetAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_RasterizeCategorizedVectorAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_RasterizeVectorAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_RasterLayerZonalAggregationAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_RasterMathAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_RegeressionPerformanceAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_RegressionBasedUnmixingAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_RegressionWorkflowAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_RegressorPerformanceAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_RocCurveAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_SampleRasterValuesAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_SaveLibraryAsGeoJsonAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_SaveRasterAsAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_SelectFeaturesFromDatasetAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_SpatialFilterFunctionAlgorithmBase.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_SpectralResamplingByResponseFunctionConvolutionAlgorithmBase.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_SpectralResamplingByResponseFunctionLibraryAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_SpectralResamplingBySpectralRasterWavelengthAndFwhmAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_StackRasterLayersAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_SubsetRasterBandsAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_TransformRasterAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_TranslateClassificationAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_TranslateRasterAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_VrtBandMathAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/algorithm/test_WriteEnviHeaderAlgorithm.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/test_extentwalker.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/test_glossary.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/test_gridwalker.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/test_guidropping.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/test_numpyutils.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/test_rasterdriver.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/test_rastermetadataeditor.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/test_rasterprocessing.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/test_rasterreader.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/test_rasterreaderrfc1.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/test_rasterreaderrfc2.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/test_rasterreaderrfc3.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/test_rasterreaderrfc4.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/test_reportwriter.py
-python3 -m coverage run --rcfile=.coveragec --append  enmapboxprocessing/test/test_utils.py
-python3 -m coverage report
+python3 -m unittest tests/src/core/test_applications.py
+python3 -m unittest tests/src/core/test_crosshair.py
+python3 -m unittest tests/src/core/test_cursorlocationsvalues.py
+python3 -m unittest tests/src/core/test_datasources.py
+python3 -m unittest tests/src/core/test_dependencycheck.py
+python3 -m unittest tests/src/core/test_enmapbox.py
+python3 -m unittest tests/src/core/test_enmapboxplugin.py
+python3 -m unittest tests/src/core/test_enmapboxprocessingprovider.py
+python3 -m unittest tests/src/core/test_enmapbox_utils.py
+python3 -m unittest tests/src/core/test_mapcanvas.py
+python3 -m unittest tests/src/core/test_mimedata.py
+python3 -m unittest tests/src/core/test_processing_framework.py
+python3 -m unittest tests/src/core/test_settings.py
+python3 -m unittest tests/src/core/test_speclibs.py
+python3 -m unittest tests/src/core/test_spectral_processing.py
+python3 -m unittest tests/src/core/test_splashscreen.py
+python3 -m unittest tests/src/core/test_testing.py
+python3 -m unittest tests/src/core/test_utils.py
+python3 -m unittest tests/src/core/test_vectorlayertools.py
+python3 -m unittest tests/src/coreapps/test_enmapboxapplications.py
+python3 -m unittest tests/src/coreapps/test_imagecube.py
+python3 -m unittest tests/src/coreapps/test_metadataeditorapp.py
+python3 -m unittest tests/src/coreapps/test_reclassifyapp.py
+python3 -m unittest tests/src/coreapps/test_vrtbuilderapp.py
+python3 -m unittest tests/src/enmapboxplugins_/test_classfractionrenderer.py
+python3 -m unittest tests/src/enmapboxplugins_/test_decorrelationstretchrenderer.py
+python3 -m unittest tests/src/issues/test_issue_1089.py
+python3 -m unittest tests/src/issues/test_issue_1330_QGIS.py
+python3 -m unittest tests/src/issues/test_issue_1386.py
+python3 -m unittest tests/src/issues/test_issue_478.py
+python3 -m unittest tests/src/issues/test_issue_711.py
+python3 -m unittest tests/src/issues/test_issue_724.py
+python3 -m unittest tests/src/issues/test_issue_737.py
+python3 -m unittest tests/src/issues/test_issue_88.py
+python3 -m unittest tests/src/otherapps/test_enpt_enmapboxapp.py
+python3 -m unittest tests/src/otherapps/test_ensomap.py
+python3 -m unittest tests/src/otherapps/test_lmuvegetationapps.py
+python3 -m unittest tests/src/test_docksanddatasources.py
+python3 -m unittest tests/src/test_repo.py
+python3 -m unittest tests/src/test_template.py
+python3 -m unittest tests/src/widgets_/test_CodeEditWidget.py
+python3 -m unittest tests/src/widgets_/test_MultipleMapLayerSelectionWidget.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_AggregateRasterBandsAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ApplyMaskAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ClassFractionFromCategorizedVectorAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ClassificationFromClassProbabilityAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ClassificationPerformanceSimpleAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ClassificationPerformanceStratifiedAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ClassificationWorkflowAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ClassifierPerformanceAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ClassifierPermutationFeatureImportanceAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ConvexHullAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ConvolutionFilterAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_CreateDefaultPalettedRasterRendererAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_CreateGridAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_CreateMaskAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_CreateRgbImageFromClassProbabilityAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_CreateSpectralIndicesAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_EditRasterSourceBandPropertiesAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_FeatureClusteringHierarchicalAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_FitClassifierAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_FitClustererAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_FitRegressorAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_FitTransformerAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_GeolocateRasterAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ImportDesisL1BAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ImportDesisL1CAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ImportDesisL2AAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ImportEnmapL1BAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ImportEnmapL1CAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ImportEnmapL2AAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ImportLandsatL2Algorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ImportPrismaL1Algorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ImportPrismaL2BAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ImportPrismaL2CAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ImportPrismaL2DAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ImportSentinel2L2AAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_LayerToMaskAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_MergeClassificationDatasetAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PredictClassificationAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PredictClassProbabilityAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PredictRegressionAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareClassificationDatasetFromCategorizedLibraryAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareClassificationDatasetFromCategorizedRasterAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareClassificationDatasetFromCategorizedVectorAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareClassificationDatasetFromCategorizedVectorAndFieldsAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareClassificationDatasetFromCodeAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareClassificationDatasetFromFilesAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareClassificationDatasetFromJsonAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareClassificationDatasetFromTableAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareRegressionDatasetFromCodeAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareRegressionDatasetFromContinuousLibraryAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareRegressionDatasetFromContinuousRasterAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareRegressionDatasetFromContinuousVectorAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareRegressionDatasetFromContinuousVectorAndFieldsAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareRegressionDatasetFromFilesAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareRegressionDatasetFromJsonAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareRegressionDatasetFromSynthMixAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareRegressionDatasetFromTableAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareUnsupervisedDatasetFromCodeAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareUnsupervisedDatasetFromFileAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareUnsupervisedDatasetFromJsonAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareUnsupervisedDatasetFromLibraryAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareUnsupervisedDatasetFromRasterAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_PrepareUnsupervisedDatasetFromVectorAndFieldsAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_RandomPointsInMaskAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_RandomPointsInStratificationAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_RandomSamplesFromClassificationDatasetAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_RandomSamplesFromRegressionDatasetAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_RasterizeCategorizedVectorAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_RasterizeVectorAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_RasterLayerZonalAggregationAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_RasterMathAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_ReclassifyRasterAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_RegeressionPerformanceAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_RegressionBasedUnmixingAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_RegressionWorkflowAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_RegressorPerformanceAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_RocCurveAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_SampleRasterValuesAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_SaveLibraryAsGeoJsonAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_SaveRasterAsAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_SelectFeaturesFromDatasetAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_SpatialFilterFunctionAlgorithmBase.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_SpectralIndexOptimizerAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_SpectralResamplingByResponseFunctionConvolutionAlgorithmBase.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_SpectralResamplingByResponseFunctionLibraryAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_SpectralResamplingBySpectralRasterWavelengthAndFwhmAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_StackRasterLayersAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_SubsetRasterBandsAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_TransformRasterAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_TranslateClassificationAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_TranslateRasterAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_VrtBandMathAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/algorithm/test_WriteEnviHeaderAlgorithm.py
+python3 -m unittest enmapboxprocessing/test/test_extentwalker.py
+python3 -m unittest enmapboxprocessing/test/test_glossary.py
+python3 -m unittest enmapboxprocessing/test/test_gridwalker.py
+python3 -m unittest enmapboxprocessing/test/test_numpyutils.py
+python3 -m unittest enmapboxprocessing/test/test_rasterdriver.py
+python3 -m unittest enmapboxprocessing/test/test_rasterreader.py
+python3 -m unittest enmapboxprocessing/test/test_rasterwriter.py
+python3 -m unittest enmapboxprocessing/test/test_reportwriter.py
+python3 -m unittest enmapboxprocessing/test/test_utils.py

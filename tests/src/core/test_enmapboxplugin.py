@@ -15,25 +15,18 @@
 *                                                                         *
 ***************************************************************************
 """
-# noinspection PyPep8Naming
+
 import pathlib
 import site
 import unittest
 
-from qgis.core import QgsProject
-
-from enmapbox.qgispluginsupport.qps.testing import start_app
 from enmapbox import DIR_REPO
+from enmapbox.testing import TestCase
 from qgis.utils import iface
 
-QGIS_APP = start_app()
 
-
-class TestEnMAPBoxPlugin(unittest.TestCase):
-
-    def setUp(self):
-        print('START TEST {}'.format(self.id()))
-        QgsProject.instance().removeMapLayers(QgsProject.instance().mapLayers().keys())
+class TestEnMAPBoxPlugin(TestCase):
+    deploy_folder = pathlib.Path(DIR_REPO) / 'deploy'
 
     def test_metadata(self):
         from qgis.utils import findPlugins
@@ -41,11 +34,11 @@ class TestEnMAPBoxPlugin(unittest.TestCase):
         path_repo_root = pathlib.Path(DIR_REPO).parent
         plugins = {k: parser for k, parser in findPlugins(path_repo_root.as_posix())}
 
-        self.assertTrue('enmap-box' in plugins.keys(), msg=f'Unable to find enmapb-box below {path_repo_root}')
+        self.assertTrue('enmap-box' in plugins.keys(), msg=f'Unable to find enmap-box below {path_repo_root}')
         parser = plugins['enmap-box']
 
-        required = ['name', 'qgisMinimumVersion', 'description', ]
-        # details in https://docs.qgis.org/testing/en/docs/pyqgis_developer_cookbook/plugins/plugins.html#plugin-metadata
+        # details in
+        # https://docs.qgis.org/testing/en/docs/pyqgis_developer_cookbook/plugins/plugins.html#plugin-metadata
         self.assertTrue(parser.get('general', 'name') != '')
         self.assertTrue(parser.get('general', 'qgisMinimumVersion') != '')
         self.assertTrue(parser.get('general', 'description') != '')
@@ -62,8 +55,6 @@ class TestEnMAPBoxPlugin(unittest.TestCase):
         self.assertIsInstance(plugin, EnMAPBoxPlugin)
         plugin.initGui()
         plugin.unload()
-
-    deploy_folder = pathlib.Path(DIR_REPO) / 'deploy'
 
     @unittest.skipIf(not deploy_folder.is_dir(), 'Missing deploy folder')
     def test_loadplugin2(self):
