@@ -51,4 +51,3 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd):/usr/share/qgis/python/plugins"
 
 if __name__ == "__main__":
     create_runtests()
-
