@@ -36,6 +36,7 @@ exclude =
     site-packages
     # There's no value in checking cache directories
     __pycache__,
+    deploy
     test-reports,
     test-outputs,
     qgisresources

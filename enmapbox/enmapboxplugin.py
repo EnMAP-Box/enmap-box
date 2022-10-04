@@ -70,28 +70,25 @@ class EnMAPBoxPlugin(object):
 
         import enmapbox
         from qgis.utils import iface
-        if isinstance(iface, QgisInterface):
+        assert isinstance(iface, QgisInterface)
 
-            actionStartBox = QAction(enmapbox.icon(), 'EnMAP-Box', iface)
-            actionStartBox.triggered.connect(self.run)
-            actionAbout = QAction(QIcon(':/enmapbox/gui/ui/icons/metadata.svg'),
-                                  'About')
-            actionAbout.triggered.connect(self.showAboutDialog)
-            self.rasterMenuActions.append(actionStartBox)
-            self.rasterMenuActions.append(actionAbout)
-            self.pluginToolbarActions.append(actionStartBox)
+        actionStartBox = QAction(enmapbox.icon(), 'EnMAP-Box', iface)
+        actionStartBox.triggered.connect(self.run)
+        actionAbout = QAction(QIcon(':/enmapbox/gui/ui/icons/metadata.svg'),
+                              'About')
+        actionAbout.triggered.connect(self.showAboutDialog)
+        self.rasterMenuActions.append(actionStartBox)
+        self.rasterMenuActions.append(actionAbout)
+        self.pluginToolbarActions.append(actionStartBox)
 
-            for action in self.rasterMenuActions:
-                iface.addPluginToRasterMenu('EnMAP-Box', action)
+        for action in self.rasterMenuActions:
+            iface.addPluginToRasterMenu('EnMAP-Box', action)
 
-            for action in self.pluginToolbarActions:
-                iface.addToolBarIcon(action)
+        for action in self.pluginToolbarActions:
+            iface.addToolBarIcon(action)
 
-            # init stand-alone apps, that can operate in QGIS GUI without EnMAP-Box
-            self.initStandAloneAppGuis()
-
-        else:
-            print('EnMAPBoxPlugin.initGui() called without iface')
+        # init stand-alone apps, that can operate in QGIS GUI without EnMAP-Box
+        self.initStandAloneAppGuis()
 
     def showAboutDialog(self):
         from enmapbox.gui.about import AboutDialog
@@ -144,7 +141,7 @@ class EnMAPBoxPlugin(object):
         E.g. the GEE Time Series Explorer plugin.
         Those apps can now be used inside the EnMAP-Box GUI, but also in QGIS GUI as stand-alone.
         Therefore, we need to add toolbar icons.
-        Note that an app can't do this on it's own, because apps only get initialized on box startup.
+        Note that an app can't do this on its own, because apps only get initialized on box startup.
         """
 
         self.initCurrentLocationMapTool()
