@@ -1,8 +1,8 @@
-from os.path import dirname, join
-
+from os.path import join
+from pathlib import Path
 from enmapbox import exampledata
 
-root = join(dirname(dirname(__file__)), 'testdata')
+root = Path(__file__).parents[1] / 'testdata'
 
 # RASTER
 _subdir = 'raster'
@@ -81,3 +81,9 @@ regressorDumpMultiTargetPkl = join(root, _subdir, 'regressor_multitarget.pkl')
 # - Regression dataset
 regressionDatasetAsJsonFile = join(root, _subdir, 'regression_dataset.json')
 regressionDatasetAsPkl = join(root, _subdir, 'regression_dataset.pkl')
+
+# engeomap testdata
+_subdir = root / 'external' / 'engeomap'
+engeomap_cubus_gamsberg_subset = _subdir / 'cubus_gamsberg_subset'
+engeomap_gamsberg_field_library = _subdir / 'gamsberg_field_library'
+engeomap_gamesberg_field_library_color_mod = _subdir / 'gamesberg_field_library_color_mod.csv'

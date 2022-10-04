@@ -1,5 +1,3 @@
-from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
-
 collection = ee.ImageCollection("MODIS/006/MCD43A4")
 
 # default colors for bands and spectral indices
