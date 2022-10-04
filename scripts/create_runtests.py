@@ -42,7 +42,7 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd):/usr/share/qgis/python/plugins"
             linesSh.append(lineSh)
             n += 1
 
-    linesSh.append('python3 -m coverage report')
+    # linesSh.append('python3 -m coverage report')
 
     print('Write {}...'.format(PATH_RUNTESTS_SH))
     with open(PATH_RUNTESTS_SH, 'w', encoding='utf-8', newline='\n') as f:
