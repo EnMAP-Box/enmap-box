@@ -43,7 +43,6 @@ from qgis.PyQt.QtCore import QObject, pyqtSignal, QRunnable, pyqtSlot, QThreadPo
 from qgis.PyQt.QtWidgets import QFileDialog, QDialog, QMessageBox
 
 from engeomap import APP_DIR
-from enmapbox.gui.utils import loadUIFormClass
 from enmapbox.qgispluginsupport.qps.utils import loadUi
 
 """"
