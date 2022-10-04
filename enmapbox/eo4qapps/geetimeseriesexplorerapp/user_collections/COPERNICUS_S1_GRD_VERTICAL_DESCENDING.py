@@ -9,7 +9,8 @@
 # Thoughts, doubts, suggestions: juandb@gmail.com.
 
 
-import ee, math
+import ee
+import math
 
 
 def toDB(img):
@@ -35,7 +36,7 @@ def getLIA(img):
         .get('aspect')
     azimuthEdge = getDESCCorners(img)
     TrueAzimuth = azimuthEdge.get(
-        'azimuth');  # This should be some degree off the South direction (180), due to Earth rotation
+        'azimuth')  # This should be some degree off the South direction (180), due to Earth rotation
     rotationFromSouth = ee.Number(TrueAzimuth).subtract(180.0)
     s1_azimuth = ee.Number(s1_azimuth).add(rotationFromSouth)
     srtm_slope = ee.Terrain.slope(srtm).select('slope')
@@ -59,7 +60,7 @@ def getDESCCorners(f):
     azimuth = ee.Number(crdLons.get(crdLats.indexOf(minLat))).subtract(minLon) \
         .atan2(ee.Number(crdLats.get(crdLons.indexOf(minLon))).subtract(minLat)) \
         .multiply(180.0 / math.pi) \
-        .add(180.0);
+        .add(180.0)
     return ee.Feature(ee.Geometry.LineString([crdLons.get(crdLats.indexOf(maxLat)), maxLat,
                                               minLon, crdLats.get(crdLons.indexOf(minLon))]),
                       {'azimuth': azimuth}).copyProperties(f)
@@ -80,8 +81,7 @@ S1col = ee.ImageCollection("COPERNICUS/S1_GRD_FLOAT") \
     .map(toDB) \
     .map(lambda image: image.addBands(image.select('VVg0').subtract(image.select('VHg0')).rename('Ratio')))
 
-S1col = S1col.map(lambda image: image.addBands(image.subtract(S1col.median())) \
-                  .rename(
+S1col = S1col.map(lambda image: image.addBands(image.subtract(S1col.median())).rename(
     ['VH', 'VV', 'VHg0', 'VVg0', 'Ratio', 'VH_dev', 'VV_dev', 'VHg0_dev', 'VVg0_dev', 'Ratio_dev']))
 
 bandColors = {
