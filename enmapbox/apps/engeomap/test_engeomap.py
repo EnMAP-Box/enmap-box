@@ -23,19 +23,21 @@ class EnGeoMAPTests(EnMAPBoxTestCase):
         self.showGui(ui)
 
     def test_gamsberg(self):
-        from testdata.engeomap import cubus_gamsberg_subset, gamsberg_field_library, gamesberg_field_library_color_mod
+        from enmapboxtestdata import engeomap_cubus_gamsberg_subset, \
+            engeomap_gamsberg_field_library, engeomap_gamesberg_field_library_color_mod
+
         ui = EnGeoMAPGUI()
-        ui.input_image.setText(cubus_gamsberg_subset.as_posix())
-        ui.speclib.setText(gamsberg_field_library.as_posix())
-        ui.colormap.setText(gamesberg_field_library_color_mod.as_posix())
+        ui.input_image.setText(engeomap_cubus_gamsberg_subset.as_posix())
+        ui.speclib.setText(engeomap_gamsberg_field_library.as_posix())
+        ui.colormap.setText(engeomap_gamesberg_field_library_color_mod.as_posix())
 
         params = ui.collectParameters()
 
         worker = Worker()
         worker.run()
 
-        root = cubus_gamsberg_subset.parent
-        bn = os.path.basename(cubus_gamsberg_subset.name)
+        root = engeomap_cubus_gamsberg_subset.parent
+        bn = os.path.basename(engeomap_cubus_gamsberg_subset.name)
 
         to_delete = []
         for suffix in ['abundance_result',
