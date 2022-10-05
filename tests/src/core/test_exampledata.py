@@ -2,22 +2,26 @@
 Tests to ensure that module testfiles exist
 """
 import pathlib
+import re
 import unittest
 from os.path import exists
+from typing import List
+
+rx_skipped_sources = re.compile(r'(.*url=https://.*)')  # skip URLs
 
 
 class EnMAPBoxTestCaseExample(unittest.TestCase):
     """
-    Tests to ensure that module testfiles exist
+    Tests to ensure that module test files exist
     """
 
-    def checkModule(self, module):
+    def checkModule(self, module, excluded: List = []):
         for a in module.__dict__.keys():
-            if a.startswith('__'):
-                continue
-            if a == 'google_maps':
+            if a.startswith('__') or a in excluded:
                 continue
             filepath = getattr(module, a)
+            if rx_skipped_sources.search(str(filepath)):
+                continue
             if isinstance(filepath, (str, pathlib.Path)):
                 self.assertTrue(exists(filepath), msg=f'Path does not exist: {filepath}')
 
