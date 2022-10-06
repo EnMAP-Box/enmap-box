@@ -208,7 +208,9 @@ def extractMapLayers(mimeData: QMimeData,
     elif MDF_URILIST in mimeData.formats():
         for url in mimeData.urls():
 
-            if basename(url.url()) == 'MTD_MSIL2A.xml':  # resolves GitHub issue #42
+            if basename(url.url()) == 'MTD_MSIL2A.xml':  # resolves #42
+                dataSources = [None]
+            elif basename(url.url()).startswith('PRS_L') and  basename(url.url()).endswith('.he5'):  # resolves #100
                 dataSources = [None]
             else:
                 dataSources = DataSourceFactory.create(url)
