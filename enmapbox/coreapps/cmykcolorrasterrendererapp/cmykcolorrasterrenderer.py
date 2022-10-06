@@ -14,6 +14,7 @@ class CmykColorRasterRenderer(QgsRasterRenderer):
     min1: float
     min2: float
     min3: float
+    min4: float
     max1: float
     max2: float
     max3: float

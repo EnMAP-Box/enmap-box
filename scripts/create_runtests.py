@@ -14,7 +14,6 @@ def create_runtests():
     # these test should be run first (fail fast)
     rxRunFirst = re.compile(r'(.*test_exampledata\.py)')
 
-
     TEST_DIRECTORIES = [
         DIR_REPO / 'tests',
         DIR_REPO / 'enmapboxprocessing' / 'test',
