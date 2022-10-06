@@ -2,7 +2,7 @@ People who made large contributions to the EnMAP-Box
 
 Earth Observation Lab, Humboldt-Universität zu Berlin, Germany
 
-* Andreas Rabe <andreas.rabe@geo.hu-berlin.de>
+* Andreas Janz <andreas.janz@geo.hu-berlin.de>
 * Benjamin Jakimow <benjamin.jakimow@geo.hu-berlin.de>
 * Franz Schug <franz.schug@geo.hu-berlin.de>
 * Matthias Held <matthias.held@hu-berlin.de>

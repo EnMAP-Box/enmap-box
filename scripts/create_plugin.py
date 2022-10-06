@@ -419,7 +419,7 @@ if __name__ == "__main__":
             Processing algo documentation up-to-date (run create_processing_rst).
             Run weblink checker (in doc folder make linkcheck).
             Check if box runs without optional dependencies (see tests/non-blocking-dependencies/readme.txt).
-            Version number increased? (enmapbox/__init__.py -> __version__)
+            Version number increased? (see .plugin.ini version = 3.x.y)
             QGIS Min-Version? (enmapbox/__init__.py -> MIN_VERSION_QGIS)
             ZIP containing branch (i.e. master) information (GIT installed)?
             Install ZIP and quick-test under the latest supported QGIS versions and OS, e.g.:
