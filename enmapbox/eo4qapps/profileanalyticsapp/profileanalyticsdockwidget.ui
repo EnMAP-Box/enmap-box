@@ -99,7 +99,7 @@
               </sizepolicy>
              </property>
              <property name="text">
-              <string>Source</string>
+              <string>Source type</string>
              </property>
             </widget>
            </item>
@@ -129,7 +129,7 @@
                   </sizepolicy>
                  </property>
                  <property name="text">
-                  <string>Type</string>
+                  <string>Profile type</string>
                  </property>
                 </widget>
                </item>

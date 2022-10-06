@@ -1720,6 +1720,12 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
             action.setIcon(HsvColorRasterRendererApp.icon())
             action.triggered.connect(lambda: self.onHsvColorRasterRendererClicked(lyr))
 
+        if lyr.bandCount() >= 1:
+            from multisourcemultibandcolorrendererapp import MultiSourceMultiBandColorRendererApp
+            action = menu.addAction(MultiSourceMultiBandColorRendererApp.title())
+            action.setIcon(MultiSourceMultiBandColorRendererApp.icon())
+            action.triggered.connect(lambda: self.onMultiSourceMultiBandColorRendererClicked(lyr))
+
         if isinstance(lyr.renderer(), QgsPalettedRasterRenderer):
             from classificationstatisticsapp import ClassificationStatisticsApp
             action = menu.addAction(ClassificationStatisticsApp.title())
@@ -1957,6 +1963,16 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         self.hsvColorRasterRendererDialog = HsvColorRasterRendererDialog(parent=self.mDockTreeView)
         self.hsvColorRasterRendererDialog.show()
         self.hsvColorRasterRendererDialog.mLayer.setLayer(layer)
+
+    @typechecked
+    def onMultiSourceMultiBandColorRendererClicked(self, layer: QgsRasterLayer):
+        from multisourcemultibandcolorrendererapp import MultiSourceMultiBandColorRendererDialog
+        self.multiSourceMultiBandColorRendererDialog = MultiSourceMultiBandColorRendererDialog(parent=self.mDockTreeView)
+        self.multiSourceMultiBandColorRendererDialog.show()
+        self.multiSourceMultiBandColorRendererDialog.mLayer1.setLayer(layer)
+        self.multiSourceMultiBandColorRendererDialog.mLayer2.setLayer(layer)
+        self.multiSourceMultiBandColorRendererDialog.mLayer3.setLayer(layer)
+        self.multiSourceMultiBandColorRendererDialog.onApplyClicked()
 
     @typechecked
     def onCopyLayerToQgisClicked(self, layer: QgsMapLayer):

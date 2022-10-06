@@ -427,9 +427,10 @@ class RasterReader(object):
         """Return band center wavelength in nanometers. Optionally, specify destination units."""
 
         # special handling: FORCE TSI raster
-        enviDescription = self.metadataItem('description', 'ENVI')[0]
-        if enviDescription.startswith('FORCE') and enviDescription.endswith('Time Series Analysis'):
-            return None
+        enviDescription = self.metadataItem('description', 'ENVI')
+        if enviDescription is not None:
+            if enviDescription[0].startswith('FORCE') and enviDescription[0].endswith('Time Series Analysis'):
+                return None
 
         if raw:
             conversionFactor = 1.
