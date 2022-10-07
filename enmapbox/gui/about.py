@@ -53,7 +53,7 @@ class AboutDialog(QDialog):
             return lines
 
         self.labelAboutText.setText(f'<html><head/><body>{ABOUT}</body></html>')
-        self.tbLicense.setText(loadTextFile(os.path.join(DIR_REPO, 'LICENSE.txt')))
+        self.tbLicense.setText(loadTextFile(os.path.join(DIR_REPO, 'LICENSE.md')))
         self.tbContributors.setText(loadTextFile(os.path.join(DIR_REPO, 'CONTRIBUTORS.rst')))
         self.tbChanges.setText(loadTextFile(os.path.join(DIR_REPO, 'CHANGELOG.rst')))
 
