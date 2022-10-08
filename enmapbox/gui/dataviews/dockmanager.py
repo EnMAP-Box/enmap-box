@@ -23,7 +23,7 @@ import typing
 import uuid
 from typing import Optional, List, Dict
 
-from enmapbox import debugLog
+from enmapbox import debugLog, messageLog
 from enmapbox.gui import \
     SpectralLibrary, SpectralLibraryWidget, SpatialExtent, showLayerPropertiesDialog
 from enmapbox.gui.datasources.datasources import DataSource, ModelDataSource
@@ -45,6 +45,7 @@ from qgis.PyQt.QtCore import Qt, QMimeData, QModelIndex, QObject, QTimer, pyqtSi
 from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDropEvent, QDragLeaveEvent
 from qgis.PyQt.QtWidgets import QHeaderView, QMenu, QAbstractItemView, QApplication, QWidget, QToolButton, QAction
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
+from qgis._core import QgsMessageLog
 from qgis.core import Qgis, QgsCoordinateReferenceSystem, QgsMapLayer, QgsVectorLayer, QgsRasterLayer, \
     QgsProject, QgsReadWriteContext, \
     QgsLayerTreeLayer, QgsLayerTreeNode, QgsLayerTreeGroup, \
@@ -1536,6 +1537,8 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
 
         viewNode = findParent(node, DockTreeNode, checkInstance=True)
 
+        errors: List[ModuleNotFoundError] = []
+
         menu = QMenu()
         menu.setToolTipsVisible(True)
 
@@ -1569,21 +1572,36 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
             lyr = node.layer()
 
             if isinstance(lyr, QgsMapLayer):
-                self.addMapLayerMenuItems(node, menu, canvas, selectedLayerNodes)
+                try:
+                    self.addMapLayerMenuItems(node, menu, canvas, selectedLayerNodes)
+                except ModuleNotFoundError as ex:
+                    errors.append(ex)
 
             if isinstance(lyr, QgsVectorLayer):
-                self.addVectorLayerMenuItems(node, menu)
+                try:
+                    self.addVectorLayerMenuItems(node, menu)
+                except ModuleNotFoundError as ex:
+                    errors.append(ex)
 
             if isinstance(lyr, QgsRasterLayer):
-                self.addRasterLayerMenuItems(node, menu)
+                try:
+                    self.addRasterLayerMenuItems(node, menu)
+                except ModuleNotFoundError as ex:
+                    errors.append(ex)
 
         elif isinstance(node, DockTreeNode):
             assert isinstance(node.dock, Dock)
-            node.dock.populateContextMenu(menu)
+            try:
+                node.dock.populateContextMenu(menu)
+            except ModuleNotFoundError as ex:
+                errors.append(ex)
 
         elif isinstance(node, LayerTreeNode):
             if col == 0:
-                node.populateContextMenu(menu)
+                try:
+                    node.populateContextMenu(menu)
+                except ModuleNotFoundError as ex:
+                    errors.append(ex)
             elif col == 1:
                 a = menu.addAction('Copy')
                 a.triggered.connect(lambda *args, n=node: QApplication.clipboard().setText('{}'.format(n.value())))
@@ -1591,7 +1609,10 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         # last chance to add other menu actions
         # self.mSignals.sigPopulateContextMenu.emit(menu)
         if isinstance(self.mDockTreeView, DockTreeView):
-            self.mDockTreeView.sigPopulateContextMenu.emit(menu)
+            try:
+                self.mDockTreeView.sigPopulateContextMenu.emit(menu)
+            except ModuleNotFoundError as ex:
+                errors.append(ex)
 
         # let layer properties always be the last menu item
         if isinstance(lyr, QgsMapLayer):
@@ -1599,6 +1620,19 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
             action = menu.addAction('Layer properties')
             action.setToolTip('Set layer properties')
             action.triggered.connect(lambda *args, l=lyr, c=canvas: self.showLayerProperties(l, c))
+
+        if len(errors) > 0:
+            # show warning for missing modules
+            missing = []
+            for ex in errors:
+                if isinstance(ex, ModuleNotFoundError):
+                    missing.append(ex.name)
+            if len(missing) > 0:
+                msg = 'Failed to create full layer context menu ' \
+                      'due to the following missing packages: {}'.format(','.join(missing))
+
+                messageLog(msg)
+                QgsMessageLog.logMessage(msg, level=Qgis.MessageLevel.Warning)
 
         return menu
 
