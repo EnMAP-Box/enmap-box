@@ -60,6 +60,7 @@ except ModuleNotFoundError as ex:
             sys.path.append(p)
             try:
                 import git
+
                 found = True
                 break
             except ModuleNotFoundError:
@@ -67,7 +68,7 @@ except ModuleNotFoundError as ex:
     if found:
         warnings.warn(f'Git executable was not available in PATH! Found it in {p}')
     else:
-        os.environ['PATH'] = oldPath # avoid side-effects!
+        os.environ['PATH'] = oldPath  # avoid side-effects!
         raise ex
 
 DIR_REPO = pathlib.Path(DIR_REPO)
