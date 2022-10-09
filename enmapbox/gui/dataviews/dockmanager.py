@@ -1695,56 +1695,65 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
 
         menu.addSeparator()
         # add processing algorithm & application shortcuts
+        submenu = menu.addMenu(QIcon(':/images/themes/default/styleicons/color.svg'), 'Statistics and Visualization')
+
         from bandstatisticsapp import BandStatisticsApp
-        action = menu.addAction(BandStatisticsApp.title())
+        action = submenu.addAction(BandStatisticsApp.title())
         action.setIcon(BandStatisticsApp.icon())
         action.triggered.connect(lambda: self.onBandStatisticsClicked(lyr))
-        if lyr.bandCount() >= 2:
-            from scatterplotapp import ScatterPlotApp
-            action = menu.addAction(ScatterPlotApp.title())
-            action.setIcon(ScatterPlotApp.icon())
-            action.triggered.connect(lambda: self.onScatterPlotClicked(lyr))
-        if lyr.bandCount() >= 3:
-            from colorspaceexplorerapp import ColorSpaceExplorerApp
-            action = menu.addAction(ColorSpaceExplorerApp.title())
-            action.setIcon(ColorSpaceExplorerApp.icon())
-            action.triggered.connect(lambda: self.onColorSpaceExplorerClicked(lyr))
 
+        if lyr.bandCount() >= 2:
+            from bivariatecolorrasterrendererapp import BivariateColorRasterRendererApp
+            action: QAction = submenu.addAction(BivariateColorRasterRendererApp.title())
+            action.setIcon(BivariateColorRasterRendererApp.icon())
+            action.triggered.connect(lambda: self.onBivariateColorRasterRendererClicked(lyr))
+
+        from classfractionstatisticsapp import ClassFractionStatisticsApp
+        action: QAction = submenu.addAction(ClassFractionStatisticsApp.title())
+        action.setIcon(ClassFractionStatisticsApp.icon())
+        action.triggered.connect(lambda: self.onClassFractionStatisticsClicked(lyr))
+
+        if isinstance(lyr.renderer(), QgsPalettedRasterRenderer):
+            from classificationstatisticsapp import ClassificationStatisticsApp
+            action = submenu.addAction(ClassificationStatisticsApp.title())
+            action.setIcon(ClassificationStatisticsApp.icon())
+            action.triggered.connect(lambda: self.onClassificationStatisticsClicked(lyr))
+
+        if lyr.bandCount() >= 3:
             from cmykcolorrasterrendererapp import CmykColorRasterRendererApp
-            action = menu.addAction(CmykColorRasterRendererApp.title())
+            action = submenu.addAction(CmykColorRasterRendererApp.title())
             action.setIcon(CmykColorRasterRendererApp.icon())
             action.triggered.connect(lambda: self.onCmykColorRasterRendererClicked(lyr))
 
+        if lyr.bandCount() >= 3:
+            from colorspaceexplorerapp import ColorSpaceExplorerApp
+            action = submenu.addAction(ColorSpaceExplorerApp.title())
+            action.setIcon(ColorSpaceExplorerApp.icon())
+            action.triggered.connect(lambda: self.onColorSpaceExplorerClicked(lyr))
+
+        if lyr.bandCount() >= 3:
+            from decorrelationstretchapp import DecorrelationStretchApp
+            action: QAction = submenu.addAction(DecorrelationStretchApp.title())
+            action.setIcon(DecorrelationStretchApp.icon())
+            action.triggered.connect(lambda: self.onDecorrelationStretchClicked(lyr))
+
+        if lyr.bandCount() >= 3:
             from hsvcolorrasterrendererapp import HsvColorRasterRendererApp
-            action = menu.addAction(HsvColorRasterRendererApp.title())
+            action = submenu.addAction(HsvColorRasterRendererApp.title())
             action.setIcon(HsvColorRasterRendererApp.icon())
             action.triggered.connect(lambda: self.onHsvColorRasterRendererClicked(lyr))
 
         if lyr.bandCount() >= 1:
             from multisourcemultibandcolorrendererapp import MultiSourceMultiBandColorRendererApp
-            action = menu.addAction(MultiSourceMultiBandColorRendererApp.title())
+            action = submenu.addAction(MultiSourceMultiBandColorRendererApp.title())
             action.setIcon(MultiSourceMultiBandColorRendererApp.icon())
             action.triggered.connect(lambda: self.onMultiSourceMultiBandColorRendererClicked(lyr))
 
-        if isinstance(lyr.renderer(), QgsPalettedRasterRenderer):
-            from classificationstatisticsapp import ClassificationStatisticsApp
-            action = menu.addAction(ClassificationStatisticsApp.title())
-            action.setIcon(ClassificationStatisticsApp.icon())
-            action.triggered.connect(lambda: self.onClassificationStatisticsClicked(lyr))
-        from classfractionstatisticsapp import ClassFractionStatisticsApp
-        action: QAction = menu.addAction(ClassFractionStatisticsApp.title())
-        action.setIcon(ClassFractionStatisticsApp.icon())
-        action.triggered.connect(lambda: self.onClassFractionStatisticsClicked(lyr))
-        if lyr.bandCount() >= 3:
-            from decorrelationstretchapp import DecorrelationStretchApp
-            action: QAction = menu.addAction(DecorrelationStretchApp.title())
-            action.setIcon(DecorrelationStretchApp.icon())
-            action.triggered.connect(lambda: self.onDecorrelationStretchClicked(lyr))
         if lyr.bandCount() >= 2:
-            from bivariatecolorrasterrendererapp import BivariateColorRasterRendererApp
-            action: QAction = menu.addAction(BivariateColorRasterRendererApp.title())
-            action.setIcon(BivariateColorRasterRendererApp.icon())
-            action.triggered.connect(lambda: self.onBivariateColorRasterRendererClicked(lyr))
+            from scatterplotapp import ScatterPlotApp
+            action = submenu.addAction(ScatterPlotApp.title())
+            action.setIcon(ScatterPlotApp.icon())
+            action.triggered.connect(lambda: self.onScatterPlotClicked(lyr))
 
         # add apply model shortcuts
         from enmapbox import EnMAPBox
@@ -1967,7 +1976,8 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
     @typechecked
     def onMultiSourceMultiBandColorRendererClicked(self, layer: QgsRasterLayer):
         from multisourcemultibandcolorrendererapp import MultiSourceMultiBandColorRendererDialog
-        self.multiSourceMultiBandColorRendererDialog = MultiSourceMultiBandColorRendererDialog(parent=self.mDockTreeView)
+        self.multiSourceMultiBandColorRendererDialog = MultiSourceMultiBandColorRendererDialog(
+            parent=self.mDockTreeView)
         self.multiSourceMultiBandColorRendererDialog.show()
         self.multiSourceMultiBandColorRendererDialog.mLayer1.setLayer(layer)
         self.multiSourceMultiBandColorRendererDialog.mLayer2.setLayer(layer)
