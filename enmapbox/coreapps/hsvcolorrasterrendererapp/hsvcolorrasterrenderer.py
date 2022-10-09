@@ -76,7 +76,7 @@ class HsvColorRasterRenderer(QgsRasterRenderer):
         # convert HSV to RGB
         valuesH = np.clip((values1 - self.min1) / (self.max1 - self.min1), 0, 1)
         valuesS = np.clip((values2 - self.min2) / (self.max2 - self.min2), 0, 1)
-        valuesV = np.clip((values3 - self.min3) / (self.max2 - self.min3), 0, 1)
+        valuesV = np.clip((values3 - self.min3) / (self.max3 - self.min3), 0, 1)
         valuesRgb = hsv_to_rgb(np.transpose([valuesH, valuesS, valuesV])) * 255
         valuesR, valuesG, valuesB = valuesRgb.T
 
