@@ -6,8 +6,8 @@ on:
       - '**.py'
   pull_request:
     branches:
-      - 'main'
-      - 'release*'
+      - main
+      - release-**
     paths:
       - '**.py'
 
