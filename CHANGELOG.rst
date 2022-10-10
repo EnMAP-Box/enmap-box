@@ -30,7 +30,8 @@ Version 3.11
 
 **Data Formats / Metadata Handling**
 
-* added support for human-readable JSON files for storing classification/regression datasets used in ML algorithms (`#21: <https://github.com/EnMAP-Box/enmap-box/issues/21>`_)
+* GDAL metadata like band names can be edited in layer properties (support for ENVI images available with `GDAL 3.6+ <https://github.com/OSGeo/gdal/issues/6444>`_)
+* added support for JSON files for storing classification/regression datasets used in ML algorithms (`#21: <https://github.com/EnMAP-Box/enmap-box/issues/21>`_)
 * added support for marking a raster bands as bad inside the *Raster Layer Styling* panel (`#31: <https://github.com/EnMAP-Box/enmap-box/issues/31>`_)
 * added support for FORCE v1.2 TSI format (`#111: <https://github.com/EnMAP-Box/enmap-box/issues/111>`_)
 

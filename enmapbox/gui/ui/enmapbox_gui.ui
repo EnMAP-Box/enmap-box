@@ -813,7 +813,7 @@
   </action>
   <action name="mActionLoadExampleData">
    <property name="text">
-    <string>Load Example Data</string>
+    <string>Add Example Data</string>
    </property>
   </action>
  </widget>
