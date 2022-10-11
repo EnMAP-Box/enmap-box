@@ -3,13 +3,12 @@ from enmapbox.gui.widgets.multiplerasterbandselectionwidget.multiplerasterbandse
     MultipleRasterBandSelectionWidget
 from enmapbox.testing import start_app
 from enmapboxtestdata import enmap
-from qgis._core import QgsRasterLayer
+from qgis.core import QgsRasterLayer
 
 qgsApp = start_app()
 initAll()
 
 enmapBox = EnMAPBox(None)
-#enmapBox.loadExampleData()
 widget = MultipleRasterBandSelectionWidget()
 layer = QgsRasterLayer(enmap)
 widget.mBand.setLayer(layer)

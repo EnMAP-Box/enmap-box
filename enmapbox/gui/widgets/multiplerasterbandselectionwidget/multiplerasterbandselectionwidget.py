@@ -1,13 +1,10 @@
 from typing import List, Optional
 
-from PyQt5.QtWidgets import QComboBox
-
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QListWidget, QListWidgetItem, QDialog
 from qgis.PyQt.uic import loadUi
-from qgis._core import QgsRasterLayer
-from qgis._gui import QgsRasterBandComboBox
-from qgis.core import QgsMapLayer
+from qgis.core import QgsRasterLayer, QgsMapLayer
+from qgis.gui import QgsRasterBandComboBox
 from typeguard import typechecked
 
 
