@@ -528,7 +528,7 @@ class Utils(object):
     def tmpFilename(cls, root: str, basename_: str):
         """Create a temp-filename relative to root."""
         tmpDirname = join(dirname(root), f'_temp_{basename(root)}')
-        if not exists(tmpDirname):
+        if not exists(tmpDirname) and not tmpDirname.startswith('/vsimem/'):
             makedirs(tmpDirname)
         tmpFilename = join(tmpDirname, basename_)
         return tmpFilename

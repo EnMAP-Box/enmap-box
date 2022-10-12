@@ -534,10 +534,11 @@ class RasterReader(object):
         if bandNo is not None:
 
             # special handling: FORCE TSI raster
-            enviDescription = self.metadataItem('description', 'ENVI')[0]
-            if enviDescription.startswith('FORCE') and enviDescription.endswith('Time Series Analysis'):
-                decimalYear = float(self.metadataItem('wavelength', '', bandNo))
-                return Utils.decimalYearToDateTime(decimalYear)
+            enviDescription = self.metadataItem('description', 'ENVI')
+            if enviDescription is not None:
+                if enviDescription[0].startswith('FORCE') and enviDescription[0].endswith('Time Series Analysis'):
+                    decimalYear = float(self.metadataItem('wavelength', '', bandNo))
+                    return Utils.decimalYearToDateTime(decimalYear)
 
             # check band-level default-domain
             dateTime = self.metadataItem('start_time', '', bandNo)

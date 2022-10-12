@@ -24,7 +24,10 @@ class MultipleRasterBandSelectionWidget(QWidget):
         self.updateInfo()
 
     def currentBands(self) -> List[int]:
-        return list(self.bandNumbers)
+        if self.mBand.currentIndex() == 0:
+            return list(self.bandNumbers)
+        else:
+            return [self.mBand.currentIndex()]
 
     def currentLayer(self) -> Optional[QgsRasterLayer]:
         layer = self.mBand.layer()
@@ -58,7 +61,6 @@ class MultipleRasterBandSelectionWidget(QWidget):
 
     def onButtonClicked(self):
         layer = self.currentLayer()
-        print('Hello', layer)
         if layer is None:
             return
         selection = self.currentBands()
