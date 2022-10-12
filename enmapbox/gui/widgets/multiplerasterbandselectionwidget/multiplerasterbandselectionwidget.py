@@ -1,7 +1,5 @@
 from typing import List, Optional
 
-from PyQt5.QtWidgets import QComboBox
-
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QListWidget, QListWidgetItem, QDialog
 from qgis.PyQt.uic import loadUi

@@ -2,13 +2,12 @@ import pickle
 from os.path import join, basename, isabs
 from typing import Optional
 
-from PyQt5.QtWidgets import QRadioButton
 from osgeo import gdal
 
 import processing
 from enmapbox import EnMAPBox
 from enmapbox.gui.mimedata import MDF_RASTERBANDS, QGIS_URILIST_MIMETYPE, MDF_ENMAPBOX_LAYERTREEMODELDATA, \
-    MDF_QGIS_LAYERTREEMODELDATA, MDF_QGIS_LAYERTREEMODELDATA_XML
+    MDF_QGIS_LAYERTREEMODELDATA, MDF_QGIS_LAYERTREEMODELDATA_XML, MDF_URILIST
 from enmapbox.gui.widgets.multiplerasterbandselectionwidget.multiplerasterbandselectionwidget import \
     MultipleRasterBandSelectionWidget
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
@@ -18,12 +17,11 @@ from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp import MapTool
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QEvent
-from qgis.PyQt.QtWidgets import QToolButton, QTableWidget
+from qgis.PyQt.QtWidgets import QToolButton, QTableWidget, QRadioButton
 from qgis.PyQt.QtXml import QDomDocument
-from qgis._gui import QgsFileWidget
 from qgis.core import QgsMimeDataUtils, QgsReadWriteContext, QgsLayerTree, QgsProject, QgsMapLayerProxyModel, \
     QgsRasterLayer
-from qgis.gui import QgsMapLayerComboBox, QgsDockWidget, QgisInterface
+from qgis.gui import QgsMapLayerComboBox, QgsDockWidget, QgisInterface, QgsFileWidget
 from typeguard import typechecked
 
 
@@ -93,6 +91,9 @@ class RasterBandStackingDockWidget(QgsDockWidget):
             elif QGIS_URILIST_MIMETYPE in mimeData.formats():
                 for uri in QgsMimeDataUtils.decodeUriList(mimeData):
                     self.onAddRasterClicked(uri=uri.uri)
+            elif MDF_URILIST in mimeData.formats():
+                for url in mimeData.urls():
+                    self.onAddRasterClicked(uri=url.url().replace('file:///', ''))
             else:
                 raise NotImplementedError()
 
@@ -133,6 +134,10 @@ class RasterBandStackingDockWidget(QgsDockWidget):
         self.mRasterTable.setCellWidget(row, 1, mMultiBand)
 
         if uri is not None:
+            items = mRaster.additionalItems()
+            if uri not in items:
+                items.append(uri)
+            mRaster.setAdditionalItems(items)
             mRaster.setCurrentText(uri)
             layer = QgsRasterLayer(uri)
             mMultiBand.setLayer(layer)
