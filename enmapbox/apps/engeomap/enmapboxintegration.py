@@ -50,7 +50,7 @@ class EnGeoMAP(EnMAPBoxApplication):
 
     def menu(self, appMenu):
         appMenu = self.enmapbox.menu('Applications')
-        menu = self.utilsAddMenuInAlphanumericOrder(appMenu, 'GFZ EnGeoMAP')
+        menu = self.utilsAddMenuInAlphanumericOrder(appMenu, 'Mineral Applications')
         menu.setIcon(self.icon())
         # add a QAction that starts your GUI
         a = menu.addAction('EnGeoMAP 3.1')
