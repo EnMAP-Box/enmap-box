@@ -1,11 +1,9 @@
-from os.path import basename, splitext
-
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QListWidget, QListWidgetItem, QLineEdit, QSpinBox, QComboBox
+from os.path import splitext
 
 from enmapbox.qgispluginsupport.qps.resources import showResources
-from qgis.PyQt.QtWidgets import QMainWindow
+from qgis.PyQt.QtCore import QSize
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QMainWindow, QListWidget, QListWidgetItem, QLineEdit, QComboBox
 from qgis.PyQt.uic import loadUi
 from typeguard import typechecked
 
