@@ -286,10 +286,10 @@
      <normaloff>:/enmapbox/gui/ui/icons/viewlist_mapdock.svg</normaloff>:/enmapbox/gui/ui/icons/viewlist_mapdock.svg</iconset>
    </property>
    <property name="text">
-    <string>Add Map Window</string>
+    <string>Add Map View</string>
    </property>
    <property name="toolTip">
-    <string>Open a map window</string>
+    <string>Open a map view</string>
    </property>
   </action>
   <action name="mActionAddTextView">
@@ -298,10 +298,10 @@
      <normaloff>:/enmapbox/gui/ui/icons/viewlist_textview.svg</normaloff>:/enmapbox/gui/ui/icons/viewlist_textview.svg</iconset>
    </property>
    <property name="text">
-    <string>Add Text Window</string>
+    <string>Add Text View</string>
    </property>
    <property name="toolTip">
-    <string>Open a text window</string>
+    <string>Open a text view</string>
    </property>
   </action>
   <action name="mActionAddSpeclibView">
@@ -310,10 +310,10 @@
      <normaloff>:/enmapbox/gui/ui/icons/viewlist_spectrumdock.svg</normaloff>:/enmapbox/gui/ui/icons/viewlist_spectrumdock.svg</iconset>
    </property>
    <property name="text">
-    <string>Add Spectral Library Window</string>
+    <string>Add Spectral Library View</string>
    </property>
    <property name="toolTip">
-    <string>Open a spectral library window</string>
+    <string>Open a spectral library view</string>
    </property>
   </action>
   <action name="mActionZoomIn">
@@ -407,7 +407,7 @@
      <normaloff>:/enmapbox/gui/ui/icons/viewlist_dock.svg</normaloff>:/enmapbox/gui/ui/icons/viewlist_dock.svg</iconset>
    </property>
    <property name="text">
-    <string>Add MimeData Viewer (experimental)</string>
+    <string>Add MimeData View (experimental)</string>
    </property>
   </action>
   <action name="mActionZoomPixelScale">
