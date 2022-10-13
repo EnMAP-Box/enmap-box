@@ -549,6 +549,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.ui.actionShowResourceBrowser.triggered.connect(self.showResourceBrowser)
         m.addAction(self.ui.actionShowResourceBrowser)
 
+        a: QAction = m.addAction('Recource Gallery')
+        a.setIcon(QIcon())
+        a.triggered.connect(self.onRecourceGallery)
+
         a: QAction = m.addAction('Remove non-EnMAP-Box layers from project')
         a.setIcon(QIcon(':/images/themes/default/mActionRemoveLayer.svg'))
         a.triggered.connect(self.onRemoveNoneEnMAPBoxLayerFromProject)
@@ -757,6 +761,11 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         browser = showResources()
         browser.setWindowTitle('Resource Browser')
         self._browser = browser
+
+    def onRecourceGallery(self):
+        from resourcegalleryapp.resourcegallery import ResourceGalleryDialog
+        self._resourceGalleryDialog = ResourceGalleryDialog()
+        self._resourceGalleryDialog.show()
 
     def onRemoveNoneEnMAPBoxLayerFromProject(self):
         """Remove non-EnMAP-Box layers from project (see #973)."""
