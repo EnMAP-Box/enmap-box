@@ -48,3 +48,8 @@ class MapTool(QgsMapTool):
         point = self.crosshairItem.center()
         crs = Utils.mapCanvasCrs(self.mapCanvas)
         return SpatialPoint(crs, point)
+
+    def setCurrentLocation(self, point: SpatialPoint):
+        crs = Utils.mapCanvasCrs(self.mapCanvas)
+        point = point.toCrs(crs)
+        self.crosshairItem.setCenter(point)
