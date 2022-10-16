@@ -128,6 +128,7 @@ class LocationBrowserDockWidget(QgsDockWidget):
             raise ValueError()
         layer.loadNamedStyle(qmlFile, False)
 
+
         if self.interfaceType == self.EnmapBoxInterface:
             mapCanvas = self.enmapBoxInterface().currentMapCanvas()
             mapCanvas.setCrosshairPosition(point, True)
