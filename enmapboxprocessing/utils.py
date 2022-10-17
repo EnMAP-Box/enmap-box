@@ -430,21 +430,29 @@ class Utils(object):
         if isinstance(obj, str):
             items: List[str] = [v for v in obj.replace(' ', ',').split(',') if len(v) > 1]
             if len(items) == 2:
-                for item in items:
-                    try:
-                        lon, lat = items
-                        return SpatialPoint(QgsCoordinateReferenceSystem.fromEpsgId(4326), float(lat), float(lon))
-                    except Exception:
-                        raise NotImplementedError()
-                        # todo: support 53°04'29.2"N 13°53'42.3"E format
-                        #       see https://stackoverflow.com/questions/17193351/how-to-convert-latitude-and-longitude-in-dms-format-into-decimal-format-and-vic
+                lon, lat = items
+                try:
+                    return SpatialPoint(QgsCoordinateReferenceSystem.fromEpsgId(4326), float(lat), float(lon))
+                except Exception:
+                    pass
+                try:
+                    def conversion(old):  # adopted from https://stackoverflow.com/questions/10852955/python-batch-convert-gps-positions-to-lat-lon-decimals
+                        direction = {'N': 1, 'S': -1, 'E': 1, 'W': -1}
+                        new = old.replace(u'°', ' ').replace('\'', ' ').replace('"', ' ')
+                        new = new.split()
+                        new_dir = new.pop()
+                        new.extend([0, 0, 0])
+                        return (int(new[0]) + int(new[1]) / 60.0 + float(new[2]) / 3600.0) * direction[new_dir]
+                    return SpatialPoint(QgsCoordinateReferenceSystem.fromEpsgId(4326), conversion(lat), conversion(lon))
+                except Exception:
+                    pass
             if len(items) == 3:
                 lat, lon, epsgId = items
                 if epsgId.upper().startswith('[EPSG:'):
                     epsgId = int(epsgId[6:-1])
                     return SpatialPoint(QgsCoordinateReferenceSystem.fromEpsgId(epsgId), float(lat), float(lon))
 
-        raise ValueError('invalid spatial point')
+        raise error
 
     @classmethod
     def parseDateTime(cls, obj) -> QDateTime:

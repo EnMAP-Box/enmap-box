@@ -361,6 +361,8 @@ class TestUtils(TestCase):
         self.assertEqual(point, Utils.parseSpatialPoint('13.895089018465338, 53.07478793449 [EPSG:4326]'))
         self.assertEqual(point, Utils.parseSpatialPoint('13.895089018465338,53.07478793449,[EPSG:4326]'))
         self.assertEqual(point, Utils.parseSpatialPoint('13.895089018465338 53.07478793449 [EPSG:4326]'))
+        self.assertEqual(13.895, round(Utils.parseSpatialPoint('''53°04'29.2"N, 13°53'42.3"E''').x(), 3))
+        self.assertEqual(53.075, round(Utils.parseSpatialPoint('''53°04'29.2"N, 13°53'42.3"E''').y(), 3))
 
         try:
             Utils.parseSpatialPoint('dummy')
