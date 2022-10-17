@@ -1,16 +1,18 @@
 import json
+import urllib.parse
 from os.path import join, dirname
 from typing import Optional
 
-from PyQt5.QtWidgets import QListWidgetItem, QCheckBox, QToolButton
+from PyQt5.QtWidgets import QListWidgetItem, QToolButton
 
+import requests
 from enmapbox import EnMAPBox
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
+from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp import MapTool
 from locationbrowserapp.locationbrowserresultwidget import LocationBrowserResultWidget
 from qgis.PyQt import uic
-from qgis._core import QgsCoordinateReferenceSystem, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPointXY, \
-    QgsSingleSymbolRenderer
+from qgis._core import QgsCoordinateReferenceSystem, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPointXY
 from qgis._gui import QgsFilterLineEdit
 from qgis.gui import QgsDockWidget, QgisInterface
 from typeguard import typechecked
@@ -19,6 +21,8 @@ from typeguard import typechecked
 @typechecked
 class LocationBrowserDockWidget(QgsDockWidget):
     mSearch: QgsFilterLineEdit
+    mGoToLocation: QToolButton
+    mRequestNominatim: QToolButton
     mResult: LocationBrowserResultWidget
 
     EnmapBoxInterface, QgisInterface = 0, 1
@@ -35,6 +39,8 @@ class LocationBrowserDockWidget(QgsDockWidget):
 
         # connect signals
         self.mSearch.editingFinished.connect(self.onTextEditingFinished)
+        self.mGoToLocation.clicked.connect(self.onGoToLocationClicked)
+        self.mRequestNominatim.clicked.connect(self.onRequestNominatimClicked)
 
     def enmapBoxInterface(self) -> EnMAPBox:
         return self.interface
@@ -65,6 +71,49 @@ class LocationBrowserDockWidget(QgsDockWidget):
         self.mResult = LocationBrowserResultWidget(parent=parent)
         self.mResult.mList.currentItemChanged.connect(self.onResultSelectionChanged)
         self.mResult.mZoomToSelection.clicked.connect(self.onZoomToSelectionClicked)
+
+    def onExtentClicked(self):
+        pass
+
+    def onResultSelectionChanged(self):
+        self.liveUpdate()
+
+    def onCurrentLocationChanged(self):
+        pass
+
+    def onTextEditingFinished(self):
+        self.mGoToLocation.animateClick(100)
+
+    def onGoToLocationClicked(self):
+        text = self.mSearch.value()
+        try:
+            point = Utils.parseSpatialPoint(text)
+        except ValueError:
+            return
+        mapCanvas = self.enmapBoxInterface().currentMapCanvas()
+        mapCanvas.setCrosshairPosition(point, True)
+        mapCanvas.setCenter(point.toCrs(mapCanvas.crs()))
+        mapCanvas.refresh()
+
+    def onRequestNominatimClicked(self):
+        text = self.mSearch.value()
+
+        # for details see https://nominatim.org/release-docs/latest/api/Search/
+        url = 'https://nominatim.openstreetmap.org/search/' \
+              f'{urllib.parse.quote(text)}' \
+              '?limit=50&extratags=1&polygon_geojson=1&format=json'
+
+        nominatimResults = requests.get(url).json()
+        self.mResult.mList.clear()
+        item = QListWidgetItem('')
+        item.json = None
+        self.mResult.mList.addItem(item)
+        for json in nominatimResults:
+            item = QListWidgetItem(json['display_name'])
+            item.json = json
+            self.mResult.mList.addItem(item)
+
+        self.mResult.show()
 
     def onZoomToSelectionClicked(self):
         item = self.mResult.mList.currentItem()
@@ -133,7 +182,7 @@ class LocationBrowserDockWidget(QgsDockWidget):
             mapCanvas.setCrosshairPosition(point, True)
 
             self.enmapBoxInterface().setCurrentLocation(point, self.enmapBoxInterface().currentMapCanvas())
-            if coordinates is None:
+            if coordinates is None or type == 'Point':
                 mapCanvas.setCenter(point.toCrs(mapCanvas.crs()))
             else:
                 mapCanvas.setExtent(SpatialExtent(layer.crs(), layer.extent()))
@@ -145,39 +194,8 @@ class LocationBrowserDockWidget(QgsDockWidget):
         else:
             raise ValueError()
 
-    def onExtentClicked(self):
-        pass
-
-    def onResultSelectionChanged(self):
-        self.liveUpdate()
-
-    def onCurrentLocationChanged(self):
-        pass
-
-    def onTextEditingFinished(self):
-        import requests
-        import urllib.parse
-
-        address = self.mSearch.value()
-        #url = 'https://nominatim.openstreetmap.org/search/' + urllib.parse.quote(address) + '?format=json'
-        url = 'https://nominatim.openstreetmap.org/search/' + urllib.parse.quote(address) + '?limit=50&extratags=1&polygon_geojson=1&format=json'
-
-        jsons = requests.get(url).json()
-
-        self.mResult.mList.clear()
-        item = QListWidgetItem('')
-        item.json = None
-        self.mResult.mList.addItem(item)
-        for json in jsons:
-            item = QListWidgetItem(json['display_name'])
-            item.json = json
-            self.mResult.mList.addItem(item)
-
-        self.mResult.show()
-
     def liveUpdate(self):
         if self.mResult.mLiveUpdate.isChecked():
             self.onZoomToSelectionClicked()
 
-    def parseLocation(self, text:str):
-        pass
+
