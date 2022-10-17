@@ -11,7 +11,8 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.testcase import TestCase
 from enmapboxprocessing.typing import Category, Target
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import landcover_polygon_30m, fraction_point_singletarget, fraction_point_multitarget, landcover_map_l3, \
+from enmapboxtestdata import landcover_polygon_30m, fraction_point_singletarget, fraction_point_multitarget, \
+    landcover_map_l3, \
     fraction_map_l3
 from qgis.PyQt.QtCore import QDateTime, QSizeF
 from qgis.PyQt.QtGui import QColor
@@ -355,20 +356,20 @@ class TestUtils(TestCase):
     def test_parseSpatialPoint(self):
         point = SpatialPoint(QgsCoordinateReferenceSystem.fromEpsgId(4326), 13.895089018465338, 53.07478793449)
         self.assertEqual(point, Utils.parseSpatialPoint('53.07478793449, 13.895089018465338'))
-        #self.assertEqual(white, Utils.parseColor(16777215))
-        #self.assertEqual(white, Utils.parseColor('16777215'))
-        #self.assertEqual(white, Utils.parseColor((255, 255, 255)))
-        #self.assertEqual(white, Utils.parseColor([255, 255, 255]))
-        #self.assertEqual(white, Utils.parseColor('(255, 255, 255)'))
-        #self.assertEqual(white, Utils.parseColor('[255, 255, 255]'))
-        #self.assertEqual(white, Utils.parseColor('255, 255, 255'))
-        #self.assertIsNone(white, Utils.parseColor(None))
+        self.assertEqual(point, Utils.parseSpatialPoint('53.07478793449,13.895089018465338'))
+        self.assertEqual(point, Utils.parseSpatialPoint('53.07478793449 13.895089018465338'))
+        self.assertEqual(point, Utils.parseSpatialPoint('13.895089018465338, 53.07478793449 [EPSG:4326]'))
+        self.assertEqual(point, Utils.parseSpatialPoint('13.895089018465338,53.07478793449,[EPSG:4326]'))
+        self.assertEqual(point, Utils.parseSpatialPoint('13.895089018465338 53.07478793449 [EPSG:4326]'))
 
         try:
             Utils.parseSpatialPoint('dummy')
         except ValueError:
             pass
-
+        try:
+            Utils.parseSpatialPoint('1,1,[123]')
+        except ValueError:
+            pass
 
     def test_parseDateTime(self):
         self.assertEqual(QDateTime(1970, 1, 1, 0, 0), Utils.parseDateTime(QDateTime(1970, 1, 1, 0, 0)))

@@ -3,8 +3,6 @@ import urllib.parse
 from os.path import join, dirname
 from typing import Optional
 
-from PyQt5.QtWidgets import QListWidgetItem, QToolButton
-
 import requests
 from enmapbox import EnMAPBox
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
@@ -12,9 +10,9 @@ from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp import MapTool
 from locationbrowserapp.locationbrowserresultwidget import LocationBrowserResultWidget
 from qgis.PyQt import uic
-from qgis._core import QgsCoordinateReferenceSystem, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPointXY
-from qgis._gui import QgsFilterLineEdit
-from qgis.gui import QgsDockWidget, QgisInterface
+from qgis.PyQt.QtWidgets import QListWidgetItem, QToolButton
+from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPointXY
+from qgis.gui import QgsFilterLineEdit, QgsDockWidget, QgisInterface
 from typeguard import typechecked
 
 
@@ -108,9 +106,9 @@ class LocationBrowserDockWidget(QgsDockWidget):
         item = QListWidgetItem('')
         item.json = None
         self.mResult.mList.addItem(item)
-        for json in nominatimResults:
-            item = QListWidgetItem(json['display_name'])
-            item.json = json
+        for result in nominatimResults:
+            item = QListWidgetItem(result['display_name'])
+            item.result = result
             self.mResult.mList.addItem(item)
 
         self.mResult.show()
@@ -118,11 +116,11 @@ class LocationBrowserDockWidget(QgsDockWidget):
     def onZoomToSelectionClicked(self):
         item = self.mResult.mList.currentItem()
         self.mResult.mDetails.clear()
-        if not hasattr(item, 'json') or item.json is None:
+        if not hasattr(item, 'result') or item.result is None:
             return
-        self.mResult.mDetails.setText(json.dumps(item.json, indent=4))
+        self.mResult.mDetails.setText(json.dumps(item.result, indent=4))
         point = SpatialPoint(
-            QgsCoordinateReferenceSystem.fromEpsgId(4326), float(item.json['lon']), float(item.json['lat'])
+            QgsCoordinateReferenceSystem.fromEpsgId(4326), float(item.result['lon']), float(item.result['lat'])
         )
 
         # remove existing polygon layer
@@ -139,25 +137,25 @@ class LocationBrowserDockWidget(QgsDockWidget):
         else:
             raise ValueError()
 
-        type = item.json['geojson']['type']
+        type = item.result['geojson']['type']
         if type == 'MultiPolygon':
             layer = QgsVectorLayer('MultiPolygon?crs=epsg:4326', baseNamePolygon, 'memory')
-            coordinates = item.json['geojson']['coordinates']
+            coordinates = item.result['geojson']['coordinates']
             coordinates = [[QgsPointXY(x, y) for x, y in polygon] for polygon in coordinates[0]]
             geometry = QgsGeometry.fromMultiPolygonXY([coordinates])
         elif type == 'Polygon':
             layer = QgsVectorLayer('MultiPolygon?crs=epsg:4326', baseNamePolygon, 'memory')
-            coordinates = item.json['geojson']['coordinates']
+            coordinates = item.result['geojson']['coordinates']
             coordinates = [[QgsPointXY(x, y) for x, y in polygon] for polygon in coordinates]
             geometry = QgsGeometry.fromMultiPolygonXY([coordinates])
         elif type == 'LineString':
             layer = QgsVectorLayer('Linestring?crs=epsg:4326', baseNameLine, 'memory')
-            coordinates = item.json['geojson']['coordinates']
+            coordinates = item.result['geojson']['coordinates']
             coordinates = [QgsPointXY(x, y) for x, y in coordinates]
             geometry = QgsGeometry.fromPolylineXY(coordinates)
         else:
             layer = QgsVectorLayer('MultiPolygon?crs=epsg:4326', baseNamePolygon, 'memory')
-            y1, y2, x1, x2 = [float(v) for v in item.json['boundingbox']]
+            y1, y2, x1, x2 = [float(v) for v in item.result['boundingbox']]
             coordinates = [
                 [QgsPointXY(x1, y1), QgsPointXY(x1, y2), QgsPointXY(x2, y2), QgsPointXY(x2, y1), QgsPointXY(x1, y1)]
             ]
@@ -197,5 +195,3 @@ class LocationBrowserDockWidget(QgsDockWidget):
     def liveUpdate(self):
         if self.mResult.mLiveUpdate.isChecked():
             self.onZoomToSelectionClicked()
-
-

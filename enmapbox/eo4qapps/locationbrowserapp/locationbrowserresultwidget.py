@@ -1,6 +1,4 @@
-from PyQt5.QtWidgets import QListWidget, QTextEdit, QCheckBox, QToolButton
-
-from qgis.PyQt.QtWidgets import QWidget, QMainWindow
+from qgis.PyQt.QtWidgets import QWidget, QMainWindow, QListWidget, QTextEdit, QCheckBox, QToolButton
 from qgis.PyQt.uic import loadUi
 from typeguard import typechecked
 

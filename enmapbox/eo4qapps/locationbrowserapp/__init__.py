@@ -4,7 +4,6 @@ from enmapbox import EnMAPBox
 from enmapbox.gui.applications import EnMAPBoxApplication
 from geetimeseriesexplorerapp.maptool import MapTool
 from locationbrowserapp.locationbrowserdockwidget import LocationBrowserDockWidget
-from profileanalyticsapp.profileanalyticsdockwidget import ProfileAnalyticsDockWidget
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction

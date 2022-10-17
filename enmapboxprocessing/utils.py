@@ -439,12 +439,12 @@ class Utils(object):
                         # todo: support 53°04'29.2"N 13°53'42.3"E format
                         #       see https://stackoverflow.com/questions/17193351/how-to-convert-latitude-and-longitude-in-dms-format-into-decimal-format-and-vic
             if len(items) == 3:
-                lon, lat, crs = items
-                epsgId = int('[EPSG:4326]'[6:-1])
-                return SpatialPoint(QgsCoordinateReferenceSystem.fromEpsgId(epsgId), float(lat), float(lon))
+                lat, lon, epsgId = items
+                if epsgId.upper().startswith('[EPSG:'):
+                    epsgId = int(epsgId[6:-1])
+                    return SpatialPoint(QgsCoordinateReferenceSystem.fromEpsgId(epsgId), float(lat), float(lon))
 
         raise ValueError('invalid spatial point')
-
 
     @classmethod
     def parseDateTime(cls, obj) -> QDateTime:
