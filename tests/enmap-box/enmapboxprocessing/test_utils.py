@@ -4,13 +4,15 @@ import numpy as np
 from osgeo import gdal
 
 from enmapbox.exampledata import landcover_polygon, enmap, hires
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.testing import initQgisApplication
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.testcase import TestCase
 from enmapboxprocessing.typing import Category, Target
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import landcover_raster_30m, fraction_points_singletarget, fraction_points, landcover_map_l3, \
+from enmapboxtestdata import landcover_polygon_30m, fraction_point_singletarget, fraction_point_multitarget, \
+    landcover_map_l3, \
     fraction_map_l3
 from qgis.PyQt.QtCore import QDateTime, QSizeF
 from qgis.PyQt.QtGui import QColor
@@ -203,7 +205,7 @@ class TestUtils(TestCase):
         self.assertListEqual(categories, categories2)
 
     def test_categoriesFromRenderer(self):
-        layer = QgsRasterLayer(landcover_raster_30m)
+        layer = QgsRasterLayer(landcover_polygon_30m)
         categories = Utils.categoriesFromRenderer(layer.renderer())
         self.assertEqual(6, len(categories))
 
@@ -212,7 +214,7 @@ class TestUtils(TestCase):
         self.assertEqual(6, len(categories))
 
     def test_categoriesFromRasterBand(self):
-        layer = QgsRasterLayer(landcover_raster_30m)
+        layer = QgsRasterLayer(landcover_polygon_30m)
         categories = Utils.categoriesFromRasterBand(layer, 1)
         self.assertEqual(6, len(categories))
         self.assertListEqual([1, 2, 3, 4, 5, 6], [category.value for category in categories])
@@ -242,7 +244,7 @@ class TestUtils(TestCase):
         )
 
     def test_categoriesFromRasterLayer(self):
-        layer = QgsRasterLayer(landcover_raster_30m)
+        layer = QgsRasterLayer(landcover_polygon_30m)
         categories, bandNo = Utils.categoriesFromRasterLayer(layer)
         self.assertEqual(1, bandNo)
         self.assertEqual(6, len(categories))
@@ -266,7 +268,7 @@ class TestUtils(TestCase):
         self.assertListEqual([1, 2, 3], [category.value for category in categories])
 
     def test_categoriesFromPalettedRasterRenderer(self):
-        layer = QgsRasterLayer(landcover_raster_30m)
+        layer = QgsRasterLayer(landcover_polygon_30m)
         categories = Utils.categoriesFromPalettedRasterRenderer(layer.renderer())
         self.assertEqual(6, len(categories))
         self.assertListEqual(
@@ -280,7 +282,7 @@ class TestUtils(TestCase):
         )
 
     def test_targetsFromSingleCategoryDiagramRenderer(self):
-        layer = QgsVectorLayer(fraction_points)
+        layer = QgsVectorLayer(fraction_point_multitarget)
         targets = Utils.targetsFromSingleCategoryDiagramRenderer(layer.diagramRenderer())
         self.assertEqual(6, len(targets))
         self.assertListEqual(
@@ -295,13 +297,13 @@ class TestUtils(TestCase):
         )
 
     def test_targetsFromGraduatedSymbolRenderer(self):
-        layer = QgsVectorLayer(fraction_points_singletarget)
+        layer = QgsVectorLayer(fraction_point_singletarget)
         targets = Utils.targetsFromGraduatedSymbolRenderer(layer.renderer())
         self.assertEqual(1, len(targets))
         self.assertListEqual([Target(name='vegetation', color='#98e600')], targets)
 
     def test_targetsFromLayer(self):
-        layer = QgsVectorLayer(fraction_points)
+        layer = QgsVectorLayer(fraction_point_multitarget)
         targets = Utils.targetsFromLayer(layer)
         self.assertEqual(6, len(targets))
         self.assertListEqual(
@@ -315,7 +317,7 @@ class TestUtils(TestCase):
             targets
         )
 
-        layer = QgsVectorLayer(fraction_points_singletarget)
+        layer = QgsVectorLayer(fraction_point_singletarget)
         targets = Utils.targetsFromGraduatedSymbolRenderer(layer.renderer())
         self.assertEqual(1, len(targets))
         self.assertListEqual([Target(name='vegetation', color='#98e600')], targets)
@@ -347,7 +349,25 @@ class TestUtils(TestCase):
         self.assertIsNone(white, Utils.parseColor(None))
 
         try:
-            self.assertIsNone(white, Utils.parseColor('dummy'))
+            Utils.parseColor('dummy')
+        except ValueError:
+            pass
+
+    def test_parseSpatialPoint(self):
+        point = SpatialPoint(QgsCoordinateReferenceSystem.fromEpsgId(4326), 13.895089018465338, 53.07478793449)
+        self.assertEqual(point, Utils.parseSpatialPoint('53.07478793449, 13.895089018465338'))
+        self.assertEqual(point, Utils.parseSpatialPoint('53.07478793449,13.895089018465338'))
+        self.assertEqual(point, Utils.parseSpatialPoint('53.07478793449 13.895089018465338'))
+        self.assertEqual(point, Utils.parseSpatialPoint('13.895089018465338, 53.07478793449 [EPSG:4326]'))
+        self.assertEqual(point, Utils.parseSpatialPoint('13.895089018465338,53.07478793449,[EPSG:4326]'))
+        self.assertEqual(point, Utils.parseSpatialPoint('13.895089018465338 53.07478793449 [EPSG:4326]'))
+
+        try:
+            Utils.parseSpatialPoint('dummy')
+        except ValueError:
+            pass
+        try:
+            Utils.parseSpatialPoint('1,1,[123]')
         except ValueError:
             pass
 

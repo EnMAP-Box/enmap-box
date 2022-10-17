@@ -11,6 +11,7 @@ from warnings import warn
 import numpy as np
 from osgeo import gdal
 
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapboxprocessing.typing import (NumpyDataType, MetadataValue, GdalDataType,
                                        GdalResamplingAlgorithm, Categories, Category, Targets, Target)
 from qgis.PyQt.QtCore import QDateTime, QDate
@@ -416,6 +417,34 @@ class Utils(object):
             return QColor(*obj)
 
         raise ValueError('invalid color')
+
+    @classmethod
+    def parseSpatialPoint(cls, obj) -> Optional[SpatialPoint]:
+        error = ValueError(f'invalid spatial point: {obj}')
+        if obj is None:
+            return None
+
+        if isinstance(obj, SpatialPoint):
+            return obj
+
+        if isinstance(obj, str):
+            items: List[str] = [v for v in obj.replace(' ', ',').split(',') if len(v) > 1]
+            if len(items) == 2:
+                for item in items:
+                    try:
+                        lon, lat = items
+                        return SpatialPoint(QgsCoordinateReferenceSystem.fromEpsgId(4326), float(lat), float(lon))
+                    except Exception:
+                        raise NotImplementedError()
+                        # todo: support 53°04'29.2"N 13°53'42.3"E format
+                        #       see https://stackoverflow.com/questions/17193351/how-to-convert-latitude-and-longitude-in-dms-format-into-decimal-format-and-vic
+            if len(items) == 3:
+                lat, lon, epsgId = items
+                if epsgId.upper().startswith('[EPSG:'):
+                    epsgId = int(epsgId[6:-1])
+                    return SpatialPoint(QgsCoordinateReferenceSystem.fromEpsgId(epsgId), float(lat), float(lon))
+
+        raise ValueError('invalid spatial point')
 
     @classmethod
     def parseDateTime(cls, obj) -> QDateTime:
