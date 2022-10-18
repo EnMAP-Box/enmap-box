@@ -57,7 +57,7 @@ class RasterBandStackingApp(EnMAPBoxApplication):
         self.dock.hide()
 
         if self.isEnmapInterface:
-            interface.ui.mPluginsToolbar.addAction(self.actionToggleDock)
+            interface.ui.mEo4qToolbar.addAction(self.actionToggleDock)
         else:
             interface.addToolBarIcon(self.actionToggleDock)
 

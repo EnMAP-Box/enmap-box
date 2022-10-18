@@ -71,7 +71,7 @@ class GeeTimeseriesExplorerApp(EnMAPBoxApplication):
         self.mainDock.hide()
 
         if self.isEnmapInterface:
-            interface.ui.mPluginsToolbar.addAction(self.actionToggleMainDock)
+            interface.ui.mEo4qToolbar.addAction(self.actionToggleMainDock)
         else:
             interface.addToolBarIcon(self.actionToggleMainDock)
 
