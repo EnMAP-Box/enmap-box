@@ -11,6 +11,7 @@ from geetimeseriesexplorerapp import MapTool
 from locationbrowserapp.locationbrowserresultwidget import LocationBrowserResultWidget
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QListWidgetItem, QToolButton
+from qgis._core import QgsProject
 from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPointXY
 from qgis.gui import QgsFilterLineEdit, QgsDockWidget, QgisInterface
 from typeguard import typechecked
@@ -61,8 +62,7 @@ class LocationBrowserDockWidget(QgsDockWidget):
             parent = self.enmapBoxInterface().ui
         elif self.interfaceType == self.QgisInterface:
             self.currentLocationMapTool.sigClicked.connect(self.onCurrentLocationChanged)
-            parent = None
-            assert 0
+            parent = self.qgisInterface().mapCanvas()
         else:
             raise ValueError()
 
@@ -88,9 +88,17 @@ class LocationBrowserDockWidget(QgsDockWidget):
             point = Utils.parseSpatialPoint(text)
         except ValueError:
             return
-        mapCanvas = self.enmapBoxInterface().currentMapCanvas()
-        mapCanvas.setCrosshairPosition(point, True)
-        mapCanvas.setCenter(point.toCrs(mapCanvas.crs()))
+
+        if self.interfaceType == self.EnmapBoxInterface:
+            mapCanvas = self.enmapBoxInterface().currentMapCanvas()
+            mapCanvas.setCrosshairPosition(point, True)
+        elif self.interfaceType == self.QgisInterface:
+            mapCanvas = self.qgisInterface().mapCanvas()
+            self.currentLocationMapTool.setCurrentLocation(point)
+        else:
+            raise ValueError()
+
+        mapCanvas.setCenter(point.toCrs(Utils.mapCanvasCrs(mapCanvas)))
         mapCanvas.refresh()
 
     def onRequestNominatimClicked(self):
@@ -133,7 +141,10 @@ class LocationBrowserDockWidget(QgsDockWidget):
                 if aLayer.name() in [baseNamePolygon, baseNameLine]:
                     self.enmapBoxInterface().removeMapLayer(aLayer)
         elif self.interfaceType == self.QgisInterface:
-            raise NotImplementedError()
+            mapCanvas = self.qgisInterface().mapCanvas()
+            for aLayer in mapCanvas.layers():
+                if aLayer.name() in [baseNamePolygon, baseNameLine]:
+                    QgsProject.instance().removeMapLayer(aLayer)
         else:
             raise ValueError()
 
@@ -176,21 +187,28 @@ class LocationBrowserDockWidget(QgsDockWidget):
         layer.loadNamedStyle(qmlFile, False)
 
         if self.interfaceType == self.EnmapBoxInterface:
-            mapCanvas = self.enmapBoxInterface().currentMapCanvas()
             mapCanvas.setCrosshairPosition(point, True)
-
             self.enmapBoxInterface().setCurrentLocation(point, self.enmapBoxInterface().currentMapCanvas())
-            if coordinates is None or type == 'Point':
-                mapCanvas.setCenter(point.toCrs(mapCanvas.crs()))
-            else:
-                mapCanvas.setExtent(SpatialExtent(layer.crs(), layer.extent()))
+            if not (coordinates is None or type == 'Point'):
                 self.enmapBoxInterface().currentMapDock().insertLayer(0, layer)
-            mapCanvas.refresh()
-
         elif self.interfaceType == self.QgisInterface:
             self.currentLocationMapTool.setCurrentLocation(point)
+            if not (coordinates is None or type == 'Point'):
+                QgsProject.instance().addMapLayer(layer)
         else:
             raise ValueError()
+
+        crs = Utils.mapCanvasCrs(mapCanvas)
+        if coordinates is None or type == 'Point':
+            mapCanvas.setCenter(point.toCrs(crs))
+        else:
+            extent = SpatialExtent(layer.crs(), layer.extent()).toCrs(crs)
+            mapCanvas.setExtent(extent)
+            print(crs)
+            print(extent)
+
+
+        mapCanvas.refresh()
 
     def liveUpdate(self):
         if self.mResult.mLiveUpdate.isChecked():

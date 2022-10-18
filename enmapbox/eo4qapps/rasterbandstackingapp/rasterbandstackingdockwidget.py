@@ -31,6 +31,8 @@ class RasterBandStackingDockWidget(QgsDockWidget):
     mAddRaster: QToolButton
     mRemoveRaster: QToolButton
     mRemoveAllRaster: QToolButton
+    mMoveUp: QToolButton
+    mMoveDown: QToolButton
     mFile: QgsFileWidget
     mCreate: QToolButton
 
@@ -57,6 +59,8 @@ class RasterBandStackingDockWidget(QgsDockWidget):
         self.mAddRaster.clicked.connect(self.onAddRasterClicked)
         self.mRemoveRaster.clicked.connect(self.onRemoveRasterClicked)
         self.mRemoveAllRaster.clicked.connect(self.onRemoveAllRasterClicked)
+        self.mMoveUp.clicked.connect(self.onMoveUpClicked)
+        self.mMoveDown.clicked.connect(self.onMoveDownClicked)
         self.mCreate.clicked.connect(self.onCreateClicked)
 
         self.mRasterTable.installEventFilter(self)
@@ -93,7 +97,10 @@ class RasterBandStackingDockWidget(QgsDockWidget):
                     self.onAddRasterClicked(uri=uri.uri)
             elif MDF_URILIST in mimeData.formats():
                 for url in mimeData.urls():
-                    self.onAddRasterClicked(uri=url.url().replace('file:///', ''))
+                    source = url.url().replace('file:///', '')
+                    layer = QgsRasterLayer(source)
+                    if layer.isValid():
+                        self.onAddRasterClicked(uri=source)
             else:
                 raise NotImplementedError()
 
@@ -117,14 +124,16 @@ class RasterBandStackingDockWidget(QgsDockWidget):
 
     def onAddRasterClicked(self, *args, uri: str = None, layer: QgsRasterLayer = None, bandNo: int = None):
 
-        sources = self.enmapBoxInterface().dataSources('RASTER', True)
-
         self.mRasterTable.setRowCount(self.mRasterTable.rowCount() + 1)
         row = self.mRasterTable.rowCount() - 1
         mRaster = QgsMapLayerComboBox()
         mRaster.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        mRaster.setExcludedProviders(['wms'])
         mRaster.setAllowEmptyLayer(True)
-        mRaster.setAdditionalItems(sources)
+
+        if self.interfaceType == self.EnmapBoxInterface:
+            sources = self.enmapBoxInterface().dataSources('RASTER', True)
+            mRaster.setAdditionalItems(sources)
         self.mRasterTable.setCellWidget(row, 0, mRaster)
 
         mMultiBand = MultipleRasterBandSelectionWidget()
@@ -176,6 +185,26 @@ class RasterBandStackingDockWidget(QgsDockWidget):
     def onRemoveAllRasterClicked(self):
         for i in reversed(range(self.mRasterTable.rowCount())):
             self.mRasterTable.removeRow(i)
+
+    def onMoveUpClicked(self):
+        row = self.mRasterTable.currentRow()
+        if row == 0:
+            return
+        self.mRasterTable.insertRow(row - 1)
+        self.mRasterTable.selectRow(row - 1)
+        for i in range(self.mRasterTable.columnCount()):
+            self.mRasterTable.setCellWidget(row - 1, i, self.mRasterTable.cellWidget(row + 1, i))
+        self.mRasterTable.removeRow(row + 1)
+
+    def onMoveDownClicked(self):
+        row = self.mRasterTable.currentRow()
+        if row + 1 == self.mRasterTable.rowCount():
+            return
+        self.mRasterTable.insertRow(row + 2)
+        self.mRasterTable.selectRow(row + 2)
+        for i in range(self.mRasterTable.columnCount()):
+            self.mRasterTable.setCellWidget(row + 2, i, self.mRasterTable.cellWidget(row, i))
+        self.mRasterTable.removeRow(row)
 
     def onCreateClicked(self):
 
@@ -252,6 +281,6 @@ class RasterBandStackingDockWidget(QgsDockWidget):
             else:
                 mapDock.insertLayer(0, layer)
         elif self.interfaceType == self.QgisInterface:
-            raise NotImplementedError()
+            QgsProject.instance().addMapLayer(layer)
         else:
             raise ValueError()

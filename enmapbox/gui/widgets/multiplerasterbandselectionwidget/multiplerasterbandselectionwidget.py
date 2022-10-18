@@ -129,6 +129,8 @@ class MultipleRasterBandSelectionDialog(QDialog):
     def onToggleSelectionClicked(self):
         for row in range(self.mList.count()):
             item = self.mList.item(row)
+            if not item.isSelected():
+                continue
             if item.checkState() == Qt.Checked:
                 item.setCheckState(Qt.Unchecked)
             else:
