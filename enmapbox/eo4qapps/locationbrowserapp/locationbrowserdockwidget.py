@@ -11,8 +11,7 @@ from geetimeseriesexplorerapp import MapTool
 from locationbrowserapp.locationbrowserresultwidget import LocationBrowserResultWidget
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QListWidgetItem, QToolButton
-from qgis._core import QgsProject
-from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPointXY
+from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPointXY, QgsProject
 from qgis.gui import QgsFilterLineEdit, QgsDockWidget, QgisInterface
 from typeguard import typechecked
 
@@ -206,7 +205,6 @@ class LocationBrowserDockWidget(QgsDockWidget):
             mapCanvas.setExtent(extent)
             print(crs)
             print(extent)
-
 
         mapCanvas.refresh()
 
