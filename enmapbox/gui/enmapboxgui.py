@@ -24,14 +24,11 @@ import typing
 import warnings
 from typing import Optional, Dict, Union, Any, List
 
-from typeguard import typechecked
-
 import enmapbox
 import enmapbox.gui.datasources.manager
 import qgis.utils
 from enmapbox import messageLog, debugLog, DEBUG
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
-from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, loadUi, SpatialExtent, file_search
 from enmapbox.gui.dataviews.dockmanager import DockManagerTreeModel, MapDockTreeNode
 from enmapbox.gui.dataviews.docks import SpectralLibraryDock, Dock, AttributeTableDock, MapDock
 from enmapbox.qgispluginsupport.qps.cursorlocationvalue import CursorLocationInfoDock
@@ -42,6 +39,7 @@ from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import Spe
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprofilesources import SpectralProfileSourcePanel, \
     MapCanvasLayerProfileSource
 from enmapbox.qgispluginsupport.qps.subdatasets import SubDatasetSelectionDialog
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, loadUi, SpatialExtent, file_search
 from enmapboxprocessing.algorithm.importdesisl1balgorithm import ImportDesisL1BAlgorithm
 from enmapboxprocessing.algorithm.importdesisl1calgorithm import ImportDesisL1CAlgorithm
 from enmapboxprocessing.algorithm.importdesisl2aalgorithm import ImportDesisL2AAlgorithm
@@ -80,6 +78,7 @@ from qgis.gui import QgsMapCanvas, QgisInterface, QgsMessageBar, QgsMessageViewe
     QgsSymbolWidgetContext
 from qgis.gui import QgsProcessingAlgorithmDialogBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog, \
     QgsNewVectorLayerDialog, QgsProcessingContextGenerator
+from typeguard import typechecked
 from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
 from .dataviews.docks import DockTypes
 from .mapcanvas import MapCanvas
@@ -2236,15 +2235,11 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
     def actionZoomOut(self):
         return self.ui.mActionZoomOut
 
-    def showProcessingAlgorithmDialog(self,
-                                      algorithmName: Union[str, QgsProcessingAlgorithm],
-                                      parameters: Dict = None,
-                                      show: bool = True,
-                                      modal: bool = False,
-                                      wrapper: type = None,
-                                      autoRun: bool = False,
-                                      parent: QWidget = None
-                                      ) -> AlgorithmDialog:
+    @staticmethod
+    def showProcessingAlgorithmDialog(
+            algorithmName: Union[str, QgsProcessingAlgorithm], parameters: Dict = None, show: bool = True,
+            modal: bool = False, wrapper: type = None, autoRun: bool = False, parent: QWidget = None
+    ) -> AlgorithmDialog:
         """
         Create an algorithm dialog.
 
@@ -2261,7 +2256,17 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         """
         if parent is None:
-            parent = self.ui
+            from enmapbox import EnMAPBox
+            if EnMAPBox.instance() is not None:
+                parent = EnMAPBox.instance().ui
+
+        if parent is None:
+            from qgis.utils import iface
+            if iface is not None:
+                parent = iface.mapCanvas()
+
+        if parent is None:
+            raise ValueError()
 
         algorithm = None
         all_names = []
