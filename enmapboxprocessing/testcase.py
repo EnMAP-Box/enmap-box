@@ -21,8 +21,7 @@ class TestCase(unittest.case.TestCase):
         self.assertTrue(np.all(array1 == array2))
 
     def filename(self, basename: str):
-        import enmapbox
-        return join(dirname(dirname(enmapbox.__file__)), 'test-outputs', basename)
+        return join(dirname(dirname(__file__)), 'test-outputs', basename)
 
     def rasterFromArray(
             self, array, basename: str = None, extent: QgsRectangle = None, crs: QgsCoordinateReferenceSystem = None
