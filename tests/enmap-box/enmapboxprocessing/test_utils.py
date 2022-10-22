@@ -4,7 +4,7 @@ import numpy as np
 from osgeo import gdal
 
 from enmapbox.exampledata import landcover_polygon, enmap, hires
-from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
 from enmapbox.testing import initQgisApplication
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader
@@ -363,6 +363,43 @@ class TestUtils(TestCase):
         self.assertEqual(point, Utils.parseSpatialPoint('13.895089018465338 53.07478793449 [EPSG:4326]'))
         self.assertEqual(13.895, round(Utils.parseSpatialPoint('''53°04'29.2"N, 13°53'42.3"E''').x(), 3))
         self.assertEqual(53.075, round(Utils.parseSpatialPoint('''53°04'29.2"N, 13°53'42.3"E''').y(), 3))
+
+        try:
+            Utils.parseSpatialPoint('dummy')
+        except ValueError:
+            pass
+        try:
+            Utils.parseSpatialPoint('1,1,[123]')
+        except ValueError:
+            pass
+
+    def test_parseSpatialExtent(self):
+        def rectangleEqual(r1: QgsRectangle, r2: QgsRectangle):
+            return all([
+                r1.xMinimum() == r2.xMinimum(), r1.xMaximum() == r2.xMaximum(),
+                r1.yMinimum() == r2.yMinimum(), r1.yMaximum() == r2.yMaximum(),
+            ])
+
+        self.assertTrue(rectangleEqual(
+            SpatialExtent(QgsCoordinateReferenceSystem.fromEpsgId(4326), QgsRectangle(1, 1, 1, 1)),
+            Utils.parseSpatialExtent('POINT(1 1)')
+        ))
+        self.assertTrue(rectangleEqual(
+            SpatialExtent(QgsCoordinateReferenceSystem.fromEpsgId(4326), QgsRectangle(1, 1, 1, 1)),
+            Utils.parseSpatialExtent('POINT(1 1)[EPSG:4326]')
+        ))
+        self.assertTrue(rectangleEqual(
+            SpatialExtent(QgsCoordinateReferenceSystem.fromEpsgId(4326), QgsRectangle(1, 1, 1, 1)),
+            Utils.parseSpatialExtent('POINT(1 1) [EPSG:4326] ')
+        ))
+        self.assertTrue(rectangleEqual(
+            SpatialExtent(QgsCoordinateReferenceSystem.fromEpsgId(4326), QgsRectangle(0, 10, 1, 11)),
+            Utils.parseSpatialExtent('LINESTRING(0 10, 1 11)')
+        ))
+        self.assertTrue(rectangleEqual(
+            SpatialExtent(QgsCoordinateReferenceSystem.fromEpsgId(4326), QgsRectangle(0, 10, 1, 11)),
+            Utils.parseSpatialExtent('LINESTRING(0 10, 1 11) [EPSG:4326] ')
+        ))
 
         try:
             Utils.parseSpatialPoint('dummy')
