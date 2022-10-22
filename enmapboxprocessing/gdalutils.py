@@ -1,7 +1,5 @@
 from typing import List
 
-from osgeo import gdal
-
 from enmapboxprocessing.rasterreader import RasterReader
 from typeguard import typechecked
 
