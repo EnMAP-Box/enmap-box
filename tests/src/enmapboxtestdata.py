@@ -1,15 +1,14 @@
-from os.path import join
-from pathlib import Path
-from enmapbox import exampledata
+from os.path import join, dirname, abspath
 
-root = Path(__file__).parents[1] / 'testdata'
+root = abspath(join(dirname(dirname(__file__)), 'testdata'))
+root2 = abspath(join(dirname(dirname(dirname(__file__))), 'enmapbox', 'exampledata'))
 
 # RASTER
 _subdir = 'raster'
 
 # - spectral raster
-enmap = exampledata.enmap
-hires = exampledata.hires
+enmap = join(root2, 'enmap_berlin.bsq')
+hires = join(root2, 'hires_berlin.bsq')
 
 # - rasterized landcover polygons
 landcover_polygon_1m = join(root, _subdir, 'landcover_polygon_1m.tif')
@@ -38,13 +37,13 @@ enmap_grid_300m = join(root, _subdir, 'enmap_grid_300m.vrt')
 _subdir = 'vector'
 
 # - landcover polygons
-landcover_polygon = exampledata.landcover_polygon
+landcover_polygon = join(root2, 'landcover_berlin_polygon.gpkg')
 landcover_polygon_3classes = join(root, _subdir, 'landcover_polygon_3classes.gpkg')
 landcover_polygon_3classes_id = join(root, _subdir, 'landcover_polygon_3classes_id.gpkg')
 landcover_polygon_3classes_epsg4326 = join(root, _subdir, 'landcover_polygon_3classes_EPSG4326.gpkg')
 
 # - landcover points
-landcover_point = exampledata.landcover_point
+landcover_point = join(root2, 'landcover_berlin_point.gpkg')
 landcover_points_singlepart_epsg3035 = join(root, _subdir, 'landcover_point_singlepart_3035.gpkg')
 landcover_points_multipart_epsg3035 = join(root, _subdir, 'landcover_point_multipart_3035.gpkg')
 
@@ -82,8 +81,8 @@ regressorDumpMultiTargetPkl = join(root, _subdir, 'regressor_multitarget.pkl')
 regressionDatasetAsJsonFile = join(root, _subdir, 'regression_dataset.json')
 regressionDatasetAsPkl = join(root, _subdir, 'regression_dataset.pkl')
 
-# engeomap testdata
-_subdir = root / 'external' / 'engeomap'
-engeomap_cubus_gamsberg_subset = _subdir / 'cubus_gamsberg_subset'
-engeomap_gamsberg_field_library = _subdir / 'gamsberg_field_library'
-engeomap_gamesberg_field_library_color_mod = _subdir / 'gamesberg_field_library_color_mod.csv'
+# external testdata
+_subdir = 'external'
+engeomap_cubus_gamsberg_subset = join(root, _subdir, 'engeomap', 'cubus_gamsberg_subset')
+engeomap_gamsberg_field_library = join(root, _subdir, 'engeomap', 'gamsberg_field_library')
+engeomap_gamesberg_field_library_color_mod = join(root, _subdir, 'engeomap', 'gamesberg_field_library_color_mod.csv')
