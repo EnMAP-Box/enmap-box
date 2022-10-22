@@ -18,7 +18,7 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>132</width>
+    <width>158</width>
     <height>46</height>
    </size>
   </property>
@@ -69,7 +69,7 @@
       <item>
        <widget class="QToolButton" name="mGoToLocation">
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to location.&lt;/p&gt;&lt;p&gt;Usage examples:&lt;br/&gt;53.07478793449, 13.895089018465338&lt;br/&gt;53°04'29.2&amp;quot;N, 13°53'42.3&amp;quot;E&lt;br/&gt;13.895089018465338, 53.07478793449 [EPSG:4326]&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to location or geometry centroid.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Usage examples:&lt;br/&gt;&lt;/span&gt;&lt;br/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Point location formats:&lt;/span&gt;&lt;br/&gt;- 53.07478793449, 13.895089018465338&lt;br/&gt;- 53°04'29.2&amp;quot;N, 13°53'42.3&amp;quot;E&lt;br/&gt;- 13.895089018465338, 53.07478793449 [EPSG:4326]&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Geometry formats:&lt;br/&gt;- &lt;/span&gt;POINT(13.895089018465338 53.07478793449)&lt;br/&gt;- POINT(13.895089018465338 53.07478793449) [EPSG:4326]&lt;br/&gt;- POLYGON(...)&lt;br/&gt;- LINESTRING(...)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string>...</string>

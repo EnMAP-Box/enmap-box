@@ -11,7 +11,7 @@ from warnings import warn
 import numpy as np
 from osgeo import gdal
 
-from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
 from enmapboxprocessing.typing import (NumpyDataType, MetadataValue, GdalDataType,
                                        GdalResamplingAlgorithm, Categories, Category, Targets, Target)
 from qgis.PyQt.QtCore import QDateTime, QDate
@@ -25,7 +25,7 @@ from qgis.core import (QgsRasterBlock, QgsProcessingFeedback, QgsPalettedRasterR
                        QgsMultiBandColorRenderer, QgsContrastEnhancement, QgsSingleBandPseudoColorRenderer,
                        QgsRasterShader, QgsColorRampShader, QgsColorRamp, QgsSingleBandGrayRenderer,
                        QgsSingleCategoryDiagramRenderer, QgsGraduatedSymbolRenderer,
-                       QgsProcessingUtils
+                       QgsProcessingUtils, QgsGeometry
                        )
 from qgis.gui import QgsMapCanvas
 from typeguard import typechecked
@@ -436,13 +436,15 @@ class Utils(object):
                 except Exception:
                     pass
                 try:
-                    def conversion(old):  # adopted from https://stackoverflow.com/questions/10852955/python-batch-convert-gps-positions-to-lat-lon-decimals
+                    def conversion(
+                            old):  # adopted from https://stackoverflow.com/questions/10852955/python-batch-convert-gps-positions-to-lat-lon-decimals
                         direction = {'N': 1, 'S': -1, 'E': 1, 'W': -1}
                         new = old.replace(u'°', ' ').replace('\'', ' ').replace('"', ' ')
                         new = new.split()
                         new_dir = new.pop()
                         new.extend([0, 0, 0])
                         return (int(new[0]) + int(new[1]) / 60.0 + float(new[2]) / 3600.0) * direction[new_dir]
+
                     return SpatialPoint(QgsCoordinateReferenceSystem.fromEpsgId(4326), conversion(lat), conversion(lon))
                 except Exception:
                     pass
@@ -452,6 +454,29 @@ class Utils(object):
                     epsgId = int(epsgId[6:-1])
                     return SpatialPoint(QgsCoordinateReferenceSystem.fromEpsgId(epsgId), float(lat), float(lon))
 
+        raise error
+
+    @classmethod
+    def parseSpatialExtent(cls, obj) -> Optional[SpatialExtent]:
+        error = ValueError(f'invalid spatial extent: {obj}')
+        if obj is None:
+            return None
+
+        if isinstance(obj, SpatialExtent):
+            return obj
+
+        if isinstance(obj, str):
+            items: List[str] = obj.split('[')
+            if len(items) == 1:
+                wkt = items[0]
+                geometry = QgsGeometry.fromWkt(wkt)
+                return SpatialExtent(QgsCoordinateReferenceSystem.fromEpsgId(4326), geometry.boundingBox())
+            if len(items) == 2:
+                wkt, epsgId = items
+                if epsgId.upper().startswith('EPSG:') and epsgId.strip().endswith(']'):
+                    epsgId = int(epsgId.strip()[5:-1])
+                    geometry = QgsGeometry.fromWkt(wkt)
+                    return SpatialExtent(QgsCoordinateReferenceSystem.fromEpsgId(epsgId), geometry.boundingBox())
         raise error
 
     @classmethod

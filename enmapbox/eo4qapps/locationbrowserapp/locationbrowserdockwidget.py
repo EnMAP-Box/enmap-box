@@ -83,9 +83,26 @@ class LocationBrowserDockWidget(QgsDockWidget):
 
     def onGoToLocationClicked(self):
         text = self.mSearch.value()
+
+        point = None
+        extent = None
+
         try:
             point = Utils.parseSpatialPoint(text)
-        except ValueError:
+            extent = None
+        except Exception:
+            pass
+
+        if point is None:
+            try:
+                extent = Utils.parseSpatialExtent(text)
+                point = extent.spatialCenter()
+                if extent.isEmpty():
+                    extent = None
+            except Exception:
+                pass
+
+        if point is None:
             return
 
         if self.interfaceType == self.EnmapBoxInterface:
@@ -97,7 +114,11 @@ class LocationBrowserDockWidget(QgsDockWidget):
         else:
             raise ValueError()
 
-        mapCanvas.setCenter(point.toCrs(Utils.mapCanvasCrs(mapCanvas)))
+        if extent is None:
+            mapCanvas.setCenter(point.toCrs(Utils.mapCanvasCrs(mapCanvas)))
+        else:
+            mapCanvas.setExtent(extent)
+
         mapCanvas.refresh()
 
     def onRequestNominatimClicked(self):
