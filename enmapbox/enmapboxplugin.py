@@ -151,6 +151,7 @@ class EnMAPBoxPlugin(object):
         self.initLocationBrowserGui()
         self.initProfileAnalyticsGui()
         self.initRasterBandStackingGui()
+        self.initSensorProductImportGui()
 
     def initCurrentLocationMapTool(self):
         """
@@ -217,3 +218,13 @@ class EnMAPBoxPlugin(object):
         # add items to be removed when unload the plugin
         self.pluginToolbarActions.append(self.rasterBandStackingApp.actionToggleDock)
         self.dockWidgets.append(self.rasterBandStackingApp.dock)
+
+    def initSensorProductImportGui(self):
+        from qgis.utils import iface
+        from sensorproductimportapp import SensorProductImportApp
+
+        self.sensorProductImportApp = SensorProductImportApp(None, iface)
+
+        # add items to be removed when unload the plugin
+        self.pluginToolbarActions.append(self.sensorProductImportApp.actionToggleDock)
+        self.dockWidgets.append(self.sensorProductImportApp.dock)

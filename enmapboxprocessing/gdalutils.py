@@ -1,3 +1,5 @@
+from os import makedirs
+from os.path import exists, dirname
 from typing import List
 
 from enmapboxprocessing.rasterreader import RasterReader
@@ -44,6 +46,9 @@ class GdalUtils(object):
                 vrtRasterBands[fname, bandNo] = item + key + '\n  '
 
         # write VRT stack manually
+        if not exists(dirname(filename)):
+            makedirs(dirname(filename))
+
         with open(filename, 'w') as file:
             # copy first part from first VRT
             with open(filenames[0]) as file2:

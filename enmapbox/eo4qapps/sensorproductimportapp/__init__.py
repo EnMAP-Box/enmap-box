@@ -2,7 +2,6 @@ from typing import Optional
 
 from enmapbox import EnMAPBox
 from enmapbox.gui.applications import EnMAPBoxApplication
-from geetimeseriesexplorerapp.maptool import MapTool
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
@@ -19,8 +18,7 @@ def enmapboxApplicationFactory(enmapBox: EnMAPBox):
 class SensorProductImportApp(EnMAPBoxApplication):
 
     def __init__(
-            self, enmapBox: Optional[EnMAPBox], interface: Optional[QgisInterface],
-            currentLocationMapTool: Optional[MapTool], parent=None
+            self, enmapBox: Optional[EnMAPBox], interface: Optional[QgisInterface], parent=None
     ):
         super().__init__(enmapBox, parent=parent)
 
@@ -28,7 +26,6 @@ class SensorProductImportApp(EnMAPBoxApplication):
             interface = enmapBox
         self.interface = interface
         self.isEnmapInterface = isinstance(interface, EnMAPBox)
-        self.currentLocationMapTool = currentLocationMapTool
 
         self.name = SensorProductImportApp.__name__
         self.version = 'dev'
