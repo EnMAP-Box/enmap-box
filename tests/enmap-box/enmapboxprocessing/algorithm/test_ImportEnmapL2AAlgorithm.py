@@ -59,7 +59,7 @@ class TestImportEnmapL2AAlgorithm(TestCase):
 
         alg = ImportEnmapL2AAlgorithm()
         parameters = {
-            alg.P_FILE: SensorProducts.EnMAP_L2A_MetadataXml,
+            alg.P_FILE: SensorProducts.Enmap.L2A_MetadataXml,
             alg.P_DETECTOR_OVERLAP: alg.SwirOnlyOverlapOption,
             alg.P_OUTPUT_RASTER: self.filename('enmapL2A_SwirOnly.vrt'),
         }
@@ -75,7 +75,7 @@ class TestImportEnmapL2AAlgorithm(TestCase):
 
         alg = ImportEnmapL2AAlgorithm()
         parameters = {
-            alg.P_FILE: SensorProducts.EnMAP_L2A_MetadataXml,
+            alg.P_FILE: SensorProducts.Enmap.L2A_MetadataXml,
             alg.P_DETECTOR_OVERLAP: alg.MovingAverageFilterOverlapOption,
             alg.P_OUTPUT_RASTER: self.filename('enmapL2A_MovingAverageFilter.vrt'),
         }

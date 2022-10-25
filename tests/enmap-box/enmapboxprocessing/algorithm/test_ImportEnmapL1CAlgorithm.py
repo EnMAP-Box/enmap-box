@@ -3,6 +3,7 @@ import numpy as np
 from enmapboxprocessing.algorithm.importenmapl1calgorithm import ImportEnmapL1CAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.algorithm.testcase import TestCase
+from enmapboxtestdata import SensorProducts
 
 
 class TestImportEnmapL1CAlgorithm(TestCase):
@@ -10,7 +11,7 @@ class TestImportEnmapL1CAlgorithm(TestCase):
     def test(self):
         alg = ImportEnmapL1CAlgorithm()
         parameters = {
-            alg.P_FILE: r'D:\data\sensors\enmap\L1C_Arcachon_3\ENMAP01-____L1C-DT000400126_20170218T110119Z_003_V000204_20200510T095443Z-METADATA.XML',
+            alg.P_FILE: SensorProducts.Enmap.L1C_MetadataXml,
             alg.P_OUTPUT_RASTER: self.filename('enmapL1C.vrt'),
         }
         if not self.fileExists(parameters[alg.P_FILE]):
