@@ -47,6 +47,7 @@ class RasterReader(object):
                 gdalDataset = None
 
         self.gdalDataset = gdalDataset
+        assert self.gdalDataset is not None
 
     def bandCount(self) -> int:
         """Return iterator over all band numbers."""

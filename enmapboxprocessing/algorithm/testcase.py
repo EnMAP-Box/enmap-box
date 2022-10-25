@@ -1,11 +1,11 @@
 from typing import Dict
 
-from enmapbox.testing import start_app
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
 from enmapboxprocessing.testcase import TestCase as TestCase_
 from processing.core.Processing import Processing
 from qgis.core import QgsProcessingFeedback
 
+from enmapbox.testing import start_app
 qgsApp = start_app()
 
 
