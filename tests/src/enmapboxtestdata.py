@@ -89,20 +89,22 @@ engeomap_cubus_gamsberg_subset = join(root, _subdir, 'engeomap', 'cubus_gamsberg
 engeomap_gamsberg_field_library = join(root, _subdir, 'engeomap', 'gamsberg_field_library')
 engeomap_gamesberg_field_library_color_mod = join(root, _subdir, 'engeomap', 'gamesberg_field_library_color_mod.csv')
 
+# external sensor products
+# - let's have some developer-dependent default locations
+root = {
+    'Andreas@PC-21-0602': r'd:\data\sensors'
+}.get(os.getlogin() + '@' + platform.node())
+
+# - check environment variable
+if root is None:
+    root = os.environ.get('ENMAPBOX_SENSOR_PRODUCT_ROOT')
+
+# - fall back to SAN EnMAP server
+if root is None:
+    root = r'\\141.20.140.91\san\_EnMAP\Rohdaten\EnmapBoxExternalSensorProducts'
+
 
 class SensorProducts(object):
-    # let's have some developer-dependent defaults
-    root = {
-        'Andreas@PC-21-0602': r'd:\data\sensors'
-    }.get(os.getlogin() + '@' + platform.node())
-
-    # check environment variable
-    if root is None:
-        root = os.environ.get('ENMAPBOX_SENSOR_PRODUCT_ROOT')
-
-    # fall back to SAN EnMAP server
-    if root is None:
-        root = r'\\141.20.140.91\san_EnMAP\Rohdaten\EnMAP-Box external Sensor Products'
 
     class Desis(object):
         L1B = join(

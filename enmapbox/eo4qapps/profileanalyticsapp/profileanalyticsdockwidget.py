@@ -1,6 +1,8 @@
+import traceback
 import warnings
 from dataclasses import dataclass
 from os.path import exists, join, dirname
+from shutil import copyfile
 from typing import Optional, List
 
 import numpy as np
@@ -15,6 +17,7 @@ from enmapboxprocessing.algorithm.subsetrasterbandsalgorithm import SubsetRaster
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp import MapTool
+from profileanalyticsapp.profileanalyticseditorwidget import ProfileAnalyticsEditorWidget
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QComboBox, QTableWidget, QCheckBox, QToolButton, QLineEdit, QWidget
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsVectorLayer, QgsProcessingFeatureSourceDefinition, \
@@ -35,6 +38,7 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
     mRasterTable: QTableWidget
     mAddRaster: QToolButton
     mRemoveRaster: QToolButton
+    mEditUserFunction: QToolButton
     mRemoveAllRaster: QToolButton
 
     # analytics tab
@@ -65,6 +69,7 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
         self.mRasterProfileType.currentIndexChanged.connect(self.onRasterProfileTypeChanged)
         self.mAddRaster.clicked.connect(self.onAddRasterClicked)
         self.mRemoveRaster.clicked.connect(self.onRemoveRasterClicked)
+        self.mEditUserFunction.clicked.connect(self.onEditUserFunctionClicked)
         self.mRemoveAllRaster.clicked.connect(self.onmRemoveAllRasterClicked)
         self.mXUnit.currentIndexChanged.connect(self.onLiveUpdate)
         self.mApply.clicked.connect(self.onApplyClicked)
@@ -179,6 +184,7 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
         w.setFilter('*.py')
         w.setDefaultRoot(join(dirname(__file__), 'examples'))
         w.fileChanged.connect(self.onLiveUpdate)
+        w.dialog = None
         self.mRasterTable.setCellWidget(row, 4, w)
 
         self.onLiveUpdate()
@@ -190,6 +196,27 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
         self.mRasterTable.removeRow(row)
 
         self.onLiveUpdate()
+
+    def onEditUserFunctionClicked(self):
+        row = self.mRasterTable.currentRow()
+        if row == -1:
+            return
+        w: QgsFileWidget = self.mRasterTable.cellWidget(row, 4)
+
+        if w.filePath() == '':
+            filename = join(Utils.getTempDirInTempFolder(), 'analytics.py')
+            copyfile(join(dirname(__file__), 'examples', 'default.py'), filename)
+            w.setFilePath(filename)
+
+        filename = w.filePath()
+        with open(filename) as file:
+            text = file.read()
+
+        w.dialog = ProfileAnalyticsEditorWidget(self)
+        w.dialog.mFilename.setText(filename)
+        w.dialog.mCode.setText(text)
+        w.dialog.mSave.clicked.connect(self.onLiveUpdate)
+        w.dialog.show()
 
     def onmRemoveAllRasterClicked(self):
         for i in reversed(range(self.mRasterTable.rowCount())):
@@ -216,6 +243,7 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
         if self.mSourceType.currentIndex() == self.RasterLayerSource:
             profiles = list()
             userFunctions = list()
+            userFunctionEditors = list()
             # read and analyse profiles
             for row in range(self.mRasterTable.rowCount()):
                 w: QgsMapLayerComboBox = self.mRasterTable.cellWidget(row, 0)
@@ -374,19 +402,30 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                         userFunction = namespace['updatePlot']
                     except Exception:
                         pass
+                userFunctionEditor = w.dialog
 
                 profile = Profile(xValues, yValues, xUnit, name, style)
                 profiles.append(profile)
                 userFunctions.append(userFunction)
+                userFunctionEditors.append(userFunctionEditor)
         else:
             raise ValueError()
 
         # plot profiles and call user functions
-        for profile, ufunc in zip(profiles, userFunctions):
+        for profile, ufunc, dialog in zip(profiles, userFunctions, userFunctionEditors):
             plotDataItem: pg.PlotDataItem = self.mPlotWidget.plot(profile.xValues, profile.yValues, name=profile.name)
             profile.style.apply(plotDataItem)
             if ufunc is not None:
-                ufunc(profile, profiles, self.mPlotWidget)
+                try:
+                    ufunc(profile, profiles, self.mPlotWidget)
+                    msg = 'Done!'
+                except Exception:
+                    traceback.print_exc()
+                    msg = traceback.format_exc()
+
+                if dialog is not None:
+                    assert isinstance(dialog, ProfileAnalyticsEditorWidget)
+                    dialog.mLog.setText(msg)
 
         # set x axis title
         if self.mSourceType.currentIndex() == self.RasterLayerSource:
