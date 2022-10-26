@@ -116,7 +116,7 @@ class SensorProductImportDockWidget(QgsDockWidget):
                     alg, parameters, True, True, AlgorithmDialogWrapper, False
                 )
                 if not dialog.finishedSuccessful:
-                    continue
+                    return
                 result = dialog.finishResult
                 result = {}  # results will be opened by the processing framework
 
