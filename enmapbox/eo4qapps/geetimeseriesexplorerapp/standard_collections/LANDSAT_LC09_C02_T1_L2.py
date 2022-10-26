@@ -21,4 +21,4 @@ bandColors = {
 }
 
 # mapping from spectral index formular identifiers to image bands
-wavebandMapping = {'B': 'SR_B2', 'G': 'SR_B3', 'R': 'SR_B4', 'N': 'SR_B5', 'S1': 'SR_B6', 'S2': 'SR_B7', 'T1': 'SR_B10'}
+wavebandMapping = {'B': 'SR_B2', 'G': 'SR_B3', 'R': 'SR_B4', 'N': 'SR_B5', 'S1': 'SR_B6', 'S2': 'SR_B7'}

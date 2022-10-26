@@ -981,8 +981,19 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
             for spectralIndex in self.selectedSpectralIndices():
                 name = spectralIndex['short_name']  # NDVI
                 formula = spectralIndex['formula']  # (N - R)/(N + R)
-                mapping = {identifier: eeImage.select(bandName)
-                           for identifier, bandName in self.eeFullCollectionInfo.wavebandMapping.items()}
+                mapping = dict()
+                for identifier, bandName in self.eeFullCollectionInfo.wavebandMapping.items():
+                    eeBand = eeImage.select(bandName)
+
+                    bandNo = self.eeFullCollectionInfo.bandNames.index(bandName) + 1
+                    offset = self.eeFullCollectionJson.bandOffset(bandNo)
+                    scale = self.eeFullCollectionJson.bandScale(bandNo)
+                    if scale != 1.:
+                        eeBand = eeBand.multiply(scale)
+                    if offset != 0.:
+                        eeBand = eeBand.add(offset)
+                    mapping[identifier] = eeBand
+
                 mapping.update({key: ee.Image(value)
                                 for key, value in CreateSpectralIndicesAlgorithm.ConstantMapping.items()})
                 eeImage = eeImage.addBands(eeImage.expression(formula, mapping).rename(name))
