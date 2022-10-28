@@ -5,7 +5,8 @@ import numpy as np
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import checkSampleShape, ClassifierDump
 from enmapboxprocessing.utils import Utils
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsFeature, QgsProcessingParameterField)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsFeature, QgsProcessingParameterField,
+                       QgsProcessing)
 from typeguard import typechecked
 
 
@@ -42,7 +43,8 @@ class PrepareClassificationDatasetFromTableAlgorithm(EnMAPProcessingAlgorithm):
         return Group.DatasetCreation.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
-        self.addParameterVectorLayer(self.P_TABLE, self._TABLE)
+        self.addParameterVectorLayer(self.P_TABLE, self._TABLE, [QgsProcessing.SourceType.TypeVector])
+
         self.addParameterField(
             self.P_FEATURE_FIELDS, self._FEATURE_FIELDS, None, self.P_TABLE, QgsProcessingParameterField.Any, True
         )
