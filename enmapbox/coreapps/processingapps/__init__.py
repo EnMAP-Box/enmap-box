@@ -46,7 +46,6 @@ class ProcessingApps(EnMAPBoxApplication):
 
         # tools
         algs = [
-            StackRasterLayersAlgorithm()
         ]
         for alg in algs:
             a = self.utilsAddActionInAlphanumericOrder(toolMenu, alg.displayName())
