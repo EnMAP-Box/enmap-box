@@ -1,14 +1,12 @@
 from os.path import join, dirname
 
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QAction
-
 from enmapbox.gui.applications import EnMAPBoxApplication
 from enmapboxprocessing.algorithm.classificationworkflowalgorithm import ClassificationWorkflowAlgorithm
 from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import RasterMathAlgorithm
 from enmapboxprocessing.algorithm.regressionbasedunmixingalgorithm import RegressionBasedUnmixingAlgorithm
 from enmapboxprocessing.algorithm.regressionworkflowalgorithm import RegressionWorkflowAlgorithm
-from enmapboxprocessing.algorithm.stackrasterlayersalgorithm import StackRasterLayersAlgorithm
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QMenu, QAction
 
 
 def enmapboxApplicationFactory(enmapBox):
