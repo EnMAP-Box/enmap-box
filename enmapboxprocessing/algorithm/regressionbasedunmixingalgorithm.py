@@ -12,6 +12,7 @@ from enmapboxprocessing.algorithm.fitgenericregressoralgorithm import FitGeneric
 from enmapboxprocessing.algorithm.predictregressionalgorithm import PredictRegressionAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromsynthmixalgorithm import \
     PrepareRegressionDatasetFromSynthMixAlgorithm
+from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import RasterMathAlgorithm
 from enmapboxprocessing.algorithm.stackrasterlayersalgorithm import StackRasterLayersAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterwriter import RasterWriter
@@ -35,6 +36,7 @@ class RegressionBasedUnmixingAlgorithm(EnMAPProcessingAlgorithm):
     P_CLASS_PROBABILITIES, _CLASS_PROBABILITIES = 'classProbabilities', 'Class probabilities'
     P_ENSEMBLE_SIZE, _ENSEMBLE_SIZE = 'ensembleSize', 'Ensemble size'
     P_ROBUST_FUSION, _ROBUST_FUSION = 'robustFusion', 'Robust decision fusion'
+    P_SUM_TO_ONE, _SUM_TO_ONE = 'sumToOne', 'Sum-to-one constraint'
     P_OUTPUT_FRACTION, _OUTPUT_FRACTION = 'outputFraction', 'Output class fraction layer'
     P_OUTPUT_CLASSIFICATION, _OUTPUT_CLASSIFICATION = 'outputClassification', 'Output classification layer'
     P_OUTPUT_VARIATION, _OUTPUT_VARIATION = 'outputFractionVariation', 'Output class fraction variation layer'
@@ -67,6 +69,7 @@ class RegressionBasedUnmixingAlgorithm(EnMAPProcessingAlgorithm):
             (self._ENSEMBLE_SIZE, 'Number of individual runs/predictions.'),
             (self._ROBUST_FUSION, 'Whether to use median and IQR (interquartile range) aggregation for ensemble '
                                   'decision fusion. The default is to use mean and standard deviation.'),
+            (self._SUM_TO_ONE, 'Whether to ensure sum-to-one constraint for predicted fractions.'),
             (self._OUTPUT_FRACTION, self.RasterFileDestination),
             (self._OUTPUT_CLASSIFICATION, self.RasterFileDestination),
             (self._OUTPUT_VARIATION, self.RasterFileDestination)
@@ -87,6 +90,7 @@ class RegressionBasedUnmixingAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterString(self.P_CLASS_PROBABILITIES, self._CLASS_PROBABILITIES, None, False, True)
         self.addParameterInt(self.P_ENSEMBLE_SIZE, self._ENSEMBLE_SIZE, 1, False, 1)
         self.addParameterBoolean(self.P_ROBUST_FUSION, self._ROBUST_FUSION, False, True)
+        self.addParameterBoolean(self.P_SUM_TO_ONE, self._SUM_TO_ONE, False, True)
         self.addParameterRasterDestination(self.P_OUTPUT_FRACTION, self._OUTPUT_FRACTION)
         self.addParameterRasterDestination(self.P_OUTPUT_CLASSIFICATION, self._OUTPUT_CLASSIFICATION, None, True, False)
         self.addParameterRasterDestination(self.P_OUTPUT_VARIATION, self._OUTPUT_VARIATION, None, True, False)
@@ -105,6 +109,7 @@ class RegressionBasedUnmixingAlgorithm(EnMAPProcessingAlgorithm):
         classProbabilities = self.parameterAsValues(parameters, self.P_CLASS_PROBABILITIES, context)
         ensembleSize = self.parameterAsInt(parameters, self.P_ENSEMBLE_SIZE, context)
         robustFusion = self.parameterAsBoolean(parameters, self.P_ROBUST_FUSION, context)
+        sumToOne = self.parameterAsBoolean(parameters, self.P_SUM_TO_ONE, context)
         filenameFraction = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_FRACTION, context)
         filenameClassification = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_CLASSIFICATION, context)
         filenameVariation = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_VARIATION, context)
@@ -209,7 +214,25 @@ class RegressionBasedUnmixingAlgorithm(EnMAPProcessingAlgorithm):
                 alg.P_OUTPUT_RASTER: filename
             }
             self.runAlg(alg, parameters, None, feedback2, context, True)
-            ds = gdal.Translate(filenameFraction, filename)
+
+            # sum-to-one constraint
+            if sumToOne:
+                filename2 = Utils.tmpFilename(filenameFraction, 'fractionNormalized.tif')
+                alg = RasterMathAlgorithm()
+                alg.initAlgorithm()
+                parameters = {
+                    alg.P_R1: filename,
+                    alg.P_CODE: 'outputRaster = R1 / np.sum(R1, axis=0)\n'
+                                'outputRaster[~R1Mask] = -1\n'
+                                'for bandNo in R1.bandNumbers():\n'
+                                '    outputRaster.setNoDataValue(-1, bandNo)',
+                    alg.P_OUTPUT_RASTER: filename2
+                }
+                self.runAlg(alg, parameters, None, feedback2, context, True)
+            else:
+                filename2 = filename
+
+            ds = gdal.Translate(filenameFraction, filename2)
             writer = RasterWriter(ds)
             for bandNo, category in enumerate(categories, 1):
                 writer.setBandName(category.name, bandNo)
