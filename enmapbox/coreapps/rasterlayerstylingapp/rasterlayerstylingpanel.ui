@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>314</width>
-    <height>172</height>
+    <width>781</width>
+    <height>763</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -98,8 +98,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>351</width>
-         <height>314</height>
+         <width>763</width>
+         <height>660</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -152,8 +152,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>309</width>
-                 <height>102</height>
+                 <width>721</width>
+                 <height>223</height>
                 </rect>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -250,8 +250,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>398</width>
-                 <height>102</height>
+                 <width>721</width>
+                 <height>223</height>
                 </rect>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -334,8 +334,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>398</width>
-                 <height>72</height>
+                 <width>721</width>
+                 <height>193</height>
                 </rect>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -688,6 +688,154 @@ count cut</string>
           </layout>
          </widget>
         </item>
+        <item>
+         <widget class="QgsCollapsibleGroupBox" name="mGroupBoxTransparency">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="title">
+           <string>Custom Transparency Options</string>
+          </property>
+          <property name="checkable">
+           <bool>false</bool>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_15">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <item>
+              <widget class="QCheckBox" name="mUseTransparency">
+               <property name="text">
+                <string>Set lower/upper values transparency to</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="mTransparencyValue">
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="value">
+                <number>100</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_35">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>%</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QgsRangeSlider" name="mTransparencySlider" native="true"/>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="2,1,0,2">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_9">
+               <item>
+                <widget class="QLabel" name="label_36">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Lower</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="mTransparencyLower">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_5">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>1</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_37">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>Upper</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_10">
+               <item>
+                <widget class="QLineEdit" name="mTransparencyUpper">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
        </layout>
       </widget>
      </widget>
@@ -757,7 +905,46 @@ count cut</string>
    <header>rasterlayerstylingapp.rasterlayerstylingbandwidget</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>QgsRangeSlider</class>
+   <extends>QWidget</extends>
+   <header>qgis.gui</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>mUseTransparency</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>mTransparencySlider</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>83</x>
+     <y>645</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>357</x>
+     <y>666</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mUseTransparency</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>mTransparencyValue</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>152</x>
+     <y>641</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>269</x>
+     <y>639</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
