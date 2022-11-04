@@ -1,4 +1,4 @@
-from math import nan
+from math import nan, inf
 from typing import Optional
 
 from osgeo import gdal
@@ -14,13 +14,12 @@ from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QDoubleSpinBox, QComboBox, QCheckBox, QToolButton, QLabel, QTabWidget, \
-    QLineEdit, QTableWidget
-from qgis.core import QgsProject
+    QLineEdit, QTableWidget, QSpinBox
 from qgis.core import QgsRasterLayer, QgsSingleBandGrayRenderer, QgsRectangle, \
     QgsContrastEnhancement, QgsRasterRenderer, QgsMultiBandColorRenderer, QgsSingleBandPseudoColorRenderer, \
-    QgsMapLayerProxyModel, QgsRasterDataProvider, QgsRasterShader
+    QgsMapLayerProxyModel, QgsRasterDataProvider, QgsRasterShader, QgsProject, QgsRasterTransparency
 from qgis.gui import (
-    QgsDockWidget, QgsMapLayerComboBox, QgsCollapsibleGroupBox, QgsColorRampButton
+    QgsDockWidget, QgsMapLayerComboBox, QgsCollapsibleGroupBox, QgsColorRampButton, QgsRangeSlider
 )
 from rasterlayerstylingapp.rasterlayerstylingbandwidget import RasterLayerStylingBandWidget
 from rasterlayerstylingapp.rasterlayerstylingpercentileswidget import RasterLayerStylingPercentilesWidget
@@ -58,7 +57,17 @@ class RasterLayerStylingPanel(QgsDockWidget):
     mAccuracy: QComboBox
     mApply: QToolButton
 
+    # custom transparency options
+    mUseTransparency: QCheckBox
+    mTransparencyValue: QSpinBox
+    mTransparencySlider: QgsRangeSlider
+    mTransparencyMin: QLineEdit
+    mTransparencyMax: QLineEdit
+    mTransparencyLower: QLineEdit
+    mTransparencyUpper: QLineEdit
+
     mGroupBoxMinMax: QgsCollapsibleGroupBox
+    mGroupBoxTransparency: QgsCollapsibleGroupBox
 
     RgbRendererTab, GrayRendererTab, PseudoRendererTab, DefaultRendererTab, SpectralLinkingTab = range(5)
     BandLinkage, WavelengthLinkage = range(2)
@@ -113,6 +122,13 @@ class RasterLayerStylingPanel(QgsDockWidget):
         self.mExtent.currentIndexChanged.connect(self.onStatisticsChanged)
         self.mAccuracy.currentIndexChanged.connect(self.onStatisticsChanged)
         self.mApply.clicked.connect(self.updateMinMax)
+
+        # custom transparency options
+        self.mTransparencySlider.setRangeLimits(0, 100)
+        self.mTransparencySlider.setRange(0, 100)
+        self.mTransparencySlider.setSingleStep(1)
+        self.mTransparencySlider.rangeChanged.connect(self.onTransparencyRangeChanged)
+        self.mUseTransparency.toggled.connect(self.updateRenderer)
 
         # spectral linking
         self.mAddLink.clicked.connect(self.onAddLinkClicked)
@@ -365,11 +381,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
         for mBand in [self.mRedBand, self.mGreenBand, self.mBlueBand, self.mGrayBand, self.mPseudoBand]:
             self.updateIsBadBand(mBand)
 
-        if self.mRenderer.currentIndex() < self.DefaultRendererTab:
-            self.mGroupBoxMinMax.show()
-        else:
-            self.mGroupBoxMinMax.hide()
-
+        self.updateGroupBoxVisibility()
         self.updateMinMax()
         self.updateRenderer()
 
@@ -485,6 +497,31 @@ class RasterLayerStylingPanel(QgsDockWidget):
         else:
             pass
 
+    def onTransparencyRangeChanged(self):
+        layer: QgsRasterLayer = self.mLayer.currentLayer()
+        if layer is None:
+            return
+        renderer: QgsRasterRenderer = layer.renderer()
+        bandNo = renderer.usesBands()[0]
+        provider: QgsRasterDataProvider = layer.dataProvider()
+        p1 = self.mTransparencySlider.lowerValue()
+        p2 = self.mTransparencySlider.upperValue()
+        if p1 == 0 and p2 == 100:
+            lower = upper = 0
+        else:
+            lower, upper = provider.cumulativeCut(
+                bandNo, max(p1, 0) / 100., min(p2, 100) / 100., layer.extent(), int(QgsRasterLayer.SAMPLE_SIZE)
+            )
+        if p1 == 0:
+            self.mTransparencyLower.setText('')
+        else:
+            self.mTransparencyLower.setText(str(lower))
+        if p2 == 100:
+            self.mTransparencyUpper.setText('')
+        else:
+            self.mTransparencyUpper.setText(str(upper))
+        self.updateRenderer()
+
     def updateWavelengthInfo(self, mBand: RasterLayerStylingBandWidget):
         layer: QgsRasterLayer = self.mLayer.currentLayer()
         if layer is None:
@@ -572,6 +609,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
             ce = renderer.contrastEnhancement()
             ce.setMinimumValue(tofloat(self.mGrayBand.mMin.text()))
             ce.setMaximumValue(tofloat(self.mGrayBand.mMax.text()))
+
         elif self.mRenderer.currentIndex() == self.PseudoRendererTab:
             bandNo = self.mPseudoBand.mBandNo.currentBand()
             minValue = tofloat(self.mPseudoBand.mMin.text())
@@ -585,6 +623,26 @@ class RasterLayerStylingPanel(QgsDockWidget):
             pass
         else:
             raise ValueError()
+
+        # set transparency
+        if self.mRenderer.currentIndex() in [self.GrayRendererTab, self.PseudoRendererTab]:
+            rasterTransparency = QgsRasterTransparency()
+            transparentSingleValuePixelList = list()
+            if self.mUseTransparency.isChecked():
+                if self.mTransparencyLower.text() != '':
+                    transparentSingleValuePixel = QgsRasterTransparency.TransparentSingleValuePixel()
+                    transparentSingleValuePixel.min = -inf
+                    transparentSingleValuePixel.max = tofloat(self.mTransparencyLower.text())
+                    transparentSingleValuePixel.percentTransparent = self.mTransparencyValue.value()
+                    transparentSingleValuePixelList.append(transparentSingleValuePixel)
+                if self.mTransparencyUpper.text() != '':
+                    transparentSingleValuePixel = QgsRasterTransparency.TransparentSingleValuePixel()
+                    transparentSingleValuePixel.min = tofloat(self.mTransparencyUpper.text())
+                    transparentSingleValuePixel.max = inf
+                    transparentSingleValuePixel.percentTransparent = self.mTransparencyValue.value()
+                    transparentSingleValuePixelList.append(transparentSingleValuePixel)
+            rasterTransparency.setTransparentSingleValuePixelList(transparentSingleValuePixelList)
+            layer.renderer().setRasterTransparency(rasterTransparency)
 
         layer.rendererChanged.emit()
         layer.triggerRepaint()
@@ -810,6 +868,21 @@ class RasterLayerStylingPanel(QgsDockWidget):
             layer.rendererChanged.emit()
             layer2.triggerRepaint()
 
+    def updateGroupBoxVisibility(self):
+        if self.mRenderer.currentIndex() < self.DefaultRendererTab:
+            self.mGroupBoxMinMax.show()
+        else:
+            self.mGroupBoxMinMax.hide()
+
+        if all(
+                [self.mRenderer.currentIndex() < self.DefaultRendererTab,
+                 self.mRenderer.currentIndex() != self.RgbRendererTab]
+        ):
+
+            self.mGroupBoxTransparency.show()
+        else:
+            self.mGroupBoxTransparency.hide()
+
     def currentExtent(self, layer: QgsRasterLayer, statisticsType: int) -> QgsRectangle:
 
         if statisticsType == self.WholeRasterStatistics:
@@ -839,11 +912,13 @@ class RasterLayerStylingPanel(QgsDockWidget):
         self.mInfo.show()
         self.mRenderer.hide()
         self.mGroupBoxMinMax.hide()
+        self.mGroupBoxTransparency.hide()
 
     def enableGui(self):
         self.mInfo.hide()
         self.mRenderer.show()
         self.mGroupBoxMinMax.show()
+        self.updateGroupBoxVisibility()
 
 
 # utils
