@@ -152,6 +152,7 @@ class EnMAPBoxPlugin(object):
         self.initProfileAnalyticsGui()
         self.initRasterBandStackingGui()
         self.initSensorProductImportGui()
+        self.initTemporalRasterStackControllerGui()
 
     def initCurrentLocationMapTool(self):
         """
@@ -228,3 +229,11 @@ class EnMAPBoxPlugin(object):
         # add items to be removed when unload the plugin
         self.pluginToolbarActions.append(self.sensorProductImportApp.actionToggleDock)
         self.dockWidgets.append(self.sensorProductImportApp.dock)
+
+    def initTemporalRasterStackControllerGui(self):
+        from temporalrasterstackcontrollerapp import TemporalRasterStackControllerApp
+
+        self.sensorProductImportApp = TemporalRasterStackControllerApp(None)
+
+        # add items to be removed when unload the plugin
+        self.pluginToolbarActions.append(self.sensorProductImportApp.actionToolbarIcon)

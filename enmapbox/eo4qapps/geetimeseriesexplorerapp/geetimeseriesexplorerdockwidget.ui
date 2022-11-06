@@ -286,8 +286,8 @@ QListWidget::item::selected {
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>597</width>
-                   <height>860</height>
+                   <width>440</width>
+                   <height>825</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_2">
@@ -1075,8 +1075,8 @@ Surface Reflectance</string>
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>597</width>
-                   <height>860</height>
+                   <width>422</width>
+                   <height>843</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_4">
@@ -1723,8 +1723,8 @@ Terra Surface Reflectance
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>597</width>
-                   <height>860</height>
+                   <width>422</width>
+                   <height>396</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_3">
@@ -2142,8 +2142,8 @@ Full Resolution</string>
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>597</width>
-                   <height>860</height>
+                   <width>211</width>
+                   <height>265</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_5">
@@ -3011,8 +3011,8 @@ Hyperspectral Imager</string>
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>621</width>
-               <height>907</height>
+               <width>419</width>
+               <height>405</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_22">
@@ -4757,6 +4757,35 @@ count cut</string>
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QToolButton" name="mUnderTemporalControl">
+        <property name="toolTip">
+         <string>Update layer.</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/images/themes/default/mIconTemporalRaster.svg</normaloff>:/images/themes/default/mIconTemporalRaster.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item>
@@ -4999,6 +5028,11 @@ count cut</string>
    <header>qgsspinbox.h</header>
   </customwidget>
   <customwidget>
+   <class>QgsColorRampButton</class>
+   <extends>QToolButton</extends>
+   <header>qgis.gui</header>
+  </customwidget>
+  <customwidget>
    <class>CodeEditWidget</class>
    <extends>QWidget</extends>
    <header>enmapboxprocessing.parameter.processingparametercodeeditwidget</header>
@@ -5009,11 +5043,6 @@ count cut</string>
    <extends>QFrame</extends>
    <header>qgis.gui</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QgsColorRampButton</class>
-   <extends>QToolButton</extends>
-   <header>qgis.gui</header>
   </customwidget>
  </customwidgets>
  <resources>

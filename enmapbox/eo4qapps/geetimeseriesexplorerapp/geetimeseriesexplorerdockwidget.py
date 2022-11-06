@@ -28,9 +28,9 @@ from qgis.PyQt.QtWidgets import (QToolButton, QApplication, QComboBox, QLineEdit
                                  QPlainTextEdit, QTreeWidget, QTreeWidgetItem, QTabWidget, QLabel, QMainWindow,
                                  QListWidgetItem, QProgressBar, QFrame)
 from qgis.core import QgsRasterLayer, QgsCoordinateReferenceSystem, QgsMapLayer, QgsMapSettings, \
-    QgsColorRamp, QgsDateTimeRange, QgsApplication, QgsMessageLog, Qgis
+    QgsColorRamp, QgsApplication, QgsMessageLog, Qgis
 from qgis.gui import (
-    QgsDockWidget, QgsMessageBar, QgsColorRampButton, QgsSpinBox, QgsMapCanvas, QgsDateTimeEdit, QgisInterface
+    QgsDockWidget, QgsMessageBar, QgsColorRampButton, QgsSpinBox, QgsMapCanvas, QgisInterface
 )
 from typeguard import typechecked
 
@@ -135,13 +135,7 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
     mLiveUpdateLayer: QCheckBox
     mUpdateLayer: QToolButton
     mStretchAndUpdateLayer: QToolButton
-    mTemporalEnabled: QCheckBox
-    mTemporalRangeValue: QgsSpinBox
-    mTemporalRangeUnits: QComboBox
-    mTemporalStartFixed: QCheckBox
-    mTemporalEndFixed: QCheckBox
-    mTemporalStart: QgsDateTimeEdit
-    mTemporalEnd: QgsDateTimeEdit
+    mUnderTemporalControl: QToolButton
 
     mProgressBarFrame: QFrame
     mProgressBar: QProgressBar
@@ -150,6 +144,17 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
     # additional typing
 
     sigCollectionChanged = pyqtSignal()
+
+    class InterfaceType(object):
+        EnmapBox = 0
+        Qgis = 1
+
+    @staticmethod
+    def qgisInstance() -> Optional['GeeTimeseriesExplorerDockWidget']:
+        from qgis.utils import iface
+        for dockWidget in iface.mapCanvas().parent().parent().parent().findChildren(QgsDockWidget):
+            if isinstance(dockWidget, GeeTimeseriesExplorerDockWidget):
+                return dockWidget
 
     def __init__(self, parent=None):
         # eeImported, ee = importEarthEngine(False)
@@ -253,10 +258,6 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
         from geetimeseriesexplorerapp import GeeTemporalProfileDockWidget
         assert isinstance(profileDock, GeeTemporalProfileDockWidget)
         self.profileDock = profileDock
-
-    class InterfaceType(object):
-        EnmapBox = 0
-        Qgis = 1
 
     def setInterface(self, interface: QgisInterface):
         self.interface = interface
@@ -605,20 +606,6 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
                 warnings.simplefilter("ignore")
                 ee.Initialize()
         self.eeInitialized = True
-
-    def currentImageLayerTemporalRange(self) -> Optional[QgsDateTimeRange]:
-        if self.mTemporalEnabled:
-            if self.mTemporalStartFixed:
-                start = self.mTemporalStart.dateTime()
-            else:
-                start = QDateTime()  # the bound is considered to be infinite
-            if self.mTemporalEndFixed:
-                end = self.mTemporalEnd.dateTime()
-            else:
-                end = QDateTime()  # the bound is considered to be infinite
-            return QgsDateTimeRange(start, end)
-        else:
-            return None
 
     def updateBandProperties(self):
         self.mBandProperty.setRowCount(len(self.eeFullCollectionInfo.bandNames))
