@@ -3,12 +3,14 @@ from typing import Optional, List
 from enmapbox import EnMAPBox
 from enmapbox.gui.applications import EnMAPBoxApplication
 from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp import GeeTimeseriesExplorerDockWidget
 from qgis.PyQt.QtCore import QDateTime
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from qgis.core import QgsTemporalNavigationObject, QgsDateTimeRange, QgsProject, QgsRasterLayer, \
-    QgsSingleBandGrayRenderer, QgsSingleBandPseudoColorRenderer, Qgis, QgsRasterLayerTemporalProperties
+    QgsSingleBandGrayRenderer, QgsSingleBandPseudoColorRenderer, Qgis, QgsRasterLayerTemporalProperties, \
+    QgsPalettedRasterRenderer
 from qgis.gui import QgsMapCanvas
 from typeguard import typechecked
 
@@ -100,9 +102,13 @@ class TemporalRasterStackControllerApp(EnMAPBoxApplication):
                 renderer.setGrayBand(bandNo)
             elif isinstance(renderer, QgsSingleBandPseudoColorRenderer):
                 renderer.setBand(bandNo)
+            elif isinstance(renderer, QgsPalettedRasterRenderer):
+                categories = Utils.categoriesFromPalettedRasterRenderer(renderer)
+                renderer = Utils.palettedRasterRendererFromCategories(layer.dataProvider(), bandNo, categories)
+                layer.setRenderer(renderer)
             else:
-                raise NotImplementedError(str(renderer))
-            print(bandNo)
+                raise NotImplementedError(renderer.__class__)
+
             layer.rendererChanged.emit()
             layer.triggerRepaint()
 
