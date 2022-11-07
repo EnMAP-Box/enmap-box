@@ -2,6 +2,7 @@ from math import isnan
 from typing import Iterable, List, Union, Optional, Tuple, Iterator
 
 import numpy as np
+from PyQt5.QtCore import QDate
 from osgeo import gdal
 
 from enmapboxprocessing.gridwalker import GridWalker
@@ -547,11 +548,21 @@ class RasterReader(object):
             if dateTime is not None:
                 return Utils.parseDateTime(dateTime)
 
-            # check band-level FORCE-domain (see GitHub-issue #9)
+            # check band-level FORCE-domain (see #9)
             dateTime = self.metadataItem('Date', 'FORCE', bandNo)
 
             if dateTime is not None:
                 return Utils.parseDateTime(dateTime)
+
+            # check band-level default-domain for NETCDF_DIM_time (see #251)
+            dateTime = self.metadataItem('NETCDF_DIM_time', '', bandNo)
+
+            if dateTime is not None:
+                dateTimeUnit = self.metadataItem('time#units')
+                if dateTimeUnit == 'days since 1970-1-1':
+                    return QDateTime(QDate(1970, 1, 1)).addDays(int(dateTime))
+                else:
+                    raise NotImplementedError(dateTimeUnit)
 
         # check dataset-level default-domain
         dateTime = self.metadataItem('start_time')
