@@ -2,14 +2,13 @@ from math import isnan
 from typing import Iterable, List, Union, Optional, Tuple, Iterator
 
 import numpy as np
-from PyQt5.QtCore import QDate
 from osgeo import gdal
 
 from enmapboxprocessing.gridwalker import GridWalker
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.typing import RasterSource, Array3d, Metadata, MetadataValue, MetadataDomain
 from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtCore import QSizeF, QDateTime
+from qgis.PyQt.QtCore import QSizeF, QDateTime, QDate
 from qgis.PyQt.QtGui import QColor
 from qgis.core import (QgsRasterLayer, QgsRasterDataProvider, QgsCoordinateReferenceSystem, QgsRectangle,
                        QgsRasterRange, QgsPoint, QgsRasterBlockFeedback, QgsRasterBlock, QgsPointXY,
