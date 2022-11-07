@@ -501,6 +501,14 @@ class TestRasterReader(TestCase):
         self.assertEqual(Utils.decimalYearToDateTime(2015.003), reader.centerTime(1))
         self.assertIsNone(reader.wavelengthUnits(1))
 
+    def test_centerTime_NETCDF_DIM_time_format(self):  # see #251
+        writer = self.rasterFromArray(np.zeros((1, 1, 1)))
+        writer.setMetadataItem('NETCDF_DIM_time ', 1, '', 1)
+        writer.setMetadataItem('time#units', 'days since 1970-1-1', '')
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual(QDateTime(1970, 1, 2, 0, 0), reader.centerTime(1))
+
     def test_findTime(self):
         writer = self.rasterFromArray(np.zeros((4, 1, 1)))
         writer.setStartTime(QDateTime(2000, 1, 1, 0, 0), 1)

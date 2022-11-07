@@ -34,7 +34,6 @@ from difflib import SequenceMatcher
 from typing import List
 
 import requests
-
 from enmapbox import debugLog
 from enmapbox.qgispluginsupport.qps.utils import qgisAppQgisInterface
 from enmapbox.settings import EnMAPBoxSettings
@@ -238,7 +237,6 @@ class PIPPackage(object):
             except ModuleNotFoundError:
                 return False
         return False
-
 
 
 def localPythonExecutable() -> pathlib.Path:
