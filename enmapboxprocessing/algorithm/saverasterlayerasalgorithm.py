@@ -29,7 +29,6 @@ class SaveRasterAsAlgorithm(EnMAPProcessingAlgorithm):
             (self._CREATION_PROFILE, 'Output format and creation options. '
                                      'The default format is GeoTiff with creation options: '
                                      '' + ', '.join(self.DefaultGTiffCreationOptions)),
-            (self._CREATION_PROFILE, 'Output format and creation options.'),
             (self._OUTPUT_RASTER, self.RasterFileDestination)
         ]
 

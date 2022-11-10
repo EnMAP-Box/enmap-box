@@ -35,7 +35,7 @@ class RegressionPerformanceAlgorithm(EnMAPProcessingAlgorithm):
 
     def shortDescription(self) -> str:
         return 'Estimates map accuracy.' \
-               'We use the formulars as described in ' \
+               'We use the formulas as described in ' \
                '<a href="https://scikit-learn.org/stable/modules/model_evaluation.html#regression-metrics">Scikit-Learn Regression metrics</a> ' \
                'user guide. ' \
                'Observed and predicted target variables are matched by name.'

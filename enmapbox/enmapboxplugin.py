@@ -145,8 +145,14 @@ class EnMAPBoxPlugin(object):
         """
 
         self.initCurrentLocationMapTool()
+
+        # here we are adding all the EO4Q apps manually, later we should do that automatically
         self.initGeeTimeseriesExplorerGui()
+        self.initLocationBrowserGui()
         self.initProfileAnalyticsGui()
+        self.initRasterBandStackingGui()
+        self.initSensorProductImportGui()
+        self.initTemporalRasterStackControllerGui()
 
     def initCurrentLocationMapTool(self):
         """
@@ -193,3 +199,41 @@ class EnMAPBoxPlugin(object):
         # add items to be removed when unload the plugin
         self.pluginToolbarActions.append(self.profileAnalyticsApp.actionToggleDock)
         self.dockWidgets.append(self.profileAnalyticsApp.dock)
+
+    def initLocationBrowserGui(self):
+        from qgis.utils import iface
+        from locationbrowserapp import LocationBrowserApp
+
+        self.locationBrowserApp = LocationBrowserApp(None, iface, self.currentLocationMapTool)
+
+        # add items to be removed when unload the plugin
+        self.pluginToolbarActions.append(self.locationBrowserApp.actionToggleDock)
+        self.dockWidgets.append(self.locationBrowserApp.dock)
+
+    def initRasterBandStackingGui(self):
+        from qgis.utils import iface
+        from rasterbandstackingapp import RasterBandStackingApp
+
+        self.rasterBandStackingApp = RasterBandStackingApp(None, iface, self.currentLocationMapTool)
+
+        # add items to be removed when unload the plugin
+        self.pluginToolbarActions.append(self.rasterBandStackingApp.actionToggleDock)
+        self.dockWidgets.append(self.rasterBandStackingApp.dock)
+
+    def initSensorProductImportGui(self):
+        from qgis.utils import iface
+        from sensorproductimportapp import SensorProductImportApp
+
+        self.sensorProductImportApp = SensorProductImportApp(None, iface)
+
+        # add items to be removed when unload the plugin
+        self.pluginToolbarActions.append(self.sensorProductImportApp.actionToggleDock)
+        self.dockWidgets.append(self.sensorProductImportApp.dock)
+
+    def initTemporalRasterStackControllerGui(self):
+        from temporalrasterstackcontrollerapp import TemporalRasterStackControllerApp
+
+        self.sensorProductImportApp = TemporalRasterStackControllerApp(None)
+
+        # add items to be removed when unload the plugin
+        self.pluginToolbarActions.append(self.sensorProductImportApp.actionToolbarIcon)

@@ -23,7 +23,7 @@ import typing
 import uuid
 from typing import Optional, List, Dict
 
-from enmapbox import debugLog
+from enmapbox import debugLog, messageLog
 from enmapbox.gui import \
     SpectralLibrary, SpectralLibraryWidget, SpatialExtent, showLayerPropertiesDialog
 from enmapbox.gui.datasources.datasources import DataSource, ModelDataSource
@@ -45,7 +45,7 @@ from qgis.PyQt.QtCore import Qt, QMimeData, QModelIndex, QObject, QTimer, pyqtSi
 from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDropEvent, QDragLeaveEvent
 from qgis.PyQt.QtWidgets import QHeaderView, QMenu, QAbstractItemView, QApplication, QWidget, QToolButton, QAction
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
-from qgis.core import Qgis, QgsCoordinateReferenceSystem, QgsMapLayer, QgsVectorLayer, QgsRasterLayer, \
+from qgis.core import Qgis, QgsMessageLog, QgsCoordinateReferenceSystem, QgsMapLayer, QgsVectorLayer, QgsRasterLayer, \
     QgsProject, QgsReadWriteContext, \
     QgsLayerTreeLayer, QgsLayerTreeNode, QgsLayerTreeGroup, \
     QgsLayerTreeModelLegendNode, QgsLayerTree, QgsLayerTreeModel, QgsLayerTreeUtils, \
@@ -1536,6 +1536,8 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
 
         viewNode = findParent(node, DockTreeNode, checkInstance=True)
 
+        errors: List[ModuleNotFoundError] = []
+
         menu = QMenu()
         menu.setToolTipsVisible(True)
 
@@ -1569,21 +1571,36 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
             lyr = node.layer()
 
             if isinstance(lyr, QgsMapLayer):
-                self.addMapLayerMenuItems(node, menu, canvas, selectedLayerNodes)
+                try:
+                    self.addMapLayerMenuItems(node, menu, canvas, selectedLayerNodes)
+                except ModuleNotFoundError as ex:
+                    errors.append(ex)
 
             if isinstance(lyr, QgsVectorLayer):
-                self.addVectorLayerMenuItems(node, menu)
+                try:
+                    self.addVectorLayerMenuItems(node, menu)
+                except ModuleNotFoundError as ex:
+                    errors.append(ex)
 
             if isinstance(lyr, QgsRasterLayer):
-                self.addRasterLayerMenuItems(node, menu)
+                try:
+                    self.addRasterLayerMenuItems(node, menu)
+                except ModuleNotFoundError as ex:
+                    errors.append(ex)
 
         elif isinstance(node, DockTreeNode):
             assert isinstance(node.dock, Dock)
-            node.dock.populateContextMenu(menu)
+            try:
+                node.dock.populateContextMenu(menu)
+            except ModuleNotFoundError as ex:
+                errors.append(ex)
 
         elif isinstance(node, LayerTreeNode):
             if col == 0:
-                node.populateContextMenu(menu)
+                try:
+                    node.populateContextMenu(menu)
+                except ModuleNotFoundError as ex:
+                    errors.append(ex)
             elif col == 1:
                 a = menu.addAction('Copy')
                 a.triggered.connect(lambda *args, n=node: QApplication.clipboard().setText('{}'.format(n.value())))
@@ -1591,7 +1608,10 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         # last chance to add other menu actions
         # self.mSignals.sigPopulateContextMenu.emit(menu)
         if isinstance(self.mDockTreeView, DockTreeView):
-            self.mDockTreeView.sigPopulateContextMenu.emit(menu)
+            try:
+                self.mDockTreeView.sigPopulateContextMenu.emit(menu)
+            except ModuleNotFoundError as ex:
+                errors.append(ex)
 
         # let layer properties always be the last menu item
         if isinstance(lyr, QgsMapLayer):
@@ -1599,6 +1619,19 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
             action = menu.addAction('Layer properties')
             action.setToolTip('Set layer properties')
             action.triggered.connect(lambda *args, l=lyr, c=canvas: self.showLayerProperties(l, c))
+
+        if len(errors) > 0:
+            # show warning for missing modules
+            missing = []
+            for ex in errors:
+                if isinstance(ex, ModuleNotFoundError):
+                    missing.append(ex.name)
+            if len(missing) > 0:
+                msg = 'Failed to create full layer context menu ' \
+                      'due to the following missing packages: {}'.format(','.join(missing))
+
+                messageLog(msg)
+                QgsMessageLog.logMessage(msg, level=Qgis.MessageLevel.Warning)
 
         return menu
 
@@ -1695,56 +1728,65 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
 
         menu.addSeparator()
         # add processing algorithm & application shortcuts
+        submenu = menu.addMenu(QIcon(':/images/themes/default/styleicons/color.svg'), 'Statistics and Visualization')
+
         from bandstatisticsapp import BandStatisticsApp
-        action = menu.addAction(BandStatisticsApp.title())
+        action = submenu.addAction(BandStatisticsApp.title())
         action.setIcon(BandStatisticsApp.icon())
         action.triggered.connect(lambda: self.onBandStatisticsClicked(lyr))
-        if lyr.bandCount() >= 2:
-            from scatterplotapp import ScatterPlotApp
-            action = menu.addAction(ScatterPlotApp.title())
-            action.setIcon(ScatterPlotApp.icon())
-            action.triggered.connect(lambda: self.onScatterPlotClicked(lyr))
-        if lyr.bandCount() >= 3:
-            from colorspaceexplorerapp import ColorSpaceExplorerApp
-            action = menu.addAction(ColorSpaceExplorerApp.title())
-            action.setIcon(ColorSpaceExplorerApp.icon())
-            action.triggered.connect(lambda: self.onColorSpaceExplorerClicked(lyr))
 
+        if lyr.bandCount() >= 2:
+            from bivariatecolorrasterrendererapp import BivariateColorRasterRendererApp
+            action: QAction = submenu.addAction(BivariateColorRasterRendererApp.title())
+            action.setIcon(BivariateColorRasterRendererApp.icon())
+            action.triggered.connect(lambda: self.onBivariateColorRasterRendererClicked(lyr))
+
+        from classfractionstatisticsapp import ClassFractionStatisticsApp
+        action: QAction = submenu.addAction(ClassFractionStatisticsApp.title())
+        action.setIcon(ClassFractionStatisticsApp.icon())
+        action.triggered.connect(lambda: self.onClassFractionStatisticsClicked(lyr))
+
+        if isinstance(lyr.renderer(), QgsPalettedRasterRenderer):
+            from classificationstatisticsapp import ClassificationStatisticsApp
+            action = submenu.addAction(ClassificationStatisticsApp.title())
+            action.setIcon(ClassificationStatisticsApp.icon())
+            action.triggered.connect(lambda: self.onClassificationStatisticsClicked(lyr))
+
+        if lyr.bandCount() >= 3:
             from cmykcolorrasterrendererapp import CmykColorRasterRendererApp
-            action = menu.addAction(CmykColorRasterRendererApp.title())
+            action = submenu.addAction(CmykColorRasterRendererApp.title())
             action.setIcon(CmykColorRasterRendererApp.icon())
             action.triggered.connect(lambda: self.onCmykColorRasterRendererClicked(lyr))
 
+        if lyr.bandCount() >= 3:
+            from colorspaceexplorerapp import ColorSpaceExplorerApp
+            action = submenu.addAction(ColorSpaceExplorerApp.title())
+            action.setIcon(ColorSpaceExplorerApp.icon())
+            action.triggered.connect(lambda: self.onColorSpaceExplorerClicked(lyr))
+
+        if lyr.bandCount() >= 3:
+            from decorrelationstretchapp import DecorrelationStretchApp
+            action: QAction = submenu.addAction(DecorrelationStretchApp.title())
+            action.setIcon(DecorrelationStretchApp.icon())
+            action.triggered.connect(lambda: self.onDecorrelationStretchClicked(lyr))
+
+        if lyr.bandCount() >= 3:
             from hsvcolorrasterrendererapp import HsvColorRasterRendererApp
-            action = menu.addAction(HsvColorRasterRendererApp.title())
+            action = submenu.addAction(HsvColorRasterRendererApp.title())
             action.setIcon(HsvColorRasterRendererApp.icon())
             action.triggered.connect(lambda: self.onHsvColorRasterRendererClicked(lyr))
 
         if lyr.bandCount() >= 1:
             from multisourcemultibandcolorrendererapp import MultiSourceMultiBandColorRendererApp
-            action = menu.addAction(MultiSourceMultiBandColorRendererApp.title())
+            action = submenu.addAction(MultiSourceMultiBandColorRendererApp.title())
             action.setIcon(MultiSourceMultiBandColorRendererApp.icon())
             action.triggered.connect(lambda: self.onMultiSourceMultiBandColorRendererClicked(lyr))
 
-        if isinstance(lyr.renderer(), QgsPalettedRasterRenderer):
-            from classificationstatisticsapp import ClassificationStatisticsApp
-            action = menu.addAction(ClassificationStatisticsApp.title())
-            action.setIcon(ClassificationStatisticsApp.icon())
-            action.triggered.connect(lambda: self.onClassificationStatisticsClicked(lyr))
-        from classfractionstatisticsapp import ClassFractionStatisticsApp
-        action: QAction = menu.addAction(ClassFractionStatisticsApp.title())
-        action.setIcon(ClassFractionStatisticsApp.icon())
-        action.triggered.connect(lambda: self.onClassFractionStatisticsClicked(lyr))
-        if lyr.bandCount() >= 3:
-            from decorrelationstretchapp import DecorrelationStretchApp
-            action: QAction = menu.addAction(DecorrelationStretchApp.title())
-            action.setIcon(DecorrelationStretchApp.icon())
-            action.triggered.connect(lambda: self.onDecorrelationStretchClicked(lyr))
         if lyr.bandCount() >= 2:
-            from bivariatecolorrasterrendererapp import BivariateColorRasterRendererApp
-            action: QAction = menu.addAction(BivariateColorRasterRendererApp.title())
-            action.setIcon(BivariateColorRasterRendererApp.icon())
-            action.triggered.connect(lambda: self.onBivariateColorRasterRendererClicked(lyr))
+            from scatterplotapp import ScatterPlotApp
+            action = submenu.addAction(ScatterPlotApp.title())
+            action.setIcon(ScatterPlotApp.icon())
+            action.triggered.connect(lambda: self.onScatterPlotClicked(lyr))
 
         # add apply model shortcuts
         from enmapbox import EnMAPBox
@@ -1967,7 +2009,8 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
     @typechecked
     def onMultiSourceMultiBandColorRendererClicked(self, layer: QgsRasterLayer):
         from multisourcemultibandcolorrendererapp import MultiSourceMultiBandColorRendererDialog
-        self.multiSourceMultiBandColorRendererDialog = MultiSourceMultiBandColorRendererDialog(parent=self.mDockTreeView)
+        self.multiSourceMultiBandColorRendererDialog = MultiSourceMultiBandColorRendererDialog(
+            parent=self.mDockTreeView)
         self.multiSourceMultiBandColorRendererDialog.show()
         self.multiSourceMultiBandColorRendererDialog.mLayer1.setLayer(layer)
         self.multiSourceMultiBandColorRendererDialog.mLayer2.setLayer(layer)

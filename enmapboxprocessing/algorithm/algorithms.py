@@ -405,6 +405,7 @@ def algorithms():
         WriteEnviHeaderAlgorithm()
     ]
 
-    algos.append(MyAlgorithm())
+    if False:
+        algos.append(MyAlgorithm())
 
     return algos

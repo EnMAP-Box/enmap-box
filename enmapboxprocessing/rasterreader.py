@@ -8,7 +8,7 @@ from enmapboxprocessing.gridwalker import GridWalker
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.typing import RasterSource, Array3d, Metadata, MetadataValue, MetadataDomain
 from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtCore import QSizeF, QDateTime
+from qgis.PyQt.QtCore import QSizeF, QDateTime, QDate
 from qgis.PyQt.QtGui import QColor
 from qgis.core import (QgsRasterLayer, QgsRasterDataProvider, QgsCoordinateReferenceSystem, QgsRectangle,
                        QgsRasterRange, QgsPoint, QgsRasterBlockFeedback, QgsRasterBlock, QgsPointXY,
@@ -47,6 +47,7 @@ class RasterReader(object):
                 gdalDataset = None
 
         self.gdalDataset = gdalDataset
+        assert self.gdalDataset is not None
 
     def bandCount(self) -> int:
         """Return iterator over all band numbers."""
@@ -534,10 +535,11 @@ class RasterReader(object):
         if bandNo is not None:
 
             # special handling: FORCE TSI raster
-            enviDescription = self.metadataItem('description', 'ENVI')[0]
-            if enviDescription.startswith('FORCE') and enviDescription.endswith('Time Series Analysis'):
-                decimalYear = float(self.metadataItem('wavelength', '', bandNo))
-                return Utils.decimalYearToDateTime(decimalYear)
+            enviDescription = self.metadataItem('description', 'ENVI')
+            if enviDescription is not None:
+                if enviDescription[0].startswith('FORCE') and enviDescription[0].endswith('Time Series Analysis'):
+                    decimalYear = float(self.metadataItem('wavelength', '', bandNo))
+                    return Utils.decimalYearToDateTime(decimalYear)
 
             # check band-level default-domain
             dateTime = self.metadataItem('start_time', '', bandNo)
@@ -545,11 +547,21 @@ class RasterReader(object):
             if dateTime is not None:
                 return Utils.parseDateTime(dateTime)
 
-            # check band-level FORCE-domain (see GitHub-issue #9)
+            # check band-level FORCE-domain (see #9)
             dateTime = self.metadataItem('Date', 'FORCE', bandNo)
 
             if dateTime is not None:
                 return Utils.parseDateTime(dateTime)
+
+            # check band-level default-domain for NETCDF_DIM_time (see #251)
+            dateTime = self.metadataItem('NETCDF_DIM_time', '', bandNo)
+
+            if dateTime is not None:
+                dateTimeUnit = self.metadataItem('time#units')
+                if dateTimeUnit == 'days since 1970-1-1':
+                    return QDateTime(QDate(1970, 1, 1)).addDays(int(dateTime))
+                else:
+                    raise NotImplementedError(dateTimeUnit)
 
         # check dataset-level default-domain
         dateTime = self.metadataItem('start_time')

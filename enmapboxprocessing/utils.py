@@ -24,7 +24,7 @@ from qgis.core import (QgsRasterBlock, QgsProcessingFeedback, QgsPalettedRasterR
                        QgsMultiBandColorRenderer, QgsContrastEnhancement, QgsSingleBandPseudoColorRenderer,
                        QgsRasterShader, QgsColorRampShader, QgsColorRamp, QgsSingleBandGrayRenderer,
                        QgsSingleCategoryDiagramRenderer, QgsGraduatedSymbolRenderer,
-                       QgsProcessingUtils
+                       QgsProcessingUtils, QgsGeometry
                        )
 from qgis.gui import QgsMapCanvas
 from typeguard import typechecked
@@ -418,6 +418,71 @@ class Utils(object):
         raise ValueError('invalid color')
 
     @classmethod
+    def parseSpatialPoint(cls, obj) -> Optional['SpatialPoint']:
+        from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
+
+        error = ValueError(f'invalid spatial point: {obj}')
+        if obj is None:
+            return None
+
+        if isinstance(obj, SpatialPoint):
+            return obj
+
+        if isinstance(obj, str):
+            items: List[str] = [v for v in obj.replace(' ', ',').split(',') if len(v) > 1]
+            if len(items) == 2:
+                lon, lat = items
+                try:
+                    return SpatialPoint(QgsCoordinateReferenceSystem.fromEpsgId(4326), float(lat), float(lon))
+                except Exception:
+                    pass
+                try:
+                    def conversion(
+                            old):  # adopted from https://stackoverflow.com/questions/10852955/python-batch-convert-gps-positions-to-lat-lon-decimals
+                        direction = {'N': 1, 'S': -1, 'E': 1, 'W': -1}
+                        new = old.replace(u'°', ' ').replace('\'', ' ').replace('"', ' ')
+                        new = new.split()
+                        new_dir = new.pop()
+                        new.extend([0, 0, 0])
+                        return (int(new[0]) + int(new[1]) / 60.0 + float(new[2]) / 3600.0) * direction[new_dir]
+
+                    return SpatialPoint(QgsCoordinateReferenceSystem.fromEpsgId(4326), conversion(lat), conversion(lon))
+                except Exception:
+                    pass
+            if len(items) == 3:
+                lat, lon, epsgId = items
+                if epsgId.upper().startswith('[EPSG:'):
+                    epsgId = int(epsgId[6:-1])
+                    return SpatialPoint(QgsCoordinateReferenceSystem.fromEpsgId(epsgId), float(lat), float(lon))
+
+        raise error
+
+    @classmethod
+    def parseSpatialExtent(cls, obj) -> Optional['SpatialExtent']:
+        from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
+
+        error = ValueError(f'invalid spatial extent: {obj}')
+        if obj is None:
+            return None
+
+        if isinstance(obj, SpatialExtent):
+            return obj
+
+        if isinstance(obj, str):
+            items: List[str] = obj.split('[')
+            if len(items) == 1:
+                wkt = items[0]
+                geometry = QgsGeometry.fromWkt(wkt)
+                return SpatialExtent(QgsCoordinateReferenceSystem.fromEpsgId(4326), geometry.boundingBox())
+            if len(items) == 2:
+                wkt, epsgId = items
+                if epsgId.upper().startswith('EPSG:') and epsgId.strip().endswith(']'):
+                    epsgId = int(epsgId.strip()[5:-1])
+                    geometry = QgsGeometry.fromWkt(wkt)
+                    return SpatialExtent(QgsCoordinateReferenceSystem.fromEpsgId(epsgId), geometry.boundingBox())
+        raise error
+
+    @classmethod
     def parseDateTime(cls, obj) -> QDateTime:
         if isinstance(obj, QDateTime):
             return obj
@@ -528,7 +593,7 @@ class Utils(object):
     def tmpFilename(cls, root: str, basename_: str):
         """Create a temp-filename relative to root."""
         tmpDirname = join(dirname(root), f'_temp_{basename(root)}')
-        if not exists(tmpDirname):
+        if not exists(tmpDirname) and not tmpDirname.startswith('/vsimem/'):
             makedirs(tmpDirname)
         tmpFilename = join(tmpDirname, basename_)
         return tmpFilename

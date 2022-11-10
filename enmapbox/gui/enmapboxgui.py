@@ -20,18 +20,16 @@ import os
 import pathlib
 import re
 import sys
+import traceback
 import typing
 import warnings
 from typing import Optional, Dict, Union, Any, List
-
-from typeguard import typechecked
 
 import enmapbox
 import enmapbox.gui.datasources.manager
 import qgis.utils
 from enmapbox import messageLog, debugLog, DEBUG
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
-from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, loadUi, SpatialExtent, file_search
 from enmapbox.gui.dataviews.dockmanager import DockManagerTreeModel, MapDockTreeNode
 from enmapbox.gui.dataviews.docks import SpectralLibraryDock, Dock, AttributeTableDock, MapDock
 from enmapbox.qgispluginsupport.qps.cursorlocationvalue import CursorLocationInfoDock
@@ -42,6 +40,7 @@ from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import Spe
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprofilesources import SpectralProfileSourcePanel, \
     MapCanvasLayerProfileSource
 from enmapbox.qgispluginsupport.qps.subdatasets import SubDatasetSelectionDialog
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, loadUi, SpatialExtent, file_search
 from enmapboxprocessing.algorithm.importdesisl1balgorithm import ImportDesisL1BAlgorithm
 from enmapboxprocessing.algorithm.importdesisl1calgorithm import ImportDesisL1CAlgorithm
 from enmapboxprocessing.algorithm.importdesisl2aalgorithm import ImportDesisL2AAlgorithm
@@ -80,6 +79,7 @@ from qgis.gui import QgsMapCanvas, QgisInterface, QgsMessageBar, QgsMessageViewe
     QgsSymbolWidgetContext
 from qgis.gui import QgsProcessingAlgorithmDialogBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog, \
     QgsNewVectorLayerDialog, QgsProcessingContextGenerator
+from typeguard import typechecked
 from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
 from .dataviews.docks import DockTypes
 from .mapcanvas import MapCanvas
@@ -204,9 +204,9 @@ class EnMAPBoxUI(QMainWindow):
 
         self.setWindowTitle('EnMAP-Box 3 ({})'.format(enmapbox.__version__))
 
-        # add a toolbar for EnMAP-Box Plugins
-        self.mPluginsToolbar = QToolBar('Plugins Toolbar')
-        self.addToolBar(self.mPluginsToolbar)
+        # add a toolbar for EO4Q apps
+        self.mEo4qToolbar = QToolBar('Earth Observation for QGIS (EO4Q)')
+        self.addToolBar(self.mEo4qToolbar)
 
     def addDockWidget(self, *args, **kwds):
         super(EnMAPBoxUI, self).addDockWidget(*args, **kwds)
@@ -392,8 +392,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     sigClosed = pyqtSignal()
 
-    sigCurrentLocationChanged = pyqtSignal([SpatialPoint],
-                                           [SpatialPoint, QgsMapCanvas])
+    #sigCurrentLocationChanged = pyqtSignal([SpatialPoint], [SpatialPoint, QgsMapCanvas])
+    sigCurrentLocationChanged = pyqtSignal(list)
 
     sigCurrentSpectraChanged = pyqtSignal(list)
 
@@ -548,6 +548,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         self.ui.actionShowResourceBrowser.triggered.connect(self.showResourceBrowser)
         m.addAction(self.ui.actionShowResourceBrowser)
+
+        a: QAction = m.addAction('Recource Gallery')
+        a.setIcon(QIcon())
+        a.triggered.connect(self.onRecourceGallery)
 
         a: QAction = m.addAction('Remove non-EnMAP-Box layers from project')
         a.setIcon(QIcon(':/images/themes/default/mActionRemoveLayer.svg'))
@@ -757,6 +761,11 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         browser = showResources()
         browser.setWindowTitle('Resource Browser')
         self._browser = browser
+
+    def onRecourceGallery(self):
+        from resourcegalleryapp.resourcegallery import ResourceGalleryDialog
+        self._resourceGalleryDialog = ResourceGalleryDialog()
+        self._resourceGalleryDialog.show()
 
     def onRemoveNoneEnMAPBoxLayerFromProject(self):
         """Remove non-EnMAP-Box layers from project (see #973)."""
@@ -1865,9 +1874,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.mCurrentMapLocation = spatialPoint
 
         if emitSignal:
-            self.sigCurrentLocationChanged[SpatialPoint].emit(self.mCurrentMapLocation)
+            self.sigCurrentLocationChanged.emit([self.mCurrentMapLocation])
             if isinstance(mapCanvas, QgsMapCanvas):
-                self.sigCurrentLocationChanged[SpatialPoint, QgsMapCanvas].emit(self.mCurrentMapLocation, mapCanvas)
+                self.sigCurrentLocationChanged.emit([self.mCurrentMapLocation, mapCanvas])
 
         if isinstance(mapCanvas, QgsMapCanvas):
             if bCLV:
@@ -2227,15 +2236,11 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
     def actionZoomOut(self):
         return self.ui.mActionZoomOut
 
-    def showProcessingAlgorithmDialog(self,
-                                      algorithmName: Union[str, QgsProcessingAlgorithm],
-                                      parameters: Dict = None,
-                                      show: bool = True,
-                                      modal: bool = False,
-                                      wrapper: type = None,
-                                      autoRun: bool = False,
-                                      parent: QWidget = None
-                                      ) -> AlgorithmDialog:
+    @staticmethod
+    def showProcessingAlgorithmDialog(
+            algorithmName: Union[str, QgsProcessingAlgorithm], parameters: Dict = None, show: bool = True,
+            modal: bool = False, wrapper: type = None, autoRun: bool = False, parent: QWidget = None
+    ) -> AlgorithmDialog:
         """
         Create an algorithm dialog.
 
@@ -2252,7 +2257,17 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         """
         if parent is None:
-            parent = self.ui
+            from enmapbox import EnMAPBox
+            if EnMAPBox.instance() is not None:
+                parent = EnMAPBox.instance().ui
+
+        if parent is None:
+            from qgis.utils import iface
+            if iface is not None:
+                parent = iface.mapCanvas()
+
+        if parent is None:
+            raise ValueError()
 
         algorithm = None
         all_names = []

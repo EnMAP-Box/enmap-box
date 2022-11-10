@@ -430,7 +430,7 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
                         continue
                     i += 1
                     data = f'{name} ({field.typeName()})'
-                    item = VectorBandItem([f'@{Utils.makeIdentifier(name)}', data])
+                    item = VectorBandItem([f'@"{Utils.makeIdentifier(name)}"', data])
                     item.layerItem = layerItem
                     item.layer = layer
                     item.field = name

@@ -12,7 +12,7 @@ from geetimeseriesexplorerapp.maptool import MapTool
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
-from qgis.core import QgsRasterLayer, QgsRectangle
+from qgis.core import QgsRasterLayer, QgsRectangle, QgsProject
 from qgis.gui import QgisInterface
 from typeguard import typechecked
 
@@ -71,7 +71,7 @@ class GeeTimeseriesExplorerApp(EnMAPBoxApplication):
         self.mainDock.hide()
 
         if self.isEnmapInterface:
-            interface.ui.mPluginsToolbar.addAction(self.actionToggleMainDock)
+            interface.ui.mEo4qToolbar.addAction(self.actionToggleMainDock)
         else:
             interface.addToolBarIcon(self.actionToggleMainDock)
 
@@ -102,6 +102,10 @@ class GeeTimeseriesExplorerApp(EnMAPBoxApplication):
         if isinstance(self.interface, EnMAPBox):
             if len(self.enmapbox.docks(DockTypes.MapDock)) == 0:
                 self.newEnmapBoxMapView()
+        else:
+            from qgis.utils import iface
+            if iface.mapCanvas().layerCount() == 0:
+                QgsProject.instance().addMapLayer(self.backgroundLayer.clone())
 
     def newEnmapBoxMapView(self):
         currentMapDock = self.enmapbox.currentMapDock()

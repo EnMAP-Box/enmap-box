@@ -21,7 +21,7 @@ class ColorSpaceExplorerApp(EnMAPBoxApplication):
 
     @classmethod
     def icon(cls):
-        return QIcon(':/images/themes/default/styleicons/color.svg')
+        return QIcon(':/images/themes/default/propertyicons/symbology.svg')
 
     @classmethod
     def title(cls):

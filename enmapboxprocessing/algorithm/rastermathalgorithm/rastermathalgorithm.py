@@ -203,7 +203,7 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
                 vectors[vectorName] = vector
 
             # get all hard coded vector layer from comments
-            # <name> := QgsVectorLayer(<uri>), <field name>
+            # <name> := QgsVectorLayer(<uri>)
             for line in code.splitlines():
                 if line.strip().startswith('#') and ':=' in line:
                     layerName, value = line.split(':=')
@@ -285,10 +285,14 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
             if overlap is None:
                 overlap = 0
             for block in grid.walkGrid(blockSizeX, blockSizeY, feedback):
+
                 results = self.processBlock(
                     code, block, readers, readers2, writers, floatInput, overlap, feedback
                 )
                 for key in results:
+                    if self.isTemporaryVariable(key):
+                        continue
+
                     writer = writers[key]
                     result = results[key]
                     writer.writeArray(result, block.xOffset, block.yOffset, overlap=overlap)
@@ -321,11 +325,17 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
                     identifier = substring.split('.')[0]
                     writers[identifier] = Mock()  # silently ignore all writer interaction
 
+        results = {}
         for block in grid.walkGrid(1, 1, None):
             results = self.processBlock(code, block, readers, readers2, writers, floatInput, 0, feedback, dryRun=True)
             break  # stop after processing the first pixel
 
+        for name in list(results.keys()):
+            if self.isTemporaryVariable(name):
+                results.pop(name)
+
         for name, result in results.items():
+
             if name == self.P_OUTPUT_RASTER:
                 newFilename = filename
             else:
@@ -410,6 +420,7 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
             #  find single band usages indicated by '@'
             atBands: Dict[Tuple, List[str]] = defaultdict(list)
             match_: Match
+
             for line in code.splitlines():
                 if line.startswith('#'):
                     continue
@@ -569,3 +580,6 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
         if isSingleLineCode and len(results) > 1:
             results.pop(self.P_OUTPUT_RASTER)
         return results
+
+    def isTemporaryVariable(self, name) -> bool:
+        return name.startswith('_') or name.endswith('_') or name.startswith('tmp') or name.startswith('temp')
