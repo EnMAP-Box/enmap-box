@@ -20,6 +20,7 @@ import os
 import pathlib
 import re
 import sys
+import traceback
 import typing
 import warnings
 from typing import Optional, Dict, Union, Any, List
@@ -391,8 +392,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     sigClosed = pyqtSignal()
 
-    sigCurrentLocationChanged = pyqtSignal([SpatialPoint],
-                                           [SpatialPoint, QgsMapCanvas])
+    #sigCurrentLocationChanged = pyqtSignal([SpatialPoint], [SpatialPoint, QgsMapCanvas])
+    sigCurrentLocationChanged = pyqtSignal(list)
 
     sigCurrentSpectraChanged = pyqtSignal(list)
 
@@ -1873,9 +1874,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.mCurrentMapLocation = spatialPoint
 
         if emitSignal:
-            self.sigCurrentLocationChanged[SpatialPoint].emit(self.mCurrentMapLocation)
+            self.sigCurrentLocationChanged.emit([self.mCurrentMapLocation])
             if isinstance(mapCanvas, QgsMapCanvas):
-                self.sigCurrentLocationChanged[SpatialPoint, QgsMapCanvas].emit(self.mCurrentMapLocation, mapCanvas)
+                self.sigCurrentLocationChanged.emit([self.mCurrentMapLocation, mapCanvas])
 
         if isinstance(mapCanvas, QgsMapCanvas):
             if bCLV:
