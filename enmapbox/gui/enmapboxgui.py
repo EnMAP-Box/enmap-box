@@ -391,6 +391,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     sigClosed = pyqtSignal()
 
+    # see https://github.com/qgis/QGIS/issues/50893
+    # should be pyqtSignal([SpatialPoint], [SpatialPoint, QgsMapCanvas])
     sigCurrentLocationChanged = pyqtSignal([object], [object, QgsMapCanvas])
 
     sigCurrentSpectraChanged = pyqtSignal(list)
