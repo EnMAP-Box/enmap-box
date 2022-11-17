@@ -210,7 +210,7 @@ class Examples(unittest.TestCase):
         def printLocationAndCanvas(spatialPoint: SpatialPoint, canvas: QgsMapCanvas):
             print('Mouse clicked on {} in {}'.format(spatialPoint, canvas))
 
-        enmapBox.sigCurrentLocationChanged[SpatialPoint, QgsMapCanvas].connect(printLocationAndCanvas)
+        enmapBox.sigCurrentLocationChanged[object, QgsMapCanvas].connect(printLocationAndCanvas)
 
         def printSpectralProfiles(currentSpectra: list):
             print('{} SpectralProfiles collected'.format(len(currentSpectra)))

@@ -20,10 +20,11 @@ import os
 import pathlib
 import re
 import sys
-import traceback
 import typing
 import warnings
 from typing import Optional, Dict, Union, Any, List
+
+from typeguard import typechecked
 
 import enmapbox
 import enmapbox.gui.datasources.manager
@@ -79,7 +80,6 @@ from qgis.gui import QgsMapCanvas, QgisInterface, QgsMessageBar, QgsMessageViewe
     QgsSymbolWidgetContext
 from qgis.gui import QgsProcessingAlgorithmDialogBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog, \
     QgsNewVectorLayerDialog, QgsProcessingContextGenerator
-from typeguard import typechecked
 from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
 from .dataviews.docks import DockTypes
 from .mapcanvas import MapCanvas
@@ -392,8 +392,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     sigClosed = pyqtSignal()
 
-    #sigCurrentLocationChanged = pyqtSignal([SpatialPoint], [SpatialPoint, QgsMapCanvas])
-    sigCurrentLocationChanged = pyqtSignal(list)
+    # see https://github.com/qgis/QGIS/issues/50893
+    # should be pyqtSignal([SpatialPoint], [SpatialPoint, QgsMapCanvas])
+    sigCurrentLocationChanged = pyqtSignal([object], [object, QgsMapCanvas])
 
     sigCurrentSpectraChanged = pyqtSignal(list)
 
@@ -1874,9 +1875,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.mCurrentMapLocation = spatialPoint
 
         if emitSignal:
-            self.sigCurrentLocationChanged.emit([self.mCurrentMapLocation])
+            self.sigCurrentLocationChanged[object].emit(self.mCurrentMapLocation)
             if isinstance(mapCanvas, QgsMapCanvas):
-                self.sigCurrentLocationChanged.emit([self.mCurrentMapLocation, mapCanvas])
+                self.sigCurrentLocationChanged[object, QgsMapCanvas].emit(self.mCurrentMapLocation, mapCanvas)
 
         if isinstance(mapCanvas, QgsMapCanvas):
             if bCLV:
