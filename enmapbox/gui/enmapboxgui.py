@@ -20,10 +20,11 @@ import os
 import pathlib
 import re
 import sys
-import traceback
 import typing
 import warnings
 from typing import Optional, Dict, Union, Any, List
+
+from typeguard import typechecked
 
 import enmapbox
 import enmapbox.gui.datasources.manager
@@ -79,7 +80,6 @@ from qgis.gui import QgsMapCanvas, QgisInterface, QgsMessageBar, QgsMessageViewe
     QgsSymbolWidgetContext
 from qgis.gui import QgsProcessingAlgorithmDialogBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog, \
     QgsNewVectorLayerDialog, QgsProcessingContextGenerator
-from typeguard import typechecked
 from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
 from .dataviews.docks import DockTypes
 from .mapcanvas import MapCanvas
