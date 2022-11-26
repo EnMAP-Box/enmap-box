@@ -879,9 +879,6 @@ class MapDock(Dock):
     """
     A dock to visualize geodata that can be mapped
     """
-    # sigCursorLocationValueRequest = pyqtSignal(QgsPoint, QgsRectangle, float, QgsRectangle)
-    # sigCursorLocationRequest = pyqtSignal(SpatialPoint)
-    # sigSpectrumRequest = pyqtSignal(SpatialPoint)
 
     ISSUE_1344_REFERENCES: List[MapCanvas] = []
 
