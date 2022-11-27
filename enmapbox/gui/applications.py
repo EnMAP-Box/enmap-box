@@ -26,7 +26,7 @@ import site
 import sys
 import traceback
 import typing
-from typing import Optional
+from typing import Optional, List, Union
 
 from enmapbox import messageLog
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
@@ -118,7 +118,7 @@ class EnMAPBoxApplication(QObject):
         """
         raise Exception('Use "processingAlgorithms" instead.')
 
-    def processingAlgorithms(self) -> list:
+    def processingAlgorithms(self) -> List[QgsProcessingAlgorithm]:
 
         return []
 
@@ -197,14 +197,14 @@ class ApplicationRegistry(QObject):
     def __iter__(self):
         return iter(self.mAppWrapper.values())
 
-    def applications(self) -> list:
+    def applications(self) -> List[EnMAPBoxApplication]:
         """
         Returns the EnMAPBoxApplications
         :return: [list-of-EnMAPBoxApplications]
         """
         return [w.app for w in self.applicationWrapper()]
 
-    def applicationWrapper(self, nameOrApp=None) -> list:
+    def applicationWrapper(self, nameOrApp:Union[str, EnMAPBoxApplication] = None) -> List[ApplicationWrapper]:
         """
         Returns the EnMAPBoxApplicationWrappers.
         :param nameOrApp: str | EnMAPBoxApplication to return the ApplicationWrapper for
@@ -216,7 +216,7 @@ class ApplicationRegistry(QObject):
                         isinstance(w, ApplicationWrapper) and nameOrApp in [w.appId, w.app.name, w.app]]
         return wrappers
 
-    def addApplicationListing(self, path: str):
+    def addApplicationListing(self, path: Union[str, pathlib.Path]):
         """
         Loads EnMAPBoxApplications from locations defined in a text file
         :param path: str, filepath to file with locations of EnMAPBoxApplications
@@ -240,7 +240,7 @@ class ApplicationRegistry(QObject):
         for app_folder in app_folders:
             self.addApplicationFolder(app_folder)
 
-    def isApplicationFolder(self, path: pathlib.Path) -> bool:
+    def isApplicationFolder(self, path: Union[str, pathlib.Path]) -> bool:
         """
         Checks if the directory "appPackage" contains an '__init__.py' with an enmapboxApplicationFactory
         :param appPackage: path to directory
@@ -264,7 +264,7 @@ class ApplicationRegistry(QObject):
         return re.search(r'def\s+enmapboxApplicationFactory\(.+\)\s*(->[^:]+)?:', lines) is not None
 
     def findApplicationFolders(self,
-                               rootDir: pathlib.Path,
+                               rootDir: Union[str, pathlib.Path],
                                max_deep: int = 2) -> typing.List[pathlib.Path]:
         """
         Searches for folders that contain an EnMAPBoxApplication
@@ -287,7 +287,7 @@ class ApplicationRegistry(QObject):
                     )
             return results
 
-    def addApplicationFolder(self, app_folder: pathlib.Path) -> bool:
+    def addApplicationFolder(self, app_folder: Union[str, pathlib.Path]) -> bool:
         """
         Loads EnMAP-Box application from ann application folder.
         Searches in folder and each sub-folder for EnMAP-Box Applications

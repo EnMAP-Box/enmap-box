@@ -39,7 +39,8 @@ from .qgispluginsupport.qps.testing import TestObjects, TestCase
 
 SHOW_GUI = True
 
-
+from .qgispluginsupport.qps.testing import stop_app
+stop_app = stop_app
 def start_app(*args, **kwds) -> QgsApplication:
     """
     Initializes a QGIS Environment
