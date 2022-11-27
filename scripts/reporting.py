@@ -3,20 +3,17 @@ This scripts generates some reports stats related to the EnMAP-Box repository
 """
 import csv
 import datetime
+import inspect
 import json
 import os
 import pathlib
 import re
-import inspect
 import urllib.request
 
 import pandas as pd
-import requests
-from PyQt5.QtWidgets import QMenu
-from PyQt5.QtXml import QDomDocument
+from qgis.PyQt.QtWidgets import QMenu
 from xlsxwriter.workbook import Workbook
 
-import enmapbox.testing
 from enmapbox import DIR_REPO_TMP, EnMAPBox, EnMAPBoxApplication
 from enmapbox import initAll
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
@@ -41,7 +38,6 @@ def linesOfCode(path) -> int:
 def report_downloads() -> pd.DataFrame:
     url = r'https://plugins.qgis.org/plugins/enmapboxplugin'
 
-    import urllib.request
     hdr = {'User-agent': 'Mozilla/5.0'}
     req = urllib.request.Request(url, headers=hdr)
     response = urllib.request.urlopen(req)

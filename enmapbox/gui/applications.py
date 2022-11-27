@@ -204,7 +204,7 @@ class ApplicationRegistry(QObject):
         """
         return [w.app for w in self.applicationWrapper()]
 
-    def applicationWrapper(self, nameOrApp:Union[str, EnMAPBoxApplication] = None) -> List[ApplicationWrapper]:
+    def applicationWrapper(self, nameOrApp: Union[str, EnMAPBoxApplication] = None) -> List[ApplicationWrapper]:
         """
         Returns the EnMAPBoxApplicationWrappers.
         :param nameOrApp: str | EnMAPBoxApplication to return the ApplicationWrapper for

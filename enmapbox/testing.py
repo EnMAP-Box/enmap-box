@@ -36,11 +36,12 @@ from qgis.gui import QgsPluginManagerInterface
 
 from .gui.enmapboxgui import EnMAPBox
 from .qgispluginsupport.qps.testing import TestObjects, TestCase
+from .qgispluginsupport.qps.testing import stop_app
 
 SHOW_GUI = True
-
-from .qgispluginsupport.qps.testing import stop_app
 stop_app = stop_app
+
+
 def start_app(*args, **kwds) -> QgsApplication:
     """
     Initializes a QGIS Environment
