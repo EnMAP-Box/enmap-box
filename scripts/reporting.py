@@ -16,7 +16,13 @@ from enmapbox import DIR_REPO_TMP, EnMAPBox
 from enmapbox import initAll
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
 from enmapbox.testing import start_app
-from qgis._core import QgsProcessingAlgorithm
+from qgis.core import QgsProcessingOutputRasterLayer, QgsProcessingParameterBoolean, QgsProcessingOutputHtml, \
+    QgsProcessingParameterFeatureSink, QgsProcessingOutputFile, QgsProcessingParameterFeatureSource, \
+    QgsProcessingOutputVectorLayer, QgsProcessingParameterFolderDestination, QgsProcessingOutputFolder, \
+    QgsProcessingParameterMultipleLayers, QgsProcessing
+from qgis.core import QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer, QgsProcessingParameterVectorLayer, \
+    QgsProcessingParameterMapLayer, QgsProcessingParameterEnum, QgsProcessingParameterRasterDestination, \
+    QgsProcessingParameterVectorDestination, QgsProcessingParameterFile, QgsProcessingParameterFileDestination
 
 """
 Syntax github issue request:
@@ -30,7 +36,9 @@ author:jakimowb type:issue created:>=2022-07-01 created:<=2022-12-31
 class TestReporting(enmapbox.testing.TestCase):
 
     def test_report_processingalgorithms(self):
-
+        """
+        Lists the names of all QgsProcessingAlgorithms in a XLSX.
+        """
         path_xlsx = pathlib.Path(DIR_REPO_TMP) / 'processingalgorithms.xlsx'
         os.makedirs(path_xlsx.parent, exist_ok=True)
         app = start_app()
@@ -38,26 +46,70 @@ class TestReporting(enmapbox.testing.TestCase):
         emb = EnMAPBox()
         provider: EnMAPBoxProcessingProvider = emb.processingProvider()
 
-        ids = []
-        names = []
-        groups = []
-        short_description = []
-        long_help = []
+
+        DATA = {k:[] for k in ['group', 'name', 'in', 'out', 'id', 'description', 'help']}
+
+        NOT_HANDLED = set()
+        LUT_LAYERTYPE = {QgsProcessing.SourceType.TypeMapLayer: ['R','V'],
+                         QgsProcessing.SourceType.TypeFile: ['F'],
+                         QgsProcessing.SourceType.TypeRaster: ['R'],
+                         }
+        for t in [QgsProcessing.SourceType.TypeVector, QgsProcessing.SourceType.TypeVectorAnyGeometry,
+                  QgsProcessing.SourceType.TypeVectorPoint,
+                  QgsProcessing.SourceType.TypeVectorLine,
+                  QgsProcessing.SourceType.TypeVectorPolygon]:
+            LUT_LAYERTYPE[t] = ['V']
+        def dataString(parameters) -> str:
+            data_sources = set()
+            for p in parameters:
+                if isinstance(p, (QgsProcessingParameterRasterLayer, QgsProcessingParameterRasterDestination,
+                                  QgsProcessingOutputRasterLayer)):
+                    data_sources.add('R')
+                elif isinstance(p, (QgsProcessingParameterVectorLayer, QgsProcessingOutputVectorLayer,
+                                    QgsProcessingParameterVectorDestination,
+                                    QgsProcessingParameterFeatureSource, QgsProcessingParameterFeatureSink)):
+                    data_sources.add('V')
+                elif isinstance(p, QgsProcessingParameterMapLayer):
+                    data_sources.add('V')
+                    data_sources.add('R')
+                elif isinstance(p, QgsProcessingParameterMultipleLayers):
+                    t = p.layerType()
+                    if t in LUT_LAYERTYPE.keys():
+                        data_sources.update(LUT_LAYERTYPE[t])
+
+                elif isinstance(p, (QgsProcessingParameterFile, QgsProcessingParameterFileDestination,
+                                    QgsProcessingOutputFile,
+                                    QgsProcessingParameterFolderDestination, QgsProcessingOutputFolder)):
+                    data_sources.add('F')
+                elif isinstance(p, (QgsProcessingOutputHtml,)):
+                    data_sources.add('H')
+                elif isinstance(p, (QgsProcessingParameterEnum, QgsProcessingParameterBoolean)):
+                    pass
+                else:
+                    NOT_HANDLED.add(p.__class__.__name__)
+            return ''.join(sorted(data_sources))
+
+
         for a in provider.algorithms():
             a: QgsProcessingAlgorithm
-            ids.append(a.id())
-            names.append(a.name())
-            groups.append(a.group())
-            short_description.append(a.shortDescription())
-            long_help.append(a.helpString())
+            DATA['id'].append(a.id())
+            DATA['name'].append(a.name())
+            DATA['group'].append(a.group())
+            DATA['description'].append(re.sub('\n', ' ', a.shortDescription()))
+            DATA['help'].append(a.shortHelpString())
+            DATA['in'].append(dataString(a.parameterDefinitions()))
+            DATA['out'].append(dataString(a.outputDefinitions()))
 
-            s = ""
-
-        df = pd.DataFrame(list(zip(ids, names, groups, short_description)),
-                          columns=['id', 'name', 'group', 'description'])
+        df = pd.DataFrame.from_records(DATA)
+        column_order = ['group', 'name', 'in', 'out', 'description', 'id', 'help']
+        df = df.reindex(columns=column_order)
 
         df.sort_values(by=['group', 'name'], inplace=True)
 
+        if len(NOT_HANDLED) > 0:
+            print('Not handled data types:')
+            for p in NOT_HANDLED:
+                print(p)
         with pd.ExcelWriter(path_xlsx.as_posix()) as writer:
             df.to_excel(writer, sheet_name='EnMAPBox_PAs')
 
