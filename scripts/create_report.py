@@ -1,6 +1,7 @@
 """
 This scripts generates some reports stats related to the EnMAP-Box repository
 """
+import argparse
 import csv
 import datetime
 import inspect
@@ -48,7 +49,7 @@ def report_downloads() -> pd.DataFrame:
     import xml.etree.ElementTree as ET
     tree = ET.fromstring(html)
     table = tree.find('.//table[@class="table table-striped plugins"]')
-    DATA = {k: [] for k in ['version', 'experimental', 'downloads', 'uploader', 'datetime']}
+    DATA = {k: [] for k in ['version', 'minQGIS', 'experimental', 'downloads', 'uploader', 'datetime']}
     for tr in table.findall('.//tbody/tr'):
         tds = list(tr.findall('td'))
         """
@@ -60,20 +61,23 @@ def report_downloads() -> pd.DataFrame:
         <td><span class="user-timezone">2022-10-09T22:36:01.698509+00:00</span></td>
         """
         s = ""
-        version = tds[0].find('.//a').text
-        version2 = tds[2].text
+        versionEMB = tds[0].find('.//a').text
+        versionQGIS = tds[2].text
         experimental = tds[1].text.lower() == 'yes'
         downloads = int(tds[3].text)
         uploader = tds[4].find('a').text
         datetime = tds[5].find('span').text
-        DATA['version'].append(version2)
+        DATA['version'].append(versionEMB)
+        DATA['minQGIS'].append(versionQGIS)
         DATA['experimental'].append(experimental)
         DATA['downloads'].append(downloads)
         DATA['datetime'].append(datetime)
         DATA['uploader'].append(uploader)
 
     df = pd.DataFrame.from_dict(DATA)
-    df.sort_values(by=['version', 'datetime'], inplace=True, ascending=True)
+
+    df = df.query('experimental == False')
+    df.sort_values(by=['datetime'], inplace=True, ascending=False)
     return df
 
 
@@ -112,7 +116,6 @@ def report_EnMAPBoxApplications() -> pd.DataFrame:
 
 
 def report_processingalgorithms() -> pd.DataFrame:
-
     emb = EnMAPBox.instance()
     if not isinstance(emb, EnMAPBox):
         emb = EnMAPBox()
@@ -129,7 +132,7 @@ def report_processingalgorithms() -> pd.DataFrame:
         names.append(a.name())
         groups.append(a.group())
         short_description.append(a.shortDescription())
-        long_help.append(a.helpString())
+        long_help.append(a.shortHelpString())
 
         s = ""
 
@@ -238,18 +241,29 @@ def report_bitbucket_issues(self):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Install testdata', formatter_class=argparse.RawTextHelpFormatter)
+    path_xlsx = pathlib.Path(DIR_REPO_TMP) / 'enmapbox_report.xlsx'
+    parser.add_argument('-f', '--filename',
+                        required=False,
+                        default=path_xlsx.as_posix(),
+                        help=f'Filename of XLSX file to save the report. Defaults to {path_xlsx}',
+                        action='store_true')
+
+    args = parser.parse_args()
+    path_xlsx = pathlib.Path(args.filename)
+
     app = start_app(cleanup=False)
     initAll()
 
-    path_xlsx = pathlib.Path(DIR_REPO_TMP) / 'enmapbox_report.xlsx'
     os.makedirs(path_xlsx.parent, exist_ok=True)
     with pd.ExcelWriter(path_xlsx.as_posix()) as writer:
+        dfDownloads = report_downloads()
+        dfDownloads.to_excel(writer, sheet_name='Downloads')
+
         dfApp = report_EnMAPBoxApplications()
         dfApp.to_excel(writer, sheet_name='Apps')
 
         dfPAs = report_processingalgorithms()
         dfPAs.to_excel(writer, sheet_name='PAs')
 
-        dfDownloads = report_downloads()
-        dfDownloads.to_excel(writer, sheet_name='Downloads')
     stop_app()
