@@ -9,10 +9,10 @@ import json
 import os
 import pathlib
 import re
+import unittest
 import urllib.request
 
 import pandas as pd
-from qgis.PyQt.QtWidgets import QMenu
 from xlsxwriter.workbook import Workbook
 
 from enmapbox import DIR_REPO_TMP, EnMAPBox, EnMAPBoxApplication
@@ -20,6 +20,7 @@ from enmapbox import initAll
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
 from enmapbox.gui.applications import ApplicationWrapper
 from enmapbox.testing import start_app, stop_app
+from qgis.PyQt.QtWidgets import QMenu
 from qgis._core import QgsProcessing, QgsProcessingParameterRasterLayer, QgsProcessingParameterRasterDestination, \
     QgsProcessingOutputVectorLayer, QgsProcessingParameterFeatureSink, QgsProcessingParameterFeatureSource, \
     QgsProcessingOutputRasterLayer, QgsProcessingParameterVectorLayer, QgsProcessingParameterVectorDestination, \
@@ -86,6 +87,14 @@ def report_downloads() -> pd.DataFrame:
     df = df.query('experimental == False')
     df.sort_values(by=['datetime'], inplace=True, ascending=False)
     return df
+
+
+def report_github_issues() -> pd.DataFrame:
+    import github3
+
+    gh = github3.login()
+
+    s = ""
 
 
 def report_EnMAPBoxApplications() -> pd.DataFrame:
@@ -285,6 +294,46 @@ def report_bitbucket_issues(self):
         writer.writerow(ROW2)
 
     csv2xlsx(PATH_CSV_REPORT)
+
+
+class TestCases(unittest.TestCase):
+
+    def test_github_issue(self):
+        from github3api import GitHubAPI
+        import json
+        path_json = pathlib.Path(DIR_REPO_TMP) / 'issues.json'
+        client = GitHubAPI()
+
+        if not path_json.is_file():
+            issues = []
+            for issue_slice in client.get('https://api.github.com/repos/EnMAP-Box/enmap-box/issues',
+                                          _get='all',
+                                          # _attributes = ['title', 'user', 'labels', 'html_url', 'state', 'locked',
+                                          # 'assignees', 'milestone', 'created_at', 'updated_at', 'closed_at', 'state_reason', 'pull_request']
+                                          ):
+                if isinstance(issue_slice, dict):
+                    issues.append(issue_slice)
+                else:
+                    issues.extend(issue_slice)
+
+            with open(path_json, 'w', encoding='utf-8') as f:
+                json.dump(issues, f)
+        else:
+            with open(path_json, 'r', encoding='utf-8') as f:
+                issues = json.load(f)
+            s = ""
+        s = ""
+        for issue in issues:
+            dtg_created = issue['created_at']
+            dtg_updates = issue['updated_at']
+            dtg_closed = issue['closed_at']
+            state = issue['state']
+
+            s = ""
+        s = ""
+        # gh = github3.login(username='foo', password='bar')
+        #
+        # s = ""
 
 
 if __name__ == "__main__":
