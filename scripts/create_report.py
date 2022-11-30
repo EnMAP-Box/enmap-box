@@ -128,7 +128,6 @@ def report_processingalgorithms() -> pd.DataFrame:
         emb = EnMAPBox()
     provider: EnMAPBoxProcessingProvider = emb.processingProvider()
 
-
     DATA = {k: [] for k in ['group', 'name', 'in', 'out', 'id', 'description', 'help']}
 
     NOT_HANDLED = set()
