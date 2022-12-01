@@ -1414,6 +1414,7 @@ class MapCanvas(QgsMapCanvas):
                     self.setLayers(to_add + self.layers())
 
             event.accept()
+            s = ""
 
     def setExtent(self, rectangle):
         """
