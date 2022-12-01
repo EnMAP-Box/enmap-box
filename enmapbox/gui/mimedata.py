@@ -202,7 +202,7 @@ def extractMapLayers(mimeData: QMimeData,
                 if isinstance(dataSource, SpatialDataSource):
                     lyr = dataSource.asMapLayer(project=project)
                     if isinstance(lyr, QgsMapLayer):
-                        #if isinstance(lyr, QgsRasterLayer):
+                        #  if isinstance(lyr, QgsRasterLayer):
                         #    lyr.setRenderer(defaultRasterRenderer(lyr))
                         newMapLayers.append(lyr)
 
