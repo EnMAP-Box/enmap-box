@@ -860,13 +860,13 @@ class MapCanvas(QgsMapCanvas):
     def instances():
         return list(MapCanvas._instances)
 
-    sigSpatialExtentChanged = pyqtSignal(SpatialExtent)
+    sigSpatialExtentChanged = pyqtSignal(object)
     sigCrsChanged = pyqtSignal(QgsCoordinateReferenceSystem)
 
     sigNameChanged = pyqtSignal(str)
     sigCanvasLinkAdded = pyqtSignal(CanvasLink)
     sigCanvasLinkRemoved = pyqtSignal(CanvasLink)
-    sigCrosshairPositionChanged = pyqtSignal(SpatialPoint)
+    sigCrosshairPositionChanged = pyqtSignal(object)
 
     def __init__(self, *args, **kwds):
         super().__init__(*args, **kwds)
@@ -913,8 +913,8 @@ class MapCanvas(QgsMapCanvas):
     def mousePressEvent(self, event: QMouseEvent):
 
         self.setProperty(KEY_LAST_CLICKED, time.time())
-        set_cursor_location: bool = event.button() == Qt.LeftButton \
-            and isinstance(self.mapTool(), (QgsMapToolIdentify, CursorLocationMapTool))
+        set_cursor_location: bool = event.button() == Qt.LeftButton and \
+            isinstance(self.mapTool(), (QgsMapToolIdentify, CursorLocationMapTool))
 
         super(MapCanvas, self).mousePressEvent(event)
 
@@ -924,7 +924,7 @@ class MapCanvas(QgsMapCanvas):
             spatialPoint = SpatialPoint(ms.destinationCrs(), pointXY)
             self.setCrosshairPosition(spatialPoint)
 
-    def setCrosshairPosition(self, spatialPoint: SpatialPoint, emitSignal=True):
+    def setCrosshairPosition(self, spatialPoint: SpatialPoint, emitSignal: bool = True):
         """
         Sets the position of the Crosshair.
         :param spatialPoint: SpatialPoint
@@ -934,7 +934,7 @@ class MapCanvas(QgsMapCanvas):
         point = spatialPoint.toCrs(self.mapSettings().destinationCrs())
         self.mCrosshairItem.setPosition(point)
         if emitSignal:
-            self.sigCrosshairPositionChanged.emit(point)
+            self.sigCrosshairPositionChanged[object].emit(point)
 
     def mouseMoveEvent(self, event):
         self.mMapMouseEvent = QgsMapMouseEvent(self, event)

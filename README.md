@@ -36,7 +36,7 @@ Open a shell that allows to run git and python with PyQGIS, then run:
 
 ````bash
 
-
+git clone --recurse-submodules git@github.com:EnMAP-Box/enmap-box.git
 # alternatively, but not recommended, you can use https as well:
 # git clone --recurse-submodules https://github.org:EnMAP-Box/enmap-box.git
 
@@ -72,13 +72,6 @@ Replace it with your own EnMAP-Box fork from which you can create pull requests.
     # on macOS: 
     export PYTHONPATH=/<qgispath>/Contents/Resources/python
     set PATH=C:\<qgispath>\bin;C:\<qgispath>\apps\<qgisrelease>\bin;%PATH% where <qgisrelease> should be replaced with the type of release you are targeting (eg, qgis-ltr, qgis, qgis-dev)
-    
-
-    on Linux: 
-
-    on Windows: 
-
-   
     ````
    
 2. Clone the EnMAP-Box repository.

@@ -30,7 +30,6 @@ class ImageCubeApplication(EnMAPBoxApplication):
     def openglAvailable(self) -> bool:
         try:
             __import__('OpenGL')
-            __import__('qgis.PyQt.QtOpenGL')
             self.mErrorMessage = None
             return True
         except (ImportError, ModuleNotFoundError) as ex:

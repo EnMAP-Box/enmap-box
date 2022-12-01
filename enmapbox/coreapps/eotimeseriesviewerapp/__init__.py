@@ -4,7 +4,7 @@
 ***************************************************************************
     hubtimeseriesviewer/__init__.py
 
-    Package definition of HUB TimeSeriesViewer for EnMAP-Box
+    Package definition of EO Time Series Viewer for EnMAP-Box
     ---------------------
     Date                 : Juli 2017
     Copyright            : (C) 2017 by Benjamin Jakimow
