@@ -389,10 +389,13 @@ class MapDockTreeNode(DockTreeNode):
 
         self.mTreeCanvasBridge.setCanvasLayers()
 
+    def mapLayers(self) -> List[QgsMapLayer]:
+        return [n.layer() for n in self.findLayers()]
+
     @staticmethod
     def visibleLayers(node):
         """
-        Returns the QgsMapLayers from all sub-nodes the are set as 'visible'
+        Returns the QgsMapLayers from all sub-nodes set as 'visible'
         :param node:
         :return:
         """
