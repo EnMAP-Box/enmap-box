@@ -11,7 +11,6 @@ from qgis.PyQt.QtGui import QColor
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis, QgsProcessingException)
 from typeguard import typechecked
 
-raise NotImplementedError()  # todo
 
 @typechecked
 class TemporalProfileFittingRbfEnsembleAlgorithm(EnMAPProcessingAlgorithm):
