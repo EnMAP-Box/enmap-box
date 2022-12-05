@@ -34,7 +34,6 @@ from difflib import SequenceMatcher
 from typing import List
 
 import requests
-
 from enmapbox import debugLog
 from enmapbox.qgispluginsupport.qps.utils import qgisAppQgisInterface
 from enmapbox.settings import EnMAPBoxSettings
@@ -227,8 +226,17 @@ class PIPPackage(object):
         :return:
         :rtype:
         """
-        spam_spec = importlib.util.find_spec(self.pyPkgName)
-        return spam_spec is not None
+        try:
+            spam_spec = importlib.util.find_spec(self.pyPkgName)
+            return spam_spec is not None
+        except KeyError:
+            # https://github.com/EnMAP-Box/enmap-box/issues/215
+            try:
+                __import__(self.pyPkgName)
+                return True
+            except ModuleNotFoundError:
+                return False
+        return False
 
 
 def localPythonExecutable() -> pathlib.Path:

@@ -56,7 +56,24 @@ In the following we refer to the EnMAP-Box repository ``https://github.com/EnMAP
 Replace it with your own EnMAP-Box fork from which you can create pull requests.
 
 1. Ensure that your environment has git available and can start QGIS by calling `qgis`.
+   You may use a bootstrap script as [scripts/OSGeo4W/qgis_env.bat](scripts/OSGeo4W/qgis_env.bat) (windows) or
+   [scripts/qgis_env.bat](scripts/qgis_env.sh) (linux)
+2. 
+   The essential lines are:
+    ````
+    # on Linux: 
+    export PYTHONPATH=/<qgispath>/share/qgis/python
+    export LD_LIBRARY_PATH=/<qgispath>/lib
+   
+    ::on Windows: 
+    set PYTHONPATH=c:\<qgispath>\python
+    set PATH=C:\<qgispath>\bin;C:\<qgispath>\apps\<qgisrelease>\bin;%PATH% where <qgisrelease> should be replaced with the type of release you are targeting (eg, qgis-ltr, qgis, qgis-dev)
 
+    # on macOS: 
+    export PYTHONPATH=/<qgispath>/Contents/Resources/python
+    set PATH=C:\<qgispath>\bin;C:\<qgispath>\apps\<qgisrelease>\bin;%PATH% where <qgisrelease> should be replaced with the type of release you are targeting (eg, qgis-ltr, qgis, qgis-dev)
+    ````
+   
 2. Clone the EnMAP-Box repository.
    
     ````bash

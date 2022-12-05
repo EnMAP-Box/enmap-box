@@ -13,6 +13,8 @@ ignore =
     # allow lambda functions
     E731,
     # allow unused local variables
+    F821
+    # undefined name
     F841,
     # Do not pass iface (QgisInterface) as an argument, instead import it: 'from qgis.utils import iface'
     QGS105,
