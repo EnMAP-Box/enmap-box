@@ -3,7 +3,7 @@ import warnings
 from dataclasses import dataclass
 from os.path import exists, join, dirname
 from shutil import copyfile
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 import numpy as np
 
@@ -461,6 +461,16 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
             return self.currentLocationMapTool.currentLocation()
         else:
             raise ValueError()
+
+    def projectSettings(self) -> Dict:
+        return {
+            'mSourceType.currentIndex': self.mSourceType.currentIndex(),
+            'mRasterProfileType.currentIndex': self.mRasterProfileType.currentIndex()
+        }
+
+    def setProjectSettings(self, settings: Dict):
+        self.mSourceType.setCurrentIndex(settings['mSourceType.currentIndex'])
+        self.mRasterProfileType.setCurrentIndex(settings['mRasterProfileType.currentIndex'])
 
 
 @typechecked

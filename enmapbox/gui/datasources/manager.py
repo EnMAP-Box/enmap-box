@@ -6,7 +6,7 @@ import re
 import warnings
 import webbrowser
 from os.path import splitext, exists, sep, dirname
-from typing import List, Union, Any
+from typing import List, Union, Any, Dict
 
 import numpy as np
 
@@ -907,6 +907,14 @@ class DataSourceManagerPanelUI(QgsDockWidget):
                     sources.add(s)
         return list(sources)
 
+    def projectSettings(self) -> Dict:
+        sources = [dataSource.source() for dataSource in self.mDataSourceManager.dataSources()]
+        return {
+            'sources': sources
+        }
+
+    def setProjectSettings(self, settings: Dict):
+        self.mDataSourceManager.addDataSources(settings['sources'])
 
 class DataSourceFactory(object):
 
