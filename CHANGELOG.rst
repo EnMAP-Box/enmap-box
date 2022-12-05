@@ -38,6 +38,7 @@ Version 3.11
 **Bugfixes**
 
 * `v3.11.0 <https://github.com/EnMAP-Box/enmap-box/milestone/2?closed=1>`_
+* `v3.11.1 <https://github.com/EnMAP-Box/enmap-box/milestone/5?closed=1>`_
 
 Version 3.10
 ------------
