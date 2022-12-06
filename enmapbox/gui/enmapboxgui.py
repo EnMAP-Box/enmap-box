@@ -84,7 +84,7 @@ from .datasources.datasources import DataSource, RasterDataSource, VectorDataSou
 from .dataviews.docks import DockTypes
 from .mapcanvas import MapCanvas
 from .utils import enmapboxUiPath
-from ..settings import EnMAPBoxSettings
+from ..enmapboxsettings import EnMAPBoxSettings
 
 MAX_MISSING_DEPENDENCY_WARNINGS = 3
 KEY_MISSING_DEPENDENCY_VERSION = 'MISSING_PACKAGE_WARNING_VERSION'
@@ -1616,7 +1616,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             self.applicationRegistry.addApplicationListing(p)
 
         # find other app-folders or listing files folders
-        from enmapbox.settings import enmapboxSettings
+        from enmapbox.enmapboxsettings import enmapboxSettings
         settings = enmapboxSettings()
         for appPath in re.split('[;\n]', settings.value('EMB_APPLICATION_PATH', '')):
             if os.path.isdir(appPath):
