@@ -36,7 +36,7 @@ from typing import List
 import requests
 from enmapbox import debugLog
 from enmapbox.qgispluginsupport.qps.utils import qgisAppQgisInterface
-from enmapbox.settings import EnMAPBoxSettings
+from enmapbox.enmapboxsettings import EnMAPBoxSettings
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import \
     pyqtSignal, pyqtSlot, Qt, \
