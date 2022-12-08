@@ -1,12 +1,11 @@
-from os import getcwd, chdir
+from os import chdir
 
 from osgeo import gdal
 
 from enmapbox.exampledata import enmap
-from enmapbox.testing import initQgisApplication
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
-from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.algorithm.testcase import TestCase
+from enmapboxprocessing.rasterreader import RasterReader
 from qgis.core import QgsProcessingException
 
 
