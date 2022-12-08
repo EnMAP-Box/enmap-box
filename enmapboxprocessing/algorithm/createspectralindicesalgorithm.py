@@ -5,6 +5,7 @@ from osgeo import gdal
 
 from enmapboxprocessing.algorithm.vrtbandmathalgorithm import VrtBandMathAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from enmapboxprocessing.gdalutils import GdalUtils
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
@@ -201,7 +202,9 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
                 metadatas.append({'short_name': short_name, 'long_name': long_name, 'formula': formula})
 
             # create stack VRT
-            ds = gdal.BuildVRT(filename, filenames, separate=True)
+            filenameTmpStack = Utils.tmpFilename(filename, 'stack.vrt')
+            GdalUtils.stackVrtBands(filenameTmpStack, filenames, [1] * len(filenames))
+            ds = gdal.Translate(filename, filenameTmpStack)
             writer = RasterWriter(ds)
             for bandNo, (ifilename, metadata) in enumerate(zip(filenames, metadatas), 1):
                 writer.setBandName(metadata['short_name'], bandNo)
