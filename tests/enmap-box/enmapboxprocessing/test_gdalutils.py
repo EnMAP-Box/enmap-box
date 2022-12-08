@@ -39,3 +39,20 @@ class TestGdalUtils(TestCase):
             RasterReader(enmap).array(bandList=[62, 116, 39]),
             RasterReader(filename).array(),
         )
+
+    def test_stackMultiBandVrts_withRelativeInputs(self):
+
+        gdal.Translate(self.filename('enmap.tif'), enmap)
+
+        # create VRT copy with all bands
+        filename1 = self.filename('enmap.vrt')
+        gdal.Translate(filename1, self.filename('enmap.tif'), format='VRT')
+
+        # stack bands
+        filename = self.filename('stack.vrt')
+        GdalUtils.stackVrtBands(filename, [filename1, filename1, filename1], [62, 116, 39])
+
+        self.assertArrayEqual(
+            RasterReader(enmap).array(bandList=[62, 116, 39]),
+            RasterReader(filename).array(),
+        )
