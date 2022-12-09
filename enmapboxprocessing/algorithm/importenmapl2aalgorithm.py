@@ -48,8 +48,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterFile(self.P_FILE, self._FILE, extension='xml')
         self.addParameterEnum(
-            self.P_DETECTOR_OVERLAP, self._DETECTOR_OVERLAP, self.O_DETECTOR_OVERLAP, False,
-            self.OrderByWavelengthOverlapOption
+            self.P_DETECTOR_OVERLAP, self._DETECTOR_OVERLAP, self.O_DETECTOR_OVERLAP, False, self.SwirOnlyOverlapOption
         )
         self.addParameterVrtDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 
