@@ -84,7 +84,7 @@ from .datasources.datasources import DataSource, RasterDataSource, VectorDataSou
 from .dataviews.docks import DockTypes
 from .mapcanvas import MapCanvas
 from .utils import enmapboxUiPath
-from ..settings import EnMAPBoxSettings
+from ..enmapboxsettings import EnMAPBoxSettings
 
 MAX_MISSING_DEPENDENCY_WARNINGS = 3
 KEY_MISSING_DEPENDENCY_VERSION = 'MISSING_PACKAGE_WARNING_VERSION'
@@ -434,7 +434,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.ui = EnMAPBoxUI()
         self.ui.closeEvent = self.closeEvent
 
-        self.iface = qgis.utils.iface
+        self.iface: QgisInterface = qgis.utils.iface
         assert isinstance(self.iface, QgisInterface)
 
         self.mMapToolKey = MapTools.Pan
@@ -1227,12 +1227,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         # self.ui.mActionAddFeature.triggered.connect(self.onAddFeatureTriggered)
         self.setMapTool(MapTools.CursorLocation)
 
-        self.ui.mActionSaveProject.triggered.connect(lambda: self.saveProject(False))
-        self.ui.mActionSaveProjectAs.triggered.connect(lambda: self.saveProject(True))
-
-        # re-enable if there is a proper connection
-        self.ui.mActionSaveProject.setVisible(False)
-        self.ui.mActionSaveProjectAs.setVisible(False)
+        # redirect to QGIS Project Management
+        self.ui.mActionSaveProject.triggered.connect(lambda: self.iface.actionSaveProject().trigger())
+        self.ui.mActionSaveProjectAs.triggered.connect(lambda: self.iface.actionSaveProjectAs().trigger())
+        # AJ: Question for Benjamin: currently we don't have an open button, why?
 
         from enmapbox.gui.mapcanvas import CanvasLinkDialog
         self.ui.mActionMapLinking.triggered.connect(
@@ -1616,7 +1614,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             self.applicationRegistry.addApplicationListing(p)
 
         # find other app-folders or listing files folders
-        from enmapbox.settings import enmapboxSettings
+        from enmapbox.enmapboxsettings import enmapboxSettings
         settings = enmapboxSettings()
         for appPath in re.split('[;\n]', settings.value('EMB_APPLICATION_PATH', '')):
             if os.path.isdir(appPath):
@@ -2203,27 +2201,6 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     def actionSaveProjectAs(self) -> QAction:
         return self.mActionSaveProjectAs
-
-    def saveProject(self, saveAs: bool):
-        """
-        Call to save EnMAP-Box settings in a QgsProject file
-        :param saveAs: bool, if True, opens a dialog to save the project into another file
-        """
-
-        # todo: save EnMAP Project settings
-        # 1. save data sources
-
-        # 2. save docks / map canvases
-
-        # inform others that the project will be saves
-        self.sigProjectWillBeSaved.emit()
-
-        # call QGIS standard functionality
-        from qgis.utils import iface
-        if saveAs:
-            iface.actionSaveProjectAs().trigger()
-        else:
-            iface.actionSaveProject().trigger()
 
     def actionZoomActualSize(self):
         return self.ui.mActionZoomPixelScale

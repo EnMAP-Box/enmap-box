@@ -462,6 +462,9 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
         else:
             raise ValueError()
 
+    def projectSettingsKey(self) -> str:
+        return self.__class__.__name__
+
     def projectSettings(self) -> Dict:
         return {
             'mSourceType.currentIndex': self.mSourceType.currentIndex(),

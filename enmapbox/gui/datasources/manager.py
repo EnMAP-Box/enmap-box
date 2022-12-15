@@ -24,11 +24,8 @@ from qgis.PyQt.QtWidgets import QWidget, QDialog, QMenu, QAction, QApplication, 
 from qgis.core import QgsLayerTreeGroup, QgsLayerTreeLayer, QgsMapLayer, QgsProject, QgsWkbTypes, QgsRasterLayer, \
     QgsRasterDataProvider, QgsRasterRenderer, QgsVectorLayer, QgsDataItem, QgsLayerItem, Qgis
 from qgis.core import QgsMimeDataUtils
-
 from qgis.gui import QgisInterface, QgsMapCanvas, QgsDockWidget
-
 from typeguard import typechecked
-
 from .datasources import DataSource, SpatialDataSource, VectorDataSource, RasterDataSource, \
     ModelDataSource, FileDataSource, LayerItem
 from .metadata import RasterBandTreeNode
@@ -279,9 +276,9 @@ class DataSourceManager(TreeModel):
                     lyr = dataItem.referenceLayer()
                     if isinstance(lyr, QgsVectorLayer):
                         updateState = f'{lyr.isValid()}|{lyr.name()}|' \
-                                     f'{lyr.featureCount()}|' \
-                                     f'{lyr.geometryType()}|' \
-                                     f'{is_spectral_library(lyr)}'
+                                      f'{lyr.featureCount()}|' \
+                                      f'{lyr.geometryType()}|' \
+                                      f'{is_spectral_library(lyr)}'
 
             oldInfo = self.mUpdateState.get(sid, None)
             if oldInfo is None:
@@ -907,6 +904,9 @@ class DataSourceManagerPanelUI(QgsDockWidget):
                     sources.add(s)
         return list(sources)
 
+    def projectSettingsKey(self) -> str:
+        return self.__class__.__name__
+
     def projectSettings(self) -> Dict:
         sources = [dataSource.source() for dataSource in self.mDataSourceManager.dataSources()]
         return {
@@ -915,6 +915,7 @@ class DataSourceManagerPanelUI(QgsDockWidget):
 
     def setProjectSettings(self, settings: Dict):
         self.mDataSourceManager.addDataSources(settings['sources'])
+
 
 class DataSourceFactory(object):
 

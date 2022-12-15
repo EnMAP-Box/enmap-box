@@ -1,5 +1,7 @@
 from typing import Optional
 
+from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget
+from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from qgis.PyQt.QtGui import QMouseEvent, QColor
 from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QTableWidget, QComboBox, QCheckBox, \
     QLabel
@@ -7,9 +9,6 @@ from qgis.PyQt.uic import loadUi
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsRasterDataProvider, QgsRasterBandStats, \
     QgsRasterHistogram, QgsMapSettings, QgsRasterRenderer
 from qgis.gui import QgsRasterBandComboBox, QgsMapLayerComboBox, QgsFilterLineEdit, QgsSpinBox, QgsMapCanvas
-
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget
-from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from typeguard import typechecked
 
 

@@ -20,14 +20,12 @@ import os
 import sys
 import typing
 
-from PyQt5.QtXml import QDomDocument
-
-from enmapbox.enmapboxpluginsettings import EnMAPBoxPluginSettings
+from enmapbox.enmapboxprojectsettings import EnMAPBoxProjectSettings
 from qgis.PyQt.QtCore import QOperatingSystemVersion
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
-from qgis._core import QgsProject
-from qgis.core import Qgis
+from qgis.PyQt.QtXml import QDomDocument
+from qgis.core import QgsProject, Qgis
 from qgis.gui import QgisInterface, QgsDockWidget
 
 
@@ -63,11 +61,11 @@ class EnMAPBoxPlugin(object):
         QgsProject.instance().readProject.connect(self.readProject)
 
     def writeProject(self, document: QDomDocument):
-        settings =  EnMAPBoxPluginSettings()
+        settings = EnMAPBoxProjectSettings()
         settings.writeToProject(document)
 
     def readProject(self, document: QDomDocument):
-        settings = EnMAPBoxPluginSettings()
+        settings = EnMAPBoxProjectSettings()
         settings.readFromProject(document)
 
     def initialDependencyCheck(self):

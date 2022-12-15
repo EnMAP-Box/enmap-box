@@ -1,17 +1,16 @@
 from typing import Dict
 
-from PyQt5.QtXml import QDomDocument, QDomElement
-
-from qgis._core import QgsXmlUtils
-from qgis._gui import QgsDockWidget
+from qgis.PyQt.QtXml import QDomDocument, QDomElement
+from qgis.core import QgsXmlUtils
+from qgis.gui import QgsDockWidget
 
 
 class EnMAPBoxProjectSettings(object):
     # (adopted from Data Plotly plugin)
 
     def writeToProject(self, document: QDomDocument):
-        element = self.writeXml(document)
         parent_element = document.createElement('EnMAP-Box')
+        element = self.writeXml(document, parent_element)
         parent_element.appendChild(element)
 
         root_node = document.elementsByTagName("qgis").item(0)
@@ -23,11 +22,8 @@ class EnMAPBoxProjectSettings(object):
         element = node.toElement()
         return self.readXml(element.firstChildElement())
 
-    def writeXml(self, document: QDomDocument):
-        settings = self.getSettings()
-
-        self.writeProject.emit(settings)
-
+    def writeXml(self, document: QDomDocument, enmapBoxElement: QDomElement):
+        settings = self.settings(document, enmapBoxElement)
         element = QgsXmlUtils.writeVariant(settings, document)
         return element
 
@@ -35,16 +31,7 @@ class EnMAPBoxProjectSettings(object):
         settings = QgsXmlUtils.readVariant(element)
         self.setSettings(settings)
 
-    def getSettings(self) -> Dict:
-        from geetimeseriesexplorerapp import GeeTimeseriesExplorerDockWidget
-        from locationbrowserapp import LocationBrowserDockWidget
-        from profileanalyticsapp import ProfileAnalyticsDockWidget
-        from rasterbandstackingapp import RasterBandStackingDockWidget
-        from sensorproductimportapp import SensorProductImportDockWidget
-        from enmapbox.gui.datasources.manager import DataSourceManagerPanelUI
-        from enmapbox.gui.dataviews.dockmanager import DockPanelUI
-        from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprofilesources import SpectralProfileSourcePanel
-
+    def settings(self, document: QDomDocument, enmapBoxElement: QDomElement) -> Dict:
         from qgis.utils import iface
         from enmapbox import EnMAPBox
         enmapBox = EnMAPBox.instance()
@@ -53,55 +40,31 @@ class EnMAPBoxProjectSettings(object):
 
         # QGIS GUI
         qgisMainWindow = iface.mapCanvas().parent().parent().parent()
-        # - EO4Q apps (inside QGIS)
         for dockWidget in qgisMainWindow.findChildren(QgsDockWidget):
-            if isinstance(dockWidget, GeeTimeseriesExplorerDockWidget):
-                pass  # don't save GUI state
-            if isinstance(dockWidget, LocationBrowserDockWidget):
-                pass  # don't save GUI state
-            if isinstance(dockWidget, ProfileAnalyticsDockWidget):
-                settings[f'EO4Q/{ProfileAnalyticsDockWidget.__name__}'] = dockWidget.projectSettings()
-            if isinstance(dockWidget, RasterBandStackingDockWidget):
-                pass  # don't save GUI state
-            if isinstance(dockWidget, SensorProductImportDockWidget):
-                pass  # don't save GUI state
+            if hasattr(dockWidget, 'projectSettings'):
+                key = dockWidget.projectSettingsKey()
+                values = dockWidget.projectSettings()
+                settings[f'EO4Q/{key}'] = values
 
         # EnMAP-Box GUI
         if enmapBox is not None:
             enmapBoxMainWindow = enmapBox.ui
             for dockWidget in enmapBoxMainWindow.findChildren(QgsDockWidget):
-                # - EO4Q apps (inside EnMAP-Box)
-                if isinstance(dockWidget, GeeTimeseriesExplorerDockWidget):
-                    pass  # don't save GUI state
-                if isinstance(dockWidget, LocationBrowserDockWidget):
-                    pass  # don't save GUI state
-                if isinstance(dockWidget, ProfileAnalyticsDockWidget):
-                    settings[ProfileAnalyticsDockWidget.__name__] = dockWidget.projectSettings()
-                if isinstance(dockWidget, RasterBandStackingDockWidget):
-                    pass  # don't save GUI state
-                if isinstance(dockWidget, SensorProductImportDockWidget):
-                    pass  # don't save GUI state
+                if hasattr(dockWidget, 'projectSettings'):
+                    key = dockWidget.projectSettingsKey()
+                    values = dockWidget.projectSettings()
+                    settings[key] = values
 
-                # other panels
-                if isinstance(dockWidget, DataSourceManagerPanelUI):
-                    settings[DataSourceManagerPanelUI.__name__] = dockWidget.projectSettings()
-                if isinstance(dockWidget, DockPanelUI):
-                    pass  # todo
-                if isinstance(dockWidget, SpectralProfileSourcePanel):
-                    pass  # todo
+            # EnMAP-Box Apps
+            for app in enmapBox.applicationRegistry.applications():
+                key = app.projectSettingsKey()
+                values = app.projectSettings(document, enmapBoxElement)
+                if len(values) > 0:
+                    settings[key] = values
 
         return settings
 
     def setSettings(self, settings: Dict):
-        from geetimeseriesexplorerapp import GeeTimeseriesExplorerDockWidget
-        from locationbrowserapp import LocationBrowserDockWidget
-        from profileanalyticsapp import ProfileAnalyticsDockWidget
-        from rasterbandstackingapp import RasterBandStackingDockWidget
-        from sensorproductimportapp import SensorProductImportDockWidget
-        from enmapbox.gui.datasources.manager import DataSourceManagerPanelUI
-        from enmapbox.gui.dataviews.dockmanager import DockPanelUI
-        from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprofilesources import SpectralProfileSourcePanel
-
         from qgis.utils import iface
         from enmapbox import EnMAPBox
         enmapBox = EnMAPBox.instance()
@@ -110,37 +73,23 @@ class EnMAPBoxProjectSettings(object):
         qgisMainWindow = iface.mapCanvas().parent().parent().parent()
         # - EO4Q apps (inside QGIS)
         for dockWidget in qgisMainWindow.findChildren(QgsDockWidget):
-            if isinstance(dockWidget, GeeTimeseriesExplorerDockWidget):
-                pass
-            if isinstance(dockWidget, LocationBrowserDockWidget):
-                pass
-            if isinstance(dockWidget, ProfileAnalyticsDockWidget):
-                dockWidget.setProjectSettings(settings[f'EO4Q/{ProfileAnalyticsDockWidget.__name__}'])
-            if isinstance(dockWidget, RasterBandStackingDockWidget):
-                pass
-            if isinstance(dockWidget, SensorProductImportDockWidget):
-                pass
+            if hasattr(dockWidget, 'projectSettings'):
+                key = dockWidget.projectSettingsKey()
+                values = settings[f'EO4Q/{key}']
+                dockWidget.setProjectSettings(values)
 
         # EnMAP-Box GUI
         if enmapBox is not None:
             enmapBoxMainWindow = enmapBox.ui
             for dockWidget in enmapBoxMainWindow.findChildren(QgsDockWidget):
-                # - EO4Q apps (inside EnMAP-Box)
-                if isinstance(dockWidget, GeeTimeseriesExplorerDockWidget):
-                    pass  # don't save GUI state
-                if isinstance(dockWidget, LocationBrowserDockWidget):
-                    pass  # don't save GUI state
-                if isinstance(dockWidget, ProfileAnalyticsDockWidget):
-                    dockWidget.setProjectSettings(settings[ProfileAnalyticsDockWidget.__name__])
-                if isinstance(dockWidget, RasterBandStackingDockWidget):
-                    pass  # don't save GUI state
-                if isinstance(dockWidget, SensorProductImportDockWidget):
-                    pass  # don't save GUI state
+                if hasattr(dockWidget, 'projectSettings'):
+                    key = dockWidget.projectSettingsKey()
+                    values = settings[key]
+                    dockWidget.setProjectSettings(values)
 
-                # other panels
-                if isinstance(dockWidget, DataSourceManagerPanelUI):
-                    dockWidget.setProjectSettings(settings[DataSourceManagerPanelUI.__name__])
-                if isinstance(dockWidget, DockPanelUI):
-                    pass  # todo
-                if isinstance(dockWidget, SpectralProfileSourcePanel):
-                    pass  # todo
+            # EnMAP-Box Apps
+            for app in enmapBox.applicationRegistry.applications():
+                key = app.projectSettingsKey()
+                values = settings.get(key)
+                if values is not None:
+                    app.setProjectSettings(values)

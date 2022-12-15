@@ -20,7 +20,7 @@ import os
 import unittest
 
 from enmapbox import EnMAPBox
-from enmapbox.settings import enmapboxSettings, EnMAPBoxSettings
+from enmapbox.enmapboxsettings import enmapboxSettings, EnMAPBoxSettings
 from enmapbox.testing import EnMAPBoxTestCase
 from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsProject
