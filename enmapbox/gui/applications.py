@@ -26,15 +26,15 @@ import site
 import sys
 import traceback
 import typing
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Dict
 
 from enmapbox import messageLog
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction
-from qgis.PyQt.QtWidgets import QMenu
+from qgis.PyQt.QtWidgets import QAction, QMenu
+from qgis.PyQt.QtXml import QDomDocument, QDomElement
 from qgis.core import QgsProcessingAlgorithm
 from qgis.gui import QgisInterface
 
@@ -121,6 +121,29 @@ class EnMAPBoxApplication(QObject):
     def processingAlgorithms(self) -> List[QgsProcessingAlgorithm]:
 
         return []
+
+    def projectSettingsKey(self) -> str:
+        """Overwrite to specify custom project settings key inside QGIS Project file (*.QGZ)."""
+        return self.__class__.__name__
+
+    def projectSettings(self, document: QDomDocument, enmapBoxElement: QDomElement) -> Dict:
+        """
+        Overwrite to specify project settings to be stored inside QGIS Project file (*.QGZ).
+
+        You can either
+        a) return a dictionary with values to be stored, or
+        b) directly write XML into the QGIS DOM Document.
+        """
+        return {}
+
+    def setProjectSettings(self, settings: Dict, document: QDomDocument, enmapBoxElement: QDomElement):
+        """
+        Overwrite to restore project settings from QGIS Project file (*.QGZ).
+
+        You can either
+        a) use the values from the settings dictionary, or
+        b) directly read XML from the QGIS DOM Document.
+        """
 
     @staticmethod
     def utilsAddActionInAlphanumericOrder(menu: QMenu, text: str) -> QAction:

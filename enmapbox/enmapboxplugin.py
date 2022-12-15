@@ -20,10 +20,12 @@ import os
 import sys
 import typing
 
+from enmapbox.enmapboxprojectsettings import EnMAPBoxProjectSettings
 from qgis.PyQt.QtCore import QOperatingSystemVersion
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
-from qgis.core import Qgis
+from qgis.PyQt.QtXml import QDomDocument
+from qgis.core import QgsProject, Qgis
 from qgis.gui import QgisInterface, QgsDockWidget
 
 
@@ -52,6 +54,19 @@ class EnMAPBoxPlugin(object):
         enmapbox.initAll()
 
         self.mAddedSysPaths = [p for p in sys.path if p not in pathes]
+
+        # listen out for project save/restore, and update our state accordingly
+        # (adopted from Data Plotly plugin)
+        QgsProject.instance().writeProject.connect(self.writeProject)
+        QgsProject.instance().readProject.connect(self.readProject)
+
+    def writeProject(self, document: QDomDocument):
+        settings = EnMAPBoxProjectSettings()
+        settings.writeToProject(document)
+
+    def readProject(self, document: QDomDocument):
+        settings = EnMAPBoxProjectSettings()
+        settings.readFromProject(document)
 
     def initialDependencyCheck(self):
         """
