@@ -30,6 +30,7 @@ from enmapbox.gui import MapTools, MapToolCenter, PixelScaleExtentMapTool, \
     CrosshairDialog, CrosshairStyle, CrosshairMapCanvasItem
 from enmapbox.gui.mimedata import containsMapLayers, extractMapLayers
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent, qgisAppQgisInterface
+
 from qgis.PyQt.QtCore import Qt, QObject, QCoreApplication, pyqtSignal, QEvent, QPointF, QMimeData, QTimer, QSize, \
     QModelIndex, QAbstractListModel
 from qgis.PyQt.QtGui import QMouseEvent, QIcon, QDragEnterEvent, QDropEvent, QResizeEvent, QKeyEvent, QColor
