@@ -5,6 +5,7 @@
 set OSGEO4W_ROOT=F:\OSGeo4W
 :: PyCharm executable, adjust for version updates
 set PYCHARM_EXE="C:\Program Files (x86)\JetBrains\PyCharm 2022.2.4\bin\pycharm64.exe"
+set GIT_SSH=C:\ProgramData\chocolatey\bin\PLINK.exe
 
 :: locations to be added to PATH, e.g. to find git.exe
 set _PATH=^
