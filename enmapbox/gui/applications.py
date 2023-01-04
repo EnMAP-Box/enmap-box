@@ -130,8 +130,8 @@ class EnMAPBoxApplication(QObject):
         """
         Overwrite to specify project settings to be stored inside QGIS Project file (*.QGZ).
 
-        You can either
-        a) return a dictionary with values to be stored, or
+        You can
+        a) return a dictionary with values to be stored, and/or
         b) directly write XML into the QGIS DOM Document.
         """
         return {}
@@ -141,7 +141,7 @@ class EnMAPBoxApplication(QObject):
         Overwrite to restore project settings from QGIS Project file (*.QGZ).
 
         You can either
-        a) use the values from the settings dictionary, or
+        a) use the values from the settings dictionary, and/or
         b) directly read XML from the QGIS DOM Document.
         """
 

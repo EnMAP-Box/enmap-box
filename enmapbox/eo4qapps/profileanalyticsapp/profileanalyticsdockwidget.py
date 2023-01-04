@@ -20,6 +20,7 @@ from geetimeseriesexplorerapp import MapTool
 from profileanalyticsapp.profileanalyticseditorwidget import ProfileAnalyticsEditorWidget
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QComboBox, QTableWidget, QCheckBox, QToolButton, QLineEdit, QWidget
+from qgis.PyQt.QtXml import QDomElement, QDomDocument
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsVectorLayer, QgsProcessingFeatureSourceDefinition, \
     QgsFeatureRequest, QgsWkbTypes
 from qgis.gui import QgsMapLayerComboBox, QgsFileWidget, QgsRasterBandComboBox, QgsDockWidget, QgisInterface
@@ -465,13 +466,13 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
     def projectSettingsKey(self) -> str:
         return self.__class__.__name__
 
-    def projectSettings(self) -> Dict:
+    def projectSettings(self, document: QDomDocument, enmapBoxElement: QDomElement) -> Dict:
         return {
             'mSourceType.currentIndex': self.mSourceType.currentIndex(),
             'mRasterProfileType.currentIndex': self.mRasterProfileType.currentIndex()
         }
 
-    def setProjectSettings(self, settings: Dict):
+    def setProjectSettings(self, settings: Dict, document: QDomDocument, enmapBoxElement: QDomElement):
         self.mSourceType.setCurrentIndex(settings['mSourceType.currentIndex'])
         self.mRasterProfileType.setCurrentIndex(settings['mRasterProfileType.currentIndex'])
 

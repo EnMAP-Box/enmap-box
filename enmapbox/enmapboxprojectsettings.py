@@ -18,18 +18,18 @@ class EnMAPBoxProjectSettings(object):
 
     def readFromProject(self, document: QDomDocument):
         root_node = document.elementsByTagName("qgis").item(0)
-        node = root_node.toElement().firstChildElement('EnMAP-Box')
-        element = node.toElement()
-        return self.readXml(element.firstChildElement())
+        enmapBoxElement = root_node.toElement().firstChildElement('EnMAP-Box')
+        element = enmapBoxElement.toElement()
+        return self.readXml(element.firstChildElement(), document, enmapBoxElement)
 
     def writeXml(self, document: QDomDocument, enmapBoxElement: QDomElement):
         settings = self.settings(document, enmapBoxElement)
         element = QgsXmlUtils.writeVariant(settings, document)
         return element
 
-    def readXml(self, element: QDomElement):
+    def readXml(self, element: QDomElement, document: QDomDocument, enmapBoxElement: QDomElement):
         settings = QgsXmlUtils.readVariant(element)
-        self.setSettings(settings)
+        self.setSettings(settings, document, enmapBoxElement)
 
     def settings(self, document: QDomDocument, enmapBoxElement: QDomElement) -> Dict:
         from qgis.utils import iface
@@ -43,7 +43,7 @@ class EnMAPBoxProjectSettings(object):
         for dockWidget in qgisMainWindow.findChildren(QgsDockWidget):
             if hasattr(dockWidget, 'projectSettings'):
                 key = dockWidget.projectSettingsKey()
-                values = dockWidget.projectSettings()
+                values = dockWidget.projectSettings(document, enmapBoxElement)
                 settings[f'EO4Q/{key}'] = values
 
         # EnMAP-Box GUI
@@ -52,7 +52,7 @@ class EnMAPBoxProjectSettings(object):
             for dockWidget in enmapBoxMainWindow.findChildren(QgsDockWidget):
                 if hasattr(dockWidget, 'projectSettings'):
                     key = dockWidget.projectSettingsKey()
-                    values = dockWidget.projectSettings()
+                    values = dockWidget.projectSettings(document, enmapBoxElement)
                     settings[key] = values
 
             # EnMAP-Box Apps
@@ -64,7 +64,7 @@ class EnMAPBoxProjectSettings(object):
 
         return settings
 
-    def setSettings(self, settings: Dict):
+    def setSettings(self, settings: Dict, document: QDomDocument, enmapBoxElement: QDomElement):
         from qgis.utils import iface
         from enmapbox import EnMAPBox
         enmapBox = EnMAPBox.instance()
@@ -76,7 +76,7 @@ class EnMAPBoxProjectSettings(object):
             if hasattr(dockWidget, 'projectSettings'):
                 key = dockWidget.projectSettingsKey()
                 values = settings[f'EO4Q/{key}']
-                dockWidget.setProjectSettings(values)
+                dockWidget.setProjectSettings(values, document, enmapBoxElement)
 
         # EnMAP-Box GUI
         if enmapBox is not None:
@@ -85,11 +85,11 @@ class EnMAPBoxProjectSettings(object):
                 if hasattr(dockWidget, 'projectSettings'):
                     key = dockWidget.projectSettingsKey()
                     values = settings[key]
-                    dockWidget.setProjectSettings(values)
+                    dockWidget.setProjectSettings(values, document, enmapBoxElement)
 
             # EnMAP-Box Apps
             for app in enmapBox.applicationRegistry.applications():
                 key = app.projectSettingsKey()
                 values = settings.get(key)
                 if values is not None:
-                    app.setProjectSettings(values)
+                    app.setProjectSettings(values, document, enmapBoxElement)

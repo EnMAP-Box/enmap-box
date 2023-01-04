@@ -2130,6 +2130,36 @@ class DockPanelUI(QgsDockWidget):
     def dockManagerTreeModel(self) -> DockManagerTreeModel:
         return self.dockTreeView.layerTreeModel()
 
+    def projectSettingsKey(self) -> str:
+        """Specify custom project settings key inside QGIS Project file (*.QGZ)."""
+        return self.__class__.__name__
+
+    def projectSettings(self, document: QDomDocument, enmapBoxElement: QDomElement) -> Dict:
+        """
+        Specify project settings to be stored inside QGIS Project file (*.QGZ).
+
+        You can
+        a) return a dictionary with values to be stored, and/or
+        b) directly write XML into the QGIS DOM Document.
+        """
+        print('get Data Views project settings [not yet implemented, see #308]')
+
+        # todo: see issue #308
+
+        return {}
+
+    def setProjectSettings(self, settings: Dict, document: QDomDocument, enmapBoxElement: QDomElement):
+        """
+        Restore project settings from QGIS Project file (*.QGZ).
+
+        You can either
+        a) use the values from the settings dictionary, and/or
+        b) directly read XML from the QGIS DOM Document.
+        """
+        print('set Data Views project settings [not yet implemented, see #308]')
+
+        # todo: see issue #308
+
 
 class MapCanvasBridge(QgsLayerTreeMapCanvasBridge):
 

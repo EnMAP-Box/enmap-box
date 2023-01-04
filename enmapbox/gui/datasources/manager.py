@@ -21,6 +21,7 @@ from qgis.PyQt.QtCore import QAbstractItemModel, QItemSelectionModel, QFileInfo,
     QMimeData, QModelIndex, Qt, QUrl, QSortFilterProxyModel, pyqtSignal
 from qgis.PyQt.QtGui import QContextMenuEvent, QIcon, QDesktopServices
 from qgis.PyQt.QtWidgets import QWidget, QDialog, QMenu, QAction, QApplication, QAbstractItemView, QTreeView
+from qgis.PyQt.QtXml import QDomDocument, QDomElement
 from qgis.core import QgsLayerTreeGroup, QgsLayerTreeLayer, QgsMapLayer, QgsProject, QgsWkbTypes, QgsRasterLayer, \
     QgsRasterDataProvider, QgsRasterRenderer, QgsVectorLayer, QgsDataItem, QgsLayerItem, Qgis
 from qgis.core import QgsMimeDataUtils
@@ -905,16 +906,33 @@ class DataSourceManagerPanelUI(QgsDockWidget):
         return list(sources)
 
     def projectSettingsKey(self) -> str:
+        """Specify custom project settings key inside QGIS Project file (*.QGZ)."""
         return self.__class__.__name__
 
-    def projectSettings(self) -> Dict:
+    def projectSettings(self, document: QDomDocument, enmapBoxElement: QDomElement) -> Dict:
+        """
+        Specify project settings to be stored inside QGIS Project file (*.QGZ).
+
+        You can
+        a) return a dictionary with values to be stored, and/or
+        b) directly write XML into the QGIS DOM Document.
+        """
+        print('get Data Sources project settings')
         sources = [dataSource.source() for dataSource in self.mDataSourceManager.dataSources()]
         return {
             'sources': sources
         }
 
-    def setProjectSettings(self, settings: Dict):
-        self.mDataSourceManager.addDataSources(settings['sources'])
+    def setProjectSettings(self, settings: Dict, document: QDomDocument, enmapBoxElement: QDomElement):
+        """
+        Restore project settings from QGIS Project file (*.QGZ).
+
+        You can either
+        a) use the values from the settings dictionary, and/or
+        b) directly read XML from the QGIS DOM Document.
+        """
+        print('set Data Sources project settings')
+        self.mDataSourceManager.addDataSources(settings.get('sources', []))
 
 
 class DataSourceFactory(object):
