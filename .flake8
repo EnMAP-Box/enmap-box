@@ -12,10 +12,14 @@ ignore =
     E501,
     # allow lambda functions
     E731,
+    # allow ambiguous variable names
+    E741,
     # allow unused local variables
-    F821
+    F821,
     # undefined name
     F841,
+    # allow to annotate not used variables
+    F842,
     # Do not pass iface (QgisInterface) as an argument, instead import it: 'from qgis.utils import iface'
     QGS105,
     # allow line break before binary operator
