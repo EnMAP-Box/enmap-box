@@ -686,7 +686,7 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
                 bandItem.setExpanded(False)
                 self.mFilterBitmask.addTopLevelItem(bandItem)
                 for part in eo_band['gee:bitmask']['bitmask_parts']:
-                    values = part['values']
+                    values = part.get('values', [])
                     partsItem = PixelQualityBitmaskItem(
                         part['description'], eo_band['name'], part['first_bit'], part['bit_count'], 1
                     )

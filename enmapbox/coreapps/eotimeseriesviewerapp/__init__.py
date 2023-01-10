@@ -4,7 +4,7 @@
 ***************************************************************************
     hubtimeseriesviewer/__init__.py
 
-    Package definition of HUB TimeSeriesViewer for EnMAP-Box
+    Package definition of EO Time Series Viewer for EnMAP-Box
     ---------------------
     Date                 : Juli 2017
     Copyright            : (C) 2017 by Benjamin Jakimow
@@ -48,14 +48,12 @@ class EOTimeSeriesViewerApp(EnMAPBoxApplication):
 
         self.name = 'EO Time Series Viewer'
         self.mTSVInstance = None
-
+        self.licence = 'GNU GPL-3'
         if self.mPluginInstalled:
             import eotimeseriesviewer
             self.version = eotimeseriesviewer.__version__
-            self.licence = 'GNU GPL-3'
         else:
             self.version = 'Unknown'
-            self.licence = 'Unknown'
         self.mTSVInstance = None
 
     def icon(self):

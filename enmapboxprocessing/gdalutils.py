@@ -15,8 +15,9 @@ class GdalUtils(object):
         Stack a list of VRT bands, given by filenames and bandNumbers, together.
         The resulting VRT stack will not dependent on the source VRT files (those may be deleted afterwards).
 
-        It is assumed, that all pixel grids match! So this is not the most general kind of band stacking.
-
+        It is assumed, that:
+        1. all pixel grids match
+        2. all source files and the destination path are located in the same folder
         """
 
         reader = RasterReader(filenames[0])
@@ -32,6 +33,15 @@ class GdalUtils(object):
                 reader.gdalDataset.GetDriver().ShortName == 'VRT'
             ]):
                 raise ValueError('VRT input rasters not matching')
+
+        # make sure all source files are located inside the same directory
+        for fname in filenames:
+            if dirname(fname) != dirname(filenames[0]):
+                raise ValueError('all input files must be located in the same directory')
+
+        # make sure that the destination file is located inside the same directory
+        if dirname(filename) != dirname(filenames[0]):
+            raise ValueError('destination file must be located in the same directory as the input files')
 
         # extract all VRTRasterBand blocks
         vrtRasterBands = dict()

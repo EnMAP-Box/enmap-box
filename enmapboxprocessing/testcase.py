@@ -20,8 +20,11 @@ class TestCase(unittest.case.TestCase):
         array2 = np.array(array2)
         self.assertTrue(np.all(array1 == array2))
 
+    def testOutputFolder(self):
+        return join(dirname(dirname(__file__)), 'test-outputs')
+
     def filename(self, basename: str):
-        return join(dirname(dirname(__file__)), 'test-outputs', basename)
+        return join(self.testOutputFolder(), basename)
 
     def rasterFromArray(
             self, array, basename: str = None, extent: QgsRectangle = None, crs: QgsCoordinateReferenceSystem = None

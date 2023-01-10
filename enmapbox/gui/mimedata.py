@@ -7,6 +7,7 @@ from typing import List
 from enmapbox import debugLog
 from qgis.PyQt.QtCore import QMimeData, QUrl, QByteArray
 from qgis.PyQt.QtXml import QDomNamedNodeMap, QDomDocument
+from qgis.core import QgsVectorLayer
 from qgis.core import QgsLayerItem
 from qgis.core import QgsMapLayer, QgsRasterLayer, QgsProject, QgsReadWriteContext, \
     QgsMimeDataUtils, QgsLayerTree
@@ -201,8 +202,8 @@ def extractMapLayers(mimeData: QMimeData,
                 if isinstance(dataSource, SpatialDataSource):
                     lyr = dataSource.asMapLayer(project=project)
                     if isinstance(lyr, QgsMapLayer):
-                        if isinstance(lyr, QgsRasterLayer):
-                            lyr.setRenderer(defaultRasterRenderer(lyr))
+                        # if isinstance(lyr, QgsRasterLayer):
+                        #     lyr.setRenderer(defaultRasterRenderer(lyr))
                         newMapLayers.append(lyr)
 
     elif MDF_URILIST in mimeData.formats():
@@ -241,7 +242,7 @@ def extractMapLayers(mimeData: QMimeData,
     return newMapLayers
 
 
-def extractSpectralLibraries(mimeData: QMimeData) -> list:
+def extractSpectralLibraries(mimeData: QMimeData) -> List[QgsVectorLayer]:
     """Reads spectral libraries that may be defined in mimeData"""
     results = []
     slib = SpectralLibrary.readFromMimeData(mimeData)

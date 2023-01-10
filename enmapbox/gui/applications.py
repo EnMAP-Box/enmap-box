@@ -26,15 +26,15 @@ import site
 import sys
 import traceback
 import typing
-from typing import Optional
+from typing import Optional, List, Union, Dict
 
 from enmapbox import messageLog
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction
-from qgis.PyQt.QtWidgets import QMenu
+from qgis.PyQt.QtWidgets import QAction, QMenu
+from qgis.PyQt.QtXml import QDomDocument, QDomElement
 from qgis.core import QgsProcessingAlgorithm
 from qgis.gui import QgisInterface
 
@@ -118,9 +118,32 @@ class EnMAPBoxApplication(QObject):
         """
         raise Exception('Use "processingAlgorithms" instead.')
 
-    def processingAlgorithms(self) -> list:
+    def processingAlgorithms(self) -> List[QgsProcessingAlgorithm]:
 
         return []
+
+    def projectSettingsKey(self) -> str:
+        """Overwrite to specify custom project settings key inside QGIS Project file (*.QGZ)."""
+        return self.__class__.__name__
+
+    def projectSettings(self, document: QDomDocument, enmapBoxElement: QDomElement) -> Dict:
+        """
+        Overwrite to specify project settings to be stored inside QGIS Project file (*.QGZ).
+
+        You can either
+        a) return a dictionary with values to be stored, or
+        b) directly write XML into the QGIS DOM Document.
+        """
+        return {}
+
+    def setProjectSettings(self, settings: Dict, document: QDomDocument, enmapBoxElement: QDomElement):
+        """
+        Overwrite to restore project settings from QGIS Project file (*.QGZ).
+
+        You can either
+        a) use the values from the settings dictionary, or
+        b) directly read XML from the QGIS DOM Document.
+        """
 
     @staticmethod
     def utilsAddActionInAlphanumericOrder(menu: QMenu, text: str) -> QAction:
@@ -197,14 +220,14 @@ class ApplicationRegistry(QObject):
     def __iter__(self):
         return iter(self.mAppWrapper.values())
 
-    def applications(self) -> list:
+    def applications(self) -> List[EnMAPBoxApplication]:
         """
         Returns the EnMAPBoxApplications
         :return: [list-of-EnMAPBoxApplications]
         """
         return [w.app for w in self.applicationWrapper()]
 
-    def applicationWrapper(self, nameOrApp=None) -> list:
+    def applicationWrapper(self, nameOrApp: Union[str, EnMAPBoxApplication] = None) -> List[ApplicationWrapper]:
         """
         Returns the EnMAPBoxApplicationWrappers.
         :param nameOrApp: str | EnMAPBoxApplication to return the ApplicationWrapper for
@@ -216,7 +239,7 @@ class ApplicationRegistry(QObject):
                         isinstance(w, ApplicationWrapper) and nameOrApp in [w.appId, w.app.name, w.app]]
         return wrappers
 
-    def addApplicationListing(self, path: str):
+    def addApplicationListing(self, path: Union[str, pathlib.Path]):
         """
         Loads EnMAPBoxApplications from locations defined in a text file
         :param path: str, filepath to file with locations of EnMAPBoxApplications
@@ -240,7 +263,7 @@ class ApplicationRegistry(QObject):
         for app_folder in app_folders:
             self.addApplicationFolder(app_folder)
 
-    def isApplicationFolder(self, path: pathlib.Path) -> bool:
+    def isApplicationFolder(self, path: Union[str, pathlib.Path]) -> bool:
         """
         Checks if the directory "appPackage" contains an '__init__.py' with an enmapboxApplicationFactory
         :param appPackage: path to directory
@@ -264,7 +287,7 @@ class ApplicationRegistry(QObject):
         return re.search(r'def\s+enmapboxApplicationFactory\(.+\)\s*(->[^:]+)?:', lines) is not None
 
     def findApplicationFolders(self,
-                               rootDir: pathlib.Path,
+                               rootDir: Union[str, pathlib.Path],
                                max_deep: int = 2) -> typing.List[pathlib.Path]:
         """
         Searches for folders that contain an EnMAPBoxApplication
@@ -287,7 +310,7 @@ class ApplicationRegistry(QObject):
                     )
             return results
 
-    def addApplicationFolder(self, app_folder: pathlib.Path) -> bool:
+    def addApplicationFolder(self, app_folder: Union[str, pathlib.Path]) -> bool:
         """
         Loads EnMAP-Box application from ann application folder.
         Searches in folder and each sub-folder for EnMAP-Box Applications

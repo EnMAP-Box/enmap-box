@@ -1,7 +1,11 @@
+from os import chdir
+
+from osgeo import gdal
+
 from enmapbox.exampledata import enmap
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
-from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.algorithm.testcase import TestCase
+from enmapboxprocessing.rasterreader import RasterReader
 from qgis.core import QgsProcessingException
 
 
@@ -61,3 +65,17 @@ class TestCreateSpectralIndicesAlgorithm(TestCase):
             self.runalg(alg, parameters)
         except QgsProcessingException as error:
             self.assertEqual('unknown index: NOT_AN_INDEX', str(error))
+
+    def test_relativeInputPath(self):
+
+        gdal.Translate(self.filename('enmap.tif'), enmap)  # copy enmap_berlin to output folder
+        chdir(self.testOutputFolder())  # set output folder the current workdir
+
+        alg = CreateSpectralIndicesAlgorithm()
+        alg.initAlgorithm()
+        parameters = {
+            alg.P_RASTER: 'enmap.tif',  # use reletive input path!
+            alg.P_INDICES: 'NDVI, EVI',
+            alg.P_OUTPUT_VRT: self.filename('vi.vrt'),
+        }
+        result = self.runalg(alg, parameters)
