@@ -24,6 +24,7 @@ import qgis
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from qgis.core import QgsProject
+import enmapbox.exampledata
 
 
 class TestIssue711(EnMAPBoxTestCase):
@@ -63,13 +64,12 @@ class TestIssue711(EnMAPBoxTestCase):
         if False:
             EMB.loadExampleData()
         else:
-            import enmapbox.exampledata
+
             sources = []
             sources += [enmapbox.exampledata.enmap,
                         enmapbox.exampledata.landcover_polygon,
                         enmapbox.exampledata.landcover_point,
                         enmapbox.exampledata.library_gpkg,
-                        enmapbox.exampledata.library_sli,
                         enmapbox.exampledata.enmap_srf_library
                         ]
 

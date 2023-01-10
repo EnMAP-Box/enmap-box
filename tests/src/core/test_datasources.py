@@ -200,7 +200,7 @@ class DataSourceTests(EnMAPBoxTestCase):
         self.assertTrue(ds2.updateTime() > t0_2)
 
     def test_DataSourceModel(self):
-        from enmapbox.exampledata import enmap, landcover_polygon, library_gpkg, library_sli, enmap_srf_library
+        from enmapbox.exampledata import enmap, landcover_polygon, library_gpkg, enmap_srf_library
         sources = [enmap,
                    enmap,
                    landcover_polygon,
@@ -208,7 +208,6 @@ class DataSourceTests(EnMAPBoxTestCase):
                    enmap_srf_library,
                    enmap_srf_library,
                    library_gpkg,
-                   library_sli,
                    classifierDumpPkl]
 
         model = DataSourceManager()

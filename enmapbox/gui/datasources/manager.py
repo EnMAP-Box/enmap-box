@@ -21,6 +21,7 @@ from qgis.PyQt.QtCore import QAbstractItemModel, QItemSelectionModel, QFileInfo,
     QMimeData, QModelIndex, Qt, QUrl, QSortFilterProxyModel, pyqtSignal
 from qgis.PyQt.QtGui import QContextMenuEvent, QIcon, QDesktopServices
 from qgis.PyQt.QtWidgets import QWidget, QDialog, QMenu, QAction, QApplication, QAbstractItemView, QTreeView
+from qgis.core import QgsProviderRegistry, QgsProviderSublayerDetails
 from qgis.core import QgsLayerTreeGroup, QgsLayerTreeLayer, QgsMapLayer, QgsProject, QgsWkbTypes, QgsRasterLayer, \
     QgsRasterDataProvider, QgsRasterRenderer, QgsVectorLayer, QgsDataItem, QgsLayerItem, Qgis
 from qgis.core import QgsMimeDataUtils
@@ -324,9 +325,8 @@ class DataSourceManager(TreeModel):
 
     def addDataSources(self,
                        sources: Union[DataSource, List[DataSource], Any],
-                       provider: str = None,
                        name: str = None) -> List[DataSource]:
-        sources = DataSourceFactory.create(sources, provider=provider, name=name, project=self.project())
+        sources = DataSourceFactory.create(sources, name=name, project=self.project())
         if isinstance(sources, DataSource):
             sources = [sources]
 
@@ -921,7 +921,6 @@ class DataSourceFactory(object):
 
     @staticmethod
     def create(source: any,
-               provider: str = None,
                name: str = None,
                project: QgsProject = QgsProject.instance(),
                parent: QWidget = None) -> List[DataSource]:
@@ -931,13 +930,15 @@ class DataSourceFactory(object):
         results = []
         if isinstance(source, list):
             for s in source:
-                results.extend(DataSourceFactory.create(s, provider=provider, name=name, project=project))
+                results.extend(DataSourceFactory.create(s, name=name, project=project))
         else:
             if isinstance(source, DataSource):
                 return [source]
 
                 s = ""
             dataItem: QgsDataItem = None
+            if isinstance(source, QgsProviderSublayerDetails):
+                source = source.toMimeUri()
 
             if isinstance(source, QgsMimeDataUtils.Uri):
                 if source.layerType == 'raster':
@@ -954,7 +955,6 @@ class DataSourceFactory(object):
 
                 elif source.isValid():
                     source = source.uri
-                    provider = source.providerKey
                     name = source.name
 
                 else:
@@ -982,45 +982,26 @@ class DataSourceFactory(object):
                         name = pathlib.Path(source).name
 
                     if re.search(r'\.(pkl)$', source, re.I):
-                        if Qgis.versionInt() < 32000:
-                            dataItem = QgsDataItem(QgsDataItem.Custom, None, name, source, 'special:pkl')
-                        else:
-                            dataItem = QgsDataItem(Qgis.BrowserItemType.Custom, None, name, source, 'special:pkl')
-
-                    if not isinstance(dataItem, QgsDataItem):
-                        if provider in ['gdal']:
-                            mapLayerTypes = [QgsRasterLayer]
-                        elif provider in ['ogr']:
-                            mapLayerTypes = [QgsVectorLayer]
-                        elif re.search(r'\.(bsq|tiff?|hdf|bil|bip|grib|xml|vrt)$', source, re.I):
-                            mapLayerTypes = [QgsRasterLayer, QgsVectorLayer]
-                        else:
-                            mapLayerTypes = [QgsVectorLayer, QgsRasterLayer]
-
-                        for mapLayerType in mapLayerTypes:
-                            try:
-                                lyr = mapLayerType(source, name)
-                                if isinstance(lyr, QgsMapLayer):
-                                    if lyr.isValid():
-                                        dtype = QgsLayerItem.typeFromMapLayer(lyr)
-
-                                        dataItem = LayerItem(None, lyr.name(), lyr.source(),
-                                                             lyr.source(), dtype, lyr.providerType())
-                                        if is_spectral_library(lyr):
-                                            dataItem.setIcon(QIcon(r':/qps/ui/icons/speclib.svg'))
-                                        break
-                                    elif len(lyr.subLayers()) > 0:
-                                        return DataSourceFactory.createSubLayerSources(lyr)
-                                        break
-                            except Exception as ex:
-                                pass
-
+                        dataItem = QgsDataItem(Qgis.BrowserItemType.Custom, None, name, source, 'special:pkl')
+                    else:
+                        sublayerDetails = QgsProviderRegistry.instance().querySublayers(source)
+                        if len(sublayerDetails) == 1:
+                            return DataSourceFactory.create(sublayerDetails[0])
+                        elif len(sublayerDetails) > 1:
+                            # show sublayer selection dialog
+                            d = SubDatasetSelectionDialog()
+                            d.setWindowTitle('Select Layers')
+                            from enmapbox import icon as enmapBoxIcon
+                            d.setWindowIcon(enmapBoxIcon())
+                            d.showMultiFiles(False)
+                            d.setSubDatasetDetails(sublayerDetails)
+                            if d.exec_() == QDialog.Accepted:
+                                return DataSourceFactory.create(d.selectedSublayerDetails())
+                            else:
+                                return []
                     if dataItem is None:
                         if pathlib.Path(source).is_file():
-                            if Qgis.versionInt() < 32000:
-                                dataItem = QgsDataItem(QgsDataItem.Custom, None, name, source, 'special:file')
-                            else:
-                                dataItem = QgsDataItem(Qgis.BrowserItemType.Custom, None, name, source, 'special:file')
+                            dataItem = QgsDataItem(Qgis.BrowserItemType.Custom, None, name, source, 'special:file')
 
             if isinstance(dataItem, QgsDataItem):
                 ds: DataSource = None
@@ -1046,23 +1027,6 @@ class DataSourceFactory(object):
                     results.append(ds)
 
         return results
-
-    @staticmethod
-    def createSubLayerSources(source: QgsMapLayer, parent: QWidget = None) -> List[DataSource]:
-        assert isinstance(source, QgsMapLayer)
-
-        if not len(source.subLayers()) > 0:
-            return []
-
-        d = SubDatasetSelectionDialog(parent=parent)
-        d.setWindowIcon(QIcon(':/enmapbox/gui/ui/icons/enmapbox.svg'))
-        d.setWindowTitle('Select Sub-Datasets')
-        d.setFiles([source.source()])
-
-        if d.exec_() == QDialog.Accepted:
-            return DataSourceFactory.create(d.selectedSubDatasets(), provider=source.providerType())
-        else:
-            return []
 
     @staticmethod
     def srcToString(src) -> str:

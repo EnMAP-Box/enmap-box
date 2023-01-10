@@ -16,7 +16,7 @@ import unittest
 
 from enmapbox import EnMAPBox
 from enmapbox.exampledata import enmap, hires, landcover_polygon, library_gpkg
-from enmapbox.gui.dataviews.dockmanager import MapDockTreeNode, MapCanvasBridge
+from enmapbox.gui.dataviews.dockmanager import MapDockTreeNode
 from enmapbox.gui.dataviews.docks import MapDock
 from enmapbox.gui.mapcanvas import CanvasLink, MapCanvas, KEY_LAST_CLICKED, LINK_ON_CENTER
 from enmapbox.qgispluginsupport.qps.maptools import CursorLocationMapTool, MapTools
@@ -154,9 +154,11 @@ class MapCanvasTests(EnMAPBoxTestCase):
 
     def test_dropEvents(self):
 
+        from enmapboxtestdata import SensorProducts
+        SensorProducts.Desis.L1B
+
         mapDock = MapDock()
         node = MapDockTreeNode(mapDock)
-        bridge = MapCanvasBridge(node, mapDock.mapCanvas())
         mapCanvas = mapDock.mapCanvas()
         allFiles = [enmap, hires, landcover_polygon, library_gpkg]
         spatialFiles = [enmap, hires, landcover_polygon]
@@ -169,9 +171,16 @@ class MapCanvasTests(EnMAPBoxTestCase):
         mapCanvas.dropEvent(TestObjects.createDropEvent(md))
         # self.assertTrue(len(self.mapCanvas.layerPaths()) == len(spatialFiles))
 
-        layerPaths = [pathlib.Path(p) for p in mapCanvas.layerPaths()]
+        layerSources = []
+        for p in mapCanvas.layerPaths():
+            p = pathlib.Path(p)
+            if '|' in p.name:
+                p = p.parent / p.name.split('|')[0]
+            layerSources.append(p)
+
         for p in spatialFiles:
-            self.assertTrue(pathlib.Path(p) in layerPaths)
+            p2 = pathlib.Path(p)
+            self.assertTrue(pathlib.Path(p) in layerSources, msg=f'Failed to drop {p}')
 
 
 if __name__ == "__main__":

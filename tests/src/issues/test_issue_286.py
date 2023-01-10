@@ -4,17 +4,17 @@ This is a template to create an EnMAP-Box test
 import pathlib
 import unittest
 
-from qgis.PyQt.QtWidgets import QApplication
-from qgis._core import QgsWkbTypes, QgsVectorFileWriter, QgsProcessingFeedback, QgsCoordinateTransformContext, \
+from qgis.core import QgsWkbTypes, QgsVectorFileWriter, QgsProcessingFeedback, QgsCoordinateTransformContext, \
     QgsProject
-from qgis.core import QgsApplication, QgsRasterLayer, QgsVectorLayer
-from enmapbox.testing import EnMAPBoxTestCase, TestObjects
+
 from enmapbox import EnMAPBox
+from enmapbox.testing import EnMAPBoxTestCase, TestObjects
+from qgis.core import QgsVectorLayer
 
 
 class EnMAPBoxTestCaseIssue286(EnMAPBoxTestCase):
 
-    def createMultiLayerGPKG(self, path):
+    def createMultiLayerGPKG(self, path) -> pathlib.Path:
 
         path = pathlib.Path(path)
         lyr1 = TestObjects.createVectorLayer(QgsWkbTypes.Point)
@@ -65,17 +65,18 @@ class EnMAPBoxTestCaseIssue286(EnMAPBoxTestCase):
                 # QgsVectorFileWriter.writeAsVectorFormatV2(lyr, path.as_posix(), )
                 del writer
             else:
-                err, p2 = QgsVectorFileWriter.writeAsVectorFormatV2(lyr, path.as_posix(), context, options)
+                err, msg, p, geom = QgsVectorFileWriter.writeAsVectorFormatV3(lyr, path.as_posix(), context, options)
+                assert err == QgsVectorFileWriter.WriterError.NoError
+                s = ""
 
+    @unittest.skipIf(not TestObjects.repoDirGDAL(), 'Test requires GDAL repo testdata')
+    @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'Blocking dialog to select sublayer')
     def test_with_enmapbox(self):
-        tmpDir = self.tempDir()
-
-        pathGPKG = tmpDir / 'test.gpkg'
-        if True or not pathGPKG.is_file():
-            self.createMultiLayerGPKG(pathGPKG)
+        dir_gdal = TestObjects.repoDirGDAL()
+        path_grps = dir_gdal / 'autotest/gdrivers/data/hdf5/groups.h5'
 
         enmapBox = EnMAPBox(load_core_apps=False, load_other_apps=False)
-        enmapBox.addSource(pathGPKG)
+        enmapBox.addSource(path_grps)
 
         self.showGui(enmapBox.ui)
 

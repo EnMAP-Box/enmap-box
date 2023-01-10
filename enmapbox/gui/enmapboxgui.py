@@ -1152,7 +1152,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         result = d.exec_()
 
         if result == QDialog.Accepted:
-            subdatasets = d.selectedSubDatasets()
+            subdatasets = d.selectedSublayerDetails()
             layers = []
             loptions = QgsRasterLayer.LayerOptions(loadDefaultStyle=False)
             for i, s in enumerate(subdatasets):

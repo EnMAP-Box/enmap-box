@@ -66,10 +66,10 @@ initQgisApplication = start_app
 class EnMAPBoxTestCase(TestCase):
     @classmethod
     def setUpClass(cls, resources=[]):
-        tmpDir = cls.tempDir(cls, subdir=cls.__name__)
+        tmpDir = cls.tempDir(cls)
         os.chdir(tmpDir)
         super().setUpClass(resources=resources)
-
+        QgsApplication.processEvents()
         # add test-dir as site lib
         from enmapbox import DIR_REPO
         DIR_TESTS = pathlib.Path(DIR_REPO) / 'tests'
@@ -79,11 +79,16 @@ class EnMAPBoxTestCase(TestCase):
         import enmapbox
         enmapbox.initAll()
 
-    def closeEnMAPBoxInstance(self):
+    @classmethod
+    def closeEnMAPBoxInstance(cls):
         eb = EnMAPBox.instance()
         if isinstance(eb, EnMAPBox):
             eb.close()
         QApplication.processEvents()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.closeEnMAPBoxInstance()
 
     def tempDir(self, subdir: str = None, cleanup: bool = False) -> pathlib.Path:
         """

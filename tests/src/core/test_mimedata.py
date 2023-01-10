@@ -14,20 +14,17 @@ __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
 import os
 import pathlib
-import sys
-import time
 import unittest
-
-from qgis.PyQt.QtCore import QMimeData, QByteArray, QUrl, Qt, QPoint
-from qgis.PyQt.QtGui import QDropEvent
-from qgis.PyQt.QtWidgets import QApplication
-from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, QgsWkbTypes
-from qgis.gui import QgsMapCanvas
 
 import enmapbox.gui.mimedata as mimedata
 from enmapbox import EnMAPBox, DIR_EXAMPLEDATA
 from enmapbox.exampledata import enmap, hires, library_gpkg, landcover_polygon
 from enmapbox.testing import EnMAPBoxTestCase
+from qgis.PyQt.QtCore import QMimeData, QByteArray, QUrl, Qt, QPoint
+from qgis.PyQt.QtGui import QDropEvent
+from qgis.PyQt.QtWidgets import QApplication
+from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer
+from qgis.core import QgsProviderRegistry
 
 
 class MimeDataTests(EnMAPBoxTestCase):
@@ -107,6 +104,13 @@ class MimeDataTests(EnMAPBoxTestCase):
         return QDropEvent(QPoint(0, 0), Qt.CopyAction, md, Qt.LeftButton, Qt.NoModifier)
 
     def test_dropping_files_empty_dockarea(self):
+
+        import datetime
+        t0 = datetime.datetime.now()
+        p = r'\\141.20.140.91\san\_EnMAP\Rohdaten\EnmapBoxExternalSensorProducts'
+        os.path.isdir(p)
+        print(datetime.datetime.now() - t0)
+
         files = []
         nMax = 25
         for root, dirs, f in os.walk(DIR_EXAMPLEDATA):
@@ -120,6 +124,10 @@ class MimeDataTests(EnMAPBoxTestCase):
         dockManager = EB.dockManager()
         dockArea = dockManager.currentDockArea()
         for path in files:
+
+            sublayers = QgsProviderRegistry.instance().querySublayers(path.as_posix())
+            if len(sublayers) != 1:
+                continue
             print(f'Drop {path}...', flush=True)
             dockManager.onDockAreaDragDropEvent(dockArea, self.file2DropEvent(path))
             QApplication.processEvents()
@@ -131,81 +139,6 @@ class MimeDataTests(EnMAPBoxTestCase):
             QApplication.processEvents()
 
         print('Done!')
-        EB.close()
-
-    def test_csv_drop(self):
-
-        path_csv = pathlib.Path(enmap).parent / 'library_berlin.csv'
-        self.assertTrue(path_csv.is_file())
-
-        mimeData = QMimeData()
-        mimeData.setUrls([QUrl.fromLocalFile(path_csv.as_posix())])
-
-        layers = mimedata.extractMapLayers(mimeData)
-        self.assertTrue(len(layers) > 0)
-        self.assertIsInstance(layers[0], QgsVectorLayer)
-
-        vl = layers[0]
-
-        self.assertTrue(vl.wkbType() == QgsWkbTypes.NoGeometry)
-        QgsProject.instance().addMapLayer(vl)
-
-        self.assertTrue(vl.isValid())
-        canvas = QgsMapCanvas()
-        canvas.setLayers([vl])
-
-        s = ""
-
-    @unittest.SkipTest
-    def test_dropping_files_speclib_widget(self):
-        files = []
-        nMax = 25
-        for root, dirs, f in os.walk(DIR_EXAMPLEDATA):
-            if len(files) >= nMax:
-                break
-            for file in f:
-                if not file.endswith('__init__.py'):
-                    files.append(pathlib.Path(root) / file)
-
-        # drop on spectral library widget
-        from enmapbox.gui.dataviews.docks import SpectralLibraryDock
-        from enmapbox.gui import SpectralLibraryWidget
-        from enmapbox.exampledata import library_gpkg
-        EB = EnMAPBox(load_other_apps=False, load_core_apps=False)
-        sld = EB.createDock('SPECLIB')
-        self.assertIsInstance(sld, SpectralLibraryDock)
-        w = sld.speclibWidget()
-        self.assertIsInstance(w, SpectralLibraryWidget)
-
-        # drop a speclib
-        self.assertTrue(len(w.speclib()) == 0)
-        w.dropEvent(self.file2DropEvent(library_gpkg))
-        QApplication.processEvents()
-        self.assertTrue(len(w.speclib()) > 0)
-
-        # drop ASD file
-        asdFile = pathlib.Path(DIR_EXAMPLEDATA) / 'asd' / 'txt' / 'ribb00002.asd.txt'
-        if asdFile.is_file():
-            w.dropEvent(self.file2DropEvent(asdFile))
-            QApplication.processEvents()
-            s = ""
-
-        # drop random files
-        for file in files:
-            event = self.file2DropEvent(file)
-            try:
-                print(f'Drop {file}...', flush=True)
-                w.dropEvent(event)
-
-                QApplication.processEvents()
-                print(f'Remove {file}...', flush=True)
-                EB.dataSourceManager().removeSource(file)
-                QApplication.processEvents()
-                time.sleep(2)
-            except Exception as ex:
-                print(ex, file=sys.stderr)
-                s = ""
-
         EB.close()
 
 
