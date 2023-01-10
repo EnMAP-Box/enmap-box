@@ -25,7 +25,7 @@ from enmapbox.qgispluginsupport.qps.utils import fid2pixelindices, SpatialPoint
 from enmapbox.testing import EnMAPBoxTestCase
 from qgis.gui import QgsMapLayerComboBox
 from qgis.core import QgsRasterLayer, QgsVectorLayer
-from enmapboxtestdata import fraction_polygon_l3, fraction_points
+from enmapboxtestdata import fraction_polygon_l3, fraction_point_singletarget
 
 
 class TestSpeclibs(EnMAPBoxTestCase):
@@ -39,7 +39,7 @@ class TestSpeclibs(EnMAPBoxTestCase):
     def test_issue_1036(self):
         EB = EnMAPBox(load_core_apps=False, load_other_apps=False)
         lyrR = QgsRasterLayer(enmap, 'EnMAP')
-        lyrV = QgsVectorLayer(fraction_points, 'points')
+        lyrV = QgsVectorLayer(fraction_point_singletarget, 'points')
         canvas: MapCanvas = EB.createNewMapCanvas()
         sld: SpectralLibraryDock = EB.createNewSpectralLibrary()
         tree = canvas.layerTree()

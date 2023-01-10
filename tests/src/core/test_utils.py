@@ -44,7 +44,6 @@ class testClassUtils(EnMAPBoxTestCase):
         self.w.close()
 
     def test_spatialObjects(self):
-        from enmapbox.gui.utils import SpatialPoint
 
         pt1 = SpatialPoint('EPSG:4326', 300, 300)
         self.assertIsInstance(pt1, SpatialPoint)

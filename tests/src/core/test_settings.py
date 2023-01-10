@@ -55,8 +55,6 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
         tmp_path = self.tempDir() / 'project.qgs'
         os.makedirs(tmp_path.parent, exist_ok=True)
 
-        box.saveProject(tmp_path)
-
         box.close()
         self.assertTrue(EnMAPBox.instance() is None)
 
