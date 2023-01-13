@@ -2,7 +2,6 @@ from math import isnan
 from typing import Iterable, List, Union, Optional, Tuple, Iterator
 
 import numpy as np
-from PyQt5.QtCore import QPoint
 from osgeo import gdal
 
 import processing
@@ -12,12 +11,12 @@ from enmapboxprocessing.numpyutils import NumpyUtils
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.typing import RasterSource, Array3d, Metadata, MetadataValue, MetadataDomain, Array2d
 from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtCore import QSizeF, QDateTime, QDate
+from qgis.PyQt.QtCore import QSizeF, QDateTime, QDate, QPoint
 from qgis.PyQt.QtGui import QColor
-from qgis._core import QgsGeometry, QgsVectorLayer, QgsWkbTypes, QgsFeature
 from qgis.core import (QgsRasterLayer, QgsRasterDataProvider, QgsCoordinateReferenceSystem, QgsRectangle,
                        QgsRasterRange, QgsPoint, QgsRasterBlockFeedback, QgsRasterBlock, QgsPointXY,
-                       QgsProcessingFeedback, QgsRasterBandStats, Qgis)
+                       QgsProcessingFeedback, QgsRasterBandStats, Qgis, QgsGeometry, QgsVectorLayer, QgsWkbTypes,
+                       QgsFeature)
 from typeguard import typechecked
 
 
@@ -383,7 +382,7 @@ class RasterReader(object):
 
     def sampleWeightedValues(
             self, extent: QgsRectangle, weightsArray: Array2d, bandNo: int
-    ) -> Tuple[np.ndarray,np.ndarray]:
+    ) -> Tuple[np.ndarray, np.ndarray]:
         height, width = weightsArray.shape
         array = self.arrayFromBoundingBoxAndSize(extent, width, height, [bandNo])[0]
         maskArray = self.maskArray([array], [bandNo])[0] * (weightsArray != 0)
