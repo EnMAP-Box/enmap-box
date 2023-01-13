@@ -19,7 +19,7 @@ class ImportLandsatL2Algorithm(EnMAPProcessingAlgorithm):
     def shortDescription(self):
         return 'Prepare a spectral raster layer from the given product. ' \
                'Wavelength information is set and data is scaled into the 0 to 1 range.' \
-               'Supports Landsat 4 to 9, collection 1 and 2. '
+               'Supports Landsat 4 to 9, collection 2. '
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
@@ -38,8 +38,15 @@ class ImportLandsatL2Algorithm(EnMAPProcessingAlgorithm):
         self.addParameterVrtDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 
     def isValidFile(self, mtlFilename: str) -> bool:
-        return basename(mtlFilename).startswith('L') & \
-               mtlFilename.endswith('MTL.txt')
+        if not mtlFilename.endswith('MTL.txt'):
+            return False
+        sensor, level, *_ = basename(mtlFilename).split('_')
+        if sensor not in ['LT04', 'LT05', 'LE07', 'LC08', 'LC09']:
+            return False
+        if level != 'L2SP':
+            return False
+
+        return True
 
     def defaultParameters(self, mtlFilename: str):
         return {
@@ -68,9 +75,7 @@ class ImportLandsatL2Algorithm(EnMAPProcessingAlgorithm):
             collectionNumber = mtlFilename[-13:-11]
 
             if collectionNumber == '01':
-                pattern = 'sr_band{}.tif'
-                gain = 1. / 10000
-                offset = None
+                raise QgsProcessingException('Landsat collection 1 not supported anymore')
             elif collectionNumber == '02':
                 pattern = 'SR_B{}.TIF'
                 gain = 0.0000275  # see https://www.usgs.gov/core-science-systems/nli/landsat/landsat-collection-2-level-2-science-products

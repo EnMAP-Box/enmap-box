@@ -11,6 +11,8 @@ from enmapboxprocessing.algorithm.importenmapl1calgorithm import ImportEnmapL1CA
 from enmapboxprocessing.algorithm.importenmapl2aalgorithm import ImportEnmapL2AAlgorithm
 from enmapboxprocessing.algorithm.importlandsatl2algorithm import ImportLandsatL2Algorithm
 from enmapboxprocessing.algorithm.importprismal1algorithm import ImportPrismaL1Algorithm
+from enmapboxprocessing.algorithm.importprismal2balgorithm import ImportPrismaL2BAlgorithm
+from enmapboxprocessing.algorithm.importprismal2calgorithm import ImportPrismaL2CAlgorithm
 from enmapboxprocessing.algorithm.importprismal2dalgorithm import ImportPrismaL2DAlgorithm
 from enmapboxprocessing.algorithm.importproductsdraganddropsupport import AlgorithmDialogWrapper
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
@@ -81,57 +83,67 @@ class SensorProductImportDockWidget(QgsDockWidget):
             ImportEnmapL2AAlgorithm(),
             ImportLandsatL2Algorithm(),
             ImportPrismaL1Algorithm(),
+            ImportPrismaL2BAlgorithm(),
+            ImportPrismaL2CAlgorithm(),
             ImportPrismaL2DAlgorithm(),
             ImportSentinel2L2AAlgorithm()
         ]
         layers = list()
         filename = None
+        # check URL
         for alg in algs:
             if isfile(url):
                 if alg.isValidFile(url):
                     filename = url
-                else:
-                    for name in listdir(dirname(url)):
-                        url2 = join(dirname(url), name)
-                        if alg.isValidFile(url2):
-                            filename = url2
-                            break
+                    break
             elif isdir(url):
                 for name in listdir(url):
                     url2 = join(url, name)
                     if alg.isValidFile(url2):
                         filename = url2
                         break
+                if filename is not None:
+                    break
 
-            if filename is None:
-                continue
+        # check URL directory
+        if filename is None:
+            for alg in algs:
+                for name in listdir(dirname(url)):
+                    url2 = join(dirname(url), name)
+                    if alg.isValidFile(url2):
+                        filename = url2
+                        break
+                if filename is not None:
+                    break
 
-            parameters = alg.defaultParameters(filename)
-            alreadyExists = True
-            for key, value in parameters.items():
-                if key.startswith('output'):
-                    alreadyExists &= exists(value)
-            if not alreadyExists:
-                dialog: AlgorithmDialogWrapper = EnMAPBox.showProcessingAlgorithmDialog(
-                    alg, parameters, True, True, AlgorithmDialogWrapper, False
-                )
-                if not dialog.finishedSuccessful:
-                    return
-                result = dialog.finishResult
-                result = {}  # results will be opened by the processing framework
-
-            else:
-                result = {key: value for key, value in parameters.items()
-                          if key.startswith('output')}
-
-            for key, value in result.items():
-                if parameters[key] is None or value is None:
-                    continue
-                layer = QgsRasterLayer(parameters[key], basename(value))
-                layers.append(layer)
-
-            if self.interfaceType == self.EnmapBoxInterface:
-                self.enmapBoxInterface().addMapLayers(layers)
-            elif self.interfaceType == self.QgisInterface:
-                QgsProject.instance().addMapLayers(layers)
+        if filename is None:
             return
+
+        parameters = alg.defaultParameters(filename)
+        alreadyExists = True
+        for key, value in parameters.items():
+            if key.startswith('output'):
+                alreadyExists &= exists(value)
+        if not alreadyExists:
+            dialog: AlgorithmDialogWrapper = EnMAPBox.showProcessingAlgorithmDialog(
+                alg, parameters, True, True, AlgorithmDialogWrapper, False
+            )
+            if not dialog.finishedSuccessful:
+                return
+            result = dialog.finishResult
+            result = {}  # results will be opened by the processing framework
+
+        else:
+            result = {key: value for key, value in parameters.items()
+                      if key.startswith('output')}
+
+        for key, value in result.items():
+            if parameters[key] is None or value is None:
+                continue
+            layer = QgsRasterLayer(parameters[key], basename(value))
+            layers.append(layer)
+
+        if self.interfaceType == self.EnmapBoxInterface:
+            self.enmapBoxInterface().addMapLayers(layers)
+        elif self.interfaceType == self.QgisInterface:
+            QgsProject.instance().addMapLayers(layers)
