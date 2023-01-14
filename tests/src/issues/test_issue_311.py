@@ -23,16 +23,19 @@ class EnMAPBoxTestCaseIssue311(EnMAPBoxTestCase):
 
         slw: SpectralLibraryWidget = dock.speclibWidget()
 
-        QgsApplication.processEvents()
-
         self.assertEqual(slw.actionShowAttributeTable.isChecked(),
-                         slw.mMainView.isVisible() and slw.mMainView.view() == QgsDualView.ViewMode.AttributeTable)
+                         slw.centralWidget().isVisibleTo(
+                             slw) and slw.mMainView.view() == QgsDualView.ViewMode.AttributeTable)
         self.assertEqual(slw.actionShowFormView.isChecked(),
-                         slw.mMainView.isVisible() and slw.mMainView.view() == QgsDualView.ViewMode.AttributeEditor)
-        self.assertEqual(slw.actionShowProfileView.isChecked(), slw.mSpeclibPlotWidget.isVisible())
-        self.assertEqual(slw.actionShowProfileView.isChecked(), slw.mSpeclibPlotWidget.plotWidget.isVisible())
-        self.assertEqual(slw.actionShowProfileViewSettings.isChecked(), slw.mSpeclibPlotWidget.treeView.isVisble())
+                         slw.centralWidget().isVisibleTo(
+                             slw) and slw.mMainView.view() == QgsDualView.ViewMode.AttributeEditor)
+        self.assertEqual(slw.actionShowProfileView.isChecked(), slw.mSpeclibPlotWidget.isVisibleTo(slw))
+        self.assertEqual(slw.actionShowProfileView.isChecked(), slw.mSpeclibPlotWidget.plotWidget.isVisibleTo(slw))
+        self.assertEqual(slw.actionShowProfileView.isChecked() and
+                         slw.actionShowProfileViewSettings.isChecked(),
+                         slw.mSpeclibPlotWidget.treeView.isVisibleTo(slw))
         self.showGui(enmapBox.ui)
+
 
 if __name__ == '__main__':
     unittest.main(buffer=False)
