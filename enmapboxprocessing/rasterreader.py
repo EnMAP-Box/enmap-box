@@ -4,15 +4,19 @@ from typing import Iterable, List, Union, Optional, Tuple, Iterator
 import numpy as np
 from osgeo import gdal
 
+import processing
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapboxprocessing.gridwalker import GridWalker
+from enmapboxprocessing.numpyutils import NumpyUtils
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
-from enmapboxprocessing.typing import RasterSource, Array3d, Metadata, MetadataValue, MetadataDomain
+from enmapboxprocessing.typing import RasterSource, Array3d, Metadata, MetadataValue, MetadataDomain, Array2d
 from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtCore import QSizeF, QDateTime, QDate
+from qgis.PyQt.QtCore import QSizeF, QDateTime, QDate, QPoint
 from qgis.PyQt.QtGui import QColor
 from qgis.core import (QgsRasterLayer, QgsRasterDataProvider, QgsCoordinateReferenceSystem, QgsRectangle,
                        QgsRasterRange, QgsPoint, QgsRasterBlockFeedback, QgsRasterBlock, QgsPointXY,
-                       QgsProcessingFeedback, QgsRasterBandStats, Qgis)
+                       QgsProcessingFeedback, QgsRasterBandStats, Qgis, QgsGeometry, QgsVectorLayer, QgsWkbTypes,
+                       QgsFeature)
 from typeguard import typechecked
 
 
@@ -302,6 +306,89 @@ class RasterReader(object):
 
             maskArray.append(m)
         return maskArray
+
+    def pixelByPoint(self, point: QgsPointXY) -> QPoint:
+        return SpatialPoint(self.crs(), point).toPixelPosition(self.layer)
+
+    def pixelExtent(self, pixel: QPoint) -> QgsRectangle:
+        xoff = self.extent().xMinimum()
+        yoff = self.extent().yMaximum()
+        xres = self.rasterUnitsPerPixelX()
+        yres = self.rasterUnitsPerPixelY()
+
+        x1 = xoff + pixel.x() * xres
+        x2 = x1 + xres
+        y1 = yoff - pixel.y() * yres
+        y2 = y1 - yres
+
+        extent = QgsRectangle(x1, y2, x2, y1)
+        return extent
+
+    def extentByGeometry(self, geometry: QgsGeometry) -> QgsRectangle:
+
+        bb = geometry.boundingBox()
+        point1 = SpatialPoint(self.crs(), QgsPointXY(bb.xMinimum(), bb.yMinimum()))
+        point2 = SpatialPoint(self.crs(), QgsPointXY(bb.xMaximum(), bb.yMaximum()))
+        pixel1 = point1.toPixelPosition(self.layer)
+        pixel2 = point2.toPixelPosition(self.layer)
+        pixel1Extent = self.pixelExtent(pixel1)
+        pixel2Extent = self.pixelExtent(pixel2)
+
+        xvalues = [pixel1Extent.xMinimum(), pixel1Extent.xMaximum(), pixel2Extent.xMinimum(), pixel2Extent.xMaximum()]
+        yvalues = [pixel1Extent.yMinimum(), pixel1Extent.yMaximum(), pixel2Extent.yMinimum(), pixel2Extent.yMaximum()]
+
+        extent = QgsRectangle(min(xvalues), min(yvalues), max(xvalues), max(yvalues))
+        return extent
+
+    def geometryCoverage(self, geometry: QgsGeometry, fractions=True) -> Tuple[np.ndarray, QgsRectangle]:
+        assert geometry.type() == QgsWkbTypes.GeometryType.PolygonGeometry
+
+        # make memory layer from geometry
+        layer = QgsVectorLayer(f'Polygon?crs={self.crs().authid()}', 'polygon', 'memory')
+        feature = QgsFeature()
+        feature.setGeometry(QgsGeometry(geometry))
+        layer.dataProvider().addFeatures([feature])
+        layer.updateExtents()
+
+        # rasterize polygon
+        extent = self.extentByGeometry(geometry)
+        xsize = max(1, round(extent.width() / self.rasterUnitsPerPixelX()))
+        ysize = max(1, round(extent.height() / self.rasterUnitsPerPixelY()))
+
+        if fractions:
+            xsize2 = xsize * 10
+            ysize2 = ysize * 10
+        else:
+            xsize2 = xsize
+            ysize2 = ysize
+
+        alg = 'gdal:rasterize'
+        parameters = {
+            'INPUT': layer,
+            'INIT': 0,
+            'BURN': 1,
+            'UNITS': 0, 'WIDTH': xsize2, 'HEIGHT': ysize2,
+            'EXTENT': extent,
+            'DATA_TYPE': 5,
+            'OUTPUT': 'TEMPORARY_OUTPUT'
+        }
+        result = processing.run(alg, parameters)
+
+        # read mask and calculate fractions
+        maskArray = RasterReader(result['OUTPUT']).array()[0]
+        fractionArray = NumpyUtils.rebinMean(maskArray, (ysize, xsize))
+
+        return fractionArray, extent
+
+    def sampleWeightedValues(
+            self, extent: QgsRectangle, weightsArray: Array2d, bandNo: int
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        height, width = weightsArray.shape
+        array = self.arrayFromBoundingBoxAndSize(extent, width, height, [bandNo])[0]
+        maskArray = self.maskArray([array], [bandNo])[0] * (weightsArray != 0)
+        values = array[maskArray]
+        weights = weightsArray[maskArray]
+        return values, weights
 
     def samplingWidthAndHeight(self, bandNo: int, extent=None, sampleSize: int = 0) -> Tuple[int, int]:
         """Return number of pixel for width and heigth, that approx. match the given sample size."""

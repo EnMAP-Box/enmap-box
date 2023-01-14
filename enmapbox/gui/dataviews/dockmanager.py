@@ -1618,7 +1618,7 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
             menu.addSeparator()
             action = menu.addAction('Layer properties')
             action.setToolTip('Set layer properties')
-            action.triggered.connect(lambda *args, l=lyr, c=canvas: self.showLayerProperties(l, c))
+            action.triggered.connect(lambda *args, _lyr=lyr, c=canvas: self.showLayerProperties(_lyr, c))
 
         if len(errors) > 0:
             # show warning for missing modules
@@ -1646,7 +1646,7 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         if isinstance(canvas, QgsMapCanvas):
             action = menu.addAction('Zoom to layer')
             action.setIcon(QIcon(':/images/themes/default/mActionZoomToLayer.svg'))
-            action.triggered.connect(lambda *args, l=lyr, c=canvas: self.onZoomToLayer(l, c))
+            action.triggered.connect(lambda *args, _lyr=lyr, c=canvas: self.onZoomToLayer(_lyr, c))
 
             action = menu.addAction('Set layer CRS to map canvas')
             action.triggered.connect(lambda: canvas.setDestinationCrs(lyr.crs()))
@@ -1671,10 +1671,10 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
                 lambda *arg, nodes=selectedLayerNodes: self.mDockTreeView.layerTreeModel().removeNodes(nodes))
 
         actionPasteStyle = menu.addAction('Paste Style')
-        actionPasteStyle.triggered.connect(lambda *args, l=lyr: pasteStyleFromClipboard(l))
+        actionPasteStyle.triggered.connect(lambda *args, _lyr=lyr: pasteStyleFromClipboard(_lyr))
         actionPasteStyle.setEnabled(MDF_QGIS_LAYER_STYLE in QApplication.clipboard().mimeData().formats())
         actionCopyStyle = menu.addAction('Copy Style')
-        actionCopyStyle.triggered.connect(lambda *args, l=lyr: pasteStyleToClipboard(l))
+        actionCopyStyle.triggered.connect(lambda *args, _lyr=lyr: pasteStyleToClipboard(_lyr))
         menu.addSeparator()
 
         action = menu.addAction('Copy layer path')
@@ -1685,7 +1685,7 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         action.triggered.connect((lambda: self.onCopyLayerToQgisClicked(lyr)))
 
         action = menu.addAction('Save as...')
-        action.triggered.connect(lambda *args, l=lyr: self.onSaveAs(l))
+        action.triggered.connect(lambda *args, _lyr=lyr: self.onSaveAs(_lyr))
 
     def addVectorLayerMenuItems(self, node: QgsLayerTreeLayer, menu: QMenu):
         """
@@ -1706,10 +1706,10 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
 
         action = menu.addAction('Open Attribute Table')
         action.setToolTip('Opens the layer attribute table')
-        action.triggered.connect(lambda *args, l=lyr: self.openAttributeTable(l))
+        action.triggered.connect(lambda *args, _lyr=lyr: self.openAttributeTable(_lyr))
         action = menu.addAction('Open Spectral Library Viewer')
         action.setToolTip('Opens the vector layer in a spectral library view')
-        action.triggered.connect(lambda *args, l=lyr: self.openSpectralLibraryView(l))
+        action.triggered.connect(lambda *args, _lyr=lyr: self.openSpectralLibraryView(_lyr))
 
     def addRasterLayerMenuItems(self, node: QgsLayerTreeLayer, menu: QMenu):
         """
@@ -1864,7 +1864,7 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
             action = menu.addAction('Raster Layer Styling')
             action.setToolTip('Open layer in Raster Layer Styling panel')
             action.setIcon(QIcon(':/images/themes/default/propertyicons/symbology.svg'))
-            action.triggered.connect(lambda *args, l=lyr: self.onRasterLayerStylingClicked(l))
+            action.triggered.connect(lambda *args, _lyr=lyr: self.onRasterLayerStylingClicked(_lyr))
 
     def onSaveAs(self, layer: QgsMapLayer):
         """

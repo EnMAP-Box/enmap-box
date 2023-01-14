@@ -126,6 +126,7 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         self.assertIsInstance(EMB, QgsExpressionContextGenerator)
         self.assertIsInstance(EMB, QgsProcessingContextGenerator)
         EMB.loadExampleData()
+        QgsApplication.processEvents()
         canvas1 = EMB.currentMapCanvas()
         canvas2 = EMB.createNewMapCanvas('MyNewMapDock')
         self.assertIsInstance(canvas1, QgsMapCanvas)

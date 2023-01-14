@@ -29,7 +29,7 @@ class EnMAPBoxTestCaseExample(unittest.TestCase):
         import enmapbox.exampledata
         self.checkModule(enmapbox.exampledata)
 
-    def test_tests_testdata(self):
+    def test_enmapboxtestdata(self):
         import enmapboxtestdata
         self.checkModule(enmapboxtestdata)
 
