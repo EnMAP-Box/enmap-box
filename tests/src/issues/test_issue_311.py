@@ -3,12 +3,11 @@ This is a template to create an EnMAP-Box test
 """
 import unittest
 
-from enmapbox.gui.dataviews.docks import SpectralLibraryDock
-from qgis.PyQt.QtWidgets import QApplication
-from qgis._gui import QgsDualView
-from qgis.core import QgsApplication, QgsRasterLayer, QgsVectorLayer
-from enmapbox.testing import EnMAPBoxTestCase, TestObjects
+from qgis.gui import QgsDualView
+
 from enmapbox import EnMAPBox
+from enmapbox.gui.dataviews.docks import SpectralLibraryDock
+from enmapbox.testing import EnMAPBoxTestCase
 from qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 
 
@@ -31,8 +30,8 @@ class EnMAPBoxTestCaseIssue311(EnMAPBoxTestCase):
                              slw) and slw.mMainView.view() == QgsDualView.ViewMode.AttributeEditor)
         self.assertEqual(slw.actionShowProfileView.isChecked(), slw.mSpeclibPlotWidget.isVisibleTo(slw))
         self.assertEqual(slw.actionShowProfileView.isChecked(), slw.mSpeclibPlotWidget.plotWidget.isVisibleTo(slw))
-        self.assertEqual(slw.actionShowProfileView.isChecked() and
-                         slw.actionShowProfileViewSettings.isChecked(),
+        self.assertEqual(slw.actionShowProfileView.isChecked()
+                         and slw.actionShowProfileViewSettings.isChecked(),
                          slw.mSpeclibPlotWidget.treeView.isVisibleTo(slw))
         self.showGui(enmapBox.ui)
 
