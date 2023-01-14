@@ -154,9 +154,6 @@ class MapCanvasTests(EnMAPBoxTestCase):
 
     def test_dropEvents(self):
 
-        from enmapboxtestdata import SensorProducts
-        SensorProducts.Desis.L1B
-
         mapDock = MapDock()
         node = MapDockTreeNode(mapDock)
         mapCanvas = mapDock.mapCanvas()

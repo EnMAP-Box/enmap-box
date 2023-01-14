@@ -89,6 +89,7 @@ _subdir = 'external'
 engeomap_cubus_gamsberg_subset = join(root, _subdir, 'engeomap', 'cubus_gamsberg_subset')
 engeomap_gamsberg_field_library = join(root, _subdir, 'engeomap', 'gamsberg_field_library')
 engeomap_gamesberg_field_library_color_mod = join(root, _subdir, 'engeomap', 'gamesberg_field_library_color_mod.csv')
+del _subdir
 
 
 # external sensor products
@@ -106,8 +107,7 @@ def sensorProductsRoot() -> Optional[str]:
 
 
 class SensorProducts(object):
-
-    if sensorProductsRoot() is None:
+    if sensorProductsRoot() is not None:
         class Desis(object):
             L1B = join(
                 sensorProductsRoot(), 'desis', 'DESIS-HSI-L1B-DT1203190212_025-20191203T021128-V0210'
@@ -132,21 +132,24 @@ class SensorProducts(object):
 
         class Enmap(object):
             L1B = join(
-                sensorProductsRoot(), 'enmap', 'ENMAP01-____L1B-DT0000004135_20221005T023547Z_010_V010106_20221014T102746Z'
+                sensorProductsRoot(), 'enmap',
+                'ENMAP01-____L1B-DT0000004135_20221005T023547Z_010_V010106_20221014T102746Z'
             )
             L1B_MetadataXml = join(
                 L1B, 'ENMAP01-____L1B-DT0000004135_20221005T023547Z_010_V010106_20221014T102746Z-METADATA.XML'
             )
 
             L1C = join(
-                sensorProductsRoot(), 'enmap', 'ENMAP01-____L1C-DT0000004135_20221005T023547Z_010_V010106_20221014T102747Z'
+                sensorProductsRoot(), 'enmap',
+                'ENMAP01-____L1C-DT0000004135_20221005T023547Z_010_V010106_20221014T102747Z'
             )
             L1C_MetadataXml = join(
                 L1B, 'ENMAP01-____L1C-DT0000004135_20221005T023547Z_010_V010106_20221014T102747Z-METADATA.XML'
             )
 
             L2A = join(
-                sensorProductsRoot(), 'enmap', 'ENMAP01-____L2A-DT0000004135_20221005T023547Z_010_V010106_20221014T102749Z'
+                sensorProductsRoot(), 'enmap',
+                'ENMAP01-____L2A-DT0000004135_20221005T023547Z_010_V010106_20221014T102749Z'
             )
             L2A_MetadataXml = join(
                 L2A, 'ENMAP01-____L2A-DT0000004135_20221005T023547Z_010_V010106_20221014T102749Z-METADATA.XML'
