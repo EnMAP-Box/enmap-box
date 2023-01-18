@@ -569,10 +569,13 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
             if not isinstance(value, np.ndarray):  # skip all non-arrays
                 continue
             if value.ndim == 2:  # if single band array ...
+                feedback.pushInfo(f'Expand 2d-array ({key}) to 3d')
                 value = value[None]  # ... add third dimension
             if value.ndim != 3:  # skip all non-3d-arrays
+                feedback.pushInfo(f'Skip non-3d-array ({key}{list(value.shape)})')
                 continue
             if value.shape[1:] != (block.height + 2 * overlap, block.width + 2 * overlap):  # skip mismatching arrays
+                feedback.pushInfo(f'Skip mismatching array ({key})')
                 continue
             results[key] = value
 
