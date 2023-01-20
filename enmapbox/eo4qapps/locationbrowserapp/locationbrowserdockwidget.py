@@ -43,10 +43,10 @@ class LocationBrowserDockWidget(QgsDockWidget):
     def enmapBoxInterface(self) -> EnMAPBox:
         return self.interface
 
-    def qgisInterface(self) -> QgisInterface:
+    def qgisInterface(self):
         return self.interface
 
-    def setInterface(self, interface: QgisInterface):
+    def setInterface(self, interface):
         self.interface = interface
         if isinstance(interface, EnMAPBox):
             self.interfaceType = 0
