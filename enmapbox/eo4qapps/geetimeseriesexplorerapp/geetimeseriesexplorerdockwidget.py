@@ -251,7 +251,7 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
     def enmapBoxInterface(self) -> EnMAPBox:
         return self.interface
 
-    def qgisInterface(self) -> QgisInterface:
+    def qgisInterface(self):
         return self.interface
 
     def setProfileDock(self, profileDock):
