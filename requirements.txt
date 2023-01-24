@@ -25,3 +25,7 @@ catboost # required by CatBoost classifier/regressor, see #960
 numba>=0.56.4 # required by EnSoMAP
 netCDF4 # required by ONNS
 enpt-enmapboxapp # required by EnPT
+
+# moved scikit-learn to bottom because of
+# https://github.com/qgis/QGIS/issues/51557
+scikit-learn>=0.24
