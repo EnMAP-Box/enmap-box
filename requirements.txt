@@ -22,6 +22,6 @@ lightgbm # required by LightGBM classifier/regressor, see #960
 catboost # required by CatBoost classifier/regressor, see #960
 
 # required by parts of EnMAP-Box Applications
-numba # required by EnSoMAP
+numba>=0.56.4 # required by EnSoMAP
 netCDF4 # required by ONNS
 enpt-enmapboxapp # required by EnPT
