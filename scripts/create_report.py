@@ -11,7 +11,7 @@ import pathlib
 import re
 import unittest
 import urllib.request
-
+import xml.etree.ElementTree as etree
 import pandas as pd
 from xlsxwriter.workbook import Workbook
 
@@ -53,8 +53,8 @@ def report_downloads() -> pd.DataFrame:
     html = re.sub(r'&nbsp;', '', html)
     html = re.sub(r'xmlns=".*"', '', html)
 
-    import xml.etree.ElementTree as ET
-    tree = ET.fromstring(html)
+
+    tree = etree.fromstring(html)
     table = tree.find('.//table[@class="table table-striped plugins"]')
     DATA = {k: [] for k in ['version', 'minQGIS', 'experimental', 'downloads', 'uploader', 'datetime']}
     for tr in table.findall('.//tbody/tr'):
@@ -298,13 +298,15 @@ def report_bitbucket_issues(self):
 class TestCases(unittest.TestCase):
 
     def test_github_issue(self):
-        from github3api import GitHubAPI
-        import json
+
+
         path_json = pathlib.Path(DIR_REPO_TMP) / 'issues.json'
-        client = GitHubAPI()
 
         if not path_json.is_file():
             issues = []
+            from github3api import GitHubAPI
+            client = GitHubAPI()
+
             for issue_slice in client.get('https://api.github.com/repos/EnMAP-Box/enmap-box/issues',
                                           _get='all',
                                           # _attributes = ['title', 'user', 'labels', 'html_url', 'state', 'locked',
