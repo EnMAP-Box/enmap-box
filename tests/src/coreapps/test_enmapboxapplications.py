@@ -3,7 +3,7 @@ import site
 import unittest
 
 from enmapbox import DIR_ENMAPBOX
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.speclib.core import profile_field_list
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibraryrasterdataprovider import registerDataProvider
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import SpectralSetting

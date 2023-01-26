@@ -407,10 +407,9 @@ def run():
 # https://docs.readthedocs.io/en/stable/builds.html
 # print(f'QGIS_PREFIX_PATH={QgsApplication.prefixPath()}')
 if not os.environ.get('READTHEDOCS', False) in [True, 'True']:
-    from enmapbox.gui.enmapboxgui import EnMAPBox
-
-    EnMAPBox = EnMAPBox
-
-    from enmapbox.gui.applications import EnMAPBoxApplication
-
-    EnMAPBoxApplication = EnMAPBoxApplication
+    pass
+    # removed import shorcuts (see #346)
+    # from enmapbox.gui.enmapboxgui import EnMAPBox
+    # EnMAPBox = EnMAPBox
+    # from enmapbox.gui.applications import EnMAPBoxApplication
+    # EnMAPBoxApplication = EnMAPBoxApplication

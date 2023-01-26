@@ -57,7 +57,7 @@ class DataSourceManager(TreeModel):
         self.mUpdateTimer.start()
         self.mUpdateState: dict = dict()
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         self.mEnMAPBoxInstance: EnMAPBox = None
 
     def __len__(self):
@@ -660,7 +660,7 @@ class DataSourceManagerTreeView(TreeView):
 
         if target is None:
             emb = self.enmapboxInstance()
-            from enmapbox import EnMAPBox
+            from enmapbox.gui.enmapboxgui import EnMAPBox
             if not isinstance(emb, EnMAPBox):
                 return None
             dock = emb.createDock('MAP')
@@ -799,7 +799,7 @@ class DataSourceManagerTreeView(TreeView):
         :param speclib: SpectralLibrary
 
         """
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         from enmapbox.gui.dataviews.docks import SpectralLibraryDock
 
         emb = self.enmapboxInstance()
@@ -808,7 +808,7 @@ class DataSourceManagerTreeView(TreeView):
 
     def openInAttributeEditor(self, vectorLayer: QgsVectorLayer):
         from enmapbox.gui.dataviews.docks import AttributeTableDock
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         emb = self.enmapboxInstance()
         if isinstance(emb, EnMAPBox):
             emb.dockManager().createDock(AttributeTableDock, layer=vectorLayer)

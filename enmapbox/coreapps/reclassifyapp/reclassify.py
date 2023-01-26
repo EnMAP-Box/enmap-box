@@ -82,7 +82,7 @@ def reclassify(layerSrc: QgsRasterLayer, dstClassScheme: ClassificationScheme, l
         alg.P_CATEGORIES: categories,
         alg.P_OUTPUT_CLASSIFICATION: QgsProcessing.TEMPORARY_OUTPUT
     }
-    from enmapbox import EnMAPBox
+    from enmapbox.gui.enmapboxgui import EnMAPBox
     enmapBox = EnMAPBox.instance()
     enmapBox.showProcessingAlgorithmDialog(alg, parameters, True)
 

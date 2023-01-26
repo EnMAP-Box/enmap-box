@@ -17,7 +17,8 @@ import pathlib
 import unittest
 
 import enmapbox.gui.mimedata as mimedata
-from enmapbox import EnMAPBox, DIR_EXAMPLEDATA
+from enmapbox import DIR_EXAMPLEDATA
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.exampledata import enmap, hires, library_gpkg, landcover_polygon
 from enmapbox.testing import EnMAPBoxTestCase
 from qgis.PyQt.QtCore import QMimeData, QByteArray, QUrl, Qt, QPoint

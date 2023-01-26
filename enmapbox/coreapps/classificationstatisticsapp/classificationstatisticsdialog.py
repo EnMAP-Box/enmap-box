@@ -50,7 +50,7 @@ class ClassificationStatisticsDialog(QMainWindow):
         QMainWindow.__init__(self, *args, **kwds)
         loadUi(__file__.replace('.py', '.ui'), self)
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         self.enmapBox = EnMAPBox.instance()
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None

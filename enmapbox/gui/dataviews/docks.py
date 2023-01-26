@@ -977,7 +977,7 @@ class MapDock(Dock):
             tree.addLayer(lyr)
 
     def insertLayer(self, idx, layerSource):
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         from enmapbox.gui.dataviews.dockmanager import MapDockTreeNode
 
         enmapBox = EnMAPBox.instance()
@@ -990,7 +990,7 @@ class MapDock(Dock):
     def addOrUpdateLayer(self, layer: QgsMapLayer):
         """Add a new layer or update existing layer with matching name."""
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapBox = EnMAPBox.instance()
 
         # look for existing layer and update ...

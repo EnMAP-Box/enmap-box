@@ -5,7 +5,7 @@ from typing import Optional
 from osgeo import gdal
 
 import processing
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mimedata import MDF_RASTERBANDS, QGIS_URILIST_MIMETYPE, MDF_ENMAPBOX_LAYERTREEMODELDATA, \
     MDF_QGIS_LAYERTREEMODELDATA, MDF_QGIS_LAYERTREEMODELDATA_XML, MDF_URILIST
 from enmapbox.gui.widgets.multiplerasterbandselectionwidget.multiplerasterbandselectionwidget import \

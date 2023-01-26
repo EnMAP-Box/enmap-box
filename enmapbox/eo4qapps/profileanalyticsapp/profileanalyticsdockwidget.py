@@ -9,7 +9,7 @@ import numpy as np
 
 import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
 import processing
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.widgets.codeeditwidget import CodeEditWidget
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyleButton, PlotStyle
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint

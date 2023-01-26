@@ -1,6 +1,6 @@
 from typing import Optional
 
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.applications import EnMAPBoxApplication
 from geetimeseriesexplorerapp.maptool import MapTool
 

@@ -15,7 +15,8 @@ __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 import pathlib
 import unittest
 import site
-from enmapbox import EnMAPBox, initPythonPaths, DIR_ENMAPBOX
+from enmapbox import initPythonPaths, DIR_ENMAPBOX
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import EnMAPBoxTestCase
 
 initPythonPaths()

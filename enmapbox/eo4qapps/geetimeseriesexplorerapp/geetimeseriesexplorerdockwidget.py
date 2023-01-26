@@ -8,7 +8,7 @@ from os.path import join, exists, dirname, basename, splitext
 from traceback import print_exc
 from typing import Optional, Dict, List, Tuple
 
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
 from enmapbox.utils import importEarthEngine
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm

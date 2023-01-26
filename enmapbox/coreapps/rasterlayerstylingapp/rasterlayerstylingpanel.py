@@ -3,7 +3,7 @@ from typing import Optional
 
 from osgeo import gdal
 
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.dataviews.dockmanager import DockPanelUI
 from enmapbox.gui.mapcanvas import MapCanvas
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent

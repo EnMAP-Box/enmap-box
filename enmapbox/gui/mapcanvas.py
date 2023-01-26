@@ -1133,7 +1133,7 @@ class MapCanvas(QgsMapCanvas):
         action = menu.addAction('Show background layer')
         action.triggered.connect(self.setBackgroundLayer)
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         emb = EnMAPBox.instance()
         node = self.layerTree()
         if isinstance(emb, EnMAPBox) and isinstance(node, QgsLayerTree):

@@ -4,7 +4,8 @@ import numpy as np
 
 from enmapbox.exampledata import enmap
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapbox import EnMAPBox, initAll
+from enmapbox import initAll
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import RobustScaler, MinMaxScaler

@@ -20,7 +20,7 @@ from qgis.PyQt.QtCore import QMimeData, QModelIndex
 from qgis.core import QgsLayerTreeLayer, QgsProject, QgsVectorLayer, QgsRasterLayer, QgsLayerTreeModel, QgsLayerTree
 from qgis.gui import QgsMapCanvas, QgsLayerTreeView
 
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.exampledata import landcover_polygon, library_gpkg, enmap, hires
 from enmapbox.gui.datasources.datasources import VectorDataSource, RasterDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager
