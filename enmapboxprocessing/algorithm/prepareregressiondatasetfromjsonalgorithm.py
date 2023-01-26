@@ -3,7 +3,7 @@ from typing import Dict, Any, List, Tuple
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import RegressorDump
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

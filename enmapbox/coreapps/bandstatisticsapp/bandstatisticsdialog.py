@@ -9,7 +9,7 @@ from qgis.PyQt.uic import loadUi
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsRasterDataProvider, QgsRasterBandStats, \
     QgsRasterHistogram, QgsMapSettings, QgsRasterRenderer
 from qgis.gui import QgsRasterBandComboBox, QgsMapLayerComboBox, QgsFilterLineEdit, QgsSpinBox, QgsMapCanvas
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

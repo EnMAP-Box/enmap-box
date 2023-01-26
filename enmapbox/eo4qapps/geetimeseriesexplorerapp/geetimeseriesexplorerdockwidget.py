@@ -32,7 +32,7 @@ from qgis.core import QgsRasterLayer, QgsCoordinateReferenceSystem, QgsMapLayer,
 from qgis.gui import (
     QgsDockWidget, QgsMessageBar, QgsColorRampButton, QgsSpinBox, QgsMapCanvas, QgisInterface
 )
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

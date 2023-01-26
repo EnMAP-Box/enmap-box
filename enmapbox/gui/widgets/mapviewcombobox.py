@@ -3,7 +3,7 @@ from typing import Optional
 from qgis.PyQt.QtWidgets import QComboBox
 
 from enmapbox.gui.dataviews.docks import MapDock, DockTypes
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

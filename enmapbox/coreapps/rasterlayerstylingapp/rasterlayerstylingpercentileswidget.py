@@ -1,7 +1,7 @@
 from qgis.PyQt.QtWidgets import QDoubleSpinBox, QWidget
 
 from qgis.PyQt import uic
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

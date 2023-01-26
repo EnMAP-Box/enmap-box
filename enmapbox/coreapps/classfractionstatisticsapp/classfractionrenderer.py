@@ -7,7 +7,7 @@ from qgis.core import QgsRasterRenderer, QgsRasterInterface, QgsRectangle, QgsRa
     Qgis
 
 from enmapboxprocessing.utils import Utils
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

@@ -8,7 +8,7 @@ from enmapboxprocessing.typing import checkSampleShape, Target, RegressorDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterField,
                        QgsProcessingException)
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

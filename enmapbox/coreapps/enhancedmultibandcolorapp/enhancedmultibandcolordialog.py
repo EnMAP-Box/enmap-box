@@ -11,7 +11,7 @@ from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QCheckBox, QTableWidge
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer, QgsRasterDataProvider, QgsRasterHistogram, QgsMapLayerProxyModel, QgsMapSettings
 from qgis.gui import QgsMapCanvas, QgsMapLayerComboBox, QgsColorButton, QgsDoubleSpinBox
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

@@ -28,7 +28,7 @@ from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer
                        QgsProcessingParameterCrs, QgsProcessingParameterVectorDestination, QgsProcessing,
                        QgsProcessingUtils, QgsProcessingParameterMultipleLayers, QgsProcessingException,
                        QgsProcessingParameterFolderDestination, QgsProject)
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 class AlgorithmCanceledException(Exception):

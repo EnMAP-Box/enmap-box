@@ -21,7 +21,7 @@ from qgis.core import (
     QgsProviderMetadata, QgsMessageLog, Qgis, QgsRaster, QgsRasterInterface,
     QgsVectorDataProvider, QgsDataProvider
 )
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 BAND_TYPES = {
     'int8': Qgis.Int16,

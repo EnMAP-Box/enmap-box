@@ -16,7 +16,7 @@ except Exception as error:
     ClusterMixin = Any
     Pipeline = Any
 
-from enmapboxexternal.typeguard import typechecked, check_type
+from enmapbox.typeguard import typechecked, check_type
 
 GdalDataType = int
 GdalResamplingAlgorithm = int

@@ -14,7 +14,7 @@ from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer, QgsMapLayerProxyModel, QgsMapSettings
 from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsDoubleSpinBox, QgsMapLayerComboBox, QgsColorButton, \
     QgsSpinBox
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

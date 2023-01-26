@@ -23,7 +23,7 @@ from qgis.gui import (
 )
 from rasterlayerstylingapp.rasterlayerstylingbandwidget import RasterLayerStylingBandWidget
 from rasterlayerstylingapp.rasterlayerstylingpercentileswidget import RasterLayerStylingPercentilesWidget
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

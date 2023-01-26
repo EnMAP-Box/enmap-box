@@ -4,7 +4,7 @@ from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp.externals.ee_plugin.provider import BAND_TYPES
 from qgis.PyQt.QtGui import QColor
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

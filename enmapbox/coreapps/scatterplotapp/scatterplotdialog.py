@@ -24,7 +24,7 @@ from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsMapSettings, Qgs
     QgsFieldProxyModel, QgsMapLayer
 from qgis.gui import QgsMapLayerComboBox, QgsMapCanvas, QgsRasterBandComboBox, QgsColorButton, QgsColorRampButton, \
     QgsFilterLineEdit, QgsFieldComboBox
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

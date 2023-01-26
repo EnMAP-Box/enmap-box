@@ -11,7 +11,7 @@ from qgis.gui import QgsRasterBandComboBox, QgsMapLayerComboBox, QgsFilterLineEd
 import processing
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

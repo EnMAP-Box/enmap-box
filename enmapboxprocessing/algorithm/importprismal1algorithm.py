@@ -13,7 +13,7 @@ from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsMapLayer)
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

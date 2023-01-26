@@ -1,7 +1,7 @@
 from typing import TextIO
 
 from qgis.core import QgsProcessingFeedback
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

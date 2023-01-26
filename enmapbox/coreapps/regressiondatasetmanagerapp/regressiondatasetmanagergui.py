@@ -12,7 +12,7 @@ from qgis.PyQt.QtWidgets import (QMainWindow, QTableWidget, QTableWidgetItem, QL
                                  QDialog)
 from qgis.PyQt.uic import loadUi
 from qgis.gui import QgsColorButton
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

@@ -13,7 +13,7 @@ from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QTableWidget, QComboBo
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer, QgsProject
 from qgis.gui import QgsFilterLineEdit, QgsDateTimeEdit, QgsCollapsibleGroupBox
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

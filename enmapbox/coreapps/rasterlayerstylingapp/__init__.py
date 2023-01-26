@@ -4,7 +4,7 @@ from qgis.PyQt.QtCore import Qt
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.applications import EnMAPBoxApplication
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 from rasterlayerstylingapp.rasterlayerstylingpanel import RasterLayerStylingPanel
 
 

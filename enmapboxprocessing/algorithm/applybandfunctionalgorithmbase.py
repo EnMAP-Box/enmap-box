@@ -6,7 +6,7 @@ from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

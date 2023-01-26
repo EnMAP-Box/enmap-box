@@ -9,7 +9,7 @@ from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import Array2d, Array3d, Number
 from qgis.core import QgsRectangle, QgsCoordinateReferenceSystem
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

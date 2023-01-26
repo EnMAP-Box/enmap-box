@@ -1,6 +1,6 @@
 from typing import Optional, Tuple
 
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QMessageBox

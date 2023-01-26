@@ -1,7 +1,7 @@
 from enmapbox.gui.widgets.codeeditwidget import CodeEditWidget
 from qgis.PyQt.QtWidgets import QWidget, QMainWindow, QToolButton, QLabel, QTextEdit
 from qgis.PyQt.uic import loadUi
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

@@ -14,7 +14,7 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import Array3d, Number
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
-from enmapboxexternal.typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 RESPONSE_CUTOFF_VALUE = 0.001
 RESPONSE_CUTOFF_DIGITS = 3
