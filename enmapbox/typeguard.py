@@ -9,5 +9,5 @@ except (ImportError, ModuleNotFoundError):  # or mock them
             return partial(typechecked, always=always, _localns=_localns)
         return func
 
-    def check_type():
+    def check_type(*args, **kwds):
         pass
