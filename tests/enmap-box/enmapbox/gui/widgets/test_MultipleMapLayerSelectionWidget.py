@@ -7,7 +7,8 @@ from qgis.core import QgsRasterLayer
 class TestMultipleMapLayerSelectionWidget(EnMAPBoxTestCase):
 
     def test(self):
-        from enmapbox import EnMAPBox, initAll
+        from enmapbox import initAll
+from enmapbox.gui.enmapboxgui import EnMAPBox
 
         from enmapbox.testing import start_app
 

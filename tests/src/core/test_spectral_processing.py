@@ -2,7 +2,7 @@ import unittest
 
 from qgis.core import QgsVectorLayer
 
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.dataviews.docks import DockTypes, SpectralLibraryDock
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.testing import EnMAPBoxTestCase

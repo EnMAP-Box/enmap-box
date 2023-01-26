@@ -60,7 +60,7 @@ class BivariateColorRasterRendererDialog(QMainWindow):
         QWidget.__init__(self, parent)
         loadUi(__file__.replace('.py', '.ui'), self)
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         self.enmapBox = EnMAPBox.instance()
         self.colorPlane: np.ndarray
 

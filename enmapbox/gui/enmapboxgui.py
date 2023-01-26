@@ -240,7 +240,7 @@ class EnMAPBoxMapCanvasRenderProgressBar(QProgressBar):
         QProgressBar.__init__(self, parent)
 
     def toggleVisibility(self):
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapBox = EnMAPBox.instance()
         if enmapBox is None:
             return
@@ -789,7 +789,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                '# Use enmapBox to access EnMAP-Box API interface.\n' \
                '# Security warning: typing commands from an untrusted source can harm your computer.'
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapBox = EnMAPBox.instance()
 
         window = QMainWindow(self.ui)
@@ -2235,7 +2235,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         """
         if parent is None:
-            from enmapbox import EnMAPBox
+            from enmapbox.gui.enmapboxgui import EnMAPBox
             if EnMAPBox.instance() is not None:
                 parent = EnMAPBox.instance().ui
 

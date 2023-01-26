@@ -33,7 +33,7 @@ class EnMAPBoxProjectSettings(object):
 
     def settings(self, document: QDomDocument, enmapBoxElement: QDomElement) -> Dict:
         from qgis.utils import iface
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapBox = EnMAPBox.instance()
 
         settings = dict()
@@ -66,7 +66,7 @@ class EnMAPBoxProjectSettings(object):
 
     def setSettings(self, settings: Dict):
         from qgis.utils import iface
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapBox = EnMAPBox.instance()
 
         # QGIS GUI

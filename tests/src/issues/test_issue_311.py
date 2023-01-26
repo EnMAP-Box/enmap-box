@@ -5,7 +5,7 @@ import unittest
 
 from qgis.gui import QgsDualView
 
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.dataviews.docks import SpectralLibraryDock
 from enmapbox.testing import EnMAPBoxTestCase
 from qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget

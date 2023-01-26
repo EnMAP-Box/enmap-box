@@ -90,7 +90,8 @@ class SpecMixTestCase(TestCase):
     def test_EnMAPBoxApplication(self):
 
         from specmixapp import SpecMixApp
-        from enmapbox import EnMAPBox, initAll
+        from enmapbox import initAll
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         initAll()
         EB = EnMAPBox(load_core_apps=False, load_other_apps=False)
         app = SpecMixApp(EB)
