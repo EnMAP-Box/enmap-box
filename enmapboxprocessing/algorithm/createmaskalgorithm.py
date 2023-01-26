@@ -3,7 +3,7 @@ from typing import Optional
 from enmapboxprocessing.algorithm.applybandfunctionalgorithmbase import ApplyBandFunctionAlgorithmBase
 from enmapboxprocessing.enmapalgorithm import Group
 from qgis.core import Qgis
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

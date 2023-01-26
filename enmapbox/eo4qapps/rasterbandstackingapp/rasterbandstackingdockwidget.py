@@ -22,7 +22,7 @@ from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsMimeDataUtils, QgsReadWriteContext, QgsLayerTree, QgsProject, QgsMapLayerProxyModel, \
     QgsRasterLayer
 from qgis.gui import QgsMapLayerComboBox, QgsDockWidget, QgisInterface, QgsFileWidget
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

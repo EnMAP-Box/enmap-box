@@ -7,7 +7,7 @@ from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtCore import QDateTime
 from qgis.PyQt.QtGui import QColor
 from qgis.core import Qgis
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

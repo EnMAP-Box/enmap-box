@@ -26,7 +26,7 @@ from qgis.core import QgsLayerTreeGroup, QgsLayerTreeLayer, QgsMapLayer, QgsProj
     QgsRasterDataProvider, QgsRasterRenderer, QgsVectorLayer, QgsDataItem, QgsLayerItem, Qgis
 from qgis.core import QgsMimeDataUtils
 from qgis.gui import QgisInterface, QgsMapCanvas, QgsDockWidget
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 from .datasources import DataSource, SpatialDataSource, VectorDataSource, RasterDataSource, \
     ModelDataSource, FileDataSource, LayerItem
 from .metadata import RasterBandTreeNode

@@ -1,7 +1,7 @@
 import math
 
 from qgis.core import QgsRectangle, QgsProcessingFeedback, QgsProcessingException
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

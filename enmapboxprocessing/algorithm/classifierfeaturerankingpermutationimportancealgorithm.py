@@ -9,7 +9,7 @@ from enmapboxprocessing.reportwriter import MultiReportWriter, HtmlReportWriter,
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

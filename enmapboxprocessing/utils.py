@@ -27,7 +27,7 @@ from qgis.core import (QgsRasterBlock, QgsProcessingFeedback, QgsPalettedRasterR
                        QgsProcessingUtils, QgsGeometry
                        )
 from qgis.gui import QgsMapCanvas
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

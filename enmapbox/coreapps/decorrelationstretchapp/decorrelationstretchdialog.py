@@ -11,7 +11,7 @@ from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsDoubleSpinBox, QgsM
 from decorrelationstretchapp.decorrelationstretchrenderer import DecorrelationStretchRenderer
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from enmapboxprocessing.rasterreader import RasterReader
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

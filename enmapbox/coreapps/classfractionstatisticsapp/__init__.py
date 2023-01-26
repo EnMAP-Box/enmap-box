@@ -3,7 +3,7 @@ from qgis.PyQt.QtWidgets import QMenu, QAction
 
 from classfractionstatisticsapp.classfractionstatisticsdialog import ClassFractionStatisticsDialog
 from enmapbox.gui.applications import EnMAPBoxApplication
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 def enmapboxApplicationFactory(enmapBox):

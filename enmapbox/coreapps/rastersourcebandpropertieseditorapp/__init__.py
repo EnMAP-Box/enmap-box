@@ -3,7 +3,7 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu, QAction
 from rastersourcebandpropertieseditorapp.rastersourcebandpropertieseditordialog import \
     RasterSourceBandPropertiesEditorDialog
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 def enmapboxApplicationFactory(enmapBox):

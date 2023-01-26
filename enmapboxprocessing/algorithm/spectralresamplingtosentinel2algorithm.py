@@ -1,6 +1,6 @@
 from enmapboxprocessing.algorithm.spectralresamplingbyresponsefunctionconvolutionalgorithmbase import \
     SpectralResamplingByResponseFunctionConvolutionAlgorithmBase
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

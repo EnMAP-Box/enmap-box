@@ -24,7 +24,7 @@ import typing
 import warnings
 from typing import Optional, Dict, Union, Any, List
 
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 import enmapbox
 import enmapbox.gui.datasources.manager

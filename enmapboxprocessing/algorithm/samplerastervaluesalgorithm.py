@@ -13,7 +13,7 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLay
                        QgsFeature, QgsField, QgsProcessingFeatureSourceDefinition, QgsApplication,
                        QgsVectorDataProvider, QgsRasterDataProvider, QgsPoint)
 from qgis.core.additions.edit import edit
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

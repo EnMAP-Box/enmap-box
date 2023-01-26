@@ -7,7 +7,7 @@ from osgeo import gdal
 
 from enmapboxprocessing.rasterwriter import RasterWriter
 from qgis.core import QgsTask, QgsMessageLog, Qgis
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

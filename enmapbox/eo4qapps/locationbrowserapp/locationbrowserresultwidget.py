@@ -1,6 +1,6 @@
 from qgis.PyQt.QtWidgets import QWidget, QMainWindow, QListWidget, QTextEdit, QCheckBox, QToolButton
 from qgis.PyQt.uic import loadUi
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked
