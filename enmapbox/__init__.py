@@ -39,8 +39,8 @@ from qgis.PyQt.QtCore import QSettings
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import Qgis, QgsApplication, QgsProcessingRegistry, QgsProcessingProvider, QgsProcessingAlgorithm
 from qgis.gui import QgisInterface, QgsMapLayerConfigWidgetFactory
+
 # provide shortcuts
-from .qgispluginsupport.qps.pyqtgraph import pyqtgraph
 
 # true version is added from .plugin.ini during plugin build process
 __version__ = 'dev'
@@ -377,10 +377,6 @@ def unloadAll():
     unregisterExpressionFunctions()
     unregisterMapLayerConfigWidgetFactories()
     unregisterEnMAPBoxProcessingProvider()
-
-
-EnMAPBox = None
-EnMAPBoxApplication = None
 
 
 def tr(text: str) -> str:

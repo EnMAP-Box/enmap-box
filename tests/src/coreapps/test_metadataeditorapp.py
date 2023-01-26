@@ -20,9 +20,12 @@
 """
 import datetime
 import unittest
+
 from osgeo import gdal, ogr
-from enmapbox import initPythonPaths, EnMAPBox
+
+from enmapbox import initPythonPaths
 from enmapbox.exampledata import landcover_polygon, enmap
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
 from metadataeditorapp.metadataeditor import MetadataEditorDialog
 from qgis.core import QgsRasterLayer, QgsVectorLayer, QgsProject
