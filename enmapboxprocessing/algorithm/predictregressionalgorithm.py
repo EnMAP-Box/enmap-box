@@ -10,7 +10,7 @@ from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtGui import QColor
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis, QgsProcessingException)
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

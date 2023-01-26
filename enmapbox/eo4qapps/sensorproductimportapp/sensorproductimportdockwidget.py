@@ -22,7 +22,7 @@ from qgis.PyQt.QtWidgets import QLabel
 from qgis.core import QgsProject
 from qgis.core import QgsRasterLayer
 from qgis.gui import QgsDockWidget, QgisInterface
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

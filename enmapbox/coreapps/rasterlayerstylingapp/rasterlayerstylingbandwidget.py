@@ -2,7 +2,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QCheckBox
 from qgis.PyQt.QtWidgets import QWidget, QLabel, QLineEdit, QSlider, QSpinBox
 from qgis.gui import QgsRasterBandComboBox
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

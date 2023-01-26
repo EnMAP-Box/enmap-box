@@ -2,7 +2,7 @@ from cmykcolorrasterrendererapp.cmykcolorrasterrendererdialog import CmykColorRa
 from enmapbox.gui.applications import EnMAPBoxApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu, QAction
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 def enmapboxApplicationFactory(enmapBox):

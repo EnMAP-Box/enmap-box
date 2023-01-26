@@ -9,7 +9,7 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer)
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

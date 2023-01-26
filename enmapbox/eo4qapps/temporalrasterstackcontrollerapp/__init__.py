@@ -12,7 +12,7 @@ from qgis.core import QgsTemporalNavigationObject, QgsDateTimeRange, QgsProject,
     QgsSingleBandGrayRenderer, QgsSingleBandPseudoColorRenderer, Qgis, QgsRasterLayerTemporalProperties, \
     QgsPalettedRasterRenderer
 from qgis.gui import QgsMapCanvas
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 def enmapboxApplicationFactory(enmapBox: EnMAPBox):

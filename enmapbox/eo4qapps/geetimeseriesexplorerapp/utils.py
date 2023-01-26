@@ -2,7 +2,7 @@ import os
 
 from qgis.PyQt.QtCore import QDateTime, QDate
 
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 def version():

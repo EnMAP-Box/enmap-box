@@ -23,7 +23,7 @@ from qgis.PyQt.QtWidgets import QComboBox, QTableWidget, QCheckBox, QToolButton,
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsVectorLayer, QgsProcessingFeatureSourceDefinition, \
     QgsFeatureRequest, QgsWkbTypes
 from qgis.gui import QgsMapLayerComboBox, QgsFileWidget, QgsRasterBandComboBox, QgsDockWidget, QgisInterface
-from typeguard import typechecked, check_type
+from enmapboxexternal.typeguard import typechecked, check_type
 
 
 @typechecked

@@ -6,7 +6,7 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QCursor, QColor
 from qgis.PyQt.QtWidgets import QAction
 from qgis.gui import QgsMapTool, QgsMapMouseEvent, QgsMapCanvas, QgsVertexMarker
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

@@ -13,7 +13,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QListWidgetItem, QToolButton
 from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPointXY, QgsProject
 from qgis.gui import QgsFilterLineEdit, QgsDockWidget, QgisInterface
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

@@ -1,5 +1,5 @@
 from enmapboxprocessing.algorithm.fittransformeralgorithmbase import FitTransformerAlgorithmBase
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

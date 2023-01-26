@@ -14,7 +14,7 @@ from qgis.PyQt.QtWidgets import (
 )
 from qgis.PyQt.uic import loadUi
 from qgis.gui import QgsColorButton, QgsDoubleSpinBox, QgsSpinBox
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

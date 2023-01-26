@@ -5,7 +5,7 @@ from qgis.PyQt.uic import loadUi
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QWidget, QLineEdit, QToolButton, QListWidget, QListWidgetItem, QDialog
 from qgis.core import QgsMapLayer, QgsProject, QgsCoordinateReferenceSystem, QgsRasterLayer, QgsVectorLayer
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

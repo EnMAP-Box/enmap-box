@@ -10,7 +10,7 @@ from enmapboxprocessing.typing import SampleX, SampleY, Categories, checkSampleS
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsPalettedRasterRenderer,
                        QgsMapLayer)
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

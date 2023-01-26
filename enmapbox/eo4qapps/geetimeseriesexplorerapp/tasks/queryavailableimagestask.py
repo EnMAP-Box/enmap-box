@@ -4,7 +4,7 @@ from enmapbox.utils import importEarthEngine
 from geetimeseriesexplorerapp.utils import utilsMsecToDateTime
 from qgis.core import QgsTask
 from qgis.gui import QgsMessageBar
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

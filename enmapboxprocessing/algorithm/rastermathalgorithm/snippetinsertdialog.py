@@ -3,7 +3,7 @@ from typing import List
 from enmapboxprocessing.parameter.processingparametercodeeditwidget import CodeEditWidget
 from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QComboBox, QLabel, QVBoxLayout
 from qgis.core import QgsRasterLayer
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 class DialogUi(object):

@@ -3,7 +3,7 @@ from qgis.PyQt.QtWidgets import QMenu, QAction
 
 from decorrelationstretchapp.decorrelationstretchdialog import DecorrelationStretchDialog
 from enmapbox.gui.applications import EnMAPBoxApplication
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 def enmapboxApplicationFactory(enmapBox):

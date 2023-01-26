@@ -1,5 +1,5 @@
 from enmapboxprocessing.algorithm.fitclustereralgorithmbase import FitClustererAlgorithmBase
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

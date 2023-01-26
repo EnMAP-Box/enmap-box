@@ -54,7 +54,7 @@ from qgis.core import QgsWkbTypes
 from qgis.gui import QgsLayerTreeProxyModel
 from qgis.gui import QgsLayerTreeView, \
     QgsMapCanvas, QgsLayerTreeViewMenuProvider, QgsLayerTreeMapCanvasBridge, QgsDockWidget, QgsMessageBar
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 class LayerTreeNode(QgsLayerTree):

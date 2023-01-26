@@ -33,7 +33,7 @@ from qgis.gui import (
     QgsDockWidget, QgsFeaturePickerWidget, QgsMapLayerComboBox, QgsFieldComboBox, QgsMessageBar, QgsColorButton,
     QgsFileWidget, QgsCheckableComboBox, QgsMapMouseEvent
 )
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked

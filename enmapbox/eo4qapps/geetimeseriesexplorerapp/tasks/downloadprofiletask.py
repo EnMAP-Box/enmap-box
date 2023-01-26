@@ -4,7 +4,7 @@ from typing import Optional, List
 
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsTask, QgsMessageLog, Qgis
-from typeguard import typechecked
+from enmapboxexternal.typeguard import typechecked
 
 
 @typechecked
