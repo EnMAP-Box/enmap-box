@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.applications import EnMAPBoxApplication
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils

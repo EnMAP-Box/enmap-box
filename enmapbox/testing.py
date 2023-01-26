@@ -128,7 +128,7 @@ class TestObjects(TestObjects):
     @staticmethod
     def enmapboxApplication():
         from enmapbox.gui.applications import EnMAPBoxApplication
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         assert isinstance(EnMAPBox.instance(), EnMAPBox), 'Please initialize an EnMAP-Box instance first'
 
         def testAlgorithm(self, *args):

@@ -3,7 +3,8 @@ import site
 import unittest
 
 from enmapbox import DIR_ENMAPBOX
-from enmapbox import EnMAPBox, EnMAPBoxApplication
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.gui.applications import EnMAPBoxApplication
 from enmapbox.testing import EnMAPBoxTestCase
 from qgis.PyQt.QtWidgets import QWidget
 

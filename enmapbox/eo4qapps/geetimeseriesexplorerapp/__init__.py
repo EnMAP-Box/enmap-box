@@ -1,6 +1,6 @@
 from typing import Optional
 
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.applications import EnMAPBoxApplication
 from enmapbox.gui.dataviews.docks import DockTypes, MapDock
 from enmapbox.gui.mapcanvas import CanvasLink

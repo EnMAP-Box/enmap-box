@@ -21,7 +21,7 @@ if True:
     from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog
     showLayerPropertiesDialog(layer)
 else:
-    from enmapbox import EnMAPBox
+    from enmapbox.gui.enmapboxgui import EnMAPBox
     enmapBox = EnMAPBox(load_other_apps=False)
     enmapBox.onDataDropped([layer])
 qgsApp.exec_()

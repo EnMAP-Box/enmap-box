@@ -202,7 +202,7 @@ class DockTreeNode(LayerTreeNode):
         return f'<{self.__class__.__name__} at {id(self)}>'
 
     def setEnMAPBoxInstance(self, enmapbox):
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         if isinstance(enmapbox, EnMAPBox):
             self.mEnMAPBoxInstance = enmapbox
 
@@ -489,7 +489,7 @@ class DockManager(QObject):
         self.mDataSourceManager: Optional[DataSourceManager] = None
         self.mMessageBar: QgsMessageBar = Optional[None]
         self.mProject: QgsProject = QgsProject.instance()
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         self.mEnMAPBoxInstance: Optional[EnMAPBox] = None
 
     def clear(self):
@@ -715,7 +715,7 @@ class DockManager(QObject):
             if isinstance(self.mDataSourceManager, DataSourceManager):
                 dock.sigLayersAdded.connect(self.mDataSourceManager.addDataSources)
 
-            from enmapbox import EnMAPBox
+            from enmapbox.gui.enmapboxgui import EnMAPBox
             if isinstance(self.mEnMAPBoxInstance, EnMAPBox):
                 dock.sigRenderStateChanged.connect(self.mEnMAPBoxInstance.ui.mProgressBarRendering.toggleVisibility)
             dock.mapCanvas().enableMapTileRendering(True)
@@ -1789,7 +1789,7 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
             action.triggered.connect(lambda: self.onScatterPlotClicked(lyr))
 
         # add apply model shortcuts
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapBox = EnMAPBox.instance()
         classifiers = list()
         regressors = list()
@@ -1903,21 +1903,21 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
             s = ""
 
     def openAttributeTable(self, layer: QgsVectorLayer):
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         emb = EnMAPBox.instance()
         if isinstance(emb, EnMAPBox) and isinstance(layer, QgsVectorLayer):
             from enmapbox.gui.dataviews.docks import AttributeTableDock
             emb.createDock(AttributeTableDock, layer=layer)
 
     def openSpectralLibraryView(self, layer: QgsVectorLayer):
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         emb = EnMAPBox.instance()
         if isinstance(emb, EnMAPBox) and isinstance(layer, QgsVectorLayer):
             from enmapbox.gui.dataviews.docks import SpectralLibraryDock
             emb.createDock(SpectralLibraryDock, speclib=layer)
 
     def showLayerProperties(self, layer: QgsMapLayer, canvas: QgsMapCanvas):
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         messageBar = None
         emb = EnMAPBox.instance()
         if isinstance(emb, EnMAPBox) and isinstance(layer, QgsVectorLayer):
@@ -2024,7 +2024,7 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
 
     def onRunProcessingAlgorithmClicked(self):
         from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapBox = EnMAPBox.instance()
 
         action = self.mDockTreeView.sender()
@@ -2078,7 +2078,7 @@ class DockPanelUI(QgsDockWidget):
         if panel is not None:
             panel.setUserVisible(self.mRasterLayerStyling.isChecked())
         if panel.isUserVisible():
-            from enmapbox import EnMAPBox
+            from enmapbox.gui.enmapboxgui import EnMAPBox
             enmapBox = EnMAPBox.instance()
             panel.mLayer.setLayer(enmapBox.currentLayer())
 

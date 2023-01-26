@@ -27,7 +27,9 @@ from qgis.PyQt.QtWidgets import QApplication, QAction, QWidget, QMenu
 from enmapbox.testing import EnMAPBoxTestCase, TestObjects
 from qgis.core import QgsProcessingAlgorithm, QgsProcessingParameterDefinition, QgsProcessingParameterRasterLayer, \
     QgsApplication
-from enmapbox import EnMAPBox, DIR_ENMAPBOX, DIR_REPO, EnMAPBoxApplication
+from enmapbox import DIR_ENMAPBOX, DIR_REPO, initAll
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.gui.applications import EnMAPBoxApplication
 
 
 class test_applications(EnMAPBoxTestCase):

@@ -2,7 +2,7 @@ from typing import Optional
 
 from qgis.PyQt.QtCore import Qt
 
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.applications import EnMAPBoxApplication
 from typeguard import typechecked
 from rasterlayerstylingapp.rasterlayerstylingpanel import RasterLayerStylingPanel

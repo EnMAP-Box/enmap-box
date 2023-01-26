@@ -6,7 +6,7 @@ import unittest
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import QgsApplication, QgsRasterLayer, QgsVectorLayer
 from enmapbox.testing import EnMAPBoxTestCase, TestObjects
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 
 
 class EnMAPBoxTestCaseExample(EnMAPBoxTestCase):

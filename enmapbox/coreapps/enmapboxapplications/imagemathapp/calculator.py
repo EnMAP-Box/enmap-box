@@ -24,7 +24,7 @@ class Calulator(Applier):
             for key in self.outputRaster.flatRasterKeys():
                 value = self.outputRaster.raster(key=key)
                 self.controls.progressBar.setText('<b>{}</b> = {}'.format(key, value.filename()))
-                from enmapbox import EnMAPBox
+                from enmapbox.gui.enmapboxgui import EnMAPBox
                 enmapBox = EnMAPBox.instance()
                 if isinstance(enmapBox, EnMAPBox):
                     enmapBox.addSource(value.filename())

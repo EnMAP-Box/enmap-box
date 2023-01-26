@@ -2,7 +2,7 @@ from os.path import basename, join, dirname
 
 from qgis.PyQt.uic import loadUi
 
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from processing.gui.wrappers import WidgetWrapper
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QMenu

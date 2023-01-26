@@ -5,7 +5,7 @@ from osgeo import gdal
 
 from engeomap.enmapboxintegration import EnGeoMAP
 from engeomap.userinterfaces import EnGeoMAPGUI, Worker
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from qgis.core import QgsRasterLayer, QgsFileUtils
 from enmapbox.testing import EnMAPBoxTestCase
 

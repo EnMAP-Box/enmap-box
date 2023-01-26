@@ -43,7 +43,7 @@ class RasterSourceBandPropertiesEditorDialog(QMainWindow):
         QMainWindow.__init__(self, *args, **kwds)
         loadUi(__file__.replace('.py', '.ui'), self)
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         self.enmapBox = EnMAPBox.instance()
         self.defaultValues: Dict = dict()
         self.mSource.addItems([''] + self.enmapBox.dataSources('RASTER', True))

@@ -4,7 +4,7 @@ from os.path import join, dirname
 from typing import Optional
 
 import requests
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
 from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp import MapTool

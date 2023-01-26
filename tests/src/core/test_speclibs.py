@@ -16,7 +16,7 @@ import unittest
 
 from qgis.core import QgsFeature
 
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.exampledata import enmap, enmap_srf_library
 from enmapbox.gui.dataviews.docks import SpectralLibraryDock
 from enmapbox.gui.mapcanvas import MapCanvas

@@ -4,7 +4,7 @@ from enmapboxprocessing.algorithm.prepareclassificationdatasetfromjsonalgorithm 
     PrepareClassificationDatasetFromJsonAlgorithm
 from qgis.PyQt.uic import loadUi
 
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedlibraryalgorithm import \
     PrepareClassificationDatasetFromCategorizedLibraryAlgorithm
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedrasteralgorithm import \
@@ -104,7 +104,7 @@ class ProcessingParameterPickleFileClassificationDatasetWidget(QWidget):
     setFilePath = setValue
 
     def onCreateClicked(self):
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapBox = EnMAPBox.instance()
 
         class AlgorithmDialogWrapper(AlgorithmDialog):

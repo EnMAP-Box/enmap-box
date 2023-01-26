@@ -7,7 +7,7 @@ import unittest
 
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.datasources.datasources import VectorDataSource
 from enmapbox.gui.mapcanvas import MapCanvas
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
