@@ -77,11 +77,6 @@ class GeetseEarthEngineRasterDataProvider(QgsRasterDataProvider):
         self.ee_object = ee_object
         # self.ee_info = ee_object.getInfo()
 
-    def setImageForProfile(self, eeImage, showBandInProfile):
-        self.eeImage = eeImage
-        self.showBandInProfile = showBandInProfile
-        self.ee_info = eeImage.getInfo()
-
     def setInformation(self, collectionJson, imageInfo):
         from geetimeseriesexplorerapp.collectioninfo import CollectionInfo
         from geetimeseriesexplorerapp.imageinfo import ImageInfo
@@ -155,22 +150,11 @@ class GeetseEarthEngineRasterDataProvider(QgsRasterDataProvider):
             return Qgis.UnknownDataType
 
     def identify(self, point, format, boundingBox=None, width=None, height=None, dpi=None) -> QgsRasterIdentifyResult:
-        eeImported, ee = importEarthEngine(False)
-        from geetimeseriesexplorerapp.externals.ee_plugin import utils
-
-        point = utils.geom_to_geo(point)
-        point_ee = ee.Geometry.Point([point.x(), point.y()])
-
-        scale = 1
-        values = self.eeImage.reduceRegion(ee.Reducer.first(), point_ee, scale).getInfo()
-
         band_indices = range(1, self.bandCount() + 1)
         band_names = [self.generateBandName(band_no) for band_no in band_indices]
-        band_values = [values[band_name] for band_name in band_names]
-
+        band_values = [None for band_name in band_names]
         results = dict(zip(band_indices, band_values))
         identifyResult = QgsRasterIdentifyResult(QgsRaster.IdentifyFormatValue, results)
-
         return identifyResult
 
     def block(self, bandNo, boundingBox, width, height, feedback=None):
