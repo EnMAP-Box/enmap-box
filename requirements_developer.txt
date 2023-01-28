@@ -21,7 +21,7 @@ sphinx-autobuild
 docutils
 coverage
 urlchecker
-
+typeguard
 
 # optionals
 git-lfs
