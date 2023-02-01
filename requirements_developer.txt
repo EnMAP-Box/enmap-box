@@ -10,15 +10,6 @@ gitpython
 # clean code
 flake8-qgis
 
-# required to build the documentation
-
-recommonmark
-sphinx
-sphinx-argparse
-sphinx-markdown
-sphinx-rtd-theme
-sphinx-autobuild
-docutils
 coverage
 urlchecker
 typeguard
