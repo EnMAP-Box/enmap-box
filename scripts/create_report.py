@@ -53,7 +53,6 @@ def report_downloads() -> pd.DataFrame:
     html = re.sub(r'&nbsp;', '', html)
     html = re.sub(r'xmlns=".*"', '', html)
 
-
     tree = etree.fromstring(html)
     table = tree.find('.//table[@class="table table-striped plugins"]')
     DATA = {k: [] for k in ['version', 'minQGIS', 'experimental', 'downloads', 'uploader', 'datetime']}
@@ -298,7 +297,6 @@ def report_bitbucket_issues(self):
 class TestCases(unittest.TestCase):
 
     def test_github_issue(self):
-
 
         path_json = pathlib.Path(DIR_REPO_TMP) / 'issues.json'
 
