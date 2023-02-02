@@ -9,7 +9,7 @@ from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessingParameterField,
                        QgsCategorizedSymbolRenderer, QgsProcessingException)
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

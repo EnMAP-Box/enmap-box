@@ -5,7 +5,7 @@ import numpy as np
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsRasterRenderer, QgsRasterInterface, QgsRectangle, QgsRasterBlockFeedback, Qgis, QgsRasterLayer
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

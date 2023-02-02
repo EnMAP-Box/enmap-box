@@ -11,7 +11,7 @@ from qgis.PyQt.QtWidgets import QWidget, QToolButton, QCheckBox, QMainWindow, QC
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsMultiBandColorRenderer, QgsRasterLayer, QgsMapLayerProxyModel, QgsMapSettings
 from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsDoubleSpinBox, QgsMapLayerComboBox
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

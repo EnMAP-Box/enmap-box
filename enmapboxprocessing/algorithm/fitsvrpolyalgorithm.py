@@ -1,5 +1,5 @@
 from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

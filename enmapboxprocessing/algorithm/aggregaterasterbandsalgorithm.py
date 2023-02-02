@@ -10,7 +10,7 @@ from enmapboxprocessing.numpyutils import NumpyUtils
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

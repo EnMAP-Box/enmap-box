@@ -8,7 +8,7 @@ from enmapboxprocessing.typing import checkSampleShape, SampleX, SampleY, Target
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsFeature, QgsProcessingParameterField,
                        QgsVectorLayer, QgsProcessingException)
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

@@ -39,8 +39,8 @@ from qgis.PyQt.QtCore import QSettings
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import Qgis, QgsApplication, QgsProcessingRegistry, QgsProcessingProvider, QgsProcessingAlgorithm
 from qgis.gui import QgisInterface, QgsMapLayerConfigWidgetFactory
+
 # provide shortcuts
-from .qgispluginsupport.qps.pyqtgraph import pyqtgraph
 
 # true version is added from .plugin.ini during plugin build process
 __version__ = 'dev'
@@ -379,10 +379,6 @@ def unloadAll():
     unregisterEnMAPBoxProcessingProvider()
 
 
-EnMAPBox = None
-EnMAPBoxApplication = None
-
-
 def tr(text: str) -> str:
     """
     to be implemented: string translation
@@ -399,17 +395,3 @@ def run():
     """
     import enmapbox.__main__
     enmapbox.__main__.run()
-
-
-# skip imports when QGIS is not properly setup.
-# this is the case e.g. in a Read-the-docs environment, when the source code needs just to be there,
-# but not its dependencies
-# https://docs.readthedocs.io/en/stable/builds.html
-# print(f'QGIS_PREFIX_PATH={QgsApplication.prefixPath()}')
-if not os.environ.get('READTHEDOCS', False) in [True, 'True']:
-    pass
-    # removed import shorcuts (see #346)
-    # from enmapbox.gui.enmapboxgui import EnMAPBox
-    # EnMAPBox = EnMAPBox
-    # from enmapbox.gui.applications import EnMAPBoxApplication
-    # EnMAPBoxApplication = EnMAPBoxApplication

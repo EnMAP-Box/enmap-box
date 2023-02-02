@@ -7,7 +7,7 @@ from qgis.PyQt.QtCore import QVariant
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsProcessingParameterField,
                        QgsVectorFileWriter,
                        QgsProject, QgsCoordinateTransform, QgsField)
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

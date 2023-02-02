@@ -5,7 +5,7 @@ from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import Spectral
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsFeature)
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

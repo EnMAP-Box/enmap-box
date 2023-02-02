@@ -4,23 +4,24 @@ name: qgis
 channels:
   - conda-forge
 dependencies:
-  - qgis>=3.18
+  - qgis>=3.26
   - pip
   - numpy
   - scipy
   - scikit-learn
+  - xgboost
+  - lightgbm
+  - catboost
   - matplotlib
   - astropy
-  - numba
+  - numba>=0.56.4
+  - sympy
   - pyopengl
   - netcdf4
   - h5py
   - gitpython
   - git-lfs
-  - sphinx=1.8.5
-  - recommonmark
   - pip:
-    - sphinx-rtd-theme
     - enpt-enmapboxapp
 variables:
   QT_MAC_WANTS_LAYER: 1

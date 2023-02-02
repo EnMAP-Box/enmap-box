@@ -40,7 +40,7 @@ from qgis.PyQt.QtWidgets import QFileDialog, QTableView, QMenu, QStyledItemDeleg
 from qgis.core import QgsProcessing
 from qgis.core import QgsProviderRegistry, QgsRasterLayer, QgsProject, QgsMapLayerProxyModel
 from qgis.gui import QgsMapLayerComboBox
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 from . import APP_DIR
 
 SETTINGS_KEY = 'ENMAPBOX_RECLASSIFY_APP'

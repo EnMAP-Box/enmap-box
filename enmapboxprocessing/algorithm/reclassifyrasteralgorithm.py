@@ -9,7 +9,7 @@ from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsRasterLayer, QgsMapLayer
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

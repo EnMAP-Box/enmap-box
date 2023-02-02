@@ -3,7 +3,7 @@ from os.path import exists, dirname
 from typing import List
 
 from enmapboxprocessing.rasterreader import RasterReader
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

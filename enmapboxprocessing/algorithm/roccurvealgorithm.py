@@ -18,7 +18,7 @@ from enmapboxprocessing.typing import Categories
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer, \
     QgsProcessingException
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

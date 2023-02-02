@@ -57,7 +57,7 @@ from qgis.PyQt.QtWidgets import (
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsMapLayerProxyModel, Qgis, QgsProcessingFeedback, QgsRasterLayer, QgsProcessing
 from qgis.gui import QgsFileWidget, QgsMapLayerComboBox, QgsSpinBox, QgsMessageBar, QgsColorButton, QgsDoubleSpinBox
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 class MissingParameterError(Exception):

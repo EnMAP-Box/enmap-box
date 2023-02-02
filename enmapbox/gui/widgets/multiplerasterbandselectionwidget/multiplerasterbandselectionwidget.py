@@ -5,7 +5,7 @@ from qgis.PyQt.QtWidgets import QWidget, QToolButton, QListWidget, QListWidgetIt
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer, QgsMapLayer
 from qgis.gui import QgsRasterBandComboBox
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

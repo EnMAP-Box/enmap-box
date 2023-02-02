@@ -1,7 +1,7 @@
 import numpy as np
 
 from enmapboxprocessing.algorithm.convolutionfilteralgorithmbase import ConvolutionFilterAlgorithmBase
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

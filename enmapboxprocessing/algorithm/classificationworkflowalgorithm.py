@@ -6,7 +6,7 @@ from enmapboxprocessing.algorithm.predictclassificationalgorithm import PredictC
 from enmapboxprocessing.algorithm.predictclassprobabilityalgorithm import PredictClassPropabilityAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

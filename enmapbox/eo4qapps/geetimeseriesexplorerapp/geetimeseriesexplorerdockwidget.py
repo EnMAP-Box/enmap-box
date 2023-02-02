@@ -32,7 +32,7 @@ from qgis.core import QgsRasterLayer, QgsCoordinateReferenceSystem, QgsMapLayer,
 from qgis.gui import (
     QgsDockWidget, QgsMessageBar, QgsColorRampButton, QgsSpinBox, QgsMapCanvas, QgisInterface
 )
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -1077,7 +1077,7 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
             extentIndex = self.MapViewExtent  # when limiting the collection always use the map extent
 
         if extentIndex == self.MapViewExtent:
-            mapCanvasCrs = Utils.mapCanvasCrs()
+            # mapCanvasCrs = Utils.mapCanvasCrs(self.currentMapCanvas())
             # extent = Utils.transformMapCanvasExtent(self.currentMapCanvas(), self.crsEpsg4326)
             extent = Utils.transformExtent(
                 self.currentMapCanvas().extent(), Utils.mapCanvasCrs(self.currentMapCanvas()), self.crsEpsg4326
@@ -1121,22 +1121,7 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
         eeReducers = self.eeReducers()
         bandNames = self.eeFullCollectionInfo.bandNames + self.currentSpectralIndexBandNames()
 
-        # - create composite used for z-profiles
-        if self.mReducerType.currentIndex() == 0:  # uniform
-            reducer = eeReducers[self.mReducerUniform.currentText()]
-            eeCompositeProfile = eeCollection.reduce(reducer)
-        elif self.mReducerType.currentIndex() == 1:  # band-wise
-            eeBands = list()
-            for i, bandName in enumerate(bandNames):
-                w: QComboBox = self.mReducerBandWise.cellWidget(i, 1)
-                reducer = eeReducers[w.currentText()]
-                eeBand = eeCollection.select(bandName).reduce(reducer)
-                eeBands.append(eeBand)
-            eeCompositeProfile = ee.ImageCollection.fromImages(eeBands).toBands()
-        else:
-            assert 0
-
-        eeCompositeProfile = eeCompositeProfile.rename(bandNames)
+        eeCompositeProfile = None
 
         # - create composite used for WMS layer
         if self.mRendererType.currentIndex() == self.MultibandColorRenderer:
@@ -1449,9 +1434,6 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
         # set collection information
         provider: GeetseEarthEngineRasterDataProvider = layer.dataProvider()
         provider.setInformation(self.eeFullCollectionJson, self.eeFullCollectionInfo)
-        showBandInProfile = [self.mBandProperty.cellWidget(row, 4).isChecked()
-                             for row in range(self.mBandProperty.rowCount())]
-        provider.setImageForProfile(eeImage, showBandInProfile)
         # layer.dataSourceChanged.emit()  # wait for issue #1270
 
     def pushInfoMissingCollection(self):

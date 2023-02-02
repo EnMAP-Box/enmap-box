@@ -17,7 +17,7 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLay
                        QgsProject, QgsField, QgsCoordinateTransform, QgsRasterLayer, QgsProcessingException,
                        QgsMapLayer)
 from qgis.core import edit
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

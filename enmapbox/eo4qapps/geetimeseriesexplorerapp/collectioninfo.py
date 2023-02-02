@@ -3,7 +3,7 @@ from typing import Dict, List, Tuple
 
 from qgis.PyQt.QtCore import QDate, QDateTime
 
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

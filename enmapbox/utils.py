@@ -1,11 +1,10 @@
 from typing import Optional, Tuple
 
+from enmapbox.typeguard import typechecked
+from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QMessageBox
-
-from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from qgis.core import QgsRasterLayer
-from typeguard import typechecked
 
 
 @typechecked
@@ -52,6 +51,25 @@ def isEarthEnginePluginInstalled() -> bool:
 
 @typechecked
 def importEarthEngine(showMessage=True, parent=None) -> Tuple[bool, object]:
+    if isEarthEngineModuleInstalled():
+        import ee
+
+        # ## debugging
+        # import traceback
+        # traceback.print_stack()
+        # QMessageBox.information(parent, 'DEBUG', 'Just imported the "ee" module!')
+        # ##
+
+        return True, ee
+    else:
+        if showMessage:
+            message = "Google Earth Engine plugin not installed. Can't import 'ee' module."
+            QMessageBox.information(parent, 'Missing dependency', message)
+        return False, None
+
+
+@typechecked
+def importTypeguard() -> Tuple[bool, object]:
     if isEarthEngineModuleInstalled():
         import ee
 

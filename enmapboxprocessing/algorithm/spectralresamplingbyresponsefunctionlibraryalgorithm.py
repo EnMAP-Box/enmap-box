@@ -11,7 +11,7 @@ from enmapboxprocessing.algorithm.spectralresamplingtocustomsensoralgorithm impo
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException,
                        QgsProcessingParameterField)
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

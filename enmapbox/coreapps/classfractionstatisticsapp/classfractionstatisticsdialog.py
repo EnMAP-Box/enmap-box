@@ -16,7 +16,7 @@ from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

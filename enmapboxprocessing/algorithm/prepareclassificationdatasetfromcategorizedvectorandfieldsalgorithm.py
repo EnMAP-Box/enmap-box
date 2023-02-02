@@ -7,7 +7,7 @@ from enmapboxprocessing.typing import checkSampleShape, ClassifierDump, Categori
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCategorizedSymbolRenderer,
                        QgsFeature, QgsProcessingParameterField, QgsVectorLayer)
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

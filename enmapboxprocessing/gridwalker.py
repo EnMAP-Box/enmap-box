@@ -1,6 +1,6 @@
 from enmapboxprocessing.extentwalker import ExtentWalker
 from qgis.core import QgsRectangle, QgsProcessingFeedback
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
