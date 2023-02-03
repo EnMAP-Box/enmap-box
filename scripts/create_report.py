@@ -15,10 +15,11 @@ import xml.etree.ElementTree as etree
 import pandas as pd
 from xlsxwriter.workbook import Workbook
 
-from enmapbox import DIR_REPO_TMP, EnMAPBox, EnMAPBoxApplication
+from enmapbox import DIR_REPO_TMP
 from enmapbox import initAll
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
-from enmapbox.gui.applications import ApplicationWrapper
+from enmapbox.gui.applications import ApplicationWrapper, EnMAPBoxApplication
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app, stop_app
 from qgis.PyQt.QtWidgets import QMenu
 from qgis.core import QgsProcessing, QgsProcessingParameterRasterLayer, QgsProcessingParameterRasterDestination, \
@@ -88,11 +89,14 @@ def report_downloads() -> pd.DataFrame:
 
 
 def report_github_issues() -> pd.DataFrame:
-    import github3
+    """
 
-    gh = github3.login()
+    is:issue created:2022-07-01..2022-12-31
+    is:issue closed:2022-07-01..2022-12-31
+    """
 
     s = ""
+    return None
 
 
 def report_EnMAPBoxApplications() -> pd.DataFrame:
