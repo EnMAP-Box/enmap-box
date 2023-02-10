@@ -727,9 +727,11 @@ class CanvasLink(QObject):
         dstCrs = dstCanvas.mapSettings().destinationCrs()
         extentT = srcExt.toCrs(dstCrs)
 
-        assert isinstance(extentT, SpatialExtent), \
-            'Unable to transform {} from {} to {}'.format(srcExt.asWktCoordinates(), srcCrs.description(),
-                                                          dstCrs.description())
+        if not isinstance(extentT, SpatialExtent):
+            info = 'Unable to transform {} from {} to {}'.format(srcExt.asWktCoordinates(), srcCrs.description(),
+                                                                 dstCrs.description())
+            warnings.warn(info)
+            return dstCanvas
 
         centerT = SpatialPoint(srcExt.crs(), srcExt.center())
 
@@ -914,7 +916,7 @@ class MapCanvas(QgsMapCanvas):
 
         self.setProperty(KEY_LAST_CLICKED, time.time())
         set_cursor_location: bool = event.button() == Qt.LeftButton and \
-            isinstance(self.mapTool(), (QgsMapToolIdentify, CursorLocationMapTool))
+                                    isinstance(self.mapTool(), (QgsMapToolIdentify, CursorLocationMapTool))
 
         super(MapCanvas, self).mousePressEvent(event)
 

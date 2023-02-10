@@ -1933,6 +1933,22 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             sources = [s.source() for s in sources]
         return sources
 
+    def createMapDock(self, *args,
+                      name='New Map',
+                      position='bottom',
+                      relativeTo=None) -> MapDock:
+        """
+        Create a new map dock
+        """
+        return self.createDock(MapDock, name=name, position=position, relativeTo=relativeTo)
+
+    def createSpectralLibraryDock(self, *args,
+                                  speclib: QgsVectorLayer = None,
+                                  name='New Speclib',
+                                  position='bottom', relativeTo=None) -> SpectralLibraryDock:
+        return self.createDock(SpectralLibraryDock, speclib=speclib, name=name, position=position,
+                               relativeTo=relativeTo)
+
     def createDock(self, *args, **kwds) -> Dock:
         """
         Create and returns a new Dock

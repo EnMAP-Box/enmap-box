@@ -670,7 +670,7 @@ class DockManager(QObject):
             return True
         return False
 
-    def createDock(self, dockType, *args, cls=None, **kwds) -> Dock:
+    def createDock(self, dockType, *args, cls=None, position='bottom', relativeTo=None, **kwds) -> Dock:
         """
         Creates and returns a new Dock
         :param cls:
@@ -761,7 +761,7 @@ class DockManager(QObject):
         else:
             raise Exception('Unknown dock type: {}'.format(dockType))
         # dock.setParent(dockArea)
-        dockArea.addDock(dock, *args, **kwds)
+        dockArea.addDock(dock, *args, position=position, relativeTo=relativeTo, **kwds)
         dock.setVisible(True)
 
         if dock not in self.mDocks:
