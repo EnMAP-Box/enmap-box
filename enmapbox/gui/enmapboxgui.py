@@ -2353,6 +2353,12 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
     def vectorMenu(self):
         return QMenu()
 
+    def dockWidgets(self) -> Dict[str, QDockWidget]:
+        """
+        Returns a dictionary of all dock widgets
+        """
+        return {w.windowTitle(): w for w in self.ui.findChildren(QDockWidget)}
+
     def addDockWidget(self, area, dockwidget: QDockWidget, orientation=None):
 
         self.ui.addDockWidget(area, dockwidget)
