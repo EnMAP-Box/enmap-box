@@ -727,9 +727,11 @@ class CanvasLink(QObject):
         dstCrs = dstCanvas.mapSettings().destinationCrs()
         extentT = srcExt.toCrs(dstCrs)
 
-        assert isinstance(extentT, SpatialExtent), \
-            'Unable to transform {} from {} to {}'.format(srcExt.asWktCoordinates(), srcCrs.description(),
-                                                          dstCrs.description())
+        if not isinstance(extentT, SpatialExtent):
+            info = 'Unable to transform {} from {} to {}'.format(srcExt.asWktCoordinates(), srcCrs.description(),
+                                                                 dstCrs.description())
+            warnings.warn(info)
+            return dstCanvas
 
         centerT = SpatialPoint(srcExt.crs(), srcExt.center())
 

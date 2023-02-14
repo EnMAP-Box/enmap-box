@@ -963,11 +963,11 @@ class MapDock(Dock):
         else:
             super(MapDock, self).mousePressEvent(event)
 
-    def linkWithMapDock(self, mapDock, linkType) -> CanvasLink:
+    def linkWithMapDock(self, mapDock: 'MapDock', linkType=CanvasLink.LINK_ON_CENTER_SCALE) -> CanvasLink:
         assert isinstance(mapDock, MapDock)
         return self.linkWithCanvas(mapDock.mCanvas, linkType)
 
-    def linkWithCanvas(self, canvas, linkType) -> CanvasLink:
+    def linkWithCanvas(self, canvas: QgsMapCanvas, linkType=CanvasLink.LINK_ON_CENTER_SCALE) -> CanvasLink:
         assert isinstance(canvas, QgsMapCanvas)
         return self.mapCanvas().createCanvasLink(canvas, linkType)
 

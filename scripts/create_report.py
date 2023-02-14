@@ -11,14 +11,15 @@ import pathlib
 import re
 import unittest
 import urllib.request
-
+import xml.etree.ElementTree as etree
 import pandas as pd
 from xlsxwriter.workbook import Workbook
 
-from enmapbox import DIR_REPO_TMP, EnMAPBox, EnMAPBoxApplication
+from enmapbox import DIR_REPO_TMP
 from enmapbox import initAll
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
-from enmapbox.gui.applications import ApplicationWrapper
+from enmapbox.gui.applications import ApplicationWrapper, EnMAPBoxApplication
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app, stop_app
 from qgis.PyQt.QtWidgets import QMenu
 from qgis.core import QgsProcessing, QgsProcessingParameterRasterLayer, QgsProcessingParameterRasterDestination, \
@@ -53,8 +54,7 @@ def report_downloads() -> pd.DataFrame:
     html = re.sub(r'&nbsp;', '', html)
     html = re.sub(r'xmlns=".*"', '', html)
 
-    import xml.etree.ElementTree as ET
-    tree = ET.fromstring(html)
+    tree = etree.fromstring(html)
     table = tree.find('.//table[@class="table table-striped plugins"]')
     DATA = {k: [] for k in ['version', 'minQGIS', 'experimental', 'downloads', 'uploader', 'datetime']}
     for tr in table.findall('.//tbody/tr'):
@@ -89,11 +89,14 @@ def report_downloads() -> pd.DataFrame:
 
 
 def report_github_issues() -> pd.DataFrame:
-    import github3
+    """
 
-    gh = github3.login()
+    is:issue created:2022-07-01..2022-12-31
+    is:issue closed:2022-07-01..2022-12-31
+    """
 
     s = ""
+    return None
 
 
 def report_EnMAPBoxApplications() -> pd.DataFrame:
@@ -298,13 +301,14 @@ def report_bitbucket_issues(self):
 class TestCases(unittest.TestCase):
 
     def test_github_issue(self):
-        from github3api import GitHubAPI
-        import json
+
         path_json = pathlib.Path(DIR_REPO_TMP) / 'issues.json'
-        client = GitHubAPI()
 
         if not path_json.is_file():
             issues = []
+            from github3api import GitHubAPI
+            client = GitHubAPI()
+
             for issue_slice in client.get('https://api.github.com/repos/EnMAP-Box/enmap-box/issues',
                                           _get='all',
                                           # _attributes = ['title', 'user', 'labels', 'html_url', 'state', 'locked',
