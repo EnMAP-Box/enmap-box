@@ -916,7 +916,7 @@ class MapCanvas(QgsMapCanvas):
 
         self.setProperty(KEY_LAST_CLICKED, time.time())
         set_cursor_location: bool = event.button() == Qt.LeftButton and \
-                                    isinstance(self.mapTool(), (QgsMapToolIdentify, CursorLocationMapTool))
+            isinstance(self.mapTool(), (QgsMapToolIdentify, CursorLocationMapTool))
 
         super(MapCanvas, self).mousePressEvent(event)
 
