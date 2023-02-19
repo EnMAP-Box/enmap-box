@@ -19,22 +19,13 @@
 ***************************************************************************
 
 Changelog
-EnGeoMAP Version 3.1
-Date: April 2022
+EnGeoMAP Version 3.2
+Date: February 2023
 Author: Helge L. C. Daempfling
 Email: hdaemp@gfz-potsdam.de
 
-Several modifications were realized and new functions and features have
-been added to the UI, while others were removed.
-- The UI now uses multithreading with a Qthreadpool,
-and QRunnable Worker functions in order to prevent freezing of the UI
-once processing has started. functions to display a busy and ready
-status in the GUI have been added.
-- EnGeoMAP's algorithms are now called over the Algo_multi function
-and the connected Worker class and threadpool.
-- The previous version ready and busy display over images has been removed.
-- The Lab image and Lab Library tick boxes were removed as they were just
-non-working placeholders for a future development.
+See algorithms.py and engeomap_aux_funcul.py
+
 """
 
 import os
@@ -122,6 +113,7 @@ class EnGeoMAPGUI(QDialog):
         self.choose_csv.clicked.connect(self.selectFile3)
         self.threadpool = QThreadPool()
         self.worker = Worker()
+        self.worker.setAutoDelete(0)
         self.buttonBox.accepted.connect(self.Algo_Multi) # Button Box
         self.buttonBox.rejected.connect(self.close)
         p = self.frame_5.palette()
@@ -151,6 +143,7 @@ class EnGeoMAPGUI(QDialog):
         self.show()
         # Display Ready Message
         self.worker.signals.finished.connect(self.Im_Ready)
+        #self.threadpool.releaseThread()
         self.update()
         self.show()
 
