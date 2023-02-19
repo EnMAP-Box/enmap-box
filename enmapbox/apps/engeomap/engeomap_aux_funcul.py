@@ -22,19 +22,19 @@ Remote Sens. 2016, 8, 127.
 ***************************************************************************
 
 Changelog
-EnGeoMAP Version 3.1
-Date: April 2022
+EnGeoMAP Version 3.2
+Date: February 2023
 Author: Helge L. C. Daempfling
 Email: hdaemp@gfz-potsdam.de
 
-The following modifications to the EnGeoMAP 3.0 release were realized:
+The following modifications to the EnGeoMAP 3.1 release were realized:
 
-- functions corr_colour and corr_colours_unmix were modified.
-Mean data products have been commented out.
+- console output added and modified to indicate stage of
+calculations of EnGeoMAP.
 
-- schreibeBSQsingle_band_class_best_matchmat function modified.
-Problem with BSQ .hdr file writing corrected.
-BSQ and Geotiff products now show the same color map result.
+- data output names were changed for more clarity
+(see algorithms.py)
+
 """
 
 import copy
@@ -48,7 +48,6 @@ from scipy import ndimage
 from scipy import optimize
 from scipy import signal
 from scipy import spatial
-
 
 # from engeomap import APP_DIR
 
@@ -208,11 +207,13 @@ class read_hdr_flt(object):  # Read in Header and give its values back as floats
 
 
 def check_load_data(bild):
+    bildh = os.path.basename(bild)
+    print('...loading '+bildh)
     try:
         data = gdalnumeric.LoadFile(bild)
     except Exception:
-        print("No data load possible please check the File Type in the HEADER!")
-        print("All following Errors can be ignored because the program will not run anyway!")
+        print("No data load possible! Please check the Files and headers (.hdr)!")
+        print("EnGeoMAP execution halted! Please restart the Application.")
     data = data.astype(float)
     if '.' in bild:
         bild = bild.split('.')[0]
@@ -224,15 +225,15 @@ def check_load_data(bild):
     if numpy.max(wavelength) < 30:
         wavelength *= 1000
     if numpy.max(data) < 10:
-        print("data will be scaled mit 10k")
+        print("The image data will be scaled x10k for processing.")
         data *= 10000.0
     maxx = numpy.trunc(numpy.max(wavelength))
     minn = numpy.trunc(numpy.min(wavelength))
     nwav1nm = numpy.arange(minn, maxx, 1)
     return wavelength, nwav1nm, data
 
-
 def compare_wavelengths(wvlib, wvbild):
+    print('...comparing wavelengths...')
     minbild = wvbild.min()
     maxbild = wvbild.max()
     minlib = wvlib.min()
@@ -250,16 +251,16 @@ def compare_wavelengths(wvlib, wvbild):
         maxx = maxlib
         maxflag = 1
     if maxflag == 1 and minflag == 1:
-        print('All well no clipping needed')
+        print('Spectral range of image data and library is matching: No clipping needed.')
     else:
-        print('Data Longer than the used library I have to clip it to its Intersection')
+        print('Spectral range of image data larger than the used library entries: Data must be be clipped!')
     return minn, maxx, minflag, maxflag
 
 
 # returns shortest intersecting wvl rage for 1nm interpolation
 
-
 def prep_1nm_interpol_intersect(minn, maxx, minflag, maxflag, w1nmlib, w1nmbild):
+    print('...interpolating...')
     if minflag * maxflag == 1:
         maximum = numpy.max(w1nmbild)
         minimum = numpy.min(w1nmbild)
@@ -282,7 +283,6 @@ def prep_1nm_interpol_intersect(minn, maxx, minflag, maxflag, w1nmlib, w1nmbild)
 ###
 # misc interpolation functions for the spectra:
 #########
-
 
 def interpolate_generic1nmlib(wv, data):
     neowave = numpy.arange(numpy.trunc(min(wv)), numpy.trunc(max(wv)), 1)
@@ -345,7 +345,7 @@ def interpolate_1nm_spectrum(wvto, wvfrom, data, flag=None):
         output = interpolate.splev(wvto, interpolator, der=0)
         return output  # ,wvto,wv_from_neo
     else:
-        print("Error expected spectral library data (2d mat)")
+        #print("Error expected spectral library data (2d mat)")
         return None
 
 
@@ -428,7 +428,6 @@ def cvx_uhull3(spc, wv):
     hullfinal = numpy.interp(wv, a2, a1)
     return hullfinal
 
-
 def sortierer(wv, wve):
     if wv[0] > wve:
         return 0, 0
@@ -451,7 +450,6 @@ def getrange(wv):
             indices.append(d[2])
             minima.append(d[1])
     return numpy.asarray([indices, minima])
-
 
 def generic_1nm_data_feat_grabber(lneo, rneo, spec, wave):
     ww = numpy.where((wave >= lneo) & (wave <= rneo))
@@ -608,7 +606,6 @@ def scrut_weigh3(rm_abs, rm_rel, wav, vnir_thr, swir_thr):
         posswirmax = wav[r_abs_mod_swir][swirargmax]
     return r_abs_mod, r_rel, vnirmax, swirmax, posvnirmax, posswirmax
 
-
 def corr(libdat_rel_weighted, w_rel_scale):
     sz = numpy.corrcoef(numpy.concatenate((libdat_rel_weighted, w_rel_scale[numpy.newaxis, :])))
     correlate = sz[-1, :-1]
@@ -701,7 +698,7 @@ def treat_library_cvx(wv, data, neowave, vnir_thr=0.01, swir_thr=0.02):
                 cvxabs[j, :], cvxrel[j, :], nwv, vnir_thr, swir_thr)
             w_rel_scale[j, :], w_rel_chm_scale[j, :], a, b, c, d = weighting_lib2(cvxrel_mod[j, :], nwv)
         except Exception:
-            print('treat_library_cvx-->E')
+            #print('treat_library_cvx-->E')
             cvxabs_mod[j, :], cvxrel_mod[j, :], vnirmax[j], swirmax, posvnirmax[j], posswirmax[j] = numpy.zeros_like(
                 arr[j, :]), numpy.ones_like(arr[j, :]), 0, 0, 0, 0
             continue
@@ -709,6 +706,7 @@ def treat_library_cvx(wv, data, neowave, vnir_thr=0.01, swir_thr=0.02):
 
 
 def treat_library_cvx_full_range(wv, data, neowave, vnir_thr=0.00, swir_thr=0.00):
+    print('...calculating values for library endmembers...')
     arr, nwv = interpolate_generic1nmlib_nwave(wv, data, neowave, flag=0)
     # return arr,nwv
     cvxabs = numpy.zeros_like(arr)
@@ -729,13 +727,14 @@ def treat_library_cvx_full_range(wv, data, neowave, vnir_thr=0.00, swir_thr=0.00
                 cvxabs[j, :], cvxrel[j, :], nwv, vnir_thr, swir_thr)
             w_rel_scale[j, :], w_rel_chm_scale[j, :], a, b, c, d = weighting_lib2(cvxrel_mod[j, :], nwv)
         except Exception:
-            print('treat_library_cvx_full_range-->E')
+            #print('treat_library_cvx_full_range-->E')
             cvxabs[j, :], cvxrel[j, :], cvxhull[j, :] = numpy.zeros_like(arr[j, :]), numpy.ones_like(arr[j, :]), arr[j,
                                                                                                                  :]  # Please mind the colinearity!
     return cvxabs_mod, cvxrel_mod, w_rel_scale, w_rel_chm_scale, vnirmax, swirmax
 
 
 # hull calculation Only!
+
 
 def treat_library_cvx_full_range_lo(wv, data, neowave, vnir_thr=0.00, swir_thr=0.00):
     arr, nwv = interpolate_generic1nmlib_nwave(wv, data, neowave, flag=0)
@@ -783,6 +782,7 @@ def treat_library_cvx_full_range_lo(wv, data, neowave, vnir_thr=0.00, swir_thr=0
 #########
 ########Fitting Routines
 ###########
+
 
 def fitting_cvx(wfrom, wto, data, libdat_rel_weighted, libdat_rel_chm_weighted, libdat_abs, vnir_thr=0.01,
                 swir_thr=0.02, lib_flag=0, mix_minerals=6, fit_threshold=0.5):
@@ -843,6 +843,7 @@ def fitting_cvx(wfrom, wto, data, libdat_rel_weighted, libdat_rel_chm_weighted, 
 
 def fitting_cvx_fullrange(wfrom, wto, data, libdat_rel_weighted, libdat_rel_chm_weighted, libdat_abs, vnir_thr=0.00,
                           swir_thr=0.00, lib_flag=0, mix_minerals=6, fit_threshold=0.5):
+    print('...feature fitting and bvls...')
     dshape2 = data.shape
     data = data.reshape(dshape2[0], dshape2[1] * dshape2[2])
     dshape = data.shape
@@ -1011,6 +1012,7 @@ def writiff(rgb, out):
 
 
 def reshreib(data, name, shp):
+    print('...writing results to disk...')
     data = data.reshape(shp)
     schreibeBSQ(data, name)
     return None
@@ -1107,7 +1109,7 @@ def schreibefarbfile7(numpyarray, out, classfilename):
     format = "ENVI"
     driver = gdal.GetDriverByName(format)
     h = numpy.shape(rgb)
-    dst_ds = driver.Create(out + '_class_geotiff.tif', h[2], h[1], h[0], gdal.GDT_Byte)
+    dst_ds = driver.Create(out + '_geotiff.tif', h[2], h[1], h[0], gdal.GDT_Byte)
     ka = 1
     while ka <= h[0]:
         hhh = ka - 1
@@ -1133,13 +1135,13 @@ def schreibeBSQsingle_band_class_best_matchmat(numpyarray, out, classfilename):
     unik_vals = numpy.unique(numpyarray)
     classes_numbers = len(unik_vals)
     ####
-    print('Library entries used in class image = ', classes_numbers)
-    ####
     obd = loadmineral_colors(classfilename)
     ####
     len_obd = len(obd[1])
-    print('Library entries = ', len_obd)
+    print('Total number of library entries = ', len_obd)
     ###
+    print('Number of library endmembers present in the EnGeoMAP classification result = ', classes_numbers)
+    ####
     description = []
     class_names = []
     class_lookup = []
@@ -1178,7 +1180,7 @@ def schreibeBSQsingle_band_class_best_matchmat(numpyarray, out, classfilename):
     format = "GTiff"
     driver = gdal.GetDriverByName(format)
     h = numpy.shape(rgb)
-    dst_ds = driver.Create(out + '_class_geotiff.tif', h[2], h[1], h[0], gdal.GDT_Byte)
+    dst_ds = driver.Create(out + '_geotiff.tif', h[2], h[1], h[0], gdal.GDT_Byte)
     ka = 1
     while ka <= h[0]:
         hhh = ka - 1
@@ -1231,11 +1233,11 @@ def corr_colours(corrmat, colorfile, basename, shape_param, minerals=30, thresh=
     maxcormat = maxcormat.reshape(minerals, shape_param[1], shape_param[2])
     # schreibeBSQ(maxcormat,basename+'_best_matches_')
     # schreibeBSQ(indexmat,basename+'_best_matches_indices')
-    rgb = schreibeBSQsingle_band_class_best_matchmat(indexmat[0, :, :], basename + '_best_fit_coleur', colorfile)
+    rgb = schreibeBSQsingle_band_class_best_matchmat(indexmat[0, :, :], basename + '_result', colorfile)
     indexmedian = signal.medfilt2d(indexmat[0, :, :], kernel_size=3)
     # schreibeBSQsingle(indexmedian,basename+'_median_filtered_best_match_index')
     # Optional median filtered
-    # rgbm=schreibeBSQsingle_band_class_best_matchmat(indexmedian,basename+'_median_filtered__best_fit_coleur',colorfile)
+    # rgbm=schreibeBSQsingle_band_class_best_matchmat(indexmedian,basename+'_median_filtered_result',colorfile)
     # indexmedian2=signal.medfilt2d(indexmat[1,:,:],kernel_size=3)
     return rgb, indexmat  # ,rgbm
 
@@ -1246,13 +1248,13 @@ def corr_colours_unmix(corrmat, colorfile, basename, shape_param, minerals, thre
     indexmat, maxcormat = own_mix_corelation(threshold_applied, minerals)
     indexmat = indexmat.reshape(minerals, shape_param[1], shape_param[2])
     maxcormat = maxcormat.reshape(minerals, shape_param[1], shape_param[2])
-    rgb = schreibeBSQsingle_band_class_best_matchmat(indexmat[0, :, :], basename + '_best_unmix_coleur', colorfile)
+    rgb = schreibeBSQsingle_band_class_best_matchmat(indexmat[0, :, :], basename + '_highest_abundance_result', colorfile)
     # schreibeBSQ(maxcormat,basename+'_highest_abundance_unmix_')
     # schreibeBSQ(indexmat,basename+'_highest_abundance_unmix_indices')
     indexmedian = signal.medfilt2d(indexmat[0, :, :], kernel_size=3)
     # schreibeBSQsingle(indexmedian,basename+'_median_filtered_best_match_index')
     # Optional median filtered
-    # rgbm=schreibeBSQsingle_band_class_best_matchmat(indexmedian,basename+'_median_filtered_best_unmix_coleur',colorfile)
+    # rgbm=schreibeBSQsingle_band_class_best_matchmat(indexmedian,basename+'_median_filtered_highest_abundance',colorfile)
     # indexmedian2=signal.medfilt2d(indexmat[1,:,:],kernel_size=3)
     return rgb, indexmat  # ,rgbm
 
@@ -1264,7 +1266,7 @@ def corr_colours_dist(corrmat, colorfile, basename, shape_param, minerals):
     maxcormat = maxcormat.reshape(minerals, shape_param[1], shape_param[2])
     schreibeBSQ(maxcormat, basename + '_best_matches_')
     schreibeBSQ(indexmat, basename + '_best_matches_indices')
-    rgb = schreibeBSQsingle_band_class_best_matchmat(indexmat[0, :, :], basename + '_best_fit_coleur', colorfile)
+    rgb = schreibeBSQsingle_band_class_best_matchmat(indexmat[0, :, :], basename + '_result', colorfile)
     return rgb, indexmat
 
 
@@ -1379,14 +1381,14 @@ def rewrite_headers(
         mapinfo = 'map info={' + mapinfo + '}\n'
         L.append(mapinfo)
     except(AttributeError):
-        print('Keine Koordinateninfo vorhanden!!!!')
+        print('No coordinate info was found in the input image data -> No coordinate info will be transferred to the classification results header files.')
         return -1
     try:
         crs = inputs.coordinate_system_string
         crs = 'coordinate system string={' + crs + '}\n'
         L.append(crs)
     except(AttributeError):
-        print('Keine CRS Info vorhanden, halb so wild!')
+        print('No CRS Info was found.')
     for j in enumerate(liste):
         if j[1] == inputbildhdr:
             continue
