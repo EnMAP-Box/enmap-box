@@ -33,7 +33,7 @@ import hys
 # from ensomap_ui import ENSOMAP_UI
 
 from PyQt5.QtCore    import *
-from qgis.PyQt.QtWidgets import *
+from PyQt5.QtWidgets import *
 from PyQt5.QtGui     import *
 
 import numpy as np
@@ -102,10 +102,11 @@ class EnSoMAP(EnMAPBoxApplication):
 
     def menu(self, appMenu):
         appMenu = self.enmapbox.menu('Applications')
-        menu = self.utilsAddMenuInAlphanumericOrder(appMenu, 'Soil Applications')
+        menu = appMenu.addMenu('Soil Applications')
         menu.setIcon(self.icon())
         a = menu.addAction('EnSoMAP 2.0')
         a.triggered.connect(self.startGUI)
+        appMenu.addMenu(menu)
         return menu
     
     def startGUI(self, *args):

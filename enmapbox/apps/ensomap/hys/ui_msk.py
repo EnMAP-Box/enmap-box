@@ -4,9 +4,9 @@
 # Licensed under the terms of the 
 # (see ../LICENSE.md for details)
 
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtWidgets import *
-from qgis.PyQt.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 import numpy as np
 import time
 import hys
@@ -42,7 +42,7 @@ class ui_msk:
         self.gui.widget_label(text = 'Hyperspectral Data:', width = 170)
         self.gui.widget_text(ID="msk_txt_file_pathname")
         self.gui.widget_tool_button(text='...', action=self.msk_set_data_pathname)
-        self.gui.widget_tool_button(text='Get', action=self.msk_get_data_pathname)
+        self.gui.widget_tool_button(text='Get it from Mapping', action=self.msk_get_data_pathname)
         self.gui.widget_row_close()
 
         # second line
@@ -61,7 +61,7 @@ class ui_msk:
         self.gui.widget_label(text = 'Soil Mask Directory:', width = 170)
         self.gui.widget_text(ID='msk_txt_mask_dir_pathname', text=self.msk_dname)
         self.gui.widget_tool_button(text='...', action=self.msk_set_mask_dir_pathname)
-        self.gui.widget_tool_button(text='Get', action=self.msk_get_mask_dir_pathname)
+        self.gui.widget_tool_button(text='Get it to Mapping', action=self.msk_get_mask_dir_pathname)
         self.gui.widget_row_close()
         self.gui.widget_group_box_close()
 
@@ -173,7 +173,7 @@ class ui_msk:
     ###############################################################################################
     def msk_get_data_pathname(self):
         if self.map_cube is None:
-            msg = "No hyperspectral product has been load!"
+            msg = "No hyperspectral product has been loaded!"
             hys.display_error(self, msg)
             return
         if type(self.map_cube) == hys.SpectralLibrary:
