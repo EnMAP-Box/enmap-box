@@ -18,16 +18,15 @@
 *   (at your option) any later version.                                   *
 *                                                                         *
 ***************************************************************************
+
 Changelog
-EnGeoMAP Version 3.1
-Date: April 2022
+EnGeoMAP Version 3.2
+Date: February 2023
 Author: Helge L. C. Daempfling
 Email: hdaemp@gfz-potsdam.de
 
-The following modifications to the EnGeoMAP 3.0 release were realized:
+See algorithms.py and engeomap_aux_funcul.py
 
-- Image loader function display_all was removed due to image removal in GUI.
-A status text and color icon display was added in userinterfaces.py instead.
 """
 
 import os
@@ -53,7 +52,7 @@ class EnGeoMAP(EnMAPBoxApplication):
         menu = self.utilsAddMenuInAlphanumericOrder(appMenu, 'Mineral Applications')
         menu.setIcon(self.icon())
         # add a QAction that starts your GUI
-        a = menu.addAction('EnGeoMAP 3.1')
+        a = menu.addAction('EnGeoMAP 3.2')
         a.triggered.connect(self.startGUI)
         return menu
 
