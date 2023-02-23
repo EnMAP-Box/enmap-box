@@ -126,7 +126,7 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
             self.P_BAND_LIST, self._BAND_LIST, parentLayerParameterName=self.P_RASTER, optional=True
         )
         self.addParameterRasterLayer(self.P_GRID, self._GRID, optional=True)
-        self.addParameterBoolean(self.P_COPY_METADATA, self._COPY_METADATA, defaultValue=False)
+        self.addParameterBoolean(self.P_COPY_METADATA, self._COPY_METADATA, defaultValue=True)
         self.addParameterBoolean(self.P_COPY_STYLE, self._COPY_STYLE, defaultValue=False)
         self.addParameterBoolean(self.P_EXCLUDE_BAD_BANDS, self._EXCLUDE_BAD_BANDS, defaultValue=False)
         self.addParameterBoolean(self.P_WRITE_ENVI_HEADER, self._WRITE_ENVI_HEADER, defaultValue=True)
