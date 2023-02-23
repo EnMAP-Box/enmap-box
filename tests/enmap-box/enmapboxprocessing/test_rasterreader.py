@@ -537,3 +537,19 @@ class TestRasterReader(TestCase):
         self.assertEqual(gold, reader.lineMemoryUsage())
         self.assertEqual(gold * 2, reader.lineMemoryUsage(nBands=bandCount * 2))
         self.assertEqual(gold * 2, reader.lineMemoryUsage(dataTypeSize=8))
+
+    def test_pamMetadata(self):
+
+        layer = QgsRasterLayer(enmap)
+        reader = RasterReader(layer)
+        wavelength1 = 0.123
+        wavelengthUnits1 = 'Micrometers'
+        layer.setCustomProperty('QGISPAM/band/42//wavelength', wavelength1)
+        layer.setCustomProperty('QGISPAM/band/42//wavelength_units', wavelengthUnits1)
+        self.assertEqual(wavelength1, layer.customProperty('QGISPAM/band/42//wavelength'))
+        self.assertEqual(wavelengthUnits1, layer.customProperty('QGISPAM/band/42//wavelength_units'))
+
+        wavelengthUnits2 = reader.wavelengthUnits(42)
+        wavelength2 = reader.wavelength(42, wavelengthUnits2)
+        self.assertEqual(wavelength1, wavelength2)
+        self.assertEqual(wavelengthUnits1, wavelengthUnits2)
