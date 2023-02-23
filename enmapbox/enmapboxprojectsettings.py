@@ -1,6 +1,7 @@
 from typing import Dict
 
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
+from qgis.gui import QgisInterface
 from qgis.core import QgsXmlUtils
 from qgis.gui import QgsDockWidget
 
@@ -47,9 +48,8 @@ class EnMAPBoxProjectSettings(object):
                 settings[f'EO4Q/{key}'] = values
 
         # EnMAP-Box GUI
-        if enmapBox is not None:
-            enmapBoxMainWindow = enmapBox.ui
-            for dockWidget in enmapBoxMainWindow.findChildren(QgsDockWidget):
+        if isinstance(enmapBox, EnMAPBox):
+            for dockWidget in enmapBox.dockWidgets():
                 if hasattr(dockWidget, 'projectSettings'):
                     key = dockWidget.projectSettingsKey()
                     values = dockWidget.projectSettings()
@@ -70,16 +70,17 @@ class EnMAPBoxProjectSettings(object):
         enmapBox = EnMAPBox.instance()
 
         # QGIS GUI
-        qgisMainWindow = iface.mapCanvas().parent().parent().parent()
-        # - EO4Q apps (inside QGIS)
-        for dockWidget in qgisMainWindow.findChildren(QgsDockWidget):
-            if hasattr(dockWidget, 'projectSettings'):
-                key = dockWidget.projectSettingsKey()
-                values = settings[f'EO4Q/{key}']
-                dockWidget.setProjectSettings(values)
+        if isinstance(iface, QgisInterface):
+            qgisMainWindow = iface.mainWindow()
+            # - EO4Q apps (inside QGIS)
+            for dockWidget in qgisMainWindow.findChildren(QgsDockWidget):
+                if hasattr(dockWidget, 'projectSettings'):
+                    key = dockWidget.projectSettingsKey()
+                    values = settings[f'EO4Q/{key}']
+                    dockWidget.setProjectSettings(values)
 
         # EnMAP-Box GUI
-        if enmapBox is not None:
+        if isinstance(enmapBox, EnMAPBox):
             enmapBoxMainWindow = enmapBox.ui
             for dockWidget in enmapBoxMainWindow.findChildren(QgsDockWidget):
                 if hasattr(dockWidget, 'projectSettings'):
