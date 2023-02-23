@@ -428,12 +428,28 @@ class RasterReader(object):
         return list(map(float, uniqueValues)), list(map(int, counts))
 
     def metadataItem(
-            self, key: str, domain: str = '', bandNo: int = None
+            self, key: str, domain: str = '', bandNo: int = None, checkCustomProperties=True
     ) -> Optional[MetadataValue]:
         """Return metadata item."""
+
+        key2 = key.replace(' ', '_')
+
+        # check QGISPAM
+        if checkCustomProperties:
+            if bandNo is None:
+                string = self.layer.customProperty(f'QGISPAM/dataset/{domain}/{key}')
+                if string is None:
+                    string = self.layer.customProperty(f'QGISPAM/dataset/{domain}/{key2}')
+            else:
+                string = self.layer.customProperty(f'QGISPAM/band/{bandNo}/{domain}/{key}')
+                if string is None:
+                    string = self.layer.customProperty(f'QGISPAM/band/{bandNo}/{domain}/{key2}')
+            if string is not None:
+                return Utils.stringToMetadateValue(str(string))
+
         string = self._gdalObject(bandNo).GetMetadataItem(key, domain)
         if string is None:
-            string = self._gdalObject(bandNo).GetMetadataItem(key.replace(' ', '_'), domain)
+            string = self._gdalObject(bandNo).GetMetadataItem(key2, domain)
         if string is None:
             return None
         return Utils.stringToMetadateValue(string)
@@ -484,13 +500,13 @@ class RasterReader(object):
             'Wavelength_unit'  # support for FORCE BOA files
         ]:
             # check band-level domains
-            for domain in self.metadataDomainKeys(bandNo):
+            for domain in set(self.metadataDomainKeys(bandNo) + ['']):
                 units = self.metadataItem(key, domain, bandNo)
                 if units is not None:
                     return Utils.wavelengthUnitsLongName(units)
 
             # check dataset-level domains
-            for domain in self.metadataDomainKeys():
+            for domain in set(self.metadataDomainKeys() + ['']):
                 units = self.metadataItem(key, domain)
                 if units is not None:
                     return Utils.wavelengthUnitsLongName(units)
@@ -537,13 +553,13 @@ class RasterReader(object):
             'Wavelength'  # support for FORCE BOA files
         ]:
             # check band-level domains
-            for domain in self.metadataDomainKeys(bandNo):
+            for domain in set(self.metadataDomainKeys(bandNo) + ['']):
                 wavelength = self.metadataItem(key, domain, bandNo)
                 if wavelength is not None:
                     return conversionFactor * float(wavelength)
 
             # check dataset-level domains
-            for domain in self.metadataDomainKeys():
+            for domain in set(self.metadataDomainKeys() + ['']):
                 wavelengths = self.metadataItem(key, domain)
                 if wavelengths is not None:
                     wavelength = wavelengths[bandNo - 1]
@@ -584,13 +600,13 @@ class RasterReader(object):
         conversionFactor = Utils.wavelengthUnitsConversionFactor(wavelength_units, units)
 
         # check band-level domains
-        for domain in self.metadataDomainKeys(bandNo):
+        for domain in set(self.metadataDomainKeys(bandNo) + ['']):
             fwhm = self.metadataItem('fwhm', domain, bandNo)
             if fwhm is not None:
                 return conversionFactor * float(fwhm)
 
         # check dataset-level domains
-        for domain in self.metadataDomainKeys():
+        for domain in set(self.metadataDomainKeys() + ['']):
             fwhm = self.metadataItem('fwhm', domain)
             if fwhm is not None:
                 fwhm = fwhm[bandNo - 1]
@@ -602,13 +618,13 @@ class RasterReader(object):
         """Return bad band multiplier, 0 for bad band and 1 for good band."""
 
         # check band-level domains
-        for domain in self.metadataDomainKeys(bandNo):
+        for domain in set(self.metadataDomainKeys(bandNo) + ['']):
             badBandMultiplier = self.metadataItem('bbl', domain, bandNo)
             if badBandMultiplier is not None:
                 return int(badBandMultiplier)
 
         # check dataset-level domains
-        for domain in self.metadataDomainKeys():
+        for domain in set(self.metadataDomainKeys() + ['']):
             bbl = self.metadataItem('bbl', domain)
             if bbl is not None:
                 badBandMultiplier = bbl[bandNo - 1]
