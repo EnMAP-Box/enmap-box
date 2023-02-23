@@ -248,7 +248,7 @@ class EnMAPBoxPlugin(object):
     def initTemporalRasterStackControllerGui(self):
         from temporalrasterstackcontrollerapp import TemporalRasterStackControllerApp
 
-        self.sensorProductImportApp = TemporalRasterStackControllerApp(None)
+        self.temporalRasterStackControllerApp = TemporalRasterStackControllerApp(None)
 
         # add items to be removed when unload the plugin
-        self.pluginToolbarActions.append(self.sensorProductImportApp.actionToolbarIcon)
+        self.pluginToolbarActions.append(self.temporalRasterStackControllerApp.actionToolbarIcon)
