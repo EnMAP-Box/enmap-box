@@ -42,5 +42,7 @@ GFZ German Research Centre For Geosciences, Potsdam, Germany
 
 AWI Alfred Wegener Institute for Polar and Marine Research, Bremerhaven, Germany
 
+* Astrid Bracher <astrid.bracher@awi.de>
 * Brenner Silva <brenner.silva@awi.de>
 * Leonardo Alvarado <leonardo.alvarado@awi.de>
+* Mariana Altenburg Soppa <mariana.altenburg.soppa@awi.de>
