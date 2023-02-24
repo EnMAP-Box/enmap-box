@@ -1,0 +1,416 @@
+{
+  "description": "After 2022-01-25, Sentinel-2 scenes with PROCESSING_BASELINE '04.00' or above\nhave their DN (value) range shifted by 1000. The HARMONIZED collection\nshifts data in newer scenes to be in the same range as in older scenes.\n\nSentinel-2 is a wide-swath, high-resolution, multi-spectral\nimaging mission supporting Copernicus Land Monitoring studies,\nincluding the monitoring of vegetation, soil and water cover,\nas well as observation of inland waterways and coastal areas.\n\nThe Sentinel-2 L2 data are downloaded from scihub. They were\ncomputed by running sen2cor. WARNING: ESA did not produce L2 data\nfor all L1 assets, and earlier L2 coverage is not global.\n\nThe assets contain\n12 UINT16 spectral bands representing SR scaled by 10000 (unlike in L1 data,\nthere is no B10). There are also several more L2-specific bands (see band\nlist for details). See the\n[Sentinel-2 User Handbook](https://sentinel.esa.int/documents/247904/685211/Sentinel-2_User_Handbook)\nfor details. In addition, three QA bands are present where one\n(QA60) is a bitmask band with cloud mask information. For more\ndetails, [see the full explanation of how cloud masks are computed.](https://sentinel.esa.int/web/sentinel/technical-guides/sentinel-2-msi/level-1c/cloud-masks)\n\nEE asset ids for Sentinel-2 L2 assets have the following format:\nCOPERNICUS/S2_SR/20151128T002653_20151128T102149_T56MNN. Here the\nfirst numeric part represents the sensing date and time, the\nsecond numeric part represents the product generation date and\ntime, and the final 6-character string is a unique granule identifier\nindicating its UTM grid reference (see [MGRS](https://en.wikipedia.org/wiki/Military_Grid_Reference_System)).\n\nClouds can be removed by using\n[COPERNICUS/S2_CLOUD_PROBABILITY](COPERNICUS_S2_CLOUD_PROBABILITY).\nSee\n[this tutorial](https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless)\nexplaining how to apply the cloud mask.\n\nFor more details on Sentinel-2 radiometric resolution, [see this page](https://earth.esa.int/web/sentinel/user-guides/sentinel-2-msi/resolutions/radiometric).\n",
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [
+          -180,
+          -56,
+          180,
+          83
+        ]
+      ]
+    },
+    "temporal": {
+      "interval": [
+        [
+          "2017-03-28T00:00:00Z",
+          null
+        ]
+      ]
+    }
+  },
+  "gee:interval": {
+    "interval": 5,
+    "type": "revisit_interval",
+    "unit": "day"
+  },
+  "gee:terms_of_use": "The use of Sentinel data is governed by the [Copernicus\nSentinel Data Terms and Conditions.](https://scihub.copernicus.eu/twiki/pub/SciHubWebPortal/TermsConditions/Sentinel_Data_Terms_and_Conditions.pdf)\n",
+  "gee:type": "image_collection",
+  "id": "COPERNICUS_S2_HARMONIZED_SR_CLOUD_MASKED",
+  "keywords": [
+    "copernicus",
+    "esa",
+    "eu",
+    "msi",
+    "reflectance",
+    "sentinel",
+    "sr"
+  ],
+  "license": "proprietary",
+  "links": [
+    {
+      "href": "https://storage.googleapis.com/earthengine-stac/catalog/COPERNICUS/COPERNICUS_S2_SR_HARMONIZED.json",
+      "rel": "self",
+      "type": "application/json"
+    },
+    {
+      "href": "https://storage.googleapis.com/earthengine-stac/catalog/COPERNICUS/catalog.json",
+      "rel": "parent",
+      "type": "application/json"
+    },
+    {
+      "href": "https://storage.googleapis.com/earthengine-stac/catalog/catalog.json",
+      "rel": "root",
+      "type": "application/json"
+    },
+    {
+      "code": "JavaScript",
+      "href": "https://code.earthengine.google.com/?scriptPath=Examples:Datasets/COPERNICUS_S2_SR_HARMONIZED",
+      "rel": "related",
+      "title": "Run the example for COPERNICUS/S2_SR_HARMONIZED in the Earth Engine Code Editor",
+      "type": "text/html"
+    },
+    {
+      "href": "https://developers.google.com/earth-engine/datasets/images/COPERNICUS/COPERNICUS_S2_SR_HARMONIZED_sample.png",
+      "rel": "preview",
+      "type": "image/png"
+    },
+    {
+      "href": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED#terms-of-use",
+      "rel": "license",
+      "type": "text/html"
+    }
+  ],
+  "providers": [
+    {
+      "name": "European Union/ESA/Copernicus",
+      "roles": [
+        "licensor",
+        "producer"
+      ],
+      "url": "https://earth.esa.int/web/sentinel/user-guides/sentinel-2-msi/product-types/level-2a"
+    },
+    {
+      "name": "Google Earth Engine",
+      "roles": [
+        "host"
+      ],
+      "url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED"
+    }
+  ],
+  "stac_extensions": [
+    "https://stac-extensions.github.io/eo/v1.0.0/schema.json"
+  ],
+  "stac_version": "1.0.0",
+  "summaries": {
+    "MSK_CLDPRB": {
+      "gee:estimated_range": false,
+      "maximum": 100,
+      "minimum": 0
+    },
+    "MSK_SNWPRB": {
+      "gee:estimated_range": false,
+      "maximum": 100,
+      "minimum": 0
+    },
+    "SCL": {
+      "gee:estimated_range": false,
+      "maximum": 11,
+      "minimum": 1
+    },
+    "eo:bands": [
+      {
+        "center_wavelength": 0.4439,
+        "description": "Aerosols",
+        "gee:scale": 0.0001,
+        "gee:wavelength": "443.9nm (S2A) / 442.3nm (S2B)",
+        "gsd": 60,
+        "name": "B1"
+      },
+      {
+        "center_wavelength": 0.4966,
+        "description": "Blue",
+        "gee:scale": 0.0001,
+        "gee:wavelength": "496.6nm (S2A) / 492.1nm (S2B)",
+        "gsd": 10,
+        "name": "B2"
+      },
+      {
+        "center_wavelength": 0.56,
+        "description": "Green",
+        "gee:scale": 0.0001,
+        "gee:wavelength": "560nm (S2A) / 559nm (S2B)",
+        "gsd": 10,
+        "name": "B3"
+      },
+      {
+        "center_wavelength": 0.6645,
+        "description": "Red",
+        "gee:scale": 0.0001,
+        "gee:wavelength": "664.5nm (S2A) / 665nm (S2B)",
+        "gsd": 10,
+        "name": "B4"
+      },
+      {
+        "center_wavelength": 0.7039,
+        "description": "Red Edge 1",
+        "gee:scale": 0.0001,
+        "gee:wavelength": "703.9nm (S2A) / 703.8nm (S2B)",
+        "gsd": 20,
+        "name": "B5"
+      },
+      {
+        "center_wavelength": 0.7402,
+        "description": "Red Edge 2",
+        "gee:scale": 0.0001,
+        "gee:wavelength": "740.2nm (S2A) / 739.1nm (S2B)",
+        "gsd": 20,
+        "name": "B6"
+      },
+      {
+        "center_wavelength": 0.7825,
+        "description": "Red Edge 3",
+        "gee:scale": 0.0001,
+        "gee:wavelength": "782.5nm (S2A) / 779.7nm (S2B)",
+        "gsd": 20,
+        "name": "B7"
+      },
+      {
+        "center_wavelength": 0.8351,
+        "description": "NIR",
+        "gee:scale": 0.0001,
+        "gee:wavelength": "835.1nm (S2A) / 833nm (S2B)",
+        "gsd": 10,
+        "name": "B8"
+      },
+      {
+        "center_wavelength": 0.8648,
+        "description": "Red Edge 4",
+        "gee:scale": 0.0001,
+        "gee:wavelength": "864.8nm (S2A) / 864nm (S2B)",
+        "gsd": 20,
+        "name": "B8A"
+      },
+      {
+        "center_wavelength": 0.945,
+        "description": "Water vapor",
+        "gee:scale": 0.0001,
+        "gee:wavelength": "945nm (S2A) / 943.2nm (S2B)",
+        "gsd": 60,
+        "name": "B9"
+      },
+      {
+        "center_wavelength": 1.6137,
+        "description": "SWIR 1",
+        "gee:scale": 0.0001,
+        "gee:wavelength": "1613.7nm (S2A) / 1610.4nm (S2B)",
+        "gsd": 20,
+        "name": "B11"
+      },
+      {
+        "center_wavelength": 2.2024,
+        "description": "SWIR 2",
+        "gee:scale": 0.0001,
+        "gee:wavelength": "2202.4nm (S2A) / 2185.7nm (S2B)",
+        "gsd": 20,
+        "name": "B12"
+      },
+      {
+        "description": "Aerosol Optical Thickness",
+        "gee:scale": 0.001,
+        "gsd": 10,
+        "name": "AOT"
+      },
+      {
+        "description": "Water Vapor Pressure. The height the water would occupy if the vapor were condensed into\nliquid and spread evenly across the column.\n",
+        "gee:scale": 0.001,
+        "gee:units": "cm",
+        "gsd": 10,
+        "name": "WVP"
+      },
+      {
+        "description": "Scene Classification Map (The \"No Data\" value of 0 is masked out)",
+        "gee:classes": [
+          {
+            "color": "ff0004",
+            "description": "Saturated or defective",
+            "value": 1
+          },
+          {
+            "color": "868686",
+            "description": "Dark Area Pixels",
+            "value": 2
+          },
+          {
+            "color": "774b0a",
+            "description": "Cloud Shadows",
+            "value": 3
+          },
+          {
+            "color": "10d22c",
+            "description": "Vegetation",
+            "value": 4
+          },
+          {
+            "color": "ffff52",
+            "description": "Bare Soils",
+            "value": 5
+          },
+          {
+            "color": "0000ff",
+            "description": "Water",
+            "value": 6
+          },
+          {
+            "color": "818181",
+            "description": "Clouds Low Probability / Unclassified",
+            "value": 7
+          },
+          {
+            "color": "c0c0c0",
+            "description": "Clouds Medium Probability",
+            "value": 8
+          },
+          {
+            "color": "f1f1f1",
+            "description": "Clouds High Probability",
+            "value": 9
+          },
+          {
+            "color": "bac5eb",
+            "description": "Cirrus",
+            "value": 10
+          },
+          {
+            "color": "52fff9",
+            "description": "Snow / Ice",
+            "value": 11
+          }
+        ],
+        "gsd": 20,
+        "name": "SCL"
+      },
+      {
+        "description": "True Color Image, Red channel",
+        "gsd": 10,
+        "name": "TCI_R"
+      },
+      {
+        "description": "True Color Image, Green channel",
+        "gsd": 10,
+        "name": "TCI_G"
+      },
+      {
+        "description": "True Color Image, Blue channel",
+        "gsd": 10,
+        "name": "TCI_B"
+      },
+      {
+        "description": "Cloud Probability Map (missing in some products)",
+        "gsd": 20,
+        "name": "MSK_CLDPRB"
+      },
+      {
+        "description": "Snow Probability Map (missing in some products)",
+        "gsd": 10,
+        "name": "MSK_SNWPRB"
+      },
+      {
+        "description": "Always empty",
+        "gsd": 10,
+        "name": "QA10"
+      },
+      {
+        "description": "Always empty",
+        "gsd": 20,
+        "name": "QA20"
+      },
+      {
+        "description": "Cloud mask",
+        "gee:bitmask": {
+          "bitmask_parts": [
+            {
+              "bit_count": 10,
+              "description": "Unused",
+              "first_bit": 0
+            },
+            {
+              "bit_count": 1,
+              "description": "Opaque clouds",
+              "first_bit": 10,
+              "values": [
+                {
+                  "description": "No opaque clouds",
+                  "value": 0
+                },
+                {
+                  "description": "Opaque clouds present",
+                  "value": 1
+                }
+              ]
+            },
+            {
+              "bit_count": 1,
+              "description": "Cirrus clouds",
+              "first_bit": 11,
+              "values": [
+                {
+                  "description": "No cirrus clouds",
+                  "value": 0
+                },
+                {
+                  "description": "Cirrus clouds present",
+                  "value": 1
+                }
+              ]
+            }
+          ],
+          "total_bit_count": 12
+        },
+        "gsd": 60,
+        "name": "QA60"
+      },
+      {
+        "description": "ToDo Description",
+        "gee:bitmask": {
+          "bitmask_parts": [
+            {
+              "description": "Cloud / Cloud Shadow",
+              "bit_count": 1,
+              "first_bit": 0,
+              "values": []
+            }
+          ],
+          "total_bit_count": 1
+        },
+        "gsd": 20,
+        "name": "MASK_qa"
+      }
+    ],
+    "gee:visualizations": [
+      {
+        "display_name": "RGB",
+        "image_visualization": {
+          "band_vis": {
+            "bands": [
+              "B4",
+              "B3",
+              "B2"
+            ],
+            "max": [
+              3000
+            ],
+            "min": [
+              0
+            ]
+          }
+        },
+        "lookat": {
+          "lat": 17.7009,
+          "lon": 83.277,
+          "zoom": 12
+        }
+      }
+    ],
+    "instruments": [
+      "MSI"
+    ],
+    "platform": [
+      "Sentinel-2A",
+      "Sentinel-2B"
+    ]
+  },
+  "title": "Harmonized Sentinel-2 MSI: MultiSpectral Instrument, Level-2A",
+  "type": "Collection"
+}

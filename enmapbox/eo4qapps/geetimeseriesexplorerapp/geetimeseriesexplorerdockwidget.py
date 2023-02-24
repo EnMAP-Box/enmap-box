@@ -10,6 +10,7 @@ from typing import Optional, Dict, List, Tuple
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
+from enmapbox.typeguard import typechecked
 from enmapbox.utils import importEarthEngine
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.utils import Utils
@@ -28,11 +29,10 @@ from qgis.PyQt.QtWidgets import (QToolButton, QApplication, QComboBox, QLineEdit
                                  QPlainTextEdit, QTreeWidget, QTreeWidgetItem, QTabWidget, QLabel, QMainWindow,
                                  QListWidgetItem, QProgressBar, QFrame)
 from qgis.core import QgsRasterLayer, QgsCoordinateReferenceSystem, QgsMapLayer, QgsMapSettings, \
-    QgsColorRamp, QgsApplication, QgsMessageLog, Qgis
+    QgsColorRamp, QgsApplication
 from qgis.gui import (
     QgsDockWidget, QgsMessageBar, QgsColorRampButton, QgsSpinBox, QgsMapCanvas, QgisInterface
 )
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -192,8 +192,8 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
         self.mOpenJson.clicked.connect(self.onOpenJsonClicked)
         self.mLoadCollection.clicked.connect(self.onLoadCollectionClicked)
 
-        self.mCode.setReadOnly(True)
-        self.mLoadCollection.hide()
+        # self.mCode.setReadOnly(True)
+        # self.mLoadCollection.hide()
 
         # spectral indices
         self.initSpectralIndices()
@@ -463,7 +463,13 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
         self.eeFullCollectionInfo.addDefaultBandColors(namespace.get('bandColors', {}))
         self.eeFullCollectionInfo.addDefaultQaFlags(namespace.get('qaFlags', {}))
         self.eeFullCollectionInfo.addWavebandMappings(namespace.get('wavebandMapping', {}))
+
+        self.eeFullCollectionJson.updateData(namespace.get('stac'))
+
+        self.mCollectionTitle.setText(self.eeFullCollectionJson.data.get('title', 'unknown'))
+        self.mCollectionTitle.setCursorPosition(0)
         self.updateBandProperties()
+
         self.updateSpectralIndices()
         self.updateFilterProperties(namespace.get('propertyNames'))
         self.updateFilterBitmask()
@@ -550,12 +556,34 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
                     with urllib.request.urlopen(jsonUrl) as url:
                         data = json.loads(url.read().decode())
                 except Exception as error:
-                    QgsMessageLog.logMessage(
-                        f'url not found: {jsonUrl}', tag="GEE Time Series Explorer", level=Qgis.MessageLevel.Critical
-                    )
-                    self.mMessageBar.pushCritical('Error', str(error))
-                    self.eeFullCollectionJson = None
-                    raise error
+                    # QgsMessageLog.logMessage(
+                    #    f'url not found: {jsonUrl}', tag="GEE Time Series Explorer", level=Qgis.MessageLevel.Critical
+                    # )
+                    data = {
+                        "id": splitext(basename(jsonUrl))[0],
+                        "title": splitext(basename(jsonUrl))[0],
+                        "description": "n/a",
+                        "providers": [
+                            {
+                                "name": "Google Earth Engine",
+                                "url": "https://developers.google.com/earth-engine/datasets"
+                            }
+                        ],
+                        "extent": {
+                            "temporal": {
+                                "interval": [
+                                    ["1970-01-01T00:00:00Z", None]
+                                ]
+                            }
+                        },
+                        "summaries": {
+                            "eo:bands": [],
+                            "gee:visualizations": []
+                        }
+                    }
+                    # self.mMessageBar.pushCritical('Error', str(error))
+                    # self.eeFullCollectionJson = None
+                    # raise error
         return data
 
     def onCollectionClicked(self):
@@ -591,8 +619,6 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
         self.mOpenJson.url = jsonUrl
 
         # update GUI and load collection
-        self.mCollectionTitle.setText(data['title'])
-        self.mCollectionTitle.setCursorPosition(0)
         self.mCode.setText(code)
         self.mAvailableImages.setRowCount(0)
         self.mAvailableImages.setColumnCount(2)
