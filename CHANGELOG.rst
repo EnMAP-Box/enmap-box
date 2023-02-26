@@ -1,5 +1,25 @@
 CHANGELOG
 =========
+Version 3.12
+------------
+
+** QGIS Expressions / QGIS Field Calculator
+
+* ``raster_array(layer[,geometry='@geometry'])`` returns an array with the pixel values at geometry (point) position (point).
+* ``raster_profile(layer[,geometry='@geometry'][,encoding='text'])`` returns the the pixel values at the
+  geometry (point) position as spectral profile (json/string/map/blob)
+* renamed some Spectral Libraries functions for consistency with other QGIS functions
+
+**Spectral Library Viewer**
+
+* Spectral profiles are plotted by default in the same color as used to plot map symbols (`@symbol_color`)
+
+**Processing Algorithms**
+
+* *Aggregate Spectral Profiles* (`enmapbox:aggregateprofiles`) takes a spectral library vector layer and
+  aggregates profiles based on a group-by expression. Spectral profiles for which the group-by expression return
+  the same value aggregated by min, mean, max or median.
+
 
 Version 3.11
 ------------
