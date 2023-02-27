@@ -14,7 +14,7 @@
    <bool>false</bool>
   </property>
   <property name="windowTitle">
-   <string>EnGeoMAP 3.1</string>
+   <string>EnGeoMAP 3.2</string>
   </property>
   <widget class="QFrame" name="frame">
    <property name="geometry">
