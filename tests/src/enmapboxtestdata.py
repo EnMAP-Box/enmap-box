@@ -115,20 +115,22 @@ class SensorProducts(object):
             L1B_MetadataXml = join(
                 L1B, 'DESIS-HSI-L1B-DT1203190212_025-20191203T021128-V0210-METADATA.xml'
             )
-
             L1C = join(
                 sensorProductsRoot(), 'desis', 'DESIS-HSI-L1C-DT1203190212_025-20191203T021128-V0210'
             )
             L1C_MetadataXml = join(
                 L1B, 'DESIS-HSI-L1C-DT1203190212_025-20191203T021128-V0210-METADATA.xml'
             )
-
             L2A = join(
                 sensorProductsRoot(), 'desis', 'DESIS-HSI-L2A-DT1203190212_025-20191203T021128-V0210'
             )
             L2A_MetadataXml = join(
                 L2A, 'DESIS-HSI-L2A-DT1203190212_025-20191203T021128-V0210-METADATA.xml'
             )
+
+        class Emit(object):
+            L2A = join(sensorProductsRoot(), 'EMIT', 'EMIT_L2A')
+            L2A_RFL = join(L2A, 'EMIT_L2A_RFL_001_20230204T101746_2303507_043.nc')
 
         class Enmap(object):
             L1B = join(
@@ -138,7 +140,6 @@ class SensorProducts(object):
             L1B_MetadataXml = join(
                 L1B, 'ENMAP01-____L1B-DT0000004135_20221005T023547Z_010_V010106_20221014T102746Z-METADATA.XML'
             )
-
             L1C = join(
                 sensorProductsRoot(), 'enmap',
                 'ENMAP01-____L1C-DT0000004135_20221005T023547Z_010_V010106_20221014T102747Z'
@@ -146,7 +147,6 @@ class SensorProducts(object):
             L1C_MetadataXml = join(
                 L1B, 'ENMAP01-____L1C-DT0000004135_20221005T023547Z_010_V010106_20221014T102747Z-METADATA.XML'
             )
-
             L2A = join(
                 sensorProductsRoot(), 'enmap',
                 'ENMAP01-____L2A-DT0000004135_20221005T023547Z_010_V010106_20221014T102749Z'

@@ -67,6 +67,7 @@ from enmapboxprocessing.algorithm.geolocaterasteralgorithm import GeolocateRaste
 from enmapboxprocessing.algorithm.importdesisl1balgorithm import ImportDesisL1BAlgorithm
 from enmapboxprocessing.algorithm.importdesisl1calgorithm import ImportDesisL1CAlgorithm
 from enmapboxprocessing.algorithm.importdesisl2aalgorithm import ImportDesisL2AAlgorithm
+from enmapboxprocessing.algorithm.importemitl2aalgorithm import ImportEmitL2AAlgorithm
 from enmapboxprocessing.algorithm.importenmapl1balgorithm import ImportEnmapL1BAlgorithm
 from enmapboxprocessing.algorithm.importenmapl1calgorithm import ImportEnmapL1CAlgorithm
 from enmapboxprocessing.algorithm.importenmapl2aalgorithm import ImportEnmapL2AAlgorithm
@@ -291,6 +292,7 @@ def algorithms():
         ImportDesisL1BAlgorithm(),
         ImportDesisL1CAlgorithm(),
         ImportDesisL2AAlgorithm(),
+        ImportEmitL2AAlgorithm(),
         ImportEnmapL1BAlgorithm(),
         ImportEnmapL1CAlgorithm(),
         ImportEnmapL2AAlgorithm(),
