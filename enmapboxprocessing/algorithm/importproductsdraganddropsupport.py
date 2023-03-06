@@ -5,6 +5,7 @@ from typing import List
 from enmapboxprocessing.algorithm.importdesisl1balgorithm import ImportDesisL1BAlgorithm
 from enmapboxprocessing.algorithm.importdesisl1calgorithm import ImportDesisL1CAlgorithm
 from enmapboxprocessing.algorithm.importdesisl2aalgorithm import ImportDesisL2AAlgorithm
+from enmapboxprocessing.algorithm.importemitl2aalgorithm import ImportEmitL2AAlgorithm
 from enmapboxprocessing.algorithm.importenmapl1balgorithm import ImportEnmapL1BAlgorithm
 from enmapboxprocessing.algorithm.importenmapl1calgorithm import ImportEnmapL1CAlgorithm
 from enmapboxprocessing.algorithm.importenmapl2aalgorithm import ImportEnmapL2AAlgorithm
@@ -31,11 +32,14 @@ class AlgorithmDialogWrapper(AlgorithmDialog):
 
 
 def tryToImportSensorProducts(filename: str) -> List[QgsMapLayer]:
+    from enmapbox.gui.enmapboxgui import EnMAPBox
+
     try:
         algs = [
             ImportDesisL1BAlgorithm(),
             ImportDesisL1CAlgorithm(),
             ImportDesisL2AAlgorithm(),
+            ImportEmitL2AAlgorithm(),
             ImportEnmapL1BAlgorithm(),
             ImportEnmapL1CAlgorithm(),
             ImportEnmapL2AAlgorithm(),
@@ -47,15 +51,13 @@ def tryToImportSensorProducts(filename: str) -> List[QgsMapLayer]:
         mapLayers = list()
         for alg in algs:
             if alg.isValidFile(filename):
-                import enmapbox
-
                 parameters = alg.defaultParameters(filename)
                 alreadyExists = True
                 for key, value in parameters.items():
                     if key.startswith('output'):
                         alreadyExists &= exists(value)
                 if not alreadyExists:
-                    enmapBox = enmapbox.EnMAPBox.instance()
+                    enmapBox = EnMAPBox.instance()
                     dialog: AlgorithmDialogWrapper = enmapBox.showProcessingAlgorithmDialog(
                         alg, parameters, True, True, AlgorithmDialogWrapper, False
                     )

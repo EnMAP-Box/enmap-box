@@ -202,7 +202,7 @@ class VectorDataSource(SpatialDataSource):
 
             try:
                 wkbTypeName = QgsWkbTypes.displayString(self.mWKBType)
-            except:
+            except Exception:
                 wkbTypeName = QgsWkbTypes.displayString(int(self.mWKBType))
 
             geomTypeName = ['Point', 'Line', 'Polygon', 'Unknown', 'Null'][lyr.geometryType()]

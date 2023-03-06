@@ -213,6 +213,8 @@ def extractMapLayers(mimeData: QMimeData,
                 dataSources = [None]
             elif basename(url.url()).startswith('PRS_L') and basename(url.url()).endswith('.he5'):  # resolves #100
                 dataSources = [None]
+            elif basename(url.url()).startswith('EMIT_L') and basename(url.url()).endswith('.nc'):  # resolves #100
+                dataSources = [None]
             else:
                 dataSources = DataSourceFactory.create(url)
 
