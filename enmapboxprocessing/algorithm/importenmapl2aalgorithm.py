@@ -46,7 +46,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
         return Group.ImportData.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
-        self.addParameterFile(self.P_FILE, self._FILE, extension='xml',
+        self.addParameterFile(self.P_FILE, self._FILE, extension='XML',
                               fileFilter='Metadata file (*-METADATA.xml);;All files (*.*)')
         self.addParameterEnum(
             self.P_DETECTOR_OVERLAP, self._DETECTOR_OVERLAP, self.O_DETECTOR_OVERLAP, False, self.SwirOnlyOverlapOption

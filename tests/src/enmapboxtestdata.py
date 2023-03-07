@@ -145,7 +145,7 @@ class SensorProducts(object):
                 'ENMAP01-____L1C-DT0000004135_20221005T023547Z_010_V010106_20221014T102747Z'
             )
             L1C_MetadataXml = join(
-                L1B, 'ENMAP01-____L1C-DT0000004135_20221005T023547Z_010_V010106_20221014T102747Z-METADATA.XML'
+                L1C, 'ENMAP01-____L1C-DT0000004135_20221005T023547Z_010_V010106_20221014T102747Z-METADATA.XML'
             )
             L2A = join(
                 sensorProductsRoot(), 'enmap',
