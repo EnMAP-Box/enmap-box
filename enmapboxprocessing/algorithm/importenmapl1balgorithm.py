@@ -36,7 +36,7 @@ class ImportEnmapL1BAlgorithm(EnMAPProcessingAlgorithm):
         return Group.ImportData.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
-        self.addParameterFile(self.P_FILE, self._FILE, extension='xml')
+        self.addParameterFile(self.P_FILE, self._FILE, extension='XML')
         self.addParameterVrtDestination(self.P_OUTPUT_VNIR_RASTER, self._OUTPUT_VNIR_RASTER)
         self.addParameterVrtDestination(self.P_OUTPUT_SWIR_RASTER, self._OUTPUT_SWIR_RASTER)
 
