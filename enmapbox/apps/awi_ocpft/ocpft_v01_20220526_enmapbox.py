@@ -9,12 +9,13 @@ from osgeo import gdal
 
 np.seterr(divide='ignore', invalid='ignore')  # MH: Ignore RuntimeWarnings
 
-release             = '20221114'                                                # Date of release
-version             = 'v01'                                                    # OCPFT Version
+release = '20221114'  # Date of release
+version = 'v01'  # OCPFT Version
 
 inpath_enmap = '/home/alvarado/projects/typsynsat/data/enpt/ENMAP01-____L2A-DT0000001567_20220709T105740Z_032_V010111_20230223T123718Z'
 inpath = '/home/alvarado/projects/typsynsat/data/sentinel3/bodensee/2020/08/16'
 infile = 'S3A_OL_1_EFR____20200816T095809_20200816T100109_20200816T120938_0179_061_350_2160_MAR_O_NR_002.SEN3.nc'
+
 
 def enpt_rootdir(rootdir_l2b):
     """Check for EnPT L2B root directory."""
@@ -39,6 +40,7 @@ def enpt_rootdir(rootdir_l2b):
             raise FileNotFoundError('The root directory of the EnMAP L2B image %s misses a file with the pattern %s.'
                                     % (rootdir_l2b, pattern))
     return matches
+
 
 def geo(inpath):
     # Check files to read from EnPT L2B root directory
@@ -82,14 +84,15 @@ def geo(inpath):
         longitude.append(lon)
         latitude.append(lat)
 
-    dict_geo = {'logchl' : ds_logchl.ReadAsArray(),
-            'bitmask' : ds_bitmask.ReadAsArray(),
-            'longitude' : np.stack(longitude, axis=0),
-            'latitude' : np.stack(latitude, axis=0)}
+    dict_geo = {'logchl': ds_logchl.ReadAsArray(),
+                'bitmask': ds_bitmask.ReadAsArray(),
+                'longitude': np.stack(longitude, axis=0),
+                'latitude': np.stack(latitude, axis=0)}
 
     return dict_geo
 
-def prepare_processor_input(inpath, infile):
+
+def prepare_processor_input(inpath, infile=None):
     # Prepare the input to OCPFT independently of applied atmospheric correction.
     # Provide masks and geo information and save them.
     # Provide valid Chl-a.
@@ -151,11 +154,10 @@ def prepare_processor_input(inpath, infile):
         valid = np.logical_not(invalid_mask) & np.logical_not(flag_strange)
         flag_negative[b < 0] = True  # MH: marks pixel with any negative Chl_a value
 
-        chl_a = np.ma.array(b, mask = invalid_mask)
-        #chl_a = np.ma.masked_array(b, np.logical_not(valid)) # other way to mask
+        chl_a = np.ma.array(b, mask=invalid_mask)
+        # chl_a = np.ma.masked_array(b, np.logical_not(valid)) # other way to mask
 
         flag_suspect = (flag_strange & flag_ac_risk)
-
 
     if ac == 1:
 
@@ -219,8 +221,8 @@ def prepare_processor_input(inpath, infile):
         valid = np.logical_not(invalid_mask) & np.logical_not(flag_strange)
         flag_negative[b < 0] = True  # MH: marks pixel with any negative Chl_a value
 
-        chl_a = np.ma.array(b, mask = invalid_mask)
-        #chl_a = np.ma.masked_array(b, np.logical_not(valid)) # other way to mask
+        chl_a = np.ma.array(b, mask=invalid_mask)
+        # chl_a = np.ma.masked_array(b, np.logical_not(valid)) # other way to mask
 
         ncfile.close()
 
@@ -229,8 +231,8 @@ def prepare_processor_input(inpath, infile):
     # Provides all relevant outputs to other functions
     return chl_a, valid, lat, lon, cloud, land, AC, flag_negative, flag_suspect
 
-def model(data, model):
 
+def model(data, model):
     ### Define all model functions used in the optimization
     def func_sin(X, a0, a1, a2, a3):  # sigmoidal curve fitting function
         return a0 + a1 * np.sin(a2 * (X + a3))
@@ -278,13 +280,13 @@ def model(data, model):
     if model == 1:
         # array with coefficients for pft
         # sorted by diatoms, Haptophytes, dinoflagellates, prokaryotes, green algae, prochloroccocus
-        coefs =  np.array([[0.4486,	0.3247,	1.1424,	-0.1090],
-                          [ 0.1601,	0.1161,	1.8898,	1.2389],
-                          [ -0.0116, -0.0082, 0.0246, 0.0611],
-                          [ 2.2548,	5.9343,	4.3967,	np.nan],
-                          [ 0.1585,	0.0644,	2.5285,	1.1016],
-                          [ 5.2002,	8.0185,	6.0039,	np.nan],
-                          [ 0.0466, 0.0364, 2.0194, 0.2661]])
+        coefs = np.array([[0.4486, 0.3247, 1.1424, -0.1090],
+                          [0.1601, 0.1161, 1.8898, 1.2389],
+                          [-0.0116, -0.0082, 0.0246, 0.0611],
+                          [2.2548, 5.9343, 4.3967, np.nan],
+                          [0.1585, 0.0644, 2.5285, 1.1016],
+                          [5.2002, 8.0185, 6.0039, np.nan],
+                          [0.0466, 0.0364, 2.0194, 0.2661]])
 
         X = np.array(data.copy(), dtype=np.float32)
 
@@ -293,7 +295,7 @@ def model(data, model):
 
         PFT['chlorophyll_a'] = np.array(10 ** (X))
 
-        for i in range(len(coefs)+1):
+        for i in range(len(coefs) + 1):
             if i == 0:  # sinusoidal
                 vname = 'diatoms'
                 coefs_nonan = coefs[i][~np.isnan(coefs[i])]
@@ -302,7 +304,7 @@ def model(data, model):
             if i == 1:  # exponential 3 parameters
                 vname = 'haptophytes'
                 coefs_nonan = coefs[i][~np.isnan(coefs[i])]
-                PFT[vname] = func_sin(X, *coefs_nonan) # applying the model to the Chl-a
+                PFT[vname] = func_sin(X, *coefs_nonan)  # applying the model to the Chl-a
 
             if i == 2:  # polynomial order 3
                 vname = 'dinoflagellates'
@@ -310,20 +312,20 @@ def model(data, model):
                 poly = np.poly1d(coefs_nonan)  # generating the function
                 PFT[vname] = poly(X)
 
-            if i == 3: # exponential 3 parameters
+            if i == 3:  # exponential 3 parameters
                 vname = 'prokaryotes'
                 coefs_nonan = coefs[i][~np.isnan(coefs[i])]
                 PFT[vname] = func_exp_3Logistic(X, *coefs_nonan)  # applying the model to the Chl-a
 
-            if i == 4: # exponential sinusuidal
+            if i == 4:  # exponential sinusuidal
                 vname = 'green_algae'
                 coefs_nonan = coefs[i][~np.isnan(coefs[i])]
-                PFT[vname] = func_sin(X, *coefs_nonan) # applying the model to the Chl-a
+                PFT[vname] = func_sin(X, *coefs_nonan)  # applying the model to the Chl-a
 
-            if i == 5: # exponential 3 parameters
+            if i == 5:  # exponential 3 parameters
                 vname = 'prochloroccocus'
                 coefs_nonan = coefs[i][~np.isnan(coefs[i])]
-                PFT[vname] = func_exp_3Logistic(X, *coefs_nonan) # applying the model to the Chl-a
+                PFT[vname] = func_exp_3Logistic(X, *coefs_nonan)  # applying the model to the Chl-a
 
             if i == 6:  # exponential 3 parameters
                 vname = 'cryptophytes'
@@ -334,7 +336,6 @@ def model(data, model):
 
 
 def save_results(PFT, outname):
-
     # One output file for all processor results
     out = nc(outname, 'w')
 
@@ -456,7 +457,6 @@ def save_results(PFT, outname):
     test.coordinates = 'lat lon'
 
     if model == 1:
-
         test = out.createVariable('hapt', 'f4', ('x', 'y'), zlib=True, fill_value=np.nan)
         test[:, :] = PFT['haptophytes'][:, :]
 
@@ -576,7 +576,6 @@ if __name__ == '__main__':
 
                 outname = os.path.join(outpath, outfile[:-3] + '_' + str(output_size) + str(version) + '.nc')
 
-
                 outfile = ''.join(outfile)
 
                 outname = os.path.join(outpath, outfile[:-3] + '_' + str(output_size) + str(version) + '.nc')
@@ -635,7 +634,6 @@ if __name__ == '__main__':
                 outfile = ''.join(outfile)
 
                 outname = os.path.join(outpath, outfile[:-3] + '_' + str(output_size) + str(version) + '.nc')
-
 
                 outfile = ''.join(outfile)
 

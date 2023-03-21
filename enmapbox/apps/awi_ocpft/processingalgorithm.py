@@ -5,7 +5,8 @@ from .core import ocpft
 # 1
 class OCPFTProcessingAlgorithm(QgsProcessingAlgorithm):
 
-    P_FILE = 'innc'
+    P_FILE_IN = 'innc'
+    P_FILE_GEOTIFF = 'ingeo'
     P_SENSOR = 'sensor'
     P_MODEL = 'model'
     P_AC = 'ac'
