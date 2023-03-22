@@ -1,27 +1,10 @@
 # run: conda env create --file conda_environment.yml
 # see also https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
-name: enmapbox_full
+name: enmapbox_light
 channels:
   - conda-forge
 dependencies:
   - qgis>=3.26
   - pip
-  - numpy
-  - scipy
-  - scikit-learn
-  - xgboost
-  - lightgbm
-  - catboost
-  - matplotlib
-  - astropy
-  - numba>=0.56.4
-  - sympy
-  - pyopengl
-  - netcdf4
-  - h5py
-  - gitpython
-  - git-lfs
-  - pip:
-    - enpt-enmapboxapp
 variables:
   QT_MAC_WANTS_LAYER: 1
