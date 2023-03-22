@@ -403,7 +403,8 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                     except Exception:
                         pass
                 userFunctionEditor = w.dialog
-
+                xValues = [float(v) for v in xValues]
+                yValues = [float(v) for v in yValues]
                 profile = Profile(xValues, yValues, xUnit, name, style)
                 profiles.append(profile)
                 userFunctions.append(userFunction)
