@@ -8,8 +8,8 @@ from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.utils import Utils
-from qgis._core import QgsRectangle, QgsCoordinateReferenceSystem
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRectangle, \
+    QgsCoordinateReferenceSystem
 
 
 @typechecked
