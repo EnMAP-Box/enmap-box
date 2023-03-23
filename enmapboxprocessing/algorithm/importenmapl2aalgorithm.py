@@ -19,7 +19,7 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessin
 @typechecked
 class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
     P_FILE, _FILE = 'file', 'Metadata file'
-    P_DERIVE_BAD_BANDS, _DERIVE_BAD_BANDS = 'deriveBadBands', 'Derive bad bands'
+    P_SET_BAD_BANDS, _SET_BAD_BANDS = 'setBadBands', 'Set bad bands'
     P_DETECTOR_OVERLAP, _DETECTOR_OVERLAP = 'detectorOverlap', 'Detector overlap region'
     O_DETECTOR_OVERLAP = ['Order by wavelength', 'Moving average filter', 'VNIR only', 'SWIR only']
     OrderByWavelengthOverlapOption, MovingAverageFilterOverlapOption, VnirOnlyOverlapOption, SwirOnlyOverlapOption = \
@@ -39,7 +39,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                          'Instead of executing this algorithm, '
                          'you may drag&drop the metadata XML file directly from your system file browser onto '
                          'the EnMAP-Box map view area.'),
-            (self._DERIVE_BAD_BANDS, 'Whether to derive the bad bands list from the image data.'),
+            (self._SET_BAD_BANDS, 'Whether to find and set the bad bands list by evaluating the image data.'),
             (self._DETECTOR_OVERLAP, 'Different options for handling the detector overlap region from 900 to 1000 '
                                      'nanometers. For the Moving average filter, a kernel size of 3 is used.'),
             (self._OUTPUT_RASTER, self.RasterFileDestination)
@@ -52,7 +52,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFile(
             self.P_FILE, self._FILE, extension='XML', fileFilter='Metadata file (*-METADATA.xml);;All files (*.*)'
         )
-        self.addParameterBoolean(self.P_DERIVE_BAD_BANDS, self._DERIVE_BAD_BANDS, True, True)
+        self.addParameterBoolean(self.P_SET_BAD_BANDS, self._SET_BAD_BANDS, True)
         self.addParameterEnum(
             self.P_DETECTOR_OVERLAP, self._DETECTOR_OVERLAP, self.O_DETECTOR_OVERLAP, False, self.SwirOnlyOverlapOption
         )
@@ -73,7 +73,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         xmlFilename = self.parameterAsFile(parameters, self.P_FILE, context)
-        deriveBadBands = self.parameterAsBoolean(parameters, self.P_DERIVE_BAD_BANDS, context)
+        setBadBands = self.parameterAsBoolean(parameters, self.P_SET_BAD_BANDS, context)
         detectorOverlap = self.parameterAsEnum(parameters, self.P_DETECTOR_OVERLAP, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_RASTER, context)
         with open(filename + '.log', 'w') as logfile:
@@ -202,7 +202,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                 rasterBand.SetOffset(float(offsets[i]))
                 rasterBand.FlushCache()
 
-            if deriveBadBands:  # see issue #267
+            if setBadBands:  # see issue #267
                 reader = RasterReader(ds)
                 writer = RasterWriter(ds)
                 for bandNo in reader.bandNumbers():
