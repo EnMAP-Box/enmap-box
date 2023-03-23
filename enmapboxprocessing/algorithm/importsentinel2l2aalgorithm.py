@@ -127,7 +127,9 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
             ds.SetMetadataItem('wavelength', '{' + ', '.join(wavelength[:ds.RasterCount]) + '}', 'ENVI')
             ds.SetMetadataItem('wavelength_units', 'nanometers', 'ENVI')
             for bandNo, name in enumerate(bandNames, 1):
-                ds.GetRasterBand(bandNo).SetDescription(name)
+                rb: gdal.Band = ds.GetRasterBand(bandNo)
+                rb.SetDescription(name)
+                rb.SetScale(1e-4)
             result = {self.P_OUTPUT_RASTER: filename}
             self.toc(feedback, result)
 
