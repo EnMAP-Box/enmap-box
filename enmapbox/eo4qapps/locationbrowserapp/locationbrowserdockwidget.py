@@ -4,6 +4,8 @@ from os.path import join, dirname
 from typing import Optional
 
 import requests
+
+from enmapbox.gui.dataviews.docks import DockTypes
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
 from enmapboxprocessing.utils import Utils
@@ -157,6 +159,9 @@ class LocationBrowserDockWidget(QgsDockWidget):
 
         if self.interfaceType == self.EnmapBoxInterface:
             mapCanvas = self.enmapBoxInterface().currentMapCanvas()
+            if mapCanvas is None:
+                mapDock = self.enmapBoxInterface().createMapDock()
+                mapCanvas = mapDock.mapCanvas()
             for aLayer in mapCanvas.layers():
                 if aLayer.name() in [baseNamePolygon, baseNameLine]:
                     self.enmapBoxInterface().removeMapLayer(aLayer)
