@@ -1,7 +1,8 @@
 from typing import Tuple
 import sys
-from enmapboxprocessing.test.algorithm.testcase import TestCase
+#from enmapboxprocessing.test.algorithm.testcase import TestCase
 from awi_ocpft.processingalgorithm import OCPFTProcessingAlgorithm
+from enmapboxprocessing.testcase import TestCase
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback
 
 class TestOCPFTProcessingAlgorithm(TestCase):
@@ -42,6 +43,5 @@ class TestOCPFTProcessingAlgorithm(TestCase):
         results = alg.processAlgorithm(parameters, context, feedback)
         self.assertTrue(len(results) > 0)
         s = []
-
 
         #self.runalg(alg, parameters)

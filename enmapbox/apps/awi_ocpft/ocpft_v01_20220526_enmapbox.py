@@ -9,12 +9,12 @@ from osgeo import gdal
 
 np.seterr(divide='ignore', invalid='ignore')  # MH: Ignore RuntimeWarnings
 
-release = '20221114'  # Date of release
+release = '20230322'  # Date of release
 version = 'v01'  # OCPFT Version
 
-inpath_enmap = '/home/alvarado/projects/typsynsat/data/enpt/ENMAP01-____L2A-DT0000001567_20220709T105740Z_032_V010111_20230223T123718Z'
-inpath = '/home/alvarado/projects/typsynsat/data/sentinel3/bodensee/2020/08/16'
-infile = 'S3A_OL_1_EFR____20200816T095809_20200816T100109_20200816T120938_0179_061_350_2160_MAR_O_NR_002.SEN3.nc'
+#inpath_enmap = '/home/alvarado/projects/typsynsat/data/enpt/ENMAP01-____L2A-DT0000001567_20220709T105740Z_032_V010111_20230223T123718Z'
+#inpath = '/home/alvarado/projects/typsynsat/data/sentinel3/bodensee/2020/08/16'
+#infile = 'S3A_OL_1_EFR____20200816T095809_20200816T100109_20200816T120938_0179_061_350_2160_MAR_O_NR_002.SEN3.nc'
 
 
 def enpt_rootdir(rootdir_l2b):
@@ -97,9 +97,9 @@ def prepare_processor_input(inpath, infile=None):
     # Provide masks and geo information and save them.
     # Provide valid Chl-a.
 
-    if ac == 0:
+    if ac == 0 and infile is None:
 
-        AC = 'ENPT_ACwater'
+        AC = 'ENPT-ACWATER Polymer'
 
         # manin variable for work =  chl-a
         in_varnames = ('logchl')
@@ -146,8 +146,10 @@ def prepare_processor_input(inpath, infile=None):
 
         b = geofile[in_varnames][:]
 
+        b = np.ma.masked_where(b == -9999, b)
+
         # converting log scale
-        b = np.array(10 ** b, dtype=np.float32)
+        b = np.power(10, b, dtype=np.float64)
 
         flag_strange[b > 1] = True  # MH: basically remove any remaining masked data
 
@@ -177,7 +179,6 @@ def prepare_processor_input(inpath, infile=None):
 
         qflags = ncfile['bitmask']
         l1_flags = qflags[:]
-        print(l1_flags)
 
         if isinstance(l1_flags, np.ma.MaskedArray):  # MH: bug fix for py netcdf4 version inconsistency
             l1_flags = np.ma.getdata(l1_flags)
@@ -214,7 +215,7 @@ def prepare_processor_input(inpath, infile=None):
         b = ncfile.variables[in_varnames][:]
 
         # converting log scale
-        b = np.array(10 ** b, dtype=np.float32)
+        b = np.power(10, b, dtype=np.float64)
 
         flag_strange[b > 1] = True  # MH: basically remove any remaining masked data
 
@@ -244,6 +245,7 @@ def model(data, model):
         return a0 + (a0 - a1) / (1 + a2 * np.exp(a3 * X + a4))
 
     if model == 0:
+        print('Processing PFT for Lake Constance.')
         # array with coefficients for pft
         # sorted by diatoms, cryptophyte, dinoflagellates, prokaryotes, green algae
         coefs = np.array([[0.0207, 0.4203, -0.0077],
@@ -278,6 +280,7 @@ def model(data, model):
         return PFT
 
     if model == 1:
+        print('Processing PFT for Global.')
         # array with coefficients for pft
         # sorted by diatoms, Haptophytes, dinoflagellates, prokaryotes, green algae, prochloroccocus
         coefs = np.array([[0.4486, 0.3247, 1.1424, -0.1090],
@@ -288,7 +291,7 @@ def model(data, model):
                           [5.2002, 8.0185, 6.0039, np.nan],
                           [0.0466, 0.0364, 2.0194, 0.2661]])
 
-        X = np.array(data.copy(), dtype=np.float32)
+        X = np.array(data.copy(), dtype=np.float64)
 
         # funtion evaluation for each PFT
         PFT = {}
@@ -323,7 +326,7 @@ def model(data, model):
                 PFT[vname] = func_sin(X, *coefs_nonan)  # applying the model to the Chl-a
 
             if i == 5:  # exponential 3 parameters
-                vname = 'prochloroccocus'
+                vname = 'prochlorococcus'
                 coefs_nonan = coefs[i][~np.isnan(coefs[i])]
                 PFT[vname] = func_exp_3Logistic(X, *coefs_nonan)  # applying the model to the Chl-a
 
@@ -466,11 +469,11 @@ def save_results(PFT, outname):
         test.coordinates = 'lat lon'
 
         test = out.createVariable('proch', 'f4', ('x', 'y'), zlib=True, fill_value=np.nan)
-        test[:, :] = PFT['prochloroccocus'][:, :]
+        test[:, :] = PFT['prochlorococcus'][:, :]
 
         test.units = 'molec.cm^{-3}'
         test.standard_name = 'proch'
-        test.long_name = 'Concentration of Prochloroccocus sp.'
+        test.long_name = 'Concentration of Prochlorococcus sp.'
         test.coordinates = 'lat lon'
 
     # Close the one output file
@@ -515,7 +518,7 @@ if __name__ == '__main__':
         # Output size
 
         if args.osize == '0':
-            output_size = 0  # MH: standard product output (7 products + uncertainty)
+            output_size = 0  # MH: standard product output (8 products + bitmask)
         else:
             print(
                 'Error: Define "-osize" output size: 0 = standard product output (7 products) (default)')
@@ -529,22 +532,22 @@ if __name__ == '__main__':
 
         if args.model == '0':  # use Lake Constance coefficients
 
-            model = 0
+            pftmodel = 0
             version = ('_' + version + '_lake_constance')
 
         elif args.model == '1':  # use global coefficients
 
-            model = 1
+            pftmodel = 1
             version = ('_' + version + '_global')
 
-        if args.ac == '0':  # EnPT_ACwater
+        if args.ac == '0':  # EnPT-ACwater Polymer
             ac = 0
         elif args.ac == '1':  # POLYMER
             ac = 1
 
         # Generation of the output file name
 
-        if args.outfile or args.ac == '0':  # MH: if output file name is provided...
+        if args.outfile:  # MH: if output file name is provided...
 
             if args.outfile:
                 outfile = args.outfile
@@ -554,31 +557,18 @@ if __name__ == '__main__':
             if outfile[-3:] == '.nc':
                 print('Output file is NETCDF4 file.')
                 outname = os.path.join(outpath, outfile)
+            else:
+                print('NETCDF4 extension is added to output name.')
+                outname = os.path.join(outpath, outfile + '.nc')
 
-            elif infile[7] == '1':  # MH: Check if filename includes Level-1 OLCI data
+        else:
 
-                outfile = list(infile)
-                outfile[7] = '2'  # MH: The product will be Level-2
+            outfile = infile
 
-                if args.ac == '0':  # EnPT-ACWater
-                    outfile[14] = 'O'
-                elif args.ac == '1':  # POLYMER
-                    outfile[14] = 'O'
+            outname = os.path.join(outpath, 'PFT' + str(version) + '_' + outfile[:-4] + '.nc')
 
-                    print(
-                        'Error: Provide atmospheric corrected (Level-2) (EnPT-ACWater, or POL). ')
-                    sys.exit()
+            print('Warning: Input file name is not according to EnMAP convention.')
 
-                    # ac              = 3
-                    # outfile[14]     = 'O'
-
-                outfile = ''.join(outfile)
-
-                outname = os.path.join(outpath, outfile[:-3] + '_' + str(output_size) + str(version) + '.nc')
-
-                outfile = ''.join(outfile)
-
-                outname = os.path.join(outpath, outfile[:-3] + '_' + str(output_size) + str(version) + '.nc')
 
     if args.sensor == 'OLCI':
 
@@ -588,12 +578,12 @@ if __name__ == '__main__':
 
         if args.model == '0':  # use Lake Constance coefficients
 
-            model = 0
+            pftmodel = 0
             version = ('_' + version + '_lake_constance')
 
         elif args.model == '1':  # use global coefficients
 
-            model = 1
+            pftmodel = 1
             version = ('_' + version + '_global')
 
         if args.ac == '0':  # EnPT_ACwater
@@ -603,7 +593,7 @@ if __name__ == '__main__':
 
         # Generation of the output file name
 
-        if args.outfile or args.ac == '0':  # MH: if output file name is provided...
+        if args.outfile:  # MH: if output file name is provided...
 
             if args.outfile:
                 outfile = args.outfile
@@ -613,92 +603,35 @@ if __name__ == '__main__':
             if outfile[-3:] == '.nc':
                 print('Output file is NETCDF4 file.')
                 outname = os.path.join(outpath, outfile)
-
-            elif infile[7] == '1':  # MH: Check if filename includes Level-1 OLCI data
-
-                outfile = list(infile)
-                outfile[7] = '2'  # MH: The product will be Level-2
-
-                if args.ac == '0':  # EnPT-ACWater
-                    outfile[14] = 'O'
-                elif args.ac == '1':  # POLYMER
-                    outfile[14] = 'O'
-
-                    print(
-                        'Error: Provide atmospheric corrected (Level-2) (EnPT-ACWater, or POL). ')
-                    sys.exit()
-
-                    # ac              = 3
-                    # outfile[14]     = 'O'
-
-                outfile = ''.join(outfile)
-
-                outname = os.path.join(outpath, outfile[:-3] + '_' + str(output_size) + str(version) + '.nc')
-
-                outfile = ''.join(outfile)
-
-                outname = os.path.join(outpath, outfile[:-3] + '_' + str(output_size) + str(version) + '.nc')
-
-
             else:
+                print('NETCDF4 extension is added to output name.')
+                outname = os.path.join(outpath, outfile + '.nc')
 
-                outfile = infile
+        else:
 
-                outname = os.path.join(outpath, outfile)
+            outfile = infile
 
-                print('Warning: Input file name is not according to OLCI convention.')
+            outname = os.path.join(outpath, 'PFT' + str(version) + '_' + outfile)
 
-    ######################## TEST PLOTTING ######################
-# import matplotlib
-# matplotlib.use("TkAgg")
-# import matplotlib.pyplot as plt
-# import matplotlib as mpl
-# import cartopy.crs as ccrs
-# import cartopy.feature as cfeature
-#
-# import matplotlib.dates as mdates
-#
-# from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
-# from mpl_toolkits.axes_grid1 import make_axes_locatable
-#
-# ac = 1
-# chl_a, valid, lat, lon, cloud, land, AC, flag_negative, flag_suspect = prepare_processor_input(inpath,infile)
-#
-#
-# fig, ax = plt.subplots(1, 1, subplot_kw=dict(projection=ccrs.PlateCarree()))
-#
-# # region to plot
-# ax.set_extent((9.0, 9.6, 47.45, 47.85))
-# arr = chl_a
-# #arr = arr[valid]
-#
-# #arr = arr[~arr.mask]
-#
-# #lat, lon = ds.variables['latitude'][:], ds.variables['longitude'][:]
-#
-# cmap = plt.get_cmap('viridis')
-#
-# im = ax.pcolormesh(lon, lat, arr, shading="auto", vmin=0, vmax=5,
-#                    cmap=cmap, transform=ccrs.PlateCarree())
-#
-# ax.add_feature(cfeature.COASTLINE)
-# ax.add_feature(cfeature.LAND, facecolor='0.95')
-#
-# lon_formatter = LongitudeFormatter()
-# lat_formatter = LatitudeFormatter()
-# ax.set_yticks(np.linspace(47.45 + 0.05, 47.85 - 0.05, 5),
-#               crs=ccrs.PlateCarree())
-# ax.set_xticks(np.linspace(9.0, 9.6, 7),
-#               crs=ccrs.PlateCarree())
-# ax.xaxis.set_major_formatter(lon_formatter)
-# ax.yaxis.set_major_formatter(lat_formatter)
-#
-# ax.gridlines()
-#
-# # changing the size of ticks
-# ax.tick_params(width=1, length=5)
-#
-# fig.colorbar(im, label='Chl-a', orientation='horizontal',
-#              extend='both',
-#              )
-#######################################################################
+            print('Warning: Input file name is not according to OLCI convention.')
+
+    ### -------------------------------------------------------------------
+    # Start executing OC-PFT
+    ### -------------------------------------------------------------------
+
+    print('Start: ', str(dt.now()))
+    print('Processing of: ', infile)
+
+    if (sensor == 'EnMAP'):
+        chl_a, valid, lat, lon, cloud, land, AC, flag_negative, flag_suspect = prepare_processor_input(inpath)
+
+    elif (sensor == 'OLCI'):
+        chl_a, valid, lat, lon, cloud, land, AC, flag_negative, flag_suspect = prepare_processor_input(inpath, infile)
+
+    PFT = model(chl_a, pftmodel)
+
+    print('Saving results in: ', outname)
+
+    save_results(PFT, outname)
+
+    print('Ready ', str(dt.now()), ' after ', str(dt.now() - start_time))

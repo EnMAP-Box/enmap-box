@@ -9,20 +9,21 @@ def ocpft(inputfile, outputDirectory, sensor, model, ac, osize):
 
     assert sensor in ['EnMAP', 'OLCI', 'MSI', 'DESIS']#, "MERIS", "MSI", "EnMAP", "SeaWiFS_OCCCI", "DESIS"]
     assert model in [0, 1]
-    assert ac in [0, 1], f'ac={ac}' # 0 = EnPT ACwater, 1 = POLYMER
+    assert ac in [0, 1] # 0 = EnPT ACwater, 1 = POLYMER
     assert osize in [0] # 0 = standard product output (7 products + bitmask) (default)
 
     # cmd = r'python {script} {input} -od={output} -sensor=EnMAP -model=0 -adapt=0 -osize=0'
-    # cmd = r'python ONNS_v09_20190611_for_EnMAP_Box.py S3A_OL_2_WFRC8R_20160720T093421_20160720T093621_20171002T063739_0119_006_307______MR1_R_NT_002_sylt.nc -od=output/ -sensor=OLCI -adapt=0 -ac=1 -osize=1 -txt_header=1 -txt_ID=1 -txt_columns 1'
+    #cmd = r'python ocpft_v01_20220526.py /home/alvarado/projects/typsynsat/data/test_dataset/olci/S3A_OL_1_EFR____20200816T095809_20200816T100109_20200816T120938_0179_061_350_2160_MAR_O_NR_002.SEN3.nc -od=output/ -sensor=OLCI -adapt=0 -ac=1 -osize=0'
 
-    import os
-    python = abspath(join(dirname(os.__file__), '..', 'python'))
+    import sys
+    python = abspath(sys.executable)
 
     cmd = r'{python} {script} {input} -od={output} -sensor={sensor} -model={model} -ac={ac} -osize={osize}'
     script = join(dirname(__file__), 'ocpft_v01_20220526_enmapbox.py')
+
     assert exists(script)
     cmd = cmd.format(python=python, script=script, input=inputfile, output=outputDirectory, sensor=sensor, model=model, ac=ac, osize=osize)
-
+    print(cmd)
     try:
         process = subprocess.run(cmd,
             check=True,
