@@ -119,16 +119,6 @@ settings = enmapboxSettings()
 DEBUG = str(os.environ.get('DEBUG', False)).lower() in ['1', 'true']
 site.addsitedir(DIR_SITEPACKAGES)
 
-# test if PyQtGraph is available
-try:
-    import pyqtgraph  # noqa
-except ModuleNotFoundError:
-    # use PyQtGraph brought by QPS
-    pSrc = pathlib.Path(DIR_ENMAPBOX) / 'qgispluginsupport' / 'qps' / 'pyqtgraph'
-    assert pSrc.is_dir()
-    site.addsitedir(pSrc)
-    # import pyqtgraph
-
 
 def icon() -> QIcon:
     """
