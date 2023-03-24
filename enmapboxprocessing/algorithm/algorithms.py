@@ -1,5 +1,6 @@
 from enmapboxprocessing.algorithm.aggregaterasterbandsalgorithm import AggregateRasterBandsAlgorithm
 from enmapboxprocessing.algorithm.applymaskalgorithm import ApplyMaskAlgorithm
+from enmapboxprocessing.algorithm.build3dcubealgorithm import Build3dCubeAlgorithm
 from enmapboxprocessing.algorithm.classfractionfromcategorizedvectoralgorithm import \
     ClassFractionFromCategorizedVectorAlgorithm
 from enmapboxprocessing.algorithm.classificationfromclassprobabilityalgorithm import \
@@ -233,6 +234,7 @@ def algorithms():
     algos = [
         AggregateRasterBandsAlgorithm(),
         ApplyMaskAlgorithm(),
+        Build3dCubeAlgorithm(),
         ClassFractionFromCategorizedVectorAlgorithm(),
         CreateSpectralIndicesAlgorithm(),
         ClassificationFromClassProbabilityAlgorithm(),

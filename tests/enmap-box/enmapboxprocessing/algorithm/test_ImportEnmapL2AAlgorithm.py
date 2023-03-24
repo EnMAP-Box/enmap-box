@@ -11,7 +11,7 @@ class TestImportEnmapL2AAlgorithm(TestCase):
     def test(self):
         alg = ImportEnmapL2AAlgorithm()
         parameters = {
-            alg.P_FILE: SensorProducts.EnMAP_L2A_MetadataXml,
+            alg.P_FILE: SensorProducts.Enmap.L2A_MetadataXml,
             alg.P_OUTPUT_RASTER: self.filename('enmapL2A.vrt'),
         }
 
@@ -86,3 +86,27 @@ class TestImportEnmapL2AAlgorithm(TestCase):
         result = self.runalg(alg, parameters)
         reader = RasterReader(result[alg.P_OUTPUT_RASTER])
         self.assertEqual(224, reader.bandCount())
+
+    def test_setBadBandList(self):
+
+        alg = ImportEnmapL2AAlgorithm()
+        parameters = {
+            alg.P_FILE: SensorProducts.Enmap.L2A_MetadataXml,
+            alg.P_SET_BAD_BANDS: True,
+            alg.P_OUTPUT_RASTER: self.filename('enmapL2A_BBL.vrt'),
+        }
+
+        if not self.fileExists(parameters[alg.P_FILE]):
+            return
+
+        result = self.runalg(alg, parameters)
+        reader = RasterReader(result[alg.P_OUTPUT_RASTER])
+        bbl = [reader.badBandMultiplier(bandNo) for bandNo in reader.bandNumbers()]
+        gold = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1]
+        self.assertListEqual(gold, bbl)

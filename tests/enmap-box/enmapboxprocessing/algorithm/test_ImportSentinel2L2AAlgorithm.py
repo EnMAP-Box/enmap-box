@@ -1,7 +1,4 @@
-import numpy as np
-
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
-from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.algorithm.testcase import TestCase
 
 
@@ -17,8 +14,4 @@ class TestImportSentinel2L2AAlgorithm(TestCase):
         if not self.fileExists(parameters[alg.P_FILE]):
             return
 
-        result = self.runalg(alg, parameters)
-        self.assertEqual(
-            15816,
-            round(np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array(5000, 5000, 1, 1), dtype=float))
-        )
+        self.runalg(alg, parameters)

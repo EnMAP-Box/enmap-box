@@ -4,16 +4,17 @@ from os.path import join, dirname
 from typing import Optional
 
 import requests
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
-from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp import MapTool
 from locationbrowserapp.locationbrowserresultwidget import LocationBrowserResultWidget
+
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
+from enmapbox.typeguard import typechecked
+from enmapboxprocessing.utils import Utils
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QListWidgetItem, QToolButton
 from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPointXY, QgsProject
 from qgis.gui import QgsFilterLineEdit, QgsDockWidget, QgisInterface
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -151,15 +152,24 @@ class LocationBrowserDockWidget(QgsDockWidget):
             QgsCoordinateReferenceSystem.fromEpsgId(4326), float(item.result['lon']), float(item.result['lat'])
         )
 
-        # remove existing polygon layer
+        # remove existing layer
         baseNamePolygon = 'Location Browser Boundary'
         baseNameLine = 'Location Browser Course'
 
         if self.interfaceType == self.EnmapBoxInterface:
             mapCanvas = self.enmapBoxInterface().currentMapCanvas()
+            if mapCanvas is None:
+                mapDock = self.enmapBoxInterface().createMapDock()
+                mapCanvas = mapDock.mapCanvas()
+            # remove from map
             for aLayer in mapCanvas.layers():
                 if aLayer.name() in [baseNamePolygon, baseNameLine]:
                     self.enmapBoxInterface().removeMapLayer(aLayer)
+                    # remove from sources
+                    for source in self.enmapBoxInterface().dataSources('VECTOR', False):
+                        uri = source.source()
+                        if aLayer.source() == uri:
+                            self.enmapBoxInterface().removeSource(source)
         elif self.interfaceType == self.QgisInterface:
             mapCanvas = self.qgisInterface().mapCanvas()
             for aLayer in mapCanvas.layers():

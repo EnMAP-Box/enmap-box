@@ -548,6 +548,9 @@ class RasterLayerStylingPanel(QgsDockWidget):
             mBand.mIsBadBand.hide()
         else:
             mBand.mIsBadBand.show()
+            reader = RasterReader(layer)
+            if reader.bandCount() < bandNo:
+                return
             if RasterReader(layer).badBandMultiplier(bandNo) == 0:
                 mBand.mIsBadBand.setChecked(True)
             else:
