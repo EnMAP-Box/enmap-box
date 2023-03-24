@@ -152,7 +152,7 @@ class LocationBrowserDockWidget(QgsDockWidget):
             QgsCoordinateReferenceSystem.fromEpsgId(4326), float(item.result['lon']), float(item.result['lat'])
         )
 
-        # remove existing polygon layer
+        # remove existing layer
         baseNamePolygon = 'Location Browser Boundary'
         baseNameLine = 'Location Browser Course'
 
@@ -161,9 +161,15 @@ class LocationBrowserDockWidget(QgsDockWidget):
             if mapCanvas is None:
                 mapDock = self.enmapBoxInterface().createMapDock()
                 mapCanvas = mapDock.mapCanvas()
+            # remove from map
             for aLayer in mapCanvas.layers():
                 if aLayer.name() in [baseNamePolygon, baseNameLine]:
                     self.enmapBoxInterface().removeMapLayer(aLayer)
+                    # remove from sources
+                    for source in self.enmapBoxInterface().dataSources('VECTOR', False):
+                        uri = source.source()
+                        if aLayer.source() == uri:
+                            self.enmapBoxInterface().removeSource(source)
         elif self.interfaceType == self.QgisInterface:
             mapCanvas = self.qgisInterface().mapCanvas()
             for aLayer in mapCanvas.layers():
