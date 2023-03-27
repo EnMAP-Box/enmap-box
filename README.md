@@ -63,7 +63,7 @@ Open a shell that allows to run git and python with PyQGIS, then run:
 
 git clone --recurse-submodules git@github.com:EnMAP-Box/enmap-box.git
 # alternatively, but not recommended, you can use https as well:
-# git clone --recurse-submodules https://github.org:EnMAP-Box/enmap-box.git
+# git clone --recurse-submodules https://github.com/EnMAP-Box/enmap-box.git
 
 cd enmap-box
 git config --local include.path ../.gitconfig
