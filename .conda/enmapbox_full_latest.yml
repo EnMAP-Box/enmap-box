@@ -32,6 +32,7 @@ dependencies:
   - h5py
   - gitpython
   - git-lfs
+  - typeguard
   - pip:
     - enpt-enmapboxapp
 variables:
