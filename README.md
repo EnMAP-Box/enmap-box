@@ -73,7 +73,13 @@ python scripts/setup_repository.py
 
 # start the EnMAP-Box
 python enmapbox
+
+# if you have writing access to a submodule, set the remote-URL accordingly, e.g.
+cd enmapbox/qgispluginsupport
+git git remote set-url origin git@github.com:EnMAP-Box/qgispluginsupport.git
 ````
+
+ 
 
 ### Detailed description
 
