@@ -34,8 +34,9 @@ However, the following steps show you how to run the EnMAP-Box from python witho
 
 ## 1. Install QGIS
 
-mamba env create -n enmapbox_light -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/conda_env_light.yml 
-mamba env create -n enmapbox_full -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/conda_environment.yml
+mamba env create -n enmapbox_light -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_light.yml 
+mamba env create -n enmapbox_full -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full.yml
+mamba env create -n enmapbox_full_3.28 -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_3.28.yml
 
 ## 2. Clone this repository
 
