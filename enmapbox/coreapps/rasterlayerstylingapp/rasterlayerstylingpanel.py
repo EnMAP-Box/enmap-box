@@ -306,7 +306,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 self.mRenderer.setCurrentIndex(3)
 
     def onRendererTabChanged(self):
-        layer: QgsRasterLayer = self.mLayer.currentLayer()
+        layer: Optional[QgsRasterLayer] = self.mLayer.currentLayer()
 
         if layer is None:
             return
