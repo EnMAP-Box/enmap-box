@@ -67,6 +67,10 @@ class EnMAPBoxProjectSettings(object):
     def setSettings(self, settings: Dict):
         from qgis.utils import iface
         from enmapbox.gui.enmapboxgui import EnMAPBox
+
+        if not isinstance(settings, dict):
+            return
+        
         enmapBox = EnMAPBox.instance()
 
         # QGIS GUI

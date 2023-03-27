@@ -35,9 +35,22 @@ However, the following steps show you how to run the EnMAP-Box from python witho
 ## 1. Install QGIS
 
 ### conda / mamba environment (all OS)
-mamba env create -n enmapbox_light -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_light.yml 
-mamba env create -n enmapbox_full -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full.yml
+
+Call one of the following commands to install a QGIS environment for the EnMAP-Box. 
+
+`latest` = most-recent QGIS version available in the [conda-forge](https://conda-forge.org/) channel.
+
+`light` = basic QGIS installation only. No additional packages. In this environment the EnMAP-Box provides basic 
+      visualization features only.
+
+`full` = QGIS + all other python requirements that allow to run all EnMAP-Box features 
+
+````bash
+mamba env create -n enmapbox_full_latest -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_latest.yml
 mamba env create -n enmapbox_full_3.28 -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_3.28.yml
+mamba env create -n enmapbox_light_latest -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_light_latest.yml
+mamba env create -n enmapbox_light_3.28 -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_light_3.28.yml
+````
 
 ### Windows OSGeo4W installer
 
@@ -63,7 +76,7 @@ Open a shell that allows to run git and python with PyQGIS, then run:
 
 git clone --recurse-submodules git@github.com:EnMAP-Box/enmap-box.git
 # alternatively, but not recommended, you can use https as well:
-# git clone --recurse-submodules https://github.org:EnMAP-Box/enmap-box.git
+# git clone --recurse-submodules https://github.com/EnMAP-Box/enmap-box.git
 
 cd enmap-box
 git config --local include.path ../.gitconfig
