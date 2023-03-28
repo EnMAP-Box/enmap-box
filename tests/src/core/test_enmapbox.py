@@ -348,6 +348,5 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         center = SpatialPoint.fromMapCanvasCenter(mapDock.mapCanvas())
 
 
-
 if __name__ == '__main__':
     unittest.main(buffer=False)

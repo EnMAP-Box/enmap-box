@@ -11,8 +11,7 @@ from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import Spe
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprocessingdialog import SpectralProcessingDialog
 from enmapbox.testing import EnMAPBoxTestCase, TestObjects
 from qgis.PyQt.QtWidgets import QDialogButtonBox
-from qgis._core import QgsProject
-from qgis.core import QgsApplication
+from qgis.core import QgsApplication, QgsProject
 from qgis.core import QgsVectorLayer, QgsProcessingRegistry, QgsProcessingAlgorithm
 
 site.addsitedir(pathlib.Path(DIR_ENMAPBOX) / 'coreapps')

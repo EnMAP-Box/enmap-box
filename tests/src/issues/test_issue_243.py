@@ -13,8 +13,7 @@ from enmapbox.gui.mapcanvas import MapCanvas
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.testing import EnMAPBoxTestCase
 from qgis.PyQt import Qt
-from qgis._core import QgsProject
-from qgis.core import Qgis
+from qgis.core import Qgis, QgsProject
 
 
 class ExampleClass(QObject):

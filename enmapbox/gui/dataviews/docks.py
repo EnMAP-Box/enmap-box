@@ -324,10 +324,8 @@ class DockArea(pgDockArea):
         #  print "added temp area", area, area.window()
         return area
 
-    def addDock(self, dock, position='bottom', relativeTo=None, **kwds) -> Dock:
-        assert dock is not None
-
-        assert isinstance(dock, Dock)
+    def addDock(self, dock: pgDock, position='bottom', relativeTo=None, **kwds) -> Dock:
+        assert isinstance(dock, (Dock, pgDock))
         if hasattr(dock, 'orig_area'):
             dock.label.btnUnFloat.setVisible(dock.orig_area != self)
 

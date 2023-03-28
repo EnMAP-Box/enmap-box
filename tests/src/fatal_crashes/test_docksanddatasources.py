@@ -16,7 +16,7 @@ import os
 import tempfile
 import unittest
 
-from PyQt5.QtWidgets import QApplication
+from qgis.PyQt.QtWidgets import QApplication
 
 from qgis.PyQt.QtCore import QMimeData, QModelIndex
 from qgis.core import QgsLayerTreeLayer, QgsProject, QgsVectorLayer, QgsRasterLayer, QgsLayerTreeModel, QgsLayerTree

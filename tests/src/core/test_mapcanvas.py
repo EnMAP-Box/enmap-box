@@ -71,6 +71,7 @@ class MapCanvasTests(EnMAPBoxTestCase):
 
         self.showGui(mapCanvas)
         QgsProject.instance().removeAllMapLayers()
+
     def test_canvaslinks(self):
         canvases = []
         for i in range(3):
@@ -123,6 +124,7 @@ class MapCanvasTests(EnMAPBoxTestCase):
         self.assertTrue(c3.center() == center3)
 
         QgsProject.instance().removeAllMapLayers()
+
     def test_mapCrosshairDistance(self):
 
         lyrWorld = QgsRasterLayer(TestObjects.uriWMS(), 'Background', 'wms')

@@ -37,7 +37,6 @@ from qgis.gui import QgsPluginManagerInterface
 from .gui.enmapboxgui import EnMAPBox
 from .qgispluginsupport.qps.testing import TestObjects, TestCase, start_app
 
-
 start_app = start_app
 
 
@@ -51,7 +50,6 @@ class EnMAPBoxTestCase(TestCase):
         if emb:
             emb.close()
             EnMAPBox._instance = None
-
 
     @classmethod
     def setUpClass(cls, resources=[]):

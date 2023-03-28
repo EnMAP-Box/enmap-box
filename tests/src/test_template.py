@@ -4,8 +4,7 @@ This is a template to create an EnMAP-Box test
 import unittest
 
 from qgis.PyQt.QtWidgets import QApplication
-from qgis._core import QgsProject
-from qgis.core import QgsApplication, QgsRasterLayer, QgsVectorLayer
+from qgis.core import QgsProject, QgsApplication, QgsRasterLayer, QgsVectorLayer
 from enmapbox.testing import EnMAPBoxTestCase, TestObjects
 from enmapbox.gui.enmapboxgui import EnMAPBox
 

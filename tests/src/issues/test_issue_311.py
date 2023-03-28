@@ -3,7 +3,7 @@ This is a template to create an EnMAP-Box test
 """
 import unittest
 
-from qgis._core import QgsProject
+from qgis.core import QgsProject
 from qgis.gui import QgsDualView
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
