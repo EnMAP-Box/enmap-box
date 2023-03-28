@@ -5,6 +5,7 @@ import unittest
 from osgeo import gdal
 
 from _classic.hubflow.core import Classification, Color, ClassDefinition
+from enmapbox.gui.enmapboxgui import EnMAPBox
 
 try:
     from reclassifyapp.reclassify import ReclassifyTableView, ReclassifyTableModel, ReclassifyTableViewDelegate, \
@@ -125,6 +126,7 @@ class TestReclassify(EnMAPBoxTestCase):
 
     def test_reclassify(self):
 
+        enmapBox = EnMAPBox(load_core_apps=False, load_other_apps=False)
         csDst = ClassificationScheme.create(2)
         csDst[0].setName('Not specified')
         csDst[1].setName('Test Class')
@@ -142,10 +144,13 @@ class TestReclassify(EnMAPBoxTestCase):
         print('src classes: {}'.format(classA.GetRasterBand(1).GetCategoryNames()))
         print('dst path: {}'.format(pathDst))
         print('dst classes: {}'.format(csDst.classNames()))
-        dsDst = reclassify(pathSrc, pathDst, csDst, LUT, drvDst='ENVI')
+        dsDst = reclassify(pathSrc, csDst, LUT, output_classification=pathDst)
         csDst2 = ClassificationScheme.fromRasterImage(dsDst)
         self.assertIsInstance(csDst2, ClassificationScheme)
         self.assertEqual(csDst, csDst2)
+
+        enmapBox.close()
+        QgsProject.instance().removeAllMapLayers()
 
     def test_transformation_table(self):
 

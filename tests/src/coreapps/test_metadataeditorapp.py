@@ -36,8 +36,8 @@ initPythonPaths()
 class MetadataEditorTests(EnMAPBoxTestCase):
     @classmethod
     def setUpClass(cls):
-        from enmapbox.testing import initQgisApplication
-        cls.qgsApp = initQgisApplication()
+        from enmapbox.testing import start_app
+        cls.qgsApp = start_app()
 
     @classmethod
     def tearDownClass(cls):

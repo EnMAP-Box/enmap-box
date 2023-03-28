@@ -13,6 +13,7 @@ from enmapbox.gui.mapcanvas import MapCanvas
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.testing import EnMAPBoxTestCase
 from qgis.PyQt import Qt
+from qgis._core import QgsProject
 from qgis.core import Qgis
 
 
@@ -56,6 +57,10 @@ class TestIssue243Examples(EnMAPBoxTestCase):
         self.assertIsInstance(pt, SpatialPoint)
         enmapBox.setCurrentLocation(pt, mapCanvas=c1)
         self.showGui(enmapBox.ui)
+
+        # cleanup
+        enmapBox.close()
+        QgsProject.instance().removeAllMapLayers()
 
 
 if __name__ == '__main__':

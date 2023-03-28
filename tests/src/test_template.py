@@ -4,6 +4,7 @@ This is a template to create an EnMAP-Box test
 import unittest
 
 from qgis.PyQt.QtWidgets import QApplication
+from qgis._core import QgsProject
 from qgis.core import QgsApplication, QgsRasterLayer, QgsVectorLayer
 from enmapbox.testing import EnMAPBoxTestCase, TestObjects
 from enmapbox.gui.enmapboxgui import EnMAPBox
@@ -25,7 +26,7 @@ class EnMAPBoxTestCaseExample(EnMAPBoxTestCase):
         print(f'Place for temporary outputs: {DIR_TEMP}')
 
     def test_with_enmapbox(self):
-        enmapBox = EnMAPBox()
+        enmapBox = EnMAPBox(load_core_apps=True, load_other_apps=False)
 
         self.assertIsInstance(enmapBox, EnMAPBox)
         self.assertEqual(enmapBox, EnMAPBox.instance())
@@ -39,6 +40,10 @@ class EnMAPBoxTestCaseExample(EnMAPBoxTestCase):
         vectorLayer = TestObjects.createVectorLayer()
         self.assertIsInstance(vectorLayer, QgsVectorLayer)
         self.assertTrue(vectorLayer.isValid())
+
+        # cleanup.
+        enmapBox.close()
+        QgsProject.instance().removeAllLayers()
 
 
 if __name__ == '__main__':

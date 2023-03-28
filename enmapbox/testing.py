@@ -35,35 +35,24 @@ from qgis.core import QgsApplication, QgsProcessingParameterRasterDestination, Q
 from qgis.gui import QgsPluginManagerInterface
 
 from .gui.enmapboxgui import EnMAPBox
-from .qgispluginsupport.qps.testing import TestObjects, TestCase
-from .qgispluginsupport.qps.testing import stop_app
-
-SHOW_GUI = True
-stop_app = stop_app
+from .qgispluginsupport.qps.testing import TestObjects, TestCase, start_app
 
 
-def start_app(*args, **kwds) -> QgsApplication:
-    """
-    Initializes a QGIS Environment
-    :return: QgsApplication instance of local QGIS installation
-    """
-    if isinstance(QgsApplication.instance(), QgsApplication):
-        return QgsApplication.instance()
-    else:
-        from .qgispluginsupport.qps.testing import start_app, StartOptions
-        app = start_app(*args, options=StartOptions.All, **kwds)
-
-        import enmapbox
-        enmapbox.initAll()
-        return app
-
-
-initQgisApplication = start_app
+start_app = start_app
 
 
 # get_iface()
 
 class EnMAPBoxTestCase(TestCase):
+
+    def tearDown(self):
+        super().tearDown()
+        emb = EnMAPBox.instance()
+        if emb:
+            emb.close()
+            EnMAPBox._instance = None
+
+
     @classmethod
     def setUpClass(cls, resources=[]):
         tmpDir = cls.tempDir(cls)

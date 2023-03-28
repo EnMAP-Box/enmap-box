@@ -22,13 +22,13 @@
 from unittest import TestCase
 
 from enmapbox.gui.applications import EnMAPBoxApplication
-from enmapbox.testing import initQgisApplication
+from enmapbox.testing import start_app
 from minimumexample.exampleapp import exampleAlgorithm, ExampleProcessingAlgorithm, ExampleApplicationGUI, \
     ExampleApplication
 from qgis.core import QgsProcessingAlgorithm, QgsProcessingContext, QgsProcessingFeedback, QgsProcessingProvider
 
 # initialize the QGIS API + several background states
-APP = initQgisApplication()
+APP = start_app()
 
 # set on True to show widgets and wait until a user closes them.
 SHOW_GUI = True

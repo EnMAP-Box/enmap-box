@@ -16,6 +16,8 @@ import os
 import tempfile
 import unittest
 
+from PyQt5.QtWidgets import QApplication
+
 from qgis.PyQt.QtCore import QMimeData, QModelIndex
 from qgis.core import QgsLayerTreeLayer, QgsProject, QgsVectorLayer, QgsRasterLayer, QgsLayerTreeModel, QgsLayerTree
 from qgis.gui import QgsMapCanvas, QgsLayerTreeView
@@ -40,10 +42,6 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         self.wmsUri = r'crs=EPSG:3857&format&type=xyz&url=https://mt1.google.com/vt/lyrs%3Ds%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D&zmax=19&zmin=0'
         self.wmsUri = 'referer=OpenStreetMap%20contributors,%20under%20ODbL&type=xyz&url=http://tiles.wmflabs.org/hikebike/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=17&zmin=1'
         self.wfsUri = r'restrictToRequestBBOX=''1'' srsname=''EPSG:25833'' typename=''fis:re_postleit'' url=''http://fbinter.stadt-berlin.de/fb/wfs/geometry/senstadt/re_postleit'' version=''auto'''
-
-    def tearDown(self):
-        self.closeEnMAPBoxInstance()
-        super().tearDown()
 
     def test_dataSourceManager(self):
 
@@ -102,9 +100,12 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
                 self.assertIsInstance(sources[0], RasterDataSource)
                 DSM.removeDataSources(sources)
 
+        QgsProject.instance().removeAllMapLayers()
+
     def test_dockview(self):
         TV = DockTreeView(None)
         self.assertIsInstance(TV, QgsLayerTreeView)
+        QgsProject.instance().removeAllMapLayers()
 
     def test_dockmanager(self):
 
@@ -113,14 +114,19 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         self.assertTrue(lyr.id() not in QgsProject.instance().mapLayers().keys())
 
         DM = DockManager()
+        DMTM = DockManagerTreeModel(DM)
 
+        self.assertEqual(DM.project(), DMTM.project())
+
+        dockArea = DockArea()
+        DM.connectDockArea(dockArea)
         self.assertTrue(len(DM) == 0)
-        dock = DM.createDock('MAP')
+        dock: MapDock = DM.createDock('MAP')
         self.assertIsInstance(dock, MapDock)
-        dock.mapCanvas().setLayers([lyr])
+        tree: QgsLayerTree = dock.layerTree()
+        tree.addLayer(lyr)
         self.assertTrue(lyr.id() in QgsProject.instance().mapLayers().keys())
 
-        DMTM = DockManagerTreeModel(DM)
         self.assertIsInstance(DMTM, DockManagerTreeModel)
 
         mapNodes = DMTM.mapDockTreeNodes()
@@ -141,6 +147,10 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
 
         mimeData = DMTM.mimeData([idx])
         self.assertIsInstance(mimeData, QMimeData)
+
+        # cleanup
+        tree.removeAllChildren()
+        QgsProject.instance().removeAllMapLayers()
 
     def test_canvasBridge(self):
         project = QgsProject()
@@ -188,6 +198,9 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
             root.addLayer(lyr)
         widgets.insert(0, view)
         self.showGui(widgets)
+
+        project.removeAllMapLayers()
+        QgsProject.instance().removeAllMapLayers()
 
     def test_DockPanelUI(self):
 
@@ -239,6 +252,10 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         # DM.createDock('WEBVIEW')
         self.showGui(w)
 
+        root.removeAllChildren()
+        project.removeAllMapLayers()
+        QgsProject.instance().removeAllMapLayers()
+
     def test_pgDock(self):
 
         da = DockArea()
@@ -247,12 +264,15 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         da.addDock(dock)
         da.show()
         self.showGui(da)
+        QgsProject.instance().removeAllMapLayers()
 
     def test_MimeDataDock(self):
         da = DockArea()
         dock = MimeDataDock()
         da.addDock(dock)
         self.showGui(da)
+
+        QgsProject.instance().removeAllMapLayers()
 
     def test_TextDock(self):
         da = DockArea()
@@ -285,6 +305,8 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         da.show()
         self.showGui(da)
 
+        QgsProject.instance().removeAllMapLayers()
+
     def test_SpeclibDock(self):
         da = DockArea()
         dock = SpectralLibraryDock()
@@ -293,6 +315,8 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         self.assertIsInstance(dock, SpectralLibraryDock)
         self.showGui(da)
 
+        QgsProject.instance().removeAllMapLayers()
+
     def test_MapDock(self):
         da = DockArea()
         from enmapbox.gui.dataviews.docks import MapDock
@@ -300,6 +324,9 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         self.assertIsInstance(dock, MapDock)
         da.addDock(dock)
         self.showGui(da)
+
+        del da, dock
+        QgsProject.instance().removeAllMapLayers()
 
     def test_MapDockLayerHandling(self):
 
@@ -328,6 +355,9 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         node = EMB.findDockTreeNode(speclib1)
         self.assertTrue(node, SpeclibDockTreeNode)
 
+        EMB.close()
+        QgsProject.instance().removeAllMapLayers()
+
     def test_issue_881(self):
         enmapBox = EnMAPBox(load_core_apps=False, load_other_apps=False)
         dock: MapDock = enmapBox.onDataDropped([QgsRasterLayer(enmap, 'enmap')])
@@ -335,12 +365,16 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
 
         self.showGui(enmapBox.ui)
         enmapBox.close()
+        QApplication.processEvents()
+        QgsProject.instance().removeAllMapLayers()
 
     def test_issue_737(self):
         enmapBox = EnMAPBox(load_core_apps=False, load_other_apps=False)
         enmapBox.addSource(classificationDatasetAsPklFile)
         self.showGui(enmapBox.ui)
         enmapBox.close()
+        QApplication.processEvents()
+        QgsProject.instance().removeAllMapLayers()
 
     def test_dockTreeViewDoubleClicks(self):
         eb = EnMAPBox(load_core_apps=False, load_other_apps=False)
@@ -360,6 +394,8 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         self.assertIsInstance(tv, DockTreeView)
 
         self.showGui(eb.ui)
+        eb.close()
+        QgsProject.instance().removeAllMapLayers()
 
 
 if __name__ == "__main__":

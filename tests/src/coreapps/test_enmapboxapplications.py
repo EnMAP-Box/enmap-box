@@ -11,6 +11,7 @@ from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import Spe
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprocessingdialog import SpectralProcessingDialog
 from enmapbox.testing import EnMAPBoxTestCase, TestObjects
 from qgis.PyQt.QtWidgets import QDialogButtonBox
+from qgis._core import QgsProject
 from qgis.core import QgsApplication
 from qgis.core import QgsVectorLayer, QgsProcessingRegistry, QgsProcessingAlgorithm
 
@@ -68,6 +69,8 @@ class TestEnMAPBoxApplications(EnMAPBoxTestCase):
         speclibCB = UiLibrary()
 
         self.assertTrue(len(speclibDataSources) == speclibCB.count() - 1)
+        enmapBox.close()
+        QgsProject.instance().removeAllMapLayers()
 
     def test_Resampling(self):
         registerDataProvider()

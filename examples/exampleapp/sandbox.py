@@ -55,11 +55,11 @@ def sandboxShowAppGuiOnly():
 
 if __name__ == '__main__':
 
-    from enmapbox.testing import initQgisApplication
+    from enmapbox.testing import start_app
 
     # this will initialize the QApplication/QgsApplication which runs in the background
     # see https://qgis.org/api/classQgsApplication.html for details
-    qgsApp = initQgisApplication()
+    qgsApp = start_app()
 
     if False:
         sandboxShowAppGuiOnly()
