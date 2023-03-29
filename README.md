@@ -155,13 +155,29 @@ Replace it with your own EnMAP-Box fork from which you can create pull requests.
     ````
     
     This setting (and maybe more in future) is already defined in the `.gitconfig`. 
-    You can enable it for your local repository by:
+You can enable it for your local repository by:
     
     ````bash
     git config --local include.path ../.gitconfig
     ````
     
-    If you have writing access to a submodule's repository, you can push changes upstream by:
+    Submodules use https addresses to pull and push updates (`url` and `pushurl` in [.gitmodules](.gitmodules)), e.g.
+`https://bitbucket.org/ecstagriculture/enmap-box-lmu-vegetation-apps.git`.
+To enable ssh authentication you can replace them with SSH uris as followed:
+
+    ```bash
+    cd enmapbox/apps/lmuapps
+    # check existing url
+    git remote -v
+    # change remote urls
+    git remote set url origin git@bitbucket.org:ecstagriculture/enmap-box-lmu-vegetation-apps.git
+    # check changed url
+    git remote -v
+    ```
+    
+    
+
+6. you can push changes upstream by:
     
     ````bash
     cd <submodule>
@@ -169,6 +185,8 @@ Replace it with your own EnMAP-Box fork from which you can create pull requests.
     git commit -m "my changes"
     git push origin HEAD:master
     ````
+   
+    
     
     Finally, announce changes in a submodule to the EnMAP-Box (super) project by:
     ````bash
