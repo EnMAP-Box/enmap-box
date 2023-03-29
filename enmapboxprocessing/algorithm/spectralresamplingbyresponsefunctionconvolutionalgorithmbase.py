@@ -1,4 +1,5 @@
 import inspect
+import json
 from collections import OrderedDict
 from math import ceil, sqrt, pi, exp
 from typing import Dict, Any, List, Tuple, Union
@@ -6,15 +7,13 @@ from warnings import warn
 
 import numpy as np
 from osgeo import gdal
+from typeguard import typechecked
 
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import Array3d, Number
-from qgis.core import (QgsFeature, QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, edit)
-from enmapbox.typeguard import typechecked
-from qps.speclib.core.spectrallibrary import SpectralLibraryUtils
-from qps.speclib.core.spectralprofile import prepareProfileValueDict, encodeProfileValueDict
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 
 RESPONSE_CUTOFF_VALUE = 0.001
 RESPONSE_CUTOFF_DIGITS = 3
@@ -39,7 +38,7 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
             (self._RASTER, 'A spectral raster layer to be resampled.'),
             (self._CODE, 'Python code specifying the spectral response function.'),
             (self._SAVE_RESPONSE_FUNCTION,
-             'Whether to save the spectral response function library as *.srf.gpkg sidecar file.'),
+             'Whether to save the spectral response function library as *.srf.geojson sidecar file.'),
             (self._OUTPUT_RASTER, self.RasterFileDestination)
         ]
 
@@ -163,24 +162,41 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
             writer.close()
 
             if saveResponseFunction:
+                with open(filename + '.srf.geojson', 'w') as file:
+                    file.write(
+                        '{\n'
+                        '    "type": "FeatureCollection",\n'
+                        '    "name": "Spectral Response Function",\n'
+                        '    "description": "",\n'
+                        '    "features": [\n'
+                    )
 
-                library = SpectralLibraryUtils.createSpectralLibrary()
-                iField = library.fields().indexOf('profiles')
-                field = library.fields().at(iField)
-                assert iField >= 0
-                features = list()
-                for name in responses:
-                    values = responses[name]
-                    x = [xi for xi, yi in values]
-                    y = [yi for xi, yi in values]
-                    profile = prepareProfileValueDict(x=x, y=y, xUnit='nm')
-                    feature = QgsFeature(library.fields())
-                    feature.setAttribute(iField, encodeProfileValueDict(profile, encoding=field))
-                    features.append(feature)
+                    for i, name in enumerate(responses):
+                        values = responses[name]
+                        x = [xi for xi, yi in values]
+                        y = [yi for xi, yi in values]
+                        feature = {
+                            "type": "Feature",
+                            "properties": {
+                                "name": name,
+                                "profiles": {
+                                    "x": x,
+                                    "xUnit": "Nanometers",
+                                    "y": y
+                                }
+                            },
+                            "geometry": None
+                        }
+                        file.write(' ' * 8)
+                        file.write(json.dumps(feature))
+                        if i + 1 < len(responses):
+                            file.write(',')
+                        file.write('\n')
 
-                with edit(library):
-                    library.addFeatures(features)
-                library.write(filename + '.srf.gpkg')
+                    file.write(
+                        '    ]\n'
+                        '}\n'
+                    )
 
             result = {self.P_OUTPUT_RASTER: filename}
             self.toc(feedback, result)

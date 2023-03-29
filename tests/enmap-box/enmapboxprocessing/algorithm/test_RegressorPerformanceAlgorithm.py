@@ -2,8 +2,6 @@ from enmapboxprocessing.algorithm.regressorperformancealgorithm import Regressor
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import regressorDumpPkl, regressorDumpSingleTargetPkl
 
-openReport = True
-
 
 class TestRegressorPerformanceAlgorithm(TestCase):
 
@@ -12,7 +10,7 @@ class TestRegressorPerformanceAlgorithm(TestCase):
         parameters = {
             alg.P_REGRESSOR: regressorDumpPkl,
             alg.P_DATASET: regressorDumpPkl,
-            alg.P_OPEN_REPORT: openReport,
+            alg.P_OPEN_REPORT: self.openReport,
             alg.P_OUTPUT_REPORT: self.filename('report_train.html')
         }
         self.runalg(alg, parameters)
@@ -24,7 +22,7 @@ class TestRegressorPerformanceAlgorithm(TestCase):
             alg.P_REGRESSOR: regressorDumpPkl,
             alg.P_DATASET: regressorDumpPkl,
             alg.P_NFOLD: 3,
-            alg.P_OPEN_REPORT: openReport,
+            alg.P_OPEN_REPORT: self.openReport,
             alg.P_OUTPUT_REPORT: self.filename('report_crossval.html')
         }
         self.runalg(alg, parameters)
@@ -35,7 +33,7 @@ class TestRegressorPerformanceAlgorithm(TestCase):
         parameters = {
             alg.P_REGRESSOR: regressorDumpSingleTargetPkl,
             alg.P_DATASET: regressorDumpSingleTargetPkl,
-            alg.P_OPEN_REPORT: openReport,
+            alg.P_OPEN_REPORT: self.openReport,
             alg.P_OUTPUT_REPORT: self.filename('report_train.html')
         }
         self.runalg(alg, parameters)
@@ -47,7 +45,7 @@ class TestRegressorPerformanceAlgorithm(TestCase):
             alg.P_REGRESSOR: regressorDumpSingleTargetPkl,
             alg.P_DATASET: regressorDumpSingleTargetPkl,
             alg.P_NFOLD: 10,
-            alg.P_OPEN_REPORT: openReport,
+            alg.P_OPEN_REPORT: self.openReport,
             alg.P_OUTPUT_REPORT: self.filename('report_crossval.html')
         }
         self.runalg(alg, parameters)

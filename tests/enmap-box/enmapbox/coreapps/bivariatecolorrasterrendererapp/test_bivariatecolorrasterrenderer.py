@@ -1,7 +1,7 @@
 import numpy as np
 
 from bivariatecolorrasterrendererapp.bivariatecolorrasterrenderer import BivariateColorRasterRenderer
-from enmapboxprocessing.test.testcase import TestCase
+from enmapboxprocessing.testcase import TestCase
 from qgis.core import QgsRasterLayer
 
 

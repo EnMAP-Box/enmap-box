@@ -2,9 +2,9 @@ import numpy as np
 
 from enmapbox.exampledata import enmap
 from enmapboxprocessing.algorithm.convexhullalgorithm import ConvexHullAlgorithm
+from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxprocessing.algorithm.testcase import TestCase
 from qgis.core import QgsRectangle
 
 

@@ -73,7 +73,9 @@ classificationDatasetAsCsvVector = join(root, _subdir, 'classification_dataset.c
 classificationDatasetAsJsonFile = join(root, _subdir, 'classification_dataset.json')
 classificationDatasetAsPklFile = join(root, _subdir, 'classification_dataset.pkl')
 classificationDatasetAsForceFile = (
-    join(root, _subdir, 'force_classification_features.csv'), join(root, _subdir, 'force_classification_labels.csv'))
+    join(root, _subdir, 'classification_dataset_force_features.csv'),
+    join(root, _subdir, 'classification_dataset_force_labels.csv')
+)
 
 # - Regressor
 regressorDumpPkl = join(root, _subdir, 'regressor.pkl')
@@ -119,7 +121,7 @@ class SensorProducts(object):
                 sensorProductsRoot(), 'desis', 'DESIS-HSI-L1C-DT1203190212_025-20191203T021128-V0210'
             )
             L1C_MetadataXml = join(
-                L1B, 'DESIS-HSI-L1C-DT1203190212_025-20191203T021128-V0210-METADATA.xml'
+                L1C, 'DESIS-HSI-L1C-DT1203190212_025-20191203T021128-V0210-METADATA.xml'
             )
             L2A = join(
                 sensorProductsRoot(), 'desis', 'DESIS-HSI-L2A-DT1203190212_025-20191203T021128-V0210'

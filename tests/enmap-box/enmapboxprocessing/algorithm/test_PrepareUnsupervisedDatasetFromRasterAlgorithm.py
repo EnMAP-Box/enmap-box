@@ -46,6 +46,3 @@ class TestPrepareUnsupervisedDatasetFromRasterAlgorithm(TestCase):
         self.assertEqual((2028, 177), dump.X.shape)
         self.assertEqual(177, len(dump.features))
         self.assertListEqual(['band 8 (0.460000 Micrometers)', 'band 9 (0.465000 Micrometers)'], dump.features[:2])
-
-    def test_sampleSize(self):
-        raise NotImplementedError()

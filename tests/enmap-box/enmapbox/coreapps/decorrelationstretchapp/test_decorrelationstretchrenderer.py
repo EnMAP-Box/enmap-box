@@ -7,7 +7,7 @@ from sklearn.preprocessing import RobustScaler, MinMaxScaler
 
 from enmapbox.exampledata import enmap
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxprocessing.test.testcase import TestCase
+from enmapboxprocessing.testcase import TestCase
 from enmapboxprocessing.utils import Utils
 
 
