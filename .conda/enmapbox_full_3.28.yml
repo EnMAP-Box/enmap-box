@@ -36,6 +36,7 @@ dependencies:
   - typeguard
   - pytest
   - flake8
+  - docutils
 
   - pip:
     - enpt-enmapboxapp

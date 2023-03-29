@@ -6,6 +6,7 @@
 
 pytest
 pytest-env
+docutils
 
 # required to build the EnMAP-Box
 gitpython
