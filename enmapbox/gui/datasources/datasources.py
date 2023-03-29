@@ -94,7 +94,7 @@ class DataSource(TreeNode):
         return self.mDataItem.path()
 
     def uri(self) -> str:
-        warnings.warn('Use source()->str', DeprecationWarning)
+        warnings.warn('Use source()->str', DeprecationWarning, stacklevel=2)
         return self.source()
 
     def dataItem(self) -> QgsDataItem:
