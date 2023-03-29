@@ -88,5 +88,5 @@ if __name__ == '__main__':
     #                    action='store_true')
     args = parser.parse_args()
 
-    run(debug=args.debug, initProcessing=True, load_core_apps=True, load_other_apps=True)
+    run(debug=args.debug, load_core_apps=True, load_other_apps=True)
     s = ""
