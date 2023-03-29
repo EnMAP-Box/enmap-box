@@ -22,6 +22,7 @@ import unittest
 
 from enmapbox import DIR_REPO
 from enmapbox.testing import TestCase
+from qgis.core import QgsProject
 from qgis.utils import iface
 
 
@@ -56,6 +57,8 @@ class TestEnMAPBoxPlugin(TestCase):
         plugin.initGui()
         plugin.unload()
 
+        QgsProject.instance().removeAllMapLayers()
+
     @unittest.skipIf(not deploy_folder.is_dir(), 'Missing deploy folder')
     def test_loadplugin2(self):
         import qgis.utils
@@ -83,6 +86,8 @@ class TestEnMAPBoxPlugin(TestCase):
         import qgis.utils
         p = EnMAPBoxPlugin(qgis.utils.iface)
         p.initialDependencyCheck()
+
+        QgsProject.instance().removeAllMapLayers()
 
 
 if __name__ == '__main__':

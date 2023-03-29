@@ -13,24 +13,34 @@ __date__ = '2017-07-17'
 __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
 import pathlib
-import unittest
 import site
-from enmapbox import initPythonPaths, DIR_ENMAPBOX
+import unittest
+
+from enmapbox import DIR_ENMAPBOX
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import EnMAPBoxTestCase
 
-initPythonPaths()
 site.addsitedir(pathlib.Path(DIR_ENMAPBOX) / 'apps' / 'lmuapps')
+
+
+def has_package(name: str):
+    try:
+        __import__(name)
+        return True
+    except ModuleNotFoundError:
+        return False
 
 
 class test_applications(EnMAPBoxTestCase):
 
+    @unittest.skipIf(not has_package('scipy'), 'scipy is not installed')
     def test_MainUiFunc(self):
         from lmuapps.lmuvegetationapps.IVVRM.IVVRM_GUI import MainUiFunc
 
         m = MainUiFunc()
         self.showGui(m)
 
+    @unittest.skipIf(not has_package('scipy'), 'scipy is not installed')
     def test_application(self):
         EB = EnMAPBox.instance()
         if EB is None:

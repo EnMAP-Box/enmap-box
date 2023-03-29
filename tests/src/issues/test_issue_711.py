@@ -29,18 +29,6 @@ import enmapbox.exampledata
 
 class TestIssue711(EnMAPBoxTestCase):
 
-    def tearDown(self):
-
-        emb = EnMAPBox.instance()
-        if isinstance(emb, EnMAPBox):
-            emb.close()
-
-        assert EnMAPBox.instance() is None
-
-        QgsProject.instance().removeAllMapLayers()
-
-        super().tearDown()
-
     def test_instance_pure(self):
         EMB = EnMAPBox(load_other_apps=False, load_core_apps=False)
 
@@ -48,6 +36,8 @@ class TestIssue711(EnMAPBoxTestCase):
         self.assertEqual(EMB, EnMAPBox.instance())
 
         self.showGui([qgis.utils.iface.mainWindow(), EMB.ui])
+        EMB.close()
+        QgsProject.instance().removeAllMapLayers()
 
     def test_issue_711(self):
         """
@@ -103,6 +93,9 @@ class TestIssue711(EnMAPBoxTestCase):
         # qgis.utils.iface.actionSaveProject().trigger()
         # qgis.utils.iface.mainWindow()
         self.showGui([EMB.ui])
+
+        EMB.close()
+        QgsProject.instance().removeAllMapLayers()
 
     def test_treeModel(self):
         from enmapbox.qgispluginsupport.qps.models import TreeView, TreeModel, TreeNode

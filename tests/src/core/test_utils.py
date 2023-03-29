@@ -15,33 +15,20 @@ __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 import pickle
 import unittest
 
-from qgis.PyQt.QtWidgets import QMainWindow, QWidget, QVBoxLayout
 from osgeo import gdal
-from qgis.core import Qgis, QgsRasterLayer, QgsCoordinateReferenceSystem, QgsPointXY
 
 from enmapbox.exampledata import enmap
 from enmapbox.gui.utils import dataTypeName
 from enmapbox.qgispluginsupport.qps.utils import gdalDataset, displayBandNames, geo2px, layerGeoTransform, SpatialPoint
 from enmapbox.testing import EnMAPBoxTestCase
 from enmapbox.utils import findBroadBand
+from qgis.core import Qgis, QgsRasterLayer, QgsCoordinateReferenceSystem, QgsPointXY
 
 
-class testClassUtils(EnMAPBoxTestCase):
+class TestCasesUtils(EnMAPBoxTestCase):
     """Test resources work."""
-
-    def setUp(self):
-        self.w = QMainWindow()
-        self.cw = QWidget()
-        self.cw.setLayout(QVBoxLayout())
-        self.w.setCentralWidget(self.cw)
-        self.w.show()
-        self.menuBar = self.w.menuBar()
-        self.menuA = self.menuBar.addMenu('Menu A')
-        self.wmsUri = r'crs=EPSG:3857&format&type=xyz&url=https://mt1.google.com/vt/lyrs%3Ds%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D&zmax=19&zmin=0'
-        self.wfsUri = r'restrictToRequestBBOX=''1'' srsname=''EPSG:25833'' typename=''fis:re_postleit'' url=''http://fbinter.stadt-berlin.de/fb/wfs/geometry/senstadt/re_postleit'' version=''auto'''
-
-    def tearDown(self):
-        self.w.close()
+    wmsUri = r'crs=EPSG:3857&format&type=xyz&url=https://mt1.google.com/vt/lyrs%3Ds%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D&zmax=19&zmin=0'
+    wfsUri = r'restrictToRequestBBOX=''1'' srsname=''EPSG:25833'' typename=''fis:re_postleit'' url=''http://fbinter.stadt-berlin.de/fb/wfs/geometry/senstadt/re_postleit'' version=''auto'''
 
     def test_spatialObjects(self):
 

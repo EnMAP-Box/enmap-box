@@ -1,12 +1,13 @@
 from enmapbox.exampledata import enmap
-from enmapbox.gui.widgets.multiplemaplayerselectionwidget import MultipleMapLayerSelectionWidget
+from enmapbox.gui.widgets.multiplemaplayerselectionwidget.multiplemaplayerselectionwidget import \
+    MultipleMapLayerSelectionWidget
 from enmapbox.testing import EnMAPBoxTestCase
 from qgis.core import QgsRasterLayer
 
 
 class TestMultipleMapLayerSelectionWidget(EnMAPBoxTestCase):
 
-    def test(self):
+    def test_widget(self):
         from enmapbox import initAll
         from enmapbox.gui.enmapboxgui import EnMAPBox
 

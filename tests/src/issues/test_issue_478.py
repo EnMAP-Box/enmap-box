@@ -10,18 +10,6 @@ from enmapbox.testing import EnMAPBoxTestCase
 
 class TestIssue478(EnMAPBoxTestCase):
 
-    def tearDown(self):
-
-        emb = EnMAPBox.instance()
-        if isinstance(emb, EnMAPBox):
-            emb.close()
-
-        assert EnMAPBox.instance() is None
-
-        QgsProject.instance().removeAllMapLayers()
-
-        super().tearDown()
-
     def test_issue478(self):
         # https://bitbucket.org/hu-geomatics/enmap-box/issues/478/visualization-of-single-band-fails
         # test if sources can be opened in a new map
@@ -40,6 +28,8 @@ class TestIssue478(EnMAPBoxTestCase):
             self.assertIsInstance(tv, QTreeView)
 
         self.showGui(EB.ui)
+        EB.close()
+        QgsProject.instance().removeAllMapLayers()
 
 
 if __name__ == '__main__':

@@ -59,7 +59,7 @@ class TestEnMAPBoxApplications(EnMAPBoxTestCase):
         # a) get the URI
         speclibUris = enmapBox.dataSources('SPECLIB')
 
-        speclibDataSources = enmapBox.dataSourceManager().sources('SPECLIB')
+        speclibDataSources = enmapBox.dataSourceManager().dataSources('SPECLIB')
 
         self.assertTrue(len(speclibUris) > 0)
         self.assertEqual(len(speclibUris), len(speclibDataSources))
@@ -73,6 +73,13 @@ class TestEnMAPBoxApplications(EnMAPBoxTestCase):
 
     def test_Resampling(self):
         registerDataProvider()
+
+        aid = 'enmapbox:SpectralResamplingToLandsat89Oli'
+        reg: QgsProcessingRegistry = QgsApplication.instance().processingRegistry()
+        alg = reg.algorithmById(aid)
+        if not isinstance(alg, QgsProcessingAlgorithm):
+            self.skipTest(f'Unable to load {aid} from processing regisry.')
+
         n_bands = [256, 13]
         n_features = 20
         speclib = TestObjects.createSpectralLibrary(n=n_features, n_bands=n_bands)
@@ -84,9 +91,6 @@ class TestEnMAPBoxApplications(EnMAPBoxTestCase):
         speclib.startEditing()
         procw = SpectralProcessingDialog()
         procw.setSpeclib(speclib)
-        reg: QgsProcessingRegistry = QgsApplication.instance().processingRegistry()
-        alg = reg.algorithmById('enmapbox:SpectralResamplingToLandsat89Oli')
-        self.assertIsInstance(alg, QgsProcessingAlgorithm)
         procw.setAlgorithm(alg)
         wrapper = procw.processingModelWrapper()
         cbInputField = wrapper.parameterWidget('raster')

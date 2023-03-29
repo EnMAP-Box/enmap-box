@@ -21,10 +21,10 @@
 import datetime
 import unittest
 
-from osgeo import gdal, ogr
+from osgeo import gdal
 
 from enmapbox import initPythonPaths
-from enmapbox.exampledata import landcover_polygon, enmap
+from enmapbox.exampledata import enmap
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
 from metadataeditorapp.metadataeditor import MetadataEditorDialog
@@ -34,24 +34,6 @@ initPythonPaths()
 
 
 class MetadataEditorTests(EnMAPBoxTestCase):
-    @classmethod
-    def setUpClass(cls):
-        from enmapbox.testing import start_app
-        cls.qgsApp = start_app()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.qgsApp.quit()
-
-    def setUp(self):
-        self.dsR = gdal.Open(enmap)
-        self.dsV = ogr.Open(landcover_polygon)
-
-        drv = gdal.GetDriverByName('MEM')
-        self.dsRM = drv.CreateCopy('', self.dsR)
-
-        drv = ogr.GetDriverByName('Memory')
-        self.dsVM = drv.CopyDataSource(self.dsV, '')
 
     def createSupportedSources(self) -> list:
         from enmapbox.exampledata import enmap, landcover_polygon
@@ -105,6 +87,8 @@ class MetadataEditorTests(EnMAPBoxTestCase):
         dt = datetime.datetime.now() - t0
 
         self.showGui(d)
+
+        QgsProject.instance().removeAllMapLayers()
 
     @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'blocking Dialog')
     def test_MDDialog_EnMAPBox(self):

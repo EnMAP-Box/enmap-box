@@ -184,13 +184,6 @@ class test_applications(EnMAPBoxTestCase):
 
         print('finished')
 
-    def test_IVVM(self):
-
-        from lmuapps.lmuvegetationapps.IVVRM.IVVRM_GUI import MainUiFunc
-        m = MainUiFunc()
-
-        self.showGui(m)
-
     def test_deployed_apps(self):
 
         pathCoreApps = pathlib.Path(DIR_ENMAPBOX) / 'coreapps'

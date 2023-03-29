@@ -19,13 +19,9 @@
 import argparse
 import pathlib
 import site
-import sys
 
-from enmapbox import initAll
-from qgis.PyQt.QtGui import QGuiApplication
 from qgis.PyQt.QtWidgets import QApplication
-from qgis._core import QgsProject
-from qgis.core import QgsApplication
+from qgis.core import QgsProject, QgsApplication
 
 site.addsitedir(pathlib.Path(__file__).parents[1])
 
@@ -55,7 +51,7 @@ def run(
     if not qAppExists:
         from enmapbox.testing import start_app
         start_app()
-
+    from enmapbox import initAll
     initAll()
     from enmapbox.gui.enmapboxgui import EnMAPBox
     enmapBox = EnMAPBox(load_core_apps=load_core_apps, load_other_apps=load_other_apps)

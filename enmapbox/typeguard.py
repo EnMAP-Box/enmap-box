@@ -11,3 +11,7 @@ except (ImportError, ModuleNotFoundError):  # or mock them
 
     def check_type(*args, **kwds):
         pass
+
+# make typeguard classes / mocks searchable for IDE
+typechecked = typechecked
+check_type = check_type

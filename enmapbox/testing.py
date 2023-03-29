@@ -28,12 +28,10 @@ import sys
 
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu, QApplication
-
-from qgis.core import QgsApplication, QgsProcessingParameterRasterDestination, QgsProcessingParameterNumber, \
+from qgis.core import QgsProcessingParameterRasterDestination, QgsProcessingParameterNumber, \
     QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterRasterLayer, \
     QgsPythonRunner, QgsProcessingAlgorithm
 from qgis.gui import QgsPluginManagerInterface
-
 from .gui.enmapboxgui import EnMAPBox
 from .qgispluginsupport.qps.testing import TestObjects, TestCase, start_app
 
@@ -56,7 +54,7 @@ class EnMAPBoxTestCase(TestCase):
         tmpDir = cls.tempDir(cls)
         os.chdir(tmpDir)
         super().setUpClass(resources=resources)
-        QgsApplication.processEvents()
+
         # add test-dir as site lib
         from enmapbox import DIR_REPO
         DIR_TESTS = pathlib.Path(DIR_REPO) / 'tests'

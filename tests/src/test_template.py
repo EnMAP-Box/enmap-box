@@ -42,7 +42,7 @@ class EnMAPBoxTestCaseExample(EnMAPBoxTestCase):
 
         # cleanup.
         enmapBox.close()
-        QgsProject.instance().removeAllLayers()
+        QgsProject.instance().removeAllMapLayers()
 
 
 if __name__ == '__main__':

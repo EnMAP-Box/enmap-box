@@ -20,15 +20,14 @@
 **************************************************************************
 """
 
+from enmapbox import initAll
 # How to write a spectral library
-from enmapbox.qgispluginsupport.qps.speclib.core import profile_fields, profile_field_list, profile_field_names, \
-    is_spectral_library
+from enmapbox.qgispluginsupport.qps.speclib.core import profile_field_list, is_spectral_library
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import prepareProfileValueDict, encodeProfileValueDict, \
     decodeProfileValueDict
-from qgis.core import QgsVectorLayer, QgsField, QgsFeature, edit
-from enmapbox import initAll
 from enmapbox.testing import start_app
+from qgis.core import QgsVectorLayer, QgsField, QgsFeature, edit
 
 start_app()
 initAll()
@@ -93,5 +92,3 @@ pfield2 = profile_field_list(speclib)[0]
 for i, feature in enumerate(speclib2.getFeatures()):
     profileDict = decodeProfileValueDict(feature.attribute(pfield2.name()))
     print(f'Profile {i+1}: {profileDict}')
-
-
