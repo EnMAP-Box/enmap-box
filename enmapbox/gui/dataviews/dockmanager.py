@@ -533,20 +533,23 @@ class DockManager(QObject):
     def connectDockArea(self, dockArea: DockArea):
         assert isinstance(dockArea, DockArea)
 
-        dockArea.sigDragEnterEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
-        dockArea.sigDragMoveEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
-        dockArea.sigDragLeaveEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
-        dockArea.sigDropEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
-        self.mConnectedDockAreas.append(dockArea)
+        if dockArea not in self.mConnectedDockAreas:
+            dockArea.sigDragEnterEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
+            dockArea.sigDragMoveEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
+            dockArea.sigDragLeaveEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
+            dockArea.sigDropEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
+            self.mConnectedDockAreas.append(dockArea)
 
-    def currentDockArea(self):
-        if self.mCurrentDockArea not in self.mConnectedDockAreas and len(self.mConnectedDockAreas) > 0:
-            self.mCurrentDockArea = self.mConnectedDockAreas[0]
-        if self.mCurrentDockArea is None:
-            s = ""
-        return self.mCurrentDockArea
+    def currentDockArea(self) -> Optional[DockArea]:
+        """
+        Returns the current dock area.
+        """
+        for dockArea in self.mConnectedDockAreas:
+            if isinstance(dockArea, DockArea):
+                return dockArea
+        return None
 
-    def onDockAreaDragDropEvent(self, dockArea, event):
+    def onDockAreaDragDropEvent(self, dockArea: DockArea, event):
 
         assert isinstance(dockArea, DockArea)
 
