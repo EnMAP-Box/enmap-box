@@ -7,8 +7,8 @@ from warnings import warn
 
 import numpy as np
 from osgeo import gdal
-from typeguard import typechecked
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
