@@ -485,7 +485,6 @@ class DockManager(QObject):
     def __init__(self):
         QObject.__init__(self)
         self.mConnectedDockAreas = []
-        self.mCurrentDockArea = None
         self.mDocks = list()
         self.mDataSourceManager: Optional[DataSourceManager] = None
         self.mMessageBar: QgsMessageBar = Optional[None]
