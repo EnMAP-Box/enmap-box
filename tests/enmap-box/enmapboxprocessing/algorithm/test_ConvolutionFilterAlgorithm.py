@@ -94,14 +94,3 @@ class TestConvolutionFilterAlgorithm(TestCase):
                 alg.P_OUTPUT_RASTER: self.filename('filtered.tif')
             }
             self.runalg(alg, parameters)
-
-    def _test_debug_issue_1319(self):
-        alg = SpatialConvolutionGaussian2DAlgorithm()
-        parameters = {
-            alg.P_RASTER: r'D:\data\issues\bitbucket\1319\01_11_water_binary_2020.tif',
-            alg.P_KERNEL: alg.defaultCodeAsString(),
-            alg.P_OUTPUT_RASTER: self.filename('filtered.tif')
-        }
-
-        if self.fileExists(parameters[alg.P_RASTER]):
-            self.runalg(alg, parameters)

@@ -7,8 +7,6 @@ from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifie
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import classifierDumpPkl
 
-openReport = True
-
 
 class FitTestClassifierAlgorithm(FitClassifierAlgorithmBase):
 
@@ -36,7 +34,7 @@ class TestClassificationAlgorithm(TestCase):
             alg.P_CLASSIFIER: FitTestClassifierAlgorithm().defaultCodeAsString(),
             alg.P_RASTER: enmap,
             alg.P_NFOLD: 10,
-            alg.P_OPEN_REPORT: openReport,
+            alg.P_OPEN_REPORT: self.openReport,
             alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl'),
             alg.P_OUTPUT_CLASSIFICATION: self.filename('classification.tif'),
             alg.P_OUTPUT_PROBABILITY: self.filename('probability.tif'),
@@ -50,7 +48,7 @@ class TestClassificationAlgorithm(TestCase):
             alg.P_DATASET: classifierDumpPkl,
             alg.P_CLASSIFIER: FitCatBoostClassifierAlgorithm().defaultCodeAsString(),
             alg.P_RASTER: enmap,
-            alg.P_OPEN_REPORT: openReport,
+            alg.P_OPEN_REPORT: self.openReport,
             alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl'),
             alg.P_OUTPUT_CLASSIFICATION: self.filename('classification.tif'),
             alg.P_OUTPUT_PROBABILITY: self.filename('probability.tif'),

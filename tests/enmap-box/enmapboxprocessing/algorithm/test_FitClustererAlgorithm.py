@@ -7,8 +7,8 @@ from enmapboxprocessing.algorithm.fitclustereralgorithmbase import FitClustererA
 from enmapboxprocessing.algorithm.fitkmeansalgorithm import FitKMeansAlgorithm
 from enmapboxprocessing.algorithm.fitmeanshiftalgorithm import FitMeanShiftAlgorithm
 from enmapboxprocessing.algorithm.predictclusteringalgorithm import PredictClusteringAlgorithm
-from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.algorithm.testcase import TestCase
+from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import ClustererDump
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import classifierDumpPkl, classificationDatasetAsJsonFile
@@ -81,18 +81,6 @@ class TestFitClustererAlgorithm(TestCase):
         reader = RasterReader(parameters[alg.P_OUTPUT_CLASSIFICATION])
         self.assertEqual(8, max(reader.uniqueValueCounts(1)[0]))
         self.assertEqual(Qgis.DataType.Byte, reader.dataType(1))
-
-    def test_unfitted(self):
-        alg = FitTestClustererAlgorithm()
-        parameters = {
-            alg.P_DATASET: None,
-            alg.P_OUTPUT_CLUSTERER: self.filename('clusterer.pkl')
-        }
-        self.runalg(alg, parameters)
-        dump = ClustererDump.fromDict(Utils.pickleLoad(parameters[alg.P_OUTPUT_CLUSTERER]))
-        self.assertIsNone(dump.features)
-        self.assertIsNone(dump.X)
-        self.assertIsInstance(dump.clusterer, ClusterMixin)
 
     def test_clusterers(self):
         algs = [

@@ -1,15 +1,14 @@
 import unittest.case
-import warnings
-from os.path import join, dirname, exists
+from os.path import join, dirname
 from typing import Union
 
 import numpy as np
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import Array2d, Array3d, Number
 from qgis.core import QgsRectangle, QgsCoordinateReferenceSystem
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -43,14 +42,8 @@ class TestCase(unittest.case.TestCase):
         return self.rasterFromArray(array, basename, extent, crs)
 
     def rasterFromValue(
-            self, shape, value, basename: str = None, extent: QgsRectangle = None, crs: QgsCoordinateReferenceSystem = None
+            self, shape, value, basename: str = None, extent: QgsRectangle = None,
+            crs: QgsCoordinateReferenceSystem = None
     ) -> RasterWriter:
         array = np.full(shape, value)
         return self.rasterFromArray(array, basename, extent, crs)
-
-    def fileExists(self, filename):
-        if exists(filename):
-            return True
-        else:
-            warnings.warn(f'Skipping test using local file: {filename}')
-            return False

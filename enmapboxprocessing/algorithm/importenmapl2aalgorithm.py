@@ -177,8 +177,9 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                         vrtBandFilenames.append(vrtStackFilename)
                         bandNumbers.append(bandNo)
 
-                GdalUtils.stackVrtBands(filename, vrtBandFilenames, bandNumbers)
-                ds: gdal.Dataset = gdal.Open(filename)
+                vrtStackFilename = Utils.tmpFilename(filename, 'stack.vrt')
+                GdalUtils.stackVrtBands(vrtStackFilename, vrtBandFilenames, bandNumbers)
+                ds: gdal.Dataset = gdal.Translate(filename, vrtStackFilename)
                 bandList = list(range(1, len(wavelength) + 1))
 
             # update metadata

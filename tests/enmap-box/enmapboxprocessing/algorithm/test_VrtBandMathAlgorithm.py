@@ -1,6 +1,6 @@
 from enmapbox.exampledata import enmap
-from enmapboxprocessing.algorithm.vrtbandmathalgorithm import VrtBandMathAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
+from enmapboxprocessing.algorithm.vrtbandmathalgorithm import VrtBandMathAlgorithm
 
 
 class TestVrtBandMathAlgorithm(TestCase):

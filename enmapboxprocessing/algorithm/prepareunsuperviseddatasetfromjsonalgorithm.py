@@ -48,7 +48,11 @@ class PrepareUnsupervisedDatasetFromJsonAlgorithm(EnMAPProcessingAlgorithm):
             json['X'] = np.array(json['X'])
             json['y'] = np.array(json['y'])
             dump = TransformerDump.fromDict(json)
-            Utils.pickleDump(dump.__dict__, filename)
+
+            if filename.endswith('.pkl'):
+                Utils.pickleDump(dump.__dict__, filename)
+            elif filename.endswith('.json'):
+                Utils.jsonDump(dump.__dict__, filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)

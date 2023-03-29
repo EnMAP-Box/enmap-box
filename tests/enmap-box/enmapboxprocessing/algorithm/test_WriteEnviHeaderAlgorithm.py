@@ -1,10 +1,10 @@
 from osgeo import gdal
 
 from enmapbox.exampledata import enmap
+from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.algorithm.writeenviheaderalgorithm import WriteEnviHeaderAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
-from enmapboxprocessing.algorithm.testcase import TestCase
 from qgis.core import QgsProcessingException
 
 

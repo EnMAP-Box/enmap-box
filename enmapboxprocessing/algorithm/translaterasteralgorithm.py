@@ -319,12 +319,17 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
             reader = RasterReader(raster)
             if bandList is None:
                 bandList = range(1, reader.bandCount() + 1)
+            metadata = reader.metadata()
             if copyMetadata:
-                metadata = reader.metadata()
                 writer.setMetadata(metadata)
-                for dstBandNo, srcBandNo in enumerate(bandList, 1):
-                    # general metadata
-                    metadata = reader.metadata(srcBandNo)
+            else:
+                for domain in metadata:
+                    writer.setMetadataDomain({}, domain)
+            for dstBandNo, srcBandNo in enumerate(bandList, 1):
+                # general metadata
+                metadata = reader.metadata(srcBandNo)
+
+                if copyMetadata:
                     writer.setMetadata(metadata, dstBandNo)
                     # band name
                     bandName = reader.bandName(srcBandNo)
@@ -336,11 +341,9 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                     writer.setFwhm(fwhm, dstBandNo)
                     badBandMultiplier = reader.badBandMultiplier(srcBandNo)
                     writer.setBadBandMultiplier(badBandMultiplier, dstBandNo)
-            else:
-                pass
-                # writer.removeMetadata()
-                # for bandNo in writer.bandNumbers():
-                #    writer.removeMetadata(bandNo)
+                else:
+                    for domain in metadata:
+                        writer.setMetadataDomain({}, domain)
 
             # clean up ENVI metadata domain (see #1098)
             metadata = reader.metadataDomain('ENVI')
