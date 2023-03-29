@@ -223,7 +223,7 @@ class DockTreeNode(LayerTreeNode):
         """
         Returns the map layer related to this dock
         """
-        raise NotImplementedError()
+        return [lt.layer() for lt in self.findLayers()]
 
 
 class TextDockTreeNode(DockTreeNode):
@@ -379,6 +379,7 @@ class MapDockTreeNode(DockTreeNode):
 
         # ensure that layers have a project
         unregistered = [lyr for lyr in self.mLayers if not isinstance(lyr.project(), QgsProject)]
+
         if self.mapCanvas() is None:
             s = ""
         if self.mapCanvas().project() is None:
@@ -791,9 +792,11 @@ class DockManagerTreeModel(QgsLayerTreeModel):
         assert isinstance(dockManager, DockManager)
         super(DockManagerTreeModel, self).__init__(self.rootNode, parent)
         self.columnNames = ['Property', 'Value']
-        self.mProject: QgsProject = dockManager.project() \
-            if isinstance(dockManager.project(), QgsProject) \
-            else QgsProject.instance()
+
+        if isinstance(dockManager.project(), QgsProject):
+            self.mProject = dockManager.project()
+        else:
+            self.mProject: QgsProject.instance()
 
         if True:
             """
