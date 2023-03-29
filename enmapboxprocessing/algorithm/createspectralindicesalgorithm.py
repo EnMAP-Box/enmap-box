@@ -207,7 +207,7 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
             ds = gdal.Translate(filename, filenameTmpStack)
             writer = RasterWriter(ds)
             for bandNo, (ifilename, metadata) in enumerate(zip(filenames, metadatas), 1):
-                writer.setBandName(metadata['short_name'], bandNo)
+                writer.setBandName(f"{metadata['short_name']} - {metadata['long_name']}", bandNo)
                 writer.setMetadataDomain(metadata, '', bandNo)
             writer = None
             ds = None
