@@ -24,6 +24,7 @@ import sys
 from enmapbox import initAll
 from qgis.PyQt.QtGui import QGuiApplication
 from qgis.PyQt.QtWidgets import QApplication
+from qgis._core import QgsProject
 from qgis.core import QgsApplication
 
 site.addsitedir(pathlib.Path(__file__).parents[1])
@@ -38,7 +39,7 @@ def exitAll(*args):
     print('## Quit QgsApplication')
     r = QgsApplication.quit()
     print('## QgsApplication down')
-    sys.exit(0)
+    # sys.exit(0)
 
 
 def run(
@@ -74,8 +75,9 @@ def run(
 
     if not qAppExists:
         print('Execute QgsApplication')
-        enmapBox.sigClosed.connect(exitAll)
+        # enmapBox.sigClosed.connect(exitAll)
         exit_code = QgsApplication.instance().exec_()
+        QgsProject.instance().removeAllMapLayers()
         return exit_code
     else:
         return 0
