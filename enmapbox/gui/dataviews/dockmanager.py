@@ -1798,23 +1798,28 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
 
         # add apply model shortcuts
         from enmapbox.gui.enmapboxgui import EnMAPBox
-        enmapBox = EnMAPBox.instance()
+        enmapBox = self.enmapboxInstance()
+
         classifiers = list()
         regressors = list()
         transformers = list()
         clusterers = list()
-        modelDataSource: ModelDataSource
-        for modelDataSource in enmapBox.dataSources('MODEL', False):
-            if not isinstance(modelDataSource.mPklObject, dict):
-                continue
-            if modelDataSource.mPklObject.get('classifier') is not None:
-                classifiers.append(modelDataSource)
-            if modelDataSource.mPklObject.get('regressor') is not None:
-                regressors.append(modelDataSource)
-            if modelDataSource.mPklObject.get('transformer') is not None:
-                transformers.append(modelDataSource)
-            if modelDataSource.mPklObject.get('clusterer') is not None:
-                clusterers.append(modelDataSource)
+
+        if isinstance(enmapBox, EnMAPBox):
+            for modelDataSource in enmapBox.dataSources('MODEL', False):
+                modelDataSource: ModelDataSource
+
+                if not (isinstance(modelDataSource, ModelDataSource) and isinstance(modelDataSource.mPklObject, dict)):
+                    continue
+                if modelDataSource.mPklObject.get('classifier') is not None:
+                    classifiers.append(modelDataSource)
+                if modelDataSource.mPklObject.get('regressor') is not None:
+                    regressors.append(modelDataSource)
+                if modelDataSource.mPklObject.get('transformer') is not None:
+                    transformers.append(modelDataSource)
+                if modelDataSource.mPklObject.get('clusterer') is not None:
+                    clusterers.append(modelDataSource)
+
         if len(classifiers + regressors + transformers + clusterers) > 0:
             submenu = menu.addMenu(QIcon(':/images/themes/default/processingAlgorithm.svg'),
                                    'Apply model')
