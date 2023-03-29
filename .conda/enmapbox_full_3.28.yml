@@ -30,10 +30,15 @@ dependencies:
   - pyopengl
   - netcdf4
   - h5py
+  # Development
   - gitpython
   - git-lfs
   - typeguard
+  - pytest
+  - flake8
+
   - pip:
     - enpt-enmapboxapp
+    - flake8-qgis
 variables:
   QT_MAC_WANTS_LAYER: 1

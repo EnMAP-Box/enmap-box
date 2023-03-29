@@ -6,5 +6,15 @@ channels:
 dependencies:
   - qgis>=3.30
   - pip
+
+  # Development
+  - gitpython
+  - git-lfs
+  - typeguard
+  - pytest
+  - flake8
+
+  - pip:
+      - flake8-qgis
 variables:
   QT_MAC_WANTS_LAYER: 1
