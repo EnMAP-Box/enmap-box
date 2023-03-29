@@ -1748,9 +1748,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             dir_exampledata = os.path.dirname(enmapbox.exampledata.__file__)
             files = list(pathlib.Path(f).as_posix() for f in file_search(dir_exampledata, rx, recursive=True))
 
-            self.addSources(files)
-            exampleSources = [s for s in self.dataSourceManager().dataSources()
-                              if isinstance(s, SpatialDataSource) and s.source() in files]
+            exampleSources = self.addSources(files)
+            exampleSources = [s for s in exampleSources if isinstance(s, SpatialDataSource)]
 
             for n in range(mapWindows):
                 dock: MapDock = self.createDock('MAP')
@@ -2003,7 +2002,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         """
         return self.mDockManager.docks(dockType=dockType)
 
-    def addSources(self, sourceList):
+    def addSources(self, sourceList) -> List[DataSource]:
         """
         :param sourceList:
         :return: Returns a list of added DataSources or the list of DataSources that were derived from a single data source uri.
