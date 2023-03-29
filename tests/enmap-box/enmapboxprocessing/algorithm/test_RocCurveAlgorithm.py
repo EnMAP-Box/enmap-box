@@ -14,7 +14,7 @@ class TestRocCurveAlgorithm(TestCase):
         parameters = {
             alg.P_PROBABILITY: fraction_map_l3,
             alg.P_REFERENCE: landcover_polygon,
-            alg.P_OPEN_REPORT: openReport,
+            alg.P_OPEN_REPORT: self.openReport,
             alg.P_OUTPUT_REPORT: self.filename('report.html'),
         }
         self.runalg(alg, parameters)
@@ -25,7 +25,7 @@ class TestRocCurveAlgorithm(TestCase):
         parameters = {
             alg.P_PROBABILITY: fraction_polygon_l3,
             alg.P_REFERENCE: landcover_polygon_3classes,
-            alg.P_OPEN_REPORT: openReport,
+            alg.P_OPEN_REPORT: self.openReport,
             alg.P_OUTPUT_REPORT: self.filename('report_perfectMap.html'),
         }
         self.runalg(alg, parameters)

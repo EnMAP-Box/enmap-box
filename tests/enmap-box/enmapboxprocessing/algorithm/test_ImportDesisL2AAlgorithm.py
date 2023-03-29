@@ -1,20 +1,22 @@
 import numpy as np
 
 from enmapboxprocessing.algorithm.importdesisl2aalgorithm import ImportDesisL2AAlgorithm
-from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.algorithm.testcase import TestCase
+from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxtestdata import sensorProductsRoot, SensorProducts
 
 
 class TestImportDesisL2AAlgorithm(TestCase):
 
     def test(self):
+        if sensorProductsRoot() is None:
+            return
+
         alg = ImportDesisL2AAlgorithm()
         parameters = {
-            alg.P_FILE: r'D:\data\sensors\desis\DESIS-HSI-L2A-DT1203190212_025-20191203T021128-V0210\DESIS-HSI-L2A-DT1203190212_025-20191203T021128-V0210-METADATA.xml',
+            alg.P_FILE: SensorProducts.Desis.L2A_MetadataXml,
             alg.P_OUTPUT_RASTER: self.filename('desisL2A.vrt'),
         }
-        if not self.fileExists(parameters[alg.P_FILE]):
-            return
 
         result = self.runalg(alg, parameters)
         self.assertEqual(

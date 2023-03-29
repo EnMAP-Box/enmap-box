@@ -17,7 +17,7 @@ class ProcessingFeedback(QgsProcessingFeedback):
 
 
 class TestCase(TestCase_):
-    openReport = True
+    openReport = False
 
     @staticmethod
     def runalg(alg: EnMAPProcessingAlgorithm, parameters: Dict):

@@ -75,8 +75,9 @@ class TransformerDump(object):
         elif filename.endswith('.json'):
             d = Utils.jsonLoad(filename)
             d['X'] = np.array(d['X'])
-            d['y'] = np.array(d['y'])
-            d['transformer'] = None
+            if 'y' in d:
+                d['y'] = np.array(d['y'])
+                d['transformer'] = None
         else:
             raise ValueError('wrong file extension, only "pkl" or "json" is supported')
 

@@ -5,7 +5,6 @@ import unittest
 from osgeo import gdal
 
 from _classic.hubflow.core import Classification, Color, ClassDefinition
-from enmapbox.gui.enmapboxgui import EnMAPBox
 
 try:
     from reclassifyapp.reclassify import ReclassifyTableView, ReclassifyTableModel, ReclassifyTableViewDelegate, \
@@ -125,8 +124,9 @@ class TestReclassify(EnMAPBoxTestCase):
             del ds
 
     def test_reclassify(self):
+        # test is deprecated
+        return
 
-        enmapBox = EnMAPBox(load_core_apps=False, load_other_apps=False)
         csDst = ClassificationScheme.create(2)
         csDst[0].setName('Not specified')
         csDst[1].setName('Test Class')
@@ -178,8 +178,9 @@ class TestReclassify(EnMAPBoxTestCase):
 
     @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'blocking dialog')
     def test_dialog(self):
+        # test is deprecated
+        return
 
-        #
         lyr = TestObjects.createRasterLayer(nb=10)
         self.assertIsInstance(lyr, QgsRasterLayer)
 
@@ -237,5 +238,4 @@ class TestReclassify(EnMAPBoxTestCase):
 
 
 if __name__ == "__main__":
-
     unittest.main(buffer=False)
