@@ -25,7 +25,7 @@ from typing import Optional, List, Dict
 
 from enmapbox import debugLog, messageLog
 from enmapbox.gui import \
-    SpectralLibrary, SpectralLibraryWidget, SpatialExtent, showLayerPropertiesDialog
+    SpectralLibraryWidget, SpatialExtent, showLayerPropertiesDialog
 from enmapbox.gui.datasources.datasources import DataSource, ModelDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager
 from enmapbox.gui.dataviews.docks import Dock, DockArea, \
@@ -279,7 +279,7 @@ class SpeclibDockTreeNode(DockTreeNode):
             speclib.committedFeaturesRemoved.connect(self.updateNodes)
             self.updateNodes()
 
-    def speclib(self) -> SpectralLibrary:
+    def speclib(self) -> QgsVectorLayer:
         return self.speclibWidget().speclib()
 
     def speclibWidget(self) -> SpectralLibraryWidget:
@@ -290,7 +290,7 @@ class SpeclibDockTreeNode(DockTreeNode):
         PROFILES = dict()
         debugLog('update speclib nodes')
         if isinstance(self.mSpeclibWidget, SpectralLibraryWidget):
-            sl: SpectralLibrary = self.mSpeclibWidget.speclib()
+            sl: QgsVectorLayer = self.mSpeclibWidget.speclib()
             if is_spectral_library(sl):
                 # count number of profiles
                 n = 0
@@ -541,6 +541,8 @@ class DockManager(QObject):
     def currentDockArea(self):
         if self.mCurrentDockArea not in self.mConnectedDockAreas and len(self.mConnectedDockAreas) > 0:
             self.mCurrentDockArea = self.mConnectedDockAreas[0]
+        if self.mCurrentDockArea is None:
+            s = ""
         return self.mCurrentDockArea
 
     def onDockAreaDragDropEvent(self, dockArea, event):
@@ -718,6 +720,7 @@ class DockManager(QObject):
             from enmapbox.gui.enmapboxgui import EnMAPBox
             if isinstance(self.mEnMAPBoxInstance, EnMAPBox):
                 dock.sigRenderStateChanged.connect(self.mEnMAPBoxInstance.ui.mProgressBarRendering.toggleVisibility)
+            dock.mapCanvas().setProject(self.project())
             dock.mapCanvas().enableMapTileRendering(True)
             dock.mapCanvas().setParallelRenderingEnabled(True)
             dock.mapCanvas().setPreviewJobsEnabled(True)
@@ -788,7 +791,9 @@ class DockManagerTreeModel(QgsLayerTreeModel):
         assert isinstance(dockManager, DockManager)
         super(DockManagerTreeModel, self).__init__(self.rootNode, parent)
         self.columnNames = ['Property', 'Value']
-        self.mProject: QgsProject = QgsProject.instance()
+        self.mProject: QgsProject = dockManager.project() \
+            if isinstance(dockManager.project(), QgsProject) \
+            else QgsProject.instance()
 
         if True:
             """

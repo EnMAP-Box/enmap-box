@@ -1,10 +1,10 @@
 from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.testing import initQgisApplication
+from enmapbox.testing import start_app
 from _classic.classificationapp.core import ClassificationWorkflowApp
 
 if __name__ == '__main__':
 
-    qgsApp = initQgisApplication()
+    qgsApp = start_app()
 
     #import qgisresources.images
     #qgisresources.images.qInitResources()

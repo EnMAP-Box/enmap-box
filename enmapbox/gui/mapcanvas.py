@@ -807,7 +807,7 @@ class MapCanvasMapTools(QObject):
         self.mtPixelScaleExtent = PixelScaleExtentMapTool(canvas)
         self.mtFullExtentMapTool = FullExtentMapTool(canvas)
         self.mtCursorLocation = CursorLocationMapTool(canvas, True)
-        self.mtAddFeature = QgsMapToolAddFeature(canvas, QgsMapToolCapture.CaptureNone, cadDock)
+        self.mtAddFeature = QgsMapToolAddFeature(canvas, cadDock, mode=QgsMapToolCapture.CaptureNone)
         self.mtSelectFeature = QgsMapToolSelect(canvas)
 
     def mapTools(self) -> List[QgsMapTool]:

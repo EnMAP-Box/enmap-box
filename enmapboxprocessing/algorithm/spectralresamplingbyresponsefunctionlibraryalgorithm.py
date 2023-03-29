@@ -3,13 +3,12 @@ from collections import OrderedDict
 from typing import Dict, Any, List, Tuple
 
 from enmapbox.qgispluginsupport.qps.speclib import FIELD_VALUES
-from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibrary
 from enmapboxprocessing.algorithm.spectralresamplingbyresponsefunctionconvolutionalgorithmbase import \
     RESPONSE_CUTOFF_VALUE, RESPONSE_CUTOFF_DIGITS
 from enmapboxprocessing.algorithm.spectralresamplingtocustomsensoralgorithm import \
     SpectralResamplingToCustomSensorAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException,
+from qgis.core import (QgsProcessingContext, QgsVectorLayer, QgsProcessingFeedback, QgsProcessingException,
                        QgsProcessingParameterField)
 from enmapbox.typeguard import typechecked
 
@@ -63,7 +62,7 @@ class SpectralResamplingByResponseFunctionLibraryAlgorithm(EnMAPProcessingAlgori
             self.tic(feedback, parameters, context)
 
             try:
-                spectralLibrary = SpectralLibrary(library.source())
+                spectralLibrary = QgsVectorLayer(library.source())
             except Exception as error:
                 traceback.print_exc()
                 message = f"failed to open spectral library: {error}"

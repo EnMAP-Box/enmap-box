@@ -70,7 +70,7 @@ class EnMAPBoxProjectSettings(object):
 
         if not isinstance(settings, dict):
             return
-        
+
         enmapBox = EnMAPBox.instance()
 
         # QGIS GUI

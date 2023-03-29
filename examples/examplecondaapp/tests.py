@@ -4,10 +4,10 @@ __author__ = 'benjamin.jakimow@geo.hu-berlin.de'
 
 import unittest
 import os
-from enmapbox.testing import initQgisApplication
+from enmapbox.testing import start_app
 from examplecondaapp.exampleapp import AnacondaEnvironmentInfo
 
-QGIS_APP = initQgisApplication()
+QGIS_APP = start_app()
 
 ANACONDA_ROOT = r'C:\Users\geo_beja\AppData\Local\Continuum\miniconda3'
 assert os.path.isdir(ANACONDA_ROOT), 'This test requires to specify a local Anaconda Environment'

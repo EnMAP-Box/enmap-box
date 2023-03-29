@@ -7,14 +7,14 @@ from warnings import warn
 import numpy as np
 from osgeo import gdal
 
-from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibrary
-from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import SpectralProfile
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import Array3d, Number
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
+from qgis.core import (QgsFeature, QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, edit)
 from enmapbox.typeguard import typechecked
+from qps.speclib.core.spectrallibrary import SpectralLibraryUtils
+from qps.speclib.core.spectralprofile import prepareProfileValueDict, encodeProfileValueDict
 
 RESPONSE_CUTOFF_VALUE = 0.001
 RESPONSE_CUTOFF_DIGITS = 3
@@ -164,19 +164,22 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
 
             if saveResponseFunction:
 
-                library = SpectralLibrary()
-                profiles = list()
+                library = SpectralLibraryUtils.createSpectralLibrary()
+                iField = library.fields().indexOf('profiles')
+                field = library.fields().at(iField)
+                assert iField >= 0
+                features = list()
                 for name in responses:
                     values = responses[name]
-                    profile = SpectralProfile()
-                    profile.setName(name)
                     x = [xi for xi, yi in values]
                     y = [yi for xi, yi in values]
-                    profile.setValues(x, y, 'Nanometers')
-                    profiles.append(profile)
-                library.startEditing()
-                library.addProfiles(profiles)
-                library.commitChanges()
+                    profile = prepareProfileValueDict(x=x, y=y, xUnit='nm')
+                    feature = QgsFeature(library.fields())
+                    feature.setAttribute(iField, encodeProfileValueDict(profile, encoding=field))
+                    features.append(feature)
+
+                with edit(library):
+                    library.addFeatures(features)
                 library.write(filename + '.srf.gpkg')
 
             result = {self.P_OUTPUT_RASTER: filename}

@@ -4,6 +4,8 @@
 # see https://www.python.org/dev/peps/pep-0440/#version-specifiers
 ###### Requirements ######
 
+pytest
+
 # required to build the EnMAP-Box
 gitpython
 

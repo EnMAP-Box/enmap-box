@@ -5,7 +5,7 @@ from osgeo import gdal
 
 from enmapbox.exampledata import landcover_polygon, enmap, hires
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
-from enmapbox.testing import initQgisApplication
+from enmapbox.testing import start_app
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.testcase import TestCase
@@ -570,7 +570,7 @@ class TestUtils(TestCase):
         )
 
     def test_mapCanvasCrs(self):
-        app = initQgisApplication()
+        app = start_app()
         crs = QgsCoordinateReferenceSystem().fromEpsgId(4326)
         mapCanvas = QgsMapCanvas()
         mapCanvas.setDestinationCrs(crs)
@@ -602,7 +602,7 @@ class TestUtils(TestCase):
         print(Utils.getTempDirInTempFolder())
 
     def test_QgsMapLayer_reload(self):
-        app = initQgisApplication()
+        app = start_app()
 
         # create a raster
         filename = self.filename('raster.tif')

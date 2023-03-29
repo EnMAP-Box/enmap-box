@@ -16,17 +16,19 @@
 *                                                                         *
 **************************************************************************
 """
-import sys
 import argparse
 import pathlib
 import site
+import sys
 
+from enmapbox import initAll
 from qgis.PyQt.QtGui import QGuiApplication
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import QgsApplication
 
 site.addsitedir(pathlib.Path(__file__).parents[1])
 from enmapbox.testing import start_app
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.resources import findQGISResourceFiles
 
 qApp: QgsApplication = None
@@ -61,10 +63,9 @@ def run(
         print('## QgsApplication created')
     else:
         print('## QgsApplication exists')
-        from enmapbox import initAll
-        initAll()
 
-    from enmapbox.gui.enmapboxgui import EnMAPBox
+    initAll()
+
     enmapBox = EnMAPBox(load_core_apps=load_core_apps, load_other_apps=load_other_apps)
     enmapBox.run()
     print('## EnMAP-Box started')

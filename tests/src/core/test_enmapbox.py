@@ -26,7 +26,6 @@ from enmapbox import DIR_REPO
 from enmapbox.gui.dataviews.docks import SpectralLibraryDock, MapDock, Dock
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import MapCanvas
-from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import SpectralProfile
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
@@ -347,10 +346,6 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         self.assertIsInstance(slw, SpectralLibraryWidget)
         self.assertTrue(len(slw.speclib()) == 0)
         center = SpatialPoint.fromMapCanvasCenter(mapDock.mapCanvas())
-
-        profiles = SpectralProfile.fromMapCanvas(mapDock.mapCanvas(), center)
-        for p in profiles:
-            self.assertIsInstance(p, SpectralProfile)
 
 
 if __name__ == '__main__':

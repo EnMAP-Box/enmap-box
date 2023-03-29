@@ -70,9 +70,9 @@ class AboutDialog(QDialog):
 
 
 if __name__ == '__main__':
-    from enmapbox.testing import initQgisApplication
+    from enmapbox.testing import start_app
 
-    app = initQgisApplication()
+    app = start_app()
     d = AboutDialog()
     d.show()
     app.exec_()

@@ -70,6 +70,7 @@ class MapCanvasTests(EnMAPBoxTestCase):
         mapCanvas.keyPressed.connect(onKeyPressed)
 
         self.showGui(mapCanvas)
+        QgsProject.instance().removeAllMapLayers()
 
     def test_canvaslinks(self):
         canvases = []
@@ -122,6 +123,8 @@ class MapCanvasTests(EnMAPBoxTestCase):
         self.assertTrue(c2.center() == center3)
         self.assertTrue(c3.center() == center3)
 
+        QgsProject.instance().removeAllMapLayers()
+
     def test_mapCrosshairDistance(self):
 
         lyrWorld = QgsRasterLayer(TestObjects.uriWMS(), 'Background', 'wms')
@@ -141,6 +144,8 @@ class MapCanvasTests(EnMAPBoxTestCase):
             canvas.zoomToProjectExtent()
         canvas.setCrosshairVisibility(True)
         self.showGui(canvas)
+
+        QgsProject.instance().removeAllMapLayers()
 
     def test_mapLinking(self):
 

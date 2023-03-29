@@ -1,5 +1,6 @@
 # Untracked directories
 .idea/
+.pytest_cache/
 deploy/
 build/
 tmp/
