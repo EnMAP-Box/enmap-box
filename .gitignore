@@ -12,7 +12,9 @@ test-outputs/
 qgisresources
 qgisresources/
 qgisresources.zip
-
+examples/*.geojson
+examples/*.json
+examples/*.qml
 symbology-style.db
 # enmapbox/exampledata/*.gpkg
 
