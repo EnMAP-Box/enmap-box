@@ -16,5 +16,7 @@ dependencies:
 
   - pip:
       - flake8-qgis
+      - pytest-env
+
 variables:
   QT_MAC_WANTS_LAYER: 1
