@@ -27,9 +27,6 @@ from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import QgsApplication
 
 site.addsitedir(pathlib.Path(__file__).parents[1])
-from enmapbox.testing import start_app
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.qgispluginsupport.qps.resources import findQGISResourceFiles
 
 qApp: QgsApplication = None
 
@@ -39,33 +36,26 @@ def exitAll(*args):
     QApplication.closeAllWindows()
     QApplication.processEvents()
     print('## Quit QgsApplication')
-    QgsApplication.quit()
+    r = QgsApplication.quit()
     print('## QgsApplication down')
-    qApp = None
     sys.exit(0)
 
 
 def run(
         sources: list = None,
-        initProcessing=False,
-        load_core_apps=False, load_other_apps=False,
-        debug: bool = False
+        load_core_apps=False,
+        load_other_apps=False,
 ):
     """
     Starts the EnMAP-Box GUI.
     """
-    global qApp
-    qAppExists = isinstance(qApp, QgsApplication)
+    qAppExists = isinstance(QgsApplication.instance(), QgsApplication)
     if not qAppExists:
-        print('## Create a QgsApplication...')
-        qApp = start_app(resources=findQGISResourceFiles())
-        QGuiApplication.instance().lastWindowClosed.connect(qApp.quit)
-        print('## QgsApplication created')
-    else:
-        print('## QgsApplication exists')
+        from enmapbox.testing import start_app
+        start_app()
 
     initAll()
-
+    from enmapbox.gui.enmapboxgui import EnMAPBox
     enmapBox = EnMAPBox(load_core_apps=load_core_apps, load_other_apps=load_other_apps)
     enmapBox.run()
     print('## EnMAP-Box started')
@@ -84,7 +74,7 @@ def run(
     if not qAppExists:
         print('Execute QgsApplication')
         enmapBox.sigClosed.connect(exitAll)
-        exit_code = qApp.exec_()
+        exit_code = QgsApplication.instance().exec_()
         return exit_code
     else:
         return 0
