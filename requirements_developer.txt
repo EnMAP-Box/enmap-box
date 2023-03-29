@@ -5,6 +5,7 @@
 ###### Requirements ######
 
 pytest
+pytest-env
 
 # required to build the EnMAP-Box
 gitpython
