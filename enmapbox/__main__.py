@@ -42,6 +42,7 @@ def exitAll(*args):
 
 
 def run(
+        debug: bool = False,
         sources: list = None,
         load_core_apps=False,
         load_other_apps=False,
