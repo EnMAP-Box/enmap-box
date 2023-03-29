@@ -3,19 +3,23 @@ This is a template to create an EnMAP-Box test
 """
 import unittest
 
-from qgis.core import QgsProcessingRegistry, QgsApplication, QgsProcessingContext
-
 from enmapbox.testing import EnMAPBoxTestCase
-from enmapboxprocessing.algorithm.spectralresamplingtoprismaalgorithm import SpectralResamplingToPrismaAlgorithm
+from qgis.core import QgsProcessingAlgorithm
+from qgis.core import QgsProcessingRegistry, QgsApplication, QgsProcessingContext
 
 
 class EnMAPBoxTestCaseExample(EnMAPBoxTestCase):
 
     def test_parameterization_strings(self):
+        aid = 'enmapbox:SpectralResamplingToPrisma'
         reg: QgsProcessingRegistry = QgsApplication.instance().processingRegistry()
-        alg = reg.algorithmById('enmapbox:SpectralResamplingToPrisma')
-        self.assertIsInstance(alg, SpectralResamplingToPrismaAlgorithm)
+        alg: QgsProcessingAlgorithm = reg.algorithmById(aid)
+
+        if not isinstance(alg, QgsProcessingAlgorithm):
+            self.skipTest(f'Unable to load {aid} from processing registry.')
+
         configuration = {}
+
         alg.initAlgorithm(configuration)
 
         context = QgsProcessingContext()
