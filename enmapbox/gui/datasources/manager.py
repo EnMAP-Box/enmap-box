@@ -837,6 +837,7 @@ class DataSourceManagerPanelUI(QgsDockWidget):
         self.actionSyncWithQGIS.triggered.connect(self.onSyncToQGIS)
 
         self.tbFilterText.textChanged.connect(self.setFilter)
+        self.tbFilterText.hide()  # see #167
         hasQGIS = qgisAppQgisInterface() is not None
         self.actionSyncWithQGIS.setEnabled(hasQGIS)
 
