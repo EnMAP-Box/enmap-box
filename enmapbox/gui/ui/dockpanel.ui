@@ -194,7 +194,7 @@
     <string>Add Data Source</string>
    </property>
    <property name="toolTip">
-    <string>Adds a data sourc, e.g. raster or vector file</string>
+    <string>Adds a data source, e.g. raster or vector file</string>
    </property>
   </action>
   <action name="actionRemoveSelected">
