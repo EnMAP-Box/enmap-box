@@ -16,7 +16,7 @@ flake8-qgis
 
 coverage
 urlchecker
-typeguard=2.13.3  # version 3.x created several problems
+typeguard=2  # version 3.x created several problems
 
 # optionals
 git-lfs

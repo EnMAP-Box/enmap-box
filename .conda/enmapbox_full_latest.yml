@@ -34,7 +34,7 @@ dependencies:
   # Development
   - gitpython
   - git-lfs
-  - typeguard
+  - typeguard=2
   - pytest
   - flake8
   - docutils
