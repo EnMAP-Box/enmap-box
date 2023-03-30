@@ -1,5 +1,4 @@
 import inspect
-import json
 from collections import OrderedDict
 from math import ceil, sqrt, pi, exp
 from typing import Dict, Any, List, Tuple, Union
@@ -14,7 +13,6 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.geojsonlibrarywriter import GeoJsonLibraryWriter
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import Array3d, Number
-from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 
 RESPONSE_CUTOFF_VALUE = 0.001
