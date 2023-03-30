@@ -170,7 +170,7 @@ To enable ssh authentication you can replace them with SSH uris as followed:
     # check existing url
     git remote -v
     # change remote urls
-    git remote set url origin git@bitbucket.org:ecstagriculture/enmap-box-lmu-vegetation-apps.git
+    git remote set-url origin git@bitbucket.org:ecstagriculture/enmap-box-lmu-vegetation-apps.git
     # check changed url
     git remote -v
     ```
