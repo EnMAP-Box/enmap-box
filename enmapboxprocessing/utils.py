@@ -125,11 +125,11 @@ class Utils(object):
             return Qgis.DataType.Float64
         elif dataType == np.int16:
             return Qgis.DataType.Int16
-        elif dataType == np.int32:
+        elif dataType in [np.int32, np.int64]:
             return Qgis.DataType.Int32
         elif dataType == np.uint16:
             return Qgis.DataType.UInt16
-        elif dataType == np.uint32:
+        elif dataType in [np.uint32, np.uint64]:
             return Qgis.DataType.UInt32
         else:
             raise ValueError(f'unsupported data type: {dataType}')
