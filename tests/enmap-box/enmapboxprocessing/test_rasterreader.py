@@ -1,7 +1,7 @@
 import numpy as np
 from osgeo import gdal
 
-from enmapbox.exampledata import enmap, google_maps
+from enmapbox.exampledata import enmap
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.testcase import TestCase
@@ -534,7 +534,6 @@ class TestRasterReader(TestCase):
         self.assertEqual(gold * 2, reader.lineMemoryUsage(dataTypeSize=8))
 
     def test_pamMetadata(self):
-
         layer = QgsRasterLayer(enmap)
         reader = RasterReader(layer)
         wavelength1 = 0.123
