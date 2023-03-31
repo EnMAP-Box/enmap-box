@@ -11,6 +11,7 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from qgis.core import (QgsProcessingContext, QgsVectorLayer, QgsProcessingFeedback, QgsProcessingException,
                        QgsProcessingParameterField)
 from enmapbox.typeguard import typechecked
+from qps.speclib.core.spectralprofile import decodeProfileValueDict
 
 
 @typechecked
@@ -73,19 +74,24 @@ class SpectralResamplingByResponseFunctionLibraryAlgorithm(EnMAPProcessingAlgori
             if binaryField is None:
                 binaryField = FIELD_VALUES
 
-            for profile in spectralLibrary.profiles(profile_field=binaryField):
+            for feature in library.getFeatures():
+                profileDict = decodeProfileValueDict(feature.attribute(binaryField))
+                if len(profileDict) == 0:
+                    raise QgsProcessingException(f'Not a valid Profiles field: {binaryField}')
+
                 # derive to-nanometers scale factor
-                wavelength_units = profile.xUnit()
+                wavelength_units = profileDict['xUnit']
                 if wavelength_units.lower() in ['micrometers', 'um']:
                     scale = 1000.
                 elif wavelength_units.lower() in ['nanometers', 'nm']:
                     scale = 1.
                 else:
                     raise ValueError(f'unsupported wavelength units: {wavelength_units}')
+
                 # prepare responses
-                responses[profile.attribute('name')] = [
+                responses[feature.attribute('name')] = [
                     (int(round(x * scale)), round(y, RESPONSE_CUTOFF_DIGITS))  # scale and round
-                    for x, y in zip(profile.xValues(), profile.yValues())
+                    for x, y in zip(profileDict['x'], profileDict['y'])
                     if y >= RESPONSE_CUTOFF_VALUE  # filter very small weights for better performance
                 ]
 

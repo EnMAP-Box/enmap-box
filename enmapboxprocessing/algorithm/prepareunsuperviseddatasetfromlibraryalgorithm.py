@@ -9,6 +9,7 @@ from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterField,
                        QgsProcessingException)
 from enmapbox.typeguard import typechecked
+from qps.speclib.core.spectralprofile import decodeProfileValueDict
 
 
 @typechecked
@@ -67,13 +68,14 @@ class PrepareUnsupervisedDatasetFromLibraryAlgorithm(EnMAPProcessingAlgorithm):
             # prepare data
             n = library.featureCount()
             X = list()
-            for i, profile in enumerate(SpectralLibraryUtils.profiles(library, profile_field=binaryField)):
+            for i, feature in enumerate(library.getFeatures()):
                 feedback.setProgress(i / n * 100)
-                try:
-                    Xi = profile.yValues()
-                except TypeError:
-                    raise QgsProcessingException(f'Profiles field must be Binary: {binaryField}')
 
+                profileDict = decodeProfileValueDict(feature.attribute(binaryField))
+                if len(profileDict) == 0:
+                    raise QgsProcessingException(f'Not a valid Profiles field: {binaryField}')
+
+                Xi = profileDict['y']
                 X.append(Xi)
 
             if len(set(map(len, X))) != 1:
