@@ -1,5 +1,4 @@
 import inspect
-import json
 from collections import OrderedDict
 from math import ceil, sqrt, pi, exp
 from typing import Dict, Any, List, Tuple, Union
@@ -11,6 +10,7 @@ from osgeo import gdal
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from enmapboxprocessing.geojsonlibrarywriter import GeoJsonLibraryWriter
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import Array3d, Number
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
@@ -162,41 +162,16 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
             writer.close()
 
             if saveResponseFunction:
-                with open(filename + '.srf.geojson', 'w') as file:
-                    file.write(
-                        '{\n'
-                        '    "type": "FeatureCollection",\n'
-                        '    "name": "Spectral Response Function",\n'
-                        '    "description": "",\n'
-                        '    "features": [\n'
-                    )
-
+                with open(filename + '.srf.geojson', 'w') as file1, open(filename + '.srf.qml', 'w') as file2:
+                    writer = GeoJsonLibraryWriter(file1, 'Spectral Response Function', '')
+                    writer.initWriting()
                     for i, name in enumerate(responses):
                         values = responses[name]
                         x = [xi for xi, yi in values]
                         y = [yi for xi, yi in values]
-                        feature = {
-                            "type": "Feature",
-                            "properties": {
-                                "name": name,
-                                "profiles": {
-                                    "x": x,
-                                    "xUnit": "Nanometers",
-                                    "y": y
-                                }
-                            },
-                            "geometry": None
-                        }
-                        file.write(' ' * 8)
-                        file.write(json.dumps(feature))
-                        if i + 1 < len(responses):
-                            file.write(',')
-                        file.write('\n')
-
-                    file.write(
-                        '    ]\n'
-                        '}\n'
-                    )
+                        writer.writeProfile(x, y, 'Nanometers', name)
+                    writer.endWriting()
+                    writer.writeQml(file2)
 
             result = {self.P_OUTPUT_RASTER: filename}
             self.toc(feedback, result)
