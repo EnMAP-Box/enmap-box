@@ -1,4 +1,4 @@
-from os.path import join, dirname, exists
+from os.path import join, dirname
 
 import numpy as np
 from osgeo import gdal
@@ -6,7 +6,6 @@ from osgeo import gdal
 from enmapbox.exampledata import landcover_polygon, enmap, hires
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
 from enmapbox.testing import start_app
-from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.testcase import TestCase
 from enmapboxprocessing.typing import Category, Target
@@ -17,7 +16,7 @@ from enmapboxtestdata import landcover_polygon_30m, fraction_point_singletarget,
 from qgis.PyQt.QtCore import QDateTime, QSizeF
 from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsVectorLayer, Qgis, QgsProcessingFeedback, QgsRasterLayer, QgsRasterShader, QgsColorRamp, \
-    QgsStyle, QgsColorRampShader, QgsRectangle, QgsWkbTypes, QgsCoordinateReferenceSystem, QgsProject
+    QgsStyle, QgsColorRampShader, QgsRectangle, QgsWkbTypes, QgsCoordinateReferenceSystem
 from qgis.gui import QgsMapCanvas
 
 
