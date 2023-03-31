@@ -11,6 +11,8 @@ from warnings import warn
 import numpy as np
 from osgeo import gdal
 
+from enmapbox.qgispluginsupport.qps.utils import SpatialExtent, SpatialPoint
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.typing import (NumpyDataType, MetadataValue, GdalDataType,
                                        GdalResamplingAlgorithm, Categories, Category, Targets, Target)
 from qgis.PyQt.QtCore import QDateTime, QDate
@@ -27,7 +29,6 @@ from qgis.core import (QgsRasterBlock, QgsProcessingFeedback, QgsPalettedRasterR
                        QgsProcessingUtils, QgsGeometry
                        )
 from qgis.gui import QgsMapCanvas
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -419,8 +420,6 @@ class Utils(object):
 
     @classmethod
     def parseSpatialPoint(cls, obj) -> Optional['SpatialPoint']:
-        from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
-
         error = ValueError(f'invalid spatial point: {obj}')
         if obj is None:
             return None
@@ -459,8 +458,6 @@ class Utils(object):
 
     @classmethod
     def parseSpatialExtent(cls, obj) -> Optional['SpatialExtent']:
-        from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-
         error = ValueError(f'invalid spatial extent: {obj}')
         if obj is None:
             return None
