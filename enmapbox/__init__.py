@@ -92,7 +92,6 @@ granted by the Federal Ministry of Economic Affairs and Energy (BMWi; grant no. 
 
 DIR_ENMAPBOX = os.path.dirname(__file__)
 DIR_REPO = os.path.dirname(DIR_ENMAPBOX)
-DIR_SITEPACKAGES = os.path.join(DIR_REPO, 'site-packages')
 DIR_UIFILES = os.path.join(DIR_ENMAPBOX, *['gui', 'ui'])
 DIR_ICONS = os.path.join(DIR_ENMAPBOX, *['gui', 'ui', 'icons'])
 DIR_EXAMPLEDATA = (pathlib.Path(DIR_REPO) / 'enmapbox' / 'exampledata').as_posix()
@@ -106,6 +105,16 @@ _ENMAPBOX_MAPLAYER_CONFIG_WIDGET_FACTORIES: typing.List[QgsMapLayerConfigWidgetF
 
 gdal.SetConfigOption('GDAL_VRT_ENABLE_PYTHON', 'YES')
 
+# test if PyQtGraph is available
+try:
+    import pyqtgraph  # noqa
+except ModuleNotFoundError:
+    # use PyQtGraph brought by QPS
+    pSrc = pathlib.Path(DIR_ENMAPBOX) / 'qgispluginsupport' / 'qps' / 'pyqtgraph'
+    assert pSrc.is_dir()
+    site.addsitedir(pSrc)
+    # import pyqtgraph
+
 
 def enmapboxSettings() -> QSettings:
     """
@@ -117,7 +126,6 @@ def enmapboxSettings() -> QSettings:
 
 settings = enmapboxSettings()
 DEBUG = str(os.environ.get('DEBUG', False)).lower() in ['1', 'true']
-site.addsitedir(DIR_SITEPACKAGES)
 
 
 def icon() -> QIcon:

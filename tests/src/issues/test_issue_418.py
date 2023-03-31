@@ -13,6 +13,7 @@ from enmapbox.testing import EnMAPBoxTestCase
 
 path = pathlib.Path(r'/home/benni/Downloads/MOD05_L2.A2022305.0005.061.2022335032530.hdf').resolve()
 
+
 @unittest.skipIf(not path.is_file(), 'MODIS file does not exist')
 class TestCaseIssue418(EnMAPBoxTestCase):
 

@@ -12,15 +12,11 @@ __author__ = 'benjamin.jakimow@geo.hu-berlin.de'
 __date__ = '2017-07-17'
 __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
-import pathlib
-import site
 import unittest
 
-from enmapbox import DIR_ENMAPBOX
+from enmapbox.apps.lmuapps.lmuvegetationapps.IVVRM.IVVRM_GUI import IVVRM_GUI, MainUiFunc
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import EnMAPBoxTestCase
-
-site.addsitedir(pathlib.Path(DIR_ENMAPBOX) / 'apps' / 'lmuapps')
 
 
 def has_package(name: str):
@@ -35,8 +31,6 @@ class test_applications(EnMAPBoxTestCase):
 
     @unittest.skipIf(not has_package('scipy'), 'scipy is not installed')
     def test_MainUiFunc(self):
-        from lmuapps.lmuvegetationapps.IVVRM.IVVRM_GUI import MainUiFunc
-
         m = MainUiFunc()
         self.showGui(m)
 
@@ -46,8 +40,6 @@ class test_applications(EnMAPBoxTestCase):
         if EB is None:
             EB = EnMAPBox()
         EB.ui.hide()
-
-        from lmuapps.lmuvegetationapps.IVVRM.IVVRM_GUI import IVVRM_GUI
 
         w = IVVRM_GUI()
         self.showGui(w)
