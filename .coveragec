@@ -1,0 +1,13 @@
+[run]
+include =
+    enmapbox/*
+    enmapboxprocessing/*
+
+
+
+omit =
+    enmapbox/qgispluginsupport/qps/pyqtgraph/*
+
+
+
+
