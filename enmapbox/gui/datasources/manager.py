@@ -325,8 +325,9 @@ class DataSourceManager(TreeModel):
 
     def addDataSources(self,
                        sources: Union[DataSource, List[DataSource], Any],
-                       name: str = None) -> List[DataSource]:
-        sources = DataSourceFactory.create(sources, name=name, project=self.project())
+                       name: str = None,
+                       show_dialogs: bool = True) -> List[DataSource]:
+        sources = DataSourceFactory.create(sources, name=name, project=self.project(), show_dialogs=show_dialogs)
         if isinstance(sources, DataSource):
             sources = [sources]
 
@@ -922,6 +923,7 @@ class DataSourceFactory(object):
     @staticmethod
     def create(source: any,
                name: str = None,
+               show_dialogs: bool = True,
                project: QgsProject = QgsProject.instance(),
                parent: QWidget = None) -> List[DataSource]:
         """
@@ -988,17 +990,25 @@ class DataSourceFactory(object):
                         if len(sublayerDetails) == 1:
                             return DataSourceFactory.create(sublayerDetails[0])
                         elif len(sublayerDetails) > 1:
-                            # show sublayer selection dialog
-                            d = SubDatasetSelectionDialog()
-                            d.setWindowTitle('Select Layers')
-                            from enmapbox import icon as enmapBoxIcon
-                            d.setWindowIcon(enmapBoxIcon())
-                            d.showMultiFiles(False)
-                            d.setSubDatasetDetails(sublayerDetails)
-                            if d.exec_() == QDialog.Accepted:
-                                return DataSourceFactory.create(d.selectedSublayerDetails())
+                            if show_dialogs:
+                                # show sublayer selection dialog
+                                d = SubDatasetSelectionDialog()
+                                d.setWindowTitle('Select Layers')
+                                from enmapbox import icon as enmapBoxIcon
+                                d.setWindowIcon(enmapBoxIcon())
+                                d.showMultiFiles(False)
+                                d.setSubDatasetDetails(sublayerDetails)
+                                if d.exec_() == QDialog.Accepted:
+                                    return DataSourceFactory.create(d.selectedSublayerDetails())
+                                else:
+                                    return []
                             else:
-                                return []
+                                # create a data source for each sublayer
+                                results = []
+                                for d in sublayerDetails:
+                                    results.extend(DataSourceFactory.create(d))
+                                return results
+
                     if dataItem is None:
                         if pathlib.Path(source).is_file():
                             dataItem = QgsDataItem(Qgis.BrowserItemType.Custom, None, name, source, 'special:file')

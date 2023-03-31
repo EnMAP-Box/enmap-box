@@ -2010,14 +2010,14 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         assert isinstance(sourceList, list)
         return self.mDataSourceManager.addDataSources(sourceList)
 
-    def addSource(self, source, name=None):
+    def addSource(self, source, name: str = None, show_dialogs: bool = True):
         """
         Returns a list of added DataSources or the list of DataSources that were derived from a single data source uri.
         :param source:
         :param name:
         :return: [list-of-dataSources]
         """
-        return self.mDataSourceManager.addDataSources(source, name=name)
+        return self.mDataSourceManager.addDataSources(source, name=name, show_dialogs=show_dialogs)
 
     def removeSources(self, dataSourceList: list = None):
         """

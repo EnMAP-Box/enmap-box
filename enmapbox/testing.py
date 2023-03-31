@@ -32,7 +32,7 @@ from qgis.core import QgsProcessingParameterRasterDestination, QgsProcessingPara
     QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterRasterLayer, \
     QgsPythonRunner, QgsProcessingAlgorithm
 from qgis.gui import QgsPluginManagerInterface
-from .gui.enmapboxgui import EnMAPBox
+
 from .qgispluginsupport.qps.testing import TestObjects, TestCase, start_app
 
 start_app = start_app
@@ -44,6 +44,7 @@ class EnMAPBoxTestCase(TestCase):
 
     def tearDown(self):
         super().tearDown()
+        from .gui.enmapboxgui import EnMAPBox
         emb = EnMAPBox.instance()
         if emb:
             emb.close()
@@ -66,6 +67,7 @@ class EnMAPBoxTestCase(TestCase):
 
     @classmethod
     def closeEnMAPBoxInstance(cls):
+        from .gui.enmapboxgui import EnMAPBox
         eb = EnMAPBox.instance()
         if isinstance(eb, EnMAPBox):
             eb.close()

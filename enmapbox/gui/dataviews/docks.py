@@ -20,7 +20,6 @@
 import codecs
 import os
 import re
-import typing
 import uuid
 import warnings
 from math import ceil
@@ -969,7 +968,7 @@ class MapDock(Dock):
         assert isinstance(canvas, QgsMapCanvas)
         return self.mapCanvas().createCanvasLink(canvas, linkType)
 
-    def addLayers(self, layers: typing.List[QgsMapLayer]):
+    def addLayers(self, layers: List[QgsMapLayer]):
         tree: QgsLayerTree = self.layerTree()
         for lyr in layers:
             tree.addLayer(lyr)
