@@ -9,7 +9,7 @@ from enmapboxprocessing.typing import checkSampleShape, ClassifierDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCategorizedSymbolRenderer,
                        QgsProcessingParameterField, QgsProcessingException)
-from qps.speclib.core.spectralprofile import decodeProfileValueDict
+from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
 
 
 @typechecked

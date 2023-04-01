@@ -11,7 +11,7 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from qgis.core import (QgsProcessingContext, QgsVectorLayer, QgsProcessingFeedback, QgsProcessingException,
                        QgsProcessingParameterField)
 from enmapbox.typeguard import typechecked
-from qps.speclib.core.spectralprofile import decodeProfileValueDict
+from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
 
 
 @typechecked
