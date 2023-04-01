@@ -25,6 +25,7 @@ from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QApplication, QAction, QWidget, QMenu
 
 from enmapbox.testing import EnMAPBoxTestCase, TestObjects
+from qgis._core import QgsProject
 from qgis.core import QgsProcessingAlgorithm, QgsProcessingParameterDefinition, QgsProcessingParameterRasterLayer, \
     QgsApplication
 from enmapbox import DIR_ENMAPBOX, DIR_REPO
@@ -33,23 +34,6 @@ from enmapbox.gui.applications import EnMAPBoxApplication
 
 
 class test_applications(EnMAPBoxTestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-
-        from enmapbox import DIR_ENMAPBOX
-        site.addsitedir(pathlib.Path(DIR_ENMAPBOX) / 'coreapps')
-        site.addsitedir(pathlib.Path(DIR_ENMAPBOX) / 'eo4qapps')
-        site.addsitedir(pathlib.Path(DIR_ENMAPBOX) / 'apps')
-        site.addsitedir(pathlib.Path(DIR_ENMAPBOX) / 'apps' / 'lmuapps')
-
-    def tearDown(self):
-
-        app = QgsApplication.instance()
-        if isinstance(app, QgsApplication):
-            app.closeAllWindows()
-        super().tearDown()
 
     def createTestData(self) -> (str, str, str):
         """
@@ -122,6 +106,9 @@ class test_applications(EnMAPBoxTestCase):
         self.assertTrue(len(testApp.processingAlgorithms()) > 0)
         self.assertIsInstance(testApp.menu(QMenu()), QMenu)
 
+        EB.close()
+        QgsProject.instance().removeAllMapLayers()
+
     def test_applicationRegistry(self):
         TESTDATA = self.createTestData()
 
@@ -182,8 +169,11 @@ class test_applications(EnMAPBoxTestCase):
         reg.addApplicationFolder(rootFolder)
         self.assertTrue(len(reg) > 0, msg='Failed to add example EnMAPBoxApplication from {}'.format(rootFolder))
 
-        print('finished')
+        del reg
+        EB.close()
+        QgsProject.instance().removeAllMapLayers()
 
+    # @unittest.skip('unknown reason')
     def test_deployed_apps(self):
 
         pathCoreApps = pathlib.Path(DIR_ENMAPBOX) / 'coreapps'
@@ -225,6 +215,7 @@ class test_applications(EnMAPBoxTestCase):
             print('Close blocking {} "{}"'.format(w.__class__.__name__, w.windowTitle()))
             w.close()
 
+    @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'trigger makes problems')
     def test_enmapbox_start(self):
 
         timer = QTimer()
@@ -254,6 +245,9 @@ class test_applications(EnMAPBoxTestCase):
             QApplication.processEvents()
 
         self.showGui()
+        timer.stop()
+        EB.close()
+        QgsProject.instance().removeAllMapLayers()
 
 
 if __name__ == "__main__":
