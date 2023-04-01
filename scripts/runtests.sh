@@ -1,10 +1,10 @@
 #!/bin/bash
-QT_QPA_PLATFORM=offscreen
-export QT_QPA_PLATFORM
-CI=True
-export CI
+export QT_QPA_PLATFORM=offscreen
+export CI=True
+
 rm -Rf test-outputs
 rm -Rf test-reports
+
 export PYTHONPATH="${PYTHONPATH}"\
 ":$(pwd)"\
 ":/usr/share/qgis/python/plugins"\
@@ -13,5 +13,5 @@ export PYTHONPATH="${PYTHONPATH}"\
 ":$(pwd)/enmapbox/eo4qapps"
 
 echo $PYTHONPATH
-pytest
-# python3 scripts/setup_repository.py
+pytest --no-cov-on-fail
+
