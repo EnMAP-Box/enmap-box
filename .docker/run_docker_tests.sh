@@ -25,7 +25,7 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 # xvfb-run pytest ${@:-`echo $DEFAULT_PARAMS`}
 # python3 scripts/create_runtests.py
 # xvfb-run scripts/runtests.sh
-python3 scripts/setup_repository.py
+python3 scripts/setup_repository.py -r
 chmod +x scripts/runtests.sh
 source scripts/runtests.sh
 popd
