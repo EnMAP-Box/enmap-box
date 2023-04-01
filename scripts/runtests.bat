@@ -8,7 +8,8 @@ rmdir /s /q test-reports
 set PYTHONPATH=%PYTHONPATH%;^
 %cd%\enmapbox\apps;^
 %cd%\enmapbox\coreapps;^
-%cd%\enmapbox\eo4qapps
+%cd%\enmapbox\eo4qapps;^
+%cd%\tests\src
 
 ::echo %PYTHONPATH%
 ::echo %CD%

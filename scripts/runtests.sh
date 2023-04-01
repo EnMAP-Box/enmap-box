@@ -10,7 +10,8 @@ export PYTHONPATH="${PYTHONPATH}"\
 ":/usr/share/qgis/python/plugins"\
 ":$(pwd)/enmapbox/apps"\
 ":$(pwd)/enmapbox/coreapps"\
-":$(pwd)/enmapbox/eo4qapps"
+":$(pwd)/enmapbox/eo4qapps"\
+":$(pwd)/tests/src"
 
 echo $PYTHONPATH
 pytest --no-cov-on-fail
