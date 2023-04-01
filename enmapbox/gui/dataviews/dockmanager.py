@@ -2078,7 +2078,7 @@ class DockPanelUI(QgsDockWidget):
         assert isinstance(self.dockTreeView, DockTreeView)
         # self.dockTreeView.currentLayerChanged.connect(self.onSelectionChanged)
         self.tbFilterText.textChanged.connect(self.setFilter)
-        self.tbFilterText.hide()  # see #167
+        # self.tbFilterText.hide()  # see #167
         self.initActions()
 
     def setFilter(self, pattern: str):
