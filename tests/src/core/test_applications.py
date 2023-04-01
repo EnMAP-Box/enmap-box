@@ -10,7 +10,6 @@
 import os
 import pathlib
 import shutil
-import site
 import sys
 
 __author__ = 'benjamin.jakimow@geo.hu-berlin.de'
@@ -25,9 +24,8 @@ from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QApplication, QAction, QWidget, QMenu
 
 from enmapbox.testing import EnMAPBoxTestCase, TestObjects
-from qgis._core import QgsProject
-from qgis.core import QgsProcessingAlgorithm, QgsProcessingParameterDefinition, QgsProcessingParameterRasterLayer, \
-    QgsApplication
+from qgis.core import QgsProject, QgsProcessingAlgorithm, \
+    QgsProcessingParameterDefinition, QgsProcessingParameterRasterLayer
 from enmapbox import DIR_ENMAPBOX, DIR_REPO
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.applications import EnMAPBoxApplication

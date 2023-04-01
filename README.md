@@ -230,6 +230,12 @@ To check staged files only, run:
 flake8 $(git status -s | grep -E '\.py$' | cut -c 4-)
 ````
 
+# Testing
+
+Run `scripts/runtests.sh` (Linux/macOS) or `scripts\runtests.bat` (Win) 
+to start the tests defined in `/tests/`.
+
+
 
 # License
 

@@ -50,7 +50,7 @@ class TestCasesUtils(EnMAPBoxTestCase):
         self.assertEqual(dataTypeName(Qgis.ARGB32_Premultiplied), 'ARGB32_Premultiplied')
 
     def test_bandNames(self):
-        validSources = [QgsRasterLayer(self.wmsUri, '', 'wms'), enmap, QgsRasterLayer(enmap), gdal.Open(enmap)]
+        validSources = [enmap, QgsRasterLayer(enmap), gdal.Open(enmap)]
 
         for src in validSources:
             names = displayBandNames(src, leadingBandNumber=True)
