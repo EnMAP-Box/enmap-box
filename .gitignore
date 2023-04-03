@@ -9,6 +9,7 @@ doc/build/
 */build/
 test-reports/
 test-outputs/
+*.log
 qgisresources
 qgisresources/
 qgisresources.zip
