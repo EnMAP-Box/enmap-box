@@ -7,18 +7,17 @@ Version 3.12
 **Earth Observation for QGIS (EO4Q) Applications**
 
 The label *EO4Q* refers to a new collection of EnMAP-Box tools and applications designed to integrate well in both, EnMAP-Box and QGIS environments.
-Also see https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/eo4q.html#.
+Also see https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/eo4q.html.
 
 * added *Location Browser* application: allows to navigate to a map location directly, or to send a request to the Nominatim geocoding service. (`#200 <https://github.com/EnMAP-Box/enmap-box/issues/200>`_)
 * added *Raster Band Stacking* application: allows to easily stack bands into a new VRT raster layer (`#155 <https://github.com/EnMAP-Box/enmap-box/issues/155>`_)
 * added *Sensor Product Import* application: allows to import various sensor products via drag&drop (`#211 <https://github.com/EnMAP-Box/enmap-box/issues/211>`_)
-
 * note that *Profile Analytics* app was already released with EnMAP-Box 3.11 (`#81 <https://github.com/EnMAP-Box/enmap-box/issues/81>`_)
 * note that *GEE Time Series Explorer* app was already released with EnMAP-Box 3.10
+* added *Profile Analytics* UFUNC for RBF-based Timeseries Fitting (`#273 <https://github.com/EnMAP-Box/enmap-box/issues/273>`_)
 
 **Applications**
 
-* added Profile Analytics UFUNC for RBF-based Timeseries Fitting (`#273 <https://github.com/EnMAP-Box/enmap-box/issues/273>`_)
 * added range-slider in *Raster Layer Styling* for interactively masking values to be displayed (`#247 <https://github.com/EnMAP-Box/enmap-box/issues/247>`_)
 
 **QGIS Temporal Controller**
