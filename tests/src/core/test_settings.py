@@ -20,7 +20,7 @@ import os
 import unittest
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.enmapboxsettings import enmapboxSettings, EnMAPBoxSettings
+from enmapbox.enmapboxsettings import enmapboxSettings, EnMAPBoxSettings, EnMAPBoxSettingsWidget
 from enmapbox.testing import EnMAPBoxTestCase
 from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsProject
@@ -36,13 +36,10 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
         self.assertIsInstance(s2.value(EnMAPBoxSettings.MAP_BACKGROUND), QColor)
         print(s1)
 
-    def setUp(self):
-        emb = EnMAPBox.instance()
-        if isinstance(emb, EnMAPBox):
-            emb.close()
+    def test_settings_wdiget(self):
 
-        QgsProject.instance().removeAllMapLayers()
-
+        w = EnMAPBoxSettingsWidget()
+        self.showGui(w)
     def test_enmapbox_settings(self):
 
         box = EnMAPBox(load_core_apps=False, load_other_apps=False)
@@ -65,6 +62,9 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
         if False:
             self.assertEqual(dataSources, box.dataSources())
             self.assertEqual(n_maps, len(box.mapCanvases()))
+
+        box.close()
+        QgsProject.instance().removeAllMapLayers()
 
 
 if __name__ == '__main__':

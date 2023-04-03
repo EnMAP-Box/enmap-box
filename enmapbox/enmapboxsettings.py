@@ -1,6 +1,17 @@
+from enmapbox import DIR_UIFILES
+from enmapbox.qgispluginsupport.qps.utils import loadUi
 from qgis.PyQt.QtGui import QColor
+from qgis.gui import QgsOptionsPageWidget
 
 from qgis.core import QgsSettings
+
+
+class EnMAPBoxSettingsWidget(QgsOptionsPageWidget):
+
+    def __init__(self, *args, **kwds):
+
+        super().__init__(*args, **kwds)
+        loadUi(DIR_UIFILES / 'settingswidget.ui', self)
 
 
 class EnMAPBoxSettings(QgsSettings):

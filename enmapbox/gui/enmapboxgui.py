@@ -603,6 +603,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         splash.showMessage('Load project settings...')
         debugLog('Load settings from QgsProject.instance()')
 
+        # load project settings from current QgsProject
         self.onReloadProject()
 
     def executeAlgorithm(self, alg_id, parent, in_place=False, as_batch=False):
