@@ -31,6 +31,7 @@ import sys
 import textwrap
 import typing
 import warnings
+import markdown
 from typing import Union
 
 import docutils.core
@@ -318,9 +319,11 @@ def create_enmapbox_plugin(include_testdata: bool = False,
 
     return None
 
+
 def markdownToHTML(path_md: Union[str, pathlib.Path]) -> str:
     path_md = pathlib.Path(path_md)
 
+    html = None
     if not path_md.is_file():
         for s in ['.md', '.rst']:
             p = path_md.parent / (os.path.splitext(path_md.name)[0] + s)
@@ -328,19 +331,28 @@ def markdownToHTML(path_md: Union[str, pathlib.Path]) -> str:
                 path_md = p
                 break
 
-    assert path_md.is_file(), path_md
-    overrides = {'stylesheet': None,
-                 'embed_stylesheet': False,
-                 'output_encoding': 'utf-8',
-                 }
+    if path_md.name.endswith('.rst'):
 
-    buffer = io.StringIO()
-    html = docutils.core.publish_file(
-        source_path=path_md,
-        writer_name='html5',
-        destination=buffer,
-        settings_overrides=overrides)
+        assert path_md.is_file(), path_md
+        overrides = {'stylesheet': None,
+                     'embed_stylesheet': False,
+                     'output_encoding': 'utf-8',
+                     }
+
+        buffer = io.StringIO()
+        html = docutils.core.publish_file(
+            source_path=path_md,
+            writer_name='html5',
+            destination=buffer,
+            settings_overrides=overrides)
+    elif path_md.name.endswith('.md'):
+        with open(path_md, 'r', encoding='utf-8') as f:
+            md = f.read()
+        html = markdown.markdown(md)
+    else:
+        raise Exception(f'Unsupported file: {path_md}')
     return html
+
 
 def createCHANGELOG(dirPlugin):
     """

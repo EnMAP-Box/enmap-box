@@ -12,7 +12,7 @@ Also see https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/eo4q.
 * added *Location Browser* application: allows to navigate to a map location directly, or to send a request to the Nominatim geocoding service. (`#200 <https://github.com/EnMAP-Box/enmap-box/issues/200>`_)
 * added *Raster Band Stacking* application: allows to easily stack bands into a new VRT raster layer (`#155 <https://github.com/EnMAP-Box/enmap-box/issues/155>`_)
 * added *Sensor Product Import* application: allows to import various sensor products via drag&drop (`#211 <https://github.com/EnMAP-Box/enmap-box/issues/211>`_)
-* note that *Profile Analytics* app was already released with EnMAP-Box 3.11 (`#81 <https://github.com/EnMAP-Box/enmap-box/issues/81>`_)
+* note that *Profile Analytics* app was already released with EnMAP-Box 3.11 ([#81](<https://github.com/EnMAP-Box/enmap-box/issues/81>))
 * note that *GEE Time Series Explorer* app was already released with EnMAP-Box 3.10
 * added *Profile Analytics* UFUNC for RBF-based Timeseries Fitting (`#273 <https://github.com/EnMAP-Box/enmap-box/issues/273>`_)
 
