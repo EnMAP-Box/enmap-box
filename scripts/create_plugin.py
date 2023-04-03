@@ -31,8 +31,9 @@ import sys
 import textwrap
 import typing
 import warnings
-import docutils.core
 from os.path import exists
+
+import docutils.core
 
 from qgis.core import QgsUserProfileManager, QgsUserProfile, QgsFileUtils
 
