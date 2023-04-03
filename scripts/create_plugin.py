@@ -360,7 +360,7 @@ def createCHANGELOG(dirPlugin):
     :return:
     """
 
-    pathMD = os.path.join(DIR_REPO, 'CHANGELOG.rst')
+    pathMD = os.path.join(DIR_REPO, 'CHANGELOG.md')
     pathCL = os.path.join(dirPlugin, 'CHANGELOG')
 
     os.makedirs(os.path.dirname(pathCL), exist_ok=True)
@@ -368,25 +368,25 @@ def createCHANGELOG(dirPlugin):
     #    import sphinx.transforms
 
     html = markdownToHTML(pathMD)
+    if False:
+        from xml.dom import minidom
+        xml = minidom.parseString(html)
+        #  remove headline
+        for i, node in enumerate(xml.getElementsByTagName('h1')):
+            if i == 0:
+                node.parentNode.removeChild(node)
+            else:
+                node.tagName = 'h4'
 
-    from xml.dom import minidom
-    xml = minidom.parseString(html)
-    #  remove headline
-    for i, node in enumerate(xml.getElementsByTagName('h1')):
-        if i == 0:
-            node.parentNode.removeChild(node)
-        else:
-            node.tagName = 'h4'
-
-    for node in xml.getElementsByTagName('link'):
-        node.parentNode.removeChild(node)
-
-    for node in xml.getElementsByTagName('meta'):
-        if node.getAttribute('name') == 'generator':
+        for node in xml.getElementsByTagName('link'):
             node.parentNode.removeChild(node)
 
-    xml = xml.getElementsByTagName('body')[0]
-    html = xml.toxml()
+        for node in xml.getElementsByTagName('meta'):
+            if node.getAttribute('name') == 'generator':
+                node.parentNode.removeChild(node)
+
+        xml = xml.getElementsByTagName('body')[0]
+        html = xml.toxml()
     html_cleaned = []
     for line in html.split('\n'):
         # line to modify
