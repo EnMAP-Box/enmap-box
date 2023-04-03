@@ -2,12 +2,32 @@ CHANGELOG
 =========
 Version 3.12
 ------------
+*This release was tested under QGIS LTR 3.28.4*
 
-** QGIS Expressions / QGIS Field Calculator
+**Earth Observation for QGIS (EO4Q) Applications**
+
+The label *EO4Q* refers to a new collection of EnMAP-Box tools and applications designed to integrate well in both, EnMAP-Box and QGIS environments.
+Also see https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/eo4q.html.
+
+* added *Location Browser* application: allows to navigate to a map location directly, or to send a request to the Nominatim geocoding service. (`#200 <https://github.com/EnMAP-Box/enmap-box/issues/200>`_)
+* added *Raster Band Stacking* application: allows to easily stack bands into a new VRT raster layer (`#155 <https://github.com/EnMAP-Box/enmap-box/issues/155>`_)
+* added *Sensor Product Import* application: allows to import various sensor products via drag&drop (`#211 <https://github.com/EnMAP-Box/enmap-box/issues/211>`_)
+* note that *Profile Analytics* app was already released with EnMAP-Box 3.11 (`#81 <https://github.com/EnMAP-Box/enmap-box/issues/81>`_)
+* note that *GEE Time Series Explorer* app was already released with EnMAP-Box 3.10
+* added *Profile Analytics* UFUNC for RBF-based Timeseries Fitting (`#273 <https://github.com/EnMAP-Box/enmap-box/issues/273>`_)
+
+**Applications**
+
+* added range-slider in *Raster Layer Styling* for interactively masking values to be displayed (`#247 <https://github.com/EnMAP-Box/enmap-box/issues/247>`_)
+
+**QGIS Temporal Controller**
+
+* added support for temporal raster stacks (`#245 <https://github.com/EnMAP-Box/enmap-box/issues/245>`_)
+
+**QGIS Expressions / QGIS Field Calculator**
 
 * ``raster_array(layer[,geometry='@geometry'])`` returns an array with the pixel values at geometry (point) position (point).
-* ``raster_profile(layer[,geometry='@geometry'][,encoding='text'])`` returns the the pixel values at the
-  geometry (point) position as spectral profile (json/string/map/blob)
+* ``raster_profile(layer[,geometry='@geometry'][,encoding='text'])`` returns the the pixel values at the geometry (point) position as spectral profile (json/string/map/blob)
 * renamed some Spectral Libraries functions for consistency with other QGIS functions
 
 **Spectral Library Viewer**
@@ -16,10 +36,17 @@ Version 3.12
 
 **Processing Algorithms**
 
-* *Aggregate Spectral Profiles* (`enmapbox:aggregateprofiles`) takes a spectral library vector layer and
-  aggregates profiles based on a group-by expression. Spectral profiles for which the group-by expression return
-  the same value aggregated by min, mean, max or median.
+* added *Import EMIT L2A product* processing algorithm: added support for EMIT L2A products (`#278 <https://github.com/EnMAP-Box/enmap-box/issues/278>`_)
+* added *Sum-to-one constraint* option to *Regression-based unmixing* algorithm (`#239 <https://github.com/EnMAP-Box/enmap-box/issues/239>`_)
+* *Aggregate Spectral Profiles* (`enmapbox:aggregateprofiles`) takes a spectral library vector layer and aggregates profiles based on a group-by expression. Spectral profiles for which the group-by expression return the same value aggregated by min, mean, max or median.
 
+**Data Formats / Metadata Handling**
+
+* added support for *NETCDF_DIM_time* format (`#251 <https://github.com/EnMAP-Box/enmap-box/issues/251>`_)
+
+**Bugfixes**
+
+* `v3.12.0 <https://github.com/EnMAP-Box/enmap-box/milestone/7?closed=1>`_
 
 Version 3.11
 ------------
@@ -36,17 +63,17 @@ Version 3.11
 
 * improved *Scatter Plot* app:
 
-  * added support for vector data (`#1393: <https://bitbucket.org/hu-geomatics/enmap-box/issues/1393/scatter-plot-app-allow-vector-sources-as>`_)
-  * added support for simple scatter plots with symbols plotted, instead count density (`#1410: <https://bitbucket.org/hu-geomatics/enmap-box/issues/1410/scatter-plot-app-allow-to-plot-scatter>`_)
-  * added support for showing 1:1 line (`#1394: <https://bitbucket.org/hu-geomatics/enmap-box/issues/1394/scatter-plot-app-add-performance-measures>`_)
-  * added support for fitting a line to the data and report goodness of fit measures (`#1394: <https://bitbucket.org/hu-geomatics/enmap-box/issues/1394/scatter-plot-app-add-performance-measures>`_)
+  * added support for vector data (`#1393 <https://bitbucket.org/hu-geomatics/enmap-box/issues/1393/scatter-plot-app-allow-vector-sources-as>`_)
+  * added support for simple scatter plots with symbols plotted, instead count density (`#1410 <https://bitbucket.org/hu-geomatics/enmap-box/issues/1410/scatter-plot-app-allow-to-plot-scatter>`_)
+  * added support for showing 1:1 line (`#1394 <https://bitbucket.org/hu-geomatics/enmap-box/issues/1394/scatter-plot-app-add-performance-measures>`_)
+  * added support for fitting a line to the data and report goodness of fit measures (`#1394 <https://bitbucket.org/hu-geomatics/enmap-box/issues/1394/scatter-plot-app-add-performance-measures>`_)
 
 **Renderer**
 
-* added custom *Bivariate Color Raster Renderer*: allows to visualize two bands using a 2d color ramp. Find a mapping example here: https://www.joshuastevens.net/cartography/make-a-bivariate-choropleth-map/ (`#70: <https://github.com/EnMAP-Box/enmap-box/issues/70>`_)
-* added custom *CMYK Color Raster Renderer*: allows to visualize four bands using the CMYK (Cyan, Magenta, Yellow, and Key (black)) color model. Find a mapping example here: https://adventuresinmapping.com/2018/10/31/cmyk-vice/ (`#74: <https://github.com/EnMAP-Box/enmap-box/issues/74>`_)
-* added custom *HSV Color Raster Renderer*: allows to visualize three bands using the HSV (Hue, Saturation, Value (black)) color model. Find a mapping example here: https://landmonitoring.earth/portal/ ; select Maps > Global Landcover Dynamics 2016-2020 (`#73: <https://github.com/EnMAP-Box/enmap-box/issues/73>`_)
-* added custom *Multisource Multiband Color Raster Renderer*: same functionality as the default QGIS Multiband Color Raster Renderer, but the Red, Green and Blue bands can come from different raster sources (`#112: <https://github.com/EnMAP-Box/enmap-box/issues/112>`_)
+* added custom *Bivariate Color Raster Renderer*: allows to visualize two bands using a 2d color ramp. Find a mapping example here: https://www.joshuastevens.net/cartography/make-a-bivariate-choropleth-map/ (`#70 <https://github.com/EnMAP-Box/enmap-box/issues/70>`_)
+* added custom *CMYK Color Raster Renderer*: allows to visualize four bands using the CMYK (Cyan, Magenta, Yellow, and Key (black)) color model. Find a mapping example here: https://adventuresinmapping.com/2018/10/31/cmyk-vice/ (`#74 <https://github.com/EnMAP-Box/enmap-box/issues/74>`_)
+* added custom *HSV Color Raster Renderer*: allows to visualize three bands using the HSV (Hue, Saturation, Value (black)) color model. Find a mapping example here: https://landmonitoring.earth/portal/ ; select Maps > Global Landcover Dynamics 2016-2020 (`#73 <https://github.com/EnMAP-Box/enmap-box/issues/73>`_)
+* added custom *Multisource Multiband Color Raster Renderer*: same functionality as the default QGIS Multiband Color Raster Renderer, but the Red, Green and Blue bands can come from different raster sources (`#112 <https://github.com/EnMAP-Box/enmap-box/issues/112>`_)
 
 **Data Formats / Metadata Handling**
 
@@ -58,6 +85,7 @@ Version 3.11
 **Bugfixes**
 
 * `v3.11.0 <https://github.com/EnMAP-Box/enmap-box/milestone/2?closed=1>`_
+* `v3.11.1 <https://github.com/EnMAP-Box/enmap-box/milestone/5?closed=1>`_
 
 Version 3.10
 ------------
