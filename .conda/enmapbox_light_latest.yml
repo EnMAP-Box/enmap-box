@@ -12,6 +12,7 @@ dependencies:
   - git-lfs
   - typeguard=2
   - pytest
+  - pytest-cov
   - flake8
   - docutils
 
