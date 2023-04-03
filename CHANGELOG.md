@@ -2,25 +2,24 @@
 
 ## Version 3.12
 
-*This release was tested under QGIS LTR 3.28.4*
+_This release was tested under QGIS LTR 3.28.4_
 
 ### Applications
 
-* added range-slider in *Raster Layer Styling* for interactively masking values to be displayed ([#247](https://github.com/EnMAP-Box/enmap-box/issues/247))
-
-* *QGIS Temporal Controller*: added support for temporal raster stacks ([#245](https://github.com/EnMAP-Box/enmap-box/issues/245))
+* added range-slider in _Raster Layer Styling_ for interactively masking values to be displayed ([#247](https://github.com/EnMAP-Box/enmap-box/issues/247))
+* _QGIS Temporal Controller_: added support for temporal raster stacks ([#245](https://github.com/EnMAP-Box/enmap-box/issues/245))
 
 #### Earth Observation for QGIS (EO4Q) Applications
 
-The label *EO4Q* refers to a new collection of EnMAP-Box tools and applications designed to integrate well in both, EnMAP-Box and QGIS environments.
+The label _EO4Q_ refers to a new collection of EnMAP-Box tools and applications designed to integrate well in both, EnMAP-Box and QGIS environments.
 Also see https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/eo4q.html.
 
-* added *Location Browser* application: allows to navigate to a map location directly, or to send a request to the Nominatim geocoding service. ([#200](https://github.com/EnMAP-Box/enmap-box/issues/200))
-* added *Raster Band Stacking* application: allows to easily stack bands into a new VRT raster layer ([#155](https://github.com/EnMAP-Box/enmap-box/issues/155))
-* added *Sensor Product Import* application: allows to import various sensor products via drag&drop ([#211](https://github.com/EnMAP-Box/enmap-box/issues/211))
-* note that *Profile Analytics* app was already released with EnMAP-Box 3.11 ([#81](https://github.com/EnMAP-Box/enmap-box/issues/81))
-* note that *GEE Time Series Explorer* app was already released with EnMAP-Box 3.10
-* added *Profile Analytics* UFUNC for RBF-based Timeseries Fitting ([#273](https://github.com/EnMAP-Box/enmap-box/issues/273))
+* added _Location Browser_ application: allows to navigate to a map location directly, or to send a request to the Nominatim geocoding service. ([#200](https://github.com/EnMAP-Box/enmap-box/issues/200))
+* added _Raster Band Stacking_ application: allows to easily stack bands into a new VRT raster layer ([#155](https://github.com/EnMAP-Box/enmap-box/issues/155))
+* added _Sensor Product Import_ application: allows to import various sensor products via drag&drop ([#211](https://github.com/EnMAP-Box/enmap-box/issues/211))
+* note that _Profile Analytics_ app was already released with EnMAP-Box 3.11 ([#81](https://github.com/EnMAP-Box/enmap-box/issues/81))
+* note that _GEE Time Series Explorer_ app was already released with EnMAP-Box 3.10
+* added _Profile Analytics_ UFUNC for RBF-based Timeseries Fitting ([#273](https://github.com/EnMAP-Box/enmap-box/issues/273))
 
 
 #### QGIS Expressions / QGIS Field Calculator
@@ -36,13 +35,13 @@ Also see https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/eo4q.
 
 ### Processing Algorithms
 
-* added *Import EMIT L2A product* processing algorithm: added support for EMIT L2A products ([#278](https://github.com/EnMAP-Box/enmap-box/issues/278))
-* added *Sum-to-one constraint* option to *Regression-based unmixing* algorithm ([#239](https://github.com/EnMAP-Box/enmap-box/issues/239))
-* *Aggregate Spectral Profiles* (`enmapbox:aggregateprofiles`) takes a spectral library vector layer and aggregates profiles based on a group-by expression. Spectral profiles for which the group-by expression return the same value aggregated by min, mean, max or median.
+* added _Import EMIT L2A product_ processing algorithm: added support for EMIT L2A products ([#278](https://github.com/EnMAP-Box/enmap-box/issues/278))
+* added _Sum-to-one constraint_ option to _Regression-based unmixing_ algorithm ([#239](https://github.com/EnMAP-Box/enmap-box/issues/239))
+* _Aggregate Spectral Profiles_ (`enmapbox:aggregateprofiles`) takes a spectral library vector layer and aggregates profiles based on a group-by expression. Spectral profiles for which the group-by expression return the same value aggregated by min, mean, max or median.
 
 ### Data Formats / Metadata Handling
 
-* added support for *NETCDF_DIM_time* format ([#251](https://github.com/EnMAP-Box/enmap-box/issues/251))
+* added support for _NETCDF_DIM_time_ format ([#251](https://github.com/EnMAP-Box/enmap-box/issues/251))
 
 ### Bugfixes
 
@@ -51,18 +50,18 @@ Also see https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/eo4q.
 
 ## Version 3.11
 
-*This release was tested under QGIS 3.26.2*
+_This release was tested under QGIS 3.26.2_
 
-*Important Notice: the EnMAP-Box repository moved to https://github.com/EnMAP-Box/enmap-box*
+_Important Notice: the EnMAP-Box repository moved to https://github.com/EnMAP-Box/enmap-box_
 
 ### Applications
 
-* added *Profile Analytics* app: ([#81](https://github.com/EnMAP-Box/enmap-box/issues/81))
+* added _Profile Analytics_ app: ([#81](https://github.com/EnMAP-Box/enmap-box/issues/81))
 
   * allows various profile plot types like spectral profiles, temporal profiles, spatial profiles.
   * profile data can be analysed by user-defined function; the user-function has access to the plot widget and can draw additional plot items
 
-* improved *Scatter Plot* app:
+* improved _Scatter Plot_ app:
 
   * added support for vector data ([#1393](https://bitbucket.org/hu-geomatics/enmap-box/issues/1393/scatter-plot-app-allow-vector-sources-as))
   * added support for simple scatter plots with symbols plotted, instead count density ([#1410](https://bitbucket.org/hu-geomatics/enmap-box/issues/1410/scatter-plot-app-allow-to-plot-scatter))
@@ -71,16 +70,16 @@ Also see https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/eo4q.
 
 ### Renderer
 
-* added custom *Bivariate Color Raster Renderer*: allows to visualize two bands using a 2d color ramp. Find a mapping example here: https://www.joshuastevens.net/cartography/make-a-bivariate-choropleth-map/ ([#70](https://github.com/EnMAP-Box/enmap-box/issues/70))
-* added custom *CMYK Color Raster Renderer*: allows to visualize four bands using the CMYK (Cyan, Magenta, Yellow, and Key (black)) color model. Find a mapping example here: https://adventuresinmapping.com/2018/10/31/cmyk-vice/ ([#74](https://github.com/EnMAP-Box/enmap-box/issues/74))
-* added custom *HSV Color Raster Renderer*: allows to visualize three bands using the HSV (Hue, Saturation, Value (black)) color model. Find a mapping example here: https://landmonitoring.earth/portal/ ; select Maps > Global Landcover Dynamics 2016-2020 ([#73](https://github.com/EnMAP-Box/enmap-box/issues/73))
-* added custom *Multisource Multiband Color Raster Renderer*: same functionality as the default QGIS Multiband Color Raster Renderer, but the Red, Green and Blue bands can come from different raster sources ([#112](https://github.com/EnMAP-Box/enmap-box/issues/112))
+* added custom _Bivariate Color Raster Renderer_: allows to visualize two bands using a 2d color ramp. Find a mapping example here: https://www.joshuastevens.net/cartography/make-a-bivariate-choropleth-map/ ([#70](https://github.com/EnMAP-Box/enmap-box/issues/70))
+* added custom _CMYK Color Raster Renderer_: allows to visualize four bands using the CMYK (Cyan, Magenta, Yellow, and Key (black)) color model. Find a mapping example here: https://adventuresinmapping.com/2018/10/31/cmyk-vice/ ([#74](https://github.com/EnMAP-Box/enmap-box/issues/74))
+* added custom _HSV Color Raster Renderer_: allows to visualize three bands using the HSV (Hue, Saturation, Value (black)) color model. Find a mapping example here: https://landmonitoring.earth/portal/ ; select Maps > Global Landcover Dynamics 2016-2020 ([#73](https://github.com/EnMAP-Box/enmap-box/issues/73))
+* added custom _Multisource Multiband Color Raster Renderer_: same functionality as the default QGIS Multiband Color Raster Renderer, but the Red, Green and Blue bands can come from different raster sources ([#112](https://github.com/EnMAP-Box/enmap-box/issues/112))
 
 ### Data Formats / Metadata Handling
 
 * GDAL metadata like band names can be edited in layer properties (support for ENVI images available with [GDAL 3.6](https://github.com/OSGeo/gdal/issues/6444)
 * added support for JSON files for storing classification/regression datasets used in ML algorithms ([#21](https://github.com/EnMAP-Box/enmap-box/issues/21))
-* added support for marking a raster bands as bad inside the *Raster Layer Styling* panel ([#31](https://github.com/EnMAP-Box/enmap-box/issues/31))
+* added support for marking a raster bands as bad inside the _Raster Layer Styling_ panel ([#31](https://github.com/EnMAP-Box/enmap-box/issues/31))
 * added support for FORCE v1.2 TSI format ([#111](https://github.com/EnMAP-Box/enmap-box/issues/111))
 
 ### Bugfixes
@@ -90,29 +89,29 @@ Also see https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/eo4q.
 
 ## Version 3.10
 
-*This release was tested under QGIS 3.24.1*
+_This release was tested under QGIS 3.24.1_
 
 ### GUI
 
-* *Project -> Create Data Source* to create new shapefiles, Geopackages or in-memory vector layers
+* _Project -> Create Data Source_ to create new shapefiles, Geopackages or in-memory vector layers
 * refactored layer handling and added layer groups ([#649](https://bitbucket.org/hu-geomatics/enmap-box/issues/649))
 * connected attribute table context menu 'Zoom/Pan to/Flash Feature' with EnMAP-Box maps ([#1250](https://bitbucket.org/hu-geomatics/enmap-box/issues/1250), [#1260](https://bitbucket.org/hu-geomatics/enmap-box/issues/1260))
 
 ### Data Sources
 
-* added 16 predefined RGB band combinations in the raster source context menu (thanks to the *GEE Data Catalog* plugin)
-* added *Create/update ENVI header* option in raster source context menu: allows to quickly create an ENVI header with proper metadata required for ENVI Software; works for ENVI and GeoTiff raster
+* added 16 predefined RGB band combinations in the raster source context menu (thanks to the _GEE Data Catalog_ plugin)
+* added _Create/update ENVI header_ option in raster source context menu: allows to quickly create an ENVI header with proper metadata required for ENVI Software; works for ENVI and GeoTiff raster
 * added option for opening a band in an existing map view
-* added *Save as* option in the layer source context menu
+* added _Save as_ option in the layer source context menu
 * shows in-memory vector layers
 * shows sub-dataset names ([#1145](https://bitbucket.org/hu-geomatics/enmap-box/issues/1145))
 * source properties are updated in regular intervals ([#1230](https://bitbucket.org/hu-geomatics/enmap-box/issues/1230))
 
 ### Data Views
 
-* added *Add Group* to create layer groups
-* added *Copy layer to QGIS* option in layer context menu
-* added *Apply model* option in raster layer context menu: allows to quickly apply a machine learner to predict a map using the raster
+* added _Add Group_ to create layer groups
+* added _Copy layer to QGIS_ option in layer context menu
+* added _Apply model_ option in raster layer context menu: allows to quickly apply a machine learner to predict a map using the raster
 * fixed drag & drop ([#1143](https://bitbucket.org/hu-geomatics/enmap-box/issues/1143))
 * fixed floating & unfloating issues ([#1231](https://bitbucket.org/hu-geomatics/enmap-box/issues/1231))
 
@@ -120,7 +119,7 @@ Also see https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/eo4q.
 
 * spectral profiles can be stored in text and JSON fields
 * added functions to access and modify spectral profiles within field calculator expressions, e.g.
-  *encodeProfile(field, encoding)* to convert a profile into its binary or JSON string representation
+  _encodeProfile(field, encoding)_ to convert a profile into its binary or JSON string representation
 * added first aggregation functions: maxProfile, meanProfile, medianProfile, minProfile ([#1130](https://bitbucket.org/hu-geomatics/enmap-box/issues/1130))
 * added Spectral Processing allows to create and modify spectral profiles using raster processing algorithms / models
 * revised import and export of spectral profiles from/to other formats (e.g. [#1249](https://bitbucket.org/hu-geomatics/enmap-box/issues/1249), [#1274](https://bitbucket.org/hu-geomatics/enmap-box/issues/1274))
@@ -140,9 +139,9 @@ Also see https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/eo4q.
 
 * Metadata Viewer revised ([#1185](https://bitbucket.org/hu-geomatics/enmap-box/issues/1185), [#1329](https://bitbucket.org/hu-geomatics/enmap-box/issues/1329)), added more band-specific settings
 
-* included the *GEE Timeseries Explorer* plugin into the EnMAP-Box
+* included the _GEE Timeseries Explorer_ plugin into the EnMAP-Box
 
-  * (slightly) new name *GEE Time Series Explorer* app
+  * (slightly) new name _GEE Time Series Explorer_ app
   * can be used inside EnMAP-Box GUI and stand-alone QGIS GUI
   * overhauled the GUI
 
@@ -165,68 +164,68 @@ Also see https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/eo4q.
   * improved bulk download
   * added bulk download for image chips (500x500 pixel around the data point location)
 
-* added *Classification Dataset Manager* app: allows to edit existing datasets (change class names and colors) and supports random subsampling
+* added _Classification Dataset Manager_ app: allows to edit existing datasets (change class names and colors) and supports random subsampling
 
-* added *Raster Layer Styling* panel
+* added _Raster Layer Styling_ panel
 
   * allows to quickly select an RGB, Gray or Pseudocolor visualization
   * supports band selection by wavelength
   * provides predefined RGB band combinations (e.g. Natural color, False color etc.)
   * supports the linking of the style between multiple raster layer
 
-* added *Spectral Index Creator* app: allows to calculated over 100 spectral indices (thanks to the Awesome Spectral Indices project: https://awesome-ee-spectral-indices.readthedocs.io)
-* added *Raster Source Band Properties Editor* application: allows to view and edit band properties of GDAL raster sources; with special support for ENVI metadata
-* added *Color Space Explorer* application: allows to animate RGB / Gray bands of a raster layer (comparable to the ENVI Band Animator, but more advanced)
-* replaced the old *Band statistics* application with a new more interactive application
-* replaced the old *Classification statistics* application with a new more interactive application
-* replaced the old *Scatter plot* application with a new more interactive application
+* added _Spectral Index Creator_ app: allows to calculated over 100 spectral indices (thanks to the Awesome Spectral Indices project: https://awesome-ee-spectral-indices.readthedocs.io)
+* added _Raster Source Band Properties Editor_ application: allows to view and edit band properties of GDAL raster sources; with special support for ENVI metadata
+* added _Color Space Explorer_ application: allows to animate RGB / Gray bands of a raster layer (comparable to the ENVI Band Animator, but more advanced)
+* replaced the old _Band statistics_ application with a new more interactive application
+* replaced the old _Classification statistics_ application with a new more interactive application
+* replaced the old _Scatter plot_ application with a new more interactive application
 
-* added *Python Console* option under Tools > Developers menu: mainly for debugging in EnMAP-Box stand-alone mode, where the QGIS GUI and QGIS Python Console isn't available
-* added *Remove non-EnMAP-Box layers from project* option under Tools > Developers menu: mainly for closing layers that aren't accessible in EnMAP-Box stand-alone mode, where the QGIS GUI isn't available
+* added _Python Console_ option under Tools > Developers menu: mainly for debugging in EnMAP-Box stand-alone mode, where the QGIS GUI and QGIS Python Console isn't available
+* added _Remove non-EnMAP-Box layers from project_ option under Tools > Developers menu: mainly for closing layers that aren't accessible in EnMAP-Box stand-alone mode, where the QGIS GUI isn't available
 
 ### Renderer
 
-* added custom *Enhanced Multiband Color Rendering* raster renderer: allows to visualize arbitrary many bands at the same time using individual color canons for each band (it's currently more a prototype)
+* added custom _Enhanced Multiband Color Rendering_ raster renderer: allows to visualize arbitrary many bands at the same time using individual color canons for each band (it's currently more a prototype)
 
 ### Processing algorithms
 
-* added *Classification workflow* processing algorithm: combines model fitting, map prediction and model performance assessment in one algorithm
-* added *Regression workflow* processing algorithm: combines model fitting, map prediction and model performance assessment in one algorithm
-* added *Receiver operating characteristic (ROC) and detection error tradeoff (DET) curves* processing algorithm
-* added *Create regression dataset (SynthMix from classification dataset)* processing algorithm
-* added *Fit Spectral Angle Mapper* processing algorithm
-* added *Fit Spectral Angle Mapper* processing algorithm
-* added *Edit raster source band properties* processing algorithm: allows to set band names, center wavelength, FWHM, bad band multipliers, acquisition start and end times, data offset and scale, and no data values, to a GDAL raster source
-* added *Stack raster layers* processing algorithm: a simple way to stack the bands of a list of rasters
-* added *Fit CatBoostClassifier* processing algorithm
-* added *Fit LGBMClassifier* processing algorithm
-* added *Fit XGBClassifier* processing algorithm
-* added *Fit XGBRFClassifier* processing algorithm
-* added *Fit CatBoostRegressor* processing algorithm
-* added *Fit LGBMRegressor* processing algorithm
-* added *Fit XGBRegressor* processing algorithm
-* added *Fit XGBRFRegressor* processing algorithm
-* added *Merge classification datasets* processing algorithm
-* added *Import PRISMA L2B product* processing algorithm
-* added *Import PRISMA L2C product* processing algorithm
-* improved *Import Landsat L2 product* processing algorithm: added support for Landsat 9
-* improved *Import PRISMA \<XYZ\> product* processing algorithms: set default style for QA masks with nice colors
-* improved *Import PRISMA L2D product* processing algorithm: allow to identify bad bands, based on the amount of bad pixels observed in the band
-* improved *Translate raster layer* processing algorithm: remove several items from the ENVI dataset metadata domain, to avoid inconsistencies after band subsetting
-* improved *Aggregate raster layer bands* processing algorithm: we support more aggregation functions and multi-band output
-* overhauled *Regression layer accuracy report* processing algorithm
-* overhauled *Regressor performance report* processing algorithm
-* overhauled *Import PRISMA L1 product* processing algorithms: now supports all sub-datasets
-* replaced *Regression-based unmixing* application by a processing algorithm
-* added *Aggregate Spectral Profiles* (enmapbox:aggregrateprofiles) ([#1130](https://bitbucket.org/hu-geomatics/enmap-box/issues/1130))
+* added _Classification workflow_ processing algorithm: combines model fitting, map prediction and model performance assessment in one algorithm
+* added _Regression workflow_ processing algorithm: combines model fitting, map prediction and model performance assessment in one algorithm
+* added _Receiver operating characteristic (ROC) and detection error tradeoff (DET) curves_ processing algorithm
+* added _Create regression dataset (SynthMix from classification dataset)_ processing algorithm
+* added _Fit Spectral Angle Mapper_ processing algorithm
+* added _Fit Spectral Angle Mapper_ processing algorithm
+* added _Edit raster source band properties_ processing algorithm: allows to set band names, center wavelength, FWHM, bad band multipliers, acquisition start and end times, data offset and scale, and no data values, to a GDAL raster source
+* added _Stack raster layers_ processing algorithm: a simple way to stack the bands of a list of rasters
+* added _Fit CatBoostClassifier_ processing algorithm
+* added _Fit LGBMClassifier_ processing algorithm
+* added _Fit XGBClassifier_ processing algorithm
+* added _Fit XGBRFClassifier_ processing algorithm
+* added _Fit CatBoostRegressor_ processing algorithm
+* added _Fit LGBMRegressor_ processing algorithm
+* added _Fit XGBRegressor_ processing algorithm
+* added _Fit XGBRFRegressor_ processing algorithm
+* added _Merge classification datasets_ processing algorithm
+* added _Import PRISMA L2B product_ processing algorithm
+* added _Import PRISMA L2C product_ processing algorithm
+* improved _Import Landsat L2 product_ processing algorithm: added support for Landsat 9
+* improved _Import PRISMA \<XYZ\> product_ processing algorithms: set default style for QA masks with nice colors
+* improved _Import PRISMA L2D product_ processing algorithm: allow to identify bad bands, based on the amount of bad pixels observed in the band
+* improved _Translate raster layer_ processing algorithm: remove several items from the ENVI dataset metadata domain, to avoid inconsistencies after band subsetting
+* improved _Aggregate raster layer bands_ processing algorithm: we support more aggregation functions and multi-band output
+* overhauled _Regression layer accuracy report_ processing algorithm
+* overhauled _Regressor performance report_ processing algorithm
+* overhauled _Import PRISMA L1 product_ processing algorithms: now supports all sub-datasets
+* replaced _Regression-based unmixing_ application by a processing algorithm
+* added _Aggregate Spectral Profiles_ (enmapbox:aggregrateprofiles) ([#1130](https://bitbucket.org/hu-geomatics/enmap-box/issues/1130))
 
 * added custom processing widgets for selecting predefined classifier, regressor, clusterer and transformer specifications (i.e. code snippets)
 * added custom processing widgets for selecting, and on-the-fly creating, training datasets: this makes ML workflows more convenient
-* added custom processing widgets for selecting raster output format and creation options in the *Translate raster layer* processing algorithm
+* added custom processing widgets for selecting raster output format and creation options in the _Translate raster layer_ processing algorithm
 
 ### Miscellaneous
 
-* plugin settings are now defined in *.plugin.ini*
+* plugin settings are now defined in _.plugin.ini_
 * refactored unit tests
 * new vector layers are added on top of the map canvas layer stack ([#1210](https://bitbucket.org/hu-geomatics/enmap-box/issues/1210))
 * fixed bug in cursor location value panel in case of failed CRS transformation ([#1221](https://bitbucket.org/hu-geomatics/enmap-box/issues/1221))
@@ -237,23 +236,23 @@ Also see https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/eo4q.
 
 ## Version 3.9
 
-*This release was tested under QGIS 3.18 and 3.20.*
+ _This release was tested under QGIS 3.18 and 3.20._
 
-*Note that we are currently in a transition phase, where we're overhauling all processing algorithms.
-Already overhauled algorithms are placed in groups prefixed by an asterisk, e.g. "*Classification".*
+ _Note that we are currently in a transition phase, where we're overhauling all processing algorithms.
+Already overhauled algorithms are placed in groups prefixed by an asterisk, e.g. "Classification"._
 
 
 ### GUI
 
 * added drag&drop functionality for opening external products (PRISMA, DESIS, Sentinel-2, Landsat) by simply dragging and dropping the product metadata file from the system file explorer onto the map view area.
-* added map view context menu *Set background color* option
+* added map view context menu _Set background color_ option
 
-* new *Save as* options in data source and data view panel context menus:
+* new _Save as_ options in data source and data view panel context menus:
 
-  * opens *Translate raster layer* dialog for raster sources
-  * opens *Save Features* dialog for vector sources
+  * opens _Translate raster layer_ dialog for raster sources
+  * opens _Save Features_ dialog for vector sources
 
-* added data sources context menu *Append ENVI header* option: opens *Append ENVI header to GeoTiff raster layer* algorithm dialog
+* added data sources context menu _Append ENVI header_ option: opens _Append ENVI header to GeoTiff raster layer_ algorithm dialog
 * added single pixel movement in map view using \<Ctrl\> + \<Arrow\> keys, \<Ctrl\> + S to save a selected profile in a Spectral Library
 
 * revised Data Source Panel and Data Source handling ([#430](https://bitbucket.org/hu-geomatics/enmap-box/issues/430))
@@ -292,12 +291,12 @@ Already overhauled algorithms are placed in groups prefixed by an asterisk, e.g.
 
 We started to introduced new raster renderer into the EnMAP-Box / QGIS.
 Unfortunately, QGIS currently doesn't support registering custom Python raster renderer.
-Because of this, our renderers aren't visible in the *Renderer type* list inside the *Layer Properties* dialog under *Symbology > Band Rendering*.
+Because of this, our renderers aren't visible in the _Renderer type_ list inside the _Layer Properties_ dialog under _Symbology > Band Rendering_.
 
-To actually use one of our renderers, you need to choose it from the *Custom raster renderer* submenu inside the raster layer context menu in the *Date Views* panel.
+To actually use one of our renderers, you need to choose it from the _Custom raster renderer_ submenu inside the raster layer context menu in the _Date Views_ panel.
 
-* added custom *Class fraction/probability* raster renderer: allows to visualize arbitrary many fraction/probability bands at the same time; this will replace the *Create RGB image from class probability/fraction layer* processing algorithm
-* added custom *Decorrelation stretch* raster renderer: remove the high correlation commonly found in optical bands to produce a more colorful color composite image; this will replace the *Decorrelation stretch* processing algorithm
+* added custom _Class fraction/probability_ raster renderer: allows to visualize arbitrary many fraction/probability bands at the same time; this will replace the _Create RGB image from class probability/fraction layer_ processing algorithm
+* added custom _Decorrelation stretch_ raster renderer: remove the high correlation commonly found in optical bands to produce a more colorful color composite image; this will replace the _Decorrelation stretch_ processing algorithm
 
 ### Processing algorithms
 
@@ -306,20 +305,20 @@ To actually use one of our renderers, you need to choose it from the *Custom ras
 * added Sentinel-2 L2A product import
 * added custom processing widget for selecting classification datasets from various sources; improves consistency and look&feel in algorithm dialogs and application GUIs
 * added custom processing widget for Python code with highlighting
-* added custem processing widget for building raster math expressions and code snippets
+* added custom processing widget for building raster math expressions and code snippets
 * improved raster math algorithms dialog and provided comprehensive cookbook usage recipe on ReadTheDocs
-* added *Layer to mask layer* processing algorithm
-* added *Create mask raster layer* processing algorithm
+* added _Layer to mask layer_ processing algorithm
+* added _Create mask raster layer_ processing algorithm
 * overhauled all spatial and spectral filter algorithms
-* added *Spatial convolution 2D Savitzki-Golay filter* processing algorithm
+* added _Spatial convolution 2D Savitzki-Golay filter_ processing algorithm
 * overhauled all spectral resampling algorithms; added more custom sensors for spectral resampling: we now support EnMAP, DESIS, PRISMA, Landsat 4-8 and Sentinel-2; predefined sensor response functions are editable in the algorithm dialog
-* added *Spectral resampling (to response function library)* processing algorithm: allows to specify the target response functions via a spectral library
-* added *Spectral resampling (to spectral raster layer wavelength and FWHM)* processing algorithm: allows to specify the target response functions via a spectral raster layer
-* added *Spectral resampling (to custom sensor)* processing algorithm: allows to specify the target response function via Python code
-* improved *Translate raster layer* processing algorithm: 1) improved source and target no data handling, 2) added option for spectral subsetting to another spectral raster layer, 3) added options for setting/updating band scale and offset values, 4) added option for creating an ENVI header sidecar file for better compatibility to ENVI software
-* added *Save raster layer as* processing algorithm: a slimmed down version of "Translate raster layer"
-* added *Append ENVI header to GeoTiff raster layer* processing algorithm: places a \*.hdr ENVI header file next to a GeoTiff raster to improve compatibility to ENVI software
-* added *Geolocate raster layer* processing algorithm: allows to geolocate a raster given in sensor geometry using X/Y location bands; e.g. usefull for geolocating PRISMA L1 Landcover into PRISMA L2 pixel grid using the Lat/Lon location bands
+* added _Spectral resampling (to response function library)_ processing algorithm: allows to specify the target response functions via a spectral library
+* added _Spectral resampling (to spectral raster layer wavelength and FWHM)_ processing algorithm: allows to specify the target response functions via a spectral raster layer
+* added _Spectral resampling (to custom sensor)_ processing algorithm: allows to specify the target response function via Python code
+* improved _Translate raster layer_ processing algorithm: 1) improved source and target no data handling, 2) added option for spectral subsetting to another spectral raster layer, 3) added options for setting/updating band scale and offset values, 4) added option for creating an ENVI header sidecar file for better compatibility to ENVI software
+* added _Save raster layer as_ processing algorithm: a slimmed down version of "Translate raster layer"
+* added _Append ENVI header to GeoTiff raster layer_ processing algorithm: places a \_.hdr ENVI header file next to a GeoTiff raster to improve compatibility to ENVI software
+_ added _Geolocate raster layer_ processing algorithm: allows to geolocate a raster given in sensor geometry using X/Y location bands; e.g. usefull for geolocating PRISMA L1 Landcover into PRISMA L2 pixel grid using the Lat/Lon location bands
 
 ### Miscellaneous
 
@@ -344,7 +343,7 @@ To actually use one of our renderers, you need to choose it from the *Custom ras
 * overhauled processing algorithm for creating RGB images from class probability or class fraction layer
 * added processing algorithm for creating a grid (i.e. an empty raster layer) by specifying target CRS, extent and size
 * added processing algorithm for doing raster math with a list of input raster layers
-* added processing algorithm for rasterizing categoriezed vector layers
+* added processing algorithm for rasterizing categorized vector layers
 * overhauled processing algorithm for rasterizing vector layers (improved performance)
 * added processing algorithm for translating categorized raster layers
 * overhauled processing algorithm for translating raster layers
@@ -365,10 +364,10 @@ To actually use one of our renderers, you need to choose it from the *Custom ras
 * added Save As ENVI Raster PA: saves a raster in ENVI format and takes care of proper metadata storage inside ENVI header file
 * added Aggregate Raster Bands PA: allows to aggregate multiband raster into a single band using aggregation functions like min, max, mean, any, all, etc.
 * classification scheme is now defined by the layer renderer
-* *Spectral Resampling PA* reworked spectral resampling
-* *Classification Workflow* support libraries as input
-* *ImageMath* added predefined code snippets
-* *Subset Raster Wavebands PA* support band selection via wavelength
+* _Spectral Resampling PA_ reworked spectral resampling
+* _Classification Workflow_ support libraries as input
+* _ImageMath_ added predefined code snippets
+* _Subset Raster Wavebands PA_ support band selection via wavelength
 * LayerTreeView: enhanced context menus:
   double-click on map layer opens Properties Dialog,
   double-click on a vector layers' legend item opens a Symbol dialog
@@ -397,6 +396,7 @@ To actually use one of our renderers, you need to choose it from the *Custom ras
 * Spectral Profile Source panel
     * is properly updated on removal/adding of raster sources or spectral libraries
     * allows to define source-specific profile plot styles ([#422](https://bitbucket.org/hu-geomatics/enmap-box/issues//422), [#468](https://bitbucket.org/hu-geomatics/enmap-box/issues/468))
+
 ### Spectral Library Viewer & Spectral Libraries
 
   * added color schemes to set plot and profile styles
@@ -424,6 +424,7 @@ To actually use one of our renderers, you need to choose it from the *Custom ras
 
 
 (including last hotfixes from 2019-11-12)
+
 
 * removed numba imports from LMU vegetation app
 * vector layer styling is loaded by default
@@ -464,7 +465,7 @@ To actually use one of our renderers, you need to choose it from the *Custom ras
 ## Version 3.2
 
 
-* ... *sorry, but we forgot to track the changes here*
+* ... _sorry, but we forgot to track the changes here_
 
 ## Version 3.1
 
