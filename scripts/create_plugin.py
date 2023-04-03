@@ -31,6 +31,8 @@ import sys
 import textwrap
 import typing
 import warnings
+from typing import Union
+
 import docutils.core
 from os.path import exists
 
@@ -182,6 +184,8 @@ def create_enmapbox_plugin(include_testdata: bool = False,
 
     PATH_METADATAFILE = PLUGIN_DIR / 'metadata.txt'
 
+    pathAbout = DIR_REPO / 'About.md'
+
     # set QGIS Metadata file values
     MD = QGISMetadataFileWriter()
     MD.mName = config['metadata']['name']
@@ -191,7 +195,7 @@ def create_enmapbox_plugin(include_testdata: bool = False,
     MD.mAuthor = config['metadata']['authors'].strip().split('\n')
     MD.mIcon = config['metadata']['icon']
     MD.mHomepage = config['metadata']['homepage']
-    MD.mAbout = enmapbox.ABOUT
+    MD.mAbout = markdownToHTML(pathAbout)
     MD.mTracker = enmapbox.ISSUE_TRACKER
     MD.mRepository = enmapbox.REPOSITORY
     MD.mQgisMinimumVersion = enmapbox.MIN_VERSION_QGIS
@@ -314,6 +318,29 @@ def create_enmapbox_plugin(include_testdata: bool = False,
 
     return None
 
+def markdownToHTML(path_md: Union[str, pathlib.Path]) -> str:
+    path_md = pathlib.Path(path_md)
+
+    if not path_md.is_file():
+        for s in ['.md', '.rst']:
+            p = path_md.parent / (os.path.splitext(path_md.name)[0] + s)
+            if p.is_file():
+                path_md = p
+                break
+
+    assert path_md.is_file(), path_md
+    overrides = {'stylesheet': None,
+                 'embed_stylesheet': False,
+                 'output_encoding': 'utf-8',
+                 }
+
+    buffer = io.StringIO()
+    html = docutils.core.publish_file(
+        source_path=path_md,
+        writer_name='html5',
+        destination=buffer,
+        settings_overrides=overrides)
+    return html
 
 def createCHANGELOG(dirPlugin):
     """
@@ -328,17 +355,7 @@ def createCHANGELOG(dirPlugin):
     assert os.path.isfile(pathMD)
     #    import sphinx.transforms
 
-    overrides = {'stylesheet': None,
-                 'embed_stylesheet': False,
-                 'output_encoding': 'utf-8',
-                 }
-
-    buffer = io.StringIO()
-    html = docutils.core.publish_file(
-        source_path=pathMD,
-        writer_name='html5',
-        destination=buffer,
-        settings_overrides=overrides)
+    html = markdownToHTML(pathMD)
 
     from xml.dom import minidom
     xml = minidom.parseString(html)

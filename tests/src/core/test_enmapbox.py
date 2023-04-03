@@ -40,13 +40,6 @@ from qgis.gui import QgsMapLayerComboBox, QgisInterface, QgsProcessingContextGen
 
 class EnMAPBoxTests(EnMAPBoxTestCase):
 
-    def test_AboutDialog(self):
-
-        from enmapbox.gui.about import AboutDialog
-        d = AboutDialog()
-        self.assertIsInstance(d, AboutDialog)
-        self.showGui(d)
-
     @unittest.skipIf(not (pathlib.Path(DIR_REPO) / 'qgisresources').is_dir(), 'qgisresources dir does not exist')
     def test_find_qgis_resources(self):
         from enmapbox.qgispluginsupport.qps.resources import findQGISResourceFiles

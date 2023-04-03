@@ -18,11 +18,11 @@
 ***************************************************************************
 """
 
-import os
 import pathlib
-from qgis.PyQt.QtWidgets import QDialog
-from enmapbox import DIR_REPO, ABOUT, REPOSITORY
+
+from enmapbox import DIR_REPO, REPOSITORY
 from enmapbox.gui.utils import loadUi
+from qgis.PyQt.QtWidgets import QDialog
 
 
 class AboutDialog(QDialog):
@@ -44,18 +44,25 @@ class AboutDialog(QDialog):
         self.setAboutTitle()
 
         def loadTextFile(p):
-            if not os.path.isfile(p):
+            p = pathlib.Path(p)
+            if not p.is_file():
+                if p.name.endswith('.rst'):
+                    p = p.parent / p.name.replace('.rst', '.md')
+            if not p.is_file():
                 return 'File not found "{}"'.format(p)
 
-            f = open(p, 'r', encoding='utf-8')
-            lines = f.read()
-            f.close()
+            with open(p, 'r', encoding='utf-8') as f:
+                lines = f.read()
             return lines
 
-        self.labelAboutText.setText(f'<html><head/><body>{ABOUT}</body></html>')
-        self.tbLicense.setText(loadTextFile(os.path.join(DIR_REPO, 'LICENSE.md')))
-        self.tbContributors.setText(loadTextFile(os.path.join(DIR_REPO, 'CONTRIBUTORS.rst')))
-        self.tbChanges.setText(loadTextFile(os.path.join(DIR_REPO, 'CHANGELOG.rst')))
+        r = pathlib.Path(DIR_REPO)
+
+        # self.labelAboutText.setText(f'<html><head/><body>{ABOUT}</body></html>')
+        self.tbAbout.setMarkdown(loadTextFile(r / 'ABOUT.md'))
+        self.tbLicense.setMarkdown(loadTextFile(r / 'LICENSE.md'))
+        self.tbCredits.setMarkdown(loadTextFile(r / 'CREDITS.md'))
+        self.tbContributors.setMarkdown(loadTextFile(r / 'CONTRIBUTORS.md'))
+        self.tbChanges.setMarkdown(loadTextFile(r / 'CHANGELOG.rst'))
 
     def setAboutTitle(self, suffix=None):
         item = self.listWidget.currentItem()
