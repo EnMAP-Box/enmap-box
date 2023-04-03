@@ -57,16 +57,14 @@ _Important Notice: the EnMAP-Box repository moved to https://github.com/EnMAP-Bo
 ### Applications
 
 * added _Profile Analytics_ app: ([#81](https://github.com/EnMAP-Box/enmap-box/issues/81))
-
-  * allows various profile plot types like spectral profiles, temporal profiles, spatial profiles.
-  * profile data can be analysed by user-defined function; the user-function has access to the plot widget and can draw additional plot items
+    * allows various profile plot types like spectral profiles, temporal profiles, spatial profiles.
+    * profile data can be analysed by user-defined function; the user-function has access to the plot widget and can draw additional plot items
 
 * improved _Scatter Plot_ app:
-
-  * added support for vector data ([#1393](https://bitbucket.org/hu-geomatics/enmap-box/issues/1393/scatter-plot-app-allow-vector-sources-as))
-  * added support for simple scatter plots with symbols plotted, instead count density ([#1410](https://bitbucket.org/hu-geomatics/enmap-box/issues/1410/scatter-plot-app-allow-to-plot-scatter))
-  * added support for showing 1:1 line ([#1394](https://bitbucket.org/hu-geomatics/enmap-box/issues/1394/scatter-plot-app-add-performance-measures))
-  * added support for fitting a line to the data and report goodness of fit measures ([#1394](https://bitbucket.org/hu-geomatics/enmap-box/issues/1394/scatter-plot-app-add-performance-measures))
+    * added support for vector data ([#1393](https://bitbucket.org/hu-geomatics/enmap-box/issues/1393/scatter-plot-app-allow-vector-sources-as))
+    * added support for simple scatter plots with symbols plotted, instead count density ([#1410](https://bitbucket.org/hu-geomatics/enmap-box/issues/1410/scatter-plot-app-allow-to-plot-scatter))
+    * added support for showing 1:1 line ([#1394](https://bitbucket.org/hu-geomatics/enmap-box/issues/1394/scatter-plot-app-add-performance-measures))
+    * added support for fitting a line to the data and report goodness of fit measures ([#1394](https://bitbucket.org/hu-geomatics/enmap-box/issues/1394/scatter-plot-app-add-performance-measures))
 
 ### Renderer
 
@@ -140,10 +138,9 @@ _This release was tested under QGIS 3.24.1_
 * Metadata Viewer revised ([#1185](https://bitbucket.org/hu-geomatics/enmap-box/issues/1185), [#1329](https://bitbucket.org/hu-geomatics/enmap-box/issues/1329)), added more band-specific settings
 
 * included the _GEE Timeseries Explorer_ plugin into the EnMAP-Box
-
-  * (slightly) new name _GEE Time Series Explorer_ app
-  * can be used inside EnMAP-Box GUI and stand-alone QGIS GUI
-  * overhauled the GUI
+    * (slightly) new name _GEE Time Series Explorer_ app
+    * can be used inside EnMAP-Box GUI and stand-alone QGIS GUI
+    * overhauled the GUI
 
     * highlighted the most important satellite archive collections like Landsat, MODIS, Sentinel, and the only hyperspectral collection available (i.e. EO-1 Hyperion Hyperspectral Imager)
     * added a band properties table showing band names, wavelength, data offset and gain, and a description
@@ -152,34 +149,27 @@ _This release was tested under QGIS 3.24.1_
     * added pixel quality filtering
     * improved temporal profile plot styling
     * requests to Google Earth Engine server is now asyncronized (i.e. not blocking the GUI)
-
-  * made better use of collection metadata
-
-    * use spectral wavelength for showing spectral profiles
-    * use offset and scale values for proper data scaling
-    * use band descriptions in tooltips
-    * use band properties to enable pixel quality screening
-    * use predefined RGB visualizations for band rendering
-
-  * improved bulk download
-  * added bulk download for image chips (500x500 pixel around the data point location)
+    * made better use of collection metadata
+        * use spectral wavelength for showing spectral profiles
+        * use offset and scale values for proper data scaling
+        * use band descriptions in tooltips
+        * use band properties to enable pixel quality screening
+        * use predefined RGB visualizations for band rendering
+        * improved bulk download
+        * added bulk download for image chips (500x500 pixel around the data point location)
 
 * added _Classification Dataset Manager_ app: allows to edit existing datasets (change class names and colors) and supports random subsampling
-
 * added _Raster Layer Styling_ panel
-
-  * allows to quickly select an RGB, Gray or Pseudocolor visualization
-  * supports band selection by wavelength
-  * provides predefined RGB band combinations (e.g. Natural color, False color etc.)
-  * supports the linking of the style between multiple raster layer
-
+    * allows to quickly select an RGB, Gray or Pseudocolor visualization
+    * supports band selection by wavelength
+    * provides predefined RGB band combinations (e.g. Natural color, False color etc.)
+    * supports the linking of the style between multiple raster layer
 * added _Spectral Index Creator_ app: allows to calculated over 100 spectral indices (thanks to the Awesome Spectral Indices project: https://awesome-ee-spectral-indices.readthedocs.io)
 * added _Raster Source Band Properties Editor_ application: allows to view and edit band properties of GDAL raster sources; with special support for ENVI metadata
 * added _Color Space Explorer_ application: allows to animate RGB / Gray bands of a raster layer (comparable to the ENVI Band Animator, but more advanced)
 * replaced the old _Band statistics_ application with a new more interactive application
 * replaced the old _Classification statistics_ application with a new more interactive application
 * replaced the old _Scatter plot_ application with a new more interactive application
-
 * added _Python Console_ option under Tools > Developers menu: mainly for debugging in EnMAP-Box stand-alone mode, where the QGIS GUI and QGIS Python Console isn't available
 * added _Remove non-EnMAP-Box layers from project_ option under Tools > Developers menu: mainly for closing layers that aren't accessible in EnMAP-Box stand-alone mode, where the QGIS GUI isn't available
 
@@ -231,8 +221,7 @@ _This release was tested under QGIS 3.24.1_
 * fixed bug in cursor location value panel in case of failed CRS transformation ([#1221](https://bitbucket.org/hu-geomatics/enmap-box/issues/1221))
 * fixed crosshair distance measurements
 * introduces EnMAPBoxProject, a QgsProject to keep EnMAP-Box QgsMapLayer references alive ([#1227](https://bitbucket.org/hu-geomatics/enmap-box/issues/1227))
-
-* fixe bug in Spectral Profile import dialog (#
+* fixe bug in Spectral Profile import dialog
 
 ## Version 3.9
 
@@ -249,8 +238,8 @@ Already overhauled algorithms are placed in groups prefixed by an asterisk, e.g.
 
 * new _Save as_ options in data source and data view panel context menus:
 
-  * opens _Translate raster layer_ dialog for raster sources
-  * opens _Save Features_ dialog for vector sources
+    * opens _Translate raster layer_ dialog for raster sources
+    * opens _Save Features_ dialog for vector sources
 
 * added data sources context menu _Append ENVI header_ option: opens _Append ENVI header to GeoTiff raster layer_ algorithm dialog
 * added single pixel movement in map view using \<Ctrl\> + \<Arrow\> keys, \<Ctrl\> + S to save a selected profile in a Spectral Library
@@ -258,32 +247,32 @@ Already overhauled algorithms are placed in groups prefixed by an asterisk, e.g.
 * revised Data Source Panel and Data Source handling ([#430](https://bitbucket.org/hu-geomatics/enmap-box/issues/430))
 * revised Spectral Library concept:
 
-  * each vector layer that allows storing binary data can become a spectral library
-    (e.g. Geopackage, PostGIS, in-memory layers)
-  * spectral libraries can define multiple spectral profile fields
+    * each vector layer that allows storing binary data can become a spectral library
+      (e.g. Geopackage, PostGIS, in-memory layers)
+    * spectral libraries can define multiple spectral profile fields
 
 * revised Spectral Profile Source panel:
 
-  * tree view defines how spectral profile features will be generated when using the Identify
-    map tool with activated pixel profile option
-  * allows to extract spectral profiles from different raster sources into different
-    spectral profile fields of the same feature or into different features
-  * values of extracted spectral profiles can be scaled by a (new) offset and a multiplier
-  * other attributes of new features, e.g. for text and numeric fields, can be
-    added by static values or expressions
+    * tree view defines how spectral profile features will be generated when using the Identify
+      map tool with activated pixel profile option
+    * allows to extract spectral profiles from different raster sources into different
+      spectral profile fields of the same feature or into different features
+    * values of extracted spectral profiles can be scaled by a (new) offset and a multiplier
+    * other attributes of new features, e.g. for text and numeric fields, can be
+      added by static values or expressions
 
 * revised Spectral Library Viewer:
 
-  * each vector layer can be opened in a Spectral Library Viewer
-  * spectral profile visualizations allow to define colors, lines styles and
-    profile labels
-  * spectral profile visualizations are applied to individual sets of spectral profiles,
-    e.g. all profiles of a spectral profile field, or only to profiles that match
-    filter expressions like ``"name" = 'vegetation'``
-  * profile colors can be defined as static color, attribute value or expression
-  * profile plot allows to select multiple data points, e.g. to compare individual
-    bands between spectral profiles
-  * dialog to add new fields shows data type icons for available field types
+    * each vector layer can be opened in a Spectral Library Viewer
+    * spectral profile visualizations allow to define colors, lines styles and
+      profile labels
+    * spectral profile visualizations are applied to individual sets of spectral profiles,
+      e.g. all profiles of a spectral profile field, or only to profiles that match
+      filter expressions like ``"name" = 'vegetation'``
+    * profile colors can be defined as static color, attribute value or expression
+    * profile plot allows to select multiple data points, e.g. to compare individual
+      bands between spectral profiles
+    * dialog to add new fields shows data type icons for available field types
 
 
 

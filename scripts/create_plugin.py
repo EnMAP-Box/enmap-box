@@ -387,21 +387,26 @@ def createCHANGELOG(dirPlugin):
 
         xml = xml.getElementsByTagName('body')[0]
         html = xml.toxml()
-    html_cleaned = []
-    for line in html.split('\n'):
-        # line to modify
-        line = re.sub(r'class="[^"]*"', '', line)
-        line = re.sub(r'id="[^"]*"', '', line)
-        line = re.sub(r'<li><p>', '<li>', line)
-        line = re.sub(r'</p></li>', '</li>', line)
-        line = re.sub(r'</?(dd|dt|div|body)[ ]*>', '', line)
-        line = line.strip()
-        if line != '':
-            html_cleaned.append(line)
+
+    if True:
+        html_cleaned = html
+    else:
+        html_cleaned = []
+        for line in html.split('\n'):
+            # line to modify
+            line = re.sub(r'class="[^"]*"', '', line)
+            line = re.sub(r'id="[^"]*"', '', line)
+            line = re.sub(r'<li><p>', '<li>', line)
+            line = re.sub(r'</p></li>', '</li>', line)
+            line = re.sub(r'</?(dd|dt|div|body)[ ]*>', '', line)
+            line = line.strip()
+            if line != '':
+                html_cleaned.append(line)
+        html_cleaned = '\n'.join(html_cleaned)
     # make html compact
 
     with open(pathCL, 'w', encoding='utf-8') as f:
-        f.write('\n'.join(html_cleaned))
+        f.write(html_cleaned)
 
 
 if __name__ == "__main__":
