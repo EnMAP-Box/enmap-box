@@ -31,7 +31,7 @@ class TestClassFractionRenderer(TestCase):
         XPcaStretched = scaler1.transform(XPca)
         Xt = pca.inverse_transform(XPcaStretched)
         percentiles = np.percentile(Xt, quantile_range, axis=0)
-        scaler2 = MinMaxScaler(feature_range=[0, 255], clip=True)
+        scaler2 = MinMaxScaler(feature_range=(0, 255), clip=True)
         scaler2.fit(percentiles)
 
         # make renderer
