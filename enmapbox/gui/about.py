@@ -19,7 +19,12 @@
 """
 
 import pathlib
+import webbrowser
+from typing import Union
 
+from qgis.PyQt.QtCore import QUrl
+from qgis.PyQt.QtWidgets import QTextBrowser
+from qgis.PyQt.QtCore import Qt
 from enmapbox import DIR_REPO, REPOSITORY
 from enmapbox.gui.utils import loadUi
 from qgis.PyQt.QtWidgets import QDialog
@@ -32,6 +37,23 @@ class AboutDialog(QDialog):
         from enmapbox import DIR_UIFILES
         pathUi = pathlib.Path(DIR_UIFILES) / 'aboutdialog.ui'
         loadUi(pathUi, self)
+        self.setWindowFlag(Qt.WindowContextHelpButtonHint, False)
+        self.tbAbout: QTextBrowser
+        self.tbLicense: QTextBrowser
+        self.tbCredits: QTextBrowser
+        self.tbContributors: QTextBrowser
+        self.tbChanges: QTextBrowser
+
+        for tb in [self.tbAbout, self.tbLicense, self.tbCredits, self.tbContributors, self.tbChanges]:
+            tb: QTextBrowser
+            tb.setOpenLinks(False)
+            tb.setOpenExternalLinks(False)
+
+        self.tbAbout.anchorClicked.connect(self.anchorClicked)
+        self.tbLicense.anchorClicked.connect(self.anchorClicked)
+        self.tbCredits.anchorClicked.connect(self.anchorClicked)
+        self.tbContributors.anchorClicked.connect(self.anchorClicked)
+        self.tbChanges.anchorClicked.connect(self.anchorClicked)
 
         self.mTitle = self.windowTitle()
         self.listWidget.currentItemChanged.connect(lambda: self.setAboutTitle())
@@ -43,7 +65,7 @@ class AboutDialog(QDialog):
         self.labelVersion.setText(info)
         self.setAboutTitle()
 
-        def loadTextFile(p):
+        def loadTextFile(p: Union[str, pathlib.Path]):
             p = pathlib.Path(p)
             if not p.is_file():
                 if p.name.endswith('.rst'):
@@ -64,7 +86,15 @@ class AboutDialog(QDialog):
         self.tbContributors.setMarkdown(loadTextFile(r / 'CONTRIBUTORS.md'))
         self.tbChanges.setMarkdown(loadTextFile(r / 'CHANGELOG.rst'))
 
-    def setAboutTitle(self, suffix=None):
+    def anchorClicked(self, url: QUrl):
+        """Opens an URL in local browser / mail client"""
+        assert isinstance(url, QUrl)
+        webbrowser.open(url.url())
+
+    def setAboutTitle(self, suffix: str = None):
+        """
+        Sets the dialog title
+        """
         item = self.listWidget.currentItem()
 
         if item:

@@ -321,7 +321,7 @@ test-align:center;</string>
               <string>&lt; replaces with content from ABOUT.md&gt;</string>
              </property>
              <property name="openExternalLinks">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
              <property name="openLinks">
               <bool>false</bool>
@@ -461,6 +461,9 @@ test-align:center;</string>
              <property name="placeholderText">
               <string>&lt; replaced with content CONTRIBUTORS.md&gt;</string>
              </property>
+             <property name="openLinks">
+              <bool>false</bool>
+             </property>
             </widget>
            </item>
           </layout>
@@ -492,6 +495,9 @@ test-align:center;</string>
              </property>
              <property name="placeholderText">
               <string>&lt; replaced with content CHANGELOG.md &gt;</string>
+             </property>
+             <property name="openLinks">
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -526,7 +532,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:5px; margin-bottom:5px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&amp;lt; replaced with content of CREDITS.md&amp;gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="openExternalLinks">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
              <property name="openLinks">
               <bool>false</bool>
@@ -555,7 +561,10 @@ p, li { white-space: pre-wrap; }
               <string>&lt; replaced with content LICENSE.md &gt;</string>
              </property>
              <property name="openExternalLinks">
-              <bool>true</bool>
+              <bool>false</bool>
+             </property>
+             <property name="openLinks">
+              <bool>false</bool>
              </property>
             </widget>
            </item>
