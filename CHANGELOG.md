@@ -96,7 +96,7 @@ Also see https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/eo4q.
 
 * *Project -> Create Data Source* to create new shapefiles, Geopackages or in-memory vector layers
 * refactored layer handling and added layer groups ([#649](https://bitbucket.org/hu-geomatics/enmap-box/issues/649))
-* connected attribute table context menu 'Zoom/Pan to/Flash Feature' with EnMAP-Box maps (#1250, #1260)
+* connected attribute table context menu 'Zoom/Pan to/Flash Feature' with EnMAP-Box maps ([#1250](https://bitbucket.org/hu-geomatics/enmap-box/issues/1250), [#1260](https://bitbucket.org/hu-geomatics/enmap-box/issues/1260))
 
 ### Data Sources
 
@@ -123,7 +123,7 @@ Also see https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/eo4q.
   *encodeProfile(field, encoding)* to convert a profile into its binary or JSON string representation
 * added first aggregation functions: maxProfile, meanProfile, medianProfile, minProfile ([#1130](https://bitbucket.org/hu-geomatics/enmap-box/issues/1130))
 * added Spectral Processing allows to create and modify spectral profiles using raster processing algorithms / models
-* revised import and export of spectral profiles from/to other formats (e.g. #1249, #1274)
+* revised import and export of spectral profiles from/to other formats (e.g. [#1249](https://bitbucket.org/hu-geomatics/enmap-box/issues/1249), [#1274](https://bitbucket.org/hu-geomatics/enmap-box/issues/1274))
 * new editor to modify single spectral profiles
 * reads profiles from Spectral Evolution .sed files (reference, target, reflectance)
 
@@ -138,7 +138,7 @@ Also see https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/eo4q.
 
 ### Applications
 
-* Metadata Viewer revised (#1185, #1329), added more band-specific settings
+* Metadata Viewer revised ([#1185](https://bitbucket.org/hu-geomatics/enmap-box/issues/1185), [#1329](https://bitbucket.org/hu-geomatics/enmap-box/issues/1329)), added more band-specific settings
 
 * included the *GEE Timeseries Explorer* plugin into the EnMAP-Box
 
@@ -352,7 +352,7 @@ To actually use one of our renderers, you need to choose it from the *Custom ras
 * added processing algorithm for sampling of raster layer values
 * added processing algorithm for decorrelation stretching
 * rename layers, map views and spectral library views with F2
-* model browser: improved visualization (#645, #646, #647), array values can be copied to clipboard ([#520](https://bitbucket.org/hu-geomatics/enmap-box/issues/520))
+* model browser: improved visualization ([#645](https://bitbucket.org/hu-geomatics/enmap-box/issues/645), [#646](https://bitbucket.org/hu-geomatics/enmap-box/issues/646), [#647](https://bitbucket.org/hu-geomatics/enmap-box/issues/647)), array values can be copied to clipboard ([#520](https://bitbucket.org/hu-geomatics/enmap-box/issues/520))
 * layers can be moved between maps ([#437](https://bitbucket.org/hu-geomatics/enmap-box/issues/437))
 * updated pyqtgraph to 0.12.1
 
@@ -372,7 +372,7 @@ To actually use one of our renderers, you need to choose it from the *Custom ras
 * LayerTreeView: enhanced context menus:
   double-click on map layer opens Properties Dialog,
   double-click on a vector layers' legend item opens a Symbol dialog
-* GDAL raster metadata can be modified (resolves #181)
+* GDAL raster metadata can be modified (resolves [#181](https://bitbucket.org/hu-geomatics/enmap-box/issues/181))
 * map canvas preserves scale on window resize ([#409](https://bitbucket.org/hu-geomatics/enmap-box/issues/409))
 * Reclassify Tool: can save and reload the class mapping, fixed ([#501](https://bitbucket.org/hu-geomatics/enmap-box/issues/501))
 * several fixed in Image Cube App
@@ -396,17 +396,17 @@ To actually use one of our renderers, you need to choose it from the *Custom ras
 * Map Canvas Crosshair can now show the pixel boundaries of any raster source known to QGIS
 * Spectral Profile Source panel
     * is properly updated on removal/adding of raster sources or spectral libraries
-    * allows to define source-specific profile plot styles (#422, #468)
+    * allows to define source-specific profile plot styles ([#422](https://bitbucket.org/hu-geomatics/enmap-box/issues//422), [#468](https://bitbucket.org/hu-geomatics/enmap-box/issues/468))
 ### Spectral Library Viewer & Spectral Libraries
 
   * added color schemes to set plot and profile styles
-  * fixed color scheme issue (# fixed #467 )
+  * fixed color scheme issue (# fixed [#467](https://bitbucket.org/hu-geomatics/enmap-box/issues/467) )
   * profile styles can be changed per profile ([#268](https://bitbucket.org/hu-geomatics/enmap-box/issues/268))
   * current/temporary profiles are shown in the attribute table
-  * added workaround for #345 (Spectral library create new field: problems with default fields)
-  * loading profiles based in vector position is done in a background process (closed #329)
-  * profile data point can be selected to show point specific information, e.g. the band number (#462, #267)
-  * closed #252
+  * added workaround for [#345](https://bitbucket.org/hu-geomatics/enmap-box/issues/345) (Spectral library create new field: problems with default fields)
+  * loading profiles based in vector position is done in a background process (closed [#329](https://bitbucket.org/hu-geomatics/enmap-box/issues/329))
+  * profile data point can be selected to show point specific information, e.g. the band number ([#462](https://bitbucket.org/hu-geomatics/enmap-box/issues/462), [#267](https://bitbucket.org/hu-geomatics/enmap-box/issues/267))
+  * closed [#252](https://bitbucket.org/hu-geomatics/enmap-box/issues/252)
   * implemented SpectralProfileRenderer to maintain profile-specific plot styles
 
 ### Miscellaneous
@@ -418,7 +418,7 @@ To actually use one of our renderers, you need to choose it from the *Custom ras
 * updated EnPTEnMAPBoxApp (see https://git-pages.gfz-potsdam.de/EnMAP/GFZ_Tools_EnMAP_BOX/enpt_enmapboxapp for documentation)
 * added EnSoMAP and EnGeoMAP applications provided by GFZ
 * added ONNS application provided by HZG
-* removed several bugs, e.g. #285, #206,
+* removed several bugs, e.g. [#285](https://bitbucket.org/hu-geomatics/enmap-box/issues/285), [#206](https://bitbucket.org/hu-geomatics/enmap-box/issues/206),
 
 ## Version 3.5
 
