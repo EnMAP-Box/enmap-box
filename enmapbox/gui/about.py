@@ -17,7 +17,7 @@
 *                                                                         *
 ***************************************************************************
 """
-
+import os
 import pathlib
 import webbrowser
 from typing import Union
@@ -67,9 +67,13 @@ class AboutDialog(QDialog):
 
         def loadTextFile(p: Union[str, pathlib.Path]):
             p = pathlib.Path(p)
+
             if not p.is_file():
-                if p.name.endswith('.rst'):
-                    p = p.parent / p.name.replace('.rst', '.md')
+                for suffix in ['.md', '.rst', '']:
+                    _p = p.parent / (os.path.splitext(p.name)[0] + suffix)
+                    if _p.is_file():
+                        p = _p
+                        break
             if not p.is_file():
                 return 'File not found "{}"'.format(p)
 
@@ -80,11 +84,11 @@ class AboutDialog(QDialog):
         r = pathlib.Path(DIR_REPO)
 
         # self.labelAboutText.setText(f'<html><head/><body>{ABOUT}</body></html>')
-        self.tbAbout.setMarkdown(loadTextFile(r / 'ABOUT.md'))
-        self.tbLicense.setMarkdown(loadTextFile(r / 'LICENSE.md'))
-        self.tbCredits.setMarkdown(loadTextFile(r / 'CREDITS.md'))
-        self.tbContributors.setMarkdown(loadTextFile(r / 'CONTRIBUTORS.md'))
-        self.tbChanges.setMarkdown(loadTextFile(r / 'CHANGELOG.rst'))
+        self.tbAbout.setMarkdown(loadTextFile(r / 'ABOUT'))
+        self.tbLicense.setMarkdown(loadTextFile(r / 'LICENSE'))
+        self.tbCredits.setMarkdown(loadTextFile(r / 'CREDITS'))
+        self.tbContributors.setMarkdown(loadTextFile(r / 'CONTRIBUTORS'))
+        self.tbChanges.setMarkdown(loadTextFile(r / 'CHANGELOG'))
 
     def anchorClicked(self, url: QUrl):
         """Opens an URL in local browser / mail client"""
