@@ -17,7 +17,6 @@
 *                                                                         *
 ***************************************************************************
 """
-import os
 import pathlib
 import webbrowser
 from typing import Union
