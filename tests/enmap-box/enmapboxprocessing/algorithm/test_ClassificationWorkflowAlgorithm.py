@@ -2,7 +2,6 @@ from sklearn.base import ClassifierMixin
 
 from enmapbox.exampledata import enmap
 from enmapboxprocessing.algorithm.classificationworkflowalgorithm import ClassificationWorkflowAlgorithm
-from enmapboxprocessing.algorithm.fitcatboostclassifieralgorithm import FitCatBoostClassifierAlgorithm
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import classifierDumpPkl
@@ -39,18 +38,5 @@ class TestClassificationAlgorithm(TestCase):
             alg.P_OUTPUT_CLASSIFICATION: self.filename('classification.tif'),
             alg.P_OUTPUT_PROBABILITY: self.filename('probability.tif'),
             alg.P_OUTPUT_REPORT: self.filename('report.html')
-        }
-        self.runalg(alg, parameters)
-
-    def _test_debug_issue1140(self):
-        alg = ClassificationWorkflowAlgorithm()
-        parameters = {
-            alg.P_DATASET: classifierDumpPkl,
-            alg.P_CLASSIFIER: FitCatBoostClassifierAlgorithm().defaultCodeAsString(),
-            alg.P_RASTER: enmap,
-            alg.P_OPEN_REPORT: self.openReport,
-            alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl'),
-            alg.P_OUTPUT_CLASSIFICATION: self.filename('classification.tif'),
-            alg.P_OUTPUT_PROBABILITY: self.filename('probability.tif'),
         }
         self.runalg(alg, parameters)
