@@ -1,4 +1,4 @@
-from os.path import join, dirname
+from os.path import join
 from typing import Union
 
 import numpy as np
@@ -20,7 +20,8 @@ class TestCase(enmapbox.testing.TestCase):
         self.assertTrue(np.all(array1 == array2))
 
     def testOutputFolder(self):
-        return join(dirname(dirname(__file__)), 'test-outputs')
+        return self.tempDir()
+        # return join(dirname(dirname(__file__)), 'test-outputs')
 
     def filename(self, basename: str):
         return join(self.testOutputFolder(), basename)

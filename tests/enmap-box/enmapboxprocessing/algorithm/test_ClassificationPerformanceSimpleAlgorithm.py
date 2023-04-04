@@ -1,16 +1,11 @@
 from math import isnan
 
-import numpy as np
-
-from enmapbox.exampledata import landcover_polygon, enmap
+from enmapbox.exampledata import landcover_polygon
 from enmapboxprocessing.algorithm.classificationperformancesimplealgorithm import \
     ClassificationPerformanceSimpleAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxprocessing.driver import Driver
-from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import landcover_map_l3
-from qgis.core import QgsProcessingException, QgsRasterLayer
 
 writeToDisk = True
 
