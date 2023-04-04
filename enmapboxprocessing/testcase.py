@@ -1,9 +1,9 @@
-import unittest.case
 from os.path import join, dirname
 from typing import Union
 
 import numpy as np
 
+import enmapbox.testing
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterwriter import RasterWriter
@@ -12,7 +12,7 @@ from qgis.core import QgsRectangle, QgsCoordinateReferenceSystem
 
 
 @typechecked
-class TestCase(unittest.case.TestCase):
+class TestCase(enmapbox.testing.TestCase):
 
     def assertArrayEqual(self, array1: Union[Number, Array2d, Array3d], array2: Union[Array2d, Array3d]):
         array1 = np.array(array1)

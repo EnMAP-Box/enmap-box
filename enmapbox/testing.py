@@ -32,7 +32,6 @@ from qgis.core import QgsProcessingParameterRasterDestination, QgsProcessingPara
     QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterRasterLayer, \
     QgsPythonRunner, QgsProcessingAlgorithm
 from qgis.gui import QgsPluginManagerInterface
-
 from .qgispluginsupport.qps.testing import TestObjects, TestCase, start_app
 
 start_app = start_app
