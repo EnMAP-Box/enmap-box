@@ -30,6 +30,12 @@ from enmapbox.gui.utils import loadUi
 from qgis.PyQt.QtWidgets import QDialog
 
 
+def anchorClicked(url: QUrl):
+    """Opens a URL in local browser / mail client"""
+    assert isinstance(url, QUrl)
+    webbrowser.open(url.url())
+
+
 class AboutDialog(QDialog):
     def __init__(self, *args, **kwds):
         """Constructor."""
@@ -49,11 +55,11 @@ class AboutDialog(QDialog):
             tb.setOpenLinks(False)
             tb.setOpenExternalLinks(False)
 
-        self.tbAbout.anchorClicked.connect(self.anchorClicked)
-        self.tbLicense.anchorClicked.connect(self.anchorClicked)
-        self.tbCredits.anchorClicked.connect(self.anchorClicked)
-        self.tbContributors.anchorClicked.connect(self.anchorClicked)
-        self.tbChanges.anchorClicked.connect(self.anchorClicked)
+        self.tbAbout.anchorClicked.connect(anchorClicked)
+        self.tbLicense.anchorClicked.connect(anchorClicked)
+        self.tbCredits.anchorClicked.connect(anchorClicked)
+        self.tbContributors.anchorClicked.connect(anchorClicked)
+        self.tbChanges.anchorClicked.connect(anchorClicked)
 
         self.mTitle = self.windowTitle()
         self.listWidget.currentItemChanged.connect(lambda: self.setAboutTitle())
@@ -65,35 +71,26 @@ class AboutDialog(QDialog):
         self.labelVersion.setText(info)
         self.setAboutTitle()
 
-        def loadTextFile(p: Union[str, pathlib.Path]):
+        def loadMD(p: Union[str, pathlib.Path]):
             p = pathlib.Path(p)
 
-            if not p.is_file():
-                for suffix in ['.md', '.rst', '']:
-                    _p = p.parent / (os.path.splitext(p.name)[0] + suffix)
-                    if _p.is_file():
-                        p = _p
-                        break
-            if not p.is_file():
-                return 'File not found "{}"'.format(p)
-
-            with open(p, 'r', encoding='utf-8') as f:
-                lines = f.read()
-            return lines
+            try:
+                assert p.is_file()
+                assert p.name.endswith('.md')
+                with open(p, 'r', encoding='utf-8') as f:
+                    md = f.read()
+            except (AssertionError, FileNotFoundError) as ex:
+                md = f'Unable to load "{p}"\n{ex}'
+            return md
 
         r = pathlib.Path(DIR_REPO)
 
         # self.labelAboutText.setText(f'<html><head/><body>{ABOUT}</body></html>')
-        self.tbAbout.setMarkdown(loadTextFile(r / 'ABOUT'))
-        self.tbLicense.setMarkdown(loadTextFile(r / 'LICENSE'))
-        self.tbCredits.setMarkdown(loadTextFile(r / 'CREDITS'))
-        self.tbContributors.setMarkdown(loadTextFile(r / 'CONTRIBUTORS'))
-        self.tbChanges.setMarkdown(loadTextFile(r / 'CHANGELOG'))
-
-    def anchorClicked(self, url: QUrl):
-        """Opens an URL in local browser / mail client"""
-        assert isinstance(url, QUrl)
-        webbrowser.open(url.url())
+        self.tbAbout.setMarkdown(loadMD(r / 'ABOUT.md'))
+        self.tbLicense.setMarkdown(loadMD(r / 'LICENSE.md'))
+        self.tbCredits.setMarkdown(loadMD(r / 'CREDITS.md'))
+        self.tbContributors.setMarkdown(loadMD(r / 'CONTRIBUTORS.md'))
+        self.tbChanges.setMarkdown(loadMD(r / 'CHANGELOG.md'))
 
     def setAboutTitle(self, suffix: str = None):
         """

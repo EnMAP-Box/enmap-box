@@ -354,14 +354,14 @@ def markdownToHTML(path_md: Union[str, pathlib.Path]) -> str:
     return html
 
 
-def createCHANGELOG(dirPlugin):
+def createCHANGELOG(dirPlugin: pathlib.Path) -> str:
     """
     Reads the CHANGELOG.rst and creates the deploy/CHANGELOG (without extension!) for the QGIS Plugin Manager
     :return:
     """
 
-    pathMD = os.path.join(DIR_REPO, 'CHANGELOG.md')
-    pathCL = os.path.join(dirPlugin, 'CHANGELOG')
+    pathMD = DIR_REPO / 'CHANGELOG.md'
+    pathCL = dirPlugin / 'CHANGELOG'
 
     os.makedirs(os.path.dirname(pathCL), exist_ok=True)
     assert os.path.isfile(pathMD)
@@ -404,6 +404,9 @@ def createCHANGELOG(dirPlugin):
                 html_cleaned.append(line)
         html_cleaned = '\n'.join(html_cleaned)
     # make html compact
+    # remove newlines as each line will be shown in a table row <tr>
+    # see qgspluginmanager.cpp
+    html_cleaned = html_cleaned.replace('\n', '')
 
     with open(pathCL, 'w', encoding='utf-8') as f:
         f.write(html_cleaned)
