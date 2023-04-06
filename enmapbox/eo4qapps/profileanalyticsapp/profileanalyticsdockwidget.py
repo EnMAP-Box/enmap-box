@@ -271,7 +271,7 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                     pixel = None
 
                 # read data
-                if layer.dataProvider().name() != 'GDAL':  # see issue #443
+                if layer.dataProvider().name() != 'gdal':  # see issue #443
                     return
                 reader = RasterReader(layer)
                 if self.mRasterProfileType.currentIndex() == self.ZProfileType:
