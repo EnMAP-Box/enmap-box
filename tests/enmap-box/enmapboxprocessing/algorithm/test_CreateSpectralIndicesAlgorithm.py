@@ -1,4 +1,5 @@
 from os import chdir
+from os.path import dirname
 
 from osgeo import gdal
 
@@ -68,13 +69,14 @@ class TestCreateSpectralIndicesAlgorithm(TestCase):
 
     def test_relativeInputPath(self):
 
-        gdal.Translate(self.filename('enmap.tif'), enmap)  # copy enmap_berlin to output folder
-        chdir(self.testOutputFolder())  # set output folder the current workdir
+        filename = self.filename('enmap.tif')
+        gdal.Translate(filename, enmap)  # copy enmap_berlin to output folder
+        chdir(dirname(filename))  # set output folder the current workdir
 
         alg = CreateSpectralIndicesAlgorithm()
         alg.initAlgorithm()
         parameters = {
-            alg.P_RASTER: 'enmap.tif',  # use reletive input path!
+            alg.P_RASTER: 'enmap.tif',
             alg.P_INDICES: 'NDVI, EVI',
             alg.P_OUTPUT_VRT: self.filename('vi.vrt'),
         }
