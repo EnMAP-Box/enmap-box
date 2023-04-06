@@ -150,6 +150,8 @@
     <addaction name="mMenuCreateDataSource"/>
     <addaction name="mActionLoadExampleData"/>
     <addaction name="separator"/>
+    <addaction name="mActionOpenProject"/>
+    <addaction name="separator"/>
     <addaction name="mActionSaveProject"/>
     <addaction name="mActionSaveProjectAs"/>
     <addaction name="separator"/>
@@ -321,7 +323,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="F:/Repositories/QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionZoomIn.svg</normaloff>:/images/themes/default/mActionZoomIn.svg</iconset>
    </property>
    <property name="text">
@@ -363,7 +365,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../../qgispluginsupport/qps/qpsresources.qrc">
+    <iconset>
      <normaloff>:/qps/ui/icons/select_location.svg</normaloff>
      <normalon>:/enmapbox/icons/mActionIdentify.svg</normalon>:/qps/ui/icons/select_location.svg</iconset>
    </property>
@@ -376,7 +378,7 @@
   </action>
   <action name="mActionAddDataSource">
    <property name="icon">
-    <iconset resource="F:/Repositories/QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionDataSourceManager.svg</normaloff>:/images/themes/default/mActionDataSourceManager.svg</iconset>
    </property>
    <property name="text">
@@ -391,7 +393,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="F:/Repositories/QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionZoomFullExtent.svg</normaloff>:/images/themes/default/mActionZoomFullExtent.svg</iconset>
    </property>
    <property name="text">
@@ -415,7 +417,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="F:/Repositories/QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionZoomActual.svg</normaloff>:/images/themes/default/mActionZoomActual.svg</iconset>
    </property>
    <property name="text">
@@ -442,7 +444,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="F:/Repositories/QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionPropertiesWidget.svg</normaloff>:/images/themes/default/mActionPropertiesWidget.svg</iconset>
    </property>
    <property name="text">
@@ -454,7 +456,7 @@
   </action>
   <action name="mActionProjectSettings">
    <property name="icon">
-    <iconset resource="F:/Repositories/QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/propertyicons/settings.svg</normaloff>:/images/themes/default/propertyicons/settings.svg</iconset>
    </property>
    <property name="text">
@@ -466,7 +468,7 @@
   </action>
   <action name="mActionExit">
    <property name="icon">
-    <iconset resource="F:/Repositories/QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mIconClose.svg</normaloff>:/images/themes/default/mIconClose.svg</iconset>
    </property>
    <property name="text">
@@ -475,7 +477,7 @@
   </action>
   <action name="mActionPanToSelected">
    <property name="icon">
-    <iconset resource="F:/Repositories/QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionPan.svg</normaloff>:/images/themes/default/mActionPan.svg</iconset>
    </property>
    <property name="text">
@@ -547,7 +549,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../../qgispluginsupport/qps/qpsresources.qrc">
+    <iconset>
      <normaloff>:/qps/ui/icons/pan_center.svg</normaloff>:/qps/ui/icons/pan_center.svg</iconset>
    </property>
    <property name="text">
@@ -559,7 +561,7 @@
   </action>
   <action name="mActionSaveProjectAs">
    <property name="icon">
-    <iconset resource="F:/Repositories/QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionFileSaveAs.svg</normaloff>:/images/themes/default/mActionFileSaveAs.svg</iconset>
    </property>
    <property name="text">
@@ -596,7 +598,7 @@
   </action>
   <action name="mActionProcessingToolbox">
    <property name="icon">
-    <iconset resource="F:/Repositories/QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/processingAlgorithm.svg</normaloff>:/images/themes/default/processingAlgorithm.svg</iconset>
    </property>
    <property name="text">
@@ -616,7 +618,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../../qgispluginsupport/qps/qpsresources.qrc">
+    <iconset>
      <normaloff>:/qps/ui/icons/profile.svg</normaloff>:/qps/ui/icons/profile.svg</iconset>
    </property>
    <property name="text">
@@ -634,7 +636,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="F:/Repositories/QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionSelectRectangle.svg</normaloff>:/images/themes/default/mActionSelectRectangle.svg</iconset>
    </property>
    <property name="text">
@@ -649,7 +651,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="F:/Repositories/QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionSelectPolygon.svg</normaloff>:/images/themes/default/mActionSelectPolygon.svg</iconset>
    </property>
    <property name="text">
@@ -664,7 +666,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="F:/Repositories/QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionSelectFreehand.svg</normaloff>:/images/themes/default/mActionSelectFreehand.svg</iconset>
    </property>
    <property name="text">
@@ -676,7 +678,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="F:/Repositories/QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionSelectRadius.svg</normaloff>:/images/themes/default/mActionSelectRadius.svg</iconset>
    </property>
    <property name="text">
@@ -688,7 +690,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="F:/Repositories/QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionSelectRectangle.svg</normaloff>:/images/themes/default/mActionSelectRectangle.svg</iconset>
    </property>
    <property name="text">
@@ -703,7 +705,7 @@
   </action>
   <action name="mActionDeselectFeatures">
    <property name="icon">
-    <iconset resource="F:/Repositories/QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionDeselectAll.svg</normaloff>:/images/themes/default/mActionDeselectAll.svg</iconset>
    </property>
    <property name="text">
@@ -718,7 +720,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="F:/Repositories/QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionToggleEditing.svg</normaloff>:/images/themes/default/mActionToggleEditing.svg</iconset>
    </property>
    <property name="text">
@@ -730,7 +732,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="F:/Repositories/QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionCapturePolygon.svg</normaloff>:/images/themes/default/mActionCapturePolygon.svg</iconset>
    </property>
    <property name="text">
@@ -742,7 +744,7 @@
   </action>
   <action name="mActionSaveEdits">
    <property name="icon">
-    <iconset resource="F:/Repositories/QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionSaveEdits.svg</normaloff>:/images/themes/default/mActionSaveEdits.svg</iconset>
    </property>
    <property name="text">
@@ -783,7 +785,7 @@
   </action>
   <action name="mActionCreateNewMemoryLayer">
    <property name="icon">
-    <iconset resource="F:/Repositories/QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionCreateMemory.svg</normaloff>:/images/themes/default/mActionCreateMemory.svg</iconset>
    </property>
    <property name="text">
@@ -792,7 +794,7 @@
   </action>
   <action name="mActionCreateNewShapefileLayer">
    <property name="icon">
-    <iconset resource="F:/Repositories/QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionNewVectorLayer.svg</normaloff>:/images/themes/default/mActionNewVectorLayer.svg</iconset>
    </property>
    <property name="text">
@@ -804,7 +806,7 @@
   </action>
   <action name="mActionCreateNewGeoPackageLayer">
    <property name="icon">
-    <iconset resource="F:/Repositories/QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionNewGeoPackageLayer.svg</normaloff>:/images/themes/default/mActionNewGeoPackageLayer.svg</iconset>
    </property>
    <property name="text">
@@ -814,6 +816,15 @@
   <action name="mActionLoadExampleData">
    <property name="text">
     <string>Add Example Data</string>
+   </property>
+  </action>
+  <action name="mActionOpenProject">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/images/themes/default/mActionFileOpen.svg</normaloff>:/images/themes/default/mActionFileOpen.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Open Project</string>
    </property>
   </action>
  </widget>

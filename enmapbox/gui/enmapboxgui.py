@@ -1229,6 +1229,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.setMapTool(MapTools.CursorLocation)
 
         # redirect to QGIS Project Management
+        self.ui.mActionOpenProject.triggered.connect(lambda: self.iface.actionOpenProject().trigger())
         self.ui.mActionSaveProject.triggered.connect(lambda: self.iface.actionSaveProject().trigger())
         self.ui.mActionSaveProjectAs.triggered.connect(lambda: self.iface.actionSaveProjectAs().trigger())
         # AJ: Question for Benjamin: currently we don't have an open button, why?
