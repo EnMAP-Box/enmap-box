@@ -12,7 +12,7 @@ class TestRegressionPerformanceSimpleAlgorithm(TestCase):
             alg.P_REGRESSION: fraction_map_l3,
             alg.P_REFERENCE: fraction_point_multitarget,
             alg.P_OPEN_REPORT: self.openReport,
-            alg.P_OUTPUT_REPORT: self.filename('report.html'),
+            alg.P_OUTPUT_REPORT: self.filename('report1.html'),
         }
         self.runalg(alg, parameters)
 
@@ -22,6 +22,6 @@ class TestRegressionPerformanceSimpleAlgorithm(TestCase):
             alg.P_REGRESSION: fraction_map_l3,
             alg.P_REFERENCE: fraction_map_l3,
             alg.P_OPEN_REPORT: self.openReport,
-            alg.P_OUTPUT_REPORT: self.filename('report.html'),
+            alg.P_OUTPUT_REPORT: self.filename('report2.html'),
         }
         self.runalg(alg, parameters)
