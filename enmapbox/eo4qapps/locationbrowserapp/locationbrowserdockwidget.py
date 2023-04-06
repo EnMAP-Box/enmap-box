@@ -4,13 +4,13 @@ from os.path import join, dirname
 from typing import Optional
 
 import requests
-from geetimeseriesexplorerapp import MapTool
-from locationbrowserapp.locationbrowserresultwidget import LocationBrowserResultWidget
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.utils import Utils
+from geetimeseriesexplorerapp import MapTool
+from locationbrowserapp.locationbrowserresultwidget import LocationBrowserResultWidget
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QListWidgetItem, QToolButton
 from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPointXY, QgsProject
@@ -234,8 +234,6 @@ class LocationBrowserDockWidget(QgsDockWidget):
         else:
             extent = SpatialExtent(layer.crs(), layer.extent()).toCrs(crs)
             mapCanvas.setExtent(extent)
-            print(crs)
-            print(extent)
 
         mapCanvas.refresh()
 
