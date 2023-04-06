@@ -328,7 +328,7 @@ class Utils(object):
                 if colorField is not None:
                     colors[value] = feature.attribute(colorField)  # only keep the last occurrence!
 
-        values = np.unique(values)
+        values = np.unique(values).tolist()
         categories = list()
         for value in values:
             color = colors.get(value, QColor(randint(0, 2 ** 24 - 1)))
@@ -387,8 +387,16 @@ class Utils(object):
         elif isinstance(layer, QgsRasterLayer):
             from enmapboxprocessing.rasterreader import RasterReader
             reader = RasterReader(layer)
-            targets = [Target(reader.bandName(bandNo), reader.bandColor(bandNo))
-                       for bandNo in reader.bandNumbers()]
+            targets = list()
+            for bandNo in reader.bandNumbers():
+                name = reader.bandName(bandNo)
+                color = reader.bandColor(bandNo)
+                if color is None:
+                    hexcolor = '#000000'
+                else:
+                    hexcolor = color.name()
+                target = Target(name, hexcolor)
+                targets.append(target)
         else:
             raise ValueError()
 
