@@ -1,3 +1,4 @@
+import inspect
 from os import makedirs
 from os.path import join, exists
 from typing import Union
@@ -10,7 +11,7 @@ from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import Array2d, Array3d, Number
 from qgis.core import QgsRectangle, QgsCoordinateReferenceSystem
-import inspect
+
 
 @typechecked
 class TestCase(enmapbox.testing.TestCase):
