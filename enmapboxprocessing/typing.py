@@ -38,7 +38,7 @@ HexColor = str
 @typechecked
 @dataclass
 class Category(object):
-    value: Union[int, str]
+    value: Union[int, float, str]
     name: str
     color: HexColor
 

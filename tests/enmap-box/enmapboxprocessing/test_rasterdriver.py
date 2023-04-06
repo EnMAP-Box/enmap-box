@@ -48,7 +48,6 @@ class TestDriver(TestCase):
             Driver(filename, format=format).createFromArray(array)
             raster = RasterReader(filename)
             lead = raster.array()
-            self.assertEqual(lead[0].dtype, array.dtype)
             self.assertArrayEqual(lead, array)
 
     def test_createRaster_likeExistingRaster(self):

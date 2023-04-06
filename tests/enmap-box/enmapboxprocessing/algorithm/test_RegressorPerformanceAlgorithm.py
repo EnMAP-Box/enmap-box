@@ -11,7 +11,7 @@ class TestRegressorPerformanceAlgorithm(TestCase):
             alg.P_REGRESSOR: regressorDumpPkl,
             alg.P_DATASET: regressorDumpPkl,
             alg.P_OPEN_REPORT: self.openReport,
-            alg.P_OUTPUT_REPORT: self.filename('report_train.html')
+            alg.P_OUTPUT_REPORT: self.filename('report_train_multitarget.html')
         }
         self.runalg(alg, parameters)
         # check the result manually
@@ -23,7 +23,7 @@ class TestRegressorPerformanceAlgorithm(TestCase):
             alg.P_DATASET: regressorDumpPkl,
             alg.P_NFOLD: 3,
             alg.P_OPEN_REPORT: self.openReport,
-            alg.P_OUTPUT_REPORT: self.filename('report_crossval.html')
+            alg.P_OUTPUT_REPORT: self.filename('report_crossval_multitarget.html')
         }
         self.runalg(alg, parameters)
         # check the result manually
@@ -34,7 +34,7 @@ class TestRegressorPerformanceAlgorithm(TestCase):
             alg.P_REGRESSOR: regressorDumpSingleTargetPkl,
             alg.P_DATASET: regressorDumpSingleTargetPkl,
             alg.P_OPEN_REPORT: self.openReport,
-            alg.P_OUTPUT_REPORT: self.filename('report_train.html')
+            alg.P_OUTPUT_REPORT: self.filename('report_train_singletarget.html')
         }
         self.runalg(alg, parameters)
         # check the result manually
@@ -46,7 +46,7 @@ class TestRegressorPerformanceAlgorithm(TestCase):
             alg.P_DATASET: regressorDumpSingleTargetPkl,
             alg.P_NFOLD: 10,
             alg.P_OPEN_REPORT: self.openReport,
-            alg.P_OUTPUT_REPORT: self.filename('report_crossval.html')
+            alg.P_OUTPUT_REPORT: self.filename('report_crossval_singletarget.html')
         }
         self.runalg(alg, parameters)
         # check the result manually

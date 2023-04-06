@@ -83,7 +83,7 @@ class RandomSamplesFromRegressionDatasetAlgorithm(EnMAPProcessingAlgorithm):
 
             # draw samples
             indices = list()
-            categories = [Category(i, f'Bin {i + 1}', None) for i in range(bins)]
+            categories = [Category(i, f'Bin {i + 1}', '#000000') for i in range(bins)]
             for i, target in enumerate(dump.targets):
                 feedback.pushInfo(f'Target: {target.name}')
                 ymin = np.min(dump.y[:, i])
