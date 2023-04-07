@@ -112,10 +112,10 @@ class RandomSamplesFromClassificationDatasetAlgorithm(EnMAPProcessingAlgorithm):
             if Ni == 0:
                 continue
             drawn = np.random.choice(valid, Ni, replace=replace)
-            indices.extend(drawn)
+            indices.extend(drawn.tolist())
 
         indices2 = np.full((dump.X.shape[0],), True, bool)
         indices2[indices] = False
-        indices2 = list(np.where(indices2))
+        indices2 = np.where(indices2)[0].tolist()
 
         return indices, indices2

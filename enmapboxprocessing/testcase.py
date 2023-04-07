@@ -1,4 +1,6 @@
-from os.path import join
+import inspect
+from os import makedirs
+from os.path import join, exists
 from typing import Union
 
 import numpy as np
@@ -20,8 +22,12 @@ class TestCase(enmapbox.testing.TestCase):
         self.assertTrue(np.all(array1 == array2))
 
     def testOutputFolder(self):
-        return self.tempDir()
-        # return join(dirname(dirname(__file__)), 'test-outputs')
+        testClassDir = self.tempDir()
+        testMethodDir = join(testClassDir, inspect.stack()[3].function)
+        if not exists(testMethodDir):
+            if not testMethodDir.endswith('__call__'):
+                makedirs(testMethodDir)
+        return testMethodDir
 
     def filename(self, basename: str):
         return join(self.testOutputFolder(), basename)
