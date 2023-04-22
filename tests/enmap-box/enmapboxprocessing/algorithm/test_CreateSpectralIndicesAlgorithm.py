@@ -81,3 +81,17 @@ class TestCreateSpectralIndicesAlgorithm(TestCase):
             alg.P_OUTPUT_VRT: self.filename('vi.vrt'),
         }
         result = self.runalg(alg, parameters)
+
+    def test_single_custom_narrowband_index(self):
+        alg = CreateSpectralIndicesAlgorithm()
+        alg.initAlgorithm()
+        parameters = {
+            alg.P_RASTER: enmap,
+            alg.P_INDICES: 'CUSTOM = (B + r555 - r1640) / (r555 + r1640)',
+            alg.P_OUTPUT_VRT: self.filename('custom.vrt'),
+        }
+        result = self.runalg(alg, parameters)
+        reader = RasterReader(result[alg.P_OUTPUT_VRT])
+        self.assertEqual('CUSTOM', reader.metadataItem('short_name', '', 1))
+        self.assertIsNone(reader.metadataItem('long_name', '', 1))
+        self.assertEqual('(B + r555 - r1640) / (r555 + r1640)', reader.metadataItem('formula', '', 1))
