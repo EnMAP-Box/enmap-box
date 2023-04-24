@@ -12,6 +12,7 @@ from enmapboxprocessing.typing import Array2d, Array3d, Number
 from qgis.core import QgsRectangle, QgsCoordinateReferenceSystem
 import inspect
 
+
 @typechecked
 class TestCase(enmapbox.testing.TestCase):
 
