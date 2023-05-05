@@ -51,27 +51,26 @@ class TemporalRasterStackControllerApp(EnMAPBoxApplication):
         self.mapCanvas: QgsMapCanvas = iface.mapCanvas()
 
     def onToolbarIconClicked(self):
-        layers: List[QgsRasterLayer] = [layer for layer in QgsProject.instance().mapLayers().values()
-                                        if layer.dataProvider().name() == 'gdal']
-        if len(layers) == 0:
-            return
-        isActive = [layer.temporalProperties().isActive() for layer in layers]
+        from qgis.utils import iface
 
-        if all(isActive):
-            for layer in layers:
-                layer.temporalProperties().setIsActive(False)
+        layer = iface.activeLayer()
+        if layer is None:
+            return
+        if layer.dataProvider().name() != 'gdal':
+            return
+
+        if layer.temporalProperties().isActive():
+            layer.temporalProperties().setIsActive(False)
         else:
             begin = QDateTime(9999, 1, 1, 0, 0)
             end = QDateTime(1, 1, 1, 0, 0)
-            for layer in layers:
-                layer.temporalProperties().setIsActive(True)
-                layer.temporalProperties().setMode(Qgis.RasterTemporalMode.TemporalRangeFromDataProvider)
-                try:
-                    begin = min(begin, RasterReader(layer).centerTime(1))
-                    end = max(end, RasterReader(layer).centerTime(layer.bandCount()))
-                except Exception:
-                    pass
-
+            layer.temporalProperties().setIsActive(True)
+            layer.temporalProperties().setMode(Qgis.RasterTemporalMode.TemporalRangeFromDataProvider)
+            try:
+                begin = min(begin, RasterReader(layer).centerTime(1))
+                end = max(end, RasterReader(layer).centerTime(layer.bandCount()))
+            except Exception:
+                pass
             self.temporalController.setTemporalExtents(QgsDateTimeRange(begin, end, True, True))
 
     def onUpdateTemporalRange(self, dateTimeRange: QgsDateTimeRange):
