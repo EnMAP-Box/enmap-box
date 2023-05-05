@@ -1,3 +1,5 @@
+import numpy
+
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox import initAll
 
@@ -10,3 +12,5 @@ enmapBox = EnMAPBox()
 
 enmapBox.openExampleData()
 qgsApp.exec_()
+
+numpy.greater()
