@@ -296,44 +296,44 @@ def model(data, model):
         # funtion evaluation for each PFT
         PFT = {}
 
-        PFT['chlorophyll_a'] = np.array(10 ** (X))
+        PFT['chlorophyll_a'] = X
 
         for i in range(len(coefs) + 1):
             if i == 0:  # sinusoidal
                 vname = 'diatoms'
                 coefs_nonan = coefs[i][~np.isnan(coefs[i])]
-                PFT[vname] = func_sin(X, *coefs_nonan)  # applying the model to the Chl-a
+                PFT[vname] = chl_a * func_sin(X, *coefs_nonan)  # applying the model to the Chl-a
 
             if i == 1:  # exponential 3 parameters
                 vname = 'haptophytes'
                 coefs_nonan = coefs[i][~np.isnan(coefs[i])]
-                PFT[vname] = func_sin(X, *coefs_nonan)  # applying the model to the Chl-a
+                PFT[vname] = chl_a * func_sin(X, *coefs_nonan)  # applying the model to the Chl-a
 
             if i == 2:  # polynomial order 3
                 vname = 'dinoflagellates'
                 coefs_nonan = coefs[i][~np.isnan(coefs[i])]
                 poly = np.poly1d(coefs_nonan)  # generating the function
-                PFT[vname] = poly(X)
+                PFT[vname] = chl_a * poly(X)
 
             if i == 3:  # exponential 3 parameters
                 vname = 'prokaryotes'
                 coefs_nonan = coefs[i][~np.isnan(coefs[i])]
-                PFT[vname] = func_exp_3Logistic(X, *coefs_nonan)  # applying the model to the Chl-a
+                PFT[vname] = chl_a * func_exp_3Logistic(X, *coefs_nonan)  # applying the model to the Chl-a
 
             if i == 4:  # exponential sinusuidal
                 vname = 'green_algae'
                 coefs_nonan = coefs[i][~np.isnan(coefs[i])]
-                PFT[vname] = func_sin(X, *coefs_nonan)  # applying the model to the Chl-a
+                PFT[vname] = chl_a * func_sin(X, *coefs_nonan)  # applying the model to the Chl-a
 
             if i == 5:  # exponential 3 parameters
                 vname = 'prochlorococcus'
                 coefs_nonan = coefs[i][~np.isnan(coefs[i])]
-                PFT[vname] = func_exp_3Logistic(X, *coefs_nonan)  # applying the model to the Chl-a
+                PFT[vname] = chl_a * func_exp_3Logistic(X, *coefs_nonan)  # applying the model to the Chl-a
 
             if i == 6:  # exponential 3 parameters
                 vname = 'cryptophytes'
                 coefs_nonan = coefs[i][~np.isnan(coefs[i])]
-                PFT[vname] = func_sin(X, *coefs_nonan)  # applying the model to the Chl-a
+                PFT[vname] = chl_a * func_sin(X, *coefs_nonan)  # applying the model to the Chl-a
 
         return PFT
 
