@@ -1,11 +1,10 @@
-from PyQt5.QtWidgets import QTableWidget, QToolButton
+from qgis.PyQt.QtWidgets import QTableWidget, QToolButton
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.typeguard import typechecked
 from qgis.PyQt import uic
-from qgis._core import QgsMapLayerProxyModel
-from qgis._gui import QgsMapLayerComboBox
-from qgis.gui import QgsDockWidget, QgisInterface
+from qgis.core import QgsMapLayerProxyModel
+from qgis.gui import QgsMapLayerComboBox, QgsDockWidget, QgisInterface
 
 
 @typechecked
@@ -86,4 +85,3 @@ class RasterMaskingDockWidget(QgsDockWidget):
             mMultiBand.mBand.setCurrentIndex(bandNo)
 
         # self.onLayerChanged()
-

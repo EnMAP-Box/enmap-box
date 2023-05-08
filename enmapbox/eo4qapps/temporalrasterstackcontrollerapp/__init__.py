@@ -1,7 +1,8 @@
-from typing import Optional, List
+from typing import Optional
 
-from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.applications import EnMAPBoxApplication
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp import GeeTimeseriesExplorerDockWidget
@@ -12,7 +13,6 @@ from qgis.core import QgsTemporalNavigationObject, QgsDateTimeRange, QgsProject,
     QgsSingleBandGrayRenderer, QgsSingleBandPseudoColorRenderer, Qgis, QgsRasterLayerTemporalProperties, \
     QgsPalettedRasterRenderer
 from qgis.gui import QgsMapCanvas
-from enmapbox.typeguard import typechecked
 
 
 def enmapboxApplicationFactory(enmapBox: EnMAPBox):
