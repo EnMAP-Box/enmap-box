@@ -2,8 +2,8 @@ import numpy as np
 
 from enmapbox.exampledata import enmap, landcover_polygon
 from enmapboxprocessing.algorithm.rasterizecategorizedvectoralgorithm import RasterizeCategorizedVectorAlgorithm
-from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.algorithm.testcase import TestCase
+from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import landcover_points_multipart_epsg3035, landcover_polygon_3classes_id, \
     landcover_polygon_3classes_epsg4326

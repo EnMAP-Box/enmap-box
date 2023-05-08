@@ -3,19 +3,23 @@
 # see https://pip.pypa.io/en/stable/reference/pip_install/#requirements-file-format
 # see https://www.python.org/dev/peps/pep-0440/#version-specifiers
 ###### Requirements ######
-
 # required to build the EnMAP-Box
 gitpython
+git-lfs
+
+pytest
+pytest-env
+pytest-cov
+docutils
+markdown
+coverage
 
 # clean code
+flake8
 flake8-qgis
 
-coverage
 urlchecker
-typeguard
-
-# optionals
-git-lfs
+typeguard==2.13.3  # version 3.x created several problems
 
 #standard requirements
 -r requirements.txt

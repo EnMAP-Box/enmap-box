@@ -27,7 +27,13 @@ class TestCaseIssue345(EnMAPBoxTestCase):
         except TypeError as ex:
             exception = ex
 
-        if TestCaseIssue345.IS_INSTALLED:
+        try:
+            __import__('typeguard')
+            is_installed = True
+        except ModuleNotFoundError:
+            is_installed = False
+
+        if is_installed:
             self.assertIsInstance(exception, TypeError)
         else:
             self.assertTrue(exception is None)

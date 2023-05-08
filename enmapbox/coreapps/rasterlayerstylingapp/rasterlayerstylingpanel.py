@@ -306,7 +306,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 self.mRenderer.setCurrentIndex(3)
 
     def onRendererTabChanged(self):
-        layer: QgsRasterLayer = self.mLayer.currentLayer()
+        layer: Optional[QgsRasterLayer] = self.mLayer.currentLayer()
 
         if layer is None:
             return
@@ -548,6 +548,9 @@ class RasterLayerStylingPanel(QgsDockWidget):
             mBand.mIsBadBand.hide()
         else:
             mBand.mIsBadBand.show()
+            reader = RasterReader(layer)
+            if reader.bandCount() < bandNo:
+                return
             if RasterReader(layer).badBandMultiplier(bandNo) == 0:
                 mBand.mIsBadBand.setChecked(True)
             else:

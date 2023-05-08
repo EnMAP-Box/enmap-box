@@ -1,8 +1,7 @@
 from enmapbox.exampledata import enmap, hires
 from enmapboxprocessing.algorithm.stackrasterlayersalgorithm import StackRasterLayersAlgorithm
-
-from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.algorithm.testcase import TestCase
+from enmapboxprocessing.rasterreader import RasterReader
 
 
 class TestSubsetRasterBandsAlgorithm(TestCase):

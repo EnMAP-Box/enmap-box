@@ -3,8 +3,8 @@ import numpy as np
 from enmapbox.exampledata import enmap, enmap_srf_library
 from enmapboxprocessing.algorithm.spectralresamplingbyresponsefunctionlibraryalgorithm import \
     SpectralResamplingByResponseFunctionLibraryAlgorithm
-from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.algorithm.testcase import TestCase
+from enmapboxprocessing.rasterreader import RasterReader
 
 
 class TestSpectralResamplingByResponseFunctionLibraryAlgorithmBase(TestCase):

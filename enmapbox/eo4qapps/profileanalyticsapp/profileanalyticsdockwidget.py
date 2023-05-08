@@ -70,7 +70,7 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
         self.mAddRaster.clicked.connect(self.onAddRasterClicked)
         self.mRemoveRaster.clicked.connect(self.onRemoveRasterClicked)
         self.mEditUserFunction.clicked.connect(self.onEditUserFunctionClicked)
-        self.mRemoveAllRaster.clicked.connect(self.onmRemoveAllRasterClicked)
+        self.mRemoveAllRaster.clicked.connect(self.onRemoveAllRasterClicked)
         self.mXUnit.currentIndexChanged.connect(self.onLiveUpdate)
         self.mApply.clicked.connect(self.onApplyClicked)
 
@@ -218,7 +218,7 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
         w.dialog.mSave.clicked.connect(self.onLiveUpdate)
         w.dialog.show()
 
-    def onmRemoveAllRasterClicked(self):
+    def onRemoveAllRasterClicked(self):
         for i in reversed(range(self.mRasterTable.rowCount())):
             self.mRasterTable.removeRow(i)
 
@@ -249,8 +249,10 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                 w: QgsMapLayerComboBox = self.mRasterTable.cellWidget(row, 0)
                 layer: QgsRasterLayer = w.currentLayer()
                 if layer is None:
-                    continue
-
+                    layer = self.enmapBoxInterface().currentLayer()
+                    w.setLayer(layer)
+                if layer is None:
+                    return
                 w: QgsRasterBandComboBox = self.mRasterTable.cellWidget(row, 1)
 
                 if self.mRasterProfileType.currentIndex() != self.ZProfileType:
@@ -269,6 +271,8 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                     pixel = None
 
                 # read data
+                if layer.dataProvider().name() != 'gdal':  # see issue #443
+                    return
                 reader = RasterReader(layer)
                 if self.mRasterProfileType.currentIndex() == self.ZProfileType:
                     name = f'{layer.name()} [column {pixel.x() + 1}, row {pixel.y() + 1}]'
@@ -403,7 +407,8 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                     except Exception:
                         pass
                 userFunctionEditor = w.dialog
-
+                xValues = [float(v) for v in xValues]
+                yValues = [float(v) for v in yValues]
                 profile = Profile(xValues, yValues, xUnit, name, style)
                 profiles.append(profile)
                 userFunctions.append(userFunction)

@@ -16,18 +16,14 @@
 *                                                                         *
 **************************************************************************
 """
-import sys
 import argparse
 import pathlib
 import site
 
-from qgis.PyQt.QtGui import QGuiApplication
 from qgis.PyQt.QtWidgets import QApplication
-from qgis.core import QgsApplication
+from qgis.core import QgsProject, QgsApplication
 
 site.addsitedir(pathlib.Path(__file__).parents[1])
-from enmapbox.testing import start_app
-from enmapbox.qgispluginsupport.qps.resources import findQGISResourceFiles
 
 qApp: QgsApplication = None
 
@@ -37,33 +33,26 @@ def exitAll(*args):
     QApplication.closeAllWindows()
     QApplication.processEvents()
     print('## Quit QgsApplication')
-    QgsApplication.quit()
+    r = QgsApplication.quit()
     print('## QgsApplication down')
-    qApp = None
-    sys.exit(0)
+    # sys.exit(0)
 
 
 def run(
+        debug: bool = False,
         sources: list = None,
-        initProcessing=False,
-        load_core_apps=False, load_other_apps=False,
-        debug: bool = False
+        load_core_apps=False,
+        load_other_apps=False,
 ):
     """
     Starts the EnMAP-Box GUI.
     """
-    global qApp
-    qAppExists = isinstance(qApp, QgsApplication)
+    qAppExists = isinstance(QgsApplication.instance(), QgsApplication)
     if not qAppExists:
-        print('## Create a QgsApplication...')
-        qApp = start_app(resources=findQGISResourceFiles())
-        QGuiApplication.instance().lastWindowClosed.connect(qApp.quit)
-        print('## QgsApplication created')
-    else:
-        print('## QgsApplication exists')
-        from enmapbox import initAll
-        initAll()
-
+        from enmapbox.testing import start_app
+        start_app()
+    from enmapbox import initAll
+    initAll()
     from enmapbox.gui.enmapboxgui import EnMAPBox
     enmapBox = EnMAPBox(load_core_apps=load_core_apps, load_other_apps=load_other_apps)
     enmapBox.run()
@@ -82,8 +71,9 @@ def run(
 
     if not qAppExists:
         print('Execute QgsApplication')
-        enmapBox.sigClosed.connect(exitAll)
-        exit_code = qApp.exec_()
+        # enmapBox.sigClosed.connect(exitAll)
+        exit_code = QgsApplication.instance().exec_()
+        QgsProject.instance().removeAllMapLayers()
         return exit_code
     else:
         return 0
@@ -96,5 +86,5 @@ if __name__ == '__main__':
     #                    action='store_true')
     args = parser.parse_args()
 
-    run(debug=args.debug, initProcessing=True, load_core_apps=True, load_other_apps=True)
+    run(debug=args.debug, load_core_apps=True, load_other_apps=True)
     s = ""

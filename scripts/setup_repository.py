@@ -16,6 +16,9 @@ site.addsitedir(DIR_REPO)
 
 
 def install_zipfile(url: str, localPath: pathlib.Path, zip_root: str = None):
+    """
+    Downloads and extracts a zip file
+    """
     assert isinstance(localPath, pathlib.Path)
     localPath = localPath.resolve()
 
@@ -50,12 +53,18 @@ def install_zipfile(url: str, localPath: pathlib.Path, zip_root: str = None):
 
 
 def install_qgisresources():
+    """
+    Downloads and install QGIS resource files to enmap-box/qgisresources
+    """
     localpath = DIR_REPO / 'qgisresources'
     from enmapbox import URL_QGIS_RESOURCES
     install_zipfile(URL_QGIS_RESOURCES, localpath)
 
 
-def setup_enmapbox_repository(resources=True, qgis_resources=True):
+def setup_enmapbox_repository(resources: bool = True, qgis_resources: bool = True):
+    """
+    Prepares *_rc.py files that allow to open QIcons from EnMAP-Box and QGIS
+    """
     # specify the local path to the cloned QGIS repository
 
     # 1. compile EnMAP-Box resource files (*.qrc) into corresponding python modules (*.py)

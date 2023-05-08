@@ -17,12 +17,22 @@
 *                                                                         *
 ***************************************************************************
 """
-
-import os
 import pathlib
-from qgis.PyQt.QtWidgets import QDialog
-from enmapbox import DIR_REPO, ABOUT, REPOSITORY
+import webbrowser
+from typing import Union
+
+from qgis.PyQt.QtCore import QUrl
+from qgis.PyQt.QtWidgets import QTextBrowser
+from qgis.PyQt.QtCore import Qt
+from enmapbox import DIR_REPO, REPOSITORY
 from enmapbox.gui.utils import loadUi
+from qgis.PyQt.QtWidgets import QDialog
+
+
+def anchorClicked(url: QUrl):
+    """Opens a URL in local browser / mail client"""
+    assert isinstance(url, QUrl)
+    webbrowser.open(url.url())
 
 
 class AboutDialog(QDialog):
@@ -32,6 +42,23 @@ class AboutDialog(QDialog):
         from enmapbox import DIR_UIFILES
         pathUi = pathlib.Path(DIR_UIFILES) / 'aboutdialog.ui'
         loadUi(pathUi, self)
+        self.setWindowFlag(Qt.WindowContextHelpButtonHint, False)
+        self.tbAbout: QTextBrowser
+        self.tbLicense: QTextBrowser
+        self.tbCredits: QTextBrowser
+        self.tbContributors: QTextBrowser
+        self.tbChanges: QTextBrowser
+
+        for tb in [self.tbAbout, self.tbLicense, self.tbCredits, self.tbContributors, self.tbChanges]:
+            tb: QTextBrowser
+            tb.setOpenLinks(False)
+            tb.setOpenExternalLinks(False)
+
+        self.tbAbout.anchorClicked.connect(anchorClicked)
+        self.tbLicense.anchorClicked.connect(anchorClicked)
+        self.tbCredits.anchorClicked.connect(anchorClicked)
+        self.tbContributors.anchorClicked.connect(anchorClicked)
+        self.tbChanges.anchorClicked.connect(anchorClicked)
 
         self.mTitle = self.windowTitle()
         self.listWidget.currentItemChanged.connect(lambda: self.setAboutTitle())
@@ -43,21 +70,31 @@ class AboutDialog(QDialog):
         self.labelVersion.setText(info)
         self.setAboutTitle()
 
-        def loadTextFile(p):
-            if not os.path.isfile(p):
-                return 'File not found "{}"'.format(p)
+        def loadMD(p: Union[str, pathlib.Path]):
+            p = pathlib.Path(p)
 
-            f = open(p, 'r', encoding='utf-8')
-            lines = f.read()
-            f.close()
-            return lines
+            try:
+                assert p.is_file()
+                assert p.name.endswith('.md')
+                with open(p, 'r', encoding='utf-8') as f:
+                    md = f.read()
+            except (AssertionError, FileNotFoundError) as ex:
+                md = f'Unable to load "{p}"\n{ex}'
+            return md
 
-        self.labelAboutText.setText(f'<html><head/><body>{ABOUT}</body></html>')
-        self.tbLicense.setText(loadTextFile(os.path.join(DIR_REPO, 'LICENSE.md')))
-        self.tbContributors.setText(loadTextFile(os.path.join(DIR_REPO, 'CONTRIBUTORS.rst')))
-        self.tbChanges.setText(loadTextFile(os.path.join(DIR_REPO, 'CHANGELOG.rst')))
+        r = pathlib.Path(DIR_REPO)
 
-    def setAboutTitle(self, suffix=None):
+        # self.labelAboutText.setText(f'<html><head/><body>{ABOUT}</body></html>')
+        self.tbAbout.setMarkdown(loadMD(r / 'ABOUT.md'))
+        self.tbLicense.setMarkdown(loadMD(r / 'LICENSE.md'))
+        self.tbCredits.setMarkdown(loadMD(r / 'CREDITS.md'))
+        self.tbContributors.setMarkdown(loadMD(r / 'CONTRIBUTORS.md'))
+        self.tbChanges.setMarkdown(loadMD(r / 'CHANGELOG.md'))
+
+    def setAboutTitle(self, suffix: str = None):
+        """
+        Sets the dialog title
+        """
         item = self.listWidget.currentItem()
 
         if item:
@@ -70,9 +107,9 @@ class AboutDialog(QDialog):
 
 
 if __name__ == '__main__':
-    from enmapbox.testing import initQgisApplication
+    from enmapbox.testing import start_app
 
-    app = initQgisApplication()
+    app = start_app()
     d = AboutDialog()
     d.show()
     app.exec_()

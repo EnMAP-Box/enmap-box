@@ -25,7 +25,7 @@ from typing import Optional, List, Dict
 
 from enmapbox import debugLog, messageLog
 from enmapbox.gui import \
-    SpectralLibrary, SpectralLibraryWidget, SpatialExtent, showLayerPropertiesDialog
+    SpectralLibraryWidget, SpatialExtent, showLayerPropertiesDialog
 from enmapbox.gui.datasources.datasources import DataSource, ModelDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager
 from enmapbox.gui.dataviews.docks import Dock, DockArea, \
@@ -223,7 +223,7 @@ class DockTreeNode(LayerTreeNode):
         """
         Returns the map layer related to this dock
         """
-        raise NotImplementedError()
+        return [lt.layer() for lt in self.findLayers()]
 
 
 class TextDockTreeNode(DockTreeNode):
@@ -279,7 +279,7 @@ class SpeclibDockTreeNode(DockTreeNode):
             speclib.committedFeaturesRemoved.connect(self.updateNodes)
             self.updateNodes()
 
-    def speclib(self) -> SpectralLibrary:
+    def speclib(self) -> QgsVectorLayer:
         return self.speclibWidget().speclib()
 
     def speclibWidget(self) -> SpectralLibraryWidget:
@@ -290,7 +290,7 @@ class SpeclibDockTreeNode(DockTreeNode):
         PROFILES = dict()
         debugLog('update speclib nodes')
         if isinstance(self.mSpeclibWidget, SpectralLibraryWidget):
-            sl: SpectralLibrary = self.mSpeclibWidget.speclib()
+            sl: QgsVectorLayer = self.mSpeclibWidget.speclib()
             if is_spectral_library(sl):
                 # count number of profiles
                 n = 0
@@ -379,6 +379,7 @@ class MapDockTreeNode(DockTreeNode):
 
         # ensure that layers have a project
         unregistered = [lyr for lyr in self.mLayers if not isinstance(lyr.project(), QgsProject)]
+
         if self.mapCanvas() is None:
             s = ""
         if self.mapCanvas().project() is None:
@@ -484,7 +485,6 @@ class DockManager(QObject):
     def __init__(self):
         QObject.__init__(self)
         self.mConnectedDockAreas = []
-        self.mCurrentDockArea = None
         self.mDocks = list()
         self.mDataSourceManager: Optional[DataSourceManager] = None
         self.mMessageBar: QgsMessageBar = Optional[None]
@@ -532,18 +532,23 @@ class DockManager(QObject):
     def connectDockArea(self, dockArea: DockArea):
         assert isinstance(dockArea, DockArea)
 
-        dockArea.sigDragEnterEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
-        dockArea.sigDragMoveEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
-        dockArea.sigDragLeaveEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
-        dockArea.sigDropEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
-        self.mConnectedDockAreas.append(dockArea)
+        if dockArea not in self.mConnectedDockAreas:
+            dockArea.sigDragEnterEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
+            dockArea.sigDragMoveEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
+            dockArea.sigDragLeaveEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
+            dockArea.sigDropEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
+            self.mConnectedDockAreas.append(dockArea)
 
-    def currentDockArea(self):
-        if self.mCurrentDockArea not in self.mConnectedDockAreas and len(self.mConnectedDockAreas) > 0:
-            self.mCurrentDockArea = self.mConnectedDockAreas[0]
-        return self.mCurrentDockArea
+    def currentDockArea(self) -> Optional[DockArea]:
+        """
+        Returns the current dock area.
+        """
+        for dockArea in self.mConnectedDockAreas:
+            if isinstance(dockArea, DockArea):
+                return dockArea
+        return None
 
-    def onDockAreaDragDropEvent(self, dockArea, event):
+    def onDockAreaDragDropEvent(self, dockArea: DockArea, event):
 
         assert isinstance(dockArea, DockArea)
 
@@ -718,6 +723,7 @@ class DockManager(QObject):
             from enmapbox.gui.enmapboxgui import EnMAPBox
             if isinstance(self.mEnMAPBoxInstance, EnMAPBox):
                 dock.sigRenderStateChanged.connect(self.mEnMAPBoxInstance.ui.mProgressBarRendering.toggleVisibility)
+            dock.mapCanvas().setProject(self.project())
             dock.mapCanvas().enableMapTileRendering(True)
             dock.mapCanvas().setParallelRenderingEnabled(True)
             dock.mapCanvas().setPreviewJobsEnabled(True)
@@ -788,7 +794,11 @@ class DockManagerTreeModel(QgsLayerTreeModel):
         assert isinstance(dockManager, DockManager)
         super(DockManagerTreeModel, self).__init__(self.rootNode, parent)
         self.columnNames = ['Property', 'Value']
-        self.mProject: QgsProject = QgsProject.instance()
+
+        if isinstance(dockManager.project(), QgsProject):
+            self.mProject = dockManager.project()
+        else:
+            self.mProject: QgsProject.instance()
 
         if True:
             """
@@ -1790,23 +1800,28 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
 
         # add apply model shortcuts
         from enmapbox.gui.enmapboxgui import EnMAPBox
-        enmapBox = EnMAPBox.instance()
+        enmapBox = self.enmapboxInstance()
+
         classifiers = list()
         regressors = list()
         transformers = list()
         clusterers = list()
-        modelDataSource: ModelDataSource
-        for modelDataSource in enmapBox.dataSources('MODEL', False):
-            if not isinstance(modelDataSource.mPklObject, dict):
-                continue
-            if modelDataSource.mPklObject.get('classifier') is not None:
-                classifiers.append(modelDataSource)
-            if modelDataSource.mPklObject.get('regressor') is not None:
-                regressors.append(modelDataSource)
-            if modelDataSource.mPklObject.get('transformer') is not None:
-                transformers.append(modelDataSource)
-            if modelDataSource.mPklObject.get('clusterer') is not None:
-                clusterers.append(modelDataSource)
+
+        if isinstance(enmapBox, EnMAPBox):
+            for modelDataSource in enmapBox.dataSources('MODEL', False):
+                modelDataSource: ModelDataSource
+
+                if not (isinstance(modelDataSource, ModelDataSource) and isinstance(modelDataSource.mPklObject, dict)):
+                    continue
+                if modelDataSource.mPklObject.get('classifier') is not None:
+                    classifiers.append(modelDataSource)
+                if modelDataSource.mPklObject.get('regressor') is not None:
+                    regressors.append(modelDataSource)
+                if modelDataSource.mPklObject.get('transformer') is not None:
+                    transformers.append(modelDataSource)
+                if modelDataSource.mPklObject.get('clusterer') is not None:
+                    clusterers.append(modelDataSource)
+
         if len(classifiers + regressors + transformers + clusterers) > 0:
             submenu = menu.addMenu(QIcon(':/images/themes/default/processingAlgorithm.svg'),
                                    'Apply model')
@@ -2063,6 +2078,7 @@ class DockPanelUI(QgsDockWidget):
         assert isinstance(self.dockTreeView, DockTreeView)
         # self.dockTreeView.currentLayerChanged.connect(self.onSelectionChanged)
         self.tbFilterText.textChanged.connect(self.setFilter)
+        # self.tbFilterText.hide()  # see #167
         self.initActions()
 
     def setFilter(self, pattern: str):

@@ -7,14 +7,13 @@ from warnings import warn
 import numpy as np
 from osgeo import gdal
 
-from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibrary
-from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import SpectralProfile
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from enmapboxprocessing.geojsonlibrarywriter import GeoJsonLibraryWriter
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import Array3d, Number
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
-from enmapbox.typeguard import typechecked
 
 RESPONSE_CUTOFF_VALUE = 0.001
 RESPONSE_CUTOFF_DIGITS = 3
@@ -39,7 +38,7 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
             (self._RASTER, 'A spectral raster layer to be resampled.'),
             (self._CODE, 'Python code specifying the spectral response function.'),
             (self._SAVE_RESPONSE_FUNCTION,
-             'Whether to save the spectral response function library as *.srf.gpkg sidecar file.'),
+             'Whether to save the spectral response function library as *.srf.geojson sidecar file.'),
             (self._OUTPUT_RASTER, self.RasterFileDestination)
         ]
 
@@ -163,21 +162,16 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
             writer.close()
 
             if saveResponseFunction:
-
-                library = SpectralLibrary()
-                profiles = list()
-                for name in responses:
-                    values = responses[name]
-                    profile = SpectralProfile()
-                    profile.setName(name)
-                    x = [xi for xi, yi in values]
-                    y = [yi for xi, yi in values]
-                    profile.setValues(x, y, 'Nanometers')
-                    profiles.append(profile)
-                library.startEditing()
-                library.addProfiles(profiles)
-                library.commitChanges()
-                library.write(filename + '.srf.gpkg')
+                with open(filename + '.srf.geojson', 'w') as file1, open(filename + '.srf.qml', 'w') as file2:
+                    writer = GeoJsonLibraryWriter(file1, 'Spectral Response Function', '')
+                    writer.initWriting()
+                    for i, name in enumerate(responses):
+                        values = responses[name]
+                        x = [xi for xi, yi in values]
+                        y = [yi for xi, yi in values]
+                        writer.writeProfile(x, y, 'Nanometers', name)
+                    writer.endWriting()
+                    writer.writeQml(file2)
 
             result = {self.P_OUTPUT_RASTER: filename}
             self.toc(feedback, result)

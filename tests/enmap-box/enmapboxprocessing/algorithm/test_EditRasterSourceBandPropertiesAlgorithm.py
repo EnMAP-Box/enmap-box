@@ -4,9 +4,9 @@ from osgeo import gdal
 
 from enmapbox.exampledata import enmap
 from enmapboxprocessing.algorithm.editrastersourcebandpropertiesalgorithm import EditRasterSourceBandPropertiesAlgorithm
+from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxprocessing.algorithm.testcase import TestCase
 from qgis.PyQt.QtCore import QDateTime
 
 

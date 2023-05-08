@@ -1,4 +1,4 @@
-from enmapboxprocessing.test.testcase import TestCase
+from enmapboxprocessing.testcase import TestCase
 from enmapboxtestdata import enmap
 from multisourcemultibandcolorrendererapp.multisourcemultibandcolorrenderer import MultiSourceMultiBandColorRenderer
 from qgis.core import QgsRasterLayer

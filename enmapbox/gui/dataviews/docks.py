@@ -20,7 +20,6 @@
 import codecs
 import os
 import re
-import typing
 import uuid
 import warnings
 from math import ceil
@@ -324,10 +323,8 @@ class DockArea(pgDockArea):
         #  print "added temp area", area, area.window()
         return area
 
-    def addDock(self, dock, position='bottom', relativeTo=None, **kwds) -> Dock:
-        assert dock is not None
-
-        assert isinstance(dock, Dock)
+    def addDock(self, dock: pgDock, position='bottom', relativeTo=None, **kwds) -> Dock:
+        assert isinstance(dock, (Dock, pgDock))
         if hasattr(dock, 'orig_area'):
             dock.label.btnUnFloat.setVisible(dock.orig_area != self)
 
@@ -971,7 +968,7 @@ class MapDock(Dock):
         assert isinstance(canvas, QgsMapCanvas)
         return self.mapCanvas().createCanvasLink(canvas, linkType)
 
-    def addLayers(self, layers: typing.List[QgsMapLayer]):
+    def addLayers(self, layers: List[QgsMapLayer]):
         tree: QgsLayerTree = self.layerTree()
         for lyr in layers:
             tree.addLayer(lyr)

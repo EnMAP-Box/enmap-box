@@ -1229,6 +1229,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.setMapTool(MapTools.CursorLocation)
 
         # redirect to QGIS Project Management
+        self.ui.mActionOpenProject.triggered.connect(lambda: self.iface.actionOpenProject().trigger())
         self.ui.mActionSaveProject.triggered.connect(lambda: self.iface.actionSaveProject().trigger())
         self.ui.mActionSaveProjectAs.triggered.connect(lambda: self.iface.actionSaveProjectAs().trigger())
         # AJ: Question for Benjamin: currently we don't have an open button, why?
@@ -1748,9 +1749,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             dir_exampledata = os.path.dirname(enmapbox.exampledata.__file__)
             files = list(pathlib.Path(f).as_posix() for f in file_search(dir_exampledata, rx, recursive=True))
 
-            self.addSources(files)
-            exampleSources = [s for s in self.dataSourceManager().dataSources()
-                              if isinstance(s, SpatialDataSource) and s.source() in files]
+            exampleSources = self.addSources(files)
+            exampleSources = [s for s in exampleSources if isinstance(s, SpatialDataSource)]
 
             for n in range(mapWindows):
                 dock: MapDock = self.createDock('MAP')
@@ -2003,7 +2003,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         """
         return self.mDockManager.docks(dockType=dockType)
 
-    def addSources(self, sourceList):
+    def addSources(self, sourceList) -> List[DataSource]:
         """
         :param sourceList:
         :return: Returns a list of added DataSources or the list of DataSources that were derived from a single data source uri.
@@ -2011,14 +2011,14 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         assert isinstance(sourceList, list)
         return self.mDataSourceManager.addDataSources(sourceList)
 
-    def addSource(self, source, name=None):
+    def addSource(self, source, name: str = None, show_dialogs: bool = True):
         """
         Returns a list of added DataSources or the list of DataSources that were derived from a single data source uri.
         :param source:
         :param name:
         :return: [list-of-dataSources]
         """
-        return self.mDataSourceManager.addDataSources(source, name=name)
+        return self.mDataSourceManager.addDataSources(source, name=name, show_dialogs=show_dialogs)
 
     def removeSources(self, dataSourceList: list = None):
         """

@@ -6,7 +6,7 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import checkSampleShape, ClassifierDump, Categories, SampleX, SampleY
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCategorizedSymbolRenderer,
-                       QgsFeature, QgsProcessingParameterField, QgsVectorLayer)
+                       QgsFeature, QgsProcessingParameterField, QgsVectorLayer, QgsProcessingException)
 from enmapbox.typeguard import typechecked
 
 
@@ -77,9 +77,8 @@ class PrepareClassificationDatasetFromCategorizedVectorAndFieldsAlgorithm(EnMAPP
                     classField = renderer.classAttribute()
                     feedback.pushInfo(f'Use categories from style: {categories}')
                 else:
-                    feedback.reportError(
-                        'Select either a categorited vector layer, or a field with class values.',
-                        fatalError=True
+                    raise QgsProcessingException(
+                        'Select either a categorited vector layer, or a field with class values.'
                     )
             else:
                 categories = Utils.categoriesFromVectorField(classification, classField)

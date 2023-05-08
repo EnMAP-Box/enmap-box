@@ -14,7 +14,7 @@ dataclasses # ; python_version < '3.7'
 # PyQt5-sip  # commented out; caused "Unable to import PyQt5-sip" issue, see #718
 
 # required by parts of EnMAP-Box Core
-typeguard
+typeguard==2.13.3  # version 3.x created several problems
 scikit-learn>=0.24
 astropy # required for convolution
 PyOpenGL # required by ImageCube app

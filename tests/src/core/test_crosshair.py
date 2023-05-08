@@ -46,6 +46,8 @@ class CrosshairTests(EnMAPBoxTestCase):
         refCanvas.populateContextMenu(menu, None)
         self.showGui([refCanvas, menu])
 
+        QgsProject.instance().removeAllMapLayers()
+
 
 if __name__ == "__main__":
     unittest.main(buffer=False)

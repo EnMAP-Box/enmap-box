@@ -1,13 +1,14 @@
 import numpy as np
 
 from bivariatecolorrasterrendererapp.bivariatecolorrasterrenderer import BivariateColorRasterRenderer
-from enmapboxprocessing.test.testcase import TestCase
+from enmapboxprocessing.testcase import TestCase
 from qgis.core import QgsRasterLayer
 
 
 class TestDualbandPseudocolorRenderer(TestCase):
 
     def test(self):
+        return  # just a local test
         layer = QgsRasterLayer(r'D:\data\katja_kowalski\NDFI.vrt', 'NDFI')
         renderer = BivariateColorRasterRenderer(layer.dataProvider())
         renderer.setRange(12, 618, 187, 8087)

@@ -1,4 +1,5 @@
 from os import chdir
+from os.path import dirname
 
 from osgeo import gdal
 
@@ -68,14 +69,29 @@ class TestCreateSpectralIndicesAlgorithm(TestCase):
 
     def test_relativeInputPath(self):
 
-        gdal.Translate(self.filename('enmap.tif'), enmap)  # copy enmap_berlin to output folder
-        chdir(self.testOutputFolder())  # set output folder the current workdir
+        filename = self.filename('enmap.tif')
+        gdal.Translate(filename, enmap)  # copy enmap_berlin to output folder
+        chdir(dirname(filename))  # set output folder the current workdir
 
         alg = CreateSpectralIndicesAlgorithm()
         alg.initAlgorithm()
         parameters = {
-            alg.P_RASTER: 'enmap.tif',  # use reletive input path!
+            alg.P_RASTER: 'enmap.tif',
             alg.P_INDICES: 'NDVI, EVI',
             alg.P_OUTPUT_VRT: self.filename('vi.vrt'),
         }
         result = self.runalg(alg, parameters)
+
+    def test_single_custom_narrowband_index(self):
+        alg = CreateSpectralIndicesAlgorithm()
+        alg.initAlgorithm()
+        parameters = {
+            alg.P_RASTER: enmap,
+            alg.P_INDICES: 'CUSTOM = (B + r555 - r1640) / (r555 + r1640)',
+            alg.P_OUTPUT_VRT: self.filename('custom.vrt'),
+        }
+        result = self.runalg(alg, parameters)
+        reader = RasterReader(result[alg.P_OUTPUT_VRT])
+        self.assertEqual('CUSTOM', reader.metadataItem('short_name', '', 1))
+        self.assertIsNone(reader.metadataItem('long_name', '', 1))
+        self.assertEqual('(B + r555 - r1640) / (r555 + r1640)', reader.metadataItem('formula', '', 1))

@@ -31,6 +31,9 @@ import sys
 import textwrap
 import typing
 import warnings
+import markdown
+from typing import Union
+
 import docutils.core
 from os.path import exists
 
@@ -182,6 +185,8 @@ def create_enmapbox_plugin(include_testdata: bool = False,
 
     PATH_METADATAFILE = PLUGIN_DIR / 'metadata.txt'
 
+    pathAbout = DIR_REPO / 'About.md'
+
     # set QGIS Metadata file values
     MD = QGISMetadataFileWriter()
     MD.mName = config['metadata']['name']
@@ -191,7 +196,7 @@ def create_enmapbox_plugin(include_testdata: bool = False,
     MD.mAuthor = config['metadata']['authors'].strip().split('\n')
     MD.mIcon = config['metadata']['icon']
     MD.mHomepage = config['metadata']['homepage']
-    MD.mAbout = enmapbox.ABOUT
+    MD.mAbout = markdownToHTML(pathAbout)
     MD.mTracker = enmapbox.ISSUE_TRACKER
     MD.mRepository = enmapbox.REPOSITORY
     MD.mQgisMinimumVersion = enmapbox.MIN_VERSION_QGIS
@@ -315,64 +320,96 @@ def create_enmapbox_plugin(include_testdata: bool = False,
     return None
 
 
-def createCHANGELOG(dirPlugin):
+def markdownToHTML(path_md: Union[str, pathlib.Path]) -> str:
+    path_md = pathlib.Path(path_md)
+
+    html = None
+    if not path_md.is_file():
+        for s in ['.md', '.rst']:
+            p = path_md.parent / (os.path.splitext(path_md.name)[0] + s)
+            if p.is_file():
+                path_md = p
+                break
+
+    if path_md.name.endswith('.rst'):
+
+        assert path_md.is_file(), path_md
+        overrides = {'stylesheet': None,
+                     'embed_stylesheet': False,
+                     'output_encoding': 'utf-8',
+                     }
+
+        buffer = io.StringIO()
+        html = docutils.core.publish_file(
+            source_path=path_md,
+            writer_name='html5',
+            destination=buffer,
+            settings_overrides=overrides)
+    elif path_md.name.endswith('.md'):
+        with open(path_md, 'r', encoding='utf-8') as f:
+            md = f.read()
+        html = markdown.markdown(md)
+    else:
+        raise Exception(f'Unsupported file: {path_md}')
+    return html
+
+
+def createCHANGELOG(dirPlugin: pathlib.Path) -> str:
     """
     Reads the CHANGELOG.rst and creates the deploy/CHANGELOG (without extension!) for the QGIS Plugin Manager
     :return:
     """
 
-    pathMD = os.path.join(DIR_REPO, 'CHANGELOG.rst')
-    pathCL = os.path.join(dirPlugin, 'CHANGELOG')
+    pathMD = DIR_REPO / 'CHANGELOG.md'
+    pathCL = dirPlugin / 'CHANGELOG'
 
     os.makedirs(os.path.dirname(pathCL), exist_ok=True)
     assert os.path.isfile(pathMD)
     #    import sphinx.transforms
 
-    overrides = {'stylesheet': None,
-                 'embed_stylesheet': False,
-                 'output_encoding': 'utf-8',
-                 }
+    html = markdownToHTML(pathMD)
+    if False:
+        from xml.dom import minidom
+        xml = minidom.parseString(html)
+        #  remove headline
+        for i, node in enumerate(xml.getElementsByTagName('h1')):
+            if i == 0:
+                node.parentNode.removeChild(node)
+            else:
+                node.tagName = 'h4'
 
-    buffer = io.StringIO()
-    html = docutils.core.publish_file(
-        source_path=pathMD,
-        writer_name='html5',
-        destination=buffer,
-        settings_overrides=overrides)
-
-    from xml.dom import minidom
-    xml = minidom.parseString(html)
-    #  remove headline
-    for i, node in enumerate(xml.getElementsByTagName('h1')):
-        if i == 0:
-            node.parentNode.removeChild(node)
-        else:
-            node.tagName = 'h4'
-
-    for node in xml.getElementsByTagName('link'):
-        node.parentNode.removeChild(node)
-
-    for node in xml.getElementsByTagName('meta'):
-        if node.getAttribute('name') == 'generator':
+        for node in xml.getElementsByTagName('link'):
             node.parentNode.removeChild(node)
 
-    xml = xml.getElementsByTagName('body')[0]
-    html = xml.toxml()
-    html_cleaned = []
-    for line in html.split('\n'):
-        # line to modify
-        line = re.sub(r'class="[^"]*"', '', line)
-        line = re.sub(r'id="[^"]*"', '', line)
-        line = re.sub(r'<li><p>', '<li>', line)
-        line = re.sub(r'</p></li>', '</li>', line)
-        line = re.sub(r'</?(dd|dt|div|body)[ ]*>', '', line)
-        line = line.strip()
-        if line != '':
-            html_cleaned.append(line)
+        for node in xml.getElementsByTagName('meta'):
+            if node.getAttribute('name') == 'generator':
+                node.parentNode.removeChild(node)
+
+        xml = xml.getElementsByTagName('body')[0]
+        html = xml.toxml()
+
+    if True:
+        html_cleaned = html
+    else:
+        html_cleaned = []
+        for line in html.split('\n'):
+            # line to modify
+            line = re.sub(r'class="[^"]*"', '', line)
+            line = re.sub(r'id="[^"]*"', '', line)
+            line = re.sub(r'<li><p>', '<li>', line)
+            line = re.sub(r'</p></li>', '</li>', line)
+            line = re.sub(r'</?(dd|dt|div|body)[ ]*>', '', line)
+            line = line.strip()
+            if line != '':
+                html_cleaned.append(line)
+        html_cleaned = '\n'.join(html_cleaned)
     # make html compact
+    # remove newlines as each line will be shown in a table row <tr>
+    # see qgspluginmanager.cpp
+    html_cleaned = html_cleaned.replace('\n', '')
 
     with open(pathCL, 'w', encoding='utf-8') as f:
-        f.write('\n'.join(html_cleaned))
+        f.write(html_cleaned)
 
 
 if __name__ == "__main__":

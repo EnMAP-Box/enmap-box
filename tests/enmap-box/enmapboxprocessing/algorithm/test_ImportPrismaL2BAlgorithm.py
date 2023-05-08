@@ -1,16 +1,20 @@
 import numpy as np
 
 from enmapboxprocessing.algorithm.importprismal2balgorithm import ImportPrismaL2BAlgorithm
-from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.algorithm.testcase import TestCase
+from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxtestdata import sensorProductsRoot, SensorProducts
 
 
 class TestImportPrismaL2BAlgorithm(TestCase):
 
     def test(self):
+        if sensorProductsRoot() is None:
+            return
+
         alg = ImportPrismaL2BAlgorithm()
         parameters = {
-            alg.P_FILE: r'D:\data\sensors\prisma\PRS_L2B_STD_20201107101404_20201107101408_0001.he5',
+            alg.P_FILE: SensorProducts.Prisma.L2B,
             alg.P_OUTPUT_SPECTRAL_CUBE: self.filename('prismaL2B_SPECTRAL.tif'),
             alg.P_OUTPUT_SPECTRAL_GEOLOCATION: self.filename('prismaL2B_SPECTRAL_GEOLOCATION.vrt'),
             alg.P_OUTPUT_SPECTRAL_GEOMETRIC: self.filename('prismaL2B_SPECTRAL_GEOMETRIC.vrt'),
@@ -19,9 +23,6 @@ class TestImportPrismaL2BAlgorithm(TestCase):
             alg.P_OUTPUT_PAN_GEOLOCATION: self.filename('prismaL2B_PAN_GEOLOCATION.vrt'),
             alg.P_OUTPUT_PAN_ERROR: self.filename('prismaL2B_PAN_ERROR.vrt'),
         }
-        if not self.fileExists(parameters[alg.P_FILE]):
-            return
-
         result = self.runalg(alg, parameters)
         self.assertEqual(234, RasterReader(result[alg.P_OUTPUT_SPECTRAL_CUBE]).bandCount())
         self.assertAlmostEqual(3077.497, np.mean(RasterReader(result[alg.P_OUTPUT_SPECTRAL_CUBE]).array()), 3)

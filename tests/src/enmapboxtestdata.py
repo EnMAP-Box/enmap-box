@@ -1,9 +1,10 @@
 import os
 import platform
+import warnings
 from os.path import join, dirname, abspath
 from typing import Optional
 
-root = abspath(join(dirname(dirname(__file__)), 'testdata'))
+_root = abspath(join(dirname(dirname(__file__)), 'testdata'))
 root2 = abspath(join(dirname(dirname(dirname(__file__))), 'enmapbox', 'exampledata'))
 
 # RASTER
@@ -14,90 +15,96 @@ enmap = join(root2, 'enmap_berlin.bsq')
 hires = join(root2, 'hires_berlin.bsq')
 
 # - rasterized landcover polygons
-landcover_polygon_1m = join(root, _subdir, 'landcover_polygon_1m.tif')
-landcover_polygon_1m_3classes = join(root, _subdir, 'landcover_polygon_1m_3classes.tif')
-landcover_polygon_1m_epsg3035 = join(root, _subdir, 'landcover_polygon_1m_EPSG3035.tif')
-landcover_polygon_30m = join(root, _subdir, 'landcover_polygon_30m.tif')
-landcover_polygon_30m_epsg3035 = join(root, _subdir, 'landcover_polygon_30m_EPSG3035.tif')
+landcover_polygon_1m = join(_root, _subdir, 'landcover_polygon_1m.tif')
+landcover_polygon_1m_3classes = join(_root, _subdir, 'landcover_polygon_1m_3classes.tif')
+landcover_polygon_1m_epsg3035 = join(_root, _subdir, 'landcover_polygon_1m_EPSG3035.tif')
+landcover_polygon_30m = join(_root, _subdir, 'landcover_polygon_30m.tif')
+landcover_polygon_30m_epsg3035 = join(_root, _subdir, 'landcover_polygon_30m_EPSG3035.tif')
 
 # - landcover maps (predicted by RF)
-landcover_map_l2 = join(root, _subdir, 'landcover_map_l2.tif')
-landcover_map_l3 = join(root, _subdir, 'landcover_map_l3.tif')
+landcover_map_l2 = join(_root, _subdir, 'landcover_map_l2.tif')
+landcover_map_l3 = join(_root, _subdir, 'landcover_map_l3.tif')
 
 # - rasterized landcover polygon fractions
-fraction_polygon_l3 = join(root, _subdir, 'fraction_polygon_l3.tif')
+fraction_polygon_l3 = join(_root, _subdir, 'fraction_polygon_l3.tif')
 
 # - landcover fraction maps (predicted by RF)
-fraction_map_l3 = join(root, _subdir, 'fraction_map_l3.tif')
+fraction_map_l3 = join(_root, _subdir, 'fraction_map_l3.tif')
 
 # - binary water mask (derived from landcover map)
-water_mask_30m = join(root, _subdir, 'water_mask_30m.tif')
+water_mask_30m = join(_root, _subdir, 'water_mask_30m.tif')
 
 # - 300m grid (same extent as 30m rasters)
-enmap_grid_300m = join(root, _subdir, 'enmap_grid_300m.vrt')
+enmap_grid_300m = join(_root, _subdir, 'enmap_grid_300m.vrt')
 
 # VECTOR
 _subdir = 'vector'
 
 # - landcover polygons
 landcover_polygon = join(root2, 'landcover_berlin_polygon.gpkg')
-landcover_polygon_3classes = join(root, _subdir, 'landcover_polygon_3classes.gpkg')
-landcover_polygon_3classes_id = join(root, _subdir, 'landcover_polygon_3classes_id.gpkg')
-landcover_polygon_3classes_epsg4326 = join(root, _subdir, 'landcover_polygon_3classes_EPSG4326.gpkg')
+landcover_polygon_3classes = join(_root, _subdir, 'landcover_polygon_3classes.gpkg')
+landcover_polygon_3classes_id = join(_root, _subdir, 'landcover_polygon_3classes_id.gpkg')
+landcover_polygon_3classes_epsg4326 = join(_root, _subdir, 'landcover_polygon_3classes_EPSG4326.gpkg')
 
 # - landcover points
 landcover_point = join(root2, 'landcover_berlin_point.gpkg')
-landcover_points_singlepart_epsg3035 = join(root, _subdir, 'landcover_point_singlepart_3035.gpkg')
-landcover_points_multipart_epsg3035 = join(root, _subdir, 'landcover_point_multipart_3035.gpkg')
+landcover_points_singlepart_epsg3035 = join(_root, _subdir, 'landcover_point_singlepart_3035.gpkg')
+landcover_points_multipart_epsg3035 = join(_root, _subdir, 'landcover_point_multipart_3035.gpkg')
 
 # - landcover fraction points
-fraction_point_multitarget = join(root, _subdir, 'fraction_point_multitarget.gpkg')
-fraction_point_singletarget = join(root, _subdir, 'fraction_point_singletarget.gpkg')
+fraction_point_multitarget = join(_root, _subdir, 'fraction_point_multitarget.gpkg')
+fraction_point_singletarget = join(_root, _subdir, 'fraction_point_singletarget.gpkg')
 
-points_in_no_data_region = join(root, _subdir, 'points_in_no_data_region.gpkg')
+points_in_no_data_region = join(_root, _subdir, 'points_in_no_data_region.gpkg')
 
 # LIBRARY
 _subdir = 'library'
-library = join(root, _subdir, 'library.gpkg')
-landsat8_srf = join(root, _subdir, 'landsat8_srf.gpkg')
+library = join(_root, _subdir, 'library.gpkg')
+landsat8_srf = join(_root, _subdir, 'landsat8_srf.gpkg')
 
 # DATASET
 _subdir = 'ml'
 
 # - Classifier
-classifierDumpPkl = join(root, _subdir, 'classifier.pkl')
+classifierDumpPkl = join(_root, _subdir, 'classifier.pkl')
 
 # - Classification dataset
-classificationDatasetAsGpkgVector = join(root, _subdir, 'classification_dataset.gpkg')
-classificationDatasetAsCsvVector = join(root, _subdir, 'classification_dataset.csv')
-classificationDatasetAsJsonFile = join(root, _subdir, 'classification_dataset.json')
-classificationDatasetAsPklFile = join(root, _subdir, 'classification_dataset.pkl')
+classificationDatasetAsGpkgVector = join(_root, _subdir, 'classification_dataset.gpkg')
+classificationDatasetAsCsvVector = join(_root, _subdir, 'classification_dataset.csv')
+classificationDatasetAsJsonFile = join(_root, _subdir, 'classification_dataset.json')
+classificationDatasetAsPklFile = join(_root, _subdir, 'classification_dataset.pkl')
 classificationDatasetAsForceFile = (
-    join(root, _subdir, 'force_classification_features.csv'), join(root, _subdir, 'force_classification_labels.csv'))
+    join(_root, _subdir, 'classification_dataset_force_features.csv'),
+    join(_root, _subdir, 'classification_dataset_force_labels.csv')
+)
 
 # - Regressor
-regressorDumpPkl = join(root, _subdir, 'regressor.pkl')
-regressorDumpSingleTargetPkl = join(root, _subdir, 'regressor_singletarget.pkl')
-regressorDumpMultiTargetPkl = join(root, _subdir, 'regressor_multitarget.pkl')
+regressorDumpPkl = join(_root, _subdir, 'regressor.pkl')
+regressorDumpSingleTargetPkl = join(_root, _subdir, 'regressor_singletarget.pkl')
+regressorDumpMultiTargetPkl = join(_root, _subdir, 'regressor_multitarget.pkl')
 
 # - Regression dataset
-regressionDatasetAsJsonFile = join(root, _subdir, 'regression_dataset.json')
-regressionDatasetAsPkl = join(root, _subdir, 'regression_dataset.pkl')
+regressionDatasetAsJsonFile = join(_root, _subdir, 'regression_dataset.json')
+regressionDatasetAsPkl = join(_root, _subdir, 'regression_dataset.pkl')
 
 # external testdata
 _subdir = 'external'
-engeomap_cubus_gamsberg_subset = join(root, _subdir, 'engeomap', 'cubus_gamsberg_subset')
-engeomap_gamsberg_field_library = join(root, _subdir, 'engeomap', 'gamsberg_field_library')
-engeomap_gamesberg_field_library_color_mod = join(root, _subdir, 'engeomap', 'gamesberg_field_library_color_mod.csv')
-del _subdir
+engeomap_cubus_gamsberg_subset = join(_root, _subdir, 'engeomap', 'cubus_gamsberg_subset')
+engeomap_gamsberg_field_library = join(_root, _subdir, 'engeomap', 'gamsberg_field_library')
+engeomap_gamesberg_field_library_color_mod = join(_root, _subdir, 'engeomap', 'gamesberg_field_library_color_mod.csv')
+del _subdir, _root
 
 
 # external sensor products
 def sensorProductsRoot() -> Optional[str]:
     # - let's have some developer-dependent default locations
-    root = {
-        'Andreas@PC-21-0602': r'd:\data\sensors'
-    }.get(os.getlogin() + '@' + platform.node())
+    root = None
+    try:
+        root = {
+            'Andreas@PC-21-0602': r'd:\data\sensors'
+        }.get(os.getlogin() + '@' + platform.node())
+    except OSError as ex:
+        warnings.warn(f'Exception raised in sensorProductsRoot():\n{ex}')
 
     # - check environment variable
     if root is None:
@@ -119,7 +126,7 @@ class SensorProducts(object):
                 sensorProductsRoot(), 'desis', 'DESIS-HSI-L1C-DT1203190212_025-20191203T021128-V0210'
             )
             L1C_MetadataXml = join(
-                L1B, 'DESIS-HSI-L1C-DT1203190212_025-20191203T021128-V0210-METADATA.xml'
+                L1C, 'DESIS-HSI-L1C-DT1203190212_025-20191203T021128-V0210-METADATA.xml'
             )
             L2A = join(
                 sensorProductsRoot(), 'desis', 'DESIS-HSI-L2A-DT1203190212_025-20191203T021128-V0210'

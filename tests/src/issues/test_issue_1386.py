@@ -7,6 +7,7 @@ from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QMenu, QWidgetAction, QToo
 
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyleButton
 from enmapbox.testing import EnMAPBoxTestCase
+from qgis.core import QgsProject
 from qgis.gui import QgsColorButton
 
 
@@ -36,6 +37,8 @@ class TestCaseIssue1386(EnMAPBoxTestCase):
 
         # tb.clicked.connect(lambda: self.activateWindow())
         self.showGui(tBtn)
+
+        QgsProject.instance().removeAllMapLayers()
 
     def test_plotStyleWidget(self):
         btn = PlotStyleButton()

@@ -3,15 +3,15 @@ from collections import OrderedDict
 from typing import Dict, Any, List, Tuple
 
 from enmapbox.qgispluginsupport.qps.speclib import FIELD_VALUES
-from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibrary
 from enmapboxprocessing.algorithm.spectralresamplingbyresponsefunctionconvolutionalgorithmbase import \
     RESPONSE_CUTOFF_VALUE, RESPONSE_CUTOFF_DIGITS
 from enmapboxprocessing.algorithm.spectralresamplingtocustomsensoralgorithm import \
     SpectralResamplingToCustomSensorAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException,
+from qgis.core import (QgsProcessingContext, QgsVectorLayer, QgsProcessingFeedback, QgsProcessingException,
                        QgsProcessingParameterField)
 from enmapbox.typeguard import typechecked
+from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
 
 
 @typechecked
@@ -63,7 +63,7 @@ class SpectralResamplingByResponseFunctionLibraryAlgorithm(EnMAPProcessingAlgori
             self.tic(feedback, parameters, context)
 
             try:
-                spectralLibrary = SpectralLibrary(library.source())
+                spectralLibrary = QgsVectorLayer(library.source())
             except Exception as error:
                 traceback.print_exc()
                 message = f"failed to open spectral library: {error}"
@@ -74,19 +74,24 @@ class SpectralResamplingByResponseFunctionLibraryAlgorithm(EnMAPProcessingAlgori
             if binaryField is None:
                 binaryField = FIELD_VALUES
 
-            for profile in spectralLibrary.profiles(profile_field=binaryField):
+            for feature in library.getFeatures():
+                profileDict = decodeProfileValueDict(feature.attribute(binaryField))
+                if len(profileDict) == 0:
+                    raise QgsProcessingException(f'Not a valid Profiles field: {binaryField}')
+
                 # derive to-nanometers scale factor
-                wavelength_units = profile.xUnit()
+                wavelength_units = profileDict['xUnit']
                 if wavelength_units.lower() in ['micrometers', 'um']:
                     scale = 1000.
                 elif wavelength_units.lower() in ['nanometers', 'nm']:
                     scale = 1.
                 else:
                     raise ValueError(f'unsupported wavelength units: {wavelength_units}')
+
                 # prepare responses
-                responses[profile.attribute('name')] = [
+                responses[feature.attribute('name')] = [
                     (int(round(x * scale)), round(y, RESPONSE_CUTOFF_DIGITS))  # scale and round
-                    for x, y in zip(profile.xValues(), profile.yValues())
+                    for x, y in zip(profileDict['x'], profileDict['y'])
                     if y >= RESPONSE_CUTOFF_VALUE  # filter very small weights for better performance
                 ]
 

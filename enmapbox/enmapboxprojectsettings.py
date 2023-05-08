@@ -67,6 +67,10 @@ class EnMAPBoxProjectSettings(object):
     def setSettings(self, settings: Dict):
         from qgis.utils import iface
         from enmapbox.gui.enmapboxgui import EnMAPBox
+
+        if not isinstance(settings, dict):
+            return
+
         enmapBox = EnMAPBox.instance()
 
         # QGIS GUI
@@ -76,8 +80,9 @@ class EnMAPBoxProjectSettings(object):
             for dockWidget in qgisMainWindow.findChildren(QgsDockWidget):
                 if hasattr(dockWidget, 'projectSettings'):
                     key = dockWidget.projectSettingsKey()
-                    values = settings[f'EO4Q/{key}']
-                    dockWidget.setProjectSettings(values)
+                    values = settings.get(f'EO4Q/{key}')
+                    if values is not None:
+                        dockWidget.setProjectSettings(values)
 
         # EnMAP-Box GUI
         if isinstance(enmapBox, EnMAPBox):
@@ -85,8 +90,9 @@ class EnMAPBoxProjectSettings(object):
             for dockWidget in enmapBoxMainWindow.findChildren(QgsDockWidget):
                 if hasattr(dockWidget, 'projectSettings'):
                     key = dockWidget.projectSettingsKey()
-                    values = settings[key]
-                    dockWidget.setProjectSettings(values)
+                    values = settings.get(key)
+                    if values is not None:
+                        dockWidget.setProjectSettings(values)
 
             # EnMAP-Box Apps
             for app in enmapBox.applicationRegistry.applications():

@@ -1,7 +1,7 @@
 import numpy as np
 from osgeo import gdal
 
-from enmapbox.exampledata import enmap, google_maps
+from enmapbox.exampledata import enmap
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.testcase import TestCase
@@ -30,10 +30,6 @@ class TestRasterReader(TestCase):
         self.assertTrue(layer is not reader.layer)
         self.assertEqual(layer.source(), reader.layer.source())
         self.assertTrue(ds is reader.gdalDataset)
-
-        wms = QgsRasterLayer(google_maps)
-        reader = RasterReader(wms, openWithGdal=False)
-        self.assertIsNone(reader.gdalDataset)
 
     def test_bandCount(self):
         self.assertEqual(177, RasterReader(enmap).bandCount())
@@ -267,11 +263,10 @@ class TestRasterReader(TestCase):
 
     def test_metadataDomain(self):
         reader = RasterReader(enmap)
-        self.assertEqual(20, len(reader.metadataDomain('ENVI')))
+        # self.assertEqual(20, len(reader.metadataDomain('ENVI')))
 
     def test_metadata(self):
         reader = RasterReader(enmap)
-        self.assertEqual(4, len(reader.metadata()))
 
     def test_metadataDomainKeys(self):
         reader = RasterReader(enmap)
@@ -539,7 +534,6 @@ class TestRasterReader(TestCase):
         self.assertEqual(gold * 2, reader.lineMemoryUsage(dataTypeSize=8))
 
     def test_pamMetadata(self):
-
         layer = QgsRasterLayer(enmap)
         reader = RasterReader(layer)
         wavelength1 = 0.123

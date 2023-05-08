@@ -25,11 +25,7 @@ import pathlib
 
 from qgis.core import QgsVectorLayer
 
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
-from qgis.PyQt.QtGui import *
 from enmapbox.gui.applications import EnMAPBoxApplication
-from enmapbox.gui import SpectralLibrary
 from enmapbox.gui.dataviews.docks import SpectralLibraryDock
 
 APP_DIR = pathlib.Path(__file__).parent

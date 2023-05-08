@@ -5,19 +5,21 @@ from xml.etree import ElementTree
 import numpy as np
 from osgeo import gdal
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.importenmapl1balgorithm import ImportEnmapL1BAlgorithm
 from enmapboxprocessing.algorithm.vrtbandmathalgorithm import VrtBandMathAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.gdalutils import GdalUtils
 from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
 class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
     P_FILE, _FILE = 'file', 'Metadata file'
+    P_SET_BAD_BANDS, _SET_BAD_BANDS = 'setBadBands', 'Set bad bands'
     P_DETECTOR_OVERLAP, _DETECTOR_OVERLAP = 'detectorOverlap', 'Detector overlap region'
     O_DETECTOR_OVERLAP = ['Order by wavelength', 'Moving average filter', 'VNIR only', 'SWIR only']
     OrderByWavelengthOverlapOption, MovingAverageFilterOverlapOption, VnirOnlyOverlapOption, SwirOnlyOverlapOption = \
@@ -37,8 +39,9 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                          'Instead of executing this algorithm, '
                          'you may drag&drop the metadata XML file directly from your system file browser onto '
                          'the EnMAP-Box map view area.'),
-            (self.P_DETECTOR_OVERLAP, 'Different options for handling the detector overlap region from 900 to 1000 '
-                                      'nanometers. For the Moving average filter, a kernel size of 3 is used.'),
+            (self._SET_BAD_BANDS, 'Whether to find and set the bad bands list by evaluating the image data.'),
+            (self._DETECTOR_OVERLAP, 'Different options for handling the detector overlap region from 900 to 1000 '
+                                     'nanometers. For the Moving average filter, a kernel size of 3 is used.'),
             (self._OUTPUT_RASTER, self.RasterFileDestination)
         ]
 
@@ -46,8 +49,10 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
         return Group.ImportData.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
-        self.addParameterFile(self.P_FILE, self._FILE, extension='XML',
-                              fileFilter='Metadata file (*-METADATA.xml);;All files (*.*)')
+        self.addParameterFile(
+            self.P_FILE, self._FILE, extension='XML', fileFilter='Metadata file (*-METADATA.xml);;All files (*.*)'
+        )
+        self.addParameterBoolean(self.P_SET_BAD_BANDS, self._SET_BAD_BANDS, True)
         self.addParameterEnum(
             self.P_DETECTOR_OVERLAP, self._DETECTOR_OVERLAP, self.O_DETECTOR_OVERLAP, False, self.SwirOnlyOverlapOption
         )
@@ -68,6 +73,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         xmlFilename = self.parameterAsFile(parameters, self.P_FILE, context)
+        setBadBands = self.parameterAsBoolean(parameters, self.P_SET_BAD_BANDS, context)
         detectorOverlap = self.parameterAsEnum(parameters, self.P_DETECTOR_OVERLAP, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_RASTER, context)
         with open(filename + '.log', 'w') as logfile:
@@ -171,8 +177,9 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                         vrtBandFilenames.append(vrtStackFilename)
                         bandNumbers.append(bandNo)
 
-                GdalUtils.stackVrtBands(filename, vrtBandFilenames, bandNumbers)
-                ds: gdal.Dataset = gdal.Open(filename)
+                vrtStackFilename = Utils.tmpFilename(filename, 'stack.vrt')
+                GdalUtils.stackVrtBands(vrtStackFilename, vrtBandFilenames, bandNumbers)
+                ds: gdal.Dataset = gdal.Translate(filename, vrtStackFilename)
                 bandList = list(range(1, len(wavelength) + 1))
 
             # update metadata
@@ -195,6 +202,15 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                 rasterBand.SetScale(float(gains[i]))
                 rasterBand.SetOffset(float(offsets[i]))
                 rasterBand.FlushCache()
+
+            if setBadBands:  # see issue #267
+                reader = RasterReader(ds)
+                writer = RasterWriter(ds)
+                for bandNo in reader.bandNumbers():
+                    feedback.setProgress(bandNo / reader.bandCount() * 100)
+                    allNoData = np.all(reader.array(bandList=[bandNo])[0] == reader.noDataValue(bandNo))
+                    if allNoData:
+                        writer.setBadBandMultiplier(0, bandNo)
 
             result = {self.P_OUTPUT_RASTER: filename}
             self.toc(feedback, result)

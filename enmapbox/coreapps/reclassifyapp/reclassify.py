@@ -72,7 +72,8 @@ def setClassInfo(targetDataset, classificationScheme, bandIndex=0):
 
 
 @typechecked
-def reclassify(layerSrc: QgsRasterLayer, dstClassScheme: ClassificationScheme, labelLookup: dict):
+def reclassify(layerSrc: QgsRasterLayer, dstClassScheme: ClassificationScheme, labelLookup: dict,
+               output_classification=QgsProcessing.TEMPORARY_OUTPUT):
     mapping = str(labelLookup)
     categories = str([(c.label(), c.name(), c.color().name()) for c in dstClassScheme])
     alg = ReclassifyRasterAlgorithm()
@@ -80,11 +81,12 @@ def reclassify(layerSrc: QgsRasterLayer, dstClassScheme: ClassificationScheme, l
         alg.P_RASTER: layerSrc,
         alg.P_MAPPING: mapping,
         alg.P_CATEGORIES: categories,
-        alg.P_OUTPUT_CLASSIFICATION: QgsProcessing.TEMPORARY_OUTPUT
+        alg.P_OUTPUT_CLASSIFICATION: output_classification
     }
     from enmapbox.gui.enmapboxgui import EnMAPBox
     enmapBox = EnMAPBox.instance()
-    enmapBox.showProcessingAlgorithmDialog(alg, parameters, True)
+    if isinstance(enmapBox, EnMAPBox):
+        enmapBox.showProcessingAlgorithmDialog(alg, parameters, True)
 
 
 class ReclassifyTableModel(QAbstractTableModel):

@@ -2,14 +2,14 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import FIELD_VALUES, \
-    SpectralLibraryUtils
+from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import FIELD_VALUES
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import checkSampleShape, ClassifierDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCategorizedSymbolRenderer,
                        QgsProcessingParameterField, QgsProcessingException)
-from enmapbox.typeguard import typechecked
+from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
 
 
 @typechecked
@@ -66,7 +66,7 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
-        library = self.parameterAsLayer(parameters, self.P_CATEGORIZED_LIBRARY, context)
+        library = self.parameterAsVectorLayer(parameters, self.P_CATEGORIZED_LIBRARY, context)
         binaryField = self.parameterAsField(parameters, self.P_FIELD, context)
         classField = self.parameterAsField(parameters, self.P_CATEGORY_FIELD, context)
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_DATASET, context)
@@ -105,15 +105,20 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
             n = library.featureCount()
             X = list()
             y = list()
-            for i, profile in enumerate(SpectralLibraryUtils.profiles(library, profile_field=binaryField)):
+            for i, feature in enumerate(library.getFeatures()):
                 feedback.setProgress(i / n * 100)
-                yi = valueLookup.get(profile.attribute(classField), None)
+
+                profileDict = decodeProfileValueDict(feature.attribute(binaryField))
+                if len(profileDict) == 0:
+                    raise QgsProcessingException(f'Not a valid Profiles field: {binaryField}')
+
+                yi = valueLookup.get(feature.attribute(classField), None)
                 if yi is None:  # if category is not of interest ...
                     continue  # ... we skip the profile
                 try:
-                    Xi = profile.yValues()
-                except TypeError:
-                    raise QgsProcessingException(f'Profiles field must be Binary: {binaryField}')
+                    Xi = profileDict['y']
+                except KeyError:
+                    raise QgsProcessingException(f'Not a valid Profiles field: {binaryField}')
 
                 y.append(yi)
                 X.append(Xi)

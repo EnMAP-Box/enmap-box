@@ -80,6 +80,9 @@ class EnMAPBoxTestCaseIssue286(EnMAPBoxTestCase):
 
         self.showGui(enmapBox.ui)
 
+        enmapBox.close()
+        QgsProject.instance().removeAllMapLayers()
+
 
 if __name__ == '__main__':
     unittest.main(buffer=False)

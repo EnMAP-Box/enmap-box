@@ -60,7 +60,7 @@ URL_TESTDATA = fr'https://bitbucket.org/hu-geomatics/enmap-box/downloads/example
 URL_INSTALLATION = r'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html#install-required-python-packages'
 URL_QGIS_RESOURCES = r'https://bitbucket.org/hu-geomatics/enmap-box/downloads/qgisresources.zip'
 
-MIN_VERSION_QGIS = '3.24'
+MIN_VERSION_QGIS = '3.28'
 
 PLUGIN_DEPENDENCIES = ['vrtbuilderplugin>=0.9']
 ABOUT = """
@@ -92,7 +92,6 @@ granted by the Federal Ministry of Economic Affairs and Energy (BMWi; grant no. 
 
 DIR_ENMAPBOX = os.path.dirname(__file__)
 DIR_REPO = os.path.dirname(DIR_ENMAPBOX)
-DIR_SITEPACKAGES = os.path.join(DIR_REPO, 'site-packages')
 DIR_UIFILES = os.path.join(DIR_ENMAPBOX, *['gui', 'ui'])
 DIR_ICONS = os.path.join(DIR_ENMAPBOX, *['gui', 'ui', 'icons'])
 DIR_EXAMPLEDATA = (pathlib.Path(DIR_REPO) / 'enmapbox' / 'exampledata').as_posix()
@@ -106,6 +105,16 @@ _ENMAPBOX_MAPLAYER_CONFIG_WIDGET_FACTORIES: typing.List[QgsMapLayerConfigWidgetF
 
 gdal.SetConfigOption('GDAL_VRT_ENABLE_PYTHON', 'YES')
 
+# test if PyQtGraph is available
+try:
+    import pyqtgraph  # noqa
+except ModuleNotFoundError:
+    # use PyQtGraph brought by QPS
+    pSrc = pathlib.Path(DIR_ENMAPBOX) / 'qgispluginsupport' / 'qps' / 'pyqtgraph'
+    assert pSrc.is_dir()
+    site.addsitedir(pSrc)
+    # import pyqtgraph
+
 
 def enmapboxSettings() -> QSettings:
     """
@@ -117,17 +126,6 @@ def enmapboxSettings() -> QSettings:
 
 settings = enmapboxSettings()
 DEBUG = str(os.environ.get('DEBUG', False)).lower() in ['1', 'true']
-site.addsitedir(DIR_SITEPACKAGES)
-
-# test if PyQtGraph is available
-try:
-    import pyqtgraph  # noqa
-except ModuleNotFoundError:
-    # use PyQtGraph brought by QPS
-    pSrc = pathlib.Path(DIR_ENMAPBOX) / 'qgispluginsupport' / 'qps' / 'pyqtgraph'
-    assert pSrc.is_dir()
-    site.addsitedir(pSrc)
-    # import pyqtgraph
 
 
 def icon() -> QIcon:
@@ -314,8 +312,9 @@ def registerMapLayerConfigWidgetFactories():
 
     from enmapbox.qgispluginsupport.qps.layerconfigwidgets.rasterbands import RasterBandConfigWidgetFactory
     from enmapbox.qgispluginsupport.qps.layerconfigwidgets.gdalmetadata import GDALMetadataConfigWidgetFactory
+
     for factory in [RasterBandConfigWidgetFactory(),
-                    GDALMetadataConfigWidgetFactory()
+                    GDALMetadataConfigWidgetFactory(),
                     ]:
 
         registered = registerMapLayerConfigWidgetFactory(factory)

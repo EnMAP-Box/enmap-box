@@ -3,6 +3,7 @@ This is a template to create an EnMAP-Box test
 """
 import unittest
 
+from qgis.core import QgsProject
 from qgis.gui import QgsDualView
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
@@ -34,6 +35,9 @@ class EnMAPBoxTestCaseIssue311(EnMAPBoxTestCase):
                          and slw.actionShowProfileViewSettings.isChecked(),
                          slw.mSpeclibPlotWidget.treeView.isVisibleTo(slw))
         self.showGui(enmapBox.ui)
+
+        enmapBox.close()
+        QgsProject.instance().removeAllMapLayers()
 
 
 if __name__ == '__main__':

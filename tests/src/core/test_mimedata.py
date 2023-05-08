@@ -104,6 +104,7 @@ class MimeDataTests(EnMAPBoxTestCase):
         self._mdref = md
         return QDropEvent(QPoint(0, 0), Qt.CopyAction, md, Qt.LeftButton, Qt.NoModifier)
 
+    @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'Start manually only')
     def test_dropping_files_empty_dockarea(self):
 
         import datetime

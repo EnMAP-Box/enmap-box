@@ -7,7 +7,7 @@ It is particularly developed to handle imaging spectroscopy data, as from the up
 
 ![Screenshot](screenshot.png)
 
-# Highlights:
+# Highlights
 
 * an easy-to-use graphical user interface for the visualization of vector and raster data sources in parallel and in spatially linked maps.
 
@@ -26,11 +26,57 @@ Documentation: http://enmap-box.readthedocs.io
 
 Git Repository: https://github.com/EnMAP-Box/enmap-box
 
-## How to clone
+# Run the EnMAP-Box
+
+The EnMAP-Box is a QGIS Plugin that can be installed from the QGIS Plugin Manager.
+
+However, the following steps show you how to run the EnMAP-Box from python without starting the QGIS Desktop application.
+
+## 1. Install QGIS
+
+### conda / mamba environment (all OS)
+
+Call one of the following commands to install a QGIS environment for the EnMAP-Box. 
+
+`latest` = most-recent QGIS version available in the [conda-forge](https://conda-forge.org/) channel.
+
+`light` = basic QGIS installation only. No additional packages. In this environment the EnMAP-Box provides basic 
+      visualization features only.
+
+`full` = QGIS + all other python requirements that allow to run all EnMAP-Box features 
+
+````bash
+mamba env create -n enmapbox_full_latest -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_latest.yml
+mamba env create -n enmapbox_full_3.28 -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_3.28.yml
+mamba env create -n enmapbox_light_latest -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_light_latest.yml
+mamba env create -n enmapbox_light_3.28 -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_light_3.28.yml
+````
+
+You can update an existing envionemn with `mamba update`, e.g:
+
+````bash
+mamba env update -n enmapbox_full_3.28 --prune -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_3.28.yml
+````
+
+`--prune` causes conda to remove any dependencies that are no longer required from the environment.
+
+### Windows OSGeo4W installer
+
+ tbd.
+
+### Linux
+
+ tbd.
+
+### MacOS
+
+ tbd.
+
+## 2. Clone this repository
 
 Use the following commands to clone the EnMAP-Box and update its submodules:
 
-### TL;DR:
+### TLDR:
 
 Open a shell that allows to run git and python with PyQGIS, then run:
 
@@ -38,7 +84,7 @@ Open a shell that allows to run git and python with PyQGIS, then run:
 
 git clone --recurse-submodules git@github.com:EnMAP-Box/enmap-box.git
 # alternatively, but not recommended, you can use https as well:
-# git clone --recurse-submodules https://github.org:EnMAP-Box/enmap-box.git
+# git clone --recurse-submodules https://github.com/EnMAP-Box/enmap-box.git
 
 cd enmap-box
 git config --local include.path ../.gitconfig
@@ -48,7 +94,13 @@ python scripts/setup_repository.py
 
 # start the EnMAP-Box
 python enmapbox
+
+# if you have writing access to a submodule, set the remote-URL accordingly, e.g.
+cd enmapbox/qgispluginsupport
+git git remote set-url origin git@github.com:EnMAP-Box/qgispluginsupport.git
 ````
+
+ 
 
 ### Detailed description
 
@@ -74,7 +126,7 @@ Replace it with your own EnMAP-Box fork from which you can create pull requests.
     set PATH=C:\<qgispath>\bin;C:\<qgispath>\apps\<qgisrelease>\bin;%PATH% where <qgisrelease> should be replaced with the type of release you are targeting (eg, qgis-ltr, qgis, qgis-dev)
     ````
    
-2. Clone the EnMAP-Box repository.
+3. Clone the EnMAP-Box repository.
    
     ````bash
     git clone git@github.com:EnMAP-Box/enmap-box.git
@@ -83,13 +135,13 @@ Replace it with your own EnMAP-Box fork from which you can create pull requests.
    You might also use the url `https://github.com/EnMAP-Box/enmap-box.git` instead. 
    However, ssh access is preferred.
 
-3. Initialize submodules and pull their code, which is hosted in different repositories
+4. Initialize submodules and pull their code, which is hosted in different repositories
     ````bash
     cd enmapbox
     git submodule update --init --remote --recursive
     ````
 
-4. Once initialized, you can update submodules at any later point by:
+5. Once initialized, you can update submodules at any later point by:
     ````bash
     git submodule update --remote
     ````
@@ -111,13 +163,29 @@ Replace it with your own EnMAP-Box fork from which you can create pull requests.
     ````
     
     This setting (and maybe more in future) is already defined in the `.gitconfig`. 
-    You can enable it for your local repository by:
+You can enable it for your local repository by:
     
     ````bash
     git config --local include.path ../.gitconfig
     ````
     
-    If you have writing access to a submodule's repository, you can push changes upstream by:
+    Submodules use https addresses to pull and push updates (`url` and `pushurl` in [.gitmodules](.gitmodules)), e.g.
+`https://bitbucket.org/ecstagriculture/enmap-box-lmu-vegetation-apps.git`.
+To enable ssh authentication you can replace them with SSH uris as followed:
+
+    ```bash
+    cd enmapbox/apps/lmuapps
+    # check existing url
+    git remote -v
+    # change remote urls
+    git remote set-url origin git@bitbucket.org:ecstagriculture/enmap-box-lmu-vegetation-apps.git
+    # check changed url
+    git remote -v
+    ```
+    
+    
+
+6. you can push changes upstream by:
     
     ````bash
     cd <submodule>
@@ -125,6 +193,8 @@ Replace it with your own EnMAP-Box fork from which you can create pull requests.
     git commit -m "my changes"
     git push origin HEAD:master
     ````
+   
+    
     
     Finally, announce changes in a submodule to the EnMAP-Box (super) project by:
     ````bash
@@ -133,19 +203,22 @@ Replace it with your own EnMAP-Box fork from which you can create pull requests.
     git commit -m "added submodule updates"
     git push
     ````
-5. Ensure that PyQGIS is [available to your python enviroment](https://docs.qgis.org/3.22/en/docs/pyqgis_developer_cookbook/intro.html#running-custom-applications).
+6. Ensure that PyQGIS is [available to your python enviroment](https://docs.qgis.org/3.22/en/docs/pyqgis_developer_cookbook/intro.html#running-custom-applications).
    (This means you can start a python shell and `import qgis`)
    
-6. Compile resource files and download the test data. 
+7. Compile resource files and download the test data. 
     ````bash
     python scripts/setup_repository.py
     ````
    
-7. Now you can start the EnMAP-Box from shell by:
+8. Now you can start the EnMAP-Box from shell by:
     ````bash
     python enmapbox
     ````
 
+## 3. Setup your IDE, e.g. PyCharm
+
+tbd.
 
 ## How to contribute
 
@@ -165,8 +238,14 @@ To check staged files only, run:
 flake8 $(git status -s | grep -E '\.py$' | cut -c 4-)
 ````
 
+# Testing
 
-## License
+Run `scripts/runtests.sh` (Linux/macOS) or `scripts\runtests.bat` (Win) 
+to start the tests defined in `/tests/`.
+
+
+
+# License
 
 The EnMAP-Box is released under the GNU Public License (GPL) Version 3 or above. A copy of this licence can be found in 
 the LICENSE.txt file that is part of the EnMAP-Box plugin folder and the EnMAP-Box repository, and also at
@@ -176,7 +255,7 @@ Developing the EnMAP-Box under this license means that you can (if you want to) 
 will always have access to an EnMAP-Box software that is free of cost and can be freely
 modified.
 
-## Support
+# Support
 You can get support in the following ways:
 
  -  Read the EnMAP-Box documentation [http://enmap-box.readthedocs.io](http://enmap-box.readthedocs.io)

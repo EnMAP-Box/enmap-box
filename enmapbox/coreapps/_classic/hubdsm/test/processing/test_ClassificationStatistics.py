@@ -57,8 +57,8 @@ class TestClassificationStatistics(TestCase):
         if showPlot:
             categories = eval(result[alg.P_OUTPUT_CATEGORIES])
             counts = eval(result[alg.P_OUTPUT_COUNTS])
-            from enmapbox.testing import initQgisApplication
-            qgsApp = initQgisApplication()
+            from enmapbox.testing import start_app
+            qgsApp = start_app()
             widget = ClassificationStatisticsPlot(
                 categories=categories,
                 counts=counts,

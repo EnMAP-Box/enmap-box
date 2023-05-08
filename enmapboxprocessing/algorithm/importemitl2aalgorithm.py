@@ -1,15 +1,14 @@
 from os.path import basename
 from typing import Dict, Any, List, Tuple
 
-import netCDF4
 import numpy as np
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.utils import Utils
-from qgis._core import QgsRectangle, QgsCoordinateReferenceSystem
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRectangle, \
+    QgsCoordinateReferenceSystem
 
 
 @typechecked
@@ -76,6 +75,7 @@ class ImportEmitL2AAlgorithm(EnMAPProcessingAlgorithm):
                 feedback.reportError(message, True)
                 raise QgsProcessingException(message)
 
+            import netCDF4
             nc_ds = netCDF4.Dataset(ncFilename, 'r', format='NETCDF4')
             glt = np.zeros(list(nc_ds.groups['location']['glt_x'].shape) + [2], dtype=np.int32)
             glt[..., 0] = np.array(nc_ds.groups['location']['glt_x'])

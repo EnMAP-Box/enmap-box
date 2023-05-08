@@ -1,19 +1,20 @@
-import unittest.case
-import warnings
-from os.path import join, dirname, exists
+import inspect
+from os import makedirs
+from os.path import join, exists
 from typing import Union
 
 import numpy as np
 
+import enmapbox.testing
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import Array2d, Array3d, Number
 from qgis.core import QgsRectangle, QgsCoordinateReferenceSystem
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
-class TestCase(unittest.case.TestCase):
+class TestCase(enmapbox.testing.TestCase):
 
     def assertArrayEqual(self, array1: Union[Number, Array2d, Array3d], array2: Union[Array2d, Array3d]):
         array1 = np.array(array1)
@@ -21,7 +22,12 @@ class TestCase(unittest.case.TestCase):
         self.assertTrue(np.all(array1 == array2))
 
     def testOutputFolder(self):
-        return join(dirname(dirname(__file__)), 'test-outputs')
+        testClassDir = self.tempDir()
+        testMethodDir = join(testClassDir, inspect.stack()[3].function)
+        if not exists(testMethodDir):
+            if not testMethodDir.endswith('__call__'):
+                makedirs(testMethodDir)
+        return testMethodDir
 
     def filename(self, basename: str):
         return join(self.testOutputFolder(), basename)
@@ -43,14 +49,8 @@ class TestCase(unittest.case.TestCase):
         return self.rasterFromArray(array, basename, extent, crs)
 
     def rasterFromValue(
-            self, shape, value, basename: str = None, extent: QgsRectangle = None, crs: QgsCoordinateReferenceSystem = None
+            self, shape, value, basename: str = None, extent: QgsRectangle = None,
+            crs: QgsCoordinateReferenceSystem = None
     ) -> RasterWriter:
         array = np.full(shape, value)
         return self.rasterFromArray(array, basename, extent, crs)
-
-    def fileExists(self, filename):
-        if exists(filename):
-            return True
-        else:
-            warnings.warn(f'Skipping test using local file: {filename}')
-            return False

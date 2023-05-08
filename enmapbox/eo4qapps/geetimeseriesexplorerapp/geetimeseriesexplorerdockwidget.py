@@ -282,7 +282,7 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
             'drought': self.mAsiDrought, 'urban': self.mAsiUrban, 'other': self.mAsiOther
         }
         for name, spec in CreateSpectralIndicesAlgorithm.IndexDatabase.items():
-            mList: QListWidget = mAsiLists.get(spec['type'])
+            mList = mAsiLists.get(spec['type'])
             if mList is None:
                 continue
             item = QListWidgetItem(f"{spec['short_name']}: {spec['long_name']}")
