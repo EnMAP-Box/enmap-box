@@ -52,7 +52,7 @@ mamba env create -n enmapbox_light_latest -f https://raw.githubusercontent.com/E
 mamba env create -n enmapbox_light_3.28 -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_light_3.28.yml
 ````
 
-You can update an existing envionemn with `mamba update`, e.g:
+You can update an existing environment with `mamba update`, e.g:
 
 ````bash
 mamba env update -n enmapbox_full_3.28 --prune -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_3.28.yml
