@@ -11,11 +11,12 @@ from rastermaskingapp.rastermaskingdockwidget import RasterMaskingDockWidget
 
 
 def enmapboxApplicationFactory(enmapBox: EnMAPBox):
-    return [RasterMaskingImportApp(enmapBox, None, None)]
+    return []
+    return [RasterMaskingApp(enmapBox, None, None)]
 
 
 @typechecked
-class RasterMaskingImportApp(EnMAPBoxApplication):
+class RasterMaskingApp(EnMAPBoxApplication):
 
     def __init__(self, enmapBox: Optional[EnMAPBox], interface: Optional[QgisInterface], parent=None):
         super().__init__(enmapBox, parent=parent)
@@ -25,7 +26,7 @@ class RasterMaskingImportApp(EnMAPBoxApplication):
         self.interface = interface
         self.isEnmapInterface = isinstance(interface, EnMAPBox)
 
-        self.name = RasterMaskingImportApp.__name__
+        self.name = RasterMaskingApp.__name__
         self.version = 'dev'
         self.licence = 'GNU GPL-3'
 

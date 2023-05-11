@@ -1,10 +1,9 @@
-from qgis.PyQt.QtWidgets import QTableWidget, QToolButton
-
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.typeguard import typechecked
 from qgis.PyQt import uic
+from qgis.PyQt.QtWidgets import QTableWidget, QToolButton, QComboBox, QLineEdit
 from qgis.core import QgsMapLayerProxyModel
-from qgis.gui import QgsMapLayerComboBox, QgsDockWidget, QgisInterface
+from qgis.gui import QgsMapLayerComboBox, QgsRasterBandComboBox, QgsDockWidget, QgisInterface
 
 
 @typechecked
@@ -14,6 +13,7 @@ class RasterMaskingDockWidget(QgsDockWidget):
     mThresholdingAdd: QToolButton
     mThresholdingRemove: QToolButton
     mThresholdingRemoveAll: QToolButton
+    mApply: QToolButton
 
     EnmapBoxInterface, QgisInterface = 0, 1
 
@@ -26,6 +26,10 @@ class RasterMaskingDockWidget(QgsDockWidget):
         self.interfaceType = None
 
         self.mRaster.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mThresholdingAdd.clicked.connect(self.onThresholdingAddClicked)
+        self.mThresholdingRemove.clicked.connect(self.onThresholdingRemoveClicked)
+        self.mThresholdingRemoveAll.clicked.connect(self.onThresholdingRemoveAllClicked)
+        self.mApply.clicked.connect(self.onApplyClicked)
 
     def enmapBoxInterface(self) -> EnMAPBox:
         return self.interface
@@ -42,46 +46,55 @@ class RasterMaskingDockWidget(QgsDockWidget):
         else:
             raise ValueError()
 
+    operators = ['less than', 'less than or equals', 'greater than', 'greater than or equals', 'equals', 'not equals']
+
     def onThresholdingAddClicked(self):
 
         self.mThresholdingTable.setRowCount(self.mThresholdingTable.rowCount() + 1)
-        row = self.mRasterTable.rowCount() - 1
+        row = self.mThresholdingTable.rowCount() - 1
+
         mRaster = QgsMapLayerComboBox()
         mRaster.setFilters(QgsMapLayerProxyModel.RasterLayer)
         mRaster.setExcludedProviders(['wms'])
         mRaster.setAllowEmptyLayer(True)
+        self.mThresholdingTable.setCellWidget(row, 0, mRaster)
 
-        if self.interfaceType == self.EnmapBoxInterface:
-            sources = self.enmapBoxInterface().dataSources('RASTER', True)
-            mRaster.setAdditionalItems(sources)
-        self.mRasterTable.setCellWidget(row, 0, mRaster)
+        mBand = QgsRasterBandComboBox()
+        mBand.setLayer(mRaster.currentLayer())
+        mRaster.layerChanged.connect(mBand.setLayer)
+        self.mThresholdingTable.setCellWidget(row, 1, mBand)
 
-        weiter
+        mOperator = QComboBox()
+        mOperator.addItems(self.operators)
+        self.mThresholdingTable.setCellWidget(row, 2, mOperator)
 
-        mMultiBand = MultipleRasterBandSelectionWidget()
+        mValue = QLineEdit()
+        self.mThresholdingTable.setCellWidget(row, 3, mValue)
+        mValue.setText('350')
 
-        mRaster.layerChanged.connect(self.onLayerChanged)
-        mRaster.mMultiBand = mMultiBand
-        self.mRasterTable.setCellWidget(row, 1, mMultiBand)
+    def onThresholdingRemoveClicked(self):
+        row = self.mThresholdingTable.currentRow()
+        if row == -1:
+            return
+        self.mThresholdingTable.removeRow(row)
 
-        if uri is not None:
-            items = mRaster.additionalItems()
-            if uri not in items:
-                items.append(uri)
-            mRaster.setAdditionalItems(items)
-            mRaster.setCurrentText(uri)
-            layer = QgsRasterLayer(uri)
-            mMultiBand.setLayer(layer)
-            mMultiBand.setCurrentBands(None)
-        elif layer is not None:
-            mRaster.setLayer(layer)
-            mMultiBand.setLayer(layer)
-            mMultiBand.setCurrentBands(None)
-        else:
-            mRaster.setLayer(None)
-            mMultiBand.setLayer(None)
+    def onThresholdingRemoveAllClicked(self):
+        for i in reversed(range(self.mThresholdingTable.rowCount())):
+            self.mThresholdingTable.removeRow(i)
 
-        if bandNo is not None:
-            mMultiBand.mBand.setCurrentIndex(bandNo)
+        # if bandNo is not None:
+        #    mMultiBand.mBand.setCurrentIndex(bandNo)
 
         # self.onLayerChanged()
+
+    def onApplyClicked(self):
+        layer = self.mRaster.currentLayer()
+        if layer is None:
+            return
+
+        for row in range(self.mThresholdingTable.rowCount()):
+            mRaster: QgsMapLayerComboBox = self.mThresholdingTable.cellWidget(row, 0)
+            mBand: QgsRasterBandComboBox = self.mThresholdingTable.cellWidget(row, 1)
+            mOperator: QComboBox = self.mThresholdingTable.cellWidget(row, 2)
+            mValue: QLineEdit = self.mThresholdingTable.cellWidget(row, 3)
+            print(mRaster.currentLayer(), mBand.currentBand(), mOperator.currentText(), mValue.text())
