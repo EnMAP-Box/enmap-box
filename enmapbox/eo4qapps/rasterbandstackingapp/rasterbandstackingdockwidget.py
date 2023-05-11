@@ -10,6 +10,7 @@ from enmapbox.gui.mimedata import MDF_RASTERBANDS, QGIS_URILIST_MIMETYPE, MDF_EN
     MDF_QGIS_LAYERTREEMODELDATA, MDF_QGIS_LAYERTREEMODELDATA_XML, MDF_URILIST
 from enmapbox.gui.widgets.multiplerasterbandselectionwidget.multiplerasterbandselectionwidget import \
     MultipleRasterBandSelectionWidget
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
@@ -17,12 +18,11 @@ from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp import MapTool
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QEvent
-from qgis.PyQt.QtWidgets import QToolButton, QTableWidget, QRadioButton
+from qgis.PyQt.QtWidgets import QToolButton, QTableWidget, QRadioButton, QCheckBox
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsMimeDataUtils, QgsReadWriteContext, QgsLayerTree, QgsProject, QgsMapLayerProxyModel, \
     QgsRasterLayer
 from qgis.gui import QgsMapLayerComboBox, QgsDockWidget, QgisInterface, QgsFileWidget
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -39,6 +39,7 @@ class RasterBandStackingDockWidget(QgsDockWidget):
     mGridAutomaticType: QRadioButton
     mGridRasterType: QRadioButton
     mGridRaster: QgsMapLayerComboBox
+    mBandNamePostfix: QCheckBox
 
     EnmapBoxInterface, QgisInterface = 0, 1
     AutomaticGridType, RasterGridType = 0, 1
@@ -258,13 +259,23 @@ class RasterBandStackingDockWidget(QgsDockWidget):
         ds = gdal.BuildVRT(filename, filenames, options=gdal.BuildVRTOptions(separate=True))
 
         # write metadata
+        bandNameCounts = dict()
         writer = RasterWriter(ds)
         for bandNo2, (source, bandNo) in enumerate(zip(sources, bands), 1):
             reader = RasterReader(source)
             writer.setMetadata(reader.metadata(bandNo), bandNo2)
             writer.setBadBandMultiplier(reader.badBandMultiplier(bandNo), bandNo2)
             writer.setBandColor(reader.bandColor(bandNo), bandNo2)
-            writer.setBandName(reader.bandName(bandNo), bandNo2)
+
+            bandName = reader.bandName(bandNo)
+            if self.mBandNamePostfix.isChecked():  # handle duplicated band names (see #468)
+                bandNameCount = bandNameCounts.get(bandName, 0)
+                bandNameCount += 1
+                if bandNameCount > 1:
+                    bandName = bandName + '_' + str(bandNameCount)
+                bandNameCounts[bandName] = bandNameCount
+            writer.setBandName(bandName, bandNo2)
+
             writer.setEndTime(reader.endTime(bandNo), bandNo2)
             writer.setFwhm(reader.fwhm(bandNo), bandNo2)
             writer.setStartTime(reader.startTime(bandNo), bandNo2)
