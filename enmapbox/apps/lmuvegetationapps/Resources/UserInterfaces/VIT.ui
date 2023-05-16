@@ -1,0 +1,1585 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <author>Matthias Wocher</author>
+ <class>AVI</class>
+ <widget class="QDialog" name="AVI">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>690</width>
+    <height>643</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>690</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>5000</width>
+    <height>5000</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Vegetation Index Toolbox</string>
+  </property>
+  <property name="locale">
+   <locale language="English" country="UnitedStates"/>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_7">
+   <item row="9" column="0">
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>670</width>
+        <height>373</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>13</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Check tooltips for detailed information</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QgsCollapsibleGroupBox" name="mGroupBox">
+         <property name="title">
+          <string>Structural</string>
+         </property>
+         <property name="collapsed">
+          <bool>false</bool>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_13">
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="box_hndvi_opp">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Hyperspectral Normalized Difference Vegetation Index&lt;/p&gt;&lt;p&gt;OPPELT, N. (2002): Monitoring of Plant Chlorophyll and Nitrogen Status Using the Airborne Imaging Spectrometer AVIS. Dissertation. Department for earth- and environmental sciences, Munich.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>hNDVI (Oppelt 2002)</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+            <property name="tristate">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QCheckBox" name="box_ndvi_apa">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Normalized Difference Vegetation Index&lt;/p&gt;&lt;p&gt;APARICIO, N., VILLEGAS, D., ARAUS, J.L., CASADESUS, J. and ROYO, C. (2002). Relationship between growth traits and spectral vegetation indices in Durum Wheat. In: Crop Science, 42(5), 1547–1555. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>NDVI (Aparicio et al. 2002)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QCheckBox" name="box_ndvi_dat">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Normalized Difference Vegetation Index&lt;/p&gt;&lt;p&gt;DATT, B. (1998): Remote sensing of chlorophyll a, chlorophyll b, chlorophyll a+b and total carotenoid content in eucalyptus leaves. In: Remote sensing of the environment, 66(2), 111-121.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>NDVI (Datt 1998)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QCheckBox" name="box_ndvi_hab">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Normalized Difference Vegetation Index&lt;/p&gt;&lt;p&gt;HABOUDANE, D., MILLER, J.R., PATTEY, E., ZARCO-TEJADA, P.J. and STRACHAN, I. (2004): Hyperspectral vegetation indices and novel algorithms for predicting green LAI of crop canopies: Modeling and validation in the context of precision agriculture. In: Remote Sensing of Environment, 90(3), 337-352.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>NDVI (Haboudane et al. 2004)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="box_ndvi_zar">
+            <property name="toolTip">
+             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Normalized Difference Vegetation Index&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;ZARCO-TEJADA, P.J., MILLER, J.R., MOHAMMED, G.H., NOLAND, T.L. and SAMPSON, P.H. (1999): Canopy optical indices from infinite reflectance and canopy reflectance models for forest condition monitoring: Application to hyperspectral CASI data. In: IEEE 1999 International Geoscience and Remote Sensing Symposium, IGARSS'99, 3(/), n.d..&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>NDVI (Zarco-Tejada et al. 1999)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QCheckBox" name="box_mcari1">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Modified Chlorophyll Absorption in Reflectance Index 1&lt;/p&gt;&lt;p&gt;HABOUDANE, D., MILLER, J.R., PATTEY, E., ZARCO-TEJADA, P.J. and STRACHAN, I. (2004): Hyperspectral vegetation indices and novel algorithms for predicting green LAI of crop canopies: Modeling and validation in the context of precision agriculture. In: Remote Sensing of Environment, 90(3), 337-352.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>MCARI 1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QCheckBox" name="box_mcari2">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Modified Chlorophyll Absorption in Reflectance Index 2&lt;/p&gt;&lt;p&gt;HABOUDANE, D., MILLER, J.R., PATTEY, E., ZARCO-TEJADA, P.J. and STRACHAN, I. (2004): Hyperspectral vegetation indices and novel algorithms for predicting green LAI of crop canopies: Modeling and validation in the context of precision agriculture. In: Remote Sensing of Environment, 90(3), 337-352.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>MCARI 2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QCheckBox" name="box_msavi">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Improved SAVI (Soil Adjusted Vegetation Index) with self-adjustment factor L&lt;/p&gt;&lt;p&gt;QI, J., CHEHBOUNI, A., HUETE, A.R., KEER, Y.H. and SOROOSHIAN, S. (1994): A modified soil vegetation adjusted index. In: Remote Sensing of Environment, 48(2), 119-126.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>MSAVI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="box_mtvi1">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Modified Triangular Vegetation Index 1&lt;/p&gt;&lt;p&gt;HABOUDANE, D., MILLER, J.R., PATTEY, E., ZARCO-TEJADA, P.J. and STRACHAN, I. (2004): Hyperspectral vegetation indices and novel algorithms for predicting green LAI of crop canopies: Modeling and validation in the context of precision agriculture. In: Remote Sensing of Environment, 90(3), 337-352.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>MTVI 1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QCheckBox" name="box_mtvi2">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Modified Triangular Vegetation Index 2&lt;/p&gt;&lt;p&gt;HABOUDANE, D., MILLER, J.R., PATTEY, E., ZARCO-TEJADA, P.J. and STRACHAN, I. (2004): Hyperspectral vegetation indices and novel algorithms for predicting green LAI of crop canopies: Modeling and validation in the context of precision agriculture. In: Remote Sensing of Environment, 90(3), 337-352.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>MTVI 2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QCheckBox" name="box_osavi">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optimized Soil Adjusted Vegetation Index&lt;/p&gt;&lt;p&gt;RONDEAUX, G.,STEVEN, M. and BARE, F. (1996): Optimization of soil-adjusted vegetation indices. In: Remote Sensing of Environment, 55(2), 95-107.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>OSAVI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QCheckBox" name="box_spvi">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Spectral Polygon Vegetation Index&lt;/p&gt;&lt;p&gt;VINCINI, M., FRAZZI, E. and D ALESSIO, P. (2006): Angular dependence of maize and sugar beet VIs from directional CHRIS/Proba data. In: Proc. 4 th ESA CHRIS PROBA Workshop 2006, 19 - 21 September, ESRIN Frascati, Italy.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>SPVI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="box_rdvi">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Renormalized Difference Vegetation Index&lt;/p&gt;&lt;p&gt;ROUGEAN, J.-L. and BREON, F.M. (1995): Estimating PAR absorbed by vegetation from bidirectional reflectance measurements. In: Remote Sensing of Environment, 51(3), 375-384.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>RDVI</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QgsCollapsibleGroupBox" name="mGroupBox_2">
+         <property name="title">
+          <string>Chlorophyll</string>
+         </property>
+         <property name="collapsed">
+          <bool>true</bool>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="2">
+           <widget class="QCheckBox" name="box_gi">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Greenness Index&lt;/p&gt;&lt;p&gt;ZARCO-TEJADA, P.J., BERJON, A., LOPEZ-LOZANO, R., MILLER, J.R., MARTIN, P., CACHORRO, V., GONZALES, M.R. and de FRUTOS, A. (2005): Assessing vineyard condition with hyperspectral indices: Leaf and canopy reflectance simulation in a row-structured discontinuous canopy. In: Remote Sensing of Environment, 99(3), 271-287.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Greeness Index</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QCheckBox" name="box_srtot">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Simple Ratio (Chl tot)&lt;/p&gt;&lt;p&gt;DATT, B. (1998): Remote sensing of chlorophyll a, chlorophyll b, chlorophyll a+b and total carotenoid content in eucalyptus leaves. In: Remote sensing of the environment, 66(2), 111-121.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>SRtot</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="2">
+           <widget class="QCheckBox" name="box_pssra">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pigment Specific Simple Ratio for Chl a&lt;/p&gt;&lt;p&gt;BLACKBURN, G.A. (1998): Spectral indices for estimating photosynthetic pigment concentrations: a test using senescent tree leaves. In: International Journal of Remote Sensing, 19(4), 657-675.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>PSSRa</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QCheckBox" name="box_srb2">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Simple Ratio (Chl b2)&lt;/p&gt;&lt;p&gt;DATT, B. (1998): Remote sensing of chlorophyll a, chlorophyll b, chlorophyll a+b and total carotenoid content in eucalyptus leaves. In: Remote sensing of the environment, 66(2), 111-121.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>SRb 2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="3">
+           <widget class="QCheckBox" name="box_pssrb">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pigment Specific Simple Ratio for Chl b&lt;/p&gt;&lt;p&gt;BLACKBURN, G.A. (1998): Spectral indices for estimating photosynthetic pigment concentrations: a test using senescent tree leaves. In: International Journal of Remote Sensing, 19(4), 657-675.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>PSSRb</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="box_csi1">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Carter Stress Index 1&lt;/p&gt;&lt;p&gt;CARTER, G.A. (1994): Ratios of leaf reflectances in narrow wavebands as indicators of plant stress. In: International Journal of Remote Sensing, 15(3), 697-703.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>CSI 1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QCheckBox" name="box_gitmer1">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Gitelson &amp;amp; Merzlyak Index 1&lt;/p&gt;&lt;p&gt;GITELSON, A.A. and MERZLYAK, M.N. (1997): Remote estimation of chlorophyll content in higher plant leaves. In: International Journal of Remote Sensing, 18(12), 2691-2697.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>GM 1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QCheckBox" name="box_csi2">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Carter Stress Index 2&lt;/p&gt;&lt;p&gt;CARTER, G.A. (1994): Ratios of leaf reflectances in narrow wavebands as indicators of plant stress. In: International Journal of Remote Sensing, 15(3), 697-703. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>CSI 2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="box_gitmer2">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Gitelson &amp;amp; Merzlyak Index 2&lt;/p&gt;&lt;p&gt;GITELSON, A.A. and MERZLYAK, M.N. (1997): Remote estimation of chlorophyll content in higher plant leaves. In: International Journal of Remote Sensing, 18(12), 2691-2697.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>GM 2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QCheckBox" name="box_gndvi">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Green NDVI&lt;/p&gt;&lt;p&gt;DATT, B. (1998): Remote sensing of chlorophyll a, chlorophyll b, chlorophyll a+b and total carotenoid content in eucalyptus leaves. In: Remote sensing of the environment, 66(2), 111-121.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>green NDVI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QCheckBox" name="box_mcari">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Modified Chlorophyll Absorption in Reflectance Index&lt;/p&gt;&lt;p&gt;DAUGHTRY, C.S.T., WALTHALL, C.L., KIM, M.S., BROWN DE COLSTOUN, E. and McMURTREY, J.E. (2000): Estimating corn leaf chlorophyll concentration from leaf and canopy reflectance. In: Remote Sensing of Environment,74(2), 229-239.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>MCARI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QCheckBox" name="box_npqi">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Normalized Phaeophytinization Index&lt;/p&gt;&lt;p&gt;BARNES, J.D., BALAGUER, L., MANRIQUE, E., ELVIRA, S. and DAVISON, A.W. (1992): A reappraisal of the use of DMSO for the extraction and determination of chlorophylls a and b in lichens and higher plants. In: Environmental and Experimental Botany, 32(2), 85-100.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>NPQI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="box_pri">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Photochemical Reflectance Index&lt;/p&gt;&lt;p&gt;GAMON, J.A., PENUELAS, J. and FIELD, C.B. (1992): A narrow-waveband spectral index that tracks diurnal changes in photosynthetic efficiency. In: Remote Sensing of Environment, 41(1), 35-44.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>PRI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QCheckBox" name="box_reip">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Red Edge Inflection Point&lt;/p&gt;&lt;p&gt;GUYOT, G., BARET, F. and MAJOR, D.J. (1988): High spectral resolution: determination of spectral shifts between the red and the near infrared. In: International Archives of Photogrammetry and Remote Sensing, 11 (/), 750-760.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Red Edge Inflection Point</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QCheckBox" name="box_rep">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Red Edge Point&lt;/p&gt;&lt;p&gt;DAWSON, T.P. and CURRAN, P.J., (1998): A new technique for interpolating red edge position. In: International Journal of Remote Sensing, 19(11), 2133-2139.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Red Edge Point</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QCheckBox" name="box_srch1">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Simple Ratio (chl)&lt;/p&gt;&lt;p&gt;DATT, B. (1998): Remote sensing of chlorophyll a, chlorophyll b, chlorophyll a+b and total carotenoid content in eucalyptus leaves. In: Remote sensing of the environment, 66(2), 111-121.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>SRchl</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="box_sr705">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Simple Ratio at 705 Index&lt;/p&gt;&lt;p&gt;SIMS, D.A. and GAMON, J.A. (2002): Relationships between leaf pigment content and spectral reflectance across a wide range of species, leaf structures and developmental stages. In: Remote Sensing of Environment, 81(2), 337-354.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>SR705</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QCheckBox" name="box_tcari">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Transformed Chlorophyll Absorption in Reflectance Index&lt;/p&gt;&lt;p&gt;HABOUDANE, D., MILLER, J.R., TREMBLAY, N., ZARCO-TEJADA, P.J. and DEXTRAZE, L. (2002): Integration of hyperspectral vegetation indices for prediction of crop chlorophyll content for application to precision agriculture. In: Remote Sensing of Environment, 81(2), 416-426.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>TCARI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QCheckBox" name="box_tvi">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Triangular Vegetation Index&lt;/p&gt;&lt;p&gt;BROGE, N.H. and LEBLANC, E. (2000): Comparing prediction power and stability of broadband and hyperspectral vegetation indices for estimation of green leaf area index and canopy chlorophyll density. In: Remote Sensing of Environment, 76(2), 156-172.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>TVI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="3">
+           <widget class="QCheckBox" name="box_vog1">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Vogelmann Index 1&lt;/p&gt;&lt;p&gt;VOGELMANN, J.E., ROCK, B.N. and MOSS, D.M. (1993): Red edge spectral measurements from sugar maple leaves. In: International Journal of Remote Sensing, 14(8), 1563-1575.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Vogelmann Index 1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QCheckBox" name="box_vog2">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Vogelmann Index 2&lt;/p&gt;&lt;p&gt;VOGELMANN, J.E., ROCK, B.N. and MOSS, D.M. (1993): Red edge spectral measurements from sugar maple leaves. In: International Journal of Remote Sensing, 14(8), 1563-1575.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Vogelmann Index 2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QCheckBox" name="box_ztm">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zarco-Tejada &amp;amp; Miller&lt;/p&gt;&lt;p&gt;ZARCO-TEJADA, P.J., MILLER, J.R., MOHAMMED, G.H., NOLAND, T.L. and SAMPSON, P.H. (2001): Scaling-up and model inversion methods with narrow-band optical indices for chlorophyll content estimation in closed forest canopies with hyperspectral data. In: IEEE Transactions on Geoscience and Remote Sensing, 39(7), 1491-1507.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>ZTM</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="2">
+           <widget class="QCheckBox" name="box_sra">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Simple Ratio (Chl a)&lt;/p&gt;&lt;p&gt;DATT, B. (1998): Remote sensing of chlorophyll a, chlorophyll b, chlorophyll a+b and total carotenoid content in eucalyptus leaves. In: Remote sensing of the environment, 66(2), 111-121.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>SRa</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="3">
+           <widget class="QCheckBox" name="box_srb1">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Simple Ratio (Chl b1)&lt;/p&gt;&lt;p&gt;DATT, B. (1998): Remote sensing of chlorophyll a, chlorophyll b, chlorophyll a+b and total carotenoid content in eucalyptus leaves. In: Remote sensing of the environment, 66(2), 111-121.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>SRb 1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1">
+           <widget class="QCheckBox" name="box_mlo">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;M Locherer Chlorophyll&lt;/p&gt;&lt;p&gt;(unpublished)&lt;/p&gt;&lt;p&gt;M to the LO. Don't hassel the hoff! (in Memory of an unknown editor) &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>MLO</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="QCheckBox" name="box_lci">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Leaf Chlorophyll Index&lt;/p&gt;&lt;p&gt;Datt, B. (1999): A new reflectance index for remote sensing of chlorophyll content in higher plants: tests using Eucalyptus leaves. In: Journal of Plant Physiology, 154(1), 30-36.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>LCI</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+         <zorder>box_gi</zorder>
+         <zorder>box_srtot</zorder>
+         <zorder>box_pssra</zorder>
+         <zorder>box_srb2</zorder>
+         <zorder>box_pssrb</zorder>
+         <zorder>box_csi1</zorder>
+         <zorder>box_gitmer1</zorder>
+         <zorder>box_csi2</zorder>
+         <zorder>box_gitmer2</zorder>
+         <zorder>box_gndvi</zorder>
+         <zorder>box_mcari</zorder>
+         <zorder>box_npqi</zorder>
+         <zorder>box_pri</zorder>
+         <zorder>box_reip</zorder>
+         <zorder>box_rep</zorder>
+         <zorder>box_srch1</zorder>
+         <zorder>box_sr705</zorder>
+         <zorder>box_tcari</zorder>
+         <zorder>box_tvi</zorder>
+         <zorder>box_vog1</zorder>
+         <zorder>box_vog2</zorder>
+         <zorder>box_ztm</zorder>
+         <zorder>box_sra</zorder>
+         <zorder>box_srb1</zorder>
+         <zorder>box_lci</zorder>
+         <zorder>box_mlo</zorder>
+        </widget>
+       </item>
+       <item>
+        <widget class="QgsCollapsibleGroupBox" name="mGroupBox_3">
+         <property name="title">
+          <string>Carotenoids and Anthocyanin</string>
+         </property>
+         <property name="collapsed">
+          <bool>true</bool>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <item row="0" column="3">
+           <widget class="QCheckBox" name="box_pssrc">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pigment Specific Simple Ratio for Chl c&lt;/p&gt;&lt;p&gt;BLACKBURN, G.A. (1998): Spectral indices for estimating photosynthetic pigment concentrations: a test using senescent tree leaves. In: International Journal of Remote Sensing, 19(4), 657-675.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>PSSRc</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QCheckBox" name="box_cri2">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Carotenoid Reflectance Index 2&lt;/p&gt;&lt;p&gt;GITELSON, A.A., ZUR, Y., CHIVKUNOVA, O.B. and MERZLYAK, M.N. (2002): Assessing carotenoid content in plant leaves with reflectance spectroscopy. In: Photochemistry and Photobiology, 75(3), 272-281.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>CRI 2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="box_sipi">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Structural Independent Pigment Index&lt;/p&gt;&lt;p&gt;PENUELAS, J. and FILELLA, I. (1998): Visible and near-infrared reflectance techniques for diagnosing plant physiological status. In: Trends in Plant Science, 3(4), 151-156.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>SIPI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QCheckBox" name="box_cri1">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Carotenoid Reflectance Index 1&lt;/p&gt;&lt;p&gt;GITELSON, A.A., ZUR, Y., CHIVKUNOVA, O.B. and MERZLYAK, M.N. (2002): Assessing carotenoid content in plant leaves with reflectance spectroscopy. In: Photochemistry and Photobiology, 75(3), 272-281.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>CRI 1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="box_ari">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Anthocyanin Reflectance Index&lt;/p&gt;&lt;p&gt;GITELSON, A.A., ZUR, Y., CHIVKUNOVA, O.B. and MERZLYAK, M.N. (2002): Assessing carotenoid content in plant leaves with reflectance spectroscopy. In: Photochemistry and Photobiology, 75(3), 272-281.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>ARI</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QgsCollapsibleGroupBox" name="mGroupBox_4">
+         <property name="title">
+          <string>Leaf Water</string>
+         </property>
+         <property name="collapsed">
+          <bool>false</bool>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="1" column="2">
+           <widget class="QCheckBox" name="box_pwi">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Plant Water Index&lt;/p&gt;&lt;p&gt;PENUELAS, J., PINOL, J., OGAYA, R. and FILELLA, I. (1997): Estimation of plant water concentration by the reflectance Water Index (R900/R970). In: International Journal of Remote Sensing, 18(13), 2869-2875.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>PWI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QCheckBox" name="box_dswi5">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Desease Water Stress Index&lt;/p&gt;&lt;p&gt;APAN, A., HELD, A., PHINN, S. and MARKLEY, J. (2004): Detecting sugarcane 'orange rust' disease using EO-1 Hyperion hyperspectral imagery. In: International Journal of Remote Sensing, 25(2), 489-498.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>DSWI5</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QCheckBox" name="box_ndwi">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Normalized Difference Water Index&lt;/p&gt;&lt;p&gt;GAO, B.-C. (1996): NDWI—a normalized difference water index for remote sensing of vegetation liquid water from space. In: Remote Sensing of Environment, 58(3), 257-266.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>NDWI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QCheckBox" name="box_srwi">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Simple Ratio Water Index&lt;/p&gt;&lt;p&gt;ZARCO-TEJADA, P.J., RUEDA, C.A. and USTIN, S.L. (2003): Water content estimation in vegetation with MODIS reflectance data and model inversion methods. In: Remote Sensing of Environment, 85(1), 109-124.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>SRWI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="box_msi">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Moisture Stress Index&lt;/p&gt;&lt;p&gt;HUNT Jr., R.E. and ROCK, B.N. (1989): Detection of changes in leaf water content using Near- and Middle-Infrared reflectances. In: Remote Sensing of Environment, 30(1), 43-54.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>MSI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QCheckBox" name="box_lwvi1">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Leaf Water Vegetation Index 1&lt;/p&gt;&lt;p&gt;GALVAO, L.S., FORMAGGIO, A.R. and TISOT, D.A. (2005): Discrimination of sugarcane varieties in Southeastern Brazil with EO-1 Hyperion data. In: Remote Sensing of Environment, 94(4), 523-534.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>LWVI 1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QCheckBox" name="box_lwvi2">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Leaf Water Vegetation Index 2&lt;/p&gt;&lt;p&gt;GALVAO, L.S., FORMAGGIO, A.R. and TISOT, D.A. (2005): Discrimination of sugarcane varieties in Southeastern Brazil with EO-1 Hyperion data. In: Remote Sensing of Environment, 94(4), 523-534.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>LWVI 2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="box_dswi">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Desease Water Stress Index&lt;/p&gt;&lt;p&gt;GALVAO, L.S., FORMAGGIO, A.R. and TISOT, D.A. (2005): Discrimination of sugarcane varieties in Southeastern Brazil with EO-1 Hyperion data. In: Remote Sensing of Environment, 94(4), 523-534.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>DSWI</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QgsCollapsibleGroupBox" name="mGroupBox_5">
+         <property name="title">
+          <string>Dry Matter</string>
+         </property>
+         <property name="collapsed">
+          <bool>true</bool>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="0" column="3">
+           <widget class="QCheckBox" name="box_ndni">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Normalized Difference Nitrogen Index&lt;/p&gt;&lt;p&gt;SERRANO, L., PENUELAS, J. and USTIN, S.L. (2002): Remote sensing of nitrogen and lignin in Mediterranean vegetation from AVIRIS data: Decomposing biochemical from structural signals. In: Remote Sensing of Environment, 81(2), 355-364.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>NDNI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QCheckBox" name="box_ndli">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Normalized Difference Lignin Index&lt;/p&gt;&lt;p&gt;SERRANO, L., PENUELAS, J. and USTIN, S.L. (2002): Remote sensing of nitrogen and lignin in Mediterranean vegetation from AVIRIS data: Decomposing biochemical from structural signals. In: Remote Sensing of Environment, 81(2), 355-364.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>NDLI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="box_swirvi">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shortwave Infrared Green Vegetation Index&lt;/p&gt;&lt;p&gt;LOBELL, D.B., ASNER, G.P., LAW, B.E. and TREUHAFT, R.N. (2001): Subpixel canopy cover estimation of coniferous forests in Oregon using SWIR imaging spectrometry. In: Journal of Geophysical Research: Atmospheres, 106(D6), 5151-5160.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>SWIRVI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QCheckBox" name="box_cai">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cellulose Absorption Index&lt;/p&gt;&lt;p&gt;NAGLER, P.L., INOUE, Y., GLENN, E.P., RUSS, A.L. and DAUGHTRY, C.S.T. (2003): Cellulose absorption index (CAI) to quantify mixed soil-plant litter scenes. In: Remote Sensing of Environment, 87(2), 310-325.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>CAI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="box_npci">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Normalized Pigment Chlorophyll Index&lt;/p&gt;&lt;p&gt;PENUELAS, J., GAMON, J.A., FREDEEN, A.L., MERINO, J. and FIELD, C.B. (1994): Reflectance indices associated with physiological changes in nitrogen- and water-limited sunflower leaves. In: Remote Sensing of Environment, 48(2), 135-146.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>NPCI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QCheckBox" name="box_srpi">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Simple Ratio Pigment Index&lt;/p&gt;&lt;p&gt;PENUELAS, J., FILELLA, I., LLORET, P., MUNOZ, F. and VILAJELIU, M. (1995): Reflectance assessment of mite effects on apple trees. In: International Journal of Remote Sensing,  Vol.16(14), 2727-2733.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>SRPI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QCheckBox" name="box_rgi">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Red-Green Pigment Index&lt;/p&gt;&lt;p&gt;ZARCO-TEJADA, P.J., BERJON, A., LOPEZ-LOZANO, R., MILLER, J.R., MARTIN, P., CACHORRO, V., GONZALES, M.R. and de FRUTOS, A. (2005): Assessing vineyard condition with hyperspectral indices: Leaf and canopy reflectance simulation in a row-structured discontinuous canopy. In: Remote Sensing of Environment, 99(3), 271-287.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>RGI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QCheckBox" name="box_bri">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Blue Red Pigment Index&lt;/p&gt;&lt;p&gt;ZARCO-TEJADA, P.J., BERJON, A., LOPEZ-LOZANO, R., MILLER, J.R., MARTIN, P., CACHORRO, V., GONZALES, M.R. and de FRUTOS, A. (2005): Assessing vineyard condition with hyperspectral indices: Leaf and canopy reflectance simulation in a row-structured discontinuous canopy. In: Remote Sensing of Environment, 99(3), 271-287.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>BRI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="box_bgi">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Blue Green Pigment Index&lt;/p&gt;&lt;p&gt;ZARCO-TEJADA, P.J., BERJON, A., LOPEZ-LOZANO, R., MILLER, J.R., MARTIN, P., CACHORRO, V., GONZALES, M.R. and de FRUTOS, A. (2005): Assessing vineyard condition with hyperspectral indices: Leaf and canopy reflectance simulation in a row-structured discontinuous canopy. In: Remote Sensing of Environment, 99(3), 271-287.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>BGI</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QCheckBox" name="box_ndi_test">
+            <property name="text">
+             <string>NDI (test)</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QgsCollapsibleGroupBox" name="mGroupBox_6">
+         <property name="title">
+          <string>Fluorescence</string>
+         </property>
+         <property name="collapsed">
+          <bool>true</bool>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_5">
+          <item row="0" column="1">
+           <widget class="QCheckBox" name="box_lic1">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lichtenthaler Index 1&lt;/p&gt;&lt;p&gt;LICHTENHALER, H.K., LANG, M., SOWINSKA, M., HEISEL, F. and MIEH, J.A. (1996): Detection of vegetation stress via a new high resolution fluorescence imaging system. In: Journal of Plant Physiology, 148(5), 599-612.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>LIC 1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QCheckBox" name="box_lic3">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lichtenthaler Index 3&lt;/p&gt;&lt;p&gt;LICHTENHALER, H.K., LANG, M., SOWINSKA, M., HEISEL, F. and MIEH, J.A. (1996): Detection of vegetation stress via a new high resolution fluorescence imaging system. In: Journal of Plant Physiology, 148(5), 599-612.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>LIC 3</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="box_cur">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Curvature Index&lt;/p&gt;&lt;p&gt;ZARCO-TEJADA, P.J., MILLER, J.R., MOHAMMED, G.H. and NOLAND, T.L. (2000): Chlorophyll fluorescence effects on vegetation apparent reflectance: I. Leaflevel measurements and simulation of reflectance and transmittance spectra. In: Remote Sensing of Environment, 74(3), 582- 595.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>CUR</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QCheckBox" name="box_lic2">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lichtenthaler Index 2&lt;/p&gt;&lt;p&gt;LICHTENHALER, H.K., LANG, M., SOWINSKA, M., HEISEL, F. and MIEH, J.A. (1996): Detection of vegetation stress via a new high resolution fluorescence imaging system. In: Journal of Plant Physiology, 148(5), 599-612.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>LIC 2</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item row="11" column="0">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="17" column="0">
+    <widget class="QFrame" name="frame_3">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <property name="leftMargin">
+       <number>9</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://enmap-box-lmu-vegetation-apps.readthedocs.io/en/latest/apps/VIT.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;How to use this tool&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="cmdOK">
+        <property name="text">
+         <string>OK</string>
+        </property>
+        <property name="shortcut">
+         <string>Ctrl+Shift+F10</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+        <property name="default">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="cmdCancel">
+        <property name="text">
+         <string>Quit</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QFrame" name="frame_5">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_8">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item row="0" column="2" rowspan="2">
+       <widget class="QFrame" name="frame_6">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <property name="leftMargin">
+          <number>9</number>
+         </property>
+         <property name="topMargin">
+          <number>5</number>
+         </property>
+         <property name="bottomMargin">
+          <number>5</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="cmdSelectAll">
+           <property name="whatsThis">
+            <string>Select all indices for calculation</string>
+           </property>
+           <property name="text">
+            <string>Select All</string>
+           </property>
+           <property name="shortcut">
+            <string>Ctrl+A</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="cmdDeselectAll">
+           <property name="whatsThis">
+            <string>Select all indices for calculation</string>
+           </property>
+           <property name="text">
+            <string notr="true">Deselect All</string>
+           </property>
+           <property name="shortcut">
+            <string>Ctrl+Del</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="0" column="3" rowspan="2">
+       <widget class="QFrame" name="frame_4">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <property name="topMargin">
+          <number>5</number>
+         </property>
+         <property name="bottomMargin">
+          <number>5</number>
+         </property>
+         <item>
+          <widget class="QGroupBox" name="groupBox_2">
+           <property name="title">
+            <string>Image Out</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <widget class="QRadioButton" name="radSingle">
+              <property name="whatsThis">
+               <string>All indices are stored as individual bands into one single output file</string>
+              </property>
+              <property name="text">
+               <string>Output to single file</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="radIndiv">
+              <property name="whatsThis">
+               <string>All indices are stored as separate output files</string>
+              </property>
+              <property name="text">
+               <string>Output to individual files</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="0" column="4" rowspan="2" colspan="2">
+       <widget class="QFrame" name="frame_8">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_11">
+         <property name="topMargin">
+          <number>5</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>5</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QGroupBox" name="groupBox">
+           <property name="title">
+            <string>Interpolation type</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_10">
+            <item row="0" column="0">
+             <widget class="QFrame" name="frame_2">
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Plain</enum>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout">
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QRadioButton" name="radNN">
+                 <property name="whatsThis">
+                  <string>If requested wavelength for an index is not supplied by the sensor, pick the nearest one instead</string>
+                 </property>
+                 <property name="text">
+                  <string>Nearest Neighbor</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                 <attribute name="buttonGroup">
+                  <string notr="true">buttonGroup</string>
+                 </attribute>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="radLinear">
+                 <property name="whatsThis">
+                  <string>If requested wavelength for an index is not supplied by the sensor, interpolate linearly instead</string>
+                 </property>
+                 <property name="text">
+                  <string>Linear Interpolation</string>
+                 </property>
+                 <attribute name="buttonGroup">
+                  <string notr="true">buttonGroup</string>
+                 </attribute>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QFrame" name="frame_7">
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Plain</enum>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QRadioButton" name="radIDW">
+                 <property name="whatsThis">
+                  <string>If requested wavelength for an index is not supplied by the sensor, perform inverse distance weighting between two neighbors</string>
+                 </property>
+                 <property name="text">
+                  <string>Inverse Distance Weighting / exponent:</string>
+                 </property>
+                 <attribute name="buttonGroup">
+                  <string notr="true">buttonGroup</string>
+                 </attribute>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="spinIDW_exp">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="whatsThis">
+                  <string>Choose the exponent for the IDW-interpolation. &quot;1&quot; equals a linear interpolation.</string>
+                 </property>
+                 <property name="minimum">
+                  <number>1</number>
+                 </property>
+                 <property name="maximum">
+                  <number>50</number>
+                 </property>
+                 <property name="value">
+                  <number>2</number>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QFrame" name="frame">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_9">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QGroupBox" name="groupBox_3">
+        <property name="title">
+         <string>Image Files</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_12">
+         <item row="3" column="1">
+          <widget class="QLineEdit" name="txtOutputImage"/>
+         </item>
+         <item row="1" column="2">
+          <widget class="QPushButton" name="cmdInputImage">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>20</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="whatsThis">
+            <string>Select input image to calculate indices on (must be ENVI-type)</string>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="2">
+          <widget class="QPushButton" name="cmdOutputImage">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>20</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="whatsThis">
+            <string>Specify location for output image containing the final indices</string>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QgsMapLayerComboBox" name="mLayer">
+           <property name="allowEmptyLayer">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Input Image:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>Output Image:</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QGroupBox" name="groupBox_4">
+        <property name="title">
+         <string>Divide Input by</string>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QFrame" name="frame_9">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Plain</enum>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_6">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_3">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="txtDivisionFactor">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>50</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>1.0</string>
+              </property>
+              <property name="frame">
+               <bool>true</bool>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QGroupBox" name="groupBox_9">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="title">
+         <string>No Data</string>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QFrame" name="frame_10">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>80</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Plain</enum>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_5">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_12">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>80</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Input:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lblNodatImage">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>80</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="whatsThis">
+               <string>The no data value for the input image is automatically supplied or requested from the user if it is not contained in the header-file</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Box</enum>
+              </property>
+              <property name="text">
+               <string>NA</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="frame_12">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Plain</enum>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_7">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_21">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Output:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="txtNodatOutput">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>50</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="whatsThis">
+               <string>Supply no data value for output image</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>5</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsCollapsibleGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>qgscollapsiblegroupbox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QgsMapLayerComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qgsmaplayercombobox.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+ </buttongroups>
+</ui>
