@@ -11,3 +11,8 @@ Sandbox.py
 
 /Processor/ideal_v3/
 /Processor/modAL/
+/Resources/Spec2Sensor/Spec2Sensor_exec.py
+/Resources/Spec2Sensor/srf/EnMAP_noWaterV_generic.srf
+/Resources/Spec2Sensor/srf/EnMAP_noOverlap_generic.srf
+/Resources/Spec2Sensor/srf/EnMAP_ComPhase_generic.srf
+/Resources/Spec2Sensor/srf/CHIME_generic.srf
