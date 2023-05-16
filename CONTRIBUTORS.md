@@ -20,8 +20,8 @@ People who made large contributions to the EnMAP-Box (in alphabetical order).
 
 ### Ludwig-Maximilians-Universität München, Germany
 
-* Martin Danner <martin.danner@iggf.geo.uni-muenchen.de>
-* Matthias Wocher <m.wocher@iggf.geo.uni-muenchen.de>
+* Matthias Wocher <m.wocher@lmu.de>
+* Martin Danner
 
 ### GFZ German Research Centre For Geosciences, Potsdam, Germany
 
