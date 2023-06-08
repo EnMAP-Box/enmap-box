@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from typing import Dict, Any, List, Tuple, Optional
+import re
 
 from osgeo import gdal
 
@@ -158,7 +159,7 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
                     short_name, formula = [s.strip() for s in item.split('=')]
                     if short_name in self.IndexDatabase:
                         raise QgsProcessingException(
-                            f'custom index name already exists in as predefined index: {short_name}'
+                            f'custom index name already exists as a predefined index: {short_name}'
                         )
                     # derive bands from formular
                     formula_ = formula
@@ -180,6 +181,15 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
                     bandName = short_name + ' - ' + long_name
 
                 bandList = [bandNos[name] for name in bands]
+
+                # derive bands given by nanometers from formular (see #456)
+                for key in set(re.findall(r'r\d+', formula)):
+                    wavelength = float(key[1:])  # remove leading 'R'
+                    bandNo = reader.findWavelength(wavelength)
+                    bands.append(key)
+                    bandNos[key] = bandNo
+                    bandList.append(bandNo)
+
                 code = self.deriveParameters(short_name, formula, bands, bandList, reader, scale)
                 indices[short_name] = long_name, formula, bandList, code, bandName
 

@@ -45,7 +45,9 @@ Also see https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/eo4q.
 
 ### Bugfixes
 
+* [v3.12.1](https://github.com/EnMAP-Box/enmap-box/milestone/8?closed=1)
 * [v3.12.0](https://github.com/EnMAP-Box/enmap-box/milestone/7?closed=1)
+
 
 
 ## Version 3.11

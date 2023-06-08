@@ -235,6 +235,16 @@ class EnMAPBoxPlugin(object):
         self.pluginToolbarActions.append(self.rasterBandStackingApp.actionToggleDock)
         self.dockWidgets.append(self.rasterBandStackingApp.dock)
 
+    def initRasterMaskingGui(self):
+        from qgis.utils import iface
+        from rastermaskingapp import RasterMaskingApp
+
+        self.rasterMaskingApp = RasterMaskingApp(None, iface)
+
+        # add items to be removed when unload the plugin
+        self.pluginToolbarActions.append(self.rasterMaskingApp.actionToggleDock)
+        self.dockWidgets.append(self.rasterMaskingApp.dock)
+
     def initSensorProductImportGui(self):
         from qgis.utils import iface
         from sensorproductimportapp import SensorProductImportApp
