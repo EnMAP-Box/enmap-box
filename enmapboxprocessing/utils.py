@@ -61,9 +61,25 @@ class Utils(object):
             raise ValueError(f'unsupported data type: {dataType}')
 
     @staticmethod
-    def gdalDataTypeToNumpyDataType(dataType: GdalDataType) -> NumpyDataType:
-        qgisDataType = Utils.gdalDataTypeToQgisDataType(dataType)
-        return Utils.qgisDataTypeToNumpyDataType(qgisDataType)
+    def qgisDataTypeToGdalDataType(dataType: Optional[Qgis.DataType]) -> Optional[int]:
+        if dataType is None:
+            return None
+        elif dataType == Qgis.DataType.Byte:
+            return gdal.GDT_Byte
+        elif dataType == Qgis.DataType.Float32:
+            return gdal.GDT_Float32
+        elif dataType == Qgis.DataType.Float64:
+            return gdal.GDT_Float64
+        elif dataType == Qgis.DataType.Int16:
+            return gdal.GDT_Int16
+        elif dataType == Qgis.DataType.Int32:
+            return gdal.GDT_Int32
+        elif dataType == Qgis.DataType.UInt16:
+            return gdal.GDT_UInt16
+        elif dataType == Qgis.DataType.UInt32:
+            return gdal.GDT_UInt32
+        else:
+            raise ValueError(f'unsupported data type: {dataType}')
 
     @staticmethod
     def qgisDataTypeToGdalDataType(dataType: Optional[Qgis.DataType]) -> Optional[int]:
