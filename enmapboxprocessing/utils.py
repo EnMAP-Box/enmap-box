@@ -88,7 +88,23 @@ class Utils(object):
 
     @staticmethod
     def qgisDataTypeName(dataType: Qgis.DataType) -> str:
-        return str(dataType).split('.')[1]
+        typeNameMap = {
+            Qgis.DataType.UnknownDataType: 'UnknownDataType',
+            Qgis.DataType.Byte: 'Byte',
+            Qgis.DataType.UInt16: 'UInt16',
+            Qgis.DataType.Int16: 'Int16',
+            Qgis.DataType.UInt32: 'UInt32',
+            Qgis.DataType.Int32: 'Int32',
+            Qgis.DataType.Float32: 'Float32',
+            Qgis.DataType.Float64: 'Float64',
+            Qgis.DataType.CInt16: 'CInt16',
+            Qgis.DataType.CInt32: 'CInt32',
+            Qgis.DataType.CFloat32: 'CFloat32',
+            Qgis.DataType.CFloat64: 'CFloat64',
+            Qgis.DataType.ARGB32: 'ARGB32',
+            Qgis.DataType.ARGB32_Premultiplied: 'ARGB32_Premultiplied'
+        }
+        return typeNameMap[dataType]
 
     @staticmethod
     def gdalResampleAlgName(resampleAlg: GdalResamplingAlgorithm) -> str:
