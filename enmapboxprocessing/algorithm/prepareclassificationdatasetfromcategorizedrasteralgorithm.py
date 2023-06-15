@@ -154,9 +154,11 @@ class PrepareClassificationDatasetFromCategorizedRasterAlgorithm(EnMAPProcessing
 
         # skip samples that contain a no data value
         noDataValues = np.array([reader.noDataValue(bandNo) for bandNo in reader.bandNumbers()])
-        valid = np.all(np.not_equal(X, noDataValues.T), axis=1)
+        valid1 = np.all(np.not_equal(X, noDataValues.T), axis=1)
+        valid2 = np.all(np.isfinite(X), axis=1)  # resolves issue #495
+        valid = np.logical_and(valid1, valid2)
         X = X[valid]
         y = y[valid]
-
         checkSampleShape(X, y)
+
         return X, y
