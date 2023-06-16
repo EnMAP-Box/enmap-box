@@ -409,7 +409,7 @@ def algorithms():
     ]
 
     if True:
-        algos = list()
+        # algos = list()
         from enmapboxprocessing.algorithm.ISSUE_504_ALGO import MyAlgorithm
         algos.append(MyAlgorithm())
 
