@@ -1,3 +1,4 @@
+import traceback
 from enum import Enum
 from math import nan
 from os import makedirs
@@ -603,6 +604,14 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def helpUrl(self, *args, **kwargs):
         return 'https://bitbucket.org/hu-geomatics/enmap-box-geoalgorithmsprovider/overview'
 
+    def isRunnungInsideModeller(self):
+        # hacky way to figure out if this algorithm is currently running inside the modeller
+        # needed for fixing issue #504
+        for text in traceback.format_stack():
+            if 'ModelerDialog.py' in text:
+                return True
+        return False
+
     def addParameterClassificationDataset(
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
@@ -613,8 +622,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         fileFilter = 'Pickle files (*.pkl);;JSON files (*.json)'
         param = QgsProcessingParameterFile(name, description, behavior, extension, defaultValue, optional, fileFilter)
 
-        # fix issue # #1366
-        if not bool(self.flags() & self.Flag.FlagHideFromToolbox):
+        if not self.isRunnungInsideModeller():
             param.setMetadata(
                 {'widget_wrapper': {'class': ProcessingParameterPickleFileClassificationDatasetWidgetWrapper}})
             param.setDefaultValue(defaultValue)
@@ -642,8 +650,13 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         extension = ''
         fileFilter = 'Pickle files (*.pkl);;JSON files (*.json)'
         param = QgsProcessingParameterFile(name, description, behavior, extension, defaultValue, optional, fileFilter)
-        param.setMetadata({'widget_wrapper': {'class': ProcessingParameterPickleFileRegressionDatasetWidgetWrapper}})
-        param.setDefaultValue(defaultValue)
+
+        if not self.isRunnungInsideModeller():
+            param.setMetadata(
+                {'widget_wrapper': {'class': ProcessingParameterPickleFileRegressionDatasetWidgetWrapper}}
+            )
+            param.setDefaultValue(defaultValue)
+
         self.addParameter(param)
         self.flagParameterAsAdvanced(name, advanced)
 
@@ -667,8 +680,13 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         extension = ''
         fileFilter = 'Pickle files (*.pkl);;JSON files (*.json)'
         param = QgsProcessingParameterFile(name, description, behavior, extension, defaultValue, optional, fileFilter)
-        param.setMetadata({'widget_wrapper': {'class': ProcessingParameterPickleFileUnsupervisedDatasetWidgetWrapper}})
-        param.setDefaultValue(defaultValue)
+
+        if not self.isRunnungInsideModeller():
+            param.setMetadata(
+                {'widget_wrapper': {'class': ProcessingParameterPickleFileUnsupervisedDatasetWidgetWrapper}}
+            )
+            param.setDefaultValue(defaultValue)
+
         self.addParameter(param)
         self.flagParameterAsAdvanced(name, advanced)
 
@@ -780,8 +798,9 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             name, description, QgsProcessingParameterFile.Behavior.File, '', defaultValue, optional,
             self.PickleFileFilter
         )
-        param.setMetadata({'widget_wrapper': {'class': ProcessingParameterPickleFileWidgetWrapper}})
-        param.setDefaultValue(defaultValue)
+        if not self.isRunnungInsideModeller():
+            param.setMetadata({'widget_wrapper': {'class': ProcessingParameterPickleFileWidgetWrapper}})
+            param.setDefaultValue(defaultValue)
         self.addParameter(param)
         self.flagParameterAsAdvanced(name, advanced)
 
