@@ -79,7 +79,6 @@ from enmapboxprocessing.algorithm.importprismal2calgorithm import ImportPrismaL2
 from enmapboxprocessing.algorithm.importprismal2dalgorithm import ImportPrismaL2DAlgorithm
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
 from enmapboxprocessing.algorithm.inversetransformrasteralgorithm import InverseTransformRasterAlgorithm
-from enmapboxprocessing.algorithm.issue1366_algorithm import MyAlgorithm
 from enmapboxprocessing.algorithm.layertomaskalgorithm import LayerToMaskAlgorithm
 from enmapboxprocessing.algorithm.mergeclassificationdatasetalgorithm import MergeClassificationDatasetsAlgorithm
 from enmapboxprocessing.algorithm.predictclassificationalgorithm import PredictClassificationAlgorithm
@@ -409,7 +408,9 @@ def algorithms():
         WriteEnviHeaderAlgorithm()
     ]
 
-    if False:
+    if True:
+        algos = list()
+        from enmapboxprocessing.algorithm.ISSUE_504_ALGO import MyAlgorithm
         algos.append(MyAlgorithm())
 
     return algos
