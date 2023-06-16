@@ -50,8 +50,7 @@ from enmapboxprocessing.algorithm.fitnormalizeralgorithm import FitNormalizerAlg
 from enmapboxprocessing.algorithm.fitpcaalgorithm import FitPcaAlgorithm
 from enmapboxprocessing.algorithm.fitplsegressionalgorithm import FitPLSRegressionAlgorithm
 from enmapboxprocessing.algorithm.fitquantiletransformeralgorithm import FitQuantileTransformerAlgorithm
-from enmapboxprocessing.algorithm.fitrandomforestclassifieralgorithm import FitRandomForestClassifierAlgorithm, \
-    FitRandomForestClassifierAlgorithm4Modeler
+from enmapboxprocessing.algorithm.fitrandomforestclassifieralgorithm import FitRandomForestClassifierAlgorithm
 from enmapboxprocessing.algorithm.fitrandomforestregressoralgorithm import FitRandomForestRegressorAlgorithm
 from enmapboxprocessing.algorithm.fitrobustscaleralgorithm import FitRobustScalerAlgorithm
 from enmapboxprocessing.algorithm.fitsamalgorithm import FitSamAlgorithm
@@ -253,7 +252,7 @@ def algorithms():
         FitGenericRegressorAlgorithm(),
         FitLinearSvcAlgorithm(),
         FitLogisticRegressionAlgorithm(),
-        FitRandomForestClassifierAlgorithm(), FitRandomForestClassifierAlgorithm4Modeler(),
+        FitRandomForestClassifierAlgorithm(),
         FitSamAlgorithm(),
         FitSvcRbfAlgorithm(),
         FitSvcPolyAlgorithm(),
@@ -407,10 +406,5 @@ def algorithms():
         VrtBandMathAlgorithm(),
         WriteEnviHeaderAlgorithm()
     ]
-
-    if True:
-        # algos = list()
-        from enmapboxprocessing.algorithm.ISSUE_504_ALGO import MyAlgorithm
-        algos.append(MyAlgorithm())
 
     return algos
