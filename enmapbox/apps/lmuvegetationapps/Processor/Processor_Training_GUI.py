@@ -78,7 +78,7 @@ class ML_Training:
 
     def initial_values(self):
         # exclude_wavelengths: from ... to [nm]; these are default values for atmospheric water vapor absorption
-        self.exclude_wavelengths = [[1290, 1525], [1730, 1970], [2450, 2500]]
+        self.exclude_wavelengths = [[1290, 1525], [1730, 1970], [2400, 2500]]
         self.lut_path = None  # file path to the LUT metafile
         self.meta_dict = None  # intial empty dictionary for LUT meta
         self.wunit = "nanometers"

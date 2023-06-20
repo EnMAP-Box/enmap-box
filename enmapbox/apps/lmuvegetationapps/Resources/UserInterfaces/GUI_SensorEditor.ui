@@ -108,19 +108,7 @@
           <widget class="QgsMapLayerComboBox" name="mLayer"/>
          </item>
          <item>
-          <widget class="QPushButton" name="cmdInputImage">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>20</width>
-             <height>16777215</height>
-            </size>
-           </property>
+          <widget class="QToolButton" name="cmdInputImage">
            <property name="text">
             <string>...</string>
            </property>
@@ -182,7 +170,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Select SRF-Files</string>
+            <string>Select SRF-Files:</string>
            </property>
           </widget>
          </item>
@@ -213,7 +201,7 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>25</height>
+             <height>0</height>
             </size>
            </property>
            <property name="frameShape">
@@ -234,22 +222,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="cmdInputFile">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>20</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="whatsThis">
-            <string>Select Image as input for the inversion (ENVI-type)</string>
-           </property>
+          <widget class="QToolButton" name="cmdInputFile">
            <property name="text">
             <string>...</string>
            </property>
@@ -279,22 +252,6 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item>
-          <spacer name="horizontalSpacer_8">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>125</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
          <item>
           <widget class="QCheckBox" name="radioHeader">
            <property name="enabled">
@@ -356,37 +313,35 @@
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer_3">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Maximum</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>74</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
           <widget class="QComboBox" name="cmbDelimiter">
            <property name="enabled">
             <bool>false</bool>
            </property>
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
            <property name="minimumSize">
             <size>
-             <width>150</width>
+             <width>0</width>
              <height>0</height>
             </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Unit of Wavelengths:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="cmbWLunit">
+           <property name="enabled">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -402,36 +357,6 @@
             </size>
            </property>
           </spacer>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>Unit of Wavelengths:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_6">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Maximum</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>30</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QComboBox" name="cmbWLunit">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-          </widget>
          </item>
         </layout>
        </widget>
@@ -503,7 +428,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Select Wavelengths-File</string>
+            <string>Select Wavelengths-File:</string>
            </property>
           </widget>
          </item>
@@ -534,7 +459,7 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>25</height>
+             <height>0</height>
             </size>
            </property>
            <property name="frameShape">
@@ -552,19 +477,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="cmdWLFile">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>20</width>
-             <height>16777215</height>
-            </size>
-           </property>
+          <widget class="QToolButton" name="cmdWLFile">
            <property name="text">
             <string>...</string>
            </property>
@@ -755,7 +668,6 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>cmdInputFile</tabstop>
   <tabstop>radioHeader</tabstop>
   <tabstop>cmbDelimiter</tabstop>
   <tabstop>tablePreview</tabstop>

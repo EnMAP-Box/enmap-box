@@ -26,6 +26,7 @@ from qgis.gui import QgsMapLayerComboBox
 from qgis.core import QgsMapLayerProxyModel
 import sys
 import os
+from PyQt5.QtCore import Qt
 from qgis.PyQt.QtWidgets import *
 from PyQt5.QtGui import QPixmap
 from _classic.hubflow.core import *
@@ -73,8 +74,12 @@ class PWR:
         self.connections()
         label = QLabel(self.gui.pwrImage)
         pixelmap = QPixmap(pathIMG)
+        size = pixelmap.size()
+        width = size.width()
+        height = size.height()
+        pixelmap = pixelmap.scaled(width, height, transformMode=Qt.SmoothTransformation, aspectRatioMode=Qt.KeepAspectRatio)
+        label.setScaledContents(True)
         label.setPixmap(pixelmap)
-        self.gui.pwrImage.resize(pixelmap.width(), pixelmap.height())
         self.gui.pwrImage.show()
 
     def initial_values(self):

@@ -37,14 +37,19 @@ import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.neural_network import MLPRegressor
 from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import RBF, WhiteKernel
+from sklearn.gaussian_process.kernels import Matern, RBF, WhiteKernel
+from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, r2_score
 # from modAL.models import BayesianOptimizer
 from lmuvegetationapps.Processor.modAL import ActiveLearner
 from lmuvegetationapps.Processor.modAL.disagreement import *
+from sklearn.metrics import pairwise_distances
+from sklearn.linear_model import LinearRegression
+
+
 # from modAL.uncertainty import uncertainty_sampling
 # from modAL.disagreement import *
 # from modAL.acquisition import max_EI, max_UCB, max_PI
@@ -52,13 +57,24 @@ from lmuvegetationapps.Processor.modAL.disagreement import *
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-
 import joblib
 
 def GP_reg_std(regressor, X_actpool):
     _, std = regressor.predict(X_actpool, return_std=True)
     query_idx = np.argmax(std)
     return query_idx, X_actpool[query_idx]
+
+
+def max_euclidean_distances(data1, data2, n):
+    # Compute all pairwise distances
+    all_distances = pairwise_distances(data1, data2, metric='euclidean')
+    max_n_indices = np.argpartition(all_distances.flatten(), -n)[-n:]
+    max_n_2d_indices = np.unravel_index(max_n_indices, all_distances.shape)
+    indices_arr1 = max_n_2d_indices[0]
+    # Return the n maximum distances indices as a list
+    # Convert to set and back to list to remove duplicates
+    unique_indices = list(set(indices_arr1.tolist()))
+    return unique_indices
 
 # Class MLRATraining will only be used for training new models, not for predictions!
 class MLRATraining:
@@ -95,212 +111,80 @@ class MLRATraining:
 
     @staticmethod
     def _al_gpr_internal(X, y, kernel):
-
-        n_initial = int(2*len(X)/100)
-        initial_idx = np.random.choice(range(len(X)), size=n_initial, replace=False)
-        X_initial, y_initial = X[initial_idx], y[initial_idx]
-
-        regressor = ActiveLearner(estimator=GaussianProcessRegressor(
-            kernel=kernel, random_state=0, n_restarts_optimizer=1, normalize_y=True),
-                                  query_strategy=edb, X_training=X_initial, y_training=y_initial)
-
-        regressor_true = ActiveLearner(estimator=GaussianProcessRegressor(
-            kernel=kernel, random_state=0, n_restarts_optimizer=1, normalize_y=True),
-                                  query_strategy=edb, X_training=X_initial, y_training=y_initial)
-
-        initial_predict = regressor.predict(X)
-        initial_rmse = mean_squared_error(y, initial_predict)
-        initial_score = regressor.score(X, y)
-        X_pool = np.delete(X, initial_idx, axis=0)
-        y_pool = np.delete(y, initial_idx)
-
-        performance_history = [[initial_rmse], [initial_score]]
-        n_queries = 50
-        x_query_list = X[initial_idx]
-        y_query_list = y[initial_idx]
-
-        for idx in range(n_queries):
-            print('Query no. %d' % (idx + 1))
-            query_idx, query_instance = regressor.query(X_pool, n_instances=1)
-            print(X_pool[query_idx].shape, y_pool[query_idx].shape)
-
-            regressor.teach(X=X_pool[query_idx], y=y_pool[query_idx])
-            predict = regressor.predict(X)
-            rmse = mean_squared_error(y, predict)
-            if rmse < performance_history[0][-1]:
-                x_query_list = np.append(x_query_list, X_pool[query_idx], axis=0)
-                y_query_list = np.append(y_query_list, y_pool[query_idx])
-                performance_history[0] = np.append(performance_history[0], mean_squared_error(y, predict))
-                performance_history[1] = np.append(performance_history[1], regressor.score(X, y))
-                regressor_true.teach(X_pool[query_idx], y_pool[query_idx])
-            else:
-                regressor._fit_on_new(x_query_list, y_query_list)
-
-            X_pool = np.delete(X_pool, query_idx, axis=0)
-            y_pool = np.delete(y_pool, query_idx)
-            print(len(X_pool))
-
-        fig, ax = plt.subplots(figsize=(8.5, 6), dpi=130)
-        ax2 = ax.twinx()
-
-        ax.plot(performance_history[0], c='k')
-        ax.scatter(range(len(performance_history[0])), performance_history[0], s=13, c='k', )
-        ax2.plot(performance_history[1], c='r')
-        ax2.scatter(range(len(performance_history[1])), performance_history[1], s=13, c='r')
-
-        ax.xaxis.set_major_locator(mpl.ticker.MaxNLocator(nbins=5, integer=True))
-        ax.yaxis.set_major_locator(mpl.ticker.MaxNLocator(nbins=10))
-
-        ax2.yaxis.set_major_locator(mpl.ticker.MaxNLocator(nbins=10))
-
-        #ax.set_ylim(bottom=0, top=1)
-        ax.grid(False)
-
-        ax.set_xlabel('Number of iterations (max GPR-std sampling)', fontsize=16)
-        ax.set_ylabel('LAI RMSE [m$^{2}$/m$^{2}$]', fontsize=16)
-        ax2.set_ylabel('R² [-]', fontsize=16)
-        ax.tick_params("both", labelsize=16)
-        ax2.tick_params("y", labelsize=16)
-
-        plt.tight_layout()
-        plt.savefig(r"U:\EnVAL\Meetings\20_March_2023/AL_process.png", dpi=300)
-        plt.show()
-
-        print(performance_history)
-
-        fig, ax = plt.subplots(figsize=(6, 6), dpi=130)
-        ax.set_aspect('equal', adjustable='box')
-        y_pred = regressor_true.predict(X)
-        ax.scatter(y, y_pred, c='k', s=5)
-        ax.plot([0, 1], [0, 1], 'k--', transform=ax.transAxes, )
-        ax.tick_params("both", labelsize=16)
-        ax.set_xlabel('LAI PROSAIL-PRO simulated [m$^{2}$/m$^{2}$]', fontsize=16)
-        ax.set_ylabel('LAI estimated [m$^{2}$/m$^{2}$]', fontsize=16)
-        ax.xaxis.set_major_locator(mpl.ticker.MaxNLocator(nbins=4, integer=True))
-        ax.yaxis.set_major_locator(mpl.ticker.MaxNLocator(nbins=4, integer=True))
-        plt.tight_layout()
-        plt.savefig(r"U:\EnVAL\Meetings\20_March_2023/LAI_GPR-AL_performance.png", dpi=300)
-        plt.show()
+        pass
 
     @staticmethod
-    def _al_gpr_insitu(X, y, kernel, X_val, y_val):
-        print(len(X))
-        n_initial = int(2*len(X)/100)
-        initial_idx = np.random.choice(range(len(X)), size=n_initial, replace=False)
+    def _al_gpr_insitu(X, y, kernel, X_val, y_val, init_percentage):
+
+        init_percentage = init_percentage/100
+        n_samples = X.shape[0]
+        n_init = int(init_percentage * n_samples)
+        # Compute the pairwise distances between all samples
+        distances = pairwise_distances(X)
+        # Get the maximum distance for each sample
+        max_distances = distances.max(axis=1)
+        # Get the indices of the samples sorted by their maximum distance in descending order
+        sorted_indices = np.argsort(max_distances)[::-1]
+        # Select the initial indices as the top 2% of the sorted indices
+        initial_idx = sorted_indices[:n_init]
+        # initial_idx = np.random.choice(range(len(X)), size=n_init, replace=False)
         X_initial, y_initial = X[initial_idx], y[initial_idx]
+        training_indices = list(initial_idx)
+        performances = []
 
-        regressor = ActiveLearner(estimator=GaussianProcessRegressor(
-            kernel=kernel, random_state=0),
-                                  query_strategy=edb, X_training=X_initial, y_training=y_initial)
+        gpr = GaussianProcessRegressor(kernel=kernel, random_state=0)
 
-        regressor_true = ActiveLearner(estimator=GaussianProcessRegressor(
-            kernel=kernel, random_state=0),
-                                  query_strategy=edb, X_training=X_initial, y_training=y_initial)
+        initital_pred = gpr.predict(X_val)
+        best_score = np.sqrt(mean_squared_error(y_val, initital_pred))
+        performances.append(best_score)
 
-        initial_predict = regressor.predict(X_val)
-        initial_rmse = mean_squared_error(y_val, initial_predict)
-        initial_score = regressor.score(X_val, y_val)
-        X_pool = np.delete(X, initial_idx, axis=0)
-        y_pool = np.delete(y, initial_idx)
+        remaining_indices = np.setdiff1d(np.arange(n_samples), training_indices)
+        n_query = 1
 
-        performance_history = [[initial_rmse], [initial_score]]
-        n_queries = int(len(X)/n_initial)-1
-        x_query_list = X[initial_idx]
-        y_query_list = y[initial_idx]
-        print(X_pool.shape)
-        print(X_val.shape)
+        total_remaining = len(remaining_indices)
+        last_printed = -1
 
-        for idx in range(n_queries):
-            print('Query no. %d of %d' % (idx + 1, (n_queries)) )
-            query_idx, query_instance = regressor.query(X_pool, n_instances=1)
-            print(query_idx.shape)
-            regressor.teach(X=X_pool[query_idx], y=y_pool[query_idx])
-            predict = regressor.predict(X_val)
-            rmse = mean_squared_error(y_val, predict)
-            print(rmse)
-            print(performance_history[0][-1])
-            if rmse < performance_history[0][-1]:
-                print("found")
-                x_query_list = np.append(x_query_list, X_pool[query_idx], axis=0)
-                y_query_list = np.append(y_query_list, y_pool[query_idx])
-                performance_history[0] = np.append(performance_history[0], mean_squared_error(y_val, predict))
-                performance_history[1] = np.append(performance_history[1], regressor.score(X_val, y_val))
-                regressor_true.teach(X_pool[query_idx], y_pool[query_idx])
+        for i in range(len(remaining_indices)):
+
+            remaining_X = X[remaining_indices]
+            query_indices = max_euclidean_distances(remaining_X, X_initial, n=n_query)
+            chosen_indices = remaining_indices[query_indices]
+
+            X_initial = np.concatenate((X_initial, X[chosen_indices]))
+            y_initial = np.concatenate((y_initial, y[chosen_indices]))
+            training_indices.append(chosen_indices)
+
+            gpr.fit(X_initial, y_initial)
+
+            pred = gpr.predict(X_val)
+            score = np.sqrt(mean_squared_error(y_val, pred))
+            performances.append(score)
+
+            progress = (total_remaining - len(remaining_indices)) / total_remaining * 100
+            if int(progress) % 2 == 0 and int(progress) != last_printed:
+                print('Progress: {:.0f}%'.format(progress))
+                last_printed = int(progress)
+
+            if score > best_score:
+                X_initial = np.delete(X_initial, -len(query_indices), axis=0)
+                y_initial = np.delete(y_initial, -len(query_indices), axis=0)
+                training_indices.pop(-len(query_indices))
+                performances.pop()
             else:
-                regressor._fit_on_new(X=x_query_list, y=y_query_list)
+                best_score = score
+                # print('RMSE: {:.4f}'.format(best_score))
 
-            X_pool = np.delete(X_pool, query_idx, axis=0)
-            y_pool = np.delete(y_pool, query_idx)
-            print(len(X_pool))
+            remaining_indices = np.delete(remaining_indices, query_indices)
+            # print(len(remaining_X))
 
-        fig, ax = plt.subplots(figsize=(8.5, 6), dpi=130)
-        ax2 = ax.twinx()
+        final_pred, pred_std = gpr.predict(X_val, return_std=True)
 
-        ax.plot(performance_history[0], c='k')
-        ax.scatter(range(len(performance_history[0])), performance_history[0], s=13, c='k', )
-        ax2.plot(performance_history[1], c='r')
-        ax2.scatter(range(len(performance_history[1])), performance_history[1], s=13, c='r')
+        np.savetxt("U:\EnVAL\Meetings\EnSAG/performances.txt", performances)
+        out_pred = np.array([y_val, final_pred, pred_std])
+        np.savetxt("U:\EnVAL\Meetings\EnSAG/LAI_results.txt", out_pred)
 
-        ax.xaxis.set_major_locator(mpl.ticker.MaxNLocator(nbins=5, integer=True))
-        ax.yaxis.set_major_locator(mpl.ticker.MaxNLocator(nbins=10))
 
-        ax2.yaxis.set_major_locator(mpl.ticker.MaxNLocator(nbins=10))
-
-        #ax.set_ylim(bottom=0, top=1)
-        ax.grid(False)
-
-        ax.set_xlabel('Number of iterations (max GPR-std sampling)', fontsize=16)
-        ax.set_ylabel('LAI RMSE [m$^{2}$/m$^{2}$]', fontsize=16)
-        ax2.set_ylabel('R² [-]', fontsize=16)
-        ax.tick_params("both", labelsize=16)
-        ax2.tick_params("y", labelsize=16)
-
-        plt.tight_layout()
-        plt.savefig(r"U:\EnVAL\Meetings\20_March_2023/AL_process.png", dpi=300)
-        plt.show()
-
-        print(performance_history)
-
-        fig, ax = plt.subplots(figsize=(6, 6), dpi=130)
-        ax.set_aspect('equal', adjustable='box')
-        y_pred = regressor_true.predict(X_val)
-        ax.scatter(y_val, y_pred, c='k', s=5)
-        ax.plot([0, 1], [0, 1], 'k--', transform=ax.transAxes, )
-        ax.tick_params("both", labelsize=16)
-        ax.set_xlabel('LAI PROSAIL-PRO simulated [m$^{2}$/m$^{2}$]', fontsize=16)
-        ax.set_ylabel('LAI estimated [m$^{2}$/m$^{2}$]', fontsize=16)
-        ax.xaxis.set_major_locator(mpl.ticker.MaxNLocator(nbins=4, integer=True))
-        ax.yaxis.set_major_locator(mpl.ticker.MaxNLocator(nbins=4, integer=True))
-        plt.tight_layout()
-        plt.savefig(r"U:\EnVAL\Meetings\20_March_2023/LAI_GPR-AL_performance.png", dpi=300)
-        plt.show()
-
-    @staticmethod
-    def _al_gpr_ideal(X, y, kernel, X_val, y_val):
-
-        pred_type = 'regression'
-        n_init = int(2*len(X)/100)
-        maxevals = int(30*len(X)/100)
-
-        regressor = GaussianProcessRegressor(kernel=kernel, random_state=0)
-
-        data = {"X": X, "Y": y, "X_test": X_val, "Y_test": y_val}
-
-        trained_pred, samples, scores = ideal.ideal_training(data, regressor, pred_type, delta=5.,
-                                                             n_init=n_init, maxevals=maxevals, method='ideal',
-                                                             verbose=1)
-        X_act = samples["X_act"]
-        Y_act = samples["Y_act"]
-
-        plt.figure(1)
-        plt.semilogy(np.arange(n_init, maxevals) + 1, scores["test"][n_init:maxevals], linewidth=3)
-        plt.title('RMSE on test data')
-        plt.grid()
-        plt.xlabel('queries')
-        plt.draw()
-        plt.show()
-
-    # Add more ML-algorithms here in the same design if needed at any time (e.g. SVR, GPR, RandomForest, ...)
+        # Add more ML-algorithms here in the same design if needed at any time (e.g. SVR, GPR, RandomForest, ...)
 
 
 # Some basic functions are placed in this class
@@ -425,7 +309,8 @@ class ProcessorTraining:
     def __init__(self, main):
         self.m = main
         # these are the four PROSAIL parameters to be estimated. Mind the order!
-        self.para_list = ['LAI', 'LIDF', 'cab', 'cm']
+        #self.para_list = ['LAI', 'LIDF', 'cab', 'cm']
+        self.para_list = ['LAI', 'cab']
 
         # Parameterization (everything except ANN is deprecated)
 
@@ -439,11 +324,12 @@ class ProcessorTraining:
         # self.ml_params_dict_rforest = None
         # self.ml_params_dict_gpr = None
 
-    def training_setup(self, lut_metafile, exclude_bands, npca, model_meta, algorithm='ann', use_al=False):
+    def training_setup(self, lut_metafile, exclude_bands, npca, model_meta, algorithm='ann', use_al=False, n_initial=2):
         # Setup everything for training new models
         self.exclude_bands = exclude_bands  # the bands to be excluded for the training (water vapor absorption etc.)
         self.algorithm = algorithm  # name of the Algorithm ('ann' by default)
         self.use_al = use_al
+        self.n_initial = n_initial
 
         # LUT
         self.get_meta_LUT(lut_metafile=lut_metafile)  # read meta information of the LUT to be trained
@@ -484,7 +370,7 @@ class ProcessorTraining:
         self.para_boost = True  # on per default
 
         # Add/multiply a noise term to LUT-spectra to gain more resilience towards real "noisy" spectra
-        self.noise_type = 1  # 0: Off, 1: Additive, 2: Multiplicative
+        self.noise_type = 0   # 0: Off, 1: Gaussian, 2: Additive, 3: Multiplicative
         self.sigma = 4  # std. of the noise in %
 
         # Which scaler should be used?
@@ -641,13 +527,16 @@ class ProcessorTraining:
 
         # sigma (strength of the noise) is provided as %, so it needs to be converted to relative values
         # and optionally multiplied with the conversion factor to match reflectance value ranges for additive noise
-        sigma_c = (sigma/100) * conversion  # sigma converted (e.g. 0...1 -> 0...10000)
 
         if noise_type == 0:    # no noise
             return ref_list
-        elif noise_type == 1:  # additive noise
+        elif noise_type == 1:  # gaussian noise
+            noise_std = np.std(ref_list) * sigma / 100
+            ref_noisy = np.random.normal(loc=0.0, scale=noise_std, size=ref_list.shape)
+        elif noise_type == 2:  # additive noise
+            sigma_c = (sigma / 100) * conversion  # sigma converted (e.g. 0...1 -> 0...10000)
             ref_noisy = np.random.normal(loc=0.0, scale=sigma_c, size=ref_list.shape) + ref_list
-        elif noise_type == 2:  # multiplicative noise
+        elif noise_type == 3:  # multiplicative noise
             ref_noisy = (1 + np.random.normal(loc=0.0, scale=sigma / 100, size=ref_list.shape)) * ref_list
         else:
             return None
@@ -708,18 +597,10 @@ class ProcessorTraining:
 
         if self.algorithm == 'al_gpr_insitu':
             self.gpr_kernel = 1.0 * RBF(1.0) + WhiteKernel()
-            self.ml_params = {'kernel': self.gpr_kernel, 'X_val': self.X_val, 'y_val': self.y_val}
+            self.ml_params = {'kernel': self.gpr_kernel, 'X_val': self.X_val, 'y_val': self.y_val,
+                              'init_percentage': self.n_initial}
             self.ml_model_ext = '.al_gpr_insitu'  # extension of the models to recognize it as a GPR model
             self.ml_model = self.m.mlra_training._al_gpr_insitu  # construct the model and pass it to self.ml_model
-
-        if self.algorithm == 'al_gpr_ideal':
-            self.gpr_kernel = 1.0 * RBF(1.0) + WhiteKernel()
-            self.ml_params = {'kernel': self.gpr_kernel, 'X_val': self.X_val, 'y_val': self.y_val}
-            self.ml_model_ext = '.al_gpr_ideal'  # extension of the models to recognize it as a GPR model
-            self.ml_model = self.m.mlra_training._al_gpr_ideal  # construct the model and pass it to self.ml_model
-
-
-
 
 # Class to handle predicting variables from spectral reflectances with pre-trained Machine Learning (ML) algorithms
 # At the moment, only ANNs are implemented, but potentially this script could be appended by any other ML-algo

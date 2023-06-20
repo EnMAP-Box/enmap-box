@@ -139,7 +139,7 @@ class LUT:
         self.gui.lblCar.setText('Carotenoids (Ccx) [µg/cm²] \n[0.0 - 30.0]')
         self.gui.lblCanth.setText('Anthocyanins (Canth) [µg/cm²] \n[0.0 - 10.0]')
         self.gui.lblLAI.setText('Leaf Area Index (LAI) [m²/m²] \n[0.01 - 10.0]')
-        self.gui.lblLAIu.setText('Undergrowth Leaf Area Index \n(LAI) [m²/m²] \n[0.01 - 10.0]')
+        self.gui.lblLAIu.setText('Undergrowth LAI [m²/m²] \n[0.01 - 10.0]')
         # self.gui.lblCp.setText('Proteins (Cp) [g/cm²] \n[0.0 - 0.01]')
         # self.gui.lblCbc.setText('Carbon-based constit. (CBC) [g/cm²] \n[0.0 - 0.01]')
 
