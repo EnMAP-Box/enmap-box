@@ -55,6 +55,8 @@ class Utils(object):
             return np.uint16
         elif dataType == Qgis.DataType.UInt32:
             return np.uint32
+        elif dataType == Qgis.DataType.ARGB32:
+            return np.uint32
         elif dataType == Qgis.DataType.ARGB32_Premultiplied:
             return np.uint32
         else:
