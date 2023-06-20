@@ -185,7 +185,7 @@ def create_enmapbox_plugin(include_testdata: bool = False,
 
     PATH_METADATAFILE = PLUGIN_DIR / 'metadata.txt'
 
-    pathAbout = DIR_REPO / 'About.md'
+    pathAbout = DIR_REPO / 'ABOUT.md'
 
     # set QGIS Metadata file values
     MD = QGISMetadataFileWriter()
