@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>629</width>
-    <height>508</height>
+    <height>504</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -1146,65 +1146,23 @@
          <enum>Qt::LeftToRight</enum>
         </property>
         <property name="title">
-         <string>Choose Variables</string>
+         <string>Output</string>
         </property>
         <property name="flat">
          <bool>false</bool>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
-          <widget class="QCheckBox" name="checkLAI">
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
+          <widget class="QLabel" name="label_16">
            <property name="text">
-            <string>LAI</string>
+            <string>Model Target Variables:</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="checkALIA">
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>ALIA</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="checkCab">
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>Cab</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="checkCm">
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>Cm</string>
+          <widget class="QLineEdit" name="lblTargets">
+           <property name="enabled">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -1227,6 +1185,19 @@
             <bool>false</bool>
            </property>
           </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
          </item>
         </layout>
        </widget>
@@ -1256,10 +1227,6 @@
   <tabstop>txtRAA</tabstop>
   <tabstop>cmdNewModel</tabstop>
   <tabstop>SpinNDVI</tabstop>
-  <tabstop>checkLAI</tabstop>
-  <tabstop>checkALIA</tabstop>
-  <tabstop>checkCab</tabstop>
-  <tabstop>checkCm</tabstop>
   <tabstop>radOutSingle</tabstop>
   <tabstop>radOutIndividual</tabstop>
   <tabstop>cmdClose</tabstop>

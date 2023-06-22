@@ -85,6 +85,8 @@ class ML_Training:
         self.wl, self.nbands, self.nbands_valid = (None, None, None)
         self.out_dir = None  # directory for output
         self.model_name = None  # name of the output model
+        self.noisetype = 0
+        self.noiselevel = 0
 
     def connections(self):
         self.gui.cmdInputLUT.clicked.connect(lambda: self.open_lut())
@@ -94,6 +96,10 @@ class ML_Training:
 
         self.gui.cmdExcludeBands.clicked.connect(lambda: self.open_wavelength_selection())
         self.gui.cmbPCA.toggled.connect(lambda: self.handle_pca())
+
+        self.gui.radNoiseOff.clicked.connect(lambda: self.select_noise(mode=0))
+        self.gui.radNoiseGauss.clicked.connect(lambda: self.select_noise(mode=1))
+        self.gui.radNoiseAdd.clicked.connect(lambda: self.select_noise(mode=2))
 
     def open_lut(self):  # open and read a lut-metafile
         result = str(QFileDialog.getOpenFileName(caption='Select LUT meta-file', filter="LUT-file (*.lut)")[0])
@@ -112,7 +118,7 @@ class ML_Training:
         self.meta_dict = dict(zip(keys, values))  # file the metadata dictionary
 
         # wavelengths of the LUT are stored in the LUT-meta
-        self.wl = np.asarray(self.meta_dict['wavelengths']).astype(np.float16)
+        self.wl = np.asarray(self.meta_dict['wavelengths']).astype(np.float32)
         self.nbands = len(self.wl)
         # default wavelength ranges to be excluded are defined in __init__ and now with the metadata
         # of the spectral image, the respective "exclude bands" can be found
@@ -171,6 +177,14 @@ class ML_Training:
             self.gui.spnPCA.setDisabled(True)
             self.npca = 0
 
+    def select_noise(self, mode):
+        # Enables and disables lineEdit for noise level
+        if mode == 0:
+            self.gui.txtNoiseLevel.setDisabled(True)
+        else:
+            self.gui.txtNoiseLevel.setDisabled(False)
+        self.noise_type = mode
+
     def get_folder(self):
         # The model folder is important, as it contains all files needed
         path = str(QFileDialog.getExistingDirectory(caption='Select Output Directory for Model'))
@@ -190,6 +204,17 @@ class ML_Training:
         else:
             self.model_name = self.gui.txtModelName.text()
             self.model_meta = self.out_dir + self.model_name + '.meta'
+
+        if not self.noisetype == 0:
+            if self.gui.txtNoiseLevel.text() == "":
+                raise ValueError('Please specify level for artificial noise')
+
+            else:
+                self.noiselevel = self.gui.txtNoiseLevel.text()
+                try:
+                    self.noiselevel = float(self.noiselevel)
+                except ValueError:
+                    raise ValueError('Cannot interpret noise level as decimal number')
 
         if self.gui.spnPCA.isEnabled():
             self.npca = self.gui.spnPCA.value()

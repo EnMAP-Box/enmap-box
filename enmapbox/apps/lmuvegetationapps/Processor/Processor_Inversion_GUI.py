@@ -111,10 +111,12 @@ class MLInversion:
         self.gui.mLayerGeometry.setLayer(None)
         self.gui.mLayerMask.setLayer(None)
 
+        self.algorithm = None
+
         # Initial Model is set to EnMAP as default
         self.model_meta_file = os.path.join(APP_DIR, 'Resources/Processor/EnMAP.meta')
-        meta_dict = self._get_processor_meta(file=self.model_meta_file)
-        if not meta_dict:
+        self.meta_dict = self._get_processor_meta(file=self.model_meta_file)
+        if not self.meta_dict:
             return
         self.model_name = os.path.splitext(os.path.basename(self.model_meta_file))[0]
         # The name of the meta-file == name of the model
@@ -309,8 +311,10 @@ class MLInversion:
                                                      filter="Processor META File (*.meta)")[0])
             if not result:
                 return
-            meta_dict = self._get_processor_meta(file=result)
-            if not meta_dict:
+            self.meta_dict = self._get_processor_meta(file=result)
+            self.algorithm = self.meta_dict['alg']
+            self.gui.lblTargets.setText(', '.join(self.meta_dict['target_parameters']))
+            if not self.meta_dict:
                 return
             self.model_meta_file = result
             self.model_name = os.path.splitext(os.path.basename(result))[0]
@@ -380,13 +384,13 @@ class MLInversion:
             else:
                 self.gui.lblInputMask.setText(result)
 
-        elif mode == "model":  # Select algorithm for inversion my picking its Meta-file (*.meta)
+        elif mode == "model":  # Select algorithm for inversion by picking its Meta-file (*.meta)
             result = str(QFileDialog.getOpenFileName(caption='Select Machine Learning Model',
                                                      filter="Processor META File (*.meta)")[0])
             if not result:
                 return
-            meta_dict = self._get_processor_meta(file=result)
-            if not meta_dict:
+            self.meta_dict = self._get_processor_meta(file=result)
+            if not self.meta_dict:
                 return
             self.model_meta_file = result
             self.model_name = os.path.splitext(os.path.basename(result))[0]
@@ -501,17 +505,17 @@ class MLInversion:
                 raise ValueError('%s is not a valid no data value for output' % self.gui.txtNodatOutput.text())
 
         # Parameters to invert
-        self.paras = list()
-        if self.gui.checkLAI.isChecked():
-            self.paras.append("LAI")
-        if self.gui.checkALIA.isChecked():
-            self.paras.append("LIDF")
-        if self.gui.checkCab.isChecked():
-            self.paras.append("cab")
-        if self.gui.checkCm.isChecked():
-            self.paras.append("cm")
-        if not self.paras:
-            raise ValueError("At least one parameter needs to be selected!")
+        self.paras = self.meta_dict['target_parameters']
+        # if self.gui.checkLAI.isChecked():
+        #     self.paras.append("LAI")
+        # if self.gui.checkALIA.isChecked():
+        #     self.paras.append("LIDF")
+        # if self.gui.checkCab.isChecked():
+        #     self.paras.append("cab")
+        # if self.gui.checkCm.isChecked():
+        #     self.paras.append("cm")
+        # if not self.paras:
+        #     raise ValueError("At least one parameter needs to be selected!")
 
     def get_image_meta(self, image, image_type):
         # extracts meta information from the spectral image
@@ -610,7 +614,7 @@ class MLInversion:
 
         try:
             # Setup the inversion process
-            proc.predict_main.prediction_setup(model_meta=self.model_meta_file, algorithm='ann', img_in=self.image,
+            proc.predict_main.prediction_setup(model_meta=self.model_meta_file, algorithm=self.algorithm, img_in=self.image,
                                                res_out=self.out_image, out_mode=self.out_mode,
                                                mask_ndvi=self.mask_ndvi, ndvi_thr=self.ndvi_thr,
                                                ndvi_bands=self.ndvi_bands, mask_image=self.mask_image,

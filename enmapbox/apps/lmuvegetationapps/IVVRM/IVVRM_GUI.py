@@ -1303,7 +1303,7 @@ class LoadTxtFile:
             n_entries -= 1
         n_cols = len(data[0 + header_offset])
         try:
-            self.wl_open = [int(float(data[i + header_offset][0])) for i in range(n_entries)]  # read wavelengths
+            self.wl_open = [float(data[i + header_offset][0]) for i in range(n_entries)]  # read wavelengths
         except ValueError:
             self.houston(message="Error: Cannot read file. Please check delimiter and header!")
             return

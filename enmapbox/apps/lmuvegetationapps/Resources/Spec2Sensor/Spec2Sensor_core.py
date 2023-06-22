@@ -135,7 +135,7 @@ class Spec2Sensor:
             exit()
 
         # Be aware that wavelengths are converted into int, so 423.89 nm will become 423 nm.
-        self.wl = np.asarray([int(float(wl * wave_convert)) for wl in wavelengths])
+        self.wl = np.asarray([float(wl * wave_convert) for wl in wavelengths])
         self.n_wl = self.wl.shape[0]
 
         reflectances_straight = np.swapaxes(np.reshape(in_matrix, (nbands, -1)), 0, 1)
@@ -320,7 +320,7 @@ class BuildGenericSRF:
         new_srf = np.full(shape=(np.max(new_srf_nbands), len(wavelength), 2), fill_value=self.nodat, dtype=np.float64)
 
         for wl in range(len(wavelength)):
-            new_srf[0:new_srf_nbands[wl], wl, 0] = np.around(x_list[wl]/1000, decimals=3)
+            new_srf[0:new_srf_nbands[wl], wl, 0] = np.around(x_list[wl]/1000, decimals=4)
             new_srf[0:new_srf_nbands[wl], wl, 1] = gs_list[wl]
 
         ndvi = list()

@@ -59,11 +59,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import joblib
 
-def GP_reg_std(regressor, X_actpool):
-    _, std = regressor.predict(X_actpool, return_std=True)
-    query_idx = np.argmax(std)
-    return query_idx, X_actpool[query_idx]
-
 
 def max_euclidean_distances(data1, data2, n):
     # Compute all pairwise distances
@@ -82,26 +77,29 @@ class MLRATraining:
         self.m = main
 
     @staticmethod
-    def _ann(X, y, activation, solver, alpha, max_iter):
-        # This method calls and returns an MLP-Regressor based on the hyperparameters passed
-        # It also fits ("trains") the model by assessing X (predictors, reflectances) and y (PROSAIL parameters)
+    def _fit(X, y, model):
+        # fits ("trains") the model by assessing X (predictors, reflectances) and y (PROSAIL parameters)
         # So the result is a model that is ready to be used as in ".predict(new_x)"
-        return MLPRegressor(activation=activation, solver=solver, alpha=alpha, max_iter=max_iter).fit(X, y)
+        return model.fit(X, y)
 
     @staticmethod
-    def _gpr(X, y, kernel):
-        return GaussianProcessRegressor(kernel=kernel, copy_X_train=True, random_state=0).fit(X, y)
+    def _rfr(XXX):
+        pass
 
     @staticmethod
-    def _al_gpr(X, y, kernel):
+    def _svr(XXX):
+        pass
+
+    @staticmethod
+    def _al_internal(X, y, model):
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
-        regressor = ActiveLearner(estimator=GaussianProcessRegressor(kernel=kernel, copy_X_train=True, random_state=0),
+        regressor = ActiveLearner(estimator=model,
                                   query_strategy=edb,
                                   X_training=X_train, y_training=y_train)
 
-        print("Train score: ", regressor.score(X_train, y_train))
-        print("Test score: ", regressor.score(X_test, y_test))
+        # print("Train score: ", regressor.score(X_train, y_train))
+        # print("Test score: ", regressor.score(X_test, y_test))
 
         y_pred = regressor.predict(X_test)
         plt.scatter(y_test,y_pred)
@@ -110,11 +108,7 @@ class MLRATraining:
         return regressor
 
     @staticmethod
-    def _al_gpr_internal(X, y, kernel):
-        pass
-
-    @staticmethod
-    def _al_gpr_insitu(X, y, kernel, X_val, y_val, init_percentage):
+    def _al_insitu(X, y, model, X_val, y_val, init_percentage):
 
         init_percentage = init_percentage/100
         n_samples = X.shape[0]
@@ -129,12 +123,12 @@ class MLRATraining:
         initial_idx = sorted_indices[:n_init]
         # initial_idx = np.random.choice(range(len(X)), size=n_init, replace=False)
         X_initial, y_initial = X[initial_idx], y[initial_idx]
+
+        model.fit(X_initial, y_initial)
         training_indices = list(initial_idx)
         performances = []
 
-        gpr = GaussianProcessRegressor(kernel=kernel, random_state=0)
-
-        initital_pred = gpr.predict(X_val)
+        initital_pred = model.predict(X_val)
         best_score = np.sqrt(mean_squared_error(y_val, initital_pred))
         performances.append(best_score)
 
@@ -154,9 +148,9 @@ class MLRATraining:
             y_initial = np.concatenate((y_initial, y[chosen_indices]))
             training_indices.append(chosen_indices)
 
-            gpr.fit(X_initial, y_initial)
+            model.fit(X_initial, y_initial)
 
-            pred = gpr.predict(X_val)
+            pred = model.predict(X_val)
             score = np.sqrt(mean_squared_error(y_val, pred))
             performances.append(score)
 
@@ -177,11 +171,12 @@ class MLRATraining:
             remaining_indices = np.delete(remaining_indices, query_indices)
             # print(len(remaining_X))
 
-        final_pred, pred_std = gpr.predict(X_val, return_std=True)
+        return model, training_indices, performances
+        # final_pred, pred_std = model.predict(X_val, return_std=True)
 
-        np.savetxt("U:\EnVAL\Meetings\EnSAG/performances.txt", performances)
-        out_pred = np.array([y_val, final_pred, pred_std])
-        np.savetxt("U:\EnVAL\Meetings\EnSAG/LAI_results.txt", out_pred)
+        # np.savetxt("U:\EnVAL\Meetings\EnSAG/performances.txt", performances)
+        # out_pred = np.array([y_val, final_pred, pred_std])
+        # np.savetxt("U:\EnVAL\Meetings\EnSAG/LAI_results.txt", out_pred)
 
 
         # Add more ML-algorithms here in the same design if needed at any time (e.g. SVR, GPR, RandomForest, ...)
@@ -310,7 +305,11 @@ class ProcessorTraining:
         self.m = main
         # these are the four PROSAIL parameters to be estimated. Mind the order!
         #self.para_list = ['LAI', 'LIDF', 'cab', 'cm']
-        self.para_list = ['LAI', 'cab']
+        self.para_list = ['LAI']#, 'cab']
+        self.noisetype = 1
+        self.sigma = 4
+        self.mlra = None
+        self.training_indices, self.performances = (None, None)
 
         # Parameterization (everything except ANN is deprecated)
 
@@ -324,11 +323,17 @@ class ProcessorTraining:
         # self.ml_params_dict_rforest = None
         # self.ml_params_dict_gpr = None
 
-    def training_setup(self, lut_metafile, exclude_bands, npca, model_meta, algorithm='ann', use_al=False, n_initial=2):
+    def training_setup(self, lut_metafile, exclude_bands, npca, model_meta, noisetype=1, noiselevel=4, algorithm='ann',
+                       use_al=False, use_insitu=False, n_initial=2):
         # Setup everything for training new models
         self.exclude_bands = exclude_bands  # the bands to be excluded for the training (water vapor absorption etc.)
+
+        # Add/multiply a noise term to LUT-spectra to gain more resilience towards real "noisy" spectra
+        self.noisetype = noisetype  # 0: Off, 1: Gaussian, 2: Additive, 3: Multiplicative
+        self.sigma = noiselevel  # std. of the noise in %
         self.algorithm = algorithm  # name of the Algorithm ('ann' by default)
         self.use_al = use_al
+        self.use_insitu = use_insitu
         self.n_initial = n_initial
 
         # LUT
@@ -369,10 +374,6 @@ class ProcessorTraining:
         # for the training (e.g. ANN fails when learning y=0.004, so it is boosted to y=4 according to "Functions.conv"
         self.para_boost = True  # on per default
 
-        # Add/multiply a noise term to LUT-spectra to gain more resilience towards real "noisy" spectra
-        self.noise_type = 0   # 0: Off, 1: Gaussian, 2: Additive, 3: Multiplicative
-        self.sigma = 4  # std. of the noise in %
-
         # Which scaler should be used?
         self.scaler = StandardScaler()  # create instance of scaler; also: RobustScaler(),
                                         #                                  MinMaxScaler() -> need to be imported
@@ -386,7 +387,7 @@ class ProcessorTraining:
     def validation_setup(self, val_file, exclude_bands, npca,):
         self.val_file = val_file
         val_data = np.loadtxt(self.val_file, delimiter="\t", skiprows=1)
-        X_val = val_data[1:, 1:].T
+        X_val = val_data[2:, 1:].T
         self.y_val = val_data[0, 1:]
 
         self.exclude_bands = exclude_bands  # the bands to be excluded for the training (water vapor absorption etc.)
@@ -423,8 +424,8 @@ class ProcessorTraining:
                     geo_ensemble = rAA * self.ntto * self.ntts + OZA * self.ntts + SZA
                     X, y = self.read_lut(geo=geo_ensemble)  # read reflectances (X) and PROSAIL parameters (y) from LUT
 
-                    if self.noise_type > 0:
-                        X = self._add_noise(ref_list=X, noise_type=self.noise_type, sigma=self.sigma,
+                    if self.noisetype > 0:
+                        X = self._add_noise(ref_list=X, noisetype=self.noisetype, sigma=self.sigma,
                                             conversion=self.conversion_factor)
 
                     # Train and dump individual model per parameter
@@ -444,7 +445,7 @@ class ProcessorTraining:
                             qgis_app.processEvents()
                         else:  # if no progress bar exists, e.g. code is run from _exec.py
                             print("Training {} Noise {:d}-{:d} | {} | Geo {:d} of {:d}".format(
-                                self.algorithm, self.noise_type, self.sigma, para, geo_ensemble + 1,
+                                self.algorithm, self.noisetype, self.sigma, para, geo_ensemble + 1,
                                 self.ntts * self.ntto * self.npsi))
 
                         self.init_model(var=para)  # initialize the model with the given settings
@@ -460,7 +461,10 @@ class ProcessorTraining:
                             self.pca.fit(x)#, y[:, ipara])
                             x = self.pca.transform(x)
 
-                        model = self.ml_model(X=x, y=y[:, ipara], **self.ml_params)  # create instance of the model
+                        if self.use_al:
+                            model, training_indices, performances = self.ml_model(X=x, y=y[:, ipara], model=self.mlra, **self.al_paras)  # create instance of the model
+                        else:
+                            model = self.ml_model(X=x, y=y[:, ipara], model=self.mlra, **self.al_paras)
                         joblib.dump(model, self.model_base + "_{:d}_{}{}".format(
                             geo_ensemble, para, self.ml_model_ext))  # dump (save) model to file for later use
 
@@ -481,8 +485,9 @@ class ProcessorTraining:
 
         # Write Model Meta
         with open(self.model_metafile, 'w') as para_file:  # Meta-information; one meta-file for all paras!
-            para_file.write("alg={}\nnoise_type={:d}\nsigma={:d}\nPCA_components={:d}\nscaler={}"
-                            .format(self.algorithm, self.noise_type, self.sigma, self.components, str(self.scaler)))
+            para_file.write("alg={}\nnoisetype={:d}\nsigma={:d}\nPCA_components={:d}\nscaler={}"
+                            .format(self.algorithm, self.noisetype, self.sigma, self.components, str(self.scaler)))
+            para_file.write("\ntarget_parameters=" + ";".join(str(i) for i in self.para_list))
             para_file.write("\ntts=" + ";".join(str(i) for i in self.tts))
             para_file.write("\ntto=" + ";".join(str(i) for i in self.tto))
             para_file.write("\npsi=" + ";".join(str(i) for i in self.psi))
@@ -522,21 +527,21 @@ class ProcessorTraining:
         return X, y
 
     @staticmethod
-    def _add_noise(ref_list, noise_type, sigma, conversion):
+    def _add_noise(ref_list, noisetype, sigma, conversion):
         # noise module to put a noise term on top of PROSAIL spectra
 
         # sigma (strength of the noise) is provided as %, so it needs to be converted to relative values
         # and optionally multiplied with the conversion factor to match reflectance value ranges for additive noise
 
-        if noise_type == 0:    # no noise
+        if noisetype == 0:    # no noise
             return ref_list
-        elif noise_type == 1:  # gaussian noise
+        elif noisetype == 1:  # gaussian noise
             noise_std = np.std(ref_list) * sigma / 100
-            ref_noisy = np.random.normal(loc=0.0, scale=noise_std, size=ref_list.shape)
-        elif noise_type == 2:  # additive noise
+            ref_noisy = np.random.normal(loc=0.0, scale=noise_std, size=ref_list.shape) + ref_list
+        elif noisetype == 2:  # additive noise
             sigma_c = (sigma / 100) * conversion  # sigma converted (e.g. 0...1 -> 0...10000)
             ref_noisy = np.random.normal(loc=0.0, scale=sigma_c, size=ref_list.shape) + ref_list
-        elif noise_type == 3:  # multiplicative noise
+        elif noisetype == 3:  # multiplicative noise
             ref_noisy = (1 + np.random.normal(loc=0.0, scale=sigma / 100, size=ref_list.shape)) * ref_list
         else:
             return None
@@ -546,7 +551,12 @@ class ProcessorTraining:
     def init_model(self, var):
         # method to initialize a model, i.e. prepare an algorithm before it sees any data
 
+        if self.use_al:
+            pass
+        if self.use_insitu:
+            pass
         # At the moment, only algorithm == 'ann' is implemented; add parameterization for other algorithms if necessary
+
         if self.algorithm == 'ann':
             # ANN
             if not self.ann_activation:  # if self.ann_activation is None, everything is None
@@ -575,32 +585,24 @@ class ProcessorTraining:
             self.ml_params = {'activation': self.ann_activation, 'solver': self.ann_solver,
                               'alpha': self.ann_alpha, 'max_iter': self.ann_max_iter}
             self.ml_model_ext = '.ann'  # extension of the models to recognize it as a neural network model
-            self.ml_model = self.m.mlra_training._ann  # construct the model and pass it to self.ml_model
+            self.mlra = MLPRegressor(**self.ml_params)
 
         if self.algorithm == 'gpr':
             self.gpr_kernel = 1.0 * RBF(1.0) + WhiteKernel()
-            self.ml_params = {'kernel': self.gpr_kernel}
+            self.ml_params = {'kernel': self.gpr_kernel, 'random_state': 0}
             self.ml_model_ext = '.gpr'  # extension of the models to recognize it as a GPR model
-            self.ml_model = self.m.mlra_training._gpr  # construct the model and pass it to self.ml_model
+            self.mlra = GaussianProcessRegressor(**self.ml_params)
 
-        if self.algorithm == 'al_gpr':
-            self.gpr_kernel = 1.0 * RBF(1.0) + WhiteKernel()
-            self.ml_params = {'kernel': self.gpr_kernel}
-            self.ml_model_ext = '.al_gpr'  # extension of the models to recognize it as a GPR model
-            self.ml_model = self.m.mlra_training._al_gpr  # construct the model and pass it to self.ml_model
+        if self.use_al and not self.use_insitu:
+            self.ml_model = self.m.mlra_training._al_internal
+        elif self.use_al and self.use_insitu:
+            self.al_paras = {'X_val': self.X_val, 'y_val': self.y_val,
+                             'init_percentage': self.n_initial}
+            self.ml_model = self.m.mlra_training._al_insitu
+        else:
+            self.ml_model = self.m.mlra_training._fit  # construct the model and pass it to self.ml_model
 
-        if self.algorithm == 'al_gpr_internal':
-            self.gpr_kernel = 1.0 * RBF(length_scale=1.0, length_scale_bounds=(1e-05, 1000000.0)) + WhiteKernel()
-            self.ml_params = {'kernel': self.gpr_kernel}
-            self.ml_model_ext = '.al_gpr_internal'  # extension of the models to recognize it as a GPR model
-            self.ml_model = self.m.mlra_training._al_gpr_internal  # construct the model and pass it to self.ml_model
 
-        if self.algorithm == 'al_gpr_insitu':
-            self.gpr_kernel = 1.0 * RBF(1.0) + WhiteKernel()
-            self.ml_params = {'kernel': self.gpr_kernel, 'X_val': self.X_val, 'y_val': self.y_val,
-                              'init_percentage': self.n_initial}
-            self.ml_model_ext = '.al_gpr_insitu'  # extension of the models to recognize it as a GPR model
-            self.ml_model = self.m.mlra_training._al_gpr_insitu  # construct the model and pass it to self.ml_model
 
 # Class to handle predicting variables from spectral reflectances with pre-trained Machine Learning (ML) algorithms
 # At the moment, only ANNs are implemented, but potentially this script could be appended by any other ML-algo
@@ -661,11 +663,11 @@ class ProcessorPrediction:
         with open(self.model_meta, 'r') as mlra_metafile:
             metacontent = mlra_metafile.readlines()
             metacontent = [line.rstrip('\n') for line in metacontent]
-        self.all_tts = [float(i) for i in metacontent[5].split("=")[1].split(";")]
-        self.all_tto = [float(i) for i in metacontent[6].split("=")[1].split(";")]
-        self.all_psi = [float(i) for i in metacontent[7].split("=")[1].split(";")]
+        self.all_tts = [float(i) for i in metacontent[6].split("=")[1].split(";")]
+        self.all_tto = [float(i) for i in metacontent[7].split("=")[1].split(";")]
+        self.all_psi = [float(i) for i in metacontent[8].split("=")[1].split(";")]
         try:
-            self.exclude_bands = [int(i) for i in metacontent[8].split("=")[1].split(";")]
+            self.exclude_bands = [int(i) for i in metacontent[9].split("=")[1].split(";")]
         except: self.exclude_bands = []
 
         if prg_widget:
