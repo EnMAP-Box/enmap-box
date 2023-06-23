@@ -1745,58 +1745,85 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         action.setIcon(BandStatisticsApp.icon())
         action.triggered.connect(lambda: self.onBandStatisticsClicked(lyr))
 
-        if lyr.bandCount() >= 2:
-            from bivariatecolorrasterrendererapp import BivariateColorRasterRendererApp
-            action: QAction = submenu.addAction(BivariateColorRasterRendererApp.title())
-            action.setIcon(BivariateColorRasterRendererApp.icon())
-            action.triggered.connect(lambda: self.onBivariateColorRasterRendererClicked(lyr))
+        try:
+            if lyr.bandCount() >= 2:
+                from bivariatecolorrasterrendererapp import BivariateColorRasterRendererApp
+                action: QAction = submenu.addAction(BivariateColorRasterRendererApp.title())
+                action.setIcon(BivariateColorRasterRendererApp.icon())
+                action.triggered.connect(lambda: self.onBivariateColorRasterRendererClicked(lyr))
+        except Exception:
+            pass
 
-        from classfractionstatisticsapp import ClassFractionStatisticsApp
-        action: QAction = submenu.addAction(ClassFractionStatisticsApp.title())
-        action.setIcon(ClassFractionStatisticsApp.icon())
-        action.triggered.connect(lambda: self.onClassFractionStatisticsClicked(lyr))
+        try:
+            from classfractionstatisticsapp import ClassFractionStatisticsApp
+            action: QAction = submenu.addAction(ClassFractionStatisticsApp.title())
+            action.setIcon(ClassFractionStatisticsApp.icon())
+            action.triggered.connect(lambda: self.onClassFractionStatisticsClicked(lyr))
+        except Exception:
+            pass
 
-        if isinstance(lyr.renderer(), QgsPalettedRasterRenderer):
-            from classificationstatisticsapp import ClassificationStatisticsApp
-            action = submenu.addAction(ClassificationStatisticsApp.title())
-            action.setIcon(ClassificationStatisticsApp.icon())
-            action.triggered.connect(lambda: self.onClassificationStatisticsClicked(lyr))
+        try:
+            if isinstance(lyr.renderer(), QgsPalettedRasterRenderer):
+                from classificationstatisticsapp import ClassificationStatisticsApp
+                action = submenu.addAction(ClassificationStatisticsApp.title())
+                action.setIcon(ClassificationStatisticsApp.icon())
+                action.triggered.connect(lambda: self.onClassificationStatisticsClicked(lyr))
+        except Exception:
+            pass
 
-        if lyr.bandCount() >= 3:
-            from cmykcolorrasterrendererapp import CmykColorRasterRendererApp
-            action = submenu.addAction(CmykColorRasterRendererApp.title())
-            action.setIcon(CmykColorRasterRendererApp.icon())
-            action.triggered.connect(lambda: self.onCmykColorRasterRendererClicked(lyr))
+        try:
+            if lyr.bandCount() >= 3:
+                from cmykcolorrasterrendererapp import CmykColorRasterRendererApp
+                action = submenu.addAction(CmykColorRasterRendererApp.title())
+                action.setIcon(CmykColorRasterRendererApp.icon())
+                action.triggered.connect(lambda: self.onCmykColorRasterRendererClicked(lyr))
+        except Exception:
+            pass
 
-        if lyr.bandCount() >= 3:
-            from colorspaceexplorerapp import ColorSpaceExplorerApp
-            action = submenu.addAction(ColorSpaceExplorerApp.title())
-            action.setIcon(ColorSpaceExplorerApp.icon())
-            action.triggered.connect(lambda: self.onColorSpaceExplorerClicked(lyr))
+        try:
+            if lyr.bandCount() >= 3:
+                from colorspaceexplorerapp import ColorSpaceExplorerApp
+                action = submenu.addAction(ColorSpaceExplorerApp.title())
+                action.setIcon(ColorSpaceExplorerApp.icon())
+                action.triggered.connect(lambda: self.onColorSpaceExplorerClicked(lyr))
+        except Exception:
+            pass
 
-        if lyr.bandCount() >= 3:
-            from decorrelationstretchapp import DecorrelationStretchApp
-            action: QAction = submenu.addAction(DecorrelationStretchApp.title())
-            action.setIcon(DecorrelationStretchApp.icon())
-            action.triggered.connect(lambda: self.onDecorrelationStretchClicked(lyr))
+        try:
+            if lyr.bandCount() >= 3:
+                from decorrelationstretchapp import DecorrelationStretchApp
+                action: QAction = submenu.addAction(DecorrelationStretchApp.title())
+                action.setIcon(DecorrelationStretchApp.icon())
+                action.triggered.connect(lambda: self.onDecorrelationStretchClicked(lyr))
+        except Exception:
+            pass
 
-        if lyr.bandCount() >= 3:
-            from hsvcolorrasterrendererapp import HsvColorRasterRendererApp
-            action = submenu.addAction(HsvColorRasterRendererApp.title())
-            action.setIcon(HsvColorRasterRendererApp.icon())
-            action.triggered.connect(lambda: self.onHsvColorRasterRendererClicked(lyr))
+        try:
+            if lyr.bandCount() >= 3:
+                from hsvcolorrasterrendererapp import HsvColorRasterRendererApp
+                action = submenu.addAction(HsvColorRasterRendererApp.title())
+                action.setIcon(HsvColorRasterRendererApp.icon())
+                action.triggered.connect(lambda: self.onHsvColorRasterRendererClicked(lyr))
+        except Exception:
+            pass
 
-        if lyr.bandCount() >= 1:
-            from multisourcemultibandcolorrendererapp import MultiSourceMultiBandColorRendererApp
-            action = submenu.addAction(MultiSourceMultiBandColorRendererApp.title())
-            action.setIcon(MultiSourceMultiBandColorRendererApp.icon())
-            action.triggered.connect(lambda: self.onMultiSourceMultiBandColorRendererClicked(lyr))
+        try:
+            if lyr.bandCount() >= 1:
+                from multisourcemultibandcolorrendererapp import MultiSourceMultiBandColorRendererApp
+                action = submenu.addAction(MultiSourceMultiBandColorRendererApp.title())
+                action.setIcon(MultiSourceMultiBandColorRendererApp.icon())
+                action.triggered.connect(lambda: self.onMultiSourceMultiBandColorRendererClicked(lyr))
+        except Exception:
+            pass
 
-        if lyr.bandCount() >= 2:
-            from scatterplotapp import ScatterPlotApp
-            action = submenu.addAction(ScatterPlotApp.title())
-            action.setIcon(ScatterPlotApp.icon())
-            action.triggered.connect(lambda: self.onScatterPlotClicked(lyr))
+        try:
+            if lyr.bandCount() >= 2:
+                from scatterplotapp import ScatterPlotApp
+                action = submenu.addAction(ScatterPlotApp.title())
+                action.setIcon(ScatterPlotApp.icon())
+                action.triggered.connect(lambda: self.onScatterPlotClicked(lyr))
+        except Exception:
+            pass
 
         # add apply model shortcuts
         from enmapbox.gui.enmapboxgui import EnMAPBox
