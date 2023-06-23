@@ -216,7 +216,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                     feedback.setProgress(bandNo / reader.bandCount() * 100)
                     allNoData = np.all(
                         reader.array(
-                            yOffset=int(reader.height()/2), height=1,  # just check single image line
+                            yOffset=int(reader.height() / 2), height=1,  # just check single image line
                             bandList=[bandNo]
                         )[0] == reader.noDataValue(bandNo))
                     if allNoData:
