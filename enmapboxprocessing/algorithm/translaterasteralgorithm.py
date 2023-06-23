@@ -316,7 +316,6 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
             outGdalDataset = gdal.Open(filename)
 
             writer = RasterWriter(outGdalDataset)
-            reader = RasterReader(raster)
             if bandList is None:
                 bandList = range(1, reader.bandCount() + 1)
             metadata = reader.metadata()
@@ -367,11 +366,21 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                 outraster.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
                 del outraster
 
-            for bandNo in writer.bandNumbers():
-                writer.setOffset(offset, bandNo)
-                writer.setScale(scale, bandNo)
-
             driverShortName = writer.gdalDataset.GetDriver().ShortName
+            del writer, outGdalDataset
+
+            # need to re-open the raster before setting the scal/offset (issue #501)
+            outGdalDataset = gdal.Open(filename)
+            writer = RasterWriter(outGdalDataset)
+            for dstBandNo, srcBandNo in enumerate(bandList, 1):
+                if offset is None:
+                    writer.setOffset(reader.offset(srcBandNo), dstBandNo)
+                else:
+                    writer.setOffset(offset, dstBandNo)
+                if scale is None:
+                    writer.setScale(reader.scale(srcBandNo), dstBandNo)
+                else:
+                    writer.setScale(scale, dstBandNo)
             del writer, outGdalDataset
 
             if writeEnviHeader:
