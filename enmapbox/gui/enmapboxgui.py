@@ -81,6 +81,7 @@ from qgis.gui import QgsMapCanvas, QgisInterface, QgsMessageBar, QgsMessageViewe
     QgsSymbolWidgetContext
 from qgis.gui import QgsProcessingAlgorithmDialogBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog, \
     QgsNewVectorLayerDialog, QgsProcessingContextGenerator
+from .contextmenus import EnMAPBoxContextMenuProvider, EnMAPBoxContextMenuRegistry
 from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
 from .dataviews.docks import DockTypes
 from .mapcanvas import MapCanvas
@@ -442,6 +443,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.mMapToolMode = None
         self.mMessageBarItems = []
 
+        self.mContextMenuRegistry = EnMAPBoxContextMenuRegistry()
         def removeItem(item):
             if item in self.mMessageBarItems:
                 self.mMessageBarItems.remove(item)
@@ -2352,6 +2354,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
     def unregisterMapLayerConfigWidgetFactory(self, factory):
         self.iface.unregisterMapLayerConfigWidgetFactory(factory)
 
+    def registerContextMenuProvider(self, provider: EnMAPBoxContextMenuProvider):
+        self.mContextMenuProvider
     def vectorMenu(self):
         return QMenu()
 
