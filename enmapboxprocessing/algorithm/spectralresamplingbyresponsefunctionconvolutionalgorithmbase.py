@@ -137,11 +137,12 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
             blockSizeX = raster.width()
             for block in reader.walkGrid(blockSizeX, blockSizeY, feedback):
                 array = reader.arrayFromBlock(block)
-                outarray = self.resampleData(array, wavelength, responses, outputNoDataValue, feedback)
-                if outputNoDataValue is not None:
-                    marray = np.all(reader.maskArray(array), axis=0)
-                    for arr in outarray:
-                        arr[np.logical_not(marray)] = outputNoDataValue
+                marray = reader.maskArray(array)
+                outarray = self.resampleData(array, marray, wavelength, responses, outputNoDataValue, feedback)
+                #if outputNoDataValue is not None:
+                #    marray = np.all(reader.maskArray(array), axis=0)
+                #    for arr in outarray:
+                #        arr[np.logical_not(marray)] = outputNoDataValue
                 writer.writeArray(outarray, block.xOffset, block.yOffset)
 
             outputWavelength = list()
@@ -180,7 +181,7 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
 
     @staticmethod
     def resampleData(
-            array: Array3d, wavelength: List, responses: Dict[str, List[Tuple[int, float]]], noDataValue: float,
+            array: Array3d, marray: Array3d, wavelength: List, responses: Dict[str, List[Tuple[int, float]]], noDataValue: float,
             feedback: QgsProcessingFeedback
     ) -> Array3d:
         wavelength = [int(round(v)) for v in wavelength]
@@ -203,7 +204,19 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
                 feedback.pushWarning(message)
                 outarray.append(np.full_like(array[0], noDataValue, dtype=array[0].dtype))
             else:
-                weights = np.divide(weights, np.sum(weights))
-                outarray.append(np.average([array[i] for i in indices], 0, weights))
+                tmparray = np.asarray(array, np.float32)[indices]
+                tmpmarray = np.asarray(marray)[indices]
+                warray = np.array(weights).reshape((-1, 1, 1)) * np.ones_like(tmparray)
+                for tmparr, warr, marr in zip(tmparray, warray, tmpmarray):
+                    invalid = np.logical_not(marr)
+                    tmparr[invalid] = np.nan
+                    warr[invalid] = np.nan
+                outarr = np.nansum(tmparray * warray, 0) / np.nansum(warray, 0)
+                if np.nanmin(outarr) < -3000:
+                    a=1
+                outarr[np.isnan(outarr)] = noDataValue
+                outarray.append(outarr)
+
+                #outarray.append(np.average([array[i] for i in indices], 0, weights))
 
         return outarray
