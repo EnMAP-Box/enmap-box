@@ -48,3 +48,12 @@ class TestSpectralResamplingByResponseFunctionConvolutionAlgorithmBase(TestCase)
             }
             print(alg.displayName())
             self.runalg(alg, parameters)
+
+    def _test_issue490(self):
+        alg = SpectralResamplingToLandsat5Algorithm()
+        parameters = {
+            alg.P_RASTER: r'D:\data\sensors\enmap\ENMAP01-____L2A-DT0000004135_20221005T023547Z_010_V010106_20221014T102749Z\ENMAP01-____L2A-DT0000004135_20221005T023547Z_010_V010106_20221014T102749Z-SPECTRAL_IMAGE.vrt',
+            alg.P_OUTPUT_RASTER: self.filename('resampled.tif')
+        }
+        print(alg.displayName())
+        self.runalg(alg, parameters)
