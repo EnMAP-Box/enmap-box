@@ -139,7 +139,7 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
                 array = reader.arrayFromBlock(block)
                 marray = reader.maskArray(array)
                 outarray = self.resampleData(array, marray, wavelength, responses, outputNoDataValue, feedback)
-                #if outputNoDataValue is not None:
+                # if outputNoDataValue is not None:
                 #    marray = np.all(reader.maskArray(array), axis=0)
                 #    for arr in outarray:
                 #        arr[np.logical_not(marray)] = outputNoDataValue
@@ -181,7 +181,8 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
 
     @staticmethod
     def resampleData(
-            array: Array3d, marray: Array3d, wavelength: List, responses: Dict[str, List[Tuple[int, float]]], noDataValue: float,
+            array: Array3d, marray: Array3d, wavelength: List, responses: Dict[str, List[Tuple[int, float]]],
+            noDataValue: float,
             feedback: QgsProcessingFeedback
     ) -> Array3d:
         wavelength = [int(round(v)) for v in wavelength]
@@ -213,10 +214,10 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
                     warr[invalid] = np.nan
                 outarr = np.nansum(tmparray * warray, 0) / np.nansum(warray, 0)
                 if np.nanmin(outarr) < -3000:
-                    a=1
+                    a = 1
                 outarr[np.isnan(outarr)] = noDataValue
                 outarray.append(outarr)
 
-                #outarray.append(np.average([array[i] for i in indices], 0, weights))
+                # outarray.append(np.average([array[i] for i in indices], 0, weights))
 
         return outarray
