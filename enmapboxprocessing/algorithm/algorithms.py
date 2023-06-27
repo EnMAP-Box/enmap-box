@@ -50,8 +50,7 @@ from enmapboxprocessing.algorithm.fitnormalizeralgorithm import FitNormalizerAlg
 from enmapboxprocessing.algorithm.fitpcaalgorithm import FitPcaAlgorithm
 from enmapboxprocessing.algorithm.fitplsegressionalgorithm import FitPLSRegressionAlgorithm
 from enmapboxprocessing.algorithm.fitquantiletransformeralgorithm import FitQuantileTransformerAlgorithm
-from enmapboxprocessing.algorithm.fitrandomforestclassifieralgorithm import FitRandomForestClassifierAlgorithm, \
-    FitRandomForestClassifierAlgorithm4Modeler
+from enmapboxprocessing.algorithm.fitrandomforestclassifieralgorithm import FitRandomForestClassifierAlgorithm
 from enmapboxprocessing.algorithm.fitrandomforestregressoralgorithm import FitRandomForestRegressorAlgorithm
 from enmapboxprocessing.algorithm.fitrobustscaleralgorithm import FitRobustScalerAlgorithm
 from enmapboxprocessing.algorithm.fitsamalgorithm import FitSamAlgorithm
@@ -79,7 +78,6 @@ from enmapboxprocessing.algorithm.importprismal2calgorithm import ImportPrismaL2
 from enmapboxprocessing.algorithm.importprismal2dalgorithm import ImportPrismaL2DAlgorithm
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
 from enmapboxprocessing.algorithm.inversetransformrasteralgorithm import InverseTransformRasterAlgorithm
-from enmapboxprocessing.algorithm.issue1366_algorithm import MyAlgorithm
 from enmapboxprocessing.algorithm.layertomaskalgorithm import LayerToMaskAlgorithm
 from enmapboxprocessing.algorithm.mergeclassificationdatasetalgorithm import MergeClassificationDatasetsAlgorithm
 from enmapboxprocessing.algorithm.predictclassificationalgorithm import PredictClassificationAlgorithm
@@ -254,7 +252,7 @@ def algorithms():
         FitGenericRegressorAlgorithm(),
         FitLinearSvcAlgorithm(),
         FitLogisticRegressionAlgorithm(),
-        FitRandomForestClassifierAlgorithm(), FitRandomForestClassifierAlgorithm4Modeler(),
+        FitRandomForestClassifierAlgorithm(),
         FitSamAlgorithm(),
         FitSvcRbfAlgorithm(),
         FitSvcPolyAlgorithm(),
@@ -408,8 +406,5 @@ def algorithms():
         VrtBandMathAlgorithm(),
         WriteEnviHeaderAlgorithm()
     ]
-
-    if False:
-        algos.append(MyAlgorithm())
 
     return algos

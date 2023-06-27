@@ -55,15 +55,12 @@ class Utils(object):
             return np.uint16
         elif dataType == Qgis.DataType.UInt32:
             return np.uint32
+        elif dataType == Qgis.DataType.ARGB32:
+            return np.uint32
         elif dataType == Qgis.DataType.ARGB32_Premultiplied:
             return np.uint32
         else:
             raise ValueError(f'unsupported data type: {dataType}')
-
-    @staticmethod
-    def gdalDataTypeToNumpyDataType(dataType: GdalDataType) -> NumpyDataType:
-        qgisDataType = Utils.gdalDataTypeToQgisDataType(dataType)
-        return Utils.qgisDataTypeToNumpyDataType(qgisDataType)
 
     @staticmethod
     def qgisDataTypeToGdalDataType(dataType: Optional[Qgis.DataType]) -> Optional[int]:
@@ -87,8 +84,42 @@ class Utils(object):
             raise ValueError(f'unsupported data type: {dataType}')
 
     @staticmethod
+    def gdalDataTypeToNumpyDataType(dataType: Optional[int]) -> Optional[NumpyDataType]:
+        if dataType == gdal.GDT_Byte:
+            return np.uint8
+        elif dataType == gdal.GDT_Float32:
+            return np.float32
+        elif dataType == gdal.GDT_Float64:
+            return np.float64
+        elif dataType == gdal.GDT_Int16:
+            return np.int16
+        elif dataType == gdal.GDT_Int32:
+            return np.int32
+        elif dataType == gdal.GDT_UInt16:
+            return np.uint16
+        elif dataType == gdal.GDT_UInt32:
+            return np.uint32
+        else:
+            raise ValueError(f'unsupported data type: {dataType}')
+
     def qgisDataTypeName(dataType: Qgis.DataType) -> str:
-        return str(dataType).split('.')[1]
+        typeNameMap = {
+            Qgis.DataType.UnknownDataType: 'UnknownDataType',
+            Qgis.DataType.Byte: 'Byte',
+            Qgis.DataType.UInt16: 'UInt16',
+            Qgis.DataType.Int16: 'Int16',
+            Qgis.DataType.UInt32: 'UInt32',
+            Qgis.DataType.Int32: 'Int32',
+            Qgis.DataType.Float32: 'Float32',
+            Qgis.DataType.Float64: 'Float64',
+            Qgis.DataType.CInt16: 'CInt16',
+            Qgis.DataType.CInt32: 'CInt32',
+            Qgis.DataType.CFloat32: 'CFloat32',
+            Qgis.DataType.CFloat64: 'CFloat64',
+            Qgis.DataType.ARGB32: 'ARGB32',
+            Qgis.DataType.ARGB32_Premultiplied: 'ARGB32_Premultiplied'
+        }
+        return typeNameMap[dataType]
 
     @staticmethod
     def gdalResampleAlgName(resampleAlg: GdalResamplingAlgorithm) -> str:
