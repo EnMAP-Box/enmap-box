@@ -24,8 +24,6 @@ import typing
 import warnings
 from typing import Optional, Dict, Union, Any, List
 
-from enmapbox.typeguard import typechecked
-
 import enmapbox
 import enmapbox.gui.datasources.manager
 import qgis.utils
@@ -42,6 +40,7 @@ from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprofilesources import Sp
     MapCanvasLayerProfileSource
 from enmapbox.qgispluginsupport.qps.subdatasets import SubDatasetSelectionDialog
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, loadUi, SpatialExtent, file_search
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.importdesisl1balgorithm import ImportDesisL1BAlgorithm
 from enmapboxprocessing.algorithm.importdesisl1calgorithm import ImportDesisL1CAlgorithm
 from enmapboxprocessing.algorithm.importdesisl2aalgorithm import ImportDesisL2AAlgorithm
@@ -81,7 +80,7 @@ from qgis.gui import QgsMapCanvas, QgisInterface, QgsMessageBar, QgsMessageViewe
     QgsSymbolWidgetContext
 from qgis.gui import QgsProcessingAlgorithmDialogBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog, \
     QgsNewVectorLayerDialog, QgsProcessingContextGenerator
-from .contextmenus import EnMAPBoxContextMenuProvider, EnMAPBoxContextMenuRegistry
+from .contextmenus import EnMAPBoxContextMenuRegistry
 from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
 from .dataviews.docks import DockTypes
 from .mapcanvas import MapCanvas
@@ -443,7 +442,6 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.mMapToolMode = None
         self.mMessageBarItems = []
 
-        self.mContextMenuRegistry = EnMAPBoxContextMenuRegistry()
         def removeItem(item):
             if item in self.mMessageBarItems:
                 self.mMessageBarItems.remove(item)
@@ -2354,8 +2352,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
     def unregisterMapLayerConfigWidgetFactory(self, factory):
         self.iface.unregisterMapLayerConfigWidgetFactory(factory)
 
-    def registerContextMenuProvider(self, provider: EnMAPBoxContextMenuProvider):
-        self.mContextMenuProvider
+    def contexMenuProviderRegistry(self) -> EnMAPBoxContextMenuRegistry:
+        return self.mContextMenuRegistry
+
     def vectorMenu(self):
         return QMenu()
 
