@@ -485,7 +485,7 @@ class DockManager(QObject):
     def __init__(self):
         QObject.__init__(self)
         self.mConnectedDockAreas = []
-        self.mDocks = list()
+        self.mDocks: List[Dock] = list()
         self.mDataSourceManager: Optional[DataSourceManager] = None
         self.mMessageBar: QgsMessageBar = Optional[None]
         self.mProject: QgsProject = QgsProject.instance()
@@ -508,6 +508,8 @@ class DockManager(QObject):
         self.mEnMAPBoxInstance = enmapBox
         self.mEnMAPBoxInstance.project().layersWillBeRemoved.connect(self.onLayersWillBeRemoved)
         self.mProject = self.mEnMAPBoxInstance.project()
+        for d in self.mDocks:
+            d.setEnMAPBox(enmapBox)
 
     def enmapBoxInstance(self) -> Optional['EnMAPBox']:  # noqa: F821
         return self.mEnMAPBoxInstance
@@ -717,6 +719,7 @@ class DockManager(QObject):
         dock = None
         if issubclass(cls, MapDock):  # allow subclasses
             dock = cls(*args, **kwds)
+
             if isinstance(self.mDataSourceManager, DataSourceManager):
                 dock.sigLayersAdded.connect(self.mDataSourceManager.addDataSources)
 
@@ -767,6 +770,7 @@ class DockManager(QObject):
         else:
             raise Exception('Unknown dock type: {}'.format(dockType))
         # dock.setParent(dockArea)
+        dock.setEnMAPBox(self.enmapBoxInstance())
         dockArea.addDock(dock, *args, position=position, relativeTo=relativeTo, **kwds)
         dock.setVisible(True)
 
@@ -1533,7 +1537,7 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         self.mDockTreeView: DockTreeView = treeView
         # self.mSignals = DockManagerLayerTreeModelMenuProvider.Signals()
 
-    def enmapboxInstance(self):
+    def enmapboxInstance(self) -> 'EnMAPBox':
         return self.mDockTreeView.enmapBoxInstance()
 
     def createContextMenu(self):
@@ -1550,6 +1554,8 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
 
         menu = QMenu()
         menu.setToolTipsVisible(True)
+
+        enmapBox = self.enmapboxInstance()
 
         lyr: QgsMapLayer = None
         canvas: QgsMapCanvas = None

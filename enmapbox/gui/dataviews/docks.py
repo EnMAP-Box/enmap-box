@@ -21,7 +21,6 @@ import codecs
 import os
 import re
 import uuid
-import warnings
 from math import ceil
 from typing import List
 
@@ -74,10 +73,8 @@ class Dock(pgDock):
 
     def __init__(self, name='Data View', closable=True, *args, **kwds):
         super().__init__(name=name, closable=closable, *args, **kwds)
-        # KeepRefs.__init__(self)
-        # ssert enmapboxInstance is not None
-        # self.enmapbox = enmapboxInstance
-        # self.setStyleSheet('background:#FFF')
+
+        self.mEnMAPBox = None
 
         # replace PyQtGraph Label by EnmapBox labels (could be done by inheritances as well)
         title = self.title()
@@ -133,26 +130,13 @@ class Dock(pgDock):
             self.widgetArea.setStyleSheet(self.hStyle)
         self.topLayout.update()
 
-    def contextMenu(self, menu: QMenu = None):
-        warnings.warn('Use populateContextMenu instead', DeprecationWarning)
-        self.populateContextMenu(menu)
-        return menu
-
     def populateContextMenu(self, menu: QMenu) -> QMenu:
         """
         implement this to return a QMenu with context menu properties for this dock.
         :return: None or QMenu
         """
-        assert isinstance(menu, QMenu)
-        if self.isVisible():
-            a = menu.addAction('Hide View')
-            a.triggered.connect(lambda: self.setVisible(False))
-        else:
-            a = menu.addAction('Show View')
-            a.triggered.connect(lambda: self.setVisible(True))
-
-        a = menu.addAction('Close View')
-        a.triggered.connect(lambda: self.close())
+        from enmapbox.gui.contextmenus import populateDataViewContextMenu
+        populateDataViewContextMenu(menu, self)
         return menu
 
     sigVisibilityChanged = pyqtSignal(bool)
@@ -188,6 +172,12 @@ class Dock(pgDock):
         style = ' \n{} {{\n{}\n}} '.format(obj_name, stylestr)
         self.hStyle += style
         self.vStyle += style
+
+    def setEnMAPBox(self, enmapBox: 'EnMAPBox'):
+        self.mEnMAPBox = enmapBox
+
+    def enmapBox(self) -> 'EnMAPBox':
+        return self.mEnMAPBox
 
     def addTempArea(self):
         if self.home is None:
@@ -950,7 +940,6 @@ class MapDock(Dock):
         :return: QMenu
         """
         super(MapDock, self).populateContextMenu(menu)
-
         self.mCanvas.populateContextMenu(menu, None)
         return menu
 
