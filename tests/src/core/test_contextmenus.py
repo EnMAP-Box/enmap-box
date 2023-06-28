@@ -1,3 +1,5 @@
+from PyQt5.QtCore import QPoint
+
 from qgis.PyQt.QtCore import QEvent, Qt, QPointF
 from qgis.PyQt.QtGui import QMouseEvent
 from qgis.PyQt.QtWidgets import QMenu
@@ -55,7 +57,7 @@ class test_applications(EnMAPBoxTestCase):
             self.assertIsInstance(menu, QMenu)
             self.assertIsInstance(canvas, MapCanvas)
             self.assertIsInstance(point, QgsPointXY)
-            self.assertEqual(pos, QPointF)
+            self.assertIsInstance(pos, QPoint)
 
         provider.mCallbackMapCanvas = callback1
         canvas.mousePressEvent(event)
@@ -70,6 +72,18 @@ class test_applications(EnMAPBoxTestCase):
 
         provider.mCallbackDataView = callback2
         mapDock.populateContextMenu(m)
+
+        m = QMenu()
+
+        def callback3(menu, view):
+            self.assertEqual(menu, m)
+            self.assertEqual(view, eb.dataSourceManagerTreeView())
+
+        provider.mCallbackDataSource = callback3
+
+        eb.dataSourceManagerTreeView()
+
+        EnMAPBoxContextMenuRegistry.instance().removeProvider(provider)
 
         self.showGui(eb.ui)
         eb.close()
