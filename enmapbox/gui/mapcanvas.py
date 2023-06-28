@@ -978,10 +978,8 @@ class MapCanvas(QgsMapCanvas):
 
         pointGeo = mapSettings.mapToPixel().toMapCoordinates(pos.x(), pos.y())
         assert isinstance(pointGeo, QgsPointXY)
-        spatialPoint = SpatialPoint(mapSettings.destinationCrs(), pointGeo)
-
-        from enmapbox.gui.contextmenus import populateMapCanvasContextMenu
-        success, errors = populateMapCanvasContextMenu(menu, self, pos, pointGeo)
+        from enmapbox.gui.contextmenus import EnMAPBoxContextMenuRegistry
+        EnMAPBoxContextMenuRegistry.instance().populateMapCanvasMenu(menu, self, pos, pointGeo)
         return menu
 
     def clearLayers(self, *args):

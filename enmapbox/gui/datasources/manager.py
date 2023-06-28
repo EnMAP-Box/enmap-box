@@ -30,6 +30,7 @@ from enmapbox.typeguard import typechecked
 from .datasources import DataSource, SpatialDataSource, VectorDataSource, RasterDataSource, \
     ModelDataSource, FileDataSource, LayerItem
 from .metadata import RasterBandTreeNode
+from ..contextmenus import EnMAPBoxContextMenuRegistry
 from ..dataviews.docks import Dock
 from ..mapcanvas import MapCanvas
 from ..mimedata import MDF_URILIST, QGIS_URILIST_MIMETYPE, extractMapLayers, fromDataSourceList
@@ -397,219 +398,21 @@ class DataSourceManagerTreeView(TreeView):
         Creates and shows the context menu created with a right-mouse-click.
         :param event: QContextMenuEvent
         """
-        from enmapboxprocessing.algorithm.subsetrasterbandsalgorithm import SubsetRasterBandsAlgorithm
-        from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
-        from enmapboxprocessing.algorithm.writeenviheaderalgorithm import WriteEnviHeaderAlgorithm
 
         idx = self.currentIndex()
         assert isinstance(event, QContextMenuEvent)
 
         col = idx.column()
 
-        selectedNodes = self.selectedNodes()
+
         node = self.selectedNode()
-        dataSources = self.selectedDataSources()
-        srcURIs = list(set([s.source() for s in dataSources]))
-
-        from enmapbox.gui.enmapboxgui import EnMAPBox
-
-        DSM: DataSourceManager = self.dataSourceManager()
-        if not isinstance(DSM, DataSourceManager):
-            return
-
-        enmapbox: EnMAPBox = self.enmapboxInstance()
-        mapDocks = []
-        if isinstance(enmapbox, EnMAPBox):
-            mapDocks = enmapbox.dockManager().docks('MAP')
 
         m: QMenu = QMenu()
         m.setToolTipsVisible(True)
 
-        aRemove = m.addAction('Remove')
-        if isinstance(node, DataSourceSet):
-            assert isinstance(aRemove, QAction)
-            aRemove.setToolTip('Removes all datasources from this node')
-            aRemove.triggered.connect(lambda *args, n=node, dsm=DSM:
-                                      DSM.removeDataSources(n.dataSources()))
+        EnMAPBoxContextMenuRegistry.instance().populateDataSourceMenu(m, self)
 
-        elif isinstance(node, DataSource):
-            aRemove.triggered.connect(lambda *args, ds=dataSources, dsm=DSM:
-                                      dsm.removeDataSources(ds))
-            aCopy = m.addAction('Copy URI / path')
-            aCopy.triggered.connect(lambda *args, u=srcURIs:
-                                    QApplication.clipboard().setText('\n'.join(u)))
-
-            a: QAction = m.addAction('Open in Explorer')
-            a.setIcon(QIcon(':/images/themes/default/mIconFolderOpen.svg'))
-            if not exists(node.source()):
-                a.setDisabled(True)
-            a.triggered.connect(lambda *args, src=node: self.onOpenInExplorer(src))
-
-            # todo: implement rename function
-
-            def appendRasterActions(subMenu: QMenu, src: RasterDataSource, target):
-                assert isinstance(src, RasterDataSource)
-                subAction = subMenu.addAction('Default Colors')
-                subAction.triggered.connect(lambda *args, s=src, t=target:
-                                            self.openInMap(s, t, rgb='DEFAULT'))
-
-                b = src.mWavelengthUnits is not None
-
-                subAction = subMenu.addAction('True Color')
-                subAction.setToolTip('Red-Green-Blue true colors')
-                subAction.triggered.connect(lambda *args, s=src, t=target:
-                                            self.openInMap(s, t, rgb='R,G,B'))
-                subAction.setEnabled(b)
-                subAction = subMenu.addAction('CIR')
-                subAction.setToolTip('nIR Red Green')
-                subAction.triggered.connect(lambda *args, s=src, t=target:
-                                            self.openInMap(s, t, rgb='NIR,R,G'))
-                subAction.setEnabled(b)
-
-                subAction = subMenu.addAction('SWIR')
-                subAction.setToolTip('nIR swIR Red')
-                subAction.triggered.connect(lambda *args, s=src, t=target:
-                                            self.openInMap(s, t, rgb='NIR,SWIR,R'))
-                subAction.setEnabled(b)
-
-                from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
-                subMenu2 = subMenu.addMenu('GEE Data Catalog plugin')
-                for name, shortNames in CreateSpectralIndicesAlgorithm.sentinel2Visualizations().items():
-                    longNames = [CreateSpectralIndicesAlgorithm.LongNameMapping[shortName] for shortName in shortNames]
-                    wavelengths = [f'{CreateSpectralIndicesAlgorithm.WavebandMapping[shortName][0]} nm'
-                                   for shortName in shortNames]
-                    subAction = subMenu2.addAction(name + f' ({" - ".join(wavelengths)})')
-                    subAction.setToolTip(' - '.join(longNames))
-                    subAction.triggered.connect(lambda *args, s=src, t=target, rgb=name: self.openInMap(s, t, rgb=rgb))
-                    subAction.setEnabled(b)
-
-            if isinstance(node, RasterDataSource):
-                sub = m.addMenu('Open in new map...')
-                appendRasterActions(sub, node, None)
-
-                sub = m.addMenu('Open in existing map...')
-                if len(mapDocks) > 0:
-                    for mapDock in mapDocks:
-                        from ..dataviews.docks import MapDock
-                        assert isinstance(mapDock, MapDock)
-                        subsub = sub.addMenu(mapDock.title())
-                        appendRasterActions(subsub, node, mapDock)
-                else:
-                    sub.setEnabled(False)
-                sub = m.addMenu('Open in QGIS')
-                if isinstance(qgis.utils.iface, QgisInterface):
-                    appendRasterActions(sub, node, QgsProject.instance())
-                else:
-                    sub.setEnabled(False)
-
-                # AR: add some useful processing algo shortcuts
-                a: QAction = m.addAction('Save as')
-                a.setIcon(QIcon(':/images/themes/default/mActionFileSaveAs.svg'))
-                a.triggered.connect(lambda *args, src=node: self.onSaveAs(src))
-
-                parameters = {TranslateRasterAlgorithm.P_RASTER: node.source()}
-                a: QAction = m.addAction('Translate')
-                a.setIcon(QIcon(':/images/themes/default/mActionFileSaveAs.svg'))
-                a.triggered.connect(
-                    lambda src: EnMAPBox.instance().showProcessingAlgorithmDialog(
-                        TranslateRasterAlgorithm(), parameters, parent=self
-                    )
-                )
-
-                parameters = {SubsetRasterBandsAlgorithm.P_RASTER: node.source()}
-                a: QAction = m.addAction('Subset bands')
-                a.setIcon(QIcon(':/images/themes/default/mActionFileSaveAs.svg'))
-                a.triggered.connect(
-                    lambda src: EnMAPBox.instance().showProcessingAlgorithmDialog(
-                        SubsetRasterBandsAlgorithm(), parameters, parent=self
-                    )
-                )
-
-                if splitext(node.source())[1].lower() in ['.tif', '.tiff', '.bsq', '.bil', '.bip']:
-                    parameters = {WriteEnviHeaderAlgorithm.P_RASTER: node.source()}
-                    a: QAction = m.addAction('Create/update ENVI header')
-                    a.setIcon(QIcon(':/images/themes/default/mActionFileSaveAs.svg'))
-                    a.triggered.connect(
-                        lambda src: EnMAPBox.instance().showProcessingAlgorithmDialog(
-                            WriteEnviHeaderAlgorithm(), parameters, parent=self
-                        )
-                    )
-
-            elif isinstance(node, VectorDataSource):
-
-                if node.geometryType() not in [QgsWkbTypes.NullGeometry, QgsWkbTypes.UnknownGeometry]:
-                    a = m.addAction('Open in new map')
-                    a.triggered.connect(lambda *args, s=node: self.openInMap(s, None))
-
-                    sub = m.addMenu('Open in existing map...')
-                    if len(mapDocks) > 0:
-                        for mapDock in mapDocks:
-                            from ..dataviews.docks import MapDock
-                            assert isinstance(mapDock, MapDock)
-                            a = sub.addAction(mapDock.title())
-                            a.triggered.connect(
-                                lambda checked, s=node, d=mapDock:
-                                self.openInMap(s, d))
-                    else:
-                        sub.setEnabled(False)
-
-                a = m.addAction('Open Spectral Library Viewer')
-                a.triggered.connect(
-                    lambda *args, s=node: self.openInSpeclibEditor(node.asMapLayer()))
-
-                a = m.addAction('Open Attribute Table')
-                a.triggered.connect(lambda *args, s=node: self.openInAttributeEditor(s.asMapLayer()))
-
-                a = m.addAction('Open in QGIS')
-                if isinstance(qgis.utils.iface, QgisInterface):
-                    a.triggered.connect(lambda *args, s=node:
-                                        self.openInMap(s, QgsProject.instance()))
-
-                a: QAction = m.addAction('Save as')
-                a.setIcon(QIcon(':/images/themes/default/mActionFileSaveAs.svg'))
-                a.triggered.connect(lambda *args, src=node: self.onSaveAs(src))
-
-            elif isinstance(node, ModelDataSource):
-                a = m.addAction('View as JSON')
-                a.setIcon(QIcon(':/images/themes/default/mIconFieldJson.svg'))
-                a.triggered.connect(lambda *args, node=node: self.onViewPklAsJson(node))
-
-        elif isinstance(node, RasterBandTreeNode):
-            # a = m.addAction('Band statistics')
-            # a.setEnabled(False)
-            # todo: AR call band stats dialog here
-            # similar to:
-            # a.triggered.connect(lambda: self.runImageStatistics(lyr))
-            # See issue #792. Will be implemented for v3.10
-
-            a = m.addAction('Open in new map')
-            a.triggered.connect(lambda *args, n=node: self.openInMap(n.rasterSource(), rgb=[n.bandIndex()]))
-
-            sub = m.addMenu('Open in existing map...')
-            if len(mapDocks) > 0:
-                for mapDock in mapDocks:
-                    from ..dataviews.docks import MapDock
-                    assert isinstance(mapDock, MapDock)
-                    a = sub.addAction(mapDock.title())
-                    a.node = node
-                    a.mapCanvas = mapDock.mapCanvas()
-                    a.triggered.connect(self.onOpenBandInExistingMap)
-            else:
-                sub.setEnabled(False)
-        else:
-            aRemove.setEnabled(False)
-
-        if col == 1 and node.value() is not None:
-            a = m.addAction('Copy')
-            a.triggered.connect(lambda *args, n=node: self.copyNodeValue(n))
-
-        if isinstance(node, TreeNode):
-            node.populateContextMenu(m)
-
-        a = m.addAction('Remove all DataSources')
-        a.setToolTip('Removes all data source.')
-        a.triggered.connect(self.onRemoveAllDataSources)
-
+        # backward compatibility, will be removed
         self.sigPopulateContextMenu.emit(m, node)
 
         m.exec_(self.viewport().mapToGlobal(event.pos()))
