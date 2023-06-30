@@ -15,9 +15,7 @@ from enmapbox.gui.datasources.manager import DataSourceManager, DataSourceManage
 from enmapbox.gui.datasources.metadata import RasterBandTreeNode
 from enmapbox.gui.dataviews.docks import Dock, MapDock
 from enmapbox.gui.mapcanvas import MapCanvas, CanvasLink
-from qgis._core import QgsMessageLog, Qgis
-
-from qgis.core import QgsWkbTypes, QgsPointXY, QgsRasterLayer, QgsMapLayerProxyModel, \
+from qgis.core import QgsWkbTypes, QgsPointXY, QgsRasterLayer, QgsMapLayerProxyModel, QgsMessageLog, Qgis, \
     QgsProject, QgsLayerTree, QgsVectorLayer, QgsLayerTreeNode, QgsMapLayer, QgsLayerTreeLayer, QgsLayerTreeGroup
 
 from qgis.gui import QgsMapCanvas, QgisInterface, QgsMapLayerComboBox
