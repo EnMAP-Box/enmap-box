@@ -1,22 +1,31 @@
-from os.path import exists
+from os.path import exists, splitext
+from typing import List, Union
 
-from PyQt5.QtCore import QObject, QPoint
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMenu, QWidgetAction, QApplication, QAction
+from enmapbox import messageLog
+from enmapbox.gui.dataviews.dockmanager import DockTreeNode, MapDockTreeNode, DockManagerLayerTreeModelMenuProvider, \
+    DockTreeView, LayerTreeNode
+from qgis.PyQt.QtCore import Qt, QObject, QPoint, QModelIndex
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QMenu, QWidgetAction, QApplication, QAction
 
 from enmapbox.gui.contextmenus import EnMAPBoxAbstractContextMenuProvider
-from enmapbox.gui.datasources.datasources import DataSource, RasterDataSource
+from enmapbox.gui.datasources.datasources import DataSource, RasterDataSource, VectorDataSource, ModelDataSource
 from enmapbox.gui.datasources.datasourcesets import DataSourceSet
 from enmapbox.gui.datasources.manager import DataSourceManager, DataSourceManagerTreeView
+from enmapbox.gui.datasources.metadata import RasterBandTreeNode
 from enmapbox.gui.dataviews.docks import Dock, MapDock
 from enmapbox.gui.mapcanvas import MapCanvas, CanvasLink
-from qgis.core import QgsPointXY, QgsRasterLayer, QgsMapLayerProxyModel, QgsProject, QgsLayerTree, QgsVectorLayer
+from qgis._core import QgsMessageLog, Qgis
 
-from qgis.gui import QgisInterface, QgsMapLayerComboBox
+from qgis.core import QgsWkbTypes, QgsPointXY, QgsRasterLayer, QgsMapLayerProxyModel, \
+    QgsProject, QgsLayerTree, QgsVectorLayer, QgsLayerTreeNode, QgsMapLayer, QgsLayerTreeLayer, QgsLayerTreeGroup
 
-from qps.crosshair.crosshair import CrosshairDialog
-from qps.speclib.gui.spectrallibraryplotwidget import SpectralProfilePlotModel
-from qps.utils import qgisAppQgisInterface, SpatialPoint, SpatialExtent
+from qgis.gui import QgsMapCanvas, QgisInterface, QgsMapLayerComboBox
+import qgis.utils
+from enmapbox.qgispluginsupport.qps.crosshair.crosshair import CrosshairDialog
+from enmapbox.qgispluginsupport.qps.models import TreeNode
+from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibraryplotwidget import SpectralProfilePlotModel
+from enmapbox.qgispluginsupport.qps.utils import qgisAppQgisInterface, SpatialPoint, SpatialExtent, findParent
 
 
 class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
@@ -90,9 +99,9 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
         rasterLayers = [lyr for lyr in mapCanvas.layers() if isinstance(lyr, QgsRasterLayer) and lyr.isValid()]
 
         def onShowRasterGrid(layer: QgsRasterLayer):
-            self.mCrosshairItem.setVisibility(True)
-            self.mCrosshairItem.crosshairStyle().setShowPixelBorder(True)
-            self.mCrosshairItem.setRasterGridLayer(layer)
+            mapCanvas.mCrosshairItem.setVisibility(True)
+            mapCanvas.mCrosshairItem.crosshairStyle().setShowPixelBorder(True)
+            mapCanvas.mCrosshairItem.setRasterGridLayer(layer)
 
         actionTop = mPxGrid.addAction('Top Raster')
         actionBottom = mPxGrid.addAction('Bottom Raster')
@@ -202,13 +211,15 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
 
     def populateDataSourceMenu(self,
                                menu: QMenu,
-                               treeView: DataSourceManagerTreeView):
+                               treeView: DataSourceManagerTreeView,
+                               selectedNodes: List[Union[DataSourceSet, DataSource]]):
 
-        node = treeView.selectedNode()
-        dataSources = treeView.selectedDataSources()
+        dataSources = [n for n in selectedNodes if isinstance(n, DataSource)]
+        srcURIs = [ds.source() for ds in dataSources]
+        node = selectedNodes[0]
         from enmapbox.gui.enmapboxgui import EnMAPBox
-        enmapbox: EnMAPBox = treeView.enmapboxInstance()
-
+        enmapbox: EnMAPBox = self.enmapBox()
+        col = treeView.currentIndex().column()
         DSM: DataSourceManager = self.enmapBox().dataSourceManager()
         if not isinstance(DSM, DataSourceManager):
             return
@@ -234,7 +245,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
             a: QAction = menu.addAction('Open in Explorer')
             a.setIcon(QIcon(':/images/themes/default/mIconFolderOpen.svg'))
             a.setEnabled(exists(node.source()))
-            a.triggered.connect(lambda *args, src=node: self.onOpenInExplorer(src))
+            a.triggered.connect(lambda *args, src=node: treeView.onOpenInExplorer(src))
 
             # todo: implement rename function
 
@@ -242,7 +253,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                 assert isinstance(src, RasterDataSource)
                 subAction = subMenu.addAction('Default Colors')
                 subAction.triggered.connect(lambda *args, s=src, t=target:
-                                            self.openInMap(s, t, rgb='DEFAULT'))
+                                            treeView.openInMap(s, t, rgb='DEFAULT'))
 
                 b = src.mWavelengthUnits is not None
 
@@ -283,7 +294,6 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                 self.enmapBox()
                 if len(mapDocks) > 0:
                     for mapDock in mapDocks:
-
                         assert isinstance(mapDock, MapDock)
                         subsub = sub.addMenu(mapDock.title())
                         appendRasterActions(subsub, node, mapDock)
@@ -291,6 +301,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                     SpectralProfilePlotModel
                     sub.setEnabled(False)
                 sub = menu.addMenu('Open in QGIS')
+
                 if isinstance(qgis.utils.iface, QgisInterface):
                     appendRasterActions(sub, node, QgsProject.instance())
                 else:
@@ -303,14 +314,14 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                 # AR: add some useful processing algo shortcuts
                 a: QAction = menu.addAction('Save as')
                 a.setIcon(QIcon(':/images/themes/default/mActionFileSaveAs.svg'))
-                a.triggered.connect(lambda *args, src=node: self.onSaveAs(src))
+                a.triggered.connect(lambda *args, src=node: treeView.onSaveAs(src))
 
                 parameters = {TranslateRasterAlgorithm.P_RASTER: node.source()}
                 a: QAction = menu.addAction('Translate')
                 a.setIcon(QIcon(':/images/themes/default/mActionFileSaveAs.svg'))
                 a.triggered.connect(
                     lambda src: EnMAPBox.instance().showProcessingAlgorithmDialog(
-                        TranslateRasterAlgorithm(), parameters, parent=self
+                        TranslateRasterAlgorithm(), parameters, parent=treeView
                     )
                 )
 
@@ -319,30 +330,29 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                 a.setIcon(QIcon(':/images/themes/default/mActionFileSaveAs.svg'))
                 a.triggered.connect(
                     lambda src: EnMAPBox.instance().showProcessingAlgorithmDialog(
-                        SubsetRasterBandsAlgorithm(), parameters, parent=self
+                        SubsetRasterBandsAlgorithm(), parameters, parent=treeView
                     )
                 )
 
                 if splitext(node.source())[1].lower() in ['.tif', '.tiff', '.bsq', '.bil', '.bip']:
                     parameters = {WriteEnviHeaderAlgorithm.P_RASTER: node.source()}
-                    a: QAction = m.addAction('Create/update ENVI header')
+                    a: QAction = menu.addAction('Create/update ENVI header')
                     a.setIcon(QIcon(':/images/themes/default/mActionFileSaveAs.svg'))
                     a.triggered.connect(
                         lambda src: EnMAPBox.instance().showProcessingAlgorithmDialog(
-                            WriteEnviHeaderAlgorithm(), parameters, parent=self
+                            WriteEnviHeaderAlgorithm(), parameters, parent=treeView
                         )
                     )
 
             elif isinstance(node, VectorDataSource):
 
                 if node.geometryType() not in [QgsWkbTypes.NullGeometry, QgsWkbTypes.UnknownGeometry]:
-                    a = m.addAction('Open in new map')
-                    a.triggered.connect(lambda *args, s=node: self.openInMap(s, None))
+                    a = menu.addAction('Open in new map')
+                    a.triggered.connect(lambda *args, s=node: treeView.openInMap(s, None))
 
-                    sub = m.addMenu('Open in existing map...')
+                    sub = menu.addMenu('Open in existing map...')
                     if len(mapDocks) > 0:
                         for mapDock in mapDocks:
-                            from ..dataviews.docks import MapDock
                             assert isinstance(mapDock, MapDock)
                             a = sub.addAction(mapDock.title())
                             a.triggered.connect(
@@ -351,24 +361,24 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                     else:
                         sub.setEnabled(False)
 
-                a = m.addAction('Open Spectral Library Viewer')
+                a = menu.addAction('Open Spectral Library Viewer')
                 a.triggered.connect(
                     lambda *args, s=node: self.openInSpeclibEditor(node.asMapLayer()))
 
-                a = m.addAction('Open Attribute Table')
+                a = menu.addAction('Open Attribute Table')
                 a.triggered.connect(lambda *args, s=node: self.openInAttributeEditor(s.asMapLayer()))
 
-                a = m.addAction('Open in QGIS')
+                a = menu.addAction('Open in QGIS')
                 if isinstance(qgis.utils.iface, QgisInterface):
                     a.triggered.connect(lambda *args, s=node:
                                         self.openInMap(s, QgsProject.instance()))
 
-                a: QAction = m.addAction('Save as')
+                a: QAction = menu.addAction('Save as')
                 a.setIcon(QIcon(':/images/themes/default/mActionFileSaveAs.svg'))
                 a.triggered.connect(lambda *args, src=node: self.onSaveAs(src))
 
             elif isinstance(node, ModelDataSource):
-                a = m.addAction('View as JSON')
+                a = menu.addAction('View as JSON')
                 a.setIcon(QIcon(':/images/themes/default/mIconFieldJson.svg'))
                 a.triggered.connect(lambda *args, node=node: self.onViewPklAsJson(node))
 
@@ -380,36 +390,45 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
             # a.triggered.connect(lambda: self.runImageStatistics(lyr))
             # See issue #792. Will be implemented for v3.10
 
-            a = m.addAction('Open in new map')
-            a.triggered.connect(lambda *args, n=node: self.openInMap(n.rasterSource(), rgb=[n.bandIndex()]))
+            a = menu.addAction('Open in new map')
+            a.triggered.connect(lambda *args, n=node: treeView.openInMap(n.rasterSource(), rgb=[n.bandIndex()]))
 
-            sub = m.addMenu('Open in existing map...')
+            sub = menu.addMenu('Open in existing map...')
             if len(mapDocks) > 0:
                 for mapDock in mapDocks:
-                    from ..dataviews.docks import MapDock
                     assert isinstance(mapDock, MapDock)
                     a = sub.addAction(mapDock.title())
                     a.node = node
                     a.mapCanvas = mapDock.mapCanvas()
-                    a.triggered.connect(self.onOpenBandInExistingMap)
+                    a.triggered.connect(treeView.onOpenBandInExistingMap)
             else:
                 sub.setEnabled(False)
         else:
             aRemove.setEnabled(False)
 
         if col == 1 and node.value() is not None:
-            a = m.addAction('Copy')
-            a.triggered.connect(lambda *args, n=node: self.copyNodeValue(n))
+            a = menu.addAction('Copy')
+            a.triggered.connect(lambda *args, n=node: treeView.copyNodeValue(n))
 
+        # add the node-specific menu actions
         if isinstance(node, TreeNode):
-            node.populateContextMenu(m)
+            node.populateContextMenu(menu)
 
-        a = m.addAction('Remove all DataSources')
+        a = menu.addAction('Remove all DataSources')
         a.setToolTip('Removes all data source.')
-        a.triggered.connect(self.onRemoveAllDataSources)
+        a.triggered.connect(treeView.onRemoveAllDataSources)
 
-    def populateDataViewMenu(self, menu: QMenu, dataView: Dock):
+    def populateDataViewMenu(self, menu: QMenu, view: DockTreeView, node: QgsLayerTreeNode):
+
         assert isinstance(menu, QMenu)
+        cidx: QModelIndex = view.currentIndex()
+        viewNode: DockTreeNode = findParent(node, DockTreeNode, checkInstance=True)
+
+        oldProvider: DockManagerLayerTreeModelMenuProvider = view.menuProvider()
+        errors: List[ModuleNotFoundError] = []
+
+        dataView = viewNode.dock
+
         if dataView.isVisible():
             a = menu.addAction('Hide View')
             a.triggered.connect(lambda: dataView.setVisible(False))
@@ -419,4 +438,89 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
 
         a = menu.addAction('Close View')
         a.triggered.connect(lambda: dataView.close())
+
+        lyr: QgsMapLayer = None
+        canvas: QgsMapCanvas = None
+        if isinstance(viewNode, MapDockTreeNode):
+            assert isinstance(viewNode.dock, MapDock)
+            canvas = viewNode.dock.mCanvas
+
+        selectedLayerNodes = list(set(view.selectedLayerNodes()))
+
+        if isinstance(node, (DockTreeNode, QgsLayerTreeLayer, QgsLayerTreeGroup)):
+            actionEdit = menu.addAction('Rename')
+            actionEdit.setShortcut(Qt.Key_F2)
+            actionEdit.triggered.connect(lambda *args, idx=cidx: view.edit(idx))
+
+        if isinstance(node, MapDockTreeNode) or isinstance(viewNode, MapDockTreeNode) \
+                and isinstance(node, (QgsLayerTreeGroup, QgsLayerTreeLayer)):
+            action = menu.addAction('Add Group')
+            action.setIcon(QIcon(':/images/themes/default/mActionAddGroup.svg'))
+            action.triggered.connect(view.menuProvider().onAddGroup)
+
+        if type(node) is QgsLayerTreeGroup:
+            action = menu.addAction('Remove Group')
+            action.setToolTip('Remove the layer group')
+            action.triggered.connect(
+                lambda *arg, nodes=[node]: view.layerTreeModel().removeNodes(nodes))
+
+        if type(node) is QgsLayerTreeLayer:
+            # get parent dock node -> related map canvas
+            lyr = node.layer()
+
+            if isinstance(lyr, QgsMapLayer):
+                try:
+                    oldProvider.addMapLayerMenuItems(node, menu, canvas, selectedLayerNodes)
+                except ModuleNotFoundError as ex:
+                    errors.append(ex)
+
+            if isinstance(lyr, QgsVectorLayer):
+                try:
+                    oldProvider.addVectorLayerMenuItems(node, menu)
+                except ModuleNotFoundError as ex:
+                    errors.append(ex)
+
+            if isinstance(lyr, QgsRasterLayer):
+                try:
+                    oldProvider.addRasterLayerMenuItems(node, menu)
+                except ModuleNotFoundError as ex:
+                    errors.append(ex)
+
+        elif isinstance(node, DockTreeNode):
+            assert isinstance(node.dock, Dock)
+            try:
+                node.dock.populateContextMenu(menu)
+            except ModuleNotFoundError as ex:
+                errors.append(ex)
+
+        elif isinstance(node, LayerTreeNode):
+            if cidx.column() == 0:
+                try:
+                    node.populateContextMenu(menu)
+                except ModuleNotFoundError as ex:
+                    errors.append(ex)
+            elif cidx.column() == 1:
+                a = menu.addAction('Copy')
+                a.triggered.connect(lambda *args, n=node: QApplication.clipboard().setText('{}'.format(n.value())))
+
+        # let layer properties always be the last menu item
+        if isinstance(lyr, QgsMapLayer):
+            menu.addSeparator()
+            action = menu.addAction('Layer properties')
+            action.setToolTip('Set layer properties')
+            action.triggered.connect(lambda *args, _lyr=lyr, c=canvas: self.showLayerProperties(_lyr, c))
+
+        if len(errors) > 0:
+            # show warning for missing modules
+            missing = []
+            for ex in errors:
+                if isinstance(ex, ModuleNotFoundError):
+                    missing.append(ex.name)
+            if len(missing) > 0:
+                msg = 'Failed to create full layer context menu ' \
+                      'due to the following missing packages: {}'.format(','.join(missing))
+
+                messageLog(msg)
+                QgsMessageLog.logMessage(msg, level=Qgis.MessageLevel.Warning)
+
         return menu

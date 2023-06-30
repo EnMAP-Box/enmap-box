@@ -80,6 +80,7 @@ from qgis.gui import QgsMapCanvas, QgisInterface, QgsMessageBar, QgsMessageViewe
     QgsSymbolWidgetContext
 from qgis.gui import QgsProcessingAlgorithmDialogBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog, \
     QgsNewVectorLayerDialog, QgsProcessingContextGenerator
+from .contextmenuprovider import EnMAPBoxContextMenuProvider
 from .contextmenus import EnMAPBoxContextMenuRegistry
 from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
 from .dataviews.docks import DockTypes
@@ -431,6 +432,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         # in future this might become an own EnMAP-Box Project
         # QgsProject.instance()
         self.mProject = EnMAPBoxProject()
+
+        cmReg = EnMAPBoxContextMenuRegistry.instance()
+        if len(cmReg) == 0:
+            cmReg.addProvider(EnMAPBoxContextMenuProvider())
 
         self.ui = EnMAPBoxUI()
         self.ui.closeEvent = self.closeEvent
@@ -807,6 +812,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             QgsProject.instance().layersWillBeRemoved.disconnect(self.onLayersWillBeRemoved)
         except TypeError:
             pass
+
+    def contextMenuRegistry(self) -> EnMAPBoxContextMenuRegistry:
+        return EnMAPBoxContextMenuRegistry.instance()
 
     def dataSourceManager(self) -> enmapbox.gui.datasources.manager.DataSourceManager:
         return self.mDataSourceManager

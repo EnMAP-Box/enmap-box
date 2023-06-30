@@ -5,32 +5,30 @@ import pickle
 import re
 import warnings
 import webbrowser
-from os.path import splitext, exists, sep, dirname
+from os.path import exists, sep, dirname
 from typing import List, Union, Any, Dict
 
 import numpy as np
 
-import qgis
 from enmapbox.gui.datasources.datasourcesets import DataSourceSet, ModelDataSourceSet, VectorDataSourceSet, \
     FileDataSourceSet, RasterDataSourceSet
 from enmapbox.gui.utils import enmapboxUiPath
 from enmapbox.qgispluginsupport.qps.layerproperties import defaultRasterRenderer
 from enmapbox.qgispluginsupport.qps.models import TreeModel, TreeView, TreeNode, PyObjectTreeNode
 from enmapbox.qgispluginsupport.qps.utils import defaultBands, bandClosestToWavelength, loadUi, qgisAppQgisInterface
+from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtCore import QAbstractItemModel, QItemSelectionModel, QFileInfo, QFile, QTimer, \
     QMimeData, QModelIndex, Qt, QUrl, QSortFilterProxyModel, pyqtSignal
-from qgis.PyQt.QtGui import QContextMenuEvent, QIcon, QDesktopServices
+from qgis.PyQt.QtGui import QContextMenuEvent, QDesktopServices
 from qgis.PyQt.QtWidgets import QWidget, QDialog, QMenu, QAction, QApplication, QAbstractItemView, QTreeView
-from qgis.core import QgsProviderRegistry, QgsProviderSublayerDetails
-from qgis.core import QgsLayerTreeGroup, QgsLayerTreeLayer, QgsMapLayer, QgsProject, QgsWkbTypes, QgsRasterLayer, \
+from qgis.core import QgsLayerTreeGroup, QgsLayerTreeLayer, QgsMapLayer, QgsProject, QgsRasterLayer, \
     QgsRasterDataProvider, QgsRasterRenderer, QgsVectorLayer, QgsDataItem, QgsLayerItem, Qgis
 from qgis.core import QgsMimeDataUtils
+from qgis.core import QgsProviderRegistry, QgsProviderSublayerDetails
 from qgis.gui import QgisInterface, QgsMapCanvas, QgsDockWidget
-from enmapbox.typeguard import typechecked
 from .datasources import DataSource, SpatialDataSource, VectorDataSource, RasterDataSource, \
     ModelDataSource, FileDataSource, LayerItem
 from .metadata import RasterBandTreeNode
-from ..contextmenus import EnMAPBoxContextMenuRegistry
 from ..dataviews.docks import Dock
 from ..mapcanvas import MapCanvas
 from ..mimedata import MDF_URILIST, QGIS_URILIST_MIMETYPE, extractMapLayers, fromDataSourceList
@@ -399,23 +397,25 @@ class DataSourceManagerTreeView(TreeView):
         :param event: QContextMenuEvent
         """
 
-        idx = self.currentIndex()
         assert isinstance(event, QContextMenuEvent)
-
-        col = idx.column()
-
-
-        node = self.selectedNode()
 
         m: QMenu = QMenu()
         m.setToolTipsVisible(True)
+        self.populateContextMenu(m)
+        m.exec_(self.viewport().mapToGlobal(event.pos()))
 
-        EnMAPBoxContextMenuRegistry.instance().populateDataSourceMenu(m, self)
+    def populateContextMenu(self, menu: QMenu):
+        from ..contextmenus import EnMAPBoxContextMenuRegistry
+        # backward compatibility, will be removed
+        nodes = self.selectedNodes()
+        if len(nodes) > 0:
+            self.sigPopulateContextMenu.emit(menu, nodes[0])
+
+        EnMAPBoxContextMenuRegistry.instance().populateDataSourceMenu(menu, self, nodes)
 
         # backward compatibility, will be removed
-        self.sigPopulateContextMenu.emit(m, node)
-
-        m.exec_(self.viewport().mapToGlobal(event.pos()))
+        if len(nodes) > 0:
+            self.sigPopulateContextMenu.emit(menu, nodes[0])
 
     def copyNodeValue(self, node):
 

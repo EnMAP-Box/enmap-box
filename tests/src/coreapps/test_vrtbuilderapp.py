@@ -23,10 +23,13 @@ class TestVRTBuilderApp(EnMAPBoxTestCase):
 
         enmapbox = EnMAPBox(load_core_apps=False, load_other_apps=False)
         enmapbox.loadExampleData()
+        enmapbox.contextMenuRegistry().setRaiseErrors(True)
 
         APP = VRTBuilderApp(enmapbox)
-
         self.assertIsInstance(APP, EnMAPBoxApplication)
+
+        enmapbox.applicationRegistry.addApplication(APP)
+
         w = APP.startGUI()
         if vrtBuilderPluginInstalled():
             self.assertIsInstance(w, QWidget)
