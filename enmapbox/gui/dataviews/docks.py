@@ -135,8 +135,7 @@ class Dock(pgDock):
         implement this to return a QMenu with context menu properties for this dock.
         :return: None or QMenu
         """
-        from enmapbox.gui.contextmenus import EnMAPBoxContextMenuRegistry
-        EnMAPBoxContextMenuRegistry.instance().populateDataViewMenu(menu, self)
+
         return menu
 
     sigVisibilityChanged = pyqtSignal(bool)
