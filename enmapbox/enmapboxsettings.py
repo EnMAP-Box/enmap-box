@@ -1,5 +1,4 @@
 from qgis.PyQt.QtGui import QColor
-
 from qgis.core import QgsSettings
 
 

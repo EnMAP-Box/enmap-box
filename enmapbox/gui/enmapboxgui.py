@@ -24,8 +24,6 @@ import typing
 import warnings
 from typing import Optional, Dict, Union, Any, List
 
-from enmapbox.typeguard import typechecked
-
 import enmapbox
 import enmapbox.gui.datasources.manager
 import qgis.utils
@@ -42,6 +40,7 @@ from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprofilesources import Sp
     MapCanvasLayerProfileSource
 from enmapbox.qgispluginsupport.qps.subdatasets import SubDatasetSelectionDialog
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, loadUi, SpatialExtent, file_search
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.importdesisl1balgorithm import ImportDesisL1BAlgorithm
 from enmapboxprocessing.algorithm.importdesisl1calgorithm import ImportDesisL1CAlgorithm
 from enmapboxprocessing.algorithm.importdesisl2aalgorithm import ImportDesisL2AAlgorithm
@@ -81,6 +80,8 @@ from qgis.gui import QgsMapCanvas, QgisInterface, QgsMessageBar, QgsMessageViewe
     QgsSymbolWidgetContext
 from qgis.gui import QgsProcessingAlgorithmDialogBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog, \
     QgsNewVectorLayerDialog, QgsProcessingContextGenerator
+from .contextmenuprovider import EnMAPBoxContextMenuProvider
+from .contextmenus import EnMAPBoxContextMenuRegistry
 from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
 from .dataviews.docks import DockTypes
 from .mapcanvas import MapCanvas
@@ -431,6 +432,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         # in future this might become an own EnMAP-Box Project
         # QgsProject.instance()
         self.mProject = EnMAPBoxProject()
+
+        cmReg = EnMAPBoxContextMenuRegistry.instance()
+        if len(cmReg) == 0:
+            cmReg.addProvider(EnMAPBoxContextMenuProvider())
 
         self.ui = EnMAPBoxUI()
         self.ui.closeEvent = self.closeEvent
@@ -807,6 +812,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             QgsProject.instance().layersWillBeRemoved.disconnect(self.onLayersWillBeRemoved)
         except TypeError:
             pass
+
+    def contextMenuRegistry(self) -> EnMAPBoxContextMenuRegistry:
+        return EnMAPBoxContextMenuRegistry.instance()
 
     def dataSourceManager(self) -> enmapbox.gui.datasources.manager.DataSourceManager:
         return self.mDataSourceManager
@@ -2351,6 +2359,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     def unregisterMapLayerConfigWidgetFactory(self, factory):
         self.iface.unregisterMapLayerConfigWidgetFactory(factory)
+
+    def contexMenuProviderRegistry(self) -> EnMAPBoxContextMenuRegistry:
+        return self.mContextMenuRegistry
 
     def vectorMenu(self):
         return QMenu()

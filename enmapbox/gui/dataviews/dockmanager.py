@@ -23,7 +23,7 @@ import typing
 import uuid
 from typing import Optional, List, Dict
 
-from enmapbox import debugLog, messageLog
+from enmapbox import debugLog
 from enmapbox.gui import \
     SpectralLibraryWidget, SpatialExtent, showLayerPropertiesDialog
 from enmapbox.gui.datasources.datasources import DataSource, ModelDataSource
@@ -39,13 +39,14 @@ from enmapbox.gui.mimedata import \
 from enmapbox.gui.utils import enmapboxUiPath
 from enmapbox.qgispluginsupport.qps.layerproperties import pasteStyleFromClipboard, pasteStyleToClipboard
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library, profile_field_list
-from enmapbox.qgispluginsupport.qps.utils import loadUi, findParent
+from enmapbox.qgispluginsupport.qps.utils import loadUi
+from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtCore import Qt, QMimeData, QModelIndex, QObject, QTimer, pyqtSignal, QEvent, \
     QSortFilterProxyModel, QCoreApplication
 from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDropEvent, QDragLeaveEvent
 from qgis.PyQt.QtWidgets import QHeaderView, QMenu, QAbstractItemView, QApplication, QWidget, QToolButton, QAction
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
-from qgis.core import Qgis, QgsMessageLog, QgsCoordinateReferenceSystem, QgsMapLayer, QgsVectorLayer, QgsRasterLayer, \
+from qgis.core import Qgis, QgsCoordinateReferenceSystem, QgsMapLayer, QgsVectorLayer, QgsRasterLayer, \
     QgsProject, QgsReadWriteContext, \
     QgsLayerTreeLayer, QgsLayerTreeNode, QgsLayerTreeGroup, \
     QgsLayerTreeModelLegendNode, QgsLayerTree, QgsLayerTreeModel, QgsLayerTreeUtils, \
@@ -54,7 +55,6 @@ from qgis.core import QgsWkbTypes
 from qgis.gui import QgsLayerTreeProxyModel
 from qgis.gui import QgsLayerTreeView, \
     QgsMapCanvas, QgsLayerTreeViewMenuProvider, QgsLayerTreeMapCanvasBridge, QgsDockWidget, QgsMessageBar
-from enmapbox.typeguard import typechecked
 
 
 class LayerTreeNode(QgsLayerTree):
@@ -485,7 +485,7 @@ class DockManager(QObject):
     def __init__(self):
         QObject.__init__(self)
         self.mConnectedDockAreas = []
-        self.mDocks = list()
+        self.mDocks: List[Dock] = list()
         self.mDataSourceManager: Optional[DataSourceManager] = None
         self.mMessageBar: QgsMessageBar = Optional[None]
         self.mProject: QgsProject = QgsProject.instance()
@@ -508,6 +508,8 @@ class DockManager(QObject):
         self.mEnMAPBoxInstance = enmapBox
         self.mEnMAPBoxInstance.project().layersWillBeRemoved.connect(self.onLayersWillBeRemoved)
         self.mProject = self.mEnMAPBoxInstance.project()
+        for d in self.mDocks:
+            d.setEnMAPBox(enmapBox)
 
     def enmapBoxInstance(self) -> Optional['EnMAPBox']:  # noqa: F821
         return self.mEnMAPBoxInstance
@@ -717,6 +719,7 @@ class DockManager(QObject):
         dock = None
         if issubclass(cls, MapDock):  # allow subclasses
             dock = cls(*args, **kwds)
+
             if isinstance(self.mDataSourceManager, DataSourceManager):
                 dock.sigLayersAdded.connect(self.mDataSourceManager.addDataSources)
 
@@ -767,6 +770,7 @@ class DockManager(QObject):
         else:
             raise Exception('Unknown dock type: {}'.format(dockType))
         # dock.setParent(dockArea)
+        dock.setEnMAPBox(self.enmapBoxInstance())
         dockArea.addDock(dock, *args, position=position, relativeTo=relativeTo, **kwds)
         dock.setVisible(True)
 
@@ -1533,115 +1537,25 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         self.mDockTreeView: DockTreeView = treeView
         # self.mSignals = DockManagerLayerTreeModelMenuProvider.Signals()
 
-    def enmapboxInstance(self):
+    def enmapboxInstance(self) -> 'EnMAPBox':
         return self.mDockTreeView.enmapBoxInstance()
 
-    def createContextMenu(self):
+    def createContextMenu(self) -> QMenu:
 
-        cidx: QModelIndex = self.mDockTreeView.currentIndex()
-        col = cidx.column()
-        node = self.mDockTreeView.currentNode()
+        view: DockTreeView = self.mDockTreeView
+        node = view.currentNode()
         if node is None or node == self.mDockTreeView.layerTreeModel().rootGroup():
             return
-
-        viewNode = findParent(node, DockTreeNode, checkInstance=True)
-
-        errors: List[ModuleNotFoundError] = []
 
         menu = QMenu()
         menu.setToolTipsVisible(True)
 
-        lyr: QgsMapLayer = None
-        canvas: QgsMapCanvas = None
-        if isinstance(viewNode, MapDockTreeNode):
-            assert isinstance(viewNode.dock, MapDock)
-            canvas = viewNode.dock.mCanvas
-
-        selectedLayerNodes = list(set(self.mDockTreeView.selectedLayerNodes()))
-
-        if isinstance(node, (DockTreeNode, QgsLayerTreeLayer, QgsLayerTreeGroup)):
-            actionEdit = menu.addAction('Rename')
-            actionEdit.setShortcut(Qt.Key_F2)
-            actionEdit.triggered.connect(lambda *args, idx=cidx: self.mDockTreeView.edit(idx))
-
-        if isinstance(node, MapDockTreeNode) or isinstance(viewNode, MapDockTreeNode) \
-                and isinstance(node, (QgsLayerTreeGroup, QgsLayerTreeLayer)):
-            action = menu.addAction('Add Group')
-            action.setIcon(QIcon(':/images/themes/default/mActionAddGroup.svg'))
-            action.triggered.connect(self.onAddGroup)
-
-        if type(node) is QgsLayerTreeGroup:
-            action = menu.addAction('Remove Group')
-            action.setToolTip('Remove the layer group')
-            action.triggered.connect(
-                lambda *arg, nodes=[node]: self.mDockTreeView.layerTreeModel().removeNodes(nodes))
-
-        if type(node) is QgsLayerTreeLayer:
-            # get parent dock node -> related map canvas
-            lyr = node.layer()
-
-            if isinstance(lyr, QgsMapLayer):
-                try:
-                    self.addMapLayerMenuItems(node, menu, canvas, selectedLayerNodes)
-                except ModuleNotFoundError as ex:
-                    errors.append(ex)
-
-            if isinstance(lyr, QgsVectorLayer):
-                try:
-                    self.addVectorLayerMenuItems(node, menu)
-                except ModuleNotFoundError as ex:
-                    errors.append(ex)
-
-            if isinstance(lyr, QgsRasterLayer):
-                try:
-                    self.addRasterLayerMenuItems(node, menu)
-                except ModuleNotFoundError as ex:
-                    errors.append(ex)
-
-        elif isinstance(node, DockTreeNode):
-            assert isinstance(node.dock, Dock)
-            try:
-                node.dock.populateContextMenu(menu)
-            except ModuleNotFoundError as ex:
-                errors.append(ex)
-
-        elif isinstance(node, LayerTreeNode):
-            if col == 0:
-                try:
-                    node.populateContextMenu(menu)
-                except ModuleNotFoundError as ex:
-                    errors.append(ex)
-            elif col == 1:
-                a = menu.addAction('Copy')
-                a.triggered.connect(lambda *args, n=node: QApplication.clipboard().setText('{}'.format(n.value())))
+        from enmapbox.gui.contextmenus import EnMAPBoxContextMenuRegistry
+        EnMAPBoxContextMenuRegistry.instance().populateDataViewMenu(menu, view, node)
 
         # last chance to add other menu actions
         # self.mSignals.sigPopulateContextMenu.emit(menu)
-        if isinstance(self.mDockTreeView, DockTreeView):
-            try:
-                self.mDockTreeView.sigPopulateContextMenu.emit(menu)
-            except ModuleNotFoundError as ex:
-                errors.append(ex)
-
-        # let layer properties always be the last menu item
-        if isinstance(lyr, QgsMapLayer):
-            menu.addSeparator()
-            action = menu.addAction('Layer properties')
-            action.setToolTip('Set layer properties')
-            action.triggered.connect(lambda *args, _lyr=lyr, c=canvas: self.showLayerProperties(_lyr, c))
-
-        if len(errors) > 0:
-            # show warning for missing modules
-            missing = []
-            for ex in errors:
-                if isinstance(ex, ModuleNotFoundError):
-                    missing.append(ex.name)
-            if len(missing) > 0:
-                msg = 'Failed to create full layer context menu ' \
-                      'due to the following missing packages: {}'.format(','.join(missing))
-
-                messageLog(msg)
-                QgsMessageLog.logMessage(msg, level=Qgis.MessageLevel.Warning)
+        view.sigPopulateContextMenu.emit(menu)
 
         return menu
 
