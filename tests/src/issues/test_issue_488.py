@@ -1,5 +1,14 @@
 from enmapboxprocessing.testcase import TestCase
 
+"""
+import sys
+from qgis.core import Qgis, QgsMarkerSymbol, QgsSingleSymbolRenderer
+print(Qgis.versionInt())
+print(sys.version)
+symbol = QgsMarkerSymbol.createSimple({'name': 'square', 'color': 'white'})
+renderer = QgsSingleSymbolRenderer(symbol)
+"""
+
 
 class Issue488Tests(TestCase):
 
