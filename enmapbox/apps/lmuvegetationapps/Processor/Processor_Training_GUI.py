@@ -42,6 +42,7 @@ from enmapbox.gui.utils import loadUi
 pathUI_train = os.path.join(APP_DIR, 'Resources/UserInterfaces/Processor_Train.ui')
 pathUI_wavelength = os.path.join(APP_DIR, 'Resources/UserInterfaces/Select_Wavelengths.ui')
 pathUI_prgbar = os.path.join(APP_DIR, 'Resources/UserInterfaces/ProgressBar.ui')
+pathUI_Performance = os.path.join(APP_DIR, 'Resources/UserInterfaces/Processor_Performance_View.ui')
 
 
 class MLTrainingGUI(QDialog):
@@ -68,12 +69,20 @@ class PRG_GUI(QDialog):
         else:
             event.ignore()
 
+
+class Performance_GUI(QDialog):
+    def __init__(self, parent=None):
+        super(Performance_GUI, self).__init__(parent)
+        loadUi(pathUI_Performance, self)
+
+
 # MLTraining is a GUI handler for training new ML-models. For more information, go to Processor_Inversion_core.py
 class ML_Training:
     def __init__(self, main):
         self.main = main
         self.gui = MLTrainingGUI()
         self.initial_values()
+        self.params_dict_check()
         self.connections()
 
     def initial_values(self):
@@ -85,8 +94,17 @@ class ML_Training:
         self.wl, self.nbands, self.nbands_valid = (None, None, None)
         self.out_dir = None  # directory for output
         self.model_name = None  # name of the output model
-        self.noisetype = 0
-        self.noiselevel = 0
+        self.noisetype = 1
+        self.noiselevel = 4
+        self.use_al = False
+        self.use_insitu = False
+        self.split_method = 'train_test_split'
+        self.kfolds = None
+        self.perf_eval = False
+        self.n_initial = None
+        self.algorithm = 'ANN'
+        self.param_flags = [-1] * 12
+        self.para_list = None
 
     def connections(self):
         self.gui.cmdInputLUT.clicked.connect(lambda: self.open_lut())
@@ -96,16 +114,109 @@ class ML_Training:
 
         self.gui.cmdExcludeBands.clicked.connect(lambda: self.open_wavelength_selection())
         self.gui.cmbPCA.toggled.connect(lambda: self.handle_pca())
+        # Art. Noise Radio Button Group
+        self.gui.radNoiseOff.clicked.connect(lambda: self.select_noise(mode=0))  # off
+        self.gui.radNoiseAdd.clicked.connect(lambda: self.select_noise(mode=1))  # additive
+        self.gui.radNoiseGauss.clicked.connect(lambda: self.select_noise(mode=2))  # gaussian
+        # ML Algorithms Radio Button Group
+        self.gui.rbANN.clicked.connect(lambda: self.handle_algorithm(mode=0))  # 0: ANN
+        self.gui.rbGPR.clicked.connect(lambda: self.handle_algorithm(mode=1))  # 2: GPR
+        self.gui.rbRFR.clicked.connect(lambda: self.handle_algorithm(mode=2))  # 1: RFR
+        self.gui.rbSVR.clicked.connect(lambda: self.handle_algorithm(mode=3))  # 3: SVR
 
-        self.gui.radNoiseOff.clicked.connect(lambda: self.select_noise(mode=0))
-        self.gui.radNoiseGauss.clicked.connect(lambda: self.select_noise(mode=1))
-        self.gui.radNoiseAdd.clicked.connect(lambda: self.select_noise(mode=2))
+        self.gui.radAL.toggled.connect(lambda: self.handle_AL())
+        self.gui.radNoAL.toggled.connect(lambda: self.handle_AL())
 
-    def open_lut(self):  # open and read a lut-metafile
-        result = str(QFileDialog.getOpenFileName(caption='Select LUT meta-file', filter="LUT-file (*.lut)")[0])
-        if not result:
-            return
-        self.lut_path = result
+        self.gui.radInternal.toggled.connect(lambda: self.handle_AL_strat(mode='internal'))
+        self.gui.radInsitu.toggled.connect(lambda: self.handle_AL_strat(mode='insitu'))
+
+        self.gui.radPerf.toggled.connect(lambda: self.handle_PerfEval())
+        self.gui.radNoPerf.toggled.connect(lambda: self.handle_PerfEval())
+
+        self.gui.radTrainTest.toggled.connect(lambda: self.handle_PerfEvalStrat())
+        self.gui.radCrossVal.toggled.connect(lambda: self.handle_PerfEvalStrat())
+
+        for para in self.paramsdict:
+            self.paramsdict[para].stateChanged.connect(lambda group, pid=para:
+                                                       self.params_toggle(group="targets", para_id=pid))
+
+    def params_toggle(self, para_id, group):
+        if group == 'targets':
+            # If checkbox checked, prepare param to be included for training
+            self.param_flags[para_id] *= -1
+
+    @staticmethod
+    def toggle_params(param_flags):
+        # Prepare target parameters from Boolean list
+        all_labels = ["cab", "car", "anth", "cw", "cp", "cbc", "LAI", "AGBdry", "AGBfresh", "CWC", "Nitrogen", "Carbon"]
+        # sort out only the labels for the indices which should be calculated
+        para_list = [all_labels[i] for i in range(len(all_labels)) if param_flags[i] == 1]
+        return para_list
+
+    def enable_all(self):
+        self.gui.cmbPCA.setEnabled(True), self.gui.cmbPCA.setChecked(True), self.gui.Noise_Box.setEnabled(True),
+        self.gui.Paras_Box.setEnabled(True), self.gui.AL_Box.setEnabled(True), self.gui.Perf_Box.setEnabled(True),
+        self.gui.ML_Box.setEnabled(True), self.gui.rbANN.setEnabled(True), self.gui.rbGPR.setEnabled(True),
+        self.gui.rbRFR.setEnabled(True), self.gui.rbSVR.setEnabled(True)
+
+    def handle_algorithm(self, mode):
+        algorithm_dict = {0: 'ANN', 1: 'GPR', 2: 'RFR', 3: 'SVR'}
+        self.algorithm = algorithm_dict[mode]
+
+    def handle_AL(self):
+        if self.gui.radAL.isChecked():
+            self.gui.AL_rbFrame.setEnabled(True), self.gui.lblInitSamples.setEnabled(True),
+            self.gui.sbInitSamples.setEnabled(True), self.gui.lblSelectOut.setEnabled(True),
+            self.gui.txtSelectOut.setEnabled(True), self.gui.cmdSelectOut.setEnabled(True),
+            self.gui.radPerf.setChecked(True), self.gui.radNoPerf.setEnabled(False)
+        if self.gui.radNoAL.isChecked():
+            self.gui.AL_rbFrame.setEnabled(False), self.gui.lblInitSamples.setEnabled(False),
+            self.gui.sbInitSamples.setEnabled(False), self.gui.lblSelectOut.setEnabled(False),
+            self.gui.txtSelectOut.setEnabled(False), self.gui.cmdSelectOut.setEnabled(False),
+            self.gui.radNoPerf.setEnabled(True), self.gui.radInternal.setChecked(True),
+            self.gui.radNoPerf.setChecked(True)
+
+    def handle_AL_strat(self, mode):
+        if mode == 'internal':
+            self.gui.frame_PerfEvalOptions.setEnabled(True), self.gui.radTrainTest.setEnabled(True),
+            self.gui.radCrossVal.setEnabled(True), self.gui.lblTrainSize.setEnabled(True),
+            self.gui.txtTrainSize.setEnabled(True)
+        if mode == 'insitu':
+            self.gui.frame_PerfEvalOptions.setEnabled(False)
+
+    def handle_PerfEval(self):
+        if self.gui.radPerf.isChecked():
+            if self.gui.radInsitu.isChecked():
+                self.gui.frame_PerfEvalOptions.setEnabled(False)
+            else:
+                self.gui.frame_PerfEvalOptions.setEnabled(True),
+                self.gui.radTrainTest.setEnabled(True), self.gui.radCrossVal.setEnabled(True),
+                self.gui.lblTrainSize.setEnabled(True), self.gui.txtTrainSize.setEnabled(True)
+        if self.gui.radNoPerf.isChecked():
+            self.gui.radTrainTest.setChecked(True),
+            self.gui.radTrainTest.setEnabled(False), self.gui.radCrossVal.setEnabled(False),
+            self.gui.lblTrainSize.setEnabled(False), self.gui.txtTrainSize.setEnabled(False),
+            self.gui.lblFolds.setEnabled(False), self.gui.txtFolds.setEnabled(False)
+
+    def handle_PerfEvalStrat(self):
+        if self.gui.radTrainTest.isChecked():
+            self.gui.lblTrainSize.setEnabled(True), self.gui.txtTrainSize.setEnabled(True),
+            self.gui.lblFolds.setEnabled(False), self.gui.txtFolds.setEnabled(False)
+        if self.gui.radCrossVal.isChecked():
+            self.gui.lblTrainSize.setEnabled(False), self.gui.txtTrainSize.setEnabled(False),
+            self.gui.lblFolds.setEnabled(True), self.gui.txtFolds.setEnabled(True)
+
+
+    def open_lut(self, lutpath):  # open and read a lut-metafile
+        if not __name__ == '__main__':
+            result = str(QFileDialog.getOpenFileName(caption='Select LUT meta-file', filter="LUT-file (*.lut)")[0])
+            if not result:
+                return
+            self.lut_path = result
+        else:
+            result = lutpath
+            self.lut_path = lutpath
+
         self.gui.lblInputLUT.setText(result)
 
         with open(self.lut_path, 'r') as meta_file:
@@ -129,8 +240,13 @@ class ML_Training:
         self.gui.txtExclude.setText(" ".join(str(i) for i in self.exclude_bands))  # join to string for lineEdit
         self.gui.txtExclude.setCursorPosition(0)
         self.nbands_valid = self.nbands - len(self.exclude_bands)
-        self.gui.cmbPCA.setEnabled(True)
-        self.gui.cmbPCA.setChecked(True)
+        self.enable_all()
+
+    def params_dict_check(self):
+        self.paramsdict = {0: self.gui.chkCab, 1: self.gui.chkCcx, 2: self.gui.chkCanth,
+                           3: self.gui.chkCw,  4: self.gui.chkCp, 5: self.gui.chkCBC,
+                           6: self.gui.chkLAI, 7: self.gui.chkAGBdry, 8: self.gui.chkAGBfresh,
+                           9: self.gui.chkCWC, 10: self.gui.chkNitrogen, 11: self.gui.chkCarbon}
 
     def open_wavelength_selection(self):
         # Handle opening the GUI for adding/excluding wavelengths from the list
@@ -171,7 +287,7 @@ class ML_Training:
             elif 15 < self.nbands_valid <= 120:
                 self.npca = 10
             else:
-                self.npca = 15
+                self.npca = 20
             self.gui.spnPCA.setValue(self.npca)  # place the value in the spinBox of the GUI
         if not self.gui.cmbPCA.isChecked():
             self.gui.spnPCA.setDisabled(True)
@@ -183,11 +299,18 @@ class ML_Training:
             self.gui.txtNoiseLevel.setDisabled(True)
         else:
             self.gui.txtNoiseLevel.setDisabled(False)
-        self.noise_type = mode
+        self.noisetype = mode
 
-    def get_folder(self):
+    def get_folder(self, path):
         # The model folder is important, as it contains all files needed
-        path = str(QFileDialog.getExistingDirectory(caption='Select Output Directory for Model'))
+        if not __name__ == '__main__':
+            path = str(QFileDialog.getExistingDirectory(caption='Select Output Directory for Model'))
+            if not path:
+                return
+        else:  # test-case
+            self.out_dir = path
+            self.gui.txtModelName.setText("test")
+            self.model_name = self.gui.txtModelName.text()
         if path:
             self.gui.txtModelDir.setText(path)
             self.out_dir = self.gui.txtModelDir.text().replace("\\", "/")
@@ -197,6 +320,8 @@ class ML_Training:
     def check_and_assign(self):
         if not self.lut_path:
             raise ValueError("A Lookup-Table metafile needs to be selected!")
+        if not self.out_dir:
+            raise ValueError("Output directory is missing")
         if not os.path.isdir(self.out_dir):
             raise ValueError("Output directory does not exist!")
         if self.gui.txtModelName.text() == "":
@@ -212,7 +337,7 @@ class ML_Training:
             else:
                 self.noiselevel = self.gui.txtNoiseLevel.text()
                 try:
-                    self.noiselevel = float(self.noiselevel)
+                    self.noiselevel = int(self.noiselevel)
                 except ValueError:
                     raise ValueError('Cannot interpret noise level as decimal number')
 
@@ -225,6 +350,36 @@ class ML_Training:
         else:
             self.npca = 0
 
+        if len(set(self.param_flags)) == 1:
+            raise ValueError("No target parameters selected")
+        else:
+            self.para_list = self.toggle_params(param_flags=self.param_flags)
+
+        if self.gui.radAL.isChecked():
+            self.use_al = True
+            self.n_initial = self.gui.sbInitSamples.value()
+        else:
+            self.use_al = False
+        if self.gui.radInsitu.isChecked():
+            self.use_insitu = True
+        else:
+            self.use_insitu = False
+        if self.gui.radPerf.isChecked():
+            self.perf_eval = True
+            if self.gui.radTrainTest.isChecked():
+                self.split_method = 'train_test_split'
+                if self.gui.txtTrainSize.text() == '':
+                    raise ValueError('Please specify training set size')
+                # TODO: check what happens if Train size is 100%
+                self.test_size = 1 - int(self.gui.txtTrainSize.text()) / 100
+            if self.gui.radCrossVal.isChecked():
+                self.split_method = 'kfold'
+                if self.gui.txtFolds.text() == '':
+                    raise ValueError('Please specify number of folds for cross validation')
+                self.kfolds = int(self.gui.txtFolds.text())
+        else:
+            self.perf_eval = False
+
     def abort(self, message):
         QMessageBox.critical(self.gui, "Error", message)
 
@@ -236,6 +391,8 @@ class ML_Training:
             self.abort(message=str(e))
             return
 
+        proc = processor.ProcessorMainFunction()  # instance of the Processor main class
+
         self.prg_widget = self.main.prg_widget
         self.prg_widget.gui.lblCaption_l.setText("Training Machine Learning Model")
         self.prg_widget.gui.lblCaption_r.setText("Setting up training...")
@@ -245,12 +402,15 @@ class ML_Training:
 
         self.main.qgis_app.processEvents()
 
-        proc = processor.ProcessorMainFunction()  # instance of the Processor main class
-
         try:
             # Setup everything for training
             proc.train_main.training_setup(lut_metafile=self.lut_path, exclude_bands=self.exclude_bands, npca=self.npca,
-                                           model_meta=self.model_meta)
+                                           model_meta=self.model_meta, para_list=self.para_list,
+                                           noisetype=self.noisetype, noiselevel=self.noiselevel,
+                                           algorithm=self.algorithm, use_al=self.use_al, use_insitu=self.use_insitu,
+                                           perf_eval=self.perf_eval,
+                                           split_method=self.split_method, kfolds=self.kfolds,
+                                           n_initial=self.n_initial)
         except ValueError as e:
             self.abort(message="Failed to setup model training: {}".format(str(e)))
             self.prg_widget.gui.lblCancel.setText("")
@@ -259,25 +419,25 @@ class ML_Training:
             return
 
         # if new models are added, change the text of the ProgressBar accordingly
-        self.prg_widget.gui.lblCaption_r.setText("Starting training of Neural Network...")
+        self.prg_widget.gui.lblCaption_r.setText("Starting training of MLRA...")
         self.main.qgis_app.processEvents()
 
-        try:
-            # Train model and dump it to memory
-            proc.train_main.train_and_dump(prgbar_widget=self.prg_widget, qgis_app=self.main.qgis_app)
-        except ValueError as e:
-            self.abort(message="Failed to train model: {}".format(str(e)))
-            self.prg_widget.gui.lblCancel.setText("")
-            self.prg_widget.gui.allow_cancel = True
-            self.prg_widget.gui.close()
-            return
+        # TODO: uncomment lines here
+        # try:
+        #     # Train model and dump it to memory
+        proc.train_main.train_and_dump(prgbar_widget=self.prg_widget, qgis_app=self.main.qgis_app)
+        # except ValueError as e:
+        #     self.abort(message="Failed to train model: {}".format(str(e)))
+        #     self.prg_widget.gui.lblCancel.setText("")
+        #     self.prg_widget.gui.allow_cancel = True
+        #     self.prg_widget.gui.close()
+        #     return
 
         self.prg_widget.gui.lblCancel.setText("")
         self.prg_widget.gui.allow_cancel = True
         self.prg_widget.gui.close()
         QMessageBox.information(self.gui, "Finish", "Training finished")
-        self.gui.close()
-
+        #▬self.gui.close()
 
 # The SelectWavelengths class allows to add/remove wavelengths from the inversion
 class SelectWavelengths:
@@ -388,6 +548,14 @@ class PRG:
         self.gui.cmdCancel.setDisabled(True)
         self.gui.lblCancel.setText("-1")
 
+class ALperfView:
+    def __init__(self, main):
+        self.main = main
+        self.gui = Performance_GUI()
+
+    def connections(self):
+        self.gui.cmdQuit.clicked.connect(lambda: self.gui.close())
+
 # class MainUiFunc is the interface between all sub-GUIs, so they can communicate between each other
 class MainUiFunc:
     def __init__(self):
@@ -395,6 +563,7 @@ class MainUiFunc:
         self.ann_training = ML_Training(self)
         self.select_wavelengths = SelectWavelengths(self)
         self.prg_widget = PRG(self)
+        self.performance_view = ALperfView(self)
 
     def show(self):
         self.ann_training.gui.show()
@@ -405,4 +574,7 @@ if __name__ == '__main__':
     app = start_app()
     m = MainUiFunc()
     m.show()
+    lut_path = r"E:\LUTs\testLUT_2000_00meta.lut"
+    m.ann_training.open_lut(lutpath=lut_path)
+    m.ann_training.get_folder(path="E:\LUTs\Model_TEST/")
     sys.exit(app.exec_())

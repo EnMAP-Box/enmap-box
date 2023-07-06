@@ -38,22 +38,14 @@ from sklearn.decomposition import PCA
 from sklearn.neural_network import MLPRegressor
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import Matern, RBF, WhiteKernel
-from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import cross_val_score
 from sklearn.metrics import mean_squared_error, r2_score
 # from modAL.models import BayesianOptimizer
-from lmuvegetationapps.Processor.modAL import ActiveLearner
-from lmuvegetationapps.Processor.modAL.disagreement import *
+# from lmuvegetationapps.Processor.modAL import ActiveLearner
+# from lmuvegetationapps.Processor.modAL.disagreement import *
 from sklearn.metrics import pairwise_distances
-from sklearn.linear_model import LinearRegression
-
-
-# from modAL.uncertainty import uncertainty_sampling
-# from modAL.disagreement import *
-# from modAL.acquisition import max_EI, max_UCB, max_PI
-# from ideal_v3 import ideal
+from sklearn.model_selection import KFold, train_test_split
+# from sklearn.linear_model import LinearRegression
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -83,32 +75,67 @@ class MLRATraining:
         return model.fit(X, y)
 
     @staticmethod
-    def _rfr(XXX):
-        pass
+    def _fit_split(X, y, model, split_method="train_test_split", kfolds=5, test_size=0.2, random_state=42):
+        performances = []
+        loop_counter = 1
+
+        for train_X, train_y, test_X, test_y in MLRATraining._split(X, y, split_method=split_method, kfolds=kfolds,
+                                                                    test_size=test_size, random_state=random_state):
+            model.fit(train_X, train_y)
+            predictions = model.predict(test_X)
+            score = mean_squared_error(test_y, predictions)
+            performances.append(score)
+
+            if split_method == "kfold":
+                progress = loop_counter / kfolds * 100
+                yield {"type": "progress", "progress": progress, "loop_counter": loop_counter}
+            loop_counter += 1
+
+        # After the validation process, fit the model on the entire dataset
+        model.fit(X, y)
+        yield {'type': 'result', 'model': model, 'all_performances': performances}
 
     @staticmethod
-    def _svr(XXX):
-        pass
-
+    def _split(X, y, split_method="train_test_split", kfolds=5, test_size=0.2, random_state=42):
+        if split_method == "train_test_split":
+            train_X, test_X, train_y, test_y = train_test_split(X, y, test_size=test_size, random_state=random_state)
+            yield train_X, train_y, test_X, test_y
+        elif split_method == "kfold":
+            kf = KFold(n_splits=kfolds, random_state=random_state, shuffle=True)
+            for train_index, test_index in kf.split(X, y):
+                yield X[train_index], y[train_index], X[test_index], y[test_index]
+        else:
+            raise ValueError(f"Unrecognized split method: {split_method}")
+    
     @staticmethod
-    def _al_internal(X, y, model):
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+    def _al_loop_internal(X, y, model, init_percentage, split_method="train_test_split", kfolds=5, test_size=0.2):
+        all_training_indices = []
+        all_performances = []
+        X_val, y_val = None, None
+        loop_counter = 1
+        for train_X, train_y, test_X, test_y in MLRATraining._split(X, y, split_method=split_method, kfolds=kfolds,
+                                                                    test_size=test_size):
+            # Get generator from _al_loop
+            loop_gen = MLRATraining._al_loop(train_X, train_y, model, test_X, test_y, init_percentage=init_percentage)
 
-        regressor = ActiveLearner(estimator=model,
-                                  query_strategy=edb,
-                                  X_training=X_train, y_training=y_train)
-
-        # print("Train score: ", regressor.score(X_train, y_train))
-        # print("Test score: ", regressor.score(X_test, y_test))
-
-        y_pred = regressor.predict(X_test)
-        plt.scatter(y_test,y_pred)
-        plt.show()
-
-        return regressor
-
+            for output in loop_gen:
+                if output['type'] == 'result':
+                    all_training_indices.append(output['training_indices'])
+                    all_performances.append(output['performances'])
+                    X_val = output['X_val']
+                    y_val = output['y_val']
+                else:
+                    if split_method == 'kfold':
+                        output['loop_counter'] = loop_counter
+                    yield output
+            loop_counter += 1
+        yield {'type': 'result', 'model': model, 'all_training_indices': all_training_indices,
+               'all_performances': all_performances, 'X_val': X_val, 'y_val': y_val}
+        # return model, all_training_indices, all_performances, X_val, y_val
+        
+        
     @staticmethod
-    def _al_insitu(X, y, model, X_val, y_val, init_percentage):
+    def _al_loop(X, y, model, X_val, y_val, init_percentage):
 
         init_percentage = init_percentage/100
         n_samples = X.shape[0]
@@ -156,8 +183,9 @@ class MLRATraining:
 
             progress = (total_remaining - len(remaining_indices)) / total_remaining * 100
             if int(progress) % 2 == 0 and int(progress) != last_printed:
-                print('Progress: {:.0f}%'.format(progress))
+                # print('Progress: {:.0f}%'.format(progress))
                 last_printed = int(progress)
+                yield{'type': 'progress', 'progress': progress}
 
             if score > best_score:
                 X_initial = np.delete(X_initial, -len(query_indices), axis=0)
@@ -171,12 +199,9 @@ class MLRATraining:
             remaining_indices = np.delete(remaining_indices, query_indices)
             # print(len(remaining_X))
 
-        return model, training_indices, performances
-        # final_pred, pred_std = model.predict(X_val, return_std=True)
-
-        # np.savetxt("U:\EnVAL\Meetings\EnSAG/performances.txt", performances)
-        # out_pred = np.array([y_val, final_pred, pred_std])
-        # np.savetxt("U:\EnVAL\Meetings\EnSAG/LAI_results.txt", out_pred)
+        yield{'type': 'result', 'model': model, 'training_indices': training_indices, 'performances': performances,
+              'X_val': X_val, 'y_val': y_val}
+        #return model, training_indices, performances, X_val, y_val
 
 
         # Add more ML-algorithms here in the same design if needed at any time (e.g. SVR, GPR, RandomForest, ...)
@@ -305,7 +330,7 @@ class ProcessorTraining:
         self.m = main
         # these are the four PROSAIL parameters to be estimated. Mind the order!
         #self.para_list = ['LAI', 'LIDF', 'cab', 'cm']
-        self.para_list = ['LAI']#, 'cab']
+        self.para_list = []
         self.noisetype = 1
         self.sigma = 4
         self.mlra = None
@@ -323,18 +348,29 @@ class ProcessorTraining:
         # self.ml_params_dict_rforest = None
         # self.ml_params_dict_gpr = None
 
-    def training_setup(self, lut_metafile, exclude_bands, npca, model_meta, noisetype=1, noiselevel=4, algorithm='ann',
-                       use_al=False, use_insitu=False, n_initial=2):
+
+    def training_setup(self, lut_metafile, exclude_bands, npca, model_meta, para_list, noisetype=1, noiselevel=4,
+                       algorithm='ANN',
+                       use_al=False, use_insitu=False, n_initial=2,
+                       perf_eval=False, split_method='train_test_split', kfolds=5, test_size=0.2):
         # Setup everything for training new models
         self.exclude_bands = exclude_bands  # the bands to be excluded for the training (water vapor absorption etc.)
+        self.para_list = para_list
 
         # Add/multiply a noise term to LUT-spectra to gain more resilience towards real "noisy" spectra
         self.noisetype = noisetype  # 0: Off, 1: Gaussian, 2: Additive, 3: Multiplicative
         self.sigma = noiselevel  # std. of the noise in %
-        self.algorithm = algorithm  # name of the Algorithm ('ann' by default)
+
+        # Algorithm/Training/AL Setup
+        self.algorithm = algorithm  # name of the Algorithm ('ANN' by default)
         self.use_al = use_al
         self.use_insitu = use_insitu
         self.n_initial = n_initial
+
+        self.perf_eval = perf_eval
+        self.split_method = split_method
+        self.kfolds = kfolds
+        self.test_size = test_size
 
         # LUT
         self.get_meta_LUT(lut_metafile=lut_metafile)  # read meta information of the LUT to be trained
@@ -372,11 +408,12 @@ class ProcessorTraining:
 
         # Boosting the parameters is necessary for some algorithms which cannot handle very small or large values
         # for the training (e.g. ANN fails when learning y=0.004, so it is boosted to y=4 according to "Functions.conv"
-        self.para_boost = True  # on per default
+        if self.algorithm == 'ANN':
+            self.para_boost = True
+        else: self.para_boost = False
 
         # Which scaler should be used?
-        self.scaler = StandardScaler()  # create instance of scaler; also: RobustScaler(),
-                                        #                                  MinMaxScaler() -> need to be imported
+        self.scaler = StandardScaler()  # create instance of standard scaler
         if npca > 0:
             self.pca = PCA(npca)  # create an instance of the PCA for the desired number of components
         else:
@@ -384,7 +421,7 @@ class ProcessorTraining:
 
         self.components = npca  # how many components for the PCA? (0 if deactivated)
 
-    def validation_setup(self, val_file, exclude_bands, npca,):
+    def validation_setup(self, val_file, exclude_bands, npca):
         self.val_file = val_file
         val_data = np.loadtxt(self.val_file, delimiter="\t", skiprows=1)
         X_val = val_data[2:, 1:].T
@@ -407,6 +444,74 @@ class ProcessorTraining:
         if self.pca:
             self.pca.fit(X_val)  # , y[:, ipara])
             self.X_val = self.pca.transform(X_val)
+
+    def init_model(self, var):
+        # method to initialize a model, i.e. prepare an algorithm before it sees any data
+
+        # At the moment, only algorithm == 'ann' is implemented; add parameterization for other algorithms if necessary
+
+        if self.algorithm == 'ANN':
+            # ANN
+            if not self.ann_activation:  # if self.ann_activation is None, everything is None
+                if var == "LIDF":  # hyperparameters best suited to estimate the ALIA
+                    self.ann_activation = 'tanh'  # logistic, relu, identity, tanh
+                    self.ann_solver = 'lbfgs'  # adam, lbfgs, sgd
+                    self.ann_alpha = 10.0
+                    self.ann_max_iter = 10000  # 5000
+                elif var == "cab":  # hyperparameters best suited to estimate Cab
+                    self.ann_activation = 'tanh'  # logistic, relu, identity, tanh
+                    self.ann_solver = 'adam'  # adam, lbfgs, sgd
+                    self.ann_alpha = 0.01
+                    self.ann_max_iter = 10000  # 2000
+                elif var == "cm":  # hyperparameters best suited to estimate LMA
+                    self.ann_activation = 'logistic'  # logistic, relu, identity, tanh
+                    self.ann_solver = 'lbfgs'  # adam, lbfgs, sgd
+                    self.ann_alpha = 0.1
+                    self.ann_max_iter = 10000  # 1000
+                else:    # hyperparameters best suited to estimate LAI and all others
+                    self.ann_activation = 'logistic'  # logistic, relu, identity, tanh
+                    self.ann_solver = 'lbfgs'  # adam, lbfgs, sgd
+                    self.ann_alpha = 1.0
+                    self.ann_max_iter = 10000  #5000
+
+            # make a dictionary from the hyperparams
+            self.ml_params = {'activation': self.ann_activation, 'solver': self.ann_solver,
+                              'alpha': self.ann_alpha, 'max_iter': self.ann_max_iter}
+            self.ml_model_ext = '.ann'  # extension of the models to recognize it as a neural network model
+            self.mlra = MLPRegressor(**self.ml_params)
+
+        if self.algorithm == 'GPR':
+            self.gpr_kernel = 1.0 * RBF(1.0) + WhiteKernel()
+            self.ml_params = {'kernel': self.gpr_kernel, 'random_state': 0}
+            self.ml_model_ext = '.gpr'  # extension of the models to recognize it as a GPR model
+            self.mlra = GaussianProcessRegressor(**self.ml_params)
+
+        # TODO: implement RFR
+        if self.algorithm == 'RFR':
+            pass
+        # TODO: implement SVR
+        if self.algorithm == 'SVR':
+            pass
+
+        # AL based on split (train-test-split or kfold cross val)
+        if self.use_al and not self.use_insitu:
+            self.al_paras = {'split_method': self.split_method, 'kfolds': self.kfolds, 'test_size': self.test_size,
+                             'init_percentage': self.n_initial}
+            self.ml_model = self.m.mlra_training._al_loop_internal
+
+        # AL with external insitu data
+        elif self.use_al and self.use_insitu:
+            self.al_paras = {'X_val': self.X_val, 'y_val': self.y_val,
+                             'init_percentage': self.n_initial}
+            self.ml_model = self.m.mlra_training._al_loop
+
+        # No AL, training on splits
+        elif not self.use_al and self.perf_eval:
+            self.al_paras = {'split_method': self.split_method, 'kfolds': self.kfolds, 'test_size': self.test_size}
+            self.ml_model = self.m.mlra_training._fit_split
+        # No AL, only training -> all samples
+        else:
+            self.ml_model = self.m.mlra_training._fit  # construct the model and pass it to self.ml_model
 
 
     def train_and_dump(self, prgbar_widget=None, qgis_app=None):
@@ -433,6 +538,10 @@ class ProcessorTraining:
 
                         model_no = geo_ensemble * len(self.para_list) + ipara + 1  # serial number of model
 
+                        if self.use_al and not self.use_insitu: prg_al_string = 'internal AL'
+                        elif self.use_al and self.use_insitu: prg_al_string = 'insitu AL'
+                        else: prg_al_string = ''
+
                         # Update progress bar
                         if prgbar_widget:
                             if prgbar_widget.gui.lblCancel.text() == "-1":
@@ -440,11 +549,39 @@ class ProcessorTraining:
                                 prgbar_widget.gui.cmdCancel.setDisabled(False)
                                 raise ValueError("Training cancelled!")
 
-                            prgbar_widget.gui.lblCaption_r.setText('Training model {:d} of {:d}'.format(model_no,
-                                                                                                        nmodels_total))
-                            qgis_app.processEvents()
-                        else:  # if no progress bar exists, e.g. code is run from _exec.py
-                            print("Training {} Noise {:d}-{:d} | {} | Geo {:d} of {:d}".format(
+                        if self.split_method == 'train_test_split':
+                            if prgbar_widget:
+                                prgbar_widget.gui.lblCaption_r.setText(
+                                    'Training {} {} model {:d} of {:d}: {}'.format(
+                                        prg_al_string, self.algorithm, model_no, nmodels_total, para))
+                                qgis_app.processEvents()
+                            else:  # if no progress bar exists, e.g. code is run from _exec.py
+                                print(
+                                    "Training {} {} Noise {:d}-{:d} | {} | Geo {:d} of {:d}".format(prg_al_string,
+                                        self.algorithm, self.noisetype, self.sigma, para, geo_ensemble + 1,
+                                        self.ntts * self.ntto * self.npsi))
+                        elif self.split_method == 'kfold':
+                            fold = 1
+                            if prgbar_widget:
+                                prgbar_widget.gui.lblCaption_r.setText(
+                                    'Training {} {} model {:d} of {:d}: {} | Fold {:d} of {:d}'.format(
+                                        prg_al_string, self.algorithm, model_no, nmodels_total, para,
+                                        fold, self.kfolds))
+                                qgis_app.processEvents()
+                            else:  # if no progress bar exists, e.g. code is run from _exec.py
+                                print("Training {} {} Noise {:d}-{:d} | {} | Fold {:d} of {:d} | Geo {:d} of {:d}".format(
+                                    prg_al_string,
+                                    self.algorithm, self.noisetype, self.sigma, para, fold, self.kfolds, geo_ensemble + 1,
+                                    self.ntts * self.ntto * self.npsi))
+                        else:
+                            if prgbar_widget:
+                                prgbar_widget.gui.lblCaption_r.setText(
+                                    'Training {} {} model {:d} of {:d}: {}'.format(
+                                        prg_al_string, self.algorithm, model_no, nmodels_total, para,
+                                        fold, self.kfolds))
+                                qgis_app.processEvents()
+                            else:
+                                print("Training {} {} Noise {:d}-{:d} | {} | Geo {:d} of {:d}".format(prg_al_string,
                                 self.algorithm, self.noisetype, self.sigma, para, geo_ensemble + 1,
                                 self.ntts * self.ntto * self.npsi))
 
@@ -461,16 +598,49 @@ class ProcessorTraining:
                             self.pca.fit(x)#, y[:, ipara])
                             x = self.pca.transform(x)
 
-                        if self.use_al:
-                            model, training_indices, performances = self.ml_model(X=x, y=y[:, ipara], model=self.mlra, **self.al_paras)  # create instance of the model
+                        if self.perf_eval:
+                            loop = 1
+                            for result_dict in self.ml_model(X=x, y=y[:, ipara], model=self.mlra, **self.al_paras):
+                                if result_dict["type"] == "result":
+                                    model = result_dict["model"]
+                                    if self.use_al:
+                                        training_indices = result_dict["all_training_indices"]
+                                        self.X_val = result_dict["X_val"]
+                                        self.y_val = result_dict["y_val"]
+                                    performances = result_dict["all_performances"]
+
+                                elif result_dict["type"] == "progress":
+                                    if prgbar_widget:
+                                        prgbar_widget.gui.prgBar.setValue(int(result_dict['progress']))
+                                        qgis_app.processEvents()
+                                        loop_counter = result_dict['loop_counter']
+                                        if loop_counter > loop:
+                                            if prgbar_widget:
+                                                prgbar_widget.gui.lblCaption_r.setText(
+                                                    'Training {} {} model {:d} of {:d}: {} | Fold {:d} of {:d}'.format(
+                                                        prg_al_string, self.algorithm, model_no, nmodels_total, para,
+                                                        loop_counter, self.kfolds))
+                                                qgis_app.processEvents()
+                                            else:
+                                                print('Progress: {:d}%'.format(int(result_dict['progress'])))
+                                    else:
+                                        if result_dict['loop_counter'] > loop:
+                                            print('Fold: {:d} of {:d}'.format(int(result_dict['loop_counter']), self.kfolds))
+                                    loop += 1
+
+
+                            # final_pred, pred_std = model.predict(self.X_val, return_std=True)
+
+                            # np.savetxt("E:\Testdaten/performances.txt", performances)
+                            # out_pred = np.array([self.y_val, final_pred, pred_std])
+                            # np.savetxt("E:\Testdaten/LAI_results.txt", out_pred)
+
                         else:
-                            model = self.ml_model(X=x, y=y[:, ipara], model=self.mlra, **self.al_paras)
+                            model = self.ml_model(X=x, y=y[:, ipara], model=self.mlra)
                         joblib.dump(model, self.model_base + "_{:d}_{}{}".format(
                             geo_ensemble, para, self.ml_model_ext))  # dump (save) model to file for later use
 
-                        if prgbar_widget:
-                            prgbar_widget.gui.prgBar.setValue(int(model_no * 100 / nmodels_total))
-                            qgis_app.processEvents()
+
 
         # Not Done yet! Save further information to the base-folder: information about scaler and pca
         # are saved to a .proc-file; this file is read before calling predict on a model to prepare spectral data
@@ -478,8 +648,7 @@ class ProcessorTraining:
         # since scaler and pca can/does vary between parameters; however: at the time being, scaler and PCA are the
         # same for all parameters and are saved as copies
         for para in self.para_list:
-            processing_dict = {"scaler": self.scaler,
-                               "pca": self.pca}
+            processing_dict = {"scaler": self.scaler, "pca": self.pca}
 
             joblib.dump(processing_dict, self.model_base + '_{}.proc'.format(para))  # dump the .proc-file as well
 
@@ -492,6 +661,12 @@ class ProcessorTraining:
             para_file.write("\ntto=" + ";".join(str(i) for i in self.tto))
             para_file.write("\npsi=" + ";".join(str(i) for i in self.psi))
             para_file.write("\nexclude_bands=" + ";".join(str(i) for i in self.exclude_bands))
+            if self.use_al:
+                para_file.write("\nactive_learning=" + ";".join(str(self.use_al)))
+
+        if self.use_al:
+            pass
+
 
     def get_meta_LUT(self, lut_metafile):
         # opens the LUT-metafile and processes the content
@@ -505,6 +680,7 @@ class ProcessorTraining:
         values = [value.split(';') if ';' in value else value for value in values]
         self.meta_dict = dict(zip(keys, values))  # dictionary for meta-information in the LUT
         # dictionary for the parameters stored in the LUT
+        # ['N', 'cab', 'car', 'anth', 'cbrown', 'cw', 'cm', 'cp', 'cbc', 'LAI', 'typeLIDF', 'LIDF', 'hspot', 'psoil', 'tts', 'tto', 'psi', 'LAIu', 'cd', 'sd', 'h']
         self.para_dict = dict(zip(self.meta_dict['parameters'], list(range(len(self.meta_dict['parameters'])))))
         for geo in ['tts', 'tto', 'psi']:  # happens when only one angle is provided (no ";"-split)
             if not isinstance(self.meta_dict[geo], list):  # reads as: if meta_dict[geo] is not of type "list"
@@ -518,6 +694,8 @@ class ProcessorTraining:
         X = np.asarray(lut[self.subset_bands_lut, :]).T
         y = np.zeros(shape=(lut.shape[1], len(self.para_list)))  # open up a new array for PROSAIL parameters
 
+        #  all LUT_params
+        #  ['N', 'cab', 'car', 'anth', 'cbrown', 'cw', 'cm', 'cp', 'cbc', 'LAI', 'typeLIDF', 'LIDF', 'hspot', 'psoil', 'tts', 'tto', 'psi', 'LAIu', 'cd', 'sd', 'h']
         for i, para in enumerate(self.para_list):  # extract parameters
             if self.para_boost:  # to boost or not to boost
                 y[:, i] = lut[self.para_dict[para], :] * self.m.func.conv.get(para)[2]
@@ -548,61 +726,6 @@ class ProcessorTraining:
         ref_noisy[ref_noisy < 0] = 0  # stochastic process may happen to produce ref < 0 -> set to zero
         return ref_noisy
 
-    def init_model(self, var):
-        # method to initialize a model, i.e. prepare an algorithm before it sees any data
-
-        if self.use_al:
-            pass
-        if self.use_insitu:
-            pass
-        # At the moment, only algorithm == 'ann' is implemented; add parameterization for other algorithms if necessary
-
-        if self.algorithm == 'ann':
-            # ANN
-            if not self.ann_activation:  # if self.ann_activation is None, everything is None
-                if var == "LIDF":  # hyperparameters best suited to estimate the ALIA
-                    self.ann_activation = 'tanh'  # logistic, relu, identity, tanh
-                    self.ann_solver = 'lbfgs'  # adam, lbfgs, sgd
-                    self.ann_alpha = 10.0
-                    self.ann_max_iter = 10000  # 5000
-                elif var == "cab":  # hyperparameters best suited to estimate Cab
-                    self.ann_activation = 'tanh'  # logistic, relu, identity, tanh
-                    self.ann_solver = 'adam'  # adam, lbfgs, sgd
-                    self.ann_alpha = 0.01
-                    self.ann_max_iter = 10000  # 2000
-                elif var == "cm":  # hyperparameters best suited to estimate LMA
-                    self.ann_activation = 'logistic'  # logistic, relu, identity, tanh
-                    self.ann_solver = 'lbfgs'  # adam, lbfgs, sgd
-                    self.ann_alpha = 0.1
-                    self.ann_max_iter = 10000  # 1000
-                else:    # hyperparameters best suited to estimate LAI and all others
-                    self.ann_activation = 'logistic'  # logistic, relu, identity, tanh
-                    self.ann_solver = 'lbfgs'  # adam, lbfgs, sgd
-                    self.ann_alpha = 1.0
-                    self.ann_max_iter = 10000  #5000
-
-            # make a dictionary from the hyperparams
-            self.ml_params = {'activation': self.ann_activation, 'solver': self.ann_solver,
-                              'alpha': self.ann_alpha, 'max_iter': self.ann_max_iter}
-            self.ml_model_ext = '.ann'  # extension of the models to recognize it as a neural network model
-            self.mlra = MLPRegressor(**self.ml_params)
-
-        if self.algorithm == 'gpr':
-            self.gpr_kernel = 1.0 * RBF(1.0) + WhiteKernel()
-            self.ml_params = {'kernel': self.gpr_kernel, 'random_state': 0}
-            self.ml_model_ext = '.gpr'  # extension of the models to recognize it as a GPR model
-            self.mlra = GaussianProcessRegressor(**self.ml_params)
-
-        if self.use_al and not self.use_insitu:
-            self.ml_model = self.m.mlra_training._al_internal
-        elif self.use_al and self.use_insitu:
-            self.al_paras = {'X_val': self.X_val, 'y_val': self.y_val,
-                             'init_percentage': self.n_initial}
-            self.ml_model = self.m.mlra_training._al_insitu
-        else:
-            self.ml_model = self.m.mlra_training._fit  # construct the model and pass it to self.ml_model
-
-
 
 # Class to handle predicting variables from spectral reflectances with pre-trained Machine Learning (ML) algorithms
 # At the moment, only ANNs are implemented, but potentially this script could be appended by any other ML-algo
@@ -611,14 +734,10 @@ class ProcessorPrediction:
         self.m = main
 
         # Some basic information about the algorithm; svr is added just for the sake of demonstration
-        self.mlra_meta = {'ann':
-                              {'name': 'ann',
-                               'file_ext': '.ann',
-                               'file_name': 'ann_mlp'},
-                          'gpr':
-                              {'name': 'gpr',
-                               'file_ext': '.gpr',
-                               'file_name': 'gpr_mlp'}}
+        self.mlra_meta = {'ANN': {'name': 'ann', 'file_ext': '.ann', 'file_name': 'ann_mlp'},
+                          'GPR': {'name': 'gpr', 'file_ext': '.gpr', 'file_name': 'gpr_mlp'},
+                          'RFR': {'name': 'rfr', 'file_ext': '.rfr', 'file_name': 'rfr_mlp'},
+                          'SVR': {'name': 'svr', 'file_ext': '.svr', 'file_name': 'svr_mlp'}}
 
     def prediction_setup(self, model_meta, img_in, res_out, out_mode, mask_ndvi, ndvi_thr, ndvi_bands, mask_image,
                          geo_in, spatial_geo, paras, algorithm, fixed_geos=None, nodat=None):
@@ -639,7 +758,7 @@ class ProcessorPrediction:
         # should each pixel be inverted according to its geometry (True) or calculate the average for all pixels (False)
         self.spatial_geo = spatial_geo
         self.paras = paras  # Which PROSAIL parameters should be estimated? LAI, ALIA, cab, cm
-        self.algorithm = algorithm  # 'ann' at the moment, but possibly other algorithms, too
+        self.algorithm = algorithm
 
         if fixed_geos is None:  # no fixed geo for the image
             self.tts_unique, self.tto_unique, self.psi_unique = [None, None, None]

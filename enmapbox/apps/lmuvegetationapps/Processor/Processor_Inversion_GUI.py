@@ -313,7 +313,13 @@ class MLInversion:
                 return
             self.meta_dict = self._get_processor_meta(file=result)
             self.algorithm = self.meta_dict['alg']
-            self.gui.lblTargets.setText(', '.join(self.meta_dict['target_parameters']))
+
+            targets = self.meta_dict.get('target_parameters')
+            if isinstance(targets, str):
+                self.gui.lblTargets.setText(targets)
+            else:
+                self.gui.lblTargets.setText(', '.join(self.meta_dict['target_parameters']))
+
             if not self.meta_dict:
                 return
             self.model_meta_file = result
