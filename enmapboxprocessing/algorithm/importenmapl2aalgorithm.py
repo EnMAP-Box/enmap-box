@@ -22,7 +22,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
     P_SET_BAD_BANDS, _SET_BAD_BANDS = 'setBadBands', 'Set bad bands'
     P_DETECTOR_OVERLAP, _DETECTOR_OVERLAP = 'detectorOverlap', 'Detector overlap region'
     O_DETECTOR_OVERLAP = [
-        'Order by detector (VNIR, SWIR)', 'Order by wavelength', 'Moving average filter', 'VNIR only', 'SWIR only'
+        'Order by detector (VNIR, SWIR)', 'Order by wavelength (default order)', 'Moving average filter', 'VNIR only', 'SWIR only'
     ]
     OrderByDetectorOverlapOption, OrderByWavelengthOverlapOption, MovingAverageFilterOverlapOption, \
     VnirOnlyOverlapOption, SwirOnlyOverlapOption = range(5)
