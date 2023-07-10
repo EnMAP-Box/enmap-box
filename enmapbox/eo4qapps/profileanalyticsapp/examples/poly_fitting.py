@@ -19,14 +19,14 @@ def updatePlot(profile: Profile, profiles: List[Profile], plotWidget: pg.PlotIte
     X2 = np.linspace(np.min(X), np.max(X), 1000)
     y2 = np.polyval(coefs, X2)
 
-    # plot
+    # instead of plotting the fit, we can return it as a Profile object
+    xValues = X2.tolist()
+    yValues = y2.tolist()
     style = PlotStyle()
+    name = f'fitted {profile.name}'
     style.setMarkerSymbol(MarkerSymbol.No_Symbol)
     style.linePen.setStyle(Qt.SolidLine)
     style.linePen.setColor(QColor('#ff0000'))
     style.linePen.setWidth(1)
-    plotDataItem = plotWidget.plot(X2, y2, name=f'fitted {profile.name}')
-    style.apply(plotDataItem)
 
-    # plot what ever you want using PyQtGraph
-    # ... more plotting examples can be added here
+    return [Profile(xValues, yValues, profile.xUnit, name, style)]
