@@ -351,6 +351,9 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
             bandCount = len(result)
             driver = Driver(newFilename, feedback=feedback)
             writer = driver.createLike(grid, dataType, bandCount)
+            # init band names (see #532)
+            for bandNo in writer.bandNumbers():
+                writer.setBandName('band ' + str(bandNo), bandNo)
             writers[name] = writer
 
         return writers
