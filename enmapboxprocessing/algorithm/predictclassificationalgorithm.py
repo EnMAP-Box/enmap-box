@@ -17,6 +17,7 @@ from enmapbox.typeguard import typechecked
 class PredictClassificationAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer with features'
     P_CLASSIFIER, _CLASSIFIER = 'classifier', 'Classifier'
+    P_MATCH_BY_NAME,_MATCH_BY_NAME = 'matchByName', 'Match features and bands by name'
     P_OUTPUT_CLASSIFICATION, _OUTPUT_CLASSIFICATION = 'outputClassification', 'Output classification layer'
 
     def displayName(self) -> str:
@@ -37,6 +38,7 @@ class PredictClassificationAlgorithm(EnMAPProcessingAlgorithm):
                            'on a subset of the raster bands. If raster bands and classifier features are not matching by name, '
                            'but overall number of bands and features do match, raster bands are used in original order.'),
             (self._CLASSIFIER, 'A fitted classifier.'),
+            (self._MATCH_BY_NAME, 'Whether to match raster bands and classifier features by name.'),
             (self._OUTPUT_CLASSIFICATION, self.RasterFileDestination)
         ]
 
@@ -46,6 +48,7 @@ class PredictClassificationAlgorithm(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
         self.addParameterPickleFile(self.P_CLASSIFIER, self._CLASSIFIER)
+        self.addParameterBoolean(self.P_MATCH_BY_NAME, self._MATCH_BY_NAME, False, True)
         self.addParameterRasterDestination(self.P_OUTPUT_CLASSIFICATION, self._OUTPUT_CLASSIFICATION)
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
@@ -60,6 +63,7 @@ class PredictClassificationAlgorithm(EnMAPProcessingAlgorithm):
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         dump = self.parameterAsClassifierDump(parameters, self.P_CLASSIFIER, context)
+        matchByName = self.parameterAsBoolean(parameters, self.P_MATCH_BY_NAME, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_CLASSIFICATION, context)
         maximumMemoryUsage = Utils.maximumMemoryUsage()
 
@@ -71,14 +75,18 @@ class PredictClassificationAlgorithm(EnMAPProcessingAlgorithm):
             bandNames = [rasterReader.bandName(i + 1) for i in range(rasterReader.bandCount())]
 
             # match classifier features with raster band names
-            try:  # try to find matching bands ...
-                bandList = [bandNames.index(feature) + 1 for feature in dump.features]
-            except ValueError:
-                bandList = None
+            bandList = None
+            if matchByName:
+                try:  # try to find matching bands ...
+                    bandList = [bandNames.index(feature) + 1 for feature in dump.features]
+                except ValueError:
+                    pass
 
             # ... if not possible, use original bands, if overall number of bands and features do match
             if bandList is None and len(bandNames) != len(dump.features):
-                message = f'classifier features ({dump.features}) not matching raster bands ({bandNames})'
+                message = f'classifier features ({dump.features}) not matching raster bands ({bandNames})\n' \
+                          f'number of features: {len(dump.features)}\n' \
+                          f'number of bands: {len(bandNames)}\n'
                 feedback.reportError(message, fatalError=True)
                 raise QgsProcessingException(message)
 

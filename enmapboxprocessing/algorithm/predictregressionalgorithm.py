@@ -17,6 +17,7 @@ from enmapbox.typeguard import typechecked
 class PredictRegressionAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer with features'
     P_REGRESSOR, _REGRESSOR = 'regressor', 'Regressor'
+    P_MATCH_BY_NAME,_MATCH_BY_NAME = 'matchByName', 'Match features and bands by name'
     P_OUTPUT_REGRESSION, _OUTPUT_REGRESSION = 'outputRegression', 'Output regression layer'
 
     def displayName(self) -> str:
@@ -30,6 +31,7 @@ class PredictRegressionAlgorithm(EnMAPProcessingAlgorithm):
             (self._RASTER, 'A raster layer with bands used as features. '
                            'Regressor features and raster bands are matched by name.'),
             (self._REGRESSOR, 'A fitted regressor.'),
+            (self._MATCH_BY_NAME, 'Whether to match raster bands and regressor features by name.'),
             (self._OUTPUT_REGRESSION, self.RasterFileDestination)
         ]
 
@@ -39,6 +41,7 @@ class PredictRegressionAlgorithm(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
         self.addParameterPickleFile(self.P_REGRESSOR, self._REGRESSOR)
+        self.addParameterBoolean(self.P_MATCH_BY_NAME, self._MATCH_BY_NAME, False, True)
         self.addParameterRasterDestination(self.P_OUTPUT_REGRESSION, self._OUTPUT_REGRESSION)
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
@@ -55,6 +58,7 @@ class PredictRegressionAlgorithm(EnMAPProcessingAlgorithm):
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         dump = self.parameterAsRegressorDump(parameters, self.P_REGRESSOR, context)
+        matchByName = self.parameterAsBoolean(parameters, self.P_MATCH_BY_NAME, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_REGRESSION, context)
         maximumMemoryUsage = Utils.maximumMemoryUsage()
 
@@ -66,14 +70,18 @@ class PredictRegressionAlgorithm(EnMAPProcessingAlgorithm):
             bandNames = [rasterReader.bandName(i + 1) for i in range(rasterReader.bandCount())]
 
             # match regressor features with raster band names
-            try:  # try to find matching bands ...
-                bandList = [bandNames.index(feature) + 1 for feature in dump.features]
-            except ValueError:
-                bandList = None
+            bandList = None
+            if matchByName:
+                try:  # try to find matching bands ...
+                    bandList = [bandNames.index(feature) + 1 for feature in dump.features]
+                except ValueError:
+                    pass
 
             # ... if not possible, use original bands, if overall number of bands and features do match
             if bandList is None and len(bandNames) != len(dump.features):
-                message = f'classifier features ({dump.features}) not matching raster bands ({bandNames})'
+                message = f'regressor features ({dump.features}) not matching raster bands ({bandNames})\n' \
+                          f'number of features: {len(dump.features)}\n' \
+                          f'number of bands: {len(bandNames)}\n'
                 feedback.reportError(message, fatalError=True)
                 raise QgsProcessingException(message)
 
