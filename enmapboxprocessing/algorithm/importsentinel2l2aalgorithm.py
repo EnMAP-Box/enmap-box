@@ -56,7 +56,9 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
         return Group.ImportData.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
-        self.addParameterFile(self.P_FILE, self._FILE, extension='xml')
+        self.addParameterFile(
+            self.P_FILE, self._FILE, extension='xml', fileFilter='Metadata file (MTD_MSIL2A.xml);;All files (*.*)'
+        )
         self.addParameterEnum(self.P_BAND_LIST, self._BAND_LIST, self.O_BAND_LIST, True, self.D_BAND_LIST, True)
         self.addParameterVrtDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 
