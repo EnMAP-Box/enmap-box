@@ -33,7 +33,9 @@ class ImportDesisL1BAlgorithm(EnMAPProcessingAlgorithm):
         return Group.ImportData.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
-        self.addParameterFile(self.P_FILE, self._FILE, extension='xml')
+        self.addParameterFile(
+            self.P_FILE, self._FILE, extension='xml', fileFilter='Metadata file (*-METADATA.xml);;All files (*.*)'
+        )
         self.addParameterVrtDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 
     def isValidFile(self, file: str) -> bool:

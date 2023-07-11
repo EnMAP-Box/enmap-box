@@ -52,7 +52,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterFile(
-            self.P_FILE, self._FILE, extension='XML', fileFilter='Metadata file (*-METADATA.xml);;All files (*.*)'
+            self.P_FILE, self._FILE, extension='XML', fileFilter='Metadata file (*-METADATA.XML);;All files (*.*)'
         )
         self.addParameterBoolean(self.P_SET_BAD_BANDS, self._SET_BAD_BANDS, True)
         self.addParameterEnum(
