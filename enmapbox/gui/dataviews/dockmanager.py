@@ -1596,7 +1596,8 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
 
         actionPasteStyle = menu.addAction('Paste Style')
         actionPasteStyle.triggered.connect(lambda *args, _lyr=lyr: pasteStyleFromClipboard(_lyr))
-        actionPasteStyle.setEnabled(MDF_QGIS_LAYER_STYLE in QApplication.clipboard().mimeData().formats())
+        cbmd: QMimeData = QApplication.clipboard().mimeData()
+        actionPasteStyle.setEnabled(isinstance(cbmd, QMimeData) and MDF_QGIS_LAYER_STYLE in cbmd.formats())
         actionCopyStyle = menu.addAction('Copy Style')
         actionCopyStyle.triggered.connect(lambda *args, _lyr=lyr: pasteStyleToClipboard(_lyr))
         menu.addSeparator()
