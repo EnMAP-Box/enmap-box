@@ -1,30 +1,28 @@
 from os.path import exists, splitext
 from typing import List, Union
 
+import qgis.utils
 from enmapbox import messageLog
-from enmapbox.gui.dataviews.dockmanager import DockTreeNode, MapDockTreeNode, DockManagerLayerTreeModelMenuProvider, \
-    DockTreeView, LayerTreeNode
-from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog
-from qgis.PyQt.QtCore import Qt, QObject, QPoint, QModelIndex
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QWidgetAction, QApplication, QAction
-
 from enmapbox.gui.contextmenus import EnMAPBoxAbstractContextMenuProvider
 from enmapbox.gui.datasources.datasources import DataSource, RasterDataSource, VectorDataSource, ModelDataSource
 from enmapbox.gui.datasources.datasourcesets import DataSourceSet
 from enmapbox.gui.datasources.manager import DataSourceManager, DataSourceManagerTreeView
 from enmapbox.gui.datasources.metadata import RasterBandTreeNode
+from enmapbox.gui.dataviews.dockmanager import DockTreeNode, MapDockTreeNode, DockManagerLayerTreeModelMenuProvider, \
+    DockTreeView, LayerTreeNode
 from enmapbox.gui.dataviews.docks import Dock, MapDock
 from enmapbox.gui.mapcanvas import MapCanvas, CanvasLink
-from qgis.core import QgsWkbTypes, QgsPointXY, QgsRasterLayer, QgsMapLayerProxyModel, QgsMessageLog, Qgis, \
-    QgsProject, QgsLayerTree, QgsVectorLayer, QgsLayerTreeNode, QgsMapLayer, QgsLayerTreeLayer, QgsLayerTreeGroup
-
-from qgis.gui import QgsMapCanvas, QgisInterface, QgsMapLayerComboBox
-import qgis.utils
 from enmapbox.qgispluginsupport.qps.crosshair.crosshair import CrosshairDialog
+from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog
 from enmapbox.qgispluginsupport.qps.models import TreeNode
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibraryplotwidget import SpectralProfilePlotModel
 from enmapbox.qgispluginsupport.qps.utils import qgisAppQgisInterface, SpatialPoint, SpatialExtent, findParent
+from qgis.PyQt.QtCore import Qt, QObject, QPoint, QModelIndex
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QMenu, QWidgetAction, QApplication, QAction
+from qgis.core import QgsWkbTypes, QgsPointXY, QgsRasterLayer, QgsMapLayerProxyModel, QgsMessageLog, Qgis, \
+    QgsProject, QgsLayerTree, QgsVectorLayer, QgsLayerTreeNode, QgsMapLayer, QgsLayerTreeLayer, QgsLayerTreeGroup
+from qgis.gui import QgsMapCanvas, QgisInterface, QgsMapLayerComboBox
 
 
 class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
@@ -207,6 +205,27 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                         a.triggered.connect(lambda *args, sl=speclib, n=node: node.insertLayer(0, sl))
         menu.addSeparator()
         s = ""
+
+    def onAddGroup(self, view: DockTreeView):
+        """
+        Create a new layer group
+        """
+        node = view.currentNode()
+        selectedLayerNodes = view.selectedLayerNodes()
+
+        newNode = QgsLayerTreeGroup(name='Group')
+        if isinstance(node, QgsLayerTree):
+            node.insertChildNode(0, newNode)
+        elif isinstance(node, (QgsLayerTreeGroup, QgsLayerTreeLayer)):
+            parent = node.parent()
+            if isinstance(parent, QgsLayerTreeGroup):
+                index = parent.children().index(node) + 1
+                parent.insertChildNode(index, newNode)
+
+        model = view.layerTreeModel()
+        model.removeNodes(selectedLayerNodes)
+        for n in selectedLayerNodes:
+            newNode.addChildNode(n)
 
     def populateDataSourceMenu(self,
                                menu: QMenu,
@@ -460,7 +479,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                 and isinstance(node, (QgsLayerTreeGroup, QgsLayerTreeLayer)):
             action = menu.addAction('Add Group')
             action.setIcon(QIcon(':/images/themes/default/mActionAddGroup.svg'))
-            action.triggered.connect(view.menuProvider().onAddGroup)
+            action.triggered.connect(lambda tv=view: self.onAddGroup(view))
 
         if type(node) is QgsLayerTreeGroup:
             action = menu.addAction('Remove Group')
@@ -534,4 +553,5 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
         emb = self.enmapBox()
         if isinstance(emb, QgisInterface) and isinstance(layer, QgsVectorLayer):
             messageBar = emb.messageBar()
-        showLayerPropertiesDialog(layer, canvas=canvas, messageBar=messageBar, modal=True, useQGISDialog=False)
+        showLayerPropertiesDialog(layer, canvas=canvas, messageBar=messageBar,
+                                  modal=True, useQGISDialog=False)

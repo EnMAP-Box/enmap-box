@@ -137,7 +137,6 @@ class test_applications(EnMAPBoxTestCase):
 
     def test_enmapbox_contextMenus(self):
 
-
         eb = EnMAPBox()
         eb.loadExampleData()
 

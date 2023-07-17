@@ -25,7 +25,7 @@ from typing import Optional, List, Dict
 
 from enmapbox import debugLog
 from enmapbox.gui import \
-    SpectralLibraryWidget, SpatialExtent, showLayerPropertiesDialog
+    SpectralLibraryWidget, SpatialExtent
 from enmapbox.gui.datasources.datasources import DataSource, ModelDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager
 from enmapbox.gui.dataviews.docks import Dock, DockArea, \
