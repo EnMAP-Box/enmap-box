@@ -134,3 +134,11 @@ class test_applications(EnMAPBoxTestCase):
 
         self.showGui(eb.ui)
         eb.close()
+
+    def test_enmapbox_contextMenus(self):
+
+
+        eb = EnMAPBox()
+        eb.loadExampleData()
+
+        self.showGui(eb.ui)

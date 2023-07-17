@@ -1872,14 +1872,6 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
             from enmapbox.gui.dataviews.docks import SpectralLibraryDock
             emb.createDock(SpectralLibraryDock, speclib=layer)
 
-    def showLayerProperties(self, layer: QgsMapLayer, canvas: QgsMapCanvas):
-        from enmapbox.gui.enmapboxgui import EnMAPBox
-        messageBar = None
-        emb = EnMAPBox.instance()
-        if isinstance(emb, EnMAPBox) and isinstance(layer, QgsVectorLayer):
-            messageBar = emb.messageBar()
-        showLayerPropertiesDialog(layer, canvas=canvas, messageBar=messageBar, modal=True, useQGISDialog=False)
-
     def onAddGroup(self):
         """
         Create a new layer group

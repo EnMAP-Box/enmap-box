@@ -4,6 +4,7 @@ from typing import List, Union
 from enmapbox import messageLog
 from enmapbox.gui.dataviews.dockmanager import DockTreeNode, MapDockTreeNode, DockManagerLayerTreeModelMenuProvider, \
     DockTreeView, LayerTreeNode
+from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog
 from qgis.PyQt.QtCore import Qt, QObject, QPoint, QModelIndex
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu, QWidgetAction, QApplication, QAction
@@ -258,18 +259,18 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                 subAction = subMenu.addAction('True Color')
                 subAction.setToolTip('Red-Green-Blue true colors')
                 subAction.triggered.connect(lambda *args, s=src, t=target:
-                                            self.openInMap(s, t, rgb='R,G,B'))
+                                            treeView.openInMap(s, t, rgb='R,G,B'))
                 subAction.setEnabled(b)
                 subAction = subMenu.addAction('CIR')
                 subAction.setToolTip('nIR Red Green')
                 subAction.triggered.connect(lambda *args, s=src, t=target:
-                                            self.openInMap(s, t, rgb='NIR,R,G'))
+                                            treeView.openInMap(s, t, rgb='NIR,R,G'))
                 subAction.setEnabled(b)
 
                 subAction = subMenu.addAction('SWIR')
                 subAction.setToolTip('nIR swIR Red')
                 subAction.triggered.connect(lambda *args, s=src, t=target:
-                                            self.openInMap(s, t, rgb='NIR,SWIR,R'))
+                                            treeView.openInMap(s, t, rgb='NIR,SWIR,R'))
                 subAction.setEnabled(b)
 
                 # todo: move to different context menu provider
@@ -281,7 +282,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                                    for shortName in shortNames]
                     subAction = subMenu2.addAction(name + f' ({" - ".join(wavelengths)})')
                     subAction.setToolTip(' - '.join(longNames))
-                    subAction.triggered.connect(lambda *args, s=src, t=target, rgb=name: self.openInMap(s, t, rgb=rgb))
+                    subAction.triggered.connect(lambda *args, s=src, t=target, rgb=name: treeView.openInMap(s, t, rgb=rgb))
                     subAction.setEnabled(b)
 
             if isinstance(node, RasterDataSource):
@@ -355,30 +356,30 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                             a = sub.addAction(mapDock.title())
                             a.triggered.connect(
                                 lambda checked, s=node, d=mapDock:
-                                self.openInMap(s, d))
+                                treeView.openInMap(s, d))
                     else:
                         sub.setEnabled(False)
 
                 a = menu.addAction('Open Spectral Library Viewer')
                 a.triggered.connect(
-                    lambda *args, s=node: self.openInSpeclibEditor(node.asMapLayer()))
+                    lambda *args, s=node: treeView.openInSpeclibEditor(node.asMapLayer()))
 
                 a = menu.addAction('Open Attribute Table')
-                a.triggered.connect(lambda *args, s=node: self.openInAttributeEditor(s.asMapLayer()))
+                a.triggered.connect(lambda *args, s=node: treeView.openInAttributeEditor(s.asMapLayer()))
 
                 a = menu.addAction('Open in QGIS')
                 if isinstance(qgis.utils.iface, QgisInterface):
                     a.triggered.connect(lambda *args, s=node:
-                                        self.openInMap(s, QgsProject.instance()))
+                                        treeView.openInMap(s, QgsProject.instance()))
 
                 a: QAction = menu.addAction('Save as')
                 a.setIcon(QIcon(':/images/themes/default/mActionFileSaveAs.svg'))
-                a.triggered.connect(lambda *args, src=node: self.onSaveAs(src))
+                a.triggered.connect(lambda *args, src=node: treeView.onSaveAs(src))
 
             elif isinstance(node, ModelDataSource):
                 a = menu.addAction('View as JSON')
                 a.setIcon(QIcon(':/images/themes/default/mIconFieldJson.svg'))
-                a.triggered.connect(lambda *args, node=node: self.onViewPklAsJson(node))
+                a.triggered.connect(lambda *args, node=node: treeView.onViewPklAsJson(node))
 
         elif isinstance(node, RasterBandTreeNode):
             # a = m.addAction('Band statistics')
@@ -420,7 +421,12 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
 
         assert isinstance(menu, QMenu)
         cidx: QModelIndex = view.currentIndex()
-        viewNode: DockTreeNode = findParent(node, DockTreeNode, checkInstance=True)
+        if isinstance(node, DockTreeNode):
+            viewNode: DockTreeNode = node
+        else:
+            viewNode: DockTreeNode = findParent(node, DockTreeNode, checkInstance=True)
+        if not isinstance(viewNode, DockTreeNode):
+            return
 
         oldProvider: DockManagerLayerTreeModelMenuProvider = view.menuProvider()
         errors: List[ModuleNotFoundError] = []
@@ -522,3 +528,10 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                 QgsMessageLog.logMessage(msg, level=Qgis.MessageLevel.Warning)
 
         return menu
+
+    def showLayerProperties(self, layer: QgsMapLayer, canvas: QgsMapCanvas):
+        messageBar = None
+        emb = self.enmapBox()
+        if isinstance(emb, QgisInterface) and isinstance(layer, QgsVectorLayer):
+            messageBar = emb.messageBar()
+        showLayerPropertiesDialog(layer, canvas=canvas, messageBar=messageBar, modal=True, useQGISDialog=False)
