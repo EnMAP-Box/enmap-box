@@ -26,7 +26,7 @@ from enmapboxprocessing.algorithm.testcase import TestCase
 
 try:
     import astropy.convolution
-
+    assert astropy.convolution is not None
     has_astropy = True
 except ModuleNotFoundError:
     has_astropy = False
