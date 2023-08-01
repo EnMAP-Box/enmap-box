@@ -31,6 +31,9 @@ models on basis of individual Lookup-Tables.
 
 import sys
 import os
+
+import numpy as np
+
 #ensure to call QGIS before PyQtGraph
 from qgis.PyQt.QtWidgets import *
 import lmuvegetationapps.Processor.Processor_Inversion_core as processor
@@ -38,6 +41,16 @@ from lmuvegetationapps import APP_DIR
 from _classic.hubflow.core import *
 
 from enmapbox.gui.utils import loadUi
+
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+from PyQt5.QtWidgets import QVBoxLayout
+
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 pathUI_train = os.path.join(APP_DIR, 'Resources/UserInterfaces/Processor_Train.ui')
 pathUI_wavelength = os.path.join(APP_DIR, 'Resources/UserInterfaces/Select_Wavelengths.ui')
@@ -100,6 +113,7 @@ class ML_Training:
         self.use_insitu = False
         self.split_method = 'train_test_split'
         self.kfolds = None
+        self.test_size = None
         self.perf_eval = False
         self.n_initial = None
         self.algorithm = 'ANN'
@@ -120,9 +134,11 @@ class ML_Training:
         self.gui.radNoiseGauss.clicked.connect(lambda: self.select_noise(mode=2))  # gaussian
         # ML Algorithms Radio Button Group
         self.gui.rbANN.clicked.connect(lambda: self.handle_algorithm(mode=0))  # 0: ANN
-        self.gui.rbGPR.clicked.connect(lambda: self.handle_algorithm(mode=1))  # 2: GPR
-        self.gui.rbRFR.clicked.connect(lambda: self.handle_algorithm(mode=2))  # 1: RFR
+        self.gui.rbGPR.clicked.connect(lambda: self.handle_algorithm(mode=1))  # 1: GPR
+        self.gui.rbRFR.clicked.connect(lambda: self.handle_algorithm(mode=2))  # 2: RFR
         self.gui.rbSVR.clicked.connect(lambda: self.handle_algorithm(mode=3))  # 3: SVR
+        self.gui.rbKRR.clicked.connect(lambda: self.handle_algorithm(mode=4))  # 4: KRR
+        self.gui.rbGBR.clicked.connect(lambda: self.handle_algorithm(mode=5))  # 5: GBR
 
         self.gui.radAL.toggled.connect(lambda: self.handle_AL())
         self.gui.radNoAL.toggled.connect(lambda: self.handle_AL())
@@ -157,10 +173,11 @@ class ML_Training:
         self.gui.cmbPCA.setEnabled(True), self.gui.cmbPCA.setChecked(True), self.gui.Noise_Box.setEnabled(True),
         self.gui.Paras_Box.setEnabled(True), self.gui.AL_Box.setEnabled(True), self.gui.Perf_Box.setEnabled(True),
         self.gui.ML_Box.setEnabled(True), self.gui.rbANN.setEnabled(True), self.gui.rbGPR.setEnabled(True),
-        self.gui.rbRFR.setEnabled(True), self.gui.rbSVR.setEnabled(True)
+        self.gui.rbRFR.setEnabled(True), self.gui.rbSVR.setEnabled(True), self.gui.rbKRR.setEnabled(True),
+        self.gui.rbGBR.setEnabled(True)
 
     def handle_algorithm(self, mode):
-        algorithm_dict = {0: 'ANN', 1: 'GPR', 2: 'RFR', 3: 'SVR'}
+        algorithm_dict = {0: 'ANN', 1: 'GPR', 2: 'RFR', 3: 'SVR', 4: 'KRR', 5: 'GBR'}
         self.algorithm = algorithm_dict[mode]
 
     def handle_AL(self):
@@ -168,7 +185,8 @@ class ML_Training:
             self.gui.AL_rbFrame.setEnabled(True), self.gui.lblInitSamples.setEnabled(True),
             self.gui.sbInitSamples.setEnabled(True), self.gui.lblSelectOut.setEnabled(True),
             self.gui.txtSelectOut.setEnabled(True), self.gui.cmdSelectOut.setEnabled(True),
-            self.gui.radPerf.setChecked(True), self.gui.radNoPerf.setEnabled(False)
+            self.gui.radPerf.setChecked(True), self.gui.radNoPerf.setEnabled(False),
+            self.gui.radCrossVal.setEnabled(False), self.gui.radTrainTest.setChecked(True)
         if self.gui.radNoAL.isChecked():
             self.gui.AL_rbFrame.setEnabled(False), self.gui.lblInitSamples.setEnabled(False),
             self.gui.sbInitSamples.setEnabled(False), self.gui.lblSelectOut.setEnabled(False),
@@ -179,8 +197,8 @@ class ML_Training:
     def handle_AL_strat(self, mode):
         if mode == 'internal':
             self.gui.frame_PerfEvalOptions.setEnabled(True), self.gui.radTrainTest.setEnabled(True),
-            self.gui.radCrossVal.setEnabled(True), self.gui.lblTrainSize.setEnabled(True),
-            self.gui.txtTrainSize.setEnabled(True)
+            self.gui.radCrossVal.setEnabled(False), self.gui.lblTrainSize.setEnabled(True),
+            self.gui.txtTrainSize.setEnabled(True),
         if mode == 'insitu':
             self.gui.frame_PerfEvalOptions.setEnabled(False)
 
@@ -350,7 +368,7 @@ class ML_Training:
         else:
             self.npca = 0
 
-        if len(set(self.param_flags)) == 1:
+        if all(flag == -1 for flag in self.param_flags):
             raise ValueError("No target parameters selected")
         else:
             self.para_list = self.toggle_params(param_flags=self.param_flags)
@@ -394,7 +412,7 @@ class ML_Training:
         proc = processor.ProcessorMainFunction()  # instance of the Processor main class
 
         self.prg_widget = self.main.prg_widget
-        self.prg_widget.gui.lblCaption_l.setText("Training Machine Learning Model")
+        self.prg_widget.gui.lblCaption_l.setText("Training Machine Learning Model...")
         self.prg_widget.gui.lblCaption_r.setText("Setting up training...")
         self.main.prg_widget.gui.prgBar.setValue(0)
         self.main.prg_widget.gui.setModal(True)
@@ -410,7 +428,7 @@ class ML_Training:
                                            algorithm=self.algorithm, use_al=self.use_al, use_insitu=self.use_insitu,
                                            perf_eval=self.perf_eval,
                                            split_method=self.split_method, kfolds=self.kfolds,
-                                           n_initial=self.n_initial)
+                                           n_initial=self.n_initial, test_size=self.test_size)
         except ValueError as e:
             self.abort(message="Failed to setup model training: {}".format(str(e)))
             self.prg_widget.gui.lblCancel.setText("")
@@ -432,12 +450,152 @@ class ML_Training:
         #     self.prg_widget.gui.allow_cancel = True
         #     self.prg_widget.gui.close()
         #     return
+        self.results_dict = proc.train_main.get_result_dict()
 
         self.prg_widget.gui.lblCancel.setText("")
         self.prg_widget.gui.allow_cancel = True
         self.prg_widget.gui.close()
         QMessageBox.information(self.gui, "Finish", "Training finished")
         #▬self.gui.close()
+        if self.perf_eval:
+            self.perfView_widget = self.main.performance_view
+            self.perfView_widget.collect(self.results_dict)
+            self.perfView_widget.gui.show()
+
+
+class perfView:
+    def __init__(self, main):
+        self.main = main
+        self.gui = Performance_GUI()
+        self.connections()
+        self.all_results_dict = None
+
+        self.layout_perf = QVBoxLayout()
+        self.gui.perfView.setLayout(self.layout_perf)
+
+        self.figure_perf = Figure(figsize=(6, 6))
+        self.canvas_perf = FigureCanvas(self.figure_perf)
+        self.toolbar_perf = NavigationToolbar(self.canvas_perf, self.gui.scatterView)
+        self.layout_perf.addWidget(self.canvas_perf)
+        self.layout_perf.addWidget(self.toolbar_perf)
+
+        self.layout_scatter = QVBoxLayout()
+        self.gui.scatterView.setLayout(self.layout_scatter)
+
+        self.figure_scatter = Figure(figsize=(6, 6))
+        self.canvas_scatter = FigureCanvas(self.figure_scatter)
+        self.toolbar_scatter = NavigationToolbar(self.canvas_scatter, self.gui.scatterView)
+        self.layout_scatter.addWidget(self.canvas_scatter)
+        self.layout_scatter.addWidget(self.toolbar_scatter)
+
+    def connections(self):
+        self.gui.cmdQuit.clicked.connect(lambda: self.gui.close())
+        self.gui.modelComboBox.currentIndexChanged.connect(self.plot_results)
+
+    def collect(self, dict):
+        self.all_results_dict = dict
+        for key in dict:
+            self.gui.modelComboBox.addItem(str(key))
+
+    def close(self):
+        pass
+
+    def plot_results(self, index):
+        key = self.gui.modelComboBox.itemText(index)  # Get the text of the selected item
+        data = self.all_results_dict.get(key, None)  # Retrieve the data from the dictionary
+
+        # def colorbar(mappable):
+        #     ax = mappable.axes
+        #     fig = ax.figure
+        #     divider = make_axes_locatable(ax)
+        #     cax = divider.append_axes("right", size="5%", pad=0.05)
+        #     return fig.colorbar(mappable, cax=cax)
+        def format_float_by_scale(value):
+            if value >= 100:
+                formatted_value = "{:.0f}".format(value)
+            elif value >= 10:
+                formatted_value = "{:.1f}".format(value)
+            elif value >= 1:
+                formatted_value = "{:.2f}".format(value)
+            elif value >= 0.1:
+                formatted_value = "{:.3f}".format(value)
+            else:
+                formatted_value = "{:.4f}".format(value)
+            return formatted_value
+
+        if data is None:
+            return
+
+        performances, y_val, predictions = data["performances"], data["y_val"], data["predictions"]
+        if isinstance(performances, np.ndarray):
+            performances = [performances]
+        performances = np.asarray(performances).flatten()
+        y_val = np.asarray(y_val).flatten()
+        final_pred = np.asarray(predictions).flatten()
+
+        pred_std = None
+        try:
+            pred_std = np.asarray(data["stds"]).flatten()
+        except:
+            pred_std = np.empty((0,))
+
+        r2 = r2_score(y_val, final_pred)
+
+        self.figure_perf.clf()
+        self.figure_scatter.clf()
+        # Create a new subplot
+        ax = self.figure_perf.add_subplot(111)
+        if isinstance(performances, np.ndarray) and len(performances) > 1:
+            # Plot the data
+            ax.plot(range(len(performances)), performances, 'k-')
+            ax.set_xlabel('Number of added samples')
+            ax.set_ylabel('RMSE {}'.format(key))
+            ax.tick_params("both")
+            # Redraw the canvas
+        else:
+            performance = [format_float_by_scale(i) for i in performances]
+            ax.text(0.5, 0.5,
+                    'No Active Learning applied\nFull test set RMSE = ' + str(np.array(performance[0], dtype=float)),
+                    ha='center', va='center', transform=ax.transAxes)
+            ax.set_xticks([])
+            ax.set_yticks([])
+        self.canvas_perf.draw()
+
+
+        # Create a new subplot
+        ax0 = self.figure_scatter.add_subplot(111, aspect='equal')
+        # Scatter plot
+        if not isinstance(pred_std, np.ndarray):
+            pred_std = np.array(pred_std)
+        if pred_std.size > 0:
+            scatter = ax0.scatter(y_val, final_pred, c=pred_std, cmap='plasma')
+        else:
+            scatter = ax0.scatter(y_val, final_pred, c='k')
+        # 1:1 line
+        ax_max = max(y_val.max(), final_pred.max())
+        ax0.plot([0, ax_max], [0, ax_max], 'k-')
+        # Regression line
+        lr = LinearRegression()
+        lr.fit(y_val.reshape(-1, 1), final_pred)
+        x_fit = np.linspace(0, ax_max, 100)
+        y_fit = lr.predict(x_fit.reshape(-1, 1))
+        ax0.plot(x_fit, y_fit, 'r-')
+
+        ax0.text(0.05, 0.95, 'R² = {:.2f}'.format(r2), transform=ax0.transAxes)
+        ax0.set_xlabel('{} measured'.format(key))
+        ax0.set_ylabel('{} estimated'.format(key))
+        ax0.tick_params("both")
+
+        # Colorbar.
+        if pred_std.size > 0:
+            the_divider = make_axes_locatable(ax0)
+            color_axis = the_divider.append_axes("right", size="5%", pad=0.1)
+            scatter = ax0.scatter(y_val, final_pred, c=pred_std, cmap='plasma')
+            cbar = plt.colorbar(scatter, cax=color_axis)
+            cbar.set_label(label='SD', labelpad=0)
+
+        # Redraw the canvas
+        self.canvas_scatter.draw()
 
 # The SelectWavelengths class allows to add/remove wavelengths from the inversion
 class SelectWavelengths:
@@ -548,13 +706,6 @@ class PRG:
         self.gui.cmdCancel.setDisabled(True)
         self.gui.lblCancel.setText("-1")
 
-class ALperfView:
-    def __init__(self, main):
-        self.main = main
-        self.gui = Performance_GUI()
-
-    def connections(self):
-        self.gui.cmdQuit.clicked.connect(lambda: self.gui.close())
 
 # class MainUiFunc is the interface between all sub-GUIs, so they can communicate between each other
 class MainUiFunc:
@@ -563,11 +714,13 @@ class MainUiFunc:
         self.ann_training = ML_Training(self)
         self.select_wavelengths = SelectWavelengths(self)
         self.prg_widget = PRG(self)
-        self.performance_view = ALperfView(self)
+        self.performance_view = perfView(self)
 
     def show(self):
         self.ann_training.gui.show()
 
+    def pass_results(self):
+        pass
 
 if __name__ == '__main__':
     from enmapbox.testing import start_app

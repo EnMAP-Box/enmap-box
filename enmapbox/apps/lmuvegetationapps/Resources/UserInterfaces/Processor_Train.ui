@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>595</width>
+    <width>625</width>
     <height>678</height>
    </rect>
   </property>
@@ -183,7 +183,7 @@
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Initial sample size [%]:</string>
+         <string>AL initial sample size [%]:</string>
         </property>
        </widget>
       </item>
@@ -516,36 +516,20 @@
       <string>Machine Learning Regression Algorithm</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_6">
-      <item row="0" column="2">
-       <widget class="QRadioButton" name="rbGPR">
-        <property name="enabled">
-         <bool>false</bool>
+      <item row="0" column="5">
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-        <property name="text">
-         <string>Gaussian Process Regression (GPR)</string>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
         </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">rad_group_ml</string>
-        </attribute>
-       </widget>
+       </spacer>
       </item>
       <item row="1" column="0">
-       <widget class="QRadioButton" name="rbRFR">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Random Forest Regression (RFR)</string>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">rad_group_ml</string>
-        </attribute>
-       </widget>
-      </item>
-      <item row="1" column="2">
        <widget class="QRadioButton" name="rbSVR">
         <property name="enabled">
          <bool>false</bool>
@@ -574,18 +558,54 @@
         </attribute>
        </widget>
       </item>
-      <item row="0" column="3">
-       <spacer name="horizontalSpacer_3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+      <item row="1" column="1">
+       <widget class="QRadioButton" name="rbKRR">
+        <property name="text">
+         <string>Kernel Ridge Regression (KRR)</string>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
+        <attribute name="buttonGroup">
+         <string notr="true">rad_group_ml</string>
+        </attribute>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QRadioButton" name="rbGPR">
+        <property name="enabled">
+         <bool>false</bool>
         </property>
-       </spacer>
+        <property name="text">
+         <string>Gaussian Process Regression (GPR)</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">rad_group_ml</string>
+        </attribute>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QRadioButton" name="rbGBR">
+        <property name="text">
+         <string>Gradient Boosting Regression (GBR)</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">rad_group_ml</string>
+        </attribute>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QRadioButton" name="rbRFR">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Random Forest Regression (RFR)</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">rad_group_ml</string>
+        </attribute>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -1192,7 +1212,7 @@
          <number>0</number>
         </property>
         <property name="text">
-         <string>Model Name:</string>
+         <string>Model base name:</string>
         </property>
        </widget>
       </item>
@@ -1382,7 +1402,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Lookup-Table (LUT) /Training Database (TDB)</string>
+      <string>Lookup-Table (LUT) / Training Database (TDB)</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
@@ -1518,10 +1538,13 @@
             <set>Qt::ImhDigitsOnly</set>
            </property>
            <property name="maxLength">
-            <number>3</number>
+            <number>2</number>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
+           </property>
+           <property name="placeholderText">
+            <string>[1-99]</string>
            </property>
           </widget>
          </item>
@@ -1547,7 +1570,7 @@
             <bool>false</bool>
            </property>
            <property name="text">
-            <string>Folds</string>
+            <string>k-Folds</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1671,7 +1694,7 @@
          <item row="1" column="0">
           <widget class="QLabel" name="label_3">
            <property name="text">
-            <string>             </string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -1686,10 +1709,10 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="rad_group_noise"/>
+  <buttongroup name="rad_group_al"/>
+  <buttongroup name="rad_group_splitstrat"/>
   <buttongroup name="rad_group_ml"/>
   <buttongroup name="rad_group_eval"/>
-  <buttongroup name="rad_group_splitstrat"/>
-  <buttongroup name="rad_group_al"/>
+  <buttongroup name="rad_group_noise"/>
  </buttongroups>
 </ui>

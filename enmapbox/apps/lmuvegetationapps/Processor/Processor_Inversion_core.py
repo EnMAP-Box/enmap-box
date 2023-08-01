@@ -34,18 +34,28 @@ can do both training and prediction, the GUIs are split into different scripts.
 
 from _classic.hubflow.core import *
 import numpy as np
-from sklearn.decomposition import PCA
+from PyQt5 import QtCore
+
 from sklearn.neural_network import MLPRegressor
 from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import Matern, RBF, WhiteKernel
+from sklearn.gaussian_process.kernels import RBF, WhiteKernel
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.svm import SVR
+from sklearn.kernel_ridge import KernelRidge
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.model_selection import GridSearchCV
+
+from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error, r2_score
-# from modAL.models import BayesianOptimizer
-# from lmuvegetationapps.Processor.modAL import ActiveLearner
-# from lmuvegetationapps.Processor.modAL.disagreement import *
+
 from sklearn.metrics import pairwise_distances
 from sklearn.model_selection import KFold, train_test_split
 # from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import check_cv
+from sklearn.model_selection import cross_val_predict
+from sklearn.base import is_classifier
+
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -69,41 +79,84 @@ class MLRATraining:
         self.m = main
 
     @staticmethod
+    def cross_val_predict_with_std(X, y, model, cv=None):
+        """
+        Custom version of cross_val_predict that also computes prediction standard deviations.
+        Only works for GaussianProcessRegressor; for other regressors, it behaves just like cross_val_predict.
+        """
+        if not isinstance(model, GaussianProcessRegressor):
+            # Fall back to scikit-learn's cross_val_predict if we don't need std. dev.
+            return cross_val_predict(model, X, y, cv=cv)
+
+        cv = check_cv(cv, y, classifier=is_classifier(model))
+
+        predictions = np.empty_like(y, dtype=float)
+        stds = np.empty_like(y, dtype=float)
+
+        for train, test in cv.split(X, y):
+            model.fit(X[train], y[train])
+            preds, sigmas = model.predict(X[test], return_std=True)
+            predictions[test] = preds
+            stds[test] = sigmas
+
+        return predictions, stds
+
+    @staticmethod
     def _fit(X, y, model):
         # fits ("trains") the model by assessing X (predictors, reflectances) and y (PROSAIL parameters)
         # So the result is a model that is ready to be used as in ".predict(new_x)"
         return model.fit(X, y)
 
     @staticmethod
-    def _fit_split(X, y, model, split_method="train_test_split", kfolds=5, test_size=0.2, random_state=42):
-        performances = []
-        loop_counter = 1
+    def _fit_split(X, y, model, split_method="train_test_split", kfolds=5, test_size=0.2, random_state=42,
+                   hypara_opt=False, param_grid=None):
 
-        for train_X, train_y, test_X, test_y in MLRATraining._split(X, y, split_method=split_method, kfolds=kfolds,
-                                                                    test_size=test_size, random_state=random_state):
+        if split_method == 'train_test_split':
+            stds = []
+            yield {"type": "progress", "progress": 1, "loop_counter": 1}
+            train_X, test_X, train_y, test_y = train_test_split(X, y, test_size=test_size, random_state=random_state)
             model.fit(train_X, train_y)
-            predictions = model.predict(test_X)
+            yield {"type": "progress", "progress": 50, "loop_counter": 1}
+            if isinstance(model, GaussianProcessRegressor):
+                predictions, stds = model.predict(test_X, return_std=True)
+            else:
+                predictions = model.predict(test_X)
             score = mean_squared_error(test_y, predictions)
-            performances.append(score)
+            model.fit(X, y)
+            yield {"type": "progress", "progress": 100, "loop_counter": 1}
+            yield {'type': 'result', 'model': model, 'performances': score, 'predictions': predictions, 'stds': stds,
+                   'X_val': test_X, 'y_val': test_y}
 
-            if split_method == "kfold":
-                progress = loop_counter / kfolds * 100
-                yield {"type": "progress", "progress": progress, "loop_counter": loop_counter}
-            loop_counter += 1
+        elif split_method == 'kfold':
+            # In the case of k-fold cross-validation, use cross_val_predict to get the predictions for each fold
+            yield {"type": "progress", "progress": 0, "loop_counter": 1}  # Indicate start of process
+            if isinstance(model, GaussianProcessRegressor):
+                # If the model is a GaussianProcessRegressor, also get the standard deviations of the predictions
+                predictions, stds = MLRATraining.cross_val_predict_with_std(X, y, model, cv=kfolds)
+                score = mean_squared_error(y, predictions)
+                yield {"type": "progress", "progress": 100, "loop_counter": 1}  # Indicate end of process
+                yield {'type': 'result', 'model': model, 'performances': score,
+                       'predictions': predictions, 'stds': stds, 'X_val': X, 'y_val': y}
+            else:
+                # If the model is not a GaussianProcessRegressor, get the predictions without standard deviations
+                predictions = cross_val_predict(model, X, y, cv=kfolds)
+                score = mean_squared_error(y, predictions)
+                yield {"type": "progress", "progress": 100, "loop_counter": 1}  # Indicate end of process
+                yield {'type': 'result', 'model': model, 'performances': score,
+                       'predictions': predictions, 'X_val': X, 'y_val': y}
+        else:
+            raise ValueError(f"Unrecognized split method: {split_method}")
 
-        # After the validation process, fit the model on the entire dataset
-        model.fit(X, y)
-        yield {'type': 'result', 'model': model, 'all_performances': performances}
 
     @staticmethod
     def _split(X, y, split_method="train_test_split", kfolds=5, test_size=0.2, random_state=42):
         if split_method == "train_test_split":
-            train_X, test_X, train_y, test_y = train_test_split(X, y, test_size=test_size, random_state=random_state)
-            yield train_X, train_y, test_X, test_y
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+            yield X_train, X_test, y_train, y_test
         elif split_method == "kfold":
             kf = KFold(n_splits=kfolds, random_state=random_state, shuffle=True)
             for train_index, test_index in kf.split(X, y):
-                yield X[train_index], y[train_index], X[test_index], y[test_index]
+                yield X[train_index], X[test_index], y[train_index], y[test_index]
         else:
             raise ValueError(f"Unrecognized split method: {split_method}")
     
@@ -111,44 +164,52 @@ class MLRATraining:
     def _al_loop_internal(X, y, model, init_percentage, split_method="train_test_split", kfolds=5, test_size=0.2):
         all_training_indices = []
         all_performances = []
+        all_stds = []
+        all_preds = []
         X_val, y_val = None, None
         loop_counter = 1
-        for train_X, train_y, test_X, test_y in MLRATraining._split(X, y, split_method=split_method, kfolds=kfolds,
+        for X_train, X_test, y_train, y_test in MLRATraining._split(X, y, split_method=split_method, kfolds=kfolds,
                                                                     test_size=test_size):
             # Get generator from _al_loop
-            loop_gen = MLRATraining._al_loop(train_X, train_y, model, test_X, test_y, init_percentage=init_percentage)
+            loop_gen = MLRATraining._al_loop(X_train, y_train, X_test, y_test, model, init_percentage=init_percentage)
 
             for output in loop_gen:
                 if output['type'] == 'result':
                     all_training_indices.append(output['training_indices'])
                     all_performances.append(output['performances'])
+                    if isinstance(model, GaussianProcessRegressor):
+                        preds, stds = model.predict(output['X_val'], return_std=True)
+                        all_stds.append(stds)
+                        all_preds.append(preds)
+                    else:
+                        all_preds.append(model.predict(output['X_val']))
                     X_val = output['X_val']
                     y_val = output['y_val']
                 else:
-                    if split_method == 'kfold':
-                        output['loop_counter'] = loop_counter
+                    output['loop_counter'] = loop_counter
                     yield output
             loop_counter += 1
+
         yield {'type': 'result', 'model': model, 'all_training_indices': all_training_indices,
-               'all_performances': all_performances, 'X_val': X_val, 'y_val': y_val}
+               'performances': all_performances, 'predictions': all_preds, 'stds': all_stds, 'X_val': X_val, 'y_val': y_val}
         # return model, all_training_indices, all_performances, X_val, y_val
         
         
     @staticmethod
-    def _al_loop(X, y, model, X_val, y_val, init_percentage):
+    def _al_loop(X, y, X_val, y_val, model, init_percentage):
 
         init_percentage = init_percentage/100
         n_samples = X.shape[0]
         n_init = int(init_percentage * n_samples)
         # Compute the pairwise distances between all samples
-        distances = pairwise_distances(X)
-        # Get the maximum distance for each sample
-        max_distances = distances.max(axis=1)
-        # Get the indices of the samples sorted by their maximum distance in descending order
-        sorted_indices = np.argsort(max_distances)[::-1]
-        # Select the initial indices as the top 2% of the sorted indices
-        initial_idx = sorted_indices[:n_init]
-        # initial_idx = np.random.choice(range(len(X)), size=n_init, replace=False)
+        # distances = pairwise_distances(X)
+        # # Get the maximum distance for each sample
+        # max_distances = distances.max(axis=1)
+        # # Get the indices of the samples sorted by their maximum distance in descending order
+        # sorted_indices = np.argsort(max_distances)[::-1]
+        # # Select the initial indices as the top x% of the sorted indices
+        # initial_idx = sorted_indices[:n_init]
+        initial_idx = np.random.choice(range(len(X)), size=n_init, replace=False)  # random initial sampling
         X_initial, y_initial = X[initial_idx], y[initial_idx]
 
         model.fit(X_initial, y_initial)
@@ -182,7 +243,7 @@ class MLRATraining:
             performances.append(score)
 
             progress = (total_remaining - len(remaining_indices)) / total_remaining * 100
-            if int(progress) % 2 == 0 and int(progress) != last_printed:
+            if int(progress) % 5 == 0 and int(progress) != last_printed:
                 # print('Progress: {:.0f}%'.format(progress))
                 last_printed = int(progress)
                 yield{'type': 'progress', 'progress': progress}
@@ -201,10 +262,6 @@ class MLRATraining:
 
         yield{'type': 'result', 'model': model, 'training_indices': training_indices, 'performances': performances,
               'X_val': X_val, 'y_val': y_val}
-        #return model, training_indices, performances, X_val, y_val
-
-
-        # Add more ML-algorithms here in the same design if needed at any time (e.g. SVR, GPR, RandomForest, ...)
 
 
 # Some basic functions are placed in this class
@@ -233,7 +290,13 @@ class Functions:
             "cbc": ["ccl", [0.0, 0.005], 1000],
             "car": ["Car", [0.0, 20.0], 1],
             "anth": ["Canth", [0.0, 5.0], 1],
-            "cbrown": ["brown_pigments", [0.0, 1.0], 10]}
+            "cbrown": ["brown_pigments", [0.0, 1.0], 10],
+            "AGBdry": ["AGBdry", [0.0, 2000.0], 0.01],
+            "AGBfresh": ["AGBfresh", [0.0, 5000.0], 0.001],
+            "CWC": ["CWC", [0.0, 0.3], 1],
+            "Nitrogen": ["Nitrogen", [0.0, 40], 0.1],
+            "Carbon": ["Carbon", [0.0, 600], 0.01]
+            }
 
     @staticmethod
     def _ndvi(bands, in_matrix, thr):
@@ -347,6 +410,7 @@ class ProcessorTraining:
         # self.ml_params_dict_svr = None
         # self.ml_params_dict_rforest = None
         # self.ml_params_dict_gpr = None
+        self.all_results_dict = {}
 
 
     def training_setup(self, lut_metafile, exclude_bands, npca, model_meta, para_list, noisetype=1, noiselevel=4,
@@ -408,9 +472,10 @@ class ProcessorTraining:
 
         # Boosting the parameters is necessary for some algorithms which cannot handle very small or large values
         # for the training (e.g. ANN fails when learning y=0.004, so it is boosted to y=4 according to "Functions.conv"
-        if self.algorithm == 'ANN':
-            self.para_boost = True
-        else: self.para_boost = False
+        self.para_boost = True
+        # if self.algorithm == 'ANN':
+        #     self.para_boost = True
+        # else: self.para_boost = False
 
         # Which scaler should be used?
         self.scaler = StandardScaler()  # create instance of standard scaler
@@ -481,17 +546,58 @@ class ProcessorTraining:
             self.mlra = MLPRegressor(**self.ml_params)
 
         if self.algorithm == 'GPR':
-            self.gpr_kernel = 1.0 * RBF(1.0) + WhiteKernel()
-            self.ml_params = {'kernel': self.gpr_kernel, 'random_state': 0}
+            self.gpr_kernel = 1.0 * RBF(length_scale=1.0, length_scale_bounds=(1e-5, 1e5)) + WhiteKernel()
+            self.ml_params = {'kernel': self.gpr_kernel, 'random_state': 42}
             self.ml_model_ext = '.gpr'  # extension of the models to recognize it as a GPR model
             self.mlra = GaussianProcessRegressor(**self.ml_params)
 
-        # TODO: implement RFR
         if self.algorithm == 'RFR':
-            pass
-        # TODO: implement SVR
+            self.ml_paras = {
+                'n_estimators': 100,  # The number of trees in the forest.
+                'criterion': 'mse',  # The function to measure the quality of a split.
+                'max_depth': None,  # The maximum depth of the tree.
+                'min_samples_split': 2,  # The minimum number of samples required to split an internal node.
+                'min_samples_leaf': 1,  # The minimum number of samples required to be at a leaf node.
+                # Add more parameters as needed.
+            }
+            self.ml_model_ext = '.rfr'
+            self.mlra = RandomForestRegressor(**self.ml_paras)
+
         if self.algorithm == 'SVR':
-            pass
+            self.ml_paras = {
+                'kernel': 'rbf',  # Specifies the kernel type to be used in the algorithm.
+                'gamma': 'scale',  # Kernel coefficient for ‘rbf’, ‘poly’ and ‘sigmoid’.
+                'C': 1000.0,
+                # Regularization parameter. The strength of the regularization is inversely proportional to C.
+                'epsilon': 0.1,  # Epsilon in the epsilon-SVR model.
+                # Add more parameters as needed.
+            }
+            self.ml_model_ext = '.svr'
+            self.mlra = SVR(**self.ml_paras)
+
+        if self.algorithm == 'KRR':
+            self.ml_params = {
+                'alpha': 1.0,  # Regularization strength; must be a positive float.
+                'kernel': 'rbf',  # Specifies the kernel type to be used in the algorithm.
+                'gamma': None,  # Kernel coefficient for ‘rbf’, ‘poly’ and ‘sigmoid’.
+                'degree': 3,  # Degree for ‘poly’ kernel. Ignored by all other kernels.
+                'coef0': 1  # Independent term in ‘poly’ and ‘sigmoid’.
+                # Add more parameters as needed.
+            }
+            self.ml_model_ext = '.krr'  # extension of the models to recognize it as a KRR model
+            self.mlra = KernelRidge(**self.ml_params)
+
+        if self.algorithm == 'GBR':
+            self.ml_params = {
+                'n_estimators': 100,  # The number of boosting stages to perform.
+                'learning_rate': 0.1,  # Learning rate shrinks the contribution of each tree by learning_rate.
+                'max_depth': 3,  # Maximum depth of the individual regression estimators.
+                'subsample': 1.0,  # The fraction of samples to be used for fitting the individual base learners.
+                'random_state': 42  # Controls the randomness of the estimator.
+                # Add more parameters as needed.
+            }
+            self.ml_model_ext = '.gbr'  # extension of the models to recognize it as a GBR model
+            self.mlra = GradientBoostingRegressor(**self.ml_params)
 
         # AL based on split (train-test-split or kfold cross val)
         if self.use_al and not self.use_insitu:
@@ -540,7 +646,9 @@ class ProcessorTraining:
 
                         if self.use_al and not self.use_insitu: prg_al_string = 'internal AL'
                         elif self.use_al and self.use_insitu: prg_al_string = 'insitu AL'
-                        else: prg_al_string = ''
+                        else: prg_al_string = 'non AL'
+
+                        self.init_model(var=para)  # initialize the model with the given settings
 
                         # Update progress bar
                         if prgbar_widget:
@@ -561,31 +669,26 @@ class ProcessorTraining:
                                         self.algorithm, self.noisetype, self.sigma, para, geo_ensemble + 1,
                                         self.ntts * self.ntto * self.npsi))
                         elif self.split_method == 'kfold':
-                            fold = 1
                             if prgbar_widget:
                                 prgbar_widget.gui.lblCaption_r.setText(
-                                    'Training {} {} model {:d} of {:d}: {} | Fold {:d} of {:d}'.format(
-                                        prg_al_string, self.algorithm, model_no, nmodels_total, para,
-                                        fold, self.kfolds))
+                                    'Training {} {} model {:d} of {:d}: {}'.format(
+                                        prg_al_string, self.algorithm, model_no, nmodels_total, para))
                                 qgis_app.processEvents()
                             else:  # if no progress bar exists, e.g. code is run from _exec.py
-                                print("Training {} {} Noise {:d}-{:d} | {} | Fold {:d} of {:d} | Geo {:d} of {:d}".format(
+                                print("Training {} {} Noise {:d}-{:d} | {} | Geo {:d} of {:d}".format(
                                     prg_al_string,
-                                    self.algorithm, self.noisetype, self.sigma, para, fold, self.kfolds, geo_ensemble + 1,
+                                    self.algorithm, self.noisetype, self.sigma, para, geo_ensemble + 1,
                                     self.ntts * self.ntto * self.npsi))
                         else:
                             if prgbar_widget:
                                 prgbar_widget.gui.lblCaption_r.setText(
                                     'Training {} {} model {:d} of {:d}: {}'.format(
-                                        prg_al_string, self.algorithm, model_no, nmodels_total, para,
-                                        fold, self.kfolds))
+                                        prg_al_string, self.algorithm, model_no, nmodels_total, para))
                                 qgis_app.processEvents()
                             else:
                                 print("Training {} {} Noise {:d}-{:d} | {} | Geo {:d} of {:d}".format(prg_al_string,
                                 self.algorithm, self.noisetype, self.sigma, para, geo_ensemble + 1,
                                 self.ntts * self.ntto * self.npsi))
-
-                        self.init_model(var=para)  # initialize the model with the given settings
 
                         if self.scaler:  # if X (reflectances) are to be scaled
                             self.scaler.fit(X)  # fit scaler
@@ -598,49 +701,70 @@ class ProcessorTraining:
                             self.pca.fit(x)#, y[:, ipara])
                             x = self.pca.transform(x)
 
-                        if self.perf_eval:
-                            loop = 1
-                            for result_dict in self.ml_model(X=x, y=y[:, ipara], model=self.mlra, **self.al_paras):
-                                if result_dict["type"] == "result":
+                        if self.perf_eval:  # performance evaluation
+
+                            for result_dict in self.ml_model(
+                                    X=x, y=y[:, ipara], model=self.mlra, **self.al_paras):
+                                if result_dict["type"] == "result":  # results are ready, populate results
                                     model = result_dict["model"]
+                                    self.X_val = result_dict["X_val"]
+                                    self.y_val = result_dict["y_val"]
+                                    performances = np.array(result_dict["performances"])
+                                    predictions = np.array(result_dict["predictions"])
+
+                                    # bring results back to original scale:
+                                    self.y_val = self.y_val / self.m.func.conv[para][2]
+                                    performances = performances / self.m.func.conv[para][2]
+                                    predictions = predictions / self.m.func.conv[para][2]
+
+                                    temp_dict = {
+                                        "X_val": self.X_val,
+                                        "y_val": self.y_val,
+                                        "performances": performances,
+                                        "predictions": predictions}
+                                    # GPR yields stds
+                                    if 'stds' in result_dict:
+                                        stds = np.array(result_dict['stds'])
+                                        stds = stds / self.m.func.conv[para][2]
+                                        temp_dict['stds'] = stds
                                     if self.use_al:
+                                        # TODO: these indices point at AL selected spectra -> export
                                         training_indices = result_dict["all_training_indices"]
-                                        self.X_val = result_dict["X_val"]
-                                        self.y_val = result_dict["y_val"]
-                                    performances = result_dict["all_performances"]
+                                        temp_dict["training_indices"] = training_indices
+                                    self.all_results_dict[f'{para} {prg_al_string} {self.algorithm}'] = temp_dict
 
-                                elif result_dict["type"] == "progress":
+                                elif result_dict["type"] == "progress" and self.use_al:  # progressbar updates
+                                    progress = result_dict['progress']
+                                    loop_counter = result_dict['loop_counter']
                                     if prgbar_widget:
-                                        prgbar_widget.gui.prgBar.setValue(int(result_dict['progress']))
+                                        prgbar_widget.gui.prgBar.setValue(int(progress))
                                         qgis_app.processEvents()
-                                        loop_counter = result_dict['loop_counter']
-                                        if loop_counter > loop:
-                                            if prgbar_widget:
-                                                prgbar_widget.gui.lblCaption_r.setText(
-                                                    'Training {} {} model {:d} of {:d}: {} | Fold {:d} of {:d}'.format(
-                                                        prg_al_string, self.algorithm, model_no, nmodels_total, para,
-                                                        loop_counter, self.kfolds))
-                                                qgis_app.processEvents()
-                                            else:
-                                                print('Progress: {:d}%'.format(int(result_dict['progress'])))
                                     else:
-                                        if result_dict['loop_counter'] > loop:
-                                            print('Fold: {:d} of {:d}'.format(int(result_dict['loop_counter']), self.kfolds))
-                                    loop += 1
-
+                                        print('Progress: {:d}%'.format(int(progress)))
 
                             # final_pred, pred_std = model.predict(self.X_val, return_std=True)
+                            # if self.algorithm == 'GPR':
+                            #     out_pred = np.array([self.y_val, predictions, stds])
+                            # else:
+                            #     out_pred = np.array([self.y_val, predictions])
 
-                            # np.savetxt("E:\Testdaten/performances.txt", performances)
-                            # out_pred = np.array([self.y_val, final_pred, pred_std])
-                            # np.savetxt("E:\Testdaten/LAI_results.txt", out_pred)
+                            if isinstance(performances, list):
+                                for element in performances:
+                                    if isinstance(element, list):
+                                        if len(performances[0]) == 1:
+                                            performances = np.asarray(performances).reshape((1, 1))
+
+                            # np.save("E:\Testdaten/performances_{}".format(str(para)), performances)
+                            # np.save("E:\Testdaten/results_{}".format(str(para)), out_pred)
 
                         else:
                             model = self.ml_model(X=x, y=y[:, ipara], model=self.mlra)
                         joblib.dump(model, self.model_base + "_{:d}_{}{}".format(
                             geo_ensemble, para, self.ml_model_ext))  # dump (save) model to file for later use
 
-
+                        if not self.use_al:
+                            prgbar_widget.gui.prgBar.setValue(int(model_no/nmodels_total*100))
+                            qgis_app.processEvents()
 
         # Not Done yet! Save further information to the base-folder: information about scaler and pca
         # are saved to a .proc-file; this file is read before calling predict on a model to prepare spectral data
@@ -664,9 +788,8 @@ class ProcessorTraining:
             if self.use_al:
                 para_file.write("\nactive_learning=" + ";".join(str(self.use_al)))
 
-        if self.use_al:
-            pass
-
+    def get_result_dict(self):
+        return self.all_results_dict
 
     def get_meta_LUT(self, lut_metafile):
         # opens the LUT-metafile and processes the content
@@ -697,10 +820,28 @@ class ProcessorTraining:
         #  all LUT_params
         #  ['N', 'cab', 'car', 'anth', 'cbrown', 'cw', 'cm', 'cp', 'cbc', 'LAI', 'typeLIDF', 'LIDF', 'hspot', 'psoil', 'tts', 'tto', 'psi', 'LAIu', 'cd', 'sd', 'h']
         for i, para in enumerate(self.para_list):  # extract parameters
-            if self.para_boost:  # to boost or not to boost
+            # check if para is *'derived' and calculate:
+            if para == 'AGBdry':
+                y[:, i] = (lut[self.para_dict['cp'], :]
+                           + lut[self.para_dict['cbc'], :]) * lut[self.para_dict['LAI'], :] \
+                          * self.m.func.conv.get(para)[2] * 10000
+            if para == 'AGBfresh':
+                y[:, i] = (lut[self.para_dict['cp'], :] + lut[self.para_dict['cbc'], :]
+                           + lut[self.para_dict['cw'], :]) * lut[self.para_dict['LAI'], :] * self.m.func.conv.get(para)[2] * 10000
+            if para == 'CWC':
+                y[:, i] = lut[self.para_dict['cw'], :] * lut[self.para_dict['LAI'], :]
+            if para == 'Nitrogen':
+                y[:, i] = (lut[self.para_dict['LAI'], :] * lut[self.para_dict['cp'], :]
+                           * self.m.func.conv.get(para)[2]) * 10000 / 4.43
+            if para == 'Carbon':
+                y[:, i] = (lut[self.para_dict['LAI'], :] * lut[self.para_dict['cbc'], :]
+                           * self.m.func.conv.get(para)[2]) * 10000 / 2.31
+
+            if self.para_boost and para in self.para_dict:  # to boost or not to boost
                 y[:, i] = lut[self.para_dict[para], :] * self.m.func.conv.get(para)[2]
             else:
-                y[:, i] = lut[self.para_dict[para], :]
+                if para in self.para_dict:
+                    y[:, i] = lut[self.para_dict[para], :]
 
         return X, y
 
@@ -854,7 +995,7 @@ class ProcessorPrediction:
         self.out_matrix = np.full(shape=(len(self.paras), nrows, ncols), fill_value=self.nodat[2], dtype=np.float64)
         # self.predict does the actual prediction and returns a matrix that overwrites self.out_matrix
         # it seems confusing to prepare a matrix and then overwrite it, but self.predict needs self.out_matrix
-        # as an argument!                                                                           vvvvvvvvvv
+        # as an argument!
         self.out_matrix = self.predict(image=in_matrix, whichModel_coords=whichModel_coords, out_matrix=self.out_matrix,
                                        prg_widget=prg_widget, qgis_app=qgis_app)
 
