@@ -13,6 +13,7 @@ class RegressionWorkflowAlgorithm(EnMAPProcessingAlgorithm):
     P_DATASET, _DATASET = 'dataset', 'Training dataset'
     P_REGRESSOR, _REGRESSOR = 'regressor', 'Regressor'
     P_RASTER, _RASTER = 'raster', 'Raster layer with features'
+    P_MATCH_BY_NAME, _MATCH_BY_NAME = 'matchByName', 'Match regressor features and raster bands by name'
     P_NFOLD, _NFOLD = 'nfold', 'Number of cross-validation folds'
     P_OPEN_REPORT, _OPEN_REPORT = 'openReport', 'Open output cross-validation regressor performance report in ' \
                                                 'webbrowser after running algorithm'
@@ -35,6 +36,7 @@ class RegressionWorkflowAlgorithm(EnMAPProcessingAlgorithm):
             (self._RASTER, 'A raster layer with bands used as features for mapping. '
                            'Regressor features and raster bands are matched by name. '
                            'Will be ignored, if map prediction is skipped.'),
+            (self._MATCH_BY_NAME, 'Whether to match raster bands and regressor features by name.'),
             (self._NFOLD, 'The number of folds used for assessing cross-validation performance. '
                           'Will be ignored, if the cross-validation performance assessment is skipped.'),
             (self._OPEN_REPORT, 'Whether to open the cross-validation performance report in the web browser. '
@@ -51,6 +53,7 @@ class RegressionWorkflowAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterRegressionDataset(self.P_DATASET, self._DATASET)
         self.addParameterRegressorCode(self.P_REGRESSOR, self._REGRESSOR)
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
+        self.addParameterBoolean(self.P_MATCH_BY_NAME, self._MATCH_BY_NAME, False, True, True)
         self.addParameterInt(self.P_NFOLD, self._NFOLD, 10, True, 2, 100)
         self.addParameterBoolean(self.P_OPEN_REPORT, self._OPEN_REPORT, True)
         self.addParameterFileDestination(
@@ -65,6 +68,7 @@ class RegressionWorkflowAlgorithm(EnMAPProcessingAlgorithm):
         filenameDataset = self.parameterAsFile(parameters, self.P_DATASET, context)
         code = self.parameterAsString(parameters, self.P_REGRESSOR, context)
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
+        matchByName = self.parameterAsBoolean(parameters, self.P_MATCH_BY_NAME, context)
         nfold = self.parameterAsInt(parameters, self.P_NFOLD, context)
         openReport = self.parameterAsBoolean(parameters, self.P_OPEN_REPORT, context)
         filenameRegressor = self.parameterAsFileOutput(parameters, self.P_OUTPUT_REGRESSOR, context)
@@ -92,6 +96,7 @@ class RegressionWorkflowAlgorithm(EnMAPProcessingAlgorithm):
                 parameters = {
                     alg.P_RASTER: raster,
                     alg.P_REGRESSOR: filenameRegressor,
+                    alg.P_MATCH_BY_NAME: matchByName,
                     alg.P_OUTPUT_REGRESSION: filenameRegression
                 }
                 self.runAlg(alg, parameters, None, feedback2, context, True)

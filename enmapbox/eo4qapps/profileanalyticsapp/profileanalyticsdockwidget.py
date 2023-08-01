@@ -9,10 +9,13 @@ import numpy as np
 
 import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
 import processing
+from enmapbox.gui.dataviews.docks import SpectralLibraryDock
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.widgets.codeeditwidget import CodeEditWidget
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyleButton, PlotStyle
+from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import prepareProfileValueDict
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
+from enmapbox.typeguard import typechecked, check_type
 from enmapboxprocessing.algorithm.subsetrasterbandsalgorithm import SubsetRasterBandsAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
@@ -21,9 +24,8 @@ from profileanalyticsapp.profileanalyticseditorwidget import ProfileAnalyticsEdi
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QComboBox, QTableWidget, QCheckBox, QToolButton, QLineEdit, QWidget
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsVectorLayer, QgsProcessingFeatureSourceDefinition, \
-    QgsFeatureRequest, QgsWkbTypes
+    QgsFeatureRequest, QgsWkbTypes, QgsFeature
 from qgis.gui import QgsMapLayerComboBox, QgsFileWidget, QgsRasterBandComboBox, QgsDockWidget, QgisInterface
-from enmapbox.typeguard import typechecked, check_type
 
 
 @typechecked
@@ -45,6 +47,7 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
     mCode: CodeEditWidget
 
     mXUnit: QComboBox
+    mShowInSpectralView: QCheckBox
     mLiveUpdate: QCheckBox
     mApply: QToolButton
 
@@ -250,11 +253,13 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                 layer: QgsRasterLayer = w.currentLayer()
                 if layer is None:
                     layer = self.enmapBoxInterface().currentLayer()
+                    if not isinstance(layer, QgsRasterLayer):
+                        return
                     w.setLayer(layer)
                 if layer is None:
                     return
-                w: QgsRasterBandComboBox = self.mRasterTable.cellWidget(row, 1)
 
+                w: QgsRasterBandComboBox = self.mRasterTable.cellWidget(row, 1)
                 if self.mRasterProfileType.currentIndex() != self.ZProfileType:
                     bandNo: int = w.currentBand()
                     if bandNo == -1:
@@ -417,12 +422,24 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
             raise ValueError()
 
         # plot profiles and call user functions
+        ufuncProfiles = list()
         for profile, ufunc, dialog in zip(profiles, userFunctions, userFunctionEditors):
             plotDataItem: pg.PlotDataItem = self.mPlotWidget.plot(profile.xValues, profile.yValues, name=profile.name)
             profile.style.apply(plotDataItem)
             if ufunc is not None:
                 try:
-                    ufunc(profile, profiles, self.mPlotWidget)
+                    outputProfiles = ufunc(profile, profiles, self.mPlotWidget)
+                    if outputProfiles is not None:
+                        assert isinstance(outputProfiles, list)
+                        for outputProfile in outputProfiles:
+                            assert isinstance(outputProfile, Profile)
+                            plotDataItem = self.mPlotWidget.plot(
+                                outputProfile.xValues,
+                                outputProfile.yValues,
+                                name=f'fitted {profile.name}'
+                            )
+                            outputProfile.style.apply(plotDataItem)
+                        ufuncProfiles.extend(outputProfiles)
                     msg = 'Done!'
                 except Exception:
                     traceback.print_exc()
@@ -431,6 +448,26 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                 if dialog is not None:
                     assert isinstance(dialog, ProfileAnalyticsEditorWidget)
                     dialog.mLog.setText(msg)
+
+        # link profiles into Spectral Views (see #530)
+        if self.mShowInSpectralView.isChecked():
+            for dock in self.enmapBoxInterface().docks():
+                if isinstance(dock, SpectralLibraryDock):
+                    currentProfiles = list()
+                    currentStyles = dict()
+                    allProfiles = profiles + ufuncProfiles
+                    for id, profile in enumerate(allProfiles):
+                        profileValueDict = prepareProfileValueDict(
+                            profile.xValues, profile.yValues, profile.xUnit)
+                        feature = QgsFeature()
+                        feature.setId(id)
+                        feature.setFields(dock.speclib().fields())
+                        feature.setAttribute('name', profile.name)
+                        feature.setAttribute('profiles', profileValueDict)
+                        currentStyles[(feature.id(), 'profiles')] = profile.style
+                        currentProfiles.append(feature)
+
+                    dock.speclibWidget().setCurrentProfiles(currentProfiles, None, currentStyles)
 
         # set x axis title
         if self.mSourceType.currentIndex() == self.RasterLayerSource:

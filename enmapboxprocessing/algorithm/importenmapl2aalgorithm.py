@@ -21,9 +21,11 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
     P_FILE, _FILE = 'file', 'Metadata file'
     P_SET_BAD_BANDS, _SET_BAD_BANDS = 'setBadBands', 'Set bad bands'
     P_DETECTOR_OVERLAP, _DETECTOR_OVERLAP = 'detectorOverlap', 'Detector overlap region'
-    O_DETECTOR_OVERLAP = ['Order by wavelength', 'Moving average filter', 'VNIR only', 'SWIR only']
-    OrderByWavelengthOverlapOption, MovingAverageFilterOverlapOption, VnirOnlyOverlapOption, SwirOnlyOverlapOption = \
-        range(4)
+    O_DETECTOR_OVERLAP = [
+        'Order by detector (VNIR, SWIR)', 'Order by wavelength (default order)', 'Moving average filter', 'VNIR only', 'SWIR only'
+    ]
+    OrderByDetectorOverlapOption, OrderByWavelengthOverlapOption, MovingAverageFilterOverlapOption, \
+    VnirOnlyOverlapOption, SwirOnlyOverlapOption = range(5)
     P_OUTPUT_RASTER, _OUTPUT_RASTER = 'outputEnmapL2ARaster', 'Output raster layer'
 
     def displayName(self):
@@ -50,7 +52,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterFile(
-            self.P_FILE, self._FILE, extension='XML', fileFilter='Metadata file (*-METADATA.xml);;All files (*.*)'
+            self.P_FILE, self._FILE, extension='XML', fileFilter='Metadata file (*-METADATA.XML);;All files (*.*)'
         )
         self.addParameterBoolean(self.P_SET_BAD_BANDS, self._SET_BAD_BANDS, True)
         self.addParameterEnum(
@@ -89,7 +91,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
 
             # read metadata
             root = ElementTree.parse(xmlFilename).getroot()
-            wavelength = [item.text for item in
+            wavelength = [float(item.text) for item in
                           root.findall('specific/bandCharacterisation/bandID/wavelengthCenterOfBand')]
             fwhm = [item.text for item in root.findall('specific/bandCharacterisation/bandID/FWHMOfBand')]
             gains = [item.text for item in root.findall('specific/bandCharacterisation/bandID/GainOfBand')]
@@ -102,13 +104,17 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
             # create VRT
             if detectorOverlap != self.MovingAverageFilterOverlapOption:
                 vnirWavelength = [float(item.text)
-                                  for item in root.findall('product/smileCorrection/VNIR/bandID/wavelength')
-                                  if 900 <= float(item.text) <= 1000]
+                                  for item in root.findall('product/smileCorrection/VNIR/bandID/wavelength')]
                 swirWavelength = [float(item.text)
-                                  for item in root.findall('product/smileCorrection/SWIR/bandID/wavelength')
-                                  if 900 <= float(item.text) <= 1000]
+                                  for item in root.findall('product/smileCorrection/SWIR/bandID/wavelength')]
 
-                if detectorOverlap == self.OrderByWavelengthOverlapOption:
+                if detectorOverlap == self.OrderByDetectorOverlapOption:
+                    bandList = list()
+                    for w in list(vnirWavelength) + list(swirWavelength):
+                        bandNo = np.argmin(np.abs(np.subtract(wavelength, w))) + 1
+                        bandList.append(bandNo)
+                        print(bandNo, w)
+                elif detectorOverlap == self.OrderByWavelengthOverlapOption:
                     bandList = list(range(1, len(wavelength) + 1))
                 elif detectorOverlap == self.VnirOnlyOverlapOption:
                     bandList = list()
@@ -183,7 +189,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                 bandList = list(range(1, len(wavelength) + 1))
 
             # update metadata
-            wavelength = [wavelength[bandNo - 1] for bandNo in bandList]
+            wavelength = [str(wavelength[bandNo - 1]) for bandNo in bandList]
             fwhm = [fwhm[bandNo - 1] for bandNo in bandList]
             gains = [gains[bandNo - 1] for bandNo in bandList]
             offsets = [offsets[bandNo - 1] for bandNo in bandList]
@@ -208,7 +214,11 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                 writer = RasterWriter(ds)
                 for bandNo in reader.bandNumbers():
                     feedback.setProgress(bandNo / reader.bandCount() * 100)
-                    allNoData = np.all(reader.array(bandList=[bandNo])[0] == reader.noDataValue(bandNo))
+                    allNoData = np.all(
+                        reader.array(
+                            yOffset=int(reader.height() / 2), height=1,  # just check single image line
+                            bandList=[bandNo]
+                        )[0] == reader.noDataValue(bandNo))
                     if allNoData:
                         writer.setBadBandMultiplier(0, bandNo)
 

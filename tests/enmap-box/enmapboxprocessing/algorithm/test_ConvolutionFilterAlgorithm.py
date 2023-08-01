@@ -1,3 +1,5 @@
+import unittest
+
 from enmapbox.exampledata import hires
 from enmapboxprocessing.algorithm.convolutionfilteralgorithmbase import ConvolutionFilterAlgorithmBase
 from enmapboxprocessing.algorithm.spatialconvolutionairydisk2dalgorithm import SpatialConvolutionAiryDisk2DAlgorithm
@@ -22,6 +24,13 @@ from enmapboxprocessing.algorithm.spectralconvolutionsavitskygolay1dalgorithm im
 from enmapboxprocessing.algorithm.spectralconvolutiontrapezoid1dalgorithm import SpectralConvolutionTrapezoid1DAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 
+try:
+    import astropy.convolution
+    assert astropy.convolution is not None
+    has_astropy = True
+except ModuleNotFoundError:
+    has_astropy = False
+
 
 class ConvolutionFilterAlgorithm(ConvolutionFilterAlgorithmBase):
 
@@ -41,9 +50,10 @@ class ConvolutionFilterAlgorithm(ConvolutionFilterAlgorithmBase):
         return kernel
 
 
+@unittest.skipIf(not has_astropy, 'astropy is not installed')
 class TestConvolutionFilterAlgorithm(TestCase):
 
-    def test(self):
+    def test_convolutionFilterAlgorithm(self):
         alg = ConvolutionFilterAlgorithm()
         parameters = {
             alg.P_RASTER: hires,

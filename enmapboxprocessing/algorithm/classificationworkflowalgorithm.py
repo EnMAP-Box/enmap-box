@@ -14,6 +14,7 @@ class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
     P_DATASET, _DATASET = 'dataset', 'Training dataset'
     P_CLASSIFIER, _CLASSIFIER = 'classifier', 'Classifier'
     P_RASTER, _RASTER = 'raster', 'Raster layer with features'
+    P_MATCH_BY_NAME, _MATCH_BY_NAME = 'matchByName', 'Match classifier features and raster bands by name'
     P_NFOLD, _NFOLD = 'nfold', 'Number of cross-validation folds'
     P_OPEN_REPORT, _OPEN_REPORT = 'openReport', 'Open output report in webbrowser after running algorithm'
     P_OUTPUT_CLASSIFIER, _OUTPUT_CLASSIFIER = 'outputClassifier', 'Output classifier'
@@ -32,6 +33,7 @@ class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
             (self._DATASET, 'Training dataset pickle file used for fitting the classifier.'),
             (self._CLASSIFIER, 'Scikit-Learn Python code specifying a classifier.'),
             (self._RASTER, 'A raster layer with bands used as features.'),
+            (self._MATCH_BY_NAME, 'Whether to match raster bands and classifier features by name.'),
             (self._NFOLD, 'The number of folds used for assessing cross-validation performance.'),
             (self._OPEN_REPORT, self.ReportOpen),
             (self._OUTPUT_CLASSIFIER, self.PickleFileDestination),
@@ -47,8 +49,9 @@ class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterClassificationDataset(self.P_DATASET, self._DATASET)
         self.addParameterClassifierCode(self.P_CLASSIFIER, self._CLASSIFIER)
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
-        self.addParameterInt(self.P_NFOLD, self._NFOLD, 10, True, 2, 100)
-        self.addParameterBoolean(self.P_OPEN_REPORT, self._OPEN_REPORT, True)
+        self.addParameterBoolean(self.P_MATCH_BY_NAME, self._MATCH_BY_NAME, False, True, True)
+        self.addParameterInt(self.P_NFOLD, self._NFOLD, 10, True, 2, 100, True)
+        self.addParameterBoolean(self.P_OPEN_REPORT, self._OPEN_REPORT, True, True, True)
         self.addParameterFileDestination(self.P_OUTPUT_CLASSIFIER, self._OUTPUT_CLASSIFIER, self.PickleFileFilter)
         self.addParameterRasterDestination(self.P_OUTPUT_CLASSIFICATION, self._OUTPUT_CLASSIFICATION, None, True, True)
         self.addParameterRasterDestination(self.P_OUTPUT_PROBABILITY, self._OUTPUT_PROBABILITY, None, True, False)
@@ -62,6 +65,7 @@ class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
         filenameDataset = self.parameterAsFile(parameters, self.P_DATASET, context)
         code = self.parameterAsString(parameters, self.P_CLASSIFIER, context)
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
+        matchByName = self.parameterAsBoolean(parameters, self.P_MATCH_BY_NAME, context)
         nfold = self.parameterAsInt(parameters, self.P_NFOLD, context)
         openReport = self.parameterAsBoolean(parameters, self.P_OPEN_REPORT, context)
         filenameClassifier = self.parameterAsFileOutput(parameters, self.P_OUTPUT_CLASSIFIER, context)
@@ -90,6 +94,7 @@ class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
                 parameters = {
                     alg.P_RASTER: raster,
                     alg.P_CLASSIFIER: filenameClassifier,
+                    alg.P_MATCH_BY_NAME: matchByName,
                     alg.P_OUTPUT_CLASSIFICATION: filenameClassification
                 }
                 self.runAlg(alg, parameters, None, feedback2, context, True)
@@ -101,6 +106,7 @@ class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
                 parameters = {
                     alg.P_RASTER: raster,
                     alg.P_CLASSIFIER: filenameClassifier,
+                    alg.P_MATCH_BY_NAME: matchByName,
                     alg.P_OUTPUT_PROBABILITY: filenameProbability
                 }
                 self.runAlg(alg, parameters, None, feedback2, context, True)

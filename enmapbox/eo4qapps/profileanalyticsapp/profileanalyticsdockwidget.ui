@@ -599,6 +599,19 @@
        </spacer>
       </item>
       <item>
+       <widget class="QCheckBox" name="mShowInSpectralView">
+        <property name="toolTip">
+         <string>Whether to auto-apply styling.</string>
+        </property>
+        <property name="text">
+         <string>Show in Spectral Views</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="mLiveUpdate">
         <property name="toolTip">
          <string>Whether to auto-apply styling.</string>

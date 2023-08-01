@@ -23,6 +23,19 @@ class TestImportEnmapL2AAlgorithm(TestCase):
             np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array(bandList=[1]), dtype=float)
         )
 
+    def test_OrderByDetectorOverlapOption(self):
+        if sensorProductsRoot() is None:
+            return
+
+        alg = ImportEnmapL2AAlgorithm()
+        parameters = {
+            alg.P_FILE: SensorProducts.Enmap.L2A_MetadataXml,
+            alg.P_DETECTOR_OVERLAP: alg.OrderByDetectorOverlapOption,
+            alg.P_OUTPUT_RASTER: self.filename('enmapL2A_OrderByWavelength.vrt'),
+        }
+        result = self.runalg(alg, parameters)
+        self.assertEqual(224, RasterReader(result[alg.P_OUTPUT_RASTER]).bandCount())
+
     def test_OrderByWavelengthOverlapOption(self):
         if sensorProductsRoot() is None:
             return

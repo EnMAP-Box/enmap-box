@@ -34,7 +34,9 @@ class ImportLandsatL2Algorithm(EnMAPProcessingAlgorithm):
         return Group.ImportData.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
-        self.addParameterFile(self.P_FILE, self._FILE, extension='txt')
+        self.addParameterFile(
+            self.P_FILE, self._FILE, extension='txt', fileFilter='Metadata file (*_MTL.txt);;All files (*.*)'
+        )
         self.addParameterVrtDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 
     def isValidFile(self, mtlFilename: str) -> bool:
