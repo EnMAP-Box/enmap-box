@@ -17,7 +17,7 @@ from enmapbox.typeguard import typechecked
 class PredictRegressionAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer with features'
     P_REGRESSOR, _REGRESSOR = 'regressor', 'Regressor'
-    P_MATCH_BY_NAME,_MATCH_BY_NAME = 'matchByName', 'Match features and bands by name'
+    P_MATCH_BY_NAME, _MATCH_BY_NAME = 'matchByName', 'Match features and bands by name'
     P_OUTPUT_REGRESSION, _OUTPUT_REGRESSION = 'outputRegression', 'Output regression layer'
 
     def displayName(self) -> str:

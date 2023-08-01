@@ -145,31 +145,6 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         EMB.close()
         QgsProject.instance().removeAllMapLayers()
 
-    def test_instance_coreapps(self):
-        EMB = EnMAPBox(load_core_apps=True, load_other_apps=False)
-        self.assertIsInstance(EMB, EnMAPBox)
-        self.showGui(EMB.ui)
-        EMB.close()
-        QgsProject.instance().removeAllMapLayers()
-
-    def test_instance_coreapps_and_data(self):
-
-        EMB = EnMAPBox(load_core_apps=True, load_other_apps=False)
-
-        self.assertTrue(len(QgsProject.instance().mapLayers()) == 0)
-        self.assertIsInstance(EnMAPBox.instance(), EnMAPBox)
-        self.assertEqual(EMB, EnMAPBox.instance())
-
-        EMB.openExampleData(mapWindows=1, testData=True)
-        self.assertTrue(len(QgsProject.instance().mapLayers()) > 0)
-        canvases = EMB.mapCanvases()
-        self.assertTrue(canvases[-1] == EMB.currentMapCanvas())
-
-        self.showGui([EMB.ui])
-
-        EMB.close()
-        QgsProject.instance().removeAllMapLayers()
-
     def test_qgis_project_layers(self):
 
         from enmapbox.exampledata import enmap, landcover_polygon

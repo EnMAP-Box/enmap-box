@@ -77,7 +77,6 @@ class PredictClassPropabilityAlgorithm(EnMAPProcessingAlgorithm):
                 except ValueError:
                     pass
 
-
             # ... if not possible, use original bands, if overall number of bands and features do match
             if bandList is None and len(bandNames) != len(dump.features):
                 message = f'classifier features ({dump.features}) not matching raster bands ({bandNames})\n' \

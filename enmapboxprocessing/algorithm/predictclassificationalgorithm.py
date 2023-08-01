@@ -17,7 +17,7 @@ from enmapbox.typeguard import typechecked
 class PredictClassificationAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer with features'
     P_CLASSIFIER, _CLASSIFIER = 'classifier', 'Classifier'
-    P_MATCH_BY_NAME,_MATCH_BY_NAME = 'matchByName', 'Match features and bands by name'
+    P_MATCH_BY_NAME, _MATCH_BY_NAME = 'matchByName', 'Match features and bands by name'
     P_OUTPUT_CLASSIFICATION, _OUTPUT_CLASSIFICATION = 'outputClassification', 'Output classification layer'
 
     def displayName(self) -> str:

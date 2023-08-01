@@ -25,7 +25,7 @@ from typing import Optional, List, Dict
 
 from enmapbox import debugLog
 from enmapbox.gui import \
-    SpectralLibraryWidget, SpatialExtent, showLayerPropertiesDialog
+    SpectralLibraryWidget, SpatialExtent
 from enmapbox.gui.datasources.datasources import DataSource, ModelDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager
 from enmapbox.gui.dataviews.docks import Dock, DockArea, \
@@ -1596,7 +1596,8 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
 
         actionPasteStyle = menu.addAction('Paste Style')
         actionPasteStyle.triggered.connect(lambda *args, _lyr=lyr: pasteStyleFromClipboard(_lyr))
-        actionPasteStyle.setEnabled(MDF_QGIS_LAYER_STYLE in QApplication.clipboard().mimeData().formats())
+        cbmd: QMimeData = QApplication.clipboard().mimeData()
+        actionPasteStyle.setEnabled(isinstance(cbmd, QMimeData) and MDF_QGIS_LAYER_STYLE in cbmd.formats())
         actionCopyStyle = menu.addAction('Copy Style')
         actionCopyStyle.triggered.connect(lambda *args, _lyr=lyr: pasteStyleToClipboard(_lyr))
         menu.addSeparator()
@@ -1871,14 +1872,6 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         if isinstance(emb, EnMAPBox) and isinstance(layer, QgsVectorLayer):
             from enmapbox.gui.dataviews.docks import SpectralLibraryDock
             emb.createDock(SpectralLibraryDock, speclib=layer)
-
-    def showLayerProperties(self, layer: QgsMapLayer, canvas: QgsMapCanvas):
-        from enmapbox.gui.enmapboxgui import EnMAPBox
-        messageBar = None
-        emb = EnMAPBox.instance()
-        if isinstance(emb, EnMAPBox) and isinstance(layer, QgsVectorLayer):
-            messageBar = emb.messageBar()
-        showLayerPropertiesDialog(layer, canvas=canvas, messageBar=messageBar, modal=True, useQGISDialog=False)
 
     def onAddGroup(self):
         """
