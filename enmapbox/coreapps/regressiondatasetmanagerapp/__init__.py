@@ -1,6 +1,5 @@
 from enmapbox.gui.applications import EnMAPBoxApplication
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QAction
 from regressiondatasetmanagerapp.regressiondatasetmanagergui import RegressionDatasetManagerGui
 
 

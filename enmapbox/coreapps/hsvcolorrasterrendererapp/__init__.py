@@ -1,8 +1,8 @@
 from enmapbox.gui.applications import EnMAPBoxApplication
+from enmapbox.typeguard import typechecked
 from hsvcolorrasterrendererapp.hsvcolorrasterrendererdialog import HsvColorRasterRendererDialog
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QAction
-from enmapbox.typeguard import typechecked
+from qgis.PyQt.QtWidgets import QMenu
 
 
 def enmapboxApplicationFactory(enmapBox):

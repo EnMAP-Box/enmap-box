@@ -4,12 +4,11 @@ This is a template to create an EnMAP-Box test
 import pathlib
 import unittest
 
-from qgis.core import QgsProject
-
 from enmapbox.gui.datasources.datasources import RasterDataSource
 from enmapbox.gui.datasources.manager import DataSourceFactory
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import EnMAPBoxTestCase
+from qgis.core import QgsProject
 
 path = pathlib.Path(r'/home/benni/Downloads/MOD05_L2.A2022305.0005.061.2022335032530.hdf').resolve()
 

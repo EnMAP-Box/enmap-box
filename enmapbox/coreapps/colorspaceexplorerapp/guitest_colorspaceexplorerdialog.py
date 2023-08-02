@@ -1,10 +1,9 @@
-from qgis.core import QgsRasterLayer
-
 from colorspaceexplorerapp import ColorSpaceExplorerDialog
 from enmapbox import initAll
-from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.exampledata import enmap
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
+from qgis.core import QgsRasterLayer
 
 qgsApp = start_app()
 initAll()

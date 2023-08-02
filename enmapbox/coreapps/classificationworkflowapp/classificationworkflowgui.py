@@ -8,6 +8,7 @@ from typing import Tuple, Dict, Optional
 import numpy as np
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.algorithms import algorithms
 from enmapboxprocessing.algorithm.classificationperformancesimplealgorithm import \
     ClassificationPerformanceSimpleAlgorithm
@@ -57,7 +58,6 @@ from qgis.PyQt.QtWidgets import (
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsMapLayerProxyModel, Qgis, QgsProcessingFeedback, QgsRasterLayer, QgsProcessing
 from qgis.gui import QgsFileWidget, QgsMapLayerComboBox, QgsSpinBox, QgsMessageBar, QgsColorButton, QgsDoubleSpinBox
-from enmapbox.typeguard import typechecked
 
 
 class MissingParameterError(Exception):

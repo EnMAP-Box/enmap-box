@@ -21,16 +21,18 @@ class Test(TestCase):
 
     def test_sample_polygons(self):
         raster = openRasterDataset(filename=enmapboxtestdata.enmap)
-        vector = openVectorDataset(filename=enmapboxtestdata.landcover_points)#lygons)
-        samples = sample_polygons(raster=raster, vector=vector, fieldNames=['level_2', 'level_2_id'], oversampling=1, allTouched=False)
+        vector = openVectorDataset(filename=enmapboxtestdata.landcover_points)  # lygons)
+        samples = sample_polygons(raster=raster, vector=vector, fieldNames=['level_2', 'level_2_id'], oversampling=1,
+                                  allTouched=False)
         for sample in samples:
             print(sample.fid, sample.fieldValues, sample.profiles.shape)
 
-        samples = sample_polygons(raster=raster, vector=vector, fieldNames=['level_2', 'level_2_id'], oversampling=5, allTouched=False)
+        samples = sample_polygons(raster=raster, vector=vector, fieldNames=['level_2', 'level_2_id'], oversampling=5,
+                                  allTouched=False)
         for sample in samples:
             print(sample.fid, sample.fieldValues, sample.profiles.shape)
 
-
-        samples = sample_polygons(raster=raster, vector=vector, fieldNames=['level_2', 'level_2_id'], oversampling=10, allTouched=False)
+        samples = sample_polygons(raster=raster, vector=vector, fieldNames=['level_2', 'level_2_id'], oversampling=10,
+                                  allTouched=False)
         for sample in samples:
             print(sample.fid, sample.fieldValues, sample.profiles.shape)

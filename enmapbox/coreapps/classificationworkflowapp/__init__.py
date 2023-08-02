@@ -1,7 +1,6 @@
 from classificationworkflowapp.classificationworkflowgui import ClassificationWorkflowGui
 from enmapbox.gui.applications import EnMAPBoxApplication
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QAction
 
 
 def enmapboxApplicationFactory(enmapBox):

@@ -4,6 +4,7 @@ from typing import Optional, List, Tuple
 from enhancedmultibandcolorapp.enhancedmultibandcolorrenderer import EnhancedMultiBandColorRenderer
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QMouseEvent, QColor
@@ -11,7 +12,6 @@ from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QCheckBox, QTableWidge
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer, QgsRasterDataProvider, QgsRasterHistogram, QgsMapLayerProxyModel, QgsMapSettings
 from qgis.gui import QgsMapCanvas, QgsMapLayerComboBox, QgsColorButton, QgsDoubleSpinBox
-from enmapbox.typeguard import typechecked
 
 
 @typechecked

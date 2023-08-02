@@ -20,11 +20,11 @@
 
 import unittest
 
-import qgis
-from enmapbox.testing import TestObjects, EnMAPBoxTestCase
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from qgis.core import QgsProject
 import enmapbox.exampledata
+import qgis
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.testing import TestObjects, EnMAPBoxTestCase
+from qgis.core import QgsProject
 
 
 class TestIssue711(EnMAPBoxTestCase):
