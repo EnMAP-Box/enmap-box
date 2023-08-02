@@ -29,11 +29,8 @@ class EnhancedMultiBandColorApp(EnMAPBoxApplication):
         return 'Enhanced Multiband Color Renderer'
 
     def menu(self, appMenu: QMenu):
-        appMenu: QMenu = self.enmapbox.menu('Tools')
-        a: QAction = self.utilsAddActionInAlphanumericOrder(appMenu, self.title())
-        a.setIcon(self.icon())
+        a = self.utilsAddActionInAlphanumericOrder(self.enmapbox.ui.menuToolsRasterVisualizations, self.title())
         a.triggered.connect(self.startGUI)
-        return appMenu
 
     def startGUI(self):
         w = EnhancedMultiBandColorDialog(parent=self.enmapbox.ui)

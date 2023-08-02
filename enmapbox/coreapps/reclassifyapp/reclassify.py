@@ -616,19 +616,16 @@ class ReclassifyTool(EnMAPBoxApplication):
         pathIcon = os.path.join(APP_DIR, 'icon.png')
         return QIcon(pathIcon)
 
+    def title(self):
+        return self.name
+
     def menu(self, appMenu):
         """
         Specify menu, submenus and actions
         :return: the QMenu or QAction to be added to the "Applications" menu.
         """
-        appMenu = self.enmapbox.menu('Tools')
-
-        # add a QAction that starts your GUI
-        a = self.utilsAddActionInAlphanumericOrder(appMenu, 'Reclassify')
-        assert isinstance(a, QAction)
-        a.setIcon(self.icon())
+        a = self.utilsAddActionInAlphanumericOrder(self.enmapbox.ui.menuApplicationsClassification, self.title())
         a.triggered.connect(self.startGUI)
-        return a
 
     def startGUI(self, *args):
         uiDialog = ReclassifyDialog(self.enmapbox.ui)

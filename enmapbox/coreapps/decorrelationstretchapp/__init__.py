@@ -28,12 +28,8 @@ class DecorrelationStretchApp(EnMAPBoxApplication):
         return 'Decorrelation Stretch Renderer'
 
     def menu(self, appMenu: QMenu):
-        appMenu: QMenu = self.enmapbox.menu('Tools')
-        a = self.utilsAddActionInAlphanumericOrder(appMenu, self.title())
-        assert isinstance(a, QAction)
-        a.setIcon(self.icon())
+        a = self.utilsAddActionInAlphanumericOrder(self.enmapbox.ui.menuToolsRasterVisualizations, self.title())
         a.triggered.connect(self.startGUI)
-        return appMenu
 
     def startGUI(self):
         w = DecorrelationStretchDialog(parent=self.enmapbox.ui)

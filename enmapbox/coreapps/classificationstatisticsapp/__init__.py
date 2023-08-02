@@ -27,11 +27,9 @@ class ClassificationStatisticsApp(EnMAPBoxApplication):
         return 'Classification Statistics'
 
     def menu(self, appMenu: QMenu):
-        appMenu: QMenu = self.enmapbox.menu('Tools')
-        a = self.utilsAddActionInAlphanumericOrder(appMenu, 'Classification Statistics')
-        assert isinstance(a, QAction)
-        a.setIcon(self.icon())
-        a.triggered.connect(self.startGUI)
+        for menu in [self.enmapbox.ui.menuToolsRasterStatistics, self.enmapbox.ui.menuToolsRasterVisualizations]:
+            a = self.utilsAddActionInAlphanumericOrder(menu, self.title())
+            a.triggered.connect(self.startGUI)
         return appMenu
 
     def startGUI(self):

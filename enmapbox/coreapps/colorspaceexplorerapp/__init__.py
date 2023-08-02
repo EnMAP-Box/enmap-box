@@ -28,10 +28,7 @@ class ColorSpaceExplorerApp(EnMAPBoxApplication):
         return 'Color Space Explorer'
 
     def menu(self, appMenu: QMenu):
-        appMenu: QMenu = self.enmapbox.menu('Tools')
-        a = self.utilsAddActionInAlphanumericOrder(appMenu, 'Color Space Explorer')
-        assert isinstance(a, QAction)
-        a.setIcon(self.icon())
+        a = self.utilsAddActionInAlphanumericOrder(self.enmapbox.ui.menuToolsRasterVisualizations, self.title())
         a.triggered.connect(self.startGUI)
         return appMenu
 

@@ -19,13 +19,14 @@ class RegressioDatasetManagerApp(EnMAPBoxApplication):
     def icon(self):
         return QIcon(None)
 
+    def title(self):
+        return 'Regression Dataset Manager'
+
     def menu(self, appMenu):
-        assert isinstance(appMenu, QMenu)
-        a = self.utilsAddActionInAlphanumericOrder(appMenu, 'Regression Dataset Manager')
-        assert isinstance(a, QAction)
-        a.setIcon(self.icon())
+        a = self.utilsAddActionInAlphanumericOrder(
+            self.enmapbox.ui.menuApplicationsRegression, self.title() + ' (and Random Subsampling)'
+        )
         a.triggered.connect(self.startGUI)
-        return appMenu
 
     def geoAlgorithms(self):
         return []

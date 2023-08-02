@@ -12,20 +12,19 @@ class ClassificationWorkflowApp(EnMAPBoxApplication):
     def __init__(self, enmapBox, parent=None):
         super().__init__(enmapBox, parent=parent)
 
-        self.name = 'ClassificationWorkflowApp'
+        self.name = self.title()
         self.version = '2.0'
         self.licence = 'GNU GPL-3'
 
     def icon(self):
         return QIcon(None)
 
+    def title(self):
+        return 'Classification Workflow (advanced)'
+
     def menu(self, appMenu):
-        assert isinstance(appMenu, QMenu)
-        a = self.utilsAddActionInAlphanumericOrder(appMenu, 'Classification Workflow (advanced)')
-        assert isinstance(a, QAction)
-        a.setIcon(self.icon())
+        a = self.utilsAddActionInAlphanumericOrder(self.enmapbox.ui.menuApplicationsClassification, self.title())
         a.triggered.connect(self.startGUI)
-        return appMenu
 
     def geoAlgorithms(self):
         return []
