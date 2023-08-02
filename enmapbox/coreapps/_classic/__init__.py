@@ -19,13 +19,10 @@ class ClassificationWorkflowClassicApp(EnMAPBoxApplication):
         return QIcon(None)
 
     def menu(self, appMenu):
-        assert isinstance(appMenu, QMenu)
-        a = self.utilsAddActionInAlphanumericOrder(appMenu, 'Classification Workflow (deprecated)')
-
-        assert isinstance(a, QAction)
-        a.setIcon(self.icon())
+        a = self.utilsAddActionInAlphanumericOrder(
+            self.enmapbox.ui.menuApplicationsClassification, 'Classification Workflow (deprecated)'
+        )
         a.triggered.connect(self.startGUI)
-        return appMenu
 
     def geoAlgorithms(self):
         return []

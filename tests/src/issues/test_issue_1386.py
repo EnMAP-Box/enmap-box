@@ -3,10 +3,9 @@ This is a template to create an EnMAP-Box test
 """
 import unittest
 
-from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QMenu, QWidgetAction, QToolButton
-
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyleButton
 from enmapbox.testing import EnMAPBoxTestCase
+from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QMenu, QWidgetAction, QToolButton
 from qgis.core import QgsProject
 from qgis.gui import QgsColorButton
 

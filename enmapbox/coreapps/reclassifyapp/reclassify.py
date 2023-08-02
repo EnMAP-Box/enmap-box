@@ -33,14 +33,14 @@ from enmapbox.qgispluginsupport.qps.classification.classificationscheme import \
     ClassificationMapLayerComboBox, ClassInfo, ClassificationScheme, ClassificationSchemeComboBox, \
     ClassificationSchemeWidget
 from enmapbox.qgispluginsupport.qps.utils import loadUi
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.reclassifyrasteralgorithm import ReclassifyRasterAlgorithm
 from qgis.PyQt.QtCore import QAbstractTableModel, Qt, QModelIndex, QSortFilterProxyModel
 from qgis.PyQt.QtGui import QColor, QContextMenuEvent, QIcon
-from qgis.PyQt.QtWidgets import QFileDialog, QTableView, QMenu, QStyledItemDelegate, QDialog, QDialogButtonBox, QAction
+from qgis.PyQt.QtWidgets import QFileDialog, QTableView, QMenu, QStyledItemDelegate, QDialog, QDialogButtonBox
 from qgis.core import QgsProcessing
 from qgis.core import QgsProviderRegistry, QgsRasterLayer, QgsProject, QgsMapLayerProxyModel
 from qgis.gui import QgsMapLayerComboBox
-from enmapbox.typeguard import typechecked
 from . import APP_DIR
 
 SETTINGS_KEY = 'ENMAPBOX_RECLASSIFY_APP'
@@ -616,19 +616,16 @@ class ReclassifyTool(EnMAPBoxApplication):
         pathIcon = os.path.join(APP_DIR, 'icon.png')
         return QIcon(pathIcon)
 
+    def title(self):
+        return self.name
+
     def menu(self, appMenu):
         """
         Specify menu, submenus and actions
         :return: the QMenu or QAction to be added to the "Applications" menu.
         """
-        appMenu = self.enmapbox.menu('Tools')
-
-        # add a QAction that starts your GUI
-        a = self.utilsAddActionInAlphanumericOrder(appMenu, 'Reclassify')
-        assert isinstance(a, QAction)
-        a.setIcon(self.icon())
+        a = self.utilsAddActionInAlphanumericOrder(self.enmapbox.ui.menuApplicationsClassification, self.title())
         a.triggered.connect(self.startGUI)
-        return a
 
     def startGUI(self, *args):
         uiDialog = ReclassifyDialog(self.enmapbox.ui)

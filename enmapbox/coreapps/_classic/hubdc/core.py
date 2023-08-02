@@ -496,7 +496,7 @@ class Extent(object):
         '''Returns self as a :class:`~hubdc.model.Geometry`.'''
         ring = ogr.Geometry(ogr.wkbLinearRing)
         for x, y in zip([self.xmin(), self.xmax(), self.xmax(), self.xmin(), self.xmin()],
-                [self.ymax(), self.ymax(), self.ymin(), self.ymin(), self.ymax()]):
+                        [self.ymax(), self.ymax(), self.ymin(), self.ymin(), self.ymax()]):
             ring.AddPoint(x, y)
         geometry = ogr.Geometry(ogr.wkbPolygon)
         geometry.AddGeometry(ring)
@@ -784,7 +784,7 @@ class Geometry(object):
 
     def __repr__(self):
         return '{cls}(wkt={wkt}, projection={projection})'.format(cls=self.__class__.__name__, wkt=repr(self.wkt()),
-            projection=repr(self.projection()))
+                                                                  projection=repr(self.projection()))
 
     def wkt(self):
         '''Returns well known text string.'''
@@ -836,7 +836,7 @@ class Geometry(object):
         '''Reproject self into given ``projection``.'''
 
         transformation = osr.CoordinateTransformation(self.projection().osrSpatialReference(),
-            projection.osrSpatialReference())
+                                                      projection.osrSpatialReference())
         ogrGeometry = self.ogrGeometry()
         ogrGeometry.Transform(transformation)
         return Geometry(wkt=ogrGeometry.ExportToWkt(), projection=projection)
@@ -856,9 +856,9 @@ class Point(Geometry):
 
     def __repr__(self):
         return '{cls}(x={x}, y={y}, projection={projection})'.format(cls=self.__class__.__name__,
-            x=repr(self.x()),
-            y=repr(self.y()),
-            projection=repr(self.projection()))
+                                                                     x=repr(self.x()),
+                                                                     y=repr(self.y()),
+                                                                     projection=repr(self.projection()))
 
     def x(self):
         '''Returns map x coordinate.'''
@@ -942,10 +942,10 @@ class Grid(object):
         xsize = int(round(float(extent.xmax() - extent.xmin()) / resolution.x()))
         ysize = int(round(float(extent.ymax() - extent.ymin()) / resolution.y()))
         self._extent = Extent(xmin=extent.xmin(),
-            xmax=extent.xmin() + xsize * resolution.x(),
-            ymin=extent.ymin(),
-            ymax=extent.ymin() + ysize * resolution.y(),
-            projection=extent.projection())
+                              xmax=extent.xmin() + xsize * resolution.x(),
+                              ymin=extent.ymin(),
+                              ymax=extent.ymin() + ysize * resolution.y(),
+                              projection=extent.projection())
 
     def __repr__(self):
         return '{cls}(extent={extent}, resolution={resolution}, projection={projection}'.format(
@@ -969,7 +969,7 @@ class Grid(object):
     def size(self):
         '''Returns the :class:`~hubdc.model.Size`.'''
         return RasterSize(x=round((self.extent().xmax() - self.extent().xmin()) / self.resolution().x()),
-            y=round((self.extent().ymax() - self.extent().ymin()) / self.resolution().y()))
+                          y=round((self.extent().ymax() - self.extent().ymin()) / self.resolution().y()))
 
     def shape(self):
         '''Returns size as ``(ysize, xsize)`` tuple.'''
@@ -1096,10 +1096,10 @@ class Grid(object):
 
         # return new instance
         extent = Extent(xmin=self.extent().xmin() - xoff,
-            ymin=self.extent().ymin() - yoff,
-            xmax=self.extent().xmax() - xoff,
-            ymax=self.extent().ymax() - yoff,
-            projection=self.projection())
+                        ymin=self.extent().ymin() - yoff,
+                        xmax=self.extent().xmax() - xoff,
+                        ymax=self.extent().ymax() - yoff,
+                        projection=self.projection())
         return Grid(extent=extent, resolution=self.resolution())
 
     def subset(self, offset, size, trim=False):
@@ -1114,7 +1114,7 @@ class Grid(object):
         if trim:
             offset = Pixel(x=max(offset.x(), 0), y=max(offset.y(), 0))
             size = RasterSize(x=min(size.x(), self.size().x() - offset.x()),
-                y=min(size.y(), self.size().y() - offset.y()))
+                              y=min(size.y(), self.size().y() - offset.y()))
 
         xmin = self.extent().xmin() + offset.x() * self.resolution().x()
         xmax = xmin + size.x() * self.resolution().x()
@@ -1122,7 +1122,7 @@ class Grid(object):
         ymin = ymax - size.y() * self.resolution().y()
 
         return Grid(extent=Extent(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, projection=self.projection()),
-            resolution=self.resolution())
+                    resolution=self.resolution())
 
     def subgrids(self, size):
         '''
@@ -1162,16 +1162,16 @@ class RasterDataset(object):
         geotransform = self._gdalDataset.GetGeoTransform()
         resolution = Resolution(x=geotransform[1], y=abs(geotransform[5]))
         extent = Extent(xmin=geotransform[0],
-            xmax=geotransform[0] + self._gdalDataset.RasterXSize * resolution.x(),
-            ymin=geotransform[3] - self._gdalDataset.RasterYSize * resolution.y(),
-            ymax=geotransform[3],
-            projection=projection)
+                        xmax=geotransform[0] + self._gdalDataset.RasterXSize * resolution.x(),
+                        ymin=geotransform[3] - self._gdalDataset.RasterYSize * resolution.y(),
+                        ymax=geotransform[3],
+                        projection=projection)
 
         self._grid = Grid(extent=extent, resolution=resolution)
 
     def __repr__(self):
         return '{cls}(gdalDataset={gdalDataset})'.format(cls=self.__class__.__name__,
-            gdalDataset=repr(self.gdalDataset()))
+                                                         gdalDataset=repr(self.gdalDataset()))
 
     @staticmethod
     def fromArray(array, grid=None, filename='', driver=None, options=None):
@@ -1308,8 +1308,8 @@ class RasterDataset(object):
 
             buf_ysize, buf_xsize = grid.shape()
             array = self._gdalDataset.ReadAsArray(xoff=xoff, yoff=yoff, xsize=xsize, ysize=ysize,
-                buf_xsize=buf_xsize, buf_ysize=buf_ysize,
-                resample_alg=resampleAlg)
+                                                  buf_xsize=buf_xsize, buf_ysize=buf_ysize,
+                                                  resample_alg=resampleAlg)
 
         if array.ndim == 2:
             array = array[None]
@@ -1512,7 +1512,7 @@ class RasterDataset(object):
         year, month, day = value[0:10].split('-')
         hour, minute, second = value[11:19].split(':')
         acquisitionTime = datetime.datetime(year=int(year), month=int(month), day=int(day), hour=int(hour),
-            minute=int(minute), second=int(second))
+                                            minute=int(minute), second=int(second))
         return acquisitionTime
 
     def warp(self, grid=None, filename='', driver=MemDriver(), options=None, resampleAlg=None, **kwargs):
@@ -1619,24 +1619,24 @@ class RasterDataset(object):
 
             # read one extra source column and line
             translateOptions = gdal.TranslateOptions(format=driver.name(), creationOptions=options,
-                resampleAlg=resampleAlg,
-                projWin=[ul.x(), ul.y(), lr.x() + self.grid().resolution().x(),
-                         lr.y() - self.grid().resolution().y()],
-                xRes=xRes, yRes=yRes, **kwargs)
+                                                     resampleAlg=resampleAlg,
+                                                     projWin=[ul.x(), ul.y(), lr.x() + self.grid().resolution().x(),
+                                                              lr.y() - self.grid().resolution().y()],
+                                                     xRes=xRes, yRes=yRes, **kwargs)
             tmpGdalDataset = gdal.Translate(destName='', srcDS=self._gdalDataset, options=translateOptions)
 
             # subset to the exact target grid
             translateOptions = gdal.TranslateOptions(format=driver.name(), creationOptions=options,
-                resampleAlg=resampleAlg,
-                srcWin=[0, 0, grid.size().x(), grid.size().y()])
+                                                     resampleAlg=resampleAlg,
+                                                     srcWin=[0, 0, grid.size().x(), grid.size().y()])
             gdalDataset = gdal.Translate(destName='', srcDS=tmpGdalDataset, options=translateOptions)
 
         else:
 
             translateOptions = gdal.TranslateOptions(format=driver.name(), creationOptions=options,
-                resampleAlg=resampleAlg,
-                projWin=[ul.x(), ul.y(), lr.x(), lr.y()],
-                xRes=xRes, yRes=yRes, **kwargs)
+                                                     resampleAlg=resampleAlg,
+                                                     projWin=[ul.x(), ul.y(), lr.x(), lr.y()],
+                                                     xRes=xRes, yRes=yRes, **kwargs)
             gdalDataset = gdal.Translate(destName=filename, srcDS=self._gdalDataset, options=translateOptions)
 
         rasterDataset = RasterDataset(gdalDataset=gdalDataset)
@@ -1651,7 +1651,7 @@ class RasterDataset(object):
         return rasterDataset
 
     def array(self, indices=None, grid=None, resampleAlg=gdal.GRA_NearestNeighbour, noDataValue=None,
-            forceWarp=True, errorThreshold=0., warpMemoryLimit=100 * 2 ** 20, multithread=False):
+              forceWarp=True, errorThreshold=0., warpMemoryLimit=100 * 2 ** 20, multithread=False):
         '''
         Returns raster data as 3d array of shape = (zsize, ysize, xsize) for the given ``grid``,
         where zsize is the number of raster bands, and ysize, xsize = grid.shape().
@@ -1684,21 +1684,21 @@ class RasterDataset(object):
 
         if self.grid().projection().equal(other=grid.projection()) and not forceWarp:
             datasetResampled = self.translate(grid=grid, filename='', driver=MemDriver(), resampleAlg=resampleAlg,
-                noData=noDataValue,
-                bandList=bandList)  # subset via bandList
+                                              noData=noDataValue,
+                                              bandList=bandList)  # subset via bandList
         else:
             if bandList is None:
                 datasetResampled = self.warp(grid=grid, filename='', driver=MemDriver(), resampleAlg=resampleAlg,
-                    errorThreshold=errorThreshold, warpMemoryLimit=warpMemoryLimit,
-                    multithread=multithread, srcNodata=noDataValue)
+                                             errorThreshold=errorThreshold, warpMemoryLimit=warpMemoryLimit,
+                                             multithread=multithread, srcNodata=noDataValue)
             else:
                 # subset bands via in-memory VRT
                 datasetSubsetted = self.translate(filename='/vsimem/hubdc.core.RasterDataset.array.vrt',
-                    driver=VrtDriver(), noData=noDataValue, bandList=bandList)
+                                                  driver=VrtDriver(), noData=noDataValue, bandList=bandList)
                 datasetResampled = datasetSubsetted.warp(grid=grid, filename='', driver=MemDriver(),
-                    resampleAlg=resampleAlg,
-                    errorThreshold=errorThreshold, warpMemoryLimit=warpMemoryLimit,
-                    multithread=multithread, srcNodata=noDataValue)
+                                                         resampleAlg=resampleAlg,
+                                                         errorThreshold=errorThreshold, warpMemoryLimit=warpMemoryLimit,
+                                                         multithread=multithread, srcNodata=noDataValue)
                 gdal.Unlink(datasetSubsetted.filename())
 
         array = datasetResampled.readAsArray()
@@ -1806,7 +1806,7 @@ class RasterDataset(object):
         return RasterLayer(qgsRasterLayer=qgsLayer)
 
     def plotSinglebandGrey(self, index=0, vmin=None, vmax=None, pmin=None, pmax=None, cmap='gray', noPlot=False,
-            showPlot=True):
+                           showPlot=True):
         '''
         cmap see https://matplotlib.org/examples/color/colormaps_reference.html
         https://matplotlib.org/api/_as_gen/matplotlib.pyplot.imshow.html
@@ -1850,7 +1850,7 @@ class RasterDataset(object):
         return grey
 
     def plotMultibandColor(self, rgbindex=(0, 1, 2), rgbvmin=(None, None, None), rgbvmax=(None, None, None),
-            rgbpmin=(None, None, None), rgbpmax=(None, None, None), noPlot=False, showPlot=True):
+                           rgbpmin=(None, None, None), rgbpmax=(None, None, None), noPlot=False, showPlot=True):
 
         def toTupel(v):
             if not isinstance(v, (list, tuple)):
@@ -1859,7 +1859,7 @@ class RasterDataset(object):
 
         rgb = [self.plotSinglebandGrey(index=index, vmin=vmin, vmax=vmax, pmin=pmin, pmax=pmax, noPlot=True)
                for index, vmin, vmax, pmin, pmax in zip(rgbindex, toTupel(rgbvmin), toTupel(rgbvmax),
-                toTupel(rgbpmin), toTupel(rgbpmax))]
+                                                        toTupel(rgbpmin), toTupel(rgbpmax))]
 
         if not noPlot:
             fig = plt.imshow(np.array(rgb).transpose((1, 2, 0)))
@@ -1991,8 +1991,8 @@ class RasterBandDataset():
             ysize = round((grid.extent().ymax() - grid.extent().ymin()) / resolution.y(), 0)
             buf_ysize, buf_xsize = grid.shape()
             array = self._gdalBand.ReadAsArray(xoff=xoff, yoff=yoff, win_xsize=xsize, win_ysize=ysize,
-                buf_xsize=buf_xsize, buf_ysize=buf_ysize,
-                resample_alg=resample_alg)
+                                               buf_xsize=buf_xsize, buf_ysize=buf_ysize,
+                                               resample_alg=resample_alg)
             if array is None or xoff < 0 or yoff < 0:  # ReadAsArray seams to accept xy offets of -1, which makes no sense, so we manually raise an error
                 raise errors.AccessGridOutOfRangeError()
 
@@ -2001,7 +2001,7 @@ class RasterBandDataset():
         return array
 
     def array(self, grid=None, resampleAlg=gdal.GRA_NearestNeighbour, noDataValue=None, errorThreshold=0.,
-            warpMemoryLimit=100 * 2 ** 20, multithread=False):
+              warpMemoryLimit=100 * 2 ** 20, multithread=False):
         '''
         Returns raster band data as 2d array of shape = (ysize, xsize) for the given ``grid``,
         where zsize is the number of raster bands, and ysize, xsize = grid.shape().
@@ -2029,7 +2029,7 @@ class RasterBandDataset():
         filename = '/vsimem/hubdc.core.RasterBandDataset.array.vrt'
         vrt = self.raster().translate(filename=filename, driver=VrtDriver(), bandList=[self.index() + 1])
         array = vrt.array(grid=grid, resampleAlg=resampleAlg, noDataValue=noDataValue, errorThreshold=errorThreshold,
-            warpMemoryLimit=warpMemoryLimit, multithread=multithread)
+                          warpMemoryLimit=warpMemoryLimit, multithread=multithread)
         gdal.Unlink(filename)
         return array[0]
 
@@ -2378,9 +2378,9 @@ class VectorDataset(object):
         driver.delete(filename=filename)
 
     def rasterize(self, grid, gdalType=gdal.GDT_Float32,
-            initValue=0, burnValue=1, burnAttribute=None, allTouched=False,
-            filterSQL=None, noDataValue=None,
-            filename='', driver=None, options=None):
+                  initValue=0, burnValue=1, burnAttribute=None, allTouched=False,
+                  filterSQL=None, noDataValue=None,
+                  filename='', driver=None, options=None):
         '''Returns a :class:`~hubdc.model.Raster` that is the rasterization of self into the given ``grid`` as.
 
         :param grid:
@@ -2449,7 +2449,7 @@ class VectorDataset(object):
             rasterizeLayerOptions.append('ATTRIBUTE=' + burnAttribute)
 
         gdal.RasterizeLayer(raster.gdalDataset(), [1], vector.ogrLayer(), burn_values=[burnValue],
-            options=rasterizeLayerOptions)
+                            options=rasterizeLayerOptions)
         vector.ogrLayer().SetAttributeFilter(None)
         raster.flushCache()
         return raster
@@ -2510,7 +2510,7 @@ class VectorDataset(object):
         tmpFilename = '/vsimem/VectorDataset.extractPixel.fid.gpkg'
         fid = self.createFidDataset(filename=tmpFilename)
         fidArray = fid.rasterize(grid=rasterDataset.grid(), initValue=-1, burnAttribute=fid.fieldNames()[0],
-            gdalType=gdal.GDT_Int32).readAsArray()[0]
+                                 gdalType=gdal.GDT_Int32).readAsArray()[0]
         #        fidArray = self.rasterizeFid(grid=rasterDataset.grid()).readAsArray()[0]
         valid = fidArray != -1
         fieldNames = self.fieldNames()
@@ -2960,10 +2960,10 @@ class MapViewer():
                 f = -3
 
             newExtent = Extent(xmin=extent.xmin() - xsize / f,
-                xmax=extent.xmax() + xsize / f,
-                ymin=extent.ymin() - ysize / f,
-                ymax=extent.ymax() + ysize / f,
-                projection=extent.projection())
+                               xmax=extent.xmax() + xsize / f,
+                               ymin=extent.ymin() - ysize / f,
+                               ymax=extent.ymax() + ysize / f,
+                               projection=extent.projection())
 
             self.setExtent(extent=newExtent)
             self.canvas.refreshAllLayers()
@@ -2985,8 +2985,8 @@ class MapViewer():
     def extent(self):
         rectangle = self.canvas.extent()
         extent = Extent(xmin=rectangle.xMinimum(), ymin=rectangle.yMinimum(),
-            xmax=rectangle.xMaximum(), ymax=rectangle.yMaximum(),
-            projection=self.projection())
+                        xmax=rectangle.xMaximum(), ymax=rectangle.yMaximum(),
+                        projection=self.projection())
         return extent
 
     def setExtent(self, extent):
@@ -3040,7 +3040,7 @@ class MapViewer():
                 crs = self.layers[0].qgsLayer().crs()
                 r = self.canvas.extent()
                 extent = Extent(xmin=r.xMinimum(), xmax=r.xMaximum(), ymin=r.yMinimum(), ymax=r.yMaximum(),
-                    projection=Projection.fromEpsg(crs.authid().split(':')[1]))
+                                projection=Projection.fromEpsg(crs.authid().split(':')[1]))
                 print(extent)
 
             self.canvas.extentsChanged.connect(onExtentChanged)
@@ -3155,9 +3155,9 @@ class RasterLayer(object):
     def initTrueColorRenderer(self, **kwargs):
         rasterDataset = openRasterDataset(filename=self.qgsLayer().source())
         return self.initMultiBandColorRenderer(redIndex=rasterDataset.waveband(center=682.5).index(),
-            greenIndex=rasterDataset.waveband(center=532.5).index(),
-            blueIndex=rasterDataset.waveband(center=467.5).index(),
-            **kwargs)
+                                               greenIndex=rasterDataset.waveband(center=532.5).index(),
+                                               blueIndex=rasterDataset.waveband(center=467.5).index(),
+                                               **kwargs)
 
 
 class VectorLayer(object):

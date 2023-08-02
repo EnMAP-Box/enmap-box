@@ -28,26 +28,17 @@ class ProcessingApps(EnMAPBoxApplication):
         return QIcon(join(dirname(__file__), 'numpy.png'))
 
     def menu(self, appMenu: QMenu):
-
-        toolMenu: QMenu = self.enmapbox.menu('Tools')
-
-        # apps
-        algs = [
-            ClassificationWorkflowAlgorithm(), RasterMathAlgorithm(), RegressionBasedUnmixingAlgorithm(),
-            RegressionWorkflowAlgorithm()
+        algsAndMenus = [
+            (ClassificationWorkflowAlgorithm(), self.enmapbox.ui.menuApplicationsClassification),
+            (RasterMathAlgorithm(), self.enmapbox.ui.menuApplications),
+            (RegressionBasedUnmixingAlgorithm(), self.enmapbox.ui.menuApplicationsUnmixing),
+            (RegressionWorkflowAlgorithm(), self.enmapbox.ui.menuApplicationsRegression),
         ]
-        for alg in algs:
-            a = self.utilsAddActionInAlphanumericOrder(appMenu, alg.displayName())
+        for alg, menu in algsAndMenus:
+            a = self.utilsAddActionInAlphanumericOrder(menu, alg.displayName())
             a.setIcon(self.processingIcon())
-            a.triggered.connect(self.startAlgorithm)
-            a.algorithm = alg
-
-        # tools
-        algs = [
-        ]
-        for alg in algs:
-            a = self.utilsAddActionInAlphanumericOrder(toolMenu, alg.displayName())
-            a.setIcon(self.processingIcon())
+            if isinstance(alg, RasterMathAlgorithm):
+                a.setIcon(self.numpyIcon())
             a.triggered.connect(self.startAlgorithm)
             a.algorithm = alg
 

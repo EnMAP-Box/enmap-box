@@ -2,6 +2,7 @@ from copy import deepcopy
 from typing import List
 
 import numpy as np
+
 from qgis.core import QgsRasterRenderer, QgsRasterInterface, QgsRectangle, QgsRasterBlockFeedback, Qgis
 
 try:

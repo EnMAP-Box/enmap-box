@@ -5,14 +5,13 @@ import platform
 import sys
 import unittest
 
-from qgis.PyQt.QtCore import QObject, pyqtSignal
-
-from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.datasources.datasources import VectorDataSource
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import MapCanvas
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.testing import EnMAPBoxTestCase
 from qgis.PyQt import Qt
+from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.core import Qgis, QgsProject
 
 

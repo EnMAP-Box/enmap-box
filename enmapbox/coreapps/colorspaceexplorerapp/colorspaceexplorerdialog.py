@@ -1,6 +1,7 @@
 from random import randint
 from typing import Optional
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QCheckBox, QMainWindow, QSpinBox, QGridLayout
@@ -8,7 +9,6 @@ from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer, QgsMultiBandColorRenderer, QgsContrastEnhancement, QgsRasterMinMaxOrigin, \
     QgsMapLayerProxyModel
 from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsMapLayerComboBox
-from enmapbox.typeguard import typechecked
 
 
 @typechecked

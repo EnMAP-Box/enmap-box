@@ -1,11 +1,9 @@
-
-
 import unittest
-from qgis.PyQt.QtWidgets import QTreeView
-from qgis.core import QgsProject
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import EnMAPBoxTestCase
+from qgis.PyQt.QtWidgets import QTreeView
+from qgis.core import QgsProject
 
 
 class TestIssue478(EnMAPBoxTestCase):

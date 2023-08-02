@@ -3,13 +3,12 @@ This is a template to create an EnMAP-Box test
 """
 import unittest
 
+from enmapbox.gui.dataviews.docks import SpectralLibraryDock
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
+from enmapbox.testing import EnMAPBoxTestCase
 from qgis.core import QgsProject
 from qgis.gui import QgsDualView
-
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.gui.dataviews.docks import SpectralLibraryDock
-from enmapbox.testing import EnMAPBoxTestCase
-from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 
 
 class EnMAPBoxTestCaseIssue311(EnMAPBoxTestCase):

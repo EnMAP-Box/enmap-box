@@ -173,6 +173,17 @@ class EnMAPBoxUI(QMainWindow):
     mStatusBar: QStatusBar
     mActionProcessingToolbox: QAction
     menuAdd_Product: QMenu
+    menuFile: QMenu
+    menuView: QMenu
+    menuTools: QMenu
+    menuToolsRasterStatistics: QMenu
+    menuToolsRasterVisualizations: QMenu
+    menuApplications: QMenu
+    menuApplicationsClassification: QMenu
+    menuApplicationsRegression: QMenu
+    menuApplicationsUnmixing: QMenu
+
+    menuAbout: QMenu
 
     def __init__(self, *args, **kwds):
         """Constructor."""
@@ -210,6 +221,8 @@ class EnMAPBoxUI(QMainWindow):
         self.mEo4qToolbar = QToolBar('Earth Observation for QGIS (EO4Q)')
         self.addToolBar(self.mEo4qToolbar)
 
+        self.initSubmenus()
+
     def addDockWidget(self, *args, **kwds):
         super(EnMAPBoxUI, self).addDockWidget(*args, **kwds)
 
@@ -225,6 +238,36 @@ class EnMAPBoxUI(QMainWindow):
     def closeEvent(event):
         pass
 
+    def initSubmenus(self):
+        """Initialize submenus to improve menu structure (see issue #386)"""
+
+        self.menuToolsRasterStatistics = self.menuTools.addMenu(
+            QIcon(':/images/themes/default/histogram.svg'),
+            'Raster Statistics')
+
+        self.menuToolsRasterVisualizations = self.menuTools.addMenu(
+            QIcon(':/images/themes/default/propertyicons/symbology.svg'),
+            'Raster Visualizations'
+        )
+
+        self.menuApplicationsClassification = self.menuApplications.addMenu(
+            QIcon(':/qps/ui/icons/raster_classification.svg'),
+            'Classification'
+        )
+
+        self.menuApplicationsRegression = self.menuApplications.addMenu(
+            QIcon(':/enmapbox/gui/ui/icons/filelist_regression.svg'),
+            'Regression'
+        )
+
+        self.menuApplicationsUnmixing = self.menuApplications.addMenu(
+            QIcon(':/qps/ui/icons/raster_multispectral.svg'),
+            'Unmixing'
+        )
+
+
+#        self.menuAdd_Product.addMenu(self.menuToolsRasterVisualizations)
+# separator = self.ui.mActionAddSentinel2  # outdated
 
 def getIcon() -> QIcon:
     """
