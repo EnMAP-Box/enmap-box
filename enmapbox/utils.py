@@ -1,9 +1,10 @@
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Iterator
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from qgis.PyQt.QtCore import QObject
-from qgis.PyQt.QtWidgets import QMessageBox
+from qgis.PyQt.QtWidgets import QMessageBox, QWidget
+from qgis.gui import QgisInterface
 from qgis.core import QgsRasterLayer
 
 
@@ -68,20 +69,22 @@ def importEarthEngine(showMessage=True, parent=None) -> Tuple[bool, object]:
         return False, None
 
 
-@typechecked
-def importTypeguard() -> Tuple[bool, object]:
-    if isEarthEngineModuleInstalled():
-        import ee
+def findQgisGuiWidgets(type) -> Iterator[QWidget]:
+    """Finds all QGIS widgets of a given type."""
+    from qgis.utils import iface
 
-        # ## debugging
-        # import traceback
-        # traceback.print_stack()
-        # QMessageBox.information(parent, 'DEBUG', 'Just imported the "ee" module!')
-        # ##
+    if isinstance(iface, QgisInterface):
+        qgisMainWindow = iface.mainWindow()
+        for dockWidget in qgisMainWindow.findChildren(type):
+            yield dockWidget
 
-        return True, ee
-    else:
-        if showMessage:
-            message = "Google Earth Engine plugin not installed. Can't import 'ee' module."
-            QMessageBox.information(parent, 'Missing dependency', message)
-        return False, None
+
+def findEnmapBoxGuiWidgets(type) -> Iterator[QWidget]:
+    """Finds all EnMAP-Box widgets of a given type."""
+    from enmapbox.gui.enmapboxgui import EnMAPBox
+
+    enmapBox = EnMAPBox.instance()
+    if enmapBox is not None:
+        enmapBoxMainWindow = enmapBox.ui
+        for dockWidget in enmapBoxMainWindow.findChildren(type):
+            yield dockWidget

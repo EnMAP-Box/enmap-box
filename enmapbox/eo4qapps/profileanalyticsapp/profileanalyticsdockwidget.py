@@ -11,18 +11,18 @@ import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
 import processing
 from enmapbox.gui.dataviews.docks import SpectralLibraryDock
 from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.gui.widgets.codeeditwidget import CodeEditWidget
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyleButton, PlotStyle
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import prepareProfileValueDict
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.typeguard import typechecked, check_type
+from enmapbox.utils import findEnmapBoxGuiWidgets, findQgisGuiWidgets
 from enmapboxprocessing.algorithm.subsetrasterbandsalgorithm import SubsetRasterBandsAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
-from geetimeseriesexplorerapp import MapTool
+from geetimeseriesexplorerapp import MapTool, GeeTimeseriesExplorerDockWidget, GeeTemporalProfileDockWidget
 from profileanalyticsapp.profileanalyticseditorwidget import ProfileAnalyticsEditorWidget
 from qgis.PyQt import uic
-from qgis.PyQt.QtWidgets import QComboBox, QTableWidget, QCheckBox, QToolButton, QLineEdit, QWidget
+from qgis.PyQt.QtWidgets import QComboBox, QTableWidget, QCheckBox, QToolButton, QLineEdit, QWidget, QLabel
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsVectorLayer, QgsProcessingFeatureSourceDefinition, \
     QgsFeatureRequest, QgsWkbTypes, QgsFeature
 from qgis.gui import QgsMapLayerComboBox, QgsFileWidget, QgsRasterBandComboBox, QgsDockWidget, QgisInterface
@@ -34,6 +34,7 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
 
     # data tab
     mSourceType: QComboBox
+    # - raster
     mRasterProfileType: QComboBox
     mTip1: QWidget
     mTip2: QWidget
@@ -42,17 +43,19 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
     mRemoveRaster: QToolButton
     mEditUserFunction: QToolButton
     mRemoveAllRaster: QToolButton
-
-    # analytics tab
-    mCode: CodeEditWidget
+    # - GEE raster
+    mGeeRefresh: QToolButton
+    mGeeRasterTable: QTableWidget
+    mGeeCollectionTitle: QLineEdit
 
     mXUnit: QComboBox
     mShowInSpectralView: QCheckBox
     mLiveUpdate: QCheckBox
     mApply: QToolButton
 
-    RasterLayerSource, = 0,
+    RasterLayerSource, GeeSource = 0, 1
     ZProfileType, XProfileType, YProfileType, LineProfileType = 0, 1, 2, 3
+    GeeTemporalProfileType, GeePixelProfileType = 0, 1
     NumberUnits, NanometerUnits, DecimalYearUnits = 0, 1, 2
     EnmapBoxInterface, QgisInterface = 0, 1
 
@@ -74,6 +77,9 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
         self.mRemoveRaster.clicked.connect(self.onRemoveRasterClicked)
         self.mEditUserFunction.clicked.connect(self.onEditUserFunctionClicked)
         self.mRemoveAllRaster.clicked.connect(self.onRemoveAllRasterClicked)
+
+        self.mGeeRefresh.clicked.connect(self.onGeeRefreshClicked)
+
         self.mXUnit.currentIndexChanged.connect(self.onLiveUpdate)
         self.mApply.clicked.connect(self.onApplyClicked)
 
@@ -85,6 +91,10 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
 
         self.onRasterProfileTypeChanged()
         self.onAddRasterClicked()
+
+        self.mGeeCollectionTitle.setVisible(False)
+        self.mGeeCollectionTitleLabel.setVisible(False)
+        self.mGeeRasterTable.setVisible(False)
 
     def enmapBoxInterface(self) -> EnMAPBox:
         return self.interface
@@ -200,6 +210,48 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
 
         self.onLiveUpdate()
 
+    def onGeeDataChanged(self):
+        self.onGeeRefreshClicked()
+
+    def onGeeRefreshClicked(self):
+
+        # connect to GEETSE (can't do this in __init__ because GEETSE may not yet exist
+        geeTimeseriesExplorerDockWidget, geeTemporalProfileDockWidget = self.utilsFindGeetse()
+        geeTemporalProfileDockWidget.sigDataChanged.connect(self.onGeeDataChanged)
+        self.mGeeRefresh.setVisible(False)
+        self.mGeeCollectionTitle.setVisible(True)
+        self.mGeeCollectionTitleLabel.setVisible(True)
+        self.mGeeRasterTable.setVisible(True)
+
+        self.mGeeCollectionTitle.setText(geeTimeseriesExplorerDockWidget.mCollectionTitle.text())
+
+        if geeTemporalProfileDockWidget.isDataAvailable():
+            bandNames = geeTemporalProfileDockWidget.dataBandNames()
+            self.mGeeRasterTable.setRowCount(len(bandNames))
+            for row, bandName in enumerate(bandNames):
+                w = QLabel(bandName)
+                self.mGeeRasterTable.setCellWidget(row, 0, w)
+
+                plotStyle = geeTemporalProfileDockWidget.dataBandStyle(bandName)
+                w = PlotStyleButton()
+                w.setMinimumSize(5, 5)
+                w.setPlotStyle(plotStyle)
+                w.mDialog.sigPlotStyleChanged.connect(self.onLiveUpdate)
+                self.mGeeRasterTable.setCellWidget(row, 1, w)
+
+                w = QLineEdit('0. + 1. * y')
+                w.editingFinished.connect(self.onLiveUpdate)
+                self.mGeeRasterTable.setCellWidget(row, 2, w)
+
+                w = QgsFileWidget()
+                w.setFilter('*.py')
+                w.setDefaultRoot(join(dirname(__file__), 'examples'))
+                w.fileChanged.connect(self.onLiveUpdate)
+                w.dialog = None
+                self.mGeeRasterTable.setCellWidget(row, 3, w)
+
+        self.onLiveUpdate()
+
     def onEditUserFunctionClicked(self):
         row = self.mRasterTable.currentRow()
         if row == -1:
@@ -243,10 +295,11 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
 
         self.mPlotWidget.clear()
 
+        profiles = list()
+        userFunctions = list()
+        userFunctionEditors = list()
+
         if self.mSourceType.currentIndex() == self.RasterLayerSource:
-            profiles = list()
-            userFunctions = list()
-            userFunctionEditors = list()
             # read and analyse profiles
             for row in range(self.mRasterTable.rowCount()):
                 w: QgsMapLayerComboBox = self.mRasterTable.cellWidget(row, 0)
@@ -418,6 +471,53 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                 profiles.append(profile)
                 userFunctions.append(userFunction)
                 userFunctionEditors.append(userFunctionEditor)
+        elif self.mSourceType.currentIndex() == self.GeeSource:
+            geeTimeseriesExplorerDockWidget, geeTemporalProfileDockWidget = self.utilsFindGeetse()
+            for row in range(self.mGeeRasterTable.rowCount()):
+                w: QLabel = self.mGeeRasterTable.cellWidget(row, 0)
+                bandName = w.text()
+                xValues = np.array(geeTemporalProfileDockWidget.dataDecimalYears(), np.float32)
+                yValues = np.array(geeTemporalProfileDockWidget.dataProfile(bandName), np.float32)
+                xUnit = 'decimal year'
+
+                if len(xValues) == 0:
+                    continue
+
+                w: PlotStyleButton = self.mGeeRasterTable.cellWidget(row, 1)
+                style = w.plotStyle()
+
+                w: QLineEdit = self.mGeeRasterTable.cellWidget(row, 2)
+                formular = w.text()
+                try:
+                    offset, tmp = formular.split('+')
+                    scale, _ = tmp.split('*')
+                    offset = float(offset)
+                    scale = float(scale)
+                    if offset != 0 or scale != 1:
+                        yValues = [offset + scale * y for y in yValues]
+                except Exception:
+                    pass
+
+                w: QgsFileWidget = self.mGeeRasterTable.cellWidget(row, 3)
+                filename = w.filePath()
+                userFunction = None
+                if exists(filename):
+                    namespace = dict()
+                    with open(filename) as file:
+                        code = file.read()
+                    try:
+                        exec(code, namespace)
+                        userFunction = namespace['updatePlot']
+                    except Exception:
+                        pass
+                userFunctionEditor = w.dialog
+                xValues = [float(v) for v in xValues]
+                yValues = [float(v) for v in yValues]
+                name = f'{bandName} [{self.mGeeCollectionTitle.text()}]'
+                profile = Profile(xValues, yValues, xUnit, name, style)
+                profiles.append(profile)
+                userFunctions.append(userFunction)
+                userFunctionEditors.append(userFunctionEditor)
         else:
             raise ValueError()
 
@@ -481,6 +581,8 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                 xtitle = 'Distance from line start'
             else:
                 raise ValueError()
+        elif self.mSourceType.currentIndex() == self.GeeSource:
+            xtitle = self.mXUnit.itemText(self.DecimalYearUnits)
         else:
             raise ValueError()
 
@@ -516,6 +618,21 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
     def setProjectSettings(self, settings: Dict):
         self.mSourceType.setCurrentIndex(settings['mSourceType.currentIndex'])
         self.mRasterProfileType.setCurrentIndex(settings['mRasterProfileType.currentIndex'])
+
+    def utilsFindGeetse(self):
+        if self.interfaceType == self.EnmapBoxInterface:
+            findWidgets = findEnmapBoxGuiWidgets
+        elif self.interfaceType == self.QgisInterface:
+            findWidgets = findQgisGuiWidgets
+        else:
+            raise ValueError()
+        widgets1 = list(findWidgets(GeeTimeseriesExplorerDockWidget))
+        widgets2 = list(findWidgets(GeeTemporalProfileDockWidget))
+        assert len(widgets1) == 1
+        assert len(widgets2) == 1
+        geeTimeseriesExplorerDockWidget: GeeTimeseriesExplorerDockWidget = widgets1[0]
+        geeTemporalProfileDockWidget: GeeTemporalProfileDockWidget = widgets2[0]
+        return geeTimeseriesExplorerDockWidget, geeTemporalProfileDockWidget
 
 
 @typechecked
