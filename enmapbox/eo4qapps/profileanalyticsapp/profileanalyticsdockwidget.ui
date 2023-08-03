@@ -18,7 +18,7 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>592</width>
+    <width>744</width>
     <height>401</height>
    </size>
   </property>
@@ -105,9 +105,17 @@
            </item>
            <item>
             <widget class="QComboBox" name="mSourceType">
+             <property name="currentIndex">
+              <number>0</number>
+             </property>
              <item>
               <property name="text">
                <string>Raster layer</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>GEE Time Series Explorer</string>
               </property>
              </item>
             </widget>
@@ -218,7 +226,7 @@
                          </sizepolicy>
                         </property>
                         <property name="text">
-                         <string>map tool to select a locations.</string>
+                         <string>map tool to select a location.</string>
                         </property>
                        </widget>
                       </item>
@@ -356,7 +364,7 @@
                <item>
                 <widget class="QStackedWidget" name="stackedWidget_2">
                  <property name="currentIndex">
-                  <number>1</number>
+                  <number>0</number>
                  </property>
                  <widget class="QWidget" name="page_3"/>
                  <widget class="QWidget" name="page_4">
@@ -543,7 +551,77 @@
              </item>
             </layout>
            </widget>
-           <widget class="QWidget" name="page_2"/>
+           <widget class="QWidget" name="page_2">
+            <layout class="QVBoxLayout" name="verticalLayout_7">
+             <item>
+              <widget class="QToolButton" name="mGeeRefresh">
+               <property name="text">
+                <string>Connect</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="mGeeCollectionGroup">
+               <item>
+                <widget class="QLabel" name="mGeeCollectionTitleLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Collection</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="mGeeCollectionTitle">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="text">
+                  <string>Landsat 8</string>
+                 </property>
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QTableWidget" name="mGeeRasterTable">
+               <attribute name="horizontalHeaderDefaultSectionSize">
+                <number>100</number>
+               </attribute>
+               <attribute name="horizontalHeaderStretchLastSection">
+                <bool>true</bool>
+               </attribute>
+               <column>
+                <property name="text">
+                 <string>Band</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Style</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Scaling</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Analytics</string>
+                </property>
+               </column>
+              </widget>
+             </item>
+            </layout>
+           </widget>
           </widget>
          </item>
         </layout>
@@ -607,7 +685,7 @@
          <string>Show in Spectral Views</string>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -674,12 +752,28 @@
    <slot>setCurrentIndex(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>613</x>
-     <y>204</y>
+     <x>609</x>
+     <y>213</y>
     </hint>
     <hint type="destinationlabel">
      <x>739</x>
      <y>204</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mSourceType</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>stackedWidget</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>903</x>
+     <y>86</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>952</x>
+     <y>111</y>
     </hint>
    </hints>
   </connection>
