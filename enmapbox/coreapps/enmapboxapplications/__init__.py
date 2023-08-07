@@ -1,11 +1,10 @@
 from os.path import join, dirname
 
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QAction
-
 from enmapbox.gui.applications import EnMAPBoxApplication
 from enmapboxapplications.imagemathapp.core import ImageMathApp
 from enmapboxapplications.regressionapp.core import RegressionWorkflowApp
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QMenu, QAction
 
 
 def enmapboxApplicationFactory(enmapBox):
@@ -56,12 +55,10 @@ class EnMAPBoxRegressionWorkflowApp(EnMAPBoxApplication):
         return QIcon(None)
 
     def menu(self, appMenu):
-        assert isinstance(appMenu, QMenu)
-        a = self.utilsAddActionInAlphanumericOrder(appMenu, 'Regression Workflow (deprecated)')
-        assert isinstance(a, QAction)
-        a.setIcon(self.icon())
+        a = self.utilsAddActionInAlphanumericOrder(
+            self.enmapbox.ui.menuApplicationsRegression, 'Regression Workflow (deprecated)'
+        )
         a.triggered.connect(self.startGUI)
-        return appMenu
 
     def geoAlgorithms(self):
         return []

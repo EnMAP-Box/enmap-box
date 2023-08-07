@@ -4,12 +4,11 @@ This is a template to create an EnMAP-Box test
 import pathlib
 import unittest
 
-from qgis.core import QgsWkbTypes, QgsVectorFileWriter, QgsProcessingFeedback, QgsCoordinateTransformContext, \
-    QgsProject
-
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import EnMAPBoxTestCase, TestObjects
 from qgis.core import QgsVectorLayer
+from qgis.core import QgsWkbTypes, QgsVectorFileWriter, QgsProcessingFeedback, QgsCoordinateTransformContext, \
+    QgsProject
 
 
 class EnMAPBoxTestCaseIssue286(EnMAPBoxTestCase):

@@ -1,14 +1,14 @@
-from enmapbox.coreapps.decorrelationstretchapp.decorrelationstretchrenderer import DecorrelationStretchRenderer
-from qgis.core import QgsRasterLayer
 import numpy as np
-
-from enmapbox.exampledata import enmap
-from enmapboxprocessing.rasterreader import RasterReader
-from enmapbox import initAll
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.testing import start_app
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import RobustScaler, MinMaxScaler
+
+from enmapbox import initAll
+from enmapbox.coreapps.decorrelationstretchapp.decorrelationstretchrenderer import DecorrelationStretchRenderer
+from enmapbox.exampledata import enmap
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.testing import start_app
+from enmapboxprocessing.rasterreader import RasterReader
+from qgis.core import QgsRasterLayer
 
 layer = QgsRasterLayer(enmap, 'enmap_berlin.bsq')
 reader = RasterReader(layer)

@@ -76,7 +76,7 @@ class EnMAPBoxApplication(QObject):
             parent=None
     ):
         super(EnMAPBoxApplication, self).__init__(parent)
-        self.enmapbox = enmapBox
+        self.enmapbox: EnMAPBox = enmapBox
 
         if enmapBox is None:
             from qgis.utils import iface

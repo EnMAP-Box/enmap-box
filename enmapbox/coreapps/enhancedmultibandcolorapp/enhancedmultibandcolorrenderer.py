@@ -3,11 +3,11 @@ from typing import List, Optional, Tuple
 
 import numpy as np
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsRasterRenderer, QgsRasterInterface, QgsRectangle, QgsRasterBlockFeedback, QgsRasterBlock, \
     Qgis
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
