@@ -5,6 +5,7 @@ from os.path import abspath, join, dirname, exists, basename
 from shutil import rmtree
 from typing import List
 
+from enmapboxprocessing.algorithm.spatialconvolutionairydisk2dalgorithm import SpatialConvolutionAiryDisk2DAlgorithm
 from qgis.core import QgsProcessingParameterDefinition, QgsProcessingDestinationParameter
 
 from enmapboxprocessing.algorithm.algorithms import algorithms
@@ -40,8 +41,6 @@ def generateRST():
 
     nalg = 0
     algs = algorithms()
-    # from enmapboxprocessing.algorithm.rasterlayerzonalaggregationalgorithm import RasterLayerZonalAggregationAlgorithm
-    # algs = [RasterLayerZonalAggregationAlgorithm()]
     for alg in algs:
         # print(alg.displayName())
         if Group.Experimental.name in alg.group():
@@ -102,9 +101,12 @@ def generateRST():
 
             alg = groups[gkey][akey]
             print(alg)
+            if not isinstance(alg, SpatialConvolutionAiryDisk2DAlgorithm):
+                continue
+
             if isinstance(alg, EnMAPProcessingAlgorithm):
                 alg.initAlgorithm()
-                text = v3(alg, text)
+                text = v3(alg, text, groupFolder, algoId)
             else:
                 print(f'skip {alg}')
                 continue
@@ -122,13 +124,20 @@ def generateRST():
     print('created RST file: ', filename)
 
 
-def v3(alg: EnMAPProcessingAlgorithm, text):
+def v3(alg: EnMAPProcessingAlgorithm, text, groupFolder, algoId):
     try:
         helpParameters = {k: v for k, v in alg.helpParameters()}
     except Exception:
         assert 0
 
     text += injectGlossaryLinks(alg.shortDescription()) + '\n\n'
+
+    # include manual algo description
+    optionalRstFilename = join(groupFolder, algoId + '.rst').replace(
+        'processing_algorithms', 'processing_algorithms_includes'
+    )
+    if exists(optionalRstFilename):
+        text += f'.. include:: ../../processing_algorithms_includes/{basename(groupFolder)}/{algoId}.rst\n\n'
 
     text += '**Parameters**\n\n'
     outputsHeadingCreated = False
