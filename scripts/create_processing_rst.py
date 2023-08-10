@@ -5,14 +5,11 @@ from os.path import abspath, join, dirname, exists, basename
 from shutil import rmtree
 from typing import List
 
-from enmapboxprocessing.algorithm.spatialconvolutionairydisk2dalgorithm import SpatialConvolutionAiryDisk2DAlgorithm
-from qgis.core import QgsProcessingParameterDefinition, QgsProcessingDestinationParameter
-
+import enmapbox
 from enmapboxprocessing.algorithm.algorithms import algorithms
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.glossary import injectGlossaryLinks
-
-import enmapbox
+from qgis.core import QgsProcessingParameterDefinition, QgsProcessingDestinationParameter
 
 try:
     enmapboxdocumentation = __import__('enmapboxdocumentation')
@@ -101,8 +98,6 @@ def generateRST():
 
             alg = groups[gkey][akey]
             print(alg)
-            if not isinstance(alg, SpatialConvolutionAiryDisk2DAlgorithm):
-                continue
 
             if isinstance(alg, EnMAPProcessingAlgorithm):
                 alg.initAlgorithm()
