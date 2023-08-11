@@ -22,6 +22,7 @@ import re
 import sys
 import typing
 import warnings
+from os.path import basename
 from typing import Optional, Dict, Union, Any, List
 
 import enmapbox
@@ -87,6 +88,7 @@ from .dataviews.docks import DockTypes
 from .mapcanvas import MapCanvas
 from .utils import enmapboxUiPath
 from ..enmapboxsettings import EnMAPBoxSettings
+from ..exampledata import enmap_potsdam, aerial_potsdam
 
 MAX_MISSING_DEPENDENCY_WARNINGS = 3
 KEY_MISSING_DEPENDENCY_VERSION = 'MISSING_PACKAGE_WARNING_VERSION'
@@ -1842,7 +1844,14 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                         pass
                     return oType, area
 
-                for lyr in sorted(lyrs, key=niceLayerOrder):
+                lyrs = [lyr for lyr in sorted(lyrs, key=niceLayerOrder)]
+
+                # quick fix for issue #555
+                lyrNames = [basename(lyr.source()) for lyr in lyrs]
+                a, b = lyrNames.index(basename(aerial_potsdam)), lyrNames.index(basename(enmap_potsdam))
+                lyrs[b], lyrs[a] = lyrs[a], lyrs[b]  # we just switch positions
+
+                for lyr in lyrs:
                     dock.layerTree().addLayer(lyr)
 
         if testData:
