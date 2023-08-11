@@ -77,7 +77,7 @@ class Driver(object):
         for bandNo in range(1, gdalDataset.RasterCount + 1):
             rb: gdal.Band = gdalDataset.GetRasterBand(bandNo)
             rb.SetColorInterpretation((gdal.GCI_Undefined))
-                
+
         return RasterWriter(gdalDataset)
 
     def createFromArray(

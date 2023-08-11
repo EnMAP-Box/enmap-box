@@ -2,7 +2,7 @@ from time import sleep
 
 from osgeo import gdal
 
-from enmapbox.exampledata import enmap
+from enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.editrastersourcebandpropertiesalgorithm import EditRasterSourceBandPropertiesAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
@@ -33,6 +33,18 @@ class TestEditRasterSourceBandPropertiesAlgorithm(TestCase):
         parameters = {
             alg.P_SOURCE: filename,
             alg.P_NAMES: str(values),
+        }
+        self.runalg(alg, parameters)
+        reader = RasterReader(filename)
+        self.assertListEqual(values, [reader.bandName(bandNo) for bandNo in reader.bandNumbers()])
+
+    def test_name_withCounterVariable(self):
+        filename = self.copyEnmap()
+        values = [f'band {bandNo}' for bandNo in range(1, 178)]
+        alg = EditRasterSourceBandPropertiesAlgorithm()
+        parameters = {
+            alg.P_SOURCE: filename,
+            alg.P_NAMES: 'band {bandNo}',
         }
         self.runalg(alg, parameters)
         reader = RasterReader(filename)
