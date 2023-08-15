@@ -13,6 +13,7 @@ from enmapboxprocessing.algorithm.classificationworkflowalgorithm import Classif
 from enmapboxprocessing.algorithm.classifierfeaturerankingpermutationimportancealgorithm import \
     ClassifierFeatureRankingPermutationImportanceAlgorithm
 from enmapboxprocessing.algorithm.classifierperformancealgorithm import ClassifierPerformanceAlgorithm
+from enmapboxprocessing.algorithm.classseparabilityalgorithm import ClassSeparabilityAlgorithm
 from enmapboxprocessing.algorithm.convexhullalgorithm import ConvexHullAlgorithm
 from enmapboxprocessing.algorithm.createdefaultpalettedrasterrendereralgorithm import \
     CreateDefaultPalettedRasterRendererAlgorithm
@@ -241,6 +242,7 @@ def algorithms():
         ClassificationWorkflowAlgorithm(),
         ClassifierPerformanceAlgorithm(),
         ClassifierFeatureRankingPermutationImportanceAlgorithm(),
+        ClassSeparabilityAlgorithm(),
         ConvexHullAlgorithm(),
         CreateDefaultPalettedRasterRendererAlgorithm(),
         CreateGridAlgorithm(),
