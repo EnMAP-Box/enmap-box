@@ -72,12 +72,12 @@ class LMU_EnMAPBoxApp(EnMAPBoxApplication):
         g = menu.addAction('interactive Red-Edge Inflection Point (iREIP)')
         g.triggered.connect(self.start_GUI_iREIP)
 
-        h = menu.addMenu('Vegetation Processor')
+        h = menu.addMenu('Vegetation Machine Learning Processor')
 
-        ha = h.addAction("ANN Training")
+        ha = h.addAction("ML Training")
         ha.triggered.connect(self.start_GUI_ProcessorTraining)
 
-        hb = h.addAction('ANN Inversion')
+        hb = h.addAction('ML Inversion')
         hb.triggered.connect(self.start_GUI_ProcessorInversion)
 
         appMenu.addMenu(menu)
