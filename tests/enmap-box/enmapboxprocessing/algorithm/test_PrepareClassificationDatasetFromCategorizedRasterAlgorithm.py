@@ -1,10 +1,10 @@
-from enmapbox.exampledata import enmap
+from enmapbox.exampledata import enmap_potsdam
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedrasteralgorithm import \
     PrepareClassificationDatasetFromCategorizedRasterAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import landcover_polygon_30m
+from enmapboxtestdata import landcover_polygon_30m, enmap
 from qgis.core import QgsRasterLayer
 
 
@@ -60,3 +60,31 @@ class TestPrepareClassificationSampleFromCategorizedRaster(TestCase):
         self.assertEqual(177, len(dump.features))
         self.assertEqual(['band 8 (0.460000 Micrometers)', 'band 9 (0.465000 Micrometers)'], dump.features[:2])
         self.assertEqual(1911, len(dump.categories))
+
+    def test_excludeBadBands(self):
+        alg = PrepareClassificationDatasetFromCategorizedRasterAlgorithm()
+        print(QgsRasterLayer(enmap).renderer())
+        parameters = {
+            alg.P_FEATURE_RASTER: enmap_potsdam,
+            alg.P_CATEGORIZED_RASTER: enmap_potsdam,  # this makes not much sense, but we allow it anyways
+            alg.P_EXCLUDE_BAD_BANDS: True,
+            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+        }
+        self.runalg(alg, parameters)
+        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        self.assertEqual(218, dump.X.shape[1])
+        self.assertEqual(218, len(dump.features))
+
+    def test_notExcludeBadBands(self):
+        alg = PrepareClassificationDatasetFromCategorizedRasterAlgorithm()
+        print(QgsRasterLayer(enmap).renderer())
+        parameters = {
+            alg.P_FEATURE_RASTER: enmap_potsdam,
+            alg.P_CATEGORIZED_RASTER: enmap_potsdam,  # this makes not much sense, but we allow it anyways
+            alg.P_EXCLUDE_BAD_BANDS: False,
+            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+        }
+        self.runalg(alg, parameters)
+        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        self.assertEqual(224, dump.X.shape[1])
+        self.assertEqual(224, len(dump.features))

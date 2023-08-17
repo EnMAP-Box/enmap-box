@@ -1,10 +1,10 @@
-from enmapbox.exampledata import enmap
+from enmapbox.exampledata import enmap_potsdam
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousrasteralgorithm import \
     PrepareRegressionDatasetFromContinuousRasterAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import fraction_polygon_l3
+from enmapboxtestdata import fraction_polygon_l3, enmap
 
 
 class TestPrepareRegressionDatasetFromContinuousRasterAlgorithm(TestCase):
@@ -30,3 +30,31 @@ class TestPrepareRegressionDatasetFromContinuousRasterAlgorithm(TestCase):
             ['#e60000', '#9c9c9c', '#98e600', '#267300', '#a87000', '#0064ff'],
             [t.color for t in dump.targets]
         )
+
+    def test_excludeBadBands(self):
+        alg = PrepareRegressionDatasetFromContinuousRasterAlgorithm()
+        parameters = {
+            alg.P_FEATURE_RASTER: enmap_potsdam,
+            alg.P_CONTINUOUS_RASTER: enmap_potsdam,  # this makes not much sense, but we allow it anyways
+            alg.P_TARGETS: [1],
+            alg.P_EXCLUDE_BAD_BANDS: True,
+            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+        }
+        self.runalg(alg, parameters)
+        dump = RegressorDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        self.assertEqual(218, dump.X.shape[1])
+        self.assertEqual(218, len(dump.features))
+
+    def test_notExcludeBadBands(self):
+        alg = PrepareRegressionDatasetFromContinuousRasterAlgorithm()
+        parameters = {
+            alg.P_FEATURE_RASTER: enmap_potsdam,
+            alg.P_CONTINUOUS_RASTER: enmap_potsdam,  # this makes not much sense, but we allow it anyways
+            alg.P_TARGETS: [1],
+            alg.P_EXCLUDE_BAD_BANDS: False,
+            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+        }
+        self.runalg(alg, parameters)
+        dump = RegressorDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        self.assertEqual(224, dump.X.shape[1])
+        self.assertEqual(224, len(dump.features))

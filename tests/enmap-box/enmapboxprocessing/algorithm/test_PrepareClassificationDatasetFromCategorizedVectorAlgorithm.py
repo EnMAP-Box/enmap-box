@@ -1,10 +1,10 @@
-from enmapbox.exampledata import enmap, landcover_polygon, landcover_point
+from enmapbox.exampledata import enmap_potsdam, landcover_potsdam_polygon
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedvectoralgorithm import \
     PrepareClassificationDatasetFromCategorizedVectorAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import points_in_no_data_region
+from enmapboxtestdata import points_in_no_data_region, enmap, landcover_polygon, landcover_point
 
 
 class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
@@ -111,3 +111,29 @@ class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
         self.assertListEqual(
             ['roof', 'pavement', 'low vegetation', 'tree', 'soil', 'water'], [c.name for c in dump.categories]
         )
+
+    def test_excludeBadBands(self):
+        alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
+        parameters = {
+            alg.P_FEATURE_RASTER: enmap_potsdam,
+            alg.P_CATEGORIZED_VECTOR: landcover_potsdam_polygon,
+            alg.P_EXCLUDE_BAD_BANDS: True,
+            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+        }
+        self.runalg(alg, parameters)
+        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        self.assertEqual(218, dump.X.shape[1])
+        self.assertEqual(218, len(dump.features))
+
+    def test_notExcludeBadBands(self):
+        alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
+        parameters = {
+            alg.P_FEATURE_RASTER: enmap_potsdam,
+            alg.P_CATEGORIZED_VECTOR: landcover_potsdam_polygon,
+            alg.P_EXCLUDE_BAD_BANDS: False,
+            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+        }
+        self.runalg(alg, parameters)
+        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        self.assertEqual(224, dump.X.shape[1])
+        self.assertEqual(224, len(dump.features))
