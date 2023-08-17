@@ -7,6 +7,7 @@ from osgeo import gdal
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.importenmapl1balgorithm import ImportEnmapL1BAlgorithm
+from enmapboxprocessing.algorithm.subsetrasterbandsalgorithm import SubsetRasterBandsAlgorithm
 from enmapboxprocessing.algorithm.vrtbandmathalgorithm import VrtBandMathAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.gdalutils import GdalUtils
@@ -20,6 +21,7 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessin
 class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
     P_FILE, _FILE = 'file', 'Metadata file'
     P_SET_BAD_BANDS, _SET_BAD_BANDS = 'setBadBands', 'Set bad bands'
+    P_EXCLUDE_BAD_BANDS, _EXCLUDE_BAD_BANDS, = 'excludeBadBands', 'Exclude bad bands'
     P_DETECTOR_OVERLAP, _DETECTOR_OVERLAP = 'detectorOverlap', 'Detector overlap region'
     O_DETECTOR_OVERLAP = [
         'Order by detector (VNIR, SWIR)', 'Order by wavelength (default order)', 'Moving average filter', 'VNIR only', 'SWIR only'
@@ -42,6 +44,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                          'you may drag&drop the metadata XML file directly from your system file browser onto '
                          'the EnMAP-Box map view area.'),
             (self._SET_BAD_BANDS, 'Whether to find and set the bad bands list by evaluating the image data.'),
+            (self._EXCLUDE_BAD_BANDS, 'Whether to exclude bands.'),
             (self._DETECTOR_OVERLAP, 'Different options for handling the detector overlap region from 900 to 1000 '
                                      'nanometers. For the Moving average filter, a kernel size of 3 is used.'),
             (self._OUTPUT_RASTER, self.RasterFileDestination)
@@ -54,7 +57,8 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFile(
             self.P_FILE, self._FILE, extension='XML', fileFilter='Metadata file (*-METADATA.XML);;All files (*.*)'
         )
-        self.addParameterBoolean(self.P_SET_BAD_BANDS, self._SET_BAD_BANDS, True)
+        self.addParameterBoolean(self.P_SET_BAD_BANDS, self._SET_BAD_BANDS, True, True)
+        self.addParameterBoolean(self.P_EXCLUDE_BAD_BANDS, self._EXCLUDE_BAD_BANDS, True, True)
         self.addParameterEnum(
             self.P_DETECTOR_OVERLAP, self._DETECTOR_OVERLAP, self.O_DETECTOR_OVERLAP, False, self.SwirOnlyOverlapOption
         )
@@ -76,6 +80,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
     ) -> Dict[str, Any]:
         xmlFilename = self.parameterAsFile(parameters, self.P_FILE, context)
         setBadBands = self.parameterAsBoolean(parameters, self.P_SET_BAD_BANDS, context)
+        excludeBadBands = self.parameterAsBoolean(parameters, self.P_EXCLUDE_BAD_BANDS, context)
         detectorOverlap = self.parameterAsEnum(parameters, self.P_DETECTOR_OVERLAP, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_RASTER, context)
         with open(filename + '.log', 'w') as logfile:
@@ -100,6 +105,8 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
             # make sure that wavelength are sorted
             values = np.array(wavelength, float)
             assert np.all(values[:-1] <= values[1:]), 'wavelength are assumed to be sorted'
+
+            vrtTempFilename = Utils.tmpFilename(filename, 'stack.vrt')
 
             # create VRT
             if detectorOverlap != self.MovingAverageFilterOverlapOption:
@@ -139,7 +146,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                     xmlFilename.replace('-METADATA.XML', '-SPECTRAL_IMAGE'))
                 )
                 options = gdal.TranslateOptions(format='VRT', outputType=gdal.GDT_Float32, bandList=bandList)
-                ds: gdal.Dataset = gdal.Translate(destName=filename, srcDS=ds, options=options)
+                ds: gdal.Dataset = gdal.Translate(destName=vrtTempFilename, srcDS=ds, options=options)
             else:
                 # create VRT stack with all bands
                 spectralImageFilename = ImportEnmapL1BAlgorithm.findFilename(
@@ -183,9 +190,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                         vrtBandFilenames.append(vrtStackFilename)
                         bandNumbers.append(bandNo)
 
-                vrtStackFilename = Utils.tmpFilename(filename, 'stack.vrt')
-                GdalUtils.stackVrtBands(vrtStackFilename, vrtBandFilenames, bandNumbers)
-                ds: gdal.Dataset = gdal.Translate(filename, vrtStackFilename)
+                GdalUtils.stackVrtBands(vrtTempFilename, vrtBandFilenames, bandNumbers)
                 bandList = list(range(1, len(wavelength) + 1))
 
             # update metadata
@@ -221,6 +226,20 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                         )[0] == reader.noDataValue(bandNo))
                     if allNoData:
                         writer.setBadBandMultiplier(0, bandNo)
+                del reader, writer
+            del ds
+
+            if excludeBadBands:  # see issue #461
+                if not setBadBands:
+                    raise QgsProcessingException('To "Exclude bad bands", also active "Set bad bands" option.')
+
+            alg = SubsetRasterBandsAlgorithm()
+            parameters = {
+                alg.P_RASTER: vrtTempFilename,
+                alg.P_EXCLUDE_BAD_BANDS: excludeBadBands,
+                alg.P_OUTPUT_RASTER: filename
+            }
+            alg.runAlg(alg, parameters, None, feedback2)
 
             result = {self.P_OUTPUT_RASTER: filename}
             self.toc(feedback, result)
