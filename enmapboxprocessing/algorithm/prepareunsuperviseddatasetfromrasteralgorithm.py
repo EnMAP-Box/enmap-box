@@ -18,6 +18,7 @@ class PrepareUnsupervisedDatasetFromRasterAlgorithm(EnMAPProcessingAlgorithm):
     P_FEATURE_RASTER, _FEATURE_RASTER = 'featureRaster', 'Raster layer with features'
     P_MASK, _MASK = 'mask', 'Mask layer'
     P_SAMPLE_SIZE, _SAMPLE_SIZE = 'sampleSize', 'Sample size'
+    P_EXCLUDE_BAD_BANDS, _EXCLUDE_BAD_BANDS, = 'excludeBadBands', 'Exclude bad bands'
     P_OUTPUT_DATASET, _OUTPUT_DATASET = 'outputUnsupervisedDataset', 'Output dataset'
 
     @classmethod
@@ -37,6 +38,8 @@ class PrepareUnsupervisedDatasetFromRasterAlgorithm(EnMAPProcessingAlgorithm):
             (self._SAMPLE_SIZE, 'Approximate number of samples drawn from raster. '
                                 'If 0, whole raster will be used. '
                                 'Note that this is only a hint for limiting the number of rows and columns.'),
+            (self._EXCLUDE_BAD_BANDS, 'Whether to exclude bands, that are marked as bad bands, '
+                                      'or contain no data, inf or nan values in all samples.'),
             (self._OUTPUT_DATASET, self.PickleFileDestination)
         ]
 
@@ -47,6 +50,7 @@ class PrepareUnsupervisedDatasetFromRasterAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterRasterLayer(self.P_FEATURE_RASTER, self._FEATURE_RASTER)
         self.addParameterMapLayer(self.P_MASK, self._MASK, None, True)
         self.addParameterInt(self.P_SAMPLE_SIZE, self._SAMPLE_SIZE, 0, True, 0)
+        self.addParameterBoolean(self.P_EXCLUDE_BAD_BANDS, self._EXCLUDE_BAD_BANDS, True, True)
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
 
     def processAlgorithm(
@@ -55,6 +59,7 @@ class PrepareUnsupervisedDatasetFromRasterAlgorithm(EnMAPProcessingAlgorithm):
         raster = self.parameterAsRasterLayer(parameters, self.P_FEATURE_RASTER, context)
         mask = self.parameterAsLayer(parameters, self.P_MASK, context)
         sampleSize = self.parameterAsInt(parameters, self.P_SAMPLE_SIZE, context)
+        excludeBadBands = self.parameterAsBoolean(parameters, self.P_EXCLUDE_BAD_BANDS, context)
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_DATASET, context)
 
         with open(filename + '.log', 'w') as logfile:
@@ -112,19 +117,34 @@ class PrepareUnsupervisedDatasetFromRasterAlgorithm(EnMAPProcessingAlgorithm):
                     width, height = reader.samplingWidthAndHeight(1, block.extent, sampleSize)
                     array = reader.arrayFromBoundingBoxAndSize(block.extent, width, height)
 
-                maskArray = np.all(reader.maskArray(array), axis=0)
+                maskArray = reader.maskArray(array)
+
+                # skip bad bands (see issue #560)
+                if excludeBadBands:
+                    goodBands = np.any(np.reshape(maskArray, (reader.bandCount(), -1)), 1)
+                    goodBandNumbers = list(map(int, np.where(goodBands)[0] + 1))
+                    badBandNumbers = list(map(str, np.where(~goodBands)[0] + 1))
+                    if len(badBandNumbers) > 0:
+                        feedback.pushInfo(f'Removed bad bands: {", ".join(badBandNumbers)}')
+                else:
+                    goodBands = [True] * reader.bandCount()
+                    goodBandNumbers = list(reader.bandNumbers())
+
+                # skip samples that contain a no data value
+                maskArray = np.all(np.asarray(maskArray)[goodBands], axis=0)
                 if mask is not None:
                     array2 = readerMask.arrayFromBlock(block)
                     maskArray2 = np.all(readerMask.maskArray(array2, defaultNoDataValue=0), axis=0)
                     maskArray = np.logical_and(maskArray, maskArray2)
 
                 blockX = list()
-                for a in array:
-                    blockX.append(a[maskArray])
+                for a, goodBand in zip(array, goodBands):
+                    if goodBand:
+                        blockX.append(a[maskArray])
                 X.append(blockX)
             X = np.concatenate(X, axis=1).T
-
-            features = [RasterReader(raster).bandName(i + 1) for i in range(raster.bandCount())]
+            reader = RasterReader(raster)
+            features = [reader.bandName(bandNo) for bandNo in goodBandNumbers]
             feedback.pushInfo(f'Sampled data: X=array{list(X.shape)}')
 
             dump = TransformerDump(features=features, X=X)
