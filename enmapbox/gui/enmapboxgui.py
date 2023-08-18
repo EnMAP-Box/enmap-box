@@ -23,7 +23,7 @@ import sys
 import typing
 import warnings
 from os.path import basename
-from typing import Optional, Dict, Union, Any, List
+from typing import Optional, Dict, Union, Any, List, Sequence
 
 import enmapbox
 import enmapbox.gui.datasources.manager
@@ -88,7 +88,6 @@ from .dataviews.docks import DockTypes
 from .mapcanvas import MapCanvas
 from .utils import enmapboxUiPath
 from ..enmapboxsettings import EnMAPBoxSettings
-from ..exampledata import enmap_potsdam, aerial_potsdam
 
 MAX_MISSING_DEPENDENCY_WARNINGS = 3
 KEY_MISSING_DEPENDENCY_VERSION = 'MISSING_PACKAGE_WARNING_VERSION'
@@ -613,6 +612,13 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         a.setIcon(QIcon(':/images/themes/default/console/mIconRunConsole.svg'))
         a.triggered.connect(self.onOpenPythonConsole)
 
+        # add datasets (see issue #561)
+        m2 = m.addMenu('Datasets')
+        a: QAction = m2.addAction('Add Berlin Dataset')
+        a.triggered.connect(self.onAddBerlinDataset)
+        a: QAction = m2.addAction('Add Potsdam Dataset')
+        a.triggered.connect(self.onAddPotsdamDataset)
+
         debugLog('Set ui visible...')
         self.ui.setVisible(True)
 
@@ -847,6 +853,31 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         window.setWindowTitle('EnMAP-Box Python console')
         window.setCentralWidget(ConsoleWidget(self.ui, {'enmapBox': enmapBox}, None, text))
         window.show()
+
+    def onAddBerlinDataset(self):
+        # example datasets are stored here: https://github.com/EnMAP-Box/enmap-box-exampledata
+        from enmapboxexampledata.berlin import enmap_berlin, hires_berlin, landcover_berlin_polygon, \
+            landcover_berlin_point
+        layers = [
+            QgsRasterLayer(enmap_berlin, basename(enmap_berlin)),
+            QgsRasterLayer(hires_berlin, basename(hires_berlin)),
+            QgsVectorLayer(landcover_berlin_polygon, basename(landcover_berlin_polygon)),
+            QgsVectorLayer(landcover_berlin_point, basename(landcover_berlin_point))
+        ]
+
+        self.onDataDropped(reversed(layers))
+
+    def onAddPotsdamDataset(self):
+        # example datasets are stored here: https://github.com/EnMAP-Box/enmap-box-exampledata
+        from enmapboxexampledata.potsdam import enmap_potsdam, aerial_potsdam, landcover_potsdam_polygon, \
+            landcover_potsdam_point
+        layers = [
+            QgsRasterLayer(enmap_potsdam, basename(enmap_potsdam)),
+            QgsRasterLayer(aerial_potsdam, basename(aerial_potsdam)),
+            QgsVectorLayer(landcover_potsdam_polygon, basename(landcover_potsdam_polygon)),
+            QgsVectorLayer(landcover_potsdam_point, basename(landcover_potsdam_point))
+        ]
+        self.onDataDropped(reversed(layers))
 
     def disconnectQGISSignals(self):
         try:
@@ -1765,8 +1796,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         contains_html = re.search(r'<(html|br|a|p/?>)', message) is not None
         self.addMessageBarTextBoxItem(line1, message, level=level, html=contains_html)
 
-    def onDataDropped(self, droppedData: Any, mapDock: MapDock = None) -> MapDock:
-        assert isinstance(droppedData, list)
+    def onDataDropped(self, droppedData: Sequence, mapDock: MapDock = None) -> MapDock:
         if mapDock is None:
             mapDock = self.createDock('MAP')
         from enmapbox.gui.datasources.datasources import SpatialDataSource
@@ -1847,12 +1877,14 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                 lyrs = [lyr for lyr in sorted(lyrs, key=niceLayerOrder)]
 
                 # quick fix for issue #555
+                from enmapbox.exampledata import enmap_potsdam, aerial_potsdam
                 lyrNames = [basename(lyr.source()) for lyr in lyrs]
                 a, b = lyrNames.index(basename(aerial_potsdam)), lyrNames.index(basename(enmap_potsdam))
                 lyrs[b], lyrs[a] = lyrs[a], lyrs[b]  # we just switch positions
 
                 for lyr in lyrs:
                     dock.layerTree().addLayer(lyr)
+                dock.mapCanvas().zoomToFullExtent()
 
         if testData:
             from enmapbox import DIR_REPO
