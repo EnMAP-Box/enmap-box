@@ -2,10 +2,10 @@ from os.path import normpath
 
 import numpy as np
 
-from enmapbox.exampledata import enmap, hires, landcover_polygon
 from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import RasterMathAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxtestdata import enmap, landcover_polygon, hires
 from qgis.core import Qgis
 
 
@@ -240,7 +240,7 @@ class TestRasterMathAlgorithm(TestCase):
             alg.P_OUTPUT_RASTER: self.filename('raster.tif')
         }
         result = self.runalg(alg, parameters)
-        self.assertEqual(Qgis.Float32, RasterReader(result[alg.P_OUTPUT_RASTER]).dataType(1))
+        self.assertEqual(Qgis.DataType.Float32, RasterReader(result[alg.P_OUTPUT_RASTER]).dataType(1))
 
     def test_not_floatInput(self):
         alg = RasterMathAlgorithm()
@@ -251,7 +251,7 @@ class TestRasterMathAlgorithm(TestCase):
             alg.P_OUTPUT_RASTER: self.filename('raster.tif')
         }
         result = self.runalg(alg, parameters)
-        self.assertEqual(Qgis.Int16, RasterReader(result[alg.P_OUTPUT_RASTER]).dataType(1))
+        self.assertEqual(Qgis.DataType.Int16, RasterReader(result[alg.P_OUTPUT_RASTER]).dataType(1))
 
     def _test_debug_issue1245(self):
         alg = RasterMathAlgorithm()
@@ -263,3 +263,25 @@ class TestRasterMathAlgorithm(TestCase):
         }
         result = self.runalg(alg, parameters)
         self.assertEqual(Qgis.DataType.Float64, RasterReader(result[alg.P_OUTPUT_RASTER]).dataType(1))
+
+    def test_replaceNoDataValue(self):
+        alg = RasterMathAlgorithm()
+        parameters = {
+            alg.P_R1: enmap,
+            alg.P_CODE: 'raster=R1',
+            alg.P_NO_DATA_VALUE: -42,
+            alg.P_OUTPUT_RASTER: self.filename('raster.tif')
+        }
+        result = self.runalg(alg, parameters)
+        self.assertArrayEqual(-42, RasterReader(result[alg.P_OUTPUT_RASTER]).array(0, 0, 1, 1))
+
+    def test_notReplaceNoDataValue(self):
+        alg = RasterMathAlgorithm()
+        parameters = {
+            alg.P_R1: enmap,
+            alg.P_CODE: 'raster=R1',
+            alg.P_NO_DATA_VALUE: None,
+            alg.P_OUTPUT_RASTER: self.filename('raster.tif')
+        }
+        result = self.runalg(alg, parameters)
+        self.assertArrayEqual(-99, RasterReader(result[alg.P_OUTPUT_RASTER]).array(0, 0, 1, 1))
