@@ -149,6 +149,7 @@
     <addaction name="menuAdd_Product"/>
     <addaction name="mMenuCreateDataSource"/>
     <addaction name="mActionLoadExampleData"/>
+    <addaction name="mActionLoadExampleScene"/>
     <addaction name="separator"/>
     <addaction name="mActionOpenProject"/>
     <addaction name="separator"/>
@@ -825,6 +826,11 @@
    </property>
    <property name="text">
     <string>Open Project</string>
+   </property>
+  </action>
+  <action name="mActionLoadExampleScene">
+   <property name="text">
+    <string>Download Example Scene</string>
    </property>
   </action>
  </widget>
