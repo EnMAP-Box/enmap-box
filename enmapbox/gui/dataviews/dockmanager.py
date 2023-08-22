@@ -1575,6 +1575,13 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
             action = menu.addAction('Set layer CRS to map canvas')
             action.triggered.connect(lambda: canvas.setDestinationCrs(lyr.crs()))
 
+            def setLayerNameAsMapName(node, lyr):
+                node.parent().setName(lyr.name())
+                node.parent().dock.setTitle(lyr.name())
+
+            action = menu.addAction('Set layer name as view name')
+            action.triggered.connect(lambda: setLayerNameAsMapName(node, lyr))
+
             def onDuplicateLayer(n: QgsLayerTreeLayer):
 
                 group = n.parent()
