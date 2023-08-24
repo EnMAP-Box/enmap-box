@@ -24,7 +24,8 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
     P_EXCLUDE_BAD_BANDS, _EXCLUDE_BAD_BANDS, = 'excludeBadBands', 'Exclude bad bands'
     P_DETECTOR_OVERLAP, _DETECTOR_OVERLAP = 'detectorOverlap', 'Detector overlap region'
     O_DETECTOR_OVERLAP = [
-        'Order by detector (VNIR, SWIR)', 'Order by wavelength (default order)', 'Moving average filter', 'VNIR only', 'SWIR only'
+        'Order by detector (VNIR, SWIR)', 'Order by wavelength (default order)', 'Moving average filter', 'VNIR only',
+        'SWIR only'
     ]
     OrderByDetectorOverlapOption, OrderByWavelengthOverlapOption, MovingAverageFilterOverlapOption, \
     VnirOnlyOverlapOption, SwirOnlyOverlapOption = range(5)
@@ -110,35 +111,27 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
 
             # create VRT
             if detectorOverlap != self.MovingAverageFilterOverlapOption:
-                vnirWavelength = [float(item.text)
-                                  for item in root.findall('product/smileCorrection/VNIR/bandID/wavelength')]
-                swirWavelength = [float(item.text)
-                                  for item in root.findall('product/smileCorrection/SWIR/bandID/wavelength')]
+
+                # vnirWavelength = [float(item.text)
+                #                  for item in root.findall('product/smileCorrection/VNIR/bandID/wavelength')]
+                # swirWavelength = [float(item.text)
+                #                  for item in root.findall('product/smileCorrection/SWIR/bandID/wavelength')]
+
+                vnirBandNumbers = [
+                    int(text) for text in root.find('specific/vnirProductQuality/expectedChannelsList').text.split(',')
+                ]
+                swirBandNumbers = [
+                    int(text) for text in root.find('specific/swirProductQuality/expectedChannelsList').text.split(',')
+                ]
 
                 if detectorOverlap == self.OrderByDetectorOverlapOption:
-                    bandList = list()
-                    for w in list(vnirWavelength) + list(swirWavelength):
-                        bandNo = np.argmin(np.abs(np.subtract(wavelength, w))) + 1
-                        bandList.append(bandNo)
-                        print(bandNo, w)
+                    bandList = vnirBandNumbers + swirBandNumbers
                 elif detectorOverlap == self.OrderByWavelengthOverlapOption:
                     bandList = list(range(1, len(wavelength) + 1))
                 elif detectorOverlap == self.VnirOnlyOverlapOption:
-                    bandList = list()
-                    for bandNo, w in enumerate(wavelength, 1):
-                        w = float(w)
-                        if 900 <= w <= 1000:
-                            if np.min(np.abs(np.subtract(swirWavelength, w))) < 0.01:
-                                continue  # skip SWIR bands
-                        bandList.append(bandNo)
+                    bandList = vnirBandNumbers
                 elif detectorOverlap == self.SwirOnlyOverlapOption:
-                    bandList = list()
-                    for bandNo, w in enumerate(wavelength, 1):
-                        w = float(w)
-                        if 900 <= w <= 1000:
-                            if np.min(np.abs(np.subtract(vnirWavelength, w))) < 0.01:
-                                continue  # skip VNIR bands
-                        bandList.append(bandNo)
+                    bandList = swirBandNumbers
                 else:
                     raise ValueError()
 
