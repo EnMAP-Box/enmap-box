@@ -857,15 +857,16 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
     def onAddBerlinDataset(self):
         # example datasets are stored here: https://github.com/EnMAP-Box/enmap-box-exampledata
         from enmapboxexampledata.berlin import enmap_berlin, hires_berlin, landcover_berlin_polygon, \
-            landcover_berlin_point
+            landcover_berlin_point, veg_cover_fraction_berlin_point, enmap_srf_library, library_berlin
         layers = [
             QgsRasterLayer(enmap_berlin, basename(enmap_berlin)),
             QgsRasterLayer(hires_berlin, basename(hires_berlin)),
             QgsVectorLayer(landcover_berlin_polygon, basename(landcover_berlin_polygon)),
-            QgsVectorLayer(landcover_berlin_point, basename(landcover_berlin_point))
+            QgsVectorLayer(landcover_berlin_point, basename(landcover_berlin_point)),
+            QgsVectorLayer(veg_cover_fraction_berlin_point, basename(veg_cover_fraction_berlin_point)),
         ]
-
         self.onDataDropped(reversed(layers))
+        self.addSources([enmap_srf_library, library_berlin])
 
     def onAddPotsdamDataset(self):
         # example datasets are stored here: https://github.com/EnMAP-Box/enmap-box-exampledata
