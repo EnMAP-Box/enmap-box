@@ -28,17 +28,23 @@ because the user may not change the important hyperparameters on his own. There 
 models on basis of individual Lookup-Tables.
 
 """
-
 import sys
-import os
+# import os
+# import logging
 
 import numpy as np
+import pandas as pd
 
-#ensure to call QGIS before PyQtGraph
+# ensure to call QGIS before PyQtGraph
 from qgis.PyQt.QtWidgets import *
+from PyQt5.QtGui import QIntValidator
+# from PyQt5.QtCore import QThread, pyqtSignal
+# from PyQt5.QtCore import QTimer
 import lmuvegetationapps.Processor.Processor_Inversion_core as processor
 from lmuvegetationapps import APP_DIR
 from _classic.hubflow.core import *
+import csv
+import joblib
 
 from enmapbox.gui.utils import loadUi
 
@@ -52,16 +58,28 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
+import warnings
+warnings.filterwarnings('ignore', category=DeprecationWarning)
+warnings.filterwarnings('ignore', category=UserWarning)
+
 pathUI_train = os.path.join(APP_DIR, 'Resources/UserInterfaces/Processor_Train.ui')
+pathUI_loadtxt = os.path.join(APP_DIR, 'Resources/UserInterfaces/LoadTxtFileInsitu.ui')
 pathUI_wavelength = os.path.join(APP_DIR, 'Resources/UserInterfaces/Select_Wavelengths.ui')
 pathUI_prgbar = os.path.join(APP_DIR, 'Resources/UserInterfaces/ProgressBar.ui')
 pathUI_Performance = os.path.join(APP_DIR, 'Resources/UserInterfaces/Processor_Performance_View.ui')
+pathUI_Printer = os.path.join(APP_DIR, 'Resources/UserInterfaces/Printer.ui')
 
 
 class MLTrainingGUI(QDialog):
     def __init__(self, parent=None):
         super(MLTrainingGUI, self).__init__(parent)
         loadUi(pathUI_train, self)
+
+
+class LoadTxtFileGUI(QDialog):
+    def __init__(self, parent=None):
+        super(LoadTxtFileGUI, self).__init__(parent)
+        loadUi(pathUI_loadtxt, self)
 
 
 class SelectWavelengthsGUI(QDialog):
@@ -87,6 +105,11 @@ class Performance_GUI(QDialog):
     def __init__(self, parent=None):
         super(Performance_GUI, self).__init__(parent)
         loadUi(pathUI_Performance, self)
+
+class PrinterGUI(QDialog):
+    def __init__(self, parent=None):
+        super(PrinterGUI, self).__init__(parent)
+        loadUi(pathUI_Printer, self)
 
 
 # MLTraining is a GUI handler for training new ML-models. For more information, go to Processor_Inversion_core.py
@@ -117,8 +140,13 @@ class ML_Training:
         self.perf_eval = False
         self.n_initial = None
         self.algorithm = 'ANN'
+        self.algorithm_dict = {0: 'ANN', 1: 'GPR', 2: 'RFR', 3: 'SVR', 4: 'KRR', 5: 'GBR'}
+        self.all_labels = ["cab", "car", "anth", "cw", "cp", "cbc", "LAI", "AGBdry", "AGBfresh", "CWC", "Nitrogen", "Carbon"]
         self.param_flags = [-1] * 12
         self.para_list = None
+        self.hyperp_tuning = False
+        self.hyperparas_dict = None
+        self.val_data = None
 
     def connections(self):
         self.gui.cmdInputLUT.clicked.connect(lambda: self.open_lut())
@@ -140,8 +168,14 @@ class ML_Training:
         self.gui.rbKRR.clicked.connect(lambda: self.handle_algorithm(mode=4))  # 4: KRR
         self.gui.rbGBR.clicked.connect(lambda: self.handle_algorithm(mode=5))  # 5: GBR
 
+        self.gui.chkHyptuning.toggled.connect(lambda: self.handle_hyp_tuning())
+        self.gui.cmdLoadHyp.clicked.connect(lambda: self.load_hyperparas())
+        self.gui.txtInputHyp.textChanged.connect(self.on_hypinput_text_deleted)
+
         self.gui.radAL.toggled.connect(lambda: self.handle_AL())
         self.gui.radNoAL.toggled.connect(lambda: self.handle_AL())
+
+        self.gui.pushImportInsitu.clicked.connect(lambda: self.open_txt_file())  # load own in situ
 
         self.gui.radInternal.toggled.connect(lambda: self.handle_AL_strat(mode='internal'))
         self.gui.radInsitu.toggled.connect(lambda: self.handle_AL_strat(mode='insitu'))
@@ -154,43 +188,30 @@ class ML_Training:
 
         for para in self.paramsdict:
             self.paramsdict[para].stateChanged.connect(lambda group, pid=para:
-                                                       self.params_toggle(group="targets", para_id=pid))
+                                                       self.set_params_flags(group="targets", para_id=pid))
 
-    def params_toggle(self, para_id, group):
-        if group == 'targets':
-            # If checkbox checked, prepare param to be included for training
-            self.param_flags[para_id] *= -1
-
-    @staticmethod
-    def toggle_params(param_flags):
-        # Prepare target parameters from Boolean list
-        all_labels = ["cab", "car", "anth", "cw", "cp", "cbc", "LAI", "AGBdry", "AGBfresh", "CWC", "Nitrogen", "Carbon"]
-        # sort out only the labels for the indices which should be calculated
-        para_list = [all_labels[i] for i in range(len(all_labels)) if param_flags[i] == 1]
-        return para_list
 
     def enable_all(self):
         self.gui.cmbPCA.setEnabled(True), self.gui.cmbPCA.setChecked(True), self.gui.Noise_Box.setEnabled(True),
         self.gui.Paras_Box.setEnabled(True), self.gui.AL_Box.setEnabled(True), self.gui.Perf_Box.setEnabled(True),
         self.gui.ML_Box.setEnabled(True), self.gui.rbANN.setEnabled(True), self.gui.rbGPR.setEnabled(True),
         self.gui.rbRFR.setEnabled(True), self.gui.rbSVR.setEnabled(True), self.gui.rbKRR.setEnabled(True),
-        self.gui.rbGBR.setEnabled(True)
+        self.gui.rbGBR.setEnabled(True), self.gui.Hyp_frame.setEnabled(True)
 
     def handle_algorithm(self, mode):
-        algorithm_dict = {0: 'ANN', 1: 'GPR', 2: 'RFR', 3: 'SVR', 4: 'KRR', 5: 'GBR'}
-        self.algorithm = algorithm_dict[mode]
+        self.algorithm = self.algorithm_dict[mode]
 
     def handle_AL(self):
         if self.gui.radAL.isChecked():
             self.gui.AL_rbFrame.setEnabled(True), self.gui.lblInitSamples.setEnabled(True),
-            self.gui.sbInitSamples.setEnabled(True), self.gui.lblSelectOut.setEnabled(True),
-            self.gui.txtSelectOut.setEnabled(True), self.gui.cmdSelectOut.setEnabled(True),
+            self.gui.sbInitSamples.setEnabled(True),
+            self.gui.chkALsave.setEnabled(True), self.gui.chkALsave.setChecked(True),
             self.gui.radPerf.setChecked(True), self.gui.radNoPerf.setEnabled(False),
-            self.gui.radCrossVal.setEnabled(False), self.gui.radTrainTest.setChecked(True)
+            self.gui.radCrossVal.setEnabled(False), self.gui.radTrainTest.setChecked(True),
+            self.gui.pushImportInsitu.setEnabled(False)
         if self.gui.radNoAL.isChecked():
             self.gui.AL_rbFrame.setEnabled(False), self.gui.lblInitSamples.setEnabled(False),
-            self.gui.sbInitSamples.setEnabled(False), self.gui.lblSelectOut.setEnabled(False),
-            self.gui.txtSelectOut.setEnabled(False), self.gui.cmdSelectOut.setEnabled(False),
+            self.gui.sbInitSamples.setEnabled(False), self.gui.chkALsave.setEnabled(False), self.gui.chkALsave.setChecked(False),
             self.gui.radNoPerf.setEnabled(True), self.gui.radInternal.setChecked(True),
             self.gui.radNoPerf.setChecked(True)
 
@@ -198,9 +219,10 @@ class ML_Training:
         if mode == 'internal':
             self.gui.frame_PerfEvalOptions.setEnabled(True), self.gui.radTrainTest.setEnabled(True),
             self.gui.radCrossVal.setEnabled(False), self.gui.lblTrainSize.setEnabled(True),
-            self.gui.txtTrainSize.setEnabled(True),
+            self.gui.txtTrainSize.setEnabled(True), self.gui.pushImportInsitu.setEnabled(False)
         if mode == 'insitu':
-            self.gui.frame_PerfEvalOptions.setEnabled(False)
+            self.gui.frame_PerfEvalOptions.setEnabled(False), self.gui.pushImportInsitu.setEnabled(True)
+            self.gui.txtTrainSize.setPlaceholderText(""), self.gui.txtFolds.setPlaceholderText("")
 
     def handle_PerfEval(self):
         if self.gui.radPerf.isChecked():
@@ -209,31 +231,126 @@ class ML_Training:
             else:
                 self.gui.frame_PerfEvalOptions.setEnabled(True),
                 self.gui.radTrainTest.setEnabled(True), self.gui.radCrossVal.setEnabled(True),
-                self.gui.lblTrainSize.setEnabled(True), self.gui.txtTrainSize.setEnabled(True)
+                self.gui.lblTrainSize.setEnabled(True), self.gui.txtTrainSize.setEnabled(True),
+                self.gui.txtTrainSize.setPlaceholderText("[0-99]")
+
         if self.gui.radNoPerf.isChecked():
             self.gui.radTrainTest.setChecked(True),
             self.gui.radTrainTest.setEnabled(False), self.gui.radCrossVal.setEnabled(False),
             self.gui.lblTrainSize.setEnabled(False), self.gui.txtTrainSize.setEnabled(False),
-            self.gui.lblFolds.setEnabled(False), self.gui.txtFolds.setEnabled(False)
+            self.gui.lblFolds.setEnabled(False), self.gui.txtFolds.setEnabled(False),
+            self.gui.txtTrainSize.setPlaceholderText(""), self.gui.txtFolds.setPlaceholderText("")
+
 
     def handle_PerfEvalStrat(self):
         if self.gui.radTrainTest.isChecked():
             self.gui.lblTrainSize.setEnabled(True), self.gui.txtTrainSize.setEnabled(True),
-            self.gui.lblFolds.setEnabled(False), self.gui.txtFolds.setEnabled(False)
+            self.gui.lblFolds.setEnabled(False), self.gui.txtFolds.setEnabled(False),
+            self.gui.txtTrainSize.setPlaceholderText("[0-99]"),
+            self.gui.txtFolds.setPlaceholderText("")
         if self.gui.radCrossVal.isChecked():
             self.gui.lblTrainSize.setEnabled(False), self.gui.txtTrainSize.setEnabled(False),
-            self.gui.lblFolds.setEnabled(True), self.gui.txtFolds.setEnabled(True)
+            self.gui.lblFolds.setEnabled(True), self.gui.txtFolds.setEnabled(True),
+            self.gui.txtTrainSize.setPlaceholderText(""),
+            self.gui.txtFolds.setPlaceholderText("[2-10]")
 
+    def handle_hyp_tuning(self):
+        if self.gui.chkHyptuning.isChecked():
+            self.hyperp_tuning = True
+            self.gui.AL_frame.setEnabled(False), self.gui.radNoAL.setChecked(True),
+            self.gui.lblInitSamples.setEnabled(False),
+            (self.gui.sbInitSamples.setEnabled(False), self.gui.chkALsave.setEnabled(False),
+             self.gui.chkALsave.setChecked(False),)
+            (self.gui.radInternal.setChecked(True), self.gui.radPerf.setChecked(True),
+             self.gui.radNoPerf.setEnabled(False),)
+            self.gui.radCrossVal.setChecked(True), self.gui.radTrainTest.setEnabled(False),
+            (self.gui.lblLoadHyp.setEnabled(False), self.gui.cmdLoadHyp.setEnabled(False),
+             self.gui.txtInputHyp.setEnabled(False))
+            self.handle_PerfEvalStrat()
+        else:
+            self.hyperp_tuning = False
+            (self.gui.AL_frame.setEnabled(True), self.gui.chkALsave.setEnabled(True),
+             self.gui.radNoPerf.setEnabled(True),)
+            self.gui.radPerf.setChecked(False),self.gui.radTrainTest.setEnabled(True),
+            (self.gui.lblLoadHyp.setEnabled(True), self.gui.cmdLoadHyp.setEnabled(True),
+             self.gui.txtInputHyp.setEnabled(True))
 
-    def open_lut(self, lutpath):  # open and read a lut-metafile
+    def load_hyperparas(self, **path):
+        result = str(QFileDialog.getOpenFileName(
+            caption='Select Hyperparameters file', filter="HYPER-file (*.hyper)")[0])
+        if not result:
+            self.gui.chkHyptuning.setEnabled(True)
+            self.gui.MLRA_frame.setEnabled(True)
+            return
+        self.gui.txtInputHyp.setText(result)
+        self.gui.chkHyptuning.setEnabled(False)
+        try:
+            self.hyperparas_dict = joblib.load(result)
+        except ValueError:
+            raise ValueError('Error reading hyperparameter file')
+
+        algorithm_name = list(self.hyperparas_dict.keys())[0]
+        paras = list(self.hyperparas_dict[algorithm_name].keys())
+        self.set_algorithm_radiobutton(algorithm_name)
+        self.set_checkboxes_from_paras(paras)
+
+        self.gui.MLRA_frame.setEnabled(False)
+
+    def set_algorithm_radiobutton(self, algorithm_name):
+        # set the algorithm by loading a .hyper file
+        # 1. Reverse the dictionary to map from name to index
+        reverse_algorithm_dict = {v: k for k, v in self.algorithm_dict.items()}
+        # 2. Map the indices to their respective radio buttons
+        radio_buttons_map = {
+            0: self.gui.rbANN,
+            1: self.gui.rbGPR,
+            2: self.gui.rbRFR,
+            3: self.gui.rbSVR,
+            4: self.gui.rbKRR,
+            5: self.gui.rbGBR
+        }
+        # 3. Set the matched radio button to True
+        if algorithm_name in reverse_algorithm_dict:
+            idx = reverse_algorithm_dict[algorithm_name]
+            radio_buttons_map[idx].setChecked(True)
+            self.handle_algorithm(idx)
+
+    def on_hypinput_text_deleted(self, text):
+        # if a hyperparameter set is loaded, then deleted -> reactivate MLRA-Radio buttons
+        if not text:
+            self.gui.chkHyptuning.setEnabled(True)
+            self.gui.MLRA_frame.setEnabled(True)
+            self.hyperparas_dict = None
+
+            for checkbox in self.paramsdict.values():
+                checkbox.setChecked(False)
+
+    def set_params_flags(self, para_id, group):
+        if group == 'targets':
+            # If checkbox checked, prepare param to be included for training
+            self.param_flags[para_id] *= -1
+
+    def set_params_from_checkboxes(self, param_flags):
+        # sort out only the labels for the indices which should be calculated
+        para_list = [self.all_labels[i] for i in range(len(self.all_labels)) if param_flags[i] == 1]
+        return para_list
+
+    def set_checkboxes_from_paras(self, paras):
+        for idx, label in enumerate(self.all_labels):
+            if label in paras:
+                self.paramsdict[idx].setChecked(True)
+            else:
+                self.paramsdict[idx].setChecked(False)
+
+    def open_lut(self, **lutpath):  # open and read a lut-metafile
         if not __name__ == '__main__':
             result = str(QFileDialog.getOpenFileName(caption='Select LUT meta-file', filter="LUT-file (*.lut)")[0])
             if not result:
                 return
             self.lut_path = result
         else:
-            result = lutpath
-            self.lut_path = lutpath
+            key, result = next(iter(lutpath.items()))
+            self.lut_path = result
 
         self.gui.lblInputLUT.setText(result)
 
@@ -265,6 +382,9 @@ class ML_Training:
                            3: self.gui.chkCw,  4: self.gui.chkCp, 5: self.gui.chkCBC,
                            6: self.gui.chkLAI, 7: self.gui.chkAGBdry, 8: self.gui.chkAGBfresh,
                            9: self.gui.chkCWC, 10: self.gui.chkNitrogen, 11: self.gui.chkCarbon}
+
+    def open_txt_file(self):
+        self.main.loadtxtfile.open()
 
     def open_wavelength_selection(self):
         # Handle opening the GUI for adding/excluding wavelengths from the list
@@ -319,13 +439,14 @@ class ML_Training:
             self.gui.txtNoiseLevel.setDisabled(False)
         self.noisetype = mode
 
-    def get_folder(self, path):
+    def get_folder(self, **path):
         # The model folder is important, as it contains all files needed
         if not __name__ == '__main__':
             path = str(QFileDialog.getExistingDirectory(caption='Select Output Directory for Model'))
             if not path:
                 return
         else:  # test-case
+            key, path = next(iter(path.items()))
             self.out_dir = path
             self.gui.txtModelName.setText("test")
             self.model_name = self.gui.txtModelName.text()
@@ -347,6 +468,12 @@ class ML_Training:
         else:
             self.model_name = self.gui.txtModelName.text()
             self.model_meta = self.out_dir + self.model_name + '.meta'
+
+        if self.gui.txtInputHyp.text() == "":
+            self.hyperparas_path = None
+        else:
+            pass
+
 
         if not self.noisetype == 0:
             if self.gui.txtNoiseLevel.text() == "":
@@ -371,7 +498,7 @@ class ML_Training:
         if all(flag == -1 for flag in self.param_flags):
             raise ValueError("No target parameters selected")
         else:
-            self.para_list = self.toggle_params(param_flags=self.param_flags)
+            self.para_list = self.set_params_from_checkboxes(param_flags=self.param_flags)
 
         if self.gui.radAL.isChecked():
             self.use_al = True
@@ -380,17 +507,26 @@ class ML_Training:
             self.use_al = False
         if self.gui.radInsitu.isChecked():
             self.use_insitu = True
+            if not self.val_data:
+                raise ValueError("In situ data supported Active Learning is selected\nbut no data is loaded")
+            else:
+                # print(self.val_data)
+                pass
+
         else:
             self.use_insitu = False
+
         if self.gui.radPerf.isChecked():
             self.perf_eval = True
-            if self.gui.radTrainTest.isChecked():
+            if self.gui.radInsitu.isChecked():
+                self.test_size = 0.2  # just a dummy value but not used
+            elif self.gui.radTrainTest.isChecked():
                 self.split_method = 'train_test_split'
                 if self.gui.txtTrainSize.text() == '':
                     raise ValueError('Please specify training set size')
                 # TODO: check what happens if Train size is 100%
                 self.test_size = 1 - int(self.gui.txtTrainSize.text()) / 100
-            if self.gui.radCrossVal.isChecked():
+            elif self.gui.radCrossVal.isChecked():
                 self.split_method = 'kfold'
                 if self.gui.txtFolds.text() == '':
                     raise ValueError('Please specify number of folds for cross validation')
@@ -404,7 +540,7 @@ class ML_Training:
     def run_training(self):
         # Starting the procedure of training the model
         try:
-            self.check_and_assign()  # check if all user definitions are made
+            self.check_and_assign()  # check which user definitions were made
         except ValueError as e:
             self.abort(message=str(e))
             return
@@ -412,10 +548,15 @@ class ML_Training:
         proc = processor.ProcessorMainFunction()  # instance of the Processor main class
 
         self.prg_widget = self.main.prg_widget
-        self.prg_widget.gui.lblCaption_l.setText("Training Machine Learning Model...")
+        if self.hyperp_tuning:
+            self.prg_widget.gui.lblCaption_l.setText("Optimizing Hyperparameters... This may take some time...")
+        elif self.use_al:
+            self.prg_widget.gui.lblCaption_l.setText("Training Machine Learning Model with Active Learning...")
+        else:
+            self.prg_widget.gui.lblCaption_l.setText("Training Machine Learning Model...")
         self.prg_widget.gui.lblCaption_r.setText("Setting up training...")
-        self.main.prg_widget.gui.prgBar.setValue(0)
-        self.main.prg_widget.gui.setModal(True)
+        #self.prg_widget.gui.prgBar.setValue(5)
+        self.prg_widget.gui.setModal(True)
         self.prg_widget.gui.show()
 
         self.main.qgis_app.processEvents()
@@ -428,13 +569,17 @@ class ML_Training:
                                            algorithm=self.algorithm, use_al=self.use_al, use_insitu=self.use_insitu,
                                            perf_eval=self.perf_eval,
                                            split_method=self.split_method, kfolds=self.kfolds,
-                                           n_initial=self.n_initial, test_size=self.test_size)
+                                           n_initial=self.n_initial, test_size=self.test_size,
+                                           hyperp_tuning=self.hyperp_tuning, hyperparas_dict=self.hyperparas_dict)
         except ValueError as e:
             self.abort(message="Failed to setup model training: {}".format(str(e)))
             self.prg_widget.gui.lblCancel.setText("")
             self.prg_widget.gui.allow_cancel = True
             self.prg_widget.gui.close()
             return
+
+        if self.use_insitu and self.val_data:
+            proc.train_main.insitu_data_setup(self.val_data, npca=self.npca)
 
         # if new models are added, change the text of the ProgressBar accordingly
         self.prg_widget.gui.lblCaption_r.setText("Starting training of MLRA...")
@@ -444,6 +589,7 @@ class ML_Training:
         # try:
         #     # Train model and dump it to memory
         proc.train_main.train_and_dump(prgbar_widget=self.prg_widget, qgis_app=self.main.qgis_app)
+
         # except ValueError as e:
         #     self.abort(message="Failed to train model: {}".format(str(e)))
         #     self.prg_widget.gui.lblCancel.setText("")
@@ -451,17 +597,19 @@ class ML_Training:
         #     self.prg_widget.gui.close()
         #     return
         self.results_dict = proc.train_main.get_result_dict()
+        self.best_hyperparams_dict = proc.train_main.get_hyperparams_dict()
 
         self.prg_widget.gui.lblCancel.setText("")
         self.prg_widget.gui.allow_cancel = True
         self.prg_widget.gui.close()
+        self.prg_widget.gui.prgBar.setValue(0)
+
         QMessageBox.information(self.gui, "Finish", "Training finished")
         #▬self.gui.close()
         if self.perf_eval:
             self.perfView_widget = self.main.performance_view
-            self.perfView_widget.collect(self.results_dict)
+            self.perfView_widget.collect_results(self.results_dict)
             self.perfView_widget.gui.show()
-
 
 class perfView:
     def __init__(self, main):
@@ -491,25 +639,51 @@ class perfView:
     def connections(self):
         self.gui.cmdQuit.clicked.connect(lambda: self.gui.close())
         self.gui.modelComboBox.currentIndexChanged.connect(self.plot_results)
+        self.gui.cmdExport.clicked.connect(self.export_data)
 
-    def collect(self, dict):
+    def collect_results(self, dict):
         self.all_results_dict = dict
         for key in dict:
             self.gui.modelComboBox.addItem(str(key))
 
-    def close(self):
-        pass
+    def export_data(self, index):
+        outpath = QFileDialog.getSaveFileName(caption='Specify Output File',
+                                             filter="Text files (*.txt)")[0]
+        key = self.gui.modelComboBox.itemText(index)
+        data = self.all_results_dict.get(key, None)
+
+        if outpath is None or data is None:
+            return
+
+        performances, y_val, predictions = data["performances"], data["y_val"], data["predictions"]
+        if isinstance(performances, np.ndarray):
+            performances = [performances]
+        performances = np.asarray(performances).flatten()
+        y_val = np.asarray(y_val).flatten()
+        final_pred = np.asarray(predictions).flatten()
+        try:
+            pred_std = np.asarray(data["stds"]).flatten()
+        except:
+            pred_std = np.array([np.nan])
+
+        max_length = max(len(y_val), len(final_pred), len(pred_std), len(performances))
+
+        # Pad arrays with NaN values to match the maximum length
+        x = np.pad(y_val, (0, max_length - len(y_val)), mode='constant', constant_values=np.nan)
+        y = np.pad(final_pred, (0, max_length - len(final_pred)), mode='constant', constant_values=np.nan)
+        std = np.pad(pred_std, (0, max_length - len(pred_std)), mode='constant', constant_values=np.nan)
+        perf = np.pad(performances, (0, max_length - len(performances)), mode='constant', constant_values=np.nan)
+
+        # Create structured array using dtype to define the columns
+        structured_array = np.array(list(zip(x, y, std, perf)))
+
+        # Save the structured array to a text file
+        np.savetxt(outpath, structured_array, delimiter='\t', header='measured\testimated\test_std\tRMSE', comments='')
 
     def plot_results(self, index):
         key = self.gui.modelComboBox.itemText(index)  # Get the text of the selected item
         data = self.all_results_dict.get(key, None)  # Retrieve the data from the dictionary
 
-        # def colorbar(mappable):
-        #     ax = mappable.axes
-        #     fig = ax.figure
-        #     divider = make_axes_locatable(ax)
-        #     cax = divider.append_axes("right", size="5%", pad=0.05)
-        #     return fig.colorbar(mappable, cax=cax)
         def format_float_by_scale(value):
             if value >= 100:
                 formatted_value = "{:.0f}".format(value)
@@ -533,7 +707,6 @@ class perfView:
         y_val = np.asarray(y_val).flatten()
         final_pred = np.asarray(predictions).flatten()
 
-        pred_std = None
         try:
             pred_std = np.asarray(data["stds"]).flatten()
         except:
@@ -568,9 +741,9 @@ class perfView:
         if not isinstance(pred_std, np.ndarray):
             pred_std = np.array(pred_std)
         if pred_std.size > 0:
-            scatter = ax0.scatter(y_val, final_pred, c=pred_std, cmap='plasma')
+            scatter = ax0.scatter(y_val, final_pred, s=10, c=pred_std, cmap='plasma',)
         else:
-            scatter = ax0.scatter(y_val, final_pred, c='k')
+            scatter = ax0.scatter(y_val, final_pred, s=10, c='k')
         # 1:1 line
         ax_max = max(y_val.max(), final_pred.max())
         ax0.plot([0, ax_max], [0, ax_max], 'k-')
@@ -582,20 +755,344 @@ class perfView:
         ax0.plot(x_fit, y_fit, 'r-')
 
         ax0.text(0.05, 0.95, 'R² = {:.2f}'.format(r2), transform=ax0.transAxes)
-        ax0.set_xlabel('{} measured'.format(key))
-        ax0.set_ylabel('{} estimated'.format(key))
+        ax0.set_xlabel('{} - measured'.format(key))
+        ax0.set_ylabel('{} - estimated'.format(key))
         ax0.tick_params("both")
 
         # Colorbar.
         if pred_std.size > 0:
             the_divider = make_axes_locatable(ax0)
             color_axis = the_divider.append_axes("right", size="5%", pad=0.1)
-            scatter = ax0.scatter(y_val, final_pred, c=pred_std, cmap='plasma')
+            #scatter = ax0.scatter(y_val, final_pred, c=pred_std, cmap='plasma')
             cbar = plt.colorbar(scatter, cax=color_axis)
             cbar.set_label(label='SD', labelpad=0)
 
         # Redraw the canvas
         self.canvas_scatter.draw()
+
+# LoadTxtFile is a class to open a new GUI in which a text file is opened which needs to meet certain criteria
+# In this case, it's the background spectrum which needs to be a two column text file with wavelengths and
+# reflectance values.
+class LoadTxtFile:
+    def __init__(self, main):
+        self.main = main
+        self.gui = LoadTxtFileGUI()
+        self.initial_values()
+        self.connections()
+
+    def connections(self):
+        self.gui.cmdOK.clicked.connect(lambda: self.ok())
+        self.gui.cmdCancel.clicked.connect(lambda: self.gui.close())
+        self.gui.cmdInputFile.clicked.connect(lambda: self.open_file())
+        self.gui.radioHeader.toggled.connect(lambda: self.change_radioHeader())
+        self.gui.cmbDelimiter.activated.connect(
+            lambda: self.change_cmbDelimiter())   # "activated" signal is only called for user activity, not code call
+        self.gui.spinDivisionFactor.valueChanged.connect(lambda: self.change_division())
+
+    def initial_values(self):
+        self.header_bool = None
+        self.filenameIn = None
+        self.delimiter_str = ["Tab", "Space", ",", ";"]
+        self.gui.cmbDelimiter.clear()
+        self.gui.cmbDelimiter.addItems(self.delimiter_str)
+        self.gui.tablePreview.setRowCount(0)
+        self.gui.tablePreview.setColumnCount(0)
+        self.gui.radioHeader.setDisabled(True)
+        self.gui.radioHeader.setChecked(False)
+        self.gui.cmbDelimiter.setDisabled(True)
+        self.gui.spinDivisionFactor.setDisabled(True)
+        self.gui.spinDivisionFactor.setValue(1.0)
+        self.gui.cmdOK.setDisabled(True)
+        self.gui.label.setStyleSheet("color: rgb(170, 0, 0);")
+        self.gui.label.setText("No File selected")
+        self.gui.lblInputFile.setText("")
+        self.divide_by = 1.0
+        self.open_type = None
+        self.wl_open, self.data_mean, self.nbands = (None, None, None)
+        self.para_list = None
+        self.data_array = None
+        self.spinboxes, self.ref_spinbox = [], None
+
+    def open(self):
+        self.initial_values()
+        self.populate_paras()
+        if self.para_list:
+            self.gui.show()
+        else: return
+
+    def populate_paras(self):
+        if all(flag == -1 for flag in self.main.mlra_training.param_flags):
+            QMessageBox.critical(self.gui, 'No targets',
+                                 "select target RTM parameters for training first.")
+            return
+        else:
+            self.para_list = self.main.mlra_training.set_params_from_checkboxes(
+                param_flags=self.main.mlra_training.param_flags)
+
+            if self.para_list:
+                self.clear_dynamic_layout()
+                self.setup_dynamic_layout()
+
+    def open_file(self):
+        file_choice, _filter = QFileDialog.getOpenFileName(None, 'Select Spectrum File',
+                                                           APP_DIR + "/Resources/Example_Files", "(*.txt *.csv)")
+        if not file_choice:  # Cancel clicked
+            if not self.filenameIn:
+                self.houston(message="No File selected")  # plus: no file in memory
+            return
+        self.filenameIn = file_choice
+        self.gui.lblInputFile.setText(self.filenameIn)
+        self.gui.radioHeader.setEnabled(True)
+        self.gui.cmbDelimiter.setEnabled(True)
+        self.gui.spinDivisionFactor.setEnabled(True)
+        self.header_bool = False
+        self.inspect_file()
+
+    def inspect_file(self):
+        # Look into the file and detect the delimiter and if it has a header
+        sniffer = csv.Sniffer()  # the csv.Sniffer detects the "dialect" of the text file
+        with open(self.filenameIn, 'r') as raw_file:
+            self.dialect = sniffer.sniff(raw_file.readline())
+            if self.dialect.delimiter == "\t":
+                self.gui.cmbDelimiter.setCurrentIndex(0)
+            elif self.dialect.delimiter == " ":
+                self.gui.cmbDelimiter.setCurrentIndex(1)
+            elif self.dialect.delimiter == ",":
+                self.gui.cmbDelimiter.setCurrentIndex(2)
+            elif self.dialect.delimiter == ";":
+                self.gui.cmbDelimiter.setCurrentIndex(3)
+            raw_file.seek(0)
+            raw = csv.reader(raw_file, self.dialect)
+            try:
+                # if the first row can be converted to int, it most likely does not contain a header
+                _ = int(next(raw)[0])
+                self.header_bool = False
+            except:
+                self.header_bool = True
+            self.gui.radioHeader.setChecked(self.header_bool)
+            self.read_file()  # now read the file for good with the information you have
+
+    def change_radioHeader(self):
+        self.header_bool = self.gui.radioHeader.isChecked()
+        self.read_file()
+
+    def change_cmbDelimiter(self):
+        index = self.gui.cmbDelimiter.currentIndex()
+        if index == 0:
+            self.dialect.delimiter = "\t"
+        elif index == 1:
+            self.dialect.delimiter = " "
+        elif index == 2:
+            self.dialect.delimiter = ","
+        elif index == 3:
+            self.dialect.delimiter = ";"
+        self.read_file()
+
+    def change_division(self):
+        self.read_file()
+        self.divide_by = self.gui.spinDivisionFactor.value()
+        self.apply_division_factor_to_reflectance_rows(self.divide_by)
+
+    def read_file(self):
+        if not self.filenameIn:
+            return
+
+        header_offset = 0
+
+        with open(self.filenameIn, 'r') as raw_file:
+            raw_file.seek(0)
+            raw = csv.reader(raw_file, self.dialect)
+            data = list()
+            for content in raw:
+                data.append(content)  # write the content of the file to "data"
+
+        n_entries = len(data)
+        if self.header_bool:
+            header = data[0]  # if file has a header, first row is taken as header
+            if not len(header) == len(data[1]):  # header needs to have as many columns as the rest of the data
+                self.houston(
+                    message="Error: Data has %i columns, but header has %i columns" % (len(data[1]), len(header)))
+                return
+            header_offset += 1
+            n_entries -= 1
+        n_cols = len(data[0 + header_offset])
+        try:
+            first_col = [float(data[i + header_offset][0]) for i in range(n_entries)]  # read row_labels
+        except ValueError:
+            self.houston(message="Error: Cannot read file. Please check delimiter and header!")
+            return
+
+        # row labels of the QTableWidget are the actual data
+        row_labels = [str(first_col[i]) for i in range(n_entries)]
+
+        self.data_array = np.zeros(shape=(n_entries, n_cols - 1))  # prepare for reading the data into numpy array
+        for data_list in range(n_entries):
+            self.data_array[data_list, :] = np.asarray(data[data_list + header_offset][1:]).astype(dtype=np.float16)
+
+        # Populate QTableWidget:
+        self.gui.tablePreview.setRowCount(n_entries)
+        self.gui.tablePreview.setColumnCount(n_cols)
+
+        if self.header_bool:
+            headers = ['Row Labels'] + header[1:]
+            self.gui.tablePreview.setHorizontalHeaderLabels(headers)
+        else:
+            headers = ['Row Labels'] + [str(i) for i in range(1, n_cols)]
+            self.gui.tablePreview.setHorizontalHeaderLabels(headers)
+
+        self.gui.tablePreview.setVerticalHeaderLabels([str(i) for i in range(1, n_entries + 1)])
+        # self.gui.tablePreview.setVerticalHeaderLabels(row_labels)
+
+        # Place the data of the text file into the QTableWidget
+        for row in range(n_entries):
+            item = QTableWidgetItem(row_labels[row])  # This line is for the new column
+            self.gui.tablePreview.setItem(row, 0, item)
+            for col in range(1, n_cols):
+                item = QTableWidgetItem(str(self.data_array[row, col - 1]))
+                self.gui.tablePreview.setItem(row, col, item)
+                self.gui.tablePreview.setColumnWidth(col, 100)
+
+        self.gui.tablePreview.resizeColumnToContents(0)
+
+        # Prepare for Statistics
+        # wl_offset = 400 - int(self.wl_open[0])  # PROSAIL wavelengths start at 400, consider an offset if necessary)
+        # if wl_offset > 0:
+        #     data_array = data_array[wl_offset:]  # cut off first Bands to start at appropriate band
+        #     self.wl_open = self.wl_open[wl_offset:]
+
+        self.gui.label.setStyleSheet("color: rgb(0, 170, 0);")
+        self.gui.label.setText("Ok. No Errors")
+        self.gui.cmdOK.setEnabled(True)
+
+    def apply_division_factor_to_reflectance_rows(self, factor):
+        # Get the row index of the start of reflectance values from the spinbox
+        # Subtract 1 to account for 0-based indexing
+        if self.ref_spinbox:
+            ref_start_row_idx = self.ref_spinbox.value() - 1
+
+            # The maximum row index to loop up to should be the smaller of tablePreview.rowCount()
+            # and the number of rows in self.data_array
+            max_row_idx = min(self.gui.tablePreview.rowCount(), len(self.data_array))
+
+            # Iterate from the reflectance start row to the last row
+            for row in range(ref_start_row_idx, max_row_idx):
+                for col in range(1, self.gui.tablePreview.columnCount()):  # Starting from 1 to skip the label column
+                    item = self.gui.tablePreview.item(row, col)
+                    if item:  # Check if the item exists (in case of blank cells)
+                        original_value = self.data_array[row][col - 1]
+                        adjusted_value = original_value / factor
+                        item.setText(str(adjusted_value))
+
+    def clear_dynamic_layout(self):
+        # Get current layout
+        layout = self.gui.dynamicLayoutWidget.layout()
+
+        # If the layout exists, clear it and delete
+        if layout:
+            while layout.count():
+                child = layout.takeAt(0)
+                if child.widget():
+                    child.widget().deleteLater()
+
+    def setup_dynamic_layout(self):
+        # Set up the dynamic layout below the QTableWidget
+        dynamic_layout = self.gui.dynamicLayoutWidget.layout()
+
+        if dynamic_layout is None:
+            dynamic_layout = QGridLayout(self.gui.dynamicLayoutWidget)
+            self.gui.dynamicLayoutWidget.setLayout(dynamic_layout)
+
+        # Number of max possible columns in the grid
+        num_cols = 8
+        col_counter = 0
+        row_counter = 0
+
+        for param in self.para_list:
+            label = QLabel(f"Row for {param}:")
+            spinbox = QSpinBox()
+            spinbox.setRange(0, 99)
+            spinbox.setButtonSymbols(QAbstractSpinBox.NoButtons)
+            self.spinboxes.append(spinbox)
+
+            # Add to the grid layout
+            dynamic_layout.addWidget(label, row_counter, col_counter)
+            col_counter += 1  # Move to next column for the QLineEdit
+            dynamic_layout.addWidget(spinbox, row_counter, col_counter)
+
+            # Adjust row and column counters for next iteration
+            row_counter += (col_counter + 1) // num_cols
+            col_counter = (col_counter + 1) % num_cols
+
+        # LineEdit for the starting row of reflectance values
+        reflectance_label = QLabel("Reflectance start row:")
+        reflectance_spinbox = QSpinBox()
+        reflectance_spinbox.setRange(0, 99)
+        reflectance_spinbox.setButtonSymbols(QAbstractSpinBox.NoButtons)
+        self.ref_spinbox = reflectance_spinbox
+
+        dynamic_layout.addWidget(reflectance_label, row_counter, col_counter)
+        col_counter += 1  # Move to next column for the QLineEdit
+        dynamic_layout.addWidget(reflectance_spinbox, row_counter, col_counter)
+
+        # Setting the dynamic layout to the QWidget you've placed in QtDesigner
+        # self.gui.dynamicLayoutWidget.setLayout(dynamic_layout)
+        self.gui.dynamicLayoutWidget.update()
+        self.gui.dynamicLayoutWidget.show()
+        # self.ref_spinbox.valueChanged.connect(self.apply_division_factor_to_reflectance_rows(self.divide_by))
+
+    def extract_data_from_table(self):
+        extracted_data = {}
+
+        # Assuming your data is stored in a 2D list called "data_array"
+        # If you use another structure or variable name, adjust the below code accordingly
+
+        for i, para_name in enumerate(self.para_list):
+            # Get row index from spinbox (remember to subtract 1 due to label)
+            row_idx = self.spinboxes[i].value() - 1
+
+            # Extract the data from that row
+            extracted_row = [self.gui.tablePreview.item(row_idx, col).text() for col in
+                             range(1, self.gui.tablePreview.columnCount())]
+
+            # Convert to float for processing (if needed)
+            extracted_row = [float(val) for val in extracted_row]
+
+            # Assign to dictionary
+            extracted_data[para_name] = extracted_row
+
+        # Extract reflectance start row (always last added spinbox)
+        ref_start_row_idx = self.ref_spinbox.value() - 1
+        max_row_idx = min(self.gui.tablePreview.rowCount(), len(self.data_array))
+        reflectance_data = []
+        wavelengths = []
+        for row in range(ref_start_row_idx, max_row_idx):
+            # Extract data for this row
+            row_data = [self.gui.tablePreview.item(row, col).text() for col in
+                        range(1, self.gui.tablePreview.columnCount())]
+            # Convert to float
+            row_data = [float(val) for val in row_data]
+            # Append this row data to reflectance_data
+            reflectance_data.append(row_data)
+            # Extract and store wavelength
+            wavelength_value = self.gui.tablePreview.item(row, 0).text()
+            wavelengths.append(float(wavelength_value))
+        extracted_data["Reflectance"] = reflectance_data
+        extracted_data["Wavelengths"] = wavelengths
+
+        # Now, "extracted_data" contains your extracted data, indexed by parameter name
+        return extracted_data
+
+    def houston(self, message):
+        # Houston, we have a problem
+        self.gui.label.setStyleSheet("color: rgb(170, 0, 0);")
+        self.gui.label.setText(message)
+        self.gui.tablePreview.setRowCount(0)
+        self.gui.tablePreview.setColumnCount(0)
+        self.gui.cmdOK.setDisabled(True)
+
+    def ok(self):
+        self.main.mlra_training.val_data = self.extract_data_from_table()
+        self.gui.close()
 
 # The SelectWavelengths class allows to add/remove wavelengths from the inversion
 class SelectWavelengths:
@@ -613,25 +1110,25 @@ class SelectWavelengths:
         self.gui.cmdOK.clicked.connect(lambda: self.ok())
 
     def populate(self, default_exclude):
-        if self.main.ann_training.nbands < 10:
+        if self.main.mlra_training.nbands < 10:
             width = 1
-        elif self.main.ann_training.nbands < 100:
+        elif self.main.mlra_training.nbands < 100:
             width = 2
-        elif self.main.ann_training.nbands < 1000:
+        elif self.main.mlra_training.nbands < 1000:
             width = 3
         else:
             width = 4
 
         # Any bands with central wavelengths in the specified domain are excluded by default,
         # i.e. the GUI is prepared to add these to the exclude list;
-        for i in range(self.main.ann_training.nbands):
+        for i in range(self.main.mlra_training.nbands):
             if i in default_exclude:
                 str_band_no = '{num:0{width}}'.format(num=i + 1, width=width)
-                label = "band %s: %6.2f %s" % (str_band_no, self.main.ann_training.wl[i], self.main.ann_training.wunit)
+                label = "band %s: %6.2f %s" % (str_band_no, self.main.mlra_training.wl[i], self.main.mlra_training.wunit)
                 self.gui.lstExcluded.addItem(label)
             else:
                 str_band_no = '{num:0{width}}'.format(num=i+1, width=width)
-                label = "band %s: %6.2f %s" % (str_band_no, self.main.ann_training.wl[i], self.main.ann_training.wunit)
+                label = "band %s: %6.2f %s" % (str_band_no, self.main.mlra_training.wl[i], self.main.mlra_training.wunit)
                 self.gui.lstIncluded.addItem(label)
 
     def send(self, direction):
@@ -676,12 +1173,12 @@ class SelectWavelengths:
             raw_list.append(item)
 
         # convert the text-string of the list object into a python list of integers (bands to be excluded)
-        self.main.ann_training.exclude_bands = [int(raw_list[i].split(" ")[1][:-1])-1 for i in range(len(raw_list))]
-        self.main.ann_training.nbands_valid = self.main.ann_training.nbands - len(self.main.ann_training.exclude_bands)
+        self.main.mlra_training.exclude_bands = [int(raw_list[i].split(" ")[1][:-1])-1 for i in range(len(raw_list))]
+        self.main.mlra_training.nbands_valid = self.main.mlra_training.nbands - len(self.main.mlra_training.exclude_bands)
 
         # Join the list to a string and set it to the txtExclude lineEdit
-        exclude_string = " ".join(str(x+1) for x in self.main.ann_training.exclude_bands)
-        self.main.ann_training.gui.txtExclude.setText(exclude_string)
+        exclude_string = " ".join(str(x+1) for x in self.main.mlra_training.exclude_bands)
+        self.main.mlra_training.gui.txtExclude.setText(exclude_string)
 
         # clean up
         for list_object in [self.gui.lstIncluded, self.gui.lstExcluded]:
@@ -706,21 +1203,51 @@ class PRG:
         self.gui.cmdCancel.setDisabled(True)
         self.gui.lblCancel.setText("-1")
 
+# class Printer:
+#     def __init__(self, main):
+#         self.main = main
+#         self.gui = PrinterGUI()
+#
+#         # Set up custom logging handler
+#         logger = logging.getLogger('sklearn')
+#         logger.setLevel(logging.INFO)
+#         handler = TextEditLogger(self.gui.printCanvas)
+#         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+#         handler.setFormatter(formatter)
+#         logger.addHandler(handler)
+#
+#     def updateTextEdit(self):
+#         self.gui.printCanvas.append(captured_output)
+#         sys.stdout.truncate(0)
+#         sys.stdout.seek(0)
+
+# class TextEditLogger(logging.Handler):
+#     def __init__(self, widget):
+#         super().__init__()
+#         self.widget = widget
+#
+#     def emit(self, record):
+#         msg = self.format(record)
+#         self.widget.append(msg)
+
 
 # class MainUiFunc is the interface between all sub-GUIs, so they can communicate between each other
 class MainUiFunc:
     def __init__(self):
         self.qgis_app = QApplication.instance()
-        self.ann_training = ML_Training(self)
+        self.mlra_training = ML_Training(self)
+        self.loadtxtfile = LoadTxtFile(self)
         self.select_wavelengths = SelectWavelengths(self)
         self.prg_widget = PRG(self)
         self.performance_view = perfView(self)
+        # self.printer = Printer(self)
 
     def show(self):
-        self.ann_training.gui.show()
+        self.mlra_training.gui.show()
 
     def pass_results(self):
         pass
+
 
 if __name__ == '__main__':
     from enmapbox.testing import start_app
@@ -728,6 +1255,7 @@ if __name__ == '__main__':
     m = MainUiFunc()
     m.show()
     lut_path = r"E:\LUTs\testLUT_2000_00meta.lut"
-    m.ann_training.open_lut(lutpath=lut_path)
-    m.ann_training.get_folder(path="E:\LUTs\Model_TEST/")
+    m.mlra_training.open_lut(lutpath=lut_path)
+    out_folder = r"E:\LUTs\Model_TEST/"
+    m.mlra_training.get_folder(path=out_folder)
     sys.exit(app.exec_())

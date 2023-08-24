@@ -13,7 +13,7 @@
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
-                                                                                                                                                 *
+
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -31,10 +31,15 @@ but new algorithms can always be created manually by updating the values in this
 can do both training and prediction, the GUIs are split into different scripts.
 
 """
+import warnings
+warnings.filterwarnings('ignore', category=DeprecationWarning)
+warnings.filterwarnings('ignore', category=UserWarning)
 
 from _classic.hubflow.core import *
 import numpy as np
 from PyQt5 import QtCore
+
+from Processor_Training_MLRA_defaults import MLRA_defaults
 
 from sklearn.neural_network import MLPRegressor
 from sklearn.gaussian_process import GaussianProcessRegressor
@@ -44,6 +49,8 @@ from sklearn.svm import SVR
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import RandomizedSearchCV
+from scipy.stats import expon, reciprocal
 
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
@@ -108,22 +115,35 @@ class MLRATraining:
         return model.fit(X, y)
 
     @staticmethod
+    def _fit_hyper(X, y, model):
+        stds = []
+        # yield {"type": "progress", "progress": 0, "loop_counter": 1}
+        model.fit(X, y)
+        if isinstance(model, RandomizedSearchCV) and isinstance(model.best_estimator_, GaussianProcessRegressor):
+            predictions, stds = model.best_estimator_.predict(X, return_std=True)
+        else:
+            predictions = model.best_estimator_.predict(X)
+        best_hyperparams = model.best_params_
+        yield {"type": "hyperparameters", "best_hyperparams": best_hyperparams}
+        score = mean_squared_error(y, predictions, squared=False)
+        yield {'type': 'result', 'model': model, 'performances': score, 'predictions': predictions, 'stds': stds,
+               'X_val': X, 'y_val': y}
+
+    @staticmethod
     def _fit_split(X, y, model, split_method="train_test_split", kfolds=5, test_size=0.2, random_state=42,
                    hypara_opt=False, param_grid=None):
-
+        yield {"type": "progress", "progress": 0, "loop_counter": 1}
         if split_method == 'train_test_split':
             stds = []
-            yield {"type": "progress", "progress": 1, "loop_counter": 1}
             train_X, test_X, train_y, test_y = train_test_split(X, y, test_size=test_size, random_state=random_state)
             model.fit(train_X, train_y)
-            yield {"type": "progress", "progress": 50, "loop_counter": 1}
             if isinstance(model, GaussianProcessRegressor):
                 predictions, stds = model.predict(test_X, return_std=True)
             else:
                 predictions = model.predict(test_X)
-            score = mean_squared_error(test_y, predictions)
+            score = mean_squared_error(test_y, predictions, squared=False)
             model.fit(X, y)
-            yield {"type": "progress", "progress": 100, "loop_counter": 1}
+
             yield {'type': 'result', 'model': model, 'performances': score, 'predictions': predictions, 'stds': stds,
                    'X_val': test_X, 'y_val': test_y}
 
@@ -133,14 +153,14 @@ class MLRATraining:
             if isinstance(model, GaussianProcessRegressor):
                 # If the model is a GaussianProcessRegressor, also get the standard deviations of the predictions
                 predictions, stds = MLRATraining.cross_val_predict_with_std(X, y, model, cv=kfolds)
-                score = mean_squared_error(y, predictions)
+                score = mean_squared_error(y, predictions, squared=False)
                 yield {"type": "progress", "progress": 100, "loop_counter": 1}  # Indicate end of process
                 yield {'type': 'result', 'model': model, 'performances': score,
                        'predictions': predictions, 'stds': stds, 'X_val': X, 'y_val': y}
             else:
                 # If the model is not a GaussianProcessRegressor, get the predictions without standard deviations
                 predictions = cross_val_predict(model, X, y, cv=kfolds)
-                score = mean_squared_error(y, predictions)
+                score = mean_squared_error(y, predictions, squared=False)
                 yield {"type": "progress", "progress": 100, "loop_counter": 1}  # Indicate end of process
                 yield {'type': 'result', 'model': model, 'performances': score,
                        'predictions': predictions, 'X_val': X, 'y_val': y}
@@ -201,15 +221,17 @@ class MLRATraining:
         init_percentage = init_percentage/100
         n_samples = X.shape[0]
         n_init = int(init_percentage * n_samples)
+
         # Compute the pairwise distances between all samples
-        # distances = pairwise_distances(X)
-        # # Get the maximum distance for each sample
-        # max_distances = distances.max(axis=1)
-        # # Get the indices of the samples sorted by their maximum distance in descending order
-        # sorted_indices = np.argsort(max_distances)[::-1]
-        # # Select the initial indices as the top x% of the sorted indices
-        # initial_idx = sorted_indices[:n_init]
-        initial_idx = np.random.choice(range(len(X)), size=n_init, replace=False)  # random initial sampling
+        distances = pairwise_distances(X)
+        # Get the maximum distance for each sample
+        max_distances = distances.max(axis=1)
+        # Get the indices of the samples sorted by their maximum distance in descending order
+        sorted_indices = np.argsort(max_distances)[::-1]
+        # Select the initial indices as the top x% of the sorted indices
+        initial_idx = sorted_indices[:n_init]
+        # initial_idx = np.random.choice(range(len(X)), size=n_init, replace=False)  # random initial sampling
+
         X_initial, y_initial = X[initial_idx], y[initial_idx]
 
         model.fit(X_initial, y_initial)
@@ -217,7 +239,7 @@ class MLRATraining:
         performances = []
 
         initital_pred = model.predict(X_val)
-        best_score = np.sqrt(mean_squared_error(y_val, initital_pred))
+        best_score = np.sqrt(mean_squared_error(y_val, initital_pred, squared=False))
         performances.append(best_score)
 
         remaining_indices = np.setdiff1d(np.arange(n_samples), training_indices)
@@ -239,8 +261,9 @@ class MLRATraining:
             model.fit(X_initial, y_initial)
 
             pred = model.predict(X_val)
-            score = np.sqrt(mean_squared_error(y_val, pred))
+            score = np.sqrt(mean_squared_error(y_val, pred, squared=False))
             performances.append(score)
+
 
             progress = (total_remaining - len(remaining_indices)) / total_remaining * 100
             if int(progress) % 5 == 0 and int(progress) != last_printed:
@@ -260,7 +283,7 @@ class MLRATraining:
             remaining_indices = np.delete(remaining_indices, query_indices)
             # print(len(remaining_X))
 
-        yield{'type': 'result', 'model': model, 'training_indices': training_indices, 'performances': performances,
+        yield{'type': 'result', 'model': model, 'all_training_indices': training_indices, 'performances': performances,
               'X_val': X_val, 'y_val': y_val}
 
 
@@ -389,6 +412,7 @@ class Functions:
 # can always add new algorithms or change the parameters. The training process needs a working LUT that was created
 # with "CreateLUT_core.py".
 class ProcessorTraining:
+
     def __init__(self, main):
         self.m = main
         # these are the four PROSAIL parameters to be estimated. Mind the order!
@@ -397,26 +421,30 @@ class ProcessorTraining:
         self.noisetype = 1
         self.sigma = 4
         self.mlra = None
+        self.ml_params = {}
         self.training_indices, self.performances = (None, None)
 
         # Parameterization (everything except ANN is deprecated)
 
         # Activation function     Solver      alpha (penalty) max. nr. of iterations
-        self.ann_activation, self.ann_solver, self.ann_alpha, self.ann_max_iter = (None, None, None, None)
-        self.gpr_kernel = None
+        # self.ann_activation, self.ann_solver, self.ann_alpha, self.ann_max_iter = (None, None, None, None)
+        # self.gpr_kernel = None
         # self.svr_kernel, self.svr_C, self.svr_g = (None, None, None)
         # self.rf_n_estimators, self.rf_max_features, self.rf_min_samples_leaf = (None, None, None)
-        self.ml_params_dict_ann = None  # this is the init of a dictionary containing the hyperparameter of the ANN
+        # self.ml_params_dict_ann = None  # this is the init of a dictionary containing the hyperparameter of the ANN
         # self.ml_params_dict_svr = None
         # self.ml_params_dict_rforest = None
         # self.ml_params_dict_gpr = None
         self.all_results_dict = {}
+        self.best_hyperparameters_dict = {}
+        self.y_val_dict = {}
 
 
     def training_setup(self, lut_metafile, exclude_bands, npca, model_meta, para_list, noisetype=1, noiselevel=4,
                        algorithm='ANN',
                        use_al=False, use_insitu=False, n_initial=2,
-                       perf_eval=False, split_method='train_test_split', kfolds=5, test_size=0.2):
+                       perf_eval=False, split_method='train_test_split', kfolds=5, test_size=0.2, hyperp_tuning=False,
+                       hyperparas_dict=None):
         # Setup everything for training new models
         self.exclude_bands = exclude_bands  # the bands to be excluded for the training (water vapor absorption etc.)
         self.para_list = para_list
@@ -436,13 +464,16 @@ class ProcessorTraining:
         self.kfolds = kfolds
         self.test_size = test_size
 
+        self.hyperp_tuning = hyperp_tuning
+        self.hyperparas_dict = hyperparas_dict
+
         # LUT
         self.get_meta_LUT(lut_metafile=lut_metafile)  # read meta information of the LUT to be trained
         self.splits = int(self.meta_dict['splits'])  # number of splits per geo-ensemble in the LUT
         self.conversion_factor = int(self.meta_dict['multiplication_factor'])  # LUT boost e.g. 10000 for EnMAP
         self.lut_metafile = lut_metafile  # full path to the LUT metafile
         self.lut_basedir = os.path.dirname(lut_metafile)  # basic directory in which the LUT is stored
-        self.lut_base = self.lut_basedir + "/" + self.meta_dict['name']  # base name of the LUT
+        self.lut_base = self.lut_basedir + "/" + str(self.meta_dict['name'])  # base name of the LUT
 
         # Algorithm Output
         self.model_metafile = model_meta  # full path to the model metafile to be written (.meta)
@@ -472,7 +503,7 @@ class ProcessorTraining:
 
         # Boosting the parameters is necessary for some algorithms which cannot handle very small or large values
         # for the training (e.g. ANN fails when learning y=0.004, so it is boosted to y=4 according to "Functions.conv"
-        self.para_boost = True
+        self.para_boost = False
         # if self.algorithm == 'ANN':
         #     self.para_boost = True
         # else: self.para_boost = False
@@ -486,10 +517,36 @@ class ProcessorTraining:
 
         self.components = npca  # how many components for the PCA? (0 if deactivated)
 
+    def insitu_data_setup(self, val_data, npca):
+        # Scaling and PCA dim reduction of insitu spectra
+        self.y_val_dict = {key: val_data[key] for key in val_data if key not in ['Reflectance', 'Wavelengths']}
+        X_val = val_data.get('Reflectance')
+        wavelengths = val_data.get('Wavelengths')
+
+        subset_bands = [i for i in range(len(wavelengths))
+                                 if i not in self.exclude_bands]
+
+        X_val = [X_val[i] for i in subset_bands]
+        X_val = np.asarray(X_val).T
+
+        self.scaler = StandardScaler()
+        if self.scaler:  # if X (reflectances) are to be scaled
+            self.scaler.fit(X_val)  # fit scaler
+            X_val = self.scaler.transform(X_val)  # transform scaler
+        else:
+            X_val = np.copy(X_val)
+        if npca > 0:
+            self.pca = PCA(npca)  # create an instance of the PCA for the desired number of components
+        else:
+            self.pca = None
+        if self.pca:
+            self.pca.fit(X_val)  # , y[:, ipara])
+            self.X_val = self.pca.transform(X_val)
+
     def validation_setup(self, val_file, exclude_bands, npca):
         self.val_file = val_file
         val_data = np.loadtxt(self.val_file, delimiter="\t", skiprows=1)
-        X_val = val_data[2:, 1:].T
+        X_val = val_data[2:, 1:].T / 10000
         self.y_val = val_data[0, 1:]
 
         self.exclude_bands = exclude_bands  # the bands to be excluded for the training (water vapor absorption etc.)
@@ -510,94 +567,61 @@ class ProcessorTraining:
             self.pca.fit(X_val)  # , y[:, ipara])
             self.X_val = self.pca.transform(X_val)
 
-    def init_model(self, var):
+    def init_model(self, var, hyperparams=None):
+        # 1. Initialization with default settings
+        self.ml_params = MLRA_defaults.__dict__[self.algorithm].get(
+            var, MLRA_defaults.__dict__[self.algorithm]['default']).copy()
+        # 2. Update with provided hyperparameters, if any
+        if hyperparams and var in hyperparams[self.algorithm]:
+            hyperparams_for_var = hyperparams[self.algorithm][var]['hyperparas']
+            self.ml_params.update(hyperparams_for_var)
+
         # method to initialize a model, i.e. prepare an algorithm before it sees any data
-
-        # At the moment, only algorithm == 'ann' is implemented; add parameterization for other algorithms if necessary
-
         if self.algorithm == 'ANN':
-            # ANN
-            if not self.ann_activation:  # if self.ann_activation is None, everything is None
-                if var == "LIDF":  # hyperparameters best suited to estimate the ALIA
-                    self.ann_activation = 'tanh'  # logistic, relu, identity, tanh
-                    self.ann_solver = 'lbfgs'  # adam, lbfgs, sgd
-                    self.ann_alpha = 10.0
-                    self.ann_max_iter = 10000  # 5000
-                elif var == "cab":  # hyperparameters best suited to estimate Cab
-                    self.ann_activation = 'tanh'  # logistic, relu, identity, tanh
-                    self.ann_solver = 'adam'  # adam, lbfgs, sgd
-                    self.ann_alpha = 0.01
-                    self.ann_max_iter = 10000  # 2000
-                elif var == "cm":  # hyperparameters best suited to estimate LMA
-                    self.ann_activation = 'logistic'  # logistic, relu, identity, tanh
-                    self.ann_solver = 'lbfgs'  # adam, lbfgs, sgd
-                    self.ann_alpha = 0.1
-                    self.ann_max_iter = 10000  # 1000
-                else:    # hyperparameters best suited to estimate LAI and all others
-                    self.ann_activation = 'logistic'  # logistic, relu, identity, tanh
-                    self.ann_solver = 'lbfgs'  # adam, lbfgs, sgd
-                    self.ann_alpha = 1.0
-                    self.ann_max_iter = 10000  #5000
 
-            # make a dictionary from the hyperparams
-            self.ml_params = {'activation': self.ann_activation, 'solver': self.ann_solver,
-                              'alpha': self.ann_alpha, 'max_iter': self.ann_max_iter}
             self.ml_model_ext = '.ann'  # extension of the models to recognize it as a neural network model
             self.mlra = MLPRegressor(**self.ml_params)
 
-        if self.algorithm == 'GPR':
-            self.gpr_kernel = 1.0 * RBF(length_scale=1.0, length_scale_bounds=(1e-5, 1e5)) + WhiteKernel()
-            self.ml_params = {'kernel': self.gpr_kernel, 'random_state': 42}
-            self.ml_model_ext = '.gpr'  # extension of the models to recognize it as a GPR model
-            self.mlra = GaussianProcessRegressor(**self.ml_params)
+        elif self.algorithm == 'GPR':
+            # Extract kernel parameters
+            constant_value = self.ml_params.get('kernel__k1__k1__constant_value', 1.0)
+            length_scale = self.ml_params.get('kernel__k1__k2__length_scale', 1.0)
+            noise_level = self.ml_params.get('kernel__k2__noise_level', 1e-10)
 
-        if self.algorithm == 'RFR':
-            self.ml_paras = {
-                'n_estimators': 100,  # The number of trees in the forest.
-                'criterion': 'mse',  # The function to measure the quality of a split.
-                'max_depth': None,  # The maximum depth of the tree.
-                'min_samples_split': 2,  # The minimum number of samples required to split an internal node.
-                'min_samples_leaf': 1,  # The minimum number of samples required to be at a leaf node.
-                # Add more parameters as needed.
-            }
-            self.ml_model_ext = '.rfr'
-            self.mlra = RandomForestRegressor(**self.ml_paras)
+            # Construct the kernel
+            self.gpr_kernel = constant_value * RBF(length_scale=length_scale,
+                                                   length_scale_bounds=(1e-5, 1e5)) + WhiteKernel(
+                noise_level=noise_level)
 
-        if self.algorithm == 'SVR':
-            self.ml_paras = {
-                'kernel': 'rbf',  # Specifies the kernel type to be used in the algorithm.
-                'gamma': 'scale',  # Kernel coefficient for ‘rbf’, ‘poly’ and ‘sigmoid’.
-                'C': 1000.0,
-                # Regularization parameter. The strength of the regularization is inversely proportional to C.
-                'epsilon': 0.1,  # Epsilon in the epsilon-SVR model.
-                # Add more parameters as needed.
-            }
+            # Exclude the keys specific to kernel construction from the model's params
+            model_params = {key: val for key, val in self.ml_params.items() if not key.startswith('kernel__')}
+
+            # Update the 'kernel' argument with the constructed kernel
+            model_params['kernel'] = self.gpr_kernel
+
+            # Now initialize the GPR
+            self.ml_model_ext = '.gpr'
+            self.mlra = GaussianProcessRegressor(**model_params)
+
+        elif self.algorithm == 'RFR':
+            self.ml_model_ext = '.rfr'  # extension for RFR model
+            self.mlra = RandomForestRegressor(**self.ml_params)
+
+        elif self.algorithm == 'SVR':
             self.ml_model_ext = '.svr'
-            self.mlra = SVR(**self.ml_paras)
+            self.mlra = SVR(**self.ml_params)
 
-        if self.algorithm == 'KRR':
-            self.ml_params = {
-                'alpha': 1.0,  # Regularization strength; must be a positive float.
-                'kernel': 'rbf',  # Specifies the kernel type to be used in the algorithm.
-                'gamma': None,  # Kernel coefficient for ‘rbf’, ‘poly’ and ‘sigmoid’.
-                'degree': 3,  # Degree for ‘poly’ kernel. Ignored by all other kernels.
-                'coef0': 1  # Independent term in ‘poly’ and ‘sigmoid’.
-                # Add more parameters as needed.
-            }
+        elif self.algorithm == 'KRR':
             self.ml_model_ext = '.krr'  # extension of the models to recognize it as a KRR model
             self.mlra = KernelRidge(**self.ml_params)
 
-        if self.algorithm == 'GBR':
-            self.ml_params = {
-                'n_estimators': 100,  # The number of boosting stages to perform.
-                'learning_rate': 0.1,  # Learning rate shrinks the contribution of each tree by learning_rate.
-                'max_depth': 3,  # Maximum depth of the individual regression estimators.
-                'subsample': 1.0,  # The fraction of samples to be used for fitting the individual base learners.
-                'random_state': 42  # Controls the randomness of the estimator.
-                # Add more parameters as needed.
-            }
+        elif self.algorithm == 'GBR':
             self.ml_model_ext = '.gbr'  # extension of the models to recognize it as a GBR model
             self.mlra = GradientBoostingRegressor(**self.ml_params)
+
+        if self.hyperp_tuning:
+            param_dist = MLRA_defaults.__dict__[self.algorithm]['param_dist']
+            self.mlra = self.init_hyperparameter_tuning(self.mlra, param_dist)
 
         # AL based on split (train-test-split or kfold cross val)
         if self.use_al and not self.use_insitu:
@@ -607,17 +631,32 @@ class ProcessorTraining:
 
         # AL with external insitu data
         elif self.use_al and self.use_insitu:
+            if self.y_val_dict:
+                self.y_val = self.y_val_dict.get(var)
+
             self.al_paras = {'X_val': self.X_val, 'y_val': self.y_val,
                              'init_percentage': self.n_initial}
+
             self.ml_model = self.m.mlra_training._al_loop
 
         # No AL, training on splits
-        elif not self.use_al and self.perf_eval:
+        elif not self.use_al and self.perf_eval and not self.hyperp_tuning:
             self.al_paras = {'split_method': self.split_method, 'kfolds': self.kfolds, 'test_size': self.test_size}
             self.ml_model = self.m.mlra_training._fit_split
+        # No AL, training with hyperparameter tuning
+        elif self.hyperp_tuning:
+            self.al_paras = {}
+            self.ml_model = self.m.mlra_training._fit_hyper
         # No AL, only training -> all samples
         else:
-            self.ml_model = self.m.mlra_training._fit  # construct the model and pass it to self.ml_model
+            self.ml_model = self.m.mlra_training._fit # construct the model and pass it to self.ml_model
+
+    def init_hyperparameter_tuning(self, mlra, param_dist, n_iter_search=10, n_jobs=2):
+        random_search = RandomizedSearchCV(mlra, param_distributions=param_dist, n_iter=n_iter_search,
+                                           scoring='neg_mean_squared_error', n_jobs=n_jobs, cv=self.kfolds,
+                                           verbose=2, random_state=42)
+        return random_search
+
 
 
     def train_and_dump(self, prgbar_widget=None, qgis_app=None):
@@ -646,9 +685,15 @@ class ProcessorTraining:
 
                         if self.use_al and not self.use_insitu: prg_al_string = 'internal AL'
                         elif self.use_al and self.use_insitu: prg_al_string = 'insitu AL'
+                        elif self.hyperp_tuning: prg_al_string = 'hyperparams tuned'
                         else: prg_al_string = 'non AL'
 
-                        self.init_model(var=para)  # initialize the model with the given settings
+                        if self.hyperparas_dict:
+                            hyperparams = self.hyperparas_dict
+                        else:
+                            hyperparams = {}
+
+                        self.init_model(var=para, hyperparams=hyperparams)  # initialize the model with the given settings
 
                         # Update progress bar
                         if prgbar_widget:
@@ -657,38 +702,14 @@ class ProcessorTraining:
                                 prgbar_widget.gui.cmdCancel.setDisabled(False)
                                 raise ValueError("Training cancelled!")
 
-                        if self.split_method == 'train_test_split':
-                            if prgbar_widget:
-                                prgbar_widget.gui.lblCaption_r.setText(
-                                    'Training {} {} model {:d} of {:d}: {}'.format(
-                                        prg_al_string, self.algorithm, model_no, nmodels_total, para))
-                                qgis_app.processEvents()
-                            else:  # if no progress bar exists, e.g. code is run from _exec.py
-                                print(
-                                    "Training {} {} Noise {:d}-{:d} | {} | Geo {:d} of {:d}".format(prg_al_string,
-                                        self.algorithm, self.noisetype, self.sigma, para, geo_ensemble + 1,
-                                        self.ntts * self.ntto * self.npsi))
-                        elif self.split_method == 'kfold':
-                            if prgbar_widget:
-                                prgbar_widget.gui.lblCaption_r.setText(
-                                    'Training {} {} model {:d} of {:d}: {}'.format(
-                                        prg_al_string, self.algorithm, model_no, nmodels_total, para))
-                                qgis_app.processEvents()
-                            else:  # if no progress bar exists, e.g. code is run from _exec.py
-                                print("Training {} {} Noise {:d}-{:d} | {} | Geo {:d} of {:d}".format(
-                                    prg_al_string,
-                                    self.algorithm, self.noisetype, self.sigma, para, geo_ensemble + 1,
-                                    self.ntts * self.ntto * self.npsi))
+                            prgbar_widget.gui.lblCaption_r.setText(
+                                'Training {} {} model {:d} of {:d}: {}'.format(
+                                    prg_al_string, self.algorithm, model_no, nmodels_total, para))
+                            qgis_app.processEvents()
                         else:
-                            if prgbar_widget:
-                                prgbar_widget.gui.lblCaption_r.setText(
-                                    'Training {} {} model {:d} of {:d}: {}'.format(
-                                        prg_al_string, self.algorithm, model_no, nmodels_total, para))
-                                qgis_app.processEvents()
-                            else:
-                                print("Training {} {} Noise {:d}-{:d} | {} | Geo {:d} of {:d}".format(prg_al_string,
-                                self.algorithm, self.noisetype, self.sigma, para, geo_ensemble + 1,
-                                self.ntts * self.ntto * self.npsi))
+                            print("Training {} {} Noise {:d}-{:d} | {} | Geo {:d} of {:d}".format(prg_al_string,
+                            self.algorithm, self.noisetype, self.sigma, para, geo_ensemble + 1,
+                            self.ntts * self.ntto * self.npsi))
 
                         if self.scaler:  # if X (reflectances) are to be scaled
                             self.scaler.fit(X)  # fit scaler
@@ -710,12 +731,20 @@ class ProcessorTraining:
                                     self.X_val = result_dict["X_val"]
                                     self.y_val = result_dict["y_val"]
                                     performances = np.array(result_dict["performances"])
-                                    predictions = np.array(result_dict["predictions"])
+                                    temp_dict = {}
+                                    if self.use_insitu and self.algorithm == 'GPR':
+                                        predictions, stds = model.predict(self.X_val, return_std=True)
+                                        temp_dict['stds'] = stds
+                                    elif self.use_insitu and self.algorithm != 'GPR':
+                                        predictions = model.predict(self.X_val)
+                                    else:
+                                        predictions = np.array(result_dict["predictions"])
 
-                                    # bring results back to original scale:
-                                    self.y_val = self.y_val / self.m.func.conv[para][2]
-                                    performances = performances / self.m.func.conv[para][2]
-                                    predictions = predictions / self.m.func.conv[para][2]
+                                    if self.para_boost:
+                                        # bring results back to original scale:
+                                        self.y_val = self.y_val / self.m.func.conv[para][2]
+                                        performances = performances / self.m.func.conv[para][2]
+                                        predictions = predictions / self.m.func.conv[para][2]
 
                                     temp_dict = {
                                         "X_val": self.X_val,
@@ -725,7 +754,8 @@ class ProcessorTraining:
                                     # GPR yields stds
                                     if 'stds' in result_dict:
                                         stds = np.array(result_dict['stds'])
-                                        stds = stds / self.m.func.conv[para][2]
+                                        if self.para_boost:
+                                            stds = stds / self.m.func.conv[para][2]
                                         temp_dict['stds'] = stds
                                     if self.use_al:
                                         # TODO: these indices point at AL selected spectra -> export
@@ -733,9 +763,17 @@ class ProcessorTraining:
                                         temp_dict["training_indices"] = training_indices
                                     self.all_results_dict[f'{para} {prg_al_string} {self.algorithm}'] = temp_dict
 
-                                elif result_dict["type"] == "progress" and self.use_al:  # progressbar updates
+                                elif result_dict["type"] == "hyperparameters":
+                                    if self.algorithm not in self.best_hyperparameters_dict:
+                                        self.best_hyperparameters_dict[self.algorithm] = {}
+
+                                    self.best_hyperparameters_dict[self.algorithm][para] = {
+                                        'hyperparas': result_dict["best_hyperparams"]}
+
+                                elif result_dict["type"] == "progress":  # progressbar updates
+
                                     progress = result_dict['progress']
-                                    loop_counter = result_dict['loop_counter']
+                                    # loop_counter = result_dict['loop_counter']
                                     if prgbar_widget:
                                         prgbar_widget.gui.prgBar.setValue(int(progress))
                                         qgis_app.processEvents()
@@ -748,7 +786,7 @@ class ProcessorTraining:
                             # else:
                             #     out_pred = np.array([self.y_val, predictions])
 
-                            if isinstance(performances, list):
+                            if isinstance(performances, list):  # weird exception handling
                                 for element in performances:
                                     if isinstance(element, list):
                                         if len(performances[0]) == 1:
@@ -757,12 +795,23 @@ class ProcessorTraining:
                             # np.save("E:\Testdaten/performances_{}".format(str(para)), performances)
                             # np.save("E:\Testdaten/results_{}".format(str(para)), out_pred)
 
+                            # if self.hyperp_tuning:
+                            #     print("Best parameters found: ", self.mlra.best_params_)
+                            #     print("Lowest RMSE found: ", np.sqrt(np.abs(self.mlra.best_score_)))
+
                         else:
                             model = self.ml_model(X=x, y=y[:, ipara], model=self.mlra)
+
                         joblib.dump(model, self.model_base + "_{:d}_{}{}".format(
                             geo_ensemble, para, self.ml_model_ext))  # dump (save) model to file for later use
 
-                        if not self.use_al:
+                        # if self.hyperp_tuning:
+                        #     joblib.dump(self.best_hyperparameters_dict,
+                        #                 self.model_base + '_{:d}_{}_{}.hyper'.format(geo_ensemble, self.algorithm,
+                        #                                                         para))
+
+                        if not self.use_al and len(self.para_list) > 1:
+                            prgbar_widget.gui.prgBar.setMaximum(100)
                             prgbar_widget.gui.prgBar.setValue(int(model_no/nmodels_total*100))
                             qgis_app.processEvents()
 
@@ -773,7 +822,6 @@ class ProcessorTraining:
         # same for all parameters and are saved as copies
         for para in self.para_list:
             processing_dict = {"scaler": self.scaler, "pca": self.pca}
-
             joblib.dump(processing_dict, self.model_base + '_{}.proc'.format(para))  # dump the .proc-file as well
 
         # Write Model Meta
@@ -787,9 +835,19 @@ class ProcessorTraining:
             para_file.write("\nexclude_bands=" + ";".join(str(i) for i in self.exclude_bands))
             if self.use_al:
                 para_file.write("\nactive_learning=" + ";".join(str(self.use_al)))
+            if self.hyperp_tuning:
+                para_file.write("\nbest_hyperparameters=" + str(
+                    self.best_hyperparameters_dict[self.algorithm]))
+
+        if self.hyperp_tuning:
+            # print(self.best_hyperparameters_dict)
+            joblib.dump(self.best_hyperparameters_dict,
+                        self.model_base + '.hyper')
 
     def get_result_dict(self):
         return self.all_results_dict
+    def get_hyperparams_dict(self):
+        return self.best_hyperparameters_dict
 
     def get_meta_LUT(self, lut_metafile):
         # opens the LUT-metafile and processes the content
@@ -815,6 +873,7 @@ class ProcessorTraining:
                         for split in range(self.splits)])  # load all splits of the current geo_ensembles
         # only select the rows with correct band information, then transpose into columns
         X = np.asarray(lut[self.subset_bands_lut, :]).T
+
         y = np.zeros(shape=(lut.shape[1], len(self.para_list)))  # open up a new array for PROSAIL parameters
 
         #  all LUT_params
@@ -823,19 +882,16 @@ class ProcessorTraining:
             # check if para is *'derived' and calculate:
             if para == 'AGBdry':
                 y[:, i] = (lut[self.para_dict['cp'], :]
-                           + lut[self.para_dict['cbc'], :]) * lut[self.para_dict['LAI'], :] \
-                          * self.m.func.conv.get(para)[2] * 10000
+                           + lut[self.para_dict['cbc'], :]) * lut[self.para_dict['LAI'], :]  * 10000
             if para == 'AGBfresh':
                 y[:, i] = (lut[self.para_dict['cp'], :] + lut[self.para_dict['cbc'], :]
-                           + lut[self.para_dict['cw'], :]) * lut[self.para_dict['LAI'], :] * self.m.func.conv.get(para)[2] * 10000
+                           + lut[self.para_dict['cw'], :]) * lut[self.para_dict['LAI'], :] * 10000
             if para == 'CWC':
                 y[:, i] = lut[self.para_dict['cw'], :] * lut[self.para_dict['LAI'], :]
             if para == 'Nitrogen':
-                y[:, i] = (lut[self.para_dict['LAI'], :] * lut[self.para_dict['cp'], :]
-                           * self.m.func.conv.get(para)[2]) * 10000 / 4.43
+                y[:, i] = (lut[self.para_dict['LAI'], :] * lut[self.para_dict['cp'], :]) * 10000 / 4.43
             if para == 'Carbon':
-                y[:, i] = (lut[self.para_dict['LAI'], :] * lut[self.para_dict['cbc'], :]
-                           * self.m.func.conv.get(para)[2]) * 10000 / 2.31
+                y[:, i] = (lut[self.para_dict['LAI'], :] * lut[self.para_dict['cbc'], :]) * 10000 / 2.31
 
             if self.para_boost and para in self.para_dict:  # to boost or not to boost
                 y[:, i] = lut[self.para_dict[para], :] * self.m.func.conv.get(para)[2]
@@ -878,7 +934,9 @@ class ProcessorPrediction:
         self.mlra_meta = {'ANN': {'name': 'ann', 'file_ext': '.ann', 'file_name': 'ann_mlp'},
                           'GPR': {'name': 'gpr', 'file_ext': '.gpr', 'file_name': 'gpr_mlp'},
                           'RFR': {'name': 'rfr', 'file_ext': '.rfr', 'file_name': 'rfr_mlp'},
-                          'SVR': {'name': 'svr', 'file_ext': '.svr', 'file_name': 'svr_mlp'}}
+                          'SVR': {'name': 'svr', 'file_ext': '.svr', 'file_name': 'svr_mlp'},
+                          'KRR': {'name': 'krr', 'file_ext': '.krr', 'file_name': 'krr_mlp'},
+                          'GBR': {'name': 'gbr', 'file_ext': '.gbr', 'file_name': 'gbr_mlp'}}
 
     def prediction_setup(self, model_meta, img_in, res_out, out_mode, mask_ndvi, ndvi_thr, ndvi_bands, mask_image,
                          geo_in, spatial_geo, paras, algorithm, fixed_geos=None, nodat=None):
@@ -1050,7 +1108,8 @@ class ProcessorPrediction:
 
             # Browse through all geo-ensembles and add the models as objects to the mod-list
             for igeo in range(n_geo):
-                mod.append(joblib.load(self.model_dir + "/" + self.model_name + '_{:d}_{}'.format(igeo, para) + '.' + self.algorithm))
+                mod.append(joblib.load(
+                    self.model_dir + "/" + self.model_name + '_{:d}_{}'.format(igeo, para) + '.' + self.algorithm))
 
             # Browse through all models that were trained
             for i_imodel, imodel in enumerate(self.whichModel_unique):
@@ -1063,8 +1122,7 @@ class ProcessorPrediction:
 
                 # Convert the results and put it into the right position
                 # out_matrix[parameter, row, col], row and col is stored in the coordinates of whichModel
-                out_matrix[ipara, whichModel_coords[i_imodel][0], whichModel_coords[i_imodel][1]] = \
-                    result / self.m.func.conv[para][2]
+                out_matrix[ipara, whichModel_coords[i_imodel][0], whichModel_coords[i_imodel][1]] = result  # / self.m.func.conv[para][2]
 
         return out_matrix
 

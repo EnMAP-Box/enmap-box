@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>625</width>
-    <height>678</height>
+    <width>627</width>
+    <height>699</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -47,6 +47,74 @@
       <string>Active Learning (AL)</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
+      <item row="0" column="0">
+       <widget class="QFrame" name="AL_frame">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <property name="spacing">
+          <number>9</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QRadioButton" name="radNoAL">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Off</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">rad_group_al</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radAL">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Perform AL</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">rad_group_al</string>
+           </attribute>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
       <item row="0" column="3">
        <widget class="QFrame" name="AL_rbFrame">
         <property name="enabled">
@@ -120,6 +188,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::TabFocus</enum>
+           </property>
            <property name="text">
             <string>Import...</string>
            </property>
@@ -144,124 +215,6 @@
         </layout>
        </widget>
       </item>
-      <item row="2" column="4">
-       <widget class="QToolButton" name="cmdSelectOut">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>...</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QSpinBox" name="sbInitSamples">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="value">
-         <number>2</number>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="lblSelectOut">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sample Selection Output:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="lblInitSamples">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>AL initial sample size [%]:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2" colspan="2">
-       <widget class="QLineEdit" name="txtSelectOut">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QFrame" name="frame">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <property name="spacing">
-          <number>9</number>
-         </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QRadioButton" name="radNoAL">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Off</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-           <attribute name="buttonGroup">
-            <string notr="true">rad_group_al</string>
-           </attribute>
-          </widget>
-         </item>
-         <item>
-          <widget class="QRadioButton" name="radAL">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Perform AL</string>
-           </property>
-           <attribute name="buttonGroup">
-            <string notr="true">rad_group_al</string>
-           </attribute>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
       <item row="1" column="3" colspan="2">
        <spacer name="horizontalSpacer_4">
         <property name="orientation">
@@ -274,6 +227,36 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="lblInitSamples">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>AL initial sample size [%]:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="sbInitSamples">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>2</number>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="chkALsave">
+        <property name="text">
+         <string>Save AL selection</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -477,6 +460,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::TabFocus</enum>
+        </property>
         <property name="text">
          <string>Run</string>
         </property>
@@ -499,6 +485,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::TabFocus</enum>
+        </property>
         <property name="text">
          <string>Cancel</string>
         </property>
@@ -516,95 +505,176 @@
       <string>Machine Learning Regression Algorithm</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_6">
-      <item row="0" column="5">
-       <spacer name="horizontalSpacer_3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+      <property name="bottomMargin">
+       <number>6</number>
+      </property>
+      <property name="horizontalSpacing">
+       <number>6</number>
+      </property>
+      <item row="3" column="0">
+       <widget class="QFrame" name="Hyp_frame">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
         </property>
-       </spacer>
-      </item>
-      <item row="1" column="0">
-       <widget class="QRadioButton" name="rbSVR">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Support Vector Regression (SVR)</string>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">rad_group_ml</string>
-        </attribute>
+        <layout class="QGridLayout" name="gridLayout_14">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <property name="spacing">
+          <number>6</number>
+         </property>
+         <item row="1" column="1">
+          <spacer name="horizontalSpacer_5">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="chkHyptuning">
+           <property name="text">
+            <string>Perform Hyperparameter tuning</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="4">
+          <widget class="QLineEdit" name="txtInputHyp"/>
+         </item>
+         <item row="1" column="5">
+          <widget class="QToolButton" name="cmdLoadHyp">
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="3">
+          <widget class="QLabel" name="lblLoadHyp">
+           <property name="text">
+            <string>Load hyperparameters:</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QRadioButton" name="rbANN">
-        <property name="enabled">
-         <bool>false</bool>
+      <item row="0" column="0" rowspan="2">
+       <widget class="QFrame" name="MLRA_frame">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
         </property>
-        <property name="text">
-         <string>Artificial Neural Network (ANN)</string>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
         </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">rad_group_ml</string>
-        </attribute>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QRadioButton" name="rbKRR">
-        <property name="text">
-         <string>Kernel Ridge Regression (KRR)</string>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">rad_group_ml</string>
-        </attribute>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QRadioButton" name="rbGPR">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Gaussian Process Regression (GPR)</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">rad_group_ml</string>
-        </attribute>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QRadioButton" name="rbGBR">
-        <property name="text">
-         <string>Gradient Boosting Regression (GBR)</string>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">rad_group_ml</string>
-        </attribute>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QRadioButton" name="rbRFR">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Random Forest Regression (RFR)</string>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">rad_group_ml</string>
-        </attribute>
+        <layout class="QGridLayout" name="gridLayout_13">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QRadioButton" name="rbANN">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Artificial Neural Network (ANN)</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">rad_group_ml</string>
+           </attribute>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QRadioButton" name="rbGPR">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Gaussian Process Regression (GPR)</string>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">rad_group_ml</string>
+           </attribute>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QRadioButton" name="rbGBR">
+           <property name="text">
+            <string>Gradient Boosting Regression (GBR)</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">rad_group_ml</string>
+           </attribute>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QRadioButton" name="rbRFR">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Random Forest Regression (RFR)</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">rad_group_ml</string>
+           </attribute>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QRadioButton" name="rbSVR">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Support Vector Regression (SVR)</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">rad_group_ml</string>
+           </attribute>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QRadioButton" name="rbKRR">
+           <property name="text">
+            <string>Kernel Ridge Regression (KRR)</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">rad_group_ml</string>
+           </attribute>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
@@ -1191,7 +1261,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Model Output</string>
+      <string>Model Outputs</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_5">
       <item row="1" column="0">
@@ -1304,7 +1374,7 @@
       <item row="2" column="0">
        <widget class="QRadioButton" name="radNoiseGauss">
         <property name="text">
-         <string>Gaussian noise</string>
+         <string>Gaussian noise    </string>
         </property>
         <attribute name="buttonGroup">
          <string notr="true">rad_group_noise</string>
@@ -1360,6 +1430,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
            <property name="inputMethodHints">
             <set>Qt::ImhDigitsOnly</set>
            </property>
@@ -1371,6 +1444,9 @@
            </property>
            <property name="maxLength">
             <number>1</number>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
            </property>
           </widget>
          </item>
@@ -1544,7 +1620,7 @@
             <set>Qt::AlignCenter</set>
            </property>
            <property name="placeholderText">
-            <string>[1-99]</string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -1615,6 +1691,9 @@
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
+           </property>
+           <property name="placeholderText">
+            <string/>
            </property>
           </widget>
          </item>
@@ -1706,13 +1785,52 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>cmdInputLUT</tabstop>
+  <tabstop>txtExclude</tabstop>
+  <tabstop>cmdExcludeBands</tabstop>
+  <tabstop>cmbPCA</tabstop>
+  <tabstop>spnPCA</tabstop>
+  <tabstop>radNoiseOff</tabstop>
+  <tabstop>radNoiseAdd</tabstop>
+  <tabstop>radNoiseGauss</tabstop>
+  <tabstop>txtNoiseLevel</tabstop>
+  <tabstop>chkCab</tabstop>
+  <tabstop>chkCcx</tabstop>
+  <tabstop>chkCanth</tabstop>
+  <tabstop>chkCw</tabstop>
+  <tabstop>chkCp</tabstop>
+  <tabstop>chkCBC</tabstop>
+  <tabstop>chkLAI</tabstop>
+  <tabstop>chkAGBdry</tabstop>
+  <tabstop>chkAGBfresh</tabstop>
+  <tabstop>chkCWC</tabstop>
+  <tabstop>chkNitrogen</tabstop>
+  <tabstop>chkCarbon</tabstop>
+  <tabstop>radNoAL</tabstop>
+  <tabstop>radAL</tabstop>
+  <tabstop>radInternal</tabstop>
+  <tabstop>radInsitu</tabstop>
+  <tabstop>pushImportInsitu</tabstop>
+  <tabstop>radNoPerf</tabstop>
+  <tabstop>radPerf</tabstop>
+  <tabstop>radTrainTest</tabstop>
+  <tabstop>radCrossVal</tabstop>
+  <tabstop>txtTrainSize</tabstop>
+  <tabstop>txtFolds</tabstop>
+  <tabstop>txtModelDir</tabstop>
+  <tabstop>cmdModelDir</tabstop>
+  <tabstop>txtModelName</tabstop>
+  <tabstop>cmdRun</tabstop>
+  <tabstop>cmdClose</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="rad_group_al"/>
-  <buttongroup name="rad_group_splitstrat"/>
   <buttongroup name="rad_group_ml"/>
-  <buttongroup name="rad_group_eval"/>
+  <buttongroup name="rad_group_splitstrat"/>
+  <buttongroup name="rad_group_al"/>
   <buttongroup name="rad_group_noise"/>
+  <buttongroup name="rad_group_eval"/>
  </buttongroups>
 </ui>
