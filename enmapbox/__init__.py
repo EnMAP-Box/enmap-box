@@ -58,7 +58,7 @@ DEPENDENCIES = ['numpy', 'scipy', 'osgeo.gdal', 'PyQt5', 'sklearn', 'matplotlib'
 DOCUMENTATION = 'https://enmap-box.readthedocs.io/'
 URL_TESTDATA = fr'https://bitbucket.org/hu-geomatics/enmap-box/downloads/exampledata.{__version_exampledata__}.zip'
 URL_INSTALLATION = r'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html#install-required-python-packages'
-URL_QGIS_RESOURCES = r'https://bitbucket.org/hu-geomatics/enmap-box/downloads/qgisresources.zip'
+URL_QGIS_RESOURCES = r'https://box.hu-berlin.de/f/6949ab1099044018a5e4/?dl=1'
 
 MIN_VERSION_QGIS = '3.28'
 
