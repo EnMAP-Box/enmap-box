@@ -22,7 +22,8 @@ import re
 import sys
 import typing
 import warnings
-from typing import Optional, Dict, Union, Any, List
+from os.path import basename
+from typing import Optional, Dict, Union, Any, List, Sequence
 
 import enmapbox
 import enmapbox.gui.datasources.manager
@@ -173,6 +174,17 @@ class EnMAPBoxUI(QMainWindow):
     mStatusBar: QStatusBar
     mActionProcessingToolbox: QAction
     menuAdd_Product: QMenu
+    menuFile: QMenu
+    menuView: QMenu
+    menuTools: QMenu
+    menuToolsRasterStatistics: QMenu
+    menuToolsRasterVisualizations: QMenu
+    menuApplications: QMenu
+    menuApplicationsClassification: QMenu
+    menuApplicationsRegression: QMenu
+    menuApplicationsUnmixing: QMenu
+
+    menuAbout: QMenu
 
     def __init__(self, *args, **kwds):
         """Constructor."""
@@ -210,6 +222,8 @@ class EnMAPBoxUI(QMainWindow):
         self.mEo4qToolbar = QToolBar('Earth Observation for QGIS (EO4Q)')
         self.addToolBar(self.mEo4qToolbar)
 
+        self.initSubmenus()
+
     def addDockWidget(self, *args, **kwds):
         super(EnMAPBoxUI, self).addDockWidget(*args, **kwds)
 
@@ -225,6 +239,36 @@ class EnMAPBoxUI(QMainWindow):
     def closeEvent(event):
         pass
 
+    def initSubmenus(self):
+        """Initialize submenus to improve menu structure (see issue #386)"""
+
+        self.menuToolsRasterStatistics = self.menuTools.addMenu(
+            QIcon(':/images/themes/default/histogram.svg'),
+            'Raster Statistics')
+
+        self.menuToolsRasterVisualizations = self.menuTools.addMenu(
+            QIcon(':/images/themes/default/propertyicons/symbology.svg'),
+            'Raster Visualizations'
+        )
+
+        self.menuApplicationsClassification = self.menuApplications.addMenu(
+            QIcon(':/qps/ui/icons/raster_classification.svg'),
+            'Classification'
+        )
+
+        self.menuApplicationsRegression = self.menuApplications.addMenu(
+            QIcon(':/enmapbox/gui/ui/icons/filelist_regression.svg'),
+            'Regression'
+        )
+
+        self.menuApplicationsUnmixing = self.menuApplications.addMenu(
+            QIcon(':/qps/ui/icons/raster_multispectral.svg'),
+            'Unmixing'
+        )
+
+
+#        self.menuAdd_Product.addMenu(self.menuToolsRasterVisualizations)
+# separator = self.ui.mActionAddSentinel2  # outdated
 
 def getIcon() -> QIcon:
     """
@@ -568,6 +612,13 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         a.setIcon(QIcon(':/images/themes/default/console/mIconRunConsole.svg'))
         a.triggered.connect(self.onOpenPythonConsole)
 
+        # add datasets (see issue #561)
+        m2 = m.addMenu('Datasets')
+        a: QAction = m2.addAction('Add Berlin Dataset')
+        a.triggered.connect(self.onAddBerlinDataset)
+        a: QAction = m2.addAction('Add Potsdam Dataset')
+        a.triggered.connect(self.onAddPotsdamDataset)
+
         debugLog('Set ui visible...')
         self.ui.setVisible(True)
 
@@ -802,6 +853,32 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         window.setWindowTitle('EnMAP-Box Python console')
         window.setCentralWidget(ConsoleWidget(self.ui, {'enmapBox': enmapBox}, None, text))
         window.show()
+
+    def onAddBerlinDataset(self):
+        # example datasets are stored here: https://github.com/EnMAP-Box/enmap-box-exampledata
+        from enmapboxexampledata.berlin import enmap_berlin, hires_berlin, landcover_berlin_polygon, \
+            landcover_berlin_point, veg_cover_fraction_berlin_point, enmap_srf_library, library_berlin
+        layers = [
+            QgsRasterLayer(enmap_berlin, basename(enmap_berlin)),
+            QgsRasterLayer(hires_berlin, basename(hires_berlin)),
+            QgsVectorLayer(landcover_berlin_polygon, basename(landcover_berlin_polygon)),
+            QgsVectorLayer(landcover_berlin_point, basename(landcover_berlin_point)),
+            QgsVectorLayer(veg_cover_fraction_berlin_point, basename(veg_cover_fraction_berlin_point)),
+        ]
+        self.onDataDropped(reversed(layers))
+        self.addSources([enmap_srf_library, library_berlin])
+
+    def onAddPotsdamDataset(self):
+        # example datasets are stored here: https://github.com/EnMAP-Box/enmap-box-exampledata
+        from enmapboxexampledata.potsdam import enmap_potsdam, aerial_potsdam, landcover_potsdam_polygon, \
+            landcover_potsdam_point
+        layers = [
+            QgsRasterLayer(enmap_potsdam, basename(enmap_potsdam)),
+            QgsRasterLayer(aerial_potsdam, basename(aerial_potsdam)),
+            QgsVectorLayer(landcover_potsdam_polygon, basename(landcover_potsdam_polygon)),
+            QgsVectorLayer(landcover_potsdam_point, basename(landcover_potsdam_point))
+        ]
+        self.onDataDropped(reversed(layers))
 
     def disconnectQGISSignals(self):
         try:
@@ -1188,7 +1265,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             lambda: self.mDockManager.createDock(DockTypes.SpectralLibraryDock))
         self.ui.mActionLoadExampleData.triggered.connect(lambda: self.openExampleData(
             mapWindows=1 if len(self.mDockManager.docks(MapDock)) == 0 else 0))
-
+        self.ui.mActionLoadExampleScene.triggered.connect(  # see issue #566
+            lambda: webbrowser.open('https://box.hu-berlin.de/f/8baee334773b4cb8847e/')
+        )
         # create new datasets
         self.ui.mActionCreateNewMemoryLayer.triggered.connect(lambda *args: self.createNewLayer('memory'))
         self.ui.mActionCreateNewGeoPackageLayer.triggered.connect(lambda *args: self.createNewLayer('gpkg'))
@@ -1720,8 +1799,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         contains_html = re.search(r'<(html|br|a|p/?>)', message) is not None
         self.addMessageBarTextBoxItem(line1, message, level=level, html=contains_html)
 
-    def onDataDropped(self, droppedData: Any, mapDock: MapDock = None) -> MapDock:
-        assert isinstance(droppedData, list)
+    def onDataDropped(self, droppedData: Sequence, mapDock: MapDock = None) -> MapDock:
         if mapDock is None:
             mapDock = self.createDock('MAP')
         from enmapbox.gui.datasources.datasources import SpatialDataSource
@@ -1799,8 +1877,17 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                         pass
                     return oType, area
 
-                for lyr in sorted(lyrs, key=niceLayerOrder):
+                lyrs = [lyr for lyr in sorted(lyrs, key=niceLayerOrder)]
+
+                # quick fix for issue #555
+                from enmapbox.exampledata import enmap_potsdam, aerial_potsdam
+                lyrNames = [basename(lyr.source()) for lyr in lyrs]
+                a, b = lyrNames.index(basename(aerial_potsdam)), lyrNames.index(basename(enmap_potsdam))
+                lyrs[b], lyrs[a] = lyrs[a], lyrs[b]  # we just switch positions
+
+                for lyr in lyrs:
                     dock.layerTree().addLayer(lyr)
+                dock.mapCanvas().zoomToFullExtent()
 
         if testData:
             from enmapbox import DIR_REPO

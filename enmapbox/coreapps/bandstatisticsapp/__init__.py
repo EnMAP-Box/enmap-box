@@ -1,8 +1,8 @@
 from bandstatisticsapp.bandstatisticsdialog import BandStatisticsDialog
 from enmapbox.gui.applications import EnMAPBoxApplication
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QAction
 from enmapbox.typeguard import typechecked
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QMenu
 
 
 def enmapboxApplicationFactory(enmapBox):
@@ -27,12 +27,8 @@ class BandStatisticsApp(EnMAPBoxApplication):
         return 'Band Statistics'
 
     def menu(self, appMenu: QMenu):
-        appMenu: QMenu = self.enmapbox.menu('Tools')
-        a = self.utilsAddActionInAlphanumericOrder(appMenu, self.title())
-        assert isinstance(a, QAction)
-        a.setIcon(self.icon())
+        a = self.utilsAddActionInAlphanumericOrder(self.enmapbox.ui.menuToolsRasterStatistics, self.title())
         a.triggered.connect(self.startGUI)
-        return appMenu
 
     def startGUI(self):
         w = BandStatisticsDialog(parent=self.enmapbox.ui)

@@ -497,7 +497,8 @@ class RasterReader(object):
 
         for key in [
             'wavelength_units',
-            'Wavelength_unit'  # support for FORCE BOA files
+            'Wavelength_unit',  # support for FORCE BOA files
+            'wavelength units'  # support for GDAL Metadata Editor dialog (by @jakimow)
         ]:
             # check band-level domains
             for domain in set(self.metadataDomainKeys(bandNo) + ['']):

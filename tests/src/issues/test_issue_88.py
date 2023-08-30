@@ -3,9 +3,8 @@ This is a template to create an EnMAP-Box test
 """
 import unittest
 
-from qgis.PyQt.QtCore import QPoint
-
 from enmapbox.testing import EnMAPBoxTestCase
+from qgis.PyQt.QtCore import QPoint
 from qgis.core import QgsCoordinateReferenceSystem, QgsRasterLayer
 
 

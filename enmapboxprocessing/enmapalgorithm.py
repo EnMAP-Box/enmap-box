@@ -967,7 +967,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         feedback.pushTiming(time() - self._startTime)
 
     @staticmethod
-    def runAlg(algOrName, parameters, onFinish, feedback, context, is_child_algorithm) -> Dict:
+    def runAlg(algOrName, parameters, onFinish=None, feedback=None, context=None, is_child_algorithm=False) -> Dict:
         return processing.run(algOrName, parameters, onFinish, feedback, context, is_child_algorithm)
 
 

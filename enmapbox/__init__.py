@@ -48,7 +48,6 @@ __version__ = 'dev'
 __version_sha__ = ''
 # note that the exampledata folder is part of the repo,
 # but will be removed from the plugin ZIP
-__version_exampledata__ = '3.10'
 
 HOMEPAGE = 'https://github.com/EnMAP-Box/enmap-box'
 REPOSITORY = 'https://github.com/EnMAP-Box/enmap-box.git'
@@ -56,7 +55,7 @@ ISSUE_TRACKER = 'https://github.com/EnMAP-Box/enmap-box/issues'
 CREATE_ISSUE = 'https://github.com/EnMAP-Box/enmap-box/issues/new'
 DEPENDENCIES = ['numpy', 'scipy', 'osgeo.gdal', 'PyQt5', 'sklearn', 'matplotlib']
 DOCUMENTATION = 'https://enmap-box.readthedocs.io/'
-URL_TESTDATA = fr'https://bitbucket.org/hu-geomatics/enmap-box/downloads/exampledata.{__version_exampledata__}.zip'
+URL_TESTDATA = 'https://github.com/EnMAP-Box/enmap-box-exampledata/releases/download/v1.0/exampledata.zip'
 URL_INSTALLATION = r'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html#install-required-python-packages'
 URL_QGIS_RESOURCES = r'https://box.hu-berlin.de/f/6949ab1099044018a5e4/?dl=1'
 

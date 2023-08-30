@@ -5,13 +5,13 @@ import numpy as np
 from osgeo import gdal
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QCheckBox, QMainWindow, QComboBox, QLineEdit, QRadioButton
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsMultiBandColorRenderer, QgsRasterLayer, QgsMapLayerProxyModel, QgsMapSettings
 from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsDoubleSpinBox, QgsMapLayerComboBox
-from enmapbox.typeguard import typechecked
 
 
 @typechecked

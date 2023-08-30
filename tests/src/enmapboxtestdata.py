@@ -4,8 +4,10 @@ import warnings
 from os.path import join, dirname, abspath
 from typing import Optional
 
+import enmapboxexampledata.berlin
+
 _root = abspath(join(dirname(dirname(__file__)), 'testdata'))
-root2 = abspath(join(dirname(dirname(dirname(__file__))), 'enmapbox', 'exampledata'))
+root2 = dirname(enmapboxexampledata.berlin.__file__)
 
 # RASTER
 _subdir = 'raster'
