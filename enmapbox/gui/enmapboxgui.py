@@ -1266,7 +1266,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.ui.mActionLoadExampleData.triggered.connect(lambda: self.openExampleData(
             mapWindows=1 if len(self.mDockManager.docks(MapDock)) == 0 else 0))
         self.ui.mActionLoadExampleScene.triggered.connect(  # see issue #566
-            lambda: webbrowser.open('https://box.hu-berlin.de/f/8baee334773b4cb8847e/')
+            lambda: webbrowser.open('https://box.hu-berlin.de/f/c35a6b0655c54d518aab/')
         )
         # create new datasets
         self.ui.mActionCreateNewMemoryLayer.triggered.connect(lambda *args: self.createNewLayer('memory'))
