@@ -28,7 +28,8 @@ from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer
                        QgsProcessingParameterFileDestination, QgsProcessingParameterFile, QgsProcessingParameterRange,
                        QgsProcessingParameterCrs, QgsProcessingParameterVectorDestination, QgsProcessing,
                        QgsProcessingUtils, QgsProcessingParameterMultipleLayers, QgsProcessingException,
-                       QgsProcessingParameterFolderDestination, QgsProject)
+                       QgsProcessingParameterFolderDestination, QgsProject, QgsProcessingOutputLayerDefinition,
+                       QgsProperty)
 from enmapbox.typeguard import typechecked
 
 
@@ -424,6 +425,12 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
 
         if filename == '':
             filename = parameters.get(name, '')
+
+        if isinstance(filename, QgsProcessingOutputLayerDefinition):
+            sink: QgsProperty = filename.sink
+            filename = sink.toVariant()['val']
+            assert isinstance(filename, str)
+
         if filename == '':
             return None
         if not isabs(filename):
