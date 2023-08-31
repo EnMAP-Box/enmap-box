@@ -1,6 +1,8 @@
-import sys
 import platform
+import sys
+
 from qgis.core import Qgis
+
 print(platform.platform())
 print(platform.processor())
 print(platform.python_implementation())
@@ -20,4 +22,3 @@ for p in packages:
         print(pkg.__file__)
     except Exception as ex:
         print(ex)
-
