@@ -3,6 +3,7 @@ This scripts generates some reports stats related to the EnMAP-Box repository
 """
 import argparse
 import csv
+import requests
 import datetime
 import inspect
 import json
@@ -20,7 +21,7 @@ from enmapbox import initAll
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
 from enmapbox.gui.applications import ApplicationWrapper, EnMAPBoxApplication
 from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.testing import start_app, stop_app
+from enmapbox.testing import start_app
 from qgis.PyQt.QtWidgets import QMenu
 from qgis.core import QgsProcessing, QgsProcessingParameterRasterLayer, QgsProcessingParameterRasterDestination, \
     QgsProcessingOutputVectorLayer, QgsProcessingParameterFeatureSink, QgsProcessingParameterFeatureSource, \
@@ -94,8 +95,66 @@ def report_github_issues() -> pd.DataFrame:
     is:issue created:2022-07-01..2022-12-31
     is:issue closed:2022-07-01..2022-12-31
     """
+    # Your GitHub personal access token
+    assert 'GITHUB_TOKEN' in os.environ, 'GITHUB_TOKEN is not set. ' \
+                                        'Read https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens for details.'
+    token = os.environ['GITHUB_TOKEN']
 
-    s = ""
+    # GitHub repository owner and name
+    owner = 'EnMAP-Box'
+    repo = 'enmap-box'
+
+    # Define the date range
+    start_date = datetime.datetime.strptime('2023-01-01', '%Y-%m-%d')
+    end_date = datetime.datetime.strptime('2023-06-30', '%Y-%m-%d')
+
+    # Create a session and set the authorization header
+    session = requests.Session()
+    session.headers.update({'Authorization': f'token {token}'})
+
+    # Get the list of issues from the GitHub API
+    issues_url = f'https://api.github.com/repos/{owner}/{repo}/issues'
+    params = {
+        'state': 'all',  # 'all' includes open and closed issues
+        'per_page': 100,  # Adjust as needed
+    }
+    all_issues = []
+
+    while True:
+        response = session.get(issues_url, params=params)
+
+        response.raise_for_status()
+        all_issues.extend(response.json())
+
+        # Check if there are more pages of issues
+        link_header = response.headers.get('Link', '')
+        if 'rel="next"' not in link_header:
+            break
+
+        rx = re.compile(r'<(.[^>]+)>; *rel="next"')
+
+        # Extract the URL for the next page
+        link = [l.strip() for l in link_header.split(',') if 'rel="next"' in l]
+        if len(link) > 0:
+            link = link[0]
+            issues_url = rx.match(link).group(1)
+        else:
+            response.close()
+            break
+
+    pull_requests = [i for i in all_issues if 'pull_request' in i]
+    issues = [i for i in all_issues if 'pull_request' not in i]
+
+    # Filter issues within the date range
+    issues_created = [i for i in issues if
+                      start_date <= datetime.datetime.strptime(i['created_at'], '%Y-%m-%dT%H:%M:%SZ') <= end_date]
+
+    issues_closed = [i for i in issues if i['closed_at'] and
+                     start_date <= datetime.datetime.strptime(i['closed_at'], '%Y-%m-%dT%H:%M:%SZ') <= end_date]
+
+    print(f'Issues {start_date} to {end_date}')
+    print(f'Created: {len(issues_created)}')
+    print(f'Closed: {len(issues_closed)}')
     return None
 
 
@@ -300,6 +359,10 @@ def report_bitbucket_issues(self):
 
 class TestCases(unittest.TestCase):
 
+    def test_github_2(self):
+
+        report_github_issues()
+
     def test_github_issue(self):
 
         path_json = pathlib.Path(DIR_REPO_TMP) / 'issues.json'
@@ -364,5 +427,3 @@ if __name__ == "__main__":
 
         dfPAs = report_processingalgorithms()
         dfPAs.to_excel(writer, sheet_name='PAs')
-
-    stop_app()
