@@ -97,7 +97,7 @@ def report_github_issues() -> pd.DataFrame:
     """
     # Your GitHub personal access token
     assert 'GITHUB_TOKEN' in os.environ, 'GITHUB_TOKEN is not set. ' \
-                                        'Read https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens for details.'
+                                         'Read https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens for details.'
     token = os.environ['GITHUB_TOKEN']
 
     # GitHub repository owner and name
@@ -149,8 +149,8 @@ def report_github_issues() -> pd.DataFrame:
     issues_created = [i for i in issues if
                       start_date <= datetime.datetime.strptime(i['created_at'], '%Y-%m-%dT%H:%M:%SZ') <= end_date]
 
-    issues_closed = [i for i in issues if i['closed_at'] and
-                     start_date <= datetime.datetime.strptime(i['closed_at'], '%Y-%m-%dT%H:%M:%SZ') <= end_date]
+    issues_closed = [i for i in issues if
+                     i['closed_at'] and start_date <= datetime.datetime.strptime(i['closed_at'], '%Y-%m-%dT%H:%M:%SZ') <= end_date]
 
     print(f'Issues {start_date} to {end_date}')
     print(f'Created: {len(issues_created)}')
