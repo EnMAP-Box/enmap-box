@@ -418,7 +418,7 @@ class MDKeyDomainString(MDKeyAbstract):
     def setValue(self, value):
 
         def convertOrFail(value):
-            if type(value) != self.mType:
+            if type(value) is not self.mType:
                 try:
                     value = self.mType(value)
                 except Exception as ex:
