@@ -18,7 +18,7 @@ class PrepareClassificationDatasetFromCategorizedVectorAlgorithm(EnMAPProcessing
     P_FEATURE_RASTER, _FEATURE_RASTER = 'featureRaster', 'Raster layer with features'
     P_EXCLUDE_BAD_BANDS, _EXCLUDE_BAD_BANDS, = 'excludeBadBands', 'Exclude bad bands'
     P_CATEGORY_FIELD, _CATEGORY_FIELD = 'categoryField', 'Field with class values'
-    P_COVERAGE, _COVERAGE = 'coverage', 'Minimum pixel coverage'
+    P_COVERAGE, _COVERAGE = 'coverage', 'Minimum pixel coverage [%]'
     P_MAJORITY_VOTING, _MAJORITY_VOTING = 'majorityVoting', 'Majority voting'
     P_OUTPUT_DATASET, _OUTPUT_DATASET = 'outputClassificationDataset', 'Output dataset'
 
