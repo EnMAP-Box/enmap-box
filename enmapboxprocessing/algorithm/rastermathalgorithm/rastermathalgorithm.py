@@ -60,8 +60,8 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
 
     linkNumpy = EnMAPProcessingAlgorithm.htmlLink('https://numpy.org/doc/stable/reference/', 'NumPy')
     linkRecipe = EnMAPProcessingAlgorithm.htmlLink(
-        'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_cookbook/raster_math.html',
-        'RasterMath cookbook recipe')
+        'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/applications.html#raster-math',
+        'User Manual')
 
     def displayName(self) -> str:
         return 'Raster math'
