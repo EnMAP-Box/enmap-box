@@ -21,7 +21,7 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessin
 class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
     P_FILE, _FILE = 'file', 'Metadata file'
     P_SET_BAD_BANDS, _SET_BAD_BANDS = 'setBadBands', 'Set bad bands'
-    P_EXCLUDE_BAD_BANDS, _EXCLUDE_BAD_BANDS, = 'excludeBadBands', 'Exclude bad bands'
+    P_EXCLUDE_BAD_BANDS, _EXCLUDE_BAD_BANDS, = 'excludeBadBands', 'Mark no data bands as bad bands'
     P_DETECTOR_OVERLAP, _DETECTOR_OVERLAP = 'detectorOverlap', 'Detector overlap region'
     O_DETECTOR_OVERLAP = [
         'Order by detector (VNIR, SWIR)', 'Order by wavelength (default order)', 'Moving average filter', 'VNIR only',
@@ -44,7 +44,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                          'Instead of executing this algorithm, '
                          'you may drag&drop the metadata XML file directly from your system file browser onto '
                          'the EnMAP-Box map view area.'),
-            (self._SET_BAD_BANDS, 'Whether to find and set the bad bands list by evaluating the image data.'),
+            (self._SET_BAD_BANDS, 'Whether to mark no data bands as bad bands.'),
             (self._EXCLUDE_BAD_BANDS, 'Whether to exclude bands.'),
             (self._DETECTOR_OVERLAP, 'Different options for handling the detector overlap region from 900 to 1000 '
                                      'nanometers. For the Moving average filter, a kernel size of 3 is used.'),
