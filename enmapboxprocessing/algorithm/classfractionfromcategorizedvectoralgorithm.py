@@ -18,7 +18,7 @@ from enmapbox.typeguard import typechecked
 class ClassFractionFromCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
     P_CATEGORIZED_VECTOR, _CATEGORIZED_VECTOR = 'categorizedVector', 'Categorized vector layer'
     P_GRID, _GRID = 'grid', 'Grid'
-    P_COVERAGE, _COVERAGE = 'coverage', 'Minimum pixel coverage'
+    P_COVERAGE, _COVERAGE = 'coverage', 'Minimum pixel coverage [%]'
     P_OUTPUT_FRACTION_RASTER, _OUTPUT_FRACTION_RASTER = 'outputFraction', 'Output class fraction layer'
 
     def displayName(self):
