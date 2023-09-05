@@ -21,7 +21,8 @@ veg_cover_fraction_berlin_point = join(_root, _subdir, 'veg-cover-fraction_berli
 
 # Potsdam example data
 # ...current example dataset is placed under enmapbox.exampledata
-enmap_potsdam = enmapbox.exampledata.enmap_potsdam
+aerial_potsdam = enmapbox.exampledata.aerial
+enmap_potsdam = enmapbox.exampledata.enmap
 landcover_potsdam_polygon = enmapbox.exampledata.landcover_potsdam_polygon
 landcover_potsdam_point = enmapbox.exampledata.landcover_potsdam_point
 

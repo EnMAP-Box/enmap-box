@@ -1880,9 +1880,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                 lyrs = [lyr for lyr in sorted(lyrs, key=niceLayerOrder)]
 
                 # quick fix for issue #555
-                from enmapbox.exampledata import enmap_potsdam, aerial_potsdam
+                from enmapbox.exampledata import enmap, aerial
                 lyrNames = [basename(lyr.source()) for lyr in lyrs]
-                a, b = lyrNames.index(basename(aerial_potsdam)), lyrNames.index(basename(enmap_potsdam))
+                a, b = lyrNames.index(basename(aerial)), lyrNames.index(basename(enmap))
                 lyrs[b], lyrs[a] = lyrs[a], lyrs[b]  # we just switch positions
 
                 for lyr in lyrs:
