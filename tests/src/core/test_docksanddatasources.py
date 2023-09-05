@@ -16,7 +16,7 @@ import os
 import tempfile
 import unittest
 
-from enmapbox.exampledata import landcover_polygon, library_gpkg, enmap, hires
+from enmapbox.exampledata import landcover_polygon, enmap, hires
 from enmapbox.gui.datasources.datasources import VectorDataSource, RasterDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager
 from enmapbox.gui.dataviews.dockmanager import DockManager, SpeclibDockTreeNode, MapDockTreeNode, \
@@ -26,7 +26,7 @@ from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.Dock import Dock as pgDock
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
 from enmapbox.testing import EnMAPBoxTestCase, TestObjects
-from enmapboxtestdata import classificationDatasetAsPklFile
+from enmapboxtestdata import classificationDatasetAsPklFile, library_berlin
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import QgsProject, QgsVectorLayer, QgsRasterLayer, QgsLayerTreeModel, QgsLayerTree
 from qgis.gui import QgsMapCanvas, QgsLayerTreeView
@@ -50,7 +50,7 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
 
         DSM.addDataSources(enmap)
         DSM.addDataSources(landcover_polygon)
-        DSM.addDataSources(library_gpkg)
+        DSM.addDataSources(library_berlin)
 
         self.assertTrue(len(signalArgs) == 3)
         self.assertIsInstance(signalArgs[0], RasterDataSource)

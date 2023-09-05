@@ -1,6 +1,6 @@
 from os.path import dirname, join
 
-aerial = join(dirname(__file__), 'aerial_potsdam.tif')
+hires = join(dirname(__file__), 'aerial_potsdam.tif')
 enmap = join(dirname(__file__), 'enmap_potsdam.tif')
-landcover_potsdam_point = join(dirname(__file__), 'landcover_potsdam_point.gpkg')
-landcover_potsdam_polygon = join(dirname(__file__), 'landcover_potsdam_polygon.gpkg')
+landcover_point = join(dirname(__file__), 'landcover_potsdam_point.gpkg')
+landcover_polygon = join(dirname(__file__), 'landcover_potsdam_polygon.gpkg')

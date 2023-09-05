@@ -23,12 +23,12 @@ from qgis.PyQt import sip
 from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, QgsRasterRenderer, QgsRasterDataProvider
 from qgis.gui import QgsMapCanvas
 
-from enmapbox.exampledata import enmap, hires, landcover_polygon, library_gpkg, enmap_srf_library
+from enmapbox.exampledata import enmap, hires, landcover_polygon
 from enmapbox.gui.datasources.datasources import SpatialDataSource, DataSource, RasterDataSource, VectorDataSource, \
     FileDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager, DataSourceManagerPanelUI, DataSourceFactory
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
-from enmapboxtestdata import classifierDumpPkl
+from enmapboxtestdata import classifierDumpPkl, library_berlin, enmap_srf_library
 
 
 class DataSourceTests(EnMAPBoxTestCase):
@@ -82,7 +82,7 @@ class DataSourceTests(EnMAPBoxTestCase):
     def createTestSources(self) -> list:
 
         # return [library, self.wfsUri, self.wmsUri, enmap, landcover_polygons]
-        return [library_gpkg, enmap, landcover_polygon]
+        return [library_berlin, enmap, landcover_polygon]
 
     def createOGCSources(self) -> list:
         # todo: add WCS
@@ -146,7 +146,7 @@ class DataSourceTests(EnMAPBoxTestCase):
         dsm = DataSourceManager()
         panel = DataSourceManagerPanelUI()
         panel.connectDataSourceManager(dsm)
-        uris = [library_gpkg, enmap, landcover_polygon]
+        uris = [library_berlin, enmap, landcover_polygon]
         dsm.addDataSources(uris)
         self.showGui(panel)
 
@@ -192,14 +192,14 @@ class DataSourceTests(EnMAPBoxTestCase):
         self.assertTrue(ds2.updateTime() > t0_2)
 
     def test_DataSourceModel(self):
-        from enmapbox.exampledata import enmap, landcover_polygon, library_gpkg, enmap_srf_library
+
         sources = [enmap,
                    enmap,
                    landcover_polygon,
                    landcover_polygon,
                    enmap_srf_library,
                    enmap_srf_library,
-                   library_gpkg,
+                   library_berlin,
                    classifierDumpPkl]
 
         model = DataSourceManager()

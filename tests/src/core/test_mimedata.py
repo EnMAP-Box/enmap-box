@@ -19,8 +19,9 @@ import unittest
 import enmapbox.gui.mimedata as mimedata
 from enmapbox import DIR_EXAMPLEDATA
 from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.exampledata import enmap, hires, library_gpkg, landcover_polygon
+from enmapbox.exampledata import enmap, hires, landcover_polygon
 from enmapbox.testing import EnMAPBoxTestCase
+from enmapboxtestdata import library_berlin
 from qgis.PyQt.QtCore import QMimeData, QByteArray, QUrl, Qt, QPoint
 from qgis.PyQt.QtGui import QDropEvent
 from qgis.PyQt.QtWidgets import QApplication
@@ -65,7 +66,7 @@ class MimeDataTests(EnMAPBoxTestCase):
         from enmapbox.gui.datasources.datasources import DataSource
         from enmapbox.gui.datasources.manager import DataSourceFactory
 
-        dataSources = DataSourceFactory.create([enmap, hires, library_gpkg, landcover_polygon])
+        dataSources = DataSourceFactory.create([enmap, hires, library_berlin, landcover_polygon])
         dataSourceObjectIDs = [id(ds) for ds in dataSources]
 
         md = mimedata.fromDataSourceList(dataSources)

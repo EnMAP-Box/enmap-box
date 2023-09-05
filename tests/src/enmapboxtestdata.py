@@ -1,4 +1,5 @@
 import os
+import pathlib
 import platform
 import warnings
 from os.path import join, dirname, abspath
@@ -10,9 +11,9 @@ _root = abspath(join(dirname(dirname(__file__)), 'testdata'))
 
 # Berlin example data
 # ...this is the old example dataset, which we still need for unittests
-_subdir = 'exampledata/berlin'
+_subdir = pathlib.Path('exampledata/berlin')
 enmap_berlin = join(_root, _subdir, 'enmap_berlin.bsq')
-enmap_srf_library = join(dirname(__file__), 'enmap_srf_library.gpkg')
+enmap_srf_library = join(_root, _subdir, 'enmap_srf_library.gpkg')
 hires_berlin = join(_root, _subdir, 'hires_berlin.bsq')
 landcover_berlin_point = join(_root, _subdir, 'landcover_berlin_point.gpkg')
 landcover_berlin_polygon = join(_root, _subdir, 'landcover_berlin_polygon.gpkg')
@@ -21,10 +22,9 @@ veg_cover_fraction_berlin_point = join(_root, _subdir, 'veg-cover-fraction_berli
 
 # Potsdam example data
 # ...current example dataset is placed under enmapbox.exampledata
-aerial_potsdam = enmapbox.exampledata.aerial
 enmap_potsdam = enmapbox.exampledata.enmap
-landcover_potsdam_polygon = enmapbox.exampledata.landcover_potsdam_polygon
-landcover_potsdam_point = enmapbox.exampledata.landcover_potsdam_point
+landcover_potsdam_polygon = enmapbox.exampledata.landcover_polygon
+landcover_potsdam_point = enmapbox.exampledata.landcover_point
 
 # connect old shortcuts (requested by @jakimow)
 enmap = enmap_berlin
