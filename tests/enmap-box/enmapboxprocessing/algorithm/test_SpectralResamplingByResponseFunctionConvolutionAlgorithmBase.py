@@ -1,6 +1,6 @@
 import numpy as np
 
-from enmapbox.exampledata import enmap
+from enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.spectralresamplingtodesisalgorithm import SpectralResamplingToDesisAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtoenmapalgorithm import SpectralResamplingToEnmapAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtolandsat5algorithm import SpectralResamplingToLandsat5Algorithm

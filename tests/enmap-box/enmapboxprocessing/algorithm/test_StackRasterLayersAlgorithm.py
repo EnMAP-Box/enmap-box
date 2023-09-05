@@ -1,4 +1,4 @@
-from enmapbox.exampledata import enmap, hires
+from enmapboxtestdata import enmap, hires
 from enmapboxprocessing.algorithm.stackrasterlayersalgorithm import StackRasterLayersAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader

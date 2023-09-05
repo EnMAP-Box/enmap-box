@@ -1,6 +1,6 @@
 import numpy as np
 
-from enmapbox.exampledata import enmap, enmap_srf_library
+from enmapboxtestdata import enmap, enmap_srf_library
 from enmapboxprocessing.algorithm.spectralresamplingbyresponsefunctionlibraryalgorithm import \
     SpectralResamplingByResponseFunctionLibraryAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase

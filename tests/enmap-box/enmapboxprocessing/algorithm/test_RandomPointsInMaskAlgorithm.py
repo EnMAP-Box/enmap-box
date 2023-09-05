@@ -1,4 +1,4 @@
-from enmapbox.exampledata import enmap
+from enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.randompointsfrommaskrasteralgorithm import RandomPointsFromMaskRasterAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from qgis.core import QgsRasterLayer

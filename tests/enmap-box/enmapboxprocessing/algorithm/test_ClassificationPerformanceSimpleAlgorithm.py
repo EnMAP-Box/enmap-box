@@ -1,6 +1,6 @@
 from math import isnan
 
-from enmapbox.exampledata import landcover_polygon
+from enmapboxtestdata import landcover_polygon
 from enmapboxprocessing.algorithm.classificationperformancesimplealgorithm import \
     ClassificationPerformanceSimpleAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase

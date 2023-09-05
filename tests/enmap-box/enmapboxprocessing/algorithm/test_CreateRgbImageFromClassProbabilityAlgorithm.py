@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.base import ClassifierMixin
 
-from enmapbox.exampledata import enmap
+from enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.creatergbimagefromclassprobabilityalgorithm import \
     CreateRgbImageFromClassProbabilityAlgorithm
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase

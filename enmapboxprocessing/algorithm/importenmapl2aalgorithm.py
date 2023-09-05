@@ -124,14 +124,18 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                     int(text) for text in root.find('specific/swirProductQuality/expectedChannelsList').text.split(',')
                 ]
 
+                overlapStart = wavelength[swirBandNumbers[0]]
+                overlapEnd = wavelength[vnirBandNumbers[-1]]
                 if detectorOverlap == self.OrderByDetectorOverlapOption:
                     bandList = vnirBandNumbers + swirBandNumbers
                 elif detectorOverlap == self.OrderByWavelengthOverlapOption:
                     bandList = list(range(1, len(wavelength) + 1))
                 elif detectorOverlap == self.VnirOnlyOverlapOption:
                     bandList = vnirBandNumbers
+                    bandList.extend([bandNo for bandNo in swirBandNumbers if wavelength[bandNo - 1] > overlapEnd])
                 elif detectorOverlap == self.SwirOnlyOverlapOption:
-                    bandList = swirBandNumbers
+                    bandList = [bandNo for bandNo in vnirBandNumbers if wavelength[bandNo - 1] < overlapStart]
+                    bandList.extend(swirBandNumbers)
                 else:
                     raise ValueError()
 
