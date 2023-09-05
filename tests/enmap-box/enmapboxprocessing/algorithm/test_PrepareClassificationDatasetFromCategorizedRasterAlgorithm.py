@@ -1,4 +1,4 @@
-from enmapbox.exampledata import enmap_potsdam
+from enmapboxtestdata import enmap_potsdam
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedrasteralgorithm import \
     PrepareClassificationDatasetFromCategorizedRasterAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase

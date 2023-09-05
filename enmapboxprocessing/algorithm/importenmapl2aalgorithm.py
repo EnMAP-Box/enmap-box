@@ -21,7 +21,7 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessin
 class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
     P_FILE, _FILE = 'file', 'Metadata file'
     P_SET_BAD_BANDS, _SET_BAD_BANDS = 'setBadBands', 'Set bad bands'
-    P_EXCLUDE_BAD_BANDS, _EXCLUDE_BAD_BANDS, = 'excludeBadBands', 'Exclude bad bands'
+    P_EXCLUDE_BAD_BANDS, _EXCLUDE_BAD_BANDS, = 'excludeBadBands', 'Mark no data bands as bad bands'
     P_DETECTOR_OVERLAP, _DETECTOR_OVERLAP = 'detectorOverlap', 'Detector overlap region'
     O_DETECTOR_OVERLAP = [
         'Order by detector (VNIR, SWIR)', 'Order by wavelength (default order)', 'Moving average filter', 'VNIR only',
@@ -44,7 +44,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                          'Instead of executing this algorithm, '
                          'you may drag&drop the metadata XML file directly from your system file browser onto '
                          'the EnMAP-Box map view area.'),
-            (self._SET_BAD_BANDS, 'Whether to find and set the bad bands list by evaluating the image data.'),
+            (self._SET_BAD_BANDS, 'Whether to mark no data bands as bad bands.'),
             (self._EXCLUDE_BAD_BANDS, 'Whether to exclude bands.'),
             (self._DETECTOR_OVERLAP, 'Different options for handling the detector overlap region from 900 to 1000 '
                                      'nanometers. For the Moving average filter, a kernel size of 3 is used.'),
@@ -124,14 +124,18 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                     int(text) for text in root.find('specific/swirProductQuality/expectedChannelsList').text.split(',')
                 ]
 
+                overlapStart = wavelength[swirBandNumbers[0]]
+                overlapEnd = wavelength[vnirBandNumbers[-1]]
                 if detectorOverlap == self.OrderByDetectorOverlapOption:
                     bandList = vnirBandNumbers + swirBandNumbers
                 elif detectorOverlap == self.OrderByWavelengthOverlapOption:
                     bandList = list(range(1, len(wavelength) + 1))
                 elif detectorOverlap == self.VnirOnlyOverlapOption:
                     bandList = vnirBandNumbers
+                    bandList.extend([bandNo for bandNo in swirBandNumbers if wavelength[bandNo - 1] > overlapEnd])
                 elif detectorOverlap == self.SwirOnlyOverlapOption:
-                    bandList = swirBandNumbers
+                    bandList = [bandNo for bandNo in vnirBandNumbers if wavelength[bandNo - 1] < overlapStart]
+                    bandList.extend(swirBandNumbers)
                 else:
                     raise ValueError()
 

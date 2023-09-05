@@ -1,6 +1,6 @@
 from sklearn.base import TransformerMixin
 
-from enmapbox.exampledata import enmap
+from enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.fitfactoranalysisalgorithm import FitFactorAnalysisAlgorithm
 from enmapboxprocessing.algorithm.fitfasticaalgorithm import FitFastIcaAlgorithm
 from enmapboxprocessing.algorithm.fitfeatureagglomerationalgorithm import FitFeatureAgglomerationAlgorithm

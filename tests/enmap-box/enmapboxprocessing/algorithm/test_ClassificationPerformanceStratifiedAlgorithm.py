@@ -1,6 +1,6 @@
 import numpy as np
 
-from enmapbox.exampledata import landcover_polygon
+from enmapboxtestdata import landcover_polygon
 from enmapboxprocessing.algorithm.classificationperformancestratifiedalgorithm import (
     stratifiedAccuracyAssessment, ClassificationPerformanceStratifiedAlgorithm
 )

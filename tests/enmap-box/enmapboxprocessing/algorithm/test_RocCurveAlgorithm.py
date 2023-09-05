@@ -1,4 +1,4 @@
-from enmapbox.exampledata import landcover_polygon
+from enmapboxtestdata import landcover_polygon
 from enmapboxprocessing.algorithm.roccurvealgorithm import RocCurveAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import fraction_map_l3, fraction_polygon_l3, landcover_polygon_3classes

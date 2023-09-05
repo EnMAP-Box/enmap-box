@@ -1,4 +1,4 @@
-from enmapbox.exampledata import library_gpkg
+from enmapboxtestdata import library_gpkg
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuouslibraryalgorithm import \
     PrepareRegressionDatasetFromContinuousLibraryAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase

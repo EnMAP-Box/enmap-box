@@ -29,7 +29,7 @@ def has_package(name: str):
     try:
         __import__(name)
         return True
-    except ModuleNotFoundError:
+    except (ModuleNotFoundError, SystemError):
         return False
 
 
