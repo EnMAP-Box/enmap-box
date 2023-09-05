@@ -89,72 +89,108 @@ def report_downloads() -> pd.DataFrame:
     return df
 
 
+def toDate(text, format: str = '%Y-%m-%dT%H:%M:%SZ') -> datetime.datetime:
+    return datetime.datetime.strptime(text, format)
+
+
 def report_github_issues() -> pd.DataFrame:
     """
 
     is:issue created:2022-07-01..2022-12-31
     is:issue closed:2022-07-01..2022-12-31
     """
-    # Your GitHub personal access token
-    assert 'GITHUB_TOKEN' in os.environ, 'GITHUB_TOKEN is not set. ' \
-                                         'Read https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens for details.'
-    token = os.environ['GITHUB_TOKEN']
 
     # GitHub repository owner and name
     owner = 'EnMAP-Box'
     repo = 'enmap-box'
 
     # Define the date range
-    start_date = datetime.datetime.strptime('2023-01-01', '%Y-%m-%d')
-    end_date = datetime.datetime.strptime('2023-06-30', '%Y-%m-%d')
+    start_date = toDate('2023-01-01', '%Y-%m-%d')
+    end_date = toDate('2023-06-30', '%Y-%m-%d')
 
-    # Create a session and set the authorization header
-    session = requests.Session()
-    session.headers.update({'Authorization': f'token {token}'})
+    today = datetime.datetime.now().isoformat().split('T')[0]
 
-    # Get the list of issues from the GitHub API
-    issues_url = f'https://api.github.com/repos/{owner}/{repo}/issues'
-    params = {
-        'state': 'all',  # 'all' includes open and closed issues
-        'per_page': 100,  # Adjust as needed
-    }
-    all_issues = []
+    PATH_GH_JSON = pathlib.Path(__file__).parents[1] / 'tmp' / f'githubissues.{today}.json'
 
-    while True:
-        response = session.get(issues_url, params=params)
+    if not PATH_GH_JSON.is_file():
+        os.makedirs(PATH_GH_JSON.parent, exist_ok=True)
+        # Your GitHub personal access token
+        assert 'GITHUB_TOKEN' in os.environ, 'GITHUB_TOKEN is not set. ' \
+                                             'Read https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens for details.'
+        token = os.environ['GITHUB_TOKEN']
 
-        response.raise_for_status()
-        all_issues.extend(response.json())
 
-        # Check if there are more pages of issues
-        link_header = response.headers.get('Link', '')
-        if 'rel="next"' not in link_header:
-            break
 
-        rx = re.compile(r'<(.[^>]+)>; *rel="next"')
+        # Create a session and set the authorization header
+        session = requests.Session()
+        session.headers.update({'Authorization': f'token {token}'})
 
-        # Extract the URL for the next page
-        link = [l.strip() for l in link_header.split(',') if 'rel="next"' in l]
-        if len(link) > 0:
-            link = link[0]
-            issues_url = rx.match(link).group(1)
-        else:
-            response.close()
-            break
+        # Get the list of issues from the GitHub API
+        issues_url = f'https://api.github.com/repos/{owner}/{repo}/issues'
+        params = {
+            'state': 'all',  # 'all' includes open and closed issues
+            'per_page': 100,  # Adjust as needed
+        }
+        all_issues = []
 
+        while True:
+            response = session.get(issues_url, params=params)
+
+            response.raise_for_status()
+            all_issues.extend(response.json())
+
+            # Check if there are more pages of issues
+            link_header = response.headers.get('Link', '')
+            if 'rel="next"' not in link_header:
+                break
+
+            rx = re.compile(r'<(.[^>]+)>; *rel="next"')
+
+            # Extract the URL for the next page
+            link = [l.strip() for l in link_header.split(',') if 'rel="next"' in l]
+            if len(link) > 0:
+                link = link[0]
+                issues_url = rx.match(link).group(1)
+            else:
+                response.close()
+                break
+        with open(PATH_GH_JSON, 'w') as f:
+            json.dump(all_issues, f)
+
+    with open(PATH_GH_JSON, 'r') as f:
+        all_issues = json.load(f)
     pull_requests = [i for i in all_issues if 'pull_request' in i]
     issues = [i for i in all_issues if 'pull_request' not in i]
 
     # Filter issues within the date range
-    issues_created = [i for i in issues if
-                      start_date <= datetime.datetime.strptime(i['created_at'], '%Y-%m-%dT%H:%M:%SZ') <= end_date]
 
-    issues_closed = [i for i in issues if
-                     i['closed_at'] and start_date <= datetime.datetime.strptime(i['closed_at'], '%Y-%m-%dT%H:%M:%SZ') <= end_date]
+    issues_created = [i for i in issues if start_date <= toDate(i['created_at']) <= end_date]
+    issues_updated = [i for i in issues if start_date <= toDate(i['updated_at']) <= end_date and toDate(i['created_at']) < start_date]
 
-    print(f'Issues {start_date} to {end_date}')
-    print(f'Created: {len(issues_created)}')
-    print(f'Closed: {len(issues_closed)}')
+
+    def printInfos(issues):
+        is_closed = []
+        is_open = []
+        is_duplicate = []
+        is_wontfix = []
+        for i in issues:
+            pass
+        is_closed = [i for i in issues_created if 'closed_at' in i and toDate(i['closed_at']) <= end_date]
+        is_open = [i for i in issues_created if i['closed_at'] > 0]
+        is_duplicate = [i for i in issues_created if i['closed_at'] > 0]
+        is_wontfix = [i for i in issues_created if i['closed_at'] > 0]
+        print(f' Total: {len(issues)}')
+        print(f' Open: {len(is_open)}')
+        print(f' Closed: {len(is_closed)}')
+
+    print(f'Issues created in reporting period: {start_date} to {end_date}')
+    print(f'Total: {len(issues_created)}')
+    print(f'By today: {today}')
+    printInfos(issues_created)
+
+    print(f'Issues created before {start_date} but handled in reporting period')
+    printInfos(issues_updated)
+
     return None
 
 
@@ -362,44 +398,6 @@ class TestCases(unittest.TestCase):
     def test_github_2(self):
 
         report_github_issues()
-
-    def test_github_issue(self):
-
-        path_json = pathlib.Path(DIR_REPO_TMP) / 'issues.json'
-
-        if not path_json.is_file():
-            issues = []
-            from github3api import GitHubAPI
-            client = GitHubAPI()
-
-            for issue_slice in client.get('https://api.github.com/repos/EnMAP-Box/enmap-box/issues',
-                                          _get='all',
-                                          # _attributes = ['title', 'user', 'labels', 'html_url', 'state', 'locked',
-                                          # 'assignees', 'milestone', 'created_at', 'updated_at', 'closed_at', 'state_reason', 'pull_request']
-                                          ):
-                if isinstance(issue_slice, dict):
-                    issues.append(issue_slice)
-                else:
-                    issues.extend(issue_slice)
-
-            with open(path_json, 'w', encoding='utf-8') as f:
-                json.dump(issues, f)
-        else:
-            with open(path_json, 'r', encoding='utf-8') as f:
-                issues = json.load(f)
-            s = ""
-        s = ""
-        for issue in issues:
-            dtg_created = issue['created_at']
-            dtg_updates = issue['updated_at']
-            dtg_closed = issue['closed_at']
-            state = issue['state']
-
-            s = ""
-        s = ""
-        # gh = github3.login(username='foo', password='bar')
-        #
-        # s = ""
 
 
 if __name__ == "__main__":
