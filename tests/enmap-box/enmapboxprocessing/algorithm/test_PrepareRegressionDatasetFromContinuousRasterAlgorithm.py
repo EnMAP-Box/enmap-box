@@ -1,4 +1,4 @@
-from enmapbox.exampledata import enmap_potsdam
+from enmapboxtestdata import enmap_potsdam
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousrasteralgorithm import \
     PrepareRegressionDatasetFromContinuousRasterAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase

@@ -73,11 +73,12 @@ class EditRasterSourceBandPropertiesAlgorithm(EnMAPProcessingAlgorithm):
         assert ds is not None
 
         # allow counter variables for band names (see issue #539)
-        if '{bandNo}' in parameters[self.P_NAMES] or '{bandName}' in parameters[self.P_NAMES]:
-            reader = RasterReader(source)
-            bandNames = [reader.bandName(bandNo) for bandNo in reader.bandNumbers()]
-            parameters[self.P_NAMES] = \
-                f"[f'{parameters[self.P_NAMES]}' for bandNo, bandName in enumerate({bandNames}, 1)]"
+        if self.P_NAMES in parameters:
+            if '{bandNo}' in parameters[self.P_NAMES] or '{bandName}' in parameters[self.P_NAMES]:
+                reader = RasterReader(source)
+                bandNames = [reader.bandName(bandNo) for bandNo in reader.bandNumbers()]
+                parameters[self.P_NAMES] = \
+                    f"[f'{parameters[self.P_NAMES]}' for bandNo, bandName in enumerate({bandNames}, 1)]"
 
         names = self.parameterAsStringValues(parameters, self.P_NAMES, context)
         wavelengths = self.parameterAsFloatValues(parameters, self.P_WAVELENGTHS, context)

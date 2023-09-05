@@ -1,6 +1,6 @@
 import numpy as np
 
-from enmapbox.exampledata import enmap
+from enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.convexhullalgorithm import ConvexHullAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm

@@ -1,4 +1,4 @@
-from enmapbox.exampledata import hires
+from enmapboxtestdata import hires
 from enmapboxprocessing.algorithm.spatialgaussiangradientmagnitudealgorithm import \
     SpatialGaussianGradientMagnitudeAlgorithm
 from enmapboxprocessing.algorithm.spatiallaplacealgorithm import SpatialLaplaceAlgorithm

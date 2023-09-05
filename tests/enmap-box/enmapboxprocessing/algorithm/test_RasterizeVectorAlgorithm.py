@@ -1,4 +1,4 @@
-from enmapbox.exampledata import enmap, landcover_polygon
+from enmapboxtestdata import enmap, landcover_polygon
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader

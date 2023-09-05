@@ -3,7 +3,7 @@ from os.path import join, dirname
 import numpy as np
 from osgeo import gdal
 
-from enmapbox.exampledata import landcover_polygon, enmap, hires
+from enmapboxtestdata import landcover_polygon, enmap, hires
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
 from enmapbox.testing import start_app
 from enmapboxprocessing.rasterreader import RasterReader

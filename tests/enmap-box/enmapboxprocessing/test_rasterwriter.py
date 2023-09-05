@@ -1,7 +1,7 @@
 import numpy as np
 from osgeo import gdal
 
-from enmapbox.exampledata import enmap
+from enmapboxtestdata import enmap
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.testcase import TestCase

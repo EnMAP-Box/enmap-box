@@ -1,6 +1,6 @@
 import unittest
 
-from enmapbox.exampledata import hires
+from enmapboxtestdata import hires
 from enmapboxprocessing.algorithm.convolutionfilteralgorithmbase import ConvolutionFilterAlgorithmBase
 from enmapboxprocessing.algorithm.spatialconvolutionairydisk2dalgorithm import SpatialConvolutionAiryDisk2DAlgorithm
 from enmapboxprocessing.algorithm.spatialconvolutionbox2dalgorithm import SpatialConvolutionBox2DAlgorithm
