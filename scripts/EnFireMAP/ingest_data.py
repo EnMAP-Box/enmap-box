@@ -9,7 +9,7 @@ from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from enmapboxprocessing.algorithm.importenmapl2aalgorithm import ImportEnmapL2AAlgorithm
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader
-from qgis._core import QgsVectorLayer
+from qgis.core import QgsVectorLayer
 
 rootData = r'D:\data\EnFireMap\data'
 rootCube = r'D:\data\EnFireMap\cube'
@@ -48,7 +48,7 @@ def ingestData():
         try:
             prefix, datestamp, sceneNo = scene.split('_')
             assert prefix == 'nc'
-        except:
+        except Exception:
             continue
         scenesByDate[datestamp].append(scene)
 

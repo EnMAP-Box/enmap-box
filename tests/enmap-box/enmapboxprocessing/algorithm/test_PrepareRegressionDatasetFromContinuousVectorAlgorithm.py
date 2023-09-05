@@ -1,4 +1,4 @@
-from enmapbox.exampledata import enmap_potsdam, landcover_potsdam_point
+from enmapboxtestdata import enmap_potsdam, landcover_potsdam_point
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousvectoralgorithm import \
     PrepareRegressionDatasetFromContinuousVectorAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase

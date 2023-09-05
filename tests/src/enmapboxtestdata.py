@@ -4,18 +4,34 @@ import warnings
 from os.path import join, dirname, abspath
 from typing import Optional
 
-import enmapboxexampledata.berlin
+import enmapbox.exampledata
 
 _root = abspath(join(dirname(dirname(__file__)), 'testdata'))
-root2 = dirname(enmapboxexampledata.berlin.__file__)
+
+# Berlin example data
+# ...this is the old example dataset, which we still need for unittests
+_subdir = 'exampledata/berlin'
+enmap_berlin = join(_root, _subdir, 'enmap_berlin.bsq')
+enmap_srf_library = join(dirname(__file__), 'enmap_srf_library.gpkg')
+hires_berlin = join(_root, _subdir, 'hires_berlin.bsq')
+landcover_berlin_point = join(_root, _subdir, 'landcover_berlin_point.gpkg')
+landcover_berlin_polygon = join(_root, _subdir, 'landcover_berlin_polygon.gpkg')
+library_berlin = join(_root, _subdir, 'library_berlin.gpkg')
+veg_cover_fraction_berlin_point = join(_root, _subdir, 'veg-cover-fraction_berlin_point.gpkg')
+
+# Potsdam example data
+# ...current example dataset is placed under enmapbox.exampledata
+enmap_potsdam = enmapbox.exampledata.enmap_potsdam
+landcover_potsdam_polygon = enmapbox.exampledata.landcover_potsdam_polygon
+landcover_potsdam_point = enmapbox.exampledata.landcover_potsdam_point
+
+# connect old shortcuts (requested by @jakimow)
+enmap = enmap_berlin
+hires = hires_berlin
+library_gpkg = library_berlin
 
 # RASTER
 _subdir = 'raster'
-
-# - spectral raster
-enmap = join(root2, 'enmap_berlin.bsq')
-hires = join(root2, 'hires_berlin.bsq')
-
 # - rasterized landcover polygons
 landcover_polygon_1m = join(_root, _subdir, 'landcover_polygon_1m.tif')
 landcover_polygon_1m_3classes = join(_root, _subdir, 'landcover_polygon_1m_3classes.tif')
@@ -43,13 +59,13 @@ enmap_grid_300m = join(_root, _subdir, 'enmap_grid_300m.vrt')
 _subdir = 'vector'
 
 # - landcover polygons
-landcover_polygon = join(root2, 'landcover_berlin_polygon.gpkg')
+landcover_polygon = landcover_berlin_polygon
 landcover_polygon_3classes = join(_root, _subdir, 'landcover_polygon_3classes.gpkg')
 landcover_polygon_3classes_id = join(_root, _subdir, 'landcover_polygon_3classes_id.gpkg')
 landcover_polygon_3classes_epsg4326 = join(_root, _subdir, 'landcover_polygon_3classes_EPSG4326.gpkg')
 
 # - landcover points
-landcover_point = join(root2, 'landcover_berlin_point.gpkg')
+landcover_point = landcover_berlin_point
 landcover_points_singlepart_epsg3035 = join(_root, _subdir, 'landcover_point_singlepart_3035.gpkg')
 landcover_points_multipart_epsg3035 = join(_root, _subdir, 'landcover_point_multipart_3035.gpkg')
 

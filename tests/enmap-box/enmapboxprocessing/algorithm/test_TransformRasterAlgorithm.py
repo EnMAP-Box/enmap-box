@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.base import TransformerMixin
 
-from enmapbox.exampledata import enmap
+from enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.fittransformeralgorithmbase import FitTransformerAlgorithmBase
 from enmapboxprocessing.algorithm.inversetransformrasteralgorithm import InverseTransformRasterAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase

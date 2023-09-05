@@ -1,6 +1,6 @@
 from sklearn.base import ClusterMixin, TransformerMixin
 
-from enmapbox.exampledata import enmap
+from enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.fitaffinitypropagationalgorithm import FitAffinityPropagationAlgorithm
 from enmapboxprocessing.algorithm.fitbirchalgorithm import FitBirchAlgorithm
 from enmapboxprocessing.algorithm.fitclustereralgorithmbase import FitClustererAlgorithmBase

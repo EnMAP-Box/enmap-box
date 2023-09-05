@@ -3,7 +3,7 @@ from os.path import exists
 import numpy as np
 from osgeo import gdal
 
-from enmapbox.exampledata import enmap, hires
+from enmapboxtestdata import enmap, hires
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader

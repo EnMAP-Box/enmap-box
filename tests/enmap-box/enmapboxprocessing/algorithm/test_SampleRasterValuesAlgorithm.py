@@ -1,4 +1,4 @@
-from enmapbox.exampledata import enmap, landcover_polygon
+from enmapboxtestdata import enmap, landcover_polygon
 from enmapboxprocessing.algorithm.samplerastervaluesalgorithm import SampleRasterValuesAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import landcover_points_singlepart_epsg3035

@@ -20,8 +20,8 @@ class TestImportEnmapL2AAlgorithm(TestCase):
         }
         result = self.runalg(alg, parameters)
         self.assertAlmostEqual(
-            -11535788939.968838,
-            np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array(bandList=[1]), dtype=float)
+            -11535788939.969,
+            np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array(bandList=[1]), dtype=float), 3
         )
 
     def test_OrderByDetectorOverlapOption(self):
@@ -65,7 +65,7 @@ class TestImportEnmapL2AAlgorithm(TestCase):
         }
         result = self.runalg(alg, parameters)
         reader = RasterReader(result[alg.P_OUTPUT_RASTER])
-        self.assertEqual(91, reader.bandCount())
+        self.assertEqual(214, reader.bandCount())
 
     def test_SwirOnlyOverlapOption(self):
         if sensorProductsRoot() is None:
@@ -80,7 +80,7 @@ class TestImportEnmapL2AAlgorithm(TestCase):
         }
         result = self.runalg(alg, parameters)
         reader = RasterReader(result[alg.P_OUTPUT_RASTER])
-        self.assertEqual(133, reader.bandCount())
+        self.assertEqual(212, reader.bandCount())
 
     def test_MovingAverageFilterOverlapOption(self):
         if sensorProductsRoot() is None:

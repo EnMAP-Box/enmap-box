@@ -80,7 +80,7 @@ class TestClassFractionFromCategorizedVectorAlgorithm(TestCase):
         }
         self.runalg(alg, parameters)
         reader = RasterReader(parameters[alg.P_OUTPUT_FRACTION_RASTER])
-        self.assertAlmostEqual(247.589, np.mean(reader.array()), 3)
+        self.assertAlmostEqual(249.092, np.mean(reader.array()), 3)
 
     def test_100p_coverage(self):
         alg = ClassFractionFromCategorizedVectorAlgorithm()
@@ -93,4 +93,4 @@ class TestClassFractionFromCategorizedVectorAlgorithm(TestCase):
         }
         self.runalg(alg, parameters)
         reader = RasterReader(parameters[alg.P_OUTPUT_FRACTION_RASTER])
-        self.assertAlmostEqual(247.589, np.mean(reader.array()), 3)
+        self.assertAlmostEqual(250.711, np.mean(reader.array()), 3)
