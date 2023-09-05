@@ -498,7 +498,7 @@ def missingTestData() -> bool:
     """
     try:
         import enmapbox.exampledata
-        assert os.path.isfile(enmapbox.exampledata.enmap_potsdam)
+        assert os.path.isfile(enmapbox.exampledata.enmap)
         return False
     except Exception as ex:
         print(ex, file=sys.stderr)
