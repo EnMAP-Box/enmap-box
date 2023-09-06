@@ -195,7 +195,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext
     ) -> Optional[List[str]]:
         if Qgis.versionInt() >= 33200:
-            fields = super().parameterAsString(parameters, name, context)
+            fields = super().parameterAsStrings(parameters, name, context)
         else:
             fields = super().parameterAsFields(parameters, name, context)
         if len(fields) == 0:
