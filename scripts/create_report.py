@@ -3,6 +3,8 @@ This scripts generates some reports stats related to the EnMAP-Box repository
 """
 import argparse
 import csv
+from typing import List, Dict
+
 import requests
 import datetime
 import inspect
@@ -14,6 +16,7 @@ import unittest
 import urllib.request
 import xml.etree.ElementTree as etree
 import pandas as pd
+
 from xlsxwriter.workbook import Workbook
 
 from enmapbox import DIR_REPO_TMP
@@ -93,7 +96,133 @@ def toDate(text, format: str = '%Y-%m-%dT%H:%M:%SZ') -> datetime.datetime:
     return datetime.datetime.strptime(text, format)
 
 
-def report_github_issues() -> pd.DataFrame:
+def report_github_issues_QGIS(authors=['jakimowb', 'janzandr']) -> pd.DataFrame:
+    """
+
+    is:issue created:2022-07-01..2022-12-31
+    is:issue closed:2022-07-01..2022-12-31
+    """
+
+    # GitHub repository owner and name
+    owner = 'qgis'
+    repo = 'QGIS'
+
+    # Define the date range
+    start_date = toDate('2023-01-01', '%Y-%m-%d')
+    end_date = toDate('2023-06-30', '%Y-%m-%d')
+
+    today = datetime.datetime.now().isoformat().split('T')[0]
+
+    PATH_GH_JSON = pathlib.Path(__file__).parents[1] / 'tmp' / f'githubissues.{today}.QGIS.json'
+
+    if not PATH_GH_JSON.is_file():
+        os.makedirs(PATH_GH_JSON.parent, exist_ok=True)
+        # Your GitHub personal access token
+        assert 'GITHUB_TOKEN' in os.environ, 'GITHUB_TOKEN is not set. ' \
+                                             'Read https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens for details.'
+        token = os.environ['GITHUB_TOKEN']
+
+        # Create a session and set the authorization header
+        session = requests.Session()
+        session.headers.update({'Authorization': f'token {token}'})
+
+        # Get the list of issues from the GitHub API
+        issues_url = f'https://api.github.com/repos/{owner}/{repo}/issues'
+        params = {
+            'state': 'all',  # 'all' includes open and closed issues
+            'per_page': 100,  # Adjust as needed
+            'creator': ','.join(authors),
+        }
+        all_issues = []
+
+        n_pages = 1
+        while True:
+            print(f'Read page {n_pages}...')
+            response = session.get(issues_url, params=params)
+
+            response.raise_for_status()
+            all_issues.extend(response.json())
+
+            # Check if there are more pages of issues
+            link_header = response.headers.get('Link', '')
+            if 'rel="next"' not in link_header:
+                break
+
+            rx = re.compile(r'<(.[^>]+)>; *rel="next"')
+
+            # Extract the URL for the next page
+            link = [l.strip() for l in link_header.split(',') if 'rel="next"' in l]
+            if len(link) > 0:
+                link = link[0]
+                issues_url = rx.match(link).group(1)
+            else:
+                response.close()
+                break
+            n_pages += 1
+        with open(PATH_GH_JSON, 'w') as f:
+            json.dump(all_issues, f)
+
+    with open(PATH_GH_JSON, 'r') as f:
+        all_issues = json.load(f)
+
+    # filter by authors
+
+    pull_requests = [i for i in all_issues if 'pull_request' in i]
+    issues = [i for i in all_issues if 'pull_request' not in i]
+    if True:
+        for i in issues:
+            if i['closed_at'] and toDate(i['closed_at']) > end_date:
+                i['closed_at'] = None
+            else:
+                s = ""
+
+    # Filter issues within the date range
+
+    created_in_report_period = [i for i in issues if start_date <= toDate(i['created_at']) <= end_date]
+    created_before_but_touched = [i for i in issues if toDate(i['created_at']) < start_date
+                                  and start_date <= toDate(i['updated_at']) <= end_date]
+
+
+    def printInfos(issues: List[dict], labels=['duplicate', 'wontfix']):
+        is_closed = []
+        is_open = []
+
+        issues_by_label: Dict[str, List[dict]] = dict()
+        for i in issues:
+            if i['closed_at'] is None:
+                is_open.append(i)
+            else:
+                is_closed.append(i)
+
+            for label in i['labels']:
+                n = label['name']
+                issues_by_label[n] = issues_by_label.get(n, []) + [i]
+
+        n_t = len(issues)
+        print(' Total: {:3}'.format(n_t))
+        if n_t > 0:
+            n_o = len(is_open)
+            n_c = len(is_closed)
+
+            print('  Open: {:3} {:0.2f}%'.format(n_o, n_o/n_t*100))
+            print('Closed: {:3} {:0.2f}%'.format(n_c, n_c/n_t*100))
+            for label in labels:
+                print(f' {label}: {len(issues_by_label.get(label, []))}')
+
+    print(f'By today: {today}')
+    print(f'Issues created in reporting period: {start_date} to {end_date}:')
+    printInfos(created_in_report_period)
+
+    print(f'Issues created before {start_date} but handled in reporting period:')
+    printInfos(created_before_but_touched)
+
+    print(f'Total:')
+    printInfos(created_before_but_touched + created_in_report_period)
+    return None
+
+
+
+def report_github_issues_EnMAPBox() -> pd.DataFrame:
     """
 
     is:issue created:2022-07-01..2022-12-31
@@ -161,36 +290,54 @@ def report_github_issues() -> pd.DataFrame:
         all_issues = json.load(f)
     pull_requests = [i for i in all_issues if 'pull_request' in i]
     issues = [i for i in all_issues if 'pull_request' not in i]
+    if True:
+        for i in issues:
+            if i['closed_at'] and toDate(i['closed_at']) > end_date:
+                i['closed_at'] = None
+            else:
+                s = ""
+
 
     # Filter issues within the date range
 
-    issues_created = [i for i in issues if start_date <= toDate(i['created_at']) <= end_date]
-    issues_updated = [i for i in issues if start_date <= toDate(i['updated_at']) <= end_date and toDate(i['created_at']) < start_date]
+    created_in_report_period = [i for i in issues if start_date <= toDate(i['created_at']) <= end_date]
+    created_before_but_touched = [i for i in issues if toDate(i['created_at']) < start_date
+                                  and start_date <= toDate(i['updated_at']) <= end_date]
 
 
-    def printInfos(issues):
+    def printInfos(issues: List[dict], labels=['duplicate', 'wontfix']):
         is_closed = []
         is_open = []
-        is_duplicate = []
-        is_wontfix = []
+
+        issues_by_label: Dict[str, List[dict]] = dict()
         for i in issues:
-            pass
-        is_closed = [i for i in issues_created if 'closed_at' in i and toDate(i['closed_at']) <= end_date]
-        is_open = [i for i in issues_created if i['closed_at'] > 0]
-        is_duplicate = [i for i in issues_created if i['closed_at'] > 0]
-        is_wontfix = [i for i in issues_created if i['closed_at'] > 0]
-        print(f' Total: {len(issues)}')
-        print(f' Open: {len(is_open)}')
-        print(f' Closed: {len(is_closed)}')
+            if i['closed_at'] is None:
+                is_open.append(i)
+            else:
+                is_closed.append(i)
 
-    print(f'Issues created in reporting period: {start_date} to {end_date}')
-    print(f'Total: {len(issues_created)}')
+            for label in i['labels']:
+                n = label['name']
+                issues_by_label[n] = issues_by_label.get(n, []) + [i]
+
+        n_t = len(issues)
+        n_o = len(is_open)
+        n_c = len(is_closed)
+        print(' Total: {:3}'.format(n_t))
+        print('  Open: {:3} {:0.2f}%'.format(n_o, n_o/n_t*100))
+        print('Closed: {:3} {:0.2f}%'.format(n_c, n_c/n_t*100))
+        for label in labels:
+            print(f' {label}: {len(issues_by_label.get(label, []))}')
+
     print(f'By today: {today}')
-    printInfos(issues_created)
+    print(f'Issues created in reporting period: {start_date} to {end_date}:')
+    printInfos(created_in_report_period)
 
-    print(f'Issues created before {start_date} but handled in reporting period')
-    printInfos(issues_updated)
+    print(f'Issues created before {start_date} but handled in reporting period:')
+    printInfos(created_before_but_touched)
 
+    print(f'Total:')
+    printInfos(created_before_but_touched + created_in_report_period)
     return None
 
 
@@ -395,9 +542,13 @@ def report_bitbucket_issues(self):
 
 class TestCases(unittest.TestCase):
 
-    def test_github_2(self):
+    def test_github_EnMAPBox(self):
 
-        report_github_issues()
+        report_github_issues_EnMAPBox()
+
+    def test_github_QGIS(self):
+
+        report_github_issues_QGIS()
 
 
 if __name__ == "__main__":
