@@ -40,7 +40,13 @@ class TestEditRasterSourceBandPropertiesAlgorithm(TestCase):
 
     def test_name_withCounterVariable(self):
         filename = self.copyEnmap()
-        values = [f'band {bandNo}' for bandNo in range(1, 178)]
+
+        # fix BJ: I assue values should contain the GDAL names
+        # without QGIS prefix, right?
+        # values = [f'band {bandNo}' for bandNo in range(1, 178)]
+        ds: gdal.Dataset = gdal.Open(filename)
+        values = [ds.GetRasterBand(b).GetDescription() for b in range(1, ds.RasterCount+1)]
+
         alg = EditRasterSourceBandPropertiesAlgorithm()
         parameters = {
             alg.P_SOURCE: filename,
