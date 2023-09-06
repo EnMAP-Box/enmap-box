@@ -166,7 +166,7 @@ class TestRasterMathAlgorithm(TestCase):
     def test_externalRasterLayer(self):
         alg = RasterMathAlgorithm()
         parameters = {
-            alg.P_CODE: f"# enmap := QgsRasterLayer('{enmap}')\n"
+            alg.P_CODE: f"# enmap := QgsRasterLayer(r'{enmap}')\n"
                         'enmap',
             alg.P_OUTPUT_RASTER: self.filename('raster.tif')
         }
@@ -177,7 +177,7 @@ class TestRasterMathAlgorithm(TestCase):
     def test_externalRasterLayer_withAt(self):
         alg = RasterMathAlgorithm()
         parameters = {
-            alg.P_CODE: f"# enmap := QgsRasterLayer('{enmap}')\n"
+            alg.P_CODE: f"# enmap := QgsRasterLayer(r'{enmap}')\n"
                         'raster1 = enmap@42\n'  # band 42 by index
                         'raster2 = enmapMask@42\n'
                         'raster3 = enmap@685nm\n'  # band 42 by wavelength
@@ -210,7 +210,7 @@ class TestRasterMathAlgorithm(TestCase):
     def test_externalVectorLayer_field(self):
         alg = RasterMathAlgorithm()
         parameters = {
-            alg.P_CODE: f"# landcover := QgsVectorLayer('{landcover_polygon}')\n"
+            alg.P_CODE: f"# landcover := QgsVectorLayer(r'{landcover_polygon}')\n"
                         'landcover@"level_3_id"',
             alg.P_GRID: enmap,
             alg.P_OUTPUT_RASTER: self.filename('dummy.tif')
@@ -222,7 +222,7 @@ class TestRasterMathAlgorithm(TestCase):
     def test_externalVectorLayer_mask(self):
         alg = RasterMathAlgorithm()
         parameters = {
-            alg.P_CODE: f"# landcover := QgsVectorLayer('{landcover_polygon}')\n"
+            alg.P_CODE: f"# landcover := QgsVectorLayer(r'{landcover_polygon}')\n"
                         'landcover',
             alg.P_GRID: enmap,
             alg.P_OUTPUT_RASTER: self.filename('dummy.tif')
