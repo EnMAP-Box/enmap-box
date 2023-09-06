@@ -1,5 +1,5 @@
 from typing import List, Iterator, Dict, Union
-from enmapbox import messageLog
+from enmapbox import messageLog, RAISE_ALL_EXCEPTIONS
 from enmapbox.gui.datasources.datasources import DataSource
 from enmapbox.gui.datasources.datasourcesets import DataSourceSet
 from enmapbox.gui.datasources.manager import DataSourceManagerTreeView
@@ -108,6 +108,8 @@ class EnMAPBoxContextMenuRegistry(QObject):
                 p.populateMapCanvasMenu(menu, mapCanvas, pos, point)
             except Exception as ex:
                 self.logError(ex)
+                if RAISE_ALL_EXCEPTIONS:
+                    raise ex
         return len(self.mErrorList) == 0
 
     def populateDataViewMenu(self,
@@ -120,6 +122,8 @@ class EnMAPBoxContextMenuRegistry(QObject):
                 p.populateDataViewMenu(menu, view, node)
             except Exception as ex:
                 self.logError(ex)
+                if RAISE_ALL_EXCEPTIONS:
+                    raise ex
         return len(self.mErrorList) == 0
 
     def populateDataSourceMenu(self,
@@ -132,4 +136,6 @@ class EnMAPBoxContextMenuRegistry(QObject):
                 p.populateDataSourceMenu(menu, treeView, selectedNodes)
             except Exception as ex:
                 self.logError(ex)
+                if RAISE_ALL_EXCEPTIONS:
+                    raise ex
         return len(self.mErrorList) == 0
