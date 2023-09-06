@@ -182,7 +182,6 @@ def report_github_issues_QGIS(authors=['jakimowb', 'janzandr']) -> pd.DataFrame:
     created_before_but_touched = [i for i in issues if toDate(i['created_at']) < start_date
                                   and start_date <= toDate(i['updated_at']) <= end_date]
 
-
     def printInfos(issues: List[dict], labels=['duplicate', 'wontfix']):
         is_closed = []
         is_open = []
@@ -204,8 +203,8 @@ def report_github_issues_QGIS(authors=['jakimowb', 'janzandr']) -> pd.DataFrame:
             n_o = len(is_open)
             n_c = len(is_closed)
 
-            print('  Open: {:3} {:0.2f}%'.format(n_o, n_o/n_t*100))
-            print('Closed: {:3} {:0.2f}%'.format(n_c, n_c/n_t*100))
+            print('  Open: {:3} {:0.2f}%'.format(n_o, n_o / n_t * 100))
+            print('Closed: {:3} {:0.2f}%'.format(n_c, n_c / n_t * 100))
             for label in labels:
                 print(f' {label}: {len(issues_by_label.get(label, []))}')
 
@@ -216,10 +215,9 @@ def report_github_issues_QGIS(authors=['jakimowb', 'janzandr']) -> pd.DataFrame:
     print(f'Issues created before {start_date} but handled in reporting period:')
     printInfos(created_before_but_touched)
 
-    print(f'Total:')
+    print('Total:')
     printInfos(created_before_but_touched + created_in_report_period)
     return None
-
 
 
 def report_github_issues_EnMAPBox() -> pd.DataFrame:
@@ -247,8 +245,6 @@ def report_github_issues_EnMAPBox() -> pd.DataFrame:
         assert 'GITHUB_TOKEN' in os.environ, 'GITHUB_TOKEN is not set. ' \
                                              'Read https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens for details.'
         token = os.environ['GITHUB_TOKEN']
-
-
 
         # Create a session and set the authorization header
         session = requests.Session()
@@ -297,13 +293,11 @@ def report_github_issues_EnMAPBox() -> pd.DataFrame:
             else:
                 s = ""
 
-
     # Filter issues within the date range
 
     created_in_report_period = [i for i in issues if start_date <= toDate(i['created_at']) <= end_date]
     created_before_but_touched = [i for i in issues if toDate(i['created_at']) < start_date
                                   and start_date <= toDate(i['updated_at']) <= end_date]
-
 
     def printInfos(issues: List[dict], labels=['duplicate', 'wontfix']):
         is_closed = []
@@ -324,8 +318,8 @@ def report_github_issues_EnMAPBox() -> pd.DataFrame:
         n_o = len(is_open)
         n_c = len(is_closed)
         print(' Total: {:3}'.format(n_t))
-        print('  Open: {:3} {:0.2f}%'.format(n_o, n_o/n_t*100))
-        print('Closed: {:3} {:0.2f}%'.format(n_c, n_c/n_t*100))
+        print('  Open: {:3} {:0.2f}%'.format(n_o, n_o / n_t * 100))
+        print('Closed: {:3} {:0.2f}%'.format(n_c, n_c / n_t * 100))
         for label in labels:
             print(f' {label}: {len(issues_by_label.get(label, []))}')
 
@@ -336,7 +330,7 @@ def report_github_issues_EnMAPBox() -> pd.DataFrame:
     print(f'Issues created before {start_date} but handled in reporting period:')
     printInfos(created_before_but_touched)
 
-    print(f'Total:')
+    print('Total:')
     printInfos(created_before_but_touched + created_in_report_period)
     return None
 
@@ -543,11 +537,9 @@ def report_bitbucket_issues(self):
 class TestCases(unittest.TestCase):
 
     def test_github_EnMAPBox(self):
-
         report_github_issues_EnMAPBox()
 
     def test_github_QGIS(self):
-
         report_github_issues_QGIS()
 
 
