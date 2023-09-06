@@ -1,5 +1,6 @@
 from typing import List, Iterator, Dict, Union
-from enmapbox import messageLog, RAISE_ALL_EXCEPTIONS
+
+from enmapbox import messageLog
 from enmapbox.gui.datasources.datasources import DataSource
 from enmapbox.gui.datasources.datasourcesets import DataSourceSet
 from enmapbox.gui.datasources.manager import DataSourceManagerTreeView
@@ -103,12 +104,13 @@ class EnMAPBoxContextMenuRegistry(QObject):
                               pos: QPoint,
                               point: QgsPointXY) -> bool:
         self.mErrorList.clear()
-        for p in EnMAPBoxContextMenuRegistry.instance():
+        import enmapbox
+        for p in self:
             try:
                 p.populateMapCanvasMenu(menu, mapCanvas, pos, point)
             except Exception as ex:
                 self.logError(ex)
-                if RAISE_ALL_EXCEPTIONS:
+                if enmapbox.RAISE_ALL_EXCEPTIONS:
                     raise ex
         return len(self.mErrorList) == 0
 
@@ -117,12 +119,13 @@ class EnMAPBoxContextMenuRegistry(QObject):
                              view: DockTreeView,
                              node: QgsLayerTreeNode) -> bool:
         self.mErrorList.clear()
+        import enmapbox
         for p in self:
             try:
                 p.populateDataViewMenu(menu, view, node)
             except Exception as ex:
                 self.logError(ex)
-                if RAISE_ALL_EXCEPTIONS:
+                if enmapbox.RAISE_ALL_EXCEPTIONS:
                     raise ex
         return len(self.mErrorList) == 0
 
@@ -131,11 +134,12 @@ class EnMAPBoxContextMenuRegistry(QObject):
                                treeView: DataSourceManagerTreeView,
                                selectedNodes: List[Union[DataSourceSet, DataSource]]) -> bool:
         self.mErrorList.clear()
+        import enmapbox
         for p in self:
             try:
                 p.populateDataSourceMenu(menu, treeView, selectedNodes)
             except Exception as ex:
                 self.logError(ex)
-                if RAISE_ALL_EXCEPTIONS:
+                if enmapbox.RAISE_ALL_EXCEPTIONS:
                     raise ex
         return len(self.mErrorList) == 0
