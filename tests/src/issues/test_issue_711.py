@@ -24,6 +24,7 @@ import enmapbox.exampledata
 import qgis
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
+from enmapboxtestdata import library_gpkg, enmap_srf_library
 from qgis.core import QgsProject
 
 
@@ -59,8 +60,8 @@ class TestIssue711(EnMAPBoxTestCase):
             sources += [enmapbox.exampledata.enmap,
                         enmapbox.exampledata.landcover_polygon,
                         enmapbox.exampledata.landcover_point,
-                        enmapbox.exampledata.library_gpkg,
-                        enmapbox.exampledata.enmap_srf_library
+                        library_gpkg,
+                        enmap_srf_library
                         ]
 
             sources += [TestObjects.createVectorLayer(),
