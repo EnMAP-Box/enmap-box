@@ -18,8 +18,8 @@ class TestEditRasterSourceBandPropertiesAlgorithm(TestCase):
         parameters = {
             alg.P_RASTER: enmap,
             alg.P_OFFSET: -9999,
-            alg.P_CREATION_PROFILE: alg.VrtFormat,
-            alg.P_OUTPUT_RASTER: self.filename('enmap.vrt')
+            alg.P_CREATION_PROFILE: alg.GTiffFormat,
+            alg.P_OUTPUT_RASTER: self.filename('enmap.tif')
         }
         self.runalg(alg, parameters)
 
@@ -40,6 +40,7 @@ class TestEditRasterSourceBandPropertiesAlgorithm(TestCase):
 
     def test_name_withCounterVariable(self):
         filename = self.copyEnmap()
+        print(filename)
         values = [f'band {bandNo}' for bandNo in range(1, 178)]
         alg = EditRasterSourceBandPropertiesAlgorithm()
         parameters = {
@@ -48,6 +49,7 @@ class TestEditRasterSourceBandPropertiesAlgorithm(TestCase):
         }
         self.runalg(alg, parameters)
         reader = RasterReader(filename)
+        print(filename)
         self.assertListEqual(values, [reader.bandName(bandNo) for bandNo in reader.bandNumbers()])
 
     def test_wavelength(self):

@@ -4,7 +4,7 @@ from enmapboxprocessing.algorithm.testcase import TestCase
 from qgis.core import QgsRasterLayer
 
 
-class TestRandomPointsInMaskAlgorithm(TestCase):
+class TestRandomPointsFromMaskRasterAlgorithm(TestCase):
 
     def test(self):
         alg = RandomPointsFromMaskRasterAlgorithm()

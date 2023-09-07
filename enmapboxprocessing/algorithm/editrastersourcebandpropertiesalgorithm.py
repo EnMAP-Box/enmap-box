@@ -107,6 +107,8 @@ class EditRasterSourceBandPropertiesAlgorithm(EnMAPProcessingAlgorithm):
         if names is not None:
             for bandNo, name in enumerate(names, 1):
                 writer.setBandName(name, bandNo)
+                assert name == writer.gdalBand(bandNo).GetDescription()
+
         if wavelengths is not None:
             for bandNo, wavelength in enumerate(wavelengths, 1):
                 writer.setWavelength(wavelength, bandNo)
