@@ -30,13 +30,13 @@ import subprocess
 import sys
 import time
 import typing
-from difflib import SequenceMatcher
 from typing import List
 
 import requests
+
 from enmapbox import debugLog
-from enmapbox.qgispluginsupport.qps.utils import qgisAppQgisInterface
 from enmapbox.enmapboxsettings import EnMAPBoxSettings
+from enmapbox.qgispluginsupport.qps.utils import qgisAppQgisInterface
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import \
     pyqtSignal, pyqtSlot, Qt, \
