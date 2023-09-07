@@ -125,6 +125,7 @@ def enmapboxSettings() -> QSettings:
 
 settings = enmapboxSettings()
 DEBUG = str(os.environ.get('DEBUG', False)).lower() in ['1', 'true']
+RAISE_ALL_EXCEPTIONS = str(os.environ.get('RAISE_ALL_EXCEPTIONS', False)).lower() in ['1', 'true']
 
 
 def icon() -> QIcon:
