@@ -244,17 +244,7 @@ def localPythonExecutable() -> pathlib.Path:
     Searches for the local python executable
     :return:
     """
-
-    candidates = [shutil.which('python3'),
-                  shutil.which('python')]
-
-    candidates = [c for c in candidates if isinstance(c, str) and os.path.isfile(c)]
-
-    r = os.path.dirname(os.__file__)
-    similarity = [SequenceMatcher(None, r, c).ratio() for c in candidates]
-
-    pyexe = candidates[similarity.index(max(similarity))]
-    return pathlib.Path(pyexe)
+    return pathlib.Path(sys.executable).resolve()
 
 
 class PIPPackageInfoTask(QgsTask):
@@ -974,9 +964,12 @@ class PIPPackageInstaller(QWidget):
         qgsTask.taskTerminated.connect(lambda *args, tid=tid: self.onRemoveTask(tid))
         qgsTask.sigMessage.connect(self.onTaskMessage)
         self.mTasks[tid] = qgsTask
-        tm = QgsApplication.taskManager()
-        assert isinstance(tm, QgsTaskManager)
-        tm.addTask(qgsTask)
+        if False:
+            tm = QgsApplication.taskManager()
+            assert isinstance(tm, QgsTaskManager)
+            tm.addTask(qgsTask)
+        else:
+            qgsTask.run()
 
     def onTaskMessage(self, msg: str, is_error: bool):
         if is_error:
