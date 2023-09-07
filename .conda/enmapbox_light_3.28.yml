@@ -4,9 +4,10 @@ name: enmapbox_light_3.28
 channels:
   - conda-forge
 dependencies:
+  - python>=3.11
   - qgis=3.28
   - pip
-  -
+
   # Development
   - gitpython
   - git-lfs

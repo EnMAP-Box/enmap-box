@@ -5,6 +5,7 @@ channels:
   - conda-forge
 dependencies:
   - qgis=3.28
+  - python>=3.11
   - pip
   -
   # Development
