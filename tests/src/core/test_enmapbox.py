@@ -253,6 +253,7 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
 
         lastValue = enmapbox.RAISE_ALL_EXCEPTIONS
 
+        reg0 = EnMAPBoxContextMenuRegistry.instance()
         reg = EnMAPBoxContextMenuRegistry()
         reg.addProvider(ErrorProvider())
 
