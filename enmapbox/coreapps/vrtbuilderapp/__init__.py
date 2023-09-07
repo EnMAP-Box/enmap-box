@@ -28,6 +28,7 @@ from typing import Union, List, Optional
 from osgeo import gdal
 
 from enmapbox.gui.contextmenuprovider import EnMAPBoxContextMenuProvider
+from enmapbox.gui.contextmenus import EnMAPBoxAbstractContextMenuProvider
 from enmapbox.gui.datasources.datasources import DataSource
 from enmapbox.gui.datasources.datasourcesets import DataSourceSet
 from qgis.PyQt.QtWidgets import QMessageBox, QMainWindow, QMenu
@@ -162,7 +163,7 @@ class VRTBuilderApp(EnMAPBoxApplication):
             w.createCurrentMapTool(mapCanvas)
 
 
-class VRTBuilderAppContextMenuProvider(EnMAPBoxContextMenuProvider):
+class VRTBuilderAppContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
     """
     This class creates EnMAP-Box context menus to interact with the VRTBuilder
     """
