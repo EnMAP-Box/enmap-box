@@ -16,10 +16,10 @@ on:
 jobs:
   # Run EnMAP-Box tests
   test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
-        qgis_version: [release-3_28, release-3_30, latest]
+        qgis_version: [release-3_28, release-3_32]
         python: [3.10]
     env:
         QGIS_TEST_VERSION: ${{ matrix.qgis_version}}

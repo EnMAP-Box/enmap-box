@@ -134,6 +134,7 @@ from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromvectorandfieldsa
 from enmapboxprocessing.algorithm.randompointsfromcategorizedrasteralgorithm import \
     RandomPointsFromCategorizedRasterAlgorithm
 from enmapboxprocessing.algorithm.randompointsfrommaskrasteralgorithm import RandomPointsFromMaskRasterAlgorithm
+from enmapboxprocessing.algorithm.randompointsfromrasteralgorithm import RandomPointsFromRasterAlgorithm
 from enmapboxprocessing.algorithm.randomsamplesfromclassificationdatasetalgorithm import \
     RandomSamplesFromClassificationDatasetAlgorithm
 from enmapboxprocessing.algorithm.randomsamplesfromregressiondatasetalgorithm import \
@@ -333,8 +334,9 @@ def algorithms():
         PrepareUnsupervisedDatasetFromFileAlgorithm(),
         PrepareUnsupervisedDatasetFromVectorAndFieldsAlgorithm(),
         PrepareUnsupervisedDatasetFromJsonAlgorithm(),
-        RandomPointsFromMaskRasterAlgorithm(),
         RandomPointsFromCategorizedRasterAlgorithm(),
+        RandomPointsFromMaskRasterAlgorithm(),
+        RandomPointsFromRasterAlgorithm(),
         RandomSamplesFromClassificationDatasetAlgorithm(),
         RandomSamplesFromRegressionDatasetAlgorithm(),
         RasterizeCategorizedVectorAlgorithm(),

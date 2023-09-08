@@ -356,10 +356,8 @@ def initAll():
     initEnMAPBoxResources()
     from enmapbox.qgispluginsupport.qps import \
         registerSpectralLibraryIOs, \
-        registerSpectralProfileSamplingModes, \
         registerSpectralLibraryPlotFactories
     registerSpectralLibraryIOs()
-    registerSpectralProfileSamplingModes()
     registerSpectralLibraryPlotFactories()
 
     registerEditorWidgets()
