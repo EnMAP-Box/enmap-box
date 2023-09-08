@@ -136,7 +136,7 @@ class RandomPointsFromCategorizedRasterAlgorithm(EnMAPProcessingAlgorithm):
                     indices = np.where(mask.flat)[0]
                     if len(indices) == 0:
                         feedback.pushInfo(
-                            f"Could only draw {i + 1} points ({n} requested) for category '{category.name}'."
+                            f"Could only draw {i} points ({n} requested) for category '{category.name}'."
                         )
                         break  # no pixel left
                     if len(indices) == 1:
