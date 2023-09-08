@@ -21,7 +21,7 @@ jobs:
     strategy:
       matrix:
         qgis_version: [release-3_28, release-3_32]
-        python: [3.10]
+        python: [3.9]
     env:
         QGIS_TEST_VERSION: ${{ matrix.qgis_version}}
     steps:
