@@ -14,15 +14,14 @@ jobs:
     name: Python Lint
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Python
-        uses: actions/setup-python@v2.3.1
-        with:
-          python-version: 3.10
-          architecture: x64
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
       - name: Run flake8
-        uses: julianwachholz/flake8-action@v2.0.2
+        uses: julianwachholz/flake8-action@v2
         with:
           checkName: 'Python Lint'
           plugins: flake8-qgis
