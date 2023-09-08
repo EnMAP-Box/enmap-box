@@ -34,43 +34,39 @@ However, the following steps show you how to run the EnMAP-Box from python witho
 
 ## 1. Install QGIS
 
-### conda / mamba environment (all OS)
+### conda / mamba (all OS)
 
-Call one of the following commands to install a QGIS environment for the EnMAP-Box. 
+1. Install conda / mamba
 
-`latest` = most-recent QGIS version available in the [conda-forge](https://conda-forge.org/) channel.
+2. Install one of the QGIS + EnMAP-Box environments listed in https://github.com/EnMAP-Box/enmap-box/tree/main/.conda
+   
+   `latest` = the most-recent QGIS version available in the [conda-forge](https://conda-forge.org/) channel.
+   
+   `light` = basic QGIS installation only. No additional packages. In this environment the EnMAP-Box provides basic 
+         visualization features only.
+   
+   `full` = QGIS + all other python requirements that allow to run all EnMAP-Box features
 
-`light` = basic QGIS installation only. No additional packages. In this environment the EnMAP-Box provides basic 
-      visualization features only.
+   Examples:
+   ````bash
+   mamba env create -n enmapbox_full_latest -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_latest.yml
+   mamba env create -n enmapbox_full_3.28 -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_3.28.yml
+   mamba env create -n enmapbox_light_latest -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_light_latest.yml
+   mamba env create -n enmapbox_light_3.28 -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_light_3.28.yml
+   ````
 
-`full` = QGIS + all other python requirements that allow to run all EnMAP-Box features 
+* You can update an existing environment with `mamba update`, e.g:
+   
+   ````bash
+   mamba env update -n enmapbox_full_3.28 --prune -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_3.28.yml
+   ````
 
-````bash
-mamba env create -n enmapbox_full_latest -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_latest.yml
-mamba env create -n enmapbox_full_3.28 -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_3.28.yml
-mamba env create -n enmapbox_light_latest -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_light_latest.yml
-mamba env create -n enmapbox_light_3.28 -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_light_3.28.yml
-````
+* `--prune` causes conda to remove any dependencies that are no longer required from the environment.
 
-You can update an existing environment with `mamba update`, e.g:
+### Windows / Linux / MacOS
 
-````bash
-mamba env update -n enmapbox_full_3.28 --prune -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_3.28.yml
-````
+ Follow install instructions described here: https://qgis.org/en/site/forusers/download.html
 
-`--prune` causes conda to remove any dependencies that are no longer required from the environment.
-
-### Windows OSGeo4W installer
-
- tbd.
-
-### Linux
-
- tbd.
-
-### MacOS
-
- tbd.
 
 ## 2. Clone this repository
 
@@ -78,12 +74,15 @@ Use the following commands to clone the EnMAP-Box and update its submodules:
 
 ### TLDR:
 
-Open a shell that allows to run git and python with PyQGIS, then run:
+Open a shell (e.g. OSGeo4W or mamba) that allows to run git and python with PyQGIS, then run:
+
 
 ````bash
-
+# Clone the repository using ssh 
+# See https://docs.github.com/en/authentication/connecting-to-github-with-ssh for details on SSH
 git clone --recurse-submodules git@github.com:EnMAP-Box/enmap-box.git
-# alternatively, but not recommended, you can use https as well:
+
+# alternatively (but not recommended) you can use https as well:
 # git clone --recurse-submodules https://github.com/EnMAP-Box/enmap-box.git
 
 cd enmap-box
