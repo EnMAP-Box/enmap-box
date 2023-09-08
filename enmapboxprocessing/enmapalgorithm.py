@@ -10,6 +10,7 @@ import numpy as np
 from osgeo import gdal
 
 import processing
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.glossary import injectGlossaryLinks
 from enmapboxprocessing.parameter.processingparameterrasterdestination import ProcessingParameterRasterDestination
@@ -29,8 +30,7 @@ from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer
                        QgsProcessingParameterCrs, QgsProcessingParameterVectorDestination, QgsProcessing,
                        QgsProcessingUtils, QgsProcessingParameterMultipleLayers, QgsProcessingException,
                        QgsProcessingParameterFolderDestination, QgsProject, QgsProcessingOutputLayerDefinition,
-                       QgsProperty)
-from enmapbox.typeguard import typechecked
+                       QgsProperty, QgsProcessingParameterMatrix)
 
 
 class AlgorithmCanceledException(Exception):
@@ -312,6 +312,14 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             ints = None
         return ints
 
+    def parameterAsBand(
+            self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext
+    ) -> Optional[int]:
+        bandNo = self.parameterAsInt(parameters, name, context)
+        if bandNo is None or bandNo == -1:
+            return None
+        return bandNo
+
     def parameterAsRange(
             self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext
     ) -> Optional[Tuple[float, float]]:
@@ -503,6 +511,11 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
                       f'use {extensions} instead'
             raise QgsProcessingException(message)
         return format, options
+
+    def parameterAsMatrix(
+            self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext
+    ) -> Optional[List[Any]]:
+        return parameters.get(name)
 
     def parameterIsNone(self, parameters: Dict[str, Any], name: str):
         return parameters.get(name, None) is None
@@ -935,6 +948,17 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     ):
         options = self.O_RESAMPLE_ALG
         self.addParameterEnum(name, description, options, False, defaultValue, optional, advanced)
+
+    def addParameterMatrix(
+            self, name: str, description: str, numberRows=3, hasFixedNumberRows=False, headers: Iterable[str] = None,
+            defaultValue=None, optional=False, advanced=False
+    ):
+        self.addParameter(
+            QgsProcessingParameterMatrix(
+                name, description, numberRows, hasFixedNumberRows, headers, defaultValue, optional
+            )
+        )
+        self.flagParameterAsAdvanced(name, advanced)
 
     def flagParameterAsAdvanced(self, name: str, advanced: bool):
         if advanced:
