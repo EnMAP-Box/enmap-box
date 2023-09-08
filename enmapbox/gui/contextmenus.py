@@ -56,7 +56,6 @@ class EnMAPBoxContextMenuRegistry(QObject):
         return EnMAPBoxContextMenuRegistry._instance
 
     def __init__(self, *args, **kwds):
-        assert self._instance is None, 'EnMAPBoxContextMenuRegistry already instantiated'
         super().__init__(*args, **kwds)
 
         self.mProviders: List[EnMAPBoxAbstractContextMenuProvider] = []
