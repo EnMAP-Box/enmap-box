@@ -17,7 +17,7 @@ on:
 jobs:
   # Run EnMAP-Box tests
   test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         qgis_version: [release-3_28, release-3_32]

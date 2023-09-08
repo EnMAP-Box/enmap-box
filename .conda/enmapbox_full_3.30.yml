@@ -4,9 +4,9 @@ name: enmapbox_full_3.30
 channels:
   - conda-forge
 dependencies:
-  - python=3.11
-  - ipython
+  - python>=3.11
   - qgis=3.30
+  - ipython
   - pip  # avoids that conda uses the wrong pip
   - enpt
   - xgboost
