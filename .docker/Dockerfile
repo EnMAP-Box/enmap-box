@@ -2,7 +2,7 @@ ARG QGIS_TEST_VERSION=latest
 FROM  qgis/qgis:${QGIS_TEST_VERSION}
 MAINTAINER Benjamin Jakimow <benjamin.jakimow@geo.hu-berlin.de>
 
-LABEL Description="Docker container with QGIS + EnMAP-Box" Vendor="QGIS.org"
+LABEL Description="Docker container with QGIS + EnMAP-Box" Vendor="enmap.org"
 
 RUN apt-get update && \
     apt-get -y install python3-pip wget unzip \
@@ -10,6 +10,12 @@ RUN apt-get update && \
 
 RUN apt-get update
 
+
+RUN echo "Basic python environment:"
+RUN python3 --version
+RUN pip3 list
+
+RUN echo "Install missing EnMAP-Box requirements:"
 COPY ./requirements.txt /tmp/
 COPY ./requirements_developer.txt /tmp/
 RUN pip3 install -r /tmp/requirements.txt
