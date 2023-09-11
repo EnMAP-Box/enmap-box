@@ -38,7 +38,7 @@ However, the following steps show you how to run the EnMAP-Box from python witho
 
 ### conda / mamba (all OS)
 
-1. Install conda / mamba
+1. Install conda / mamba (prefered), as described [here](https://mamba.readthedocs.io/en/latest/mamba-installation.html#mamba-install)  
 
 2. Install one of the QGIS + EnMAP-Box environments listed in https://github.com/EnMAP-Box/enmap-box/tree/main/.conda
    
@@ -72,14 +72,70 @@ However, the following steps show you how to run the EnMAP-Box from python witho
 
  Either use mamba (see above), or follow the OS-specific instructions here: https://qgis.org/en/site/forusers/download.html
 
+## 2. Test the QGIS environment
 
-## 2. Clone this repository
+You need to be able to run the following commands from your shell:
+1. Git (to check out the EnMAP-Box repository)
+    
+    ````shell
+    $git --version
+    ````
+   
+   Test if git can connect to the remote EnMAP-Box repository:
+   
+   * ssh (recommended): `git ls-remote git@github.com:EnMAP-Box/enmap-box.git`
+   * https: `git ls-remote https://github.com/EnMAP-Box/enmap-box.git`
+  
+
+2. [QGIS](https://qgis.org), [Qt Designer](https://doc.qt.io/qt-6/qtdesigner-manual.html) (to design GUIs) and the [Qt Assistant](https://doc.qt.io/qt-6/assistant-details.html) (superfast browsing of Qt / QGIS API documents)
+    
+    ````bash
+    $qgis --version
+    $designer
+    $assistant
+    ````
+3. Check if all environmental variables are set correctly. Start Python and try to use the QGIS API: 
+
+    ````bash
+    $python
+    Python 3.9.18 | packaged by conda-forge | (main, Aug 30 2023, 03:40:31) [MSC v.1929 64 bit (AMD64)] on win32
+    Type "help", "copyright", "credits" or "license" for more information.
+    ````
+    Print the QGIS version   
+    ````shell
+    >>> from qgis.core import Qgis
+    >>> print(Qgis.version())
+    3.28.10-Firenze
+    ````
+
+    Import the QGIS Processing Framework    
+
+    ````
+    >>> import processing
+    Application path not initialized
+    ````
+   (Don't worry about the *Application path not initialized* message)
+
+
+If one of these tests fail, check the values for the follwing variables in your local environment:
+
+* `PATH` - needs to include the directories with your git and qgis executable 
+
+* `PYTHONPATH` - needs to include the QGIS python code directories, including the QGIS-internal plugin folder:
+  `PYTHONPATH=F:\mamba_envs\enmapbox_light_longterm\Library\python\plugins;F:\mamba_envs\enmapbox_light_longterm\Library\python;`
+
+* `QT_PLUGN_PATH` - the Qt plugin directory, e.g.:
+
+  ``QT_PLUGIN_PATH=F:\mamba_envs\enmapbox_light_longterm\Library\qtplugins;F:\mamba_envs\enmapbox_light_longterm\Library\plugins;``
+
+
+## 3. Clone this repository
 
 Use the following commands to clone the EnMAP-Box and update its submodules:
 
 ### TLDR:
 
-Open a shell (e.g. OSGeo4W or mamba) that allows to run git and python with PyQGIS, then run:
+Open a shell (e.g. OSGeo4W or mamba, see above) that allows to run git and python with PyQGIS, then run:
 
 
 ````bash
@@ -111,26 +167,12 @@ git git remote set-url origin git@github.com:EnMAP-Box/qgispluginsupport.git
 In the following we refer to the EnMAP-Box repository ``https://github.com/EnMAP-Box/enmap-box.git``
 Replace it with your own EnMAP-Box fork from which you can create pull requests.
 
-1. Ensure that your environment has git available and can start QGIS by calling `qgis`.
-   You may use a bootstrap script as [scripts/OSGeo4W/qgis_env.bat](scripts/OSGeo4W/qgis_env.bat) (windows) or
-   [scripts/qgis_env.bat](scripts/qgis_env.sh) (linux)
-2. 
-   The essential lines are:
-    ````
-    # on Linux: 
-    export PYTHONPATH=/<qgispath>/share/qgis/python
-    export LD_LIBRARY_PATH=/<qgispath>/lib
-   
-    ::on Windows: 
-    set PYTHONPATH=c:\<qgispath>\python
-    set PATH=C:\<qgispath>\bin;C:\<qgispath>\apps\<qgisrelease>\bin;%PATH% where <qgisrelease> should be replaced with the type of release you are targeting (eg, qgis-ltr, qgis, qgis-dev)
+1. Ensure that your environment has git available and starts QGIS by calling `qgis` 
+   (see[1.](#1-install-qgis) and [2.](#2-test-the-qgis-environment)).
+   You copy a bootstrap script like [scripts/OSGeo4W/qgis_env.bat](scripts/OSGeo4W/qgis_env.bat) (windows) or
+   [scripts/qgis_env.sh](scripts/qgis_env.sh) (linux) and adjust to your local settings for.
 
-    # on macOS: 
-    export PYTHONPATH=/<qgispath>/Contents/Resources/python
-    set PATH=C:\<qgispath>\bin;C:\<qgispath>\apps\<qgisrelease>\bin;%PATH% where <qgisrelease> should be replaced with the type of release you are targeting (eg, qgis-ltr, qgis, qgis-dev)
-    ````
-   
-3. Clone the EnMAP-Box repository.
+2. Clone the EnMAP-Box repository.
    
     ````bash
     git clone git@github.com:EnMAP-Box/enmap-box.git
