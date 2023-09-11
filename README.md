@@ -49,11 +49,14 @@ However, the following steps show you how to run the EnMAP-Box from python witho
 
    Examples:
    ````bash
-   mamba env create -n enmapbox_full_latest -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_latest.yml
-   mamba env create -n enmapbox_full_3.28 -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_3.28.yml
-   mamba env create -n enmapbox_light_latest -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_light_latest.yml
-   mamba env create -n enmapbox_light_3.28 -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_light_3.28.yml
+   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_latest.yml
+   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_3.28.yml
+   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_light_latest.yml
+   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_light_3.28.yml
    ````
+   
+   The environment name corresponds to the `*.yml` basename. You can change it with  `-n`, e.g. `-n myenvironmennane`.
+
 
 * You can update an existing environment with `mamba update`, e.g:
    
