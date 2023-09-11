@@ -63,10 +63,10 @@ However, the following steps show you how to run the EnMAP-Box from python witho
 * You can update an existing environment with `mamba update`, e.g:
    
    ````bash
-   mamba env update -n enmapbox_full_3.28 --prune -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_3.28.yml
+   mamba env update --prune -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_3.28.yml
    ````
-
-* `--prune` causes conda to remove any dependencies that are no longer required from the environment.
+   * `-n myenvironmentname` allows to overwrite environments with names different to that specified in the `*.yml` file.
+   * `--prune` causes conda to remove any dependencies that are no longer required from the environment.
 
 ### Windows / Linux / MacOS
 
