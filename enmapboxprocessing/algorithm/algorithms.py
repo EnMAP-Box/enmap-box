@@ -5,6 +5,8 @@ from enmapboxprocessing.algorithm.classfractionfromcategorizedvectoralgorithm im
     ClassFractionFromCategorizedVectorAlgorithm
 from enmapboxprocessing.algorithm.classificationfromclassprobabilityalgorithm import \
     ClassificationFromClassProbabilityAlgorithm
+from enmapboxprocessing.algorithm.classificationfromrenderedimagealgorithm import \
+    ClassificationFromRenderedImageAlgorithm
 from enmapboxprocessing.algorithm.classificationperformancesimplealgorithm import \
     ClassificationPerformanceSimpleAlgorithm
 from enmapboxprocessing.algorithm.classificationperformancestratifiedalgorithm import \
@@ -238,6 +240,7 @@ def algorithms():
         ClassFractionFromCategorizedVectorAlgorithm(),
         CreateSpectralIndicesAlgorithm(),
         ClassificationFromClassProbabilityAlgorithm(),
+        ClassificationFromRenderedImageAlgorithm(),
         ClassificationPerformanceSimpleAlgorithm(),
         ClassificationPerformanceStratifiedAlgorithm(),
         ClassificationWorkflowAlgorithm(),
