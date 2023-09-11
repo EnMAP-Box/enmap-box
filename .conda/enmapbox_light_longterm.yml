@@ -7,6 +7,7 @@ dependencies:
   - qgis=3.28
   - python=3.9
   - pip
+  - scikit-learn>=1 # if necessary, this will install scipy and numpy too
   - matplotlib
   # Development
   - gitpython
