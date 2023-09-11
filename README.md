@@ -26,6 +26,8 @@ Documentation: http://enmap-box.readthedocs.io
 
 Git Repository: https://github.com/EnMAP-Box/enmap-box
 
+About EnMAP: https://www.enmap.org/
+
 # Run the EnMAP-Box
 
 The EnMAP-Box is a QGIS Plugin that can be installed from the QGIS Plugin Manager.
@@ -68,7 +70,7 @@ However, the following steps show you how to run the EnMAP-Box from python witho
 
 ### Windows / Linux / MacOS
 
- Follow install instructions described here: https://qgis.org/en/site/forusers/download.html
+ Either use mamba (see above), or follow the OS-specific instructions here: https://qgis.org/en/site/forusers/download.html
 
 
 ## 2. Clone this repository

@@ -1,10 +1,10 @@
 # run: conda env create --file conda_environment.yml
 # see also https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
-name: enmapbox_full_long_term
+name: enmapbox_full_longterm
 channels:
   - conda-forge
 dependencies:
-  - python>=3.11
+  - python=3.9
   - qgis=3.28
   - pip  # avoids that conda uses the wrong pip
   - enpt

@@ -1,6 +1,6 @@
 # run: conda env create --file conda_environment.yml
 # see also https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
-name: enmapbox_light_3.28
+name: enmapbox_light_longterm
 channels:
   - conda-forge
 dependencies:

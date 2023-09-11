@@ -4,7 +4,7 @@ name: enmapbox_full_3.32
 channels:
   - conda-forge
 dependencies:
-  - python>=3.11
+  - python=3.9
   - ipython
   - qgis=3.32
   - pip  # avoids that conda uses the wrong pip
