@@ -29,6 +29,11 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Inspect Files
+        run: |
+          ls -lisa
+          ls -lisa ./conda
+
       - name: Setup Mambaforge
         uses: conda-incubator/setup-miniconda@v2
         with:
