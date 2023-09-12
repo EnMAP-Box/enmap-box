@@ -1,4 +1,4 @@
-name: 🧪 EnMAP-Box Tests
+name: 🐍 EnMAP-Box Mamba Tests
 
 on:
   push:
