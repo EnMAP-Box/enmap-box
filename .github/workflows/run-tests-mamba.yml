@@ -31,10 +31,10 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Inspect Files
+      - name: Inspect conda environment file
         run: |
-          ls -lisa
           ls -lisa .conda
+          cat .conda/${{matrix.mamba_env}}.yml
 
       - name: Setup Mambaforge
         uses: conda-incubator/setup-miniconda@v2
@@ -49,7 +49,6 @@ jobs:
         run: |
           mamba info
           mamba list
-          mamba activate ${{matrix.mamba_env}}
       - name: Python Packages Info
         run: |
           qgis --version
