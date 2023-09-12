@@ -3,8 +3,7 @@ name: 🐍 EnMAP-Box Mamba Tests
 on:
   push:
     branches:
-      - main
-      - release-**
+      - mamba**
 
   pull_request:
     branches:
