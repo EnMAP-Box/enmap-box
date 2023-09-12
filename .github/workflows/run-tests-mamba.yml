@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mamba_env: [enmapbox_light_latest, enmapbox_light_longterm]
+        mamba_env: [enmapbox_light_latest]
 
     steps:
       - name: Checkout
@@ -34,12 +34,8 @@ jobs:
         with:
           miniforge-variant: Mambaforge
           miniforge-version: latest
+          activate-environment: .conda/${{matrix.mamba_env}}
           use-mamba: true
-
-      - name: Create & activate mamba environment
-        run: | 
-          mamba env create -f .conda/${{matrix.mamba_env}}.yml
-          mamba activate ${{matrix.mamba_env}}
 
       - name: Python Packages Info
         run: |
