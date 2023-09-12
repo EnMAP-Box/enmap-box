@@ -21,9 +21,9 @@ jobs:
       run:
         shell: bash -el {0}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        mamba_env: [enmapbox_light_latest]
+        mamba_env: [enmapbox_light_latest, enmapbox_light_longterm]
       # python_version : [3.9, 3.10, 3.11]
       # mamba_env: [enmapbox_light_latest, enmapbox_light_longterm, enmapbox_full_latest, enmapbox_full_longterm]
     steps:
