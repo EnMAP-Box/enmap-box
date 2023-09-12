@@ -1,0 +1,49 @@
+name: 🧪 EnMAP-Box Tests
+
+on:
+  push:
+    branches:
+      - main
+      - release-**
+
+  pull_request:
+    branches:
+      - main
+      - release-**
+
+  release:
+    types: [published]
+
+jobs:
+  # Run EnMAP-Box tests
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mamba_env: [enmapbox_light_latest, enmapbox_light_longterm]
+      fail-fast: false
+
+    env:
+        MAMBA_ENV: ${{ matrix.mamba_env}}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Docker Environment Info
+        run: |
+          # ls -la .docker/
+          # ls -la
+          # ls -la ~
+          # ls -la /usr/bin
+          docker --version
+      - name: Create & activate mamba environment
+        run: | 
+          mamba env create -f .conda/${MAMBA_ENV}.yml
+          mamba activate ${MAMBA_ENV}
+      - name: Python Packages Info
+        run: |
+          python3 --version
+          pip list
+          qgis --version

@@ -38,7 +38,7 @@ However, the following steps show you how to run the EnMAP-Box from python witho
 
 ### conda / mamba (all OS)
 
-1. Install conda / mamba (prefered), as described [here](https://mamba.readthedocs.io/en/latest/mamba-installation.html#mamba-install)  
+1. Install conda / mamba (preferred), as described [here](https://mamba.readthedocs.io/en/latest/mamba-installation.html#mamba-install)  
 
 2. Install one of the QGIS + EnMAP-Box environments listed in https://github.com/EnMAP-Box/enmap-box/tree/main/.conda
    
