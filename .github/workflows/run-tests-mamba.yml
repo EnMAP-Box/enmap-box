@@ -20,6 +20,11 @@ jobs:
     defaults:
       run:
         shell: bash -el {0}
+
+    env:
+      QT_QPA_PLATFORM: offscreen
+      CI: true
+
     strategy:
       fail-fast: false
       matrix:
