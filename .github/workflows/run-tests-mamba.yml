@@ -49,6 +49,12 @@ jobs:
         run: |
           mamba info
           mamba list
-      - name: Python Packages Info
+
+      - name: Python Package Info
         run: |
           qgis --version
+
+      - name: Test EnMAP-Box in ${{matrix.mamba_env}}
+        run: |
+          chmod +x scripts/runtests.sh
+          sh ./scripts/runtests.sh
