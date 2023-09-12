@@ -17,6 +17,9 @@ jobs:
   # Run EnMAP-Box tests
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
     strategy:
       fail-fast: false
       matrix:
@@ -38,21 +41,15 @@ jobs:
         with:
           miniforge-variant: Mambaforge
           miniforge-version: latest
-          activate-environment: test
+          activate-environment: ${{matrix.mamba_env}}
           environment-file: .conda/${{matrix.mamba_env}}.yml
           use-mamba: true
           auto-activate-base: false
-      - name: Conda Environment Info
-        run: |
-          conda info
-          conda list
       - name: Mamba Environment Info
         run: |
           mamba info
           mamba list
-
+          mamba activate ${{matrix.mamba_env}}
       - name: Python Packages Info
         run: |
-          python3 --version
-          pip list
           qgis --version
