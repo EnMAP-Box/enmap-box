@@ -31,15 +31,20 @@ jobs:
       - name: Inspect Files
         run: |
           ls -lisa
-          ls -lisa ./conda
+          ls -lisa .conda
 
       - name: Setup Mambaforge
         uses: conda-incubator/setup-miniconda@v2
         with:
           miniforge-variant: Mambaforge
           miniforge-version: latest
-          activate-environment: .conda/${{matrix.mamba_env}}
+          activate-environment: test
+          environment-file: .conda/${{matrix.mamba_env}}.yml
           use-mamba: true
+          auto-activate-base: false
+        run: |
+          conda info
+          conda list
 
       - name: Python Packages Info
         run: |
