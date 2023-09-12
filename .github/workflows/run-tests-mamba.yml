@@ -42,9 +42,14 @@ jobs:
           environment-file: .conda/${{matrix.mamba_env}}.yml
           use-mamba: true
           auto-activate-base: false
+      - name: Conda Environment Info
         run: |
           conda info
           conda list
+      - name: Mamba Environment Info
+        run: |
+          mamba info
+          mamba list
 
       - name: Python Packages Info
         run: |
