@@ -110,6 +110,7 @@ regressionDatasetAsPkl = join(_root, _subdir, 'regression_dataset.pkl')
 # SRF
 _subdir = 'srf'
 enmap_berlin_srf_csv = join(_root, _subdir, 'enmap_berlin_srf.csv')  # wavelenght and fwhm
+enmap_potsdam_srf_csv = join(_root, _subdir, 'enmap_potsdam_srf.csv')  # wavelenght and fwhm
 
 # external testdata
 _subdir = 'external'

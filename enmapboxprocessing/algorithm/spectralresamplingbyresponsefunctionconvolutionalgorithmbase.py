@@ -103,8 +103,8 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
                     weights = np.divide(weights, np.max(weights))  # scale to 0-1 range
                     #                responses2[f'Band {i + 1} ({k} Nanometers)'] = [(x, round(w, RESPONSE_CUTOFF_DIGITS)) for x, w in
                     #                                                                zip(xs, weights)]
-                    responses2[f'band {i + 1}'] = [(x, round(w, RESPONSE_CUTOFF_DIGITS)) for x, w in
-                                                   zip(xs, weights)]
+                    responses2[f'band {i + 1} ({x0} Nanometers)'] = [(x, round(w, RESPONSE_CUTOFF_DIGITS)) for x, w in
+                                                                     zip(xs, weights)]
 
                 else:
                     responses2[k] = v

@@ -1,10 +1,10 @@
 import numpy as np
 
-from enmapboxtestdata import enmap, envi_library_berlin_sli, enmap_berlin_srf_csv
 from enmapboxprocessing.algorithm.spectralresamplingbywavelengthandfwhmalgorithm import \
     SpectralResamplingByWavelengthAndFwhmAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxtestdata import enmap, envi_library_berlin_sli, enmap_berlin_srf_csv
 
 
 class TestSpectralResamplingByWavelengthAndFwhmAlgorithm(TestCase):
