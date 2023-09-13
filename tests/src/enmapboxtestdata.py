@@ -120,7 +120,6 @@ engeomap_gamesberg_field_library_color_mod = join(_root, _subdir, 'engeomap', 'g
 del _subdir, _root
 
 
-
 # external sensor products
 def sensorProductsRoot() -> Optional[str]:
     # - let's have some developer-dependent default locations
