@@ -212,8 +212,8 @@ from enmapboxprocessing.algorithm.spectralconvolutiontrapezoid1dalgorithm import
 from enmapboxprocessing.algorithm.spectralindexoptimizeralgorithm import SpectralIndexOptimizerAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingbyresponsefunctionlibraryalgorithm import \
     SpectralResamplingByResponseFunctionLibraryAlgorithm
-from enmapboxprocessing.algorithm.spectralresamplingbyspectralrasterwavelengthandfwhmalgorithm import \
-    SpectralResamplingBySpectralRasterWavelengthAndFwhmAlgorithm
+from enmapboxprocessing.algorithm.spectralresamplingbywavelengthandfwhmalgorithm import \
+    SpectralResamplingByWavelengthAndFwhmAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtocustomsensoralgorithm import \
     SpectralResamplingToCustomSensorAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtodesisalgorithm import SpectralResamplingToDesisAlgorithm
@@ -395,7 +395,7 @@ def algorithms():
         SpectralConvolutionTrapezoid1DAlgorithm(),
         SpectralIndexOptimizerAlgorithm(),
         SpectralResamplingByResponseFunctionLibraryAlgorithm(),
-        SpectralResamplingBySpectralRasterWavelengthAndFwhmAlgorithm(),
+        SpectralResamplingByWavelengthAndFwhmAlgorithm(),
         SpectralResamplingToCustomSensorAlgorithm(),
         SpectralResamplingToDesisAlgorithm(),
         SpectralResamplingToEnmapAlgorithm(),
