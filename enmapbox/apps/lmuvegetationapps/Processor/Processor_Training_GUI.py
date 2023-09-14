@@ -35,12 +35,14 @@ import sys
 import numpy as np
 import pandas as pd
 
+import LUT.CreateLUT_GUI
 # ensure to call QGIS before PyQtGraph
 from qgis.PyQt.QtWidgets import *
 from PyQt5.QtGui import QIntValidator
 # from PyQt5.QtCore import QThread, pyqtSignal
 # from PyQt5.QtCore import QTimer
 import lmuvegetationapps.Processor.Processor_Inversion_core as processor
+import lmuvegetationapps.LUT.CreateLUT_GUI
 from lmuvegetationapps import APP_DIR
 from _classic.hubflow.core import *
 import csv
@@ -147,9 +149,13 @@ class ML_Training:
         self.hyperp_tuning = False
         self.hyperparas_dict = None
         self.val_data = None
+        self.query_strat = 'PAL'
+        self.saveALselection = False
+        self.eval_on_insitu = False
 
     def connections(self):
         self.gui.cmdInputLUT.clicked.connect(lambda: self.open_lut())
+        self.gui.pushCreateLUT.clicked.connect(lambda: self.start_GUI_LUT())
         self.gui.cmdModelDir.clicked.connect(lambda: self.get_folder())
         self.gui.cmdRun.clicked.connect(lambda: self.run_training())
         self.gui.cmdClose.clicked.connect(lambda: self.gui.close())
@@ -176,9 +182,11 @@ class ML_Training:
         self.gui.radNoAL.toggled.connect(lambda: self.handle_AL())
 
         self.gui.pushImportInsitu.clicked.connect(lambda: self.open_txt_file())  # load own in situ
+        self.gui.pushImportValinsitu.clicked.connect(lambda: self.open_txt_file())
 
         self.gui.radInternal.toggled.connect(lambda: self.handle_AL_strat(mode='internal'))
         self.gui.radInsitu.toggled.connect(lambda: self.handle_AL_strat(mode='insitu'))
+        self.gui.chkALsave.toggled.connect(lambda: self.handle_AL_selection_save())
 
         self.gui.radPerf.toggled.connect(lambda: self.handle_PerfEval())
         self.gui.radNoPerf.toggled.connect(lambda: self.handle_PerfEval())
@@ -190,6 +198,10 @@ class ML_Training:
             self.paramsdict[para].stateChanged.connect(lambda group, pid=para:
                                                        self.set_params_flags(group="targets", para_id=pid))
 
+    def start_GUI_LUT(self, *args):
+        from lmuvegetationapps.LUT.CreateLUT_GUI import MainUiFunc
+        lutapp = MainUiFunc()
+        lutapp.show()
 
     def enable_all(self):
         self.gui.cmbPCA.setEnabled(True), self.gui.cmbPCA.setChecked(True), self.gui.Noise_Box.setEnabled(True),
@@ -208,21 +220,32 @@ class ML_Training:
             self.gui.chkALsave.setEnabled(True), self.gui.chkALsave.setChecked(True),
             self.gui.radPerf.setChecked(True), self.gui.radNoPerf.setEnabled(False),
             self.gui.radCrossVal.setEnabled(False), self.gui.radTrainTest.setChecked(True),
-            self.gui.pushImportInsitu.setEnabled(False)
+            self.gui.pushImportInsitu.setEnabled(False), self.gui.frameQueryStrat.setEnabled(True),
+            self.gui.lblQueryStrat.setEnabled(True), self.gui.radEBD.setEnabled(True), self.gui.radPAL.setEnabled(True)
+            self.gui.radValinsitu.setEnabled(False)
         if self.gui.radNoAL.isChecked():
             self.gui.AL_rbFrame.setEnabled(False), self.gui.lblInitSamples.setEnabled(False),
             self.gui.sbInitSamples.setEnabled(False), self.gui.chkALsave.setEnabled(False), self.gui.chkALsave.setChecked(False),
             self.gui.radNoPerf.setEnabled(True), self.gui.radInternal.setChecked(True),
-            self.gui.radNoPerf.setChecked(True)
+            self.gui.radNoPerf.setChecked(True), self.gui.frameQueryStrat.setEnabled(False),
+            self.gui.frameQueryStrat.setEnabled(False),
+            self.gui.lblQueryStrat.setEnabled(False), self.gui.radEBD.setEnabled(False), self.gui.radPAL.setEnabled(False)
 
     def handle_AL_strat(self, mode):
         if mode == 'internal':
             self.gui.frame_PerfEvalOptions.setEnabled(True), self.gui.radTrainTest.setEnabled(True),
             self.gui.radCrossVal.setEnabled(False), self.gui.lblTrainSize.setEnabled(True),
             self.gui.txtTrainSize.setEnabled(True), self.gui.pushImportInsitu.setEnabled(False)
+            self.gui.radValinsitu.setEnabled(False)
         if mode == 'insitu':
             self.gui.frame_PerfEvalOptions.setEnabled(False), self.gui.pushImportInsitu.setEnabled(True)
             self.gui.txtTrainSize.setPlaceholderText(""), self.gui.txtFolds.setPlaceholderText("")
+
+    def handle_AL_selection_save(self):
+        if self.gui.chkALsave.isChecked():
+            self.saveALselection = True
+        else:
+            self.saveALselection = False
 
     def handle_PerfEval(self):
         if self.gui.radPerf.isChecked():
@@ -232,27 +255,41 @@ class ML_Training:
                 self.gui.frame_PerfEvalOptions.setEnabled(True),
                 self.gui.radTrainTest.setEnabled(True), self.gui.radCrossVal.setEnabled(True),
                 self.gui.lblTrainSize.setEnabled(True), self.gui.txtTrainSize.setEnabled(True),
-                self.gui.txtTrainSize.setPlaceholderText("[0-99]")
+                self.gui.txtTrainSize.setPlaceholderText("[0-99]"),
+                self.gui.radValinsitu.setEnabled(True)
 
         if self.gui.radNoPerf.isChecked():
             self.gui.radTrainTest.setChecked(True),
             self.gui.radTrainTest.setEnabled(False), self.gui.radCrossVal.setEnabled(False),
             self.gui.lblTrainSize.setEnabled(False), self.gui.txtTrainSize.setEnabled(False),
             self.gui.lblFolds.setEnabled(False), self.gui.txtFolds.setEnabled(False),
-            self.gui.txtTrainSize.setPlaceholderText(""), self.gui.txtFolds.setPlaceholderText("")
+            self.gui.txtTrainSize.setPlaceholderText(""), self.gui.txtFolds.setPlaceholderText(""),
+            self.gui.radValinsitu.setEnabled(False), self.gui.pushImportValinsitu.setEnabled(False)
 
 
     def handle_PerfEvalStrat(self):
         if self.gui.radTrainTest.isChecked():
-            self.gui.lblTrainSize.setEnabled(True), self.gui.txtTrainSize.setEnabled(True),
-            self.gui.lblFolds.setEnabled(False), self.gui.txtFolds.setEnabled(False),
-            self.gui.txtTrainSize.setPlaceholderText("[0-99]"),
+            self.gui.lblTrainSize.setEnabled(True), self.gui.txtTrainSize.setEnabled(True)
+            self.gui.lblFolds.setEnabled(False), self.gui.txtFolds.setEnabled(False)
+            self.gui.txtTrainSize.setPlaceholderText("[1-99]")
+            self.gui.txtFolds.setText("")
             self.gui.txtFolds.setPlaceholderText("")
+            self.gui.pushImportValinsitu.setEnabled(False)
         if self.gui.radCrossVal.isChecked():
             self.gui.lblTrainSize.setEnabled(False), self.gui.txtTrainSize.setEnabled(False),
             self.gui.lblFolds.setEnabled(True), self.gui.txtFolds.setEnabled(True),
-            self.gui.txtTrainSize.setPlaceholderText(""),
+            self.gui.txtTrainSize.setText("")
+            self.gui.txtTrainSize.setPlaceholderText("")
             self.gui.txtFolds.setPlaceholderText("[2-10]")
+            self.gui.pushImportValinsitu.setEnabled(False)
+        if self.gui.radValinsitu.isChecked():
+            self.gui.pushImportValinsitu.setEnabled(True)
+            self.gui.lblTrainSize.setEnabled(False), self.gui.txtTrainSize.setEnabled(False)
+            self.gui.lblFolds.setEnabled(False), self.gui.txtFolds.setEnabled(False)
+            self.gui.txtTrainSize.setText("")
+            self.gui.txtTrainSize.setPlaceholderText("")
+            self.gui.txtFolds.setText("")
+            self.gui.txtFolds.setPlaceholderText("")
 
     def handle_hyp_tuning(self):
         if self.gui.chkHyptuning.isChecked():
@@ -343,13 +380,13 @@ class ML_Training:
                 self.paramsdict[idx].setChecked(False)
 
     def open_lut(self, **lutpath):  # open and read a lut-metafile
-        if not __name__ == '__main__':
+        if lutpath:
+            key, result = next(iter(lutpath.items()))
+            self.lut_path = result
+        else:
             result = str(QFileDialog.getOpenFileName(caption='Select LUT meta-file', filter="LUT-file (*.lut)")[0])
             if not result:
                 return
-            self.lut_path = result
-        else:
-            key, result = next(iter(lutpath.items()))
             self.lut_path = result
 
         self.gui.lblInputLUT.setText(result)
@@ -376,6 +413,7 @@ class ML_Training:
         self.gui.txtExclude.setCursorPosition(0)
         self.nbands_valid = self.nbands - len(self.exclude_bands)
         self.enable_all()
+        self.handle_AL()
 
     def params_dict_check(self):
         self.paramsdict = {0: self.gui.chkCab, 1: self.gui.chkCcx, 2: self.gui.chkCanth,
@@ -512,9 +550,13 @@ class ML_Training:
             else:
                 # print(self.val_data)
                 pass
-
         else:
             self.use_insitu = False
+
+        if self.gui.radPAL.isChecked():
+            self.query_strat = 'PAL'
+        elif self.gui.radEBD.isChecked():
+            self.query_strat = 'EBD'
 
         if self.gui.radPerf.isChecked():
             self.perf_eval = True
@@ -524,13 +566,16 @@ class ML_Training:
                 self.split_method = 'train_test_split'
                 if self.gui.txtTrainSize.text() == '':
                     raise ValueError('Please specify training set size')
-                # TODO: check what happens if Train size is 100%
                 self.test_size = 1 - int(self.gui.txtTrainSize.text()) / 100
             elif self.gui.radCrossVal.isChecked():
                 self.split_method = 'kfold'
                 if self.gui.txtFolds.text() == '':
                     raise ValueError('Please specify number of folds for cross validation')
                 self.kfolds = int(self.gui.txtFolds.text())
+            elif self.gui.radValinsitu.isChecked():
+                self.eval_on_insitu = True
+                if not self.val_data:
+                    raise ValueError("Performance evaluation on situ data is selected\nbut no data is loaded")
         else:
             self.perf_eval = False
 
@@ -570,7 +615,9 @@ class ML_Training:
                                            perf_eval=self.perf_eval,
                                            split_method=self.split_method, kfolds=self.kfolds,
                                            n_initial=self.n_initial, test_size=self.test_size,
-                                           hyperp_tuning=self.hyperp_tuning, hyperparas_dict=self.hyperparas_dict)
+                                           hyperp_tuning=self.hyperp_tuning, hyperparas_dict=self.hyperparas_dict,
+                                           query_strat=self.query_strat, saveALselection=self.saveALselection,
+                                           eval_on_insitu=self.eval_on_insitu)
         except ValueError as e:
             self.abort(message="Failed to setup model training: {}".format(str(e)))
             self.prg_widget.gui.lblCancel.setText("")
@@ -578,7 +625,7 @@ class ML_Training:
             self.prg_widget.gui.close()
             return
 
-        if self.use_insitu and self.val_data:
+        if (self.use_insitu or self.eval_on_insitu) and self.val_data:
             proc.train_main.insitu_data_setup(self.val_data, npca=self.npca)
 
         # if new models are added, change the text of the ProgressBar accordingly
@@ -608,6 +655,7 @@ class ML_Training:
         #▬self.gui.close()
         if self.perf_eval:
             self.perfView_widget = self.main.performance_view
+            self.perfView_widget.gui.modelComboBox.clear()
             self.perfView_widget.collect_results(self.results_dict)
             self.perfView_widget.gui.show()
 
@@ -681,6 +729,8 @@ class perfView:
         np.savetxt(outpath, structured_array, delimiter='\t', header='measured\testimated\test_std\tRMSE', comments='')
 
     def plot_results(self, index):
+
+        plt.rcParams["savefig.dpi"] = 300
         key = self.gui.modelComboBox.itemText(index)  # Get the text of the selected item
         data = self.all_results_dict.get(key, None)  # Retrieve the data from the dictionary
 
@@ -713,6 +763,8 @@ class perfView:
             pred_std = np.empty((0,))
 
         r2 = r2_score(y_val, final_pred)
+        rmse = performances[-1]
+        rmse_float = format_float_by_scale(rmse)
 
         self.figure_perf.clf()
         self.figure_scatter.clf()
@@ -753,8 +805,7 @@ class perfView:
         x_fit = np.linspace(0, ax_max, 100)
         y_fit = lr.predict(x_fit.reshape(-1, 1))
         ax0.plot(x_fit, y_fit, 'r-')
-
-        ax0.text(0.05, 0.95, 'R² = {:.2f}'.format(r2), transform=ax0.transAxes)
+        ax0.text(0.05, 0.90, 'R² = {:.2f}'.format(r2) + '\nRMSE = ' + str(rmse_float), transform=ax0.transAxes)
         ax0.set_xlabel('{} - measured'.format(key))
         ax0.set_ylabel('{} - estimated'.format(key))
         ax0.tick_params("both")
@@ -1092,6 +1143,7 @@ class LoadTxtFile:
 
     def ok(self):
         self.main.mlra_training.val_data = self.extract_data_from_table()
+        #self.main.gui.
         self.gui.close()
 
 # The SelectWavelengths class allows to add/remove wavelengths from the inversion
@@ -1187,8 +1239,8 @@ class SelectWavelengths:
         self.gui.close()
 
 
-# class PRG handles the GUI of the ProgressBar
 class PRG:
+    # class PRG handles the GUI of the ProgressBar
     def __init__(self, main):
         self.main = main
         self.gui = PRG_GUI()
@@ -1245,17 +1297,13 @@ class MainUiFunc:
     def show(self):
         self.mlra_training.gui.show()
 
-    def pass_results(self):
-        pass
-
-
 if __name__ == '__main__':
     from enmapbox.testing import start_app
     app = start_app()
     m = MainUiFunc()
     m.show()
-    lut_path = r"E:\LUTs\testLUT_2000_00meta.lut"
+    lut_path = r"E:\LUTs\TestLUT_2000_CpCBCcheck_00meta.lut"
     m.mlra_training.open_lut(lutpath=lut_path)
-    out_folder = r"E:\LUTs\Model_TEST/"
+    out_folder = r"E:\Testdaten\Model_TEST/"
     m.mlra_training.get_folder(path=out_folder)
     sys.exit(app.exec_())

@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ***************************************************************************
-    Processor_Training_MLRA_defaults.py - LMU Agri Apps - Machine learning based spectroscopic image inversion of
-    PROSAIL parameters - CORE
+    Processor_Training_MLRA_defaults.py - LMU Agri Apps
     -----------------------------------------------------------------------
     begin                : 08/2023
     copyright            : (C) 2023 Matthias Wocher
@@ -25,10 +24,16 @@
 """
 
 from scipy.stats import expon, reciprocal
-from sklearn.gaussian_process.kernels import RBF, WhiteKernel, ConstantKernel as C
+from sklearn.gaussian_process import kernels
 
 
 class MLRA_defaults:
+    """
+    MLRA defaults and pretested variable specific settings
+    'param_dist': default hyperparameter settings for RandomizedSearchCV/GridSearchCV
+    ANN settings acc. to Danner et al. 2021
+    GPR settings acc. to GridSearchCV by Wocher (2023)
+    """
     # Artificial Neural Network
     ANN = {
         'default': {
@@ -43,7 +48,7 @@ class MLRA_defaults:
             'hidden_layer_sizes': [(50, 50, 50), (50, 100, 50), (100,)],
             'activation': ['tanh', 'relu', 'logistic'],
             'solver': ['sgd', 'adam', 'lbfgs'],
-            'alpha': reciprocal(0.01, 10),  # L2 penalty (regularization term) parameter.
+            'alpha': [0.01, 0.1, 1.0, 10.0],  # L2 penalty (regularization term) parameter.
             'learning_rate': ['constant', 'adaptive'],
             'max_iter': [500, 1000, 2000, 5000]
         },
@@ -75,20 +80,55 @@ class MLRA_defaults:
     # Gaussian Process Regression
     GPR = {
         'default': {
-            'kernel': C(1.0, constant_value_bounds="fixed")
-                      * RBF(length_scale=1.0, length_scale_bounds=(1e-5, 1e5))
-                      + WhiteKernel(noise_level=1.0, noise_level_bounds="fixed"),
-            'alpha': 1e-10,
-            'random_state': 42
+            'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=1, nu=1.5), #kernels.ConstantKernel(1.0) *
+                # 1.0 * kernels.RBF(length_scale=1.0, length_scale_bounds=(1e-5, 1e5)) +
+                #       kernels.WhiteKernel(noise_level=1.0, noise_level_bounds="fixed"),
+            'alpha': 1.0,
+            'n_restarts_optimizer': 10
+            # 'warm_start': True
         },
         'param_dist': {
-            "alpha": expon(scale=1),
-            "kernel__k1__k1__constant_value": expon(scale=1),
-            "kernel__k1__k2__length_scale": expon(scale=1),
-            "kernel__k2__noise_level": expon(scale=1)
+            'kernel': [kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=v, nu=nu) for v in [0.01, 0.1, 1.0, 10, 100] for nu in [0.5, 1.5, 2.5, float('inf')]],  #**kernels.ConstantKernel(1.0) *
+            # [1.0 * kernels.RBF(length_scale=v) + kernels.WhiteKernel(noise_level=1.0, noise_level_bounds=(1e-5, 1e5)) for v in [0.01, 0.1, 1.0, 10, 100]]
+            "alpha": [0.001, 0.01, 0.1, 1.0],
+        },
+        'cab': {
+            'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=10, nu=2.5),
+            'alpha': 1.0,
+            'n_restarts_optimizer': 10
+        },
+        'LAI': {
+            'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=1, nu=2.5),
+            'alpha': 0.1,
+            'n_restarts_optimizer': 10
+        },
+        'AGBdry': {
+            'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=10, nu=0.5),
+            'alpha': 1.0,
+            'n_restarts_optimizer': 10
+        },
+        'AGBfresh': {
+            'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=100, nu=0.5),
+            'alpha': 1.0,
+            'n_restarts_optimizer': 10
+        },
+        'CWC': {
+            'kernel':  kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=1, nu=float('inf')),
+            'alpha': 0.001,
+            'n_restarts_optimizer': 10
+        },
+        'Nitrogen': {
+            'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=1, nu=2.5),
+            'alpha': 1.0,
+            'n_restarts_optimizer': 10
+        },
+        'Carbon': {
+            'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=100, nu=0.5),
+            'alpha': 1.0,
+            'n_restarts_optimizer': 10
         }
     }
-
+    # Random Forest Regression
     RFR = {
         'default': {
             'n_estimators': 100,  # The number of trees in the forest.
@@ -117,10 +157,10 @@ class MLRA_defaults:
             # Add more parameters as needed.
             },
         'param_dist': {
-            'C': reciprocal(1, 1000),
+            'C': [1, 10, 100, 1000],
             'epsilon': [0.01, 0.1, 1],
             'kernel': ['rbf', 'sigmoid'],
-            'gamma': ['scale', 'auto'] + list(reciprocal(0.01, 1).rvs(size=1000))
+            'gamma': ['scale', 'auto'] + [0.01, 0.1, 1.0]
         }
     }
     # Kernel Ridge Regression

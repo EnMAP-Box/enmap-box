@@ -150,7 +150,7 @@ class CallModel:
 # Arrays that are later fed into PROSAIL in blocks (vectorized)
 class SetupMultiple:
 
-    def __init__(self, ns, paras, depends):
+    def __init__(self, ns, paras, depends, depends_cp_cbc):
         self.whichlogicals = []  # list of all parameters with a logical distribution (start, stop, steps)
         self.nruns_logic_geo, self.nruns_logic_no_geo, self.nruns_logic_total = (1, 1, 1)
 
@@ -168,6 +168,7 @@ class SetupMultiple:
                                           # for any of the PROSPECT / SAIL versions
 
         self.depends = depends  # should Car be calculated in dependence to cab?
+        self.depends_cp_cbc = depends_cp_cbc
         self.paras = paras  # paras are input of this class as a dictionary (**kwargs)
         self.ns = int(ns)  # ns: number of statistical distributions; i.e. "draw #ns times from the distribution"
         self.error_array = []
@@ -246,7 +247,13 @@ class SetupMultiple:
                 self.para_grid[:, self.para_nums[para_key]] = \
                     self.car_cab_dependency(grid=self.para_grid[:, self.para_nums['cab']])  # set car according to cab
 
-        return self.para_grid
+        if self.depends_cp_cbc == 1:
+            # Delete cp > cbc? This is a 'dirty' solution: To keep original lut size,
+            # redistribution should be considered like for car_cab_dependency
+            mask = self.para_grid[:, self.para_nums['cp']] <= self.para_grid[:, self.para_nums['cbc']]
+        else: mask = None
+
+        return self.para_grid, mask
 
     def fixed(self, para_name, value):
         return_list = np.linspace(start=value, stop=value, num=self.ns)
@@ -276,7 +283,7 @@ class SetupMultiple:
         return return_list
 
     def car_cab_dependency(self, grid):
-
+        # redistribute Car values according to laplace distribution inside lower/upper cab boundaries
         def truncated_noise(y, lower, upper):
             while True:
                 y_noise = np.random.laplace(loc=0, scale=spread, size=1) + y
@@ -336,7 +343,8 @@ class InitModel:
         self.run_model(paras=dict(zip(self.para_names, para_grid.T)))
 
     def initialize_vectorized(self, LUT_dir, LUT_name, ns, max_per_file=5000, soil=None,
-                            prgbar_widget=None, qgis_app=None, depends=False, testmode=False, **paras):
+                            prgbar_widget=None, qgis_app=None, depends=False, depends_cp_cbc=False,
+                              testmode=False, **paras):
         # This is the most important function for initializing PROSAIL
         # It calls instances of PROSAIL and provides blocks of the para_grid
         self.soil = soil
@@ -348,8 +356,8 @@ class InitModel:
         self.max_filelength = max_per_file  # defines the number of PROSAIL runs in one file ("split"), default=5000
         npara = len(self.para_names)  # how many parameters are stored in the LUT
                                       # (at maximum! Does NOT depend on the version of PROSPECT / SAIL used)
-        setup = SetupMultiple(ns=ns, paras=paras, depends=depends)  # Prepare for setting up PROSAIL
-        para_grid = setup.create_grid()  # Now create the para_grid
+        setup = SetupMultiple(ns=ns, paras=paras, depends=depends, depends_cp_cbc=depends_cp_cbc)  # Prepare for setting up PROSAIL
+        para_grid, mask = setup.create_grid()  # Now create the para_grid
 
         crun_max = setup.nruns_total  # The total number of PROSAIL executions
         crun_pergeo = setup.ns * setup.nruns_logic_no_geo  # The number of PROSAIL executions
@@ -507,6 +515,9 @@ class InitModel:
                 save_array[npara:, :] = self.run_model(paras=
                                                        dict(zip(self.para_names, para_grid[run:run + nruns, :].T))).T
                 save_array[:npara, :] = para_grid[run:run + nruns, :].T
+                if mask is not None:
+                    save_array = save_array[:, mask]
+                    #TODO: adapt "n_total"/"ns" to number of final samples in the LUT is mask was applied
 
                 rest -= max_per_file  # calculate what's left for next iteration
 

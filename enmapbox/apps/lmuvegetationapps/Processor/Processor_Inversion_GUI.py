@@ -511,7 +511,10 @@ class MLInversion:
                 raise ValueError('%s is not a valid no data value for output' % self.gui.txtNodatOutput.text())
 
         # Parameters to invert
-        self.paras = self.meta_dict['target_parameters']
+        self.paras = self.meta_dict.get('target_parameters', [])
+
+        if isinstance(self.paras, str):
+            self.paras = [self.paras]
         # if self.gui.checkLAI.isChecked():
         #     self.paras.append("LAI")
         # if self.gui.checkALIA.isChecked():
@@ -656,7 +659,7 @@ class MLInversion:
         self.prg_widget.gui.lblCancel.setText("")
         self.prg_widget.gui.allow_cancel = True
         self.prg_widget.gui.close()
-        QMessageBox.information(self.gui, "Finish", "Automatic inversion finished")
+        QMessageBox.information(self.gui, "Finish", "ML model mapping finished")
         self.gui.close()
 
     def open_train_gui(self):

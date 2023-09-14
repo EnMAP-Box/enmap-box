@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>ANN Vegetation Processor</string>
+   <string>Apply Machine Learning Model</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_11">
    <item row="2" column="4" colspan="3">
@@ -174,30 +174,11 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>18</width>
-          <height>23</height>
+          <width>20</width>
+          <height>20</height>
          </size>
         </property>
        </spacer>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_11">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://syncandshare.lrz.de/getlink/fiUaJLLmkRAfqRKmj3RDRNN8/PretrainedANNs.zip&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Download&lt;br/&gt;pretrained&lt;br/&gt; ANNs&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-        <property name="openExternalLinks">
-         <bool>true</bool>
-        </property>
-       </widget>
       </item>
       <item>
        <widget class="QPushButton" name="cmdNewModel">
@@ -518,6 +499,9 @@
         </property>
         <property name="text">
          <string>Preset Geometry</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
         </property>
        </widget>
       </item>

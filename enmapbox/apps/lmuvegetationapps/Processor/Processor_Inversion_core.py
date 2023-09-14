@@ -39,18 +39,17 @@ from _classic.hubflow.core import *
 import numpy as np
 from PyQt5 import QtCore
 
-from Processor_Training_MLRA_defaults import MLRA_defaults
+from lmuvegetationapps.Processor.Processor_Training_MLRA_defaults import MLRA_defaults
 
 from sklearn.neural_network import MLPRegressor
 from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import RBF, WhiteKernel
+from sklearn.gaussian_process import kernels
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm import SVR
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import RandomizedSearchCV
-from scipy.stats import expon, reciprocal
 
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
@@ -63,15 +62,22 @@ from sklearn.model_selection import check_cv
 from sklearn.model_selection import cross_val_predict
 from sklearn.base import is_classifier
 
-
-import matplotlib as mpl
-import matplotlib.pyplot as plt
 import joblib
 
 
 def max_euclidean_distances(data1, data2, n):
+    """
+    Find n indices from data1 that are furthest from data2 using squared Euclidean distance.
+
+    Parameters:
+    - data1, data2 (np.array): Data arrays.
+    - n (int): Number of indices to select.
+
+    Returns:
+    - list: Indices of data1 that are furthest from data2.
+    """
     # Compute all pairwise distances
-    all_distances = pairwise_distances(data1, data2, metric='euclidean')
+    all_distances = pairwise_distances(data1, data2, metric='sqeuclidean')
     max_n_indices = np.argpartition(all_distances.flatten(), -n)[-n:]
     max_n_2d_indices = np.unravel_index(max_n_indices, all_distances.shape)
     indices_arr1 = max_n_2d_indices[0]
@@ -79,6 +85,63 @@ def max_euclidean_distances(data1, data2, n):
     # Convert to set and back to list to remove duplicates
     unique_indices = list(set(indices_arr1.tolist()))
     return unique_indices
+
+def pool_active_learning(X_train, y_train, X_unlabeled, model, n, k):
+    """
+    Implements the Pool Active Learning (PAL) approach.
+
+    Parameters:
+    - X_train (np.array): Original training data.
+    - y_train (np.array): Original training labels.
+    - X_unlabeled (np.array): Data for which the labels are to be queried.
+    - model: The regressor model. Assumes that the model has `.fit` and `.predict` methods.
+    - n (int): Number of instances to query.
+    - n_models (int): Number of models to be trained on different subsets.
+
+    Returns:
+    - list: Indices of instances to be queried.
+    """
+    # Here, we will train the model on different subsets from the original training set
+    # and collect predictions for the unlabeled data.
+    predictions = []
+
+    n_samples = X_train.shape[0]
+    subset_size = n_samples // k
+
+    for i in range(k):
+        # Create random subsets of the original training data
+        subset_indices = np.random.choice(n_samples, size=subset_size, replace=False)
+        X_subset = X_train[subset_indices]
+        y_subset = y_train[subset_indices]
+
+        # Train the model on the subset
+        model.fit(X_subset, y_subset)
+
+        # Predict on the entire unlabeled set and store the predictions
+        preds = model.predict(X_unlabeled)
+        predictions.append(preds)
+
+    # Convert list of predictions into an array [n_samples, n_models]
+    predictions_array = np.array(predictions).T
+
+    # Calculate the variance for each instance across models
+    variances = np.var(predictions_array, axis=1)
+
+    # Get indices of instances with the highest variance
+    top_indices = np.argsort(variances)[-n:]
+
+    return top_indices.tolist()
+
+
+def al_query(X_train, y_train, X_unlabeled, strategy, model, n=1, k=10):
+    if strategy == "EBD":
+        return max_euclidean_distances(X_unlabeled, X_train, n=n)
+    elif strategy == 'PAL':
+        return pool_active_learning(X_train, y_train, X_unlabeled, model=model, n=n, k=k)
+    # More strategies can be added here as elif conditions
+    else:
+        raise ValueError(f"Strategy {strategy} not recognized!")
+
 
 # Class MLRATraining will only be used for training new models, not for predictions!
 class MLRATraining:
@@ -88,7 +151,7 @@ class MLRATraining:
     @staticmethod
     def cross_val_predict_with_std(X, y, model, cv=None):
         """
-        Custom version of cross_val_predict that also computes prediction standard deviations.
+        Custom version of cross_val_predict that also computes prediction standard deviations (for GPRs).
         Only works for GaussianProcessRegressor; for other regressors, it behaves just like cross_val_predict.
         """
         if not isinstance(model, GaussianProcessRegressor):
@@ -115,11 +178,28 @@ class MLRATraining:
         return model.fit(X, y)
 
     @staticmethod
+    def _fit_insitu(X, y, X_val, y_val, model):
+        # fit a model on RTM-data but evaluate performance on insitu data (e.g. retraining case after AL)
+        stds = []
+        model.fit(X, y)
+        if isinstance(model, GaussianProcessRegressor):
+            predictions, stds = model.predict(X_val, return_std=True)
+        else:
+            predictions = model.predict(X_val)
+        score = mean_squared_error(y_val, predictions, squared=False)
+
+        yield {'type': 'result', 'model': model, 'performances': score, 'predictions': predictions, 'stds': stds,
+               'X_val': X_val, 'y_val': y_val}
+
+    @staticmethod
     def _fit_hyper(X, y, model):
+        # fit a RandomSearchCV or GridSearchCV model -> model here is a wrapper
         stds = []
         # yield {"type": "progress", "progress": 0, "loop_counter": 1}
         model.fit(X, y)
         if isinstance(model, RandomizedSearchCV) and isinstance(model.best_estimator_, GaussianProcessRegressor):
+            predictions, stds = model.best_estimator_.predict(X, return_std=True)
+        elif isinstance(model, GridSearchCV) and isinstance(model.best_estimator_, GaussianProcessRegressor):
             predictions, stds = model.best_estimator_.predict(X, return_std=True)
         else:
             predictions = model.best_estimator_.predict(X)
@@ -130,12 +210,12 @@ class MLRATraining:
                'X_val': X, 'y_val': y}
 
     @staticmethod
-    def _fit_split(X, y, model, split_method="train_test_split", kfolds=5, test_size=0.2, random_state=42,
-                   hypara_opt=False, param_grid=None):
+    def _fit_split(X, y, model, split_method="train_test_split", kfolds=5, test_size=0.2):
+        # basic model fit on train-test-split or on cross validation sets
         yield {"type": "progress", "progress": 0, "loop_counter": 1}
         if split_method == 'train_test_split':
             stds = []
-            train_X, test_X, train_y, test_y = train_test_split(X, y, test_size=test_size, random_state=random_state)
+            train_X, test_X, train_y, test_y = train_test_split(X, y, test_size=test_size)
             model.fit(train_X, train_y)
             if isinstance(model, GaussianProcessRegressor):
                 predictions, stds = model.predict(test_X, return_std=True)
@@ -164,38 +244,43 @@ class MLRATraining:
                 yield {"type": "progress", "progress": 100, "loop_counter": 1}  # Indicate end of process
                 yield {'type': 'result', 'model': model, 'performances': score,
                        'predictions': predictions, 'X_val': X, 'y_val': y}
-        else:
-            raise ValueError(f"Unrecognized split method: {split_method}")
-
 
     @staticmethod
     def _split(X, y, split_method="train_test_split", kfolds=5, test_size=0.2, random_state=42):
+        # split function for the internal active learning loop
         if split_method == "train_test_split":
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
-            yield X_train, X_test, y_train, y_test
+            X_idx = range(len(X))
+            X_train, X_test, y_train, y_test, X_idx_train, X_idx_test = train_test_split(
+                X, y, X_idx, test_size=test_size, random_state=random_state)
+            yield X_train, X_test, y_train, y_test, X_idx_train
         elif split_method == "kfold":
             kf = KFold(n_splits=kfolds, random_state=random_state, shuffle=True)
             for train_index, test_index in kf.split(X, y):
-                yield X[train_index], X[test_index], y[train_index], y[test_index]
+                yield X[train_index], X[test_index], y[train_index], y[test_index], train_index
         else:
             raise ValueError(f"Unrecognized split method: {split_method}")
     
     @staticmethod
-    def _al_loop_internal(X, y, model, init_percentage, split_method="train_test_split", kfolds=5, test_size=0.2):
+    def _al_loop_internal(X, y, model, init_percentage, query_strat='PAL', split_method="train_test_split", kfolds=5, test_size=0.2):
         all_training_indices = []
         all_performances = []
         all_stds = []
         all_preds = []
         X_val, y_val = None, None
         loop_counter = 1
-        for X_train, X_test, y_train, y_test in MLRATraining._split(X, y, split_method=split_method, kfolds=kfolds,
-                                                                    test_size=test_size):
+        for X_train, X_test, y_train, y_test, train_idx in MLRATraining._split(X, y, split_method=split_method,
+                                                                               kfolds=kfolds, test_size=test_size):
+            # X_raw_query = X_raw[train_idx] -> for EBD query strat, distances of orig. data may be beneficial
+            # needs further testing
+
             # Get generator from _al_loop
-            loop_gen = MLRATraining._al_loop(X_train, y_train, X_test, y_test, model, init_percentage=init_percentage)
+            loop_gen = MLRATraining._al_loop(X_train, y_train, X_test, y_test, model,
+                                             init_percentage=init_percentage, query_strat=query_strat)
 
             for output in loop_gen:
+                # loop_gen is the yield dict output of _al_loop() and can be of 'type': 'result' or 'progress'
                 if output['type'] == 'result':
-                    all_training_indices.append(output['training_indices'])
+                    all_training_indices.append(output['all_training_indices'])
                     all_performances.append(output['performances'])
                     if isinstance(model, GaussianProcessRegressor):
                         preds, stds = model.predict(output['X_val'], return_std=True)
@@ -216,54 +301,50 @@ class MLRATraining:
         
         
     @staticmethod
-    def _al_loop(X, y, X_val, y_val, model, init_percentage):
+    def _al_loop(X, y, X_val, y_val, model, init_percentage, query_strat):
 
         init_percentage = init_percentage/100
         n_samples = X.shape[0]
         n_init = int(init_percentage * n_samples)
 
-        # Compute the pairwise distances between all samples
-        distances = pairwise_distances(X)
-        # Get the maximum distance for each sample
-        max_distances = distances.max(axis=1)
-        # Get the indices of the samples sorted by their maximum distance in descending order
-        sorted_indices = np.argsort(max_distances)[::-1]
-        # Select the initial indices as the top x% of the sorted indices
-        initial_idx = sorted_indices[:n_init]
+        # initial samples are not randomly selected but already queried using query_strat
+        initial_idx = al_query(X_train=X, y_train=y, X_unlabeled=X_val, model=model, strategy=query_strat, n=n_init)
         # initial_idx = np.random.choice(range(len(X)), size=n_init, replace=False)  # random initial sampling
+        training_indices = list(initial_idx)  # save the indices of n initial samples
 
-        X_initial, y_initial = X[initial_idx], y[initial_idx]
+        X_initial, y_initial = X[initial_idx], y[initial_idx]  # select n initial samples from X
 
-        model.fit(X_initial, y_initial)
-        training_indices = list(initial_idx)
-        performances = []
+        model.fit(X_initial, y_initial)  # fit the model on n initial samples
 
-        initital_pred = model.predict(X_val)
-        best_score = np.sqrt(mean_squared_error(y_val, initital_pred, squared=False))
-        performances.append(best_score)
+        performances = []  # initialize performances list
 
+        initital_pred = model.predict(X_val)  # predict first model on validation set (insitu or test split)
+        best_score = mean_squared_error(y_val, initital_pred, squared=False)  # calculate first score (RMSE)
+        performances.append(best_score)  # save first RMSE
+
+        # update remaining indices -> all indices (n_samples) minus current training indices
         remaining_indices = np.setdiff1d(np.arange(n_samples), training_indices)
-        n_query = 1
 
-        total_remaining = len(remaining_indices)
+        total_remaining = len(remaining_indices)  # count remaining indices
         last_printed = -1
 
+        # here the actual al loop starts
         for i in range(len(remaining_indices)):
 
-            remaining_X = X[remaining_indices]
-            query_indices = max_euclidean_distances(remaining_X, X_initial, n=n_query)
+            remaining_X = X[remaining_indices]  # get remaining X
+            query_indices = al_query(X_train=X[initial_idx], y_train=y[initial_idx],
+                                     X_unlabeled=remaining_X, model=model, strategy=query_strat)  # X_raw[initial_idx])
             chosen_indices = remaining_indices[query_indices]
 
             X_initial = np.concatenate((X_initial, X[chosen_indices]))
             y_initial = np.concatenate((y_initial, y[chosen_indices]))
-            training_indices.append(chosen_indices)
+            training_indices.extend(chosen_indices)
 
             model.fit(X_initial, y_initial)
 
             pred = model.predict(X_val)
-            score = np.sqrt(mean_squared_error(y_val, pred, squared=False))
+            score = mean_squared_error(y_val, pred, squared=False)
             performances.append(score)
-
 
             progress = (total_remaining - len(remaining_indices)) / total_remaining * 100
             if int(progress) % 5 == 0 and int(progress) != last_printed:
@@ -278,134 +359,24 @@ class MLRATraining:
                 performances.pop()
             else:
                 best_score = score
+                initial_idx = np.concatenate((initial_idx, chosen_indices))  #
                 # print('RMSE: {:.4f}'.format(best_score))
 
+            #TODO: implement case when n query is > 1 -> Avoid deletion of more than available samples:
+            # if score > best_score:
+            #     num_to_delete = min(len(query_indices), len(X_initial))
+            #     X_initial = np.delete(X_initial, -num_to_delete, axis=0)
+            #     y_initial = np.delete(y_initial, -num_to_delete, axis=0)
+            #     for _ in range(num_to_delete):
+            #         training_indices.pop()
+            #     performances.pop()
+
             remaining_indices = np.delete(remaining_indices, query_indices)
+            # initial_idx = np.concatenate((initial_idx, training_indices))
             # print(len(remaining_X))
 
         yield{'type': 'result', 'model': model, 'all_training_indices': training_indices, 'performances': performances,
               'X_val': X_val, 'y_val': y_val}
-
-
-# Some basic functions are placed in this class
-class Functions:
-    def __init__(self, main):
-        self.m = main
-
-        # self.conv is a dictionary for additional information about paras
-        # Convention: {"para": [full name, [ylim/xlim], boost]}
-        # ylim/xlim is useful for plotting results
-        # boost is used to boost the parameters into preferred ranges of e.g. 0..1 or 0..100 instead of 0..0.0001
-        self.conv = {
-            "N": ["N", [1.0, 2.2], 1],
-            "cab": ["chlorophyll", [10, 80], 1],
-            "cw": ["EWT_S", [0.001, 0.07], 1000],
-            "cm": ["LMA", [0.0025, 0.006], 1000],
-            "LAI": ["greenLAI", [0.0, 8.0], 1],
-            "typeLIDF": ["typeLIDF", [1.0, 2.0], 1],
-            "LIDF": ["ALIA_S", [10, 80], 1],
-            "hspot": ["hspot", [0.0, 0.1], 100],
-            "psoil": ["psoil", [0.0, 1.0], 10],
-            "tts": ["tts"],
-            "tto": ["tto"],
-            "psi": ["psi"],
-            "cp": ["cp", [0.0, 0.002], 1000],
-            "cbc": ["ccl", [0.0, 0.005], 1000],
-            "car": ["Car", [0.0, 20.0], 1],
-            "anth": ["Canth", [0.0, 5.0], 1],
-            "cbrown": ["brown_pigments", [0.0, 1.0], 10],
-            "AGBdry": ["AGBdry", [0.0, 2000.0], 0.01],
-            "AGBfresh": ["AGBfresh", [0.0, 5000.0], 0.001],
-            "CWC": ["CWC", [0.0, 0.3], 1],
-            "Nitrogen": ["Nitrogen", [0.0, 40], 0.1],
-            "Carbon": ["Carbon", [0.0, 600], 0.01]
-            }
-
-    @staticmethod
-    def _ndvi(bands, in_matrix, thr):
-        # Calculates the NDVI when the two bands ([0]: red, [1]: nir) are supplied
-        red, nir = bands[0], bands[1]
-        ndvi_out = (in_matrix[nir, :, :] - in_matrix[red, :, :]) / (in_matrix[nir, :, :] + in_matrix[red, :, :])
-        ndvi_out = np.nan_to_num(ndvi_out)
-        ndvi_out = np.where(ndvi_out > thr, 1, 0)  # mask all ndvi values above a certain threshold (thr) with 0
-        return ndvi_out
-
-    @staticmethod
-    def _read_image(image, dtype=np.float32):
-        # Method for loading bsq images, no bands are skipped anymore
-        dataset = openRasterDataset(image)
-        in_matrix = dataset.readAsArray().astype(dtype=dtype)
-        nbands, nrows, ncols = in_matrix.shape
-        grid = dataset.grid()
-
-        return nrows, ncols, nbands, grid, in_matrix  # return a tuple back to the last function (type "dtype")
-
-    @staticmethod
-    def write_image(out_matrix, image_out, grid, paras_out, nodat, out_mode):
-        # Method for writing output to binary raster file
-        if out_mode == 'single':  # write one single file with multiple bands
-            output = RasterDataset.fromArray(array=out_matrix, filename=image_out, grid=grid,
-                                             driver=EnviDriver())
-            output.setMetadataItem('data ignore value', nodat, 'ENVI')
-
-            for iband, band in enumerate(output.bands()):
-                band.setDescription(paras_out[iband])
-                band.setNoDataValue(nodat)
-
-        else:  # write several files, one per parameters
-            for ipara in range(len(paras_out)):
-                # naming convention: drop extension, add para name, add extension
-                base, ext = os.path.splitext(image_out)
-                image_out_individual = base + "_" + paras_out[ipara] + ext
-                output = RasterDataset.fromArray(array=out_matrix[ipara, :, :], filename=image_out_individual,
-                                                 grid=grid, driver=EnviDriver())
-                output.setMetadataItem('data ignore value', nodat, 'ENVI')
-                band = next(output.bands())  # output.bands() is a generator; here only one band
-                band.setDescription(paras_out[ipara])
-                band.setNoDataValue(nodat)
-
-    def read_geometry(self, geo_in):
-        # Read geometry from input file (raster based)
-        _, georows, geocols, _, geometry_raw = self._read_image(image=geo_in)
-
-        # Detect data range by inspecting the mean SZA in the image (where SZA > 0)
-        mean_sza = np.mean(geometry_raw[geometry_raw > 0])
-        int_boost_geo = 10 ** (np.ceil(np.log10(mean_sza)) - 2)  # evaluates as 1 for SZA=45, 100 for SZA=4500, ...
-
-        geometry_matrix = np.empty(shape=(3, georows, geocols))  # three "bands" for SZA, OZA, rAA
-        geometry_matrix.fill(-9999)
-        geometry_matrix = geometry_raw / int_boost_geo  # insert all geometries from file into the geometry matrix
-
-        return geometry_matrix
-
-    @staticmethod
-    def _which_model(geometry_matrix, geo):
-        nrows = geometry_matrix.shape[1]
-        ncols = geometry_matrix.shape[2]
-        tts, tto, psi = geo
-
-        # whichLUT is an array with shape of the input image; the pixel values set an integer number which
-        # identifies the LUT to be used. Notice that the same LUT is calculated for different geometry-constellations
-        # and those constellations are numbered as integers according to what is specified in the .lut-meta-file
-        whichModel = np.zeros(shape=(nrows, ncols), dtype=np.int16)
-
-        for row in range(nrows):
-            for col in range(ncols):
-                # find the geometrical setting that is closest to the geometry that is actually observed
-                # tts_LUT, tto_LUT and psi_LUT are the constellations present in the LUT
-                angles = list()
-                angles.append(np.argmin(np.abs(geometry_matrix[0, row, col] - tts)))  # tts
-                angles.append(np.argmin(np.abs(geometry_matrix[1, row, col] - tto)))  # tto
-                angles.append(np.argmin(np.abs(geometry_matrix[2, row, col] - psi)))  # psi
-
-                # find out the number of the LUT to be used - they are sorted in the following order
-                #  0    1    2   ...  5    6   ... ...  31   32   ... n_total   -> for case psin = 6, tton = 5
-                # tts0 tts0 tts0 ... tts0 tts0 ... ... tts0 tts1  ...  ttsn     -> n = len(tts)
-                # tto0 tto0 tto0 ... tto0 tto1 ... ... tton tto0  ...  tton     -> n = len(tto)
-                # psi0 psi1 psi2 ... psin psi0 ... ... psin psi0  ...  psin     -> n = len(psi)
-                whichModel[row, col] = angles[2] * len(tto) * len(tts) + angles[1] * len(tts) + angles[0]
-
-        return whichModel
 
 
 # Train new algorithm; at the moment, only MLPR can be used and the hyperparameters are fixed but the developers
@@ -424,27 +395,15 @@ class ProcessorTraining:
         self.ml_params = {}
         self.training_indices, self.performances = (None, None)
 
-        # Parameterization (everything except ANN is deprecated)
-
-        # Activation function     Solver      alpha (penalty) max. nr. of iterations
-        # self.ann_activation, self.ann_solver, self.ann_alpha, self.ann_max_iter = (None, None, None, None)
-        # self.gpr_kernel = None
-        # self.svr_kernel, self.svr_C, self.svr_g = (None, None, None)
-        # self.rf_n_estimators, self.rf_max_features, self.rf_min_samples_leaf = (None, None, None)
-        # self.ml_params_dict_ann = None  # this is the init of a dictionary containing the hyperparameter of the ANN
-        # self.ml_params_dict_svr = None
-        # self.ml_params_dict_rforest = None
-        # self.ml_params_dict_gpr = None
         self.all_results_dict = {}
         self.best_hyperparameters_dict = {}
         self.y_val_dict = {}
-
 
     def training_setup(self, lut_metafile, exclude_bands, npca, model_meta, para_list, noisetype=1, noiselevel=4,
                        algorithm='ANN',
                        use_al=False, use_insitu=False, n_initial=2,
                        perf_eval=False, split_method='train_test_split', kfolds=5, test_size=0.2, hyperp_tuning=False,
-                       hyperparas_dict=None):
+                       hyperparas_dict=None, query_strat='PAL', saveALselection=False, eval_on_insitu=False):
         # Setup everything for training new models
         self.exclude_bands = exclude_bands  # the bands to be excluded for the training (water vapor absorption etc.)
         self.para_list = para_list
@@ -466,6 +425,9 @@ class ProcessorTraining:
 
         self.hyperp_tuning = hyperp_tuning
         self.hyperparas_dict = hyperparas_dict
+        self.query_strat = query_strat
+        self.saveALselection = saveALselection
+        self.eval_on_insitu = eval_on_insitu
 
         # LUT
         self.get_meta_LUT(lut_metafile=lut_metafile)  # read meta information of the LUT to be trained
@@ -501,12 +463,9 @@ class ProcessorTraining:
 
         # # Training Values
 
-        # Boosting the parameters is necessary for some algorithms which cannot handle very small or large values
+        # Boosting the parameters may be necessary for some algorithms which cannot handle very small or large values
         # for the training (e.g. ANN fails when learning y=0.004, so it is boosted to y=4 according to "Functions.conv"
         self.para_boost = False
-        # if self.algorithm == 'ANN':
-        #     self.para_boost = True
-        # else: self.para_boost = False
 
         # Which scaler should be used?
         self.scaler = StandardScaler()  # create instance of standard scaler
@@ -529,7 +488,6 @@ class ProcessorTraining:
         X_val = [X_val[i] for i in subset_bands]
         X_val = np.asarray(X_val).T
 
-        self.scaler = StandardScaler()
         if self.scaler:  # if X (reflectances) are to be scaled
             self.scaler.fit(X_val)  # fit scaler
             X_val = self.scaler.transform(X_val)  # transform scaler
@@ -542,8 +500,11 @@ class ProcessorTraining:
         if self.pca:
             self.pca.fit(X_val)  # , y[:, ipara])
             self.X_val = self.pca.transform(X_val)
+        else:
+            self.X_val = X_val
 
     def validation_setup(self, val_file, exclude_bands, npca):
+        # only for external usage via _exec.py direct execution test environment
         self.val_file = val_file
         val_data = np.loadtxt(self.val_file, delimiter="\t", skiprows=1)
         X_val = val_data[2:, 1:].T / 10000
@@ -551,7 +512,6 @@ class ProcessorTraining:
 
         self.exclude_bands = exclude_bands  # the bands to be excluded for the training (water vapor absorption etc.)
 
-        self.scaler = StandardScaler()
         if self.scaler:  # if X (reflectances) are to be scaled
             self.scaler.fit(X_val)  # fit scaler
             X_val = self.scaler.transform(X_val)  # transform scaler
@@ -583,25 +543,20 @@ class ProcessorTraining:
             self.mlra = MLPRegressor(**self.ml_params)
 
         elif self.algorithm == 'GPR':
-            # Extract kernel parameters
-            constant_value = self.ml_params.get('kernel__k1__k1__constant_value', 1.0)
-            length_scale = self.ml_params.get('kernel__k1__k2__length_scale', 1.0)
-            noise_level = self.ml_params.get('kernel__k2__noise_level', 1e-10)
 
             # Construct the kernel
-            self.gpr_kernel = constant_value * RBF(length_scale=length_scale,
-                                                   length_scale_bounds=(1e-5, 1e5)) + WhiteKernel(
-                noise_level=noise_level)
+            # self.gpr_kernel = self.ml_params
+            # self.gpr_kernel = kernels.ConstantKernel() * kernels.RBF() + kernels.WhiteKernel()
 
-            # Exclude the keys specific to kernel construction from the model's params
-            model_params = {key: val for key, val in self.ml_params.items() if not key.startswith('kernel__')}
-
-            # Update the 'kernel' argument with the constructed kernel
-            model_params['kernel'] = self.gpr_kernel
+            # # Exclude the keys specific to kernel construction from the model's params
+            # model_params = {key: val for key, val in self.ml_params.items() if not key.startswith('kernel__')}
+            #
+            # # Update the 'kernel' argument with the constructed kernel
+            # model_params['kernel'] = self.gpr_kernel
 
             # Now initialize the GPR
             self.ml_model_ext = '.gpr'
-            self.mlra = GaussianProcessRegressor(**model_params)
+            self.mlra = GaussianProcessRegressor(**self.ml_params)
 
         elif self.algorithm == 'RFR':
             self.ml_model_ext = '.rfr'  # extension for RFR model
@@ -621,28 +576,35 @@ class ProcessorTraining:
 
         if self.hyperp_tuning:
             param_dist = MLRA_defaults.__dict__[self.algorithm]['param_dist']
-            self.mlra = self.init_hyperparameter_tuning(self.mlra, param_dist)
+            #TODO: add radiobutton for tuning options
+            self.mlra = self.init_hyperparameter_tuning(self.mlra, param_dist, mode='randomized')
 
         # AL based on split (train-test-split or kfold cross val)
         if self.use_al and not self.use_insitu:
-            self.al_paras = {'split_method': self.split_method, 'kfolds': self.kfolds, 'test_size': self.test_size,
-                             'init_percentage': self.n_initial}
+            self.al_paras = {'split_method': self.split_method, 'kfolds': self.kfolds,
+                             'test_size': self.test_size,
+                             'init_percentage': self.n_initial, 'query_strat': self.query_strat}
             self.ml_model = self.m.mlra_training._al_loop_internal
 
         # AL with external insitu data
         elif self.use_al and self.use_insitu:
             if self.y_val_dict:
-                self.y_val = self.y_val_dict.get(var)
+                self.y_val = np.asarray(self.y_val_dict.get(var))
 
             self.al_paras = {'X_val': self.X_val, 'y_val': self.y_val,
-                             'init_percentage': self.n_initial}
-
+                             'init_percentage': self.n_initial, 'query_strat': self.query_strat}
             self.ml_model = self.m.mlra_training._al_loop
 
         # No AL, training on splits
-        elif not self.use_al and self.perf_eval and not self.hyperp_tuning:
+        elif not self.use_al and self.perf_eval and not self.hyperp_tuning and not self.eval_on_insitu:
             self.al_paras = {'split_method': self.split_method, 'kfolds': self.kfolds, 'test_size': self.test_size}
             self.ml_model = self.m.mlra_training._fit_split
+        # No AL, Training on full Training data with evaluation on insitu data -> The Retraining case
+        elif self.eval_on_insitu:
+            if self.y_val_dict:
+                self.y_val = np.asarray(self.y_val_dict.get(var))
+            self.al_paras = {'X_val': self.X_val, 'y_val': self.y_val}
+            self.ml_model = self.m.mlra_training._fit_insitu
         # No AL, training with hyperparameter tuning
         elif self.hyperp_tuning:
             self.al_paras = {}
@@ -651,11 +613,16 @@ class ProcessorTraining:
         else:
             self.ml_model = self.m.mlra_training._fit # construct the model and pass it to self.ml_model
 
-    def init_hyperparameter_tuning(self, mlra, param_dist, n_iter_search=10, n_jobs=2):
-        random_search = RandomizedSearchCV(mlra, param_distributions=param_dist, n_iter=n_iter_search,
-                                           scoring='neg_mean_squared_error', n_jobs=n_jobs, cv=self.kfolds,
-                                           verbose=2, random_state=42)
-        return random_search
+    def init_hyperparameter_tuning(self, mlra, param_dist, mode, n_iter_search=10, n_jobs=4):
+        if mode == 'randomized':
+            search = RandomizedSearchCV(mlra, param_distributions=param_dist, n_iter=n_iter_search,
+                                        n_jobs=n_jobs, cv=self.kfolds,
+                                        verbose=4, scoring='neg_root_mean_squared_error')
+        if mode == 'grid':
+            search = GridSearchCV(mlra, param_grid=param_dist,
+                                  n_jobs=n_jobs, cv=self.kfolds,
+                                  verbose=4, scoring='neg_root_mean_squared_error')
+        return search
 
 
 
@@ -672,7 +639,10 @@ class ProcessorTraining:
 
                     # number of geo-ensemble, corresponds to name of the LUT-file
                     geo_ensemble = rAA * self.ntto * self.ntts + OZA * self.ntts + SZA
-                    X, y = self.read_lut(geo=geo_ensemble)  # read reflectances (X) and PROSAIL parameters (y) from LUT
+                    X, y, lut = self.read_lut(geo=geo_ensemble)  # read reflectances (X) and PROSAIL parameters (y) from LUT
+
+                    # if self.use_al:
+                    #     self.X_raw = np.copy(X)
 
                     if self.noisetype > 0:
                         X = self._add_noise(ref_list=X, noisetype=self.noisetype, sigma=self.sigma,
@@ -724,17 +694,18 @@ class ProcessorTraining:
 
                         if self.perf_eval:  # performance evaluation
 
+                            # result_dict is of type key 'result', 'progress', or 'hyperparameters'
                             for result_dict in self.ml_model(
                                     X=x, y=y[:, ipara], model=self.mlra, **self.al_paras):
                                 if result_dict["type"] == "result":  # results are ready, populate results
                                     model = result_dict["model"]
+                                    temp_dict = {}
                                     self.X_val = result_dict["X_val"]
                                     self.y_val = result_dict["y_val"]
                                     performances = np.array(result_dict["performances"])
-                                    temp_dict = {}
                                     if self.use_insitu and self.algorithm == 'GPR':
                                         predictions, stds = model.predict(self.X_val, return_std=True)
-                                        temp_dict['stds'] = stds
+                                        result_dict['stds'] = stds
                                     elif self.use_insitu and self.algorithm != 'GPR':
                                         predictions = model.predict(self.X_val)
                                     else:
@@ -751,7 +722,7 @@ class ProcessorTraining:
                                         "y_val": self.y_val,
                                         "performances": performances,
                                         "predictions": predictions}
-                                    # GPR yields stds
+                                    # GPR yields prediciton stds, others not
                                     if 'stds' in result_dict:
                                         stds = np.array(result_dict['stds'])
                                         if self.para_boost:
@@ -770,6 +741,7 @@ class ProcessorTraining:
                                     self.best_hyperparameters_dict[self.algorithm][para] = {
                                         'hyperparas': result_dict["best_hyperparams"]}
 
+
                                 elif result_dict["type"] == "progress":  # progressbar updates
 
                                     progress = result_dict['progress']
@@ -780,40 +752,40 @@ class ProcessorTraining:
                                     else:
                                         print('Progress: {:d}%'.format(int(progress)))
 
-                            # final_pred, pred_std = model.predict(self.X_val, return_std=True)
-                            # if self.algorithm == 'GPR':
-                            #     out_pred = np.array([self.y_val, predictions, stds])
-                            # else:
-                            #     out_pred = np.array([self.y_val, predictions])
-
-                            if isinstance(performances, list):  # weird exception handling
+                            if isinstance(performances, list):  # weird exception handling to get rid of potential sublists
                                 for element in performances:
                                     if isinstance(element, list):
                                         if len(performances[0]) == 1:
                                             performances = np.asarray(performances).reshape((1, 1))
 
-                            # np.save("E:\Testdaten/performances_{}".format(str(para)), performances)
-                            # np.save("E:\Testdaten/results_{}".format(str(para)), out_pred)
-
-                            # if self.hyperp_tuning:
-                            #     print("Best parameters found: ", self.mlra.best_params_)
-                            #     print("Lowest RMSE found: ", np.sqrt(np.abs(self.mlra.best_score_)))
-
-                        else:
+                        else:  # no performance evaluation means just fitting the model without feedback
                             model = self.ml_model(X=x, y=y[:, ipara], model=self.mlra)
-
-                        joblib.dump(model, self.model_base + "_{:d}_{}{}".format(
-                            geo_ensemble, para, self.ml_model_ext))  # dump (save) model to file for later use
-
-                        # if self.hyperp_tuning:
-                        #     joblib.dump(self.best_hyperparameters_dict,
-                        #                 self.model_base + '_{:d}_{}_{}.hyper'.format(geo_ensemble, self.algorithm,
-                        #                                                         para))
 
                         if not self.use_al and len(self.para_list) > 1:
                             prgbar_widget.gui.prgBar.setMaximum(100)
                             prgbar_widget.gui.prgBar.setValue(int(model_no/nmodels_total*100))
                             qgis_app.processEvents()
+
+                        # The final trained model is saved
+                        joblib.dump(model, self.model_base + "_{:d}_{}{}".format(geo_ensemble,
+                            para, self.ml_model_ext))  # dump (save) model to file for later use
+
+                        # save the AL selection LUT if Checkbox is checked.
+                        if self.saveALselection and training_indices:
+                            out_name = self.model_name + "_{}_AL_selection".format(para)
+                            out_lut = np.squeeze(lut[:, training_indices])
+                            np.save(self.model_basedir + '/' + out_name + '_0_0', out_lut)
+                            with open("%s_00meta.lut" % (self.model_basedir + '/' + out_name), "w") as meta:
+                                meta.write("name=%s" % out_name)
+                                meta.write("\nn_total=%i" % np.shape(lut[:, training_indices])[1])
+                                meta.write("\nparameters={}".format(para))
+                                meta.write("\nsplits=%i" % 1)
+                                meta.write("\ntts={}".format(";".join(i for i in self.meta_dict['tts'])))
+                                meta.write("\ntto={}".format(";".join(i for i in self.meta_dict['tto'])))
+                                meta.write("\npsi={}".format(";".join(i for i in self.meta_dict['psi'])))
+                                meta.write("\nmultiplication_factor=%i" % int(self.meta_dict['multiplication_factor']))
+                                meta.write("\nparameters={}".format(";".join(str(i) for i in self.meta_dict['parameters'])))
+                                meta.write("\nwavelengths={}".format(";".join(str(i) for i in self.meta_dict['wavelengths'])))
 
         # Not Done yet! Save further information to the base-folder: information about scaler and pca
         # are saved to a .proc-file; this file is read before calling predict on a model to prepare spectral data
@@ -826,7 +798,7 @@ class ProcessorTraining:
 
         # Write Model Meta
         with open(self.model_metafile, 'w') as para_file:  # Meta-information; one meta-file for all paras!
-            para_file.write("alg={}\nnoisetype={:d}\nsigma={:d}\nPCA_components={:d}\nscaler={}"
+            para_file.write("alg={}\nnoisetype={:d}\nnoiselvl={:d}%\nPCA_components={:d}\nscaler={}"
                             .format(self.algorithm, self.noisetype, self.sigma, self.components, str(self.scaler)))
             para_file.write("\ntarget_parameters=" + ";".join(str(i) for i in self.para_list))
             para_file.write("\ntts=" + ";".join(str(i) for i in self.tts))
@@ -834,11 +806,12 @@ class ProcessorTraining:
             para_file.write("\npsi=" + ";".join(str(i) for i in self.psi))
             para_file.write("\nexclude_bands=" + ";".join(str(i) for i in self.exclude_bands))
             if self.use_al:
-                para_file.write("\nactive_learning=" + ";".join(str(self.use_al)))
+                para_file.write("\nactive_learning=" + str(self.use_al))
             if self.hyperp_tuning:
                 para_file.write("\nbest_hyperparameters=" + str(
                     self.best_hyperparameters_dict[self.algorithm]))
 
+        # write found hyperparameters
         if self.hyperp_tuning:
             # print(self.best_hyperparameters_dict)
             joblib.dump(self.best_hyperparameters_dict,
@@ -889,17 +862,17 @@ class ProcessorTraining:
             if para == 'CWC':
                 y[:, i] = lut[self.para_dict['cw'], :] * lut[self.para_dict['LAI'], :]
             if para == 'Nitrogen':
-                y[:, i] = (lut[self.para_dict['LAI'], :] * lut[self.para_dict['cp'], :]) * 10000 / 4.43
+                y[:, i] = (lut[self.para_dict['LAI'], :] * lut[self.para_dict['cp'], :] * 10000) / 4.43
             if para == 'Carbon':
-                y[:, i] = (lut[self.para_dict['LAI'], :] * lut[self.para_dict['cbc'], :]) * 10000 / 2.31
+                y[:, i] = (lut[self.para_dict['LAI'], :] * lut[self.para_dict['cbc'], :] * 10000) / 2.31
 
-            if self.para_boost and para in self.para_dict:  # to boost or not to boost
-                y[:, i] = lut[self.para_dict[para], :] * self.m.func.conv.get(para)[2]
-            else:
-                if para in self.para_dict:
-                    y[:, i] = lut[self.para_dict[para], :]
+            if para in self.para_dict:
+                y[:, i] = lut[self.para_dict[para], :]
 
-        return X, y
+            if self.para_boost: # and para in self.para_dict:  # to boost or not to boost
+                y[:, i] = y[:, i] * self.m.func.conv.get(para)[2]
+
+        return X, y, lut
 
     @staticmethod
     def _add_noise(ref_list, noisetype, sigma, conversion):
@@ -1125,6 +1098,126 @@ class ProcessorPrediction:
                 out_matrix[ipara, whichModel_coords[i_imodel][0], whichModel_coords[i_imodel][1]] = result  # / self.m.func.conv[para][2]
 
         return out_matrix
+
+# Some basic functions are placed in this class
+class Functions:
+    def __init__(self, main):
+        self.m = main
+
+        # self.conv is a dictionary for additional information about paras
+        # Convention: {"para": [full name, [ylim/xlim], boost]}
+        # ylim/xlim is useful for plotting results
+        # boost is used to boost the parameters into preferred ranges of e.g. 0..1 or 0..100 instead of 0..0.0001
+        self.conv = {
+            "N": ["N", [1.0, 2.2], 1],
+            "cab": ["chlorophyll", [10, 80], 1],
+            "cw": ["EWT_S", [0.001, 0.07], 1000],
+            "cm": ["LMA", [0.0025, 0.006], 1000],
+            "LAI": ["greenLAI", [0.0, 8.0], 1],
+            "typeLIDF": ["typeLIDF", [1.0, 2.0], 1],
+            "LIDF": ["ALIA_S", [10, 80], 1],
+            "hspot": ["hspot", [0.0, 0.1], 100],
+            "psoil": ["psoil", [0.0, 1.0], 10],
+            "tts": ["tts"],
+            "tto": ["tto"],
+            "psi": ["psi"],
+            "cp": ["cp", [0.0, 0.002], 1000],
+            "cbc": ["ccl", [0.0, 0.005], 1000],
+            "car": ["Car", [0.0, 20.0], 1],
+            "anth": ["Canth", [0.0, 5.0], 1],
+            "cbrown": ["brown_pigments", [0.0, 1.0], 10],
+            "AGBdry": ["AGBdry", [0.0, 2000.0], 0.001],
+            "AGBfresh": ["AGBfresh", [0.0, 5000.0], 0.001],
+            "CWC": ["CWC", [0.0, 0.3], 1],
+            "Nitrogen": ["Nitrogen", [0.0, 40], 0.1],
+            "Carbon": ["Carbon", [0.0, 600], 0.001]
+            }
+
+    @staticmethod
+    def _ndvi(bands, in_matrix, thr):
+        # Calculates the NDVI when the two bands ([0]: red, [1]: nir) are supplied
+        red, nir = bands[0], bands[1]
+        ndvi_out = (in_matrix[nir, :, :] - in_matrix[red, :, :]) / (in_matrix[nir, :, :] + in_matrix[red, :, :])
+        ndvi_out = np.nan_to_num(ndvi_out)
+        ndvi_out = np.where(ndvi_out > thr, 1, 0)  # mask all ndvi values above a certain threshold (thr) with 0
+        return ndvi_out
+
+    @staticmethod
+    def _read_image(image, dtype=np.float32):
+        # Method for loading bsq images, no bands are skipped anymore
+        dataset = openRasterDataset(image)
+        in_matrix = dataset.readAsArray().astype(dtype=dtype)
+        nbands, nrows, ncols = in_matrix.shape
+        grid = dataset.grid()
+
+        return nrows, ncols, nbands, grid, in_matrix  # return a tuple back to the last function (type "dtype")
+
+    @staticmethod
+    def write_image(out_matrix, image_out, grid, paras_out, nodat, out_mode):
+        # Method for writing output to binary raster file
+        if out_mode == 'single':  # write one single file with multiple bands
+            output = RasterDataset.fromArray(array=out_matrix, filename=image_out, grid=grid,
+                                             driver=EnviDriver())
+            output.setMetadataItem('data ignore value', nodat, 'ENVI')
+
+            for iband, band in enumerate(output.bands()):
+                band.setDescription(paras_out[iband])
+                band.setNoDataValue(nodat)
+
+        else:  # write several files, one per parameters
+            for ipara in range(len(paras_out)):
+                # naming convention: drop extension, add para name, add extension
+                base, ext = os.path.splitext(image_out)
+                image_out_individual = base + "_" + paras_out[ipara] + ext
+                output = RasterDataset.fromArray(array=out_matrix[ipara, :, :], filename=image_out_individual,
+                                                 grid=grid, driver=EnviDriver())
+                output.setMetadataItem('data ignore value', nodat, 'ENVI')
+                band = next(output.bands())  # output.bands() is a generator; here only one band
+                band.setDescription(paras_out[ipara])
+                band.setNoDataValue(nodat)
+
+    def read_geometry(self, geo_in):
+        # Read geometry from input file (raster based)
+        _, georows, geocols, _, geometry_raw = self._read_image(image=geo_in)
+
+        # Detect data range by inspecting the mean SZA in the image (where SZA > 0)
+        mean_sza = np.mean(geometry_raw[geometry_raw > 0])
+        int_boost_geo = 10 ** (np.ceil(np.log10(mean_sza)) - 2)  # evaluates as 1 for SZA=45, 100 for SZA=4500, ...
+
+        geometry_matrix = np.empty(shape=(3, georows, geocols))  # three "bands" for SZA, OZA, rAA
+        geometry_matrix.fill(-9999)
+        geometry_matrix = geometry_raw / int_boost_geo  # insert all geometries from file into the geometry matrix
+
+        return geometry_matrix
+
+    @staticmethod
+    def _which_model(geometry_matrix, geo):
+        nrows = geometry_matrix.shape[1]
+        ncols = geometry_matrix.shape[2]
+        tts, tto, psi = geo
+
+        # whichLUT is an array with shape of the input image; the pixel values set an integer number which
+        # identifies the LUT to be used. Notice that the same LUT is calculated for different geometry-constellations
+        # and those constellations are numbered as integers according to what is specified in the .lut-meta-file
+        whichModel = np.zeros(shape=(nrows, ncols), dtype=np.int16)
+
+        for row in range(nrows):
+            for col in range(ncols):
+                # find the geometrical setting that is closest to the geometry that is actually observed
+                # tts_LUT, tto_LUT and psi_LUT are the constellations present in the LUT
+                angles = list()
+                angles.append(np.argmin(np.abs(geometry_matrix[0, row, col] - tts)))  # tts
+                angles.append(np.argmin(np.abs(geometry_matrix[1, row, col] - tto)))  # tto
+                angles.append(np.argmin(np.abs(geometry_matrix[2, row, col] - psi)))  # psi
+
+                # find out the number of the LUT to be used - they are sorted in the following order
+                #  0    1    2   ...  5    6   ... ...  31   32   ... n_total   -> for case psin = 6, tton = 5
+                # tts0 tts0 tts0 ... tts0 tts0 ... ... tts0 tts1  ...  ttsn     -> n = len(tts)
+                # tto0 tto0 tto0 ... tto0 tto1 ... ... tton tto0  ...  tton     -> n = len(tto)
+                # psi0 psi1 psi2 ... psin psi0 ... ... psin psi0  ...  psin     -> n = len(psi)
+                whichModel[row, col] = angles[2] * len(tto) * len(tts) + angles[1] * len(tts) + angles[0]
+
+        return whichModel
 
 
 class ProcessorMainFunction:
