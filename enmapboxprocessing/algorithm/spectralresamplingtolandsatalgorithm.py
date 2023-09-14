@@ -7,9 +7,11 @@ from enmapboxprocessing.algorithm.spectralresamplingtosensoralgorithmbase import
 class SpectralResamplingToLandsatOliAlgorithm(SpectralResamplingToSensorAlgorithmBase):
     sensor = SpectralSensors.LandsatOli
 
+
 @typechecked
 class SpectralResamplingToLandsatEtmAlgorithm(SpectralResamplingToSensorAlgorithmBase):
     sensor = SpectralSensors.LandsatEtm
+
 
 @typechecked
 class SpectralResamplingToLandsatTmAlgorithm(SpectralResamplingToSensorAlgorithmBase):

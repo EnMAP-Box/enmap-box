@@ -7,6 +7,7 @@ from enmapboxprocessing.algorithm.spectralresamplingtosensoralgorithmbase import
 class SpectralResamplingToSentinel2aAlgorithm(SpectralResamplingToSensorAlgorithmBase):
     sensor = SpectralSensors.Sentinel2a
 
+
 @typechecked
 class SpectralResamplingToSentinel2bAlgorithm(SpectralResamplingToSensorAlgorithmBase):
     sensor = SpectralSensors.Sentinel2b

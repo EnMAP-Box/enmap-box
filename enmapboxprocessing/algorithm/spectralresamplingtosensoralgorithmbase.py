@@ -1,13 +1,12 @@
 from typing import List, Tuple, Dict, Any
 
 from enmapbox.typeguard import typechecked
-from enmapboxprocessing.algorithm.spectralresampling import SpectralSensors
 from enmapboxprocessing.algorithm.spectralresamplingbyresponsefunctionlibraryalgorithm import \
     SpectralResamplingByResponseFunctionLibraryAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingbywavelengthandfwhmalgorithm import \
     SpectralResamplingByWavelengthAndFwhmAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-from qgis._core import QgsProcessingContext, QgsProcessingFeedback
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback
 
 
 @typechecked
