@@ -89,11 +89,22 @@ class SpectralResamplingByResponseFunctionLibraryAlgorithm(EnMAPProcessingAlgori
                     raise ValueError(f'unsupported wavelength units: {wavelength_units}')
 
                 # prepare responses
-                responses[feature.attribute('name')] = [
-                    (int(round(x * scale)), round(y, RESPONSE_CUTOFF_DIGITS))  # scale and round
+                response = {
+                    int(round(x * scale)): round(y, RESPONSE_CUTOFF_DIGITS)  # scale and round
                     for x, y in zip(profileDict['x'], profileDict['y'])
                     if y >= RESPONSE_CUTOFF_VALUE  # filter very small weights for better performance
-                ]
+                }
+
+                # fill gaps with zeroes
+                xmin = min(response)
+                xmax = max(response)
+                for x in range(xmin, xmax + 1):
+                    if x not in response:
+                        response[x] = 0
+
+                # reformat into list of tuples
+                response = [(x, response[x]) for x in range(xmin, xmax + 1)]
+                responses[feature.attribute('name')] = response
 
             # prepare code snippet
             text = ['from collections import OrderedDict',

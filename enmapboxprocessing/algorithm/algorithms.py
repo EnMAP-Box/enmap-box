@@ -218,11 +218,11 @@ from enmapboxprocessing.algorithm.spectralresamplingtocustomsensoralgorithm impo
     SpectralResamplingToCustomSensorAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtodesisalgorithm import SpectralResamplingToDesisAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtoenmapalgorithm import SpectralResamplingToEnmapAlgorithm
-from enmapboxprocessing.algorithm.spectralresamplingtolandsat5algorithm import SpectralResamplingToLandsat5Algorithm
-from enmapboxprocessing.algorithm.spectralresamplingtolandsat7algorithm import SpectralResamplingToLandsat7Algorithm
-from enmapboxprocessing.algorithm.spectralresamplingtolandsat8algorithm import SpectralResamplingToLandsat8Algorithm
+from enmapboxprocessing.algorithm.spectralresamplingtolandsatalgorithm import SpectralResamplingToLandsatTmAlgorithm, \
+    SpectralResamplingToLandsatEtmAlgorithm, SpectralResamplingToLandsatOliAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtoprismaalgorithm import SpectralResamplingToPrismaAlgorithm
-from enmapboxprocessing.algorithm.spectralresamplingtosentinel2algorithm import SpectralResamplingToSentinel2Algorithm
+from enmapboxprocessing.algorithm.spectralresamplingtosentinel2algorithm import SpectralResamplingToSentinel2aAlgorithm, \
+    SpectralResamplingToSentinel2bAlgorithm
 from enmapboxprocessing.algorithm.stackrasterlayersalgorithm import StackRasterLayersAlgorithm
 from enmapboxprocessing.algorithm.subsetrasterbandsalgorithm import SubsetRasterBandsAlgorithm
 from enmapboxprocessing.algorithm.transformrasteralgorithm import TransformRasterAlgorithm
@@ -399,11 +399,12 @@ def algorithms():
         SpectralResamplingToCustomSensorAlgorithm(),
         SpectralResamplingToDesisAlgorithm(),
         SpectralResamplingToEnmapAlgorithm(),
-        SpectralResamplingToLandsat5Algorithm(),
-        SpectralResamplingToLandsat7Algorithm(),
-        SpectralResamplingToLandsat8Algorithm(),
+        SpectralResamplingToLandsatTmAlgorithm(),
+        SpectralResamplingToLandsatEtmAlgorithm(),
+        SpectralResamplingToLandsatOliAlgorithm(),
         SpectralResamplingToPrismaAlgorithm(),
-        SpectralResamplingToSentinel2Algorithm(),
+        SpectralResamplingToSentinel2aAlgorithm(),
+        SpectralResamplingToSentinel2bAlgorithm(),
         StackRasterLayersAlgorithm(),
         SubsetRasterBandsAlgorithm(),
         PrepareRegressionDatasetFromSynthMixAlgorithm(),
