@@ -1,5 +1,6 @@
 from typing import Dict, Any, List, Tuple
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedrasteralgorithm import \
     PrepareClassificationDatasetFromCategorizedRasterAlgorithm
 from enmapboxprocessing.algorithm.rasterizecategorizedvectoralgorithm import RasterizeCategorizedVectorAlgorithm
@@ -9,15 +10,15 @@ from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessingParameterField,
                        QgsCategorizedSymbolRenderer, QgsProcessingException)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
 class PrepareClassificationDatasetFromCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
     P_CATEGORIZED_VECTOR, _CATEGORIZED_VECTOR = 'categorizedVector', 'Categorized vector layer'
     P_FEATURE_RASTER, _FEATURE_RASTER = 'featureRaster', 'Raster layer with features'
+    P_EXCLUDE_BAD_BANDS, _EXCLUDE_BAD_BANDS, = 'excludeBadBands', 'Exclude bad bands'
     P_CATEGORY_FIELD, _CATEGORY_FIELD = 'categoryField', 'Field with class values'
-    P_COVERAGE, _COVERAGE = 'coverage', 'Minimum pixel coverage'
+    P_COVERAGE, _COVERAGE = 'coverage', 'Minimum pixel coverage [%]'
     P_MAJORITY_VOTING, _MAJORITY_VOTING = 'majorityVoting', 'Majority voting'
     P_OUTPUT_DATASET, _OUTPUT_DATASET = 'outputClassificationDataset', 'Output dataset'
 
@@ -41,6 +42,8 @@ class PrepareClassificationDatasetFromCategorizedVectorAlgorithm(EnMAPProcessing
              'Categorized vector layer specifying sample locations and target data y. '
              'If required, the layer is reprojected and rasterized internally to match the feature raster grid.'),
             (self._FEATURE_RASTER, 'Raster layer used for sampling feature data X.'),
+            (self._EXCLUDE_BAD_BANDS, 'Whether to exclude bands, that are marked as bad bands, '
+                                      'or contain no data, inf or nan values in all samples.'),
             (self._CATEGORY_FIELD, 'Field with class values used as target data y. '
                                    'If not selected, the field defined by the renderer is used. '
                                    'If that is also not specified, an error is raised.'),
@@ -57,6 +60,7 @@ class PrepareClassificationDatasetFromCategorizedVectorAlgorithm(EnMAPProcessing
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterVectorLayer(self.P_CATEGORIZED_VECTOR, self._CATEGORIZED_VECTOR)
         self.addParameterRasterLayer(self.P_FEATURE_RASTER, self._FEATURE_RASTER)
+        self.addParameterBoolean(self.P_EXCLUDE_BAD_BANDS, self._EXCLUDE_BAD_BANDS, True, True)
         self.addParameterField(
             self.P_CATEGORY_FIELD, self._CATEGORY_FIELD, None, self.P_CATEGORIZED_VECTOR,
             QgsProcessingParameterField.Any, False, True, False, True
@@ -70,6 +74,7 @@ class PrepareClassificationDatasetFromCategorizedVectorAlgorithm(EnMAPProcessing
     ) -> Dict[str, Any]:
         classification = self.parameterAsVectorLayer(parameters, self.P_CATEGORIZED_VECTOR, context)
         raster = self.parameterAsRasterLayer(parameters, self.P_FEATURE_RASTER, context)
+        excludeBadBands = self.parameterAsBoolean(parameters, self.P_EXCLUDE_BAD_BANDS, context)
         classField = self.parameterAsField(parameters, self.P_CATEGORY_FIELD, context)
         minCoverage = self.parameterAsInt(parameters, self.P_COVERAGE, context)
         majorityVoting = self.parameterAsBoolean(parameters, self.P_MAJORITY_VOTING, context)
@@ -113,11 +118,11 @@ class PrepareClassificationDatasetFromCategorizedVectorAlgorithm(EnMAPProcessing
             classification = QgsRasterLayer(result[alg.P_OUTPUT_CATEGORIZED_RASTER])
             categories = Utils.categoriesFromPalettedRasterRenderer(classification.renderer())
             feedback.pushInfo('Sample data')
-            X, y = PrepareClassificationDatasetFromCategorizedRasterAlgorithm.sampleData(
-                raster, classification, 1, categories, feedback2
+            X, y, goodBandNumbers = PrepareClassificationDatasetFromCategorizedRasterAlgorithm.sampleData(
+                raster, classification, 1, categories, excludeBadBands, feedback
             )
-
-            features = [RasterReader(raster).bandName(i + 1) for i in range(raster.bandCount())]
+            reader = RasterReader(raster)
+            features = [reader.bandName(bandNo) for bandNo in goodBandNumbers]
             feedback.pushInfo(f'Sampled data: X=array{list(X.shape)} y=array{list(y.shape)}')
 
             dump = ClassifierDump(categories=categories, features=features, X=X, y=y)

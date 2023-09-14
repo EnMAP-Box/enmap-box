@@ -4,13 +4,14 @@ from collections import OrderedDict, defaultdict
 from math import ceil
 from os.path import basename, splitext, join, dirname
 from re import finditer, Match
-from typing import Dict, Any, List, Tuple, Union
+from typing import Dict, Any, List, Tuple, Union, Optional
 from unittest.mock import Mock
 
 import numpy
 import numpy as np
 from osgeo import gdal
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.driver import Driver
@@ -24,7 +25,6 @@ from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsProcessing,
                        QgsProcessingParameterString, QgsProject, QgsRasterLayer, Qgis, QgsVectorLayer, QgsFields)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -32,6 +32,7 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
     P_CODE, _CODE = 'code', 'Code'
     P_GRID, _GRID = 'grid', 'Grid'
     P_FLOAT_INPUT, _FLOAT_INPUT = 'floatInput', '32-bit floating-point inputs'
+    P_NO_DATA_VALUE, _NO_DATA_VALUE = 'noDataValue', 'No data value'
     P_OVERLAP, _OVERLAP = 'overlap', 'Block overlap'
     P_MONOLITHIC, _MONOLITHIC = 'monolithic', 'Monolithic processing'
     P_R1 = 'R1'
@@ -59,8 +60,8 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
 
     linkNumpy = EnMAPProcessingAlgorithm.htmlLink('https://numpy.org/doc/stable/reference/', 'NumPy')
     linkRecipe = EnMAPProcessingAlgorithm.htmlLink(
-        'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_cookbook/raster_math.html',
-        'RasterMath cookbook recipe')
+        'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/applications.html#raster-math',
+        'User Manual')
 
     def displayName(self) -> str:
         return 'Raster math'
@@ -79,7 +80,9 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
                          'In the code snippets section you can find some prepdefined code snippets ready to use.\n'
                          f'See the {self.linkRecipe} for detailed usage instructions.'),
             (self._GRID, 'The destination grid. If not specified, the grid of the first raster layer is used.'),
-            (self._FLOAT_INPUT, 'Whether to  cast inputs to 32-bit floating point.'),
+            (self._FLOAT_INPUT, 'Whether to cast inputs to 32-bit floating point.'),
+            (self._NO_DATA_VALUE, 'Specified value is used as no data value for all inputs. '
+                                  'If not specified, the original input no data values are used.'),
             (self._OVERLAP, 'The number of columns and rows to read from the neighbouring blocks. '
                             'Needs to be specified only when performing spatial operations, '
                             'to avoid artifacts at block borders.'),
@@ -131,6 +134,7 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterMathCode(self.P_CODE, self._CODE, None)
         self.addParameterRasterLayer(self.P_GRID, self._GRID, optional=True)
         self.addParameterBoolean(self.P_FLOAT_INPUT, self._FLOAT_INPUT, True, False, True)
+        self.addParameterFloat(self.P_NO_DATA_VALUE, self._NO_DATA_VALUE, None, True, None, None, True)
         self.addParameterInt(self.P_OVERLAP, self._OVERLAP, None, True, 0)
         self.addParameterBoolean(self.P_MONOLITHIC, self._MONOLITHIC, False, True)
         for name, description in self.inputRasterNames():
@@ -151,6 +155,7 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
     ) -> Dict[str, Any]:
         code = self.parameterAsString(parameters, self.P_CODE, context)
         grid = self.parameterAsRasterLayer(parameters, self.P_GRID, context)
+        noDataValue = self.parameterAsFloat(parameters, self.P_NO_DATA_VALUE, context)
         floatInput = self.parameterAsBoolean(parameters, self.P_FLOAT_INPUT, context)
         overlap = self.parameterAsInt(parameters, self.P_OVERLAP, context)
         monolithic = self.parameterAsBoolean(parameters, self.P_MONOLITHIC, context)
@@ -267,7 +272,8 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
             readers2 = {rasterName: RasterReader(raster) for rasterName, raster in rasters2.items()}
 
             # init output raster layer
-            writers = self.makeWriter(code, filename, grid, readers, readers2, floatInput, feedback)
+            writers = self.makeWriter(
+                code, filename, grid, readers, readers2, floatInput, noDataValue, feedback)
 
             # get block size
             lineMemoryUsage = 0
@@ -287,7 +293,7 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
             for block in grid.walkGrid(blockSizeX, blockSizeY, feedback):
 
                 results = self.processBlock(
-                    code, block, readers, readers2, writers, floatInput, overlap, feedback
+                    code, block, readers, readers2, writers, floatInput, noDataValue, overlap, feedback
                 )
                 for key in results:
                     if self.isTemporaryVariable(key):
@@ -309,7 +315,8 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
 
     def makeWriter(
             self, code: str, filename: str, grid: RasterReader, readers: Dict[str, RasterReader],
-            readers2: Dict[str, RasterReader], floatInput: bool, feedback: ProcessingFeedback
+            readers2: Dict[str, RasterReader], floatInput: bool, noDataValue: Optional[float],
+            feedback: ProcessingFeedback
     ) -> Dict[str, Union[RasterWriter, Mock]]:
         # We derive output data types and band counts by executing the code on a minimal extent (i.e. one pixel).
         # We call this a dry-run.
@@ -327,7 +334,9 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
 
         results = {}
         for block in grid.walkGrid(1, 1, None):
-            results = self.processBlock(code, block, readers, readers2, writers, floatInput, 0, feedback, dryRun=True)
+            results = self.processBlock(
+                code, block, readers, readers2, writers, floatInput, noDataValue, 0, feedback, True
+            )
             break  # stop after processing the first pixel
 
         for name in list(results.keys()):
@@ -361,7 +370,7 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
     def processBlock(
             self, code: str, block: RasterBlockInfo, readers: Dict[str, RasterReader],
             readers2: Dict[str, RasterReader], writers: Dict[str, Union[RasterWriter, Mock]],
-            floatInput: bool, overlap: int, feedback: ProcessingFeedback, dryRun=False
+            floatInput: bool, noDataValue: Optional[float], overlap: int, feedback: ProcessingFeedback, dryRun=False
     ) -> Dict[str, np.ndarray]:
 
         # add modules
@@ -417,6 +426,13 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
                     namespace[rasterName + 'Mask'] = array == 1
                 else:
                     array = np.array(reader2.arrayFromBlock(block, None, overlap))
+
+                    # replace no data values (see #479)
+                    if noDataValue is not None:
+                        for bandNo, arr in enumerate(array, 1):
+                            if reader.noDataValue(bandNo) is not None:
+                                arr[arr == reader.noDataValue(bandNo)] = noDataValue
+
                     namespace[rasterName] = array
                     namespace[rasterName + 'Mask'] = np.array(reader2.maskArray(array, None))
 
@@ -479,6 +495,13 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
             # add single band data
             for bandNos, identifiers in atBands.items():
                 array = np.array(reader2.arrayFromBlock(block, list(bandNos), overlap))
+
+                # replace no data values (see #479)
+                if noDataValue is not None:
+                    for i, arr in enumerate(array):
+                        if reader.noDataValue(bandNos[i]) is not None:
+                            arr[arr == reader.noDataValue(bandNos[i])] = noDataValue
+
                 marray = np.array(reader2.maskArray(array, list(bandNos)))
                 for identifier in identifiers:
                     tmp = identifier.split('@')

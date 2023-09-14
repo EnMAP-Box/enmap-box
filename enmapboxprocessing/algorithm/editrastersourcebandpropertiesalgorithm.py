@@ -2,11 +2,12 @@ from typing import Dict, Any, List, Tuple
 
 from osgeo import gdal
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -32,7 +33,7 @@ class EditRasterSourceBandPropertiesAlgorithm(EnMAPProcessingAlgorithm):
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
             (self._SOURCE, 'GDAL raster source.'),
-            (self._NAMES, 'List of band name strings (e.g).'),
+            (self._NAMES, 'List of band name strings.'),
             (self._WAVELENGTHS, 'List of band center wavelength values in nanometers. '
                                 'Use nan value to unset property.'),
             (self._FWHMS, 'List of band FWHM values in nanometers. '
@@ -66,7 +67,19 @@ class EditRasterSourceBandPropertiesAlgorithm(EnMAPProcessingAlgorithm):
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
+
         source = self.parameterAsFile(parameters, self.P_SOURCE, context)
+        ds = gdal.Open(source)
+        assert ds is not None
+
+        # allow counter variables for band names (see issue #539)
+        if self.P_NAMES in parameters:
+            if '{bandNo}' in parameters[self.P_NAMES] or '{bandName}' in parameters[self.P_NAMES]:
+                reader = RasterReader(source)
+                bandNames = [reader.bandName(bandNo) for bandNo in reader.bandNumbers()]
+                parameters[self.P_NAMES] = \
+                    f"[f'{parameters[self.P_NAMES]}' for bandNo, bandName in enumerate({bandNames}, 1)]"
+
         names = self.parameterAsStringValues(parameters, self.P_NAMES, context)
         wavelengths = self.parameterAsFloatValues(parameters, self.P_WAVELENGTHS, context)
         fwhms = self.parameterAsFloatValues(parameters, self.P_FWHMS, context)
@@ -76,9 +89,6 @@ class EditRasterSourceBandPropertiesAlgorithm(EnMAPProcessingAlgorithm):
         offsets = self.parameterAsFloatValues(parameters, self.P_OFFSETS, context)
         scales = self.parameterAsFloatValues(parameters, self.P_SCALES, context)
         noDataValues = self.parameterAsFloatValues(parameters, self.P_NO_DATA_VALUES, context, True)
-
-        ds = gdal.Open(source)
-        assert ds is not None
 
         # check number of values values
         for name, values in zip(
@@ -97,6 +107,8 @@ class EditRasterSourceBandPropertiesAlgorithm(EnMAPProcessingAlgorithm):
         if names is not None:
             for bandNo, name in enumerate(names, 1):
                 writer.setBandName(name, bandNo)
+                assert name == writer.gdalBand(bandNo).GetDescription()
+
         if wavelengths is not None:
             for bandNo, wavelength in enumerate(wavelengths, 1):
                 writer.setWavelength(wavelength, bandNo)
@@ -129,7 +141,7 @@ class EditRasterSourceBandPropertiesAlgorithm(EnMAPProcessingAlgorithm):
             for bandNo, scale in enumerate(scales, 1):
                 writer.setScale(scale, bandNo)
 
-        del writer
         ds.FlushCache()
+        del writer
         del ds
         return {}

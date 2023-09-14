@@ -1,6 +1,6 @@
 import numpy as np
 
-from enmapbox.exampledata import enmap, landcover_polygon
+from enmapboxtestdata import enmap, landcover_polygon
 from enmapboxprocessing.algorithm.classfractionfromcategorizedvectoralgorithm import \
     ClassFractionFromCategorizedVectorAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
@@ -55,3 +55,42 @@ class TestClassFractionFromCategorizedVectorAlgorithm(TestCase):
             [reader.bandName(bandNo) for bandNo in reader.bandNumbers()]
         )
         self.assertAlmostEqual(247.589, np.mean(reader.array()), 3)
+
+    def test_0p_coverage(self):
+        alg = ClassFractionFromCategorizedVectorAlgorithm()
+        alg.initAlgorithm()
+        parameters = {
+            alg.P_CATEGORIZED_VECTOR: QgsVectorLayer(landcover_polygon),
+            alg.P_GRID: QgsRasterLayer(enmap),
+            alg.P_COVERAGE: 0,
+            alg.P_OUTPUT_FRACTION_RASTER: self.filename('fractions_0p.tif')
+        }
+        self.runalg(alg, parameters)
+        reader = RasterReader(parameters[alg.P_OUTPUT_FRACTION_RASTER])
+        self.assertAlmostEqual(247.589, np.mean(reader.array()), 3)
+
+    def test_50p_coverage(self):
+        alg = ClassFractionFromCategorizedVectorAlgorithm()
+        alg.initAlgorithm()
+        parameters = {
+            alg.P_CATEGORIZED_VECTOR: QgsVectorLayer(landcover_polygon),
+            alg.P_GRID: QgsRasterLayer(enmap),
+            alg.P_COVERAGE: 50,
+            alg.P_OUTPUT_FRACTION_RASTER: self.filename('fractions_50p.tif')
+        }
+        self.runalg(alg, parameters)
+        reader = RasterReader(parameters[alg.P_OUTPUT_FRACTION_RASTER])
+        self.assertAlmostEqual(249.092, np.mean(reader.array()), 3)
+
+    def test_100p_coverage(self):
+        alg = ClassFractionFromCategorizedVectorAlgorithm()
+        alg.initAlgorithm()
+        parameters = {
+            alg.P_CATEGORIZED_VECTOR: QgsVectorLayer(landcover_polygon),
+            alg.P_GRID: QgsRasterLayer(enmap),
+            alg.P_COVERAGE: 100,
+            alg.P_OUTPUT_FRACTION_RASTER: self.filename('fractions_100p.tif')
+        }
+        self.runalg(alg, parameters)
+        reader = RasterReader(parameters[alg.P_OUTPUT_FRACTION_RASTER])
+        self.assertAlmostEqual(250.711, np.mean(reader.array()), 3)

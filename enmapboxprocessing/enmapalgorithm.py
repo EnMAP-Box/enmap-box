@@ -10,6 +10,7 @@ import numpy as np
 from osgeo import gdal
 
 import processing
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.glossary import injectGlossaryLinks
 from enmapboxprocessing.parameter.processingparameterrasterdestination import ProcessingParameterRasterDestination
@@ -28,8 +29,8 @@ from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer
                        QgsProcessingParameterFileDestination, QgsProcessingParameterFile, QgsProcessingParameterRange,
                        QgsProcessingParameterCrs, QgsProcessingParameterVectorDestination, QgsProcessing,
                        QgsProcessingUtils, QgsProcessingParameterMultipleLayers, QgsProcessingException,
-                       QgsProcessingParameterFolderDestination, QgsProject)
-from enmapbox.typeguard import typechecked
+                       QgsProcessingParameterFolderDestination, QgsProject, QgsProcessingOutputLayerDefinition,
+                       QgsProperty, QgsProcessingParameterMatrix)
 
 
 class AlgorithmCanceledException(Exception):
@@ -136,12 +137,16 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext
     ) -> Optional[QgsRasterLayer]:
         layer = super().parameterAsRasterLayer(parameters, name, context)
+
         if layer is None:
             return None
 
-        # if layer is given by URI string or renderer is undefined, we need to manually load the default style
-        if isinstance(parameters.get(name), str) or layer.renderer() is None:
-            layer.loadDefaultStyle()
+        # if layer is given by string (but not by layer ID), ...
+        if isinstance(parameters.get(name), str) and parameters.get(name) not in QgsProject.instance().mapLayers():
+            layer.loadDefaultStyle()  # ... we need to manually load the default style
+
+        if layer.renderer() is None:  # if we still have no valid renderer...
+            layer.loadDefaultStyle()  # ... we also load the dafault style
 
         return layer
 
@@ -311,6 +316,14 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             ints = None
         return ints
 
+    def parameterAsBand(
+            self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext
+    ) -> Optional[int]:
+        bandNo = self.parameterAsInt(parameters, name, context)
+        if bandNo is None or bandNo == -1:
+            return None
+        return bandNo
+
     def parameterAsRange(
             self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext
     ) -> Optional[Tuple[float, float]]:
@@ -424,6 +437,12 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
 
         if filename == '':
             filename = parameters.get(name, '')
+
+        if isinstance(filename, QgsProcessingOutputLayerDefinition):
+            sink: QgsProperty = filename.sink
+            filename = sink.toVariant()['val']
+            assert isinstance(filename, str)
+
         if filename == '':
             return None
         if not isabs(filename):
@@ -496,6 +515,11 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
                       f'use {extensions} instead'
             raise QgsProcessingException(message)
         return format, options
+
+    def parameterAsMatrix(
+            self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext
+    ) -> Optional[List[Any]]:
+        return parameters.get(name)
 
     def parameterIsNone(self, parameters: Dict[str, Any], name: str):
         return parameters.get(name, None) is None
@@ -929,6 +953,17 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         options = self.O_RESAMPLE_ALG
         self.addParameterEnum(name, description, options, False, defaultValue, optional, advanced)
 
+    def addParameterMatrix(
+            self, name: str, description: str, numberRows=3, hasFixedNumberRows=False, headers: Iterable[str] = None,
+            defaultValue=None, optional=False, advanced=False
+    ):
+        self.addParameter(
+            QgsProcessingParameterMatrix(
+                name, description, numberRows, hasFixedNumberRows, headers, defaultValue, optional
+            )
+        )
+        self.flagParameterAsAdvanced(name, advanced)
+
     def flagParameterAsAdvanced(self, name: str, advanced: bool):
         if advanced:
             p = self.parameterDefinition(name)
@@ -967,7 +1002,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         feedback.pushTiming(time() - self._startTime)
 
     @staticmethod
-    def runAlg(algOrName, parameters, onFinish, feedback, context, is_child_algorithm) -> Dict:
+    def runAlg(algOrName, parameters, onFinish=None, feedback=None, context=None, is_child_algorithm=False) -> Dict:
         return processing.run(algOrName, parameters, onFinish, feedback, context, is_child_algorithm)
 
 

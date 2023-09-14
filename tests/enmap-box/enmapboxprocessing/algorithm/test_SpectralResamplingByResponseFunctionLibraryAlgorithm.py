@@ -1,6 +1,6 @@
 import numpy as np
 
-from enmapbox.exampledata import enmap, enmap_srf_library
+from enmapboxtestdata import enmap, enmap_srf_library
 from enmapboxprocessing.algorithm.spectralresamplingbyresponsefunctionlibraryalgorithm import \
     SpectralResamplingByResponseFunctionLibraryAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
@@ -17,4 +17,4 @@ class TestSpectralResamplingByResponseFunctionLibraryAlgorithmBase(TestCase):
             alg.P_OUTPUT_RASTER: self.filename('resampled.tif')
         }
         result = self.runalg(alg, parameters)
-        self.assertEqual(14908146678, np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array(), dtype=float))
+        self.assertEqual(14908146452, np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array(), dtype=float))

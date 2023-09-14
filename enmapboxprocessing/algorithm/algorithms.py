@@ -5,6 +5,8 @@ from enmapboxprocessing.algorithm.classfractionfromcategorizedvectoralgorithm im
     ClassFractionFromCategorizedVectorAlgorithm
 from enmapboxprocessing.algorithm.classificationfromclassprobabilityalgorithm import \
     ClassificationFromClassProbabilityAlgorithm
+from enmapboxprocessing.algorithm.classificationfromrenderedimagealgorithm import \
+    ClassificationFromRenderedImageAlgorithm
 from enmapboxprocessing.algorithm.classificationperformancesimplealgorithm import \
     ClassificationPerformanceSimpleAlgorithm
 from enmapboxprocessing.algorithm.classificationperformancestratifiedalgorithm import \
@@ -13,6 +15,7 @@ from enmapboxprocessing.algorithm.classificationworkflowalgorithm import Classif
 from enmapboxprocessing.algorithm.classifierfeaturerankingpermutationimportancealgorithm import \
     ClassifierFeatureRankingPermutationImportanceAlgorithm
 from enmapboxprocessing.algorithm.classifierperformancealgorithm import ClassifierPerformanceAlgorithm
+from enmapboxprocessing.algorithm.classseparabilityalgorithm import ClassSeparabilityAlgorithm
 from enmapboxprocessing.algorithm.convexhullalgorithm import ConvexHullAlgorithm
 from enmapboxprocessing.algorithm.createdefaultpalettedrasterrendereralgorithm import \
     CreateDefaultPalettedRasterRendererAlgorithm
@@ -133,6 +136,7 @@ from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromvectorandfieldsa
 from enmapboxprocessing.algorithm.randompointsfromcategorizedrasteralgorithm import \
     RandomPointsFromCategorizedRasterAlgorithm
 from enmapboxprocessing.algorithm.randompointsfrommaskrasteralgorithm import RandomPointsFromMaskRasterAlgorithm
+from enmapboxprocessing.algorithm.randompointsfromrasteralgorithm import RandomPointsFromRasterAlgorithm
 from enmapboxprocessing.algorithm.randomsamplesfromclassificationdatasetalgorithm import \
     RandomSamplesFromClassificationDatasetAlgorithm
 from enmapboxprocessing.algorithm.randomsamplesfromregressiondatasetalgorithm import \
@@ -208,8 +212,8 @@ from enmapboxprocessing.algorithm.spectralconvolutiontrapezoid1dalgorithm import
 from enmapboxprocessing.algorithm.spectralindexoptimizeralgorithm import SpectralIndexOptimizerAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingbyresponsefunctionlibraryalgorithm import \
     SpectralResamplingByResponseFunctionLibraryAlgorithm
-from enmapboxprocessing.algorithm.spectralresamplingbyspectralrasterwavelengthandfwhmalgorithm import \
-    SpectralResamplingBySpectralRasterWavelengthAndFwhmAlgorithm
+from enmapboxprocessing.algorithm.spectralresamplingbywavelengthandfwhmalgorithm import \
+    SpectralResamplingByWavelengthAndFwhmAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtocustomsensoralgorithm import \
     SpectralResamplingToCustomSensorAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtodesisalgorithm import SpectralResamplingToDesisAlgorithm
@@ -236,11 +240,13 @@ def algorithms():
         ClassFractionFromCategorizedVectorAlgorithm(),
         CreateSpectralIndicesAlgorithm(),
         ClassificationFromClassProbabilityAlgorithm(),
+        ClassificationFromRenderedImageAlgorithm(),
         ClassificationPerformanceSimpleAlgorithm(),
         ClassificationPerformanceStratifiedAlgorithm(),
         ClassificationWorkflowAlgorithm(),
         ClassifierPerformanceAlgorithm(),
         ClassifierFeatureRankingPermutationImportanceAlgorithm(),
+        ClassSeparabilityAlgorithm(),
         ConvexHullAlgorithm(),
         CreateDefaultPalettedRasterRendererAlgorithm(),
         CreateGridAlgorithm(),
@@ -331,8 +337,9 @@ def algorithms():
         PrepareUnsupervisedDatasetFromFileAlgorithm(),
         PrepareUnsupervisedDatasetFromVectorAndFieldsAlgorithm(),
         PrepareUnsupervisedDatasetFromJsonAlgorithm(),
-        RandomPointsFromMaskRasterAlgorithm(),
         RandomPointsFromCategorizedRasterAlgorithm(),
+        RandomPointsFromMaskRasterAlgorithm(),
+        RandomPointsFromRasterAlgorithm(),
         RandomSamplesFromClassificationDatasetAlgorithm(),
         RandomSamplesFromRegressionDatasetAlgorithm(),
         RasterizeCategorizedVectorAlgorithm(),
@@ -388,7 +395,7 @@ def algorithms():
         SpectralConvolutionTrapezoid1DAlgorithm(),
         SpectralIndexOptimizerAlgorithm(),
         SpectralResamplingByResponseFunctionLibraryAlgorithm(),
-        SpectralResamplingBySpectralRasterWavelengthAndFwhmAlgorithm(),
+        SpectralResamplingByWavelengthAndFwhmAlgorithm(),
         SpectralResamplingToCustomSensorAlgorithm(),
         SpectralResamplingToDesisAlgorithm(),
         SpectralResamplingToEnmapAlgorithm(),

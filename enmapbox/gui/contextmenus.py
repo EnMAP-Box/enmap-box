@@ -1,4 +1,5 @@
 from typing import List, Iterator, Dict, Union
+
 from enmapbox import messageLog
 from enmapbox.gui.datasources.datasources import DataSource
 from enmapbox.gui.datasources.datasourcesets import DataSourceSet
@@ -55,7 +56,6 @@ class EnMAPBoxContextMenuRegistry(QObject):
         return EnMAPBoxContextMenuRegistry._instance
 
     def __init__(self, *args, **kwds):
-        assert self._instance is None, 'EnMAPBoxContextMenuRegistry already instantiated'
         super().__init__(*args, **kwds)
 
         self.mProviders: List[EnMAPBoxAbstractContextMenuProvider] = []
@@ -103,11 +103,14 @@ class EnMAPBoxContextMenuRegistry(QObject):
                               pos: QPoint,
                               point: QgsPointXY) -> bool:
         self.mErrorList.clear()
-        for p in EnMAPBoxContextMenuRegistry.instance():
+        import enmapbox
+        for p in self:
             try:
                 p.populateMapCanvasMenu(menu, mapCanvas, pos, point)
             except Exception as ex:
                 self.logError(ex)
+                if enmapbox.RAISE_ALL_EXCEPTIONS:
+                    raise ex
         return len(self.mErrorList) == 0
 
     def populateDataViewMenu(self,
@@ -115,11 +118,14 @@ class EnMAPBoxContextMenuRegistry(QObject):
                              view: DockTreeView,
                              node: QgsLayerTreeNode) -> bool:
         self.mErrorList.clear()
+        import enmapbox
         for p in self:
             try:
                 p.populateDataViewMenu(menu, view, node)
             except Exception as ex:
                 self.logError(ex)
+                if enmapbox.RAISE_ALL_EXCEPTIONS:
+                    raise ex
         return len(self.mErrorList) == 0
 
     def populateDataSourceMenu(self,
@@ -127,9 +133,12 @@ class EnMAPBoxContextMenuRegistry(QObject):
                                treeView: DataSourceManagerTreeView,
                                selectedNodes: List[Union[DataSourceSet, DataSource]]) -> bool:
         self.mErrorList.clear()
+        import enmapbox
         for p in self:
             try:
                 p.populateDataSourceMenu(menu, treeView, selectedNodes)
             except Exception as ex:
                 self.logError(ex)
+                if enmapbox.RAISE_ALL_EXCEPTIONS:
+                    raise ex
         return len(self.mErrorList) == 0

@@ -4,10 +4,12 @@ name: enmapbox_full_3.32
 channels:
   - conda-forge
 dependencies:
-  - python=3.10
+  - python=3.9
   - ipython
   - qgis=3.32
-  - pip  # avoids that conda uses the wrong pip
+  - pip
+  - scikit-learn>=1 # if necessary, this will install scipy and numpy too
+  - matplotlib  # avoids that conda uses the wrong pip
   - enpt
   - xgboost
   - lightgbm

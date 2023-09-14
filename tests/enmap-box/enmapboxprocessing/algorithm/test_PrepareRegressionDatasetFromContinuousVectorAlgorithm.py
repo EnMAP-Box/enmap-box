@@ -1,10 +1,10 @@
-from enmapbox.exampledata import enmap, landcover_polygon
+from enmapboxtestdata import enmap_potsdam, landcover_potsdam_point
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousvectoralgorithm import \
     PrepareRegressionDatasetFromContinuousVectorAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import fraction_point_multitarget, fraction_point_singletarget
+from enmapboxtestdata import fraction_point_multitarget, fraction_point_singletarget, enmap, landcover_polygon
 from qgis.core import QgsProcessingException
 
 
@@ -55,3 +55,31 @@ class TestPrepareRegressionDatasetFromCategorizedVectorAlgorithm(TestCase):
             self.runalg(alg, parameters)
         except QgsProcessingException as error:
             self.assertEqual(str(error), 'Select either a continuous-valued vector layer, or fields with targets.')
+
+    def test_excludeBadBands(self):
+        alg = PrepareRegressionDatasetFromContinuousVectorAlgorithm()
+        parameters = {
+            alg.P_FEATURE_RASTER: enmap_potsdam,
+            alg.P_CONTINUOUS_VECTOR: landcover_potsdam_point,
+            alg.P_TARGET_FIELDS: ['level_1', 'level_2'],
+            alg.P_EXCLUDE_BAD_BANDS: True,
+            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+        }
+        self.runalg(alg, parameters)
+        dump = RegressorDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        self.assertEqual(218, dump.X.shape[1])
+        self.assertEqual(218, len(dump.features))
+
+    def test_notExcludeBadBands(self):
+        alg = PrepareRegressionDatasetFromContinuousVectorAlgorithm()
+        parameters = {
+            alg.P_FEATURE_RASTER: enmap_potsdam,
+            alg.P_CONTINUOUS_VECTOR: landcover_potsdam_point,
+            alg.P_TARGET_FIELDS: ['level_1', 'level_2'],
+            alg.P_EXCLUDE_BAD_BANDS: False,
+            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+        }
+        self.runalg(alg, parameters)
+        dump = RegressorDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        self.assertEqual(224, dump.X.shape[1])
+        self.assertEqual(224, len(dump.features))

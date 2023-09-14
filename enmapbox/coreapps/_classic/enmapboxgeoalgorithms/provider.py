@@ -3,7 +3,7 @@ import sys
 from qgis.core import *
 
 #from enmapbox.qgispluginsupport.qps.speclib.core import SpectralLibrary
-from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibrary
+#from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibrary
 from _classic.hubflow.core import *
 import _classic.hubdc.progressbar
 #from _classic.enmapboxgeoalgorithms import ENMAPBOXGEOALGORITHMS_VERSION
@@ -351,6 +351,7 @@ class EnMAPAlgorithm(QgisAlgorithm):
             return None
         elif isinstance(qgsVectorLayer, QgsVectorLayer):
             filename = qgsVectorLayer.source()
+            from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibrary
             return SpectralLibrary(uri=filename)
         else:
             assert 0, repr(qgsVectorLayer)

@@ -1,19 +1,39 @@
 import os
+import pathlib
 import platform
 import warnings
 from os.path import join, dirname, abspath
 from typing import Optional
 
+import enmapbox.exampledata
+
 _root = abspath(join(dirname(dirname(__file__)), 'testdata'))
-root2 = abspath(join(dirname(dirname(dirname(__file__))), 'enmapbox', 'exampledata'))
+
+# Berlin example data
+# ...this is the old example dataset, which we still need for unittests
+_subdir = pathlib.Path('exampledata/berlin')
+enmap_berlin = join(_root, _subdir, 'enmap_berlin.bsq')
+enmap_srf_library = join(_root, _subdir, 'enmap_srf_library.gpkg')
+hires_berlin = join(_root, _subdir, 'hires_berlin.bsq')
+landcover_berlin_point = join(_root, _subdir, 'landcover_berlin_point.gpkg')
+landcover_berlin_polygon = join(_root, _subdir, 'landcover_berlin_polygon.gpkg')
+library_berlin = join(_root, _subdir, 'library_berlin.gpkg')
+veg_cover_fraction_berlin_point = join(_root, _subdir, 'veg-cover-fraction_berlin_point.gpkg')
+
+# Potsdam example data
+# ...current example dataset is placed under enmapbox.exampledata
+enmap_potsdam = enmapbox.exampledata.enmap
+hires_potsdom = enmapbox.exampledata.hires
+landcover_potsdam_polygon = enmapbox.exampledata.landcover_polygon
+landcover_potsdam_point = enmapbox.exampledata.landcover_point
+
+# connect old shortcuts (requested by @jakimow)
+enmap = enmap_berlin
+hires = hires_berlin
+library_gpkg = library_berlin
 
 # RASTER
 _subdir = 'raster'
-
-# - spectral raster
-enmap = join(root2, 'enmap_berlin.bsq')
-hires = join(root2, 'hires_berlin.bsq')
-
 # - rasterized landcover polygons
 landcover_polygon_1m = join(_root, _subdir, 'landcover_polygon_1m.tif')
 landcover_polygon_1m_3classes = join(_root, _subdir, 'landcover_polygon_1m_3classes.tif')
@@ -41,13 +61,13 @@ enmap_grid_300m = join(_root, _subdir, 'enmap_grid_300m.vrt')
 _subdir = 'vector'
 
 # - landcover polygons
-landcover_polygon = join(root2, 'landcover_berlin_polygon.gpkg')
+landcover_polygon = landcover_berlin_polygon
 landcover_polygon_3classes = join(_root, _subdir, 'landcover_polygon_3classes.gpkg')
 landcover_polygon_3classes_id = join(_root, _subdir, 'landcover_polygon_3classes_id.gpkg')
 landcover_polygon_3classes_epsg4326 = join(_root, _subdir, 'landcover_polygon_3classes_EPSG4326.gpkg')
 
 # - landcover points
-landcover_point = join(root2, 'landcover_berlin_point.gpkg')
+landcover_point = landcover_berlin_point
 landcover_points_singlepart_epsg3035 = join(_root, _subdir, 'landcover_point_singlepart_3035.gpkg')
 landcover_points_multipart_epsg3035 = join(_root, _subdir, 'landcover_point_multipart_3035.gpkg')
 
@@ -87,8 +107,14 @@ regressorDumpMultiTargetPkl = join(_root, _subdir, 'regressor_multitarget.pkl')
 regressionDatasetAsJsonFile = join(_root, _subdir, 'regression_dataset.json')
 regressionDatasetAsPkl = join(_root, _subdir, 'regression_dataset.pkl')
 
+# SRF
+_subdir = 'srf'
+enmap_berlin_srf_csv = join(_root, _subdir, 'enmap_berlin_srf.csv')  # wavelenght and fwhm
+enmap_potsdam_srf_csv = join(_root, _subdir, 'enmap_potsdam_srf.csv')  # wavelenght and fwhm
+
 # external testdata
 _subdir = 'external'
+envi_library_berlin_sli = join(_root, _subdir, 'envi', 'library_berlin.sli')
 engeomap_cubus_gamsberg_subset = join(_root, _subdir, 'engeomap', 'cubus_gamsberg_subset')
 engeomap_gamsberg_field_library = join(_root, _subdir, 'engeomap', 'gamsberg_field_library')
 engeomap_gamesberg_field_library_color_mod = join(_root, _subdir, 'engeomap', 'gamesberg_field_library_color_mod.csv')

@@ -95,7 +95,7 @@ class Dock(pgDock):
         self.progressBar = self.label.progressBar
         self.uuid = uuid.uuid4()
 
-        self.raiseOverlay()
+        # self.raiseOverlay()
 
         if False:
             self.hStyle = """

@@ -234,7 +234,11 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
 
         dataSources = [n for n in selectedNodes if isinstance(n, DataSource)]
         srcURIs = [ds.source() for ds in dataSources]
-        node = selectedNodes[0]
+
+        if len(selectedNodes) > 0:
+            node = selectedNodes[0]
+        else:
+            node = None
         from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapbox: EnMAPBox = self.enmapBox()
         col = treeView.currentIndex().column()

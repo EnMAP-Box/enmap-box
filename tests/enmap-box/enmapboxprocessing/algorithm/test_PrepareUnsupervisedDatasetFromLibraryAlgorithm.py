@@ -1,9 +1,9 @@
-from enmapbox.exampledata import library_gpkg
 from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromlibraryalgorithm import \
     PrepareUnsupervisedDatasetFromLibraryAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
+from enmapboxtestdata import library_gpkg
 from qgis.core import QgsProcessingException
 
 

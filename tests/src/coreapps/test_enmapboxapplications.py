@@ -47,12 +47,17 @@ class TestEnMAPBoxApplications(EnMAPBoxTestCase):
             self.assertTrue(n_produced > 0, msg='Algorithm "{}" did not create any data source'.format(a.id()))
 
         self.showGui(EB.ui)
+        EB.close()
+        QgsProject.instance().removeAllMapLayers()
 
     def test_UiLibrary(self):
         # Addresses https://bitbucket.org/hu-geomatics/enmap-box/issues/310/attributeerror-function-object-has-no
 
         enmapBox = EnMAPBox(load_core_apps=True, load_other_apps=False)
+        from enmapboxtestdata import library_berlin
+
         enmapBox.loadExampleData()
+        enmapBox.addSource(library_berlin)
         self.assertIsInstance(enmapBox, EnMAPBox)
 
         # how to get SPECLIBs listed in the EnMAP-Box

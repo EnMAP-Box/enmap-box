@@ -1,6 +1,6 @@
 import numpy as np
 
-from enmapbox.exampledata import enmap
+from enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.spectralresamplingtodesisalgorithm import SpectralResamplingToDesisAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtoenmapalgorithm import SpectralResamplingToEnmapAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtolandsat5algorithm import SpectralResamplingToLandsat5Algorithm
@@ -21,9 +21,9 @@ class TestSpectralResamplingByResponseFunctionConvolutionAlgorithmBase(TestCase)
             alg.P_OUTPUT_RASTER: self.filename('resampled.tif')
         }
         result = self.runalg(alg, parameters)
-        self.assertEqual(30542976, np.round(np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array()[0])))
+        self.assertEqual(30542975, np.round(np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array()[0])))
 
-    def test_fwhm(self):
+    def test_responseFunctionByFwhm(self):
         alg = SpectralResamplingToEnmapAlgorithm()
         parameters = {
             alg.P_RASTER: enmap,
@@ -31,7 +31,7 @@ class TestSpectralResamplingByResponseFunctionConvolutionAlgorithmBase(TestCase)
             alg.P_OUTPUT_RASTER: self.filename('resampled.tif')
         }
         result = self.runalg(alg, parameters)
-        self.assertEqual(29437304, np.round(np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array()[0])))
+        self.assertEqual(140855227, np.round(np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array()[0])))
 
     def test_all(self):
         algs = [SpectralResamplingToPrismaAlgorithm(),

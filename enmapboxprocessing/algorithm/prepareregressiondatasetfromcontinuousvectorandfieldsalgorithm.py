@@ -20,7 +20,7 @@ class PrepareRegressionDatasetFromContinuousVectorAndFieldsAlgorithm(EnMAPProces
 
     @classmethod
     def displayName(cls) -> str:
-        return 'Create regression dataset (from continuous-valued layer with attribute table)'
+        return 'Create regression dataset (from continuous-valued vector layer with attribute table)'
 
     def shortDescription(self) -> str:
         return 'Create a regression dataset from attribute table rows that matches the given target variables ' \

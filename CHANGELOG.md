@@ -1,4 +1,10 @@
 # CHANGELOG
+## Version 3.13
+
+_This release was tested with QGIS 3.28 (LTR) and 3.32 (latest release)
+
+* updated [PyQtGraph](https://www.pyqtgraph.org/) to version 0.13.4 (via update of QPS)
+* 
 
 ## Version 3.12
 

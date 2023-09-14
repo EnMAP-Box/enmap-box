@@ -19,16 +19,19 @@
 import pathlib
 import unittest
 
-from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel
+from qgis.PyQt.QtCore import QPoint
+from qgis.PyQt.QtWidgets import QMenu
 
 import qgis
 from enmapbox import DIR_REPO
+from enmapbox.gui.contextmenus import EnMAPBoxContextMenuRegistry, EnMAPBoxAbstractContextMenuProvider
 from enmapbox.gui.dataviews.docks import SpectralLibraryDock, MapDock, Dock
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import MapCanvas
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
+from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel
 from qgis.core import Qgis, QgsExpressionContextGenerator, QgsProcessingContext, QgsExpressionContext
 from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, \
     QgsLayerTree, QgsApplication
@@ -224,6 +227,50 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
 
         EMB.close()
         QgsProject.instance().removeAllMapLayers()
+
+    def test_RAISE_ALL_EXCEPTIONS(self):
+
+        import enmapbox
+        self.assertIsInstance(enmapbox.RAISE_ALL_EXCEPTIONS, bool)
+
+        class TestException(Exception):
+
+            def __init__(self, *args, **kwds):
+                super().__init__(*args, **kwds)
+
+        class ErrorProvider(EnMAPBoxAbstractContextMenuProvider):
+            def __init__(self, *args, **kwds):
+                super().__init__(*args, **kwds)
+
+            def populateDataViewMenu(self, *args, **kwargs):
+                raise TestException()
+
+            def populateDataSourceMenu(self, *args, **kwargs):
+                raise TestException()
+
+            def populateMapCanvasMenu(self, *args, **kwargs):
+                raise TestException()
+
+        lastValue = enmapbox.RAISE_ALL_EXCEPTIONS
+
+        reg0 = EnMAPBoxContextMenuRegistry.instance()
+        reg = EnMAPBoxContextMenuRegistry()
+        reg.addProvider(ErrorProvider())
+
+        menu = QMenu()
+        canvas = QgsMapCanvas()
+        point = SpatialPoint.fromMapCanvasCenter(canvas)
+
+        enmapbox.RAISE_ALL_EXCEPTIONS = True
+
+        with self.assertRaises(TestException):
+            reg.populateMapCanvasMenu(menu, canvas, QPoint(0, 0), point)
+
+        enmapbox.RAISE_ALL_EXCEPTIONS = False
+
+        reg.populateMapCanvasMenu(menu, canvas, QPoint(0, 0), point)
+
+        enmapbox.RAISE_ALL_EXCEPTIONS = lastValue
 
     def test_addSources(self):
         E = EnMAPBox()

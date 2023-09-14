@@ -4,8 +4,11 @@ name: enmapbox_light_latest
 channels:
   - conda-forge
 dependencies:
-  - qgis>=3.30
+  - python=3.9
+  - qgis>=3.32
   - pip
+  - scikit-learn>=1 # if necessary, this will install scipy and numpy too
+  - matplotlib
 
   # Development
   - gitpython
