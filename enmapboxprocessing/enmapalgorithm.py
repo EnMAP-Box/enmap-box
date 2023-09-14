@@ -50,9 +50,12 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     PickleFileDestination = 'Pickle file destination.'
     JsonFileFilter = 'JSON files (*.json)'
     JsonFileExtension = 'json'
-    JsonFileDestination = 'JSON file destination .'
+    JsonFileDestination = 'JSON file destination.'
+    GeoJsonFileFilter = 'GEOJSON files (*.json)'
+    GeoJsonFileExtension = 'geojson'
+    GeoJsonFileDestination = 'GEOJSON file destination.'
     DatasetFileFilter = PickleFileFilter + ';;' + JsonFileFilter
-    DatasetFileDestination = 'Dataset file destination .'
+    DatasetFileDestination = 'Dataset file destination.'
     RasterFileDestination = 'Raster file destination.'
     VectorFileDestination = 'Vector file destination.'
     TableFileDestination = 'Table file destination.'
@@ -419,6 +422,8 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         if filename == '':
             filename = parameters.get(name, '')
         if filename == '':
+            return None
+        if filename is None:
             return None
         if not isabs(filename):
             filename = join(QgsProcessingUtils.tempFolder(), filename)

@@ -257,6 +257,9 @@ class ImportPrismaL2DAlgorithm(EnMAPProcessingAlgorithm):
             writer.setFwhm(fwhm[bandNo - 1], bandNo)
             writer.setScale(1. / 65535., bandNo)
 
+            print(f'{round(wl,1)},{round(fwhm[bandNo - 1],1)}')
+
+
         if badBandMultipliers is not None:
             for bandNo, badBandMultiplier in enumerate(badBandMultipliers, 1):
                 writer.setBadBandMultiplier(badBandMultiplier, bandNo)

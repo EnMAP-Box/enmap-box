@@ -1,6 +1,7 @@
 import inspect
 from collections import OrderedDict
 from math import ceil, sqrt, pi, exp
+from os.path import splitext
 from typing import Dict, Any, List, Tuple, Union
 from warnings import warn
 
@@ -23,7 +24,7 @@ RESPONSE_CUTOFF_DIGITS = 3
 class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Spectral raster layer'
     P_CODE, _CODE = 'response', 'Spectral response function'
-    P_SAVE_RESPONSE_FUNCTION, _SAVE_RESPONSE_FUNCTION = 'saveResponseFunction', 'Save spectral response function'
+    P_OUTPUT_LIBRARY, _OUTPUT_LIBRARY = 'outputResponseFunctionLibrary', 'Output spectral response function library'
     P_OUTPUT_RASTER, _OUTPUT_RASTER = 'outputResampledRaster', 'Output raster layer'
     A_CODE = False
 
@@ -37,8 +38,7 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
         return [
             (self._RASTER, 'A spectral raster layer to be resampled.'),
             (self._CODE, 'Python code specifying the spectral response function.'),
-            (self._SAVE_RESPONSE_FUNCTION,
-             'Whether to save the spectral response function library as *.srf.geojson sidecar file.'),
+            (self._OUTPUT_LIBRARY, self.GeoJsonFileDestination),
             (self._OUTPUT_RASTER, self.RasterFileDestination)
         ]
 
@@ -68,7 +68,9 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
         self.addParameterCode(self.P_CODE, self._CODE, self.defaultCodeAsString(), advanced=self.A_CODE)
-        self.addParameterBoolean(self.P_SAVE_RESPONSE_FUNCTION, self._SAVE_RESPONSE_FUNCTION, False, True, True)
+        self.addParameterFileDestination(
+            self.P_OUTPUT_LIBRARY, self._OUTPUT_LIBRARY, self.GeoJsonFileFilter, None, True, True
+        )
         self.addParameterRasterDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 
     def processAlgorithm(
@@ -76,7 +78,7 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
     ) -> Dict[str, Any]:
         raster = self.parameterAsSpectralRasterLayer(parameters, self.P_RASTER, context)
         responses = self.parameterAsResponses(parameters, self.P_CODE, context)
-        saveResponseFunction = self.parameterAsBoolean(parameters, self.P_SAVE_RESPONSE_FUNCTION, context)
+        filenameSrf = self.parameterAsFileOutput(parameters, self.P_OUTPUT_LIBRARY, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_RASTER, context)
         maximumMemoryUsage = gdal.GetCacheMax()
 
@@ -101,18 +103,11 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
                         weights.append(fx)
                         xs.append(x)
                     weights = np.divide(weights, np.max(weights))  # scale to 0-1 range
-                    #                responses2[f'Band {i + 1} ({k} Nanometers)'] = [(x, round(w, RESPONSE_CUTOFF_DIGITS)) for x, w in
-                    #                                                                zip(xs, weights)]
                     responses2[f'band {i + 1} ({x0} Nanometers)'] = [(x, round(w, RESPONSE_CUTOFF_DIGITS)) for x, w in
                                                                      zip(xs, weights)]
-
                 else:
                     responses2[k] = v
             responses = responses2
-
-            feedback.getQgsFeedback().pushInfo('Spectral response functions:')  # never silence this info!
-            for name in responses:
-                feedback.getQgsFeedback().pushInfo(f"responses['{name}'] = {responses[name]}")
 
             # check if wavelength have single nanometer step
             for name in responses:
@@ -130,6 +125,8 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
             wavelength = [reader.wavelength(i + 1) for i in range(reader.bandCount())]
             outputBandCount = len(responses)
             outputNoDataValue = reader.noDataValue()
+            if outputNoDataValue is None:
+                outputNoDataValue = 0
 
             writer = Driver(filename, feedback=feedback).createLike(reader, reader.dataType(), outputBandCount)
             lineMemoryUsage = reader.lineMemoryUsage() * 2
@@ -162,8 +159,8 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
             writer.setNoDataValue(outputNoDataValue, bandNo)
             writer.close()
 
-            if saveResponseFunction:
-                with open(filename + '.srf.geojson', 'w') as file1, open(filename + '.srf.qml', 'w') as file2:
+            if filenameSrf is not None:
+                with open(filenameSrf, 'w') as file1, open(splitext(filenameSrf)[0] + '.qml', 'w') as file2:
                     writer = GeoJsonLibraryWriter(file1, 'Spectral Response Function', '')
                     writer.initWriting()
                     for i, name in enumerate(responses):
@@ -174,7 +171,10 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
                     writer.endWriting()
                     writer.writeQml(file2)
 
-            result = {self.P_OUTPUT_RASTER: filename}
+            result = {
+                self.P_OUTPUT_LIBRARY: filenameSrf,
+                self.P_OUTPUT_RASTER: filename
+            }
             self.toc(feedback, result)
 
         return result
