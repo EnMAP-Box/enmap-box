@@ -51,7 +51,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     JsonFileFilter = 'JSON files (*.json)'
     JsonFileExtension = 'json'
     JsonFileDestination = 'JSON file destination.'
-    GeoJsonFileFilter = 'GEOJSON files (*.json)'
+    GeoJsonFileFilter = 'GEOJSON files (*.geojson)'
     GeoJsonFileExtension = 'geojson'
     GeoJsonFileDestination = 'GEOJSON file destination.'
     DatasetFileFilter = PickleFileFilter + ';;' + JsonFileFilter
