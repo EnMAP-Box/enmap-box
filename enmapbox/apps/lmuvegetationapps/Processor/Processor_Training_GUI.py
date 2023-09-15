@@ -32,21 +32,28 @@ import sys
 # import os
 # import logging
 
-import numpy as np
-import pandas as pd
+# import numpy as np
+# import pandas as pd
 
-import LUT.CreateLUT_GUI
+from qgis.gui import QgsMapLayerComboBox
+from qgis.core import QgsMapLayerProxyModel
+from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
+from qgis.core import QgsVectorLayer
+
+
+# import LUT.CreateLUT_GUI
 # ensure to call QGIS before PyQtGraph
 from qgis.PyQt.QtWidgets import *
-from PyQt5.QtGui import QIntValidator
+# from PyQt5.QtGui import QIntValidator
 # from PyQt5.QtCore import QThread, pyqtSignal
 # from PyQt5.QtCore import QTimer
 import lmuvegetationapps.Processor.Processor_Inversion_core as processor
-import lmuvegetationapps.LUT.CreateLUT_GUI
+# import lmuvegetationapps.LUT.CreateLUT_GUI
 from lmuvegetationapps import APP_DIR
 from _classic.hubflow.core import *
 import csv
 import joblib
+import json
 
 from enmapbox.gui.utils import loadUi
 
@@ -64,7 +71,7 @@ import warnings
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 warnings.filterwarnings('ignore', category=UserWarning)
 
-pathUI_train = os.path.join(APP_DIR, 'Resources/UserInterfaces/Processor_Train.ui')
+pathUI_train = os.path.join(APP_DIR, 'Resources/UserInterfaces/Processor_Train_SoilSpecTest.ui')
 pathUI_loadtxt = os.path.join(APP_DIR, 'Resources/UserInterfaces/LoadTxtFileInsitu.ui')
 pathUI_wavelength = os.path.join(APP_DIR, 'Resources/UserInterfaces/Select_Wavelengths.ui')
 pathUI_prgbar = os.path.join(APP_DIR, 'Resources/UserInterfaces/ProgressBar.ui')
@@ -74,8 +81,10 @@ pathUI_Printer = os.path.join(APP_DIR, 'Resources/UserInterfaces/Printer.ui')
 
 class MLTrainingGUI(QDialog):
     def __init__(self, parent=None):
+        mLayerSpeclib: QgsMapLayerComboBox
         super(MLTrainingGUI, self).__init__(parent)
         loadUi(pathUI_train, self)
+        self.mLayerSpeclib.setFilters(QgsMapLayerProxyModel.PointLayer)
 
 
 class LoadTxtFileGUI(QDialog):
@@ -152,6 +161,12 @@ class ML_Training:
         self.query_strat = 'PAL'
         self.saveALselection = False
         self.eval_on_insitu = False
+        
+        self.addItemSpeclib = []
+        self.gui.mLayerSpeclib.setLayer(None)
+        self.speclib = None
+        self.soil_wavelengths = None
+        self.soil_specs = None
 
     def connections(self):
         self.gui.cmdInputLUT.clicked.connect(lambda: self.open_lut())
@@ -197,6 +212,10 @@ class ML_Training:
         for para in self.paramsdict:
             self.paramsdict[para].stateChanged.connect(lambda group, pid=para:
                                                        self.set_params_flags(group="targets", para_id=pid))
+            
+        self.gui.mLayerSpeclib.layerChanged.connect(lambda: self.open_speclib(mode="libDropdown"))
+        self.gui.cmdLibSelect.clicked.connect(lambda: self.open_speclib(mode='libSelect'))
+        
 
     def start_GUI_LUT(self, *args):
         from lmuvegetationapps.LUT.CreateLUT_GUI import MainUiFunc
@@ -493,6 +512,56 @@ class ML_Training:
             self.out_dir = self.gui.txtModelDir.text().replace("\\", "/")
             if not self.out_dir[-1] == "/":  # last letter of the folder name needs to be a slash to add filenames
                 self.out_dir += "/"
+    def open_speclib(self, mode):
+        if mode == "libSelect":
+            if self.speclib is not None:
+                self.speclib = None
+            lib_input = QFileDialog.getOpenFileName(caption='Select Input Spectral Library',
+                                                    filter="ENVI Spectral Library Geopackage(*.gpkg)")[0]
+            if not lib_input:
+                return
+            self.addItemSpeclib.append(lib_input)
+            self.gui.mLayerSpeclib.setAdditionalItems(self.addItemSpeclib)
+            self.gui.mLayerSpeclib.setCurrentText(lib_input)
+            self.speclib = lib_input
+
+        if mode == "libDropdown":
+            if self.speclib is not None:
+                self.speclib = None
+            if self.gui.mLayerSpeclib.currentLayer() is not None:
+                input = self.gui.mLayerSpeclib.currentLayer()
+                lib_input = input.source()
+            elif len(self.gui.mLayerSpeclib.currentText()) > 0:
+                lib_input = self.gui.mLayerSpeclib.currentText()
+            else:
+                self.speclib = None
+                return
+            self.speclib = lib_input
+
+        all_specs = []
+        wl_extracted = False
+        layer = QgsVectorLayer(self.speclib, "Soil spectra layer")  #<- works only for gpkg Geopackage
+        #TODO: add option for spectral library .sli
+        features = list(layer.getFeatures())
+        # Loop through the features
+        for feature in layer.getFeatures():
+            # Assuming that the JSON string is in an attribute named 'json_data'
+            json_data = feature[2]
+            # Parse the JSON string
+            data_dict = json.loads(json_data)
+
+            # Extract 'x' values only once
+            if not wl_extracted:
+                wl_values = data_dict.get('x', [])
+                wl_extracted = True
+
+            # Extract and store y_values
+            y_values = data_dict.get('y', [])
+            all_specs.append(y_values)
+
+        self.soil_wavelengths = wl_values
+        self.soil_specs = [list(row) for row in zip(*all_specs)]
+
 
     def check_and_assign(self):
         if not self.lut_path:
@@ -579,6 +648,12 @@ class ML_Training:
         else:
             self.perf_eval = False
 
+        if self.soil_wavelengths:
+            soil_nbands_valid = len(self.soil_wavelengths) - len(self.exclude_bands)
+            if not soil_nbands_valid == self.nbands_valid:
+                raise ValueError("LUT band number ({:d}) does not match band "
+                                 "number of added soil spectra ({:d})".format(self.nbands_valid, soil_nbands_valid))
+
     def abort(self, message):
         QMessageBox.critical(self.gui, "Error", message)
 
@@ -617,7 +692,8 @@ class ML_Training:
                                            n_initial=self.n_initial, test_size=self.test_size,
                                            hyperp_tuning=self.hyperp_tuning, hyperparas_dict=self.hyperparas_dict,
                                            query_strat=self.query_strat, saveALselection=self.saveALselection,
-                                           eval_on_insitu=self.eval_on_insitu)
+                                           eval_on_insitu=self.eval_on_insitu,
+                                           soil_wavelengths=self.soil_wavelengths, soil_specs=self.soil_specs)
         except ValueError as e:
             self.abort(message="Failed to setup model training: {}".format(str(e)))
             self.prg_widget.gui.lblCancel.setText("")

@@ -659,7 +659,7 @@ class MLInversion:
         self.prg_widget.gui.lblCancel.setText("")
         self.prg_widget.gui.allow_cancel = True
         self.prg_widget.gui.close()
-        QMessageBox.information(self.gui, "Finish", "ML model mapping finished")
+        QMessageBox.information(self.gui, "Finish", "ML mapping finished")
         self.gui.close()
 
     def open_train_gui(self):

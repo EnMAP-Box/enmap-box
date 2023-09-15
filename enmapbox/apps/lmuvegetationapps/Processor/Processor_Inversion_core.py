@@ -403,7 +403,8 @@ class ProcessorTraining:
                        algorithm='ANN',
                        use_al=False, use_insitu=False, n_initial=2,
                        perf_eval=False, split_method='train_test_split', kfolds=5, test_size=0.2, hyperp_tuning=False,
-                       hyperparas_dict=None, query_strat='PAL', saveALselection=False, eval_on_insitu=False):
+                       hyperparas_dict=None, query_strat='PAL', saveALselection=False, eval_on_insitu=False,
+                       soil_wavelengths=None, soil_specs=None):
         # Setup everything for training new models
         self.exclude_bands = exclude_bands  # the bands to be excluded for the training (water vapor absorption etc.)
         self.para_list = para_list
@@ -428,6 +429,9 @@ class ProcessorTraining:
         self.query_strat = query_strat
         self.saveALselection = saveALselection
         self.eval_on_insitu = eval_on_insitu
+
+        self.soil_wavelengths = soil_wavelengths
+        self.soil_specs = soil_specs
 
         # LUT
         self.get_meta_LUT(lut_metafile=lut_metafile)  # read meta information of the LUT to be trained
@@ -460,6 +464,7 @@ class ProcessorTraining:
         # subset_bands_lut skips "npara_in_lut" values and jumps into reflectances, but also skips exclude_bands
         self.subset_bands_lut = [i + self.npara_in_lut for i in range(len(self.meta_dict['wavelengths']))
                                  if i not in self.exclude_bands]
+
 
         # # Training Values
 
@@ -664,6 +669,16 @@ class ProcessorTraining:
                             hyperparams = {}
 
                         self.init_model(var=para, hyperparams=hyperparams)  # initialize the model with the given settings
+
+                        if self.soil_specs:
+                            subset_bands = [i for i in range(len(self.soil_wavelengths))
+                                            if i not in self.exclude_bands]
+                            soilspecs = [self.soil_specs[i] for i in subset_bands]
+                            soilspecs = np.asarray(soilspecs).T
+                            X = np.vstack((X, soilspecs))
+                            add_zero_len = len(soilspecs)
+                            zeroes = np.zeros((add_zero_len, 1))
+                            y = np.vstack((y, zeroes))
 
                         # Update progress bar
                         if prgbar_widget:
