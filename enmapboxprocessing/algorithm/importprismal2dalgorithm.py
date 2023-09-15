@@ -4,13 +4,13 @@ from typing import Dict, Any, List, Tuple, Optional
 import numpy as np
 from osgeo import gdal
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.importprismal1algorithm import utilsReadAsArray, utilsDeleteCopy
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterwriter import RasterWriter
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRectangle,
                        QgsCoordinateReferenceSystem)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -256,6 +256,8 @@ class ImportPrismaL2DAlgorithm(EnMAPProcessingAlgorithm):
             writer.setWavelength(wl, bandNo)
             writer.setFwhm(fwhm[bandNo - 1], bandNo)
             writer.setScale(1. / 65535., bandNo)
+
+            print(f'{round(wl, 1)},{round(fwhm[bandNo - 1], 1)}')
 
         if badBandMultipliers is not None:
             for bandNo, badBandMultiplier in enumerate(badBandMultipliers, 1):

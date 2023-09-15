@@ -870,10 +870,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     def onAddPotsdamDataset(self):
         # example datasets are stored here: https://github.com/EnMAP-Box/enmap-box-exampledata
-        from enmapboxtestdata import enmap_potsdam, aerial_potsdam, landcover_potsdam_polygon, landcover_potsdam_point
+        from enmapboxtestdata import enmap_potsdam, hires_potsdom, landcover_potsdam_polygon, landcover_potsdam_point
         layers = [
             QgsRasterLayer(enmap_potsdam, basename(enmap_potsdam)),
-            QgsRasterLayer(aerial_potsdam, basename(aerial_potsdam)),
+            QgsRasterLayer(hires_potsdom, basename(hires_potsdom)),
             QgsVectorLayer(landcover_potsdam_polygon, basename(landcover_potsdam_polygon)),
             QgsVectorLayer(landcover_potsdam_point, basename(landcover_potsdam_point))
         ]
@@ -1828,7 +1828,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         if missingTestData():
             installTestData()
 
-        rx = re.compile('.*(bsq|bil|bip|tif|gpkg|sli|img|shp|pkl)$', re.I)
+        rx = re.compile('.*(bsq|bil|bip|tif|gpkg|sli|img|shp|pkl|geojson)$', re.I)
         if not missingTestData():
             import enmapbox.exampledata
             dir_exampledata = os.path.dirname(enmapbox.exampledata.__file__)

@@ -107,8 +107,14 @@ regressorDumpMultiTargetPkl = join(_root, _subdir, 'regressor_multitarget.pkl')
 regressionDatasetAsJsonFile = join(_root, _subdir, 'regression_dataset.json')
 regressionDatasetAsPkl = join(_root, _subdir, 'regression_dataset.pkl')
 
+# SRF
+_subdir = 'srf'
+enmap_berlin_srf_csv = join(_root, _subdir, 'enmap_berlin_srf.csv')  # wavelenght and fwhm
+enmap_potsdam_srf_csv = join(_root, _subdir, 'enmap_potsdam_srf.csv')  # wavelenght and fwhm
+
 # external testdata
 _subdir = 'external'
+envi_library_berlin_sli = join(_root, _subdir, 'envi', 'library_berlin.sli')
 engeomap_cubus_gamsberg_subset = join(_root, _subdir, 'engeomap', 'cubus_gamsberg_subset')
 engeomap_gamsberg_field_library = join(_root, _subdir, 'engeomap', 'gamsberg_field_library')
 engeomap_gamesberg_field_library_color_mod = join(_root, _subdir, 'engeomap', 'gamesberg_field_library_color_mod.csv')
