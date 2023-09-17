@@ -25,6 +25,8 @@ import warnings
 from os.path import basename
 from typing import Optional, Dict, Union, Any, List, Sequence
 
+from PyQt5.QtXml import QDomElement
+
 import enmapbox
 import enmapbox.gui.datasources.manager
 import qgis.utils
@@ -68,6 +70,7 @@ from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, Q
     QMainWindow, QApplication, QSizePolicy, QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
     QProgressBar, QMessageBox
 from qgis.PyQt.QtXml import QDomDocument
+from qgis._core import QgsReadWriteContext
 from qgis.core import QgsExpressionContextGenerator, QgsExpressionContext, QgsProcessingContext, \
     QgsExpressionContextUtils
 from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
@@ -935,17 +938,22 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             if isinstance(archive, QgsProjectArchive):
                 archive.clearProjectFile()
 
-    def onWriteProject(self, dom: QDomDocument):
+    def onWriteProject(self, doc: QDomDocument):
 
-        node = dom.createElement('ENMAPBOX')
-        root = dom.documentElement()
+        context = QgsReadWriteContext()
 
-        # save time series
-        # self.timeSeries().writeXml(node, dom)
-
-        # save map views
-        # self.mapWidget().writeXml(node, dom)
+        node: QDomElement = doc.createElement('EnMAPBox')
+        root = doc.documentElement()
         root.appendChild(node)
+
+        # save data sources
+        self.dataSourceManagerTreeView().writeXml(node, doc, context)
+
+        # save data views
+        self.dockTreeView().writeXml(node, doc, context)
+
+        s = ""
+
 
     def onReadProject(self, doc: QDomDocument) -> bool:
         """
@@ -956,10 +964,18 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         if not isinstance(doc, QDomDocument):
             return False
 
-        root = doc.documentElement()
-        node = root.firstChildElement('ENMAPBOX')
-        if node.nodeName() == 'ENMAPBOX':
-            pass
+        context = QgsReadWriteContext()
+
+        root: QDomElement = doc.documentElement()
+        node: QDomElement = root.firstChildElement('EnMAPBox')
+        if node.isNull():
+           return False
+
+        # save data sources
+        self.dataSourceManagerTreeView().readXml(node, context)
+
+        # save data views
+        self.dockTreeView().readXml(node, context)
 
         return True
 
@@ -1318,7 +1334,6 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.ui.mActionOpenProject.triggered.connect(lambda: self.iface.actionOpenProject().trigger())
         self.ui.mActionSaveProject.triggered.connect(lambda: self.iface.actionSaveProject().trigger())
         self.ui.mActionSaveProjectAs.triggered.connect(lambda: self.iface.actionSaveProjectAs().trigger())
-        # AJ: Question for Benjamin: currently we don't have an open button, why?
 
         from enmapbox.gui.mapcanvas import CanvasLinkDialog
         self.ui.mActionMapLinking.triggered.connect(
@@ -2272,13 +2287,14 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         if isinstance(project, str):
             self.addProject(pathlib.Path(project))
         elif isinstance(project, pathlib.Path) and project.is_file():
-            p = QgsProject()
+            p = QgsProject.instance()
             p.read(project.as_posix())
             self.addProject(p)
         elif isinstance(project, QgsProject):
             scope = 'HU-Berlin'
             key = 'EnMAP-Box'
 
+            QgsProject.instance().readProject
             self.onReloadProject()
 
     def actionAddRasterLayer(self):

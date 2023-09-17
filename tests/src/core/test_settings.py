@@ -27,7 +27,8 @@ from enmapbox.testing import EnMAPBoxTestCase
 from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsProject
 
-
+from enmapbox.testing import start_app
+start_app()
 class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
 
     def test_loadSettings(self):
@@ -78,6 +79,9 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
         self.assertIsInstance(proj, QgsProject)
         tmp_path = self.tempDir() / 'project.qgs'
         os.makedirs(tmp_path.parent, exist_ok=True)
+        proj.write(tmp_path.as_posix())
+
+        self.assertTrue(tmp_path.is_file())
 
         box.close()
         self.assertTrue(EnMAPBox.instance() is None)
@@ -90,6 +94,7 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
             self.assertEqual(dataSources, box.dataSources())
             self.assertEqual(n_maps, len(box.mapCanvases()))
 
+        self.showGui(box.ui)
 
 if __name__ == '__main__':
     unittest.main(buffer=False)

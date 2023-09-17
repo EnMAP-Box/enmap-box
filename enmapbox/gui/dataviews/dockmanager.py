@@ -1394,6 +1394,26 @@ class DockTreeView(QgsLayerTreeView):
         self.mMenuProvider = DockManagerLayerTreeModelMenuProvider(self)
         self.setMenuProvider(self.mMenuProvider)
 
+    def readXml(self, parent: QDomElement, context: QgsReadWriteContext):
+
+        pass
+    def writeXml(self, parent: QDomElement, doc: QDomDocument, context: QgsReadWriteContext):
+
+        node = doc.createElement(self.__class__.__name__)
+        parent.appendChild(node)
+
+        model = self.model().sourceModel()
+        if isinstance(model, DockManagerTreeModel):
+            for dn in model.dockTreeNodes():
+                node: QDomElement = doc.createElement('DataView')
+                node.setAttribute('name', dn.name())
+                node.setAttribute('isVisible', dn.isVisible())
+                dn: DockTreeNode
+                dn.writeXml(node, context)
+                nLayers = doc.createElement('Layers')
+
+
+        s = ""
     def findParentMapDockTreeNode(self, node: QgsLayerTreeNode) -> MapDockTreeNode:
         while isinstance(node, QgsLayerTreeNode) and not isinstance(node, MapDockTreeNode):
             node = node.parent()
