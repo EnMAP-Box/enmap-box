@@ -19,8 +19,10 @@ import os
 # noinspection PyPep8Naming
 import unittest
 
+from qgis.PyQt.QtGui import QIcon
+
+from enmapbox.enmapboxsettings import enmapboxSettings, EnMAPBoxSettings, EnMAPBoxOptionsFactory
 from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.enmapboxsettings import enmapboxSettings, EnMAPBoxSettings
 from enmapbox.testing import EnMAPBoxTestCase
 from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsProject
@@ -42,6 +44,28 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
             emb.close()
 
         QgsProject.instance().removeAllMapLayers()
+
+    def test_enmapbox_setting_dialog(self):
+        from enmapbox.enmapboxsettings import EnMAPBoxSettingsPage
+
+        page = EnMAPBoxSettingsPage()
+
+        self.showGui(page)
+
+    def test_enmapbox_optionsFactory(self):
+
+        f = EnMAPBoxOptionsFactory()
+
+        from qgis.utils import iface
+        iface.registerOptionsWidgetFactory(f)
+        self.assertIsInstance(f.icon(), QIcon)
+        self.assertIsInstance(f.key(), str)
+        self.assertEqual(f.title(), 'EnMAP-Box')
+        w = f.createWidget(None)
+
+        icon = f.icon()
+
+        self.showGui(w)
 
     def test_enmapbox_settings(self):
 

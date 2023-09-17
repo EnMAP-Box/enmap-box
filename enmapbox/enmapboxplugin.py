@@ -21,12 +21,14 @@ import sys
 import typing
 
 from enmapbox.enmapboxprojectsettings import EnMAPBoxProjectSettings
+from enmapbox.enmapboxsettings import EnMAPBoxOptionsFactory
 from qgis.PyQt.QtCore import QOperatingSystemVersion
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsProject, Qgis
 from qgis.gui import QgisInterface, QgsDockWidget
+import qgis.utils
 
 
 class EnMAPBoxPlugin(object):
@@ -37,6 +39,10 @@ class EnMAPBoxPlugin(object):
         self.pluginToolbarActions: typing.List[QAction] = []
         self.rasterMenuActions: typing.List[QAction] = []
         self.dockWidgets: typing.List[QgsDockWidget] = []
+        self.optionsFactory: EnMAPBoxOptionsFactory = None
+        if not isinstance(self.optionsFactory, EnMAPBoxOptionsFactory):
+            self.optionsFactory = EnMAPBoxOptionsFactory()
+            qgis.utils.iface.registerOptionsWidgetFactory(self.optionsFactory)
 
         if QOperatingSystemVersion.current().name() == 'macOS':
             # os.environ['SKLEARN_SITE_JOBLIB']='True'True
@@ -143,6 +149,8 @@ class EnMAPBoxPlugin(object):
             for dockWidget in self.dockWidgets:
                 iface.removeDockWidget(dockWidget)
 
+            if self.optionsFactory:
+                iface.unregisterOptionsWidgetFactory(self.optionsFactory)
         import enmapbox
         enmapbox.unloadAll()
 
