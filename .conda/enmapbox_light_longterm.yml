@@ -17,6 +17,7 @@ dependencies:
   - pytest-cov
   - flake8
   - docutils
+  - markdown
 
   - pip:
       - flake8-qgis

@@ -12,6 +12,7 @@ dependencies:
   - enpt
   - xgboost
   - lightgbm
+  - markdown
 
   # Polymer AC additional conda requirements
   - cdsapi
