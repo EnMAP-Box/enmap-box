@@ -43,8 +43,8 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
         return [
             (self._FILE, 'The MTD_MSIL2A.xml metadata file associated with the product.\n'
                          'Instead of executing this algorithm, '
-                         'you may drag&drop the metadata file directly from your system file browser onto '
-                         'the EnMAP-Box map view area.'),
+                         'you may drag&drop the metadata file directly from your system file browser '
+                         'a) onto the EnMAP-Box map view area, or b) onto the Sensor Product Import panel.'),
             (self._BAND_LIST, 'Bands to be stacked together. '
                               'Defaults to all 10m and 20m bands ordered by center wavelength. '
                               'Note that the destination pixel size matches the smallest/finest '
