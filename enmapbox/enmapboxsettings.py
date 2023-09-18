@@ -17,6 +17,7 @@ class EnMAPBoxSettings(QgsSettings):
     SHOW_WARNING = 'SHOW_WARNINGS'
     SHOW_SPLASHSCREEN = 'SHOW_SPLASHSCREEN'
     MAP_BACKGROUND = 'MAP_BACKGROUND'
+    STARTUP_LOAD_PROJECT = 'STARTUP_LOAD_PROJECT'
 
     def __init__(self):
         super().__init__('EnMAP', 'EnMAP-Box')
@@ -25,6 +26,7 @@ class EnMAPBoxSettings(QgsSettings):
         self.setIfUndefined(self.SHOW_WARNING, True)
         self.setIfUndefined(self.SHOW_SPLASHSCREEN, True)
         self.setIfUndefined(self.MAP_BACKGROUND, QColor('black'))
+        self.setIfUndefined(self.STARTUP_LOAD_PROJECT, False)
 
     def setIfUndefined(self, key, value):
         if key not in self.allKeys():
@@ -34,6 +36,13 @@ class EnMAPBoxSettings(QgsSettings):
         print('EnMAP-Box Settings:')
         for k in self.allKeys():
             print(f'{k}={self.value(k)}')
+
+    def valueAsBool(self, key, default=None) -> bool:
+        v = self.value(key, default)
+        if isinstance(v, bool):
+            return v
+        else:
+            return str(v).lower() in ['1', 'true']
 
 
 def enmapboxSettings() -> EnMAPBoxSettings:
@@ -72,7 +81,7 @@ class EnMAPBoxSettingsPage(QgsOptionsPageWidget):
         )
 
         self.btnReset.setIcon(QIcon(QgsApplication.iconPath("mActionUndo.svg")))
-        self.btnReset.pressed.connect(self.reset_settings)
+        self.btnReset.pressed.connect(self.resetSettings)
 
         # load previously saved settings
         self.loadSettings()
@@ -115,7 +124,7 @@ class EnMAPBoxSettingsPage(QgsOptionsPageWidget):
         self.cbDebugMode.setChecked(settings.value('DEBUG_MODE', defaultValue=False))
         self.labelTitle.setText(enmapbox.__version__)
 
-    def reset_settings(self):
+    def resetSettings(self):
         """Reset settings to default values (set in preferences.py module)."""
 
         # default_settings = PlgSettingsStructure()

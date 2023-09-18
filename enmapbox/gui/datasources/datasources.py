@@ -2,8 +2,12 @@ import datetime
 import json
 import pickle
 import warnings
+from typing import List
+
+from qgis.PyQt.QtXml import QDomElement, QDomDocument
 
 from qgis.PyQt.QtGui import QIcon
+from qgis.core import QgsReadWriteContext, QgsMimeDataUtils
 from qgis.core import QgsCoordinateReferenceSystem, QgsUnitTypes, \
     QgsMapLayerType, QgsVectorLayer, Qgis, QgsWkbTypes, QgsField, QgsProject
 from qgis.core import QgsDataItem, QgsLayerItem, QgsMapLayer, QgsRasterLayer
@@ -92,6 +96,43 @@ class DataSource(TreeNode):
 
     def source(self) -> str:
         return self.mDataItem.path()
+
+    def writeXml(self, parent: QDomElement, context: QgsReadWriteContext):
+        doc: QDomDocument = parent.ownerDocument()
+        n: QDomElement = doc.createElement('DataSource')
+        n.setAttribute('type', self.__class__.__name__)
+
+        for uri in self.dataItem().mimeUris():
+            nUri: QDomElement = doc.createElement('Uri')
+            nUri.appendChild(doc.createTextNode(uri.data()))
+            n.appendChild(nUri)
+        parent.appendChild(n)
+
+    @staticmethod
+    def readXml(parent: QDomElement) -> List['DataSource']:
+
+        dsNodes: List[QDomElement] = []
+        if parent.tagName() == 'DataSource':
+            dsNodes.append(parent)
+        else:
+            dsNodes = []
+            n = parent.firstChildElement('DataSource')
+            while not n.isNull():
+                dsNodes.append(n.toElement())
+                n = n.nextSibling()
+
+        uris: List[QgsMimeDataUtils] = []
+        for dsNode in dsNodes:
+            ntype = dsNode.attribute('type')
+            nUri: QDomElement = dsNode.firstChildElement('Uri')
+            while not nUri.isNull():
+                uri_str: str = nUri.firstChild().nodeValue()
+                uri: QgsMimeDataUtils.Uri = QgsMimeDataUtils.Uri(uri_str)
+                uris.append(uri)
+                nUri = nUri.nextSibling()
+
+        from enmapbox.gui.datasources.manager import DataSourceFactory
+        return DataSourceFactory.create(uris)
 
     def uri(self) -> str:
         warnings.warn('Use source()->str', DeprecationWarning, stacklevel=2)

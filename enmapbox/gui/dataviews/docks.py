@@ -1026,3 +1026,4 @@ LUT_DOCKTYPES = {DockTypes.MapDock: MapDock,
 
 for cls in set(LUT_DOCKTYPES.values()):
     LUT_DOCKTYPES[cls] = cls
+    LUT_DOCKTYPES[cls.__name__] = cls

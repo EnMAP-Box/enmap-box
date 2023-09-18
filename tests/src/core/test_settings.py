@@ -19,6 +19,7 @@ import os
 # noinspection PyPep8Naming
 import unittest
 
+from enmapbox.gui.dataviews.docks import MapDock, Dock
 from qgis.PyQt.QtGui import QIcon
 
 from enmapbox.enmapboxsettings import enmapboxSettings, EnMAPBoxSettings, EnMAPBoxOptionsFactory
@@ -28,7 +29,10 @@ from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsProject
 
 from enmapbox.testing import start_app
+
 start_app()
+
+
 class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
 
     def test_loadSettings(self):
@@ -70,10 +74,26 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
 
     def test_enmapbox_settings(self):
 
+        def dataSourceState(box: EnMAPBox):
+            states = []
+            for ds in box.dataSources(onlyUri=False):
+                states.append(ds.source())
+            return states
+
+        def dataViewState(box: EnMAPBox):
+            states = []
+            for dock in box.docks():
+                state = {'name': dock.name(),
+                         'type': dock.__class__.__name__}
+                states.append(state)
+            return states
+
         box = EnMAPBox(load_core_apps=False, load_other_apps=False)
         box.loadExampleData()
-        dataSources = box.dataSources()
-        n_maps = len(box.mapCanvases())
+        dock1: Dock = box.docks(MapDock)[0]
+        dock1.setTitle('MyMap1')
+        dock2 = box.createMapDock(name='MyMap2', position='left')
+        dock3 = box.createSpectralLibraryDock(name='MySpeclib', position='bottom')
 
         proj = QgsProject.instance()
         self.assertIsInstance(proj, QgsProject)
@@ -83,20 +103,45 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
 
         self.assertTrue(tmp_path.is_file())
 
+        sources1 = dataSourceState(box)
+        views1 = dataViewState(box)
+
         box.close()
+        QgsProject.instance().removeAllMapLayers()
+
         self.assertTrue(EnMAPBox.instance() is None)
+        settings = enmapboxSettings()
 
+        settings.setValue(EnMAPBoxSettings.STARTUP_LOAD_PROJECT, False)
         box = EnMAPBox()
-        self.assertIsInstance(box, EnMAPBox)
-        box.addProject(tmp_path.as_posix())
+        self.assertEqual(len(box.dataSources()), 0)
+        self.assertEqual(len(box.docks()), 0)
 
-        if False:
-            self.assertEqual(dataSources, box.dataSources())
-            self.assertEqual(n_maps, len(box.mapCanvases()))
+        box.readProject(tmp_path)
+        sources2 = dataSourceState(box)
+        views2 = dataViewState(box)
+
+        self.showGui(box.ui)
+
+        self.assertEqual(sources1, sources2)
+        self.assertEqual(views1, views2)
+
+        box.close()
+        QgsProject.instance().removeAllMapLayers()
+
+        # load on startup
+        settings.setValue(EnMAPBoxSettings.STARTUP_LOAD_PROJECT, True)
+        box = EnMAPBox()
+
+        sources3 = dataSourceState(box)
+        views3 = dataViewState(box)
+        self.assertEqual(sources1, sources3)
+        self.assertEqual(views1, views3)
 
         self.showGui(box.ui)
 
         QgsProject.instance().removeAllMapLayers()
+
 
 if __name__ == '__main__':
     unittest.main(buffer=False)

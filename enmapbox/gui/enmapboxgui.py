@@ -25,7 +25,7 @@ import warnings
 from os.path import basename
 from typing import Optional, Dict, Union, Any, List, Sequence
 
-from PyQt5.QtXml import QDomElement
+from qgis.PyQt.QtXml import QDomElement
 
 import enmapbox
 import enmapbox.gui.datasources.manager
@@ -70,7 +70,6 @@ from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, Q
     QMainWindow, QApplication, QSizePolicy, QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
     QProgressBar, QMessageBox
 from qgis.PyQt.QtXml import QDomDocument
-from qgis._core import QgsReadWriteContext
 from qgis.core import QgsExpressionContextGenerator, QgsExpressionContext, QgsProcessingContext, \
     QgsExpressionContextUtils
 from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
@@ -78,6 +77,7 @@ from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
     QgsPointXY, QgsLayerTree, QgsLayerTreeLayer, QgsVectorLayerTools, \
     QgsZipUtils, QgsProjectArchive, QgsSettings, \
     QgsStyle, QgsSymbolLegendNode, QgsSymbol, QgsTaskManager, QgsApplication, QgsProcessingAlgRunnerTask
+from qgis.core import QgsReadWriteContext
 from qgis.core import QgsRectangle
 from qgis.gui import QgsMapCanvas, QgisInterface, QgsMessageBar, QgsMessageViewer, QgsMessageBarItem, \
     QgsMapLayerConfigWidgetFactory, QgsAttributeTableFilterModel, QgsSymbolSelectorDialog, \
@@ -523,8 +523,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         QgsProject.instance().layersWillBeRemoved.connect(self.onLayersWillBeRemoved)
 
-        QgsProject.instance().writeProject.connect(self.onWriteProject)
-        QgsProject.instance().readProject.connect(self.onReadProject)
+        QgsProject.instance().writeProject.connect(self.writeProject)
+        QgsProject.instance().readProject.connect(self.readProject)
 
         QgsApplication.taskManager().taskAdded.connect(self.onTaskAdded)
 
@@ -659,10 +659,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         EnMAPBox._instance = self
 
         splash.finish(self.ui)
-        splash.showMessage('Load project settings...')
-        debugLog('Load settings from QgsProject.instance()')
 
-        self.onReloadProject()
+        if settings.valueAsBool(EnMAPBoxSettings.STARTUP_LOAD_PROJECT, False):
+            splash.showMessage('Load project settings...')
+            self.readProject(QgsProject.instance())
 
     def executeAlgorithm(self, alg_id, parent, in_place=False, as_batch=False):
 
@@ -914,68 +914,68 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             # add current profiles (if collected)
             self.spectralProfileSourcePanel().addCurrentProfilesToSpeclib()
 
-    def onReloadProject(self, *args):
-        """
-        Reads project settings from the opened QGIS Project.
-        :param args:
-        :return:
-        """
-        proj: QgsProject = QgsProject.instance()
-        path = proj.fileName()
-        if os.path.isfile(path):
-            archive = None
-            if QgsZipUtils.isZipFile(path):
-                archive = QgsProjectArchive()
-                archive.unzip(path)
-                path = archive.projectFile()
-
-            file = QFile(path)
-
-            doc = QDomDocument('qgis')
-            doc.setContent(file)
-            self.onReadProject(doc)
-
-            if isinstance(archive, QgsProjectArchive):
-                archive.clearProjectFile()
-
-    def onWriteProject(self, doc: QDomDocument):
+    def writeProject(self, doc: QDomDocument):
 
         context = QgsReadWriteContext()
 
         node: QDomElement = doc.createElement('EnMAPBox')
-        root = doc.documentElement()
-        root.appendChild(node)
+        doc.documentElement().appendChild(node)
 
         # save data sources
-        self.dataSourceManagerTreeView().writeXml(node, doc, context)
+        self.dataSourceManagerTreeView().writeXml(node, context)
 
         # save data views
-        self.dockTreeView().writeXml(node, doc, context)
+        self.dockTreeView().writeXml(node, context)
 
         s = ""
 
-
-    def onReadProject(self, doc: QDomDocument) -> bool:
+    def readProject(self, doc: Union[QgsProject, str, pathlib.Path, QDomDocument]) -> bool:
         """
         Reads images and visualization settings from a QgsProject QDomDocument
         :param doc: QDomDocument
         :return: bool
         """
+        context = QgsReadWriteContext()
+
+        if not isinstance(doc, QDomDocument):
+            if isinstance(doc, (str, pathlib.Path)):
+
+                path = pathlib.Path(doc)
+                if not path.is_file():
+                    context.pushMessage(f'File does not exists: {path}', Qgis.MessageLevel.Critical)
+                else:
+                    path = path.as_posix()
+                    archive = None
+                    if QgsZipUtils.isZipFile(path):
+                        archive = QgsProjectArchive()
+                        archive.unzip(path)
+                        path = archive.projectFile()
+
+                    doc = QDomDocument('qgis')
+                    doc.setContent(QFile(path))
+                    if isinstance(archive, QgsProjectArchive):
+                        archive.clearProjectFile()
+            elif isinstance(doc, QgsProject):
+                return self.readProject(doc.fileName())
+
         if not isinstance(doc, QDomDocument):
             return False
-
-        context = QgsReadWriteContext()
 
         root: QDomElement = doc.documentElement()
         node: QDomElement = root.firstChildElement('EnMAPBox')
         if node.isNull():
-           return False
+            return False
 
-        # save data sources
+        # load data sources
         self.dataSourceManagerTreeView().readXml(node, context)
 
-        # save data views
+        # load data views
         self.dockTreeView().readXml(node, context)
+
+        MESSAGES = dict()
+        for m in context.takeMessages():
+            m: QgsReadWriteContext.ReadWriteMessage
+            MESSAGES[m.level()] = MESSAGES.get(m.level(), []) + [m.message()]
 
         return True
 
@@ -2281,21 +2281,11 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
     def actionAddPgLayer(self):
         return self.ui.mActionAddDataSource
 
-    def addProject(self, project: str):
-        # 1- clear everything
-        # restore
-        if isinstance(project, str):
-            self.addProject(pathlib.Path(project))
-        elif isinstance(project, pathlib.Path) and project.is_file():
-            p = QgsProject.instance()
-            p.read(project.as_posix())
-            self.addProject(p)
-        elif isinstance(project, QgsProject):
-            scope = 'HU-Berlin'
-            key = 'EnMAP-Box'
-
-            QgsProject.instance().readProject
-            self.onReloadProject()
+    def addProject(self, *args, **kwds):
+        """
+        Implements QgisInterface.addProject. Just calls readProject
+        """
+        self.readProject(*args, **kwds)
 
     def actionAddRasterLayer(self):
         return self.ui.mActionAddDataSource
@@ -2312,14 +2302,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         return self.ui.mActionIdentify
 
     def openProject(self, project):
-        if isinstance(project, str):
-            project = pathlib.Path(project)
-        if isinstance(project, pathlib.Path):
-            p = QgsProject()
-            p.read(project.as_posix())
-            self.openProject(project)
-        elif isinstance(project, QgsProject):
-            self.addProject(project)
+        warnings.warn(DeprecationWarning('Use readProject(project)'))
+        self.readProject(project)
 
     def actionPan(self):
         return self.ui.mActionPan

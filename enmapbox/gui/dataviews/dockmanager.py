@@ -92,9 +92,6 @@ class LayerTreeNode(QgsLayerTree):
         d += '{}:"{}":"{}"\n'.format(self.__class__.__name__, self.name(), self.value())
         return d
 
-    def xmlTag(self) -> str:
-        return self.mXmlTag
-
     def _removeSubNode(self, node):
         if node in self.children():
             self.takeChild(node)
@@ -138,39 +135,6 @@ class LayerTreeNode(QgsLayerTree):
         """
         pass
 
-    @staticmethod
-    def readXml(element):
-
-        raise NotImplementedError()
-
-        return None
-
-    @staticmethod
-    def attachCommonPropertiesFromXML(node, element):
-        assert 'tree-node' in element.tagName()
-
-        node.setName(element.attribute('name'))
-        node.setExpanded(element.attribute('expanded') == '1')
-        node.setVisible(QgsLayerTreeUtils.checkStateFromXml(element.attribute("checked")))
-        node.readCommonXml(element)
-
-    def writeXML(self, parentElement):
-
-        assert isinstance(parentElement, QDomElement)
-        doc = parentElement.ownerDocument()
-        elem = doc.createElement('tree-node')
-
-        elem.setAttribute('name', self.name())
-        elem.setAttribute('expanded', '1' if self.isExpanded() else '0')
-        elem.setAttribute('checked', QgsLayerTreeUtils.checkStateToXml(Qt.Checked))
-
-        # custom properties
-        self.writeCommonXml(elem)
-
-        for node in self.children():
-            node.writeXML(elem)
-        parentElement.appendChild(elem)
-
     def dropMimeData(self):
         raise NotImplementedError()
 
@@ -209,15 +173,15 @@ class DockTreeNode(LayerTreeNode):
     def enmapBoxInstance(self) -> Optional['EnMAPBox']:  # noqa: F821
         return self.mEnMAPBoxInstance
 
-    def writeXML(self, parentElement):
-        elem = super(DockTreeNode, self).writeXML(parentElement)
-        elem.setTagName('dock-tree-node')
-        return elem
-
-    def writeLayerTreeGroupXML(self, parentElement):
-        QgsLayerTreeGroup.writeXML(self, parentElement)
-
-        # return super(QgsLayerTreeNode,self).writeXml(parentElement)
+    def writeXml(self, parent: QDomElement, context: QgsReadWriteContext):
+        doc: QDomDocument = parent.ownerDocument()
+        node: QDomElement = doc.createElement('DataView')
+        node.setAttribute('type', self.dock.__class__.__name__)
+        node.setAttribute('name', self.name())
+        node.setAttribute('isVisible', self.isVisible())
+        node.setAttribute('isExpanded', self.isExpanded())
+        parent.appendChild(node)
+        return node
 
     def mapLayers(self) -> List[QgsMapLayer]:
         """
@@ -350,6 +314,15 @@ class MapDockTreeNode(DockTreeNode):
         canvas.setCanvasBridge(self.mTreeCanvasBridge)
         self.sigAddedLayers.connect(dock.sigLayersAdded.emit)
         self.sigRemovedLayers.connect(dock.sigLayersRemoved.emit)
+
+    def writeXml(self, parent: QDomElement, context: QgsReadWriteContext):
+        doc: QDomDocument = parent.ownerDocument()
+        node: QDomElement = super().writeXml(parent, context)
+
+        layerNode = doc.createElement('maplayers')
+        node.appendChild(layerNode)
+        # use the standard QgsLayerTree writeXml
+        super(QgsLayerTree, self).writeXml(layerNode, context)
 
     def onAddedChildren(self, node, idxFrom, idxTo):
         layers: List[QgsMapLayer] = self.mLayers[:]
@@ -849,13 +822,16 @@ class DockManagerTreeModel(QgsLayerTreeModel):
     def project(self) -> QgsProject:
         return self.mProject
 
-    def findDockNode(self, object: typing.Union[str, QgsMapCanvas, QgsRasterLayer,
-                                                QgsVectorLayer, SpectralLibraryWidget]) -> DockTreeNode:
+    def findDockNode(self,  object: object) -> DockTreeNode:
         """
         Returns the dock that contains the given object
         :param object:
         :return:
         """
+        if isinstance(object, Dock):
+            for node in self.dockTreeNodes():
+                if node.dock == object:
+                    return node
         if isinstance(object, MapCanvas):
             return self.mapDockTreeNode(object)
         elif isinstance(object, SpectralLibraryWidget):
@@ -1396,24 +1372,51 @@ class DockTreeView(QgsLayerTreeView):
 
     def readXml(self, parent: QDomElement, context: QgsReadWriteContext):
 
-        pass
-    def writeXml(self, parent: QDomElement, doc: QDomDocument, context: QgsReadWriteContext):
+        nodeDataViews: QDomElement = parent.firstChildElement(self.__class__.__name__)
+        if nodeDataViews.isNull():
+            return False
 
-        node = doc.createElement(self.__class__.__name__)
-        parent.appendChild(node)
+        model = self.model().sourceModel()
+
+        if isinstance(model, DockManagerTreeModel):
+            manager: DockManager = model.dockManager()
+
+            # clearn all existing docks
+            model.removeNodes(model.dockTreeNodes())
+
+            # load docks from XML
+            n: QDomElement = nodeDataViews.firstChildElement('DataView')
+
+            while not n.isNull():
+                n = n.toElement()
+                dockType = n.attribute('type')
+                dockName = n.attribute('name')
+                isVisible = n.attribute('isVisible', 'true').lower() in ['1', 'true']
+                isExpanded = n.attribute('isExpanded', 'true').lower() in ['1', 'true']
+                newDock = manager.createDock(dockType, name=dockName, )
+                newDockNode: DockTreeNode = model.findDockNode(newDock)
+                newDockNode.setExpanded(isExpanded)
+
+                n = n.nextSibling()
+
+            s = ""
+
+        return True
+
+    def writeXml(self, parent: QDomElement, context: QgsReadWriteContext):
+        doc: QDomDocument = parent.ownerDocument()
+        nodeDataViews: QDomElement = doc.createElement(self.__class__.__name__)
+
+        parent.appendChild(nodeDataViews)
 
         model = self.model().sourceModel()
         if isinstance(model, DockManagerTreeModel):
             for dn in model.dockTreeNodes():
-                node: QDomElement = doc.createElement('DataView')
-                node.setAttribute('name', dn.name())
-                node.setAttribute('isVisible', dn.isVisible())
                 dn: DockTreeNode
-                dn.writeXml(node, context)
-                nLayers = doc.createElement('Layers')
-
+                dn.writeXml(nodeDataViews, context)
 
         s = ""
+
     def findParentMapDockTreeNode(self, node: QgsLayerTreeNode) -> MapDockTreeNode:
         while isinstance(node, QgsLayerTreeNode) and not isinstance(node, MapDockTreeNode):
             node = node.parent()

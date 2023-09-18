@@ -9,7 +9,7 @@ from os.path import exists, sep, dirname
 from typing import List, Union, Any, Dict
 
 import numpy as np
-from PyQt5.QtXml import QDomDocument, QDomElement
+from qgis.PyQt.QtXml import QDomDocument, QDomElement
 
 from enmapbox.gui.datasources.datasourcesets import DataSourceSet, ModelDataSourceSet, VectorDataSourceSet, \
     FileDataSourceSet, RasterDataSourceSet
@@ -22,7 +22,7 @@ from qgis.PyQt.QtCore import QAbstractItemModel, QItemSelectionModel, QFileInfo,
     QMimeData, QModelIndex, Qt, QUrl, QSortFilterProxyModel, pyqtSignal
 from qgis.PyQt.QtGui import QContextMenuEvent, QDesktopServices
 from qgis.PyQt.QtWidgets import QWidget, QDialog, QMenu, QAction, QApplication, QAbstractItemView, QTreeView
-from qgis._core import QgsReadWriteContext
+from qgis.core import QgsReadWriteContext
 from qgis.core import QgsLayerTreeGroup, QgsLayerTreeLayer, QgsMapLayer, QgsProject, QgsRasterLayer, \
     QgsRasterDataProvider, QgsRasterRenderer, QgsVectorLayer, QgsDataItem, QgsLayerItem, Qgis
 from qgis.core import QgsMimeDataUtils
@@ -371,38 +371,28 @@ class DataSourceManagerTreeView(TreeView):
         if node.isNull():
             return False
         dsm: DataSourceManager = self.dataSourceManager()
-        n = node.firstChildElement('DataSource')
-        while not n.isNull():
-            n = n.toElement()
-            ntype = n.attribute('type')
-            nUri: QDomElement = n.firstChildElement('Uri')
-            while not nUri.isNull():
-                uri_str: str = nUri.firstChild().nodeValue()
-                uri: QgsMimeDataUtils.Uri = QgsMimeDataUtils.Uri(uri_str)
-                dsm.addDataSources([uri])
-                nUri = nUri.nextSibling().toElement()
-            n = n.nextSibling()
+        if not isinstance(dsm, DataSourceManager):
+            return False
 
-    def writeXml(self, parent: QDomElement, doc: QDomDocument, context: QgsReadWriteContext):
+        datasources = DataSource.readXml(node)
+        dsm.addDataSources(datasources)
+
+        return True
+
+    def writeXml(self, parent: QDomElement, context: QgsReadWriteContext):
         """
         Writes the current state of the DataSources into an XML structure
         """
+        doc: QDomDocument = parent.ownerDocument()
         node: QDomElement = doc.createElement(self.__class__.__name__)
         dsm: DataSourceManager = self.dataSourceManager()
         if isinstance(dsm, DataSourceManager):
             for ds in dsm.dataSources():
                 ds: DataSource
-                s = ds.source()
-                n: QDomElement = doc.createElement('DataSource')
-                n.setAttribute('type', ds.__class__.__name__)
-                dataItem: QgsDataItem = ds.dataItem()
-                for uri in dataItem.mimeUris():
-                    nUri: QDomElement = doc.createElement('Uri')
-                    nUri.appendChild(doc.createTextNode(uri.data()))
-                    n.appendChild(nUri)
-                node.appendChild(n)
+                ds.writeXml(node, context)
 
         parent.appendChild(node)
+
     def setModel(self, model: QAbstractItemModel):
         super().setModel(model)
 
