@@ -14,7 +14,7 @@ from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer, QgsMapLayerProxyModel, QgsMapSettings
 from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsDoubleSpinBox, QgsMapLayerComboBox, QgsColorButton, \
     QgsSpinBox
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -60,7 +60,7 @@ class BivariateColorRasterRendererDialog(QMainWindow):
         QWidget.__init__(self, parent)
         loadUi(__file__.replace('.py', '.ui'), self)
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         self.enmapBox = EnMAPBox.instance()
         self.colorPlane: np.ndarray
 

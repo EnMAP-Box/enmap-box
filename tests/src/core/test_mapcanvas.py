@@ -14,14 +14,15 @@ __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 import pathlib
 import unittest
 
-from enmapbox import EnMAPBox
-from enmapbox.exampledata import enmap, hires, landcover_polygon, library_gpkg
-from enmapbox.gui.dataviews.dockmanager import MapDockTreeNode, MapCanvasBridge
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.exampledata import enmap, hires, landcover_polygon
+from enmapbox.gui.dataviews.dockmanager import MapDockTreeNode
 from enmapbox.gui.dataviews.docks import MapDock
 from enmapbox.gui.mapcanvas import CanvasLink, MapCanvas, KEY_LAST_CLICKED, LINK_ON_CENTER
 from enmapbox.qgispluginsupport.qps.maptools import CursorLocationMapTool, MapTools
 from enmapbox.testing import EnMAPBoxTestCase
 from enmapbox.testing import TestObjects
+from enmapboxtestdata import library_berlin
 from qgis.PyQt.QtCore import QMimeData, QUrl
 from qgis.PyQt.QtGui import QKeyEvent
 from qgis.PyQt.QtWidgets import QMenu, QAction
@@ -70,6 +71,7 @@ class MapCanvasTests(EnMAPBoxTestCase):
         mapCanvas.keyPressed.connect(onKeyPressed)
 
         self.showGui(mapCanvas)
+        QgsProject.instance().removeAllMapLayers()
 
     def test_canvaslinks(self):
         canvases = []
@@ -122,6 +124,8 @@ class MapCanvasTests(EnMAPBoxTestCase):
         self.assertTrue(c2.center() == center3)
         self.assertTrue(c3.center() == center3)
 
+        QgsProject.instance().removeAllMapLayers()
+
     def test_mapCrosshairDistance(self):
 
         lyrWorld = QgsRasterLayer(TestObjects.uriWMS(), 'Background', 'wms')
@@ -142,6 +146,8 @@ class MapCanvasTests(EnMAPBoxTestCase):
         canvas.setCrosshairVisibility(True)
         self.showGui(canvas)
 
+        QgsProject.instance().removeAllMapLayers()
+
     def test_mapLinking(self):
 
         enmapBox = EnMAPBox(load_core_apps=False, load_other_apps=False)
@@ -156,9 +162,8 @@ class MapCanvasTests(EnMAPBoxTestCase):
 
         mapDock = MapDock()
         node = MapDockTreeNode(mapDock)
-        bridge = MapCanvasBridge(node, mapDock.mapCanvas())
         mapCanvas = mapDock.mapCanvas()
-        allFiles = [enmap, hires, landcover_polygon, library_gpkg]
+        allFiles = [enmap, hires, landcover_polygon, library_berlin]
         spatialFiles = [enmap, hires, landcover_polygon]
 
         md = QMimeData()
@@ -169,9 +174,16 @@ class MapCanvasTests(EnMAPBoxTestCase):
         mapCanvas.dropEvent(TestObjects.createDropEvent(md))
         # self.assertTrue(len(self.mapCanvas.layerPaths()) == len(spatialFiles))
 
-        layerPaths = [pathlib.Path(p) for p in mapCanvas.layerPaths()]
+        layerSources = []
+        for p in mapCanvas.layerPaths():
+            p = pathlib.Path(p)
+            if '|' in p.name:
+                p = p.parent / p.name.split('|')[0]
+            layerSources.append(p)
+
         for p in spatialFiles:
-            self.assertTrue(pathlib.Path(p) in layerPaths)
+            p2 = pathlib.Path(p)
+            self.assertTrue(pathlib.Path(p) in layerSources, msg=f'Failed to drop {p}')
 
 
 if __name__ == "__main__":

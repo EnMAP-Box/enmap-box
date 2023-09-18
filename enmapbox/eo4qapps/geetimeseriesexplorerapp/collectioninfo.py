@@ -1,9 +1,9 @@
 from math import inf, nan
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 from qgis.PyQt.QtCore import QDate, QDateTime
 
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -11,14 +11,18 @@ class CollectionInfo():
     def __init__(self, data: dict):
         self.data = data
 
+    def updateData(self, data: Optional[dict]):
+        if data is not None:
+            self.data = data
+
     def id(self) -> str:
         return self.data['id']
 
     def googleEarthEngineUrl(self):
-        for provider in self.data['providers']:
+        for provider in self.data.get('providers', []):
             if provider['name'] == "Google Earth Engine":
                 return provider['url']
-        assert 0, 'missing Google Earth Engine url'
+        return 'https://developers.google.com/earth-engine/datasets/'
 
     def eo_band(self, bandNo: int) -> Dict:
         if bandNo <= len(self.data['summaries']['eo:bands']):
@@ -31,10 +35,12 @@ class CollectionInfo():
         gsd = inf
         for eoBand in self.data['summaries']['eo:bands']:
             gsd = min(gsd, eoBand['gsd'])
+        if gsd == inf:
+            gsd = 1
         return gsd
 
     def visualizations(self) -> List[Dict]:
-        return self.data['summaries']['gee:visualizations']
+        return self.data['summaries'].get('gee:visualizations', [])
 
     def bandWavelength(self, bandNo: int) -> float:
         eoBand = self.eo_band(bandNo)

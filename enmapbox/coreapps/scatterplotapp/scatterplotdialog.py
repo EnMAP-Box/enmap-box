@@ -24,7 +24,7 @@ from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsMapSettings, Qgs
     QgsFieldProxyModel, QgsMapLayer
 from qgis.gui import QgsMapLayerComboBox, QgsMapCanvas, QgsRasterBandComboBox, QgsColorButton, QgsColorRampButton, \
     QgsFilterLineEdit, QgsFieldComboBox
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -90,7 +90,7 @@ class ScatterPlotDialog(QMainWindow):
         QMainWindow.__init__(self, *args, **kwds)
         loadUi(__file__.replace('.py', '.ui'), self)
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         self.enmapBox = EnMAPBox.instance()
 
         # init gui

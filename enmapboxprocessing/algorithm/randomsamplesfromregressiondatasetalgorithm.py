@@ -8,7 +8,7 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClassifierDump, Category, RegressorDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -83,7 +83,7 @@ class RandomSamplesFromRegressionDatasetAlgorithm(EnMAPProcessingAlgorithm):
 
             # draw samples
             indices = list()
-            categories = [Category(i, f'Bin {i + 1}', None) for i in range(bins)]
+            categories = [Category(i, f'Bin {i + 1}', '#000000') for i in range(bins)]
             for i, target in enumerate(dump.targets):
                 feedback.pushInfo(f'Target: {target.name}')
                 ymin = np.min(dump.y[:, i])

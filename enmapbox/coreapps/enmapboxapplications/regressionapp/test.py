@@ -1,11 +1,11 @@
-from enmapbox.testing import initQgisApplication
+from enmapbox.testing import start_app
 from enmapboxapplications.widgets.core import *
 from enmapboxapplications.regressionapp.core import RegressionWorkflowApp
 from enmapbox.exampledata import *
 
 if __name__ == '__main__':
 
-    qgsApp = initQgisApplication()
+    qgsApp = start_app()
 
 #    import qgisresources.images
 #    qgisresources.images.qInitResources()

@@ -10,13 +10,14 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis, QgsProcessingException)
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
 class PredictClassPropabilityAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer with features'
     P_CLASSIFIER, _CLASSIFIER = 'classifier', 'Classifier'
+    P_MATCH_BY_NAME, _MATCH_BY_NAME = 'matchByName', 'Match features and bands by name'
     P_OUTPUT_PROBABILITY, _OUTPUT_PROBABILITY = 'outputProbability', 'Output class probability layer'
 
     def displayName(self) -> str:
@@ -30,6 +31,7 @@ class PredictClassPropabilityAlgorithm(EnMAPProcessingAlgorithm):
             (self._RASTER, 'A raster layer with bands used as features. '
                            'Classifier features and raster bands are matched by name.'),
             (self._CLASSIFIER, 'A fitted classifier.'),
+            (self._MATCH_BY_NAME, 'Whether to match raster bands and classifier features by name.'),
             (self._OUTPUT_PROBABILITY, self.RasterFileDestination)
         ]
 
@@ -39,6 +41,7 @@ class PredictClassPropabilityAlgorithm(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
         self.addParameterPickleFile(self.P_CLASSIFIER, self._CLASSIFIER)
+        self.addParameterBoolean(self.P_MATCH_BY_NAME, self._MATCH_BY_NAME, False, True)
         self.addParameterRasterDestination(self.P_OUTPUT_PROBABILITY, self._OUTPUT_PROBABILITY)
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
@@ -55,6 +58,7 @@ class PredictClassPropabilityAlgorithm(EnMAPProcessingAlgorithm):
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         dump = self.parameterAsClassifierDump(parameters, self.P_CLASSIFIER, context)
+        matchByName = self.parameterAsBoolean(parameters, self.P_MATCH_BY_NAME, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_PROBABILITY, context)
         maximumMemoryUsage = gdal.GetCacheMax()
 
@@ -66,14 +70,18 @@ class PredictClassPropabilityAlgorithm(EnMAPProcessingAlgorithm):
             bandNames = [rasterReader.bandName(i + 1) for i in range(rasterReader.bandCount())]
 
             # match classifier features with raster band names
-            try:  # try to find matching bands ...
-                bandList = [bandNames.index(feature) + 1 for feature in dump.features]
-            except ValueError:
-                bandList = None
+            bandList = None
+            if matchByName:
+                try:  # try to find matching bands ...
+                    bandList = [bandNames.index(feature) + 1 for feature in dump.features]
+                except ValueError:
+                    pass
 
             # ... if not possible, use original bands, if overall number of bands and features do match
             if bandList is None and len(bandNames) != len(dump.features):
-                message = f'classifier features ({dump.features}) not matching raster bands ({bandNames})'
+                message = f'classifier features ({dump.features}) not matching raster bands ({bandNames})\n' \
+                          f'number of features: {len(dump.features)}\n' \
+                          f'number of bands: {len(bandNames)}\n'
                 feedback.reportError(message, fatalError=True)
                 raise QgsProcessingException(message)
 

@@ -41,7 +41,8 @@ class Tests(EnMAPBoxTestCase):
 
     def test_enmapboxApplication(self):
 
-        from enmapbox import EnMAPBoxApplication, EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
+        from enmapbox.gui.applications import EnMAPBoxApplication
 
         emb = EnMAPBox.instance()
         if not isinstance(emb, EnMAPBox):

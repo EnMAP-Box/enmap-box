@@ -1,7 +1,6 @@
 import os
 import unittest
 
-from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
@@ -11,18 +10,6 @@ from qgis.gui import QgsEditorWidgetRegistry, QgsGui
 
 
 class TestIssue724(EnMAPBoxTestCase):
-
-    def tearDown(self):
-
-        emb = EnMAPBox.instance()
-        if isinstance(emb, EnMAPBox):
-            emb.close()
-
-        assert EnMAPBox.instance() is None
-
-        QgsProject.instance().removeAllMapLayers()
-
-        super().tearDown()
 
     def test_issue_724(self):
 
@@ -76,6 +63,8 @@ class TestIssue724(EnMAPBoxTestCase):
             print(f'editor: {setup.type()}')
             print(f'is spectral library?: {is_spectral_library(lyr)}')
             self.assertTrue(setup.type() == EDITOR_WIDGET_REGISTRY_KEY)
+
+        QgsProject.instance().removeAllMapLayers()
 
 
 if __name__ == '__main__':

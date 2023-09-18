@@ -10,6 +10,7 @@ from typing import Optional, List, Tuple, Dict
 import numpy as np
 
 import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
+from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyle, MarkerSymbol
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.utils import importEarthEngine
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
@@ -33,7 +34,7 @@ from qgis.gui import (
     QgsDockWidget, QgsFeaturePickerWidget, QgsMapLayerComboBox, QgsFieldComboBox, QgsMessageBar, QgsColorButton,
     QgsFileWidget, QgsCheckableComboBox, QgsMapMouseEvent
 )
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -108,6 +109,7 @@ class GeeTemporalProfileDockWidget(QgsDockWidget):
     mCopyData: QToolButton
 
     sigCurrentLocationChanged = pyqtSignal()
+    sigDataChanged = pyqtSignal()
 
     def __init__(self, mainDock: GeeTimeseriesExplorerDockWidget, parent=None):
         QgsDockWidget.__init__(self, parent)
@@ -1170,6 +1172,8 @@ class GeeTemporalProfileDockWidget(QgsDockWidget):
                 self.mData.setItem(row, column, QTableWidgetItem(value))
         self.mData.resizeColumnsToContents()
 
+        self.sigDataChanged.emit()
+
     def isDataAvailable(self) -> bool:
         return self.data is not None
 
@@ -1193,6 +1197,41 @@ class GeeTemporalProfileDockWidget(QgsDockWidget):
 
     def dataProfile(self, bandName: str) -> Optional[np.array]:
         return self._dataProfile.get(bandName)
+
+    def dataBandNames(self) -> List[str]:
+        return list(self._dataProfile.keys())
+
+    def dataBandStyle(self, bandName: str) -> PlotStyle:
+        for i in range(self.mLegend.count()):
+            item: QListWidgetItem = self.mLegend.item(i)
+            if bandName == item.text():
+                style = PlotStyle()
+                style.setMarkerSymbol(MarkerSymbol.No_Symbol)
+                color = item.color
+                if self.mShowLines.isChecked() or self.mShowPoints.isChecked():
+                    if self.mShowLines.isChecked() and not self.mShowPoints.isChecked():
+                        linePen = QPen(QBrush(color), self.mLineSize.value())
+                        linePen.setCosmetic(True)
+                        style.setLinePen(linePen)
+                    if not self.mShowLines.isChecked() and self.mShowPoints.isChecked():
+                        style.setMarkerSymbol('o')
+                        style.setLineColor(color)
+                        style.setMarkerColor(color)
+                        style.markerSize = self.mPointSize.value()
+                    if self.mShowLines.isChecked() and self.mShowPoints.isChecked():
+                        linePen = QPen(QBrush(color), self.mLineSize.value())
+                        linePen.setCosmetic(True)
+                        style.setLinePen(linePen)
+                        style.setLineWidth(self.mLineSize.value())
+                        style.setLineColor(color)
+                        style.setMarkerSymbol('o')
+                        style.setMarkerColor(color)
+                        style.markerSize = self.mPointSize.value()
+                else:
+                    style = PlotStyle()
+                return style
+
+        raise KeyError()
 
     def clearPlot(self):
         for plotItem in self.plotItems:

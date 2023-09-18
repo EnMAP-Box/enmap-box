@@ -30,6 +30,8 @@ from typing import Optional, List, Union, Dict
 
 from enmapbox import messageLog
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
+from enmapbox.gui.contextmenuprovider import EnMAPBoxContextMenuProvider
+from enmapbox.gui.contextmenus import EnMAPBoxContextMenuRegistry
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.PyQt.QtGui import QIcon
@@ -74,7 +76,7 @@ class EnMAPBoxApplication(QObject):
             parent=None
     ):
         super(EnMAPBoxApplication, self).__init__(parent)
-        self.enmapbox = enmapBox
+        self.enmapbox: EnMAPBox = enmapBox
 
         if enmapBox is None:
             from qgis.utils import iface
@@ -112,11 +114,11 @@ class EnMAPBoxApplication(QObject):
         """
         return None
 
-    def geoAlgorithms(self) -> list:
+    def contextMenuProvider(self) -> EnMAPBoxContextMenuProvider:
         """
-        Deprecated. Use processingAlgorithms() to return a list of QgsProcessingAlgorithms
+        Returns an EnMAPBoxContextMenuProvider that controls how context menus are created
         """
-        raise Exception('Use "processingAlgorithms" instead.')
+        return None
 
     def processingAlgorithms(self) -> List[QgsProcessingAlgorithm]:
 
@@ -190,10 +192,11 @@ class ApplicationWrapper(QObject):
     def __init__(self, app: EnMAPBoxApplication, parent=None):
         super(ApplicationWrapper, self).__init__(parent)
         assert isinstance(app, EnMAPBoxApplication)
-        self.app = app
-        self.appId = '{}.{}'.format(app.__class__, app.name)
-        self.menuItems = []
-        self.processingAlgorithms = []
+        self.app: EnMAPBoxApplication = app
+        self.appId: str = '{}.{}'.format(app.__class__, app.name)
+        self.menuItems: List = []
+        self.processingAlgorithms: List[QgsProcessingAlgorithm] = []
+        self.contextMenuProvider: EnMAPBoxContextMenuProvider = None
 
 
 class ApplicationRegistry(QObject):
@@ -434,7 +437,11 @@ class ApplicationRegistry(QObject):
         if DEBUG:
             print('Load menu items...')
 
+        # load menu items (might become part of contextMenuProvider)
         self.loadMenuItems(appWrapper)
+
+        # load context menu providers
+        self.loadContextMenuProviders(appWrapper)
 
         # load QGIS Processing Framework Integration
         import enmapbox.algorithmprovider
@@ -450,8 +457,6 @@ class ApplicationRegistry(QObject):
         self.sigLoadingInfo.emit(f'Load QgsProcessingAlgorithms of {appWrapper.app.name}')
         assert isinstance(appWrapper, ApplicationWrapper)
         processingAlgorithms = appWrapper.app.processingAlgorithms()
-        if DEBUG:
-            print('appWrapper.app.geoAlgorithms() returned: {}'.format(processingAlgorithms))
 
         if not isinstance(processingAlgorithms, list):
             processingAlgorithms = [processingAlgorithms]
@@ -470,6 +475,13 @@ class ApplicationRegistry(QObject):
                 provider.addAlgorithms(processingAlgorithms)
             else:
                 print('Can not find EnMAPBoxAlgorithmProvider')
+
+    def loadContextMenuProviders(self, appWrapper: ApplicationWrapper):
+        assert isinstance(appWrapper, ApplicationWrapper)
+        provider = appWrapper.app.contextMenuProvider()
+        if isinstance(provider, EnMAPBoxContextMenuProvider):
+            appWrapper.contextMenuProvider = provider
+            EnMAPBoxContextMenuRegistry.instance().addProvider(provider)
 
     def loadMenuItems(self, appWrapper: ApplicationWrapper, parentMenuName='Applications'):
         """

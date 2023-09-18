@@ -12,7 +12,7 @@ from qgis.PyQt.QtWidgets import (QMainWindow, QTableWidget, QTableWidgetItem, QL
                                  QDialog)
 from qgis.PyQt.uic import loadUi
 from qgis.gui import QgsColorButton
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -31,7 +31,7 @@ class RegressionDatasetManagerGui(QDialog):
         QMainWindow.__init__(self, parent)
         loadUi(__file__.replace('.py', '.ui'), self)
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         self.enmapBox = EnMAPBox.instance()
 
         self.mDataset.mEdit.hide()

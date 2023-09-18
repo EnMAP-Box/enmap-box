@@ -1,16 +1,20 @@
 import numpy as np
 
 from enmapboxprocessing.algorithm.importprismal1algorithm import ImportPrismaL1Algorithm
-from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.algorithm.testcase import TestCase
+from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxtestdata import sensorProductsRoot, SensorProducts
 
 
 class TestImportPrismaL1Algorithm(TestCase):
 
     def test(self):
+        if sensorProductsRoot() is None:
+            return
+
         alg = ImportPrismaL1Algorithm()
         parameters = {
-            alg.P_FILE: r'D:\data\sensors\prisma\PRS_L1_STD_OFFL_20201107101404_20201107101408_0001.he5',
+            alg.P_FILE: SensorProducts.Prisma.L1,
             alg.P_OUTPUT_SPECTRAL_CUBE: self.filename('prismaL1_SPECTRAL.tif'),
             alg.P_OUTPUT_PAN_CUBE: self.filename('prismaL1_PAN.vrt'),
             alg.P_OUTPUT_CLOUD_MASK: self.filename('prismaL1_CLOUD_MASK.vrt'),
@@ -21,9 +25,6 @@ class TestImportPrismaL1Algorithm(TestCase):
             alg.P_OUTPUT_PAN_GEOLOCATION: self.filename('prismaL1_PAN_GEOLOCATION.vrt'),
             alg.P_OUTPUT_PAN_ERROR: self.filename('prismaL1_PAN_ERROR.vrt'),
         }
-        if not self.fileExists(parameters[alg.P_FILE]):
-            return
-
         result = self.runalg(alg, parameters)
 
         self.assertEqual(234, RasterReader(result[alg.P_OUTPUT_SPECTRAL_CUBE]).bandCount())

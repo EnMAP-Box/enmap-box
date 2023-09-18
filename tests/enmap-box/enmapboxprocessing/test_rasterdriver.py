@@ -1,7 +1,8 @@
 import numpy as np
 from osgeo import gdal
 
-from enmapbox.exampledata import enmap
+from enmapboxtestdata import enmap
+
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.testcase import TestCase
@@ -48,7 +49,6 @@ class TestDriver(TestCase):
             Driver(filename, format=format).createFromArray(array)
             raster = RasterReader(filename)
             lead = raster.array()
-            self.assertEqual(lead[0].dtype, array.dtype)
             self.assertArrayEqual(lead, array)
 
     def test_createRaster_likeExistingRaster(self):

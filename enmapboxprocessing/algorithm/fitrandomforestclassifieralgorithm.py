@@ -1,12 +1,9 @@
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
 class FitRandomForestClassifierAlgorithm(FitClassifierAlgorithmBase):
-
-    def flags(self):
-        return super().flags() | self.Flag.FlagHideFromModeler
 
     def displayName(self) -> str:
         return 'Fit RandomForestClassifier'
@@ -28,12 +25,3 @@ class FitRandomForestClassifierAlgorithm(FitClassifierAlgorithmBase):
         from sklearn.ensemble import RandomForestClassifier
         classifier = RandomForestClassifier(n_estimators=100, oob_score=True)
         return classifier
-
-
-class FitRandomForestClassifierAlgorithm4Modeler(FitRandomForestClassifierAlgorithm):
-
-    def flags(self):
-        return self.Flag.FlagHideFromToolbox | self.Flag.FlagNotAvailableInStandaloneTool
-
-    def name(self) -> str:
-        return super().name() + '4Modeler'

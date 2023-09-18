@@ -8,7 +8,7 @@ from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorA
 from enmapboxprocessing.parameter.processingparametercodeeditwidget import CodeEditWidget
 from processing.gui.wrappers import WidgetWrapper
 from qgis.PyQt.QtWidgets import QWidget, QComboBox, QTextBrowser
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

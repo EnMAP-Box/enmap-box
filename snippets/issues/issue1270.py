@@ -3,7 +3,7 @@ from typing import Union
 import numpy as np
 from qgis.PyQt.QtCore import QObject
 
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.qgsrasterlayerproperties import QgsRasterLayerSpectralProperties
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibraryrasterdataprovider import nn_resample
 from enmapbox.testing import start_app

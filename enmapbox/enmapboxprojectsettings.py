@@ -2,6 +2,7 @@ from typing import Dict
 
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
 from qgis.core import QgsXmlUtils
+from qgis.gui import QgisInterface
 from qgis.gui import QgsDockWidget
 
 
@@ -33,7 +34,7 @@ class EnMAPBoxProjectSettings(object):
 
     def settings(self, document: QDomDocument, enmapBoxElement: QDomElement) -> Dict:
         from qgis.utils import iface
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapBox = EnMAPBox.instance()
 
         settings = dict()
@@ -47,9 +48,8 @@ class EnMAPBoxProjectSettings(object):
                 settings[f'EO4Q/{key}'] = values
 
         # EnMAP-Box GUI
-        if enmapBox is not None:
-            enmapBoxMainWindow = enmapBox.ui
-            for dockWidget in enmapBoxMainWindow.findChildren(QgsDockWidget):
+        if isinstance(enmapBox, EnMAPBox):
+            for dockWidget in enmapBox.dockWidgets():
                 if hasattr(dockWidget, 'projectSettings'):
                     key = dockWidget.projectSettingsKey()
                     values = dockWidget.projectSettings(document, enmapBoxElement)
@@ -66,26 +66,33 @@ class EnMAPBoxProjectSettings(object):
 
     def setSettings(self, settings: Dict, document: QDomDocument, enmapBoxElement: QDomElement):
         from qgis.utils import iface
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
+
+        if not isinstance(settings, dict):
+            return
+
         enmapBox = EnMAPBox.instance()
 
         # QGIS GUI
-        qgisMainWindow = iface.mapCanvas().parent().parent().parent()
-        # - EO4Q apps (inside QGIS)
-        for dockWidget in qgisMainWindow.findChildren(QgsDockWidget):
-            if hasattr(dockWidget, 'projectSettings'):
-                key = dockWidget.projectSettingsKey()
-                values = settings[f'EO4Q/{key}']
-                dockWidget.setProjectSettings(values, document, enmapBoxElement)
+        if isinstance(iface, QgisInterface):
+            qgisMainWindow = iface.mainWindow()
+            # - EO4Q apps (inside QGIS)
+            for dockWidget in qgisMainWindow.findChildren(QgsDockWidget):
+                if hasattr(dockWidget, 'projectSettings'):
+                    key = dockWidget.projectSettingsKey()
+                    values = settings.get(f'EO4Q/{key}')
+                    if values is not None:
+                        dockWidget.setProjectSettings(values)
 
         # EnMAP-Box GUI
-        if enmapBox is not None:
+        if isinstance(enmapBox, EnMAPBox):
             enmapBoxMainWindow = enmapBox.ui
             for dockWidget in enmapBoxMainWindow.findChildren(QgsDockWidget):
                 if hasattr(dockWidget, 'projectSettings'):
                     key = dockWidget.projectSettingsKey()
-                    values = settings[key]
-                    dockWidget.setProjectSettings(values, document, enmapBoxElement)
+                    values = settings.get(key)
+                    if values is not None:
+                        dockWidget.setProjectSettings(values)
 
             # EnMAP-Box Apps
             for app in enmapBox.applicationRegistry.applications():

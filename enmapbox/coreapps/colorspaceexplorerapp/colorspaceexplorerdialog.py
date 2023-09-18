@@ -1,6 +1,7 @@
 from random import randint
 from typing import Optional
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QCheckBox, QMainWindow, QSpinBox, QGridLayout
@@ -8,7 +9,6 @@ from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer, QgsMultiBandColorRenderer, QgsContrastEnhancement, QgsRasterMinMaxOrigin, \
     QgsMapLayerProxyModel
 from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsMapLayerComboBox
-from typeguard import typechecked
 
 
 @typechecked
@@ -41,7 +41,7 @@ class ColorSpaceExplorerDialog(QMainWindow):
         QWidget.__init__(self, parent)
         loadUi(__file__.replace('.py', '.ui'), self)
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         self.enmapBox = EnMAPBox.instance()
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None

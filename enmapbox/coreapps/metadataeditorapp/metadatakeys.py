@@ -418,7 +418,7 @@ class MDKeyDomainString(MDKeyAbstract):
     def setValue(self, value):
 
         def convertOrFail(value):
-            if type(value) != self.mType:
+            if type(value) is not self.mType:
                 try:
                     value = self.mType(value)
                 except Exception as ex:
@@ -612,11 +612,11 @@ class MDKeyClassification(MDKeyAbstract):
 if __name__ == '__main__':
 
     from enmapbox.exampledata import enmap, landcover
-    from enmapbox.testing import initQgisApplication
+    from enmapbox.testing import start_app
 
     # this will initialize the QApplication/QgsApplication which runs in the background
     # see https://qgis.org/api/classQgsApplication.html for details
-    qgsApp = initQgisApplication()
+    qgsApp = start_app()
 
     dsR = gdal.Open(enmap)
     dsV = ogr.Open(landcover)

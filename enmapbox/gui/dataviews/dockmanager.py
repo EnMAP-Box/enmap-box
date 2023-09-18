@@ -23,9 +23,9 @@ import typing
 import uuid
 from typing import Optional, List, Dict
 
-from enmapbox import debugLog, messageLog
+from enmapbox import debugLog
 from enmapbox.gui import \
-    SpectralLibrary, SpectralLibraryWidget, SpatialExtent, showLayerPropertiesDialog
+    SpectralLibraryWidget, SpatialExtent
 from enmapbox.gui.datasources.datasources import DataSource, ModelDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager
 from enmapbox.gui.dataviews.docks import Dock, DockArea, \
@@ -39,13 +39,14 @@ from enmapbox.gui.mimedata import \
 from enmapbox.gui.utils import enmapboxUiPath
 from enmapbox.qgispluginsupport.qps.layerproperties import pasteStyleFromClipboard, pasteStyleToClipboard
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library, profile_field_list
-from enmapbox.qgispluginsupport.qps.utils import loadUi, findParent
+from enmapbox.qgispluginsupport.qps.utils import loadUi
+from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtCore import Qt, QMimeData, QModelIndex, QObject, QTimer, pyqtSignal, QEvent, \
     QSortFilterProxyModel, QCoreApplication
 from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDropEvent, QDragLeaveEvent
 from qgis.PyQt.QtWidgets import QHeaderView, QMenu, QAbstractItemView, QApplication, QWidget, QToolButton, QAction
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
-from qgis.core import Qgis, QgsMessageLog, QgsCoordinateReferenceSystem, QgsMapLayer, QgsVectorLayer, QgsRasterLayer, \
+from qgis.core import Qgis, QgsCoordinateReferenceSystem, QgsMapLayer, QgsVectorLayer, QgsRasterLayer, \
     QgsProject, QgsReadWriteContext, \
     QgsLayerTreeLayer, QgsLayerTreeNode, QgsLayerTreeGroup, \
     QgsLayerTreeModelLegendNode, QgsLayerTree, QgsLayerTreeModel, QgsLayerTreeUtils, \
@@ -54,7 +55,6 @@ from qgis.core import QgsWkbTypes
 from qgis.gui import QgsLayerTreeProxyModel
 from qgis.gui import QgsLayerTreeView, \
     QgsMapCanvas, QgsLayerTreeViewMenuProvider, QgsLayerTreeMapCanvasBridge, QgsDockWidget, QgsMessageBar
-from typeguard import typechecked
 
 
 class LayerTreeNode(QgsLayerTree):
@@ -202,7 +202,7 @@ class DockTreeNode(LayerTreeNode):
         return f'<{self.__class__.__name__} at {id(self)}>'
 
     def setEnMAPBoxInstance(self, enmapbox):
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         if isinstance(enmapbox, EnMAPBox):
             self.mEnMAPBoxInstance = enmapbox
 
@@ -223,7 +223,7 @@ class DockTreeNode(LayerTreeNode):
         """
         Returns the map layer related to this dock
         """
-        raise NotImplementedError()
+        return [lt.layer() for lt in self.findLayers()]
 
 
 class TextDockTreeNode(DockTreeNode):
@@ -279,7 +279,7 @@ class SpeclibDockTreeNode(DockTreeNode):
             speclib.committedFeaturesRemoved.connect(self.updateNodes)
             self.updateNodes()
 
-    def speclib(self) -> SpectralLibrary:
+    def speclib(self) -> QgsVectorLayer:
         return self.speclibWidget().speclib()
 
     def speclibWidget(self) -> SpectralLibraryWidget:
@@ -290,7 +290,7 @@ class SpeclibDockTreeNode(DockTreeNode):
         PROFILES = dict()
         debugLog('update speclib nodes')
         if isinstance(self.mSpeclibWidget, SpectralLibraryWidget):
-            sl: SpectralLibrary = self.mSpeclibWidget.speclib()
+            sl: QgsVectorLayer = self.mSpeclibWidget.speclib()
             if is_spectral_library(sl):
                 # count number of profiles
                 n = 0
@@ -379,6 +379,7 @@ class MapDockTreeNode(DockTreeNode):
 
         # ensure that layers have a project
         unregistered = [lyr for lyr in self.mLayers if not isinstance(lyr.project(), QgsProject)]
+
         if self.mapCanvas() is None:
             s = ""
         if self.mapCanvas().project() is None:
@@ -484,12 +485,11 @@ class DockManager(QObject):
     def __init__(self):
         QObject.__init__(self)
         self.mConnectedDockAreas = []
-        self.mCurrentDockArea = None
-        self.mDocks = list()
+        self.mDocks: List[Dock] = list()
         self.mDataSourceManager: Optional[DataSourceManager] = None
         self.mMessageBar: QgsMessageBar = Optional[None]
         self.mProject: QgsProject = QgsProject.instance()
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         self.mEnMAPBoxInstance: Optional[EnMAPBox] = None
 
     def clear(self):
@@ -508,6 +508,8 @@ class DockManager(QObject):
         self.mEnMAPBoxInstance = enmapBox
         self.mEnMAPBoxInstance.project().layersWillBeRemoved.connect(self.onLayersWillBeRemoved)
         self.mProject = self.mEnMAPBoxInstance.project()
+        for d in self.mDocks:
+            d.setEnMAPBox(enmapBox)
 
     def enmapBoxInstance(self) -> Optional['EnMAPBox']:  # noqa: F821
         return self.mEnMAPBoxInstance
@@ -532,18 +534,23 @@ class DockManager(QObject):
     def connectDockArea(self, dockArea: DockArea):
         assert isinstance(dockArea, DockArea)
 
-        dockArea.sigDragEnterEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
-        dockArea.sigDragMoveEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
-        dockArea.sigDragLeaveEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
-        dockArea.sigDropEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
-        self.mConnectedDockAreas.append(dockArea)
+        if dockArea not in self.mConnectedDockAreas:
+            dockArea.sigDragEnterEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
+            dockArea.sigDragMoveEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
+            dockArea.sigDragLeaveEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
+            dockArea.sigDropEvent.connect(lambda event: self.onDockAreaDragDropEvent(dockArea, event))
+            self.mConnectedDockAreas.append(dockArea)
 
-    def currentDockArea(self):
-        if self.mCurrentDockArea not in self.mConnectedDockAreas and len(self.mConnectedDockAreas) > 0:
-            self.mCurrentDockArea = self.mConnectedDockAreas[0]
-        return self.mCurrentDockArea
+    def currentDockArea(self) -> Optional[DockArea]:
+        """
+        Returns the current dock area.
+        """
+        for dockArea in self.mConnectedDockAreas:
+            if isinstance(dockArea, DockArea):
+                return dockArea
+        return None
 
-    def onDockAreaDragDropEvent(self, dockArea, event):
+    def onDockAreaDragDropEvent(self, dockArea: DockArea, event):
 
         assert isinstance(dockArea, DockArea)
 
@@ -670,7 +677,7 @@ class DockManager(QObject):
             return True
         return False
 
-    def createDock(self, dockType, *args, cls=None, **kwds) -> Dock:
+    def createDock(self, dockType, *args, cls=None, position='bottom', relativeTo=None, **kwds) -> Dock:
         """
         Creates and returns a new Dock
         :param cls:
@@ -712,12 +719,14 @@ class DockManager(QObject):
         dock = None
         if issubclass(cls, MapDock):  # allow subclasses
             dock = cls(*args, **kwds)
+
             if isinstance(self.mDataSourceManager, DataSourceManager):
                 dock.sigLayersAdded.connect(self.mDataSourceManager.addDataSources)
 
-            from enmapbox import EnMAPBox
+            from enmapbox.gui.enmapboxgui import EnMAPBox
             if isinstance(self.mEnMAPBoxInstance, EnMAPBox):
                 dock.sigRenderStateChanged.connect(self.mEnMAPBoxInstance.ui.mProgressBarRendering.toggleVisibility)
+            dock.mapCanvas().setProject(self.project())
             dock.mapCanvas().enableMapTileRendering(True)
             dock.mapCanvas().setParallelRenderingEnabled(True)
             dock.mapCanvas().setPreviewJobsEnabled(True)
@@ -761,7 +770,8 @@ class DockManager(QObject):
         else:
             raise Exception('Unknown dock type: {}'.format(dockType))
         # dock.setParent(dockArea)
-        dockArea.addDock(dock, *args, **kwds)
+        dock.setEnMAPBox(self.enmapBoxInstance())
+        dockArea.addDock(dock, *args, position=position, relativeTo=relativeTo, **kwds)
         dock.setVisible(True)
 
         if dock not in self.mDocks:
@@ -788,7 +798,11 @@ class DockManagerTreeModel(QgsLayerTreeModel):
         assert isinstance(dockManager, DockManager)
         super(DockManagerTreeModel, self).__init__(self.rootNode, parent)
         self.columnNames = ['Property', 'Value']
-        self.mProject: QgsProject = QgsProject.instance()
+
+        if isinstance(dockManager.project(), QgsProject):
+            self.mProject = dockManager.project()
+        else:
+            self.mProject: QgsProject.instance()
 
         if True:
             """
@@ -1523,115 +1537,25 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         self.mDockTreeView: DockTreeView = treeView
         # self.mSignals = DockManagerLayerTreeModelMenuProvider.Signals()
 
-    def enmapboxInstance(self):
+    def enmapboxInstance(self) -> 'EnMAPBox':
         return self.mDockTreeView.enmapBoxInstance()
 
-    def createContextMenu(self):
+    def createContextMenu(self) -> QMenu:
 
-        cidx: QModelIndex = self.mDockTreeView.currentIndex()
-        col = cidx.column()
-        node = self.mDockTreeView.currentNode()
+        view: DockTreeView = self.mDockTreeView
+        node = view.currentNode()
         if node is None or node == self.mDockTreeView.layerTreeModel().rootGroup():
             return
-
-        viewNode = findParent(node, DockTreeNode, checkInstance=True)
-
-        errors: List[ModuleNotFoundError] = []
 
         menu = QMenu()
         menu.setToolTipsVisible(True)
 
-        lyr: QgsMapLayer = None
-        canvas: QgsMapCanvas = None
-        if isinstance(viewNode, MapDockTreeNode):
-            assert isinstance(viewNode.dock, MapDock)
-            canvas = viewNode.dock.mCanvas
-
-        selectedLayerNodes = list(set(self.mDockTreeView.selectedLayerNodes()))
-
-        if isinstance(node, (DockTreeNode, QgsLayerTreeLayer, QgsLayerTreeGroup)):
-            actionEdit = menu.addAction('Rename')
-            actionEdit.setShortcut(Qt.Key_F2)
-            actionEdit.triggered.connect(lambda *args, idx=cidx: self.mDockTreeView.edit(idx))
-
-        if isinstance(node, MapDockTreeNode) or isinstance(viewNode, MapDockTreeNode) \
-                and isinstance(node, (QgsLayerTreeGroup, QgsLayerTreeLayer)):
-            action = menu.addAction('Add Group')
-            action.setIcon(QIcon(':/images/themes/default/mActionAddGroup.svg'))
-            action.triggered.connect(self.onAddGroup)
-
-        if type(node) is QgsLayerTreeGroup:
-            action = menu.addAction('Remove Group')
-            action.setToolTip('Remove the layer group')
-            action.triggered.connect(
-                lambda *arg, nodes=[node]: self.mDockTreeView.layerTreeModel().removeNodes(nodes))
-
-        if type(node) is QgsLayerTreeLayer:
-            # get parent dock node -> related map canvas
-            lyr = node.layer()
-
-            if isinstance(lyr, QgsMapLayer):
-                try:
-                    self.addMapLayerMenuItems(node, menu, canvas, selectedLayerNodes)
-                except ModuleNotFoundError as ex:
-                    errors.append(ex)
-
-            if isinstance(lyr, QgsVectorLayer):
-                try:
-                    self.addVectorLayerMenuItems(node, menu)
-                except ModuleNotFoundError as ex:
-                    errors.append(ex)
-
-            if isinstance(lyr, QgsRasterLayer):
-                try:
-                    self.addRasterLayerMenuItems(node, menu)
-                except ModuleNotFoundError as ex:
-                    errors.append(ex)
-
-        elif isinstance(node, DockTreeNode):
-            assert isinstance(node.dock, Dock)
-            try:
-                node.dock.populateContextMenu(menu)
-            except ModuleNotFoundError as ex:
-                errors.append(ex)
-
-        elif isinstance(node, LayerTreeNode):
-            if col == 0:
-                try:
-                    node.populateContextMenu(menu)
-                except ModuleNotFoundError as ex:
-                    errors.append(ex)
-            elif col == 1:
-                a = menu.addAction('Copy')
-                a.triggered.connect(lambda *args, n=node: QApplication.clipboard().setText('{}'.format(n.value())))
+        from enmapbox.gui.contextmenus import EnMAPBoxContextMenuRegistry
+        EnMAPBoxContextMenuRegistry.instance().populateDataViewMenu(menu, view, node)
 
         # last chance to add other menu actions
         # self.mSignals.sigPopulateContextMenu.emit(menu)
-        if isinstance(self.mDockTreeView, DockTreeView):
-            try:
-                self.mDockTreeView.sigPopulateContextMenu.emit(menu)
-            except ModuleNotFoundError as ex:
-                errors.append(ex)
-
-        # let layer properties always be the last menu item
-        if isinstance(lyr, QgsMapLayer):
-            menu.addSeparator()
-            action = menu.addAction('Layer properties')
-            action.setToolTip('Set layer properties')
-            action.triggered.connect(lambda *args, l=lyr, c=canvas: self.showLayerProperties(l, c))
-
-        if len(errors) > 0:
-            # show warning for missing modules
-            missing = []
-            for ex in errors:
-                if isinstance(ex, ModuleNotFoundError):
-                    missing.append(ex.name)
-            if len(missing) > 0:
-                msg = 'Failed to create full layer context menu ' \
-                      'due to the following missing packages: {}'.format(','.join(missing))
-
-                messageLog(msg)
-                QgsMessageLog.logMessage(msg, level=Qgis.MessageLevel.Warning)
+        view.sigPopulateContextMenu.emit(menu)
 
         return menu
 
@@ -1646,10 +1570,17 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         if isinstance(canvas, QgsMapCanvas):
             action = menu.addAction('Zoom to layer')
             action.setIcon(QIcon(':/images/themes/default/mActionZoomToLayer.svg'))
-            action.triggered.connect(lambda *args, l=lyr, c=canvas: self.onZoomToLayer(l, c))
+            action.triggered.connect(lambda *args, _lyr=lyr, c=canvas: self.onZoomToLayer(_lyr, c))
 
             action = menu.addAction('Set layer CRS to map canvas')
             action.triggered.connect(lambda: canvas.setDestinationCrs(lyr.crs()))
+
+            def setLayerNameAsMapName(node, lyr):
+                node.parent().setName(lyr.name())
+                node.parent().dock.setTitle(lyr.name())
+
+            action = menu.addAction('Set layer name as view name')
+            action.triggered.connect(lambda: setLayerNameAsMapName(node, lyr))
 
             def onDuplicateLayer(n: QgsLayerTreeLayer):
 
@@ -1671,10 +1602,11 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
                 lambda *arg, nodes=selectedLayerNodes: self.mDockTreeView.layerTreeModel().removeNodes(nodes))
 
         actionPasteStyle = menu.addAction('Paste Style')
-        actionPasteStyle.triggered.connect(lambda *args, l=lyr: pasteStyleFromClipboard(l))
-        actionPasteStyle.setEnabled(MDF_QGIS_LAYER_STYLE in QApplication.clipboard().mimeData().formats())
+        actionPasteStyle.triggered.connect(lambda *args, _lyr=lyr: pasteStyleFromClipboard(_lyr))
+        cbmd: QMimeData = QApplication.clipboard().mimeData()
+        actionPasteStyle.setEnabled(isinstance(cbmd, QMimeData) and MDF_QGIS_LAYER_STYLE in cbmd.formats())
         actionCopyStyle = menu.addAction('Copy Style')
-        actionCopyStyle.triggered.connect(lambda *args, l=lyr: pasteStyleToClipboard(l))
+        actionCopyStyle.triggered.connect(lambda *args, _lyr=lyr: pasteStyleToClipboard(_lyr))
         menu.addSeparator()
 
         action = menu.addAction('Copy layer path')
@@ -1685,7 +1617,7 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         action.triggered.connect((lambda: self.onCopyLayerToQgisClicked(lyr)))
 
         action = menu.addAction('Save as...')
-        action.triggered.connect(lambda *args, l=lyr: self.onSaveAs(l))
+        action.triggered.connect(lambda *args, _lyr=lyr: self.onSaveAs(_lyr))
 
     def addVectorLayerMenuItems(self, node: QgsLayerTreeLayer, menu: QMenu):
         """
@@ -1706,10 +1638,10 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
 
         action = menu.addAction('Open Attribute Table')
         action.setToolTip('Opens the layer attribute table')
-        action.triggered.connect(lambda *args, l=lyr: self.openAttributeTable(l))
+        action.triggered.connect(lambda *args, _lyr=lyr: self.openAttributeTable(_lyr))
         action = menu.addAction('Open Spectral Library Viewer')
         action.setToolTip('Opens the vector layer in a spectral library view')
-        action.triggered.connect(lambda *args, l=lyr: self.openSpectralLibraryView(l))
+        action.triggered.connect(lambda *args, _lyr=lyr: self.openSpectralLibraryView(_lyr))
 
     def addRasterLayerMenuItems(self, node: QgsLayerTreeLayer, menu: QMenu):
         """
@@ -1735,78 +1667,110 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         action.setIcon(BandStatisticsApp.icon())
         action.triggered.connect(lambda: self.onBandStatisticsClicked(lyr))
 
-        if lyr.bandCount() >= 2:
-            from bivariatecolorrasterrendererapp import BivariateColorRasterRendererApp
-            action: QAction = submenu.addAction(BivariateColorRasterRendererApp.title())
-            action.setIcon(BivariateColorRasterRendererApp.icon())
-            action.triggered.connect(lambda: self.onBivariateColorRasterRendererClicked(lyr))
+        try:
+            if lyr.bandCount() >= 2:
+                from bivariatecolorrasterrendererapp import BivariateColorRasterRendererApp
+                action: QAction = submenu.addAction(BivariateColorRasterRendererApp.title())
+                action.setIcon(BivariateColorRasterRendererApp.icon())
+                action.triggered.connect(lambda: self.onBivariateColorRasterRendererClicked(lyr))
+        except Exception:
+            pass
 
-        from classfractionstatisticsapp import ClassFractionStatisticsApp
-        action: QAction = submenu.addAction(ClassFractionStatisticsApp.title())
-        action.setIcon(ClassFractionStatisticsApp.icon())
-        action.triggered.connect(lambda: self.onClassFractionStatisticsClicked(lyr))
+        try:
+            from classfractionstatisticsapp import ClassFractionStatisticsApp
+            action: QAction = submenu.addAction(ClassFractionStatisticsApp.title())
+            action.setIcon(ClassFractionStatisticsApp.icon())
+            action.triggered.connect(lambda: self.onClassFractionStatisticsClicked(lyr))
+        except Exception:
+            pass
 
-        if isinstance(lyr.renderer(), QgsPalettedRasterRenderer):
-            from classificationstatisticsapp import ClassificationStatisticsApp
-            action = submenu.addAction(ClassificationStatisticsApp.title())
-            action.setIcon(ClassificationStatisticsApp.icon())
-            action.triggered.connect(lambda: self.onClassificationStatisticsClicked(lyr))
+        try:
+            if isinstance(lyr.renderer(), QgsPalettedRasterRenderer):
+                from classificationstatisticsapp import ClassificationStatisticsApp
+                action = submenu.addAction(ClassificationStatisticsApp.title())
+                action.setIcon(ClassificationStatisticsApp.icon())
+                action.triggered.connect(lambda: self.onClassificationStatisticsClicked(lyr))
+        except Exception:
+            pass
 
-        if lyr.bandCount() >= 3:
-            from cmykcolorrasterrendererapp import CmykColorRasterRendererApp
-            action = submenu.addAction(CmykColorRasterRendererApp.title())
-            action.setIcon(CmykColorRasterRendererApp.icon())
-            action.triggered.connect(lambda: self.onCmykColorRasterRendererClicked(lyr))
+        try:
+            if lyr.bandCount() >= 3:
+                from cmykcolorrasterrendererapp import CmykColorRasterRendererApp
+                action = submenu.addAction(CmykColorRasterRendererApp.title())
+                action.setIcon(CmykColorRasterRendererApp.icon())
+                action.triggered.connect(lambda: self.onCmykColorRasterRendererClicked(lyr))
+        except Exception:
+            pass
 
-        if lyr.bandCount() >= 3:
-            from colorspaceexplorerapp import ColorSpaceExplorerApp
-            action = submenu.addAction(ColorSpaceExplorerApp.title())
-            action.setIcon(ColorSpaceExplorerApp.icon())
-            action.triggered.connect(lambda: self.onColorSpaceExplorerClicked(lyr))
+        try:
+            if lyr.bandCount() >= 3:
+                from colorspaceexplorerapp import ColorSpaceExplorerApp
+                action = submenu.addAction(ColorSpaceExplorerApp.title())
+                action.setIcon(ColorSpaceExplorerApp.icon())
+                action.triggered.connect(lambda: self.onColorSpaceExplorerClicked(lyr))
+        except Exception:
+            pass
 
-        if lyr.bandCount() >= 3:
-            from decorrelationstretchapp import DecorrelationStretchApp
-            action: QAction = submenu.addAction(DecorrelationStretchApp.title())
-            action.setIcon(DecorrelationStretchApp.icon())
-            action.triggered.connect(lambda: self.onDecorrelationStretchClicked(lyr))
+        try:
+            if lyr.bandCount() >= 3:
+                from decorrelationstretchapp import DecorrelationStretchApp
+                action: QAction = submenu.addAction(DecorrelationStretchApp.title())
+                action.setIcon(DecorrelationStretchApp.icon())
+                action.triggered.connect(lambda: self.onDecorrelationStretchClicked(lyr))
+        except Exception:
+            pass
 
-        if lyr.bandCount() >= 3:
-            from hsvcolorrasterrendererapp import HsvColorRasterRendererApp
-            action = submenu.addAction(HsvColorRasterRendererApp.title())
-            action.setIcon(HsvColorRasterRendererApp.icon())
-            action.triggered.connect(lambda: self.onHsvColorRasterRendererClicked(lyr))
+        try:
+            if lyr.bandCount() >= 3:
+                from hsvcolorrasterrendererapp import HsvColorRasterRendererApp
+                action = submenu.addAction(HsvColorRasterRendererApp.title())
+                action.setIcon(HsvColorRasterRendererApp.icon())
+                action.triggered.connect(lambda: self.onHsvColorRasterRendererClicked(lyr))
+        except Exception:
+            pass
 
-        if lyr.bandCount() >= 1:
-            from multisourcemultibandcolorrendererapp import MultiSourceMultiBandColorRendererApp
-            action = submenu.addAction(MultiSourceMultiBandColorRendererApp.title())
-            action.setIcon(MultiSourceMultiBandColorRendererApp.icon())
-            action.triggered.connect(lambda: self.onMultiSourceMultiBandColorRendererClicked(lyr))
+        try:
+            if lyr.bandCount() >= 1:
+                from multisourcemultibandcolorrendererapp import MultiSourceMultiBandColorRendererApp
+                action = submenu.addAction(MultiSourceMultiBandColorRendererApp.title())
+                action.setIcon(MultiSourceMultiBandColorRendererApp.icon())
+                action.triggered.connect(lambda: self.onMultiSourceMultiBandColorRendererClicked(lyr))
+        except Exception:
+            pass
 
-        if lyr.bandCount() >= 2:
-            from scatterplotapp import ScatterPlotApp
-            action = submenu.addAction(ScatterPlotApp.title())
-            action.setIcon(ScatterPlotApp.icon())
-            action.triggered.connect(lambda: self.onScatterPlotClicked(lyr))
+        try:
+            if lyr.bandCount() >= 2:
+                from scatterplotapp import ScatterPlotApp
+                action = submenu.addAction(ScatterPlotApp.title())
+                action.setIcon(ScatterPlotApp.icon())
+                action.triggered.connect(lambda: self.onScatterPlotClicked(lyr))
+        except Exception:
+            pass
 
         # add apply model shortcuts
-        from enmapbox import EnMAPBox
-        enmapBox = EnMAPBox.instance()
+        from enmapbox.gui.enmapboxgui import EnMAPBox
+        enmapBox = self.enmapboxInstance()
+
         classifiers = list()
         regressors = list()
         transformers = list()
         clusterers = list()
-        modelDataSource: ModelDataSource
-        for modelDataSource in enmapBox.dataSources('MODEL', False):
-            if not isinstance(modelDataSource.mPklObject, dict):
-                continue
-            if modelDataSource.mPklObject.get('classifier') is not None:
-                classifiers.append(modelDataSource)
-            if modelDataSource.mPklObject.get('regressor') is not None:
-                regressors.append(modelDataSource)
-            if modelDataSource.mPklObject.get('transformer') is not None:
-                transformers.append(modelDataSource)
-            if modelDataSource.mPklObject.get('clusterer') is not None:
-                clusterers.append(modelDataSource)
+
+        if isinstance(enmapBox, EnMAPBox):
+            for modelDataSource in enmapBox.dataSources('MODEL', False):
+                modelDataSource: ModelDataSource
+
+                if not (isinstance(modelDataSource, ModelDataSource) and isinstance(modelDataSource.mPklObject, dict)):
+                    continue
+                if modelDataSource.mPklObject.get('classifier') is not None:
+                    classifiers.append(modelDataSource)
+                if modelDataSource.mPklObject.get('regressor') is not None:
+                    regressors.append(modelDataSource)
+                if modelDataSource.mPklObject.get('transformer') is not None:
+                    transformers.append(modelDataSource)
+                if modelDataSource.mPklObject.get('clusterer') is not None:
+                    clusterers.append(modelDataSource)
+
         if len(classifiers + regressors + transformers + clusterers) > 0:
             submenu = menu.addMenu(QIcon(':/images/themes/default/processingAlgorithm.svg'),
                                    'Apply model')
@@ -1864,7 +1828,7 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
             action = menu.addAction('Raster Layer Styling')
             action.setToolTip('Open layer in Raster Layer Styling panel')
             action.setIcon(QIcon(':/images/themes/default/propertyicons/symbology.svg'))
-            action.triggered.connect(lambda *args, l=lyr: self.onRasterLayerStylingClicked(l))
+            action.triggered.connect(lambda *args, _lyr=lyr: self.onRasterLayerStylingClicked(_lyr))
 
     def onSaveAs(self, layer: QgsMapLayer):
         """
@@ -1903,26 +1867,18 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
             s = ""
 
     def openAttributeTable(self, layer: QgsVectorLayer):
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         emb = EnMAPBox.instance()
         if isinstance(emb, EnMAPBox) and isinstance(layer, QgsVectorLayer):
             from enmapbox.gui.dataviews.docks import AttributeTableDock
             emb.createDock(AttributeTableDock, layer=layer)
 
     def openSpectralLibraryView(self, layer: QgsVectorLayer):
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         emb = EnMAPBox.instance()
         if isinstance(emb, EnMAPBox) and isinstance(layer, QgsVectorLayer):
             from enmapbox.gui.dataviews.docks import SpectralLibraryDock
             emb.createDock(SpectralLibraryDock, speclib=layer)
-
-    def showLayerProperties(self, layer: QgsMapLayer, canvas: QgsMapCanvas):
-        from enmapbox import EnMAPBox
-        messageBar = None
-        emb = EnMAPBox.instance()
-        if isinstance(emb, EnMAPBox) and isinstance(layer, QgsVectorLayer):
-            messageBar = emb.messageBar()
-        showLayerPropertiesDialog(layer, canvas=canvas, messageBar=messageBar, modal=True, useQGISDialog=False)
 
     def onAddGroup(self):
         """
@@ -2024,7 +1980,7 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
 
     def onRunProcessingAlgorithmClicked(self):
         from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapBox = EnMAPBox.instance()
 
         action = self.mDockTreeView.sender()
@@ -2063,6 +2019,7 @@ class DockPanelUI(QgsDockWidget):
         assert isinstance(self.dockTreeView, DockTreeView)
         # self.dockTreeView.currentLayerChanged.connect(self.onSelectionChanged)
         self.tbFilterText.textChanged.connect(self.setFilter)
+        # self.tbFilterText.hide()  # see #167
         self.initActions()
 
     def setFilter(self, pattern: str):
@@ -2078,7 +2035,7 @@ class DockPanelUI(QgsDockWidget):
         if panel is not None:
             panel.setUserVisible(self.mRasterLayerStyling.isChecked())
         if panel.isUserVisible():
-            from enmapbox import EnMAPBox
+            from enmapbox.gui.enmapboxgui import EnMAPBox
             enmapBox = EnMAPBox.instance()
             panel.mLayer.setLayer(enmapBox.currentLayer())
 

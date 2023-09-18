@@ -38,12 +38,12 @@ class Examples(unittest.TestCase):
     def test_Ex1_StartEnMAPBox(self):
 
         # start EnMAP-Box instance
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapBox = EnMAPBox(None)
         enmapBox.openExampleData(mapWindows=1)
 
         # access existing EnMAP-Box instance
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapBox = EnMAPBox.instance()
         print(enmapBox)
 
@@ -58,7 +58,7 @@ class Examples(unittest.TestCase):
 
     def test_Ex2_DataSources(self):
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         EMB = EnMAPBox(None)
 
         enmapBox = EnMAPBox.instance()
@@ -109,7 +109,7 @@ class Examples(unittest.TestCase):
 
     def test_Ex2_UniqueDataSources(self):
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         from enmapbox.exampledata import enmap
 
         enmapBox = EnMAPBox(None)
@@ -122,7 +122,7 @@ class Examples(unittest.TestCase):
 
     def test_Ex2_DataSource_Versions(self):
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
 
         enmapBox = EnMAPBox(None)
         enmapBox.sigDataSourcesAdded.connect(lambda uri: print('DataSource added: {}'.format(uri)))
@@ -195,7 +195,7 @@ class Examples(unittest.TestCase):
 
     def test_Ex4_MapTools(self):
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapBox = EnMAPBox(None)
         enmapBox.loadExampleData()  # this opens a map dock as well
 
@@ -231,7 +231,7 @@ class Examples(unittest.TestCase):
 
     def test_ActivateMapToolsFromExternalApplication(self):
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapBox = EnMAPBox(None)
         enmapBox.loadExampleData()  # this opens a map dock as well
 

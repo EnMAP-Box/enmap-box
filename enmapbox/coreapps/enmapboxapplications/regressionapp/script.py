@@ -74,7 +74,7 @@ def regressionWorkflow(
     setInfo('Step 2: fit regressor')
     regressor.fit(sample)
 
-    from enmapbox import EnMAPBox
+    from enmapbox.gui.enmapboxgui import EnMAPBox
     enmapBox: EnMAPBox = EnMAPBox.instance()
 
     if saveModel:

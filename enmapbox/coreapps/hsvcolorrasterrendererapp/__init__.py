@@ -1,8 +1,8 @@
 from enmapbox.gui.applications import EnMAPBoxApplication
+from enmapbox.typeguard import typechecked
 from hsvcolorrasterrendererapp.hsvcolorrasterrendererdialog import HsvColorRasterRendererDialog
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QAction
-from typeguard import typechecked
+from qgis.PyQt.QtWidgets import QMenu
 
 
 def enmapboxApplicationFactory(enmapBox):
@@ -27,10 +27,7 @@ class HsvColorRasterRendererApp(EnMAPBoxApplication):
         return 'HSV Color Raster Renderer'
 
     def menu(self, appMenu: QMenu):
-        appMenu: QMenu = self.enmapbox.menu('Tools')
-        a = self.utilsAddActionInAlphanumericOrder(appMenu, self.title())
-        assert isinstance(a, QAction)
-        a.setIcon(self.icon())
+        a = self.utilsAddActionInAlphanumericOrder(self.enmapbox.ui.menuToolsRasterVisualizations, self.title())
         a.triggered.connect(self.startGUI)
         return appMenu
 

@@ -11,7 +11,7 @@ from qgis.gui import QgsRasterBandComboBox, QgsMapLayerComboBox, QgsFilterLineEd
 import processing
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -43,7 +43,7 @@ class SpectralIndexCreatorDialog(QMainWindow):
         QMainWindow.__init__(self, *args, **kwds)
         loadUi(__file__.replace('.py', '.ui'), self)
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         self.enmapBox = EnMAPBox.instance()
 
         self.mAsiLists = {

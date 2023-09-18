@@ -94,7 +94,7 @@ class DataSource(TreeNode):
         return self.mDataItem.path()
 
     def uri(self) -> str:
-        warnings.warn('Use source()->str', DeprecationWarning)
+        warnings.warn('Use source()->str', DeprecationWarning, stacklevel=2)
         return self.source()
 
     def dataItem(self) -> QgsDataItem:
@@ -200,7 +200,11 @@ class VectorDataSource(SpatialDataSource):
                 if self.name() != lyr.name():
                     self.setName(lyr.name())
 
-            wkbTypeName = QgsWkbTypes.displayString(int(self.mWKBType))
+            try:
+                wkbTypeName = QgsWkbTypes.displayString(self.mWKBType)
+            except TypeError:
+                wkbTypeName = QgsWkbTypes.displayString(int(self.mWKBType))
+
             geomTypeName = ['Point', 'Line', 'Polygon', 'Unknown', 'Null'][lyr.geometryType()]
             self.nodeWKBType.setValue(wkbTypeName)
             self.nodeGeomType.setValue(geomTypeName)

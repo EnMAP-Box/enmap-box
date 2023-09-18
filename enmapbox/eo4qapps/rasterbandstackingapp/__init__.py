@@ -1,6 +1,6 @@
 from typing import Optional
 
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.applications import EnMAPBoxApplication
 from geetimeseriesexplorerapp.maptool import MapTool
 
@@ -9,7 +9,7 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from qgis.gui import QgisInterface
 from rasterbandstackingapp.rasterbandstackingdockwidget import RasterBandStackingDockWidget
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 def enmapboxApplicationFactory(enmapBox: EnMAPBox):

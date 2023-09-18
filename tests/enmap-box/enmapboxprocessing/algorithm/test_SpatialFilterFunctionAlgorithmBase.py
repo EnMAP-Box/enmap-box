@@ -1,5 +1,4 @@
-from enmapbox.exampledata import hires
-from enmapboxprocessing.algorithm.applybandfunctionalgorithmbase import ApplyBandFunctionAlgorithmBase
+from enmapboxtestdata import hires
 from enmapboxprocessing.algorithm.spatialgaussiangradientmagnitudealgorithm import \
     SpatialGaussianGradientMagnitudeAlgorithm
 from enmapboxprocessing.algorithm.spatiallaplacealgorithm import SpatialLaplaceAlgorithm
@@ -36,39 +35,9 @@ from enmapboxprocessing.algorithm.spatialsobelalgorithm import SpatialSobelAlgor
 from enmapboxprocessing.algorithm.testcase import TestCase
 
 
-class ApplyBandFunctionAlgorithm(ApplyBandFunctionAlgorithmBase):
-
-    def displayName(self) -> str:
-        return ''
-
-    def shortDescription(self) -> str:
-        return ''
-
-    def helpParameterCode(self) -> str:
-        return ''
-
-    def group(self):
-        return ''
-
-    def code(self):
-        def function(array):
-            return array
-
-        return function
-
-
-class TestApplyBandFunctionAlgorithm(TestCase):
+class TestSpatialFilterFunctionAlgorithm(TestCase):
 
     def test(self):
-        alg = ApplyBandFunctionAlgorithm()
-        parameters = {
-            alg.P_RASTER: hires,
-            alg.P_FUNCTION: alg.defaultCodeAsString(),
-            alg.P_OUTPUT_RASTER: self.filename('result.tif')
-        }
-        self.runalg(alg, parameters)
-
-    def test_bandFunctions(self):
         algs = [
             SpatialMorphologicalBinaryClosingAlgorithm(),
             SpatialMorphologicalBinaryDilationAlgorithm(),

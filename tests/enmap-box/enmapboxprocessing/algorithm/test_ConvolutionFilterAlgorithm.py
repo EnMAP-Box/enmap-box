@@ -1,4 +1,6 @@
-from enmapbox.exampledata import hires
+import unittest
+
+from enmapboxtestdata import hires
 from enmapboxprocessing.algorithm.convolutionfilteralgorithmbase import ConvolutionFilterAlgorithmBase
 from enmapboxprocessing.algorithm.spatialconvolutionairydisk2dalgorithm import SpatialConvolutionAiryDisk2DAlgorithm
 from enmapboxprocessing.algorithm.spatialconvolutionbox2dalgorithm import SpatialConvolutionBox2DAlgorithm
@@ -22,6 +24,13 @@ from enmapboxprocessing.algorithm.spectralconvolutionsavitskygolay1dalgorithm im
 from enmapboxprocessing.algorithm.spectralconvolutiontrapezoid1dalgorithm import SpectralConvolutionTrapezoid1DAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 
+try:
+    import astropy.convolution
+    assert astropy.convolution is not None
+    has_astropy = True
+except ModuleNotFoundError:
+    has_astropy = False
+
 
 class ConvolutionFilterAlgorithm(ConvolutionFilterAlgorithmBase):
 
@@ -41,9 +50,10 @@ class ConvolutionFilterAlgorithm(ConvolutionFilterAlgorithmBase):
         return kernel
 
 
+@unittest.skipIf(not has_astropy, 'astropy is not installed')
 class TestConvolutionFilterAlgorithm(TestCase):
 
-    def test(self):
+    def test_convolutionFilterAlgorithm(self):
         alg = ConvolutionFilterAlgorithm()
         parameters = {
             alg.P_RASTER: hires,
@@ -93,15 +103,4 @@ class TestConvolutionFilterAlgorithm(TestCase):
                 alg.P_INTERPOLATE: False,
                 alg.P_OUTPUT_RASTER: self.filename('filtered.tif')
             }
-            self.runalg(alg, parameters)
-
-    def _test_debug_issue_1319(self):
-        alg = SpatialConvolutionGaussian2DAlgorithm()
-        parameters = {
-            alg.P_RASTER: r'D:\data\issues\bitbucket\1319\01_11_water_binary_2020.tif',
-            alg.P_KERNEL: alg.defaultCodeAsString(),
-            alg.P_OUTPUT_RASTER: self.filename('filtered.tif')
-        }
-
-        if self.fileExists(parameters[alg.P_RASTER]):
             self.runalg(alg, parameters)

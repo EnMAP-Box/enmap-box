@@ -1,12 +1,10 @@
 from sklearn.base import RegressorMixin
 
-from enmapbox.exampledata import enmap
+from enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 from enmapboxprocessing.algorithm.regressionworkflowalgorithm import RegressionWorkflowAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import regressorDumpMultiTargetPkl
-
-openReport = True
 
 
 class FitTestRegressorAlgorithm(FitClassifierAlgorithmBase):
@@ -35,7 +33,7 @@ class TestRegressionWorkflowAlgorithm(TestCase):
             alg.P_REGRESSOR: FitTestRegressorAlgorithm().defaultCodeAsString(),
             alg.P_RASTER: enmap,
             alg.P_NFOLD: 10,
-            alg.P_OPEN_REPORT: openReport,
+            alg.P_OPEN_REPORT: self.openReport,
             alg.P_OUTPUT_REGRESSOR: self.filename('regressor.pkl'),
             alg.P_OUTPUT_REGRESSION: self.filename('regression.tif'),
             alg.P_OUTPUT_REPORT: self.filename('report.html')

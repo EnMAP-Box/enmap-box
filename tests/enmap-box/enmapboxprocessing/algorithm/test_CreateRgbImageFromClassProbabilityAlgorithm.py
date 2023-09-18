@@ -1,14 +1,14 @@
 import numpy as np
 from sklearn.base import ClassifierMixin
 
-from enmapbox.exampledata import enmap
+from enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.creatergbimagefromclassprobabilityalgorithm import \
     CreateRgbImageFromClassProbabilityAlgorithm
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 from enmapboxprocessing.algorithm.predictclassificationalgorithm import PredictClassificationAlgorithm
 from enmapboxprocessing.algorithm.predictclassprobabilityalgorithm import PredictClassPropabilityAlgorithm
-from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.algorithm.testcase import TestCase
+from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import classifierDumpPkl

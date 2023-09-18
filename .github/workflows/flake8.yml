@@ -2,27 +2,24 @@ name: ❄ Flake8
 
 on:
   push:
-    paths:
-      - '**.py'
+    branches:
+      - '**'
   pull_request:
     branches:
       - main
       - release-**
-    paths:
-      - '**.py'
 
 jobs:
   flake8_py3:
     name: Python Lint
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Python
-        uses: actions/setup-python@v2.3.1
-        with:
-          python-version: 3.9
-          architecture: x64
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.8"
       - name: Run flake8
         uses: julianwachholz/flake8-action@v2
         with:

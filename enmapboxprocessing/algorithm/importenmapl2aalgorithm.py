@@ -5,23 +5,30 @@ from xml.etree import ElementTree
 import numpy as np
 from osgeo import gdal
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.importenmapl1balgorithm import ImportEnmapL1BAlgorithm
+from enmapboxprocessing.algorithm.subsetrasterbandsalgorithm import SubsetRasterBandsAlgorithm
 from enmapboxprocessing.algorithm.vrtbandmathalgorithm import VrtBandMathAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.gdalutils import GdalUtils
 from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
-from typeguard import typechecked
 
 
 @typechecked
 class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
     P_FILE, _FILE = 'file', 'Metadata file'
+    P_SET_BAD_BANDS, _SET_BAD_BANDS = 'setBadBands', 'Set bad bands'
+    P_EXCLUDE_BAD_BANDS, _EXCLUDE_BAD_BANDS, = 'excludeBadBands', 'Mark no data bands as bad bands'
     P_DETECTOR_OVERLAP, _DETECTOR_OVERLAP = 'detectorOverlap', 'Detector overlap region'
-    O_DETECTOR_OVERLAP = ['Order by wavelength', 'Moving average filter', 'VNIR only', 'SWIR only']
-    OrderByWavelengthOverlapOption, MovingAverageFilterOverlapOption, VnirOnlyOverlapOption, SwirOnlyOverlapOption = \
-        range(4)
+    O_DETECTOR_OVERLAP = [
+        'Order by detector (VNIR, SWIR)', 'Order by wavelength (default order)', 'Moving average filter', 'VNIR only',
+        'SWIR only'
+    ]
+    OrderByDetectorOverlapOption, OrderByWavelengthOverlapOption, MovingAverageFilterOverlapOption, \
+    VnirOnlyOverlapOption, SwirOnlyOverlapOption = range(5)
     P_OUTPUT_RASTER, _OUTPUT_RASTER = 'outputEnmapL2ARaster', 'Output raster layer'
 
     def displayName(self):
@@ -37,8 +44,10 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                          'Instead of executing this algorithm, '
                          'you may drag&drop the metadata XML file directly from your system file browser onto '
                          'the EnMAP-Box map view area.'),
-            (self.P_DETECTOR_OVERLAP, 'Different options for handling the detector overlap region from 900 to 1000 '
-                                      'nanometers. For the Moving average filter, a kernel size of 3 is used.'),
+            (self._SET_BAD_BANDS, 'Whether to mark no data bands as bad bands.'),
+            (self._EXCLUDE_BAD_BANDS, 'Whether to exclude bands.'),
+            (self._DETECTOR_OVERLAP, 'Different options for handling the detector overlap region from 900 to 1000 '
+                                     'nanometers. For the Moving average filter, a kernel size of 3 is used.'),
             (self._OUTPUT_RASTER, self.RasterFileDestination)
         ]
 
@@ -46,7 +55,11 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
         return Group.ImportData.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
-        self.addParameterFile(self.P_FILE, self._FILE, extension='xml')
+        self.addParameterFile(
+            self.P_FILE, self._FILE, extension='XML', fileFilter='Metadata file (*-METADATA.XML);;All files (*.*)'
+        )
+        self.addParameterBoolean(self.P_SET_BAD_BANDS, self._SET_BAD_BANDS, True, True)
+        self.addParameterBoolean(self.P_EXCLUDE_BAD_BANDS, self._EXCLUDE_BAD_BANDS, True, True)
         self.addParameterEnum(
             self.P_DETECTOR_OVERLAP, self._DETECTOR_OVERLAP, self.O_DETECTOR_OVERLAP, False, self.SwirOnlyOverlapOption
         )
@@ -67,6 +80,8 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         xmlFilename = self.parameterAsFile(parameters, self.P_FILE, context)
+        setBadBands = self.parameterAsBoolean(parameters, self.P_SET_BAD_BANDS, context)
+        excludeBadBands = self.parameterAsBoolean(parameters, self.P_EXCLUDE_BAD_BANDS, context)
         detectorOverlap = self.parameterAsEnum(parameters, self.P_DETECTOR_OVERLAP, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_RASTER, context)
         with open(filename + '.log', 'w') as logfile:
@@ -82,7 +97,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
 
             # read metadata
             root = ElementTree.parse(xmlFilename).getroot()
-            wavelength = [item.text for item in
+            wavelength = [float(item.text) for item in
                           root.findall('specific/bandCharacterisation/bandID/wavelengthCenterOfBand')]
             fwhm = [item.text for item in root.findall('specific/bandCharacterisation/bandID/FWHMOfBand')]
             gains = [item.text for item in root.findall('specific/bandCharacterisation/bandID/GainOfBand')]
@@ -92,33 +107,35 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
             values = np.array(wavelength, float)
             assert np.all(values[:-1] <= values[1:]), 'wavelength are assumed to be sorted'
 
+            vrtTempFilename = Utils.tmpFilename(filename, 'stack.vrt')
+
             # create VRT
             if detectorOverlap != self.MovingAverageFilterOverlapOption:
-                vnirWavelength = [float(item.text)
-                                  for item in root.findall('product/smileCorrection/VNIR/bandID/wavelength')
-                                  if 900 <= float(item.text) <= 1000]
-                swirWavelength = [float(item.text)
-                                  for item in root.findall('product/smileCorrection/SWIR/bandID/wavelength')
-                                  if 900 <= float(item.text) <= 1000]
 
-                if detectorOverlap == self.OrderByWavelengthOverlapOption:
+                # vnirWavelength = [float(item.text)
+                #                  for item in root.findall('product/smileCorrection/VNIR/bandID/wavelength')]
+                # swirWavelength = [float(item.text)
+                #                  for item in root.findall('product/smileCorrection/SWIR/bandID/wavelength')]
+
+                vnirBandNumbers = [
+                    int(text) for text in root.find('specific/vnirProductQuality/expectedChannelsList').text.split(',')
+                ]
+                swirBandNumbers = [
+                    int(text) for text in root.find('specific/swirProductQuality/expectedChannelsList').text.split(',')
+                ]
+
+                overlapStart = wavelength[swirBandNumbers[0]]
+                overlapEnd = wavelength[vnirBandNumbers[-1]]
+                if detectorOverlap == self.OrderByDetectorOverlapOption:
+                    bandList = vnirBandNumbers + swirBandNumbers
+                elif detectorOverlap == self.OrderByWavelengthOverlapOption:
                     bandList = list(range(1, len(wavelength) + 1))
                 elif detectorOverlap == self.VnirOnlyOverlapOption:
-                    bandList = list()
-                    for bandNo, w in enumerate(wavelength, 1):
-                        w = float(w)
-                        if 900 <= w <= 1000:
-                            if np.min(np.abs(np.subtract(swirWavelength, w))) < 0.01:
-                                continue  # skip SWIR bands
-                        bandList.append(bandNo)
+                    bandList = vnirBandNumbers
+                    bandList.extend([bandNo for bandNo in swirBandNumbers if wavelength[bandNo - 1] > overlapEnd])
                 elif detectorOverlap == self.SwirOnlyOverlapOption:
-                    bandList = list()
-                    for bandNo, w in enumerate(wavelength, 1):
-                        w = float(w)
-                        if 900 <= w <= 1000:
-                            if np.min(np.abs(np.subtract(vnirWavelength, w))) < 0.01:
-                                continue  # skip VNIR bands
-                        bandList.append(bandNo)
+                    bandList = [bandNo for bandNo in vnirBandNumbers if wavelength[bandNo - 1] < overlapStart]
+                    bandList.extend(swirBandNumbers)
                 else:
                     raise ValueError()
 
@@ -126,7 +143,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                     xmlFilename.replace('-METADATA.XML', '-SPECTRAL_IMAGE'))
                 )
                 options = gdal.TranslateOptions(format='VRT', outputType=gdal.GDT_Float32, bandList=bandList)
-                ds: gdal.Dataset = gdal.Translate(destName=filename, srcDS=ds, options=options)
+                ds: gdal.Dataset = gdal.Translate(destName=vrtTempFilename, srcDS=ds, options=options)
             else:
                 # create VRT stack with all bands
                 spectralImageFilename = ImportEnmapL1BAlgorithm.findFilename(
@@ -170,12 +187,11 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                         vrtBandFilenames.append(vrtStackFilename)
                         bandNumbers.append(bandNo)
 
-                GdalUtils.stackVrtBands(filename, vrtBandFilenames, bandNumbers)
-                ds: gdal.Dataset = gdal.Open(filename)
+                GdalUtils.stackVrtBands(vrtTempFilename, vrtBandFilenames, bandNumbers)
                 bandList = list(range(1, len(wavelength) + 1))
 
             # update metadata
-            wavelength = [wavelength[bandNo - 1] for bandNo in bandList]
+            wavelength = [str(wavelength[bandNo - 1]) for bandNo in bandList]
             fwhm = [fwhm[bandNo - 1] for bandNo in bandList]
             gains = [gains[bandNo - 1] for bandNo in bandList]
             offsets = [offsets[bandNo - 1] for bandNo in bandList]
@@ -194,6 +210,33 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                 rasterBand.SetScale(float(gains[i]))
                 rasterBand.SetOffset(float(offsets[i]))
                 rasterBand.FlushCache()
+
+            if setBadBands:  # see issue #267
+                reader = RasterReader(ds)
+                writer = RasterWriter(ds)
+                for bandNo in reader.bandNumbers():
+                    feedback.setProgress(bandNo / reader.bandCount() * 100)
+                    allNoData = np.all(
+                        reader.array(
+                            yOffset=int(reader.height() / 2), height=1,  # just check single image line
+                            bandList=[bandNo]
+                        )[0] == reader.noDataValue(bandNo))
+                    if allNoData:
+                        writer.setBadBandMultiplier(0, bandNo)
+                del reader, writer
+            del ds
+
+            if excludeBadBands:  # see issue #461
+                if not setBadBands:
+                    raise QgsProcessingException('To "Exclude bad bands", also active "Set bad bands" option.')
+
+            alg = SubsetRasterBandsAlgorithm()
+            parameters = {
+                alg.P_RASTER: vrtTempFilename,
+                alg.P_EXCLUDE_BAD_BANDS: excludeBadBands,
+                alg.P_OUTPUT_RASTER: filename
+            }
+            alg.runAlg(alg, parameters, None, feedback2)
 
             result = {self.P_OUTPUT_RASTER: filename}
             self.toc(feedback, result)

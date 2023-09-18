@@ -1,5 +1,6 @@
 import os
 import unittest
+
 from enmapbox.testing import EnMAPBoxTestCase, TestObjects
 from enmapboxprocessing.algorithm.savelibraryasgeojsonalgorithm import SaveLibraryAsGeoJsonAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
@@ -27,6 +28,9 @@ class TestIssue1089(EnMAPBoxTestCase):
             self.assertEqual(field.type(), field2.type())
             self.assertEqual(field.editorWidgetSetup().type(), field2.editorWidgetSetup().type())
 
+        # cleanup
+        QgsProject.instance().removeAllMapLayers()
+
     def test_issue1089(self):
         slib = TestObjects.createSpectralLibrary()
         QgsProject.instance().addMapLayer(slib)
@@ -46,6 +50,9 @@ class TestIssue1089(EnMAPBoxTestCase):
                   }
 
         results = alg.processAlgorithm(params, context, feedback)
+
+        # cleanup
+        QgsProject.instance().removeAllMapLayers()
 
 
 if __name__ == '__main__':

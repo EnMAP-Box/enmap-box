@@ -9,7 +9,7 @@ from qgis.PyQt.uic import loadUi
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsRasterDataProvider, QgsRasterBandStats, \
     QgsRasterHistogram, QgsMapSettings, QgsRasterRenderer
 from qgis.gui import QgsRasterBandComboBox, QgsMapLayerComboBox, QgsFilterLineEdit, QgsSpinBox, QgsMapCanvas
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -39,7 +39,7 @@ class BandStatisticsDialog(QMainWindow):
         QMainWindow.__init__(self, *args, **kwds)
         loadUi(__file__.replace('.py', '.ui'), self)
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         self.enmapBox = EnMAPBox.instance()
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None

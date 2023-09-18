@@ -4,7 +4,7 @@ from enmapboxprocessing.algorithm.prepareregressiondatasetfromjsonalgorithm impo
     PrepareRegressionDatasetFromJsonAlgorithm
 from qgis.PyQt.uic import loadUi
 
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcodealgorithm import \
     PrepareRegressionDatasetFromCodeAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuouslibraryalgorithm import \
@@ -103,7 +103,7 @@ class ProcessingParameterPickleFileRegressionDatasetWidget(QWidget):
     setFilePath = setValue
 
     def onCreateClicked(self):
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapBox = EnMAPBox.instance()
 
         class AlgorithmDialogWrapper(AlgorithmDialog):

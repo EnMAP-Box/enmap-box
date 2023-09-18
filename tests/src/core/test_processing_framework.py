@@ -1,6 +1,6 @@
 import unittest
 
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import TestCase
 
 

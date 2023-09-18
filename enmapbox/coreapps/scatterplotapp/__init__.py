@@ -6,7 +6,7 @@ from qgis.PyQt.QtWidgets import QMenu, QAction
 
 from enmapbox.gui.applications import EnMAPBoxApplication
 from scatterplotapp.scatterplotdialog import ScatterPlotDialog
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 def enmapboxApplicationFactory(enmapBox):

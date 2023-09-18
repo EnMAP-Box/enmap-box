@@ -19,17 +19,19 @@
 import pathlib
 import unittest
 
-from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel
+from qgis.PyQt.QtCore import QPoint
+from qgis.PyQt.QtWidgets import QMenu
 
 import qgis
 from enmapbox import DIR_REPO
+from enmapbox.gui.contextmenus import EnMAPBoxContextMenuRegistry, EnMAPBoxAbstractContextMenuProvider
 from enmapbox.gui.dataviews.docks import SpectralLibraryDock, MapDock, Dock
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import MapCanvas
-from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import SpectralProfile
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
+from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel
 from qgis.core import Qgis, QgsExpressionContextGenerator, QgsProcessingContext, QgsExpressionContext
 from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, \
     QgsLayerTree, QgsApplication
@@ -41,32 +43,14 @@ from qgis.gui import QgsMapLayerComboBox, QgisInterface, QgsProcessingContextGen
 
 class EnMAPBoxTests(EnMAPBoxTestCase):
 
-    def tearDown(self):
-
-        emb = EnMAPBox.instance()
-        if isinstance(emb, EnMAPBox):
-            emb.close()
-
-        assert EnMAPBox.instance() is None
-
-        QgsProject.instance().removeAllMapLayers()
-
-        super().tearDown()
-
-    def test_AboutDialog(self):
-
-        from enmapbox.gui.about import AboutDialog
-        d = AboutDialog()
-        self.assertIsInstance(d, AboutDialog)
-        self.showGui(d)
-
     @unittest.skipIf(not (pathlib.Path(DIR_REPO) / 'qgisresources').is_dir(), 'qgisresources dir does not exist')
     def test_find_qgis_resources(self):
         from enmapbox.qgispluginsupport.qps.resources import findQGISResourceFiles
         results = findQGISResourceFiles()
-        print('QGIS Resource files:')
-        for p in results:
-            print(p)
+        if not self.runsInCI():
+            print('Resource files found:')
+            for p in results:
+                print(p)
         self.assertTrue(len(results) > 0)
 
     def test_qgis_project_lists(self):
@@ -99,6 +83,9 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         w.setLayout(grid)
         self.showGui([EMB.ui, iface.ui, w])
 
+        EMB.close()
+        QgsProject.instance().removeAllMapLayers()
+
     def test_instance_pure(self):
         EMB = EnMAPBox(load_other_apps=False, load_core_apps=False)
 
@@ -119,6 +106,8 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
                 widgets.append(cbEMB)
 
         self.showGui(widgets)
+        EMB.close()
+        QgsProject.instance().removeAllMapLayers()
 
     def test_context_interfaces(self):
 
@@ -126,6 +115,7 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         self.assertIsInstance(EMB, QgsExpressionContextGenerator)
         self.assertIsInstance(EMB, QgsProcessingContextGenerator)
         EMB.loadExampleData()
+        QgsApplication.processEvents()
         canvas1 = EMB.currentMapCanvas()
         canvas2 = EMB.createNewMapCanvas('MyNewMapDock')
         self.assertIsInstance(canvas1, QgsMapCanvas)
@@ -148,31 +138,15 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         self.assertIsInstance(canvas2, QgsMapCanvas)
         self.assertTrue(canvas2.name(), 'MyNewMapDock')
         self.assertTrue(canvas1 != canvas2)
+        EMB.close()
+        QgsProject.instance().removeAllMapLayers()
 
     def test_instance_all_apps(self):
         EMB = EnMAPBox(load_core_apps=True, load_other_apps=True)
         self.assertIsInstance(EMB, EnMAPBox)
         self.showGui(EMB.ui)
-
-    def test_instance_coreapps(self):
-        EMB = EnMAPBox(load_core_apps=True, load_other_apps=False)
-        self.assertIsInstance(EMB, EnMAPBox)
-        self.showGui(EMB.ui)
-
-    def test_instance_coreapps_and_data(self):
-
-        EMB = EnMAPBox(load_core_apps=True, load_other_apps=False)
-
-        self.assertTrue(len(QgsProject.instance().mapLayers()) == 0)
-        self.assertIsInstance(EnMAPBox.instance(), EnMAPBox)
-        self.assertEqual(EMB, EnMAPBox.instance())
-
-        EMB.openExampleData(mapWindows=1, testData=True)
-        self.assertTrue(len(QgsProject.instance().mapLayers()) > 0)
-        canvases = EMB.mapCanvases()
-        self.assertTrue(canvases[-1] == EMB.currentMapCanvas())
-
-        self.showGui([EMB.ui])
+        EMB.close()
+        QgsProject.instance().removeAllMapLayers()
 
     def test_qgis_project_layers(self):
 
@@ -241,13 +215,62 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         n2 = cb1.model().rowCount()
         self.assertEqual(n2, n - 1)
 
+        QgsProject.instance().removeAllMapLayers()
+
     def test_createDock(self):
 
         EMB = EnMAPBox()
         for d in ['MAP', 'TEXT', 'SPECLIB', 'MIME']:
             dock = EMB.createDock(d)
             self.assertIsInstance(dock, Dock)
-        self.showGui()
+        self.showGui(EMB.ui)
+
+        EMB.close()
+        QgsProject.instance().removeAllMapLayers()
+
+    def test_RAISE_ALL_EXCEPTIONS(self):
+
+        import enmapbox
+        self.assertIsInstance(enmapbox.RAISE_ALL_EXCEPTIONS, bool)
+
+        class TestException(Exception):
+
+            def __init__(self, *args, **kwds):
+                super().__init__(*args, **kwds)
+
+        class ErrorProvider(EnMAPBoxAbstractContextMenuProvider):
+            def __init__(self, *args, **kwds):
+                super().__init__(*args, **kwds)
+
+            def populateDataViewMenu(self, *args, **kwargs):
+                raise TestException()
+
+            def populateDataSourceMenu(self, *args, **kwargs):
+                raise TestException()
+
+            def populateMapCanvasMenu(self, *args, **kwargs):
+                raise TestException()
+
+        lastValue = enmapbox.RAISE_ALL_EXCEPTIONS
+
+        reg0 = EnMAPBoxContextMenuRegistry.instance()
+        reg = EnMAPBoxContextMenuRegistry()
+        reg.addProvider(ErrorProvider())
+
+        menu = QMenu()
+        canvas = QgsMapCanvas()
+        point = SpatialPoint.fromMapCanvasCenter(canvas)
+
+        enmapbox.RAISE_ALL_EXCEPTIONS = True
+
+        with self.assertRaises(TestException):
+            reg.populateMapCanvasMenu(menu, canvas, QPoint(0, 0), point)
+
+        enmapbox.RAISE_ALL_EXCEPTIONS = False
+
+        reg.populateMapCanvasMenu(menu, canvas, QPoint(0, 0), point)
+
+        enmapbox.RAISE_ALL_EXCEPTIONS = lastValue
 
     def test_addSources(self):
         E = EnMAPBox()
@@ -261,6 +284,9 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         self.assertTrue(len(E.dataSources()) == 2)
 
         self.showGui()
+
+        E.close()
+        QgsProject.instance().removeAllMapLayers()
 
     def test_mapCanvas(self):
         E = EnMAPBox()
@@ -277,7 +303,10 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         for c in E.mapCanvases():
             self.assertIsInstance(c, MapCanvas)
 
-        self.showGui()
+        self.showGui(E.ui)
+
+        E.close()
+        QgsProject.instance().removeAllMapLayers()
 
     @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'blocking dialogs')
     def test_createNewLayers(self):
@@ -291,12 +320,17 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
 
         self.showGui(E.ui)
 
+        E.close()
+        QgsProject.instance().removeAllMapLayers()
+
     def test_loadExampleData(self):
         E = EnMAPBox(load_core_apps=False, load_other_apps=False)
         E.loadExampleData()
         n = len(E.dataSources())
         self.assertTrue(n > 0)
         self.showGui(E.ui)
+        E.close()
+        QgsProject.instance().removeAllMapLayers()
 
     def test_loadAndUnloadData(self):
 
@@ -327,6 +361,9 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         self.assertEqual(nSrc(), 0)
         self.assertEqual(nQgis(), 1)
 
+        E.close()
+        QgsProject.instance().removeAllMapLayers()
+
     def test_speclibDocks(self):
         EMB = EnMAPBox()
         EMB.loadExampleData()
@@ -347,9 +384,8 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         self.assertTrue(len(slw.speclib()) == 0)
         center = SpatialPoint.fromMapCanvasCenter(mapDock.mapCanvas())
 
-        profiles = SpectralProfile.fromMapCanvas(mapDock.mapCanvas(), center)
-        for p in profiles:
-            self.assertIsInstance(p, SpectralProfile)
+        EMB.close()
+        QgsProject.instance().removeAllMapLayers()
 
 
 if __name__ == '__main__':

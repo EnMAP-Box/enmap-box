@@ -1,4 +1,4 @@
-from enmapbox.exampledata import library_gpkg
+from enmapboxtestdata import library_gpkg
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedlibraryalgorithm import \
     PrepareClassificationDatasetFromCategorizedLibraryAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
@@ -57,4 +57,4 @@ class TestPrepareClassificationDatasetFromCategorizedLibrary(TestCase):
         try:
             self.runalg(alg, parameters)
         except QgsProcessingException as error:
-            self.assertEqual('Profiles field must be Binary: level_1', str(error))
+            self.assertEqual('Not a valid Profiles field: level_1', str(error))

@@ -12,13 +12,14 @@ from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtGui import QColor
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer,
                        QgsProcessingException, QgsMapLayer)
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
 class PredictClusteringAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer with features'
     P_CLUSTERER, _CLUSTERER = 'clusterer', 'Clusterer'
+    P_MATCH_BY_NAME, _MATCH_BY_NAME = 'matchByName', 'Match features and bands by name'
     P_OUTPUT_CLASSIFICATION, _OUTPUT_CLASSIFICATION = 'outputClassification', 'Output classification layer'
 
     def displayName(self) -> str:
@@ -36,6 +37,7 @@ class PredictClusteringAlgorithm(EnMAPProcessingAlgorithm):
                            'by name, but overall number of bands and features do match, '
                            'raster bands are used in original order.'),
             (self._CLUSTERER, 'A fitted clusterer.'),
+            (self._MATCH_BY_NAME, 'Whether to match raster bands and classifier features by name.'),
             (self._OUTPUT_CLASSIFICATION, self.RasterFileDestination)
         ]
 
@@ -45,6 +47,7 @@ class PredictClusteringAlgorithm(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
         self.addParameterPickleFile(self.P_CLUSTERER, self._CLUSTERER)
+        self.addParameterBoolean(self.P_MATCH_BY_NAME, self._MATCH_BY_NAME, False, True)
         self.addParameterRasterDestination(self.P_OUTPUT_CLASSIFICATION, self._OUTPUT_CLASSIFICATION)
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
@@ -59,6 +62,7 @@ class PredictClusteringAlgorithm(EnMAPProcessingAlgorithm):
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         dump = self.parameterAsClustererDump(parameters, self.P_CLUSTERER, context)
+        matchByName = self.parameterAsBoolean(parameters, self.P_MATCH_BY_NAME, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_CLASSIFICATION, context)
         maximumMemoryUsage = Utils.maximumMemoryUsage()
 
@@ -70,14 +74,18 @@ class PredictClusteringAlgorithm(EnMAPProcessingAlgorithm):
             bandNames = [rasterReader.bandName(i + 1) for i in range(rasterReader.bandCount())]
 
             # match clusterer features with raster band names
-            try:  # try to find matching bands ...
-                bandList = [bandNames.index(feature) + 1 for feature in dump.features]
-            except ValueError:
-                bandList = None
+            bandList = None
+            if matchByName:
+                try:  # try to find matching bands ...
+                    bandList = [bandNames.index(feature) + 1 for feature in dump.features]
+                except ValueError:
+                    pass
 
             # ... if not possible, use original bands, if overall number of bands and features do match
             if bandList is None and len(bandNames) != len(dump.features):
-                message = f'clusterer features ({dump.features}) not matching raster bands ({bandNames})'
+                message = f'clusterer features ({dump.features}) not matching raster bands ({bandNames})' \
+                          f'number of features: {len(dump.features)}\n' \
+                          f'number of bands: {len(bandNames)}\n'
                 feedback.reportError(message, fatalError=True)
                 raise QgsProcessingException(message)
 

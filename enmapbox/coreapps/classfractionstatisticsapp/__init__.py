@@ -1,9 +1,8 @@
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QAction
-
 from classfractionstatisticsapp.classfractionstatisticsdialog import ClassFractionStatisticsDialog
 from enmapbox.gui.applications import EnMAPBoxApplication
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QMenu
 
 
 def enmapboxApplicationFactory(enmapBox):
@@ -22,18 +21,16 @@ class ClassFractionStatisticsApp(EnMAPBoxApplication):
 
     @classmethod
     def icon(cls):
-        return QIcon(':/images/themes/default/histogram.svg')
+        return QIcon(':/images/themes/default/propertyicons/symbology.svg')
 
     @classmethod
     def title(cls):
         return 'Class Fraction/Probability Renderer and Statistics'
 
     def menu(self, appMenu: QMenu):
-        appMenu: QMenu = self.enmapbox.menu('Tools')
-        a: QAction = self.utilsAddActionInAlphanumericOrder(appMenu, self.title())
-        a.setIcon(self.icon())
-        a.triggered.connect(self.startGUI)
-        return appMenu
+        for menu in [self.enmapbox.ui.menuToolsRasterStatistics, self.enmapbox.ui.menuToolsRasterVisualizations]:
+            a = self.utilsAddActionInAlphanumericOrder(menu, self.title())
+            a.triggered.connect(self.startGUI)
 
     def startGUI(self):
         w = ClassFractionStatisticsDialog(parent=self.enmapbox.ui)

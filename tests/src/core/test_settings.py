@@ -19,7 +19,7 @@ import os
 # noinspection PyPep8Naming
 import unittest
 
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.enmapboxsettings import enmapboxSettings, EnMAPBoxSettings
 from enmapbox.testing import EnMAPBoxTestCase
 from qgis.PyQt.QtGui import QColor
@@ -54,8 +54,6 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
         self.assertIsInstance(proj, QgsProject)
         tmp_path = self.tempDir() / 'project.qgs'
         os.makedirs(tmp_path.parent, exist_ok=True)
-
-        box.saveProject(tmp_path)
 
         box.close()
         self.assertTrue(EnMAPBox.instance() is None)

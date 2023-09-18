@@ -16,7 +16,7 @@ from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -41,7 +41,7 @@ class ClassFractionStatisticsDialog(QMainWindow):
         QMainWindow.__init__(self, *args, **kwds)
         loadUi(__file__.replace('.py', '.ui'), self)
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         self.enmapBox = EnMAPBox.instance()
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None

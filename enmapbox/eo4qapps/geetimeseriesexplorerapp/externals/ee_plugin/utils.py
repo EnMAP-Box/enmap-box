@@ -53,7 +53,7 @@ def add_ee_image_layer(image, name, mapCanvas, shown, opacity):
         raise ValueError()
 
     if isinstance(mapCanvas, MapCanvas):  # add to EnMAP-Box
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapBox = EnMAPBox.instance()
         mapDock = enmapBox.currentMapDock()
         mapDock.insertLayer(0, layer)

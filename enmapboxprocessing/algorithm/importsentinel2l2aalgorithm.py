@@ -4,9 +4,11 @@ from typing import Dict, Any, List, Tuple
 from osgeo import gdal
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -54,7 +56,9 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
         return Group.ImportData.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
-        self.addParameterFile(self.P_FILE, self._FILE, extension='xml')
+        self.addParameterFile(
+            self.P_FILE, self._FILE, extension='xml', fileFilter='Metadata file (MTD_MSIL2A.xml);;All files (*.*)'
+        )
         self.addParameterEnum(self.P_BAND_LIST, self._BAND_LIST, self.O_BAND_LIST, True, self.D_BAND_LIST, True)
         self.addParameterVrtDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 
@@ -127,8 +131,19 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
             ds.SetMetadataItem('wavelength', '{' + ', '.join(wavelength[:ds.RasterCount]) + '}', 'ENVI')
             ds.SetMetadataItem('wavelength_units', 'nanometers', 'ENVI')
             for bandNo, name in enumerate(bandNames, 1):
-                ds.GetRasterBand(bandNo).SetDescription(name)
+                rb: gdal.Band = ds.GetRasterBand(bandNo)
+                rb.SetDescription(name)
+                rb.SetScale(1e-4)
             result = {self.P_OUTPUT_RASTER: filename}
             self.toc(feedback, result)
 
+            # copy metadata (see issue #269)
+            writer = RasterWriter(ds)
+            for bandNo, filename in enumerate(filenames, 1):
+                reader = RasterReader(filename)
+                metadata = reader.metadata(1)
+                writer.setMetadata(metadata, bandNo)
+                if bandNo == 1:
+                    metadata = reader.metadataDomain('')
+                    writer.setMetadataDomain(metadata, '')
         return result

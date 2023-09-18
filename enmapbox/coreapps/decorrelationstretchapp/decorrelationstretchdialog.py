@@ -2,16 +2,16 @@ from math import sqrt
 from typing import Optional
 
 import numpy as np
+
+from decorrelationstretchapp.decorrelationstretchrenderer import DecorrelationStretchRenderer
+from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
+from enmapbox.typeguard import typechecked
+from enmapboxprocessing.rasterreader import RasterReader
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QCheckBox, \
     QMainWindow, QComboBox
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer, QgsMultiBandColorRenderer, QgsMapLayerProxyModel, QgsMapSettings
 from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsDoubleSpinBox, QgsMapLayerComboBox
-
-from decorrelationstretchapp.decorrelationstretchrenderer import DecorrelationStretchRenderer
-from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapboxprocessing.rasterreader import RasterReader
-from typeguard import typechecked
 
 
 @typechecked
@@ -36,7 +36,7 @@ class DecorrelationStretchDialog(QMainWindow):
         QWidget.__init__(self, parent)
         loadUi(__file__.replace('.py', '.ui'), self)
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         self.enmapBox = EnMAPBox.instance()
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None

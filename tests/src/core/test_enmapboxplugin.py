@@ -22,12 +22,14 @@ import unittest
 
 from enmapbox import DIR_REPO
 from enmapbox.testing import TestCase
+from qgis.core import QgsProject
 from qgis.utils import iface
 
 
 class TestEnMAPBoxPlugin(TestCase):
     deploy_folder = pathlib.Path(DIR_REPO) / 'deploy'
 
+    @unittest.skipIf(TestCase.runsInCI(), 'not adjusted for linux testing')
     def test_metadata(self):
         from qgis.utils import findPlugins
 
@@ -56,7 +58,9 @@ class TestEnMAPBoxPlugin(TestCase):
         plugin.initGui()
         plugin.unload()
 
-    @unittest.skipIf(not deploy_folder.is_dir(), 'Missing deploy folder')
+        QgsProject.instance().removeAllMapLayers()
+
+    @unittest.skipIf(TestCase.runsInCI() or not deploy_folder.is_dir(), 'CI/Missing deploy folder')
     def test_loadplugin2(self):
         import qgis.utils
         name = 'enmapboxplugin'
@@ -83,6 +87,8 @@ class TestEnMAPBoxPlugin(TestCase):
         import qgis.utils
         p = EnMAPBoxPlugin(qgis.utils.iface)
         p.initialDependencyCheck()
+
+        QgsProject.instance().removeAllMapLayers()
 
 
 if __name__ == '__main__':

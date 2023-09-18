@@ -3,14 +3,14 @@ from typing import Optional
 from qgis.PyQt.QtWidgets import QComboBox
 
 from enmapbox.gui.dataviews.docks import MapDock, DockTypes
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
 class MapViewComboBox(QComboBox):
 
     def __init__(self, parent=None):
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         super().__init__(parent)
 
         self._emptyText = ''

@@ -5,7 +5,7 @@ from qgis.core import QgsRasterLayer, Qgis
 import numpy as np
 
 
-from enmapboxprocessing.test.testcase import TestCase
+from enmapboxprocessing.testcase import TestCase
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import landcover_map_l3
 from enmapboxtestdata import fraction_map_l3

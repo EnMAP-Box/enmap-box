@@ -1,10 +1,10 @@
 import numpy as np
 
-from enmapbox.exampledata import enmap
+from enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.subsetrasterbandsalgorithm import SubsetRasterBandsAlgorithm
+from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxprocessing.algorithm.testcase import TestCase
 
 
 class TestSubsetRasterBandsAlgorithm(TestCase):

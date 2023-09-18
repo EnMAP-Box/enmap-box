@@ -1,9 +1,12 @@
 from enmapboxprocessing.algorithm.aggregaterasterbandsalgorithm import AggregateRasterBandsAlgorithm
 from enmapboxprocessing.algorithm.applymaskalgorithm import ApplyMaskAlgorithm
+from enmapboxprocessing.algorithm.build3dcubealgorithm import Build3dCubeAlgorithm
 from enmapboxprocessing.algorithm.classfractionfromcategorizedvectoralgorithm import \
     ClassFractionFromCategorizedVectorAlgorithm
 from enmapboxprocessing.algorithm.classificationfromclassprobabilityalgorithm import \
     ClassificationFromClassProbabilityAlgorithm
+from enmapboxprocessing.algorithm.classificationfromrenderedimagealgorithm import \
+    ClassificationFromRenderedImageAlgorithm
 from enmapboxprocessing.algorithm.classificationperformancesimplealgorithm import \
     ClassificationPerformanceSimpleAlgorithm
 from enmapboxprocessing.algorithm.classificationperformancestratifiedalgorithm import \
@@ -12,6 +15,7 @@ from enmapboxprocessing.algorithm.classificationworkflowalgorithm import Classif
 from enmapboxprocessing.algorithm.classifierfeaturerankingpermutationimportancealgorithm import \
     ClassifierFeatureRankingPermutationImportanceAlgorithm
 from enmapboxprocessing.algorithm.classifierperformancealgorithm import ClassifierPerformanceAlgorithm
+from enmapboxprocessing.algorithm.classseparabilityalgorithm import ClassSeparabilityAlgorithm
 from enmapboxprocessing.algorithm.convexhullalgorithm import ConvexHullAlgorithm
 from enmapboxprocessing.algorithm.createdefaultpalettedrasterrendereralgorithm import \
     CreateDefaultPalettedRasterRendererAlgorithm
@@ -49,8 +53,7 @@ from enmapboxprocessing.algorithm.fitnormalizeralgorithm import FitNormalizerAlg
 from enmapboxprocessing.algorithm.fitpcaalgorithm import FitPcaAlgorithm
 from enmapboxprocessing.algorithm.fitplsegressionalgorithm import FitPLSRegressionAlgorithm
 from enmapboxprocessing.algorithm.fitquantiletransformeralgorithm import FitQuantileTransformerAlgorithm
-from enmapboxprocessing.algorithm.fitrandomforestclassifieralgorithm import FitRandomForestClassifierAlgorithm, \
-    FitRandomForestClassifierAlgorithm4Modeler
+from enmapboxprocessing.algorithm.fitrandomforestclassifieralgorithm import FitRandomForestClassifierAlgorithm
 from enmapboxprocessing.algorithm.fitrandomforestregressoralgorithm import FitRandomForestRegressorAlgorithm
 from enmapboxprocessing.algorithm.fitrobustscaleralgorithm import FitRobustScalerAlgorithm
 from enmapboxprocessing.algorithm.fitsamalgorithm import FitSamAlgorithm
@@ -67,6 +70,7 @@ from enmapboxprocessing.algorithm.geolocaterasteralgorithm import GeolocateRaste
 from enmapboxprocessing.algorithm.importdesisl1balgorithm import ImportDesisL1BAlgorithm
 from enmapboxprocessing.algorithm.importdesisl1calgorithm import ImportDesisL1CAlgorithm
 from enmapboxprocessing.algorithm.importdesisl2aalgorithm import ImportDesisL2AAlgorithm
+from enmapboxprocessing.algorithm.importemitl2aalgorithm import ImportEmitL2AAlgorithm
 from enmapboxprocessing.algorithm.importenmapl1balgorithm import ImportEnmapL1BAlgorithm
 from enmapboxprocessing.algorithm.importenmapl1calgorithm import ImportEnmapL1CAlgorithm
 from enmapboxprocessing.algorithm.importenmapl2aalgorithm import ImportEnmapL2AAlgorithm
@@ -77,7 +81,6 @@ from enmapboxprocessing.algorithm.importprismal2calgorithm import ImportPrismaL2
 from enmapboxprocessing.algorithm.importprismal2dalgorithm import ImportPrismaL2DAlgorithm
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
 from enmapboxprocessing.algorithm.inversetransformrasteralgorithm import InverseTransformRasterAlgorithm
-from enmapboxprocessing.algorithm.issue1366_algorithm import MyAlgorithm
 from enmapboxprocessing.algorithm.layertomaskalgorithm import LayerToMaskAlgorithm
 from enmapboxprocessing.algorithm.mergeclassificationdatasetalgorithm import MergeClassificationDatasetsAlgorithm
 from enmapboxprocessing.algorithm.predictclassificationalgorithm import PredictClassificationAlgorithm
@@ -133,6 +136,7 @@ from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromvectorandfieldsa
 from enmapboxprocessing.algorithm.randompointsfromcategorizedrasteralgorithm import \
     RandomPointsFromCategorizedRasterAlgorithm
 from enmapboxprocessing.algorithm.randompointsfrommaskrasteralgorithm import RandomPointsFromMaskRasterAlgorithm
+from enmapboxprocessing.algorithm.randompointsfromrasteralgorithm import RandomPointsFromRasterAlgorithm
 from enmapboxprocessing.algorithm.randomsamplesfromclassificationdatasetalgorithm import \
     RandomSamplesFromClassificationDatasetAlgorithm
 from enmapboxprocessing.algorithm.randomsamplesfromregressiondatasetalgorithm import \
@@ -208,17 +212,17 @@ from enmapboxprocessing.algorithm.spectralconvolutiontrapezoid1dalgorithm import
 from enmapboxprocessing.algorithm.spectralindexoptimizeralgorithm import SpectralIndexOptimizerAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingbyresponsefunctionlibraryalgorithm import \
     SpectralResamplingByResponseFunctionLibraryAlgorithm
-from enmapboxprocessing.algorithm.spectralresamplingbyspectralrasterwavelengthandfwhmalgorithm import \
-    SpectralResamplingBySpectralRasterWavelengthAndFwhmAlgorithm
+from enmapboxprocessing.algorithm.spectralresamplingbywavelengthandfwhmalgorithm import \
+    SpectralResamplingByWavelengthAndFwhmAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtocustomsensoralgorithm import \
     SpectralResamplingToCustomSensorAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtodesisalgorithm import SpectralResamplingToDesisAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtoenmapalgorithm import SpectralResamplingToEnmapAlgorithm
-from enmapboxprocessing.algorithm.spectralresamplingtolandsat5algorithm import SpectralResamplingToLandsat5Algorithm
-from enmapboxprocessing.algorithm.spectralresamplingtolandsat7algorithm import SpectralResamplingToLandsat7Algorithm
-from enmapboxprocessing.algorithm.spectralresamplingtolandsat8algorithm import SpectralResamplingToLandsat8Algorithm
+from enmapboxprocessing.algorithm.spectralresamplingtolandsatalgorithm import SpectralResamplingToLandsatTmAlgorithm, \
+    SpectralResamplingToLandsatEtmAlgorithm, SpectralResamplingToLandsatOliAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtoprismaalgorithm import SpectralResamplingToPrismaAlgorithm
-from enmapboxprocessing.algorithm.spectralresamplingtosentinel2algorithm import SpectralResamplingToSentinel2Algorithm
+from enmapboxprocessing.algorithm.spectralresamplingtosentinel2algorithm import SpectralResamplingToSentinel2aAlgorithm, \
+    SpectralResamplingToSentinel2bAlgorithm
 from enmapboxprocessing.algorithm.stackrasterlayersalgorithm import StackRasterLayersAlgorithm
 from enmapboxprocessing.algorithm.subsetrasterbandsalgorithm import SubsetRasterBandsAlgorithm
 from enmapboxprocessing.algorithm.transformrasteralgorithm import TransformRasterAlgorithm
@@ -232,14 +236,17 @@ def algorithms():
     algos = [
         AggregateRasterBandsAlgorithm(),
         ApplyMaskAlgorithm(),
+        Build3dCubeAlgorithm(),
         ClassFractionFromCategorizedVectorAlgorithm(),
         CreateSpectralIndicesAlgorithm(),
         ClassificationFromClassProbabilityAlgorithm(),
+        ClassificationFromRenderedImageAlgorithm(),
         ClassificationPerformanceSimpleAlgorithm(),
         ClassificationPerformanceStratifiedAlgorithm(),
         ClassificationWorkflowAlgorithm(),
         ClassifierPerformanceAlgorithm(),
         ClassifierFeatureRankingPermutationImportanceAlgorithm(),
+        ClassSeparabilityAlgorithm(),
         ConvexHullAlgorithm(),
         CreateDefaultPalettedRasterRendererAlgorithm(),
         CreateGridAlgorithm(),
@@ -251,7 +258,7 @@ def algorithms():
         FitGenericRegressorAlgorithm(),
         FitLinearSvcAlgorithm(),
         FitLogisticRegressionAlgorithm(),
-        FitRandomForestClassifierAlgorithm(), FitRandomForestClassifierAlgorithm4Modeler(),
+        FitRandomForestClassifierAlgorithm(),
         FitSamAlgorithm(),
         FitSvcRbfAlgorithm(),
         FitSvcPolyAlgorithm(),
@@ -291,6 +298,7 @@ def algorithms():
         ImportDesisL1BAlgorithm(),
         ImportDesisL1CAlgorithm(),
         ImportDesisL2AAlgorithm(),
+        ImportEmitL2AAlgorithm(),
         ImportEnmapL1BAlgorithm(),
         ImportEnmapL1CAlgorithm(),
         ImportEnmapL2AAlgorithm(),
@@ -329,8 +337,9 @@ def algorithms():
         PrepareUnsupervisedDatasetFromFileAlgorithm(),
         PrepareUnsupervisedDatasetFromVectorAndFieldsAlgorithm(),
         PrepareUnsupervisedDatasetFromJsonAlgorithm(),
-        RandomPointsFromMaskRasterAlgorithm(),
         RandomPointsFromCategorizedRasterAlgorithm(),
+        RandomPointsFromMaskRasterAlgorithm(),
+        RandomPointsFromRasterAlgorithm(),
         RandomSamplesFromClassificationDatasetAlgorithm(),
         RandomSamplesFromRegressionDatasetAlgorithm(),
         RasterizeCategorizedVectorAlgorithm(),
@@ -386,15 +395,16 @@ def algorithms():
         SpectralConvolutionTrapezoid1DAlgorithm(),
         SpectralIndexOptimizerAlgorithm(),
         SpectralResamplingByResponseFunctionLibraryAlgorithm(),
-        SpectralResamplingBySpectralRasterWavelengthAndFwhmAlgorithm(),
+        SpectralResamplingByWavelengthAndFwhmAlgorithm(),
         SpectralResamplingToCustomSensorAlgorithm(),
         SpectralResamplingToDesisAlgorithm(),
         SpectralResamplingToEnmapAlgorithm(),
-        SpectralResamplingToLandsat5Algorithm(),
-        SpectralResamplingToLandsat7Algorithm(),
-        SpectralResamplingToLandsat8Algorithm(),
+        SpectralResamplingToLandsatTmAlgorithm(),
+        SpectralResamplingToLandsatEtmAlgorithm(),
+        SpectralResamplingToLandsatOliAlgorithm(),
         SpectralResamplingToPrismaAlgorithm(),
-        SpectralResamplingToSentinel2Algorithm(),
+        SpectralResamplingToSentinel2aAlgorithm(),
+        SpectralResamplingToSentinel2bAlgorithm(),
         StackRasterLayersAlgorithm(),
         SubsetRasterBandsAlgorithm(),
         PrepareRegressionDatasetFromSynthMixAlgorithm(),
@@ -404,8 +414,5 @@ def algorithms():
         VrtBandMathAlgorithm(),
         WriteEnviHeaderAlgorithm()
     ]
-
-    if False:
-        algos.append(MyAlgorithm())
 
     return algos

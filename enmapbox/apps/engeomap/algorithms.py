@@ -22,20 +22,26 @@ Remote Sens. 2016, 8, 127.
 ***************************************************************************
 
 Changelog
-EnGeoMAP Version 3.1
-Date: April 2022
+EnGeoMAP Version 3.2
+Date: February 2023
 Author: Helge L. C. Daempfling
 Email: hdaemp@gfz-potsdam.de
 
-The following modifications to the EnGeoMAP 3.0 release were realized:
+The following modifications to the EnGeoMAP 3.1 release were realized:
 
-- function mapper_fullrange was removed. -> new GUI only supports
-function mapper_fullrange
+- support for .esl and .sli file name extension as library input was added
+(in prior versions manual removal of suffixes was necessary)
 
-- function mapper_fullrange was modified to reduce the number of
-data products. Several data products were deleted others for upcoming
-version releases commmented out.
+- data output names were changed for more clarity:
+
+data type: correlat -> '_feature_fitting_correlation_scores'
+-> '_feature_fitting_highest_correlation_result'
+
+data type: bvlss -> '_bvls_unmixing_scores'
+-> 'bvls_unmixing_highest_abundance_result'
+
 """
+import os
 from engeomap import engeomap_aux_funcul as auxfunul
 
 
@@ -46,7 +52,7 @@ def thresholder(guidat):
     except(Exception):
         print("Threshold Exception: Please use float values between 0 and 1")
         return None
-    if (guidat > 0) and (guidat < 1):
+    if (guidat >= 0) and (guidat <= 1):
         pass
     else:
         print("Threshold Exception: Please use float values between 0 and 1")
@@ -79,18 +85,18 @@ def brp(path):
 
 def engeomapp_headless(params):
     # Parameter:
-    print('Hallo')
-    print(params['vnirt'])
-    print(params['swirt'])
-    print(params['fit_thresh'])
-    print(params['mixminerals'])
+    print('EnGeoMAP: processing user input')
+    print('VNIR threshold: '+params['vnirt'])
+    print('SWIR threshold: '+params['swirt'])
+    print('Minimum fit threshold: '+params['fit_thresh'])
+    print('Max number of endmembers in unmixing: '+params['mixminerals'])
     # print(params['enmap'])
     # print(params['hyperion'])
     # print(params['laboratory'])
     # print(params['liblab'])
-    print(params['image'])
-    print(params['library'])
-    print(params['farbe'])
+    print('Path to image data: '+params['image'])
+    print('Path to spectral library: '+params['library'])
+    print('Path to CSV color file: '+params['farbe'])
     vnirt = thresholder(params['vnirt'])
     swirt = thresholder(params['swirt'])
     fit_thr = thresholder(params['fit_thresh'])
@@ -121,7 +127,11 @@ def mapper_fullrange(params):
 
     # check and modify the .hdr file of the library for processing
 
-    file = open(libname + ".hdr", "r")
+    print(libname)
+    tempTuple = os.path.splitext(libname)
+    libnameh = tempTuple[0]
+    print(libnameh)
+    file = open(libnameh + ".hdr", "r")
     replacement = ""
 
     for line in file:
@@ -131,14 +141,16 @@ def mapper_fullrange(params):
 
     file.close()
 
-    fout = open(libname + ".hdr", "w")
+    fout = open(libnameh + ".hdr", "w")
     fout.write(replacement)
     fout.close()
 
     ###############################################
 
     # Load and check data:
+
     wbild, w1nmbild, bilddata = auxfunul.check_load_data(bildname)
+
     wlib, w1nmlib, libdata = auxfunul.check_load_data(libname)
 
     # Data Shape
@@ -162,8 +174,8 @@ def mapper_fullrange(params):
 
     # Schreib-Funktionen:
 
-    auxfunul.reshreib(correlat, basename + '_correlation_result', [lsh[0], bsh[1], bsh[2]])
-    auxfunul.reshreib(bvlss, basename + '_abundance_result', [lsh[0], bsh[1], bsh[2]])
+    auxfunul.reshreib(correlat, basename + '_feature_fitting_correlation_scores', [lsh[0], bsh[1], bsh[2]])
+    auxfunul.reshreib(bvlss, basename + '_bvls_unmixing_scores', [lsh[0], bsh[1], bsh[2]])
 
     # Optional
     """
@@ -172,20 +184,20 @@ def mapper_fullrange(params):
 
     rgbdurchschn, indexmatdurchschn = auxfunul.corr_colours(correlat,
                                                             colorfile,
-                                                            basename + '_bestmatches_correlation_',
+                                                            basename + '_feature_fitting_highest_correlation',
                                                             [lsh[0],
                                                              bsh[1],
                                                              bsh[2]],
                                                             minerals=lsh[
                                                                 0])
     rgbu, indexmatu = auxfunul.corr_colours_unmix(bvlss, colorfile,
-                                                  basename + '_abundance_unmix_',
+                                                  basename + '_bvls_unmixing',
                                                   [lsh[0], bsh[1], bsh[2]], minerals=lsh[0])
 
     """
     rgbdurchschn, indexmatdurchschn, rgbmdurchschn = auxfunul.corr_colours(correlat,
                                                                            colorfile,
-                                                                           basename + '_bestmatches_correlation_',
+                                                                           basename + '_feature_fitting_highest_correlation',
                                                                            [lsh[0],
                                                                             bsh[1],
                                                                             bsh[2]],
@@ -218,7 +230,7 @@ def mapper_fullrange(params):
 
     # restore Spectral Library .hdr
 
-    file = open(libname + ".hdr", "r")
+    file = open(libnameh + ".hdr", "r")
     replacement = ""
 
     for line in file:
@@ -228,10 +240,12 @@ def mapper_fullrange(params):
 
     file.close()
 
-    fout = open(libname + ".hdr", "w")
+    fout = open(libnameh + ".hdr", "w")
     fout.write(replacement)
     fout.close()
 
     ###############################################
+
+    print('finished')
 
     return

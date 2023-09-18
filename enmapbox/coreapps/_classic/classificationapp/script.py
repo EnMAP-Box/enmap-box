@@ -65,7 +65,7 @@ def classificationWorkflow(sample, classifier, raster, mask, n, cv,
     setInfo('Step 2: fit classifier')
     classifier.fit(sample)
 
-    from enmapbox import EnMAPBox
+    from enmapbox.gui.enmapboxgui import EnMAPBox
     enmapBox: EnMAPBox = EnMAPBox.instance()
 
     if saveModel:

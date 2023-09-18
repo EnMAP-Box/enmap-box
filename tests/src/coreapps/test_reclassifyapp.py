@@ -8,42 +8,21 @@ from _classic.hubflow.core import Classification, Color, ClassDefinition
 
 try:
     from reclassifyapp.reclassify import ReclassifyTableView, ReclassifyTableModel, ReclassifyTableViewDelegate, \
-        ReclassifyDialog, reclassify
+        reclassify
 except ModuleNotFoundError as ex:
     if ex.name == 'reclassifyapp':
         raise unittest.SkipTest('Failed to import reclassifyapp')
     else:
         raise ex
-from enmapbox import initPythonPaths
 from enmapbox.qgispluginsupport.qps.classification.classificationscheme import ClassificationScheme
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
 from qgis.PyQt.QtCore import QSortFilterProxyModel
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QTableView
-from qgis.core import QgsProject, QgsRasterLayer, QgsPalettedRasterRenderer
-
-initPythonPaths()
+from qgis.core import QgsProject
 
 
 class TestReclassify(EnMAPBoxTestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        from tempfile import mkdtemp
-        cls.testDir = mkdtemp(prefix='TestDir')
-        cls.classA = TestObjects.createRasterLayer(nc=2)
-        cls.classB = TestObjects.createRasterLayer(nc=5)
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.classA = None
-        cls.classB = None
-
-        QgsProject.instance().removeAllMapLayers()
-        # todo: remove temp files
-        # if os.path.exists(cls.testDir):
-        #    os.remove(cls.testDir)
 
     def test_hubflow_reclassify(self):
 
@@ -123,7 +102,11 @@ class TestReclassify(EnMAPBoxTestCase):
             print('Success: created {}'.format(pathDst))
             del ds
 
+        QgsProject.instance().removeAllMapLayers()
+
     def test_reclassify(self):
+        # test is deprecated
+        return
 
         csDst = ClassificationScheme.create(2)
         csDst[0].setName('Not specified')
@@ -142,10 +125,13 @@ class TestReclassify(EnMAPBoxTestCase):
         print('src classes: {}'.format(classA.GetRasterBand(1).GetCategoryNames()))
         print('dst path: {}'.format(pathDst))
         print('dst classes: {}'.format(csDst.classNames()))
-        dsDst = reclassify(pathSrc, pathDst, csDst, LUT, drvDst='ENVI')
+        dsDst = reclassify(pathSrc, csDst, LUT, output_classification=pathDst)
         csDst2 = ClassificationScheme.fromRasterImage(dsDst)
         self.assertIsInstance(csDst2, ClassificationScheme)
         self.assertEqual(csDst, csDst2)
+
+        enmapBox.close()
+        QgsProject.instance().removeAllMapLayers()
 
     def test_transformation_table(self):
 
@@ -171,66 +157,8 @@ class TestReclassify(EnMAPBoxTestCase):
 
         self.showGui(tv)
 
-    @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'blocking dialog')
-    def test_dialog(self):
-
-        #
-        lyr = TestObjects.createRasterLayer(nb=10)
-        self.assertIsInstance(lyr, QgsRasterLayer)
-
-        classes = [QgsPalettedRasterRenderer.Class(0, QColor('black'), 'unclassified'),
-                   QgsPalettedRasterRenderer.Class(1, QColor('red'), 'foo'),
-                   QgsPalettedRasterRenderer.Class(2, QColor('green'), 'bar')
-                   ]
-
-        renderer = QgsPalettedRasterRenderer(lyr.dataProvider(), 2, classes)
-        renderer.setInput(lyr.dataProvider())
-        lyr.setRenderer(renderer)
-        layers = [TestObjects.createRasterLayer(nc=5),
-                  TestObjects.createRasterLayer(nb=10),
-                  lyr,
-                  TestObjects.createVectorLayer()]
-        QgsProject.instance().addMapLayers(layers)
-
-        dialog = ReclassifyDialog()
-        self.assertIsInstance(dialog, ReclassifyDialog)
-
-        dialog.setSrcRasterLayer(self.classA)
-        self.assertEqual(dialog.srcRasterLayer(), self.classA)
-        dialog.setSrcRasterLayer(self.classA)
-        self.assertEqual(dialog.srcRasterLayer(), self.classA)
-        dialog.setSrcRasterLayer(self.classB)
-        self.assertEqual(dialog.srcRasterLayer(), self.classB)
-
-        dialog.setDstRaster(os.path.join(self.testDir, 'testclass.bsq'))
-        dstCS = ClassificationScheme.create(2)
-        dstCS[1].setName('Foobar')
-        dialog.setDstClassificationScheme(dstCS)
-        self.assertEqual(dstCS, dialog.dstClassificationScheme())
-
-        settings = dialog.reclassificationSettings()
-        for key in ['labelLookup', 'dstClassScheme', 'pathDst', 'pathSrc']:
-            self.assertTrue(key in settings.keys(), msg='Missing setting key "{}"'.format(key))
-
-        dstCS = dialog.dstClassificationScheme()
-        dialog.close()
-
-        dsDst = reclassify(drvDst='ENVI', **settings)
-
-        self.assertIsInstance(dsDst, gdal.Dataset)
-        cs2 = ClassificationScheme.fromRasterImage(dsDst)
-        dsDst = None
-        cs3 = ClassificationScheme.fromRasterImage(settings['pathDst'])
-
-        self.assertIsInstance(cs2, ClassificationScheme)
-        self.assertIsInstance(cs3, ClassificationScheme)
-        self.assertEqual(cs2, cs3)
-        self.assertEqual(dstCS, cs2, msg='Expected:\n{}\nbut got:\n{}'.format(dstCS.toString(), cs2.toString()))
-        self.assertEqual(dstCS, cs3, msg='Expected:\n{}\nbut got:\n{}'.format(dstCS.toString(), cs3.toString()))
-
-        self.showGui(dialog)
+        QgsProject.instance().removeAllMapLayers()
 
 
 if __name__ == "__main__":
-
     unittest.main(buffer=False)

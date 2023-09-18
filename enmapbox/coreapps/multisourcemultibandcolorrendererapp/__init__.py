@@ -1,9 +1,9 @@
 from enmapbox.gui.applications import EnMAPBoxApplication
+from enmapbox.typeguard import typechecked
 from multisourcemultibandcolorrendererapp.multisourcemultibandcolorrendererdialog import \
     MultiSourceMultiBandColorRendererDialog
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QAction
-from typeguard import typechecked
+from qgis.PyQt.QtWidgets import QMenu
 
 
 def enmapboxApplicationFactory(enmapBox):
@@ -28,12 +28,8 @@ class MultiSourceMultiBandColorRendererApp(EnMAPBoxApplication):
         return 'Multisource Multiband Color Raster Renderer'
 
     def menu(self, appMenu: QMenu):
-        appMenu: QMenu = self.enmapbox.menu('Tools')
-        a = self.utilsAddActionInAlphanumericOrder(appMenu, self.title())
-        assert isinstance(a, QAction)
-        a.setIcon(self.icon())
+        a = self.utilsAddActionInAlphanumericOrder(self.enmapbox.ui.menuToolsRasterVisualizations, self.title())
         a.triggered.connect(self.startGUI)
-        return appMenu
 
     def startGUI(self):
         w = MultiSourceMultiBandColorRendererDialog(parent=self.enmapbox.ui)

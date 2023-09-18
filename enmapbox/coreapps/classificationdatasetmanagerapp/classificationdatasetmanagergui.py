@@ -2,6 +2,7 @@ from os.path import basename, join
 
 import numpy as np
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.randomsamplesfromclassificationdatasetalgorithm import \
     RandomSamplesFromClassificationDatasetAlgorithm
 from enmapboxprocessing.parameter.processingparameterpicklefileclassificationdatasetwidget import \
@@ -14,7 +15,6 @@ from qgis.PyQt.QtWidgets import (
 )
 from qgis.PyQt.uic import loadUi
 from qgis.gui import QgsColorButton, QgsDoubleSpinBox, QgsSpinBox
-from typeguard import typechecked
 
 
 @typechecked
@@ -36,7 +36,7 @@ class ClassificationDatasetManagerGui(QDialog):
         QMainWindow.__init__(self, parent)
         loadUi(__file__.replace('.py', '.ui'), self)
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         self.enmapBox = EnMAPBox.instance()
 
         self.mDataset.mEdit.hide()

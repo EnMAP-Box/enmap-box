@@ -1,6 +1,6 @@
 from typing import Optional
 
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.applications import EnMAPBoxApplication
 from enmapbox.gui.dataviews.docks import DockTypes, MapDock
 from enmapbox.gui.mapcanvas import CanvasLink
@@ -12,9 +12,9 @@ from geetimeseriesexplorerapp.maptool import MapTool
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
-from qgis.core import QgsRasterLayer, QgsRectangle, QgsProject
+from qgis.core import QgsRasterLayer, QgsRectangle, QgsProject, QgsMessageLog, Qgis
 from qgis.gui import QgisInterface
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 def enmapboxApplicationFactory(enmapBox: EnMAPBox):
@@ -94,6 +94,7 @@ class GeeTimeseriesExplorerApp(EnMAPBoxApplication):
         if not isEarthEngineModuleInstalled():
             self.mainDock.setVisible(False)
             self.profileDock.setVisible(False)
+            QgsMessageLog.logMessage("Can't import ee (Earth Engine) package.", level=Qgis.MessageLevel.Warning)
             return
 
         self.mainDock.setVisible(not self.mainDock.isVisible())

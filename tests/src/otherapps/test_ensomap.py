@@ -18,13 +18,28 @@ import unittest
 
 from qgis.PyQt.QtWidgets import QWidget
 
-from enmapbox import EnMAPBox, EnMAPBoxApplication
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.gui.applications import EnMAPBoxApplication
 
 from enmapbox.testing import EnMAPBoxTestCase
+from qgis.core import QgsProject
+
+
+def has_package(name: str):
+    try:
+        __import__(name)
+        return True
+    except (ModuleNotFoundError, SystemError):
+        return False
+
+
+has_numba = has_package('numba')
+has_hys = has_package('hys')
 
 
 class test_ensomap(EnMAPBoxTestCase):
 
+    @unittest.skipIf(not has_hys, 'hys package not installed')
     def test_imports(self):
         import ensomap
         self.assertTrue(os.path.isfile(ensomap.__file__))
@@ -32,15 +47,16 @@ class test_ensomap(EnMAPBoxTestCase):
 
         self.assertTrue(os.path.isfile(hys.__file__))
 
+    @unittest.skipIf(not has_numba, 'numba not installed')
     def test_ENSOMAP_UI(self):
         homedir = os.path.expanduser('~')
         from ensomap.enmapboxintegration import ENSOMAP_UI
         w = ENSOMAP_UI(homedir)
         self.assertIsInstance(w, QWidget)
+        QgsProject.instance().removeAllMapLayers()
 
+    @unittest.skipIf(not has_numba, 'numba not installed')
     def test_EnSOMAP_App(self):
-        if EnMAPBox.instance():
-            EnMAPBox.instance().close()
         emb = EnMAPBox(load_core_apps=False, load_other_apps=False)
 
         from ensomap import enmapboxApplicationFactory
@@ -48,6 +64,8 @@ class test_ensomap(EnMAPBoxTestCase):
         app = enmapboxApplicationFactory(emb)
 
         self.assertTrue(isinstance(app, list) or isinstance(app, EnMAPBoxApplication))
+        emb.close()
+        QgsProject.instance().removeAllMapLayers()
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-from enmapbox.exampledata import enmap
+from enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.creategridalgorithm import CreateGridAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from qgis.core import QgsRasterLayer

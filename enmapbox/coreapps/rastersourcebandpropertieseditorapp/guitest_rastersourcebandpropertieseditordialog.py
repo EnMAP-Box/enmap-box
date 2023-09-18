@@ -1,6 +1,7 @@
 from rastersourcebandpropertieseditorapp.rastersourcebandpropertieseditordialog import \
     RasterSourceBandPropertiesEditorDialog
-from enmapbox import EnMAPBox, initAll
+from enmapbox import initAll
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.exampledata import enmap
 from enmapbox.testing import start_app
 

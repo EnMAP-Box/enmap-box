@@ -25,7 +25,7 @@ def maskS2cdi(image):
     return image.updateMask(cdi.gt(-0.8)).addBands(cdi)
 
 
-collectionen = collection.map(maskS2cdi)
+collection = collection.map(maskS2cdi)
 
 # default colors for bands and spectral indices
 bandColors = {

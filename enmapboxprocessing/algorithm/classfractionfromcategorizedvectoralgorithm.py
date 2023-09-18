@@ -11,13 +11,14 @@ from enmapboxprocessing.numpyutils import NumpyUtils
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer)
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
 class ClassFractionFromCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
     P_CATEGORIZED_VECTOR, _CATEGORIZED_VECTOR = 'categorizedVector', 'Categorized vector layer'
     P_GRID, _GRID = 'grid', 'Grid'
+    P_COVERAGE, _COVERAGE = 'coverage', 'Minimum pixel coverage [%]'
     P_OUTPUT_FRACTION_RASTER, _OUTPUT_FRACTION_RASTER = 'outputFraction', 'Output class fraction layer'
 
     def displayName(self):
@@ -33,6 +34,7 @@ class ClassFractionFromCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
         return [
             (self._CATEGORIZED_VECTOR, 'A categorized vector layer to be rasterized.'),
             (self._GRID, 'The target grid.'),
+            (self._COVERAGE, 'Exclude all pixel where (polygon) coverage is smaller than given threshold.'),
             (self._OUTPUT_FRACTION_RASTER, self.RasterFileDestination)
         ]
 
@@ -42,6 +44,7 @@ class ClassFractionFromCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterVectorLayer(self.P_CATEGORIZED_VECTOR, self._CATEGORIZED_VECTOR)
         self.addParameterRasterLayer(self.P_GRID, self._GRID)
+        self.addParameterInt(self.P_COVERAGE, self._COVERAGE, 0, False, 0, 100, advanced=True)
         self.addParameterRasterDestination(self.P_OUTPUT_FRACTION_RASTER, self._OUTPUT_FRACTION_RASTER)
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
@@ -52,6 +55,7 @@ class ClassFractionFromCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
     ) -> Dict[str, Any]:
         vector = self.parameterAsVectorLayer(parameters, self.P_CATEGORIZED_VECTOR, context)
         grid = self.parameterAsRasterLayer(parameters, self.P_GRID, context)
+        minCoverage = self.parameterAsInt(parameters, self.P_COVERAGE, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_FRACTION_RASTER, context)
 
         with open(filename + '.log', 'w') as logfile:
@@ -95,6 +99,9 @@ class ClassFractionFromCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
                 categoryMask = fractionArray > 0
                 np.logical_or(mask, categoryMask, out=mask)
                 fractionArrays.append(fractionArray)
+
+            minCoverMask = np.sum(fractionArrays, 0) >= minCoverage
+            np.logical_and(mask, minCoverMask, out=mask)
             invalid = ~mask
             noDataValue = 255
             for fractionArray in fractionArrays:

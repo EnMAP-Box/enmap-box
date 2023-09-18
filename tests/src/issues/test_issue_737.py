@@ -47,28 +47,15 @@ import unittest
 
 from enmapbox.gui.datasources.datasources import ModelDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager
-from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.models import PyObjectTreeNode
 from enmapbox.testing import EnMAPBoxTestCase
+from enmapboxtestdata import classificationDatasetAsPklFile
 from qgis.PyQt.QtCore import QSize
 from qgis.PyQt.QtWidgets import QTreeView
 from qgis.core import QgsProject
-from enmapboxtestdata import classificationDatasetAsPklFile
 
 
 class TestIssue737(EnMAPBoxTestCase):
-
-    def tearDown(self):
-
-        emb = EnMAPBox.instance()
-        if isinstance(emb, EnMAPBox):
-            emb.close()
-
-        assert EnMAPBox.instance() is None
-
-        QgsProject.instance().removeAllMapLayers()
-
-        super().tearDown()
 
     def test_issue_747(self):
         """
@@ -119,6 +106,8 @@ class TestIssue737(EnMAPBoxTestCase):
         s = ""
 
         self.showGui(tv)
+
+        QgsProject.instance().removeAllMapLayers()
 
 
 if __name__ == '__main__':

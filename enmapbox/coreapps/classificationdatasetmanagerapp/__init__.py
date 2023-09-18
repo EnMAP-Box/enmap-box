@@ -1,7 +1,6 @@
 from classificationdatasetmanagerapp.classificationdatasetmanagergui import ClassificationDatasetManagerGui
 from enmapbox.gui.applications import EnMAPBoxApplication
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QAction
 
 
 def enmapboxApplicationFactory(enmapBox):
@@ -19,13 +18,14 @@ class ClassificationDatasetManagerApp(EnMAPBoxApplication):
     def icon(self):
         return QIcon(None)
 
+    def title(self):
+        return 'Classification Dataset Manager'
+
     def menu(self, appMenu):
-        assert isinstance(appMenu, QMenu)
-        a = self.utilsAddActionInAlphanumericOrder(appMenu, 'Classification Dataset Manager')
-        assert isinstance(a, QAction)
-        a.setIcon(self.icon())
+        a = self.utilsAddActionInAlphanumericOrder(
+            self.enmapbox.ui.menuApplicationsClassification, self.title() + ' (and Random Subsampling)'
+        )
         a.triggered.connect(self.startGUI)
-        return appMenu
 
     def geoAlgorithms(self):
         return []

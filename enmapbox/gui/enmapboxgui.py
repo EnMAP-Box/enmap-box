@@ -22,9 +22,8 @@ import re
 import sys
 import typing
 import warnings
-from typing import Optional, Dict, Union, Any, List
-
-from typeguard import typechecked
+from os.path import basename
+from typing import Optional, Dict, Union, Any, List, Sequence
 
 import enmapbox
 import enmapbox.gui.datasources.manager
@@ -42,9 +41,11 @@ from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprofilesources import Sp
     MapCanvasLayerProfileSource
 from enmapbox.qgispluginsupport.qps.subdatasets import SubDatasetSelectionDialog
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, loadUi, SpatialExtent, file_search
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.importdesisl1balgorithm import ImportDesisL1BAlgorithm
 from enmapboxprocessing.algorithm.importdesisl1calgorithm import ImportDesisL1CAlgorithm
 from enmapboxprocessing.algorithm.importdesisl2aalgorithm import ImportDesisL2AAlgorithm
+from enmapboxprocessing.algorithm.importemitl2aalgorithm import ImportEmitL2AAlgorithm
 from enmapboxprocessing.algorithm.importenmapl1balgorithm import ImportEnmapL1BAlgorithm
 from enmapboxprocessing.algorithm.importenmapl1calgorithm import ImportEnmapL1CAlgorithm
 from enmapboxprocessing.algorithm.importenmapl2aalgorithm import ImportEnmapL2AAlgorithm
@@ -80,6 +81,8 @@ from qgis.gui import QgsMapCanvas, QgisInterface, QgsMessageBar, QgsMessageViewe
     QgsSymbolWidgetContext
 from qgis.gui import QgsProcessingAlgorithmDialogBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog, \
     QgsNewVectorLayerDialog, QgsProcessingContextGenerator
+from .contextmenuprovider import EnMAPBoxContextMenuProvider
+from .contextmenus import EnMAPBoxContextMenuRegistry
 from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
 from .dataviews.docks import DockTypes
 from .mapcanvas import MapCanvas
@@ -171,6 +174,17 @@ class EnMAPBoxUI(QMainWindow):
     mStatusBar: QStatusBar
     mActionProcessingToolbox: QAction
     menuAdd_Product: QMenu
+    menuFile: QMenu
+    menuView: QMenu
+    menuTools: QMenu
+    menuToolsRasterStatistics: QMenu
+    menuToolsRasterVisualizations: QMenu
+    menuApplications: QMenu
+    menuApplicationsClassification: QMenu
+    menuApplicationsRegression: QMenu
+    menuApplicationsUnmixing: QMenu
+
+    menuAbout: QMenu
 
     def __init__(self, *args, **kwds):
         """Constructor."""
@@ -208,6 +222,8 @@ class EnMAPBoxUI(QMainWindow):
         self.mEo4qToolbar = QToolBar('Earth Observation for QGIS (EO4Q)')
         self.addToolBar(self.mEo4qToolbar)
 
+        self.initSubmenus()
+
     def addDockWidget(self, *args, **kwds):
         super(EnMAPBoxUI, self).addDockWidget(*args, **kwds)
 
@@ -223,6 +239,36 @@ class EnMAPBoxUI(QMainWindow):
     def closeEvent(event):
         pass
 
+    def initSubmenus(self):
+        """Initialize submenus to improve menu structure (see issue #386)"""
+
+        self.menuToolsRasterStatistics = self.menuTools.addMenu(
+            QIcon(':/images/themes/default/histogram.svg'),
+            'Raster Statistics')
+
+        self.menuToolsRasterVisualizations = self.menuTools.addMenu(
+            QIcon(':/images/themes/default/propertyicons/symbology.svg'),
+            'Raster Visualizations'
+        )
+
+        self.menuApplicationsClassification = self.menuApplications.addMenu(
+            QIcon(':/qps/ui/icons/raster_classification.svg'),
+            'Classification'
+        )
+
+        self.menuApplicationsRegression = self.menuApplications.addMenu(
+            QIcon(':/enmapbox/gui/ui/icons/filelist_regression.svg'),
+            'Regression'
+        )
+
+        self.menuApplicationsUnmixing = self.menuApplications.addMenu(
+            QIcon(':/qps/ui/icons/raster_multispectral.svg'),
+            'Unmixing'
+        )
+
+
+#        self.menuAdd_Product.addMenu(self.menuToolsRasterVisualizations)
+# separator = self.ui.mActionAddSentinel2  # outdated
 
 def getIcon() -> QIcon:
     """
@@ -240,7 +286,7 @@ class EnMAPBoxMapCanvasRenderProgressBar(QProgressBar):
         QProgressBar.__init__(self, parent)
 
     def toggleVisibility(self):
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapBox = EnMAPBox.instance()
         if enmapBox is None:
             return
@@ -431,6 +477,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         # QgsProject.instance()
         self.mProject = EnMAPBoxProject()
 
+        cmReg = EnMAPBoxContextMenuRegistry.instance()
+        if len(cmReg) == 0:
+            cmReg.addProvider(EnMAPBoxContextMenuProvider())
+
         self.ui = EnMAPBoxUI()
         self.ui.closeEvent = self.closeEvent
 
@@ -561,6 +611,13 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         a: QAction = m.addAction('Open Python Console')
         a.setIcon(QIcon(':/images/themes/default/console/mIconRunConsole.svg'))
         a.triggered.connect(self.onOpenPythonConsole)
+
+        # add datasets (see issue #561)
+        m2 = m.addMenu('Datasets')
+        a: QAction = m2.addAction('Add Berlin Dataset')
+        a.triggered.connect(self.onAddBerlinDataset)
+        a: QAction = m2.addAction('Add Potsdam Dataset')
+        a.triggered.connect(self.onAddPotsdamDataset)
 
         debugLog('Set ui visible...')
         self.ui.setVisible(True)
@@ -789,13 +846,38 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                '# Use enmapBox to access EnMAP-Box API interface.\n' \
                '# Security warning: typing commands from an untrusted source can harm your computer.'
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapBox = EnMAPBox.instance()
 
         window = QMainWindow(self.ui)
         window.setWindowTitle('EnMAP-Box Python console')
         window.setCentralWidget(ConsoleWidget(self.ui, {'enmapBox': enmapBox}, None, text))
         window.show()
+
+    def onAddBerlinDataset(self):
+        # example datasets are stored here: https://github.com/EnMAP-Box/enmap-box-exampledata
+        from enmapboxtestdata import enmap_berlin, hires_berlin, landcover_berlin_polygon, landcover_berlin_point, \
+            veg_cover_fraction_berlin_point, enmap_srf_library, library_berlin
+        layers = [
+            QgsRasterLayer(enmap_berlin, basename(enmap_berlin)),
+            QgsRasterLayer(hires_berlin, basename(hires_berlin)),
+            QgsVectorLayer(landcover_berlin_polygon, basename(landcover_berlin_polygon)),
+            QgsVectorLayer(landcover_berlin_point, basename(landcover_berlin_point)),
+            QgsVectorLayer(veg_cover_fraction_berlin_point, basename(veg_cover_fraction_berlin_point)),
+        ]
+        self.onDataDropped(reversed(layers))
+        self.addSources([enmap_srf_library, library_berlin])
+
+    def onAddPotsdamDataset(self):
+        # example datasets are stored here: https://github.com/EnMAP-Box/enmap-box-exampledata
+        from enmapboxtestdata import enmap_potsdam, hires_potsdom, landcover_potsdam_polygon, landcover_potsdam_point
+        layers = [
+            QgsRasterLayer(enmap_potsdam, basename(enmap_potsdam)),
+            QgsRasterLayer(hires_potsdom, basename(hires_potsdom)),
+            QgsVectorLayer(landcover_potsdam_polygon, basename(landcover_potsdam_polygon)),
+            QgsVectorLayer(landcover_potsdam_point, basename(landcover_potsdam_point))
+        ]
+        self.onDataDropped(reversed(layers))
 
     def disconnectQGISSignals(self):
         try:
@@ -806,6 +888,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             QgsProject.instance().layersWillBeRemoved.disconnect(self.onLayersWillBeRemoved)
         except TypeError:
             pass
+
+    def contextMenuRegistry(self) -> EnMAPBoxContextMenuRegistry:
+        return EnMAPBoxContextMenuRegistry.instance()
 
     def dataSourceManager(self) -> enmapbox.gui.datasources.manager.DataSourceManager:
         return self.mDataSourceManager
@@ -1152,7 +1237,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         result = d.exec_()
 
         if result == QDialog.Accepted:
-            subdatasets = d.selectedSubDatasets()
+            subdatasets = d.selectedSublayerDetails()
             layers = []
             loptions = QgsRasterLayer.LayerOptions(loadDefaultStyle=False)
             for i, s in enumerate(subdatasets):
@@ -1179,7 +1264,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             lambda: self.mDockManager.createDock(DockTypes.SpectralLibraryDock))
         self.ui.mActionLoadExampleData.triggered.connect(lambda: self.openExampleData(
             mapWindows=1 if len(self.mDockManager.docks(MapDock)) == 0 else 0))
-
+        self.ui.mActionLoadExampleScene.triggered.connect(  # see issue #566
+            lambda: webbrowser.open('https://box.hu-berlin.de/f/c35a6b0655c54d518aab/')
+        )
         # create new datasets
         self.ui.mActionCreateNewMemoryLayer.triggered.connect(lambda *args: self.createNewLayer('memory'))
         self.ui.mActionCreateNewGeoPackageLayer.triggered.connect(lambda *args: self.createNewLayer('gpkg'))
@@ -1228,6 +1315,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.setMapTool(MapTools.CursorLocation)
 
         # redirect to QGIS Project Management
+        self.ui.mActionOpenProject.triggered.connect(lambda: self.iface.actionOpenProject().trigger())
         self.ui.mActionSaveProject.triggered.connect(lambda: self.iface.actionSaveProject().trigger())
         self.ui.mActionSaveProjectAs.triggered.connect(lambda: self.iface.actionSaveProjectAs().trigger())
         # AJ: Question for Benjamin: currently we don't have an open button, why?
@@ -1309,6 +1397,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             ImportDesisL1BAlgorithm(),
             ImportDesisL1CAlgorithm(),
             ImportDesisL2AAlgorithm(),
+            ImportEmitL2AAlgorithm(),
             ImportEnmapL1BAlgorithm(),
             ImportEnmapL1CAlgorithm(),
             ImportEnmapL2AAlgorithm(),
@@ -1709,8 +1798,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         contains_html = re.search(r'<(html|br|a|p/?>)', message) is not None
         self.addMessageBarTextBoxItem(line1, message, level=level, html=contains_html)
 
-    def onDataDropped(self, droppedData: Any, mapDock: MapDock = None) -> MapDock:
-        assert isinstance(droppedData, list)
+    def onDataDropped(self, droppedData: Sequence, mapDock: MapDock = None) -> MapDock:
         if mapDock is None:
             mapDock = self.createDock('MAP')
         from enmapbox.gui.datasources.datasources import SpatialDataSource
@@ -1740,15 +1828,14 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         if missingTestData():
             installTestData()
 
-        rx = re.compile('.*(bsq|bil|bip|tif|gpkg|sli|img|shp|pkl)$', re.I)
+        rx = re.compile('.*(bsq|bil|bip|tif|gpkg|sli|img|shp|pkl|geojson)$', re.I)
         if not missingTestData():
             import enmapbox.exampledata
             dir_exampledata = os.path.dirname(enmapbox.exampledata.__file__)
             files = list(pathlib.Path(f).as_posix() for f in file_search(dir_exampledata, rx, recursive=True))
 
-            self.addSources(files)
-            exampleSources = [s for s in self.dataSourceManager().dataSources()
-                              if isinstance(s, SpatialDataSource) and s.source() in files]
+            exampleSources = self.addSources(files)
+            exampleSources = [s for s in exampleSources if isinstance(s, SpatialDataSource)]
 
             for n in range(mapWindows):
                 dock: MapDock = self.createDock('MAP')
@@ -1789,8 +1876,17 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                         pass
                     return oType, area
 
-                for lyr in sorted(lyrs, key=niceLayerOrder):
+                lyrs = [lyr for lyr in sorted(lyrs, key=niceLayerOrder)]
+
+                # quick fix for issue #555
+                from enmapbox.exampledata import enmap, hires
+                lyrNames = [basename(lyr.source()) for lyr in lyrs]
+                a, b = lyrNames.index(basename(hires)), lyrNames.index(basename(enmap))
+                lyrs[b], lyrs[a] = lyrs[a], lyrs[b]  # we just switch positions
+
+                for lyr in lyrs:
                     dock.layerTree().addLayer(lyr)
+                dock.mapCanvas().zoomToFullExtent()
 
         if testData:
             from enmapbox import DIR_REPO
@@ -1933,6 +2029,22 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             sources = [s.source() for s in sources]
         return sources
 
+    def createMapDock(self, *args,
+                      name='New Map',
+                      position='bottom',
+                      relativeTo=None) -> MapDock:
+        """
+        Create a new map dock
+        """
+        return self.createDock(MapDock, name=name, position=position, relativeTo=relativeTo)
+
+    def createSpectralLibraryDock(self, *args,
+                                  speclib: QgsVectorLayer = None,
+                                  name='New Speclib',
+                                  position='bottom', relativeTo=None) -> SpectralLibraryDock:
+        return self.createDock(SpectralLibraryDock, speclib=speclib, name=name, position=position,
+                               relativeTo=relativeTo)
+
     def createDock(self, *args, **kwds) -> Dock:
         """
         Create and returns a new Dock
@@ -1985,7 +2097,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         """
         return self.mDockManager.docks(dockType=dockType)
 
-    def addSources(self, sourceList):
+    def addSources(self, sourceList) -> List[DataSource]:
         """
         :param sourceList:
         :return: Returns a list of added DataSources or the list of DataSources that were derived from a single data source uri.
@@ -1993,14 +2105,14 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         assert isinstance(sourceList, list)
         return self.mDataSourceManager.addDataSources(sourceList)
 
-    def addSource(self, source, name=None):
+    def addSource(self, source, name: str = None, show_dialogs: bool = True):
         """
         Returns a list of added DataSources or the list of DataSources that were derived from a single data source uri.
         :param source:
         :param name:
         :return: [list-of-dataSources]
         """
-        return self.mDataSourceManager.addDataSources(source, name=name)
+        return self.mDataSourceManager.addDataSources(source, name=name, show_dialogs=show_dialogs)
 
     def removeSources(self, dataSourceList: list = None):
         """
@@ -2235,7 +2347,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         """
         if parent is None:
-            from enmapbox import EnMAPBox
+            from enmapbox.gui.enmapboxgui import EnMAPBox
             if EnMAPBox.instance() is not None:
                 parent = EnMAPBox.instance().ui
 
@@ -2334,8 +2446,17 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
     def unregisterMapLayerConfigWidgetFactory(self, factory):
         self.iface.unregisterMapLayerConfigWidgetFactory(factory)
 
+    def contexMenuProviderRegistry(self) -> EnMAPBoxContextMenuRegistry:
+        return self.mContextMenuRegistry
+
     def vectorMenu(self):
         return QMenu()
+
+    def dockWidgets(self) -> Dict[str, QDockWidget]:
+        """
+        Returns a dictionary of all dock widgets
+        """
+        return {w.windowTitle(): w for w in self.ui.findChildren(QDockWidget)}
 
     def addDockWidget(self, area, dockwidget: QDockWidget, orientation=None):
 

@@ -3,8 +3,6 @@ from enmapboxprocessing.algorithm.regressionperformancealgorithm import Regressi
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import fraction_map_l3, fraction_point_multitarget
 
-openReport = True
-
 
 class TestRegressionPerformanceSimpleAlgorithm(TestCase):
 
@@ -13,8 +11,8 @@ class TestRegressionPerformanceSimpleAlgorithm(TestCase):
         parameters = {
             alg.P_REGRESSION: fraction_map_l3,
             alg.P_REFERENCE: fraction_point_multitarget,
-            alg.P_OPEN_REPORT: openReport,
-            alg.P_OUTPUT_REPORT: self.filename('report.html'),
+            alg.P_OPEN_REPORT: self.openReport,
+            alg.P_OUTPUT_REPORT: self.filename('report1.html'),
         }
         self.runalg(alg, parameters)
 
@@ -23,7 +21,7 @@ class TestRegressionPerformanceSimpleAlgorithm(TestCase):
         parameters = {
             alg.P_REGRESSION: fraction_map_l3,
             alg.P_REFERENCE: fraction_map_l3,
-            alg.P_OPEN_REPORT: openReport,
-            alg.P_OUTPUT_REPORT: self.filename('report.html'),
+            alg.P_OPEN_REPORT: self.openReport,
+            alg.P_OUTPUT_REPORT: self.filename('report2.html'),
         }
         self.runalg(alg, parameters)

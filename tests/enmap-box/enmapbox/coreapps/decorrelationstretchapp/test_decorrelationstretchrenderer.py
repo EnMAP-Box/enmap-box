@@ -5,9 +5,9 @@ from qgis.core import QgsRasterLayer, Qgis
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import RobustScaler, MinMaxScaler
 
-from enmapbox.exampledata import enmap
+from enmapboxtestdata import enmap
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxprocessing.test.testcase import TestCase
+from enmapboxprocessing.testcase import TestCase
 from enmapboxprocessing.utils import Utils
 
 
@@ -31,7 +31,7 @@ class TestClassFractionRenderer(TestCase):
         XPcaStretched = scaler1.transform(XPca)
         Xt = pca.inverse_transform(XPcaStretched)
         percentiles = np.percentile(Xt, quantile_range, axis=0)
-        scaler2 = MinMaxScaler(feature_range=[0, 255], clip=True)
+        scaler2 = MinMaxScaler(feature_range=(0, 255), clip=True)
         scaler2.fit(percentiles)
 
         # make renderer

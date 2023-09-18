@@ -5,7 +5,7 @@ from osgeo import gdal
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -37,7 +37,9 @@ class ImportDesisL1CAlgorithm(EnMAPProcessingAlgorithm):
         return Group.ImportData.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
-        self.addParameterFile(self.P_FILE, self._FILE, extension='xml')
+        self.addParameterFile(
+            self.P_FILE, self._FILE, extension='xml', fileFilter='Metadata file (*-METADATA.xml);;All files (*.*)'
+        )
         self.addParameterVrtDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 
     def isValidFile(self, file: str) -> bool:

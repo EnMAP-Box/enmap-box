@@ -17,14 +17,14 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLay
                        QgsProject, QgsField, QgsCoordinateTransform, QgsRasterLayer, QgsProcessingException,
                        QgsMapLayer)
 from qgis.core import edit
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
 class RasterizeCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
     P_CATEGORIZED_VECTOR, _CATEGORIZED_VECTOR = 'categorizedVector', 'Categorized vector layer'
     P_GRID, _GRID = 'grid', 'Grid'
-    P_COVERAGE, _COVERAGE = 'coverage', 'Minimum pixel coverage'
+    P_COVERAGE, _COVERAGE = 'coverage', 'Minimum pixel coverage [%]'
     P_MAJORITY_VOTING, _MAJORITY_VOTING = 'majorityVoting', 'Majority voting'
     P_OUTPUT_CATEGORIZED_RASTER, _OUTPUT_CATEGORIZED_RASTER = 'outputRasterizedCategories', \
                                                               'Output categorized raster layer'

@@ -14,9 +14,9 @@ __bands__    = [2133, 2209, 2225]
 __filename__ = "_Clay_SWIRFI"
 __gui__      = "Clay Content SWIR Fine particle Index"
 __info__     = "This parameter estimates the clay mineral content:\n\n" + \
-    "           B2133^2       \n" + \
+    "           R_2133^2       \n" + \
     " ind = ------------------\n" + \
-    "        B2225 . B2209^3  \n\n" + \
+    "        R_2225 . R_2209^3  \n\n" + \
     "Levin, N., Kidron, G.J., Ben-Dor, E., (2007)\n"+\
     "Surface properties of stabilizing coastal dunes: combining spectral\n"+\
     "field analyses. Sedimentology 54, 771–788."

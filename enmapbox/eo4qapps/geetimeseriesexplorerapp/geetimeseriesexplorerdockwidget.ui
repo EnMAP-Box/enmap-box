@@ -240,7 +240,7 @@ QListWidget::item::selected {
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>5</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="page">
          <layout class="QVBoxLayout" name="verticalLayout_12" stretch="0">
@@ -286,8 +286,8 @@ QListWidget::item::selected {
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>440</width>
-                   <height>825</height>
+                   <width>597</width>
+                   <height>860</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_2">
@@ -2428,7 +2428,7 @@ Hyperspectral Imager</string>
                 <item>
                  <widget class="QToolButton" name="mLoadCollection">
                   <property name="enabled">
-                   <bool>false</bool>
+                   <bool>true</bool>
                   </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -3011,8 +3011,8 @@ Hyperspectral Imager</string>
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>419</width>
-               <height>405</height>
+               <width>621</width>
+               <height>907</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_22">

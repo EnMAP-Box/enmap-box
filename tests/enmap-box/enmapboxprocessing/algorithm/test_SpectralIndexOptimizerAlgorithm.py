@@ -1,8 +1,8 @@
 import numpy as np
 
 from enmapboxprocessing.algorithm.spectralindexoptimizeralgorithm import SpectralIndexOptimizerAlgorithm
-from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.algorithm.testcase import TestCase
+from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxtestdata import regressionDatasetAsPkl
 
 

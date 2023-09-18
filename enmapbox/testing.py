@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
-                              EO Time Series Viewer
+                              enmapbox/testing.py
                               -------------------
         begin                : 2015-08-20
         git sha              : $Format:%H$
@@ -13,7 +13,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
@@ -28,45 +28,30 @@ import sys
 
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu, QApplication
-
-from qgis.core import QgsApplication, QgsProcessingParameterRasterDestination, QgsProcessingParameterNumber, \
+from qgis.core import QgsProcessingParameterRasterDestination, QgsProcessingParameterNumber, \
     QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterRasterLayer, \
     QgsPythonRunner, QgsProcessingAlgorithm
 from qgis.gui import QgsPluginManagerInterface
+from .qgispluginsupport.qps.testing import TestObjects, TestCase, start_app
 
-from .gui.enmapboxgui import EnMAPBox
-from .qgispluginsupport.qps.testing import TestObjects, TestCase
-from .qgispluginsupport.qps.testing import stop_app
-
-SHOW_GUI = True
-stop_app = stop_app
-
-
-def start_app(*args, **kwds) -> QgsApplication:
-    """
-    Initializes a QGIS Environment
-    :return: QgsApplication instance of local QGIS installation
-    """
-    if isinstance(QgsApplication.instance(), QgsApplication):
-        return QgsApplication.instance()
-    else:
-        from .qgispluginsupport.qps.testing import start_app, StartOptions
-        app = start_app(*args, options=StartOptions.All, **kwds)
-
-        import enmapbox
-        enmapbox.initAll()
-        return app
-
-
-initQgisApplication = start_app
+start_app = start_app
 
 
 # get_iface()
 
 class EnMAPBoxTestCase(TestCase):
+
+    def tearDown(self):
+        super().tearDown()
+        from .gui.enmapboxgui import EnMAPBox
+        emb = EnMAPBox.instance()
+        if emb:
+            emb.close()
+            EnMAPBox._instance = None
+
     @classmethod
     def setUpClass(cls, resources=[]):
-        tmpDir = cls.tempDir(cls, subdir=cls.__name__)
+        tmpDir = cls.tempDir(cls)
         os.chdir(tmpDir)
         super().setUpClass(resources=resources)
 
@@ -79,11 +64,17 @@ class EnMAPBoxTestCase(TestCase):
         import enmapbox
         enmapbox.initAll()
 
-    def closeEnMAPBoxInstance(self):
+    @classmethod
+    def closeEnMAPBoxInstance(cls):
+        from .gui.enmapboxgui import EnMAPBox
         eb = EnMAPBox.instance()
         if isinstance(eb, EnMAPBox):
             eb.close()
         QApplication.processEvents()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.closeEnMAPBoxInstance()
 
     def tempDir(self, subdir: str = None, cleanup: bool = False) -> pathlib.Path:
         """
@@ -123,7 +114,7 @@ class TestObjects(TestObjects):
     @staticmethod
     def enmapboxApplication():
         from enmapbox.gui.applications import EnMAPBoxApplication
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         assert isinstance(EnMAPBox.instance(), EnMAPBox), 'Please initialize an EnMAP-Box instance first'
 
         def testAlgorithm(self, *args):

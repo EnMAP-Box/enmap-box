@@ -49,6 +49,6 @@ def process(cube, wvl, ind, mask):
             W400 = wvl[ind[0]]
             W600 = wvl[ind[1]]
             slope = (R600 - R400) / (W600 - W400)
-            if slope != 0: out[ky, kx] = 1. / slope
+            if slope > 0: out[ky, kx] = 1. / slope
             else:        out[ky, kx] = np.nan
     return out

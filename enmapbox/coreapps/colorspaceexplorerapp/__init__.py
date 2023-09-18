@@ -1,9 +1,8 @@
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QAction
-
 from colorspaceexplorerapp.colorspaceexplorerdialog import ColorSpaceExplorerDialog
 from enmapbox.gui.applications import EnMAPBoxApplication
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QMenu
 
 
 def enmapboxApplicationFactory(enmapBox):
@@ -28,10 +27,7 @@ class ColorSpaceExplorerApp(EnMAPBoxApplication):
         return 'Color Space Explorer'
 
     def menu(self, appMenu: QMenu):
-        appMenu: QMenu = self.enmapbox.menu('Tools')
-        a = self.utilsAddActionInAlphanumericOrder(appMenu, 'Color Space Explorer')
-        assert isinstance(a, QAction)
-        a.setIcon(self.icon())
+        a = self.utilsAddActionInAlphanumericOrder(self.enmapbox.ui.menuToolsRasterVisualizations, self.title())
         a.triggered.connect(self.startGUI)
         return appMenu
 

@@ -1,6 +1,6 @@
 from typing import TextIO, List, Tuple, Union
 
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

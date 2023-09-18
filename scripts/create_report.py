@@ -3,6 +3,9 @@ This scripts generates some reports stats related to the EnMAP-Box repository
 """
 import argparse
 import csv
+from typing import List, Dict
+
+import requests
 import datetime
 import inspect
 import json
@@ -11,15 +14,17 @@ import pathlib
 import re
 import unittest
 import urllib.request
-
+import xml.etree.ElementTree as etree
 import pandas as pd
+
 from xlsxwriter.workbook import Workbook
 
-from enmapbox import DIR_REPO_TMP, EnMAPBox, EnMAPBoxApplication
+from enmapbox import DIR_REPO_TMP
 from enmapbox import initAll
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
-from enmapbox.gui.applications import ApplicationWrapper
-from enmapbox.testing import start_app, stop_app
+from enmapbox.gui.applications import ApplicationWrapper, EnMAPBoxApplication
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.testing import start_app
 from qgis.PyQt.QtWidgets import QMenu
 from qgis.core import QgsProcessing, QgsProcessingParameterRasterLayer, QgsProcessingParameterRasterDestination, \
     QgsProcessingOutputVectorLayer, QgsProcessingParameterFeatureSink, QgsProcessingParameterFeatureSource, \
@@ -53,8 +58,7 @@ def report_downloads() -> pd.DataFrame:
     html = re.sub(r'&nbsp;', '', html)
     html = re.sub(r'xmlns=".*"', '', html)
 
-    import xml.etree.ElementTree as ET
-    tree = ET.fromstring(html)
+    tree = etree.fromstring(html)
     table = tree.find('.//table[@class="table table-striped plugins"]')
     DATA = {k: [] for k in ['version', 'minQGIS', 'experimental', 'downloads', 'uploader', 'datetime']}
     for tr in table.findall('.//tbody/tr'):
@@ -88,12 +92,247 @@ def report_downloads() -> pd.DataFrame:
     return df
 
 
-def report_github_issues() -> pd.DataFrame:
-    import github3
+def toDate(text, format: str = '%Y-%m-%dT%H:%M:%SZ') -> datetime.datetime:
+    return datetime.datetime.strptime(text, format)
 
-    gh = github3.login()
 
-    s = ""
+def report_github_issues_QGIS(authors=['jakimowb', 'janzandr']) -> pd.DataFrame:
+    """
+
+    is:issue created:2022-07-01..2022-12-31
+    is:issue closed:2022-07-01..2022-12-31
+    """
+
+    # GitHub repository owner and name
+    owner = 'qgis'
+    repo = 'QGIS'
+
+    # Define the date range
+    start_date = toDate('2023-01-01', '%Y-%m-%d')
+    end_date = toDate('2023-06-30', '%Y-%m-%d')
+
+    today = datetime.datetime.now().isoformat().split('T')[0]
+
+    PATH_GH_JSON = pathlib.Path(__file__).parents[1] / 'tmp' / f'githubissues.{today}.QGIS.json'
+
+    if not PATH_GH_JSON.is_file():
+        os.makedirs(PATH_GH_JSON.parent, exist_ok=True)
+        # Your GitHub personal access token
+        assert 'GITHUB_TOKEN' in os.environ, 'GITHUB_TOKEN is not set. ' \
+                                             'Read https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens for details.'
+        token = os.environ['GITHUB_TOKEN']
+
+        # Create a session and set the authorization header
+        session = requests.Session()
+        session.headers.update({'Authorization': f'token {token}'})
+
+        # Get the list of issues from the GitHub API
+        issues_url = f'https://api.github.com/repos/{owner}/{repo}/issues'
+        params = {
+            'state': 'all',  # 'all' includes open and closed issues
+            'per_page': 100,  # Adjust as needed
+            'creator': ','.join(authors),
+        }
+        all_issues = []
+
+        n_pages = 1
+        while True:
+            print(f'Read page {n_pages}...')
+            response = session.get(issues_url, params=params)
+
+            response.raise_for_status()
+            all_issues.extend(response.json())
+
+            # Check if there are more pages of issues
+            link_header = response.headers.get('Link', '')
+            if 'rel="next"' not in link_header:
+                break
+
+            rx = re.compile(r'<(.[^>]+)>; *rel="next"')
+
+            # Extract the URL for the next page
+            link = [l.strip() for l in link_header.split(',') if 'rel="next"' in l]
+            if len(link) > 0:
+                link = link[0]
+                issues_url = rx.match(link).group(1)
+            else:
+                response.close()
+                break
+            n_pages += 1
+        with open(PATH_GH_JSON, 'w') as f:
+            json.dump(all_issues, f)
+
+    with open(PATH_GH_JSON, 'r') as f:
+        all_issues = json.load(f)
+
+    # filter by authors
+
+    pull_requests = [i for i in all_issues if 'pull_request' in i]
+    issues = [i for i in all_issues if 'pull_request' not in i]
+    if True:
+        for i in issues:
+            if i['closed_at'] and toDate(i['closed_at']) > end_date:
+                i['closed_at'] = None
+            else:
+                s = ""
+
+    # Filter issues within the date range
+
+    created_in_report_period = [i for i in issues if start_date <= toDate(i['created_at']) <= end_date]
+    created_before_but_touched = [i for i in issues if toDate(i['created_at']) < start_date
+                                  and start_date <= toDate(i['updated_at']) <= end_date]
+
+    def printInfos(issues: List[dict], labels=['duplicate', 'wontfix']):
+        is_closed = []
+        is_open = []
+
+        issues_by_label: Dict[str, List[dict]] = dict()
+        for i in issues:
+            if i['closed_at'] is None:
+                is_open.append(i)
+            else:
+                is_closed.append(i)
+
+            for label in i['labels']:
+                n = label['name']
+                issues_by_label[n] = issues_by_label.get(n, []) + [i]
+
+        n_t = len(issues)
+        print(' Total: {:3}'.format(n_t))
+        if n_t > 0:
+            n_o = len(is_open)
+            n_c = len(is_closed)
+
+            print('  Open: {:3} {:0.2f}%'.format(n_o, n_o / n_t * 100))
+            print('Closed: {:3} {:0.2f}%'.format(n_c, n_c / n_t * 100))
+            for label in labels:
+                print(f' {label}: {len(issues_by_label.get(label, []))}')
+
+    print(f'By today: {today}')
+    print(f'Issues created in reporting period: {start_date} to {end_date}:')
+    printInfos(created_in_report_period)
+
+    print(f'Issues created before {start_date} but handled in reporting period:')
+    printInfos(created_before_but_touched)
+
+    print('Total:')
+    printInfos(created_before_but_touched + created_in_report_period)
+    return None
+
+
+def report_github_issues_EnMAPBox() -> pd.DataFrame:
+    """
+
+    is:issue created:2022-07-01..2022-12-31
+    is:issue closed:2022-07-01..2022-12-31
+    """
+
+    # GitHub repository owner and name
+    owner = 'EnMAP-Box'
+    repo = 'enmap-box'
+
+    # Define the date range
+    start_date = toDate('2023-01-01', '%Y-%m-%d')
+    end_date = toDate('2023-06-30', '%Y-%m-%d')
+
+    today = datetime.datetime.now().isoformat().split('T')[0]
+
+    PATH_GH_JSON = pathlib.Path(__file__).parents[1] / 'tmp' / f'githubissues.{today}.json'
+
+    if not PATH_GH_JSON.is_file():
+        os.makedirs(PATH_GH_JSON.parent, exist_ok=True)
+        # Your GitHub personal access token
+        assert 'GITHUB_TOKEN' in os.environ, 'GITHUB_TOKEN is not set. ' \
+                                             'Read https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens for details.'
+        token = os.environ['GITHUB_TOKEN']
+
+        # Create a session and set the authorization header
+        session = requests.Session()
+        session.headers.update({'Authorization': f'token {token}'})
+
+        # Get the list of issues from the GitHub API
+        issues_url = f'https://api.github.com/repos/{owner}/{repo}/issues'
+        params = {
+            'state': 'all',  # 'all' includes open and closed issues
+            'per_page': 100,  # Adjust as needed
+        }
+        all_issues = []
+
+        while True:
+            response = session.get(issues_url, params=params)
+
+            response.raise_for_status()
+            all_issues.extend(response.json())
+
+            # Check if there are more pages of issues
+            link_header = response.headers.get('Link', '')
+            if 'rel="next"' not in link_header:
+                break
+
+            rx = re.compile(r'<(.[^>]+)>; *rel="next"')
+
+            # Extract the URL for the next page
+            link = [l.strip() for l in link_header.split(',') if 'rel="next"' in l]
+            if len(link) > 0:
+                link = link[0]
+                issues_url = rx.match(link).group(1)
+            else:
+                response.close()
+                break
+        with open(PATH_GH_JSON, 'w') as f:
+            json.dump(all_issues, f)
+
+    with open(PATH_GH_JSON, 'r') as f:
+        all_issues = json.load(f)
+    pull_requests = [i for i in all_issues if 'pull_request' in i]
+    issues = [i for i in all_issues if 'pull_request' not in i]
+    if True:
+        for i in issues:
+            if i['closed_at'] and toDate(i['closed_at']) > end_date:
+                i['closed_at'] = None
+            else:
+                s = ""
+
+    # Filter issues within the date range
+
+    created_in_report_period = [i for i in issues if start_date <= toDate(i['created_at']) <= end_date]
+    created_before_but_touched = [i for i in issues if toDate(i['created_at']) < start_date
+                                  and start_date <= toDate(i['updated_at']) <= end_date]
+
+    def printInfos(issues: List[dict], labels=['duplicate', 'wontfix']):
+        is_closed = []
+        is_open = []
+
+        issues_by_label: Dict[str, List[dict]] = dict()
+        for i in issues:
+            if i['closed_at'] is None:
+                is_open.append(i)
+            else:
+                is_closed.append(i)
+
+            for label in i['labels']:
+                n = label['name']
+                issues_by_label[n] = issues_by_label.get(n, []) + [i]
+
+        n_t = len(issues)
+        n_o = len(is_open)
+        n_c = len(is_closed)
+        print(' Total: {:3}'.format(n_t))
+        print('  Open: {:3} {:0.2f}%'.format(n_o, n_o / n_t * 100))
+        print('Closed: {:3} {:0.2f}%'.format(n_c, n_c / n_t * 100))
+        for label in labels:
+            print(f' {label}: {len(issues_by_label.get(label, []))}')
+
+    print(f'By today: {today}')
+    print(f'Issues created in reporting period: {start_date} to {end_date}:')
+    printInfos(created_in_report_period)
+
+    print(f'Issues created before {start_date} but handled in reporting period:')
+    printInfos(created_before_but_touched)
+
+    print('Total:')
+    printInfos(created_before_but_touched + created_in_report_period)
+    return None
 
 
 def report_EnMAPBoxApplications() -> pd.DataFrame:
@@ -297,42 +536,11 @@ def report_bitbucket_issues(self):
 
 class TestCases(unittest.TestCase):
 
-    def test_github_issue(self):
-        from github3api import GitHubAPI
-        import json
-        path_json = pathlib.Path(DIR_REPO_TMP) / 'issues.json'
-        client = GitHubAPI()
+    def test_github_EnMAPBox(self):
+        report_github_issues_EnMAPBox()
 
-        if not path_json.is_file():
-            issues = []
-            for issue_slice in client.get('https://api.github.com/repos/EnMAP-Box/enmap-box/issues',
-                                          _get='all',
-                                          # _attributes = ['title', 'user', 'labels', 'html_url', 'state', 'locked',
-                                          # 'assignees', 'milestone', 'created_at', 'updated_at', 'closed_at', 'state_reason', 'pull_request']
-                                          ):
-                if isinstance(issue_slice, dict):
-                    issues.append(issue_slice)
-                else:
-                    issues.extend(issue_slice)
-
-            with open(path_json, 'w', encoding='utf-8') as f:
-                json.dump(issues, f)
-        else:
-            with open(path_json, 'r', encoding='utf-8') as f:
-                issues = json.load(f)
-            s = ""
-        s = ""
-        for issue in issues:
-            dtg_created = issue['created_at']
-            dtg_updates = issue['updated_at']
-            dtg_closed = issue['closed_at']
-            state = issue['state']
-
-            s = ""
-        s = ""
-        # gh = github3.login(username='foo', password='bar')
-        #
-        # s = ""
+    def test_github_QGIS(self):
+        report_github_issues_QGIS()
 
 
 if __name__ == "__main__":
@@ -360,5 +568,3 @@ if __name__ == "__main__":
 
         dfPAs = report_processingalgorithms()
         dfPAs.to_excel(writer, sheet_name='PAs')
-
-    stop_app()

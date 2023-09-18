@@ -1,26 +1,38 @@
 # run: conda env create --file conda_environment.yml
 # see also https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
-name: qgis
+name: enmapbox_full
 channels:
   - conda-forge
 dependencies:
-  - qgis>=3.18
-  - pip
-  - numpy
-  - scipy
-  - scikit-learn
+  - python>=3.8
+  - qgis>=3.28.2
+  - pip  # avoids that conda uses the wrong pip
+  - enpt
+  - xgboost
+  - lightgbm
+
+  # Polymer AC additional conda requirements
+  - cdsapi
+  - cython
+  - gdal
+  - netcdf4
+  - pygrib
+  - pyhdf
+  - xarray
+
+  # EnMAP-Box
+  - astropy
+  - catboost
   - matplotlib
   - astropy
-  - numba
+  - numba>=0.56.4
+  - sympy
   - pyopengl
   - netcdf4
   - h5py
   - gitpython
   - git-lfs
-  - sphinx=1.8.5
-  - recommonmark
   - pip:
-    - sphinx-rtd-theme
     - enpt-enmapboxapp
 variables:
   QT_MAC_WANTS_LAYER: 1

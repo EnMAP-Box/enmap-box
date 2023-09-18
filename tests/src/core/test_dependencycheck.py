@@ -12,30 +12,21 @@ __author__ = 'benjamin.jakimow@geo.hu-berlin.de'
 __date__ = '2017-07-17'
 __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
-import os
 import pathlib
 import unittest
 import uuid
 
-from qgis.PyQt.QtGui import QMovie
-from qgis.core import QgsApplication
-from qgis.PyQt.QtCore import QTimer
-from qgis.PyQt.QtWidgets import QApplication, QTableView, QLabel
-
 from enmapbox.dependencycheck import PIPPackage, requiredPackages, PIPPackageInstaller, PIPPackageInfoTask, \
     localPythonExecutable, INSTALLATION_BLOCK, missingPackageInfo, checkGDALIssues, PIPPackageInstallerTableModel
 from enmapbox.testing import EnMAPBoxTestCase
+from qgis.PyQt.QtGui import QMovie
+from qgis.PyQt.QtWidgets import QApplication, QTableView, QLabel
+from qgis.core import QgsApplication
 
 
 class test_dependencycheck(EnMAPBoxTestCase):
 
-    def setUp(self):
-        super().setUp()
-        if str(os.environ.get('CI')).lower() in ['1', 'true', 'yes']:
-            QTimer.singleShot(2000, QApplication.instance().closeAllWindows)
-
     def test_gdalissues(self):
-
         issues = checkGDALIssues()
         self.assertIsInstance(issues, list)
         for i in issues:
@@ -56,7 +47,6 @@ class test_dependencycheck(EnMAPBoxTestCase):
         del enmapbox.dependencycheck.PACKAGE_LOOKUP[pyName]
 
     def test_pippackage(self):
-
         pkg = PIPPackage('osgeo.gdal', pipCmd='GDAL>=3.0')
 
         self.assertTrue(pkg.isInstalled())
@@ -78,7 +68,6 @@ class test_dependencycheck(EnMAPBoxTestCase):
         self.assertTrue('reason' in pkg.stderrMsg)
 
     def test_pippackagemodel(self):
-
         model = PIPPackageInstallerTableModel()
         self.assertTrue(len(model) == 0)
 
@@ -111,7 +100,6 @@ class test_dependencycheck(EnMAPBoxTestCase):
         self.showGui(w)
 
     def test_AnimatedIcon(self):
-
         label = QLabel()
         p = QgsApplication.iconPath("/mIconLoading.gif")
         # icon = QIcon(p)
@@ -123,7 +111,6 @@ class test_dependencycheck(EnMAPBoxTestCase):
         self.showGui(label)
 
     def test_PIPPackageInfoTask(self):
-
         required = [PIPPackage(self.nonexistingPackageName())] + requiredPackages()
         AVAILABLE = dict()
         INSTALLED = dict()
@@ -151,7 +138,6 @@ class test_dependencycheck(EnMAPBoxTestCase):
         QApplication.processEvents()
 
     def test_findpython(self):
-
         p = localPythonExecutable()
         self.assertIsInstance(p, pathlib.Path)
         self.assertTrue(p.is_file())

@@ -14,7 +14,7 @@ def addLayer(eeObject, visParams, name, mapCanvas, shown=True, opacity=1.0) -> Q
 
 
 def getBounds(asGeoJSON=False):
-    from enmapbox import EnMAPBox
+    from enmapbox.gui.enmapboxgui import EnMAPBox
     enmapBox = EnMAPBox.instance()
     ex = enmapBox.currentMapCanvas().extent()
     xmax = ex.xMaximum()

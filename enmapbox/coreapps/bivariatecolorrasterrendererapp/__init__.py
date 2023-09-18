@@ -2,7 +2,7 @@ from bivariatecolorrasterrendererapp.bivariatecolorrasterrendererdialog import B
 from enmapbox.gui.applications import EnMAPBoxApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu, QAction
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 def enmapboxApplicationFactory(enmapBox):
@@ -27,12 +27,9 @@ class BivariateColorRasterRendererApp(EnMAPBoxApplication):
         return 'Bivariate Color Raster Renderer'
 
     def menu(self, appMenu: QMenu):
-        appMenu: QMenu = self.enmapbox.menu('Tools')
-        a = self.utilsAddActionInAlphanumericOrder(appMenu, self.title())
+        a = self.utilsAddActionInAlphanumericOrder(self.enmapbox.ui.menuToolsRasterVisualizations, self.title())
         assert isinstance(a, QAction)
-        a.setIcon(self.icon())
         a.triggered.connect(self.startGUI)
-        return appMenu
 
     def startGUI(self):
         w = BivariateColorRasterRendererDialog(parent=self.enmapbox.ui)

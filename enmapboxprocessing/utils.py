@@ -11,6 +11,8 @@ from warnings import warn
 import numpy as np
 from osgeo import gdal
 
+from enmapbox.qgispluginsupport.qps.utils import SpatialExtent, SpatialPoint
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.typing import (NumpyDataType, MetadataValue, GdalDataType,
                                        GdalResamplingAlgorithm, Categories, Category, Targets, Target)
 from qgis.PyQt.QtCore import QDateTime, QDate
@@ -27,7 +29,6 @@ from qgis.core import (QgsRasterBlock, QgsProcessingFeedback, QgsPalettedRasterR
                        QgsProcessingUtils, QgsGeometry
                        )
 from qgis.gui import QgsMapCanvas
-from typeguard import typechecked
 
 
 @typechecked
@@ -54,15 +55,12 @@ class Utils(object):
             return np.uint16
         elif dataType == Qgis.DataType.UInt32:
             return np.uint32
+        elif dataType == Qgis.DataType.ARGB32:
+            return np.uint32
         elif dataType == Qgis.DataType.ARGB32_Premultiplied:
             return np.uint32
         else:
             raise ValueError(f'unsupported data type: {dataType}')
-
-    @staticmethod
-    def gdalDataTypeToNumpyDataType(dataType: GdalDataType) -> NumpyDataType:
-        qgisDataType = Utils.gdalDataTypeToQgisDataType(dataType)
-        return Utils.qgisDataTypeToNumpyDataType(qgisDataType)
 
     @staticmethod
     def qgisDataTypeToGdalDataType(dataType: Optional[Qgis.DataType]) -> Optional[int]:
@@ -86,8 +84,42 @@ class Utils(object):
             raise ValueError(f'unsupported data type: {dataType}')
 
     @staticmethod
+    def gdalDataTypeToNumpyDataType(dataType: Optional[int]) -> Optional[NumpyDataType]:
+        if dataType == gdal.GDT_Byte:
+            return np.uint8
+        elif dataType == gdal.GDT_Float32:
+            return np.float32
+        elif dataType == gdal.GDT_Float64:
+            return np.float64
+        elif dataType == gdal.GDT_Int16:
+            return np.int16
+        elif dataType == gdal.GDT_Int32:
+            return np.int32
+        elif dataType == gdal.GDT_UInt16:
+            return np.uint16
+        elif dataType == gdal.GDT_UInt32:
+            return np.uint32
+        else:
+            raise ValueError(f'unsupported data type: {dataType}')
+
     def qgisDataTypeName(dataType: Qgis.DataType) -> str:
-        return str(dataType).split('.')[1]
+        typeNameMap = {
+            Qgis.DataType.UnknownDataType: 'UnknownDataType',
+            Qgis.DataType.Byte: 'Byte',
+            Qgis.DataType.UInt16: 'UInt16',
+            Qgis.DataType.Int16: 'Int16',
+            Qgis.DataType.UInt32: 'UInt32',
+            Qgis.DataType.Int32: 'Int32',
+            Qgis.DataType.Float32: 'Float32',
+            Qgis.DataType.Float64: 'Float64',
+            Qgis.DataType.CInt16: 'CInt16',
+            Qgis.DataType.CInt32: 'CInt32',
+            Qgis.DataType.CFloat32: 'CFloat32',
+            Qgis.DataType.CFloat64: 'CFloat64',
+            Qgis.DataType.ARGB32: 'ARGB32',
+            Qgis.DataType.ARGB32_Premultiplied: 'ARGB32_Premultiplied'
+        }
+        return typeNameMap[dataType]
 
     @staticmethod
     def gdalResampleAlgName(resampleAlg: GdalResamplingAlgorithm) -> str:
@@ -125,11 +157,11 @@ class Utils(object):
             return Qgis.DataType.Float64
         elif dataType == np.int16:
             return Qgis.DataType.Int16
-        elif dataType == np.int32:
+        elif dataType in [np.int32, np.int64]:
             return Qgis.DataType.Int32
         elif dataType == np.uint16:
             return Qgis.DataType.UInt16
-        elif dataType == np.uint32:
+        elif dataType in [np.uint32, np.uint64]:
             return Qgis.DataType.UInt32
         else:
             raise ValueError(f'unsupported data type: {dataType}')
@@ -327,7 +359,7 @@ class Utils(object):
                 if colorField is not None:
                     colors[value] = feature.attribute(colorField)  # only keep the last occurrence!
 
-        values = np.unique(values)
+        values = np.unique(values).tolist()
         categories = list()
         for value in values:
             color = colors.get(value, QColor(randint(0, 2 ** 24 - 1)))
@@ -386,8 +418,16 @@ class Utils(object):
         elif isinstance(layer, QgsRasterLayer):
             from enmapboxprocessing.rasterreader import RasterReader
             reader = RasterReader(layer)
-            targets = [Target(reader.bandName(bandNo), reader.bandColor(bandNo))
-                       for bandNo in reader.bandNumbers()]
+            targets = list()
+            for bandNo in reader.bandNumbers():
+                name = reader.bandName(bandNo)
+                color = reader.bandColor(bandNo)
+                if color is None:
+                    hexcolor = '#000000'
+                else:
+                    hexcolor = color.name()
+                target = Target(name, hexcolor)
+                targets.append(target)
         else:
             raise ValueError()
 
@@ -419,8 +459,6 @@ class Utils(object):
 
     @classmethod
     def parseSpatialPoint(cls, obj) -> Optional['SpatialPoint']:
-        from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
-
         error = ValueError(f'invalid spatial point: {obj}')
         if obj is None:
             return None
@@ -459,8 +497,6 @@ class Utils(object):
 
     @classmethod
     def parseSpatialExtent(cls, obj) -> Optional['SpatialExtent']:
-        from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-
         error = ValueError(f'invalid spatial extent: {obj}')
         if obj is None:
             return None

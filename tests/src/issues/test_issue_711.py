@@ -20,25 +20,15 @@
 
 import unittest
 
+import enmapbox.exampledata
 import qgis
-from enmapbox.testing import TestObjects, EnMAPBoxTestCase
 from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.testing import TestObjects, EnMAPBoxTestCase
+from enmapboxtestdata import library_gpkg, enmap_srf_library
 from qgis.core import QgsProject
 
 
 class TestIssue711(EnMAPBoxTestCase):
-
-    def tearDown(self):
-
-        emb = EnMAPBox.instance()
-        if isinstance(emb, EnMAPBox):
-            emb.close()
-
-        assert EnMAPBox.instance() is None
-
-        QgsProject.instance().removeAllMapLayers()
-
-        super().tearDown()
 
     def test_instance_pure(self):
         EMB = EnMAPBox(load_other_apps=False, load_core_apps=False)
@@ -47,6 +37,8 @@ class TestIssue711(EnMAPBoxTestCase):
         self.assertEqual(EMB, EnMAPBox.instance())
 
         self.showGui([qgis.utils.iface.mainWindow(), EMB.ui])
+        EMB.close()
+        QgsProject.instance().removeAllMapLayers()
 
     def test_issue_711(self):
         """
@@ -63,14 +55,13 @@ class TestIssue711(EnMAPBoxTestCase):
         if False:
             EMB.loadExampleData()
         else:
-            import enmapbox.exampledata
+
             sources = []
             sources += [enmapbox.exampledata.enmap,
                         enmapbox.exampledata.landcover_polygon,
                         enmapbox.exampledata.landcover_point,
-                        enmapbox.exampledata.library_gpkg,
-                        enmapbox.exampledata.library_sli,
-                        enmapbox.exampledata.enmap_srf_library
+                        library_gpkg,
+                        enmap_srf_library
                         ]
 
             sources += [TestObjects.createVectorLayer(),
@@ -103,6 +94,9 @@ class TestIssue711(EnMAPBoxTestCase):
         # qgis.utils.iface.actionSaveProject().trigger()
         # qgis.utils.iface.mainWindow()
         self.showGui([EMB.ui])
+
+        EMB.close()
+        QgsProject.instance().removeAllMapLayers()
 
     def test_treeModel(self):
         from enmapbox.qgispluginsupport.qps.models import TreeView, TreeModel, TreeNode

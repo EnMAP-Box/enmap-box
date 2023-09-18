@@ -10,17 +10,19 @@ on:
     branches:
       - main
       - release-**
+
   release:
     types: [published]
 
 jobs:
   # Run EnMAP-Box tests
   test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
-        qgis_version: [latest]
-        python: [3.9]
+        qgis_version: [release-3_28, release-3_32]
+      fail-fast: false
+
     env:
         QGIS_TEST_VERSION: ${{ matrix.qgis_version}}
     steps:
@@ -29,13 +31,17 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Environment Info
+      - name: Docker Environment Info
         run: |
           # ls -la .docker/
           # ls -la
           # ls -la ~
           # ls -la /usr/bin
           docker --version
+      - name: Python Packages Info
+        run: |
+          python3 --version
+          pip list
       - name: Test EnMAP-Box on QGIS
         run: | 
           chmod +x .docker/run_docker_tests.sh

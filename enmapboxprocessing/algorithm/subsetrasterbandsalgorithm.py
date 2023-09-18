@@ -3,7 +3,7 @@ from typing import Dict, Any, List, Tuple
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

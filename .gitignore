@@ -1,5 +1,6 @@
 # Untracked directories
 .idea/
+.pytest_cache/
 deploy/
 build/
 tmp/
@@ -8,10 +9,13 @@ doc/build/
 */build/
 test-reports/
 test-outputs/
+*.log
 qgisresources
 qgisresources/
 qgisresources.zip
-
+examples/*.geojson
+examples/*.json
+examples/*.qml
 symbology-style.db
 # enmapbox/exampledata/*.gpkg
 

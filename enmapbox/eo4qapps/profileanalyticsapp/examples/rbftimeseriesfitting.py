@@ -3,7 +3,7 @@ from typing import List, Tuple
 
 import numpy as np
 
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

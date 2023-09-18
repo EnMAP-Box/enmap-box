@@ -10,7 +10,7 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsMapLayer)
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

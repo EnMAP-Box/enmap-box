@@ -23,26 +23,18 @@ from qgis.PyQt import sip
 from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, QgsRasterRenderer, QgsRasterDataProvider
 from qgis.gui import QgsMapCanvas
 
-from enmapbox.exampledata import enmap, hires, landcover_polygon, library_gpkg, enmap_srf_library
+from enmapbox.exampledata import enmap, hires, landcover_polygon
 from enmapbox.gui.datasources.datasources import SpatialDataSource, DataSource, RasterDataSource, VectorDataSource, \
     FileDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager, DataSourceManagerPanelUI, DataSourceFactory
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
-from enmapboxtestdata import classifierDumpPkl
+from enmapboxtestdata import classifierDumpPkl, library_berlin, enmap_srf_library
 
 
 class DataSourceTests(EnMAPBoxTestCase):
-
-    def setUp(self):
-        self.closeEnMAPBoxInstance()
-
-        self.wmsUri = r'crs=EPSG:3857&format&type=xyz&url=https://mt1.google.com/vt/lyrs%3Ds%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D&zmax=19&zmin=0'
-        self.wmsUri = 'referer=OpenStreetMap%20contributors,%20under%20ODbL&type=xyz&url=http://tiles.wmflabs.org/hikebike/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=17&zmin=1'
-        self.wfsUri = r'restrictToRequestBBOX=''1'' srsname=''EPSG:25833'' typename=''fis:re_postleit'' url=''http://fbinter.stadt-berlin.de/fb/wfs/geometry/senstadt/re_postleit'' version=''auto'''
-        pass
-
-    def tearDown(self):
-        self.closeEnMAPBoxInstance()
+    wmsUri = r'crs=EPSG:3857&format&type=xyz&url=https://mt1.google.com/vt/lyrs%3Ds%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D&zmax=19&zmin=0'
+    wmsUri = 'referer=OpenStreetMap%20contributors,%20under%20ODbL&type=xyz&url=http://tiles.wmflabs.org/hikebike/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=17&zmin=1'
+    wfsUri = r'restrictToRequestBBOX=''1'' srsname=''EPSG:25833'' typename=''fis:re_postleit'' url=''http://fbinter.stadt-berlin.de/fb/wfs/geometry/senstadt/re_postleit'' version=''auto'''
 
     def test_rasterVersioning(self):
 
@@ -90,7 +82,7 @@ class DataSourceTests(EnMAPBoxTestCase):
     def createTestSources(self) -> list:
 
         # return [library, self.wfsUri, self.wmsUri, enmap, landcover_polygons]
-        return [library_gpkg, enmap, landcover_polygon]
+        return [library_berlin, enmap, landcover_polygon]
 
     def createOGCSources(self) -> list:
         # todo: add WCS
@@ -154,7 +146,7 @@ class DataSourceTests(EnMAPBoxTestCase):
         dsm = DataSourceManager()
         panel = DataSourceManagerPanelUI()
         panel.connectDataSourceManager(dsm)
-        uris = [library_gpkg, enmap, landcover_polygon]
+        uris = [library_berlin, enmap, landcover_polygon]
         dsm.addDataSources(uris)
         self.showGui(panel)
 
@@ -200,15 +192,14 @@ class DataSourceTests(EnMAPBoxTestCase):
         self.assertTrue(ds2.updateTime() > t0_2)
 
     def test_DataSourceModel(self):
-        from enmapbox.exampledata import enmap, landcover_polygon, library_gpkg, library_sli, enmap_srf_library
+
         sources = [enmap,
                    enmap,
                    landcover_polygon,
                    landcover_polygon,
                    enmap_srf_library,
                    enmap_srf_library,
-                   library_gpkg,
-                   library_sli,
+                   library_berlin,
                    classifierDumpPkl]
 
         model = DataSourceManager()
@@ -289,7 +280,7 @@ class DataSourceTests(EnMAPBoxTestCase):
         # remove
         dsm = DataSourceManager()
         lyr = TestObjects.createVectorLayer()
-        dsm.addSource(lyr)
+        dsm.addDataSources(lyr)
         self.assertTrue(len(dsm) == 1)
         QgsProject.instance().addMapLayer(lyr)
         self.assertTrue(len(dsm) == 1)

@@ -1,6 +1,6 @@
 import numpy as np
 
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from enmapboxprocessing.driver import Driver
 from qgis.core import QgsRasterLayer

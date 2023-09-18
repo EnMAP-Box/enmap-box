@@ -2,15 +2,13 @@ from math import nan
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -58,6 +56,9 @@ class SpectralIndexOptimizerAlgorithm(EnMAPProcessingAlgorithm):
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
+        from sklearn.linear_model import LinearRegression
+        from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+
         filenameDataset = self.parameterAsFile(parameters, self.P_DATASET, context)
         formular = self.parameterAsString(parameters, self.P_FORMULAR, context)
         maxFeatures = self.parameterAsInt(parameters, self.P_MAX_FEATURES, context)

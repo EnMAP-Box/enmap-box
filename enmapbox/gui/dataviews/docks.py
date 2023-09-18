@@ -20,9 +20,7 @@
 import codecs
 import os
 import re
-import typing
 import uuid
-import warnings
 from math import ceil
 from typing import List
 
@@ -75,10 +73,8 @@ class Dock(pgDock):
 
     def __init__(self, name='Data View', closable=True, *args, **kwds):
         super().__init__(name=name, closable=closable, *args, **kwds)
-        # KeepRefs.__init__(self)
-        # ssert enmapboxInstance is not None
-        # self.enmapbox = enmapboxInstance
-        # self.setStyleSheet('background:#FFF')
+
+        self.mEnMAPBox = None
 
         # replace PyQtGraph Label by EnmapBox labels (could be done by inheritances as well)
         title = self.title()
@@ -99,7 +95,7 @@ class Dock(pgDock):
         self.progressBar = self.label.progressBar
         self.uuid = uuid.uuid4()
 
-        self.raiseOverlay()
+        # self.raiseOverlay()
 
         if False:
             self.hStyle = """
@@ -134,26 +130,12 @@ class Dock(pgDock):
             self.widgetArea.setStyleSheet(self.hStyle)
         self.topLayout.update()
 
-    def contextMenu(self, menu: QMenu = None):
-        warnings.warn('Use populateContextMenu instead', DeprecationWarning)
-        self.populateContextMenu(menu)
-        return menu
-
     def populateContextMenu(self, menu: QMenu) -> QMenu:
         """
         implement this to return a QMenu with context menu properties for this dock.
         :return: None or QMenu
         """
-        assert isinstance(menu, QMenu)
-        if self.isVisible():
-            a = menu.addAction('Hide View')
-            a.triggered.connect(lambda: self.setVisible(False))
-        else:
-            a = menu.addAction('Show View')
-            a.triggered.connect(lambda: self.setVisible(True))
 
-        a = menu.addAction('Close View')
-        a.triggered.connect(lambda: self.close())
         return menu
 
     sigVisibilityChanged = pyqtSignal(bool)
@@ -189,6 +171,12 @@ class Dock(pgDock):
         style = ' \n{} {{\n{}\n}} '.format(obj_name, stylestr)
         self.hStyle += style
         self.vStyle += style
+
+    def setEnMAPBox(self, enmapBox: 'EnMAPBox'):
+        self.mEnMAPBox = enmapBox
+
+    def enmapBox(self) -> 'EnMAPBox':
+        return self.mEnMAPBox
 
     def addTempArea(self):
         if self.home is None:
@@ -324,10 +312,8 @@ class DockArea(pgDockArea):
         #  print "added temp area", area, area.window()
         return area
 
-    def addDock(self, dock, position='bottom', relativeTo=None, **kwds) -> Dock:
-        assert dock is not None
-
-        assert isinstance(dock, Dock)
+    def addDock(self, dock: pgDock, position='bottom', relativeTo=None, **kwds) -> Dock:
+        assert isinstance(dock, (Dock, pgDock))
         if hasattr(dock, 'orig_area'):
             dock.label.btnUnFloat.setVisible(dock.orig_area != self)
 
@@ -953,7 +939,6 @@ class MapDock(Dock):
         :return: QMenu
         """
         super(MapDock, self).populateContextMenu(menu)
-
         self.mCanvas.populateContextMenu(menu, None)
         return menu
 
@@ -963,21 +948,21 @@ class MapDock(Dock):
         else:
             super(MapDock, self).mousePressEvent(event)
 
-    def linkWithMapDock(self, mapDock, linkType) -> CanvasLink:
+    def linkWithMapDock(self, mapDock: 'MapDock', linkType=CanvasLink.LINK_ON_CENTER_SCALE) -> CanvasLink:
         assert isinstance(mapDock, MapDock)
         return self.linkWithCanvas(mapDock.mCanvas, linkType)
 
-    def linkWithCanvas(self, canvas, linkType) -> CanvasLink:
+    def linkWithCanvas(self, canvas: QgsMapCanvas, linkType=CanvasLink.LINK_ON_CENTER_SCALE) -> CanvasLink:
         assert isinstance(canvas, QgsMapCanvas)
         return self.mapCanvas().createCanvasLink(canvas, linkType)
 
-    def addLayers(self, layers: typing.List[QgsMapLayer]):
+    def addLayers(self, layers: List[QgsMapLayer]):
         tree: QgsLayerTree = self.layerTree()
         for lyr in layers:
             tree.addLayer(lyr)
 
     def insertLayer(self, idx, layerSource):
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         from enmapbox.gui.dataviews.dockmanager import MapDockTreeNode
 
         enmapBox = EnMAPBox.instance()
@@ -990,7 +975,7 @@ class MapDock(Dock):
     def addOrUpdateLayer(self, layer: QgsMapLayer):
         """Add a new layer or update existing layer with matching name."""
 
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapBox = EnMAPBox.instance()
 
         # look for existing layer and update ...

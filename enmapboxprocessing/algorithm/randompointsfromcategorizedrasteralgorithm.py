@@ -9,7 +9,7 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -112,7 +112,7 @@ class RandomPointsFromCategorizedRasterAlgorithm(EnMAPProcessingAlgorithm):
             yborder2, xborder2 = [(v - 1) // 2 for v in kernelStratum.shape]
             yborder, xborder = max(yborder1, yborder2), max(xborder1, xborder2)
             noData = min(-9999, np.min([c.value for c in categories]) - 1)
-            arrayStrata = np.full((ysize + 2 * yborder, xsize + 2 * xborder), noData)
+            arrayStrata = np.full((ysize + 2 * yborder, xsize + 2 * xborder), noData, np.int64)
             arrayStrata[yborder: yborder + ysize, xborder: xborder + xsize] = \
                 RasterReader(stratification).array(bandList=[stratification.renderer().band()])[0]
             ysize2, xsize2 = arrayStrata.shape
@@ -136,7 +136,7 @@ class RandomPointsFromCategorizedRasterAlgorithm(EnMAPProcessingAlgorithm):
                     indices = np.where(mask.flat)[0]
                     if len(indices) == 0:
                         feedback.pushInfo(
-                            f"Could only draw {i + 1} points ({n} requested) for category '{category.name}'."
+                            f"Could only draw {i} points ({n} requested) for category '{category.name}'."
                         )
                         break  # no pixel left
                     if len(indices) == 1:

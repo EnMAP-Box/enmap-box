@@ -1,26 +1,12 @@
-
-
 import unittest
-from qgis.PyQt.QtWidgets import QTreeView
-from qgis.core import QgsProject
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import EnMAPBoxTestCase
+from qgis.PyQt.QtWidgets import QTreeView
+from qgis.core import QgsProject
 
 
 class TestIssue478(EnMAPBoxTestCase):
-
-    def tearDown(self):
-
-        emb = EnMAPBox.instance()
-        if isinstance(emb, EnMAPBox):
-            emb.close()
-
-        assert EnMAPBox.instance() is None
-
-        QgsProject.instance().removeAllMapLayers()
-
-        super().tearDown()
 
     def test_issue478(self):
         # https://bitbucket.org/hu-geomatics/enmap-box/issues/478/visualization-of-single-band-fails
@@ -40,6 +26,8 @@ class TestIssue478(EnMAPBoxTestCase):
             self.assertIsInstance(tv, QTreeView)
 
         self.showGui(EB.ui)
+        EB.close()
+        QgsProject.instance().removeAllMapLayers()
 
 
 if __name__ == '__main__':

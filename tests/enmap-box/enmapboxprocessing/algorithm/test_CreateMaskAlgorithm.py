@@ -1,9 +1,9 @@
 import numpy as np
 
-from enmapbox.exampledata import hires
+from enmapboxtestdata import hires
 from enmapboxprocessing.algorithm.createmaskalgorithm import CreateMaskAlgorithm
-from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.algorithm.testcase import TestCase
+from enmapboxprocessing.rasterreader import RasterReader
 
 
 class TestCreateMaskAlgorithm(TestCase):

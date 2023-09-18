@@ -1,9 +1,8 @@
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QAction
-
 from decorrelationstretchapp.decorrelationstretchdialog import DecorrelationStretchDialog
 from enmapbox.gui.applications import EnMAPBoxApplication
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QMenu
 
 
 def enmapboxApplicationFactory(enmapBox):
@@ -28,12 +27,8 @@ class DecorrelationStretchApp(EnMAPBoxApplication):
         return 'Decorrelation Stretch Renderer'
 
     def menu(self, appMenu: QMenu):
-        appMenu: QMenu = self.enmapbox.menu('Tools')
-        a = self.utilsAddActionInAlphanumericOrder(appMenu, self.title())
-        assert isinstance(a, QAction)
-        a.setIcon(self.icon())
+        a = self.utilsAddActionInAlphanumericOrder(self.enmapbox.ui.menuToolsRasterVisualizations, self.title())
         a.triggered.connect(self.startGUI)
-        return appMenu
 
     def startGUI(self):
         w = DecorrelationStretchDialog(parent=self.enmapbox.ui)

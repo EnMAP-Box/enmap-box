@@ -2,8 +2,8 @@ import numpy as np
 
 from enmapboxprocessing.algorithm.createdefaultpalettedrasterrendereralgorithm import \
     CreateDefaultPalettedRasterRendererAlgorithm
-from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.algorithm.testcase import TestCase
+from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsRasterLayer

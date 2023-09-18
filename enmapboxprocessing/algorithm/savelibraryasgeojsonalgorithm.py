@@ -1,11 +1,11 @@
 from typing import Dict, Any, List, Tuple
 
 from enmapbox.qgispluginsupport.qps.speclib.core import profile_field_list
-from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import SpectralProfile
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsFeature)
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
+from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
 
 
 @typechecked
@@ -60,8 +60,11 @@ class SaveLibraryAsGeoJsonAlgorithm(EnMAPProcessingAlgorithm):
             for i, feature in enumerate(library.getFeatures()):
                 feedback.setProgress(i / n * 100)
                 for field in profileFields:
-                    spectralProfile = SpectralProfile.fromQgsFeature(feature, field)
-                    data['features'][i]['properties'][field.name()] = spectralProfile.values()
+                    dump = feature.attribute(field.name())
+                    if dump:
+                        profileDict = decodeProfileValueDict(dump)
+
+                        data['features'][i]['properties'][field.name()] = profileDict
 
             Utils.jsonDump(data, filename)
 

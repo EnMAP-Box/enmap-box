@@ -1,20 +1,20 @@
 import inspect
 from collections import OrderedDict
 from math import ceil, sqrt, pi, exp
+from os.path import splitext
 from typing import Dict, Any, List, Tuple, Union
 from warnings import warn
 
 import numpy as np
 from osgeo import gdal
 
-from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibrary
-from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import SpectralProfile
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from enmapboxprocessing.geojsonlibrarywriter import GeoJsonLibraryWriter
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import Array3d, Number
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
-from typeguard import typechecked
 
 RESPONSE_CUTOFF_VALUE = 0.001
 RESPONSE_CUTOFF_DIGITS = 3
@@ -24,7 +24,7 @@ RESPONSE_CUTOFF_DIGITS = 3
 class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Spectral raster layer'
     P_CODE, _CODE = 'response', 'Spectral response function'
-    P_SAVE_RESPONSE_FUNCTION, _SAVE_RESPONSE_FUNCTION = 'saveResponseFunction', 'Save spectral response function'
+    P_OUTPUT_LIBRARY, _OUTPUT_LIBRARY = 'outputResponseFunctionLibrary', 'Output spectral response function library'
     P_OUTPUT_RASTER, _OUTPUT_RASTER = 'outputResampledRaster', 'Output raster layer'
     A_CODE = False
 
@@ -38,8 +38,7 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
         return [
             (self._RASTER, 'A spectral raster layer to be resampled.'),
             (self._CODE, 'Python code specifying the spectral response function.'),
-            (self._SAVE_RESPONSE_FUNCTION,
-             'Whether to save the spectral response function library as *.srf.gpkg sidecar file.'),
+            (self._OUTPUT_LIBRARY, self.GeoJsonFileDestination),
             (self._OUTPUT_RASTER, self.RasterFileDestination)
         ]
 
@@ -69,7 +68,9 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
         self.addParameterCode(self.P_CODE, self._CODE, self.defaultCodeAsString(), advanced=self.A_CODE)
-        self.addParameterBoolean(self.P_SAVE_RESPONSE_FUNCTION, self._SAVE_RESPONSE_FUNCTION, False, True, True)
+        self.addParameterFileDestination(
+            self.P_OUTPUT_LIBRARY, self._OUTPUT_LIBRARY, self.GeoJsonFileFilter, None, True, True
+        )
         self.addParameterRasterDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 
     def processAlgorithm(
@@ -77,7 +78,7 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
     ) -> Dict[str, Any]:
         raster = self.parameterAsSpectralRasterLayer(parameters, self.P_RASTER, context)
         responses = self.parameterAsResponses(parameters, self.P_CODE, context)
-        saveResponseFunction = self.parameterAsBoolean(parameters, self.P_SAVE_RESPONSE_FUNCTION, context)
+        filenameSrf = self.parameterAsFileOutput(parameters, self.P_OUTPUT_LIBRARY, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_RASTER, context)
         maximumMemoryUsage = gdal.GetCacheMax()
 
@@ -102,18 +103,11 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
                         weights.append(fx)
                         xs.append(x)
                     weights = np.divide(weights, np.max(weights))  # scale to 0-1 range
-                    #                responses2[f'Band {i + 1} ({k} Nanometers)'] = [(x, round(w, RESPONSE_CUTOFF_DIGITS)) for x, w in
-                    #                                                                zip(xs, weights)]
-                    responses2[f'band {i + 1}'] = [(x, round(w, RESPONSE_CUTOFF_DIGITS)) for x, w in
-                                                   zip(xs, weights)]
-
+                    responses2[f'band {i + 1} ({x0} Nanometers)'] = [(x, round(w, RESPONSE_CUTOFF_DIGITS)) for x, w in
+                                                                     zip(xs, weights)]
                 else:
                     responses2[k] = v
             responses = responses2
-
-            feedback.getQgsFeedback().pushInfo('Spectral response functions:')  # never silence this info!
-            for name in responses:
-                feedback.getQgsFeedback().pushInfo(f"responses['{name}'] = {responses[name]}")
 
             # check if wavelength have single nanometer step
             for name in responses:
@@ -131,6 +125,8 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
             wavelength = [reader.wavelength(i + 1) for i in range(reader.bandCount())]
             outputBandCount = len(responses)
             outputNoDataValue = reader.noDataValue()
+            if outputNoDataValue is None:
+                outputNoDataValue = 0
 
             writer = Driver(filename, feedback=feedback).createLike(reader, reader.dataType(), outputBandCount)
             lineMemoryUsage = reader.lineMemoryUsage() * 2
@@ -138,11 +134,12 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
             blockSizeX = raster.width()
             for block in reader.walkGrid(blockSizeX, blockSizeY, feedback):
                 array = reader.arrayFromBlock(block)
-                outarray = self.resampleData(array, wavelength, responses, outputNoDataValue, feedback)
-                if outputNoDataValue is not None:
-                    marray = np.all(reader.maskArray(array), axis=0)
-                    for arr in outarray:
-                        arr[np.logical_not(marray)] = outputNoDataValue
+                marray = reader.maskArray(array)
+                outarray = self.resampleData(array, marray, wavelength, responses, outputNoDataValue, feedback)
+                # if outputNoDataValue is not None:
+                #    marray = np.all(reader.maskArray(array), axis=0)
+                #    for arr in outarray:
+                #        arr[np.logical_not(marray)] = outputNoDataValue
                 writer.writeArray(outarray, block.xOffset, block.yOffset)
 
             outputWavelength = list()
@@ -162,31 +159,30 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
             writer.setNoDataValue(outputNoDataValue, bandNo)
             writer.close()
 
-            if saveResponseFunction:
+            if filenameSrf is not None:
+                with open(filenameSrf, 'w') as file1, open(splitext(filenameSrf)[0] + '.qml', 'w') as file2:
+                    writer = GeoJsonLibraryWriter(file1, 'Spectral Response Function', '')
+                    writer.initWriting()
+                    for i, name in enumerate(responses):
+                        values = responses[name]
+                        x = [xi for xi, yi in values]
+                        y = [yi for xi, yi in values]
+                        writer.writeProfile(x, y, 'Nanometers', name)
+                    writer.endWriting()
+                    writer.writeQml(file2)
 
-                library = SpectralLibrary()
-                profiles = list()
-                for name in responses:
-                    values = responses[name]
-                    profile = SpectralProfile()
-                    profile.setName(name)
-                    x = [xi for xi, yi in values]
-                    y = [yi for xi, yi in values]
-                    profile.setValues(x, y, 'Nanometers')
-                    profiles.append(profile)
-                library.startEditing()
-                library.addProfiles(profiles)
-                library.commitChanges()
-                library.write(filename + '.srf.gpkg')
-
-            result = {self.P_OUTPUT_RASTER: filename}
+            result = {
+                self.P_OUTPUT_LIBRARY: filenameSrf,
+                self.P_OUTPUT_RASTER: filename
+            }
             self.toc(feedback, result)
 
         return result
 
     @staticmethod
     def resampleData(
-            array: Array3d, wavelength: List, responses: Dict[str, List[Tuple[int, float]]], noDataValue: float,
+            array: Array3d, marray: Array3d, wavelength: List, responses: Dict[str, List[Tuple[int, float]]],
+            noDataValue: float,
             feedback: QgsProcessingFeedback
     ) -> Array3d:
         wavelength = [int(round(v)) for v in wavelength]
@@ -209,7 +205,19 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
                 feedback.pushWarning(message)
                 outarray.append(np.full_like(array[0], noDataValue, dtype=array[0].dtype))
             else:
-                weights = np.divide(weights, np.sum(weights))
-                outarray.append(np.average([array[i] for i in indices], 0, weights))
+                tmparray = np.asarray(array, np.float32)[indices]
+                tmpmarray = np.asarray(marray)[indices]
+                warray = np.array(weights).reshape((-1, 1, 1)) * np.ones_like(tmparray)
+                for tmparr, warr, marr in zip(tmparray, warray, tmpmarray):
+                    invalid = np.logical_not(marr)
+                    tmparr[invalid] = np.nan
+                    warr[invalid] = np.nan
+                outarr = np.nansum(tmparray * warray, 0) / np.nansum(warray, 0)
+                if np.nanmin(outarr) < -3000:
+                    a = 1
+                outarr[np.isnan(outarr)] = noDataValue
+                outarray.append(outarr)
+
+                # outarray.append(np.average([array[i] for i in indices], 0, weights))
 
         return outarray

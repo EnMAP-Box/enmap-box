@@ -39,8 +39,8 @@ from qgis.PyQt.QtCore import QSettings
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import Qgis, QgsApplication, QgsProcessingRegistry, QgsProcessingProvider, QgsProcessingAlgorithm
 from qgis.gui import QgisInterface, QgsMapLayerConfigWidgetFactory
+
 # provide shortcuts
-from .qgispluginsupport.qps.pyqtgraph import pyqtgraph
 
 # true version is added from .plugin.ini during plugin build process
 __version__ = 'dev'
@@ -48,7 +48,6 @@ __version__ = 'dev'
 __version_sha__ = ''
 # note that the exampledata folder is part of the repo,
 # but will be removed from the plugin ZIP
-__version_exampledata__ = '3.10'
 
 HOMEPAGE = 'https://github.com/EnMAP-Box/enmap-box'
 REPOSITORY = 'https://github.com/EnMAP-Box/enmap-box.git'
@@ -56,11 +55,11 @@ ISSUE_TRACKER = 'https://github.com/EnMAP-Box/enmap-box/issues'
 CREATE_ISSUE = 'https://github.com/EnMAP-Box/enmap-box/issues/new'
 DEPENDENCIES = ['numpy', 'scipy', 'osgeo.gdal', 'PyQt5', 'sklearn', 'matplotlib']
 DOCUMENTATION = 'https://enmap-box.readthedocs.io/'
-URL_TESTDATA = fr'https://bitbucket.org/hu-geomatics/enmap-box/downloads/exampledata.{__version_exampledata__}.zip'
+URL_TESTDATA = 'https://github.com/EnMAP-Box/enmap-box-exampledata/releases/download/v1.0/exampledata.zip'
 URL_INSTALLATION = r'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html#install-required-python-packages'
-URL_QGIS_RESOURCES = r'https://bitbucket.org/hu-geomatics/enmap-box/downloads/qgisresources.zip'
+URL_QGIS_RESOURCES = r'https://box.hu-berlin.de/f/6949ab1099044018a5e4/?dl=1'
 
-MIN_VERSION_QGIS = '3.24'
+MIN_VERSION_QGIS = '3.28'
 
 PLUGIN_DEPENDENCIES = ['vrtbuilderplugin>=0.9']
 ABOUT = """
@@ -92,7 +91,6 @@ granted by the Federal Ministry of Economic Affairs and Energy (BMWi; grant no. 
 
 DIR_ENMAPBOX = os.path.dirname(__file__)
 DIR_REPO = os.path.dirname(DIR_ENMAPBOX)
-DIR_SITEPACKAGES = os.path.join(DIR_REPO, 'site-packages')
 DIR_UIFILES = os.path.join(DIR_ENMAPBOX, *['gui', 'ui'])
 DIR_ICONS = os.path.join(DIR_ENMAPBOX, *['gui', 'ui', 'icons'])
 DIR_EXAMPLEDATA = (pathlib.Path(DIR_REPO) / 'enmapbox' / 'exampledata').as_posix()
@@ -106,6 +104,16 @@ _ENMAPBOX_MAPLAYER_CONFIG_WIDGET_FACTORIES: typing.List[QgsMapLayerConfigWidgetF
 
 gdal.SetConfigOption('GDAL_VRT_ENABLE_PYTHON', 'YES')
 
+# test if PyQtGraph is available
+try:
+    import pyqtgraph  # noqa
+except ModuleNotFoundError:
+    # use PyQtGraph brought by QPS
+    pSrc = pathlib.Path(DIR_ENMAPBOX) / 'qgispluginsupport' / 'qps' / 'pyqtgraph'
+    assert pSrc.is_dir()
+    site.addsitedir(pSrc)
+    # import pyqtgraph
+
 
 def enmapboxSettings() -> QSettings:
     """
@@ -117,17 +125,7 @@ def enmapboxSettings() -> QSettings:
 
 settings = enmapboxSettings()
 DEBUG = str(os.environ.get('DEBUG', False)).lower() in ['1', 'true']
-site.addsitedir(DIR_SITEPACKAGES)
-
-# test if PyQtGraph is available
-try:
-    import pyqtgraph  # noqa
-except ModuleNotFoundError:
-    # use PyQtGraph brought by QPS
-    pSrc = pathlib.Path(DIR_ENMAPBOX) / 'qgispluginsupport' / 'qps' / 'pyqtgraph'
-    assert pSrc.is_dir()
-    site.addsitedir(pSrc)
-    # import pyqtgraph
+RAISE_ALL_EXCEPTIONS = str(os.environ.get('RAISE_ALL_EXCEPTIONS', False)).lower() in ['1', 'true']
 
 
 def icon() -> QIcon:
@@ -314,8 +312,9 @@ def registerMapLayerConfigWidgetFactories():
 
     from enmapbox.qgispluginsupport.qps.layerconfigwidgets.rasterbands import RasterBandConfigWidgetFactory
     from enmapbox.qgispluginsupport.qps.layerconfigwidgets.gdalmetadata import GDALMetadataConfigWidgetFactory
+
     for factory in [RasterBandConfigWidgetFactory(),
-                    GDALMetadataConfigWidgetFactory()
+                    GDALMetadataConfigWidgetFactory(),
                     ]:
 
         registered = registerMapLayerConfigWidgetFactory(factory)
@@ -357,10 +356,8 @@ def initAll():
     initEnMAPBoxResources()
     from enmapbox.qgispluginsupport.qps import \
         registerSpectralLibraryIOs, \
-        registerSpectralProfileSamplingModes, \
         registerSpectralLibraryPlotFactories
     registerSpectralLibraryIOs()
-    registerSpectralProfileSamplingModes()
     registerSpectralLibraryPlotFactories()
 
     registerEditorWidgets()
@@ -379,10 +376,6 @@ def unloadAll():
     unregisterEnMAPBoxProcessingProvider()
 
 
-EnMAPBox = None
-EnMAPBoxApplication = None
-
-
 def tr(text: str) -> str:
     """
     to be implemented: string translation
@@ -399,18 +392,3 @@ def run():
     """
     import enmapbox.__main__
     enmapbox.__main__.run()
-
-
-# skip imports when QGIS is not properly setup.
-# this is the case e.g. in a Read-the-docs environment, when the source code needs just to be there,
-# but not its dependencies
-# https://docs.readthedocs.io/en/stable/builds.html
-# print(f'QGIS_PREFIX_PATH={QgsApplication.prefixPath()}')
-if not os.environ.get('READTHEDOCS', False) in [True, 'True']:
-    from enmapbox.gui.enmapboxgui import EnMAPBox
-
-    EnMAPBox = EnMAPBox
-
-    from enmapbox.gui.applications import EnMAPBoxApplication
-
-    EnMAPBoxApplication = EnMAPBoxApplication

@@ -2,15 +2,13 @@ from math import ceil, isnan
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from scipy import interpolate
-from scipy.spatial import ConvexHull
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
-from typeguard import typechecked
 
 
 @typechecked
@@ -84,6 +82,7 @@ class ConvexHullAlgorithm(EnMAPProcessingAlgorithm):
                         xValues.append(wavelength)
                 else:
                     raise ValueError
+            xValues = np.array(xValues)
 
             if filenameConvexHull is not None:
                 writerConvexHull = Driver(filenameConvexHull, feedback=feedback).createLike(reader)
@@ -97,8 +96,8 @@ class ConvexHullAlgorithm(EnMAPProcessingAlgorithm):
             blockSizeX = raster.width()
             for block in reader.walkGrid(blockSizeX, blockSizeY, feedback):
                 array = np.array(reader.arrayFromBlock(block, bandList))
-                valid = np.all(reader.maskArray(array, bandList), axis=0)
-
+                invalid = np.logical_not(reader.maskArray(array, bandList))
+                array[invalid] = 0  # filling no data values with zeroes should be fine (fixes #397)
                 noDataValueConvexHull = Utils.defaultNoDataValue(array.dtype)
                 arrayConvexHull = np.full_like(array, noDataValueConvexHull, dtype=array.dtype)
                 noDataValueContinuumRemoved = Utils.defaultNoDataValue(np.float32)
@@ -107,11 +106,15 @@ class ConvexHullAlgorithm(EnMAPProcessingAlgorithm):
                 for yi in range(array.shape[1]):
                     feedback.setProgress((block.yOffset + yi) / reader.height() * 100)
                     for xi in range(array.shape[2]):
-                        if valid[yi, xi]:
-                            yValues = list(array[:, yi, xi])
+                        yValues = array[:, yi, xi]
+                        if np.all(yValues == 0):
+                            continue
+                        try:
                             continuumRemovedValues, convexHullValues = self.convexHullRemoval(yValues, xValues)
                             arrayConvexHull[:, yi, xi] = convexHullValues
                             arrayContinuumRemoved[:, yi, xi] = continuumRemovedValues
+                        except Exception as error:
+                            print(f'Skip pixel {xi, yi}: {str(error)}')
 
                 if filenameConvexHull is not None:
                     writerConvexHull.writeArray(arrayConvexHull, xOffset=block.xOffset, yOffset=block.yOffset)
@@ -128,10 +131,12 @@ class ConvexHullAlgorithm(EnMAPProcessingAlgorithm):
                     writerConvexHull.setBandName(bandName, i + 1)
                     writerConvexHull.setWavelength(wavelength, i + 1)
                     writerConvexHull.setFwhm(fwhm, i + 1)
+                    writerConvexHull.setNoDataValue(noDataValueConvexHull, i + 1)
                 if filenameContinuumRemoved is not None:
                     writerContinuumRemoved.setBandName(bandName, i + 1)
                     writerContinuumRemoved.setWavelength(wavelength, i + 1)
                     writerContinuumRemoved.setFwhm(fwhm, i + 1)
+                    writerContinuumRemoved.setNoDataValue(noDataValueContinuumRemoved, i + 1)
 
             self.toc(feedback, result)
 
@@ -143,6 +148,8 @@ class ConvexHullAlgorithm(EnMAPProcessingAlgorithm):
         #     https://pysptools.sourceforge.io/_modules/pysptools/spectro/hull_removal.html#convex_hull_removal
         # We use scipy.spatial.ConvexHull instead of _jarvis.convex_hull to avoid external dependencies.
 
+        from scipy import interpolate
+        from scipy.spatial import ConvexHull
         points = list(zip(xValues, yValues))
 
         # add extra points to close the polygon

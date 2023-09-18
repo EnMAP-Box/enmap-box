@@ -16,7 +16,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.reportwriter import HtmlReportWriter, CsvReportWriter, MultiReportWriter
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsRasterLayer, QgsUnitTypes)
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

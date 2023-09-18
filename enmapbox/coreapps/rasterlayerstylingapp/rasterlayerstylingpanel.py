@@ -3,7 +3,7 @@ from typing import Optional
 
 from osgeo import gdal
 
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.dataviews.dockmanager import DockPanelUI
 from enmapbox.gui.mapcanvas import MapCanvas
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
@@ -23,7 +23,7 @@ from qgis.gui import (
 )
 from rasterlayerstylingapp.rasterlayerstylingbandwidget import RasterLayerStylingBandWidget
 from rasterlayerstylingapp.rasterlayerstylingpercentileswidget import RasterLayerStylingPercentilesWidget
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -306,7 +306,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 self.mRenderer.setCurrentIndex(3)
 
     def onRendererTabChanged(self):
-        layer: QgsRasterLayer = self.mLayer.currentLayer()
+        layer: Optional[QgsRasterLayer] = self.mLayer.currentLayer()
 
         if layer is None:
             return
@@ -548,6 +548,9 @@ class RasterLayerStylingPanel(QgsDockWidget):
             mBand.mIsBadBand.hide()
         else:
             mBand.mIsBadBand.show()
+            reader = RasterReader(layer)
+            if reader.bandCount() < bandNo:
+                return
             if RasterReader(layer).badBandMultiplier(bandNo) == 0:
                 mBand.mIsBadBand.setChecked(True)
             else:

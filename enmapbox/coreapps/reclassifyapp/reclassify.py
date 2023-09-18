@@ -33,14 +33,14 @@ from enmapbox.qgispluginsupport.qps.classification.classificationscheme import \
     ClassificationMapLayerComboBox, ClassInfo, ClassificationScheme, ClassificationSchemeComboBox, \
     ClassificationSchemeWidget
 from enmapbox.qgispluginsupport.qps.utils import loadUi
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.reclassifyrasteralgorithm import ReclassifyRasterAlgorithm
 from qgis.PyQt.QtCore import QAbstractTableModel, Qt, QModelIndex, QSortFilterProxyModel
 from qgis.PyQt.QtGui import QColor, QContextMenuEvent, QIcon
-from qgis.PyQt.QtWidgets import QFileDialog, QTableView, QMenu, QStyledItemDelegate, QDialog, QDialogButtonBox, QAction
+from qgis.PyQt.QtWidgets import QFileDialog, QTableView, QMenu, QStyledItemDelegate, QDialog, QDialogButtonBox
 from qgis.core import QgsProcessing
 from qgis.core import QgsProviderRegistry, QgsRasterLayer, QgsProject, QgsMapLayerProxyModel
 from qgis.gui import QgsMapLayerComboBox
-from typeguard import typechecked
 from . import APP_DIR
 
 SETTINGS_KEY = 'ENMAPBOX_RECLASSIFY_APP'
@@ -72,7 +72,8 @@ def setClassInfo(targetDataset, classificationScheme, bandIndex=0):
 
 
 @typechecked
-def reclassify(layerSrc: QgsRasterLayer, dstClassScheme: ClassificationScheme, labelLookup: dict):
+def reclassify(layerSrc: QgsRasterLayer, dstClassScheme: ClassificationScheme, labelLookup: dict,
+               output_classification=QgsProcessing.TEMPORARY_OUTPUT):
     mapping = str(labelLookup)
     categories = str([(c.label(), c.name(), c.color().name()) for c in dstClassScheme])
     alg = ReclassifyRasterAlgorithm()
@@ -80,11 +81,12 @@ def reclassify(layerSrc: QgsRasterLayer, dstClassScheme: ClassificationScheme, l
         alg.P_RASTER: layerSrc,
         alg.P_MAPPING: mapping,
         alg.P_CATEGORIES: categories,
-        alg.P_OUTPUT_CLASSIFICATION: QgsProcessing.TEMPORARY_OUTPUT
+        alg.P_OUTPUT_CLASSIFICATION: output_classification
     }
-    from enmapbox import EnMAPBox
+    from enmapbox.gui.enmapboxgui import EnMAPBox
     enmapBox = EnMAPBox.instance()
-    enmapBox.showProcessingAlgorithmDialog(alg, parameters, True)
+    if isinstance(enmapBox, EnMAPBox):
+        enmapBox.showProcessingAlgorithmDialog(alg, parameters, True)
 
 
 class ReclassifyTableModel(QAbstractTableModel):
@@ -614,19 +616,16 @@ class ReclassifyTool(EnMAPBoxApplication):
         pathIcon = os.path.join(APP_DIR, 'icon.png')
         return QIcon(pathIcon)
 
+    def title(self):
+        return self.name
+
     def menu(self, appMenu):
         """
         Specify menu, submenus and actions
         :return: the QMenu or QAction to be added to the "Applications" menu.
         """
-        appMenu = self.enmapbox.menu('Tools')
-
-        # add a QAction that starts your GUI
-        a = self.utilsAddActionInAlphanumericOrder(appMenu, 'Reclassify')
-        assert isinstance(a, QAction)
-        a.setIcon(self.icon())
+        a = self.utilsAddActionInAlphanumericOrder(self.enmapbox.ui.menuApplicationsClassification, self.title())
         a.triggered.connect(self.startGUI)
-        return a
 
     def startGUI(self, *args):
         uiDialog = ReclassifyDialog(self.enmapbox.ui)

@@ -87,6 +87,9 @@ class ImageCubeTests(EnMAPBoxTestCase):
         self.assertEqual(xml1, xml2)
         self.assertEqual(job.extent(), lyr.extent())
 
+        del job
+        QgsProject.instance().removeAllMapLayers()
+
     def test_widget(self):
 
         W = ImageCubeWidget()
@@ -144,11 +147,15 @@ class ImageCubeTests(EnMAPBoxTestCase):
             W.startDataLoading()
 
         self.showGui(W)
+        del W
+        QgsProject.instance().removeAllMapLayers()
 
     def test_noLayers(self):
 
         w = ImageCubeWidget()
         self.showGui(w)
+        del w
+        QgsProject.instance().removeAllMapLayers()
 
     def test_extent(self):
 
@@ -203,6 +210,8 @@ class ImageCubeTests(EnMAPBoxTestCase):
         W.startDataLoading()
 
         self.showGui(W)
+        del W
+        QgsProject.instance().removeAllMapLayers()
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 from enmapboxprocessing.algorithm.spatialfilterfunctionalgorithmbase import SpatialFilterFunctionAlgorithmBase
 from enmapboxprocessing.enmapalgorithm import Group
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked

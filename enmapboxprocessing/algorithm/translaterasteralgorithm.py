@@ -11,7 +11,7 @@ from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRectangle, QgsRasterLayer,
                        QgsRasterDataProvider, QgsPoint, QgsPointXY, QgsMapLayer)
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -126,7 +126,7 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
             self.P_BAND_LIST, self._BAND_LIST, parentLayerParameterName=self.P_RASTER, optional=True
         )
         self.addParameterRasterLayer(self.P_GRID, self._GRID, optional=True)
-        self.addParameterBoolean(self.P_COPY_METADATA, self._COPY_METADATA, defaultValue=False)
+        self.addParameterBoolean(self.P_COPY_METADATA, self._COPY_METADATA, defaultValue=True)
         self.addParameterBoolean(self.P_COPY_STYLE, self._COPY_STYLE, defaultValue=False)
         self.addParameterBoolean(self.P_EXCLUDE_BAD_BANDS, self._EXCLUDE_BAD_BANDS, defaultValue=False)
         self.addParameterBoolean(self.P_WRITE_ENVI_HEADER, self._WRITE_ENVI_HEADER, defaultValue=True)
@@ -316,15 +316,19 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
             outGdalDataset = gdal.Open(filename)
 
             writer = RasterWriter(outGdalDataset)
-            reader = RasterReader(raster)
             if bandList is None:
                 bandList = range(1, reader.bandCount() + 1)
+            metadata = reader.metadata()
             if copyMetadata:
-                metadata = reader.metadata()
                 writer.setMetadata(metadata)
-                for dstBandNo, srcBandNo in enumerate(bandList, 1):
-                    # general metadata
-                    metadata = reader.metadata(srcBandNo)
+            else:
+                for domain in metadata:
+                    writer.setMetadataDomain({}, domain)
+            for dstBandNo, srcBandNo in enumerate(bandList, 1):
+                # general metadata
+                metadata = reader.metadata(srcBandNo)
+
+                if copyMetadata:
                     writer.setMetadata(metadata, dstBandNo)
                     # band name
                     bandName = reader.bandName(srcBandNo)
@@ -336,11 +340,9 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                     writer.setFwhm(fwhm, dstBandNo)
                     badBandMultiplier = reader.badBandMultiplier(srcBandNo)
                     writer.setBadBandMultiplier(badBandMultiplier, dstBandNo)
-            else:
-                pass
-                # writer.removeMetadata()
-                # for bandNo in writer.bandNumbers():
-                #    writer.removeMetadata(bandNo)
+                else:
+                    for domain in metadata:
+                        writer.setMetadataDomain({}, domain)
 
             # clean up ENVI metadata domain (see #1098)
             metadata = reader.metadataDomain('ENVI')
@@ -364,11 +366,21 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                 outraster.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
                 del outraster
 
-            for bandNo in writer.bandNumbers():
-                writer.setOffset(offset, bandNo)
-                writer.setScale(scale, bandNo)
-
             driverShortName = writer.gdalDataset.GetDriver().ShortName
+            del writer, outGdalDataset
+
+            # need to re-open the raster before setting the scal/offset (issue #501)
+            outGdalDataset = gdal.Open(filename)
+            writer = RasterWriter(outGdalDataset)
+            for dstBandNo, srcBandNo in enumerate(bandList, 1):
+                if offset is None:
+                    writer.setOffset(reader.offset(srcBandNo), dstBandNo)
+                else:
+                    writer.setOffset(offset, dstBandNo)
+                if scale is None:
+                    writer.setScale(reader.scale(srcBandNo), dstBandNo)
+                else:
+                    writer.setScale(scale, dstBandNo)
             del writer, outGdalDataset
 
             if writeEnviHeader:

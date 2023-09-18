@@ -10,7 +10,6 @@ from qgis.PyQt.QtCore import *
 from qgis.PyQt.QtGui import *
 from qgis.PyQt.QtWidgets import *
 
-from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibrary
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
 from _classic.hubdsm.core.color import Color as HubdsmColor
 from _classic.hubdsm.core.gdalraster import GdalRaster
@@ -209,7 +208,7 @@ class ClassificationWorkflowApp(QMainWindow):
 
             try:
                 renderer = libraryLayer.renderer().clone()
-                libraryLayer = SpectralLibrary(name=libraryLayer.name(), uri=libraryLayer.source())
+                libraryLayer = QgsVectorLayer(baseName=libraryLayer.name(), path=libraryLayer.source())
                 libraryLayer.setRenderer(renderer)
             except:
                 self.uiType2Library_.setLayer(None)
@@ -497,8 +496,8 @@ class CategoryFieldSelectionDialog(QDialog):
 
     @staticmethod
     def openLayerPropertiesDialog(layer: QgsVectorLayer, parent: QWidget):
-        from enmapbox.qgispluginsupport.qps.layerproperties import LayerPropertiesDialog
-        dialog = LayerPropertiesDialog(layer, parent=parent)
+        from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog
+        dialog = showLayerPropertiesDialog(layer, parent=parent, modal=False)
         dialog.mOptionsListWidget.setCurrentRow(2)
         dialog.setModal(True)
         dialog.exec_()

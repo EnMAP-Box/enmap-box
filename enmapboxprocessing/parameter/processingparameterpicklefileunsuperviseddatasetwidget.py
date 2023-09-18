@@ -1,6 +1,6 @@
 from os.path import basename, join, dirname
 
-from enmapbox import EnMAPBox
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromcodealgorithm import \
     PrepareUnsupervisedDatasetFromCodeAlgorithm
 from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromfilealgorithm import \
@@ -89,7 +89,7 @@ class ProcessingParameterPickleFileUnsupervisedDatasetWidget(QWidget):
     setFilePath = setValue
 
     def onCreateClicked(self):
-        from enmapbox import EnMAPBox
+        from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapBox = EnMAPBox.instance()
 
         class AlgorithmDialogWrapper(AlgorithmDialog):

@@ -19,7 +19,7 @@ from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer, \
     QgsProcessingException
-from typeguard import typechecked
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -330,7 +330,7 @@ class AccuracyAssessmentResult(object):
     r2Score: float
     meanError: float
     squaredPearsonCorrelationScore: float
-    fittedLineCoeffs: np.ndarray
+    fittedLineCoeffs: Any
 
 
 @typechecked
@@ -347,15 +347,15 @@ def accuracyAssessment(yObserved: np.ndarray, yPredicted: np.ndarray):
     n = len(yO)
     residuals = yP - yO
 
-    explainedVarianceScore = explained_variance_score(yO, yP)
-    meanAbsoluteError = mean_absolute_error(yO, yP)
-    meanSquaredError = mean_squared_error(yO, yP)
-    rootMeanSquaredError = np.sqrt(meanSquaredError)
-    ratioOfPerformanceToDeviation = np.std(yO / rootMeanSquaredError)
-    medianAbsoluteError = median_absolute_error(yO, yP)
-    r2Score = r2_score(yO, yP)
-    meanError = np.mean(yP - yO)
-    squaredPearsonCorrelationScore = pearsonr(yO, yP)[0] ** 2
+    explainedVarianceScore = float(explained_variance_score(yO, yP))
+    meanAbsoluteError = float(mean_absolute_error(yO, yP))
+    meanSquaredError = float(mean_squared_error(yO, yP))
+    rootMeanSquaredError = float(np.sqrt(meanSquaredError))
+    ratioOfPerformanceToDeviation = float(np.std(yO / rootMeanSquaredError))
+    medianAbsoluteError = float(median_absolute_error(yO, yP))
+    r2Score = float(r2_score(yO, yP))
+    meanError = float(np.mean(yP - yO))
+    squaredPearsonCorrelationScore = float(pearsonr(yO, yP)[0] ** 2)
     fittedLineCoeffs = np.polyfit(yO, yP, 1)  # f(x) = m*x + n
 
     return AccuracyAssessmentResult(

@@ -2,13 +2,13 @@ import inspect
 import traceback
 from typing import Dict, Any, List, Tuple
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromjsonalgorithm import \
     PrepareClassificationDatasetFromJsonAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback
-from typeguard import typechecked
 
 
 @typechecked

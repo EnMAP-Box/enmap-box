@@ -1,12 +1,9 @@
 from typing import Dict
 
+import enmapboxprocessing.testcase
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
-from enmapboxprocessing.testcase import TestCase as TestCase_
 from processing.core.Processing import Processing
 from qgis.core import QgsProcessingFeedback
-
-from enmapbox.testing import start_app
-qgsApp = start_app()
 
 
 class ProcessingFeedback(QgsProcessingFeedback):
@@ -16,8 +13,8 @@ class ProcessingFeedback(QgsProcessingFeedback):
             print('\r', end='')
 
 
-class TestCase(TestCase_):
-    openReport = True
+class TestCase(enmapboxprocessing.testcase.TestCase):
+    openReport = False
 
     @staticmethod
     def runalg(alg: EnMAPProcessingAlgorithm, parameters: Dict):
