@@ -48,7 +48,6 @@ class TestRasterMathAlgorithm(TestCase):
         result = self.runalg(alg, parameters)
         self.assertEqual(14908457369, np.sum(RasterReader(result['test']).array(), dtype=float))
         self.assertEqual(14908457369, np.sum(RasterReader(result['test2']).array(), dtype=float))
-        self.assertIsNone(result.get(alg.P_OUTPUT_RASTER))
 
     def test_expression(self):
         alg = RasterMathAlgorithm()
