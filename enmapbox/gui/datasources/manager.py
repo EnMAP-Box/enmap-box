@@ -385,13 +385,14 @@ class DataSourceManagerTreeView(TreeView):
         """
         doc: QDomDocument = parent.ownerDocument()
         node: QDomElement = doc.createElement(self.__class__.__name__)
+        parent.appendChild(node)
+
         dsm: DataSourceManager = self.dataSourceManager()
         if isinstance(dsm, DataSourceManager):
             for ds in dsm.dataSources():
                 ds: DataSource
-                ds.writeXml(node, context)
-
-        parent.appendChild(node)
+                if ds.dataItem().providerKey() != 'memory':
+                    ds.writeXml(node, context)
 
     def setModel(self, model: QAbstractItemModel):
         super().setModel(model)

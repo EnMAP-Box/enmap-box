@@ -927,7 +927,14 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         # save data views
         self.dockTreeView().writeXml(node, context)
 
-        s = ""
+        MESSAGES = dict()
+        for m in context.takeMessages():
+            m: QgsReadWriteContext.ReadWriteMessage
+            MESSAGES[m.level()] = MESSAGES.get(m.level(), []) + [m.message()]
+
+        for level, messages in MESSAGES.items():
+            info = '\n'.join(messages)
+            messageLog(info, level=level)
 
     def readProject(self, doc: Union[QgsProject, str, pathlib.Path, QDomDocument]) -> bool:
         """
