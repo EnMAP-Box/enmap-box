@@ -96,5 +96,7 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
 
         self.showGui(box.ui)
 
+        QgsProject.instance().removeAllMapLayers()
+
 if __name__ == '__main__':
     unittest.main(buffer=False)
