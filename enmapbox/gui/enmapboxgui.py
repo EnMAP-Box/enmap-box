@@ -977,6 +977,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             m: QgsReadWriteContext.ReadWriteMessage
             MESSAGES[m.level()] = MESSAGES.get(m.level(), []) + [m.message()]
 
+        for level, messages in MESSAGES.items():
+            info = '\n'.join(messages)
+            messageLog(info, level=level)
+
         return True
 
     def onLayersWillBeRemoved(self, layerIDs):
