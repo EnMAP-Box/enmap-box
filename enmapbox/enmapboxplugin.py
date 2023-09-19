@@ -221,7 +221,7 @@ class EnMAPBoxPlugin(object):
 
         # add items to be removed when unload the plugin
         self.pluginToolbarActions.append(self.profileAnalyticsApp.actionToggleDock)
-        self.dockWidgets.append(self.profileAnalyticsApp.dock)
+        self.dockWidgets.append(self.profileAnalyticsApp.mDock)
 
     def initLocationBrowserGui(self):
         from qgis.utils import iface
@@ -231,7 +231,7 @@ class EnMAPBoxPlugin(object):
 
         # add items to be removed when unload the plugin
         self.pluginToolbarActions.append(self.locationBrowserApp.actionToggleDock)
-        self.dockWidgets.append(self.locationBrowserApp.dock)
+        self.dockWidgets.append(self.locationBrowserApp.mDock)
 
     def initRasterBandStackingGui(self):
         from qgis.utils import iface
@@ -241,7 +241,7 @@ class EnMAPBoxPlugin(object):
 
         # add items to be removed when unload the plugin
         self.pluginToolbarActions.append(self.rasterBandStackingApp.actionToggleDock)
-        self.dockWidgets.append(self.rasterBandStackingApp.dock)
+        self.dockWidgets.append(self.rasterBandStackingApp.mDock)
 
     def initRasterMaskingGui(self):
         from qgis.utils import iface
@@ -251,7 +251,7 @@ class EnMAPBoxPlugin(object):
 
         # add items to be removed when unload the plugin
         self.pluginToolbarActions.append(self.rasterMaskingApp.actionToggleDock)
-        self.dockWidgets.append(self.rasterMaskingApp.dock)
+        self.dockWidgets.append(self.rasterMaskingApp.mDock)
 
     def initSensorProductImportGui(self):
         from qgis.utils import iface
@@ -261,7 +261,7 @@ class EnMAPBoxPlugin(object):
 
         # add items to be removed when unload the plugin
         self.pluginToolbarActions.append(self.sensorProductImportApp.actionToggleDock)
-        self.dockWidgets.append(self.sensorProductImportApp.dock)
+        self.dockWidgets.append(self.sensorProductImportApp.mDock)
 
     def initTemporalRasterStackControllerGui(self):
         from temporalrasterstackcontrollerapp import TemporalRasterStackControllerApp

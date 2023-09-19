@@ -454,7 +454,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
         oldProvider: DockManagerLayerTreeModelMenuProvider = view.menuProvider()
         errors: List[ModuleNotFoundError] = []
 
-        dataView = viewNode.dock
+        dataView = viewNode.dock()
 
         if dataView.isVisible():
             a = menu.addAction('Hide View')
@@ -469,8 +469,8 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
         lyr: QgsMapLayer = None
         canvas: QgsMapCanvas = None
         if isinstance(viewNode, MapDockTreeNode):
-            assert isinstance(viewNode.dock, MapDock)
-            canvas = viewNode.dock.mCanvas
+            assert isinstance(viewNode.mDock, MapDock)
+            canvas = viewNode.dock().mCanvas
 
         selectedLayerNodes = list(set(view.selectedLayerNodes()))
 
@@ -514,9 +514,9 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                     errors.append(ex)
 
         elif isinstance(node, DockTreeNode):
-            assert isinstance(node.dock, Dock)
+            assert isinstance(node.dock(), Dock)
             try:
-                node.dock.populateContextMenu(menu)
+                node.dock().populateContextMenu(menu)
             except ModuleNotFoundError as ex:
                 errors.append(ex)
 

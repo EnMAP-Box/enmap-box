@@ -16,6 +16,7 @@
 ***************************************************************************
 """
 import os
+import pathlib
 # noinspection PyPep8Naming
 import unittest
 
@@ -27,7 +28,7 @@ from enmapbox.enmapboxsettings import enmapboxSettings, EnMAPBoxSettings, EnMAPB
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import EnMAPBoxTestCase
 from qgis.PyQt.QtGui import QColor
-from qgis.core import QgsProject
+from qgis.core import QgsProject, QgsVectorLayer
 
 from enmapbox.testing import start_app
 
@@ -75,6 +76,9 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
 
     def test_enmapbox_settings(self):
 
+        import enmapbox
+        enmapbox.RAISE_ALL_EXCEPTIONS = True
+
         def dataSourceState(box: EnMAPBox):
             states = []
             for ds in box.dataSources(onlyUri=False):
@@ -92,12 +96,18 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
             return states
 
         box = EnMAPBox(load_core_apps=False, load_other_apps=False)
+
+        tmpDir = self.createTestOutputDirectory('docktest')
+        from enmapboxtestdata import library_berlin
+        speclib = QgsVectorLayer(pathlib.Path(library_berlin).as_posix())
         box.loadExampleData()
+
         dock1: Dock = box.docks(MapDock)[0]
         dock1.setTitle('MyMap1')
         dock2 = box.createMapDock(name='MyMap2', position='left')
-        dock3 = box.createSpectralLibraryDock(name='MySpeclib', position='bottom')
-        dock4 = box.createDock('TEXT')
+        dock3 = box.createSpectralLibraryDock(name='MySpeclib', speclib=speclib, position='bottom')
+        dock4 = box.createDock('TEXT', name='MyTextDock')
+        dock4.textDockWidget().setText('My Text')
 
         proj = QgsProject.instance()
         self.assertIsInstance(proj, QgsProject)
@@ -109,6 +119,7 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
 
         sources1 = dataSourceState(box)
         views1 = dataViewState(box)
+        layerSources1 = sorted([l.source() for l in box.project().mapLayers().values()])
 
         box.close()
         QgsProject.instance().removeAllMapLayers()
@@ -124,11 +135,12 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
         box.readProject(tmp_path)
         sources2 = dataSourceState(box)
         views2 = dataViewState(box)
-
+        layerSources2 = sorted([lyr.source() for lyr in box.project().mapLayers().values()])
         self.showGui(box.ui)
 
         self.assertEqual(sources1, sources2)
         self.assertEqual(views1, views2)
+        self.assertEqual(layerSources1, layerSources2)
 
         box.close()
         QgsProject.instance().removeAllMapLayers()
@@ -139,9 +151,10 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
 
         sources3 = dataSourceState(box)
         views3 = dataViewState(box)
+        layerSources3 = sorted([l.source() for l in box.project().mapLayers().values()])
         self.assertEqual(sources1, sources3)
         self.assertEqual(views1, views3)
-
+        self.assertEqual(layerSources1, layerSources3)
         self.showGui(box.ui)
 
         QgsProject.instance().removeAllMapLayers()

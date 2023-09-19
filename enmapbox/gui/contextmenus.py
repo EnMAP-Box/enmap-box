@@ -95,7 +95,7 @@ class EnMAPBoxContextMenuRegistry(QObject):
             raise exception
         else:
             self.mErrorList.append(exception)
-            messageLog(str(exception), Qgis.MessageLevel.Critical, notifyUser=False)
+            messageLog(f'{exception.__class__.__name__}:"{exception}"', Qgis.MessageLevel.Critical, notifyUser=False)
 
     def populateMapCanvasMenu(self,
                               menu: QMenu,

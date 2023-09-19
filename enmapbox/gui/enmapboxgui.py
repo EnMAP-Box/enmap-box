@@ -25,8 +25,6 @@ import warnings
 from os.path import basename
 from typing import Optional, Dict, Union, Any, List, Sequence
 
-from qgis.PyQt.QtXml import QDomElement
-
 import enmapbox
 import enmapbox.gui.datasources.manager
 import qgis.utils
@@ -42,7 +40,7 @@ from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import Spe
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprofilesources import SpectralProfileSourcePanel, \
     MapCanvasLayerProfileSource
 from enmapbox.qgispluginsupport.qps.subdatasets import SubDatasetSelectionDialog
-from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, loadUi, SpatialExtent, file_search, nodeXmlString
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, loadUi, SpatialExtent, file_search
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.importdesisl1balgorithm import ImportDesisL1BAlgorithm
 from enmapboxprocessing.algorithm.importdesisl1calgorithm import ImportDesisL1CAlgorithm
@@ -70,7 +68,7 @@ from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, Q
     QMainWindow, QApplication, QSizePolicy, QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
     QProgressBar, QMessageBox
 from qgis.PyQt.QtXml import QDomDocument
-from qgis._core import QgsMimeDataUtils
+from qgis.PyQt.QtXml import QDomElement
 from qgis.core import QgsExpressionContextGenerator, QgsExpressionContext, QgsProcessingContext, \
     QgsExpressionContextUtils
 from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
@@ -919,12 +917,21 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     def writeProject(self, doc: QDomDocument):
 
+        info = []
+
         context = QgsReadWriteContext()
 
         node: QDomElement = doc.createElement('EnMAPBox')
         doc.documentElement().appendChild(node)
 
         # save data sources
+        in_memory = []
+        for ds in self.dataSources(onlyUri=False):
+            ds: DataSource
+            item = ds.dataItem()
+            if item.providerKey() in ['memory'] or 'vsimem' in item.path():
+                in_memory.append(item)
+
         self.dataSourceManagerTreeView().writeXml(node, context)
 
         # save data views
@@ -1001,10 +1008,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         if len(sources) > 0:
             self.project().addMapLayers(sources)
-        n2 = len(self.project().mapLayers())
+
         # load data views
         self.dockTreeView().readXml(node, context)
-        n3 = len(self.project().mapLayers())
 
         MESSAGES = dict()
         for m in context.takeMessages():
@@ -1843,7 +1849,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         mbar = self.ui.messageBar
         assert isinstance(mbar, QgsMessageBar)
-        line1 = msgLines[0]
+
+        line1 = msgLines[0] if len(msgLines) > 0 else ''
+
         showMore = '' if len(msgLines) == 1 else '\n'.join(msgLines[1:])
 
         if level == Qgis.Critical:
