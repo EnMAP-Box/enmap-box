@@ -19,6 +19,7 @@ import os
 # noinspection PyPep8Naming
 import unittest
 
+from enmapbox.gui.datasources.datasources import DataSource
 from enmapbox.gui.dataviews.docks import MapDock, Dock
 from qgis.PyQt.QtGui import QIcon
 
@@ -77,7 +78,9 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
         def dataSourceState(box: EnMAPBox):
             states = []
             for ds in box.dataSources(onlyUri=False):
-                states.append(ds.source())
+                ds: DataSource
+                if ds.dataItem().providerKey() != 'memory':
+                    states.append(ds.source())
             return states
 
         def dataViewState(box: EnMAPBox):
@@ -94,6 +97,7 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
         dock1.setTitle('MyMap1')
         dock2 = box.createMapDock(name='MyMap2', position='left')
         dock3 = box.createSpectralLibraryDock(name='MySpeclib', position='bottom')
+        dock4 = box.createDock('TEXT')
 
         proj = QgsProject.instance()
         self.assertIsInstance(proj, QgsProject)
@@ -113,7 +117,7 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
         settings = enmapboxSettings()
 
         settings.setValue(EnMAPBoxSettings.STARTUP_LOAD_PROJECT, False)
-        box = EnMAPBox()
+        box = EnMAPBox(load_core_apps=False, load_other_apps=False)
         self.assertEqual(len(box.dataSources()), 0)
         self.assertEqual(len(box.docks()), 0)
 
@@ -131,7 +135,7 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
 
         # load on startup
         settings.setValue(EnMAPBoxSettings.STARTUP_LOAD_PROJECT, True)
-        box = EnMAPBox()
+        box = EnMAPBox(load_core_apps=False, load_other_apps=False)
 
         sources3 = dataSourceState(box)
         views3 = dataViewState(box)

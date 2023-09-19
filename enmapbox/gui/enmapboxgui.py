@@ -42,7 +42,7 @@ from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import Spe
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprofilesources import SpectralProfileSourcePanel, \
     MapCanvasLayerProfileSource
 from enmapbox.qgispluginsupport.qps.subdatasets import SubDatasetSelectionDialog
-from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, loadUi, SpatialExtent, file_search
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, loadUi, SpatialExtent, file_search, nodeXmlString
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.importdesisl1balgorithm import ImportDesisL1BAlgorithm
 from enmapboxprocessing.algorithm.importdesisl1calgorithm import ImportDesisL1CAlgorithm
@@ -70,6 +70,7 @@ from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, Q
     QMainWindow, QApplication, QSizePolicy, QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
     QProgressBar, QMessageBox
 from qgis.PyQt.QtXml import QDomDocument
+from qgis._core import QgsMimeDataUtils
 from qgis.core import QgsExpressionContextGenerator, QgsExpressionContext, QgsProcessingContext, \
     QgsExpressionContextUtils
 from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
@@ -364,7 +365,7 @@ class EnMAPBoxProject(QgsProject):
 
     def removeAllMapLayers(self):
         self.mLayerRefs.clear()
-        super().removeMapLayers()
+        super().removeAllMapLayers()
         self.mLayerRefs.clear()
 
     def addMapLayer(self, mapLayer: QgsMapLayer, *args, **kwds) -> QgsMapLayer:
@@ -479,6 +480,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         # in future this might become an own EnMAP-Box Project
         # QgsProject.instance()
         self.mProject = EnMAPBoxProject()
+
+        self.mSyncFreeze: bool = False
 
         cmReg = EnMAPBoxContextMenuRegistry.instance()
         if len(cmReg) == 0:
@@ -942,6 +945,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         :param doc: QDomDocument
         :return: bool
         """
+
         context = QgsReadWriteContext()
 
         if not isinstance(doc, QDomDocument):
@@ -973,11 +977,34 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         if node.isNull():
             return False
 
+        self.mSyncFreeze = True
+        self.project().removeAllMapLayers()
+
+        nodes = node.elementsByTagName('layer-tree-layer')
+        sources = []
+        for i in range(nodes.count()):
+            n = nodes.item(i).toElement()
+            nSource = n.attribute('source')
+            nProvider = n.attribute('providerKey')
+            nName = n.attribute('name')
+            lyr = None
+            if nProvider in ['ogr']:
+                lyr = QgsVectorLayer(nSource, nName, nProvider)
+            elif nProvider in ['gdal']:
+                lyr = QgsRasterLayer(nSource, nName, nProvider)
+            if isinstance(lyr, QgsMapLayer):
+                sources.append(lyr)
+
+        n1 = len(self.project().mapLayers())
         # load data sources
         self.dataSourceManagerTreeView().readXml(node, context)
 
+        if len(sources) > 0:
+            self.project().addMapLayers(sources)
+        n2 = len(self.project().mapLayers())
         # load data views
         self.dockTreeView().readXml(node, context)
+        n3 = len(self.project().mapLayers())
 
         MESSAGES = dict()
         for m in context.takeMessages():
@@ -988,6 +1015,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             info = '\n'.join(messages)
             messageLog(info, level=level)
 
+        self.mSyncFreeze = False
         return True
 
     def onLayersWillBeRemoved(self, layerIDs):
@@ -1009,6 +1037,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         Ensures that the layers in the EnMAP-Box are a subset of the QgsProject.instance() layers
         :return:
         """
+        if self.mSyncFreeze:
+            return
+
         SYNC_WITH_QGIS = True
 
         # 1. sync own project to layer tree

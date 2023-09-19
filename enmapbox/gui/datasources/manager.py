@@ -391,6 +391,7 @@ class DataSourceManagerTreeView(TreeView):
         if isinstance(dsm, DataSourceManager):
             for ds in dsm.dataSources():
                 ds: DataSource
+                # do not save in-memory sources
                 if ds.dataItem().providerKey() != 'memory':
                     ds.writeXml(node, context)
 

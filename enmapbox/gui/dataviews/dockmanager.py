@@ -39,7 +39,7 @@ from enmapbox.gui.mimedata import \
 from enmapbox.gui.utils import enmapboxUiPath
 from enmapbox.qgispluginsupport.qps.layerproperties import pasteStyleFromClipboard, pasteStyleToClipboard
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library, profile_field_list
-from enmapbox.qgispluginsupport.qps.utils import loadUi
+from enmapbox.qgispluginsupport.qps.utils import loadUi, nodeXmlString
 from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtCore import Qt, QMimeData, QModelIndex, QObject, QTimer, pyqtSignal, QEvent, \
     QSortFilterProxyModel, QCoreApplication
@@ -72,8 +72,6 @@ class LayerTreeNode(QgsLayerTree):
         self.mValue = None
         self.mIcon: QIcon = None
 
-        self.mXmlTag = 'tree-node'
-
         self.setName(name)
         self.setValue(value)
         self.setExpanded(False)
@@ -85,6 +83,12 @@ class LayerTreeNode(QgsLayerTree):
         #    parent.addChildNode(self)
         #    if isinstance(parent, LayerTreeNode):
         #        self.sigValueChanged.connect(parent.sigValueChanged)
+
+    def readXml(self, element: QDomElement, context: QgsReadWriteContext):
+        raise NotImplementedError(f'{self.__class__.__name__} needs to implement readXml(...) ')
+
+    def writeXml(self, parent: QDomElement, context: QgsReadWriteContext):
+        raise NotImplementedError(f'{self.__class__.__name__} needs to implement writeXml(...) ')
 
     def dump(self, *args, **kwargs) -> str:
 
@@ -173,6 +177,34 @@ class DockTreeNode(LayerTreeNode):
     def enmapBoxInstance(self) -> Optional['EnMAPBox']:  # noqa: F821
         return self.mEnMAPBoxInstance
 
+    @staticmethod
+    def fromXml(n: QDomElement, context: QgsReadWriteContext, treeView: 'DockTreeView') -> 'DockTreeNode':
+        """
+        Each DockNode subclass needs to implement its own readXml(n, context)!
+        """
+        assert n.tagName() == 'DataView'
+        treeView: DockTreeView
+        treeModel = treeView.model()
+        if isinstance(treeModel, QSortFilterProxyModel):
+            treeModel = treeModel.sourceModel()
+        assert isinstance(treeModel, DockManagerTreeModel)
+
+        manager: DockManager = treeModel.dockManager()
+        # create the data view dock
+        dockType = n.attribute('type')
+        dockName = n.attribute('name')
+        isVisible = n.attribute('isVisible', 'true').lower() in ['1', 'true']
+        isExpanded = n.attribute('isExpanded', 'true').lower() in ['1', 'true']
+        newDock = manager.createDock(dockType, name=dockName, )
+
+        newDockNode: DockTreeNode = treeModel.findDockNode(newDock)
+        newDockNode.setExpanded(isExpanded)
+        newDockNode.readXml(n, context)
+
+        newDockNode.resolveReferences(manager.enmapBoxInstance().project(), True)
+
+        return newDockNode
+
     def writeXml(self, parent: QDomElement, context: QgsReadWriteContext):
         doc: QDomDocument = parent.ownerDocument()
         node: QDomElement = doc.createElement('DataView')
@@ -202,6 +234,15 @@ class TextDockTreeNode(DockTreeNode):
         dock.mTextDockWidget.sigSourceChanged.connect(self.setLinkedFile)
         self.setLinkedFile(dock.mTextDockWidget.mFile)
         self.addChildNode(self.fileNode)
+
+    def readXml(self, element: QDomElement, context: QgsReadWriteContext):
+        pass
+
+    def writeXml(self, parent: QDomElement, context: QgsReadWriteContext):
+        doc: QDomDocument = parent.ownerDocument()
+        node: QDomElement = super().writeXml(parent, context)
+
+        textnode = doc.createElement('text')
 
     def setLinkedFile(self, path: str):
         self.fileNode.setName(f'File: {path}')
@@ -248,6 +289,35 @@ class SpeclibDockTreeNode(DockTreeNode):
 
     def speclibWidget(self) -> SpectralLibraryWidget:
         return self.mSpeclibWidget
+
+    def readXml(self, n: QDomElement, context: QgsReadWriteContext):
+
+        speclibNode = n.firstChildElement('spectrallibrary').toElement()
+
+        if speclibNode.isNull():
+            return
+
+        s = ""
+        pass
+
+    def writeXml(self, parent: QDomElement, context: QgsReadWriteContext):
+        doc: QDomDocument = parent.ownerDocument()
+        node: QDomElement = super().writeXml(parent, context)
+
+        sl: QgsVectorLayer = self.speclib()
+
+        speclibNode = doc.createElement('speclib')
+        node.appendChild(speclibNode)
+
+        # use the standard QgsLayerTree writeXml
+        super(QgsLayerTree, self).writeXml(speclibNode, context)
+
+        slw: SpectralLibraryWidget = self.speclibWidget()
+        slwNode = doc.createElement('speclib_widget')
+        node.appendChild(slwNode)
+
+        # todo: save visualization settings
+
 
     def updateNodes(self):
 
@@ -323,6 +393,19 @@ class MapDockTreeNode(DockTreeNode):
         node.appendChild(layerNode)
         # use the standard QgsLayerTree writeXml
         super(QgsLayerTree, self).writeXml(layerNode, context)
+        s = ""
+
+    def readXml(self, parent: QDomElement, context: QgsReadWriteContext):
+        """
+        Sets the map dock content from XML
+        """
+        assert parent.tagName() == 'DataView'
+        layerNode = parent.firstChildElement('maplayers').toElement()
+        if not layerNode.isNull():
+            self.removeAllChildren()
+            n = layerNode.firstChild().toElement()
+            self.readCommonXml(n)
+            self.readChildrenFromXml(n, context)
 
     def onAddedChildren(self, node, idxFrom, idxTo):
         layers: List[QgsMapLayer] = self.mLayers[:]
@@ -822,7 +905,7 @@ class DockManagerTreeModel(QgsLayerTreeModel):
     def project(self) -> QgsProject:
         return self.mProject
 
-    def findDockNode(self,  object: object) -> DockTreeNode:
+    def findDockNode(self, object: object) -> DockTreeNode:
         """
         Returns the dock that contains the given object
         :param object:
@@ -1389,14 +1472,7 @@ class DockTreeView(QgsLayerTreeView):
 
             while not n.isNull():
                 n = n.toElement()
-                dockType = n.attribute('type')
-                dockName = n.attribute('name')
-                isVisible = n.attribute('isVisible', 'true').lower() in ['1', 'true']
-                isExpanded = n.attribute('isExpanded', 'true').lower() in ['1', 'true']
-                newDock = manager.createDock(dockType, name=dockName, )
-                newDockNode: DockTreeNode = model.findDockNode(newDock)
-                newDockNode.setExpanded(isExpanded)
-
+                DockTreeNode.fromXml(n, context, self)
                 n = n.nextSibling()
 
             s = ""
