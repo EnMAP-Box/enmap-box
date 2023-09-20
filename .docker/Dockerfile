@@ -10,16 +10,16 @@ RUN apt-get update && \
 
 RUN apt-get update
 
-
-RUN echo "Basic python environment:"
-RUN python3 --version
-RUN pip3 list
-
 RUN echo "Install missing EnMAP-Box requirements:"
 COPY ./requirements.txt /tmp/
 COPY ./requirements_developer.txt /tmp/
 RUN pip3 install -r /tmp/requirements.txt
 RUN pip3 install -r /tmp/requirements_developer.txt
+
+RUN echo "EnMAP-Box Python Environment:"
+RUN python3 --version
+RUN pip3 list
+
 
 # Avoid sqlcmd termination due to locale -- see https://github.com/Microsoft/mssql-docker/issues/163
 RUN echo "nb_NO.UTF-8 UTF-8" > /etc/locale.gen
