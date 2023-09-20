@@ -60,8 +60,8 @@ class ImportPrismaL2DAlgorithm(EnMAPProcessingAlgorithm):
                          'The main data contained in the PRS_L2d_PCO Swath is the surface panchromatic reflectance '
                          'image (in instrument geometric reference).\n'
                          'Instead of executing this algorithm, '
-                         'you may drag&drop the HE5 file directly from your system file browser on '
-                         'the EnMAP-Box map view area.'),
+                         'you may drag&drop the HE5 file directly from your system file browser '
+                         'a) onto the EnMAP-Box map view area, or b) onto the Sensor Product Import panel.'),
             (self._SPECTRAL_REGION, 'Spectral region to be imported.'),
             (self._BAD_BAND_THRESHOLD, 'If the proportion of erroneous pixels in the VNIR/SWIR Pixel Error Matrix,'
                                        'exceeds the bad band threshold (a value between 0 and 1), '
