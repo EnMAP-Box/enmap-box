@@ -231,7 +231,7 @@ class EnMAPBoxPlugin(object):
 
         # add items to be removed when unload the plugin
         self.pluginToolbarActions.append(self.locationBrowserApp.actionToggleDock)
-        self.dockWidgets.append(self.locationBrowserApp.mDock)
+        self.dockWidgets.append(self.locationBrowserApp.dock)
 
     def initRasterBandStackingGui(self):
         from qgis.utils import iface
@@ -241,7 +241,7 @@ class EnMAPBoxPlugin(object):
 
         # add items to be removed when unload the plugin
         self.pluginToolbarActions.append(self.rasterBandStackingApp.actionToggleDock)
-        self.dockWidgets.append(self.rasterBandStackingApp.mDock)
+        self.dockWidgets.append(self.rasterBandStackingApp.dock)
 
     def initRasterMaskingGui(self):
         from qgis.utils import iface
@@ -251,7 +251,7 @@ class EnMAPBoxPlugin(object):
 
         # add items to be removed when unload the plugin
         self.pluginToolbarActions.append(self.rasterMaskingApp.actionToggleDock)
-        self.dockWidgets.append(self.rasterMaskingApp.mDock)
+        self.dockWidgets.append(self.rasterMaskingApp.dock)
 
     def initSensorProductImportGui(self):
         from qgis.utils import iface
@@ -261,7 +261,7 @@ class EnMAPBoxPlugin(object):
 
         # add items to be removed when unload the plugin
         self.pluginToolbarActions.append(self.sensorProductImportApp.actionToggleDock)
-        self.dockWidgets.append(self.sensorProductImportApp.mDock)
+        self.dockWidgets.append(self.sensorProductImportApp.dock)
 
     def initTemporalRasterStackControllerGui(self):
         from temporalrasterstackcontrollerapp import TemporalRasterStackControllerApp
