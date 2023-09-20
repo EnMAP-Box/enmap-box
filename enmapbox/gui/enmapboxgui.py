@@ -919,6 +919,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             self.spectralProfileSourcePanel().addCurrentProfilesToSpeclib()
 
     def writeProject(self, doc: QDomDocument):
+        assert isinstance(doc, QDomDocument)
 
         info = []
 
@@ -2362,10 +2363,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         return self.ui.mActionPan
 
     def actionSaveProject(self) -> QAction:
-        return self.mActionSaveProject
+        return self.ui.mActionSaveProject
 
     def actionSaveProjectAs(self) -> QAction:
-        return self.mActionSaveProjectAs
+        return self.ui.mActionSaveProjectAs
 
     def actionZoomActualSize(self):
         return self.ui.mActionZoomPixelScale

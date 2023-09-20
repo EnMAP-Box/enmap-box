@@ -77,8 +77,29 @@ class TestEnMAPBoxSettings(EnMAPBoxTestCase):
 
     def test_enmapbox_project_settings(self):
 
+        proj_old = QgsProject.instance()
+        proj = QgsProject()
+        proj.setTitle('test_project_settings')
+        self.assertIsInstance(proj, QgsProject)
+        tmp_path = self.tempDir() / 'project.qgs'
+        os.makedirs(tmp_path.parent, exist_ok=True)
+        self.assertTrue(proj.write(tmp_path.as_posix()))
+
+        self.assertTrue(tmp_path.is_file())
+
+        QgsProject.setInstance(proj)
+
         import enmapbox
         enmapbox.RAISE_ALL_EXCEPTIONS = True
+
+        def projectXml() -> str:
+            path = pathlib.Path(QgsProject.instance().fileName())
+            if path.is_file():
+                with open(path, 'r', encoding='utf8') as f:
+                    lines = f.read()
+                return lines
+            else:
+                return ''
 
         def dataSourceState(box: EnMAPBox):
             states = []
@@ -98,7 +119,6 @@ class TestEnMAPBoxSettings(EnMAPBoxTestCase):
 
         box = EnMAPBox(load_core_apps=False, load_other_apps=False)
 
-        tmpDir = self.createTestOutputDirectory('docktest')
         from enmapboxtestdata import library_berlin
         speclib = QgsVectorLayer(pathlib.Path(library_berlin).as_posix())
         box.loadExampleData()
@@ -115,35 +135,33 @@ class TestEnMAPBoxSettings(EnMAPBoxTestCase):
         self.assertEqual(dock3.name(), 'MySpeclib1')
         self.assertEqual(dock4.name(), 'MyText1')
 
-        proj = QgsProject.instance()
-        self.assertIsInstance(proj, QgsProject)
-        tmp_path = self.tempDir() / 'project.qgs'
-        os.makedirs(tmp_path.parent, exist_ok=True)
-        self.assertTrue(proj.write(tmp_path.as_posix()))
-
-        self.assertTrue(tmp_path.is_file())
-
         sources1 = dataSourceState(box)
         views1 = dataViewState(box)
         layerSources1 = sorted([l.source() for l in box.project().mapLayers().values()])
+        box.actionSaveProject().trigger()
 
+        self.assertTrue('<EnMAPBox>' in projectXml())
         box.close()
+        self.assertTrue('<EnMAPBox>' in projectXml())
         QgsProject.instance().removeAllMapLayers()
-
+        self.assertTrue('<EnMAPBox>' in projectXml())
         self.assertTrue(EnMAPBox.instance() is None)
         settings = enmapboxSettings()
 
         settings.setValue(EnMAPBoxSettings.STARTUP_LOAD_PROJECT, False)
         box = EnMAPBox(load_core_apps=False, load_other_apps=False)
+        self.assertTrue('<EnMAPBox>' in projectXml())
         self.assertEqual(len(box.dataSources()), 0)
         self.assertEqual(len(box.docks()), 0)
 
+        self.assertTrue('<EnMAPBox>' in projectXml())
         self.assertTrue(box.readProject(tmp_path))
+        self.assertTrue('<EnMAPBox>' in projectXml())
         sources2 = dataSourceState(box)
         views2 = dataViewState(box)
         layerSources2 = sorted([lyr.source() for lyr in box.project().mapLayers().values()])
         self.showGui(box.ui)
-
+        self.assertTrue('<EnMAPBox>' in projectXml())
         if len(sources2) == 0:
             info = ['Info EnMAP-Box DataSources']
             for ds in box.dataSources():
@@ -164,7 +182,7 @@ class TestEnMAPBoxSettings(EnMAPBoxTestCase):
 
         box.close()
         QgsProject.instance().removeAllMapLayers()
-
+        self.assertTrue('<EnMAPBox>' in projectXml())
         # load on startup
         settings.setValue(EnMAPBoxSettings.STARTUP_LOAD_PROJECT, True)
         box = EnMAPBox(load_core_apps=False, load_other_apps=False)
@@ -178,6 +196,10 @@ class TestEnMAPBoxSettings(EnMAPBoxTestCase):
         self.showGui(box.ui)
 
         QgsProject.instance().removeAllMapLayers()
+        self.assertTrue('<EnMAPBox>' in projectXml())
+
+        QgsProject.setInstance(proj_old)
+        self.assertFalse('<EnMAPBox>' in projectXml())
 
 
 if __name__ == '__main__':
