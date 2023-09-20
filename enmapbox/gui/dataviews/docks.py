@@ -130,6 +130,8 @@ class Dock(pgDock):
             self.widgetArea.setStyleSheet(self.hStyle)
         self.topLayout.update()
 
+        self.setName(name)
+
     def populateContextMenu(self, menu: QMenu) -> QMenu:
         """
         implement this to return a QMenu with context menu properties for this dock.
@@ -146,6 +148,12 @@ class Dock(pgDock):
         super(Dock, self).setVisible(b)
         if i != self.isVisible():
             self.sigVisibilityChanged.emit(self.isVisible())
+
+    def setName(self, name):
+        self.setTitle(name)
+
+    def name(self) -> str:
+        return self.title()
 
     def setTitle(self, title):
         """

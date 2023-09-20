@@ -105,9 +105,14 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
         dock1: Dock = box.docks(MapDock)[0]
         dock1.setTitle('MyMap1')
         dock2 = box.createMapDock(name='MyMap2', position='left')
-        dock3 = box.createSpectralLibraryDock(name='MySpeclib', speclib=speclib, position='bottom')
-        dock4 = box.createDock('TEXT', name='MyTextDock')
-        dock4.textDockWidget().setText('My Text')
+        dock3 = box.createSpectralLibraryDock(name='MySpeclib1', speclib=speclib, position='bottom')
+        dock4 = box.createDock('TEXT', name='MyText1')
+        dock4.textDockWidget().setText('My text content')
+
+        self.assertEqual(dock1.name(), 'MyMap1')
+        self.assertEqual(dock2.name(), 'MyMap2')
+        self.assertEqual(dock3.name(), 'MySpeclib1')
+        self.assertEqual(dock4.name(), 'MyText1')
 
         proj = QgsProject.instance()
         self.assertIsInstance(proj, QgsProject)

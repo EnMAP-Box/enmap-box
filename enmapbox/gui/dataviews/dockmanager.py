@@ -17,7 +17,7 @@
 ***************************************************************************
 """
 import os
- import pathlib
+import pathlib
 import re
 import time
 import typing
@@ -161,7 +161,7 @@ class DockTreeNode(LayerTreeNode):
     def __init__(self, dock: Dock):
         assert isinstance(dock, Dock)
         self.mDock = dock
-        super(DockTreeNode, self).__init__('<dockname not available>')
+        super(DockTreeNode, self).__init__(dock.title())
 
         self.mIcon = QIcon(':/enmapbox/gui/ui/icons/viewlist_dock.svg')
         self.mDock = dock
@@ -171,6 +171,13 @@ class DockTreeNode(LayerTreeNode):
 
     def dock(self) -> Dock:
         return self.mDock
+
+    def setName(self, n: str) -> None:
+        super().setName(n)
+        self.dock().setTitle(n)
+
+    def name(self) -> str:
+        return self.dock().name()
 
     def __repr__(self):
         return f'<{self.__class__.__name__} at {id(self)}>'
@@ -891,7 +898,8 @@ class DockManager(QObject):
 
         elif cls == SpectralLibraryDock:
             speclib = kwds.get('speclib')
-            if isinstance(speclib, QgsVectorLayer):
+
+            if 'name' not in kwds and isinstance(speclib, QgsVectorLayer):
                 kwds['name'] = speclib.name()
             dock = SpectralLibraryDock(*args, **kwds)
             dock.speclib().willBeDeleted.connect(lambda *args, d=dock: self.removeDock(d))
@@ -1499,7 +1507,7 @@ class DockManagerTreeModel(QgsLayerTreeModel):
                     node.mDock.setVisible(True)
                 result = True
             if role == Qt.EditRole and len(value) > 0:
-                node.mDock.setTitle(value)
+                node.dock().setTitle(value)
                 result = True
 
         if isinstance(node, CheckableLayerTreeNode) and role == Qt.CheckStateRole:
@@ -1568,12 +1576,9 @@ class DockTreeView(QgsLayerTreeView):
 
             while not n.isNull():
                 n = n.toElement()
-                DockTreeNode.constructFromXml(n, context, model)
+                node = DockTreeNode.constructFromXml(n, context, model)
+                # print(nodeXmlString(n))
                 n = n.nextSibling()
-
-            layerIds = model.mapLayerIds()
-            layerIds2 = list(model.dockManager().enmapBoxInstance().project().mapLayers().keys())
-            s = ""
 
         return True
 
