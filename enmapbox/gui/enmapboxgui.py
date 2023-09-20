@@ -398,7 +398,7 @@ class EnMAPBoxProject(QgsProject):
             self.mLayerRefs.remove(layer)
         return super().takeMapLayer(layer)
 
-    def debugPrint(self, msg: str = ''):
+    def debugInfo(self, msg: str = '') -> str:
 
         keysE = list(self.mapLayers().keys())
         if len(keysE) != len(self.mLayerRefs):
@@ -411,7 +411,10 @@ class EnMAPBoxProject(QgsProject):
         info = '\n'.join(['{:<8}\t{:<4}\t{}'.format(*row) for row in rows])
         if len(rows) == 1:
             info += '\t - no map layers -'
-        print(info, flush=True)
+        return info
+
+    def debugPrint(self, msg: str = ''):
+        print(self.debugInfo(msg), flush=True)
 
 
 class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcessingContextGenerator):

@@ -17,6 +17,7 @@
 """
 import os
 import pathlib
+import sys
 # noinspection PyPep8Naming
 import unittest
 
@@ -35,7 +36,7 @@ from enmapbox.testing import start_app
 start_app()
 
 
-class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
+class TestEnMAPBoxSettings(EnMAPBoxTestCase):
 
     def test_loadSettings(self):
         s1 = enmapboxSettings()
@@ -118,7 +119,7 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
         self.assertIsInstance(proj, QgsProject)
         tmp_path = self.tempDir() / 'project.qgs'
         os.makedirs(tmp_path.parent, exist_ok=True)
-        proj.write(tmp_path.as_posix())
+        self.assertTrue(proj.write(tmp_path.as_posix()))
 
         self.assertTrue(tmp_path.is_file())
 
@@ -142,6 +143,20 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
         views2 = dataViewState(box)
         layerSources2 = sorted([lyr.source() for lyr in box.project().mapLayers().values()])
         self.showGui(box.ui)
+
+        if len(sources2) == 0:
+            info = ['Info EnMAP-Box DataSources']
+            for ds in box.dataSources():
+                info.append(f'DS: {ds}')
+            info.append('Docks:')
+            for dock in box.docks():
+                info.append(f' {dock}')
+            info.append('EnMAPBox().project():')
+            info.append(box.project().debugInfo())
+            info.append('QgsProject.instance():')
+            for lyrID, lyr in QgsProject.instance().mapLayers():
+                info.append(f'\t{lyrID}:{lyr}')
+            print('\n'.join(info), file=sys.stderr)
 
         self.assertEqual(sources1, sources2)
         self.assertEqual(views1, views2)
