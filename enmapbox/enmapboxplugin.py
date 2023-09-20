@@ -221,7 +221,7 @@ class EnMAPBoxPlugin(object):
 
         # add items to be removed when unload the plugin
         self.pluginToolbarActions.append(self.profileAnalyticsApp.actionToggleDock)
-        self.dockWidgets.append(self.profileAnalyticsApp.mDock)
+        self.dockWidgets.append(self.profileAnalyticsApp.dock)
 
     def initLocationBrowserGui(self):
         from qgis.utils import iface
