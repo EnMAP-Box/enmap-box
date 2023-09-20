@@ -2095,8 +2095,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         return sources
 
     def createMapDock(self, *args,
-                      name='New Map',
-                      position='bottom',
+                      name: str = 'New Map',
+                      position: str = 'bottom',
                       relativeTo=None) -> MapDock:
         """
         Create a new map dock

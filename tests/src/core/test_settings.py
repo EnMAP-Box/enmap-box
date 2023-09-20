@@ -74,7 +74,7 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
 
         self.showGui(w)
 
-    def test_enmapbox_settings(self):
+    def test_enmapbox_project_settings(self):
 
         import enmapbox
         enmapbox.RAISE_ALL_EXCEPTIONS = True
@@ -137,7 +137,7 @@ class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
         self.assertEqual(len(box.dataSources()), 0)
         self.assertEqual(len(box.docks()), 0)
 
-        box.readProject(tmp_path)
+        self.assertTrue(box.readProject(tmp_path))
         sources2 = dataSourceState(box)
         views2 = dataViewState(box)
         layerSources2 = sorted([lyr.source() for lyr in box.project().mapLayers().values()])
