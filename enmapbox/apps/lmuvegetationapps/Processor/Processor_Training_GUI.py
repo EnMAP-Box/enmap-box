@@ -71,7 +71,7 @@ import warnings
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 warnings.filterwarnings('ignore', category=UserWarning)
 
-pathUI_train = os.path.join(APP_DIR, 'Resources/UserInterfaces/Processor_Train_SoilSpecTest.ui')
+pathUI_train = os.path.join(APP_DIR, 'Resources/UserInterfaces/Processor_Train.ui')
 pathUI_loadtxt = os.path.join(APP_DIR, 'Resources/UserInterfaces/LoadTxtFileInsitu.ui')
 pathUI_wavelength = os.path.join(APP_DIR, 'Resources/UserInterfaces/Select_Wavelengths.ui')
 pathUI_prgbar = os.path.join(APP_DIR, 'Resources/UserInterfaces/ProgressBar.ui')
@@ -517,7 +517,7 @@ class ML_Training:
             if self.speclib is not None:
                 self.speclib = None
             lib_input = QFileDialog.getOpenFileName(caption='Select Input Spectral Library',
-                                                    filter="ENVI Spectral Library Geopackage(*.gpkg)")[0]
+                                                    filter="Geopackage (*.gpkg)")[0]
             if not lib_input:
                 return
             self.addItemSpeclib.append(lib_input)
@@ -539,10 +539,12 @@ class ML_Training:
             self.speclib = lib_input
 
         all_specs = []
+        wl_values = []
         wl_extracted = False
         layer = QgsVectorLayer(self.speclib, "Soil spectra layer")  #<- works only for gpkg Geopackage
         #TODO: add option for spectral library .sli
-        features = list(layer.getFeatures())
+
+        # features = list(layer.getFeatures())
         # Loop through the features
         for feature in layer.getFeatures():
             # Assuming that the JSON string is in an attribute named 'json_data'
