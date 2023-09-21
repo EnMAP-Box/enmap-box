@@ -3,17 +3,16 @@ from os import listdir, makedirs, sep
 from os.path import join, isdir, dirname, exists, normpath
 from typing import Optional
 from xml.etree import ElementTree
+
 from osgeo import gdal
-from osgeo._osr import SpatialReference_SetPolyconic
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from enmapboxprocessing.algorithm.importenmapl2aalgorithm import ImportEnmapL2AAlgorithm
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
-from qgis._core import QgsPolygon, QgsPoint, QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform, \
-    QgsProject
-from qgis.core import QgsVectorLayer, QgsGeometry
+from qgis.core import QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform, \
+    QgsProject, QgsVectorLayer, QgsGeometry
 
 rootData = r'D:\data\EnFireMap\data'
 rootCube = r'D:\data\EnFireMap\cube'
@@ -116,8 +115,8 @@ def ingestData():
         if not exists(filename):
             gdal.BuildVRT(filename, filenames)
         reader = RasterReader(filename)
-        #extent = SpatialExtent(reader.crs(), reader.extent())
-        #extent2 = extent.toCrs(tilingScheme.crs())
+        # extent = SpatialExtent(reader.crs(), reader.extent())
+        # extent2 = extent.toCrs(tilingScheme.crs())
         boundingPolygon = QgsGeometry.unaryUnion(boundingPolygonsByDate[datestamp])
         sourceCrs = QgsCoordinateReferenceSystem(4326)
         destCrs = reader.crs()
