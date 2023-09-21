@@ -2,14 +2,17 @@ from collections import defaultdict
 from os import listdir, makedirs, sep
 from os.path import join, isdir, dirname, exists, normpath
 from typing import Optional
-
+from xml.etree import ElementTree
 from osgeo import gdal
+from osgeo._osr import SpatialReference_SetPolyconic
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from enmapboxprocessing.algorithm.importenmapl2aalgorithm import ImportEnmapL2AAlgorithm
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
+from qgis._core import QgsPolygon, QgsPoint, QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform, \
+    QgsProject
 from qgis.core import QgsVectorLayer, QgsGeometry
 
 rootData = r'D:\data\EnFireMap\data'
@@ -57,10 +60,25 @@ def ingestData():
 
     # build mosaic for each date and product
     filesByDateAndProduct = defaultdict(list)
+    boundingPolygonsByDate = defaultdict(list)
     for datestamp, scenes in scenesByDate.items():
         for scene in scenes:
             print('warp', scene, flush=True)
             xmlFilename = auxFindMetadataXml(join(rootData, scene))
+
+            # get bounding polygon
+            root = ElementTree.parse(xmlFilename).getroot()
+            points = dict()
+            for point in root.findall('base/spatialCoverage/boundingPolygon/point'):
+                key = point.find('frame').text
+                x = point.find('longitude').text
+                y = point.find('latitude').text
+                points[key] = QgsPointXY(float(x), float(y))
+            boundingPolygon = QgsGeometry.fromPolygonXY(
+                [[points[key] for key in ['upper_left', 'upper_right', 'lower_right', 'lower_left']]]
+            )
+            boundingPolygonsByDate[datestamp].append(boundingPolygon)
+
             for product in products:
                 productFilename = xmlFilename.replace('METADATA.XML', product)
                 tmp = normpath(productFilename).split(sep)
@@ -98,10 +116,19 @@ def ingestData():
         if not exists(filename):
             gdal.BuildVRT(filename, filenames)
         reader = RasterReader(filename)
-        extent = SpatialExtent(reader.crs(), reader.extent())
-        extent2 = extent.toCrs(tilingScheme.crs())
-        tilingScheme.selectByRect(extent2)
-        for feature in tilingScheme.selectedFeatures():
+        #extent = SpatialExtent(reader.crs(), reader.extent())
+        #extent2 = extent.toCrs(tilingScheme.crs())
+        boundingPolygon = QgsGeometry.unaryUnion(boundingPolygonsByDate[datestamp])
+        sourceCrs = QgsCoordinateReferenceSystem(4326)
+        destCrs = reader.crs()
+        tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
+        boundingPolygon.transform(tr)
+
+        # get bounding polygon from all individual scenes and build union -> removes the empty tiles!
+        tilingScheme.selectByRect(boundingPolygon.boundingBox())
+        for feature in tilingScheme.selectedFeatures():  # course selection via bounding box
+            if not feature.geometry().intersects(boundingPolygon):  # fine selection
+                continue
             tileName = str(feature.attribute(idField))
             print('cut', tileName, 'ENMAPL2A_' + datestamp + '_' + product, flush=True)
             filename2 = join(rootCube, tileName, 'ENMAPL2A_' + datestamp + '_' + product).replace('.vrt', '.TIF')
