@@ -4,13 +4,13 @@ from typing import Dict, Any, List, Tuple, Optional
 import numpy as np
 from osgeo import gdal
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.importprismal1algorithm import utilsReadAsArray, utilsDeleteCopy
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterwriter import RasterWriter
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRectangle,
                        QgsCoordinateReferenceSystem)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -60,8 +60,8 @@ class ImportPrismaL2DAlgorithm(EnMAPProcessingAlgorithm):
                          'The main data contained in the PRS_L2d_PCO Swath is the surface panchromatic reflectance '
                          'image (in instrument geometric reference).\n'
                          'Instead of executing this algorithm, '
-                         'you may drag&drop the HE5 file directly from your system file browser on '
-                         'the EnMAP-Box map view area.'),
+                         'you may drag&drop the HE5 file directly from your system file browser '
+                         'a) onto the EnMAP-Box map view area, or b) onto the Sensor Product Import panel.'),
             (self._SPECTRAL_REGION, 'Spectral region to be imported.'),
             (self._BAD_BAND_THRESHOLD, 'If the proportion of erroneous pixels in the VNIR/SWIR Pixel Error Matrix,'
                                        'exceeds the bad band threshold (a value between 0 and 1), '
@@ -256,6 +256,8 @@ class ImportPrismaL2DAlgorithm(EnMAPProcessingAlgorithm):
             writer.setWavelength(wl, bandNo)
             writer.setFwhm(fwhm[bandNo - 1], bandNo)
             writer.setScale(1. / 65535., bandNo)
+
+            print(f'{round(wl, 1)},{round(fwhm[bandNo - 1], 1)}')
 
         if badBandMultipliers is not None:
             for bandNo, badBandMultiplier in enumerate(badBandMultipliers, 1):

@@ -52,8 +52,8 @@ class ImportPrismaL2CAlgorithm(EnMAPProcessingAlgorithm):
                          'The main data contained in the PRS_L2C_PCO Swath is the surface panchromatic reflectance '
                          'image (in instrument geometric reference).\n'
                          'Instead of executing this algorithm, '
-                         'you may drag&drop the HE5 file directly from your system file browser on '
-                         'the EnMAP-Box map view area.'),
+                         'you may drag&drop the HE5 file directly from your system file browser '
+                         'a) onto the EnMAP-Box map view area, or b) onto the Sensor Product Import panel.'),
             (self._SPECTRAL_REGION, 'Spectral region to be imported.'),
             (self._OUTPUT_SPECTRAL_CUBE, 'VNIR/SWIR Cube GTiff raster file destination.'),
             (self._OUTPUT_PAN_CUBE, 'PAN VRT raster file destination.'),

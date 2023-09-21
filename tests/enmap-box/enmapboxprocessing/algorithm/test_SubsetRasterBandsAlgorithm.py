@@ -1,10 +1,11 @@
+from math import inf, nan
+
 import numpy as np
 
-from enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.subsetrasterbandsalgorithm import SubsetRasterBandsAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxtestdata import enmap, enmap_potsdam
 
 
 class TestSubsetRasterBandsAlgorithm(TestCase):
@@ -22,32 +23,28 @@ class TestSubsetRasterBandsAlgorithm(TestCase):
         self.assertEqual(gold[0].dtype, lead[0].dtype)
         self.assertEqual(np.sum(gold), np.sum(lead))
 
-    def _test_issue1349(self):
-        filename = self.filename('rasterWithBadBands.tif')
-        writer = Driver(filename).createFromArray(np.zeros((2, 10, 10)))
-        writer.setBandName('a', 1)
-        writer.setBandName('b', 2)
-        writer.setBadBandMultiplier(0, 1)
+    def test_excludeBadBands(self):
+        alg = SubsetRasterBandsAlgorithm()
+        parameters = {
+            alg.P_RASTER: enmap_potsdam,
+            alg.P_EXCLUDE_BAD_BANDS: True,
+            alg.P_OUTPUT_RASTER: self.filename('raster.vrt')
+        }
+        self.runalg(alg, parameters)
+        self.assertEqual(218, RasterReader(parameters[alg.P_OUTPUT_RASTER]).bandCount())
+
+    def test_excludeDerivedBadBands(self):
+        array = [[[1, 1, 1]], [[inf, nan, -99]]]
+
+        writer = self.rasterFromArray(array)
+        writer.setNoDataValue(-99)
         writer.close()
 
         alg = SubsetRasterBandsAlgorithm()
         parameters = {
-            alg.P_RASTER: filename,
-            alg.P_EXCLUDE_BAD_BANDS: True,
+            alg.P_RASTER: writer.source(),
+            alg.P_EXCLUDE_DERIVED_BAD_BANDS: True,
             alg.P_OUTPUT_RASTER: self.filename('raster.vrt')
         }
         self.runalg(alg, parameters)
-        reader = RasterReader(parameters[alg.P_OUTPUT_RASTER])
-        self.assertEqual(reader.bandCount(), 1)
-        self.assertEqual(reader.bandName(1), 'b')
-
-    def _test_issue1349_2(self):
-        alg = SubsetRasterBandsAlgorithm()
-        parameters = {
-            alg.P_RASTER: r'C:\Users\Andreas\Downloads\PRISMA_DESTRIPPED_AOI\PRISMA_DESTRIPPED_AOI.tif',
-            alg.P_EXCLUDE_BAD_BANDS: True,
-            alg.P_OUTPUT_RASTER: self.filename('raster.vrt')
-        }
-        self.runalg(alg, parameters)
-        reader = RasterReader(parameters[alg.P_OUTPUT_RASTER])
-        self.assertEqual(reader.bandCount(), 1)
+        self.assertEqual(3, np.sum(RasterReader(parameters[alg.P_OUTPUT_RASTER]).array()))

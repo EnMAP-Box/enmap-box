@@ -18,7 +18,7 @@ from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessing
 class SpectralResamplingByWavelengthAndFwhmAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Spectral raster layer'
     P_RESPONSE_FILE, _RESPONSE_FILE = 'responseFile', 'File with wavelength and FWHM'
-    P_SAVE_RESPONSE_FUNCTION, _SAVE_RESPONSE_FUNCTION = 'saveResponseFunction', 'Save spectral response function'
+    P_OUTPUT_LIBRARY, _OUTPUT_LIBRARY = 'outputResponseFunctionLibrary', 'Output spectral response function library'
     P_OUTPUT_RASTER, _OUTPUT_RASTER = 'outputResampledRaster', 'Output raster layer'
 
     def displayName(self) -> str:
@@ -26,8 +26,7 @@ class SpectralResamplingByWavelengthAndFwhmAlgorithm(EnMAPProcessingAlgorithm):
 
     def shortDescription(self) -> str:
         return 'Spectrally resample a spectral raster layer by applying spectral response function convolution, ' \
-               'with spectral response function derived from wavelength and FWHM information stored inside a ' \
-               'spectral raster layer.'
+               'with spectral response function derived from wavelength and FWHM information.'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
@@ -36,8 +35,7 @@ class SpectralResamplingByWavelengthAndFwhmAlgorithm(EnMAPProcessingAlgorithm):
              'A file with center wavelength and FWHM information defining the destination sensor. '
              'Possible inputs are i) raster files, ii) ENVI Spectral Library files, iii) ENVI Header files, '
              'and iv) CSV table files with wavelength and fwhm columns.'),
-            (self._SAVE_RESPONSE_FUNCTION,
-             'Whether to save the spectral response function library as *.srf.gpkg sidecar file.'),
+            (self._OUTPUT_LIBRARY, self.GeoJsonFileDestination),
             (self._OUTPUT_RASTER, self.RasterFileDestination)
         ]
 
@@ -47,7 +45,9 @@ class SpectralResamplingByWavelengthAndFwhmAlgorithm(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
         self.addParameterFile(self.P_RESPONSE_FILE, self._RESPONSE_FILE)
-        self.addParameterBoolean(self.P_SAVE_RESPONSE_FUNCTION, self._SAVE_RESPONSE_FUNCTION, False, True, True)
+        self.addParameterFileDestination(
+            self.P_OUTPUT_LIBRARY, self._OUTPUT_LIBRARY, self.GeoJsonFileFilter, None, True, True
+        )
         self.addParameterRasterDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 
     def processAlgorithm(
@@ -55,7 +55,7 @@ class SpectralResamplingByWavelengthAndFwhmAlgorithm(EnMAPProcessingAlgorithm):
     ) -> Dict[str, Any]:
         raster = self.parameterAsSpectralRasterLayer(parameters, self.P_RASTER, context)
         responseFile = self.parameterAsFile(parameters, self.P_RESPONSE_FILE, context)
-        saveResponseFunction = self.parameterAsBoolean(parameters, self.P_SAVE_RESPONSE_FUNCTION, context)
+        filenameSrf = self.parameterAsFileOutput(parameters, self.P_OUTPUT_LIBRARY, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_RASTER, context)
 
         with open(filename + '.log', 'w') as logfile:
@@ -108,12 +108,15 @@ class SpectralResamplingByWavelengthAndFwhmAlgorithm(EnMAPProcessingAlgorithm):
             parameters = {
                 alg.P_RASTER: raster,
                 alg.P_CODE: code,
-                alg.P_SAVE_RESPONSE_FUNCTION: saveResponseFunction,
+                alg.P_OUTPUT_LIBRARY: filenameSrf,
                 alg.P_OUTPUT_RASTER: filename
             }
             self.runAlg(alg, parameters, None, feedback2, context, True)
 
-            result = {self.P_OUTPUT_RASTER: filename}
+            result = {
+                self.P_OUTPUT_LIBRARY: filenameSrf,
+                self.P_OUTPUT_RASTER: filename
+            }
             self.toc(feedback, result)
 
         return result
