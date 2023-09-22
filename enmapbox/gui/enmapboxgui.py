@@ -936,6 +936,13 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             if item.providerKey() in ['memory'] or 'vsimem' in item.path():
                 in_memory.append(item)
 
+        if len(in_memory) > 0:
+            info = ['In-memory datasets cannot be saved in project files:']
+            for lyr in in_memory:
+                info.append(f'\n{lyr.name()}: {lyr.path()}')
+
+            self.showMessage('\n'.join(info))
+
         self.dataSourceManagerTreeView().writeXml(node, context)
 
         # save data views

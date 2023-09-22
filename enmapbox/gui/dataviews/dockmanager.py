@@ -16,6 +16,7 @@
 *                                                                         *
 ***************************************************************************
 """
+import json
 import os
 import pathlib
 import re
@@ -205,6 +206,8 @@ class DockTreeNode(LayerTreeNode):
         # create the data view dock
         dockNodeType = n.attribute('type')
         dockNodeName = n.attribute('name')
+        iDockArea = int(n.attribute('dockArea', '0'))
+
         isVisible = n.attribute('isVisible', 'true').lower() in ['1', 'true']
         isExpanded = n.attribute('isExpanded', 'true').lower() in ['1', 'true']
         if dockNodeType in DockTreeNode.Constructors:
@@ -216,7 +219,7 @@ class DockTreeNode(LayerTreeNode):
             return newDockNode
         return None
 
-    def writeXml(self, parent: QDomElement, context: QgsReadWriteContext):
+    def writeXml(self, parent: QDomElement, context: QgsReadWriteContext) -> QDomElement:
         doc: QDomDocument = parent.ownerDocument()
         node: QDomElement = doc.createElement('DataView')
         node.setAttribute('type', self.__class__.__name__)
@@ -277,7 +280,7 @@ class TextDockTreeNode(DockTreeNode):
             text = nodeC.firstChildElement('text').firstChild().nodeValue()
             self.textDockWidget().setText(text)
 
-    def writeXml(self, parent: QDomElement, context: QgsReadWriteContext):
+    def writeXml(self, parent: QDomElement, context: QgsReadWriteContext) -> QDomElement:
         doc: QDomDocument = parent.ownerDocument()
         node: QDomElement = super().writeXml(parent, context)
 
@@ -293,6 +296,8 @@ class TextDockTreeNode(DockTreeNode):
             nodeText: QDomElement = doc.createElement('text')
             nodeText.appendChild(doc.createTextNode(self.textDockWidget().text()))
             nodeC.appendChild(nodeText)
+
+        return node
 
     def setLinkedFile(self, path: str):
         self.fileNode.setName(f'File: {path}')
@@ -381,7 +386,7 @@ class SpeclibDockTreeNode(DockTreeNode):
         if not slwNode.isNull():
             s = ""
 
-    def writeXml(self, parent: QDomElement, context: QgsReadWriteContext):
+    def writeXml(self, parent: QDomElement, context: QgsReadWriteContext) -> QDomElement:
         doc: QDomDocument = parent.ownerDocument()
         node: QDomElement = super().writeXml(parent, context)
 
@@ -398,6 +403,8 @@ class SpeclibDockTreeNode(DockTreeNode):
         node.appendChild(slwNode)
 
         # todo: save visualization settings
+
+        return node
 
     def updateNodes(self):
 
@@ -464,15 +471,21 @@ class MapDockTreeNode(DockTreeNode):
         self.sigAddedLayers.connect(dock.sigLayersAdded.emit)
         self.sigRemovedLayers.connect(dock.sigLayersRemoved.emit)
 
-    def writeXml(self, parent: QDomElement, context: QgsReadWriteContext):
+    def writeXml(self, parent: QDomElement, context: QgsReadWriteContext) -> QDomElement:
         doc: QDomDocument = parent.ownerDocument()
         node: QDomElement = super().writeXml(parent, context)
 
-        layerNode = doc.createElement('maplayers')
+        # save map canvas settings
+        canvasNode = doc.createElement('MapCanvas')
+        node.appendChild(canvasNode)
+        self.mapCanvas().mapSettings().writeXml(canvasNode, doc)
+
+        # save layertree layers
+        layerNode = doc.createElement('MapLayers')
         node.appendChild(layerNode)
         # use the standard QgsLayerTree writeXml
         super(QgsLayerTree, self).writeXml(layerNode, context)
-        s = ""
+        return node
 
     @staticmethod
     def fromXml(n: QDomElement,
@@ -488,6 +501,10 @@ class MapDockTreeNode(DockTreeNode):
         node.readXml(n, context)
         node.resolveReferences(manager.enmapBoxInstance().project(), looseMatching=True)
 
+        # 3. trigger refresh
+        node.mTreeCanvasBridge.setCanvasLayers()
+        node.mapCanvas().refreshAllLayers()
+
         return node
 
     def readXml(self, parent: QDomElement, context: QgsReadWriteContext):
@@ -495,15 +512,17 @@ class MapDockTreeNode(DockTreeNode):
         Sets the map dock content from XML
         """
         assert parent.tagName() == 'DataView'
-        layerNode = parent.firstChildElement('maplayers').toElement()
+
+        canvasNode = parent.firstChildElement('MapCanvas').toElement()
+        if not canvasNode.isNull():
+            self.mapCanvas().mapSettings().readXml(canvasNode)
+
+        layerNode = parent.firstChildElement('MapLayers').toElement()
         if not layerNode.isNull():
             self.removeAllChildren()
             n = layerNode.firstChild().toElement()
             self.readCommonXml(n)
             self.readChildrenFromXml(n, context)
-
-        self.mTreeCanvasBridge.setCanvasLayers()
-        # todo: set CRS etc.
 
     def onAddedChildren(self, node, idxFrom, idxTo):
         layers: List[QgsMapLayer] = self.mLayers[:]
@@ -790,6 +809,9 @@ class DockManager(QObject):
         Iterator over all Docks.
         """
         return iter(self.mDocks)
+
+    def dockAreas(self) -> List[DockArea]:
+        return self.mConnectedDockAreas[:]
 
     def docks(self, dockType=None) -> List[Dock]:
         """
@@ -1561,40 +1583,93 @@ class DockTreeView(QgsLayerTreeView):
 
     def readXml(self, parent: QDomElement, context: QgsReadWriteContext):
 
-        nodeDataViews: QDomElement = parent.firstChildElement(self.__class__.__name__)
-        if nodeDataViews.isNull():
+        nDataViews: QDomElement = parent.firstChildElement('DataViews')
+        if nDataViews.isNull():
             return False
 
         model = self.model().sourceModel()
+        if not isinstance(model, DockManagerTreeModel):
+            return False
 
-        if isinstance(model, DockManagerTreeModel):
-            # clearn all existing docks
-            model.removeNodes(model.dockTreeNodes())
+        manager: DockManager = model.dockManager()
+        if not isinstance(manager, DockManager):
+            return False
 
-            # load dock nodes from XML
-            n: QDomElement = nodeDataViews.firstChildElement('DataView')
+        nDockAreas: QDomElement = nDataViews.firstChildElement('DockAreas')
+        nDockTreeView: QDomElement = nDataViews.firstChildElement('DockTreeView')
 
-            while not n.isNull():
-                n = n.toElement()
-                node = DockTreeNode.constructFromXml(n, context, model)
-                # print(nodeXmlString(n))
-                n = n.nextSibling()
+        # remove existing docks
+        model.removeNodes(model.dockTreeNodes())
+
+        # load dock nodes from XML and restore Docks
+        n: QDomElement = nDockTreeView.firstChildElement('DataView')
+        while not n.isNull():
+            n = n.toElement()
+            node = DockTreeNode.constructFromXml(n, context, model)
+
+            n = n.nextSibling()
+
+        # restore DockArea states
+        n: QDomElement = nDockAreas.firstChildElement('DockArea')
+        i = -1
+
+        while not n.isNull():
+            i += 1
+            n = n.toElement()
+            state = n.childNodes().item(0).toCDATASection().data()
+            state = json.loads(state)
+            if i >= len(manager.dockAreas()):
+                break
+
+            dockArea: DockArea = manager.dockAreas()[i]
+            dockArea.restoreState(state, missing='ignore')
+
+            n = n.nextSibling()
 
         return True
 
     def writeXml(self, parent: QDomElement, context: QgsReadWriteContext):
         doc: QDomDocument = parent.ownerDocument()
-        nodeDataViews: QDomElement = doc.createElement(self.__class__.__name__)
-
-        parent.appendChild(nodeDataViews)
 
         model = self.model().sourceModel()
-        if isinstance(model, DockManagerTreeModel):
-            for dn in model.dockTreeNodes():
-                dn: DockTreeNode
-                dn.writeXml(nodeDataViews, context)
+        if not isinstance(model, DockManagerTreeModel):
+            return None
+        manager: DockManager = model.dockManager()
+        if not isinstance(manager, DockManager):
+            return None
 
-        s = ""
+        nDataViews: QDomElement = doc.createElement('DataViews')
+        parent.appendChild(nDataViews)
+
+        # save state of DockAreas (there may be multiple)
+        nDockAreas: QDomElement = doc.createElement('DockAreas')
+        nDockTreeView: QDomElement = doc.createElement('DockTreeView')
+
+        nDataViews.appendChild(nDockAreas)
+        nDataViews.appendChild(nDockTreeView)
+
+        for dockArea in manager.dockAreas():
+            nDockArea: QDomElement = doc.createElement('DockArea')
+            nDockArea.setAttribute('nDocks', len(dockArea.docks))
+            state = dockArea.saveState()
+            nState = doc.createCDATASection(json.dumps(state))
+            nDockArea.appendChild(nState)
+            nDockAreas.appendChild(nDockArea)
+
+        # print(nodeXmlString(nDataViews))
+
+        model = self.model().sourceModel()
+        for dn in model.dockTreeNodes():
+            dn: DockTreeNode
+            nDockNode = dn.writeXml(nDockTreeView, context)
+            assert isinstance(nDockNode, QDomElement)
+            dock: Dock = dn.dock()
+            for i, dockArea in enumerate(manager.dockAreas()):
+                if dock in dockArea.docks.values():
+                    nDockNode.setAttribute('dockArea', i)
+                    break
+
+            s = ""
 
     def findParentMapDockTreeNode(self, node: QgsLayerTreeNode) -> MapDockTreeNode:
         while isinstance(node, QgsLayerTreeNode) and not isinstance(node, MapDockTreeNode):
