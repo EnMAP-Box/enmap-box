@@ -127,8 +127,10 @@ class TestEnMAPBoxSettings(EnMAPBoxTestCase):
         dock1.setTitle('MyMap1')
         dock2 = box.createMapDock(name='MyMap2', position='left')
         dock3 = box.createSpectralLibraryDock(name='MySpeclib1', speclib=speclib, position='bottom')
-        dock4 = box.createDock('TEXT', name='MyText1')
+        dock4 = box.createDock('TEXT', name='MyText1', position='top')
         dock4.textDockWidget().setText('My text content')
+
+        # self.showGui(box.ui)
 
         self.assertEqual(dock1.name(), 'MyMap1')
         self.assertEqual(dock2.name(), 'MyMap2')
