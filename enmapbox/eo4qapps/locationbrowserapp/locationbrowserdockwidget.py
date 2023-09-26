@@ -126,11 +126,16 @@ class LocationBrowserDockWidget(QgsDockWidget):
         text = self.mSearch.value()
 
         # for details see https://nominatim.org/release-docs/latest/api/Search/
-        url = 'https://nominatim.openstreetmap.org/search/' \
+        # find first result
+        url = 'https://nominatim.openstreetmap.org/search?q=' \
               f'{urllib.parse.quote(text)}' \
-              '?limit=50&extratags=1&polygon_geojson=1&format=json'
-
+              '&limit=50&extratags=1&polygon_geojson=1&format=json'
         nominatimResults = requests.get(url).json()
+        # find additional results
+        if len(nominatimResults) == 1:
+            url += f'&exclude_place_ids={nominatimResults[0]["place_id"]}'
+            nominatimResults.extend(requests.get(url).json())
+
         self.mResult.mList.clear()
         item = QListWidgetItem('')
         item.json = None
@@ -141,6 +146,7 @@ class LocationBrowserDockWidget(QgsDockWidget):
             self.mResult.mList.addItem(item)
 
         self.mResult.show()
+        self.mResult.mList.setCurrentRow(1)
 
     def onZoomToSelectionClicked(self):
         item = self.mResult.mList.currentItem()

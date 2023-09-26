@@ -4,6 +4,7 @@ from typing import Dict, Any, List, Tuple
 import numpy as np
 from osgeo import gdal
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.writeenviheaderalgorithm import WriteEnviHeaderAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
@@ -11,7 +12,6 @@ from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRectangle, QgsRasterLayer,
                        QgsRasterDataProvider, QgsPoint, QgsPointXY, QgsMapLayer)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -26,6 +26,8 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
     P_COPY_METADATA, _COPY_METADATA = 'copyMetadata', 'Copy metadata'
     P_COPY_STYLE, _COPY_STYLE = 'copyStyle', 'Copy style'
     P_EXCLUDE_BAD_BANDS, _EXCLUDE_BAD_BANDS = 'excludeBadBands', 'Exclude bad bands'
+    P_EXCLUDE_DERIVED_BAD_BANDS, _EXCLUDE_DERIVED_BAD_BANDS = \
+        'excludeDerivedBadBands', 'Derive and exclude additional bad bands'
     P_WRITE_ENVI_HEADER, _WRITE_ENVI_HEADER = 'writeEnviHeader', 'Write ENVI header'
     P_EXTENT, _EXTENT = 'extent', 'Spatial extent'
     P_SOURCE_COLUMNS, _SOURCE_COLUMNS = 'sourceColumns', 'Column subset'
@@ -58,7 +60,9 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
             (self._COPY_STYLE, 'Whether to copy style from source to destination.'),
             (self._EXCLUDE_BAD_BANDS, 'Whether to exclude bad bands (given by BBL metadata item inside ENVI domain). '
                                       'Also see The ENVI Header Format for more details: '
-                                      'https://www.l3harrisgeospatial.com/docs/ENVIHeaderFiles.html '),
+                                      'https://www.l3harrisgeospatial.com/docs/ENVIHeaderFiles.html'),
+            (self._EXCLUDE_DERIVED_BAD_BANDS,
+             'Whether to derive and exclude additional bad bands fully filled with inf, nan or no data values.'),
             (self._WRITE_ENVI_HEADER, 'Whether to write an ENVI header *.hdr sidecar file with '
                                       'spectral metadata required for proper visualization in ENVI software.'),
             (self._CREATION_PROFILE, 'Output format and creation options. '
@@ -125,27 +129,28 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterBandList(
             self.P_BAND_LIST, self._BAND_LIST, parentLayerParameterName=self.P_RASTER, optional=True
         )
-        self.addParameterRasterLayer(self.P_GRID, self._GRID, optional=True)
-        self.addParameterBoolean(self.P_COPY_METADATA, self._COPY_METADATA, defaultValue=True)
-        self.addParameterBoolean(self.P_COPY_STYLE, self._COPY_STYLE, defaultValue=False)
-        self.addParameterBoolean(self.P_EXCLUDE_BAD_BANDS, self._EXCLUDE_BAD_BANDS, defaultValue=False)
-        self.addParameterBoolean(self.P_WRITE_ENVI_HEADER, self._WRITE_ENVI_HEADER, defaultValue=True)
+        self.addParameterRasterLayer(self.P_GRID, self._GRID, None, True)
+        self.addParameterBoolean(self.P_COPY_METADATA, self._COPY_METADATA, True)
+        self.addParameterBoolean(self.P_COPY_STYLE, self._COPY_STYLE, False)
+        self.addParameterBoolean(self.P_EXCLUDE_BAD_BANDS, self._EXCLUDE_BAD_BANDS, False)
+        self.addParameterBoolean(self.P_EXCLUDE_DERIVED_BAD_BANDS, self._EXCLUDE_DERIVED_BAD_BANDS, False)
+        self.addParameterBoolean(self.P_WRITE_ENVI_HEADER, self._WRITE_ENVI_HEADER, True)
         self.addParameterRasterLayer(self.P_SPECTRAL_RASTER, self._SPECTRAL_RASTER, None, True, True)
         self.addParameterBandList(
             self.P_SPECTRAL_BAND_LIST, self._SPECTRAL_BAND_LIST, None, self.P_SPECTRAL_RASTER, True, True
         )
         self.addParameterFloat(self.P_OFFSET, self._OFFSET, None, True, None, None, True)
         self.addParameterFloat(self.P_SCALE, self._SCALE, None, True, None, None, True)
-        self.addParameterExtent(self.P_EXTENT, self._EXTENT, optional=True, advanced=True)
-        self.addParameterIntRange(self.P_SOURCE_COLUMNS, self._SOURCE_COLUMNS, optional=True, advanced=True)
-        self.addParameterIntRange(self.P_SOURCE_ROWS, self._SOURCE_ROWS, optional=True, advanced=True)
-        self.addParameterResampleAlg(self.P_RESAMPLE_ALG, self._RESAMPLE_ALG, advanced=True)
+        self.addParameterExtent(self.P_EXTENT, self._EXTENT, None, True, True)
+        self.addParameterIntRange(self.P_SOURCE_COLUMNS, self._SOURCE_COLUMNS, None, True, True)
+        self.addParameterIntRange(self.P_SOURCE_ROWS, self._SOURCE_ROWS, None, True, True)
+        self.addParameterResampleAlg(self.P_RESAMPLE_ALG, self._RESAMPLE_ALG, 0, False, True)
         self.addParameterFloat(self.P_SOURCE_NODATA, self._SOURCE_NODATA, None, True, None, None, True)
         self.addParameterFloat(self.P_NODATA, self._NODATA, None, True, None, None, True)
         self.addParameterBoolean(self.P_UNSET_SOURCE_NODATA, self._UNSET_SOURCE_NODATA, False, False, True)
         self.addParameterBoolean(self.P_UNSET_NODATA, self._UNSET_NODATA, False, False, True)
         self.addParameterDataType(self.P_WORKING_DATA_TYPE, self._WORKING_DATA_TYPE, None, True, True)
-        self.addParameterDataType(self.P_DATA_TYPE, self._DATA_TYPE, optional=True, advanced=True)
+        self.addParameterDataType(self.P_DATA_TYPE, self._DATA_TYPE, None, True, True)
         self.addParameterCreationProfile(self.P_CREATION_PROFILE, self._CREATION_PROFILE, '', True, False)
         self.addParameterRasterDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER, allowEnvi=True, allowVrt=True)
 
@@ -172,6 +177,7 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
         if extent.isEmpty():
             extent = grid.extent()
         excludeBadBands = self.parameterAsBoolean(parameters, self.P_EXCLUDE_BAD_BANDS, context)
+        excludeDerivedBadBands = self.parameterAsBoolean(parameters, self.P_EXCLUDE_DERIVED_BAD_BANDS, context)
         resampleAlg = self.parameterAsGdalResampleAlg(parameters, self.P_RESAMPLE_ALG, context)
         srcNoDataValue = self.parameterAsFloat(parameters, self.P_SOURCE_NODATA, context)
         dstNoDataValue = self.parameterAsFloat(parameters, self.P_NODATA, context)
@@ -195,14 +201,27 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
             reader = RasterReader(raster)
             gdalDataType = Utils.qgisDataTypeToGdalDataType(dataType)
 
-            # bad bands subset
-            if excludeBadBands:
+            # exclude bad bands
+            if excludeBadBands or excludeDerivedBadBands:
+
+                def isBadBand(bandNo: int) -> bool:
+                    if excludeBadBands:
+                        if reader.badBandMultiplier(bandNo) == 0:
+                            return True
+                    if excludeDerivedBadBands:
+                        array = reader.array(bandList=[bandNo])
+                        marray = reader.maskArray(
+                            array, bandList=[bandNo],
+                            maskNotFinite=excludeDerivedBadBands,
+                        )
+                        if not np.any(marray):
+                            return True
+                    return False
+
                 if bandList is None:
-                    bandList = [bandNo for bandNo in range(1, reader.bandCount() + 1)
-                                if reader.badBandMultiplier(bandNo) == 1]
-                else:
-                    bandList = [bandNo for bandNo in bandList
-                                if reader.badBandMultiplier(bandNo) == 1]
+                    bandList = list(reader.bandNumbers())
+
+                bandList = [bandNo for bandNo in bandList if not isBadBand(bandNo)]
 
             # spectral subset
             if spectralRaster is not None:
