@@ -305,7 +305,10 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                 w: QgsMapLayerComboBox = self.mRasterTable.cellWidget(row, 0)
                 layer: QgsRasterLayer = w.currentLayer()
                 if layer is None:
-                    layer = self.enmapBoxInterface().currentLayer()
+                    if self.interfaceType == self.EnmapBoxInterface:
+                        layer = self.enmapBoxInterface().currentLayer()
+                    elif self.interfaceType == self.QgisInterface:
+                        layer = self.qgisInterface().activeLayer()
                     if not isinstance(layer, QgsRasterLayer):
                         return
                     w.setLayer(layer)
