@@ -2,7 +2,7 @@ from typing import List, Tuple, Dict
 
 from qgis.PyQt.QtCore import QSize
 
-from deploy.enmapboxplugin.enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import prepareProfileValueDict
+from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import prepareProfileValueDict
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprofilesources import SpectralProfileSource
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
