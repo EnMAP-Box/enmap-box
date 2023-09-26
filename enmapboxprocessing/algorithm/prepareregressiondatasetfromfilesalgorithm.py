@@ -24,10 +24,19 @@ class PrepareRegressionDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
             "https://force-eo.readthedocs.io/en/latest/components/higher-level/smp/index.html",
             "FORCE Higher Level Sampling Submodule"
         )
+        link2 = self.htmlLink(
+            "https://github.com/EnMAP-Box/enmap-box/blob/main/tests/testdata/ml/classification_dataset_force_features.csv",
+            "classification_dataset_force_features.csv"
+        )
+        link3 = self.htmlLink(
+            "https://github.com/EnMAP-Box/enmap-box/blob/main/tests/testdata/ml/classification_dataset_force_labels.csv",
+            "classification_dataset_force_labels.csv"
+        )
+
         return 'Create a regression dataset from tabulated text files ' \
                'and store the result as a pickle file. \n' \
                f'The format matches that of the {link}.\n' \
-               f'Example files (force_features.csv and force_labels.csv) can be found in the EnMAP-Box testdata folder).'
+               f'Example files ({link2} and {link3}) can be found in the EnMAP-Box testdata folder).'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [

@@ -84,11 +84,10 @@ class FitRegressorAlgorithmBase(EnMAPProcessingAlgorithm):
                     f'Load training dataset: X=array{list(dump.X.shape)} y=array{list(dump.y.shape)} '
                     f'targets={[c.name for c in dump.targets]}')
                 feedback.pushInfo('Fit regressor')
-                try:
-                    regressor.fit(dump.X, dump.y)
-                except ValueError:
+                if dump.y.shape[1] == 1:
                     regressor.fit(dump.X, dump.y.ravel())
-
+                else:
+                    regressor.fit(dump.X, dump.y)
             else:
                 feedback.pushInfo('Store unfitted classifier')
                 dump = RegressorDump(None, None, None, None, regressor)

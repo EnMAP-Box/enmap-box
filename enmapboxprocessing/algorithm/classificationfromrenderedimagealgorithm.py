@@ -61,7 +61,7 @@ class ClassificationFromRenderedImageAlgorithm(EnMAPProcessingAlgorithm):
                     array[array == v] = 0
                     continue
                 name = color = QColor(r, g, b).name()
-                categories.append(Category(v, name, color))
+                categories.append(Category(int(v), name, color))
 
             writer = Driver(filename).createFromArray([array], raster.extent(), raster.crs())
             writer.setNoDataValue(0)

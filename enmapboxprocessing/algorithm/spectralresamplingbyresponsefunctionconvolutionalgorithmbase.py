@@ -213,11 +213,7 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
                     tmparr[invalid] = np.nan
                     warr[invalid] = np.nan
                 outarr = np.nansum(tmparray * warray, 0) / np.nansum(warray, 0)
-                if np.nanmin(outarr) < -3000:
-                    a = 1
                 outarr[np.isnan(outarr)] = noDataValue
                 outarray.append(outarr)
-
-                # outarray.append(np.average([array[i] for i in indices], 0, weights))
 
         return outarray

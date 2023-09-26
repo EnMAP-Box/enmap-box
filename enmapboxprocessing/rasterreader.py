@@ -213,7 +213,7 @@ class RasterReader(object):
             height = height + 2 * overlap
         arrays = list()
         for bandNo in bandList:
-            assert 0 < bandNo <= self.bandCount()
+            assert 0 < bandNo <= self.bandCount(), f'bandNo is {bandNo}'
             block: QgsRasterBlock = self.provider.block(bandNo, boundingBox, width, height, feedback)
             array = Utils.qgsRasterBlockToNumpyArray(block=block)
             arrays.append(array)
