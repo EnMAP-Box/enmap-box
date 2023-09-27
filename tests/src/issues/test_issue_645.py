@@ -17,7 +17,6 @@ from qgis.core import QgsVectorLayer
 from enmapboxtestdata import library_berlin
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprocessingdialog import SpectralProcessingModelCreatorAlgorithmWrapper
 
-
 class Issue645Tests(TestCase):
 
     def test_issue_646(self):
@@ -45,6 +44,7 @@ class Issue645Tests(TestCase):
         initAll()
         base = TestBase()
         a = 'enmapbox:TranslateRasterLayer'
+        # a = 'enmapbox:SpectralResamplingToWavelength'
         # a = 'gdal:translate'
         reg: QgsProcessingRegistry = QgsApplication.instance().processingRegistry()
         alg: QgsProcessingAlgorithm = reg.algorithmById(a)
