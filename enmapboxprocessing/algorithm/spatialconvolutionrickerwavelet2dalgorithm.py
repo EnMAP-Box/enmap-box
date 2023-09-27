@@ -19,6 +19,9 @@ class SpatialConvolutionRickerWavelet2DAlgorithm(ConvolutionFilterAlgorithmBase)
                              'RickerWavelet2DKernel')
         return f'Python code. See {link} for information on different parameters.'
 
+    def interpolateByDefault(self) -> bool:
+        return False
+
     def code(cls):
         from astropy.convolution import RickerWavelet2DKernel
         kernel = RickerWavelet2DKernel(width=1)

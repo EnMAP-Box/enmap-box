@@ -30,8 +30,8 @@ class ImportEmitL2AAlgorithm(EnMAPProcessingAlgorithm):
         return [
             (self._FILE, 'The EMIT L2A RFL NetCDF product file.\n'
                          'Instead of executing this algorithm, '
-                         'you may drag&drop the NetCDF file directly from your system file browser onto '
-                         'the EnMAP-Box map view area.'),
+                         'you may drag&drop the NetCDF file directly from your system file browser '
+                         'a) onto the EnMAP-Box map view area, or b) onto the Sensor Product Import panel.'),
             (self._SKIP_BAD_BANDS, 'Whether to exclude bad bands.'),
             (self._OUTPUT_RASTER, self.RasterFileDestination)
         ]

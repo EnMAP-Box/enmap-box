@@ -309,6 +309,30 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
                 if key == splitext(basename(filename))[0]:  # if identifier matches the output basename, ...
                     key = self.P_OUTPUT_RASTER  # ... map the result to the name of the output
                 result[key] = writer.source()
+
+            # in case we don't have the default output raster defined, we use the first output as default
+            if result[self.P_OUTPUT_RASTER] is None:
+                for writer in list(writers.values()):
+                    firstResult = writer.source()
+                    writer.close()
+                    del writer
+                    del writers
+                    feedback.pushWarning(
+                        f'Default output raster ({self.P_OUTPUT_RASTER} variable) not specified. '
+                        f'First variable found ({splitext(basename(firstResult))[0]}) is used instead.'
+                    )
+                    alg = TranslateRasterAlgorithm()
+                    alg.initAlgorithm()
+                    parameters = {
+                        alg.P_RASTER: firstResult,
+                        alg.P_COPY_METADATA: True,
+                        alg.P_COPY_STYLE: True,
+                        alg.P_OUTPUT_RASTER: filename
+                    }
+                    alg.runAlg(alg, parameters)
+                    result[self.P_OUTPUT_RASTER] = firstResult
+                    break
+
             self.toc(feedback, result)
 
         return result

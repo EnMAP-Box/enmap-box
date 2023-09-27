@@ -47,11 +47,17 @@ class ConvolutionFilterAlgorithmBase(EnMAPProcessingAlgorithm):
     def group(self):
         return Group.ConvolutionMorphologyAndFiltering.value
 
+    def normalizeByDefault(self) -> bool:
+        return False
+
+    def interpolateByDefault(self) -> bool:
+        return True
+
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
         self.addParameterCode(self.P_KERNEL, self._KERNEL, self.defaultCodeAsString())
-        self.addParameterBoolean(self.P_NORMALIZE, self._NORMALIZE, False, False, True)
-        self.addParameterBoolean(self.P_INTERPOLATE, self._INTERPOLATE, True, False, True)
+        self.addParameterBoolean(self.P_NORMALIZE, self._NORMALIZE, self.normalizeByDefault(), False, True)
+        self.addParameterBoolean(self.P_INTERPOLATE, self._INTERPOLATE, self.interpolateByDefault(), False, True)
         self.addParameterRasterDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 
     def defaultCodeAsString(self):
