@@ -24,10 +24,10 @@ class TestSpectralResamplingByWavelengthAlgorithm(TestCase):
         parameters = {
             alg.P_RASTER: enmap,
             alg.P_WAVELENGTH_FILE: enmap_potsdam,
-            alg.P_OUTPUT_RASTER: self.filename('resampled2.tif')
+            alg.P_OUTPUT_RASTER: self.filename('resampled.tif')
         }
         result = self.runalg(alg, parameters)
-        self.assertEqual(29424494, np.round(np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array()[0])))
+        self.assertEqual(29478653, np.round(np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array()[0])))
 
     def test_fromEnviSpeclib(self):
         alg = SpectralResamplingByWavelengthAlgorithm()
