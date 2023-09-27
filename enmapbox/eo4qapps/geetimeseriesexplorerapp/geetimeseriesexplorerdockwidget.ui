@@ -240,7 +240,7 @@ QListWidget::item::selected {
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="page">
          <layout class="QVBoxLayout" name="verticalLayout_12" stretch="0">
@@ -1075,8 +1075,8 @@ Surface Reflectance</string>
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>422</width>
-                   <height>843</height>
+                   <width>597</width>
+                   <height>860</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_4">
@@ -1723,8 +1723,8 @@ Terra Surface Reflectance
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>422</width>
-                   <height>396</height>
+                   <width>597</width>
+                   <height>860</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_3">
@@ -2142,8 +2142,8 @@ Full Resolution</string>
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>211</width>
-                   <height>265</height>
+                   <width>597</width>
+                   <height>860</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_5">
@@ -2339,6 +2339,30 @@ Hyperspectral Imager</string>
                  </property>
                 </column>
                </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_7">
+                <item>
+                 <spacer name="horizontalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="mOpenUserCollectionFolder">
+                  <property name="text">
+                   <string>Open Custom Collections Folder </string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
              </layout>
             </widget>
@@ -4766,7 +4790,7 @@ count cut</string>
          <string/>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="../../../../../QGIS3-master/images/images.qrc">
           <normaloff>:/images/themes/default/mIconTemporalRaster.svg</normaloff>:/images/themes/default/mIconTemporalRaster.svg</iconset>
         </property>
         <property name="iconSize">
