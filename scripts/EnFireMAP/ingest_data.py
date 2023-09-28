@@ -1,6 +1,7 @@
+import shutil
 from collections import defaultdict
 from os import listdir, makedirs, sep
-from os.path import join, isdir, dirname, exists, normpath
+from os.path import join, isdir, dirname, exists, normpath, basename
 from typing import Optional
 from xml.etree import ElementTree
 
@@ -18,7 +19,8 @@ rootData = r'D:\data\EnFireMap\data'
 rootCube = r'D:\data\EnFireMap\cube'
 rootTmpWarped = r'D:\data\EnFireMap\data\_warped'
 rootTmpMosaics = r'D:\data\EnFireMap\data\_mosaics'
-tilingScheme = QgsVectorLayer(r'D:\data\EnFireMap\cube\shp\grid.shp')
+tilingScheme = QgsVectorLayer(r'D:\data\EnFireMap\cube\shp\grid2.geojson')
+assert tilingScheme.isValid()
 idField = 'Tile_ID'
 
 products = [
@@ -46,6 +48,29 @@ def prepareSpectralImages():
                 alg.runAlg(alg, parameters)
 
 
+def copyMetadataXml():
+    for name in listdir(rootData):
+        if isdir(join(rootData, name)):
+            xmlFilename = auxFindMetadataXml(join(rootData, name))
+            if xmlFilename is not None:
+                boundingPolygon = auxDeriveSceneBoundingPolygon(xmlFilename)
+                sourceCrs = QgsCoordinateReferenceSystem(4326)
+                destCrs = tilingScheme.crs()
+                tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
+                boundingPolygon.transform(tr)
+                tilingScheme.selectByRect(boundingPolygon.boundingBox())
+                for feature in tilingScheme.selectedFeatures():  # course selection via bounding box
+                    if not feature.geometry().intersects(boundingPolygon):  # fine selection
+                        continue
+                    tileName = str(feature.attribute(idField))
+                    print('copy', tileName, basename(xmlFilename), flush=True)
+                    filename2 = join(rootCube, tileName, basename(xmlFilename))
+                    if not exists(join(rootCube, tileName)):
+                        makedirs(join(rootCube, tileName))
+                    if not exists(filename2):
+                        shutil.copyfile(xmlFilename, filename2)
+
+
 def ingestData():
     # group by date
     scenesByDate = defaultdict(list)
@@ -64,18 +89,7 @@ def ingestData():
         for scene in scenes:
             print('warp', scene, flush=True)
             xmlFilename = auxFindMetadataXml(join(rootData, scene))
-
-            # get bounding polygon
-            root = ElementTree.parse(xmlFilename).getroot()
-            points = dict()
-            for point in root.findall('base/spatialCoverage/boundingPolygon/point'):
-                key = point.find('frame').text
-                x = point.find('longitude').text
-                y = point.find('latitude').text
-                points[key] = QgsPointXY(float(x), float(y))
-            boundingPolygon = QgsGeometry.fromPolygonXY(
-                [[points[key] for key in ['upper_left', 'upper_right', 'lower_right', 'lower_left']]]
-            )
+            boundingPolygon = auxDeriveSceneBoundingPolygon(xmlFilename)
             boundingPolygonsByDate[datestamp].append(boundingPolygon)
 
             for product in products:
@@ -158,6 +172,22 @@ def auxFindMetadataXml(folder: str) -> Optional[str]:
     return None
 
 
-# prepareSpectralImages()
+def auxDeriveSceneBoundingPolygon(xmlFilename) -> QgsGeometry:
+    # get bounding polygon
+    root = ElementTree.parse(xmlFilename).getroot()
+    points = dict()
+    for point in root.findall('base/spatialCoverage/boundingPolygon/point'):
+        key = point.find('frame').text
+        x = point.find('longitude').text
+        y = point.find('latitude').text
+        points[key] = QgsPointXY(float(x), float(y))
+    boundingPolygon = QgsGeometry.fromPolygonXY(
+        [[points[key] for key in ['upper_left', 'upper_right', 'lower_right', 'lower_left']]]
+    )
+    return boundingPolygon
+
+
+prepareSpectralImages()
+copyMetadataXml()
 ingestData()
 print('done')
