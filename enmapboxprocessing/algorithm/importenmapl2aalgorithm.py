@@ -21,7 +21,7 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessin
 class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
     P_FILE, _FILE = 'file', 'Metadata file'
     P_SET_BAD_BANDS, _SET_BAD_BANDS = 'setBadBands', 'Set bad bands'
-    P_EXCLUDE_BAD_BANDS, _EXCLUDE_BAD_BANDS, = 'excludeBadBands', 'Mark no data bands as bad bands'
+    P_EXCLUDE_BAD_BANDS, _EXCLUDE_BAD_BANDS, = 'excludeBadBands', 'Exclude bad bands'
     P_DETECTOR_OVERLAP, _DETECTOR_OVERLAP = 'detectorOverlap', 'Detector overlap region'
     O_DETECTOR_OVERLAP = [
         'Order by detector (VNIR, SWIR)', 'Order by wavelength (default order)', 'Moving average filter', 'VNIR only',
