@@ -21,8 +21,12 @@ import sys
 # noinspection PyPep8Naming
 import unittest
 
+from PyQt5.QtXml import QDomDocument
+
 from enmapbox.gui.datasources.datasources import DataSource
-from enmapbox.gui.dataviews.docks import MapDock, Dock
+from enmapbox.gui.dataviews.docks import MapDock, Dock, SpectralLibraryDock
+from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibraryplotmodelitems import ProfileVisualizationGroup
+from enmapbox.qgispluginsupport.qps.utils import nodeXmlString
 from qgis.PyQt.QtGui import QIcon
 
 from enmapbox.enmapboxsettings import enmapboxSettings, EnMAPBoxSettings, EnMAPBoxOptionsFactory
@@ -109,6 +113,21 @@ class TestEnMAPBoxSettings(EnMAPBoxTestCase):
                     states.append(ds.source())
             return states
 
+        def speclibVisualizationState(box: EnMAPBox) -> list:
+
+            states = []
+            for d in box.docks('SPECLIB'):
+                d: SpectralLibraryDock
+                for vis in d.speclibWidget().plotControl().visualizations():
+
+                    doc = QDomDocument('tmp')
+                    n = doc.createElement('root')
+                    doc.appendChild(n)
+                    vis.writeXml(n)
+                    # xml = nodeXmlString(n)
+                    states.append(vis)
+            return states
+
         def dataViewState(box: EnMAPBox):
             states = []
             for dock in box.docks():
@@ -127,6 +146,10 @@ class TestEnMAPBoxSettings(EnMAPBoxTestCase):
         dock1.setTitle('MyMap1')
         dock2 = box.createMapDock(name='MyMap2', position='left')
         dock3 = box.createSpectralLibraryDock(name='MySpeclib1', speclib=speclib, position='bottom')
+
+        vis: ProfileVisualizationGroup = dock3.speclibWidget().plotControl().visualizations()[0]
+        vis.setColor('red')
+
         dock4 = box.createDock('TEXT', name='MyText1', position='top')
         dock4.textDockWidget().setText('My text content')
 
@@ -137,6 +160,7 @@ class TestEnMAPBoxSettings(EnMAPBoxTestCase):
         self.assertEqual(dock3.name(), 'MySpeclib1')
         self.assertEqual(dock4.name(), 'MyText1')
 
+        profileVis1 = speclibVisualizationState(box)
         sources1 = dataSourceState(box)
         views1 = dataViewState(box)
         layerSources1 = sorted([l.source() for l in box.project().mapLayers().values()])
@@ -159,9 +183,12 @@ class TestEnMAPBoxSettings(EnMAPBoxTestCase):
         self.assertTrue('<EnMAPBox>' in projectXml())
         self.assertTrue(box.readProject(tmp_path))
         self.assertTrue('<EnMAPBox>' in projectXml())
+
         sources2 = dataSourceState(box)
         views2 = dataViewState(box)
         layerSources2 = sorted([lyr.source() for lyr in box.project().mapLayers().values()])
+        profileVis2 = speclibVisualizationState(box)
+
         self.showGui(box.ui)
         self.assertTrue('<EnMAPBox>' in projectXml())
         if len(sources2) == 0:
@@ -182,6 +209,13 @@ class TestEnMAPBoxSettings(EnMAPBoxTestCase):
         self.assertEqual(views1, views2)
         self.assertEqual(layerSources1, layerSources2)
 
+        for v1, v2 in zip(profileVis1, profileVis2):
+            if v1 != v2:
+                b = v1 == v2
+                s = ""
+
+        self.assertListEqual(profileVis1, profileVis2)
+
         box.close()
         QgsProject.instance().removeAllMapLayers()
         self.assertTrue('<EnMAPBox>' in projectXml())
@@ -192,9 +226,12 @@ class TestEnMAPBoxSettings(EnMAPBoxTestCase):
         sources3 = dataSourceState(box)
         views3 = dataViewState(box)
         layerSources3 = sorted([l.source() for l in box.project().mapLayers().values()])
+        profileVis3 = speclibVisualizationState(box)
+
         self.assertEqual(sources1, sources3)
         self.assertEqual(views1, views3)
         self.assertEqual(layerSources1, layerSources3)
+        self.assertEqual(profileVis1, profileVis3)
         self.showGui(box.ui)
 
         QgsProject.instance().removeAllMapLayers()

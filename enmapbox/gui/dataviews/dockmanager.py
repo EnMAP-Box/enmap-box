@@ -381,10 +381,10 @@ class SpeclibDockTreeNode(DockTreeNode):
         if not speclibNode.isNull():
             pass
 
-        slw = self.speclibWidget()
+        slw: SpectralLibraryWidget = self.speclibWidget()
         slwNode: QDomElement = n.firstChildElement('speclibWidget').toElement()
         if not slwNode.isNull():
-            s = ""
+            slw.readXml(slwNode, context)
 
     def writeXml(self, parent: QDomElement, context: QgsReadWriteContext) -> QDomElement:
         doc: QDomDocument = parent.ownerDocument()
@@ -401,8 +401,7 @@ class SpeclibDockTreeNode(DockTreeNode):
         slw: SpectralLibraryWidget = self.speclibWidget()
         slwNode = doc.createElement('speclibWidget')
         node.appendChild(slwNode)
-
-        # todo: save visualization settings
+        slw.writeXml(slwNode, context)
 
         return node
 
