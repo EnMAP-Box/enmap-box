@@ -27,7 +27,9 @@ class TestSpectralResamplingByWavelengthAlgorithm(TestCase):
             alg.P_OUTPUT_RASTER: self.filename('resampled.tif')
         }
         result = self.runalg(alg, parameters)
-        self.assertEqual(29478653, np.round(np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array()[0])))
+        reader = RasterReader(result[alg.P_OUTPUT_RASTER])
+        self.assertEqual(133921411, np.round(np.sum(reader.array()[100])))
+        self.assertEqual(14, np.sum([reader.badBandMultiplier(bandNo) == 0 for bandNo in reader.bandNumbers()]))
 
     def test_fromEnviSpeclib(self):
         alg = SpectralResamplingByWavelengthAlgorithm()

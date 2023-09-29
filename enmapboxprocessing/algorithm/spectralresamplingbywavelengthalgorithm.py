@@ -89,6 +89,8 @@ class SpectralResamplingByWavelengthAlgorithm(EnMAPProcessingAlgorithm):
 
             reader = RasterReader(raster)
             sourceWavelengths = np.array([reader.wavelength(i + 1) for i in range(reader.bandCount())])
+            minSourceWavelengths = sourceWavelengths.min()
+            maxSourceWavelengths = sourceWavelengths.max()
             outputBandCount = len(targetWavelengths)
             outputNoDataValue = reader.noDataValue()
             if outputNoDataValue is None:
@@ -118,11 +120,14 @@ class SpectralResamplingByWavelengthAlgorithm(EnMAPProcessingAlgorithm):
                 marray = np.logical_and(marray1, marray2)
                 outarray = weight1 * array1 + weight2 * array2
                 outarray[~marray] = outputNoDataValue
+                if targetWavelength < minSourceWavelengths or targetWavelength > maxSourceWavelengths:
+                    outarray[:] = outputNoDataValue
+                    writer.setBadBandMultiplier(0, targetBandNo)  # mask as bad band
                 writer.writeArray2d(outarray, targetBandNo)
 
-            for bandNo, targetWavelength in enumerate(targetWavelengths, 1):
-                writer.setWavelength(targetWavelength, bandNo)
-                writer.setNoDataValue(outputNoDataValue, bandNo)
+            #for bandNo, targetWavelength in enumerate(targetWavelengths, 1):
+                writer.setWavelength(targetWavelength, targetBandNo)
+                writer.setNoDataValue(outputNoDataValue, targetBandNo)
 
             result = {
                 self.P_OUTPUT_RASTER: filename
