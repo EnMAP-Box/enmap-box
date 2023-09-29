@@ -125,7 +125,7 @@ class SpectralResamplingByWavelengthAlgorithm(EnMAPProcessingAlgorithm):
                     writer.setBadBandMultiplier(0, targetBandNo)  # mask as bad band
                 writer.writeArray2d(outarray, targetBandNo)
 
-            #for bandNo, targetWavelength in enumerate(targetWavelengths, 1):
+                # for bandNo, targetWavelength in enumerate(targetWavelengths, 1):
                 writer.setWavelength(targetWavelength, targetBandNo)
                 writer.setNoDataValue(outputNoDataValue, targetBandNo)
 
