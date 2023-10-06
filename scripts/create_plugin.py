@@ -462,7 +462,8 @@ if __name__ == "__main__":
                                   copy_to_profile=args.profile,
                                   build_name=args.build_name)
 
-    if isinstance(path, pathlib.Path) and re.search(r'\.master\.', path.name):
+#    if isinstance(path, pathlib.Path) and re.search(r'\.master\.', path.name):  # not sure what happens here, but the checklist seams to be never printed
+    if True:
         message = \
             r"""
             Very important checklist. Do not remove!!!
