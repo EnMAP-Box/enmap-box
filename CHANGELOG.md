@@ -13,8 +13,6 @@ _This release was tested with QGIS 3.28 (LTR) and 3.32 (latest release)_
 
 * updated [PyQtGraph](https://www.pyqtgraph.org/) to version 0.13.4 (via update of QPS)
 
-### Applications
-
 ### Earth Observation for QGIS (EO4Q) Applications
 
 * _Profile Analytics_ application: added option for linking profiles from _GEE Time Series Explorer_ ([#531](https://github.com/EnMAP-Box/enmap-box/issues/531))
