@@ -44,8 +44,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import mean_squared_error, r2_score
 # from modAL.models import BayesianOptimizer
-from lmuvegetationapps.Processor.modAL import ActiveLearner
-from lmuvegetationapps.Processor.modAL.disagreement import *
 from sklearn.metrics import pairwise_distances
 from sklearn.linear_model import LinearRegression
 
