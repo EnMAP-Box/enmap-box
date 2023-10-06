@@ -10,7 +10,6 @@ EnMAP-Box 3 Example Dataset
 	Number of bad bands: 6 (filled with no data value)
 	Data: 330x200x244 (Float32)
 
-
 2. aerial_potsdam.tif
 	Aerial image acquired on the 1st of April 2019 over the City of Potsdam, Germany.
 	Provider: LGB (Landesvermessung und Geobasisinformation Brandenburg)
@@ -21,7 +20,6 @@ EnMAP-Box 3 Example Dataset
 		GeoBasis-DE/LGB, dl-de/by-2-0 and
 		Geoportal Berlin, dl-de/by-2-0 (data modified)
 		Also see https://geobroker.geobasis-bb.de/gbss.php?MODE=GetProductInformation&PRODUCTID=253b7d3d-6b42-47dc-b127-682de078b7ae
-
 
 3. landcover_potsdam_polygon.gpkg
 	Land cover reference polygons derived from the aerial imagery described above.
@@ -37,3 +35,6 @@ EnMAP-Box 3 Example Dataset
 	Level 1 classes: Impervious, Vegetation, Soil, Water
 	Level 2 classes: Impervious, Low Vegetation, Soil, Tree, Water
 
+5. veg-cover-fraction_potsdam_point.gpkg
+	Vegetation cover fraction reference points derived from the landcover reference polygons described above.
+	Number of points: 200
