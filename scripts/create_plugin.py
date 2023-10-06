@@ -468,15 +468,13 @@ if __name__ == "__main__":
             r"""
             Very important checklist. Do not remove!!!
             Checklist for release:
-            Run scripts\runtests.bat (win) or scripts/runtests.sh (linux/mac)
             Change log up-to-date?
-            Processing algo documentation up-to-date (run create_processing_rst).
+            Processing algo documentation up-to-date (run create_processing_rst)?
             Run weblink checker (in doc folder make linkcheck).
             Check if box runs without optional dependencies (see tests/non-blocking-dependencies/readme.txt).
             Version number increased? (see .plugin.ini version = 3.x.y)
             QGIS Min-Version? (enmapbox/__init__.py -> MIN_VERSION_QGIS)
-            ZIP containing branch (i.e. master) information (GIT installed)?
-            Install ZIP and quick-test under the latest supported QGIS versions and OS, e.g.:
+            Install ZIP and quick-test under the LTR and latest QGIS versions and OS, e.g.:
                 Andreas: latest Windows Conda QGIS
                 Fabian: Linux QGIS used in Greifswald-Teaching
                 Benjamin: latest OSGeo4W (maybe also MacOS?) QGIS
