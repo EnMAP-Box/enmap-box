@@ -415,11 +415,11 @@ class data:
         
         # get bbl
         bbl = self.meta.get("bbl")
-        if bbl is not None: bbl = np.asarray(bbl, dtype=np.int_)
-        else: bbl = np.ones(self.bands, dtype=np.int_)
+        if bbl is not None: bbl = np.asarray(bbl, dtype=np.int16)
+        else: bbl = np.ones(self.bands, dtype=np.int16)
         
         # get band indices
-        bind = np.arange(self.bands, dtype=np.int_)
+        bind = np.arange(self.bands, dtype=np.int16)
         
         # remove bad band
         ind = np.where(bbl == 1)
