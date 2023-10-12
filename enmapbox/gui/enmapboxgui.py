@@ -22,7 +22,7 @@ import re
 import sys
 import typing
 import warnings
-from os.path import basename
+from os.path import basename, dirname
 from typing import Optional, Dict, Union, Any, List, Sequence
 
 import enmapbox
@@ -60,7 +60,9 @@ from processing.ProcessingPlugin import ProcessingPlugin
 from processing.gui.AlgorithmDialog import AlgorithmDialog
 from processing.gui.ProcessingToolbox import ProcessingToolbox
 from qgis import utils as qgsUtils
+from qgis.PyQt.QtCore import QUrl
 from qgis.PyQt.QtCore import pyqtSignal, Qt, QObject, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
+from qgis.PyQt.QtGui import QDesktopServices
 from qgis.PyQt.QtGui import QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QPixmap, QColor, QIcon, \
     QKeyEvent, \
     QCloseEvent, QGuiApplication
@@ -612,6 +614,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         a.setIcon(QIcon(':/images/themes/default/console/mIconRunConsole.svg'))
         a.triggered.connect(self.onOpenPythonConsole)
 
+        a: QAction = m.addAction('Open Plugin Folder in Explorer')
+        a.setIcon(QIcon(':/images/themes/default/mIconFolderOpen.svg'))
+        a.triggered.connect(self.onOpenPluginFolderInExplorer)
+
         # add datasets (see issue #561)
         m2 = m.addMenu('Datasets')
         a: QAction = m2.addAction('Add Berlin Dataset')
@@ -853,6 +859,19 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         window.setWindowTitle('EnMAP-Box Python console')
         window.setCentralWidget(ConsoleWidget(self.ui, {'enmapBox': enmapBox}, None, text))
         window.show()
+
+    def onOpenPluginFolderInExplorer(self):
+        import platform
+        system = platform.system()
+
+        folder = dirname(dirname(enmapbox.__file__))
+        if system == 'Windows':
+            import subprocess
+            cmd = rf'explorer.exe /select,"{folder}"'
+            subprocess.Popen(cmd)
+        else:
+            url = QUrl.fromLocalFile(folder)
+            QDesktopServices.openUrl(url)
 
     def onAddBerlinDataset(self):
         # example datasets are stored here: https://github.com/EnMAP-Box/enmap-box-exampledata
