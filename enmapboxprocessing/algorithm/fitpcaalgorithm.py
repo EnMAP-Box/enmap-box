@@ -28,3 +28,6 @@ class FitPcaAlgorithm(FitTransformerAlgorithmBase):
         pca = PCA(n_components=0.95)
         transformer = make_pipeline(StandardScaler(), pca)
         return transformer
+
+    def summary(self, transformer):
+        return {'explained_variance_ratio_': list(transformer.explained_variance_ratio_)}

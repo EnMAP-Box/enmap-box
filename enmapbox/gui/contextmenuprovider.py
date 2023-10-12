@@ -439,14 +439,18 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
 
             # plotting list of values (see issue #668)
             try:
-                array = np.array(eval(re.sub(r'\s+', ' ', node.value()).replace(' ', ',')))
-                array = np.array(array, dtype=float)
+                text = re.sub(r'\s+', ' ', node.value())  # compress whitespaces
+                if ',' not in text:  # values are separated by whitespace (numpy-style)
+                    text = text.replace(' ', ',')
+                array = np.array(eval(text), dtype=float)
                 assert array.ndim == 1
                 a = menu.addAction('Plot values')
                 a.triggered.connect(
                     lambda *args: pg.plot(range(1, len(array) + 1), array).setWindowTitle(f'Value Plot - {node.name()}')
                 )
-            except Exception:
+            except Exception as error:
+                print(str(error))
+                raise
                 pass  # not a numeric value
 
         # add the node-specific menu actions
