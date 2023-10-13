@@ -1,7 +1,7 @@
 from enmapboxprocessing.algorithm.rasterboundingpolygonalgorithm import RasterBoundingPolygonAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import enmap_potsdam
-from qgis._core import QgsVectorLayer
+from qgis.core import QgsVectorLayer
 
 
 class TestRasterBoundingPolygonAlgorithm(TestCase):
