@@ -142,6 +142,7 @@ from enmapboxprocessing.algorithm.randomsamplesfromclassificationdatasetalgorith
     RandomSamplesFromClassificationDatasetAlgorithm
 from enmapboxprocessing.algorithm.randomsamplesfromregressiondatasetalgorithm import \
     RandomSamplesFromRegressionDatasetAlgorithm
+from enmapboxprocessing.algorithm.rasterboundingpolygonalgorithm import RasterBoundingPolygonAlgorithm
 from enmapboxprocessing.algorithm.rasterizecategorizedvectoralgorithm import RasterizeCategorizedVectorAlgorithm
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.algorithm.rasterlayerzonalaggregationalgorithm import RasterLayerZonalAggregationAlgorithm
@@ -348,6 +349,7 @@ def algorithms():
         RasterizeCategorizedVectorAlgorithm(),
         RasterizeVectorAlgorithm(),
         RasterLayerZonalAggregationAlgorithm(),
+        RasterBoundingPolygonAlgorithm(),
         RasterMathAlgorithm(),
         ReclassifyRasterAlgorithm(),
         RegressionBasedUnmixingAlgorithm(),
