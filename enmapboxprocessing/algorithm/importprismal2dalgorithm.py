@@ -5,12 +5,15 @@ import numpy as np
 from osgeo import gdal
 
 from enmapbox.typeguard import typechecked
+from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.algorithm.importprismal1algorithm import utilsReadAsArray, utilsDeleteCopy
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRectangle,
-                       QgsCoordinateReferenceSystem)
+from enmapboxprocessing.utils import Utils
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRectangle, \
+    QgsCoordinateReferenceSystem, QgsRasterLayer, QgsMapLayer
 
 
 @typechecked
@@ -262,6 +265,25 @@ class ImportPrismaL2DAlgorithm(EnMAPProcessingAlgorithm):
         if badBandMultipliers is not None:
             for bandNo, badBandMultiplier in enumerate(badBandMultipliers, 1):
                 writer.setBadBandMultiplier(badBandMultiplier, bandNo)
+
+        writer.close()
+        del writer
+
+        # setup default renderer
+        layer = QgsRasterLayer(filenameSpectralCube)
+        reader = RasterReader(layer)
+        redBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['R'][0])
+        greenBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['G'][0])
+        blueBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['B'][0])
+        redMin, redMax = reader.provider.cumulativeCut(redBandNo, 0.02, 0.98)
+        greenMin, greenMax = reader.provider.cumulativeCut(greenBandNo, 0.02, 0.98)
+        blueMin, blueMax = reader.provider.cumulativeCut(blueBandNo, 0.02, 0.98)
+        renderer = Utils().multiBandColorRenderer(
+            reader.provider, [redBandNo, greenBandNo, blueBandNo], [redMin, greenMin, blueMin],
+            [redMax, greenMax, blueMax]
+        )
+        layer.setRenderer(renderer)
+        layer.saveDefaultStyle(QgsMapLayer.StyleCategory.Rendering)
 
     def writeSpectralErrorMatrix(
             self, filenameSpectralError, he5Filename, spectralRegion, badPixelThreshold: Optional[float],

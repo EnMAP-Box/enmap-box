@@ -3,8 +3,11 @@ from typing import Dict, Any, List, Tuple
 
 from osgeo import gdal
 
+from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
+from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxprocessing.utils import Utils
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer, QgsMapLayer
 from enmapbox.typeguard import typechecked
 
 
@@ -104,6 +107,23 @@ class ImportDesisL2AAlgorithm(EnMAPProcessingAlgorithm):
                 rasterBand.SetScale(float(gains[i]) * 1e4)
                 rasterBand.SetOffset(float(offsets[i]))
                 rasterBand.FlushCache()
+            del ds
+
+            # setup default renderer
+            layer = QgsRasterLayer(filename)
+            reader = RasterReader(layer)
+            redBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['R'][0])
+            greenBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['G'][0])
+            blueBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['B'][0])
+            redMin, redMax = reader.provider.cumulativeCut(redBandNo, 0.02, 0.98)
+            greenMin, greenMax = reader.provider.cumulativeCut(greenBandNo, 0.02, 0.98)
+            blueMin, blueMax = reader.provider.cumulativeCut(blueBandNo, 0.02, 0.98)
+            renderer = Utils().multiBandColorRenderer(
+                reader.provider, [redBandNo, greenBandNo, blueBandNo], [redMin, greenMin, blueMin],
+                [redMax, greenMax, blueMax]
+            )
+            layer.setRenderer(renderer)
+            layer.saveDefaultStyle(QgsMapLayer.StyleCategory.Rendering)
 
             result = {self.P_OUTPUT_RASTER: filename}
             self.toc(feedback, result)
