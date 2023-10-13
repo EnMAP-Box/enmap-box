@@ -6,6 +6,7 @@ from osgeo import gdal
 
 import processing
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.gridwalker import GridWalker
 from enmapboxprocessing.numpyutils import NumpyUtils
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
@@ -17,7 +18,6 @@ from qgis.core import (QgsRasterLayer, QgsRasterDataProvider, QgsCoordinateRefer
                        QgsRasterRange, QgsPoint, QgsRasterBlockFeedback, QgsRasterBlock, QgsPointXY,
                        QgsProcessingFeedback, QgsRasterBandStats, Qgis, QgsGeometry, QgsVectorLayer, QgsWkbTypes,
                        QgsFeature)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
