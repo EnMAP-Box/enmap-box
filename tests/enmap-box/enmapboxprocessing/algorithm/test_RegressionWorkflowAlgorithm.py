@@ -39,3 +39,12 @@ class TestRegressionWorkflowAlgorithm(TestCase):
             alg.P_OUTPUT_REPORT: self.filename('report.html')
         }
         self.runalg(alg, parameters)
+
+    def test_trainingOnly(self):
+        alg = RegressionWorkflowAlgorithm()
+        parameters = {
+            alg.P_DATASET: regressorDumpMultiTargetPkl,
+            alg.P_REGRESSOR: FitTestRegressorAlgorithm().defaultCodeAsString(),
+            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.pkl'),
+        }
+        self.runalg(alg, parameters)
