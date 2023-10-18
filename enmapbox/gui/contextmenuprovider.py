@@ -270,7 +270,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
 
             a: QAction = menu.addAction('Open in Explorer')
             a.setIcon(QIcon(':/images/themes/default/mIconFolderOpen.svg'))
-            a.setEnabled(exists(node.source()))
+            a.setEnabled(exists(node.source().split('|')[0]))
             a.triggered.connect(lambda *args, src=node: treeView.onOpenInExplorer(src))
 
             # todo: implement rename function
