@@ -40,3 +40,12 @@ class TestClassificationAlgorithm(TestCase):
             alg.P_OUTPUT_REPORT: self.filename('report.html')
         }
         self.runalg(alg, parameters)
+
+    def test_trainingOnly(self):
+        alg = ClassificationWorkflowAlgorithm()
+        parameters = {
+            alg.P_DATASET: classifierDumpPkl,
+            alg.P_CLASSIFIER: FitTestClassifierAlgorithm().defaultCodeAsString(),
+            alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl'),
+        }
+        self.runalg(alg, parameters)

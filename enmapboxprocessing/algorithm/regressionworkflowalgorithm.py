@@ -33,9 +33,7 @@ class RegressionWorkflowAlgorithm(EnMAPProcessingAlgorithm):
         return [
             (self._DATASET, 'Training dataset pickle file used for fitting the regressor.'),
             (self._REGRESSOR, 'Scikit-Learn Python code specifying a regressor.'),
-            (self._RASTER, 'A raster layer with bands used as features for mapping. '
-                           'Regressor features and raster bands are matched by name. '
-                           'Will be ignored, if map prediction is skipped.'),
+            (self._RASTER, 'A raster layer used for prediction.'),
             (self._MATCH_BY_NAME, 'Whether to match raster bands and regressor features by name.'),
             (self._NFOLD, 'The number of folds used for assessing cross-validation performance. '
                           'Will be ignored, if the cross-validation performance assessment is skipped.'),
@@ -52,7 +50,7 @@ class RegressionWorkflowAlgorithm(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRegressionDataset(self.P_DATASET, self._DATASET)
         self.addParameterRegressorCode(self.P_REGRESSOR, self._REGRESSOR)
-        self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
+        self.addParameterRasterLayer(self.P_RASTER, self._RASTER, None, True)
         self.addParameterBoolean(self.P_MATCH_BY_NAME, self._MATCH_BY_NAME, False, True, True)
         self.addParameterInt(self.P_NFOLD, self._NFOLD, 10, True, 2, 100)
         self.addParameterBoolean(self.P_OPEN_REPORT, self._OPEN_REPORT, True)
@@ -61,6 +59,14 @@ class RegressionWorkflowAlgorithm(EnMAPProcessingAlgorithm):
         )
         self.addParameterFileDestination(self.P_OUTPUT_REGRESSOR, self._OUTPUT_REGRESSOR, self.PickleFileFilter)
         self.addParameterRasterDestination(self.P_OUTPUT_REGRESSION, self._OUTPUT_REGRESSION, None, True, True)
+
+    def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
+        filenameRegression = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_REGRESSION, context)
+        raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
+        if filenameRegression is not None:
+            if raster is None:
+                return False, f'Wrong or missing parameter value: {self._RASTER}'
+        return True, ''
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
