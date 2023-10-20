@@ -26,13 +26,14 @@ landcover_berlin_point = join(_root, _subdir, 'landcover_berlin_point.gpkg')
 landcover_berlin_polygon = join(_root, _subdir, 'landcover_berlin_polygon.gpkg')
 library_berlin = join(_root, _subdir, 'library_berlin.gpkg')
 veg_cover_fraction_berlin_point = join(_root, _subdir, 'veg-cover-fraction_berlin_point.gpkg')
-
+assert exists(veg_cover_fraction_berlin_point)
 # Potsdam example data
 # ...current example dataset is placed under enmapbox.exampledata
 enmap_potsdam = enmapbox.exampledata.enmap
 hires_potsdom = enmapbox.exampledata.hires
 landcover_potsdam_polygon = enmapbox.exampledata.landcover_polygon
 landcover_potsdam_point = enmapbox.exampledata.landcover_point
+veg_cover_fraction_potsdam_point = enmapbox.exampledata.veg_cover_fraction_point
 
 # connect old shortcuts (requested by @jakimow)
 enmap = enmap_berlin
