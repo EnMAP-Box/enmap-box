@@ -30,4 +30,4 @@ class FitPcaAlgorithm(FitTransformerAlgorithmBase):
         return transformer
 
     def summary(self, transformer):
-        return {'explained_variance_ratio_': list(transformer.explained_variance_ratio_)}
+        return {'explained_variance_ratio_': transformer.steps[1][1].explained_variance_ratio_.tolist()}
