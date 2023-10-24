@@ -25,3 +25,5 @@ jobs:
 
         # choose if the force pass or not
         force_pass : false
+
+        exclude_patterns: https://tile.openstreetmap.org/,http://fbinter.stadt-berlin.de/,http://tiles.wmflabs.org/,http://tile.stamen.com/,http://basemaps.cartocdn.com/,http://tile.openweathermap.org/,https://heatmap-external-b.strava.com/tiles/,https://tile.opentopomap.org/,http://ecn.t3.tiles.virtualearth.net/,
