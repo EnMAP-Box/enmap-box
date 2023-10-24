@@ -54,6 +54,9 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     GeoJsonFileFilter = 'GEOJSON files (*.geojson)'
     GeoJsonFileExtension = 'geojson'
     GeoJsonFileDestination = 'GEOJSON file destination.'
+    CsvFileFilter = 'CSV files (*.csv)'
+    CsvFileExtension = 'cvs'
+    CsvFileDestination = 'CSV file destination.'
     DatasetFileFilter = PickleFileFilter + ';;' + JsonFileFilter
     DatasetFileDestination = 'Dataset file destination.'
     RasterFileDestination = 'Raster file destination.'

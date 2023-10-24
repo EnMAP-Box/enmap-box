@@ -62,6 +62,7 @@ class TransformerDump(object):
     features: Optional[List[str]]
     X: Optional[SampleX]
     transformer: Optional[Union[TransformerMixin, Pipeline]] = None
+    summary: Optional[Dict] = None
 
     @staticmethod
     def fromDict(d: Dict):
@@ -85,10 +86,13 @@ class TransformerDump(object):
 
     def write(self, filename: str):
         from enmapboxprocessing.utils import Utils
+        d = self.__dict__
+        if d['summary'] is None:
+            d.pop('summary')
         if filename.endswith('.pkl'):
-            Utils.pickleDump(self.__dict__, filename)
+            Utils.pickleDump(d, filename)
         elif filename.endswith('.json'):
-            Utils.jsonDump(self.__dict__, filename)
+            Utils.jsonDump(d, filename)
         else:
             raise ValueError('wrong file extension, use "pkl" or "json"')
 

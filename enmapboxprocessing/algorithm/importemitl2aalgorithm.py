@@ -4,11 +4,13 @@ from typing import Dict, Any, List, Tuple
 import numpy as np
 
 from enmapbox.typeguard import typechecked
+from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRectangle, \
-    QgsCoordinateReferenceSystem
+    QgsCoordinateReferenceSystem, QgsRasterLayer, QgsMapLayer
 
 
 @typechecked
@@ -124,6 +126,25 @@ class ImportEmitL2AAlgorithm(EnMAPProcessingAlgorithm):
                 writer.setFwhm(metadata['fwhm'][bandNo - 1], bandNo)
                 writer.setBadBandMultiplier(metadata['good_wavelengths'][bandNo - 1], bandNo)
                 writer.setBandName(f'band {bandNo} ({wavelength} Nanometers)', bandNo)
+
+            writer.close()
+            del writer
+
+            # setup default renderer
+            layer = QgsRasterLayer(filename)
+            reader = RasterReader(layer)
+            redBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['R'][0])
+            greenBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['G'][0])
+            blueBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['B'][0])
+            redMin, redMax = reader.provider.cumulativeCut(redBandNo, 0.02, 0.98)
+            greenMin, greenMax = reader.provider.cumulativeCut(greenBandNo, 0.02, 0.98)
+            blueMin, blueMax = reader.provider.cumulativeCut(blueBandNo, 0.02, 0.98)
+            renderer = Utils().multiBandColorRenderer(
+                reader.provider, [redBandNo, greenBandNo, blueBandNo], [redMin, greenMin, blueMin],
+                [redMax, greenMax, blueMax]
+            )
+            layer.setRenderer(renderer)
+            layer.saveDefaultStyle(QgsMapLayer.StyleCategory.Rendering)
 
             result = {self.P_OUTPUT_RASTER: filename}
             self.toc(feedback, result)

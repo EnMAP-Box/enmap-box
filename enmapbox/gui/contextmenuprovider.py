@@ -1,6 +1,10 @@
+import re
 from os.path import exists, splitext
 from typing import List, Union
 
+import numpy as np
+
+import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
 import qgis.utils
 from enmapbox import messageLog
 from enmapbox.gui.contextmenus import EnMAPBoxAbstractContextMenuProvider
@@ -266,7 +270,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
 
             a: QAction = menu.addAction('Open in Explorer')
             a.setIcon(QIcon(':/images/themes/default/mIconFolderOpen.svg'))
-            a.setEnabled(exists(node.source()))
+            a.setEnabled(exists(node.source().split('|')[0]))
             a.triggered.connect(lambda *args, src=node: treeView.onOpenInExplorer(src))
 
             # todo: implement rename function
@@ -305,7 +309,8 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                                    for shortName in shortNames]
                     subAction = subMenu2.addAction(name + f' ({" - ".join(wavelengths)})')
                     subAction.setToolTip(' - '.join(longNames))
-                    subAction.triggered.connect(lambda *args, s=src, t=target, rgb=name: treeView.openInMap(s, t, rgb=rgb))
+                    subAction.triggered.connect(
+                        lambda *args, s=src, t=target, rgb=name: treeView.openInMap(s, t, rgb=rgb))
                     subAction.setEnabled(b)
 
             if isinstance(node, RasterDataSource):
@@ -431,6 +436,22 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
         if col == 1 and node.value() is not None:
             a = menu.addAction('Copy')
             a.triggered.connect(lambda *args, n=node: treeView.copyNodeValue(n))
+
+            # plotting list of values (see issue #668)
+            try:
+                text = re.sub(r'\s+', ' ', node.value())  # compress whitespaces
+                if ',' not in text:  # values are separated by whitespace (numpy-style)
+                    text = text.replace(' ', ',')
+                array = np.array(eval(text), dtype=float)
+                assert array.ndim == 1
+                a = menu.addAction('Plot values')
+                a.triggered.connect(
+                    lambda *args: pg.plot(range(1, len(array) + 1), array).setWindowTitle(f'Value Plot - {node.name()}')
+                )
+            except Exception as error:
+                print(str(error))
+                raise
+                pass  # not a numeric value
 
         # add the node-specific menu actions
         if isinstance(node, TreeNode):
