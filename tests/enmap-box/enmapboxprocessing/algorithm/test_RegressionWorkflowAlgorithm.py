@@ -5,7 +5,7 @@ from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousvectoral
     PrepareRegressionDatasetFromContinuousVectorAlgorithm
 from enmapboxprocessing.algorithm.regressionworkflowalgorithm import RegressionWorkflowAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxtestdata import enmap, enmap_potsdam
+from enmapboxtestdata import enmap, enmap_potsdam, veg_cover_fraction_potsdam_point
 from enmapboxtestdata import regressorDumpMultiTargetPkl
 
 
