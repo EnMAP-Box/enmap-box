@@ -54,12 +54,16 @@ def report_downloads() -> pd.DataFrame:
     hdr = {'User-agent': 'Mozilla/5.0'}
     req = urllib.request.Request(url, headers=hdr)
     response = urllib.request.urlopen(req)
+
     html = response.read().decode('utf-8')
+
+    html = re.search(r'<table .*</table>', re.sub('\n', ' ', html)).group()
     html = re.sub(r'&nbsp;', '', html)
     html = re.sub(r'xmlns=".*"', '', html)
-
+    html = re.sub(r'>&times;<', '><', html)
     tree = etree.fromstring(html)
-    table = tree.find('.//table[@class="table table-striped plugins"]')
+    table = tree
+    #  table = tree.find('.//table[@class="table table-striped plugins"]')
     DATA = {k: [] for k in ['version', 'minQGIS', 'experimental', 'downloads', 'uploader', 'datetime']}
     for tr in table.findall('.//tbody/tr'):
         tds = list(tr.findall('td'))
@@ -541,6 +545,10 @@ class TestCases(unittest.TestCase):
 
     def test_github_QGIS(self):
         report_github_issues_QGIS()
+
+    def test_report_downloads(self):
+        df = report_downloads()
+        print(df)
 
 
 if __name__ == "__main__":
