@@ -43,7 +43,6 @@ class PrepareRegressionDatasetFromContinuousVectorAlgorithm(EnMAPProcessingAlgor
             (self._TARGET_FIELDS, 'Fields used as target data y. '
                                   'If not selected, the fields defined by the renderer are used. '
                                   'If those are also not specified, an error is raised.'),
-
             (self._OUTPUT_DATASET, self.PickleFileDestination)
         ]
 
