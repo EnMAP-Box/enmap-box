@@ -1,6 +1,6 @@
 from enmapboxprocessing.algorithm.regressorperformancealgorithm import RegressorPerformanceAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from tests.enmapboxtestdata import regressorDumpPkl, regressorDumpSingleTargetPkl
+from enmapboxtestdata import regressorDumpPkl, regressorDumpSingleTargetPkl
 
 
 class TestRegressorPerformanceAlgorithm(TestCase):

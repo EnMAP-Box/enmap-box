@@ -2,7 +2,7 @@ from time import sleep
 
 from osgeo import gdal
 
-from tests.enmapboxtestdata import enmap
+from enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.editrastersourcebandpropertiesalgorithm import EditRasterSourceBandPropertiesAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm

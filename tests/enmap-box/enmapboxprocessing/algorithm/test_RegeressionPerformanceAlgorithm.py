@@ -1,7 +1,7 @@
 from enmapboxprocessing.algorithm.regressionperformancealgorithm import RegressionPerformanceAlgorithm
 
 from enmapboxprocessing.algorithm.testcase import TestCase
-from tests.enmapboxtestdata import fraction_map_l3, fraction_point_multitarget
+from enmapboxtestdata import fraction_map_l3, fraction_point_multitarget
 
 
 class TestRegressionPerformanceSimpleAlgorithm(TestCase):

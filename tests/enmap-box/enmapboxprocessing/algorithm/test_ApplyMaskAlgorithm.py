@@ -1,6 +1,6 @@
 import numpy as np
 
-from tests.enmapboxtestdata import enmap, landcover_polygon
+from enmapboxtestdata import enmap, landcover_polygon
 from enmapboxprocessing.algorithm.applymaskalgorithm import ApplyMaskAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader

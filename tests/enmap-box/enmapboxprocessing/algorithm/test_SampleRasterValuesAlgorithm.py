@@ -1,7 +1,7 @@
 from enmapboxprocessing.algorithm.samplerastervaluesalgorithm import SampleRasterValuesAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from tests.enmapboxtestdata import enmap, landcover_polygon, hires_potsdom
-from tests.enmapboxtestdata import landcover_points_singlepart_epsg3035
+from enmapboxtestdata import enmap, landcover_polygon, hires_potsdom
+from enmapboxtestdata import landcover_points_singlepart_epsg3035
 from qgis.core import (QgsRasterLayer, QgsVectorLayer)
 
 

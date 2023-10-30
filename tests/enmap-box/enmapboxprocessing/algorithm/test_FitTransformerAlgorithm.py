@@ -17,8 +17,8 @@ from enmapboxprocessing.algorithm.fittransformeralgorithmbase import FitTransfor
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
-from tests.enmapboxtestdata import classifierDumpPkl
-from tests.enmapboxtestdata import enmap
+from enmapboxtestdata import classifierDumpPkl
+from enmapboxtestdata import enmap
 from qgis.core import QgsProcessingException
 
 

@@ -1,12 +1,12 @@
 import numpy as np
 from sklearn.base import ClassifierMixin
 
-from tests.enmapboxtestdata import enmap
+from enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 from enmapboxprocessing.algorithm.predictclassificationalgorithm import PredictClassificationAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
-from tests.enmapboxtestdata import classifierDumpPkl
+from enmapboxtestdata import classifierDumpPkl
 
 
 class FitTestClassifierAlgorithm(FitClassifierAlgorithmBase):

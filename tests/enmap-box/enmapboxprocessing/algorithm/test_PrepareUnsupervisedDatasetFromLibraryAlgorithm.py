@@ -3,7 +3,7 @@ from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromlibraryalgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
-from tests.enmapboxtestdata import library_gpkg
+from enmapboxtestdata import library_gpkg
 from qgis.core import QgsProcessingException
 
 

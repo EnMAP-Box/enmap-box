@@ -1,10 +1,10 @@
 import numpy as np
 
-from tests.enmapboxtestdata import enmap
+from enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.algorithm.translatecategorizedrasteralgorithm import TranslateCategorizedRasterAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
-from tests.enmapboxtestdata import landcover_polygon_30m_epsg3035
+from enmapboxtestdata import landcover_polygon_30m_epsg3035
 from qgis.core import QgsRasterLayer
 
 

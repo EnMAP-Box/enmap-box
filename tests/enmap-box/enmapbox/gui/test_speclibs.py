@@ -25,7 +25,7 @@ from enmapbox.qgispluginsupport.qps.utils import fid2pixelindices, SpatialPoint
 from enmapbox.testing import EnMAPBoxTestCase
 from qgis.gui import QgsMapLayerComboBox
 from qgis.core import QgsRasterLayer, QgsVectorLayer
-from tests.enmapboxtestdata import fraction_polygon_l3, fraction_point_singletarget, enmap_srf_library
+from enmapboxtestdata import fraction_polygon_l3, fraction_point_singletarget, enmap_srf_library
 
 
 class TestSpeclibs(EnMAPBoxTestCase):

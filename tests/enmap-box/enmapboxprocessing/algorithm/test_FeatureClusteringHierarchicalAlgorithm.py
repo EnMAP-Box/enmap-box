@@ -1,6 +1,6 @@
 from enmapboxprocessing.algorithm.featureclusteringhierarchicalalgorithm import FeatureClusteringHierarchicalAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from tests.enmapboxtestdata import classifierDumpPkl
+from enmapboxtestdata import classifierDumpPkl
 
 
 class TestFeatureClusteringHierarchicalAlgorithm(TestCase):

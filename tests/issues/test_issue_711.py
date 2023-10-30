@@ -24,7 +24,7 @@ import enmapbox.exampledata
 import qgis
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
-from tests.enmapboxtestdata import library_gpkg, enmap_srf_library
+from enmapboxtestdata import library_gpkg, enmap_srf_library
 from qgis.core import QgsProject
 
 

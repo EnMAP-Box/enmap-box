@@ -3,7 +3,7 @@ import numpy as np
 from enmapboxprocessing.algorithm.spectralindexoptimizeralgorithm import SpectralIndexOptimizerAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
-from tests.enmapboxtestdata import regressionDatasetAsPkl
+from enmapboxtestdata import regressionDatasetAsPkl
 
 
 class TestSpectralIndexOptimizerAlgorithm(TestCase):

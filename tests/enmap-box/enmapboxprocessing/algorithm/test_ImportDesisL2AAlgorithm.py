@@ -3,7 +3,7 @@ import numpy as np
 from enmapboxprocessing.algorithm.importdesisl2aalgorithm import ImportDesisL2AAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
-from tests.enmapboxtestdata import sensorProductsRoot, SensorProducts
+from enmapboxtestdata import sensorProductsRoot, SensorProducts
 
 
 class TestImportDesisL2AAlgorithm(TestCase):

@@ -1,10 +1,10 @@
-from tests.enmapboxtestdata import enmap_potsdam
+from enmapboxtestdata import enmap_potsdam
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousrasteralgorithm import \
     PrepareRegressionDatasetFromContinuousRasterAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
-from tests.enmapboxtestdata import fraction_polygon_l3, enmap
+from enmapboxtestdata import fraction_polygon_l3, enmap
 
 
 class TestPrepareRegressionDatasetFromContinuousRasterAlgorithm(TestCase):

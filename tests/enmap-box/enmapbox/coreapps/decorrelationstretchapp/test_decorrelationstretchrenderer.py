@@ -5,7 +5,7 @@ from qgis.core import QgsRasterLayer, Qgis
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import RobustScaler, MinMaxScaler
 
-from tests.enmapboxtestdata import enmap
+from enmapboxtestdata import enmap
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.testcase import TestCase
 from enmapboxprocessing.utils import Utils

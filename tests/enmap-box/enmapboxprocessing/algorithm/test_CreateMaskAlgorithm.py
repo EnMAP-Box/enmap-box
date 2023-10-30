@@ -1,6 +1,6 @@
 import numpy as np
 
-from tests.enmapboxtestdata import hires
+from enmapboxtestdata import hires
 from enmapboxprocessing.algorithm.createmaskalgorithm import CreateMaskAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader

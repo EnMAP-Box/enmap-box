@@ -1,6 +1,6 @@
 from enmapboxprocessing.algorithm.geolocaterasteralgorithm import GeolocateRasterAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from tests.enmapboxtestdata import sensorProductsRoot, SensorProducts
+from enmapboxtestdata import sensorProductsRoot, SensorProducts
 from qgis.core import QgsRasterLayer
 
 

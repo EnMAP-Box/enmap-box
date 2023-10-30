@@ -3,7 +3,7 @@ from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromjsonalgorithm im
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
-from tests.enmapboxtestdata import regressionDatasetAsJsonFile
+from enmapboxtestdata import regressionDatasetAsJsonFile
 
 
 class TestPrepareUnsupervisedDatasetFromJsonAlgorithm(TestCase):

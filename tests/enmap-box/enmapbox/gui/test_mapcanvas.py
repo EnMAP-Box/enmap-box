@@ -22,7 +22,7 @@ from enmapbox.gui.mapcanvas import CanvasLink, MapCanvas, KEY_LAST_CLICKED, LINK
 from enmapbox.qgispluginsupport.qps.maptools import CursorLocationMapTool, MapTools
 from enmapbox.testing import EnMAPBoxTestCase
 from enmapbox.testing import TestObjects
-from tests.enmapboxtestdata import library_berlin
+from enmapboxtestdata import library_berlin
 from qgis.PyQt.QtCore import QMimeData, QUrl
 from qgis.PyQt.QtGui import QKeyEvent
 from qgis.PyQt.QtWidgets import QMenu, QAction

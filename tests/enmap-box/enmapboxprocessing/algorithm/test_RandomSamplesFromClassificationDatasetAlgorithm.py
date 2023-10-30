@@ -2,7 +2,7 @@ from enmapboxprocessing.algorithm.randomsamplesfromclassificationdatasetalgorith
     RandomSamplesFromClassificationDatasetAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.utils import Utils
-from tests.enmapboxtestdata import classifierDumpPkl
+from enmapboxtestdata import classifierDumpPkl
 
 
 class TestRandomSamplesFromClassificationDatasetAlgorithm(TestCase):

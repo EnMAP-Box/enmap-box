@@ -1,6 +1,6 @@
 from enmapboxprocessing.enviutils import EnviUtils
 from enmapboxprocessing.testcase import TestCase
-from tests.enmapboxtestdata import enmap_berlin
+from enmapboxtestdata import enmap_berlin
 
 
 class TestEnviUtils(TestCase):

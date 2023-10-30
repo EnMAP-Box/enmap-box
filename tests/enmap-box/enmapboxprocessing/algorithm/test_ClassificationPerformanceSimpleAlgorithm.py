@@ -1,11 +1,11 @@
 from math import isnan
 
-from tests.enmapboxtestdata import landcover_polygon
+from enmapboxtestdata import landcover_polygon
 from enmapboxprocessing.algorithm.classificationperformancesimplealgorithm import \
     ClassificationPerformanceSimpleAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.utils import Utils
-from tests.enmapboxtestdata import landcover_map_l3
+from enmapboxtestdata import landcover_map_l3
 
 writeToDisk = True
 

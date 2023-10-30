@@ -1,6 +1,6 @@
 import unittest
 
-from tests.enmapboxtestdata import library_berlin
+from enmapboxtestdata import library_berlin
 from qgis.core import QgsVectorLayer
 
 from enmapbox.gui.enmapboxgui import EnMAPBox

@@ -1,7 +1,7 @@
 from enmapboxprocessing.algorithm.classificationfromclassprobabilityalgorithm import \
     ClassificationFromClassProbabilityAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from tests.enmapboxtestdata import fraction_map_l3
+from enmapboxtestdata import fraction_map_l3
 
 
 class TestClassificationFromClassProbabilityAlgorithm(TestCase):

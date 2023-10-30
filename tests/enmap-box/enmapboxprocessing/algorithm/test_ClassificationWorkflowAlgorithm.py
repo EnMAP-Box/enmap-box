@@ -2,11 +2,11 @@ from sklearn.base import ClassifierMixin
 
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedvectoralgorithm import \
     PrepareClassificationDatasetFromCategorizedVectorAlgorithm
-from tests.enmapboxtestdata import enmap, landcover_potsdam_point, enmap_potsdam
+from enmapboxtestdata import enmap, landcover_potsdam_point, enmap_potsdam
 from enmapboxprocessing.algorithm.classificationworkflowalgorithm import ClassificationWorkflowAlgorithm
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 from enmapboxprocessing.algorithm.testcase import TestCase
-from tests.enmapboxtestdata import classifierDumpPkl
+from enmapboxtestdata import classifierDumpPkl
 
 
 class FitTestClassifierAlgorithm(FitClassifierAlgorithmBase):

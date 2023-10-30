@@ -5,7 +5,7 @@ import numpy as np
 from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import RasterMathAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
-from tests.enmapboxtestdata import enmap, landcover_polygon, hires
+from enmapboxtestdata import enmap, landcover_polygon, hires
 from qgis.core import Qgis
 
 

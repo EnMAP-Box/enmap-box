@@ -3,7 +3,7 @@ from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromvectorandfieldsa
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
-from tests.enmapboxtestdata import classificationDatasetAsGpkgVector
+from enmapboxtestdata import classificationDatasetAsGpkgVector
 
 
 class TestPrepareUnsupervisedDatasetFromVectorAndFieldsAlgorithm(TestCase):

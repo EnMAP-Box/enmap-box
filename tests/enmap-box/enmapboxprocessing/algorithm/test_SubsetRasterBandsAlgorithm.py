@@ -5,7 +5,7 @@ import numpy as np
 from enmapboxprocessing.algorithm.subsetrasterbandsalgorithm import SubsetRasterBandsAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
-from tests.enmapboxtestdata import enmap, enmap_potsdam
+from enmapboxtestdata import enmap, enmap_potsdam
 
 
 class TestSubsetRasterBandsAlgorithm(TestCase):

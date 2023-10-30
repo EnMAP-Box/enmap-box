@@ -3,7 +3,7 @@ import unittest
 from enmapboxprocessing.algorithm.algorithms import algorithms
 from enmapboxprocessing.algorithm.convolutionfilteralgorithmbase import ConvolutionFilterAlgorithmBase
 from enmapboxprocessing.algorithm.testcase import TestCase
-from tests.enmapboxtestdata import hires
+from enmapboxtestdata import hires
 
 try:
     import astropy.convolution

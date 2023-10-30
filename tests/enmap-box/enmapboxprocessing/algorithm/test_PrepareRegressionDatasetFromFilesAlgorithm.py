@@ -3,7 +3,7 @@ from enmapboxprocessing.algorithm.prepareregressiondatasetfromfilesalgorithm imp
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
-from tests.enmapboxtestdata import classificationDatasetAsForceFile
+from enmapboxtestdata import classificationDatasetAsForceFile
 
 
 class TestPrepareRegressionDatasetFromFilesAlgorithm(TestCase):

@@ -3,7 +3,7 @@ from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedvec
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
-from tests.enmapboxtestdata import classificationDatasetAsGpkgVector
+from enmapboxtestdata import classificationDatasetAsGpkgVector
 
 
 class TestPrepareClassificationDatasetFromVectorAndFieldsAlgorithm(TestCase):

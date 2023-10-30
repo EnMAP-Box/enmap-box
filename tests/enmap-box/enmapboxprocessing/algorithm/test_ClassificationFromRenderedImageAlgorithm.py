@@ -2,7 +2,7 @@ from enmapboxprocessing.algorithm.classificationfromrenderedimagealgorithm impor
     ClassificationFromRenderedImageAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.utils import Utils
-from tests.enmapboxtestdata import landcover_map_l3, enmap_berlin
+from enmapboxtestdata import landcover_map_l3, enmap_berlin
 from qgis.core import QgsMapLayer, QgsSingleBandPseudoColorRenderer, QgsMultiBandColorRenderer, \
     QgsPalettedRasterRenderer, QgsRasterLayer
 

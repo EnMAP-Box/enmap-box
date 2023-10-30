@@ -1,6 +1,6 @@
 from enmapboxprocessing.algorithm.importenmapl1calgorithm import ImportEnmapL1CAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from tests.enmapboxtestdata import SensorProducts, sensorProductsRoot
+from enmapboxtestdata import SensorProducts, sensorProductsRoot
 
 
 class TestImportEnmapL1CAlgorithm(TestCase):
