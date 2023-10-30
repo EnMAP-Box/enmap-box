@@ -3,7 +3,7 @@ from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromfilealgorithm im
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import classificationDatasetAsForceFile
+from tests.enmapboxtestdata import classificationDatasetAsForceFile
 
 
 class TestPrepareUnsupervisedDatasetFromFileAlgorithm(TestCase):

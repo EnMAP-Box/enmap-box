@@ -3,7 +3,7 @@ from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedvec
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import points_in_no_data_region, enmap, landcover_polygon, landcover_point, enmap_potsdam, \
+from tests.enmapboxtestdata import points_in_no_data_region, enmap, landcover_polygon, landcover_point, enmap_potsdam, \
     landcover_potsdam_polygon
 
 

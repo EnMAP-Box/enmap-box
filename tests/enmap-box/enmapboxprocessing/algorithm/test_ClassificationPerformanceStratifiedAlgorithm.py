@@ -1,11 +1,11 @@
 import numpy as np
 
-from enmapboxtestdata import landcover_polygon
+from tests.enmapboxtestdata import landcover_polygon
 from enmapboxprocessing.algorithm.classificationperformancestratifiedalgorithm import (
     stratifiedAccuracyAssessment, ClassificationPerformanceStratifiedAlgorithm
 )
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxtestdata import landcover_map_l3
+from tests.enmapboxtestdata import landcover_map_l3
 from qgis.core import QgsRasterLayer, QgsVectorLayer
 
 

@@ -1,7 +1,7 @@
-from enmapboxtestdata import enmap
+from tests.enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.rasterlayerzonalaggregationalgorithm import RasterLayerZonalAggregationAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxtestdata import landcover_map_l3
+from tests.enmapboxtestdata import landcover_map_l3
 
 
 class TestRasterLayerZonalAggregationAlgorithm(TestCase):

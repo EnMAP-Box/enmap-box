@@ -21,7 +21,7 @@ from enmapbox import DIR_EXAMPLEDATA
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.exampledata import enmap, hires, landcover_polygon
 from enmapbox.testing import EnMAPBoxTestCase
-from enmapboxtestdata import library_berlin
+from tests.enmapboxtestdata import library_berlin
 from qgis.PyQt.QtCore import QMimeData, QByteArray, QUrl, Qt, QPoint
 from qgis.PyQt.QtGui import QDropEvent
 from qgis.PyQt.QtWidgets import QApplication

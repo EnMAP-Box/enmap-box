@@ -54,7 +54,7 @@ class TestEnMAPBoxApplications(EnMAPBoxTestCase):
         # Addresses https://bitbucket.org/hu-geomatics/enmap-box/issues/310/attributeerror-function-object-has-no
 
         enmapBox = EnMAPBox(load_core_apps=True, load_other_apps=False)
-        from enmapboxtestdata import library_berlin
+        from tests.enmapboxtestdata import library_berlin
 
         enmapBox.loadExampleData()
         enmapBox.addSource(library_berlin)

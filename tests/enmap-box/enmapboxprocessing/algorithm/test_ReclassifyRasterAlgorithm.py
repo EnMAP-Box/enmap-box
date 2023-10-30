@@ -5,7 +5,7 @@ from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import landcover_polygon_30m
+from tests.enmapboxtestdata import landcover_polygon_30m
 from qgis.core import QgsRasterLayer
 
 

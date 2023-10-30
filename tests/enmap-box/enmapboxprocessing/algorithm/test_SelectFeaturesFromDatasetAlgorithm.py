@@ -2,7 +2,7 @@ from enmapboxprocessing.algorithm.selectfeaturesfromdatasetalgorithm import Sele
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import classifierDumpPkl
+from tests.enmapboxtestdata import classifierDumpPkl
 
 
 class TestSelectFeatureSubsetFromSampleAlgorithm(TestCase):

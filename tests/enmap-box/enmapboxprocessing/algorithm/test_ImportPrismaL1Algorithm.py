@@ -3,7 +3,7 @@ import numpy as np
 from enmapboxprocessing.algorithm.importprismal1algorithm import ImportPrismaL1Algorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxtestdata import sensorProductsRoot, SensorProducts
+from tests.enmapboxtestdata import sensorProductsRoot, SensorProducts
 
 
 class TestImportPrismaL1Algorithm(TestCase):

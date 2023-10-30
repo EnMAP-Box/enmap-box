@@ -1,7 +1,7 @@
 from enmapboxprocessing.algorithm.classifierfeaturerankingpermutationimportancealgorithm import \
     ClassifierFeatureRankingPermutationImportanceAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxtestdata import classifierDumpPkl
+from tests.enmapboxtestdata import classifierDumpPkl
 
 
 class TestClassifierPerformanceAlgorithm(TestCase):

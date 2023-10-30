@@ -1,6 +1,6 @@
 import numpy as np
 
-from enmapboxtestdata import enmap, hires
+from tests.enmapboxtestdata import enmap, hires
 from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader

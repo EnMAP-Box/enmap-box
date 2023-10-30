@@ -3,7 +3,7 @@ from enmapboxprocessing.algorithm.prepareclassificationdatasetfromjsonalgorithm 
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import classificationDatasetAsJsonFile
+from tests.enmapboxtestdata import classificationDatasetAsJsonFile
 
 
 class TestPrepareClassificationDatasetFromJsonAlgorithm(TestCase):

@@ -1,10 +1,10 @@
-from enmapboxtestdata import enmap_potsdam, landcover_potsdam_point
+from tests.enmapboxtestdata import enmap_potsdam, landcover_potsdam_point
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousvectoralgorithm import \
     PrepareRegressionDatasetFromContinuousVectorAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import fraction_point_multitarget, fraction_point_singletarget, enmap, landcover_polygon
+from tests.enmapboxtestdata import fraction_point_multitarget, fraction_point_singletarget, enmap, landcover_polygon
 from qgis.core import QgsProcessingException
 
 

@@ -7,8 +7,8 @@ import numpy as np
 
 from enmapboxprocessing.testcase import TestCase
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import landcover_map_l3
-from enmapboxtestdata import fraction_map_l3
+from tests.enmapboxtestdata import landcover_map_l3
+from tests.enmapboxtestdata import fraction_map_l3
 
 
 class TestClassFractionRenderer(TestCase):

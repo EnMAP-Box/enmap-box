@@ -6,7 +6,7 @@ from enmapboxprocessing.algorithm.spectralresamplingtoprismaalgorithm import Spe
 from enmapboxprocessing.algorithm.spectralresamplingtosentinel2algorithm import \
     SpectralResamplingToSentinel2aAlgorithm, SpectralResamplingToSentinel2bAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxtestdata import enmap
+from tests.enmapboxtestdata import enmap
 from qgis.core import QgsRasterLayer
 
 

@@ -2,7 +2,7 @@ from enmapboxprocessing.algorithm.randomsamplesfromregressiondatasetalgorithm im
     RandomSamplesFromRegressionDatasetAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import regressorDumpMultiTargetPkl
+from tests.enmapboxtestdata import regressorDumpMultiTargetPkl
 
 
 class TestRandomSamplesFromRegressionDatasetAlgorithm(TestCase):

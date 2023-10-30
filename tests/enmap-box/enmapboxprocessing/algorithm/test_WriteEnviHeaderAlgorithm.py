@@ -1,6 +1,6 @@
 from osgeo import gdal
 
-from enmapboxtestdata import enmap
+from tests.enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.algorithm.writeenviheaderalgorithm import WriteEnviHeaderAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader

@@ -1,4 +1,4 @@
-from enmapboxtestdata import library_gpkg
+from tests.enmapboxtestdata import library_gpkg
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedlibraryalgorithm import \
     PrepareClassificationDatasetFromCategorizedLibraryAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase

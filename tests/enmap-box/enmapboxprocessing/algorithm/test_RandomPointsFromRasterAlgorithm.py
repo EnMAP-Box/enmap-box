@@ -1,6 +1,6 @@
 from enmapboxprocessing.algorithm.randompointsfromrasteralgorithm import RandomPointsFromRasterAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxtestdata import enmap
+from tests.enmapboxtestdata import enmap
 from qgis.core import QgsVectorLayer
 
 

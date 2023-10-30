@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.base import ClassifierMixin
 
-from enmapboxtestdata import enmap
+from tests.enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.creatergbimagefromclassprobabilityalgorithm import \
     CreateRgbImageFromClassProbabilityAlgorithm
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
@@ -11,7 +11,7 @@ from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import classifierDumpPkl
+from tests.enmapboxtestdata import classifierDumpPkl
 from qgis.core import QgsProcessingException
 
 

@@ -9,7 +9,7 @@ start_app()
 class TestCaseIssue622(EnMAPBoxTestCase):
 
     def test_loadENVI(self):
-        from enmapboxtestdata import enmap_berlin as path
+        from tests.enmapboxtestdata import enmap_berlin as path
         path = path.replace('.bsq', '.hdr')
         self.assertTrue(os.path.isfile(path))
         hdr = readENVIHeader(path)

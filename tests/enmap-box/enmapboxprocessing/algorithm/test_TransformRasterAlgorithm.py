@@ -3,13 +3,13 @@ from sklearn.base import TransformerMixin
 
 from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromrasteralgorithm import \
     PrepareUnsupervisedDatasetFromRasterAlgorithm
-from enmapboxtestdata import enmap, enmap_potsdam
+from tests.enmapboxtestdata import enmap, enmap_potsdam
 from enmapboxprocessing.algorithm.fittransformeralgorithmbase import FitTransformerAlgorithmBase
 from enmapboxprocessing.algorithm.inversetransformrasteralgorithm import InverseTransformRasterAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.algorithm.transformrasteralgorithm import TransformRasterAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxtestdata import classifierDumpPkl
+from tests.enmapboxtestdata import classifierDumpPkl
 
 
 class FitTestTransformerAlgorithm(FitTransformerAlgorithmBase):

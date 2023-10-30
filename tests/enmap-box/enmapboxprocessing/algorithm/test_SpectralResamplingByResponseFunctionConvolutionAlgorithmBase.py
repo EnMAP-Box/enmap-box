@@ -4,7 +4,7 @@ from enmapboxprocessing.algorithm.spectralresamplingtoenmapalgorithm import Spec
 from enmapboxprocessing.algorithm.spectralresamplingtolandsatalgorithm import SpectralResamplingToLandsatOliAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxtestdata import enmap
+from tests.enmapboxtestdata import enmap
 
 
 class TestSpectralResamplingByResponseFunctionConvolutionAlgorithmBase(TestCase):

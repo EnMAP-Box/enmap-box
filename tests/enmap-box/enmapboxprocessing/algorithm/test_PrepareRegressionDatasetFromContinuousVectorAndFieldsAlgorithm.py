@@ -3,7 +3,7 @@ from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousvectoran
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import classificationDatasetAsGpkgVector
+from tests.enmapboxtestdata import classificationDatasetAsGpkgVector
 
 
 class TestPrepareRegressionDatasetFromContinuousVectorAndFieldsAlgorithm(TestCase):

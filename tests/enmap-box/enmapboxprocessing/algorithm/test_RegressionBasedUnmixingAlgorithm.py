@@ -1,11 +1,11 @@
 import numpy as np
 
-from enmapboxtestdata import enmap
+from tests.enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.fitrandomforestregressoralgorithm import FitRandomForestRegressorAlgorithm
 from enmapboxprocessing.algorithm.regressionbasedunmixingalgorithm import RegressionBasedUnmixingAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxtestdata import classificationDatasetAsPklFile
+from tests.enmapboxtestdata import classificationDatasetAsPklFile
 
 
 class TestRegressionBasedUnmixingAlgorithm(TestCase):

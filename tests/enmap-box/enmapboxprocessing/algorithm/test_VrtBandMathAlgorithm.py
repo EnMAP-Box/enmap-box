@@ -1,4 +1,4 @@
-from enmapboxtestdata import enmap
+from tests.enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.algorithm.vrtbandmathalgorithm import VrtBandMathAlgorithm
 

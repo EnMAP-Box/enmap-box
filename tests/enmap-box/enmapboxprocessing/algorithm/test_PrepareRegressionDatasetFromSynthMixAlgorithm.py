@@ -5,7 +5,7 @@ from enmapboxprocessing.algorithm.prepareregressiondatasetfromsynthmixalgorithm 
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClassifierDump, RegressorDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import classifierDumpPkl
+from tests.enmapboxtestdata import classifierDumpPkl
 
 
 class TestFitClassifierAlgorithm(TestCase):

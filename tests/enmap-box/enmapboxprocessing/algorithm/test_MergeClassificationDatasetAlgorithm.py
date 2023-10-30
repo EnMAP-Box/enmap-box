@@ -2,7 +2,7 @@ from enmapboxprocessing.algorithm.mergeclassificationdatasetalgorithm import Mer
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import classifierDumpPkl
+from tests.enmapboxtestdata import classifierDumpPkl
 
 
 class TestMergeClassificationDatasetsAlgorithm(TestCase):

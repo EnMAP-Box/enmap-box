@@ -3,7 +3,7 @@ from enmapboxprocessing.algorithm.prepareregressiondatasetfromjsonalgorithm impo
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import regressionDatasetAsJsonFile
+from tests.enmapboxtestdata import regressionDatasetAsJsonFile
 
 
 class TestPrepareRegressionDatasetFromJsonAlgorithm(TestCase):

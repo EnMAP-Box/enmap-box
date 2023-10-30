@@ -1,7 +1,7 @@
 from sys import version_info
 from unittest import TestCase, skipIf
 
-import enmapboxtestdata
+from tests import enmapboxtestdata
 from _classic.hubdc.algorithm.sampling import sample_points, sample_polygons
 from _classic.hubdc.core import openRasterDataset, openVectorDataset
 

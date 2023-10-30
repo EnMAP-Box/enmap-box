@@ -1,6 +1,6 @@
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxtestdata import sensorProductsRoot, SensorProducts
+from tests.enmapboxtestdata import sensorProductsRoot, SensorProducts
 
 
 class TestImportSentinel2L2AAlgorithm(TestCase):

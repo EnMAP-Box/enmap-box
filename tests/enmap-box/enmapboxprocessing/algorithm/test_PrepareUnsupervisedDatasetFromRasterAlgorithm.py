@@ -1,10 +1,10 @@
-from enmapboxtestdata import enmap_potsdam
+from tests.enmapboxtestdata import enmap_potsdam
 from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromrasteralgorithm import \
     PrepareUnsupervisedDatasetFromRasterAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import landcover_polygon_30m, enmap, landcover_point
+from tests.enmapboxtestdata import landcover_polygon_30m, enmap, landcover_point
 
 
 class TestPrepareUnsupervisedDatasetFromRasterAlgorithm(TestCase):

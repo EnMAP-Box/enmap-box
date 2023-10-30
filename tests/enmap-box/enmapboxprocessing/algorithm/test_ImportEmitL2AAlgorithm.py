@@ -1,7 +1,7 @@
 from enmapboxprocessing.algorithm.importemitl2aalgorithm import ImportEmitL2AAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxtestdata import SensorProducts, sensorProductsRoot
+from tests.enmapboxtestdata import SensorProducts, sensorProductsRoot
 
 
 class TestImportEmitL2AAlgorithm(TestCase):

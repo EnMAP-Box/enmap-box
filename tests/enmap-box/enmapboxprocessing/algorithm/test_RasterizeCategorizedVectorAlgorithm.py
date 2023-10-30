@@ -1,11 +1,11 @@
 import numpy as np
 
-from enmapboxtestdata import enmap, landcover_polygon
+from tests.enmapboxtestdata import enmap, landcover_polygon
 from enmapboxprocessing.algorithm.rasterizecategorizedvectoralgorithm import RasterizeCategorizedVectorAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import landcover_points_multipart_epsg3035, landcover_polygon_3classes_id, \
+from tests.enmapboxtestdata import landcover_points_multipart_epsg3035, landcover_polygon_3classes_id, \
     landcover_polygon_3classes_epsg4326
 from qgis.core import QgsRasterLayer, QgsVectorLayer, QgsPalettedRasterRenderer, QgsCategorizedSymbolRenderer
 

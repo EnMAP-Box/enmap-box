@@ -1,4 +1,4 @@
-from enmapboxtestdata import SensorProducts, sensorProductsRoot
+from tests.enmapboxtestdata import SensorProducts, sensorProductsRoot
 from qgis.testing import TestCase
 
 

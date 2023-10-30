@@ -4,7 +4,7 @@ from enmapboxprocessing.algorithm.spectralresamplingbyresponsefunctionlibraryalg
     SpectralResamplingByResponseFunctionLibraryAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxtestdata import enmap, enmap_srf_library
+from tests.enmapboxtestdata import enmap, enmap_srf_library
 
 
 class TestSpectralResamplingByResponseFunctionLibraryAlgorithmBase(TestCase):

@@ -12,8 +12,8 @@ from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import ClustererDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import classifierDumpPkl, classificationDatasetAsJsonFile
-from enmapboxtestdata import enmap, enmap_potsdam
+from tests.enmapboxtestdata import classifierDumpPkl, classificationDatasetAsJsonFile
+from tests.enmapboxtestdata import enmap, enmap_potsdam
 from qgis.core import Qgis
 
 

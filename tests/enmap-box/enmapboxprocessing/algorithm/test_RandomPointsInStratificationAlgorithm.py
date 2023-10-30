@@ -3,7 +3,7 @@ import numpy as np
 from enmapboxprocessing.algorithm.randompointsfromcategorizedrasteralgorithm import \
     RandomPointsFromCategorizedRasterAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxtestdata import landcover_map_l3
+from tests.enmapboxtestdata import landcover_map_l3
 from qgis.core import QgsRasterLayer, QgsVectorLayer
 
 

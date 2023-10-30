@@ -28,7 +28,7 @@ from enmapbox.gui.datasources.datasources import SpatialDataSource, DataSource, 
     FileDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager, DataSourceManagerPanelUI, DataSourceFactory
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
-from enmapboxtestdata import classifierDumpPkl, library_berlin, enmap_srf_library
+from tests.enmapboxtestdata import classifierDumpPkl, library_berlin, enmap_srf_library
 
 
 class DataSourceTests(EnMAPBoxTestCase):

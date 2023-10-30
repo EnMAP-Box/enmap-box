@@ -2,7 +2,7 @@ from enmapbox import initAll
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprocessingdialog import SpectralProcessingDialog
 from enmapbox.testing import TestObjects
 from enmapboxprocessing.testcase import TestCase
-from enmapboxtestdata import library_berlin
+from tests.enmapboxtestdata import library_berlin
 from qgis.core import QgsVectorLayer
 
 

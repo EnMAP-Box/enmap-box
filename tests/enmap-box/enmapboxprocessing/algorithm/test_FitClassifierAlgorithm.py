@@ -8,7 +8,7 @@ from enmapboxprocessing.algorithm.fitrandomforestclassifieralgorithm import FitR
 from enmapboxprocessing.algorithm.fitsvcpolyalgorithm import FitSvcPolyAlgorithm
 from enmapboxprocessing.algorithm.fitsvcrbfalgorithm import FitSvcRbfAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxtestdata import classifierDumpPkl, classificationDatasetAsJsonFile
+from tests.enmapboxtestdata import classifierDumpPkl, classificationDatasetAsJsonFile
 
 
 class FitTestClassifierAlgorithm(FitClassifierAlgorithmBase):
