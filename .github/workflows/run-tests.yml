@@ -33,7 +33,7 @@ jobs:
 
       - name: Docker Environment Info
         run: |
-          # ls -la .docker/
+          # ls -la .env/docker/
           # ls -la
           # ls -la ~
           # ls -la /usr/bin
@@ -44,6 +44,6 @@ jobs:
           pip list
       - name: Test EnMAP-Box on QGIS
         run: | 
-          chmod +x .docker/run_docker_tests.sh
-          ls -la .docker/
-          docker compose -f .docker/docker-compose.gh.yml run qgis /usr/src/.docker/run_docker_tests.sh
+          chmod +x .env/docker/run_docker_tests.sh
+          ls -la .env/docker/
+          docker compose -f .env/docker/docker-compose.gh.yml run qgis /usr/src/.env/docker/run_docker_tests.sh
