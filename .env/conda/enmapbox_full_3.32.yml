@@ -39,6 +39,7 @@ dependencies:
   - typeguard=2
   - pytest
   - pytest-cov
+  - pytest-xdist
   - flake8
   - docutils
 
