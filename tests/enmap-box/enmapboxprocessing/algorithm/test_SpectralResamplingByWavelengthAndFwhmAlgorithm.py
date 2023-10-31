@@ -5,7 +5,8 @@ from enmapboxprocessing.algorithm.spectralresamplingbywavelengthandfwhmalgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import enmap, envi_library_berlin_sli, enmap_berlin_srf_csv, classificationDatasetAsPklFile
+from enmapboxtestdata import enmap, envi_library_berlin_sli, enmap_berlin_srf_csv, classificationDatasetAsPklFile, \
+    enmap_potsdam
 
 
 class TestSpectralResamplingByWavelengthAndFwhmAlgorithm(TestCase):
@@ -90,3 +91,17 @@ class TestSpectralResamplingByWavelengthAndFwhmAlgorithm(TestCase):
             assert 0, 'error not raised, something went wrong'
         except Exception as error:
             pass
+
+    def test_userFwhm(self):
+        alg = SpectralResamplingByWavelengthAndFwhmAlgorithm()
+        parameters = {
+            alg.P_RASTER: enmap_potsdam,
+            alg.P_RESPONSE_FILE: enmap_potsdam,
+            alg.P_FWHM: 10,
+            alg.P_OUTPUT_LIBRARY: self.filename('srf.geojson'),
+            alg.P_OUTPUT_RASTER: self.filename('resampled_10.tif')
+        }
+        result = self.runalg(alg, parameters)
+        self.assertEqual(-36108144.0, np.round(np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array()[0])))
+        srf = Utils().jsonLoad(result[alg.P_OUTPUT_LIBRARY])
+        self.assertEqual(224, len(srf['features']))
