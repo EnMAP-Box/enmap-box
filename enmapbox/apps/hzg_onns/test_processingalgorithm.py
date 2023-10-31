@@ -2,7 +2,7 @@ from os.path import join, dirname
 from qgis.core import QgsProcessingFeedback, QgsApplication
 from processing.core.Processing import Processing
 from hzg_onns.processingalgorithm import OnnsProcessingAlgorithm
-import enmapboxtestdata
+from tests import enmapboxtestdata
 
 # init QGIS
 qgsApp = QgsApplication([], True)

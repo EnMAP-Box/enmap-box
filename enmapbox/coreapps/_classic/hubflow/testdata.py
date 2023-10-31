@@ -9,7 +9,7 @@ from sklearn.cluster import KMeans
 from osgeo import gdal
 from _classic.hubflow.core import *
 import _classic.hubdc.progressbar
-import enmapboxtestdata
+from tests import enmapboxtestdata
 
 overwrite = not True
 progressBar = _classic.hubdc.progressbar.CUIProgressBar

@@ -50,7 +50,7 @@ def runalg(alg, io, info=None):
 
 
 import _classic.hubflow.test_core
-import enmapboxtestdata
+from tests import enmapboxtestdata
 
 enmap = _classic.hubflow.test_core.enmap.filename()
 enmapClassification = _classic.hubflow.test_core.enmapClassification.filename()
@@ -469,7 +469,7 @@ class TestRegression(TestCase):
 
 class RegressionSample(TestCase):
     def test_RegressionSample(self):
-        from enmapboxtestdata.artmo import directional_reflectance
+        from tests.enmapboxtestdata import directional_reflectance
         alg = RegressionSampleFromArtmo()
         io = {alg.P_FILE: directional_reflectance,
               alg.P_FLOAT: 1.,

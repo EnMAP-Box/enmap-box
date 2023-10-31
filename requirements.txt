@@ -15,7 +15,6 @@ dataclasses # ; python_version < '3.7'
 
 # required by parts of EnMAP-Box Core
 typeguard==2.13.3  # version 3.x created several problems
-scikit-learn>=0.24
 astropy # required for convolution
 PyOpenGL # required by ImageCube app
 xgboost # required by XGBoost classifier/regressor, see #960
