@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - release-**
+      - refactor_environments
 
   pull_request:
     branches:
