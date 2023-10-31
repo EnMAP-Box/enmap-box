@@ -26,12 +26,11 @@ import pathlib
 import re
 import shutil
 import subprocess
-# noinspection PyPep8Naming
 import sys
 import time
 import typing
+import platform
 from typing import List
-
 import requests
 
 from enmapbox import debugLog
@@ -244,7 +243,22 @@ def localPythonExecutable() -> pathlib.Path:
     Searches for the local python executable
     :return:
     """
-    return pathlib.Path(sys.executable).resolve()
+    candidates = [pathlib.Path(sys.executable)]
+    pythonhome = os.environ.get('PYTHONHOME', None)
+    if pythonhome:
+        ext = ''
+        if 'windows' in platform.uname().system.lower():
+            ext = '.exe'
+        for n in ['python3', 'python']:
+            p = pathlib.Path(pythonhome) / f'{n}{ext}'
+            candidates.append(p)
+
+    for c in candidates:
+        c = pathlib.Path(c.resolve())
+        if c.is_file() and 'python' in c.name.lower():
+            return c
+
+    return None
 
 
 class PIPPackageInfoTask(QgsTask):
