@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - mamba**
+      - refactor_environments
 
   pull_request:
     branches:
@@ -40,7 +41,7 @@ jobs:
       - name: Conda environment file
         run: |
           echo "conda environment file: ${{matrix.mamba_env}}.yml"
-          cat .conda/${{matrix.mamba_env}}.yml
+          cat .env/conda/${{matrix.mamba_env}}.yml
 
       - name: Setup Mambaforge
         uses: conda-incubator/setup-miniconda@v2
@@ -51,7 +52,7 @@ jobs:
           channels: conda-forge,defaults
           channel-priority: true
           activate-environment: ${{matrix.mamba_env}}
-          environment-file: .conda/${{matrix.mamba_env}}.yml
+          environment-file: .env/conda/${{matrix.mamba_env}}.yml
           clean-patched-environment-file: false
           use-mamba: true
           auto-activate-base: false
