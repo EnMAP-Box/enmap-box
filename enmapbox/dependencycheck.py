@@ -246,12 +246,15 @@ def localPythonExecutable() -> pathlib.Path:
     candidates = [pathlib.Path(sys.executable)]
     pythonhome = os.environ.get('PYTHONHOME', None)
     if pythonhome:
+        pythonhome = pathlib.Path(pythonhome)
         ext = ''
         if 'windows' in platform.uname().system.lower():
             ext = '.exe'
         for n in ['python3', 'python']:
-            p = pathlib.Path(pythonhome) / f'{n}{ext}'
-            candidates.append(p)
+            candidates.extend([
+                pythonhome / f'{n}{ext}',
+                pythonhome / 'bin' / f'{n}{ext}'
+            ])
 
     for c in candidates:
         c = pathlib.Path(c.resolve())
