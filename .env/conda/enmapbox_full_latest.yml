@@ -1,15 +1,14 @@
 # run: conda env create --file conda_environment.yml
 # see also https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
-name: enmapbox_full_3.32
+name: enmapbox_full_latest
 channels:
   - conda-forge
 dependencies:
   - python=3.9
-  - ipython
-  - qgis=3.32
+  - qgis>=3.32
   - pip
   - scikit-learn>=1 # if necessary, this will install scipy and numpy too
-  - matplotlib  # avoids that conda uses the wrong pip
+  - matplotlib # avoids that conda uses the wrong pip
   - enpt
   - xgboost
   - lightgbm
@@ -33,12 +32,14 @@ dependencies:
   - pyopengl
   - netcdf4
   - h5py
+
   # Development
   - gitpython
   - git-lfs
   - typeguard=2
   - pytest
   - pytest-cov
+  - pytest-xdist
   - flake8
   - docutils
 

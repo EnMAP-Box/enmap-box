@@ -51,10 +51,10 @@ However, the following steps show you how to run the EnMAP-Box from python witho
 
    Examples:
    ````bash
-   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_latest.yml
-   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_3.28.yml
-   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_light_latest.yml
-   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_light_3.28.yml
+   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.env/conda/enmapbox_full_latest.yml
+   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.env/conda/enmapbox_full_3.28.yml
+   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.env/conda/enmapbox_light_latest.yml
+   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.env/conda/enmapbox_light_3.28.yml
    ````
    
    The environment name corresponds to the `*.yml` basename. You can change it with  `-n`, e.g. `-n myenvironmennane`.
@@ -169,7 +169,7 @@ Replace it with your own EnMAP-Box fork from which you can create pull requests.
 
 1. Ensure that your environment has git available and starts QGIS by calling `qgis` 
    (see[1.](#1-install-qgis) and [2.](#2-test-the-qgis-environment)).
-   You copy a bootstrap script like [scripts/OSGeo4W/qgis_env.bat](scripts/OSGeo4W/qgis_env.bat) (windows) or
+   You copy a bootstrap script like [.env/OSGeo4W/qgis_env.bat](.env/OSGeo4W/qgis_env.bat) (windows) or
    [scripts/qgis_env.sh](scripts/qgis_env.sh) (linux) and adjust to your local settings for.
 
 2. Clone the EnMAP-Box repository.
