@@ -30,7 +30,7 @@ user-history.db
 .coverage
 
 # Untrack compiled files
-*.pyc 
+*.pyc*
 *.pyd
 
 #are changed all the time, should be commited explicitely
