@@ -1,10 +1,10 @@
 import numpy as np
 
-from enmapboxtestdata import enmap, landcover_polygon, landcover_map_l3, landcover_polygon_1m
 from enmapboxprocessing.algorithm.classfractionfromcategorizedlayeralgorithm import \
     ClassFractionFromCategorizedLayerAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxtestdata import enmap, landcover_polygon, landcover_polygon_1m
 from enmapboxtestdata import landcover_polygon_3classes_id
 from qgis.core import QgsRasterLayer, QgsVectorLayer
 

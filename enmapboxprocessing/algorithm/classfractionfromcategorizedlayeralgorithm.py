@@ -11,8 +11,7 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.numpyutils import NumpyUtils
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
-from qgis._core import QgsVectorLayer
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer)
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer
 from enmapbox.typeguard import typechecked
 
 
