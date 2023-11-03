@@ -28,7 +28,7 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 python3 scripts/setup_repository.py -r
 chmod +x scripts/runtests.sh
 echo "Start Tests"
-source scripts/runtests.sh
+source scripts/runtests.sh -n auto
 echo "Build plugin"
 python3 scripts/create_plugin.py
 popd

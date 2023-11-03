@@ -13,4 +13,4 @@ set PYTHONPATH=%PYTHONPATH%;^
 
 ::echo %PYTHONPATH%
 ::echo %CD%
-pytest --no-cov-on-fail --cov-config=%CD%\.coveragec
+pytest --no-cov-on-fail --cov-config=%CD%\.coveragec %*

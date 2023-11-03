@@ -10,6 +10,7 @@ git-lfs
 pytest
 pytest-env
 pytest-cov
+pytest-xdist
 docutils
 markdown
 coverage

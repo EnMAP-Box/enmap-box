@@ -14,5 +14,5 @@ export PYTHONPATH="${PYTHONPATH}"\
 ":$(pwd)/tests/src"
 
 echo $PYTHONPATH
-pytest --no-cov-on-fail
+pytest --no-cov-on-fail "$@"
 
