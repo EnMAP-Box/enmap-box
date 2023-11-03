@@ -169,7 +169,7 @@ Replace it with your own EnMAP-Box fork from which you can create pull requests.
 
 1. Ensure that your environment has git available and starts QGIS by calling `qgis` 
    (see[1.](#1-install-qgis) and [2.](#2-test-the-qgis-environment)).
-   You copy a bootstrap script like [.env/OSGeo4W/qgis_env.bat](.env/OSGeo4W/qgis_env.bat) (windows) or
+   You copy a bootstrap script like [.env/OSGeo4W/qgis_env.bat](.env/osgeo4w/qgis_env.bat) (windows) or
    [scripts/qgis_env.sh](scripts/qgis_env.sh) (linux) and adjust to your local settings for.
 
 2. Clone the EnMAP-Box repository.
