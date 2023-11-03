@@ -36,7 +36,7 @@ class LayerItem(QgsLayerItem):
 
 
 def dataItemToLayer(dataItem: QgsDataItem,
-                    project: QgsProject = QgsProject.instance()) -> QgsMapLayer:
+                    project: QgsProject = None) -> QgsMapLayer:
     lyr = None
     if project is None:
         project = QgsProject.instance()
@@ -130,7 +130,9 @@ class SpatialDataSource(DataSource):
         self.mNodeSize.appendChildNodes([self.nodeExtXmu, self.nodeExtYmu])
         self.appendChildNodes(self.nodeCRS)
 
-    def asMapLayer(self, project: QgsProject = QgsProject.instance()) -> QgsMapLayer:
+    def asMapLayer(self, project: QgsProject = None) -> QgsMapLayer:
+        if project is None:
+            project = QgsProject.instance()
         return dataItemToLayer(self.dataItem(), project=project)
 
     def mapLayer(self) -> QgsMapLayer:

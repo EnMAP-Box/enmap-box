@@ -23,13 +23,6 @@ import warnings
 from _weakrefset import WeakSet
 from typing import List
 
-from enmapbox import enmapboxSettings
-from enmapbox.enmapboxsettings import EnMAPBoxSettings
-from enmapbox.gui import MapTools, MapToolCenter, PixelScaleExtentMapTool, \
-    CursorLocationMapTool, FullExtentMapTool, QgsMapToolAddFeature, QgsMapToolSelect, \
-    CrosshairStyle, CrosshairMapCanvasItem
-from enmapbox.gui.mimedata import containsMapLayers, extractMapLayers
-from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
 from qgis.PyQt.QtCore import Qt, QObject, QCoreApplication, pyqtSignal, QEvent, QPointF, QMimeData, QTimer, QSize, \
     QModelIndex, QAbstractListModel
 from qgis.PyQt.QtGui import QMouseEvent, QIcon, QDragEnterEvent, QDropEvent, QResizeEvent, QKeyEvent, QColor
@@ -42,6 +35,14 @@ from qgis.core import QgsLayerTreeLayer, QgsCoordinateReferenceSystem, QgsRectan
 from qgis.gui import QgsColorDialog, QgsLayerTreeMapCanvasBridge, QgsMapTool
 from qgis.gui import QgsMapCanvas, QgisInterface, QgsMapToolZoom, QgsAdvancedDigitizingDockWidget, \
     QgsProjectionSelectionWidget, QgsMapToolIdentify, QgsMapToolPan, QgsMapToolCapture, QgsMapMouseEvent
+
+from enmapbox import enmapboxSettings
+from enmapbox.enmapboxsettings import EnMAPBoxSettings
+from enmapbox.gui import MapTools, MapToolCenter, PixelScaleExtentMapTool, \
+    CursorLocationMapTool, FullExtentMapTool, QgsMapToolAddFeature, QgsMapToolSelect, \
+    CrosshairStyle, CrosshairMapCanvasItem
+from enmapbox.gui.mimedata import containsMapLayers, extractMapLayers
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
 
 LINK_ON_SCALE = 'SCALE'
 LINK_ON_CENTER = 'CENTER'
