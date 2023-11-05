@@ -27,4 +27,4 @@ jobs:
         # {z}/{x}/{y}: CartoDB, ESRI, Open Weather, OSM, Stamen, Strava, Wikimedia
         # x={x}&y={y}&z={z}: Google
         exclude_patterns:
-          "%7Bz%7D/%7By%7D/%7Bx%7D","x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D",http://ecn.t3.tiles.virtualearth.net/,http://fbinter.stadt-berlin.de/,http://tiles.wmflabs.org/
+          http://ecn.t3.tiles.virtualearth.net/,http://fbinter.stadt-berlin.de/,http://tiles.wmflabs.org/
