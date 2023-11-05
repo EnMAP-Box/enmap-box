@@ -16,24 +16,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - name: urls-checker
-        uses: urlstechie/urlchecker-action@master
-        with:
-          file_types: .md,.py,.rst
+    - uses: actions/checkout@v4
+    - name: urls-checker
+      uses: urlstechie/urlchecker-action@master
+      with:
+        file_types: .md,.py,.rst
 
-          # Choose whether to include file with no URLs in the prints.
-          print_all: false
+        # Choose whether to include file with no URLs in the prints.
+        print_all: false
 
-          timeout: 5
+        timeout: 5
 
-          retry_count: 3
+        retry_count: 3
 
-          verbose: true
+        verbose: true
 
-          force_pass : false
+        force_pass : false
 
-          # {z}/{x}/{y}: CartoDB, ESRI, Open Weather, OSM, Stamen, Strava, Wikimedia
-          # x={x}&y={y}&z={z}: Google
-          exclude_patterns:
-            "%7Bz%7D/%7By%7D/%7Bx%7D","x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D",http://ecn.t3.tiles.virtualearth.net/,http://fbinter.stadt-berlin.de/,http://tiles.wmflabs.org/
+        # {z}/{x}/{y}: CartoDB, ESRI, Open Weather, OSM, Stamen, Strava, Wikimedia
+        # x={x}&y={y}&z={z}: Google
+        exclude_patterns:
+          "%7Bz%7D/%7By%7D/%7Bx%7D","x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D",http://ecn.t3.tiles.virtualearth.net/,http://fbinter.stadt-berlin.de/,http://tiles.wmflabs.org/
