@@ -1,15 +1,6 @@
 name: Check URLs
 
-on:
-  push:
-    branches:
-      - main
-      - 'releases/**'
-      - urlcheck
-  pull_request:
-    branches:
-      - main
-      - 'releases/**'
+on: [push, pull_request]
 
 jobs:
   build:
