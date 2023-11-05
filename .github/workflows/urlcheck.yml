@@ -2,6 +2,10 @@ name: Check URLs
 
 on: [push, pull_request]
 
+branches:
+  - main
+  - urlcheck
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -11,19 +15,22 @@ jobs:
     - name: urls-checker
       uses: urlstechie/urlchecker-action@master
       with:
-        # A comma-separated list of file types to cover in the URL checks
         file_types: .md,.py,.rst
 
         # Choose whether to include file with no URLs in the prints.
         print_all: false
 
-        # The timeout seconds to provide to requests, defaults to 5 seconds
         timeout: 5
 
-        # How many times to retry a failed request (each is logged, defaults to 1)
         retry_count: 3
 
-        # choose if the force pass or not
+        verbose: true
+
         force_pass : false
 
-        exclude_patterns: https://tile.openstreetmap./,http://fbinter.stadt-berlin.de/,http://tiles.wmflabs.org/,http://tile.stamen.com/,http://basemaps.cartocdn.com/,http://tile.openweathermap.org/,https://heatmap-external-b.strava.com/tiles/,https://tile.opentopomap.org/,http://ecn.t3.tiles.virtualearth.net/,
+        exclude_patterns:
+          %7Bz%7D/%7By%7D/%7Bx%7D, # {z}/{x}/{y}: CartoDB, ESRI, Open Weather, OSM, Stamen, Strava, Wikimedia
+          x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D, # x={x}&y={y}&z={z}: Google
+          http://ecn.t3.tiles.virtualearth.net/, # Bing
+          http://fbinter.stadt-berlin.de/,
+          http://tiles.wmflabs.org/
