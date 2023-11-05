@@ -1,10 +1,15 @@
 name: Check URLs
 
-on: [push, pull_request]
-
-branches:
-  - main
-  - urlcheck
+on:
+  push:
+    branches:
+      - main
+      - 'releases/**'
+      - urlcheck
+  pull_request:
+    branches:
+      - main
+      - 'releases/**'
 
 jobs:
   build:
@@ -28,9 +33,6 @@ jobs:
 
         force_pass : false
 
-        exclude_patterns:
-          %7Bz%7D/%7By%7D/%7Bx%7D, # {z}/{x}/{y}: CartoDB, ESRI, Open Weather, OSM, Stamen, Strava, Wikimedia
-          x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D, # x={x}&y={y}&z={z}: Google
-          http://ecn.t3.tiles.virtualearth.net/, # Bing
-          http://fbinter.stadt-berlin.de/,
-          http://tiles.wmflabs.org/
+        # {z}/{x}/{y}: CartoDB, ESRI, Open Weather, OSM, Stamen, Strava, Wikimedia
+        # x={x}&y={y}&z={z}: Google
+        exclude_patterns: http://ecn.t3.tiles.virtualearth.net/,%7Bz%7D/%7By%7D/%7Bx%7D,x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D,http://fbinter.stadt-berlin.de/,http://tiles.wmflabs.org/
