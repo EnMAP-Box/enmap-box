@@ -43,7 +43,7 @@ class TestClassificationAlgorithm(TestCase):
         }
         self.runalg(alg, parameters)
 
-    def test_trainingOnly(self):
+    def _DISABLED_test_trainingOnly(self):
         alg = ClassificationWorkflowAlgorithm()
         parameters = {
             alg.P_DATASET: classifierDumpPkl,

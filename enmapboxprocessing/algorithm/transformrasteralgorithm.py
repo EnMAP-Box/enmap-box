@@ -97,7 +97,10 @@ class TransformRasterAlgorithm(EnMAPProcessingAlgorithm):
                 feedback.pushInfo(f'Bands used as features: {", ".join(usedBandNames)}')
 
             # derive band count
-            X0 = np.ones((1, len(bandList)), np.float32)
+            if bandList is None:
+                X0 = np.ones((1, reader.bandCount()), np.float32)
+            else:
+                X0 = np.ones((1, len(bandList)), np.float32)
             Xt0 = dump.transformer.transform(X0)
             bandCount = Xt0.shape[1]
 
