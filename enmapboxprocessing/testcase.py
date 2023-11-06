@@ -14,6 +14,7 @@ from qgis.core import QgsRectangle, QgsCoordinateReferenceSystem
 
 enmapbox.testing.start_app()
 
+
 @typechecked
 class TestCase(enmapbox.testing.TestCase):
 
