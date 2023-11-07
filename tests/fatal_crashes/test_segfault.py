@@ -34,9 +34,12 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         self.assertIsInstance(EnMAPBox.instance(), EnMAPBox)
         self.assertEqual(EMB, EnMAPBox.instance())
         EMB.close()
+        del EMB
+        import gc
+        gc.collect()
         # EnMAPBox._instance = None
-        EMB2 = EnMAPBox()
-        # self.assertTrue(EnMAPBox.instance() is None)
+        # EMB2 = EnMAPBox()
+        self.assertTrue(EnMAPBox.instance() is None)
 
 
 if __name__ == '__main__':
