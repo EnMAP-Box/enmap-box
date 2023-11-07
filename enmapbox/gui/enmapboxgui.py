@@ -881,6 +881,11 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     def disconnectQGISSignals(self):
         try:
+            self.disconnect()
+        except TypeError:
+            pass
+
+        try:
             QgsProject.instance().layersAdded.disconnect(self.addMapLayers)
         except TypeError:
             pass
@@ -2203,6 +2208,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.ui.setGeometry(geom)
 
     def closeEvent(self, event: QCloseEvent):
+
         assert isinstance(event, QCloseEvent)
 
         try:
@@ -2213,18 +2219,24 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         except Exception as ex:
             messageLog(str(ex), Qgis.Critical)
+
         # de-refer the EnMAP-Box Singleton
-        EnMAPBox._instance = None
+
         self.sigClosed.emit()
+
         self.disconnectQGISSignals()
+
         try:
             import gc
             gc.collect()
         except Exception as ex:
             print(f'Errors when closing the EnMAP-Box: {ex}', file=sys.stderr)
             pass
-        EnMAPBox._instance = None
+
         event.accept()
+        QgsApplication.processEvents()
+
+        # EnMAPBox._instance = None
 
     def close(self):
         self.disconnectQGISSignals()
