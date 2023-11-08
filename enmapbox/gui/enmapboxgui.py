@@ -462,20 +462,16 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         settings: EnMAPBoxSettings = self.settings()
 
         splash = EnMAPBoxSplashScreen(parent=None)
-        if not settings.value(EnMAPBoxSettings.SHOW_SPLASHSCREEN, defaultValue=True, type=bool):
+        if settings.value(EnMAPBoxSettings.SHOW_SPLASHSCREEN, defaultValue=True, type=bool):
             splash.show()
 
         splash.showMessage('Load UI')
         QApplication.processEvents()
 
-        QObject.__init__(self)
         QgisInterface.__init__(self)
-        QgsExpressionContextGenerator.__init__(self)
-        QgsProcessingContextGenerator.__init__(self)
 
-        # in future this might become an own EnMAP-Box Project
-        # QgsProject.instance()
-        self.mProject = EnMAPBoxProject()
+
+        self.mProject: EnMAPBoxProject = EnMAPBoxProject()
 
         cmReg = EnMAPBoxContextMenuRegistry.instance()
         if len(cmReg) == 0:
@@ -484,8 +480,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.ui = EnMAPBoxUI()
         self.ui.closeEvent = self.closeEvent
 
-        # self.iface: QgisInterface = qgis.utils.iface
-        # assert isinstance(self.iface, QgisInterface)
+        from qgis.utils import iface
+        self.iface: QgisInterface = qgis.utils.iface
+        assert isinstance(self.iface, QgisInterface)
 
         self.mMapToolKey = MapTools.Pan
         self.mMapToolMode = None
@@ -1319,6 +1316,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         # self.ui.mActionAddFeature.triggered.connect(self.onAddFeatureTriggered)
         self.setMapTool(MapTools.CursorLocation)
 
+        from qgis.utils import iface
         # redirect to QGIS Project Management
         self.ui.mActionOpenProject.triggered.connect(lambda: iface.actionOpenProject().trigger())
         self.ui.mActionSaveProject.triggered.connect(lambda: iface.actionSaveProject().trigger())
@@ -2233,14 +2231,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             print(f'Errors when closing the EnMAP-Box: {ex}', file=sys.stderr)
             pass
 
-        event.accept()
         QgsApplication.processEvents()
-        import gc
         EnMAPBox._instance = None
-        refs = gc.get_referents(self)
-        for obj in refs:
-            s = ""
-
+        event.accept()
 
     def close(self):
         self.disconnectQGISSignals()
