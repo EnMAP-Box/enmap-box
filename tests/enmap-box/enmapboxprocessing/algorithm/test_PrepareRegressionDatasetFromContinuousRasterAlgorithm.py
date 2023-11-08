@@ -6,6 +6,10 @@ from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import fraction_polygon_l3, enmap
 
+from enmapbox.testing import start_app
+
+start_app()
+
 
 class TestPrepareRegressionDatasetFromContinuousRasterAlgorithm(TestCase):
 
