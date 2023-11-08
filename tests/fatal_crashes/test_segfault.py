@@ -18,8 +18,12 @@
 # noinspection PyPep8Naming
 import unittest
 
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.testing import EnMAPBoxTestCase, start_app
+from qgis.PyQt.QtCore import QObject
+from qgis.core import QgsExpressionContextGenerator
+from qgis.gui import QgisInterface, QgsProcessingContextGenerator
+
+from enmapbox.gui.enmapboxgui import EnMAPBox, EnMAPBoxProject
+from enmapbox.testing import EnMAPBoxTestCase, start_app, TestObjects
 
 start_app()
 
@@ -33,12 +37,21 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         EMB = EnMAPBox(load_other_apps=False, load_core_apps=False)
         self.assertIsInstance(EnMAPBox.instance(), EnMAPBox)
         self.assertEqual(EMB, EnMAPBox.instance())
+        self.assertIsInstance(EMB, QObject)
+        self.assertIsInstance(EMB, QgisInterface)
+        self.assertIsInstance(EMB, QgsExpressionContextGenerator)
+        self.assertIsInstance(EMB, QgsProcessingContextGenerator)
+        # EMB.loadExampleData()
+        lyr = TestObjects.createRasterLayer()
+        # EMB.project().addMapLayer(lyr)
+        dock1 = EMB.createMapDock()
+        dock1.layerTree().addLayer(lyr)
+
+        # EMB.openExampleData(mapWindows=1)
         EMB.close()
-        del EMB
-        import gc
-        gc.collect()
-        # EnMAPBox._instance = None
-        # EMB2 = EnMAPBox()
+
+        s = ""
+
         self.assertTrue(EnMAPBox.instance() is None)
 
 
