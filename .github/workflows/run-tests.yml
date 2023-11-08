@@ -6,6 +6,7 @@ on:
       - main
       - release-**
       - refactor_environments
+      - release_**
 
   pull_request:
     branches:
@@ -21,7 +22,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        qgis_version: [release-3_28, release-3_32]
+        qgis_version: [release-3_28, release-3_32, release-3_34]
       fail-fast: false
 
     env:
@@ -34,7 +35,7 @@ jobs:
 
       - name: Docker Environment Info
         run: |
-          # ls -la .env/docker/
+          # ls -la .docker/
           # ls -la
           # ls -la ~
           # ls -la /usr/bin
@@ -45,6 +46,6 @@ jobs:
           pip list
       - name: Test EnMAP-Box on QGIS
         run: | 
-          chmod +x .env/docker/run_docker_tests.sh
-          ls -la .env/docker/
-          docker compose -f .env/docker/docker-compose.gh.yml run qgis /usr/src/.env/docker/run_docker_tests.sh
+          chmod +x .docker/run_docker_tests.sh
+          ls -la .docker/
+          docker compose -f .docker/docker-compose.gh.yml run qgis /usr/src/.docker/run_docker_tests.sh

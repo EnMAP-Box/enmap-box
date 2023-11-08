@@ -52,7 +52,7 @@ from enmapbox.qgispluginsupport.qps.utils import zipdir
 # consider default Git location on Windows systems to avoid creating a Start-Up Script
 try:
     import git
-except ImportError as ex:
+except (ImportError, ModuleNotFoundError) as ex:
     # try to import after expanding PATH with known locations
     potentialLocations = [r'C:\Program Files\Git\bin']
     found = False

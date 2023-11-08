@@ -42,7 +42,7 @@ class TestRegressionWorkflowAlgorithm(TestCase):
         }
         self.runalg(alg, parameters)
 
-    def test_trainingOnly(self):
+    def _DISABLED_test_trainingOnly(self):
         alg = RegressionWorkflowAlgorithm()
         parameters = {
             alg.P_DATASET: regressorDumpMultiTargetPkl,

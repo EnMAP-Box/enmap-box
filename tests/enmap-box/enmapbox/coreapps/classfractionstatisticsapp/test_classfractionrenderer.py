@@ -15,6 +15,8 @@ class TestClassFractionRenderer(TestCase):
 
     def test_fractionL3(self):
         classification = QgsRasterLayer(landcover_map_l3)
+        self.assertTrue(classification.isValid())
+
         categories = Utils.categoriesFromPalettedRasterRenderer(classification.renderer())
         colors = [QColor(category.color) for category in categories]
 

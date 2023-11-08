@@ -9,14 +9,6 @@ from os.path import exists, sep, dirname
 from typing import List, Union, Any, Dict
 
 import numpy as np
-
-from enmapbox.gui.datasources.datasourcesets import DataSourceSet, ModelDataSourceSet, VectorDataSourceSet, \
-    FileDataSourceSet, RasterDataSourceSet
-from enmapbox.gui.utils import enmapboxUiPath
-from enmapbox.qgispluginsupport.qps.layerproperties import defaultRasterRenderer
-from enmapbox.qgispluginsupport.qps.models import TreeModel, TreeView, TreeNode, PyObjectTreeNode
-from enmapbox.qgispluginsupport.qps.utils import defaultBands, bandClosestToWavelength, loadUi, qgisAppQgisInterface
-from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtCore import QAbstractItemModel, QItemSelectionModel, QFileInfo, QFile, QTimer, \
     QMimeData, QModelIndex, Qt, QUrl, QSortFilterProxyModel, pyqtSignal
 from qgis.PyQt.QtGui import QContextMenuEvent, QDesktopServices
@@ -26,6 +18,15 @@ from qgis.core import QgsLayerTreeGroup, QgsLayerTreeLayer, QgsMapLayer, QgsProj
 from qgis.core import QgsMimeDataUtils
 from qgis.core import QgsProviderRegistry, QgsProviderSublayerDetails
 from qgis.gui import QgisInterface, QgsMapCanvas, QgsDockWidget
+
+from enmapbox.gui.datasources.datasourcesets import DataSourceSet, ModelDataSourceSet, VectorDataSourceSet, \
+    FileDataSourceSet, RasterDataSourceSet
+from enmapbox.gui.utils import enmapboxUiPath
+from enmapbox.qgispluginsupport.qps.layerproperties import defaultRasterRenderer
+from enmapbox.qgispluginsupport.qps.models import TreeModel, TreeView, TreeNode, PyObjectTreeNode
+from enmapbox.qgispluginsupport.qps.utils import defaultBands, bandClosestToWavelength, loadUi, qgisAppQgisInterface
+from enmapbox.typeguard import typechecked
+
 from .datasources import DataSource, SpatialDataSource, VectorDataSource, RasterDataSource, \
     ModelDataSource, FileDataSource, LayerItem
 from .metadata import RasterBandTreeNode
@@ -732,11 +733,14 @@ class DataSourceFactory(object):
     def create(source: any,
                name: str = None,
                show_dialogs: bool = True,
-               project: QgsProject = QgsProject.instance(),
+               project: QgsProject = None,
                parent: QWidget = None) -> List[DataSource]:
         """
         Searches the input for DataSources
         """
+        if project is None:
+            project = QgsProject.instance()
+
         results = []
         if isinstance(source, list):
             for s in source:

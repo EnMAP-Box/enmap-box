@@ -28,6 +28,9 @@ from qgis.PyQt.QtGui import QKeyEvent
 from qgis.PyQt.QtWidgets import QMenu, QAction
 from qgis.core import QgsPointXY, QgsProject, QgsRasterLayer
 
+from enmapbox.testing import start_app
+start_app()
+
 
 class MapCanvasTests(EnMAPBoxTestCase):
 
@@ -43,6 +46,8 @@ class MapCanvasTests(EnMAPBoxTestCase):
         self.assertTrue(m == m1)
 
     def test_mapCanvas(self):
+        box = EnMAPBox()
+
         mapCanvas = MapCanvas()
         lyr = TestObjects.createRasterLayer()
         self.assertTrue(lyr not in QgsProject.instance().mapLayers().values())
@@ -71,6 +76,7 @@ class MapCanvasTests(EnMAPBoxTestCase):
         mapCanvas.keyPressed.connect(onKeyPressed)
 
         self.showGui(mapCanvas)
+        box.close()
         QgsProject.instance().removeAllMapLayers()
 
     def test_canvaslinks(self):

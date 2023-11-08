@@ -23,12 +23,14 @@ from enmapbox.gui.applications import ApplicationRegistry
 from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QApplication, QAction, QWidget, QMenu
 
-from enmapbox.testing import EnMAPBoxTestCase, TestObjects
+from enmapbox.testing import EnMAPBoxTestCase, TestObjects, start_app
 from qgis.core import QgsProject, QgsProcessingAlgorithm, \
     QgsProcessingParameterDefinition, QgsProcessingParameterRasterLayer
 from enmapbox import DIR_ENMAPBOX, DIR_REPO
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.applications import EnMAPBoxApplication
+
+start_app()
 
 
 class test_applications(EnMAPBoxTestCase):

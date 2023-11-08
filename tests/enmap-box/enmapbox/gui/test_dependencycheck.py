@@ -141,6 +141,7 @@ class test_dependencycheck(EnMAPBoxTestCase):
         p = localPythonExecutable()
         self.assertIsInstance(p, pathlib.Path)
         self.assertTrue(p.is_file())
+        self.assertTrue('python' in p.name.lower())
 
         import subprocess
         cmd = str(p) + ' --version'

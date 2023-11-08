@@ -12,6 +12,8 @@ from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import Array2d, Array3d, Number
 from qgis.core import QgsRectangle, QgsCoordinateReferenceSystem
 
+enmapbox.testing.start_app()
+
 
 @typechecked
 class TestCase(enmapbox.testing.TestCase):
