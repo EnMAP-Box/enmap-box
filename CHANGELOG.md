@@ -1,7 +1,7 @@
 # CHANGELOG
 ## Version 3.13
 
-_This release was tested with QGIS 3.28 (LTR) and 3.32 (latest release)_
+_This release was tested with QGIS 3.28 (LTR), 3.32 and 3.34 (latest release)_
 
 ### Example Dataset
 
@@ -42,6 +42,7 @@ _This release was tested with QGIS 3.28 (LTR) and 3.32 (latest release)_
 
 ### Bugfixes
 
+* [v3.13.1](https://github.com/EnMAP-Box/enmap-box/milestone/13?closed=1)
 * [v3.13.0](https://github.com/EnMAP-Box/enmap-box/milestone/10?closed=1)
 
 ## Version 3.12
