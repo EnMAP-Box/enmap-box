@@ -470,7 +470,6 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         QgisInterface.__init__(self)
 
-
         self.mProject: EnMAPBoxProject = EnMAPBoxProject()
 
         cmReg = EnMAPBoxContextMenuRegistry.instance()
@@ -480,7 +479,6 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.ui = EnMAPBoxUI()
         self.ui.closeEvent = self.closeEvent
 
-        from qgis.utils import iface
         self.iface: QgisInterface = qgis.utils.iface
         assert isinstance(self.iface, QgisInterface)
 
