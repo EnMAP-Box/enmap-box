@@ -21,7 +21,7 @@ class TestDriver(TestCase):
 
     def test_createSinglePixel_3Band_PseudoRaster(self):
         shape = (3, 1, 1)
-        array = np.array(list(range(np.product(shape)))).reshape(shape)
+        array = np.array(list(range(np.prod(shape)))).reshape(shape)
         array[:, 0, 0] = -1
         filename = self.filename('raster.bsq')
         Driver(filename).createFromArray(array)

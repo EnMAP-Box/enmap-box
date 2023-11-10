@@ -78,11 +78,8 @@ class EnMAPBoxApplication(QObject):
         super(EnMAPBoxApplication, self).__init__(parent)
         self.enmapbox: EnMAPBox = enmapBox
 
-        if enmapBox is None:
-            from qgis.utils import iface
-            self.qgis: QgisInterface = iface
-        else:
-            self.qgis: QgisInterface = enmapBox.iface
+        from qgis.utils import iface
+        self.qgis: QgisInterface = iface
 
         # required attributes. Must be different to None
         self.name: str = None
