@@ -4,6 +4,9 @@ import platform
 import warnings
 from os.path import join, dirname, abspath, exists, basename
 from typing import Optional
+import numpy
+import sklearn
+import sys
 
 import enmapbox.exampledata
 from enmapboxprocessing.algorithm.classificationworkflowalgorithm import ClassificationWorkflowAlgorithm
@@ -140,9 +143,13 @@ regressionDatasetAsJsonFile = join(_root, _subdir, 'regression_dataset.json')
 regressionDatasetSingleTargetAsJsonFile = join(_root, _subdir, 'regression_dataset_singletarget.json')
 regressionDatasetMultiTargetAsJsonFile = join(_root, _subdir, 'regression_dataset_multitarget.json')
 
-regressionDatasetAsPkl = join(_root, _subdir, 'regression_dataset.pkl')
-regressionDatasetSingleTargetAsPkl = join(_root, _subdir, 'regression_dataset_singletarget.pkl')
-regressionDatasetMultiTargetAsPkl = join(_root, _subdir, 'regression_dataset_multitarget.pkl')
+_pklversion = (f"{str(numpy.__version__).replace('.', '')}_"
+               f"{str(sklearn.__version__).replace('.', '')}_"
+               f"{sys.api_version}")
+
+regressionDatasetAsPkl = join(_root, _subdir, f'regression_dataset_{_pklversion}.pkl')
+regressionDatasetSingleTargetAsPkl = join(_root, _subdir, f'regression_dataset_singletarget_{_pklversion}.pkl')
+regressionDatasetMultiTargetAsPkl = join(_root, _subdir, f'regression_dataset_multitarget_{_pklversion}.pkl')
 
 if not exists(regressionDatasetAsPkl):
     # we don't store pickle files inside the repo anymore (see issue #614), so we have to create it on-the-fly
@@ -188,8 +195,8 @@ if not exists(regressionDatasetMultiTargetAsPkl):
 
 # - Regressor
 regressorDumpPkl = join(_root, _subdir, 'regressor.pkl')
-regressorDumpSingleTargetPkl = join(_root, _subdir, 'regressor_singletarget.pkl')
-regressorDumpMultiTargetPkl = join(_root, _subdir, 'regressor_multitarget.pkl')
+regressorDumpSingleTargetPkl = join(_root, _subdir, f'regressor_singletarget_{_pklversion}.pkl')
+regressorDumpMultiTargetPkl = join(_root, _subdir, f'regressor_multitarget_{_pklversion}.pkl')
 
 if not exists(regressorDumpPkl):
     # we don't store pickle files inside the repo anymore (see issue #614), so we have to create it on-the-fly
