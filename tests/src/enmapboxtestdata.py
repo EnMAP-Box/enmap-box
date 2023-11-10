@@ -251,8 +251,8 @@ if not exists(regressorDumpMultiTargetPkl):
 
 # SRF
 _subdir = 'srf'
-enmap_berlin_srf_csv = join(_root, _subdir, 'enmap_berlin_srf.csv')  # wavelenght and fwhm
-enmap_potsdam_srf_csv = join(_root, _subdir, 'enmap_potsdam_srf.csv')  # wavelenght and fwhm
+enmap_berlin_srf_csv = join(_root, _subdir, 'enmap_berlin_srf.csv')  # wavelength and fwhm
+enmap_potsdam_srf_csv = join(_root, _subdir, 'enmap_potsdam_srf.csv')  # wavelength and fwhm
 
 # external testdata
 _subdir = 'external'
@@ -403,3 +403,5 @@ class SensorProducts(object):
                 sensorProductsRoot(), 'sentinel2', 'S2B_MSIL2A_20211028T102039_N0301_R065_T33UUU_20211028T121942.SAFE'
             )
             S2B_L2A_MsiL1CXml = join(S2B_L2A, 'MTD_MSIL2A.xml')
+
+del _pklversion
