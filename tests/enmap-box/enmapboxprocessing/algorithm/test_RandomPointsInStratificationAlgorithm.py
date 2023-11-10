@@ -24,15 +24,15 @@ class TestRandomPointsFromCategorizedRasterAlgorithm(TestCase):
         self.assertEqual(26317, QgsVectorLayer(parameters[alg.P_OUTPUT_POINTS]).featureCount())
 
     def test_kernel(self):
-        self.assertTrue(np.alltrue(np.equal([[0]], RandomPointsFromCategorizedRasterAlgorithm.makeKernel(30, 30, 0))))
-        self.assertTrue(np.alltrue(np.equal([[0]], RandomPointsFromCategorizedRasterAlgorithm.makeKernel(30, 30, 15))))
-        self.assertTrue(np.alltrue(np.equal(
+        self.assertTrue(np.all(np.equal([[0]], RandomPointsFromCategorizedRasterAlgorithm.makeKernel(30, 30, 0))))
+        self.assertTrue(np.all(np.equal([[0]], RandomPointsFromCategorizedRasterAlgorithm.makeKernel(30, 30, 15))))
+        self.assertTrue(np.all(np.equal(
             [[1, 1, 1], [1, 0, 1], [1, 1, 1]], RandomPointsFromCategorizedRasterAlgorithm.makeKernel(30, 30, 16)
         )))
-        self.assertTrue(np.alltrue(np.equal(
+        self.assertTrue(np.all(np.equal(
             [[1, 0, 1], [0, 0, 0], [1, 0, 1]], RandomPointsFromCategorizedRasterAlgorithm.makeKernel(30, 30, 30)
         )))
-        self.assertTrue(np.alltrue(np.equal(
+        self.assertTrue(np.all(np.equal(
             [[0, 0, 0], [0, 0, 0], [0, 0, 0]], RandomPointsFromCategorizedRasterAlgorithm.makeKernel(30, 30, 45)
         )))
 
