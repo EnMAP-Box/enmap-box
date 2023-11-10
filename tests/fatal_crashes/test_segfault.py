@@ -19,10 +19,11 @@
 import unittest
 
 from qgis.PyQt.QtCore import QObject
+from qgis.core import QgsProject
 from qgis.core import QgsExpressionContextGenerator
 from qgis.gui import QgisInterface, QgsProcessingContextGenerator
 
-from enmapbox.gui.enmapboxgui import EnMAPBox, EnMAPBoxProject
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import EnMAPBoxTestCase, start_app, TestObjects
 
 start_app()
@@ -34,7 +35,7 @@ start_app()
 class EnMAPBoxTests(EnMAPBoxTestCase):
 
     def test_segfault(self):
-        EMB = EnMAPBox(load_other_apps=False, load_core_apps=False)
+        EMB = EnMAPBox(load_other_apps=True, load_core_apps=True)
         self.assertIsInstance(EnMAPBox.instance(), EnMAPBox)
         self.assertEqual(EMB, EnMAPBox.instance())
         self.assertIsInstance(EMB, QObject)
@@ -45,14 +46,19 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         lyr = TestObjects.createRasterLayer()
         # EMB.project().addMapLayer(lyr)
         dock1 = EMB.createMapDock()
-        dock1.layerTree().addLayer(lyr)
 
+        node = dock1.layerTree().addLayer(lyr)
+        mapNode = node.parent()
+        # dock1.layerTree().removeChildNode(node)
         # EMB.openExampleData(mapWindows=1)
+
         EMB.close()
 
-        s = ""
-
+        # QgsProject.instance().removeAllMapLayers()
         self.assertTrue(EnMAPBox.instance() is None)
+
+        self.assertTrue(len(EMB.project().mapLayers()) == 0)
+        self.assertTrue(len(QgsProject().instance().mapLayers()) == 0)
 
 
 if __name__ == '__main__':

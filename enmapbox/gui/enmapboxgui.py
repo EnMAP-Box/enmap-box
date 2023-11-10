@@ -361,7 +361,7 @@ class EnMAPBoxProject(QgsProject):
 
     def removeAllMapLayers(self):
         self.mLayerRefs.clear()
-        super().removeMapLayers()
+        super().removeAllMapLayers()
         self.mLayerRefs.clear()
 
     def addMapLayer(self, mapLayer: QgsMapLayer, *args, **kwds) -> QgsMapLayer:
@@ -470,7 +470,6 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         QgisInterface.__init__(self)
 
-
         self.mProject: EnMAPBoxProject = EnMAPBoxProject()
 
         cmReg = EnMAPBoxContextMenuRegistry.instance()
@@ -481,7 +480,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.ui.closeEvent = self.closeEvent
 
         from qgis.utils import iface
-        self.iface: QgisInterface = qgis.utils.iface
+        self.iface: QgisInterface = iface
         assert isinstance(self.iface, QgisInterface)
 
         self.mMapToolKey = MapTools.Pan
@@ -2237,6 +2236,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     def close(self):
         self.disconnectQGISSignals()
+        self.dockManager()
         self.ui.close()
 
     def __del__(self):
