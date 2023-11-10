@@ -194,7 +194,7 @@ if not exists(regressionDatasetMultiTargetAsPkl):
     RegressorDump.fromFile(regressionDatasetMultiTargetAsPkl)  # check result
 
 # - Regressor
-regressorDumpPkl = join(_root, _subdir, 'regressor.pkl')
+regressorDumpPkl = join(_root, _subdir, f'regressor_{_pklversion}.pkl')
 regressorDumpSingleTargetPkl = join(_root, _subdir, f'regressor_singletarget_{_pklversion}.pkl')
 regressorDumpMultiTargetPkl = join(_root, _subdir, f'regressor_multitarget_{_pklversion}.pkl')
 
