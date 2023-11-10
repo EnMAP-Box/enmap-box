@@ -1035,7 +1035,7 @@ class RasterFromVector(EnMAPAlgorithm):
 
     def description(self):
         return Help(text='Converts vector to raster (using {}).',
-            links=[Link(url='http://gdal.org/python/osgeo.gdal-module.html#RasterizeOptions',
+            links=[Link(url='https://gdal.org/api/python/osgeo.gdal.html#osgeo.gdal.RasterizeOptions',
                 name='gdal rasterize')])
 
     def group(self):

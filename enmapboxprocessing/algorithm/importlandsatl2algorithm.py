@@ -94,12 +94,12 @@ class ImportLandsatL2Algorithm(EnMAPProcessingAlgorithm):
                 bandNames = ['Coastal aerosol', 'Blue', 'Green', 'Red', 'NIR', 'SWIR-1', 'SWIR-2']
                 wavelength = '{443, 482, 562, 655, 865, 1610, 2200}'
             elif basename(mtlFilename).startswith('LE'):
-                # https://landsat.gsfc.nasa.gov/landsat-7/landsat-7-etm-bands
+                # https://landsat.gsfc.nasa.gov/etm-plus/
                 bandNumbers = [1, 2, 3, 4, 5, 7]
                 bandNames = ['Blue', 'Green', 'Red', 'NIR', 'SWIR-1', 'SWIR-2']
                 wavelength = '{482, 565, 659, 837, 1650, 2215}'
             elif basename(mtlFilename).startswith('LT'):
-                # https://landsat.gsfc.nasa.gov/landsat-4-5/tm
+                # https://landsat.gsfc.nasa.gov/thematic-mapper/
                 bandNumbers = [1, 2, 3, 4, 5, 7]
                 bandNames = ['Blue', 'Green', 'Red', 'NIR', 'SWIR-1', 'SWIR-2']
                 wavelength = '{485, 560, 659, 830, 1650, 2215}'
