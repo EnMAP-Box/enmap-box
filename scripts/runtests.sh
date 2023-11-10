@@ -14,5 +14,7 @@ export PYTHONPATH="${PYTHONPATH}"\
 ":$(pwd)/tests/src"
 
 echo $PYTHONPATH
+qgis --version
+python3 scripts/systeminfo.py
 pytest --no-cov-on-fail "$@"
 
