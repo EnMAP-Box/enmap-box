@@ -4,6 +4,8 @@ Run this script after you have cloned the EnMAP-Box repository
 """
 import pathlib
 import site
+import sys
+
 import requests
 import zipfile
 import io
@@ -77,6 +79,15 @@ def setup_enmapbox_repository(resources: bool = True, qgis_resources: bool = Tru
         print('Install QGIS resource files')
         install_qgisresources()
 
+    DIR_ENMAPBOXTESTDATA = pathlib.Path(DIR_REPO) / 'tests' / 'src'
+    site.addsitedir(DIR_ENMAPBOXTESTDATA)
+
+def create_generic_testfiles():
+    # import to create generic testfiles
+    import enmapboxtestdata as ed
+    tmp = str(ed)
+
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Setup Repository. Run this after you have cloned the '
@@ -105,4 +116,8 @@ if __name__ == "__main__":
     print('Setup repository')
     setup_enmapbox_repository(resources=args.resources,
                               qgis_resources=args.qgisresources)
+
+    print('Create generic testfiles')
+    create_generic_testfiles()
+
     print('EnMAP-Box repository setup finished')
