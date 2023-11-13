@@ -250,8 +250,8 @@ if not exists(regressorDumpMultiTargetPkl):
 
 # SRF
 _subdir = 'srf'
-enmap_berlin_srf_csv = join(_root, _subdir, 'enmap_berlin_srf.csv')  # wavelenght and fwhm
-enmap_potsdam_srf_csv = join(_root, _subdir, 'enmap_potsdam_srf.csv')  # wavelenght and fwhm
+enmap_berlin_srf_csv = join(_root, _subdir, 'enmap_berlin_srf.csv')  # wavelength and fwhm
+enmap_potsdam_srf_csv = join(_root, _subdir, 'enmap_potsdam_srf.csv')  # wavelength and fwhm
 
 # external testdata
 _subdir = 'external'
