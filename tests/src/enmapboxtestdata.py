@@ -18,6 +18,9 @@ from enmapboxprocessing.algorithm.regressionworkflowalgorithm import RegressionW
 from enmapboxprocessing.typing import ClassifierDump, RegressorDump
 
 _root = abspath(join(dirname(dirname(__file__)), 'testdata'))
+_pklversion = (f"{str(numpy.__version__).replace('.', '')}_"
+               f"{str(sklearn.__version__).replace('.', '')}_"
+               f"{sys.api_version}")
 
 # Berlin example data
 # ...this is the old example dataset, which we still need for unittests
@@ -104,7 +107,7 @@ classificationDatasetAsForceFile = (
     join(_root, _subdir, 'classification_dataset_force_labels.csv')
 )
 
-classificationDatasetAsPklFile = join(_root, _subdir, 'classification_dataset.pkl')
+classificationDatasetAsPklFile = join(_root, _subdir, f'classification_dataset_{_pklversion}.pkl')
 if not exists(classificationDatasetAsPklFile):
     # we don't store pickle files inside the repo anymore (see issue #614), so we have to create it on-the-fly
     from enmapbox.testing import start_app
@@ -120,7 +123,7 @@ if not exists(classificationDatasetAsPklFile):
     ClassifierDump.fromFile(classificationDatasetAsPklFile)  # check result
 
 # - Classifier
-classifierDumpPkl = join(_root, _subdir, 'classifier.pkl')
+classifierDumpPkl = join(_root, _subdir, f'classifier_{_pklversion}.pkl')
 if not exists(classifierDumpPkl):
     # we don't store pickle files inside the repo anymore (see issue #614), so we have to create it on-the-fly
     from enmapbox.testing import start_app
@@ -142,10 +145,6 @@ if not exists(classifierDumpPkl):
 regressionDatasetAsJsonFile = join(_root, _subdir, 'regression_dataset.json')
 regressionDatasetSingleTargetAsJsonFile = join(_root, _subdir, 'regression_dataset_singletarget.json')
 regressionDatasetMultiTargetAsJsonFile = join(_root, _subdir, 'regression_dataset_multitarget.json')
-
-_pklversion = (f"{str(numpy.__version__).replace('.', '')}_"
-               f"{str(sklearn.__version__).replace('.', '')}_"
-               f"{sys.api_version}")
 
 regressionDatasetAsPkl = join(_root, _subdir, f'regression_dataset_{_pklversion}.pkl')
 regressionDatasetSingleTargetAsPkl = join(_root, _subdir, f'regression_dataset_singletarget_{_pklversion}.pkl')
@@ -194,7 +193,7 @@ if not exists(regressionDatasetMultiTargetAsPkl):
     RegressorDump.fromFile(regressionDatasetMultiTargetAsPkl)  # check result
 
 # - Regressor
-regressorDumpPkl = join(_root, _subdir, 'regressor.pkl')
+regressorDumpPkl = join(_root, _subdir, f'regressor_{_pklversion}.pkl')
 regressorDumpSingleTargetPkl = join(_root, _subdir, f'regressor_singletarget_{_pklversion}.pkl')
 regressorDumpMultiTargetPkl = join(_root, _subdir, f'regressor_multitarget_{_pklversion}.pkl')
 
@@ -260,7 +259,7 @@ envi_library_berlin_sli = join(_root, _subdir, 'envi', 'library_berlin.sli')
 engeomap_cubus_gamsberg_subset = join(_root, _subdir, 'engeomap', 'cubus_gamsberg_subset')
 engeomap_gamsberg_field_library = join(_root, _subdir, 'engeomap', 'gamsberg_field_library')
 engeomap_gamesberg_field_library_color_mod = join(_root, _subdir, 'engeomap', 'gamesberg_field_library_color_mod.csv')
-del _subdir, _root
+del _subdir, _root, _pklversion
 
 
 # external sensor products

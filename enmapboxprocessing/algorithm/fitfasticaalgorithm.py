@@ -22,6 +22,6 @@ class FitFastIcaAlgorithm(FitTransformerAlgorithmBase):
         from sklearn.preprocessing import StandardScaler
         from sklearn.decomposition import FastICA
 
-        fastICA = FastICA(n_components=3)
+        fastICA = FastICA(n_components=3, whiten='unit-variance')
         transformer = make_pipeline(StandardScaler(), fastICA)
         return transformer

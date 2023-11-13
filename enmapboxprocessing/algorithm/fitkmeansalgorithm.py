@@ -20,5 +20,5 @@ class FitKMeansAlgorithm(FitClustererAlgorithmBase):
     def code(cls):
         from sklearn.cluster import KMeans
 
-        clusterer = KMeans(n_clusters=8, n_init='auto')
+        clusterer = KMeans(n_clusters=8, n_init=10)
         return clusterer

@@ -22,7 +22,7 @@ jobs:
     strategy:
       matrix:
         qgis_version: [release-3_28, release-3_32, release-3_34]
-      fail-fast: true
+      fail-fast: false
 
     env:
         QGIS_TEST_VERSION: ${{ matrix.qgis_version}}
@@ -47,4 +47,4 @@ jobs:
         run: | 
           chmod +x .docker/run_docker_tests.sh
           ls -la .docker/
-          docker compose -f .docker/docker-compose.gh.yml run qgis /usr/src/.docker/run_docker_tests.sh -n auto
+          docker compose -f .docker/docker-compose.gh.yml run qgis /usr/src/.docker/run_docker_tests.sh

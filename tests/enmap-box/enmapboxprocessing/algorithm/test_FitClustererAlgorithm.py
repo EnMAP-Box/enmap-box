@@ -30,7 +30,7 @@ class FitTestClustererAlgorithm(FitClustererAlgorithmBase):
 
     def code(self) -> ClusterMixin:
         from sklearn.cluster import KMeans
-        clusterer = KMeans(n_clusters=10, random_state=42, n_init='auto')
+        clusterer = KMeans(n_clusters=10, random_state=42)
         return clusterer
 
 
