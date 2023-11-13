@@ -402,5 +402,3 @@ class SensorProducts(object):
                 sensorProductsRoot(), 'sentinel2', 'S2B_MSIL2A_20211028T102039_N0301_R065_T33UUU_20211028T121942.SAFE'
             )
             S2B_L2A_MsiL1CXml = join(S2B_L2A, 'MTD_MSIL2A.xml')
-
-del _pklversion
