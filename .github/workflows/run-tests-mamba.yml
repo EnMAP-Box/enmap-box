@@ -38,6 +38,10 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Environment Info
+        run: |
+          lsb_release -a
+
       - name: Conda environment file
         run: |
           echo "conda environment file: ${{matrix.mamba_env}}.yml"

@@ -39,6 +39,7 @@ jobs:
           # ls -la ~
           # ls -la /usr/bin
           docker --version
+          lsb_release -a
       - name: Python Packages Info
         run: |
           python3 --version
