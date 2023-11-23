@@ -244,6 +244,9 @@ def create_enmapbox_plugin(include_testdata: bool = False,
         os.makedirs(fileDst.parent, exist_ok=True)
         shutil.copy(fileSrc, fileDst.parent)
 
+    # make the LICENSE.md a LICENSE
+    shutil.copy(PLUGIN_DIR / 'LICENSE.md', PLUGIN_DIR / 'LICENSE')
+
     # update metadata version
 
     f = open(DIR_REPO / 'enmapbox' / '__init__.py')
@@ -462,7 +465,6 @@ if __name__ == "__main__":
                                   copy_to_profile=args.profile,
                                   build_name=args.build_name)
 
-#    if isinstance(path, pathlib.Path) and re.search(r'\.master\.', path.name):  # not sure what happens here, but the checklist seams to be never printed
     if True:
         message = \
             r"""
