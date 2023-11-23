@@ -9,6 +9,11 @@ _This release was tested with QGIS 3.28 (LTR), 3.32 and 3.34 (latest release)_
 * the underlying full EnMAP L2A scene can be downloaded from within the _EnMAP-Box Menu > Project > Download Example Scene_ (without user registration etc.) 
 * updated the EnMAP sensor model (wavelength and fwhm) ([#496](https://github.com/EnMAP-Box/enmap-box/issues/496))
 
+
+#### QGIS Expressions / QGIS Field Calculator
+
+* ``raster_array`` and ``raster_profile`` function can use polygon input
+
 ### Python Dependencies
 
 * updated [PyQtGraph](https://www.pyqtgraph.org/) to version 0.13.4 (via update of QPS)
@@ -21,6 +26,7 @@ _This release was tested with QGIS 3.28 (LTR), 3.32 and 3.34 (latest release)_
 ### GUI
 
 * _Spectral View_: added distance units (e.g. m, km) for properly plotting spatial profiles ([#525](https://github.com/EnMAP-Box/enmap-box/issues/525))
+* 
 
 ### Processing Algorithms
 
