@@ -21,9 +21,11 @@ import unittest
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.enmapboxsettings import enmapboxSettings, EnMAPBoxSettings
-from enmapbox.testing import EnMAPBoxTestCase
+from enmapbox.testing import EnMAPBoxTestCase, start_app
 from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsProject
+
+start_app()
 
 
 class TestEnMAPBoxPlugin(EnMAPBoxTestCase):
