@@ -1,12 +1,13 @@
 import os
 import pathlib
 import platform
+import sys
 import warnings
-from os.path import join, dirname, abspath, exists, basename
+from os.path import join, abspath, exists, basename
 from typing import Optional
+
 import numpy
 import sklearn
-import sys
 
 import enmapbox.exampledata
 from enmapboxprocessing.algorithm.classificationworkflowalgorithm import ClassificationWorkflowAlgorithm
@@ -17,7 +18,7 @@ from enmapboxprocessing.algorithm.prepareregressiondatasetfromjsonalgorithm impo
 from enmapboxprocessing.algorithm.regressionworkflowalgorithm import RegressionWorkflowAlgorithm
 from enmapboxprocessing.typing import ClassifierDump, RegressorDump
 
-_root = abspath(join(dirname(dirname(__file__)), 'testdata'))
+_root = abspath(pathlib.Path(__file__).parent / 'testdata')
 _pklversion = (f"{str(numpy.__version__).replace('.', '')}_"
                f"{str(sklearn.__version__).replace('.', '')}_"
                f"{sys.api_version}")
