@@ -4,6 +4,8 @@ Run this script after you have cloned the EnMAP-Box repository
 """
 import pathlib
 import site
+import sys
+
 import requests
 import zipfile
 import io
@@ -84,9 +86,9 @@ def setup_enmapbox_repository(resources: bool = True, qgis_resources: bool = Tru
 def create_generic_testfiles():
     # import to create generic testfiles
     from enmapbox.testing import start_app
-
+    from enmapbox import DIR_UNITTESTS
     start_app()
-
+    site.addsitedir(DIR_UNITTESTS)
     import enmapboxtestdata as ed
     tmp = str(ed)
 
