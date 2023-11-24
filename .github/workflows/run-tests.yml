@@ -49,5 +49,5 @@ jobs:
       - name: Test EnMAP-Box on QGIS
         run: | 
           chmod +x .env/docker/run_docker_tests.sh
-          ls -la .end/docker
+          ls -la .env/docker
           docker compose -f .env/docker/docker-compose.gh.yml run qgis /usr/src/.env/docker/run_docker_tests.sh -n auto
