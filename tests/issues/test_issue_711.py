@@ -23,9 +23,11 @@ import unittest
 import enmapbox.exampledata
 import qgis
 from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.testing import TestObjects, EnMAPBoxTestCase
+from enmapbox.testing import TestObjects, EnMAPBoxTestCase, start_app
 from enmapboxtestdata import library_gpkg, enmap_srf_library
 from qgis.core import QgsProject
+
+start_app()
 
 
 class TestIssue711(EnMAPBoxTestCase):
