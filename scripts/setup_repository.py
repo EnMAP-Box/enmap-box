@@ -2,16 +2,15 @@
 Initial setup of the EnMAP-Box repository.
 Run this script after you have cloned the EnMAP-Box repository
 """
-import pathlib
-import site
-import sys
-
-import requests
-import zipfile
+import argparse
 import io
 import os
+import pathlib
 import shutil
-import argparse
+import site
+import zipfile
+
+import requests
 
 DIR_REPO = pathlib.Path(__file__).parents[1].resolve()
 site.addsitedir(DIR_REPO)
