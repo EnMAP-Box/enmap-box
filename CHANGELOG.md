@@ -105,7 +105,7 @@ Also see https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/eo4q.
 
 _This release was tested under QGIS 3.26.2_
 
-_Important Notice: the EnMAP-Box repository moved to https://github.com/EnMAP-Box/enmap-box_
+_Important Notice: the EnMAP-Box repository moved to https://github.com/EnMAP-Box/enmap-box
 
 ### Applications
 

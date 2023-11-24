@@ -67,7 +67,7 @@ PACKAGE_LOOKUP = {'scikit-learn': 'sklearn',
 # just in case a package cannot /should not simply get installed
 # calling pip install --user <pip package name>
 INSTALLATION_HINT = {
-    # 'enpt_enmapboxapp' : 'git+https://gitext.gfz-potsdam.de/EnMAP/GFZ_Tools_EnMAP_BOX/enpt_enmapboxapp.git'
+
 }
 
 INSTALLATION_BLOCK = {  # 'numba': 'should to be installed manually using the local package manager.\n' +
