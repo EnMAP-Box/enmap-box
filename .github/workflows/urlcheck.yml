@@ -33,6 +33,8 @@ jobs:
 
         force_pass : false
 
+        exclude_files:
+          test_glossary.py
         # {z}/{x}/{y}: ESRI
         # {z]/{y}/{x}: CartoDB, Open Weather, OpenTopoMap, OSM, Stamen, Strava, Wikimedia
         # x={x}&y={y}&z={z}: Google
