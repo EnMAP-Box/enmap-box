@@ -1,0 +1,15 @@
+# General list of packages used by EnMAP-Box
+# DO NOT USE WITH PIP
+# instead, follow platform specific instructions in
+# .env, e.g. .env/linux
+typeguard==2.13.3
+astropy
+PyOpenGL
+xgboost
+lightgbm
+catboost
+# required by parts of EnMAP-Box Applications
+sympy
+numba
+enpt-enmapboxapp
+scikit-learn

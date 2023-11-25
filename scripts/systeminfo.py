@@ -19,6 +19,11 @@ packages = ['osgeo.gdal', 'numpy', 'scipy',
 for p in packages:
     try:
         pkg = __import__(p)
-        print(pkg.__file__)
+        version = 'unknown'
+        if hasattr(pkg, '__version__'):
+            version = pkg.__version__
+        info = f'{p} version {version}: {pkg.__file__}'
+        print(info)
+
     except Exception as ex:
         print(ex)

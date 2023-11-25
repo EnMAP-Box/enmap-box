@@ -7,6 +7,10 @@ from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxtestdata import classificationDatasetAsPklFile
 
+from enmapbox.testing import start_app
+
+start_app()
+
 
 class TestRegressionBasedUnmixingAlgorithm(TestCase):
 

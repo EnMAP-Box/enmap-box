@@ -359,6 +359,7 @@ class MapDockTreeNode(DockTreeNode):
         added = [lyr for lyr in self.mLayers if lyr not in layers]
         if len(added) > 0:
             self.sigAddedLayers.emit(added)
+            pass
 
     def onRemovedChildren(self, node, idxFrom, idxTo):
         layers = self.mLayers[:]
@@ -366,6 +367,7 @@ class MapDockTreeNode(DockTreeNode):
         removed = [lyr for lyr in layers if lyr not in self.mLayers]
         if len(removed) > 0:
             self.sigRemovedLayers[list].emit(removed)
+            pass
 
     def mapCanvas(self) -> MapCanvas:
         """
@@ -375,18 +377,19 @@ class MapDockTreeNode(DockTreeNode):
         return self.dock.mapCanvas()
 
     def updateCanvas(self):
-        # save a reference on each layer in the tree
-        self.mPreviousLayers = self.mLayers[:]
-        self.mLayers = [n.layer() for n in self.findLayers() if isinstance(n.layer(), QgsMapLayer)]
+        """
+        Calling routines should save a reference on layers in self.mLayers
+        :return:
+        """
+
+        self.mLayers.clear()
+        self.mLayers.extend([n.layer() for n in self.findLayers() if isinstance(n.layer(), QgsMapLayer)])
 
         # ensure that layers have a project
         unregistered = [lyr for lyr in self.mLayers if not isinstance(lyr.project(), QgsProject)]
 
-        if self.mapCanvas() is None:
-            s = ""
-        if self.mapCanvas().project() is None:
-            s = ""
         project = self.mapCanvas().project()
+
         if len(unregistered) > 0 and isinstance(project, QgsProject):
             project.addMapLayers(unregistered, False)
 
@@ -930,7 +933,7 @@ class DockManagerTreeModel(QgsLayerTreeModel):
 
     def removeDock(self, dock):
         rootNode = self.rootNode
-        to_remove = [n for n in rootNode.children() if n.dock == dock]
+        to_remove = [n for n in rootNode.children() if isinstance(n, DockTreeNode) and n.dock == dock]
         keep_ref = [n.layer() for n in rootNode.findLayers()]
         self.removeNodes(to_remove)
         keep_ref.clear()

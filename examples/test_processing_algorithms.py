@@ -1,12 +1,12 @@
 import time
 from typing import Dict, Any
 
-from enmapbox.testing import start_app, TestCase, TestObjects
-from enmapbox.qgispluginsupport.qps.testing import ExampleAlgorithmProvider
 import processing
-from qgis._core import QgsProject
-from qgis.core import QgsProcessingAlgorithm, QgsProcessingRegistry, QgsApplication, QgsProcessingParameterRasterLayer, \
-    QgsProcessingParameterRasterDestination, QgsProcessingParameterFolderDestination, QgsProcessingContext, \
+from enmapbox.qgispluginsupport.qps.testing import ExampleAlgorithmProvider
+from enmapbox.testing import start_app, TestCase, TestObjects
+from qgis.core import QgsProject, QgsProcessingAlgorithm, QgsProcessingRegistry, QgsApplication, \
+    QgsProcessingParameterRasterLayer, \
+    QgsProcessingContext, \
     QgsProcessingFeedback, QgsProcessingOutputFolder
 
 start_app()

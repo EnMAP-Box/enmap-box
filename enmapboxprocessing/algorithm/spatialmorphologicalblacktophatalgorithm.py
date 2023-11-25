@@ -29,7 +29,7 @@ class SpatialMorphologicalBlackTophatAlgorithm(SpatialFilterFunctionAlgorithmBas
         return f'Python code. See {links} for information on different parameters.'
 
     def code(cls):
-        from scipy.ndimage.morphology import black_tophat, generate_binary_structure, iterate_structure
+        from scipy.ndimage import black_tophat, generate_binary_structure, iterate_structure
 
         structure = generate_binary_structure(rank=2, connectivity=1)
         structure = iterate_structure(structure=structure, iterations=1)

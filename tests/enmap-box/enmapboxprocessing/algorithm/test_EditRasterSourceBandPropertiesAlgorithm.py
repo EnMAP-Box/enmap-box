@@ -1,3 +1,4 @@
+import os.path
 from time import sleep
 
 from osgeo import gdal
@@ -14,12 +15,20 @@ class TestEditRasterSourceBandPropertiesAlgorithm(TestCase):
 
     def copyEnmap(self, gtiff=False):
         # make a copy of enmap
+
         alg = TranslateRasterAlgorithm()
+
+        path_output = self.filename('enmap' + ('.tif' if gtiff else '.vrt'))
+        i = 0
+        while os.path.isfile(path_output):
+            i += 1
+            path_output = self.filename(f'enmap{i}' + ('.tif' if gtiff else '.vrt'))
+
         parameters = {
             alg.P_RASTER: enmap,
             alg.P_OFFSET: -9999,
             alg.P_CREATION_PROFILE: alg.GTiffFormat if gtiff else alg.VrtFormat,
-            alg.P_OUTPUT_RASTER: self.filename('enmap' + ('.tif' if gtiff else '.vrt'))
+            alg.P_OUTPUT_RASTER: path_output,
         }
         self.runalg(alg, parameters)
 

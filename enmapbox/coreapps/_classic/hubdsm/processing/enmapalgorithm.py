@@ -197,7 +197,7 @@ class Help(object):
 
 
 class Cookbook(object):
-    URL = r'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_cookbook'
+    URL = r'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_cookbook/usr_cookbook.html'
     R_CLASSIFICATION = 'Classification'
     R_REGRESSION = 'Regression'
     R_CLUSTERING = 'Clustering'

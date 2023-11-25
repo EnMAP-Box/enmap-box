@@ -1,13 +1,18 @@
 # CHANGELOG
 ## Version 3.13
 
-_This release was tested with QGIS 3.28 (LTR) and 3.32 (latest release)_
+_This release was tested with QGIS 3.28 (LTR), 3.32 and 3.34 (latest release)_
 
 ### Example Dataset
 
 * the previous _Berlin_ example dataset (based on simulated data) was replaced by a new dataset derived from real EnMAP L2A data, covering the _Potsdam_ region
 * the underlying full EnMAP L2A scene can be downloaded from within the _EnMAP-Box Menu > Project > Download Example Scene_ (without user registration etc.) 
 * updated the EnMAP sensor model (wavelength and fwhm) ([#496](https://github.com/EnMAP-Box/enmap-box/issues/496))
+
+
+#### QGIS Expressions / QGIS Field Calculator
+
+* ``raster_array`` and ``raster_profile`` function can use polygon input
 
 ### Python Dependencies
 
@@ -21,6 +26,7 @@ _This release was tested with QGIS 3.28 (LTR) and 3.32 (latest release)_
 ### GUI
 
 * _Spectral View_: added distance units (e.g. m, km) for properly plotting spatial profiles ([#525](https://github.com/EnMAP-Box/enmap-box/issues/525))
+* 
 
 ### Processing Algorithms
 
@@ -42,6 +48,7 @@ _This release was tested with QGIS 3.28 (LTR) and 3.32 (latest release)_
 
 ### Bugfixes
 
+* [v3.13.1](https://github.com/EnMAP-Box/enmap-box/milestone/13?closed=1)
 * [v3.13.0](https://github.com/EnMAP-Box/enmap-box/milestone/10?closed=1)
 
 ## Version 3.12
@@ -98,7 +105,7 @@ Also see https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/eo4q.
 
 _This release was tested under QGIS 3.26.2_
 
-_Important Notice: the EnMAP-Box repository moved to https://github.com/EnMAP-Box/enmap-box_
+_Important Notice: the EnMAP-Box repository moved to https://github.com/EnMAP-Box/enmap-box
 
 ### Applications
 
