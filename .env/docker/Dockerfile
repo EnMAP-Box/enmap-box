@@ -16,9 +16,9 @@ RUN python3 --version
 RUN pip3 list
 
 RUN echo "Install missing EnMAP-Box requirements:"
-COPY ./requirements_docker.txt /tmp/
+COPY ./.env/requirements.txt /tmp/
 COPY ./requirements_developer.txt /tmp/
-RUN pip3 install -r /tmp/requirements_docker.txt
+RUN pip3 install -r /tmp/requirements.txt
 RUN pip3 install -r /tmp/requirements_developer.txt
 
 # Avoid sqlcmd termination due to locale -- see https://github.com/Microsoft/mssql-docker/issues/163
