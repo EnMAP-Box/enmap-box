@@ -1,11 +1,12 @@
 from typing import Optional
 
 import numpy as np
-from scipy.interpolate import interp2d
+from scipy.interpolate import LinearNDInterpolator
 
 from bivariatecolorrasterrendererapp.bivariatecolorrasterrenderer import BivariateColorRasterRenderer
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget, ImageItem
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QCheckBox, QMainWindow, QComboBox, QMenu, QAction, QPushButton, \
@@ -14,7 +15,6 @@ from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer, QgsMapLayerProxyModel, QgsMapSettings
 from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsDoubleSpinBox, QgsMapLayerComboBox, QgsColorButton, \
     QgsSpinBox
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -262,13 +262,13 @@ class BivariateColorRasterRendererDialog(QMainWindow):
             classes = self.mClasses.value()
 
         x, y = np.meshgrid([1, classes], [1, classes])
-        Xnew = np.linspace(1, classes, classes)
-        Ynew = np.linspace(1, classes, classes)
-        fRed = interp2d(x, y, colorsEdges[:, :, 0], kind='linear')
+        Xnew, Ynew = np.meshgrid(np.linspace(1, classes, classes), np.linspace(1, classes, classes))
+        points = list(zip(x.flat, y.flat))
+        fRed = LinearNDInterpolator(points, list(colorsEdges[:, :, 0].flat))
         redPlane = fRed(Xnew, Ynew)
-        fGreen = interp2d(x, y, colorsEdges[:, :, 1], kind='linear')
+        fGreen = LinearNDInterpolator(points, list(colorsEdges[:, :, 1].flat))
         greenPlane = fGreen(Xnew, Ynew)
-        fBlue = interp2d(x, y, colorsEdges[:, :, 2], kind='linear')
+        fBlue = LinearNDInterpolator(points, list(colorsEdges[:, :, 2].flat))
         bluePlane = fBlue(Xnew, Ynew)
         self.colorPlane = np.transpose((redPlane, greenPlane, bluePlane), (1, 2, 0))
 
