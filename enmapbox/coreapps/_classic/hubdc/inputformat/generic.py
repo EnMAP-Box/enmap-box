@@ -19,7 +19,7 @@ def raster(filename, wavelength=None, date=None):
 
     if date is None:
         acquisition_time = wavelength = rasterDataset.metadataItem(key='acquisition time', domain='ENVI')
-        # see https://www.harrisgeospatial.com/docs/enviheaderfiles.html#acquisition_time for details
+        # see https://www.nv5geospatialsoftware.com/docs/enviheaderfiles.html for details
         if acquisition_time is not None:
             date = Date.parse(acquisition_time[:len('YYYY-MM-DD')])
 

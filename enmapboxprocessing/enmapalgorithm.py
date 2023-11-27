@@ -204,7 +204,10 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def parameterAsFields(
             self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext
     ) -> Optional[List[str]]:
-        fields = super().parameterAsFields(parameters, name, context)
+        if Qgis.versionInt() >= 33200:
+            fields = super().parameterAsStrings(parameters, name, context)
+        else:
+            fields = super().parameterAsFields(parameters, name, context)
         if len(fields) == 0:
             return None
         else:
@@ -1045,7 +1048,7 @@ class Group(Enum):
 
 
 class CookbookUrls(object):
-    URL = r'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_cookbook'
+    URL = r'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_cookbook/usr_cookbook.html'
     URL_CLASSIFICATION = ('Classification', URL + '/classification.html')
     URL_REGRESSION = ('Regression', URL + '/regression.html')
     URL_CLUSTERING = ('Clustering', URL + '/clustering.html')

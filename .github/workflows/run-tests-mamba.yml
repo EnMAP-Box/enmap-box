@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - mamba**
-      - refactor_environments
+      - release-**
 
   pull_request:
     branches:
@@ -37,6 +37,10 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: recursive
+
+      - name: Environment Info
+        run: |
+          lsb_release -a
 
       - name: Conda environment file
         run: |
@@ -73,4 +77,4 @@ jobs:
       - name: Test EnMAP-Box in ${{matrix.mamba_env}}
         run: |
           chmod +x scripts/runtests.sh
-          bash ./scripts/runtests.sh
+          bash ./scripts/runtests.sh -n auto

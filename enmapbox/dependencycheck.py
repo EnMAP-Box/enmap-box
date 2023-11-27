@@ -33,7 +33,7 @@ import platform
 from typing import List
 import requests
 
-from enmapbox import debugLog
+from enmapbox import debugLog, REQUIREMENTS
 from enmapbox.enmapboxsettings import EnMAPBoxSettings
 from enmapbox.qgispluginsupport.qps.utils import qgisAppQgisInterface
 from qgis.PyQt import sip
@@ -67,7 +67,7 @@ PACKAGE_LOOKUP = {'scikit-learn': 'sklearn',
 # just in case a package cannot /should not simply get installed
 # calling pip install --user <pip package name>
 INSTALLATION_HINT = {
-    # 'enpt_enmapboxapp' : 'git+https://gitext.gfz-potsdam.de/EnMAP/GFZ_Tools_EnMAP_BOX/enpt_enmapboxapp.git'
+
 }
 
 INSTALLATION_BLOCK = {  # 'numba': 'should to be installed manually using the local package manager.\n' +
@@ -423,7 +423,7 @@ def requiredPackages(return_tuples: bool = False) -> typing.List[PIPPackage]:
     # see https://pip.pypa.io/en/stable/reference/pip_install/#requirements-file-format
     # for details of requirements format
 
-    file = pathlib.Path(__file__).resolve().parents[1] / 'requirements.txt'
+    file = REQUIREMENTS
     assert file.is_file(), '{} does not exist'.format(file)
     packages = []
     rxPipPkg = re.compile(r'^[a-zA-Z_-][a-zA-Z0-9_-]*')

@@ -244,6 +244,9 @@ def create_enmapbox_plugin(include_testdata: bool = False,
         os.makedirs(fileDst.parent, exist_ok=True)
         shutil.copy(fileSrc, fileDst.parent)
 
+    # make the LICENSE.md a LICENSE
+    shutil.copy(PLUGIN_DIR / 'LICENSE.md', PLUGIN_DIR / 'LICENSE')
+
     # update metadata version
 
     f = open(DIR_REPO / 'enmapbox' / '__init__.py')

@@ -82,7 +82,7 @@ class DASFretrievalAlgorithm(QgsProcessingAlgorithm):
         return html
 # 6
     def helpUrl(self, *args, **kwargs):
-        return 'https://enmap-box-workshop2019.readthedocs.io'
+        return ''
 # 7
     def createInstance(self):
         return type(self)()

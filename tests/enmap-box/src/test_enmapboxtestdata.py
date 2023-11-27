@@ -2,7 +2,7 @@ from enmapboxtestdata import SensorProducts, sensorProductsRoot
 from qgis.testing import TestCase
 
 
-class TestEnmapboxtestdata(TestCase):
+class TestEnMAPBoxTestdata(TestCase):
 
     def test(self):
         if sensorProductsRoot() is None:

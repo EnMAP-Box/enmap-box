@@ -16,7 +16,7 @@ RUN python3 --version
 RUN pip3 list
 
 RUN echo "Install missing EnMAP-Box requirements:"
-COPY ./requirements.txt /tmp/
+COPY ./.env/requirements.txt /tmp/
 COPY ./requirements_developer.txt /tmp/
 RUN pip3 install -r /tmp/requirements.txt
 RUN pip3 install -r /tmp/requirements_developer.txt

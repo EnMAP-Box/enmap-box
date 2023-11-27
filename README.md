@@ -38,9 +38,9 @@ However, the following steps show you how to run the EnMAP-Box from python witho
 
 ### conda / mamba (all OS)
 
-1. Install conda / mamba (preferred), as described [here](https://mamba.readthedocs.io/en/latest/mamba-installation.html#mamba-install)  
+1. Install conda / conda mini-forge (preferred), as described [here](https://github.com/conda-forge/miniforge)  
 
-2. Install one of the QGIS + EnMAP-Box environments listed in https://github.com/EnMAP-Box/enmap-box/tree/main/.conda
+2. Install one of the QGIS + EnMAP-Box environments listed in https://github.com/EnMAP-Box/enmap-box/tree/main/.env/conda
    
    `latest` = the most-recent QGIS version available in the [conda-forge](https://conda-forge.org/) channel.
    
@@ -63,7 +63,7 @@ However, the following steps show you how to run the EnMAP-Box from python witho
 * You can update an existing environment with `mamba update`, e.g:
    
    ````bash
-   mamba env update --prune -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_3.28.yml
+   mamba env update --prune -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.env/conda/enmapbox_full_3.28.yml
    ````
    * `-n myenvironmentname` allows to overwrite environments with names different to that specified in the `*.yml` file.
    * `--prune` causes conda to remove any dependencies that are no longer required from the environment.
