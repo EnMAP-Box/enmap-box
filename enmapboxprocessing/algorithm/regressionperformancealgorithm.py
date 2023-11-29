@@ -3,7 +3,7 @@ from collections import OrderedDict
 from dataclasses import dataclass
 from math import isnan
 from os import makedirs
-from os.path import exists, dirname
+from os.path import exists, dirname, basename
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
@@ -300,7 +300,7 @@ class RegressionPerformanceAlgorithm(EnMAPProcessingAlgorithm):
                 filenameFig = filename + f'.{name}.scatter.png'
                 fig.savefig(filenameFig, format='png')
                 pyplot.close()
-                report.writeImage(filenameFig)
+                report.writeImage(basename(filenameFig))
 
                 fig, ax = pyplot.subplots(facecolor='white', figsize=(7, 5))
                 ax.hist(stats.residuals, bins=100, edgecolor='None', color='navy')
@@ -311,7 +311,7 @@ class RegressionPerformanceAlgorithm(EnMAPProcessingAlgorithm):
                 filenameFig = filename + f'.{name}.residuals.png'
                 fig.savefig(filenameFig, format='png')
                 pyplot.close()
-                report.writeImage(filenameFig)
+                report.writeImage(basename(filenameFig))
 
 
 @typechecked()
