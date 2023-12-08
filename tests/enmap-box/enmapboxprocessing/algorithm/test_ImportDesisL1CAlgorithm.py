@@ -9,7 +9,7 @@ from enmapboxtestdata import sensorProductsRoot, SensorProducts
 class TestImportDesisL1CAlgorithm(TestCase):
 
     def test(self):
-        if sensorProductsRoot() is None:
+        if sensorProductsRoot() is None or self.skipProductImport:
             return
 
         alg = ImportDesisL1CAlgorithm()
