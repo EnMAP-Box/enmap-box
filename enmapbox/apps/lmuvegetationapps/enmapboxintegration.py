@@ -54,11 +54,13 @@ class LMU_EnMAPBoxApp(EnMAPBoxApplication):
         a = menu.addAction('Interactive Visualization of Vegetation Reflectance Models (IVVRM)')
         a.triggered.connect(self.start_GUI_IVVRM)
 
-        b = menu.addAction('Create Look-up-table')
-        b.triggered.connect(self.start_GUI_LUT)
+        b = menu.addMenu('RTM Inversion')
 
-        c = menu.addAction('Invert Look-up-table')
-        c.triggered.connect(self.start_GUI_Inv)
+        ba = b.addAction('Create Look-up-table')
+        ba.triggered.connect(self.start_GUI_LUT)
+
+        bb = b.addAction('Invert Look-up-table')
+        bb.triggered.connect(self.start_GUI_Inv)
 
         d = menu.addAction('Vegetation Indices Toolbox')
         d.triggered.connect(self.start_GUI_VIT)
@@ -72,13 +74,16 @@ class LMU_EnMAPBoxApp(EnMAPBoxApplication):
         g = menu.addAction('interactive Red-Edge Inflection Point (iREIP)')
         g.triggered.connect(self.start_GUI_iREIP)
 
-        h = menu.addMenu('Vegetation Processor')
+        h = menu.addMenu('Vegetation Machine Learning Processor')
 
-        ha = h.addAction("ANN Training")
-        ha.triggered.connect(self.start_GUI_ProcessorTraining)
+        ha = h.addAction('Create ML Training Database')
+        ha.triggered.connect(self.start_GUI_LUT)
 
-        hb = h.addAction('ANN Inversion')
-        hb.triggered.connect(self.start_GUI_ProcessorInversion)
+        hb = h.addAction("ML Training")
+        hb.triggered.connect(self.start_GUI_ProcessorTraining)
+
+        hc = h.addAction('ML Mapping')
+        hc.triggered.connect(self.start_GUI_ProcessorInversion)
 
         appMenu.addMenu(menu)
         return menu

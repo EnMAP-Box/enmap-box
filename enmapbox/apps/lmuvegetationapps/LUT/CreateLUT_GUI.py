@@ -109,7 +109,6 @@ class Filter(QtCore.QObject):
         return False  # Do not bother about other events
 
 
-
 class LUT:
 
     def __init__(self, main):
@@ -158,6 +157,7 @@ class LUT:
             = ([] for _ in range(self.npara_flat))  # all parameters are initialized as empty lists
 
         self.depends = 0  # 0: no dependency of car-cab; 1: dependency is turned on
+        self.depends_cp_cbc = 0
 
         self.path = None
         self.LUT_name = None
@@ -334,6 +334,7 @@ class LUT:
 
         # Dependencies:
         self.gui.CarCabCheck.stateChanged.connect(lambda: self.init_dependency(which='car_cab'))
+        self.gui.CpCBCCheck.stateChanged.connect(lambda: self.init_cp_cbc_dependency())
 
         # Radio Buttons
         self.gui.radio_fix_N.clicked.connect(lambda: self.txt_enables(para="N", mode="fix"))
@@ -656,6 +657,11 @@ class LUT:
             for obj in range(5):
                 self.dict_objects["car"][obj].setDisabled(False)
 
+    def init_cp_cbc_dependency(self):
+        if self.gui.CpCBCCheck.isChecked():
+            self.depends_cp_cbc = 1
+        else: self.depends_cp_cbc = 0
+
     def reset_dependency(self):
         self.gui.CarCabCheck.setChecked(False)
         self.depends = 0
@@ -812,8 +818,8 @@ class LUT:
             for para in self.para_list[1]:
                 for obj in range(4):
                     self.dict_objects[para][obj].setDisabled(False)
-                for obj in range(12):
-                    self.dict_objects["psoil"][obj].setDisabled(False)
+            for obj in range(5):
+                self.dict_objects["psoil"][obj].setDisabled(False)
 
         elif bg_type == "load":
             self.gui.B_DefSoilSpec.setEnabled(True)
@@ -825,8 +831,8 @@ class LUT:
             for para in self.para_list[1]:
                 for obj in range(4):
                     self.dict_objects[para][obj].setDisabled(False)
-                for obj in range(12):
-                    self.dict_objects["psoil"][obj].setDisabled(True)
+            for obj in range(12):
+                self.dict_objects["psoil"][obj].setDisabled(True)
 
     def get_folder(self):
         # function is called when the user hits "..." to select a dir for the LUT to be stored in
@@ -1037,25 +1043,25 @@ class LUT:
             self.main.prg_widget.gui.close()
             return
 
-        try:
-            # Setup the model and parse all parameters
-            model_I.initialize_vectorized(LUT_dir=self.path, LUT_name=self.LUT_name, ns=self.ns,
-                                        tts=self.dict_vals['tts'], tto=self.dict_vals['tto'], psi=self.dict_vals['psi'], 
-                                        N=self.dict_vals['N'], cab=self.dict_vals['cab'], cw=self.dict_vals['cw'], 
-                                        cm=self.dict_vals['cm'], LAI=self.dict_vals['LAI'], LIDF=self.dict_vals['LIDF'],
-                                        typeLIDF=[2], hspot=self.dict_vals['hspot'], psoil=self.dict_vals['psoil'], 
-                                        car=self.dict_vals['car'], cbrown=self.dict_vals['cbrown'], soil=self.bg_spec,
-                                        anth=self.dict_vals['anth'], cp=self.dict_vals['cp'],
-                                        cbc=self.dict_vals['cbc'], LAIu=self.dict_vals['LAIu'],
-                                        cd=self.dict_vals['cd'], sd=self.dict_vals['sd'], h=self.dict_vals['h'],
-                                        prgbar_widget=self.main.prg_widget, qgis_app=self.main.qgis_app,
-                                        depends=self.depends)
+        # try:
+            # Set up the model and parse all parameters
+        model_I.initialize_vectorized(LUT_dir=self.path, LUT_name=self.LUT_name, ns=self.ns,
+                                    tts=self.dict_vals['tts'], tto=self.dict_vals['tto'], psi=self.dict_vals['psi'],
+                                    N=self.dict_vals['N'], cab=self.dict_vals['cab'], cw=self.dict_vals['cw'],
+                                    cm=self.dict_vals['cm'], LAI=self.dict_vals['LAI'], LIDF=self.dict_vals['LIDF'],
+                                    typeLIDF=[2], hspot=self.dict_vals['hspot'], psoil=self.dict_vals['psoil'],
+                                    car=self.dict_vals['car'], cbrown=self.dict_vals['cbrown'], soil=self.bg_spec,
+                                    anth=self.dict_vals['anth'], cp=self.dict_vals['cp'],
+                                    cbc=self.dict_vals['cbc'], LAIu=self.dict_vals['LAIu'],
+                                    cd=self.dict_vals['cd'], sd=self.dict_vals['sd'], h=self.dict_vals['h'],
+                                    prgbar_widget=self.main.prg_widget, qgis_app=self.main.qgis_app,
+                                    depends=self.depends, depends_cp_cbc=self.depends_cp_cbc)
 
-        except ValueError as e:
-            self.abort(message="An error occurred while creating the LUT: %s" % str(e))
-            self.main.prg_widget.gui.lblCancel.setText("")
-            self.main.prg_widget.gui.close()
-            return
+        # except ValueError as e:
+        #     self.abort(message="An error occurred while creating the LUT: %s" % str(e))
+        #     self.main.prg_widget.gui.lblCancel.setText("")
+        #     self.main.prg_widget.gui.close()
+        #     return
 
         QMessageBox.information(self.gui, "Successful", "The Look-Up-Table has successfully been created!")
         self.main.prg_widget.gui.lblCancel.setText("")
@@ -1392,7 +1398,7 @@ class SensorEditor:
             return
         if self.flag_srf and self.flag_wl and not self.flag_image:
             # A numpy array file is created from the sensor srf files and the wavelength file
-            # it is first saved as .npz format and renamed to .srf afterwards
+            # it is first saved as .npz format and renamed to .srf afterward
             self.build_true_srf.wl_file = self.wl_filename
             self.build_true_srf.out_file = APP_DIR + "/Resources/Spec2Sensor/srf/" + sensor_name + ".npz"
             # call the build_true_srf routine from Spec2Sensor
