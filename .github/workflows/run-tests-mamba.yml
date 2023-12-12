@@ -1,0 +1,80 @@
+name: 🐍 EnMAP-Box Mamba Tests
+
+on:
+  push:
+    branches:
+      - mamba**
+      - release-**
+
+  pull_request:
+    branches:
+      - main
+      - release-**
+
+  release:
+    types: [published]
+
+jobs:
+  # Run EnMAP-Box tests
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+
+    env:
+      QT_QPA_PLATFORM: offscreen
+      CI: true
+
+    strategy:
+      fail-fast: false
+      matrix:
+        mamba_env: [enmapbox_light_latest, enmapbox_light_longterm]
+      # python_version : [3.9, 3.10, 3.11]
+      # mamba_env: [enmapbox_light_latest, enmapbox_light_longterm, enmapbox_full_latest, enmapbox_full_longterm]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Environment Info
+        run: |
+          lsb_release -a
+
+      - name: Conda environment file
+        run: |
+          echo "conda environment file: ${{matrix.mamba_env}}.yml"
+          cat .env/conda/${{matrix.mamba_env}}.yml
+
+      - name: Setup Mambaforge
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          # miniforge-variant: Mambaforge
+          # miniforge-version: latest
+          mamba-version: "*"
+          channels: conda-forge,defaults
+          channel-priority: true
+          activate-environment: ${{matrix.mamba_env}}
+          environment-file: .env/conda/${{matrix.mamba_env}}.yml
+          clean-patched-environment-file: false
+          use-mamba: true
+          auto-activate-base: false
+      - name: Mamba Environment Info
+        run: |
+          mamba info
+          mamba list
+
+      - name: Python and QGIS versions
+        run: |
+          python --version
+          qgis --version
+
+      - name: Setup Repository
+        run: |
+          python scripts/setup_repository.py
+
+      - name: Test EnMAP-Box in ${{matrix.mamba_env}}
+        run: |
+          chmod +x scripts/runtests.sh
+          bash ./scripts/runtests.sh -n auto

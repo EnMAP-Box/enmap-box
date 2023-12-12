@@ -54,6 +54,9 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     GeoJsonFileFilter = 'GEOJSON files (*.geojson)'
     GeoJsonFileExtension = 'geojson'
     GeoJsonFileDestination = 'GEOJSON file destination.'
+    CsvFileFilter = 'CSV files (*.csv)'
+    CsvFileExtension = 'cvs'
+    CsvFileDestination = 'CSV file destination.'
     DatasetFileFilter = PickleFileFilter + ';;' + JsonFileFilter
     DatasetFileDestination = 'Dataset file destination.'
     RasterFileDestination = 'Raster file destination.'
@@ -201,7 +204,10 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def parameterAsFields(
             self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext
     ) -> Optional[List[str]]:
-        fields = super().parameterAsFields(parameters, name, context)
+        if Qgis.versionInt() >= 33200:
+            fields = super().parameterAsStrings(parameters, name, context)
+        else:
+            fields = super().parameterAsFields(parameters, name, context)
         if len(fields) == 0:
             return None
         else:
@@ -631,7 +637,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         return self.shortHelpString()
 
     def helpUrl(self, *args, **kwargs):
-        return 'https://bitbucket.org/hu-geomatics/enmap-box-geoalgorithmsprovider/overview'
+        return 'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/processing_algorithms/processing_algorithms.html'
 
     def isRunnungInsideModeller(self):
         # hacky way to figure out if this algorithm is currently running inside the modeller
@@ -1042,7 +1048,7 @@ class Group(Enum):
 
 
 class CookbookUrls(object):
-    URL = r'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_cookbook'
+    URL = r'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_cookbook/usr_cookbook.html'
     URL_CLASSIFICATION = ('Classification', URL + '/classification.html')
     URL_REGRESSION = ('Regression', URL + '/regression.html')
     URL_CLUSTERING = ('Clustering', URL + '/clustering.html')

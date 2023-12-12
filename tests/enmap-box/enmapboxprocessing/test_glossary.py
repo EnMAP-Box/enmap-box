@@ -12,7 +12,7 @@ class TestUtils(TestCase):
 
         # self.assertEqual(white, Utils.parseColor('255, 255, 255'))
 
-    def test_weblinkWithGlossaryTermConflict(self):  # adresses issue #741
+    def test_weblinkWithGlossaryTermConflict(self):  # addresses issue #741
         # term "classification" inside the weblink shouldn't be replaced
         text = 'Used in the Cookbook Recipes: <a href="https://classification.html">Classification</a>,'
         text2 = injectGlossaryLinks(text)

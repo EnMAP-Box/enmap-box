@@ -81,6 +81,13 @@ class PredictClusteringAlgorithm(EnMAPProcessingAlgorithm):
                 except ValueError:
                     pass
 
+            # ... if not possible, try to remove bad bands
+            if bandList is None and len(bandNames) != len(dump.features):
+                goodBandList = [bandNo for bandNo in rasterReader.bandNumbers()
+                                if rasterReader.badBandMultiplier(bandNo) == 1]
+                if len(goodBandList) == len(dump.features):
+                    bandList = goodBandList
+
             # ... if not possible, use original bands, if overall number of bands and features do match
             if bandList is None and len(bandNames) != len(dump.features):
                 message = f'clusterer features ({dump.features}) not matching raster bands ({bandNames})' \

@@ -541,9 +541,9 @@ class CreateTestClassification(EnMAPAlgorithm):
         self.addParameterOutputClassification()
 
     def processAlgorithm_(self):
-        import enmapboxtestdata
+        from tests import enmapboxtestdata
         filename = enmapboxtestdata.createClassification(filename=self.getParameterOutputClassification(),
-            gridOrResolution=Raster(enmapboxtestdata.enmap).grid())
+                                                         gridOrResolution=Raster(enmapboxtestdata.enmap).grid())
         return {self.P_OUTPUT_CLASSIFICATION: filename}
 
 
@@ -564,9 +564,9 @@ class CreateTestFraction(EnMAPAlgorithm):
         self.addParameterOutputFraction()
 
     def processAlgorithm_(self):
-        import enmapboxtestdata
+        from tests import enmapboxtestdata
         filename = enmapboxtestdata.createFraction(filename=self.getParameterOutputFraction(),
-            gridOrResolution=Raster(enmapboxtestdata.enmap).grid())
+                                                   gridOrResolution=Raster(enmapboxtestdata.enmap).grid())
         return {self.P_OUTPUT_FRACTION: filename}
 
 
@@ -587,7 +587,7 @@ class CreateTestClassifier(EnMAPAlgorithm):
         self.addParameterOutputClassifier()
 
     def processAlgorithm_(self):
-        import enmapboxtestdata
+        from tests import enmapboxtestdata
         filename = self.getParameterOutputEstimator(name=self.P_OUTPUT_CLASSIFIER)
         enmapboxtestdata.createClassifier().pickle(filename=filename)
         return {self.P_OUTPUT_CLASSIFIER: filename}
@@ -610,7 +610,7 @@ class CreateTestRegressor(EnMAPAlgorithm):
         self.addParameterOutputRegressor()
 
     def processAlgorithm_(self):
-        import enmapboxtestdata
+        from tests import enmapboxtestdata
         filename = self.getParameterOutputEstimator(name=self.P_OUTPUT_REGRESSOR)
         enmapboxtestdata.createRegressor().pickle(filename=filename)
         return {self.P_OUTPUT_REGRESSOR: filename}
@@ -633,7 +633,7 @@ class CreateTestClusterer(EnMAPAlgorithm):
         self.addParameterOutputClusterer()
 
     def processAlgorithm_(self):
-        import enmapboxtestdata
+        from tests import enmapboxtestdata
         filename = self.getParameterOutputEstimator(name=self.P_OUTPUT_CLUSTERER)
         enmapboxtestdata.createClusterer().pickle(filename=filename)
         return {self.P_OUTPUT_CLUSTERER: filename}
@@ -656,7 +656,7 @@ class CreateTestTransformer(EnMAPAlgorithm):
         self.addParameterOutputTransformer()
 
     def processAlgorithm_(self):
-        import enmapboxtestdata
+        from tests import enmapboxtestdata
         filename = self.getParameterOutputEstimator(name=self.P_OUTPUT_TRANSFORMER)
         enmapboxtestdata.createTransformer().pickle(filename=filename)
         return {self.P_OUTPUT_TRANSFORMER: filename}
@@ -826,7 +826,7 @@ class OpenTestMaps_Toolbox(EnMAPAlgorithm):
         pass
 
     def processAlgorithm_(self):
-        import enmapboxtestdata
+        from tests import enmapboxtestdata
         import qgis.utils
 
         qgis.utils.iface.addRasterLayer(enmapboxtestdata.enmap, basename(enmapboxtestdata.enmap), 'gdal')
@@ -875,7 +875,7 @@ class OpenTestMaps_Modeler(EnMAPAlgorithm):
                  'Spectral library with 75 spectra (material level, level 2 and level 3 class information)')
 
     def processAlgorithm_(self):
-        import enmapboxtestdata
+        from tests import enmapboxtestdata
         library = EnviSpectralLibrary(filename=enmapboxtestdata.library)
         return {'enmap': enmapboxtestdata.enmap,
                 'hymap': enmapboxtestdata.hires,
@@ -1035,7 +1035,7 @@ class RasterFromVector(EnMAPAlgorithm):
 
     def description(self):
         return Help(text='Converts vector to raster (using {}).',
-            links=[Link(url='http://gdal.org/python/osgeo.gdal-module.html#RasterizeOptions',
+            links=[Link(url='https://gdal.org/api/python/osgeo.gdal.html#osgeo.gdal.RasterizeOptions',
                 name='gdal rasterize')])
 
     def group(self):

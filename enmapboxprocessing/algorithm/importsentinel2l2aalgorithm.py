@@ -3,12 +3,13 @@ from typing import Dict, Any, List, Tuple
 
 from osgeo import gdal
 
+from enmapbox.typeguard import typechecked
+from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
-from enmapbox.typeguard import typechecked
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer, QgsMapLayer
 
 
 @typechecked
@@ -134,16 +135,36 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
                 rb: gdal.Band = ds.GetRasterBand(bandNo)
                 rb.SetDescription(name)
                 rb.SetScale(1e-4)
-            result = {self.P_OUTPUT_RASTER: filename}
-            self.toc(feedback, result)
 
             # copy metadata (see issue #269)
             writer = RasterWriter(ds)
-            for bandNo, filename in enumerate(filenames, 1):
-                reader = RasterReader(filename)
+            for bandNo, filename_ in enumerate(filenames, 1):
+                reader = RasterReader(filename_)
                 metadata = reader.metadata(1)
                 writer.setMetadata(metadata, bandNo)
                 if bandNo == 1:
                     metadata = reader.metadataDomain('')
                     writer.setMetadataDomain(metadata, '')
+            writer.close()
+            del writer
+
+            # setup default renderer
+            layer = QgsRasterLayer(filename)
+            reader = RasterReader(layer)
+            redBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['R'][0])
+            greenBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['G'][0])
+            blueBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['B'][0])
+            redMin, redMax = reader.provider.cumulativeCut(redBandNo, 0.02, 0.98)
+            greenMin, greenMax = reader.provider.cumulativeCut(greenBandNo, 0.02, 0.98)
+            blueMin, blueMax = reader.provider.cumulativeCut(blueBandNo, 0.02, 0.98)
+            renderer = Utils().multiBandColorRenderer(
+                reader.provider, [redBandNo, greenBandNo, blueBandNo], [redMin, greenMin, blueMin],
+                [redMax, greenMax, blueMax]
+            )
+            layer.setRenderer(renderer)
+            layer.saveDefaultStyle(QgsMapLayer.StyleCategory.Rendering)
+
+            result = {self.P_OUTPUT_RASTER: filename}
+            self.toc(feedback, result)
+
         return result

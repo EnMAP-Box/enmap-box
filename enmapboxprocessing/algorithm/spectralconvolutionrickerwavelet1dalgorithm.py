@@ -19,6 +19,9 @@ class SpectralConvolutionRickerWavelet1DAlgorithm(ConvolutionFilterAlgorithmBase
                              'RickerWavelet1DKernel')
         return f'Python code. See {link} for information on different parameters.'
 
+    def interpolateByDefault(self) -> bool:
+        return False
+
     def code(cls):
         from astropy.convolution import RickerWavelet1DKernel
         kernel = RickerWavelet1DKernel(width=1)

@@ -5,6 +5,6 @@ helpAlg = Help(text='Fits a Linear Support Vector Regression.')
 helpCode = Help(text='Scikit-learn python code. See {} for information on different parameters. See {} for information on grid search and {} for scaling.',
                 links=[Link('http://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html',
                             'LinearSVR'),
-                       Link('http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html','GridSearchCV'),
-                       Link('http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html','StandardScaler')
+                       Link('http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html', 'GridSearchCV'),
+                       Link('http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html', 'StandardScaler')
                        ])

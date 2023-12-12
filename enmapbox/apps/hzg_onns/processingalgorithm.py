@@ -135,7 +135,7 @@ class OnnsProcessingAlgorithm(QgsProcessingAlgorithm):
        return html
 # 6
     def helpUrl(self, *args, **kwargs):
-        return 'https://enmap-box-workshop2019.readthedocs.io'
+        return 'https://www.frontiersin.org/articles/10.3389/fmars.2017.00140'
 # 7
     def createInstance(self):
         return type(self)()

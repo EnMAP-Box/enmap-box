@@ -32,7 +32,7 @@ class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
         return [
             (self._DATASET, 'Training dataset pickle file used for fitting the classifier.'),
             (self._CLASSIFIER, 'Scikit-Learn Python code specifying a classifier.'),
-            (self._RASTER, 'A raster layer with bands used as features.'),
+            (self._RASTER, 'A raster layer used for prediction.'),
             (self._MATCH_BY_NAME, 'Whether to match raster bands and classifier features by name.'),
             (self._NFOLD, 'The number of folds used for assessing cross-validation performance.'),
             (self._OPEN_REPORT, self.ReportOpen),
@@ -48,7 +48,7 @@ class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterClassificationDataset(self.P_DATASET, self._DATASET)
         self.addParameterClassifierCode(self.P_CLASSIFIER, self._CLASSIFIER)
-        self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
+        self.addParameterRasterLayer(self.P_RASTER, self._RASTER, None, True)
         self.addParameterBoolean(self.P_MATCH_BY_NAME, self._MATCH_BY_NAME, False, True, True)
         self.addParameterInt(self.P_NFOLD, self._NFOLD, 10, True, 2, 100, True)
         self.addParameterBoolean(self.P_OPEN_REPORT, self._OPEN_REPORT, True, True, True)
@@ -58,6 +58,15 @@ class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFileDestination(
             self.P_OUTPUT_REPORT, self._OUTPUT_REPORT, self.ReportFileFilter, None, True, False
         )
+
+    def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
+        filenameClassification = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_CLASSIFICATION, context)
+        filenameProbability = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_PROBABILITY, context)
+        raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
+        if (filenameClassification is not None) or (filenameProbability is not None):
+            if raster is None:
+                return False, f'Wrong or missing parameter value: {self._RASTER}'
+        return True, ''
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback

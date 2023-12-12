@@ -6,6 +6,7 @@ from osgeo import gdal
 
 import processing
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.gridwalker import GridWalker
 from enmapboxprocessing.numpyutils import NumpyUtils
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
@@ -17,7 +18,6 @@ from qgis.core import (QgsRasterLayer, QgsRasterDataProvider, QgsCoordinateRefer
                        QgsRasterRange, QgsPoint, QgsRasterBlockFeedback, QgsRasterBlock, QgsPointXY,
                        QgsProcessingFeedback, QgsRasterBandStats, Qgis, QgsGeometry, QgsVectorLayer, QgsWkbTypes,
                        QgsFeature)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -213,7 +213,7 @@ class RasterReader(object):
             height = height + 2 * overlap
         arrays = list()
         for bandNo in bandList:
-            assert 0 < bandNo <= self.bandCount()
+            assert 0 < bandNo <= self.bandCount(), f'bandNo is {bandNo}'
             block: QgsRasterBlock = self.provider.block(bandNo, boundingBox, width, height, feedback)
             array = Utils.qgsRasterBlockToNumpyArray(block=block)
             arrays.append(array)

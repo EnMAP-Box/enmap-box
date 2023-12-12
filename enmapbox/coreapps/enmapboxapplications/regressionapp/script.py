@@ -94,7 +94,7 @@ def regressionWorkflow(
 
 def test():
     from sklearn.ensemble import RandomForestRegressor
-    import enmapboxtestdata
+    from tests import enmapboxtestdata
 
     outdir = r'c:\outputs'
 

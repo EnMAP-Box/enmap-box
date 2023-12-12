@@ -22,7 +22,7 @@ import re
 import sys
 import typing
 import warnings
-from os.path import basename
+from os.path import basename, dirname
 from typing import Optional, Dict, Union, Any, List, Sequence
 
 import enmapbox
@@ -60,7 +60,9 @@ from processing.ProcessingPlugin import ProcessingPlugin
 from processing.gui.AlgorithmDialog import AlgorithmDialog
 from processing.gui.ProcessingToolbox import ProcessingToolbox
 from qgis import utils as qgsUtils
+from qgis.PyQt.QtCore import QUrl
 from qgis.PyQt.QtCore import pyqtSignal, Qt, QObject, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
+from qgis.PyQt.QtGui import QDesktopServices
 from qgis.PyQt.QtGui import QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QPixmap, QColor, QIcon, \
     QKeyEvent, \
     QCloseEvent, QGuiApplication
@@ -361,7 +363,7 @@ class EnMAPBoxProject(QgsProject):
 
     def removeAllMapLayers(self):
         self.mLayerRefs.clear()
-        super().removeMapLayers()
+        super().removeAllMapLayers()
         self.mLayerRefs.clear()
 
     def addMapLayer(self, mapLayer: QgsMapLayer, *args, **kwds) -> QgsMapLayer:
@@ -462,20 +464,15 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         settings: EnMAPBoxSettings = self.settings()
 
         splash = EnMAPBoxSplashScreen(parent=None)
-        if not settings.value(EnMAPBoxSettings.SHOW_SPLASHSCREEN, defaultValue=True, type=bool):
+        if settings.value(EnMAPBoxSettings.SHOW_SPLASHSCREEN, defaultValue=True, type=bool):
             splash.show()
 
         splash.showMessage('Load UI')
         QApplication.processEvents()
 
-        QObject.__init__(self)
         QgisInterface.__init__(self)
-        QgsExpressionContextGenerator.__init__(self)
-        QgsProcessingContextGenerator.__init__(self)
 
-        # in future this might become an own EnMAP-Box Project
-        # QgsProject.instance()
-        self.mProject = EnMAPBoxProject()
+        self.mProject: EnMAPBoxProject = EnMAPBoxProject()
 
         cmReg = EnMAPBoxContextMenuRegistry.instance()
         if len(cmReg) == 0:
@@ -484,7 +481,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.ui = EnMAPBoxUI()
         self.ui.closeEvent = self.closeEvent
 
-        self.iface: QgisInterface = qgis.utils.iface
+        from qgis.utils import iface
+        self.iface: QgisInterface = iface
         assert isinstance(self.iface, QgisInterface)
 
         self.mMapToolKey = MapTools.Pan
@@ -612,6 +610,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         a.setIcon(QIcon(':/images/themes/default/console/mIconRunConsole.svg'))
         a.triggered.connect(self.onOpenPythonConsole)
 
+        a: QAction = m.addAction('Open Plugin Folder in Explorer')
+        a.setIcon(QIcon(':/images/themes/default/mIconFolderOpen.svg'))
+        a.triggered.connect(self.onOpenPluginFolderInExplorer)
+
         # add datasets (see issue #561)
         m2 = m.addMenu('Datasets')
         a: QAction = m2.addAction('Add Berlin Dataset')
@@ -662,8 +664,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.onReloadProject()
 
     def executeAlgorithm(self, alg_id, parent, in_place=False, as_batch=False):
-
-        processingPlugin = qgis.utils.plugins.get('processing', ProcessingPlugin(self.iface))
+        from qgis.utils import iface
+        processingPlugin = qgis.utils.plugins.get('processing', ProcessingPlugin(iface))
         processingPlugin.executeAlgorithm(alg_id, parent, in_place=in_place, as_batch=as_batch)
 
     def createExpressionContext(self) -> QgsExpressionContext:
@@ -854,6 +856,19 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         window.setCentralWidget(ConsoleWidget(self.ui, {'enmapBox': enmapBox}, None, text))
         window.show()
 
+    def onOpenPluginFolderInExplorer(self):
+        import platform
+        system = platform.system()
+
+        folder = dirname(dirname(enmapbox.__file__))
+        if system == 'Windows':
+            import subprocess
+            cmd = rf'explorer.exe /select,"{folder}"'
+            subprocess.Popen(cmd)
+        else:
+            url = QUrl.fromLocalFile(folder)
+            QDesktopServices.openUrl(url)
+
     def onAddBerlinDataset(self):
         # example datasets are stored here: https://github.com/EnMAP-Box/enmap-box-exampledata
         from enmapboxtestdata import enmap_berlin, hires_berlin, landcover_berlin_polygon, landcover_berlin_point, \
@@ -880,6 +895,11 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.onDataDropped(reversed(layers))
 
     def disconnectQGISSignals(self):
+        try:
+            self.disconnect()
+        except TypeError:
+            pass
+
         try:
             QgsProject.instance().layersAdded.disconnect(self.addMapLayers)
         except TypeError:
@@ -1314,10 +1334,11 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         # self.ui.mActionAddFeature.triggered.connect(self.onAddFeatureTriggered)
         self.setMapTool(MapTools.CursorLocation)
 
+        from qgis.utils import iface
         # redirect to QGIS Project Management
-        self.ui.mActionOpenProject.triggered.connect(lambda: self.iface.actionOpenProject().trigger())
-        self.ui.mActionSaveProject.triggered.connect(lambda: self.iface.actionSaveProject().trigger())
-        self.ui.mActionSaveProjectAs.triggered.connect(lambda: self.iface.actionSaveProjectAs().trigger())
+        self.ui.mActionOpenProject.triggered.connect(lambda: iface.actionOpenProject().trigger())
+        self.ui.mActionSaveProject.triggered.connect(lambda: iface.actionSaveProject().trigger())
+        self.ui.mActionSaveProjectAs.triggered.connect(lambda: iface.actionSaveProjectAs().trigger())
         # AJ: Question for Benjamin: currently we don't have an open button, why?
 
         from enmapbox.gui.mapcanvas import CanvasLinkDialog
@@ -2203,6 +2224,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.ui.setGeometry(geom)
 
     def closeEvent(self, event: QCloseEvent):
+
         assert isinstance(event, QCloseEvent)
 
         try:
@@ -2213,22 +2235,31 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         except Exception as ex:
             messageLog(str(ex), Qgis.Critical)
+
         # de-refer the EnMAP-Box Singleton
-        EnMAPBox._instance = None
+
         self.sigClosed.emit()
+
         self.disconnectQGISSignals()
+
         try:
             import gc
             gc.collect()
         except Exception as ex:
             print(f'Errors when closing the EnMAP-Box: {ex}', file=sys.stderr)
             pass
+
+        QgsApplication.processEvents()
         EnMAPBox._instance = None
         event.accept()
 
     def close(self):
         self.disconnectQGISSignals()
+        self.dockManager()
         self.ui.close()
+
+    def __del__(self):
+        EnMAPBox._instance = None
 
     def layerTreeView(self) -> enmapbox.gui.dataviews.dockmanager.DockTreeView:
         """
@@ -2441,10 +2472,12 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.ui.addAction(action)
 
     def registerMapLayerConfigWidgetFactory(self, factory: QgsMapLayerConfigWidgetFactory):
-        self.iface.registerMapLayerConfigWidgetFactory(factory)
+        from qgis.utils import iface
+        iface.registerMapLayerConfigWidgetFactory(factory)
 
     def unregisterMapLayerConfigWidgetFactory(self, factory):
-        self.iface.unregisterMapLayerConfigWidgetFactory(factory)
+        from qgis.utils import iface
+        iface.unregisterMapLayerConfigWidgetFactory(factory)
 
     def contexMenuProviderRegistry(self) -> EnMAPBoxContextMenuRegistry:
         return self.mContextMenuRegistry

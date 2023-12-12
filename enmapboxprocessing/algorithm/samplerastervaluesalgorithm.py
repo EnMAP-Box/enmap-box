@@ -1,6 +1,9 @@
 from typing import Dict, Any, List, Tuple
 
+import numpy as np
+
 import processing
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.creategridalgorithm import CreateGridAlgorithm
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.driver import Driver
@@ -13,13 +16,13 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLay
                        QgsFeature, QgsField, QgsProcessingFeatureSourceDefinition, QgsApplication,
                        QgsVectorDataProvider, QgsRasterDataProvider, QgsPoint)
 from qgis.core.additions.edit import edit
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
 class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_VECTOR, _VECTOR = 'vector', 'Vector layer'
+    P_SKIP_NO_DATA_PIXEL, _SKIP_NO_DATA_PIXEL = 'skipNoDataPixel', 'Skip no data pixel'
     P_COVERAGE_RANGE, _COVERAGE_RANGE = 'coverageRange', 'Pixel coverage (%)'
     P_OUTPUT_POINTS, _OUTPUT_POINTS = 'outputPointsData', 'Output point layer'
 
@@ -42,6 +45,7 @@ class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
         return [
             (self._RASTER, 'A raster layer to sample data from.'),
             (self._VECTOR, 'A vector layer defining the locations to sample.'),
+            (self._SKIP_NO_DATA_PIXEL, 'Whether to skip pixels from no data regions.'),
             (self._COVERAGE_RANGE, 'Samples with polygon pixel coverage outside the given range are excluded. '
                                    'This parameter has no effect in case of point locations.'),
             (self._OUTPUT_POINTS, self.VectorFileDestination)
@@ -53,6 +57,7 @@ class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
         self.addParameterVectorLayer(self.P_VECTOR, self._VECTOR)
+        self.addParameterBoolean(self.P_SKIP_NO_DATA_PIXEL, self._SKIP_NO_DATA_PIXEL, False, True, True)
         self.addParameterIntRange(self.P_COVERAGE_RANGE, self._COVERAGE_RANGE, [50, 100], True, True)
         self.addParameterVectorDestination(self.P_OUTPUT_POINTS, self._OUTPUT_POINTS)
 
@@ -61,6 +66,7 @@ class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         vector = self.parameterAsVectorLayer(parameters, self.P_VECTOR, context)
+        skipNoDataPixel = self.parameterAsBoolean(parameters, self.P_SKIP_NO_DATA_PIXEL, context)
         coverageMin, coverageMax = self.parameterAsRange(parameters, self.P_COVERAGE_RANGE, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_POINTS, context)
 
@@ -69,12 +75,15 @@ class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
             self.tic(feedback, parameters, context)
             selectedFeaturesOnly = False
             if Utils.isPointGeometry(vector.geometryType()):
-                self.samplePoints(filename, raster, vector, selectedFeaturesOnly, feedback, feedback2, context)
+                self.samplePoints(
+                    filename, raster, vector, selectedFeaturesOnly, skipNoDataPixel, feedback, feedback2, context
+                )
             else:
                 self.samplePolygons(
-                    filename, raster, vector, selectedFeaturesOnly, int(coverageMin), int(coverageMax), feedback,
-                    feedback2, context
+                    filename, raster, vector, selectedFeaturesOnly, int(coverageMin), int(coverageMax), skipNoDataPixel,
+                    feedback, feedback2, context
                 )
+
             result = {self.P_OUTPUT_POINTS: filename}
             self.toc(feedback, result)
 
@@ -83,7 +92,8 @@ class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
     @classmethod
     def samplePoints(
             cls, filename: str, raster: QgsRasterLayer, vector: QgsVectorLayer, selectedFeaturesOnly: bool,
-            feedback: QgsProcessingFeedback, feedback2: QgsProcessingFeedback, context: QgsProcessingContext
+            skipNoDataPixel: bool, feedback: QgsProcessingFeedback, feedback2: QgsProcessingFeedback,
+            context: QgsProcessingContext
     ):
         assert Utils.isPointGeometry(vector.geometryType())
         alg = 'qgis:rastersampling'
@@ -96,15 +106,19 @@ class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
         processing.run(alg, parameters, None, feedback2, context, True)
         sample = QgsVectorLayer(filename)
 
-        # add image X, Y coordinates
+        # add image X, Y coordinates and find no data pixel
         rasterProvider = raster.dataProvider()
         vectorProvider: QgsVectorDataProvider = sample.dataProvider()
         fields = [QgsField('PIXEL_X', QVariant.LongLong), QgsField('PIXEL_Y', QVariant.LongLong)]
         vectorProvider.addAttributes(fields)
         sample.updateFields()
+        noDataPixels = list()
+        dataFields = [i for i, field in enumerate(sample.fields()) if field.name().startswith('SAMPLE_')]
         with edit(sample):
             feature: QgsFeature
             for feature in sample.getFeatures():
+                if feature.geometry().isNull():
+                    continue
                 point = QgsPoint(feature.geometry().asPoint())
                 assert isinstance(point, QgsPoint)
                 imagePoint: QgsPoint = rasterProvider.transformCoordinates(
@@ -114,12 +128,19 @@ class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
                 feature.setAttribute('PIXEL_Y', imagePoint.y())
                 sample.updateFeature(feature)
 
+                if skipNoDataPixel:
+                    if np.all(np.equal(np.asarray(feature.attributes())[dataFields], None)):
+                        noDataPixels.append(feature.id())
+
+        if skipNoDataPixel:
+            sample.dataProvider().deleteFeatures(noDataPixels)
+
         return sample
 
     @classmethod
     def samplePolygons(
             cls, filename: str, raster: QgsRasterLayer, vector: QgsVectorLayer, selectedFeaturesOnly: bool,
-            coverageMin: int, coverageMax: int,
+            coverageMin: int, coverageMax: int, skipNoDataPixel: bool,
             feedback: ProcessingFeedback, feedback2: ProcessingFeedback, context: QgsProcessingContext
     ):
         assert Utils.isPolygonGeometry(vector.geometryType())
@@ -220,7 +241,7 @@ class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
 
             sampleVector = cls.samplePoints(
                 Utils.tmpFilename(filename, f'sample{fid}.gpkg'), raster, locationVector, selectedFeaturesOnly,
-                feedback, feedback2, context
+                skipNoDataPixel, feedback, feedback2, context
             )
             sampleVectors.append(sampleVector)
 

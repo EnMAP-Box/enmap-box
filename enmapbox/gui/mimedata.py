@@ -4,12 +4,13 @@ import uuid
 from os.path import basename
 from typing import List
 
-from enmapbox import debugLog
 from qgis.PyQt.QtCore import QMimeData, QUrl, QByteArray
 from qgis.PyQt.QtXml import QDomNamedNodeMap, QDomDocument
 from qgis.core import QgsLayerItem
 from qgis.core import QgsMapLayer, QgsRasterLayer, QgsProject, QgsReadWriteContext, \
     QgsMimeDataUtils, QgsLayerTree
+
+from enmapbox import debugLog
 from .datasources.datasources import DataSource
 from ..qgispluginsupport.qps.layerproperties import defaultRasterRenderer
 
@@ -127,13 +128,15 @@ def containsMapLayers(mimeData: QMimeData) -> bool:
 
 
 def extractMapLayers(mimeData: QMimeData,
-                     project: QgsProject = QgsProject.instance()) -> List[QgsMapLayer]:
+                     project: QgsProject = None) -> List[QgsMapLayer]:
     """
     Extracts QgsMapLayers from QMimeData
     :param mimeData:
     :param project:
     :return: A list if QgsMapLayers
     """
+    if project is None:
+        project = QgsProject.instance()
     assert isinstance(mimeData, QMimeData)
 
     from enmapbox.gui.datasources.datasources import DataSource

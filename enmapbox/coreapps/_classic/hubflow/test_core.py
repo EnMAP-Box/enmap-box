@@ -3,7 +3,7 @@ from tempfile import gettempdir
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
-import enmapboxtestdata
+from tests import enmapboxtestdata
 from _classic.hubdc.progressbar import CUIProgressBar
 from _classic.hubflow.core import *
 import _classic.hubflow.testdata
@@ -658,9 +658,9 @@ class TestRaster(TestCase):
             library=speclib))
 
     def test_fromAsdTxt(self):
-        import enmapboxtestdata.asd
+        import tests.enmapboxtestdata.asd
         print(Raster.fromAsdTxt(filename=join(outdir, 'RasterFromAsdTxt__.tif'),
-            asdFilenames=enmapboxtestdata.asd.filenames_ascii))
+                                asdFilenames=enmapboxtestdata.asd.filenames_ascii))
 
     def test_saveAs(self):
         raster = Raster(enmapboxtestdata.enmap)

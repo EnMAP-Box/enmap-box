@@ -1,6 +1,7 @@
+from typing import Dict
+
 from sklearn.base import TransformerMixin
 
-from enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.fitfactoranalysisalgorithm import FitFactorAnalysisAlgorithm
 from enmapboxprocessing.algorithm.fitfasticaalgorithm import FitFastIcaAlgorithm
 from enmapboxprocessing.algorithm.fitfeatureagglomerationalgorithm import FitFeatureAgglomerationAlgorithm
@@ -17,6 +18,7 @@ from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import classifierDumpPkl
+from enmapboxtestdata import enmap
 from qgis.core import QgsProcessingException
 
 
@@ -31,13 +33,16 @@ class FitTestTransformerAlgorithm(FitTransformerAlgorithmBase):
     def helpParameterCode(self) -> str:
         return ''
 
-    def code(self) -> TransformerMixin:
+    def code(self):
         from sklearn.decomposition import PCA
         transformer = PCA(n_components=3, random_state=42)
         return transformer
 
+    def summary(self, transformer) -> Dict:
+        return {'explained_variance_ratio_': list(transformer.explained_variance_ratio_)}
 
-class TestFitClassifierAlgorithm(TestCase):
+
+class TestFitTransformerAlgorithm(TestCase):
 
     def test_fit_withDataset(self):
         alg = FitTestTransformerAlgorithm()
@@ -121,3 +126,11 @@ class TestFitClassifierAlgorithm(TestCase):
                 alg.P_OUTPUT_TRANSFORMER: self.filename('transformer.pkl')
             }
             self.runalg(alg, parameters)
+
+    def test_createSummary(self):
+        alg = FitTestTransformerAlgorithm()
+        parameters = {
+            alg.P_DATASET: classifierDumpPkl,
+            alg.P_OUTPUT_TRANSFORMER: self.filename('transformer.pkl')
+        }
+        self.runalg(alg, parameters)

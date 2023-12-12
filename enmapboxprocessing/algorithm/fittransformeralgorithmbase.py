@@ -1,7 +1,7 @@
 import inspect
 import traceback
 from operator import xor
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Optional
 
 from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromrasteralgorithm import \
     PrepareUnsupervisedDatasetFromRasterAlgorithm
@@ -41,6 +41,9 @@ class FitTransformerAlgorithmBase(EnMAPProcessingAlgorithm):
 
     def code(self):
         raise NotImplementedError()
+
+    def summary(self, transformer) -> Optional[Dict]:
+        return None
 
     def helpParameterCode(self) -> str:
         raise NotImplementedError()
@@ -113,9 +116,9 @@ class FitTransformerAlgorithmBase(EnMAPProcessingAlgorithm):
                 f'Load training dataset: X=array{list(dump.X.shape)}')
             feedback.pushInfo('Fit transformer')
             transformer.fit(dump.X)
-
-            dump = TransformerDump(dump.features, dump.X, transformer)
-            Utils.pickleDump(dump.__dict__, filename)
+            summary = self.summary(transformer)
+            dump = TransformerDump(dump.features, dump.X, transformer, summary)
+            dump.write(filename)
 
             result = {self.P_OUTPUT_TRANSFORMER: filename}
             self.toc(feedback, result)

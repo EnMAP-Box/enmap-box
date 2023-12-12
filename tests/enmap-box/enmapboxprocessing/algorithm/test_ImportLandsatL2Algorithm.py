@@ -7,7 +7,7 @@ from enmapboxtestdata import SensorProducts, sensorProductsRoot
 class TestImportLandsatL2Algorithm(TestCase):
 
     def test_L9_C2(self):
-        if sensorProductsRoot() is None:
+        if sensorProductsRoot() is None or self.skipProductImport:
             return
 
         alg = ImportLandsatL2Algorithm()
@@ -21,7 +21,7 @@ class TestImportLandsatL2Algorithm(TestCase):
         # self.assertEqual(25984874883, round(np.sum(array, dtype=float)))
 
     def test_L8_C2(self):
-        if sensorProductsRoot() is None:
+        if sensorProductsRoot() is None or self.skipProductImport:
             return
 
         alg = ImportLandsatL2Algorithm()
@@ -35,7 +35,7 @@ class TestImportLandsatL2Algorithm(TestCase):
         # self.assertEqual(25984874883, round(np.sum(array, dtype=float)))
 
     def test_L7_C2(self):
-        if sensorProductsRoot() is None:
+        if sensorProductsRoot() is None or self.skipProductImport:
             return
 
         alg = ImportLandsatL2Algorithm()
@@ -49,7 +49,7 @@ class TestImportLandsatL2Algorithm(TestCase):
         # self.assertEqual(14003330657, round(np.sum(array, dtype=float)))
 
     def test_L5_C2(self):
-        if sensorProductsRoot() is None:
+        if sensorProductsRoot() is None or self.skipProductImport:
             return
 
         alg = ImportLandsatL2Algorithm()

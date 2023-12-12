@@ -139,9 +139,6 @@ class OCPFTProcessingAlgorithm(QgsProcessingAlgorithm):
                '<p>Specify where to save the output.  </p>'
         return html
 
-    # 6
-    # def helpUrl(self, *args, **kwargs):
-    #     return 'https://enmap-box-workshop2019.readthedocs.io'
 # 7
     def createInstance(self):
         return type(self)()

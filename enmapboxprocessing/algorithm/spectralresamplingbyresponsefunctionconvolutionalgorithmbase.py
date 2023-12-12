@@ -132,15 +132,15 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
             lineMemoryUsage = reader.lineMemoryUsage() * 2
             blockSizeY = min(raster.height(), ceil(maximumMemoryUsage / lineMemoryUsage))
             blockSizeX = raster.width()
+            isFirstBlock = True
             for block in reader.walkGrid(blockSizeX, blockSizeY, feedback):
                 array = reader.arrayFromBlock(block)
                 marray = reader.maskArray(array)
-                outarray = self.resampleData(array, marray, wavelength, responses, outputNoDataValue, feedback)
-                # if outputNoDataValue is not None:
-                #    marray = np.all(reader.maskArray(array), axis=0)
-                #    for arr in outarray:
-                #        arr[np.logical_not(marray)] = outputNoDataValue
+                outarray = self.resampleData(
+                    array, marray, wavelength, responses, outputNoDataValue, feedback, isFirstBlock
+                )
                 writer.writeArray(outarray, block.xOffset, block.yOffset)
+                isFirstBlock = False
 
             outputWavelength = list()
             for name in responses:
@@ -182,8 +182,7 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
     @staticmethod
     def resampleData(
             array: Array3d, marray: Array3d, wavelength: List, responses: Dict[str, List[Tuple[int, float]]],
-            noDataValue: float,
-            feedback: QgsProcessingFeedback
+            noDataValue: float, feedback: QgsProcessingFeedback, isFirstBlock=True
     ) -> Array3d:
         wavelength = [int(round(v)) for v in wavelength]
         outarray = list()
@@ -197,12 +196,13 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
                     indices.append(index)
                     weights.append(weight)
             if len(indices) == 0:
-                message = f'no source bands ({min(wavelength)} to {max(wavelength)} nanometers) ' \
-                          f'are covert by target band "{name}" ' \
-                          f'({min(weightsByWavelength.keys())} to {max(weightsByWavelength.keys())} nanometers), ' \
-                          f'which will result in output band filled with no data values'
-                warn(message)
-                feedback.pushWarning(message)
+                if isFirstBlock:
+                    message = f'no source bands ({min(wavelength)} to {max(wavelength)} nanometers) ' \
+                              f'are covert by target band "{name}" ' \
+                              f'({min(weightsByWavelength.keys())} to {max(weightsByWavelength.keys())} nanometers), ' \
+                              f'which will result in output band filled with no data values'
+                    warn(message)
+                    feedback.pushWarning(message)
                 outarray.append(np.full_like(array[0], noDataValue, dtype=array[0].dtype))
             else:
                 tmparray = np.asarray(array, np.float32)[indices]
@@ -213,11 +213,7 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
                     tmparr[invalid] = np.nan
                     warr[invalid] = np.nan
                 outarr = np.nansum(tmparray * warray, 0) / np.nansum(warray, 0)
-                if np.nanmin(outarr) < -3000:
-                    a = 1
                 outarr[np.isnan(outarr)] = noDataValue
                 outarray.append(outarr)
-
-                # outarray.append(np.average([array[i] for i in indices], 0, weights))
 
         return outarray

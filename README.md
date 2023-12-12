@@ -38,9 +38,9 @@ However, the following steps show you how to run the EnMAP-Box from python witho
 
 ### conda / mamba (all OS)
 
-1. Install conda / mamba (prefered), as described [here](https://mamba.readthedocs.io/en/latest/mamba-installation.html#mamba-install)  
+1. Install conda / conda mini-forge (preferred), as described [here](https://github.com/conda-forge/miniforge)  
 
-2. Install one of the QGIS + EnMAP-Box environments listed in https://github.com/EnMAP-Box/enmap-box/tree/main/.conda
+2. Install one of the QGIS + EnMAP-Box environments listed in https://github.com/EnMAP-Box/enmap-box/tree/main/.env/conda
    
    `latest` = the most-recent QGIS version available in the [conda-forge](https://conda-forge.org/) channel.
    
@@ -51,10 +51,10 @@ However, the following steps show you how to run the EnMAP-Box from python witho
 
    Examples:
    ````bash
-   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_latest.yml
-   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_3.28.yml
-   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_light_latest.yml
-   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_light_3.28.yml
+   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.env/conda/enmapbox_full_latest.yml
+   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.env/conda/enmapbox_full_3.28.yml
+   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.env/conda/enmapbox_light_latest.yml
+   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.env/conda/enmapbox_light_3.28.yml
    ````
    
    The environment name corresponds to the `*.yml` basename. You can change it with  `-n`, e.g. `-n myenvironmennane`.
@@ -63,7 +63,7 @@ However, the following steps show you how to run the EnMAP-Box from python witho
 * You can update an existing environment with `mamba update`, e.g:
    
    ````bash
-   mamba env update --prune -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.conda/enmapbox_full_3.28.yml
+   mamba env update --prune -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.env/conda/enmapbox_full_3.28.yml
    ````
    * `-n myenvironmentname` allows to overwrite environments with names different to that specified in the `*.yml` file.
    * `--prune` causes conda to remove any dependencies that are no longer required from the environment.
@@ -169,7 +169,7 @@ Replace it with your own EnMAP-Box fork from which you can create pull requests.
 
 1. Ensure that your environment has git available and starts QGIS by calling `qgis` 
    (see[1.](#1-install-qgis) and [2.](#2-test-the-qgis-environment)).
-   You copy a bootstrap script like [scripts/OSGeo4W/qgis_env.bat](scripts/OSGeo4W/qgis_env.bat) (windows) or
+   You copy a bootstrap script like [.env/OSGeo4W/qgis_env.bat](.env/osgeo4w/qgis_env.bat) (windows) or
    [scripts/qgis_env.sh](scripts/qgis_env.sh) (linux) and adjust to your local settings for.
 
 2. Clone the EnMAP-Box repository.

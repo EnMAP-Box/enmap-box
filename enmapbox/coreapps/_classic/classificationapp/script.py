@@ -93,7 +93,7 @@ def classificationWorkflow(sample, classifier, raster, mask, n, cv,
 
 def test():
     from sklearn.ensemble import RandomForestClassifier
-    import enmapboxtestdata
+    from tests import enmapboxtestdata
     library = EnviSpectralLibrary(filename=enmapboxtestdata.library)
     labels = Classification.fromEnviSpectralLibrary(filename='/vsimem/synthmixRegressionEnsemble/labels.bsq',
                                                     library=library, attribute='level 2')

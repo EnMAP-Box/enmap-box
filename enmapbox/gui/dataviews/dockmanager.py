@@ -21,6 +21,7 @@ import re
 import time
 import typing
 import uuid
+from os.path import basename, dirname
 from typing import Optional, List, Dict
 
 from enmapbox import debugLog
@@ -41,6 +42,7 @@ from enmapbox.qgispluginsupport.qps.layerproperties import pasteStyleFromClipboa
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library, profile_field_list
 from enmapbox.qgispluginsupport.qps.utils import loadUi
 from enmapbox.typeguard import typechecked
+from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtCore import Qt, QMimeData, QModelIndex, QObject, QTimer, pyqtSignal, QEvent, \
     QSortFilterProxyModel, QCoreApplication
 from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDropEvent, QDragLeaveEvent
@@ -357,6 +359,7 @@ class MapDockTreeNode(DockTreeNode):
         added = [lyr for lyr in self.mLayers if lyr not in layers]
         if len(added) > 0:
             self.sigAddedLayers.emit(added)
+            pass
 
     def onRemovedChildren(self, node, idxFrom, idxTo):
         layers = self.mLayers[:]
@@ -364,6 +367,7 @@ class MapDockTreeNode(DockTreeNode):
         removed = [lyr for lyr in layers if lyr not in self.mLayers]
         if len(removed) > 0:
             self.sigRemovedLayers[list].emit(removed)
+            pass
 
     def mapCanvas(self) -> MapCanvas:
         """
@@ -373,18 +377,19 @@ class MapDockTreeNode(DockTreeNode):
         return self.dock.mapCanvas()
 
     def updateCanvas(self):
-        # save a reference on each layer in the tree
-        self.mPreviousLayers = self.mLayers[:]
-        self.mLayers = [n.layer() for n in self.findLayers() if isinstance(n.layer(), QgsMapLayer)]
+        """
+        Calling routines should save a reference on layers in self.mLayers
+        :return:
+        """
+
+        self.mLayers.clear()
+        self.mLayers.extend([n.layer() for n in self.findLayers() if isinstance(n.layer(), QgsMapLayer)])
 
         # ensure that layers have a project
         unregistered = [lyr for lyr in self.mLayers if not isinstance(lyr.project(), QgsProject)]
 
-        if self.mapCanvas() is None:
-            s = ""
-        if self.mapCanvas().project() is None:
-            s = ""
         project = self.mapCanvas().project()
+
         if len(unregistered) > 0 and isinstance(project, QgsProject):
             project.addMapLayers(unregistered, False)
 
@@ -928,7 +933,7 @@ class DockManagerTreeModel(QgsLayerTreeModel):
 
     def removeDock(self, dock):
         rootNode = self.rootNode
-        to_remove = [n for n in rootNode.children() if n.dock == dock]
+        to_remove = [n for n in rootNode.children() if isinstance(n, DockTreeNode) and n.dock == dock]
         keep_ref = [n.layer() for n in rootNode.findLayers()]
         self.removeNodes(to_remove)
         keep_ref.clear()
@@ -1617,7 +1622,13 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         action.triggered.connect((lambda: self.onCopyLayerToQgisClicked(lyr)))
 
         action = menu.addAction('Save as...')
+        action.setIcon(QIcon(':/images/themes/default/mActionFileSaveAs.svg'))
         action.triggered.connect(lambda *args, _lyr=lyr: self.onSaveAs(_lyr))
+
+        if self.auxIsImpermanentLayer(lyr):
+            action = menu.addAction('Make Permanent...')
+            action.setIcon(QIcon(':/images/themes/default/mActionFileSave.svg'))
+            action.triggered.connect((lambda *args, _lyr=lyr: self.onMakePermanent(_lyr)))
 
     def addVectorLayerMenuItems(self, node: QgsLayerTreeLayer, menu: QMenu):
         """
@@ -1846,6 +1857,50 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         elif isinstance(layer, QgsVectorLayer):
             parameters = dict(INPUT=layer)
             dlg = emb.showProcessingAlgorithmDialog('native:savefeatures', parameters, parent=None)
+
+    def auxIsImpermanentLayer(self, layer: QgsMapLayer):
+
+        if layer.source().startswith('/vsimem/'):  # GDAL VSIMEM
+            return True
+        if layer.providerType() == 'memory':  # QGIS temporary scratch layer
+            return True
+        if basename(dirname(dirname(layer.source()))).startswith('processing_'):  # QGIS Processing temp output
+            return True
+        return False
+
+    def onMakePermanent(self, layer: QgsMapLayer):
+        """
+        Saves vector / raster layers
+        """
+        from enmapbox.gui.enmapboxgui import EnMAPBox
+        enmapBox: EnMAPBox = self.enmapboxInstance()
+        if enmapBox is None:
+            return
+
+        if isinstance(layer, QgsRasterLayer):
+            # We better use the EnMAP-Box algo, which will take care of metadata, instead of the QGIS dialog/algo.
+            from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
+            parameters = {SaveRasterAsAlgorithm.P_RASTER: layer}
+            dlg = enmapBox.showProcessingAlgorithmDialog(
+                SaveRasterAsAlgorithm(), parameters, modal=True, parent=None
+            )
+        elif isinstance(layer, QgsVectorLayer):
+            parameters = {'INPUT': layer}
+            dlg = enmapBox.showProcessingAlgorithmDialog(
+                'native:savefeatures', parameters, modal=True, parent=enmapBox.ui
+            )
+        else:
+            raise ValueError()
+
+        if len(list(dlg.results().values())) != 0:
+            filename = list(dlg.results().values())[0]
+            if isinstance(layer, QgsRasterLayer):
+                newLayer = QgsRasterLayer(filename)
+            elif isinstance(layer, QgsVectorLayer):
+                newLayer = QgsVectorLayer(filename)
+            else:
+                raise ValueError()
+            Utils().setLayerDataSource(layer, newLayer.dataProvider().name(), filename)
 
     def onZoomToLayer(self, lyr: QgsMapLayer, canvas: QgsMapCanvas):
         """
