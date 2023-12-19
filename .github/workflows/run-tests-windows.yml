@@ -1,0 +1,38 @@
+name: 🧪 EnMAP-Box Windows Tests
+
+on:
+  push:
+    branches:
+      - main
+      - release-**
+      - refactor_environments
+      - release_**
+
+  pull_request:
+    branches:
+      - main
+      - release-**
+      - release_**
+
+  release:
+    types: [published]
+
+jobs:
+  # Run EnMAP-Box tests
+  test:
+    runs-on: windows-2022
+    container:
+      image: ernstste/enmapbox_base_win:latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies and set the repo up
+        run: |
+          pip install --upgrade pip setuptools wheel pytest-cov
+          pip install -r .\env\osgeo4w\requirements_osgeo4w.txt
+          python .\scripts\setup_repository.py
+
+      - name: Run tests
+        run: .\scripts\runtests.bat
