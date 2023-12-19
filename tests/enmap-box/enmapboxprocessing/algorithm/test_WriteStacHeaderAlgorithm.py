@@ -8,7 +8,9 @@ from enmapboxtestdata import enmap_potsdam
 class TestWriteStacHeaderAlgorithm(TestCase):
 
     def test(self):
-        gdal.CopyFile(enmap_potsdam, self.filename('raster.tif'))
+        driver: gdal.Driver = gdal.GetDriverByName('GTiff')
+        driver.CopyFiles(self.filename('raster.tif'), enmap_potsdam)
+
         alg = WriteStacHeaderAlgorithm()
         alg.initAlgorithm()
         parameters = {
