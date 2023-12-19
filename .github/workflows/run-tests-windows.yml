@@ -7,7 +7,7 @@ on:
       - release-**
       - refactor_environments
       - release_**
-      - tests-windows
+      - tests_windows
 
   pull_request:
     branches:
