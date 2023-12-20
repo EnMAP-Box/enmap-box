@@ -717,6 +717,14 @@ class RasterReader(object):
                     return Utils.decimalYearToDateTime(decimalYear)
 
             # check STAC
+            dateTime = self.stacMetadata['properties']['envi:metadata'].get('eo:start_datetime')
+            if dateTime is not None:
+                return Utils.parseDateTime(dateTime[bandNo - 1])
+
+            dateTime = self.stacMetadata['properties']['envi:metadata'].get('eo:datetime')
+            if dateTime is not None:
+                return Utils.parseDateTime(dateTime[bandNo - 1])
+
             dateTime = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('start_datetime')
             if dateTime is not None:
                 return Utils.parseDateTime(dateTime)
@@ -774,6 +782,10 @@ class RasterReader(object):
 
         # check STAC
         if bandNo is not None:
+            dateTime = self.stacMetadata['properties']['envi:metadata'].get('eo:end_datetime')
+            if dateTime is not None:
+                return Utils.parseDateTime(dateTime[bandNo - 1])
+
             dateTime = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('end_datetime')
             if dateTime is not None:
                 return Utils.parseDateTime(dateTime)

@@ -629,7 +629,44 @@ class TestRasterReader(TestCase):
         self.assertEqual(200, reader.fwhm(2))
         self.assertEqual(1, reader.badBandMultiplier(1))
         self.assertEqual(0, reader.badBandMultiplier(2))
-        self.assertEqual(QDateTime(2022, 1, 1, 12, 0, 0), reader.startTime(1))
+        self.assertEqual(QDateTime(2022, 1, 1, 12, 0, 0), reader.startTime())
         self.assertIsNone(reader.endTime(1))
-        self.assertEqual(QDateTime(2022, 1, 1, 12, 0, 0), reader.centerTime(1))
+        self.assertEqual(QDateTime(2022, 1, 1, 12, 0, 0), reader.centerTime())
         self.assertEqual(42, reader.metadataItem('my_key', 'envi'))
+
+    def test_stacMetadata_enviStyle_datetime(self):
+        writer = self.rasterFromArray(np.zeros((2, 5, 5)), 'raster.tif')
+        stacMetadata = {
+            "properties": {
+                "envi:metadata": {
+                    "eo:datetime": ["2022-01-01T12:00:00", "2023-01-01T12:00:00"]
+                }
+            }
+        }
+        Utils().jsonDump(stacMetadata, writer.source() + '.stac.json')
+        writer.close()
+
+        reader = RasterReader(writer.source())
+        self.assertEqual(QDateTime(2022, 1, 1, 12, 0, 0), reader.startTime(1))
+        self.assertEqual(QDateTime(2022, 1, 1, 12, 0, 0), reader.centerTime(1))
+        self.assertEqual(QDateTime(2023, 1, 1, 12, 0, 0), reader.startTime(2))
+        self.assertEqual(QDateTime(2023, 1, 1, 12, 0, 0), reader.centerTime(2))
+
+    def test_stacMetadata_enviStyle_datetime2(self):
+        writer = self.rasterFromArray(np.zeros((2, 5, 5)), 'raster.tif')
+        stacMetadata = {
+            "properties": {
+                "envi:metadata": {
+                    "eo:start_datetime": ["2022-01-01T00:00:00", "2023-01-01T00:00:00"],
+                    "eo:end_datetime": ["2023-01-01T00:00:00", "2024-01-01T00:00:00"]
+                }
+            }
+        }
+        Utils().jsonDump(stacMetadata, writer.source() + '.stac.json')
+        writer.close()
+
+        reader = RasterReader(writer.source())
+        self.assertEqual(QDateTime(2022, 1, 1, 0, 0, 0), reader.startTime(1))
+        self.assertEqual(QDateTime(2023, 1, 1, 0, 0, 0), reader.endTime(1))
+        self.assertEqual(QDateTime(2023, 1, 1, 0, 0, 0), reader.startTime(2))
+        self.assertEqual(QDateTime(2024, 1, 1, 0, 0, 0), reader.endTime(2))
