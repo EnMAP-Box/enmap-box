@@ -2,12 +2,12 @@ from typing import List, Union, Optional, Iterator
 
 from osgeo import gdal
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.typing import Array3d, Array2d, MetadataValue, MetadataDomain, Metadata, Number
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtCore import QDateTime
 from qgis.PyQt.QtGui import QColor
-from qgis.core import Qgis
-from enmapbox.typeguard import typechecked
+from qgis.core import Qgis, QgsRasterLayer
 
 
 @typechecked
@@ -16,6 +16,12 @@ class RasterWriter(object):
     def __init__(self, gdalDataset: gdal.Dataset):
         self.gdalDataset = gdalDataset
         self._source: str = self.gdalDataset.GetDescription()
+
+    def __del__(self):
+        from enmapboxprocessing.algorithm.writestacheaderalgorithm import WriteStacHeaderAlgorithm
+        self.close()
+        raster = QgsRasterLayer(self.source())
+        WriteStacHeaderAlgorithm.writeStacHeader(raster)
 
     def writeArray(self, array: Array3d, xOffset=0, yOffset=0, bandList: List[int] = None, overlap: int = None):
         if bandList is None:
