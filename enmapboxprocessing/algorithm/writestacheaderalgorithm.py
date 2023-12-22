@@ -6,6 +6,7 @@ from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+from qgis._core import QgsRasterLayer
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 
 
@@ -34,10 +35,13 @@ class WriteStacHeaderAlgorithm(EnMAPProcessingAlgorithm):
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
+        self.writeStacHeader(raster)
+        return {}
 
+    @staticmethod
+    def writeStacHeader(raster: QgsRasterLayer):
         if not exists(raster.source()):
             raise QgsProcessingException(f'Raster layer source is not a valid filename: {raster.source()}')
-
         reader = RasterReader(raster)
         metadata = OrderedDict()
         metadata['stac_extensions'] = [
@@ -61,5 +65,3 @@ class WriteStacHeaderAlgorithm(EnMAPProcessingAlgorithm):
             bandMetadata['enmapbox:bad_band_multiplier'] = reader.badBandMultiplier(bandNo)
             metadata['properties']['eo:bands'].append(bandMetadata)
         Utils().jsonDump(metadata, raster.source() + '.stac.json')
-
-        return {}
