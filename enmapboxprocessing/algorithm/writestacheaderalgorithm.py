@@ -6,8 +6,7 @@ from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
-from qgis._core import QgsRasterLayer
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer)
 
 
 @typechecked

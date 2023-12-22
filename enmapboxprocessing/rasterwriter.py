@@ -7,8 +7,7 @@ from enmapboxprocessing.typing import Array3d, Array2d, MetadataValue, MetadataD
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtCore import QDateTime
 from qgis.PyQt.QtGui import QColor
-from qgis._core import QgsRasterLayer
-from qgis.core import Qgis
+from qgis.core import Qgis, QgsRasterLayer
 
 
 @typechecked
