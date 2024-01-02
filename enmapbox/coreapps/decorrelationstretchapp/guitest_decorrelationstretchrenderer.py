@@ -35,7 +35,7 @@ Xt = pca.inverse_transform(XPcaStretched)
 
 percentiles = np.percentile(Xt, [2, 98], axis=0)
 
-scaler2 = MinMaxScaler(feature_range=[0, 255], clip=True)
+scaler2 = MinMaxScaler(feature_range=(0, 255), clip=True)
 scaler2.fit(percentiles)
 rgb = scaler2.transform(Xt)
 
