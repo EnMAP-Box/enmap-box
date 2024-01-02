@@ -1,6 +1,8 @@
 from collections import OrderedDict
 from os.path import exists
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Union
+
+from osgeo import gdal
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
@@ -38,10 +40,10 @@ class WriteStacHeaderAlgorithm(EnMAPProcessingAlgorithm):
         return {}
 
     @staticmethod
-    def writeStacHeader(raster: QgsRasterLayer):
+    def writeStacHeader(raster: Union[QgsRasterLayer, gdal.Dataset]):
+        reader = RasterReader(raster)
         if not exists(raster.source()):
             raise QgsProcessingException(f'Raster layer source is not a valid filename: {raster.source()}')
-        reader = RasterReader(raster)
         metadata = OrderedDict()
         metadata['stac_extensions'] = [
             'https://stac-extensions.github.io/eo/v1.0.0/schema.json',

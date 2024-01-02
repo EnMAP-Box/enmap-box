@@ -7,7 +7,7 @@ from enmapboxprocessing.typing import Array3d, Array2d, MetadataValue, MetadataD
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtCore import QDateTime
 from qgis.PyQt.QtGui import QColor
-from qgis.core import Qgis, QgsRasterLayer
+from qgis.core import Qgis
 
 
 @typechecked
@@ -19,9 +19,7 @@ class RasterWriter(object):
 
     def __del__(self):
         from enmapboxprocessing.algorithm.writestacheaderalgorithm import WriteStacHeaderAlgorithm
-        self.close()
-        raster = QgsRasterLayer(self.source())
-        WriteStacHeaderAlgorithm.writeStacHeader(raster)
+        WriteStacHeaderAlgorithm.writeStacHeader(self.gdalDataset)
 
     def writeArray(self, array: Array3d, xOffset=0, yOffset=0, bandList: List[int] = None, overlap: int = None):
         if bandList is None:
