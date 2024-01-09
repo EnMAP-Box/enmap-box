@@ -12,6 +12,7 @@ class TestRasterWriter(TestCase):
     def test_init(self):
         ds = gdal.Open(enmap)
         writer = RasterWriter(ds)
+        writer.close()
         self.assertEqual(enmap, writer.source())
 
     def test_writeArray_all(self):

@@ -128,6 +128,7 @@ class VrtBandMathAlgorithm(EnMAPProcessingAlgorithm):
             writer.setBandName(bandName, 1)
             writer.setScale(1, 1)  # unset any input scaling (fixes #1389)
             writer.setOffset(0, 1)  # unset any input offset
+            writer.close()
 
             # prepare results
             result = {self.P_OUTPUT_VRT: filename}

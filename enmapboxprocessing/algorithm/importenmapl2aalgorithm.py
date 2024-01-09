@@ -224,6 +224,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                         )[0] == reader.noDataValue(bandNo))
                     if allNoData:
                         writer.setBadBandMultiplier(0, bandNo)
+                writer.close()
                 del reader, writer
             del ds
 

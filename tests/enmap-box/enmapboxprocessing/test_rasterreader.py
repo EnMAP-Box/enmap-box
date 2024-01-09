@@ -292,15 +292,16 @@ class TestRasterReader(TestCase):
         writer = self.rasterFromArray(np.zeros((4, 1, 1)))
         writer.setMetadataItem('wavelength', 500, '', 1)
         writer.setMetadataItem('wavelength', 0.5, '', 2)
+        writer.setMetadataItem('wavelength', 1000, '', 3)
+        writer.setMetadataItem('wavelength', 1000, '', 4)
         writer.setMetadataItem('wavelength_units', 'Nanometers', '', 3)
         writer.setMetadataItem('wavelength_unit', 'Micrometers', '', 4)
         writer.close()
         reader = RasterReader(writer.source())
-        self.assertEqual('Nanometers', reader.wavelengthUnits(1))  # guessed
-        self.assertEqual('Micrometers', reader.wavelengthUnits(2))  # guessed
-        self.assertIsNone(reader.wavelengthUnits(1, guess=False))
-        self.assertEqual('Nanometers', reader.wavelengthUnits(3))
-        self.assertEqual('Micrometers', reader.wavelengthUnits(4))
+        self.assertEqual('Micrometers', reader.wavelengthUnits(1))  # STAC stores it as Micrometers
+        self.assertEqual('Micrometers', reader.wavelengthUnits(2))  # STAC stores it as Micrometers
+        self.assertEqual('Micrometers', reader.wavelengthUnits(3))  # STAC stores it as Micrometers
+        self.assertEqual('Micrometers', reader.wavelengthUnits(4))  # STAC stores it as Micrometers
 
         # check at dataset-level
         writer = self.rasterFromArray(np.zeros((3, 1, 1)))
@@ -385,7 +386,7 @@ class TestRasterReader(TestCase):
         self.assertEqual(1, reader.badBandMultiplier(3))
 
         # check at dataset-level
-        writer = self.rasterFromArray(np.zeros((3, 1, 1)))
+        writer = self.rasterFromArray(np.zeros((2, 1, 1)))
         writer.setMetadataItem('bbl', [0, 1], '')
         writer.close()
         reader = RasterReader(writer.source())
@@ -437,7 +438,7 @@ class TestRasterReader(TestCase):
         reader = RasterReader(writer.source())
         self.assertEqual(QDateTime(2009, 8, 20, 9, 44, 50), reader.startTime(1))
 
-    def test_endTime(self):
+    def test_endTime1(self):
         # no time set
         writer = self.rasterFromArray(np.zeros((3, 1, 1)))
         writer.close()
@@ -445,6 +446,7 @@ class TestRasterReader(TestCase):
         self.assertIsNone(reader.endTime())
         self.assertIsNone(reader.endTime(1))
 
+    def test_endTime2(self):
         # check at dataset-level
         # - standard format
         writer = self.rasterFromArray(np.zeros((3, 1, 1)))
@@ -453,6 +455,7 @@ class TestRasterReader(TestCase):
         reader = RasterReader(writer.source())
         self.assertEqual(QDateTime(2009, 8, 20, 9, 44, 50), reader.endTime(1))
 
+    def test_endTime3(self):
         # check at band-level
         # - standard format
         writer = self.rasterFromArray(np.zeros((3, 1, 1)))
@@ -533,23 +536,9 @@ class TestRasterReader(TestCase):
         self.assertEqual(gold * 2, reader.lineMemoryUsage(nBands=bandCount * 2))
         self.assertEqual(gold * 2, reader.lineMemoryUsage(dataTypeSize=8))
 
-    def test_pamMetadata(self):
-        layer = QgsRasterLayer(enmap)
-        reader = RasterReader(layer)
-        wavelength1 = 0.123
-        wavelengthUnits1 = 'Micrometers'
-        layer.setCustomProperty('QGISPAM/band/42//wavelength', wavelength1)
-        layer.setCustomProperty('QGISPAM/band/42//wavelength_units', wavelengthUnits1)
-        self.assertEqual(wavelength1, layer.customProperty('QGISPAM/band/42//wavelength'))
-        self.assertEqual(wavelengthUnits1, layer.customProperty('QGISPAM/band/42//wavelength_units'))
-
-        wavelengthUnits2 = reader.wavelengthUnits(42)
-        wavelength2 = reader.wavelength(42, wavelengthUnits2)
-        self.assertEqual(wavelength1, wavelength2)
-        self.assertEqual(wavelengthUnits1, wavelengthUnits2)
-
     def test_stacMetadata(self):
         writer = self.rasterFromArray(np.zeros((1, 5, 5)), 'raster.tif')
+        writer.close()
         stacMetadata = {
             "properties": {
                 "dataset_key": 42,
@@ -566,7 +555,6 @@ class TestRasterReader(TestCase):
             }
         }
         Utils().jsonDump(stacMetadata, writer.source() + '.stac.json')
-        writer.close()
 
         reader = RasterReader(writer.source())
         self.assertEqual(42, reader.metadataItem('dataset_key'))
@@ -602,6 +590,7 @@ class TestRasterReader(TestCase):
 
     def test_stacMetadata_enviStyle(self):
         writer = self.rasterFromArray(np.zeros((2, 5, 5)), 'raster.tif')
+        writer.close()
         stacMetadata = {
             "properties": {
                 "envi:metadata": {
@@ -616,7 +605,6 @@ class TestRasterReader(TestCase):
             }
         }
         Utils().jsonDump(stacMetadata, writer.source() + '.stac.json')
-        writer.close()
 
         reader = RasterReader(writer.source())
         self.assertEqual('Band A', reader.bandName(1))

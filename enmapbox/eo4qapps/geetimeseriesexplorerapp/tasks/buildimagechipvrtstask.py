@@ -46,6 +46,7 @@ class BuildImageChipVrtsTask(QgsTask):
                         for bandNo, srcDs in enumerate(srcDss, 1):
                             rb: gdal.Band = srcDs.GetRasterBand(1)
                             writer.setBandName(rb.GetDescription(), bandNo)
+                        writer.close()
 
         except Exception as e:
             traceback.print_exc()

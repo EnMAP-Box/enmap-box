@@ -140,8 +140,7 @@ class EditRasterSourceBandPropertiesAlgorithm(EnMAPProcessingAlgorithm):
         if scales is not None:
             for bandNo, scale in enumerate(scales, 1):
                 writer.setScale(scale, bandNo)
-
-        ds.FlushCache()
+        writer.close()
         del writer
         del ds
         return {}

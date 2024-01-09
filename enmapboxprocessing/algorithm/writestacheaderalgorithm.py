@@ -41,9 +41,19 @@ class WriteStacHeaderAlgorithm(EnMAPProcessingAlgorithm):
 
     @staticmethod
     def writeStacHeader(raster: Union[QgsRasterLayer, gdal.Dataset]):
+
+        if isinstance(raster, QgsRasterLayer):
+            filename = raster.source()
+        elif isinstance(raster, gdal.Dataset):
+            filename = raster.GetDescription()
+            raster.FlushCache()
+        else:
+            raise ValueError()
+
+        if not exists(filename):
+            raise QgsProcessingException(f'Raster layer source is not a valid filename: {filename}')
+
         reader = RasterReader(raster)
-        if not exists(raster.source()):
-            raise QgsProcessingException(f'Raster layer source is not a valid filename: {raster.source()}')
         metadata = OrderedDict()
         metadata['stac_extensions'] = [
             'https://stac-extensions.github.io/eo/v1.0.0/schema.json',
@@ -54,15 +64,23 @@ class WriteStacHeaderAlgorithm(EnMAPProcessingAlgorithm):
         for bandNo in reader.bandNumbers():
             bandMetadata = OrderedDict()
             bandMetadata['name'] = reader.bandName(bandNo)
+            bandMetadata['color'] = reader.bandColor(bandNo)
             bandMetadata['center_wavelength'] = reader.wavelength(bandNo, reader.Micrometers)
             bandMetadata['full_width_half_max'] = reader.fwhm(bandNo, reader.Micrometers)
-            timeFormat = 'yyyy-MM-ddTHH:mm:ss'
             if reader.endTime(bandNo) is None:
                 if reader.centerTime(bandNo) is not None:
-                    bandMetadata['datetime'] = reader.centerTime(bandNo).toString(timeFormat)
+                    bandMetadata['datetime'] = reader.centerTime(bandNo)
             else:
-                bandMetadata['start_datetime'] = reader.startTime(bandNo).toString(timeFormat)
-                bandMetadata['end_datetime'] = reader.endTime(bandNo).toString(timeFormat)
+                bandMetadata['start_datetime'] = reader.startTime(bandNo)
+                bandMetadata['end_datetime'] = reader.endTime(bandNo)
             bandMetadata['enmapbox:bad_band_multiplier'] = reader.badBandMultiplier(bandNo)
+
+            # we can skip the bad_band_multiplier for good bands, because that is the default
+            if bandMetadata['enmapbox:bad_band_multiplier'] == 1:
+                bandMetadata.pop('enmapbox:bad_band_multiplier')
+
+            # skip None Values
+            bandMetadata = {k: v for k, v in bandMetadata.items() if v is not None}
+
             metadata['properties']['eo:bands'].append(bandMetadata)
-        Utils().jsonDump(metadata, raster.source() + '.stac.json')
+        Utils().jsonDump(metadata, filename + '.stac.json', timeFormat='yyyy-MM-ddTHH:mm:ss')

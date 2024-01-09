@@ -75,8 +75,7 @@ class ApplyMaskAlgorithm(EnMAPProcessingAlgorithm):
                 writer.setNoDataValue(noDataValue, i + 1)
 
             writer.setMetadata(reader.metadata())
-            result = {self.P_OUTPUT_RASTER: filename}
-            self.toc(feedback, result)
+            writer.close()
 
             result = {self.P_OUTPUT_RASTER: filename}
             self.toc(feedback, result)

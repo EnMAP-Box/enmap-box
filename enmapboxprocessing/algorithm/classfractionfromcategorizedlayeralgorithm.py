@@ -138,7 +138,7 @@ class ClassFractionFromCategorizedLayerAlgorithm(EnMAPProcessingAlgorithm):
                 writer.setBandName(category.name, bandNo)
                 writer.setMetadataItem('color', category.color, '', bandNo)
                 writer.setScale(1 / 100, bandNo)
-
+            writer.close()
             result = {self.P_OUTPUT_FRACTION_RASTER: filename}
             self.toc(feedback, result)
 

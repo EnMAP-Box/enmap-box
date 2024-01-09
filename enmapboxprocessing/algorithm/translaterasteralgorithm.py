@@ -386,6 +386,7 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                 del outraster
 
             driverShortName = writer.gdalDataset.GetDriver().ShortName
+            writer.close()
             del writer, outGdalDataset
 
             # need to re-open the raster before setting the scal/offset (issue #501)
@@ -400,6 +401,7 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                     writer.setScale(reader.scale(srcBandNo), dstBandNo)
                 else:
                     writer.setScale(scale, dstBandNo)
+            writer.close()
             del writer, outGdalDataset
 
             if writeEnviHeader:

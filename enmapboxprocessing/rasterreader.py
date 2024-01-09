@@ -536,6 +536,8 @@ class RasterReader(object):
         # check STAC
         if 'center_wavelength' in self.stacMetadata['properties']['eo:bands'][bandNo - 1]:
             return self.Micrometers  # STAC EO Extension always uses Micrometers
+        if 'full_width_half_max' in self.stacMetadata['properties']['eo:bands'][bandNo - 1]:
+            return self.Micrometers  # STAC EO Extension always uses Micrometers
         if 'wavelength_units' in self.stacMetadata['properties']['envi:metadata']:
             return self.stacMetadata['properties']['envi:metadata']['wavelength_units']
 

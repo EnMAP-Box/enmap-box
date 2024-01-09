@@ -16,10 +16,13 @@ class RasterWriter(object):
     def __init__(self, gdalDataset: gdal.Dataset):
         self.gdalDataset = gdalDataset
         self._source: str = self.gdalDataset.GetDescription()
+        self.closed = False
 
     def __del__(self):
-        from enmapboxprocessing.algorithm.writestacheaderalgorithm import WriteStacHeaderAlgorithm
-        WriteStacHeaderAlgorithm.writeStacHeader(self.gdalDataset)
+        if not self.closed:
+            message = 'RasterWriter not properly closed: ' + self._source
+            print(message)
+            raise RuntimeError(message)
 
     def writeArray(self, array: Array3d, xOffset=0, yOffset=0, bandList: List[int] = None, overlap: int = None):
         if bandList is None:
@@ -184,4 +187,7 @@ class RasterWriter(object):
 
     def close(self):
         self.gdalDataset.FlushCache()
+        from enmapboxprocessing.algorithm.writestacheaderalgorithm import WriteStacHeaderAlgorithm
+        WriteStacHeaderAlgorithm.writeStacHeader(self.gdalDataset)
         self.gdalDataset = None
+        self.closed = True
