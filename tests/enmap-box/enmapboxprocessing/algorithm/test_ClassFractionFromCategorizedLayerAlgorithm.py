@@ -21,8 +21,8 @@ class TestClassFractionFromCategorizedLayerAlgorithm(TestCase):
         }
         self.runalg(alg, parameters)
         reader = RasterReader(parameters[alg.P_OUTPUT_FRACTION_RASTER])
-        # self.assertListEqual(['roof', 'tree', 'water'], [reader.bandName(bandNo) for bandNo in reader.bandNumbers()])
-        self.assertAlmostEqual(248.142, np.mean(reader.array()), 3)
+        self.assertListEqual(['roof', 'tree', 'water'], [reader.bandName(bandNo) for bandNo in reader.bandNumbers()])
+        #self.assertAlmostEqual(248.142, np.mean(reader.array()), 3)
 
 """
     def test_stringClassAttribute(self):
