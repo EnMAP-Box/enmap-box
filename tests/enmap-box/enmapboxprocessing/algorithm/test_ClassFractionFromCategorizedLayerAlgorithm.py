@@ -17,7 +17,7 @@ class TestClassFractionFromCategorizedLayerAlgorithm(TestCase):
         parameters = {
             alg.P_CATEGORIZED_LAYER: landcover_polygon_3classes_id,
             alg.P_GRID: enmap,
-            alg.P_OUTPUT_FRACTION_RASTER: self.filename('fractions_polygons2.bsq')
+            alg.P_OUTPUT_FRACTION_RASTER: self.filename('fractions_polygons.bsq')
         }
         self.runalg(alg, parameters)
         reader = RasterReader(parameters[alg.P_OUTPUT_FRACTION_RASTER])
