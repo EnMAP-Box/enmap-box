@@ -57,6 +57,7 @@ class RasterReader(object):
         # prepare STAC metadata
         if exists(self.layer.source() + '.stac.json'):
             self.stacMetadata = Utils().jsonLoad(self.layer.source() + '.stac.json')
+            print('### STAC file exists ###', self.layer.source() + '.stac.json')
         else:
             self.stacMetadata = {}
         if 'properties' not in self.stacMetadata:
@@ -65,6 +66,11 @@ class RasterReader(object):
             self.stacMetadata['properties']['eo:bands'] = [{} for i in self.bandNumbers()]
         if 'envi:metadata' not in self.stacMetadata['properties']:
             self.stacMetadata['properties']['envi:metadata'] = {}
+
+        print('###', self.stacMetadata, '###')
+        print('### band count ###', self.bandCount())
+        print('### band numbers ###', list(self.bandNumbers()))
+        print()
 
     def bandCount(self) -> int:
         """Return iterator over all band numbers."""
