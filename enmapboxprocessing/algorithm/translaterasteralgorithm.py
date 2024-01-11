@@ -22,7 +22,7 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
     P_SPECTRAL_RASTER, _SPECTRAL_RASTER = 'spectralSubset', 'Spectral raster layer for band subsetting'
     P_SPECTRAL_BAND_LIST, _SPECTRAL_BAND_LIST = 'spectralBandList', 'Selected spectral bands'
     P_OFFSET, _OFFSET = 'offset', 'Data offset value'
-    P_SCALE, _SCALE = 'scale', 'Data gain/scale value'
+    P_SCALE, _SCALE = 'scale', 'Data scale value'
     P_COPY_METADATA, _COPY_METADATA = 'copyMetadata', 'Copy metadata'
     P_COPY_STYLE, _COPY_STYLE = 'copyStyle', 'Copy style'
     P_EXCLUDE_BAD_BANDS, _EXCLUDE_BAD_BANDS = 'excludeBadBands', 'Exclude bad bands'
@@ -73,7 +73,7 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
             (self._SPECTRAL_BAND_LIST, 'Spectral bands used to match source raster bands.'
                                        'An empty selection defaults to all bands in native order.'),
             (self._OFFSET, 'A data offset value applied to each band.'),
-            (self._SCALE, 'A data gain/scale value applied to each band.'),
+            (self._SCALE, 'A data scale value applied to each band.'),
             (self._EXTENT, 'Spatial extent for clipping the destination grid, '
                            'which is given by the source Raster or the selected Grid. '
                            'In both cases, the extent is aligned with the actual pixel grid '
