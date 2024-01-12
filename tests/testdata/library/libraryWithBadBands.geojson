@@ -1,0 +1,9 @@
+{
+"type": "FeatureCollection",
+"name": "libraryWithBadBands",
+"description": "SpectralLibrary #1",
+"features": [
+{ "type": "Feature", "properties": { "name": "1", "profiles": { "y": [ 95.0, 118.0, 109.0, null ], "x": [ 490.0, 560.0, 665.0, 830.0 ], "xUnit": "nanometers", "bbl": [ 1, 1, 0, 1 ] } }, "geometry": { "type": "Point", "coordinates": [ 13.012757, 52.3944126 ] } },
+{ "type": "Feature", "properties": { "name": "2", "profiles": { "y": [ 103.0, null, 93.0, null ], "x": [ 490.0, 560.0, 665.0, 830.0 ], "xUnit": "nanometers", "bbl": [ 1, 1, 0, 1 ] } }, "geometry": { "type": "Point", "coordinates": [ 13.0168252, 52.3910204 ] } }
+]
+}
