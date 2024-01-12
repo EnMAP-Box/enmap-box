@@ -96,6 +96,7 @@ points_in_no_data_region = join(_root, _subdir, 'points_in_no_data_region.gpkg')
 _subdir = 'library'
 library = join(_root, _subdir, 'library.gpkg')
 landsat8_srf = join(_root, _subdir, 'landsat8_srf.gpkg')
+libraryWithBadBands = join(_root, _subdir, 'libraryWithBadBands.geojson')
 
 # DATASET
 _subdir = 'ml'

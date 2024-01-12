@@ -17,6 +17,7 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
     P_CATEGORIZED_LIBRARY, _CATEGORIZED_LIBRARY = 'categorizedLibrary', 'Categorized spectral library'
     P_FIELD, _FIELD = 'field', 'Field with spectral profiles used as features'
     P_CATEGORY_FIELD, _CATEGORY_FIELD = 'categoryField', 'Field with class values'
+    P_EXCLUDE_BAD_BANDS, _EXCLUDE_BAD_BANDS, = 'excludeBadBands', 'Exclude bad bands'
     P_OUTPUT_DATASET, _OUTPUT_DATASET = 'outputClassificationDataset', 'Output dataset'
 
     @classmethod
@@ -45,6 +46,8 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
             (self._FIELD, 'Field with spectral profiles used as feature data X. '
                           'If not selected, the default field named "profiles" is used. '
                           'If that is also not available, an error is raised.'),
+            (self._EXCLUDE_BAD_BANDS, 'Whether to exclude bands, that are marked as bad bands, '
+                                      'or contain no data, inf or nan values in all samples.'),
             (self._OUTPUT_DATASET, self.PickleFileDestination)
         ]
 
@@ -61,6 +64,7 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
             self.P_FIELD, self._FIELD, None, self.P_CATEGORIZED_LIBRARY, QgsProcessingParameterField.Any, False, True,
             False, True
         )
+        self.addParameterBoolean(self.P_EXCLUDE_BAD_BANDS, self._EXCLUDE_BAD_BANDS, True, True, True)
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
 
     def processAlgorithm(
@@ -69,6 +73,7 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
         library = self.parameterAsVectorLayer(parameters, self.P_CATEGORIZED_LIBRARY, context)
         binaryField = self.parameterAsField(parameters, self.P_FIELD, context)
         classField = self.parameterAsField(parameters, self.P_CATEGORY_FIELD, context)
+        excludeBadBands = self.parameterAsBoolean(parameters, self.P_EXCLUDE_BAD_BANDS, context)
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_DATASET, context)
 
         with open(filename + '.log', 'w') as logfile:
@@ -116,9 +121,14 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
                 if yi is None:  # if category is not of interest ...
                     continue  # ... we skip the profile
                 try:
-                    Xi = profileDict['y']
+                    Xi = np.array(profileDict['y'])
                 except KeyError:
                     raise QgsProcessingException(f'Not a valid Profiles field: {binaryField}')
+
+                if excludeBadBands:
+                    if 'bbl' in profileDict:
+                        valid = np.equal(profileDict['bbl'], 1)
+                        Xi = Xi[valid]
 
                 y.append(yi)
                 X.append(Xi)
@@ -129,13 +139,24 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
             try:
                 X = np.array(X, dtype=np.float32)
             except Exception as error:
-                ValueError(f'invalid feature data: {error}')
+                raise ValueError(f'invalid feature data: {error}')
+
+            y = np.array(y)
+            if excludeBadBands:
+                # skip not finite bands
+                validBands = np.any(np.isfinite(X), axis=0)
+                X = X[:, validBands]
+
+                # skip samples that contain not finite values
+                validSamples = np.all(np.isfinite(X), axis=1)
+                X = X[validSamples]
+
+                y = y[validSamples]
 
             try:
-                y = np.array(y)
                 y = y.reshape(-1, 1)
             except Exception as error:
-                ValueError(f'invalid target data: {error}')
+                raise ValueError(f'invalid target data: {error}')
 
             checkSampleShape(X, y, raise_=True)
 
