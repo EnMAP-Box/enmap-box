@@ -126,8 +126,9 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
                     raise QgsProcessingException(f'Not a valid Profiles field: {binaryField}')
 
                 if excludeBadBands:
-                    valid = np.equal(profileDict['bbl'], 1)
-                    Xi = Xi[valid]
+                    if 'bbl' in profileDict:
+                        valid = np.equal(profileDict['bbl'], 1)
+                        Xi = Xi[valid]
 
                 y.append(yi)
                 X.append(Xi)
