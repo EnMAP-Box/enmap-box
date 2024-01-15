@@ -327,7 +327,7 @@ class BuildGenericSRF:
         ndvi.append(np.argmin(np.abs(wavelength - 677)))  # red
         ndvi.append(np.argmin(np.abs(wavelength - 837)))  # nir
 
-        np.savez(self.out_file, srf_nbands=new_srf_nbands, srf=new_srf, sensor_wl=wavelength, sensor_ndvi=ndvi)
+        np.savez(self.out_file, srf_nbands=new_srf_nbands, srf=new_srf, sensor_wl=wavelength, sensor_ndvi=ndvi, sensor_fwhm=fwhm)
         os.replace(self.out_file, os.path.splitext(self.out_file)[0] + ".srf")
 
         return True, self.out_file, os.path.splitext(os.path.basename(self.out_file))[0]
