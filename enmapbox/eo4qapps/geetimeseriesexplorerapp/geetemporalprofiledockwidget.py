@@ -1015,13 +1015,15 @@ class GeeTemporalProfileDockWidget(QgsDockWidget):
         layer.removeSelection()
         layer.select(feature.id())
 
-        self.onDownloadLayerProfilesClicked(onlySelected=True, updateUi=True)
+        self.onDownloadProfilesClicked(onlySelected=True, updateUi=True)
 
         point = SpatialPoint(destCrs, destPoint)
         self.setCurrentLocation(point.x(), point.y())
 
-        if self.mainDock.enmapBox is not None:
-            self.mainDock.enmapBox.currentMapCanvas().setCrosshairPosition(point, True)
+        if self.mainDock.enmapBoxInterface() is not None:
+            self.mainDock.enmapBoxInterface().currentMapCanvas().setCrosshairPosition(point, True)
+
+        self.mainDock.currentMapCanvas()
 
     def onLegendDoubleClicked(self, index: QModelIndex):
         bandItem = self.mLegend.item(index.row())

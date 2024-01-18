@@ -9,7 +9,7 @@ from enmapboxtestdata import SensorProducts, sensorProductsRoot
 class TestImportEnmapL2AAlgorithm(TestCase):
 
     def test(self):
-        if sensorProductsRoot() is None:
+        if sensorProductsRoot() is None or self.skipProductImport:
             return
 
         alg = ImportEnmapL2AAlgorithm()
@@ -25,7 +25,7 @@ class TestImportEnmapL2AAlgorithm(TestCase):
         )
 
     def test_OrderByDetectorOverlapOption(self):
-        if sensorProductsRoot() is None:
+        if sensorProductsRoot() is None or self.skipProductImport:
             return
 
         alg = ImportEnmapL2AAlgorithm()
@@ -39,7 +39,7 @@ class TestImportEnmapL2AAlgorithm(TestCase):
         self.assertEqual(224, RasterReader(result[alg.P_OUTPUT_RASTER]).bandCount())
 
     def test_OrderByWavelengthOverlapOption(self):
-        if sensorProductsRoot() is None:
+        if sensorProductsRoot() is None or self.skipProductImport:
             return
 
         alg = ImportEnmapL2AAlgorithm()
@@ -53,7 +53,7 @@ class TestImportEnmapL2AAlgorithm(TestCase):
         self.assertEqual(224, RasterReader(result[alg.P_OUTPUT_RASTER]).bandCount())
 
     def test_VnirOnlyOverlapOption(self):
-        if sensorProductsRoot() is None:
+        if sensorProductsRoot() is None or self.skipProductImport:
             return
 
         alg = ImportEnmapL2AAlgorithm()
@@ -68,7 +68,7 @@ class TestImportEnmapL2AAlgorithm(TestCase):
         self.assertEqual(214, reader.bandCount())
 
     def test_SwirOnlyOverlapOption(self):
-        if sensorProductsRoot() is None:
+        if sensorProductsRoot() is None or self.skipProductImport:
             return
 
         alg = ImportEnmapL2AAlgorithm()
@@ -83,7 +83,7 @@ class TestImportEnmapL2AAlgorithm(TestCase):
         self.assertEqual(212, reader.bandCount())
 
     def test_MovingAverageFilterOverlapOption(self):
-        if sensorProductsRoot() is None:
+        if sensorProductsRoot() is None or self.skipProductImport:
             return
 
         alg = ImportEnmapL2AAlgorithm()
@@ -98,7 +98,7 @@ class TestImportEnmapL2AAlgorithm(TestCase):
         self.assertEqual(224, reader.bandCount())
 
     def test_setBadBandList(self):
-        if sensorProductsRoot() is None:
+        if sensorProductsRoot() is None or self.skipProductImport:
             return
 
         alg = ImportEnmapL2AAlgorithm()
@@ -121,7 +121,7 @@ class TestImportEnmapL2AAlgorithm(TestCase):
         self.assertListEqual(gold, bbl)
 
     def test_excludeBadBandList(self):
-        if sensorProductsRoot() is None:
+        if sensorProductsRoot() is None or self.skipProductImport:
             return
 
         alg = ImportEnmapL2AAlgorithm()

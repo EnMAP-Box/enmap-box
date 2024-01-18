@@ -66,6 +66,7 @@ class ClassificationFromRenderedImageAlgorithm(EnMAPProcessingAlgorithm):
             writer = Driver(filename).createFromArray([array], raster.extent(), raster.crs())
             writer.setNoDataValue(0)
             writer.setBandName('classification from rgb image', 1)
+            writer.close()
             del writer
 
             layer = QgsRasterLayer(filename)

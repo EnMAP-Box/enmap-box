@@ -123,7 +123,7 @@ class TransformRasterAlgorithm(EnMAPProcessingAlgorithm):
                     writer.writeArray2d(aXt, i + 1, xOffset=block.xOffset, yOffset=block.yOffset)
 
             writer.setNoDataValue(noDataValue)
-
+            writer.close()
             result = {self.P_OUTPUT_RASTER: filename}
             self.toc(feedback, result)
 

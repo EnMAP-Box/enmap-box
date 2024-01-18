@@ -138,6 +138,10 @@ class ConvexHullAlgorithm(EnMAPProcessingAlgorithm):
                     writerContinuumRemoved.setFwhm(fwhm, i + 1)
                     writerContinuumRemoved.setNoDataValue(noDataValueContinuumRemoved, i + 1)
 
+            if filenameConvexHull is not None:
+                writerConvexHull.close()
+            if filenameContinuumRemoved is not None:
+                writerContinuumRemoved.close()
             self.toc(feedback, result)
 
         return result

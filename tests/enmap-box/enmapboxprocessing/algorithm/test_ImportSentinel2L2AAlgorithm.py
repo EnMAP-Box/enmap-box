@@ -6,7 +6,7 @@ from enmapboxtestdata import sensorProductsRoot, SensorProducts
 class TestImportSentinel2L2AAlgorithm(TestCase):
 
     def test(self):
-        if sensorProductsRoot() is None:
+        if sensorProductsRoot() is None or self.skipProductImport:
             return
 
         alg = ImportSentinel2L2AAlgorithm()

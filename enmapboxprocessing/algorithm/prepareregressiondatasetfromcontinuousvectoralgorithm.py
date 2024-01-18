@@ -102,6 +102,7 @@ class PrepareRegressionDatasetFromContinuousVectorAlgorithm(EnMAPProcessingAlgor
             ds = gdal.BuildVRT(vrtFilename, filenames, separate=True)
             writer = RasterWriter(ds)
             writer.setNoDataValue(noDataValue)
+            writer.close()
             del writer, ds
 
             # sample data

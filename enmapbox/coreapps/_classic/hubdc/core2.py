@@ -41,12 +41,12 @@ class Projection(object):
 
     @staticmethod
     def WGS84WebMercator():
-        '''Create WGS84 Web Mercator projection (epsg=3857), also see http://spatialreference.org/ref/sr-org/7483/'''
+        '''Create WGS84 Web Mercator projection (epsg=3857)'''
         return Projection.fromEPSG(epsg=3857)
 
     @staticmethod
     def WGS84():
-        '''Create WGS84 projection (epsg=4326), also see http://spatialreference.org/ref/epsg/wgs-84/'''
+        '''Create WGS84 projection (epsg=4326)'''
         return Projection.fromEPSG(epsg=4326)
 
     @classmethod

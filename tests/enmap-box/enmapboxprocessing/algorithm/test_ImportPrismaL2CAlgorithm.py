@@ -9,7 +9,7 @@ from enmapboxtestdata import sensorProductsRoot, SensorProducts
 class TestImportPrismaL2CAlgorithm(TestCase):
 
     def test(self):
-        if sensorProductsRoot() is None:
+        if sensorProductsRoot() is None or self.skipProductImport:
             return
 
         alg = ImportPrismaL2CAlgorithm()

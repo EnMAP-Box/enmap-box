@@ -128,7 +128,7 @@ class SpectralResamplingByWavelengthAlgorithm(EnMAPProcessingAlgorithm):
                 # for bandNo, targetWavelength in enumerate(targetWavelengths, 1):
                 writer.setWavelength(targetWavelength, targetBandNo)
                 writer.setNoDataValue(outputNoDataValue, targetBandNo)
-
+            writer.close()
             result = {
                 self.P_OUTPUT_RASTER: filename
             }

@@ -1,4 +1,4 @@
-from enmapboxtestdata import library_gpkg
+from enmapboxtestdata import library_gpkg, libraryWithBadBands
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedlibraryalgorithm import \
     PrepareClassificationDatasetFromCategorizedLibraryAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
@@ -58,3 +58,29 @@ class TestPrepareClassificationDatasetFromCategorizedLibrary(TestCase):
             self.runalg(alg, parameters)
         except QgsProcessingException as error:
             self.assertEqual('Not a valid Profiles field: level_1', str(error))
+
+    def test_excludeBadBands(self):
+
+        alg = PrepareClassificationDatasetFromCategorizedLibraryAlgorithm()
+        parameters = {
+            alg.P_CATEGORIZED_LIBRARY: libraryWithBadBands,
+            alg.P_EXCLUDE_BAD_BANDS: True,
+            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+        }
+        self.runalg(alg, parameters)
+        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        self.assertEqual((1, 2), dump.X.shape)
+        self.assertEqual(2, len(dump.features))
+
+    def test_notExcludeBadBands(self):
+
+        alg = PrepareClassificationDatasetFromCategorizedLibraryAlgorithm()
+        parameters = {
+            alg.P_CATEGORIZED_LIBRARY: libraryWithBadBands,
+            alg.P_EXCLUDE_BAD_BANDS: False,
+            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+        }
+        self.runalg(alg, parameters)
+        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        self.assertEqual((2, 4), dump.X.shape)
+        self.assertEqual(4, len(dump.features))

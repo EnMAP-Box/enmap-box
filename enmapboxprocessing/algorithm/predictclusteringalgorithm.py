@@ -119,6 +119,7 @@ class PredictClusteringAlgorithm(EnMAPProcessingAlgorithm):
                 arrayY[valid] = y + 1  # cluster numbers start with 1!
                 writer.writeArray2d(arrayY, 1, xOffset=block.xOffset, yOffset=block.yOffset)
             writer.setNoDataValue(noDataValue)
+            writer.close()
             del writer
 
             # create default style

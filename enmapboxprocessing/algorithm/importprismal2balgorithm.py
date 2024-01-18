@@ -222,6 +222,7 @@ class ImportPrismaL2BAlgorithm(EnMAPProcessingAlgorithm):
             writer.setBandName(f'Band {bandNo} ({wl} Nanometers)', bandNo)
             writer.setWavelength(wl, bandNo)
             writer.setFwhm(fwhm[bandNo - 1], bandNo)
+        writer.close()
 
     def writeSpectralErrorMatrix(self, filenameSpectralError, he5Filename, spectralRegion, feedback):
         if filenameSpectralError is None:
@@ -267,6 +268,7 @@ class ImportPrismaL2BAlgorithm(EnMAPProcessingAlgorithm):
             wl = wavelength[bandNo - 1]
             writer.setBandName(f'Pixel Error Band {bandNo} ({wl} Nanometers)', bandNo)
             writer.setWavelength(wl, bandNo)
+        writer.close()
 
     def writeSpectralGeolocationFields(self, filenameSpectralGeolocation, he5Filename):
         if filenameSpectralGeolocation is None:
@@ -280,6 +282,7 @@ class ImportPrismaL2BAlgorithm(EnMAPProcessingAlgorithm):
         writer.setMetadataDomain(metadata)
         writer.setBandName('Longitude', 1)
         writer.setBandName('Latitude', 2)
+        writer.close()
 
     def writeSpectralGeometricFields(self, filenameSpectralGeometric, he5Filename):
         if filenameSpectralGeometric is None:
@@ -295,6 +298,7 @@ class ImportPrismaL2BAlgorithm(EnMAPProcessingAlgorithm):
         writer.setBandName('Observing Angle', 1)
         writer.setBandName('Relative Azimuth Angle', 2)
         writer.setBandName('Solar Zinith Angle', 3)
+        writer.close()
 
     def writePanCube(self, filenamePanCube, he5Filename):
         if filenamePanCube is None:
@@ -307,6 +311,7 @@ class ImportPrismaL2BAlgorithm(EnMAPProcessingAlgorithm):
         writer.setMetadataDomain(metadata)
         writer.setNoDataValue(0)
         writer.setBandName('Panchromatic', 1)
+        writer.close()
 
     def writePanGeolocationFields(self, filenamePanGeolocation, he5Filename):
         if filenamePanGeolocation is None:
@@ -319,6 +324,7 @@ class ImportPrismaL2BAlgorithm(EnMAPProcessingAlgorithm):
         writer.setMetadataDomain(metadata)
         writer.setBandName('Longitude', 1)
         writer.setBandName('Latitude', 2)
+        writer.close()
 
     def writePanErrorMatrix(self, filenamePanError, he5Filename):
         if filenamePanError is None:
@@ -329,3 +335,4 @@ class ImportPrismaL2BAlgorithm(EnMAPProcessingAlgorithm):
         writer = RasterWriter(ds)
         writer.setMetadataDomain(metadata)
         writer.setBandName('PAN Band Pixel Error', 1)
+        writer.close()

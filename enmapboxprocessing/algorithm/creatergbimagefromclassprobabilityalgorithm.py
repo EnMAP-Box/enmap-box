@@ -97,5 +97,6 @@ class CreateRgbImageFromClassProbabilityAlgorithm(EnMAPProcessingAlgorithm):
                 for a, v in zip(arrayRgb, rgb):
                     a[:] += arrayScore * v
             writer.writeArray(arrayRgb, block.xOffset, block.yOffset)
+            writer.close()
 
         return {self.P_OUTPUT_RGB: filename}

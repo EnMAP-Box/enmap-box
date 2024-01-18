@@ -240,6 +240,7 @@ class ImportPrismaL1Algorithm(EnMAPProcessingAlgorithm):
             writer.setBandName(f'Band {bandNo} ({wl} Nanometers)', bandNo)
             writer.setWavelength(wl, bandNo)
             writer.setFwhm(fwhm[bandNo - 1], bandNo)
+        writer.close()
 
     def writeSpectralErrorMatrix(self, filenameSpectralError, he5Filename, spectralRegion, feedback):
         if filenameSpectralError is None:
@@ -285,6 +286,7 @@ class ImportPrismaL1Algorithm(EnMAPProcessingAlgorithm):
             wl = wavelength[bandNo - 1]
             writer.setBandName(f'Pixel Error Band {bandNo} ({wl} Nanometers)', bandNo)
             writer.setWavelength(wl, bandNo)
+        writer.close()
 
     def writeSpectralGeolocationFields(self, filenameSpectralGeolocation, he5Filename):
         if filenameSpectralGeolocation is None:
@@ -298,6 +300,7 @@ class ImportPrismaL1Algorithm(EnMAPProcessingAlgorithm):
         writer.setMetadataDomain(metadata)
         writer.setBandName('Longitude', 1)
         writer.setBandName('Latitude', 2)
+        writer.close()
 
     def writePanCube(self, filenamePanCube, he5Filename):
         if filenamePanCube is None:
@@ -310,6 +313,7 @@ class ImportPrismaL1Algorithm(EnMAPProcessingAlgorithm):
         writer.setMetadataDomain(metadata)
         writer.setNoDataValue(0)
         writer.setBandName('Panchromatic', 1)
+        writer.close()
 
     def writePanGeolocationFields(self, filenamePanGeolocation, he5Filename):
         if filenamePanGeolocation is None:
@@ -322,6 +326,7 @@ class ImportPrismaL1Algorithm(EnMAPProcessingAlgorithm):
         writer.setMetadataDomain(metadata)
         writer.setBandName('Longitude', 1)
         writer.setBandName('Latitude', 2)
+        writer.close()
 
     def writePanErrorMatrix(self, filenamePanError, he5Filename):
         if filenamePanError is None:
@@ -332,6 +337,7 @@ class ImportPrismaL1Algorithm(EnMAPProcessingAlgorithm):
         writer = RasterWriter(ds)
         writer.setMetadataDomain(metadata)
         writer.setBandName('PAN Band Pixel Error', 1)
+        writer.close()
 
     def writeCloudMask(self, filenameCloudMask, he5Filename):
         if filenameCloudMask is None:
@@ -342,6 +348,7 @@ class ImportPrismaL1Algorithm(EnMAPProcessingAlgorithm):
         writer = RasterWriter(ds)
         writer.setMetadataDomain(metadata)
         writer.setBandName('Cloud Mask', 1)
+        writer.close()
         del writer, ds
 
         reader = RasterReader(filenameCloudMask)
@@ -364,6 +371,7 @@ class ImportPrismaL1Algorithm(EnMAPProcessingAlgorithm):
         writer = RasterWriter(ds)
         writer.setMetadataDomain(metadata)
         writer.setBandName('Land Cover Mask', 1)
+        writer.close()
         del writer, ds
 
         reader = RasterReader(filenameLandCoverMask)
@@ -390,6 +398,7 @@ class ImportPrismaL1Algorithm(EnMAPProcessingAlgorithm):
         writer = RasterWriter(ds)
         writer.setMetadataDomain(metadata)
         writer.setBandName('Sun Glint Mask', 1)
+        writer.close()
         del writer, ds
 
         reader = RasterReader(filenameSunGlintMask)

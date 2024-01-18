@@ -237,7 +237,7 @@ class RegressionBasedUnmixingAlgorithm(EnMAPProcessingAlgorithm):
             for bandNo, category in enumerate(categories, 1):
                 writer.setBandName(category.name, bandNo)
                 writer.setBandColor(QColor(category.color), bandNo)
-
+            writer.close()
             # prepare variation results
             if filenameVariation is not None:
                 feedback.pushInfo('Prepare variation layer')
@@ -254,6 +254,7 @@ class RegressionBasedUnmixingAlgorithm(EnMAPProcessingAlgorithm):
                 for bandNo, category in enumerate(categories, 1):
                     writer.setBandName(category.name, bandNo)
                     writer.setBandColor(QColor(category.color), bandNo)
+                writer.close()
 
             # prepare classification result
             if filenameClassification is not None:

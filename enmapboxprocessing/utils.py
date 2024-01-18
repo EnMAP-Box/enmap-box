@@ -651,12 +651,16 @@ class Utils(object):
             return pickle.load(file)
 
     @classmethod
-    def jsonDumps(cls, obj: Any, default=None, indent=2) -> str:
+    def jsonDumps(cls, obj: Any, default=None, indent=2, timeFormat=None) -> str:
 
         if default is None:
             def default(obj):
                 if isinstance(obj, np.ndarray):
                     return obj.tolist()
+                elif isinstance(obj, QColor):
+                    return obj.name()
+                elif isinstance(obj, QDateTime):
+                    return obj.toString(timeFormat)
                 elif hasattr(obj, '__dict__'):
                     return obj.__dict__
                 else:
@@ -665,9 +669,9 @@ class Utils(object):
         return json.dumps(obj, default=default, indent=indent)
 
     @classmethod
-    def jsonDump(cls, obj: Any, filename: str):
+    def jsonDump(cls, obj: Any, filename: str, default=None, indent=2, timeFormat=None):
         with open(filename, 'w') as file:
-            text = Utils.jsonDumps(obj)
+            text = Utils.jsonDumps(obj, default, indent, timeFormat)
             file.write(text)
 
     @classmethod

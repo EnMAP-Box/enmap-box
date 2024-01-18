@@ -124,6 +124,7 @@ class RasterizeCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
                 ds = gdal.Open(classificationX10, gdal.OF_UPDATE)
                 writer = RasterWriter(ds)
                 writer.setNoDataValue(0)
+                writer.close()
                 del writer, ds
 
                 # select classes via majority voting

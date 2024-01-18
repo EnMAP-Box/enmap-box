@@ -121,6 +121,7 @@ class PredictRegressionAlgorithm(EnMAPProcessingAlgorithm):
                 if t.color is not None:
                     writer.setBandColor(QColor(t.color), bandNo)
             writer.setNoDataValue(noDataValue)
+            writer.close()
 
             result = {self.P_OUTPUT_REGRESSION: filename}
             self.toc(feedback, result)

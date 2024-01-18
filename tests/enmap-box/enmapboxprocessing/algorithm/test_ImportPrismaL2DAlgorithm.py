@@ -10,7 +10,7 @@ class TestImportPrismaL2DAlgorithm(TestCase):
 
     def test(self):
 
-        if sensorProductsRoot() is None:
+        if sensorProductsRoot() is None or self.skipProductImport:
             return
 
         alg = ImportPrismaL2DAlgorithm()
@@ -49,7 +49,7 @@ class TestImportPrismaL2DAlgorithm(TestCase):
         self.assertAlmostEqual(0.003, np.mean(RasterReader(result[alg.P_OUTPUT_PAN_ERROR]).array()), 3)
 
     def test_badBandThresholding1(self):
-        if sensorProductsRoot() is None:
+        if sensorProductsRoot() is None or self.skipProductImport:
             return
 
         alg = ImportPrismaL2DAlgorithm()
@@ -67,7 +67,7 @@ class TestImportPrismaL2DAlgorithm(TestCase):
         self.assertEqual(215, sum(bbl))
 
     def test_badBandThresholding2(self):
-        if sensorProductsRoot() is None:
+        if sensorProductsRoot() is None or self.skipProductImport:
             return
 
         alg = ImportPrismaL2DAlgorithm()
