@@ -2087,8 +2087,10 @@ class DockPanelUI(QgsDockWidget):
     def onRasterLayerStylingToggled(self):
         from rasterlayerstylingapp import RasterLayerStylingApp
         panel = RasterLayerStylingApp.panel()
-        if panel is not None:
-            panel.setUserVisible(self.mRasterLayerStyling.isChecked())
+        if panel is None:
+            return
+
+        panel.setUserVisible(self.mRasterLayerStyling.isChecked())
         if panel.isUserVisible():
             from enmapbox.gui.enmapboxgui import EnMAPBox
             enmapBox = EnMAPBox.instance()
