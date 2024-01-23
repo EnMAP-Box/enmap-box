@@ -30,7 +30,7 @@ from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import MapCanvas
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
-from enmapbox.testing import TestObjects, EnMAPBoxTestCase
+from enmapbox.testing import TestObjects, EnMAPBoxTestCase, start_app
 from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel
 from qgis.core import Qgis, QgsExpressionContextGenerator, QgsProcessingContext, QgsExpressionContext
 from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, \
@@ -38,7 +38,7 @@ from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, \
 from qgis.gui import QgsMapLayerComboBox, QgisInterface, QgsProcessingContextGenerator, QgsMapCanvas
 
 
-# mini test
+start_app()
 
 
 class EnMAPBoxTests(EnMAPBoxTestCase):
