@@ -36,7 +36,7 @@ class SpectralResamplingByWavelengthAndFwhmAlgorithm(EnMAPProcessingAlgorithm):
              'A file with center wavelength and FWHM information defining the destination sensor. '
              'Possible inputs are i) raster files, ii) ENVI Spectral Library files, iii) ENVI Header files, '
              'and iv) CSV table files with wavelength and fwhm columns.'),
-            (self._RESPONSE_FILE,
+            (self._FWHM,
              'Specify a FWHM value used for each band. This overwrites FWHM values read from file'),
             (self._OUTPUT_LIBRARY, self.GeoJsonFileDestination),
             (self._OUTPUT_RASTER, self.RasterFileDestination)
