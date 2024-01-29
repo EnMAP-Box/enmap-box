@@ -89,6 +89,7 @@ class EnMAPBoxTestCase(TestCase):
             foldername = self.__class__.__name__
         else:
             foldername = self.__name__
+
         p = pathlib.Path(DIR_REPO) / 'test-outputs' / foldername
         if isinstance(subdir, str):
             p = p / subdir
