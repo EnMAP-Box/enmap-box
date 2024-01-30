@@ -3,10 +3,12 @@ import unittest
 
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
-from enmapbox.testing import TestObjects, EnMAPBoxTestCase
+from enmapbox.testing import TestObjects, EnMAPBoxTestCase, start_app
 from qgis.core import QgsField, QgsMapLayer
 from qgis.core import QgsProject, QgsVectorLayerExporter, QgsVectorLayer
 from qgis.gui import QgsEditorWidgetRegistry, QgsGui
+
+start_app()
 
 
 class TestIssue724(EnMAPBoxTestCase):
@@ -15,7 +17,7 @@ class TestIssue724(EnMAPBoxTestCase):
 
         from enmapbox import registerEditorWidgets
         registerEditorWidgets()
-        from enmapbox.qgispluginsupport.qps.speclib.core import EDITOR_WIDGET_REGISTRY_KEY
+        from enmapbox.qgispluginsupport.qps.speclib import EDITOR_WIDGET_REGISTRY_KEY
 
         # create and save a speclib as GPKG
         sl = TestObjects.createSpectralLibrary()
