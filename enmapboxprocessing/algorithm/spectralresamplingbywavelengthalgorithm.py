@@ -17,6 +17,9 @@ from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessing
 class SpectralResamplingByWavelengthAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Spectral raster layer'
     P_WAVELENGTH_FILE, _WAVELENGTH_FILE = 'wavelengthFile', 'File with wavelength'
+    P_RESAMPLE_ALG, _RESAMPLE_ALG = 'resampleAlg', 'Resample algorithm'
+    O_RESAMPLE_ALG = ['Nearest neighbour', 'Linear']
+    NearestNeighbourResampleAlg, LinearResampleAlg = range(2)
     P_OUTPUT_RASTER, _OUTPUT_RASTER = 'outputResampledRaster', 'Output raster layer'
 
     def displayName(self) -> str:
@@ -26,7 +29,8 @@ class SpectralResamplingByWavelengthAlgorithm(EnMAPProcessingAlgorithm):
         link = EnMAPProcessingAlgorithm.htmlLink(
             'https://en.wikipedia.org/wiki/Linear_interpolation', 'Linear Interpolation Wikipedia Article'
         )
-        return 'Spectrally resample a spectral raster layer by applying linear interpolation at given wavelengths.\n' \
+        return 'Spectrally resample a spectral raster layer by applying linear interpolation or nearest neighbour ' \
+               'selection at given wavelengths.\n' \
                f'See {link} for more details.'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
@@ -36,6 +40,7 @@ class SpectralResamplingByWavelengthAlgorithm(EnMAPProcessingAlgorithm):
              'A file with center wavelength information defining the destination sensor. '
              'Possible inputs are i) raster files, ii) ENVI Spectral Library files, iii) ENVI Header files, '
              'and iv) CSV table files with wavelength column.'),
+            (self._RESAMPLE_ALG, 'Spectral resample algorithm.'),
             (self._OUTPUT_RASTER, self.RasterFileDestination)
         ]
 
@@ -45,6 +50,9 @@ class SpectralResamplingByWavelengthAlgorithm(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
         self.addParameterFile(self.P_WAVELENGTH_FILE, self._WAVELENGTH_FILE)
+        self.addParameterEnum(
+            self.P_RESAMPLE_ALG, self._RESAMPLE_ALG, self.O_RESAMPLE_ALG, False, self.LinearResampleAlg, True
+        )
         self.addParameterRasterDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 
     def processAlgorithm(
@@ -52,6 +60,7 @@ class SpectralResamplingByWavelengthAlgorithm(EnMAPProcessingAlgorithm):
     ) -> Dict[str, Any]:
         raster = self.parameterAsSpectralRasterLayer(parameters, self.P_RASTER, context)
         wavelengthFile = self.parameterAsFile(parameters, self.P_WAVELENGTH_FILE, context)
+        resampleAlg = self.parameterAsEnum(parameters, self.P_RESAMPLE_ALG, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_RASTER, context)
 
         with open(filename + '.log', 'w') as logfile:
@@ -68,6 +77,8 @@ class SpectralResamplingByWavelengthAlgorithm(EnMAPProcessingAlgorithm):
             elif splitext(wavelengthFile)[1].lower() == '.csv':
                 # handle CSV with wavelength case
                 array = np.loadtxt(wavelengthFile, delimiter=",", dtype=str)
+                if array.ndim == 1:
+                    array = array.reshape((-1, 1))
                 if array[0, 0] != 'wavelength':
                     raise QgsProcessingException(
                         f'first column is expected to be named "wavelength", found "{array[0, 0]}"')
@@ -100,29 +111,40 @@ class SpectralResamplingByWavelengthAlgorithm(EnMAPProcessingAlgorithm):
             for targetBandNo, targetWavelength in enumerate(targetWavelengths, 1):
                 feedback.setProgress(targetBandNo / outputBandCount * 100)
                 closestBandNo = int(np.argmin(abs(sourceWavelengths - targetWavelength)) + 1)
-                if sourceWavelengths[closestBandNo - 1] < targetWavelength:
-                    bandNo1, bandNo2 = closestBandNo, closestBandNo + 1
-                else:
-                    bandNo1, bandNo2 = closestBandNo - 1, closestBandNo
-                # fix edge cases
-                if bandNo1 < 1:
-                    bandNo1, bandNo2 = 1, 2
-                if bandNo2 > reader.bandCount():
-                    bandNo1, bandNo2 = reader.bandCount() - 1, reader.bandCount()
 
-                weight1 = abs(sourceWavelengths[bandNo2 - 1] - targetWavelength)
-                weight2 = abs(sourceWavelengths[bandNo1 - 1] - targetWavelength)
-                sumOfWeights = weight1 + weight2
-                weight1 /= sumOfWeights
-                weight2 /= sumOfWeights
-                array1, array2 = reader.array(bandList=[bandNo1, bandNo2])
-                marray1, marray2 = reader.maskArray([array1, array2], [bandNo1, bandNo2])
-                marray = np.logical_and(marray1, marray2)
-                outarray = weight1 * array1 + weight2 * array2
-                outarray[~marray] = outputNoDataValue
-                if targetWavelength < minSourceWavelengths or targetWavelength > maxSourceWavelengths:
-                    outarray[:] = outputNoDataValue
-                    writer.setBadBandMultiplier(0, targetBandNo)  # mask as bad band
+                if resampleAlg == self.LinearResampleAlg:
+                    if sourceWavelengths[closestBandNo - 1] < targetWavelength:
+                        bandNo1, bandNo2 = closestBandNo, closestBandNo + 1
+                    else:
+                        bandNo1, bandNo2 = closestBandNo - 1, closestBandNo
+                    # fix edge cases
+                    if bandNo1 < 1:
+                        bandNo1, bandNo2 = 1, 2
+                    if bandNo2 > reader.bandCount():
+                        bandNo1, bandNo2 = reader.bandCount() - 1, reader.bandCount()
+
+                    weight1 = abs(sourceWavelengths[bandNo2 - 1] - targetWavelength)
+                    weight2 = abs(sourceWavelengths[bandNo1 - 1] - targetWavelength)
+                    sumOfWeights = weight1 + weight2
+                    weight1 /= sumOfWeights
+                    weight2 /= sumOfWeights
+                    array1, array2 = reader.array(bandList=[bandNo1, bandNo2])
+                    marray1, marray2 = reader.maskArray([array1, array2], [bandNo1, bandNo2])
+                    marray = np.logical_and(marray1, marray2)
+                    outarray = weight1 * array1 + weight2 * array2
+                    outarray[~marray] = outputNoDataValue
+                    if targetWavelength < minSourceWavelengths or targetWavelength > maxSourceWavelengths:
+                        outarray[:] = outputNoDataValue
+                        writer.setBadBandMultiplier(0, targetBandNo)  # mask as bad band
+                elif resampleAlg == self.NearestNeighbourResampleAlg:
+                    print(closestBandNo)
+                    array = reader.array(bandList=[closestBandNo])[0]
+                    marray = reader.maskArray([array], [closestBandNo])[0]
+                    outarray = array
+                    outarray[~marray] = outputNoDataValue
+                else:
+                    raise ValueError()
+
                 writer.writeArray2d(outarray, targetBandNo)
 
                 # for bandNo, targetWavelength in enumerate(targetWavelengths, 1):

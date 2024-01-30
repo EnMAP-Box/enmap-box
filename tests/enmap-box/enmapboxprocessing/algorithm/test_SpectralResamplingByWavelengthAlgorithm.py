@@ -83,3 +83,19 @@ class TestSpectralResamplingByWavelengthAlgorithm(TestCase):
             assert 0, 'error not raised, something went wrong'
         except Exception as error:
             pass
+
+    def test_nearestNeighbourResampleAlg(self):
+        with open(self.filename('wavelenght.csv'), 'w') as file:
+            file.write('wavelength\n1000\n2000')
+
+        alg = SpectralResamplingByWavelengthAlgorithm()
+        parameters = {
+            alg.P_RASTER: enmap,
+            alg.P_WAVELENGTH_FILE: self.filename('wavelenght.csv'),
+            alg.P_RESAMPLE_ALG: alg.NearestNeighbourResampleAlg,
+            alg.P_OUTPUT_RASTER: self.filename('resampled.tif')
+        }
+        result = self.runalg(alg, parameters)
+        gold = RasterReader(enmap).array(bandList=[79, 133])
+        lead = RasterReader(result[alg.P_OUTPUT_RASTER]).array()
+        self.assertArrayEqual(gold, lead)
