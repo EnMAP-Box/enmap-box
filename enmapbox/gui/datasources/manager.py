@@ -53,7 +53,7 @@ class DataSourceManager(TreeModel):
 
         self.mUpdateTimer: QTimer = QTimer()
         self.mUpdateTimer.setInterval(500)
-        self.mUpdateTimer.timeout.connect(self.updateSourceNodes)
+        # self.mUpdateTimer.timeout.connect(self.updateSourceNodes)
         self.mUpdateTimer.start()
         self.mUpdateState: dict = dict()
 
