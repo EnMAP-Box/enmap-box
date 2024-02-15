@@ -1,13 +1,11 @@
 import unittest
 
-from enmapboxprocessing.algorithm.fitpcaalgorithm import FitPcaAlgorithm
-from qgis.core import QgsProcessingFeedback, QgsProcessingContext, QgsProcessingAlgorithm
-
 from enmapbox import initAll
-from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprocessingdialog import SpectralProcessingDialog
 from enmapbox.testing import EnMAPBoxTestCase, start_app, TestObjects
+from enmapboxprocessing.algorithm.fitpcaalgorithm import FitPcaAlgorithm
+from qgis.core import QgsProcessingFeedback, QgsProcessingContext, QgsProcessingAlgorithm
 from qgis.core import QgsProject, edit
 
 start_app()
