@@ -291,6 +291,31 @@ class RasterDataSource(SpatialDataSource):
             self.setIcon(icon)
 
 
+class AnyObjectSource(DataSource):
+
+    def __init__(self, obj: object, dataItem: QgsDataItem = None, name: str = None):
+
+        if name is None:
+            name = str(obj)
+
+        if dataItem is None:
+            dataItem = QgsDataItem(Qgis.BrowserItemType.Custom, None, name, str(id(obj)), 'special:anyobject')
+        super().__init__(dataItem)
+
+        self.mObject: object = obj
+        self.mObjectNode = None
+        self.updateNodes()
+
+    def updateNodes(self, **kwds) -> dict:
+        MD = super().updateNodes(**kwds)
+
+        if isinstance(self.mObjectNode, PyObjectTreeNode):
+            self.removeChildNodes([self.mObjectNode])
+        if self.mObject is not None:
+            self.mObjectNode = PyObjectTreeNode(obj=self.mObject, name='Content')
+            self.appendChildNodes([self.mObjectNode])
+
+
 class ModelDataSource(DataSource):
 
     def __init__(self, dataItem: QgsDataItem):

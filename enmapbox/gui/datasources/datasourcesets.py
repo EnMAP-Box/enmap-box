@@ -115,3 +115,13 @@ class RasterDataSourceSet(DataSourceSet):
 
     def isValidSource(self, source) -> bool:
         return isinstance(source, RasterDataSource)
+
+
+class AnyOtherSourcesSet(DataSourceSet):
+
+    def __init__(self, *args, **kwds):
+        super(AnyOtherSourcesSet, self).__init__(*args,
+                                                 name='Other sources')
+
+    def isValidSource(self, source) -> bool:
+        return isinstance(source, DataSource)

@@ -9,6 +9,7 @@ from os.path import exists, sep, dirname
 from typing import List, Union, Any, Dict
 
 import numpy as np
+from PyQt5.QtCore import QCollator
 from qgis.PyQt.QtCore import QAbstractItemModel, QItemSelectionModel, QFileInfo, QFile, QTimer, \
     QMimeData, QModelIndex, Qt, QUrl, QSortFilterProxyModel, pyqtSignal
 from qgis.PyQt.QtGui import QContextMenuEvent, QDesktopServices
@@ -20,7 +21,7 @@ from qgis.core import QgsProviderRegistry, QgsProviderSublayerDetails
 from qgis.gui import QgisInterface, QgsMapCanvas, QgsDockWidget
 
 from enmapbox.gui.datasources.datasourcesets import DataSourceSet, ModelDataSourceSet, VectorDataSourceSet, \
-    FileDataSourceSet, RasterDataSourceSet
+    FileDataSourceSet, RasterDataSourceSet, AnyOtherSourcesSet
 from enmapbox.gui.utils import enmapboxUiPath
 from enmapbox.qgispluginsupport.qps.layerproperties import defaultRasterRenderer
 from enmapbox.qgispluginsupport.qps.models import TreeModel, TreeView, TreeNode, PyObjectTreeNode
@@ -351,6 +352,19 @@ class DataSourceManagerProxyModel(QSortFilterProxyModel):
         super().__init__(*args, **kwds)
         self.setRecursiveFilteringEnabled(True)
         self.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self.setFilterWildcard('*')
+        self.setDynamicSortFilter(False)
+
+        self.mCollator = QCollator()
+        self.mCollator.setNumericMode(True)
+
+    def lessThan(self, left: QModelIndex, right: QModelIndex):
+        left_data = self.sourceModel().data(left, Qt.DisplayRole)
+        right_data = self.sourceModel().data(right, Qt.DisplayRole)
+        if isinstance(left_data, str) and isinstance(right_data, str):
+            return self.mCollator.compare(str(left_data), str(right_data)) < 0
+        else:
+            return super().lessThan(left, right)
 
 
 class DataSourceManagerTreeView(TreeView):
@@ -363,6 +377,7 @@ class DataSourceManagerTreeView(TreeView):
         super(DataSourceManagerTreeView, self).__init__(*args, **kwds)
         self.setAcceptDrops(True)
         self.setDragEnabled(True)
+        self.setSortingEnabled(True)
 
     def setModel(self, model: QAbstractItemModel):
         super().setModel(model)
@@ -378,6 +393,7 @@ class DataSourceManagerTreeView(TreeView):
 
         # select added row
         idx = self.model().index(last, 0, parent=parent)
+
         self.selectionModel().select(idx, QItemSelectionModel.ClearAndSelect)
 
     def dataSourceManager(self) -> DataSourceManager:

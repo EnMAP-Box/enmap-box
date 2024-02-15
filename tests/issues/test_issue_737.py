@@ -45,14 +45,18 @@ RtlUserThreadStart :
 """
 import unittest
 
+from qgis.PyQt.QtTest import QAbstractItemModelTester
+
 from enmapbox.gui.datasources.datasources import ModelDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager
 from enmapbox.qgispluginsupport.qps.models import PyObjectTreeNode
-from enmapbox.testing import EnMAPBoxTestCase
+from enmapbox.testing import EnMAPBoxTestCase, start_app
 from enmapboxtestdata import classificationDatasetAsPklFile
 from qgis.PyQt.QtCore import QSize
 from qgis.PyQt.QtWidgets import QTreeView
 from qgis.core import QgsProject
+
+start_app()
 
 
 class TestIssue737(EnMAPBoxTestCase):
@@ -85,6 +89,8 @@ class TestIssue737(EnMAPBoxTestCase):
 
         self.assertIsInstance(tv, QTreeView)
         model.addDataSources(classificationDatasetAsPklFile)
+
+        tester = QAbstractItemModelTester(model, QAbstractItemModelTester.FailureReportingMode.Fatal)
 
         node = model.rootNode().findChildNodes(ModelDataSource, recursive=True)
         self.assertTrue(len(node) == 1)
