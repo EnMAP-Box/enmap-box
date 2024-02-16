@@ -1,8 +1,10 @@
 import fnmatch
 import os.path
+import sys
 from typing import List, Union
 
 import numpy as np
+from PyQt5.QtCore import qInstallMessageHandler, QMessageLogContext, QtMsgType
 from PyQt5.QtTest import QAbstractItemModelTester
 from qgis.PyQt.QtCore import QModelIndex, Qt
 
@@ -10,12 +12,18 @@ from enmapbox import initAll
 from enmapbox.gui.datasources.datasources import AnyObjectSource
 from enmapbox.gui.datasources.datasourcesets import AnyOtherSourcesSet
 from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.qgispluginsupport.qps.models import PyObjectTreeNode, TreeNode
 from enmapbox.testing import start_app, EnMAPBoxTestCase
 from enmapboxtestdata import classifierDumpPkl
 
 start_app()
 
+def qt_message_handler(mode: QtMsgType, context: QMessageLogContext, message: str):
 
+    if mode in [QtMsgType.QtDebugMsg, QtMsgType.QtFatalMsg]:
+        print(f'{message}', file=sys.stderr)
+
+qInstallMessageHandler(qt_message_handler)
 def findNode(view, path: Union[str, List[str]], parent: QModelIndex = QModelIndex()) -> QModelIndex:
     """
     Returns the QModelIndex for the deepest node in a node-path., e.g. n3 from 'n1/n2/n3'
@@ -39,14 +47,7 @@ def findNode(view, path: Union[str, List[str]], parent: QModelIndex = QModelInde
     while True:
         if row == model.rowCount(parent):
             if model.canFetchMore(parent):
-
-                sm = model.sourceModel()
-                sp = model.mapToSource(parent)
-                A = [sm.index(r, 0, sp).data() for r in range(sm.rowCount(sp))]
                 model.fetchMore(parent)
-                B = [sm.index(r, 0, sp).data() for r in range(sm.rowCount(sp))]
-                if len(B) == len(A) + 1 and A != B[0:-1]:
-                    s = ""
                 continue
             else:
                 break
@@ -99,9 +100,12 @@ def expandNodes(view,
             view.setExpanded(node, expanded)
         else:
             while node.isValid():
+                print(f'Expand: "{node.data(Qt.DisplayRole)}"')
+                if node.data(Qt.DisplayRole) == 'classifier_1262_132_1013.pkl':
+                    s = ""
                 view.setExpanded(node, expanded)
                 node = node.parent()
-
+        s = ""
 
 
 class Issue641Tests(EnMAPBoxTestCase):
@@ -114,6 +118,8 @@ class Issue641Tests(EnMAPBoxTestCase):
         tv = box.dataSourceManagerTreeView()
         mgr = box.dataSourceManager()
 
+
+
         anySourcSet = AnyOtherSourcesSet()
         mgr.rootNode().appendChildNodes(anySourcSet)
         tester = QAbstractItemModelTester(mgr, QAbstractItemModelTester.FailureReportingMode.Fatal)
@@ -121,14 +127,29 @@ class Issue641Tests(EnMAPBoxTestCase):
         # path = f'Models*/{file_name}/Content/X/array/0'
         path = f'*/{file_name}/Content/X/array/0'
         # obj = {'X': np.random.rand(58, 177)}
-        obj = {'X': np.random.rand(20, 10)}
+        obj = {'X': np.random.rand(58, 177)}
         source = AnyObjectSource(obj=obj, name=file_name)
-        # box.addSource(source)
+        box.addSource(source)
 
-        box.addSource(classifierDumpPkl)
+        if False:
+            n = TreeNode(name='test')
+            mgr.rootNode().appendChildNodes(n)
+
+            pnode = PyObjectTreeNode(obj=obj, name='TEST')
+            n.appendChildNodes(pnode)
+        # box.addSource(classifierDumpPkl)
         box.ui.show()
 
         expandNodes(tv, path)
+
+        def onStop(idx: QModelIndex):
+            tv.isExpanded(QModelIndex())
+            rootNode = mgr.rootNode()
+            s  = ""
+
+        tv.collapsed.connect(onStop)
+        tv.expanded.connect(onStop)
+
         path = f'Models*/{file_name}/Content'
         # expandNodes(tv, path, expanded=False, last_only=True)
         # QApplication.processEvents()
