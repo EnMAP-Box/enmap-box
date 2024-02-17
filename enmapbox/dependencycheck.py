@@ -29,6 +29,7 @@ import subprocess
 import sys
 import time
 import platform
+import warnings
 from io import StringIO
 from typing import List, Match, Iterator, Any, Optional
 import requests
@@ -902,15 +903,15 @@ class PIPPackageInstallerTableView(QTableView):
         a.triggered.connect(lambda *args, v=txt: QApplication.clipboard().setText(v))
 
         a = m.addAction('Copy (executable)')
-        a.setToolTip('Copies the installation command including path of python executable')
+        a.setToolTip('Copies the installation command including the path of python executable')
         a.triggered.connect(lambda *args, v=cmd: QApplication.clipboard().setText(v))
 
         isInstalled = pkg.isInstalled()
         isUpdatable = pkg.updateAvailable()
 
-        a = m.addAction('Install/Update')
-        a.setEnabled(not isInstalled or isUpdatable)
-        a.triggered.connect(lambda *args, p=pkgs: self.sigInstallPackageRequest.emit(p))
+        # a = m.addAction('Install/Update')
+        # a.setEnabled(not isInstalled or isUpdatable)
+        # a.triggered.connect(lambda *args, p=pkgs: self.sigInstallPackageRequest.emit(p))
 
         a = m.addAction('Reload')
         a.setToolTip('Reloads installed and available package versions')
@@ -944,7 +945,7 @@ class PIPPackageInstaller(QWidget):
 
         assert isinstance(self.tableView, PIPPackageInstallerTableView)
         self.tableView.setSortingEnabled(True)
-        self.tableView.sigInstallPackageRequest.connect(self.installPackages)
+        # self.tableView.sigInstallPackageRequest.connect(self.installPackages)
         self.tableView.sigPackageReloadRequest.connect(self.reloadPythonPackages)
         self.tableView.sortByColumn(1, Qt.DescendingOrder)
         # self.buttonBox.button(QDialogButtonBox.YesToAll).clicked.connect(self.installAll)
@@ -972,10 +973,13 @@ class PIPPackageInstaller(QWidget):
             self.onRemoveTask(id(task))
 
     def installAll(self):
-
+        warnings.warn(DeprecationWarning(), stacklevel=2)
+        return
         self.installPackages([p for p in self.model if not p.isInstalled()])
 
     def installPackages(self, packages: List[PIPPackage]):
+        warnings.warn(DeprecationWarning(), stacklevel=2)
+        return
 
         if not self.showWarning():
             return
