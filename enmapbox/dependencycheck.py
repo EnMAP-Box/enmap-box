@@ -950,9 +950,9 @@ class PIPPackageInstaller(QWidget):
         # self.buttonBox.button(QDialogButtonBox.YesToAll).clicked.connect(self.installAll)
         self.buttonBox.button(QDialogButtonBox.Close).clicked.connect(self.close)
 
-        self.actionClearConsole.triggered.connect(self.textBrowser.clear)
+        self.actionClearConsole.triggered.connect(self.tbLog.clear)
         self.actionCopyConsole.triggered.connect(
-            lambda: QgsApplication.instance().clipboard().setText(self.textBrowser.toPlainText()))
+            lambda: QgsApplication.instance().clipboard().setText(self.tbLog.toPlainText()))
         self.btnClearConsole.setDefaultAction(self.actionClearConsole)
         self.btnCopyConsole.setDefaultAction(self.actionCopyConsole)
 
@@ -1077,11 +1077,11 @@ class PIPPackageInstaller(QWidget):
 
     def addText(self, text: str, color: QColor = None):
 
-        c = self.textBrowser.textColor()
+        c = self.tbLog.textColor()
         if isinstance(color, QColor):
-            self.textBrowser.setTextColor(color)
-        self.textBrowser.append(text)
-        self.textBrowser.setTextColor(c)
+            self.tbLog.setTextColor(color)
+        self.tbLog.append(text)
+        self.tbLog.setTextColor(c)
 
     def addPackages(self, packages: List[PIPPackage]):
         self.model.addPackages(packages)
