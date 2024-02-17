@@ -13,11 +13,13 @@ __date__ = '2017-07-17'
 __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
 import pathlib
+import sys
 import unittest
 import uuid
 
 from enmapbox.dependencycheck import PIPPackage, requiredPackages, PIPPackageInstaller, PIPPackageInfoTask, \
-    localPythonExecutable, INSTALLATION_BLOCK, missingPackageInfo, checkGDALIssues, PIPPackageInstallerTableModel
+    localPythonExecutable, INSTALLATION_BLOCK, missingPackageInfo, checkGDALIssues, PIPPackageInstallerTableModel, \
+    call_pip_command
 from enmapbox.testing import EnMAPBoxTestCase
 from qgis.PyQt.QtGui import QMovie
 from qgis.PyQt.QtWidgets import QApplication, QTableView, QLabel
@@ -69,6 +71,7 @@ class test_dependencycheck(EnMAPBoxTestCase):
 
     def test_pippackagemodel(self):
         model = PIPPackageInstallerTableModel()
+        # tester = QAbstractItemModelTester(model, QAbstractItemModelTester.FailureReportingMode.Fatal)
         self.assertTrue(len(model) == 0)
 
         model.addPackages([PIPPackage(self.nonexistingPackageName()),
@@ -136,6 +139,23 @@ class test_dependencycheck(EnMAPBoxTestCase):
         task.sigMessage.connect(onMessage)
         task.run()
         QApplication.processEvents()
+
+    def test_call_pip_command(self):
+        # python.exe -m pip list'
+
+        stdout = sys.stdout
+        stderr = sys.stderr
+        success, msg, err = call_pip_command(['list'])
+        self.assertTrue(success)
+        self.assertEqual(stdout, sys.stdout)
+        self.assertEqual(stderr, sys.stderr)
+
+        success, msg, err = call_pip_command(['foobar'])
+        self.assertFalse(success)
+        self.assertEqual(stdout, sys.stdout)
+        self.assertEqual(stderr, sys.stderr)
+
+        s = ""
 
     def test_findpython(self):
         p = localPythonExecutable()
