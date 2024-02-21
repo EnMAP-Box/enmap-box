@@ -813,7 +813,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         from ..dependencycheck import PIPPackageInstaller, requiredPackages
 
         w = PIPPackageInstaller()
-        w.addPackages(requiredPackages())
+        w.addPackages(requiredPackages(), required=True)
         w.show()
 
     def showResourceBrowser(self, *args):

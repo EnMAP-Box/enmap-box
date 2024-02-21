@@ -19,15 +19,17 @@
 *                                                                         *
 ***************************************************************************
 """
+from pip._internal.utils.misc import get_prog
+
 import csv
 import datetime
 import enum
 import importlib
+import platform
 import io
 import json
 import os
 import pathlib
-import platform
 import re
 import subprocess
 import sys
@@ -37,6 +39,7 @@ import warnings
 from contextlib import redirect_stdout, redirect_stderr
 from importlib.machinery import ModuleSpec
 from io import StringIO
+from pathlib import Path
 from typing import List, Match, Iterator, Any, Dict, Tuple
 
 from qgis.PyQt.QtCore import QProcess
@@ -153,6 +156,9 @@ class PIPPackage(object):
         else:
             self.version = '<not installed>'
 
+    def __repr__(self):
+        return super().__repr__() + f'"{self.pipPkgName}"'
+
     def updateFromDict(self, info: dict):
         info = {k.lower(): v for k, v in info.items()}
         assert 'name' in info
@@ -245,7 +251,7 @@ class PIPPackage(object):
 
         if upgrade:
             args.append('--upgrade')
-        args.append(self.pipCmd)
+        args.append(self.pipPkgName)
         return args
 
     def installCommand(self, *args, **kwds) -> str:
@@ -281,6 +287,51 @@ class PIPPackage(object):
         return False
 
 
+_LOCAL_PIPEXE: Path = None
+
+
+def localPipExecutable() -> Path:
+    global _LOCAL_PIPEXE
+    if _LOCAL_PIPEXE is None:
+        pipexe = Path(get_prog())
+        if not pipexe.is_file():
+            pipexe = None
+
+            p = platform.uname().system
+            sysexe = Path(sys.executable)
+
+            if p == 'Darwin' and '.app/Contents/MacOS' in sysexe.as_posix():
+                path = sysexe
+                while path.name != 'MacOS':
+                    path = path.parent
+                path = path / 'bin/pip'
+                if path.is_file():
+                    pipexe = path
+            else:
+
+                if p == 'Windows':
+                    candidates = ['where pip', 'where pip3']
+                else:
+                    candidates = ['which pip', 'which pip3']
+
+                for c in candidates:
+                    process = QProcess()
+                    process.start(c)
+                    process.waitForFinished()
+                    msgOut = process.readAllStandardOutput().data().decode('utf-8')
+                    msgErr = process.readAllStandardError().data().decode('utf-8')
+                    success = process.exitCode() == 0
+                    if success and len(msgOut) > 0:
+                        lines = msgOut.splitlines()
+                        path = Path(lines[0])
+                        if path.is_file():
+                            pipexe = path
+                            break
+            if isinstance(pipexe, Path) and pipexe.is_file():
+                _LOCAL_PIPEXE = pipexe
+    return _LOCAL_PIPEXE
+
+
 def localPythonExecutable() -> pathlib.Path:
     """
     Searches for the local python executable
@@ -314,13 +365,15 @@ def call_pip_command(pipArgs):
     msgOut = msgErr = None
 
     if True:
+        pipexe = localPipExecutable()
         process = QProcess()
-        process.start('pip ' + ' '.join(pipArgs))
+        process.start(f'{pipexe} ' + ' '.join(pipArgs))
         process.waitForFinished()
         msgOut = process.readAllStandardOutput().data().decode('utf-8')
         msgErr = process.readAllStandardError().data().decode('utf-8')
         success = process.exitCode() == 0
-        return success, msgOut, msgErr
+        if success or msgErr != '':
+            return success, msgOut, msgErr
 
     if False:
         with redirect_stdout(io.StringIO()) as f_out, redirect_stderr(io.StringIO) as f_err:
@@ -337,7 +390,7 @@ def call_pip_command(pipArgs):
 
         return success, msgOut, msgErr
 
-    if False:
+    if True:
         _std_out = sys.stdout
         _std_err = sys.stderr
         sys.stdout = StringIO()
@@ -542,7 +595,7 @@ def checkGDALIssues() -> List[str]:
 
 def requiredPackages(return_tuples: bool = False) -> List[PIPPackage]:
     """
-    Returns a list of pip packages that should be installable according to the `requirements.txt` file
+    Returns a list of pip packages that should be installable according to the `requirements.csv` file
     :return: [list of strings]
     :rtype: list
     """
@@ -604,12 +657,9 @@ def missingPackageInfo(missing_packages: List[PIPPackage], html=True) -> str:
         assert isinstance(pkg, PIPPackage)
         info.append('\t<li>{} (install by "{}")</li>'.format(pkg.pyPkgName, pkg.installCommand()))
 
-    pathRequirementsTxt = os.path.join(DIR_REPO, 'requirements.txt')
-
     info.append('</ol>')
     info.append('<p>Please follow the installation guide <a href="{0}">{0}</a><br/>'.format(URL_INSTALLATION))
     info.append('and install missing packages, e.g. with pip:<br/><br/>')
-    info.append('\t<code>$ python3 -m pip install -r {}</code></p><hr>'.format(pathRequirementsTxt))
 
     info = '\n'.join(info)
 

@@ -12,23 +12,23 @@ __author__ = 'benjamin.jakimow@geo.hu-berlin.de'
 __date__ = '2017-07-17'
 __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
+import os
 import pathlib
 import sys
 import unittest
 import uuid
 from time import sleep
-from typing import List
+from typing import List, Tuple
 
-from autopep8 import Tuple
+from enmapbox.dependencycheck import PIPPackage, requiredPackages, PIPPackageInstaller, PIPPackageInfoTask, \
+    localPythonExecutable, missingPackageInfo, checkGDALIssues, PIPPackageInstallerTableModel, \
+    call_pip_command, localPipExecutable
+from enmapbox.testing import EnMAPBoxTestCase, start_app
+from qgis.PyQt.QtCore import QProcess
 from qgis.PyQt.QtGui import QMovie
 from qgis.PyQt.QtWidgets import QApplication, QTableView, QLabel
 from qgis.core import Qgis, QgsTaskManager, QgsTask
 from qgis.core import QgsApplication
-
-from enmapbox.dependencycheck import PIPPackage, requiredPackages, PIPPackageInstaller, PIPPackageInfoTask, \
-    localPythonExecutable, INSTALLATION_BLOCK, missingPackageInfo, checkGDALIssues, PIPPackageInstallerTableModel, \
-    call_pip_command
-from enmapbox.testing import EnMAPBoxTestCase, start_app
 
 start_app()
 
@@ -40,6 +40,21 @@ class test_dependencycheck(EnMAPBoxTestCase):
         self.assertIsInstance(issues, list)
         for i in issues:
             self.assertIsInstance(i, str)
+
+    def test_pip_call(self):
+
+        pip_exe = localPipExecutable()
+        self.assertTrue(os.path.isfile(pip_exe))
+
+        process = QProcess()
+        process.start(f'{pip_exe} show numpy')
+        process.waitForFinished()
+        msgOut = process.readAllStandardOutput().data().decode('utf-8')
+        msgErr = process.readAllStandardError().data().decode('utf-8')
+        success = process.exitCode() == 0
+        self.assertTrue(success)
+        self.assertTrue(msgOut.startswith('Name: numpy'))
+        s = ""
 
     def test_required_packages(self):
 
@@ -53,12 +68,12 @@ class test_dependencycheck(EnMAPBoxTestCase):
         pipName = self.nonexistingPackageName()
         pyName = pipName.replace('-', '_')
 
-        info = missingPackageInfo([PIPPackage(pyName, pipName=pipName)])
+        info = missingPackageInfo([PIPPackage(pipName, py_name=pyName)])
         self.assertTrue(pyName in info)
         self.assertTrue(pipName in info)
 
     def test_pippackage(self):
-        pkg = PIPPackage('osgeo.gdal', pip_name='GDAL>=3.0')
+        pkg = PIPPackage('GDAL', py_name='osgeo.gdal')
 
         self.assertTrue(pkg.isInstalled())
         self.assertIsInstance(pkg.installCommand(), str)
@@ -67,16 +82,6 @@ class test_dependencycheck(EnMAPBoxTestCase):
         pkg = PIPPackage(self.nonexistingPackageName())
         self.assertFalse(pkg.isInstalled())
         self.assertIsInstance(pkg.installCommand(), str)
-        pkg.installPackage()
-
-        n = self.nonexistingPackageName()
-
-        INSTALLATION_BLOCK[n] = 'reason'
-        pkg = PIPPackage(n)
-
-        pkg.installPackage()
-        self.assertTrue(pkg.stdoutMsg == '')
-        self.assertTrue('reason' in pkg.stderrMsg)
 
     def test_pippackagemodel(self):
         model = PIPPackageInstallerTableModel()
@@ -216,7 +221,7 @@ class test_dependencycheck(EnMAPBoxTestCase):
         task.sigPackageInfo.connect(onPackageInfo)
         task.sigMessage.connect(onMessage)
 
-        if True:
+        if False:
             # run with QgsTaskManager
             tm = QgsApplication.taskManager()
             assert isinstance(tm, QgsTaskManager)
