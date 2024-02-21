@@ -205,14 +205,15 @@ class PIPPackage(object):
         return EnMAPBoxSettings().value(self.KEY_SKIP_WARNINGS, defaultValue='', type=str).split(',')
 
     def skipStartupWarning(self) -> bool:
-        return self.pyPkgName in self.packagesWithoutWarning()
+        return self.pipPkgName in self.packagesWithoutWarning()
 
     def setWarnIfNotInstalled(self, b: bool = True):
         noWarning = self.packagesWithoutWarning()
-        if b and self.pyPkgName in noWarning:
-            noWarning.remove(self.pyPkgName)
+        if b and self.pipPkgName in noWarning:
+            noWarning.remove(self.pipPkgName)
         elif not b and self.pyPkgName not in noWarning:
-            noWarning.append(self.pyPkgName)
+            noWarning.append(self.pipPkgName)
+        noWarning = [p for p in noWarning if isinstance(p, str)]
         EnMAPBoxSettings().setValue(self.KEY_SKIP_WARNINGS, ','.join(noWarning))
 
     def __str__(self):
@@ -1000,7 +1001,7 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
         assert isinstance(package, PIPPackage)
 
         html = f'<b>PyPi Package:</b> {package.pipPkgName}'
-        if package.pipPkgName != package.pyPkgName:
+        if isinstance(package.pyPkgName, str) and package.pipPkgName != package.pyPkgName:
             html += f'<br> import as: <code>import {package.pyPkgName}</code>'
 
         pkg_license = package.license.splitlines()[0] if len(package.license) > 0 else ''
