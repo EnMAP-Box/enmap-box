@@ -221,7 +221,7 @@ class test_dependencycheck(EnMAPBoxTestCase):
         task.sigPackageInfo.connect(onPackageInfo)
         task.sigMessage.connect(onMessage)
 
-        if False:
+        if True:
             # run with QgsTaskManager
             tm = QgsApplication.taskManager()
             assert isinstance(tm, QgsTaskManager)

@@ -38,8 +38,9 @@ from contextlib import redirect_stdout, redirect_stderr
 from importlib.machinery import ModuleSpec
 from io import StringIO
 from pathlib import Path
-from typing import List, Match, Iterator, Any, Dict, Tuple
+from typing import List, Match, Iterator, Any, Dict, Tuple, Optional
 
+from PyQt5.QtGui import QDesktopServices
 from pip._internal.cli.main_parser import parse_command
 from pip._internal.commands import create_command
 from pip._internal.utils.misc import get_prog
@@ -136,6 +137,8 @@ class PIPPackage(object):
         self.pyPkgName: str = py_name
         self.pipPkgName = pip_name
 
+        self.mIsInstalled: Optional[bool] = None
+
         self.location: str = ''
         self.stderrMsg: str = ''
         self.stdoutMsg: str = ''
@@ -170,7 +173,8 @@ class PIPPackage(object):
             self.summary = info['summary']
 
         if 'location' in info:
-            self.location = info['location']
+            if self.location == '':
+                self.location = info['location']
 
         if 'license' in info:
             self.license = info['license']
@@ -185,6 +189,9 @@ class PIPPackage(object):
         if 'latest_version' in info:
             self.version_latest = info['latest_version']
         s = ""
+
+    def isMissing(self) -> bool:
+        return not self.isInstalled()
 
     def updateAvailable(self) -> bool:
         return self.version < self.version_latest
@@ -276,15 +283,17 @@ class PIPPackage(object):
         :return:
         :rtype:
         """
-        try:
-            spam_spec = importlib.util.find_spec(self.pyPkgName)
-            if isinstance(spam_spec, ModuleSpec) and spam_spec.has_location:
-                self.location = os.path.dirname(spam_spec.origin)
-            return spam_spec is not None
-        except Exception as ex:
-            # https://github.com/EnMAP-Box/enmap-box/issues/215
-            self.mError = str(ex)
-        return False
+        if self.mIsInstalled is None:
+            try:
+                spam_spec = importlib.util.find_spec(self.pyPkgName)
+                if isinstance(spam_spec, ModuleSpec) and spam_spec.has_location:
+                    self.location = os.path.dirname(spam_spec.origin)
+                self.mIsInstalled = spam_spec is not None
+            except Exception as ex:
+                # https://github.com/EnMAP-Box/enmap-box/issues/215
+                self.mError = str(ex)
+
+        return self.mIsInstalled
 
 
 _LOCAL_PIPEXE: Path = None
@@ -373,7 +382,7 @@ def call_pip_command(pipArgs):
         msgErr = process.readAllStandardError().data().decode('utf-8')
         success = process.exitCode() == 0
         if success or msgErr != '':
-            return success, msgOut, msgErr
+            return success, msgOut.replace('\r\n', '\n'), msgErr.replace('\r\n', '\n')
 
     if False:
         with redirect_stdout(io.StringIO()) as f_out, redirect_stderr(io.StringIO) as f_err:
@@ -412,7 +421,7 @@ def call_pip_command(pipArgs):
             sys.stdout = _std_out
             sys.stderr = _std_err
 
-        return success, msgOut, msgErr
+        return success, msgOut.replace('\r\n', '\n'), msgErr.replace('\r\n', '\n')
 
 
 class PIPPackageInfoTask(QgsTask):
@@ -460,6 +469,9 @@ class PIPPackageInfoTask(QgsTask):
             return False
         self.setProgress(10)
 
+        if self.isCanceled():
+            return False
+
         msg = err = ''
         if isinstance(pkg_all, list) and self._search_updates:
             self.sigMessage.emit('Search for available updates...', Qgis.MessageLevel.Info)
@@ -480,6 +492,8 @@ class PIPPackageInfoTask(QgsTask):
                 return False
 
         self.setProgress(20)
+        if self.isCanceled():
+            return False
 
         if isinstance(pkg_all, list) and self._search_info:
             self.sigMessage.emit('Fetch package details...', Qgis.MessageLevel.Info)
@@ -524,6 +538,10 @@ class PIPPackageInfoTask(QgsTask):
                             self.sigPackageInfo.emit(infoBatch)
                             progress = int(j / n * 80) + 20
                             self.setProgress(progress)
+
+                    if self.isCanceled():
+                        return False
+
             except Exception as ex:
 
                 self.sigMessage.emit(str(ex), Qgis.MessageLevel.Critical)
@@ -871,7 +889,7 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
         flags = Qt.ItemIsEnabled | Qt.ItemIsSelectable
         if index.column() == self.CN_PIP:
             pkg = self.mPackages[index.row()]
-            if pkg.pipPkgName in self.mIsEnMAPBoxRequirement:
+            if pkg.pipPkgName in self.mIsEnMAPBoxRequirement and pkg.isMissing():
                 flags = flags | Qt.ItemIsUserCheckable
         return flags
 
@@ -1023,15 +1041,10 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
             #    else:
             #        return cmd
 
-        if role == Qt.ForegroundRole:
-            if col == self.CN_VERSION:
-                if not pkg.skipStartupWarning():
-                    if pkg.version == '<not installed>':
-                        return QColor('red')
-                    else:
-                        return QColor('green')
-                elif pkg.version_latest > pkg.version:
-                    return QColor('orange')
+        if role == Qt.BackgroundRole:
+            if not pkg.skipStartupWarning() and pkg.isMissing():
+                # #FFC800 = color used for warnings in QgsMessageBar
+                return QColor('#FFC800')
 
         if role == Qt.ToolTipRole:
             if col in [self.CN_PIP, self.CN_VERSION, self.CN_LATEST_VERSION]:
@@ -1100,9 +1113,18 @@ class PIPPackageInstallerTableView(QTableView):
 
         m = QMenu()
         a = m.addAction('Copy')
-        a.setToolTip('Copies the cell value')
+        a.setToolTip('Copy the cell value')
         a.triggered.connect(lambda *args, v=txt: QApplication.clipboard().setText(v))
 
+        a = m.addAction('Open location')
+        a.setToolTip(f'Open the installation folder of {pkg.pipPkgName}')
+        a.setEnabled(pkg.location != '')
+        a.triggered.connect(lambda *args, path=pkg.location: QDesktopServices.openUrl(QUrl.fromLocalFile(path)))
+
+        a = m.addAction('Open homepage')
+        a.setToolTip(f'Open the "{pkg.pipPkgName}" homepage')
+        a.setEnabled(pkg.homepage != '')
+        a.triggered.connect(lambda *args, url=pkg.homepage: QDesktopServices.openUrl(QUrl.fromUserInput(url)))
         m.exec_(event.globalPos())
 
 
