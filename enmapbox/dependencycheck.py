@@ -469,6 +469,9 @@ class PIPPackageInfoTask(QgsTask):
             return False
         self.setProgress(10)
 
+        if self.isCanceled():
+            return False
+
         msg = err = ''
         if isinstance(pkg_all, list) and self._search_updates:
             self.sigMessage.emit('Search for available updates...', Qgis.MessageLevel.Info)
@@ -489,6 +492,8 @@ class PIPPackageInfoTask(QgsTask):
                 return False
 
         self.setProgress(20)
+        if self.isCanceled():
+            return False
 
         if isinstance(pkg_all, list) and self._search_info:
             self.sigMessage.emit('Fetch package details...', Qgis.MessageLevel.Info)
@@ -533,6 +538,10 @@ class PIPPackageInfoTask(QgsTask):
                             self.sigPackageInfo.emit(infoBatch)
                             progress = int(j / n * 80) + 20
                             self.setProgress(progress)
+
+                    if self.isCanceled():
+                        return False
+
             except Exception as ex:
 
                 self.sigMessage.emit(str(ex), Qgis.MessageLevel.Critical)
