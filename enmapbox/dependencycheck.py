@@ -41,7 +41,6 @@ from io import StringIO
 from pathlib import Path
 from typing import List, Match, Iterator, Any, Dict, Tuple, Optional
 
-from PyQt5.QtGui import QDesktopServices
 from pip._internal.cli.main_parser import parse_command
 from pip._internal.commands import create_command
 from pip._internal.utils.misc import get_prog
@@ -50,7 +49,7 @@ from qgis.PyQt.QtCore import QProcess
 from qgis.PyQt.QtCore import \
     pyqtSignal, Qt, \
     QAbstractTableModel, QModelIndex, QSortFilterProxyModel, QUrl
-from qgis.PyQt.QtGui import QContextMenuEvent, QColor
+from qgis.PyQt.QtGui import QContextMenuEvent, QColor, QDesktopServices
 from qgis.PyQt.QtWidgets import \
     QMessageBox, QStyledItemDelegate, QApplication, QTableView, QMenu, \
     QDialogButtonBox, QWidget
@@ -133,13 +132,13 @@ class PIPPackage(object):
         assert len(pip_name) > 0
         pip_name = pip_name.strip()
         if py_name is None:
-            py_name = PACKAGE_LOOKUP.get(pip_name, pip_name)
+            py_name = PACKAGE_LOOKUP.get(pip_name)
 
         self.pyPkgName: str = py_name
         self.pipPkgName = pip_name
 
         self.mIsInstalled: Optional[bool] = None
-
+        self.installer: str = ''
         self.location: str = ''
         self.stderrMsg: str = ''
         self.stdoutMsg: str = ''
@@ -176,6 +175,9 @@ class PIPPackage(object):
         if 'location' in info:
             if self.location == '':
                 self.location = info['location']
+
+        if 'installer' in info:
+            self.installer = info['installer']
 
         if 'license' in info:
             self.license = info['license']
@@ -284,7 +286,7 @@ class PIPPackage(object):
         :return:
         :rtype:
         """
-        if self.mIsInstalled is None:
+        if not isinstance(self.mIsInstalled, bool) and isinstance(self.pyPkgName, str):
             try:
                 spam_spec = importlib.util.find_spec(self.pyPkgName)
                 if isinstance(spam_spec, ModuleSpec) and spam_spec.has_location:
@@ -294,7 +296,7 @@ class PIPPackage(object):
                 # https://github.com/EnMAP-Box/enmap-box/issues/215
                 self.mError = str(ex)
 
-        return self.mIsInstalled
+        return self.mIsInstalled is True
 
 
 _LOCAL_PIPEXE: Path = None
@@ -368,6 +370,16 @@ def localPythonExecutable() -> pathlib.Path:
     return None
 
 
+def decode_bytes(bytes_str, encodings=['utf-8', 'latin-1', 'ascii']):
+    for encoding in encodings:
+        try:
+            return bytes_str.decode(encoding)
+        except ValueError:
+            continue
+    # If all encodings fail, return None or handle the error as needed
+    return None
+
+
 def call_pip_command(pipArgs):
     assert isinstance(pipArgs, list)
 
@@ -379,8 +391,8 @@ def call_pip_command(pipArgs):
         process = QProcess()
         process.start(f'{pipexe} ' + ' '.join(pipArgs))
         process.waitForFinished()
-        msgOut = process.readAllStandardOutput().data().decode('utf-8')
-        msgErr = process.readAllStandardError().data().decode('utf-8')
+        msgOut = decode_bytes(process.readAllStandardOutput().data())
+        msgErr = decode_bytes(process.readAllStandardError().data())
         success = process.exitCode() == 0
         if success or msgErr != '':
             return success, msgOut.replace('\r\n', '\n'), msgErr.replace('\r\n', '\n')
@@ -455,7 +467,7 @@ class PIPPackageInfoTask(QgsTask):
         self.sigMessage.emit('Search for installed packages...', Qgis.MessageLevel.Info)
         msg = err = ''
         try:
-            success, msg, err = call_pip_command(['list', '--format', 'json'])
+            success, msg, err = call_pip_command(['list', '-v', '--format', 'json'])
             if success:
                 pkg_all = json.loads(msg)
                 self.sigPackageList.emit(pkg_all)
@@ -847,9 +859,10 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
     CN_LATEST_VERSION = 2
     CN_SUMMARY = 3
     CN_LOCATION = 4
-    CN_LICENSE = 5
-    CN_HOMEPAGE = 6
-    CN_REQUIRES = 7
+    CN_INSTALLER = 5
+    CN_LICENSE = 6
+    CN_HOMEPAGE = 7
+    CN_REQUIRES = 8
 
     def __init__(self, *args, **kwds):
         super().__init__(*args, **kwds)
@@ -860,6 +873,7 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
             self.CN_LATEST_VERSION: 'Latest',
             self.CN_SUMMARY: 'Summary',
             self.CN_LOCATION: 'Location',
+            self.CN_INSTALLER: 'Installer',
             self.CN_LICENSE: 'License',
             self.CN_REQUIRES: 'Requires',
             self.CN_HOMEPAGE: 'Homepage',
@@ -871,6 +885,7 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
             self.CN_LATEST_VERSION: 'Latest Version',
             self.CN_SUMMARY: 'Package Summary',
             self.CN_LOCATION: 'Install Location',
+            self.CN_INSTALLER: 'The installer that installed the package',
             self.CN_LICENSE: 'Package License',
             self.CN_REQUIRES: 'Requirements to use this package',
             self.CN_HOMEPAGE: 'Package Homepage with further details',
@@ -1030,6 +1045,9 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
             if col == self.CN_LOCATION:
                 return pkg.location
 
+            if col == self.CN_INSTALLER:
+                return pkg.installer
+
             if col == self.CN_REQUIRES:
                 return pkg.requirements
 
@@ -1044,7 +1062,7 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
             #        return cmd
 
         if role == Qt.BackgroundRole:
-            if not pkg.skipStartupWarning() and pkg.isMissing():
+            if pkg.pipPkgName in self.mIsEnMAPBoxRequirement and not pkg.skipStartupWarning() and pkg.isMissing():
                 # #FFC800 = color used for warnings in QgsMessageBar
                 return QColor('#FFC800')
 
