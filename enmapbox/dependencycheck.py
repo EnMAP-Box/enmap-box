@@ -32,6 +32,7 @@ import re
 import subprocess
 import sys
 import time
+import traceback
 import typing
 import warnings
 from contextlib import redirect_stdout, redirect_stderr
@@ -465,7 +466,8 @@ class PIPPackageInfoTask(QgsTask):
         except Exception as ex:
             err = str(ex)
             self._messages['list_err'] = (False, msg, err)
-            self.sigMessage.emit(str(ex), Qgis.MessageLevel.Critical)
+            errInfo = str(ex) + '\n' + traceback.format_exc()
+            self.sigMessage.emit(errInfo, Qgis.MessageLevel.Critical)
             return False
         self.setProgress(10)
 
@@ -486,9 +488,9 @@ class PIPPackageInfoTask(QgsTask):
 
                 self._messages['updates'] = (success, msg, err)
             except Exception as ex:
-                err = str(ex)
+                errInfo = str(ex) + '\n' + traceback.format_exc()
                 self._messages['updates'] = (False, msg, err)
-                self.sigMessage.emit(str(ex), Qgis.MessageLevel.Critical)
+                self.sigMessage.emit(errInfo, Qgis.MessageLevel.Critical)
                 return False
 
         self.setProgress(20)
@@ -543,9 +545,9 @@ class PIPPackageInfoTask(QgsTask):
                         return False
 
             except Exception as ex:
-
-                self.sigMessage.emit(str(ex), Qgis.MessageLevel.Critical)
-                self._messages['major_exception'] = str(ex)
+                errInfo = str(ex) + '\n' + traceback.format_exc()
+                self.sigMessage.emit(errInfo, Qgis.MessageLevel.Critical)
+                self._messages['major_exception'] = errInfo
                 return False
 
         self.setProgress(100)
@@ -1189,20 +1191,19 @@ class PIPPackageInstaller(QWidget):
     def onProgressChanged(self, progress):
         p = int(progress)
         self.progressBar.setValue(p)
-        if p >= 100:
-            self.progressBar.setValue(0)
 
     def onCompleted(self, result: bool, task: PIPInstallCommandTask):
         if isinstance(task, PIPInstallCommandTask) and not sip.isdeleted(task):
             for pkg in task.packages:
                 self.model.updatePackage(pkg)
-            if result is False:
-                self.progressBar.setValue(0)
+
             self.onRemoveTask(id(task))
             self.loadPIPVersionInfo(task.packages, load_latest_versions=False)
         elif isinstance(task, PIPPackageInfoTask) and not sip.isdeleted(task):
             s = ""
             self.onRemoveTask(id(task))
+
+        self.progressBar.setValue(0)
 
     def installAll(self):
         warnings.warn(DeprecationWarning(), stacklevel=2)
@@ -1239,6 +1240,7 @@ class PIPPackageInstaller(QWidget):
                 self.addText(info, True)
             except Exception as ex:
                 self.addText(str(ex), True)
+        s = ""
 
     def loadPIPVersionInfo(self, pipPackages: List[PIPPackage], load_latest_versions: bool = True):
         if len(pipPackages) == 0:
@@ -1249,7 +1251,7 @@ class PIPPackageInstaller(QWidget):
         # get names
         pipPackageNames = [p.pipPkgName for p in pipPackages]
 
-        task = PIPPackageInfoTask('Get package information')
+        task = PIPPackageInfoTask('Get package information', callback=self.onCompleted)
 
         task.sigPackageList.connect(lambda *args: self.receivePackageList(*args, prefix='Loaded package overview'))
         task.sigPackageUpdates.connect(lambda *args: self.receivePackageList(*args, prefix='Fetched available updates'))
