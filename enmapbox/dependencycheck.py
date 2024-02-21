@@ -19,17 +19,15 @@
 *                                                                         *
 ***************************************************************************
 """
-from pip._internal.utils.misc import get_prog
-
 import csv
 import datetime
 import enum
 import importlib
-import platform
 import io
 import json
 import os
 import pathlib
+import platform
 import re
 import subprocess
 import sys
@@ -42,10 +40,11 @@ from io import StringIO
 from pathlib import Path
 from typing import List, Match, Iterator, Any, Dict, Tuple
 
-from qgis.PyQt.QtCore import QProcess
 from pip._internal.cli.main_parser import parse_command
 from pip._internal.commands import create_command
+from pip._internal.utils.misc import get_prog
 from qgis.PyQt import sip
+from qgis.PyQt.QtCore import QProcess
 from qgis.PyQt.QtCore import \
     pyqtSignal, Qt, \
     QAbstractTableModel, QModelIndex, QSortFilterProxyModel, QUrl
@@ -180,7 +179,8 @@ class PIPPackage(object):
             self.requirements = info['requires']
 
         if 'home-page' in info:
-            self.homepage = info['home-page']
+            url = info['home-page']
+            self.homepage = url
 
         if 'latest_version' in info:
             self.version_latest = info['latest_version']
@@ -651,7 +651,7 @@ def missingPackageInfo(missing_packages: List[PIPPackage], html=True) -> str:
     if n == 0:
         return None
 
-    from enmapbox import DIR_REPO, URL_INSTALLATION
+    from enmapbox import URL_INSTALLATION
     info = ['The following {} package(s) are not installed:'.format(n), '<ol>']
     for i, pkg in enumerate(missing_packages):
         assert isinstance(pkg, PIPPackage)
@@ -828,7 +828,8 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
     CN_SUMMARY = 3
     CN_LOCATION = 4
     CN_LICENSE = 5
-    CN_REQUIRES = 6
+    CN_HOMEPAGE = 6
+    CN_REQUIRES = 7
 
     def __init__(self, *args, **kwds):
         super().__init__(*args, **kwds)
@@ -840,17 +841,19 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
             self.CN_SUMMARY: 'Summary',
             self.CN_LOCATION: 'Location',
             self.CN_LICENSE: 'License',
-            self.CN_REQUIRES: 'Requires'
+            self.CN_REQUIRES: 'Requires',
+            self.CN_HOMEPAGE: 'Homepage',
         }
 
         self.mColumnToolTips: dict = {
-            self.CN_PIP: 'PyPI package name',
+            self.CN_PIP: 'PyPI package name. <br>Uncheck to skip a "missing package" warning at EnMAP-Box startup.',
             self.CN_VERSION: 'Installed Version',
             self.CN_LATEST_VERSION: 'Latest Version',
             self.CN_SUMMARY: 'Package Summary',
             self.CN_LOCATION: 'Install Location',
             self.CN_LICENSE: 'Package License',
-            self.CN_REQUIRES: 'Requirements to use this package'
+            self.CN_REQUIRES: 'Requirements to use this package',
+            self.CN_HOMEPAGE: 'Package Homepage with further details',
         }
 
         self.mPackages: List[PIPPackage] = []
@@ -894,8 +897,12 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
             self.dataChanged.emit(idx0, idx1, [role, Qt.ForegroundRole])
         return changed
 
-    def updatePackages(self, updates: List[Dict[str, Any]]):
+    def updatePackages(self, updates: List[Dict[str, Any]]) -> Tuple[List[PIPPackage], Tuple[List[PIPPackage]]]:
+
+        updated_packages = []
         new_packages = []
+        n_updated = 0
+
         for pkg_dict in updates:
             name = pkg_dict.get('name', pkg_dict.get('Name'))
 
@@ -906,13 +913,16 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
                 r = idx.row()
                 self.dataChanged.emit(self.createIndex(r, 0),
                                       self.createIndex(r, self.columnCount() - 1))
-
+                updated_packages.append(pkg)
+                n_updated += 1
             else:
                 newPkg = PIPPackage.fromDict(pkg_dict)
                 new_packages.append(newPkg)
 
         if len(new_packages) > 0:
             self.addPackages(new_packages)
+
+        return updated_packages, new_packages
 
     def __getitem__(self, slice):
         return self.mPackages[slice]
@@ -951,6 +961,25 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
         pkg = self.mPackages[row]
         return self.createIndex(row, column, pkg)
 
+    def htmlToolTip(self, package: PIPPackage) -> str:
+        assert isinstance(package, PIPPackage)
+
+        html = f'<b>PyPi Package:</b> {package.pipPkgName}'
+        if package.pipPkgName != package.pyPkgName:
+            html += f'<br> import as: <code>import {package.pyPkgName}</code>'
+
+        pkg_license = package.license.splitlines()[0] if len(package.license) > 0 else ''
+
+        html += f"""<br>
+        <b>Summary:</b>{package.summary}<br>
+        <b>Installed Version:</b> {package.version}<br>
+        <b>Latest Version:</b> {package.version_latest}<br>
+        <b>Homepage:</b> <a href="{package.homepage}">{package.homepage}</a><br>
+        <b>Licence:</b> {pkg_license}<br>
+        <b>Requires:</b> {package.requirements}<br>
+        """
+        return html
+
     def data(self, index: QModelIndex, role: int = ...) -> Any:
 
         if not index.isValid():
@@ -964,7 +993,7 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
 
         if role == Qt.DisplayRole:
             if col == self.CN_PIP:
-                return pkg.pyPkgName
+                return pkg.pipPkgName
 
             if col == self.CN_VERSION:
                 return pkg.version
@@ -984,6 +1013,8 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
             if col == self.CN_REQUIRES:
                 return pkg.requirements
 
+            if col == self.CN_HOMEPAGE:
+                return pkg.homepage
             # if cn == self.cnCommand:
             #    cmd = pkg.installCommand(user=self.mUser, upgrade=pkg.mInstalledVersion < pkg.mLatestVersion)
             #    match = re.search(r'python(\.exe)?.*$', cmd, re.I)
@@ -1003,22 +1034,17 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
                     return QColor('orange')
 
         if role == Qt.ToolTipRole:
-            if col == self.CN_PIP:
-                return self.mColumnNames[index.column()]
-
-            # if cn == self.cnCommand:
-            #    info = 'Command to install/update {} from your CLI.'.format(pkg.pyPkgName)
-            #    if 'git+' in pkg.installCommand():
-            #        info += '\nThis command requires having git (https://www.git-scm.com) installed!'
-            #    return info
+            if col in [self.CN_PIP, self.CN_VERSION, self.CN_LATEST_VERSION]:
+                return self.htmlToolTip(pkg)
+            elif col == self.CN_HOMEPAGE:
+                if len(pkg.homepage) > 0:
+                    return f'<a href="{pkg.homepage}">{pkg.homepage}</a>'
+            else:
+                return self.data(index, Qt.DisplayRole)
 
         if role == Qt.CheckStateRole:
             if col == self.CN_PIP and bool(self.flags(index) & Qt.ItemIsUserCheckable):
                 return Qt.Unchecked if pkg.skipStartupWarning() else Qt.Checked
-
-        # if role == Qt.DecorationRole and index.column() == 0:
-        #    if pkg.version_latest == '<unknown>':
-        #        return QIcon(':/images/themes/default/mIconLoading.gif')
 
         if role == Qt.UserRole:
             return pkg
@@ -1139,7 +1165,10 @@ class PIPPackageInstaller(QWidget):
             self.setPrimaryFilter('all')
 
     def onProgressChanged(self, progress):
-        self.progressBar.setValue(int(progress))
+        p = int(progress)
+        self.progressBar.setValue(p)
+        if p >= 100:
+            self.progressBar.setValue(0)
 
     def onCompleted(self, result: bool, task: PIPInstallCommandTask):
         if isinstance(task, PIPInstallCommandTask) and not sip.isdeleted(task):
@@ -1200,10 +1229,19 @@ class PIPPackageInstaller(QWidget):
 
         task = PIPPackageInfoTask('Get package information')
 
-        task.sigPackageList.connect(self.model.updatePackages)
-        task.sigPackageUpdates.connect(self.model.updatePackages)
-        task.sigPackageInfo.connect(self.model.updatePackages)
+        task.sigPackageList.connect(lambda *args: self.receivePackageList(*args, prefix='Loaded package overview'))
+        task.sigPackageUpdates.connect(lambda *args: self.receivePackageList(*args, prefix='Fetched available updates'))
+        task.sigPackageInfo.connect(lambda *args: self.receivePackageList(*args, prefix='Fetched package details'))
         self.startTask(task)
+
+    def receivePackageList(self, *args, prefix: str = 'Refreshed packages'):
+        updated, newpackages = self.model.updatePackages(*args)
+
+        pkgNames = [pkg.pipPkgName for pkg in updated + newpackages]
+
+        text = f'{prefix} ({len(pkgNames)}): ' + ','.join(pkgNames)
+
+        self.addText(text, Qgis.MessageLevel.Success)
 
     def startTask(self, qgsTask: QgsTask):
         tid = id(qgsTask)
@@ -1262,7 +1300,7 @@ class PIPPackageInstaller(QWidget):
         c = self.tbLog.textColor()
         if isinstance(color, QColor):
             self.tbLog.setTextColor(color)
-        self.tbLog.append(f'{datetime.datetime.now()}: {text}')
+        self.tbLog.append(f'{datetime.datetime.now().strftime("%H:%M:%S")}: {text}')
         self.tbLog.setTextColor(c)
 
     def addPackages(self, packages: List[PIPPackage], required: bool = False):
