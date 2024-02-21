@@ -188,6 +188,7 @@ class PIPPackage(object):
         if 'latest_version' in info:
             self.version_latest = info['latest_version']
         s = ""
+
     def isMissing(self) -> bool:
         return not self.isInstalled()
 
