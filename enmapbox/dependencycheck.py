@@ -40,6 +40,7 @@ from io import StringIO
 from pathlib import Path
 from typing import List, Match, Iterator, Any, Dict, Tuple, Optional
 
+from PyQt5.QtGui import QDesktopServices
 from pip._internal.cli.main_parser import parse_command
 from pip._internal.commands import create_command
 from pip._internal.utils.misc import get_prog
@@ -1103,9 +1104,18 @@ class PIPPackageInstallerTableView(QTableView):
 
         m = QMenu()
         a = m.addAction('Copy')
-        a.setToolTip('Copies the cell value')
+        a.setToolTip('Copy the cell value')
         a.triggered.connect(lambda *args, v=txt: QApplication.clipboard().setText(v))
 
+        a = m.addAction('Open location')
+        a.setToolTip(f'Open the installation folder of {pkg.pipPkgName}')
+        a.setEnabled(pkg.location != '')
+        a.triggered.connect(lambda *args, path=pkg.location: QDesktopServices.openUrl(QUrl.fromLocalFile(path)))
+
+        a = m.addAction('Open homepage')
+        a.setToolTip(f'Open the "{pkg.pipPkgName}" homepage')
+        a.setEnabled(pkg.homepage != '')
+        a.triggered.connect(lambda *args, url=pkg.homepage: QDesktopServices.openUrl(QUrl.fromUserInput(url)))
         m.exec_(event.globalPos())
 
 
