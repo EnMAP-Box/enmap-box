@@ -17,7 +17,9 @@ RUN pip3 list
 
 RUN echo "Install missing EnMAP-Box requirements:"
 COPY ./.env/linux/requirements_ubuntu.txt /tmp/
+COPY ./requirements_developer.txt /tmp/
 RUN pip3 install -r /tmp/requirements_ubuntu.txt
+RUN pip3 install -r /tmp/requirements_developer.txt
 
 # Avoid sqlcmd termination due to locale -- see https://github.com/Microsoft/mssql-docker/issues/163
 RUN echo "nb_NO.UTF-8 UTF-8" > /etc/locale.gen
