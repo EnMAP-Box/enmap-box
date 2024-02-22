@@ -757,7 +757,7 @@
   </action>
   <action name="mActionShowPackageInstaller">
    <property name="text">
-    <string>Package Installer</string>
+    <string>PiPI Package Info</string>
    </property>
    <property name="toolTip">
     <string>Opens an installer for required python packages</string>
