@@ -1,14 +1,17 @@
-# run: conda env create --file conda_environment.yml
+# create: conda env create -f enmapbox_light_latest.yml
+# update: conda env update -f enmapbox_light_latest.yml --prune
+# delete: conda remove -n enmapbox_light_latest --all
 # see also https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
 name: enmapbox_light_latest
 channels:
   - conda-forge
 dependencies:
-  - python=3.9
-  - qgis>=3.32
+  # - python=3.9
+  - qgis>=3.34
   - pip
   - scikit-learn>=1 # if necessary, this will install scipy and numpy too
   - matplotlib
+  - scipy<1.12 # workaround https://github.com/conda-forge/qgis-feedstock/issues/405
 
   # Development
   - gitpython
