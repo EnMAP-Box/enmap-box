@@ -1,4 +1,10 @@
+"""
+Updates the version number in enmapbox/gui/ui/logo/splashscreen.png
+Requires that Inkscape (https://inkscape.org) is installed an can be used from shell
+Does not update the version number in splashscreen.svg (!), but create a temporary svg only.
+"""
 import configparser
+import os
 import re
 import subprocess
 import xml.etree.ElementTree as ET
@@ -39,15 +45,19 @@ assert isinstance(node_minor, ET.Element), f'SVG misses text element with id "{n
 node_major.text = txt_major
 node_minor.text = txt_minor
 
-# PATH_EXPORT = PATH_SVG.parent / 'splashscreentest.svg'
-PATH_EXPORT = PATH_SVG
+PATH_EXPORT = PATH_SVG.parent / 'splashscreen_tmp.svg'
+#PATH_EXPORT = PATH_SVG
 PATH_PNG = PATH_SVG.parent / PATH_EXPORT.name.replace('.svg', '.png')
 tree.write(PATH_EXPORT, encoding='utf8')
+
+# see https://inkscape.org/doc/inkscape-man.html
 cmd = ['inkscape',
-       '--export-type=.png',
+       '--export-type=png',
        '--export-area-page',
        f'--export-filename={PATH_PNG}',
-       str(PATH_EXPORT)]
+       f'{PATH_EXPORT}']
 
 print('To export the SVG to PNG with Inkscape run:\n' + ' '.join(cmd))
 subprocess.run(cmd)
+
+os.remove(PATH_EXPORT)
