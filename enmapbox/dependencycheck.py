@@ -331,8 +331,8 @@ def localPipExecutable() -> Path:
                     process = QProcess()
                     process.start(c)
                     process.waitForFinished()
-                    msgOut = process.readAllStandardOutput().data().decode('utf-8')
-                    msgErr = process.readAllStandardError().data().decode('utf-8')
+                    msgOut = decode_bytes(process.readAllStandardOutput().data())
+                    msgErr = decode_bytes(process.readAllStandardError().data())
                     success = process.exitCode() == 0
                     if success and len(msgOut) > 0:
                         lines = msgOut.splitlines()
