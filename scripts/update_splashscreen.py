@@ -1,0 +1,53 @@
+import configparser
+import re
+import subprocess
+import xml.etree.ElementTree as ET
+from pathlib import Path
+from typing import Match
+
+from qgis.testing import start_app
+
+app = start_app()
+from enmapbox import DIR_REPO
+DIR_REPO = Path(DIR_REPO)
+PATH_CONFIG_FILE = DIR_REPO / '.plugin.ini'
+PATH_SVG = DIR_REPO / 'enmapbox/gui/ui/logo/splashscreen.svg'
+assert PATH_CONFIG_FILE.is_file()
+config = configparser.ConfigParser()
+config.read(PATH_CONFIG_FILE)
+VERSION = config['metadata']['version']
+
+rxVersion = re.compile(r'(?P<major>\d+)\.(?P<minor>\d+)(?P<rest>.*)')
+
+match = rxVersion.match(VERSION)
+assert isinstance(match, Match)
+
+txt_major = match.group('major') + '.'
+txt_minor = match.group('minor')
+
+tree = ET.parse(PATH_SVG)
+root = tree.getroot()
+namespaces = dict([node for _, node in ET.iterparse(PATH_SVG, events=['start-ns'])])
+for prefix, namespace in namespaces.items():
+    ET.register_namespace(prefix, namespace)
+node_major_id = 'tspan_major_version'
+node_minor_id = 'tspan_minor_version'
+node_major = root.find(f".//*[@id='{node_major_id}']")
+node_minor = root.find(f".//*[@id='{node_minor_id}']")
+assert isinstance(node_major, ET.Element), f'SVG misses text element with id "{node_major}"'
+assert isinstance(node_minor, ET.Element), f'SVG misses text element with id "{node_minor}"'
+node_major.text = txt_major
+node_minor.text = txt_minor
+
+# PATH_EXPORT = PATH_SVG.parent / 'splashscreentest.svg'
+PATH_EXPORT = PATH_SVG
+PATH_PNG = PATH_SVG.parent / PATH_EXPORT.name.replace('.svg', '.png')
+tree.write(PATH_EXPORT, encoding='utf8')
+cmd = ['inkscape',
+       '--export-type=.png',
+       '--export-area-page',
+       f'--export-filename={PATH_PNG}',
+       str(PATH_EXPORT)]
+
+print('To export the SVG to PNG with Inkscape run:\n' + ' '.join(cmd))
+subprocess.run(cmd)
