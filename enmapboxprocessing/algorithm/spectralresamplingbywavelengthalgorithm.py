@@ -147,7 +147,6 @@ class SpectralResamplingByWavelengthAlgorithm(EnMAPProcessingAlgorithm):
 
                 writer.writeArray2d(outarray, targetBandNo)
 
-                # for bandNo, targetWavelength in enumerate(targetWavelengths, 1):
                 writer.setWavelength(targetWavelength, targetBandNo)
                 writer.setNoDataValue(outputNoDataValue, targetBandNo)
             writer.close()
