@@ -62,7 +62,7 @@ def update_splashscreen():
            f'{PATH_EXPORT}']
 
     print('Run:\n' + ' '.join(cmd))
-    print(f'to export the svg as png with Inkscape (https://inkscape.org)')
+    print('to export the svg as png with Inkscape (https://inkscape.org)')
     subprocess.run(cmd)
 
     os.remove(PATH_EXPORT)
