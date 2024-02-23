@@ -21,9 +21,11 @@ import site
 import unittest
 
 from enmapbox import DIR_REPO
-from enmapbox.testing import TestCase
+from enmapbox.testing import TestCase, start_app
 from qgis.core import QgsProject
 from qgis.utils import iface
+
+start_app()
 
 
 class TestEnMAPBoxPlugin(TestCase):

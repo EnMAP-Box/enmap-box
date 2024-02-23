@@ -1,4 +1,6 @@
-# run: conda env create --file conda_environment.yml
+# create: conda env create -f enmapbox_full_latest.yml
+# update: conda env update -f enmapbox_full_latest.yml --prune
+# delete: conda remove -n enmapbox_full_latest --all
 # see also https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
 name: enmapbox_full_longterm
 channels:
@@ -7,6 +9,7 @@ dependencies:
   - python=3.9
   - qgis=3.28
   - pip
+  - scipy<1.12 # workaround https://github.com/conda-forge/qgis-feedstock/issues/405
   - scikit-learn>=1 # if necessary, this will install scipy and numpy too
   - matplotlib # avoids that conda uses the wrong pip
   - enpt

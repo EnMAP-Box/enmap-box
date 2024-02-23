@@ -639,7 +639,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         from ..dependencycheck import requiredPackages
 
-        if len([p for p in requiredPackages() if not p.isInstalled() and p.warnIfNotInstalled()]) > 0:
+        if len([p for p in requiredPackages() if not p.isInstalled() and not p.skipStartupWarning()]) > 0:
             title = 'Missing Python Package(s)!'
 
             a = QAction('Install missing')
@@ -813,7 +813,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         from ..dependencycheck import PIPPackageInstaller, requiredPackages
 
         w = PIPPackageInstaller()
-        w.addPackages(requiredPackages())
+        w.addPackages(requiredPackages(), required=True)
         w.show()
 
     def showResourceBrowser(self, *args):
