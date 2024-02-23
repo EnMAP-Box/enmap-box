@@ -11,3 +11,4 @@ numba>=0.57 # required by EnSoMAP
 netCDF4 # required by ONNS
 enpt-enmapboxapp # required by EnPT
 scikit-learn>=1.0
+PyOpenGL
