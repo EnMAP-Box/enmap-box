@@ -6,7 +6,7 @@ name: enmapbox_light_longterm
 channels:
   - conda-forge
 dependencies:
-  - qgis=3.28
+  - qgis=3.34
   - python=3.9
   - pip
   - scipy<1.12 # workaround https://github.com/conda-forge/qgis-feedstock/issues/405

@@ -7,7 +7,7 @@ channels:
   - conda-forge
 dependencies:
   # - python=3.9
-  - qgis>=3.34
+  - qgis>=3.36
   - pip
   - scikit-learn>=1 # if necessary, this will install scipy and numpy too
   - matplotlib # avoids that conda uses the wrong pip
