@@ -978,12 +978,12 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def flagParameterAsAdvanced(self, name: str, advanced: bool):
         if advanced:
             p = self.parameterDefinition(name)
-            p.setFlags(int(p.flags()) | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
+            p.setFlags(p.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
 
     def flagParameterAsHidden(self, name: str, hidden: bool):
         if hidden:
             p = self.parameterDefinition(name)
-            p.setFlags(int(p.flags()) | QgsProcessingParameterDefinition.Flag.FlagHidden)
+            p.setFlags(p.flags() | QgsProcessingParameterDefinition.Flag.FlagHidden)
 
     def createLoggingFeedback(
             cls, feedback: QgsProcessingFeedback, logfile: TextIO
