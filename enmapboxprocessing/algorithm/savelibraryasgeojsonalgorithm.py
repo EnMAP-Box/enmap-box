@@ -45,29 +45,39 @@ class SaveLibraryAsGeoJsonAlgorithm(EnMAPProcessingAlgorithm):
             self.tic(feedback, parameters, context)
 
             # save as GeoJSON
-            alg = 'native:savefeatures'
-            parameters = {'INPUT': library, 'OUTPUT': filename}
-            self.runAlg(alg, parameters, None, feedback2, context, True)
+            if False:
+                alg = 'native:savefeatures'
+                parameters = {'INPUT': library, 'OUTPUT': filename}
+                self.runAlg(alg, parameters, None, feedback2, context, True)
 
-            # repair SpectralProfile attributes
-            data = Utils.jsonLoad(filename)
-            assert len(data['features']) == library.featureCount()
+                # repair SpectralProfile attributes
+                data = Utils.jsonLoad(filename)
+                assert len(data['features']) == library.featureCount()
 
-            profileFields = profile_field_list(library)
+                profileFields = profile_field_list(library)
 
-            n = library.featureCount()
-            feature: QgsFeature
-            for i, feature in enumerate(library.getFeatures()):
-                feedback.setProgress(i / n * 100)
-                for field in profileFields:
-                    dump = feature.attribute(field.name())
-                    if dump:
-                        profileDict = decodeProfileValueDict(dump)
+                n = library.featureCount()
+                feature: QgsFeature
+                for i, feature in enumerate(library.getFeatures()):
+                    feedback.setProgress(i / n * 100)
+                    for field in profileFields:
+                        dump = feature.attribute(field.name())
+                        if dump:
+                            profileDict = decodeProfileValueDict(dump)
 
-                        data['features'][i]['properties'][field.name()] = profileDict
+                            data['features'][i]['properties'][field.name()] = profileDict
 
-            Utils.jsonDump(data, filename)
+                Utils.jsonDump(data, filename)
 
-            result = {self.P_OUTPUT_FILE: filename}
+                result = {self.P_OUTPUT_FILE: filename}
+            else:
+                from enmapbox.qgispluginsupport.qps.speclib.io.geojson import GeoJsonSpectralLibraryIO
+
+                r = GeoJsonSpectralLibraryIO.exportProfiles(filename, library, feedback=feedback)
+                if isinstance(r, list) and len(r) > 0:
+                    result = {self.P_OUTPUT_FILE: filename}
+                else:
+                    result = {}
+
             self.toc(feedback, result)
         return result
