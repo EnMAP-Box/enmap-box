@@ -1638,13 +1638,6 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         :return:
         """
         lyr = node.layer()
-        from enmapboxprocessing.algorithm.savelibraryasgeojsonalgorithm import SaveLibraryAsGeoJsonAlgorithm
-
-        action = menu.addAction('Save as GeoJSON')
-        action.alg = SaveLibraryAsGeoJsonAlgorithm()
-        action.parameters = {action.alg.P_LIBRARY: lyr}
-        action.triggered.connect(self.onRunProcessingAlgorithmClicked)
-
         menu.addSeparator()
 
         action = menu.addAction('Open Attribute Table')
