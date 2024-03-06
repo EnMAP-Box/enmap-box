@@ -28,6 +28,7 @@ from enmapbox.gui.contextmenus import EnMAPBoxContextMenuRegistry, EnMAPBoxAbstr
 from enmapbox.gui.dataviews.docks import SpectralLibraryDock, MapDock, Dock
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import MapCanvas
+from enmapbox.qgispluginsupport.qps.maptools import MapTools
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase, start_app
@@ -36,7 +37,6 @@ from qgis.core import Qgis, QgsExpressionContextGenerator, QgsProcessingContext,
 from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, \
     QgsLayerTree, QgsApplication
 from qgis.gui import QgsMapLayerComboBox, QgisInterface, QgsProcessingContextGenerator, QgsMapCanvas
-
 
 start_app()
 
@@ -323,12 +323,17 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         E.close()
         QgsProject.instance().removeAllMapLayers()
 
-    def test_loadExampleData(self):
+    def test_loadExampleData_mapTools(self):
         E = EnMAPBox(load_core_apps=False, load_other_apps=False)
         E.loadExampleData()
         n = len(E.dataSources())
         self.assertTrue(n > 0)
+
+        for mt in MapTools.mapToolEnums():
+            E.setMapTool(mt)
+
         self.showGui(E.ui)
+
         E.close()
         QgsProject.instance().removeAllMapLayers()
 
