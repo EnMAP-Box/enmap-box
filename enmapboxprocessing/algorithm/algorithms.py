@@ -154,6 +154,7 @@ from enmapboxprocessing.algorithm.regressionworkflowalgorithm import RegressionW
 from enmapboxprocessing.algorithm.regressorperformancealgorithm import RegressorPerformanceAlgorithm
 from enmapboxprocessing.algorithm.roccurvealgorithm import RocCurveAlgorithm
 from enmapboxprocessing.algorithm.samplerastervaluesalgorithm import SampleRasterValuesAlgorithm
+from enmapboxprocessing.algorithm.savelibraryasgeojsonalgorithm import SaveLibraryAsGeoJsonAlgorithm
 from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
 from enmapboxprocessing.algorithm.selectfeaturesfromdatasetalgorithm import SelectFeaturesFromDatasetAlgorithm
 from enmapboxprocessing.algorithm.spatialconvolutionairydisk2dalgorithm import SpatialConvolutionAiryDisk2DAlgorithm
@@ -358,6 +359,7 @@ def algorithms():
         RocCurveAlgorithm(),
         SampleRasterValuesAlgorithm(),
         SaveRasterAsAlgorithm(),
+        SaveLibraryAsGeoJsonAlgorithm(),
         SelectFeaturesFromDatasetAlgorithm(),
         SpatialConvolutionAiryDisk2DAlgorithm(),
         SpatialConvolutionBox2DAlgorithm(),
