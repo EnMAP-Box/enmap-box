@@ -83,9 +83,6 @@ class TestEnMAPBoxUtils(EnMAPBoxTestCase):
         self.assertEqual(pxCoordinate.y(), 0)
         # self.assertTrue(px2geo(pxCoordinate, gt) == geoCoordinate)
 
-
-class TestEnmapboxUtils(EnMAPBoxTestCase):
-
     def test_FindBroadBand(self):
 
         lyr = QgsRasterLayer(enmap)

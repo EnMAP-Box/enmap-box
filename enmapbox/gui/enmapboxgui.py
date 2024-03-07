@@ -1668,7 +1668,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             mapTools = canvas.mapTools()
 
             if mapToolKey == MapTools.SelectFeature:
-                mapTools.mtSelectFeature.setSelectionMode(self.mMapToolMode)
+                mapTools.mtSelectFeature.setSelectionMode(mode)
 
             mapTools.activate(mapToolKey)
             results.append(canvas.mapTool())
