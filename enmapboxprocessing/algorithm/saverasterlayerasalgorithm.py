@@ -48,6 +48,7 @@ class SaveRasterAsAlgorithm(EnMAPProcessingAlgorithm):
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         copyMetadata = self.parameterAsBoolean(parameters, self.P_COPY_METADATA, context)
         copyStyle = self.parameterAsBoolean(parameters, self.P_COPY_STYLE, context)
+
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_RASTER, context)
         with open(filename + '.log', 'w') as logfile:
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
@@ -58,6 +59,7 @@ class SaveRasterAsAlgorithm(EnMAPProcessingAlgorithm):
                 alg.P_RASTER: raster,
                 alg.P_COPY_METADATA: copyMetadata,
                 alg.P_COPY_STYLE: copyStyle,
+                alg.P_CREATION_PROFILE: parameters.get(self.P_CREATION_PROFILE),
                 alg.P_OUTPUT_RASTER: filename
             }
             self.runAlg(alg, parameters, None, feedback2, context, True)
