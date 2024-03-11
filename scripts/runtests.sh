@@ -11,7 +11,7 @@ export PYTHONPATH="${PYTHONPATH}"\
 ":$(pwd)/enmapbox/apps"\
 ":$(pwd)/enmapbox/coreapps"\
 ":$(pwd)/enmapbox/eo4qapps"\
-":$(pwd)/tests/src"
+":$(pwd)/tests"
 
 echo $PYTHONPATH
 qgis --version

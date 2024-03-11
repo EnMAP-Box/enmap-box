@@ -3,9 +3,12 @@ from typing import Dict, Any, List, Tuple
 
 from osgeo import gdal
 
-from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 from enmapbox.typeguard import typechecked
+from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
+from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxprocessing.utils import Utils
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer, QgsMapLayer
 
 
 @typechecked
@@ -91,12 +94,12 @@ class ImportLandsatL2Algorithm(EnMAPProcessingAlgorithm):
                 bandNames = ['Coastal aerosol', 'Blue', 'Green', 'Red', 'NIR', 'SWIR-1', 'SWIR-2']
                 wavelength = '{443, 482, 562, 655, 865, 1610, 2200}'
             elif basename(mtlFilename).startswith('LE'):
-                # https://landsat.gsfc.nasa.gov/landsat-7/landsat-7-etm-bands
+                # https://landsat.gsfc.nasa.gov/etm-plus/
                 bandNumbers = [1, 2, 3, 4, 5, 7]
                 bandNames = ['Blue', 'Green', 'Red', 'NIR', 'SWIR-1', 'SWIR-2']
                 wavelength = '{482, 565, 659, 837, 1650, 2215}'
             elif basename(mtlFilename).startswith('LT'):
-                # https://landsat.gsfc.nasa.gov/landsat-4-5/tm
+                # https://landsat.gsfc.nasa.gov/thematic-mapper/
                 bandNumbers = [1, 2, 3, 4, 5, 7]
                 bandNames = ['Blue', 'Green', 'Red', 'NIR', 'SWIR-1', 'SWIR-2']
                 wavelength = '{485, 560, 659, 830, 1650, 2215}'
@@ -107,7 +110,7 @@ class ImportLandsatL2Algorithm(EnMAPProcessingAlgorithm):
             filenames = [mtlFilename.replace('MTL.txt', key)
                          for key in [pattern.format(i) for i in bandNumbers]]
 
-            # create VRTs
+            # create VRT
             options = gdal.BuildVRTOptions(separate=True, xRes=30, yRes=30)
             ds = gdal.BuildVRT(filename, filenames, options=options)
             ds.SetMetadataItem('wavelength', wavelength, 'ENVI')
@@ -120,6 +123,24 @@ class ImportLandsatL2Algorithm(EnMAPProcessingAlgorithm):
                     rb.SetScale(gain)
                 if offset is not None:
                     rb.SetOffset(offset)
+            del ds
+
+            # setup default renderer
+            layer = QgsRasterLayer(filename)
+            reader = RasterReader(layer)
+            redBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['R'][0])
+            greenBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['G'][0])
+            blueBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['B'][0])
+            redMin, redMax = reader.provider.cumulativeCut(redBandNo, 0.02, 0.98)
+            greenMin, greenMax = reader.provider.cumulativeCut(greenBandNo, 0.02, 0.98)
+            blueMin, blueMax = reader.provider.cumulativeCut(blueBandNo, 0.02, 0.98)
+            renderer = Utils().multiBandColorRenderer(
+                reader.provider, [redBandNo, greenBandNo, blueBandNo], [redMin, greenMin, blueMin],
+                [redMax, greenMax, blueMax]
+            )
+            layer.setRenderer(renderer)
+            layer.saveDefaultStyle(QgsMapLayer.StyleCategory.Rendering)
+
             result = {self.P_OUTPUT_RASTER: filename}
             self.toc(feedback, result)
 

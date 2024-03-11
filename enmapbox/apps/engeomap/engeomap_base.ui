@@ -149,7 +149,7 @@ p, li { white-space: pre-wrap; }
      </rect>
     </property>
     <property name="text">
-     <string>VNIR Reflactance Threshold up to 1000 nm</string>
+     <string>VNIR Reflectance Threshold up to 1000 nm</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_2">
@@ -162,7 +162,7 @@ p, li { white-space: pre-wrap; }
      </rect>
     </property>
     <property name="text">
-     <string>SWIR Reflactance Threshold from 1000-2500 nm</string>
+     <string>SWIR Reflectance Threshold from 1000-2500 nm</string>
     </property>
    </widget>
    <widget class="QTextEdit" name="swir_thresh">

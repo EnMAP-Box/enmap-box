@@ -107,8 +107,14 @@ class SpectralIndexOptimizerAlgorithm(EnMAPProcessingAlgorithm):
                     for yi in range(ntargets):
                         S = eval(formular, {'A': A, 'B': B, 'F1': F1, 'F2': F2, 'F3': F3})
                         assert isinstance(S, np.ndarray)
-                        S = S.reshape((-1, 1))
                         Y = y[:, yi].flatten()
+
+                        # formular may eval to not finite values
+                        valid = np.isfinite(S)
+                        S = S[valid]
+                        Y = Y[valid]
+
+                        S = S.reshape((-1, 1))
                         olsr.fit(S, Y)
                         yP = olsr.predict(S)
 
@@ -141,6 +147,7 @@ class SpectralIndexOptimizerAlgorithm(EnMAPProcessingAlgorithm):
                 writer.setBandName(bandName, bandNo)
             writer.setNoDataValue(nan)
             writer.setMetadataItem('features', list(features))
+            writer.close()
             result = {self.P_OUTPUT_MATRIX: filename}
 
             self.toc(feedback, result)

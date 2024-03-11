@@ -5,7 +5,7 @@ from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousvectoral
     PrepareRegressionDatasetFromContinuousVectorAlgorithm
 from enmapboxprocessing.algorithm.regressionworkflowalgorithm import RegressionWorkflowAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxtestdata import enmap, enmap_potsdam
+from enmapboxtestdata import enmap, enmap_potsdam, veg_cover_fraction_potsdam_point
 from enmapboxtestdata import regressorDumpMultiTargetPkl
 
 
@@ -51,7 +51,7 @@ class TestRegressionWorkflowAlgorithm(TestCase):
         }
         self.runalg(alg, parameters)
 
-    def _DISABLED_test_badBandsHandling_withNameMatching(self):
+    def test_badBandsHandling_withNameMatching(self):
         alg1 = PrepareRegressionDatasetFromContinuousVectorAlgorithm()
         parameters1 = {
             alg1.P_CONTINUOUS_VECTOR: veg_cover_fraction_potsdam_point,
@@ -72,7 +72,7 @@ class TestRegressionWorkflowAlgorithm(TestCase):
         }
         self.runalg(alg2, parameters2)
 
-    def _DISABLED_test_badBandsHandling_withoutNameMatching(self):
+    def test_badBandsHandling_withoutNameMatching(self):
         alg1 = PrepareRegressionDatasetFromContinuousVectorAlgorithm()
         parameters1 = {
             alg1.P_CONTINUOUS_VECTOR: veg_cover_fraction_potsdam_point,

@@ -86,15 +86,16 @@ class ClassSeparabilityAlgorithm(EnMAPProcessingAlgorithm):
                 muB = np.mean(dataB, 0)
                 covB = np.cov(dataB, rowvar=False)
 
-                print()
-                print(categoryA.name, 'versus', categoryB.name)
+                alreadyWarned = list()
                 for data, category in ((dataA, categoryA), (dataB, categoryB)):
                     if data.shape[0] < data.shape[1]:
-                        feedback.pushWarning(
-                            f'Category {category.name}: '
-                            f'sample size ({data.shape[0]}) is smaller than number of features {data.shape[1]}. '
-                            f'As a rule of thumb, have at least five times as many samples as features.'
-                        )
+                        if category.name not in alreadyWarned:
+                            feedback.pushWarning(
+                                f'Category {category.name}: '
+                                f'sample size ({data.shape[0]}) is smaller than number of features {data.shape[1]}. '
+                                f'As a rule of thumb, have at least five times as many samples as features.'
+                            )
+                        else:
+                            alreadyWarned.append(category.name)
                 jm = jeffries_matusita_distance(muA, covA, muB, covB)
-
-                print('Jeffries-Matusita Distance:', jm)
+                feedback.pushInfo(f'Jeffries-Matusita Distance {categoryA.name} versus {categoryB.name}: {jm}')

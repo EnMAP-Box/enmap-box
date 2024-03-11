@@ -7,7 +7,7 @@ from enmapboxtestdata import SensorProducts, sensorProductsRoot
 class TestImportEmitL2AAlgorithm(TestCase):
 
     def test_allBands(self):
-        if sensorProductsRoot() is None:
+        if sensorProductsRoot() is None or self.skipProductImport:
             return
 
         alg = ImportEmitL2AAlgorithm()
@@ -21,7 +21,7 @@ class TestImportEmitL2AAlgorithm(TestCase):
         self.assertEqual(285, RasterReader(parameters[alg.P_OUTPUT_RASTER]).bandCount())
 
     def test_goodBands(self):
-        if sensorProductsRoot() is None:
+        if sensorProductsRoot() is None or self.skipProductImport:
             return
 
         alg = ImportEmitL2AAlgorithm()

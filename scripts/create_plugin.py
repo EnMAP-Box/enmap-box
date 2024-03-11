@@ -199,7 +199,7 @@ def create_enmapbox_plugin(include_testdata: bool = False,
     MD.mAbout = markdownToHTML(pathAbout)
     MD.mTracker = enmapbox.ISSUE_TRACKER
     MD.mRepository = enmapbox.REPOSITORY
-    MD.mQgisMinimumVersion = enmapbox.MIN_VERSION_QGIS
+    MD.mQgisMinimumVersion = config['metadata']['qgisMinimumVersion']
     MD.mEmail = config['metadata']['email']
     MD.mHasProcessingProvider = True
     MD.mPlugin_dependencies = ['Google Earth Engine']  # the best way to make sure that the 'ee' module is available
@@ -243,6 +243,9 @@ def create_enmapbox_plugin(include_testdata: bool = False,
         fileDst = PLUGIN_DIR / fileSrc.relative_to(DIR_REPO)
         os.makedirs(fileDst.parent, exist_ok=True)
         shutil.copy(fileSrc, fileDst.parent)
+
+    # make the LICENSE.md a LICENSE
+    shutil.copy(PLUGIN_DIR / 'LICENSE.md', PLUGIN_DIR / 'LICENSE')
 
     # update metadata version
 
@@ -462,7 +465,6 @@ if __name__ == "__main__":
                                   copy_to_profile=args.profile,
                                   build_name=args.build_name)
 
-#    if isinstance(path, pathlib.Path) and re.search(r'\.master\.', path.name):  # not sure what happens here, but the checklist seams to be never printed
     if True:
         message = \
             r"""

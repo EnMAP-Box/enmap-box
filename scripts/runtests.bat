@@ -9,8 +9,9 @@ set PYTHONPATH=%PYTHONPATH%;^
 %cd%\enmapbox\apps;^
 %cd%\enmapbox\coreapps;^
 %cd%\enmapbox\eo4qapps;^
-%cd%\tests\src
+%cd%\tests
 
-::echo %PYTHONPATH%
+echo %PATH%
+echo %PYTHONPATH%
 ::echo %CD%
 pytest --no-cov-on-fail --cov-config=%CD%\.coveragec %*

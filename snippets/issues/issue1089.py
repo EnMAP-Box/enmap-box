@@ -13,6 +13,7 @@ writer = RasterWriter(ds)
 for bandNo in range(1, 101):
     writer.setBadBandMultiplier(0, bandNo)
     writer.setFwhm(42, bandNo)
+writer.close()
 del writer, ds
 layer = QgsRasterLayer(filename, 'enmap.vrt')
 

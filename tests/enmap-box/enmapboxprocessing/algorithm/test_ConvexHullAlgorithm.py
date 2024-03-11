@@ -8,7 +8,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 from qgis.core import QgsRectangle
 
 
-class TestTranslateAlgorithm(TestCase):
+class TestConvexHullAlgorithm(TestCase):
 
     def test_prisma(self):
         alg = TranslateRasterAlgorithm()

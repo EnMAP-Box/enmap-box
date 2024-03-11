@@ -7,7 +7,7 @@ from qgis.core import QgsRasterLayer
 class TestGeolocateRasterAlgorithm(TestCase):
 
     def test_prisma(self):
-        if sensorProductsRoot() is None:
+        if sensorProductsRoot() is None or self.skipProductImport:
             return
 
         alg = GeolocateRasterAlgorithm()

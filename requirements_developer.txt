@@ -10,7 +10,7 @@ git-lfs
 pytest
 pytest-env
 pytest-cov
-pytest-xdist
+pytest-xdist # parallel testing
 docutils
 markdown
 coverage
@@ -22,5 +22,3 @@ flake8-qgis
 urlchecker
 typeguard==2.13.3  # version 3.x created several problems
 
-#standard requirements
--r requirements.txt

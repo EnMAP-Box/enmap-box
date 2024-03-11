@@ -13,7 +13,7 @@ from _classic.hubflow.core import EnviSpectralLibrary, Classification, Classific
 
 def test_enviSpeclib():
     from sklearn.ensemble import RandomForestClassifier
-    import enmapboxtestdata
+    from tests import enmapboxtestdata
     library = EnviSpectralLibrary(filename=enmapboxtestdata.library)
     labels = Classification.fromEnviSpectralLibrary(filename='/vsimem/synthmixRegressionEnsemble/labels.bsq',
         library=library, attribute='level_2')
@@ -45,7 +45,7 @@ def test_enviSpeclib():
 
 def test_boxSpeclib():
     from sklearn.ensemble import RandomForestClassifier
-    import enmapboxtestdata
+    from tests import enmapboxtestdata
 
     # make speclib
     lyrV = QgsVectorLayer(enmapboxtestdata.landcover_points)
@@ -109,7 +109,7 @@ def test_boxSpeclib():
 
 def test_raster():
     from sklearn.ensemble import RandomForestClassifier
-    import enmapboxtestdata
+    from tests import enmapboxtestdata
 
     # make classification
     qgsVectorLayer = QgsVectorLayer(enmapboxtestdata.landcover_polygons)

@@ -1,0 +1,1 @@
+# EnMAP-Box on OSGeo4W installations (Windows only) 

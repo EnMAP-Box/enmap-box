@@ -18,6 +18,7 @@ from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessing
 class SpectralResamplingByWavelengthAndFwhmAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Spectral raster layer'
     P_RESPONSE_FILE, _RESPONSE_FILE = 'responseFile', 'File with wavelength and FWHM'
+    P_FWHM, _FWHM = 'fwhm', 'FWHM'
     P_OUTPUT_LIBRARY, _OUTPUT_LIBRARY = 'outputResponseFunctionLibrary', 'Output spectral response function library'
     P_OUTPUT_RASTER, _OUTPUT_RASTER = 'outputResampledRaster', 'Output raster layer'
 
@@ -35,6 +36,8 @@ class SpectralResamplingByWavelengthAndFwhmAlgorithm(EnMAPProcessingAlgorithm):
              'A file with center wavelength and FWHM information defining the destination sensor. '
              'Possible inputs are i) raster files, ii) ENVI Spectral Library files, iii) ENVI Header files, '
              'and iv) CSV table files with wavelength and fwhm columns.'),
+            (self._FWHM,
+             'Specify a FWHM value used for each band. This overwrites FWHM values read from file'),
             (self._OUTPUT_LIBRARY, self.GeoJsonFileDestination),
             (self._OUTPUT_RASTER, self.RasterFileDestination)
         ]
@@ -45,6 +48,7 @@ class SpectralResamplingByWavelengthAndFwhmAlgorithm(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
         self.addParameterFile(self.P_RESPONSE_FILE, self._RESPONSE_FILE)
+        self.addParameterFloat(self.P_FWHM, self._FWHM, None, True, 0, None, True)
         self.addParameterFileDestination(
             self.P_OUTPUT_LIBRARY, self._OUTPUT_LIBRARY, self.GeoJsonFileFilter, None, True, True
         )
@@ -55,6 +59,7 @@ class SpectralResamplingByWavelengthAndFwhmAlgorithm(EnMAPProcessingAlgorithm):
     ) -> Dict[str, Any]:
         raster = self.parameterAsSpectralRasterLayer(parameters, self.P_RASTER, context)
         responseFile = self.parameterAsFile(parameters, self.P_RESPONSE_FILE, context)
+        fwhmValue = self.parameterAsFloat(parameters, self.P_FWHM, context)
         filenameSrf = self.parameterAsFileOutput(parameters, self.P_OUTPUT_LIBRARY, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_RASTER, context)
 
@@ -69,7 +74,10 @@ class SpectralResamplingByWavelengthAndFwhmAlgorithm(EnMAPProcessingAlgorithm):
                 srcUnits = metadata['wavelength units']
                 f = Utils().wavelengthUnitsConversionFactor(srcUnits, 'nanometers')
                 wavelengths = [f * float(v) for v in metadata['wavelength']]
-                fwhms = [f * float(v) for v in metadata['fwhm']]
+                if fwhmValue is None:
+                    fwhms = [f * float(v) for v in metadata['fwhm']]
+                else:
+                    fwhms = [fwhmValue] * len(wavelengths)
             elif splitext(responseFile)[1].lower() == '.csv':
                 # handle CSV with wavelength and fwhm case
                 array = np.loadtxt(responseFile, delimiter=",", dtype=str)
@@ -79,13 +87,19 @@ class SpectralResamplingByWavelengthAndFwhmAlgorithm(EnMAPProcessingAlgorithm):
                 if array[0, 1] != 'fwhm':
                     raise QgsProcessingException(f'second column is expected to be named "fwhm", found "{array[0, 1]}"')
                 wavelengths = list(map(float, array[1:, 0].tolist()))
-                fwhms = list(map(float, array[1:, 1].tolist()))
+                if fwhmValue is None:
+                    fwhms = list(map(float, array[1:, 1].tolist()))
+                else:
+                    fwhms = [fwhmValue] * len(wavelengths)
             else:
                 try:
                     # handle raster case
                     reader = RasterReader(responseFile)
                     wavelengths = [reader.wavelength(bandNo) for bandNo in reader.bandNumbers()]
-                    fwhms = [reader.fwhm(bandNo) for bandNo in reader.bandNumbers()]
+                    if fwhmValue is None:
+                        fwhms = [reader.fwhm(bandNo) for bandNo in reader.bandNumbers()]
+                    else:
+                        fwhms = [fwhmValue] * len(wavelengths)
                 except RuntimeError as error:
                     # handle ENVI Speclib case
                     if "GDAL does not support 'ENVI Spectral Library' type files." in str(error):
@@ -93,7 +107,10 @@ class SpectralResamplingByWavelengthAndFwhmAlgorithm(EnMAPProcessingAlgorithm):
                         srcUnits = metadata['wavelength units']
                         f = Utils().wavelengthUnitsConversionFactor(srcUnits, 'nanometers')
                         wavelengths = [f * w for w in metadata['wavelength']]
-                        fwhms = [f * w for w in metadata['fwhm']]
+                        if fwhmValue is None:
+                            fwhms = [f * w for w in metadata['fwhm']]
+                        else:
+                            fwhms = [fwhmValue] * len(wavelengths)
                     else:
                         raise ValueError(f'{responseFile} not supported')
 

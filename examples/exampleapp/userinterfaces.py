@@ -40,7 +40,7 @@ class ExampleGUI(QDialog):
         # Set up the user interface from Designer.
         # After setupUI you can access any designer object by doing
         # self.<objectname>, and you can use autoconnect slots - see
-        # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
+        # https://doc.qt.io/qt-5/designer-using-a-ui-file-python.html
         # #widgets-and-dialogs-with-auto-connect
 
         # Important!!!!!!!!! this will initiate all the QWidgets etc. specified in the *.ui file

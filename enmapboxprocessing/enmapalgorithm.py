@@ -54,6 +54,9 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     GeoJsonFileFilter = 'GEOJSON files (*.geojson)'
     GeoJsonFileExtension = 'geojson'
     GeoJsonFileDestination = 'GEOJSON file destination.'
+    CsvFileFilter = 'CSV files (*.csv)'
+    CsvFileExtension = 'cvs'
+    CsvFileDestination = 'CSV file destination.'
     DatasetFileFilter = PickleFileFilter + ';;' + JsonFileFilter
     DatasetFileDestination = 'Dataset file destination.'
     RasterFileDestination = 'Raster file destination.'
@@ -975,12 +978,12 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def flagParameterAsAdvanced(self, name: str, advanced: bool):
         if advanced:
             p = self.parameterDefinition(name)
-            p.setFlags(int(p.flags()) | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
+            p.setFlags(p.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
 
     def flagParameterAsHidden(self, name: str, hidden: bool):
         if hidden:
             p = self.parameterDefinition(name)
-            p.setFlags(int(p.flags()) | QgsProcessingParameterDefinition.Flag.FlagHidden)
+            p.setFlags(p.flags() | QgsProcessingParameterDefinition.Flag.FlagHidden)
 
     def createLoggingFeedback(
             cls, feedback: QgsProcessingFeedback, logfile: TextIO
@@ -1045,7 +1048,7 @@ class Group(Enum):
 
 
 class CookbookUrls(object):
-    URL = r'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_cookbook'
+    URL = r'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_cookbook/usr_cookbook.html'
     URL_CLASSIFICATION = ('Classification', URL + '/classification.html')
     URL_REGRESSION = ('Regression', URL + '/regression.html')
     URL_CLUSTERING = ('Clustering', URL + '/clustering.html')

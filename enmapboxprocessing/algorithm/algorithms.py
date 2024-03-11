@@ -1,8 +1,8 @@
 from enmapboxprocessing.algorithm.aggregaterasterbandsalgorithm import AggregateRasterBandsAlgorithm
 from enmapboxprocessing.algorithm.applymaskalgorithm import ApplyMaskAlgorithm
 from enmapboxprocessing.algorithm.build3dcubealgorithm import Build3dCubeAlgorithm
-from enmapboxprocessing.algorithm.classfractionfromcategorizedvectoralgorithm import \
-    ClassFractionFromCategorizedVectorAlgorithm
+from enmapboxprocessing.algorithm.classfractionfromcategorizedlayeralgorithm import \
+    ClassFractionFromCategorizedLayerAlgorithm
 from enmapboxprocessing.algorithm.classificationfromclassprobabilityalgorithm import \
     ClassificationFromClassProbabilityAlgorithm
 from enmapboxprocessing.algorithm.classificationfromrenderedimagealgorithm import \
@@ -25,6 +25,7 @@ from enmapboxprocessing.algorithm.creatergbimagefromclassprobabilityalgorithm im
     CreateRgbImageFromClassProbabilityAlgorithm
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.algorithm.editrastersourcebandpropertiesalgorithm import EditRasterSourceBandPropertiesAlgorithm
+from enmapboxprocessing.algorithm.exportdatasettofilesalgorithm import ExportDatasetToFilesAlgorithm
 from enmapboxprocessing.algorithm.featureclusteringhierarchicalalgorithm import FeatureClusteringHierarchicalAlgorithm
 from enmapboxprocessing.algorithm.fitaffinitypropagationalgorithm import FitAffinityPropagationAlgorithm
 from enmapboxprocessing.algorithm.fitbirchalgorithm import FitBirchAlgorithm
@@ -141,6 +142,7 @@ from enmapboxprocessing.algorithm.randomsamplesfromclassificationdatasetalgorith
     RandomSamplesFromClassificationDatasetAlgorithm
 from enmapboxprocessing.algorithm.randomsamplesfromregressiondatasetalgorithm import \
     RandomSamplesFromRegressionDatasetAlgorithm
+from enmapboxprocessing.algorithm.rasterboundingpolygonalgorithm import RasterBoundingPolygonAlgorithm
 from enmapboxprocessing.algorithm.rasterizecategorizedvectoralgorithm import RasterizeCategorizedVectorAlgorithm
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.algorithm.rasterlayerzonalaggregationalgorithm import RasterLayerZonalAggregationAlgorithm
@@ -238,7 +240,7 @@ def algorithms():
         AggregateRasterBandsAlgorithm(),
         ApplyMaskAlgorithm(),
         Build3dCubeAlgorithm(),
-        ClassFractionFromCategorizedVectorAlgorithm(),
+        ClassFractionFromCategorizedLayerAlgorithm(),
         CreateSpectralIndicesAlgorithm(),
         ClassificationFromClassProbabilityAlgorithm(),
         ClassificationFromRenderedImageAlgorithm(),
@@ -254,6 +256,7 @@ def algorithms():
         CreateMaskAlgorithm(),
         CreateRgbImageFromClassProbabilityAlgorithm(),
         EditRasterSourceBandPropertiesAlgorithm(),
+        ExportDatasetToFilesAlgorithm(),
         FitGaussianProcessClassifierAlgorithm(),
         FitGenericClassifierAlgorithm(),
         FitGenericRegressorAlgorithm(),
@@ -346,6 +349,7 @@ def algorithms():
         RasterizeCategorizedVectorAlgorithm(),
         RasterizeVectorAlgorithm(),
         RasterLayerZonalAggregationAlgorithm(),
+        RasterBoundingPolygonAlgorithm(),
         RasterMathAlgorithm(),
         ReclassifyRasterAlgorithm(),
         RegressionBasedUnmixingAlgorithm(),

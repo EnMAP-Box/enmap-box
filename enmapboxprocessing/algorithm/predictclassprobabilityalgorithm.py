@@ -118,6 +118,7 @@ class PredictClassPropabilityAlgorithm(EnMAPProcessingAlgorithm):
             for bandNo, c in enumerate(dump.categories, 1):
                 writer.setBandName(c.name, bandNo)
             writer.setNoDataValue(-1)
+            writer.close()
 
             result = {self.P_OUTPUT_PROBABILITY: filename}
             self.toc(feedback, result)

@@ -21,6 +21,7 @@ import re
 import time
 import typing
 import uuid
+from os.path import basename, dirname
 from typing import Optional, List, Dict
 
 from enmapbox import debugLog
@@ -41,6 +42,7 @@ from enmapbox.qgispluginsupport.qps.layerproperties import pasteStyleFromClipboa
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library, profile_field_list
 from enmapbox.qgispluginsupport.qps.utils import loadUi
 from enmapbox.typeguard import typechecked
+from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtCore import Qt, QMimeData, QModelIndex, QObject, QTimer, pyqtSignal, QEvent, \
     QSortFilterProxyModel, QCoreApplication
 from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDropEvent, QDragLeaveEvent
@@ -1620,7 +1622,13 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         action.triggered.connect((lambda: self.onCopyLayerToQgisClicked(lyr)))
 
         action = menu.addAction('Save as...')
+        action.setIcon(QIcon(':/images/themes/default/mActionFileSaveAs.svg'))
         action.triggered.connect(lambda *args, _lyr=lyr: self.onSaveAs(_lyr))
+
+        if self.auxIsImpermanentLayer(lyr):
+            action = menu.addAction('Make Permanent...')
+            action.setIcon(QIcon(':/images/themes/default/mActionFileSave.svg'))
+            action.triggered.connect((lambda *args, _lyr=lyr: self.onMakePermanent(_lyr)))
 
     def addVectorLayerMenuItems(self, node: QgsLayerTreeLayer, menu: QMenu):
         """
@@ -1636,7 +1644,6 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         action.alg = SaveLibraryAsGeoJsonAlgorithm()
         action.parameters = {action.alg.P_LIBRARY: lyr}
         action.triggered.connect(self.onRunProcessingAlgorithmClicked)
-
         menu.addSeparator()
 
         action = menu.addAction('Open Attribute Table')
@@ -1850,6 +1857,50 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
             parameters = dict(INPUT=layer)
             dlg = emb.showProcessingAlgorithmDialog('native:savefeatures', parameters, parent=None)
 
+    def auxIsImpermanentLayer(self, layer: QgsMapLayer):
+
+        if layer.source().startswith('/vsimem/'):  # GDAL VSIMEM
+            return True
+        if layer.providerType() == 'memory':  # QGIS temporary scratch layer
+            return True
+        if basename(dirname(dirname(layer.source()))).startswith('processing_'):  # QGIS Processing temp output
+            return True
+        return False
+
+    def onMakePermanent(self, layer: QgsMapLayer):
+        """
+        Saves vector / raster layers
+        """
+        from enmapbox.gui.enmapboxgui import EnMAPBox
+        enmapBox: EnMAPBox = self.enmapboxInstance()
+        if enmapBox is None:
+            return
+
+        if isinstance(layer, QgsRasterLayer):
+            # We better use the EnMAP-Box algo, which will take care of metadata, instead of the QGIS dialog/algo.
+            from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
+            parameters = {SaveRasterAsAlgorithm.P_RASTER: layer}
+            dlg = enmapBox.showProcessingAlgorithmDialog(
+                SaveRasterAsAlgorithm(), parameters, modal=True, parent=None
+            )
+        elif isinstance(layer, QgsVectorLayer):
+            parameters = {'INPUT': layer}
+            dlg = enmapBox.showProcessingAlgorithmDialog(
+                'native:savefeatures', parameters, modal=True, parent=enmapBox.ui
+            )
+        else:
+            raise ValueError()
+
+        if len(list(dlg.results().values())) != 0:
+            filename = list(dlg.results().values())[0]
+            if isinstance(layer, QgsRasterLayer):
+                newLayer = QgsRasterLayer(filename)
+            elif isinstance(layer, QgsVectorLayer):
+                newLayer = QgsVectorLayer(filename)
+            else:
+                raise ValueError()
+            Utils().setLayerDataSource(layer, newLayer.dataProvider().name(), filename)
+
     def onZoomToLayer(self, lyr: QgsMapLayer, canvas: QgsMapCanvas):
         """
         Zooms a QgsMapCanvas to the extent of a QgsMapLayer
@@ -2035,8 +2086,10 @@ class DockPanelUI(QgsDockWidget):
     def onRasterLayerStylingToggled(self):
         from rasterlayerstylingapp import RasterLayerStylingApp
         panel = RasterLayerStylingApp.panel()
-        if panel is not None:
-            panel.setUserVisible(self.mRasterLayerStyling.isChecked())
+        if panel is None:
+            return
+
+        panel.setUserVisible(self.mRasterLayerStyling.isChecked())
         if panel.isUserVisible():
             from enmapbox.gui.enmapboxgui import EnMAPBox
             enmapBox = EnMAPBox.instance()

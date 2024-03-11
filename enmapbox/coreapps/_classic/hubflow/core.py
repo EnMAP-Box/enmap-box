@@ -884,7 +884,7 @@ class Raster(Map):
 
         :example:
 
-        >>> import enmapboxtestdata
+        >>> from tests import enmapboxtestdata
         >>> speclib = EnviSpectralLibrary(filename=enmapboxtestdata.speclib)
         >>> raster = Raster.fromEnviSpectralLibrary(filename='/vsimem/raster.bsq', library=speclib)
         >>> raster.shape()
@@ -910,7 +910,7 @@ class Raster(Map):
 
         :example:
 
-        >>> import enmapboxtestdata
+        >>> from tests import enmapboxtestdata
         >>> speclib = EnviSpectralLibrary(filename=enmapboxtestdata.library)
         >>> raster = Raster.fromAsdTxt(filename='/vsimem/raster.bsq', library=speclib)
         >>> raster.array().shape
@@ -1433,7 +1433,7 @@ class Raster(Map):
 
         :example:
 
-        >>> import enmapboxtestdata
+        >>> from tests import enmapboxtestdata
         >>> Raster(filename=enmapboxtestdata.enmap).metadataWavelength() # doctest: +ELLIPSIS
         [460.0, 465.0, 470.0, ..., 2393.0, 2401.0, 2409.0]
         '''
@@ -1457,7 +1457,7 @@ class Raster(Map):
 
         :example:
 
-        >>> import enmapboxtestdata
+        >>> from tests import enmapboxtestdata
         >>> Raster(filename=enmapboxtestdata.enmap).metadataFWHM() # doctest: +ELLIPSIS
         [5.8, 5.8, 5.8, ..., 9.1, 9.1, 9.1]
         '''
@@ -1843,7 +1843,7 @@ class WavebandDefinition(FlowObject):
 
         Calculate weights for resampling EnMAP sensor into Sentinel-2 band 3.
 
-        >>> import enmapboxtestdata
+        >>> from tests import enmapboxtestdata
         >>> enmapSensor = Raster(filename=enmapboxtestdata.enmap).sensorDefinition()
         >>> enmapSensor # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         SensorDefinition(wavebandDefinitions=[WavebandDefinition(center=460.0, fwhm=5.8, responses=[(452.0, 0.0051192261189367235), ..., (466.0, 0.051454981460462346)], name=None),
@@ -1960,7 +1960,7 @@ class SensorDefinition(FlowObject):
 
         Case 1 - Library contains spectra with wavelength and FWHM information (i.e. set ``isResponseFunction=False``)
 
-        >>> import enmapboxtestdata
+        >>> from tests import enmapboxtestdata
         >>> library = EnviSpectralLibrary(filename=enmapboxtestdata.speclib)
         >>> SensorDefinition.fromEnviSpectralLibrary(library=library, isResponseFunction=False) # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         SensorDefinition(wavebandDefinitions=[WavebandDefinition(center=460.0, fwhm=5.8, responses=[...], name=None),
@@ -2112,7 +2112,7 @@ class SensorDefinition(FlowObject):
 
         :example:
 
-        >>> import enmapboxtestdata
+        >>> from tests import enmapboxtestdata
         >>> sentinel2Sensor = SensorDefinition.fromPredefined(name='sentinel2')
         >>> enmapRaster = Raster(filename=enmapboxtestdata.enmap)
         >>> resampled = sentinel2Sensor.resampleRaster(filename='/vsimem/resampledLinear.bsq', raster=enmapRaster)
@@ -2154,8 +2154,7 @@ class SensorDefinition(FlowObject):
 
         :example:
 
-        >>> import pyqtgraph as pg
-        >>> import enmapboxtestdata
+        >>> from tests import enmapboxtestdata        >>> import pyqtgraph as pg
         >>> sentinel2Sensor = SensorDefinition.fromPredefined(name='sentinel2')
         >>> enmapRaster = Raster(filename=enmapboxtestdata.enmap)
         >>> enmapArray = enmapRaster.array().reshape((enmapRaster.shape()[0], -1)).T

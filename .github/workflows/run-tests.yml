@@ -5,11 +5,12 @@ on:
     branches:
       - main
       - release-**
+      - refactor_environments
       - release_**
 
   pull_request:
     branches:
-      - main
+      - '**'
       - release-**
       - release_**
 
@@ -47,6 +48,6 @@ jobs:
           pip list
       - name: Test EnMAP-Box on QGIS
         run: | 
-          chmod +x .docker/run_docker_tests.sh
-          ls -la .docker/
-          docker compose -f .docker/docker-compose.gh.yml run qgis /usr/src/.docker/run_docker_tests.sh -n auto
+          chmod +x .env/docker/run_docker_tests.sh
+          ls -la .env/docker
+          docker compose -f .env/docker/docker-compose.gh.yml run qgis /usr/src/.env/docker/run_docker_tests.sh -n auto

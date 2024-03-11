@@ -552,6 +552,10 @@ class DataSourceManagerTreeView(TreeView):
         """Open source in system file explorer."""
         import platform
         filename = dataSource.source()
+
+        # isolate filename; remove '|' options (see #678)
+        filename = filename.split('|')[0]
+
         if not exists(filename):
             return
 
