@@ -234,8 +234,12 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                     spectralBandList = [i + 1 for i in range(spectralRaster.bandCount())]
 
                 wavelength = np.array([reader.wavelength(bandNo) for bandNo in bandList])
-                bandList = [int(np.argmin(np.abs(wavelength - spectralReader.wavelength(bandNo))) + 1)
-                            for bandNo in spectralBandList]
+
+                bandList = list()
+                for targetBandNo in spectralBandList:
+                    targetWavelength = spectralReader.wavelength(targetBandNo)
+                    bandNo = int(np.argmin(np.abs(wavelength - targetWavelength)) + 1)
+                    bandList.append(bandNo)
 
             if bandList is None:
                 nBands = raster.bandCount()

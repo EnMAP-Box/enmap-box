@@ -3,11 +3,11 @@ from os.path import exists
 import numpy as np
 from osgeo import gdal
 
-from enmapboxtestdata import enmap, hires
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+from enmapboxtestdata import enmap, hires
 from enmapboxtestdata import water_mask_30m, enmap_grid_300m
 from qgis.core import QgsRectangle, QgsCoordinateReferenceSystem, QgsRasterLayer, QgsRasterRenderer, Qgis
 
