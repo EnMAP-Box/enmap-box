@@ -642,7 +642,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         if len([p for p in requiredPackages() if not p.isInstalled() and not p.skipStartupWarning()]) > 0:
             title = 'Missing Python Package(s)!'
 
-            a = QAction('Install missing')
+            a = QAction('Show missing')
             btn = QToolButton()
             btn.setStyleSheet("background-color: rgba(255, 255, 255, 0); color: black; text-decoration: underline;")
             btn.setCursor(Qt.PointingHandCursor)
