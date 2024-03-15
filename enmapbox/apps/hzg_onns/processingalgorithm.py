@@ -109,7 +109,7 @@ class OnnsProcessingAlgorithm(QgsProcessingAlgorithm):
        '<p>The algorithm requires input at 11 OLCI bands, namely remote-sensing reflectances at 400, 412.5, 442.5, ' \
        '490, 510, 560, 620, 665, 755, 777.5 and 865 nm. A spectral band-shifting procedure is implemented, which ' \
        'allows exploitation of atmospherically corrected input from other ocean colour missions too [' \
-       '<a href="https://www.osapublishing.org/oe/fulltext.cfm?uri=oe-27-12-A707&id=412341">Hieronymi, 2019</a>' \
+       '<a href="https://doi.org/10.1364/OE.27.00A707">Hieronymi, 2019</a>' \
        ']. In case of OLCI data, one has three options: no band-shifting or replacing reflectance input at only one ' \
        'or all spectral bands, e.g. in case of faulty atmospheric correction. In case of MERIS, options 2 and 3 are ' \
        'allowed. Complete band-shifting (option 3) must be applied for all other sensors. </p>' \
@@ -121,7 +121,7 @@ class OnnsProcessingAlgorithm(QgsProcessingAlgorithm):
        '"C2R" (Case-2 Regional, standard method for ONNS application) by [' \
        '<a href="https://www.brockmann-consult.de/wp-content/uploads/2017/11/sco1_12brockmann.pdf">Brockmann et al., 2016</a>' \
        '], "Polymer" by ['\
-       '<a href="https://www.osapublishing.org/oe/fulltext.cfm?uri=oe-19-10-9783&id=213648">Steinmetz et al., 2011</a>' \
+       '<a href="https://doi.org/10.1364/OE.19.009783">Steinmetz et al., 2011</a>' \
        '] and the standard Level-2 product "IPF". For the other sensors, only "Polymer" is usable. </p>' \
        '' \
        '<h3>Processor output size</h3>' \

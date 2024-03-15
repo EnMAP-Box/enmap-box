@@ -1,9 +1,10 @@
 mkdir test-reports
-mkdir test-reports\url-checks
-urlchecker check --file-types .rst,.md,.py --save test-reports\url-checks\docs.csv doc/source
-urlchecker check --file-types .rst,.md,.py --save test-reports\url-checks\enmapbox.csv --exclude-files .*\\pyqtgraph\\.* enmapbox
-urlchecker check --file-types .rst,.md,.py --save test-reports\url-checks\enmapboxgeoalgorithms.csv enmapboxgeoalgorithms
-urlchecker check --file-types .rst,.md,.py --save test-reports\url-checks\enmapboxprocessing.csv enmapboxprocessing
-urlchecker check --file-types .rst,.md,.py --save test-reports\url-checks\hubdc.csv hubdc
-urlchecker check --file-types .rst,.md,.py --save test-reports\url-checks\hubdsm.csv hubdsm
-urlchecker check --file-types .rst,.md,.py --save test-reports\url-checks\hubflow.csv hubflow
+urlchecker check ^
+    --retry-count 3 ^
+    --timeout 5 ^
+    --file-types .rst,.md,.py ^
+    --save test-reports\url-checks.csv ^
+    --exclude-files pyqtgraph ^
+    --exclude-urls https://bitbucket.org/hu-geomatics/enmap-box/issues//422,http://mrcc.com/qgis.dtd ^
+    --exclude-patterns type=xyz,%7Bx%7D,%7Bz%7D,%7zmin=,strict.dtd\,wfs/geometry/senstadt ^
+    enmapbox

@@ -110,7 +110,8 @@ class TestObjects(TestObjects):
 
     @staticmethod
     def uriWFS() -> str:
-        return r'restrictToRequestBBOX=''1'' srsname=''EPSG:25833'' typename=''fis:re_postleit'' url=''http://fbinter.stadt-berlin.de/fb/wfs/geometry/senstadt/re_postleit'' version=''auto'''
+        raise NotImplementedError()
+        return r'restrictToRequestBBOX=''1'' srsname=''EPSG:25833'' typename=''fis:re_postleit'' url=''https://fbinter.stadt-berlin.de/fb/wfs/geometry/senstadt/re_postleit'' version=''auto'''
 
     @staticmethod
     def enmapboxApplication():

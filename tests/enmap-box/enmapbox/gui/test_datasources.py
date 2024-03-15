@@ -32,9 +32,6 @@ from enmapboxtestdata import classifierDumpPkl, library_berlin, enmap_srf_librar
 
 
 class DataSourceTests(EnMAPBoxTestCase):
-    wmsUri = r'crs=EPSG:3857&format&type=xyz&url=https://mt1.google.com/vt/lyrs%3Ds%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D&zmax=19&zmin=0'
-    wmsUri = 'referer=OpenStreetMap%20contributors,%20under%20ODbL&type=xyz&url=http://tiles.wmflabs.org/hikebike/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=17&zmin=1'
-    wfsUri = r'restrictToRequestBBOX=''1'' srsname=''EPSG:25833'' typename=''fis:re_postleit'' url=''http://fbinter.stadt-berlin.de/fb/wfs/geometry/senstadt/re_postleit'' version=''auto'''
 
     def test_rasterVersioning(self):
 
@@ -83,11 +80,6 @@ class DataSourceTests(EnMAPBoxTestCase):
 
         # return [library, self.wfsUri, self.wmsUri, enmap, landcover_polygons]
         return [library_berlin, enmap, landcover_polygon]
-
-    def createOGCSources(self) -> list:
-        # todo: add WCS
-
-        return [self.wfsUri, self.wmsUri]
 
     def createTestSourceLayers(self) -> list:
 

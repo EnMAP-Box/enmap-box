@@ -4356,8 +4356,7 @@ class Regression(Raster):
         return Regression(filename=filename)
 
     def ordinationFeilhauerEtAl2014(self, filename, filenameVector, n_components, noDataValue=None):
-        # see https://www.researchgate.net/publication/263012689_Mapping_the_local_variability_of_Natura_2000_habitats_with_remote_sensing
-        #     http://dx.doi.org/10.1111/avsc.12115
+        # see https://dx.doi.org/10.1111/avsc.12115
 
         from sklearn.neighbors import DistanceMetric
         from sklearn.manifold import MDS
