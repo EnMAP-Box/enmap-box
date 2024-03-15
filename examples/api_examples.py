@@ -66,7 +66,7 @@ class Examples(unittest.TestCase):
         # add some data sources
         from enmapbox.exampledata import enmap as pathRasterSource
         from enmapbox.exampledata import landcover_polygon as pathVectorSource
-        from enmapbox.exampledata import library_sli as pathSpectralLibrary
+        from enmapbox.exampledata import enmap_srf as pathSpectralLibrary
 
         # add a single source
         enmapBox.addSource(pathRasterSource)
@@ -76,9 +76,7 @@ class Examples(unittest.TestCase):
 
         # add some Web Services
         wmsUri = 'referer=OpenStreetMap%20contributors,%20under%20ODbL&type=xyz&url=http://tiles.wmflabs.org/hikebike/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=17&zmin=1'
-        wfsUri = r'restrictToRequestBBOX=''1'' srsname=''EPSG:25833'' typename=''fis:re_postleit'' url=''http://fbinter.stadt-berlin.de/fb/wfs/geometry/senstadt/re_postleit'' version=''auto'''
         enmapBox.addSource(wmsUri, name="Open Street Map")
-        enmapBox.addSource(wfsUri, name='Berlin PLZ')
 
         # be informed over new data sources
         def onDataSourceAdded(dataSource: str):
