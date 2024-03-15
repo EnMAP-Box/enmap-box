@@ -15,7 +15,6 @@ from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
-
 from qgis.core import QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform, \
     QgsProject, QgsVectorLayer, QgsGeometry, Qgis, QgsRectangle
 
@@ -60,7 +59,7 @@ def prepareSpectralImages():
                 alg = ImportEnmapL2AAlgorithm()
                 parameters = {
                     alg.P_FILE: xmlFilename,
-                    alg.P_SET_BAD_BANDS: True,
+                    alg.P_SET_BAD_BANDS: False,
                     alg.P_EXCLUDE_BAD_BANDS: False,
                     alg.P_DETECTOR_OVERLAP: alg.OrderByWavelengthOverlapOption,
                     alg.P_OUTPUT_RASTER: xmlFilename.replace('METADATA.XML', 'SPECTRAL_IMAGE_FULL.vrt'),
@@ -220,4 +219,3 @@ def auxDeriveSceneBoundingPolygon(xmlFilename) -> QgsGeometry:
 prepareSpectralImages()
 copyMetadataXml()
 ingestData()
-print('done')
