@@ -13,7 +13,6 @@ __date__ = '2017-07-17'
 __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
 import unittest
-from qgis.core import QgsRasterLayer, QgsMapLayer, QgsVectorLayer
 from qgis.gui import QgsMapCanvas
 from qgis.core import QgsMapLayerStore
 
@@ -25,20 +24,7 @@ from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 
 class CursorLocationTest(EnMAPBoxTestCase):
 
-    def webLayers(self) -> list:
-
-        if not self.runsInCI():
-            layers = [QgsRasterLayer(TestObjects.uriWMS(), 'OSM', 'wms'),
-                      QgsVectorLayer(TestObjects.uriWFS(), 'Berlin', 'WFS')]
-        else:
-            layers = [TestObjects.createRasterLayer(), TestObjects.createVectorLayer()]
-        for lyr in layers:
-            self.assertIsInstance(lyr, QgsMapLayer)
-            self.assertTrue(lyr.isValid())
-        return layers
-
     def test_layertest(self):
-
         canvas = QgsMapCanvas()
 
         # layers = self.webLayers()

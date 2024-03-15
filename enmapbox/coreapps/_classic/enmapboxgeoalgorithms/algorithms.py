@@ -2193,7 +2193,7 @@ class ExtractOrdinationFeilhauerEtAll2014(EnMAPAlgorithm):
 
     def description(self):
         return 'Extract a regression samples where the regression labels are ordinated. See {} for details.'.format(
-            r'http://dx.doi.org/10.1111/avsc.12115')
+            r'https://dx.doi.org/10.1111/avsc.12115')
 
     def group(self): return self.GROUP_CREATE_SAMPLE
 

@@ -35,7 +35,6 @@ from qgis.gui import QgsMapCanvas, QgsLayerTreeView
 class TestDocksAndDataSources(EnMAPBoxTestCase):
     wmsUri = r'crs=EPSG:3857&format&type=xyz&url=https://mt1.google.com/vt/lyrs%3Ds%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D&zmax=19&zmin=0'
     wmsUri = 'referer=OpenStreetMap%20contributors,%20under%20ODbL&type=xyz&url=http://tiles.wmflabs.org/hikebike/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=17&zmin=1'
-    wfsUri = r'restrictToRequestBBOX=''1'' srsname=''EPSG:25833'' typename=''fis:re_postleit'' url=''http://fbinter.stadt-berlin.de/fb/wfs/geometry/senstadt/re_postleit'' version=''auto'''
 
     def test_dataSourceManager(self):
 
@@ -76,14 +75,6 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         self.assertTrue(len(sources) == 2)
         self.assertIsInstance(sources[0], VectorDataSource)
         self.assertIs(sources[0], signalArgs[1])
-
-        lyrWFS = QgsVectorLayer(TestObjects.uriWFS(), 'WFS', 'WFS')
-        if lyrWFS.isValid():
-            for o in [lyrWFS]:
-                sources = DSM.addDataSources(o)
-                self.assertEqual(len(sources), 1)
-                self.assertIsInstance(sources[0], VectorDataSource)
-                DSM.removeDataSources(sources)
 
         lyrWMS = QgsRasterLayer(TestObjects.uriWMS(), 'WMS', 'wms')
         if lyrWMS.isValid():
