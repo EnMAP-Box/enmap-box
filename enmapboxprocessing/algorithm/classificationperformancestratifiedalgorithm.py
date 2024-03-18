@@ -59,22 +59,27 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
             categoriesReference = Utils.categoriesFromPalettedRasterRenderer(reference.renderer())
         else:
             assert 0
-        categoriesPrediction = Utils.categoriesFromPalettedRasterRenderer(classification.renderer())
+        categoriesPrediction = Utils().categoriesFromRenderer(classification.renderer(), classification)
+        if len(categoriesReference) == len(categoriesPrediction):
+            return True, ''  # if the number of categories is equal, we can at leased match by name (see #845)
         for cR in categoriesReference:
+            found = False
             for cP in categoriesPrediction:
                 if cR.name == cP.name:
-                    return True, ''  # good, we found the reference class
-            return False, f'Observed category "{cR.name}" not found in predicted categories.'
+                    found = True  # good, we found the reference class
+            if not found:
+                return False, f'Observed category "{cR.name}" not found in predicted categories.'
         for cP in categoriesPrediction:
+            found = False
             for cR in categoriesReference:
                 if cR.name == cP.name:
-                    return True, ''  # good, we found the map class
-            return False, f'Predicted category "{cP.name}" not found in observed categories.'
+                    found = True  # good, we found the map class
+            if not found:
+                return False, f'Predicted category "{cP.name}" not found in observed categories.'
         return False, 'Empty category list.'
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
         checks = [
-            self.checkParameterRasterClassification(parameters, self.P_CLASSIFICATION, context),
             self.checkParameterMapClassification(parameters, self.P_REFERENCE, context),
             self.checkParameterRasterClassification(parameters, self.P_STRATIFICATION, context),
         ]
@@ -152,7 +157,7 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
             arrayReference = RasterReader(reference).array()[0]
             categoriesReference = Utils.categoriesFromPalettedRasterRenderer(reference.renderer())
             arrayPrediction = RasterReader(classification).array()[0]
-            categoriesPrediction = Utils.categoriesFromPalettedRasterRenderer(classification.renderer())
+            categoriesPrediction = Utils().categoriesFromRenderer(classification.renderer(), classification)
             arrayStratification = RasterReader(stratification).array()[0]
             categoriesStratification = Utils.categoriesFromPalettedRasterRenderer(stratification.renderer())
             # - get valid reference location
@@ -162,11 +167,18 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
             yReference = arrayReference[valid].astype(np.float32)
             yMap = arrayPrediction[valid].astype(np.float32)
             # - remap class ids by name
-            yMapRemapped = np.zeros_like(yMap)
-            for cP in categoriesPrediction:
+            yMapRemapped = yMap.copy()  # this initial state is correct for matching by order (see #845)
+            for i, cP in enumerate(categoriesPrediction):
+                found = False
                 for cR in categoriesReference:
                     if cR.name == cP.name:
                         yMapRemapped[yMap == cP.value] = cR.value
+                        found = True
+                if not found:
+                    feedback.pushWarning(
+                        f'predicted class "{categoriesPrediction[i].name}" not found in reference classes, '
+                        f'and will be matched by order to class "".'
+                    )
             yMap = yMapRemapped
             # - prepare strata
             stratum = arrayStratification[valid]

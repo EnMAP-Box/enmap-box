@@ -326,11 +326,14 @@ class Utils(object):
         return categories
 
     @classmethod
-    def categoriesFromRenderer(cls, renderer: Union[QgsFeatureRenderer, QgsRasterRenderer]) -> Optional[Categories]:
+    def categoriesFromRenderer(cls, renderer: Union[QgsFeatureRenderer, QgsRasterRenderer],
+                               layer: QgsMapLayer = None) -> Optional[Categories]:
         if isinstance(renderer, QgsPalettedRasterRenderer):
             return Utils.categoriesFromPalettedRasterRenderer(renderer)
         if isinstance(renderer, QgsCategorizedSymbolRenderer):
             return Utils.categoriesFromCategorizedSymbolRenderer(renderer)
+        if isinstance(renderer, QgsSingleBandGrayRenderer):
+            return Utils.categoriesFromRasterBand(layer, renderer.grayBand())
 
     @classmethod
     def categoriesFromRasterBand(cls, raster: QgsRasterLayer, bandNo: int) -> Categories:
