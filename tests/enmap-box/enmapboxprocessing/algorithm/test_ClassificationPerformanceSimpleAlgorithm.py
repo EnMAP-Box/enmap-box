@@ -1,11 +1,13 @@
 from math import isnan
 
-from enmapboxtestdata import landcover_polygon
 from enmapboxprocessing.algorithm.classificationperformancesimplealgorithm import \
     ClassificationPerformanceSimpleAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
+from enmapboxprocessing.driver import Driver
+from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import landcover_map_l3
+from enmapboxtestdata import landcover_polygon
 
 writeToDisk = True
 
@@ -33,6 +35,26 @@ class TestClassificationPerformanceSimpleAlgorithm(TestCase):
             alg.P_OUTPUT_REPORT: self.filename('report_perfectMap.html'),
         }
         result = self.runalg(alg, parameters)
+        stats = Utils.jsonLoad(result[alg.P_OUTPUT_REPORT] + '.json')
+        for v in stats['producers_accuracy_se'] + stats['users_accuracy_se']:
+            self.assertFalse(isnan(v))  # previously we had NaN values, so better check this
+
+    def test_nonMatchingCategoryNames(self):
+        reader = RasterReader(landcover_map_l3)
+        writer = Driver(self.filename('copy')).createFromArray(reader.array(), reader.extent(), reader.crs())
+        writer.close()
+
+        alg = ClassificationPerformanceSimpleAlgorithm()
+        alg.initAlgorithm()
+        parameters = {
+            alg.P_CLASSIFICATION: self.filename('copy'),
+            alg.P_REFERENCE: landcover_map_l3,
+            alg.P_OPEN_REPORT: self.openReport,
+            alg.P_OUTPUT_REPORT: self.filename('report.html'),
+        }
+
+        result = self.runalg(alg, parameters)
+        return
         stats = Utils.jsonLoad(result[alg.P_OUTPUT_REPORT] + '.json')
         for v in stats['producers_accuracy_se'] + stats['users_accuracy_se']:
             self.assertFalse(isnan(v))  # previously we had NaN values, so better check this
