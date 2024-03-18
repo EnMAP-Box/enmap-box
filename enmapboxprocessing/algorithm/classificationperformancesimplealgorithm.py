@@ -28,7 +28,8 @@ class ClassificationPerformanceSimpleAlgorithm(EnMAPProcessingAlgorithm):
                'Stehman (2014): https://doi.org/10.1080/01431161.2014.930207. ' \
                'Note that (simple) random sampling is a special case of stratified random sampling, ' \
                'with exactly one stratum. \n' \
-               'Observed and predicted categories are matched by name.'
+               'Observed and predicted categories are matched by name, if possible. ' \
+               'Otherwise, categories are matched by order (in this case, a warning message is logged).'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
