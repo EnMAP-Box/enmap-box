@@ -122,9 +122,12 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         if layer is None:
             return None
 
-        # if layer is given by URI string or renderer is undefined, we need to manually load the default style
-        if isinstance(parameters.get(name), str) or layer.renderer() is None:
-            layer.loadDefaultStyle()
+        # if layer is given by string (but not by layer ID), ...
+        if isinstance(parameters.get(name), str) and parameters.get(name) not in QgsProject.instance().mapLayers():
+            layer.loadDefaultStyle()  # ... we need to manually load the default style
+
+        if layer.renderer() is None:  # if we still have no valid renderer...
+            layer.loadDefaultStyle()  # ... we also load the dafault style
 
         return layer
 
