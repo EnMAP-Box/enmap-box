@@ -1,5 +1,6 @@
 import inspect
 import traceback
+from io import StringIO
 from typing import Dict, Any, List, Tuple
 
 from enmapbox.typeguard import typechecked
@@ -95,8 +96,14 @@ class FitClassifierAlgorithmBase(EnMAPProcessingAlgorithm):
                 feedback.pushInfo(
                     f'Load training dataset: X=array{list(dump.X.shape)} y=array{list(dump.y.shape)} categories={[c.name for c in dump.categories]}')
                 feedback.pushInfo('Fit classifier')
-                classifier.fit(dump.X, dump.y.ravel())
+
+                try:
+                    classifier.fit(dump.X, dump.y.ravel(), log_cout=StringIO(), log_cerr=StringIO())  # fixes issue #790
+                except TypeError:
+                    classifier.fit(dump.X, dump.y.ravel())
+
             else:
+
                 feedback.pushInfo('Store unfitted classifier')
                 dump = ClassifierDump(None, None, None, None, classifier)
 
