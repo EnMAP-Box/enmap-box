@@ -99,7 +99,7 @@ class FitClassifierAlgorithmBase(EnMAPProcessingAlgorithm):
 
                 try:
                     classifier.fit(dump.X, dump.y.ravel(), log_cout=StringIO(), log_cerr=StringIO())  # fixes issue #790
-                except TypeError:
+                except Exception:
                     classifier.fit(dump.X, dump.y.ravel())
 
             else:
