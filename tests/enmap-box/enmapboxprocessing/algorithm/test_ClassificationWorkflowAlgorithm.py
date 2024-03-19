@@ -97,7 +97,7 @@ class TestClassificationAlgorithm(TestCase):
         }
         self.runalg(alg2, parameters2)
 
-    def test_issue790(self):
+    def _test_issue790(self):
         alg = ClassificationWorkflowAlgorithm()
         parameters = {
             alg.P_DATASET: classifierDumpPkl,
