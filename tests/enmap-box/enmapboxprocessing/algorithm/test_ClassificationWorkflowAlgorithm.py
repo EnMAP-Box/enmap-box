@@ -1,12 +1,13 @@
 from sklearn.base import ClassifierMixin
 
+from enmapboxprocessing.algorithm.classificationworkflowalgorithm import ClassificationWorkflowAlgorithm
+from enmapboxprocessing.algorithm.fitcatboostclassifieralgorithm import FitCatBoostClassifierAlgorithm
+from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedvectoralgorithm import \
     PrepareClassificationDatasetFromCategorizedVectorAlgorithm
-from enmapboxtestdata import enmap, landcover_potsdam_point, enmap_potsdam
-from enmapboxprocessing.algorithm.classificationworkflowalgorithm import ClassificationWorkflowAlgorithm
-from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import classifierDumpPkl
+from enmapboxtestdata import enmap, landcover_potsdam_point, enmap_potsdam
 
 
 class FitTestClassifierAlgorithm(FitClassifierAlgorithmBase):
@@ -53,7 +54,6 @@ class TestClassificationAlgorithm(TestCase):
         self.runalg(alg, parameters)
 
     def test_badBandsHandling_withNameMatching(self):
-
         alg1 = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
         parameters1 = {
             alg1.P_CATEGORIZED_VECTOR: landcover_potsdam_point,
@@ -76,7 +76,6 @@ class TestClassificationAlgorithm(TestCase):
         self.runalg(alg2, parameters2)
 
     def test_badBandsHandling_withoutNameMatching(self):
-
         alg1 = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
         parameters1 = {
             alg1.P_CATEGORIZED_VECTOR: landcover_potsdam_point,
@@ -97,3 +96,15 @@ class TestClassificationAlgorithm(TestCase):
             alg2.P_OUTPUT_PROBABILITY: self.filename('probability.tif')
         }
         self.runalg(alg2, parameters2)
+
+    def _test_issue790(self):
+        alg = ClassificationWorkflowAlgorithm()
+        parameters = {
+            alg.P_DATASET: classifierDumpPkl,
+            alg.P_CLASSIFIER: FitCatBoostClassifierAlgorithm().defaultCodeAsString(),
+            alg.P_RASTER: enmap,
+            alg.P_OPEN_REPORT: self.openReport,
+            alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl'),
+            alg.P_OUTPUT_CLASSIFICATION: self.filename('classification.tif'),
+        }
+        self.runalg(alg, parameters)
