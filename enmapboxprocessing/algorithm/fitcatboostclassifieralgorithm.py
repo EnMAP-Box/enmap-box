@@ -28,16 +28,12 @@ class FitCatBoostClassifierAlgorithm(FitClassifierAlgorithmBase):
 
 # monkey patch for issue #790
 try:
-    from catboost.core import _StreamLikeWrapper
     import catboost.core
 
-    def _get_stream_like_object_FIXED(obj):
-        if hasattr(obj, 'write'):
-            return obj
-        if hasattr(obj, '__call__'):
-            return _StreamLikeWrapper(obj)
+    stringIO = StringIO()
 
-        return StringIO()
+    def _get_stream_like_object_FIXED(obj):
+        return stringIO
 
     catboost.core._get_stream_like_object = _get_stream_like_object_FIXED
 except Exception:

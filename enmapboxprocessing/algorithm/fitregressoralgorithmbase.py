@@ -1,5 +1,6 @@
 import inspect
 import traceback
+from io import StringIO
 from typing import Dict, Any, List, Tuple
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
@@ -84,10 +85,17 @@ class FitRegressorAlgorithmBase(EnMAPProcessingAlgorithm):
                     f'Load training dataset: X=array{list(dump.X.shape)} y=array{list(dump.y.shape)} '
                     f'targets={[c.name for c in dump.targets]}')
                 feedback.pushInfo('Fit regressor')
+
                 if dump.y.shape[1] == 1:
-                    regressor.fit(dump.X, dump.y.ravel())
+                    dumpY = dump.y.ravel()
                 else:
-                    regressor.fit(dump.X, dump.y)
+                    dumpY = dump.y
+
+                try:
+                    regressor.fit(dump.X, dumpY, log_cout=StringIO(), log_cerr=StringIO())  # fixes issue #790
+                except Exception:
+                    regressor.fit(dump.X, dumpY)
+
             else:
                 feedback.pushInfo('Store unfitted classifier')
                 dump = RegressorDump(None, None, None, None, regressor)
