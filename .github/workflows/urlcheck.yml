@@ -25,7 +25,7 @@ jobs:
         # Choose whether to include file with no URLs in the prints.
         print_all: false
 
-        timeout: 5
+        timeout: 20
 
         retry_count: 3
 
