@@ -104,6 +104,7 @@ from enmapboxprocessing.algorithm.prepareclassificationdatasetfromjsonalgorithm 
     PrepareClassificationDatasetFromJsonAlgorithm
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromtablealgorithm import \
     PrepareClassificationDatasetFromTableAlgorithm
+from enmapboxprocessing.algorithm.preparerasteralgorithm import PrepareRasterAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcodealgorithm import \
     PrepareRegressionDatasetFromCodeAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuouslibraryalgorithm import \
@@ -327,6 +328,7 @@ def algorithms():
         PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(),
         PrepareClassificationDatasetFromCodeAlgorithm(),
         PrepareClassificationDatasetFromJsonAlgorithm(),
+        PrepareRasterAlgorithm(),
         PrepareRegressionDatasetFromCodeAlgorithm(),
         PrepareRegressionDatasetFromContinuousLibraryAlgorithm(),
         PrepareRegressionDatasetFromContinuousRasterAlgorithm(),
