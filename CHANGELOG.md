@@ -1,14 +1,51 @@
 # CHANGELOG
+
+## Version 3.14
+
+_This release was tested with QGIS 3.34 (LTR) and 3.36 (latest release)._
+
+### GUI
+
+* _Spectral View_ panel: all SpectralProfile attributes are found automatically when opening a vector layer ([#778](https://github.com/EnMAP-Box/enmap-box/issues/778))
+* _Spectral View_ panel: added option for check/uncheck individual fields to be interpreted as SpectralProfile fields ([#758](https://github.com/EnMAP-Box/enmap-box/issues/758))
+* _Data Sources_ panel: improved support for _Open in Explorer_ for vector sources ([#678](https://github.com/EnMAP-Box/enmap-box/issues/678))
+* _Data Sources_ panel: added option for plotting list values ([#668](https://github.com/EnMAP-Box/enmap-box/issues/668))
+
+### Earth Observation for QGIS (EO4Q) Applications
+
+* _Profile Analytics_ application: added option for aggregated Z-Profiles under a selected polygon ([#261](https://github.com/EnMAP-Box/enmap-box/issues/261))
+
+### Data Formats / Metadata Handling
+
+* we now support STAC-like metadata ([#753](https://github.com/EnMAP-Box/enmap-box/issues/753)); for details see [Introduction to STAC Metadata](https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/metadata_guide.html#introduction-to-stac-metadata)
+
+### Processing Algorithms
+
+* added _Scale/truncate/convert raster layer_ algorithm: allows to scale, truncate and convert raster data ([#765](https://github.com/EnMAP-Box/enmap-box/issues/765))
+* added _Export classification/regression dataset (to text files)_ algorithm: allows export a classification/regression dataset to tabulated text files. ([#664](https://github.com/EnMAP-Box/enmap-box/issues/664))
+* added _Raster layer bounding polygon_ algorithm: allows to compute raster layer bounding polygon that encloses all data pixel[#634](https://github.com/EnMAP-Box/enmap-box/issues/634))
+
+* _Classification layer accuracy and area report_ algorithm: added support for non-matching category names ([#845](https://github.com/EnMAP-Box/enmap-box/issues/845))
+* _Spectral resampling (to wavelength)_ algorithm: added option for nearest neighbour resampling ([#801](https://github.com/EnMAP-Box/enmap-box/issues/801))
+* _Create classification dataset (from categorized spectral library)_ algorithm: added option for excluding bad bands ([#766](https://github.com/EnMAP-Box/enmap-box/issues/766))
+* _Class fraction layer from categorized layer_ algorithm: added support for raster layer ([#702](https://github.com/EnMAP-Box/enmap-box/issues/702))
+* _Sample raster layer values_ algorithm: added option for skipping pixels from no data regions ([#684](https://github.com/EnMAP-Box/enmap-box/issues/684))
+* _Import product_ algorithms: set default style to RGB TrueColor renderer ([#635](https://github.com/EnMAP-Box/enmap-box/issues/635))
+* _Classification workflow_ algorithm: set default style to RGB TrueColor renderer ([#635](https://github.com/EnMAP-Box/enmap-box/issues/635))
+
+### Bugfixes
+
+* [v3.14.0](https://github.com/EnMAP-Box/enmap-box/milestone/14?closed=1)
+
 ## Version 3.13
 
-_This release was tested with QGIS 3.28 (LTR), 3.32 and 3.34 (latest release)_
+_This release was tested with QGIS 3.28 (LTR), 3.32 and 3.34 (latest release)._
 
 ### Example Dataset
 
 * the previous _Berlin_ example dataset (based on simulated data) was replaced by a new dataset derived from real EnMAP L2A data, covering the _Potsdam_ region
 * the underlying full EnMAP L2A scene can be downloaded from within the _EnMAP-Box Menu > Project > Download Example Scene_ (without user registration etc.) 
 * updated the EnMAP sensor model (wavelength and fwhm) ([#496](https://github.com/EnMAP-Box/enmap-box/issues/496))
-
 
 #### QGIS Expressions / QGIS Field Calculator
 
@@ -26,7 +63,6 @@ _This release was tested with QGIS 3.28 (LTR), 3.32 and 3.34 (latest release)_
 ### GUI
 
 * _Spectral View_: added distance units (e.g. m, km) for properly plotting spatial profiles ([#525](https://github.com/EnMAP-Box/enmap-box/issues/525))
-* 
 
 ### Processing Algorithms
 
@@ -48,6 +84,9 @@ _This release was tested with QGIS 3.28 (LTR), 3.32 and 3.34 (latest release)_
 
 ### Bugfixes
 
+* [v3.13.4](https://github.com/EnMAP-Box/enmap-box/milestone/17?closed=1)
+* [v3.13.3](https://github.com/EnMAP-Box/enmap-box/milestone/16?closed=1)
+* [v3.13.2](https://github.com/EnMAP-Box/enmap-box/milestone/15?closed=1)
 * [v3.13.1](https://github.com/EnMAP-Box/enmap-box/milestone/13?closed=1)
 * [v3.13.0](https://github.com/EnMAP-Box/enmap-box/milestone/10?closed=1)
 
