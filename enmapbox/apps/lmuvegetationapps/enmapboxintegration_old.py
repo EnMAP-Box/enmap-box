@@ -54,11 +54,13 @@ class LMU_EnMAPBoxApp(EnMAPBoxApplication):
         a = menu.addAction('Interactive Visualization of Vegetation Reflectance Models (IVVRM)')
         a.triggered.connect(self.start_GUI_IVVRM)
 
-        b = menu.addAction('Create Look-up-table')
-        b.triggered.connect(self.start_GUI_LUT)
+        b = menu.addMenu('RTM Inversion')
 
-        c = menu.addAction('Invert Look-up-table')
-        c.triggered.connect(self.start_GUI_Inv)
+        ba = b.addAction('Create Look-up-table')
+        ba.triggered.connect(self.start_GUI_LUT)
+
+        bb = b.addAction('Invert Look-up-table')
+        bb.triggered.connect(self.start_GUI_Inv)
 
         d = menu.addAction('Vegetation Indices Toolbox')
         d.triggered.connect(self.start_GUI_VIT)
@@ -72,21 +74,16 @@ class LMU_EnMAPBoxApp(EnMAPBoxApplication):
         g = menu.addAction('interactive Red-Edge Inflection Point (iREIP)')
         g.triggered.connect(self.start_GUI_iREIP)
 
-        h = menu.addMenu('Vegetation Processor')
+        h = menu.addMenu('Vegetation Machine Learning Processor')
 
-        ha = h.addAction('ANN Training')
-        ha.triggered.connect(self.start_GUI_ProcessorTraining_old)
+        ha = h.addAction('Create ML Training Database')
+        ha.triggered.connect(self.start_GUI_LUT)
 
-        hb = h.addAction('ANN Inversion')
-        hb.triggered.connect(self.start_GUI_ProcessorInversion_old)
+        hb = h.addAction('ML Training')
+        hb.triggered.connect(self.start_GUI_ProcessorTraining)
 
-        i = menu.addMenu('Hybrid Retrieval Workflow')
-
-        ia = i.addAction('Training')
-        ia.triggered.connect(self.start_GUI_ProcessorTraining)
-
-        ib = i.addAction('Inversion')
-        ib.triggered.connect(self.start_GUI_ProcessorInversion)
+        hc = h.addAction('ML Mapping')
+        hc.triggered.connect(self.start_GUI_ProcessorInversion)
 
         appMenu.addMenu(menu)
         return menu
@@ -138,17 +135,8 @@ class LMU_EnMAPBoxApp(EnMAPBoxApplication):
         m = MainUiFunc()
         m.show()
 
-    def start_GUI_ProcessorInversion_old(self, *args):
-        from lmuvegetationapps.Processor_old_old.Processor_Inversion_GUI_old import MainUiFunc
-        m = MainUiFunc()
-        m.show()
-
-    def start_GUI_ProcessorTraining_old(self, *args):
-        from lmuvegetationapps.Processor_old_old.Processor_Training_GUI_old import MainUiFunc
-        m = MainUiFunc()
-        m.show()
-
 
 ### Interfaces to use algorithms in algorithms.py within
 ### QGIS Processing Framework
+
 
