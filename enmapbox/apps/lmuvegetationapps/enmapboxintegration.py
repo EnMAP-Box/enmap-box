@@ -80,7 +80,7 @@ class LMU_EnMAPBoxApp(EnMAPBoxApplication):
         hb = h.addAction('ANN Inversion')
         hb.triggered.connect(self.start_GUI_ProcessorInversion_old)
 
-        i = menu.addMenu('Vegetation Processor New')
+        i = menu.addMenu('Advanced Vegetation Processor')
 
         ia = i.addAction('Training')
         ia.triggered.connect(self.start_GUI_ProcessorTraining)

@@ -79,7 +79,7 @@ class LMU_EnMAPBoxApp(EnMAPBoxApplication):
         ha = h.addAction('Create ML Training Database')
         ha.triggered.connect(self.start_GUI_LUT)
 
-        hb = h.addAction("ML Training")
+        hb = h.addAction('ML Training')
         hb.triggered.connect(self.start_GUI_ProcessorTraining)
 
         hc = h.addAction('ML Mapping')
