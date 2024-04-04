@@ -139,12 +139,12 @@ class LMU_EnMAPBoxApp(EnMAPBoxApplication):
         m.show()
 
     def start_GUI_ProcessorInversion_old(self, *args):
-        from lmuvegetationapps.Processor_old_old.Processor_Inversion_GUI_old import MainUiFunc
+        from lmuvegetationapps.Processor_old.Processor_Inversion_GUI_old import MainUiFunc
         m = MainUiFunc()
         m.show()
 
     def start_GUI_ProcessorTraining_old(self, *args):
-        from lmuvegetationapps.Processor_old_old.Processor_Training_GUI_old import MainUiFunc
+        from lmuvegetationapps.Processor_old.Processor_Training_GUI_old import MainUiFunc
         m = MainUiFunc()
         m.show()
 
