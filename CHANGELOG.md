@@ -10,6 +10,7 @@ _This release was tested with QGIS 3.34 (LTR) and 3.36 (latest release)._
 * _Spectral View_ panel: added option for check/uncheck individual fields to be interpreted as SpectralProfile fields ([#758](https://github.com/EnMAP-Box/enmap-box/issues/758))
 * _Data Sources_ panel: improved support for _Open in Explorer_ for vector sources ([#678](https://github.com/EnMAP-Box/enmap-box/issues/678))
 * _Data Sources_ panel: added option for plotting list values ([#668](https://github.com/EnMAP-Box/enmap-box/issues/668))
+* _Map Canvas_: fixed shortcuts to copy spatial extents or the map canvas center coordinate ([#738](https://github.com/EnMAP-Box/enmap-box/issues/738)
 
 ### Earth Observation for QGIS (EO4Q) Applications
 
