@@ -8,6 +8,8 @@ from os.path import splitext, basename, exists, join, dirname
 from time import time
 from typing import Dict, Union
 
+from qgis.core import QgsProcessingContext
+
 from enmapboxprocessing.algorithm.rastermathalgorithm.snippetinsertdialog import SnippetInsertDialog
 from enmapboxprocessing.algorithm.rastermathalgorithm.snippetsaveasdialog import SnippetSaveAsDialog
 from enmapboxprocessing.parameter.processingparametercodeeditwidget import CodeEditWidget
@@ -37,6 +39,8 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
         loadUi(__file__.replace('.py', '.ui'), self)
+
+        self.mProject: QgsProject = QgsProject.instance()
 
         self.updateSources()
         # QgsProject.instance().layersAdded.connect(self.updateSources)  # better not auto-update sources, because when adding a result layer to a map view, it will be added with the basename equal to the identifier already used in the snippet
@@ -353,6 +357,15 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
         self.mCode.setCursorPosition(y, x)
         self.mCode.setFocus()
 
+    def project(self) -> QgsProject:
+        return self.mProject
+
+    def setProject(self, project: QgsProject):
+        assert isinstance(project, QgsProject)
+        if project != self.mProject:
+            self.mProject = project
+            self.updateSources()
+
     def updateSources(self):
         self.mSourcesTree.clear()
 
@@ -360,19 +373,19 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
 
         # remove duplicate sources
         identifiers = list()
-        for registryName, layer in QgsProject.instance().mapLayers().items():
+        for layer_id, layer in self.project().mapLayers().items():
             if isinstance(layer, (QgsRasterLayer, QgsVectorLayer)):
                 identifier = (layer.source(), layer.name())
                 if identifier in identifiers:
                     continue
                 identifiers.append(identifier)
-                layers[registryName] = layer
+                layers[layer_id] = layer
         del identifiers
 
         rasterIcon = QIcon(':/images/themes/default/mIconRaster.svg')
         vectorIcon = QIcon(':/images/themes/default/mIconVector.svg')
 
-        for registryName, layer in layers.items():
+        for layer_id, layer in layers.items():
 
             crs: QgsCoordinateReferenceSystem = layer.crs()
 
@@ -391,7 +404,7 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
                 data = layer.name() + crsid
                 item = RasterItem([identifier, data])
                 item.layer = layer
-                item.registryName = registryName
+                item.registryName = layer_id
                 item.setToolTip(1, layer.source())
                 item.setIcon(1, rasterIcon)
                 self.mSourcesTree.addTopLevelItems([item])
@@ -416,7 +429,7 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
                 data = layer.name() + crsid
                 item = VectorItem([identifier, data])
                 item.layer = layer
-                item.registryName = registryName
+                item.registryName = layer_id
                 item.setToolTip(1, layer.source())
                 item.setIcon(1, vectorIcon)
                 self.mSourcesTree.addTopLevelItems([item])
@@ -467,6 +480,10 @@ class ProcessingParameterRasterMathCodeEditWidgetWrapper(WidgetWrapper):
         #    raise NotImplementedError()
         # else:
         return ProcessingParameterRasterMathCodeEdit()
+
+    def setWidgetContext(self, context: QgsProcessingContext):
+        if isinstance(self.widget, ProcessingParameterRasterMathCodeEdit):
+            self.widget.setProject(context.project())
 
     def setValue(self, value):
         # if self.dialogType == DIALOG_MODELER:
