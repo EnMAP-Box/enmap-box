@@ -1,5 +1,6 @@
 from sklearn.base import RegressorMixin
 
+from enmapboxprocessing.algorithm.fitcatboostregressoralgorithm import FitCatBoostRegressorAlgorithm
 from enmapboxprocessing.algorithm.fitgaussianprocessregressoralgorithm import FitGaussianProcessRegressorAlgorithm
 from enmapboxprocessing.algorithm.fitkernelridgealgorithm import FitKernelRidgeAlgorithm
 from enmapboxprocessing.algorithm.fitlinearregressionalgorithm import FitLinearRegressionAlgorithm
@@ -78,6 +79,15 @@ class TestFitRegressorAlgorithm(TestCase):
 
     def _test_debug_issue1116(self):
         alg = FitLinearSVRAlgorithm()
+        parameters = {
+            alg.P_DATASET: regressorDumpSingleTargetPkl,
+            alg.P_REGRESSOR: alg.defaultCodeAsString(),
+            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.pkl')
+        }
+        self.runalg(alg, parameters)
+
+    def _test_issue790(self):
+        alg = FitCatBoostRegressorAlgorithm()
         parameters = {
             alg.P_DATASET: regressorDumpSingleTargetPkl,
             alg.P_REGRESSOR: alg.defaultCodeAsString(),

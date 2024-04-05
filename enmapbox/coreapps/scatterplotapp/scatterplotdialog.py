@@ -37,7 +37,8 @@ class ScatterPlotWidget(PlotWidget):
         self.autoRange()
 
     def mouseMoveEvent(self, ev):
-        self.autoRange()
+        pass
+        # self.autoRange()
 
     def mouseReleaseEvent(self, event: QMouseEvent):
         self.autoRange()

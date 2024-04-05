@@ -12,16 +12,25 @@ __author__ = 'benjamin.jakimow@geo.hu-berlin.de'
 __date__ = '2017-07-17'
 __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
+import os
 import pathlib
+import sys
 import unittest
 import uuid
+from time import sleep
+from typing import List, Tuple
 
 from enmapbox.dependencycheck import PIPPackage, requiredPackages, PIPPackageInstaller, PIPPackageInfoTask, \
-    localPythonExecutable, INSTALLATION_BLOCK, missingPackageInfo, checkGDALIssues, PIPPackageInstallerTableModel
-from enmapbox.testing import EnMAPBoxTestCase
+    localPythonExecutable, missingPackageInfo, checkGDALIssues, PIPPackageInstallerTableModel, \
+    call_pip_command, localPipExecutable
+from enmapbox.testing import EnMAPBoxTestCase, start_app
+from qgis.PyQt.QtCore import QProcess
 from qgis.PyQt.QtGui import QMovie
 from qgis.PyQt.QtWidgets import QApplication, QTableView, QLabel
+from qgis.core import Qgis, QgsTaskManager, QgsTask
 from qgis.core import QgsApplication
+
+start_app()
 
 
 class test_dependencycheck(EnMAPBoxTestCase):
@@ -32,22 +41,39 @@ class test_dependencycheck(EnMAPBoxTestCase):
         for i in issues:
             self.assertIsInstance(i, str)
 
+    def test_pip_call(self):
+
+        pip_exe = localPipExecutable()
+        self.assertTrue(os.path.isfile(pip_exe))
+
+        process = QProcess()
+        process.start(f'{pip_exe} show numpy')
+        process.waitForFinished()
+        msgOut = process.readAllStandardOutput().data().decode('utf-8')
+        msgErr = process.readAllStandardError().data().decode('utf-8')
+        success = process.exitCode() == 0
+        self.assertTrue(success)
+        self.assertTrue(msgOut.startswith('Name: numpy'))
+        s = ""
+
+    def test_required_packages(self):
+
+        for p in requiredPackages():
+            self.assertIsInstance(p, PIPPackage)
+
     def test_lookup(self):
         # some python packages have a different name when to be installed with pip
         # addresses https://bitbucket.org/hu-geomatics/enmap-box/issues/307/installation-problem-sklearn
 
-        import enmapbox.dependencycheck
         pipName = self.nonexistingPackageName()
         pyName = pipName.replace('-', '_')
-        enmapbox.dependencycheck.PACKAGE_LOOKUP[pyName] = pipName
 
-        info = missingPackageInfo([PIPPackage(pyName)])
+        info = missingPackageInfo([PIPPackage(pipName, py_name=pyName)])
         self.assertTrue(pyName in info)
         self.assertTrue(pipName in info)
-        del enmapbox.dependencycheck.PACKAGE_LOOKUP[pyName]
 
     def test_pippackage(self):
-        pkg = PIPPackage('osgeo.gdal', pipCmd='GDAL>=3.0')
+        pkg = PIPPackage('GDAL', py_name='osgeo.gdal')
 
         self.assertTrue(pkg.isInstalled())
         self.assertIsInstance(pkg.installCommand(), str)
@@ -56,19 +82,10 @@ class test_dependencycheck(EnMAPBoxTestCase):
         pkg = PIPPackage(self.nonexistingPackageName())
         self.assertFalse(pkg.isInstalled())
         self.assertIsInstance(pkg.installCommand(), str)
-        pkg.installPackage()
-
-        n = self.nonexistingPackageName()
-
-        INSTALLATION_BLOCK[n] = 'reason'
-        pkg = PIPPackage(n)
-
-        pkg.installPackage()
-        self.assertTrue(pkg.stdoutMsg == '')
-        self.assertTrue('reason' in pkg.stderrMsg)
 
     def test_pippackagemodel(self):
         model = PIPPackageInstallerTableModel()
+        # tester = QAbstractItemModelTester(model, QAbstractItemModelTester.FailureReportingMode.Fatal)
         self.assertTrue(len(model) == 0)
 
         model.addPackages([PIPPackage(self.nonexistingPackageName()),
@@ -87,13 +104,35 @@ class test_dependencycheck(EnMAPBoxTestCase):
         s = str(uuid.uuid4())
         return 'foobar' + s
 
+    def test_PIPInstallerTableModel(self):
+
+        model = PIPPackageInstallerTableModel()
+        # tester = QAbstractItemModelTester(model, QAbstractItemModelTester.FailureReportingMode.Fatal)
+
+        pkgs = requiredPackages()
+        model.addPackages(pkgs)
+        model.updatePackages([{'Name': 'foobar', 'Version': '0815'}])
+
+        pois = [p.pipPkgName for p in pkgs]
+        task = PIPPackageInfoTask(packages_of_interest=pois, poi_only=False)
+        task.sigPackageList.connect(model.updatePackages)
+        task.sigPackageUpdates.connect(model.updatePackages)
+        task.sigPackageInfo.connect(model.updatePackages)
+        task.run()
+
+        tv = QTableView()
+        tv.setModel(model)
+
+        self.showGui(tv)
+
     def test_PIPInstaller(self):
         pkgs = [PIPPackage(self.nonexistingPackageName()),
                 PIPPackage(self.nonexistingPackageName()),
                 PIPPackage(self.nonexistingPackageName())]
         pkgs += requiredPackages()
         w = PIPPackageInstaller()
-        w.addPackages(pkgs)
+
+        w.addPackages(pkgs, required=True)
         # w.installAll()
         # w.model.installAll()
 
@@ -112,30 +151,110 @@ class test_dependencycheck(EnMAPBoxTestCase):
 
     def test_PIPPackageInfoTask(self):
         required = [PIPPackage(self.nonexistingPackageName())] + requiredPackages()
-        AVAILABLE = dict()
-        INSTALLED = dict()
+        ALL_PKG: dict = dict()
+        PKG_UPDATES: dict = dict()
+        PKG_INFOS: List[Tuple[str, dict]] = []
+        last_progress = -1
+        is_completed = False
 
-        def onAvailableVersion(pkg: str, version: str):
-            print('Available {}={}'.format(pkg, version))
-            AVAILABLE[pkg] = version
+        def onPackageList(info: list):
+            for p in info:
+                ALL_PKG[p['name']] = p
 
-        def onInstalledVersion(pkg: str, version: str):
-            print('Installed {}={}'.format(pkg, version))
-            INSTALLED[pkg] = version
+        def onPackageUpdates(info: list):
+            for p in info:
+                ALL_PKG[p['name']].update(p)
+
+        def onPackageInfo(infoBadge: list):
+            self.assertIsInstance(infoBadge, list)
+            self.assertTrue(len(infoBadge) > 0)
+            for info in infoBadge:
+                self.assertIsInstance(info, dict)
+                self.assertTrue('Name' in info)
+
+                for k in ['Name', 'Version']:
+                    if k not in info:
+                        s = ""
+                    self.assertTrue(k in info.keys())
+                    value = info[k]
+                    self.assertIsInstance(value, str)
+                    self.assertEqual(value, value.strip())
+
+            PKG_INFOS.extend(infoBadge)
+            s = ""
 
         def onProgress(p: int):
             print('Progress {}'.format(p))
+            nonlocal last_progress
+            last_progress = p
 
-        def onMessage(msg: str, is_error: bool):
-            print(msg)
+        MESSAGE_LEVEL = {
+            Qgis.MessageLevel.Info: 'INFO',
+            Qgis.MessageLevel.Critical: 'CRITICAL',
+            Qgis.MessageLevel.Warning: 'WARNING',
+            Qgis.MessageLevel.Success: 'SUCCESS',
+            Qgis.MessageLevel.NoLevel: '<no level>',
+        }
 
-        task = PIPPackageInfoTask('package info', [p.pipPkgName for p in required])
+        def onMessage(msg: str, msg_level: Qgis.MessageLevel):
+            self.assertIsInstance(msg, str)
+            self.assertIsInstance(msg_level, Qgis.MessageLevel)
+            self.assertTrue(len(msg) > 0)
+
+        def onCompleted(result, task):
+            nonlocal is_completed
+            self.assertTrue(result)
+            is_completed = True
+            s = ""
+
+        pois = [p.pipPkgName for p in requiredPackages()]
+        task = PIPPackageInfoTask('package info',
+                                  packages_of_interest=pois,
+                                  poi_only=True,
+                                  search_info=True,
+                                  search_updates=True,
+                                  callback=onCompleted)
+
         task.progressChanged.connect(onProgress)
-        task.sigAvailableVersion.connect(onAvailableVersion)
-        task.sigInstalledVersion.connect(onInstalledVersion)
+        task.sigPackageList.connect(onPackageList)
+        task.sigPackageUpdates.connect(onPackageUpdates)
+        task.sigPackageInfo.connect(onPackageInfo)
         task.sigMessage.connect(onMessage)
-        task.run()
-        QApplication.processEvents()
+
+        if False:
+            # run with QgsTaskManager
+            tm = QgsApplication.taskManager()
+            assert isinstance(tm, QgsTaskManager)
+            tm.addTask(task)
+            while task.status() != QgsTask.TaskStatus.Complete:
+                QApplication.processEvents()
+                sleep(0.2)
+        else:
+            # run in same process
+            task.finished(task.run())
+
+        PKG_INFOS = {p['Name']: p for p in PKG_INFOS}
+        for k in ['numpy', 'GDAL', 'scikit-learn']:
+            self.assertTrue(k in PKG_INFOS)
+        self.assertTrue(last_progress == 100)
+        self.assertTrue(is_completed)
+
+    def test_call_pip_command(self):
+        # python.exe -m pip list'
+
+        stdout = sys.stdout
+        stderr = sys.stderr
+        success, msg, err = call_pip_command(['list'])
+        self.assertTrue(success)
+        self.assertEqual(stdout, sys.stdout)
+        self.assertEqual(stderr, sys.stderr)
+
+        success, msg, err = call_pip_command(['foobar'])
+        self.assertFalse(success)
+        self.assertEqual(stdout, sys.stdout)
+        self.assertEqual(stderr, sys.stderr)
+
+        s = ""
 
     def test_findpython(self):
         p = localPythonExecutable()

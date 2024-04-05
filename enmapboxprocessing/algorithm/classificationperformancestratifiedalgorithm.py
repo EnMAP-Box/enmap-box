@@ -9,6 +9,7 @@ from typing import Dict, Any, List, Tuple, Iterable
 
 import numpy as np
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.rasterizecategorizedvectoralgorithm import RasterizeCategorizedVectorAlgorithm
 from enmapboxprocessing.algorithm.translatecategorizedrasteralgorithm import TranslateCategorizedRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
@@ -16,7 +17,6 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.reportwriter import HtmlReportWriter, CsvReportWriter, MultiReportWriter
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsRasterLayer, QgsUnitTypes)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -34,7 +34,8 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
     def shortDescription(self) -> str:
         return 'Estimates map accuracy and area proportions for stratified random sampling as described in ' \
                'Stehman (2014): https://doi.org/10.1080/01431161.2014.930207. \n' \
-               'Observed and predicted categories are matched by name.'
+               'Observed and predicted categories are matched by name, if possible. ' \
+               'Otherwise, categories are matched by order (in this case, a warning message is logged).'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
@@ -59,22 +60,27 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
             categoriesReference = Utils.categoriesFromPalettedRasterRenderer(reference.renderer())
         else:
             assert 0
-        categoriesPrediction = Utils.categoriesFromPalettedRasterRenderer(classification.renderer())
+        categoriesPrediction = Utils().categoriesFromRenderer(classification.renderer(), classification)
+        if len(categoriesReference) == len(categoriesPrediction):
+            return True, ''  # if the number of categories is equal, we can at leased match by name (see #845)
         for cR in categoriesReference:
+            found = False
             for cP in categoriesPrediction:
                 if cR.name == cP.name:
-                    return True, ''  # good, we found the reference class
-            return False, f'Observed category "{cR.name}" not found in predicted categories.'
+                    found = True  # good, we found the reference class
+            if not found:
+                return False, f'Observed category "{cR.name}" not found in predicted categories.'
         for cP in categoriesPrediction:
+            found = False
             for cR in categoriesReference:
                 if cR.name == cP.name:
-                    return True, ''  # good, we found the map class
-            return False, f'Predicted category "{cP.name}" not found in observed categories.'
+                    found = True  # good, we found the map class
+            if not found:
+                return False, f'Predicted category "{cP.name}" not found in observed categories.'
         return False, 'Empty category list.'
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
         checks = [
-            self.checkParameterRasterClassification(parameters, self.P_CLASSIFICATION, context),
             self.checkParameterMapClassification(parameters, self.P_REFERENCE, context),
             self.checkParameterRasterClassification(parameters, self.P_STRATIFICATION, context),
         ]
@@ -152,7 +158,7 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
             arrayReference = RasterReader(reference).array()[0]
             categoriesReference = Utils.categoriesFromPalettedRasterRenderer(reference.renderer())
             arrayPrediction = RasterReader(classification).array()[0]
-            categoriesPrediction = Utils.categoriesFromPalettedRasterRenderer(classification.renderer())
+            categoriesPrediction = Utils().categoriesFromRenderer(classification.renderer(), classification)
             arrayStratification = RasterReader(stratification).array()[0]
             categoriesStratification = Utils.categoriesFromPalettedRasterRenderer(stratification.renderer())
             # - get valid reference location
@@ -162,11 +168,23 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
             yReference = arrayReference[valid].astype(np.float32)
             yMap = arrayPrediction[valid].astype(np.float32)
             # - remap class ids by name
-            yMapRemapped = np.zeros_like(yMap)
-            for cP in categoriesPrediction:
+            yMapRemapped = yMap.copy()  # this initial state is correct for matching by order (see #845)
+            classNamesMatching = list()
+            for i, cP in enumerate(categoriesPrediction):
+                found = False
                 for cR in categoriesReference:
                     if cR.name == cP.name:
                         yMapRemapped[yMap == cP.value] = cR.value
+                        found = True
+                        classNamesMatching.append([cP.name, cR.name])
+                if not found:
+                    feedback.pushWarning(
+                        f'predicted class "{categoriesPrediction[i].name}" not found in reference classes. '
+                        f'class will be matched by order: '
+                        f'"{cP.name}" -> "{categoriesReference[i].name}".'
+                    )
+                    classNamesMatching.append([cP.name, categoriesReference[i].name])
+
             yMap = yMapRemapped
             # - prepare strata
             stratum = arrayStratification[valid]
@@ -185,7 +203,10 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
             stats = stratifiedAccuracyAssessment(stratum, yReference, yMap, h, N_h, classValues, classNames)
             pixelUnits = QgsUnitTypes.toString(classification.crs().mapUnits())
             pixelArea = classification.rasterUnitsPerPixelX() * classification.rasterUnitsPerPixelY()
-            self.writeReport(filename, stats, pixelUnits=pixelUnits, pixelArea=pixelArea)
+
+            self.writeReport(
+                filename, stats, pixelUnits=pixelUnits, pixelArea=pixelArea, classNamesMatching=classNamesMatching
+            )
             # dump json
             with open(filename + '.json', 'w') as file:
                 file.write(json.dumps(stats.__dict__, indent=4))
@@ -199,7 +220,10 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
         return result
 
     @classmethod
-    def writeReport(cls, filename: str, stats: 'StratifiedAccuracyAssessmentResult', pixelUnits='pixel', pixelArea=1.):
+    def writeReport(
+            cls, filename: str, stats: 'StratifiedAccuracyAssessmentResult', pixelUnits='pixel', pixelArea=1.,
+            classNamesMatching: list = None
+    ):
 
         def smartRound(obj, ndigits):
             if isinstance(obj, list):
@@ -229,6 +253,9 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
 
             report.writeParagraph(f'Sample size: {stats.n} px')
             report.writeParagraph(f'Area size: {smartRound(stats.N, 2)} {pixelUnits}')
+
+            if classNamesMatching is not None:
+                report.writeTable(classNamesMatching, 'Class matching', ['predicted', 'observed'])
 
             values = smartRound(stats.confusion_matrix_counts, 2)
             report.writeTable(

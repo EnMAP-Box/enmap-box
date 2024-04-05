@@ -1644,7 +1644,6 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         action.alg = SaveLibraryAsGeoJsonAlgorithm()
         action.parameters = {action.alg.P_LIBRARY: lyr}
         action.triggered.connect(self.onRunProcessingAlgorithmClicked)
-
         menu.addSeparator()
 
         action = menu.addAction('Open Attribute Table')
@@ -2087,8 +2086,10 @@ class DockPanelUI(QgsDockWidget):
     def onRasterLayerStylingToggled(self):
         from rasterlayerstylingapp import RasterLayerStylingApp
         panel = RasterLayerStylingApp.panel()
-        if panel is not None:
-            panel.setUserVisible(self.mRasterLayerStyling.isChecked())
+        if panel is None:
+            return
+
+        panel.setUserVisible(self.mRasterLayerStyling.isChecked())
         if panel.isUserVisible():
             from enmapbox.gui.enmapboxgui import EnMAPBox
             enmapBox = EnMAPBox.instance()

@@ -133,6 +133,7 @@ class RegressionPerformanceAlgorithm(EnMAPProcessingAlgorithm):
                         writer.setBandColor(QColor(target.color), bandNo)
 
                 source = writer.source()
+                writer.close()
                 del writer, ds
                 reference = QgsRasterLayer(source)
             elif isinstance(reference, QgsRasterLayer):

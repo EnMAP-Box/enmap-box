@@ -1,3 +1,5 @@
+from io import StringIO
+
 from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
 from enmapbox.typeguard import typechecked
 
@@ -22,3 +24,16 @@ class FitCatBoostRegressorAlgorithm(FitRegressorAlgorithmBase):
         from catboost import CatBoostRegressor
         regressor = CatBoostRegressor(n_estimators=100)
         return regressor
+
+
+# monkey patch for issue #790
+try:
+    import catboost.core
+    stringIO = StringIO()
+
+    def _get_stream_like_object_FIXED(obj):
+        return stringIO
+
+    catboost.core._get_stream_like_object = _get_stream_like_object_FIXED
+except Exception:
+    pass

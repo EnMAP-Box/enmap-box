@@ -147,6 +147,7 @@ class SpectralIndexOptimizerAlgorithm(EnMAPProcessingAlgorithm):
                 writer.setBandName(bandName, bandNo)
             writer.setNoDataValue(nan)
             writer.setMetadataItem('features', list(features))
+            writer.close()
             result = {self.P_OUTPUT_MATRIX: filename}
 
             self.toc(feedback, result)

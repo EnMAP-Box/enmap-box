@@ -1,10 +1,12 @@
 import os
 import unittest
 
-from enmapbox.testing import EnMAPBoxTestCase, TestObjects
+from enmapbox.testing import EnMAPBoxTestCase, TestObjects, start_app
 from enmapboxprocessing.algorithm.savelibraryasgeojsonalgorithm import SaveLibraryAsGeoJsonAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProject
+
+start_app()
 
 
 class TestIssue1089(EnMAPBoxTestCase):

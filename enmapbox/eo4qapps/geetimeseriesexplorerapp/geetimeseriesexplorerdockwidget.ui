@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>719</width>
+    <width>993</width>
     <height>1075</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>556</width>
+    <width>993</width>
     <height>719</height>
    </size>
   </property>
@@ -240,7 +240,7 @@ QListWidget::item::selected {
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>5</number>
         </property>
         <widget class="QWidget" name="page">
          <layout class="QVBoxLayout" name="verticalLayout_12" stretch="0">
@@ -286,7 +286,7 @@ QListWidget::item::selected {
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>597</width>
+                   <width>871</width>
                    <height>860</height>
                   </rect>
                  </property>
@@ -1075,8 +1075,8 @@ Surface Reflectance</string>
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>597</width>
-                   <height>860</height>
+                   <width>422</width>
+                   <height>843</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_4">
@@ -1723,8 +1723,8 @@ Terra Surface Reflectance
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>597</width>
-                   <height>860</height>
+                   <width>422</width>
+                   <height>396</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_3">
@@ -2142,8 +2142,8 @@ Full Resolution</string>
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>597</width>
-                   <height>860</height>
+                   <width>211</width>
+                   <height>265</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_5">
@@ -3035,8 +3035,8 @@ Hyperspectral Imager</string>
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>621</width>
-               <height>907</height>
+               <width>419</width>
+               <height>386</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_22">
@@ -3089,7 +3089,7 @@ Hyperspectral Imager</string>
                     <property name="title">
                      <string>Band Rendering</string>
                     </property>
-                    <property name="collapsed">
+                    <property name="collapsed" stdset="0">
                      <bool>false</bool>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -3787,7 +3787,7 @@ Hyperspectral Imager</string>
                        <property name="title">
                         <string>Min / Max Value Settings</string>
                        </property>
-                       <property name="collapsed">
+                       <property name="collapsed" stdset="0">
                         <bool>false</bool>
                        </property>
                        <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -4489,7 +4489,7 @@ count cut</string>
                 <item row="3" column="1">
                  <widget class="QComboBox" name="mCompositeExtent">
                   <property name="currentIndex">
-                   <number>2</number>
+                   <number>1</number>
                   </property>
                   <item>
                    <property name="text">

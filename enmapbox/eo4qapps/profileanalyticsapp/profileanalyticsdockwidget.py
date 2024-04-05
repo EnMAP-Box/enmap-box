@@ -54,7 +54,7 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
     mApply: QToolButton
 
     RasterLayerSource, GeeSource = 0, 1
-    ZProfileType, XProfileType, YProfileType, LineProfileType = 0, 1, 2, 3
+    ZProfileType, XProfileType, YProfileType, LineProfileType, PolygonProfileType = 0, 1, 2, 3, 4
     GeeTemporalProfileType, GeePixelProfileType = 0, 1
     NumberUnits, NanometerUnits, DecimalYearUnits = 0, 1, 2
     EnmapBoxInterface, QgisInterface = 0, 1
@@ -138,15 +138,13 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
         if not isinstance(layer, QgsVectorLayer):
             return None
 
-        if layer.geometryType() != QgsWkbTypes.GeometryType.LineGeometry:
-            return None
-
         return layer
 
     def onRasterProfileTypeChanged(self):
         isLineProfile = self.mRasterProfileType.currentIndex() == self.LineProfileType
-        self.mTip1.setVisible(not isLineProfile)
-        self.mTip2.setVisible(isLineProfile)
+        isPolygonProfile = self.mRasterProfileType.currentIndex() == self.PolygonProfileType
+        self.mTip1.setVisible(not isLineProfile and not isPolygonProfile)
+        self.mTip2.setVisible(isLineProfile or isPolygonProfile)
 
         self.onLiveUpdate()
 
@@ -321,7 +319,7 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                     if bandNo == -1:
                         return
 
-                if self.mRasterProfileType.currentIndex() != self.LineProfileType:
+                if self.mRasterProfileType.currentIndex() not in [self.LineProfileType, self.PolygonProfileType]:
                     point = self.currentLocation()
                     if point is None:
                         return
@@ -366,6 +364,9 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                 elif self.mRasterProfileType.currentIndex() == self.LineProfileType:
                     lineLayer: QgsVectorLayer = self.currentLayer()
                     if lineLayer is None:
+                        return
+                    if lineLayer.geometryType() != QgsWkbTypes.GeometryType.LineGeometry:
+                        warnings.warn('vector layer is not a line')
                         return
 
                     selectedFeatureCount = lineLayer.selectedFeatureCount()
@@ -426,6 +427,54 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                     yValues = [np.nan if value is None else value for value in yValues]
                     yMaskValues = reader.maskArray(np.array(yValues).reshape((1, 1, -1)), [bandNo])
                     xUnit = 'distance from line start'
+                elif self.mRasterProfileType.currentIndex() == self.PolygonProfileType:
+                    polygonLayer: QgsVectorLayer = self.currentLayer()
+                    if polygonLayer is None:
+                        return
+                    if polygonLayer.geometryType() != QgsWkbTypes.GeometryType.PolygonGeometry:
+                        warnings.warn('vector layer is not a polygon')
+                        return
+
+                    selectedFeatureCount = polygonLayer.selectedFeatureCount()
+                    if selectedFeatureCount == 0:
+                        return
+                    elif selectedFeatureCount > 1:
+                        warnings.warn('handling multiple shapes is not yet implemented')
+                        return
+
+                    polygonId = polygonLayer.selectedFeatureIds()[0]
+                    name = f'{layer.name()} [band {bandNo}, polygon ID {polygonId}]'
+
+                    # 1. extract region of interest from raster
+                    alg = 'gdal:cliprasterbymasklayer'
+                    parameters = {
+                        'INPUT': layer,
+                        'MASK': QgsProcessingFeatureSourceDefinition(
+                            polygonLayer.source(), selectedFeaturesOnly=True, featureLimit=-1,
+                            geometryCheck=QgsFeatureRequest.InvalidGeometryCheck.GeometryAbortOnInvalid),
+                        'TARGET_CRS': layer.crs(),
+                        'NODATA': np.nan,
+                        'OUTPUT': 'TEMPORARY_OUTPUT'
+                    }
+                    raster2: QgsVectorLayer = processing.run(alg, parameters)['OUTPUT']
+
+                    # 2. Create the values
+                    reader2 = RasterReader(raster2)
+                    name = f'{layer.name()} [polygon ID {polygonId}]'
+                    yValues = np.nanmean(np.array(reader2.array()), axis=(1, 2))
+                    yMaskValues = reader.maskArray(np.array(yValues))
+                    if self.mXUnit.currentIndex() == self.NumberUnits:
+                        xUnit = 'band numbers'
+                        xValues = list(range(1, len(yValues) + 1))
+                    elif self.mXUnit.currentIndex() == self.NanometerUnits:
+                        xUnit = 'nanometers'
+                        xValues = [reader.wavelength(bandNo) for bandNo in reader.bandNumbers()]
+                    elif self.mXUnit.currentIndex() == self.DecimalYearUnits:
+                        xUnit = 'decimal year'
+                        xValues = [Utils.dateTimeToDecimalYear(reader.centerTime(bandNo))
+                                   for bandNo in reader.bandNumbers()]
+                    else:
+                        raise ValueError()
                 else:
                     raise ValueError()
                 xValues = np.array(xValues)
@@ -574,7 +623,7 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
 
         # set x axis title
         if self.mSourceType.currentIndex() == self.RasterLayerSource:
-            if self.mRasterProfileType.currentIndex() == self.ZProfileType:
+            if self.mRasterProfileType.currentIndex() in [self.ZProfileType, self.PolygonProfileType]:
                 xtitle = self.mXUnit.currentText()
             elif self.mRasterProfileType.currentIndex() == self.XProfileType:
                 xtitle = 'Column Number'

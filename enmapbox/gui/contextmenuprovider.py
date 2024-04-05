@@ -20,7 +20,7 @@ from enmapbox.qgispluginsupport.qps.crosshair.crosshair import CrosshairDialog
 from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog
 from enmapbox.qgispluginsupport.qps.models import TreeNode
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibraryplotwidget import SpectralProfilePlotModel
-from enmapbox.qgispluginsupport.qps.utils import qgisAppQgisInterface, SpatialPoint, SpatialExtent, findParent
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent, findParent
 from qgis.PyQt.QtCore import Qt, QObject, QPoint, QModelIndex
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu, QWidgetAction, QApplication, QAction
@@ -41,59 +41,62 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
 
         action = menu.addAction('Link with other maps')
         action.setIcon(QIcon(':/enmapbox/gui/ui/icons/link_basic.svg'))
-        action.triggered.connect(lambda: CanvasLink.ShowMapLinkTargets(self))
+        action.triggered.connect(lambda: CanvasLink.ShowMapLinkTargets(mapCanvas))
         action = menu.addAction('Remove links to other maps')
         action.setIcon(QIcon(':/enmapbox/gui/ui/icons/link_open.svg'))
-        action.triggered.connect(lambda: self.removeAllCanvasLinks())
+        action.triggered.connect(lambda: mapCanvas.removeAllCanvasLinks())
 
-        qgisApp = qgisAppQgisInterface()
-        b = isinstance(qgisApp, QgisInterface)
+        from qgis.utils import iface
+        b = isinstance(iface, QgisInterface)
         menu.addSeparator()
         m = menu.addMenu('QGIS...')
         m.setIcon(QIcon(r':/images/themes/default/providerQgis.svg'))
         action = m.addAction('Use map center')
         action.setEnabled(b)
         if b:
-            action.triggered.connect(lambda: self.setCenter(SpatialPoint.fromMapCanvasCenter(qgisApp.mapCanvas())))
+            action.triggered.connect(
+                lambda *args, c=mapCanvas: c.setCenter(SpatialPoint.fromMapCanvasCenter(iface.mapCanvas())))
 
         action = m.addAction('Set map center')
         action.setEnabled(b)
         if b:
-            action.triggered.connect(lambda: qgisApp.mapCanvas().setCenter(
-                self.spatialCenter().toCrs(qgisApp.mapCanvas().mapSettings().destinationCrs())))
+            action.triggered.connect(lambda *args, c=mapCanvas: iface.mapCanvas().setCenter(
+                c.spatialCenter().toCrs(iface.mapCanvas().mapSettings().destinationCrs())))
 
         action = m.addAction('Use map extent')
         action.setEnabled(b)
         if b:
-            action.triggered.connect(lambda: self.setExtent(SpatialExtent.fromMapCanvas(qgisApp.mapCanvas())))
+            action.triggered.connect(
+                lambda *args, c=mapCanvas: c.setExtent(SpatialExtent.fromMapCanvas(iface.mapCanvas())))
 
         action = m.addAction('Set map extent')
         action.setEnabled(b)
         if b:
-            action.triggered.connect(lambda: qgisApp.mapCanvas().setExtent(
-                self.spatialExtent().toCrs(qgisApp.mapCanvas().mapSettings().destinationCrs())))
+            action.triggered.connect(lambda *args, c=mapCanvas: iface.mapCanvas().setExtent(
+                c.spatialExtent().toCrs(iface.mapCanvas().mapSettings().destinationCrs())))
 
         menu.addSeparator()
         m = menu.addMenu('Crosshair')
 
         if mapCanvas.crosshairIsVisible():
             action = m.addAction('Hide')
-            action.triggered.connect(lambda: mapCanvas.setCrosshairVisibility(False))
+            action.triggered.connect(lambda *args, c=mapCanvas: c.setCrosshairVisibility(False))
         else:
             action = m.addAction('Show')
-            action.triggered.connect(lambda: mapCanvas.setCrosshairVisibility(True))
+            action.triggered.connect(lambda *args, c=mapCanvas: c.setCrosshairVisibility(True))
 
         action = m.addAction('Style')
-        action.triggered.connect(lambda: mapCanvas.setCrosshairStyle(
+        action.triggered.connect(lambda *args, c=mapCanvas: c.setCrosshairStyle(
             CrosshairDialog.getCrosshairStyle(
-                crosshairStyle=mapCanvas.crosshairStyle(), mapCanvas=mapCanvas
+                crosshairStyle=c.crosshairStyle(), mapCanvas=c
             )
         ))
 
         mPxGrid = m.addMenu('Pixel Grid')
         if mapCanvas.mCrosshairItem.crosshairStyle().mShowPixelBorder:
             action = mPxGrid.addAction('Hide')
-            action.triggered.connect(lambda: mapCanvas.mCrosshairItem.crosshairStyle().setShowPixelBorder(False))
+            action.triggered.connect(
+                lambda *args, c=mapCanvas: c.mCrosshairItem.crosshairStyle().setShowPixelBorder(False))
 
         mPxGrid.addSeparator()
 
@@ -121,11 +124,9 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
         cb.setFilters(QgsMapLayerProxyModel.RasterLayer)
         cb.setAllowEmptyLayer(True)
 
-        # keep the list short an focus on
-
         # list each source only once
         all_layers = QgsProject.instance().mapLayers().values()
-        all_layers = sorted(all_layers, key=lambda l: not l.title().startswith('[EnMAP-Box]'))
+        all_layers = sorted(all_layers, key=lambda lyr: not lyr.title().startswith('[EnMAP-Box]'))
 
         excepted_layers = []
         sources = []
@@ -156,29 +157,29 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
         action = menu.addAction('Zoom Native Resolution')
         action.setIcon(QIcon(':/images/themes/default/mActionZoomActual.svg'))
         action.setEnabled(any([lyr for lyr in mapCanvas.layers() if isinstance(lyr, QgsRasterLayer)]))
-        action.triggered.connect(lambda: mapCanvas.zoomToPixelScale(spatialPoint=point))
+        action.triggered.connect(lambda *args, c=mapCanvas: c.zoomToPixelScale(spatialPoint=point))
 
         menu.addSeparator()
 
         m = menu.addMenu('Save to...')
         action = m.addAction('PNG')
-        action.triggered.connect(lambda: mapCanvas.saveMapImageDialog('PNG'))
+        action.triggered.connect(lambda *args, c=mapCanvas: c.saveMapImageDialog('PNG'))
         action = m.addAction('JPEG')
-        action.triggered.connect(lambda: mapCanvas.saveMapImageDialog('JPG'))
+        action.triggered.connect(lambda *args, c=mapCanvas: c.saveMapImageDialog('JPG'))
         action = m.addAction('Clipboard')
-        action.triggered.connect(lambda: QApplication.clipboard().setPixmap(mapCanvas.pixmap()))
+        action.triggered.connect(lambda *args, c=mapCanvas: QApplication.clipboard().setPixmap(c.pixmap()))
         action = menu.addAction('Copy layer paths')
-        action.triggered.connect(lambda: QApplication.clipboard().setText('\n'.join(mapCanvas.layerPaths())))
+        action.triggered.connect(lambda *args, c=mapCanvas: QApplication.clipboard().setText('\n'.join(c.layerPaths())))
 
         menu.addSeparator()
 
         action = menu.addAction('Refresh')
         action.setIcon(QIcon(":/qps/ui/icons/refresh_green.svg"))
-        action.triggered.connect(lambda: mapCanvas.refresh())
+        action.triggered.connect(lambda *args, c=mapCanvas: c.refresh())
 
         action = menu.addAction('Refresh all layers')
         action.setIcon(QIcon(":/qps/ui/icons/refresh_green.svg"))
-        action.triggered.connect(lambda: mapCanvas.refreshAllLayers())
+        action.triggered.connect(lambda *args, c=mapCanvas: c.refreshAllLayers())
 
         action = menu.addAction('Clear')
         action.triggered.connect(mapCanvas.clearLayers)

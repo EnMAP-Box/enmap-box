@@ -219,7 +219,7 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
             for bandNo, (ifilename, metadata) in enumerate(zip(filenames, metadatas), 1):
                 writer.setBandName(f"{metadata['short_name']} - {metadata['long_name']}", bandNo)
                 writer.setMetadataDomain(metadata, '', bandNo)
-            writer = None
+            writer.close()
             ds = None
 
             result = {self.P_OUTPUT_VRT: filename}
