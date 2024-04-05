@@ -18,6 +18,7 @@ myInfo.innerHTML = profile
 ## Example: QgsMapTip with Spectral Profile Plot
 
 <h3>Pixel Profile</h3>
+Layer: [% @layer_name %] <br>
 Location: [% x(@layer_cursor_point) %], [% y(@layer_cursor_point) %] <br>
 CRS: [%@layer_crs%]
 
@@ -26,7 +27,7 @@ CRS: [%@layer_crs%]
 <script>
 var profile = JSON.parse(' [% raster_profile(@layer_name, geometry:=@layer_cursor_point) %] ');
 
-var data = [{x:profile['x'].filter, 
+var data = [{x:profile['x'], 
 		     y:profile['y'],
 			 type:'scatter'
 			}];
