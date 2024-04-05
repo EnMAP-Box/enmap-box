@@ -21,8 +21,10 @@ from qgis.PyQt.QtWidgets import QWidget
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.applications import EnMAPBoxApplication
 
-from enmapbox.testing import EnMAPBoxTestCase
+from enmapbox.testing import EnMAPBoxTestCase, start_app
 from qgis.core import QgsProject
+
+start_app()
 
 
 def has_package(name: str):
