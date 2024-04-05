@@ -86,9 +86,13 @@ class EnMAPBoxApplication(QObject):
         self.version: str = None
         self.licence: str = 'GNU GPL-3'
 
-        # optional attributes, can be None
+        # optional attributes, can be None or empty
         self.projectWebsite: str = None
+        self.projectRepository: str = None
+        self.projectIssueTracker: str = None
         self.description: str = None
+
+        self.keywords: List[str] = []
 
     def removeApplication(self):
         """
