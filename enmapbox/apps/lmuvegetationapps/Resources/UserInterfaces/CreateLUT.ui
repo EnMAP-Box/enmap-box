@@ -642,6 +642,9 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="toolTip">
+           <string>Carotenoids will be empirically distributed according to Chlorophyll content</string>
+          </property>
           <property name="layoutDirection">
            <enum>Qt::RightToLeft</enum>
           </property>
@@ -653,7 +656,10 @@
         <item row="3" column="2">
          <widget class="QCheckBox" name="CpCBCCheck">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
+          </property>
+          <property name="toolTip">
+           <string>Protein content probably never exceeds carbon-based constituents</string>
           </property>
           <property name="layoutDirection">
            <enum>Qt::RightToLeft</enum>
@@ -858,7 +864,7 @@
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>0</y>
+           <y>-306</y>
            <width>1050</width>
            <height>932</height>
           </rect>
@@ -973,6 +979,9 @@
                 </item>
                 <item row="3" column="6">
                  <widget class="QLineEdit" name="txt_gauss_std_alia">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                     <horstretch>0</horstretch>
@@ -1109,6 +1118,9 @@
                 </item>
                 <item row="13" column="6">
                  <widget class="QLineEdit" name="txt_gauss_std_psoil">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                     <horstretch>0</horstretch>
@@ -1274,6 +1286,9 @@
                 </item>
                 <item row="1" column="2">
                  <widget class="QLineEdit" name="txt_gauss_min_lai">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                     <horstretch>0</horstretch>
@@ -1524,6 +1539,9 @@
                 </item>
                 <item row="3" column="4">
                  <widget class="QLineEdit" name="txt_gauss_max_alia">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                     <horstretch>0</horstretch>
@@ -1602,6 +1620,9 @@
                 </item>
                 <item row="5" column="6">
                  <widget class="QLineEdit" name="txt_gauss_std_hspot">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                     <horstretch>0</horstretch>
@@ -1858,6 +1879,9 @@
                 </item>
                 <item row="1" column="5">
                  <widget class="QLineEdit" name="txt_gauss_mean_lai">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                     <horstretch>0</horstretch>
@@ -2095,7 +2119,7 @@
                    </font>
                   </property>
                   <property name="text">
-                   <string>1</string>
+                   <string>1.0</string>
                   </property>
                   <property name="placeholderText">
                    <string>value</string>
@@ -2162,6 +2186,9 @@
                 </item>
                 <item row="3" column="2">
                  <widget class="QLineEdit" name="txt_gauss_min_alia">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                     <horstretch>0</horstretch>
@@ -2188,6 +2215,9 @@
                 </item>
                 <item row="5" column="2">
                  <widget class="QLineEdit" name="txt_gauss_min_hspot">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                     <horstretch>0</horstretch>
@@ -2347,6 +2377,9 @@
                 </item>
                 <item row="5" column="4">
                  <widget class="QLineEdit" name="txt_gauss_max_hspot">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                     <horstretch>0</horstretch>
@@ -2646,6 +2679,9 @@
                 </item>
                 <item row="1" column="6">
                  <widget class="QLineEdit" name="txt_gauss_std_lai">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                     <horstretch>0</horstretch>
@@ -2798,7 +2834,7 @@
                    </font>
                   </property>
                   <property name="text">
-                   <string>1</string>
+                   <string>1.0</string>
                   </property>
                   <property name="placeholderText">
                    <string>value</string>
@@ -2807,6 +2843,9 @@
                 </item>
                 <item row="13" column="4">
                  <widget class="QLineEdit" name="txt_gauss_max_psoil">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                     <horstretch>0</horstretch>
@@ -2865,6 +2904,9 @@
                 </item>
                 <item row="13" column="5">
                  <widget class="QLineEdit" name="txt_gauss_mean_psoil">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                     <horstretch>0</horstretch>
@@ -3135,6 +3177,9 @@
                 </item>
                 <item row="13" column="2">
                  <widget class="QLineEdit" name="txt_gauss_min_psoil">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                     <horstretch>0</horstretch>
@@ -3267,6 +3312,9 @@
                 </item>
                 <item row="1" column="4">
                  <widget class="QLineEdit" name="txt_gauss_max_lai">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                     <horstretch>0</horstretch>
@@ -3319,6 +3367,9 @@
                 </item>
                 <item row="3" column="5">
                  <widget class="QLineEdit" name="txt_gauss_mean_alia">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                     <horstretch>0</horstretch>
@@ -3371,6 +3422,9 @@
                 </item>
                 <item row="5" column="5">
                  <widget class="QLineEdit" name="txt_gauss_mean_hspot">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                     <horstretch>0</horstretch>
@@ -7640,6 +7694,9 @@
                     <kerning>true</kerning>
                    </font>
                   </property>
+                  <property name="text">
+                   <string>20</string>
+                  </property>
                   <property name="placeholderText">
                    <string>value</string>
                   </property>
@@ -8040,6 +8097,9 @@
                     <kerning>true</kerning>
                    </font>
                   </property>
+                  <property name="text">
+                   <string>500</string>
+                  </property>
                   <property name="placeholderText">
                    <string>value</string>
                   </property>
@@ -8412,6 +8472,9 @@
                     <kerning>true</kerning>
                    </font>
                   </property>
+                  <property name="text">
+                   <string>1</string>
+                  </property>
                   <property name="placeholderText">
                    <string>value</string>
                   </property>
@@ -8516,6 +8579,9 @@
                     <bold>false</bold>
                     <kerning>true</kerning>
                    </font>
+                  </property>
+                  <property name="text">
+                   <string>15</string>
                   </property>
                   <property name="placeholderText">
                    <string>value</string>
@@ -8765,25 +8831,25 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_18"/>
-  <buttongroup name="buttonGroup_14"/>
-  <buttongroup name="buttonGroup_20"/>
-  <buttongroup name="buttonGroup"/>
-  <buttongroup name="buttonGroup_13"/>
+  <buttongroup name="buttonGroup_19"/>
+  <buttongroup name="buttonGroup_6"/>
   <buttongroup name="buttonGroup_16"/>
   <buttongroup name="buttonGroup_9"/>
-  <buttongroup name="buttonGroup_7"/>
-  <buttongroup name="buttonGroup_2"/>
-  <buttongroup name="buttonGroup_12"/>
-  <buttongroup name="buttonGroup_17"/>
-  <buttongroup name="buttonGroup_8"/>
-  <buttongroup name="buttonGroup_6"/>
-  <buttongroup name="buttonGroup_11"/>
-  <buttongroup name="buttonGroup_10"/>
-  <buttongroup name="buttonGroup_15"/>
   <buttongroup name="buttonGroup_3"/>
-  <buttongroup name="buttonGroup_4"/>
+  <buttongroup name="buttonGroup_15"/>
+  <buttongroup name="buttonGroup_17"/>
+  <buttongroup name="buttonGroup_11"/>
   <buttongroup name="buttonGroup_5"/>
-  <buttongroup name="buttonGroup_19"/>
+  <buttongroup name="buttonGroup_8"/>
+  <buttongroup name="buttonGroup_14"/>
+  <buttongroup name="buttonGroup_10"/>
+  <buttongroup name="buttonGroup_18"/>
+  <buttongroup name="buttonGroup_7"/>
+  <buttongroup name="buttonGroup_12"/>
+  <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup_13"/>
+  <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_4"/>
+  <buttongroup name="buttonGroup_20"/>
  </buttongroups>
 </ui>
