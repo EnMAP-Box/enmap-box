@@ -25,6 +25,9 @@ import warnings
 from os.path import basename, dirname
 from typing import Optional, Dict, Union, Any, List, Sequence
 
+from PyQt5.QtCore import QTimer
+from qgis._core import QgsSettings
+
 import enmapbox
 import enmapbox.gui.datasources.manager
 import qgis.utils
@@ -484,6 +487,12 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         from qgis.utils import iface
         self.iface: QgisInterface = iface
         assert isinstance(self.iface, QgisInterface)
+
+        self.mMapTipTimer = QTimer(self)
+        settings = QgsSettings()
+        int(settings.value('qgis/mapTipsDelay', 850))
+        self.mMapTipTimer.setInterval(int(settings.value('qgis/mapTipsDelay', 850)))
+        self.mMapTipTimer.setSingleShot(True)
 
         self.mMapToolKey = MapTools.Pan
         self.mMapToolMode = None
