@@ -13,7 +13,8 @@ class TestCreateDefaultPalettedRasterRendererAlgorithm(TestCase):
 
     def test(self):
         filename = self.filename('raster.tif')
-        Driver(filename).createFromArray(array=np.array([[[1, 2, 3]]]))
+        writer = Driver(filename).createFromArray(array=np.array([[[1, 2, 3]]]))
+        writer.close()
 
         alg = CreateDefaultPalettedRasterRendererAlgorithm()
         alg.initAlgorithm()

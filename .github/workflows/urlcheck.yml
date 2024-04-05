@@ -1,0 +1,45 @@
+name: ✅ Check URLs
+
+on:
+  push:
+    branches:
+      - main
+      - 'releases/**'
+      - urlcheck
+  pull_request:
+    branches:
+      - main
+      - 'releases/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: urls-checker
+      uses: urlstechie/urlchecker-action@master
+      with:
+        file_types: .md,.py,.rst
+
+        # Choose whether to include file with no URLs in the prints.
+        print_all: false
+
+        timeout: 20
+
+        retry_count: 3
+
+        verbose: true
+
+        force_pass : false
+
+        exclude_files:
+          test_glossary.py
+        # {z}/{x}/{y}: ESRI
+        # {z]/{y}/{x}: CartoDB, Open Weather, OpenTopoMap, OSM, Stamen, Strava, Wikimedia
+        # x={x}&y={y}&z={z}: Google
+        exclude_urls:
+          https://.*,https://bitbucket.org/hu-geomatics/enmap-box/issues//422,http://mrcc.com/qgis.dtd
+
+        exclude_patterns:
+          http://ecn.t3.tiles.virtualearth.net/,%7Bz%7D/%7By%7D/%7Bx%7D,%7Bz%7D/%7Bx%7D/%7By%7D,x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D,https://fbinter.stadt-berlin.de/,https://tiles.wmflabs.org/

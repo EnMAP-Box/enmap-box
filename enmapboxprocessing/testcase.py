@@ -1,4 +1,3 @@
-import inspect
 from os import makedirs
 from os.path import join, exists
 from typing import Union
@@ -12,6 +11,8 @@ from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import Array2d, Array3d, Number
 from qgis.core import QgsRectangle, QgsCoordinateReferenceSystem
 
+enmapbox.testing.start_app()
+
 
 @typechecked
 class TestCase(enmapbox.testing.TestCase):
@@ -23,7 +24,7 @@ class TestCase(enmapbox.testing.TestCase):
 
     def testOutputFolder(self):
         testClassDir = self.tempDir()
-        testMethodDir = join(testClassDir, inspect.stack()[3].function)
+        testMethodDir = join(testClassDir, self._testMethodName)
         if not exists(testMethodDir):
             if not testMethodDir.endswith('__call__'):
                 makedirs(testMethodDir)

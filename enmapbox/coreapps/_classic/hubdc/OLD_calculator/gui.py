@@ -309,8 +309,8 @@ class CalculatorMainWindow(QMainWindow):
         insertRoutine(di, 'Correlating', 'corrcoef correlate cov'.split())
         insertRoutine(di, 'Histograms', 'histogram histogram2d histogramdd bincount digitize'.split())
 
-        d['Online documentations'] = [WebItem(name='NumPy reference', url='https://docs.scipy.org/doc/numpy-dev/reference'),
-                                     WebItem(name='NumPy user guide', url='https://docs.scipy.org/doc/numpy-dev/user'),
+        d['Online documentations'] = [WebItem(name='NumPy reference', url='https://numpy.org/devdocs/reference/'),
+                                     WebItem(name='NumPy user guide', url='https://numpy.org/devdocs/user/'),
                                      WebItem(name='SciPy documentation', url='http://scipy.github.io/devdocs')]
 
         def createTree(d, parent):
@@ -330,7 +330,7 @@ class CalculatorMainWindow(QMainWindow):
                         node.addChild(numpyItem)
 
         createTree(d, self.uiFunctions)
-        self.uiDoc.setUrl(QUrl('https://docs.scipy.org/doc/numpy-dev/reference'))
+        self.uiDoc.setUrl(QUrl('https://numpy.org/devdocs/reference'))
 #        self.createUIFunctionsNumpyGeneric()
 
     def createIdentifier(self, name):

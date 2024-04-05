@@ -1,6 +1,6 @@
 from osgeo import gdal
 
-from enmapboxtestdata import SensorProducts
+from tests.enmapboxtestdata import SensorProducts
 
 qaFile = SensorProducts.Landsat.LC09_L2_MtlTxt.replace('MTL.txt', 'QA_PIXEL.TIF')
 qaFileCopy = SensorProducts.Landsat.LC09_L2_MtlTxt.replace('MTL.txt', 'QA_PIXEL.vrt')

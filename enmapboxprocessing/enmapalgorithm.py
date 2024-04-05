@@ -54,6 +54,9 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     GeoJsonFileFilter = 'GEOJSON files (*.geojson)'
     GeoJsonFileExtension = 'geojson'
     GeoJsonFileDestination = 'GEOJSON file destination.'
+    CsvFileFilter = 'CSV files (*.csv)'
+    CsvFileExtension = 'cvs'
+    CsvFileDestination = 'CSV file destination.'
     DatasetFileFilter = PickleFileFilter + ';;' + JsonFileFilter
     DatasetFileDestination = 'Dataset file destination.'
     RasterFileDestination = 'Raster file destination.'
@@ -119,9 +122,12 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         if layer is None:
             return None
 
-        # if layer is given by URI string or renderer is undefined, we need to manually load the default style
-        if isinstance(parameters.get(name), str) or layer.renderer() is None:
-            layer.loadDefaultStyle()
+        # if layer is given by string (but not by layer ID), ...
+        if isinstance(parameters.get(name), str) and parameters.get(name) not in QgsProject.instance().mapLayers():
+            layer.loadDefaultStyle()  # ... we need to manually load the default style
+
+        if layer.renderer() is None:  # if we still have no valid renderer...
+            layer.loadDefaultStyle()  # ... we also load the dafault style
 
         return layer
 
@@ -201,7 +207,10 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def parameterAsFields(
             self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext
     ) -> Optional[List[str]]:
-        fields = super().parameterAsFields(parameters, name, context)
+        if Qgis.versionInt() >= 33200:
+            fields = super().parameterAsStrings(parameters, name, context)
+        else:
+            fields = super().parameterAsFields(parameters, name, context)
         if len(fields) == 0:
             return None
         else:
@@ -631,7 +640,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         return self.shortHelpString()
 
     def helpUrl(self, *args, **kwargs):
-        return 'https://bitbucket.org/hu-geomatics/enmap-box-geoalgorithmsprovider/overview'
+        return 'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/processing_algorithms/processing_algorithms.html'
 
     def isRunnungInsideModeller(self):
         # hacky way to figure out if this algorithm is currently running inside the modeller
@@ -972,12 +981,12 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def flagParameterAsAdvanced(self, name: str, advanced: bool):
         if advanced:
             p = self.parameterDefinition(name)
-            p.setFlags(int(p.flags()) | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
+            p.setFlags(p.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
 
     def flagParameterAsHidden(self, name: str, hidden: bool):
         if hidden:
             p = self.parameterDefinition(name)
-            p.setFlags(int(p.flags()) | QgsProcessingParameterDefinition.Flag.FlagHidden)
+            p.setFlags(p.flags() | QgsProcessingParameterDefinition.Flag.FlagHidden)
 
     def createLoggingFeedback(
             cls, feedback: QgsProcessingFeedback, logfile: TextIO
@@ -1042,7 +1051,7 @@ class Group(Enum):
 
 
 class CookbookUrls(object):
-    URL = r'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_cookbook'
+    URL = r'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_cookbook/usr_cookbook.html'
     URL_CLASSIFICATION = ('Classification', URL + '/classification.html')
     URL_REGRESSION = ('Regression', URL + '/regression.html')
     URL_CLUSTERING = ('Clustering', URL + '/clustering.html')

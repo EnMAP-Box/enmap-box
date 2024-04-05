@@ -1,8 +1,8 @@
 from enmapboxprocessing.algorithm.aggregaterasterbandsalgorithm import AggregateRasterBandsAlgorithm
 from enmapboxprocessing.algorithm.applymaskalgorithm import ApplyMaskAlgorithm
 from enmapboxprocessing.algorithm.build3dcubealgorithm import Build3dCubeAlgorithm
-from enmapboxprocessing.algorithm.classfractionfromcategorizedvectoralgorithm import \
-    ClassFractionFromCategorizedVectorAlgorithm
+from enmapboxprocessing.algorithm.classfractionfromcategorizedlayeralgorithm import \
+    ClassFractionFromCategorizedLayerAlgorithm
 from enmapboxprocessing.algorithm.classificationfromclassprobabilityalgorithm import \
     ClassificationFromClassProbabilityAlgorithm
 from enmapboxprocessing.algorithm.classificationfromrenderedimagealgorithm import \
@@ -25,6 +25,7 @@ from enmapboxprocessing.algorithm.creatergbimagefromclassprobabilityalgorithm im
     CreateRgbImageFromClassProbabilityAlgorithm
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.algorithm.editrastersourcebandpropertiesalgorithm import EditRasterSourceBandPropertiesAlgorithm
+from enmapboxprocessing.algorithm.exportdatasettofilesalgorithm import ExportDatasetToFilesAlgorithm
 from enmapboxprocessing.algorithm.featureclusteringhierarchicalalgorithm import FeatureClusteringHierarchicalAlgorithm
 from enmapboxprocessing.algorithm.fitaffinitypropagationalgorithm import FitAffinityPropagationAlgorithm
 from enmapboxprocessing.algorithm.fitbirchalgorithm import FitBirchAlgorithm
@@ -103,6 +104,7 @@ from enmapboxprocessing.algorithm.prepareclassificationdatasetfromjsonalgorithm 
     PrepareClassificationDatasetFromJsonAlgorithm
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromtablealgorithm import \
     PrepareClassificationDatasetFromTableAlgorithm
+from enmapboxprocessing.algorithm.preparerasteralgorithm import PrepareRasterAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcodealgorithm import \
     PrepareRegressionDatasetFromCodeAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuouslibraryalgorithm import \
@@ -141,6 +143,7 @@ from enmapboxprocessing.algorithm.randomsamplesfromclassificationdatasetalgorith
     RandomSamplesFromClassificationDatasetAlgorithm
 from enmapboxprocessing.algorithm.randomsamplesfromregressiondatasetalgorithm import \
     RandomSamplesFromRegressionDatasetAlgorithm
+from enmapboxprocessing.algorithm.rasterboundingpolygonalgorithm import RasterBoundingPolygonAlgorithm
 from enmapboxprocessing.algorithm.rasterizecategorizedvectoralgorithm import RasterizeCategorizedVectorAlgorithm
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.algorithm.rasterlayerzonalaggregationalgorithm import RasterLayerZonalAggregationAlgorithm
@@ -212,6 +215,7 @@ from enmapboxprocessing.algorithm.spectralconvolutiontrapezoid1dalgorithm import
 from enmapboxprocessing.algorithm.spectralindexoptimizeralgorithm import SpectralIndexOptimizerAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingbyresponsefunctionlibraryalgorithm import \
     SpectralResamplingByResponseFunctionLibraryAlgorithm
+from enmapboxprocessing.algorithm.spectralresamplingbywavelengthalgorithm import SpectralResamplingByWavelengthAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingbywavelengthandfwhmalgorithm import \
     SpectralResamplingByWavelengthAndFwhmAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtocustomsensoralgorithm import \
@@ -237,7 +241,7 @@ def algorithms():
         AggregateRasterBandsAlgorithm(),
         ApplyMaskAlgorithm(),
         Build3dCubeAlgorithm(),
-        ClassFractionFromCategorizedVectorAlgorithm(),
+        ClassFractionFromCategorizedLayerAlgorithm(),
         CreateSpectralIndicesAlgorithm(),
         ClassificationFromClassProbabilityAlgorithm(),
         ClassificationFromRenderedImageAlgorithm(),
@@ -253,6 +257,7 @@ def algorithms():
         CreateMaskAlgorithm(),
         CreateRgbImageFromClassProbabilityAlgorithm(),
         EditRasterSourceBandPropertiesAlgorithm(),
+        ExportDatasetToFilesAlgorithm(),
         FitGaussianProcessClassifierAlgorithm(),
         FitGenericClassifierAlgorithm(),
         FitGenericRegressorAlgorithm(),
@@ -323,6 +328,7 @@ def algorithms():
         PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(),
         PrepareClassificationDatasetFromCodeAlgorithm(),
         PrepareClassificationDatasetFromJsonAlgorithm(),
+        PrepareRasterAlgorithm(),
         PrepareRegressionDatasetFromCodeAlgorithm(),
         PrepareRegressionDatasetFromContinuousLibraryAlgorithm(),
         PrepareRegressionDatasetFromContinuousRasterAlgorithm(),
@@ -345,6 +351,7 @@ def algorithms():
         RasterizeCategorizedVectorAlgorithm(),
         RasterizeVectorAlgorithm(),
         RasterLayerZonalAggregationAlgorithm(),
+        RasterBoundingPolygonAlgorithm(),
         RasterMathAlgorithm(),
         ReclassifyRasterAlgorithm(),
         RegressionBasedUnmixingAlgorithm(),
@@ -396,6 +403,7 @@ def algorithms():
         SpectralIndexOptimizerAlgorithm(),
         SpectralResamplingByResponseFunctionLibraryAlgorithm(),
         SpectralResamplingByWavelengthAndFwhmAlgorithm(),
+        SpectralResamplingByWavelengthAlgorithm(),
         SpectralResamplingToCustomSensorAlgorithm(),
         SpectralResamplingToDesisAlgorithm(),
         SpectralResamplingToEnmapAlgorithm(),

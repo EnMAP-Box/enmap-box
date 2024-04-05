@@ -17,8 +17,7 @@ class Worker(WorkflowWorker):
 
     def run_(self, progressCallback, *args, **kwargs):
         from _classic.hubflow.core import VectorClassification, Classification, Raster, ApplierOptions
-        import enmapboxtestdata
-
+        from tests import enmapboxtestdata
 
         import time
         time.time()

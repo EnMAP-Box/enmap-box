@@ -65,7 +65,7 @@ class DASFretrievalAlgorithm(QgsProcessingAlgorithm):
         html = '' \
        '<p>This tool derives the DASF (directional area scattering factor) function for vegetation canopy with dark' \
         'background or sufficiently dense vegetation where the impact of canopy background is negligible.</p>' \
-        '<a href="https://www.pnas.org/content/110/3/E185">Knyazikhin et al. 2013</a>' \
+        '<a href="https://doi.org/10.1073/pnas.1210196109">Knyazikhin et al. 2013</a>' \
         '<h3>Input raster</h3>' \
         '<p>Hyperspectral raster image.</p>' \
         '<h3>DASF output raster</h3>' \
@@ -82,7 +82,7 @@ class DASFretrievalAlgorithm(QgsProcessingAlgorithm):
         return html
 # 6
     def helpUrl(self, *args, **kwargs):
-        return 'https://enmap-box-workshop2019.readthedocs.io'
+        return ''
 # 7
     def createInstance(self):
         return type(self)()

@@ -1,7 +1,7 @@
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import regressorDumpMultiTargetPkl
+from tests.enmapboxtestdata import regressorDumpMultiTargetPkl
 from regressiondatasetmanagerapp import RegressionDatasetManagerGui
 
 qgsApp = start_app()

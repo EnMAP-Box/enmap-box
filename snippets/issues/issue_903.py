@@ -17,6 +17,7 @@ ds = gdal.Translate(filename, enmap)
 writer = RasterWriter(ds)
 for bandNo in range(1, 101):
     writer.setBadBandMultiplier(0, 2)
+writer.close()
 del writer, ds
 layer = QgsRasterLayer(filename)
 

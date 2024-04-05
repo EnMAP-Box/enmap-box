@@ -118,7 +118,7 @@ class CalculatorOperator(ApplierOperator):
 
 
 def test():
-    import enmapboxtestdata
+    from tests import enmapboxtestdata
     calculator = Calulator()
     calculator.inputRaster.setRaster(key='enmap', value=ApplierInputRaster(filename=enmapboxtestdata.enmap))
     calculator.inputRaster.setRaster(key='classification',

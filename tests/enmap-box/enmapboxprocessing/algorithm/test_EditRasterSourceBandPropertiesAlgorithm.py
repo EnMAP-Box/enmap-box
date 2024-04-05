@@ -1,25 +1,36 @@
+import os.path
 from time import sleep
+from unittest import SkipTest
 
 from osgeo import gdal
 
-from enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.editrastersourcebandpropertiesalgorithm import EditRasterSourceBandPropertiesAlgorithm
-from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxtestdata import enmap
 from qgis.PyQt.QtCore import QDateTime
+
+raise SkipTest('EditRasterSourceBandPropertiesAlgorithm disabled, wait for STAC edit functionality')
 
 
 class TestEditRasterSourceBandPropertiesAlgorithm(TestCase):
 
     def copyEnmap(self, gtiff=False):
         # make a copy of enmap
+
         alg = TranslateRasterAlgorithm()
+
+        path_output = self.filename('enmap' + ('.tif' if gtiff else '.vrt'))
+        i = 0
+        while os.path.isfile(path_output):
+            i += 1
+            path_output = self.filename(f'enmap{i}' + ('.tif' if gtiff else '.vrt'))
+
         parameters = {
             alg.P_RASTER: enmap,
             alg.P_OFFSET: -9999,
             alg.P_CREATION_PROFILE: alg.GTiffFormat if gtiff else alg.VrtFormat,
-            alg.P_OUTPUT_RASTER: self.filename('enmap' + ('.tif' if gtiff else '.vrt'))
+            alg.P_OUTPUT_RASTER: path_output,
         }
         self.runalg(alg, parameters)
 

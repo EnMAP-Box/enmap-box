@@ -248,6 +248,7 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
                 writer = RasterWriter(ds)
                 for bandNo, fieldName in enumerate(fieldNames, 1):
                     writer.setBandName(fieldName, bandNo)
+                writer.close()
                 del ds, writer
                 raster = QgsRasterLayer(stackFilename)
                 rasters[vectorName] = raster
@@ -315,8 +316,7 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
                 for writer in list(writers.values()):
                     firstResult = writer.source()
                     writer.close()
-                    del writer
-                    del writers
+
                     feedback.pushWarning(
                         f'Default output raster ({self.P_OUTPUT_RASTER} variable) not specified. '
                         f'First variable found ({splitext(basename(firstResult))[0]}) is used instead.'
@@ -333,6 +333,9 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
                     result[self.P_OUTPUT_RASTER] = firstResult
                     break
 
+            for writer in writers.values():
+                if not writer.closed:
+                    writer.close()
             self.toc(feedback, result)
 
         return result
@@ -632,6 +635,7 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
         # Check if single line was already a statement. If so, remove the default output from the results.
         if isSingleLineCode and len(results) > 1:
             results.pop(self.P_OUTPUT_RASTER)
+
         return results
 
     def isTemporaryVariable(self, name) -> bool:

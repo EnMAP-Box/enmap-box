@@ -1,11 +1,11 @@
 import numpy as np
 from osgeo import gdal
 
-from enmapboxtestdata import enmap
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.testcase import TestCase
 from enmapboxprocessing.utils import Utils
+from enmapboxtestdata import enmap
 from enmapboxtestdata import fraction_polygon_l3
 from qgis.PyQt.QtCore import QDateTime, QSizeF
 from qgis.core import QgsRasterRange, QgsRasterLayer, Qgis, QgsRectangle
@@ -292,15 +292,16 @@ class TestRasterReader(TestCase):
         writer = self.rasterFromArray(np.zeros((4, 1, 1)))
         writer.setMetadataItem('wavelength', 500, '', 1)
         writer.setMetadataItem('wavelength', 0.5, '', 2)
+        writer.setMetadataItem('wavelength', 1000, '', 3)
+        writer.setMetadataItem('wavelength', 1000, '', 4)
         writer.setMetadataItem('wavelength_units', 'Nanometers', '', 3)
         writer.setMetadataItem('wavelength_unit', 'Micrometers', '', 4)
         writer.close()
         reader = RasterReader(writer.source())
-        self.assertEqual('Nanometers', reader.wavelengthUnits(1))  # guessed
-        self.assertEqual('Micrometers', reader.wavelengthUnits(2))  # guessed
-        self.assertIsNone(reader.wavelengthUnits(1, guess=False))
-        self.assertEqual('Nanometers', reader.wavelengthUnits(3))
-        self.assertEqual('Micrometers', reader.wavelengthUnits(4))
+        self.assertEqual('Micrometers', reader.wavelengthUnits(1))  # STAC stores it as Micrometers
+        self.assertEqual('Micrometers', reader.wavelengthUnits(2))  # STAC stores it as Micrometers
+        self.assertEqual('Micrometers', reader.wavelengthUnits(3))  # STAC stores it as Micrometers
+        self.assertEqual('Micrometers', reader.wavelengthUnits(4))  # STAC stores it as Micrometers
 
         # check at dataset-level
         writer = self.rasterFromArray(np.zeros((3, 1, 1)))
@@ -385,7 +386,7 @@ class TestRasterReader(TestCase):
         self.assertEqual(1, reader.badBandMultiplier(3))
 
         # check at dataset-level
-        writer = self.rasterFromArray(np.zeros((3, 1, 1)))
+        writer = self.rasterFromArray(np.zeros((2, 1, 1)))
         writer.setMetadataItem('bbl', [0, 1], '')
         writer.close()
         reader = RasterReader(writer.source())
@@ -437,7 +438,7 @@ class TestRasterReader(TestCase):
         reader = RasterReader(writer.source())
         self.assertEqual(QDateTime(2009, 8, 20, 9, 44, 50), reader.startTime(1))
 
-    def test_endTime(self):
+    def test_endTime1(self):
         # no time set
         writer = self.rasterFromArray(np.zeros((3, 1, 1)))
         writer.close()
@@ -445,6 +446,7 @@ class TestRasterReader(TestCase):
         self.assertIsNone(reader.endTime())
         self.assertIsNone(reader.endTime(1))
 
+    def test_endTime2(self):
         # check at dataset-level
         # - standard format
         writer = self.rasterFromArray(np.zeros((3, 1, 1)))
@@ -453,6 +455,7 @@ class TestRasterReader(TestCase):
         reader = RasterReader(writer.source())
         self.assertEqual(QDateTime(2009, 8, 20, 9, 44, 50), reader.endTime(1))
 
+    def test_endTime3(self):
         # check at band-level
         # - standard format
         writer = self.rasterFromArray(np.zeros((3, 1, 1)))
@@ -533,17 +536,125 @@ class TestRasterReader(TestCase):
         self.assertEqual(gold * 2, reader.lineMemoryUsage(nBands=bandCount * 2))
         self.assertEqual(gold * 2, reader.lineMemoryUsage(dataTypeSize=8))
 
-    def test_pamMetadata(self):
-        layer = QgsRasterLayer(enmap)
-        reader = RasterReader(layer)
-        wavelength1 = 0.123
-        wavelengthUnits1 = 'Micrometers'
-        layer.setCustomProperty('QGISPAM/band/42//wavelength', wavelength1)
-        layer.setCustomProperty('QGISPAM/band/42//wavelength_units', wavelengthUnits1)
-        self.assertEqual(wavelength1, layer.customProperty('QGISPAM/band/42//wavelength'))
-        self.assertEqual(wavelengthUnits1, layer.customProperty('QGISPAM/band/42//wavelength_units'))
+    def test_stacMetadata(self):
+        writer = self.rasterFromArray(np.zeros((1, 5, 5)), 'raster.tif')
+        writer.close()
+        stacMetadata = {
+            "properties": {
+                "dataset_key": 42,
+                "eo:bands": [
+                    {
+                        "name": "A",
+                        "center_wavelength": 1,
+                        "full_width_half_max": 0.1,
+                        "datetime": "2022-01-01T12:00:00",
+                        "enmapbox:bad_band_multiplier": 0,
+                        "band_key": 42,
+                    }
+                ]
+            }
+        }
+        Utils().jsonDump(stacMetadata, writer.source() + '.stac.json')
 
-        wavelengthUnits2 = reader.wavelengthUnits(42)
-        wavelength2 = reader.wavelength(42, wavelengthUnits2)
-        self.assertEqual(wavelength1, wavelength2)
-        self.assertEqual(wavelengthUnits1, wavelengthUnits2)
+        reader = RasterReader(writer.source())
+        self.assertEqual(42, reader.metadataItem('dataset_key'))
+        self.assertEqual(42, reader.metadataItem('band_key', '', 1))
+        self.assertEqual('A', reader.bandName(1))
+        self.assertEqual(reader.Micrometers, reader.wavelengthUnits(1))
+        self.assertEqual(1000, reader.wavelength(1))
+        self.assertEqual(100, reader.fwhm(1))
+        self.assertEqual(QDateTime(2022, 1, 1, 12, 0, 0), reader.startTime(1))
+        self.assertIsNone(reader.endTime(1))
+        self.assertEqual(QDateTime(2022, 1, 1, 12, 0, 0), reader.centerTime(1))
+        self.assertEqual(0, reader.badBandMultiplier(1))
+
+    def test_stacMetadata_dateTimeRange(self):
+        writer = self.rasterFromArray(np.zeros((1, 5, 5)), 'raster.tif')
+        stacMetadata = {
+            "properties": {
+                "eo:bands": [
+                    {
+                        "start_datetime": "2022-01-01T12:00:00",
+                        "end_datetime": "2022-01-03T12:00:00",
+                    }
+                ]
+            }
+        }
+        Utils().jsonDump(stacMetadata, writer.source() + '.stac.json')
+        writer.close()
+
+        reader = RasterReader(writer.source())
+        self.assertEqual(QDateTime(2022, 1, 1, 12, 0, 0), reader.startTime(1))
+        self.assertEqual(QDateTime(2022, 1, 3, 12, 0, 0), reader.endTime(1))
+        self.assertEqual(QDateTime(2022, 1, 2, 12, 0, 0), reader.centerTime(1))
+
+    def test_stacMetadata_enviStyle(self):
+        writer = self.rasterFromArray(np.zeros((2, 5, 5)), 'raster.tif')
+        writer.close()
+        stacMetadata = {
+            "properties": {
+                "envi:metadata": {
+                    "band_names": ["Band A", "Band B"],
+                    "wavelength": [1, 2],
+                    "wavelength_units": "Micrometers",
+                    "fwhm": [0.1, 0.2],
+                    "bbl": [1, 0],
+                    "acquisition_time": "2022-01-01T12:00:00",
+                    "my_key": 42
+                }
+            }
+        }
+        Utils().jsonDump(stacMetadata, writer.source() + '.stac.json')
+
+        reader = RasterReader(writer.source())
+        self.assertEqual('Band A', reader.bandName(1))
+        self.assertEqual('Band B', reader.bandName(2))
+        self.assertEqual(reader.Micrometers, reader.wavelengthUnits(1))
+        self.assertEqual(reader.Micrometers, reader.wavelengthUnits(2))
+        self.assertEqual(1000, reader.wavelength(1))
+        self.assertEqual(2000, reader.wavelength(2))
+        self.assertEqual(100, reader.fwhm(1))
+        self.assertEqual(200, reader.fwhm(2))
+        self.assertEqual(1, reader.badBandMultiplier(1))
+        self.assertEqual(0, reader.badBandMultiplier(2))
+        self.assertEqual(QDateTime(2022, 1, 1, 12, 0, 0), reader.startTime())
+        self.assertIsNone(reader.endTime(1))
+        self.assertEqual(QDateTime(2022, 1, 1, 12, 0, 0), reader.centerTime())
+        self.assertEqual(42, reader.metadataItem('my_key', 'envi'))
+
+    def test_stacMetadata_enviStyle_datetime(self):
+        writer = self.rasterFromArray(np.zeros((2, 5, 5)), 'raster.tif')
+        stacMetadata = {
+            "properties": {
+                "envi:metadata": {
+                    "eo:datetime": ["2022-01-01T12:00:00", "2023-01-01T12:00:00"]
+                }
+            }
+        }
+        Utils().jsonDump(stacMetadata, writer.source() + '.stac.json')
+        writer.close()
+
+        reader = RasterReader(writer.source())
+        self.assertEqual(QDateTime(2022, 1, 1, 12, 0, 0), reader.startTime(1))
+        self.assertEqual(QDateTime(2022, 1, 1, 12, 0, 0), reader.centerTime(1))
+        self.assertEqual(QDateTime(2023, 1, 1, 12, 0, 0), reader.startTime(2))
+        self.assertEqual(QDateTime(2023, 1, 1, 12, 0, 0), reader.centerTime(2))
+
+    def test_stacMetadata_enviStyle_datetime2(self):
+        writer = self.rasterFromArray(np.zeros((2, 5, 5)), 'raster.tif')
+        stacMetadata = {
+            "properties": {
+                "envi:metadata": {
+                    "eo:start_datetime": ["2022-01-01T00:00:00", "2023-01-01T00:00:00"],
+                    "eo:end_datetime": ["2023-01-01T00:00:00", "2024-01-01T00:00:00"]
+                }
+            }
+        }
+        Utils().jsonDump(stacMetadata, writer.source() + '.stac.json')
+        writer.close()
+
+        reader = RasterReader(writer.source())
+        self.assertEqual(QDateTime(2022, 1, 1, 0, 0, 0), reader.startTime(1))
+        self.assertEqual(QDateTime(2023, 1, 1, 0, 0, 0), reader.endTime(1))
+        self.assertEqual(QDateTime(2023, 1, 1, 0, 0, 0), reader.startTime(2))
+        self.assertEqual(QDateTime(2024, 1, 1, 0, 0, 0), reader.endTime(2))

@@ -1,25 +1,35 @@
+import shutil
 from collections import defaultdict
 from os import listdir, makedirs, sep
-from os.path import join, isdir, dirname, exists, normpath
+from os.path import join, isdir, dirname, exists, normpath, basename
 from typing import Optional
 from xml.etree import ElementTree
 
+import numpy as np
 from osgeo import gdal
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from enmapboxprocessing.algorithm.importenmapl2aalgorithm import ImportEnmapL2AAlgorithm
+from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
+from enmapboxprocessing.utils import Utils
 from qgis.core import QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform, \
-    QgsProject, QgsVectorLayer, QgsGeometry
+    QgsProject, QgsVectorLayer, QgsGeometry, Qgis, QgsRectangle
 
 rootData = r'D:\data\EnFireMap\data'
 rootCube = r'D:\data\EnFireMap\cube'
 rootTmpWarped = r'D:\data\EnFireMap\data\_warped'
 rootTmpMosaics = r'D:\data\EnFireMap\data\_mosaics'
-tilingScheme = QgsVectorLayer(r'D:\data\EnFireMap\cube\shp\grid.shp')
+tilingScheme = QgsVectorLayer(r'D:\data\EnFireMap\cube\shp\grid2.geojson')
+assert tilingScheme.isValid()
 idField = 'Tile_ID'
+goodWavelengthFile = join(dirname(__file__), 'good_wavelengths.txt')
+badWavelengthFile = join(dirname(__file__), 'bad_wavelengths.txt')
+goodWavelength = np.loadtxt(goodWavelengthFile, float).flatten().tolist()
+badWavelength = np.loadtxt(badWavelengthFile, float).flatten().tolist()
+useWavelength = [float(v) for v in goodWavelength if v not in badWavelength]
 
 products = [
     'QL_PIXELMASK.TIF', 'QL_QUALITY_CIRRUS.TIF', 'QL_QUALITY_CLASSES.TIF', 'QL_QUALITY_CLOUD.TIF',
@@ -29,21 +39,64 @@ products = [
 productNoDataValues = defaultdict(lambda: 0)
 productNoDataValues['QL_PIXELMASK.TIF'] = 255
 
+# create spectral raster for subsetting
+spectralRasterForSubsettingFile = join(Utils().getTempDirInTempFolder(), 'spectralRasterForSubsetting.vrt')
+writer = Driver(spectralRasterForSubsettingFile).create(
+    Qgis.DataType.Byte, 1, 1, len(useWavelength), QgsRectangle(0, 0, 1, 1),
+    QgsCoordinateReferenceSystem.fromEpsgId(4326)
+)
+for bandNo, wavelength in enumerate(useWavelength, 1):
+    writer.setWavelength(wavelength, bandNo)
+writer.close()
+
 
 def prepareSpectralImages():
     for name in listdir(rootData):
         if isdir(join(rootData, name)):
             xmlFilename = auxFindMetadataXml(join(rootData, name))
             if xmlFilename is not None:
+                # import product
                 alg = ImportEnmapL2AAlgorithm()
                 parameters = {
                     alg.P_FILE: xmlFilename,
-                    alg.P_SET_BAD_BANDS: True,
-                    alg.P_EXCLUDE_BAD_BANDS: True,
+                    alg.P_SET_BAD_BANDS: False,
+                    alg.P_EXCLUDE_BAD_BANDS: False,
                     alg.P_DETECTOR_OVERLAP: alg.OrderByWavelengthOverlapOption,
-                    alg.P_OUTPUT_RASTER: xmlFilename.replace('METADATA.XML', 'SPECTRAL_IMAGE.vrt'),
+                    alg.P_OUTPUT_RASTER: xmlFilename.replace('METADATA.XML', 'SPECTRAL_IMAGE_FULL.vrt'),
                 }
-                alg.runAlg(alg, parameters)
+                result = alg.runAlg(alg, parameters)
+
+                # spectral alignment/subsetting
+                alg2 = TranslateRasterAlgorithm()
+                parameters2 = {
+                    alg2.P_RASTER: result[alg.P_OUTPUT_RASTER],
+                    alg2.P_SPECTRAL_RASTER: spectralRasterForSubsettingFile,
+                    alg2.P_OUTPUT_RASTER: xmlFilename.replace('METADATA.XML', 'SPECTRAL_IMAGE.vrt'),
+                }
+                alg2.runAlg(alg2, parameters2)
+
+
+def copyMetadataXml():
+    for name in listdir(rootData):
+        if isdir(join(rootData, name)):
+            xmlFilename = auxFindMetadataXml(join(rootData, name))
+            if xmlFilename is not None:
+                boundingPolygon = auxDeriveSceneBoundingPolygon(xmlFilename)
+                sourceCrs = QgsCoordinateReferenceSystem(4326)
+                destCrs = tilingScheme.crs()
+                tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
+                boundingPolygon.transform(tr)
+                tilingScheme.selectByRect(boundingPolygon.boundingBox())
+                for feature in tilingScheme.selectedFeatures():  # course selection via bounding box
+                    if not feature.geometry().intersects(boundingPolygon):  # fine selection
+                        continue
+                    tileName = str(feature.attribute(idField))
+                    print('copy', tileName, basename(xmlFilename), flush=True)
+                    filename2 = join(rootCube, tileName, basename(xmlFilename))
+                    if not exists(join(rootCube, tileName)):
+                        makedirs(join(rootCube, tileName))
+                    if not exists(filename2):
+                        shutil.copyfile(xmlFilename, filename2)
 
 
 def ingestData():
@@ -64,18 +117,7 @@ def ingestData():
         for scene in scenes:
             print('warp', scene, flush=True)
             xmlFilename = auxFindMetadataXml(join(rootData, scene))
-
-            # get bounding polygon
-            root = ElementTree.parse(xmlFilename).getroot()
-            points = dict()
-            for point in root.findall('base/spatialCoverage/boundingPolygon/point'):
-                key = point.find('frame').text
-                x = point.find('longitude').text
-                y = point.find('latitude').text
-                points[key] = QgsPointXY(float(x), float(y))
-            boundingPolygon = QgsGeometry.fromPolygonXY(
-                [[points[key] for key in ['upper_left', 'upper_right', 'lower_right', 'lower_left']]]
-            )
+            boundingPolygon = auxDeriveSceneBoundingPolygon(xmlFilename)
             boundingPolygonsByDate[datestamp].append(boundingPolygon)
 
             for product in products:
@@ -149,6 +191,7 @@ def ingestData():
                     for bandNo in reader.bandNumbers():
                         writer.setMetadata(reader.metadata(bandNo), bandNo)
                         writer.setBandName(reader.bandName(bandNo), bandNo)
+                    writer.close()
 
 
 def auxFindMetadataXml(folder: str) -> Optional[str]:
@@ -158,6 +201,21 @@ def auxFindMetadataXml(folder: str) -> Optional[str]:
     return None
 
 
-# prepareSpectralImages()
+def auxDeriveSceneBoundingPolygon(xmlFilename) -> QgsGeometry:
+    # get bounding polygon
+    root = ElementTree.parse(xmlFilename).getroot()
+    points = dict()
+    for point in root.findall('base/spatialCoverage/boundingPolygon/point'):
+        key = point.find('frame').text
+        x = point.find('longitude').text
+        y = point.find('latitude').text
+        points[key] = QgsPointXY(float(x), float(y))
+    boundingPolygon = QgsGeometry.fromPolygonXY(
+        [[points[key] for key in ['upper_left', 'upper_right', 'lower_right', 'lower_left']]]
+    )
+    return boundingPolygon
+
+
+prepareSpectralImages()
+copyMetadataXml()
 ingestData()
-print('done')

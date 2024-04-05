@@ -70,7 +70,8 @@ class LayerToMaskAlgorithm(EnMAPProcessingAlgorithm):
                 reader = RasterReader(raster)
                 array = reader.array()
                 marray = reader.maskArray(array, defaultNoDataValue=0)
-                Driver(filename, feedback=feedback).createFromArray(marray, reader.extent(), reader.crs())
+                writer = Driver(filename, feedback=feedback).createFromArray(marray, reader.extent(), reader.crs())
+                writer.close()
             elif isinstance(layer, QgsVectorLayer):
                 feedback.pushInfo('Prepare mask')
                 alg = RasterizeVectorAlgorithm()

@@ -3,6 +3,7 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
@@ -10,7 +11,6 @@ from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtGui import QColor
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis, QgsProcessingException)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -77,6 +77,13 @@ class PredictRegressionAlgorithm(EnMAPProcessingAlgorithm):
                 except ValueError:
                     pass
 
+            # ... if not possible, try to remove bad bands
+            if bandList is None and len(bandNames) != len(dump.features):
+                goodBandList = [bandNo for bandNo in rasterReader.bandNumbers()
+                                if rasterReader.badBandMultiplier(bandNo) == 1]
+                if len(goodBandList) == len(dump.features):
+                    bandList = goodBandList
+
             # ... if not possible, use original bands, if overall number of bands and features do match
             if bandList is None and len(bandNames) != len(dump.features):
                 message = f'regressor features ({dump.features}) not matching raster bands ({bandNames})\n' \
@@ -114,6 +121,7 @@ class PredictRegressionAlgorithm(EnMAPProcessingAlgorithm):
                 if t.color is not None:
                     writer.setBandColor(QColor(t.color), bandNo)
             writer.setNoDataValue(noDataValue)
+            writer.close()
 
             result = {self.P_OUTPUT_REGRESSION: filename}
             self.toc(feedback, result)

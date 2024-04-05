@@ -15,16 +15,18 @@ class TestDriver(TestCase):
         ds = gdal.Open(enmap)
         array = ds.ReadAsArray()
         layer = QgsRasterLayer(enmap)
-        outraster = Driver(self.filename('enmap.tif')).createFromArray(array, extent=layer.extent(), crs=layer.crs())
-        outraster.setNoDataValue(-99)
-        outraster.setMetadataItem('a', 42)
+        writer = Driver(self.filename('enmap.tif')).createFromArray(array, extent=layer.extent(), crs=layer.crs())
+        writer.setNoDataValue(-99)
+        writer.setMetadataItem('a', 42)
+        writer.close()
 
     def test_createSinglePixel_3Band_PseudoRaster(self):
         shape = (3, 1, 1)
-        array = np.array(list(range(np.product(shape)))).reshape(shape)
+        array = np.array(list(range(np.prod(shape)))).reshape(shape)
         array[:, 0, 0] = -1
         filename = self.filename('raster.bsq')
-        Driver(filename).createFromArray(array)
+        writer = Driver(filename).createFromArray(array)
+        writer.close()
         raster = RasterReader(filename)
 
         crs: QgsCoordinateReferenceSystem = raster.crs()
@@ -38,7 +40,8 @@ class TestDriver(TestCase):
         for i, dtype in enumerate([np.uint8, np.float32, np.float64, np.int16, np.int32, np.uint16, np.uint32]):
             filename = self.filename(f'raster_{i}.tif')
             array = np.array([[[0]]], dtype=dtype)
-            Driver(filename).createFromArray(array)
+            writer = Driver(filename).createFromArray(array)
+            writer.close()
             raster = RasterReader(filename)
             self.assertEqual(raster.array()[0].dtype, array.dtype)
 
@@ -46,7 +49,8 @@ class TestDriver(TestCase):
         for format in ['ENVI', 'GTiff']:
             filename = self.filename(f'raster_{format}.tif')
             array = np.array([[[1]], [[2]], [[3]]])
-            Driver(filename, format=format).createFromArray(array)
+            writer = Driver(filename, format=format).createFromArray(array)
+            writer.close()
             raster = RasterReader(filename)
             lead = raster.array()
             self.assertArrayEqual(lead, array)
@@ -55,9 +59,11 @@ class TestDriver(TestCase):
         shape = 3, 5, 6
         filename1 = self.filename('raster1.tif')
         filename2 = self.filename('raster2.tif')
-        Driver(filename1).createFromArray(np.zeros(shape))
+        writer = Driver(filename1).createFromArray(np.zeros(shape))
+        writer.close()
         raster1 = RasterReader(filename1)
-        Driver(self.filename('raster2.tif')).createLike(raster1)
+        writer = Driver(self.filename('raster2.tif')).createLike(raster1)
+        writer.close()
         raster2 = RasterReader(filename2)
         self.assertEqual(raster1.extent(), raster2.extent())
         self.assertEqual(raster1.width(), raster2.width())
@@ -68,8 +74,10 @@ class TestDriver(TestCase):
         shape = 3, 5, 6
         filename1 = self.filename('raster1.tif')
         filename2 = self.filename('raster2.tif')
-        Driver(filename1).createFromArray(np.zeros(shape))
-        Driver(filename2).createLike(RasterReader(filename1), nBands=1, dataType=Qgis.DataType.Byte)
+        writer = Driver(filename1).createFromArray(np.zeros(shape))
+        writer.close()
+        writer = Driver(filename2).createLike(RasterReader(filename1), nBands=1, dataType=Qgis.DataType.Byte)
+        writer.close()
         raster2 = RasterReader(filename2)
         self.assertEqual(1, raster2.bandCount())
         self.assertEqual(Qgis.DataType.Byte, raster2.dataType(1))
@@ -77,7 +85,8 @@ class TestDriver(TestCase):
     def test_createArray_cutOverlap(self):
         array = np.ones((3, 15, 15))
         filename = self.filename('raster.bsq')
-        Driver(filename).createFromArray(array, overlap=5)
+        writer = Driver(filename).createFromArray(array, overlap=5)
+        writer.close()
         raster = RasterReader(filename)
         self.assertEqual(5, raster.width())
         self.assertEqual(5, raster.height())

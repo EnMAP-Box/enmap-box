@@ -1,3 +1,4 @@
+import os
 import warnings
 from os import makedirs
 from os.path import splitext, exists, dirname
@@ -58,6 +59,12 @@ class Driver(object):
 
         if not exists(dirname(self.filename)):
             makedirs(dirname(self.filename))
+
+        if exists(self.filename + 'stac.json'):
+            try:
+                os.remove(self.filename + 'stac.json')
+            except Exception:
+                pass
 
         gdalDriver: gdal.Driver = gdal.GetDriverByName(self.format)
         try:

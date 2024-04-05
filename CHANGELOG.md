@@ -1,10 +1,95 @@
 # CHANGELOG
+
+## Version 3.14
+
+_This release was tested with QGIS 3.34 (LTR) and 3.36 (latest release)._
+
+### GUI
+
+* _Spectral View_ panel: all SpectralProfile attributes are found automatically when opening a vector layer ([#778](https://github.com/EnMAP-Box/enmap-box/issues/778))
+* _Spectral View_ panel: added option for check/uncheck individual fields to be interpreted as SpectralProfile fields ([#758](https://github.com/EnMAP-Box/enmap-box/issues/758))
+* _Data Sources_ panel: improved support for _Open in Explorer_ for vector sources ([#678](https://github.com/EnMAP-Box/enmap-box/issues/678))
+* _Data Sources_ panel: added option for plotting list values ([#668](https://github.com/EnMAP-Box/enmap-box/issues/668))
+* _Map Canvas_: fixed shortcuts to copy spatial extents or the map canvas center coordinate ([#738](https://github.com/EnMAP-Box/enmap-box/issues/738)
+
+### Earth Observation for QGIS (EO4Q) Applications
+
+* _Profile Analytics_ application: added option for aggregated Z-Profiles under a selected polygon ([#261](https://github.com/EnMAP-Box/enmap-box/issues/261))
+
+### Data Formats / Metadata Handling
+
+* we now support STAC-like metadata ([#753](https://github.com/EnMAP-Box/enmap-box/issues/753)); for details see [Introduction to STAC Metadata](https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/metadata_guide.html#introduction-to-stac-metadata)
+
+### Processing Algorithms
+
+* added _Scale/truncate/convert raster layer_ algorithm: allows to scale, truncate and convert raster data ([#765](https://github.com/EnMAP-Box/enmap-box/issues/765))
+* added _Export classification/regression dataset (to text files)_ algorithm: allows export a classification/regression dataset to tabulated text files. ([#664](https://github.com/EnMAP-Box/enmap-box/issues/664))
+* added _Raster layer bounding polygon_ algorithm: allows to compute raster layer bounding polygon that encloses all data pixel[#634](https://github.com/EnMAP-Box/enmap-box/issues/634))
+
+* _Classification layer accuracy and area report_ algorithm: added support for non-matching category names ([#845](https://github.com/EnMAP-Box/enmap-box/issues/845))
+* _Spectral resampling (to wavelength)_ algorithm: added option for nearest neighbour resampling ([#801](https://github.com/EnMAP-Box/enmap-box/issues/801))
+* _Create classification dataset (from categorized spectral library)_ algorithm: added option for excluding bad bands ([#766](https://github.com/EnMAP-Box/enmap-box/issues/766))
+* _Class fraction layer from categorized layer_ algorithm: added support for raster layer ([#702](https://github.com/EnMAP-Box/enmap-box/issues/702))
+* _Sample raster layer values_ algorithm: added option for skipping pixels from no data regions ([#684](https://github.com/EnMAP-Box/enmap-box/issues/684))
+* _Import product_ algorithms: set default style to RGB TrueColor renderer ([#635](https://github.com/EnMAP-Box/enmap-box/issues/635))
+* _Classification workflow_ algorithm: set default style to RGB TrueColor renderer ([#635](https://github.com/EnMAP-Box/enmap-box/issues/635))
+
+### Bugfixes
+
+* [v3.14.0](https://github.com/EnMAP-Box/enmap-box/milestone/14?closed=1)
+
 ## Version 3.13
 
-_This release was tested with QGIS 3.28 (LTR) and 3.32 (latest release)
+_This release was tested with QGIS 3.28 (LTR), 3.32 and 3.34 (latest release)._
+
+### Example Dataset
+
+* the previous _Berlin_ example dataset (based on simulated data) was replaced by a new dataset derived from real EnMAP L2A data, covering the _Potsdam_ region
+* the underlying full EnMAP L2A scene can be downloaded from within the _EnMAP-Box Menu > Project > Download Example Scene_ (without user registration etc.) 
+* updated the EnMAP sensor model (wavelength and fwhm) ([#496](https://github.com/EnMAP-Box/enmap-box/issues/496))
+
+#### QGIS Expressions / QGIS Field Calculator
+
+* ``raster_array`` and ``raster_profile`` function can use polygon input
+
+### Python Dependencies
 
 * updated [PyQtGraph](https://www.pyqtgraph.org/) to version 0.13.4 (via update of QPS)
-* 
+
+### Earth Observation for QGIS (EO4Q) Applications
+
+* _Profile Analytics_ application: added option for linking profiles from _GEE Time Series Explorer_ ([#531](https://github.com/EnMAP-Box/enmap-box/issues/531))
+* _Profile Analytics_ application: added option for linking profiles into _Spectral Views_ ([#530](https://github.com/EnMAP-Box/enmap-box/issues/530))
+
+### GUI
+
+* _Spectral View_: added distance units (e.g. m, km) for properly plotting spatial profiles ([#525](https://github.com/EnMAP-Box/enmap-box/issues/525))
+
+### Processing Algorithms
+
+* added _Classification layer from rendered image_ algorithm: allows to create a classification layer from a rendered image; classes are derived from the unique RGB values ([#611](https://github.com/EnMAP-Box/enmap-box/issues/611))
+* added _Random points from raster layer value-ranges_ algorithm: allows to create a point layer with a given number of random points, all of them within specified value-ranges of the given raster band ([#593](https://github.com/EnMAP-Box/enmap-box/issues/593))
+* added _Spectral resampling (to wavelength)_ algorithm: allows to spectrally resample a spectral raster layer by applying linear interpolation at given wavelengths ([#580](https://github.com/EnMAP-Box/enmap-box/issues/580))
+* added _Class separability report_ algorithm: allows to evaluate the pair-wise class separability in terms of the Jeffries Matusita distance ([#469](https://github.com/EnMAP-Box/enmap-box/issues/469))
+
+* _Create classification|regression|unsupervised dataset_ algorithms: added _Exclude bad bands_ ([#560](https://github.com/EnMAP-Box/enmap-box/issues/560))
+* _Subset raster layer bands_ algorithm: added _Exclude bad bands_ and _Derive and exclude additional bad bands_ ([#638](https://github.com/EnMAP-Box/enmap-box/issues/638))
+* _Spectral resampling (to spectral raster layer wavelength and FWHM)_ algorithm: the wavelength anf fwhm information can now also provided via a) an ENVI Spectral Library, b) an ENVI Header file, or c) a CSV table ([#574](https://github.com/EnMAP-Box/enmap-box/issues/574))
+* _Edit raster source band properties_ algorithm: allow expressions using counter variables to derive value lists, e.g. to specify band names list ([#539](https://github.com/EnMAP-Box/enmap-box/issues/539))
+* _Raster math_ algorithm: output band names are now enumerated by defaults, which avoids empty band names ([#532](https://github.com/EnMAP-Box/enmap-box/issues/532))
+* _Import EnMAP L2A product_ algorithm: added _Order by detector (VNIR, SWIR)_ option, which allows to reorder the spectral bands: all VNIR bands first, followed by all SWIR bands ([#515](https://github.com/EnMAP-Box/enmap-box/issues/515))
+
+### Data Formats / Metadata Handling
+
+* we now support sensor models (used for spectral resampling) provided as CSV tables with center wavelength and fwhm information; one row for each band; two column, i.e. "wavelength" and "fwhm" in nanometers  
+
+### Bugfixes
+
+* [v3.13.4](https://github.com/EnMAP-Box/enmap-box/milestone/17?closed=1)
+* [v3.13.3](https://github.com/EnMAP-Box/enmap-box/milestone/16?closed=1)
+* [v3.13.2](https://github.com/EnMAP-Box/enmap-box/milestone/15?closed=1)
+* [v3.13.1](https://github.com/EnMAP-Box/enmap-box/milestone/13?closed=1)
+* [v3.13.0](https://github.com/EnMAP-Box/enmap-box/milestone/10?closed=1)
 
 ## Version 3.12
 
@@ -51,16 +136,16 @@ Also see https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/eo4q.
 
 ### Bugfixes
 
+* [v3.12.2](https://github.com/EnMAP-Box/enmap-box/milestone/11?closed=1)
 * [v3.12.1](https://github.com/EnMAP-Box/enmap-box/milestone/8?closed=1)
 * [v3.12.0](https://github.com/EnMAP-Box/enmap-box/milestone/7?closed=1)
-
 
 
 ## Version 3.11
 
 _This release was tested under QGIS 3.26.2_
 
-_Important Notice: the EnMAP-Box repository moved to https://github.com/EnMAP-Box/enmap-box_
+_Important Notice: the EnMAP-Box repository moved to https://github.com/EnMAP-Box/enmap-box
 
 ### Applications
 
@@ -90,8 +175,8 @@ _Important Notice: the EnMAP-Box repository moved to https://github.com/EnMAP-Bo
 
 ### Bugfixes
 
-* [v3.11.0](https://github.com/EnMAP-Box/enmap-box/milestone/2?closed=1)
 * [v3.11.1](https://github.com/EnMAP-Box/enmap-box/milestone/5?closed=1)
+* [v3.11.0](https://github.com/EnMAP-Box/enmap-box/milestone/2?closed=1)
 
 ## Version 3.10
 

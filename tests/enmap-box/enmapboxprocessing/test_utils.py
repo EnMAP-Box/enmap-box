@@ -1,3 +1,4 @@
+import unittest
 from os.path import join, dirname
 
 import numpy as np
@@ -15,7 +16,7 @@ from enmapboxtestdata import landcover_polygon_30m, fraction_point_singletarget,
     fraction_map_l3
 from qgis.PyQt.QtCore import QDateTime, QSizeF
 from qgis.PyQt.QtGui import QColor
-from qgis.core import QgsVectorLayer, Qgis, QgsProcessingFeedback, QgsRasterLayer, QgsRasterShader, QgsColorRamp, \
+from qgis.core import QgsGeometry, QgsVectorLayer, Qgis, QgsProcessingFeedback, QgsRasterLayer, QgsRasterShader, QgsColorRamp, \
     QgsStyle, QgsColorRampShader, QgsRectangle, QgsWkbTypes, QgsCoordinateReferenceSystem
 from qgis.gui import QgsMapCanvas
 
@@ -167,6 +168,7 @@ class TestUtils(TestCase):
         self.assertEqual(2, renderer.contrastEnhancement().minimumValue())
         self.assertEqual(3, renderer.contrastEnhancement().maximumValue())
 
+    @unittest.skipIf('Spectral' not in QgsStyle().defaultStyle().colorRampNames(), 'Missing "Spectral" color ramp')
     def test_singleBandPseudoColorRenderer_and_deriveColorRampShaderRampItems(self):
         layer = QgsRasterLayer(enmap)
         colorRamp: QgsColorRamp = QgsStyle().defaultStyle().colorRamp('Spectral')
@@ -553,19 +555,22 @@ class TestUtils(TestCase):
         extent = QgsRasterLayer(enmap).extent()
         crs = QgsRasterLayer(enmap).crs()
         toCrs = QgsCoordinateReferenceSystem().fromEpsgId(4326)
-        self.assertEqual(
-            QgsRectangle(13.24539916899924208, 52.41260765598481441, 13.34667529330139502, 52.52184188795437336),
-            Utils.transformExtent(extent, crs, toCrs)
+        self.assertGeometriesEqual(
+            QgsGeometry.fromRect(
+            QgsRectangle(13.24539916899924208, 52.41260765598481441,
+                         13.34667529330139502, 52.52184188795437336)),
+            QgsGeometry.fromRect(Utils.transformExtent(extent, crs, toCrs))
         )
 
         # same CRS
         extent = QgsRasterLayer(enmap).extent()
         crs = QgsRasterLayer(enmap).crs()
-        self.assertEqual(
-            QgsRectangle(
-                380952.36999999999534339, 5808372.34999999962747097, 387552.36999999999534339, 5820372.34999999962747097
-            ),
-            Utils.transformExtent(extent, crs, crs)
+        self.assertGeometriesEqual(
+            QgsGeometry.fromRect(QgsRectangle(
+                380952.36999999999534339, 5808372.34999999962747097,
+                387552.36999999999534339, 5820372.34999999962747097
+            )),
+            QgsGeometry.fromRect(Utils.transformExtent(extent, crs, crs))
         )
 
     def test_mapCanvasCrs(self):

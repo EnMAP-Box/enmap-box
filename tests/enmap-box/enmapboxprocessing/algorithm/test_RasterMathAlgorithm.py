@@ -4,9 +4,12 @@ import numpy as np
 
 from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import RasterMathAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
+from enmapbox.testing import start_app
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxtestdata import enmap, landcover_polygon, hires
 from qgis.core import Qgis
+
+start_app()
 
 
 class TestRasterMathAlgorithm(TestCase):

@@ -6,6 +6,7 @@ import numpy as np
 from osgeo import gdal
 
 from enmapbox.typeguard import typechecked
+from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.algorithm.importenmapl1balgorithm import ImportEnmapL1BAlgorithm
 from enmapboxprocessing.algorithm.subsetrasterbandsalgorithm import SubsetRasterBandsAlgorithm
 from enmapboxprocessing.algorithm.vrtbandmathalgorithm import VrtBandMathAlgorithm
@@ -14,14 +15,14 @@ from enmapboxprocessing.gdalutils import GdalUtils
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer, QgsMapLayer
 
 
 @typechecked
 class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
     P_FILE, _FILE = 'file', 'Metadata file'
     P_SET_BAD_BANDS, _SET_BAD_BANDS = 'setBadBands', 'Set bad bands'
-    P_EXCLUDE_BAD_BANDS, _EXCLUDE_BAD_BANDS, = 'excludeBadBands', 'Mark no data bands as bad bands'
+    P_EXCLUDE_BAD_BANDS, _EXCLUDE_BAD_BANDS, = 'excludeBadBands', 'Exclude bad bands'
     P_DETECTOR_OVERLAP, _DETECTOR_OVERLAP = 'detectorOverlap', 'Detector overlap region'
     O_DETECTOR_OVERLAP = [
         'Order by detector (VNIR, SWIR)', 'Order by wavelength (default order)', 'Moving average filter', 'VNIR only',
@@ -223,6 +224,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                         )[0] == reader.noDataValue(bandNo))
                     if allNoData:
                         writer.setBadBandMultiplier(0, bandNo)
+                writer.close()
                 del reader, writer
             del ds
 
@@ -237,6 +239,22 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                 alg.P_OUTPUT_RASTER: filename
             }
             alg.runAlg(alg, parameters, None, feedback2)
+
+            # setup default renderer
+            layer = QgsRasterLayer(filename)
+            reader = RasterReader(layer)
+            redBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['R'][0])
+            greenBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['G'][0])
+            blueBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['B'][0])
+            redMin, redMax = reader.provider.cumulativeCut(redBandNo, 0.02, 0.98)
+            greenMin, greenMax = reader.provider.cumulativeCut(greenBandNo, 0.02, 0.98)
+            blueMin, blueMax = reader.provider.cumulativeCut(blueBandNo, 0.02, 0.98)
+            renderer = Utils().multiBandColorRenderer(
+                reader.provider, [redBandNo, greenBandNo, blueBandNo], [redMin, greenMin, blueMin],
+                [redMax, greenMax, blueMax]
+            )
+            layer.setRenderer(renderer)
+            layer.saveDefaultStyle(QgsMapLayer.StyleCategory.Rendering)
 
             result = {self.P_OUTPUT_RASTER: filename}
             self.toc(feedback, result)

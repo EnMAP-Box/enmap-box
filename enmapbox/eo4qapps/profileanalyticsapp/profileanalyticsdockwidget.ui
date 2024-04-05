@@ -166,6 +166,11 @@
                    <string>Profile along selected vector-line (single band)</string>
                   </property>
                  </item>
+                 <item>
+                  <property name="text">
+                   <string>Z-Profile over a polygon (all bands)</string>
+                  </property>
+                 </item>
                 </widget>
                </item>
                <item row="1" column="1">
@@ -301,7 +306,7 @@
                          </sizepolicy>
                         </property>
                         <property name="text">
-                         <string>map tool to select a vector-line.</string>
+                         <string>map tool to select a vector shape.</string>
                         </property>
                        </widget>
                       </item>

@@ -1,4 +1,5 @@
 import json
+import platform
 import warnings
 import webbrowser
 from collections import OrderedDict
@@ -22,8 +23,8 @@ from geetimeseriesexplorerapp.tasks.queryavailableimagestask import QueryAvailab
 from geetimeseriesexplorerapp.utils import utilsMsecToDateTime
 from qgis.PyQt import QtGui
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import Qt, QLocale, QDate, pyqtSignal, QModelIndex, QDateTime
-from qgis.PyQt.QtGui import QPixmap, QColor, QIcon
+from qgis.PyQt.QtCore import Qt, QLocale, QDate, pyqtSignal, QModelIndex, QDateTime, QUrl
+from qgis.PyQt.QtGui import QPixmap, QColor, QIcon, QDesktopServices
 from qgis.PyQt.QtWidgets import (QToolButton, QApplication, QComboBox, QLineEdit,
                                  QTableWidget, QDateEdit, QRadioButton, QListWidget, QCheckBox, QTableWidgetItem,
                                  QPlainTextEdit, QTreeWidget, QTreeWidgetItem, QTabWidget, QLabel, QMainWindow,
@@ -42,6 +43,7 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
 
     # data catalog
     mUserCollection: QTableWidget
+    mOpenUserCollectionFolder: QToolButton
     mCollectionTitle: QLineEdit
     mOpenCatalog: QToolButton
     mOpenJson: QToolButton
@@ -188,6 +190,7 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
         # data catalog
         self.initDataCatalog()
         self.mUserCollection.itemSelectionChanged.connect(self.onCollectionClicked)
+        self.mOpenUserCollectionFolder.clicked.connect(self.onOpenUserCollectionFolderClicked)
         self.mOpenCatalog.clicked.connect(self.onOpenCatalogClicked)
         self.mOpenJson.clicked.connect(self.onOpenJsonClicked)
         self.mLoadCollection.clicked.connect(self.onLoadCollectionClicked)
@@ -624,6 +627,17 @@ class GeeTimeseriesExplorerDockWidget(QgsDockWidget):
         self.mAvailableImages.setColumnCount(2)
         self.mImageId.setText('')
         self.onLoadCollectionClicked()
+
+    def onOpenUserCollectionFolderClicked(self):
+        system = platform.system()
+        root = join(dirname(__file__), 'user_collections')
+        if system == 'Windows':
+            import subprocess
+            cmd = rf'explorer.exe /select,"{root}"'
+            subprocess.Popen(cmd)
+        else:
+            url = QUrl.fromLocalFile(dirname(root))
+            QDesktopServices.openUrl(url)
 
     def eeInitialize(self):
         eeImported, ee = importEarthEngine(False)

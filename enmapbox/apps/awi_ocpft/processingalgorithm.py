@@ -127,7 +127,7 @@ class OCPFTProcessingAlgorithm(QgsProcessingAlgorithm):
                'applied to ocean colour sensors. The Polymer algorithm was integrated into EnPT using the wrapper module ' \
                'ACwater developed by AWI in cooperation with GFZ. In addition, Polymer was further adapted to process ' \
                'EnMAP L1B satellite data. For details on the underlying Polymer algorithm, please refer to ' \
-               '<a href="https://opg.optica.org/oe/fulltext.cfm?uri=oe-19-10-9783&id=213648">Steinmetz et al., 2011</a> ' \
+               '<a href="https://doi.org/10.1364/OE.19.009783">Steinmetz et al., 2011</a> ' \
                '<a href="https://www.mdpi.com/1424-8220/21/12/4125"> and Soppa et al. 2021</a>. ' \
                '' \
                '<h3>Processor output size</h3>' \
@@ -139,9 +139,6 @@ class OCPFTProcessingAlgorithm(QgsProcessingAlgorithm):
                '<p>Specify where to save the output.  </p>'
         return html
 
-    # 6
-    # def helpUrl(self, *args, **kwargs):
-    #     return 'https://enmap-box-workshop2019.readthedocs.io'
 # 7
     def createInstance(self):
         return type(self)()

@@ -1,5 +1,7 @@
-from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
+from io import StringIO
+
 from enmapbox.typeguard import typechecked
+from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 
 
 @typechecked
@@ -22,3 +24,17 @@ class FitCatBoostClassifierAlgorithm(FitClassifierAlgorithmBase):
         from catboost import CatBoostClassifier
         classifier = CatBoostClassifier(n_estimators=100)
         return classifier
+
+
+# monkey patch for issue #790
+try:
+    import catboost.core
+
+    stringIO = StringIO()
+
+    def _get_stream_like_object_FIXED(obj):
+        return stringIO
+
+    catboost.core._get_stream_like_object = _get_stream_like_object_FIXED
+except Exception:
+    pass

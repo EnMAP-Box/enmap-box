@@ -1,3 +1,4 @@
+import math
 from os.path import join
 from random import randint
 from typing import Dict, Any, List, Tuple
@@ -159,7 +160,7 @@ class PrepareRegressionDatasetFromSynthMixAlgorithm(EnMAPProcessingAlgorithm):
                 randomWeights.append(weight)
             randomWeights.append(1. - sum(randomWeights))
 
-            assert sum(randomWeights) == 1.
+            assert math.isclose(sum(randomWeights), 1.0)
             mixtures.append(np.sum(drawnFeatures * randomWeights, axis=1))
             fractions.append(np.sum(drawnFractions * randomWeights, axis=1)[targetIndex])
 

@@ -2,7 +2,7 @@ from classificationdatasetmanagerapp import ClassificationDatasetManagerGui
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import classifierDumpPkl
+from tests.enmapboxtestdata import classifierDumpPkl
 
 qgsApp = start_app()
 enmapBox = EnMAPBox()
