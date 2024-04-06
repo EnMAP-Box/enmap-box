@@ -1425,7 +1425,7 @@
             <string>Diversity sampling: Euclidean distance based diversity</string>
            </property>
            <property name="text">
-            <string>EBD</string>
+            <string>EDB</string>
            </property>
            <attribute name="buttonGroup">
             <string notr="true">rad_group_al_strats</string>
@@ -2013,9 +2013,9 @@
  <buttongroups>
   <buttongroup name="rad_group_eval"/>
   <buttongroup name="rad_group_noise"/>
-  <buttongroup name="rad_group_splitstrat"/>
-  <buttongroup name="rad_group_al_strats"/>
   <buttongroup name="rad_group_al"/>
+  <buttongroup name="rad_group_al_strats"/>
   <buttongroup name="rad_group_ml"/>
+  <buttongroup name="rad_group_splitstrat"/>
  </buttongroups>
 </ui>
