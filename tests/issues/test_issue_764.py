@@ -1,11 +1,22 @@
 import unittest
 
+import numpy as np
+
 from enmapbox import initAll
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
+from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibraryrasterdataprovider import \
+    createRasterLayers
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprocessingdialog import SpectralProcessingDialog
+from enmapbox.qgispluginsupport.qps.utils import rasterArray
 from enmapbox.testing import EnMAPBoxTestCase, start_app, TestObjects
+from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import RasterMathAlgorithm
+from enmapboxprocessing.parameter.processingparameterrastermathcodeeditwidget import \
+    ProcessingParameterRasterMathCodeEditWidgetWrapper, ProcessingParameterRasterMathCodeEdit
+from processing import AlgorithmDialog
+from qgis.core import QgsProcessingParameterString, QgsProcessingContext, QgsRasterLayer
 from qgis.core import QgsProject, edit
+from qgis.gui import QgsAbstractProcessingParameterWidgetWrapper
 
 start_app()
 
@@ -26,7 +37,7 @@ class TestIssue764(EnMAPBoxTestCase):
             slw = SpectralLibraryWidget(speclib=speclib)
 
             spd = SpectralProcessingDialog(speclib=speclib, algorithmId=algorithmId, parameters=parameters)
-            # slw.showSpectralProcessingWidget(algorithmId=algorithmId)
+            slw.showSpectralProcessingWidget(algorithmId=algorithmId)
             wrapper = spd.processingModelWrapper()
 
             for k, v in parameters.items():
@@ -37,6 +48,51 @@ class TestIssue764(EnMAPBoxTestCase):
             self.showGui([spd, slw])
 
         QgsProject.instance().removeAllMapLayers()
+
+    def test_RasterMathWidgets(self):
+
+        alg = RasterMathAlgorithm()
+        alg.initAlgorithm({})
+        p = alg.parameterDefinition(RasterMathAlgorithm.P_CODE)
+
+        self.assertIsInstance(p, QgsProcessingParameterString)
+        algDialog = AlgorithmDialog(alg)
+        wrapper = ProcessingParameterRasterMathCodeEditWidgetWrapper(p, algDialog)
+        self.assertIsInstance(wrapper, QgsAbstractProcessingParameterWidgetWrapper)
+
+        speclib = TestObjects.createSpectralLibrary()
+        # convert a vector layer / speclib into in-memory raster layers.
+        layers = createRasterLayers(speclib)
+        # add another raster layer
+        layers.append(TestObjects.createRasterLayer(path='/vsimem/mytif.tif'))
+
+        for lyr in layers:
+            self.assertIsInstance(lyr, QgsRasterLayer)
+            self.assertTrue(lyr.isValid())
+            data = rasterArray(lyr)
+            self.assertIsInstance(data, np.ndarray)
+
+        project = QgsProject()
+        project.addMapLayers(layers)
+
+        context = QgsProcessingContext()
+        context.setProject(project)
+
+        wrapper.setWidgetContext(context)
+        if True:
+            # old way
+            widget = wrapper.widget
+            widget: ProcessingParameterRasterMathCodeEdit
+            layers_in_widget = widget.getRasterSources()
+
+            for lyr in project.mapLayers().values():
+                if isinstance(lyr, QgsRasterLayer):
+                    self.assertTrue(lyr.id() in layers_in_widget.values(),
+                                    msg=f'{lyr} not shown in ProcessingParameterRasterMathCodeEdit')
+        else:
+            widget = wrapper.createWrappedWidget(context)
+
+        self.showGui(widget)
 
 
 if __name__ == '__main__':
