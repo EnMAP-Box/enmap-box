@@ -326,7 +326,7 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
 
     def getRasterSources(self) -> Dict:
         sources = {k: v for k, v in self.getSources().items()
-                   if isinstance(QgsProject.instance().mapLayer(v), QgsRasterLayer)}
+                   if isinstance(self.project().mapLayer(v), QgsRasterLayer)}
         return sources
 
     def insertIdentifier(self, identifier: str = None):
@@ -458,7 +458,7 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
         for identifier, registryName in self.getSources().items():
             if identifier not in code:
                 continue
-            layer = QgsProject.instance().mapLayer(registryName)
+            layer = self.project().mapLayer(registryName)
             if isinstance(layer, QgsRasterLayer):
                 text += f'# {identifier} := QgsRasterLayer("{layer.source()}")\n'
             if isinstance(layer, QgsVectorLayer):
