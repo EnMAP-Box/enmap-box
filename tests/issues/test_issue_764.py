@@ -14,9 +14,8 @@ from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import
 from enmapboxprocessing.parameter.processingparameterrastermathcodeeditwidget import \
     ProcessingParameterRasterMathCodeEditWidgetWrapper, ProcessingParameterRasterMathCodeEdit
 from processing import AlgorithmDialog
-from qgis.core import QgsProcessingParameterString, QgsProcessingContext, QgsRasterLayer
-from qgis.core import QgsProject, edit
-from qgis.gui import QgsAbstractProcessingParameterWidgetWrapper
+from qgis.core import QgsProject, edit, QgsProcessingParameterString, QgsRasterLayer
+from qgis.gui import QgsAbstractProcessingParameterWidgetWrapper, QgsProcessingParameterWidgetContext
 
 start_app()
 
@@ -61,9 +60,12 @@ class TestIssue764(EnMAPBoxTestCase):
         self.assertIsInstance(wrapper, QgsAbstractProcessingParameterWidgetWrapper)
 
         speclib = TestObjects.createSpectralLibrary()
-        # convert a vector layer / speclib into in-memory raster layers.
+
+        # create a QgsRasterLayer for Spectral Library vector attributes
+        # using the VectorLayerFieldRasterDataProvider(QgsRasterDataProvider)
+        # this way we do not need to write extra "files" just to parameterize widgets
         layers = createRasterLayers(speclib)
-        # add another raster layer
+        # add another raster layer -> uses the GDAL backend
         layers.append(TestObjects.createRasterLayer(path='/vsimem/mytif.tif'))
 
         for lyr in layers:
@@ -75,7 +77,7 @@ class TestIssue764(EnMAPBoxTestCase):
         project = QgsProject()
         project.addMapLayers(layers)
 
-        context = QgsProcessingContext()
+        context = QgsProcessingParameterWidgetContext()
         context.setProject(project)
 
         wrapper.setWidgetContext(context)
@@ -90,6 +92,7 @@ class TestIssue764(EnMAPBoxTestCase):
                     self.assertTrue(lyr.id() in layers_in_widget.values(),
                                     msg=f'{lyr} not shown in ProcessingParameterRasterMathCodeEdit')
         else:
+            # new way: proper provider
             widget = wrapper.createWrappedWidget(context)
 
         self.showGui(widget)

@@ -8,8 +8,6 @@ from os.path import splitext, basename, exists, join, dirname
 from time import time
 from typing import Dict, Union
 
-from qgis.core import QgsProcessingContext
-
 from enmapboxprocessing.algorithm.rastermathalgorithm.snippetinsertdialog import SnippetInsertDialog
 from enmapboxprocessing.algorithm.rastermathalgorithm.snippetsaveasdialog import SnippetSaveAsDialog
 from enmapboxprocessing.parameter.processingparametercodeeditwidget import CodeEditWidget
@@ -22,6 +20,7 @@ from qgis.PyQt.QtWidgets import QWidget, QTreeWidget, QTreeWidgetItem, QPushButt
     QInputDialog, QMenu, QAction, QComboBox, QToolButton, QFileDialog
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsProject, QgsRasterLayer, QgsVectorLayer, QgsFields, QgsField, QgsCoordinateReferenceSystem
+from qgis.gui import QgsProcessingParameterWidgetContext
 
 
 class ProcessingParameterRasterMathCodeEdit(QWidget):
@@ -481,7 +480,8 @@ class ProcessingParameterRasterMathCodeEditWidgetWrapper(WidgetWrapper):
         # else:
         return ProcessingParameterRasterMathCodeEdit()
 
-    def setWidgetContext(self, context: QgsProcessingContext):
+    def setWidgetContext(self, context: QgsProcessingParameterWidgetContext):
+        super().setWidgetContext(context)
         if isinstance(self.widget, ProcessingParameterRasterMathCodeEdit):
             self.widget.setProject(context.project())
 
