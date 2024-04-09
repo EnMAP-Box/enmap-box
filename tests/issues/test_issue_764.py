@@ -85,9 +85,9 @@ class TestIssue764(EnMAPBoxTestCase):
         widgetContext.setProject(project)
 
         wrapper.setWidgetContext(widgetContext)
-        if False:
+        if True:
             # show the ProcessingParameterRasterMathCodeEdit widget only
-            if True:
+            if False:
                 # old way
                 widget = wrapper.widget
                 widget: ProcessingParameterRasterMathCodeEdit
