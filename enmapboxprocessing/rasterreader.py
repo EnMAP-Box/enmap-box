@@ -43,8 +43,6 @@ class RasterReader(object):
         else:
             raise ValueError()
 
-        assert self.layer.isValid()
-
         if isinstance(source, gdal.Dataset):
             gdalDataset = source
         else:
