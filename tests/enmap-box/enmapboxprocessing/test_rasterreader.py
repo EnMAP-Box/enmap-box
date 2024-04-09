@@ -658,3 +658,25 @@ class TestRasterReader(TestCase):
         self.assertEqual(QDateTime(2023, 1, 1, 0, 0, 0), reader.endTime(1))
         self.assertEqual(QDateTime(2023, 1, 1, 0, 0, 0), reader.startTime(2))
         self.assertEqual(QDateTime(2024, 1, 1, 0, 0, 0), reader.endTime(2))
+
+    def test_nonGdalSource(self):
+        layer = QgsRasterLayer(
+            r'type=xyz&url=https://mt1.google.com/vt/lyrs%3Dm%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D&zmax=19&zmin=0',
+            'Google Maps', 'wms'
+        )
+        reader = RasterReader(layer, openWithGdal=False)
+        self.assertEqual(1, reader.bandCount())
+
+        self.assertEqual(1, reader.badBandMultiplier(1))
+        self.assertIsNone(reader.bandColor(1))
+        self.assertEqual('', reader.bandName(1))
+        self.assertEqual(0, reader.bandOffset(1))
+        self.assertEqual(1, reader.bandScale(1))
+        self.assertIsNone(reader.centerTime(1))
+        self.assertEqual(Qgis.DataType.ARGB32, reader.dataType(1))
+        self.assertEqual(4, reader.dataTypeSize(1))
+        self.assertIsNone(reader.endTime(1))
+        self.assertIsNone(reader.fwhm(1))
+        self.assertFalse(reader.isSpectralRasterLayer())
+        self.assertIsNone(reader.wavelength(1))
+        self.assertIsNone(reader.wavelengthUnits(1))
