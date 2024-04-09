@@ -52,7 +52,7 @@ from enmapbox.testing import EnMAPBoxTestCase, start_app
 from qgis.PyQt.QtCore import QSize
 from qgis.PyQt.QtWidgets import QTreeView
 from qgis.core import QgsProject
-
+from enmapboxtestdata import classificationDatasetAsPklFile
 start_app()
 
 
@@ -85,6 +85,7 @@ class TestIssue747(EnMAPBoxTestCase):
         tv.setAutoFirstColumnSpan(True)
 
         self.assertIsInstance(tv, QTreeView)
+
         model.addDataSources(classificationDatasetAsPklFile)
 
         node = model.rootNode().findChildNodes(ModelDataSource, recursive=True)
