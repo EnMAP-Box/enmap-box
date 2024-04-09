@@ -5,7 +5,7 @@ import unittest
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import EnMAPBoxTestCase, start_app
-from qgis._core import QgsMarkerSymbol, QgsSingleSymbolRenderer, QgsLayerTreeLayer
+from qgis.core import QgsMarkerSymbol, QgsSingleSymbolRenderer, QgsLayerTreeLayer
 from qgis.core import QgsProject
 from qgis.core import QgsRasterLayer, QgsVectorLayer
 

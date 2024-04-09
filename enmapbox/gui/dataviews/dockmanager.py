@@ -276,7 +276,6 @@ class SpeclibDockTreeNode(DockTreeNode):
         self.mSpeclibWidget = dock.mSpeclibWidget
         assert isinstance(self.mSpeclibWidget, SpectralLibraryWidget)
 
-
         self.speclibNode = QgsLayerTreeLayer(self.speclib())
 
         self.addChildNode(self.speclibNode)
@@ -293,14 +292,14 @@ class SpeclibDockTreeNode(DockTreeNode):
             rootNode = self.parent()
             model = rootNode.model()
             if isinstance(rootNode, QgsLayerTree) and isinstance(model, QgsLayerTreeModel):
-               # find all QgsLayerTreeLayers
-               nodes = [n for n in rootNode.findLayers() if n.layerId() == self.speclibNode.layerId()]
-               if len(nodes) > 1:
-                   # start with 2nd node.
-                   # legend of 1st node is already handled by QgsLayerTreeModel
-                   for node in nodes[1:]:
-                       if isinstance(node, QgsLayerTreeLayer):
-                           model.refreshLayerLegend(node)
+                # find all QgsLayerTreeLayers
+                nodes = [n for n in rootNode.findLayers() if n.layerId() == self.speclibNode.layerId()]
+                if len(nodes) > 1:
+                    # start with 2nd node.
+                    # legend of 1st node is already handled by QgsLayerTreeModel
+                    for node in nodes[1:]:
+                        if isinstance(node, QgsLayerTreeLayer):
+                            model.refreshLayerLegend(node)
 
     def speclib(self) -> QgsVectorLayer:
         return self.speclibWidget().speclib()
@@ -892,7 +891,7 @@ class DockManagerTreeModel(QgsLayerTreeModel):
         return results
 
     def findDockNode(self, object: Union[str, QgsMapCanvas, QgsRasterLayer,
-    QgsVectorLayer, SpectralLibraryWidget]) -> DockTreeNode:
+                                         QgsVectorLayer, SpectralLibraryWidget]) -> DockTreeNode:
         """
         Returns the dock that contains the given object
         :param object:

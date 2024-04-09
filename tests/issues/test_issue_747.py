@@ -55,6 +55,7 @@ from qgis.core import QgsProject
 
 start_app()
 
+
 class TestIssue747(EnMAPBoxTestCase):
 
     def test_issue_747(self):
