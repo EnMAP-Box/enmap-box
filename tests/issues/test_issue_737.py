@@ -30,7 +30,7 @@ class TestIssue737(EnMAPBoxTestCase):
         symbolOrange = QgsMarkerSymbol.createSimple({'name': 'circle', 'color': 'orange'})
         r1 = QgsSingleSymbolRenderer(QgsMarkerSymbol(symbolRed))
         r2 = QgsSingleSymbolRenderer(QgsMarkerSymbol(symbolOrange))
-        speclib.setRenderer(r1)
+        speclib.setRenderer(r1.clone())
 
         model = emb.dockManagerTreeModel()
         l1 = model.findLayerTreeLayers(speclib)
