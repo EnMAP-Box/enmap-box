@@ -85,21 +85,26 @@ class TestIssue764(EnMAPBoxTestCase):
         widgetContext.setProject(project)
 
         wrapper.setWidgetContext(widgetContext)
-        if True:
-            # old way
-            widget = wrapper.widget
-            widget: ProcessingParameterRasterMathCodeEdit
-            layers_in_widget = widget.getRasterSources()
+        if False:
+            # show the ProcessingParameterRasterMathCodeEdit widget only
+            if True:
+                # old way
+                widget = wrapper.widget
+                widget: ProcessingParameterRasterMathCodeEdit
+                layers_in_widget = widget.getRasterSources()
 
-            for lyr in project.mapLayers().values():
-                if isinstance(lyr, QgsRasterLayer):
-                    self.assertTrue(lyr.id() in layers_in_widget.values(),
-                                    msg=f'{lyr} not shown in ProcessingParameterRasterMathCodeEdit')
+                for lyr in project.mapLayers().values():
+                    if isinstance(lyr, QgsRasterLayer):
+                        self.assertTrue(lyr.id() in layers_in_widget.values(),
+                                        msg=f'{lyr} not shown in ProcessingParameterRasterMathCodeEdit')
+            else:
+                # new way: proper provider
+                widget = wrapper.createWrappedWidget(processingContext)
+            self.showGui(widget)
         else:
-            # new way: proper provider
-            widget = wrapper.createWrappedWidget(processingContext)
+            # show standard AlgorithmDialog, which uses a standard processing context (QgsProject.instance())
+            self.showGui(algDialog)
 
-        self.showGui(widget)
 
 
 if __name__ == '__main__':
