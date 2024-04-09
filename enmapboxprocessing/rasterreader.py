@@ -522,9 +522,6 @@ class RasterReader(object):
     def isSpectralRasterLayer(self, quickCheck=True):
         """Return whether a raster has wavelength information."""
 
-        if self.gdalDataset is None:
-            return False
-
         if quickCheck:
             return self.wavelength(1) is not None
         else:
