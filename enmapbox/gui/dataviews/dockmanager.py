@@ -270,7 +270,7 @@ class SpeclibDockTreeNode(DockTreeNode):
         self.profilesNode: LayerTreeNode = LayerTreeNode('Profiles')
         self.profilesNode.setIcon(QIcon(':/qps/ui/icons/profile.svg'))
 
-        self.controlNode = LayerTreeNode('Show')
+        # self.controlNode = LayerTreeNode('Show')
 
         self.mPROFILES: Dict[str, int] = dict()
 
@@ -280,21 +280,28 @@ class SpeclibDockTreeNode(DockTreeNode):
 
         self.speclibNode = QgsLayerTreeLayer(self.speclib())
 
-        self.addChildNode(self.speclibNode)
-        self.addChildNode(self.controlNode)
+        # self.addChildNode(self.controlNode)
 
         speclib = self.speclib()
-        if isinstance(self.mSpeclibWidget, SpectralLibraryWidget):
-            # add control nodes
-            slw = self.mSpeclibWidget
-            self.mActionNodeProfileView = ActionTreeNode(action=slw.actionShowProfileView)
-            self.mActionNodeProfileViewSettings = ActionTreeNode(action=slw.actionShowProfileViewSettings)
-            self.mActionNodeFormView = ActionTreeNode(action=slw.actionShowFormView)
-            self.mActionNodeAttributTable = ActionTreeNode(action=slw.actionShowAttributeTable)
 
-            for n in [self.mActionNodeProfileView, self.mActionNodeProfileViewSettings,
-                      self.mActionNodeAttributTable, self.mActionNodeFormView]:
-                self.controlNode.addChildNode(n)
+        if False and isinstance(self.mSpeclibWidget, SpectralLibraryWidget):
+            # add nodes to control the SpectralLibraryWidget
+            slw = self.mSpeclibWidget
+
+            self.mActionNodes: List[ActionTreeNode] = []
+            if True:
+                for action in [slw.actionShowProfileView,
+                               slw.actionShowProfileViewSettings,
+                               slw.actionShowFormView,
+                               slw.actionShowAttributeTable]:
+                    action: QAction
+                    name = re.sub('^Show ', '', action.text())
+                    node = ActionTreeNode(name=name, action=action)
+                    self.mActionNodes.append(node)
+                    # self.controlNode.addChildNode(node)
+                    self.addChildNode(node)
+
+        self.addChildNode(self.speclibNode)
 
         if is_spectral_library(speclib):
             # add legend nodes
@@ -908,8 +915,9 @@ class DockManagerTreeModel(QgsLayerTreeModel):
         results = [n for n in root.findLayers() if n.layerId() == lid]
         return results
 
-    def findDockNode(self, object: Union[str, QgsMapCanvas, QgsRasterLayer,
-                                         QgsVectorLayer, SpectralLibraryWidget]) -> DockTreeNode:
+    def findDockNode(self,
+                     object: Union[str, QgsMapCanvas, QgsRasterLayer, QgsVectorLayer, SpectralLibraryWidget]) \
+            -> DockTreeNode:
         """
         Returns the dock that contains the given object
         :param object:
@@ -2255,7 +2263,8 @@ class CheckableLayerTreeNode(LayerTreeNode):
         old = self.mCheckState
         self.mCheckState = checkState
         if old != self.mCheckState:
-            self.sigCheckStateChanged.emit(self.mCheckState)
+            self.setItemVisibilityChecked(checkState == Qt.Checked)
+            # self.sigCheckStateChanged.emit(self.mCheckState)
 
     def checkState(self):
         return self.mCheckState
@@ -2263,8 +2272,9 @@ class CheckableLayerTreeNode(LayerTreeNode):
 
 class ActionTreeNode(CheckableLayerTreeNode):
 
-    def __init__(self, *args, action: QAction = None, **kwds):
-        name = action.text() if isinstance(action, QAction) else '<dummy>'
+    def __init__(self, *args, name=None, action: QAction = None, **kwds):
+        if not isinstance(name, str):
+            name = action.text() if isinstance(action, QAction) else '<dummy>'
         super().__init__(*args, name=name, **kwds)
 
         self.mAction = None
@@ -2279,13 +2289,22 @@ class ActionTreeNode(CheckableLayerTreeNode):
     def connectAction(self, action: QAction):
 
         self.mAction = action
-        self.setName(action.text())
-        self.setCheckState(action.isChecked())
+        # self.setCheckState(action.isChecked())
         action.toggled.connect(self.onActionToggled)
+        action.changed.connect(self.onActionChanged)
 
     def onActionToggled(self, checked: bool):
         state = Qt.Checked if checked else Qt.Unchecked
+        super().setCheckState(state)
         self.sigCheckStateChanged.emit(state)
+
+    def onActionChanged(self):
+        if isinstance(self.mAction, QAction):
+            # todo: how to activate/disable a QgsLayerTreeNode
+
+            state = 'enabled' if self.mAction.isEnabled() else 'disabled'
+
+        # self.setCustomProperty('tree-state', state)
 
     def checkState(self):
         a: QAction = self.mAction

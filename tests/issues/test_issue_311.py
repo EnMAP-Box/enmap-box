@@ -6,9 +6,11 @@ import unittest
 from enmapbox.gui.dataviews.docks import SpectralLibraryDock
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
-from enmapbox.testing import EnMAPBoxTestCase
+from enmapbox.testing import EnMAPBoxTestCase, start_app
 from qgis.core import QgsProject
 from qgis.gui import QgsDualView
+
+start_app()
 
 
 class EnMAPBoxTestCaseIssue311(EnMAPBoxTestCase):
@@ -37,6 +39,8 @@ class EnMAPBoxTestCaseIssue311(EnMAPBoxTestCase):
 
         enmapBox.close()
         QgsProject.instance().removeAllMapLayers()
+
+        s = ""
 
 
 if __name__ == '__main__':

@@ -90,7 +90,7 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
 
         QgsProject.instance().removeAllMapLayers()
 
-    def test_dockview(self):
+    def test_SpeclibDockNodes(self):
 
         TV = DockTreeView(None)
         dsm = DataSourceManager()
