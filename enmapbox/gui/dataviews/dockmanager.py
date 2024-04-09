@@ -270,6 +270,8 @@ class SpeclibDockTreeNode(DockTreeNode):
         self.profilesNode: LayerTreeNode = LayerTreeNode('Profiles')
         self.profilesNode.setIcon(QIcon(':/qps/ui/icons/profile.svg'))
 
+        self.controlNode = LayerTreeNode('Show')
+
         self.mPROFILES: Dict[str, int] = dict()
 
         assert isinstance(dock, SpectralLibraryDock)
@@ -279,8 +281,23 @@ class SpeclibDockTreeNode(DockTreeNode):
         self.speclibNode = QgsLayerTreeLayer(self.speclib())
 
         self.addChildNode(self.speclibNode)
+        self.addChildNode(self.controlNode)
+
         speclib = self.speclib()
+        if isinstance(self.mSpeclibWidget, SpectralLibraryWidget):
+            # add control nodes
+            slw = self.mSpeclibWidget
+            self.mActionNodeProfileView = ActionTreeNode(action=slw.actionShowProfileView)
+            self.mActionNodeProfileViewSettings = ActionTreeNode(action=slw.actionShowProfileViewSettings)
+            self.mActionNodeFormView = ActionTreeNode(action=slw.actionShowFormView)
+            self.mActionNodeAttributTable = ActionTreeNode(action=slw.actionShowAttributeTable)
+
+            for n in [self.mActionNodeProfileView, self.mActionNodeProfileViewSettings,
+                      self.mActionNodeAttributTable, self.mActionNodeFormView]:
+                self.controlNode.addChildNode(n)
+
         if is_spectral_library(speclib):
+            # add legend nodes
             speclib: QgsVectorLayer
             speclib.editCommandEnded.connect(self.updateNodes)
             speclib.committedFeaturesAdded.connect(self.updateNodes)
@@ -545,7 +562,8 @@ class DockManager(QObject):
     def connectDataSourceManager(self, dataSourceManager: DataSourceManager):
         assert isinstance(dataSourceManager, DataSourceManager)
         self.mDataSourceManager = dataSourceManager
-        self.setEnMAPBoxInstance(self.mDataSourceManager.enmapBoxInstance())
+        if self.mDataSourceManager.enmapBoxInstance():
+            self.setEnMAPBoxInstance(self.mDataSourceManager.enmapBoxInstance())
 
     def dataSourceManager(self) -> DataSourceManager:
         return self.mDataSourceManager
@@ -2232,7 +2250,7 @@ class CheckableLayerTreeNode(LayerTreeNode):
 
     def setCheckState(self, checkState):
         if isinstance(checkState, bool):
-            checkState == Qt.Checked if checkState else Qt.Unchecked
+            checkState = Qt.Checked if checkState else Qt.Unchecked
         assert isinstance(checkState, Qt.CheckState)
         old = self.mCheckState
         self.mCheckState = checkState
@@ -2241,6 +2259,46 @@ class CheckableLayerTreeNode(LayerTreeNode):
 
     def checkState(self):
         return self.mCheckState
+
+
+class ActionTreeNode(CheckableLayerTreeNode):
+
+    def __init__(self, *args, action: QAction = None, **kwds):
+        name = action.text() if isinstance(action, QAction) else '<dummy>'
+        super().__init__(*args, name=name, **kwds)
+
+        self.mAction = None
+        if isinstance(action, QAction):
+            self.connectAction(action)
+
+    def icon(self):
+        if isinstance(self.mAction, QAction):
+            return self.mAction.icon()
+        return None
+
+    def connectAction(self, action: QAction):
+
+        self.mAction = action
+        self.setName(action.text())
+        self.setCheckState(action.isChecked())
+        action.toggled.connect(self.onActionToggled)
+
+    def onActionToggled(self, checked: bool):
+        state = Qt.Checked if checked else Qt.Unchecked
+        self.sigCheckStateChanged.emit(state)
+
+    def checkState(self):
+        a: QAction = self.mAction
+        if isinstance(a, QAction) and a.isCheckable() and a.isChecked():
+            return Qt.Checked
+        return Qt.Unchecked
+
+    def setCheckState(self, checkState):
+
+        state: bool = True if checkState == Qt.Checked else False
+        if isinstance(self.mAction, QAction):
+            self.mAction.setChecked(state)
+            self.mAction.toggled.emit(state)
 
 
 class LayerTreeViewMenuProvider(QgsLayerTreeViewMenuProvider):

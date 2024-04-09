@@ -16,6 +16,8 @@ import os
 import tempfile
 import unittest
 
+from qgis.PyQt.QtWidgets import QWidget, QHBoxLayout
+
 from enmapbox.exampledata import landcover_polygon, enmap, hires
 from enmapbox.gui.datasources.datasources import VectorDataSource, RasterDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager
@@ -25,11 +27,13 @@ from enmapbox.gui.dataviews.docks import MapDock, DockArea, MimeDataDock, TextDo
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.Dock import Dock as pgDock
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
-from enmapbox.testing import EnMAPBoxTestCase, TestObjects
+from enmapbox.testing import EnMAPBoxTestCase, TestObjects, start_app
 from enmapboxtestdata import classificationDatasetAsPklFile, library_berlin
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import QgsProject, QgsVectorLayer, QgsRasterLayer, QgsLayerTreeModel, QgsLayerTree
 from qgis.gui import QgsMapCanvas, QgsLayerTreeView
+
+start_app()
 
 
 class TestDocksAndDataSources(EnMAPBoxTestCase):
@@ -89,9 +93,32 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
     def test_dockview(self):
 
         TV = DockTreeView(None)
+        dsm = DataSourceManager()
+        dm = DockManager()
+        dm.connectDataSourceManager(dsm)
+        dockArea = DockArea()
+        dm.connectDockArea(dockArea)
+        dm.connectDataSourceManager(dsm)
+        model = DockManagerTreeModel(dm)
+        TV.setModel(model)
         self.assertIsInstance(TV, QgsLayerTreeView)
-        del TV
+        speclibDock: SpectralLibraryDock = dm.createDock(SpectralLibraryDock)
+
+        speclibDockNode: SpeclibDockTreeNode = model.findDockNode(speclibDock.speclib())
+
+        w = QWidget()
+        l = QHBoxLayout()
+        l.addWidget(TV)
+        l.addWidget(dockArea)
+        w.setLayout(l)
+        self.showGui(w)
         QgsProject.instance().removeAllMapLayers()
+
+    def test_ActionNode(self):
+
+        TV = DockTreeView(None)
+
+        self.showGui(TV)
 
     def test_canvasBridge(self):
         project = QgsProject()
