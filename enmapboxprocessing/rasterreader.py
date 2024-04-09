@@ -43,6 +43,8 @@ class RasterReader(object):
         else:
             raise ValueError()
 
+        assert self.layer.isValid()
+
         if isinstance(source, gdal.Dataset):
             gdalDataset = source
         else:
@@ -52,7 +54,6 @@ class RasterReader(object):
                 gdalDataset = None
 
         self.gdalDataset = gdalDataset
-        assert self.gdalDataset is not None
 
         # prepare STAC metadata
         if exists(self.layer.source() + '.stac.json'):
@@ -485,6 +486,9 @@ class RasterReader(object):
             if string is not None:
                 return Utils.stringToMetadateValue(str(string))
 
+        if self.gdalDataset is None:
+            return None
+
         string = self._gdalObject(bandNo).GetMetadataItem(key, domain)
         if string is None:
             string = self._gdalObject(bandNo).GetMetadataItem(key2, domain)
@@ -507,6 +511,10 @@ class RasterReader(object):
 
     def metadataDomainKeys(self, bandNo: int = None) -> List[str]:
         """Return metadata domain names."""
+
+        if self.gdalDataset is None:
+            return []
+
         domains: List = self._gdalObject(bandNo).GetMetadataDomainList()
         if domains is None:
             domains = []
@@ -515,6 +523,10 @@ class RasterReader(object):
 
     def isSpectralRasterLayer(self, quickCheck=True):
         """Return whether a raster has wavelength information."""
+
+        if self.gdalDataset is None:
+            return False
+
         if quickCheck:
             return self.wavelength(1) is not None
         else:
@@ -681,6 +693,9 @@ class RasterReader(object):
 
     def badBandMultiplier(self, bandNo: int) -> int:
         """Return bad band multiplier, 0 for bad band and 1 for good band."""
+
+        if self.gdalDataset is None:
+            return 1
 
         # check STAC
         badBandMultiplier = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('enmapbox:bad_band_multiplier')
