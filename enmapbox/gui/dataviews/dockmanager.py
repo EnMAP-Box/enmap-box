@@ -19,10 +19,9 @@
 import os
 import re
 import time
-import typing
 import uuid
 from os.path import basename, dirname
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Union
 
 from enmapbox import debugLog
 from enmapbox.gui import \
@@ -70,6 +69,7 @@ class LayerTreeNode(QgsLayerTree):
         # assert name is not None and len(str(name)) > 0
 
         self.mParent = None
+        self.mModel: QgsLayerTreeModel = None
         self.mTooltip: str = None
         self.mValue = None
         self.mIcon: QIcon = None
@@ -118,6 +118,13 @@ class LayerTreeNode(QgsLayerTree):
     # def removeChildren(self, i0, cnt):
     #    self.removeChildrenPrivate(i0, cnt)
     #    self.updateVisibilityFromChildren()
+
+    def setModel(self, model: QgsLayerTreeModel):
+        assert isinstance(model, QgsLayerTreeModel)
+        self.mModel = model
+
+    def model(self) -> QgsLayerTreeModel:
+        return self.mModel
 
     def setTooltip(self, tooltip):
         self.mTooltip = tooltip
@@ -263,15 +270,15 @@ class SpeclibDockTreeNode(DockTreeNode):
         self.profilesNode: LayerTreeNode = LayerTreeNode('Profiles')
         self.profilesNode.setIcon(QIcon(':/qps/ui/icons/profile.svg'))
 
-        self.mPROFILES: typing.Dict[str, int] = dict()
+        self.mPROFILES: Dict[str, int] = dict()
 
         assert isinstance(dock, SpectralLibraryDock)
         self.mSpeclibWidget = dock.mSpeclibWidget
         assert isinstance(self.mSpeclibWidget, SpectralLibraryWidget)
 
+
         self.speclibNode = QgsLayerTreeLayer(self.speclib())
 
-        # self.addChildNode(self.profilesNode)
         self.addChildNode(self.speclibNode)
         speclib = self.speclib()
         if is_spectral_library(speclib):
@@ -279,7 +286,21 @@ class SpeclibDockTreeNode(DockTreeNode):
             speclib.editCommandEnded.connect(self.updateNodes)
             speclib.committedFeaturesAdded.connect(self.updateNodes)
             speclib.committedFeaturesRemoved.connect(self.updateNodes)
-            self.updateNodes()
+            speclib.legendChanged.connect(self._update_legend_nodes)
+
+    def _update_legend_nodes(self):
+        if isinstance(self.speclibNode, QgsLayerTreeLayer):
+            rootNode = self.parent()
+            model = rootNode.model()
+            if isinstance(rootNode, QgsLayerTree) and isinstance(model, QgsLayerTreeModel):
+               # find all QgsLayerTreeLayers
+               nodes = [n for n in rootNode.findLayers() if n.layerId() == self.speclibNode.layerId()]
+               if len(nodes) > 1:
+                   # start with 2nd node.
+                   # legend of 1st node is already handled by QgsLayerTreeModel
+                   for node in nodes[1:]:
+                       if isinstance(node, QgsLayerTreeLayer):
+                           model.refreshLayerLegend(node)
 
     def speclib(self) -> QgsVectorLayer:
         return self.speclibWidget().speclib()
@@ -802,6 +823,8 @@ class DockManagerTreeModel(QgsLayerTreeModel):
         self.rootNode: LayerTreeNode = LayerTreeNode('<hidden root node>')
         assert isinstance(dockManager, DockManager)
         super(DockManagerTreeModel, self).__init__(self.rootNode, parent)
+        self.rootNode.setModel(self)
+
         self.columnNames = ['Property', 'Value']
 
         if isinstance(dockManager.project(), QgsProject):
@@ -854,8 +877,22 @@ class DockManagerTreeModel(QgsLayerTreeModel):
     def project(self) -> QgsProject:
         return self.mProject
 
-    def findDockNode(self, object: typing.Union[str, QgsMapCanvas, QgsRasterLayer,
-                                                QgsVectorLayer, SpectralLibraryWidget]) -> DockTreeNode:
+    def findLayerTreeLayers(self, layer: Union[QgsMapLayer, str]) -> List[QgsLayerTreeLayer]:
+        """
+        Finds all QgsLayerTreeLayers related to a QgsMapLayer
+        """
+        if isinstance(layer, QgsMapLayer):
+            lid = layer.id()
+        elif isinstance(layer, str):
+            lid = layer
+        else:
+            return []
+        root: QgsLayerTree = self.rootGroup()
+        results = [n for n in root.findLayers() if n.layerId() == lid]
+        return results
+
+    def findDockNode(self, object: Union[str, QgsMapCanvas, QgsRasterLayer,
+    QgsVectorLayer, SpectralLibraryWidget]) -> DockTreeNode:
         """
         Returns the dock that contains the given object
         :param object:

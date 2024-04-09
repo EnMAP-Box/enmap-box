@@ -5,7 +5,7 @@ import unittest
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import EnMAPBoxTestCase, start_app
-from qgis._core import QgsMarkerSymbol, QgsSingleSymbolRenderer
+from qgis._core import QgsMarkerSymbol, QgsSingleSymbolRenderer, QgsLayerTreeLayer
 from qgis.core import QgsProject
 from qgis.core import QgsRasterLayer, QgsVectorLayer
 
@@ -33,8 +33,19 @@ class TestIssue737(EnMAPBoxTestCase):
         speclib.setRenderer(r1)
 
         model = emb.dockManagerTreeModel()
+        l1 = model.findLayerTreeLayers(speclib)
+        l2 = model.findLayerTreeLayers(speclib.id())
+        self.assertEqual(len(l1), 2)
+        self.assertListEqual(l1, l2)
         node = model.rootGroup()
-        lyrIds = node.findLayerIds()
+
+        layerNodes = [n for n in node.findLayers() if n.layerId() == speclib.id()]
+        for n in layerNodes:
+            self.assertIsInstance(n, QgsLayerTreeLayer)
+            lyr = n.layer()
+            r = lyr.renderer()
+            s = r.symbol()
+            self.assertEqual(s.color(), speclib.renderer().symbol().color())
 
         self.showGui(emb.ui)
         emb.close()
