@@ -240,6 +240,8 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                     targetWavelength = spectralReader.wavelength(targetBandNo)
                     bandNo = int(np.argmin(np.abs(wavelength - targetWavelength)) + 1)
                     bandList.append(bandNo)
+                if len(bandList) == 0:
+                    bandList = None
 
             if bandList is None:
                 nBands = raster.bandCount()

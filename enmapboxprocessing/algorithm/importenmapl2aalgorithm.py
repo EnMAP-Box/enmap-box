@@ -190,6 +190,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
 
                 GdalUtils.stackVrtBands(vrtTempFilename, vrtBandFilenames, bandNumbers)
                 bandList = list(range(1, len(wavelength) + 1))
+                ds: gdal.Dataset = gdal.Open(vrtTempFilename)
 
             # update metadata
             wavelength = [str(wavelength[bandNo - 1]) for bandNo in bandList]
@@ -218,10 +219,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                 for bandNo in reader.bandNumbers():
                     feedback.setProgress(bandNo / reader.bandCount() * 100)
                     allNoData = np.all(
-                        reader.array(
-                            yOffset=int(reader.height() / 2), height=1,  # just check single image line
-                            bandList=[bandNo]
-                        )[0] == reader.noDataValue(bandNo))
+                        reader.array(bandList=[bandNo])[0] == reader.noDataValue(bandNo))
                     if allNoData:
                         writer.setBadBandMultiplier(0, bandNo)
                 writer.close()
