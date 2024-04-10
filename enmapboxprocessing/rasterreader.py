@@ -43,10 +43,12 @@ class RasterReader(object):
         else:
             raise ValueError()
 
+        isGdalProvider = self.layer.dataProvider().name() == 'gdal'
+
         if isinstance(source, gdal.Dataset):
             gdalDataset = source
         else:
-            if openWithGdal:
+            if openWithGdal and isGdalProvider:
                 gdalDataset: gdal.Dataset = gdal.Open(self.provider.dataSourceUri(), gdal.GA_ReadOnly)
             else:
                 gdalDataset = None

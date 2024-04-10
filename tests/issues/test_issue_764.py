@@ -13,6 +13,7 @@ from enmapbox.testing import EnMAPBoxTestCase, start_app, TestObjects
 from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import RasterMathAlgorithm
 from enmapboxprocessing.parameter.processingparameterrastermathcodeeditwidget import \
     ProcessingParameterRasterMathCodeEditWidgetWrapper, ProcessingParameterRasterMathCodeEdit
+from enmapboxprocessing.rasterreader import RasterReader
 from processing import AlgorithmDialog
 from qgis.core import QgsProject, edit, QgsProcessingParameterString, QgsRasterLayer, QgsProcessingContext
 from qgis.gui import QgsAbstractProcessingParameterWidgetWrapper, QgsProcessingParameterWidgetContext
@@ -104,6 +105,15 @@ class TestIssue764(EnMAPBoxTestCase):
         else:
             # show standard AlgorithmDialog, which uses a standard processing context (QgsProject.instance())
             self.showGui(algDialog)
+
+    def test_RasterReader(self):
+
+        speclib = TestObjects.createSpectralLibrary()
+        layer = createRasterLayers(speclib)[1]
+        self.assertIsInstance(layer, QgsRasterLayer)
+        self.assertTrue(layer.isValid())
+        reader = RasterReader(layer)
+        data2 = np.array(reader.array())
 
 
 if __name__ == '__main__':

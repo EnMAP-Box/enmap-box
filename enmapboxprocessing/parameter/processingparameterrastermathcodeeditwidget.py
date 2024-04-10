@@ -406,10 +406,7 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
                 self.mSourcesTree.addTopLevelItems([item])
                 layerItem = item
 
-                if layer.dataProvider().name() == 'gdal':
-                    reader = RasterReader(layer)
-                else:
-                    reader = RasterReader(layer, openWithGdal=False)
+                reader = RasterReader(layer)
 
                 for i in range(reader.bandCount()):
                     bandNo = i + 1
