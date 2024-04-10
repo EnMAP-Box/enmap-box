@@ -14,8 +14,7 @@ from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import
 from enmapboxprocessing.parameter.processingparameterrastermathcodeeditwidget import \
     ProcessingParameterRasterMathCodeEditWidgetWrapper, ProcessingParameterRasterMathCodeEdit
 from processing import AlgorithmDialog
-from qgis._core import QgsProcessingContext
-from qgis.core import QgsProject, edit, QgsProcessingParameterString, QgsRasterLayer
+from qgis.core import QgsProject, edit, QgsProcessingParameterString, QgsRasterLayer, QgsProcessingContext
 from qgis.gui import QgsAbstractProcessingParameterWidgetWrapper, QgsProcessingParameterWidgetContext
 
 start_app()
@@ -96,7 +95,7 @@ class TestIssue764(EnMAPBoxTestCase):
                 for lyr in project.mapLayers().values():
                     if isinstance(lyr, QgsRasterLayer):
                         pass
-                        #self.assertTrue(lyr.id() in layers_in_widget.values(),
+                        # self.assertTrue(lyr.id() in layers_in_widget.values(),
                         #                msg=f'{lyr} not shown in ProcessingParameterRasterMathCodeEdit')
             else:
                 # new way: proper provider
@@ -105,7 +104,6 @@ class TestIssue764(EnMAPBoxTestCase):
         else:
             # show standard AlgorithmDialog, which uses a standard processing context (QgsProject.instance())
             self.showGui(algDialog)
-
 
 
 if __name__ == '__main__':
