@@ -391,8 +391,8 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
             if not crs.isValid():
                 continue
 
-            if layer.dataProvider().name() not in ['gdal', 'ogr']:
-                continue
+            #if layer.dataProvider().name() not in ['gdal', 'ogr']:
+            #    continue
 
             crsid = f' [{crs.authid()}]'
 
