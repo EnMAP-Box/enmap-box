@@ -1311,7 +1311,7 @@ class LoadTxtFile:
         # row labels of the QTableWidget are the actual data
         row_labels = [str(self.wl_open[i]) for i in range(n_entries)]
 
-        wl_offset = 400 - self.wl_open[0]  # PROSAIL wavelengths start at 400, consider an offset if necessary
+        wl_offset = 400 - int(self.wl_open[0])  # PROSAIL wavelengths start at 400, consider an offset if necessary)
 
         data_array = np.zeros(shape=(n_entries, n_cols - 1))  # prepare for reading the data into numpy array
         for data_list in range(n_entries):

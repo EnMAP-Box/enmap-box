@@ -35,18 +35,18 @@ import sys
 import os
 # ensure to call QGIS before PyQtGraph
 from qgis.PyQt.QtWidgets import *
-import lmuvegetationapps.Processor.Processor_Inversion_core as processor
+import lmuvegetationapps.Processor_old.Processor_Inversion_core_old as processor
 from lmuvegetationapps import APP_DIR
 from _classic.hubflow.core import *
 from enmapbox.gui.utils import loadUi
 
-pathUI_processor = os.path.join(APP_DIR, 'Resources/UserInterfaces/Processor_Inversion.ui')
+pathUI_processor = os.path.join(APP_DIR, 'Resources/UserInterfaces/Processor_Inversion_old.ui')
 pathUI_nodat = os.path.join(APP_DIR, 'Resources/UserInterfaces/Nodat.ui')
-pathUI_prgbar = os.path.join(APP_DIR, 'Resources/UserInterfaces/ProgressBar.ui')
+pathUI_prgbar = os.path.join(APP_DIR, 'Resources/UserInterfaces/ProgressBar_old.ui')
 
 
 class MLInversionGUI(QDialog):
-    
+
     def __init__(self, parent=None):
         mLayerImage: QgsMapLayerComboBox
         mLayerGeometry: QgsMapLayerComboBox
@@ -102,7 +102,7 @@ class MLInversion:
 
         self.geo_mode = "file"  # Is the geometry (SZA, OZA, rAA) suplied through 'file' or are they 'fix'
         self.geo_file = None  # if geo_mode == 'file', which is the path?
-        self.geo_fixed = [None]*3  # if geo_mode == 'fix', which are the three geometry angles?
+        self.geo_fixed = [None] * 3  # if geo_mode == 'fix', which are the three geometry angles?
 
         self.conversion_factor = None  # convert spectral image (boost) to reach the same scale as the machines
 
@@ -111,12 +111,10 @@ class MLInversion:
         self.gui.mLayerGeometry.setLayer(None)
         self.gui.mLayerMask.setLayer(None)
 
-        self.algorithm = None
-
         # Initial Model is set to EnMAP as default
         self.model_meta_file = os.path.join(APP_DIR, 'Resources/Processor/EnMAP.meta')
-        self.meta_dict = self._get_processor_meta(file=self.model_meta_file)
-        if not self.meta_dict:
+        meta_dict = self._get_processor_meta(file=self.model_meta_file)
+        if not meta_dict:
             return
         self.model_name = os.path.splitext(os.path.basename(self.model_meta_file))[0]
         # The name of the meta-file == name of the model
@@ -311,16 +309,8 @@ class MLInversion:
                                                      filter="Processor META File (*.meta)")[0])
             if not result:
                 return
-            self.meta_dict = self._get_processor_meta(file=result)
-            self.algorithm = self.meta_dict['alg']
-
-            targets = self.meta_dict.get('target_parameters')
-            if isinstance(targets, str):
-                self.gui.lblTargets.setText(targets)
-            else:
-                self.gui.lblTargets.setText(', '.join(self.meta_dict['target_parameters']))
-
-            if not self.meta_dict:
+            meta_dict = self._get_processor_meta(file=result)
+            if not meta_dict:
                 return
             self.model_meta_file = result
             self.model_name = os.path.splitext(os.path.basename(result))[0]
@@ -390,13 +380,13 @@ class MLInversion:
             else:
                 self.gui.lblInputMask.setText(result)
 
-        elif mode == "model":  # Select algorithm for inversion by picking its Meta-file (*.meta)
+        elif mode == "model":  # Select algorithm for inversion my picking its Meta-file (*.meta)
             result = str(QFileDialog.getOpenFileName(caption='Select Machine Learning Model',
                                                      filter="Processor META File (*.meta)")[0])
             if not result:
                 return
-            self.meta_dict = self._get_processor_meta(file=result)
-            if not self.meta_dict:
+            meta_dict = self._get_processor_meta(file=result)
+            if not meta_dict:
                 return
             self.model_meta_file = result
             self.model_name = os.path.splitext(os.path.basename(result))[0]
@@ -511,20 +501,17 @@ class MLInversion:
                 raise ValueError('%s is not a valid no data value for output' % self.gui.txtNodatOutput.text())
 
         # Parameters to invert
-        self.paras = self.meta_dict.get('target_parameters', [])
-
-        if isinstance(self.paras, str):
-            self.paras = [self.paras]
-        # if self.gui.checkLAI.isChecked():
-        #     self.paras.append("LAI")
-        # if self.gui.checkALIA.isChecked():
-        #     self.paras.append("LIDF")
-        # if self.gui.checkCab.isChecked():
-        #     self.paras.append("cab")
-        # if self.gui.checkCm.isChecked():
-        #     self.paras.append("cm")
-        # if not self.paras:
-        #     raise ValueError("At least one parameter needs to be selected!")
+        self.paras = list()
+        if self.gui.checkLAI.isChecked():
+            self.paras.append("LAI")
+        if self.gui.checkALIA.isChecked():
+            self.paras.append("LIDF")
+        if self.gui.checkCab.isChecked():
+            self.paras.append("cab")
+        if self.gui.checkCm.isChecked():
+            self.paras.append("cm")
+        if not self.paras:
+            raise ValueError("At least one parameter needs to be selected!")
 
     def get_image_meta(self, image, image_type):
         # extracts meta information from the spectral image
@@ -546,7 +533,7 @@ class MLInversion:
                 self.main.nodat_widget.init(image_type=image_type, image=image)
                 self.main.nodat_widget.gui.setModal(True)  # parent window is blocked
                 self.main.nodat_widget.gui.exec_()  # unlike .show(), .exec_() waits with execution of the code,
-                                                    # until the app is closed
+                # until the app is closed
                 nodata = self.main.nodat_widget.nodat
 
             # When opening a spectral input image, wavelengths must be extracted from the header to find out the
@@ -575,7 +562,7 @@ class MLInversion:
                     # Pop up a warning and disable NDVI spins
                     QMessageBox.warning(self.gui, "Warning", '{}: file has missing or corrupt wavelengths and '
                                                              'wavelength unit in header. NDVI-masking is disabled!'
-                                                             .format(image))
+                                        .format(image))
                     self.gui.grpNDVI.setChecked(False)  # disable the option to select NDVI
                     self.gui.grpNDVI.setDisabled(True)
                     self.gui.SpinNDVI.setDisabled(True)  # disable the option to set NDVI threshold
@@ -623,7 +610,7 @@ class MLInversion:
 
         try:
             # Setup the inversion process
-            proc.predict_main.prediction_setup(model_meta=self.model_meta_file, algorithm=self.algorithm, img_in=self.image,
+            proc.predict_main.prediction_setup(model_meta=self.model_meta_file, algorithm='ann', img_in=self.image,
                                                res_out=self.out_image, out_mode=self.out_mode,
                                                mask_ndvi=self.mask_ndvi, ndvi_thr=self.ndvi_thr,
                                                ndvi_bands=self.ndvi_bands, mask_image=self.mask_image,
@@ -659,12 +646,12 @@ class MLInversion:
         self.prg_widget.gui.lblCancel.setText("")
         self.prg_widget.gui.allow_cancel = True
         self.prg_widget.gui.close()
-        QMessageBox.information(self.gui, "Finish", "ML mapping finished")
+        QMessageBox.information(self.gui, "Finish", "Automatic inversion finished")
         self.gui.close()
 
     def open_train_gui(self):
         # Open the GUI for training new models
-        from lmuvegetationapps.Processor.Processor_Training_GUI import MainUiFunc
+        from lmuvegetationapps.Processor_old.Processor_Training_GUI_old import MainUiFunc
         m = MainUiFunc()
         m.show()
         self.gui.close()
@@ -701,7 +688,7 @@ class Nodat:
                 self.gui.txtNodat.setText("")
                 return
         self.nodat = nodat
-        #self.gui.close()
+        # self.gui.close()
 
 
 # class PRG handles the GUI of the ProgressBar
@@ -735,6 +722,7 @@ class MainUiFunc:
 
 if __name__ == '__main__':
     from enmapbox.testing import start_app
+
     app = start_app()
     m = MainUiFunc()
     m.show()
