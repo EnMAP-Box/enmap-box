@@ -91,7 +91,7 @@ class RasterReader(object):
         # check QGIS
         bandName = self.layer.bandName(bandNo)
         # removes the "Band 042: " prefix
-        bandName = re.sub(r'^Band \d+:', '', bandName)
+        bandName = re.sub(r'^Band \d+:\s*', '', bandName)
 
         return bandName
 
