@@ -1,7 +1,7 @@
 from math import isnan
 from os.path import exists
 from typing import Iterable, List, Union, Optional, Tuple, Iterator
-
+import re
 import numpy as np
 from osgeo import gdal
 
@@ -89,7 +89,11 @@ class RasterReader(object):
             return bandName[bandNo - 1]
 
         # check QGIS
-        return ': '.join(self.layer.bandName(bandNo).split(': ')[1:])  # removes the "Band 042: " prefix
+        bandName = self.layer.bandName(bandNo)
+        # removes the "Band 042: " prefix
+        bandName = re.sub(r'^Band \d+:', '', bandName)
+
+        return bandName
 
     def bandColor(self, bandNo: int) -> Optional[QColor]:
         """Return band color."""
