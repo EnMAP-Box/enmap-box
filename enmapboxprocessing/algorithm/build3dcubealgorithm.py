@@ -140,6 +140,7 @@ class Build3dCubeAlgorithm(EnMAPProcessingAlgorithm):
             writer = Driver(filename2, feedback=feedback).createFromArray(array, extent, crs)
             writer.setNoDataValue(noDataValue)
             writer.setBandName('3D Cube Side', 1)
+            writer.close()
 
             result = {self.P_OUTPUT_FACE: filename1, self.P_OUTPUT_SIDE: filename2}
             self.toc(feedback, result)
