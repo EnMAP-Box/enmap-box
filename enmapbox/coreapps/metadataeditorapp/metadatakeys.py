@@ -296,7 +296,7 @@ class MDKeyDomainString(MDKeyAbstract):
             return MDKeyDomainString(obj, domain, name, isImmutable=True, **kwds)
 
         # ENVI Domain
-        # see http://www.harrisgeospatial.com/docs/enviheaderfiles.html for details
+        # see https://www.nv5geospatialsoftware.com/docs/enviheaderfiles.html for details
         if domain == 'ENVI':
 
             if name == 'bands':

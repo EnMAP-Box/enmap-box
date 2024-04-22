@@ -60,7 +60,7 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
             (self._COPY_STYLE, 'Whether to copy style from source to destination.'),
             (self._EXCLUDE_BAD_BANDS, 'Whether to exclude bad bands (given by BBL metadata item inside ENVI domain). '
                                       'Also see The ENVI Header Format for more details: '
-                                      'https://www.l3harrisgeospatial.com/docs/ENVIHeaderFiles.html'),
+                                      'https://www.nv5geospatialsoftware.com/docs/enviheaderfiles.html'),
             (self._EXCLUDE_DERIVED_BAD_BANDS,
              'Whether to derive and exclude additional bad bands fully filled with inf, nan or no data values.'),
             (self._WRITE_ENVI_HEADER, 'Whether to write an ENVI header *.hdr sidecar file with '
