@@ -1,6 +1,6 @@
 from math import nan
 from os import listdir
-from os.path import join
+from os.path import join, exists
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
@@ -8,20 +8,27 @@ import numpy as np
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.librarydriver import LibraryDriver
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterFile
+from qgis.core import QgsVectorLayer, QgsMapLayer, QgsProcessingContext, QgsProcessingFeedback, \
+    QgsProcessingParameterFile
 
 
 @typechecked
 class ImportUsgsSpeclib07Algorithm(EnMAPProcessingAlgorithm):
     P_FOLDER, _FOLDER = 'folder', 'USGS Speclib Library Version 7 folder'
-    P_SPECTRAL, _SPECTRAL = 'spectral', 'Spectral characteristics'
     P_CHAPTER, _CHAPTER = 'chapter', 'Selected chapters'
     O_CHAPTER = (
         'Artificial Materials', 'Coatings', 'Liquids', 'Minerals', 'Organic Compounds', 'Soils And Mixtures',
         'Vegetation'
     )
-    ArtificialMaterialsChapter, CoatingsChapter, LiquidsChapter, MineralsChapter, OrganicCompoundsChapter, \
-    SoilsAndMixturesChapter, VegetationChapter = range(7)
+    AllChapters = (
+    ArtificialMaterialsChapter, CoatingsChapter, LiquidsChapter, MineralsChapter, OrganicCompoundsChapter,
+    SoilsAndMixturesChapter, VegetationChapter) = list(range(7))
+    P_SPECTROMETER, _SPECTROMETER = 'spectrometer', 'Selected spectrometers'
+    O_SPECTROMETER = (
+        'Beckman 5270 (0.2 to 3 µm)', 'hi-resNG ASD (0.35 to 2.5 µm', 'Nicolet FTIR (0.1 to 21.6 µm',
+        'AVIRIS (0.37 to 2.5 µm)'
+    )
+    AllSpectrometers = BeckmanSpectrometer, AsdSpectrometer, NicoletSpectrometer, AvirisSpectrometer = list(range(4))
     P_OUTPUT_LIBRARY, _OUTPUT_LIBRARY = 'outputLibrary', 'Output spectral library'
 
     def displayName(self):
@@ -36,7 +43,8 @@ class ImportUsgsSpeclib07Algorithm(EnMAPProcessingAlgorithm):
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
             (self._FOLDER, 'The USGS Speclib Library Version 7 folder.'),
-            (self._CHAPTER, 'Chapters to be imported. An empty selection defaults to import all chapters.'),
+            (self._CHAPTER, 'Filter spectra to be imported by chapter.'),
+            (self._SPECTROMETER, 'Filter spectra to be imported by spectrometer.'),
             (self._OUTPUT_LIBRARY, self.GpkgFileDestination)
         ]
 
@@ -45,18 +53,17 @@ class ImportUsgsSpeclib07Algorithm(EnMAPProcessingAlgorithm):
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterFile(self.P_FOLDER, self._FOLDER, QgsProcessingParameterFile.Behavior.Folder)
-        self.addParameterEnum(self.P_CHAPTER, self._CHAPTER, self.O_CHAPTER, True, [], True)
+        self.addParameterEnum(self.P_CHAPTER, self._CHAPTER, self.O_CHAPTER, True)
+        self.addParameterEnum(self.P_SPECTROMETER, self._SPECTROMETER, self.O_SPECTROMETER, True)
         self.addParameterFileDestination(self.P_OUTPUT_LIBRARY, self._OUTPUT_LIBRARY, self.GeoJsonFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         folder = self.parameterAsFile(parameters, self.P_FOLDER, context)
-        chapters = self.parameterAsEnums(parameters, self.P_CHAPTER, context)
+        selectedChapters = self.parameterAsEnums(parameters, self.P_CHAPTER, context)
+        selectedSensors = self.parameterAsEnums(parameters, self.P_SPECTROMETER, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_LIBRARY, context)
-
-        if len(chapters) == 0:
-            chapters = list(range(len(self.O_CHAPTER)))
 
         with open(filename + '.log', 'w') as logfile:
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
@@ -64,18 +71,24 @@ class ImportUsgsSpeclib07Algorithm(EnMAPProcessingAlgorithm):
 
             folder2 = join(folder, 'ASCIIdata', 'ASCIIdata_splib07a')
             sensors = {
-                'ASD': join(folder2, 'splib07a_Wavelengths_ASD_0.35-2.5_microns_2151_ch.txt'),
                 'BEC': join(folder2, 'splib07a_Wavelengths_BECK_Beckman_0.2-3.0_microns.txt'),
+                'ASD': join(folder2, 'splib07a_Wavelengths_ASD_0.35-2.5_microns_2151_ch.txt'),
+                'NIC': join(folder2, 'splib07a_Wavelengths_NIC4_Nicolet_1.12-216microns.txt'),
                 'AVI': join(folder2, 'splib07a_Wavelengths_AVIRIS_1996_0.37-2.5_microns.txt'),
-                'NIC': join(folder2, 'splib07a_Wavelengths_NIC4_Nicolet_1.12-216microns.txt')
+            }
+            sensorIds = {
+                'BEC': self.BeckmanSpectrometer,
+                'ASD': self.AsdSpectrometer,
+                'NIC': self.NicoletSpectrometer,
+                'AVI': self.AvirisSpectrometer,
             }
 
             wavelength = dict()
             for name, filenameSensor in sensors.items():
                 with open(filenameSensor) as file:
                     text = file.readlines()
-                wavelength[name] = list(map(float, text[1:]))
-            wavelength['NIC'] = [v / 10 for v in wavelength['NIC']]
+                factor = 0.1 if name == 'NIC' else 1
+                wavelength[name] = [float(v) * factor for v in text[1:]]
             xUnit = 'Micrometers'
 
             data = []
@@ -88,7 +101,7 @@ class ImportUsgsSpeclib07Algorithm(EnMAPProcessingAlgorithm):
                 _, chapterName = chapter.split('_')
 
                 currentChapter = O_CHAPTER.index(chapterName.replace(' ', ''))
-                if currentChapter not in chapters:
+                if currentChapter not in selectedChapters:
                     continue
 
                 folder3 = join(folder2, chapter)
@@ -100,13 +113,20 @@ class ImportUsgsSpeclib07Algorithm(EnMAPProcessingAlgorithm):
                     with open(join(folder3, spectrum)) as file:
                         lines = file.readlines()
                     attributes = lines[0]
-                    tmp1, tmp2 = attributes.split(':')  # [1].strip()
+                    tmp1, tmp2 = attributes.split(':')
                     name = ' '.join([s for s in tmp2.split(' ') if s != ''])
                     record = int(tmp1.split('=')[1])
                     *tmp3, sensor, ref = tmp2.strip().split(' ')
+                    html = '_'.join([s for s in tmp2.strip().split(' ') if s != ''])
+                    html = html.replace('<', 'lt').replace('/', '-').replace('>', 'gt')
+                    html = join(folder, 'HTMLmetadata', html + '.html')
+                    sensorKey = sensor[:3]
+                    sensorId = sensorIds[sensorKey]
+                    if sensorId not in selectedSensors:
+                        continue
                     y = np.array(lines[1:], float)
                     y[y == -1.2300000e+034] = nan
-                    x = wavelength[sensor[:3]]
+                    x = wavelength[sensorKey]
                     y = list(y)
                     values = {
                         'profiles': {
@@ -116,18 +136,46 @@ class ImportUsgsSpeclib07Algorithm(EnMAPProcessingAlgorithm):
                             #                            'bbl': [1, 1, 1]
                         },
                         'name': name,
+                        'html': html,
                         'chapter': chapterName,
                         'sensor': sensor,
                         'ref': ref,
                         'record': record,
                         'basename': spectrum
                     }
+                    if not exists(values['html']):
+                        a = 1
                     data.append(values)
 
             writer = LibraryDriver().createFromData('USGS Speclib Library Version 7', data)
             writer.writeToSource(filename)
+            library = QgsVectorLayer(filename)
+            library.loadNamedStyle(__file__.replace('.py', '.qml'))
+            library.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
 
             result = {self.P_OUTPUT_LIBRARY: filename}
             self.toc(feedback, result)
 
         return result
+
+    """def parseDataTable(self, htmlFilename: str):
+        with open(htmlFilename) as file:
+            text = file.readlines()
+
+        itemIndices = []
+        for i, line in enumerate(text):
+            if line.startswith('<TR><TD scope="row">'):
+                itemIndices.append()
+
+        titles = []
+
+        for i in itemIndices:
+
+
+        description
+        asciiSpectrum
+        asciiSpectrumErrorBars
+        asciiWavelengths
+        asciiBandpass
+            <TH scope="col"><B>GIF Wavelengths (&#181;m) Plot</B></TH>
+     <TH scope="col"><B>GIF Bandpass (&#181;m) Plot</B></TH>"""
