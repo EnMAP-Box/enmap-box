@@ -137,6 +137,7 @@ if not exists(classifierDumpPkl):
         alg.P_DATASET: classificationDatasetAsPklFile,
         alg.P_CLASSIFIER: 'from sklearn.ensemble import RandomForestClassifier\n'
                           'classifier = RandomForestClassifier(n_estimators=100, oob_score=True, random_state=42)\n',
+        alg.P_NFOLD: 10,
         alg.P_RASTER: enmap,
         alg.P_OUTPUT_CLASSIFIER: classifierDumpPkl
     }
