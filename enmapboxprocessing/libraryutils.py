@@ -2,9 +2,9 @@ from typing import List
 
 from enmapbox.typeguard import typechecked
 from qgis.core import QgsVectorLayer
-from qps.qgisenums import QGIS_WKBTYPE
-from qps.speclib.core.spectrallibrary import SpectralLibraryUtils
-from qps.speclib.core.spectralprofile import ProfileEncoding
+from enmapbox.qgispluginsupport.qps.qgisenums import QGIS_WKBTYPE
+from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
+from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import ProfileEncoding
 
 
 @typechecked
