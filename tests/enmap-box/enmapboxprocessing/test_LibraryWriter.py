@@ -3,7 +3,7 @@ from enmapbox.testing import start_app
 from enmapboxprocessing.librarydriver import LibraryDriver
 from enmapboxprocessing.testcase import TestCase
 from qgis.PyQt.QtCore import QVariant
-from qps.speclib.core.spectralprofile import ProfileEncoding
+from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import ProfileEncoding
 
 
 class TestLibraryWriter(TestCase):
