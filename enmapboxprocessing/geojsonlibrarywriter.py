@@ -43,7 +43,10 @@ class GeoJsonLibraryWriter(object):
             '}\n'
         )
 
-    def writeProfile(self, x: List[Number], y: List[Number], xUnit: str, name: str, geometry: str = None):
+    def writeProfile(
+            self, x: List[Number], y: List[Number], bbl: List[int], xUnit: str, name: str, geometry: str = None,
+            properties: dict = None
+    ):
         if geometry is not None:
             raise NotImplementedError()
 
@@ -59,10 +62,16 @@ class GeoJsonLibraryWriter(object):
                 "profiles": {
                     "x": x,
                     "xUnit": xUnit,
-                    "y": y
+                    "y": y,
+                    "bbl": bbl
                 }
             },
             "geometry": None
         }
+
+        if properties is not None:
+            for k, v in properties.items():
+                profile["properties"][k] = v
+
         self.file.write(' ' * 8)
         self.file.write(json.dumps(profile))
