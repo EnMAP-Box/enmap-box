@@ -1,0 +1,8 @@
+
+            {
+                "type": "FeatureCollection",
+                "name": "dummy",
+                "description": "",
+                "features": [{"type": "Feature", "properties": {"html": "dummy.html"}}]
+            }
+        

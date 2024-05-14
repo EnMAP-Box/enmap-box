@@ -213,6 +213,8 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                 rasterBand.SetOffset(float(offsets[i]))
                 rasterBand.FlushCache()
 
+            ds.FlushCache()  # need to FlushCache to fix #879 (not quite sure why)
+
             if setBadBands:  # see issue #267
                 reader = RasterReader(ds)
                 writer = RasterWriter(ds)

@@ -167,7 +167,8 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
                         values = responses[name]
                         x = [xi for xi, yi in values]
                         y = [yi for xi, yi in values]
-                        writer.writeProfile(x, y, 'Nanometers', name)
+                        bbl = [1] * len(x)
+                        writer.writeProfile(x, y, bbl, 'Nanometers', name)
                     writer.endWriting()
                     writer.writeQml(file2)
 
