@@ -4,7 +4,7 @@ from enmapbox.typeguard import typechecked
 from enmapboxprocessing.librarywriter import LibraryWriter
 from qgis.PyQt.QtCore import QVariant
 from qgis.core import QgsVectorLayer
-from qps.speclib.core.spectrallibrary import SpectralLibraryUtils
+from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
 
 
 @typechecked

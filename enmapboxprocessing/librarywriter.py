@@ -6,8 +6,8 @@ from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import prepareP
 from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtCore import QVariant
 from qgis.core import QgsVectorLayer, QgsField, QgsFeature, edit
-from qps.speclib.core import create_profile_field
-from qps.speclib.core.spectralprofile import ProfileEncoding
+from enmapbox.qgispluginsupport.qps.speclib.core import create_profile_field
+from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import ProfileEncoding
 
 
 @typechecked
