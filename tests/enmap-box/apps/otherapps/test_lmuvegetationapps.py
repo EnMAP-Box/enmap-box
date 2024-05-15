@@ -14,10 +14,15 @@ __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
 import unittest
 
+from PyQt5.QtWidgets import QWidget
+
+import enmapboxtestdata
 from enmapbox.apps.lmuvegetationapps.IVVRM.IVVRM_GUI import IVVRM_GUI, MainUiFunc
 from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.testing import EnMAPBoxTestCase
+from enmapbox.testing import EnMAPBoxTestCase, start_app
+from lmuvegetationapps.IVVRM.IVVRM_GUI import SensorEditor
 
+start_app()
 
 def has_package(name: str):
     try:
@@ -29,10 +34,25 @@ def has_package(name: str):
 
 class test_applications(EnMAPBoxTestCase):
 
-    @unittest.skipIf(not has_package('scipy'), 'scipy is not installed')
-    def test_MainUiFunc(self):
+    def test_IVVRM(self):
         m = MainUiFunc()
-        self.showGui(m)
+
+        self.showGui(m.ivvrm.gui)
+
+    def test_SensorEditor(self):
+        m = MainUiFunc()
+        editor: SensorEditor = m.sensoreditor
+        cb = m.sensoreditor.gui.mLayer
+        self.assertEqual(cb.count(), 0)
+
+        editor.open_image(input=enmapboxtestdata.enmap_potsdam)
+        # editor.open_image()
+        # editor.image_read()
+        # editor.check_flags()
+
+
+        self.assertEqual(cb.count(), 1)
+        self.showGui(m.sensoreditor.gui)
 
     @unittest.skipIf(not has_package('scipy'), 'scipy is not installed')
     def test_application(self):

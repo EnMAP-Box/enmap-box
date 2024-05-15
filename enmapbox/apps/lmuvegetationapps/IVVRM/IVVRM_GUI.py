@@ -25,20 +25,24 @@
 
 import sys
 import os
+from typing import Union
+
 import numpy as np
+from PyQt5.QtWidgets import QDialog, QWidgetAction, QGridLayout, QLabel, QWidget, QMessageBox, QFileDialog, \
+    QTableWidgetItem, QHeaderView, QApplication
+from qgis._core import QgsApplication, QgsRasterLayer
 from scipy.interpolate import interp1d
-# from qgis.gui import *
 
 # ensure to call QGIS before PyQtGraph
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
 from enmapbox.qgispluginsupport.qps.pyqtgraph import pyqtgraph as pg
+from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.examples.syntax import QColor
+from enmapboxprocessing.rasterreader import RasterReader
 from lmuvegetationapps.Resources.PROSAIL import call_model as mod
 from lmuvegetationapps.Resources.Spec2Sensor.Spec2Sensor_core import Spec2Sensor, BuildTrueSRF, BuildGenericSRF
 from lmuvegetationapps import APP_DIR
 
 from qgis.gui import QgsMapLayerComboBox
-from _classic.hubflow.core import *
+# from _classic.hubflow.core import *
 
 import warnings
 warnings.filterwarnings('ignore')  # ignore warnings, like ZeroDivision
@@ -815,15 +819,15 @@ class IVVRM:
 
     def save_spectrum(self):
         # saves the current spectrum as a textfile with two columns (wavelength and reflectances)
-        specnameout = QFileDialog.getSaveFileName(caption='Save Modelled Spectrum',
+        path, format = QFileDialog.getSaveFileName(caption='Save Modelled Spectrum',
                                                   filter="Text files (*.txt)")
-        if not specnameout:
+        if path in [None, '']:
             return
         save_matrix = np.zeros(shape=(len(self.wl), 2))
         save_matrix[:, 0] = self.wl
         save_matrix[:, 1] = self.myResult
 
-        np.savetxt(specnameout[0], save_matrix, delimiter="\t", header="Wavelength_nm\tReflectance")
+        np.savetxt(path, save_matrix, delimiter="\t", header="Wavelength_nm\tReflectance")
 
     def save_paralist(self):
         # saves the current parameters to file with two columns (parameter name and value)
@@ -980,55 +984,75 @@ class SensorEditor:
         self.flag_image = False
         self.check_flags()  # check if the app is ready to be run
 
-    def open_image(self, mode):  # open image
+    def open_image(self,
+                   mode: str = 'imgSelect',
+                   input: Union[str, QgsRasterLayer] = None):  # open image
         self.image = None
-        if mode == "imgSelect":
-            bsq_input = QFileDialog.getOpenFileName(caption='Select Input Image')[0]
-            if not bsq_input:
-                return
-            self.addItem.append(bsq_input)
-            self.gui.mLayer.setAdditionalItems(self.addItem)
-            self.gui.mLayer.setCurrentText(bsq_input)
+        cb: QgsMapLayerComboBox = self.gui.mLayer
 
-            if len(self.addItem) > 1:
-                self.image = bsq_input
-                self.image_read()
+        cnt1 = cb.count()
+        if mode == "imgSelect":
+            if isinstance(input, str):
+                filepath = input
+            else:
+                filepath = QFileDialog.getOpenFileName(caption='Select Input Image')[0]
+            if filepath in [None, '']:
+                return
+            lyr = QgsRasterLayer(filepath, os.path.basename(filepath))
+
+            if lyr.isValid():
+                self.addItem.append(lyr)
+                cb.setAdditionalLayers(cb.additionalLayers() + [lyr])
+                # this triggers mode=imgSelect
+                return
+                # make added layer the current layer
+                cb.setCurrentIndex(cb.count() - 1)
 
         elif mode == "imgDropdown":
-            if self.gui.mLayer.currentLayer() is not None:
-                input = self.gui.mLayer.currentLayer()
-                bsq_input = input.source()
-            elif len(self.gui.mLayer.currentText()) > 0:
-                bsq_input = self.gui.mLayer.currentText()
-            else:
-                return
-            self.image = bsq_input
+            pass
+
+        lyr = cb.currentLayer()
+        if isinstance(lyr, QgsRasterLayer) and lyr.isValid():
+            self.image = lyr.source()
             self.image_read()
 
-        self.gui.lineSensorname.setEnabled(True)
-        self.flag_image = True
-        self.flag_srf = False
-        self.gui.radioHeader.setDisabled(True)
-        self.gui.radioHeader.setChecked(False)
-        self.gui.cmbDelimiter.setDisabled(True)
-        self.gui.cmbWLunit.setDisabled(True)
-        self.gui.lblInputFile.setText("")
-        self.gui.mLayer.setEnabled(True)
-        self.check_flags()
+            self.gui.lineSensorname.setEnabled(True)
+            self.flag_image = True
+            self.flag_srf = False
+            self.gui.radioHeader.setDisabled(True)
+            self.gui.radioHeader.setChecked(False)
+            self.gui.cmbDelimiter.setDisabled(True)
+            self.gui.cmbWLunit.setDisabled(True)
+            self.gui.lblInputFile.setText("")
+            self.gui.mLayer.setEnabled(True)
+            self.check_flags()
 
+        cnt2 = cb.count()
+        s = ""
     def image_read(self): # read only necessary info: fwhm and center wavelengths
         inras = self.image
-        image = openRasterDataset(inras)
-        meta = image.metadataDict()
-        try:
-            fwhm = meta['ENVI']['fwhm']
-            wavelength = meta['ENVI']['wavelength']
-        except ImportError:
-            self.houston(message="Missing wavelength and/or FWHM information"
-                                 "Make sure input imagery is ENVI bsq with wavelength and fwhm provided")
+        image = RasterReader(inras)
+        # image = openRasterDataset(inras)
+        # meta = image.metadataDict()
+        # try:
+        #    fwhm = meta['ENVI']['fwhm']
+        #    wavelength = meta['ENVI']['wavelength']
+        #except ImportError:
+        #    self.houston(message="Missing wavelength and/or FWHM information"
+        #                         "Make sure input imagery is ENVI bsq with wavelength and fwhm provided")
+        fwhm = []
+        wavelength = []
+        for b in range(1, image.bandCount() + 1):
+            fwhm.append(image.fwhm(b, units='nm'))
+            wavelength.append(image.wavelength(b, units='nm'))
 
-        fwhm = [float(i) for i in fwhm]
-        wavelength = [float(i) for i in wavelength]
+        if None in wavelength:
+            self.houston(message=f'Missing wavelength definition: {inras}')
+        if None in fwhm:
+            self.houston(message=f'Missing fwhm definition: {inras}')
+
+        # fwhm = [float(i) for i in fwhm]
+        # wavelength = [float(i) for i in wavelength]
         self.outreach = [i for i, v in enumerate(wavelength) if v < 400 or v > 2500]
 
         x = np.array(list(zip(wavelength, fwhm)))
@@ -1494,7 +1518,7 @@ class SelectWavelengths:
 # class MainUiFunc is the interface between all sub-guis, so they can communicate between each other
 class MainUiFunc:
     def __init__(self):
-        self.QGis_app = QApplication.instance()  # the QGIS-Application is made accessible within the code
+        self.QGis_app = QgsApplication.instance()  # the QGIS-Application is made accessible within the code
         self.ivvrm = IVVRM(self)
         # self.ivvrm_exec = StartIVVRM(self)
         self.loadtxtfile = LoadTxtFile(self)

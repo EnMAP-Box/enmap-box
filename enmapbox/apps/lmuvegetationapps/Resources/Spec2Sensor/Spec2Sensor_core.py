@@ -45,11 +45,18 @@ be single column (wavelengths) or two columns (wavelengths & FWHM).
 """
 
 
-
+import scipy
 import numpy as np
 import csv
 import os
-from enmapbox.coreapps._classic.hubflow.core import *
+from osgeo import gdal
+
+from enmapboxprocessing.driver import Driver
+from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxprocessing.rasterwriter import RasterWriter
+
+
+# from enmapbox.coreapps._classic.hubflow.core import *
 
 
 # Execution of a conversion between two sensors
@@ -118,24 +125,19 @@ class Spec2Sensor:
 
     def convert_image(self, in_file, out_file, nodat):
         # Method to convert a whole image from one sensor to another
-        dataset = openRasterDataset(in_file)
-        in_matrix = dataset.readAsArray()
+        dataset = RasterReader(in_file)
+        in_matrix = dataset.array()
         nbands, nrows, ncols = in_matrix.shape
-        grid = dataset.grid()
 
-        metadict = dataset.metadataDict()
-        print(metadict)
-        wavelengths = metadict['ENVI']['wavelength']
-        wl_units = metadict['ENVI']['wavelength units']
-        if wl_units.lower() in ['nanometers', 'nm', 'nanometer']:  # any of these is accepted
-            wave_convert = 1  # factor is 1, as the method expects nm anyway
-        elif wl_units.lower() in ['micrometers', 'µm', 'micrometer']:
-            wave_convert = 1000  # factor is 1000 to obtain nm
-        else:
-            exit()
+        wavelength = []
+        fwhm = []
+        for b in range(1, dataset.bandCount() + 1):
+            wavelength.append(dataset.wavelength(b, units='nm'))
+            fwhm.append(dataset.wavelength(b, units='nm'))
 
         # Be aware that wavelengths are converted into int, so 423.89 nm will become 423 nm.
-        self.wl = np.asarray([float(wl * wave_convert) for wl in wavelengths])
+        # BJ: why is this necessary?
+        self.wl = np.asarray(wavelength)
         self.n_wl = self.wl.shape[0]
 
         reflectances_straight = np.swapaxes(np.reshape(in_matrix, (nbands, -1)), 0, 1)
@@ -143,17 +145,15 @@ class Spec2Sensor:
         out_matrix = np.reshape(np.swapaxes(result, 0, 1), (self.n_wl_sensor, nrows, ncols))
         out_matrix = out_matrix.astype(np.int16)
 
-        output = RasterDataset.fromArray(array=out_matrix, filename=out_file, grid=grid,
-                                         driver=EnviDriver())
-
-        output.setMetadataItem('data ignore value', nodat, 'ENVI')
-        output.setMetadataItem('wavelength', "{" + ", ".join(str(i) for i in self.wl_sensor) + "}", 'ENVI')
-        output.setMetadataItem('wavelength units', "Nanometers", 'ENVI')
-        output.setMetadataItem('fwhm', "{" + ", ".join(str(i) for i in self.fwhm) + "}", 'ENVI')
-
-        for iband, band in enumerate(output.bands()):
-            band.setDescription("Band {:00d}".format(iband))
-            band.setNoDataValue(nodat)
+        drv: Driver = Driver(out_file)
+        output = drv.createFromArray(out_matrix, crs=dataset.crs(), extent=dataset.extent())
+        # output = RasterDataset.fromArray(array=out_matrix, filename=out_file, grid=grid,
+        #                                 driver=EnviDriver())
+        for b in range(output.bandCount()):
+            output.setNoDataValue(nodat, bandNo=b+1)
+            output.setWavelength(self.wl_sensor[b], bandNo=b+1, units='nm')
+            output.setFwhm(self.fwhm[b], bandNo=b+1)
+            output.setBandName("Band {:00d}".format(b))
 
 
 # This class builds new srf-files (numpy) from text files with the ideal structure of K. Segl's files
