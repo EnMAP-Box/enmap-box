@@ -975,7 +975,7 @@ class SensorEditor:
                 self.gui.tablePreview.setItem(row, col, item_wl)          # place wavelength item
                 self.gui.tablePreview.setItem(row, col + 1, item_weigh)   # place weight item
 
-        self.gui.tablePreview.horizontalHeader().setResizeMode(QHeaderView.ResizeToContents)
+        self.gui.tablePreview.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.flag_srf = True
         self.flag_image = False
         self.check_flags()  # check if the app is ready to be run
