@@ -76,6 +76,7 @@ from enmapboxprocessing.algorithm.importenmapl1balgorithm import ImportEnmapL1BA
 from enmapboxprocessing.algorithm.importenmapl1calgorithm import ImportEnmapL1CAlgorithm
 from enmapboxprocessing.algorithm.importenmapl2aalgorithm import ImportEnmapL2AAlgorithm
 from enmapboxprocessing.algorithm.importlandsatl2algorithm import ImportLandsatL2Algorithm
+from enmapboxprocessing.algorithm.importplanetscopealgorithm import ImportPlanetScopeAlgorithm
 from enmapboxprocessing.algorithm.importprismal1algorithm import ImportPrismaL1Algorithm
 from enmapboxprocessing.algorithm.importprismal2balgorithm import ImportPrismaL2BAlgorithm
 from enmapboxprocessing.algorithm.importprismal2calgorithm import ImportPrismaL2CAlgorithm
@@ -309,6 +310,7 @@ def algorithms():
         ImportEnmapL1CAlgorithm(),
         ImportEnmapL2AAlgorithm(),
         ImportLandsatL2Algorithm(),
+        ImportPlanetScopeAlgorithm(),
         ImportPrismaL1Algorithm(),
         ImportPrismaL2BAlgorithm(),
         ImportPrismaL2CAlgorithm(),

@@ -380,6 +380,20 @@ class SensorProducts(object):
             LM01_L1 = join(sensorProductsRoot(), 'landsat', 'LM01_L1TP_207023_19750429_20200908_02_T2')
             LM01_L1_MtlTxt = join(LM01_L1, 'LM01_L1TP_207023_19750429_20200908_02_T2_MTL.txt')
 
+        class Planet(object):
+            L1B = join(
+                sensorProductsRoot(), 'planet', 'Valencia_NTIF_1B_psscene_basic_analytic_8b_udm2', 'PSScene',
+                'PSScene_collection.json'
+            )
+            L3A = join(
+                sensorProductsRoot(), 'planet', 'Barnim_Uckermark_COG_3A_psscene_analytic_8b_udm2', 'PSScene',
+                'PSScene_collection.json'
+            )
+            L3B = join(
+                sensorProductsRoot(), 'planet', 'Valencia_psscene_analytic_8b_sr_udm2', 'PSScene',
+                'PSScene_collection.json'
+            )
+
         class Prisma(object):
             L1 = join(sensorProductsRoot(), 'prisma', 'PRS_L1_STD_OFFL_20201107101404_20201107101408_0001.he5')
             L2B = join(sensorProductsRoot(), 'prisma', 'PRS_L2B_STD_20201107101404_20201107101408_0001.he5')
