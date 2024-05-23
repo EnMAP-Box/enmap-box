@@ -188,7 +188,15 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
             yMap = yMapRemapped
             # - prepare strata
             stratum = arrayStratification[valid]
-            h_all, N_h_all = np.unique(arrayStratification, return_counts=True)
+            h_all = list()
+            N_h_all = list()
+            raw_h_all, raw_N_h_all = np.unique(arrayStratification, return_counts=True)
+            categoriesStratificationValues = [c.value for c in categoriesStratification]
+            for i_h_all, i_N_h_all in zip(raw_h_all.tolist(), raw_N_h_all.tolist()):
+                if i_h_all in categoriesStratificationValues:
+                    h_all.append(i_h_all)
+                    N_h_all.append(i_N_h_all)
+            assert len(h_all) == len(categoriesStratification)
             h = list()
             N_h = list()
             for i, category in enumerate(categoriesStratification):
