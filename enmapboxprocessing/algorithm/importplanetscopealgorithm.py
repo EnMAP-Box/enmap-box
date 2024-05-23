@@ -10,8 +10,8 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
-from qgis._core import QgsRasterPipe, QgsRasterFileWriter
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer, QgsMapLayer
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer, QgsMapLayer, \
+    QgsRasterPipe, QgsRasterFileWriter
 
 
 @typechecked
@@ -151,7 +151,6 @@ class ImportPlanetScopeAlgorithm(EnMAPProcessingAlgorithm):
             qaFilenames = convertedFilenames[len(srMetadata['filenames']):]
 
             # create SR VRT
-            feedback.pushInfo(f'create SR raster')
             options = gdal.BuildVRTOptions()
             ds: gdal.Dataset = gdal.BuildVRT(srFilename, srFilenames, options=options)
             writer = RasterWriter(ds)
@@ -169,7 +168,6 @@ class ImportPlanetScopeAlgorithm(EnMAPProcessingAlgorithm):
             writer.close()
 
             # - setup default renderer
-            feedback.pushInfo(f'setup SR default style')
             layer = QgsRasterLayer(srFilename)
             reader = RasterReader(layer)
             redBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['R'][0])
@@ -192,7 +190,6 @@ class ImportPlanetScopeAlgorithm(EnMAPProcessingAlgorithm):
             layer.saveDefaultStyle(QgsMapLayer.StyleCategory.Rendering)
 
             # create UDM2 VRT
-            feedback.pushInfo(f'create UDM2 raster')
             options = gdal.BuildVRTOptions()
             ds = gdal.BuildVRT(qaFilename, qaFilenames, options=options)
             writer = RasterWriter(ds)

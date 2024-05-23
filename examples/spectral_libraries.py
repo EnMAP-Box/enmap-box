@@ -45,7 +45,6 @@ y_values = [
     [0.267, 0.127, 0.051],
 ]
 
-
 speclib: QgsVectorLayer = SpectralLibraryUtils.createSpectralLibrary()
 assert isinstance(speclib, QgsVectorLayer)
 assert is_spectral_library(speclib)
@@ -91,4 +90,4 @@ speclib2: QgsVectorLayer = SpectralLibraryUtils.readFromSource(files[0])
 pfield2 = profile_field_list(speclib)[0]
 for i, feature in enumerate(speclib2.getFeatures()):
     profileDict = decodeProfileValueDict(feature.attribute(pfield2.name()))
-    print(f'Profile {i+1}: {profileDict}')
+    print(f'Profile {i + 1}: {profileDict}')

@@ -46,6 +46,7 @@ def tryToImportSensorProducts(filename: str) -> List[QgsMapLayer]:
             ImportEnmapL1BAlgorithm(),
             ImportEnmapL1CAlgorithm(),
             ImportEnmapL2AAlgorithm(),
+            ImportLandsatL2Algorithm(),
             ImportPlanetScopeAlgorithm(),
             ImportPrismaL1Algorithm(),
             ImportPrismaL2BAlgorithm(),
