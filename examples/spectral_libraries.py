@@ -20,6 +20,8 @@
 **************************************************************************
 """
 
+import re
+
 from enmapbox import initAll
 # How to write a spectral library
 from enmapbox.qgispluginsupport.qps.speclib.core import profile_field_list, is_spectral_library
@@ -29,10 +31,10 @@ from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import prepareP
 from enmapbox.testing import start_app
 from qgis.core import QgsVectorLayer, QgsField, QgsFeature, edit
 
-start_app()
+app = start_app()
 initAll()
 
-path = 'myspeclib.geojson'
+path = 'myspeclib.gpkg'
 
 x = [452, 453, 454]
 xUnit = 'nm'
@@ -44,6 +46,7 @@ y_values = [
     [0.921, 0.719, 0.476],
     [0.267, 0.127, 0.051],
 ]
+
 
 speclib: QgsVectorLayer = SpectralLibraryUtils.createSpectralLibrary()
 assert isinstance(speclib, QgsVectorLayer)
@@ -80,14 +83,21 @@ files = SpectralLibraryUtils.writeToSource(speclib, path)
 # print files:
 for file in files:
     print(f'File {file}:')
-    with open(file, 'r') as f:
-        print(f.read())
+    if re.search('(csv|json)$', file):
+        with open(file, 'r') as f:
+            print(f.read())
 
 # read the written speclib
 speclib2: QgsVectorLayer = SpectralLibraryUtils.readFromSource(files[0])
+
 
 # print the profiles
 pfield2 = profile_field_list(speclib)[0]
 for i, feature in enumerate(speclib2.getFeatures()):
     profileDict = decodeProfileValueDict(feature.attribute(pfield2.name()))
     print(f'Profile {i + 1}: {profileDict}')
+
+del speclib
+del speclib2
+app.processEvents()
+app.exit()

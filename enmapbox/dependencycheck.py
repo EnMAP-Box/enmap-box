@@ -143,7 +143,7 @@ class PIPPackage(object):
         self.stderrMsg: str = ''
         self.stdoutMsg: str = ''
 
-        self.version_latest: str = '<unknown>'
+        self.version_latest: str = ''
         self.version: str = ''
 
         self.summary: str = ''
@@ -168,6 +168,8 @@ class PIPPackage(object):
 
         if 'version' in info:
             self.version = info['version']
+            if self.version_latest == '':
+                self.version_latest = self.version
 
         if 'summary' in info:
             self.summary = info['summary']
@@ -471,6 +473,12 @@ class PIPPackageInfoTask(QgsTask):
             success, msg, err = call_pip_command(['list', '-v', '--format', 'json'])
             if success:
                 pkg_all = json.loads(msg)
+
+                pkg_names = [pkg['name'] for pkg in pkg_all]
+                for name in self._pois:
+                    if name not in pkg_names:
+                        pkg_all.append({'name': name})
+
                 self.sigPackageList.emit(pkg_all)
             else:
                 self.sigMessage.emit(err, Qgis.MessageLevel.Critical)
