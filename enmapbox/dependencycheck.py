@@ -143,7 +143,7 @@ class PIPPackage(object):
         self.stderrMsg: str = ''
         self.stdoutMsg: str = ''
 
-        self.version_latest: str = '<unknown>'
+        self.version_latest: str = ''
         self.version: str = ''
 
         self.summary: str = ''
@@ -168,6 +168,8 @@ class PIPPackage(object):
 
         if 'version' in info:
             self.version = info['version']
+            if self.version_latest == '':
+                self.version_latest = self.version
 
         if 'summary' in info:
             self.summary = info['summary']

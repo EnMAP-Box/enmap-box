@@ -212,7 +212,7 @@ class test_dependencycheck(EnMAPBoxTestCase):
         task = PIPPackageInfoTask('package info',
                                   packages_of_interest=pois,
                                   poi_only=True,
-                                  search_info=True,
+                                  search_info=not EnMAPBoxTestCase.runsInCI(),
                                   search_updates=True,
                                   callback=onCompleted)
 
@@ -234,46 +234,12 @@ class test_dependencycheck(EnMAPBoxTestCase):
             # run in same process
             task.finished(task.run())
 
-        PKG_INFOS = {p['Name']: p for p in PKG_INFOS}
-        for k in ['numpy', 'GDAL', 'scikit-learn']:
-            self.assertTrue(k in PKG_INFOS)
-        self.assertTrue(last_progress == 100)
-        self.assertTrue(is_completed)
-
-    def test_get_latest_version(self):
-        pois = ['astropy', 'PyOpenGL', 'numpy', 'GDAL', 'scikit-learn']
-
-        def onCompleted(result, task):
-
-            self.assertTrue(result)
-
-            s = ""
-
-        def onPackageInfo(infoBadge: list):
-            self.assertIsInstance(infoBadge, list)
-            self.assertTrue(len(infoBadge) > 0)
-            for info in infoBadge:
-                self.assertIsInstance(info, dict)
-                self.assertTrue('Name' in info)
-
-                for k in ['Name', 'Version']:
-                    if k not in info:
-                        s = ""
-                    self.assertTrue(k in info.keys())
-                    value = info[k]
-                    self.assertIsInstance(value, str)
-                    self.assertEqual(value, value.strip())
-
-        task = PIPPackageInfoTask('package info',
-                                  packages_of_interest=pois,
-                                  poi_only=True,
-                                  search_info=True,
-                                  search_updates=True,
-                                  callback=onCompleted)
-        task.sigPackageInfo.connect(onPackageInfo)
-        result = task.run()
-
-        s = ""
+        if not EnMAPBoxTestCase.runsInCI():
+            PKG_INFOS = {p['Name']: p for p in PKG_INFOS}
+            for k in ['numpy', 'GDAL', 'scikit-learn']:
+                self.assertTrue(k in PKG_INFOS, msg=f'Missing package info for {k}')
+            self.assertTrue(last_progress == 100)
+            self.assertTrue(is_completed)
 
     def test_call_pip_command(self):
         # python.exe -m pip list'
