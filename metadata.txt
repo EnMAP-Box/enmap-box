@@ -4,7 +4,7 @@ author=EnMAP-Box Authors
 email=enmapbox@enmap.org
 description=Imaging Spectroscopy and Remote Sensing for QGIS
 version=3.99
-qgisMinimumVersion=3.14
+qgisMinimumVersion=3.34
 qgisMaximumVersion=3.99
 about=<p align="center">This is a dummy text. See <code>scrpts/create_plugin.py</code> for details of metadata.txt generation</p>
 icon=enmapbox/gui/ui/icons/enmapbox.png
