@@ -471,6 +471,12 @@ class PIPPackageInfoTask(QgsTask):
             success, msg, err = call_pip_command(['list', '-v', '--format', 'json'])
             if success:
                 pkg_all = json.loads(msg)
+
+                pkg_names = [pkg['name'] for pkg in pkg_all]
+                for name in self._pois:
+                    if name not in pkg_names:
+                        pkg_all.append({'name': name})
+
                 self.sigPackageList.emit(pkg_all)
             else:
                 self.sigMessage.emit(err, Qgis.MessageLevel.Critical)
