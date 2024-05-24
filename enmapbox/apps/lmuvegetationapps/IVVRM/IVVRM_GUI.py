@@ -1047,7 +1047,7 @@ class SensorEditor:
         for i in self.outreach:
             self.gui.tablePreview.item(i, 0).setBackground(QColor(200, 0, 0))
         self.gui.tablePreview.setHorizontalHeaderLabels(header_items)
-        self.gui.tablePreview.horizontalHeader().setResizeMode(QHeaderView.ResizeToContents)
+        self.gui.tablePreview.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         wavelength_srf = np.delete(wavelength, self.outreach)
         fwhm_srf = np.delete(fwhm, self.outreach)
         self.x = np.array(list(zip(wavelength_srf, fwhm_srf)))

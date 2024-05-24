@@ -137,6 +137,7 @@ if not exists(classifierDumpPkl):
         alg.P_DATASET: classificationDatasetAsPklFile,
         alg.P_CLASSIFIER: 'from sklearn.ensemble import RandomForestClassifier\n'
                           'classifier = RandomForestClassifier(n_estimators=100, oob_score=True, random_state=42)\n',
+        alg.P_NFOLD: 10,
         alg.P_RASTER: enmap,
         alg.P_OUTPUT_CLASSIFIER: classifierDumpPkl
     }
@@ -379,6 +380,20 @@ class SensorProducts(object):
             LM01_L1 = join(sensorProductsRoot(), 'landsat', 'LM01_L1TP_207023_19750429_20200908_02_T2')
             LM01_L1_MtlTxt = join(LM01_L1, 'LM01_L1TP_207023_19750429_20200908_02_T2_MTL.txt')
 
+        class Planet(object):
+            L1B = join(
+                sensorProductsRoot(), 'planet', 'Valencia_NTIF_1B_psscene_basic_analytic_8b_udm2', 'PSScene',
+                'PSScene_collection.json'
+            )
+            L3A = join(
+                sensorProductsRoot(), 'planet', 'Barnim_Uckermark_COG_3A_psscene_analytic_8b_udm2', 'PSScene',
+                'PSScene_collection.json'
+            )
+            L3B = join(
+                sensorProductsRoot(), 'planet', 'Valencia_psscene_analytic_8b_sr_udm2', 'PSScene',
+                'PSScene_collection.json'
+            )
+
         class Prisma(object):
             L1 = join(sensorProductsRoot(), 'prisma', 'PRS_L1_STD_OFFL_20201107101404_20201107101408_0001.he5')
             L2B = join(sensorProductsRoot(), 'prisma', 'PRS_L2B_STD_20201107101404_20201107101408_0001.he5')
@@ -405,3 +420,6 @@ class SensorProducts(object):
                 sensorProductsRoot(), 'sentinel2', 'S2B_MSIL2A_20211028T102039_N0301_R065_T33UUU_20211028T121942.SAFE'
             )
             S2B_L2A_MsiL1CXml = join(S2B_L2A, 'MTD_MSIL2A.xml')
+
+        class UsgsSplib07(object):
+            folder = join(sensorProductsRoot(), 'usgs_splib07')
