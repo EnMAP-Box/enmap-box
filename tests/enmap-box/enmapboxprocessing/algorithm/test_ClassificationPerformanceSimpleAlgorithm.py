@@ -60,7 +60,7 @@ class TestClassificationPerformanceSimpleAlgorithm(TestCase):
         parameters = {
             alg.P_CLASSIFICATION: writer2.source(),
             alg.P_REFERENCE: writer1.source(),
-            alg.P_OPEN_REPORT: not self.openReport,
+            alg.P_OPEN_REPORT: self.openReport,
             alg.P_OUTPUT_REPORT: self.filename('report.html'),
         }
         self.runalg(alg, parameters)
@@ -76,7 +76,7 @@ class TestClassificationPerformanceSimpleAlgorithm(TestCase):
         }
         result = self.runalg(alg, parameters)
         stats = Utils.jsonLoad(result[alg.P_OUTPUT_REPORT] + '.json')
-        for v in stats['producers_accuracy_se'] + stats['users_accuracy_se']:
+        for v in stats['producersAccuracySe'] + stats['usersAccuracySe']:
             self.assertFalse(isnan(v))  # previously we had NaN values, so better check this
 
     def test_nonMatchingCategoryNames(self):
@@ -92,9 +92,4 @@ class TestClassificationPerformanceSimpleAlgorithm(TestCase):
             alg.P_OPEN_REPORT: self.openReport,
             alg.P_OUTPUT_REPORT: self.filename('report.html'),
         }
-
         result = self.runalg(alg, parameters)
-        return
-        stats = Utils.jsonLoad(result[alg.P_OUTPUT_REPORT] + '.json')
-        for v in stats['producers_accuracy_se'] + stats['users_accuracy_se']:
-            self.assertFalse(isnan(v))  # previously we had NaN values, so better check this
