@@ -267,16 +267,16 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
 
             values = smartRound(stats.confusion_matrix_counts, 2)
             report.writeTable(
-                values, 'Adjusted confusion matrix counts: predicted (rows) vs. observed (columns)',
+                values, 'Adjusted confusion matrix counts',
                 [f'({i + 1})' for i in range(len(stats.class_names))],
-                [f'{name} ({i + 1})' for i, name in enumerate(stats.class_names)]
+                [f'predicted {name} ({i + 1})' for i, name in enumerate(stats.class_names)]
             )
 
             values = smartRound(stats.confusion_matrix_proportions, 4)
             report.writeTable(
-                values, 'Adjusted confusion matrix area proportions: predicted (rows) vs. observed (columns)',
+                values, 'Adjusted confusion matrix area proportions',
                 [f'({i + 1})' for i in range(len(stats.class_names))],
-                stats.class_names
+                [f'predicted {name} ({i + 1})' for i, name in enumerate(stats.class_names)]
             )
 
             values = smartRound([
