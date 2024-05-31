@@ -95,7 +95,7 @@ class TestClassificationPerformanceAlgorithm(TestCase):
             alg.P_REFERENCE: QgsVectorLayer(landcover_polygon),
             alg.P_STRATIFICATION: QgsRasterLayer(landcover_map_l3),
             alg.P_OPEN_REPORT: self.openReport,
-            alg.P_OUTPUT_REPORT: self.filename('report.html'),
+            alg.P_OUTPUT_REPORT: self.filename('report.html')
         }
         self.runalg(alg, parameters)
 
