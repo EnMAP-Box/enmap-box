@@ -85,6 +85,8 @@ from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSenti
 from enmapboxprocessing.algorithm.importusgsspeclib07algorithm import ImportUsgsSpeclib07Algorithm
 from enmapboxprocessing.algorithm.inversetransformrasteralgorithm import InverseTransformRasterAlgorithm
 from enmapboxprocessing.algorithm.layertomaskalgorithm import LayerToMaskAlgorithm
+from enmapboxprocessing.algorithm.libraryfromclassificationdatasetalgorithm import \
+    LibraryFromClassificationDatasetAlgorithm
 from enmapboxprocessing.algorithm.mergeclassificationdatasetalgorithm import MergeClassificationDatasetsAlgorithm
 from enmapboxprocessing.algorithm.predictclassificationalgorithm import PredictClassificationAlgorithm
 from enmapboxprocessing.algorithm.predictclassprobabilityalgorithm import PredictClassPropabilityAlgorithm
@@ -319,6 +321,7 @@ def algorithms():
         ImportUsgsSpeclib07Algorithm(),
         InverseTransformRasterAlgorithm(),
         LayerToMaskAlgorithm(),
+        LibraryFromClassificationDatasetAlgorithm(),
         MergeClassificationDatasetsAlgorithm(),
         PredictClassificationAlgorithm(),
         PredictClassPropabilityAlgorithm(),
