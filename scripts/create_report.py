@@ -97,10 +97,14 @@ def report_downloads() -> pd.DataFrame:
 
 
 def toDate(text, format: str = '%Y-%m-%dT%H:%M:%SZ') -> datetime.datetime:
-    return datetime.datetime.strptime(text, format)
+    if isinstance(text, datetime.datetime):
+        return text
+    else:
+        return datetime.datetime.strptime(text, format)
 
 
-def report_github_issues_QGIS(authors=['jakimowb', 'janzandr']) -> pd.DataFrame:
+def report_github_issues_QGIS(authors=['jakimowb', 'janzandr'], start_date='2020-01-01',
+                              end_date='2023-12-31') -> pd.DataFrame:
     """
 
     is:issue created:2022-07-01..2022-12-31
@@ -112,8 +116,8 @@ def report_github_issues_QGIS(authors=['jakimowb', 'janzandr']) -> pd.DataFrame:
     repo = 'QGIS'
 
     # Define the date range
-    start_date = toDate('2023-01-01', '%Y-%m-%d')
-    end_date = toDate('2023-06-30', '%Y-%m-%d')
+    start_date = toDate(start_date, '%Y-%m-%d')
+    end_date = toDate(end_date, '%Y-%m-%d')
 
     today = datetime.datetime.now().isoformat().split('T')[0]
 
@@ -224,7 +228,7 @@ def report_github_issues_QGIS(authors=['jakimowb', 'janzandr']) -> pd.DataFrame:
     return None
 
 
-def report_github_issues_EnMAPBox() -> pd.DataFrame:
+def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31') -> pd.DataFrame:
     """
 
     is:issue created:2022-07-01..2022-12-31
@@ -236,8 +240,8 @@ def report_github_issues_EnMAPBox() -> pd.DataFrame:
     repo = 'enmap-box'
 
     # Define the date range
-    start_date = toDate('2023-01-01', '%Y-%m-%d')
-    end_date = toDate('2023-06-30', '%Y-%m-%d')
+    start_date = toDate(start_date, '%Y-%m-%d')
+    end_date = toDate(end_date, '%Y-%m-%d')
 
     today = datetime.datetime.now().isoformat().split('T')[0]
 
@@ -303,6 +307,8 @@ def report_github_issues_EnMAPBox() -> pd.DataFrame:
     created_before_but_touched = [i for i in issues if toDate(i['created_at']) < start_date
                                   and start_date <= toDate(i['updated_at']) <= end_date]
 
+    s = ""
+
     def printInfos(issues: List[dict], labels=['duplicate', 'wontfix']):
         is_closed = []
         is_open = []
@@ -322,10 +328,13 @@ def report_github_issues_EnMAPBox() -> pd.DataFrame:
         n_o = len(is_open)
         n_c = len(is_closed)
         print(' Total: {:3}'.format(n_t))
-        print('  Open: {:3} {:0.2f}%'.format(n_o, n_o / n_t * 100))
-        print('Closed: {:3} {:0.2f}%'.format(n_c, n_c / n_t * 100))
-        for label in labels:
-            print(f' {label}: {len(issues_by_label.get(label, []))}')
+        if n_t > 0:
+            print('  Open: {:3} {:0.2f}%'.format(n_o, n_o / n_t * 100))
+            print('Closed: {:3} {:0.2f}%'.format(n_c, n_c / n_t * 100))
+            for label in labels:
+                print(f' {label}: {len(issues_by_label.get(label, []))}')
+        else:
+            s = ""
 
     print(f'By today: {today}')
     print(f'Issues created in reporting period: {start_date} to {end_date}:')
@@ -441,7 +450,7 @@ def report_processingalgorithms() -> pd.DataFrame:
     return df
 
 
-def report_bitbucket_issues(self):
+def report_bitbucket_issues(start_date='2020-01-01', end_date='2023-12-31'):
     # 1. open bitbucket,
     # goto repository settings -> issues -> Import & export
     # 2. export issues, extract zip file and copy db-2.0.json to JSON_DIR (defaults to <repo>/tmp)
@@ -456,11 +465,11 @@ def report_bitbucket_issues(self):
     """
 
     JSON_DIR = pathlib.Path(__file__).parents[1] / 'tmp'
-    start_date = datetime.date(2022, 1, 1)
-    end_date = datetime.date(2022, 6, 30)
+    start_date = toDate(start_date, '%Y-%m-%d')
+    end_date = toDate(end_date, '%Y-%m-%d')
 
     PATH_DB_JSON = JSON_DIR / 'db-2.0.json'
-    PATH_CSV_REPORT = JSON_DIR / f'issue_report_{start_date}_{end_date}.csv'
+    PATH_CSV_REPORT = JSON_DIR / f'issue_report_{start_date.date()}_{end_date.date()}.csv'
     assert PATH_DB_JSON.is_file(), 'No db-2.0.json, no stats!'
     assert start_date < end_date
 
@@ -489,12 +498,12 @@ def report_bitbucket_issues(self):
     # DS = pd.read_json(PATH_DB_JSON.as_posix())
     ISSUES = DB['issues']
 
-    CREATED_ISSUES = [i for i in ISSUES if start_date
+    CREATED_ISSUES = [i for i in ISSUES if start_date.date()
                       <= datetime.datetime.fromisoformat(i['created_on']).date()
-                      <= end_date]
-    UPDATED_ISSUES = [i for i in ISSUES if start_date
+                      <= end_date.date()]
+    UPDATED_ISSUES = [i for i in ISSUES if start_date.date()
                       <= datetime.datetime.fromisoformat(i['updated_on']).date()
-                      <= end_date]
+                      <= end_date.date()]
 
     def byKey(ISSUES: list, key: str) -> dict:
         R = dict()
@@ -541,10 +550,13 @@ def report_bitbucket_issues(self):
 class TestCases(unittest.TestCase):
 
     def test_github_EnMAPBox(self):
-        report_github_issues_EnMAPBox()
+        report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31')
 
     def test_github_QGIS(self):
-        report_github_issues_QGIS()
+        report_github_issues_QGIS(authors=['jakimowb'], start_date='2020-01-01', end_date='2023-12-31')
+
+    def test_bitbucket(self):
+        report_bitbucket_issues(start_date='2020-01-01', end_date='2023-12-31')
 
     def test_report_downloads(self):
         df = report_downloads()
@@ -552,7 +564,8 @@ class TestCases(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Install testdata', formatter_class=argparse.RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(description='Create an EnMAP-Box report',
+                                     formatter_class=argparse.RawTextHelpFormatter)
     path_xlsx = pathlib.Path(DIR_REPO_TMP) / 'enmapbox_report.xlsx'
     parser.add_argument('-f', '--filename',
                         required=False,

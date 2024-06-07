@@ -1,18 +1,17 @@
 from typing import List
 
+from enmapbox.qgispluginsupport.qps.speclib.core import create_profile_field
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
+from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import ProfileEncoding
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import prepareProfileValueDict, \
     encodeProfileValueDict
 from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtCore import QVariant
-from qgis.core import QgsVectorLayer, QgsField, QgsFeature, edit
-from enmapbox.qgispluginsupport.qps.speclib.core import create_profile_field
-from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import ProfileEncoding
+from qgis.core import QgsVectorLayer, QgsField, QgsFeature, edit, QgsGeometry
 
 
 @typechecked
 class LibraryWriter(object):
-    DefaultProfileField = 'profiles'
 
     def __init__(self, library: QgsVectorLayer):
         self.library = library
@@ -28,13 +27,12 @@ class LibraryWriter(object):
         self.library.addAttribute(QgsField(name, type_))
         self.library.commitChanges()
 
-    def addFeature(self, values: dict, geometry: str = None):
-
-        if geometry is not None:
-            raise NotImplementedError()
+    def addFeature(self, values: dict, geometry: QgsGeometry = None):
 
         with edit(self.library):
             feature: QgsFeature = QgsFeature(self.library.fields())
+            if geometry is not None:
+                feature.setGeometry(geometry)
             for fieldName, value in values.items():
                 if isinstance(value, dict):  # is a profile attribute
                     fieldIndex = self.library.fields().indexFromName(fieldName)

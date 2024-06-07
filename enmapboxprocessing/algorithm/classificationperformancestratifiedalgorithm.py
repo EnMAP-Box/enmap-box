@@ -188,7 +188,15 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
             yMap = yMapRemapped
             # - prepare strata
             stratum = arrayStratification[valid]
-            h_all, N_h_all = np.unique(arrayStratification, return_counts=True)
+            h_all = list()
+            N_h_all = list()
+            raw_h_all, raw_N_h_all = np.unique(arrayStratification, return_counts=True)
+            categoriesStratificationValues = [c.value for c in categoriesStratification]
+            for i_h_all, i_N_h_all in zip(raw_h_all.tolist(), raw_N_h_all.tolist()):
+                if i_h_all in categoriesStratificationValues:
+                    h_all.append(i_h_all)
+                    N_h_all.append(i_N_h_all)
+            assert len(h_all) == len(categoriesStratification)
             h = list()
             N_h = list()
             for i, category in enumerate(categoriesStratification):
@@ -259,16 +267,16 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
 
             values = smartRound(stats.confusion_matrix_counts, 2)
             report.writeTable(
-                values, 'Adjusted confusion matrix counts: predicted (rows) vs. observed (columns)',
+                values, 'Adjusted confusion matrix counts',
                 [f'({i + 1})' for i in range(len(stats.class_names))],
-                [f'{name} ({i + 1})' for i, name in enumerate(stats.class_names)]
+                [f'predicted {name} ({i + 1})' for i, name in enumerate(stats.class_names)]
             )
 
             values = smartRound(stats.confusion_matrix_proportions, 4)
             report.writeTable(
-                values, 'Adjusted confusion matrix area proportions: predicted (rows) vs. observed (columns)',
+                values, 'Adjusted confusion matrix area proportions',
                 [f'({i + 1})' for i in range(len(stats.class_names))],
-                stats.class_names
+                [f'predicted {name} ({i + 1})' for i, name in enumerate(stats.class_names)]
             )
 
             values = smartRound([

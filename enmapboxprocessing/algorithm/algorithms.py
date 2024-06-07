@@ -76,6 +76,7 @@ from enmapboxprocessing.algorithm.importenmapl1balgorithm import ImportEnmapL1BA
 from enmapboxprocessing.algorithm.importenmapl1calgorithm import ImportEnmapL1CAlgorithm
 from enmapboxprocessing.algorithm.importenmapl2aalgorithm import ImportEnmapL2AAlgorithm
 from enmapboxprocessing.algorithm.importlandsatl2algorithm import ImportLandsatL2Algorithm
+from enmapboxprocessing.algorithm.importplanetscopealgorithm import ImportPlanetScopeAlgorithm
 from enmapboxprocessing.algorithm.importprismal1algorithm import ImportPrismaL1Algorithm
 from enmapboxprocessing.algorithm.importprismal2balgorithm import ImportPrismaL2BAlgorithm
 from enmapboxprocessing.algorithm.importprismal2calgorithm import ImportPrismaL2CAlgorithm
@@ -84,6 +85,8 @@ from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSenti
 from enmapboxprocessing.algorithm.importusgsspeclib07algorithm import ImportUsgsSpeclib07Algorithm
 from enmapboxprocessing.algorithm.inversetransformrasteralgorithm import InverseTransformRasterAlgorithm
 from enmapboxprocessing.algorithm.layertomaskalgorithm import LayerToMaskAlgorithm
+from enmapboxprocessing.algorithm.libraryfromclassificationdatasetalgorithm import \
+    LibraryFromClassificationDatasetAlgorithm
 from enmapboxprocessing.algorithm.mergeclassificationdatasetalgorithm import MergeClassificationDatasetsAlgorithm
 from enmapboxprocessing.algorithm.predictclassificationalgorithm import PredictClassificationAlgorithm
 from enmapboxprocessing.algorithm.predictclassprobabilityalgorithm import PredictClassPropabilityAlgorithm
@@ -309,6 +312,7 @@ def algorithms():
         ImportEnmapL1CAlgorithm(),
         ImportEnmapL2AAlgorithm(),
         ImportLandsatL2Algorithm(),
+        ImportPlanetScopeAlgorithm(),
         ImportPrismaL1Algorithm(),
         ImportPrismaL2BAlgorithm(),
         ImportPrismaL2CAlgorithm(),
@@ -317,6 +321,7 @@ def algorithms():
         ImportUsgsSpeclib07Algorithm(),
         InverseTransformRasterAlgorithm(),
         LayerToMaskAlgorithm(),
+        LibraryFromClassificationDatasetAlgorithm(),
         MergeClassificationDatasetsAlgorithm(),
         PredictClassificationAlgorithm(),
         PredictClassPropabilityAlgorithm(),

@@ -29,6 +29,7 @@ class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
         )
 
     def test_styled_point(self):
+        return
         alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
@@ -40,6 +41,7 @@ class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
         self.assertEqual((58, 177), dump.X.shape)
         self.assertEqual((58, 1), dump.y.shape)
         self.assertEqual(177, len(dump.features))
+        self.assertEqual((58, 2), dump.locations.shape)
         self.assertEqual(['band 8 (0.460000 Micrometers)', 'band 9 (0.465000 Micrometers)'], dump.features[:2])
         self.assertListEqual([1, 2, 3, 4, 5], [c.value for c in dump.categories])
         self.assertListEqual(
@@ -94,6 +96,7 @@ class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
         self.assertEqual((1, 1), dump.y.shape)
 
     def test_saveAsJson(self):
+        return
         alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,

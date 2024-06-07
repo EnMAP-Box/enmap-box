@@ -1,14 +1,16 @@
 from enmapbox import initAll
+from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import ProfileEncoding
 from enmapbox.testing import start_app
 from enmapboxprocessing.librarydriver import LibraryDriver
+from enmapboxprocessing.libraryreader import LibraryReader
 from enmapboxprocessing.testcase import TestCase
 from qgis.PyQt.QtCore import QVariant
-from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import ProfileEncoding
+from qgis.core import QgsGeometry, QgsPointXY
 
 
-class TestLibraryWriter(TestCase):
+class TestLibraryIO(TestCase):
 
-    def test(self):
+    def test_create(self):
         start_app()
         initAll()
 
@@ -34,6 +36,7 @@ class TestLibraryWriter(TestCase):
         writer = LibraryDriver().create('My Library')
         writer.addProfileAttribute('profile1', ProfileEncoding.Text)
         writer.addProfileAttribute('profile2', ProfileEncoding.Text)
+        writer.addAttribute('name', QVariant.String)
         writer.addAttribute('my field', QVariant.String)
 
         # add data
@@ -41,9 +44,14 @@ class TestLibraryWriter(TestCase):
         # ... add more features
 
         # save as GeoPackage
-        writer.writeToSource(self.filename('library.gpkg'))
+        writer.writeToSource(self.filename('library.geojson'))
 
-    def test2(self):
+        reader = LibraryReader(writer.library)
+        for values2, geometry2 in reader.data():
+            self.assertEqual(values, values2)
+            self.assertEqual(geometry, geometry2)
+
+    def test_createFromData(self):
         start_app()
         initAll()
 
@@ -65,5 +73,25 @@ class TestLibraryWriter(TestCase):
         }
         geometry = None
 
-        writer = LibraryDriver().createFromData('My Library', [values, values])
-        writer.writeToSource(self.filename('library2.gpkg'))
+        writer = LibraryDriver().createFromData([values, values])
+        writer.writeToSource(self.filename('library.geojson'))
+
+        reader = LibraryReader(writer.library)
+        for values2, geometry2 in reader.data():
+            self.assertEqual(values, values2)
+            self.assertEqual(geometry, geometry2)
+
+    def test_libraryWithGeometryAndCrs(self):
+        start_app()
+        initAll()
+
+        values = {'my field': 'Hello'}
+        geometry = QgsGeometry.fromPointXY(QgsPointXY(1, 2))
+
+        writer = LibraryDriver().createFromData([values], [geometry])
+        writer.writeToSource(self.filename('library.geojson'))
+
+        reader = LibraryReader(writer.library)
+        for values2, geometry2 in reader.data():
+            self.assertEqual(values, values2)
+            self.assertTrue(geometry.equals(geometry2))
