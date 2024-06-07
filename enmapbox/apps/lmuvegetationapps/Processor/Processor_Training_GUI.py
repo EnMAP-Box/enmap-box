@@ -134,8 +134,10 @@ class ML_Training:
 
     def initial_values(self):
         # exclude_wavelengths: from ... to [nm]; these are default values for atmospheric water vapor absorption
+        # self.exclude_wavelengths = [[1332, 1445], [1785, 1965], [2450, 2500]]
         self.exclude_wavelengths = [[1290, 1525], [1730, 1970], [2400, 2500]]
         self.lut_path = None  # file path to the LUT metafile
+        self.model_process_dict = None  # file path to model proc file
         self.meta_dict = None  # intial empty dictionary for LUT meta
         self.wunit = "nanometers"
         self.wl, self.nbands, self.nbands_valid = (None, None, None)
@@ -161,6 +163,7 @@ class ML_Training:
         self.query_strat = 'PAL'
         self.saveALselection = False
         self.eval_on_insitu = False
+        self.retrain_mode = False
         
         self.addItemSpeclib = []
         self.gui.mLayerSpeclib.setLayer(None)
@@ -174,6 +177,9 @@ class ML_Training:
         self.gui.cmdModelDir.clicked.connect(lambda: self.get_folder())
         self.gui.cmdRun.clicked.connect(lambda: self.run_training())
         self.gui.cmdClose.clicked.connect(lambda: self.gui.close())
+
+        self.gui.chkRetrain.toggled.connect(lambda: self.handle_retrain())
+        self.gui.cmdInputModel.clicked.connect(lambda: self.open_model_proc())
 
         self.gui.cmdExcludeBands.clicked.connect(lambda: self.open_wavelength_selection())
         self.gui.cmbPCA.toggled.connect(lambda: self.handle_pca())
@@ -223,11 +229,33 @@ class ML_Training:
         lutapp.show()
 
     def enable_all(self):
+        self.gui.Exclusions_Box.setEnabled(True),
         self.gui.cmbPCA.setEnabled(True), self.gui.cmbPCA.setChecked(True), self.gui.Noise_Box.setEnabled(True),
         self.gui.Paras_Box.setEnabled(True), self.gui.AL_Box.setEnabled(True), self.gui.Perf_Box.setEnabled(True),
         self.gui.ML_Box.setEnabled(True), self.gui.rbANN.setEnabled(True), self.gui.rbGPR.setEnabled(True),
         self.gui.rbRFR.setEnabled(True), self.gui.rbSVR.setEnabled(True), self.gui.rbKRR.setEnabled(True),
         self.gui.rbGBR.setEnabled(True), self.gui.Hyp_frame.setEnabled(True)
+
+    def disable_all_except_perfEval(self):
+        self.gui.Exclusions_Box.setEnabled(False),
+        self.gui.cmbPCA.setEnabled(False), self.gui.cmbPCA.setChecked(False), self.gui.Noise_Box.setEnabled(False),
+        self.gui.Paras_Box.setEnabled(False), self.gui.AL_Box.setEnabled(False), self.gui.Perf_Box.setEnabled(True),
+        self.gui.ML_Box.setEnabled(False), self.gui.rbANN.setEnabled(False), self.gui.rbGPR.setEnabled(False),
+        self.gui.rbRFR.setEnabled(False), self.gui.rbSVR.setEnabled(False), self.gui.rbKRR.setEnabled(False),
+        self.gui.rbGBR.setEnabled(False), self.gui.Hyp_frame.setEnabled(False)
+
+    def handle_retrain(self):
+        if not self.retrain_mode:
+            self.retrain_mode = True
+            self.gui.lblSelectModel.setEnabled(True), self.gui.lblInputModel.setEnabled(True), \
+                self.gui.cmdInputModel.setEnabled(True)
+        else:
+            self.retrain_mode = False
+            self.gui.lblSelectModel.setEnabled(False), self.gui.lblInputModel.setEnabled(False), \
+                self.gui.cmdInputModel.setEnabled(False)
+            self.gui.lblInputModel.setText("")
+            self.model_process_dict = None
+
 
     def handle_algorithm(self, mode):
         self.algorithm = self.algorithm_dict[mode]
@@ -319,7 +347,8 @@ class ML_Training:
              self.gui.chkALsave.setChecked(False),)
             (self.gui.radInternal.setChecked(True), self.gui.radPerf.setChecked(True),
              self.gui.radNoPerf.setEnabled(False),)
-            self.gui.radCrossVal.setChecked(True), self.gui.radTrainTest.setEnabled(False),
+            self.gui.radCrossVal.setChecked(False), self.gui.radCrossVal.setEnabled(False), \
+                self.gui.radTrainTest.setEnabled(True),
             (self.gui.lblLoadHyp.setEnabled(False), self.gui.cmdLoadHyp.setEnabled(False),
              self.gui.txtInputHyp.setEnabled(False))
             self.handle_PerfEvalStrat()
@@ -398,18 +427,16 @@ class ML_Training:
             else:
                 self.paramsdict[idx].setChecked(False)
 
-    def open_lut(self, **lutpath):  # open and read a lut-metafile
-        if lutpath:
-            key, result = next(iter(lutpath.items()))
+    def open_lut(self, **path):  # open and read a lut-metafile
+        if path:
+            key, result = next(iter(path.items()))
             self.lut_path = result
         else:
             result = str(QFileDialog.getOpenFileName(caption='Select LUT meta-file', filter="LUT-file (*.lut)")[0])
             if not result:
                 return
             self.lut_path = result
-
         self.gui.lblInputLUT.setText(result)
-
         with open(self.lut_path, 'r') as meta_file:
             content = meta_file.readlines()
             content = [item.rstrip("\n") for item in content]
@@ -418,7 +445,6 @@ class ML_Training:
         [[x.append(y) for x, y in zip([keys, values], line.split(sep="=", maxsplit=1))] for line in content]
         values = [value.split(';') if ';' in value else value for value in values]
         self.meta_dict = dict(zip(keys, values))  # file the metadata dictionary
-
         # wavelengths of the LUT are stored in the LUT-meta
         self.wl = np.asarray(self.meta_dict['wavelengths']).astype(np.float32)
         self.nbands = len(self.wl)
@@ -433,6 +459,22 @@ class ML_Training:
         self.nbands_valid = self.nbands - len(self.exclude_bands)
         self.enable_all()
         self.handle_AL()
+
+    def open_model_proc(self, **path):
+        if path:
+            key, result = next(iter(path.items()))
+        else:
+            result = str(QFileDialog.getOpenFileName(caption='Select Machine Learning Model',
+                                                 filter="Processor META File (*.proc)")[0])
+            if not result:
+                return
+        self.gui.lblInputModel.setText(result)
+        try:
+            self.model_process_dict = joblib.load(result)
+        except ValueError:
+            raise ValueError('Error reading Modelspecs .proc-file')
+        if 'pca' in self.model_process_dict:
+            self.gui.PCA_Box.setEnabled(False)
 
     def params_dict_check(self):
         self.paramsdict = {0: self.gui.chkCab, 1: self.gui.chkCcx, 2: self.gui.chkCanth,
@@ -498,7 +540,7 @@ class ML_Training:
 
     def get_folder(self, **path):
         # The model folder is important, as it contains all files needed
-        if not __name__ == '__main__':
+        if not __name__ == '__main__' or not path:
             path = str(QFileDialog.getExistingDirectory(caption='Select Output Directory for Model'))
             if not path:
                 return
@@ -512,6 +554,7 @@ class ML_Training:
             self.out_dir = self.gui.txtModelDir.text().replace("\\", "/")
             if not self.out_dir[-1] == "/":  # last letter of the folder name needs to be a slash to add filenames
                 self.out_dir += "/"
+
     def open_speclib(self, mode):
         if mode == "libSelect":
             if self.speclib is not None:
@@ -548,9 +591,9 @@ class ML_Training:
         # Loop through the features
         for feature in layer.getFeatures():
             # Assuming that the JSON string is in an attribute named 'json_data'
-            json_data = feature[2]
+            data_dict = feature[2]
             # Parse the JSON string
-            data_dict = json.loads(json_data)
+            # data_dict = json.loads(json_data)
 
             # Extract 'x' values only once
             if not wl_extracted:
@@ -568,6 +611,8 @@ class ML_Training:
     def check_and_assign(self):
         if not self.lut_path:
             raise ValueError("A Lookup-Table metafile needs to be selected!")
+        if self.retrain_mode and not self.model_process_dict:
+            raise ValueError("Retrain Mode selected but .proc-file is missing")
         if not self.out_dir:
             raise ValueError("Output directory is missing")
         if not os.path.isdir(self.out_dir):
@@ -582,7 +627,6 @@ class ML_Training:
             self.hyperparas_path = None
         else:
             pass
-
 
         if not self.noisetype == 0:
             if self.gui.txtNoiseLevel.text() == "":
@@ -684,17 +728,18 @@ class ML_Training:
         self.main.qgis_app.processEvents()
 
         try:
-            # Setup everything for training
+            # Setup everything for training and jump over to Processor_Inversion_core.py
             proc.train_main.training_setup(lut_metafile=self.lut_path, exclude_bands=self.exclude_bands, npca=self.npca,
                                            model_meta=self.model_meta, para_list=self.para_list,
                                            noisetype=self.noisetype, noiselevel=self.noiselevel,
-                                           algorithm=self.algorithm, use_al=self.use_al, use_insitu=self.use_insitu,
+                                           algorithm=self.algorithm, model_proc_dict=self.model_process_dict,
+                                           use_al=self.use_al, use_insitu=self.use_insitu,
                                            perf_eval=self.perf_eval,
                                            split_method=self.split_method, kfolds=self.kfolds,
                                            n_initial=self.n_initial, test_size=self.test_size,
                                            hyperp_tuning=self.hyperp_tuning, hyperparas_dict=self.hyperparas_dict,
                                            query_strat=self.query_strat, saveALselection=self.saveALselection,
-                                           eval_on_insitu=self.eval_on_insitu,
+                                           eval_on_insitu=self.eval_on_insitu, val_data=self.val_data,
                                            soil_wavelengths=self.soil_wavelengths, soil_specs=self.soil_specs)
         except ValueError as e:
             self.abort(message="Failed to setup model training: {}".format(str(e)))
@@ -703,8 +748,8 @@ class ML_Training:
             self.prg_widget.gui.close()
             return
 
-        if (self.use_insitu or self.eval_on_insitu) and self.val_data:
-            proc.train_main.insitu_data_setup(self.val_data, npca=self.npca)
+        # if (self.use_insitu or self.eval_on_insitu) and self.val_data:
+        #     proc.train_main.insitu_data_setup(self.val_data)
 
         # if new models are added, change the text of the ProgressBar accordingly
         self.prg_widget.gui.lblCaption_r.setText("Starting training of MLRA...")
@@ -804,7 +849,7 @@ class perfView:
         structured_array = np.array(list(zip(x, y, std, perf)))
 
         # Save the structured array to a text file
-        np.savetxt(outpath, structured_array, delimiter='\t', header='measured\testimated\test_std\tRMSE', comments='')
+        np.savetxt(outpath, structured_array, delimiter='\t', header=r'measured\testimated\test_std\tRMSE', comments='')
 
     def plot_results(self, index):
 
@@ -963,7 +1008,7 @@ class LoadTxtFile:
                 self.setup_dynamic_layout()
 
     def open_file(self):
-        file_choice, _filter = QFileDialog.getOpenFileName(None, 'Select Spectrum File',
+        file_choice, _filter = QFileDialog.getOpenFileName(None, 'Select In-Situ Data File',
                                                            APP_DIR + "/Resources/Example_Files", "(*.txt *.csv)")
         if not file_choice:  # Cancel clicked
             if not self.filenameIn:
@@ -1380,8 +1425,8 @@ if __name__ == '__main__':
     app = start_app()
     m = MainUiFunc()
     m.show()
-    lut_path = r"E:\LUTs\TestLUT_2000_CpCBCcheck_00meta.lut"
-    m.mlra_training.open_lut(lutpath=lut_path)
-    out_folder = r"E:\Testdaten\Model_TEST/"
-    m.mlra_training.get_folder(path=out_folder)
+    # lut_path = r"C:\Data\Daten\Testdaten\LUT\testLUT_1000_CpCBCcheck_00meta.lut"
+    # m.mlra_training.open_lut(lutpath=lut_path)
+    # out_folder = r"C:\Data\Daten\Testdaten\Model_TEST/"
+    # m.mlra_training.get_folder(path=out_folder)
     sys.exit(app.exec_())
