@@ -306,7 +306,7 @@ class MLInversion:
                 self.mask_image = None
                 return
 
-        elif mode == "model":  # Select algorithm for inversion my picking its Meta-file (*.meta)
+        elif mode == "model":  # Select algorithm for inversion by picking its Meta-file (*.meta)
             result = str(QFileDialog.getOpenFileName(caption='Select Machine Learning Model',
                                                      filter="Processor META File (*.meta)")[0])
             if not result:

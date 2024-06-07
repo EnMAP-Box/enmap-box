@@ -84,55 +84,66 @@ class MLRA_defaults:
                 # 1.0 * kernels.RBF(length_scale=1.0, length_scale_bounds=(1e-5, 1e5)) +
                 #       kernels.WhiteKernel(noise_level=1.0, noise_level_bounds="fixed"),
             'alpha': 1.0,
-            'n_restarts_optimizer': 10
+            'n_restarts_optimizer': 10,
+            'random_state': 42
             # 'warm_start': True
         },
         'param_dist': {
-            'kernel': [kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=v, nu=nu) for v in [0.01, 0.1, 1.0, 10, 100] for nu in [0.5, 1.5, 2.5, float('inf')]],  #**kernels.ConstantKernel(1.0) *
+            'kernel': [kernels.ConstantKernel(1.0) *
+                       kernels.Matern(length_scale=v, nu=nu, length_scale_bounds=(1e-5, 1e6))
+                       for v in [0.01, 0.1, 1.0, 10, 100] for nu in [0.5, 1.5, 2.5, float('inf')]],  #**kernels.ConstantKernel(1.0) *
             # [1.0 * kernels.RBF(length_scale=v) + kernels.WhiteKernel(noise_level=1.0, noise_level_bounds=(1e-5, 1e5)) for v in [0.01, 0.1, 1.0, 10, 100]]
             "alpha": [0.001, 0.01, 0.1, 1.0],
+            'random_state': 42
         },
         'cab': {
             'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=10, nu=2.5),
             'alpha': 1.0,
-            'n_restarts_optimizer': 10
+            'n_restarts_optimizer': 10,
+            'random_state': 42
         },
         'LAI': {
             'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=1, nu=2.5),
             'alpha': 0.1,
-            'n_restarts_optimizer': 10
+            'n_restarts_optimizer': 10,
+            'random_state': 42
         },
         'AGBdry': {
             'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=10, nu=0.5),
             'alpha': 1.0,
-            'n_restarts_optimizer': 10
+            'n_restarts_optimizer': 10,
+            'random_state': 42
         },
         'AGBfresh': {
-            'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=100, nu=0.5),
+            'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=10, nu=0.5),
             'alpha': 1.0,
-            'n_restarts_optimizer': 10
+            'n_restarts_optimizer': 10,
+            'random_state': 42
         },
         'CWC': {
             'kernel':  kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=1, nu=float('inf')),
-            'alpha': 0.001,
-            'n_restarts_optimizer': 10
+            'alpha': 1.0,
+            'n_restarts_optimizer': 10,
+            'random_state': 42
         },
         'Nitrogen': {
             'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=1, nu=2.5),
             'alpha': 1.0,
-            'n_restarts_optimizer': 10
+            'n_restarts_optimizer': 10,
+            'random_state': 42
         },
         'Carbon': {
-            'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=100, nu=0.5),
+            'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=10, nu=0.5),
             'alpha': 1.0,
-            'n_restarts_optimizer': 10
+            'n_restarts_optimizer': 10,
+            'random_state': 42
         }
     }
     # Random Forest Regression
     RFR = {
         'default': {
-            'n_estimators': 100,  # The number of trees in the forest.
-            'criterion': 'mse',  # The function to measure the quality of a split.
+            'n_estimators': 1000,  # The number of trees in the forest.
+            'criterion': 'squared error',  # The function to measure the quality of a split.
             'max_depth': None,  # The maximum depth of the tree.
             'min_samples_split': 2,  # The minimum number of samples required to split an internal node.
             'min_samples_leaf': 1,  # The minimum number of samples required to be at a leaf node.
