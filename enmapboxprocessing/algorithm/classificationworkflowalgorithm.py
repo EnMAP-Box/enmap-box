@@ -34,7 +34,11 @@ class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
             (self._CLASSIFIER, 'Scikit-Learn Python code specifying a classifier.'),
             (self._RASTER, 'A raster layer used for prediction.'),
             (self._MATCH_BY_NAME, 'Whether to match raster bands and classifier features by name.'),
-            (self._NFOLD, 'The number of folds used for assessing cross-validation performance.'),
+            (self._NFOLD, 'The number of folds (n>=2) used for assessing cross-validation performance.\n'
+                          'If not specified, simple training performance is assessed.\n'
+                          'If set to a value of 1, out-of-bag (OOB) performance is assessed. '
+                          'Note that OOB estimates are only supported by some classifiers, '
+                          'e.g. the Random Forest Classifier.'),
             (self._OPEN_REPORT, self.ReportOpen),
             (self._OUTPUT_CLASSIFIER, self.PickleFileDestination),
             (self._OUTPUT_CLASSIFICATION, self.RasterFileDestination),
@@ -50,7 +54,7 @@ class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterClassifierCode(self.P_CLASSIFIER, self._CLASSIFIER)
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER, None, True)
         self.addParameterBoolean(self.P_MATCH_BY_NAME, self._MATCH_BY_NAME, False, True, True)
-        self.addParameterInt(self.P_NFOLD, self._NFOLD, 10, True, 2, 100, True)
+        self.addParameterInt(self.P_NFOLD, self._NFOLD, 10, True, 1, 100, True)
         self.addParameterBoolean(self.P_OPEN_REPORT, self._OPEN_REPORT, True, True, True)
         self.addParameterFileDestination(self.P_OUTPUT_CLASSIFIER, self._OUTPUT_CLASSIFIER, self.PickleFileFilter)
         self.addParameterRasterDestination(self.P_OUTPUT_CLASSIFICATION, self._OUTPUT_CLASSIFICATION, None, True, True)

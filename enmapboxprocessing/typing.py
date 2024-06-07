@@ -142,18 +142,25 @@ class ClassifierDump(object):
     X: Optional[SampleX]
     y: Optional[SampleY]
     classifier: Optional[Union[ClassifierMixin, Pipeline]] = None
+    locations: Optional[np.ndarray] = None
+    crs: Optional[str] = None
 
     def __post_init__(self):
         check_type('categories', self.categories, Optional[Categories])
         check_type('features', self.features, Optional[List[str]])
         check_type('X', self.X, Optional[SampleX])
         check_type('y', self.y, Optional[SampleY])
+        if self.locations is not None:
+            assert self.locations.ndim == 2
+            assert self.locations.shape[1] == 2
         try:
             check_type('classifier', self.classifier, Optional[Union[ClassifierMixin, Pipeline]])
         except Exception:
             from sklearn.base import is_classifier
             if not is_classifier(self.classifier):
                 raise TypeError('classifier is not a valid scikit-learn classifier')
+        check_type('locations', self.locations, Optional[np.ndarray])
+        check_type('crs', self.crs, Optional[str])
 
     def write(self, filename: str):
         from enmapboxprocessing.utils import Utils
@@ -167,7 +174,9 @@ class ClassifierDump(object):
     @staticmethod
     def fromDict(d: Dict):
         return ClassifierDump(
-            d.get('categories'), d.get('features'), d.get('X'), d.get('y'), d.get('classifier'))
+            d.get('categories'), d.get('features'), d.get('X'), d.get('y'), d.get('classifier'), d.get('locations'),
+            d.get('crs')
+        )
 
     @classmethod
     def fromFile(cls, filename: str):
@@ -176,10 +185,15 @@ class ClassifierDump(object):
             d = Utils.pickleLoad(filename)
         elif filename.endswith('.json'):
             d = Utils.jsonLoad(filename)
-            d['categories'] = [Category(**values) for values in d['categories']]
-            d['X'] = np.array(d['X'])
-            d['y'] = np.array(d['y'])
+            if 'categories' in d:
+                d['categories'] = [Category(**values) for values in d['categories']]
+            if 'X' in d:
+                d['X'] = np.array(d['X'])
+            if 'y' in d:
+                d['y'] = np.array(d['y'])
             d['classifier'] = None
+            if 'locations' in d:
+                d['locations'] = np.array(d['locations'])
         else:
             raise ValueError('wrong file extension, only "pkl" or "json" is supported')
 

@@ -74,6 +74,16 @@ class RasterReader(object):
         for bandNo in range(1, self.provider.bandCount() + 1):
             yield bandNo
 
+    def checksum(self, bandNo: int = None, xoff=0, yoff=0, xsize: int = None, ysize: int = None) -> int:
+        """Return band checksum."""
+        if bandNo is None:
+            checksum = 0
+            for bandNo in self.bandNumbers():
+                checksum += self.checksum(bandNo, xoff, yoff, xsize, ysize)
+        else:
+            checksum = self.gdalBand(bandNo).Checksum(xoff, yoff, xsize, ysize)
+        return checksum
+
     def bandName(self, bandNo: int) -> str:
         """Return band name."""
 
