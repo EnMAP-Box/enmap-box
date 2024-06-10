@@ -2056,7 +2056,7 @@
    <item row="1" column="0" colspan="3">
     <widget class="QGroupBox" name="groupBox_3">
      <property name="title">
-      <string>Add Bare Soil Spectra (Optional)</string>
+      <string>Add Background Spectra (Optional)</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_15">
       <item row="0" column="0">
