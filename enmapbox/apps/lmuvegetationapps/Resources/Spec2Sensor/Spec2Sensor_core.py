@@ -77,7 +77,11 @@ class Spec2Sensor:
         self.srf_nbands = srf_file['srf_nbands']
         self.wl_sensor = srf_file['sensor_wl']
         self.n_wl_sensor = len(self.wl_sensor)
-        self.fwhm = srf_file['sensor_fwhm']  # deprecated
+        if 'sensor_fwhm' in srf_file:
+            self.fwhm = srf_file['sensor_fwhm']  # deprecated
+        else:
+            self.fwhm = None
+        # self.fwhm = srf_file['sensor_fwhm']  # deprecated
         self.ndvi = srf_file['sensor_ndvi']
         return True  # return True if everything worked
 
