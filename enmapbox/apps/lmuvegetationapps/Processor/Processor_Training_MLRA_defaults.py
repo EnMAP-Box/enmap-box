@@ -109,13 +109,13 @@ class MLRA_defaults:
             'random_state': 42
         },
         'AGBdry': {
-            'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=10, nu=0.5),
+            'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=10, nu=2.5),
             'alpha': 1.0,
             'n_restarts_optimizer': 10,
             'random_state': 42
         },
         'AGBfresh': {
-            'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=10, nu=0.5),
+            'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=10, nu=2.5),
             'alpha': 1.0,
             'n_restarts_optimizer': 10,
             'random_state': 42
@@ -143,7 +143,7 @@ class MLRA_defaults:
     RFR = {
         'default': {
             'n_estimators': 1000,  # The number of trees in the forest.
-            'criterion': 'squared error',  # The function to measure the quality of a split.
+            'criterion': 'squared_error',  # The function to measure the quality of a split.
             'max_depth': None,  # The maximum depth of the tree.
             'min_samples_split': 2,  # The minimum number of samples required to split an internal node.
             'min_samples_leaf': 1,  # The minimum number of samples required to be at a leaf node.

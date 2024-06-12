@@ -1425,8 +1425,8 @@ if __name__ == '__main__':
     app = start_app()
     m = MainUiFunc()
     m.show()
-    # lut_path = r"C:\Data\Daten\Testdaten\LUT\testLUT_1000_CpCBCcheck_00meta.lut"
-    # m.mlra_training.open_lut(lutpath=lut_path)
-    # out_folder = r"C:\Data\Daten\Testdaten\Model_TEST/"
-    # m.mlra_training.get_folder(path=out_folder)
+    #lut_path = r"C:\Data\Daten\Testdaten\LUT\testLUT_1000_CpCBCcheck_00meta.lut"
+    #m.mlra_training.open_lut(lutpath=lut_path)
+    #out_folder = r"C:\Data\Daten\Testdaten\Model_TEST/"
+    #m.mlra_training.get_folder(path=out_folder)
     sys.exit(app.exec_())

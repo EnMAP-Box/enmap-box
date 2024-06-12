@@ -1528,10 +1528,10 @@
             <string>Diversity sampling: Euclidean distance based diversity</string>
            </property>
            <property name="text">
-            <string>EDB</string>
+            <string>EBD</string>
            </property>
            <property name="checked">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <attribute name="buttonGroup">
             <string notr="true">rad_group_al_strats</string>
@@ -1547,7 +1547,7 @@
             <string>PAL</string>
            </property>
            <property name="checked">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <attribute name="buttonGroup">
             <string notr="true">rad_group_al_strats</string>
@@ -2056,7 +2056,7 @@
    <item row="1" column="0" colspan="3">
     <widget class="QGroupBox" name="groupBox_3">
      <property name="title">
-      <string>Add Bare Soil Spectra (Optional)</string>
+      <string>Add Soil Spectra (Optional)</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_15">
       <item row="0" column="0">
@@ -2132,11 +2132,11 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="rad_group_al"/>
-  <buttongroup name="rad_group_al_strats"/>
   <buttongroup name="rad_group_noise"/>
-  <buttongroup name="rad_group_splitstrat"/>
   <buttongroup name="rad_group_eval"/>
+  <buttongroup name="rad_group_al_strats"/>
   <buttongroup name="rad_group_ml"/>
+  <buttongroup name="rad_group_splitstrat"/>
+  <buttongroup name="rad_group_al"/>
  </buttongroups>
 </ui>
