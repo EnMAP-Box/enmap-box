@@ -31,6 +31,7 @@ but new algorithms can always be created manually by updating the values in this
 can do both training and prediction, the GUIs are split into different scripts.
 
 """
+import os
 import warnings
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 warnings.filterwarnings('ignore', category=UserWarning)
@@ -63,11 +64,13 @@ from sklearn.model_selection import cross_val_predict
 from sklearn.base import is_classifier
 
 import joblib
+from joblib import Parallel, delayed
+import copy
 
 
-def max_euclidean_distances(data1, data2, n):
+def max_euclidean_distances(unlabeled, train, n):
     """
-    Find n indices from data1 that are furthest from data2 using squared Euclidean distance.
+    Find n indices from unlabeled that are furthest from train using squared Euclidean distance.
 
     Parameters:
     - data1, data2 (np.array): Data arrays.
@@ -77,7 +80,7 @@ def max_euclidean_distances(data1, data2, n):
     - list: Indices of data1 that are furthest from data2.
     """
     # Compute all pairwise distances
-    all_distances = pairwise_distances(data1, data2, metric='sqeuclidean')
+    all_distances = pairwise_distances(unlabeled, train, metric='sqeuclidean')
     max_n_indices = np.argpartition(all_distances.flatten(), -n)[-n:]
     max_n_2d_indices = np.unravel_index(max_n_indices, all_distances.shape)
     indices_arr1 = max_n_2d_indices[0]
@@ -86,7 +89,7 @@ def max_euclidean_distances(data1, data2, n):
     unique_indices = list(set(indices_arr1.tolist()))
     return unique_indices
 
-def pool_active_learning(X_train, y_train, X_unlabeled, model, n, k):
+def pool_active_learning(X_train, y_train, X_unlabeled, model, n, k, n_jobs):
     """
     Implements the Pool Active Learning (PAL) approach.
 
@@ -101,43 +104,51 @@ def pool_active_learning(X_train, y_train, X_unlabeled, model, n, k):
     Returns:
     - list: Indices of instances to be queried.
     """
+    def train_and_predict(subset_indices):
+        X_subset = X_train[subset_indices]
+        y_subset = y_train[subset_indices]
+        model.fit(X_subset, y_subset)
+        return model.predict(X_unlabeled)
     # Here, we will train the model on different subsets from the original training set
     # and collect predictions for the unlabeled data.
     predictions = []
-
     n_samples = X_train.shape[0]
     subset_size = n_samples // k
 
-    for i in range(k):
-        # Create random subsets of the original training data
-        subset_indices = np.random.choice(n_samples, size=subset_size, replace=False)
-        X_subset = X_train[subset_indices]
-        y_subset = y_train[subset_indices]
+    # for i in range(k):
+    #     # Create random subsets of the original training data
+    #     if mode == 'random':
+    #         subset_indices = np.random.choice(n_samples, size=subset_size, replace=False)
+    #     else:
+    #         break
+    #     X_subset = X_train[subset_indices]
+    #     y_subset = y_train[subset_indices]
+    #     # Train the model on the subset
+    #     model.fit(X_subset, y_subset)
+    #     # Predict on the entire unlabeled set and store the predictions
+    #     preds = model.predict(X_unlabeled)
+    #     predictions.append(preds)
 
-        # Train the model on the subset
-        model.fit(X_subset, y_subset)
+    subset_indices_list = [np.random.choice(n_samples, size=subset_size, replace=False) for _ in range(k)]
 
-        # Predict on the entire unlabeled set and store the predictions
-        preds = model.predict(X_unlabeled)
-        predictions.append(preds)
+    # Parallelize the training and predicting steps
+    predictions = Parallel(n_jobs=n_jobs)(delayed(train_and_predict)(subset) for subset in subset_indices_list)
 
     # Convert list of predictions into an array [n_samples, n_models]
     predictions_array = np.array(predictions).T
-
     # Calculate the variance for each instance across models
     variances = np.var(predictions_array, axis=1)
-
     # Get indices of instances with the highest variance
     top_indices = np.argsort(variances)[-n:]
 
     return top_indices.tolist()
 
 
-def al_query(X_train, y_train, X_unlabeled, strategy, model, n=1, k=5):
+def al_query(X_train, y_train, X_unlabeled, strategy, model, n=1, k=5, n_jobs=1):
     if strategy == "EBD":
         return max_euclidean_distances(X_unlabeled, X_train, n=n)
     elif strategy == 'PAL':
-        return pool_active_learning(X_train, y_train, X_unlabeled, model=model, n=n, k=k)
+        return pool_active_learning(X_train, y_train, X_unlabeled, model=model, n=n, k=k, n_jobs=n_jobs)
     # More strategies can be added here as elif conditions
     else:
         raise ValueError(f"Strategy {strategy} not recognized!")
@@ -195,11 +206,15 @@ class MLRATraining:
                'X_val': X_val, 'y_val': y_val}
 
     @staticmethod
-    def _fit_hyper(X, y, model, test_size=0.2):
+    def _fit_hyper(X, y, model, X_val=None, y_val=None, test_size=0.2):
         # fit a RandomSearchCV or GridSearchCV model -> model here is a wrapper
         stds = []
         # yield {"type": "progress", "progress": 0, "loop_counter": 1}
-        train_X, test_X, train_y, test_y = train_test_split(X, y, test_size=test_size)
+        if X_val is None:
+            train_X, test_X, train_y, test_y = train_test_split(X, y, test_size=test_size)
+        else:
+            train_X, test_X, train_y, test_y = X, X_val, y, y_val
+
         model.fit(train_X, train_y)
         if isinstance(model, RandomizedSearchCV) and isinstance(model.best_estimator_, GaussianProcessRegressor):
             predictions, stds = model.best_estimator_.predict(test_X, return_std=True)
@@ -267,7 +282,8 @@ class MLRATraining:
             raise ValueError(f"Unrecognized split method: {split_method}")
     
     @staticmethod
-    def _al_loop_internal(X, y, model, init_percentage, query_strat='PAL', split_method="train_test_split", kfolds=5, test_size=0.2):
+    def _al_loop_internal(X, y, model, init_percentage, query_strat='PAL', split_method="train_test_split", kfolds=5,
+                          test_size=0.2, n_jobs=1):
         all_training_indices = []
         all_performances = []
         all_stds = []
@@ -281,7 +297,7 @@ class MLRATraining:
 
             # Get generator from _al_loop
             loop_gen = MLRATraining._al_loop(X_train, y_train, X_test, y_test, model,
-                                             init_percentage=init_percentage, query_strat=query_strat)
+                                             init_percentage=init_percentage, query_strat=query_strat, n_jobs=n_jobs)
 
             for output in loop_gen:
                 # loop_gen is the yield dict output of _al_loop() and can be of 'type': 'result' or 'progress'
@@ -307,14 +323,15 @@ class MLRATraining:
         
         
     @staticmethod
-    def _al_loop(X, y, X_val, y_val, model, init_percentage, query_strat):
+    def _al_loop(X, y, X_val, y_val, model, init_percentage, query_strat, n_jobs):
 
         init_percentage = init_percentage/100
         n_samples = X.shape[0]
         n_init = int(init_percentage * n_samples)
 
         # initial samples are not randomly selected but already queried using query_strat:
-        initial_idx = al_query(X_train=X, y_train=y, X_unlabeled=X_val, model=model, strategy=query_strat, n=n_init)
+        initial_idx = al_query(X_train=X, y_train=y, X_unlabeled=X_val, model=model, strategy=query_strat, n=n_init,
+                               n_jobs=n_jobs)
 
         # initial samples are randomly selected:
         # np.random.seed(42)
@@ -342,7 +359,7 @@ class MLRATraining:
 
             remaining_X = X[remaining_indices]  # get remaining X
             query_indices = al_query(X_train=X[initial_idx], y_train=y[initial_idx],
-                                     X_unlabeled=remaining_X, model=model, strategy=query_strat)  # X_raw[initial_idx])
+                                     X_unlabeled=remaining_X, model=model, strategy=query_strat, n_jobs=5)  # X_raw[initial_idx])
             chosen_indices = remaining_indices[query_indices]
 
             X_initial = np.concatenate((X_initial, X[chosen_indices]))
@@ -448,6 +465,8 @@ class ProcessorTraining:
 
         self.soil_wavelengths = soil_wavelengths
         self.soil_specs = soil_specs
+
+        self.n_jobs = os.cpu_count()
 
         # LUT
         self.get_meta_LUT(lut_metafile=lut_metafile)  # read meta information of the LUT to be trained
@@ -596,13 +615,13 @@ class ProcessorTraining:
         if self.hyperp_tuning:
             param_dist = MLRA_defaults.__dict__[self.algorithm]['param_dist']
             #TODO: add radiobutton for tuning options
-            self.mlra = self.init_hyperparameter_tuning(self.mlra, param_dist, mode='randomized')
+            self.mlra = self.init_hyperparameter_tuning(self.mlra, param_dist, mode='randomized', n_jobs=self.n_jobs)
 
         # AL based on split (train-test-split or kfold cross val)
         if self.use_al and not self.use_insitu:
             self.al_paras = {'split_method': self.split_method, 'kfolds': self.kfolds,
                              'test_size': self.test_size,
-                             'init_percentage': self.n_initial, 'query_strat': self.query_strat}
+                             'init_percentage': self.n_initial, 'query_strat': self.query_strat, 'n_jobs': self.n_jobs}
             self.ml_model = self.m.mlra_training._al_loop_internal
 
         # AL with external insitu data
@@ -611,7 +630,7 @@ class ProcessorTraining:
                 self.y_val = np.asarray(self.y_val_dict.get(var))
 
             self.al_paras = {'X_val': self.X_val, 'y_val': self.y_val,
-                             'init_percentage': self.n_initial, 'query_strat': self.query_strat}
+                             'init_percentage': self.n_initial, 'query_strat': self.query_strat, 'n_jobs': self.n_jobs}
             self.ml_model = self.m.mlra_training._al_loop
 
         # No AL, training on splits
@@ -619,20 +638,24 @@ class ProcessorTraining:
             self.al_paras = {'split_method': self.split_method, 'kfolds': self.kfolds, 'test_size': self.test_size}
             self.ml_model = self.m.mlra_training._fit_split
         # No AL, Training on full Training data with evaluation on insitu data -> The Retraining case
-        elif self.eval_on_insitu:
+        elif self.eval_on_insitu and not self.hyperp_tuning:
             if self.y_val_dict:
                 self.y_val = np.asarray(self.y_val_dict.get(var))
             self.al_paras = {'X_val': self.X_val, 'y_val': self.y_val}
             self.ml_model = self.m.mlra_training._fit_insitu
         # No AL, training with hyperparameter tuning
         elif self.hyperp_tuning:
-            self.al_paras = {'test_size': self.test_size}
+            if self.eval_on_insitu:
+                self.y_val = np.asarray(self.y_val_dict.get(var))
+                self.al_paras = {'test_size': self.test_size, 'X_val': self.X_val, 'y_val': self.y_val}
+            else:
+                self.al_paras = {'test_size': self.test_size}
             self.ml_model = self.m.mlra_training._fit_hyper
         # No AL, only training -> all samples
         else:
             self.ml_model = self.m.mlra_training._fit # construct the model and pass it to self.ml_model
 
-    def init_hyperparameter_tuning(self, mlra, param_dist, mode, n_iter_search=10, n_jobs=4):
+    def init_hyperparameter_tuning(self, mlra, param_dist, mode, n_iter_search=10, n_jobs=1):
         scoring = 'neg_root_mean_squared_error'
         if mode == 'randomized':
             search = RandomizedSearchCV(mlra, param_distributions=param_dist, n_iter=n_iter_search,
@@ -723,7 +746,8 @@ class ProcessorTraining:
                             x = x[self.model_proc_dict['training_indices'], :]
                             y = y[self.model_proc_dict['training_indices'], :]
 
-                        self.insitu_data_setup(self.val_data)
+                        if self.val_data:
+                            self.insitu_data_setup(self.val_data)
 
                         self.init_model(var=para, hyperparams=hyperparams)  # initialize the model with the given settings
 
@@ -796,6 +820,8 @@ class ProcessorTraining:
                                         'hyperparas': result_dict["best_hyperparams"]}
                                     self.best_score_dict[self.algorithm][para] = {
                                         'best_score': result_dict["best_score"]}
+                                    print(self.best_hyperparameters_dict)
+                                    print(self.best_score_dict)
 
 
                                 elif result_dict["type"] == "progress":  # progressbar updates
