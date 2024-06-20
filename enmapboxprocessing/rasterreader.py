@@ -65,6 +65,12 @@ class RasterReader(object):
         if 'envi:metadata' not in self.stacMetadata['properties']:
             self.stacMetadata['properties']['envi:metadata'] = {}
 
+        # prepare R terra (https://github.com/rspatial/terra) metadata, also see #907
+        if exists(self.layer.source() + '.aux.json'):
+            self.terraMetadata = Utils().jsonLoad(self.layer.source() + '.aux.json')
+        else:
+            self.terraMetadata = None
+
     def bandCount(self) -> int:
         """Return iterator over all band numbers."""
         return self.provider.bandCount()
@@ -776,6 +782,19 @@ class RasterReader(object):
                     return QDateTime(QDate(1970, 1, 1)).addDays(int(dateTime))
                 else:
                     raise NotImplementedError(dateTimeUnit)
+
+            # check R terra (see #907)
+            if self.terraMetadata is not None:
+                if self.terraMetadata['timestep'] == 'days':
+                    year, month, day = self.terraMetadata['time'][bandNo - 1].split('-')
+                    return QDateTime(QDate(int(year), int(month), int(day)))
+                elif self.terraMetadata['timestep'] == 'seconds':
+                    tmp1, tmp2 = self.terraMetadata['time'][bandNo - 1].split(' ')
+                    year, month, day = tmp1.split('-')
+                    hour, minute, second = tmp2.split(':')
+                    return QDateTime(int(year), int(month), int(day), int(hour), int(minute), int(second))
+                else:
+                    raise NotImplementedError(self.terraMetadata['timestep'])
 
         # check STAC
         dateTime = self.stacMetadata['properties']['envi:metadata'].get('acquisition_time')
