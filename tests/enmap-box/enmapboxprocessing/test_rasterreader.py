@@ -5,7 +5,7 @@ from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.testcase import TestCase
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import enmap
+from enmapboxtestdata import enmap, r_terra_timeseries_days, r_terra_timeseries_seconds
 from enmapboxtestdata import fraction_polygon_l3
 from qgis.PyQt.QtCore import QDateTime, QSizeF
 from qgis.core import QgsRasterRange, QgsRasterLayer, Qgis, QgsRectangle
@@ -430,6 +430,13 @@ class TestRasterReader(TestCase):
         reader = RasterReader(writer.source())
         self.assertEqual(QDateTime(2009, 8, 20, 9, 44, 50), reader.startTime(1))
         self.assertEqual(QDateTime(2009, 8, 20, 9, 44, 50), reader.startTime(2))
+
+    def test_l(self):
+        # .aux.json files created with R-cran terra package
+        reader = RasterReader(r_terra_timeseries_days)
+        self.assertEqual(QDateTime(2015, 7, 4, 0, 0, 0), reader.startTime(1))
+        reader = RasterReader(r_terra_timeseries_seconds)
+        self.assertEqual(QDateTime(2015, 7, 4, 9, 7, 2), reader.startTime(1))
 
     def test_startTime_bandLevel(self):
         writer = self.rasterFromArray(np.zeros((3, 1, 1)))
