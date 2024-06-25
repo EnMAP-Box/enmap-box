@@ -11,7 +11,7 @@ RUN apt -y install python3-pip python3-venv pyqt5-dev-tools python3-matplotlib \
 #    && rm -rf /var/lib/apt/lists/*
 
 RUN apt update
-COPY ./linux/requirements_ubuntu.txt /tmp/
+# COPY ./linux/requirements_ubuntu.txt /tmp/
 COPY ./.env/linux/requirements_ubuntu.txt /tmp/
 COPY ./requirements_developer.txt /tmp/
 
