@@ -19,8 +19,23 @@ RUN mkdir .virtualenvs
 RUN mkdir .virtualenvs/enmapbox
 RUN python3 -m venv --upgrade-deps --system-site-packages .virtualenvs/enmapbox
 RUN . .virtualenvs/enmapbox/bin/activate
-RUN pip3 install -r /tmp/requirements_ubuntu.txt
+# RUN pip3 install -r /tmp/requirements_ubuntu.txt
+
+RUN pip install typeguard==2.13.3  # version 3.x created several problems
+RUN pip install astropy # required for convolution
+RUN pip install PyOpenGL # required by ImageCube app
+RUN pip install xgboost # required by XGBoost classifier/regressor, see #960
+RUN pip install lightgbm # required by LightGBM classifier/regressor, see #960
+RUN pip install catboost # required by CatBoost classifier/regressor, see #960
+RUN pip install docutils
+
+# required by parts of EnMAP-Box Applications
+RUN pip install sympy # required by EnSoMAP
+RUN pip install numba>=0.57 # required by EnSoMAP
+RUN pip install enpt-enmapboxapp # required by EnPT
+RUN pip install scikit-learn>=1.0
 RUN pip3 install coverage-badge
+
 
 
 RUN echo "Basic python environment:"
