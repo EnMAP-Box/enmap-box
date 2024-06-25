@@ -4,8 +4,8 @@
     Processor_Training_MLRA_defaults.py - LMU Agri Apps
     -----------------------------------------------------------------------
     begin                : 08/2023
-    copyright            : (C) 2023 Matthias Wocher
-    email                : m.wocher@lmu.de
+    copyright            : (C) 2024 Matthias Wocher
+    email                : m.wocher@iggf.geo.uni-muenchen.de
 
 ***************************************************************************
     This program is free software; you can redistribute it and/or modify
@@ -90,53 +90,50 @@ class MLRA_defaults:
         },
         'param_dist': {
             'kernel': [kernels.ConstantKernel(1.0) *
-                       kernels.Matern(length_scale=v, nu=nu, length_scale_bounds=(1e-5, 1e6))
+                       kernels.Matern(length_scale=v, nu=nu)
                        for v in [0.01, 0.1, 1.0, 10, 100] for nu in [0.5, 1.5, 2.5, float('inf')]],  #**kernels.ConstantKernel(1.0) *
             # [1.0 * kernels.RBF(length_scale=v) + kernels.WhiteKernel(noise_level=1.0, noise_level_bounds=(1e-5, 1e5)) for v in [0.01, 0.1, 1.0, 10, 100]]
             "alpha": [0.001, 0.01, 0.1, 1.0],
-            'random_state': 42
+            # 'random_state': 42
         },
         'cab': {
             'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=10, nu=2.5),
             'alpha': 1.0,
             'n_restarts_optimizer': 10,
-            'random_state': 42
         },
         'LAI': {
             'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=1, nu=2.5),
             'alpha': 0.1,
             'n_restarts_optimizer': 10,
-            'random_state': 42
         },
         'AGBdry': {
-            'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=10, nu=2.5),
+            'kernel': kernels.ConstantKernel(1.0, constant_value_bounds=(1e-5, 1e7)) *
+                      kernels.Matern(length_scale=10, length_scale_bounds=(1e-5, 1e7), nu=0.5) +
+                      kernels.WhiteKernel(noise_level=1.0, noise_level_bounds=(1e-5, 1e7)),
             'alpha': 1.0,
             'n_restarts_optimizer': 10,
-            'random_state': 42
         },
         'AGBfresh': {
-            'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=10, nu=2.5),
+            'kernel': kernels.ConstantKernel(1.0, constant_value_bounds=(1e-5, 1e7)) *
+                      kernels.Matern(length_scale=10, length_scale_bounds=(1e-5, 1e7), nu=0.5) +
+                      kernels.WhiteKernel(noise_level=1.0, noise_level_bounds=(1e-5, 1e7)),
             'alpha': 1.0,
             'n_restarts_optimizer': 10,
-            'random_state': 42
         },
         'CWC': {
             'kernel':  kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=1, nu=float('inf')),
             'alpha': 1.0,
             'n_restarts_optimizer': 10,
-            'random_state': 42
         },
         'Nitrogen': {
             'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=1, nu=2.5),
             'alpha': 1.0,
             'n_restarts_optimizer': 10,
-            'random_state': 42
         },
         'Carbon': {
             'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=10, nu=0.5),
             'alpha': 1.0,
             'n_restarts_optimizer': 10,
-            'random_state': 42
         }
     }
     # Random Forest Regression

@@ -5,8 +5,8 @@
     PROSAIL parameters - CORE
     -----------------------------------------------------------------------
     begin                : 09/2020
-    copyright            : (C) 2020 Martin Danner; Matthias Wocher
-    email                : m.wocher@lmu.de
+    copyright            : (C) 2024 Matthias Wocher, Martin Danner
+    email                : m.wocher@iggf.geo.uni-muenchen.de
 
 ***************************************************************************
     This program is free software; you can redistribute it and/or modify
@@ -619,6 +619,8 @@ class ML_Training:
             raise ValueError("Output directory does not exist!")
         if self.gui.txtModelName.text() == "":
             raise ValueError("Please specify a name for the model")
+        # if self.retrain_mode and self.gui.mLayerSpeclib.text() == "":
+        #     raise ValueError("retrain")
         else:
             self.model_name = self.gui.txtModelName.text()
             self.model_meta = self.out_dir + self.model_name + '.meta'
@@ -921,13 +923,22 @@ class perfView:
             scatter = ax0.scatter(y_val, final_pred, s=10, c='k')
         # 1:1 line
         ax_max = max(y_val.max(), final_pred.max())
+        ax_min = min(y_val.min(), final_pred.min())
         ax0.plot([0, ax_max], [0, ax_max], 'k-')
         # Regression line
         lr = LinearRegression()
         lr.fit(y_val.reshape(-1, 1), final_pred)
-        x_fit = np.linspace(0, ax_max, 100)
+        nice_offest = 3 * ax_max / 100
+        x_fit = np.linspace(0, ax_max + nice_offest, 100)
         y_fit = lr.predict(x_fit.reshape(-1, 1))
         ax0.plot(x_fit, y_fit, 'r-')
+        if ax_min > 0:
+            ax0.set_xlim(0, ax_max + nice_offest)
+            ax0.set_ylim(0, ax_max + nice_offest)
+        else:
+            ax0.set_xlim(ax_min, ax_max + nice_offest)
+            ax0.set_ylim(ax_min, ax_max + nice_offest)
+
         ax0.text(0.05, 0.90, 'R² = {:.2f}'.format(r2) + '\nRMSE = ' + str(rmse_float), transform=ax0.transAxes)
         ax0.set_xlabel('{} - measured'.format(key))
         ax0.set_ylabel('{} - estimated'.format(key))
@@ -1377,6 +1388,7 @@ class PRG:
         self.gui.allow_cancel = True
         self.gui.cmdCancel.setDisabled(True)
         self.gui.lblCancel.setText("-1")
+        self.gui.close()
 
 # class Printer:
 #     def __init__(self, main):
@@ -1425,8 +1437,8 @@ if __name__ == '__main__':
     app = start_app()
     m = MainUiFunc()
     m.show()
-    #lut_path = r"C:\Data\Daten\Testdaten\LUT\testLUT_1000_CpCBCcheck_00meta.lut"
-    #m.mlra_training.open_lut(lutpath=lut_path)
-    #out_folder = r"C:\Data\Daten\Testdaten\Model_TEST/"
-    #m.mlra_training.get_folder(path=out_folder)
+    # lut_path = r"C:\Data\Daten\Testdaten\LUT\LUT_3000_Wocher2022_CpCBCcheck_EnMAP_219bands_00meta.lut"
+    # m.mlra_training.open_lut(lutpath=lut_path)
+    # out_folder = r"C:\Data\Daten\Testdaten\Model_TEST/"
+    # m.mlra_training.get_folder(path=out_folder)
     sys.exit(app.exec_())
