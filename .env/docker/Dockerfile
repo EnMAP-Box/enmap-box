@@ -18,21 +18,25 @@ COPY ./requirements_developer.txt /tmp/
 RUN mkdir .virtualenvs
 RUN mkdir .virtualenvs/enmapbox
 RUN python3 -m venv --upgrade-deps --system-site-packages .virtualenvs/enmapbox
-RUN . .virtualenvs/enmapbox/bin/activate && \
-    pip install typeguard==2.13.3 && \
-    pip install PyOpenGL && \
-    pip install xgboost && \
-    pip install lightgbm && \
-    pip install catboost && \
-    pip install docutils && \
-    pip install sympy && \
-    pip install numba>=0.57 && \
-    pip install enpt-enmapboxapp && \
-    pip install scikit-learn>=1.0 && \
-    pip3 install coverage-badge
+RUN . .virtualenvs/enmapbox/bin/activate
 
-# RUN pip3 install -r /tmp/requirements_ubuntu.txt
-# #    pip install astropy && \
+RUN virtualenv venv
+
+RUN pip3 install typeguard==2.13.3  # version 3.x created several problems
+# RUN pip3 install astropy # required for convolution
+RUN pip3 install PyOpenGL # required by ImageCube app
+RUN pip3 install xgboost # required by XGBoost classifier/regressor, see #960
+RUN pip3 install lightgbm # required by LightGBM classifier/regressor, see #960
+RUN pip3 install catboost # required by CatBoost classifier/regressor, see #960
+RUN pip3 install docutils
+
+# required by parts of EnMAP-Box Applications
+RUN pip3 install sympy # required by EnSoMAP
+RUN pip3 install numba>=0.57 # required by EnSoMAP
+RUN pip3 install enpt-enmapboxapp # required by EnPT
+RUN pip3 install scikit-learn>=1.0
+RUN pip3 install coverage-badge
+
 
 
 RUN echo "Basic python environment:"
