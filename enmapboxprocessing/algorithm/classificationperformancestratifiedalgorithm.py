@@ -51,7 +51,7 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
     def group(self):
         return Group.Classification.value
 
-    def checkCategories(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
+    def _checkCategories(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
         classification = self.parameterAsRasterLayer(parameters, self.P_CLASSIFICATION, context)
         reference = self.parameterAsLayer(parameters, self.P_REFERENCE, context)
         if isinstance(reference, QgsVectorLayer):
@@ -79,7 +79,7 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
                 return False, f'Predicted category "{cP.name}" not found in observed categories.'
         return False, 'Empty category list.'
 
-    def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
+    def _checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
         checks = [
             self.checkParameterMapClassification(parameters, self.P_REFERENCE, context),
             self.checkParameterRasterClassification(parameters, self.P_STRATIFICATION, context),

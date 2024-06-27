@@ -111,14 +111,17 @@ class PrepareClassificationDatasetFromCategorizedRasterAlgorithm(EnMAPProcessing
             classification.setRenderer(renderer)
             classification.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
 
-            X, y, goodBandNumbers = self.sampleData(
+            X, y, goodBandNumbers, locations = self.sampleData(
                 raster, classification, classBandNo, categories, excludeBadBands, feedback
             )
             reader = RasterReader(raster)
             features = [reader.bandName(bandNo) for bandNo in goodBandNumbers]
             feedback.pushInfo(f'Sampled data: X=array{list(X.shape)} y=array{list(y.shape)}')
 
-            dump = ClassifierDump(categories=categories, features=features, X=X, y=y)
+            dump = ClassifierDump(
+                categories=categories, features=features, X=X, y=y, locations=locations,
+                crs=classification.crs().toWkt()
+            )
             dumpDict = dump.__dict__
             Utils.pickleDump(dumpDict, filename)
 
@@ -130,7 +133,7 @@ class PrepareClassificationDatasetFromCategorizedRasterAlgorithm(EnMAPProcessing
     def sampleData(
             cls, raster: QgsRasterLayer, classification: QgsRasterLayer, classBandNo: int, categories: Categories,
             excludeBadBands: bool, feedback: QgsProcessingFeedback = None
-    ) -> Tuple[SampleX, SampleY, List[int]]:
+    ) -> Tuple[SampleX, SampleY, List[int], np.ndarray]:
         # assert raster.crs() == classification.crs()
         assert raster.extent() == classification.extent()
         assert (raster.width(), raster.height()) == (classification.width(), classification.height())
@@ -145,6 +148,7 @@ class PrepareClassificationDatasetFromCategorizedRasterAlgorithm(EnMAPProcessing
 
         X = list()
         y = list()
+        locations = list()
         XMask = list()
         for block in reader.walkGrid(blockSizeX, blockSizeY, feedback):
             blockClassification = classificationReader.arrayFromBlock(block, [classBandNo])[0]
@@ -159,12 +163,15 @@ class PrepareClassificationDatasetFromCategorizedRasterAlgorithm(EnMAPProcessing
                 blockBandMask = reader.maskArray(blockBand, [bandNo])
                 blockX.append(blockBand[0][labeled])
                 blockXMask.append(blockBandMask[0][labeled])
+            blockLocation = np.array([block.xMap()[labeled], block.yMap()[labeled]]).T
             X.append(blockX)
             y.append(blockY)
+            locations.append(blockLocation)
             XMask.append(blockXMask)
         X = np.concatenate(X, axis=1).T
         XMask = np.concatenate(XMask, axis=1).T
         y = np.expand_dims(np.concatenate(y), 1)
+        locations = np.concatenate(locations, axis=1)
 
         # skip bad bands (see issue #560)
         if excludeBadBands:
@@ -184,5 +191,6 @@ class PrepareClassificationDatasetFromCategorizedRasterAlgorithm(EnMAPProcessing
         valid = np.logical_and(valid1, valid2)
         X = X[valid]
         y = y[valid]
+        locations = locations[valid]
         checkSampleShape(X, y)
-        return X, y, goodBandNumbers
+        return X, y, goodBandNumbers, locations

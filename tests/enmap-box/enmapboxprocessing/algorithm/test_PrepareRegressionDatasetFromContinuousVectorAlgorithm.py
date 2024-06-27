@@ -1,16 +1,22 @@
-from enmapboxtestdata import enmap_potsdam, landcover_potsdam_point
+from enmapbox import initAll
+from enmapbox.testing import start_app
+from enmapboxprocessing.algorithm.libraryfromregressiondatasetalgorithm import LibraryFromRegressionDatasetAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousvectoralgorithm import \
     PrepareRegressionDatasetFromContinuousVectorAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
+from enmapboxtestdata import enmap_potsdam, landcover_potsdam_point
 from enmapboxtestdata import fraction_point_multitarget, fraction_point_singletarget, enmap, landcover_polygon
-from qgis.core import QgsProcessingException
+from qgis.core import QgsVectorLayer, QgsProcessingException
 
 
 class TestPrepareRegressionDatasetFromCategorizedVectorAlgorithm(TestCase):
 
     def test_styled_multitarget(self):
+        start_app()
+        initAll()
+
         alg = PrepareRegressionDatasetFromContinuousVectorAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
@@ -25,6 +31,18 @@ class TestPrepareRegressionDatasetFromCategorizedVectorAlgorithm(TestCase):
         self.assertEqual(['band 8 (0.460000 Micrometers)', 'band 9 (0.465000 Micrometers)'], dump.features[:2])
         self.assertListEqual(
             ['roof', 'pavement', 'low vegetation', 'tree', 'soil', 'water'], [t.name for t in dump.targets]
+        )
+
+        # check locations
+        alg = LibraryFromRegressionDatasetAlgorithm()
+        parameters = {
+            alg.P_DATASET: self.filename('sample.pkl'),
+            alg.P_OUTPUT_LIBRARY: self.filename('library.gpkg')
+        }
+        self.runalg(alg, parameters)
+        self.assertEqual(
+            383997,
+            round(QgsVectorLayer(self.filename('library.gpkg')).getFeatures().__next__().geometry().asPoint().x())
         )
 
     def test_styled_singletarget(self):

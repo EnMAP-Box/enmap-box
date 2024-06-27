@@ -3,13 +3,13 @@ from typing import Dict, Any, List, Tuple
 import numpy as np
 
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import FIELD_VALUES
+from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import checkSampleShape, ClassifierDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCategorizedSymbolRenderer,
-                       QgsProcessingParameterField, QgsProcessingException)
-from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
+                       QgsProcessingParameterField, QgsProcessingException, QgsFeature)
 
 
 @typechecked
@@ -110,6 +110,8 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
             n = library.featureCount()
             X = list()
             y = list()
+            locations = list()
+            feature: QgsFeature
             for i, feature in enumerate(library.getFeatures()):
                 feedback.setProgress(i / n * 100)
 
@@ -133,6 +135,9 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
                 y.append(yi)
                 X.append(Xi)
 
+                point = feature.geometry().asPoint()
+                locations.append((point.x(), point.y()))
+
             if len(set(map(len, X))) != 1:
                 raise QgsProcessingException('Number of features do not match across all spectral profiles.')
 
@@ -141,7 +146,12 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
             except Exception as error:
                 raise ValueError(f'invalid feature data: {error}')
 
-            y = np.array(y)
+            try:
+                y = np.array(y)
+            except Exception as error:
+                ValueError(f'invalid target data: {error}')
+
+            locations = np.array(locations)
             if excludeBadBands:
                 # skip not finite bands
                 validBands = np.any(np.isfinite(X), axis=0)
@@ -150,8 +160,8 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
                 # skip samples that contain not finite values
                 validSamples = np.all(np.isfinite(X), axis=1)
                 X = X[validSamples]
-
                 y = y[validSamples]
+                locations = locations[validSamples]
 
             try:
                 y = y.reshape(-1, 1)
@@ -161,7 +171,12 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
             checkSampleShape(X, y, raise_=True)
 
             features = [f'Band {i + 1}' for i in range(X.shape[1])]
-            dump = ClassifierDump(categories=categories, features=features, X=X, y=y)
+            if library.crs().isValid():
+                crs = library.crs().toWkt()
+            else:
+                locations = crs = None
+
+            dump = ClassifierDump(categories=categories, features=features, X=X, y=y, locations=locations, crs=crs)
             dumpDict = dump.__dict__
             Utils.pickleDump(dumpDict, filename)
 

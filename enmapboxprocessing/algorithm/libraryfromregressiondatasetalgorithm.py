@@ -6,27 +6,26 @@ import numpy as np
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.librarydriver import LibraryDriver
-from enmapboxprocessing.typing import ClassifierDump
-from enmapboxprocessing.utils import Utils
-from qgis.core import QgsGeometry, QgsPointXY, Qgis, QgsCoordinateReferenceSystem, QgsMapLayer, QgsVectorLayer, \
+from enmapboxprocessing.typing import RegressorDump
+from qgis.core import QgsGeometry, QgsPointXY, Qgis, QgsCoordinateReferenceSystem, QgsVectorLayer, \
     QgsProcessingContext, QgsProcessingFeedback
 
 
 @typechecked
-class LibraryFromClassificationDatasetAlgorithm(EnMAPProcessingAlgorithm):
+class LibraryFromRegressionDatasetAlgorithm(EnMAPProcessingAlgorithm):
     P_DATASET, _DATASET = 'dataset', 'Dataset'
     P_OUTPUT_LIBRARY, _OUTPUT_LIBRARY = 'outputLibrary', 'Output spectral library'
 
     @classmethod
     def displayName(cls) -> str:
-        return 'Create spectral library (from classification dataset)'
+        return 'Create spectral library (from regression dataset)'
 
     def shortDescription(self) -> str:
-        return 'Create a spectral library from a classification dataset.'
+        return 'Create a spectral library from a regression dataset.'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._DATASET, 'A classification dataset.'),
+            (self._DATASET, 'A regression dataset.'),
             (self._OUTPUT_LIBRARY, self.VectorFileDestination)
         ]
 
@@ -34,7 +33,7 @@ class LibraryFromClassificationDatasetAlgorithm(EnMAPProcessingAlgorithm):
         return Group.SpectralLibrary.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
-        self.addParameterClassificationDataset(self.P_DATASET, self._DATASET)
+        self.addParameterRegressionDataset(self.P_DATASET, self._DATASET)
         self.addParameterVectorDestination(self.P_OUTPUT_LIBRARY, self._OUTPUT_LIBRARY)
 
     def processAlgorithm(
@@ -47,16 +46,17 @@ class LibraryFromClassificationDatasetAlgorithm(EnMAPProcessingAlgorithm):
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)
 
-            dump = ClassifierDump.fromFile(filenameDataset)
-            categoryNames = {c.value: c.name for c in dump.categories}
+            dump = RegressorDump.fromFile(filenameDataset)
+            # targetNames = {c.value: c.name for c in dump.targets}
             data = list()
             geometries = list()
 
-            for i, (xvalues, yvalue) in enumerate(zip(dump.X, dump.y.flatten().tolist())):
+            for i, (xvalues, yvalues) in enumerate(zip(dump.X, dump.y)):
                 values = {
                     'profiles': {'y': xvalues.tolist()},
-                    'CategoryValue': yvalue, 'CategoryName': categoryNames[yvalue]
                 }
+                for target, yvalue in zip(dump.targets, yvalues.tolist()):
+                    values[target.name] = yvalue
 
                 data.append(values)
                 if dump.locations is None:
@@ -74,12 +74,11 @@ class LibraryFromClassificationDatasetAlgorithm(EnMAPProcessingAlgorithm):
                 crs = QgsCoordinateReferenceSystem.fromWkt(dump.crs)
 
             writer = LibraryDriver().createFromData(data, geometries, name, Qgis.WkbType.Point, crs)
+            assert crs.authid() == writer.library.crs().authid()
             writer.writeToSource(filename)
             library = QgsVectorLayer(filename)
             assert library.isValid()
-            renderer = Utils().categorizedSymbolRendererFromCategories('CategoryValue', dump.categories)
-            library.setRenderer(renderer)
-            library.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
+            assert crs.authid() == library.crs().authid()
 
             result = {self.P_OUTPUT_LIBRARY: filename}
             self.toc(feedback, result)

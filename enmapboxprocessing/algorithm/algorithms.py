@@ -87,6 +87,7 @@ from enmapboxprocessing.algorithm.inversetransformrasteralgorithm import Inverse
 from enmapboxprocessing.algorithm.layertomaskalgorithm import LayerToMaskAlgorithm
 from enmapboxprocessing.algorithm.libraryfromclassificationdatasetalgorithm import \
     LibraryFromClassificationDatasetAlgorithm
+from enmapboxprocessing.algorithm.libraryfromregressiondatasetalgorithm import LibraryFromRegressionDatasetAlgorithm
 from enmapboxprocessing.algorithm.mergeclassificationdatasetalgorithm import MergeClassificationDatasetsAlgorithm
 from enmapboxprocessing.algorithm.predictclassificationalgorithm import PredictClassificationAlgorithm
 from enmapboxprocessing.algorithm.predictclassprobabilityalgorithm import PredictClassPropabilityAlgorithm
@@ -322,6 +323,7 @@ def algorithms():
         InverseTransformRasterAlgorithm(),
         LayerToMaskAlgorithm(),
         LibraryFromClassificationDatasetAlgorithm(),
+        LibraryFromRegressionDatasetAlgorithm(),
         MergeClassificationDatasetsAlgorithm(),
         PredictClassificationAlgorithm(),
         PredictClassPropabilityAlgorithm(),

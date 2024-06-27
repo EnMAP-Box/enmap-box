@@ -17,6 +17,7 @@ class PrepareRegressionDatasetFromContinuousLibraryAlgorithm(EnMAPProcessingAlgo
     P_CONTINUOUS_LIBRARY, _CONTINUOUS_LIBRARY = 'continuousLibrary', 'Continuous-valued spectral library'
     P_FIELD, _FIELD = 'field', 'Field with spectral profiles used as features'
     P_TARGET_FIELDS, _TARGET_FIELDS = 'targetFields', 'Fields with target values'
+    P_EXCLUDE_BAD_BANDS, _EXCLUDE_BAD_BANDS, = 'excludeBadBands', 'Exclude bad bands'
     P_OUTPUT_DATASET, _OUTPUT_DATASET = 'outputRegressionDataset', 'Output dataset'
 
     @classmethod
@@ -39,6 +40,8 @@ class PrepareRegressionDatasetFromContinuousLibraryAlgorithm(EnMAPProcessingAlgo
             (self._FIELD, 'Field with spectral profiles used as feature data X. '
                           'If not selected, the default field named "profiles" is used. '
                           'If that is also not available, an error is raised.'),
+            (self._EXCLUDE_BAD_BANDS, 'Whether to exclude bands, that are marked as bad bands, '
+                                      'or contain no data, inf or nan values in all samples.'),
             (self._OUTPUT_DATASET, self.PickleFileDestination)
         ]
 
@@ -55,6 +58,7 @@ class PrepareRegressionDatasetFromContinuousLibraryAlgorithm(EnMAPProcessingAlgo
             self.P_FIELD, self._FIELD, None, self.P_CONTINUOUS_LIBRARY, QgsProcessingParameterField.Any, False, True,
             False, True
         )
+        self.addParameterBoolean(self.P_EXCLUDE_BAD_BANDS, self._EXCLUDE_BAD_BANDS, True, True, True)
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
 
     def processAlgorithm(
@@ -63,6 +67,7 @@ class PrepareRegressionDatasetFromContinuousLibraryAlgorithm(EnMAPProcessingAlgo
         library = self.parameterAsLayer(parameters, self.P_CONTINUOUS_LIBRARY, context)
         binaryField = self.parameterAsField(parameters, self.P_FIELD, context)
         targetFields = self.parameterAsFields(parameters, self.P_TARGET_FIELDS, context)
+        excludeBadBands = self.parameterAsBoolean(parameters, self.P_EXCLUDE_BAD_BANDS, context)
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_DATASET, context)
 
         with open(filename + '.log', 'w') as logfile:
@@ -88,6 +93,7 @@ class PrepareRegressionDatasetFromContinuousLibraryAlgorithm(EnMAPProcessingAlgo
             n = library.featureCount()
             X = list()
             y = list()
+            locations = list()
             for i, feature in enumerate(library.getFeatures()):
                 feedback.setProgress(i / n * 100)
 
@@ -102,9 +108,21 @@ class PrepareRegressionDatasetFromContinuousLibraryAlgorithm(EnMAPProcessingAlgo
                         yik = np.nan
                     yi.append(yik)
 
-                Xi = profileDict['y']
+                try:
+                    Xi = np.array(profileDict['y'])
+                except KeyError:
+                    raise QgsProcessingException(f'Not a valid Profiles field: {binaryField}')
+
+                if excludeBadBands:
+                    if 'bbl' in profileDict:
+                        valid = np.equal(profileDict['bbl'], 1)
+                        Xi = Xi[valid]
+
                 y.append(yi)
                 X.append(Xi)
+
+                point = feature.geometry().asPoint()
+                locations.append((point.x(), point.y()))
 
             if len(set(map(len, X))) != 1:
                 raise QgsProcessingException('Number of features do not match across all spectral profiles.')
@@ -119,10 +137,27 @@ class PrepareRegressionDatasetFromContinuousLibraryAlgorithm(EnMAPProcessingAlgo
             except Exception as error:
                 ValueError(f'invalid target data: {error}')
 
+            locations = np.array(locations)
+            if excludeBadBands:
+                # skip not finite bands
+                validBands = np.any(np.isfinite(X), axis=0)
+                X = X[:, validBands]
+
+                # skip samples that contain not finite values
+                validSamples = np.all(np.isfinite(X), axis=1)
+                X = X[validSamples]
+                y = y[validSamples]
+                locations = locations[validSamples]
+
             checkSampleShape(X, y, raise_=True)
 
             features = [f'Band {i + 1}' for i in range(X.shape[1])]
-            dump = RegressorDump(targets=targets, features=features, X=X, y=y)
+            if library.crs().isValid():
+                crs = library.crs().toWkt()
+            else:
+                locations = crs = None
+
+            dump = RegressorDump(targets=targets, features=features, X=X, y=y, locations=locations, crs=crs)
             dumpDict = dump.__dict__
             Utils.pickleDump(dumpDict, filename)
 

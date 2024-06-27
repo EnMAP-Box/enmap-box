@@ -78,7 +78,7 @@ class PrepareRegressionDatasetFromContinuousRasterAlgorithm(EnMAPProcessingAlgor
             self.runAlg(alg, parameters, None, feedback2, context, True)
             regression = QgsRasterLayer(parameters[alg.P_OUTPUT_RASTER])
 
-            X, y, goodBandNumbers = self.sampleData(raster, regression, excludeBadBands, feedback2)
+            X, y, goodBandNumbers, locations = self.sampleData(raster, regression, excludeBadBands, feedback2)
             reader = RasterReader(regression)
             targets = list()
             for i in range(regression.bandCount()):
@@ -92,9 +92,10 @@ class PrepareRegressionDatasetFromContinuousRasterAlgorithm(EnMAPProcessingAlgor
             features = [reader.bandName(bandNo) for bandNo in goodBandNumbers]
             feedback.pushInfo(f'Sampled data: X=array{list(X.shape)} y=array{list(y.shape)}')
 
-            dump = RegressorDump(targets=targets, features=features, X=X, y=y)
-            dumpDict = dump.__dict__
-            Utils.pickleDump(dumpDict, filename)
+            dump = RegressorDump(
+                targets=targets, features=features, X=X, y=y, locations=locations, crs=regression.crs().toWkt()
+            )
+            dump.write(filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)
@@ -104,7 +105,7 @@ class PrepareRegressionDatasetFromContinuousRasterAlgorithm(EnMAPProcessingAlgor
     def sampleData(
             cls, raster: QgsRasterLayer, regression: QgsRasterLayer, excludeBadBands: bool,
             feedback: QgsProcessingFeedback = None
-    ) -> Tuple[SampleX, SampleY, List[int]]:
+    ) -> Tuple[SampleX, SampleY, List[int], np.ndarray]:
         assert raster.extent() == regression.extent()
         assert (raster.width(), raster.height()) == (regression.width(), regression.height())
 
@@ -118,6 +119,7 @@ class PrepareRegressionDatasetFromContinuousRasterAlgorithm(EnMAPProcessingAlgor
 
         X = list()
         Y = list()
+        locations = list()
         XMask = list()
         for block in reader.walkGrid(blockSizeX, blockSizeY, feedback):
             arrayRegression = regressionReader.arrayFromBlock(block)
@@ -132,12 +134,15 @@ class PrepareRegressionDatasetFromContinuousRasterAlgorithm(EnMAPProcessingAlgor
                 blockBandMask = reader.maskArray(blockBand, [bandNo])
                 blockX.append(blockBand[0][labeled])
                 blockXMask.append(blockBandMask[0][labeled])
+            blockLocation = np.array([block.xMap()[labeled], block.yMap()[labeled]]).T
             X.append(blockX)
             Y.append(blockY)
+            locations.append(blockLocation)
             XMask.append(blockXMask)
         X = np.concatenate(X, axis=1).T
         XMask = np.concatenate(XMask, axis=1).T
         Y = np.concatenate(Y, axis=1).T
+        locations = np.concatenate(locations, axis=1)
 
         # skip bad bands (see issue #560)
         if excludeBadBands:
@@ -157,5 +162,6 @@ class PrepareRegressionDatasetFromContinuousRasterAlgorithm(EnMAPProcessingAlgor
         valid = np.logical_and(valid1, valid2)
         X = X[valid]
         Y = Y[valid]
+        locations = locations[valid]
         checkSampleShape(X, Y)
-        return X, Y, goodBandNumbers
+        return X, Y, goodBandNumbers, locations

@@ -108,14 +108,14 @@ class PrepareRegressionDatasetFromContinuousVectorAlgorithm(EnMAPProcessingAlgor
             # sample data
             feedback.pushInfo('Sample data')
             regression = QgsRasterLayer(vrtFilename)
-            X, y, goodBandNumbers = PrepareRegressionDatasetFromContinuousRasterAlgorithm.sampleData(
+            X, y, goodBandNumbers, locations = PrepareRegressionDatasetFromContinuousRasterAlgorithm.sampleData(
                 raster, regression, excludeBadBands, feedback
             )
             reader = RasterReader(raster)
             features = [reader.bandName(bandNo) for bandNo in goodBandNumbers]
             feedback.pushInfo(f'Sampled data: X=array{list(X.shape)} y=array{list(y.shape)}')
 
-            dump = RegressorDump(targets=targets, features=features, X=X, y=y)
+            dump = RegressorDump(targets=targets, features=features, X=X, y=y, locations=locations)
             dumpDict = dump.__dict__
             Utils.pickleDump(dumpDict, filename)
 
