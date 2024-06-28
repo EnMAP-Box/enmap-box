@@ -115,7 +115,9 @@ class PrepareRegressionDatasetFromContinuousVectorAlgorithm(EnMAPProcessingAlgor
             features = [reader.bandName(bandNo) for bandNo in goodBandNumbers]
             feedback.pushInfo(f'Sampled data: X=array{list(X.shape)} y=array{list(y.shape)}')
 
-            dump = RegressorDump(targets=targets, features=features, X=X, y=y, locations=locations)
+            dump = RegressorDump(
+                targets=targets, features=features, X=X, y=y, locations=locations, crs=raster.crs().toWkt()
+            )
             dumpDict = dump.__dict__
             Utils.pickleDump(dumpDict, filename)
 

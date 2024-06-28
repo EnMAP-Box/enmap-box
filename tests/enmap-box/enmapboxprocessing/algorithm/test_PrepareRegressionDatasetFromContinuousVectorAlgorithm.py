@@ -11,7 +11,7 @@ from enmapboxtestdata import fraction_point_multitarget, fraction_point_singleta
 from qgis.core import QgsVectorLayer, QgsProcessingException
 
 
-class TestPrepareRegressionDatasetFromCategorizedVectorAlgorithm(TestCase):
+class TestPrepareRegressionDatasetFromContinuousVectorAlgorithm(TestCase):
 
     def test_styled_multitarget(self):
         start_app()
@@ -41,7 +41,7 @@ class TestPrepareRegressionDatasetFromCategorizedVectorAlgorithm(TestCase):
         }
         self.runalg(alg, parameters)
         self.assertEqual(
-            383997,
+            384027,
             round(QgsVectorLayer(self.filename('library.gpkg')).getFeatures().__next__().geometry().asPoint().x())
         )
 

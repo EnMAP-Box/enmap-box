@@ -269,7 +269,7 @@ r_terra_timeseries_seconds = join(_root, _subdir, 'r_terra', 'Unevenly_spaced_ti
 del _subdir, _root, _pklversion
 
 
-# external sensor products
+# external products
 def sensorProductsRoot() -> Optional[str]:
     # - let's have some developer-dependent default locations
     root = None
@@ -283,6 +283,23 @@ def sensorProductsRoot() -> Optional[str]:
     # - check environment variable
     if root is None:
         root = os.environ.get('ENMAPBOX_SENSOR_PRODUCT_ROOT')
+
+    return root
+
+
+def speclibProductsRoot() -> Optional[str]:
+    # - let's have some developer-dependent default locations
+    root = None
+    try:
+        root = {
+            'Andreas@PC-21-0602': r'd:\data\speclibs'
+        }.get(os.getlogin() + '@' + platform.node())
+    except OSError as ex:
+        warnings.warn(f'Exception raised in sensorProductsRoot():\n{ex}')
+
+    # - check environment variable
+    if root is None:
+        root = os.environ.get('ENMAPBOX_SPECLIB_PRODUCT_ROOT')
 
     return root
 
@@ -424,5 +441,11 @@ class SensorProducts(object):
             )
             S2B_L2A_MsiL1CXml = join(S2B_L2A, 'MTD_MSIL2A.xml')
 
+        class UsgsSplib07(object):
+            folder = join(sensorProductsRoot(), 'usgs_splib07')
+
+
+class SpeclibProducts(object):
+    if speclibProductsRoot() is not None:
         class UsgsSplib07(object):
             folder = join(sensorProductsRoot(), 'usgs_splib07')

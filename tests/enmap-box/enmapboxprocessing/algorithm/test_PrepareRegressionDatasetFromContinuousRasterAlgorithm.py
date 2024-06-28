@@ -41,7 +41,7 @@ class TestPrepareRegressionDatasetFromContinuousRasterAlgorithm(TestCase):
         )
 
         # check locations
-        filename = self.filename('library5.geojson')
+        filename = self.filename('library.gpkg')
         alg = LibraryFromRegressionDatasetAlgorithm()
         parameters = {
             alg.P_DATASET: self.filename('sample.pkl'),
@@ -49,7 +49,7 @@ class TestPrepareRegressionDatasetFromContinuousRasterAlgorithm(TestCase):
         }
         self.runalg(alg, parameters)
         self.assertEqual(
-            383997,
+            384147,
             round(QgsVectorLayer(filename).getFeatures().__next__().geometry().asPoint().x())
         )
 

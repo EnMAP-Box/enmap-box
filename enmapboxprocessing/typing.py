@@ -197,7 +197,8 @@ class ClassifierDump(object):
                 d['y'] = np.array(d['y'])
             d['classifier'] = None
             if 'locations' in d:
-                d['locations'] = np.array(d['locations'])
+                if d['locations'] is not None:
+                    d['locations'] = np.array(d['locations'])
         else:
             raise ValueError('wrong file extension, only "pkl" or "json" is supported')
 
@@ -263,7 +264,8 @@ class RegressorDump(object):
             d['y'] = np.array(d['y'])
             d['regressor'] = None
             if 'locations' in d:
-                d['locations'] = np.array(d['locations'])
+                if d['locations'] is not None:
+                    d['locations'] = np.array(d['locations'])
         else:
             raise ValueError('wrong file extension, only "pkl" or "json" is supported')
 

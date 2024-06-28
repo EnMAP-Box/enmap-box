@@ -74,7 +74,7 @@ class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
         alg = LibraryFromClassificationDatasetAlgorithm()
         parameters = {
             alg.P_DATASET: self.filename('sample.pkl'),
-            alg.P_OUTPUT_LIBRARY: self.filename('library2.gpkg')
+            alg.P_OUTPUT_LIBRARY: self.filename('library.gpkg')
         }
         self.runalg(alg, parameters)
         self.assertEqual(

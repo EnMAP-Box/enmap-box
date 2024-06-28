@@ -20,7 +20,7 @@ class TestLibraryFromClassificationDatasetAlgorithm(TestCase):
             categories=categories,
             features=['feature 1', 'feature 2', 'feature 3'],
             X=np.array([(1, 2, 3), (10, 11, 12), (20, 21, 22)]),
-            y=np.array([1, 2, 1]),
+            y=np.array([[1], [2], [1]]),
             classifier=None,
             locations=np.array([(1, 1), (2, 2), (3, 3)]),
             crs=QgsCoordinateReferenceSystem.fromEpsgId(4326).toWkt()
@@ -43,7 +43,7 @@ class TestLibraryFromClassificationDatasetAlgorithm(TestCase):
             categories=categories,
             features=['feature 1', 'feature 2', 'feature 3'],
             X=np.array([(1, 2, 3), (10, 11, 12), (20, 21, 22)]),
-            y=np.array([1, 2, 1]),
+            y=np.array([[1], [2], [1]]),
         )
         dump.write(self.filename('dataset.pkl'))
 

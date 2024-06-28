@@ -2,14 +2,14 @@ from enmapbox import initAll
 from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.importusgsspeclib07algorithm import ImportUsgsSpeclib07Algorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxtestdata import SensorProducts, sensorProductsRoot
+from enmapboxtestdata import SensorProducts, speclibProductsRoot
 from qgis.core import QgsVectorLayer
 
 
 class TestImportUsgsSpeclib07Algorithm(TestCase):
 
     def test_AsdAndVegetation_only(self):
-        if sensorProductsRoot() is None or self.skipProductImport:
+        if speclibProductsRoot() is None or self.skipProductImport:
             return
 
         start_app()
@@ -26,7 +26,7 @@ class TestImportUsgsSpeclib07Algorithm(TestCase):
         self.assertEqual(218, library.featureCount())
 
     def test_all(self):
-        if sensorProductsRoot() is None or self.skipProductImport:
+        if speclibProductsRoot() is None or self.skipProductImport:
             return
 
         start_app()

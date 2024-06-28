@@ -6,6 +6,7 @@ import numpy as np
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.librarydriver import LibraryDriver
+from enmapboxprocessing.libraryreader import LibraryReader
 from enmapboxprocessing.typing import RegressorDump
 from qgis.core import QgsGeometry, QgsPointXY, Qgis, QgsCoordinateReferenceSystem, QgsVectorLayer, \
     QgsProcessingContext, QgsProcessingFeedback
@@ -61,7 +62,7 @@ class LibraryFromRegressionDatasetAlgorithm(EnMAPProcessingAlgorithm):
                 data.append(values)
                 if dump.locations is None:
                     # even without locations, we need to create a layer WITH geometries,
-                    # otherwise we can't properly style the layer (because it's just a table, which can't be styles)
+                    # otherwise we can't properly style the layer (because it's just a table, which can't be styled)
                     geometry = QgsGeometry.fromPointXY(QgsPointXY())
                 else:
                     geometry = QgsGeometry.fromPointXY(QgsPointXY(*dump.locations[i]))
@@ -78,6 +79,12 @@ class LibraryFromRegressionDatasetAlgorithm(EnMAPProcessingAlgorithm):
             writer.writeToSource(filename)
             library = QgsVectorLayer(filename)
             assert library.isValid()
+
+            if not crs.authid() == library.crs().authid():
+                reader = LibraryReader(writer.library)
+                data = list(reader.data())
+                assert 0
+
             assert crs.authid() == library.crs().authid()
 
             result = {self.P_OUTPUT_LIBRARY: filename}
