@@ -716,15 +716,15 @@ class Utils(object):
 
     @classmethod
     def wavelengthUnitsShortName(cls, units: str) -> Optional[str]:
-        if units.lower() in ['nm', 'nanometers']:
+        if units.lower() in ['nm', 'nanometers', 'nanometer']:
             return 'nm'
-        elif units.lower() in ['μm', 'um', 'micrometers']:
+        elif units.lower() in ['μm', 'um', 'micrometers', 'micrometer']:
             return 'μm'
-        elif units.lower() in ['mm', 'millimeters']:
+        elif units.lower() in ['mm', 'millimeters', 'millimeter']:
             return 'mm'
-        elif units.lower() in ['cm', 'centimeters']:
+        elif units.lower() in ['cm', 'centimeters', 'centimeter']:
             return 'cm'
-        elif units.lower() in ['m', 'meters']:
+        elif units.lower() in ['m', 'meters', 'meter']:
             return 'm'
         else:
             warn(f'unknown wavelength unit: {units}')
@@ -732,15 +732,15 @@ class Utils(object):
 
     @classmethod
     def wavelengthUnitsLongName(cls, units: str) -> Optional[str]:
-        if units.lower() in ['nm', 'nanometers']:
+        if units.lower() in ['nm', 'nanometers', 'nanometer']:
             return 'Nanometers'
-        elif units.lower() in ['μm', 'um', 'micrometers']:
+        elif units.lower() in ['μm', 'um', 'micrometers', 'micrometer']:
             return 'Micrometers'
-        elif units.lower() in ['mm', 'millimeters']:
+        elif units.lower() in ['mm', 'millimeters', 'millimeter']:
             return 'Millimeters'
-        elif units.lower() in ['cm', 'centimeters']:
+        elif units.lower() in ['cm', 'centimeters', 'centimeter']:
             return 'Centimeters'
-        elif units.lower() in ['m', 'meters']:
+        elif units.lower() in ['m', 'meters', 'meter']:
             return 'Meters'
         else:
             warn(f'unknown wavelength unit: {units}')
