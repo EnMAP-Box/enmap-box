@@ -149,7 +149,11 @@ class ClassifierDump(object):
         check_type('categories', self.categories, Optional[Categories])
         check_type('features', self.features, Optional[List[str]])
         check_type('X', self.X, Optional[SampleX])
+        if self.X is not None:
+            assert self.X.ndim == 2
         check_type('y', self.y, Optional[SampleY])
+        if self.y is not None:
+            assert self.y.ndim == 2
         if self.locations is not None:
             assert self.locations.ndim == 2
             assert self.locations.shape[1] == 2
@@ -193,7 +197,8 @@ class ClassifierDump(object):
                 d['y'] = np.array(d['y'])
             d['classifier'] = None
             if 'locations' in d:
-                d['locations'] = np.array(d['locations'])
+                if d['locations'] is not None:
+                    d['locations'] = np.array(d['locations'])
         else:
             raise ValueError('wrong file extension, only "pkl" or "json" is supported')
 
@@ -208,23 +213,44 @@ class RegressorDump(object):
     X: Optional[SampleX]
     y: Optional[SampleY]
     regressor: Optional[Union[RegressorMixin, Pipeline]] = None
+    locations: Optional[np.ndarray] = None
+    crs: Optional[str] = None
 
     def __post_init__(self):
         check_type('targets', self.targets, Optional[Targets])
         check_type('features', self.features, Optional[List[str]])
         check_type('X', self.X, Optional[SampleX])
+        if self.X is not None:
+            assert self.X.ndim == 2
         check_type('y', self.y, Optional[SampleY])
+        if self.y is not None:
+            assert self.y.ndim == 2
+        if self.locations is not None:
+            assert self.locations.ndim == 2
+            assert self.locations.shape[1] == 2
         try:
             check_type('regressor', self.regressor, Optional[Union[RegressorMixin, Pipeline]])
         except Exception:
             from sklearn.base import is_regressor
             if not is_regressor(self.regressor):
                 raise TypeError('regressor is not a valid scikit-learn regressor')
+        check_type('crs', self.crs, Optional[str])
+
+    def write(self, filename: str):
+        from enmapboxprocessing.utils import Utils
+        if filename.endswith('.pkl'):
+            Utils.pickleDump(self.__dict__, filename)
+        elif filename.endswith('.json'):
+            Utils.jsonDump(self.__dict__, filename)
+        else:
+            raise ValueError('wrong file extension, use "pkl" or "json"')
 
     @staticmethod
     def fromDict(d: Dict):
         return RegressorDump(
-            d.get('targets'), d.get('features'), d.get('X'), d.get('y'), d.get('regressor'))
+            d.get('targets'), d.get('features'), d.get('X'), d.get('y'), d.get('regressor'), d.get('locations'),
+            d.get('crs')
+        )
 
     @classmethod
     def fromFile(cls, filename: str):
@@ -237,19 +263,13 @@ class RegressorDump(object):
             d['X'] = np.array(d['X'])
             d['y'] = np.array(d['y'])
             d['regressor'] = None
+            if 'locations' in d:
+                if d['locations'] is not None:
+                    d['locations'] = np.array(d['locations'])
         else:
             raise ValueError('wrong file extension, only "pkl" or "json" is supported')
 
         return cls.fromDict(d)
-
-    def write(self, filename: str):
-        from enmapboxprocessing.utils import Utils
-        if filename.endswith('.pkl'):
-            Utils.pickleDump(self.__dict__, filename)
-        elif filename.endswith('.json'):
-            Utils.jsonDump(self.__dict__, filename)
-        else:
-            raise ValueError('wrong file extension, use "pkl" or "json"')
 
 
 @typechecked

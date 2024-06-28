@@ -1,3 +1,7 @@
+from enmapbox import initAll
+from enmapbox.testing import start_app
+from enmapboxprocessing.algorithm.libraryfromclassificationdatasetalgorithm import \
+    LibraryFromClassificationDatasetAlgorithm
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedvectoralgorithm import \
     PrepareClassificationDatasetFromCategorizedVectorAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
@@ -5,11 +9,15 @@ from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import points_in_no_data_region, enmap, landcover_polygon, landcover_point, enmap_potsdam, \
     landcover_potsdam_polygon
+from qgis.core import QgsVectorLayer
 
 
 class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
 
     def test_styled_poly(self):
+        start_app()
+        initAll()
+
         alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
@@ -28,8 +36,22 @@ class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
             ['roof', 'pavement', 'low vegetation', 'tree', 'soil', 'water'], [c.name for c in dump.categories]
         )
 
+        # check locations
+        alg = LibraryFromClassificationDatasetAlgorithm()
+        parameters = {
+            alg.P_DATASET: self.filename('sample.pkl'),
+            alg.P_OUTPUT_LIBRARY: self.filename('library.gpkg')
+        }
+        self.runalg(alg, parameters)
+        self.assertEqual(
+            383997,
+            round(QgsVectorLayer(self.filename('library.gpkg')).getFeatures().__next__().geometry().asPoint().x())
+        )
+
     def test_styled_point(self):
-        return
+        start_app()
+        initAll()
+
         alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
@@ -46,6 +68,18 @@ class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
         self.assertListEqual([1, 2, 3, 4, 5], [c.value for c in dump.categories])
         self.assertListEqual(
             ['impervious', 'low vegetation', 'tree', 'soil', 'water'], [c.name for c in dump.categories]
+        )
+
+        # check locations
+        alg = LibraryFromClassificationDatasetAlgorithm()
+        parameters = {
+            alg.P_DATASET: self.filename('sample.pkl'),
+            alg.P_OUTPUT_LIBRARY: self.filename('library.gpkg')
+        }
+        self.runalg(alg, parameters)
+        self.assertEqual(
+            385857,
+            round(QgsVectorLayer(self.filename('library.gpkg')).getFeatures().__next__().geometry().asPoint().x())
         )
 
     def test_field_poly(self):
@@ -96,7 +130,6 @@ class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
         self.assertEqual((1, 1), dump.y.shape)
 
     def test_saveAsJson(self):
-        return
         alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,

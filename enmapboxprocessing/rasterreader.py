@@ -785,16 +785,17 @@ class RasterReader(object):
 
             # check R terra (see #907)
             if self.terraMetadata is not None:
-                if self.terraMetadata['timestep'] == 'days':
-                    year, month, day = self.terraMetadata['time'][bandNo - 1].split('-')
-                    return QDateTime(QDate(int(year), int(month), int(day)))
-                elif self.terraMetadata['timestep'] == 'seconds':
-                    tmp1, tmp2 = self.terraMetadata['time'][bandNo - 1].split(' ')
-                    year, month, day = tmp1.split('-')
-                    hour, minute, second = tmp2.split(':')
-                    return QDateTime(int(year), int(month), int(day), int(hour), int(minute), int(second))
-                else:
-                    raise NotImplementedError(self.terraMetadata['timestep'])
+                if 'time' in self.terraMetadata and 'timestep' in self.terraMetadata:
+                    if self.terraMetadata['timestep'] == 'days':
+                        year, month, day = self.terraMetadata['time'][bandNo - 1].split('-')
+                        return QDateTime(QDate(int(year), int(month), int(day)))
+                    elif self.terraMetadata['timestep'] == 'seconds':
+                        tmp1, tmp2 = self.terraMetadata['time'][bandNo - 1].split(' ')
+                        year, month, day = tmp1.split('-')
+                        hour, minute, second = tmp2.split(':')
+                        return QDateTime(int(year), int(month), int(day), int(hour), int(minute), int(second))
+                    else:
+                        raise NotImplementedError(self.terraMetadata['timestep'])
 
         # check STAC
         dateTime = self.stacMetadata['properties']['envi:metadata'].get('acquisition_time')
