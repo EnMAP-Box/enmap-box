@@ -49,3 +49,5 @@ hubdc/gis/
 *.gpkg-wal
 enmapbox/enmapboxexampledata.zip
 *.pkl
+scripts/changelog/fetch_issues.bat
+scripts/changelog/fetch_issues.txt
