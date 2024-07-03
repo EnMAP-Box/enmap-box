@@ -108,7 +108,9 @@ with open(filename, 'w') as file:
                 file.write(f'* {issue["title"]} [#{issue["number"]}]({issue["url"]})\n')
 
         file.write('### Fixed Bugs\n')
+        file.write('<details><summary>Show all</summary>\n\n')
         for issue in fixesByVersion[version]:
             file.write(f'* {issue["title"]} [#{issue["number"]}]({issue["url"]})\n')
+        file.write('</details>\n\n')
 
 print('done!')
