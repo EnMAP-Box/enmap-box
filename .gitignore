@@ -51,3 +51,5 @@ enmapbox/enmapboxexampledata.zip
 *.pkl
 scripts/changelog/fetch_issues.bat
 scripts/changelog/fetch_issues.txt
+scripts/changelog/fetch_releases.txt
+scripts/changelog/ISSUES.md
