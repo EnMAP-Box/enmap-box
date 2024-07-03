@@ -777,9 +777,25 @@ class RasterReader(object):
             dateTime = self.metadataItem('NETCDF_DIM_time', '', bandNo)
 
             if dateTime is not None:
-                dateTimeUnit = self.metadataItem('time#units')
-                if dateTimeUnit == 'days since 1970-1-1':
-                    return QDateTime(QDate(1970, 1, 1)).addDays(int(dateTime))
+                dateTimeUnit = self.metadataItem('time#units')  # e.g. 'days since 1970-01-01 00:00:00'
+                unit, _, datestamp, *tmp = dateTimeUnit.split(' ')
+                if len(tmp) == 0:
+                    tmp = ['00:00:00']
+                hours, minutes, seconds = tmp[0].split(':')
+                years, months, days = datestamp.split('-')
+                dateTime0 = QDateTime(int(years), int(months), int(days), int(hours), int(minutes), int(seconds))
+                if unit == 'seconds':
+                    return dateTime0.addSecs(int(dateTime))
+                elif unit == 'minutes':
+                    return dateTime0.addSecs(int(dateTime) * 60)
+                elif unit == 'hours':
+                    return dateTime0.addSecs(int(dateTime) * 60 * 60)
+                elif unit == 'days':
+                    return dateTime0.addDays(int(dateTime))
+                elif unit == 'months':
+                    return dateTime0.addMonths(int(dateTime))
+                elif unit == 'years':
+                    return dateTime0.addYears(int(dateTime))
                 else:
                     raise NotImplementedError(dateTimeUnit)
 

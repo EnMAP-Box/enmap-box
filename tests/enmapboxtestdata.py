@@ -265,6 +265,7 @@ engeomap_gamsberg_field_library = join(_root, _subdir, 'engeomap', 'gamsberg_fie
 engeomap_gamesberg_field_library_color_mod = join(_root, _subdir, 'engeomap', 'gamesberg_field_library_color_mod.csv')
 r_terra_timeseries_days = join(_root, _subdir, 'r_terra', 'Unevenly_spaced_time_series_R_terra.tif')
 r_terra_timeseries_seconds = join(_root, _subdir, 'r_terra', 'Unevenly_spaced_time_series_seconds_R_terra.tif')
+netCDF_timeseries_days = join(_root, _subdir, 'netcdf', 'Unevenly_spaced_time_series.nc')
 
 del _subdir, _root, _pklversion
 
