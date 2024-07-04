@@ -795,7 +795,9 @@ class ProcessorTraining:
                         # Update progress bar
                         if prgbar_widget:
                             if prgbar_widget.gui.lblCancel.text() == "-1":
+                                print(prgbar_widget.gui.lblCancel.text())
                                 prgbar_widget.gui.lblCancel.setText("1")
+                                print(prgbar_widget.gui.lblCancel.text())
                                 prgbar_widget.gui.cmdCancel.setDisabled(False)
                                 raise ValueError("Training cancelled!")
 
@@ -1046,7 +1048,7 @@ class ProcessorPrediction:
                           'GBR': {'name': 'gbr', 'file_ext': '.gbr', 'file_name': 'gbr_mlp'}}
 
     def prediction_setup(self, model_meta, img_in, res_out, out_mode, mask_ndvi, ndvi_thr, ndvi_bands, mask_image,
-                         geo_in, spatial_geo, paras, algorithm, fixed_geos=None, nodat=None):
+                         geo_in, spatial_geo, paras, algorithm, gpr_flag, fixed_geos=None, nodat=None):
         # Setting up everything for the prediction
 
         self.model_meta = model_meta
@@ -1065,6 +1067,9 @@ class ProcessorPrediction:
         self.spatial_geo = spatial_geo
         self.paras = paras  # Which PROSAIL parameters should be estimated? LAI, ALIA, cab, cm
         self.algorithm = algorithm
+        self.gpr_flag = gpr_flag
+        if self.gpr_flag is True:
+            self.res_out_std = str(os.path.splitext(self.res_out)[0] + '_std' + os.path.splitext(self.res_out)[1])
 
         if fixed_geos is None:  # no fixed geo for the image
             self.tts_unique, self.tto_unique, self.psi_unique = [None, None, None]
@@ -1097,7 +1102,7 @@ class ProcessorPrediction:
             self.exclude_bands = []
 
         if prg_widget:
-            prg_widget.gui.lblCaption_r.setText('Reading Geometry Image...')
+            prg_widget.gui.lblCaption_r.setText('Reading Geometry...')
             qgis_app.processEvents()
 
         # SZA, OZA, rAA: angles * 100 (e.g. SZA 4500 = 45°)
@@ -1162,12 +1167,17 @@ class ProcessorPrediction:
         # self.predict does the actual prediction and returns a matrix that overwrites self.out_matrix
         # it seems confusing to prepare a matrix and then overwrite it, but self.predict needs self.out_matrix
         # as an argument!
-        self.out_matrix = self.predict(image=in_matrix, whichModel_coords=whichModel_coords, out_matrix=self.out_matrix,
+        self.out_matrix, self.out_matrix_std = self.predict(image=in_matrix, whichModel_coords=whichModel_coords, out_matrix=self.out_matrix,
                                        prg_widget=prg_widget, qgis_app=qgis_app)
 
     def write_prediction(self):
         # Write the estimated parameters to file
         self.m.func.write_image(out_matrix=self.out_matrix, image_out=self.res_out, grid=self.grid,
+                                out_mode=self.out_mode, nodat=self.nodat[2], paras_out=self.paras)
+
+    def write_prediction_std(self):
+        # Write the estimated parameters to file
+        self.m.func.write_image(out_matrix=self.out_matrix_std, image_out=self.res_out_std, grid=self.grid,
                                 out_mode=self.out_mode, nodat=self.nodat[2], paras_out=self.paras)
 
     def predict(self, image, whichModel_coords, out_matrix, prg_widget, qgis_app):
@@ -1180,6 +1190,8 @@ class ProcessorPrediction:
         # We need to "collapse" the second dimension and create one long dim as follows:
         image = image.reshape((nbands, -1))  # collapse rows and cols into 1 dimension
         image = np.swapaxes(image, 0, 1)  # place predictors into the right position (where sklearn expects them)
+
+        out_matrix_std = None
 
         # Do this for each PROSAIL parameter after another
         for ipara, para in enumerate(self.paras):
@@ -1227,17 +1239,22 @@ class ProcessorPrediction:
                 if isinstance(mod[imodel], GaussianProcessRegressor):
                     result, result_std = mod[imodel].predict(image_copy[whichModel_coords[i_imodel][0],
                                                  whichModel_coords[i_imodel][1], :], return_std=True)
+                    out_matrix_std = np.copy(out_matrix)
+                    out_matrix_std[ipara, whichModel_coords[i_imodel][0], whichModel_coords[i_imodel][
+                        1]] = result_std
+
                 else:
                     # This is the core "predict" command in which the algorithm is asked to estimate from what it has learnt
                     result = mod[imodel].predict(image_copy[whichModel_coords[i_imodel][0],
                                              whichModel_coords[i_imodel][1], :])
 
+                out_matrix[ipara, whichModel_coords[i_imodel][0], whichModel_coords[i_imodel][
+                        1]] = result  # / self.m.func.conv[para][2]
+
                 # Convert the results and put it into the right position
                 # out_matrix[parameter, row, col], row and col is stored in the coordinates of whichModel
-                out_matrix[ipara, whichModel_coords[i_imodel][0], whichModel_coords[i_imodel][
-                    1]] = result  # / self.m.func.conv[para][2]
 
-        return out_matrix
+        return out_matrix, out_matrix_std
 
 
 # Some basic functions are placed in this class

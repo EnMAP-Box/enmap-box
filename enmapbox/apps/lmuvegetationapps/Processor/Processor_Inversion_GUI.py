@@ -100,7 +100,7 @@ class MLInversion:
         self.out_image = None  # File for output results
         self.out_mode = 'single'  # 'single' all PROSAIL parameters in one file as bands, 'individual' one file per para
 
-        self.geo_mode = "file"  # Is the geometry (SZA, OZA, rAA) suplied through 'file' or are they 'fix'
+        self.geo_mode = "fix"  # Is the geometry (SZA, OZA, rAA) suplied through 'file' or are they 'fix'
         self.geo_file = None  # if geo_mode == 'file', which is the path?
         self.geo_fixed = [None]*3  # if geo_mode == 'fix', which are the three geometry angles?
 
@@ -112,6 +112,7 @@ class MLInversion:
         self.gui.mLayerMask.setLayer(None)
 
         self.algorithm = None
+        self.gpr_flag = False
 
         # Initial Model is set to EnMAP as default
         self.model_meta_file = os.path.join(APP_DIR, 'Resources/Processor/EnMAP.meta')
@@ -313,6 +314,8 @@ class MLInversion:
                 return
             self.meta_dict = self._get_processor_meta(file=result)
             self.algorithm = self.meta_dict['alg']
+            if self.algorithm == 'GPR':
+                self.gpr_flag = True
 
             targets = self.meta_dict.get('target_parameters')
             if isinstance(targets, str):
@@ -628,7 +631,7 @@ class MLInversion:
                                                mask_ndvi=self.mask_ndvi, ndvi_thr=self.ndvi_thr,
                                                ndvi_bands=self.ndvi_bands, mask_image=self.mask_image,
                                                geo_in=self.geo_file, fixed_geos=self.geo_fixed,
-                                               spatial_geo=self.spatial_geo, paras=self.paras)
+                                               spatial_geo=self.spatial_geo, paras=self.paras, gpr_flag=self.gpr_flag)
         except ValueError as e:
             self.abort(message="Failed to setup inversion: {}".format(str(e)))
             return
@@ -655,6 +658,9 @@ class MLInversion:
         except ValueError as e:
             self.abort(message="An error occurred while trying to write output-image: {}".format(str(e)))
             return
+
+        if self.gpr_flag is True:
+            proc.predict_main.write_prediction_std()
 
         self.prg_widget.gui.lblCancel.setText("")
         self.prg_widget.gui.allow_cancel = True
