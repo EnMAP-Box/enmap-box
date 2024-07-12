@@ -1,4 +1,5 @@
 import json
+import warnings
 from collections import defaultdict
 from os.path import abspath, join
 
@@ -23,6 +24,9 @@ fixesByVersion = defaultdict(list)
 for issue in issues:
     if not issue['closed']:
         continue
+    if len(issue['labels']) == 0:
+        if '/pull/' not in issue['url']:
+            warnings.warn('Closed issue has no labels: ' + issue['url'])
     if issue['milestone'] is None:
         continue
     milestone = issue['milestone']['title']
