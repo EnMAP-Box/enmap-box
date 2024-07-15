@@ -5,7 +5,7 @@ MAINTAINER Benjamin Jakimow <benjamin.jakimow@geo.hu-berlin.de>
 LABEL Description="Docker container with QGIS + EnMAP-Box" Vendor="enmap.org"
 
 RUN apt-get update
-RUN apt-get -y install pyqt5-dev-tools
+RUN apt-get -y install pyqt5-dev-tools python3-pip python3-venv
 #RUN apt-get -y install python3-pip python3-venv pyqt5-dev-tools python3-matplotlib \
 #    python3-h5py python3-pyqt5.qtopengl python3-netcdf4
 
