@@ -7,7 +7,7 @@
 gitpython
 git-lfs
 
-pytest
+pytest>= 8.0.0
 pytest-env
 pytest-cov
 pytest-xdist # parallel testing
