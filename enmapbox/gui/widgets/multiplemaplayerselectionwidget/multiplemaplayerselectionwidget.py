@@ -1,19 +1,18 @@
 from typing import List, Optional
 
-from qgis.PyQt.uic import loadUi
-
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QWidget, QLineEdit, QToolButton, QListWidget, QListWidgetItem, QDialog
-from qgis.core import QgsMapLayer, QgsProject, QgsCoordinateReferenceSystem, QgsRasterLayer, QgsVectorLayer
 from enmapbox.typeguard import typechecked
+from qgis.PyQt.QtCore import Qt, pyqtSignal
+from qgis.PyQt.QtWidgets import QWidget, QLineEdit, QToolButton, QListWidget, QListWidgetItem, QDialog
+from qgis.PyQt.uic import loadUi
+from qgis.core import QgsMapLayer, QgsProject, QgsCoordinateReferenceSystem, QgsRasterLayer, QgsVectorLayer
 
 
 @typechecked
 class MultipleMapLayerSelectionWidget(QWidget):
     mInfo: QLineEdit
     mButton: QToolButton
-
     mLayers: List[QgsMapLayer]
+    sigLayersChanged = pyqtSignal()
 
     def __init__(self, parent=None, allowRaster=True, allowVector=True):
         QWidget.__init__(self, parent)
@@ -29,6 +28,12 @@ class MultipleMapLayerSelectionWidget(QWidget):
 
         self.updateInfo()
 
+    def setAllowRaster(self, bool):
+        self.allowRaster = bool
+
+    def setAllowVector(self, bool):
+        self.allowVector = bool
+
     def currentLayers(self) -> List[QgsMapLayer]:
         return list(self.mLayers)
 
@@ -37,6 +42,7 @@ class MultipleMapLayerSelectionWidget(QWidget):
 
     def updateInfo(self):
         self.mInfo.setText(f'{len(self.mLayers)} layers selected')
+        self.sigLayersChanged.emit()
 
     def onButtonClicked(self):
         layers = MultipleMapLayerSelectionDialog.getLayers(
