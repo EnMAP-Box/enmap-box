@@ -1,12 +1,13 @@
 from sklearn.base import ClassifierMixin
 
+from enmapbox import initAll
+from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.classificationworkflowalgorithm import ClassificationWorkflowAlgorithm
-from enmapboxprocessing.algorithm.fitcatboostclassifieralgorithm import FitCatBoostClassifierAlgorithm
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedvectoralgorithm import \
     PrepareClassificationDatasetFromCategorizedVectorAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxtestdata import classifierDumpPkl
+from enmapboxtestdata import classifierDumpPkl, landcover_berlin_point
 from enmapboxtestdata import enmap, landcover_potsdam_point, enmap_potsdam
 
 
@@ -27,7 +28,7 @@ class FitTestClassifierAlgorithm(FitClassifierAlgorithmBase):
         return classifier
 
 
-class TestClassificationAlgorithm(TestCase):
+class TestClassificationWorkflowAlgorithm(TestCase):
 
     def test(self):
         alg = ClassificationWorkflowAlgorithm()
@@ -44,7 +45,7 @@ class TestClassificationAlgorithm(TestCase):
         }
         self.runalg(alg, parameters)
 
-    def _DISABLED_test_trainingOnly(self):
+    def test_trainingOnly(self):
         alg = ClassificationWorkflowAlgorithm()
         parameters = {
             alg.P_DATASET: classifierDumpPkl,
@@ -97,14 +98,26 @@ class TestClassificationAlgorithm(TestCase):
         }
         self.runalg(alg2, parameters2)
 
-    def _test_issue790(self):
+    def test_areaEstimates(self):
+        start_app()
+        initAll()
+
+        alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
+        parameters = {
+            alg.P_FEATURE_RASTER: enmap,
+            alg.P_CATEGORIZED_VECTOR: landcover_berlin_point,
+            alg.P_OUTPUT_DATASET: self.filename('dataset.pkl')
+        }
+        self.runalg(alg, parameters)
+
         alg = ClassificationWorkflowAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
-            alg.P_CLASSIFIER: FitCatBoostClassifierAlgorithm().defaultCodeAsString(),
+            alg.P_DATASET: self.filename('dataset.pkl'),
+            alg.P_CLASSIFIER: FitTestClassifierAlgorithm().defaultCodeAsString(),
             alg.P_RASTER: enmap,
             alg.P_OPEN_REPORT: self.openReport,
             alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl'),
             alg.P_OUTPUT_CLASSIFICATION: self.filename('classification.tif'),
+            alg.P_OUTPUT_REPORT2: self.filename('report2.html')
         }
         self.runalg(alg, parameters)

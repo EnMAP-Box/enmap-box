@@ -777,24 +777,41 @@ class RasterReader(object):
             dateTime = self.metadataItem('NETCDF_DIM_time', '', bandNo)
 
             if dateTime is not None:
-                dateTimeUnit = self.metadataItem('time#units')
-                if dateTimeUnit == 'days since 1970-1-1':
-                    return QDateTime(QDate(1970, 1, 1)).addDays(int(dateTime))
+                dateTimeUnit = self.metadataItem('time#units')  # e.g. 'days since 1970-01-01 00:00:00'
+                unit, _, datestamp, *tmp = dateTimeUnit.split(' ')
+                if len(tmp) == 0:
+                    tmp = ['00:00:00']
+                hours, minutes, seconds = tmp[0].split(':')
+                years, months, days = datestamp.split('-')
+                dateTime0 = QDateTime(int(years), int(months), int(days), int(hours), int(minutes), int(seconds))
+                if unit == 'seconds':
+                    return dateTime0.addSecs(int(dateTime))
+                elif unit == 'minutes':
+                    return dateTime0.addSecs(int(dateTime) * 60)
+                elif unit == 'hours':
+                    return dateTime0.addSecs(int(dateTime) * 60 * 60)
+                elif unit == 'days':
+                    return dateTime0.addDays(int(dateTime))
+                elif unit == 'months':
+                    return dateTime0.addMonths(int(dateTime))
+                elif unit == 'years':
+                    return dateTime0.addYears(int(dateTime))
                 else:
                     raise NotImplementedError(dateTimeUnit)
 
             # check R terra (see #907)
             if self.terraMetadata is not None:
-                if self.terraMetadata['timestep'] == 'days':
-                    year, month, day = self.terraMetadata['time'][bandNo - 1].split('-')
-                    return QDateTime(QDate(int(year), int(month), int(day)))
-                elif self.terraMetadata['timestep'] == 'seconds':
-                    tmp1, tmp2 = self.terraMetadata['time'][bandNo - 1].split(' ')
-                    year, month, day = tmp1.split('-')
-                    hour, minute, second = tmp2.split(':')
-                    return QDateTime(int(year), int(month), int(day), int(hour), int(minute), int(second))
-                else:
-                    raise NotImplementedError(self.terraMetadata['timestep'])
+                if 'time' in self.terraMetadata and 'timestep' in self.terraMetadata:
+                    if self.terraMetadata['timestep'] == 'days':
+                        year, month, day = self.terraMetadata['time'][bandNo - 1].split('-')
+                        return QDateTime(QDate(int(year), int(month), int(day)))
+                    elif self.terraMetadata['timestep'] == 'seconds':
+                        tmp1, tmp2 = self.terraMetadata['time'][bandNo - 1].split(' ')
+                        year, month, day = tmp1.split('-')
+                        hour, minute, second = tmp2.split(':')
+                        return QDateTime(int(year), int(month), int(day), int(hour), int(minute), int(second))
+                    else:
+                        raise NotImplementedError(self.terraMetadata['timestep'])
 
         # check STAC
         dateTime = self.stacMetadata['properties']['envi:metadata'].get('acquisition_time')

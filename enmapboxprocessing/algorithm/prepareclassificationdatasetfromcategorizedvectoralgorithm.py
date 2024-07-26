@@ -118,14 +118,17 @@ class PrepareClassificationDatasetFromCategorizedVectorAlgorithm(EnMAPProcessing
             classification = QgsRasterLayer(result[alg.P_OUTPUT_CATEGORIZED_RASTER])
             categories = Utils.categoriesFromPalettedRasterRenderer(classification.renderer())
             feedback.pushInfo('Sample data')
-            X, y, goodBandNumbers = PrepareClassificationDatasetFromCategorizedRasterAlgorithm.sampleData(
+            X, y, goodBandNumbers, locations = PrepareClassificationDatasetFromCategorizedRasterAlgorithm.sampleData(
                 raster, classification, 1, categories, excludeBadBands, feedback
             )
             reader = RasterReader(raster)
             features = [reader.bandName(bandNo) for bandNo in goodBandNumbers]
             feedback.pushInfo(f'Sampled data: X=array{list(X.shape)} y=array{list(y.shape)}')
 
-            dump = ClassifierDump(categories=categories, features=features, X=X, y=y)
+            dump = ClassifierDump(
+                categories=categories, features=features, X=X, y=y, locations=locations,
+                crs=classification.crs().toWkt()
+            )
             dump.write(filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
