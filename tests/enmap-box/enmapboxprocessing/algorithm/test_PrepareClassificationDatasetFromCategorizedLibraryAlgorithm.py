@@ -10,6 +10,8 @@ from enmapboxtestdata import library_gpkg, libraryWithBadBands
 from qgis.core import QgsPointXY, QgsGeometry, QgsVectorLayer, QgsMapLayer, QgsCoordinateReferenceSystem, \
     QgsProcessingException
 
+start_app()
+
 
 class TestPrepareClassificationDatasetFromCategorizedLibrary(TestCase):
 
@@ -93,7 +95,7 @@ class TestPrepareClassificationDatasetFromCategorizedLibrary(TestCase):
         start_app()
         initAll()
 
-        # create data
+        # create datagit
         values = {'profiles': {'y': [1, 2, 3]}, 'class': 1}
         geometry = QgsGeometry.fromPointXY(QgsPointXY(1, 2))
         writer = LibraryDriver().createFromData([values], [geometry])
