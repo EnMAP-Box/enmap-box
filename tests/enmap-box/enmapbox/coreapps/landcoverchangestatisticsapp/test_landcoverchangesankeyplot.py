@@ -52,14 +52,14 @@ class TestEnviUtils(TestCase):
         )
         self.assertListEqual([[1, 3, 5, 6], [6, 8, 10, 16]], newMatrix.tolist())
         self.assertListEqual(
-            [Category(value=1, name='1', color='#000000'), Category(value=-0.1, name='Rest', color='#ff0000')],
+            [Category(value=1, name='1', color='#000000'), Category(value=-0.1, name='Discarded', color='#ff0000')],
             newCategories1
         )
         self.assertListEqual(
             [Category(value=1, name='1', color='#000000'),
              Category(value=3, name='3', color='#000000'),
              Category(value=5, name='5', color='#000000'),
-             Category(value=-0.1, name='Rest', color='#ff0000')],
+             Category(value=-0.1, name='Discarded', color='#ff0000')],
             newCategories2
         )
 
