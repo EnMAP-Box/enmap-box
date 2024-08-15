@@ -112,7 +112,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     ) -> Dict[str, Any]:
         raise NotImplementedError()
 
-    def parameterDefinition(self, name: str) -> QgsProcessingParameterDefinition:
+    def parameterDefinition(self, name: str) -> Optional[QgsProcessingParameterDefinition]:
         parameter = super().parameterDefinition(name)
         # assert parameter is not None, name
         return parameter
