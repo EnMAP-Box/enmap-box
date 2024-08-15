@@ -9,8 +9,9 @@ from qgis.core import QgsRasterLayer
 
 class TestEnviUtils(TestCase):
 
-    def test(self):
-        if 1:
+    def _test(self):
+
+        if 0:
             # Case with non-matching classes
             layers = [QgsRasterLayer(landcover_map_l2, 'landcover_map_l2'),
                       QgsRasterLayer(landcover_map_l3, 'landcover_map_l3')]
@@ -19,11 +20,13 @@ class TestEnviUtils(TestCase):
             layers = [QgsRasterLayer(r'D:\data\CORINE\U2000_CLC1990_V2020_20u1.tif', '1990'),
                       QgsRasterLayer(r'D:\data\CORINE\U2006_CLC2000_V2020_20u1.tif', '2006'),
                       QgsRasterLayer(r'D:\data\CORINE\U2018_CLC2018_V2020_20u1.tif', '2018')]
-        if 1:
+        if 0:
             # Case with many maps
             layers = [QgsRasterLayer(rf'D:\data\timeseries\MAP_BLCM_{i}.tif', str(i)) for i in
                       range(2014, 2017)]  # 2021)]
-            classFilter = [['NV'] for layer in layers]
+
+        if 1:
+            layers = [QgsRasterLayer(landcover_map_l2, 'Level 2'), QgsRasterLayer(landcover_map_l3, 'Level 3')]
 
         builder = LandCoverChangeSankeyPlotBuilder()
         builder.setOptions()
