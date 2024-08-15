@@ -14,12 +14,15 @@ class MultipleMapLayerSelectionWidget(QWidget):
     mLayers: List[QgsMapLayer]
     sigLayersChanged = pyqtSignal()
 
-    def __init__(self, parent=None, allowRaster=True, allowVector=True):
+    ShortInfo, LongInfo = 0, 1
+
+    def __init__(self, parent=None, allowRaster=True, allowVector=True, infoType=ShortInfo):
         QWidget.__init__(self, parent)
         loadUi(__file__.replace('.py', '.ui'), self)
 
         self.allowRaster = allowRaster
         self.allowVector = allowVector
+        self.infoType = infoType
 
         self.mLayers = list()
 
@@ -34,14 +37,24 @@ class MultipleMapLayerSelectionWidget(QWidget):
     def setAllowVector(self, bool):
         self.allowVector = bool
 
+    def setInfoType(self, infoType: int):
+        self.infoType = infoType
+        self.updateInfo()
+
     def currentLayers(self) -> List[QgsMapLayer]:
         return list(self.mLayers)
 
     def setCurrentLayers(self, layers: List[QgsMapLayer]):
         self.mLayers = list(layers)
+        self.updateInfo()
 
     def updateInfo(self):
-        self.mInfo.setText(f'{len(self.mLayers)} layers selected')
+        if self.infoType == self.ShortInfo:
+            self.mInfo.setText(f'{len(self.mLayers)} layers selected')
+        elif self.infoType == self.LongInfo:
+            self.mInfo.setText(', '.join([layer.name() for layer in self.mLayers]))
+        else:
+            raise ValueError()
         self.sigLayersChanged.emit()
 
     def onButtonClicked(self):

@@ -1,6 +1,7 @@
 from enmapbox.gui.applications import EnMAPBoxApplication
 from enmapbox.typeguard import typechecked
-from landcoverchangestatisticsapp.landcoverchangestatisticsdialog import LandCoverChangeStatisticsDialog
+from landcoverchangestatisticsapp.landcoverchangestatisticsmainwindow import LandCoverChangeStatisticsMainWindow
+
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu
 
@@ -27,9 +28,9 @@ class LandCoverChangeStatisticsApp(EnMAPBoxApplication):
         return 'Land Cover Change Statistics'
 
     def menu(self, appMenu: QMenu):
-        a = self.utilsAddActionInAlphanumericOrder(self.enmapbox.ui.menuToolsRasterStatistics, self.title())
+        a = self.utilsAddActionInAlphanumericOrder(self.enmapbox.ui.menuApplicationsClassification, self.title())
         a.triggered.connect(self.startGUI)
 
     def startGUI(self):
-        w = LandCoverChangeStatisticsDialog(parent=self.enmapbox.ui)
+        w = LandCoverChangeStatisticsMainWindow(parent=self.enmapbox.ui)
         w.show()
