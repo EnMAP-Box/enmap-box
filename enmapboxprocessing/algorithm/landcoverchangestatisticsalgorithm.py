@@ -5,7 +5,6 @@ import plotly.io as pio
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-from landcoverchangestatisticsapp.landcoverchangestatisticsmainwindow import LandCoverChangeSankeyPlotBuilder
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessing, QgsProcessingException
 
 
@@ -85,6 +84,8 @@ class LandCoverChangeStatisticsAlgorithm(EnMAPProcessingAlgorithm):
             self.tic(feedback, parameters, context)
 
             grid = classifications[0]
+            from landcoverchangestatisticsapp.landcoverchangestatisticsmainwindow import \
+                LandCoverChangeSankeyPlotBuilder
             builder = LandCoverChangeSankeyPlotBuilder()
             # builder.setTitle('Land cover change statistics')
             builder.setGrid(grid)
