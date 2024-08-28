@@ -88,7 +88,7 @@ class RandomSamplesFromRegressionDatasetAlgorithm(EnMAPProcessingAlgorithm):
                 feedback.pushInfo(f'Target: {target.name}')
                 ymin = np.min(dump.y[:, i])
                 ymax = np.max(dump.y[:, i])
-                y = np.array([int(round(v)) for v in (dump.y[:, i] - ymin) / ymax * (bins - 1)])
+                y = np.array([[int(round(v))] for v in (dump.y[:, i] - ymin) / ymax * (bins - 1)])
                 dump2 = ClassifierDump(categories, dump.features, dump.X, y)
                 indices_, _ = RandomSamplesFromClassificationDatasetAlgorithm.drawSamples(
                     N, dump2, proportional, replace, feedback

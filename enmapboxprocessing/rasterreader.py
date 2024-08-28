@@ -1,4 +1,4 @@
-from math import isnan
+from math import isnan, ceil
 from os.path import exists
 from typing import Iterable, List, Union, Optional, Tuple, Iterator
 
@@ -64,6 +64,12 @@ class RasterReader(object):
             self.stacMetadata['properties']['eo:bands'] = [{} for i in self.bandNumbers()]
         if 'envi:metadata' not in self.stacMetadata['properties']:
             self.stacMetadata['properties']['envi:metadata'] = {}
+
+        # prepare R terra (https://github.com/rspatial/terra) metadata, also see #907
+        if exists(self.layer.source() + '.aux.json'):
+            self.terraMetadata = Utils().jsonLoad(self.layer.source() + '.aux.json')
+        else:
+            self.terraMetadata = None
 
     def bandCount(self) -> int:
         """Return iterator over all band numbers."""
@@ -340,8 +346,10 @@ class RasterReader(object):
             maskArray.append(m)
         return maskArray
 
-    def pixelByPoint(self, point: QgsPointXY) -> QPoint:
-        return SpatialPoint(self.crs(), point).toPixelPosition(self.layer)
+    def pixelByPoint(self, point: Union[QgsPointXY, SpatialPoint]) -> QPoint:
+        if isinstance(point, QgsPointXY):
+            point = SpatialPoint(self.crs(), point)
+        return point.toPixelPosition(self.layer)
 
     def pixelExtent(self, pixel: QPoint) -> QgsRectangle:
         xoff = self.extent().xMinimum()
@@ -426,11 +434,17 @@ class RasterReader(object):
     def samplingWidthAndHeight(self, bandNo: int, extent=None, sampleSize: int = 0) -> Tuple[int, int]:
         """Return number of pixel for width and heigth, that approx. match the given sample size."""
 
-        # get sample width and height from empty bandStatistics
         if extent is None:
-            extent = QgsRectangle()
-        bandStats: QgsRasterBandStats = self.provider.bandStatistics(bandNo, 0, extent, sampleSize)
-        return bandStats.width, bandStats.height
+            extent = self.extent()
+
+        if sampleSize == 0:
+            width = ceil((extent.xMaximum() - extent.xMinimum()) / self.rasterUnitsPerPixelX())
+            height = ceil((extent.yMaximum() - extent.yMinimum()) / self.rasterUnitsPerPixelY())
+        else:
+            bandStats: QgsRasterBandStats = self.provider.bandStatistics(bandNo, 0, extent, sampleSize)
+            width, height = bandStats.width, bandStats.height
+
+        return width, height
 
     def sampleValues(
             self, bandNo: int, extent=None, sampleSize: int = 0,
@@ -771,11 +785,41 @@ class RasterReader(object):
             dateTime = self.metadataItem('NETCDF_DIM_time', '', bandNo)
 
             if dateTime is not None:
-                dateTimeUnit = self.metadataItem('time#units')
-                if dateTimeUnit == 'days since 1970-1-1':
-                    return QDateTime(QDate(1970, 1, 1)).addDays(int(dateTime))
+                dateTimeUnit = self.metadataItem('time#units')  # e.g. 'days since 1970-01-01 00:00:00'
+                unit, _, datestamp, *tmp = dateTimeUnit.split(' ')
+                if len(tmp) == 0:
+                    tmp = ['00:00:00']
+                hours, minutes, seconds = tmp[0].split(':')
+                years, months, days = datestamp.split('-')
+                dateTime0 = QDateTime(int(years), int(months), int(days), int(hours), int(minutes), int(seconds))
+                if unit == 'seconds':
+                    return dateTime0.addSecs(int(dateTime))
+                elif unit == 'minutes':
+                    return dateTime0.addSecs(int(dateTime) * 60)
+                elif unit == 'hours':
+                    return dateTime0.addSecs(int(dateTime) * 60 * 60)
+                elif unit == 'days':
+                    return dateTime0.addDays(int(dateTime))
+                elif unit == 'months':
+                    return dateTime0.addMonths(int(dateTime))
+                elif unit == 'years':
+                    return dateTime0.addYears(int(dateTime))
                 else:
                     raise NotImplementedError(dateTimeUnit)
+
+            # check R terra (see #907)
+            if self.terraMetadata is not None:
+                if 'time' in self.terraMetadata and 'timestep' in self.terraMetadata:
+                    if self.terraMetadata['timestep'] == 'days':
+                        year, month, day = self.terraMetadata['time'][bandNo - 1].split('-')
+                        return QDateTime(QDate(int(year), int(month), int(day)))
+                    elif self.terraMetadata['timestep'] == 'seconds':
+                        tmp1, tmp2 = self.terraMetadata['time'][bandNo - 1].split(' ')
+                        year, month, day = tmp1.split('-')
+                        hour, minute, second = tmp2.split(':')
+                        return QDateTime(int(year), int(month), int(day), int(hour), int(minute), int(second))
+                    else:
+                        raise NotImplementedError(self.terraMetadata['timestep'])
 
         # check STAC
         dateTime = self.stacMetadata['properties']['envi:metadata'].get('acquisition_time')

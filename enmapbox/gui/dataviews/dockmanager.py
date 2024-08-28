@@ -1731,7 +1731,7 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         from enmapboxprocessing.algorithm.transformrasteralgorithm import TransformRasterAlgorithm
 
         menu.addSeparator()
-        # add processing algorithm & application shortcuts
+        # add application shortcuts
         submenu = menu.addMenu(QIcon(':/images/themes/default/styleicons/color.svg'), 'Statistics and Visualization')
 
         from bandstatisticsapp import BandStatisticsApp
@@ -1818,6 +1818,18 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
                 action.triggered.connect(lambda: self.onScatterPlotClicked(lyr))
         except Exception:
             pass
+
+        # add processing algorithm shortcuts
+        submenu = menu.addMenu(QIcon(':/images/themes/default/processingAlgorithm.svg'), 'Processing Algorithm')
+
+        from enmapboxprocessing.algorithm.applymaskalgorithm import ApplyMaskAlgorithm
+        alg = ApplyMaskAlgorithm()
+        action = submenu.addAction(alg.displayName())
+        action.alg = alg
+        action.parameters = {
+            alg.P_RASTER: lyr
+        }
+        action.triggered.connect(self.onRunProcessingAlgorithmClicked)
 
         # add apply model shortcuts
         from enmapbox.gui.enmapboxgui import EnMAPBox

@@ -41,16 +41,18 @@ class Utils(object):
 
     @staticmethod
     def qgisDataTypeToNumpyDataType(dataType: Qgis.DataType) -> NumpyDataType:
-        if dataType == Qgis.DataType.Byte:
-            return np.uint8
-        elif dataType == Qgis.DataType.Float32:
+        if dataType == Qgis.DataType.Float32:
             return np.float32
         elif dataType == Qgis.DataType.Float64:
             return np.float64
+        elif dataType == Qgis.DataType.Int8:
+            return np.int8
         elif dataType == Qgis.DataType.Int16:
             return np.int16
         elif dataType == Qgis.DataType.Int32:
             return np.int32
+        elif dataType == Qgis.DataType.Byte:
+            return np.uint8
         elif dataType == Qgis.DataType.UInt16:
             return np.uint16
         elif dataType == Qgis.DataType.UInt32:
@@ -66,16 +68,18 @@ class Utils(object):
     def qgisDataTypeToGdalDataType(dataType: Optional[Qgis.DataType]) -> Optional[int]:
         if dataType is None:
             return None
-        elif dataType == Qgis.DataType.Byte:
-            return gdal.GDT_Byte
         elif dataType == Qgis.DataType.Float32:
             return gdal.GDT_Float32
         elif dataType == Qgis.DataType.Float64:
             return gdal.GDT_Float64
+        elif dataType == Qgis.DataType.Int8:
+            return gdal.GDT_Int8
         elif dataType == Qgis.DataType.Int16:
             return gdal.GDT_Int16
         elif dataType == Qgis.DataType.Int32:
             return gdal.GDT_Int32
+        elif dataType == Qgis.DataType.Byte:
+            return gdal.GDT_Byte
         elif dataType == Qgis.DataType.UInt16:
             return gdal.GDT_UInt16
         elif dataType == Qgis.DataType.UInt32:
@@ -716,15 +720,15 @@ class Utils(object):
 
     @classmethod
     def wavelengthUnitsShortName(cls, units: str) -> Optional[str]:
-        if units.lower() in ['nm', 'nanometers']:
+        if units.lower() in ['nm', 'nanometers', 'nanometer']:
             return 'nm'
-        elif units.lower() in ['μm', 'um', 'micrometers']:
+        elif units.lower() in ['μm', 'um', 'micrometers', 'micrometer']:
             return 'μm'
-        elif units.lower() in ['mm', 'millimeters']:
+        elif units.lower() in ['mm', 'millimeters', 'millimeter']:
             return 'mm'
-        elif units.lower() in ['cm', 'centimeters']:
+        elif units.lower() in ['cm', 'centimeters', 'centimeter']:
             return 'cm'
-        elif units.lower() in ['m', 'meters']:
+        elif units.lower() in ['m', 'meters', 'meter']:
             return 'm'
         else:
             warn(f'unknown wavelength unit: {units}')
@@ -732,15 +736,15 @@ class Utils(object):
 
     @classmethod
     def wavelengthUnitsLongName(cls, units: str) -> Optional[str]:
-        if units.lower() in ['nm', 'nanometers']:
+        if units.lower() in ['nm', 'nanometers', 'nanometer']:
             return 'Nanometers'
-        elif units.lower() in ['μm', 'um', 'micrometers']:
+        elif units.lower() in ['μm', 'um', 'micrometers', 'micrometer']:
             return 'Micrometers'
-        elif units.lower() in ['mm', 'millimeters']:
+        elif units.lower() in ['mm', 'millimeters', 'millimeter']:
             return 'Millimeters'
-        elif units.lower() in ['cm', 'centimeters']:
+        elif units.lower() in ['cm', 'centimeters', 'centimeter']:
             return 'Centimeters'
-        elif units.lower() in ['m', 'meters']:
+        elif units.lower() in ['m', 'meters', 'meter']:
             return 'Meters'
         else:
             warn(f'unknown wavelength unit: {units}')

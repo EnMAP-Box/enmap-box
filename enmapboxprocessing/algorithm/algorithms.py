@@ -84,9 +84,11 @@ from enmapboxprocessing.algorithm.importprismal2dalgorithm import ImportPrismaL2
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
 from enmapboxprocessing.algorithm.importusgsspeclib07algorithm import ImportUsgsSpeclib07Algorithm
 from enmapboxprocessing.algorithm.inversetransformrasteralgorithm import InverseTransformRasterAlgorithm
+from enmapboxprocessing.algorithm.landcoverchangestatisticsalgorithm import LandCoverChangeStatisticsAlgorithm
 from enmapboxprocessing.algorithm.layertomaskalgorithm import LayerToMaskAlgorithm
 from enmapboxprocessing.algorithm.libraryfromclassificationdatasetalgorithm import \
     LibraryFromClassificationDatasetAlgorithm
+from enmapboxprocessing.algorithm.libraryfromregressiondatasetalgorithm import LibraryFromRegressionDatasetAlgorithm
 from enmapboxprocessing.algorithm.mergeclassificationdatasetalgorithm import MergeClassificationDatasetsAlgorithm
 from enmapboxprocessing.algorithm.predictclassificationalgorithm import PredictClassificationAlgorithm
 from enmapboxprocessing.algorithm.predictclassprobabilityalgorithm import PredictClassPropabilityAlgorithm
@@ -320,8 +322,10 @@ def algorithms():
         ImportSentinel2L2AAlgorithm(),
         ImportUsgsSpeclib07Algorithm(),
         InverseTransformRasterAlgorithm(),
+        LandCoverChangeStatisticsAlgorithm(),
         LayerToMaskAlgorithm(),
         LibraryFromClassificationDatasetAlgorithm(),
+        LibraryFromRegressionDatasetAlgorithm(),
         MergeClassificationDatasetsAlgorithm(),
         PredictClassificationAlgorithm(),
         PredictClassPropabilityAlgorithm(),

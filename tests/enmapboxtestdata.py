@@ -263,10 +263,14 @@ envi_library_berlin_sli = join(_root, _subdir, 'envi', 'library_berlin.sli')
 engeomap_cubus_gamsberg_subset = join(_root, _subdir, 'engeomap', 'cubus_gamsberg_subset')
 engeomap_gamsberg_field_library = join(_root, _subdir, 'engeomap', 'gamsberg_field_library')
 engeomap_gamesberg_field_library_color_mod = join(_root, _subdir, 'engeomap', 'gamesberg_field_library_color_mod.csv')
+r_terra_timeseries_days = join(_root, _subdir, 'r_terra', 'Unevenly_spaced_time_series_R_terra.tif')
+r_terra_timeseries_seconds = join(_root, _subdir, 'r_terra', 'Unevenly_spaced_time_series_seconds_R_terra.tif')
+netCDF_timeseries_days = join(_root, _subdir, 'netcdf', 'Unevenly_spaced_time_series.nc')
+
 del _subdir, _root, _pklversion
 
 
-# external sensor products
+# external products
 def sensorProductsRoot() -> Optional[str]:
     # - let's have some developer-dependent default locations
     root = None
@@ -280,6 +284,23 @@ def sensorProductsRoot() -> Optional[str]:
     # - check environment variable
     if root is None:
         root = os.environ.get('ENMAPBOX_SENSOR_PRODUCT_ROOT')
+
+    return root
+
+
+def speclibProductsRoot() -> Optional[str]:
+    # - let's have some developer-dependent default locations
+    root = None
+    try:
+        root = {
+            'Andreas@PC-21-0602': r'd:\data\speclibs'
+        }.get(os.getlogin() + '@' + platform.node())
+    except OSError as ex:
+        warnings.warn(f'Exception raised in sensorProductsRoot():\n{ex}')
+
+    # - check environment variable
+    if root is None:
+        root = os.environ.get('ENMAPBOX_SPECLIB_PRODUCT_ROOT')
 
     return root
 
@@ -421,5 +442,11 @@ class SensorProducts(object):
             )
             S2B_L2A_MsiL1CXml = join(S2B_L2A, 'MTD_MSIL2A.xml')
 
+        class UsgsSplib07(object):
+            folder = join(sensorProductsRoot(), 'usgs_splib07')
+
+
+class SpeclibProducts(object):
+    if speclibProductsRoot() is not None:
         class UsgsSplib07(object):
             folder = join(sensorProductsRoot(), 'usgs_splib07')
