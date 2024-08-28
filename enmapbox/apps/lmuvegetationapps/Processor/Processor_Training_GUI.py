@@ -37,9 +37,8 @@ import sys
 
 from qgis.gui import QgsMapLayerComboBox
 from qgis.core import QgsMapLayerProxyModel
-from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
+# from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
 from qgis.core import QgsVectorLayer
-
 
 # import LUT.CreateLUT_GUI
 # ensure to call QGIS before PyQtGraph
@@ -255,6 +254,7 @@ class ML_Training:
                 self.gui.cmdInputModel.setEnabled(False)
             self.gui.lblInputModel.setText("")
             self.model_process_dict = None
+            self.gui.txtTrainSize.setText("")
 
 
     def handle_algorithm(self, mode):
@@ -312,6 +312,11 @@ class ML_Training:
             self.gui.lblFolds.setEnabled(False), self.gui.txtFolds.setEnabled(False),
             self.gui.txtTrainSize.setPlaceholderText(""), self.gui.txtFolds.setPlaceholderText(""),
             self.gui.radValinsitu.setEnabled(False), self.gui.pushImportValinsitu.setEnabled(False)
+        if self.gui.radPerf.isChecked() and self.gui.chkRetrain.isChecked():
+            self.gui.radCrossVal.setEnabled(False), self.gui.txtFolds.setEnabled(False),
+            if self.gui.radTrainTest.isChecked():
+                self.gui.txtTrainSize.setText("100"), self.gui.txtTrainSize.setEnabled(False)
+
 
 
     def handle_PerfEvalStrat(self):
@@ -322,6 +327,8 @@ class ML_Training:
             self.gui.txtFolds.setText("")
             self.gui.txtFolds.setPlaceholderText("")
             self.gui.pushImportValinsitu.setEnabled(False)
+            if self.gui.chkRetrain.isChecked():
+                self.gui.txtTrainSize.setText("100"), self.gui.txtTrainSize.setEnabled(False)
         if self.gui.radCrossVal.isChecked():
             self.gui.lblTrainSize.setEnabled(False), self.gui.txtTrainSize.setEnabled(False),
             self.gui.lblFolds.setEnabled(True), self.gui.txtFolds.setEnabled(True),
@@ -560,7 +567,7 @@ class ML_Training:
             if self.speclib is not None:
                 self.speclib = None
             lib_input = QFileDialog.getOpenFileName(caption='Select Input Spectral Library',
-                                                    filter="Geopackage (*.gpkg)")[0]
+                                                    filter="Spectral Library (*.gpkg *.sli)")[0]
             if not lib_input:
                 return
             self.addItemSpeclib.append(lib_input)
@@ -584,29 +591,31 @@ class ML_Training:
         all_specs = []
         wl_values = []
         wl_extracted = False
-        layer = QgsVectorLayer(self.speclib, "Soil spectra layer")  #<- works only for gpkg Geopackage
-        #TODO: add option for spectral library .sli
+        print(os.path.splitext(self.speclib))
+        if os.path.splitext(self.speclib)[1] == ".gpkg":
+            layer = QgsVectorLayer(self.speclib, "Soil spectra layer")  #<- works only for gpkg Geopackage
+            # Loop through the features
+            for feature in layer.getFeatures():
+                # Assuming that the JSON string is in an attribute named 'json_data'
+                data_dict = feature[2]
+                # Parse the JSON string
 
-        # features = list(layer.getFeatures())
-        # Loop through the features
-        for feature in layer.getFeatures():
-            # Assuming that the JSON string is in an attribute named 'json_data'
-            data_dict = feature[2]
-            # Parse the JSON string
-            # data_dict = json.loads(json_data)
+                # Extract 'x' values only once
+                if not wl_extracted:
+                    wl_values = data_dict.get('x', [])
+                    wl_extracted = True
 
-            # Extract 'x' values only once
-            if not wl_extracted:
-                wl_values = data_dict.get('x', [])
-                wl_extracted = True
+                # Extract and store y_values
+                y_values = data_dict.get('y', [])
+                all_specs.append(y_values)
 
-            # Extract and store y_values
-            y_values = data_dict.get('y', [])
-            all_specs.append(y_values)
-
-        self.soil_wavelengths = wl_values
-        self.soil_specs = [list(row) for row in zip(*all_specs)]
-
+            self.soil_wavelengths = wl_values
+            self.soil_specs = [list(row) for row in zip(*all_specs)]
+        if os.path.splitext(self.speclib)[1] == ".sli":
+            speclib = EnviSpectralLibrary(filename=self.speclib)
+            raster = speclib.raster()
+            self.soil_wavelengths = raster.dataset().metadataItem(key='wavelength', domain='ENVI', dtype=float)
+            self.soil_specs = raster.dataset().array()[:, :, 0].tolist()
 
     def check_and_assign(self):
         if not self.lut_path:
@@ -874,8 +883,12 @@ class perfView:
 
         if data is None:
             return
-
-        performances, y_val, predictions = data["performances"], data["y_val"], data["predictions"]
+        try:
+            performances, y_val, predictions, al_training_indices = \
+                data["performances"], data["y_val"], data["predictions"], data['al_training_indices'][0]
+        except:
+            performances, y_val, predictions, al_training_indices = \
+                data["performances"], data["y_val"], data["predictions"], data['al_training_indices']
         if isinstance(performances, np.ndarray):
             performances = [performances]
         performances = np.asarray(performances).flatten()
@@ -1389,6 +1402,7 @@ class PRG:
         self.gui.cmdCancel.setDisabled(True)
         self.gui.lblCancel.setText("-1")
         self.gui.close()
+        self.gui.lblCancel.setText("1")
 
 # class Printer:
 #     def __init__(self, main):
@@ -1437,7 +1451,7 @@ if __name__ == '__main__':
     app = start_app()
     m = MainUiFunc()
     m.show()
-    # lut_path = r"C:\Data\Daten\Testdaten\LUT\LUT_3000_Wocher2022_CpCBCcheck_EnMAP_219bands_00meta.lut"
+    # lut_path = r"C:\Data\Daten\Testdaten\LUT\LUT_1000_Wocher2022_CpCBCcheck_EnMAP_207bands_00meta.lut"
     # m.mlra_training.open_lut(lutpath=lut_path)
     # out_folder = r"C:\Data\Daten\Testdaten\Model_TEST/"
     # m.mlra_training.get_folder(path=out_folder)

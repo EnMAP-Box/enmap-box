@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>637</width>
+    <width>621</width>
     <height>816</height>
    </rect>
   </property>
@@ -151,7 +151,7 @@
          </sizepolicy>
         </property>
         <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
+         <enum>Qt::NoFocus</enum>
         </property>
         <property name="text">
          <string>Create LUT...</string>
@@ -262,9 +262,6 @@
          </property>
          <item row="1" column="0">
           <widget class="QRadioButton" name="radPerf">
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
-           </property>
            <property name="text">
             <string>Perform Evaluation</string>
            </property>
@@ -275,9 +272,6 @@
          </item>
          <item row="0" column="0">
           <widget class="QRadioButton" name="radNoPerf">
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
-           </property>
            <property name="text">
             <string>Off</string>
            </property>
@@ -347,13 +341,6 @@
            <property name="enabled">
             <bool>false</bool>
            </property>
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
-           </property>
-           <property name="toolTip">
-            <string>1st col: variables numbered followed by wavelengths
-2nd to n col: measured values followed by reflectance values</string>
-           </property>
            <property name="text">
             <string>Import...</string>
            </property>
@@ -377,9 +364,6 @@
            <property name="enabled">
             <bool>false</bool>
            </property>
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
-           </property>
            <property name="text">
             <string>On insitu data:</string>
            </property>
@@ -392,9 +376,6 @@
           <widget class="QRadioButton" name="radTrainTest">
            <property name="enabled">
             <bool>false</bool>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
            </property>
            <property name="text">
             <string>Train-Test Split</string>
@@ -424,14 +405,11 @@
              <height>16777215</height>
             </size>
            </property>
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
-           </property>
            <property name="inputMethodHints">
             <set>Qt::ImhDigitsOnly</set>
            </property>
            <property name="maxLength">
-            <number>2</number>
+            <number>3</number>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -459,9 +437,6 @@
            <property name="enabled">
             <bool>false</bool>
            </property>
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
-           </property>
            <property name="text">
             <string>Cross Validation</string>
            </property>
@@ -486,9 +461,6 @@
              <width>16777215</width>
              <height>16777215</height>
             </size>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
            </property>
            <property name="inputMethodHints">
             <set>Qt::ImhDigitsOnly</set>
@@ -580,9 +552,6 @@
           <height>0</height>
          </size>
         </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
         <property name="whatsThis">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify the bands that shall be excluded from the inversion. Separate band numbers with blanks or push the button on the right to select them manually. By default this is set to the water absorption bands of the selected sensor or other domains that may cause trouble.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
@@ -615,9 +584,6 @@
      <layout class="QGridLayout" name="gridLayout_9">
       <item row="2" column="0">
        <widget class="QRadioButton" name="radNoiseGauss">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
         <property name="text">
          <string>Gaussian noise    </string>
         </property>
@@ -628,9 +594,6 @@
       </item>
       <item row="0" column="0">
        <widget class="QRadioButton" name="radNoiseOff">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
         <property name="text">
          <string>No noise</string>
         </property>
@@ -681,9 +644,6 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
-           </property>
            <property name="layoutDirection">
             <enum>Qt::LeftToRight</enum>
            </property>
@@ -709,9 +669,6 @@
       </item>
       <item row="1" column="0">
        <widget class="QRadioButton" name="radNoiseAdd">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
         <property name="text">
          <string>Additive noise</string>
         </property>
@@ -737,9 +694,6 @@
      <layout class="QGridLayout" name="gridLayout_8">
       <item row="1" column="1">
        <widget class="QCheckBox" name="chkCp">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
         <property name="toolTip">
          <string>Leaf protein content</string>
         </property>
@@ -750,9 +704,6 @@
       </item>
       <item row="2" column="2">
        <widget class="QCheckBox" name="chkAGBfresh">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
         <property name="toolTip">
          <string>Above-ground fresh biomass: (Cp + CBC + Cw) * LAI * 10,000 [g/m²]</string>
         </property>
@@ -763,9 +714,6 @@
       </item>
       <item row="0" column="1">
        <widget class="QCheckBox" name="chkCcx">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
         <property name="toolTip">
          <string>Leaf carotenoid content</string>
         </property>
@@ -776,9 +724,6 @@
       </item>
       <item row="0" column="2">
        <widget class="QCheckBox" name="chkCanth">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
         <property name="toolTip">
          <string>Leaf anthocyanin content</string>
         </property>
@@ -789,9 +734,6 @@
       </item>
       <item row="2" column="0">
        <widget class="QCheckBox" name="chkLAI">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
         <property name="toolTip">
          <string>Leaf area index</string>
         </property>
@@ -805,9 +747,6 @@
       </item>
       <item row="1" column="2">
        <widget class="QCheckBox" name="chkCBC">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
         <property name="toolTip">
          <string>Carbon-based constituents</string>
         </property>
@@ -818,9 +757,6 @@
       </item>
       <item row="3" column="0">
        <widget class="QCheckBox" name="chkCWC">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
         <property name="toolTip">
          <string>Canopy Water Content: Cw x LAI [g/cm²]</string>
         </property>
@@ -831,9 +767,6 @@
       </item>
       <item row="1" column="0">
        <widget class="QCheckBox" name="chkCw">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
         <property name="toolTip">
          <string>Leaf water content</string>
         </property>
@@ -844,9 +777,6 @@
       </item>
       <item row="3" column="2">
        <widget class="QCheckBox" name="chkCarbon">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
         <property name="toolTip">
          <string>Carbon content: (CBC x LAI x 10,000) / 2.31 [g/m²]</string>
         </property>
@@ -857,9 +787,6 @@
       </item>
       <item row="3" column="1">
        <widget class="QCheckBox" name="chkNitrogen">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
         <property name="toolTip">
          <string>Nitrogen content: (LAI x Cp x 10,000) / 4.43 [g/m²]</string>
         </property>
@@ -870,9 +797,6 @@
       </item>
       <item row="0" column="0">
        <widget class="QCheckBox" name="chkCab">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
         <property name="toolTip">
          <string>Leaf chlorophyll content</string>
         </property>
@@ -886,9 +810,6 @@
       </item>
       <item row="2" column="1">
        <widget class="QCheckBox" name="chkAGBdry">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
         <property name="toolTip">
          <string>Above-ground dry biomass / Non-photosyntetic vegetation: (Cp + CBC) * LAI * 10,000 [g/m²]</string>
         </property>
@@ -1375,9 +1296,6 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
         <property name="text">
          <string>Perform PCA</string>
         </property>
@@ -1396,9 +1314,6 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
         </property>
         <property name="maximum">
          <number>100</number>
@@ -1485,9 +1400,6 @@
           <height>0</height>
          </size>
         </property>
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
         <property name="frame">
          <bool>true</bool>
         </property>
@@ -1495,9 +1407,6 @@
       </item>
       <item row="0" column="2">
        <widget class="QToolButton" name="cmdModelDir">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
         <property name="text">
          <string>...</string>
         </property>
@@ -1516,9 +1425,6 @@
           <width>0</width>
           <height>0</height>
          </size>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
         </property>
         <property name="frame">
          <bool>true</bool>
@@ -1543,6 +1449,29 @@
       <string>Active Learning (AL)</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
+      <item row="2" column="1">
+       <widget class="QSpinBox" name="sbInitSamples">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>2</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="lblInitSamples">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>AL initial sample size [%]:</string>
+        </property>
+       </widget>
+      </item>
       <item row="2" column="2">
        <widget class="QFrame" name="frameQueryStrat">
         <property name="frameShape">
@@ -1595,9 +1524,6 @@
            <property name="enabled">
             <bool>false</bool>
            </property>
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
-           </property>
            <property name="toolTip">
             <string>Diversity sampling: Euclidean distance based diversity</string>
            </property>
@@ -1614,9 +1540,6 @@
          </item>
          <item>
           <widget class="QRadioButton" name="radPAL">
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
-           </property>
            <property name="toolTip">
             <string>Uncertainty Sampling: Pool Active Learning</string>
            </property>
@@ -1646,89 +1569,9 @@
          </item>
          <item>
           <widget class="QCheckBox" name="chkALsave">
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
-           </property>
            <property name="text">
             <string>Save AL selection</string>
            </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="0" column="0" rowspan="2" colspan="2">
-       <widget class="QFrame" name="AL_frame">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="lineWidth">
-         <number>0</number>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <property name="spacing">
-          <number>6</number>
-         </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QRadioButton" name="radNoAL">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
-           </property>
-           <property name="text">
-            <string>Off</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-           <attribute name="buttonGroup">
-            <string notr="true">rad_group_al</string>
-           </attribute>
-          </widget>
-         </item>
-         <item>
-          <widget class="QRadioButton" name="radAL">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
-           </property>
-           <property name="text">
-            <string>Perform Active Learning</string>
-           </property>
-           <attribute name="buttonGroup">
-            <string notr="true">rad_group_al</string>
-           </attribute>
           </widget>
          </item>
         </layout>
@@ -1784,12 +1627,24 @@
            <property name="focusPolicy">
             <enum>Qt::TabFocus</enum>
            </property>
-           <property name="toolTip">
-            <string>1st col: variables numbered followed by wavelengths
-2nd to n col: measured values followed by reflectance values</string>
-           </property>
            <property name="text">
             <string>Import...</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QRadioButton" name="radInsitu">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>Use insitu data:</string>
            </property>
           </widget>
          </item>
@@ -1800,9 +1655,6 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
            </property>
            <property name="text">
             <string>TDB internal AL</string>
@@ -1825,52 +1677,78 @@
            </property>
           </spacer>
          </item>
-         <item row="0" column="2">
-          <widget class="QRadioButton" name="radInsitu">
+        </layout>
+       </widget>
+      </item>
+      <item row="0" column="0" rowspan="2" colspan="2">
+       <widget class="QFrame" name="AL_frame">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="lineWidth">
+         <number>0</number>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <property name="spacing">
+          <number>6</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QRadioButton" name="radNoAL">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
+           <property name="text">
+            <string>Off</string>
            </property>
-           <property name="layoutDirection">
-            <enum>Qt::LeftToRight</enum>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">rad_group_al</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radAL">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
            <property name="text">
-            <string>Use insitu data:</string>
+            <string>Perform Active Learning</string>
            </property>
+           <attribute name="buttonGroup">
+            <string notr="true">rad_group_al</string>
+           </attribute>
           </widget>
          </item>
         </layout>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QSpinBox" name="sbInitSamples">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="value">
-         <number>2</number>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="lblInitSamples">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>AL initial sample size [%]:</string>
-        </property>
        </widget>
       </item>
      </layout>
@@ -1930,9 +1808,6 @@
          </item>
          <item row="1" column="0">
           <widget class="QCheckBox" name="chkHyptuning">
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
-           </property>
            <property name="toolTip">
             <string>If not checked default hyperparameters are used</string>
            </property>
@@ -1942,11 +1817,7 @@
           </widget>
          </item>
          <item row="1" column="4">
-          <widget class="QLineEdit" name="txtInputHyp">
-           <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
-           </property>
-          </widget>
+          <widget class="QLineEdit" name="txtInputHyp"/>
          </item>
          <item row="1" column="1">
           <spacer name="horizontalSpacer_5">
@@ -2000,9 +1871,6 @@
            <property name="enabled">
             <bool>false</bool>
            </property>
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
-           </property>
            <property name="text">
             <string>Artificial Neural Network (ANN)</string>
            </property>
@@ -2018,9 +1886,6 @@
           <widget class="QRadioButton" name="rbGPR">
            <property name="enabled">
             <bool>false</bool>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
            </property>
            <property name="toolTip">
             <string/>
@@ -2038,9 +1903,6 @@
          </item>
          <item row="1" column="2">
           <widget class="QRadioButton" name="rbGBR">
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
-           </property>
            <property name="text">
             <string>Gradient Boosting Regression (GBR)</string>
            </property>
@@ -2053,9 +1915,6 @@
           <widget class="QRadioButton" name="rbRFR">
            <property name="enabled">
             <bool>false</bool>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
            </property>
            <property name="text">
             <string>Random Forest Regression (RFR)</string>
@@ -2070,9 +1929,6 @@
            <property name="enabled">
             <bool>false</bool>
            </property>
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
-           </property>
            <property name="text">
             <string>Support Vector Regression (SVR)</string>
            </property>
@@ -2083,9 +1939,6 @@
          </item>
          <item row="1" column="1">
           <widget class="QRadioButton" name="rbKRR">
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
-           </property>
            <property name="text">
             <string>Kernel Ridge Regression (KRR)</string>
            </property>
@@ -2202,17 +2055,15 @@
    </item>
    <item row="1" column="0" colspan="3">
     <widget class="QGroupBox" name="groupBox_3">
-     <property name="toolTip">
-      <string>When retraining: add bare soil spectra of the target image to improve inversion mapping results</string>
-     </property>
      <property name="title">
-      <string>Add Bare Soil Spectra (Optional)</string>
+      <string>Add Soil Spectra (Optional)</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_15">
       <item row="0" column="0">
        <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>Geopackage (*.gpkg):</string>
+         <string>Select Spectral Library
+(*.gpkg *.sli):</string>
         </property>
        </widget>
       </item>
@@ -2223,9 +2074,6 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
         </property>
        </widget>
       </item>
@@ -2250,9 +2098,7 @@
  </customwidgets>
  <tabstops>
   <tabstop>cmdInputLUT</tabstop>
-  <tabstop>pushCreateLUT</tabstop>
-  <tabstop>cmdInputModel</tabstop>
-  <tabstop>cmdLibSelect</tabstop>
+  <tabstop>txtExclude</tabstop>
   <tabstop>cmdExcludeBands</tabstop>
   <tabstop>cmbPCA</tabstop>
   <tabstop>spnPCA</tabstop>
@@ -2272,31 +2118,12 @@
   <tabstop>chkCWC</tabstop>
   <tabstop>chkNitrogen</tabstop>
   <tabstop>chkCarbon</tabstop>
-  <tabstop>rbANN</tabstop>
-  <tabstop>rbGPR</tabstop>
-  <tabstop>rbRFR</tabstop>
-  <tabstop>rbSVR</tabstop>
-  <tabstop>rbKRR</tabstop>
-  <tabstop>rbGBR</tabstop>
-  <tabstop>chkHyptuning</tabstop>
-  <tabstop>cmdLoadHyp</tabstop>
-  <tabstop>radNoAL</tabstop>
   <tabstop>radAL</tabstop>
   <tabstop>radInternal</tabstop>
   <tabstop>radInsitu</tabstop>
-  <tabstop>pushImportInsitu</tabstop>
-  <tabstop>sbInitSamples</tabstop>
-  <tabstop>radEBD</tabstop>
-  <tabstop>radPAL</tabstop>
-  <tabstop>chkALsave</tabstop>
   <tabstop>radNoPerf</tabstop>
-  <tabstop>radPerf</tabstop>
-  <tabstop>radTrainTest</tabstop>
-  <tabstop>radCrossVal</tabstop>
-  <tabstop>radValinsitu</tabstop>
   <tabstop>txtTrainSize</tabstop>
   <tabstop>txtFolds</tabstop>
-  <tabstop>pushImportValinsitu</tabstop>
   <tabstop>txtModelDir</tabstop>
   <tabstop>cmdModelDir</tabstop>
   <tabstop>txtModelName</tabstop>
@@ -2306,8 +2133,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="rad_group_noise"/>
   <buttongroup name="rad_group_splitstrat"/>
+  <buttongroup name="rad_group_noise"/>
   <buttongroup name="rad_group_al"/>
   <buttongroup name="rad_group_ml"/>
   <buttongroup name="rad_group_al_strats"/>

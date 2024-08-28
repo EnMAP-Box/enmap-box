@@ -121,12 +121,14 @@ class MLRA_defaults:
             'n_restarts_optimizer': 10,
         },
         'CWC': {
-            'kernel':  kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=1, nu=float('inf')),
+            'kernel':  kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=1, nu=1.5),
             'alpha': 1.0,
             'n_restarts_optimizer': 10,
         },
         'Nitrogen': {
-            'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=1, nu=2.5),
+            'kernel': kernels.ConstantKernel(1.0, constant_value_bounds=(1e-5, 1e7)) *
+                      kernels.Matern(length_scale=1, length_scale_bounds=(1e-5, 1e7), nu=2.5) +
+                      kernels.WhiteKernel(noise_level=1.0, noise_level_bounds=(1e-5, 1e7)),
             'alpha': 1.0,
             'n_restarts_optimizer': 10,
         },
