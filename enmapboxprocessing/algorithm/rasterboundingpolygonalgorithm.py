@@ -13,6 +13,10 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 @typechecked
 class RasterBoundingPolygonAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
+    P_GEOMETRY_TYPE, _GEOMETRY_TYPE = 'geometryType', 'Geometry type'
+    O_GEOMETRY_TYPE = ['Envelope (Bounding Box)', 'Minimum Oriented Rectangle', 'Minimum Enclosing Circle',
+                       'Convex Hull']
+    EnvelopeBoundingBox, MinimumOrientedRectangle, MinimumEnclosingCircle, ConvexHull = range(4)
     P_OUTPUT_VECTOR, _OUTPUT_VECTOR = 'outputVector', 'Output vector layer'
 
     def displayName(self) -> str:
