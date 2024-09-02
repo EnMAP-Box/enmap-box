@@ -1025,6 +1025,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
 
 class Group(Enum):
     AccuracyAssessment = 'Accuracy Assessment'
+    AnalysisReadyData = 'Analysis ready data'
     Auxilliary = 'Auxilliary'
     Classification = 'Classification'
     Clustering = 'Clustering'
