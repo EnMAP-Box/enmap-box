@@ -13,6 +13,12 @@ DIR_TMP = REPO_ROOT / 'tmp'
 DIR_YAML = REPO_ROOT / '.env/conda'
 os.makedirs(DIR_TMP, exist_ok=True)
 
+# define how QGIS branches with be named in the yml file names
+BRANCH_NAME_LOOKUP = {
+    'stable': 'longterm',
+    'latest': 'latest'
+}
+
 DEPENDENCIES = {
     'light': ['pip', 'scikit-learn>=1', 'matplotlib', 'enpt'],
     'full': [{'conda': 'enpt', 'pip': 'enpt-enmapboxapp'}, 'xgboost', 'lightgbm', 'cdsapi', 'cython', 'netcdf4',
@@ -169,10 +175,9 @@ def update_yamls():
     for branch, (current_version, latest_fix) in current_versions.items():
         latest_version_fix = max([v for v in conda_versions if v.startswith(current_version)])
 
-        update_yaml(DIR_YAML, branch, latest_version_fix, full=True)
-        update_yaml(DIR_YAML, branch, latest_version_fix, full=False)
-
-    s = ""
+        branch_name = BRANCH_NAME_LOOKUP.get(branch, branch)
+        update_yaml(DIR_YAML, branch_name, latest_version_fix, full=True)
+        update_yaml(DIR_YAML, branch_name, latest_version_fix, full=False)
 
 
 def generate_environment_file(lr_version, ltr_version):
