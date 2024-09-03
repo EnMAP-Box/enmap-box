@@ -84,6 +84,7 @@ from enmapboxprocessing.algorithm.importprismal2dalgorithm import ImportPrismaL2
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
 from enmapboxprocessing.algorithm.importusgsspeclib07algorithm import ImportUsgsSpeclib07Algorithm
 from enmapboxprocessing.algorithm.inversetransformrasteralgorithm import InverseTransformRasterAlgorithm
+from enmapboxprocessing.algorithm.landcoverchangestatisticsalgorithm import LandCoverChangeStatisticsAlgorithm
 from enmapboxprocessing.algorithm.layertomaskalgorithm import LayerToMaskAlgorithm
 from enmapboxprocessing.algorithm.libraryfromclassificationdatasetalgorithm import \
     LibraryFromClassificationDatasetAlgorithm
@@ -234,6 +235,7 @@ from enmapboxprocessing.algorithm.spectralresamplingtosentinel2algorithm import 
     SpectralResamplingToSentinel2bAlgorithm
 from enmapboxprocessing.algorithm.stackrasterlayersalgorithm import StackRasterLayersAlgorithm
 from enmapboxprocessing.algorithm.subsetrasterbandsalgorithm import SubsetRasterBandsAlgorithm
+from enmapboxprocessing.algorithm.tilerasteralgorithm import TileRasterAlgorithm
 from enmapboxprocessing.algorithm.transformrasteralgorithm import TransformRasterAlgorithm
 from enmapboxprocessing.algorithm.translatecategorizedrasteralgorithm import TranslateCategorizedRasterAlgorithm
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
@@ -321,6 +323,7 @@ def algorithms():
         ImportSentinel2L2AAlgorithm(),
         ImportUsgsSpeclib07Algorithm(),
         InverseTransformRasterAlgorithm(),
+        LandCoverChangeStatisticsAlgorithm(),
         LayerToMaskAlgorithm(),
         LibraryFromClassificationDatasetAlgorithm(),
         LibraryFromRegressionDatasetAlgorithm(),
@@ -425,6 +428,7 @@ def algorithms():
         StackRasterLayersAlgorithm(),
         SubsetRasterBandsAlgorithm(),
         PrepareRegressionDatasetFromSynthMixAlgorithm(),
+        TileRasterAlgorithm(),
         TranslateCategorizedRasterAlgorithm(),
         TranslateRasterAlgorithm(),
         TransformRasterAlgorithm(),

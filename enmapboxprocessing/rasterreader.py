@@ -1,4 +1,4 @@
-from math import isnan
+from math import isnan, ceil
 from os.path import exists
 from typing import Iterable, List, Union, Optional, Tuple, Iterator
 
@@ -346,8 +346,10 @@ class RasterReader(object):
             maskArray.append(m)
         return maskArray
 
-    def pixelByPoint(self, point: QgsPointXY) -> QPoint:
-        return SpatialPoint(self.crs(), point).toPixelPosition(self.layer)
+    def pixelByPoint(self, point: Union[QgsPointXY, SpatialPoint]) -> QPoint:
+        if isinstance(point, QgsPointXY):
+            point = SpatialPoint(self.crs(), point)
+        return point.toPixelPosition(self.layer)
 
     def pixelExtent(self, pixel: QPoint) -> QgsRectangle:
         xoff = self.extent().xMinimum()
@@ -432,11 +434,17 @@ class RasterReader(object):
     def samplingWidthAndHeight(self, bandNo: int, extent=None, sampleSize: int = 0) -> Tuple[int, int]:
         """Return number of pixel for width and heigth, that approx. match the given sample size."""
 
-        # get sample width and height from empty bandStatistics
         if extent is None:
-            extent = QgsRectangle()
-        bandStats: QgsRasterBandStats = self.provider.bandStatistics(bandNo, 0, extent, sampleSize)
-        return bandStats.width, bandStats.height
+            extent = self.extent()
+
+        if sampleSize == 0:
+            width = ceil((extent.xMaximum() - extent.xMinimum()) / self.rasterUnitsPerPixelX())
+            height = ceil((extent.yMaximum() - extent.yMinimum()) / self.rasterUnitsPerPixelY())
+        else:
+            bandStats: QgsRasterBandStats = self.provider.bandStatistics(bandNo, 0, extent, sampleSize)
+            width, height = bandStats.width, bandStats.height
+
+        return width, height
 
     def sampleValues(
             self, bandNo: int, extent=None, sampleSize: int = 0,

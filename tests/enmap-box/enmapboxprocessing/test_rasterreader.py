@@ -7,7 +7,7 @@ from enmapboxprocessing.testcase import TestCase
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import enmap, r_terra_timeseries_days, r_terra_timeseries_seconds, netCDF_timeseries_days
 from enmapboxtestdata import fraction_polygon_l3
-from qgis.PyQt.QtCore import QDateTime, QSizeF
+from qgis.PyQt.QtCore import QDateTime, QSizeF, QPoint
 from qgis.core import QgsRasterRange, QgsRasterLayer, Qgis, QgsRectangle
 
 
@@ -237,7 +237,14 @@ class TestRasterReader(TestCase):
         reader = RasterReader(enmap)
         self.assertEqual((220, 400), reader.samplingWidthAndHeight(1))
         self.assertEqual((220, 400), reader.samplingWidthAndHeight(1, reader.extent()))
+        extent = QgsRectangle(380952.37, 5808372.35, 380952.37 + 30, 5808372.35 + 30)  # single pixel
+        self.assertEqual((1, 1), reader.samplingWidthAndHeight(1, extent))
         self.assertEqual((8, 14), reader.samplingWidthAndHeight(1, reader.extent(), 100))
+
+    def test_samplingWidthAndHeight_singlePixel(self):
+        reader = RasterReader(enmap)
+        extent = reader.pixelExtent(QPoint(42, 42))
+        self.assertEqual((1, 1), reader.samplingWidthAndHeight(1, extent))
 
     def test_sampleValues(self):
         reader = RasterReader(enmap)
