@@ -252,10 +252,13 @@ if not exists(regressorDumpMultiTargetPkl):
     print(f'created {basename(regressorDumpMultiTargetPkl)}: {regressorDumpMultiTargetPkl}')
     RegressorDump.fromFile(regressorDumpMultiTargetPkl)  # check result
 
-# SRF
+# processing
 _subdir = 'srf'
-enmap_berlin_srf_csv = join(_root, _subdir, 'enmap_berlin_srf.csv')  # wavelength and fwhm
-enmap_potsdam_srf_csv = join(_root, _subdir, 'enmap_potsdam_srf.csv')  # wavelength and fwhm
+customModel = join(_root, _subdir, 'enmap_berlin_srf.csv')  # wavelength and fwhm
+
+# SRF
+_subdir = 'processing'
+custom_model = join(_root, _subdir, 'importEnmapL2.model3')
 
 # external testdata
 _subdir = 'external'
