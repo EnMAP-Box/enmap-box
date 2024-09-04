@@ -18,7 +18,7 @@ class TestCase(enmapboxprocessing.testcase.TestCase):
     skipProductImport = True
 
     @staticmethod
-    def runalg(alg: EnMAPProcessingAlgorithm, parameters: Dict):
+    def runalg(alg, parameters: Dict):
         print(f'\n{"#" * 80}')
         if isinstance(alg, EnMAPProcessingAlgorithm):
             alg.initAlgorithm(configuration=None)

@@ -257,6 +257,10 @@ _subdir = 'srf'
 enmap_berlin_srf_csv = join(_root, _subdir, 'enmap_berlin_srf.csv')  # wavelength and fwhm
 enmap_potsdam_srf_csv = join(_root, _subdir, 'enmap_potsdam_srf.csv')  # wavelength and fwhm
 
+# processing
+_subdir = 'processing'
+custom_model = join(_root, _subdir, 'importEnmapL2.model3')
+
 # external testdata
 _subdir = 'external'
 envi_library_berlin_sli = join(_root, _subdir, 'envi', 'library_berlin.sli')
