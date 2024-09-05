@@ -4,7 +4,9 @@ from enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.aggregaterasterbandsalgorithm import AggregateRasterBandsAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
+from enmapbox.testing import start_app
 
+start_app()
 
 class TestAggregateRasterBandsAlgorithm(TestCase):
 

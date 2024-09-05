@@ -28,7 +28,7 @@ class NumpyUtils(object):
         valid_obs = np.sum(np.isfinite(a), axis=0)
         invalid_pixel = valid_obs == 0
 
-        a[np.isnan(a)] = np.Inf
+        a[np.isnan(a)] = np.inf
 
         # sort - former NaNs will move to the end
         arr = np.sort(a, axis=0)
