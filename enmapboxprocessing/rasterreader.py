@@ -300,7 +300,8 @@ class RasterReader(object):
         return array
 
     def maskArray(
-            self, array: Array3d, bandList: List[int] = None, maskNotFinite=True, defaultNoDataValue: float = None
+            self, array: Array3d, bandList: List[int] = None, maskNotFinite=True, defaultNoDataValue: float = None,
+            maskNoDataValue=True
     ) -> Array3d:
         """Return mask for given data. No data values evaluate to False, all other to True."""
         if bandList is None:
@@ -310,13 +311,14 @@ class RasterReader(object):
         for i, a in enumerate(array):
             bandNo = i + 1
             m = np.full_like(a, True, dtype=bool)
-            if self.provider.sourceHasNoDataValue(bandNo) and self.provider.useSourceNoDataValue(bandNo):
-                noDataValue = self.provider.sourceNoDataValue(bandNo)
-                if not isnan(noDataValue):
-                    m[a == noDataValue] = False
-            else:
-                if defaultNoDataValue is not None:
-                    m[a == defaultNoDataValue] = False
+            if maskNoDataValue:
+                if self.provider.sourceHasNoDataValue(bandNo) and self.provider.useSourceNoDataValue(bandNo):
+                    noDataValue = self.provider.sourceNoDataValue(bandNo)
+                    if not isnan(noDataValue):
+                        m[a == noDataValue] = False
+                else:
+                    if defaultNoDataValue is not None:
+                        m[a == defaultNoDataValue] = False
             rasterRange: QgsRasterRange
             for rasterRange in self.provider.userNoDataValues(bandNo):
                 if rasterRange.bounds() == QgsRasterRange.BoundsType.IncludeMinAndMax:
