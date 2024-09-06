@@ -8,6 +8,7 @@ from enmapbox.testing import start_app
 
 start_app()
 
+
 class TestAggregateRasterBandsAlgorithm(TestCase):
 
     def test_p0_and_p100(self):
