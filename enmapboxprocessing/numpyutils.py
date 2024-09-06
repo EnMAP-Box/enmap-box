@@ -50,7 +50,7 @@ class NumpyUtils(object):
             quant_arr = np.array(floor_value * floor_weight + ceil_value * ceil_weight, dtype=np.float32)
 
             # fill invalid pixels with fill value
-            quant_arr[invalid_pixel] = np.NaN
+            quant_arr[invalid_pixel] = np.nan
 
             result.append(quant_arr)
 
