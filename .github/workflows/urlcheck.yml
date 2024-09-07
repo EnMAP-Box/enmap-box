@@ -34,7 +34,7 @@ jobs:
         force_pass : false
 
         exclude_files:
-          test_glossary.py,snippets\grabPotsdamWmsData.py
+          test_glossary.py,snippets/grabPotsdamWmsData.py
 
         # {z}/{x}/{y}: ESRI
         # {z]/{y}/{x}: CartoDB, Open Weather, OpenTopoMap, OSM, Stamen, Strava, Wikimedia
