@@ -303,7 +303,7 @@ class TestRasterReader(TestCase):
         writer.setMetadataItem('wavelength', 1000, '', 4)
         writer.setMetadataItem('wavelength_units', 'Nanometers', '', 3)
         writer.setMetadataItem('wavelength_unit', 'Micrometers', '', 4)
-        writer.close()
+        writer.close(stac=True)
         reader = RasterReader(writer.source())
         self.assertEqual('Micrometers', reader.wavelengthUnits(1))  # STAC stores it as Micrometers
         self.assertEqual('Micrometers', reader.wavelengthUnits(2))  # STAC stores it as Micrometers
