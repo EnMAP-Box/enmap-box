@@ -1,4 +1,5 @@
 from enmapboxprocessing.algorithm.aggregaterasterbandsalgorithm import AggregateRasterBandsAlgorithm
+from enmapboxprocessing.algorithm.aggregaterastersalgorithm import AggregateRastersAlgorithm
 from enmapboxprocessing.algorithm.applymaskalgorithm import ApplyMaskAlgorithm
 from enmapboxprocessing.algorithm.build3dcubealgorithm import Build3dCubeAlgorithm
 from enmapboxprocessing.algorithm.classfractionfromcategorizedlayeralgorithm import \
@@ -246,6 +247,7 @@ from enmapboxprocessing.algorithm.writeenviheaderalgorithm import WriteEnviHeade
 def algorithms():
     algos = [
         AggregateRasterBandsAlgorithm(),
+        AggregateRastersAlgorithm(),
         ApplyMaskAlgorithm(),
         Build3dCubeAlgorithm(),
         ClassFractionFromCategorizedLayerAlgorithm(),
