@@ -148,4 +148,3 @@ class TestImportEnmapL2AAlgorithm(TestCase):
         }
         result = self.runalg(alg, parameters)
         reader = RasterReader(result[alg.P_OUTPUT_RASTER])
-        #self.assertEqual(190, reader.bandCount())
