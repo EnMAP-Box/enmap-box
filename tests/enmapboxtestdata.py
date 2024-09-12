@@ -357,6 +357,10 @@ class SensorProducts(object):
             L2A_MetadataXml = join(
                 L2A, 'ENMAP01-____L2A-DT0000004135_20221005T023547Z_010_V010106_20221014T102749Z-METADATA.XML'
             )
+            L2A_ARD = join(sensorProductsRoot(), 'enmap', 'ard')
+            L2A_ARD_MetadataXml = join(
+                L2A_ARD, 'ENMAP01-____L2A-DT0000071543_20240502T105133Z_003_V010402_20240505T210636Z-METADATA.XML'
+            )
 
         class Landsat(object):  # collection 2 only
 
