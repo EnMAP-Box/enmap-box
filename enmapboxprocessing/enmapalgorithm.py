@@ -18,6 +18,7 @@ from enmapboxprocessing.processingfeedback import ProcessingFeedback
 from enmapboxprocessing.typing import CreationOptions, GdalResamplingAlgorithm, ClassifierDump, \
     TransformerDump, RegressorDump, ClustererDump
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer, QgsProcessingParameterVectorLayer,
                        QgsProcessingContext, QgsProcessingFeedback,
@@ -536,7 +537,10 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def parameterAsMatrix(
             self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext
     ) -> Optional[List[Any]]:
-        return parameters.get(name)
+        value = parameters.get(name)
+        if value == [QVariant()]:
+            return None
+        return value
 
     def parameterIsNone(self, parameters: Dict[str, Any], name: str):
         return parameters.get(name, None) is None
@@ -1025,6 +1029,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
 
 class Group(Enum):
     AccuracyAssessment = 'Accuracy Assessment'
+    AnalysisReadyData = 'Analysis ready data'
     Auxilliary = 'Auxilliary'
     Classification = 'Classification'
     Clustering = 'Clustering'

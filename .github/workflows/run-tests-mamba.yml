@@ -1,4 +1,4 @@
-name: 🐍 EnMAP-Box Mamba Tests
+name: 🐍 Conda Environments
 
 on:
   push:
