@@ -94,7 +94,12 @@ class FitRegressorAlgorithmBase(EnMAPProcessingAlgorithm):
                 try:
                     regressor.fit(dump.X, dumpY, log_cout=StringIO(), log_cerr=StringIO())  # fixes issue #790
                 except Exception:
-                    regressor.fit(dump.X, dumpY)
+                    try:
+                        regressor.fit(dump.X, dumpY)
+                    except ValueError as error:  # fixes issue #967
+                        if str(error) == 'y must have at least two dimensions for multi-output regression ' \
+                                         'but has only one.':
+                            regressor.fit(dump.X, dumpY.reshape((-1, 1)))
 
             else:
                 feedback.pushInfo('Store unfitted classifier')

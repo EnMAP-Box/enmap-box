@@ -262,11 +262,11 @@ To enable ssh authentication you can replace them with SSH uris as followed:
     python enmapbox
     ````
 
-## 3. Setup your IDE, e.g. PyCharm
+## 4. Setup your IDE, e.g. PyCharm
 
 tbd.
 
-## How to contribute
+# How to contribute
 
 Our online documentation at [http://enmap-box.readthedocs.io](http://enmap-box.readthedocs.io/en/latest/general/contribute.html) describes how you can support the development of the EnMAP-Box.
 
@@ -300,6 +300,9 @@ the LICENSE.txt file that is part of the EnMAP-Box plugin folder and the EnMAP-B
 Developing the EnMAP-Box under this license means that you can (if you want to) inspect and modify the source code and guarantees that you 
 will always have access to an EnMAP-Box software that is free of cost and can be freely
 modified.
+
+# FAQ
+    tbd.
 
 # Support
 You can get support in the following ways:

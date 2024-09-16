@@ -27,11 +27,11 @@ class LibraryFromClassificationDatasetAlgorithm(EnMAPProcessingAlgorithm):
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
             (self._DATASET, 'A classification dataset.'),
-            (self._OUTPUT_POINTS, self.VectorFileDestination)
+            (self._OUTPUT_LIBRARY, self.VectorFileDestination)
         ]
 
     def group(self):
-        return Group.VectorCreation.value
+        return Group.SpectralLibrary.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterClassificationDataset(self.P_DATASET, self._DATASET)
@@ -52,7 +52,7 @@ class LibraryFromClassificationDatasetAlgorithm(EnMAPProcessingAlgorithm):
             data = list()
             geometries = list()
 
-            for i, (xvalues, yvalue) in enumerate(zip(dump.X, dump.y.tolist())):
+            for i, (xvalues, yvalue) in enumerate(zip(dump.X, dump.y.flatten().tolist())):
                 values = {
                     'profiles': {'y': xvalues.tolist()},
                     'CategoryValue': yvalue, 'CategoryName': categoryNames[yvalue]
@@ -76,6 +76,7 @@ class LibraryFromClassificationDatasetAlgorithm(EnMAPProcessingAlgorithm):
             writer = LibraryDriver().createFromData(data, geometries, name, Qgis.WkbType.Point, crs)
             writer.writeToSource(filename)
             library = QgsVectorLayer(filename)
+            assert library.isValid()
             renderer = Utils().categorizedSymbolRendererFromCategories('CategoryValue', dump.categories)
             library.setRenderer(renderer)
             library.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)

@@ -7,7 +7,7 @@
 gitpython
 git-lfs
 
-pytest
+pytest>= 8.0.0
 pytest-env
 pytest-cov
 pytest-xdist # parallel testing
@@ -21,4 +21,4 @@ flake8-qgis
 
 urlchecker
 typeguard==2.13.3  # version 3.x created several problems
-
+coverage-badge

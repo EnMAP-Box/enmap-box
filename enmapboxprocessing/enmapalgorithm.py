@@ -18,6 +18,7 @@ from enmapboxprocessing.processingfeedback import ProcessingFeedback
 from enmapboxprocessing.typing import CreationOptions, GdalResamplingAlgorithm, ClassifierDump, \
     TransformerDump, RegressorDump, ClustererDump
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer, QgsProcessingParameterVectorLayer,
                        QgsProcessingContext, QgsProcessingFeedback,
@@ -536,7 +537,10 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def parameterAsMatrix(
             self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext
     ) -> Optional[List[Any]]:
-        return parameters.get(name)
+        value = parameters.get(name)
+        if value == [QVariant()]:
+            return None
+        return value
 
     def parameterIsNone(self, parameters: Dict[str, Any], name: str):
         return parameters.get(name, None) is None
@@ -1025,17 +1029,11 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
 
 class Group(Enum):
     AccuracyAssessment = 'Accuracy Assessment'
+    AnalysisReadyData = 'Analysis ready data'
     Auxilliary = 'Auxilliary'
-    ConvolutionMorphologyAndFiltering = 'Convolution, morphology and filtering'
-    RasterAnalysis = 'Raster analysis'
-    RasterConversion = 'Raster conversion'
-    RasterExtraction = 'Raster extraction'
-    RasterMiscellaneous = 'Raster miscellaneous'
-    RasterProjections = 'Raster projections'
-    VectorConversion = 'Vector conversion'
-    VectorCreation = 'Vector creation'
     Classification = 'Classification'
     Clustering = 'Clustering'
+    ConvolutionMorphologyAndFiltering = 'Convolution, morphology and filtering'
     DatasetCreation = 'Dataset creation'
     Experimental = 'Experimental'
     ExportData = 'Export data'
@@ -1044,13 +1042,20 @@ class Group(Enum):
     Masking = 'Masking'
     Options = 'Options'
     Preprocessing = 'Pre-processing'
-    # Postprocessing = 'Post-processing'
-    SpectralResampling = 'Spectral resampling'
-    Sampling = 'Sampling'
+    RasterAnalysis = 'Raster analysis'
+    RasterConversion = 'Raster conversion'
+    RasterExtraction = 'Raster extraction'
+    RasterMiscellaneous = 'Raster miscellaneous'
+    RasterProjections = 'Raster projections'
     Regression = 'Regression'
+    Sampling = 'Sampling'
+    SpectralLibrary = 'Spectral library'
+    SpectralResampling = 'Spectral resampling'
     Testdata = 'Testdata'
     Transformation = 'Transformation'
     Unmixing = 'Unmixing'
+    VectorConversion = 'Vector conversion'
+    VectorCreation = 'Vector creation'
 
 
 class CookbookUrls(object):

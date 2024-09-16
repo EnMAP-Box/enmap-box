@@ -550,7 +550,7 @@ def report_bitbucket_issues(start_date='2020-01-01', end_date='2023-12-31'):
 class TestCases(unittest.TestCase):
 
     def test_github_EnMAPBox(self):
-        report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31')
+        report_github_issues_EnMAPBox(start_date='2024-01-01', end_date='2024-06-30')
 
     def test_github_QGIS(self):
         report_github_issues_QGIS(authors=['jakimowb'], start_date='2020-01-01', end_date='2023-12-31')

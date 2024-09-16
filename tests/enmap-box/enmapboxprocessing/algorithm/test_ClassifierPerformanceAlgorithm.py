@@ -38,7 +38,7 @@ class TestClassifierPerformanceAlgorithm(TestCase):
             alg.P_CLASSIFIER: classifierDumpPkl,
             alg.P_DATASET: classifierDumpPkl,
             alg.P_NFOLD: 1,
-            alg.P_OPEN_REPORT: not self.openReport,
+            alg.P_OPEN_REPORT: self.openReport,
             alg.P_OUTPUT_REPORT: self.filename('report_oobval.html')
         }
         self.runalg(alg, parameters)

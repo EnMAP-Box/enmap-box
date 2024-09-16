@@ -1,10 +1,16 @@
-from enmapboxtestdata import library_gpkg, libraryWithBadBands
+from enmapbox import initAll
+from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedlibraryalgorithm import \
     PrepareClassificationDatasetFromCategorizedLibraryAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxprocessing.typing import ClassifierDump
+from enmapboxprocessing.librarydriver import LibraryDriver
+from enmapboxprocessing.typing import ClassifierDump, Category
 from enmapboxprocessing.utils import Utils
-from qgis.core import QgsProcessingException
+from enmapboxtestdata import library_gpkg, libraryWithBadBands
+from qgis.core import QgsPointXY, QgsGeometry, QgsVectorLayer, QgsMapLayer, QgsCoordinateReferenceSystem, \
+    QgsProcessingException
+
+start_app()
 
 
 class TestPrepareClassificationDatasetFromCategorizedLibrary(TestCase):
@@ -84,3 +90,30 @@ class TestPrepareClassificationDatasetFromCategorizedLibrary(TestCase):
         dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((2, 4), dump.X.shape)
         self.assertEqual(4, len(dump.features))
+
+    def test_locations(self):
+        start_app()
+        initAll()
+
+        # create datagit
+        values = {'profiles': {'y': [1, 2, 3]}, 'class': 1}
+        geometry = QgsGeometry.fromPointXY(QgsPointXY(1, 2))
+        writer = LibraryDriver().createFromData([values], [geometry])
+        filename = self.filename('library2.geojson')
+        writer.writeToSource(filename)
+        layer = QgsVectorLayer(filename)
+        renderer = Utils().categorizedSymbolRendererFromCategories('class', [Category(1, 'class 1', '#f00')])
+        layer.setRenderer(renderer)
+        layer.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
+
+        alg = PrepareClassificationDatasetFromCategorizedLibraryAlgorithm()
+        parameters = {
+            alg.P_CATEGORIZED_LIBRARY: layer,
+            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+        }
+        self.runalg(alg, parameters)
+        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        self.assertEqual(
+            QgsCoordinateReferenceSystem.fromEpsgId(4326), QgsCoordinateReferenceSystem.fromWkt(dump.crs)
+        )
+        self.assertEqual((1, 2), tuple(dump.locations[0]))

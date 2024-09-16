@@ -107,7 +107,8 @@ class SpectralResamplingByResponseFunctionLibraryAlgorithm(EnMAPProcessingAlgori
                 responses[feature.attribute('name')] = response
 
             # prepare code snippet
-            text = ['from collections import OrderedDict',
+            text = ['import numpy as np',
+                    'from collections import OrderedDict',
                     'responses = OrderedDict()']
             for name in responses:
                 text.append(f"responses[{repr(name)}] = {responses[name]}")

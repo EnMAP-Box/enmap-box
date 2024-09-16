@@ -1,4 +1,5 @@
 from enmapboxprocessing.algorithm.aggregaterasterbandsalgorithm import AggregateRasterBandsAlgorithm
+from enmapboxprocessing.algorithm.aggregaterastersalgorithm import AggregateRastersAlgorithm
 from enmapboxprocessing.algorithm.applymaskalgorithm import ApplyMaskAlgorithm
 from enmapboxprocessing.algorithm.build3dcubealgorithm import Build3dCubeAlgorithm
 from enmapboxprocessing.algorithm.classfractionfromcategorizedlayeralgorithm import \
@@ -84,9 +85,11 @@ from enmapboxprocessing.algorithm.importprismal2dalgorithm import ImportPrismaL2
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
 from enmapboxprocessing.algorithm.importusgsspeclib07algorithm import ImportUsgsSpeclib07Algorithm
 from enmapboxprocessing.algorithm.inversetransformrasteralgorithm import InverseTransformRasterAlgorithm
+from enmapboxprocessing.algorithm.landcoverchangestatisticsalgorithm import LandCoverChangeStatisticsAlgorithm
 from enmapboxprocessing.algorithm.layertomaskalgorithm import LayerToMaskAlgorithm
 from enmapboxprocessing.algorithm.libraryfromclassificationdatasetalgorithm import \
     LibraryFromClassificationDatasetAlgorithm
+from enmapboxprocessing.algorithm.libraryfromregressiondatasetalgorithm import LibraryFromRegressionDatasetAlgorithm
 from enmapboxprocessing.algorithm.mergeclassificationdatasetalgorithm import MergeClassificationDatasetsAlgorithm
 from enmapboxprocessing.algorithm.predictclassificationalgorithm import PredictClassificationAlgorithm
 from enmapboxprocessing.algorithm.predictclassprobabilityalgorithm import PredictClassPropabilityAlgorithm
@@ -233,6 +236,7 @@ from enmapboxprocessing.algorithm.spectralresamplingtosentinel2algorithm import 
     SpectralResamplingToSentinel2bAlgorithm
 from enmapboxprocessing.algorithm.stackrasterlayersalgorithm import StackRasterLayersAlgorithm
 from enmapboxprocessing.algorithm.subsetrasterbandsalgorithm import SubsetRasterBandsAlgorithm
+from enmapboxprocessing.algorithm.tilerasteralgorithm import TileRasterAlgorithm
 from enmapboxprocessing.algorithm.transformrasteralgorithm import TransformRasterAlgorithm
 from enmapboxprocessing.algorithm.translatecategorizedrasteralgorithm import TranslateCategorizedRasterAlgorithm
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
@@ -243,6 +247,7 @@ from enmapboxprocessing.algorithm.writeenviheaderalgorithm import WriteEnviHeade
 def algorithms():
     algos = [
         AggregateRasterBandsAlgorithm(),
+        AggregateRastersAlgorithm(),
         ApplyMaskAlgorithm(),
         Build3dCubeAlgorithm(),
         ClassFractionFromCategorizedLayerAlgorithm(),
@@ -320,8 +325,10 @@ def algorithms():
         ImportSentinel2L2AAlgorithm(),
         ImportUsgsSpeclib07Algorithm(),
         InverseTransformRasterAlgorithm(),
+        LandCoverChangeStatisticsAlgorithm(),
         LayerToMaskAlgorithm(),
         LibraryFromClassificationDatasetAlgorithm(),
+        LibraryFromRegressionDatasetAlgorithm(),
         MergeClassificationDatasetsAlgorithm(),
         PredictClassificationAlgorithm(),
         PredictClassPropabilityAlgorithm(),
@@ -423,6 +430,7 @@ def algorithms():
         StackRasterLayersAlgorithm(),
         SubsetRasterBandsAlgorithm(),
         PrepareRegressionDatasetFromSynthMixAlgorithm(),
+        TileRasterAlgorithm(),
         TranslateCategorizedRasterAlgorithm(),
         TranslateRasterAlgorithm(),
         TransformRasterAlgorithm(),

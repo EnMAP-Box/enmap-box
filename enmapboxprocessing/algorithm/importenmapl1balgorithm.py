@@ -120,7 +120,7 @@ class ImportEnmapL1BAlgorithm(EnMAPProcessingAlgorithm):
 
     @staticmethod
     def findFilename(basename: str):
-        extensions = ['.TIF', '.GEOTIFF', '.BSQ', '.BIL', '.BIP', 'JPEG2000', '.JP2', '.jp2']  # see issue #1421
+        extensions = ['.TIF', '.GEOTIFF', '.BSQ', '.BIL', '.BIP', 'JPEG2000', '.JP2', '.jp2', '_COG.tiff']
         for extention in extensions:
             filename = basename + extention
             if exists(filename):

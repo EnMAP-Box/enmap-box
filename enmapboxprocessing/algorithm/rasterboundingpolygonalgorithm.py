@@ -13,6 +13,10 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 @typechecked
 class RasterBoundingPolygonAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
+    P_GEOMETRY_TYPE, _GEOMETRY_TYPE = 'geometryType', 'Geometry type'
+    O_GEOMETRY_TYPE = ['Envelope (Bounding Box)', 'Minimum Oriented Rectangle', 'Minimum Enclosing Circle',
+                       'Convex Hull']
+    EnvelopeBoundingBox, MinimumOrientedRectangle, MinimumEnclosingCircle, ConvexHull = range(4)
     P_OUTPUT_VECTOR, _OUTPUT_VECTOR = 'outputVector', 'Output vector layer'
 
     def displayName(self) -> str:
@@ -24,6 +28,7 @@ class RasterBoundingPolygonAlgorithm(EnMAPProcessingAlgorithm):
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
             (self._RASTER, 'A raster layer used for bounding polygon calculation.'),
+            (self._GEOMETRY_TYPE, 'Enclosing geometry type.'),
             (self._OUTPUT_VECTOR, self.VectorFileDestination)
         ]
 
@@ -32,12 +37,16 @@ class RasterBoundingPolygonAlgorithm(EnMAPProcessingAlgorithm):
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
+        self.addParameterEnum(
+            self.P_GEOMETRY_TYPE, self._GEOMETRY_TYPE, self.O_GEOMETRY_TYPE, False, self.ConvexHull, True
+        )
         self.addParameterVectorDestination(self.P_OUTPUT_VECTOR, self._OUTPUT_VECTOR)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
+        geometryType = self.parameterAsEnum(parameters, self.P_GEOMETRY_TYPE, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_VECTOR, context)
 
         with open(filename + '.log', 'w') as logfile:
@@ -67,9 +76,10 @@ class RasterBoundingPolygonAlgorithm(EnMAPProcessingAlgorithm):
             self.runAlg(alg, parameters, None, feedback2, context, True)
 
             # simplify to convex hull polygon
-            alg = 'native:convexhull'
+            alg = 'qgis:minimumboundinggeometry'
             parameters = {
                 'INPUT': filenamePolygon,
+                'TYPE': geometryType,
                 'OUTPUT': filename
             }
             self.runAlg(alg, parameters, None, feedback2, context, True)

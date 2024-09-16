@@ -185,9 +185,10 @@ class RasterWriter(object):
     def gdalBand(self, bandNo: int = None) -> gdal.Band:
         return self._gdalObject(bandNo)
 
-    def close(self):
+    def close(self, stac=False):
         self.gdalDataset.FlushCache()
-        from enmapboxprocessing.algorithm.writestacheaderalgorithm import WriteStacHeaderAlgorithm
-        WriteStacHeaderAlgorithm.writeStacHeader(self.gdalDataset)
+        if stac:
+            from enmapboxprocessing.algorithm.writestacheaderalgorithm import WriteStacHeaderAlgorithm
+            WriteStacHeaderAlgorithm.writeStacHeader(self.gdalDataset)
         self.gdalDataset = None
         self.closed = True
