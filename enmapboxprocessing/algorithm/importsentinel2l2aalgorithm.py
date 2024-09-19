@@ -5,6 +5,7 @@ from osgeo import gdal
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
+from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
@@ -128,7 +129,19 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
             options = gdal.BuildVRTOptions(separate=True, xRes=pixelSize, yRes=pixelSize)
 
             # create VRTs
-            ds: gdal.Dataset = gdal.BuildVRT(filename, filenames, options=options)
+            if filename.endswith('.vrt'):
+                ds: gdal.Dataset = gdal.BuildVRT(filename, filenames, options=options)
+            else:
+                gdal.BuildVRT(filename + '.vrt', filenames, options=options)
+                alg = SaveRasterAsAlgorithm()
+                parameters = {
+                    alg.P_RASTER: filename + '.vrt',
+                    alg.P_COPY_METADATA: False,
+                    alg.P_COPY_STYLE: False,
+                    alg.P_OUTPUT_RASTER: filename
+                }
+                self.runAlg(alg, parameters, None, feedback2, context, True)
+                ds = gdal.Open(filename, gdal.GA_Update)
             ds.SetMetadataItem('wavelength', '{' + ', '.join(wavelength[:ds.RasterCount]) + '}', 'ENVI')
             ds.SetMetadataItem('wavelength_units', 'nanometers', 'ENVI')
             for bandNo, name in enumerate(bandNames, 1):

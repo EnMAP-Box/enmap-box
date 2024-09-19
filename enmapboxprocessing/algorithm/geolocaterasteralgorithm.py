@@ -87,7 +87,6 @@ class GeolocateRasterAlgorithm(EnMAPProcessingAlgorithm):
         pixelStep = self.parameterAsInt(parameters, self.P_PIXEL_STEP, context)
         lineStep = self.parameterAsInt(parameters, self.P_LINE_STEP, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_RASTER, context)
-        assert filename.endswith('.vrt')
 
         if xband is None:
             xband = 1
@@ -120,7 +119,6 @@ class GeolocateRasterAlgorithm(EnMAPProcessingAlgorithm):
             ds = None
 
             # apply geolocations by warping
-            # ds = gdal.Warp(filename, zfilename, geoloc=True, dstSRS=crs.toWkt(), xRes=0.0001, yRes=0.0001)
             if grid is None:
                 ds = gdal.Warp(filename, zfilename, geoloc=True, srcSRS=crs.toWkt(), dstSRS=crs.toWkt())
             else:

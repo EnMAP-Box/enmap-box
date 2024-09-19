@@ -46,7 +46,7 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
     P_sla, _sla = 'sla', 'Soil line slope'
     P_slb, _slb = 'slb', 'Soil line intercept'
 
-    P_OUTPUT_VRT, _OUTPUT_VRT = 'outputVrt', 'Output VRT layer'
+    P_OUTPUT_RASTER, _OUTPUT_RASTER = 'outputVrt', 'Output VRT layer'
 
     ShortNames = ['A', 'B', 'G', 'R', 'RE1', 'RE2', 'RE3', 'RE4', 'N', 'S1', 'S2', 'T1', 'T2']
 
@@ -103,7 +103,7 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
              'If the source raster has proper wavelength information, mapping is done automatically.'),
             ('Canopy background adjustment (L), ..., Soil line intercept (slb)',
              'Standardized additional index parameters L, ..., slb used in the formulas.'),
-            (self._OUTPUT_VRT, 'VRT file destination.'),
+            (self._OUTPUT_RASTER, 'VRT file destination.'),
         ]
         keys = [self._A, self._B, self._G, self._R, self._RE1, self._RE2, self._RE3, self._RE4, self._N, self._S1,
                 self._S2, self._T1, self._T2, self._L, self._g, self._C1, self._C2, self._cexp, self._nexp, self._alpha,
@@ -124,7 +124,7 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
         for name in self.ConstantMapping:
             description = getattr(self, '_' + name)
             self.addParameterFloat(name, description, self.ConstantMapping[name], True, None, None, True)
-        self.addParameterVrtDestination(self.P_OUTPUT_VRT, self._OUTPUT_VRT)
+        self.addParameterVrtDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
@@ -135,7 +135,7 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
         scale = self.parameterAsFloat(parameters, self.P_SCALE, context)
         if scale is None:
             scale = 1
-        filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_VRT, context)
+        filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_RASTER, context)
 
         with open(filename + '.log', 'w') as logfile:
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
@@ -222,7 +222,7 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
             writer.close()
             ds = None
 
-            result = {self.P_OUTPUT_VRT: filename}
+            result = {self.P_OUTPUT_RASTER: filename}
             self.toc(feedback, result)
 
         return result

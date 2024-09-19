@@ -48,3 +48,12 @@ class TestSubsetRasterBandsAlgorithm(TestCase):
         }
         self.runalg(alg, parameters)
         self.assertEqual(3, np.sum(RasterReader(parameters[alg.P_OUTPUT_RASTER]).array()))
+
+    def test_saveAsTif(self):
+        alg = SubsetRasterBandsAlgorithm()
+        parameters = {
+            alg.P_RASTER: enmap,
+            alg.P_BAND_LIST: [1, 11, 21],
+            alg.P_OUTPUT_RASTER: self.filename('raster.tif')
+        }
+        self.runalg(alg, parameters)
