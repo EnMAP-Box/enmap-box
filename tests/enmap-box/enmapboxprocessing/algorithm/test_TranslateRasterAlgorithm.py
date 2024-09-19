@@ -14,14 +14,6 @@ from qgis.core import QgsRectangle, QgsCoordinateReferenceSystem, QgsRasterLayer
 
 class TestTranslateAlgorithm(TestCase):
 
-    def test_TEST(self):
-        alg = TranslateRasterAlgorithm()
-        parameters = {
-            alg.P_RASTER: r'D:\data\sensors\enmap\ENMAP01-____L1B-DT0000004135_20221005T023547Z_010_V010106_20221014T102746Z\ENMAP01-____L1B-DT0000004135_20221005T023547Z_010_V010106_20221014T102746Z-SPECTRAL_IMAGE_VNIR.TIF',
-            alg.P_OUTPUT_RASTER: self.filename('raster.vrt')
-        }
-        self.runalg(alg, parameters)
-
     def test_default(self):
         writer = self.rasterFromRange((3, 10, 10))
         writer.close()
