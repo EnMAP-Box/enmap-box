@@ -6,6 +6,7 @@ from typing import Dict, Any, List, Tuple
 import numpy as np
 from osgeo import gdal
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
@@ -13,7 +14,6 @@ from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsMapLayer)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -86,16 +86,24 @@ class ImportPrismaL1Algorithm(EnMAPProcessingAlgorithm):
         self.addParameterFile(self.P_FILE, self._FILE, extension='he5')
         self.addParameterEnum(self.P_SPECTRAL_REGION, self._SPECTRAL_REGION, self.O_SPECTRAL_REGION, False, 0)
         self.addParameterRasterDestination(self.P_OUTPUT_SPECTRAL_CUBE, self._OUTPUT_SPECTRAL_CUBE)
-        self.addParameterVrtDestination(self.P_OUTPUT_PAN_CUBE, self._OUTPUT_PAN_CUBE, None, True, False)
-        self.addParameterVrtDestination(self.P_OUTPUT_CLOUD_MASK, self._OUTPUT_CLOUD_MASK, None, True, False)
-        self.addParameterVrtDestination(self.P_OUTPUT_LANDCOVER_MASK, self._OUTPUT_LANDCOVER_MASK, None, True, False)
-        self.addParameterVrtDestination(self.P_OUTPUT_SUN_GLINT_MASK, self._OUTPUT_SUN_GLINT_MASK, None, True, False)
-        self.addParameterRasterDestination(self.P_OUTPUT_SPECTRAL_ERROR, self._OUTPUT_SPECTRAL_ERROR, None, True, False)
+        self.addParameterVrtDestination(self.P_OUTPUT_PAN_CUBE, self._OUTPUT_PAN_CUBE, None, True, False, True)
+        self.addParameterVrtDestination(self.P_OUTPUT_CLOUD_MASK, self._OUTPUT_CLOUD_MASK, None, True, False, True)
+        self.addParameterVrtDestination(
+            self.P_OUTPUT_LANDCOVER_MASK, self._OUTPUT_LANDCOVER_MASK, None, True, False, True
+        )
+        self.addParameterVrtDestination(
+            self.P_OUTPUT_SUN_GLINT_MASK, self._OUTPUT_SUN_GLINT_MASK, None, True, False, True
+        )
+        self.addParameterRasterDestination(
+            self.P_OUTPUT_SPECTRAL_ERROR, self._OUTPUT_SPECTRAL_ERROR, None, True, False, True
+        )
         self.addParameterVrtDestination(
             self.P_OUTPUT_SPECTRAL_GEOLOCATION, self._OUTPUT_SPECTRAL_GEOLOCATION, None, True, False
         )
-        self.addParameterVrtDestination(self.P_OUTPUT_PAN_GEOLOCATION, self._OUTPUT_PAN_GEOLOCATION, None, True, False)
-        self.addParameterVrtDestination(self.P_OUTPUT_PAN_ERROR, self._OUTPUT_PAN_ERROR, None, True, False)
+        self.addParameterVrtDestination(
+            self.P_OUTPUT_PAN_GEOLOCATION, self._OUTPUT_PAN_GEOLOCATION, None, True, False, True
+        )
+        self.addParameterVrtDestination(self.P_OUTPUT_PAN_ERROR, self._OUTPUT_PAN_ERROR, None, True, False, True)
 
     def defaultParameters(self, file: str):
         return {

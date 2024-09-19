@@ -5,6 +5,7 @@ from osgeo import gdal
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
+from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
@@ -112,7 +113,19 @@ class ImportLandsatL2Algorithm(EnMAPProcessingAlgorithm):
 
             # create VRT
             options = gdal.BuildVRTOptions(separate=True, xRes=30, yRes=30)
-            ds = gdal.BuildVRT(filename, filenames, options=options)
+            if filename.endswith('.vrt'):
+                ds = gdal.BuildVRT(filename, filenames, options=options)
+            else:
+                gdal.BuildVRT(filename + '.vrt', filenames, options=options)
+                alg = SaveRasterAsAlgorithm()
+                parameters = {
+                    alg.P_RASTER: filename + '.vrt',
+                    alg.P_COPY_METADATA: False,
+                    alg.P_COPY_STYLE: False,
+                    alg.P_OUTPUT_RASTER: filename
+                }
+                self.runAlg(alg, parameters, None, feedback2, context, True)
+                ds = gdal.Open(filename, gdal.GA_Update)
             ds.SetMetadataItem('wavelength', wavelength, 'ENVI')
             ds.SetMetadataItem('wavelength_units', 'nanometers', 'ENVI')
             wavelength = wavelength[1:-1].split(',')

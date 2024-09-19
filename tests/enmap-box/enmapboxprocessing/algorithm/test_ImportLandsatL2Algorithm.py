@@ -61,3 +61,15 @@ class TestImportLandsatL2Algorithm(TestCase):
         result = self.runalg(alg, parameters)
         array = RasterReader(result[alg.P_OUTPUT_RASTER]).array(bandList=[1])
         # self.assertEqual(31240899446, round(np.sum(array, dtype=float)))
+
+    def test_saveAsTif(self):
+        if sensorProductsRoot() is None or self.skipProductImport:
+            return
+
+        alg = ImportLandsatL2Algorithm()
+        parameters = {
+            alg.P_FILE: SensorProducts.Landsat.LC08_L2_MtlTxt,
+            alg.P_OUTPUT_RASTER: self.filename('landsat9L2C2.tif')
+        }
+
+        result = self.runalg(alg, parameters)

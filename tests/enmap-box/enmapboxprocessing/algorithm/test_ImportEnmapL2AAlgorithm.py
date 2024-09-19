@@ -148,3 +148,14 @@ class TestImportEnmapL2AAlgorithm(TestCase):
         }
         result = self.runalg(alg, parameters)
         reader = RasterReader(result[alg.P_OUTPUT_RASTER])
+
+    def test_saveAsTif(self):
+        if sensorProductsRoot() is None or self.skipProductImport:
+            return
+
+        alg = ImportEnmapL2AAlgorithm()
+        parameters = {
+            alg.P_FILE: SensorProducts.Enmap.L2A_MetadataXml,
+            alg.P_OUTPUT_RASTER: self.filename('enmapL2A.tif'),
+        }
+        result = self.runalg(alg, parameters)
