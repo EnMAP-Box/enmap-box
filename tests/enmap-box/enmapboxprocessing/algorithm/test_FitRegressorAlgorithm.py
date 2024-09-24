@@ -4,7 +4,7 @@ from enmapboxprocessing.algorithm.fitcatboostregressoralgorithm import FitCatBoo
 from enmapboxprocessing.algorithm.fitgaussianprocessregressoralgorithm import FitGaussianProcessRegressorAlgorithm
 from enmapboxprocessing.algorithm.fitkernelridgealgorithm import FitKernelRidgeAlgorithm
 from enmapboxprocessing.algorithm.fitlinearregressionalgorithm import FitLinearRegressionAlgorithm
-from enmapboxprocessing.algorithm.fitlinearsvralgorithm import FitLinearSVRAlgorithm
+from enmapboxprocessing.algorithm.fitlinearsvralgorithm import FitLinearSvrAlgorithm
 from enmapboxprocessing.algorithm.fitplsegressionalgorithm import FitPLSRegressionAlgorithm
 from enmapboxprocessing.algorithm.fitrandomforestregressoralgorithm import FitRandomForestRegressorAlgorithm
 from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
@@ -63,7 +63,7 @@ class TestFitRegressorAlgorithm(TestCase):
             FitGaussianProcessRegressorAlgorithm(),
             FitLinearRegressionAlgorithm(),
             FitKernelRidgeAlgorithm(),
-            FitLinearSVRAlgorithm(),
+            FitLinearSvrAlgorithm(),
             FitPLSRegressionAlgorithm(),
         ]
         for alg in algs:
@@ -78,7 +78,7 @@ class TestFitRegressorAlgorithm(TestCase):
             self.runalg(alg, parameters)
 
     def test_debug_issue967(self):
-        alg = FitLinearSVRAlgorithm()
+        alg = FitLinearSvrAlgorithm()
         parameters = {
             alg.P_DATASET: regressorDumpMultiTargetPkl,
             alg.P_REGRESSOR: alg.defaultCodeAsString(),
@@ -86,7 +86,7 @@ class TestFitRegressorAlgorithm(TestCase):
         }
         self.runalg(alg, parameters)
 
-        alg = FitLinearSVRAlgorithm()
+        alg = FitLinearSvrAlgorithm()
         parameters = {
             alg.P_DATASET: regressorDumpSingleTargetPkl,
             alg.P_REGRESSOR: alg.defaultCodeAsString(),

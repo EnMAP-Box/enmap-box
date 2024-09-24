@@ -46,7 +46,7 @@ from enmapboxprocessing.algorithm.fitlgbmclassifieralgorithm import FitLGBMClass
 from enmapboxprocessing.algorithm.fitlgbmregressoralgorithm import FitLGBMRegressorAlgorithm
 from enmapboxprocessing.algorithm.fitlinearregressionalgorithm import FitLinearRegressionAlgorithm
 from enmapboxprocessing.algorithm.fitlinearsvcalgorithm import FitLinearSvcAlgorithm
-from enmapboxprocessing.algorithm.fitlinearsvralgorithm import FitLinearSVRAlgorithm
+from enmapboxprocessing.algorithm.fitlinearsvralgorithm import FitLinearSvrAlgorithm
 from enmapboxprocessing.algorithm.fitlogisticregressionralgorithm import FitLogisticRegressionAlgorithm
 from enmapboxprocessing.algorithm.fitmaxabsscaleralgorithm import FitMaxAbsScalerAlgorithm
 from enmapboxprocessing.algorithm.fitmeanshiftalgorithm import FitMeanShiftAlgorithm
@@ -290,7 +290,7 @@ def algorithms():
         FitGaussianProcessRegressorAlgorithm(),
         FitLinearRegressionAlgorithm(),
         FitKernelRidgeAlgorithm(),
-        FitLinearSVRAlgorithm(),
+        FitLinearSvrAlgorithm(),
         FitPLSRegressionAlgorithm(),
         FitPcaAlgorithm(),
         FitFastIcaAlgorithm(),
