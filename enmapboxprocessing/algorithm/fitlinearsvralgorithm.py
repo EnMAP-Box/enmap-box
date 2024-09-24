@@ -3,7 +3,7 @@ from enmapbox.typeguard import typechecked
 
 
 @typechecked
-class FitLinearSVRAlgorithm(FitRegressorAlgorithmBase):
+class FitLinearSvrAlgorithm(FitRegressorAlgorithmBase):
 
     def displayName(self) -> str:
         return 'Fit LinearSVR'
