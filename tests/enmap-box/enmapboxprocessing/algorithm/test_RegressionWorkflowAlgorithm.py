@@ -51,6 +51,8 @@ class TestRegressionWorkflowAlgorithm(TestCase):
         except ModuleNotFoundError:
             return
 
+        print(catboost.version)
+
         alg = RegressionWorkflowAlgorithm()
         parameters = {
             alg.P_DATASET: regressorDumpSingleTargetPkl,
@@ -69,6 +71,8 @@ class TestRegressionWorkflowAlgorithm(TestCase):
             import catboost
         except ModuleNotFoundError:
             return
+
+        print(catboost.version)
 
         alg = RegressionWorkflowAlgorithm()
         parameters = {
