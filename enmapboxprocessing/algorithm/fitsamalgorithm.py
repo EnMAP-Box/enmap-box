@@ -13,7 +13,7 @@ class FitSamAlgorithm(FitClassifierAlgorithmBase):
                'Samples are first normalizes to the unit sphere and then classified using nearest neighbour.\n' \
                'See ' \
                '<a href="' \
-               'https://www.nv5geospatialsoftware.com/docs/spectralanglemapper.html' \
+               'https://www.nv5geospatialsoftware.com/docs/SpectralAngleMapper.html' \
                '">Docs Center > Using ENVI > Spectral Angle Mapper</a> for a more details description.'
 
     def helpParameterCode(self) -> str:
