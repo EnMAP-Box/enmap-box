@@ -45,6 +45,12 @@ class TestRegressionWorkflowAlgorithm(TestCase):
         self.runalg(alg, parameters)
 
     def test_catBoost_singleTarget(self):
+
+        try:
+            import catboost
+        except ModuleNotFoundError:
+            return
+
         alg = RegressionWorkflowAlgorithm()
         parameters = {
             alg.P_DATASET: regressorDumpSingleTargetPkl,
@@ -59,6 +65,11 @@ class TestRegressionWorkflowAlgorithm(TestCase):
         self.runalg(alg, parameters)
 
     def test_catBoost_multiTarget(self):
+        try:
+            import catboost
+        except ModuleNotFoundError:
+            return
+
         alg = RegressionWorkflowAlgorithm()
         parameters = {
             alg.P_DATASET: regressorDumpMultiTargetPkl,
