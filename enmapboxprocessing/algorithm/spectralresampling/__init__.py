@@ -12,9 +12,9 @@ class SpectralSensors():
 
     class Emit():
         responseFunctionFile = join(root, 'emit.csv')
-        shortname = 'PRISMA'
-        longname = 'Hyperspectral Precursor of the Application Mission'
-        website = 'https://www.asi.it/en/earth-science/prisma/'
+        shortname = 'EMIT'
+        longname = 'Earth Surface Mineral Dust Source Investigation'
+        website = 'https://earth.jpl.nasa.gov/emit/'
 
     class Enmap():
         responseFunctionFile = join(root, 'enmap.csv')

@@ -21,7 +21,7 @@ class SpectralResamplingToSensorAlgorithmBase(EnMAPProcessingAlgorithm):
 
     def shortDescription(self) -> str:
         link = self.htmlLink(self.sensor.website, 'mission website')
-        return f'Spectral resampling to {self.sensor.shortname} sensor.\n' \
+        return f'Spectral resampling to the {self.sensor.longname} ({self.sensor.shortname}) sensor.\n' \
                f'For more information see the {link}.'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
