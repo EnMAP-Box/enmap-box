@@ -228,6 +228,7 @@ from enmapboxprocessing.algorithm.spectralresamplingbywavelengthandfwhmalgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtocustomsensoralgorithm import \
     SpectralResamplingToCustomSensorAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtodesisalgorithm import SpectralResamplingToDesisAlgorithm
+from enmapboxprocessing.algorithm.spectralresamplingtoemitalgorithm import SpectralResamplingToEmitAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtoenmapalgorithm import SpectralResamplingToEnmapAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtolandsatalgorithm import SpectralResamplingToLandsatTmAlgorithm, \
     SpectralResamplingToLandsatEtmAlgorithm, SpectralResamplingToLandsatOliAlgorithm
@@ -420,6 +421,7 @@ def algorithms():
         SpectralResamplingByWavelengthAlgorithm(),
         SpectralResamplingToCustomSensorAlgorithm(),
         SpectralResamplingToDesisAlgorithm(),
+        SpectralResamplingToEmitAlgorithm(),
         SpectralResamplingToEnmapAlgorithm(),
         SpectralResamplingToLandsatTmAlgorithm(),
         SpectralResamplingToLandsatEtmAlgorithm(),
