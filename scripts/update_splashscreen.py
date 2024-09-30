@@ -57,7 +57,7 @@ def update_splashscreen():
     # see https://inkscape.org/doc/inkscape-man.html
     cmd = [
         #  'inkscape',
-        '"C:\Program Files\Inkscape\inkscape.exe"'
+        r'"C:\Program Files\Inkscape\inkscape.exe"',
         '--export-type=png',
         '--export-area-page',
         f'--export-filename={PATH_PNG}',
