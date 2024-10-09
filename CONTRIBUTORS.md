@@ -3,25 +3,28 @@ People who made large contributions to the EnMAP-Box (in alphabetical order).
 ### Earth Observation Lab, Humboldt-Universität zu Berlin, Germany
 
 * Andreas Janz <andreas.janz@geo.hu-berlin.de>
-* Akpona Okujeni <akpona.okujeni@geo.hu-berlin.de>
+* Akpona Okujeni
 * Benjamin Jakimow <benjamin.jakimow@geo.hu-berlin.de>
-* Franz Schug <franz.schug@geo.hu-berlin.de>
-* Katja Kowalski <katja.kowalski@geo.hu-berlin.de>
-* Philippe Rufin <philippe.rufin@geo.hu-berlin.de>
-* Marcel Schwieder <marcel.schwieder@geo.hu-berlin.de>
-* Matthias Held <matthias.held@hu-berlin.de>
-* Sam Cooper <sam.cooper@geo.hu-berlin.de>
-* Stefan Ernst <stefan.ernst@geo.hu-berlin.de>
+* Franz Schug
+* Katja Kowalski
+* Philippe Rufin
+* Marcel Schwieder
+* Matthias Held
+* Sam Cooper
+* Stefan Ernst
 
 ### Earth Observation and Geoinformation Science Lab, University of Greifswald, Germany
 
-* Fabian Thiel <fabian.thiel@uni-greifswald.de>
+* Fabian Thiel
 * Sebastian van der Linden <sebastian.linden@uni-greifswald.de>
 
 ### Ludwig-Maximilians-Universität München, Germany
 
-* Matthias Wocher <m.wocher@lmu.de>
-* Martin Danner
+* Katja Berger <katja.berger@gfz-potsdam.de>
+* Matthias Wocher <matthias.wocher@ohb.de>
+* Martin Danner <martin.danner@stmelf.bayern.de>
+* Stefanie Steinhauser <stefanie.steinhauser@lmu.de>
+* Tobias Hank <tobias.hank@lmu.de>
 
 ### GFZ German Research Centre For Geosciences, Potsdam, Germany
 
@@ -43,6 +46,6 @@ People who made large contributions to the EnMAP-Box (in alphabetical order).
 ### AWI Alfred Wegener Institute for Polar and Marine Research, Bremerhaven, Germany
 
 * Astrid Bracher <astrid.bracher@awi.de>
-* Brenner Silva <brenner.silva@awi.de>
-* Leonardo Alvarado <leonardo.alvarado@awi.de>
+* Brenner Silva
+* Leonardo Alvarado  <leonardo.alvarado@dlr.de>
 * Mariana Altenburg Soppa <mariana.altenburg.soppa@awi.de>
