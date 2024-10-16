@@ -80,8 +80,7 @@ class ImportEnmapL1CAlgorithm(EnMAPProcessingAlgorithm):
             ds = gdal.Open(ImportEnmapL1BAlgorithm.findFilename(
                 xmlFilename.replace('-METADATA.XML', '-SPECTRAL_IMAGE'))
             )
-            options = gdal.TranslateOptions(format='VRT')
-            ds: gdal.Dataset = gdal.Translate(destName=filename, srcDS=ds, options=options)
+            ds: gdal.Dataset = gdal.Translate(filename, ds)
             ds.SetMetadataItem('wavelength', '{' + ', '.join(wavelength[:ds.RasterCount]) + '}', 'ENVI')
             ds.SetMetadataItem('wavelength_units', 'nanometers', 'ENVI')
             ds.SetMetadataItem('fwhm', '{' + ', '.join(fwhm[:ds.RasterCount]) + '}', 'ENVI')

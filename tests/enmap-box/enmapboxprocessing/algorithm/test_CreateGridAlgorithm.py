@@ -1,6 +1,8 @@
-from enmapboxtestdata import enmap
+from osgeo import gdal
+
 from enmapboxprocessing.algorithm.creategridalgorithm import CreateGridAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
+from enmapboxtestdata import enmap
 from qgis.core import QgsRasterLayer
 
 
@@ -45,3 +47,21 @@ class TestCreateGridAlgorithm(TestCase):
             (raster.height(), grid.height())
         ]:
             self.assertEqual(gold, lead)
+
+    def test_saveAsTif(self):
+        raster = QgsRasterLayer(enmap)
+        alg = CreateGridAlgorithm()
+        alg.initAlgorithm()
+        parameters = {
+            alg.P_CRS: raster.crs(),
+            alg.P_EXTENT: raster.extent(),
+            alg.P_UNIT: alg.PixelUnits,
+            alg.P_WIDTH: raster.width(),
+            alg.P_HEIGHT: raster.height(),
+            alg.P_OUTPUT_GRID: self.filename('grid.tif')
+        }
+        result = self.runalg(alg, parameters)
+        return
+        ds: gdal.Dataset = gdal.Open(result[alg.P_OUTPUT_GRID])
+        driver: gdal.Driver = ds.GetDriver()
+        self.assertEqual('GeoTIFF', driver.LongName)

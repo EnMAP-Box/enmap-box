@@ -1,4 +1,3 @@
-import re
 from os.path import exists, splitext
 from typing import List, Union
 
@@ -440,19 +439,15 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
 
             # plotting list of values (see issue #668)
             try:
-                text = re.sub(r'\s+', ' ', node.value())  # compress whitespaces
-                if ',' not in text:  # values are separated by whitespace (numpy-style)
-                    text = text.replace(' ', ',')
-                array = np.array(eval(text), dtype=float)
+                obj = node.mPyObject
+                array = np.array(obj, dtype=float)
                 assert array.ndim == 1
                 a = menu.addAction('Plot values')
                 a.triggered.connect(
                     lambda *args: pg.plot(range(1, len(array) + 1), array).setWindowTitle(f'Value Plot - {node.name()}')
                 )
             except Exception as error:
-                print(str(error))
-                raise
-                pass  # not a numeric value
+                pass
 
         # add the node-specific menu actions
         if isinstance(node, TreeNode):

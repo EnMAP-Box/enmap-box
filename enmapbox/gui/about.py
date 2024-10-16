@@ -70,6 +70,12 @@ class AboutDialog(QDialog):
         self.labelVersion.setText(info)
         self.setAboutTitle()
 
+        def loadMDAndremoveDetailsSection(p: Union[str, pathlib.Path]):  # see issue #990
+            with open(p, 'r', encoding='utf-8') as f:
+                md = f.readlines()
+            md = [l for l in md if 'details>' not in l]
+            return ''.join(md)
+
         def loadMD(p: Union[str, pathlib.Path]):
             p = pathlib.Path(p)
 
@@ -89,7 +95,7 @@ class AboutDialog(QDialog):
         self.tbLicense.setMarkdown(loadMD(r / 'LICENSE.md'))
         self.tbCredits.setMarkdown(loadMD(r / 'CREDITS.md'))
         self.tbContributors.setMarkdown(loadMD(r / 'CONTRIBUTORS.md'))
-        self.tbChanges.setMarkdown(loadMD(r / 'CHANGELOG.md'))
+        self.tbChanges.setMarkdown(loadMDAndremoveDetailsSection(r / 'CHANGELOG.md'))
 
     def setAboutTitle(self, suffix: str = None):
         """

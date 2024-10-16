@@ -55,11 +55,14 @@ def update_splashscreen():
     tree.write(PATH_EXPORT, encoding='utf8')
 
     # see https://inkscape.org/doc/inkscape-man.html
-    cmd = ['inkscape',
-           '--export-type=png',
-           '--export-area-page',
-           f'--export-filename={PATH_PNG}',
-           f'{PATH_EXPORT}']
+    cmd = [
+        #  'inkscape',
+        r'"C:\Program Files\Inkscape\inkscape.exe"',
+        '--export-type=png',
+        '--export-area-page',
+        f'--export-filename={PATH_PNG}',
+        f'{PATH_EXPORT}'
+    ]
 
     print('Run:\n' + ' '.join(cmd))
     print('to export the svg as png with Inkscape (https://inkscape.org)')

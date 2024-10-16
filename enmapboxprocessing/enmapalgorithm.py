@@ -794,22 +794,24 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
 
     def addParameterRasterDestination(
             self, name: str, description: str, defaultValue=None, optional=False, createByDefault=True,
-            allowTif=True, allowEnvi=True, allowVrt=False, advanced=False
+            allowTif=True, allowEnvi=True, allowVrt=False, defaultFileExtension: str = None, advanced=False
     ):
         self.addParameter(
             ProcessingParameterRasterDestination(
-                name, description, defaultValue, optional, createByDefault, allowTif, allowEnvi, allowVrt
+                name, description, defaultValue, optional, createByDefault, allowTif, allowEnvi, allowVrt,
+                defaultFileExtension
             )
         )
         self.flagParameterAsAdvanced(name, advanced)
 
     def addParameterVrtDestination(
             self, name: str, description: str, defaultValue=None, optional=False, createByDefault=True,
-            advanced=False
+            vrtOnly=False, advanced=False
     ):
         self.addParameterRasterDestination(
-            name, description, defaultValue, optional, createByDefault, False, False, True, advanced
+            name, description, defaultValue, optional, createByDefault, not vrtOnly, not vrtOnly, True, 'vrt', advanced
         )
+
         self.flagParameterAsAdvanced(name, advanced)
 
     def addParameterVectorDestination(

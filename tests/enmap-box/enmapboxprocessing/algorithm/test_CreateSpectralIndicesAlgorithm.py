@@ -3,10 +3,11 @@ from os.path import dirname
 
 from osgeo import gdal
 
-from enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxprocessing.utils import Utils
+from enmapboxtestdata import enmap
 from qgis.core import QgsProcessingException
 
 
@@ -18,10 +19,10 @@ class TestCreateSpectralIndicesAlgorithm(TestCase):
         parameters = {
             alg.P_RASTER: enmap,
             alg.P_INDICES: 'NDVI',
-            alg.P_OUTPUT_VRT: self.filename('ndvi.vrt'),
+            alg.P_OUTPUT_RASTER: self.filename('ndvi.vrt'),
         }
         result = self.runalg(alg, parameters)
-        reader = RasterReader(result[alg.P_OUTPUT_VRT])
+        reader = RasterReader(result[alg.P_OUTPUT_RASTER])
         self.assertEqual('NDVI', reader.metadataItem('short_name', '', 1))
         self.assertEqual('Normalized Difference Vegetation Index', reader.metadataItem('long_name', '', 1))
         self.assertEqual('(N - R)/(N + R)', reader.metadataItem('formula', '', 1))
@@ -32,10 +33,10 @@ class TestCreateSpectralIndicesAlgorithm(TestCase):
         parameters = {
             alg.P_RASTER: enmap,
             alg.P_INDICES: 'MY_NDVI = (N - R)/(N + R)',
-            alg.P_OUTPUT_VRT: self.filename('my_ndvi.vrt'),
+            alg.P_OUTPUT_RASTER: self.filename('my_ndvi.vrt'),
         }
         result = self.runalg(alg, parameters)
-        reader = RasterReader(result[alg.P_OUTPUT_VRT])
+        reader = RasterReader(result[alg.P_OUTPUT_RASTER])
         self.assertEqual('MY_NDVI', reader.metadataItem('short_name', '', 1))
         self.assertIsNone(reader.metadataItem('long_name', '', 1))
         self.assertEqual('(N - R)/(N + R)', reader.metadataItem('formula', '', 1))
@@ -46,10 +47,10 @@ class TestCreateSpectralIndicesAlgorithm(TestCase):
         parameters = {
             alg.P_RASTER: enmap,
             alg.P_INDICES: 'NDVI, EVI, MY_NDVI = (N - R)/(N + R)',
-            alg.P_OUTPUT_VRT: self.filename('ndvi.vrt'),
+            alg.P_OUTPUT_RASTER: self.filename('ndvi.vrt'),
         }
         result = self.runalg(alg, parameters)
-        reader = RasterReader(result[alg.P_OUTPUT_VRT])
+        reader = RasterReader(result[alg.P_OUTPUT_RASTER])
         self.assertEqual('NDVI', reader.metadataItem('short_name', '', 1))
         self.assertEqual('EVI', reader.metadataItem('short_name', '', 2))
         self.assertEqual('MY_NDVI', reader.metadataItem('short_name', '', 3))
@@ -60,7 +61,7 @@ class TestCreateSpectralIndicesAlgorithm(TestCase):
         parameters = {
             alg.P_RASTER: enmap,
             alg.P_INDICES: 'NOT_AN_INDEX',
-            alg.P_OUTPUT_VRT: self.filename('evi.vrt'),
+            alg.P_OUTPUT_RASTER: self.filename('evi.vrt'),
         }
         try:
             self.runalg(alg, parameters)
@@ -78,7 +79,7 @@ class TestCreateSpectralIndicesAlgorithm(TestCase):
         parameters = {
             alg.P_RASTER: 'enmap.tif',
             alg.P_INDICES: 'NDVI, EVI',
-            alg.P_OUTPUT_VRT: self.filename('vi.vrt'),
+            alg.P_OUTPUT_RASTER: self.filename('vi.vrt'),
         }
         result = self.runalg(alg, parameters)
 
@@ -88,10 +89,54 @@ class TestCreateSpectralIndicesAlgorithm(TestCase):
         parameters = {
             alg.P_RASTER: enmap,
             alg.P_INDICES: 'CUSTOM = (B + r555 - r1640) / (r555 + r1640)',
-            alg.P_OUTPUT_VRT: self.filename('custom.vrt'),
+            alg.P_OUTPUT_RASTER: self.filename('custom.vrt'),
         }
         result = self.runalg(alg, parameters)
-        reader = RasterReader(result[alg.P_OUTPUT_VRT])
+        reader = RasterReader(result[alg.P_OUTPUT_RASTER])
         self.assertEqual('CUSTOM', reader.metadataItem('short_name', '', 1))
         self.assertIsNone(reader.metadataItem('long_name', '', 1))
         self.assertEqual('(B + r555 - r1640) / (r555 + r1640)', reader.metadataItem('formula', '', 1))
+
+    def test_saveAsTif(self):
+        alg = CreateSpectralIndicesAlgorithm()
+        alg.initAlgorithm()
+        parameters = {
+            alg.P_RASTER: enmap,
+            alg.P_INDICES: 'NDVI',
+            alg.P_OUTPUT_RASTER: self.filename('ndvi.tif'),
+        }
+        result = self.runalg(alg, parameters)
+        ds: gdal.Dataset = gdal.Open(result[alg.P_OUTPUT_RASTER])
+        driver: gdal.Driver = ds.GetDriver()
+        self.assertEqual('GeoTIFF', driver.LongName)
+
+    def test_indicesFromFile(self):
+
+        formulars = {
+            "SpectralIndices": {
+                "MY_INDEX": {
+                    "bands": [
+                        "N",
+                        "S1",
+                        "S2"
+                    ],
+                    "formula": "(N - S1) / (N + S1)",
+                    "long_name": "Normalized Difference Moisture Index",
+                    "reference": "https://doi.org/10.1016/S0034-4257(96)00067-3",
+                    "short_name": "MY_INDEX",
+                    "type": "other"
+                }
+            }
+        }
+
+        Utils().jsonDump(formulars, self.filename('formulars.json'))
+
+        alg = CreateSpectralIndicesAlgorithm()
+        alg.initAlgorithm()
+        parameters = {
+            alg.P_RASTER: enmap,
+            alg.P_INDICES: 'MY_INDEX',
+            alg.P_JSON_FILE: self.filename('formulars.json'),
+            alg.P_OUTPUT_RASTER: self.filename('index.vrt'),
+        }
+        self.runalg(alg, parameters)

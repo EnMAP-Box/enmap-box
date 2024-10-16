@@ -6,8 +6,6 @@ HTML.py - v0.04 2009-07-28 Philippe Lagadec
 This module provides a few classes to easily generate HTML code such as tables
 and lists.
 
-Project website: http://www.decalage.info/python/html
-
 License: CeCILL (open-source GPL compatible), see source code for details.
          http://www.cecill.info
 """

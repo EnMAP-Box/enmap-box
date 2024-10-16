@@ -243,7 +243,7 @@ class SpectralIndexCreatorDialog(QMainWindow):
             alg.P_RASTER: layer,
             alg.P_SCALE: reflectanceScaleFactor,
             alg.P_INDICES: ', '.join(formulas),
-            alg.P_OUTPUT_VRT: filename
+            alg.P_OUTPUT_RASTER: filename
         }
         for name, bandNo in bandMapping.items():
             parameters[name] = bandNo
@@ -252,4 +252,4 @@ class SpectralIndexCreatorDialog(QMainWindow):
 
         result = processing.runAndLoadResults(alg, parameters)
 
-        self.enmapBox.addSource(result[alg.P_OUTPUT_VRT])
+        self.enmapBox.addSource(result[alg.P_OUTPUT_RASTER])

@@ -60,7 +60,6 @@ class SubsetRasterBandsAlgorithm(EnMAPProcessingAlgorithm):
             alg.P_EXCLUDE_BAD_BANDS: excludeBadBands,
             alg.P_EXCLUDE_DERIVED_BAD_BANDS: excludeDerivedBadBands,
             alg.P_COPY_METADATA: True,
-            alg.P_CREATION_PROFILE: self.DefaultVrtCreationProfile,
             alg.P_OUTPUT_RASTER: filename
         }
         self.runAlg(alg, parameters, None, feedback, context, True)
