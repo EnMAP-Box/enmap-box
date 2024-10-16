@@ -212,7 +212,7 @@ class RegressorDump(object):
     features: Optional[List[str]]
     X: Optional[SampleX]
     y: Optional[SampleY]
-    regressor: Optional[Union[RegressorMixin, Pipeline]] = None
+    regressor: Optional[Union[RegressorMixin, Pipeline, Any]] = None
     locations: Optional[np.ndarray] = None
     crs: Optional[str] = None
 

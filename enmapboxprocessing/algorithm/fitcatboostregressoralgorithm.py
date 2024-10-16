@@ -22,7 +22,9 @@ class FitCatBoostRegressorAlgorithm(FitRegressorAlgorithmBase):
 
     def code(cls):
         from catboost import CatBoostRegressor
-        regressor = CatBoostRegressor(n_estimators=100)
+        from sklearn.multioutput import MultiOutputRegressor
+
+        regressor = MultiOutputRegressor(CatBoostRegressor(n_estimators=100))
         return regressor
 
 

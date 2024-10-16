@@ -16,3 +16,15 @@ class TestImportEnmapL1BAlgorithm(TestCase):
             alg.P_OUTPUT_SWIR_RASTER: self.filename('enmapL1BSwir.vrt'),
         }
         self.runalg(alg, parameters)
+
+    def test_saveAsTif(self):
+        if sensorProductsRoot() is None or self.skipProductImport:
+            return
+
+        alg = ImportEnmapL1BAlgorithm()
+        parameters = {
+            alg.P_FILE: SensorProducts.Enmap.L1B_MetadataXml,
+            alg.P_OUTPUT_VNIR_RASTER: self.filename('enmapL1BVnir.tif'),
+            alg.P_OUTPUT_SWIR_RASTER: self.filename('enmapL1BSwir.tif'),
+        }
+        self.runalg(alg, parameters)

@@ -103,6 +103,8 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
             fwhm = [item.text for item in root.findall('specific/bandCharacterisation/bandID/FWHMOfBand')]
             gains = [item.text for item in root.findall('specific/bandCharacterisation/bandID/GainOfBand')]
             offsets = [item.text for item in root.findall('specific/bandCharacterisation/bandID/OffsetOfBand')]
+            bandStatisticsStdDev = [item.text for item in root.findall('product/bandStatistics/bandID/stdDeviation')]
+            bandStatisticsMean = [item.text for item in root.findall('product/bandStatistics/bandID/mean')]
 
             # make sure that wavelength are sorted
             values = np.array(wavelength, float)
@@ -112,11 +114,6 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
 
             # create VRT
             if detectorOverlap != self.MovingAverageFilterOverlapOption:
-
-                # vnirWavelength = [float(item.text)
-                #                  for item in root.findall('product/smileCorrection/VNIR/bandID/wavelength')]
-                # swirWavelength = [float(item.text)
-                #                  for item in root.findall('product/smileCorrection/SWIR/bandID/wavelength')]
 
                 vnirBandNumbers = [
                     int(text) for text in root.find('specific/vnirProductQuality/expectedChannelsList').text.split(',')
@@ -197,6 +194,8 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
             fwhm = [fwhm[bandNo - 1] for bandNo in bandList]
             gains = [gains[bandNo - 1] for bandNo in bandList]
             offsets = [offsets[bandNo - 1] for bandNo in bandList]
+            bandStatisticsStdDev = [bandStatisticsStdDev[bandNo - 1] for bandNo in bandList]
+            bandStatisticsMean = [bandStatisticsMean[bandNo - 1] for bandNo in bandList]
 
             for values in [wavelength, fwhm, gains, offsets]:
                 assert len(values) == ds.RasterCount
@@ -213,24 +212,18 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
                 rasterBand.SetOffset(float(offsets[i]))
                 rasterBand.FlushCache()
 
-            ds.FlushCache()  # need to FlushCache to fix #879 (not quite sure why)
-
-            if setBadBands:  # see issue #267
-                reader = RasterReader(ds)
+            if setBadBands:  # see issues #267 and #974
                 writer = RasterWriter(ds)
-                for bandNo in reader.bandNumbers():
-                    feedback.setProgress(bandNo / reader.bandCount() * 100)
-                    allNoData = np.all(
-                        reader.array(bandList=[bandNo])[0] == reader.noDataValue(bandNo))
-                    if allNoData:
+                for bandNo in writer.bandNumbers():
+                    if bandStatisticsStdDev[bandNo - 1] == '0' and bandStatisticsMean[bandNo - 1] == '-1000000':
                         writer.setBadBandMultiplier(0, bandNo)
                 writer.close()
-                del reader, writer
+                del writer
             del ds
 
             if excludeBadBands:  # see issue #461
                 if not setBadBands:
-                    raise QgsProcessingException('To "Exclude bad bands", also active "Set bad bands" option.')
+                    raise QgsProcessingException('To "Exclude bad bands", also "Set bad bands" option.')
 
             alg = SubsetRasterBandsAlgorithm()
             parameters = {
@@ -246,9 +239,15 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
             redBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['R'][0])
             greenBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['G'][0])
             blueBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['B'][0])
-            redMin, redMax = reader.provider.cumulativeCut(redBandNo, 0.02, 0.98)
-            greenMin, greenMax = reader.provider.cumulativeCut(greenBandNo, 0.02, 0.98)
-            blueMin, blueMax = reader.provider.cumulativeCut(blueBandNo, 0.02, 0.98)
+            redMin, redMax = reader.provider.cumulativeCut(
+                redBandNo, 0.02, 0.98, reader.extent(), int(QgsRasterLayer.SAMPLE_SIZE)
+            )
+            greenMin, greenMax = reader.provider.cumulativeCut(
+                greenBandNo, 0.02, 0.98, reader.extent(), int(QgsRasterLayer.SAMPLE_SIZE)
+            )
+            blueMin, blueMax = reader.provider.cumulativeCut(
+                blueBandNo, 0.02, 0.98, reader.extent(), int(QgsRasterLayer.SAMPLE_SIZE)
+            )
             renderer = Utils().multiBandColorRenderer(
                 reader.provider, [redBandNo, greenBandNo, blueBandNo], [redMin, greenMin, blueMin],
                 [redMax, greenMax, blueMax]

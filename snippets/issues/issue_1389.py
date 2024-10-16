@@ -12,7 +12,7 @@ initAll()
 alg = CreateSpectralIndicesAlgorithm()
 parameters = {
     alg.P_RASTER: filename,
-    alg.P_OUTPUT_VRT: r'D:\data\issues\1389\ndvi.vrt'
+    alg.P_OUTPUT_RASTER: r'D:\data\issues\1389\ndvi.vrt'
 }
 
 run(alg, parameters)

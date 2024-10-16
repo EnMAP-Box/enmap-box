@@ -350,8 +350,9 @@ def markdownToHTML(path_md: Union[str, pathlib.Path]) -> str:
             settings_overrides=overrides)
     elif path_md.name.endswith('.md'):
         with open(path_md, 'r', encoding='utf-8') as f:
-            md = f.read()
-        html = markdown.markdown(md)
+            md = f.readlines()
+        md = [l for l in md if 'details>' not in l]  # remove details section (see issue #990)
+        html = markdown.markdown(''.join(md))
     else:
         raise Exception(f'Unsupported file: {path_md}')
     return html

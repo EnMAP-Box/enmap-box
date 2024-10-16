@@ -75,16 +75,18 @@ class ImportPrismaL2BAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFile(self.P_FILE, self._FILE, extension='he5')
         self.addParameterEnum(self.P_SPECTRAL_REGION, self._SPECTRAL_REGION, self.O_SPECTRAL_REGION, False, 0)
         self.addParameterRasterDestination(self.P_OUTPUT_SPECTRAL_CUBE, self._OUTPUT_SPECTRAL_CUBE)
-        self.addParameterVrtDestination(self.P_OUTPUT_PAN_CUBE, self._OUTPUT_PAN_CUBE, None, True, False)
+        self.addParameterVrtDestination(self.P_OUTPUT_PAN_CUBE, self._OUTPUT_PAN_CUBE, None, True, False, True)
         self.addParameterRasterDestination(self.P_OUTPUT_SPECTRAL_ERROR, self._OUTPUT_SPECTRAL_ERROR, None, True, False)
         self.addParameterVrtDestination(
-            self.P_OUTPUT_SPECTRAL_GEOLOCATION, self._OUTPUT_SPECTRAL_GEOLOCATION, None, True, False
+            self.P_OUTPUT_SPECTRAL_GEOLOCATION, self._OUTPUT_SPECTRAL_GEOLOCATION, None, True, False, True
         )
         self.addParameterVrtDestination(
-            self.P_OUTPUT_SPECTRAL_GEOMETRIC, self._OUTPUT_SPECTRAL_GEOMETRIC, None, True, False
+            self.P_OUTPUT_SPECTRAL_GEOMETRIC, self._OUTPUT_SPECTRAL_GEOMETRIC, None, True, False, True
         )
-        self.addParameterVrtDestination(self.P_OUTPUT_PAN_GEOLOCATION, self._OUTPUT_PAN_GEOLOCATION, None, True, False)
-        self.addParameterVrtDestination(self.P_OUTPUT_PAN_ERROR, self._OUTPUT_PAN_ERROR, None, True, False)
+        self.addParameterVrtDestination(
+            self.P_OUTPUT_PAN_GEOLOCATION, self._OUTPUT_PAN_GEOLOCATION, None, True, False, True
+        )
+        self.addParameterVrtDestination(self.P_OUTPUT_PAN_ERROR, self._OUTPUT_PAN_ERROR, None, True, False, True)
 
     def defaultParameters(self, file: str):
         return {

@@ -46,7 +46,7 @@ from enmapboxprocessing.algorithm.fitlgbmclassifieralgorithm import FitLGBMClass
 from enmapboxprocessing.algorithm.fitlgbmregressoralgorithm import FitLGBMRegressorAlgorithm
 from enmapboxprocessing.algorithm.fitlinearregressionalgorithm import FitLinearRegressionAlgorithm
 from enmapboxprocessing.algorithm.fitlinearsvcalgorithm import FitLinearSvcAlgorithm
-from enmapboxprocessing.algorithm.fitlinearsvralgorithm import FitLinearSVRAlgorithm
+from enmapboxprocessing.algorithm.fitlinearsvralgorithm import FitLinearSvrAlgorithm
 from enmapboxprocessing.algorithm.fitlogisticregressionralgorithm import FitLogisticRegressionAlgorithm
 from enmapboxprocessing.algorithm.fitmaxabsscaleralgorithm import FitMaxAbsScalerAlgorithm
 from enmapboxprocessing.algorithm.fitmeanshiftalgorithm import FitMeanShiftAlgorithm
@@ -228,6 +228,7 @@ from enmapboxprocessing.algorithm.spectralresamplingbywavelengthandfwhmalgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtocustomsensoralgorithm import \
     SpectralResamplingToCustomSensorAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtodesisalgorithm import SpectralResamplingToDesisAlgorithm
+from enmapboxprocessing.algorithm.spectralresamplingtoemitalgorithm import SpectralResamplingToEmitAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtoenmapalgorithm import SpectralResamplingToEnmapAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtolandsatalgorithm import SpectralResamplingToLandsatTmAlgorithm, \
     SpectralResamplingToLandsatEtmAlgorithm, SpectralResamplingToLandsatOliAlgorithm
@@ -290,7 +291,7 @@ def algorithms():
         FitGaussianProcessRegressorAlgorithm(),
         FitLinearRegressionAlgorithm(),
         FitKernelRidgeAlgorithm(),
-        FitLinearSVRAlgorithm(),
+        FitLinearSvrAlgorithm(),
         FitPLSRegressionAlgorithm(),
         FitPcaAlgorithm(),
         FitFastIcaAlgorithm(),
@@ -420,6 +421,7 @@ def algorithms():
         SpectralResamplingByWavelengthAlgorithm(),
         SpectralResamplingToCustomSensorAlgorithm(),
         SpectralResamplingToDesisAlgorithm(),
+        SpectralResamplingToEmitAlgorithm(),
         SpectralResamplingToEnmapAlgorithm(),
         SpectralResamplingToLandsatTmAlgorithm(),
         SpectralResamplingToLandsatEtmAlgorithm(),

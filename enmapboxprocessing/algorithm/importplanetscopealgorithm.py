@@ -6,6 +6,7 @@ from osgeo import gdal
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
+from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
@@ -152,7 +153,20 @@ class ImportPlanetScopeAlgorithm(EnMAPProcessingAlgorithm):
 
             # create SR VRT
             options = gdal.BuildVRTOptions()
-            ds: gdal.Dataset = gdal.BuildVRT(srFilename, srFilenames, options=options)
+            if srFilename.endswith('.vrt'):
+                ds: gdal.Dataset = gdal.BuildVRT(srFilename, srFilenames, options=options)
+            else:
+                gdal.BuildVRT(srFilename + '.vrt', srFilenames, options=options)
+                alg = SaveRasterAsAlgorithm()
+                parameters = {
+                    alg.P_RASTER: srFilename + '.vrt',
+                    alg.P_COPY_METADATA: False,
+                    alg.P_COPY_STYLE: False,
+                    alg.P_OUTPUT_RASTER: srFilename
+                }
+                self.runAlg(alg, parameters, None, feedback2, context, True)
+                ds = gdal.Open(srFilename, gdal.GA_Update)
+
             writer = RasterWriter(ds)
             for bandNo, (name, wavelength, fwhm, scale, noDataValue) in enumerate(
                     zip(
@@ -191,7 +205,19 @@ class ImportPlanetScopeAlgorithm(EnMAPProcessingAlgorithm):
 
             # create UDM2 VRT
             options = gdal.BuildVRTOptions()
-            ds = gdal.BuildVRT(qaFilename, qaFilenames, options=options)
+            if qaFilename.endswith('.vrt'):
+                ds = gdal.BuildVRT(qaFilename, qaFilenames, options=options)
+            else:
+                gdal.BuildVRT(qaFilename + '.vrt', qaFilenames, options=options)
+                alg = SaveRasterAsAlgorithm()
+                parameters = {
+                    alg.P_RASTER: qaFilename + '.vrt',
+                    alg.P_COPY_METADATA: False,
+                    alg.P_COPY_STYLE: False,
+                    alg.P_OUTPUT_RASTER: qaFilename
+                }
+                self.runAlg(alg, parameters, None, feedback2, context, True)
+                ds = gdal.Open(qaFilename, gdal.GA_Update)
             writer = RasterWriter(ds)
             for bandNo, name in enumerate(qaMetadata['names'], 1):
                 writer.setBandName(name, bandNo)
