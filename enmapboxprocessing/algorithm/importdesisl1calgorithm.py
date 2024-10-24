@@ -91,8 +91,7 @@ class ImportDesisL1CAlgorithm(EnMAPProcessingAlgorithm):
 
             # create VRTs
             ds = gdal.Open(xmlFilename.replace('-METADATA.xml', '-SPECTRAL_IMAGE.tif'))
-            options = gdal.TranslateOptions(format='VRT')
-            ds: gdal.Dataset = gdal.Translate(destName=filename, srcDS=ds, options=options)
+            ds: gdal.Dataset = gdal.Translate(filename, ds)
             ds.SetMetadataItem('wavelength', '{' + ', '.join(wavelength[:ds.RasterCount]) + '}', 'ENVI')
             ds.SetMetadataItem('wavelength_units', 'nanometers', 'ENVI')
             ds.SetMetadataItem('fwhm', '{' + ', '.join(fwhm[:ds.RasterCount]) + '}', 'ENVI')

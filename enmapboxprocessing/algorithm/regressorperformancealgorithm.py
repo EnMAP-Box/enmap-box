@@ -2,14 +2,15 @@ import webbrowser
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
+from sklearn.multioutput import MultiOutputRegressor
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.regressionperformancealgorithm import RegressionPerformanceAlgorithm
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -71,11 +72,16 @@ class RegressorPerformanceAlgorithm(EnMAPProcessingAlgorithm):
             else:
                 feedback.pushInfo('Evaluate cross-validation performance')
                 from sklearn.model_selection import cross_val_predict
-                if sample.y.shape[1] == 1:
+                if sample.y.shape[1] == 1 and not isinstance(dump.regressor, MultiOutputRegressor):
                     y = sample.y.flatten()
                 else:
                     y = sample.y
-                y2 = cross_val_predict(dump.regressor, X=sample.X, y=y, cv=nfold)
+                try:
+                    y2 = cross_val_predict(dump.regressor, X=sample.X, y=y, cv=nfold)
+                except ValueError as error:
+                    if str(error) == 'y must have at least two dimensions for multi-output regression but has only one.':
+                        y2 = cross_val_predict(dump.regressor, X=sample.X, y=np.reshape(y, (-1, 1)), cv=nfold)
+
                 y2 = np.reshape(y2, (len(dump.targets), -1, 1))
 
             # prepare raster layers

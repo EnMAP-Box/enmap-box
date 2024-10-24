@@ -1,11 +1,13 @@
 from sklearn.base import RegressorMixin
 
+from enmapboxprocessing.algorithm.fitcatboostregressoralgorithm import FitCatBoostRegressorAlgorithm
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
+from enmapboxprocessing.algorithm.fitlinearsvralgorithm import FitLinearSvrAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousvectoralgorithm import \
     PrepareRegressionDatasetFromContinuousVectorAlgorithm
 from enmapboxprocessing.algorithm.regressionworkflowalgorithm import RegressionWorkflowAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxtestdata import enmap, enmap_potsdam, veg_cover_fraction_potsdam_point
+from enmapboxtestdata import enmap, enmap_potsdam, veg_cover_fraction_potsdam_point, regressorDumpSingleTargetPkl
 from enmapboxtestdata import regressorDumpMultiTargetPkl
 
 
@@ -39,6 +41,57 @@ class TestRegressionWorkflowAlgorithm(TestCase):
             alg.P_OUTPUT_REGRESSOR: self.filename('regressor.pkl'),
             alg.P_OUTPUT_REGRESSION: self.filename('regression.tif'),
             alg.P_OUTPUT_REPORT: self.filename('report.html')
+        }
+        self.runalg(alg, parameters)
+
+    def test_catBoost_singleTarget(self):
+
+        try:
+            import catboost
+        except ModuleNotFoundError:
+            return
+
+        print(catboost.version)
+
+        alg = RegressionWorkflowAlgorithm()
+        parameters = {
+            alg.P_DATASET: regressorDumpSingleTargetPkl,
+            alg.P_REGRESSOR: FitCatBoostRegressorAlgorithm().defaultCodeAsString(),
+            alg.P_RASTER: enmap,
+            alg.P_NFOLD: 3,
+            alg.P_OPEN_REPORT: self.openReport,
+            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.pkl'),
+            alg.P_OUTPUT_REGRESSION: self.filename('regression.tif'),
+            alg.P_OUTPUT_REPORT: self.filename('report.html')
+        }
+        self.runalg(alg, parameters)
+
+    def test_catBoost_multiTarget(self):
+        try:
+            import catboost
+        except ModuleNotFoundError:
+            return
+
+        print(catboost.version)
+
+        alg = RegressionWorkflowAlgorithm()
+        parameters = {
+            alg.P_DATASET: regressorDumpMultiTargetPkl,
+            alg.P_REGRESSOR: FitCatBoostRegressorAlgorithm().defaultCodeAsString(),
+            alg.P_RASTER: enmap,
+            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.pkl'),
+            alg.P_OUTPUT_REGRESSION: self.filename('regression.tif'),
+        }
+        self.runalg(alg, parameters)
+
+    def test_linearSvrAlgorithm(self):
+        alg = RegressionWorkflowAlgorithm()
+        parameters = {
+            alg.P_DATASET: regressorDumpMultiTargetPkl,
+            alg.P_REGRESSOR: FitLinearSvrAlgorithm().defaultCodeAsString(),
+            alg.P_RASTER: enmap,
+            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.pkl'),
+            alg.P_OUTPUT_REGRESSION: self.filename('regression.tif'),
         }
         self.runalg(alg, parameters)
 

@@ -4,9 +4,11 @@ from collections import defaultdict
 from os.path import abspath, join
 
 currentDevVersion = '3.15'
-skipDevVersion = True
+currentDevReleaseDate = '2024-10-01'
+skipDevVersion = not True
 
 releaseHeader = {
+    '3.15': 'This release was tested under QGIS 3.34 (LTR) and 3.38 (latest release).',
     '3.14': 'This release was tested under QGIS 3.34 (LTR) and 3.36 (latest release).',
     '3.13': 'This release was tested under QGIS 3.28 (LTR), 3.32 and 3.34 (latest release).',
     '3.12': 'This release was tested under QGIS 3.28 (LTR).',
@@ -53,13 +55,14 @@ with open(filename, 'w') as file:
         if version == currentDevVersion:
             if skipDevVersion:
                 continue
-            file.write(f'## Version {version} (DEV)\n')
+            file.write(f'## Version {version} ({currentDevReleaseDate})\n')
         else:
             releaseDate = None
             for release in releases:
                 if release['tagName'] == 'v' + version + '.0':
                     releaseDate = release['publishedAt'][:10]
-            assert releaseDate is not None
+            if releaseDate is None:
+                assert 0
             file.write(f'## Version {version} ({releaseDate})\n')
         file.write(f'_{releaseHeader[version]}_\n')
         file.write('### New Features\n')
@@ -73,17 +76,23 @@ with open(filename, 'w') as file:
 
         for issue in featuresByVersion[version]:
             labels = [label['name'] for label in issue['labels']]
+            isMisc = True
             if 'application' in labels or 'eo4q' in labels:
                 appFeatures.append(issue)
-            elif 'ci' in labels:
+                isMisc = False
+            if 'ci' in labels:
                 ciFeatures.append(issue)
-            elif 'data/metadata' in labels:
+                isMisc = False
+            if 'data/metadata' in labels:
                 dataFeatures.append(issue)
-            elif 'gui' in labels:
+                isMisc = False
+            if 'gui' in labels:
                 guiFeatures.append(issue)
-            elif 'qpa' in labels:
+                isMisc = False
+            if 'qpa' in labels:
                 qpaFeatures.append(issue)
-            else:
+                isMisc = False
+            if isMisc:
                 miscFeatures.append(issue)
 
         if len(appFeatures) > 0:
@@ -112,7 +121,7 @@ with open(filename, 'w') as file:
                 file.write(f'* {issue["title"]} [#{issue["number"]}]({issue["url"]})\n')
 
         file.write('### Fixed Bugs\n')
-        file.write('<details><summary>Show all</summary>\n\n')
+        file.write(f'<details><summary>Show all ({len(fixesByVersion[version])})</summary>\n\n')
         for issue in fixesByVersion[version]:
             file.write(f'* {issue["title"]} [#{issue["number"]}]({issue["url"]})\n')
         file.write('</details>\n\n')
