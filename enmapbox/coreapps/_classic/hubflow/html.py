@@ -16,7 +16,7 @@ __author__  = 'Philippe Lagadec'
 
 #--- LICENSE ------------------------------------------------------------------
 
-# Copyright Philippe Lagadec - see http://www.decalage.info/contact for contact info
+# Copyright Philippe Lagadec
 #
 # This module provides a few classes to easily generate HTML tables and lists.
 #
