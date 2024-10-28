@@ -234,6 +234,7 @@ class RasterReader(object):
     def setRasterPipeCrs(self, crs: QgsCoordinateReferenceSystem = None):
         if crs is None:
             projector = self.provider
+            pipe = None
         elif isinstance(crs, QgsCoordinateReferenceSystem):
             pipe = QgsRasterPipe()
             pipe.set(self.provider.clone())
@@ -242,6 +243,7 @@ class RasterReader(object):
             pipe.insert(1, projector)
         else:
             raise ValueError()
+        self.pipe = pipe
         self.projector = projector
 
     def arrayFromBlock(
