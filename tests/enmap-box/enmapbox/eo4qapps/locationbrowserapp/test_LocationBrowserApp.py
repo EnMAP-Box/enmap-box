@@ -1,6 +1,7 @@
 import requests
 from enmapboxprocessing.testcase import TestCase
 
+
 class LocationBrowserApp(TestCase):
 
     def test_nominatim(self):
