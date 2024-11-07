@@ -18,7 +18,7 @@ from enmapbox.gui.splashscreen.splashscreen import PATH_SPLASHSCREEN
 
 DIR_REPO = Path(DIR_REPO)
 PATH_CONFIG_FILE = DIR_REPO / '.plugin.ini'
-PATH_SVG = DIR_REPO / 'enmapbox/gui/ui/splashscreen/splashscreen.svg'
+PATH_SVG = DIR_REPO / 'enmapbox/gui/splashscreen/splashscreen.svg'
 ENV_INKSCAPE_BIN = 'INKSCAPE_BIN'
 
 
