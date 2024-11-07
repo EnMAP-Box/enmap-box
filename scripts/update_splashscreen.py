@@ -3,73 +3,116 @@ Updates the version number in enmapbox/gui/ui/logo/splashscreen.png
 Requires that Inkscape (https://inkscape.org) is installed an can be used from shell
 Does not update the version number in splashscreen.svg (!), but create a temporary svg only.
 """
+import argparse
 import configparser
 import os
 import re
+import shutil
 import subprocess
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Match
 
-from qgis.testing import start_app
-
-app = start_app()
 from enmapbox import DIR_REPO
+from enmapbox.gui.splashscreen.splashscreen import PATH_SPLASHSCREEN
 
 DIR_REPO = Path(DIR_REPO)
 PATH_CONFIG_FILE = DIR_REPO / '.plugin.ini'
-PATH_SVG = DIR_REPO / 'enmapbox/gui/ui/logo/splashscreen.svg'
+PATH_SVG = DIR_REPO / 'enmapbox/gui/ui/splashscreen/splashscreen.svg'
+ENV_INKSCAPE_BIN = 'INKSCAPE_BIN'
 
 
-def update_splashscreen():
-    assert PATH_CONFIG_FILE.is_file()
-    config = configparser.ConfigParser()
-    config.read(PATH_CONFIG_FILE)
-    VERSION = config['metadata']['version']
+def inkscapeBin() -> Path:
+    """
+    Searches for the Inkscape binary
+    """
+    if ENV_INKSCAPE_BIN in os.environ:
+        path = os.environ[ENV_INKSCAPE_BIN]
+    else:
+        path = shutil.which('inkscape')
+    if path:
+        path = Path(path)
+
+    assert path.is_file(), f'Could not find inkscape executable. Set {ENV_INKSCAPE_BIN}=<path to inkscape binary>'
+    return path
+
+
+def update_splashscreen(version: str = None, path_png=None):
+    assert PATH_SVG.is_file()
+    PATH_INKSCAPE = inkscapeBin()
+
+    if path_png:
+        path_png = Path(path_png)
+    else:
+        path_png = PATH_SVG.parent / PATH_SVG.name.replace('.svg', '.png')
+
+    if version is None:
+        assert PATH_CONFIG_FILE.is_file()
+        config = configparser.ConfigParser()
+        config.read(PATH_CONFIG_FILE)
+        version = config['metadata']['version']
 
     rxVersion = re.compile(r'(?P<major>\d+)\.(?P<minor>\d+)(?P<rest>.*)')
 
-    match = rxVersion.match(VERSION)
+    match = rxVersion.match(version)
     assert isinstance(match, Match)
 
-    txt_major = match.group('major') + '.'
-    txt_minor = match.group('minor')
+    txt_major = match.group('major')
+    txt_minor = '.' + match.group('minor')
 
-    tree = ET.parse(PATH_SVG)
+    with open(PATH_SVG, encoding='utf-8') as f:
+        tree = ET.parse(f)
     root = tree.getroot()
-    namespaces = dict([node for _, node in ET.iterparse(PATH_SVG, events=['start-ns'])])
+    # namespaces = dict([node for _, node in ET.iterparse(PATH_SVG, events=['start-ns'])])
+    namespaces = {'inkscape': "http://www.inkscape.org/namespaces/inkscape",
+                  'sodipodi': "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd",
+                  'svg': 'http://www.w3.org/2000/svg'}
+
     for prefix, namespace in namespaces.items():
         ET.register_namespace(prefix, namespace)
-    node_major_id = 'tspan_major_version'
-    node_minor_id = 'tspan_minor_version'
-    node_major = root.find(f".//*[@id='{node_major_id}']")
-    node_minor = root.find(f".//*[@id='{node_minor_id}']")
-    assert isinstance(node_major, ET.Element), f'SVG misses text element with id "{node_major}"'
-    assert isinstance(node_minor, ET.Element), f'SVG misses text element with id "{node_minor}"'
+
+    node_major = root.find(".//*[@inkscape:label='maj_version']/*", namespaces)
+    node_minor = root.find(".//*[@inkscape:label='min_version']/*", namespaces)
+    assert isinstance(node_major, ET.Element), 'SVG misses tspan element below inkscape:label = "maj_version"'
+    assert isinstance(node_minor, ET.Element), 'SVG misses tspan element below inkscape:label = "min_version"'
+
     node_major.text = txt_major
     node_minor.text = txt_minor
 
-    PATH_EXPORT = PATH_SVG.parent / 'splashscreen_tmp.svg'
+    PATH_EXPORT_TMP = PATH_SVG.parent / 'splashscreen_tmp.svg'
+
     # PATH_EXPORT = PATH_SVG
-    PATH_PNG = PATH_SVG.parent / PATH_EXPORT.name.replace('.svg', '.png')
-    tree.write(PATH_EXPORT, encoding='utf8')
+    tree.write(PATH_EXPORT_TMP, encoding='utf8')
 
     # see https://inkscape.org/doc/inkscape-man.html
     cmd = [
         #  'inkscape',
-        r'"C:\Program Files\Inkscape\inkscape.exe"',
+        f'{PATH_INKSCAPE}',
         '--export-type=png',
         '--export-area-page',
-        f'--export-filename={PATH_PNG}',
-        f'{PATH_EXPORT}'
+        f'--export-filename={path_png}',
+        f'{PATH_EXPORT_TMP}'
     ]
 
     print('Run:\n' + ' '.join(cmd))
     print('to export the svg as png with Inkscape (https://inkscape.org)')
-    subprocess.run(cmd)
-
-    os.remove(PATH_EXPORT)
+    subprocess.run(cmd, check=True)
+    os.remove(PATH_EXPORT_TMP)
 
 
 if __name__ == "__main__":
-    update_splashscreen()
+
+    parser = argparse.ArgumentParser(description='Update the EnMAP-Box splashscreen.',
+                                     formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument('-v', '--version',
+                        required=False,
+                        default=None,
+                        help='A version string with major and minor version, like "3.12"')
+
+    parser.add_argument('--png',
+                        required=False,
+                        default=PATH_SPLASHSCREEN,
+                        help=f'Path of PNG file to create. Defaults to {PATH_SPLASHSCREEN}')
+
+    args = parser.parse_args()
+    update_splashscreen(version=args.version)
