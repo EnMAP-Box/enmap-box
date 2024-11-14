@@ -18,7 +18,7 @@ examples/*.json
 examples/*.qml
 symbology-style.db
 # enmapbox/exampledata/*.gpkg
-
+splashscreen_tmp.*
 
 # we do not like to have compiled qt resource files in our repository!
 *_rc.py

@@ -1,16 +1,17 @@
 import unittest
-
+import time
 from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QWidget
 
-from enmapbox.gui.enmapboxgui import EnMAPBoxSplashScreen
-from enmapbox.testing import EnMAPBoxTestCase
+from enmapbox.gui.splashscreen.splashscreen import EnMAPBoxSplashScreen
+from enmapbox.testing import EnMAPBoxTestCase, start_app
+
+start_app()
 
 
 class TestEnMAPBoxSplashScreen(EnMAPBoxTestCase):
 
     def test_splashScreen(self):
-        import time
         w = QWidget()
 
         splash = EnMAPBoxSplashScreen(parent=w)
