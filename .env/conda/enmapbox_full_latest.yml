@@ -17,7 +17,7 @@ dependencies:
 - flake8
 - git-lfs
 - gitpython
-- hy5py
+- h5py
 - lightgbm
 - matplotlib
 - netcdf4
