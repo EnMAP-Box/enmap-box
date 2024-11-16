@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 ***************************************************************************
-    Processor_Inversion_core.py - LMU Agri Apps - Artificial Neural Network based spectroscopic image inversion of
-    PROSAIL parameters - CORE
+    Processor_Inversion_core.py - LMU Agri Apps - Machine Learning Algorithms - Training and Inversion of PROSAIL
+    parameters for mapping of spectroscopic imagery - CORE
     -----------------------------------------------------------------------
     begin                : 09/2020
-    copyright            : (C) 2020 Martin Danner; Matthias Wocher
-    email                : m.wocher@lmu.de
+    copyright            : (C) 2024 Matthias Wocher; Martin Danner
+    email                : m.wocher@iggf.geo.uni-muenchen.de
 
 ***************************************************************************
     This program is free software; you can redistribute it and/or modify
@@ -23,18 +23,23 @@
     along with this software. If not, see <http://www.gnu.org/licenses/>.
 ***************************************************************************
 
-This script uses pre-trained Machine Learning (ML) algorithms to predict / estimate PROSAIL parameters
-from spectral images. At the time being, the "processor" will only rely on Artificial Neural Networks
-(Multi-Layer-Perceptron-Regression; MLPR), because they yield good results, are fast, take little memory and are
-easier to handle than SVR or GPR. The basic idea is that algorithms are already distributed through the EnMAP-box,
-but new algorithms can always be created manually by updating the values in this script. While this _core module
-can do both training and prediction, the GUIs are split into different scripts.
+This script uses Machine Learning (ML) algorithms to predict / estimate PROSAIL parameters
+from spectral images. This _core module can do both training and prediction, the GUIs are split into different scripts.
 
 """
 import os
+import sys
 import warnings
+
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 warnings.filterwarnings('ignore', category=UserWarning)
+# from sklearn.exceptions import ConvergenceWarning
+# warnings.filterwarnings('ignore', category=ConvergenceWarning)
+
+if not sys.warnoptions:
+    warnings.simplefilter("ignore")
+    os.environ["PYTHONWARNINGS"] = "ignore" # Also affect subprocesses
+
 
 from _classic.hubflow.core import *
 import numpy as np
@@ -53,7 +58,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import RandomizedSearchCV
 
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler, RobustScaler
+from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error, r2_score
 
 from sklearn.metrics import pairwise_distances
@@ -63,21 +68,31 @@ from sklearn.model_selection import check_cv
 from sklearn.model_selection import cross_val_predict
 from sklearn.base import is_classifier
 
+from sklearn.utils._testing import ignore_warnings
+from sklearn.exceptions import ConvergenceWarning
+
 import joblib
 from joblib import Parallel, delayed
-import copy
 
-
+def squeeze_first_dim(arr):
+  """Squeezes a numpy array only if its first dimension is 1.
+  Args:
+    arr: The numpy array to be squeezed.
+  Returns:
+    The squeezed array if the first dimension was 1, otherwise the original array.
+  """
+  if arr.shape[0] == 1:
+    return np.squeeze(arr, axis=0)
+  else:
+    return arr
 def max_euclidean_distances(unlabeled, train, n):
     """
     Find n indices from unlabeled that are furthest from train using squared Euclidean distance.
-
     Parameters:
-    - data1, data2 (np.array): Data arrays.
+    - unlabeled, train (np.array): Data arrays.
     - n (int): Number of indices to select.
-
     Returns:
-    - list: Indices of data1 that are furthest from data2.
+    - list: Indices of unlabeled that are furthest from train.
     """
     # Compute all pairwise distances
     all_distances = pairwise_distances(unlabeled, train, metric='sqeuclidean')
@@ -86,9 +101,10 @@ def max_euclidean_distances(unlabeled, train, n):
     indices_arr1 = max_n_2d_indices[0]
     # Return the n maximum distances indices as a list
     # Convert to set and back to list to remove duplicates
-    unique_indices = list(set(indices_arr1.tolist()))
-    return unique_indices
+    # unique_indices = list(set(indices_arr1.tolist()))
+    return indices_arr1.tolist()
 
+@ignore_warnings(category=ConvergenceWarning)
 def pool_active_learning(X_train, y_train, X_unlabeled, model, n, k, n_jobs):
     """
     Implements the Pool Active Learning (PAL) approach.
@@ -104,17 +120,21 @@ def pool_active_learning(X_train, y_train, X_unlabeled, model, n, k, n_jobs):
     Returns:
     - list: Indices of instances to be queried.
     """
+
     def train_and_predict(subset_indices):
         X_subset = X_train[subset_indices]
         y_subset = y_train[subset_indices]
         model.fit(X_subset, y_subset)
         return model.predict(X_unlabeled)
-    # Here, we will train the model on different subsets from the original training set
-    # and collect predictions for the unlabeled data.
-    predictions = []
+
     n_samples = X_train.shape[0]
     subset_size = n_samples // k
 
+    # Here, we will train the model on different subsets from the original training set
+    # and collect predictions for the unlabeled data.
+    # predictions = []
+
+    # deprecated non-parallelized version of fit/predict the random subsets
     # for i in range(k):
     #     # Create random subsets of the original training data
     #     if mode == 'random':
@@ -148,6 +168,7 @@ def al_query(X_train, y_train, X_unlabeled, strategy, model, n=1, k=5, n_jobs=1)
     if strategy == "EBD":
         return max_euclidean_distances(X_unlabeled, X_train, n=n)
     elif strategy == 'PAL':
+        # X_train: X[initial_idx]; X_unlabeled: remaining_X
         return pool_active_learning(X_train, y_train, X_unlabeled, model=model, n=n, k=k, n_jobs=n_jobs)
     # More strategies can be added here as elif conditions
     else:
@@ -189,12 +210,13 @@ class MLRATraining:
         return model.fit(X, y)
 
     @staticmethod
-    def _fit_insitu(X, y, X_val, y_val, model):
-        # fit a model on RTM-data but evaluate performance on insitu data (e.g. retraining case after AL)
+    def _fit_insitu_or_testset(X, y, X_val, y_val, model):
+        # fit a model on RTM-data but evaluate performance on insitu data or previous test set
+        # (e.g. retraining case after AL)
         stds = []
-        # np.savetxt("C:\Data\Daten\Testdaten\LUT/x_test_retrain.txt", X, delimiter="\t")
-        # np.savetxt("C:\Data\Daten\Testdaten\LUT/y_test_retrain.txt", y, delimiter="\t")
-        # np.savetxt("C:\Data\Daten\Testdaten\LUT/x_val_test_retrain.txt", X_val, delimiter="\t")
+        np.savetxt("C:\Data\Daten\Testdaten\LUT/x_train_retrain.txt", X, delimiter="\t")
+        np.savetxt("C:\Data\Daten\Testdaten\LUT/y_train_retrain.txt", y, delimiter="\t")
+        np.savetxt("C:\Data\Daten\Testdaten\LUT/x_test_retrain.txt", X_val, delimiter="\t")
         model.fit(X, y)
         if isinstance(model, GaussianProcessRegressor):
             predictions, stds = model.predict(X_val, return_std=True)
@@ -211,7 +233,7 @@ class MLRATraining:
         stds = []
         # yield {"type": "progress", "progress": 0, "loop_counter": 1}
         if X_val is None:
-            train_X, test_X, train_y, test_y = train_test_split(X, y, test_size=test_size)
+            train_X, test_X, train_y, test_y = train_test_split(X, y, test_size=test_size, random_state=42)
         else:
             train_X, test_X, train_y, test_y = X, X_val, y, y_val
 
@@ -273,28 +295,27 @@ class MLRATraining:
             X_idx = range(len(X))
             X_train, X_test, y_train, y_test, X_idx_train, X_idx_test = train_test_split(
                 X, y, X_idx, test_size=test_size, random_state=random_state)
-            yield X_train, X_test, y_train, y_test, X_idx_train
+            yield X_train, X_test, y_train, y_test, X_idx_train, X_idx_test
         elif split_method == "kfold":
             kf = KFold(n_splits=kfolds, random_state=random_state, shuffle=True)
             for train_index, test_index in kf.split(X, y):
-                yield X[train_index], X[test_index], y[train_index], y[test_index], train_index
+                yield X[train_index], X[test_index], y[train_index], y[test_index], train_index, test_index
         else:
             raise ValueError(f"Unrecognized split method: {split_method}")
-    
+
     @staticmethod
     def _al_loop_internal(X, y, model, init_percentage, query_strat='PAL', split_method="train_test_split", kfolds=5,
                           test_size=0.2, n_jobs=1):
-        all_training_indices = []
+        al_training_indices = []
         all_performances = []
         all_stds = []
         all_preds = []
+        train_idx = []
+        test_idx = []
         X_val, y_val = None, None
         loop_counter = 1
-        for X_train, X_test, y_train, y_test, train_idx in MLRATraining._split(X, y, split_method=split_method,
-                                                                               kfolds=kfolds, test_size=test_size):
-            # X_raw_query = X_raw[train_idx] -> for EBD query strat, distances of orig. data may be beneficial
-            # needs further testing
-
+        for X_train, X_test, y_train, y_test, train_idx, test_idx in (
+                MLRATraining._split(X, y, split_method=split_method, kfolds=kfolds, test_size=test_size)):
             # Get generator from _al_loop
             loop_gen = MLRATraining._al_loop(X_train, y_train, X_test, y_test, model,
                                              init_percentage=init_percentage, query_strat=query_strat, n_jobs=n_jobs)
@@ -302,7 +323,7 @@ class MLRATraining:
             for output in loop_gen:
                 # loop_gen is the yield dict output of _al_loop() and can be of 'type': 'result' or 'progress'
                 if output['type'] == 'result':
-                    all_training_indices.append(output['all_training_indices'])
+                    al_training_indices.append(output['al_training_indices'])
                     all_performances.append(output['performances'])
                     if isinstance(model, GaussianProcessRegressor):
                         preds, stds = model.predict(output['X_val'], return_std=True)
@@ -317,26 +338,27 @@ class MLRATraining:
                     yield output
             loop_counter += 1
 
-        yield {'type': 'result', 'model': model, 'all_training_indices': all_training_indices,
-               'performances': all_performances, 'predictions': all_preds, 'stds': all_stds, 'X_val': X_val, 'y_val': y_val}
-        # return model, all_training_indices, all_performances, X_val, y_val
-        
-        
+        np.savetxt("C:\Data\Daten\Testdaten\LUT/training_indices_AL_internal.txt", al_training_indices, delimiter="\t")
+
+        yield {'type': 'result', 'model': model, 'al_training_indices': al_training_indices,
+               'performances': all_performances, 'predictions': all_preds, 'stds': all_stds, 'X_val': X_val,
+               'y_val': y_val, 'test_indices': test_idx, 'split_training_indices': train_idx}
+
     @staticmethod
     def _al_loop(X, y, X_val, y_val, model, init_percentage, query_strat, n_jobs):
 
-        init_percentage = init_percentage/100
+        def get_random_choice(array, size, random_state=42):
+            rng = np.random.default_rng(random_state)
+            return rng.choice(range(len(array)), size=size, replace=False)
+
+        init_percentage = init_percentage / 100
+        # print("init_perc: " + str(init_percentage))
         n_samples = X.shape[0]
-        n_init = int(init_percentage * n_samples)
+        n_init = round(init_percentage * n_samples)
+        # print("n_init: " + str(n_init))
+        initial_idx = get_random_choice(range(len(X)), size=n_init)  # random initial sampling
 
-        # initial samples are not randomly selected but already queried using query_strat:
-        initial_idx = al_query(X_train=X, y_train=y, X_unlabeled=X_val, model=model, strategy=query_strat, n=n_init,
-                               n_jobs=n_jobs)
-
-        # initial samples are randomly selected:
-        # np.random.seed(42)
-        # initial_idx = np.random.choice(range(len(X)), size=n_init, replace=False)  # random initial sampling
-        training_indices = list(initial_idx)  # save the indices of n initial samples
+        al_training_indices = list(initial_idx)  # save the indices of n initial samples
 
         X_initial, y_initial = X[initial_idx], y[initial_idx]  # select n initial samples from X
 
@@ -344,12 +366,12 @@ class MLRATraining:
 
         performances = []  # initialize performances list
 
-        initital_pred = model.predict(X_val)  # predict first model on validation set (insitu or test split)
-        best_score = mean_squared_error(y_val, initital_pred, squared=False)  # calculate first score (RMSE)
+        initial_pred = model.predict(X_val)  # predict first model on validation set (insitu or test split)
+        best_score = mean_squared_error(y_val, initial_pred, squared=False)  # calculate first score (RMSE)
         performances.append(best_score)  # save first RMSE
 
         # update remaining indices -> all indices (n_samples) minus current training indices
-        remaining_indices = np.setdiff1d(np.arange(n_samples), training_indices)
+        remaining_indices = np.setdiff1d(np.arange(n_samples), al_training_indices)
 
         total_remaining = len(remaining_indices)  # count remaining indices
         last_printed = -1
@@ -359,12 +381,13 @@ class MLRATraining:
 
             remaining_X = X[remaining_indices]  # get remaining X
             query_indices = al_query(X_train=X[initial_idx], y_train=y[initial_idx],
-                                     X_unlabeled=remaining_X, model=model, strategy=query_strat, n_jobs=5)  # X_raw[initial_idx])
+                                     X_unlabeled=remaining_X, model=model, strategy=query_strat,
+                                     n_jobs=n_jobs)  # X_raw[initial_idx])
             chosen_indices = remaining_indices[query_indices]
 
             X_initial = np.concatenate((X_initial, X[chosen_indices]))
             y_initial = np.concatenate((y_initial, y[chosen_indices]))
-            training_indices.extend(chosen_indices)
+            al_training_indices.extend(chosen_indices)
 
             model.fit(X_initial, y_initial)
 
@@ -376,54 +399,50 @@ class MLRATraining:
             if int(progress) % 5 == 0 and int(progress) != last_printed:
                 # print('Progress: {:.0f}%'.format(progress))
                 last_printed = int(progress)
-                yield{'type': 'progress', 'progress': progress}
+                yield {'type': 'progress', 'progress': progress}
 
             if score > best_score:
                 X_initial = np.delete(X_initial, -len(query_indices), axis=0)
                 y_initial = np.delete(y_initial, -len(query_indices), axis=0)
-                training_indices.pop(-len(query_indices))
+                al_training_indices.pop(-len(query_indices))
                 performances.pop()
             else:
                 best_score = score
                 initial_idx = np.concatenate((initial_idx, chosen_indices))  #
                 # print('RMSE: {:.4f}'.format(best_score))
 
-            #TODO: implement case when n query is > 1 -> Avoid deletion of more than available samples:
+            # TODO: implement case when n query is > 1 -> Avoid deletion of more than available samples:
             # if score > best_score:
             #     num_to_delete = min(len(query_indices), len(X_initial))
             #     X_initial = np.delete(X_initial, -num_to_delete, axis=0)
             #     y_initial = np.delete(y_initial, -num_to_delete, axis=0)
             #     for _ in range(num_to_delete):
-            #         training_indices.pop()
+            #         al_training_indices.pop()
             #     performances.pop()
 
             remaining_indices = np.delete(remaining_indices, query_indices)
-            # initial_idx = np.concatenate((initial_idx, training_indices))
-            # print(len(remaining_X))
 
-        # np.savetxt("C:\Data\Daten\Testdaten\LUT/x_test.txt", X_initial, delimiter="\t")
-        # np.savetxt("C:\Data\Daten\Testdaten\LUT/y_test.txt", y_initial, delimiter="\t")
-        # np.savetxt("C:\Data\Daten\Testdaten\LUT/x_val_test.txt", X_val, delimiter="\t")
+        np.savetxt("C:\Data\Daten\Testdaten\LUT/x_train.txt", X_initial, delimiter="\t")
+        np.savetxt("C:\Data\Daten\Testdaten\LUT/y_train.txt", y_initial, delimiter="\t")
+        np.savetxt("C:\Data\Daten\Testdaten\LUT/x_test.txt", X_val, delimiter="\t")
+        np.savetxt("C:\Data\Daten\Testdaten\LUT/training_indices_AL.txt", al_training_indices, delimiter="\t")
 
-        yield{'type': 'result', 'model': model, 'all_training_indices': training_indices, 'performances': performances,
-              'X_val': X_val, 'y_val': y_val, 'final_X': X_initial, 'final_y': y_initial}
+        yield {'type': 'result', 'model': model, 'al_training_indices': al_training_indices, 'performances': performances,
+               'X_val': X_val, 'y_val': y_val, 'final_X': X_initial, 'final_y': y_initial}
 
 
-# Train new algorithm; at the moment, only MLPR can be used and the hyperparameters are fixed but the developers
-# can always add new algorithms or change the parameters. The training process needs a working LUT that was created
-# with "CreateLUT_core.py".
 class ProcessorTraining:
 
     def __init__(self, main):
         self.m = main
         # these are the four PROSAIL parameters to be estimated. Mind the order!
-        #self.para_list = ['LAI', 'LIDF', 'cab', 'cm']
+        # self.para_list = ['LAI', 'LIDF', 'cab', 'cm']
         self.para_list = []
         self.noisetype = 1
         self.sigma = 4
         self.mlra = None
         self.ml_params = {}
-        self.training_indices, self.performances = (None, None)
+        self.al_training_indices, self.performances = (None, None)
 
         self.all_results_dict = {}
         self.best_hyperparameters_dict = {}
@@ -466,7 +485,7 @@ class ProcessorTraining:
         self.soil_wavelengths = soil_wavelengths
         self.soil_specs = soil_specs
 
-        self.n_jobs = os.cpu_count()
+        self.n_jobs = os.cpu_count() // 2
 
         # LUT
         self.get_meta_LUT(lut_metafile=lut_metafile)  # read meta information of the LUT to be trained
@@ -476,7 +495,7 @@ class ProcessorTraining:
         self.lut_basedir = os.path.dirname(lut_metafile)  # basic directory in which the LUT is stored
         self.lut_base = self.lut_basedir + "/" + str(self.meta_dict['name'])  # base name of the LUT
 
-        # Retrain case: .proc file contains Scaler/PCA specifications
+        # Retrain case: .proc file contains Scaler/PCA specifications and training indices
         self.model_proc_dict = model_proc_dict
 
         # Algorithm Output
@@ -503,7 +522,6 @@ class ProcessorTraining:
         self.subset_bands_lut = [i + self.npara_in_lut for i in range(len(self.meta_dict['wavelengths']))
                                  if i not in self.exclude_bands]
 
-
         # # Training Values
 
         # Boosting the parameters may be necessary for some algorithms which cannot handle very small or large values
@@ -519,13 +537,272 @@ class ProcessorTraining:
         if self.model_proc_dict:
             if 'pca' in self.model_proc_dict:
                 self.pca = self.model_proc_dict['pca']
-            else: self.pca = None
+            else:
+                self.pca = None
         elif npca > 0:
             self.pca = PCA(npca, random_state=42)  # create an instance of the PCA for the desired number of components
         else:
             self.pca = None
 
         self.components = npca  # how many components for the PCA? (0 if deactivated)
+
+    def train_and_dump(self, prgbar_widget=None, qgis_app=None):
+        # Train a model and dump the trained model to a file in the model directory
+        # Number of models to be trained and dumped: one model per geo-ensemble and parameter
+        nmodels_total = self.npsi * self.ntto * self.ntts * len(self.para_list)
+        al_training_indices = None
+
+        # Train Model for each geo-ensemble
+        for rAA in range(self.npsi):
+            for OZA in range(self.ntto):
+                for SZA in range(self.ntts):
+
+                    # number of geo-ensemble, corresponds to name of the LUT-file
+                    geo_ensemble = rAA * self.ntto * self.ntts + OZA * self.ntts + SZA
+                    X, y, lut = self.read_lut(
+                        geo=geo_ensemble)  # read reflectances (X) and PROSAIL parameters (y) from LUT
+
+                    # if self.use_al:
+                    #     self.X_raw = np.copy(X)
+                    if self.soil_specs:
+                        subset_bands = [i for i in range(len(self.soil_wavelengths))
+                                        if i not in self.exclude_bands]
+                        soilspecs = [self.soil_specs[i] for i in subset_bands]
+                        soilspecs = np.asarray(soilspecs).T
+                        X = np.vstack((X, soilspecs))
+                        add_zero_len = len(soilspecs)
+                        zeroes = np.zeros((add_zero_len, y.shape[1]))
+                        y = np.vstack((y, zeroes))
+
+                    if self.noisetype > 0:
+                        X = self._add_noise(ref_list=X, noisetype=self.noisetype, sigma=self.sigma,
+                                            conversion=self.conversion_factor)
+
+                    # Train and dump individual model per parameter
+                    for ipara, para in enumerate(self.para_list):
+
+                        model_no = geo_ensemble * len(self.para_list) + ipara + 1  # serial number of model
+
+                        if self.use_al and not self.use_insitu:
+                            prg_al_string = 'internal AL'
+                        elif self.use_al and self.use_insitu:
+                            prg_al_string = 'insitu AL'
+                        elif self.hyperp_tuning:
+                            prg_al_string = 'hyperparams tuned'
+                        elif self.model_proc_dict:
+                            prg_al_string = "RETRAIN"
+                        else:
+                            prg_al_string = 'non AL'
+
+                        if self.hyperparas_dict:
+                            hyperparams = self.hyperparas_dict
+                        else:
+                            hyperparams = {}
+
+                        if self.scaler and not self.model_proc_dict:  # if X (reflectances) are to be scaled
+                            self.scaler.fit(X)  # fit scaler
+                            x = self.scaler.transform(X)
+
+                        elif self.model_proc_dict:
+                            x = self.scaler.transform(X)  # transform scaler
+                        else:
+                            x = np.copy(X)  # consecutive code needs x instead of X; copy if no scaler is used
+
+                        # fit and transform a PCA
+                        if self.pca and not self.model_proc_dict:
+                            self.pca.fit(x)  # , y[:, ipara])
+                            x = self.pca.transform(x)
+                        elif self.model_proc_dict:
+                            x = self.pca.transform(x)
+
+                        if self.soil_specs:
+                            soils_x = x[-len(soilspecs):, :]
+                            soils_y = y[-len(soilspecs):, :]
+
+                        if self.model_proc_dict:
+                            # retraining case -> proc_dict carries training indices of previously
+                            # trained AL model
+                            if not self.eval_on_insitu:
+                                self.X_val = squeeze_first_dim(x[self.model_proc_dict['test_indices']])
+                                self.y_val = squeeze_first_dim(y[self.model_proc_dict['test_indices']])
+                                x = squeeze_first_dim(x[self.model_proc_dict['split_training_indices']])
+                                y = squeeze_first_dim(y[self.model_proc_dict['split_training_indices']])
+                            x = squeeze_first_dim(x[self.model_proc_dict['al_training_indices']])
+                            y = squeeze_first_dim(y[self.model_proc_dict['al_training_indices']])
+
+                        if self.soil_specs:
+                            x = np.vstack((x, soils_x))
+                            y = np.vstack((y, soils_y))
+
+
+                        if self.val_data:
+                            self.insitu_data_setup(self.val_data)
+
+                        self.init_model(var=para,
+                                        hyperparams=hyperparams)  # initialize the model with the given settings
+
+                        # Update progress bar
+                        if prgbar_widget:
+                            if prgbar_widget.gui.lblCancel.text() == "-1":
+                                prgbar_widget.gui.lblCancel.setText("1")
+                                prgbar_widget.gui.cmdCancel.setDisabled(False)
+                                raise ValueError("Training cancelled!")
+
+                            prgbar_widget.gui.lblCaption_r.setText(
+                                'Training {} {} model {:d} of {:d}: {}'.format(
+                                    prg_al_string, self.algorithm, model_no, nmodels_total, para))
+                            qgis_app.processEvents()
+                        else:
+                            print("Training {} {} Noise {:d}-{:d} | {} | Geo {:d} of {:d}".format(prg_al_string,
+                                                                                                  self.algorithm,
+                                                                                                  self.noisetype,
+                                                                                                  self.sigma, para,
+                                                                                                  geo_ensemble + 1,
+                                                                                                  self.ntts * self.ntto * self.npsi))
+
+                        if self.perf_eval:  # performance evaluation
+                            # result_dict is of type key 'result', 'progress', or 'hyperparameters'
+                            al_training_indices = []
+                            split_training_indices = []
+                            test_indices = []
+                            for result_dict in self.ml_model(
+                                    X=x, y=y[:, ipara], model=self.mlra, **self.al_paras):
+                                if result_dict["type"] == "result":  # results are ready, populate results
+                                    model = result_dict["model"]
+                                    # temp_dict = {}
+                                    self.X_val = result_dict["X_val"]
+                                    self.y_val = result_dict["y_val"]
+                                    performances = np.array(result_dict["performances"])
+                                    if self.use_insitu and self.algorithm == 'GPR':
+                                        predictions, stds = model.predict(self.X_val, return_std=True)
+                                        result_dict['stds'] = stds
+                                    elif self.use_insitu and self.algorithm != 'GPR':
+                                        predictions = model.predict(self.X_val)
+                                    else:
+                                        predictions = np.array(result_dict["predictions"])
+
+                                    # if self.para_boost:
+                                    #     # bring results back to original scale; #deprecated!
+                                    #     self.y_val = self.y_val / self.m.func.conv[para][2]
+                                    #     performances = performances / self.m.func.conv[para][2]
+                                    #     predictions = predictions / self.m.func.conv[para][2]
+
+                                    temp_dict = {
+                                        "X_val": self.X_val,
+                                        "y_val": self.y_val,
+                                        "performances": performances,
+                                        "predictions": predictions}
+                                    # GPR yields prediciton stds, others not
+                                    if 'stds' in result_dict:
+                                        stds = np.array(result_dict['stds'])
+                                        # if self.para_boost:
+                                        #     stds = stds / self.m.func.conv[para][2]
+                                        temp_dict['stds'] = stds
+                                    if self.use_al:
+                                        al_training_indices = result_dict["al_training_indices"]
+                                        split_training_indices = result_dict["split_training_indices"]
+                                        test_indices = result_dict["test_indices"]
+                                    temp_dict["al_training_indices"] = al_training_indices
+                                    temp_dict["split_training_indices"] = split_training_indices
+                                    temp_dict["test_indices"] = test_indices
+                                    self.all_results_dict[f'{para} {prg_al_string} {self.algorithm}'] = temp_dict
+
+                                elif result_dict["type"] == "hyperparameters":
+                                    if self.algorithm not in self.best_hyperparameters_dict:
+                                        self.best_hyperparameters_dict[self.algorithm] = {}
+                                    if self.algorithm not in self.best_score_dict:
+                                        self.best_score_dict[self.algorithm] = {}
+
+                                    self.best_hyperparameters_dict[self.algorithm][para] = {
+                                        'hyperparas': result_dict["best_hyperparams"]}
+                                    self.best_score_dict[self.algorithm][para] = {
+                                        'best_score': result_dict["best_score"]}
+                                    # print(self.best_hyperparameters_dict)
+                                    # print(self.best_score_dict)
+
+                                elif result_dict["type"] == "progress":  # progressbar updates
+
+                                    progress = result_dict['progress']
+                                    # loop_counter = result_dict['loop_counter']
+                                    if prgbar_widget:
+                                        prgbar_widget.gui.prgBar.setValue(int(progress))
+                                        qgis_app.processEvents()
+                                    else:
+                                        print('Progress: {:d}%'.format(int(progress)))
+
+                            if isinstance(performances,
+                                          list):  # weird exception handling to get rid of potential sublists
+                                for element in performances:
+                                    if isinstance(element, list):
+                                        if len(performances[0]) == 1:
+                                            performances = np.asarray(performances).reshape((1, 1))
+
+                        else:  # no performance evaluation means just fitting the model without feedback
+                            model = self.ml_model(X=x, y=y[:, ipara], model=self.mlra)
+
+                        if not self.use_al and len(self.para_list) > 1:
+                            prgbar_widget.gui.prgBar.setMaximum(100)
+                            prgbar_widget.gui.prgBar.setValue(int(model_no / nmodels_total * 100))
+                            qgis_app.processEvents()
+
+                        # The final trained model is saved
+                        joblib.dump(model, self.model_base + "_{:d}_{}{}".format(geo_ensemble,
+                                                                                 para,
+                                                                                 self.ml_model_ext))  # dump (save) model to file for later use
+
+                        # save the AL selection LUT if Checkbox is checked.
+                        if self.saveALselection and al_training_indices:
+                            out_name = self.model_name + "_{}_AL_selection".format(para)
+                            out_lut = np.squeeze(lut[:, al_training_indices])
+                            np.save(self.model_basedir + '/' + out_name + '_0_0', out_lut)
+                            with open("%s_00meta.lut" % (self.model_basedir + '/' + out_name), "w") as meta:
+                                meta.write("name=%s" % out_name)
+                                meta.write("\nn_total=%i" % (np.shape(lut[:, al_training_indices])[-1]))
+                                meta.write("\nparameters={}".format(para))
+                                meta.write("\nsplits=%i" % 1)
+                                meta.write("\ntts={}".format(";".join(i for i in self.meta_dict['tts'])))
+                                meta.write("\ntto={}".format(";".join(i for i in self.meta_dict['tto'])))
+                                meta.write("\npsi={}".format(";".join(i for i in self.meta_dict['psi'])))
+                                meta.write("\nmultiplication_factor=%i" % int(self.meta_dict['multiplication_factor']))
+                                meta.write(
+                                    "\nwavelengths={}".format(";".join(str(i) for i in self.meta_dict['wavelengths'])))
+
+        # Not Done yet! Save further information to the base-folder: information about scaler and pca
+        # are saved to a .proc-file; this file is read before calling predict on a model to prepare spectral data
+        # the same way as the LUT-spectra were preprocessed in this routine; there is one .proc-file per parameter,
+        # since scaler and pca can/does vary between parameters; however: at the time being, scaler and PCA are the
+        # same for all parameters and are saved as copies
+        if al_training_indices:
+            for para in self.para_list:
+                processing_dict = {"scaler": self.scaler, "pca": self.pca, "al_training_indices": al_training_indices,
+                                   "split_training_indices": split_training_indices, "test_indices": test_indices}
+                joblib.dump(processing_dict, self.model_base + '_{}.proc'.format(para))  # dump the .proc-file as well
+        else:
+            for para in self.para_list:
+                processing_dict = {"scaler": self.scaler, "pca": self.pca, "test_indices": test_indices}
+                joblib.dump(processing_dict, self.model_base + '_{}.proc'.format(para))  # dump the .proc-file as well
+
+        # Write Model Meta
+        with open(self.model_metafile, 'w') as para_file:  # Meta-information; one meta-file for all paras!
+            para_file.write("alg={}\nnoisetype={:d}\nnoiselvl={:d}%\nPCA_components={:d}\nscaler={}"
+                            .format(self.algorithm, self.noisetype, self.sigma, self.components, str(self.scaler)))
+            para_file.write("\ntarget_parameters=" + ";".join(str(i) for i in self.para_list))
+            para_file.write("\ntts=" + ";".join(str(i) for i in self.tts))
+            para_file.write("\ntto=" + ";".join(str(i) for i in self.tto))
+            para_file.write("\npsi=" + ";".join(str(i) for i in self.psi))
+            para_file.write("\nexclude_bands=" + ";".join(str(i) for i in self.exclude_bands))
+            if self.use_al:
+                para_file.write("\nactive_learning=" + str(self.use_al))
+            if self.hyperp_tuning:
+                para_file.write("\nbest_hyperparameters=" + str(
+                    self.best_hyperparameters_dict[self.algorithm]))
+                para_file.write("\nbest_score=" + str(self.best_score_dict[self.algorithm]))
+
+        # write found hyperparameters
+        if self.hyperp_tuning:
+            # print(self.best_hyperparameters_dict)
+            joblib.dump(self.best_hyperparameters_dict,
+                        self.model_base + '.hyper')
 
     def insitu_data_setup(self, val_data):
         # Scaling and PCA dim reduction of insitu spectra
@@ -534,14 +811,14 @@ class ProcessorTraining:
         wavelengths = val_data.get('Wavelengths')
 
         subset_bands = [i for i in range(len(wavelengths))
-                                 if i not in self.exclude_bands]
+                        if i not in self.exclude_bands]
 
         X_val = [X_val[i] for i in subset_bands]
         X_val = np.asarray(X_val).T
 
         if self.noisetype > 0:
             X_val = self._add_noise(ref_list=X_val, noisetype=self.noisetype, sigma=self.sigma,
-                                conversion=self.conversion_factor)
+                                    conversion=self.conversion_factor)
 
         if self.scaler:
             X_val = self.scaler.transform(X_val)  # transform scaler
@@ -614,7 +891,7 @@ class ProcessorTraining:
 
         if self.hyperp_tuning:
             param_dist = MLRA_defaults.__dict__[self.algorithm]['param_dist']
-            #TODO: add radiobutton for tuning options
+            # TODO: add radiobutton for tuning options
             self.mlra = self.init_hyperparameter_tuning(self.mlra, param_dist, mode='randomized', n_jobs=self.n_jobs)
 
         # AL based on split (train-test-split or kfold cross val)
@@ -634,15 +911,22 @@ class ProcessorTraining:
             self.ml_model = self.m.mlra_training._al_loop
 
         # No AL, training on splits
-        elif not self.use_al and self.perf_eval and not self.hyperp_tuning and not self.eval_on_insitu:
+        elif (not self.use_al and self.perf_eval and not self.hyperp_tuning and not self.eval_on_insitu
+              and not self.model_proc_dict):
             self.al_paras = {'split_method': self.split_method, 'kfolds': self.kfolds, 'test_size': self.test_size}
             self.ml_model = self.m.mlra_training._fit_split
-        # No AL, Training on full Training data with evaluation on insitu data -> The Retraining case
+        # No AL, Training on full Training data with evaluation on insitu data
+        # -> The Retraining case
         elif self.eval_on_insitu and not self.hyperp_tuning:
             if self.y_val_dict:
                 self.y_val = np.asarray(self.y_val_dict.get(var))
             self.al_paras = {'X_val': self.X_val, 'y_val': self.y_val}
-            self.ml_model = self.m.mlra_training._fit_insitu
+            self.ml_model = self.m.mlra_training._fit_insitu_or_testset
+        # No AL, Training on full Training data with evaluation on previous test data split
+        # -> The internal Retraining case
+        elif not self.eval_on_insitu and self.model_proc_dict:
+            self.al_paras = {'X_val': self.X_val, 'y_val': self.y_val}
+            self.ml_model = self.m.mlra_training._fit_insitu_or_testset
         # No AL, training with hyperparameter tuning
         elif self.hyperp_tuning:
             if self.eval_on_insitu:
@@ -653,7 +937,7 @@ class ProcessorTraining:
             self.ml_model = self.m.mlra_training._fit_hyper
         # No AL, only training -> all samples
         else:
-            self.ml_model = self.m.mlra_training._fit # construct the model and pass it to self.ml_model
+            self.ml_model = self.m.mlra_training._fit  # construct the model and pass it to self.ml_model
 
     def init_hyperparameter_tuning(self, mlra, param_dist, mode, n_iter_search=10, n_jobs=1):
         scoring = 'neg_root_mean_squared_error'
@@ -670,243 +954,9 @@ class ProcessorTraining:
 
         return search
 
-
-
-    def train_and_dump(self, prgbar_widget=None, qgis_app=None):
-        # Train a model and dump the trained model to a file in the model directory
-        # Number of models to be trained and dumped: one model per geo-ensemble and parameter
-        nmodels_total = self.npsi * self.ntto * self.ntts * len(self.para_list)
-        training_indices = None
-
-        # Train Model for each geo-ensemble
-        for rAA in range(self.npsi):
-            for OZA in range(self.ntto):
-                for SZA in range(self.ntts):
-
-                    # number of geo-ensemble, corresponds to name of the LUT-file
-                    geo_ensemble = rAA * self.ntto * self.ntts + OZA * self.ntts + SZA
-                    X, y, lut = self.read_lut(geo=geo_ensemble)  # read reflectances (X) and PROSAIL parameters (y) from LUT
-
-
-                    # if self.use_al:
-                    #     self.X_raw = np.copy(X)
-                    if self.soil_specs:
-                        subset_bands = [i for i in range(len(self.soil_wavelengths))
-                                        if i not in self.exclude_bands]
-                        soilspecs = [self.soil_specs[i] for i in subset_bands]
-                        soilspecs = np.asarray(soilspecs).T
-                        X = np.vstack((X, soilspecs))
-                        add_zero_len = len(soilspecs)
-                        zeroes = np.zeros((add_zero_len, y.shape[1]))
-                        y = np.vstack((y, zeroes))
-
-                    if self.noisetype > 0:
-                        X = self._add_noise(ref_list=X, noisetype=self.noisetype, sigma=self.sigma,
-                                            conversion=self.conversion_factor)
-
-                    # Train and dump individual model per parameter
-                    for ipara, para in enumerate(self.para_list):
-
-                        model_no = geo_ensemble * len(self.para_list) + ipara + 1  # serial number of model
-
-                        if self.use_al and not self.use_insitu: prg_al_string = 'internal AL'
-                        elif self.use_al and self.use_insitu: prg_al_string = 'insitu AL'
-                        elif self.hyperp_tuning: prg_al_string = 'hyperparams tuned'
-                        else: prg_al_string = 'non AL'
-
-                        if self.hyperparas_dict:
-                            hyperparams = self.hyperparas_dict
-                        else:
-                            hyperparams = {}
-
-                        if self.scaler and not self.model_proc_dict:  # if X (reflectances) are to be scaled
-                            self.scaler.fit(X)  # fit scaler
-                            x = self.scaler.transform(X)
-
-                        elif self.model_proc_dict:
-                            x = self.scaler.transform(X)  # transform scaler
-                        else:
-                            x = np.copy(X)  # consecutive code needs x instead of X; copy if no scaler is used
-
-                        # fit and transform a PCA
-                        if self.pca and not self.model_proc_dict:
-                            self.pca.fit(x)#, y[:, ipara])
-                            x = self.pca.transform(x)
-                        elif self.model_proc_dict:
-                            x = self.pca.transform(x)
-
-                        if self.model_proc_dict and self.soil_specs:
-                            soils_x = x[-len(soilspecs):, :]
-                            soils_y = y[-len(soilspecs):, :]
-                            x_select = x[self.model_proc_dict['training_indices'], :]
-                            x = np.vstack((x_select, soils_x))
-                            y_select = y[self.model_proc_dict['training_indices'], :]
-                            y = np.vstack((y_select, soils_y))
-                        elif self.model_proc_dict and not soilspecs:
-                            x = x[self.model_proc_dict['training_indices'], :]
-                            y = y[self.model_proc_dict['training_indices'], :]
-
-                        if self.val_data:
-                            self.insitu_data_setup(self.val_data)
-
-                        self.init_model(var=para, hyperparams=hyperparams)  # initialize the model with the given settings
-
-                        # Update progress bar
-                        if prgbar_widget:
-                            if prgbar_widget.gui.lblCancel.text() == "-1":
-                                prgbar_widget.gui.lblCancel.setText("")
-                                prgbar_widget.gui.cmdCancel.setDisabled(False)
-                                raise ValueError("Training cancelled!")
-
-                            prgbar_widget.gui.lblCaption_r.setText(
-                                'Training {} {} model {:d} of {:d}: {}'.format(
-                                    prg_al_string, self.algorithm, model_no, nmodels_total, para))
-                            qgis_app.processEvents()
-                        else:
-                            print("Training {} {} Noise {:d}-{:d} | {} | Geo {:d} of {:d}".format(prg_al_string,
-                            self.algorithm, self.noisetype, self.sigma, para, geo_ensemble + 1,
-                            self.ntts * self.ntto * self.npsi))
-
-
-                        if self.perf_eval:  # performance evaluation
-
-                            # result_dict is of type key 'result', 'progress', or 'hyperparameters'
-                            for result_dict in self.ml_model(
-                                    X=x, y=y[:, ipara], model=self.mlra, **self.al_paras):
-                                if result_dict["type"] == "result":  # results are ready, populate results
-                                    model = result_dict["model"]
-                                    # temp_dict = {}
-                                    self.X_val = result_dict["X_val"]
-                                    self.y_val = result_dict["y_val"]
-                                    performances = np.array(result_dict["performances"])
-                                    if self.use_insitu and self.algorithm == 'GPR':
-                                        predictions, stds = model.predict(self.X_val, return_std=True)
-                                        result_dict['stds'] = stds
-                                    elif self.use_insitu and self.algorithm != 'GPR':
-                                        predictions = model.predict(self.X_val)
-                                    else:
-                                        predictions = np.array(result_dict["predictions"])
-
-                                    if self.para_boost:
-                                        # bring results back to original scale:
-                                        self.y_val = self.y_val / self.m.func.conv[para][2]
-                                        performances = performances / self.m.func.conv[para][2]
-                                        predictions = predictions / self.m.func.conv[para][2]
-
-                                    temp_dict = {
-                                        "X_val": self.X_val,
-                                        "y_val": self.y_val,
-                                        "performances": performances,
-                                        "predictions": predictions}
-                                    # GPR yields prediciton stds, others not
-                                    if 'stds' in result_dict:
-                                        stds = np.array(result_dict['stds'])
-                                        if self.para_boost:
-                                            stds = stds / self.m.func.conv[para][2]
-                                        temp_dict['stds'] = stds
-                                    if self.use_al:
-                                        # TODO: these indices point at AL selected spectra -> export
-                                        training_indices = result_dict["all_training_indices"]
-                                        temp_dict["training_indices"] = training_indices
-                                    self.all_results_dict[f'{para} {prg_al_string} {self.algorithm}'] = temp_dict
-
-                                elif result_dict["type"] == "hyperparameters":
-                                    if self.algorithm not in self.best_hyperparameters_dict:
-                                        self.best_hyperparameters_dict[self.algorithm] = {}
-                                    if self.algorithm not in self.best_score_dict:
-                                        self.best_score_dict[self.algorithm] = {}
-
-                                    self.best_hyperparameters_dict[self.algorithm][para] = {
-                                        'hyperparas': result_dict["best_hyperparams"]}
-                                    self.best_score_dict[self.algorithm][para] = {
-                                        'best_score': result_dict["best_score"]}
-                                    print(self.best_hyperparameters_dict)
-                                    print(self.best_score_dict)
-
-
-                                elif result_dict["type"] == "progress":  # progressbar updates
-
-                                    progress = result_dict['progress']
-                                    # loop_counter = result_dict['loop_counter']
-                                    if prgbar_widget:
-                                        prgbar_widget.gui.prgBar.setValue(int(progress))
-                                        qgis_app.processEvents()
-                                    else:
-                                        print('Progress: {:d}%'.format(int(progress)))
-
-                            if isinstance(performances, list):  # weird exception handling to get rid of potential sublists
-                                for element in performances:
-                                    if isinstance(element, list):
-                                        if len(performances[0]) == 1:
-                                            performances = np.asarray(performances).reshape((1, 1))
-
-                        else:  # no performance evaluation means just fitting the model without feedback
-                            model = self.ml_model(X=x, y=y[:, ipara], model=self.mlra)
-
-                        if not self.use_al and len(self.para_list) > 1:
-                            prgbar_widget.gui.prgBar.setMaximum(100)
-                            prgbar_widget.gui.prgBar.setValue(int(model_no/nmodels_total*100))
-                            qgis_app.processEvents()
-
-                        # The final trained model is saved
-                        joblib.dump(model, self.model_base + "_{:d}_{}{}".format(geo_ensemble,
-                            para, self.ml_model_ext))  # dump (save) model to file for later use
-
-                        # save the AL selection LUT if Checkbox is checked.
-                        if self.saveALselection and training_indices:
-                            out_name = self.model_name + "_{}_AL_selection".format(para)
-                            out_lut = np.squeeze(lut[:, training_indices])
-                            np.save(self.model_basedir + '/' + out_name + '_0_0', out_lut)
-                            with open("%s_00meta.lut" % (self.model_basedir + '/' + out_name), "w") as meta:
-                                meta.write("name=%s" % out_name)
-                                meta.write("\nn_total=%i" % np.shape(lut[:, training_indices])[1])
-                                meta.write("\nparameters={}".format(para))
-                                meta.write("\nsplits=%i" % 1)
-                                meta.write("\ntts={}".format(";".join(i for i in self.meta_dict['tts'])))
-                                meta.write("\ntto={}".format(";".join(i for i in self.meta_dict['tto'])))
-                                meta.write("\npsi={}".format(";".join(i for i in self.meta_dict['psi'])))
-                                meta.write("\nmultiplication_factor=%i" % int(self.meta_dict['multiplication_factor']))
-                                meta.write("\nparameters={}".format(";".join(str(i) for i in self.meta_dict['parameters'])))
-                                meta.write("\nwavelengths={}".format(";".join(str(i) for i in self.meta_dict['wavelengths'])))
-
-        # Not Done yet! Save further information to the base-folder: information about scaler and pca
-        # are saved to a .proc-file; this file is read before calling predict on a model to prepare spectral data
-        # the same way as the LUT-spectra were preprocessed in this routine; there is one .proc-file per parameter,
-        # since scaler and pca can/does vary between parameters; however: at the time being, scaler and PCA are the
-        # same for all parameters and are saved as copies
-        if training_indices:
-            for para in self.para_list:
-                processing_dict = {"scaler": self.scaler, "pca": self.pca, "training_indices": training_indices}
-                joblib.dump(processing_dict, self.model_base + '_{}.proc'.format(para))  # dump the .proc-file as well
-        else:
-            for para in self.para_list:
-                processing_dict = {"scaler": self.scaler, "pca": self.pca}
-                joblib.dump(processing_dict, self.model_base + '_{}.proc'.format(para))  # dump the .proc-file as well
-
-        # Write Model Meta
-        with open(self.model_metafile, 'w') as para_file:  # Meta-information; one meta-file for all paras!
-            para_file.write("alg={}\nnoisetype={:d}\nnoiselvl={:d}%\nPCA_components={:d}\nscaler={}"
-                            .format(self.algorithm, self.noisetype, self.sigma, self.components, str(self.scaler)))
-            para_file.write("\ntarget_parameters=" + ";".join(str(i) for i in self.para_list))
-            para_file.write("\ntts=" + ";".join(str(i) for i in self.tts))
-            para_file.write("\ntto=" + ";".join(str(i) for i in self.tto))
-            para_file.write("\npsi=" + ";".join(str(i) for i in self.psi))
-            para_file.write("\nexclude_bands=" + ";".join(str(i) for i in self.exclude_bands))
-            if self.use_al:
-                para_file.write("\nactive_learning=" + str(self.use_al))
-            if self.hyperp_tuning:
-                para_file.write("\nbest_hyperparameters=" + str(
-                    self.best_hyperparameters_dict[self.algorithm]))
-                para_file.write("\nbest_score=" + str(self.best_score_dict[self.algorithm]))
-
-        # write found hyperparameters
-        if self.hyperp_tuning:
-            # print(self.best_hyperparameters_dict)
-            joblib.dump(self.best_hyperparameters_dict,
-                        self.model_base + '.hyper')
-
     def get_result_dict(self):
         return self.all_results_dict
+
     def get_hyperparams_dict(self):
         return self.best_hyperparameters_dict
 
@@ -931,7 +981,7 @@ class ProcessorTraining:
     def read_lut(self, geo):
         # open a lut-file and reads the content; loads all splits of one geo-ensemble which is passed into the method
         lut = np.hstack([np.load(self.lut_base + '_{:d}_{:d}'.format(geo, split) + ".npy")
-                        for split in range(self.splits)])  # load all splits of the current geo_ensembles
+                         for split in range(self.splits)])  # load all splits of the current geo_ensembles
         # only select the rows with correct band information, then transpose into columns
         X = np.asarray(lut[self.subset_bands_lut, :]).T
 
@@ -943,7 +993,7 @@ class ProcessorTraining:
             # check if para is *'derived' and calculate:
             if para == 'AGBdry':
                 y[:, i] = (lut[self.para_dict['cp'], :]
-                           + lut[self.para_dict['cbc'], :]) * lut[self.para_dict['LAI'], :]  * 10000
+                           + lut[self.para_dict['cbc'], :]) * lut[self.para_dict['LAI'], :] * 10000
             if para == 'AGBfresh':
                 y[:, i] = (lut[self.para_dict['cp'], :] + lut[self.para_dict['cbc'], :]
                            + lut[self.para_dict['cw'], :]) * lut[self.para_dict['LAI'], :] * 10000
@@ -957,7 +1007,7 @@ class ProcessorTraining:
             if para in self.para_dict:
                 y[:, i] = lut[self.para_dict[para], :]
 
-            if self.para_boost: # and para in self.para_dict:  # to boost or not to boost
+            if self.para_boost:  # and para in self.para_dict:  # to boost or not to boost
                 y[:, i] = y[:, i] * self.m.func.conv.get(para)[2]
 
         return X, y, lut
@@ -967,7 +1017,7 @@ class ProcessorTraining:
 
         # sigma (strength of the noise) is provided as %, so it needs to be converted to relative values
         # and optionally multiplied with the conversion factor to match reflectance value ranges for additive noise
-        if noisetype == 0:    # no noise
+        if noisetype == 0:  # no noise
             return ref_list
         elif noisetype == 1:  # gaussian noise
             noise_std = np.std(ref_list) * sigma / 100
@@ -998,7 +1048,7 @@ class ProcessorPrediction:
                           'GBR': {'name': 'gbr', 'file_ext': '.gbr', 'file_name': 'gbr_mlp'}}
 
     def prediction_setup(self, model_meta, img_in, res_out, out_mode, mask_ndvi, ndvi_thr, ndvi_bands, mask_image,
-                         geo_in, spatial_geo, paras, algorithm, fixed_geos=None, nodat=None):
+                         geo_in, spatial_geo, paras, algorithm, gpr_flag, fixed_geos=None, nodat=None):
         # Setting up everything for the prediction
 
         self.model_meta = model_meta
@@ -1017,6 +1067,9 @@ class ProcessorPrediction:
         self.spatial_geo = spatial_geo
         self.paras = paras  # Which PROSAIL parameters should be estimated? LAI, ALIA, cab, cm
         self.algorithm = algorithm
+        self.gpr_flag = gpr_flag
+        if self.gpr_flag is True:
+            self.res_out_std = str(os.path.splitext(self.res_out)[0] + '_std' + os.path.splitext(self.res_out)[1])
 
         if fixed_geos is None:  # no fixed geo for the image
             self.tts_unique, self.tto_unique, self.psi_unique = [None, None, None]
@@ -1045,10 +1098,11 @@ class ProcessorPrediction:
         self.all_psi = [float(i) for i in metacontent[8].split("=")[1].split(";")]
         try:
             self.exclude_bands = [int(i) for i in metacontent[9].split("=")[1].split(";")]
-        except: self.exclude_bands = []
+        except:
+            self.exclude_bands = []
 
         if prg_widget:
-            prg_widget.gui.lblCaption_r.setText('Reading Geometry Image...')
+            prg_widget.gui.lblCaption_r.setText('Reading Geometry...')
             qgis_app.processEvents()
 
         # SZA, OZA, rAA: angles * 100 (e.g. SZA 4500 = 45°)
@@ -1113,12 +1167,17 @@ class ProcessorPrediction:
         # self.predict does the actual prediction and returns a matrix that overwrites self.out_matrix
         # it seems confusing to prepare a matrix and then overwrite it, but self.predict needs self.out_matrix
         # as an argument!
-        self.out_matrix = self.predict(image=in_matrix, whichModel_coords=whichModel_coords, out_matrix=self.out_matrix,
+        self.out_matrix, self.out_matrix_std = self.predict(image=in_matrix, whichModel_coords=whichModel_coords, out_matrix=self.out_matrix,
                                        prg_widget=prg_widget, qgis_app=qgis_app)
 
     def write_prediction(self):
         # Write the estimated parameters to file
         self.m.func.write_image(out_matrix=self.out_matrix, image_out=self.res_out, grid=self.grid,
+                                out_mode=self.out_mode, nodat=self.nodat[2], paras_out=self.paras)
+
+    def write_prediction_std(self):
+        # Write the estimated parameters to file
+        self.m.func.write_image(out_matrix=self.out_matrix_std, image_out=self.res_out_std, grid=self.grid,
                                 out_mode=self.out_mode, nodat=self.nodat[2], paras_out=self.paras)
 
     def predict(self, image, whichModel_coords, out_matrix, prg_widget, qgis_app):
@@ -1130,25 +1189,27 @@ class ProcessorPrediction:
         # In Sklearn, prediction of multiple data inputs at once is possible, but not as a 2D-array
         # We need to "collapse" the second dimension and create one long dim as follows:
         image = image.reshape((nbands, -1))  # collapse rows and cols into 1 dimension
-        image = np.swapaxes(image, 0, 1)     # place predictors into the right position (where sklearn expects them)
+        image = np.swapaxes(image, 0, 1)  # place predictors into the right position (where sklearn expects them)
+
+        out_matrix_std = None
 
         # Do this for each PROSAIL parameter after another
         for ipara, para in enumerate(self.paras):
             if prg_widget:
                 prg_widget.gui.lblCaption_r.setText('Predicting {} (parameter {:d} of {:d})...'
-                                                    .format(para, ipara+1, len(self.paras)))
+                                                    .format(para, ipara + 1, len(self.paras)))
                 qgis_app.processEvents()
 
             # Load the right model from drive; it's actually a .npz file, so the arrays of .proc can be
             # addressed like a dictionary; in the .proc-file the preprocession of the LUT is stored to perform
             # the same on the spectral image
             process_dict = joblib.load(self.model_dir + "/" + self.model_name + "_{}".format(para) + '.proc')
-            #print(process_dict)
+            # print(process_dict)
 
             # Make a copy of the input image and only work on that one to keep the original image.
             # This is memory expensive but better than loading image over and over again
             image_copy = np.copy(image).astype(dtype=np.float32)
-            #print(image_copy.shape)
+            # print(image_copy.shape)
 
             # scale the reflectance data according to the scaler
             if process_dict['scaler']:
@@ -1175,15 +1236,26 @@ class ProcessorPrediction:
                 if whichModel_coords[i_imodel][0].size == 0:
                     continue  # after masking, not all 'imodels' are present in the image_copy
 
-                # This is the core "predict" command in which the algorithm is asked to estimate from what it has learnt
-                result = mod[imodel].predict(image_copy[whichModel_coords[i_imodel][0],
+                if isinstance(mod[imodel], GaussianProcessRegressor):
+                    result, result_std = mod[imodel].predict(image_copy[whichModel_coords[i_imodel][0],
+                                                 whichModel_coords[i_imodel][1], :], return_std=True)
+                    out_matrix_std = np.copy(out_matrix)
+                    out_matrix_std[ipara, whichModel_coords[i_imodel][0], whichModel_coords[i_imodel][
+                        1]] = result_std
+
+                else:
+                    # This is the core "predict" command in which the algorithm is asked to estimate from what it has learnt
+                    result = mod[imodel].predict(image_copy[whichModel_coords[i_imodel][0],
                                              whichModel_coords[i_imodel][1], :])
+
+                out_matrix[ipara, whichModel_coords[i_imodel][0], whichModel_coords[i_imodel][
+                        1]] = result  # / self.m.func.conv[para][2]
 
                 # Convert the results and put it into the right position
                 # out_matrix[parameter, row, col], row and col is stored in the coordinates of whichModel
-                out_matrix[ipara, whichModel_coords[i_imodel][0], whichModel_coords[i_imodel][1]] = result  # / self.m.func.conv[para][2]
 
-        return out_matrix
+        return out_matrix, out_matrix_std
+
 
 # Some basic functions are placed in this class
 class Functions:
@@ -1217,7 +1289,7 @@ class Functions:
             "CWC": ["CWC", [0.0, 0.3], 1],
             "Nitrogen": ["Nitrogen", [0.0, 40], 0.1],
             "Carbon": ["Carbon", [0.0, 600], 0.001]
-            }
+        }
 
     @staticmethod
     def _ndvi(bands, in_matrix, thr):
@@ -1309,6 +1381,7 @@ class Functions:
     def get_random_normal(loc, scale, size, random_state=42):
         rng = np.random.default_rng(random_state)
         return rng.normal(loc=loc, scale=scale, size=size)
+
 
 
 class ProcessorMainFunction:
