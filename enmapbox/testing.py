@@ -53,7 +53,7 @@ class EnMAPBoxTestCase(TestCase):
     def setUpClass(cls, resources=[]):
         tmpDir = cls.tempDir(cls)
         os.chdir(tmpDir)
-        super().setUpClass(resources=resources)
+        super().setUpClass()
 
         # add test-dir as site lib
         from enmapbox import DIR_REPO
