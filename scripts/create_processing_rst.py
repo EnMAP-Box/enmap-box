@@ -1,6 +1,7 @@
 import os
 import re
 import subprocess
+import textwrap
 from os import makedirs
 from os.path import abspath, join, dirname, exists, basename
 from pathlib import Path
@@ -41,7 +42,6 @@ def generateRST():
 
     groups = dict()
 
-    nalg = 0
     algs = algorithms()
     for alg in algs:
         # print(alg.displayName())
@@ -50,17 +50,16 @@ def generateRST():
         if alg.group() not in groups:
             groups[alg.group()] = dict()
         groups[alg.group()][alg.displayName()] = alg
-        nalg += 1
 
-    print(f'Found {nalg} algorithms.')
+    print(f'Found {len(algs)} algorithms.')
 
-    textProcessingAlgorithmsRst = '''Processing Algorithms
-*********************
-
-.. toctree::
-    :maxdepth: 1
-
-'''
+    textProcessingAlgorithmsRst = textwrap.dedent(
+                    """Processing Algorithms
+                       *********************
+                                    
+                        .. toctree::
+                            :maxdepth: 1
+                    """)
 
     for gkey in sorted(groups.keys()):
 
