@@ -97,16 +97,20 @@ class ImportPrismaL2DAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFloat(self.P_BAD_BAND_THRESHOLD, self._BAD_BAND_THRESHOLD, None, True, 0, 1, False)
         self.addParameterEnum(self.P_BAD_PIXEL_TYPE, self._BAD_PIXEL_TYPE, self.O_BAD_PIXEL_TYPE, True, [0], True)
         self.addParameterRasterDestination(self.P_OUTPUT_SPECTRAL_CUBE, self._OUTPUT_SPECTRAL_CUBE)
-        self.addParameterVrtDestination(self.P_OUTPUT_PAN_CUBE, self._OUTPUT_PAN_CUBE, None, True, False)
         self.addParameterVrtDestination(
-            self.P_OUTPUT_SPECTRAL_GEOLOCATION, self._OUTPUT_SPECTRAL_GEOLOCATION, None, True, False
+            self.P_OUTPUT_PAN_CUBE, self._OUTPUT_PAN_CUBE, None, True, False, True
         )
         self.addParameterVrtDestination(
-            self.P_OUTPUT_SPECTRAL_GEOMETRIC, self._OUTPUT_SPECTRAL_GEOMETRIC, None, True, False
+            self.P_OUTPUT_SPECTRAL_GEOLOCATION, self._OUTPUT_SPECTRAL_GEOLOCATION, None, True, False, True
+        )
+        self.addParameterVrtDestination(
+            self.P_OUTPUT_SPECTRAL_GEOMETRIC, self._OUTPUT_SPECTRAL_GEOMETRIC, None, True, False, True
         )
         self.addParameterRasterDestination(self.P_OUTPUT_SPECTRAL_ERROR, self._OUTPUT_SPECTRAL_ERROR, None, True, False)
-        self.addParameterVrtDestination(self.P_OUTPUT_PAN_GEOLOCATION, self._OUTPUT_PAN_GEOLOCATION, None, True, False)
-        self.addParameterVrtDestination(self.P_OUTPUT_PAN_ERROR, self._OUTPUT_PAN_ERROR, None, True, False)
+        self.addParameterVrtDestination(
+            self.P_OUTPUT_PAN_GEOLOCATION, self._OUTPUT_PAN_GEOLOCATION, None, True, False, True
+        )
+        self.addParameterVrtDestination(self.P_OUTPUT_PAN_ERROR, self._OUTPUT_PAN_ERROR, None, True, False, True)
 
     def defaultParameters(self, file: str):
         return {

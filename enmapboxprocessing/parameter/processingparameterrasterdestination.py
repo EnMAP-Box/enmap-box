@@ -7,23 +7,26 @@ class ProcessingParameterRasterDestination(QgsProcessingParameterRasterDestinati
 
     def __init__(
             self, name: str, description: str, defaultValue=None, optional=False, createByDefault=True,
-            allowTif=True, allowEnvi=False, allowVrt=False
+            allowTif=True, allowEnvi=False, allowVrt=False, defaultFileExtension: str = None
     ):
         super().__init__(name, description, defaultValue, optional, createByDefault)
         self.optional = optional
         self.allowTif = allowTif
         self.allowEnvi = allowEnvi
         self.allowVrt = allowVrt
+        self.defaultFileExtension_ = defaultFileExtension
 
     def clone(self):
         copy = ProcessingParameterRasterDestination(
             self.name(), self.description(), self.defaultValue(), self.optional, self.createByDefault(),
-            self.allowTif, self.allowEnvi, self.allowVrt
+            self.allowTif, self.allowEnvi, self.allowVrt, self.defaultFileExtension_
         )
         copy.setFlags(self.flags())
         return copy
 
     def defaultFileExtension(self):
+        if self.defaultFileExtension_ is not None:
+            return self.defaultFileExtension_
         if self.allowTif:
             return 'tif'
         if self.allowEnvi:

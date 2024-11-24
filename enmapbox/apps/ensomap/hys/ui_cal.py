@@ -219,7 +219,7 @@ class ui_cal:
         # check if gain and offset has been set
         gain = self.gui.gui['cal_txt_gain'].text()
         offset = self.gui.gui['cal_txt_offset'].text()
-        if gain.replace('.', '', 1).isdigit() is False:
+        if gain.replace('-','', 1).replace('.', '', 1).isdigit() is False:
             hys.display_error(self, 'Gain is not valid!')
             return
         if offset.replace('-','', 1).replace('.','',1).isdigit() is False:

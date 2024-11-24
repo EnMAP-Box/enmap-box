@@ -3,6 +3,8 @@ import traceback
 from io import StringIO
 from typing import Dict, Any, List, Tuple
 
+from sklearn.multioutput import MultiOutputRegressor
+
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
@@ -86,7 +88,9 @@ class FitRegressorAlgorithmBase(EnMAPProcessingAlgorithm):
                     f'targets={[c.name for c in dump.targets]}')
                 feedback.pushInfo('Fit regressor')
 
-                if dump.y.shape[1] == 1:
+                if isinstance(regressor, MultiOutputRegressor):
+                    dumpY = dump.y
+                elif dump.y.shape[1] == 1:
                     dumpY = dump.y.ravel()
                 else:
                     dumpY = dump.y

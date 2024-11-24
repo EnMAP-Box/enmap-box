@@ -18,7 +18,7 @@ from qgis.PyQt.QtGui import QColor
 from qgis.core import (QgsRasterLayer, QgsRasterDataProvider, QgsCoordinateReferenceSystem, QgsRectangle,
                        QgsRasterRange, QgsPoint, QgsRasterBlockFeedback, QgsRasterBlock, QgsPointXY,
                        QgsProcessingFeedback, QgsRasterBandStats, Qgis, QgsGeometry, QgsVectorLayer, QgsWkbTypes,
-                       QgsFeature)
+                       QgsFeature, QgsRasterPipe, QgsRasterProjector)
 
 
 @typechecked
@@ -26,8 +26,11 @@ class RasterReader(object):
     Nanometers = 'Nanometers'
     Micrometers = 'Micrometers'
 
-    def __init__(self, source: RasterSource, openWithGdal: bool = True):
-
+    def __init__(
+            self, source: RasterSource, openWithGdal: bool = True,
+            crs: QgsCoordinateReferenceSystem = None
+    ):
+        self.maskReader: Optional[RasterReader] = None
         if isinstance(source, QgsRasterLayer):
             self.layer = source
             self.provider: QgsRasterDataProvider = self.layer.dataProvider()
@@ -53,6 +56,8 @@ class RasterReader(object):
 
         self.gdalDataset = gdalDataset
 
+        self.setRasterPipeCrs(crs)
+
         # prepare STAC metadata
         if exists(self.layer.source() + '.stac.json'):
             self.stacMetadata = Utils().jsonLoad(self.layer.source() + '.stac.json')
@@ -70,6 +75,9 @@ class RasterReader(object):
             self.terraMetadata = Utils().jsonLoad(self.layer.source() + '.aux.json')
         else:
             self.terraMetadata = None
+
+    def setExternalMask(self, layer: QgsRasterLayer):
+        self.maskReader = RasterReader(layer)
 
     def bandCount(self) -> int:
         """Return iterator over all band numbers."""
@@ -223,6 +231,21 @@ class RasterReader(object):
                 continue  # empty blocks may occure, but can just skip over
             yield RasterBlockInfo(blockExtent, xOffset, yOffset, width, height)
 
+    def setRasterPipeCrs(self, crs: QgsCoordinateReferenceSystem = None):
+        if crs is None:
+            projector = self.provider
+            pipe = None
+        elif isinstance(crs, QgsCoordinateReferenceSystem):
+            pipe = QgsRasterPipe()
+            pipe.set(self.provider.clone())
+            projector = QgsRasterProjector()
+            projector.setCrs(self.provider.crs(), crs)
+            pipe.insert(1, projector)
+        else:
+            raise ValueError()
+        self.pipe = pipe
+        self.projector = projector
+
     def arrayFromBlock(
             self, block: RasterBlockInfo, bandList: List[int] = None, overlap: int = None,
             feedback: QgsRasterBlockFeedback = None
@@ -253,7 +276,7 @@ class RasterReader(object):
         arrays = list()
         for bandNo in bandList:
             assert 0 < bandNo <= self.bandCount(), f'bandNo is {bandNo}'
-            block: QgsRasterBlock = self.provider.block(bandNo, boundingBox, width, height, feedback)
+            block: QgsRasterBlock = self.projector.block(bandNo, boundingBox, width, height, feedback)
             array = Utils.qgsRasterBlockToNumpyArray(block=block)
             arrays.append(array)
         return arrays
@@ -300,9 +323,11 @@ class RasterReader(object):
         return array
 
     def maskArray(
-            self, array: Array3d, bandList: List[int] = None, maskNotFinite=True, defaultNoDataValue: float = None
+            self, array: Array3d, bandList: List[int] = None, maskNotFinite=True, defaultNoDataValue: float = None,
+            maskNoDataValue=True
     ) -> Array3d:
         """Return mask for given data. No data values evaluate to False, all other to True."""
+
         if bandList is None:
             bandList = range(1, self.provider.bandCount() + 1)
         assert len(bandList) == len(array)
@@ -310,13 +335,14 @@ class RasterReader(object):
         for i, a in enumerate(array):
             bandNo = i + 1
             m = np.full_like(a, True, dtype=bool)
-            if self.provider.sourceHasNoDataValue(bandNo) and self.provider.useSourceNoDataValue(bandNo):
-                noDataValue = self.provider.sourceNoDataValue(bandNo)
-                if not isnan(noDataValue):
-                    m[a == noDataValue] = False
-            else:
-                if defaultNoDataValue is not None:
-                    m[a == defaultNoDataValue] = False
+            if maskNoDataValue:
+                if self.provider.sourceHasNoDataValue(bandNo) and self.provider.useSourceNoDataValue(bandNo):
+                    noDataValue = self.provider.sourceNoDataValue(bandNo)
+                    if not isnan(noDataValue):
+                        m[a == noDataValue] = False
+                else:
+                    if defaultNoDataValue is not None:
+                        m[a == defaultNoDataValue] = False
             rasterRange: QgsRasterRange
             for rasterRange in self.provider.userNoDataValues(bandNo):
                 if rasterRange.bounds() == QgsRasterRange.BoundsType.IncludeMinAndMax:

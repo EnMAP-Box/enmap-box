@@ -4,12 +4,12 @@ from enmapboxprocessing.algorithm.fitcatboostregressoralgorithm import FitCatBoo
 from enmapboxprocessing.algorithm.fitgaussianprocessregressoralgorithm import FitGaussianProcessRegressorAlgorithm
 from enmapboxprocessing.algorithm.fitkernelridgealgorithm import FitKernelRidgeAlgorithm
 from enmapboxprocessing.algorithm.fitlinearregressionalgorithm import FitLinearRegressionAlgorithm
-from enmapboxprocessing.algorithm.fitlinearsvralgorithm import FitLinearSVRAlgorithm
+from enmapboxprocessing.algorithm.fitlinearsvralgorithm import FitLinearSvrAlgorithm
 from enmapboxprocessing.algorithm.fitplsegressionalgorithm import FitPLSRegressionAlgorithm
 from enmapboxprocessing.algorithm.fitrandomforestregressoralgorithm import FitRandomForestRegressorAlgorithm
 from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxtestdata import regressorDumpSingleTargetPkl, regressorDumpPkl
+from enmapboxtestdata import regressorDumpSingleTargetPkl, regressorDumpPkl, regressorDumpMultiTargetPkl
 
 
 class FitTestRegressorAlgorithm(FitRegressorAlgorithmBase):
@@ -63,7 +63,7 @@ class TestFitRegressorAlgorithm(TestCase):
             FitGaussianProcessRegressorAlgorithm(),
             FitLinearRegressionAlgorithm(),
             FitKernelRidgeAlgorithm(),
-            FitLinearSVRAlgorithm(),
+            FitLinearSvrAlgorithm(),
             FitPLSRegressionAlgorithm(),
         ]
         for alg in algs:
@@ -77,12 +77,20 @@ class TestFitRegressorAlgorithm(TestCase):
             }
             self.runalg(alg, parameters)
 
-    def _test_debug_issue1116(self):
-        alg = FitLinearSVRAlgorithm()
+    def test_debug_issue967(self):
+        alg = FitLinearSvrAlgorithm()
+        parameters = {
+            alg.P_DATASET: regressorDumpMultiTargetPkl,
+            alg.P_REGRESSOR: alg.defaultCodeAsString(),
+            alg.P_OUTPUT_REGRESSOR: self.filename('regressor1.pkl')
+        }
+        self.runalg(alg, parameters)
+
+        alg = FitLinearSvrAlgorithm()
         parameters = {
             alg.P_DATASET: regressorDumpSingleTargetPkl,
             alg.P_REGRESSOR: alg.defaultCodeAsString(),
-            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.pkl')
+            alg.P_OUTPUT_REGRESSOR: self.filename('regressor2.pkl')
         }
         self.runalg(alg, parameters)
 

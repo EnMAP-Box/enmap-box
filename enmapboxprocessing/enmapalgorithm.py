@@ -535,7 +535,10 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def parameterAsMatrix(
             self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext
     ) -> Optional[List[Any]]:
-        return parameters.get(name)
+        value = parameters.get(name)
+        if value == [QVariant()]:
+            return None
+        return value
 
     def parameterIsNone(self, parameters: Dict[str, Any], name: str):
         return parameters.get(name, None) is None
@@ -789,22 +792,24 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
 
     def addParameterRasterDestination(
             self, name: str, description: str, defaultValue=None, optional=False, createByDefault=True,
-            allowTif=True, allowEnvi=True, allowVrt=False, advanced=False
+            allowTif=True, allowEnvi=True, allowVrt=False, defaultFileExtension: str = None, advanced=False
     ):
         self.addParameter(
             ProcessingParameterRasterDestination(
-                name, description, defaultValue, optional, createByDefault, allowTif, allowEnvi, allowVrt
+                name, description, defaultValue, optional, createByDefault, allowTif, allowEnvi, allowVrt,
+                defaultFileExtension
             )
         )
         self.flagParameterAsAdvanced(name, advanced)
 
     def addParameterVrtDestination(
             self, name: str, description: str, defaultValue=None, optional=False, createByDefault=True,
-            advanced=False
+            vrtOnly=False, advanced=False
     ):
         self.addParameterRasterDestination(
-            name, description, defaultValue, optional, createByDefault, False, False, True, advanced
+            name, description, defaultValue, optional, createByDefault, not vrtOnly, not vrtOnly, True, 'vrt', advanced
         )
+
         self.flagParameterAsAdvanced(name, advanced)
 
     def addParameterVectorDestination(
@@ -1024,6 +1029,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
 
 class Group(Enum):
     AccuracyAssessment = 'Accuracy Assessment'
+    AnalysisReadyData = 'Analysis ready data'
     Auxilliary = 'Auxilliary'
     Classification = 'Classification'
     Clustering = 'Clustering'

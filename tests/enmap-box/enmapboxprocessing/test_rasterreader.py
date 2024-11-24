@@ -8,7 +8,7 @@ from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import enmap, r_terra_timeseries_days, r_terra_timeseries_seconds, netCDF_timeseries_days
 from enmapboxtestdata import fraction_polygon_l3
 from qgis.PyQt.QtCore import QDateTime, QSizeF, QPoint
-from qgis.core import QgsRasterRange, QgsRasterLayer, Qgis, QgsRectangle
+from qgis.core import QgsRasterRange, QgsRasterLayer, Qgis, QgsRectangle, QgsCoordinateReferenceSystem
 
 
 class TestRasterReader(TestCase):
@@ -303,7 +303,7 @@ class TestRasterReader(TestCase):
         writer.setMetadataItem('wavelength', 1000, '', 4)
         writer.setMetadataItem('wavelength_units', 'Nanometers', '', 3)
         writer.setMetadataItem('wavelength_unit', 'Micrometers', '', 4)
-        writer.close()
+        writer.close(stac=True)
         reader = RasterReader(writer.source())
         self.assertEqual('Micrometers', reader.wavelengthUnits(1))  # STAC stores it as Micrometers
         self.assertEqual('Micrometers', reader.wavelengthUnits(2))  # STAC stores it as Micrometers
@@ -699,3 +699,13 @@ class TestRasterReader(TestCase):
         self.assertFalse(reader.isSpectralRasterLayer())
         self.assertIsNone(reader.wavelength(1))
         self.assertIsNone(reader.wavelengthUnits(1))
+
+    def test_arrayFromBoundingBoxAndSize_withRasterPipe(self):
+        reader = RasterReader(enmap, True, QgsCoordinateReferenceSystem('EPSG:4326'))
+        extent4326 = QgsRectangle(
+            13.24539916899924741, 52.41274014201967901, 13.34677689752254182, 52.52184188795427389
+        )
+        array = reader.arrayFromBoundingBoxAndSize(extent4326, 10, 10, [1])
+        print(array)
+
+        # self.assertTrue(np.all(np.equal(reader.noDataValue(1), lead)))

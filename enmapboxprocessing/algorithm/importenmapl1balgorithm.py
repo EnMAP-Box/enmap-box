@@ -82,15 +82,13 @@ class ImportEnmapL1BAlgorithm(EnMAPProcessingAlgorithm):
 
             # create VRTs
             ds = gdal.Open(self.findFilename(xmlFilename.replace('-METADATA.XML', '-SPECTRAL_IMAGE_VNIR')))
-            options = gdal.TranslateOptions(format='VRT')
-            dsVnir: gdal.Dataset = gdal.Translate(destName=filename1, srcDS=ds, options=options)
+            dsVnir: gdal.Dataset = gdal.Translate(filename1, ds)
             dsVnir.SetMetadataItem('wavelength', '{' + ', '.join(wavelength[:dsVnir.RasterCount]) + '}', 'ENVI')
             dsVnir.SetMetadataItem('wavelength_units', 'nanometers', 'ENVI')
             dsVnir.SetMetadataItem('fwhm', '{' + ', '.join(fwhm[:dsVnir.RasterCount]) + '}', 'ENVI')
 
             ds = gdal.Open(self.findFilename(xmlFilename.replace('-METADATA.XML', '-SPECTRAL_IMAGE_SWIR')))
-            options = gdal.TranslateOptions(format='VRT')
-            dsSwir: gdal.Dataset = gdal.Translate(destName=filename2, srcDS=ds, options=options)
+            dsSwir: gdal.Dataset = gdal.Translate(filename2, ds)
             dsSwir.SetMetadataItem('wavelength', '{' + ', '.join(wavelength[dsVnir.RasterCount:]) + '}', 'ENVI')
             dsSwir.SetMetadataItem('wavelength_units', 'nanometers', 'ENVI')
             dsSwir.SetMetadataItem('fwhm', '{' + ', '.join(fwhm[dsVnir.RasterCount:]) + '}', 'ENVI')
@@ -120,7 +118,7 @@ class ImportEnmapL1BAlgorithm(EnMAPProcessingAlgorithm):
 
     @staticmethod
     def findFilename(basename: str):
-        extensions = ['.TIF', '.GEOTIFF', '.BSQ', '.BIL', '.BIP', 'JPEG2000', '.JP2', '.jp2']  # see issue #1421
+        extensions = ['.TIF', '.GEOTIFF', '.BSQ', '.BIL', '.BIP', 'JPEG2000', '.JP2', '.jp2', '_COG.tiff']
         for extention in extensions:
             filename = basename + extention
             if exists(filename):
