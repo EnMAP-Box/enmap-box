@@ -50,6 +50,15 @@ class EnMAPBoxProcessingProvider(QgsProcessingProvider):
     It enhances the "standard" processing.core.AlgorithmProvider by functionality to add and remove GeoAlgorithms during runtime.
     """
 
+    _ENMAPBOX_PROCESSING_PROVIDER = None
+
+    @staticmethod
+    def instance() -> 'EnMAPBoxProcessingProvider':
+
+        if EnMAPBoxProcessingProvider._ENMAPBOX_PROCESSING_PROVIDER is None:
+            EnMAPBoxProcessingProvider._ENMAPBOX_PROCESSING_PROVIDER = EnMAPBoxProcessingProvider()
+        return EnMAPBoxProcessingProvider._ENMAPBOX_PROCESSING_PROVIDER
+
     def __init__(self):
         super(EnMAPBoxProcessingProvider, self).__init__()
         # internal list of GeoAlgorithms. Is used on re-loads and can be manipulated
