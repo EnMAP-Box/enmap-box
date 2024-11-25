@@ -9,6 +9,7 @@ from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple
 import numpy as np
 from osgeo import gdal
 import processing
+from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import (Qgis, QgsCategorizedSymbolRenderer, QgsCoordinateReferenceSystem, QgsMapLayer,
                        QgsPalettedRasterRenderer, QgsProcessing, QgsProcessingAlgorithm, QgsProcessingContext,
