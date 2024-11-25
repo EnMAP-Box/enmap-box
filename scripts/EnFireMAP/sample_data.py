@@ -1,9 +1,12 @@
 from os import listdir, makedirs
-from os.path import join, exists, dirname
+from os.path import dirname, exists, join
 
+from qgis.core import QgsVectorFileWriter, QgsVectorLayer
+
+from enmapbox import initAll
+from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.samplerastervaluesalgorithm import SampleRasterValuesAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
-from qgis.core import QgsVectorFileWriter, QgsVectorLayer
 
 rootCube = r'D:\data\EnFireMap\cube'
 tilingScheme = QgsVectorLayer(r'D:\data\EnFireMap\cube\shp\grid2.geojson')
@@ -20,9 +23,6 @@ products = [
 
 locations = QgsVectorLayer(r'D:\data\EnFireMap\lib_points\lib_points.shp')
 rootOutputSample = r'D:\data\EnFireMap\sample3'
-
-from enmapbox import initAll
-from enmapbox.testing import start_app
 
 qgsApp = start_app()
 initAll()

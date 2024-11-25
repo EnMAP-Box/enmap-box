@@ -26,29 +26,24 @@ import os
 import pathlib
 import re
 import shutil
-import site
 import sys
 import textwrap
 import typing
 import warnings
-import markdown
 from typing import Union
-
-import docutils.core
 from os.path import exists
 
-from qgis.core import QgsUserProfileManager, QgsUserProfile, QgsFileUtils
-
-site.addsitedir(pathlib.Path(__file__).parents[1])  # noqa
-
+import markdown
+import docutils.core
+from qgis.core import QgsFileUtils, QgsUserProfile, QgsUserProfileManager
 from qgis.testing import start_app
 
-app = start_app()
 import enmapbox
 from enmapbox import DIR_REPO
 from enmapbox.qgispluginsupport.qps.make.deploy import QGISMetadataFileWriter, userProfileManager
 from enmapbox.qgispluginsupport.qps.utils import zipdir
 
+app = start_app()
 # consider default Git location on Windows systems to avoid creating a Start-Up Script
 try:
     import git
