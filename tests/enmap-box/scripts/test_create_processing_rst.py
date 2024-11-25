@@ -67,7 +67,9 @@ class CreateProcessingRSTTestCases(TestCase):
     def test_generateRST(self):
         dir_tmp = self.createTestOutputDirectory()
         dir_rst_root = dir_tmp / 'rst_root1'
-        generateRST(dir_rst_root, algorithmIds=['gdal:translate', 'enmapbox:Build3DCube'])
+        generateRST(dir_rst_root,
+                    algorithmIds=['gdal:translate', 'enmapbox:Build3DCube'],
+                    load_process_help=False)
 
         expected_paths = [
             dir_rst_root / 'auxilliary' / 'build_3d_cube.rst',

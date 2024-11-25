@@ -224,8 +224,8 @@ def doc_repo_root() -> Path:
 
 
 def generateRST(rootRst: Union[Path, str],
-                algorithmIds: List[str] = None
-                ):
+                algorithmIds: List[str] = None,
+                load_process_help: bool = True):
     rootRst = Path(rootRst)
     assert rootRst.is_dir()
     print(rootCodeRepo)
@@ -250,7 +250,7 @@ def generateRST(rootRst: Union[Path, str],
     # create group folders, <group>/index.rst and processing_algorithms.rst
     print(f'Create *.rst files for {len(algs)} algorithms')
     generateGroupRSTs(rootRst, algs)
-    generateAlgorithmRSTs(rootRst, algs)
+    generateAlgorithmRSTs(rootRst, algs, load_process_help=load_process_help)
 
 
 def wrapWithNewLines(text: str) -> str:
