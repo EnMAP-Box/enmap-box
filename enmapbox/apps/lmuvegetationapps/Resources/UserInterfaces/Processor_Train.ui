@@ -409,7 +409,7 @@
             <set>Qt::ImhDigitsOnly</set>
            </property>
            <property name="maxLength">
-            <number>2</number>
+            <number>3</number>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -2062,7 +2062,8 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>Geopackage (*.gpkg):</string>
+         <string>Select Spectral Library
+(*.gpkg *.sli):</string>
         </property>
        </widget>
       </item>
@@ -2132,11 +2133,11 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="rad_group_noise"/>
-  <buttongroup name="rad_group_eval"/>
-  <buttongroup name="rad_group_al_strats"/>
-  <buttongroup name="rad_group_ml"/>
   <buttongroup name="rad_group_splitstrat"/>
+  <buttongroup name="rad_group_noise"/>
   <buttongroup name="rad_group_al"/>
+  <buttongroup name="rad_group_ml"/>
+  <buttongroup name="rad_group_al_strats"/>
+  <buttongroup name="rad_group_eval"/>
  </buttongroups>
 </ui>

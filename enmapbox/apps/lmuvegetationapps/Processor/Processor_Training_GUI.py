@@ -5,8 +5,8 @@
     PROSAIL parameters - CORE
     -----------------------------------------------------------------------
     begin                : 09/2020
-    copyright            : (C) 2020 Martin Danner; Matthias Wocher
-    email                : m.wocher@lmu.de
+    copyright            : (C) 2024 Matthias Wocher, Martin Danner
+    email                : m.wocher@iggf.geo.uni-muenchen.de
 
 ***************************************************************************
     This program is free software; you can redistribute it and/or modify
@@ -37,9 +37,8 @@ import sys
 
 from qgis.gui import QgsMapLayerComboBox
 from qgis.core import QgsMapLayerProxyModel
-from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
+# from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
 from qgis.core import QgsVectorLayer
-
 
 # import LUT.CreateLUT_GUI
 # ensure to call QGIS before PyQtGraph
@@ -255,6 +254,7 @@ class ML_Training:
                 self.gui.cmdInputModel.setEnabled(False)
             self.gui.lblInputModel.setText("")
             self.model_process_dict = None
+            self.gui.txtTrainSize.setText("")
 
 
     def handle_algorithm(self, mode):
@@ -312,6 +312,11 @@ class ML_Training:
             self.gui.lblFolds.setEnabled(False), self.gui.txtFolds.setEnabled(False),
             self.gui.txtTrainSize.setPlaceholderText(""), self.gui.txtFolds.setPlaceholderText(""),
             self.gui.radValinsitu.setEnabled(False), self.gui.pushImportValinsitu.setEnabled(False)
+        if self.gui.radPerf.isChecked() and self.gui.chkRetrain.isChecked():
+            self.gui.radCrossVal.setEnabled(False), self.gui.txtFolds.setEnabled(False),
+            if self.gui.radTrainTest.isChecked():
+                self.gui.txtTrainSize.setText("100"), self.gui.txtTrainSize.setEnabled(False)
+
 
 
     def handle_PerfEvalStrat(self):
@@ -322,6 +327,8 @@ class ML_Training:
             self.gui.txtFolds.setText("")
             self.gui.txtFolds.setPlaceholderText("")
             self.gui.pushImportValinsitu.setEnabled(False)
+            if self.gui.chkRetrain.isChecked():
+                self.gui.txtTrainSize.setText("100"), self.gui.txtTrainSize.setEnabled(False)
         if self.gui.radCrossVal.isChecked():
             self.gui.lblTrainSize.setEnabled(False), self.gui.txtTrainSize.setEnabled(False),
             self.gui.lblFolds.setEnabled(True), self.gui.txtFolds.setEnabled(True),
@@ -560,7 +567,7 @@ class ML_Training:
             if self.speclib is not None:
                 self.speclib = None
             lib_input = QFileDialog.getOpenFileName(caption='Select Input Spectral Library',
-                                                    filter="Geopackage (*.gpkg)")[0]
+                                                    filter="Spectral Library (*.gpkg *.sli)")[0]
             if not lib_input:
                 return
             self.addItemSpeclib.append(lib_input)
@@ -584,29 +591,31 @@ class ML_Training:
         all_specs = []
         wl_values = []
         wl_extracted = False
-        layer = QgsVectorLayer(self.speclib, "Soil spectra layer")  #<- works only for gpkg Geopackage
-        #TODO: add option for spectral library .sli
+        print(os.path.splitext(self.speclib))
+        if os.path.splitext(self.speclib)[1] == ".gpkg":
+            layer = QgsVectorLayer(self.speclib, "Soil spectra layer")  #<- works only for gpkg Geopackage
+            # Loop through the features
+            for feature in layer.getFeatures():
+                # Assuming that the JSON string is in an attribute named 'json_data'
+                data_dict = feature[2]
+                # Parse the JSON string
 
-        # features = list(layer.getFeatures())
-        # Loop through the features
-        for feature in layer.getFeatures():
-            # Assuming that the JSON string is in an attribute named 'json_data'
-            data_dict = feature[2]
-            # Parse the JSON string
-            # data_dict = json.loads(json_data)
+                # Extract 'x' values only once
+                if not wl_extracted:
+                    wl_values = data_dict.get('x', [])
+                    wl_extracted = True
 
-            # Extract 'x' values only once
-            if not wl_extracted:
-                wl_values = data_dict.get('x', [])
-                wl_extracted = True
+                # Extract and store y_values
+                y_values = data_dict.get('y', [])
+                all_specs.append(y_values)
 
-            # Extract and store y_values
-            y_values = data_dict.get('y', [])
-            all_specs.append(y_values)
-
-        self.soil_wavelengths = wl_values
-        self.soil_specs = [list(row) for row in zip(*all_specs)]
-
+            self.soil_wavelengths = wl_values
+            self.soil_specs = [list(row) for row in zip(*all_specs)]
+        if os.path.splitext(self.speclib)[1] == ".sli":
+            speclib = EnviSpectralLibrary(filename=self.speclib)
+            raster = speclib.raster()
+            self.soil_wavelengths = raster.dataset().metadataItem(key='wavelength', domain='ENVI', dtype=float)
+            self.soil_specs = raster.dataset().array()[:, :, 0].tolist()
 
     def check_and_assign(self):
         if not self.lut_path:
@@ -619,6 +628,8 @@ class ML_Training:
             raise ValueError("Output directory does not exist!")
         if self.gui.txtModelName.text() == "":
             raise ValueError("Please specify a name for the model")
+        # if self.retrain_mode and self.gui.mLayerSpeclib.text() == "":
+        #     raise ValueError("retrain")
         else:
             self.model_name = self.gui.txtModelName.text()
             self.model_meta = self.out_dir + self.model_name + '.meta'
@@ -872,8 +883,12 @@ class perfView:
 
         if data is None:
             return
-
-        performances, y_val, predictions = data["performances"], data["y_val"], data["predictions"]
+        try:
+            performances, y_val, predictions, al_training_indices = \
+                data["performances"], data["y_val"], data["predictions"], data['al_training_indices'][0]
+        except:
+            performances, y_val, predictions, al_training_indices = \
+                data["performances"], data["y_val"], data["predictions"], data['al_training_indices']
         if isinstance(performances, np.ndarray):
             performances = [performances]
         performances = np.asarray(performances).flatten()
@@ -921,13 +936,22 @@ class perfView:
             scatter = ax0.scatter(y_val, final_pred, s=10, c='k')
         # 1:1 line
         ax_max = max(y_val.max(), final_pred.max())
+        ax_min = min(y_val.min(), final_pred.min())
         ax0.plot([0, ax_max], [0, ax_max], 'k-')
         # Regression line
         lr = LinearRegression()
         lr.fit(y_val.reshape(-1, 1), final_pred)
-        x_fit = np.linspace(0, ax_max, 100)
+        nice_offest = 3 * ax_max / 100
+        x_fit = np.linspace(0, ax_max + nice_offest, 100)
         y_fit = lr.predict(x_fit.reshape(-1, 1))
         ax0.plot(x_fit, y_fit, 'r-')
+        if ax_min > 0:
+            ax0.set_xlim(0, ax_max + nice_offest)
+            ax0.set_ylim(0, ax_max + nice_offest)
+        else:
+            ax0.set_xlim(ax_min, ax_max + nice_offest)
+            ax0.set_ylim(ax_min, ax_max + nice_offest)
+
         ax0.text(0.05, 0.90, 'R² = {:.2f}'.format(r2) + '\nRMSE = ' + str(rmse_float), transform=ax0.transAxes)
         ax0.set_xlabel('{} - measured'.format(key))
         ax0.set_ylabel('{} - estimated'.format(key))
@@ -1377,6 +1401,8 @@ class PRG:
         self.gui.allow_cancel = True
         self.gui.cmdCancel.setDisabled(True)
         self.gui.lblCancel.setText("-1")
+        self.gui.close()
+        self.gui.lblCancel.setText("1")
 
 # class Printer:
 #     def __init__(self, main):
