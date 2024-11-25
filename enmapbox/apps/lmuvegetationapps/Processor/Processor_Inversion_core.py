@@ -58,7 +58,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import RandomizedSearchCV
 
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, RobustScaler
 from sklearn.metrics import mean_squared_error, r2_score
 
 from sklearn.metrics import pairwise_distances
@@ -214,9 +214,9 @@ class MLRATraining:
         # fit a model on RTM-data but evaluate performance on insitu data or previous test set
         # (e.g. retraining case after AL)
         stds = []
-        np.savetxt("C:\Data\Daten\Testdaten\LUT/x_train_retrain.txt", X, delimiter="\t")
-        np.savetxt("C:\Data\Daten\Testdaten\LUT/y_train_retrain.txt", y, delimiter="\t")
-        np.savetxt("C:\Data\Daten\Testdaten\LUT/x_test_retrain.txt", X_val, delimiter="\t")
+        np.savetxt("C:\Data\Daten\Testdaten\LUT/x_test_retrain.txt", X, delimiter="\t")
+        np.savetxt("C:\Data\Daten\Testdaten\LUT/y_test_retrain.txt", y, delimiter="\t")
+        np.savetxt("C:\Data\Daten\Testdaten\LUT/x_val_test_retrain.txt", X_val, delimiter="\t")
         model.fit(X, y)
         if isinstance(model, GaussianProcessRegressor):
             predictions, stds = model.predict(X_val, return_std=True)
@@ -1382,7 +1382,7 @@ class Functions:
         rng = np.random.default_rng(random_state)
         return rng.normal(loc=loc, scale=scale, size=size)
 
-
+      
 
 class ProcessorMainFunction:
     def __init__(self):
