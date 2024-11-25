@@ -2,36 +2,35 @@ import traceback
 from enum import Enum
 from math import nan
 from os import makedirs
-from os.path import isabs, join, dirname, exists, splitext, abspath
+from os.path import abspath, dirname, exists, isabs, join, splitext
 from time import time
-from typing import Any, Dict, Iterable, Optional, List, Tuple, TextIO
+from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple
 
 import numpy as np
 from osgeo import gdal
-
 import processing
+from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtGui import QIcon
+from qgis.core import (Qgis, QgsCategorizedSymbolRenderer, QgsCoordinateReferenceSystem, QgsMapLayer,
+                       QgsPalettedRasterRenderer, QgsProcessing, QgsProcessingAlgorithm, QgsProcessingContext,
+                       QgsProcessingException, QgsProcessingFeedback, QgsProcessingOutputLayerDefinition,
+                       QgsProcessingParameterBand, QgsProcessingParameterBoolean, QgsProcessingParameterCrs,
+                       QgsProcessingParameterDefinition, QgsProcessingParameterEnum, QgsProcessingParameterExtent,
+                       QgsProcessingParameterField, QgsProcessingParameterFile, QgsProcessingParameterFileDestination,
+                       QgsProcessingParameterFolderDestination, QgsProcessingParameterMapLayer,
+                       QgsProcessingParameterMatrix, QgsProcessingParameterMultipleLayers, QgsProcessingParameterNumber,
+                       QgsProcessingParameterRange, QgsProcessingParameterRasterLayer, QgsProcessingParameterString,
+                       QgsProcessingParameterVectorDestination, QgsProcessingParameterVectorLayer, QgsProcessingUtils,
+                       QgsProject, QgsProperty, QgsRasterLayer, QgsRectangle, QgsVectorLayer)
+
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.glossary import injectGlossaryLinks
 from enmapboxprocessing.parameter.processingparameterrasterdestination import ProcessingParameterRasterDestination
 from enmapboxprocessing.processingfeedback import ProcessingFeedback
-from enmapboxprocessing.typing import CreationOptions, GdalResamplingAlgorithm, ClassifierDump, \
-    TransformerDump, RegressorDump, ClustererDump
+from enmapboxprocessing.typing import ClassifierDump, ClustererDump, CreationOptions, GdalResamplingAlgorithm, \
+    RegressorDump, TransformerDump
 from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtCore import QVariant
-from qgis.PyQt.QtGui import QIcon
-from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer, QgsProcessingParameterVectorLayer,
-                       QgsProcessingContext, QgsProcessingFeedback,
-                       QgsRasterLayer, QgsVectorLayer, QgsProcessingParameterNumber, QgsProcessingParameterDefinition,
-                       QgsProcessingParameterField, QgsProcessingParameterBoolean, QgsProcessingParameterEnum, Qgis,
-                       QgsProcessingParameterString, QgsProcessingParameterBand, QgsCategorizedSymbolRenderer,
-                       QgsPalettedRasterRenderer, QgsProcessingParameterMapLayer, QgsMapLayer,
-                       QgsProcessingParameterExtent, QgsCoordinateReferenceSystem, QgsRectangle,
-                       QgsProcessingParameterFileDestination, QgsProcessingParameterFile, QgsProcessingParameterRange,
-                       QgsProcessingParameterCrs, QgsProcessingParameterVectorDestination, QgsProcessing,
-                       QgsProcessingUtils, QgsProcessingParameterMultipleLayers, QgsProcessingException,
-                       QgsProcessingParameterFolderDestination, QgsProject, QgsProcessingOutputLayerDefinition,
-                       QgsProperty, QgsProcessingParameterMatrix)
 
 
 class AlgorithmCanceledException(Exception):
@@ -42,8 +41,8 @@ class AlgorithmCanceledException(Exception):
 class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     O_RESAMPLE_ALG = 'NearestNeighbour Bilinear Cubic CubicSpline Lanczos Average Mode Min Q1 Med Q3 Max'.split()
     NearestNeighbourResampleAlg, BilinearResampleAlg, CubicResampleAlg, CubicSplineResampleAlg, LanczosResampleAlg, \
-    AverageResampleAlg, ModeResampleAlg, MinResampleAlg, Q1ResampleAlg, MedResampleAlg, Q3ResampleAlg, \
-    MaxResampleAlg = range(12)
+        AverageResampleAlg, ModeResampleAlg, MinResampleAlg, Q1ResampleAlg, MedResampleAlg, Q3ResampleAlg, \
+        MaxResampleAlg = range(12)
     O_DATA_TYPE = 'Byte Int16 UInt16 UInt32 Int32 Float32 Float64'.split()
     Byte, Int16, UInt16, Int32, UInt32, Float32, Float64 = range(len(O_DATA_TYPE))
     PickleFileFilter = 'Pickle files (*.pkl)'
@@ -1051,7 +1050,7 @@ class Group(Enum):
     RasterProjections = 'Raster projections'
     Regression = 'Regression'
     Sampling = 'Sampling'
-    SpectralLibrary = 'Spectral library'
+    SpectralLibrary = 'Spectral Library'
     SpectralResampling = 'Spectral resampling'
     Testdata = 'Testdata'
     Transformation = 'Transformation'
