@@ -17,6 +17,7 @@
 ***************************************************************************
 """
 import collections
+import datetime
 import importlib
 import inspect
 import os
@@ -26,7 +27,7 @@ import site
 import sys
 import traceback
 import typing
-from typing import Optional, List, Union, Dict
+from typing import Optional, List, OrderedDict, Union, Dict
 
 from enmapbox import messageLog
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
@@ -194,6 +195,7 @@ class ApplicationWrapper(QObject):
         self.menuItems: List = []
         self.processingAlgorithms: List[QgsProcessingAlgorithm] = []
         self.contextMenuProvider: EnMAPBoxContextMenuProvider = None
+        self.loading_time: datetime.timedelta = None
 
 
 class ApplicationRegistry(QObject):
@@ -210,7 +212,7 @@ class ApplicationRegistry(QObject):
         assert isinstance(enmapBox, EnMAPBox)
 
         self.mEnMAPBox = enmapBox
-        self.mAppWrapper = collections.OrderedDict()
+        self.mAppWrapper: OrderedDict[str, ApplicationWrapper] = collections.OrderedDict()
 
         self.mAppInitializationMessages = collections.OrderedDict()
 
@@ -340,8 +342,8 @@ class ApplicationRegistry(QObject):
                 if appPkgName in blacklist:
                     raise Exception('Skipped loading EnMAPBoxApplication "{}"'.format(appPkgName))
 
-                print('Load EnMAPBoxApplication(s) from "{}"'.format(appPkgName))
-
+                print('Load EnMAPBoxApplication(s) from "{}" ... '.format(appPkgName), end='')
+                t0 = datetime.datetime.now()
                 if not os.path.isfile(pkgFile):
                     raise Exception('File does not exist: "{}"'.format(pkgFile))
 
@@ -385,6 +387,9 @@ class ApplicationRegistry(QObject):
                 else:
                     # return False if app factory did not return any EnMAPBoxApplication
                     self.mAppInitializationMessages[basename] = False
+
+                dt = datetime.datetime.now() - t0
+                print('{} sec.'.format(dt.total_seconds()))
                 return foundValidApps
 
             except Exception as ex:
@@ -415,6 +420,7 @@ class ApplicationRegistry(QObject):
             print('addApplication({})'.format(str(app)))
         assert isinstance(app, EnMAPBoxApplication)
 
+        t0 = datetime.datetime.now()
         appWrapper = ApplicationWrapper(app)
         self.sigLoadingInfo.emit(f'Load {appWrapper.app.name} ...')
         if DEBUG:
@@ -445,9 +451,11 @@ class ApplicationRegistry(QObject):
         if isinstance(enmapbox.algorithmprovider.instance(), enmapbox.algorithmprovider.EnMAPBoxProcessingProvider):
             self.loadProcessingAlgorithms(appWrapper)
 
-        if DEBUG:
-            print('Loading done.')
+        dt = datetime.datetime.now() - t0
+        appWrapper.loading_time = dt
+
         self.sigLoadingFinished.emit(True, f'{app} loaded')
+
         return True
 
     def loadProcessingAlgorithms(self, appWrapper: ApplicationWrapper):

@@ -130,11 +130,12 @@ class LocationBrowserDockWidget(QgsDockWidget):
         url = 'https://nominatim.openstreetmap.org/search?q=' \
               f'{urllib.parse.quote(text)}' \
               '&limit=50&extratags=1&polygon_geojson=1&format=json'
-        nominatimResults = requests.get(url).json()
+        headers = {'User-Agent': 'EnMAP-Box QGIS Plugin (enmapbox@enmap.org)'}  # Required user agent
+        nominatimResults = requests.get(url, headers=headers).json()
         # find additional results
         if len(nominatimResults) == 1:
             url += f'&exclude_place_ids={nominatimResults[0]["place_id"]}'
-            nominatimResults.extend(requests.get(url).json())
+            nominatimResults.extend(requests.get(url, headers=headers).json())
 
         self.mResult.mList.clear()
         item = QListWidgetItem('')
