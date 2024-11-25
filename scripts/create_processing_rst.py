@@ -359,7 +359,7 @@ def v3(alg: QgsProcessingAlgorithm, section_adds: dict = None, qgis_process_help
     for pd in alg.parameterDefinitions():
         assert isinstance(pd, QgsProcessingParameterDefinition)
 
-        pdhelp = helpParameters.get(pd.description(), pd.description())
+        pdhelp = helpParameters.get(pd.description(), pd.help())
 
         if not outputsHeadingCreated and isinstance(pd, QgsProcessingDestinationParameter):
             param_text += '\n\n**Outputs**\n\n'
