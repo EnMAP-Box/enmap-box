@@ -12,7 +12,7 @@ class TestImportLandsatL2Algorithm(TestCase):
 
         alg = ImportLandsatL2Algorithm()
         parameters = {
-            alg.P_FILE: SensorProducts.Landsat.LC08_L2_MtlTxt,
+            alg.P_FILE: SensorProducts.Landsat.LC09_L2_MtlTxt,
             alg.P_OUTPUT_RASTER: self.filename('landsat9L2C2.vrt')
         }
 
@@ -68,7 +68,7 @@ class TestImportLandsatL2Algorithm(TestCase):
 
         alg = ImportLandsatL2Algorithm()
         parameters = {
-            alg.P_FILE: SensorProducts.Landsat.LC08_L2_MtlTxt,
+            alg.P_FILE: SensorProducts.Landsat.LC09_L2_MtlTxt,
             alg.P_OUTPUT_RASTER: self.filename('landsat9L2C2.tif')
         }
 

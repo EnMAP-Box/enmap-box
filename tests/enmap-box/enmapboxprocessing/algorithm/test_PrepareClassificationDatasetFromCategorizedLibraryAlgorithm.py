@@ -117,3 +117,16 @@ class TestPrepareClassificationDatasetFromCategorizedLibrary(TestCase):
             QgsCoordinateReferenceSystem.fromEpsgId(4326), QgsCoordinateReferenceSystem.fromWkt(dump.crs)
         )
         self.assertEqual((1, 2), tuple(dump.locations[0]))
+
+    def test_BUG(self):
+        alg = PrepareClassificationDatasetFromCategorizedLibraryAlgorithm()
+        parameters = {
+            alg.P_CATEGORIZED_LIBRARY: r'C:\Users\Andreas\Downloads\data_austausch_unmixing\endm_w_gv_npv_2023_06_library.gpkg',
+            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+        }
+        self.runalg(alg, parameters)
+        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        self.assertEqual(
+            QgsCoordinateReferenceSystem.fromEpsgId(4326), QgsCoordinateReferenceSystem.fromWkt(dump.crs)
+        )
+        self.assertEqual((1, 2), tuple(dump.locations[0]))
