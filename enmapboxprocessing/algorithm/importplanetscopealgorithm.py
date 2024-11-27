@@ -6,8 +6,10 @@ from osgeo import gdal
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
+from enmapboxprocessing.algorithm.preparerasteralgorithm import PrepareRasterAlgorithm
 from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from enmapboxprocessing.gdalutils import GdalUtils
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
@@ -68,7 +70,7 @@ class ImportPlanetScopeAlgorithm(EnMAPProcessingAlgorithm):
     def defaultParameters(self, scFilename: str):
         return {
             self.P_FILE: scFilename,
-            self.P_OUTPUT_RASTER_SR: scFilename.replace('.json', '_SR.vrt'),
+            self.P_OUTPUT_RASTER_SR: scFilename.replace('.json', '_SR.tif'),
             self.P_OUTPUT_RASTER_QA: scFilename.replace('.json', '_UDM2.vrt'),
         }
 
@@ -152,20 +154,25 @@ class ImportPlanetScopeAlgorithm(EnMAPProcessingAlgorithm):
             qaFilenames = convertedFilenames[len(srMetadata['filenames']):]
 
             # create SR VRT
+            isVrt = srFilename.endswith('.vrt')
             options = gdal.BuildVRTOptions()
-            if srFilename.endswith('.vrt'):
+            if isVrt:
                 ds: gdal.Dataset = gdal.BuildVRT(srFilename, srFilenames, options=options)
             else:
                 gdal.BuildVRT(srFilename + '.vrt', srFilenames, options=options)
-                alg = SaveRasterAsAlgorithm()
+                alg = PrepareRasterAlgorithm()
                 parameters = {
                     alg.P_RASTER: srFilename + '.vrt',
-                    alg.P_COPY_METADATA: False,
-                    alg.P_COPY_STYLE: False,
+                    alg.P_SCALE: srMetadata['scales'],
+                    alg.P_DATA_TYPE: self.Float32,
+                    alg.P_MONOLITHIC: False,
                     alg.P_OUTPUT_RASTER: srFilename
                 }
-                self.runAlg(alg, parameters, None, feedback2, context, True)
-                ds = gdal.Open(srFilename, gdal.GA_Update)
+                self.runAlg(alg, parameters, None, feedback, context, True)
+                ds = gdal.Open(srFilename)
+
+            if isVrt:
+                GdalUtils().calculateDefaultHistrogram(ds, inMemory=False, feedback=feedback)
 
             writer = RasterWriter(ds)
             for bandNo, (name, wavelength, fwhm, scale, noDataValue) in enumerate(
@@ -177,7 +184,8 @@ class ImportPlanetScopeAlgorithm(EnMAPProcessingAlgorithm):
                 writer.setBandName(name, bandNo)
                 writer.setWavelength(wavelength * 1000, bandNo)
                 writer.setFwhm(fwhm * 1000, bandNo)
-                writer.setScale(scale, bandNo)
+                if isVrt:
+                    writer.setScale(scale, bandNo)
                 writer.setNoDataValue(noDataValue)
             writer.close()
 
