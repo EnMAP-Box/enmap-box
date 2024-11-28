@@ -118,7 +118,7 @@ class TestPrepareClassificationDatasetFromCategorizedLibrary(TestCase):
         )
         self.assertEqual((1, 2), tuple(dump.locations[0]))
 
-    def test_BUG(self):
+    def _test_BUG(self):
         alg = PrepareClassificationDatasetFromCategorizedLibraryAlgorithm()
         parameters = {
             alg.P_CATEGORIZED_LIBRARY: r'C:\Users\Andreas\Downloads\data_austausch_unmixing\endm_w_gv_npv_2023_06_library.gpkg',
