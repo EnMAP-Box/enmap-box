@@ -21,6 +21,7 @@ class Driver(object):
     GTiffFormat = 'GTiff'
     DefaultGTiffCreationOptions = 'INTERLEAVE=BAND COMPRESS=LZW TILED=YES BIGTIFF=YES'.split()
     EnviFormat = 'ENVI'
+    MemFormat = 'MEM'
     DefaultEnviBsqCreationOptions = 'INTERLEAVE=BSQ'.split()
     DefaultEnviBilCreationOptions = 'INTERLEAVE=BIL'.split()
     DefaultEnviBipCreationOptions = 'INTERLEAVE=BIP'.split()
@@ -57,14 +58,15 @@ class Driver(object):
         if self.feedback is not None:
             self.feedback.pushInfo(info)
 
-        if not exists(dirname(self.filename)):
-            makedirs(dirname(self.filename))
+        if self.format != self.MemFormat:
+            if not exists(dirname(self.filename)):
+                makedirs(dirname(self.filename))
 
-        if exists(self.filename + 'stac.json'):
-            try:
-                os.remove(self.filename + 'stac.json')
-            except Exception:
-                pass
+            if exists(self.filename + 'stac.json'):
+                try:
+                    os.remove(self.filename + 'stac.json')
+                except Exception:
+                    pass
 
         gdalDriver: gdal.Driver = gdal.GetDriverByName(self.format)
         try:

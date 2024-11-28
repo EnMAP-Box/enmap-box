@@ -5,8 +5,9 @@ from osgeo import gdal
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
-from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
+from enmapboxprocessing.algorithm.preparerasteralgorithm import PrepareRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from enmapboxprocessing.gdalutils import GdalUtils
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
@@ -48,9 +49,9 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
                          'you may drag&drop the metadata file directly from your system file browser '
                          'a) onto the EnMAP-Box map view area, or b) onto the Sensor Product Import panel.'),
             (self._BAND_LIST, 'Bands to be stacked together. '
-                              'Defaults to all 10m and 20m bands ordered by center wavelength. '
+                              'Defaults to all bands ordered by center wavelength. '
                               'Note that the destination pixel size matches the smallest/finest '
-                              'pixel size over all selected bands.'),
+                              'pixel size over all selected bands (i.e. 10, 20 or 60 meters).'),
             (self._OUTPUT_RASTER, self.RasterFileDestination)
         ]
 
@@ -71,7 +72,7 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
         dir = dirname(xmlFilename)
         return {
             self.P_FILE: xmlFilename,
-            self.P_OUTPUT_RASTER: join(dir, basename(dir)) + '_SR.vrt',
+            self.P_OUTPUT_RASTER: join(dir, basename(dir)) + '_SR.tif',
         }
 
     def processAlgorithm(
@@ -100,6 +101,7 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
             ds10 = gdal.Open(f10)
             ds20 = gdal.Open(f20)
             ds60 = gdal.Open(f60)
+
             info = dict()
             for ds, f, s in [(ds10, f10, 10), (ds20, f20, 20), (ds60, f60, 60)]:
                 for i in range(ds.RasterCount):
@@ -129,25 +131,29 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
             options = gdal.BuildVRTOptions(separate=True, xRes=pixelSize, yRes=pixelSize)
 
             # create VRTs
-            if filename.endswith('.vrt'):
+            isVrt = filename.endswith('.vrt')
+            if isVrt:
                 ds: gdal.Dataset = gdal.BuildVRT(filename, filenames, options=options)
             else:
                 gdal.BuildVRT(filename + '.vrt', filenames, options=options)
-                alg = SaveRasterAsAlgorithm()
+                alg = PrepareRasterAlgorithm()
                 parameters = {
                     alg.P_RASTER: filename + '.vrt',
-                    alg.P_COPY_METADATA: False,
-                    alg.P_COPY_STYLE: False,
+                    alg.P_SCALE: 0.0001,
+                    alg.P_DATA_TYPE: self.Float32,
                     alg.P_OUTPUT_RASTER: filename
                 }
-                self.runAlg(alg, parameters, None, feedback2, context, True)
-                ds = gdal.Open(filename, gdal.GA_Update)
+                alg.runAlg(alg, parameters, None, feedback)
+                ds = gdal.Open(filename)
+
             ds.SetMetadataItem('wavelength', '{' + ', '.join(wavelength[:ds.RasterCount]) + '}', 'ENVI')
             ds.SetMetadataItem('wavelength_units', 'nanometers', 'ENVI')
             for bandNo, name in enumerate(bandNames, 1):
                 rb: gdal.Band = ds.GetRasterBand(bandNo)
                 rb.SetDescription(name)
-                rb.SetScale(1e-4)
+                if isVrt:
+                    rb.SetScale(1e-4)
+                    GdalUtils().calculateDefaultHistrogram(ds, inMemory=False, feedback=feedback)
 
             # copy metadata (see issue #269)
             writer = RasterWriter(ds)
@@ -167,9 +173,15 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
             redBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['R'][0])
             greenBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['G'][0])
             blueBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['B'][0])
-            redMin, redMax = reader.provider.cumulativeCut(redBandNo, 0.02, 0.98)
-            greenMin, greenMax = reader.provider.cumulativeCut(greenBandNo, 0.02, 0.98)
-            blueMin, blueMax = reader.provider.cumulativeCut(blueBandNo, 0.02, 0.98)
+            redMin, redMax = reader.provider.cumulativeCut(
+                redBandNo, 0.02, 0.98, sampleSize=int(QgsRasterLayer.SAMPLE_SIZE)
+            )
+            greenMin, greenMax = reader.provider.cumulativeCut(
+                greenBandNo, 0.02, 0.98, sampleSize=int(QgsRasterLayer.SAMPLE_SIZE)
+            )
+            blueMin, blueMax = reader.provider.cumulativeCut(
+                blueBandNo, 0.02, 0.98, sampleSize=int(QgsRasterLayer.SAMPLE_SIZE)
+            )
             renderer = Utils().multiBandColorRenderer(
                 reader.provider, [redBandNo, greenBandNo, blueBandNo], [redMin, greenMin, blueMin],
                 [redMax, greenMax, blueMax]

@@ -144,7 +144,7 @@ class TestImportEnmapL2AAlgorithm(TestCase):
             alg.P_FILE: SensorProducts.Enmap.L2A_ARD_MetadataXml,
             alg.P_SET_BAD_BANDS: True,
             alg.P_EXCLUDE_BAD_BANDS: False,
-            alg.P_OUTPUT_RASTER: self.filename('enmapL2A.vrt'),
+            alg.P_OUTPUT_RASTER: self.filename('enmapL2A.tif'),
         }
         result = self.runalg(alg, parameters)
         reader = RasterReader(result[alg.P_OUTPUT_RASTER])

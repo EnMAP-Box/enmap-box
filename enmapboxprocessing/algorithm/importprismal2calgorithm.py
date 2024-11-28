@@ -7,6 +7,7 @@ from osgeo import gdal
 from enmapboxprocessing.algorithm.importprismal1algorithm import utilsReadAsArray, utilsDeleteCopy
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from enmapboxprocessing.gdalutils import GdalUtils
 from enmapboxprocessing.rasterwriter import RasterWriter
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 from enmapbox.typeguard import typechecked
@@ -225,6 +226,9 @@ class ImportPrismaL2CAlgorithm(EnMAPProcessingAlgorithm):
             writer.setWavelength(wl, bandNo)
             writer.setFwhm(fwhm[bandNo - 1], bandNo)
             writer.setScale(1. / 65535., bandNo)
+
+        GdalUtils().calculateDefaultHistrogram(writer.gdalDataset, inMemory=False, feedback=feedback)
+
         writer.close()
 
     def writeSpectralErrorMatrix(self, filenameSpectralError, he5Filename, spectralRegion, feedback):
