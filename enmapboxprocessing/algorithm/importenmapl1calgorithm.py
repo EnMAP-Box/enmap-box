@@ -6,6 +6,7 @@ from osgeo import gdal
 
 from enmapboxprocessing.algorithm.importenmapl1balgorithm import ImportEnmapL1BAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from enmapboxprocessing.gdalutils import GdalUtils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 from enmapbox.typeguard import typechecked
 
@@ -84,6 +85,8 @@ class ImportEnmapL1CAlgorithm(EnMAPProcessingAlgorithm):
             ds.SetMetadataItem('wavelength', '{' + ', '.join(wavelength[:ds.RasterCount]) + '}', 'ENVI')
             ds.SetMetadataItem('wavelength_units', 'nanometers', 'ENVI')
             ds.SetMetadataItem('fwhm', '{' + ', '.join(fwhm[:ds.RasterCount]) + '}', 'ENVI')
+
+            GdalUtils().calculateDefaultHistrogram(ds, inMemory=False, feedback=feedback)
 
             rasterBands = [ds.GetRasterBand(i + 1) for i in range(ds.RasterCount)]
             rasterBand: gdal.Band

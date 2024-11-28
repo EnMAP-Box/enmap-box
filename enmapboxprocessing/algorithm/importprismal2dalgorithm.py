@@ -246,9 +246,10 @@ class ImportPrismaL2DAlgorithm(EnMAPProcessingAlgorithm):
             wavelength.extend(wavelengthSwir)
             fwhm.extend(fwhmSwir)
             metadata.update(metadataSwir)
-        # - mask no data region
+        # - scale data and mask no data region
         mask = np.all(np.equal(array, 0), axis=0)
-        array = np.clip(array, 1, None)
+        array = np.clip(array, 1, None, dtype=np.float32)
+        array /= 65535
         array[:, mask] = 0
         assert len(wavelength) == len(array)
         assert len(fwhm) == len(array)
@@ -262,10 +263,6 @@ class ImportPrismaL2DAlgorithm(EnMAPProcessingAlgorithm):
             writer.setBandName(f'Band {bandNo} ({wl} Nanometers)', bandNo)
             writer.setWavelength(wl, bandNo)
             writer.setFwhm(fwhm[bandNo - 1], bandNo)
-            writer.setScale(1. / 65535., bandNo)
-
-            print(f'{round(wl, 1)},{round(fwhm[bandNo - 1], 1)}')
-
         if badBandMultipliers is not None:
             for bandNo, badBandMultiplier in enumerate(badBandMultipliers, 1):
                 writer.setBadBandMultiplier(badBandMultiplier, bandNo)
@@ -339,6 +336,7 @@ class ImportPrismaL2DAlgorithm(EnMAPProcessingAlgorithm):
             wl = wavelength[bandNo - 1]
             writer.setBandName(f'Pixel Error Band {bandNo} ({wl} Nanometers)', bandNo)
             writer.setWavelength(wl, bandNo)
+        writer.close()
 
         # bad pixel thresholding
         if badPixelThreshold is None:
@@ -382,6 +380,7 @@ class ImportPrismaL2DAlgorithm(EnMAPProcessingAlgorithm):
         writer.setMetadataDomain(metadata)
         writer.setBandName('Longitude', 1)
         writer.setBandName('Latitude', 2)
+        writer.close()
 
     def writeSpectralGeometricFields(self, filenameSpectralGeometric, he5Filename):
         if filenameSpectralGeometric is None:
@@ -400,6 +399,7 @@ class ImportPrismaL2DAlgorithm(EnMAPProcessingAlgorithm):
         writer.setBandName('Observing Angle', 1)
         writer.setBandName('Relative Azimuth Angle', 2)
         writer.setBandName('Solar Zinith Angle', 3)
+        writer.close()
 
     def writePanCube(self, filenamePanCube, he5Filename):
         if filenamePanCube is None:
@@ -415,6 +415,7 @@ class ImportPrismaL2DAlgorithm(EnMAPProcessingAlgorithm):
         writer.setNoDataValue(0)
         writer.setScale(1. / 65535., 1)
         writer.setBandName('Panchromatic', 1)
+        writer.close()
 
     def writePanGeolocationFields(self, filenamePanGeolocation, he5Filename):
         if filenamePanGeolocation is None:
@@ -430,6 +431,7 @@ class ImportPrismaL2DAlgorithm(EnMAPProcessingAlgorithm):
         writer.setMetadataDomain(metadata)
         writer.setBandName('Longitude', 1)
         writer.setBandName('Latitude', 2)
+        writer.close()
 
     def writePanErrorMatrix(self, filenamePanError, he5Filename):
         if filenamePanError is None:
@@ -443,6 +445,7 @@ class ImportPrismaL2DAlgorithm(EnMAPProcessingAlgorithm):
         writer = RasterWriter(ds)
         writer.setMetadataDomain(metadata)
         writer.setBandName('PAN Band Pixel Error', 1)
+        writer.close()
 
     def spatialInfo(self, metadata, res):
         extent = QgsRectangle(

@@ -2,12 +2,44 @@ from os import makedirs
 from os.path import exists, dirname
 from typing import List
 
-from enmapboxprocessing.rasterreader import RasterReader
+from osgeo import gdal
+
 from enmapbox.typeguard import typechecked
+from enmapboxprocessing.rasterreader import RasterReader
+from qgis.core import QgsProcessingFeedback
 
 
 @typechecked
 class GdalUtils(object):
+
+    @staticmethod
+    def calculateDefaultHistrogram(
+            ds: gdal.Dataset, buckets=256, inMemory=False, feedback: QgsProcessingFeedback = None
+    ):
+        if feedback is not None:
+            feedback.pushInfo('calculate histograms')
+
+        if inMemory:
+            options = gdal.TranslateOptions(format='MEM')
+            dsMem = gdal.Translate('', ds, options=options)
+        else:
+            dsMem = ds
+
+        for bandNo in range(1, ds.RasterCount + 1):
+            if feedback is not None:
+                feedback.setProgress(bandNo / ds.RasterCount * 100)
+            band: gdal.Band = ds.GetRasterBand(bandNo)
+            bandMem = dsMem.GetRasterBand(bandNo)
+            try:
+                vmin, vmax = bandMem.ComputeRasterMinMax()
+            except RuntimeError:  # handle no valid pixel found
+                vmin = 0
+                vmax = 1
+
+            if vmin == vmax:  # handle constant values
+                vmax += 1
+            histogram = bandMem.GetHistogram(min=vmin, max=vmax, buckets=buckets, approx_ok=True)
+            band.SetDefaultHistogram(vmin, vmax, histogram)
 
     @staticmethod
     def stackVrtBands(filename: str, filenames: List[str], bandNumbers: List[int]):

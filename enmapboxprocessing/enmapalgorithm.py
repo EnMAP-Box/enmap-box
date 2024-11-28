@@ -805,10 +805,13 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
 
     def addParameterVrtDestination(
             self, name: str, description: str, defaultValue=None, optional=False, createByDefault=True,
-            vrtOnly=False, advanced=False
+            vrtOnly=False, defaultFileExtension: str = None, advanced=False
     ):
+        if defaultFileExtension is None:
+            defaultFileExtension = 'vrt'
         self.addParameterRasterDestination(
-            name, description, defaultValue, optional, createByDefault, not vrtOnly, not vrtOnly, True, 'vrt', advanced
+            name, description, defaultValue, optional, createByDefault, not vrtOnly, not vrtOnly, True,
+            defaultFileExtension, advanced
         )
 
         self.flagParameterAsAdvanced(name, advanced)
