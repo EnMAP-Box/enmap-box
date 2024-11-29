@@ -1,4 +1,42 @@
 # CHANGELOG
+## Version 3.15 (2024-10-01)
+_This release was tested under QGIS 3.34 (LTR) and 3.38 (latest release)._
+### New Features
+#### Applications
+* add algorithm and interactive tool for plotting trajectories of land cover change over time via Sankey plot [#924](https://github.com/EnMAP-Box/enmap-box/issues/924)
+#### Data / Metadata Model
+* support temporal metadata provided by 'time' dimension in NetCDF files [#906](https://github.com/EnMAP-Box/enmap-box/issues/906)
+* support temporal metadata provided by .aux.json files created with  R-cran terra package [#907](https://github.com/EnMAP-Box/enmap-box/issues/907)
+#### GUI
+* [Data Views] add "Apply mask" option to the raster layer context menu [#942](https://github.com/EnMAP-Box/enmap-box/issues/942)
+#### Processing Algorithms
+* Import USGS ASCII Speclib [#302](https://github.com/EnMAP-Box/enmap-box/issues/302)
+* add import algorithms for Planet Scope products [#492](https://github.com/EnMAP-Box/enmap-box/issues/492)
+* [Classification workflow] support OOB validation [#910](https://github.com/EnMAP-Box/enmap-box/issues/910)
+* [Create classification/regression/unsupervised dataset] store sample locations inside a dataset if available [#911](https://github.com/EnMAP-Box/enmap-box/issues/911)
+* [Classification workflow] add "classification layer accuracy and area report" output [#912](https://github.com/EnMAP-Box/enmap-box/issues/912)
+* implement "Create spectral library (from classification dataset)" [#917](https://github.com/EnMAP-Box/enmap-box/issues/917)
+* add algorithm and interactive tool for plotting trajectories of land cover change over time via Sankey plot [#924](https://github.com/EnMAP-Box/enmap-box/issues/924)
+* add algorithms for creating spectral library from classification/regression dataset [#931](https://github.com/EnMAP-Box/enmap-box/issues/931)
+* [Raster layer bounding polygon] add option for convex hull [#950](https://github.com/EnMAP-Box/enmap-box/issues/950)
+* [Analysis ready data] add algorithm for raster tiling [#953](https://github.com/EnMAP-Box/enmap-box/issues/953)
+* add "Aggregate raster layers" algorithm [#956](https://github.com/EnMAP-Box/enmap-box/issues/956)
+* add algorithm for creating a raster mask [#959](https://github.com/EnMAP-Box/enmap-box/issues/959)
+* [Import EnMAP L2A product] support L2A Analysis Ready Data from Geoservice / EOLAB [#973](https://github.com/EnMAP-Box/enmap-box/issues/973)
+* [Import EnMAP L2A product] derive bad band information from metadata file [#974](https://github.com/EnMAP-Box/enmap-box/issues/974)
+* in all algorithms with VRT raster output, also support GTiff and ENVI outputs [#977](https://github.com/EnMAP-Box/enmap-box/issues/977)
+#### Miscellaneous
+* implement auto-generated changelog [#938](https://github.com/EnMAP-Box/enmap-box/issues/938)
+### Fixed Bugs
+<details><summary>Show all (5)</summary>
+
+* Save current profiles on CTRL+S [#871](https://github.com/EnMAP-Box/enmap-box/issues/871)
+* [Spectral resampling] EMIT sensor is missing [#891](https://github.com/EnMAP-Box/enmap-box/issues/891)
+* [Classification layer accuracy and area report (for simple random sampling)] wrong confidence intervals for area estimates [#909](https://github.com/EnMAP-Box/enmap-box/issues/909)
+* Regression based unmixing | problem with implementation of LinearSVR [#967](https://github.com/EnMAP-Box/enmap-box/issues/967)
+* [Regression-based unmixing] _catboost.CatBoostError: Expected callable object or stream-like object [#980](https://github.com/EnMAP-Box/enmap-box/issues/980)
+</details>
+
 ## Version 3.14 (2024-04-11)
 _This release was tested under QGIS 3.34 (LTR) and 3.36 (latest release)._
 ### New Features
@@ -30,7 +68,7 @@ _This release was tested under QGIS 3.34 (LTR) and 3.36 (latest release)._
 * [Scripts/EnFireMAP] add script for sampling point data from data cube [#681](https://github.com/EnMAP-Box/enmap-box/issues/681)
 * split and restructure the requirement.txt file by operating system and Python environment [#701](https://github.com/EnMAP-Box/enmap-box/issues/701)
 ### Fixed Bugs
-<details><summary>Show all</summary>
+<details><summary>Show all (39)</summary>
 
 * [GEE Time Series Explorer] AttributeError: 'GeeTemporalProfileDockWidget' object has no attribute 'onDownloadLayerProfilesClicked' [#691](https://github.com/EnMAP-Box/enmap-box/issues/691)
 * splash screen not showing up on EnMAP-Box startup [#714](https://github.com/EnMAP-Box/enmap-box/issues/714)
@@ -64,10 +102,13 @@ _This release was tested under QGIS 3.34 (LTR) and 3.36 (latest release)._
 * AttributeError: 'NoneType' object has no attribute 'highlightedVariables' [#863](https://github.com/EnMAP-Box/enmap-box/issues/863)
 * [RasterReader] open a WMS layer with "openWithGdal=False" isn't working [#865](https://github.com/EnMAP-Box/enmap-box/issues/865)
 * EnMAP L2A data isn't scaled correctly between 0 and 1 [#879](https://github.com/EnMAP-Box/enmap-box/issues/879)
+* [Scale/truncate/convert raster layer] algo is placed in the wrong algo group [#885](https://github.com/EnMAP-Box/enmap-box/issues/885)
 * Couldn't load plugin 'enmapboxplugin' due to an error when calling its classFactory() method  [#886](https://github.com/EnMAP-Box/enmap-box/issues/886)
 * [SpectralView] GeoJSON library with NaN values not correctly plotted [#887](https://github.com/EnMAP-Box/enmap-box/issues/887)
 * [Classification layer accuracy and area report] issue with unclassified pixel inside map [#900](https://github.com/EnMAP-Box/enmap-box/issues/900)
+* [Data Sources] right-click on nodes inside a model file (*.pkl) gives error [#908](https://github.com/EnMAP-Box/enmap-box/issues/908)
 * Spectral library axis flipped [#916](https://github.com/EnMAP-Box/enmap-box/issues/916)
+* [SpectralLibraryUtils] SpectralLibraryUtils.writeToSource is creating wrong CRS [#936](https://github.com/EnMAP-Box/enmap-box/issues/936)
 </details>
 
 ## Version 3.13 (2023-10-06)
@@ -123,7 +164,7 @@ _This release was tested under QGIS 3.28 (LTR), 3.32 and 3.34 (latest release)._
 * [Example Dataset Potsdam] add library and continuous-vector-layer [#576](https://github.com/EnMAP-Box/enmap-box/issues/576)
 * [Scripts] implement script for cutting EnMAP L2A scenes according to a given tiling scheme [#583](https://github.com/EnMAP-Box/enmap-box/issues/583)
 ### Fixed Bugs
-<details><summary>Show all</summary>
+<details><summary>Show all (62)</summary>
 
 * [Profile Analytics] ignore or handle WMS layers properly [#443](https://github.com/EnMAP-Box/enmap-box/issues/443)
 * [Scripts/create_plugin.py] can't build plugin (somehow related to Markdown) [#452](https://github.com/EnMAP-Box/enmap-box/issues/452)
@@ -227,7 +268,7 @@ _This release was tested under QGIS 3.28 (LTR)._
 * Reporting [#258](https://github.com/EnMAP-Box/enmap-box/issues/258)
 * make typeguard optional [#345](https://github.com/EnMAP-Box/enmap-box/issues/345)
 ### Fixed Bugs
-<details><summary>Show all</summary>
+<details><summary>Show all (69)</summary>
 
 * The setup for testing non-blocking-dependencies is gone. [#176](https://github.com/EnMAP-Box/enmap-box/issues/176)
 * CatBootRegressor issue [#189](https://github.com/EnMAP-Box/enmap-box/issues/189)
@@ -326,7 +367,7 @@ _This release was tested under QGIS 3.26._
 * Application path not initialized [#4](https://github.com/EnMAP-Box/enmap-box/issues/4)
 * RasterReader wavelength fails with FORCE TSI images [#9](https://github.com/EnMAP-Box/enmap-box/issues/9)
 ### Fixed Bugs
-<details><summary>Show all</summary>
+<details><summary>Show all (49)</summary>
 
 * link extraction from glossary.rst is broken [#1](https://github.com/EnMAP-Box/enmap-box/issues/1)
 * temporal pixel profile from FORCE TSI raster not correctly displayed in SpectralView [#5](https://github.com/EnMAP-Box/enmap-box/issues/5)

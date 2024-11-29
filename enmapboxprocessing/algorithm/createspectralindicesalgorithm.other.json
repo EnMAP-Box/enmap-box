@@ -309,6 +309,15 @@
       "reference": "https://www.semanticscholar.org/paper/MONITORING-COMMUNITY-HYSTERESIS-USING-SPECTRAL-AND-Merton/49aaa3b9fcf67f2957294c9d852857f8d72eb5a6",
       "short_name": "RVSI",
       "type": "other"
+    },
+    "SOCI": {
+      "bands": [],
+      "formula": "r478 / (r546 * r659)",
+      "long_name": "Soil organic carbon index",
+      "reference": "https://acsess.onlinelibrary.wiley.com/doi/10.2136/sssaj2018.09.0318",
+      "short_name": "SOCI",
+      "type": "other"
     }
   }
 }
+

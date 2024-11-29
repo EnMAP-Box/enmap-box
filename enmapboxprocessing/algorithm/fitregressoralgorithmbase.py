@@ -3,6 +3,8 @@ import traceback
 from io import StringIO
 from typing import Dict, Any, List, Tuple
 
+from sklearn.multioutput import MultiOutputRegressor
+
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
@@ -86,7 +88,9 @@ class FitRegressorAlgorithmBase(EnMAPProcessingAlgorithm):
                     f'targets={[c.name for c in dump.targets]}')
                 feedback.pushInfo('Fit regressor')
 
-                if dump.y.shape[1] == 1:
+                if isinstance(regressor, MultiOutputRegressor):
+                    dumpY = dump.y
+                elif dump.y.shape[1] == 1:
                     dumpY = dump.y.ravel()
                 else:
                     dumpY = dump.y
@@ -94,12 +98,7 @@ class FitRegressorAlgorithmBase(EnMAPProcessingAlgorithm):
                 try:
                     regressor.fit(dump.X, dumpY, log_cout=StringIO(), log_cerr=StringIO())  # fixes issue #790
                 except Exception:
-                    try:
-                        regressor.fit(dump.X, dumpY)
-                    except ValueError as error:  # fixes issue #967
-                        if str(error) == 'y must have at least two dimensions for multi-output regression ' \
-                                         'but has only one.':
-                            regressor.fit(dump.X, dumpY.reshape((-1, 1)))
+                    regressor.fit(dump.X, dumpY)
 
             else:
                 feedback.pushInfo('Store unfitted classifier')

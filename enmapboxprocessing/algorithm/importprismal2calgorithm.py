@@ -7,6 +7,7 @@ from osgeo import gdal
 from enmapboxprocessing.algorithm.importprismal1algorithm import utilsReadAsArray, utilsDeleteCopy
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from enmapboxprocessing.gdalutils import GdalUtils
 from enmapboxprocessing.rasterwriter import RasterWriter
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 from enmapbox.typeguard import typechecked
@@ -75,16 +76,18 @@ class ImportPrismaL2CAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFile(self.P_FILE, self._FILE, extension='he5')
         self.addParameterEnum(self.P_SPECTRAL_REGION, self._SPECTRAL_REGION, self.O_SPECTRAL_REGION, False, 0)
         self.addParameterRasterDestination(self.P_OUTPUT_SPECTRAL_CUBE, self._OUTPUT_SPECTRAL_CUBE)
-        self.addParameterVrtDestination(self.P_OUTPUT_PAN_CUBE, self._OUTPUT_PAN_CUBE, None, True, False)
+        self.addParameterVrtDestination(self.P_OUTPUT_PAN_CUBE, self._OUTPUT_PAN_CUBE, None, True, False, True)
         self.addParameterRasterDestination(self.P_OUTPUT_SPECTRAL_ERROR, self._OUTPUT_SPECTRAL_ERROR, None, True, False)
         self.addParameterVrtDestination(
-            self.P_OUTPUT_SPECTRAL_GEOLOCATION, self._OUTPUT_SPECTRAL_GEOLOCATION, None, True, False
+            self.P_OUTPUT_SPECTRAL_GEOLOCATION, self._OUTPUT_SPECTRAL_GEOLOCATION, None, True, False, True
         )
         self.addParameterVrtDestination(
-            self.P_OUTPUT_SPECTRAL_GEOMETRIC, self._OUTPUT_SPECTRAL_GEOMETRIC, None, True, False
+            self.P_OUTPUT_SPECTRAL_GEOMETRIC, self._OUTPUT_SPECTRAL_GEOMETRIC, None, True, False, True
         )
-        self.addParameterVrtDestination(self.P_OUTPUT_PAN_GEOLOCATION, self._OUTPUT_PAN_GEOLOCATION, None, True, False)
-        self.addParameterVrtDestination(self.P_OUTPUT_PAN_ERROR, self._OUTPUT_PAN_ERROR, None, True, False)
+        self.addParameterVrtDestination(
+            self.P_OUTPUT_PAN_GEOLOCATION, self._OUTPUT_PAN_GEOLOCATION, None, True, False, True
+        )
+        self.addParameterVrtDestination(self.P_OUTPUT_PAN_ERROR, self._OUTPUT_PAN_ERROR, None, True, False, True)
 
     def defaultParameters(self, file: str):
         return {
@@ -223,6 +226,9 @@ class ImportPrismaL2CAlgorithm(EnMAPProcessingAlgorithm):
             writer.setWavelength(wl, bandNo)
             writer.setFwhm(fwhm[bandNo - 1], bandNo)
             writer.setScale(1. / 65535., bandNo)
+
+        GdalUtils().calculateDefaultHistrogram(writer.gdalDataset, inMemory=False, feedback=feedback)
+
         writer.close()
 
     def writeSpectralErrorMatrix(self, filenameSpectralError, he5Filename, spectralRegion, feedback):

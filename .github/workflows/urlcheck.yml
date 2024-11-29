@@ -4,12 +4,12 @@ on:
   push:
     branches:
       - main
-      - 'releases/**'
+      - 'release_**'
       - urlcheck
   pull_request:
     branches:
       - main
-      - 'releases/**'
+      - 'release_**'
 
 jobs:
   build:
@@ -34,7 +34,7 @@ jobs:
         force_pass : false
 
         exclude_files:
-          test_glossary.py,snippets/grabPotsdamWmsData.py
+          test_glossary.py,snippets/grabPotsdamWmsData.py,scripts/update_splashscreen.py
 
         # {z}/{x}/{y}: ESRI
         # {z]/{y}/{x}: CartoDB, Open Weather, OpenTopoMap, OSM, Stamen, Strava, Wikimedia
