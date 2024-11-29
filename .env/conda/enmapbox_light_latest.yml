@@ -7,7 +7,7 @@
 channels:
 - conda-forge
 dependencies:
-- qgis>=3.38.2
+- qgis>=3.40.1
 - docutils
 - enpt
 - flake8
