@@ -10,7 +10,7 @@ from enmapboxtestdata import library_gpkg
 from qgis.core import QgsGeometry, QgsPointXY, QgsVectorLayer, QgsCoordinateReferenceSystem
 
 
-class TestPrepareClassificationDatasetFromCategorizedLibrary(TestCase):
+class TestPrepareRegressionDatasetFromContinuousLibraryAlgorithm(TestCase):
 
     def test(self):
         alg = PrepareRegressionDatasetFromContinuousLibraryAlgorithm()
