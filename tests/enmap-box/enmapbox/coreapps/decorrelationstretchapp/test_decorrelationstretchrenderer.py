@@ -1,17 +1,16 @@
 import numpy as np
-
-from decorrelationstretchapp.decorrelationstretchrenderer import DecorrelationStretchRenderer
-from qgis.core import QgsRasterLayer, Qgis
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import RobustScaler, MinMaxScaler
 
-from enmapboxtestdata import enmap
+from decorrelationstretchapp.decorrelationstretchrenderer import DecorrelationStretchRenderer
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.testcase import TestCase
 from enmapboxprocessing.utils import Utils
+from enmapboxtestdata import enmap
+from qgis.core import QgsRasterLayer, Qgis
 
 
-class TestClassFractionRenderer(TestCase):
+class TestDecorrelationStretchRenderer(TestCase):
 
     def test_enmap(self):
         layer = QgsRasterLayer(enmap)
