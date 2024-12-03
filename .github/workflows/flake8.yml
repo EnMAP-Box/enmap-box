@@ -7,7 +7,8 @@ on:
   pull_request:
     branches:
       - main
-      - release-**
+      - 'release-**'
+      - 'release_**'
 
 jobs:
   flake8_py3:
