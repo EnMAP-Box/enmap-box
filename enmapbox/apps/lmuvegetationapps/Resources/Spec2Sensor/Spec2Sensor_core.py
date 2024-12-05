@@ -77,7 +77,11 @@ class Spec2Sensor:
         self.srf_nbands = srf_file['srf_nbands']
         self.wl_sensor = srf_file['sensor_wl']
         self.n_wl_sensor = len(self.wl_sensor)
-        self.fwhm = srf_file['sensor_fwhm']  # deprecated
+        if 'sensor_fwhm' in srf_file:
+            self.fwhm = srf_file['sensor_fwhm']  # deprecated
+        else:
+            self.fwhm = None
+        # self.fwhm = srf_file['sensor_fwhm']  # deprecated
         self.ndvi = srf_file['sensor_ndvi']
         return True  # return True if everything worked
 
@@ -328,6 +332,7 @@ class BuildGenericSRF:
         ndvi.append(np.argmin(np.abs(wavelength - 837)))  # nir
 
         np.savez(self.out_file, srf_nbands=new_srf_nbands, srf=new_srf, sensor_wl=wavelength, sensor_ndvi=ndvi, sensor_fwhm=fwhm) #sensor_fwhm added
+
         os.replace(self.out_file, os.path.splitext(self.out_file)[0] + ".srf")
 
         return True, self.out_file, os.path.splitext(os.path.basename(self.out_file))[0]
