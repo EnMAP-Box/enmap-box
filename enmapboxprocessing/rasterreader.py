@@ -1,4 +1,4 @@
-from math import isnan
+from math import isnan, ceil
 from os.path import exists
 from typing import Iterable, List, Union, Optional, Tuple, Iterator
 
@@ -18,7 +18,7 @@ from qgis.PyQt.QtGui import QColor
 from qgis.core import (QgsRasterLayer, QgsRasterDataProvider, QgsCoordinateReferenceSystem, QgsRectangle,
                        QgsRasterRange, QgsPoint, QgsRasterBlockFeedback, QgsRasterBlock, QgsPointXY,
                        QgsProcessingFeedback, QgsRasterBandStats, Qgis, QgsGeometry, QgsVectorLayer, QgsWkbTypes,
-                       QgsFeature)
+                       QgsFeature, QgsRasterPipe, QgsRasterProjector)
 
 
 @typechecked
@@ -26,8 +26,11 @@ class RasterReader(object):
     Nanometers = 'Nanometers'
     Micrometers = 'Micrometers'
 
-    def __init__(self, source: RasterSource, openWithGdal: bool = True):
-
+    def __init__(
+            self, source: RasterSource, openWithGdal: bool = True,
+            crs: QgsCoordinateReferenceSystem = None
+    ):
+        self.maskReader: Optional[RasterReader] = None
         if isinstance(source, QgsRasterLayer):
             self.layer = source
             self.provider: QgsRasterDataProvider = self.layer.dataProvider()
@@ -53,6 +56,8 @@ class RasterReader(object):
 
         self.gdalDataset = gdalDataset
 
+        self.setRasterPipeCrs(crs)
+
         # prepare STAC metadata
         if exists(self.layer.source() + '.stac.json'):
             self.stacMetadata = Utils().jsonLoad(self.layer.source() + '.stac.json')
@@ -65,6 +70,15 @@ class RasterReader(object):
         if 'envi:metadata' not in self.stacMetadata['properties']:
             self.stacMetadata['properties']['envi:metadata'] = {}
 
+        # prepare R terra (https://github.com/rspatial/terra) metadata, also see #907
+        if exists(self.layer.source() + '.aux.json'):
+            self.terraMetadata = Utils().jsonLoad(self.layer.source() + '.aux.json')
+        else:
+            self.terraMetadata = None
+
+    def setExternalMask(self, layer: QgsRasterLayer):
+        self.maskReader = RasterReader(layer)
+
     def bandCount(self) -> int:
         """Return iterator over all band numbers."""
         return self.provider.bandCount()
@@ -73,6 +87,16 @@ class RasterReader(object):
         """Return iterator over all band numbers."""
         for bandNo in range(1, self.provider.bandCount() + 1):
             yield bandNo
+
+    def checksum(self, bandNo: int = None, xoff=0, yoff=0, xsize: int = None, ysize: int = None) -> int:
+        """Return band checksum."""
+        if bandNo is None:
+            checksum = 0
+            for bandNo in self.bandNumbers():
+                checksum += self.checksum(bandNo, xoff, yoff, xsize, ysize)
+        else:
+            checksum = self.gdalBand(bandNo).Checksum(xoff, yoff, xsize, ysize)
+        return checksum
 
     def bandName(self, bandNo: int) -> str:
         """Return band name."""
@@ -207,6 +231,21 @@ class RasterReader(object):
                 continue  # empty blocks may occure, but can just skip over
             yield RasterBlockInfo(blockExtent, xOffset, yOffset, width, height)
 
+    def setRasterPipeCrs(self, crs: QgsCoordinateReferenceSystem = None):
+        if crs is None:
+            projector = self.provider
+            pipe = None
+        elif isinstance(crs, QgsCoordinateReferenceSystem):
+            pipe = QgsRasterPipe()
+            pipe.set(self.provider.clone())
+            projector = QgsRasterProjector()
+            projector.setCrs(self.provider.crs(), crs)
+            pipe.insert(1, projector)
+        else:
+            raise ValueError()
+        self.pipe = pipe
+        self.projector = projector
+
     def arrayFromBlock(
             self, block: RasterBlockInfo, bandList: List[int] = None, overlap: int = None,
             feedback: QgsRasterBlockFeedback = None
@@ -237,7 +276,7 @@ class RasterReader(object):
         arrays = list()
         for bandNo in bandList:
             assert 0 < bandNo <= self.bandCount(), f'bandNo is {bandNo}'
-            block: QgsRasterBlock = self.provider.block(bandNo, boundingBox, width, height, feedback)
+            block: QgsRasterBlock = self.projector.block(bandNo, boundingBox, width, height, feedback)
             array = Utils.qgsRasterBlockToNumpyArray(block=block)
             arrays.append(array)
         return arrays
@@ -284,9 +323,11 @@ class RasterReader(object):
         return array
 
     def maskArray(
-            self, array: Array3d, bandList: List[int] = None, maskNotFinite=True, defaultNoDataValue: float = None
+            self, array: Array3d, bandList: List[int] = None, maskNotFinite=True, defaultNoDataValue: float = None,
+            maskNoDataValue=True
     ) -> Array3d:
         """Return mask for given data. No data values evaluate to False, all other to True."""
+
         if bandList is None:
             bandList = range(1, self.provider.bandCount() + 1)
         assert len(bandList) == len(array)
@@ -294,13 +335,14 @@ class RasterReader(object):
         for i, a in enumerate(array):
             bandNo = i + 1
             m = np.full_like(a, True, dtype=bool)
-            if self.provider.sourceHasNoDataValue(bandNo) and self.provider.useSourceNoDataValue(bandNo):
-                noDataValue = self.provider.sourceNoDataValue(bandNo)
-                if not isnan(noDataValue):
-                    m[a == noDataValue] = False
-            else:
-                if defaultNoDataValue is not None:
-                    m[a == defaultNoDataValue] = False
+            if maskNoDataValue:
+                if self.provider.sourceHasNoDataValue(bandNo) and self.provider.useSourceNoDataValue(bandNo):
+                    noDataValue = self.provider.sourceNoDataValue(bandNo)
+                    if not isnan(noDataValue):
+                        m[a == noDataValue] = False
+                else:
+                    if defaultNoDataValue is not None:
+                        m[a == defaultNoDataValue] = False
             rasterRange: QgsRasterRange
             for rasterRange in self.provider.userNoDataValues(bandNo):
                 if rasterRange.bounds() == QgsRasterRange.BoundsType.IncludeMinAndMax:
@@ -330,8 +372,10 @@ class RasterReader(object):
             maskArray.append(m)
         return maskArray
 
-    def pixelByPoint(self, point: QgsPointXY) -> QPoint:
-        return SpatialPoint(self.crs(), point).toPixelPosition(self.layer)
+    def pixelByPoint(self, point: Union[QgsPointXY, SpatialPoint]) -> QPoint:
+        if isinstance(point, QgsPointXY):
+            point = SpatialPoint(self.crs(), point)
+        return point.toPixelPosition(self.layer)
 
     def pixelExtent(self, pixel: QPoint) -> QgsRectangle:
         xoff = self.extent().xMinimum()
@@ -416,11 +460,17 @@ class RasterReader(object):
     def samplingWidthAndHeight(self, bandNo: int, extent=None, sampleSize: int = 0) -> Tuple[int, int]:
         """Return number of pixel for width and heigth, that approx. match the given sample size."""
 
-        # get sample width and height from empty bandStatistics
         if extent is None:
-            extent = QgsRectangle()
-        bandStats: QgsRasterBandStats = self.provider.bandStatistics(bandNo, 0, extent, sampleSize)
-        return bandStats.width, bandStats.height
+            extent = self.extent()
+
+        if sampleSize == 0:
+            width = ceil((extent.xMaximum() - extent.xMinimum()) / self.rasterUnitsPerPixelX())
+            height = ceil((extent.yMaximum() - extent.yMinimum()) / self.rasterUnitsPerPixelY())
+        else:
+            bandStats: QgsRasterBandStats = self.provider.bandStatistics(bandNo, 0, extent, sampleSize)
+            width, height = bandStats.width, bandStats.height
+
+        return width, height
 
     def sampleValues(
             self, bandNo: int, extent=None, sampleSize: int = 0,
@@ -761,11 +811,41 @@ class RasterReader(object):
             dateTime = self.metadataItem('NETCDF_DIM_time', '', bandNo)
 
             if dateTime is not None:
-                dateTimeUnit = self.metadataItem('time#units')
-                if dateTimeUnit == 'days since 1970-1-1':
-                    return QDateTime(QDate(1970, 1, 1)).addDays(int(dateTime))
+                dateTimeUnit = self.metadataItem('time#units')  # e.g. 'days since 1970-01-01 00:00:00'
+                unit, _, datestamp, *tmp = dateTimeUnit.split(' ')
+                if len(tmp) == 0:
+                    tmp = ['00:00:00']
+                hours, minutes, seconds = tmp[0].split(':')
+                years, months, days = datestamp.split('-')
+                dateTime0 = QDateTime(int(years), int(months), int(days), int(hours), int(minutes), int(seconds))
+                if unit == 'seconds':
+                    return dateTime0.addSecs(int(dateTime))
+                elif unit == 'minutes':
+                    return dateTime0.addSecs(int(dateTime) * 60)
+                elif unit == 'hours':
+                    return dateTime0.addSecs(int(dateTime) * 60 * 60)
+                elif unit == 'days':
+                    return dateTime0.addDays(int(dateTime))
+                elif unit == 'months':
+                    return dateTime0.addMonths(int(dateTime))
+                elif unit == 'years':
+                    return dateTime0.addYears(int(dateTime))
                 else:
                     raise NotImplementedError(dateTimeUnit)
+
+            # check R terra (see #907)
+            if self.terraMetadata is not None:
+                if 'time' in self.terraMetadata and 'timestep' in self.terraMetadata:
+                    if self.terraMetadata['timestep'] == 'days':
+                        year, month, day = self.terraMetadata['time'][bandNo - 1].split('-')
+                        return QDateTime(QDate(int(year), int(month), int(day)))
+                    elif self.terraMetadata['timestep'] == 'seconds':
+                        tmp1, tmp2 = self.terraMetadata['time'][bandNo - 1].split(' ')
+                        year, month, day = tmp1.split('-')
+                        hour, minute, second = tmp2.split(':')
+                        return QDateTime(int(year), int(month), int(day), int(hour), int(minute), int(second))
+                    else:
+                        raise NotImplementedError(self.terraMetadata['timestep'])
 
         # check STAC
         dateTime = self.stacMetadata['properties']['envi:metadata'].get('acquisition_time')

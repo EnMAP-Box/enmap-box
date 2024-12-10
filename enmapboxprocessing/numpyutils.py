@@ -28,7 +28,7 @@ class NumpyUtils(object):
         valid_obs = np.sum(np.isfinite(a), axis=0)
         invalid_pixel = valid_obs == 0
 
-        a[np.isnan(a)] = np.Inf
+        a[np.isnan(a)] = np.inf
 
         # sort - former NaNs will move to the end
         arr = np.sort(a, axis=0)
@@ -50,7 +50,7 @@ class NumpyUtils(object):
             quant_arr = np.array(floor_value * floor_weight + ceil_value * ceil_weight, dtype=np.float32)
 
             # fill invalid pixels with fill value
-            quant_arr[invalid_pixel] = np.NaN
+            quant_arr[invalid_pixel] = np.nan
 
             result.append(quant_arr)
 

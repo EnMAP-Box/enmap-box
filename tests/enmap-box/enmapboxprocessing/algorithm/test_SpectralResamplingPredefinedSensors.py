@@ -1,4 +1,5 @@
 from enmapboxprocessing.algorithm.spectralresamplingtodesisalgorithm import SpectralResamplingToDesisAlgorithm
+from enmapboxprocessing.algorithm.spectralresamplingtoemitalgorithm import SpectralResamplingToEmitAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtoenmapalgorithm import SpectralResamplingToEnmapAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtolandsatalgorithm import SpectralResamplingToLandsatOliAlgorithm, \
     SpectralResamplingToLandsatEtmAlgorithm, SpectralResamplingToLandsatTmAlgorithm
@@ -20,6 +21,15 @@ class TestSpectralResamplingPredefinedSensors(TestCase):
         }
         self.runalg(alg, parameters)
         self.assertEqual(235, QgsRasterLayer(parameters[alg.P_OUTPUT_RASTER]).bandCount())
+
+    def test_emit(self):
+        alg = SpectralResamplingToEmitAlgorithm()
+        parameters = {
+            alg.P_RASTER: enmap,
+            alg.P_OUTPUT_RASTER: self.filename('resampled3.tif')
+        }
+        self.runalg(alg, parameters)
+        self.assertEqual(285, QgsRasterLayer(parameters[alg.P_OUTPUT_RASTER]).bandCount())
 
     def test_enmap(self):
         alg = SpectralResamplingToEnmapAlgorithm()

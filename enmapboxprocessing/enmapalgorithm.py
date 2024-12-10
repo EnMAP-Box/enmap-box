@@ -2,35 +2,35 @@ import traceback
 from enum import Enum
 from math import nan
 from os import makedirs
-from os.path import isabs, join, dirname, exists, splitext, abspath
+from os.path import abspath, dirname, exists, isabs, join, splitext
 from time import time
-from typing import Any, Dict, Iterable, Optional, List, Tuple, TextIO
+from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple
 
 import numpy as np
 from osgeo import gdal
-
 import processing
+from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtGui import QIcon
+from qgis.core import (Qgis, QgsCategorizedSymbolRenderer, QgsCoordinateReferenceSystem, QgsMapLayer,
+                       QgsPalettedRasterRenderer, QgsProcessing, QgsProcessingAlgorithm, QgsProcessingContext,
+                       QgsProcessingException, QgsProcessingFeedback, QgsProcessingOutputLayerDefinition,
+                       QgsProcessingParameterBand, QgsProcessingParameterBoolean, QgsProcessingParameterCrs,
+                       QgsProcessingParameterDefinition, QgsProcessingParameterEnum, QgsProcessingParameterExtent,
+                       QgsProcessingParameterField, QgsProcessingParameterFile, QgsProcessingParameterFileDestination,
+                       QgsProcessingParameterFolderDestination, QgsProcessingParameterMapLayer,
+                       QgsProcessingParameterMatrix, QgsProcessingParameterMultipleLayers, QgsProcessingParameterNumber,
+                       QgsProcessingParameterRange, QgsProcessingParameterRasterLayer, QgsProcessingParameterString,
+                       QgsProcessingParameterVectorDestination, QgsProcessingParameterVectorLayer, QgsProcessingUtils,
+                       QgsProject, QgsProperty, QgsRasterLayer, QgsRectangle, QgsVectorLayer)
+
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.glossary import injectGlossaryLinks
 from enmapboxprocessing.parameter.processingparameterrasterdestination import ProcessingParameterRasterDestination
 from enmapboxprocessing.processingfeedback import ProcessingFeedback
-from enmapboxprocessing.typing import CreationOptions, GdalResamplingAlgorithm, ClassifierDump, \
-    TransformerDump, RegressorDump, ClustererDump
+from enmapboxprocessing.typing import ClassifierDump, ClustererDump, CreationOptions, GdalResamplingAlgorithm, \
+    RegressorDump, TransformerDump
 from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtGui import QIcon
-from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer, QgsProcessingParameterVectorLayer,
-                       QgsProcessingContext, QgsProcessingFeedback,
-                       QgsRasterLayer, QgsVectorLayer, QgsProcessingParameterNumber, QgsProcessingParameterDefinition,
-                       QgsProcessingParameterField, QgsProcessingParameterBoolean, QgsProcessingParameterEnum, Qgis,
-                       QgsProcessingParameterString, QgsProcessingParameterBand, QgsCategorizedSymbolRenderer,
-                       QgsPalettedRasterRenderer, QgsProcessingParameterMapLayer, QgsMapLayer,
-                       QgsProcessingParameterExtent, QgsCoordinateReferenceSystem, QgsRectangle,
-                       QgsProcessingParameterFileDestination, QgsProcessingParameterFile, QgsProcessingParameterRange,
-                       QgsProcessingParameterCrs, QgsProcessingParameterVectorDestination, QgsProcessing,
-                       QgsProcessingUtils, QgsProcessingParameterMultipleLayers, QgsProcessingException,
-                       QgsProcessingParameterFolderDestination, QgsProject, QgsProcessingOutputLayerDefinition,
-                       QgsProperty, QgsProcessingParameterMatrix)
 
 
 class AlgorithmCanceledException(Exception):
@@ -41,8 +41,8 @@ class AlgorithmCanceledException(Exception):
 class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     O_RESAMPLE_ALG = 'NearestNeighbour Bilinear Cubic CubicSpline Lanczos Average Mode Min Q1 Med Q3 Max'.split()
     NearestNeighbourResampleAlg, BilinearResampleAlg, CubicResampleAlg, CubicSplineResampleAlg, LanczosResampleAlg, \
-    AverageResampleAlg, ModeResampleAlg, MinResampleAlg, Q1ResampleAlg, MedResampleAlg, Q3ResampleAlg, \
-    MaxResampleAlg = range(12)
+        AverageResampleAlg, ModeResampleAlg, MinResampleAlg, Q1ResampleAlg, MedResampleAlg, Q3ResampleAlg, \
+        MaxResampleAlg = range(12)
     O_DATA_TYPE = 'Byte Int16 UInt16 UInt32 Int32 Float32 Float64'.split()
     Byte, Int16, UInt16, Int32, UInt32, Float32, Float64 = range(len(O_DATA_TYPE))
     PickleFileFilter = 'Pickle files (*.pkl)'
@@ -54,6 +54,9 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     GeoJsonFileFilter = 'GEOJSON files (*.geojson)'
     GeoJsonFileExtension = 'geojson'
     GeoJsonFileDestination = 'GEOJSON file destination.'
+    GpkgFileFilter = 'GeoPackage files (*.gpkg)'
+    GpkgFileExtension = 'gpkg'
+    GpkgFileDestination = 'GeoPackage file destination.'
     CsvFileFilter = 'CSV files (*.csv)'
     CsvFileExtension = 'cvs'
     CsvFileDestination = 'CSV file destination.'
@@ -533,7 +536,10 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def parameterAsMatrix(
             self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext
     ) -> Optional[List[Any]]:
-        return parameters.get(name)
+        value = parameters.get(name)
+        if value == [QVariant()]:
+            return None
+        return value
 
     def parameterIsNone(self, parameters: Dict[str, Any], name: str):
         return parameters.get(name, None) is None
@@ -787,22 +793,27 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
 
     def addParameterRasterDestination(
             self, name: str, description: str, defaultValue=None, optional=False, createByDefault=True,
-            allowTif=True, allowEnvi=True, allowVrt=False, advanced=False
+            allowTif=True, allowEnvi=True, allowVrt=False, defaultFileExtension: str = None, advanced=False
     ):
         self.addParameter(
             ProcessingParameterRasterDestination(
-                name, description, defaultValue, optional, createByDefault, allowTif, allowEnvi, allowVrt
+                name, description, defaultValue, optional, createByDefault, allowTif, allowEnvi, allowVrt,
+                defaultFileExtension
             )
         )
         self.flagParameterAsAdvanced(name, advanced)
 
     def addParameterVrtDestination(
             self, name: str, description: str, defaultValue=None, optional=False, createByDefault=True,
-            advanced=False
+            vrtOnly=False, defaultFileExtension: str = None, advanced=False
     ):
+        if defaultFileExtension is None:
+            defaultFileExtension = 'vrt'
         self.addParameterRasterDestination(
-            name, description, defaultValue, optional, createByDefault, False, False, True, advanced
+            name, description, defaultValue, optional, createByDefault, not vrtOnly, not vrtOnly, True,
+            defaultFileExtension, advanced
         )
+
         self.flagParameterAsAdvanced(name, advanced)
 
     def addParameterVectorDestination(
@@ -1022,17 +1033,11 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
 
 class Group(Enum):
     AccuracyAssessment = 'Accuracy Assessment'
+    AnalysisReadyData = 'Analysis ready data'
     Auxilliary = 'Auxilliary'
-    ConvolutionMorphologyAndFiltering = 'Convolution, morphology and filtering'
-    RasterAnalysis = 'Raster analysis'
-    RasterConversion = 'Raster conversion'
-    RasterExtraction = 'Raster extraction'
-    RasterMiscellaneous = 'Raster miscellaneous'
-    RasterProjections = 'Raster projections'
-    VectorConversion = 'Vector conversion'
-    VectorCreation = 'Vector creation'
     Classification = 'Classification'
     Clustering = 'Clustering'
+    ConvolutionMorphologyAndFiltering = 'Convolution, morphology and filtering'
     DatasetCreation = 'Dataset creation'
     Experimental = 'Experimental'
     ExportData = 'Export data'
@@ -1041,13 +1046,20 @@ class Group(Enum):
     Masking = 'Masking'
     Options = 'Options'
     Preprocessing = 'Pre-processing'
-    # Postprocessing = 'Post-processing'
-    SpectralResampling = 'Spectral resampling'
-    Sampling = 'Sampling'
+    RasterAnalysis = 'Raster analysis'
+    RasterConversion = 'Raster conversion'
+    RasterExtraction = 'Raster extraction'
+    RasterMiscellaneous = 'Raster miscellaneous'
+    RasterProjections = 'Raster projections'
     Regression = 'Regression'
+    Sampling = 'Sampling'
+    SpectralLibrary = 'Spectral Library'
+    SpectralResampling = 'Spectral resampling'
     Testdata = 'Testdata'
     Transformation = 'Transformation'
     Unmixing = 'Unmixing'
+    VectorConversion = 'Vector conversion'
+    VectorCreation = 'Vector creation'
 
 
 class CookbookUrls(object):

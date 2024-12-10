@@ -2,6 +2,7 @@ from typing import Dict, Any, List, Tuple
 
 from osgeo import gdal
 
+from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
@@ -86,7 +87,19 @@ class StackRasterLayersAlgorithm(EnMAPProcessingAlgorithm):
 
             # stack bands
             options = gdal.BuildVRTOptions(separate=True)
-            ds: gdal.Dataset = gdal.BuildVRT(filename, filenames, options=options)
+            if filename.endswith('.vrt'):
+                ds: gdal.Dataset = gdal.BuildVRT(filename, filenames, options=options)
+            else:
+                gdal.BuildVRT(filename + '.vrt', filenames, options=options)
+                alg = SaveRasterAsAlgorithm()
+                parameters = {
+                    alg.P_RASTER: filename + '.vrt',
+                    alg.P_COPY_METADATA: False,
+                    alg.P_COPY_STYLE: False,
+                    alg.P_OUTPUT_RASTER: filename
+                }
+                self.runAlg(alg, parameters, None, feedback2, context, True)
+                ds = gdal.Open(filename, gdal.GA_Update)
             writer = RasterWriter(ds)
             for bandNo, bandName in enumerate(bandNames, 1):
                 writer.setBandName(bandName, bandNo)

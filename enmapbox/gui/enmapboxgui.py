@@ -50,6 +50,7 @@ from enmapboxprocessing.algorithm.importenmapl1balgorithm import ImportEnmapL1BA
 from enmapboxprocessing.algorithm.importenmapl1calgorithm import ImportEnmapL1CAlgorithm
 from enmapboxprocessing.algorithm.importenmapl2aalgorithm import ImportEnmapL2AAlgorithm
 from enmapboxprocessing.algorithm.importlandsatl2algorithm import ImportLandsatL2Algorithm
+from enmapboxprocessing.algorithm.importplanetscopealgorithm import ImportPlanetScopeAlgorithm
 from enmapboxprocessing.algorithm.importprismal1algorithm import ImportPrismaL1Algorithm
 from enmapboxprocessing.algorithm.importprismal2balgorithm import ImportPrismaL2BAlgorithm
 from enmapboxprocessing.algorithm.importprismal2calgorithm import ImportPrismaL2CAlgorithm
@@ -63,11 +64,10 @@ from qgis import utils as qgsUtils
 from qgis.PyQt.QtCore import QUrl
 from qgis.PyQt.QtCore import pyqtSignal, Qt, QObject, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
 from qgis.PyQt.QtGui import QDesktopServices
-from qgis.PyQt.QtGui import QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QPixmap, QColor, QIcon, \
+from qgis.PyQt.QtGui import QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QColor, QIcon, \
     QKeyEvent, \
     QCloseEvent, QGuiApplication
-from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, QSplashScreen, QGraphicsDropShadowEffect, \
-    QMainWindow, QApplication, QSizePolicy, QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
+from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, QMainWindow, QApplication, QSizePolicy, QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
     QProgressBar, QMessageBox
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsExpressionContextGenerator, QgsExpressionContext, QgsProcessingContext, \
@@ -88,6 +88,7 @@ from .contextmenus import EnMAPBoxContextMenuRegistry
 from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
 from .dataviews.docks import DockTypes
 from .mapcanvas import MapCanvas
+from .splashscreen.splashscreen import EnMAPBoxSplashScreen
 from .utils import enmapboxUiPath
 from ..enmapboxsettings import EnMAPBoxSettings
 
@@ -120,56 +121,6 @@ class CentralFrame(QFrame):
     def dropEvent(self, event):
         pass
         # self.sigDropEvent.emit(event)
-
-
-class EnMAPBoxSplashScreen(QSplashScreen):
-    """
-    Thr EnMAP-Box Splash Screen
-    """
-
-    def __init__(self, parent=None):
-        pm = QPixmap(':/enmapbox/gui/ui/logo/splashscreen.png')
-        super(EnMAPBoxSplashScreen, self).__init__(parent, pixmap=pm)
-
-        effect = QGraphicsDropShadowEffect()
-        effect.setBlurRadius(5)
-        effect.setColor(QColor('white'))
-        self.setGraphicsEffect(effect)
-
-        css = "" \
-              ""
-
-    def showMessage(self, text: str, alignment: Qt.Alignment = None, color: QColor = None):
-        """
-        Shows a message
-        :param text:
-        :param alignment:
-        :param color:
-        :return:
-        """
-        if alignment is None:
-            alignment = int(Qt.AlignLeft | Qt.AlignBottom)
-        if color is None:
-            color = QColor('black')
-        super(EnMAPBoxSplashScreen, self).showMessage(text, alignment, color)
-        QApplication.processEvents()
-
-    """
-    def drawContents(self, painter: QPainter) -> None:
-        # color = QColor('black')
-        color = QColor('white')
-        color.setAlpha(125)
-
-        painter.setBrush(color)
-        painter.setPen(color)
-        size = self.size()
-        h = 25
-        d = 10
-        rect = QRect(QRect(0, size.height()-h-d, size.width(), size.height()-d) )
-        painter.drawRect(rect)
-        #painter.setPen(QColor('white'))
-        super().drawContents(painter)
-    """
 
 
 class EnMAPBoxUI(QMainWindow):
@@ -1432,11 +1383,12 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             ImportEnmapL1CAlgorithm(),
             ImportEnmapL2AAlgorithm(),
             ImportLandsatL2Algorithm(),
+            ImportPlanetScopeAlgorithm(),
             ImportPrismaL1Algorithm(),
             ImportPrismaL2BAlgorithm(),
             ImportPrismaL2CAlgorithm(),
             ImportPrismaL2DAlgorithm(),
-            ImportSentinel2L2AAlgorithm(),
+            ImportSentinel2L2AAlgorithm()
         ]
 
         for alg in algs:

@@ -1467,30 +1467,18 @@ class ApplierControls(object):
         return self
 
     def setGDALCacheMax(self, bytes=ApplierDefaults.GDALEnv.cacheMax):
-        """
-        For details see the `GDAL_CACHEMAX Configuration Option <https://trac.osgeo.org/gdal/wiki/ConfigOptions#GDAL_CACHEMAX>`_.
-        """
         self.cacheMax = bytes
         return self
 
     def setGDALSwathSize(self, bytes=ApplierDefaults.GDALEnv.swathSize):
-        """
-        For details see the `GDAL_SWATH_SIZE Configuration Option <https://trac.osgeo.org/gdal/wiki/ConfigOptions#GDAL_SWATH_SIZE>`_.
-        """
         self.swathSize = bytes
         return self
 
     def setGDALDisableReadDirOnOpen(self, disable=ApplierDefaults.GDALEnv.disableReadDirOnOpen):
-        """
-        For details see the `GDAL_DISABLE_READDIR_ON_OPEN Configuration Option <https://trac.osgeo.org/gdal/wiki/ConfigOptions#GDAL_DISABLE_READDIR_ON_OPEN>`_.
-        """
         self.disableReadDirOnOpen = disable
         return self
 
     def setGDALMaxDatasetPoolSize(self, nfiles=ApplierDefaults.GDALEnv.maxDatasetPoolSize):
-        """
-        For details see the `GDAL_MAX_DATASET_POOL_SIZE Configuration Option <https://trac.osgeo.org/gdal/wiki/ConfigOptions#GDAL_MAX_DATASET_POOL_SIZE>`_.
-        """
         self.maxDatasetPoolSize = nfiles
         return self
 

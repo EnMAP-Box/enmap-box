@@ -134,3 +134,28 @@ class TestImportEnmapL2AAlgorithm(TestCase):
         result = self.runalg(alg, parameters)
         reader = RasterReader(result[alg.P_OUTPUT_RASTER])
         self.assertEqual(190, reader.bandCount())
+
+    def test_ardProduct(self):
+        if sensorProductsRoot() is None or self.skipProductImport:
+            return
+
+        alg = ImportEnmapL2AAlgorithm()
+        parameters = {
+            alg.P_FILE: SensorProducts.Enmap.L2A_ARD_MetadataXml,
+            alg.P_SET_BAD_BANDS: True,
+            alg.P_EXCLUDE_BAD_BANDS: False,
+            alg.P_OUTPUT_RASTER: self.filename('enmapL2A.tif'),
+        }
+        result = self.runalg(alg, parameters)
+        reader = RasterReader(result[alg.P_OUTPUT_RASTER])
+
+    def test_saveAsTif(self):
+        if sensorProductsRoot() is None or self.skipProductImport:
+            return
+
+        alg = ImportEnmapL2AAlgorithm()
+        parameters = {
+            alg.P_FILE: SensorProducts.Enmap.L2A_MetadataXml,
+            alg.P_OUTPUT_RASTER: self.filename('enmapL2A.tif'),
+        }
+        result = self.runalg(alg, parameters)

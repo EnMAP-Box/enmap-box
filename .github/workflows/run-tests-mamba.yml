@@ -1,9 +1,9 @@
-name: 🐍 EnMAP-Box Mamba Tests
+name: 🐍 Conda Environments
 
 on:
   push:
     branches:
-      - mamba**
+      - main
       - release-**
 
   pull_request:

@@ -8,13 +8,13 @@ class SpectralSensors():
         responseFunctionFile = join(root, 'desis.csv')
         shortname = 'DESIS'
         longname = 'DLR Earth Sensing Imaging Spectrometer Mission'
-        website = 'https://www.dlr.de/eoc/desktopdefault.aspx/tabid-13614/'
+        website = 'https://www.dlr.de/en/images/institutes-1/institute-of-optical-sensor-systems/os-desis'
 
     class Emit():
         responseFunctionFile = join(root, 'emit.csv')
-        shortname = 'PRISMA'
-        longname = 'Hyperspectral Precursor of the Application Mission'
-        website = 'https://www.asi.it/en/earth-science/prisma/'
+        shortname = 'EMIT'
+        longname = 'Earth Surface Mineral Dust Source Investigation'
+        website = 'https://earth.jpl.nasa.gov/emit/'
 
     class Enmap():
         responseFunctionFile = join(root, 'enmap.csv')

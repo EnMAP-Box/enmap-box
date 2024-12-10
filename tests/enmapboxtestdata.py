@@ -137,6 +137,7 @@ if not exists(classifierDumpPkl):
         alg.P_DATASET: classificationDatasetAsPklFile,
         alg.P_CLASSIFIER: 'from sklearn.ensemble import RandomForestClassifier\n'
                           'classifier = RandomForestClassifier(n_estimators=100, oob_score=True, random_state=42)\n',
+        alg.P_NFOLD: 10,
         alg.P_RASTER: enmap,
         alg.P_OUTPUT_CLASSIFIER: classifierDumpPkl
     }
@@ -256,16 +257,24 @@ _subdir = 'srf'
 enmap_berlin_srf_csv = join(_root, _subdir, 'enmap_berlin_srf.csv')  # wavelength and fwhm
 enmap_potsdam_srf_csv = join(_root, _subdir, 'enmap_potsdam_srf.csv')  # wavelength and fwhm
 
+# processing
+_subdir = 'processing'
+custom_model = join(_root, _subdir, 'importEnmapL2.model3')
+
 # external testdata
 _subdir = 'external'
 envi_library_berlin_sli = join(_root, _subdir, 'envi', 'library_berlin.sli')
 engeomap_cubus_gamsberg_subset = join(_root, _subdir, 'engeomap', 'cubus_gamsberg_subset')
 engeomap_gamsberg_field_library = join(_root, _subdir, 'engeomap', 'gamsberg_field_library')
 engeomap_gamesberg_field_library_color_mod = join(_root, _subdir, 'engeomap', 'gamesberg_field_library_color_mod.csv')
+r_terra_timeseries_days = join(_root, _subdir, 'r_terra', 'Unevenly_spaced_time_series_R_terra.tif')
+r_terra_timeseries_seconds = join(_root, _subdir, 'r_terra', 'Unevenly_spaced_time_series_seconds_R_terra.tif')
+netCDF_timeseries_days = join(_root, _subdir, 'netcdf', 'Unevenly_spaced_time_series.nc')
+
 del _subdir, _root, _pklversion
 
 
-# external sensor products
+# external products
 def sensorProductsRoot() -> Optional[str]:
     # - let's have some developer-dependent default locations
     root = None
@@ -279,6 +288,23 @@ def sensorProductsRoot() -> Optional[str]:
     # - check environment variable
     if root is None:
         root = os.environ.get('ENMAPBOX_SENSOR_PRODUCT_ROOT')
+
+    return root
+
+
+def speclibProductsRoot() -> Optional[str]:
+    # - let's have some developer-dependent default locations
+    root = None
+    try:
+        root = {
+            'Andreas@PC-21-0602': r'd:\data\speclibs'
+        }.get(os.getlogin() + '@' + platform.node())
+    except OSError as ex:
+        warnings.warn(f'Exception raised in sensorProductsRoot():\n{ex}')
+
+    # - check environment variable
+    if root is None:
+        root = os.environ.get('ENMAPBOX_SPECLIB_PRODUCT_ROOT')
 
     return root
 
@@ -331,6 +357,10 @@ class SensorProducts(object):
             L2A_MetadataXml = join(
                 L2A, 'ENMAP01-____L2A-DT0000004135_20221005T023547Z_010_V010106_20221014T102749Z-METADATA.XML'
             )
+            L2A_ARD = join(sensorProductsRoot(), 'enmap', 'ard')
+            L2A_ARD_MetadataXml = join(
+                L2A_ARD, 'ENMAP01-____L2A-DT0000071543_20240502T105133Z_003_V010402_20240505T210636Z-METADATA.XML'
+            )
 
         class Landsat(object):  # collection 2 only
 
@@ -379,6 +409,20 @@ class SensorProducts(object):
             LM01_L1 = join(sensorProductsRoot(), 'landsat', 'LM01_L1TP_207023_19750429_20200908_02_T2')
             LM01_L1_MtlTxt = join(LM01_L1, 'LM01_L1TP_207023_19750429_20200908_02_T2_MTL.txt')
 
+        class Planet(object):
+            L1B = join(
+                sensorProductsRoot(), 'planet', 'Valencia_NTIF_1B_psscene_basic_analytic_8b_udm2', 'PSScene',
+                'PSScene_collection.json'
+            )
+            L3A = join(
+                sensorProductsRoot(), 'planet', 'Barnim_Uckermark_COG_3A_psscene_analytic_8b_udm2', 'PSScene',
+                'PSScene_collection.json'
+            )
+            L3B = join(
+                sensorProductsRoot(), 'planet', 'Valencia_psscene_analytic_8b_sr_udm2', 'PSScene',
+                'PSScene_collection.json'
+            )
+
         class Prisma(object):
             L1 = join(sensorProductsRoot(), 'prisma', 'PRS_L1_STD_OFFL_20201107101404_20201107101408_0001.he5')
             L2B = join(sensorProductsRoot(), 'prisma', 'PRS_L2B_STD_20201107101404_20201107101408_0001.he5')
@@ -405,3 +449,12 @@ class SensorProducts(object):
                 sensorProductsRoot(), 'sentinel2', 'S2B_MSIL2A_20211028T102039_N0301_R065_T33UUU_20211028T121942.SAFE'
             )
             S2B_L2A_MsiL1CXml = join(S2B_L2A, 'MTD_MSIL2A.xml')
+
+        class UsgsSplib07(object):
+            folder = join(sensorProductsRoot(), 'usgs_splib07')
+
+
+class SpeclibProducts(object):
+    if speclibProductsRoot() is not None:
+        class UsgsSplib07(object):
+            folder = join(sensorProductsRoot(), 'usgs_splib07')

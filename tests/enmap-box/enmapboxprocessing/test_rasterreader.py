@@ -5,10 +5,10 @@ from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.testcase import TestCase
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import enmap
+from enmapboxtestdata import enmap, r_terra_timeseries_days, r_terra_timeseries_seconds, netCDF_timeseries_days
 from enmapboxtestdata import fraction_polygon_l3
-from qgis.PyQt.QtCore import QDateTime, QSizeF
-from qgis.core import QgsRasterRange, QgsRasterLayer, Qgis, QgsRectangle
+from qgis.PyQt.QtCore import QDateTime, QSizeF, QPoint
+from qgis.core import QgsRasterRange, QgsRasterLayer, Qgis, QgsRectangle, QgsCoordinateReferenceSystem
 
 
 class TestRasterReader(TestCase):
@@ -237,7 +237,14 @@ class TestRasterReader(TestCase):
         reader = RasterReader(enmap)
         self.assertEqual((220, 400), reader.samplingWidthAndHeight(1))
         self.assertEqual((220, 400), reader.samplingWidthAndHeight(1, reader.extent()))
+        extent = QgsRectangle(380952.37, 5808372.35, 380952.37 + 30, 5808372.35 + 30)  # single pixel
+        self.assertEqual((1, 1), reader.samplingWidthAndHeight(1, extent))
         self.assertEqual((8, 14), reader.samplingWidthAndHeight(1, reader.extent(), 100))
+
+    def test_samplingWidthAndHeight_singlePixel(self):
+        reader = RasterReader(enmap)
+        extent = reader.pixelExtent(QPoint(42, 42))
+        self.assertEqual((1, 1), reader.samplingWidthAndHeight(1, extent))
 
     def test_sampleValues(self):
         reader = RasterReader(enmap)
@@ -296,7 +303,7 @@ class TestRasterReader(TestCase):
         writer.setMetadataItem('wavelength', 1000, '', 4)
         writer.setMetadataItem('wavelength_units', 'Nanometers', '', 3)
         writer.setMetadataItem('wavelength_unit', 'Micrometers', '', 4)
-        writer.close()
+        writer.close(stac=True)
         reader = RasterReader(writer.source())
         self.assertEqual('Micrometers', reader.wavelengthUnits(1))  # STAC stores it as Micrometers
         self.assertEqual('Micrometers', reader.wavelengthUnits(2))  # STAC stores it as Micrometers
@@ -430,6 +437,18 @@ class TestRasterReader(TestCase):
         reader = RasterReader(writer.source())
         self.assertEqual(QDateTime(2009, 8, 20, 9, 44, 50), reader.startTime(1))
         self.assertEqual(QDateTime(2009, 8, 20, 9, 44, 50), reader.startTime(2))
+
+    def test_terra_timeseries(self):
+        # .aux.json files created with R-cran terra package
+        reader = RasterReader(r_terra_timeseries_days)
+        self.assertEqual(QDateTime(2015, 7, 4, 0, 0, 0), reader.startTime(1))
+        reader = RasterReader(r_terra_timeseries_seconds)
+        self.assertEqual(QDateTime(2015, 7, 4, 9, 7, 2), reader.startTime(1))
+
+    def test_netCDF_timeseries(self):
+        # NETCDF_DIM_time
+        reader = RasterReader(netCDF_timeseries_days)
+        self.assertEqual(QDateTime(2015, 7, 4, 0, 0, 0), reader.startTime(1))
 
     def test_startTime_bandLevel(self):
         writer = self.rasterFromArray(np.zeros((3, 1, 1)))
@@ -680,3 +699,13 @@ class TestRasterReader(TestCase):
         self.assertFalse(reader.isSpectralRasterLayer())
         self.assertIsNone(reader.wavelength(1))
         self.assertIsNone(reader.wavelengthUnits(1))
+
+    def test_arrayFromBoundingBoxAndSize_withRasterPipe(self):
+        reader = RasterReader(enmap, True, QgsCoordinateReferenceSystem('EPSG:4326'))
+        extent4326 = QgsRectangle(
+            13.24539916899924741, 52.41274014201967901, 13.34677689752254182, 52.52184188795427389
+        )
+        array = reader.arrayFromBoundingBoxAndSize(extent4326, 10, 10, [1])
+        print(array)
+
+        # self.assertTrue(np.all(np.equal(reader.noDataValue(1), lead)))

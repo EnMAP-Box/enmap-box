@@ -55,7 +55,7 @@ class RegressionWorkflowAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterInt(self.P_NFOLD, self._NFOLD, 10, True, 2, 100)
         self.addParameterBoolean(self.P_OPEN_REPORT, self._OPEN_REPORT, True)
         self.addParameterFileDestination(
-            self.P_OUTPUT_REPORT, self._OUTPUT_REPORT, self.ReportFileFilter, None, True, True
+            self.P_OUTPUT_REPORT, self._OUTPUT_REPORT, self.ReportFileFilter, None, True, False
         )
         self.addParameterFileDestination(self.P_OUTPUT_REGRESSOR, self._OUTPUT_REGRESSOR, self.PickleFileFilter)
         self.addParameterRasterDestination(self.P_OUTPUT_REGRESSION, self._OUTPUT_REGRESSION, None, True, True)

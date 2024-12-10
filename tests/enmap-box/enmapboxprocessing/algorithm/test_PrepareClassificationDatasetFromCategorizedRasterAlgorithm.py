@@ -1,16 +1,23 @@
-from enmapboxtestdata import enmap_potsdam
+from enmapbox import initAll
+from enmapbox.testing import start_app
+from enmapboxprocessing.algorithm.libraryfromclassificationdatasetalgorithm import \
+    LibraryFromClassificationDatasetAlgorithm
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedrasteralgorithm import \
     PrepareClassificationDatasetFromCategorizedRasterAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
+from enmapboxtestdata import enmap_potsdam
 from enmapboxtestdata import landcover_polygon_30m, enmap
-from qgis.core import QgsRasterLayer
+from qgis.core import QgsVectorLayer, QgsRasterLayer
 
 
 class TestPrepareClassificationSampleFromCategorizedRaster(TestCase):
 
     def test_styled(self):
+        start_app()
+        initAll()
+
         alg = PrepareClassificationDatasetFromCategorizedRasterAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
@@ -26,6 +33,18 @@ class TestPrepareClassificationSampleFromCategorizedRaster(TestCase):
         self.assertListEqual([1, 2, 3, 4, 5, 6], [c.value for c in dump.categories])
         self.assertListEqual(
             ['roof', 'pavement', 'low vegetation', 'tree', 'soil', 'water'], [c.name for c in dump.categories]
+        )
+
+        # check locations
+        alg = LibraryFromClassificationDatasetAlgorithm()
+        parameters = {
+            alg.P_DATASET: self.filename('sample.pkl'),
+            alg.P_OUTPUT_LIBRARY: self.filename('library.gpkg')
+        }
+        self.runalg(alg, parameters)
+        self.assertEqual(
+            383997,
+            round(QgsVectorLayer(self.filename('library.gpkg')).getFeatures().__next__().geometry().asPoint().x())
         )
 
     def test_byBand(self):

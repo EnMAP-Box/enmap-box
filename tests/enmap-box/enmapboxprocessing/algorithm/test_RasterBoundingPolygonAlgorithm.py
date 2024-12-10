@@ -10,6 +10,7 @@ class TestRasterBoundingPolygonAlgorithm(TestCase):
         alg = RasterBoundingPolygonAlgorithm()
         parameters = {
             alg.P_RASTER: enmap_potsdam,
+            alg.P_BAND: 1,
             alg.P_OUTPUT_VECTOR: self.filename('polygon.gpkg')
         }
         self.runalg(alg, parameters)

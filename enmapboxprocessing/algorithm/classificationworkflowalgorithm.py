@@ -1,12 +1,17 @@
 from typing import Dict, Any, List, Tuple
 
+from enmapbox.typeguard import typechecked
+from enmapboxprocessing.algorithm.classificationperformancestratifiedalgorithm import \
+    ClassificationPerformanceStratifiedAlgorithm
 from enmapboxprocessing.algorithm.classifierperformancealgorithm import ClassifierPerformanceAlgorithm
 from enmapboxprocessing.algorithm.fitgenericclassifieralgorithm import FitGenericClassifierAlgorithm
+from enmapboxprocessing.algorithm.libraryfromclassificationdatasetalgorithm import \
+    LibraryFromClassificationDatasetAlgorithm
 from enmapboxprocessing.algorithm.predictclassificationalgorithm import PredictClassificationAlgorithm
 from enmapboxprocessing.algorithm.predictclassprobabilityalgorithm import PredictClassPropabilityAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
-from enmapbox.typeguard import typechecked
+from enmapboxprocessing.utils import Utils
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer
 
 
 @typechecked
@@ -21,6 +26,7 @@ class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
     P_OUTPUT_CLASSIFICATION, _OUTPUT_CLASSIFICATION = 'outputClassification', 'Output classification layer'
     P_OUTPUT_PROBABILITY, _OUTPUT_PROBABILITY = 'outputProbability', 'Output class probability layer'
     P_OUTPUT_REPORT, _OUTPUT_REPORT = 'outputClassifierPerformance', 'Output classifier performance report'
+    P_OUTPUT_REPORT2, _OUTPUT_REPORT2 = 'outputClassificationAccuracy', 'Output classification accuracy and area report'
 
     def displayName(self) -> str:
         return 'Classification workflow'
@@ -34,12 +40,17 @@ class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
             (self._CLASSIFIER, 'Scikit-Learn Python code specifying a classifier.'),
             (self._RASTER, 'A raster layer used for prediction.'),
             (self._MATCH_BY_NAME, 'Whether to match raster bands and classifier features by name.'),
-            (self._NFOLD, 'The number of folds used for assessing cross-validation performance.'),
+            (self._NFOLD, 'The number of folds (n>=2) used for assessing cross-validation performance.\n'
+                          'If not specified, simple training performance is assessed.\n'
+                          'If set to a value of 1, out-of-bag (OOB) performance is assessed. '
+                          'Note that OOB estimates are only supported by some classifiers, '
+                          'e.g. the Random Forest Classifier.'),
             (self._OPEN_REPORT, self.ReportOpen),
             (self._OUTPUT_CLASSIFIER, self.PickleFileDestination),
             (self._OUTPUT_CLASSIFICATION, self.RasterFileDestination),
             (self._OUTPUT_PROBABILITY, self.RasterFileDestination),
-            (self._OUTPUT_REPORT, self.ReportFileDestination)
+            (self._OUTPUT_REPORT, self.ReportFileDestination),
+            (self._OUTPUT_REPORT2, self.ReportFileDestination)
         ]
 
     def group(self):
@@ -50,13 +61,16 @@ class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterClassifierCode(self.P_CLASSIFIER, self._CLASSIFIER)
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER, None, True)
         self.addParameterBoolean(self.P_MATCH_BY_NAME, self._MATCH_BY_NAME, False, True, True)
-        self.addParameterInt(self.P_NFOLD, self._NFOLD, 10, True, 2, 100, True)
+        self.addParameterInt(self.P_NFOLD, self._NFOLD, 10, True, 1, 100, True)
         self.addParameterBoolean(self.P_OPEN_REPORT, self._OPEN_REPORT, True, True, True)
         self.addParameterFileDestination(self.P_OUTPUT_CLASSIFIER, self._OUTPUT_CLASSIFIER, self.PickleFileFilter)
         self.addParameterRasterDestination(self.P_OUTPUT_CLASSIFICATION, self._OUTPUT_CLASSIFICATION, None, True, True)
         self.addParameterRasterDestination(self.P_OUTPUT_PROBABILITY, self._OUTPUT_PROBABILITY, None, True, False)
         self.addParameterFileDestination(
             self.P_OUTPUT_REPORT, self._OUTPUT_REPORT, self.ReportFileFilter, None, True, False
+        )
+        self.addParameterFileDestination(
+            self.P_OUTPUT_REPORT2, self._OUTPUT_REPORT2, self.ReportFileFilter, None, True, False
         )
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
@@ -81,6 +95,7 @@ class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
         filenameClassification = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_CLASSIFICATION, context)
         filenameProbability = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_PROBABILITY, context)
         filenameReport = self.parameterAsFileOutput(parameters, self.P_OUTPUT_REPORT, context)
+        filenameReport2 = self.parameterAsFileOutput(parameters, self.P_OUTPUT_REPORT2, context)
 
         with open(filenameClassifier + '.log', 'w') as logfile:
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
@@ -132,11 +147,33 @@ class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
                 }
                 self.runAlg(alg, parameters, None, feedback2, context, True)
 
+            # classification accuracy and area estimation (see #912)
+            if filenameReport2 is not None:
+                assert filenameClassification is not None
+                filenameReference = Utils().tmpFilename(filenameReport2, 'reference.gpkg')
+                alg = LibraryFromClassificationDatasetAlgorithm()
+                parameters = {
+                    alg.P_DATASET: filenameDataset,
+                    alg.P_OUTPUT_LIBRARY: filenameReference
+                }
+                self.runAlg(alg, parameters)
+
+                alg = ClassificationPerformanceStratifiedAlgorithm()
+                parameters = {
+                    alg.P_CLASSIFICATION: filenameClassification,
+                    alg.P_REFERENCE: QgsVectorLayer(filenameReference),
+                    alg.P_STRATIFICATION: filenameClassification,
+                    alg.P_OPEN_REPORT: openReport,
+                    alg.P_OUTPUT_REPORT: filenameReport2
+                }
+                self.runAlg(alg, parameters, None, feedback2, context, True)
+
             result = {
                 self.P_OUTPUT_CLASSIFIER: filenameClassifier,
                 self.P_OUTPUT_CLASSIFICATION: filenameClassification,
                 self.P_OUTPUT_PROBABILITY: filenameProbability,
                 self.P_OUTPUT_REPORT: filenameReport,
+                self.P_OUTPUT_REPORT2: filenameReport2
             }
             self.toc(feedback, result)
 

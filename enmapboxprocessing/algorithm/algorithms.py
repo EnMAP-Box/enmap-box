@@ -1,4 +1,5 @@
 from enmapboxprocessing.algorithm.aggregaterasterbandsalgorithm import AggregateRasterBandsAlgorithm
+from enmapboxprocessing.algorithm.aggregaterastersalgorithm import AggregateRastersAlgorithm
 from enmapboxprocessing.algorithm.applymaskalgorithm import ApplyMaskAlgorithm
 from enmapboxprocessing.algorithm.build3dcubealgorithm import Build3dCubeAlgorithm
 from enmapboxprocessing.algorithm.classfractionfromcategorizedlayeralgorithm import \
@@ -45,7 +46,7 @@ from enmapboxprocessing.algorithm.fitlgbmclassifieralgorithm import FitLGBMClass
 from enmapboxprocessing.algorithm.fitlgbmregressoralgorithm import FitLGBMRegressorAlgorithm
 from enmapboxprocessing.algorithm.fitlinearregressionalgorithm import FitLinearRegressionAlgorithm
 from enmapboxprocessing.algorithm.fitlinearsvcalgorithm import FitLinearSvcAlgorithm
-from enmapboxprocessing.algorithm.fitlinearsvralgorithm import FitLinearSVRAlgorithm
+from enmapboxprocessing.algorithm.fitlinearsvralgorithm import FitLinearSvrAlgorithm
 from enmapboxprocessing.algorithm.fitlogisticregressionralgorithm import FitLogisticRegressionAlgorithm
 from enmapboxprocessing.algorithm.fitmaxabsscaleralgorithm import FitMaxAbsScalerAlgorithm
 from enmapboxprocessing.algorithm.fitmeanshiftalgorithm import FitMeanShiftAlgorithm
@@ -76,13 +77,19 @@ from enmapboxprocessing.algorithm.importenmapl1balgorithm import ImportEnmapL1BA
 from enmapboxprocessing.algorithm.importenmapl1calgorithm import ImportEnmapL1CAlgorithm
 from enmapboxprocessing.algorithm.importenmapl2aalgorithm import ImportEnmapL2AAlgorithm
 from enmapboxprocessing.algorithm.importlandsatl2algorithm import ImportLandsatL2Algorithm
+from enmapboxprocessing.algorithm.importplanetscopealgorithm import ImportPlanetScopeAlgorithm
 from enmapboxprocessing.algorithm.importprismal1algorithm import ImportPrismaL1Algorithm
 from enmapboxprocessing.algorithm.importprismal2balgorithm import ImportPrismaL2BAlgorithm
 from enmapboxprocessing.algorithm.importprismal2calgorithm import ImportPrismaL2CAlgorithm
 from enmapboxprocessing.algorithm.importprismal2dalgorithm import ImportPrismaL2DAlgorithm
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
+from enmapboxprocessing.algorithm.importusgsspeclib07algorithm import ImportUsgsSpeclib07Algorithm
 from enmapboxprocessing.algorithm.inversetransformrasteralgorithm import InverseTransformRasterAlgorithm
+from enmapboxprocessing.algorithm.landcoverchangestatisticsalgorithm import LandCoverChangeStatisticsAlgorithm
 from enmapboxprocessing.algorithm.layertomaskalgorithm import LayerToMaskAlgorithm
+from enmapboxprocessing.algorithm.libraryfromclassificationdatasetalgorithm import \
+    LibraryFromClassificationDatasetAlgorithm
+from enmapboxprocessing.algorithm.libraryfromregressiondatasetalgorithm import LibraryFromRegressionDatasetAlgorithm
 from enmapboxprocessing.algorithm.mergeclassificationdatasetalgorithm import MergeClassificationDatasetsAlgorithm
 from enmapboxprocessing.algorithm.predictclassificationalgorithm import PredictClassificationAlgorithm
 from enmapboxprocessing.algorithm.predictclassprobabilityalgorithm import PredictClassPropabilityAlgorithm
@@ -221,6 +228,7 @@ from enmapboxprocessing.algorithm.spectralresamplingbywavelengthandfwhmalgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtocustomsensoralgorithm import \
     SpectralResamplingToCustomSensorAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtodesisalgorithm import SpectralResamplingToDesisAlgorithm
+from enmapboxprocessing.algorithm.spectralresamplingtoemitalgorithm import SpectralResamplingToEmitAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtoenmapalgorithm import SpectralResamplingToEnmapAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtolandsatalgorithm import SpectralResamplingToLandsatTmAlgorithm, \
     SpectralResamplingToLandsatEtmAlgorithm, SpectralResamplingToLandsatOliAlgorithm
@@ -229,6 +237,7 @@ from enmapboxprocessing.algorithm.spectralresamplingtosentinel2algorithm import 
     SpectralResamplingToSentinel2bAlgorithm
 from enmapboxprocessing.algorithm.stackrasterlayersalgorithm import StackRasterLayersAlgorithm
 from enmapboxprocessing.algorithm.subsetrasterbandsalgorithm import SubsetRasterBandsAlgorithm
+from enmapboxprocessing.algorithm.tilerasteralgorithm import TileRasterAlgorithm
 from enmapboxprocessing.algorithm.transformrasteralgorithm import TransformRasterAlgorithm
 from enmapboxprocessing.algorithm.translatecategorizedrasteralgorithm import TranslateCategorizedRasterAlgorithm
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
@@ -239,6 +248,7 @@ from enmapboxprocessing.algorithm.writeenviheaderalgorithm import WriteEnviHeade
 def algorithms():
     algos = [
         AggregateRasterBandsAlgorithm(),
+        AggregateRastersAlgorithm(),
         ApplyMaskAlgorithm(),
         Build3dCubeAlgorithm(),
         ClassFractionFromCategorizedLayerAlgorithm(),
@@ -281,7 +291,7 @@ def algorithms():
         FitGaussianProcessRegressorAlgorithm(),
         FitLinearRegressionAlgorithm(),
         FitKernelRidgeAlgorithm(),
-        FitLinearSVRAlgorithm(),
+        FitLinearSvrAlgorithm(),
         FitPLSRegressionAlgorithm(),
         FitPcaAlgorithm(),
         FitFastIcaAlgorithm(),
@@ -308,13 +318,18 @@ def algorithms():
         ImportEnmapL1CAlgorithm(),
         ImportEnmapL2AAlgorithm(),
         ImportLandsatL2Algorithm(),
+        ImportPlanetScopeAlgorithm(),
         ImportPrismaL1Algorithm(),
         ImportPrismaL2BAlgorithm(),
         ImportPrismaL2CAlgorithm(),
         ImportPrismaL2DAlgorithm(),
         ImportSentinel2L2AAlgorithm(),
+        ImportUsgsSpeclib07Algorithm(),
         InverseTransformRasterAlgorithm(),
+        LandCoverChangeStatisticsAlgorithm(),
         LayerToMaskAlgorithm(),
+        LibraryFromClassificationDatasetAlgorithm(),
+        LibraryFromRegressionDatasetAlgorithm(),
         MergeClassificationDatasetsAlgorithm(),
         PredictClassificationAlgorithm(),
         PredictClassPropabilityAlgorithm(),
@@ -406,6 +421,7 @@ def algorithms():
         SpectralResamplingByWavelengthAlgorithm(),
         SpectralResamplingToCustomSensorAlgorithm(),
         SpectralResamplingToDesisAlgorithm(),
+        SpectralResamplingToEmitAlgorithm(),
         SpectralResamplingToEnmapAlgorithm(),
         SpectralResamplingToLandsatTmAlgorithm(),
         SpectralResamplingToLandsatEtmAlgorithm(),
@@ -416,6 +432,7 @@ def algorithms():
         StackRasterLayersAlgorithm(),
         SubsetRasterBandsAlgorithm(),
         PrepareRegressionDatasetFromSynthMixAlgorithm(),
+        TileRasterAlgorithm(),
         TranslateCategorizedRasterAlgorithm(),
         TranslateRasterAlgorithm(),
         TransformRasterAlgorithm(),

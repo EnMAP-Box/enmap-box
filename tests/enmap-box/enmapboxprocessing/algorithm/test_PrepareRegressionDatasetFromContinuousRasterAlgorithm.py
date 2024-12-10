@@ -1,12 +1,14 @@
-from enmapboxtestdata import enmap_potsdam
+from enmapbox import initAll
+from enmapbox.testing import start_app
+from enmapboxprocessing.algorithm.libraryfromregressiondatasetalgorithm import LibraryFromRegressionDatasetAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousrasteralgorithm import \
     PrepareRegressionDatasetFromContinuousRasterAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
+from enmapboxtestdata import enmap_potsdam
 from enmapboxtestdata import fraction_polygon_l3, enmap
-
-from enmapbox.testing import start_app
+from qgis.core import QgsVectorLayer
 
 start_app()
 
@@ -14,6 +16,9 @@ start_app()
 class TestPrepareRegressionDatasetFromContinuousRasterAlgorithm(TestCase):
 
     def test(self):
+        start_app()
+        initAll()
+
         alg = PrepareRegressionDatasetFromContinuousRasterAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
@@ -33,6 +38,19 @@ class TestPrepareRegressionDatasetFromContinuousRasterAlgorithm(TestCase):
         self.assertListEqual(
             ['#e60000', '#9c9c9c', '#98e600', '#267300', '#a87000', '#0064ff'],
             [t.color for t in dump.targets]
+        )
+
+        # check locations
+        filename = self.filename('library.gpkg')
+        alg = LibraryFromRegressionDatasetAlgorithm()
+        parameters = {
+            alg.P_DATASET: self.filename('sample.pkl'),
+            alg.P_OUTPUT_LIBRARY: filename
+        }
+        self.runalg(alg, parameters)
+        self.assertEqual(
+            384147,
+            round(QgsVectorLayer(filename).getFeatures().__next__().geometry().asPoint().x())
         )
 
     def test_excludeBadBands(self):
