@@ -47,7 +47,7 @@ jobs:
           echo "conda environment file: ${{matrix.mamba_env}}.yml"
           cat .env/conda/${{matrix.mamba_env}}.yml
 
-      - name: Setup Mambaforge
+      - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
           # miniforge-variant: Mambaforge
@@ -59,10 +59,10 @@ jobs:
           clean-patched-environment-file: false
           # use-mamba: true
           # auto-activate-base: false
-      - name: Mamba Environment Info
+      - name: Conda Environment Info
         run: |
-          mamba info
-          mamba list
+          conda info
+          conda list
 
       - name: Python and QGIS versions
         run: |
