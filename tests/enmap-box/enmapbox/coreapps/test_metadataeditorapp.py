@@ -27,9 +27,9 @@ from enmapbox import initPythonPaths
 from enmapbox.exampledata import enmap
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
+from enmapbox.testing import start_app
 from metadataeditorapp.metadataeditor import MetadataEditorDialog
 from qgis.core import QgsRasterLayer, QgsVectorLayer, QgsProject
-from enmapbox.testing import start_app
 
 start_app()
 
@@ -76,19 +76,16 @@ class MetadataEditorTests(EnMAPBoxTestCase):
         self.showGui(d)
 
     def test_speed(self):
-        from enmapbox.exampledata import enmap
-
         lyr = QgsRasterLayer(enmap, 'EnMAP')
 
         d = MetadataEditorDialog()
         self.assertIsInstance(d, MetadataEditorDialog)
         d.show()
-        QgsProject.instance().addMapLayer(lyr)
 
         t0 = datetime.datetime.now()
-        # d.setLayer(lyr)
+        d.setLayer(lyr)
         dt = datetime.datetime.now() - t0
-
+        self.assertTrue(dt.seconds < 1)
         self.showGui(d)
 
         QgsProject.instance().removeAllMapLayers()
