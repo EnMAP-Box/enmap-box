@@ -1,12 +1,34 @@
+import subprocess
+import os
+import unittest
+
 from enmapboxprocessing.algorithm.rasterboundingpolygonalgorithm import RasterBoundingPolygonAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import enmap_potsdam
 from qgis.core import QgsVectorLayer
 
+# see https://github.com/conda-forge/qgis-feedstock/issues/487
+SKIP_POLYGONIZE_TEST = False
+if os.name == 'nt':
+    try:
+        process = subprocess.run(['where', 'gdal_polygonize'],
+                                 check=True,
+                                 shell=True,
+                                 text=True,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE,
+                                 universal_newlines=True)
+        output = str(process.stdout)
+        SKIP_POLYGONIZE_TEST = 'gdal_polygonize.bat' not in output
+    except subprocess.CalledProcessError as ex:
+        pass
+
 
 class TestRasterBoundingPolygonAlgorithm(TestCase):
 
-    def test(self):
+    @unittest.skipIf(SKIP_POLYGONIZE_TEST,
+                     'Skipped because https://github.com/conda-forge/qgis-feedstock/issues/487')
+    def test_RasterBoundingPolygonAlgorithm(self):
         alg = RasterBoundingPolygonAlgorithm()
         parameters = {
             alg.P_RASTER: enmap_potsdam,
