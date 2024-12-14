@@ -8,7 +8,9 @@ catboost # required by CatBoost classifier/regressor, see #960
 docutils
 
 # required by parts of EnMAP-Box Applications
+scipy>=1.13.0
 sympy # required by EnSoMAP
 numba # >=0.57 # required by EnSoMAP
 enpt-enmapboxapp # required by EnPT
 scikit-learn>=1.0
+
