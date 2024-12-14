@@ -1,4 +1,5 @@
 # EnMAP-Box conda environment
+# generated with scripts/update_conda_environemts.py (MANUAL CHANGES WILL BE OVERWRITTEN!) 
 # run to install: conda env create -n enmapbox_full_longterm --file enmapbox_full_longterm.yml
 # run to update : conda env update -n enmapbox_full_longterm --file enmapbox_full_longterm.yml --prune
 # run to delete : conda env remove -n enmapbox_full_longterm
@@ -17,7 +18,7 @@ dependencies:
 - flake8
 - git-lfs
 - gitpython
-- h5py
+- hy5py
 - lightgbm
 - matplotlib
 - netcdf4
