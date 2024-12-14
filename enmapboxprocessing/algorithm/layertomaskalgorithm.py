@@ -1,12 +1,12 @@
-from typing import Tuple, List, Dict, Any
+from typing import Any, Dict, List, Tuple
 
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.driver import Driver
-from enmapboxprocessing.enmapalgorithm import Group, EnMAPProcessingAlgorithm
+from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessingException, \
+from qgis.core import QgsProcessingContext, QgsProcessingException, QgsProcessingFeedback, QgsRasterLayer, \
     QgsVectorLayer
 from enmapbox.typeguard import typechecked
 
@@ -24,7 +24,7 @@ class LayerToMaskAlgorithm(EnMAPProcessingAlgorithm):
         return Group.Masking.value
 
     def shortDescription(self) -> str:
-        return 'Interprete a layer as a mask layer.'
+        return 'Interpret a layer as a mask layer.'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
