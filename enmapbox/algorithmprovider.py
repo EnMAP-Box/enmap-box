@@ -20,11 +20,13 @@
 import os
 import pathlib
 import site
+from typing import Optional
 
+from qgis.core import QgsApplication, QgsProcessingAlgorithm, QgsProcessingProvider, QgsProcessingRegistry, \
+    QgsRuntimeProfiler
 import qgis
 from enmapbox import __version__
 from qgis.PyQt.QtGui import QIcon
-from qgis.core import QgsProcessingProvider, QgsProcessingAlgorithm, QgsApplication, QgsRuntimeProfiler
 
 try:
     from processing.core.ProcessingConfig import ProcessingConfig, Setting
@@ -50,29 +52,28 @@ class EnMAPBoxProcessingProvider(QgsProcessingProvider):
     It enhances the "standard" processing.core.AlgorithmProvider by functionality to add and remove GeoAlgorithms during runtime.
     """
 
-    _ENMAPBOX_PROCESSING_PROVIDER = None
+    _ENMAPBOX_PROCESSING_PROVIDER: Optional['EnMAPBoxProcessingProvider'] = None
 
-    @staticmethod
-    def instance() -> 'EnMAPBoxProcessingProvider':
-
-        if EnMAPBoxProcessingProvider._ENMAPBOX_PROCESSING_PROVIDER is None:
-            EnMAPBoxProcessingProvider._ENMAPBOX_PROCESSING_PROVIDER = EnMAPBoxProcessingProvider()
-        return EnMAPBoxProcessingProvider._ENMAPBOX_PROCESSING_PROVIDER
+    @classmethod
+    def instance(cls) -> Optional['EnMAPBoxProcessingProvider']:
+        """
+        Returns the EnMAPBoProcessingProvider instance that is used by the
+        QgsProcessingRegistry
+        :return: EnMAPBoxProcessingProvider
+        """
+        reg: QgsProcessingRegistry = QgsApplication.instance().processingRegistry()
+        provider = reg.providerById(ID)
+        if isinstance(provider, EnMAPBoxProcessingProvider):
+            return provider
+        return None
 
     def __init__(self):
         super(EnMAPBoxProcessingProvider, self).__init__()
-        # internal list of GeoAlgorithms. Is used on re-loads and can be manipulated
         self.mAlgorithms = []
         self.mSettingsPrefix = self.id().upper().replace(' ', '_')
 
-        # try:
-        #    import _classic.hubflow.signals
-        #    _classic.hubflow.signals.sigFileCreated.connect(self.onHubFlowFileCreated)
-        # except Exception as ex:
-        #    messageLog(ex)
-
     def load(self):
-        with QgsRuntimeProfiler.profile('OTB Provider'):
+        with QgsRuntimeProfiler.profile('EnMAP-Box'):
             group = self.name()
             ProcessingConfig.settingIcons[group] = self.icon()
             ProcessingConfig.addSetting(

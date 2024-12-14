@@ -34,9 +34,10 @@ import typing
 import warnings
 
 from osgeo import gdal
+
 from qgis.PyQt.QtCore import QSettings
 from qgis.PyQt.QtGui import QIcon
-from qgis.core import Qgis, QgsApplication, QgsProcessingAlgorithm, QgsProcessingProvider, QgsProcessingRegistry
+from qgis.core import Qgis, QgsApplication, QgsProcessingAlgorithm, QgsProcessingRegistry
 from qgis.gui import QgisInterface, QgsMapLayerConfigWidgetFactory
 
 # provide shortcuts
@@ -258,10 +259,12 @@ def registerEnMAPBoxProcessingProvider():
 
     registry = QgsApplication.instance().processingRegistry()
     assert isinstance(registry, QgsProcessingRegistry)
-    provider = registry.providerById(ID)
-    if not isinstance(provider, QgsProcessingProvider):
-        provider = EnMAPBoxProcessingProvider.instance()
+    provider = EnMAPBoxProcessingProvider.instance()
+    if not isinstance(provider, EnMAPBoxProcessingProvider):
+        provider = EnMAPBoxProcessingProvider()
         registry.addProvider(provider)
+        # keep an instance
+        EnMAPBoxProcessingProvider._ENMAPBOX_PROCESSING_PROVIDER = provider
 
     assert isinstance(provider, EnMAPBoxProcessingProvider)
     assert id(registry.providerById(ID)) == id(provider)

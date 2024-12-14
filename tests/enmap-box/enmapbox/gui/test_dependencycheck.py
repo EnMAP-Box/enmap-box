@@ -20,15 +20,14 @@ import uuid
 from time import sleep
 from typing import List, Tuple
 
-from enmapbox.dependencycheck import PIPPackage, requiredPackages, PIPPackageInstaller, PIPPackageInfoTask, \
-    localPythonExecutable, missingPackageInfo, checkGDALIssues, PIPPackageInstallerTableModel, \
-    call_pip_command, localPipExecutable
+from enmapbox.dependencycheck import call_pip_command, checkGDALIssues, localPipExecutable, localPythonExecutable, \
+    missingPackageInfo, PIPPackage, PIPPackageInfoTask, PIPPackageInstaller, PIPPackageInstallerTableModel, \
+    requiredPackages
 from enmapbox.testing import EnMAPBoxTestCase, start_app
 from qgis.PyQt.QtCore import QProcess
 from qgis.PyQt.QtGui import QMovie
-from qgis.PyQt.QtWidgets import QApplication, QTableView, QLabel
-from qgis.core import Qgis, QgsTaskManager, QgsTask
-from qgis.core import QgsApplication
+from qgis.PyQt.QtWidgets import QApplication, QLabel, QTableView
+from qgis.core import Qgis, QgsApplication, QgsTask, QgsTaskManager
 
 start_app()
 
@@ -104,6 +103,7 @@ class test_dependencycheck(EnMAPBoxTestCase):
         s = str(uuid.uuid4())
         return 'foobar' + s
 
+    @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'Skipped, would take too long')
     def test_PIPInstallerTableModel(self):
 
         model = PIPPackageInstallerTableModel()

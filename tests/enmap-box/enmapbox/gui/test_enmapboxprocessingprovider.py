@@ -1,32 +1,22 @@
 import sys
 import unittest
 
-from qgis.core import QgsApplication, QgsProcessingRegistry, QgsProcessingAlgorithm, QgsProcessingProvider
+from qgis.core import QgsApplication, QgsProcessingAlgorithm, QgsProcessingProvider, QgsProcessingRegistry
+from enmapbox.testing import start_app, TestCase, TestObjects
+from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
+from qgis.PyQt import sip
 
-from enmapbox.testing import TestCase, TestObjects
+start_app()
 
 
 class ProcessingProviderTests(TestCase):
 
-    def setUp(self):
-        reg = QgsApplication.instance().processingRegistry()
-        to_Remove = []
-        from enmapbox.algorithmprovider import ID
-        for p in reg.providers():
-            if p.id() == ID:
-                to_Remove.append(p)
-        for p in to_Remove:
-            reg.removeProvider(p)
-
     def test_processing_provider(self):
 
-        from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
         reg = QgsApplication.instance().processingRegistry()
 
-        pNames = [p.name() for p in reg.providers()]
         provider = EnMAPBoxProcessingProvider()
-        self._p = provider
-        pNames2 = [p.name() for p in reg.providers()]
+
         self.assertIsInstance(provider, QgsProcessingProvider)
         self.assertTrue(len(provider.algorithms()) == 0)
 
@@ -46,7 +36,11 @@ class ProcessingProviderTests(TestCase):
         self.assertTrue(alg in provider.algorithms())
         self.assertTrue(alg in reg.algorithms())
 
+        self.assertFalse(sip.isdeleted(provider))
         reg.removeProvider(provider)
+        QgsApplication.processEvents()
+        self.assertTrue(sip.isdeleted(provider))
+
         self.assertTrue(provider not in reg.providers())
         self.assertTrue(alg not in reg.algorithms())
 

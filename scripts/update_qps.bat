@@ -4,7 +4,8 @@ echo "Update %SUBMODULE%"
 cd %SUBMODULE%
 git checkout master
 git fetch
-git pull
+git pull --recurse-submodules
+git submodule update --init --recursive
 cd ../..
 git add %SUBMODULE%
 echo 'Submodule status:'
