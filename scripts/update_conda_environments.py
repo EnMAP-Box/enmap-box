@@ -106,6 +106,7 @@ def update_yaml(dir_yaml, branch, version, full: bool = False):
     path_yml = dir_yaml / f'{name}.yml'
 
     header = f"""# EnMAP-Box conda environment
+# generated with scripts/update_conda_environemts.py (MANUAL CHANGES WILL BE OVERWRITTEN!)
 # run to install: conda env create -n {name} --file {path_yml.name}
 # run to update : conda env update -n {name} --file {path_yml.name} --prune
 # run to delete : conda env remove -n {name}
