@@ -1,4 +1,5 @@
 # EnMAP-Box conda environment
+# generated with scripts/update_conda_environemts.py (MANUAL CHANGES WILL BE OVERWRITTEN!) 
 # run to install: conda env create -n enmapbox_full_3.40 --file enmapbox_full_3.40.yml
 # run to update : conda env update -n enmapbox_full_3.40 --file enmapbox_full_3.40.yml --prune
 # run to delete : conda env remove -n enmapbox_full_3.40
