@@ -16,7 +16,6 @@ dependencies:
 - docutils
 - enpt
 - flake8
-- gdal<=3.9
 - git-lfs
 - gitpython
 - hy5py
