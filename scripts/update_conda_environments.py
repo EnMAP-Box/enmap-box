@@ -20,7 +20,8 @@ BRANCH_NAME_LOOKUP = {
 }
 
 DEPENDENCIES = {
-    'light': ['pip', 'scikit-learn>=1', 'matplotlib', 'enpt', 'gdal<=3.9'],
+    # define dependencies as: [<conda package name> | {<'conda'|'pip'>:<package name>, ...}, ...]
+    'light': ['pip', 'scikit-learn>=1', 'matplotlib', 'enpt'],
     'full': [{'conda': 'enpt', 'pip': 'enpt-enmapboxapp'}, 'xgboost', 'lightgbm', 'cdsapi', 'cython', 'netcdf4',
              'pygrib',
              'pyhdf', 'xarray', 'astropy', 'catboost', 'matplotlib', 'astropy', 'numba>=0.56.4',
