@@ -29,7 +29,7 @@ class TestAggregateRasterBandsAlgorithm(TestCase):
                 AggregateRasterBandsAlgorithm().MaximumFunction
             ],
             alg.P_OUTPUT_BASENAME: 'aggregation.{function}.tif',  # write function-wise by using the {...} pattern
-            alg.P_OUTPUT_FOLDER: self.testOutputFolder()
+            alg.P_OUTPUT_FOLDER: self.createTestOutputFolder()
         }
         self.runalg(alg, parameters)
         reader = RasterReader(join(parameters[alg.P_OUTPUT_FOLDER], 'aggregation.minimum.tif'))
@@ -61,7 +61,7 @@ class TestAggregateRasterBandsAlgorithm(TestCase):
                 AggregateRasterBandsAlgorithm().MaximumFunction
             ],
             alg.P_OUTPUT_BASENAME: 'aggregation.tif',  # write all in one file
-            alg.P_OUTPUT_FOLDER: self.testOutputFolder()
+            alg.P_OUTPUT_FOLDER: self.createTestOutputFolder()
         }
         self.runalg(alg, parameters)
         reader = RasterReader(join(parameters[alg.P_OUTPUT_FOLDER], 'aggregation.tif'))
@@ -96,7 +96,7 @@ class TestAggregateRasterBandsAlgorithm(TestCase):
             ],
             alg.P_BANDWISE: False,
             alg.P_OUTPUT_BASENAME: 'aggregation.{function}.tif',  # write function-wise by using the {...} pattern
-            alg.P_OUTPUT_FOLDER: self.testOutputFolder()
+            alg.P_OUTPUT_FOLDER: self.createTestOutputFolder()
         }
         self.runalg(alg, parameters)
         reader = RasterReader(join(parameters[alg.P_OUTPUT_FOLDER], 'aggregation.minimum.tif'))
@@ -132,7 +132,7 @@ class TestAggregateRasterBandsAlgorithm(TestCase):
             ],
             alg.P_BANDWISE: False,
             alg.P_OUTPUT_BASENAME: 'aggregation.tif',  # write all in one file
-            alg.P_OUTPUT_FOLDER: self.testOutputFolder()
+            alg.P_OUTPUT_FOLDER: self.createTestOutputFolder()
         }
         self.runalg(alg, parameters)
         reader = RasterReader(join(parameters[alg.P_OUTPUT_FOLDER], 'aggregation.tif'))
