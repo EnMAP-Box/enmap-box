@@ -1,8 +1,8 @@
 from qgis.core import QgsCoordinateReferenceSystem, QgsGeometry, QgsMapLayer, QgsPointXY, QgsProcessingException, \
     QgsVectorLayer
 
-from enmapbox.testing import start_app
 from enmapbox import initAll
+from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedlibraryalgorithm import \
     PrepareClassificationDatasetFromCategorizedLibraryAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
