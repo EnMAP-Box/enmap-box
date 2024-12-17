@@ -27,7 +27,7 @@ jobs:
       CI: true
 
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         mamba_env: [ enmapbox_light_latest, enmapbox_light_longterm ]
       # python_version : [3.9, 3.10, 3.11]
