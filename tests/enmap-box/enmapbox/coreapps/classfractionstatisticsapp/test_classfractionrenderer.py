@@ -1,14 +1,17 @@
+import numpy as np
 from qgis.PyQt.QtGui import QColor
+from qgis.core import QgsRasterLayer, Qgis
 
 from classfractionstatisticsapp.classfractionrenderer import ClassFractionRenderer
-from qgis.core import QgsRasterLayer, Qgis
-import numpy as np
-
-
+from enmapbox import initAll
+from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import landcover_map_l3
 from enmapboxtestdata import fraction_map_l3
+from enmapboxtestdata import landcover_map_l3
+
+start_app()
+initAll()
 
 
 class TestClassFractionRenderer(TestCase):

@@ -1,7 +1,5 @@
 from sklearn.base import ClassifierMixin
 
-from enmapbox import initAll
-from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.classificationworkflowalgorithm import ClassificationWorkflowAlgorithm
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedvectoralgorithm import \
@@ -99,9 +97,6 @@ class TestClassificationWorkflowAlgorithm(TestCase):
         self.runalg(alg2, parameters2)
 
     def test_areaEstimates(self):
-        start_app()
-        initAll()
-
         alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,

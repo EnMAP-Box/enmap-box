@@ -1,4 +1,3 @@
-from enmapbox import initAll
 from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedlibraryalgorithm import \
     PrepareClassificationDatasetFromCategorizedLibraryAlgorithm
@@ -9,6 +8,17 @@ from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import library_gpkg, libraryWithBadBands
 from qgis.core import QgsPointXY, QgsGeometry, QgsVectorLayer, QgsMapLayer, QgsCoordinateReferenceSystem, \
     QgsProcessingException
+from qgis.core import QgsPointXY, QgsGeometry, QgsVectorLayer, QgsMapLayer, QgsCoordinateReferenceSystem, \
+    QgsProcessingException
+
+from enmapbox.testing import start_app
+from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedlibraryalgorithm import \
+    PrepareClassificationDatasetFromCategorizedLibraryAlgorithm
+from enmapboxprocessing.algorithm.testcase import TestCase
+from enmapboxprocessing.librarydriver import LibraryDriver
+from enmapboxprocessing.typing import ClassifierDump, Category
+from enmapboxprocessing.utils import Utils
+from enmapboxtestdata import library_gpkg, libraryWithBadBands
 
 start_app()
 
@@ -92,8 +102,6 @@ class TestPrepareClassificationDatasetFromCategorizedLibrary(TestCase):
         self.assertEqual(4, len(dump.features))
 
     def test_locations(self):
-        start_app()
-        initAll()
 
         # create datagit
         values = {'profiles': {'y': [1, 2, 3]}, 'class': 1}
