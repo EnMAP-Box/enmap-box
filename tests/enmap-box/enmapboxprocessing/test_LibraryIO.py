@@ -1,18 +1,15 @@
-from enmapbox import initAll
+from qgis.PyQt.QtCore import QVariant
+from qgis.core import QgsGeometry, QgsPointXY
+
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import ProfileEncoding
-from enmapbox.testing import start_app
 from enmapboxprocessing.librarydriver import LibraryDriver
 from enmapboxprocessing.libraryreader import LibraryReader
 from enmapboxprocessing.testcase import TestCase
-from qgis.PyQt.QtCore import QVariant
-from qgis.core import QgsGeometry, QgsPointXY
 
 
 class TestLibraryIO(TestCase):
 
     def test_create(self):
-        start_app()
-        initAll()
 
         values = {
             'profile1': {
@@ -52,8 +49,6 @@ class TestLibraryIO(TestCase):
             self.assertEqual(geometry, geometry2)
 
     def test_createFromData(self):
-        start_app()
-        initAll()
 
         values = {
             'profile1': {
@@ -82,8 +77,6 @@ class TestLibraryIO(TestCase):
             self.assertEqual(geometry, geometry2)
 
     def test_libraryWithGeometryAndCrs(self):
-        start_app()
-        initAll()
 
         values = {'my field': 'Hello'}
         geometry = QgsGeometry.fromPointXY(QgsPointXY(1, 2))
