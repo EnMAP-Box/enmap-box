@@ -1,7 +1,7 @@
 import unittest
 
 import numpy as np
-from osgeo import gdal_version
+from osgeo import gdal
 
 from enmapboxtestdata import enmap, landcover_polygon
 from enmapboxprocessing.algorithm.layertomaskalgorithm import LayerToMaskAlgorithm
@@ -11,8 +11,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 
 # skip in gdal 3.10, because of
 # '" ERROR 1: Failed to parse \'220.0\' as decimal integer: pattern \'220.0\' does not match to the end"'
-@unittest.skipIf(gdal_version == (3, 10),
-                 'Rasterize decimal error')
+@unittest.skipIf(gdal.VersionInfo().startswith('310', 'Rasterize decimal error'))
 class TestLayerToMaskAlgorithm(TestCase):
 
     def test_raster(self):
