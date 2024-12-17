@@ -1,13 +1,3 @@
-from enmapboxprocessing.algorithm.libraryfromclassificationdatasetalgorithm import \
-    LibraryFromClassificationDatasetAlgorithm
-from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedvectoralgorithm import \
-    PrepareClassificationDatasetFromCategorizedVectorAlgorithm
-from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxprocessing.typing import ClassifierDump
-from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import points_in_no_data_region, enmap, landcover_polygon, landcover_point, enmap_potsdam, \
-    landcover_potsdam_polygon
-from qgis.core import QgsVectorLayer
 from qgis.core import QgsVectorLayer
 
 from enmapboxprocessing.algorithm.libraryfromclassificationdatasetalgorithm import \
