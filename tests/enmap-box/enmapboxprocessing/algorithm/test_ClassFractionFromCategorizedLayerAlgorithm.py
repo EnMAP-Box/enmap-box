@@ -1,4 +1,8 @@
+import unittest
+
 import numpy as np
+from osgeo import gdal
+from qgis.core import QgsRasterLayer, QgsVectorLayer
 
 from enmapboxprocessing.algorithm.classfractionfromcategorizedlayeralgorithm import \
     ClassFractionFromCategorizedLayerAlgorithm
@@ -6,7 +10,6 @@ from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxtestdata import enmap, landcover_polygon, landcover_polygon_1m
 from enmapboxtestdata import landcover_polygon_3classes_id
-from qgis.core import QgsRasterLayer, QgsVectorLayer
 
 
 class TestClassFractionFromCategorizedLayerAlgorithm(TestCase):
@@ -40,6 +43,7 @@ class TestClassFractionFromCategorizedLayerAlgorithm(TestCase):
         )
         self.assertAlmostEqual(247.589, np.mean(reader.array()), 3)
 
+    @unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
     def test_0p_coverage(self):
         alg = ClassFractionFromCategorizedLayerAlgorithm()
         alg.initAlgorithm()
