@@ -9,7 +9,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxtestdata import enmap, landcover_polygon
 
 
-class TestLayerToMaskAlgorithm(TestCase):
+class TestApplyMaskAlgorithm(TestCase):
 
     @unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
     def test_raster(self):
