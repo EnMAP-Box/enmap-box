@@ -6,7 +6,7 @@ from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
 
 
-class TestLayerToMaskAlgorithm(TestCase):
+class TestApplyMaskAlgorithm(TestCase):
 
     def test_raster(self):
         alg = ApplyMaskAlgorithm()
