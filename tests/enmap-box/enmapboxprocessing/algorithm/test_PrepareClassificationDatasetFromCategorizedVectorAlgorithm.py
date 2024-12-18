@@ -1,4 +1,6 @@
-from qgis.core import QgsVectorLayer
+import unittest
+
+from osgeo import gdal
 
 from enmapboxprocessing.algorithm.libraryfromclassificationdatasetalgorithm import \
     LibraryFromClassificationDatasetAlgorithm
@@ -9,8 +11,10 @@ from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import points_in_no_data_region, enmap, landcover_polygon, landcover_point, enmap_potsdam, \
     landcover_potsdam_polygon
+from qgis.core import QgsVectorLayer
 
 
+@unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
 class TestPrepareClassificationDatasetFromCategorizedVectorAlgorithm(TestCase):
 
     def test_styled_poly(self):
