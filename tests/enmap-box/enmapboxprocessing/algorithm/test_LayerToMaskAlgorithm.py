@@ -3,10 +3,10 @@ import unittest
 import numpy as np
 from osgeo import gdal
 
-from enmapboxtestdata import enmap, landcover_polygon
 from enmapboxprocessing.algorithm.layertomaskalgorithm import LayerToMaskAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxtestdata import enmap, landcover_polygon
 
 
 # skip in gdal 3.10, because of
@@ -14,6 +14,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 @unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
 class TestLayerToMaskAlgorithm(TestCase):
 
+    @unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
     def test_raster(self):
         alg = LayerToMaskAlgorithm()
         alg.initAlgorithm()
