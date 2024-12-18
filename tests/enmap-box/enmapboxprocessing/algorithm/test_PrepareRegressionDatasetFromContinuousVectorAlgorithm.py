@@ -1,3 +1,7 @@
+import unittest
+
+from osgeo import gdal
+
 from enmapbox import initAll
 from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.libraryfromregressiondatasetalgorithm import LibraryFromRegressionDatasetAlgorithm
@@ -11,6 +15,7 @@ from enmapboxtestdata import fraction_point_multitarget, fraction_point_singleta
 from qgis.core import QgsVectorLayer, QgsProcessingException
 
 
+@unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
 class TestPrepareRegressionDatasetFromContinuousVectorAlgorithm(TestCase):
 
     def test_styled_multitarget(self):

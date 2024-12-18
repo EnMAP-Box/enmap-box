@@ -1,12 +1,17 @@
-from enmapboxtestdata import enmap_potsdam
+import unittest
+
+from osgeo import gdal
+
 from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromrasteralgorithm import \
     PrepareUnsupervisedDatasetFromRasterAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
+from enmapboxtestdata import enmap_potsdam
 from enmapboxtestdata import landcover_polygon_30m, enmap, landcover_point
 
 
+@unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
 class TestPrepareUnsupervisedDatasetFromRasterAlgorithm(TestCase):
 
     def test_noMask(self):
