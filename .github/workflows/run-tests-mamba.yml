@@ -64,10 +64,13 @@ jobs:
           conda info
           conda list
 
-      - name: Python and QGIS versions
+      - name: Python, QGIS and GDAL versions
         run: |
           python --version
           qgis --version
+          gdalinfo --version
+          python -c "from osgeo.gdal import VersionInfo;print('Python-GDAL: '+ VersionInfo(''));"
+
 
       - name: Setup Repository
         run: |
