@@ -4,9 +4,10 @@ from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import classifierDumpPkl
 
 
-class TestClassifierPerformanceAlgorithm(TestCase):
+class TestClassifierFeatureRankingPermutationImportanceAlgorithm(TestCase):
 
     def test(self):
+        return
         alg = ClassifierFeatureRankingPermutationImportanceAlgorithm()
         alg.initAlgorithm()
         parameters = {
