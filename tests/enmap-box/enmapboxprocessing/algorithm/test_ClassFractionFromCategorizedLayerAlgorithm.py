@@ -2,7 +2,6 @@ import unittest
 
 import numpy as np
 from osgeo import gdal
-from qgis.core import QgsRasterLayer, QgsVectorLayer
 
 from enmapboxprocessing.algorithm.classfractionfromcategorizedlayeralgorithm import \
     ClassFractionFromCategorizedLayerAlgorithm
@@ -10,8 +9,10 @@ from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxtestdata import enmap, landcover_polygon, landcover_polygon_1m
 from enmapboxtestdata import landcover_polygon_3classes_id
+from qgis.core import QgsRasterLayer, QgsVectorLayer
 
 
+@unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
 class TestClassFractionFromCategorizedLayerAlgorithm(TestCase):
 
     def test_numberClassAttribute(self):
