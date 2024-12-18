@@ -6,7 +6,7 @@ from enmapboxtestdata import landcover_polygon_3classes_epsg4326
 from qgis.core import Qgis
 
 
-class TestRasterizeAlgorithm(TestCase):
+class TestRasterizeVectorAlgorithm(TestCase):
 
     def test_default(self):
         alg = RasterizeVectorAlgorithm()

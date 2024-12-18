@@ -91,7 +91,7 @@ class Test_aa_stratified(TestCase):
 
 
 @unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
-class TestClassificationPerformanceAlgorithm(TestCase):
+class TestClassificationPerformanceStratifiedAlgorithm(TestCase):
 
     def test_withStratification(self):
         alg = ClassificationPerformanceStratifiedAlgorithm()

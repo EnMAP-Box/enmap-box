@@ -12,7 +12,7 @@ from enmapboxtestdata import points_in_no_data_region, enmap, landcover_polygon,
 from qgis.core import QgsVectorLayer
 
 
-class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
+class TestPrepareClassificationDatasetFromCategorizedVectorAlgorithm(TestCase):
 
     def test_styled_poly(self):
         start_app()

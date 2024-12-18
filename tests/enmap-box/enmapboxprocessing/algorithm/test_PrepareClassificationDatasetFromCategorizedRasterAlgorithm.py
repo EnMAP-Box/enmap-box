@@ -12,7 +12,7 @@ from enmapboxtestdata import landcover_polygon_30m, enmap
 from qgis.core import QgsVectorLayer, QgsRasterLayer
 
 
-class TestPrepareClassificationSampleFromCategorizedRaster(TestCase):
+class TestPrepareClassificationDatasetFromCategorizedRasterAlgorithm(TestCase):
 
     def test_styled(self):
         start_app()

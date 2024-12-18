@@ -4,7 +4,7 @@ from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import fraction_map_l3, fraction_point_multitarget
 
 
-class TestRegressionPerformanceSimpleAlgorithm(TestCase):
+class TestRegressionPerformanceAlgorithm(TestCase):
 
     def test(self):
         alg = RegressionPerformanceAlgorithm()
