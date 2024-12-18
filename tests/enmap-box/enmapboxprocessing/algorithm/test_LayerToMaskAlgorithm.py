@@ -11,7 +11,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 
 # skip in gdal 3.10, because of
 # '" ERROR 1: Failed to parse \'220.0\' as decimal integer: pattern \'220.0\' does not match to the end"'
-@unittest.skipIf(gdal.VersionInfo().startswith('310', 'Rasterize decimal error'))
+@unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
 class TestLayerToMaskAlgorithm(TestCase):
 
     def test_raster(self):
