@@ -1,4 +1,6 @@
-from qgis.core import QgsVectorLayer, QgsProcessingException
+import unittest
+
+from osgeo import gdal
 
 from enmapboxprocessing.algorithm.libraryfromregressiondatasetalgorithm import LibraryFromRegressionDatasetAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousvectoralgorithm import \
@@ -8,8 +10,10 @@ from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import enmap_potsdam, landcover_potsdam_point
 from enmapboxtestdata import fraction_point_multitarget, fraction_point_singletarget, enmap, landcover_polygon
+from qgis.core import QgsVectorLayer, QgsProcessingException
 
 
+@unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
 class TestPrepareRegressionDatasetFromContinuousVectorAlgorithm(TestCase):
 
     def test_styled_multitarget(self):
