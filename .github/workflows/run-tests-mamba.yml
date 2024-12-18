@@ -69,7 +69,7 @@ jobs:
           python --version
           qgis --version
           gdalinfo --version
-          python -c "from osgeo.gdal import VersionInfo;print('Python-GDAL: '+ VersionInfo(''));"
+          python -c "from osgeo.gdal import VersionInfo;print(f'Python-GDAL:{VersionInfo('')} {VersionInfo()}');"
 
 
       - name: Setup Repository
