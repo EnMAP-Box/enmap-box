@@ -1,4 +1,7 @@
+import unittest
+
 import numpy as np
+from osgeo import gdal
 
 from enmapboxprocessing.algorithm.classificationperformancestratifiedalgorithm import (
     stratifiedAccuracyAssessment, ClassificationPerformanceStratifiedAlgorithm
@@ -87,6 +90,7 @@ class Test_aa_stratified(TestCase):
         self.assertTrue(np.isnan(result.overall_accuracy_se))
 
 
+@unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
 class TestClassificationPerformanceAlgorithm(TestCase):
 
     def test_withStratification(self):
