@@ -85,6 +85,7 @@ class TestClassFractionFromCategorizedLayerAlgorithm(TestCase):
         reader = RasterReader(parameters[alg.P_OUTPUT_FRACTION_RASTER])
         self.assertAlmostEqual(250.711, np.mean(reader.array()), 3)
 
+    @unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
     def test_raster(self):
         alg = ClassFractionFromCategorizedLayerAlgorithm()
         alg.initAlgorithm()
