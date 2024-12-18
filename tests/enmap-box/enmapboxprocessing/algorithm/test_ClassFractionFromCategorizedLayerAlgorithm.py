@@ -57,6 +57,7 @@ class TestClassFractionFromCategorizedLayerAlgorithm(TestCase):
         reader = RasterReader(parameters[alg.P_OUTPUT_FRACTION_RASTER])
         self.assertAlmostEqual(247.589, np.mean(reader.array()), 3)
 
+    @unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
     def test_50p_coverage(self):
         alg = ClassFractionFromCategorizedLayerAlgorithm()
         alg.initAlgorithm()
@@ -70,6 +71,7 @@ class TestClassFractionFromCategorizedLayerAlgorithm(TestCase):
         reader = RasterReader(parameters[alg.P_OUTPUT_FRACTION_RASTER])
         self.assertAlmostEqual(249.092, np.mean(reader.array()), 3)
 
+    @unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
     def test_100p_coverage(self):
         alg = ClassFractionFromCategorizedLayerAlgorithm()
         alg.initAlgorithm()
