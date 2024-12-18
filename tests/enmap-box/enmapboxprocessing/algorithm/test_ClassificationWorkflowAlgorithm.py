@@ -1,5 +1,6 @@
 import unittest
 
+from osgeo import gdal
 from sklearn.base import ClassifierMixin
 
 from enmapbox import initAll
@@ -30,6 +31,7 @@ class FitTestClassifierAlgorithm(FitClassifierAlgorithmBase):
         from sklearn.ensemble import RandomForestClassifier
         classifier = RandomForestClassifier(n_estimators=10, oob_score=True, random_state=42)
         return classifier
+
 
 @unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
 class TestClassificationWorkflowAlgorithm(TestCase):

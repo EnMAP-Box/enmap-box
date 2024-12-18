@@ -9,7 +9,7 @@ from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import library_gpkg
 
 
-class TestPrepareRegressionDatasetFromCategorizedLibrary(TestCase):
+class TestPrepareRegressionDatasetFromContinuousLibraryAlgorithm(TestCase):
 
     def test(self):
         alg = PrepareRegressionDatasetFromContinuousLibraryAlgorithm()

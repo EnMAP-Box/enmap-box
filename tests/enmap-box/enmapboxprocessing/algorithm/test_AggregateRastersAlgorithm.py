@@ -8,7 +8,7 @@ from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
 
 
-class TestAggregateRasterBandsAlgorithm(TestCase):
+class TestAggregateRastersAlgorithm(TestCase):
 
     def test_aggregateBandWise_and_writeFunctionWise(self):
         writer1 = self.rasterFromValue((3, 1, 1), 1)

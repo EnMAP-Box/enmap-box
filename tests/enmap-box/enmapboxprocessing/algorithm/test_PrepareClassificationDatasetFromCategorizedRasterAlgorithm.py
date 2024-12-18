@@ -11,7 +11,7 @@ from enmapboxtestdata import enmap_potsdam
 from enmapboxtestdata import landcover_polygon_30m, enmap
 
 
-class TestPrepareClassificationSampleFromCategorizedRaster(TestCase):
+class TestPrepareClassificationDatasetFromCategorizedRasterAlgorithm(TestCase):
 
     def test_styled(self):
         alg = PrepareClassificationDatasetFromCategorizedRasterAlgorithm()

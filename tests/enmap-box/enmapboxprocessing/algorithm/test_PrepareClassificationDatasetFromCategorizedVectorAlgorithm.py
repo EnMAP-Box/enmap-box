@@ -11,7 +11,7 @@ from enmapboxtestdata import points_in_no_data_region, enmap, landcover_polygon,
     landcover_potsdam_polygon
 
 
-class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
+class TestPrepareClassificationDatasetFromCategorizedVectorAlgorithm(TestCase):
 
     def test_styled_poly(self):
         alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
