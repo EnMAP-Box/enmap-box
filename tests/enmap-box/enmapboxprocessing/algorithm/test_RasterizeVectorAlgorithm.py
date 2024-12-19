@@ -1,12 +1,17 @@
-from enmapboxtestdata import enmap, landcover_polygon
+import unittest
+
+from osgeo import gdal
+
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxtestdata import enmap, landcover_polygon
 from enmapboxtestdata import landcover_polygon_3classes_epsg4326
 from qgis.core import Qgis
 
 
-class TestRasterizeAlgorithm(TestCase):
+@unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
+class TestRasterizeVectorAlgorithm(TestCase):
 
     def test_default(self):
         alg = RasterizeVectorAlgorithm()
