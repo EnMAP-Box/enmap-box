@@ -7,9 +7,11 @@ from enmapboxprocessing.algorithm.classificationperformancestratifiedalgorithm i
     stratifiedAccuracyAssessment, ClassificationPerformanceStratifiedAlgorithm
 )
 from enmapboxprocessing.algorithm.testcase import TestCase
+from enmapboxprocessing.typing import Category
+from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import landcover_map_l3
 from enmapboxtestdata import landcover_polygon
-from qgis.core import QgsRasterLayer, QgsVectorLayer
+from qgis.core import QgsRasterLayer, QgsVectorLayer, QgsMapLayer
 
 
 class Test_aa_stratified(TestCase):
@@ -113,3 +115,39 @@ class TestClassificationPerformanceStratifiedAlgorithm(TestCase):
             alg.P_OUTPUT_REPORT: self.filename('report.html'),
         }
         result = self.runalg(alg, parameters)
+
+    def test_twoClass(self):
+        Forest = 1
+        Water = 2
+        PredictedValues = [Forest, Forest, Forest, Forest, Forest, Forest, Water, Water, Water]
+        TrueValues = [Forest, Forest, Forest, Forest, Forest, Forest, Water, Forest, Forest]
+
+        categories = [Category(1, 'c1', '#000000'), Category(2, 'c2', '#000000')]
+        writer1 = self.rasterFromArray([[TrueValues]], 'observation.tif')
+        writer1.close()
+        raster1 = QgsRasterLayer(writer1.source())
+        renderer = Utils().palettedRasterRendererFromCategories(raster1.dataProvider(), 1, categories)
+        raster1.setRenderer(renderer.clone())
+        raster1.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
+
+        writer2 = self.rasterFromArray([[PredictedValues]], 'prediction.tif')
+        writer2.close()
+        raster2 = QgsRasterLayer(writer2.source())
+        renderer = Utils().palettedRasterRendererFromCategories(raster2.dataProvider(), 1, categories)
+        raster2.setRenderer(renderer.clone())
+        raster2.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
+
+        alg = ClassificationPerformanceStratifiedAlgorithm()
+        alg.initAlgorithm()
+        parameters = {
+            alg.P_CLASSIFICATION: writer2.source(),
+            alg.P_REFERENCE: writer1.source(),
+            alg.P_OPEN_REPORT: self.openReport,
+            alg.P_OUTPUT_REPORT: self.filename('report.html'),
+        }
+        result = self.runalg(alg, parameters)
+
+        stats = Utils.jsonLoad(result[alg.P_OUTPUT_REPORT] + '.json')
+        self.assertEqual(77, int(stats['overall_accuracy'] * 100))
+        self.assertListEqual([100, 33], [int(v * 100) for v in stats['users_accuracy']])
+        self.assertListEqual([75, 100], [int(v * 100) for v in stats['producers_accuracy']])
