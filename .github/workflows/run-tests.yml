@@ -5,12 +5,11 @@ on:
     branches:
       - main
       - release-**
-      - refactor_environments
       - release_**
 
   pull_request:
     branches:
-      - '**'
+      - main
       - release-**
       - release_**
 
