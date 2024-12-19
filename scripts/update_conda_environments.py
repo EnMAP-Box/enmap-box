@@ -25,7 +25,7 @@ DEPENDENCIES = {
     'full': [{'conda': 'enpt', 'pip': 'enpt-enmapboxapp'}, 'xgboost', 'lightgbm', 'cdsapi', 'cython', 'netcdf4',
              'pygrib',
              'pyhdf', 'xarray', 'astropy', 'catboost', 'matplotlib', 'astropy', 'numba>=0.56.4',
-             'sympy', 'pyopengl', 'hy5py'],
+             'sympy', 'pyopengl', 'h5py'],
     'dev': ['gitpython', 'git-lfs', 'typeguard=2', 'pytest', 'pytest-cov', 'pytest-xdist',
             {'conda': 'flake8', 'pip': 'flake8-qgis'},
             'docutils']
