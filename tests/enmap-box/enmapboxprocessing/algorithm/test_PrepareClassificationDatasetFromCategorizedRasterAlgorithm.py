@@ -1,5 +1,5 @@
-from enmapbox import initAll
-from enmapbox.testing import start_app
+from qgis.core import QgsVectorLayer, QgsRasterLayer
+
 from enmapboxprocessing.algorithm.libraryfromclassificationdatasetalgorithm import \
     LibraryFromClassificationDatasetAlgorithm
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedrasteralgorithm import \
@@ -9,15 +9,11 @@ from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import enmap_potsdam
 from enmapboxtestdata import landcover_polygon_30m, enmap
-from qgis.core import QgsVectorLayer, QgsRasterLayer
 
 
-class TestPrepareClassificationSampleFromCategorizedRaster(TestCase):
+class TestPrepareClassificationDatasetFromCategorizedRasterAlgorithm(TestCase):
 
     def test_styled(self):
-        start_app()
-        initAll()
-
         alg = PrepareClassificationDatasetFromCategorizedRasterAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,

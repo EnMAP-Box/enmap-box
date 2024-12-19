@@ -4,7 +4,7 @@ from enmapboxtestdata import enmap
 from qgis.core import QgsVectorLayer
 
 
-class TestRandomPointsFromCategorizedRasterAlgorithm(TestCase):
+class TestRandomPointsFromRasterAlgorithm(TestCase):
 
     def test(self):
         alg = RandomPointsFromRasterAlgorithm()

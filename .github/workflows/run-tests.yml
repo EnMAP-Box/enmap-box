@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - main
-      - 'release-**'
+      - release-**
       - refactor_environments
-      - 'release_**'
+      - release_**
 
   pull_request:
     branches:
@@ -23,8 +23,8 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        qgis_version: [ 3.34, 3.36, 3.38 ]
-      fail-fast: false
+        qgis_version: [ '3.34', '3.38', '3.40' ]
+      fail-fast: true
 
     env:
       QGIS_TEST_VERSION: ${{ matrix.qgis_version}}

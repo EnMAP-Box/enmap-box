@@ -1,5 +1,7 @@
-from enmapbox import initAll
-from enmapbox.testing import start_app
+import unittest
+
+from osgeo import gdal
+
 from enmapboxprocessing.algorithm.libraryfromclassificationdatasetalgorithm import \
     LibraryFromClassificationDatasetAlgorithm
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedvectoralgorithm import \
@@ -12,12 +14,10 @@ from enmapboxtestdata import points_in_no_data_region, enmap, landcover_polygon,
 from qgis.core import QgsVectorLayer
 
 
-class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
+@unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
+class TestPrepareClassificationDatasetFromCategorizedVectorAlgorithm(TestCase):
 
     def test_styled_poly(self):
-        start_app()
-        initAll()
-
         alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
@@ -49,9 +49,6 @@ class TestPrepareClassificationSampleFromCategorizedVectorAlgorithm(TestCase):
         )
 
     def test_styled_point(self):
-        start_app()
-        initAll()
-
         alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,

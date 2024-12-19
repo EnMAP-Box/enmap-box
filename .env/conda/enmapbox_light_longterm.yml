@@ -1,6 +1,7 @@
 # EnMAP-Box conda environment
-# run to install: conda env create -n enmapbox_light_longterm --file enmapbox_light_longterm.yml
-# run to update : conda env update -n enmapbox_light_longterm --file enmapbox_light_longterm.yml --prune
+# generated with scripts/update_conda_environemts.py (MANUAL CHANGES WILL BE OVERWRITTEN!)
+# run to install: conda env create -n enmapbox_light_longterm --file=enmapbox_light_longterm.yml
+# run to update : conda env update -n enmapbox_light_longterm --file=enmapbox_light_longterm.yml --prune
 # run to delete : conda env remove -n enmapbox_light_longterm
 # see also https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
 

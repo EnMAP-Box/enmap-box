@@ -1,3 +1,7 @@
+import unittest
+
+from osgeo import gdal
+
 from enmapboxprocessing.algorithm.samplerastervaluesalgorithm import SampleRasterValuesAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import enmap, landcover_polygon, hires_potsdom
@@ -5,6 +9,7 @@ from enmapboxtestdata import landcover_points_singlepart_epsg3035
 from qgis.core import (QgsRasterLayer, QgsVectorLayer)
 
 
+@unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
 class TestSampleRasterValuesAlgorithm(TestCase):
 
     def test_sampleFromVectorPoints(self):

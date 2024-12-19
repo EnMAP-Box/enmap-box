@@ -8,7 +8,7 @@ from enmapboxtestdata import landcover_polygon_30m_epsg3035
 from qgis.core import QgsRasterLayer
 
 
-class TestTranslateClassificationAlgorithm(TestCase):
+class TestTranslateCategorizedRasterAlgorithm(TestCase):
 
     def test_default(self):
         alg = TranslateCategorizedRasterAlgorithm()

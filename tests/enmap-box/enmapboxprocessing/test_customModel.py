@@ -1,11 +1,10 @@
 from os.path import join, basename
 from shutil import copyfile
 
-from enmapbox import initAll
-from enmapbox.testing import start_app
+from qgis.core import QgsApplication
+
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import custom_model, SensorProducts, sensorProductsRoot
-from qgis.core import QgsApplication
 
 
 class TestCustomModel(TestCase):
@@ -16,9 +15,6 @@ class TestCustomModel(TestCase):
 
         profileFolder = join(QgsApplication.qgisSettingsDirPath(), 'processing', 'models')
         copyfile(custom_model, join(profileFolder, basename(custom_model)))
-
-        start_app()
-        initAll()
 
         alg = 'model:importEnmapL2'
         parameters = {
