@@ -6,8 +6,6 @@ HTML.py - v0.04 2009-07-28 Philippe Lagadec
 This module provides a few classes to easily generate HTML code such as tables
 and lists.
 
-Project website: http://www.decalage.info/python/html
-
 License: CeCILL (open-source GPL compatible), see source code for details.
          http://www.cecill.info
 """
@@ -18,7 +16,7 @@ __author__  = 'Philippe Lagadec'
 
 #--- LICENSE ------------------------------------------------------------------
 
-# Copyright Philippe Lagadec - see http://www.decalage.info/contact for contact info
+# Copyright Philippe Lagadec
 #
 # This module provides a few classes to easily generate HTML tables and lists.
 #

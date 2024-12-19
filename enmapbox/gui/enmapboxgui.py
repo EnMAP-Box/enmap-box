@@ -23,24 +23,24 @@ import sys
 import typing
 import warnings
 from os.path import basename, dirname
-from typing import Any, Dict, List, Optional, Sequence, Union
+from typing import Optional, Dict, Union, Any, List, Sequence
 
 import enmapbox
 import enmapbox.gui.datasources.manager
 import qgis.utils
-from enmapbox import DEBUG, debugLog, messageLog
+from enmapbox import messageLog, debugLog, DEBUG
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
 from enmapbox.gui.dataviews.dockmanager import DockManagerTreeModel, MapDockTreeNode
-from enmapbox.gui.dataviews.docks import AttributeTableDock, Dock, MapDock, SpectralLibraryDock
+from enmapbox.gui.dataviews.docks import SpectralLibraryDock, Dock, AttributeTableDock, MapDock
 from enmapbox.qgispluginsupport.qps.cursorlocationvalue import CursorLocationInfoDock
 from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog
-from enmapbox.qgispluginsupport.qps.maptools import MapTools, QgsMapToolSelectionHandler
+from enmapbox.qgispluginsupport.qps.maptools import QgsMapToolSelectionHandler, MapTools
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
-from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprofilesources import MapCanvasLayerProfileSource, \
-    SpectralProfileSourcePanel
+from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprofilesources import SpectralProfileSourcePanel, \
+    MapCanvasLayerProfileSource
 from enmapbox.qgispluginsupport.qps.subdatasets import SubDatasetSelectionDialog
-from enmapbox.qgispluginsupport.qps.utils import file_search, loadUi, SpatialExtent, SpatialPoint
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, loadUi, SpatialExtent, file_search
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.importdesisl1balgorithm import ImportDesisL1BAlgorithm
 from enmapboxprocessing.algorithm.importdesisl1calgorithm import ImportDesisL1CAlgorithm
@@ -61,24 +61,31 @@ from processing.ProcessingPlugin import ProcessingPlugin
 from processing.gui.AlgorithmDialog import AlgorithmDialog
 from processing.gui.ProcessingToolbox import ProcessingToolbox
 from qgis import utils as qgsUtils
-from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot, QEventLoop, QFile, QModelIndex, QObject, QRect, QSize, Qt, QUrl
-from qgis.PyQt.QtGui import QCloseEvent, QColor, QDesktopServices, QDragEnterEvent, QDragLeaveEvent, QDragMoveEvent, \
-    QDropEvent, QGuiApplication, QIcon, QKeyEvent
-from qgis.PyQt.QtWidgets import QAction, QApplication, QDialog, QDockWidget, QFileDialog, QFrame, QMainWindow, QMenu, \
-    QMessageBox, QProgressBar, QSizePolicy, QStatusBar, QStyle, QToolBar, QToolButton, QWidget
+from qgis.PyQt.QtCore import QUrl
+from qgis.PyQt.QtCore import pyqtSignal, Qt, QObject, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
+from qgis.PyQt.QtGui import QDesktopServices
+from qgis.PyQt.QtGui import QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QColor, QIcon, \
+    QKeyEvent, \
+    QCloseEvent, QGuiApplication
+from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, QMainWindow, QApplication, QSizePolicy, QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
+    QProgressBar, QMessageBox
 from qgis.PyQt.QtXml import QDomDocument
-from qgis.core import Qgis, QgsApplication, QgsCoordinateReferenceSystem, QgsExpressionContext, \
-    QgsExpressionContextGenerator, QgsExpressionContextUtils, QgsLayerTree, QgsLayerTreeLayer, QgsMapLayer, QgsPointXY, \
-    QgsProcessingAlgorithm, QgsProcessingAlgRunnerTask, QgsProcessingContext, QgsProject, QgsProjectArchive, \
-    QgsRasterLayer, QgsRectangle, QgsSettings, QgsStyle, QgsSymbol, QgsSymbolLegendNode, QgsTaskManager, QgsVectorLayer, \
-    QgsVectorLayerTools, QgsWkbTypes, QgsZipUtils
-from qgis.gui import QgisInterface, QgsAttributeTableFilterModel, QgsMapCanvas, QgsMapLayerConfigWidgetFactory, \
-    QgsMapTool, QgsMessageBar, QgsMessageBarItem, QgsMessageViewer, QgsNewGeoPackageLayerDialog, \
-    QgsNewMemoryLayerDialog, QgsNewVectorLayerDialog, QgsProcessingAlgorithmDialogBase, QgsProcessingContextGenerator, \
-    QgsSymbolSelectorDialog, QgsSymbolWidgetContext
+from qgis.core import QgsExpressionContextGenerator, QgsExpressionContext, QgsProcessingContext, \
+    QgsExpressionContextUtils
+from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
+    QgsProcessingAlgorithm, Qgis, QgsCoordinateReferenceSystem, QgsWkbTypes, \
+    QgsPointXY, QgsLayerTree, QgsLayerTreeLayer, QgsVectorLayerTools, \
+    QgsZipUtils, QgsProjectArchive, QgsSettings, \
+    QgsStyle, QgsSymbolLegendNode, QgsSymbol, QgsTaskManager, QgsApplication, QgsProcessingAlgRunnerTask
+from qgis.core import QgsRectangle
+from qgis.gui import QgsMapCanvas, QgsMapTool, QgisInterface, QgsMessageBar, QgsMessageViewer, QgsMessageBarItem, \
+    QgsMapLayerConfigWidgetFactory, QgsAttributeTableFilterModel, QgsSymbolSelectorDialog, \
+    QgsSymbolWidgetContext
+from qgis.gui import QgsProcessingAlgorithmDialogBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog, \
+    QgsNewVectorLayerDialog, QgsProcessingContextGenerator
 from .contextmenuprovider import EnMAPBoxContextMenuProvider
 from .contextmenus import EnMAPBoxContextMenuRegistry
-from .datasources.datasources import DataSource, RasterDataSource, SpatialDataSource, VectorDataSource
+from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
 from .dataviews.docks import DockTypes
 from .mapcanvas import MapCanvas
 from .splashscreen.splashscreen import EnMAPBoxSplashScreen
