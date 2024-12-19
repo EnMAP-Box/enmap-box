@@ -162,6 +162,7 @@ class DL_Train_MOD(QgsProcessingAlgorithm):
        '<p> For distributated training you can also here define how many GPUs you want to use. </p>' \
        '<h3>Path for saving model and Tensorboard logger</h3>' \
        '<p>Define folder where models are saved and Tensorboard logger is saved. </p>'
+
         return html
 
     def initAlgorithm(self, config=None):
