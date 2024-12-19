@@ -1,3 +1,6 @@
+import unittest
+
+from osgeo import gdal
 from sklearn.base import ClassifierMixin
 
 from enmapbox import initAll
@@ -7,8 +10,10 @@ from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifie
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedvectoralgorithm import \
     PrepareClassificationDatasetFromCategorizedVectorAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxtestdata import classifierDumpPkl, landcover_berlin_point
-from enmapboxtestdata import enmap, landcover_potsdam_point, enmap_potsdam
+from enmapboxtestdata import classifierDumpPkl, enmap, enmap_potsdam, landcover_berlin_point, landcover_potsdam_point
+
+start_app()
+initAll()
 
 
 class FitTestClassifierAlgorithm(FitClassifierAlgorithmBase):
@@ -28,6 +33,7 @@ class FitTestClassifierAlgorithm(FitClassifierAlgorithmBase):
         return classifier
 
 
+@unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
 class TestClassificationWorkflowAlgorithm(TestCase):
 
     def test(self):
@@ -99,9 +105,6 @@ class TestClassificationWorkflowAlgorithm(TestCase):
         self.runalg(alg2, parameters2)
 
     def test_areaEstimates(self):
-        start_app()
-        initAll()
-
         alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,

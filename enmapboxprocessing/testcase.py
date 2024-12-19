@@ -1,15 +1,14 @@
-from os import makedirs
-from os.path import join, exists
+from os.path import join
 from typing import Union
 
 import numpy as np
+from qgis.core import QgsCoordinateReferenceSystem, QgsRectangle
 
 import enmapbox.testing
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import Array2d, Array3d, Number
-from qgis.core import QgsRectangle, QgsCoordinateReferenceSystem
 
 enmapbox.testing.start_app()
 
@@ -22,16 +21,11 @@ class TestCase(enmapbox.testing.TestCase):
         array2 = np.array(array2)
         self.assertTrue(np.all(array1 == array2))
 
-    def testOutputFolder(self):
-        testClassDir = self.tempDir()
-        testMethodDir = join(testClassDir, self._testMethodName)
-        if not exists(testMethodDir):
-            if not testMethodDir.endswith('__call__'):
-                makedirs(testMethodDir)
-        return testMethodDir
+    def createTestOutputFolder(self):
+        return str(self.createTestOutputDirectory())
 
     def filename(self, basename: str):
-        return join(self.testOutputFolder(), basename)
+        return join(self.createTestOutputFolder(), basename)
 
     def rasterFromArray(
             self, array, basename: str = None, extent: QgsRectangle = None, crs: QgsCoordinateReferenceSystem = None

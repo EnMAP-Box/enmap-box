@@ -34,10 +34,9 @@ import typing
 import warnings
 
 from osgeo import gdal
-
 from qgis.PyQt.QtCore import QSettings
 from qgis.PyQt.QtGui import QIcon
-from qgis.core import Qgis, QgsApplication, QgsProcessingRegistry, QgsProcessingProvider, QgsProcessingAlgorithm
+from qgis.core import Qgis, QgsApplication, QgsProcessingAlgorithm, QgsProcessingProvider, QgsProcessingRegistry
 from qgis.gui import QgisInterface, QgsMapLayerConfigWidgetFactory
 
 # provide shortcuts
@@ -96,7 +95,6 @@ DIR_UNITTESTS = (pathlib.Path(DIR_REPO) / 'tests').as_posix()
 
 ENMAP_BOX_KEY = 'EnMAP-Box'
 
-_ENMAPBOX_PROCESSING_PROVIDER: QgsProcessingProvider = None
 _ENMAPBOX_MAPLAYER_CONFIG_WIDGET_FACTORIES: typing.List[QgsMapLayerConfigWidgetFactory] = []
 
 gdal.SetConfigOption('GDAL_VRT_ENABLE_PYTHON', 'YES')
@@ -262,13 +260,11 @@ def registerEnMAPBoxProcessingProvider():
     assert isinstance(registry, QgsProcessingRegistry)
     provider = registry.providerById(ID)
     if not isinstance(provider, QgsProcessingProvider):
-        provider = EnMAPBoxProcessingProvider()
+        provider = EnMAPBoxProcessingProvider.instance()
         registry.addProvider(provider)
 
     assert isinstance(provider, EnMAPBoxProcessingProvider)
     assert id(registry.providerById(ID)) == id(provider)
-    global _ENMAPBOX_PROCESSING_PROVIDER
-    _ENMAPBOX_PROCESSING_PROVIDER = provider
 
     try:
         existingAlgNames = [a.name() for a in registry.algorithms() if a.groupId() == provider.id()]
@@ -293,8 +289,7 @@ def unregisterEnMAPBoxProcessingProvider():
     provider = registry.providerById(ID)
 
     if isinstance(provider, EnMAPBoxProcessingProvider):
-        global _ENMAPBOX_PROCESSING_PROVIDER
-        _ENMAPBOX_PROCESSING_PROVIDER = None
+        EnMAPBoxProcessingProvider._ENMAPBOX_PROCESSING_PROVIDER = None
         # this deletes the C++ object
         registry.removeProvider(ID)
 

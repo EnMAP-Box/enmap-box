@@ -1,20 +1,20 @@
 import numpy as np
+from qgis.core import QgsCoordinateReferenceSystem
 
 from enmapbox import initAll
 from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.libraryfromclassificationdatasetalgorithm import \
     LibraryFromClassificationDatasetAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxprocessing.typing import ClassifierDump, Category
-from qgis.core import QgsCoordinateReferenceSystem
+from enmapboxprocessing.typing import Category, ClassifierDump
+
+start_app()
+initAll()
 
 
 class TestLibraryFromClassificationDatasetAlgorithm(TestCase):
 
     def test_withGeometry(self):
-        start_app()
-        initAll()
-
         categories = [Category(1, 'class A', '#f00'), Category(2, 'class B', '#0f0')]
         dump = ClassifierDump(
             categories=categories,
@@ -35,9 +35,6 @@ class TestLibraryFromClassificationDatasetAlgorithm(TestCase):
         self.runalg(alg, parameters)
 
     def test_withOutGeometry(self):
-        start_app()
-        initAll()
-
         categories = [Category(1, 'class A', '#f00'), Category(2, 'class B', '#0f0')]
         dump = ClassifierDump(
             categories=categories,

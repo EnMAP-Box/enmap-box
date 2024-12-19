@@ -1,19 +1,19 @@
 import numpy as np
+from qgis.core import QgsCoordinateReferenceSystem
 
 from enmapbox import initAll
 from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.libraryfromregressiondatasetalgorithm import LibraryFromRegressionDatasetAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import RegressorDump, Target
-from qgis.core import QgsCoordinateReferenceSystem
+
+start_app()
+initAll()
 
 
 class TestLibraryFromRegressionDatasetAlgorithm(TestCase):
 
     def test_withGeometry(self):
-        start_app()
-        initAll()
-
         targets = [Target('target A', '#f00'), Target('target B', '#0f0')]
         dump = RegressorDump(
             targets=targets,
@@ -33,9 +33,6 @@ class TestLibraryFromRegressionDatasetAlgorithm(TestCase):
         self.runalg(alg, parameters)
 
     def test_withOutGeometry(self):
-        start_app()
-        initAll()
-
         targets = [Target('target A', '#f00'), Target('target B', '#0f0')]
         dump = RegressorDump(
             targets=targets,

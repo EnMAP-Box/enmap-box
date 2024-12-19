@@ -4,7 +4,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxtestdata import enmap, hires
 
 
-class TestSubsetRasterBandsAlgorithm(TestCase):
+class TestStackRasterLayersAlgorithm(TestCase):
 
     def test_default(self):
         alg = StackRasterLayersAlgorithm()

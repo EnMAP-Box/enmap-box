@@ -172,7 +172,7 @@ class ClassificationPerformanceSimpleAlgorithm(EnMAPProcessingAlgorithm):
 
             values = smartRound(stats.confusionMatrix, 2)
             report.writeTable(
-                values, 'Confusion matrix counts:',
+                np.transpose(values).tolist(), 'Confusion matrix counts:',
                 [f'({i + 1})' for i in range(len(stats.classNames))],
                 [f'predicted {name} ({i + 1})' for i, name in enumerate(stats.classNames)]
             )

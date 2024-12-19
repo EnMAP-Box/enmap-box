@@ -5,22 +5,22 @@ Run this script after you have cloned the EnMAP-Box repository
 import argparse
 import io
 import os
-import pathlib
 import shutil
 import site
 import zipfile
+from pathlib import Path
 
 import requests
 
-DIR_REPO = pathlib.Path(__file__).parents[1].resolve()
-site.addsitedir(DIR_REPO)
+DIR_REPO = Path(__file__).parents[1].resolve()
+site.addsitedir(str(DIR_REPO))
 
 
-def install_zipfile(url: str, localPath: pathlib.Path, zip_root: str = None):
+def install_zipfile(url: str, localPath: Path, zip_root: str = None):
     """
     Downloads and extracts a zip file
     """
-    assert isinstance(localPath, pathlib.Path)
+    assert isinstance(localPath, Path)
     localPath = localPath.resolve()
 
     print('Download {} \nto {}'.format(url, localPath))
@@ -30,14 +30,14 @@ def install_zipfile(url: str, localPath: pathlib.Path, zip_root: str = None):
     z = zipfile.ZipFile(io.BytesIO(response.content))
     os.makedirs(localPath, exist_ok=True)
     for src in z.namelist():
-        srcPath = pathlib.Path(src)
+        srcPath = Path(src)
         if isinstance(zip_root, str):
             if zip_root not in srcPath.parts:
                 continue
             i = srcPath.parts.index(zip_root)
-            dst = localPath / pathlib.Path(*srcPath.parts[i + 1:])
+            dst = localPath / Path(*srcPath.parts[i + 1:])
         else:
-            dst = localPath / pathlib.Path(*srcPath.parts)
+            dst = localPath / Path(*srcPath.parts)
         info = z.getinfo(src)
         if info.is_dir():
             if dst.exists():
@@ -78,8 +78,8 @@ def setup_enmapbox_repository(resources: bool = True, qgis_resources: bool = Tru
         print('Install QGIS resource files')
         install_qgisresources()
 
-    DIR_ENMAPBOXTESTDATA = pathlib.Path(DIR_REPO) / 'tests' / 'src'
-    site.addsitedir(DIR_ENMAPBOXTESTDATA)
+    DIR_ENMAPBOXTESTDATA = Path(DIR_REPO) / 'tests' / 'src'
+    site.addsitedir(str(DIR_ENMAPBOXTESTDATA))
 
 
 def create_generic_testfiles():
@@ -94,7 +94,8 @@ def create_generic_testfiles():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Setup Repository. Run this after you have cloned the '
-                                                 'EnMAP-Box repository')
+                                                 'EnMAP-Box repository to install additional resources, '
+                                                 'e.g. example data')
     parser.add_argument('-r', '--resources',
                         required=False,
                         default=False,

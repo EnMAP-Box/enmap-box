@@ -3,22 +3,22 @@ from os.path import join, dirname
 
 import numpy as np
 from osgeo import gdal
+from qgis.PyQt.QtCore import QDateTime, QSizeF
+from qgis.PyQt.QtGui import QColor
+from qgis.core import QgsGeometry, QgsVectorLayer, Qgis, QgsProcessingFeedback, QgsRasterLayer, QgsRasterShader, \
+    QgsColorRamp, \
+    QgsStyle, QgsColorRampShader, QgsRectangle, QgsWkbTypes, QgsCoordinateReferenceSystem
+from qgis.gui import QgsMapCanvas
 
-from enmapboxtestdata import landcover_polygon, enmap, hires
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
-from enmapbox.testing import start_app
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.testcase import TestCase
 from enmapboxprocessing.typing import Category, Target
 from enmapboxprocessing.utils import Utils
+from enmapboxtestdata import landcover_polygon, enmap, hires
 from enmapboxtestdata import landcover_polygon_30m, fraction_point_singletarget, fraction_point_multitarget, \
     landcover_map_l3, \
     fraction_map_l3
-from qgis.PyQt.QtCore import QDateTime, QSizeF
-from qgis.PyQt.QtGui import QColor
-from qgis.core import QgsGeometry, QgsVectorLayer, Qgis, QgsProcessingFeedback, QgsRasterLayer, QgsRasterShader, QgsColorRamp, \
-    QgsStyle, QgsColorRampShader, QgsRectangle, QgsWkbTypes, QgsCoordinateReferenceSystem
-from qgis.gui import QgsMapCanvas
 
 
 class TestUtils(TestCase):
@@ -557,8 +557,8 @@ class TestUtils(TestCase):
         toCrs = QgsCoordinateReferenceSystem().fromEpsgId(4326)
         self.assertGeometriesEqual(
             QgsGeometry.fromRect(
-            QgsRectangle(13.24539916899924208, 52.41260765598481441,
-                         13.34667529330139502, 52.52184188795437336)),
+                QgsRectangle(13.24539916899924208, 52.41260765598481441,
+                             13.34667529330139502, 52.52184188795437336)),
             QgsGeometry.fromRect(Utils.transformExtent(extent, crs, toCrs))
         )
 
@@ -574,7 +574,6 @@ class TestUtils(TestCase):
         )
 
     def test_mapCanvasCrs(self):
-        app = start_app()
         crs = QgsCoordinateReferenceSystem().fromEpsgId(4326)
         mapCanvas = QgsMapCanvas()
         mapCanvas.setDestinationCrs(crs)

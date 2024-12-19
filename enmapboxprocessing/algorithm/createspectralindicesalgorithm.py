@@ -1,9 +1,11 @@
-from collections import OrderedDict
-from typing import Dict, Any, List, Tuple, Optional
 import re
+from collections import OrderedDict
+from copy import deepcopy
+from typing import Dict, Any, List, Tuple, Optional
 
 from osgeo import gdal
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.vrtbandmathalgorithm import VrtBandMathAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.gdalutils import GdalUtils
@@ -11,14 +13,14 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException,
-                       QgsRasterLayer)
-from enmapbox.typeguard import typechecked
+                       QgsRasterLayer, QgsProcessingParameterFile)
 
 
 @typechecked
 class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_INDICES, _INDICES = 'indices', 'Indices'
+    P_JSON_FILE, _JSON_FILE = 'formulars', 'Formulars'
     P_SCALE, _SCALE = 'scale', 'Scale factor'
 
     P_A, _A = 'A', 'Aerosols band'
@@ -87,6 +89,10 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
                f'Should you need other indices added after this date, please file an issue.'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
+        link = self.htmlLink(
+            'https://raw.githubusercontent.com/EnMAP-Box/enmap-box/refs/heads/main/enmapboxprocessing/algorithm/createspectralindicesalgorithm.other.json',
+            'createspectralindicesalgorithm.other.json'
+        )
         helpParameters = [
             (self._RASTER, 'A spectral raster layer.'),
             (self._INDICES, 'The list of indices to be created. Usage examples:\n'
@@ -94,6 +100,8 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
                             'Create stack of NDVI and EVI: <code>NDVI, EVI</code>\n'
                             'Create custom index: <code>MyNDVI = (N - R) / (N + R)</code>\n'
                             f'See the full list of predefined  {self.linkAwesomeSpectralIndices}.'),
+            (self._JSON_FILE, 'A JSON file with additional spectral index formulars to be used.\n'
+                              f'See {link} for the expected format.'),
             (self._SCALE, 'Spectral reflectance scale factor. '
                           'Some indices require data to be scaled into the 0 to 1 range. '
                           'If your data is scaled differently, specify an appropriate scale factor.'
@@ -118,6 +126,10 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
         self.addParameterString(self.P_INDICES, self._INDICES, 'NDVI', True)
         self.addParameterFloat(self.P_SCALE, self._SCALE, None, True)
+        self.addParameterFile(
+            self.P_JSON_FILE, self._JSON_FILE, QgsProcessingParameterFile.Behavior.File, self.JsonFileExtension,
+            None, True
+        )
         for name in self.WavebandMapping:
             description = getattr(self, '_' + name)
             self.addParameterBand(name, description, -1, self.P_RASTER, True, False, True)
@@ -130,6 +142,7 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
+        jsonFile = self.parameterAsFile(parameters, self.P_JSON_FILE, context)
         text = self.parameterAsString(parameters, self.P_INDICES, context)
         text = ', '.join(text.splitlines())  # multiline to comma separated list
         scale = self.parameterAsFloat(parameters, self.P_SCALE, context)
@@ -151,13 +164,20 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
                     bandNo = self.findBroadBand(raster, name, True)
                 bandNos[name] = bandNo
 
+            # add user-defined formulars
+            IndexDatabase = deepcopy(self.IndexDatabase)
+            if jsonFile is not None:
+                IndexDatabase.update(  # more indices
+                    Utils.jsonLoad(jsonFile)['SpectralIndices']
+                )
+
             # eval requested indices
             indices = OrderedDict()
             for item in text.split(','):
 
                 if '=' in item:  # custom index
                     short_name, formula = [s.strip() for s in item.split('=')]
-                    if short_name in self.IndexDatabase:
+                    if short_name in IndexDatabase:
                         raise QgsProcessingException(
                             f'custom index name already exists as a predefined index: {short_name}'
                         )
@@ -172,12 +192,12 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
                     bandName = short_name
                 else:  # predefined index
                     short_name = item.strip()
-                    if short_name not in self.IndexDatabase:
+                    if short_name not in IndexDatabase:
                         raise QgsProcessingException(f'unknown index: {short_name}')
-                    formula = self.IndexDatabase[short_name]['formula']
-                    bands = self.IndexDatabase[short_name]['bands']
+                    formula = IndexDatabase[short_name]['formula']
+                    bands = IndexDatabase[short_name]['bands']
                     bands = [name for name in bands if name not in self.ConstantMapping]  # skip constants
-                    long_name = self.IndexDatabase[short_name]['long_name']
+                    long_name = IndexDatabase[short_name]['long_name']
                     bandName = short_name + ' - ' + long_name
 
                 bandList = [bandNos[name] for name in bands]

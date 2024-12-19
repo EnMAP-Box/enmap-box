@@ -1,10 +1,12 @@
+import unittest
 from os.path import normpath
 
 import numpy as np
+from osgeo import gdal
 
+from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import RasterMathAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapbox.testing import start_app
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxtestdata import enmap, landcover_polygon, hires
 from qgis.core import Qgis
@@ -12,6 +14,7 @@ from qgis.core import Qgis
 start_app()
 
 
+@unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
 class TestRasterMathAlgorithm(TestCase):
 
     def test_writeToDefaultOutput1(self):

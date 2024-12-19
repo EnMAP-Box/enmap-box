@@ -20,11 +20,12 @@ BRANCH_NAME_LOOKUP = {
 }
 
 DEPENDENCIES = {
+    # define dependencies as: [<conda package name> | {<'conda'|'pip'>:<package name>, ...}, ...]
     'light': ['pip', 'scikit-learn>=1', 'matplotlib', 'enpt'],
     'full': [{'conda': 'enpt', 'pip': 'enpt-enmapboxapp'}, 'xgboost', 'lightgbm', 'cdsapi', 'cython', 'netcdf4',
              'pygrib',
              'pyhdf', 'xarray', 'astropy', 'catboost', 'matplotlib', 'astropy', 'numba>=0.56.4',
-             'sympy', 'pyopengl', 'hy5py'],
+             'sympy', 'pyopengl', 'h5py'],
     'dev': ['gitpython', 'git-lfs', 'typeguard=2', 'pytest', 'pytest-cov', 'pytest-xdist',
             {'conda': 'flake8', 'pip': 'flake8-qgis'},
             'docutils']
@@ -80,6 +81,7 @@ def get_conda_qgis_versions() -> dict:
     if not path_repodata.is_file():
 
         base_url = 'https://conda.anaconda.org/conda-forge/win-64/repodata.json'
+        print(f'Download {base_url}')
         response = requests.get(base_url)
         if response.status_code != 200:
             raise RuntimeError(f"Failed to fetch data from {base_url}")
@@ -88,6 +90,7 @@ def get_conda_qgis_versions() -> dict:
         repodata = response.json()
         with open(path_repodata, 'w') as f:
             json.dump(repodata, f)
+    print(f'Read {path_repodata}')
     with open(path_repodata, 'r') as f:
         repodata = json.load(f)
     # qgis-3.36.0-py310h6577e97_1.conda
@@ -106,8 +109,9 @@ def update_yaml(dir_yaml, branch, version, full: bool = False):
     path_yml = dir_yaml / f'{name}.yml'
 
     header = f"""# EnMAP-Box conda environment
-# run to install: conda env create -n {name} --file {path_yml.name}
-# run to update : conda env update -n {name} --file {path_yml.name} --prune
+# generated with scripts/update_conda_environemts.py (MANUAL CHANGES WILL BE OVERWRITTEN!)
+# run to install: conda env create -n {name} --file={path_yml.name}
+# run to update : conda env update -n {name} --file={path_yml.name} --prune
 # run to delete : conda env remove -n {name}
 # see also https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
 """

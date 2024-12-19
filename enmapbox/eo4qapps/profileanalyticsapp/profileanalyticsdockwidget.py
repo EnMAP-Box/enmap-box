@@ -438,9 +438,6 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                     selectedFeatureCount = polygonLayer.selectedFeatureCount()
                     if selectedFeatureCount == 0:
                         return
-                    elif selectedFeatureCount > 1:
-                        warnings.warn('handling multiple shapes is not yet implemented')
-                        return
 
                     polygonId = polygonLayer.selectedFeatureIds()[0]
                     name = f'{layer.name()} [band {bandNo}, polygon ID {polygonId}]'

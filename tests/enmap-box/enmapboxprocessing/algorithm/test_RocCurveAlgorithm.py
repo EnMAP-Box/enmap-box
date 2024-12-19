@@ -1,11 +1,14 @@
-from enmapboxtestdata import landcover_polygon
+import unittest
+
+from osgeo import gdal
+
 from enmapboxprocessing.algorithm.roccurvealgorithm import RocCurveAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import fraction_map_l3, fraction_polygon_l3, landcover_polygon_3classes
+from enmapboxtestdata import landcover_polygon
 
-openReport = True
 
-
+@unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
 class TestRocCurveAlgorithm(TestCase):
 
     def test(self):

@@ -7,7 +7,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 from qgis.core import QgsRasterLayer
 
 
-class TestTranslateAlgorithm(TestCase):
+class TestSaveRasterAsAlgorithm(TestCase):
 
     def test_default(self):
         alg = SaveRasterAsAlgorithm()
