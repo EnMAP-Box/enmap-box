@@ -6,6 +6,7 @@ from osgeo import gdal
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import enmap
 from qgis.core import QgsProcessingException
 
@@ -108,3 +109,34 @@ class TestCreateSpectralIndicesAlgorithm(TestCase):
         ds: gdal.Dataset = gdal.Open(result[alg.P_OUTPUT_RASTER])
         driver: gdal.Driver = ds.GetDriver()
         self.assertEqual('GeoTIFF', driver.LongName)
+
+    def test_indicesFromFile(self):
+
+        formulars = {
+            "SpectralIndices": {
+                "MY_INDEX": {
+                    "bands": [
+                        "N",
+                        "S1",
+                        "S2"
+                    ],
+                    "formula": "(N - S1) / (N + S1)",
+                    "long_name": "Normalized Difference Moisture Index",
+                    "reference": "https://doi.org/10.1016/S0034-4257(96)00067-3",
+                    "short_name": "MY_INDEX",
+                    "type": "other"
+                }
+            }
+        }
+
+        Utils().jsonDump(formulars, self.filename('formulars.json'))
+
+        alg = CreateSpectralIndicesAlgorithm()
+        alg.initAlgorithm()
+        parameters = {
+            alg.P_RASTER: enmap,
+            alg.P_INDICES: 'MY_INDEX',
+            alg.P_JSON_FILE: self.filename('formulars.json'),
+            alg.P_OUTPUT_RASTER: self.filename('index.vrt'),
+        }
+        self.runalg(alg, parameters)
