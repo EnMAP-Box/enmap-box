@@ -47,6 +47,37 @@ from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 
 from torchvision.transforms import v2
 
+from  enmapbox.apps.SpecDeepMap.core_DL_UNET50_MOD_15_059_16 import MyModel,model_2D_Justo_UNet_Simple,CustomDataset,preprocessing_imagenet, preprocessing_imagenet_additional, preprocessing_sentinel2_TOA,preprocessing_normalization_csv,get_preprocessing_pipeline, transforms_v2
+from  enmapbox.apps.SpecDeepMap.core_PRED_GT_NO_DATA_mod11 import load_model_and_tile_size
+from osgeo import gdal
+import torch
+import numpy as np
+from torchvision import transforms
+from torch import nn
+import torch
+from torchvision import transforms
+import numpy as np
+import math
+from osgeo import gdal, ogr, osr
+from torchvision.transforms import Compose, ToTensor
+
+import os
+import numpy as np
+import torch
+from sklearn.metrics import jaccard_score
+import csv
+from osgeo import gdal, ogr, osr
+
+################################### tester specific code
+import numpy as np
+import torch
+import os
+import pandas as pd
+from osgeo import gdal
+import torch.nn.functional as F
+import csv
+
+
 from qgis._core import QgsProcessingFeedback
 def compute_iou(pred, gt, class_id):
     """Compute IoU for a single class."""
@@ -66,45 +97,8 @@ transforms_v2 = v2.Compose([
     v2.RandomVerticalFlip(p=0.5),
 ])
 
-from  enmapbox.apps.SpecDeepMap.core_DL_UNET50_MOD_15_059_16 import MyModel,model_2D_Justo_UNet_Simple,CustomDataset,preprocessing_imagenet, preprocessing_imagenet_additional, preprocessing_sentinel2_TOA,preprocessing_normalization_csv,get_preprocessing_pipeline, transforms_v2
-from  enmapbox.apps.SpecDeepMap.core_PRED_GT_NO_DATA_mod11 import load_model_and_tile_size
-from osgeo import gdal
-import torch
-import numpy as np
-from torchvision import transforms
-from torch import nn
-import torch
-from torchvision import transforms
-import numpy as np
-import math
-from osgeo import gdal, ogr, osr
-from torchvision.transforms import Compose, ToTensor
-
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Sep 23 11:40:42 2024
-
-@author: leon-
-"""
-
-import os
-import numpy as np
-import torch
-from sklearn.metrics import jaccard_score
-import csv
-from osgeo import gdal, ogr, osr
 
 
-
-
-################################### tester specific code
-import numpy as np
-import torch
-import os
-import pandas as pd
-from osgeo import gdal
-import torch.nn.functional as F
-import csv
 
 
 def read_image_with_gdal(image_path):
@@ -154,7 +148,8 @@ def save_prediction_as_geotiff(pred_array, geotransform, projection, output_path
     out_band = out_raster.GetRasterBand(1)
 
     out_band.WriteArray(pred_array)
-    #no_data_value = 0               ####################################  WEED modiied for weed detection example
+
+    ###########################################no_data_value = maybe also do no data value (spectral image in advanced hyperparameter, fo maldefined images)
     if no_data_value != None:
         out_band.SetNoDataValue(no_data_value)
     out_raster.FlushCache()
@@ -167,7 +162,8 @@ def calculate_iou(pred, target, num_classes):
     Calculate IoU for each class between prediction and target, ignoring class 0.
     """
     ious = []
-    for cls in range(1, num_classes+1):  # Start from class 1 to ignore class 0, as 1 classes is sum_classes-1 (ignpred zero class in onehot encoding), add here +1
+    for cls in range(1, num_classes+1):  # Start from class 1 to ignore class 0, as 1 classes is sum_classes-1 (ignpred zero class in onehot encoding),
+                                         #########################   # add here +1 need adjust ment for case when not!!!!!
         intersection = np.logical_and(pred == cls, target == cls).sum()
         union = np.logical_or(pred == cls, target == cls).sum()
         if union == 0:
@@ -218,18 +214,16 @@ def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_
         full_prediction = np.zeros((image.shape[1], image.shape[2]), dtype=np.uint8)
 
         # Assuming the image is in [channels, height, width] format and normalized
-        image = np.expand_dims(image, axis=0)     ################################################ removed as does to tensor in predict or preprocess setp
-        #image_tensor = torch.tensor(image).float().unsqueeze(0)  # Add batch dimension
+        image = np.expand_dims(image, axis=0)
 
         # Make prediction using the model
         image = image.astype(np.float32)
-         ############################################################################################ WEED  hard coded for weed detection exersice
-        preds = model.predict(image)
-        
-        #################################new
-        preds = preds + 1
 
-        #preds
+        preds = model.predict(image)
+
+        preds = preds + 1   ## adjsut
+
+        #preds  ## this doent work need different written parameter maybe string as false is not read from csv correctly
         #if remove_c == True:
             # No need to add +1
          #   preds = preds +1
@@ -247,7 +241,7 @@ def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_
 
         # Load the ground truth mask
         mask, _, _, _, _ = read_image_with_gdal(mask_path)
-        #mask = mask[0]  # Assuming the mask is single channel
+
 
         # Overwrite predictions where the mask is 0 if `no_data_label_mask` is True
         if no_data_label_mask:
@@ -299,7 +293,7 @@ def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_
             writer.writerow(['Class', 'IoU'])
 
             # Write IoU for each class
-            for cls, iou in enumerate(mean_iou_per_class, start =1):    ###### added start =1, to ignore class 0 and match with iou_calc_function
+            for cls, iou in enumerate(mean_iou_per_class, start =1):    ###### added start =1, to ignore class 0 and match with iou_calc_function adjust for when not given
                 writer.writerow([cls, iou])
 
             # Write the mean IoU in the last row

@@ -151,12 +151,10 @@ def raster_to_vector(out_ds, vector_output, no_data_value):
     # Create a new Shapefile
     driver = ogr.GetDriverByName("ESRI Shapefile")
 
-    # Delete the shapefile if it already exists
-    #if driver.DeleteDataSource(vector_output) == ogr.OGRERR_NONE:
-     #   print(f"Deleted existing shapefile: {vector_output}")
 
     # Create the new vector data source (Shapefile)
-    ############################################################################added
+    ##########################################################################
+
     directory = os.path.dirname(vector_output)
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -309,8 +307,8 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
 
 
             # Make prediction using the model
-            image = image.astype(np.float32)    #################added
-            ###############################################################
+            image = image.astype(np.float32)
+
 
             preds = model.predict(image)
 
@@ -325,12 +323,7 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
                  ###### added as now predict values from 0-5 and want 1-6 instead + added in model description prediction
 
             #####################################################################################
-                # preds = F.softmax(preds, dim=1)  # Get probabilities
-                # pred_classes = torch.argmax(preds, dim=1).squeeze(0)  # Get predicted class for each pixel
 
-             # Convert logits to probabilities
-
-            # Get the class with the maximum probability
             pred_classes = preds.squeeze(0)  # Shape becomes [H, W]
 
             # Convert to numpy for further use outside PyTorch
@@ -377,7 +370,7 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
                     break
 
 
-    no_data_value = 0 ###########################################################for weed example
+     # no_data_value = 0 #################in case images have no data value bad defined maybe , add as optional advanced hyperparameter in gui
     if no_data_value != None:
     # dataset = gdal.Open(input_raster)
         modified_band = dataset.GetRasterBand(1)
@@ -401,18 +394,12 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
     ## new
         band = mem_ds.GetRasterBand(1)
         band.SetNoDataValue(no_data_value)
-    ########################################################################################modified here  does it agan  harmoize with no-data function
+
+    #######################ified here  does it agan  harmoize with no-data function
     if gt_path:
         gt_dataset = gdal.Open(gt_path)
         gt_data_arr = gt_dataset.ReadAsArray()
-    # dataset = gdal.Open(input_raster)
 
-
-        # Read data from modified raster
-        #gt_data_arr = modified_band.ReadAsArray()
-        # data_arr = dataset.ReadAsArray(0)
-
-        # create mask for no-data values
         gt_mask = (gt_data_arr == 0)
 
         mem_arr = mem_ds.ReadAsArray()  # assuming a single band raster
@@ -426,7 +413,7 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
 
     ## new
         band = mem_ds.GetRasterBand(1)
-        band.SetNoDataValue(0)  ######################################################################## hardcoded 0 as no data   WEEED detection
+        band.SetNoDataValue(0)  #### hardcoded 0 as no data
 
     gtiff_driver = gdal.GetDriverByName('GTiff')
     out_ds = gtiff_driver.CreateCopy(raster_output, mem_ds, 0)
@@ -444,7 +431,7 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
         gt = gt_dataset.ReadAsArray()
         print('Ground truth raster shape:', gt.shape)
 
-            # Open the prediction raster (mem_ds in this case)
+            # Open the prediction raster
         pred_dataset = mem_ds
         prediction = pred_dataset.ReadAsArray()
 
@@ -468,7 +455,7 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
                 writer.writerow(['Class', 'IoU'])
 
                     # Write IoU for each class
-                for cls, iou in enumerate(ious, start=0):  # Adjust `start` to 0 or 1 based on your needs
+                for cls, iou in enumerate(ious, start=0):   ##########################  need change if background class zero was removed or not
                     writer.writerow([cls, iou])
 
                     # Write the mean IoU in the last row

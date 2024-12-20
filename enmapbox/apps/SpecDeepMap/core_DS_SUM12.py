@@ -152,10 +152,7 @@ def find_best_split(label_histograms, num_permutations,train_perc, test_perc, va
 
         print('permute ', progress_counter)
 
-    # Final statistics on the split
-    #num_train = num_files - num_val - num_test  # Remaining images are for training
-    #num_val = num_val   # Validation set size
-    #num_test = num_test  # Test set size
+
 
     # Calculate percentages
     perc_train = (num_train / num_files) * 100
@@ -269,7 +266,7 @@ def create_summary_csv(train_csv, val_csv, test_csv, out_folder_path, scaler,zer
     print('scaler', scaler)
     if scaler == 0:
         scaler_s = 'None'
-        #scaler_list = [scaler] + [None] * (len(all_classes)-1)  #####################################change as below
+
     else:
         scaler_s = scaler
         # Create DataFrame with two columns
@@ -289,8 +286,6 @@ def create_summary_csv(train_csv, val_csv, test_csv, out_folder_path, scaler,zer
                 'Class Train Weight': round(class_weights_train.get(cls, 0),4),
                 'Scaler': scaler_s,
                 'Ignored Background : Class Zero': zero_class_removed
-                #'Scaler': scaler_list[int(cls-1)] if scaler is not None else None,
-                ######'Scaler': scaler_list[int(cls-1)] if scaler is not None else None ############################# shit, will do error if no 0 class
             })
 
 
@@ -302,7 +297,6 @@ def create_summary_csv(train_csv, val_csv, test_csv, out_folder_path, scaler,zer
 
 
 ######Create additional Normalization Mean Std Normalizer, whcih ignores No-data value if no-data defined
-
 
 def read_no_data_value(train_csv_path):
     df_train = pd.read_csv(train_csv_path)
@@ -348,9 +342,6 @@ def calculate_summed_statistics(train_csv_path, progress_counter, progress_count
             # Allow user to cancel the process
             if feedback.isCanceled():
                 break
-
-        #progress_counter1 = progress_counter
-        #print('mean_loop', progress_counter, 'progess total', progress_counter_total)
 
         if not dataset:
             continue
@@ -444,10 +435,6 @@ def save_normalized_band_data(train_csv_path, out_folder_path, progress_counter,
 
 ##### modified added indexing train,test, val
 
-
-
-
-###### do as one function
 def create_train_validation_csv_balance(input_folder, out_folder_path,train_int_perc, test_int_perc, val_int_perc,scaler,
                                             random_seed=42, datatyp_index=None, normalize=True,feedback:QgsProcessingFeedback=None, min_perc = 0.01, num_permutations = 10000 ):
 
@@ -505,7 +492,7 @@ def create_train_validation_csv_balance(input_folder, out_folder_path,train_int_
 
 
 
-    return  b   # df_val,
+    return  b
 
 
 
