@@ -5,7 +5,7 @@ from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import classifierDumpPkl
 
 
-class TestSelectFeatureSubsetFromSampleAlgorithm(TestCase):
+class TestSelectFeaturesFromDatasetAlgorithm(TestCase):
 
     def test(self):
         alg = SelectFeaturesFromDatasetAlgorithm()
