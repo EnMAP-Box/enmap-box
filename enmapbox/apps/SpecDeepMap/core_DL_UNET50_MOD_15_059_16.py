@@ -45,7 +45,14 @@ from lightning.pytorch.callbacks import LearningRateFinder
 from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 
 from torchvision.transforms import v2
+import pandas as pd
+from torchvision import transforms
+from enmapbox.apps.SpecDeepMap.resnet_mod import ResNet18_Weights, ResNet50_Weights
+import utils
 
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
 
 from qgis._core import QgsProcessingFeedback
 
@@ -62,14 +69,6 @@ from segmentation_models_pytorch.encoders import get_preprocessing_fn
 
 #preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
 
-
-import pandas as pd
-import torch
-from torchvision import transforms
-
-
-from enmapbox.apps.SpecDeepMap.resnet_mod import ResNet18_Weights, ResNet50_Weights
-import utils
 
 from torchvision.models._api import Weights, WeightsEnum
 
@@ -169,19 +168,9 @@ def preprocessing_normalization_csv(csv_path):
     # Read the CSV into a pandas DataFrame
     data = pd.read_csv(csv_path)
 
-    # Filter out bands 131-135 #####################################################enmap #########################remove bad bands
-    #mask = ~((data['Band_Number'] >= 131) & (data['Band_Number'] <= 135))
-
-    # List of invalid band indices
 
     all_means = data['mean'].tolist()
     all_stds = data['std'].tolist()
-
-
-    ############################################################ enmap
-    # Extract the 'mean' and 'std' columns
-    #all_means = data['mean'].tolist()
-    #all_stds = data['std'].tolist()
 
     # Create and return the PyTorch normalization transform
     return transforms.Compose([
@@ -191,7 +180,7 @@ def preprocessing_normalization_csv(csv_path):
 
 
 
-# Example of determining the preprocessing pipeline based on user input
+
 def get_preprocessing_pipeline(pretrained_weights, channels, normalization, normalization_path):
     if pretrained_weights == 'imagenet' and channels == 3:
         preprocessing = preprocessing_imagenet()
@@ -215,14 +204,6 @@ def get_preprocessing_pipeline(pretrained_weights, channels, normalization, norm
 
 
 
-
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
 
 
 
@@ -353,7 +334,7 @@ class CustomDataset(Dataset):
         item = {'image':data_array,'mask':mask_array}
         return item
 
-### Simple Model
+### Simple Model Unet
 ### source https://github.com/NTNU-SmallSat-Lab/s_l_c_segm_hyp_img/blob/main/Justoetal_models_public_released.py
 
 class JustoUNetSimple(nn.Module):
@@ -391,11 +372,6 @@ def model_2D_Justo_UNet_Simple(input_channels, num_classes):
     model = JustoUNetSimple(input_channels, num_classes)
     return model
 
-
-
-import torch.nn.functional as F
-import torch
-import torch.nn as nn
 
 
 
@@ -523,9 +499,7 @@ class MyModel(L.LightningModule):
             x, y = x.cuda(non_blocking=True), y.cuda(non_blocking=True)
 
 
-
         preds = self.forward(x)
-
 
 
         if self.classes == 1:
@@ -875,7 +849,7 @@ def dl_train(#train_data_csv,
     # Load the first image and mask to determine their dimensions
     first_image_path = train_data['image'].iloc[0]
     first_img = gdal.Open(first_image_path, gdal.GA_ReadOnly)
-    in_channels = first_img.RasterCount ########################################## enmap -22 channel remove
+    in_channels = first_img.RasterCount
     first_img_x = first_img.RasterXSize
     first_img_y = first_img.RasterYSize
 
@@ -892,7 +866,6 @@ def dl_train(#train_data_csv,
                                                       normalization=None,
                                                       normalization_path=None)
 
-    ########## added to test preprocessing
 
 
     model = MyModel(
@@ -1004,7 +977,7 @@ def dl_train(#train_data_csv,
 
         )
 
-          #  trainer.fit(model)
+
 
         if tune == True:
             tuner = Tuner(trainer)
