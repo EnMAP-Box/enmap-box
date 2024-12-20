@@ -22,22 +22,18 @@ from osgeo import ogr
 
 import csv
 
-import pandas as pd
 #import pytorch_lightning as pl
 import segmentation_models_pytorch as smp
 import torch
 
 from torch.utils.data import Dataset
-from osgeo import gdal  # Import the gdal module
+
 
 import torch.nn as nn
 import torch.nn.functional as F
 
 from typing_extensions import ClassVar
-import numpy as np
-import pandas as pd
 from typing import Optional
-
 import torchmetrics
 from torchmetrics import JaccardIndex
 from torchmetrics.classification import BinaryJaccardIndex
@@ -52,14 +48,12 @@ from qgis._core import QgsProcessingFeedback
 
 from  enmapbox.apps.SpecDeepMap.core_DL_UNET50_MOD_15_059_16 import MyModel,CustomDataset,preprocessing_imagenet, preprocessing_imagenet_additional,preprocessing_sentinel2_TOA,preprocessing_normalization_csv,get_preprocessing_pipeline, transforms_v2
 
-from osgeo import gdal
-import torch
-import numpy as np
+
 from torchvision import transforms
 from torch import nn
 import torch
 from torchvision import transforms
-import numpy as np
+
 import math
 from osgeo import gdal, ogr, osr
 from torchvision.transforms import Compose, ToTensor
@@ -82,18 +76,7 @@ from osgeo import gdal, ogr, osr
 
 
 def load_model_and_tile_size(model_checkpoint, acc):
-    """
-    Load a model from a checkpoint and retrieve the tile sizes.
 
-    Parameters:
-    - model_checkpoint: Path to the model checkpoint file.
-    - acc: String representing the device ('cpu' or 'gpu').
-
-    Returns:
-    - model: The loaded model in evaluation mode.
-    - tile_size_x: The tile width used by the model.
-    - tile_size_y: The tile height used by the model.
-    """
     # Load the model checkpoint
     checkpoint = torch.load(model_checkpoint, map_location=torch.device(acc))
 
@@ -134,14 +117,7 @@ def load_model_and_tile_size(model_checkpoint, acc):
 
 
 def raster_to_vector(out_ds, vector_output, no_data_value):
-    """
-    Converts a raster dataset to a vector (Shapefile) using polygonization and removes features with no data.
 
-    Parameters:
-    - out_ds: GDAL raster dataset to polygonize.
-    - vector_output: Path to the output vector file (Shapefile).
-    - no_data_value: The value representing no data in the raster.
-    """
     # Get the first band of the raster dataset
     raster_band = out_ds.GetRasterBand(1)
 
@@ -220,17 +196,8 @@ def generate_positions(image_dim, tile_dim, stride):
 
 def calculate_stride_and_overlap(tile_size_x, tile_size_y, overlap_percentage):
     """
-    Calculate stride (step size) and cropping overlap based on the given tile size and overlap percentage.
+    overlap_percentage: The overlap percentage on each side.
 
-    Parameters:
-    tile_size_x (int): The width of the tile.
-    tile_size_y (int): The height of the tile.
-    overlap_percentage (float): The overlap percentage on each side.
-
-    Returns:
-    tuple: (stride_x, stride_y, overlap_x, overlap_y)
-           stride_x and stride_y are the step sizes for x and y directions.
-           overlap_x and overlap_y are the pixel overlaps for cropping in x and y directions.
     """
     # Convert overlap percentage to a fraction
     overlap = overlap_percentage / 100

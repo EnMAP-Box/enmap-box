@@ -8,33 +8,22 @@ import lightning as L
 import numpy as np
 import pandas as pd
 from torchmetrics import JaccardIndex
-from lightning.pytorch.loggers import TensorBoardLogger
-from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 from typing import Optional, List, ClassVar
-import segmentation_models_pytorch as smp
-import torch
 import albumentations as A
 from torch.utils.data import Dataset
 from osgeo import gdal
 
 import subprocess
-# CPU vs GPU, MSE And CE
 
 from lightning.pytorch.tuner import Tuner
-import pandas as pd
-#import pytorch_lightning as pl
 import segmentation_models_pytorch as smp
 import torch
-
-from torch.utils.data import Dataset
-from osgeo import gdal  # Import the gdal module
-
 import torch.nn as nn
 import torch.nn.functional as F
-
+from torch.utils.data import Dataset
+from osgeo import gdal  # Import the gdal module
 from typing_extensions import ClassVar
-import numpy as np
-import pandas as pd
+
 from typing import Optional
 
 import torchmetrics
@@ -45,14 +34,12 @@ from lightning.pytorch.callbacks import LearningRateFinder
 from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 
 from torchvision.transforms import v2
-import pandas as pd
 from torchvision import transforms
 from enmapbox.apps.SpecDeepMap.resnet_mod import ResNet18_Weights, ResNet50_Weights
 import utils
 
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
+
+
 
 from qgis._core import QgsProcessingFeedback
 

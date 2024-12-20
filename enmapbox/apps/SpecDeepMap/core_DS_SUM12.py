@@ -168,7 +168,7 @@ def find_best_split(label_histograms, num_permutations,train_perc, test_perc, va
 ### create csv for the datasets
 
 def fix_path(path):
-    """ Converts backslashes in path to forward slashes for cross-platform compatibility. """
+
     return path.replace('\\', '/')
 
 def replace_last_labels_with_images(file_paths):
@@ -430,10 +430,6 @@ def save_normalized_band_data(train_csv_path, out_folder_path, progress_counter,
     norm_df.to_csv(norm_csv, index=False)
     print(f"Summary saved to {norm_csv}")
 
-
-
-
-##### modified added indexing train,test, val
 
 def create_train_validation_csv_balance(input_folder, out_folder_path,train_int_perc, test_int_perc, val_int_perc,scaler,
                                             random_seed=42, datatyp_index=None, normalize=True,feedback:QgsProcessingFeedback=None, min_perc = 0.01, num_permutations = 10000 ):

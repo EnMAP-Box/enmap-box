@@ -2,81 +2,43 @@ import os
 import glob
 
 from qgis._core import QgsProcessingFeedback
-from torch.utils import data
+
 import lightning as L
 import numpy as np
 import pandas as pd
-from torchmetrics import JaccardIndex
-from lightning.pytorch.loggers import TensorBoardLogger
-from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
+
 from typing import Optional, List, ClassVar
 import segmentation_models_pytorch as smp
-import torch
+
 import albumentations as A
 from torch.utils.data import Dataset
-from osgeo import gdal
-from osgeo import ogr
-
-
-# CPU vs GPU, MSE And CE
 
 import csv
 
-import pandas as pd
-#import pytorch_lightning as pl
-import segmentation_models_pytorch as smp
-import torch
-
-from torch.utils.data import Dataset
-from osgeo import gdal  # Import the gdal module
-
-import torch.nn as nn
-import torch.nn.functional as F
+import math
+from osgeo import gdal, ogr, osr
 
 from typing_extensions import ClassVar
-import numpy as np
-import pandas as pd
-from typing import Optional
 
+from typing import Optional
+import torch
+from torch.utils import data
+from torch import nn
+import torch.nn.functional as F
 import torchmetrics
 from torchmetrics import JaccardIndex
 from torchmetrics.classification import BinaryJaccardIndex
 from lightning.pytorch.loggers import TensorBoardLogger
 from lightning.pytorch.callbacks import LearningRateFinder
 from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
+from torchvision.transforms import Compose, ToTensor
+from torchvision import transforms
+
 
 from torchvision.transforms import v2
 
 from  enmapbox.apps.SpecDeepMap.core_DL_UNET50_MOD_15_059_16 import MyModel,model_2D_Justo_UNet_Simple,CustomDataset,preprocessing_imagenet, preprocessing_imagenet_additional, preprocessing_sentinel2_TOA,preprocessing_normalization_csv,get_preprocessing_pipeline, transforms_v2
 from  enmapbox.apps.SpecDeepMap.core_PRED_GT_NO_DATA_mod11 import load_model_and_tile_size
-from osgeo import gdal
-import torch
-import numpy as np
-from torchvision import transforms
-from torch import nn
-import torch
-from torchvision import transforms
-import numpy as np
-import math
-from osgeo import gdal, ogr, osr
-from torchvision.transforms import Compose, ToTensor
-
-import os
-import numpy as np
-import torch
-from sklearn.metrics import jaccard_score
-import csv
-from osgeo import gdal, ogr, osr
-
-################################### tester specific code
-import numpy as np
-import torch
-import os
-import pandas as pd
-from osgeo import gdal
-import torch.nn.functional as F
-import csv
-
 
 from qgis._core import QgsProcessingFeedback
 def compute_iou(pred, gt, class_id):
@@ -102,10 +64,7 @@ transforms_v2 = v2.Compose([
 
 
 def read_image_with_gdal(image_path):
-    """
-    Reads an image using GDAL and returns it as a numpy array along with geospatial information.
-    This version reads all bands at once.
-    """
+
     dataset = gdal.Open(image_path)
 
     # channel first
@@ -138,9 +97,7 @@ def read_image_with_gdal(image_path):
 
 
 def save_prediction_as_geotiff(pred_array, geotransform, projection, output_path, no_data_value, no_data_mask):
-    """
-    Saves the prediction as a GeoTIFF file using the provided geotransform, projection, and no-data value.
-    """
+
     driver = gdal.GetDriverByName('GTiff')
     out_raster = driver.Create(output_path, pred_array.shape[1], pred_array.shape[0], 1, gdal.GDT_Byte)
     out_raster.SetGeoTransform(geotransform)
@@ -158,9 +115,7 @@ def save_prediction_as_geotiff(pred_array, geotransform, projection, output_path
 
 
 def calculate_iou(pred, target, num_classes):
-    """
-    Calculate IoU for each class between prediction and target, ignoring class 0.
-    """
+
     ious = []
     for cls in range(1, num_classes+1):  # Start from class 1 to ignore class 0, as 1 classes is sum_classes-1 (ignpred zero class in onehot encoding),
                                          #########################   # add here +1 need adjust ment for case when not!!!!!
@@ -175,11 +130,6 @@ def calculate_iou(pred, target, num_classes):
 
 def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_folder=None, csv_output_path=None,
                             no_data_label_mask=False, feedback: Optional[QgsProcessingFeedback] = None):
-    """
-    Process images from a CSV file, make predictions using the model, calculate IoU per class,
-    and optionally export predictions and write IoU results to a CSV file.
-    If `no_data_label_mask` is True, the predictions erwritten wherever the corresponding mask is 0.
-    """
 
     acc_options = ['cpu', 'gpu']
     acc = acc_options[acc_device]
