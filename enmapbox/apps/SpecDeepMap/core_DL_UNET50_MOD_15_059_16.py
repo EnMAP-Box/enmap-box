@@ -271,8 +271,8 @@ class CustomDataset(Dataset):
           mask_array = mask.ReadAsArray().astype(np.float32)
         # channel first
           mask_array = np.expand_dims(mask_array, axis=0)
-
-        else:
+        ############################################################################################################################ try
+        elif self.remove == 'Yes':
           mask_array = mask.ReadAsArray().astype(np.float32)
           mask = torch.as_tensor(mask_array, dtype=torch.int64)
 
@@ -285,6 +285,18 @@ class CustomDataset(Dataset):
           # remove one hot encoded first class ? how to adapt this for binary classes? ??
           mask_array = mask_array[1:, :, :]
 
+        elif self.remove == 'No':
+          mask_array = mask.ReadAsArray().astype(np.float32)
+          mask = torch.as_tensor(mask_array, dtype=torch.int64)
+
+          ######################### added ############################################################################################## what if no nodata class in dataset? make if condition!!!!!!
+          mask = mask.clamp(0, self.num_classes-1)
+          mask_array = torch.nn.functional.one_hot(mask, num_classes=self.num_classes) ## added +1 one to also encode no data class
+
+          mask_array = mask_array.permute(2, 0, 1).float()
+          ###############################################################################################################################
+          # remove one hot encoded first class ? how to adapt this for binary classes? ??
+          #mask_array = mask_array[1:, :, :]
 
         # Apply data augmentations, if provided
 
@@ -567,6 +579,11 @@ class MyModel(L.LightningModule):
 
         pred2 = torch.argmax(pred1, dim=1)  # Take the class with the highest probability
 
+
+        #if self.remove_b == 'Yes':
+         #   pred2 = pred2  + 1
+            #### add here +1 for pred if background removed
+
         return pred2
     def train_dataloader(self):
         # DataLoader class for training
@@ -788,12 +805,10 @@ def dl_train(#train_data_csv,
     print('scaler',scaler)
     print(f"Initial scaler: {scaler} (type: {type(scaler)})")
 
-    ignore_scaler_list = [
-        'Sentinel_2_TOA_Resnet18', 'Sentinel_2_TOA_Resnet50',
-        'LANDSAT_TM_TOA_Resnet18', 'LANDSAT_ETM_TOA_Resnet18',
-        'LANDSAT_OLI_TIRS_TOA_Resnet18', 'LANDSAT_ETM_SR_Resnet18',
-        'LANDSAT_OLI_SR_Resnet18'
-    ]
+    ignore_scaler_list = ([
+        'Sentinel_2_TOA_Resnet18', 'Sentinel_2_TOA_Resnet50'])
+
+     #   ,'LANDSAT_TM_TOA_Resnet18', 'LANDSAT_ETM_TOA_Resnet18','LANDSAT_OLI_TIRS_TOA_Resnet18', 'LANDSAT_ETM_SR_Resnet18', 'LANDSAT_OLI_SR_Resnet18'])
 
     scaler_value = None if pretrained_weights in ignore_scaler_list else summary_data['Scaler'].iloc[0]
 
@@ -802,8 +817,6 @@ def dl_train(#train_data_csv,
         scaler_value = None
 
     print(f"Scaler after handling NaN: {scaler} (type: {type(scaler)})")
-
-
 
     ### data aug:
     if data_aug == True:

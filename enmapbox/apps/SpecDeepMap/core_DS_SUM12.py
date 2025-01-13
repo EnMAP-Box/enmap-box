@@ -150,7 +150,7 @@ def find_best_split(label_histograms, num_permutations,train_perc, test_perc, va
             best_emd = avg_emd
             best_perm = perm  # Store the best permutation
 
-        print('permute ', progress_counter)
+        #print('permute ', progress_counter)
 
 
 
@@ -456,11 +456,11 @@ def create_train_validation_csv_balance(input_folder, out_folder_path,train_int_
     num_classes, unique_labels = identify_unique_classes(folder_path)
 
     # default no zero class removed
-    zero_class_removed = False
+    zero_class_removed = 'No'
 
     # Remove the label '0' if present, assuming it's the background or not relevant
     if 0 in unique_labels:
-        zero_class_removed = True
+        zero_class_removed = 'Yes'
         unique_labels.remove(0)
         num_classes = len(unique_labels)
 
