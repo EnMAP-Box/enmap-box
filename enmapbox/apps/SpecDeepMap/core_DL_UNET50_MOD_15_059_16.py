@@ -655,30 +655,30 @@ class MyModel(L.LightningModule):
                         weights = ResNet50_Weights.SENTINEL2_ALL_MOCO
                         self.backbone = 'resnet50'
 
-                    elif self.weights == 'LANDSAT_TM_TOA_Resnet18':
-                        assert self.in_channels == 7, f'Input channels should be equal to 7 , but is {self.in_channels}'
-                        weights = ResNet18_Weights.LANDSAT_TM_TOA_MOCO
-                        self.backbone = 'resnet18'
+                    #elif self.weights == 'LANDSAT_TM_TOA_Resnet18':
+                     #   assert self.in_channels == 7, f'Input channels should be equal to 7 , but is {self.in_channels}'
+                      #  weights = ResNet18_Weights.LANDSAT_TM_TOA_MOCO
+                       # self.backbone = 'resnet18'
 
-                    elif self.weights == 'LANDSAT_ETM_TOA_Resnet18':
-                        assert self.in_channels ==  9, f'Input channels should be equal to 9 , but is {self.in_channels}'
-                        weights = ResNet18_Weights.LANDSAT_ETM_TOA_MOCO
-                        self.backbone = 'resnet18'
+                    #elif self.weights == 'LANDSAT_ETM_TOA_Resnet18':
+                     #   assert self.in_channels ==  9, f'Input channels should be equal to 9 , but is {self.in_channels}'
+                      #  weights = ResNet18_Weights.LANDSAT_ETM_TOA_MOCO
+                       # self.backbone = 'resnet18'
 
-                    elif self.weights == 'LANDSAT_OLI_TIRS_TOA_Resnet18':
-                        assert self.in_channels == 11, f'Input channels should be equal to 11 , but is {self.in_channels}'
-                        weights = ResNet18_Weights.LANDSAT_OLI_TIRS_TOA_MOCO
-                        self.backbone = 'resnet18'
+                    #elif self.weights == 'LANDSAT_OLI_TIRS_TOA_Resnet18':
+                     #   assert self.in_channels == 11, f'Input channels should be equal to 11 , but is {self.in_channels}'
+                      #  weights = ResNet18_Weights.LANDSAT_OLI_TIRS_TOA_MOCO
+                       # self.backbone = 'resnet18'
 
-                    elif self.weights == 'LANDSAT_ETM_SR_Resnet18':
-                        assert self.in_channels == 6, f'Input channels should be equal to 6 , but is {self.in_channels}'
-                        weights = ResNet18_Weights.LANDSAT_ETM_SR_MOC
-                        self.backbone = 'resnet18'
+                    #elif self.weights == 'LANDSAT_ETM_SR_Resnet18':
+                     #   assert self.in_channels == 6, f'Input channels should be equal to 6 , but is {self.in_channels}'
+                      #  weights = ResNet18_Weights.LANDSAT_ETM_SR_MOC
+                       # self.backbone = 'resnet18'
 
-                    elif self.weights == 'LANDSAT_OLI_SR_Resnet18':
-                        assert self.in_channels == 7, f'Input channels should be equal to 7 , but is {self.in_channels}'
-                        weights = ResNet18_Weights.LANDSAT_OLI_SR_MOCO
-                        self.backbone = 'resnet18'
+                    #elif self.weights == 'LANDSAT_OLI_SR_Resnet18':
+                     #   assert self.in_channels == 7, f'Input channels should be equal to 7 , but is {self.in_channels}'
+                      #  weights = ResNet18_Weights.LANDSAT_OLI_SR_MOCO
+                       # self.backbone = 'resnet18'
 
                     # Load custom weights via weights enum
                 weight_enum = get_weight(self.weights)
@@ -753,7 +753,7 @@ def dl_train(#train_data_csv,
     arch_index_options = ['Unet', 'Unet++','DeepLabV3+','MAnet','JustoUNetSimple']
     arch = arch_index_options[arch_index]
 
-    pretrained_weights_options = ['imagenet', None, 'Sentinel_2_TOA_Resnet18','Sentinel_2_TOA_Resnet50','LANDSAT_TM_TOA_Resnet18','LANDSAT_ETM_TOA_Resnet18','LANDSAT_OLI_TIRS_TOA_Resnet18','LANDSAT_ETM_SR_Resnet18','LANDSAT_OLI_SR_Resnet18']
+    pretrained_weights_options = ['imagenet', None, 'Sentinel_2_TOA_Resnet18','Sentinel_2_TOA_Resnet50']#,'LANDSAT_TM_TOA_Resnet18','LANDSAT_ETM_TOA_Resnet18','LANDSAT_OLI_TIRS_TOA_Resnet18','LANDSAT_ETM_SR_Resnet18','LANDSAT_OLI_SR_Resnet18']
     pretrained_weights = pretrained_weights_options[pretrained_weights_index]
 
     if arch == 'JustoUNetSimple':

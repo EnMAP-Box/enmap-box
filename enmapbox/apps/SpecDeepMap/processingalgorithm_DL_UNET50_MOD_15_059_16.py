@@ -197,7 +197,11 @@ class DL_Train_MOD(QgsProcessingAlgorithm):
             name=self.backbone, description='Model backbone',defaultValue='resnet18'))
         self.addParameter(QgsProcessingParameterEnum(
             name=self.pretrained_weights, description='Load pretrained weights',
-            options=['imagenet', 'None', 'Sentinel_2_TOA_Resnet18','Sentinel_2_TOA_Resnet50','LANDSAT_TM_TOA_Resnet18','LANDSAT_ETM_TOA_Resnet18','LANDSAT_OLI_TIRS_TOA_Resnet18','LANDSAT_ETM_SR_Resnet18','LANDSAT_OLI_SR_Resnet18'], defaultValue=0))
+            options=['imagenet', 'None', 'Sentinel_2_TOA_Resnet18','Sentinel_2_TOA_Resnet50'], defaultValue=0))
+        #options = ['imagenet', 'None', 'Sentinel_2_TOA_Resnet18', 'Sentinel_2_TOA_Resnet50', 'LANDSAT_TM_TOA_Resnet18',
+         #          'LANDSAT_ETM_TOA_Resnet18', 'LANDSAT_OLI_TIRS_TOA_Resnet18', 'LANDSAT_ETM_SR_Resnet18',
+          #         'LANDSAT_OLI_SR_Resnet18'], defaultValue = 0))
+
         #self.addParameter(QgsProcessingParameterString(
          #   name=self.pretrained_weights, description='Load pretrained weights',defaultValue='imagenet'))
         #self.addParameter(QgsProcessingParameterNumber(
