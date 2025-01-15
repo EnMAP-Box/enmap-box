@@ -1,3 +1,4 @@
+from enmapbox.gui.applications import EnMAPBoxApplication
 
 try:
     from enmapbox.apps.SpecDeepMap.processingalgorithmDS_SUM12 import DatasetSplitter_SUM
@@ -6,8 +7,6 @@ try:
     from enmapbox.apps.SpecDeepMap.processingalgorithm_PRED_GT_NO_DATA_mod11 import DL_Mapper
     from enmapbox.apps.SpecDeepMap.processingalgorithm_Tensorboard2 import Tensorboard
     from enmapbox.apps.SpecDeepMap.processingalgorithm_Tester4 import DL_Tester
-    from enmapbox.gui.applications import EnMAPBoxApplication
-
 
     wrongEnv = False
 except Exception:
