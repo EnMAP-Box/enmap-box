@@ -1,0 +1,52 @@
+# EnMAP-Box conda environment
+# run to install: conda env create -n enmapbox_full_latest --file enmapbox_full_latest.yml
+# run to update : conda env update -n enmapbox_full_latest --file enmapbox_full_latest.yml --prune
+# run to delete : conda env remove -n enmapbox_full_latest
+# see also https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
+
+channels:
+- conda-forge
+dependencies:
+- qgis>=3.40.1
+- astropy
+- catboost
+- cdsapi
+- cython
+- docutils
+- enpt
+- flake8
+- git-lfs
+- gitpython
+- h5py
+- lightgbm
+- matplotlib
+- netcdf4
+- numba>=0.56.4
+- pip
+- pygrib
+- pyhdf
+- pyopengl
+- pytest
+- pytest-cov
+- pytest-xdist
+- scikit-learn>=1
+- sympy
+- typeguard=2
+- xarray
+- xgboost
+- pip:
+  - enpt-enmapboxapp
+  - flake8-qgis
+  # SpecDeepMap additional packages
+  - lightning
+  - torch
+  - torchmetrics
+  - segmentation-models-pytorch
+  - torchvision
+  - pandas
+  - albumentations
+  - tensorboard
+
+name: enmapbox_full_latest
+variables:
+  QT_MAC_WANTS_LAYER: 1
