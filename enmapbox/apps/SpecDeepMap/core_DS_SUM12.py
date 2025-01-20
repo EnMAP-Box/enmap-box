@@ -6,13 +6,6 @@ Created on Thu Feb 22 11:46:35 2024
 """
 
 #
-import csv
-import glob
-import os
-import numpy as np
-from osgeo import gdal
-import pandas as pd
-from collections import Counter
 from qgis._core import QgsProcessingFeedback
 
 # -*- coding: utf-8 -*-
@@ -21,7 +14,6 @@ Created on Mon Sep 16 18:56:51 2024
 
 @author: leon-
 """
-from pathlib import Path
 from osgeo import gdal
 import numpy as np
 import glob
@@ -44,10 +36,9 @@ def set_progress_counter(num_permutations, file_paths, val_perc, test_perc, norm
         train_length = math.ceil(len(file_paths) * (1 - (val_perc + test_perc)))
         # Return the number of files found
         progress_counter_total = num_permutations + (
-                    train_length * 2)  # because one loop mean, one loop std if normalization is choosen
+                train_length * 2)  # because one loop mean, one loop std if normalization is choosen
 
     return progress_counter_total
-
 
 
 def identify_unique_classes(input_folder):
@@ -77,7 +68,7 @@ def identify_unique_classes(input_folder):
         except Exception as e:
             print(f"Error processing {path}: {str(e)}")
 
-        return num_classes , unique_labels
+        return num_classes, unique_labels
 
 
 ### calculate equal data distribution across datasets
@@ -93,8 +84,9 @@ def read_label_images_and_create_histograms(input_folder, num_labels):
         label_histograms.append(histogram)
     return np.array(label_histograms), file_paths
 
-def find_best_split(label_histograms, num_permutations,train_perc, test_perc, val_perc, min_perc, random_seed,
-                    progress_counter_total,feedback:QgsProcessingFeedback=None):
+
+def find_best_split(label_histograms, num_permutations, train_perc, test_perc, val_perc, min_perc, random_seed,
+                    progress_counter_total, feedback: QgsProcessingFeedback = None):
     num_files = len(label_histograms)  # Total number of images
     num_per_class = np.sum(label_histograms, axis=0)  # Sum of labels per class
     min_per_class = num_per_class * min_perc  # Minimum instances per class based on min_perc
@@ -114,7 +106,7 @@ def find_best_split(label_histograms, num_permutations,train_perc, test_perc, va
         # for _ in range(num_permutations):
         progress_counter += 1
         progress = (progress_counter / progress_counter_total) * 100
-        #print(progress)
+        # print(progress)
         if isinstance(feedback, QgsProcessingFeedback):
             feedback.setProgress(progress)
 
@@ -123,8 +115,8 @@ def find_best_split(label_histograms, num_permutations,train_perc, test_perc, va
                 break
         perm = rng.permutation(idx)  # Random permutation of the dataset
         test_hist = np.sum(label_histograms[perm[:num_test]], axis=0)
-        val_hist = np.sum(label_histograms[perm[num_test:num_test+num_val]], axis=0)
-        train_hist = np.sum(label_histograms[perm[num_test+num_val:num_val+num_test+num_train]], axis=0)
+        val_hist = np.sum(label_histograms[perm[num_test:num_test + num_val]], axis=0)
+        train_hist = np.sum(label_histograms[perm[num_test + num_val:num_val + num_test + num_train]], axis=0)
         # Ensure counts are not less than the minimum required and the sums are not zero
         if np.any(test_hist < min_per_class) or np.any(train_hist < min_per_class) or np.any(val_hist < min_per_class):
             continue
@@ -150,9 +142,7 @@ def find_best_split(label_histograms, num_permutations,train_perc, test_perc, va
             best_emd = avg_emd
             best_perm = perm  # Store the best permutation
 
-        #print('permute ', progress_counter)
-
-
+        # print('permute ', progress_counter)
 
     # Calculate percentages
     perc_train = (num_train / num_files) * 100
@@ -164,12 +154,11 @@ def find_best_split(label_histograms, num_permutations,train_perc, test_perc, va
     return best_perm, num_train, num_test, num_val, progress_counter, progress_counter_total, b, feedback
 
 
-
 ### create csv for the datasets
 
 def fix_path(path):
-
     return path.replace('\\', '/')
+
 
 def replace_last_labels_with_images(file_paths):
     new_paths = []
@@ -180,14 +169,15 @@ def replace_last_labels_with_images(file_paths):
         new_paths.append('images'.join(new_path))
     return new_paths
 
-def save_splits_to_csv(file_paths, best_perm,num_train, num_test, num_val, out_folder_path):
+
+def save_splits_to_csv(file_paths, best_perm, num_train, num_test, num_val, out_folder_path):
     # Convert file paths using the fix_path function before processing
     fixed_file_paths = [fix_path(path) for path in file_paths]
 
     # Extract paths based on the permutation indices
     test_files = [fixed_file_paths[i] for i in best_perm[:num_test]]
-    val_files = [fixed_file_paths[i] for i in best_perm[num_test:num_val+num_test]]
-    train_files = [fixed_file_paths[i] for i in best_perm[num_val+num_test: num_val+num_test+num_train]]
+    val_files = [fixed_file_paths[i] for i in best_perm[num_test:num_val + num_test]]
+    train_files = [fixed_file_paths[i] for i in best_perm[num_val + num_test: num_val + num_test + num_train]]
 
     test_images = replace_last_labels_with_images(test_files)
     val_images = replace_last_labels_with_images(val_files)
@@ -255,7 +245,7 @@ def calculate_class_weights_from_counts(class_counts):
     return class_weights
 
 
-def create_summary_csv(train_csv, val_csv, test_csv, out_folder_path, scaler,zero_class_removed):
+def create_summary_csv(train_csv, val_csv, test_csv, out_folder_path, scaler, zero_class_removed):
     train_counts, train_percentages = calculate_class_distribution_from_csv(train_csv)
     val_counts, val_percentages = calculate_class_distribution_from_csv(val_csv)
     test_counts, test_percentages = calculate_class_distribution_from_csv(test_csv)
@@ -274,22 +264,19 @@ def create_summary_csv(train_csv, val_csv, test_csv, out_folder_path, scaler,zer
     class_weights_train = calculate_class_weights_from_counts(train_counts)
 
     data = []
-    for  cls in all_classes:
+    for cls in all_classes:
         data.append({
-                'Class ID': int(cls),
-                'Train Count': train_counts.get(cls, 0),
-                'Train Percentage': round(train_percentages.get(cls, 0),2),
-                'Validation Count': val_counts.get(cls, 0),
-                'Validation Percentage': round(val_percentages.get(cls, 0),2),
-                'Test Count': test_counts.get(cls, 0),
-                'Test Percentage':  round(test_percentages.get(cls, 0),2),
-                'Class Train Weight': round(class_weights_train.get(cls, 0),4),
-                'Scaler': scaler_s,
-                'Ignored Background : Class Zero': zero_class_removed
-            })
-
-
-
+            'Class ID': int(cls),
+            'Train Count': train_counts.get(cls, 0),
+            'Train Percentage': round(train_percentages.get(cls, 0), 2),
+            'Validation Count': val_counts.get(cls, 0),
+            'Validation Percentage': round(val_percentages.get(cls, 0), 2),
+            'Test Count': test_counts.get(cls, 0),
+            'Test Percentage': round(test_percentages.get(cls, 0), 2),
+            'Class Train Weight': round(class_weights_train.get(cls, 0), 4),
+            'Scaler': scaler_s,
+            'Ignored Background : Class Zero': zero_class_removed
+        })
 
     summary_df = pd.DataFrame(data)
     summary_csv = os.path.join(out_folder_path, 'Summary_train_val.csv')
@@ -317,7 +304,7 @@ def read_no_data_value(train_csv_path):
 
 
 def calculate_summed_statistics(train_csv_path, progress_counter, progress_counter_total, scaler,
-                                no_data_value=None, feedback:QgsProcessingFeedback=None,):
+                                no_data_value=None, feedback: QgsProcessingFeedback = None, ):
     df_train = pd.read_csv(train_csv_path)
     train_image_paths = df_train['image'].tolist()
 
@@ -356,7 +343,7 @@ def calculate_summed_statistics(train_csv_path, progress_counter, progress_count
             band = dataset.GetRasterBand(b)
             image_array = band.ReadAsArray()
 
-            if scaler is not 0:
+            if scaler != 0:
                 image_array = image_array / scaler
 
             # Apply no_data_value mask if no_data_value is provided and valid
@@ -377,20 +364,20 @@ def calculate_summed_statistics(train_csv_path, progress_counter, progress_count
         dataset = gdal.Open(path)
         progress_counter1 += 1
         progress = (progress_counter1 / progress_counter_total) * 100
-        #print(progress)
+        # print(progress)
         if isinstance(feedback, QgsProcessingFeedback):
             feedback.setProgress(progress)
 
             # Allow user to cancel the process
             if feedback.isCanceled():
                 break
-        #print('std_loop', progress_counter1, 'progess total', progress_counter_total)
+        # print('std_loop', progress_counter1, 'progess total', progress_counter_total)
 
         for b in range(1, bands + 1):
             band = dataset.GetRasterBand(b)
             image_array = band.ReadAsArray()
 
-            if scaler is not 0:
+            if scaler != 0:
                 image_array = image_array / scaler
 
             if no_data_value is not None:
@@ -405,7 +392,7 @@ def calculate_summed_statistics(train_csv_path, progress_counter, progress_count
 
     band_numbers = list(range(1, bands + 1))
 
-    if scaler is not 0:
+    if scaler != 0:
         norm_df = pd.DataFrame({
             'Band_Number': band_numbers,
             'std': global_std,
@@ -423,25 +410,25 @@ def calculate_summed_statistics(train_csv_path, progress_counter, progress_count
 
 
 def save_normalized_band_data(train_csv_path, out_folder_path, progress_counter, progress_counter_total, scaler,
-                              no_data_value=None, feedback:QgsProcessingFeedback=None):
+                              no_data_value=None, feedback: QgsProcessingFeedback = None):
     norm_df = calculate_summed_statistics(train_csv_path, progress_counter, progress_counter_total, scaler,
-                                          no_data_value,feedback)
+                                          no_data_value, feedback)
     norm_csv = os.path.join(out_folder_path, 'Normalize_Bands.csv')
     norm_df.to_csv(norm_csv, index=False)
     print(f"Summary saved to {norm_csv}")
 
 
-def create_train_validation_csv_balance(input_folder, out_folder_path,train_int_perc, test_int_perc, val_int_perc,scaler,
-                                            random_seed=42, datatyp_index=None, normalize=True,feedback:QgsProcessingFeedback=None, min_perc = 0.01, num_permutations = 10000 ):
-
+def create_train_validation_csv_balance(input_folder, out_folder_path, train_int_perc, test_int_perc, val_int_perc,
+                                        scaler,
+                                        random_seed=42, datatyp_index=None, normalize=True,
+                                        feedback: QgsProcessingFeedback = None, min_perc=0.01, num_permutations=10000):
     assert train_int_perc + val_int_perc + test_int_perc <= 100, "The sum of train, validation, and test percentages exceeds 100%. Reduce percentages number of datasets so sum is max 100%!"
 
-    train_perc = train_int_perc/100
+    train_perc = train_int_perc / 100
     test_perc = test_int_perc / 100  ## orig 0.1
     val_perc = val_int_perc / 100
 
-
-    print('scaler',scaler)
+    print('scaler', scaler)
     # Make sure the folder path uses forward slashes
     folder_path = fix_path(input_folder)
     print(folder_path)
@@ -451,7 +438,6 @@ def create_train_validation_csv_balance(input_folder, out_folder_path,train_int_
     datatyp = data_type_options[datatyp_index]
 
     img_files = glob.glob(os.path.join(folder_path, 'images', f'*.{datatyp}'))
-
 
     num_classes, unique_labels = identify_unique_classes(folder_path)
 
@@ -464,33 +450,26 @@ def create_train_validation_csv_balance(input_folder, out_folder_path,train_int_
         unique_labels.remove(0)
         num_classes = len(unique_labels)
 
-
-
-    label_histograms, file_paths = read_label_images_and_create_histograms(input_folder, num_labels =num_classes)
-    progress_counter_total = set_progress_counter(num_permutations, file_paths, val_perc, test_perc,normalize)
-    best_perm, num_train, num_test, num_val, progress_counter, progress_counter_total, b,feedback = find_best_split(label_histograms,
-                                                                                                num_permutations,train_perc,
-                                                                                                test_perc, val_perc,
-                                                                                                min_perc, random_seed,
-                                                                                                progress_counter_total,feedback)
+    label_histograms, file_paths = read_label_images_and_create_histograms(input_folder, num_labels=num_classes)
+    progress_counter_total = set_progress_counter(num_permutations, file_paths, val_perc, test_perc, normalize)
+    best_perm, num_train, num_test, num_val, progress_counter, progress_counter_total, b, feedback = find_best_split(
+        label_histograms,
+        num_permutations, train_perc,
+        test_perc, val_perc,
+        min_perc, random_seed,
+        progress_counter_total, feedback)
 
     if best_perm is None:
         raise ValueError("No valid permutation found that meets minimum class count and non-zero sum requirements.")
 
-    test_csv_path, val_csv_path, train_csv_path = save_splits_to_csv(file_paths, best_perm, num_train, num_test, num_val,
+    test_csv_path, val_csv_path, train_csv_path = save_splits_to_csv(file_paths, best_perm, num_train, num_test,
+                                                                     num_val,
                                                                      out_folder_path)
 
-    create_summary_csv(train_csv_path, val_csv_path, test_csv_path, out_folder_path, scaler,  zero_class_removed)
+    create_summary_csv(train_csv_path, val_csv_path, test_csv_path, out_folder_path, scaler, zero_class_removed)
     if normalize == True:
         no_data_value = read_no_data_value(train_csv_path)
         save_normalized_band_data(train_csv_path, out_folder_path, progress_counter, progress_counter_total, scaler,
-                                  no_data_value,feedback)
+                                  no_data_value, feedback)
 
-
-
-    return  b
-
-
-
-
-
+    return b
