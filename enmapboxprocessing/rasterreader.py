@@ -620,13 +620,9 @@ class RasterReader(object):
             wavelength = self.wavelength(bandNo, raw=True)
             if wavelength is not None:
                 if wavelength < 100:
-                    msg = 'wavelength units missing, assuming Micrometers'
                     units = 'Micrometers'
                 else:
-                    msg = 'wavelength units missing, assuming Nanometers'
                     units = 'Nanometers'
-                from enmapbox import messageLog
-                messageLog(msg, level=Qgis.MessageLevel.Warning)
                 return units
 
         return None
