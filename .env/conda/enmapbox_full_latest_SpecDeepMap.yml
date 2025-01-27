@@ -46,6 +46,7 @@ dependencies:
   - pandas
   - albumentations
   - tensorboard
+  - tqdm
 
 name: enmapbox_full_latest
 variables:
