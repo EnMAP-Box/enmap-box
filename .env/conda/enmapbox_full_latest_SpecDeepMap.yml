@@ -45,8 +45,10 @@ dependencies:
   - torchvision
   - pandas
   - albumentations
-  - tensorboard
   - tqdm
+  - tensorboard
+
+
 
 name: enmapbox_full_latest
 variables:
