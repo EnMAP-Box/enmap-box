@@ -483,10 +483,10 @@ class MyModel(L.LightningModule):
         train_iou = self.iou(preds, y)
 
         self.log_dict({'train_loss': train_loss, 'train_iou': train_iou}
-                      , on_step=False, on_epoch=True, prog_bar=True, logger=True
+                      , on_step=True, on_epoch=True, prog_bar=True, logger=True
                       )
         # Accessing step-level and epoch-level metrics during training
-        print("Logged metrics during training:", self.trainer.callback_metrics)
+        #print("Logged metrics during training:", self.trainer.callback_metrics)
 
         return {'loss': train_loss, 'train_iou': train_iou}
 
@@ -899,7 +899,7 @@ def dl_train(  # train_data_csv,
         early_stopping_callback = EarlyStopping("val_loss", mode="min", verbose=True, patience=20)
 
         checkpoint_callback = ModelCheckpoint(dirpath=logdirpath_model, monitor='val_loss_epoch',  # ,monitor='val_iou_epoch'
-                                              filename='{epoch:02d}-{val_loss_epoch:.2f}', save_top_k=num_models,
+                                              filename='{epoch:02d}-val_loss_{val_loss_epoch:.2f}', save_top_k=num_models,
                                               auto_insert_metric_name=False)
 
         feedback_callback = FeedbackCallback(feedback=feedback)
@@ -937,7 +937,7 @@ def dl_train(  # train_data_csv,
         #early_stopping_callback = EarlyStopping("val_loss", mode="min", verbose=True, patience=20)
 
         checkpoint_callback = ModelCheckpoint(dirpath=logdirpath_model, monitor='val_loss_epoch',  # ,monitor='val_iou_epoch'
-                                              filename='{epoch:02d}-{val_loss_epoch:.2f}', save_top_k=num_models,
+                                              filename='{epoch:02d}-val_loss_{val_loss_epoch:.2f}', save_top_k=num_models,
                                               auto_insert_metric_name=False)
 
         feedback_callback = FeedbackCallback(feedback=feedback)
@@ -950,7 +950,9 @@ def dl_train(  # train_data_csv,
             devices=acc_type_numbers,  # leads to gui crash, also starts multiprocess
             logger=logger,
             log_every_n_steps=1,
-            callbacks=[checkpoint_callback, feedback_callback]
+            callbacks=[checkpoint_callback, feedback_callback],
+            #limit_train_batches=1,##################################################################### remove just for test
+            #limit_val_batches=1,##################################################################### remove just for test
 
         )
 
