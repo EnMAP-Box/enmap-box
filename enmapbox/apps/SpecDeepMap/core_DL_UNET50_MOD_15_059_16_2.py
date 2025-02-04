@@ -728,6 +728,13 @@ def dl_train(  # train_data_csv,
                                   'Sentinel_2_TOA_Resnet50']  # ,'LANDSAT_TM_TOA_Resnet18','LANDSAT_ETM_TOA_Resnet18','LANDSAT_OLI_TIRS_TOA_Resnet18','LANDSAT_ETM_SR_Resnet18','LANDSAT_OLI_SR_Resnet18']
     pretrained_weights = pretrained_weights_options[pretrained_weights_index]
 
+    if pretrained_weights == 'Sentinel_2_TOA_Resnet18':
+        backbone = 'resnet18'
+
+    elif pretrained_weights == 'Sentinel_2_TOA_Resnet50':
+        backbone = 'resnet50'
+
+
     if arch == 'JustoUNetSimple':
         freeze_encoder = False
 
