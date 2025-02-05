@@ -5,15 +5,7 @@ Created on Thu Feb 22 11:46:35 2024
 @author: leon-
 """
 
-#
 from qgis._core import QgsProcessingFeedback
-
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Sep 16 18:56:51 2024
-
-@author: leon-
-"""
 from osgeo import gdal
 import numpy as np
 import glob
@@ -24,9 +16,7 @@ from collections import Counter
 import os
 import math
 
-
-## set progress counter for two main loops
-
+# set progress counter for two main loops
 
 def set_progress_counter(num_permutations, file_paths, val_perc, test_perc, normalize):
     if normalize == False:
@@ -85,17 +75,29 @@ def read_label_images_and_create_histograms(input_folder, num_labels):
     return np.array(label_histograms), file_paths
 
 
-def find_best_split(label_histograms, num_permutations, train_perc, test_perc, val_perc, min_perc, random_seed,
+def find_best_split(label_histograms, num_permutations, train_perc, test_perc, val_perc, min_perc, random_seed_gen,
                     progress_counter_total, feedback: QgsProcessingFeedback = None):
     num_files = len(label_histograms)  # Total number of images
     num_per_class = np.sum(label_histograms, axis=0)  # Sum of labels per class
     min_per_class = num_per_class * min_perc  # Minimum instances per class based on min_perc
 
     idx = np.arange(num_files)
-    rng = np.random.default_rng(seed=random_seed)  # Random number generator with seed
-    num_test = int(num_files * test_perc)  # Number of test images
-    num_val = int(num_files * val_perc)
-    num_train = int(num_files * train_perc)  # Number of validation images (cumulative with test)
+
+    rng = np.random.default_rng(seed=random_seed_gen)  # Random number generator with seed
+    #num_test = int(num_files * test_perc)  # Number of test images
+    #num_val = int(num_files * val_perc)
+    #num_train = int(num_files * train_perc)  # Number of validation images (cumulative with test)
+
+
+    # new ensure correct rounding
+
+    # Compute test and validation first (rounded up)
+    num_test = math.ceil(num_files * test_perc)
+    num_val = math.ceil(num_files * val_perc)
+
+    # Compute train set (rounded up) but ensuring no overlap
+    num_train = min(math.ceil(num_files * train_perc), num_files - (num_test + num_val))
+
 
     best_emd = np.inf
     best_perm = None  # To store the best permutation
@@ -204,7 +206,7 @@ def save_splits_to_csv(file_paths, best_perm, num_train, num_test, num_val, out_
     return test_csv_path, val_csv_path, train_csv_path
 
 
-### create summary csv with distribution absolute count and counts in percentage, as well as class weights
+# create summary csv with distribution absolute count and counts in percentage, as well as class weights
 
 def calculate_class_distribution_from_csv(csv_path):
     df = pd.read_csv(csv_path)
@@ -283,7 +285,7 @@ def create_summary_csv(train_csv, val_csv, test_csv, out_folder_path, scaler, ze
     summary_df.to_csv(summary_csv, index=False)
 
 
-######Create additional Normalization Mean Std Normalizer, whcih ignores No-data value if no-data defined
+# Create additional Normalization Mean Std Normalizer, whcih ignores No-data value if no-data defined
 
 def read_no_data_value(train_csv_path):
     df_train = pd.read_csv(train_csv_path)
@@ -420,10 +422,11 @@ def save_normalized_band_data(train_csv_path, out_folder_path, progress_counter,
 
 def create_train_validation_csv_balance(input_folder, out_folder_path, train_int_perc, test_int_perc, val_int_perc,
                                         scaler,
-                                        random_seed=42, datatyp_index=None, normalize=True,
+                                        random_seed_gen, datatyp_index=None, normalize=True,
                                         feedback: QgsProcessingFeedback = None, min_perc=0.01, num_permutations=10000):
     assert train_int_perc + val_int_perc + test_int_perc <= 100, "The sum of train, validation, and test percentages exceeds 100%. Reduce percentages number of datasets so sum is max 100%!"
 
+    #rng = np.random.default_rng(seed=random_seed_gen)
     train_perc = train_int_perc / 100
     test_perc = test_int_perc / 100  ## orig 0.1
     val_perc = val_int_perc / 100
@@ -456,7 +459,7 @@ def create_train_validation_csv_balance(input_folder, out_folder_path, train_int
         label_histograms,
         num_permutations, train_perc,
         test_perc, val_perc,
-        min_perc, random_seed,
+        min_perc, random_seed_gen,
         progress_counter_total, feedback)
 
     if best_perm is None:
@@ -473,3 +476,7 @@ def create_train_validation_csv_balance(input_folder, out_folder_path, train_int
                                   no_data_value, feedback)
 
     return b
+
+
+
+
