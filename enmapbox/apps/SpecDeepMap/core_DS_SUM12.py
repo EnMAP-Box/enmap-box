@@ -10,11 +10,12 @@ from osgeo import gdal
 import numpy as np
 import glob
 import pandas as pd
-from tqdm import tqdm
+
 from scipy.stats import wasserstein_distance
 from collections import Counter
 import os
 import math
+#from tqdm import tqdm
 
 # set progress counter for two main loops
 
@@ -41,7 +42,8 @@ def identify_unique_classes(input_folder):
     unique_labels = set()
 
     # Loop through each file
-    for path in tqdm(file_paths, desc="Processing label images"):
+    #for path in tqdm(file_paths, desc="Processing label images"):
+    for path in file_paths:
         try:
             # Open the image file
             dataset = gdal.Open(path)
@@ -67,7 +69,8 @@ def read_label_images_and_create_histograms(input_folder, num_labels):
     paths = os.path.join(input_folder, 'labels/*.tif')
     file_paths = glob.glob(paths)
     label_histograms = []
-    for path in tqdm(file_paths, desc="Reading label images"):
+    #for path in tqdm(file_paths, desc="Reading label images"):
+    for path in file_paths:
         labels = gdal.Open(path).ReadAsArray()
         # Adjust histogram to ignore label 0 and include only relevant labels
         histogram, _ = np.histogram(labels, bins=np.arange(1, num_labels + 2), range=(1, num_labels + 1))
@@ -104,7 +107,8 @@ def find_best_split(label_histograms, num_permutations, train_perc, test_perc, v
 
     progress_counter = 0
 
-    for _ in tqdm(range(num_permutations), desc="Evaluating permutations"):
+    #for _ in tqdm(range(num_permutations), desc="Evaluating permutations"):
+    for _ in range(num_permutations):
         # for _ in range(num_permutations):
         progress_counter += 1
         progress = (progress_counter / progress_counter_total) * 100
