@@ -426,7 +426,7 @@ def save_normalized_band_data(train_csv_path, out_folder_path, progress_counter,
 
 def create_train_validation_csv_balance(input_folder, out_folder_path, train_int_perc, test_int_perc, val_int_perc,
                                         scaler,
-                                        random_seed_gen, datatyp_index=None, normalize=True,
+                                        random_seed_gen,  normalize=True,
                                         feedback: QgsProcessingFeedback = None, min_perc=0.01, num_permutations=10000):
     assert train_int_perc + val_int_perc + test_int_perc <= 100, "The sum of train, validation, and test percentages exceeds 100%. Reduce percentages number of datasets so sum is max 100%!"
 
@@ -441,10 +441,10 @@ def create_train_validation_csv_balance(input_folder, out_folder_path, train_int
     print(folder_path)
     print(out_folder_path)
     # Get the image files and fix the paths
-    data_type_options = ['tif', 'jpg', 'jpeg', 'png']
-    datatyp = data_type_options[datatyp_index]
+    #data_type_options = ['tif', 'jpg', 'jpeg', 'png']
+    #datatyp = data_type_options[datatyp_index]
 
-    img_files = glob.glob(os.path.join(folder_path, 'images', f'*.{datatyp}'))
+    #img_files = glob.glob(os.path.join(folder_path, 'images', f'*.{datatyp}'))
 
     num_classes, unique_labels = identify_unique_classes(folder_path)
 

@@ -37,7 +37,7 @@ class DatasetSplitter_SUM(QgsProcessingAlgorithm):
     # N_train = "Train images"
     Seed = 'Random Seed'
     Shuffle = 'Shuffle'
-    Data_type = 'Datatypedefault:tif'
+    #Data_type = 'Datatypedefault:tif'
     Output_path = 'Outputfolderpath'
     scaler = "Scaler"
     normalize = "normalize"
@@ -149,8 +149,8 @@ class DatasetSplitter_SUM(QgsProcessingAlgorithm):
         #  defaultValue=19))
 
         # self.addParameter(
-        self.addParameter(QgsProcessingParameterString(
-            name=self.Data_type, description='Data type',  defaultValue="tif"))
+        #self.addParameter(QgsProcessingParameterString(
+         #   name=self.Data_type, description='Data type',  defaultValue="tif"))
         #self.addParameter(QgsProcessingParameterEnum(
          #   name=self.Data_type, description='Data type', options=['tif', 'jpg', 'jpeg', 'png'], defaultValue=0))
         self.addParameter(QgsProcessingParameterNumber(
@@ -190,7 +190,7 @@ class DatasetSplitter_SUM(QgsProcessingAlgorithm):
             val_int_perc=self.parameterAsInt(parameters, self.N_val, context),
             # num_labels=None,
             random_seed_gen=self.parameterAsInt(parameters, self.Seed, context),
-            datatyp_index=self.parameterAsEnum(parameters, self.Data_type, context),
+            #datatyp_index=self.parameterAsEnum(parameters, self.Data_type, context),
             normalize=self.parameterAsBool(parameters, self.normalize, context),
             feedback=feedback,
             scaler=self.parameterAsInt(parameters, self.scaler, context),
