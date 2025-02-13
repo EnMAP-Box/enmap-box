@@ -1,62 +1,10 @@
-import os
-import glob
-
-from qgis._core import QgsProcessingFeedback
-from torch.utils import data
-import lightning as L
-import numpy as np
-import pandas as pd
-from torchmetrics import JaccardIndex
-from lightning.pytorch.loggers import TensorBoardLogger
-from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
-from typing import Optional, List, ClassVar
-import segmentation_models_pytorch as smp
-import torch
-import albumentations as A
-from torch.utils.data import Dataset
-from osgeo import gdal
-from osgeo import ogr
-
-
 # CPU vs GPU, MSE And CE
 
-import csv
-
-#import pytorch_lightning as pl
-import segmentation_models_pytorch as smp
-import torch
-
-from torch.utils.data import Dataset
-
-
-import torch.nn as nn
-import torch.nn.functional as F
-
-from typing_extensions import ClassVar
-from typing import Optional
-import torchmetrics
-from torchmetrics import JaccardIndex
-from torchmetrics.classification import BinaryJaccardIndex
-from lightning.pytorch.loggers import TensorBoardLogger
-from lightning.pytorch.callbacks import LearningRateFinder
-from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
-
-from torchvision.transforms import v2
+# import pytorch_lightning as pl
 
 from qgis._core import QgsProcessingFeedback
 
-
-from  enmapbox.apps.SpecDeepMap.core_DL_UNET50_MOD_15_059_16 import MyModel,CustomDataset,preprocessing_imagenet, preprocessing_imagenet_additional,preprocessing_sentinel2_TOA,preprocessing_normalization_csv,get_preprocessing_pipeline, transforms_v2
-
-
-from torchvision import transforms
-from torch import nn
-import torch
-from torchvision import transforms
-
-import math
-from osgeo import gdal, ogr, osr
-from torchvision.transforms import Compose, ToTensor
+from enmapbox.apps.SpecDeepMap.core_DL_UNET50_MOD_15_059_16_2 import MyModel
 
 # -*- coding: utf-8 -*-
 """
@@ -68,15 +16,11 @@ Created on Mon Sep 23 11:40:42 2024
 import os
 import numpy as np
 import torch
-from sklearn.metrics import jaccard_score
 import csv
 from osgeo import gdal, ogr, osr
 
 
-
-
 def load_model_and_tile_size(model_checkpoint, acc):
-
     # Load the model checkpoint
     checkpoint = torch.load(model_checkpoint, map_location=torch.device(acc))
 
@@ -105,7 +49,7 @@ def load_model_and_tile_size(model_checkpoint, acc):
             "batch_size": 1,
             "classes": num_classes,
             "in_channels": in_channels,
-            "preprocess":pre_process
+            "preprocess": pre_process
         }
     )
 
@@ -113,11 +57,10 @@ def load_model_and_tile_size(model_checkpoint, acc):
     model.eval()
 
     # Return the model and tile sizes
-    return model, tile_size_x, tile_size_y , num_classes, remove_c
+    return model, tile_size_x, tile_size_y, num_classes, remove_c
 
 
 def raster_to_vector(out_ds, vector_output, no_data_value):
-
     # Get the first band of the raster dataset
     raster_band = out_ds.GetRasterBand(1)
 
@@ -126,7 +69,6 @@ def raster_to_vector(out_ds, vector_output, no_data_value):
 
     # Create a new Shapefile
     driver = ogr.GetDriverByName("ESRI Shapefile")
-
 
     # Create the new vector data source (Shapefile)
     ##########################################################################
@@ -162,7 +104,6 @@ def raster_to_vector(out_ds, vector_output, no_data_value):
     # Clean up and save the shapefile
     vector_ds = None  # Close the dataset to ensure it is properly saved
     print(f"Conversion to vector completed and saved at {vector_output}.")
-
 
 
 def compute_iou_per_class(pred, gt, num_classes):
@@ -214,11 +155,11 @@ def calculate_stride_and_overlap(tile_size_x, tile_size_y, overlap_percentage):
 
 
 def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=None, ignore_index=0
-         , acc=None, raster_output=None, vector_output=None, csv_output=None,
-         feedback: QgsProcessingFeedback = None):  # , #vector=True
+                , acc=None, raster_output=None, vector_output=None, csv_output=None,
+                feedback: QgsProcessingFeedback = None):  # , #vector=True
     # get names
 
-    print('vector_output',  vector_output)
+    print('vector_output', vector_output)
 
     acc_options = ['cpu', 'gpu']
     acc = acc_options[acc]
@@ -249,7 +190,6 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
 
     model, tile_size_x, tile_size_y, num_classes, remove_c = load_model_and_tile_size(model_checkpoint, acc=acc)
 
-
     stride_x, stride_y, overlap_x, overlap_y = calculate_stride_and_overlap(tile_size_x, tile_size_y,
                                                                             overlap_percentage=overlap)
 
@@ -270,24 +210,32 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
         for y in y_positions:
             tile = dataset.ReadAsArray(x, y, tile_size_x, tile_size_y)
 
-            image = np.expand_dims(tile, axis=0)
+            ############## added
+            # Step 1: Create a mask to identify where the tile has -inf values (no-data areas)
+            #mask = np.isinf(tile)  # Mask where the tile has -inf values
 
+            #replacement_value = -9999
+
+            # Step 2: Replace -inf with the replacement value (-32768)
+            #tile[mask] = replacement_value
+            ############## added
+
+            image = np.expand_dims(tile, axis=0)
 
             # Make prediction using the model
             image = image.astype(np.float32)
 
-
             preds = model.predict(image)
 
-            preds = preds +1
+            preds = preds + 1
 
-            #if remove_c == True:
-             #   # No need to add +1   but some yes, because of model loader encoding!!!!!!!!!!!!!!!!!!!!! could just be preds +1 no if needed
-              #  preds = preds +1
-            #else:
-                # Add +1 to recover original labels
-             #   preds = preds +1
-                 ###### added as now predict values from 0-5 and want 1-6 instead + added in model description prediction
+            # if remove_c == True:
+            #   # No need to add +1   but some yes, because of model loader encoding!!!!!!!!!!!!!!!!!!!!! could just be preds +1 no if needed
+            #  preds = preds +1
+            # else:
+            # Add +1 to recover original labels
+            #   preds = preds +1
+            ###### added as now predict values from 0-5 and want 1-6 instead + added in model description prediction
 
             #####################################################################################
 
@@ -336,10 +284,9 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
                 if feedback.isCanceled():
                     break
 
-
-     # no_data_value = 0 #################in case images have no data value bad defined maybe , add as optional advanced hyperparameter in gui
+    # no_data_value = 0 #################in case images have no data value bad defined maybe , add as optional advanced hyperparameter in gui
     if no_data_value != None:
-    # dataset = gdal.Open(input_raster)
+        # dataset = gdal.Open(input_raster)
         modified_band = dataset.GetRasterBand(1)
 
         # Read data from modified raster
@@ -351,14 +298,13 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
 
         mem_arr = mem_ds.ReadAsArray()  # assuming a single band raster
 
-        #mask image
-        mem_arr[mask] = no_data_value
+        # mask image
+        mem_arr[mask] = 0
 
-        #write masked image to ratser file
+        # write masked image to ratser file
         mem_ds.WriteArray(mem_arr)
 
-
-    ## new
+        ## new
         band = mem_ds.GetRasterBand(1)
         band.SetNoDataValue(no_data_value)
 
@@ -371,16 +317,15 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
 
         mem_arr = mem_ds.ReadAsArray()  # assuming a single band raster
 
-        #mask image
+        # mask image
         mem_arr[gt_mask] = 0
 
-        #write masked image to ratser file
+        # write masked image to ratser file
         mem_ds.WriteArray(mem_arr)
 
-
-    ## new
-        band = mem_ds.GetRasterBand(1)
-        band.SetNoDataValue(0)  #### hardcoded 0 as no data
+        ## new
+        #band = mem_ds.GetRasterBand(1)
+        #band.SetNoDataValue(0)  #### hardcoded 0 as no data
 
     gtiff_driver = gdal.GetDriverByName('GTiff')
     out_ds = gtiff_driver.CreateCopy(raster_output, mem_ds, 0)
@@ -391,38 +336,48 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
 
     # calc. mean and per class IoU ignore index (no-data label))
 
-
     if gt_path:
-            # Open the ground truth raster
+        # Open the ground truth raster
         gt_dataset = gdal.Open(gt_path)
         gt = gt_dataset.ReadAsArray()
         print('Ground truth raster shape:', gt.shape)
 
-            # Open the prediction raster
+        # Open the prediction raster
         pred_dataset = mem_ds
         prediction = pred_dataset.ReadAsArray()
 
-            # Ensure shapes match
+        # Ensure shapes match
         if gt.shape != prediction.shape:
             raise ValueError(f"Shape mismatch: ground truth {gt.shape} and prediction {prediction.shape}")
 
-        print('num_classes',num_classes)
+        print('num_classes', num_classes)
 
-            # Calculate IoU per class
-        ious = compute_iou_per_class(prediction, gt, num_classes)
+        # Calculate IoU per class
+        ious = compute_iou_per_class(prediction, gt, num_classes+1)   ###### if background visible or any no data needs +1 !!!!! otherwise num_classes
         print(f"Mean IoU per class: {ious}")
 
-        mean_iou = np.nanmean(ious)
+        #also exclude iou count here 0 before mean ################################### do if condition same in tester
+
+        #if 0 present in cls :
+        # ious = ious[1:]
+
+        # else:
+          #ious = ious
+
+        #ious = ious[1:] ############## removed first class permanent . doesnt check if gt has 0 and would scew results. if 0 would not be present.
+
+        mean_iou = np.nanmean(ious[1:]) # exclude first ious[1:]
         print(f"Mean IoU across all classes: {mean_iou}")
 
-            # Write IoU per class and mean IoU to a CSV
+        # Write IoU per class and mean IoU to a CSV
         if csv_output:
             with open(csv_output, mode='w', newline='') as csv_file:
                 writer = csv.writer(csv_file)
                 writer.writerow(['Class', 'IoU'])
 
-                    # Write IoU for each class
-                for cls, iou in enumerate(ious, start=0):   ##########################  need change if background class zero was removed or not
+                # Write IoU for each class
+                for cls, iou in enumerate(ious,
+                                          start=1): # 1 ##########################  need change if background class zero was removed or not 0 or 1
                     writer.writerow([cls, iou])
 
                     # Write the mean IoU in the last row
@@ -435,5 +390,3 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
     dataset = None
     modified_band = None
     modified_dataset = None
-
-
