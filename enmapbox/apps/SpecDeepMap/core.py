@@ -1,9 +1,11 @@
-import os
-import geopandas as gpd
-from shapely.geometry import Polygon
-from osgeo import gdal
-import pandas as pd
 import math
+import os
+
+import geopandas as gpd
+import pandas as pd
+from osgeo import gdal
+from shapely.geometry import Polygon
+
 
 def split_raster_rois(source_raster, source_mask, roi_s, output_path, tile_size_x, tile_size_y, x_stride, y_stride,
                       mode=True, remove_null=True):
@@ -21,9 +23,8 @@ def split_raster_rois(source_raster, source_mask, roi_s, output_path, tile_size_
     ds = gdal.Open(source_raster)
     ds_mask = gdal.Open(source_mask)
 
-
     # assert checks if same crs or pixel sizes in x and y
-    prj_ds =ds.GetProjection()
+    prj_ds = ds.GetProjection()
     prj_ds_mask = ds_mask.GetProjection()
     assert prj_ds == prj_ds_mask, "The rasters have different CRS."
     assert ds.GetGeoTransform()[1] == ds_mask.GetGeoTransform()[
@@ -64,7 +65,7 @@ def split_raster_rois(source_raster, source_mask, roi_s, output_path, tile_size_
         # get polygon bounding box per roi
         x_min, y_min, x_max, y_max, polygon = row['minx'], row['miny'], row['maxx'], row['maxy'], row['geometry']
 
-        #### next lines adapted from https://github.com/deepbands/deep-learning-datasets-maker/blob/develop/deep-learning-datasets-maker/utils/splitting.py
+        # next lines adapted from https://github.com/deepbands/deep-learning-datasets-maker/blob/develop/deep-learning-datasets-maker/utils/splitting.py
 
         x_tile_num = math.ceil((x_max - x_min) / x_tile_size_geo)
         y_tile_num = math.ceil((y_max - abs(y_min)) / y_tile_size_geo)  # very strong adapted ()
@@ -85,10 +86,10 @@ def split_raster_rois(source_raster, source_mask, roi_s, output_path, tile_size_
                            i] + x_tile_size_geo  # adapted here + tile size instead of next value ( important as stride is used for steps)
                 ymax = ysteps[j]
                 ymin = ysteps[j] - y_tile_size_geo
-                ##### adapted until here
+                # adapted until here
 
                 projwin = (
-                    xmin, ymax, xmax, ymin)  ##### does this need abs to work? , other raster tile geneartor does it
+                    xmin, ymax, xmax, ymin)  # does this need abs to work? , other raster tile geneartor does it
 
                 # create polygon for each tile
                 sub_window_polygon = Polygon([(xmin, ymin), (xmin, ymax), (xmax, ymax), (xmax, ymin), (xmin, ymin)])
