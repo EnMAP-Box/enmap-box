@@ -1,28 +1,11 @@
-
-
-from qgis.PyQt.QtCore import QCoreApplication
-from qgis.core import (QgsProcessing,
-                       QgsFeatureSink,
-                       QgsProcessingException,
-                       QgsProcessingAlgorithm,
-                       QgsProcessingParameterFeatureSource,
-                       QgsProcessingParameterFeatureSink,
-                       QgsProcessingParameterRasterLayer,
-                       QgsProcessingOutputFolder,
-                       QgsProcessingParameterNumber,
-                       QgsProcessingParameterFile,
-                       QgsProcessingParameterRasterDestination,
-                       QgsProcessingParameterFolderDestination,
-                       QgsProcessingParameterBoolean,
-                       QgsProcessingFeedback)
-from qgis import processing
-
-
-
 import subprocess
 import time
 import webbrowser
 
+from qgis.PyQt.QtCore import QCoreApplication
+from qgis.core import (QgsProcessingAlgorithm,
+                       QgsProcessingParameterNumber,
+                       QgsProcessingParameterFile)
 
 
 class Tensorboard(QgsProcessingAlgorithm):
@@ -99,11 +82,11 @@ class Tensorboard(QgsProcessingAlgorithm):
     def shortHelpString(self):
 
         html = '' \
-       '<p>This algorithm opens a Tensoboard. A Tensorboard is an interactive visualization tool to explore the trainings and validations metrics and losses.</p>' \
-       '<h3>TensorBoard Log Directory</h3>' \
-       '<p>The path which was defined during training to save model and logs.</p>' \
-       '<h3>TensorBoard Port (Optional) </h3>' \
-       '<p>Here you can define an additional local port to open a Tensorboard. When opening the Tensorboard it is checked if the defined port is already used for a tensorboard, if so its closed and the new tensorboard is initalized instead </p>'
+               '<p>This algorithm opens a Tensoboard. A Tensorboard is an interactive visualization tool to explore the trainings and validations metrics and losses.</p>' \
+               '<h3>TensorBoard Log Directory</h3>' \
+               '<p>The path which was defined during training to save model and logs.</p>' \
+               '<h3>TensorBoard Port (Optional) </h3>' \
+               '<p>Here you can define an additional local port to open a Tensorboard. When opening the Tensorboard it is checked if the defined port is already used for a tensorboard, if so its closed and the new tensorboard is initalized instead </p>'
         return html
 
     def initAlgorithm(self, config=None):
@@ -128,6 +111,7 @@ class Tensorboard(QgsProcessingAlgorithm):
             )
         )
         self.process = None
+
     def processAlgorithm(self, parameters, context, feedback):
         """
         Here is where the processing itself takes place.
@@ -135,9 +119,6 @@ class Tensorboard(QgsProcessingAlgorithm):
 
         logdir = self.parameterAsString(parameters, self.TENSORBOARD_LOGDIR, context)
         port = self.parameterAsInt(parameters, self.TENSORBOARD_PORT, context)
-
-
-
 
         tensorboard_command = f"tensorboard --logdir={logdir} --port={port}"
 
@@ -162,23 +143,21 @@ class Tensorboard(QgsProcessingAlgorithm):
         self.process = subprocess.Popen(tensorboard_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         time.sleep(10)
 
-
         url = f"http://localhost:{port}"
         webbrowser.open_new(url)
 
-        #return print('Tensorboard opened at: ',port)
+        # return print('Tensorboard opened at: ',port)
         feedback.pushInfo(f"TensorBoard started with PID {self.process.pid} at {logdir} on port {port}")
 
-
         return {"PID": self.process.pid}
-        #feedback.pushInfo(f"TensorBoard started with PID {self.process.pid} at {logdir} on port {port}")
+        # feedback.pushInfo(f"TensorBoard started with PID {self.process.pid} at {logdir} on port {port}")
         #        return {"PID": self.process.pid}
 
-        #print('Used Tensorboard port', port)
-
+        # print('Used Tensorboard port', port)
 
     def helpUrl(self, *args, **kwargs):
         return ''
-# 7
+
+    # 7
     def createInstance(self):
         return type(self)()
