@@ -353,20 +353,26 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
         print('num_classes', num_classes)
 
         # Calculate IoU per class
-        ious = compute_iou_per_class(prediction, gt, num_classes+1)   ###### if background visible or any no data needs +1 !!!!! otherwise num_classes
+
+        # check if no data class is used, if so extend class calc, and csv start parameter
+        if np.any(gt == 0):
+            b = 1
+            num_classes = num_classes + 1
+        else:
+            b = 0
+
+        ious = compute_iou_per_class(prediction, gt, num_classes)   ###### if background visible or any no data needs +1 !!!!! otherwise num_classes
         print(f"Mean IoU per class: {ious}")
 
-        #also exclude iou count here 0 before mean ################################### do if condition same in tester
+        # if no data class in gt, exclude in mean IoU calc
 
-        #if 0 present in cls :
-        # ious = ious[1:]
+        if b == 1:
+            mean_iou = np.nanmean(ious[1:])
+        else:
+            mean_iou = np.nanmean(ious)
 
-        # else:
-          #ious = ious
 
-        #ious = ious[1:] ############## removed first class permanent . doesnt check if gt has 0 and would scew results. if 0 would not be present.
-
-        mean_iou = np.nanmean(ious[1:]) # exclude first ious[1:]
+        #mean_iou = np.nanmean(ious[1:]) # exclude first ious[1:]
         print(f"Mean IoU across all classes: {mean_iou}")
 
         # Write IoU per class and mean IoU to a CSV
@@ -377,7 +383,7 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
 
                 # Write IoU for each class
                 for cls, iou in enumerate(ious,
-                                          start=1): # 1 ##########################  need change if background class zero was removed or not 0 or 1
+                                          start=b): # 1 ##########################  need change if background class zero was removed or not 0 or 1
                     writer.writerow([cls, iou])
 
                     # Write the mean IoU in the last row
