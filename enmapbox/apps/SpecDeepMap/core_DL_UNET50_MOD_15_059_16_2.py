@@ -903,10 +903,10 @@ def dl_train(  # train_data_csv,
 
     # Callbacks
     if early_stop == True:
-        early_stopping_callback = EarlyStopping("val_loss", mode="min", verbose=True, patience=20)
+        early_stopping_callback = EarlyStopping("val_iou", mode="max", verbose=True, patience=20)
 
-        checkpoint_callback = ModelCheckpoint(dirpath=logdirpath_model, monitor='val_loss_epoch',  # ,monitor='val_iou_epoch'
-                                              filename='{epoch:02d}-val_loss_{val_loss_epoch:.2f}', save_top_k=num_models,
+        checkpoint_callback = ModelCheckpoint(dirpath=logdirpath_model, monitor='val_iou_epoch',  # ,monitor='val_iou_epoch'
+                                              filename='{epoch:02d}-val_iou_{val_iou_epoch:.2f}', save_top_k=num_models,
                                               auto_insert_metric_name=False)
 
         feedback_callback = FeedbackCallback(feedback=feedback)
@@ -943,8 +943,8 @@ def dl_train(  # train_data_csv,
     else:
         #early_stopping_callback = EarlyStopping("val_loss", mode="min", verbose=True, patience=20)
 
-        checkpoint_callback = ModelCheckpoint(dirpath=logdirpath_model, monitor='val_loss_epoch',  # ,monitor='val_iou_epoch'
-                                              filename='{epoch:02d}-val_loss_{val_loss_epoch:.2f}', save_top_k=num_models,
+        checkpoint_callback = ModelCheckpoint(dirpath=logdirpath_model, monitor='val_iou_epoch',  # ,monitor='val_iou_epoch'
+                                              filename='{epoch:02d}-val_iou_{val_iou_epoch:.2f}', save_top_k=num_models,
                                               auto_insert_metric_name=False)
 
         feedback_callback = FeedbackCallback(feedback=feedback)
