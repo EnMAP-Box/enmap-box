@@ -111,8 +111,13 @@ def split_raster(raster, ds_mask, output_path, tile_size_x, tile_size_y, step_x,
                     output = f'{r_name}_tile_{x}_{y}.tif'
                     path_i_out = os.path.join(image_dir, output)
                     path_l_out = os.path.join(label_dir, output)
-                    gdal.Translate(path_i_out, ds, srcWin=[x, y, tile_size_x, tile_size_y])
-                    gdal.Translate(path_l_out, ds_mask, srcWin=[x, y, tile_size_x, tile_size_y])
+                    if nodata_spec is not None:
+
+                        gdal.Translate(path_i_out, ds, srcWin=[x, y, tile_size_x, tile_size_y], noData=nodata_spec)
+                        gdal.Translate(path_l_out, ds_mask, srcWin=[x, y, tile_size_x, tile_size_y])
+                    else:
+                        gdal.Translate(path_i_out, ds, srcWin=[x, y, tile_size_x, tile_size_y])
+                        gdal.Translate(path_l_out, ds_mask, srcWin=[x, y, tile_size_x, tile_size_y])
                     print(f"Created {output}")
                     tile_counter += 1
                 else:
@@ -123,8 +128,13 @@ def split_raster(raster, ds_mask, output_path, tile_size_x, tile_size_y, step_x,
                 output = f'{r_name}_tile_{x}_{y}.tif'
                 path_i_out = os.path.join(image_dir, output)
                 path_l_out = os.path.join(label_dir, output)
-                gdal.Translate(path_i_out, ds, srcWin=[x, y, tile_size_x, tile_size_y])
-                gdal.Translate(path_l_out, ds_mask, srcWin=[x, y, tile_size_x, tile_size_y])
+                if nodata_spec is not None:
+
+                    gdal.Translate(path_i_out, ds, srcWin=[x, y, tile_size_x, tile_size_y], noData=nodata_spec)
+                    gdal.Translate(path_l_out, ds_mask, srcWin=[x, y, tile_size_x, tile_size_y])
+                else:
+                    gdal.Translate(path_i_out, ds, srcWin=[x, y, tile_size_x, tile_size_y])
+                    gdal.Translate(path_l_out, ds_mask, srcWin=[x, y, tile_size_x, tile_size_y])
                 print(f"Created {output}")
                 tile_counter += 1
 
