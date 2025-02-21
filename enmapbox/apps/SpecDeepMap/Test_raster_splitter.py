@@ -24,16 +24,6 @@ class TestRasterReader(TestCase):
       # run algorithm
       alg = RasterSplitterRP()
 
-      INPUT_I = 'INPUT_I'
-      INPUT_L = 'INPUT_L'
-      P_tile_x = 'tileSize_x'
-      P_tile_y = 'tileSize_y'
-      P_step_x = 'stepSize_x'
-      P_step_y = 'stepSize_y'
-      P_OUTPUT_F: str = 'OutputFolder'
-      # P_removenull = 'P_removenull'
-      Percent_null = 'Percent_null'
-
       # Get the script's directory (makes paths relative)
       BASE_DIR = dirname(__file__)
 
