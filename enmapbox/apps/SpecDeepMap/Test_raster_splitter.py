@@ -8,11 +8,9 @@ from enmapbox.apps.SpecDeepMap.processingalgorithmRSRASTER_PERCENT7 import Raste
 from enmapbox import exampledata
 
 import glob
-
 from enmapboxprocessing.testcase import TestCase
-
-
 class TestRasterReader(TestCase):
+
     def test_init(self):
 
       # init QGIS
