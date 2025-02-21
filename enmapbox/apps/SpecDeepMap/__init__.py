@@ -9,7 +9,7 @@ try:
     from enmapbox.apps.SpecDeepMap.processingalgorithm_Tester4 import DL_Tester
 
     wrongEnv = False
-except Exception:
+except Exception as ex:
     wrongEnv= True
 
 #test
