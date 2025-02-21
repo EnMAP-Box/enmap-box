@@ -9,7 +9,8 @@ from enmapbox import exampledata
 
 import glob
 from enmapboxprocessing.testcase import TestCase
-class TestRasterReader(TestCase):
+
+class TestRasterSplitter(TestCase):
 
     def test_init(self):
 
