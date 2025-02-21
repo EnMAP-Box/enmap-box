@@ -1,8 +1,9 @@
 # EnMAP-Box conda environment
-# run to install: conda env create -n enmapbox_full_latest --file enmapbox_full_latest.yml
-# run to update : conda env update -n enmapbox_full_latest --file enmapbox_full_latest.yml --prune
-# run to delete : conda env remove -n enmapbox_full_latest
+# run to install: conda env create -n specdeepmap --file enmapbox_specdeepmap.yml
+# run to update : conda env update -n specdeepmap --file enmapbox_specdeepmap.yml --prune
+# run to delete : conda env remove -n specdeepmap
 # see also https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
+# in any case: ensure that qt6 is not installed, as this will mess-up the qt5-based QGIS installation
 
 name: specdeepmap
 channels:
@@ -20,7 +21,7 @@ dependencies:
 - gitpython
 - h5py
 - lightgbm
-- matplotlib
+# - matplotlib<3.10
 - netcdf4
 - numba>=0.56.4
 - pip
@@ -34,6 +35,7 @@ dependencies:
 - pytest-xdist
 - scikit-learn>=1
 - sympy
+- opencv[build=headless*]
 - typeguard=2
 - xarray
 - xgboost
