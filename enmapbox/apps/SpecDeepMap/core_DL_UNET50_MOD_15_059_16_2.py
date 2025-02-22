@@ -24,7 +24,7 @@ from enmapbox.apps.SpecDeepMap.resnet_mod import ResNet18_Weights, ResNet50_Weig
 
 # Data augmentation
 
-transforms_v2 = v2.Compose([
+transforms_v2 =  v2.Compose([
     v2.RandomRotation(degrees=45),
     v2.RandomHorizontalFlip(p=0.5),
     v2.RandomVerticalFlip(p=0.5),
@@ -721,7 +721,7 @@ def dl_train(  # train_data_csv,
         num_workers=0, num_models=1, acc_type_index=None, acc_type_numbers=1, logdirpath_model=None,
         logdirpath='./logs', tune=True, feedback: QgsProcessingFeedback = None):
 
-    arch_index_options = ['Unet', 'Unet++', 'DeepLabV3+', 'MAnet', 'JustoUNetSimple']
+    arch_index_options = ['Unet', 'Unet++', 'DeepLabV3+', 'JustoUNetSimple']
     arch = arch_index_options[arch_index]
 
     pretrained_weights_options = ['imagenet', None, 'Sentinel_2_TOA_Resnet18',
@@ -906,7 +906,7 @@ def dl_train(  # train_data_csv,
         early_stopping_callback = EarlyStopping("val_iou", mode="max", verbose=True, patience=20)
 
         checkpoint_callback = ModelCheckpoint(dirpath=logdirpath_model, monitor='val_iou_epoch',  # ,monitor='val_iou_epoch'
-                                              filename='{epoch:02d}-val_iou_{val_iou_epoch:.2f}', save_top_k=num_models,
+                                              filename='{epoch:05d}-val_iou_{val_iou_epoch:.4f}', save_top_k=num_models,
                                               auto_insert_metric_name=False)
 
         feedback_callback = FeedbackCallback(feedback=feedback)
@@ -944,7 +944,7 @@ def dl_train(  # train_data_csv,
         #early_stopping_callback = EarlyStopping("val_loss", mode="min", verbose=True, patience=20)
 
         checkpoint_callback = ModelCheckpoint(dirpath=logdirpath_model, monitor='val_iou_epoch',  # ,monitor='val_iou_epoch'
-                                              filename='{epoch:02d}-val_iou_{val_iou_epoch:.2f}', save_top_k=num_models,
+                                              filename='{epoch:05d}-val_iou_{val_iou_epoch:.4f}', save_top_k=num_models,
                                               auto_insert_metric_name=False)
 
         feedback_callback = FeedbackCallback(feedback=feedback)
@@ -978,4 +978,4 @@ def dl_train(  # train_data_csv,
 
         trainer.fit(model)
 
-    return
+

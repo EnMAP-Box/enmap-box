@@ -14,6 +14,15 @@ from qgis.core import (QgsProcessingAlgorithm,
 
 from enmapbox.apps.SpecDeepMap.core_DL_UNET50_MOD_15_059_16_2 import dl_train
 
+import os
+import re
+
+def best_ckpt_path(checkpoint_dir):
+    pattern = re.compile(r'val_iou_(\d+\.\d{4})')
+    return max(
+        (os.path.join(checkpoint_dir, f) for f in os.listdir(checkpoint_dir) if pattern.search(f)),
+        key=lambda f: float(pattern.search(f).group(1))
+    )
 
 class DL_Train_MOD(QgsProcessingAlgorithm):
     """DL_Train
@@ -302,6 +311,7 @@ class DL_Train_MOD(QgsProcessingAlgorithm):
         feedback.pushInfo("Training completed.")
 
         out = self.parameterAsString(parameters, self.logdirpath, context)
+        out_m = self.parameterAsString(parameters, self.logdirpath_model, context)
 
         tensorboard_open = self.parameterAsBool(parameters, self.tensorboard, context)
 
@@ -336,7 +346,10 @@ class DL_Train_MOD(QgsProcessingAlgorithm):
             url = f"http://localhost:{port}"
             webbrowser.open_new(url)
 
-        outputs = {self.logdirpath: out}
+        # select best iou model automatic so can be used in model builder
+        best_iou_model = best_ckpt_path(out_m)
+
+        outputs = {self.logdirpath: out, self.logdirpath_model: best_iou_model}
         return outputs
 
     # 6
