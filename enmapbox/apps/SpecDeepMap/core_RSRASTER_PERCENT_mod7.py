@@ -48,8 +48,7 @@ def split_raster(raster, ds_mask, output_path, tile_size_x, tile_size_y, step_x,
         band = ds_mask.ReadAsArray()
 
             # reserved no data label class 0
-        band[
-                mask] = 0  # or use no_data_value from interface to over-burn   ### changed. fixed to 0 for no data label
+        band[mask] = 0  # or use no_data_value from interface to over-burn   ### changed. fixed to 0 for no data label
     else:
         band = ds_mask.ReadAsArray()
 
