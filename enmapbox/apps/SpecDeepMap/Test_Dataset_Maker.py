@@ -45,12 +45,12 @@ class Test_Dataset_Maker(TestCase):
 
       print(result)
 
-       # Test all Csv files created
+       # 1 Test all Csv files created
       csv_files = glob.glob(f"{folder_path}/*.csv")
       num_csv_files = len(csv_files)# List all .tif files
       assert num_csv_files == 5, f"Error: Expected 18 .tif files, but found {num_csv_files}"
 
-      # Test split correct Train, Test, Val
+      # 2 Test split correct Train, Test, Val
 
       csv_files = {
           "train_files.csv": 14,
@@ -66,10 +66,10 @@ class Test_Dataset_Maker(TestCase):
           row_count = df['image'].count()
           assert row_count == expected_count, f"Error: Expected {expected_count} .tif files in {csv_file}, but found {row_count}"
 
-      # add test summary csv
+      # 3 add test summary csv
 
 
 
 
 
-      #add test normalization
+      # 4 add test normalization
