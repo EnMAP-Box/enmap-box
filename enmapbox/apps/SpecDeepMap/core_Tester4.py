@@ -51,6 +51,7 @@ def compute_iou(pred, gt, class_id):
         return intersection / union
 
 
+
 ### Data augmentation
 
 transforms_v2 = v2.Compose([
@@ -71,6 +72,7 @@ def load_model_and_tile_size(model_checkpoint, acc):
     tile_size_x = hyperpara['img_x']
     tile_size_y = hyperpara['img_y']
     num_classes = hyperpara['classes']
+
     in_channels = hyperpara["in_channels"]
     architecture_used = hyperpara['architecture']
     backbone_used = hyperpara['backbone']
@@ -89,7 +91,8 @@ def load_model_and_tile_size(model_checkpoint, acc):
             "batch_size": 1,
             "classes": num_classes,
             "in_channels": in_channels,
-            "preprocess": pre_process
+            "preprocess": pre_process,
+            'remove_background_class':remove_c
         }
     )
 
@@ -152,19 +155,21 @@ def save_prediction_as_geotiff(pred_array, geotransform, projection, output_path
 
 
 
-def calculate_iou(pred, target, num_classes):
 
+
+def compute_iou_per_class(pred, gt, num_classes):
+    """Compute IoU for each class."""
     ious = []
-    for cls in range(1, num_classes+1):  # Start from class 1 to ignore class 0, as 1 classes is sum_classes-1 (ignpred zero class in onehot encoding),
-                                         #########################   # add here +1 need adjust ment for case when not!!!!!
-        intersection = np.logical_and(pred == cls, target == cls).sum()
-        union = np.logical_or(pred == cls, target == cls).sum()
+    for cls in range(num_classes):
+        pred_cls = (pred == cls)
+        gt_cls = (gt == cls)
+        intersection = np.logical_and(pred_cls, gt_cls).sum()
+        union = np.logical_or(pred_cls, gt_cls).sum()
         if union == 0:
-            ious.append(float('nan'))  # Handle cases where class is not present in both target and prediction
+            ious.append(np.nan)  # Avoid dividing by zero
         else:
             ious.append(intersection / union)
     return ious
-
 
 def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_folder=None, csv_output_path=None,
                             no_data_label_mask=False, feedback: Optional[QgsProcessingFeedback] = None):
@@ -173,7 +178,7 @@ def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_
     acc = acc_options[acc_device]
     model,_,_, num_classes,remove_c = load_model_and_tile_size(model_checkpoint, acc)
 
-
+    print(num_classes)
     df = pd.read_csv(csv_file)
     all_ious = []
 
@@ -187,7 +192,7 @@ def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_
 
     # variables to check zero presence in mask, if yes first class in iou count is skipped and num_classes is extended by 1
     Zero_in_mask = False
-    b = 0
+    #b = 0
 
     for index, row in df.iterrows():
 
@@ -200,7 +205,6 @@ def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_
         # Read the image using GDAL, including the no-data mask
         image, geotransform, projection, no_data_value, no_data_mask = read_image_with_gdal(image_path)
 
-        #print(no_data_value)
         # Create an empty prediction array for the entire image
         full_prediction = np.zeros((image.shape[1], image.shape[2]), dtype=np.uint8)
 
@@ -214,18 +218,7 @@ def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_
 
         preds = preds + 1   ## adjsut
 
-        #preds  ## this doent work need different written parameter maybe string as false is not read from csv correctly
-        #if remove_c == True:
-            # No need to add +1
-         #   preds = preds +1
-        #else:
-            # Add +1 to recover original labels
-         #   preds = preds + 1
-        ### add class count as start from 1 and not zero( )
-            #preds = F.softmax(preds, dim=1)  # Get probabilities
-            #pred_classes = torch.argmax(preds, dim=1).squeeze(0)  # Get predicted class for each pixel
-
-        pred_np = preds.cpu().numpy().astype('uint8')
+        pred_np = preds.cpu().numpy()
 
         # Store the predictions for this image
         full_prediction[:, :] = pred_np  # Directly copy the entire predicted image
@@ -233,17 +226,17 @@ def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_
         # Load the ground truth mask
         mask, _, _, _, _ = read_image_with_gdal(mask_path)
 
-        if Zero_in_mask == False:  # Only check if it hasn't been set to True
-            if np.any(mask == 0):  # Check if any value in the mask is 0
-                Zero_in_mask = True
-                b = 1
-                num_classes = num_classes + 1
+        #if Zero_in_mask == False:  # Only check if it hasn't been set to True
+         #   if np.any(mask == 0):  # Check if any value in the mask is 0
+          #      Zero_in_mask = True
+           #     b = 1
+
                 # Overwrite predictions where the mask is 0 if `no_data_label_mask` is True
 
         full_prediction_iou = full_prediction[mask == 0] = 0   # no_data_value
 
         # Calculate IoU per class
-        ious = calculate_iou(full_prediction_iou, mask, num_classes)
+        ious = compute_iou_per_class(full_prediction_iou, mask, num_classes)
         print(ious)
         all_ious.append(ious)
 
@@ -276,12 +269,14 @@ def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_
     # Calculate the mean IoU across all images for each class
     mean_iou_per_class = np.nanmean(all_ious, axis=0)
 
-    if b == 1:
-        mean_iou = np.nanmean(ious[1:])
+    if remove_c == 'Yes':
+        mean_iou = np.nanmean(mean_iou_per_class[1:])  # Skip class 0
+        b = 1
     else:
-        mean_iou = np.nanmean(ious)
+        mean_iou = np.nanmean(mean_iou_per_class)  # Include all classes
+        b = 0
 
-    mean_iou = np.nanmean(mean_iou_per_class)
+    #mean_iou = np.nanmean(mean_iou_per_class)
 
     print(f"Mean IoU per class: {mean_iou_per_class}")
     print(f"Mean IoU across all classes: {mean_iou}")
@@ -293,7 +288,7 @@ def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_
             writer.writerow(['Class', 'IoU'])
 
             # Write IoU for each class
-            for cls, iou in enumerate(mean_iou_per_class, start =b):    ###### added start =1, to ignore class 0 and match with iou_calc_function adjust for when not given
+            for cls, iou in enumerate(mean_iou_per_class[b:], start =b):    ###### added start =1, to ignore class 0 and match with iou_calc_function adjust for when not given
                 writer.writerow([cls, iou])
 
             # Write the mean IoU in the last row
