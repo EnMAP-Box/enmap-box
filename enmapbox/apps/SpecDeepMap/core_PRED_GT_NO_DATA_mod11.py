@@ -22,7 +22,7 @@ from osgeo import gdal, ogr, osr
 
 def load_model_and_tile_size(model_checkpoint, acc):
     # Load the model checkpoint
-    checkpoint = torch.load(model_checkpoint, map_location=torch.device(acc))
+    checkpoint = torch.load(model_checkpoint, map_location=torch.device(acc),weights_only=False)
 
     # Retrieve hyperparameters from the checkpoint
     hyperpara = checkpoint['hyper_parameters']

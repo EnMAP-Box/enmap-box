@@ -60,6 +60,44 @@ transforms_v2 = v2.Compose([
 ])
 
 
+def load_model_and_tile_size(model_checkpoint, acc):
+    # Load the model checkpoint
+    checkpoint = torch.load(model_checkpoint, map_location=torch.device(acc), weights_only=False)
+
+    # Retrieve hyperparameters from the checkpoint
+    hyperpara = checkpoint['hyper_parameters']
+
+    # Extract tile size and other relevant hyperparameters
+    tile_size_x = hyperpara['img_x']
+    tile_size_y = hyperpara['img_y']
+    num_classes = hyperpara['classes']
+    in_channels = hyperpara["in_channels"]
+    architecture_used = hyperpara['architecture']
+    backbone_used = hyperpara['backbone']
+    pre_process = hyperpara['preprocess']
+    remove_c = hyperpara['remove_background_class']
+
+    # Load the model with the extracted hyperparameters
+    model = MyModel.load_from_checkpoint(
+        model_checkpoint,
+        hparams={
+            "architecture": architecture_used,
+            "backbone": backbone_used,
+            "transform": None,
+            "class_weights_balanced": False,
+            "acc_type": acc,
+            "batch_size": 1,
+            "classes": num_classes,
+            "in_channels": in_channels,
+            "preprocess": pre_process
+        }
+    )
+
+    # Set the model to evaluation mode
+    model.eval()
+
+    # Return the model and tile sizes
+    return model, tile_size_x, tile_size_y, num_classes, remove_c
 
 
 
