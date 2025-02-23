@@ -77,10 +77,16 @@ class Test_Deep_Learning_Tester(TestCase):
         assert unique_classes == 6 + 1 , f"Error: Expected 7 values, 6 classes and 1 mean but found 1 mean and {unique_classes}"
 
         # 2. Test if Tester predicts and exports
-        tiff_file = glob.glob(f"{folder_path_test_preds}/*.tif")
-        tiff_len = len(tiff_file)# List all .tif files
+        tiff_files = glob.glob(f"{folder_path_test_preds}/*.tif")
+        tiff_len = len(tiff_files)# List all .tif files
         assert tiff_len == 2, f"Error: Expected 2 tiff predicted & exported but found {tiff_len}"
 
+        # After test clean up
 
+        # Remove CSV
+        if os.path.exists(folder_path_test_iou):
+            os.remove(folder_path_test_iou)
 
-
+        # Remove Tiffs
+        for tiff in tiff_files:
+            os.remove(tiff)
