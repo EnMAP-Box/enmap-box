@@ -111,21 +111,21 @@ class Test_Deep_Learning_Trainer(TestCase):
 
     def test_unet_resnet_api(self):
 
-            # init QGIS
-            qgsApp = QgsApplication([], True)
-            qgsApp.initQgis()
-            qgsApp.messageLog().messageReceived.connect(lambda *args: print(args[0]))
+        # init QGIS
+        qgsApp = QgsApplication([], True)
+        qgsApp.initQgis()
+        qgsApp.messageLog().messageReceived.connect(lambda *args: print(args[0]))
 
-            # init processing framework
-            Processing.initialize()
+        # init processing framework
+        Processing.initialize()
 
-            # run algorithm
-            alg = DL_Train_MOD()
+        # run algorithm
+        alg = DL_Train_MOD()
 
             # Get the script's directory (makes paths relative)
-            BASE_DIR = dirname(__file__)
+        BASE_DIR = dirname(__file__)
 
-            folder_path = join(BASE_DIR, "test_run/")
+        folder_path = join(BASE_DIR, "test_run/")
         # 4. Test check if pretrained model runs needs 13 channel adjust indexing before splitting raster
         io = {alg.train_val_input_folder: folder_path,
               alg.arch: 0,
