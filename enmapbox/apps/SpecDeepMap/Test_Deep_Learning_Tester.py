@@ -52,7 +52,7 @@ class Test_Deep_Learning_Tester(TestCase):
         folder_path_test_csv = join(BASE_DIR, "test_run/test_files.csv")
         folder_path_test_iou = join(BASE_DIR, "test_outs/test_iou.csv")
         folder_path_test_preds = join(BASE_DIR, "test_outs/")
-        checkpoint_dir = join(BASE_DIR, "test_run/")
+        checkpoint_dir = join(BASE_DIR, "test_outs/")
 
 
         ckpt_path =best_ckpt_path(checkpoint_dir)
