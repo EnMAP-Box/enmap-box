@@ -3,8 +3,8 @@ from qgis.core import QgsProcessingFeedback, QgsApplication
 from processing.core.Processing import Processing
 import pandas as pd
 
-from enmapbox.apps.SpecDeepMap.processingalgorithm_Tester4 import DL_Tester
-from enmapbox.apps.SpecDeepMap.core_DL_UNET50_MOD_15_059_16_2 import MyModel
+from enmapbox.apps.SpecDeepMap.processingalgorithm_tester import DL_Tester
+from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import MyModel
 from enmapbox import exampledata
 import glob
 from enmapboxprocessing.testcase import TestCase
