@@ -20,7 +20,7 @@ from torchmetrics import JaccardIndex
 from torchvision import transforms
 from torchvision.transforms import v2
 
-from enmapbox.apps.SpecDeepMap.resnet_mod import ResNet18_Weights, ResNet50_Weights
+from enmapbox.apps.SpecDeepMap.utils_resnet import ResNet18_Weights, ResNet50_Weights
 
 # Data augmentation
 
