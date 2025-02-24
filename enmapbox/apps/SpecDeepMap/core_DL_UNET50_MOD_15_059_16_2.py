@@ -2,7 +2,7 @@ import math
 import math
 from typing import Optional
 
-import albumentations as A
+#import albumentations as A
 import lightning as L
 import numpy as np
 import pandas as pd
@@ -209,7 +209,7 @@ class CustomDataset(Dataset):
     def __init__(
             self,
             csv_paths_dataframe: pd.DataFrame,
-            transform: Optional[A.Compose] = None,
+            transform: Optional = None,
             num_classes: Optional[int] = None,
             preprocess_input: Optional = None,
             remove: Optional = None,
@@ -222,7 +222,7 @@ class CustomDataset(Dataset):
             x_paths (pd.DataFrame): a dataframe with a row for each chip. There must be a column for chip_id,
                 and a column with raster image, and a column with the corresponding mask.
 
-            transforms (A.Compose, optional): Albumentations.Compose object for image augmentations.
+            transforms : Compose object for image augmentations.
         """
         self.data = csv_paths_dataframe
         # Remove the extra comma, and use the actual DataFrame
