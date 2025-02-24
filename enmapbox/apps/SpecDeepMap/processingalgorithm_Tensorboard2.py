@@ -136,6 +136,7 @@ class Tensorboard(QgsProcessingAlgorithm):
                     cmd_kill = f"taskkill /PID {pid} /F"
                     subprocess.run(cmd_kill, shell=True)
                     feedback.pushInfo(f"Killed process on port {port} with PID {pid}")
+
         else:
             feedback.pushInfo(f"No process is running on port {port}")
 
