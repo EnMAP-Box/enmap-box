@@ -5,7 +5,7 @@ try:
     from enmapbox.apps.SpecDeepMap.processingalgorithm_raster_splitter import RasterSplitter
     from enmapbox.apps.SpecDeepMap.processingalgorithm_deep_learning_trainer import DL_Trainer
     from enmapbox.apps.SpecDeepMap.processingalgorithm_deep_learning_mapper import DL_Mapper
-    from enmapbox.apps.SpecDeepMap.processingalgorithm_Tensorboard2 import Tensorboard
+    from enmapbox.apps.SpecDeepMap.processingalgorithm_tensorboard import Tensorboard_visualizer
     from enmapbox.apps.SpecDeepMap.processingalgorithm_tester import DL_Tester
 
     wrongEnv = False
@@ -32,4 +32,4 @@ class SpecDeepMap(EnMAPBoxApplication):
         if wrongEnv:
             return []
         else:
-            return [RasterSplitter(), DatasetMaker(), DL_Trainer(), DL_Mapper(), Tensorboard(),DL_Tester()]  # ,DL_Train_MOD()] #DL_Train()#DatasetSplitter() #,,DatasetSplitter(),DL_Train(),RasterSplitterR(),DatasetSplitter(),RasterSplitterRP()
+            return [RasterSplitter(), DatasetMaker(), DL_Trainer(), DL_Mapper(), Tensorboard_visualizer(),DL_Tester()]  # ,DL_Train_MOD()] #DL_Train()#DatasetSplitter() #,,DatasetSplitter(),DL_Train(),RasterSplitterR(),DatasetSplitter(),RasterSplitterRP()

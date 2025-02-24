@@ -3,7 +3,7 @@ from qgis.core import QgsProcessingFeedback, QgsApplication
 from processing.core.Processing import Processing
 
 import psutil
-from enmapbox.apps.SpecDeepMap.processingalgorithm_Tensorboard2 import Tensorboard
+from enmapbox.apps.SpecDeepMap.processingalgorithm_tensorboard import Tensorboard_visualizer
 import webbrowser
 from enmapbox import exampledata
 import subprocess
@@ -24,7 +24,7 @@ class Test_Tensorboard(TestCase):
       Processing.initialize()
 
       # run algorithm
-      alg = Tensorboard()
+      alg = Tensorboard_visualizer()
 
       # Define paths
       BASE_DIR = dirname(__file__)
