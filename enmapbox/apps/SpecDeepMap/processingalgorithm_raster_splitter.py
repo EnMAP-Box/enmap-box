@@ -4,7 +4,7 @@ from qgis.core import (QgsProcessingAlgorithm,
                        QgsProcessingParameterNumber,
                        QgsProcessingParameterFolderDestination)
 
-from enmapbox.apps.SpecDeepMap.core_Raster_Splitter import split_raster
+from enmapbox.apps.SpecDeepMap.core_raster_splitter import split_raster
 
 
 class RasterSplitter(QgsProcessingAlgorithm):

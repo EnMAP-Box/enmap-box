@@ -3,7 +3,7 @@ from qgis.core import QgsProcessingFeedback, QgsApplication
 from processing.core.Processing import Processing
 
 
-from enmapbox.apps.SpecDeepMap.processingalgorithm_Raster_Splitter import RasterSplitter
+from enmapbox.apps.SpecDeepMap.processingalgorithm_raster_splitter import RasterSplitter
 
 from enmapbox import exampledata
 
