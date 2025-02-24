@@ -42,7 +42,7 @@ class RasterSplitter(QgsProcessingAlgorithm):
         return QCoreApplication.translate('Processing', string)
 
     def createInstance(self):
-        return RasterSplitterRP()
+        return RasterSplitter()
 
     def name(self):
         """

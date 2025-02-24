@@ -3,7 +3,7 @@ from qgis.core import QgsProcessingFeedback, QgsApplication
 from processing.core.Processing import Processing
 import pandas as pd
 
-from enmapbox.apps.SpecDeepMap.processingalgorithmDS_SUM12 import DatasetSplitter_SUM
+from enmapbox.apps.SpecDeepMap.processingalgorithm_dataset_maker import DatasetMaker
 
 from enmapbox import exampledata
 
@@ -23,7 +23,7 @@ class Test_Dataset_Maker(TestCase):
       Processing.initialize()
 
       # run algorithm
-      alg = DatasetSplitter_SUM()
+      alg = DatasetMaker()
 
       # Get the script's directory (makes paths relative)
       BASE_DIR = dirname(__file__)

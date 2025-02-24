@@ -8,10 +8,10 @@ from qgis.core import (QgsProcessingAlgorithm,
                        QgsProcessingParameterFolderDestination,
                        QgsProcessingParameterBoolean)
 
-from enmapbox.apps.SpecDeepMap.core_DS_SUM12 import create_train_validation_csv_balance
+from enmapbox.apps.SpecDeepMap.core_dataset_maker import create_train_validation_csv_balance
 
 
-class DatasetSplitter_SUM(QgsProcessingAlgorithm):
+class DatasetMaker(QgsProcessingAlgorithm):
     """
     This is an example algorithm that takes a vector layer and
     creates a new identical one.
@@ -54,7 +54,7 @@ class DatasetSplitter_SUM(QgsProcessingAlgorithm):
         return QCoreApplication.translate('Processing', string)
 
     def createInstance(self):
-        return DatasetSplitter_SUM()
+        return DatasetMaker()
 
     def name(self):
         """
@@ -100,7 +100,7 @@ class DatasetSplitter_SUM(QgsProcessingAlgorithm):
 
     def shortHelpString(self):
         html = '' \
-               '<p>This algorithm creates training, validation and test datasets in CSV format. Each created dataset consists of images and their corresponding labels. The data can be split by default in 80% training, 10 % validation dataset, 10 % test dataset. The test and valdiation dataset are defined by percantage and the remaining percent will be in the training dataset. it is aimed to achieve an equal class distribution with a deviation of 1 % per class per dataset, for this a wasserstein distance and the permute is used. The algorith further generates a summariy of class counts perdataset as well as there percentage and to calculate class weights.Additionaly the algorith can calculate mean and std,per channel in the train dataset whcih can be used for data normalization during training.</p>' \
+               '<p>This algorithm creates training, validation and test datasets in CSV format. Each created dataset consists of images and their corresponding labels. The data can be split by default in 80% training, 10 % validation dataset, 10 % test dataset. The algorithm aims to achieve an equal class distribution with a deviation of 1 % per class per dataset, for this a wasserstein distance and the permutatation is used. The algorith further generates a summary of class counts per dataset as well as there percentage and to calculate class weights.Additionaly the algorithm can calculate mean and standard deviation,per channel in the train dataset which can be used for data normalization during training.</p>' \
                '<h3>Data folder</h3>' \
                '<p>Folder location which contains an image tile and corresponding label tile folder.</p>' \
                '<h3>Default split </h3>' \
