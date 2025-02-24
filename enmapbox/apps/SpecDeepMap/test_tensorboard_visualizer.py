@@ -3,7 +3,7 @@ from qgis.core import QgsProcessingFeedback, QgsApplication
 from processing.core.Processing import Processing
 
 import psutil
-from enmapbox.apps.SpecDeepMap.processingalgorithm_tensorboard import Tensorboard_visualizer
+from enmapbox.apps.SpecDeepMap.processingalgorithm_tensorboard_visualizer import Tensorboard_visualizer
 import webbrowser
 from enmapbox import exampledata
 import subprocess

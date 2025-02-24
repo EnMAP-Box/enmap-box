@@ -5,7 +5,7 @@ try:
     from enmapbox.apps.SpecDeepMap.processingalgorithm_raster_splitter import RasterSplitter
     from enmapbox.apps.SpecDeepMap.processingalgorithm_deep_learning_trainer import DL_Trainer
     from enmapbox.apps.SpecDeepMap.processingalgorithm_deep_learning_mapper import DL_Mapper
-    from enmapbox.apps.SpecDeepMap.processingalgorithm_tensorboard import Tensorboard_visualizer
+    from enmapbox.apps.SpecDeepMap.processingalgorithm_tensorboard_visualizer import Tensorboard_visualizer
     from enmapbox.apps.SpecDeepMap.processingalgorithm_tester import DL_Tester
 
     wrongEnv = False
