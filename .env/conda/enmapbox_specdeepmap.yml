@@ -7,49 +7,46 @@
 
 name: specdeepmap
 channels:
-- conda-forge
+  - conda-forge
 dependencies:
-- qgis>=3.40.1
-- astropy
-- catboost
-- cdsapi
-- cython
-- docutils
-- enpt
-- flake8
-- git-lfs
-- gitpython
-- h5py
-- lightgbm
-# - matplotlib<3.10
-- netcdf4
-- numba>=0.56.4
-- pip
-- pandas
-- tqdm
-- pygrib
-- pyhdf
-- pyopengl
-- pytest
-- pytest-cov
-- pytest-xdist
-- scikit-learn>=1
-- sympy
-- opencv[build=headless*]
-- typeguard=2
-- xarray
-- xgboost
-- lightning
-- albumentations
-- tensorboard
-- torchvision # installs
-- torchmetrics
-- segmentation-models-pytorch
-- pip:
-  - enpt-enmapboxapp
-  - flake8-qgis
-  # SpecDeepMap additional packages
-  - torch
+  - qgis>=3.40.1
+  - astropy
+  - catboost
+  - cdsapi
+  - cython
+  - docutils
+  - enpt
+  - flake8
+  - git-lfs
+  - gitpython
+  - h5py
+  - lightgbm
+  # - matplotlib<3.10
+  - netcdf4
+  - numba>=0.56.4
+  - pip
+  - pandas
+  - tqdm
+  - pygrib
+  - pyhdf
+  - pyopengl
+  - pytest
+  - pytest-cov
+  - pytest-xdist
+  - scikit-learn>=1
+  - sympy
+  - opencv[build=headless*]
+  - typeguard=2
+  - xarray
+  - xgboost
+  - lightning
+  - tensorboard
+  - torchvision # installs
+  - segmentation-models-pytorch
+  - pip:
+      - enpt-enmapboxapp
+      - flake8-qgis
+    # SpecDeepMap additional packages
 
 variables:
   QT_MAC_WANTS_LAYER: 1
