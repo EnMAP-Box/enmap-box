@@ -3,7 +3,7 @@ from qgis.core import QgsProcessingFeedback, QgsApplication
 from processing.core.Processing import Processing
 import pandas as pd
 
-from enmapbox.apps.SpecDeepMap.processingalgorithm_deep_learning_mapper import DL_Mapper
+from enmapbox.apps.SpecDeepMap.processing_algorithm_deep_learning_mapper import DL_Mapper
 from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import MyModel
 from enmapbox import exampledata
 import glob

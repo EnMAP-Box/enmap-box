@@ -3,7 +3,7 @@ from qgis.core import QgsProcessingFeedback, QgsApplication
 from processing.core.Processing import Processing
 import pandas as pd
 
-from enmapbox.apps.SpecDeepMap.processingalgorithm_dataset_maker import DatasetMaker
+from enmapbox.apps.SpecDeepMap.processing_algorithm_dataset_maker import DatasetMaker
 
 from enmapbox import exampledata
 
