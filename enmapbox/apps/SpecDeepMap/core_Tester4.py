@@ -155,8 +155,6 @@ def save_prediction_as_geotiff(pred_array, geotransform, projection, output_path
 
 
 
-
-
 def compute_iou_per_class(pred, gt, num_classes):
     """Compute IoU for each class."""
     ious = []
@@ -288,7 +286,7 @@ def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_
             writer.writerow(['Class', 'IoU'])
 
             # Write IoU for each class
-            for cls, iou in enumerate(mean_iou_per_class[b:], start =b):    ###### added start =1, to ignore class 0 and match with iou_calc_function adjust for when not given
+            for cls, iou in enumerate(mean_iou_per_class[b:], start =b):
                 writer.writerow([cls, iou])
 
             # Write the mean IoU in the last row
