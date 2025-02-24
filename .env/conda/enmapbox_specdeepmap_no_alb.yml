@@ -40,16 +40,13 @@ dependencies:
 - xarray
 - xgboost
 - lightning
-#- albumentations
 - tensorboard
-- torchvision # installs
-# torchmetrics
+- torchvision
 - segmentation-models-pytorch
 - pip:
   - enpt-enmapboxapp
   - flake8-qgis
-  # SpecDeepMap additional packages
-  # torch
+
 
 variables:
   QT_MAC_WANTS_LAYER: 1
