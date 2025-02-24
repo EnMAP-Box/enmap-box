@@ -8,7 +8,7 @@ from qgis.core import (QgsProcessingAlgorithm,
                        QgsProcessingParameterVectorDestination,
                        QgsProcessingParameterFileDestination)
 
-from enmapbox.apps.SpecDeepMap.core_PRED_GT_NO_DATA_mod11 import pred_mapper
+from enmapbox.apps.SpecDeepMap.core_deep_learning_mapper import pred_mapper
 
 
 class DL_Mapper(QgsProcessingAlgorithm):

@@ -4,7 +4,7 @@ try:
     from enmapbox.apps.SpecDeepMap.processingalgorithm_dataset_maker import DatasetMaker
     from enmapbox.apps.SpecDeepMap.processingalgorithm_raster_splitter import RasterSplitter
     from enmapbox.apps.SpecDeepMap.processingalgorithm_deep_learning_trainer import DL_Trainer
-    from enmapbox.apps.SpecDeepMap.processingalgorithm_PRED_GT_NO_DATA_mod11 import DL_Mapper
+    from enmapbox.apps.SpecDeepMap.processingalgorithm_deep_learning_mapper import DL_Mapper
     from enmapbox.apps.SpecDeepMap.processingalgorithm_Tensorboard2 import Tensorboard
     from enmapbox.apps.SpecDeepMap.processingalgorithm_Tester4 import DL_Tester
 

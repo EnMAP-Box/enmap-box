@@ -4,7 +4,7 @@
 
 from qgis._core import QgsProcessingFeedback
 
-from enmapbox.apps.SpecDeepMap.core_DL_UNET50_MOD_15_059_16_2 import MyModel
+from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import MyModel
 
 # -*- coding: utf-8 -*-
 """
