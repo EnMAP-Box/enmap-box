@@ -112,9 +112,9 @@ class Test_Deep_Learning_Trainer(TestCase):
     def test_unet_resnet_api(self):
 
         # init QGIS
-        qgsApp = QgsApplication([], True)
-        qgsApp.initQgis()
-        qgsApp.messageLog().messageReceived.connect(lambda *args: print(args[0]))
+        #qgsApp = QgsApplication([], True)
+        #qgsApp.initQgis()
+        #qgsApp.messageLog().messageReceived.connect(lambda *args: print(args[0]))
 
         # init processing framework
         Processing.initialize()

@@ -15,9 +15,9 @@ class Test_Dataset_Maker(TestCase):
     def test_init(self):
 
       # init QGIS
-      qgsApp = QgsApplication([], True)
-      qgsApp.initQgis()
-      qgsApp.messageLog().messageReceived.connect(lambda *args: print(args[0]))
+      #qgsApp = QgsApplication([], True)
+      #qgsApp.initQgis()
+      #qgsApp.messageLog().messageReceived.connect(lambda *args: print(args[0]))
 
       # init processing framework
       Processing.initialize()
