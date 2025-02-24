@@ -3,7 +3,7 @@ from qgis.core import QgsProcessingFeedback, QgsApplication
 from processing.core.Processing import Processing
 
 
-from enmapbox.apps.SpecDeepMap.processingalgorithmRSRASTER_PERCENT7 import RasterSplitterRP
+from enmapbox.apps.SpecDeepMap.processingalgorithm_Raster_Splitter import RasterSplitter
 
 from enmapbox import exampledata
 
@@ -23,7 +23,7 @@ class TestRasterSplitter(TestCase):
       Processing.initialize()
 
       # run algorithm
-      alg = RasterSplitterRP()
+      alg = RasterSplitter()
 
       # Get the script's directory (makes paths relative)
       BASE_DIR = dirname(__file__)

@@ -4,10 +4,10 @@ from qgis.core import (QgsProcessingAlgorithm,
                        QgsProcessingParameterNumber,
                        QgsProcessingParameterFolderDestination)
 
-from enmapbox.apps.SpecDeepMap.core_RSRASTER_PERCENT_mod7 import split_raster
+from enmapbox.apps.SpecDeepMap.core_Raster_Splitter import split_raster
 
 
-class RasterSplitterRP(QgsProcessingAlgorithm):
+class RasterSplitter(QgsProcessingAlgorithm):
     """
     This is an example algorithm that takes a vector layer and
     creates a new identical one.
