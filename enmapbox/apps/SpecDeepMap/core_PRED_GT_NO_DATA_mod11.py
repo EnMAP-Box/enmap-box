@@ -352,44 +352,79 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
 
         print('num_classes', num_classes)
 
-        # Calculate IoU per class
+        # new calc iou
+        mean_iou_per_class = compute_iou_per_class(prediction, gt, num_classes)
 
-        # check if no data class is used, if so extend class calc, and csv start parameter
-        if np.any(gt == 0):
+        # Calculate the mean IoU across all images for each class
+        #mean_iou_per_class = np.nanmean(all_ious, axis=0)
+
+        if remove_c == 'Yes' or np.any(gt == 0):
+            mean_iou = np.nanmean(mean_iou_per_class[1:])  # Skip class 0
             b = 1
-            num_classes = num_classes + 1
         else:
+            mean_iou = np.nanmean(mean_iou_per_class)  # Include all classes
             b = 0
 
-        ious = compute_iou_per_class(prediction, gt, num_classes)   ###### if background visible or any no data needs +1 !!!!! otherwise num_classes
-        print(f"Mean IoU per class: {ious}")
+        # mean_iou = np.nanmean(mean_iou_per_class)
 
-        # if no data class in gt, exclude in mean IoU calc
-
-        if b == 1:
-            mean_iou = np.nanmean(ious[1:])
-        else:
-            mean_iou = np.nanmean(ious)
-
-
-        #mean_iou = np.nanmean(ious[1:]) # exclude first ious[1:]
+        print(f"Mean IoU per class: {mean_iou_per_class}")
         print(f"Mean IoU across all classes: {mean_iou}")
 
-        # Write IoU per class and mean IoU to a CSV
+        # Write IoU per class and mean IoU to a CSV file
         if csv_output:
             with open(csv_output, mode='w', newline='') as csv_file:
                 writer = csv.writer(csv_file)
                 writer.writerow(['Class', 'IoU'])
 
                 # Write IoU for each class
-                for cls, iou in enumerate(ious,
-                                          start=b): # 1 ##########################  need change if background class zero was removed or not 0 or 1
+                for cls, iou in enumerate(mean_iou_per_class[b:],
+                                          start=b):  ###### added start =1, to ignore class 0 and match with iou_calc_function adjust for when not given
                     writer.writerow([cls, iou])
 
-                    # Write the mean IoU in the last row
+                # Write the mean IoU in the last row
                 writer.writerow(['Mean IoU', mean_iou])
 
             print(f"IoU per class and mean IoU written to {csv_output}")
+
+
+        # Calculate IoU per class
+
+        # check if no data class is used, if so extend class calc, and csv start parameter
+        #if np.any(gt == 0):
+         #   b = 1
+          #  num_classes = num_classes + 1
+        #else:
+         #   b = 0
+
+        #ious = compute_iou_per_class(prediction, gt, num_classes)   ###### if background visible or any no data needs +1 !!!!! otherwise num_classes
+        #print(f"Mean IoU per class: {ious}")
+
+        # if no data class in gt, exclude in mean IoU calc
+
+        #if b == 1:
+         #   mean_iou = np.nanmean(ious[1:])
+        #else:
+         #   mean_iou = np.nanmean(ious)
+
+
+        #mean_iou = np.nanmean(ious[1:]) # exclude first ious[1:]
+        #print(f"Mean IoU across all classes: {mean_iou}")
+
+        # Write IoU per class and mean IoU to a CSV
+        #if csv_output:
+         #   with open(csv_output, mode='w', newline='') as csv_file:
+          #      writer = csv.writer(csv_file)
+           #     writer.writerow(['Class', 'IoU'])
+
+                # Write IoU for each class
+            #    for cls, iou in enumerate(ious,
+             #                             start=b): # 1 ##########################  need change if background class zero was removed or not 0 or 1
+              #      writer.writerow([cls, iou])
+
+                    # Write the mean IoU in the last row
+               # writer.writerow(['Mean IoU', mean_iou])
+
+            #print(f"IoU per class and mean IoU written to {csv_output}")
 
     mem_ds = None
     out_ds = None

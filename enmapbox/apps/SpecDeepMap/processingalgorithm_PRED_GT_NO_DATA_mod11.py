@@ -37,7 +37,7 @@ class DL_Mapper(QgsProcessingAlgorithm):
     # P_tile_size_y = 'tile_size_y'
     P_overlap = 'overlap'
     P_gt_path = 'gt_path'
-    P_ignore_index = 'ignore_index'
+    #P_ignore_index = 'ignore_index'
     P_vector = 'vector'
     # P_no_data_value = 'no_data_value'
     P_acc = 'acc'
