@@ -3,8 +3,8 @@ from qgis.core import QgsProcessingFeedback, QgsApplication
 from processing.core.Processing import Processing
 import pandas as pd
 
-from enmapbox.apps.SpecDeepMap.processingalgorithm_DL_UNET50_MOD_15_059_16 import DL_Train_MOD
-from enmapbox.apps.SpecDeepMap.core_DL_UNET50_MOD_15_059_16_2 import MyModel
+from enmapbox.apps.SpecDeepMap.processingalgorithm_deep_learning_trainer import DL_Trainer
+from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import MyModel
 from enmapbox import exampledata
 
 import glob
@@ -38,7 +38,7 @@ class Test_Deep_Learning_Trainer(TestCase):
         Processing.initialize()
 
         # run algorithm
-        alg = DL_Train_MOD()
+        alg = DL_Trainer()
 
         # Get the script's directory (makes paths relative)
         BASE_DIR = dirname(__file__)
@@ -120,7 +120,7 @@ class Test_Deep_Learning_Trainer(TestCase):
         Processing.initialize()
 
         # run algorithm
-        alg = DL_Train_MOD()
+        alg = DL_Trainer()
 
             # Get the script's directory (makes paths relative)
         BASE_DIR = dirname(__file__)

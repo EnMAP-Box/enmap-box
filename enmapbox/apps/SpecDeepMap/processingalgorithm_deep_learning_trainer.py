@@ -12,7 +12,7 @@ from qgis.core import (QgsProcessingAlgorithm,
                        QgsProcessingParameterString,
                        QgsProcessingParameterEnum)
 
-from enmapbox.apps.SpecDeepMap.core_DL_UNET50_MOD_15_059_16_2 import dl_train
+from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import dl_train
 
 import os
 import re
@@ -24,7 +24,7 @@ def best_ckpt_path(checkpoint_dir):
         key=lambda f: float(pattern.search(f).group(1))
     )
 
-class DL_Train_MOD(QgsProcessingAlgorithm):
+class DL_Trainer(QgsProcessingAlgorithm):
     """DL_Train
     This is an example algorithm that takes a vector layer and
     creates a new identical one.
@@ -76,7 +76,7 @@ class DL_Train_MOD(QgsProcessingAlgorithm):
         return QCoreApplication.translate('Processing', string)
 
     def createInstance(self):
-        return DL_Train()
+        return DL_Trainer()
 
     def name(self):
         """
