@@ -43,7 +43,7 @@ class Test_Deep_Learning_Trainer(TestCase):
         # Get the script's directory (makes paths relative)
         BASE_DIR = dirname(__file__)
 
-        folder_path = join(BASE_DIR, "test_run/")
+        folder_path = join(BASE_DIR, "test_requierments/")
 
         # delete checkpoint files from previous test
         for filename in os.listdir(folder_path):

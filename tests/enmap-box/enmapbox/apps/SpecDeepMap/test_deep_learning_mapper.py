@@ -34,11 +34,6 @@ class Test_Deep_Learning_Tester(TestCase):
 
     def test_iou(self):
 
-        # init QGIS
-        #qgsApp = QgsApplication([], True)
-        #qgsApp.initQgis()
-        #qgsApp.messageLog().messageReceived.connect(lambda *args: print(args[0]))
-
         # init processing framework
         Processing.initialize()
 
@@ -48,13 +43,12 @@ class Test_Deep_Learning_Tester(TestCase):
         # Get the script's directory (makes paths relative)
         BASE_DIR = dirname(__file__)
 
-
         folder_path_pred_raster = join(BASE_DIR, "test_run/pred_raster.tif")
-        folder_path_pred_iou = join(BASE_DIR, "test_outs/pred_iou.csv")
+        folder_path_pred_iou = join(BASE_DIR, "test_run/pred_iou.csv")
         folder_path_pred_vector = join(BASE_DIR, "test_run/pred_vector.shp")
-        checkpoint_dir = join(BASE_DIR, "test_outs/")
+        checkpoint_dir = join(BASE_DIR, "test_requierments/checkpoint_mapper_tester")
 
-        input_l_path = join(BASE_DIR, "test_run/enmap_landcover_unstyled.tif")
+        input_l_path = join(BASE_DIR, "test_requierments/enmap_landcover_unstyled.tif")
 
         ckpt_path =best_ckpt_path(checkpoint_dir)
 
@@ -96,7 +90,6 @@ class Test_Deep_Learning_Tester(TestCase):
         dataset = None  # Close the dataset
         dataset_com = None
 
-
         #3. Test if Mapper converts prediction to vector file
 
         datasource = ogr.Open(folder_path_pred_vector)
@@ -115,11 +108,11 @@ class Test_Deep_Learning_Tester(TestCase):
         # After test clean up
 
         # Remove CSV
-        #if os.path.exists(folder_path_pred_iou):
-         #   os.remove(folder_path_pred_iou)
+        if os.path.exists(folder_path_pred_iou):
+            os.remove(folder_path_pred_iou)
 
-        #if os.path.exists(folder_path_pred_raster):
-         #   os.remove(folder_path_pred_raster)
+        if os.path.exists(folder_path_pred_raster):
+            os.remove(folder_path_pred_raster)
 
-        #if os.path.exists(folder_path_pred_vector):
-         #   os.remove(folder_path_pred_vector)
+        if os.path.exists(folder_path_pred_vector):
+            os.remove(folder_path_pred_vector)

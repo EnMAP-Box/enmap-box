@@ -28,10 +28,11 @@ class Test_Dataset_Maker(TestCase):
       # Get the script's directory (makes paths relative)
       BASE_DIR = dirname(__file__)
 
-      folder_path = join(BASE_DIR, "test_run/")
+      folder_path_in = join(BASE_DIR, "test_requierments/")
+      folder_path_out = join(BASE_DIR, "test_run/")
 
 
-      io = {alg.Train_Val_folder: folder_path,
+      io = {alg.Train_Val_folder: folder_path_in,
             alg.N_train:80,
             alg.N_test: 10,
             alg.N_val: 10,
@@ -39,14 +40,14 @@ class Test_Dataset_Maker(TestCase):
             alg.scaler: 10000,
             alg.normalize: True,
             alg.N_permute: 100,
-            alg.Output_path: folder_path}
+            alg.Output_path: folder_path_out}
 
       result = Processing.runAlgorithm(alg, parameters=io)
 
       print(result)
 
        # 1 Test all Csv files created
-      csv_files = glob.glob(f"{folder_path}/*.csv")
+      csv_files = glob.glob(f"{folder_path_out}/*.csv")
       num_csv_files = len(csv_files)# List all .tif files
       assert num_csv_files == 5, f"Error: Expected 18 .tif files, but found {num_csv_files}"
 
@@ -60,11 +61,11 @@ class Test_Dataset_Maker(TestCase):
 
       # Loop through each CSV file and check the row count
       for csv_file, expected_count in csv_files.items():
-          path_csv_file = join(folder_path, csv_file)
+          path_csv_file = join(folder_path_out, csv_file)
           df = pd.read_csv(path_csv_file)
 
           row_count = df['image'].count()
-          assert row_count == expected_count, f"Error: Expected {expected_count} .tif files in {csv_file}, but found {row_count}"
+      assert row_count == expected_count, f"Error: Expected {expected_count} .tif files in {csv_file}, but found {row_count}"
 
       # 3 add test summary csv
 

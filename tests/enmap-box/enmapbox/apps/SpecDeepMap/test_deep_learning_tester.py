@@ -34,11 +34,6 @@ class Test_Deep_Learning_Tester(TestCase):
 
     def test_iou(self):
 
-        # init QGIS
-        #qgsApp = QgsApplication([], True)
-        #qgsApp.initQgis()
-        #qgsApp.messageLog().messageReceived.connect(lambda *args: print(args[0]))
-
         # init processing framework
         Processing.initialize()
 
@@ -48,12 +43,10 @@ class Test_Deep_Learning_Tester(TestCase):
         # Get the script's directory (makes paths relative)
         BASE_DIR = dirname(__file__)
 
-
         folder_path_test_csv = join(BASE_DIR, "test_run/test_files.csv")
-        folder_path_test_iou = join(BASE_DIR, "test_outs/test_iou.csv")
-        folder_path_test_preds = join(BASE_DIR, "test_outs/")
-        checkpoint_dir = join(BASE_DIR, "test_outs/")
-
+        folder_path_test_iou = join(BASE_DIR, "test_requierments/test_iou.csv")
+        folder_path_test_preds = join(BASE_DIR, "test_requierments/")
+        checkpoint_dir = join(BASE_DIR, "test_requierments/")
 
         ckpt_path =best_ckpt_path(checkpoint_dir)
 
