@@ -1,5 +1,5 @@
 from os.path import join, dirname
-from qgis.core import QgsProcessingFeedback, QgsApplication
+from qgis.core import QgsProcessingFeedback, QgsApplication, QgsProcessingAlgorithm
 from processing.core.Processing import Processing
 import pandas as pd
 
@@ -29,7 +29,7 @@ def best_ckpt_path(checkpoint_dir):
 
 class Test_Deep_Learning_Tester(TestCase):
 
-    def test_iou_tester(self):
+    def test_dl_tester_iou(self):
 
         # init processing framework
         Processing.initialize()
@@ -42,10 +42,10 @@ class Test_Deep_Learning_Tester(TestCase):
 
         folder_path_test_csv = join(BASE_DIR, "test_requierments/test_files.csv")
         folder_path_test_iou = join(BASE_DIR, "test_run/test_iou.csv")
-        folder_path_test_preds = join(BASE_DIR, "test_run/preds/")
-        checkpoint_dir= join(BASE_DIR, "test_requierments/checkpoint_mapper_tester")
+        folder_path_test_preds = join(BASE_DIR, "test_run/preds")
+        checkpoint_dir = join(BASE_DIR, "test_requierments")
 
-        ckpt_path =best_ckpt_path(checkpoint_dir)
+        ckpt_path = best_ckpt_path(checkpoint_dir)
 
         io = {alg.P_test_data_csv: folder_path_test_csv,
                 alg.P_model_checkpoint: ckpt_path,
