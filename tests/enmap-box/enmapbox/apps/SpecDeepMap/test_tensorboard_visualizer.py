@@ -29,7 +29,7 @@ class Test_Tensorboard(TestCase):
 
       # Define paths
       BASE_DIR = dirname(__file__)
-      folder_path_logs = join(BASE_DIR, "test_requierments/")
+      folder_path_logs = join(BASE_DIR, "../../../../testdata/external/specdeepmap/test_requierments/")
 
 
       io = {alg.TENSORBOARD_LOGDIR: folder_path_logs,

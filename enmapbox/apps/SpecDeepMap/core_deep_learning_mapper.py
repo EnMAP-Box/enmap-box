@@ -358,6 +358,7 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
         # Calculate the mean IoU across all images for each class
         #mean_iou_per_class = np.nanmean(all_ious, axis=0)
 
+
         if remove_c == 'Yes' or np.any(gt == 0):
             mean_iou = np.nanmean(mean_iou_per_class[1:])  # Skip class 0
             b = 1

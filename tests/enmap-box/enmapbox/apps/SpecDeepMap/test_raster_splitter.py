@@ -30,9 +30,10 @@ class TestRasterSplitter(TestCase):
       BASE_DIR = dirname(__file__)
 
       # Define paths using relative references
-      input_l_path = join(BASE_DIR, "test_requierments/enmap_landcover_unstyled.tif")
+      input_l_path = join(BASE_DIR,
+                          "../../../../testdata/external/specdeepmap/test_requierments/enmap_landcover_unstyled.tif")
       folder_path = join(BASE_DIR, "test_run/")
-      folder_path_images = join(BASE_DIR, "test_requierments/images/")
+      folder_path_images = join(BASE_DIR, "../../../../testdata/external/specdeepmap/test_requierments/images/")
 
 
       io = {alg.INPUT_I: exampledata.enmap,

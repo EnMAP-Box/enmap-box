@@ -43,13 +43,13 @@ class Test_Deep_Learning_Trainer(TestCase):
         # Get the script's directory (makes paths relative)
         BASE_DIR = dirname(__file__)
 
-        folder_path_input = join(BASE_DIR, "test_requierments")
+        folder_path_input = join(BASE_DIR, "../../../../testdata/external/specdeepmap/test_requierments")
         folder_path = join(BASE_DIR, "test_run")
 
         # delete checkpoint files from previous test
-        for filename in os.listdir(folder_path_input):
+        for filename in os.listdir(folder_path):
             if filename.endswith(".ckpt"):  # Assuming checkpoint files have a .ckpt extension
-                file_path = os.path.join(folder_path_input, filename)
+                file_path = os.path.join(folder_path, filename)
                 os.remove(file_path)
 
         io = {alg.train_val_input_folder: folder_path_input,
@@ -60,7 +60,7 @@ class Test_Deep_Learning_Trainer(TestCase):
                 alg.data_aug: True,
                 alg.batch_size: 2,
                 alg.n_epochs: 2,
-                alg.lr: 0.0001,
+                alg.lr: 0.001,
                 alg.lr_finder:False,
                 alg.pat: True,
                 alg.class_weights_balanced: True,
@@ -127,7 +127,7 @@ class Test_Deep_Learning_Trainer(TestCase):
         BASE_DIR = dirname(__file__)
 
         folder_path = join(BASE_DIR, "test_run")
-        folder_path_input = join(BASE_DIR, "test_requierments")
+        folder_path_input = join(BASE_DIR, "../../../../testdata/external/specdeepmap/test_requierments")
 
         # 4. Test check if pretrained model runs needs 13 channel adjust indexing before splitting raster
         io = {alg.train_val_input_folder: folder_path_input,
@@ -138,7 +138,7 @@ class Test_Deep_Learning_Trainer(TestCase):
               alg.data_aug: True,
               alg.batch_size: 2,
               alg.n_epochs: 2,
-              alg.lr: 0.001,
+              alg.lr: 0.003,
               alg.lr_finder: False,
               alg.pat: True,
               alg.class_weights_balanced: True,

@@ -28,7 +28,7 @@ class Test_Dataset_Maker(TestCase):
       # Get the script's directory (makes paths relative)
       BASE_DIR = dirname(__file__)
 
-      folder_path_in = join(BASE_DIR, "test_requierments/")
+      folder_path_in = join(BASE_DIR, "../../../../testdata/external/specdeepmap/test_requierments/")
       folder_path_out = join(BASE_DIR, "test_run/")
 
 

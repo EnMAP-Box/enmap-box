@@ -46,9 +46,11 @@ class Test_Deep_Learning_Mapper(TestCase):
         folder_path_pred_raster = join(BASE_DIR, "test_run/pred_raster.tif")
         folder_path_pred_iou = join(BASE_DIR, "test_run/pred_iou.csv")
         folder_path_pred_vector = join(BASE_DIR, "test_run/pred_vector.shp")
-        checkpoint_dir = join(BASE_DIR, "test_requierments/00056-val_iou_0.1105.ckpt")
+        checkpoint_dir = join(BASE_DIR,
+                              "../../../../testdata/external/specdeepmap/test_requierments/00056-val_iou_0.1105.ckpt")
 
-        input_l_path = join(BASE_DIR, "test_requierments/enmap_landcover_unstyled.tif")
+        input_l_path = join(BASE_DIR,
+                            "../../../../testdata/external/specdeepmap/test_requierments/enmap_landcover_unstyled.tif")
 
         ckpt_path =checkpoint_dir
 
