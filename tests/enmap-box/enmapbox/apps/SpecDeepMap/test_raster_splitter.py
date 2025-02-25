@@ -1,5 +1,5 @@
 from os.path import join, dirname
-from qgis.core import QgsProcessingFeedback, QgsApplication
+from qgis.core import QgsProcessingFeedback, QgsApplication, QgsProcessingAlgorithm
 from processing.core.Processing import Processing
 
 
@@ -24,6 +24,7 @@ class TestRasterSplitter(TestCase):
 
       # run algorithm
       alg = RasterSplitter()
+      self.assertIsInstance(alg, QgsProcessingAlgorithm)
 
       # Get the script's directory (makes paths relative)
       BASE_DIR = dirname(__file__)
@@ -31,17 +32,17 @@ class TestRasterSplitter(TestCase):
       # Define paths using relative references
       input_l_path = join(BASE_DIR, "test_requierments/enmap_landcover_unstyled.tif")
       folder_path = join(BASE_DIR, "test_run/")
-      folder_path_images = join(BASE_DIR, "test_run/images/")
+      folder_path_images = join(BASE_DIR, "test_requierments/images/")
 
 
       io = {alg.INPUT_I: exampledata.enmap,
-            alg.INPUT_L: input_l_path,
-            alg.P_tile_x: 32,
-            alg.P_tile_y: 32,
-            alg.P_step_x: 32,
-            alg.P_step_y: 32,
-            alg.Percent_null: 10,
-            alg.P_OUTPUT_F: folder_path}
+                alg.INPUT_L: input_l_path,
+                alg.P_tile_x: 32,
+                alg.P_tile_y: 32,
+                alg.P_step_x: 32,
+                alg.P_step_y: 32,
+                alg.Percent_null: 10,
+                alg.P_OUTPUT_F: folder_path}
 
       result = Processing.runAlgorithm(alg, parameters=io)
 

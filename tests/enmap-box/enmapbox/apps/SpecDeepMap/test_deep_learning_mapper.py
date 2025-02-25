@@ -30,9 +30,9 @@ def best_ckpt_path(checkpoint_dir):
     )
 
 
-class Test_Deep_Learning_Tester(TestCase):
+class Test_Deep_Learning_Mapper(TestCase):
 
-    def test_iou(self):
+    def test_iou_mapper(self):
 
         # init processing framework
         Processing.initialize()
@@ -46,11 +46,11 @@ class Test_Deep_Learning_Tester(TestCase):
         folder_path_pred_raster = join(BASE_DIR, "test_run/pred_raster.tif")
         folder_path_pred_iou = join(BASE_DIR, "test_run/pred_iou.csv")
         folder_path_pred_vector = join(BASE_DIR, "test_run/pred_vector.shp")
-        checkpoint_dir = join(BASE_DIR, "test_requierments/checkpoint_mapper_tester")
+        checkpoint_dir = join(BASE_DIR, "test_requierments/00056-val_iou_0.1105.ckpt")
 
         input_l_path = join(BASE_DIR, "test_requierments/enmap_landcover_unstyled.tif")
 
-        ckpt_path =best_ckpt_path(checkpoint_dir)
+        ckpt_path =checkpoint_dir
 
         io = {alg.P_input_raster: exampledata.enmap,
                 alg.P_model_checkpoint: ckpt_path,
@@ -110,9 +110,20 @@ class Test_Deep_Learning_Tester(TestCase):
         # Remove CSV
         if os.path.exists(folder_path_pred_iou):
             os.remove(folder_path_pred_iou)
-
+        # Remove tif
         if os.path.exists(folder_path_pred_raster):
             os.remove(folder_path_pred_raster)
 
-        if os.path.exists(folder_path_pred_vector):
-            os.remove(folder_path_pred_vector)
+        #Remove shp
+        base_name = os.path.splitext(folder_path_pred_vector)[0]
+
+        # List of extensions to remove
+        extensions = ['.shp', '.shx', '.dbf', '.prj']
+
+        # Remove each file if it exists
+        for ext in extensions:
+            file_path = base_name + ext
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            #os.remove(folder_path_pred_vector)
+

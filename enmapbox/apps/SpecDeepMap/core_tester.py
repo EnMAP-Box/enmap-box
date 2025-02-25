@@ -37,8 +37,8 @@ from torchvision import transforms
 
 from torchvision.transforms import v2
 
-from  enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import MyModel,model_2D_Justo_UNet_Simple,CustomDataset,preprocessing_imagenet, preprocessing_imagenet_additional, preprocessing_sentinel2_TOA,preprocessing_normalization_csv,get_preprocessing_pipeline, transforms_v2
-from  enmapbox.apps.SpecDeepMap.core_deep_learning_mapper import load_model_and_tile_size
+from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import MyModel,model_2D_Justo_UNet_Simple,CustomDataset,preprocessing_imagenet, preprocessing_imagenet_additional, preprocessing_sentinel2_TOA,preprocessing_normalization_csv,get_preprocessing_pipeline, transforms_v2
+from enmapbox.apps.SpecDeepMap.core_deep_learning_mapper import load_model_and_tile_size
 
 from qgis._core import QgsProcessingFeedback
 def compute_iou(pred, gt, class_id):
