@@ -10,7 +10,8 @@ import subprocess
 import time
 import glob
 from enmapboxprocessing.testcase import TestCase
-
+import os
+import shutil
 class Test_Tensorboard(TestCase):
 
     def test_init(self):
@@ -58,4 +59,9 @@ class Test_Tensorboard(TestCase):
       # Kill the main process
       process.kill()
 
+      # Remove logg folder
+      folder_path_logs_out = join(BASE_DIR, "test_run/lightning_logs")
+
+      if os.path.exists(folder_path_logs_out):
+          shutil.rmtree(folder_path_logs_out)
 
