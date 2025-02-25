@@ -16,9 +16,6 @@ from torchvision import transforms
 from torchvision.transforms import v2
 from osgeo import gdal
 
-# need test data  & one checkpoint
-# check if predict save tiff
-# if iou matrix  created
 
 
 
@@ -32,7 +29,7 @@ def best_ckpt_path(checkpoint_dir):
 
 class Test_Deep_Learning_Tester(TestCase):
 
-    def test_iou(self):
+    def test_iou_tester(self):
 
         # init processing framework
         Processing.initialize()
@@ -43,10 +40,10 @@ class Test_Deep_Learning_Tester(TestCase):
         # Get the script's directory (makes paths relative)
         BASE_DIR = dirname(__file__)
 
-        folder_path_test_csv = join(BASE_DIR, "test_run/test_files.csv")
-        folder_path_test_iou = join(BASE_DIR, "test_requierments/test_iou.csv")
-        folder_path_test_preds = join(BASE_DIR, "test_requierments/")
-        checkpoint_dir = join(BASE_DIR, "test_requierments/")
+        folder_path_test_csv = join(BASE_DIR, "test_requierments/test_files.csv")
+        folder_path_test_iou = join(BASE_DIR, "test_run/test_iou.csv")
+        folder_path_test_preds = join(BASE_DIR, "test_run/preds/")
+        checkpoint_dir= join(BASE_DIR, "test_requierments/checkpoint_mapper_tester")
 
         ckpt_path =best_ckpt_path(checkpoint_dir)
 
@@ -80,6 +77,6 @@ class Test_Deep_Learning_Tester(TestCase):
         if os.path.exists(folder_path_test_iou):
             os.remove(folder_path_test_iou)
 
-        # Remove Tiffs
+        ## Remove Tiffs
         for tiff in tiff_files:
             os.remove(tiff)
