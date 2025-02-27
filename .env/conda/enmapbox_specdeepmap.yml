@@ -40,7 +40,7 @@ dependencies:
 - xarray
 - xgboost
 - lightning
-- albumentations
+#- albumentations
 - tensorboard
 - torchvision # installs
 - torchmetrics
