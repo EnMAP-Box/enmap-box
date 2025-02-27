@@ -267,6 +267,8 @@ def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_
     # Calculate the mean IoU across all images for each class
     mean_iou_per_class = np.nanmean(all_ious, axis=0)
 
+    # different approach here compared to mapper. if remove = yes meaning automatical 0 in data as otherwise  remove_c no: meaning no class extension needed
+    # inmapper
     if remove_c == 'Yes':
         mean_iou = np.nanmean(mean_iou_per_class[1:])  # Skip class 0
         b = 1

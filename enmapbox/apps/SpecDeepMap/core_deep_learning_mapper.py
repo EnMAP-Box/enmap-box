@@ -357,7 +357,6 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
         # new calc iou ####################################### look at this logic again !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         if np.any(gt==0) and remove_c == 'No':
             num_classes = num_classes+1
-
         if np.any(gt == 0) and remove_c == 'Yes':
             num_classes = num_classes + 1
         else:
