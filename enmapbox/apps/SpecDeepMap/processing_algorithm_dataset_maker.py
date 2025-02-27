@@ -132,9 +132,6 @@ class DatasetMaker(QgsProcessingAlgorithm):
 
         self.addParameter(QgsProcessingParameterFile(
             name=self.Train_Val_folder, description='Data folder', behavior=QgsProcessingParameterFile.Behavior.Folder))
-        # self.addParameter(QgsProcessingParameterBoolean(
-        #   name=self.D_split, description='Default split',
-        #  defaultValue=True))
         self.addParameter(QgsProcessingParameterNumber(
             name=self.N_train, description='Percentage of train images',
             defaultValue=80))
@@ -144,15 +141,6 @@ class DatasetMaker(QgsProcessingAlgorithm):
         self.addParameter(QgsProcessingParameterNumber(
             name=self.N_val, description='Percentage of validation images',
             defaultValue=10))
-        # self.addParameter(QgsProcessingParameterNumber(
-        #   name=self.N_classes, description='Number of Classes',
-        #  defaultValue=19))
-
-        # self.addParameter(
-        #self.addParameter(QgsProcessingParameterString(
-         #   name=self.Data_type, description='Data type',  defaultValue="tif"))
-        #self.addParameter(QgsProcessingParameterEnum(
-         #   name=self.Data_type, description='Data type', options=['tif', 'jpg', 'jpeg', 'png'], defaultValue=0))
         self.addParameter(QgsProcessingParameterNumber(
             name=self.scaler, description='Scaler', type=QgsProcessingParameterNumber.Integer,
             defaultValue=None, optional=True))
@@ -188,15 +176,12 @@ class DatasetMaker(QgsProcessingAlgorithm):
             train_int_perc=self.parameterAsInt(parameters, self.N_train, context),
             test_int_perc=self.parameterAsInt(parameters, self.N_test, context),
             val_int_perc=self.parameterAsInt(parameters, self.N_val, context),
-            # num_labels=None,
             random_seed_gen=self.parameterAsInt(parameters, self.Seed, context),
-            #datatyp_index=self.parameterAsEnum(parameters, self.Data_type, context),
             normalize=self.parameterAsBool(parameters, self.normalize, context),
             feedback=feedback,
             scaler=self.parameterAsInt(parameters, self.scaler, context),
             min_perc=0.01,
             num_permutations=self.parameterAsInt(parameters, self.N_permute, context))
-        # dictanory . train, val, test.
 
         output_folder = self.parameterAsString(parameters, self.Output_path, context)
         outputs = {'Output': output_folder}

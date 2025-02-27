@@ -5,14 +5,6 @@
 from qgis._core import QgsProcessingFeedback
 
 from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import MyModel
-
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Sep 23 11:40:42 2024
-
-@author: leon-
-"""
-
 import os
 import numpy as np
 import torch
@@ -71,7 +63,6 @@ def raster_to_vector(out_ds, vector_output, no_data_value):
     driver = ogr.GetDriverByName("ESRI Shapefile")
 
     # Create the new vector data source (Shapefile)
-    ##########################################################################
 
     directory = os.path.dirname(vector_output)
     if not os.path.exists(directory):
@@ -186,7 +177,7 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
     mem_ds.SetGeoTransform(dataset.GetGeoTransform())
     mem_ds.SetProjection(dataset.GetProjection())
 
-    ### added read image x and y from checkpoint
+    # added read image x and y from checkpoint
 
     model, tile_size_x, tile_size_y, num_classes, remove_c = load_model_and_tile_size(model_checkpoint, acc=acc)
 
@@ -195,7 +186,7 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
 
     print(stride_x, stride_y, overlap_x, overlap_y)
 
-    ###### generate positions
+    # generate positions
 
     x_positions = generate_positions(image_x, tile_size_x, stride_x)
     y_positions = generate_positions(image_y, tile_size_y, stride_y)
@@ -210,15 +201,6 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
         for y in y_positions:
             tile = dataset.ReadAsArray(x, y, tile_size_x, tile_size_y)
 
-            ############## added
-            # Step 1: Create a mask to identify where the tile has -inf values (no-data areas)
-            #mask = np.isinf(tile)  # Mask where the tile has -inf values
-
-            #replacement_value = -9999
-
-            # Step 2: Replace -inf with the replacement value (-32768)
-            #tile[mask] = replacement_value
-            ############## added
 
             image = np.expand_dims(tile, axis=0)
 
@@ -228,16 +210,6 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
             preds = model.predict(image)
 
             preds = preds + 1
-
-            # if remove_c == True:
-            #   # No need to add +1   but some yes, because of model loader encoding!!!!!!!!!!!!!!!!!!!!! could just be preds +1 no if needed
-            #  preds = preds +1
-            # else:
-            # Add +1 to recover original labels
-            #   preds = preds +1
-            ###### added as now predict values from 0-5 and want 1-6 instead + added in model description prediction
-
-            #####################################################################################
 
             pred_classes = preds.squeeze(0)  # Shape becomes [H, W]
 
@@ -284,7 +256,6 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
                 if feedback.isCanceled():
                     break
 
-    # no_data_value = 0 #################in case images have no data value bad defined maybe , add as optional advanced hyperparameter in gui
     if no_data_value != None:
         # dataset = gdal.Open(input_raster)
         modified_band = dataset.GetRasterBand(1)
@@ -308,7 +279,6 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
         band = mem_ds.GetRasterBand(1)
         band.SetNoDataValue(no_data_value)
 
-    #######################ified here  does it agan  harmoize with no-data function
     if gt_path:
         gt_dataset = gdal.Open(gt_path)
         gt_data_arr = gt_dataset.ReadAsArray()
@@ -322,11 +292,6 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
 
         # write masked image to ratser file
         mem_ds.WriteArray(mem_arr)
-
-        ## new
-        #band = mem_ds.GetRasterBand(1)
-        #band.SetNoDataValue(0)  #### hardcoded 0 as no data
-
 
 
     gtiff_driver = gdal.GetDriverByName('GTiff')
@@ -354,20 +319,15 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
 
         print('num_classes', num_classes)
 
-        # new calc iou ####################################### look at this logic again !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # new calc iou, look at this logic again ! IMPORTANT !
         if np.any(gt==0) and remove_c == 'No':
             num_classes = num_classes+1
         if np.any(gt == 0) and remove_c == 'Yes':
-            num_classes = num_classes + 1
+            num_classes = num_classes
         else:
             num_classes = num_classes
         mean_iou_per_class = compute_iou_per_class(prediction, gt, num_classes)
 
-        # Calculate the mean IoU across all images for each class
-        #mean_iou_per_class = np.nanmean(all_ious, axis=0)
-
-        print(np.unique(gt))
-        print(np.unique(prediction))
 
         if remove_c == 'Yes' and np.any(gt == 0):
             mean_iou = np.nanmean(mean_iou_per_class[1:])  # Skip class 0
@@ -392,53 +352,13 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
 
                 # Write IoU for each class
                 for cls, iou in enumerate(mean_iou_per_class[b:],
-                                          start=b):  ###### added start =1, to ignore class 0 and match with iou_calc_function adjust for when not given
+                                          start=b):  # b, to ignore class 0 and match with iou_calc_function adjust for when not given
                     writer.writerow([cls, iou])
 
                 # Write the mean IoU in the last row
                 writer.writerow(['Mean IoU', mean_iou])
 
             print(f"IoU per class and mean IoU written to {csv_output}")
-
-
-        # Calculate IoU per class
-
-        # check if no data class is used, if so extend class calc, and csv start parameter
-        #if np.any(gt == 0):
-         #   b = 1
-          #  num_classes = num_classes + 1
-        #else:
-         #   b = 0
-
-        #ious = compute_iou_per_class(prediction, gt, num_classes)   ###### if background visible or any no data needs +1 !!!!! otherwise num_classes
-        #print(f"Mean IoU per class: {ious}")
-
-        # if no data class in gt, exclude in mean IoU calc
-
-        #if b == 1:
-         #   mean_iou = np.nanmean(ious[1:])
-        #else:
-         #   mean_iou = np.nanmean(ious)
-
-
-        #mean_iou = np.nanmean(ious[1:]) # exclude first ious[1:]
-        #print(f"Mean IoU across all classes: {mean_iou}")
-
-        # Write IoU per class and mean IoU to a CSV
-        #if csv_output:
-         #   with open(csv_output, mode='w', newline='') as csv_file:
-          #      writer = csv.writer(csv_file)
-           #     writer.writerow(['Class', 'IoU'])
-
-                # Write IoU for each class
-            #    for cls, iou in enumerate(ious,
-             #                             start=b): # 1 ##########################  need change if background class zero was removed or not 0 or 1
-              #      writer.writerow([cls, iou])
-
-                    # Write the mean IoU in the last row
-               # writer.writerow(['Mean IoU', mean_iou])
-
-            #print(f"IoU per class and mean IoU written to {csv_output}")
 
     mem_ds = None
     out_ds = None

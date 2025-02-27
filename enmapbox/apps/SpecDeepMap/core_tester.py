@@ -147,7 +147,6 @@ def save_prediction_as_geotiff(pred_array, geotransform, projection, output_path
 
     out_band.WriteArray(pred_array)
 
-    ###########################################no_data_value = maybe also do no data value (spectral image in advanced hyperparameter, fo maldefined images)
     if no_data_value != None:
         out_band.SetNoDataValue(no_data_value)
     out_raster.FlushCache()
@@ -224,12 +223,7 @@ def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_
         # Load the ground truth mask
         mask, _, _, _, _ = read_image_with_gdal(mask_path)
 
-        #if Zero_in_mask == False:  # Only check if it hasn't been set to True
-         #   if np.any(mask == 0):  # Check if any value in the mask is 0
-          #      Zero_in_mask = True
-           #     b = 1
-
-                # Overwrite predictions where the mask is 0 if `no_data_label_mask` is True
+        # Overwrite predictions where the mask is 0 if `no_data_label_mask` is True
 
         full_prediction_iou = full_prediction[mask == 0] = 0   # no_data_value
 

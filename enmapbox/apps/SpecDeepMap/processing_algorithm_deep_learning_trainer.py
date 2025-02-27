@@ -42,9 +42,7 @@ class DL_Trainer(QgsProcessingAlgorithm):
     # used when calling the algorithm from another algorithm, or when
     # calling from the QGIS console.
 
-    # In einer zeile
-    # train_data_csv = 'train_data_csv'
-    # val_data_csv = 'val_data_csv'
+
     train_val_input_folder = 'input_folder'
     arch = 'arch'
     backbone = 'Backbone'
@@ -169,26 +167,9 @@ class DL_Trainer(QgsProcessingAlgorithm):
         with some other properties.
         """
 
-        #     class_weights = 'class weights'
-        #     num_workers = 'Number of workers'
-        #     device = 'Device'
-        #     device_numbers ='Device Numbers'
-        #     logdirpath = 'Model and Logger path'
-        #
-        # self.addParameter(
-        #   QgsProcessingParameterVectorLayer(self.train_data_csv,self.tr('Trainings dataset')))
-        # self.addParameter(
-        #   QgsProcessingParameterVectorLayer(self.val_data_csv, self.tr('Validation dataset')))
         self.addParameter(QgsProcessingParameterFile(
             name=self.train_val_input_folder, description='Input folder (Train and Validation dataset)',
             behavior=QgsProcessingParameterFile.Behavior.Folder))
-
-        # self.addParameter(QgsProcessingParameterFile(
-        #   name=self.train_data_csv, description='Train dataset', behavior=QgsProcessingParameterFile.Behavior.File))
-        # self.addParameter(QgsProcessingParameterFile(
-        #   name=self.val_data_csv, description='Val dataset', behavior=QgsProcessingParameterFile.Behavior.File))
-        # self.addParameter(QgsProcessingParameterString(
-        #   name=self.arch, description='Model architecture', defaultValue='Unet'))
         self.addParameter(QgsProcessingParameterEnum(
             name=self.arch, description='Model architecture',
             options=['Unet', 'Unet++', 'DeepLabV3+', 'JustoUNetSimple'], defaultValue=0))
@@ -197,16 +178,6 @@ class DL_Trainer(QgsProcessingAlgorithm):
         self.addParameter(QgsProcessingParameterEnum(
             name=self.pretrained_weights, description='Load pretrained weights',
             options=['imagenet', 'None', 'Sentinel_2_TOA_Resnet18', 'Sentinel_2_TOA_Resnet50'], defaultValue=0))
-        # options = ['imagenet', 'None', 'Sentinel_2_TOA_Resnet18', 'Sentinel_2_TOA_Resnet50', 'LANDSAT_TM_TOA_Resnet18',
-        #          'LANDSAT_ETM_TOA_Resnet18', 'LANDSAT_OLI_TIRS_TOA_Resnet18', 'LANDSAT_ETM_SR_Resnet18',
-        #         'LANDSAT_OLI_SR_Resnet18'], defaultValue = 0))
-
-        # self.addParameter(QgsProcessingParameterString(
-        #   name=self.pretrained_weights, description='Load pretrained weights',defaultValue='imagenet'))
-        # self.addParameter(QgsProcessingParameterNumber(
-        #   name=self.n_classes, description='Number of classes', type=QgsProcessingParameterNumber.Integer,
-        #  defaultValue=20))
-
         self.addParameter(
             QgsProcessingParameterFile(self.checkpoint, description='Load model from path', optional=True))
         self.addParameter(QgsProcessingParameterBoolean(
@@ -244,7 +215,7 @@ class DL_Trainer(QgsProcessingAlgorithm):
         self.addParameter(QgsProcessingParameterEnum(
             name=self.device, description='Type of device (GPU/CPU)', options=['cpu', 'gpu'], defaultValue=0))
 
-        ### adjusted   to make advanced
+        # adjusted   to make advanced
 
         p = QgsProcessingParameterNumber(
             name=self.num_workers, description='Number of workers (CPUs used for data loading and augumenation)',
@@ -277,17 +248,11 @@ class DL_Trainer(QgsProcessingAlgorithm):
         """
         Here is where the processing itself takes place.
         """
-        dl_train(  # train_data_csv = self.parameterAsVectorLayer(parameters, self.train_data_csv, context),
-            # val_data_csv= self.parameterAsVectorLayer(parameters, self.val_data_csv, context),
-            # train_data_csv=self.parameterAsString(parameters, self.train_data_csv, context),
-            # val_data_csv = self.parameterAsString(parameters, self.val_data_csv, context),
+        dl_train(
             input_folder=self.parameterAsString(parameters, self.train_val_input_folder, context),
-            # arch=self.parameterAsString(parameters, self.arch, context),
             arch_index=self.parameterAsEnum(parameters, self.arch, context),
             backbone=self.parameterAsString(parameters, self.backbone, context),
-            # pretrained_weights = self.parameterAsString(parameters, self.pretrained_weights, context),
             pretrained_weights_index=self.parameterAsEnum(parameters, self.pretrained_weights, context),
-            # n_classes = self.parameterAsInt(parameters, self.n_classes, context),
             checkpoint_path=self.parameterAsFile(parameters, self.checkpoint, context),
             freeze_encoder=self.parameterAsBool(parameters, self.freeze_encoder, context),
             data_aug=self.parameterAsBool(parameters, self.data_aug, context),
@@ -296,11 +261,9 @@ class DL_Trainer(QgsProcessingAlgorithm):
             lr=self.parameterAsDouble(parameters, self.lr, context),
             tune=self.parameterAsBool(parameters, self.lr_finder, context),
             early_stop=self.parameterAsBool(parameters, self.pat, context),
-            # ignore_index =self.parameterAsInt(parameters, self.ignore_index, context),
             class_weights_balanced=self.parameterAsBool(parameters, self.class_weights_balanced, context),
             normalization_bool=self.parameterAsBool(parameters, self.normalization_flag, context),
             num_workers=self.parameterAsInt(parameters, self.num_workers, context),
-            # acc_type=self.parameterAsString(parameters, self.device, context),
             num_models=self.parameterAsInt(parameters, self.num_models, context),
             acc_type_index=self.parameterAsEnum(parameters, self.device, context),
             acc_type_numbers=self.parameterAsInt(parameters, self.device_numbers, context),

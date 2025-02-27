@@ -119,17 +119,8 @@ class DL_Tester(QgsProcessingAlgorithm):
             name=self.P_model_checkpoint, description='Model Checkpoint',
             behavior=QgsProcessingParameterFile.Behavior.File))
 
-        # self.addParameter(QgsProcessingParameterNumber(
-        #   name=self.P_tile_size_x, description='Image tile size x for model training', type=QgsProcessingParameterNumber.Integer))
-        # self.addParameter(QgsProcessingParameterNumber(
-        #   name=self.P_tile_size_y, description='Image tile size y used for model training', type=QgsProcessingParameterNumber.Integer))
-
-        ################################### added , enum, for drop down box, add options with iertable string list, and index default
         self.addParameter(QgsProcessingParameterEnum(
             name=self.P_acc_device, description='Device', options=['cpu', 'gpu'], defaultValue=0))
-
-        # self.addParameter(QgsProcessingParameterFolderDestination(
-        #    name=self.P_out_put, description='Output Folder'))
 
         self.addParameter(
             QgsProcessingParameterFileDestination(
@@ -152,8 +143,7 @@ class DL_Tester(QgsProcessingAlgorithm):
         Here is where the processing itself takes place.
         """
 
-        # feedback.setProgress(42)
-        # feedback.pushInfo('Hello World')
+
         process_images_from_csv(csv_file=self.parameterAsFile(parameters, self.P_test_data_csv, context),
                                 model_checkpoint=self.parameterAsFile(parameters, self.P_model_checkpoint, context),
                                 acc_device=self.parameterAsEnum(parameters, self.P_acc_device, context),
@@ -168,7 +158,6 @@ class DL_Tester(QgsProcessingAlgorithm):
         export_folder = self.parameterAsFileOutput(parameters, self.P_folder_preds, context),
 
         outputs = {self.P_csv_output_tester: csv_output_path, self.P_folder_preds: export_folder}
-        # outputs = {'raster': raster_output, 'vector': vector_output, 'csv': csv_output}
 
         return outputs
 

@@ -115,8 +115,6 @@ class RasterSplitter(QgsProcessingAlgorithm):
         with some other properties.
         """
 
-        # We add the input vector features source. It can have any kind of
-        # geometry.
         self.addParameter(
             QgsProcessingParameterRasterLayer(self.INPUT_I, self.tr('Input raster image')))
         self.addParameter(
@@ -133,17 +131,11 @@ class RasterSplitter(QgsProcessingAlgorithm):
         self.addParameter(QgsProcessingParameterNumber(
             name=self.P_step_y, description='Step size Y', type=QgsProcessingParameterNumber.Integer,
             defaultValue=256, minValue=1))
-        # self.addParameter(QgsProcessingParameterBoolean(
-        #   name=self.P_removenull, description='Skip tiles with no valid labels',
-        #  defaultValue=True))
         self.addParameter(QgsProcessingParameterNumber(
             name=self.Percent_null, description='Minimum Class-Label Coverage per Tile (%): ',
             type=QgsProcessingParameterNumber.Integer,
             defaultValue=50, minValue=0, maxValue=100))
-        # self.addParameter(QgsProcessingParameterNumber(
-        #   name=self.No_data_value, description='No-data Class-label',
-        #  type=QgsProcessingParameterNumber.Integer,
-        # defaultValue=0))
+
         self.addParameter(QgsProcessingParameterFolderDestination(
             name=self.P_OUTPUT_F, description='Output folder'))
 
@@ -158,9 +150,7 @@ class RasterSplitter(QgsProcessingAlgorithm):
                                     tile_size_y=self.parameterAsInt(parameters, self.P_tile_y, context),
                                     step_x=self.parameterAsInt(parameters, self.P_step_x, context),
                                     step_y=self.parameterAsInt(parameters, self.P_step_y, context),
-                                    # remove_null=self.parameterAsBool(parameters, self.P_removenull, context),
                                     remove_null_int=self.parameterAsInt(parameters, self.Percent_null, context),
-                                    # no_data_value=self.parameterAsDouble(parameters, self.No_data_value, context),
                                     feedback=feedback)
         out = self.parameterAsString(parameters, self.P_OUTPUT_F, context)
         outputs = {'OutputFolder': out}

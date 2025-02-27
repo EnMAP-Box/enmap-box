@@ -36,8 +36,8 @@ transforms_v2 =  v2.Compose([
 from torchvision.models._api import WeightsEnum
 
 
-### Simple Model Unet
-### source https://github.com/NTNU-SmallSat-Lab/s_l_c_segm_hyp_img/blob/main/Justoetal_models_public_released.py
+# Simple Model Unet
+# source https://github.com/NTNU-SmallSat-Lab/s_l_c_segm_hyp_img/blob/main/Justoetal_models_public_released.py
 
 class JustoUNetSimple(nn.Module):
     def __init__(self, input_channels, num_classes):
@@ -243,46 +243,9 @@ class CustomDataset(Dataset):
 
         data = gdal.Open(img_path)
 
-        ###
         mask = gdal.Open(mask_path)
         # channel first
         data_array = data.ReadAsArray().astype(np.float32)
-
-        #mask_array = mask.ReadAsArray().astype(np.float32)
-        #mask_array = torch.nn.functional.one_hot(mask,
-        #             num_classes=self.num_classes + 1)
-
-        # if self.remove == True:
-        #mask_array = mask.ReadAsArray().astype(np.float32)
-        #mask = torch.as_tensor(mask_array, dtype=torch.int64)
-
-        # added # what if no nodata class in dataset? make if condition!!!!!!
-        # mask = mask.clamp(0, self.num_classes)
-        # mask_array = torch.nn.functional.one_hot(mask,
-        #                                         num_classes=self.num_classes + 1)  # added +1 one to also encode no data class
-
-        # mask_array = mask_array.permute(2, 0, 1).float()
-        ###############################################################################################################################
-        # remove one hot encoded first class ? how to adapt this for binary classes? ??
-        # mask_array = mask_array[1:, :, :]
-        # print(self.remove)
-        # print(mask_array.shape)
-
-        # else:
-        #   mask_array = mask.ReadAsArray().astype(np.float32)
-        #  mask = torch.as_tensor(mask_array, dtype=torch.int64) #-1  # to encode 1-3 to 0,1,2
-
-        # mask = mask.clamp(0, self.num_classes)
-        # mask_array = torch.nn.functional.one_hot(mask, num_classes=self.num_classes)
-        # mask_array = mask_array.permute(2, 0, 1).float()
-        # print(self.remove)
-        # print(mask_array.shape)
-        #if self.num_classes == 1:
-         #   mask_array = mask.ReadAsArray().astype(np.float32)
-            # channel first
-          #  mask_array = np.expand_dims(mask_array, axis=0)
-        # try
-
         mask_array = mask.ReadAsArray().astype(np.float32)
         mask = torch.as_tensor(mask_array, dtype=torch.int64)
 
@@ -292,25 +255,14 @@ class CustomDataset(Dataset):
             mask_array = mask
 
         elif self.remove == 'No':
-            mask_array = mask -1
-
-        #non_zero_mask = (mask != 0)
-
-        #mask_array = torch.nn.functional.one_hot(mask,num_classes=self.num_classes+1)
-                                                     #num_classes=self.num_classes + 1)  # added +1 one to also encode no data class
-
-        #mask_array = mask_array.permute(2, 0, 1).float()
-
-        #mask_array = mask_array[:1,:,:]
+            mask_array = mask -1 # -1 because mask values from gt start at 1 upwards, to ensure same layering need to be -1
 
         if self.transform != None:
             mask_array = np.array(mask_array)
             data_array = np.array(data_array)
-            # data_array = torch.as_tensor(data_array, dtype=torch.float32)
-            # mask_array = torch.as_tensor(mask_array, dtype=torch.float32)
 
             data_array, mask_array = self.transform(data_array, mask_array)
-            # data_array, mask_array = augmented['image'], augmented['mask']
+            # data_array, mask_array = augmented['image'], augmented['mask'] # old dataaug
         else:
             data_array = torch.as_tensor(data_array, dtype=torch.float32)
             mask_array = torch.as_tensor(mask_array, dtype=torch.float32)
@@ -323,12 +275,7 @@ class CustomDataset(Dataset):
             mask_array = torch.as_tensor(mask_array, dtype=torch.float32)
             # do preprcoessing for imagnet with this
             data_array = self.preprocess_input(data_array)
-        # Convert back to channel first and then to tensors
-        # data_array = np.transpose(data_array, (2, 0, 1))
 
-        # print('preprocessed resnet18')
-
-        # if self.scale != None:
 
         item = {'image': data_array, 'mask': mask_array}
         return item
@@ -382,11 +329,7 @@ class MyModel(L.LightningModule):
         self.remove_b = self.hparams.get("remove_background_class")
         self.scaler = self.hparams.get("scaler")
 
-        # self.feedback = feedback
-        # added metrics
-        # torch metrics log batch IoU
-        # jaccard =
-        # batch_iou = jaccard(preds, y)
+
         if self.classes == 1:
             # self.iou = JaccardIndex(task="binary",num_classes=self.classes, ignore_index=self.ignore_index)
             # self.val_iou = JaccardIndex(task="binary",num_classes=self.classes, ignore_index=self.ignore_index)
@@ -457,16 +400,6 @@ class MyModel(L.LightningModule):
 
         preds = self.forward(x)  # Model predictions
 
-        # Create a mask to filter out zero values in the ground truth
-        #non_zero_mask = (y != 0)  # Boolean mask for non-zero elements
-
-        # Mask the predictions and ground truth for loss computation
-        #masked_preds = preds[non_zero_mask]  # Keep only elements where y != 0
-        #masked_y = y[non_zero_mask]  # Same for ground truth
-
-        # Compute loss (masked)
-
-
         if self.remove_b == 'Yes':
 
             train_loss = torch.nn.CrossEntropyLoss(weight=self.class_weights, reduction="mean",ignore_index=0)(preds, y)
@@ -475,8 +408,7 @@ class MyModel(L.LightningModule):
             train_loss = torch.nn.CrossEntropyLoss(weight=self.class_weights, reduction="mean")(preds, y)
 
         # Mask the predictions for IoU computation
-        #preds = (preds > 0.5).int()  # Binarize predictions
-        #masked_preds = preds[non_zero_mask]
+
         preds = torch.argmax(preds, dim=1)
 
         # Compute IoU only on non-zero masked values
@@ -486,7 +418,6 @@ class MyModel(L.LightningModule):
                       , on_step=True, on_epoch=True, prog_bar=True, logger=True
                       )
         # Accessing step-level and epoch-level metrics during training
-        #print("Logged metrics during training:", self.trainer.callback_metrics)
 
         return {'loss': train_loss, 'train_iou': train_iou}
 
@@ -517,16 +448,6 @@ class MyModel(L.LightningModule):
 
         preds = self.forward(x)  # Model predictions
 
-        # Create a mask to filter out zero values in the ground truth
-        #non_zero_mask = (y != 0)  # Boolean mask for non-zero elements
-
-        # Mask the predictions and ground truth for loss computation
-        #masked_preds = preds[non_zero_mask]  # Keep only elements where y != 0
-        #masked_y = y[non_zero_mask]  # Same for ground truth
-
-        # Compute loss (masked)
-
-        #val_loss = torch.nn.CrossEntropyLoss(weight=self.class_weights, reduction="mean")(masked_preds, masked_y)
 
         if self.remove_b == 'Yes':
 
@@ -538,10 +459,8 @@ class MyModel(L.LightningModule):
 
 
         # Mask the predictions for IoU computation
-        #preds = (preds > 0.5).int()  # Binarize predictions
 
         preds = torch.argmax(preds, dim=1)
-        #masked_preds = preds[non_zero_mask]
 
         # Compute IoU only on non-zero masked values
         val_iou = self.iou(preds, y)
@@ -573,10 +492,6 @@ class MyModel(L.LightningModule):
         pred1 = torch.softmax(logits, dim=1)
 
         pred2 = torch.argmax(pred1, dim=1)  # Take the class with the highest probability
-
-        # if self.remove_b == 'Yes':
-        #   pred2 = pred2  + 1
-        #### add here +1 for pred if background removed
 
         return pred2
 
@@ -613,7 +528,7 @@ class MyModel(L.LightningModule):
 
     def _prepare_model(self):
 
-        ### weights selection and  backbone overwrite if miss match
+        # weights selection and  backbone overwrite if miss match between pretrained weights and backbone
         weights = None
 
         if self.architecture == 'Unet':
@@ -644,8 +559,6 @@ class MyModel(L.LightningModule):
 
         # loader for backbone
 
-        # if self.weights != 'imagenet' or self.weights != None:
-        # if self.weights != 'imagenet' or self.weights != None:
         if self.weights not in ['imagenet', None]:
 
             if self.weights == 'Sentinel_2_TOA_Resnet18':
@@ -708,14 +621,11 @@ class FeedbackCallback(L.Callback):
         print(log_message)
 
 
-def dl_train(  # train_data_csv,
-        # val_data_csv,
+def dl_train(
         input_folder,
         arch_index, backbone='resnet18', pretrained_weights_index=0,
-        # n_classes=20,
         checkpoint_path=None,
         freeze_encoder=True, data_aug=True, batch_size=16, n_epochs=100, lr=0.0001, early_stop=True,
-        # ignore_index=None,
         class_weights_balanced=True,
         normalization_bool=True,
         num_workers=0, num_models=1, acc_type_index=None, acc_type_numbers=1, logdirpath_model=None,
@@ -738,7 +648,7 @@ def dl_train(  # train_data_csv,
     if arch == 'JustoUNetSimple':
         freeze_encoder = False
 
-    #### load data
+    # load data
 
     def fix_path(path):
         return path.replace('\\', '/')
@@ -754,12 +664,9 @@ def dl_train(  # train_data_csv,
     val_data = pd.read_csv(val_data_path)
     summary_data = pd.read_csv(summary_data_path)
 
-    # Extract the 'weights' column as a list
-    #n_classes = len(summary_data['Class ID'].tolist())
 
 
-
-    ###################### read from csv
+    # read from csv
     remove_zero_class = summary_data['Ignored Background : Class Zero'].tolist()[0]
     print('remove zero class', remove_zero_class)
 
@@ -781,7 +688,7 @@ def dl_train(  # train_data_csv,
     ignore_scaler_list = ([
         'Sentinel_2_TOA_Resnet18', 'Sentinel_2_TOA_Resnet50'])
 
-    #   ,'LANDSAT_TM_TOA_Resnet18', 'LANDSAT_ETM_TOA_Resnet18','LANDSAT_OLI_TIRS_TOA_Resnet18', 'LANDSAT_ETM_SR_Resnet18', 'LANDSAT_OLI_SR_Resnet18'])
+    # 'LANDSAT_TM_TOA_Resnet18', 'LANDSAT_ETM_TOA_Resnet18','LANDSAT_OLI_TIRS_TOA_Resnet18', 'LANDSAT_ETM_SR_Resnet18', 'LANDSAT_OLI_SR_Resnet18'])
 
     scaler_value = None if pretrained_weights in ignore_scaler_list else summary_data['Scaler'].iloc[0]
 
@@ -791,7 +698,7 @@ def dl_train(  # train_data_csv,
 
     print(f"Scaler after handling NaN: {scaler} (type: {type(scaler)})")
 
-    ### data aug:
+    # data aug:
     if data_aug == True:
         # Assuming transform setup here
         transform = v2.Compose([
@@ -805,7 +712,7 @@ def dl_train(  # train_data_csv,
     acc_type_options = ['cpu', 'gpu']
     acc_type = acc_type_options[acc_type_index]
 
-    #### balanced training #
+    # balanced training #
     if class_weights_balanced == True:
 
         # Extract the 'weights' column as a list
@@ -919,8 +826,6 @@ def dl_train(  # train_data_csv,
             logger=logger,
             log_every_n_steps=1,
             callbacks=[checkpoint_callback, early_stopping_callback, feedback_callback],
-            #limit_train_batches =1, ##################################################################### remove just for test
-            #limit_val_batches=1, ##################################################################### remove just for test
         )
 
 
@@ -941,7 +846,6 @@ def dl_train(  # train_data_csv,
         trainer.fit(model)
 
     else:
-        #early_stopping_callback = EarlyStopping("val_loss", mode="min", verbose=True, patience=20)
 
         checkpoint_callback = ModelCheckpoint(dirpath=logdirpath_model, monitor='val_iou_epoch',  # ,monitor='val_iou_epoch'
                                               filename='{epoch:05d}-val_iou_{val_iou_epoch:.4f}', save_top_k=num_models,
@@ -958,8 +862,6 @@ def dl_train(  # train_data_csv,
             logger=logger,
             log_every_n_steps=1,
             callbacks=[checkpoint_callback, feedback_callback],
-            #limit_train_batches=1,##################################################################### remove just for test
-            #limit_val_batches=1,##################################################################### remove just for test
 
         )
 

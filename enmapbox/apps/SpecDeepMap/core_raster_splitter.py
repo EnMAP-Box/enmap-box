@@ -30,9 +30,6 @@ def split_raster(raster, ds_mask, output_path, tile_size_x, tile_size_y, step_x,
     data_type = ds_mask.GetRasterBand(1).DataType
     projection = ds_mask.GetProjection()
 
-    #if remove_null_int > 0:
-        #######
-        # create no data mask from spectral image first channel before continuing
     spec_band = ds.GetRasterBand(1)
     nodata_spec = spec_band.GetNoDataValue()
 
@@ -48,35 +45,29 @@ def split_raster(raster, ds_mask, output_path, tile_size_x, tile_size_y, step_x,
         band = ds_mask.ReadAsArray()
 
             # reserved no data label class 0
-        band[mask] = 0  # or use no_data_value from interface to over-burn   ### changed. fixed to 0 for no data label
+        band[mask] = 0  # or use no_data_value from interface to over-burn  ' changed. fixed to 0 for no data label
     else:
         band = ds_mask.ReadAsArray()
-
-        #######
-        ####### Do this pad before loop
-        ####### this padding is only at the end sides of image and add tile length and width. as only endside, doesnt influence xy indexing in for loop)
-        ####### (gdal tranlsate write over image bounds, only for np. read important)
-        #######
 
     extended_array = np.pad(band, ((0, tile_size_y), (0, tile_size_x)), mode='constant', constant_values=0)
     original_width = ds.RasterXSize
     original_height = ds.RasterYSize
     original_band = ds.GetRasterBand(1)  # Assuming single-band raster
 
-        # Calculate the dimensions of the new raster
+    # Calculate the dimensions of the new raster
     new_width = original_width + tile_size_x
     new_height = original_height + tile_size_y
 
-        # Create an in-memory raster with the new dimensions
+    # Create an in-memory raster with the new dimensions
     driver = gdal.GetDriverByName('MEM')
     new_dataset = driver.Create('', new_width, new_height, 1, original_band.DataType)
 
-        # Set the geotransform and projection from the original raster
+    # Set the geotransform and projection from the original raster
     new_dataset.SetGeoTransform(ds.GetGeoTransform())
     new_dataset.SetProjection(ds.GetProjection())
 
-        # Read the data from the original raster and write it to the new raster
-        # data = original_band.ReadAsArray(0, 0, original_width, original_height)
+    # Read the data from the original raster and write it to the new raster
+    # data = original_band.ReadAsArray(0, 0, original_width, original_height)
     new_dataset.GetRasterBand(1).WriteArray(extended_array, 0, 0)
     ds_mask = new_dataset
 
@@ -86,20 +77,10 @@ def split_raster(raster, ds_mask, output_path, tile_size_x, tile_size_y, step_x,
 
     for x in range(0, ds.RasterXSize, step_x):  # inklusiv +1
         for y in range(0, ds.RasterYSize,
-                       step_y):  ### change order here, so in line with direction of tile production of polygon tiler generater
-
-            ##if remove_null == True:
-
-            ####if  remove_null_percent >
+                       step_y):
 
             if remove_null_int > 0:
                 mask_array = ds_mask.ReadAsArray(x, y, tile_size_x, tile_size_y)
-                # image_array = ds.ReadAsArray(x, y, tile_size_x, tile_size_y)
-                # Create a mask for all bands where the mask is zero
-                # mask = (mask_array != 0)
-
-                # Apply the mask to all bands of the image
-                # masked_image_array = image_array * mask
 
                 # changed fixed to 0 as no_data_label
                 non_zero_percentage = np.sum(mask_array != 0) / mask_array.size

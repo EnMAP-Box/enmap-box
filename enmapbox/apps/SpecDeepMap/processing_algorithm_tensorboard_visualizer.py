@@ -151,10 +151,7 @@ class Tensorboard_visualizer(QgsProcessingAlgorithm):
         feedback.pushInfo(f"TensorBoard started with PID {self.process.pid} at {logdir} on port {port}")
 
         return {"PID": self.process.pid}
-        # feedback.pushInfo(f"TensorBoard started with PID {self.process.pid} at {logdir} on port {port}")
-        #        return {"PID": self.process.pid}
 
-        # print('Used Tensorboard port', port)
 
     def helpUrl(self, *args, **kwargs):
         return ''

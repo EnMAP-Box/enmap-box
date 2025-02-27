@@ -63,7 +63,7 @@ def identify_unique_classes(input_folder):
         return num_classes, unique_labels
 
 
-### calculate equal data distribution across datasets
+# calculate equal data distribution across datasets
 
 def read_label_images_and_create_histograms(input_folder, num_labels):
     paths = os.path.join(input_folder, 'labels/*.tif')
@@ -87,10 +87,6 @@ def find_best_split(label_histograms, num_permutations, train_perc, test_perc, v
     idx = np.arange(num_files)
 
     rng = np.random.default_rng(seed=random_seed_gen)  # Random number generator with seed
-    #num_test = int(num_files * test_perc)  # Number of test images
-    #num_val = int(num_files * val_perc)
-    #num_train = int(num_files * train_perc)  # Number of validation images (cumulative with test)
-
 
     # new ensure correct rounding
 
@@ -160,7 +156,7 @@ def find_best_split(label_histograms, num_permutations, train_perc, test_perc, v
     return best_perm, num_train, num_test, num_val, progress_counter, progress_counter_total, b, feedback
 
 
-### create csv for the datasets
+# create csv for the datasets
 
 def fix_path(path):
     return path.replace('\\', '/')
@@ -289,7 +285,7 @@ def create_summary_csv(train_csv, val_csv, test_csv, out_folder_path, scaler, ze
     summary_df.to_csv(summary_csv, index=False)
 
 
-# Create additional Normalization Mean Std Normalizer, whcih ignores No-data value if no-data defined
+# Create additional Normalization Mean Std Normalizer, which ignores No-data value if no-data defined
 
 def read_no_data_value(train_csv_path):
     df_train = pd.read_csv(train_csv_path)

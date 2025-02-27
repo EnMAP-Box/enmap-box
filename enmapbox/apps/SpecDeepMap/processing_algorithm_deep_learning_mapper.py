@@ -123,66 +123,23 @@ class DL_Mapper(QgsProcessingAlgorithm):
         with some other properties.
         """
 
-        #     class_weights = 'class weights'
-        #     num_workers = 'Number of workers'
-        #     device = 'Device'
-        #     device_numbers ='Device Numbers'
-        #     logdirpath = 'Model and Logger path'
-
-        # P_input_raster = 'input_raster'
-        # In einer zeile
-
-        # P_model_checkpoint = 'model_checkpoint'
-        # P_tile_size_x = 'tile_size_x'
-        # P_tile_size_y = 'tile_size_y'
-        # P_overlap = 'overlap'
-        # P_gt_path = 'gt_path'
-        # P_ignore_index = 'ignore_index'
-        # P_vector = 'vector'
-        # P_no_data_value = 'no_data_value'
-        # P_acc = 'acc'
-        # P_out_put = 'out_put'
-
         self.addParameter(
             QgsProcessingParameterRasterLayer(self.P_input_raster, self.tr('Input Raster')))
 
         self.addParameter(
             QgsProcessingParameterRasterLayer(self.P_gt_path, 'Ground Truth Raster'))
 
-        # self.addParameter(
-        #   QgsProcessingParameterVectorLayer(self.train_data_csv,self.tr('Trainings dataset')))
-        # self.addParameter(
-        #   QgsProcessingParameterVectorLayer(self.val_data_csv, self.tr('Validation dataset')))
         self.addParameter(QgsProcessingParameterFile(
             name=self.P_model_checkpoint, description='Model Checkpoint',
             behavior=QgsProcessingParameterFile.Behavior.File))
-
-        # self.addParameter(QgsProcessingParameterNumber(
-        #   name=self.P_tile_size_x, description='Image tile size x for model training', type=QgsProcessingParameterNumber.Integer))
-        # self.addParameter(QgsProcessingParameterNumber(
-        #   name=self.P_tile_size_y, description='Image tile size y used for model training', type=QgsProcessingParameterNumber.Integer))
 
         self.addParameter(QgsProcessingParameterNumber(
             name=self.P_overlap, description='Minimum overlap of tiles in Percentage',
             type=QgsProcessingParameterNumber.Integer,
             defaultValue=10))
-        # self.addParameter(QgsProcessingParameterNumber(
-        #   name=self.P_ignore_index, description='Ignore index', type=QgsProcessingParameterNumber.Integer,optional=True))
-        # self.addParameter(QgsProcessingParameterNumber(
-        #   name=self.P_no_data_value, description='No Data Value', type=QgsProcessingParameterNumber.Integer))
-
-        # self.addParameter(QgsProcessingParameterBoolean(
-        #   name=self.P_vector, description='Export Prediction as Vectorlayer',
-        #  defaultValue=True))
-        # self.addParameter(QgsProcessingParameterString(
-        #   name=self.P_acc, description='Device', defaultValue='cpu'))
-
-        ################################### added , enum, for drop down box, add options with iertable string list, and index default
         self.addParameter(QgsProcessingParameterEnum(
             name=self.P_acc, description='Device', options=['cpu', 'gpu'], defaultValue=0))
 
-        # self.addParameter(QgsProcessingParameterFolderDestination(
-        #    name=self.P_out_put, description='Output Folder'))
 
         self.addParameter(
             QgsProcessingParameterRasterDestination(
@@ -198,7 +155,7 @@ class DL_Mapper(QgsProcessingAlgorithm):
                 'Prediction as Vector Output',
                 optional=True, createByDefault=False
             )
-        )  ##################################################### createByDefault=False
+        )
 
         self.addParameter(
             QgsProcessingParameterFileDestination(
@@ -218,16 +175,9 @@ class DL_Mapper(QgsProcessingAlgorithm):
         # feedback.pushInfo('Hello World')
 
         pred_mapper(input_raster=self.parameterAsRasterLayer(parameters, self.P_input_raster, context).source(),
-                    # out_put = self.parameterAsString(parameters, self.P_out_put, context),
                     model_checkpoint=self.parameterAsFile(parameters, self.P_model_checkpoint, context),
-                    # tile_size_x=self.parameterAsInt(parameters, self.P_tile_size_x, context),
-                    # tile_size_y=self.parameterAsInt(parameters, self.P_tile_size_y, context),
                     overlap=self.parameterAsInt(parameters, self.P_overlap, context),
                     gt_path=self.parameterAsRasterLayer(parameters, self.P_gt_path, context).source(),
-                    # ignore_index=self.parameterAsInt(parameters, self.P_ignore_index, context),
-                    # vector=self.parameterAsBool(parameters, self.P_vector, context),
-                    # no_data_value=self.parameterAsInt(parameters, self.P_no_data_value, context),
-                    # acc=self.parameterAsString(parameters, self.P_acc, context)),
                     acc=self.parameterAsEnum(parameters, self.P_acc, context),
                     feedback=feedback,
                     raster_output=self.parameterAsOutputLayer(parameters, self.P_raster_output, context),
@@ -237,12 +187,9 @@ class DL_Mapper(QgsProcessingAlgorithm):
         raster_output = self.parameterAsOutputLayer(parameters, self.P_raster_output, context)
         vector_output = self.parameterAsOutputLayer(parameters, self.P_vector_output, context)
         csv_output = self.parameterAsFileOutput(parameters, self.P_csv_output, context)
-        # out = self.parameterAsString(parameters, self.P_out_put, context)
-        # acc = self.parameterAsEnum(parameters, self.P_out_put, context)
-        # outputs = {self.P_out_put: out}
+
         outputs = {self.P_raster_output: raster_output, self.P_vector_output: vector_output,
                    self.P_csv_output: csv_output}
-        # outputs = {'raster': raster_output, 'vector': vector_output, 'csv': csv_output}
 
         return outputs
 
