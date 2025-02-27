@@ -182,7 +182,7 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
 
     # Create an in-memory raster
     driver = gdal.GetDriverByName('MEM')
-    mem_ds = driver.Create('', image_x, image_y, 1, gdal.GDT_Float32)
+    mem_ds = driver.Create('', image_x, image_y, 1, gdal.GDT_Byte)
     mem_ds.SetGeoTransform(dataset.GetGeoTransform())
     mem_ds.SetProjection(dataset.GetProjection())
 
@@ -327,6 +327,8 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
         #band = mem_ds.GetRasterBand(1)
         #band.SetNoDataValue(0)  #### hardcoded 0 as no data
 
+
+
     gtiff_driver = gdal.GetDriverByName('GTiff')
     out_ds = gtiff_driver.CreateCopy(raster_output, mem_ds, 0)
 
@@ -352,14 +354,26 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
 
         print('num_classes', num_classes)
 
-        # new calc iou
+        # new calc iou ####################################### look at this logic again !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        if np.any(gt==0) and remove_c == 'No':
+            num_classes = num_classes+1
+
+        if np.any(gt == 0) and remove_c == 'Yes':
+            num_classes = num_classes + 1
+        else:
+            num_classes = num_classes
         mean_iou_per_class = compute_iou_per_class(prediction, gt, num_classes)
 
         # Calculate the mean IoU across all images for each class
         #mean_iou_per_class = np.nanmean(all_ious, axis=0)
 
+        print(np.unique(gt))
+        print(np.unique(prediction))
 
-        if remove_c == 'Yes' or np.any(gt == 0):
+        if remove_c == 'Yes' and np.any(gt == 0):
+            mean_iou = np.nanmean(mean_iou_per_class[1:])  # Skip class 0
+            b = 1
+        elif remove_c == 'No' and np.any(gt == 0):
             mean_iou = np.nanmean(mean_iou_per_class[1:])  # Skip class 0
             b = 1
         else:

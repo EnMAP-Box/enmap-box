@@ -46,13 +46,13 @@ class Test_Deep_Learning_Mapper(TestCase):
         folder_path_pred_raster = join(BASE_DIR, "test_run/pred_raster.tif")
         folder_path_pred_iou = join(BASE_DIR, "test_run/pred_iou.csv")
         folder_path_pred_vector = join(BASE_DIR, "test_run/pred_vector.shp")
-        checkpoint_dir = join(BASE_DIR,
-                              "../../../../testdata/external/specdeepmap/test_requierments/00056-val_iou_0.1105.ckpt")
 
+
+        checkpoint_dir = join(BASE_DIR,"../../../../testdata/external/specdeepmap/test_requierments/")
         input_l_path = join(BASE_DIR,
                             "../../../../testdata/external/specdeepmap/test_requierments/enmap_landcover_unstyled.tif")
 
-        ckpt_path =checkpoint_dir
+        ckpt_path =best_ckpt_path(checkpoint_dir)
 
         io = {alg.P_input_raster: exampledata.enmap,
                 alg.P_model_checkpoint: ckpt_path,
@@ -110,8 +110,8 @@ class Test_Deep_Learning_Mapper(TestCase):
         # After test clean up
 
         # Remove CSV
-        if os.path.exists(folder_path_pred_iou):
-            os.remove(folder_path_pred_iou)
+        #if os.path.exists(folder_path_pred_iou):
+         #   os.remove(folder_path_pred_iou)
         # Remove tif
         if os.path.exists(folder_path_pred_raster):
             os.remove(folder_path_pred_raster)
