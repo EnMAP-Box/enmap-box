@@ -739,7 +739,7 @@ class ProcessorTraining:
 
                         else:  # no performance evaluation means just fitting the model without feedback
                             model = self.ml_model(X=x, y=y[:, ipara], model=self.mlra)
-                            test_indices = [] #make sure 'test_indices' is always defined, even when self.perf_eval is False
+                            test_indices = [] #make sure 'test_indices' is always defined, even when self.perf_eval is False.
 
                         if not self.use_al and len(self.para_list) > 1:
                             prgbar_widget.gui.prgBar.setMaximum(100)
