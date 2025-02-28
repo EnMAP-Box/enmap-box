@@ -5,17 +5,16 @@ on:
     branches:
       - main
       - release-**
-      - refactor_environments
       - release_**
 
   pull_request:
     branches:
-      - '**'
+      - main
       - release-**
       - release_**
 
   release:
-    types: [published]
+    types: [ published ]
 
 jobs:
   # Run EnMAP-Box tests
@@ -23,11 +22,11 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        qgis_version: [3.34, 3.36, 3.38]
-      fail-fast: false
+        qgis_version: [ '3.34', '3.38', '3.40' ]
+      fail-fast: true
 
     env:
-        QGIS_TEST_VERSION: ${{ matrix.qgis_version}}
+      QGIS_TEST_VERSION: ${{ matrix.qgis_version}}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -47,7 +46,7 @@ jobs:
           python3 --version
           pip list
       - name: Test EnMAP-Box on QGIS
-        run: | 
+        run: |
           chmod +x .env/docker/run_docker_tests.sh
           ls -la .env/docker
           docker compose -f .env/docker/docker-compose.gh.yml run qgis /usr/src/.env/docker/run_docker_tests.sh -n auto

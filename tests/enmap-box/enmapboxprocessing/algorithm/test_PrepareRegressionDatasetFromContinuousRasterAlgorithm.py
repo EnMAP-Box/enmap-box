@@ -1,4 +1,5 @@
-from enmapbox import initAll
+from qgis.core import QgsVectorLayer
+
 from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.libraryfromregressiondatasetalgorithm import LibraryFromRegressionDatasetAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousrasteralgorithm import \
@@ -8,7 +9,6 @@ from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import enmap_potsdam
 from enmapboxtestdata import fraction_polygon_l3, enmap
-from qgis.core import QgsVectorLayer
 
 start_app()
 
@@ -16,9 +16,6 @@ start_app()
 class TestPrepareRegressionDatasetFromContinuousRasterAlgorithm(TestCase):
 
     def test(self):
-        start_app()
-        initAll()
-
         alg = PrepareRegressionDatasetFromContinuousRasterAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,

@@ -10,7 +10,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import landcover_map_l3
-from qgis.core import QgsRasterLayer, QgsMapLayer
+from qgis.core import QgsRasterLayer, QgsMapLayer, QgsProcessingException
 
 
 class TestClassificationPerformanceSimpleAlgorithm(TestCase):
@@ -93,3 +93,69 @@ class TestClassificationPerformanceSimpleAlgorithm(TestCase):
             alg.P_OUTPUT_REPORT: self.filename('report.html'),
         }
         result = self.runalg(alg, parameters)
+
+    def test_twoClass(self):
+        Forest = 1
+        Water = 2
+        PredictedValues = [Forest, Forest, Forest, Forest, Forest, Forest, Water, Water, Water]
+        TrueValues = [Forest, Forest, Forest, Forest, Forest, Forest, Water, Forest, Forest]
+
+        categories = [Category(1, 'c1', '#000000'), Category(2, 'c2', '#000000')]
+        writer1 = self.rasterFromArray([[TrueValues]], 'observation.tif')
+        writer1.close()
+        raster1 = QgsRasterLayer(writer1.source())
+        renderer = Utils().palettedRasterRendererFromCategories(raster1.dataProvider(), 1, categories)
+        raster1.setRenderer(renderer.clone())
+        raster1.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
+
+        writer2 = self.rasterFromArray([[PredictedValues]], 'prediction.tif')
+        writer2.close()
+        raster2 = QgsRasterLayer(writer2.source())
+        renderer = Utils().palettedRasterRendererFromCategories(raster2.dataProvider(), 1, categories)
+        raster2.setRenderer(renderer.clone())
+        raster2.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
+
+        alg = ClassificationPerformanceSimpleAlgorithm()
+        alg.initAlgorithm()
+        parameters = {
+            alg.P_CLASSIFICATION: writer2.source(),
+            alg.P_REFERENCE: writer1.source(),
+            alg.P_OPEN_REPORT: self.openReport,
+            alg.P_OUTPUT_REPORT: self.filename('report.html'),
+        }
+        result = self.runalg(alg, parameters)
+
+        stats = Utils.jsonLoad(result[alg.P_OUTPUT_REPORT] + '.json')
+        self.assertEqual(77, int(stats['overallAccuracy'] * 100))
+        self.assertListEqual([100, 33], [int(v * 100) for v in stats['usersAccuracy']])
+        self.assertListEqual([75, 100], [int(v * 100) for v in stats['producersAccuracy']])
+
+    def test_issue1070(self):
+        # handle unclassified data
+        categories = [Category(1, 'c1', '#000000'), Category(2, 'c2', '#000000')]
+        writer1 = self.rasterFromArray([[[1, 2]]], 'observation.tif')
+        writer1.close()
+        raster1 = QgsRasterLayer(writer1.source())
+        renderer = Utils().palettedRasterRendererFromCategories(raster1.dataProvider(), 1, categories)
+        raster1.setRenderer(renderer.clone())
+        raster1.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
+
+        writer2 = self.rasterFromArray([[[0, 2]]], 'prediction.tif')  # introduce unclassified data
+        writer2.close()
+        raster2 = QgsRasterLayer(writer2.source())
+        renderer = Utils().palettedRasterRendererFromCategories(raster2.dataProvider(), 1, categories)
+        raster2.setRenderer(renderer.clone())
+        raster2.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
+
+        alg = ClassificationPerformanceSimpleAlgorithm()
+        alg.initAlgorithm()
+        parameters = {
+            alg.P_CLASSIFICATION: writer2.source(),
+            alg.P_REFERENCE: writer1.source(),
+            alg.P_OPEN_REPORT: self.openReport,
+            alg.P_OUTPUT_REPORT: self.filename('report.html'),
+        }
+        try:
+            self.runalg(alg, parameters)
+        except QgsProcessingException as error:
+            assert str(error) == 'Predicted values not matching reference classes.'

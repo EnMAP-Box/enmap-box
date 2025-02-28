@@ -1,8 +1,13 @@
+import unittest
+
+from osgeo import gdal
+
 from enmapboxprocessing.algorithm.regressorperformancealgorithm import RegressorPerformanceAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import regressorDumpPkl, regressorDumpSingleTargetPkl
 
 
+@unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
 class TestRegressorPerformanceAlgorithm(TestCase):
 
     def test_trainPerformance_multiTarget(self):

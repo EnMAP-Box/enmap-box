@@ -1,10 +1,15 @@
+import unittest
+
+from osgeo import gdal
+
 from enmapboxprocessing.algorithm.regressionperformancealgorithm import RegressionPerformanceAlgorithm
 
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import fraction_map_l3, fraction_point_multitarget
 
 
-class TestRegressionPerformanceSimpleAlgorithm(TestCase):
+@unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
+class TestRegressionPerformanceAlgorithm(TestCase):
 
     def test(self):
         alg = RegressionPerformanceAlgorithm()

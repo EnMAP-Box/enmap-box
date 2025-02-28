@@ -5,8 +5,9 @@ from osgeo import gdal
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
-from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
+from enmapboxprocessing.algorithm.preparerasteralgorithm import PrepareRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from enmapboxprocessing.gdalutils import GdalUtils
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer, QgsMapLayer
@@ -57,7 +58,7 @@ class ImportLandsatL2Algorithm(EnMAPProcessingAlgorithm):
     def defaultParameters(self, mtlFilename: str):
         return {
             self.P_FILE: mtlFilename,
-            self.P_OUTPUT_RASTER: mtlFilename.replace('MTL.txt', 'SR.vrt'),
+            self.P_OUTPUT_RASTER: mtlFilename.replace('MTL.txt', 'SR_.tif'),
         }
 
     def processAlgorithm(
@@ -112,30 +113,36 @@ class ImportLandsatL2Algorithm(EnMAPProcessingAlgorithm):
                          for key in [pattern.format(i) for i in bandNumbers]]
 
             # create VRT
+            isVrt = filename.endswith('.vrt')
             options = gdal.BuildVRTOptions(separate=True, xRes=30, yRes=30)
-            if filename.endswith('.vrt'):
+            if isVrt:
                 ds = gdal.BuildVRT(filename, filenames, options=options)
             else:
                 gdal.BuildVRT(filename + '.vrt', filenames, options=options)
-                alg = SaveRasterAsAlgorithm()
+                alg = PrepareRasterAlgorithm()
                 parameters = {
                     alg.P_RASTER: filename + '.vrt',
-                    alg.P_COPY_METADATA: False,
-                    alg.P_COPY_STYLE: False,
+                    alg.P_OFFSET: -0.2,
+                    alg.P_SCALE: 2.75e-05,
+                    alg.P_DATA_TYPE: self.Float32,
                     alg.P_OUTPUT_RASTER: filename
                 }
                 self.runAlg(alg, parameters, None, feedback2, context, True)
                 ds = gdal.Open(filename, gdal.GA_Update)
+
+            GdalUtils().calculateDefaultHistrogram(ds, inMemory=False, feedback=feedback)
+
             ds.SetMetadataItem('wavelength', wavelength, 'ENVI')
             ds.SetMetadataItem('wavelength_units', 'nanometers', 'ENVI')
             wavelength = wavelength[1:-1].split(',')
             for bandNo, (name, wl) in enumerate(zip(bandNames, wavelength), 1):
                 rb: gdal.Band = ds.GetRasterBand(bandNo)
                 rb.SetDescription(name + f' ({wl} Nanometers)')
-                if gain is not None:
-                    rb.SetScale(gain)
-                if offset is not None:
-                    rb.SetOffset(offset)
+                if isVrt:
+                    if gain is not None:
+                        rb.SetScale(gain)
+                    if offset is not None:
+                        rb.SetOffset(offset)
             del ds
 
             # setup default renderer
@@ -144,9 +151,15 @@ class ImportLandsatL2Algorithm(EnMAPProcessingAlgorithm):
             redBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['R'][0])
             greenBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['G'][0])
             blueBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['B'][0])
-            redMin, redMax = reader.provider.cumulativeCut(redBandNo, 0.02, 0.98)
-            greenMin, greenMax = reader.provider.cumulativeCut(greenBandNo, 0.02, 0.98)
-            blueMin, blueMax = reader.provider.cumulativeCut(blueBandNo, 0.02, 0.98)
+            redMin, redMax = reader.provider.cumulativeCut(
+                redBandNo, 0.02, 0.98, sampleSize=int(QgsRasterLayer.SAMPLE_SIZE)
+            )
+            greenMin, greenMax = reader.provider.cumulativeCut(
+                greenBandNo, 0.02, 0.98, sampleSize=int(QgsRasterLayer.SAMPLE_SIZE)
+            )
+            blueMin, blueMax = reader.provider.cumulativeCut(
+                blueBandNo, 0.02, 0.98, sampleSize=int(QgsRasterLayer.SAMPLE_SIZE)
+            )
             renderer = Utils().multiBandColorRenderer(
                 reader.provider, [redBandNo, greenBandNo, blueBandNo], [redMin, greenMin, blueMin],
                 [redMax, greenMax, blueMax]

@@ -1,3 +1,6 @@
+import unittest
+
+from osgeo import gdal
 from sklearn.base import RegressorMixin
 
 from enmapboxprocessing.algorithm.fitcatboostregressoralgorithm import FitCatBoostRegressorAlgorithm
@@ -28,6 +31,7 @@ class FitTestRegressorAlgorithm(FitClassifierAlgorithmBase):
         return regressor
 
 
+@unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
 class TestRegressionWorkflowAlgorithm(TestCase):
 
     def test(self):

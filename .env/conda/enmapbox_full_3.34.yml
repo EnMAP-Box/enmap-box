@@ -1,54 +1,43 @@
-# create: conda env create -f enmapbox_full_latest.yml
-# update: conda env update -f enmapbox_full_latest.yml --prune
-# delete: conda remove -n enmapbox_full_latest --all
+# EnMAP-Box conda environment
+# generated with scripts/update_conda_environemts.py (MANUAL CHANGES WILL BE OVERWRITTEN!)
+# run to install: conda env create -n enmapbox_full_3.34 --file=enmapbox_full_3.34.yml
+# run to update : conda env update -n enmapbox_full_3.34 --file=enmapbox_full_3.34.yml --prune
+# run to delete : conda env remove -n enmapbox_full_3.34
 # see also https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
-name: enmapbox_full_3.34
+
 channels:
   - conda-forge
 dependencies:
-  - python=3.9
-  - qgis=3.34
-  - pip
-  - scipy<1.12 # workaround https://github.com/conda-forge/qgis-feedstock/issues/405
-  - scikit-learn>=1 # if necessary, this will install scipy and numpy too
-  - matplotlib # avoids that conda uses the wrong pip
-  - enpt
-  - xgboost
-  - lightgbm
-
-  # Polymer AC additional conda requirements
-  - cdsapi
-  - cython
-  - gdal
-  - netcdf4
-  - pygrib
-  - pyhdf
-  - xarray
-
-  # EnMAP-Box
+  - qgis=3.34.6
   - astropy
   - catboost
-  - matplotlib
-  - astropy
-  - numba>=0.56.4
-  - sympy
-  - pyopengl
-  - netcdf4
-  - h5py
-  # Development
-  - gitpython
+  - cdsapi
+  - cython
+  - docutils
+  - enpt
+  - flake8
   - git-lfs
-  - typeguard=2
+  - gitpython
+  - h5py
+  - lightgbm
+  - matplotlib
+  - netcdf4
+  - numba>=0.56.4
+  - pip
+  - pygrib
+  - pyhdf
+  - pyopengl
   - pytest
   - pytest-cov
   - pytest-xdist
-  - flake8
-  - docutils
-
+  - scikit-learn>=1
+  - sympy
+  - typeguard=2
+  - xarray
+  - xgboost
   - pip:
-    - enpt-enmapboxapp
-    - flake8-qgis
-    - pytest-env
-
+      - enpt-enmapboxapp
+      - flake8-qgis
+name: enmapbox_full_3.34
 variables:
   QT_MAC_WANTS_LAYER: 1

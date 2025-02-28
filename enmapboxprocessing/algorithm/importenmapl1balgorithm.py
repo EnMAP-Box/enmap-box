@@ -5,6 +5,7 @@ from xml.etree import ElementTree
 from osgeo import gdal
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from enmapboxprocessing.gdalutils import GdalUtils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 from enmapbox.typeguard import typechecked
 
@@ -110,6 +111,9 @@ class ImportEnmapL1BAlgorithm(EnMAPProcessingAlgorithm):
             geoTransform = dsSwir.GetGeoTransform()
             geoTransform = geoTransform[:-1] + (-abs(geoTransform[-1]),)
             dsSwir.SetGeoTransform(geoTransform)
+
+            GdalUtils().calculateDefaultHistrogram(dsVnir, inMemory=False, feedback=feedback)
+            GdalUtils().calculateDefaultHistrogram(dsSwir, inMemory=False, feedback=feedback)
 
             result = {self.P_OUTPUT_VNIR_RASTER: filename1, self.P_OUTPUT_SWIR_RASTER: filename2}
             self.toc(feedback, result)
