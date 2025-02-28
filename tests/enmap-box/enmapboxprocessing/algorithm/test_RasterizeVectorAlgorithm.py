@@ -1,12 +1,15 @@
-from enmapboxtestdata import enmap, landcover_polygon
+import numpy as np
+from qgis.core import Qgis
+from qgis.core import QgsVectorLayer
+
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxtestdata import enmap, landcover_polygon, fraction_point_multitarget
 from enmapboxtestdata import landcover_polygon_3classes_epsg4326
-from qgis.core import Qgis
 
 
-class TestRasterizeAlgorithm(TestCase):
+class TestRasterizeVectorAlgorithm(TestCase):
 
     def test_default(self):
         alg = RasterizeVectorAlgorithm()
@@ -51,6 +54,24 @@ class TestRasterizeAlgorithm(TestCase):
         }
         result = self.runalg(alg, parameters)
         self.assertEqual(3100, RasterReader(result[alg.P_OUTPUT_RASTER]).array()[0].sum())
+
+        lyr = QgsVectorLayer(fraction_point_multitarget)
+        cnt = lyr.featureCount()
+        parameters = {
+            alg.P_GRID: enmap,
+            alg.P_INIT_VALUE: -9999,
+            alg.P_VECTOR: fraction_point_multitarget,
+            alg.P_BURN_ATTRIBUTE: 'tree',
+            alg.P_OUTPUT_RASTER: self.filename('tree_fraction.tif')
+        }
+        result = self.runalg(alg, parameters)
+        data = RasterReader(result[alg.P_OUTPUT_RASTER]).array()[0]
+        self.assertEqual(data.shape, (400, 220))
+        is_valid = np.where(data != -9999)
+        data = data[*is_valid]
+
+        self.assertAlmostEqual(12.32, float(data.sum()), 2)
+        self.assertEqual(cnt, len(data))
 
     def test_allTouched(self):
         alg = RasterizeVectorAlgorithm()

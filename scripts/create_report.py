@@ -2,10 +2,6 @@
 This scripts generates some reports stats related to the EnMAP-Box repository
 """
 import argparse
-import csv
-from typing import List, Dict
-
-import requests
 import datetime
 import inspect
 import json
@@ -15,16 +11,10 @@ import re
 import unittest
 import urllib.request
 import xml.etree.ElementTree as etree
+from typing import List, Dict
+
 import pandas as pd
-
-from xlsxwriter.workbook import Workbook
-
-from enmapbox import DIR_REPO_TMP
-from enmapbox import initAll
-from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
-from enmapbox.gui.applications import ApplicationWrapper, EnMAPBoxApplication
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.testing import start_app
+import requests
 from qgis.PyQt.QtWidgets import QMenu
 from qgis.core import QgsProcessing, QgsProcessingParameterRasterLayer, QgsProcessingParameterRasterDestination, \
     QgsProcessingOutputVectorLayer, QgsProcessingParameterFeatureSink, QgsProcessingParameterFeatureSource, \
@@ -33,6 +23,13 @@ from qgis.core import QgsProcessing, QgsProcessingParameterRasterLayer, QgsProce
     QgsProcessingOutputFile, QgsProcessingParameterFolderDestination, QgsProcessingOutputFolder, \
     QgsProcessingParameterFileDestination, QgsProcessingOutputHtml, QgsProcessingParameterEnum, \
     QgsProcessingParameterBoolean, QgsProcessingAlgorithm
+
+from enmapbox import DIR_REPO_TMP
+from enmapbox import initAll
+from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
+from enmapbox.gui.applications import ApplicationWrapper, EnMAPBoxApplication
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.testing import start_app
 
 
 def linesOfCode(path) -> int:
@@ -243,9 +240,9 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
     start_date = toDate(start_date, '%Y-%m-%d')
     end_date = toDate(end_date, '%Y-%m-%d')
 
-    today = datetime.datetime.now().isoformat().split('T')[0]
+    today = datetime.date.today()
 
-    PATH_GH_JSON = pathlib.Path(__file__).parents[1] / 'tmp' / f'githubissues.{today}.json'
+    PATH_GH_JSON = pathlib.Path(__file__).parents[1] / 'tmp' / f'githubissues.{today.isoformat()}.json'
 
     if not PATH_GH_JSON.is_file():
         os.makedirs(PATH_GH_JSON.parent, exist_ok=True)
@@ -309,6 +306,28 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
 
     s = ""
 
+    def countIssues(issues: List[dict], labels=['duplicate', 'wontfix']) -> Dict[str, int]:
+        is_closed = []
+        is_open = []
+
+        issues_by_label: Dict[str, List[dict]] = dict()
+        for i in issues:
+            if i['closed_at'] is None:
+                is_open.append(i)
+            else:
+                is_closed.append(i)
+
+            for label in i['labels']:
+                n = label['name']
+                issues_by_label[n] = issues_by_label.get(n, []) + [i]
+
+        infos = {'total': len(issues),
+                 'open': len(is_open),
+                 'closed': len(is_closed)}
+        for label in labels:
+            infos[label] = len(issues_by_label.get(label, []))
+        return infos
+
     def printInfos(issues: List[dict], labels=['duplicate', 'wontfix']):
         is_closed = []
         is_open = []
@@ -345,6 +364,29 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
 
     print('Total:')
     printInfos(created_before_but_touched + created_in_report_period)
+
+    cntP = countIssues(created_in_report_period)
+    cntB = countIssues(created_before_but_touched)
+    cntA = countIssues(created_in_report_period + created_before_but_touched)
+
+    s_start_date = start_date.strftime('%d.%m.%Y')
+    s_zeitraum = f"{s_start_date} - {end_date.strftime('%d.%m.%Y')}"
+    LaTeX = fr"""# LaTeX CODE:
+\begin{{table}}[h]
+    \centering
+    \begin{{tabular}}{{rc|cc|cc}}
+         \multicolumn{{2}}{{c|}}{{Erstellung}} & Offen & Geschlossen & Duplikat & Ungültig/nicht behebbar \\
+         \hline
+        {s_zeitraum} & {cntP['total']} & {cntP['open']} & {cntP['closed']} & {cntP['duplicate']} & {cntP['wontfix']} \\
+         vor {s_start_date} & {cntB['total']} & {cntB['open']} & {cntB['closed']} & {cntB['duplicate']} & {cntB['wontfix']} \\
+         \hline
+         Gesamt      & {cntA['total']} & {cntA['open']} & {cntA['closed']} & {cntA['duplicate']} & {cntA['wontfix']} \\
+    \end{{tabular}}
+    \caption{{Zusammenfassung \EnMAPBox Issue-Tracker (\url{{https://github.com/EnMAP-Box/enmap-box/issues}}), Stand {today.strftime("%d.%m.%Y")} }}
+    \label{{tab:enmapbox_issues}}
+\end{{table}}
+"""
+    print(LaTeX)
     return None
 
 
@@ -450,113 +492,13 @@ def report_processingalgorithms() -> pd.DataFrame:
     return df
 
 
-def report_bitbucket_issues(start_date='2020-01-01', end_date='2023-12-31'):
-    # 1. open bitbucket,
-    # goto repository settings -> issues -> Import & export
-    # 2. export issues, extract zip file and copy db-2.0.json to JSON_DIR (defaults to <repo>/tmp)
-    # 3. set report period with start_date / end_date
-
-    """
-    Syntax github issue request:
-    https://docs.github.com/en/search-github/searching-on-github/searching-issues-and-pull-requests
-
-    author:jakimowb type:issue created:>=2022-07-01 created:<=2022-12-31
-
-    """
-
-    JSON_DIR = pathlib.Path(__file__).parents[1] / 'tmp'
-    start_date = toDate(start_date, '%Y-%m-%d')
-    end_date = toDate(end_date, '%Y-%m-%d')
-
-    PATH_DB_JSON = JSON_DIR / 'db-2.0.json'
-    PATH_CSV_REPORT = JSON_DIR / f'issue_report_{start_date.date()}_{end_date.date()}.csv'
-    assert PATH_DB_JSON.is_file(), 'No db-2.0.json, no stats!'
-    assert start_date < end_date
-
-    def csv2xlsx(path_csv):
-        path_csv = pathlib.Path(path_csv)
-        path_xlsx = path_csv.parent / f'{os.path.splitext(path_csv.name)[0]}.xlsx'
-        workbook = Workbook(path_xlsx)
-        # float_format = workbook.add_format({'num_format': ''})
-        worksheet = workbook.add_worksheet()
-        rxIsInt = re.compile(r'^\d+$')
-        rxIsFloat = re.compile(r'^\d+([.,]\d*)?$')
-        with open(path_csv, 'rt', encoding='utf8') as f:
-            reader = csv.reader(f)
-            for r, row in enumerate(reader):
-                for c, col in enumerate(row):
-                    if rxIsInt.match(col):
-                        col = int(col)
-                    elif rxIsFloat.match(col):
-                        col = float(col)
-                    worksheet.write(r, c, col)
-        workbook.close()
-
-    with open(PATH_DB_JSON, 'r', encoding='utf-8') as f:
-        DB = json.load(f)
-
-    # DS = pd.read_json(PATH_DB_JSON.as_posix())
-    ISSUES = DB['issues']
-
-    CREATED_ISSUES = [i for i in ISSUES if start_date.date()
-                      <= datetime.datetime.fromisoformat(i['created_on']).date()
-                      <= end_date.date()]
-    UPDATED_ISSUES = [i for i in ISSUES if start_date.date()
-                      <= datetime.datetime.fromisoformat(i['updated_on']).date()
-                      <= end_date.date()]
-
-    def byKey(ISSUES: list, key: str) -> dict:
-        R = dict()
-        for issue in ISSUES:
-            k = issue[key]
-            L = R.get(k, [])
-            L.append(issue)
-            R[k] = L
-        return R
-
-    CREATED_BY_STATUS = byKey(CREATED_ISSUES, 'status')
-    UPDATED_BY_STATUS = byKey(UPDATED_ISSUES, 'status')
-
-    print(f'Created: {len(CREATED_ISSUES)}')
-    for k in sorted(CREATED_BY_STATUS.keys()):
-        print(f'\t{k}: {len(CREATED_BY_STATUS[k])}')
-
-    print(f'Updated: {len(UPDATED_ISSUES)}')
-    for k in sorted(UPDATED_BY_STATUS.keys()):
-        print(f'\t{k}: {len(UPDATED_BY_STATUS[k])}')
-
-    with open(PATH_CSV_REPORT, 'w', encoding='utf-8', newline='') as f:
-        states = ['new', 'open', 'on hold', 'resolved', 'closed', 'duplicate', 'wontfix', 'invalid']
-        fieldnames = ['action', 'total'] + states
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-        total_created = total_updated = 0
-        ROW1 = {'action': 'created'}
-        ROW2 = {'action': 'updated'}
-
-        for s in states:
-            total_created += len(CREATED_BY_STATUS.get(s, []))
-            total_updated += len(UPDATED_BY_STATUS.get(s, []))
-            ROW1[s] = len(CREATED_BY_STATUS.get(s, []))
-            ROW2[s] = len(UPDATED_BY_STATUS.get(s, []))
-        ROW1['total'] = total_created
-        ROW2['total'] = total_updated
-        writer.writerow(ROW1)
-        writer.writerow(ROW2)
-
-    csv2xlsx(PATH_CSV_REPORT)
-
-
 class TestCases(unittest.TestCase):
 
     def test_github_EnMAPBox(self):
-        report_github_issues_EnMAPBox(start_date='2024-01-01', end_date='2024-06-30')
+        report_github_issues_EnMAPBox(start_date='2024-07-01', end_date='2024-12-31')
 
     def test_github_QGIS(self):
-        report_github_issues_QGIS(authors=['jakimowb'], start_date='2020-01-01', end_date='2023-12-31')
-
-    def test_bitbucket(self):
-        report_bitbucket_issues(start_date='2020-01-01', end_date='2023-12-31')
+        report_github_issues_QGIS(authors=['jakimowb'], start_date='2024-07-01', end_date='2024-12-31')
 
     def test_report_downloads(self):
         df = report_downloads()

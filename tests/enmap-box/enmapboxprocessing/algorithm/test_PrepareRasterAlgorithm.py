@@ -51,6 +51,20 @@ class TestPrepareRasterAlgorithm(TestCase):
         array = reader.array()
         self.assertArrayEqual(20, array)
 
+    def test_scaleBandWise(self):
+        writer = self.rasterFromValue((2, 1, 1), 10, 'inraster.tif')
+        writer.close()
+        alg = PrepareRasterAlgorithm()
+        parameters = {
+            alg.P_RASTER: writer.source(),
+            alg.P_SCALE: [2, 3],
+            alg.P_OUTPUT_RASTER: self.filename('raster.tif'),
+        }
+        self.runalg(alg, parameters)
+        reader = RasterReader(parameters[alg.P_OUTPUT_RASTER])
+        array = reader.array()
+        self.assertArrayEqual(np.array([20, 30]), np.array(array).flatten())
+
     def test_type(self):
         writer = self.rasterFromValue((1, 1, 1), 10, 'inraster.tif')
         writer.close()

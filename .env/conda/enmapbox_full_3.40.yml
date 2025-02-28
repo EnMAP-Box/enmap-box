@@ -1,0 +1,43 @@
+# EnMAP-Box conda environment
+# generated with scripts/update_conda_environemts.py (MANUAL CHANGES WILL BE OVERWRITTEN!)
+# run to install: conda env create -n enmapbox_full_3.40 --file=enmapbox_full_3.40.yml
+# run to update : conda env update -n enmapbox_full_3.40 --file=enmapbox_full_3.40.yml --prune
+# run to delete : conda env remove -n enmapbox_full_3.40
+# see also https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
+
+channels:
+  - conda-forge
+dependencies:
+  - qgis=3.40.1
+  - astropy
+  - catboost
+  - cdsapi
+  - cython
+  - docutils
+  - enpt
+  - flake8
+  - git-lfs
+  - gitpython
+  - h5py
+  - lightgbm
+  - matplotlib
+  - netcdf4
+  - numba>=0.56.4
+  - pip
+  - pygrib
+  - pyhdf
+  - pyopengl
+  - pytest
+  - pytest-cov
+  - pytest-xdist
+  - scikit-learn>=1
+  - sympy
+  - typeguard=2
+  - xarray
+  - xgboost
+  - pip:
+      - enpt-enmapboxapp
+      - flake8-qgis
+name: enmapbox_full_3.40
+variables:
+  QT_MAC_WANTS_LAYER: 1

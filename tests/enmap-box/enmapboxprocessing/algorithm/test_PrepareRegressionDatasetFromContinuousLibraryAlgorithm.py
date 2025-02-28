@@ -1,5 +1,5 @@
-from enmapbox import initAll
-from enmapbox.testing import start_app
+from qgis.core import QgsGeometry, QgsPointXY, QgsVectorLayer, QgsCoordinateReferenceSystem
+
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuouslibraryalgorithm import \
     PrepareRegressionDatasetFromContinuousLibraryAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
@@ -7,10 +7,9 @@ from enmapboxprocessing.librarydriver import LibraryDriver
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import library_gpkg
-from qgis.core import QgsGeometry, QgsPointXY, QgsVectorLayer, QgsCoordinateReferenceSystem
 
 
-class TestPrepareRegressionDatasetFromCategorizedLibrary(TestCase):
+class TestPrepareRegressionDatasetFromContinuousLibraryAlgorithm(TestCase):
 
     def test(self):
         alg = PrepareRegressionDatasetFromContinuousLibraryAlgorithm()
@@ -28,9 +27,6 @@ class TestPrepareRegressionDatasetFromCategorizedLibrary(TestCase):
         # todo implement more tests, wait for issue #1036
 
     def test_locations(self):
-        start_app()
-        initAll()
-
         # create data
         values = {'profiles': {'y': [1, 2, 3]}, 'target': 1}
         geometry = QgsGeometry.fromPointXY(QgsPointXY(1, 2))

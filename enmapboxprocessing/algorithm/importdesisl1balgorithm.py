@@ -4,6 +4,7 @@ from typing import Dict, Any, List, Tuple
 from osgeo import gdal
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from enmapboxprocessing.gdalutils import GdalUtils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 from enmapbox.typeguard import typechecked
 
@@ -98,6 +99,8 @@ class ImportDesisL1BAlgorithm(EnMAPProcessingAlgorithm):
                 rasterBand.SetScale(float(gains[i]))
                 rasterBand.SetOffset(float(offsets[i]))
                 rasterBand.FlushCache()
+
+            GdalUtils().calculateDefaultHistrogram(ds, feedback=feedback)
 
             result = {self.P_OUTPUT_RASTER: filename}
             self.toc(feedback, result)
