@@ -1382,7 +1382,7 @@ class Functions:
         rng = np.random.default_rng(random_state)
         return rng.normal(loc=loc, scale=scale, size=size)
 
-      
+
 
 class ProcessorMainFunction:
     def __init__(self):
