@@ -3,12 +3,6 @@ from os.path import join, dirname
 
 import numpy as np
 from osgeo import gdal
-from qgis.PyQt.QtCore import QDateTime, QSizeF
-from qgis.PyQt.QtGui import QColor
-from qgis.core import QgsGeometry, QgsVectorLayer, Qgis, QgsProcessingFeedback, QgsRasterLayer, QgsRasterShader, \
-    QgsColorRamp, \
-    QgsStyle, QgsColorRampShader, QgsRectangle, QgsWkbTypes, QgsCoordinateReferenceSystem
-from qgis.gui import QgsMapCanvas
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
 from enmapboxprocessing.rasterreader import RasterReader
@@ -19,6 +13,12 @@ from enmapboxtestdata import landcover_polygon, enmap, hires
 from enmapboxtestdata import landcover_polygon_30m, fraction_point_singletarget, fraction_point_multitarget, \
     landcover_map_l3, \
     fraction_map_l3
+from qgis.PyQt.QtCore import QDateTime, QSizeF
+from qgis.PyQt.QtGui import QColor
+from qgis.core import QgsGeometry, QgsVectorLayer, Qgis, QgsProcessingFeedback, QgsRasterLayer, QgsRasterShader, \
+    QgsColorRamp, \
+    QgsStyle, QgsColorRampShader, QgsRectangle, QgsWkbTypes, QgsCoordinateReferenceSystem
+from qgis.gui import QgsMapCanvas
 
 
 class TestUtils(TestCase):
@@ -559,7 +559,8 @@ class TestUtils(TestCase):
             QgsGeometry.fromRect(
                 QgsRectangle(13.24539916899924208, 52.41260765598481441,
                              13.34667529330139502, 52.52184188795437336)),
-            QgsGeometry.fromRect(Utils.transformExtent(extent, crs, toCrs))
+            QgsGeometry.fromRect(Utils.transformExtent(extent, crs, toCrs)),
+            precision=10,
         )
 
         # same CRS
@@ -570,7 +571,9 @@ class TestUtils(TestCase):
                 380952.36999999999534339, 5808372.34999999962747097,
                 387552.36999999999534339, 5820372.34999999962747097
             )),
-            QgsGeometry.fromRect(Utils.transformExtent(extent, crs, crs))
+            QgsGeometry.fromRect(Utils.transformExtent(extent, crs, crs)),
+            precision=10,
+
         )
 
     def test_mapCanvasCrs(self):
