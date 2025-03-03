@@ -10,7 +10,7 @@ about=<p align="center">This is a dummy text. See <code>scrpts/create_plugin.py<
 icon=enmapbox/gui/ui/icons/enmapbox.png
 tags=keyword dummy
 category=https://github.com/EnMAP-Box/enmap-box.git
-homepage=http://www.enmap.org/
+homepage=https://www.enmap.org/
 tracker=https://github.com/EnMAP-Box/enmap-box/issues
 repository=https://github.com/EnMAP-Box/enmap-box.git
 changelog=CHANGELOG.rst
