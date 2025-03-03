@@ -20,7 +20,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this software. If not, see <http://www.gnu.org/licenses/>.
+    along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
 
 This module handles the conversion between sensors, mostly in terms of spectral downsampling to the characteristics
@@ -44,8 +44,6 @@ wavelengths of the target sensors need to be known, as they cannot be extracted 
 be single column (wavelengths) or two columns (wavelengths & FWHM).
 """
 
-
-
 import numpy as np
 import csv
 import os
@@ -54,7 +52,7 @@ from enmapbox.coreapps._classic.hubflow.core import *
 
 # Execution of a conversion between two sensors
 class Spec2Sensor:
-    
+
     def __init__(self, nodat, sensor):
         self.wl_sensor, self.fwhm = (None, None)
         self.wl = range(400, 2501)
@@ -101,7 +99,7 @@ class Spec2Sensor:
                     return
 
                 if wlambda not in self.wl:  # this happens when a wavelength is specified
-                    continue                # in the srf-file outside 400-2500
+                    continue  # in the srf-file outside 400-2500
 
                 # Do the same with the weighting factor for band and srf_i value ([1])
                 wfactor = self.srf[srf_i][sensor_band][1]
@@ -185,8 +183,8 @@ class BuildTrueSRF:
             raw_file.seek(0)  # rewind file
             raw = csv.reader(raw_file, delimiter=self.delimiter)
             try:
-                firstline = [i for i in next(raw) if i]   # removes blank columns in K. Segl SRF files
-                secondline = [i for i in next(raw) if i]   # - " -
+                firstline = [i for i in next(raw) if i]  # removes blank columns in K. Segl SRF files
+                secondline = [i for i in next(raw) if i]  # - " -
             except ImportError("Files could not be read."):
                 return False
 
@@ -198,7 +196,7 @@ class BuildTrueSRF:
                 except ValueError:
                     self.header_bool = True
 
-            if not self.wl_convert:   # SRF must be stored in µm; that's awkward but it's the standard I'm afraid
+            if not self.wl_convert:  # SRF must be stored in µm; that's awkward but it's the standard I'm afraid
                 try:
                     wl_testing = secondline[0]
                     if float(wl_testing) < 1:  # we ignore the possibility that the unit is cm or mm
@@ -209,7 +207,7 @@ class BuildTrueSRF:
                     pass
 
         srf_list = list()
-        for i_file, single_file in enumerate(self.files):   # iterate through all the files (1 file = 1 target band)
+        for i_file, single_file in enumerate(self.files):  # iterate through all the files (1 file = 1 target band)
             single_filename = os.path.basename(single_file)
             all_lines = list()
             with open(single_file, 'r') as raw_file:
@@ -272,7 +270,7 @@ class BuildTrueSRF:
 
         # What happens when there are more wavelengths given than in the SRF files?
         if not wavelength.shape[0] == nbands_sensor:
-            return False, "Got {:d} bands in wavelength-file, but {:d} bands in SRF-File!"\
+            return False, "Got {:d} bands in wavelength-file, but {:d} bands in SRF-File!" \
                 .format(int(wavelength.shape[0]), nbands_sensor)
 
         # Store information about which bands should be used for
@@ -298,7 +296,7 @@ class BuildGenericSRF:
         self.wl_convert = wl_convert
         self.nodat = nodat
 
-    def srf_from_imagery(self, x):   # fwhm-style
+    def srf_from_imagery(self, x):  # fwhm-style
         wavelength = x[:, 0]
         fwhm = x[:, 1]
         # sigma = fwhm / 2.355  # temporarily disabled
@@ -309,13 +307,14 @@ class BuildGenericSRF:
             x_lower = scipy.stats.norm.ppf(0.105, wavelength[wl], fwhm[wl])
             x_upper = scipy.stats.norm.ppf(0.895, wavelength[wl], fwhm[wl])
 
-            x = np.arange(x_lower, x_upper+1)
+            x = np.arange(x_lower, x_upper + 1)
             gs = scipy.stats.norm.pdf(x, wavelength[wl], fwhm[wl])
             x_list.append(x)
             gs_list.append(gs)
 
         for ix, x in enumerate(x_list):
-            n_invalid = sum(i > 2500 or i < 400 for i in x)  # if outreach of PDF is beyond PROSAIL range, then clip on both sides
+            n_invalid = sum(
+                i > 2500 or i < 400 for i in x)  # if outreach of PDF is beyond PROSAIL range, then clip on both sides
             if n_invalid > 0:
                 x_list[ix] = x_list[ix][n_invalid:-n_invalid]
                 gs_list[ix] = gs_list[ix][n_invalid:-n_invalid]
@@ -324,15 +323,16 @@ class BuildGenericSRF:
         new_srf = np.full(shape=(np.max(new_srf_nbands), len(wavelength), 2), fill_value=self.nodat, dtype=np.float64)
 
         for wl in range(len(wavelength)):
-            new_srf[0:new_srf_nbands[wl], wl, 0] = np.around(x_list[wl]/1000, decimals=4)
+            new_srf[0:new_srf_nbands[wl], wl, 0] = np.around(x_list[wl] / 1000, decimals=4)
             new_srf[0:new_srf_nbands[wl], wl, 1] = gs_list[wl]
 
         ndvi = list()
         ndvi.append(np.argmin(np.abs(wavelength - 677)))  # red
         ndvi.append(np.argmin(np.abs(wavelength - 837)))  # nir
 
-        np.savez(self.out_file, srf_nbands=new_srf_nbands, srf=new_srf, sensor_wl=wavelength, sensor_ndvi=ndvi, sensor_fwhm=fwhm) #sensor_fwhm added
+        np.savez(self.out_file, srf_nbands=new_srf_nbands, srf=new_srf, sensor_wl=wavelength, sensor_ndvi=ndvi,
+                 sensor_fwhm=fwhm)  # sensor_fwhm added
         os.replace(self.out_file, os.path.splitext(self.out_file)[0] + ".srf")
 
         return True, self.out_file, os.path.splitext(os.path.basename(self.out_file))[0]
-        #return filename  # returning the filename helps with putting the correct name into the combobox
+        # return filename  # returning the filename helps with putting the correct name into the combobox

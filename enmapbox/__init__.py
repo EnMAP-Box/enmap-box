@@ -21,7 +21,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this software. If not, see <http://www.gnu.org/licenses/>.
+    along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
 """
 
@@ -72,7 +72,7 @@ https://enmap-box.readthedocs.io</span></a></p>
 
 <p align="center">Licenced under the GNU General Public Licence<br/>
 <a href="https://www.gnu.org/licenses/"><span style=" text-decoration: underline; color:#0000ff;">
-http://www.gnu.org/licenses/</span></a></p>
+https://www.gnu.org/licenses/</span></a></p>
 
 <p align="center">Environmental Mapping and Analysis Program (EnMAP)<br/>
 <a href="https://www.enmap.org"><span style=" text-decoration: underline; color:#0000ff;">

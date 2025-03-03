@@ -19,7 +19,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this software. If not, see <http://www.gnu.org/licenses/>.
+    along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
 """
 from qgis._gui import QgsMapLayerComboBox
@@ -45,12 +45,14 @@ class GlobalInversionGUI(QDialog):
     mLayerImage: QgsMapLayerComboBox
     mLayerGeometry: QgsMapLayerComboBox
     mLayerMask: QgsMapLayerComboBox
+
     def __init__(self, parent=None):
         super(GlobalInversionGUI, self).__init__(parent)
         loadUi(pathUI_inversion, self)
         self.mLayerImage.setFilters(QgsMapLayerProxyModel.RasterLayer)
         self.mLayerGeometry.setFilters(QgsMapLayerProxyModel.RasterLayer)
         self.mLayerMask.setFilters(QgsMapLayerProxyModel.RasterLayer)
+
 
 class SelectWavelengthsGUI(QDialog):
 
@@ -579,7 +581,7 @@ class GlobalInversion:
         if not self.gui.txtExclude.text() == "":  # lineEdit is NOT empty, so some information is already there
             try:
                 pass_exclude = self.gui.txtExclude.text().split(" ")  # get whats in the field
-                pass_exclude = [int(pass_exclude[i])-1 for i in range(len(pass_exclude))]  # convert the text to int
+                pass_exclude = [int(pass_exclude[i]) - 1 for i in range(len(pass_exclude))]  # convert the text to int
             except ValueError:  # lineEdit contains crap
                 self.gui.txtExclude.setText("")
                 pass_exclude = list()
@@ -623,7 +625,7 @@ class SelectWavelengths:
                                                self.main.global_inversion.wunit)
                 self.gui.lstExcluded.addItem(label)
             else:
-                str_band_no = '{num:0{width}}'.format(num=i+1, width=width)
+                str_band_no = '{num:0{width}}'.format(num=i + 1, width=width)
                 label = "band %s: %6.2f %s" % (str_band_no, self.main.global_inversion.wl[i],
                                                self.main.global_inversion.wunit)
                 self.gui.lstIncluded.addItem(label)
@@ -749,6 +751,7 @@ class MainUiFunc:
 
 if __name__ == '__main__':
     from enmapbox.testing import start_app
+
     app = start_app()
     m = MainUiFunc()
     m.show()
