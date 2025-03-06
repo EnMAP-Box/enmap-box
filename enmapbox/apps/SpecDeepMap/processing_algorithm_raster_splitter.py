@@ -101,8 +101,6 @@ class RasterSplitter(QgsProcessingAlgorithm):
                '<p>Step size in X direction in pixel units.</p>' \
                '<h3>Step size Y </h3>' \
                '<p>Step size in Y direction in pixel units.</p>' \
-               '<h3>Skip tiles with no valid labels</h3>' \
-               '<p>If this option is selected, the image tiles which show no valid corresponding labels will be excluded from further processing. In this system the value 0 is reserved for non valid classes. </p>' \
                '<h3>Minium percent of valid labels per tile</h3>' \
                '<p>If the defined minimum percentage of valid labels per image tile is not reached, the tile will be skipped and excluded from further processing. </p>' \
                '<h3>Output folder</h3>' \
