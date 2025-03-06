@@ -144,7 +144,6 @@ class DL_Trainer(QgsProcessingAlgorithm):
                '<p>This parameter normalizes the image data with mean and std. per channel. To use this parameter the normalization statistic had to be cretaed using the Dataset Maker. </p>' \
                '<h3>Open Tensorboard after Training</h3>' \
                '<p>This parameter opens a Tensorboard after training, which is a graphical user interface in which the Loss and IoU metric can be interactively explored. This parameter works currently only for windows systems </p>' \
-
                '<h3>Batch size</h3>' \
                '<p>This defines the number of images which are porcessed in batches. </p>' \
                '<h3>Epochs</h3>' \
@@ -162,7 +161,7 @@ class DL_Trainer(QgsProcessingAlgorithm):
                '<h3>Number of models</h3>' \
                '<p> Defines how many models should be saved. -1 means each epoch a model is saved. Other integer define a limited number of models, which are saved by performances on Iou metric e.g. 5 best performing models.  </p>' \
                '<h3>Path for saving Tensorboard logger</h3>' \
-               '<p>Define folder where Tensorboard logger is saved. </p>'
+               '<p>Define folder where Tensorboard logger is saved. </p>'\
                '<h3>Path for saving model</h3>' \
                '<p>Define folder where models are saved </p>'
 
