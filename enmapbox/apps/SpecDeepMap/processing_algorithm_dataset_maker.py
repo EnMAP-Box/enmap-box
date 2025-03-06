@@ -102,23 +102,23 @@ class DatasetMaker(QgsProcessingAlgorithm):
         html = '' \
                '<p>This algorithm creates training, validation and test datasets in CSV format. Each created dataset consists of images and their corresponding labels. The data can be split by default in 80% training, 10 % validation dataset, 10 % test dataset. The algorithm aims to achieve an equal class distribution with a deviation of 1 % per class per dataset, for this a wasserstein distance and the permutatation is used. The algorith further generates a summary of class counts per dataset as well as there percentage and to calculate class weights.Additionaly the algorithm can calculate mean and standard deviation,per channel in the train dataset which can be used for data normalization during training.</p>' \
                '<h3>Data folder</h3>' \
-               '<p>Folder location which contains an image tile and corresponding label tile folder.</p>' \
-               '<h3>Default split </h3>' \
-               '<p>Data is split in 80% training and 20 % validation dataset. </p>' \
-               '<h3>Percent training images</h3>' \
-               '<p>User definable percentage  of images, which should be in training dataset. If "%" is used after number it is interpreted as percent, else as actual number. Default is "80%" training images, including automatic rounding.</p>' \
-               '<h3>Percent or number of validation images</h3>' \
-               '<p>User definable percentage or actul number of images, which should be in validation dataset. If "%" is used after number it is interpreted as percent, else as actual number. Default is "20%"  validation images, including automatic rounding.</p>' \
+               '<p>Folder which contains an image chip folder and corresponding label chip folder.</p>' \
+               '<h3>Percentage of train images</h3>' \
+               '<p>Defines how much percentage of the data is used as train dataset. </p>' \
+               '<h3>Percentage of validation images</h3>' \
+               '<p>Defines how much percentage of the data is used as validation dataset.</p>' \
+               '<h3>Percentage of test images</h3>' \
+               '<p>Defines how much percentage of the data is used as test dataset.</p>' \
+               '<h3>Scaler</h3>' \
+               '<p>Optional parameter, if a scaler is defined, the scaler is used during training and prediction to scale image data between values of 0-1. To scale data in a range of 0-1, the scaler should be the maximum possible value of the image data. If use of pretrained imagenet weight is intended, the data must be scaled to a range 0-1 to be compatibale with the pretrained weights</p>' \
+               '<h3>Create Normalisation Statistic ( Mean and std. per Channel)</h3>' \
+               '<p>If this parameter is activated, it creates a normalisation statistic in form of a csv file. Listing the mean and std. per Channel for the training dataset. If a scaler was defined it is also taken into account to scale mean and std. accordingly. This normalization statistic can be used to normalize the data during training and prediction. If pretrained Imagent weights are intended to be used, for more then 3 channels, a computation of normalisation statistic is requiered.  </p>' \    
+               '<h3Number of permutation of Wasserstein distance </h3>' \
+               '<p>This parameter defiend how many permutations the Wasserstein distance can use to find an similar datasplit. If any class in the data is not reaching the min value of 0.001 per dataset the algorithm yields an error. As it only make sense to include data which is actually present in the dataset, the algorithm doesnt allow inclusion of barley existing classes. Id this is happening you should think about your classification structure and restructure your input data.  </p>' \
                '<h3>Random seed </h3>' \
-               '<p>Defines seed for random split. Seed number is needed to generated again same random split if necessary. </p>' \
-               '<h3>Shuffle </h3>' \
-               '<p>Shuffled the data randomly before split.</p>' \
-               '<h3>Data type </h3>' \
-               '<p>Defines which data type for images and labels should be considered.</p>' \
-               '<h3>Create training and valdiation dataset summary and class weights</h3>' \
-               '<p>This generates a summary CSV , which gives an overview of how many pixel per class are in the training dataset and validation dataset. And further generates class weights for a balanced training on the base of the class distribution of the training dataset. </p>' \
+               '<p>Seed ensures that the same random starting point can be used for the data split calculations. </p>' \
                '<h3>Output folder</h3>' \
-               '<p>Location of output folder. In the output folder the csv-files are generated.</p>'
+               '<p>Location of output folder. In the output folder the csv-files are generated.  there is one csv file generated for training, validation and test dataset as well as one summary csv and optionally also a normalization csv.</p>'
         return html
 
     def initAlgorithm(self, config=None):
