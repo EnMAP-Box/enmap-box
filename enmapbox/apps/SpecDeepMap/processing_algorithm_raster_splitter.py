@@ -102,7 +102,7 @@ class RasterSplitter(QgsProcessingAlgorithm):
                '<h3>Step size Y </h3>' \
                '<p>Step size in Y direction in pixel units.</p>' \
                '<h3>Minium percent of valid labels per tile</h3>' \
-               '<p>If the defined minimum percentage of valid labels per image tile is not reached, the tile will be skipped and excluded from further processing. </p>' \
+               '<p>If the defined minimum percentage of valid labels per image tile is not reached, the tile will be skipped and excluded from further processing. The fiexed label value indicating no data is 0. The no data label 0 will continously be masked during training and prediction, so the model will ignore the pixels classified as 0. </p>' \
                '<h3>Output folder</h3>' \
                '<p>Location of output folder. In the output folder two subfolder will be created. One images and one labels. Corresponding images and labels tiles have same name.</p>'
         return html
