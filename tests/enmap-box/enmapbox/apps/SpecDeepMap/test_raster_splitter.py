@@ -1,14 +1,12 @@
 from os.path import join, dirname
 from qgis.core import QgsProcessingFeedback, QgsApplication, QgsProcessingAlgorithm
 from processing.core.Processing import Processing
-
-
 from enmapbox.apps.SpecDeepMap.processing_algorithm_raster_splitter import RasterSplitter
-
 from enmapbox import exampledata
-
 import glob
 from enmapboxprocessing.testcase import TestCase
+import os
+import shutil
 
 class TestRasterSplitter(TestCase):
 
@@ -33,8 +31,8 @@ class TestRasterSplitter(TestCase):
       input_l_path = join(BASE_DIR,
                           "../../../../testdata/external/specdeepmap/test_requierments/enmap_landcover_unstyled.tif")
       folder_path = join(BASE_DIR, "test_run/")
-      folder_path_images = join(BASE_DIR, "../../../../testdata/external/specdeepmap/test_requierments/images/")
 
+      folder_path_images = join(BASE_DIR, "test_run/images")
 
       io = {alg.INPUT_I: exampledata.enmap,
                 alg.INPUT_L: input_l_path,
@@ -54,3 +52,18 @@ class TestRasterSplitter(TestCase):
       num_tif_files = len(tif_files)# List all .tif files
       assert num_tif_files == 18, f"Error: Expected 18 .tif files, but found {num_tif_files}"
       self.assertEqual(num_tif_files, 18, f"Error: Expected 18 .tif files, but found {num_tif_files}")
+
+# Clean up
+
+      folder_path_images = join(BASE_DIR, "test_run/images")
+
+
+      if os.path.exists(folder_path_images):
+            shutil.rmtree(folder_path_images)  # Deletes folder and all its contents
+            print(f"Deleted folder: {folder_path_images}")
+
+      folder_path_labels = join(BASE_DIR, "test_run/labels")
+
+      if os.path.exists(folder_path_labels):
+            shutil.rmtree(folder_path_labels)  # Deletes folder and all its contents
+            print(f"Deleted folder: {folder_path_labels}")

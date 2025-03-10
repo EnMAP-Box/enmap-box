@@ -12,7 +12,8 @@ from qgis.core import (QgsProcessingAlgorithm,
                        QgsProcessingParameterString,
                        QgsProcessingParameterEnum)
 
-from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import dl_train
+#from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import dl_train
+from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer_remap_classes import dl_train
 
 import os
 import re
@@ -131,19 +132,19 @@ class DL_Trainer(QgsProcessingAlgorithm):
                '<h3>Load pretrained weights </h3>' \
                '<p>Here a user can chose weights for model initalization. the options are None for training from scratch and pretrained imagenet weights for RGB images which can be extended to more spectral bands. The input data need to be structured in bgr + additional channels format for imagenet weights use as well as requiers data normalization. Further pretrained weights for  Sentinel-2 Top of Atmosphere are provided for ResNet-18 and ResNet-50. These weights stem from foundation model training from SSL4EO-S12 by Wang et al. 2023. The automatic preprocessing for tehse weights is scaling the input data by 10000, any other scaling or normalization will be ignored if these weights are chosen.</p>' \
                '<h3>Load model from path</h3>' \
-               '<p>Load model from path for continuing training or to initalize a model. Restriction is that model must be compatibel with training scheme and input data type. </p>' \
+               '<p>Load model from path for continuing training or to initalize a model. Restriction is that model must be compatibel with training scheme and input data type.</p>' \
                '<h3>Freeze backbone </h3>' \
                '<p>This freezes the weight of the backbone for training. This is a routine step for transferlearning where in the first step a model is trained on new classes with a frozen backbone and in a second training step it is finetuned with an unfrozen backbone. To achieve this here, train first with frozen backbone and then load trained model again and train with unfrozen backbone. </p>' \
                '<h3>Data augmentation (random flip & rotate by 45°) </h3>' \
-               '<p>This apply data augmentation. Random vertical and horizontal flip as well as ranodm rotate with 45°. Each augmentation has a propability of occuring of 50 %. This data augmentation is happening on the fly and prevents overfitting of the model. </p>' \
+               '<p>This apply data augmentation. Random vertical and horizontal flip as well as ranodm rotate with 45°. Each augmentation has a propability of occuring of 50 %. This data augmentation is happening on the fly and prevents overfitting of the model.</p>' \
                '<h3>Early stopping</h3>' \
                '<p>This stops the model when validation loss is not imporving for 50 epochs.  </p>' \
                '<h3>Balanced Training using Class Weights</h3>' \
                '<p>This parameter enables balanced training, for this the precomputed class weights based on the training dataset are used, which are listed in the summary csv file.</p>'\
                '<h3>Data Normalization</h3>' \
-               '<p>This parameter normalizes the image data with mean and std. per channel. To use this parameter the normalization statistic had to be cretaed using the Dataset Maker. </p>' \
+               '<p>This parameter normalizes the image data with mean and std. per channel. To use this parameter the normalization statistic had to be cretaed using the Dataset Maker.</p>' \
                '<h3>Open Tensorboard after Training</h3>' \
-               '<p>This parameter opens a Tensorboard after training, which is a graphical user interface in which the Loss and IoU metric can be interactively explored. This parameter works currently only for windows systems </p>' \
+               '<p>This parameter opens a Tensorboard after training, which is a graphical user interface in which the Loss and IoU metric can be interactively explored. This parameter works currently only for windows systems.</p>' \
                '<h3>Batch size</h3>' \
                '<p>This defines the number of images which are porcessed in batches. </p>' \
                '<h3>Epochs</h3>' \
@@ -254,7 +255,7 @@ class DL_Trainer(QgsProcessingAlgorithm):
         """
         Here is where the processing itself takes place.
         """
-        dl_train(
+        model= dl_train(
             input_folder=self.parameterAsString(parameters, self.train_val_input_folder, context),
             arch_index=self.parameterAsEnum(parameters, self.arch, context),
             backbone=self.parameterAsString(parameters, self.backbone, context),
@@ -276,6 +277,8 @@ class DL_Trainer(QgsProcessingAlgorithm):
             logdirpath=self.parameterAsString(parameters, self.logdirpath, context),
             logdirpath_model=self.parameterAsString(parameters, self.logdirpath_model, context),
             feedback=feedback)
+
+
 
         feedback.pushInfo("Training completed.")
 

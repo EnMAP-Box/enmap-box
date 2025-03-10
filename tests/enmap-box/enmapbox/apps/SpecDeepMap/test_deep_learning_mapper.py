@@ -129,3 +129,6 @@ class Test_Deep_Learning_Mapper(TestCase):
                 os.remove(file_path)
             #os.remove(folder_path_pred_vector)
 
+        # Remove CSV
+        if os.path.exists(folder_path_pred_iou):
+            os.remove(folder_path_pred_iou)

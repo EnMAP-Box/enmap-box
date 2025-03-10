@@ -110,14 +110,17 @@ class DatasetMaker(QgsProcessingAlgorithm):
                '<h3>Percentage of test images</h3>' \
                '<p>Defines how much percentage of the data is used as test dataset.</p>' \
                '<h3>Scaler</h3>' \
-               '<p>Optional parameter, if a scaler is defined, the scaler is used during training and prediction to scale image data between values of 0-1. To scale data in a range of 0-1, the scaler should be the maximum possible value of the image data. If use of pretrained imagenet weight is intended, the data must be scaled to a range 0-1 to be compatibale with the pretrained weights</p>' \
+               '<p>Optional parameter, if a scaler is defined, the scaler is used during training and prediction to scale image data between values of 0-1. </p>'\
+               '</p>To scale data in a range of 0-1, the scaler should be the maximum possible value of the image data.</p>'\
+               '<p>If use of pretrained imagenet weight is intended, the data must be scaled to a range 0-1 to be compatibale with the pretrained weights. </p>'\
                '<h3>Create Normalisation Statistic ( Mean and std. per Channel)</h3>' \
-               '<p>If this parameter is activated, it creates a normalisation statistic in form of a csv file. Listing the mean and std. per Channel for the training dataset. If a scaler was defined it is also taken into account to scale mean and std. accordingly. This normalization statistic can be used to normalize the data during training and prediction. If pretrained Imagent weights are intended to be used, for more then 3 channels, a computation of normalisation statistic is requiered.  </p>' \    
-               '<h3Number of permutation of Wasserstein distance </h3>' \
-               '<p>This parameter defiend how many permutations the Wasserstein distance can use to find an similar datasplit. If any class in the data is not reaching the min value of 0.001 per dataset the algorithm yields an error. As it only make sense to include data which is actually present in the dataset, the algorithm doesnt allow inclusion of barley existing classes. Id this is happening you should think about your classification structure and restructure your input data.  </p>' \
+               '<p>If this parameter is activated, it creates a normalisation statistic in form of a csv file. Listing the mean and std. per Channel for the training dataset. </p>'\
+               '<p>If a scaler was defined it is also taken into account to scale mean and std. accordingly. This normalization statistic can be used to normalize the data during training and prediction. If pretrained Imagenet weights are intended to be used, for more then 3 channels, a computation of normalisation statistic is requiered. </p>'\
+               '<h3>Number of permutation of Wasserstein distance </h3>' \
+               '<p>This parameter defiend how many permutations the Wasserstein distance can use to find an similar datasplit. If any class in the data is not reaching the min value of 0.001 per dataset the algorithm yields an error. As it only make sense to include data which is actually present in the dataset, the algorithm doesnt allow inclusion of barley existing classes. Id this is happening you should think about your classification structure and restructure your input data.</p>'\
                '<h3>Random seed </h3>' \
                '<p>Seed ensures that the same random starting point can be used for the data split calculations. </p>' \
-               '<h3>Output folder</h3>' \
+               '<h3>Output folder</h3>'\
                '<p>Location of output folder. In the output folder the csv-files are generated.  there is one csv file generated for training, validation and test dataset as well as one summary csv and optionally also a normalization csv.</p>'
         return html
 

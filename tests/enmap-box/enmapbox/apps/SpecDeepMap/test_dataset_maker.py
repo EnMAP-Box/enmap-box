@@ -10,6 +10,7 @@ from enmapbox import exampledata
 import glob
 from enmapboxprocessing.testcase import TestCase
 
+import os
 class Test_Dataset_Maker(TestCase):
 
     def test_init(self):
@@ -74,3 +75,13 @@ class Test_Dataset_Maker(TestCase):
 
 
       # 4 add test normalization
+
+
+
+      # Clean up
+
+      if os.path.exists(folder_path_out):
+          for file in os.listdir(folder_path_out):
+              if file.endswith(".csv"):
+                  file_path_out = os.path.join(folder_path_out, file)
+                  os.remove(file_path_out)
