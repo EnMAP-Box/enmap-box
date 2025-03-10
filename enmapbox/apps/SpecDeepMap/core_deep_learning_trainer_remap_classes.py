@@ -336,6 +336,7 @@ class MyModel(L.LightningModule):
         self.scaler = self.hparams.get("scaler")
         self.reclass_look_up_table=self.hparams.get("look_up_table")
         self.reverse_look_up_table=self.hparams.get("reverse_look_up_table")
+        self.class_values = self.hparams.get("class_values")
 
 
         if self.classes == 1:
@@ -734,6 +735,11 @@ def dl_train(
     for key, value in reverse_reclass_dict.items():
         reverse_lookup_table[key] = value
 
+    cls_values = list(reclass_dict.keys())
+    print('class_values_reclass dict', cls_values)
+    cls_values = [cls for cls in cls_values if cls != 0]
+    print('filtered 0 from cls_values',cls_values)
+
     # Convert to PyTorch tensors
     reverse_lookup_table_tensor = torch.tensor(reverse_lookup_table, dtype=torch.int64)
     print('reverse lookup_table_tensor', reverse_lookup_table_tensor)
@@ -841,7 +847,10 @@ def dl_train(
             "remove_background_class": remove_zero_class,
             "scaler": scaler_value,
             "look_up_table":lookup_table_tensor,
-            "reverse_look_up_table":reverse_lookup_table_tensor
+            "reverse_look_up_table":reverse_lookup_table_tensor,
+            "class_values":cls_values
+
+
         }
         # feedback = feedback
     )
@@ -873,7 +882,8 @@ def dl_train(
                                                       "remove_background_class": remove_zero_class,
                                                       "scaler": scaler_value,
                                                       "look_up_table":lookup_table_tensor,
-                                                      "reverse_look_up_tabe":reverse_lookup_table_tensor },
+                                                      "reverse_look_up_tabe":reverse_lookup_table_tensor,
+                                                      "class_values":cls_values},
                                              map_location=acc_type
                                              )
 
