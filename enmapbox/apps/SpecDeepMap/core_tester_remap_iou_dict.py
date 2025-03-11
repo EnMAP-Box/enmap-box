@@ -41,14 +41,6 @@ from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import MyModel,model_2
 from enmapbox.apps.SpecDeepMap.core_deep_learning_mapper import load_model_and_tile_size
 
 from qgis._core import QgsProcessingFeedback
-def compute_iou(pred, gt, class_id):
-    """Compute IoU for a single class."""
-    intersection = np.logical_and(pred == class_id, gt == class_id).sum()
-    union = np.logical_or(pred == class_id, gt == class_id).sum()
-    if union == 0:
-        return 0
-    else:
-        return intersection / union
 
 
 
@@ -155,19 +147,7 @@ def save_prediction_as_geotiff(pred_array, geotransform, projection, output_path
 
 
 
-def compute_iou_per_class_old(pred, gt, num_classes):
-    """Compute IoU for each class."""
-    ious = []
-    for cls in range(num_classes):
-        pred_cls = (pred == cls)
-        gt_cls = (gt == cls)
-        intersection = np.logical_and(pred_cls, gt_cls).sum()
-        union = np.logical_or(pred_cls, gt_cls).sum()
-        if union == 0:
-            ious.append(np.nan)  # Avoid dividing by zero
-        else:
-            ious.append(intersection / union)
-    return ious
+
 
 
 def compute_iou_per_class(pred, gt, cls_values):

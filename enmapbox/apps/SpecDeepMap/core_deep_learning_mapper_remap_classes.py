@@ -11,10 +11,26 @@ import torch
 import csv
 from osgeo import gdal, ogr, osr
 
+def compute_iou_per_class(pred, gt, cls_values):
+    """Compute IoU for each class given a list of class values."""
+    ious = []  # Use a list to store IoU values
+
+    for cls in cls_values:
+        pred_cls = (pred == cls)
+        gt_cls = (gt == cls)
+        intersection = np.logical_and(pred_cls, gt_cls).sum()
+        union = np.logical_or(pred_cls, gt_cls).sum()
+
+        if union == 0:
+            ious.append(np.nan)  # Avoid dividing by zero
+        else:
+            ious.append(intersection / union)
+
+    return ious
 
 def load_model_and_tile_size(model_checkpoint, acc):
     # Load the model checkpoint
-    checkpoint = torch.load(model_checkpoint, map_location=torch.device(acc),weights_only=False)
+    checkpoint = torch.load(model_checkpoint, map_location=torch.device(acc), weights_only=False)
 
     # Retrieve hyperparameters from the checkpoint
     hyperpara = checkpoint['hyper_parameters']
@@ -23,11 +39,13 @@ def load_model_and_tile_size(model_checkpoint, acc):
     tile_size_x = hyperpara['img_x']
     tile_size_y = hyperpara['img_y']
     num_classes = hyperpara['classes']
+
     in_channels = hyperpara["in_channels"]
     architecture_used = hyperpara['architecture']
     backbone_used = hyperpara['backbone']
     pre_process = hyperpara['preprocess']
     remove_c = hyperpara['remove_background_class']
+    cls_values = hyperpara["class_values"]
 
     # Load the model with the extracted hyperparameters
     model = MyModel.load_from_checkpoint(
@@ -41,7 +59,8 @@ def load_model_and_tile_size(model_checkpoint, acc):
             "batch_size": 1,
             "classes": num_classes,
             "in_channels": in_channels,
-            "preprocess": pre_process
+            "preprocess": pre_process,
+            'remove_background_class':remove_c
         }
     )
 
@@ -49,10 +68,11 @@ def load_model_and_tile_size(model_checkpoint, acc):
     model.eval()
 
     # Return the model and tile sizes
-    return model, tile_size_x, tile_size_y, num_classes, remove_c
+    return model, tile_size_x, tile_size_y, num_classes, remove_c, cls_values
 
 
-def raster_to_vector(out_ds, vector_output, no_data_value):
+
+def raster_to_vector(out_ds, vector_output):
     # Get the first band of the raster dataset
     raster_band = out_ds.GetRasterBand(1)
 
@@ -88,7 +108,7 @@ def raster_to_vector(out_ds, vector_output, no_data_value):
     # Remove features where the "Class" field equals the no_data_value
     layer.StartTransaction()
     for feature in layer:
-        if feature.GetField("Class") == no_data_value:
+        if feature.GetField("Class") == 0:
             layer.DeleteFeature(feature.GetFID())
     layer.CommitTransaction()
 
@@ -97,19 +117,7 @@ def raster_to_vector(out_ds, vector_output, no_data_value):
     print(f"Conversion to vector completed and saved at {vector_output}.")
 
 
-def compute_iou_per_class(pred, gt, num_classes):
-    """Compute IoU for each class."""
-    ious = []
-    for cls in range(num_classes):
-        pred_cls = (pred == cls)
-        gt_cls = (gt == cls)
-        intersection = np.logical_and(pred_cls, gt_cls).sum()
-        union = np.logical_or(pred_cls, gt_cls).sum()
-        if union == 0:
-            ious.append(np.nan)  # Avoid dividing by zero
-        else:
-            ious.append(intersection / union)
-    return ious
+
 
 
 def generate_positions(image_dim, tile_dim, stride):
@@ -179,7 +187,7 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
 
     # added read image x and y from checkpoint
 
-    model, tile_size_x, tile_size_y, num_classes, remove_c = load_model_and_tile_size(model_checkpoint, acc=acc)
+    model, tile_size_x, tile_size_y, num_classes, remove_c, cls_values = load_model_and_tile_size(model_checkpoint, acc=acc)
 
     stride_x, stride_y, overlap_x, overlap_y = calculate_stride_and_overlap(tile_size_x, tile_size_y,
                                                                             overlap_percentage=overlap)
@@ -209,7 +217,7 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
 
             preds = model.predict(image)
 
-            preds = preds + 1
+            #preds = preds
 
             pred_classes = preds.squeeze(0)  # Shape becomes [H, W]
 
@@ -299,7 +307,7 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
 
     # vectorize raster  (drop no data polygon, (outside bounds))
     if vector_output:
-        raster_to_vector(out_ds, vector_output, no_data_value)
+        raster_to_vector(out_ds, vector_output)
 
     # calc. mean and per class IoU ignore index (no-data label))
 
@@ -317,42 +325,46 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
         if gt.shape != prediction.shape:
             raise ValueError(f"Shape mismatch: ground truth {gt.shape} and prediction {prediction.shape}")
 
-        print('num_classes', num_classes)
+        #print('num_classes', num_classes)
 
         # new calc iou, look at this logic again ! IMPORTANT !
-        if np.any(gt==0) and remove_c == 'No':
-            num_classes = num_classes+1
-        if np.any(gt == 0) and remove_c == 'Yes':
-            num_classes = num_classes
-        else:
-            num_classes = num_classes
-        mean_iou_per_class = compute_iou_per_class(prediction, gt, num_classes)
+        #if np.any(gt==0) and remove_c == 'No':
+         #   num_classes = num_classes+1
+        #if np.any(gt == 0) and remove_c == 'Yes':
+         #   num_classes = num_classes
+       # else:
+        #    num_classes = num_classes
+        mean_iou_per_class= compute_iou_per_class(prediction, gt, cls_values)
+        #mean_iou_per_class = compute_iou_per_class(prediction, gt, num_classes)
 
+        # Calculate IoU per class
+        #ious = compute_iou_per_class(prediction, gt, cls_values)
+        print(cls_values)
+        #print(ious)
 
-        if remove_c == 'Yes' and np.any(gt == 0):
-            mean_iou = np.nanmean(mean_iou_per_class[1:])  # Skip class 0
-            b = 1
-        elif remove_c == 'No' and np.any(gt == 0):
-            mean_iou = np.nanmean(mean_iou_per_class[1:])  # Skip class 0
-            b = 1
-        else:
-            mean_iou = np.nanmean(mean_iou_per_class)  # Include all classes
-            b = 0
+        mean_iou = np.nanmean(mean_iou_per_class)
+        # different approach here compared to mapper. if remove = yes meaning automatical 0 in data as otherwise  remove_c no: meaning no class extension needed
+        # inmapper
+        # if remove_c == 'Yes':
+        #   mean_iou = np.nanmean(mean_iou_per_class[1:])  # Skip class 0
+        #  b = 1
+        # else:
+        #   mean_iou = np.nanmean(mean_iou_per_class)  # Include all classes
+        #  b = 0
 
         # mean_iou = np.nanmean(mean_iou_per_class)
 
         print(f"Mean IoU per class: {mean_iou_per_class}")
         print(f"Mean IoU across all classes: {mean_iou}")
 
-        # Write IoU per class and mean IoU to a CSV file
+        # write csv with actual class values
         if csv_output:
             with open(csv_output, mode='w', newline='') as csv_file:
                 writer = csv.writer(csv_file)
                 writer.writerow(['Class', 'IoU'])
 
-                # Write IoU for each class
-                for cls, iou in enumerate(mean_iou_per_class[b:],
-                                          start=b):  # b, to ignore class 0 and match with iou_calc_function adjust for when not given
+                # Write IoU for each class using actual class values
+                for cls, iou in zip(cls_values, mean_iou_per_class):
                     writer.writerow([cls, iou])
 
                 # Write the mean IoU in the last row
