@@ -297,14 +297,14 @@ def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_
     print(f"Mean IoU per class: {mean_iou_per_class}")
     print(f"Mean IoU across all classes: {mean_iou}")
 
-    # Write IoU per class and mean IoU to a CSV file
+    #write csv with actual class values
     if csv_output_path:
         with open(csv_output_path, mode='w', newline='') as csv_file:
             writer = csv.writer(csv_file)
             writer.writerow(['Class', 'IoU'])
 
-            # Write IoU for each class
-            for cls, iou in enumerate(mean_iou_per_class):
+            # Write IoU for each class using actual class values
+            for cls, iou in zip(cls_values, mean_iou_per_class):
                 writer.writerow([cls, iou])
 
             # Write the mean IoU in the last row
