@@ -1,5 +1,4 @@
 pip_name,py_name,min_version,comment
-typeguard,,==2.13.3,optional
 astropy,,,
 PyOpenGL,OpenGL,,Required by imageCube application
 xgboost,,,

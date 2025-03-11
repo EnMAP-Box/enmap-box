@@ -26,7 +26,7 @@ DEPENDENCIES = {
              'pygrib',
              'pyhdf', 'xarray', 'astropy', 'catboost', 'matplotlib', 'astropy', 'numba>=0.56.4',
              'sympy', 'pyopengl', 'h5py'],
-    'dev': ['gitpython', 'git-lfs', 'typeguard=2', 'pytest', 'pytest-cov', 'pytest-xdist',
+    'dev': ['gitpython', 'git-lfs', 'pytest', 'pytest-cov', 'pytest-xdist',
             {'conda': 'flake8', 'pip': 'flake8-qgis'},
             'docutils']
 }
@@ -177,7 +177,8 @@ def update_yamls():
     s = ""
 
     for branch, (current_version, latest_fix) in current_versions.items():
-        latest_version_fix = max([v for v in conda_versions if v.startswith(current_version)])
+        latest_version_fix = sorted(conda_versions, key=lambda k: [int(v) for v in k.split('.')])[-1]
+        # latest_version_fix = max([v for v in conda_versions if v.startswith(current_version)])
 
         branch_name = BRANCH_NAME_LOOKUP.get(branch, branch)
         update_yaml(DIR_YAML, branch_name, latest_version_fix, full=True)
