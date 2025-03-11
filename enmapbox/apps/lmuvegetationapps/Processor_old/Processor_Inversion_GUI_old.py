@@ -20,7 +20,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this software. If not, see <http://www.gnu.org/licenses/>.
+    along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
 
 This script handles the GUI for inverting images with pre-trained Machine Learning models. At the time being, only
