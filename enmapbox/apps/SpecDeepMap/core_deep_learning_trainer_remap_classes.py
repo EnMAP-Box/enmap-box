@@ -251,15 +251,10 @@ class CustomDataset(Dataset):
         mask_array = mask.ReadAsArray().astype(np.float32)
         mask = torch.as_tensor(mask_array, dtype=torch.int64)
 
-        # ensure vales smaller then classes
+        # ensure remap according to look up table
 
-        if self.remove == 'Yes':
-            mask_array = mask
-            mask_array = torch.take(self.remap, mask_array)
-
-        elif self.remove == 'No':
-            mask_array = mask
-            mask_aray = torch.take(self.remap, mask_array)
+        mask_array = mask
+        mask_array = torch.take(self.remap, mask_array)
 
             #mask_array = mask -1 # -1 because mask values from gt start at 1 upwards, to ensure class values below layer number -1 just works for continues classes
 
@@ -709,13 +704,13 @@ def dl_train(
     elif remove_zero_class == 'No':
         print('remove',remove_zero_class)
         n_classes = len(summary_data['Class ID'].tolist())
-
+        print(n_classes)
 
         # Create a remapping dictionary
         class_ids = summary_data['Class ID'].tolist()
-        reclass_dict = {class_ids[i]:i for i in range(len(class_ids))}
+        reclass_dict = {class_ids[i]:i  for i in range(len(class_ids))}
         max_class_id = max(reclass_dict.keys())  # Find the maximum class ID
-        lookup_table = np.zeros(max_class_id+1, dtype=np.int64)
+        lookup_table = np.zeros(max_class_id +1, dtype=np.int64)
         print('reclass dict',reclass_dict)# Initialize with zeros
 
         # Fill the lookup table
@@ -792,11 +787,9 @@ def dl_train(
         if acc_type == 'gpu':
 
             weights_tensor = torch.as_tensor(weights_list, dtype=torch.float32).cuda()
-            lookup_table_tensor = torch.tensor(lookup_table, dtype=torch.int64).cuda()
 
         elif acc_type == 'cpu':
             weights_tensor = torch.as_tensor(weights_list, dtype=torch.float32)
-
 
     else:
         weights_tensor = None
