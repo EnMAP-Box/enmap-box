@@ -42,13 +42,11 @@ if not sys.warnoptions:
 
 from _classic.hubflow.core import *
 import numpy as np
-from PyQt5 import QtCore
 
 from lmuvegetationapps.Processor.Processor_Training_MLRA_defaults import MLRA_defaults
 
 from sklearn.neural_network import MLPRegressor
 from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process import kernels
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm import SVR
 from sklearn.kernel_ridge import KernelRidge
@@ -58,7 +56,7 @@ from sklearn.model_selection import RandomizedSearchCV
 
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_squared_error
 
 from sklearn.metrics import pairwise_distances
 from sklearn.model_selection import KFold, train_test_split
@@ -217,9 +215,9 @@ class MLRATraining:
         # fit a model on RTM-data but evaluate performance on insitu data or previous test set
         # (e.g. retraining case after AL)
         stds = []
-        np.savetxt("C:\Data\Daten\Testdaten\LUT/x_train_retrain.txt", X, delimiter="\t")
-        np.savetxt("C:\Data\Daten\Testdaten\LUT/y_train_retrain.txt", y, delimiter="\t")
-        np.savetxt("C:\Data\Daten\Testdaten\LUT/x_test_retrain.txt", X_val, delimiter="\t")
+        np.savetxt("C:\Data\Daten\Testdaten\LUT/x_test_retrain.txt", X, delimiter="\t")
+        np.savetxt("C:\Data\Daten\Testdaten\LUT/y_test_retrain.txt", y, delimiter="\t")
+        np.savetxt("C:\Data\Daten\Testdaten\LUT/x_val_test_retrain.txt", X_val, delimiter="\t")
         model.fit(X, y)
         if isinstance(model, GaussianProcessRegressor):
             predictions, stds = model.predict(X_val, return_std=True)
@@ -742,6 +740,7 @@ class ProcessorTraining:
 
                         else:  # no performance evaluation means just fitting the model without feedback
                             model = self.ml_model(X=x, y=y[:, ipara], model=self.mlra)
+                            test_indices = []  # make sure 'test_indices' is always defined, even when self.perf_eval is False
 
                         if not self.use_al and len(self.para_list) > 1:
                             prgbar_widget.gui.prgBar.setMaximum(100)
