@@ -1,12 +1,12 @@
 from enmapbox.gui.applications import EnMAPBoxApplication
 
 try:
-    from enmapbox.apps.SpecDeepMap.processingalgorithmDS_SUM12 import DatasetSplitter_SUM
-    from enmapbox.apps.SpecDeepMap.processingalgorithmRSRASTER_PERCENT7 import RasterSplitterRP
-    from enmapbox.apps.SpecDeepMap.processingalgorithm_DL_UNET50_MOD_15_059_16 import DL_Train_MOD
-    from enmapbox.apps.SpecDeepMap.processingalgorithm_PRED_GT_NO_DATA_mod11 import DL_Mapper
-    from enmapbox.apps.SpecDeepMap.processingalgorithm_Tensorboard2 import Tensorboard
-    from enmapbox.apps.SpecDeepMap.processingalgorithm_Tester4 import DL_Tester
+    from enmapbox.apps.SpecDeepMap.processing_algorithm_dataset_maker import DatasetMaker
+    from enmapbox.apps.SpecDeepMap.processing_algorithm_raster_splitter import RasterSplitter
+    from enmapbox.apps.SpecDeepMap.processing_algorithm_deep_learning_trainer import DL_Trainer
+    from enmapbox.apps.SpecDeepMap.processing_algorithm_deep_learning_mapper import DL_Mapper
+    from enmapbox.apps.SpecDeepMap.processing_algorithm_tensorboard_visualizer import Tensorboard_visualizer
+    from enmapbox.apps.SpecDeepMap.processing_algorithm_tester import DL_Tester
 
     wrongEnv = False
 except Exception as ex:
@@ -32,4 +32,4 @@ class SpecDeepMap(EnMAPBoxApplication):
         if wrongEnv:
             return []
         else:
-            return [RasterSplitterRP(), DatasetSplitter_SUM(), DL_Train_MOD(), DL_Mapper(), Tensorboard(),DL_Tester()]  # ,DL_Train_MOD()] #DL_Train()#DatasetSplitter() #,,DatasetSplitter(),DL_Train(),RasterSplitterR(),DatasetSplitter(),RasterSplitterRP()
+            return [RasterSplitter(), DatasetMaker(), DL_Trainer(), DL_Mapper(), Tensorboard_visualizer(),DL_Tester()]  # ,DL_Train_MOD()] #DL_Train()#DatasetSplitter() #,,DatasetSplitter(),DL_Train(),RasterSplitterR(),DatasetSplitter(),RasterSplitterRP()
