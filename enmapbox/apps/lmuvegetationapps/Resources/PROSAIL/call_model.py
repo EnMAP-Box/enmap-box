@@ -19,7 +19,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this software. If not, see <http://www.gnu.org/licenses/>.
+    along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
     call_model.py routine handles the execution of PROSAIL in different forms
     This version is vectorized, i.e. the idea is to pass several parameter inputs at once to obtain an array of results
@@ -79,9 +79,9 @@ class CallModel:
     def call_prospectPro(self):
         prospect_instance = prospect_v.Prospect()
         self.prospect = prospect_instance.prospect_Pro(self.par["N"], self.par["cab"], self.par["car"],
-                                                      self.par["anth"],
-                                                      self.par["cp"], self.par["cbc"], self.par["cbrown"],
-                                                      self.par["cw"])
+                                                       self.par["anth"],
+                                                       self.par["cp"], self.par["cbc"], self.par["cbrown"],
+                                                       self.par["cw"])
         return self.prospect
 
     ## All returns from "self.prospects" are in the following shape:
@@ -96,7 +96,7 @@ class CallModel:
             raise ValueError("A leaf optical properties model needs to be run first!")
 
         sail_instance = SAIL_v.Sail(np.deg2rad(self.par["tts"]), np.deg2rad(self.par["tto"]),
-                                    np.deg2rad(self.par["psi"]))   # Create Instance of SAIL and initialize angles
+                                    np.deg2rad(self.par["psi"]))  # Create Instance of SAIL and initialize angles
 
         self.sail = sail_instance.pro4sail(self.prospect[:, :, 1], self.prospect[:, :, 2], self.par["LIDF"],
                                            self.par["typeLIDF"], self.par["LAI"], self.par["hspot"], self.par["psoil"],
@@ -118,13 +118,15 @@ class CallModel:
                                     np.deg2rad(self.par["psi"]))  # Create Instance of SAIL and initialize angles
 
         # Step 1: call Pro4sail to calculate understory reflectance
-        self.sail_understory_refl = sail_instance.pro4sail(self.prospect[:, :, 1], self.prospect[:, :, 2], self.par["LIDF"],
-                                                           self.par["typeLIDF"], self.par["LAIu"], self.par["hspot"], self.par["psoil"],
+        self.sail_understory_refl = sail_instance.pro4sail(self.prospect[:, :, 1], self.prospect[:, :, 2],
+                                                           self.par["LIDF"],
+                                                           self.par["typeLIDF"], self.par["LAIu"], self.par["hspot"],
+                                                           self.par["psoil"],
                                                            self.soil)
 
         # Step 2: call Pro4sail with understory as soil to calculate infinite crown reflectance
-        inform_temp_LAI = np.asarray([15]*self.ninputs).T  # vectorized: intialize extreme LAI ninputs times
-        inform_temp_hspot = np.asarray([0]*self.ninputs).T  # vectorized: initialize hspot = 0 ninputs times
+        inform_temp_LAI = np.asarray([15] * self.ninputs).T  # vectorized: intialize extreme LAI ninputs times
+        inform_temp_hspot = np.asarray([0] * self.ninputs).T  # vectorized: initialize hspot = 0 ninputs times
         self.sail_inf_refl = sail_instance.pro4sail(self.prospect[:, :, 1], self.prospect[:, :, 2], self.par["LIDF"],
                                                     self.par["typeLIDF"], inform_temp_LAI, self.par["hspot"],
                                                     psoil=None, soil=None, understory=self.sail_understory_refl)
@@ -162,10 +164,10 @@ class SetupMultiple:
                           "psi": 16, "LAIu": 17, "cd": 18, "sd": 19, "h": 20}
 
         self.npara = len(self.para_nums)  # how many parameters are part of the LUT? Notice that these are not the
-                                          # parameters actually USED in the PROSAIL-version, but they are still STORED
-                                          # e.g. "cbrown" is not part of prospect-4, but it is still in the LUT as
-                                          # "None" or 0, so npara is the number of parameters that are currently used
-                                          # for any of the PROSPECT / SAIL versions
+        # parameters actually USED in the PROSAIL-version, but they are still STORED
+        # e.g. "cbrown" is not part of prospect-4, but it is still in the LUT as
+        # "None" or 0, so npara is the number of parameters that are currently used
+        # for any of the PROSPECT / SAIL versions
 
         self.depends = depends  # should Car be calculated in dependence to cab?
         self.depends_cp_cbc = depends_cp_cbc
@@ -232,7 +234,7 @@ class SetupMultiple:
             elif len(self.paras[para_key]) == 3:  # logically distributed parameter
                 k += 1
                 self.repeat_accum *= self.nruns_logic[para_key]  # how often do all ns-distributed parameters need to be
-                                                                 # repeated? Once for each parameter with logical dist.
+                # repeated? Once for each parameter with logical dist.
                 multiply = self.nruns_total // self.repeat_accum
                 self.para_grid[:, self.para_nums[para_key]] = self.logical_distribution(para_name=para_key,
                                                                                         min=self.paras[para_key][0],
@@ -251,7 +253,8 @@ class SetupMultiple:
             # Delete cp > cbc? This is a 'dirty' solution: To keep original lut size,
             # redistribution should be considered like for car_cab_dependency
             mask = self.para_grid[:, self.para_nums['cp']] <= self.para_grid[:, self.para_nums['cbc']]
-        else: mask = None
+        else:
+            mask = None
 
         return self.para_grid, mask
 
@@ -328,8 +331,8 @@ class InitModel:
 
         # List of names of all parameters in order in which they are written into the LUT; serves as labels for output
         self.para_names = ["N", "cab", "car", "anth", "cbrown", "cw", "cm", "cp", "cbc",
-                          "LAI", "typeLIDF", "LIDF", "hspot", "psoil", "tts", "tto",
-                          "psi", "LAIu", "cd", "sd", "h"]
+                           "LAI", "typeLIDF", "LIDF", "hspot", "psoil", "tts", "tto",
+                           "psi", "LAIu", "cd", "sd", "h"]
 
     def initialize_multiple_simple(self, soil=None, **paras):
         # simple tests for vectorized versions
@@ -343,7 +346,7 @@ class InitModel:
         self.run_model(paras=dict(zip(self.para_names, para_grid.T)))
 
     def initialize_vectorized(self, LUT_dir, LUT_name, ns, max_per_file=5000, soil=None,
-                            prgbar_widget=None, qgis_app=None, depends=False, depends_cp_cbc=False,
+                              prgbar_widget=None, qgis_app=None, depends=False, depends_cp_cbc=False,
                               testmode=False, **paras):
         # This is the most important function for initializing PROSAIL
         # It calls instances of PROSAIL and provides blocks of the para_grid
@@ -355,13 +358,14 @@ class InitModel:
 
         self.max_filelength = max_per_file  # defines the number of PROSAIL runs in one file ("split"), default=5000
         npara = len(self.para_names)  # how many parameters are stored in the LUT
-                                      # (at maximum! Does NOT depend on the version of PROSPECT / SAIL used)
-        setup = SetupMultiple(ns=ns, paras=paras, depends=depends, depends_cp_cbc=depends_cp_cbc)  # Prepare for setting up PROSAIL
+        # (at maximum! Does NOT depend on the version of PROSPECT / SAIL used)
+        setup = SetupMultiple(ns=ns, paras=paras, depends=depends,
+                              depends_cp_cbc=depends_cp_cbc)  # Prepare for setting up PROSAIL
         para_grid, mask = setup.create_grid()  # Now create the para_grid
 
         crun_max = setup.nruns_total  # The total number of PROSAIL executions
         crun_pergeo = setup.ns * setup.nruns_logic_no_geo  # The number of PROSAIL executions
-                                                           # per geometrical constellation
+        # per geometrical constellation
 
         n_ensembles_split, n_ensembles_geo = (1, 1)  # initialize ensembles
 
@@ -374,7 +378,7 @@ class InitModel:
             n_ensembles_split = 1
         else:  # second split: several files per Geo
             n_ensembles_split = (crun_pergeo - 1) // max_per_file + 1  # number of ensembles
-                                                                       # (=number of LUT-files to create)
+            # (=number of LUT-files to create)
 
         if not self.s2s == "default":
             # Initialize Spec2Sensor to convert PROSAIL output
@@ -493,7 +497,7 @@ class InitModel:
                         raise ValueError("LUT creation cancelled!")
 
                     prgbar_widget.gui.lblCaption_r.setText('Ensemble Geo {:d} of {:d} | Split {:d} of {:d}'.
-                                                           format(geo_ensemble + 1, n_ensembles_geo, split+1,
+                                                           format(geo_ensemble + 1, n_ensembles_geo, split + 1,
                                                                   n_ensembles_split))
                     qgis_app.processEvents()
 
@@ -517,7 +521,7 @@ class InitModel:
                 save_array[:npara, :] = para_grid[run:run + nruns, :].T
                 if mask is not None:
                     save_array = save_array[:, mask]
-                    #TODO: adapt "n_total"/"ns" to number of final samples in the LUT is mask was applied
+                    # TODO: adapt "n_total"/"ns" to number of final samples in the LUT is mask was applied
 
                 rest -= max_per_file  # calculate what's left for next iteration
 

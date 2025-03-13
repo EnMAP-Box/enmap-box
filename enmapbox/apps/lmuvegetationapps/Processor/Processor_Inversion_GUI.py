@@ -20,7 +20,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this software. If not, see <http://www.gnu.org/licenses/>.
+    along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
 
 This script handles the GUI for inverting images with pre-trained Machine Learning models. At the time being, only
@@ -46,7 +46,7 @@ pathUI_prgbar = os.path.join(APP_DIR, 'Resources/UserInterfaces/ProgressBar.ui')
 
 
 class MLInversionGUI(QDialog):
-    
+
     def __init__(self, parent=None):
         mLayerImage: QgsMapLayerComboBox
         mLayerGeometry: QgsMapLayerComboBox
@@ -102,7 +102,7 @@ class MLInversion:
 
         self.geo_mode = "fix"  # Is the geometry (SZA, OZA, rAA) suplied through 'file' or are they 'fix'
         self.geo_file = None  # if geo_mode == 'file', which is the path?
-        self.geo_fixed = [None]*3  # if geo_mode == 'fix', which are the three geometry angles?
+        self.geo_fixed = [None] * 3  # if geo_mode == 'fix', which are the three geometry angles?
 
         self.conversion_factor = None  # convert spectral image (boost) to reach the same scale as the machines
 
@@ -549,7 +549,7 @@ class MLInversion:
                 self.main.nodat_widget.init(image_type=image_type, image=image)
                 self.main.nodat_widget.gui.setModal(True)  # parent window is blocked
                 self.main.nodat_widget.gui.exec_()  # unlike .show(), .exec_() waits with execution of the code,
-                                                    # until the app is closed
+                # until the app is closed
                 nodata = self.main.nodat_widget.nodat
 
             # When opening a spectral input image, wavelengths must be extracted from the header to find out the
@@ -578,7 +578,7 @@ class MLInversion:
                     # Pop up a warning and disable NDVI spins
                     QMessageBox.warning(self.gui, "Warning", '{}: file has missing or corrupt wavelengths and '
                                                              'wavelength unit in header. NDVI-masking is disabled!'
-                                                             .format(image))
+                                        .format(image))
                     self.gui.grpNDVI.setChecked(False)  # disable the option to select NDVI
                     self.gui.grpNDVI.setDisabled(True)
                     self.gui.SpinNDVI.setDisabled(True)  # disable the option to set NDVI threshold
@@ -626,7 +626,8 @@ class MLInversion:
 
         try:
             # Setup the inversion process
-            proc.predict_main.prediction_setup(model_meta=self.model_meta_file, algorithm=self.algorithm, img_in=self.image,
+            proc.predict_main.prediction_setup(model_meta=self.model_meta_file, algorithm=self.algorithm,
+                                               img_in=self.image,
                                                res_out=self.out_image, out_mode=self.out_mode,
                                                mask_ndvi=self.mask_ndvi, ndvi_thr=self.ndvi_thr,
                                                ndvi_bands=self.ndvi_bands, mask_image=self.mask_image,
@@ -706,7 +707,7 @@ class Nodat:
                 self.gui.txtNodat.setText("")
                 return
         self.nodat = nodat
-        #self.gui.close()
+        # self.gui.close()
 
 
 # class PRG handles the GUI of the ProgressBar
@@ -740,6 +741,7 @@ class MainUiFunc:
 
 if __name__ == '__main__':
     from enmapbox.testing import start_app
+
     app = start_app()
     m = MainUiFunc()
     m.show()

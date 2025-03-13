@@ -19,7 +19,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this software. If not, see <http://www.gnu.org/licenses/>.
+    along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
 
 Reference (How to Cite):
@@ -29,10 +29,8 @@ retrieval of biochemical vegetation traits. International Journal of Applied Ear
 https://doi.org/10.1016/j.jag.2020.102219
 """
 
-
 from qgis.gui import QgsMapLayerComboBox
 from qgis.core import QgsMapLayerProxyModel
-
 
 from _classic.hubflow.core import *
 from qgis.PyQt.QtWidgets import *
@@ -70,7 +68,7 @@ class ASI_GUI(QDialog):
 
         self.btnBackgroundColor.colorChanged.connect(self.setBackgroundColor)
         self.btnAxisColor = QgsColorButton()
-        #self.btnAxisColor.colorChanged.connect([self.setAxisColor(canvas, QColor('white')) for canvas in self.plotItems])
+        # self.btnAxisColor.colorChanged.connect([self.setAxisColor(canvas, QColor('white')) for canvas in self.plotItems])
 
         self.rangeView.setBackground(QColor('black'))
         self.crsView.setBackground(QColor('black'))
@@ -127,7 +125,7 @@ class ASI:
     def __init__(self, main):
         self.main = main
         self.gui = ASI_GUI()
-        #self.core = ASI_core()
+        # self.core = ASI_core()
         self.initial_values()
         self.connections()
         self.init_plot()
@@ -140,7 +138,7 @@ class ASI:
         self.plot_spec = None
         self.max_ndvi_pos = None
         self.ndvi_spec = None
-        self.nodat = [-999]*2
+        self.nodat = [-999] * 2
         self.division_factor = 1.0
         self.calc_crs_flag = False
         self.calc_3band_flag = False
@@ -217,7 +215,7 @@ class ASI:
             self.dtype = meta[4]
         if self.dtype == 2 or self.dtype == 3 or self.dtype == 4 or self.dtype == 5:
             QMessageBox.information(self.gui, "Integer Input",
-                                        "Integer input image:\nTool requires float [0.0-1.0]:\nDivision factor set to 10000")
+                                    "Integer input image:\nTool requires float [0.0-1.0]:\nDivision factor set to 10000")
             self.division_factor = 10000
             self.gui.spinDivisionFactor.setText(str(self.division_factor))
         if None in meta:
@@ -228,7 +226,6 @@ class ASI:
             self.gui.lblNodatImage.setText(str(meta[0]))
             self.gui.txtNodatOutput.setText(str(meta[0]))
             self.nodat[0] = meta[0]
-
 
     def get_image_meta(self, image, image_type):
         try:
@@ -267,11 +264,13 @@ class ASI:
                                 "press 'Find' to initialize plot canvas")
         else:
             if textfeld == self.gui.lowWaveEdit:
-                try: self.limits[0] = int(str(textfeld.text()))
+                try:
+                    self.limits[0] = int(str(textfeld.text()))
                 except ValueError:
                     QMessageBox.critical(self.gui, "Not a number", "'%s' is not a valid number" % textfeld.text())
             elif textfeld == self.gui.upWaveEdit:
-                try: self.limits[1] = int(str(textfeld.text()))
+                try:
+                    self.limits[1] = int(str(textfeld.text()))
                 except ValueError:
                     QMessageBox.critical(self.gui, "Not a number", "'%s' is not a valid number" % textfeld.text())
             if not self.limits[1] > self.limits[0]:
@@ -328,7 +327,7 @@ class ASI:
             self.init_plot()
             if self.max_ndvi_pos:
                 self.init_asi(mode='init')
-                #self.plot_example(max_ndvi_pos=self.max_ndvi_pos)
+                # self.plot_example(max_ndvi_pos=self.max_ndvi_pos)
         else:
             self.calc_3band_flag = False
             self.gui.lowWaveEdit.setEnabled(True)
@@ -340,8 +339,7 @@ class ASI:
             self.init_plot()
             if self.max_ndvi_pos:
                 self.init_asi(mode='init')
-                #self.plot_example(max_ndvi_pos=self.max_ndvi_pos)
-
+                # self.plot_example(max_ndvi_pos=self.max_ndvi_pos)
 
     def init_plot(self):
         labelStyle = {'color': '#FFF', 'font-size': '12px'}
@@ -362,7 +360,6 @@ class ASI:
 
         self.gui.lblPixelLocation.setText("")
 
-
     def plot_example(self, max_ndvi_pos):
         self.gui.lblPixelLocation.setText("Image pixel: row: %s | col: %s" % (
             str(max_ndvi_pos[1]), str(max_ndvi_pos[2])))
@@ -373,14 +370,14 @@ class ASI:
             self.cr_spectrum, full_hull_x = self.core.segmented_convex_hull_1d(self.plot_spec)
 
             self.gui.rangeView.plot(self.core.wl, self.plot_spec, clear=True, pen="g", fillLevel=0,
-                                fillBrush=(255, 255, 255, 30), name='maxNDVIspec')
+                                    fillBrush=(255, 255, 255, 30), name='maxNDVIspec')
             self.gui.rangeView.plot(self.core.wl, full_hull_x, clear=False, pen="r", fillLevel=0,
-                                name='hull')
+                                    name='hull')
             self.gui.rangeView.addItem(pg.InfiniteLine(self.limits[0], pen="w"))
             self.gui.rangeView.addItem(pg.InfiniteLine(self.limits[1], pen="w"))
 
             self.gui.crsView.plot(self.core.wl, self.cr_spectrum, clear=True, pen="g", fillLevel=0,
-                              fillBrush=(255, 255, 255, 30), name='cr_spec')
+                                  fillBrush=(255, 255, 255, 30), name='cr_spec')
             self.gui.crsView.addItem(pg.InfiniteLine(0, angle=0, pen='r'))
             self.gui.crsView.addItem(pg.InfiniteLine(1, angle=0, pen='w'))
             self.gui.crsView.addItem(pg.InfiniteLine(self.limits[0], pen="w"))
@@ -415,7 +412,8 @@ class ASI:
             try:
                 self.division_factor = float(self.gui.spinDivisionFactor.text())
             except:
-                QMessageBox.critical(self.gui, "Error", "'%s' is not a valid division factor!" % self.gui.spinDivisionFactor.text())
+                QMessageBox.critical(self.gui, "Error",
+                                     "'%s' is not a valid division factor!" % self.gui.spinDivisionFactor.text())
                 return
 
             if not self.max_ndvi_pos:
@@ -449,7 +447,7 @@ class ASI:
                 self.max_ndvi_pos, self.ndvi_spec = self.core.findHighestNDVIindex(
                     in_raster=self.core.in_raster,
                     prg_widget=self.main.prg_widget, qgis_app=self.main.qgis_app)
-                #QMessageBox.critical(self.gui, 'error', "An unspecific error occured.")
+                # QMessageBox.critical(self.gui, 'error', "An unspecific error occured.")
                 self.main.prg_widget.gui.allow_cancel = True
                 self.main.prg_widget.gui.close()
 
@@ -475,7 +473,6 @@ class ASI:
             #     QMessageBox.warning(self.gui, "Invalid output path", "The defined output path is invalid")
             #     return
 
-
             # show progressbar - window
             self.main.prg_widget.gui.lblCancel.setText("")
             self.main.prg_widget.gui.lblCaption_l.setText("Analyzing Spectral Integral")
@@ -489,9 +486,9 @@ class ASI:
                 iASI = ASI_core(nodat_val=self.nodat, division_factor=self.division_factor,
                                 max_ndvi_pos=self.max_ndvi_pos, ndvi_spec=self.ndvi_spec)
                 iASI.initialize_ASI(input=self.image, output=self.out_path,
-                                        lookahead=self.lookahead,
-                                        limits=self.limits, crs=self.calc_crs_flag,
-                                        calc3band=self.calc_3band_flag, mode='run')
+                                    lookahead=self.lookahead,
+                                    limits=self.limits, crs=self.calc_crs_flag,
+                                    calc3band=self.calc_3band_flag, mode='run')
             except MemoryError:
                 QMessageBox.critical(self.gui, 'error', "File too large to read")
                 self.main.prg_widget.gui.allow_cancel = True
@@ -529,10 +526,10 @@ class ASI:
                 if self.division_factor != 1.0:
                     iASI.in_raster = np.divide(iASI.in_raster, self.division_factor)
 
-            #try:  # give it a shot
+            # try:  # give it a shot
             result, crs, res3band = iASI.execute_ASI(in_raster=iASI.in_raster,
-                                                          prg_widget=self.main.prg_widget,
-                                                          qgis_app=self.main.qgis_app)
+                                                     prg_widget=self.main.prg_widget,
+                                                     qgis_app=self.main.qgis_app)
             # except:
             #     QMessageBox.critical(self.gui, 'error', "Calculation cancelled.")
             #     self.main.prg_widget.gui.allow_cancel = True
@@ -646,7 +643,7 @@ class ASI_core:
         nrows = ds.RasterYSize
         ncols = ds.RasterXSize
         nbands = ds.RasterCount
-        dtype = ds.GetRasterBand(1).DataType # gdal.GDT_Int16
+        dtype = ds.GetRasterBand(1).DataType  # gdal.GDT_Int16
 
         try:
             wave_dict = metadict['ENVI']['wavelength']
@@ -673,7 +670,7 @@ class ASI_core:
         return grid, wl, nbands, nrows, ncols, dtype
 
     def write_integral_image(self, result):
-        #result = result.astype(float)
+        # result = result.astype(float)
 
         output = RasterDataset.fromArray(array=result, filename=self.output, grid=self.grid,
                                          driver=EnviDriver())
@@ -685,10 +682,8 @@ class ASI_core:
                                 (self.limits[0], self.limits[1]))
             band.setNoDataValue(self.nodat[1])
 
-
-
     def write_crs_image(self, crs):  #
-        #band_string_nr = ['band ' + str(x) for x in self.valid_bands + 1]
+        # band_string_nr = ['band ' + str(x) for x in self.valid_bands + 1]
         crs_output = self.output.split(".")
         crs_output = crs_output[0] + "_crs" + "." + crs_output[1]
         output = RasterDataset.fromArray(array=crs, filename=crs_output, grid=self.grid,
@@ -697,7 +692,7 @@ class ASI_core:
         output.setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
 
         for i, band in enumerate(output.bands()):
-            #band.setDescription(band_string_nr[i])
+            # band.setDescription(band_string_nr[i])
             band.setNoDataValue(self.nodat[1])
 
         output.setMetadataItem(key='wavelength', value=self.valid_wl, domain='ENVI')
@@ -743,7 +738,8 @@ class ASI_core:
         x = np.arange(len(in_matrix))
         try:
             in_matrix[self.default_exclude] = 0
-        except: pass
+        except:
+            pass
         self.res3d = np.empty(shape=np.shape(in_matrix))
         for row in range(in_matrix.shape[1]):
             for col in range(in_matrix.shape[2]):
@@ -861,7 +857,8 @@ class ASI_core:
             in_matrix = self.interp_watervapor_3d(in_matrix)
         if self.calc_crs_flag == True:
             cr_spectrum = np.empty(shape=(len(self.valid_wl), np.shape(in_matrix)[1], np.shape(in_matrix)[2]))
-        else: cr_spectrum = None
+        else:
+            cr_spectrum = None
         asi_result = np.empty(shape=(1, np.shape(in_matrix)[1], np.shape(in_matrix)[2]))
         for row in range(in_matrix.shape[1]):
             for col in range(in_matrix.shape[2]):
@@ -869,7 +866,7 @@ class ASI_core:
                     window = in_matrix[:, row, col]
                     max_, min_ = peakdetect(window, lookahead=lookahead, delta=delta)
                     full_hull_x = []
-                    #full_hull_y = []
+                    # full_hull_y = []
                     if max_:  # if local maximum has been found
                         x_max, y_max = map(list, zip(*max_))
                         x_seq = np.append(x_max, len(window))
@@ -884,7 +881,8 @@ class ASI_core:
                             wl_sample = self.valid_wl[x:i]
                             valid_array = list(zip(wl_sample, window[x:i]))
                             hull = self.convex_hull(valid_array)
-                            try: hull_x, hull_y = list(zip(*hull))
+                            try:
+                                hull_x, hull_y = list(zip(*hull))
                             except:
                                 hull_x = 0
                             full_hull_x = np.append(full_hull_x, hull_x)
@@ -912,7 +910,7 @@ class ASI_core:
 
                 else:
                     contiguous_hull_x = np.nan
-                    #full_hull_y = np.nan
+                    # full_hull_y = np.nan
                 if self.calc_crs_flag:
                     if np.mean(in_matrix[:, row, col]) != self.nodat[0]:
                         try:
@@ -923,7 +921,7 @@ class ASI_core:
                         cr_spectrum[:, row, col] = self.nodat[1]
 
                 asi_result[:, row, col] = \
-                    (np.nansum(np.log(1/in_matrix[:, row, col])) - np.nansum(np.log(1 / contiguous_hull_x))) / \
+                    (np.nansum(np.log(1 / in_matrix[:, row, col])) - np.nansum(np.log(1 / contiguous_hull_x))) / \
                     (np.nansum(np.log(1 / in_matrix[:, row, col])))
 
                 self.prgbar_process(pixel_no=row * self.ncols + col)
@@ -952,9 +950,9 @@ class ASI_core:
         ones = np.ones_like(in_matrix)
 
         closest = [self.find_closest_value(553, self.valid_wl), self.find_closest_value(554, self.valid_wl),
-                        self.find_closest_value(787, self.valid_wl),
-                        self.find_closest_value(900, self.valid_wl),
-                        self.find_closest_value(1105, self.valid_wl)]
+                   self.find_closest_value(787, self.valid_wl),
+                   self.find_closest_value(900, self.valid_wl),
+                   self.find_closest_value(1105, self.valid_wl)]
 
         closest_bands = [i for i, x in enumerate(self.valid_wl) if x in closest]
         if len(closest_bands) < 5:
@@ -987,7 +985,7 @@ class ASI_core:
                             x_seq = np.insert(x_seq, 0, c_band)
                             closest_bands[1] = x_seq[0]
                             green_peak = 0
-                        if 600 < self.valid_wl[x_seq[1]-1] < 700:
+                        if 600 < self.valid_wl[x_seq[1] - 1] < 700:
                             x_seq = np.delete(x_seq, 1)
                             green_peak = 0
                         else:
@@ -996,7 +994,8 @@ class ASI_core:
                                 green_peak = 1
                         if nir_peak:
                             closest_bands[3] = self.valid_wl.index(nir_peak)
-                        else: nir_peak = 0
+                        else:
+                            nir_peak = 0
                         for i in x_seq:  # segmented convex hull with detected maxima as separators
                             wl_sample = self.valid_wl[x:i]
                             valid_array = list(zip(wl_sample, window[x:i]))
@@ -1079,14 +1078,15 @@ class ASI_core:
                         if j == 2:
 
                             absorb_area[j, row, col] = np.nansum(np.log(1 / in_matrix[k:i, row, col]) -
-                                                                 np.log(1 / contiguous_hull_x[k:i]))  # / np.nansum(contiguous_hull_x[k:i])
-                            #hull_area[j, row, col] = np.nansum(np.log(1 / in_matrix[k:fixed_end, row, col]))
+                                                                 np.log(1 / contiguous_hull_x[
+                                                                            k:i]))  # / np.nansum(contiguous_hull_x[k:i])
+                            # hull_area[j, row, col] = np.nansum(np.log(1 / in_matrix[k:fixed_end, row, col]))
                             hull_area[j, row, col] = np.nansum(np.log(1 / contiguous_hull_x[k:fixed_end]))
-                            #res3band[j, row, col] = absorb_area[j, row, col] / hull_area[j, row, col]
+                            # res3band[j, row, col] = absorb_area[j, row, col] / hull_area[j, row, col]
                         else:
-                            cr_absorb_area[j, row, col] = np.nansum((np.log(1/in_matrix[k:i, row, col]) -
-                                                                    np.log(1/contiguous_hull_x[k:i])) /
-                                                                    np.log(1/in_matrix[k:i, row, col]))
+                            cr_absorb_area[j, row, col] = np.nansum((np.log(1 / in_matrix[k:i, row, col]) -
+                                                                     np.log(1 / contiguous_hull_x[k:i])) /
+                                                                    np.log(1 / in_matrix[k:i, row, col]))
                             ones_sum[j, row, col] = np.nansum(ones[k:i, row, col])
 
                     except ZeroDivisionError:
@@ -1104,7 +1104,7 @@ class ASI_core:
         cr_absorb_area[cr_absorb_area <= 0] = 0
         res3band[0, :, :] = cr_absorb_area[0, :, :] / max_[0]
         res3band[1, :, :] = cr_absorb_area[1, :, :] / max_[1]
-        #res3band[2, :, :] = cr_absorb_area[2, :, :] / max_[2]
+        # res3band[2, :, :] = cr_absorb_area[2, :, :] / max_[2]
         res3band[2, :, :] = absorb_area[2, :, :] / max_hull_2[2]
         res3band[res3band < 0] = 0
         res3band[~np.isfinite(res3band)] = self.nodat[1]
@@ -1185,7 +1185,7 @@ class ASI_core:
                 self.prg.gui.lblCancel.setText("")
                 self.prg.gui.cmdCancel.setDisabled(False)
                 raise ValueError("Calculation cancelled")
-            self.prg.gui.prgBar.setValue(pixel_no*100 // self.pixel_total)  # progress value is index-orientated
+            self.prg.gui.prgBar.setValue(pixel_no * 100 // self.pixel_total)  # progress value is index-orientated
             if pixel_no % 100 == 0:
                 self.prg.gui.lblCaption_r.setText("pixel %i of %i" % (pixel_no, self.pixel_total))
             self.qgis_app.processEvents()
@@ -1226,6 +1226,7 @@ class Nodat:
         self.nodat = nodat
         self.gui.close()
 
+
 class PRG:
     def __init__(self, main):
         self.main = main
@@ -1241,6 +1242,7 @@ class PRG:
         self.gui.cmdCancel.setDisabled(True)
         self.gui.lblCancel.setText("-1")
 
+
 class MainUiFunc:
     def __init__(self):
         self.qgis_app = QApplication.instance()
@@ -1253,13 +1255,11 @@ class MainUiFunc:
     def show(self):
         self.asi.gui.show()
 
+
 if __name__ == '__main__':
     from enmapbox.testing import start_app
+
     app = start_app()
     m = MainUiFunc()
     m.show()
     sys.exit(app.exec_())
-
-
-
-

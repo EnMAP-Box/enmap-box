@@ -20,7 +20,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this software. If not, see <http://www.gnu.org/licenses/>.
+    along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
 
 This script handles the GUI for training new ML-models. There is no maximum flexibility as in the _core module,
@@ -31,7 +31,7 @@ models on basis of individual Lookup-Tables.
 
 import sys
 import os
-#ensure to call QGIS before PyQtGraph
+# ensure to call QGIS before PyQtGraph
 from qgis.PyQt.QtWidgets import *
 import lmuvegetationapps.Processor_old.Processor_Inversion_core_old as processor
 from lmuvegetationapps import APP_DIR
@@ -67,6 +67,7 @@ class PRG_GUI(QDialog):
             event.accept()
         else:
             event.ignore()
+
 
 # MLTraining is a GUI handler for training new ML-models. For more information, go to Processor_Inversion_core.py
 class ML_Training:
@@ -150,7 +151,7 @@ class ML_Training:
         if not self.gui.txtExclude.text() == "":  # lineEdit is NOT empty, so some information is already there
             try:
                 pass_exclude = self.gui.txtExclude.text().split(" ")  # get whats in the field
-                pass_exclude = [int(pass_exclude[i])-1 for i in range(len(pass_exclude))]  # convert the text to int
+                pass_exclude = [int(pass_exclude[i]) - 1 for i in range(len(pass_exclude))]  # convert the text to int
             except ValueError:  # lineEdit contains crap
                 self.gui.txtExclude.setText("")
                 pass_exclude = list()
@@ -312,7 +313,7 @@ class SelectWavelengths:
                 label = "band %s: %6.2f %s" % (str_band_no, self.main.ann_training.wl[i], self.main.ann_training.wunit)
                 self.gui.lstExcluded.addItem(label)
             else:
-                str_band_no = '{num:0{width}}'.format(num=i+1, width=width)
+                str_band_no = '{num:0{width}}'.format(num=i + 1, width=width)
                 label = "band %s: %6.2f %s" % (str_band_no, self.main.ann_training.wl[i], self.main.ann_training.wunit)
                 self.gui.lstIncluded.addItem(label)
 
@@ -358,11 +359,11 @@ class SelectWavelengths:
             raw_list.append(item)
 
         # convert the text-string of the list object into a python list of integers (bands to be excluded)
-        self.main.ann_training.exclude_bands = [int(raw_list[i].split(" ")[1][:-1])-1 for i in range(len(raw_list))]
+        self.main.ann_training.exclude_bands = [int(raw_list[i].split(" ")[1][:-1]) - 1 for i in range(len(raw_list))]
         self.main.ann_training.nbands_valid = self.main.ann_training.nbands - len(self.main.ann_training.exclude_bands)
 
         # Join the list to a string and set it to the txtExclude lineEdit
-        exclude_string = " ".join(str(x+1) for x in self.main.ann_training.exclude_bands)
+        exclude_string = " ".join(str(x + 1) for x in self.main.ann_training.exclude_bands)
         self.main.ann_training.gui.txtExclude.setText(exclude_string)
 
         # clean up
@@ -388,6 +389,7 @@ class PRG:
         self.gui.cmdCancel.setDisabled(True)
         self.gui.lblCancel.setText("-1")
 
+
 # class MainUiFunc is the interface between all sub-GUIs, so they can communicate between each other
 class MainUiFunc:
     def __init__(self):
@@ -402,6 +404,7 @@ class MainUiFunc:
 
 if __name__ == '__main__':
     from enmapbox.testing import start_app
+
     app = start_app()
     m = MainUiFunc()
     m.show()
