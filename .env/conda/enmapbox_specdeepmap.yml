@@ -11,7 +11,6 @@ channels:
 dependencies:
   - qgis>=3.40.1
   - docutils
-  - enpt
   - flake8
   - git-lfs
   - gitpython
@@ -20,21 +19,20 @@ dependencies:
   - pytest-cov
   - pytest-xdist
   - scikit-learn>=1
-  - typeguard=2
   - pip:
       - flake8-qgis
   - pytest
   - pytest-cov
   - pytest-xdist
+  - pandas #1y
+  - psutil
   - opencv[build=headless*]
-  - typeguard
   - lightning
   - tensorboard
   - torchvision # installs
   - segmentation-models-pytorch
   - pip:
       - flake8-qgis
-    # SpecDeepMap additional packages
 
 variables:
   QT_MAC_WANTS_LAYER: 1
