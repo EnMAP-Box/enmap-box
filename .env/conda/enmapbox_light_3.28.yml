@@ -13,7 +13,7 @@ dependencies:
   # Development
   - gitpython
   - git-lfs
-  - typeguard=2
+
   - pytest
   - pytest-xdist
   - pytest-cov

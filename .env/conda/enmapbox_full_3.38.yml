@@ -31,7 +31,6 @@ dependencies:
 - pytest-xdist
 - scikit-learn>=1
 - sympy
-- typeguard=2
 - xarray
 - xgboost
 - pip:
