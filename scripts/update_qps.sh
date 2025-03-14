@@ -3,7 +3,7 @@
 SUBMODULE=enmapbox/qgispluginsupport
 echo "Update $SUBMODULE"
 cd $SUBMODULE
-git checkout master
+git checkout enmapbox_3.16
 git fetch
 git pull
 cd ../..
