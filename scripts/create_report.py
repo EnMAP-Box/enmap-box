@@ -3,9 +3,7 @@ This scripts generates some reports stats related to the EnMAP-Box repository
 """
 import argparse
 import csv
-from typing import List, Dict
-
-import requests
+from typing import Dict, List
 import datetime
 import inspect
 import json
@@ -15,24 +13,24 @@ import re
 import unittest
 import urllib.request
 import xml.etree.ElementTree as etree
-import pandas as pd
 
+import requests
+import pandas as pd
 from xlsxwriter.workbook import Workbook
 
-from enmapbox import DIR_REPO_TMP
-from enmapbox import initAll
+from enmapbox import DIR_REPO_TMP, initAll
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
 from enmapbox.gui.applications import ApplicationWrapper, EnMAPBoxApplication
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from qgis.PyQt.QtWidgets import QMenu
-from qgis.core import QgsProcessing, QgsProcessingParameterRasterLayer, QgsProcessingParameterRasterDestination, \
-    QgsProcessingOutputVectorLayer, QgsProcessingParameterFeatureSink, QgsProcessingParameterFeatureSource, \
-    QgsProcessingOutputRasterLayer, QgsProcessingParameterVectorLayer, QgsProcessingParameterVectorDestination, \
-    QgsProcessingParameterMapLayer, QgsProcessingParameterMultipleLayers, QgsProcessingParameterFile, \
-    QgsProcessingOutputFile, QgsProcessingParameterFolderDestination, QgsProcessingOutputFolder, \
-    QgsProcessingParameterFileDestination, QgsProcessingOutputHtml, QgsProcessingParameterEnum, \
-    QgsProcessingParameterBoolean, QgsProcessingAlgorithm
+from qgis.core import QgsProcessing, QgsProcessingAlgorithm, QgsProcessingOutputFile, QgsProcessingOutputFolder, \
+    QgsProcessingOutputHtml, QgsProcessingOutputRasterLayer, QgsProcessingOutputVectorLayer, \
+    QgsProcessingParameterBoolean, QgsProcessingParameterEnum, QgsProcessingParameterFeatureSink, \
+    QgsProcessingParameterFeatureSource, QgsProcessingParameterFile, QgsProcessingParameterFileDestination, \
+    QgsProcessingParameterFolderDestination, QgsProcessingParameterMapLayer, QgsProcessingParameterMultipleLayers, \
+    QgsProcessingParameterRasterDestination, QgsProcessingParameterRasterLayer, QgsProcessingParameterVectorDestination, \
+    QgsProcessingParameterVectorLayer
 
 
 def linesOfCode(path) -> int:
@@ -550,7 +548,7 @@ def report_bitbucket_issues(start_date='2020-01-01', end_date='2023-12-31'):
 class TestCases(unittest.TestCase):
 
     def test_github_EnMAPBox(self):
-        report_github_issues_EnMAPBox(start_date='2024-01-01', end_date='2024-06-30')
+        report_github_issues_EnMAPBox(start_date='2024-11-01', end_date='2025-03-06')
 
     def test_github_QGIS(self):
         report_github_issues_QGIS(authors=['jakimowb'], start_date='2020-01-01', end_date='2023-12-31')
