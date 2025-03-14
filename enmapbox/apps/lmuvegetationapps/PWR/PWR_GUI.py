@@ -19,7 +19,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this software. If not, see <http://www.gnu.org/licenses/>.
+    along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
 """
 from qgis.gui import QgsMapLayerComboBox
@@ -40,12 +40,15 @@ pathIMG = os.path.join(APP_DIR, "Resources/PWR_showImg.PNG")
 
 from enmapbox.gui.utils import loadUi
 
+
 class PWR_GUI(QDialog):
     mLayer: QgsMapLayerComboBox
+
     def __init__(self, parent=None):
         super(PWR_GUI, self).__init__(parent)
         loadUi(pathUI_pwr, self)
         self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+
 
 class Nodat_GUI(QDialog):
     def __init__(self, parent=None):
@@ -65,6 +68,7 @@ class PRG_GUI(QDialog):
         else:
             event.ignore()
 
+
 class PWR:
 
     def __init__(self, main):
@@ -77,14 +81,15 @@ class PWR:
         size = pixelmap.size()
         width = size.width()
         height = size.height()
-        pixelmap = pixelmap.scaled(width, height, transformMode=Qt.SmoothTransformation, aspectRatioMode=Qt.KeepAspectRatio)
+        pixelmap = pixelmap.scaled(width, height, transformMode=Qt.SmoothTransformation,
+                                   aspectRatioMode=Qt.KeepAspectRatio)
         label.setScaledContents(True)
         label.setPixmap(pixelmap)
         self.gui.pwrImage.show()
 
     def initial_values(self):
         self.image = None
-        self.nodat = [-999]*2
+        self.nodat = [-999] * 2
         self.division_factor = 1.0
         self.NDWI_th = -0.9
         self.out_path = None
@@ -149,7 +154,7 @@ class PWR:
             self.dtype = meta[4]
         if self.dtype == 2 or self.dtype == 3 or self.dtype == 4 or self.dtype == 5:
             QMessageBox.information(self.gui, "Integer Input",
-                                        "Integer input image:\nTool requires float [0.0-1.0]:\nDivision factor set to 10000")
+                                    "Integer input image:\nTool requires float [0.0-1.0]:\nDivision factor set to 10000")
             self.division_factor = 10000
             self.gui.spinDivisionFactor.setText(str(self.division_factor))
         if None in meta:
@@ -195,21 +200,22 @@ class PWR:
         elif self.out_path is None:
             QMessageBox.critical(self.gui, "No output file selected", "Please select an output file for your image!")
             return
-        elif self.gui.txtNodatOutput.text()=="":
+        elif self.gui.txtNodatOutput.text() == "":
             QMessageBox.critical(self.gui, "No Data Value", "Please specify No Data Value!")
             return
         else:
             try:
                 self.nodat[1] = int(self.gui.txtNodatOutput.text())
             except:
-                QMessageBox.critical(self.gui, "Error", "'%s' is not a valid  No Data Value!" % self.gui.txtNodatOutput.text())
+                QMessageBox.critical(self.gui, "Error",
+                                     "'%s' is not a valid  No Data Value!" % self.gui.txtNodatOutput.text())
                 return
         try:
             self.division_factor = float(self.gui.spinDivisionFactor.text())
         except:
-            QMessageBox.critical(self.gui, "Error", "'%s' is not a valid division factor!" % self.gui.spinDivisionFactor.text())
+            QMessageBox.critical(self.gui, "Error",
+                                 "'%s' is not a valid division factor!" % self.gui.spinDivisionFactor.text())
             return
-
 
         # show progressbar - window
         self.main.prg_widget.gui.lblCaption_l.setText("Plant Water Retrieval")
@@ -262,6 +268,7 @@ class PWR:
     def abort(self, message):
         QMessageBox.critical(self.gui, "Error", message)
 
+
 class Nodat:
     def __init__(self, main):
         self.main = main
@@ -294,6 +301,7 @@ class Nodat:
         self.nodat = nodat
         self.gui.close()
 
+
 class PRG:
     def __init__(self, main):
         self.main = main
@@ -309,6 +317,7 @@ class PRG:
         self.gui.cmdCancel.setDisabled(True)
         self.gui.lblCancel.setText("-1")
 
+
 class MainUiFunc:
     def __init__(self):
         self.qgis_app = QApplication.instance()
@@ -319,8 +328,10 @@ class MainUiFunc:
     def show(self):
         self.pwr.gui.show()
 
+
 if __name__ == '__main__':
     from enmapbox.testing import start_app
+
     app = start_app()
     m = MainUiFunc()
     m.show()

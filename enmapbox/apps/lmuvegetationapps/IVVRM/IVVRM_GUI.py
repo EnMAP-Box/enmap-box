@@ -19,7 +19,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this software. If not, see <http://www.gnu.org/licenses/>.
+    along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
 """
 
@@ -41,6 +41,7 @@ from qgis.gui import QgsMapLayerComboBox
 from _classic.hubflow.core import *
 
 import warnings
+
 warnings.filterwarnings('ignore')  # ignore warnings, like ZeroDivision
 
 import csv
@@ -91,10 +92,9 @@ class IVVRM_GUI(QDialog):
         wa.setDefaultWidget(self.colorWidget)
         m.addAction(wa)
 
-    # set default colors
+        # set default colors
         self.setBackgroundColor('black')
         self.setAxisColor('white')
-
 
     def setAxisColor(self, color: QColor):
         if not isinstance(color, QColor):
@@ -138,6 +138,7 @@ class SelectWavelengthsGUI(QDialog):
         super(SelectWavelengthsGUI, self).__init__(parent)
         loadUi(pathUI_wavelengths, self)
 
+
 class SensorEditorGUI(QDialog):
     def __init__(self, parent=None):
         super(SensorEditorGUI, self).__init__(parent)
@@ -171,7 +172,7 @@ class IVVRM:
         self.mPlotItems = []  # a list that stores the current plot items, i.e. single profiles.
         self.main = main
         self.gui = IVVRM_GUI()
-        self.special_chars()    # place special characters that could not be set in Qt Designer
+        self.special_chars()  # place special characters that could not be set in Qt Designer
         self.initial_values()
         self.update_slider_pos()
         self.update_lineEdit_pos()
@@ -189,7 +190,7 @@ class IVVRM:
         self.gui.lblCar.setText(u'[µg/cm²]')
         self.gui.lblCanth.setText(u'[µg/cm²]')
         self.gui.lblCp.setText(u'[g/cm²]')
-        #self.gui.lblLAI.setText(u'[m²/m²]')
+        # self.gui.lblLAI.setText(u'[m²/m²]')
         self.gui.lblCbc.setText(u'[g/cm²]')
 
     def initial_values(self):
@@ -401,7 +402,7 @@ class IVVRM:
 
     def makePen(self, sensor):
         # Different pen styles (solid, dashed, dotted, ...) are used for sensor types
-        #print("Sensor is: ", sensor)
+        # print("Sensor is: ", sensor)
         if sensor == "default":
             self.penStyle = 1
         elif sensor == "EnMAP":
@@ -659,8 +660,10 @@ class IVVRM:
         self.gui.pushClearPlot.clicked.connect(
             lambda: self.clear_plot(rescale=True, clear_plots=True))  # clear the plot canvas
         self.gui.cmdResetScale.clicked.connect(lambda: self.clear_plot(rescale=True, clear_plots=False))
-        self.gui.Push_LoadInSitu.clicked.connect(lambda: self.open_file(open_type="in situ"))  # load own in situ spectrum
-        self.gui.push_SelectFile.clicked.connect(lambda: self.open_file(open_type="background"))  # load own background spec
+        self.gui.Push_LoadInSitu.clicked.connect(
+            lambda: self.open_file(open_type="in situ"))  # load own in situ spectrum
+        self.gui.push_SelectFile.clicked.connect(
+            lambda: self.open_file(open_type="background"))  # load own background spec
 
         self.gui.Push_Exit.clicked.connect(self.gui.accept)  # exit app
         self.gui.Push_ResetInSitu.clicked.connect(self.reset_in_situ)  # remove own spectrum from plot canvas
@@ -746,7 +749,7 @@ class IVVRM:
             self.gui.graphicsView.setLabel('bottom', text="Wavelength [nm]")
 
         if self.data_mean is not None and not self.gui.CheckPlotAcc.isChecked():
-            self.plot_own_spec()   # add the in-situ spectrum if available
+            self.plot_own_spec()  # add the in-situ spectrum if available
 
             # calculate statistics for a comparison between in situ spectrum and PROSAIL output
             # Use np.nansums as spectra may contain np.nans which would cause wrong results
@@ -864,7 +867,7 @@ class SensorEditor:
         self.filenamesIn, self.wl_filename = (None, None)
         self.image = None
         self.current_path = APP_DIR + "/Resources/Spec2Sensor/srf"  # change this, if the relative path
-                                                                    # of the srfs changes
+        # of the srfs changes
         self.flag_wl, self.flag_srf, self.flag_image = (False, False, False)
         self.delimiter_str = ["Tab", "Space", ",", ";"]  # delimiters can be added here
         self.wlunit_str = ["nm", "µm"]
@@ -907,8 +910,9 @@ class SensorEditor:
 
     def read_file(self):
         # BuildTrueSRF is a Spec2Sensor class
-        self.build_true_srf = BuildTrueSRF(srf_files=self.filenamesIn, header_bool=self.header_bool, delimiter=self.delimiter,
-                                  wl_convert=self.wl_convert)
+        self.build_true_srf = BuildTrueSRF(srf_files=self.filenamesIn, header_bool=self.header_bool,
+                                           delimiter=self.delimiter,
+                                           wl_convert=self.wl_convert)
         return_flag, self.srf_list = self.build_true_srf.dframe_from_txt()
         if not return_flag:
             self.houston(message=self.srf_list, reset_table_preview=True)
@@ -962,7 +966,7 @@ class SensorEditor:
 
         for row in range(nrows):
             for col in range(0, ncols, 2):  # in the QTablePreview Widget, cols are doubled (wl, weight),
-                                            # in the array, they are not
+                # in the array, they are not
                 wl = new_srf[row, col // 2, 0]
 
                 # most bands have shorter lengths in srf_nbands, these are filled with np.nan -> sort them out
@@ -972,8 +976,8 @@ class SensorEditor:
                 else:
                     item_wl = QTableWidgetItem(str(new_srf[row, col // 2, 0]))
                     item_weigh = QTableWidgetItem(str(new_srf[row, col // 2, 1]))
-                self.gui.tablePreview.setItem(row, col, item_wl)          # place wavelength item
-                self.gui.tablePreview.setItem(row, col + 1, item_weigh)   # place weight item
+                self.gui.tablePreview.setItem(row, col, item_wl)  # place wavelength item
+                self.gui.tablePreview.setItem(row, col + 1, item_weigh)  # place weight item
 
         self.gui.tablePreview.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.flag_srf = True
@@ -1016,7 +1020,7 @@ class SensorEditor:
         self.gui.mLayer.setEnabled(True)
         self.check_flags()
 
-    def image_read(self): # read only necessary info: fwhm and center wavelengths
+    def image_read(self):  # read only necessary info: fwhm and center wavelengths
         inras = self.image
         image = openRasterDataset(inras)
         meta = image.metadataDict()
@@ -1130,7 +1134,8 @@ class SensorEditor:
             text = "Create Generic SRF from Imagery OK: " + str(len(self.x[:, 0])) + " Bands."
             self.gui.label.setText(text)
             if len(self.outreach) > 0:
-                text = "Create Generic SRF from Imagery OK with " + str(len(self.x[:, 0])) + " Bands but Caution! " + str(len(self.outreach)) + \
+                text = "Create Generic SRF from Imagery OK with " + str(
+                    len(self.x[:, 0])) + " Bands but Caution! " + str(len(self.outreach)) + \
                        " wavelengths outside PROSAIL range will be deleted!"
                 self.gui.label.setStyleSheet("color: rgb(170, 130, 0);")
                 self.gui.label.setText(text)
@@ -1157,7 +1162,8 @@ class SensorEditor:
                 self.houston(message=sensor_name)
                 return
             else:
-                QMessageBox.information(self.gui, "Done", "SRF-file created. It can be now used within IVVRM and CreateLUT")
+                QMessageBox.information(self.gui, "Done",
+                                        "SRF-file created. It can be now used within IVVRM and CreateLUT")
             self.main.ivvrm.init_sensorlist()
             # set index of the combobox to new sensor
             sensor_index = self.main.ivvrm.gui.SType_combobox.findText(sensor_name)
@@ -1171,8 +1177,10 @@ class SensorEditor:
                 self.houston(message=sensor_name)
                 return
             else:
-                QMessageBox.information(self.gui, "Done", "SRF-file created. It can be now used within IVVRM and CreateLUT")
+                QMessageBox.information(self.gui, "Done",
+                                        "SRF-file created. It can be now used within IVVRM and CreateLUT")
                 self.main.ivvrm.init_sensorlist()
+
 
 # LoadTxtFile is a class to open a new GUI in which a text file is opened which needs to meet certain criteria
 # In this case, it's the background spectrum which needs to be a two column text file with wavelengths and
@@ -1190,7 +1198,7 @@ class LoadTxtFile:
         self.gui.cmdInputFile.clicked.connect(lambda: self.open_file())
         self.gui.radioHeader.toggled.connect(lambda: self.change_radioHeader())
         self.gui.cmbDelimiter.activated.connect(
-            lambda: self.change_cmbDelimiter())   # "activated" signal is only called for user activity, not code call
+            lambda: self.change_cmbDelimiter())  # "activated" signal is only called for user activity, not code call
         self.gui.spinDivisionFactor.valueChanged.connect(lambda: self.change_division())
 
     def initial_values(self):
@@ -1359,6 +1367,7 @@ class LoadTxtFile:
         self.main.select_wavelengths.gui.show()
         self.gui.close()
 
+
 # The SelectWavelengths class allows to add/remove wavelengths from a model
 # In this case it is used to use wavelengths of a certain background as basis for the LUT
 class SelectWavelengths:
@@ -1507,9 +1516,8 @@ class MainUiFunc:
 
 if __name__ == '__main__':
     from enmapbox.testing import start_app
+
     app = start_app()
     m = MainUiFunc()
     m.show()
     sys.exit(app.exec_())
-
-

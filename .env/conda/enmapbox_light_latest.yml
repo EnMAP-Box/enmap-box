@@ -1,13 +1,14 @@
 # EnMAP-Box conda environment
-# run to install: conda env create -n enmapbox_light_latest --file enmapbox_light_latest.yml
-# run to update : conda env update -n enmapbox_light_latest --file enmapbox_light_latest.yml --prune
+# generated with scripts/update_conda_environemts.py (MANUAL CHANGES WILL BE OVERWRITTEN!)
+# run to install: conda env create -n enmapbox_light_latest --file=enmapbox_light_latest.yml
+# run to update : conda env update -n enmapbox_light_latest --file=enmapbox_light_latest.yml --prune
 # run to delete : conda env remove -n enmapbox_light_latest
 # see also https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
 
 channels:
 - conda-forge
 dependencies:
-- qgis>=3.40.1
+- qgis>=3.40.3
 - docutils
 - enpt
 - flake8
@@ -19,7 +20,6 @@ dependencies:
 - pytest-cov
 - pytest-xdist
 - scikit-learn>=1
-- typeguard=2
 - pip:
   - flake8-qgis
 name: enmapbox_light_latest

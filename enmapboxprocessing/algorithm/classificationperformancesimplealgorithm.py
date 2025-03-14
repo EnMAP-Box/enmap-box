@@ -16,7 +16,8 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.reportwriter import MultiReportWriter, HtmlReportWriter, CsvReportWriter
 from enmapboxprocessing.utils import Utils
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer, \
+    QgsProcessingException
 
 
 @typechecked
@@ -124,6 +125,8 @@ class ClassificationPerformanceSimpleAlgorithm(EnMAPProcessingAlgorithm):
             feedback.pushInfo('Estimate statistics and create report')
             classValues = [c.value for c in categoriesReference]
             classNames = [c.name for c in categoriesReference]
+            if not np.isin(yMap, classValues).all():
+                raise QgsProcessingException('Predicted values not matching reference classes.')
             stats = accuracyAssessment(yReference, yMap, classNames, classValues)
 
             self.writeReport(filename, stats, classNamesMatching)
@@ -172,7 +175,7 @@ class ClassificationPerformanceSimpleAlgorithm(EnMAPProcessingAlgorithm):
 
             values = smartRound(stats.confusionMatrix, 2)
             report.writeTable(
-                values, 'Confusion matrix counts:',
+                np.transpose(values).tolist(), 'Confusion matrix counts:',
                 [f'({i + 1})' for i in range(len(stats.classNames))],
                 [f'predicted {name} ({i + 1})' for i, name in enumerate(stats.classNames)]
             )

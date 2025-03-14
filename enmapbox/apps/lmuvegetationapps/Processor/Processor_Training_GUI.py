@@ -20,7 +20,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this software. If not, see <http://www.gnu.org/licenses/>.
+    along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
 
 This script handles the GUI for training new ML-models. There is no maximum flexibility as in the _core module,
@@ -67,6 +67,7 @@ from sklearn.metrics import r2_score
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import warnings
+
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 warnings.filterwarnings('ignore', category=UserWarning)
 
@@ -116,6 +117,7 @@ class Performance_GUI(QDialog):
         super(Performance_GUI, self).__init__(parent)
         loadUi(pathUI_Performance, self)
 
+
 class PrinterGUI(QDialog):
     def __init__(self, parent=None):
         super(PrinterGUI, self).__init__(parent)
@@ -153,7 +155,8 @@ class ML_Training:
         self.n_initial = None
         self.algorithm = 'ANN'
         self.algorithm_dict = {0: 'ANN', 1: 'GPR', 2: 'RFR', 3: 'SVR', 4: 'KRR', 5: 'GBR'}
-        self.all_labels = ["cab", "car", "anth", "cw", "cp", "cbc", "LAI", "AGBdry", "AGBfresh", "CWC", "Nitrogen", "Carbon"]
+        self.all_labels = ["cab", "car", "anth", "cw", "cp", "cbc", "LAI", "AGBdry", "AGBfresh", "CWC", "Nitrogen",
+                           "Carbon"]
         self.param_flags = [-1] * 12
         self.para_list = None
         self.hyperp_tuning = False
@@ -163,7 +166,7 @@ class ML_Training:
         self.saveALselection = False
         self.eval_on_insitu = False
         self.retrain_mode = False
-        
+
         self.addItemSpeclib = []
         self.gui.mLayerSpeclib.setLayer(None)
         self.speclib = None
@@ -217,10 +220,9 @@ class ML_Training:
         for para in self.paramsdict:
             self.paramsdict[para].stateChanged.connect(lambda group, pid=para:
                                                        self.set_params_flags(group="targets", para_id=pid))
-            
+
         self.gui.mLayerSpeclib.layerChanged.connect(lambda: self.open_speclib(mode="libDropdown"))
         self.gui.cmdLibSelect.clicked.connect(lambda: self.open_speclib(mode='libSelect'))
-        
 
     def start_GUI_LUT(self, *args):
         from lmuvegetationapps.LUT.CreateLUT_GUI import MainUiFunc
@@ -256,7 +258,6 @@ class ML_Training:
             self.model_process_dict = None
             self.gui.txtTrainSize.setText("")
 
-
     def handle_algorithm(self, mode):
         self.algorithm = self.algorithm_dict[mode]
 
@@ -272,11 +273,13 @@ class ML_Training:
             self.gui.radValinsitu.setEnabled(False)
         if self.gui.radNoAL.isChecked():
             self.gui.AL_rbFrame.setEnabled(False), self.gui.lblInitSamples.setEnabled(False),
-            self.gui.sbInitSamples.setEnabled(False), self.gui.chkALsave.setEnabled(False), self.gui.chkALsave.setChecked(False),
+            self.gui.sbInitSamples.setEnabled(False), self.gui.chkALsave.setEnabled(
+                False), self.gui.chkALsave.setChecked(False),
             self.gui.radNoPerf.setEnabled(True), self.gui.radInternal.setChecked(True),
             self.gui.radNoPerf.setChecked(True), self.gui.frameQueryStrat.setEnabled(False),
             self.gui.frameQueryStrat.setEnabled(False),
-            self.gui.lblQueryStrat.setEnabled(False), self.gui.radEBD.setEnabled(False), self.gui.radPAL.setEnabled(False)
+            self.gui.lblQueryStrat.setEnabled(False), self.gui.radEBD.setEnabled(False), self.gui.radPAL.setEnabled(
+                False)
 
     def handle_AL_strat(self, mode):
         if mode == 'internal':
@@ -316,8 +319,6 @@ class ML_Training:
             self.gui.radCrossVal.setEnabled(False), self.gui.txtFolds.setEnabled(False),
             if self.gui.radTrainTest.isChecked():
                 self.gui.txtTrainSize.setText("100"), self.gui.txtTrainSize.setEnabled(False)
-
-
 
     def handle_PerfEvalStrat(self):
         if self.gui.radTrainTest.isChecked():
@@ -363,7 +364,7 @@ class ML_Training:
             self.hyperp_tuning = False
             (self.gui.AL_frame.setEnabled(True), self.gui.chkALsave.setEnabled(True),
              self.gui.radNoPerf.setEnabled(True),)
-            self.gui.radPerf.setChecked(False),self.gui.radTrainTest.setEnabled(True),
+            self.gui.radPerf.setChecked(False), self.gui.radTrainTest.setEnabled(True),
             (self.gui.lblLoadHyp.setEnabled(True), self.gui.cmdLoadHyp.setEnabled(True),
              self.gui.txtInputHyp.setEnabled(True))
 
@@ -472,7 +473,7 @@ class ML_Training:
             key, result = next(iter(path.items()))
         else:
             result = str(QFileDialog.getOpenFileName(caption='Select Machine Learning Model',
-                                                 filter="Processor META File (*.proc)")[0])
+                                                     filter="Processor META File (*.proc)")[0])
             if not result:
                 return
         self.gui.lblInputModel.setText(result)
@@ -485,7 +486,7 @@ class ML_Training:
 
     def params_dict_check(self):
         self.paramsdict = {0: self.gui.chkCab, 1: self.gui.chkCcx, 2: self.gui.chkCanth,
-                           3: self.gui.chkCw,  4: self.gui.chkCp, 5: self.gui.chkCBC,
+                           3: self.gui.chkCw, 4: self.gui.chkCp, 5: self.gui.chkCBC,
                            6: self.gui.chkLAI, 7: self.gui.chkAGBdry, 8: self.gui.chkAGBfresh,
                            9: self.gui.chkCWC, 10: self.gui.chkNitrogen, 11: self.gui.chkCarbon}
 
@@ -510,7 +511,7 @@ class ML_Training:
         if not self.gui.txtExclude.text() == "":  # lineEdit is NOT empty, so some information is already there
             try:
                 pass_exclude = self.gui.txtExclude.text().split(" ")  # get whats in the field
-                pass_exclude = [int(pass_exclude[i])-1 for i in range(len(pass_exclude))]  # convert the text to int
+                pass_exclude = [int(pass_exclude[i]) - 1 for i in range(len(pass_exclude))]  # convert the text to int
             except ValueError:  # lineEdit contains crap
                 self.gui.txtExclude.setText("")
                 pass_exclude = list()
@@ -593,7 +594,7 @@ class ML_Training:
         wl_extracted = False
         print(os.path.splitext(self.speclib))
         if os.path.splitext(self.speclib)[1] == ".gpkg":
-            layer = QgsVectorLayer(self.speclib, "Soil spectra layer")  #<- works only for gpkg Geopackage
+            layer = QgsVectorLayer(self.speclib, "Soil spectra layer")  # <- works only for gpkg Geopackage
             # Loop through the features
             for feature in layer.getFeatures():
                 # Assuming that the JSON string is in an attribute named 'json_data'
@@ -732,7 +733,7 @@ class ML_Training:
         else:
             self.prg_widget.gui.lblCaption_l.setText("Training Machine Learning Model...")
         self.prg_widget.gui.lblCaption_r.setText("Setting up training...")
-        #self.prg_widget.gui.prgBar.setValue(5)
+        # self.prg_widget.gui.prgBar.setValue(5)
         self.prg_widget.gui.setModal(True)
         self.prg_widget.gui.show()
 
@@ -786,12 +787,13 @@ class ML_Training:
         self.prg_widget.gui.prgBar.setValue(0)
 
         QMessageBox.information(self.gui, "Finish", "Training finished")
-        #▬self.gui.close()
+        # ▬self.gui.close()
         if self.perf_eval:
             self.perfView_widget = self.main.performance_view
             self.perfView_widget.gui.modelComboBox.clear()
             self.perfView_widget.collect_results(self.results_dict)
             self.perfView_widget.gui.show()
+
 
 class perfView:
     def __init__(self, main):
@@ -830,7 +832,7 @@ class perfView:
 
     def export_data(self, index):
         outpath = QFileDialog.getSaveFileName(caption='Specify Output File',
-                                             filter="Text files (*.txt)")[0]
+                                              filter="Text files (*.txt)")[0]
         key = self.gui.modelComboBox.itemText(index)
         data = self.all_results_dict.get(key, None)
 
@@ -924,14 +926,13 @@ class perfView:
             ax.set_yticks([])
         self.canvas_perf.draw()
 
-
         # Create a new subplot
         ax0 = self.figure_scatter.add_subplot(111, aspect='equal')
         # Scatter plot
         if not isinstance(pred_std, np.ndarray):
             pred_std = np.array(pred_std)
         if pred_std.size > 0:
-            scatter = ax0.scatter(y_val, final_pred, s=10, c=pred_std, cmap='plasma',)
+            scatter = ax0.scatter(y_val, final_pred, s=10, c=pred_std, cmap='plasma', )
         else:
             scatter = ax0.scatter(y_val, final_pred, s=10, c='k')
         # 1:1 line
@@ -961,12 +962,13 @@ class perfView:
         if pred_std.size > 0:
             the_divider = make_axes_locatable(ax0)
             color_axis = the_divider.append_axes("right", size="5%", pad=0.1)
-            #scatter = ax0.scatter(y_val, final_pred, c=pred_std, cmap='plasma')
+            # scatter = ax0.scatter(y_val, final_pred, c=pred_std, cmap='plasma')
             cbar = plt.colorbar(scatter, cax=color_axis)
             cbar.set_label(label='SD', labelpad=0)
 
         # Redraw the canvas
         self.canvas_scatter.draw()
+
 
 # LoadTxtFile is a class to open a new GUI in which a text file is opened which needs to meet certain criteria
 # In this case, it's the background spectrum which needs to be a two column text file with wavelengths and
@@ -984,7 +986,7 @@ class LoadTxtFile:
         self.gui.cmdInputFile.clicked.connect(lambda: self.open_file())
         self.gui.radioHeader.toggled.connect(lambda: self.change_radioHeader())
         self.gui.cmbDelimiter.activated.connect(
-            lambda: self.change_cmbDelimiter())   # "activated" signal is only called for user activity, not code call
+            lambda: self.change_cmbDelimiter())  # "activated" signal is only called for user activity, not code call
         self.gui.spinDivisionFactor.valueChanged.connect(lambda: self.change_division())
 
     def initial_values(self):
@@ -1016,7 +1018,8 @@ class LoadTxtFile:
         self.populate_paras()
         if self.para_list:
             self.gui.show()
-        else: return
+        else:
+            return
 
     def populate_paras(self):
         if all(flag == -1 for flag in self.main.mlra_training.param_flags):
@@ -1290,8 +1293,9 @@ class LoadTxtFile:
 
     def ok(self):
         self.main.mlra_training.val_data = self.extract_data_from_table()
-        #self.main.gui.
+        # self.main.gui.
         self.gui.close()
+
 
 # The SelectWavelengths class allows to add/remove wavelengths from the inversion
 class SelectWavelengths:
@@ -1323,11 +1327,13 @@ class SelectWavelengths:
         for i in range(self.main.mlra_training.nbands):
             if i in default_exclude:
                 str_band_no = '{num:0{width}}'.format(num=i + 1, width=width)
-                label = "band %s: %6.2f %s" % (str_band_no, self.main.mlra_training.wl[i], self.main.mlra_training.wunit)
+                label = "band %s: %6.2f %s" % (
+                str_band_no, self.main.mlra_training.wl[i], self.main.mlra_training.wunit)
                 self.gui.lstExcluded.addItem(label)
             else:
-                str_band_no = '{num:0{width}}'.format(num=i+1, width=width)
-                label = "band %s: %6.2f %s" % (str_band_no, self.main.mlra_training.wl[i], self.main.mlra_training.wunit)
+                str_band_no = '{num:0{width}}'.format(num=i + 1, width=width)
+                label = "band %s: %6.2f %s" % (
+                str_band_no, self.main.mlra_training.wl[i], self.main.mlra_training.wunit)
                 self.gui.lstIncluded.addItem(label)
 
     def send(self, direction):
@@ -1372,11 +1378,12 @@ class SelectWavelengths:
             raw_list.append(item)
 
         # convert the text-string of the list object into a python list of integers (bands to be excluded)
-        self.main.mlra_training.exclude_bands = [int(raw_list[i].split(" ")[1][:-1])-1 for i in range(len(raw_list))]
-        self.main.mlra_training.nbands_valid = self.main.mlra_training.nbands - len(self.main.mlra_training.exclude_bands)
+        self.main.mlra_training.exclude_bands = [int(raw_list[i].split(" ")[1][:-1]) - 1 for i in range(len(raw_list))]
+        self.main.mlra_training.nbands_valid = self.main.mlra_training.nbands - len(
+            self.main.mlra_training.exclude_bands)
 
         # Join the list to a string and set it to the txtExclude lineEdit
-        exclude_string = " ".join(str(x+1) for x in self.main.mlra_training.exclude_bands)
+        exclude_string = " ".join(str(x + 1) for x in self.main.mlra_training.exclude_bands)
         self.main.mlra_training.gui.txtExclude.setText(exclude_string)
 
         # clean up
@@ -1403,6 +1410,7 @@ class PRG:
         self.gui.lblCancel.setText("-1")
         self.gui.close()
         self.gui.lblCancel.setText("1")
+
 
 # class Printer:
 #     def __init__(self, main):
@@ -1446,13 +1454,15 @@ class MainUiFunc:
     def show(self):
         self.mlra_training.gui.show()
 
+
 if __name__ == '__main__':
     from enmapbox.testing import start_app
+
     app = start_app()
     m = MainUiFunc()
     m.show()
-    # lut_path = r"C:\Data\Daten\Testdaten\LUT\LUT_1000_Wocher2022_CpCBCcheck_EnMAP_207bands_00meta.lut"
-    # m.mlra_training.open_lut(lutpath=lut_path)
-    # out_folder = r"C:\Data\Daten\Testdaten\Model_TEST/"
-    # m.mlra_training.get_folder(path=out_folder)
+    #lut_path = r"C:\Data\Daten\Testdaten\LUT\testLUT_1000_CpCBCcheck_00meta.lut"
+    #m.mlra_training.open_lut(lutpath=lut_path)
+    #out_folder = r"C:\Data\Daten\Testdaten\Model_TEST/"
+    #m.mlra_training.get_folder(path=out_folder)
     sys.exit(app.exec_())

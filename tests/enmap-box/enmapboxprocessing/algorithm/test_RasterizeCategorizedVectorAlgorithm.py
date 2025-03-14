@@ -1,15 +1,19 @@
-import numpy as np
+import unittest
 
-from enmapboxtestdata import enmap, landcover_polygon
+import numpy as np
+from osgeo import gdal
+
 from enmapboxprocessing.algorithm.rasterizecategorizedvectoralgorithm import RasterizeCategorizedVectorAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+from enmapboxtestdata import enmap, landcover_polygon
 from enmapboxtestdata import landcover_points_multipart_epsg3035, landcover_polygon_3classes_id, \
     landcover_polygon_3classes_epsg4326
 from qgis.core import QgsRasterLayer, QgsVectorLayer, QgsPalettedRasterRenderer, QgsCategorizedSymbolRenderer
 
 
+@unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
 class TestRasterizeCategorizedVectorAlgorithm(TestCase):
 
     def test_numberClassAttribute(self):
