@@ -190,7 +190,7 @@ class FeatureClusteringHierarchicalAlgorithm(EnMAPProcessingAlgorithm):
                 plt.xlabel('squared Spearman rank-order correlation')
                 plt.ylabel('number of clusters')
                 ax.boxplot(intra_cluster_correlation,
-                           vert=False, sym='',
+                           vert='vertical', sym='',
                            labels=[f'n={i + 1}' for i in range(len(features) - 1)],
                            )
                 fig.tight_layout()
