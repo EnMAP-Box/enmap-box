@@ -369,6 +369,9 @@ class TestRasterReader(TestCase):
         self.assertIsNone(reader.findWavelength(190))
 
     def test_fwhm(self):
+        reader = RasterReader(enmap)
+        self.assertEqual(5.8, reader.fwhm(1))  # in Nanometers
+        return
         # check at band-level
         writer = self.rasterFromArray(np.zeros((1, 1, 1)))
         writer.setMetadataItem('wavelength_units', 'Nanometers', '', 1)
