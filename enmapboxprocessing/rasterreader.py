@@ -726,6 +726,11 @@ class RasterReader(object):
         if fwhm is not None:
             return conversionFactor * float(fwhm[bandNo - 1])
 
+        # check GDAL
+        wavelength = self.metadataItem('FWHM_UM', 'IMAGERY', bandNo)
+        if wavelength is not None:
+            return conversionFactor * float(wavelength)
+
         # check band-level domains
         for domain in set(self.metadataDomainKeys(bandNo) + ['']):
             fwhm = self.metadataItem('fwhm', domain, bandNo)

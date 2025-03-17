@@ -180,6 +180,7 @@ class TestTranslateAlgorithm(TestCase):
         result = self.runalg(alg, parameters)
 
         raster = RasterReader(result[alg.P_OUTPUT_RASTER])
+        self.assertEqual(raster.Nanometers, raster.wavelengthUnits(1))
         self.assertEqual(470, int(raster.wavelength(1)))
         self.assertEqual(5.8, raster.fwhm(1))
         self.assertEqual(1, raster.badBandMultiplier(1))
