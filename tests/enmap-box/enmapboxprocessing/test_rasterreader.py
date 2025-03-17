@@ -342,6 +342,15 @@ class TestRasterReader(TestCase):
         self.assertEqual(500, reader.wavelength(1))
         self.assertEqual(500, reader.wavelength(2))
 
+    def test_wavelengthFromGdalImageryDomain(self):
+
+        writer = self.rasterFromArray(np.zeros((1, 1, 1)))
+        writer.setMetadataItem('CENTRAL_WAVELENGTH_UM', 42, 'IMAGERY', 1)
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual('Micrometers', reader.wavelengthUnits(1))
+        self.assertEqual(42 * 1000, reader.wavelength(1))
+
     def test_findWavelength(self):
         writer = self.rasterFromArray(np.zeros((5, 1, 1)))
         writer.setWavelength(100, 1)

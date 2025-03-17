@@ -598,6 +598,10 @@ class RasterReader(object):
         if 'wavelength_units' in self.stacMetadata['properties']['envi:metadata']:
             return self.stacMetadata['properties']['envi:metadata']['wavelength_units']
 
+        # check GDAL
+        if self.metadataItem('CENTRAL_WAVELENGTH_UM', 'IMAGERY', bandNo) is not None:
+            return self.Micrometers  # GDAL IMAGERY domain always uses Micrometers
+
         for key in [
             'wavelength_units',
             'Wavelength_unit',  # support for FORCE BOA files
@@ -656,6 +660,11 @@ class RasterReader(object):
         wavelength = self.stacMetadata['properties']['envi:metadata'].get('wavelength')
         if wavelength is not None:
             return conversionFactor * float(wavelength[bandNo - 1])
+
+        # check GDAL
+        wavelength = self.metadataItem('CENTRAL_WAVELENGTH_UM', 'IMAGERY', bandNo)
+        if wavelength is not None:
+            return conversionFactor * float(wavelength)
 
         for key in [
             'wavelength',
