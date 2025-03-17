@@ -6,11 +6,11 @@ from typing import Tuple
 import numpy as np
 from osgeo import gdal, gdal_array
 from osgeo.osr import SpatialReference
-from qgis._core import QgsRasterLayer
 
 from enmapbox.qgispluginsupport.qps.qgsrasterlayerproperties import QgsRasterLayerSpectralProperties
 from enmapbox.testing import TestCase, start_app
 from enmapboxprocessing.rasterreader import RasterReader
+from qgis.core import QgsRasterLayer
 
 start_app()
 
@@ -65,14 +65,12 @@ class EOMetadataReadingTests(TestCase):
 
         # RasterReader tests
         reader = RasterReader(layer)
-        self.assertEqual(reader.bandCount(), ds.RasterCount)
+        self.assertEqual(reader.bandCount(), layer.bandCount())
         for b in range(1, reader.bandCount() + 1):
             self.assertEqual(reader.wavelength(b), None)
             self.assertEqual(reader.fwhm(b), None)
             self.assertEqual(reader.wavelengthUnits(b), None)
             self.assertEqual(reader.badBandMultiplier(b), 1)  # todo: None = undefined or 1 as default if undefined?
-
-        self.assertEqual(True, False)  # add assertion here
 
     def test_layer_custom_properties_only(self):
 
@@ -124,7 +122,7 @@ class EOMetadataReadingTests(TestCase):
         #
         # wavelength according to GDAL metadata mode
         # see https://gdal.org/en/stable/user/raster_data_model.html#imagery-domain-remote-sensing
-        ds, path = self.createTestImage('no_metadata.tif')
+        ds, path = self.createTestImage('gdal_imagery.tif')
 
         wavelengths = [0.2, 0.4]
         fwhm = [0.0003, 0.0009]
@@ -145,6 +143,76 @@ class EOMetadataReadingTests(TestCase):
 
         for b in range(1, layer.bandCount() + 1):
             # todo: raster reader tests
+            pass
+
+    def test_classic_envi_domain(self):
+        ds, path = self.createTestImage('gdal_envi_dataset_domain.bsq', format='ENVI')
+
+        wl = [400, 500]
+        fwhm = [2.3, 3.4]
+        wlu = ['nm', 'nm']
+
+        ds.SetMetadataItem('wavelength', self.wrapEnviList(wl), 'ENVI')
+        ds.SetMetadataItem('wavelength units', wlu[0], 'ENVI')
+        ds.SetMetadataItem('fwhm', self.wrapEnviList(fwhm), 'ENVI')
+
+        del ds
+
+        layer = QgsRasterLayer(path.as_posix())
+        prop = QgsRasterLayerSpectralProperties.fromRasterLayer(layer)
+        self.assertWavelengthsEqual(prop.wavelengths(), prop.wavelengthUnits(),
+                                    wl, wlu)
+        self.assertWavelengthsEqual(prop.fwhm(), prop.wavelengthUnits(),
+                                    fwhm, wlu, precision=3)
+
+        reader = RasterReader(layer)
+        for b in range(layer.bandCount()):
+            self.assertWavelengthsEqual(reader.wavelength(b + 1), reader.wavelengthUnits(b + 1),
+                                        wl[b], wlu[b])
+
+    def test_overwrite_by_custom_properties(self):
+
+        ds, path = self.createTestImage('gdal_overwrite_custom_props.tif')
+
+        wl = [0.2, 0.4]
+        fwhm = [0.0003, 0.0009]
+        for b, (_wl, _fwhm) in enumerate(zip(wl, fwhm), start=1):
+            band: gdal.Band = ds.GetRasterBand(b)
+            band.SetMetadataItem('CENTRAL_WAVELENGTH_UM', str(_wl), 'IMAGERY')
+            band.SetMetadataItem('FWHM_UM', str(_fwhm), 'IMAGERY')
+        del ds
+
+        layer = QgsRasterLayer(path.as_posix())
+        propsOriginal = QgsRasterLayerSpectralProperties.fromRasterLayer(layer)
+        self.assertEqual(propsOriginal.wavelengths(), wl)
+        self.assertEqual(propsOriginal.fwhm(), fwhm)
+        self.assertEqual(propsOriginal.wavelengthUnits(), ['μm', 'μm'])
+
+        reader = RasterReader(layer)
+        for b in range(1, layer.bandCount() + 1):
+            # todo: Raster Reader support for GDAL metadata
+            # self.assertEqual(reader.wavelength(b), wl[b - 1])
+            # self.assertEqual(reader.fwhm(b), fwhm[b - 1])
+            # self.assertTrue(reader.wavelengthUnits(b) in ['μm', 'Micrometers'])
+            pass
+
+        # overwrite properties via setCustomProperty
+        wl2 = [400, 500]
+        wlu2 = ['nm', 'nm']
+        fwhm2 = [1, 2]
+
+        layer.setCustomProperty('enmapbox/wavelengths', wl2)
+        layer.setCustomProperty('enmapbox/wavelength_units', wlu2)
+        layer.setCustomProperty('enmapbox/fwhm', fwhm2)
+
+        propsChanged = QgsRasterLayerSpectralProperties.fromRasterLayer(layer)
+        self.assertEqual(propsChanged.wavelengths(), wl2)
+        self.assertEqual(propsChanged.fwhm(), fwhm2)
+        self.assertEqual(propsChanged.wavelengthUnits(), wlu2)
+
+        reader = RasterReader(layer)
+        for b in range(1, layer.bandCount() + 1):
+            # todo: raster reader test
             pass
 
 
