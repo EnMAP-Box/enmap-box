@@ -6,7 +6,7 @@ from qgis.core import (QgsProcessingAlgorithm,
                        QgsProcessingParameterBoolean,
                        QgsProcessingParameterFileDestination)
 
-from enmapbox.apps.SpecDeepMap.core_tester_remap_iou_dict import process_images_from_csv
+from enmapbox.apps.SpecDeepMap.core_tester_remap_classes import process_images_from_csv
 
 
 class DL_Tester(QgsProcessingAlgorithm):
