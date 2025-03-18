@@ -1,12 +1,16 @@
-import numpy
 import os
 import time
 
+import numpy
+
 # optional imports
-try: import pyqtgraph
-except: pass
+try:
+    import pyqtgraph
+except:
+    pass
 
 from _classic.hubflow.html import Table, TableRow, TableCell
+
 
 class Report():
 
@@ -21,13 +25,11 @@ class Report():
         self.items.append(item)
         return self
 
-
     def appendReport(self, report):
 
         assert isinstance(report, Report)
         self.items = self.items + report.items
         return self
-
 
     def generateHTML(self, dirname):
 
@@ -39,8 +41,10 @@ class Report():
         html.append('  <head>')
         html.append('    <meta charset="ASCII" />')
         html.append('    <title>' + self.title + '</title>')
-        html.append('    <link rel="stylesheet" type="text/css" href="' + os.path.join(relativeDirname, 'stylesheet.css"') + ' media="all" />')
-        html.append('    <script type="text/javascript" src="' + os.path.join(relativeDirname, 'javascript.js') + '"> </script>')
+        html.append('    <link rel="stylesheet" type="text/css" href="' + os.path.join(relativeDirname,
+                                                                                       'stylesheet.css"') + ' media="all" />')
+        html.append('    <script type="text/javascript" src="' + os.path.join(relativeDirname,
+                                                                              'javascript.js') + '"> </script>')
         html.append('    <noscript> </noscript>')
         html.append('  </head>')
         html.append('  <body>')
@@ -62,7 +66,6 @@ class Report():
         html.append('</html>')
 
         return html
-
 
     def saveHTML(self, filename, open=True):
 
@@ -92,6 +95,7 @@ class Report():
 
         return self
 
+
 class ReportHeading():
 
     def __init__(self, title, sub=0):
@@ -101,7 +105,8 @@ class ReportHeading():
     def generateHTML(self):
 
         if self.sub == -1:
-            html = ['    <header><h' + str(self.sub + 2) + '> ' + self.title + ' </h' + str(self.sub + 2) + '></header>']
+            html = [
+                '    <header><h' + str(self.sub + 2) + '> ' + self.title + ' </h' + str(self.sub + 2) + '></header>']
         else:
             html = ['    <h' + str(self.sub + 2) + '> ' + self.title + ' </h' + str(self.sub + 2) + '>']
 
@@ -113,9 +118,7 @@ class ReportMonospace():
     def __init__(self, text):
         self.text = text
 
-
     def generateHTML(self):
-
         html = list()
         html.append('    <pre><code>')
         html.append(self.text)
@@ -129,10 +132,9 @@ class ReportParagraph():
         self.text = text
         self.font_color = font_color
 
-
     def generateHTML(self):
         html = list()
-        html.append('    <p><font color="' + self.font_color +'">')
+        html.append('    <p><font color="' + self.font_color + '">')
         html.append(self.text)
         html.append('    </font></p>')
         return html
@@ -141,18 +143,15 @@ class ReportParagraph():
 class ReportImage():
 
     def __init__(self, array, caption=''):
-
         assert isinstance(array, numpy.ndarray)
         self.array = array
         self.caption = caption
 
-
     def generateHTML(self, dirname, imageCount):
-
         basename = 'image' + str(imageCount) + '.png'
         absoluteImageFilename = os.path.join(dirname, basename)
         relativeImageFilename = os.path.relpath(absoluteImageFilename, os.path.dirname(dirname))
-        relativeImageFilename = relativeImageFilename.replace(r'\\','/')
+        relativeImageFilename = relativeImageFilename.replace(r'\\', '/')
         pyqtgraph.makeQImage(self.array, transpose=False).save(absoluteImageFilename)
 
         html = list()
@@ -161,38 +160,40 @@ class ReportImage():
         html.append('    <br /><i>' + self.caption + '</i></p>')
         return html
 
+
 class ReportPlot(ReportImage):
 
     def __init__(self, figure, caption=''):
-
         def fig2rgb_array():
-
             figure.canvas.draw()
             buf = figure.canvas.tostring_rgb()
             ncols, nrows = figure.canvas.get_width_height()
-            #return numpy.fromstring(buf, dtype=numpy.uint8).reshape(nrows, ncols, 3)
+            # return numpy.fromstring(buf, dtype=numpy.uint8).reshape(nrows, ncols, 3)
             return numpy.frombuffer(buf, dtype=numpy.uint8).reshape(nrows, ncols, 3)
 
         array = fig2rgb_array()
         ReportImage.__init__(self, array, caption)
 
+
 class ReportTable():
 
-    def __init__(self, data, caption='', colHeaders=None, rowHeaders=None, colSpans=None, rowSpans=None, attribs_align='right'):
+    def __init__(self, data, caption='', colHeaders=None, rowHeaders=None, colSpans=None, rowSpans=None,
+                 attribs_align='right'):
 
         if isinstance(data, numpy.ndarray):
             if data.ndim == 1:
-                data = data.reshape((1,-1))
+                data = data.reshape((1, -1))
             assert data.ndim == 2
 
-        table = [TableRow([TableCell(str(v), attribs = {'align': attribs_align}) for v in row]) for row in data]
+        table = [TableRow([TableCell(str(v), attribs={'align': attribs_align}) for v in row]) for row in data]
 
         if colHeaders is not None:
 
             if colSpans is None:
-                 colSpans = [[None for v in vr] for vr in colHeaders]
-            table = [TableRow([TableCell(cell, header=True,  attribs = {'colspan': cscell, 'align': 'center'})
-                                 for cell, cscell in zip(row, colSpan)], header=True) for row, colSpan in zip(colHeaders, colSpans)] + table
+                colSpans = [[None for v in vr] for vr in colHeaders]
+            table = [TableRow([TableCell(cell, header=True, attribs={'colspan': cscell, 'align': 'center'})
+                               for cell, cscell in zip(row, colSpan)], header=True) for row, colSpan in
+                     zip(colHeaders, colSpans)] + table
 
         if rowHeaders is not None:
 
@@ -200,12 +201,12 @@ class ReportTable():
                 rowSpans = [[None for v in vr] for vr in rowHeaders]
 
             if colHeaders is not None:
-                table[0].cells.insert(0, TableCell('', header=True, attribs={'colspan': len(rowHeaders), 'rowspan': len(colHeaders)}))
+                table[0].cells.insert(0, TableCell('', header=True,
+                                                   attribs={'colspan': len(rowHeaders), 'rowspan': len(colHeaders)}))
 
-            for rowheader, rowspan  in reversed(list(zip(rowHeaders, rowSpans))):
+            for rowheader, rowspan in reversed(list(zip(rowHeaders, rowSpans))):
                 i = len(colHeaders) if colHeaders is not None else 0
                 for header, span in zip(rowheader, rowspan):
-
                     table[i].cells.insert(0, TableCell(header, header=True, attribs={'rowspan': span, 'align': 'left'}))
                     i += span if span is not None else 1
 
@@ -227,7 +228,6 @@ class ReportTable():
 class ReportHorizontalLine():
 
     def generateHTML(self):
-
         html = ['    <hr>']
         return html
 
@@ -235,50 +235,47 @@ class ReportHorizontalLine():
 class ReportHyperlink():
 
     def __init__(self, url, text):
-
         self.url = url
         self.text = text
 
     def generateHTML(self):
-
-        html = ['<p><a href="' + self.url + '" target="_blank">' + self.text +'</a></p>']
+        html = ['<p><a href="' + self.url + '" target="_blank">' + self.text + '</a></p>']
         return html
 
 
 class ReportHTML():
 
     def __init__(self, html):
-
         self.html = html
 
     def generateHTML(self):
-
         return [self.html]
 
 
 if __name__ == '__main__':
-
     array = numpy.random.randint(0, 255, [300, 300, 3]).astype(numpy.uint8)
     colHeaders = [['Hello World'], ['A', 'B'], ['a1', 'a2', 'b1', 'b2']]
-    colSpans =   [[4],             [2, 2],     [1, 1, 1, 1]]
+    colSpans = [[4], [2, 2], [1, 1, 1, 1]]
     rowHeaders = [['Hello World'], ['X', 'Y', 'Z'], ['x1', 'x2', 'y1', 'y2', 'z1', 'z2']]
     rowSpans = [[6], [2, 2, 2], [1, 1, 1, 1, 1, 1]]
     data = numpy.random.randint(0, 5, (6, 4))
 
     report = Report('Title') \
         .append(ReportHeading('Heading')) \
-        .append(ReportHorizontalLine())\
-        .append(ReportHeading('SubHeading', 1))\
-        .append(ReportHeading('SubSubHeading', 2))\
-        .append(ReportHeading('SubSubSubHeading', 3))\
-        .append(ReportHeading('SubSubSubSubHeading', 4))\
-        .append(ReportMonospace('Monospace text: a = 1 + 3'))\
-        .append(ReportParagraph('Paragraph text: The joy of coding Python should be in seeing short, concise, readable classes that express a lot of action in a small amount of clear code -- not in reams of trivial code that bores the reader to death. - Guido van Rossum'))\
+        .append(ReportHorizontalLine()) \
+        .append(ReportHeading('SubHeading', 1)) \
+        .append(ReportHeading('SubSubHeading', 2)) \
+        .append(ReportHeading('SubSubSubHeading', 3)) \
+        .append(ReportHeading('SubSubSubSubHeading', 4)) \
+        .append(ReportMonospace('Monospace text: a = 1 + 3')) \
+        .append(ReportParagraph(
+        'Paragraph text: The joy of coding Python should be in seeing short, concise, readable classes that express a lot of action in a small amount of clear code -- not in reams of trivial code that bores the reader to death. - Guido van Rossum')) \
         .append(ReportImage(array, 'This is a nice image')) \
-        .append(ReportTable(data, 'Table without headers.'))    \
+        .append(ReportTable(data, 'Table without headers.')) \
         .append(ReportTable(data, 'Table with column headers.', colHeaders=colHeaders, colSpans=colSpans)) \
         .append(ReportTable(data, 'Table with row headers.', rowHeaders=[rowHeaders[-1]])) \
-        .append(ReportTable(data, 'Table with nested column and row headers', colHeaders, rowHeaders, colSpans, rowSpans)) \
-        .append(ReportHyperlink('http://www.enmap.org/', 'Visit EnMAP!'))\
+        .append(
+        ReportTable(data, 'Table with nested column and row headers', colHeaders, rowHeaders, colSpans, rowSpans)) \
+        .append(ReportHyperlink('https://www.enmap.org/', 'Visit EnMAP!')) \
         .saveHTML(filename=r'c:\output\report.html')
     print(report.filename)

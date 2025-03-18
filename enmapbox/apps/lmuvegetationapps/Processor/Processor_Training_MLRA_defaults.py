@@ -19,7 +19,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this software. If not, see <http://www.gnu.org/licenses/>.
+    along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
 """
 
@@ -80,9 +80,10 @@ class MLRA_defaults:
     # Gaussian Process Regression
     GPR = {
         'default': {
-            'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=1, nu=1.5), #kernels.ConstantKernel(1.0) *
-                # 1.0 * kernels.RBF(length_scale=1.0, length_scale_bounds=(1e-5, 1e5)) +
-                #       kernels.WhiteKernel(noise_level=1.0, noise_level_bounds="fixed"),
+            'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=1, nu=1.5),
+            # kernels.ConstantKernel(1.0) *
+            # 1.0 * kernels.RBF(length_scale=1.0, length_scale_bounds=(1e-5, 1e5)) +
+            #       kernels.WhiteKernel(noise_level=1.0, noise_level_bounds="fixed"),
             'alpha': 1.0,
             'n_restarts_optimizer': 10,
             'random_state': 42
@@ -91,7 +92,8 @@ class MLRA_defaults:
         'param_dist': {
             'kernel': [kernels.ConstantKernel(1.0) *
                        kernels.Matern(length_scale=v, nu=nu)
-                       for v in [0.01, 0.1, 1.0, 10, 100] for nu in [0.5, 1.5, 2.5, float('inf')]],  #**kernels.ConstantKernel(1.0) *
+                       for v in [0.01, 0.1, 1.0, 10, 100] for nu in [0.5, 1.5, 2.5, float('inf')]],
+            # **kernels.ConstantKernel(1.0) *
             # [1.0 * kernels.RBF(length_scale=v) + kernels.WhiteKernel(noise_level=1.0, noise_level_bounds=(1e-5, 1e5)) for v in [0.01, 0.1, 1.0, 10, 100]]
             "alpha": [0.001, 0.01, 0.1, 1.0],
             # 'random_state': 42
@@ -121,7 +123,7 @@ class MLRA_defaults:
             'n_restarts_optimizer': 10,
         },
         'CWC': {
-            'kernel':  kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=1, nu=1.5),
+            'kernel': kernels.ConstantKernel(1.0) * kernels.Matern(length_scale=1, nu=1.5),
             'alpha': 1.0,
             'n_restarts_optimizer': 10,
         },
@@ -146,7 +148,7 @@ class MLRA_defaults:
             'max_depth': None,  # The maximum depth of the tree.
             'min_samples_split': 2,  # The minimum number of samples required to split an internal node.
             'min_samples_leaf': 1,  # The minimum number of samples required to be at a leaf node.
-            },
+        },
         'param_dist': {
             'n_estimators': [10, 50, 100, 200],
             'max_features': ['auto', 'sqrt', 'log2'],
@@ -165,7 +167,7 @@ class MLRA_defaults:
             # Regularization parameter. The strength of the regularization is inversely proportional to C.
             'epsilon': 0.1,  # Epsilon in the epsilon-SVR model.
             # Add more parameters as needed.
-            },
+        },
         'param_dist': {
             'C': [1, 10, 100, 1000],
             'epsilon': [0.01, 0.1, 1],
@@ -211,7 +213,6 @@ class MLRA_defaults:
         }
     }
 
-
 # settings according to Danner et al. (2021): old implementation
 # if var == "LIDF":  # hyperparameters best suited to estimate the ALIA
 #     self.ann_activation = 'tanh'  # logistic, relu, identity, tanh
@@ -233,5 +234,3 @@ class MLRA_defaults:
 #     self.ann_solver = 'lbfgs'  # adam, lbfgs, sgd
 #     self.ann_alpha = 1.0
 #     self.ann_max_iter = 10000  # 5000
-
-
