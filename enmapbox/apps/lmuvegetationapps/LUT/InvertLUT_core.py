@@ -19,7 +19,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this software. If not, see <http://www.gnu.org/licenses/>.
+    along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
 """
 
@@ -184,7 +184,7 @@ class RTMInversion:
         else:  # LUT contains only one fixed value
             self.whichLUT[:, :] = 0  # there should only be ONE geo-ensemble for the LUTs and this is #0 then
             self.geometry_matrix[:, :, :] = 911  # a value that is unlikely to be chosen for "no data"
-                                                 # In case of geo_mode != 'sort', the matrix is not used anyway
+            # In case of geo_mode != 'sort', the matrix is not used anyway
 
     def add_noise(self, ref_array, noise_type, sigma):
         # noise module to put a noise term on top of PROSAIL spectra
