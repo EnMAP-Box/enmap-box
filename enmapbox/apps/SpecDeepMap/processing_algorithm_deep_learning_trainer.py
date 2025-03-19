@@ -179,7 +179,7 @@ class DL_Trainer(QgsProcessingAlgorithm):
             behavior=QgsProcessingParameterFile.Behavior.Folder))
         self.addParameter(QgsProcessingParameterEnum(
             name=self.arch, description='Model architecture',
-            options=['Unet', 'Unet++', 'DeepLabV3+','SegFormer','JustoUNetSimple'], defaultValue=0))
+            options=['Unet', 'Unet++', 'DeepLabV3+','SegFormer','2D-Justo-UNet-Simple'], defaultValue=0))
         self.addParameter(QgsProcessingParameterString(
             name=self.backbone, description='Model backbone', defaultValue='resnet18'))
         self.addParameter(QgsProcessingParameterEnum(
