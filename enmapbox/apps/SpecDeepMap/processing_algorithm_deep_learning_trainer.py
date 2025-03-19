@@ -13,7 +13,7 @@ from qgis.core import (QgsProcessingAlgorithm,
                        QgsProcessingParameterEnum)
 
 #from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import dl_train
-from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer_remap_classes import dl_train
+from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer_remap_classes_seg_former import dl_train
 
 import os
 import re
@@ -179,7 +179,7 @@ class DL_Trainer(QgsProcessingAlgorithm):
             behavior=QgsProcessingParameterFile.Behavior.Folder))
         self.addParameter(QgsProcessingParameterEnum(
             name=self.arch, description='Model architecture',
-            options=['Unet', 'Unet++', 'DeepLabV3+', 'JustoUNetSimple'], defaultValue=0))
+            options=['Unet', 'Unet++', 'DeepLabV3+','SegFormer','JustoUNetSimple'], defaultValue=0))
         self.addParameter(QgsProcessingParameterString(
             name=self.backbone, description='Model backbone', defaultValue='resnet18'))
         self.addParameter(QgsProcessingParameterEnum(
