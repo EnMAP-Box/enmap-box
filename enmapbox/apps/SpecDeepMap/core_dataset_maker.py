@@ -231,21 +231,40 @@ def calculate_class_distribution_from_csv(csv_path):
     return class_counts, class_percentages
 
 
+#def calculate_class_weights_from_counts(class_counts):
+    # Remove class '0' if present
+ #   if 0 in class_counts:
+  #      del class_counts[0]
+
+  #  total_counts = sum(class_counts.values())
+   # class_weights = {cls: total_counts / count  for cls, count in class_counts.items() if count >0}
+
+    # Normalize weights so that the sum of weights equals the number of classes
+    #num_classes = len(class_weights)
+    #norm_factor = num_classes / sum(class_weights.values())
+    #class_weights = {cls: weight * norm_factor for cls, weight in class_weights.items()}
+    # as in sklearn
+
+
+    #return class_weights
+
+# sklearn implementation
 def calculate_class_weights_from_counts(class_counts):
     # Remove class '0' if present
     if 0 in class_counts:
         del class_counts[0]
 
-    total_counts = sum(class_counts.values())
-    class_weights = {cls: total_counts / count for cls, count in class_counts.items() if count > 0}
+    num_classes = len(class_counts)  # Remaining number of classes (excluding class 0)
+    total_samples = sum(class_counts.values())
+
+    # Compute weights using n_samples / (n_classes * np.bincount(y)) logic
+    class_weights = {cls: total_samples / (num_classes * count) for cls, count in class_counts.items() if count > 0}
 
     # Normalize weights so that the sum of weights equals the number of classes
-    num_classes = len(class_weights)
-    norm_factor = num_classes / sum(class_weights.values())
-    class_weights = {cls: weight * norm_factor for cls, weight in class_weights.items()}
+    #norm_factor = num_classes / sum(class_weights.values())
+    #class_weights = {cls: weight * norm_factor for cls, weight in class_weights.items()}
 
     return class_weights
-
 
 def create_summary_csv(train_csv, val_csv, test_csv, out_folder_path, scaler, zero_class_removed):
     train_counts, train_percentages = calculate_class_distribution_from_csv(train_csv)
