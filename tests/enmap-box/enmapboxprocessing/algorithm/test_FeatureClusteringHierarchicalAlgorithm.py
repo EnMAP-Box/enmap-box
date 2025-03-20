@@ -1,11 +1,18 @@
 from enmapboxprocessing.algorithm.featureclusteringhierarchicalalgorithm import FeatureClusteringHierarchicalAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import classifierDumpPkl
+import matplotlib
 
 
 class TestFeatureClusteringHierarchicalAlgorithm(TestCase):
 
     def test(self):
+
+        main, minor, _ = matplotlib.__version__.split('.')
+        if int(main) < 3:
+            return
+        if int(minor) < 10:
+            return
         alg = FeatureClusteringHierarchicalAlgorithm()
         alg.initAlgorithm()
         parameters = {
