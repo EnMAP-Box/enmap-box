@@ -1,5 +1,4 @@
 # required by parts of EnMAP-Box Core
-typeguard==2.13.3  # version 3.x created several problems
 astropy # required for convolution
 PyOpenGL # required by ImageCube app
 xgboost # required by XGBoost classifier/regressor, see #960

@@ -34,6 +34,7 @@ exclude =
     .git,
     # skip submodules
     enmapbox/qgispluginsupport
+    enmapbox/typeguard
     enmapbox/apps/lmuapps
     # skip external applications (too much work)
     enmapbox/apps  # external code

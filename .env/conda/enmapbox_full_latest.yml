@@ -8,7 +8,7 @@
 channels:
 - conda-forge
 dependencies:
-- qgis>=3.40.1
+- qgis>=3.40.3
 - astropy
 - catboost
 - cdsapi
@@ -32,7 +32,6 @@ dependencies:
 - pytest-xdist
 - scikit-learn>=1
 - sympy
-- typeguard=2
 - xarray
 - xgboost
 - pip:
