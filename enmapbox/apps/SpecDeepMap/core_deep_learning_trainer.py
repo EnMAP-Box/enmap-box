@@ -1,8 +1,7 @@
 import math
-import math
 from typing import Optional
 
-#import albumentations as A
+# import albumentations as A
 import lightning as L
 import numpy as np
 import pandas as pd
@@ -24,7 +23,7 @@ from enmapbox.apps.SpecDeepMap.utils_resnet import ResNet18_Weights, ResNet50_We
 
 # Data augmentation
 
-transforms_v2 =  v2.Compose([
+transforms_v2 = v2.Compose([
     v2.RandomRotation(degrees=45),
     v2.RandomHorizontalFlip(p=0.5),
     v2.RandomVerticalFlip(p=0.5),
@@ -255,7 +254,7 @@ class CustomDataset(Dataset):
             mask_array = mask
 
         elif self.remove == 'No':
-            mask_array = mask -1 # -1 because mask values from gt start at 1 upwards, to ensure same layering need to be -1
+            mask_array = mask - 1  # -1 because mask values from gt start at 1 upwards, to ensure same layering need to be -1
 
         if self.transform != None:
             mask_array = np.array(mask_array)
@@ -276,10 +275,8 @@ class CustomDataset(Dataset):
             # do preprcoessing for imagnet with this
             data_array = self.preprocess_input(data_array)
 
-
         item = {'image': data_array, 'mask': mask_array}
         return item
-
 
 
 class MyModel(L.LightningModule):
@@ -329,7 +326,6 @@ class MyModel(L.LightningModule):
         self.remove_b = self.hparams.get("remove_background_class")
         self.scaler = self.hparams.get("scaler")
 
-
         if self.classes == 1:
             # self.iou = JaccardIndex(task="binary",num_classes=self.classes, ignore_index=self.ignore_index)
             # self.val_iou = JaccardIndex(task="binary",num_classes=self.classes, ignore_index=self.ignore_index)
@@ -337,7 +333,7 @@ class MyModel(L.LightningModule):
             self.val_iou = JaccardIndex(task="binary", num_classes=self.classes)
 
 
-        elif self.classes > 1  and self.remove_b == 'Yes':
+        elif self.classes > 1 and self.remove_b == 'Yes':
             self.iou = JaccardIndex(task="multiclass", num_classes=self.classes, ignore_index=0)
             self.val_iou = JaccardIndex(task="multiclass", num_classes=self.classes, ignore_index=0)
         else:
@@ -393,7 +389,7 @@ class MyModel(L.LightningModule):
 
         x = batch["image"]
         y = batch["mask"].long()
-        #non_zero_mask = batch["zero_mask"]
+        # non_zero_mask = batch["zero_mask"]
 
         if self.acc == 'gpu':
             x, y = x.cuda(non_blocking=True), y.cuda(non_blocking=True)
@@ -402,7 +398,8 @@ class MyModel(L.LightningModule):
 
         if self.remove_b == 'Yes':
 
-            train_loss = torch.nn.CrossEntropyLoss(weight=self.class_weights, reduction="mean",ignore_index=0)(preds, y)
+            train_loss = torch.nn.CrossEntropyLoss(weight=self.class_weights, reduction="mean", ignore_index=0)(preds,
+                                                                                                                y)
 
         else:
             train_loss = torch.nn.CrossEntropyLoss(weight=self.class_weights, reduction="mean")(preds, y)
@@ -441,13 +438,12 @@ class MyModel(L.LightningModule):
 
         x = batch["image"]
         y = batch["mask"].long()  # Ground truth mask
-        #non_zero_mask = batch["zero_mask"]
+        # non_zero_mask = batch["zero_mask"]
 
         if self.acc == 'gpu':
             x, y = x.cuda(non_blocking=True), y.cuda(non_blocking=True)
 
         preds = self.forward(x)  # Model predictions
-
 
         if self.remove_b == 'Yes':
 
@@ -456,7 +452,6 @@ class MyModel(L.LightningModule):
 
         else:
             val_loss = torch.nn.CrossEntropyLoss(weight=self.class_weights, reduction="mean")(preds, y)
-
 
         # Mask the predictions for IoU computation
 
@@ -468,7 +463,6 @@ class MyModel(L.LightningModule):
         self.log_dict({'val_loss': val_loss, 'val_iou': val_iou}
                       , on_step=True, on_epoch=True, prog_bar=True, logger=True
                       )
-
 
         return {'val_loss': val_loss, 'val_iou': val_iou}  # val_iou
 
@@ -506,6 +500,7 @@ class MyModel(L.LightningModule):
             drop_last=True
         )
 
+    #
     def val_dataloader(self):
         # DataLoader class for validation
         return torch.utils.data.DataLoader(
@@ -630,7 +625,6 @@ def dl_train(
         normalization_bool=True,
         num_workers=0, num_models=1, acc_type_index=None, acc_type_numbers=1, logdirpath_model=None,
         logdirpath='./logs', tune=True, feedback: QgsProcessingFeedback = None):
-
     arch_index_options = ['Unet', 'Unet++', 'DeepLabV3+', 'JustoUNetSimple']
     arch = arch_index_options[arch_index]
 
@@ -643,7 +637,6 @@ def dl_train(
 
     elif pretrained_weights == 'Sentinel_2_TOA_Resnet50':
         backbone = 'resnet50'
-
 
     if arch == 'JustoUNetSimple':
         freeze_encoder = False
@@ -660,11 +653,11 @@ def dl_train(
     val_data_path = folder_path + '/validation_files.csv'
     summary_data_path = folder_path + '/Summary_train_val.csv'
 
-    train_data = pd.read_csv(train_data_path)
+    train_data = pd.read_csv(train_data_path)  # relative zu standort csv prüfen
     val_data = pd.read_csv(val_data_path)
     summary_data = pd.read_csv(summary_data_path)
 
-
+    # from pathlib import Path
 
     # read from csv
     remove_zero_class = summary_data['Ignored Background : Class Zero'].tolist()[0]
@@ -673,12 +666,11 @@ def dl_train(
     if remove_zero_class == 'Yes':
         n_classes = len(summary_data['Class ID'].tolist()) + 1
         print(n_classes)
-        print('removed:',n_classes)
-    elif remove_zero_class == 'No' :
-        print('remove',remove_zero_class)
+        print('removed:', n_classes)
+    elif remove_zero_class == 'No':
+        print('remove', remove_zero_class)
         n_classes = len(summary_data['Class ID'].tolist())
         print('not removed:', n_classes)
-
 
     scaler_list = summary_data['Scaler'].tolist()
     scaler = scaler_list[0]
@@ -812,7 +804,8 @@ def dl_train(
     if early_stop == True:
         early_stopping_callback = EarlyStopping("val_iou", mode="max", verbose=True, patience=20)
 
-        checkpoint_callback = ModelCheckpoint(dirpath=logdirpath_model, monitor='val_iou_epoch',  # ,monitor='val_iou_epoch'
+        checkpoint_callback = ModelCheckpoint(dirpath=logdirpath_model, monitor='val_iou_epoch',
+                                              # ,monitor='val_iou_epoch'
                                               filename='{epoch:05d}-val_iou_{val_iou_epoch:.4f}', save_top_k=num_models,
                                               auto_insert_metric_name=False)
 
@@ -827,8 +820,6 @@ def dl_train(
             log_every_n_steps=1,
             callbacks=[checkpoint_callback, early_stopping_callback, feedback_callback],
         )
-
-
 
         if tune == True:
             tuner = Tuner(trainer)
@@ -847,7 +838,8 @@ def dl_train(
 
     else:
 
-        checkpoint_callback = ModelCheckpoint(dirpath=logdirpath_model, monitor='val_iou_epoch',  # ,monitor='val_iou_epoch'
+        checkpoint_callback = ModelCheckpoint(dirpath=logdirpath_model, monitor='val_iou_epoch',
+                                              # ,monitor='val_iou_epoch'
                                               filename='{epoch:05d}-val_iou_{val_iou_epoch:.4f}', save_top_k=num_models,
                                               auto_insert_metric_name=False)
 
@@ -879,5 +871,3 @@ def dl_train(
             model.hparams.lr = new_lr
 
         trainer.fit(model)
-
-

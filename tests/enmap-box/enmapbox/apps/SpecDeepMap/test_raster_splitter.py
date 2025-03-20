@@ -1,69 +1,71 @@
-from os.path import join, dirname
-from qgis.core import QgsProcessingFeedback, QgsApplication, QgsProcessingAlgorithm
-from processing.core.Processing import Processing
-from enmapbox.apps.SpecDeepMap.processing_algorithm_raster_splitter import RasterSplitter
-from enmapbox import exampledata
 import glob
-from enmapboxprocessing.testcase import TestCase
 import os
 import shutil
+from os.path import join, dirname
+
+from processing.core.Processing import Processing
+from qgis.core import QgsProcessingAlgorithm
+
+from enmapbox import exampledata
+from enmapbox.apps.SpecDeepMap.processing_algorithm_raster_splitter import RasterSplitter
+from enmapboxprocessing.testcase import TestCase
+
 
 class TestRasterSplitter(TestCase):
 
     def test_init(self):
 
-      # init QGIS
-      #qgsApp = QgsApplication([], True)
-      #qgsApp.initQgis()
-      #qgsApp.messageLog().messageReceived.connect(lambda *args: print(args[0]))
+        # init QGIS
+        # qgsApp = QgsApplication([], True)
+        # qgsApp.initQgis()
+        # qgsApp.messageLog().messageReceived.connect(lambda *args: print(args[0]))
 
-      # init processing framework
-      Processing.initialize()
+        # init processing framework
+        Processing.initialize()
 
-      # run algorithm
-      alg = RasterSplitter()
-      self.assertIsInstance(alg, QgsProcessingAlgorithm)
+        # run algorithm
+        alg = RasterSplitter()
+        self.assertIsInstance(alg, QgsProcessingAlgorithm)
 
-      # Get the script's directory (makes paths relative)
-      BASE_DIR = dirname(__file__)
+        # Get the script's directory (makes paths relative)
+        BASE_DIR = dirname(__file__)
 
-      # Define paths using relative references
-      input_l_path = join(BASE_DIR,
-                          "../../../../testdata/external/specdeepmap/test_requierments/enmap_landcover_unstyled.tif")
-      folder_path = join(BASE_DIR, "test_run/")
+        # Define paths using relative references
+        input_l_path = join(BASE_DIR,
+                            "../../../../testdata/external/specdeepmap/test_requierments/enmap_landcover_unstyled.tif")
+        folder_path = join(BASE_DIR, "test_run/")
 
-      folder_path_images = join(BASE_DIR, "test_run/images")
+        folder_path_images = join(BASE_DIR, "test_run/images")
 
-      io = {alg.INPUT_I: exampledata.enmap,
-                alg.INPUT_L: input_l_path,
-                alg.P_tile_x: 32,
-                alg.P_tile_y: 32,
-                alg.P_step_x: 32,
-                alg.P_step_y: 32,
-                alg.Percent_null: 10,
-                alg.P_OUTPUT_F: folder_path}
+        io = {alg.INPUT_I: exampledata.enmap,
+              alg.INPUT_L: input_l_path,
+              alg.P_tile_x: 32,
+              alg.P_tile_y: 32,
+              alg.P_step_x: 32,
+              alg.P_step_y: 32,
+              alg.Percent_null: 10,
+              alg.P_OUTPUT_F: folder_path}
 
-      result = Processing.runAlgorithm(alg, parameters=io)
+        result = Processing.runAlgorithm(alg, parameters=io)
 
-      print(result)
+        print(result)
 
-       # Change to your folder path
-      tif_files = glob.glob(f"{folder_path_images}/*.tif")
-      num_tif_files = len(tif_files)# List all .tif files
-      assert num_tif_files == 18, f"Error: Expected 18 .tif files, but found {num_tif_files}"
-      self.assertEqual(num_tif_files, 18, f"Error: Expected 18 .tif files, but found {num_tif_files}")
+        # Change to your folder path
+        tif_files = glob.glob(f"{folder_path_images}/*.tif")
+        num_tif_files = len(tif_files)  # List all .tif files
+        assert num_tif_files == 18, f"Error: Expected 18 .tif files, but found {num_tif_files}"
+        self.assertEqual(num_tif_files, 18, f"Error: Expected 18 .tif files, but found {num_tif_files}")
 
-# Clean up
+        # Clean up
 
-      folder_path_images = join(BASE_DIR, "test_run/images")
+        folder_path_images = join(BASE_DIR, "test_run/images")
 
-
-      if os.path.exists(folder_path_images):
+        if os.path.exists(folder_path_images):
             shutil.rmtree(folder_path_images)  # Deletes folder and all its contents
             print(f"Deleted folder: {folder_path_images}")
 
-      folder_path_labels = join(BASE_DIR, "test_run/labels")
+        folder_path_labels = join(BASE_DIR, "test_run/labels")
 
-      if os.path.exists(folder_path_labels):
+        if os.path.exists(folder_path_labels):
             shutil.rmtree(folder_path_labels)  # Deletes folder and all its contents
             print(f"Deleted folder: {folder_path_labels}")
