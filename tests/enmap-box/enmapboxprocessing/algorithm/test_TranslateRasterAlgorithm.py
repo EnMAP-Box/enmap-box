@@ -186,7 +186,7 @@ class TestTranslateAlgorithm(TestCase):
             return  # skip test because of a value-rounding bug in GDAL
 
         self.assertEqual(470, int(raster.wavelength(1)))
-        self.assertEqual(raster.fwhm(1) in 5.8)
+        self.assertEqual(raster.fwhm(1), 5.8)
         self.assertEqual(1, raster.badBandMultiplier(1))
 
     def test_copyMetadata2(self):
