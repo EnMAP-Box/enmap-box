@@ -8,7 +8,7 @@ from osgeo import gdal, gdal_array
 from osgeo.osr import SpatialReference
 
 from enmapbox.qgispluginsupport.qps.qgsrasterlayerproperties import QgsRasterLayerSpectralProperties
-from enmapbox.testing import TestCase, start_app
+from enmapbox.testing import start_app, TestCase
 from enmapboxprocessing.rasterreader import RasterReader
 from qgis.core import QgsRasterLayer
 
@@ -167,8 +167,12 @@ class EOMetadataReadingTests(TestCase):
 
         reader = RasterReader(layer)
         for b in range(layer.bandCount()):
-            self.assertWavelengthsEqual(reader.wavelength(b + 1), reader.wavelengthUnits(b + 1),
-                                        wl[b], wlu[b])
+            wl1 = reader.wavelength(b + 1)
+            wlu1 = reader.wavelengthUnits(b + 1)
+            wl2 = wl[b]
+            wlu2 = wlu[b]
+            self.assertWavelengthsEqual(wl1, wlu1,
+                                        wl2, wlu2)
 
     def test_overwrite_by_custom_properties(self):
 
