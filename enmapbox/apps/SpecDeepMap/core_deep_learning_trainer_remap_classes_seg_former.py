@@ -1,8 +1,8 @@
 import math
-import math
+from pathlib import Path
 from typing import Optional
 
-#import albumentations as A
+# import albumentations as A
 import lightning as L
 import numpy as np
 import pandas as pd
@@ -24,7 +24,7 @@ from enmapbox.apps.SpecDeepMap.utils_resnet import ResNet18_Weights, ResNet50_We
 
 # Data augmentation
 
-transforms_v2 =  v2.Compose([
+transforms_v2 = v2.Compose([
     v2.RandomRotation(degrees=45),
     v2.RandomHorizontalFlip(p=0.5),
     v2.RandomVerticalFlip(p=0.5),
@@ -214,7 +214,7 @@ class CustomDataset(Dataset):
             preprocess_input: Optional = None,
             remove: Optional = None,
             scaler_loader: Optional = None,
-            remap: Optional=None,
+            remap: Optional = None,
             # Use A.Compose for transforms
     ):
         """
@@ -256,7 +256,7 @@ class CustomDataset(Dataset):
         mask_array = mask
         mask_array = torch.take(self.remap, mask_array)
 
-            #mask_array = mask -1 # -1 because mask values from gt start at 1 upwards, to ensure class values below layer number -1 just works for continues classes
+        # mask_array = mask -1 # -1 because mask values from gt start at 1 upwards, to ensure class values below layer number -1 just works for continues classes
 
         if self.transform != None:
             mask_array = np.array(mask_array)
@@ -277,10 +277,8 @@ class CustomDataset(Dataset):
             # do preprcoessing for imagnet with this
             data_array = self.preprocess_input(data_array)
 
-
         item = {'image': data_array, 'mask': mask_array}
         return item
-
 
 
 class MyModel(L.LightningModule):
@@ -329,10 +327,9 @@ class MyModel(L.LightningModule):
         self.counter = 0
         self.remove_b = self.hparams.get("remove_background_class")
         self.scaler = self.hparams.get("scaler")
-        self.reclass_look_up_table=self.hparams.get("look_up_table")
-        self.reverse_look_up_table=self.hparams.get("reverse_look_up_table")
+        self.reclass_look_up_table = self.hparams.get("look_up_table")
+        self.reverse_look_up_table = self.hparams.get("reverse_look_up_table")
         self.class_values = self.hparams.get("class_values")
-
 
         if self.classes == 1:
             # self.iou = JaccardIndex(task="binary",num_classes=self.classes, ignore_index=self.ignore_index)
@@ -341,7 +338,7 @@ class MyModel(L.LightningModule):
             self.val_iou = JaccardIndex(task="binary", num_classes=self.classes)
 
 
-        elif self.classes > 1  and self.remove_b == 'Yes':
+        elif self.classes > 1 and self.remove_b == 'Yes':
             self.iou = JaccardIndex(task="multiclass", num_classes=self.classes, ignore_index=0)
             self.val_iou = JaccardIndex(task="multiclass", num_classes=self.classes, ignore_index=0)
         else:
@@ -399,7 +396,7 @@ class MyModel(L.LightningModule):
 
         x = batch["image"]
         y = batch["mask"].long()
-        #non_zero_mask = batch["zero_mask"]
+        # non_zero_mask = batch["zero_mask"]
 
         if self.acc == 'gpu':
             x, y = x.cuda(non_blocking=True), y.cuda(non_blocking=True)
@@ -408,7 +405,8 @@ class MyModel(L.LightningModule):
 
         if self.remove_b == 'Yes':
 
-            train_loss = torch.nn.CrossEntropyLoss(weight=self.class_weights, reduction="mean",ignore_index=0)(preds, y)
+            train_loss = torch.nn.CrossEntropyLoss(weight=self.class_weights, reduction="mean", ignore_index=0)(preds,
+                                                                                                                y)
 
         else:
             train_loss = torch.nn.CrossEntropyLoss(weight=self.class_weights, reduction="mean")(preds, y)
@@ -447,13 +445,12 @@ class MyModel(L.LightningModule):
 
         x = batch["image"]
         y = batch["mask"].long()  # Ground truth mask
-        #non_zero_mask = batch["zero_mask"]
+        # non_zero_mask = batch["zero_mask"]
 
         if self.acc == 'gpu':
             x, y = x.cuda(non_blocking=True), y.cuda(non_blocking=True)
 
         preds = self.forward(x)  # Model predictions
-
 
         if self.remove_b == 'Yes':
 
@@ -462,7 +459,6 @@ class MyModel(L.LightningModule):
 
         else:
             val_loss = torch.nn.CrossEntropyLoss(weight=self.class_weights, reduction="mean")(preds, y)
-
 
         # Mask the predictions for IoU computation
 
@@ -474,7 +470,6 @@ class MyModel(L.LightningModule):
         self.log_dict({'val_loss': val_loss, 'val_iou': val_iou}
                       , on_step=True, on_epoch=True, prog_bar=True, logger=True
                       )
-
 
         return {'val_loss': val_loss, 'val_iou': val_iou}  # val_iou
 
@@ -497,7 +492,7 @@ class MyModel(L.LightningModule):
         pred1 = torch.softmax(logits, dim=1)
 
         pred2 = torch.argmax(pred1, dim=1)
-  # Take the class with the highest probability
+        # Take the class with the highest probability
 
         # remap to org class values        pred3 = mask_aray = torch.take(self.reverse_look_up_table, pred2)
         pred3 = torch.take(self.reverse_look_up_table, pred2)
@@ -647,8 +642,7 @@ def dl_train(
         normalization_bool=True,
         num_workers=0, num_models=1, acc_type_index=None, acc_type_numbers=1, logdirpath_model=None,
         logdirpath='./logs', tune=True, feedback: QgsProcessingFeedback = None):
-
-    arch_index_options = ['Unet', 'Unet++', 'DeepLabV3+','SegFormer','JustoUNetSimple']
+    arch_index_options = ['Unet', 'Unet++', 'DeepLabV3+', 'SegFormer', 'JustoUNetSimple']
     arch = arch_index_options[arch_index]
 
     pretrained_weights_options = ['imagenet', None, 'Sentinel_2_TOA_Resnet18',
@@ -660,7 +654,6 @@ def dl_train(
 
     elif pretrained_weights == 'Sentinel_2_TOA_Resnet50':
         backbone = 'resnet50'
-
 
     if arch == 'JustoUNetSimple':
         freeze_encoder = False
@@ -678,10 +671,16 @@ def dl_train(
     summary_data_path = folder_path + '/Summary_train_val.csv'
 
     train_data = pd.read_csv(train_data_path)
+    for col in ["image", "mask"]:
+        train_data[col] = train_data[col].apply(lambda rel_path: str(folder_path / Path(rel_path)))
+
     val_data = pd.read_csv(val_data_path)
+    for col in ["image", "mask"]:
+        val_data[col] = val_data[col].apply(lambda rel_path: str(folder_path / Path(rel_path)))
+
+    print(val_data.head())
+
     summary_data = pd.read_csv(summary_data_path)
-
-
 
     # read from csv
     remove_zero_class = summary_data['Ignored Background : Class Zero'].tolist()[0]
@@ -691,7 +690,7 @@ def dl_train(
     if remove_zero_class == 'Yes':
         n_classes = len(summary_data['Class ID'].tolist()) + 1
         # Create a remapping dictionary
-        print('removed:',n_classes)
+        print('removed:', n_classes)
         # Create a remapping dictionary
         class_ids = summary_data['Class ID'].tolist()
         reclass_dict = {0: 0}  # Keep 0 as 0
@@ -710,16 +709,16 @@ def dl_train(
     # remapping look up tables for train and prediction
 
     elif remove_zero_class == 'No':
-        print('remove',remove_zero_class)
+        print('remove', remove_zero_class)
         n_classes = len(summary_data['Class ID'].tolist())
         print(n_classes)
 
         # Create a remapping dictionary
         class_ids = summary_data['Class ID'].tolist()
-        reclass_dict = {class_ids[i]:i  for i in range(len(class_ids))}
+        reclass_dict = {class_ids[i]: i for i in range(len(class_ids))}
         max_class_id = max(reclass_dict.keys())  # Find the maximum class ID
-        lookup_table = np.zeros(max_class_id +1, dtype=np.int64)
-        print('reclass dict',reclass_dict)# Initialize with zeros
+        lookup_table = np.zeros(max_class_id + 1, dtype=np.int64)
+        print('reclass dict', reclass_dict)  # Initialize with zeros
 
         # Fill the lookup table
         for key, value in reclass_dict.items():
@@ -733,7 +732,7 @@ def dl_train(
 
     # Reverse lookup table for decoding
     max_reclass_id = max(reverse_reclass_dict.keys())  # Max original class ID
-    reverse_lookup_table = np.zeros(max_reclass_id+1, dtype=np.int64)
+    reverse_lookup_table = np.zeros(max_reclass_id + 1, dtype=np.int64)
     print('reverse_class_dict', reverse_reclass_dict)
     for key, value in reverse_reclass_dict.items():
         reverse_lookup_table[key] = value
@@ -741,7 +740,7 @@ def dl_train(
     cls_values = list(reclass_dict.keys())
     print('class_values_reclass dict', cls_values)
     cls_values = [cls for cls in cls_values if cls != 0]
-    print('filtered 0 from cls_values',cls_values)
+    print('filtered 0 from cls_values', cls_values)
 
     # Convert to PyTorch tensors
     reverse_lookup_table_tensor = torch.tensor(reverse_lookup_table, dtype=torch.int64)
@@ -847,10 +846,9 @@ def dl_train(
             "preprocess": preprocess_input,
             "remove_background_class": remove_zero_class,
             "scaler": scaler_value,
-            "look_up_table":lookup_table_tensor,
-            "reverse_look_up_table":reverse_lookup_table_tensor,
-            "class_values":cls_values
-
+            "look_up_table": lookup_table_tensor,
+            "reverse_look_up_table": reverse_lookup_table_tensor,
+            "class_values": cls_values
 
         }
         # feedback = feedback
@@ -882,9 +880,9 @@ def dl_train(
                                                       "preprocess": preprocess_input,
                                                       "remove_background_class": remove_zero_class,
                                                       "scaler": scaler_value,
-                                                      "look_up_table":lookup_table_tensor,
-                                                      "reverse_look_up_tabe":reverse_lookup_table_tensor,
-                                                      "class_values":cls_values},
+                                                      "look_up_table": lookup_table_tensor,
+                                                      "reverse_look_up_tabe": reverse_lookup_table_tensor,
+                                                      "class_values": cls_values},
                                              map_location=acc_type
                                              )
 
@@ -892,7 +890,8 @@ def dl_train(
     if early_stop == True:
         early_stopping_callback = EarlyStopping("val_iou", mode="max", verbose=True, patience=20)
 
-        checkpoint_callback = ModelCheckpoint(dirpath=logdirpath_model, monitor='val_iou_epoch',  # ,monitor='val_iou_epoch'
+        checkpoint_callback = ModelCheckpoint(dirpath=logdirpath_model, monitor='val_iou_epoch',
+                                              # ,monitor='val_iou_epoch'
                                               filename='{epoch:05d}-val_iou_{val_iou_epoch:.4f}', save_top_k=num_models,
                                               auto_insert_metric_name=False)
 
@@ -907,8 +906,6 @@ def dl_train(
             log_every_n_steps=1,
             callbacks=[checkpoint_callback, early_stopping_callback, feedback_callback],
         )
-
-
 
         if tune == True:
             tuner = Tuner(trainer)
@@ -929,7 +926,8 @@ def dl_train(
 
     else:
 
-        checkpoint_callback = ModelCheckpoint(dirpath=logdirpath_model, monitor='val_iou_epoch',  # ,monitor='val_iou_epoch'
+        checkpoint_callback = ModelCheckpoint(dirpath=logdirpath_model, monitor='val_iou_epoch',
+                                              # ,monitor='val_iou_epoch'
                                               filename='{epoch:05d}-val_iou_{val_iou_epoch:.4f}', save_top_k=num_models,
                                               auto_insert_metric_name=False)
 
@@ -963,6 +961,5 @@ def dl_train(
             feedback.pushInfo(f"learning rate finder suggested and used: {new_lr} as learning rate for training")
 
         trainer.fit(model)
-
 
     return model
