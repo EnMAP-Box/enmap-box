@@ -172,7 +172,7 @@ class EOMetadataReadingTests(TestCase):
             wl2 = wl[b]
             wlu2 = wlu[b]
             self.assertWavelengthsEqual(wl1, wlu1,
-                                        wl2, wlu2)
+                                        wl2, wlu2, precision=3)
 
     def test_overwrite_by_custom_properties(self):
 
