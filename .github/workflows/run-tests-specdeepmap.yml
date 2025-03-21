@@ -1,0 +1,81 @@
+name: 🐍 Conda Environments
+
+on:
+  push:
+    branches:
+      - main
+      - release-**
+      - release_**
+
+  pull_request:
+    branches:
+      - main
+      - release-**
+      - release_**
+
+  release:
+    types: [ published ]
+
+jobs:
+  # Run EnMAP-Box tests
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+
+    env:
+      QT_QPA_PLATFORM: offscreen
+      CI: true
+
+    strategy:
+      fail-fast: true
+      matrix:
+        mamba_env: [ enmapbox_specdeepmap ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Environment Info
+        run: |
+          lsb_release -a
+
+      - name: Conda environment file
+        run: |
+          echo "conda environment file: ${{matrix.mamba_env}}.yml"
+          cat .env/conda/${{matrix.mamba_env}}.yml
+
+      - name: Setup Miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          # miniforge-variant: Mambaforge
+          # miniforge-version: latest
+          channels: conda-forge,defaults
+          channel-priority: true
+          activate-environment: ${{matrix.mamba_env}}
+          environment-file: .env/conda/${{matrix.mamba_env}}.yml
+          clean-patched-environment-file: false
+          # use-mamba: true
+          # auto-activate-base: false
+      - name: Conda Environment Info
+        run: |
+          conda info
+          conda list
+
+      - name: Python, QGIS and GDAL versions
+        run: |
+          python --version
+          qgis --version
+          gdalinfo --version
+          python -c "from osgeo.gdal import VersionInfo;print(f'Python-GDAL:{VersionInfo('')} {VersionInfo()}');"
+
+
+      - name: Setup Repository
+        run: |
+          python scripts/setup_repository.py
+
+      - name: Test EnMAP-Box in ${{matrix.mamba_env}}
+        run: |
+          python3 -m unittest discover -s tests/enmap-box/enmapbox/apps/SpecDeepMap -t tests\enmap-box\enmapbox\apps\SpecDeepMap
