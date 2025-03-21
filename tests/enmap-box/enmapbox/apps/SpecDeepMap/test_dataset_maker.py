@@ -1,15 +1,21 @@
 import glob
 import os
-from os.path import join, dirname
+from os.path import join
+from pathlib import Path
 
 import pandas as pd
 from processing.core.Processing import Processing
 
+from enmapbox import DIR_UNITTESTS
 from enmapbox.apps.SpecDeepMap.processing_algorithm_dataset_maker import DatasetMaker
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
 
 start_app()
+
+BASE_TESTDATA = Path(DIR_UNITTESTS) / 'testdata/external/specdeepmap'
+
+BASE_DIR = Path(__file__).parent
 
 
 class Test_Dataset_Maker(TestCase):
@@ -28,12 +34,12 @@ class Test_Dataset_Maker(TestCase):
         alg = DatasetMaker()
 
         # Get the script's directory (makes paths relative)
-        BASE_DIR = dirname(__file__)
+        # BASE_DIR = dirname(__file__)
 
-        folder_path_in = join(BASE_DIR, "../../../../testdata/external/specdeepmap/test_requierments/")
-        folder_path_out = join(BASE_DIR, "test_run/")
+        folder_path_in = BASE_TESTDATA / 'test_requierments'
+        folder_path_out = BASE_DIR / "test_run"
 
-        io = {alg.Train_Val_folder: folder_path_in,
+        io = {alg.Train_Val_folder: str(folder_path_in),
               alg.N_train: 80,
               alg.N_test: 10,
               alg.N_val: 10,
@@ -41,7 +47,7 @@ class Test_Dataset_Maker(TestCase):
               alg.scaler: 10000,
               alg.normalize: True,
               alg.N_permute: 100,
-              alg.Output_path: folder_path_out}
+              alg.Output_path: str(folder_path_out)}
 
         result = Processing.runAlgorithm(alg, parameters=io)
 

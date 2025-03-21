@@ -12,7 +12,7 @@ from torchvision.transforms import v2
 
 from enmapbox import DIR_UNITTESTS
 from enmapbox.apps.SpecDeepMap import DL_Trainer
-from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer_remap_classes import MyModel
+from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer_remap_classes_seg_former import MyModel
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
 
@@ -54,7 +54,7 @@ class Test_Deep_Learning_Trainer(TestCase):
                 os.remove(file_path)
 
         io = {alg.train_val_input_folder: folder_path_input,
-              alg.arch: 3,
+              alg.arch: 4,
               alg.backbone: 'resnet18',
               alg.pretrained_weights: 1,
               alg.freeze_encoder: False,

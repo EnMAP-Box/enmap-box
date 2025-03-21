@@ -1,10 +1,11 @@
 import os
 import shutil
-from os.path import join, dirname
+from pathlib import Path
 
 import psutil
 from processing.core.Processing import Processing
 
+from enmapbox import DIR_UNITTESTS
 from enmapbox.apps.SpecDeepMap.processing_algorithm_tensorboard_visualizer import Tensorboard_visualizer
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
@@ -28,10 +29,11 @@ class Test_Tensorboard(TestCase):
         alg = Tensorboard_visualizer()
 
         # Define paths
-        BASE_DIR = dirname(__file__)
-        folder_path_logs = join(BASE_DIR, "../../../../testdata/external/specdeepmap/test_requierments/")
+        BASE_DIR = Path(__file__).parent
+        BASE_TESTDATA = Path(DIR_UNITTESTS) / 'testdata/external/specdeepmap'
+        folder_path_logs = BASE_TESTDATA / "test_requierments"
 
-        io = {alg.TENSORBOARD_LOGDIR: folder_path_logs,
+        io = {alg.TENSORBOARD_LOGDIR: str(folder_path_logs),
               alg.TENSORBOARD_PORT: 6006}
 
         result = Processing.runAlgorithm(alg, parameters=io)
@@ -59,7 +61,7 @@ class Test_Tensorboard(TestCase):
         process.kill()
 
         # Remove logg folder
-        folder_path_logs_out = join(BASE_DIR, "test_run/lightning_logs")
+        folder_path_logs_out = BASE_DIR / "test_run" / "lightning_logs"
 
-        if os.path.exists(folder_path_logs_out):
-            shutil.rmtree(folder_path_logs_out)
+        if os.path.exists(str(folder_path_logs_out)):
+            shutil.rmtree(str(folder_path_logs_out))
