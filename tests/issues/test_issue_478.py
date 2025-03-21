@@ -2,15 +2,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from qgis._core import QgsMultiBandColorRenderer, QgsRasterLayer
-from qgis._gui import QgsMapCanvas
-
+from qgis.core import QgsMultiBandColorRenderer, QgsProject, QgsRasterLayer
+from qgis.gui import QgsMapCanvas
 from enmapbox.gui.datasources.manager import DataSourceManagerTreeView
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.qgsrasterlayerproperties import QgsRasterLayerSpectralProperties
 from enmapbox.testing import EnMAPBoxTestCase, start_app, TestObjects
 from qgis.PyQt.QtWidgets import QTreeView
-from qgis.core import QgsProject
 
 start_app()
 
