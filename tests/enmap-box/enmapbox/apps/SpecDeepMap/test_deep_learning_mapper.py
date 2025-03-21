@@ -1,18 +1,21 @@
 import os
 import re
+import unittest
 from pathlib import Path
 
-import pandas as pd
 from osgeo import gdal, ogr
-from processing.core.Processing import Processing
 
-from enmapbox import DIR_UNITTESTS
-from enmapbox import exampledata
-from enmapbox.apps.SpecDeepMap.processing_algorithm_deep_learning_mapper import DL_Mapper
+from processing.core.Processing import Processing
+from enmapbox import DIR_UNITTESTS, exampledata
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
+from enmapbox.apps.SpecDeepMap import import_error
 
-start_app()
+if not import_error:
+    import pandas as pd
+    from enmapbox.apps.SpecDeepMap.processing_algorithm_deep_learning_mapper import DL_Mapper
+
+    start_app()
 
 
 def best_ckpt_path(checkpoint_dir):
@@ -27,6 +30,7 @@ BASE_TESTDATA = Path(DIR_UNITTESTS) / 'testdata/external/specdeepmap'
 BASE_DIR = Path(__file__).parent
 
 
+@unittest.skipIf(import_error, f'Missing modules to run SpecDeepMap: {import_error}')
 class Test_Deep_Learning_Mapper(TestCase):
 
     def test_iou_mapper(self):

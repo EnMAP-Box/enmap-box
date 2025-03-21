@@ -2,19 +2,22 @@ import glob
 import os
 import shutil
 from pathlib import Path
+import unittest
 
 from processing.core.Processing import Processing
 from qgis.core import QgsProcessingAlgorithm
-
-from enmapbox import DIR_UNITTESTS
-from enmapbox import exampledata
-from enmapbox.apps.SpecDeepMap.processing_algorithm_raster_splitter import RasterSplitter
+from enmapbox import DIR_UNITTESTS, exampledata
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
+from enmapbox.apps.SpecDeepMap import import_error
 
-start_app()
+if not import_error:
+    from enmapbox.apps.SpecDeepMap.processing_algorithm_raster_splitter import RasterSplitter
+
+    start_app()
 
 
+@unittest.skipIf(import_error, f'Missing modules to run SpecDeepMap: {import_error}')
 class TestRasterSplitter(TestCase):
 
     def test_init(self):

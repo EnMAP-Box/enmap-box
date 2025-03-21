@@ -2,22 +2,26 @@ import glob
 import os
 from os.path import join
 from pathlib import Path
+import unittest
 
-import pandas as pd
 from processing.core.Processing import Processing
-
 from enmapbox import DIR_UNITTESTS
-from enmapbox.apps.SpecDeepMap.processing_algorithm_dataset_maker import DatasetMaker
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
+from enmapbox.apps.SpecDeepMap import import_error
 
-start_app()
+if not import_error:
+    import pandas as pd
+    from enmapbox.apps.SpecDeepMap.processing_algorithm_dataset_maker import DatasetMaker
+
+    start_app()
 
 BASE_TESTDATA = Path(DIR_UNITTESTS) / 'testdata/external/specdeepmap'
 
 BASE_DIR = Path(__file__).parent
 
 
+@unittest.skipIf(import_error, f'Missing modules to run SpecDeepMap: {import_error}')
 class Test_Dataset_Maker(TestCase):
 
     def test_init(self):

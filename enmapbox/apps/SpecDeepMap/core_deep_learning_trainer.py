@@ -13,7 +13,7 @@ from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 from lightning.pytorch.loggers import TensorBoardLogger
 from lightning.pytorch.tuner import Tuner
 from osgeo import gdal  # Import the gdal module
-from qgis._core import QgsProcessingFeedback
+from qgis.core import QgsProcessingFeedback
 from torch.utils.data import Dataset
 from torchmetrics import JaccardIndex
 from torchvision import transforms

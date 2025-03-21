@@ -9,8 +9,10 @@ try:
     from enmapbox.apps.SpecDeepMap.processing_algorithm_tester import DL_Tester
 
     wrongEnv = False
+    import_error = None
 except Exception as ex:
     wrongEnv= True
+    import_error = ex
 
 #test
 
