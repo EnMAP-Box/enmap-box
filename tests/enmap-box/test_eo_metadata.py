@@ -167,12 +167,12 @@ class EOMetadataReadingTests(TestCase):
 
         reader = RasterReader(layer)
         for b in range(layer.bandCount()):
-            wl1 = reader.wavelength(b + 1)
             wlu1 = reader.wavelengthUnits(b + 1)
+            wl1 = reader.wavelength(b + 1, wlu1)
             wl2 = wl[b]
             wlu2 = wlu[b]
             self.assertWavelengthsEqual(wl1, wlu1,
-                                        wl2, wlu2)
+                                        wl2, wlu2, precision=3)
 
     def test_overwrite_by_custom_properties(self):
 
