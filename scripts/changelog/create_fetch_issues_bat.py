@@ -1,4 +1,4 @@
-nIssues = 1000
+nIssues = 1100
 
 # create fetch_issues.bat
 with open('fetch_issues.bat', 'w') as file:

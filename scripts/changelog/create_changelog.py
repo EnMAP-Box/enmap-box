@@ -3,11 +3,12 @@ import warnings
 from collections import defaultdict
 from os.path import abspath, join
 
-currentDevVersion = '3.15'
-currentDevReleaseDate = '2024-10-01'
+currentDevVersion = '3.16'
+currentDevReleaseDate = '2024-21-03'
 skipDevVersion = not True
 
 releaseHeader = {
+    '3.16': 'This release was tested under QGIS 3.40 (LTR) and 3.42 (latest release).',
     '3.15': 'This release was tested under QGIS 3.34 (LTR) and 3.38 (latest release).',
     '3.14': 'This release was tested under QGIS 3.34 (LTR) and 3.36 (latest release).',
     '3.13': 'This release was tested under QGIS 3.28 (LTR), 3.32 and 3.34 (latest release).',
