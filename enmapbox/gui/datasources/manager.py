@@ -5,34 +5,32 @@ import pickle
 import re
 import warnings
 import webbrowser
-from os.path import exists, sep, dirname
-from typing import List, Union, Any, Dict
+from os.path import dirname, exists, sep
+from typing import Any, Dict, List, Union
 
 import numpy as np
-from qgis.PyQt.QtCore import QAbstractItemModel, QItemSelectionModel, QFileInfo, QFile, QTimer, \
-    QMimeData, QModelIndex, Qt, QUrl, QSortFilterProxyModel, pyqtSignal
-from qgis.PyQt.QtGui import QContextMenuEvent, QDesktopServices
-from qgis.PyQt.QtWidgets import QWidget, QDialog, QMenu, QAction, QApplication, QAbstractItemView, QTreeView
-from qgis.core import QgsLayerTreeGroup, QgsLayerTreeLayer, QgsMapLayer, QgsProject, QgsRasterLayer, \
-    QgsRasterDataProvider, QgsRasterRenderer, QgsVectorLayer, QgsDataItem, QgsLayerItem, Qgis
-from qgis.core import QgsMimeDataUtils
-from qgis.core import QgsProviderRegistry, QgsProviderSublayerDetails
-from qgis.gui import QgisInterface, QgsMapCanvas, QgsDockWidget
 
-from enmapbox.gui.datasources.datasourcesets import DataSourceSet, ModelDataSourceSet, VectorDataSourceSet, \
-    FileDataSourceSet, RasterDataSourceSet
+from qgis.PyQt.QtCore import pyqtSignal, QAbstractItemModel, QFile, QFileInfo, QItemSelectionModel, QMimeData, \
+    QModelIndex, QSortFilterProxyModel, Qt, QTimer, QUrl
+from qgis.PyQt.QtGui import QContextMenuEvent, QDesktopServices
+from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QApplication, QDialog, QMenu, QTreeView, QWidget
+from qgis.core import Qgis, QgsDataItem, QgsLayerItem, QgsLayerTreeGroup, QgsLayerTreeLayer, QgsMapLayer, \
+    QgsMimeDataUtils, QgsProject, QgsProviderRegistry, QgsProviderSublayerDetails, QgsRasterDataProvider, \
+    QgsRasterLayer, QgsRasterRenderer, QgsVectorLayer
+from qgis.gui import QgisInterface, QgsDockWidget, QgsMapCanvas
+from enmapbox.gui.datasources.datasourcesets import DataSourceSet, FileDataSourceSet, ModelDataSourceSet, \
+    RasterDataSourceSet, VectorDataSourceSet
 from enmapbox.gui.utils import enmapboxUiPath
 from enmapbox.qgispluginsupport.qps.layerproperties import defaultRasterRenderer
-from enmapbox.qgispluginsupport.qps.models import TreeModel, TreeView, TreeNode, PyObjectTreeNode
-from enmapbox.qgispluginsupport.qps.utils import defaultBands, bandClosestToWavelength, loadUi, qgisAppQgisInterface
+from enmapbox.qgispluginsupport.qps.models import PyObjectTreeNode, TreeModel, TreeNode, TreeView
+from enmapbox.qgispluginsupport.qps.utils import bandClosestToWavelength, defaultBands, loadUi, qgisAppQgisInterface
 from enmapbox.typeguard import typechecked
-
-from .datasources import DataSource, SpatialDataSource, VectorDataSource, RasterDataSource, \
-    ModelDataSource, FileDataSource, LayerItem
+from .datasources import DataSource, FileDataSource, LayerItem, ModelDataSource, RasterDataSource, SpatialDataSource, \
+    VectorDataSource
 from .metadata import RasterBandTreeNode
 from ..dataviews.docks import Dock
 from ..mapcanvas import MapCanvas
-from ..mimedata import MDF_URILIST, QGIS_URILIST_MIMETYPE, extractMapLayers, fromDataSourceList
+from ..mimedata import extractMapLayers, fromDataSourceList, MDF_URILIST, QGIS_URILIST_MIMETYPE
 from ...qgispluginsupport.qps.speclib.core import is_spectral_library
 from ...qgispluginsupport.qps.subdatasets import SubDatasetSelectionDialog
 
@@ -442,8 +440,9 @@ class DataSourceManagerTreeView(TreeView):
         mapCanvas: QgsMapCanvas = action.mapCanvas
         self.openInMap(node.rasterSource(), mapCanvas, [node.bandIndex()])
 
-    def openInMap(self, dataSource: Union[VectorDataSource, RasterDataSource],
-                  target: Union[QgsMapCanvas, QgsProject, Dock] = None,
+    def openInMap(self,
+                  dataSource: Union[VectorDataSource, RasterDataSource, QgsMapLayer],
+                  target: Union[None, QgsMapCanvas, QgsProject, Dock] = None,
                   rgb=None,
                   sampleSize: int = None) -> QgsMapLayer:
         """
@@ -458,8 +457,16 @@ class DataSourceManagerTreeView(TreeView):
         if sampleSize is None:
             sampleSize = int(QgsRasterLayer.SAMPLE_SIZE)
 
-        if not isinstance(dataSource, (VectorDataSource, RasterDataSource)):
-            return
+        lyr = None
+        if isinstance(dataSource, (VectorDataSource, RasterDataSource)):
+            # loads the layer with default style (wherever it is defined)
+            lyr = dataSource.asMapLayer()
+        elif isinstance(dataSource, QgsMapLayer):
+            lyr = dataSource
+
+        if not isinstance(lyr, QgsMapLayer):
+            return None
+
         from ..dataviews.docks import MapDock
         LOAD_DEFAULT_STYLE: bool = isinstance(rgb, str) and re.search('DEFAULT', rgb, re.I)
 
@@ -477,9 +484,6 @@ class DataSourceManagerTreeView(TreeView):
             target = target.mapCanvas()
 
         assert isinstance(target, (QgsMapCanvas, QgsProject))
-
-        # loads the layer with default style (wherever it is defined)
-        lyr = dataSource.asMapLayer()
 
         if isinstance(lyr, QgsRasterLayer):
             if LOAD_DEFAULT_STYLE:
