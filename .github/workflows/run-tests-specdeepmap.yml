@@ -78,4 +78,6 @@ jobs:
 
       - name: Test EnMAP-Box in ${{matrix.mamba_env}}
         run: |
-          python3 -m unittest discover -s tests/enmap-box/enmapbox/apps/SpecDeepMap -t tests\enmap-box\enmapbox\apps\SpecDeepMap
+          pwd
+          ls -la
+          python3 -m unittest discover -s tests/enmap-box/enmapbox/apps/SpecDeepMap -t tests/enmap-box/enmapbox/apps/SpecDeepMap
