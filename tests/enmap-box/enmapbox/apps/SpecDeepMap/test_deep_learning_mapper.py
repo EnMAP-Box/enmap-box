@@ -1,25 +1,20 @@
-from os.path import join, dirname
-from qgis.core import QgsProcessingFeedback, QgsApplication
-from processing.core.Processing import Processing
-import pandas as pd
-
-from enmapbox.apps.SpecDeepMap.processing_algorithm_deep_learning_mapper import DL_Mapper
-from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import MyModel
-from enmapbox import exampledata
-import glob
-from enmapboxprocessing.testcase import TestCase
-import lightning as L
-import re
 import os
-import torch
-from torchvision import transforms
-from torchvision.transforms import v2
-from osgeo import gdal, ogr
+import re
+from os.path import join, dirname
 
+import pandas as pd
+from osgeo import gdal, ogr
+from processing.core.Processing import Processing
+
+from enmapbox import exampledata
+from enmapbox.apps.SpecDeepMap.processing_algorithm_deep_learning_mapper import DL_Mapper
 # need test data  & one checkpoint
 # check if predict save tiff
 # if iou matrix  created
+from enmapbox.testing import start_app
+from enmapboxprocessing.testcase import TestCase
 
+start_app()
 
 
 def best_ckpt_path(checkpoint_dir):
@@ -47,22 +42,21 @@ class Test_Deep_Learning_Mapper(TestCase):
         folder_path_pred_iou = join(BASE_DIR, "test_run/pred_iou.csv")
         folder_path_pred_vector = join(BASE_DIR, "test_run/pred_vector.shp")
 
-
-        checkpoint_dir = join(BASE_DIR,"../../../../testdata/external/specdeepmap/test_requierments/")
+        checkpoint_dir = join(BASE_DIR, "../../../../testdata/external/specdeepmap/test_requierments/")
         input_l_path = join(BASE_DIR,
                             "../../../../testdata/external/specdeepmap/test_requierments/enmap_landcover_unstyled.tif")
 
-        ckpt_path =best_ckpt_path(checkpoint_dir)
+        ckpt_path = best_ckpt_path(checkpoint_dir)
 
         io = {alg.P_input_raster: exampledata.enmap,
-                alg.P_model_checkpoint: ckpt_path,
-                alg.P_gt_path: input_l_path,
-                alg.P_overlap: 10,
-                alg.P_acc: 0,
-                alg.P_raster_output: folder_path_pred_raster,
-                alg.P_vector_output: folder_path_pred_vector,
-                alg.P_csv_output: folder_path_pred_iou,
-                }
+              alg.P_model_checkpoint: ckpt_path,
+              alg.P_gt_path: input_l_path,
+              alg.P_overlap: 10,
+              alg.P_acc: 0,
+              alg.P_raster_output: folder_path_pred_raster,
+              alg.P_vector_output: folder_path_pred_vector,
+              alg.P_csv_output: folder_path_pred_iou,
+              }
 
         result = Processing.runAlgorithm(alg, parameters=io)
 
@@ -73,8 +67,7 @@ class Test_Deep_Learning_Mapper(TestCase):
         df = pd.read_csv(folder_path_pred_iou)
 
         unique_classes = df['Class'].nunique()  # Count unique classes
-        assert unique_classes == 6 + 1 , f"Error: Expected 7 values, 6 classes and 1 mean but found 1 mean and {unique_classes}"
-
+        assert unique_classes == 6 + 1, f"Error: Expected 7 values, 6 classes and 1 mean but found 1 mean and {unique_classes}"
 
         # 2. Test if Mapper predicts and writes raster
 
@@ -86,13 +79,13 @@ class Test_Deep_Learning_Mapper(TestCase):
         # Check if the raster has valid dimensions
         width = dataset.RasterXSize
         height = dataset.RasterYSize
-        #assert width > 0 and height > 0, f"Error: {folder_path_pred_raster} has invalid dimensions ({width}x{height})."
+        # assert width > 0 and height > 0, f"Error: {folder_path_pred_raster} has invalid dimensions ({width}x{height})."
         assert width == dataset_com.RasterXSize and height == dataset_com.RasterYSize, f"Error: {folder_path_pred_raster} has invalid dimensions ({width}x{height}), should have ({dataset_com.RasterXSize}x {dataset_com.RasterYSize})"
 
         dataset = None  # Close the dataset
         dataset_com = None
 
-        #3. Test if Mapper converts prediction to vector file
+        # 3. Test if Mapper converts prediction to vector file
 
         datasource = ogr.Open(folder_path_pred_vector)
         assert datasource is not None, f"Error: {folder_path_pred_vector} is not a valid vector file (couldn't be opened)."
@@ -110,13 +103,13 @@ class Test_Deep_Learning_Mapper(TestCase):
         # After test clean up
 
         # Remove CSV
-        #if os.path.exists(folder_path_pred_iou):
-         #   os.remove(folder_path_pred_iou)
+        # if os.path.exists(folder_path_pred_iou):
+        #   os.remove(folder_path_pred_iou)
         # Remove tif
         if os.path.exists(folder_path_pred_raster):
             os.remove(folder_path_pred_raster)
 
-        #Remove shp
+        # Remove shp
         base_name = os.path.splitext(folder_path_pred_vector)[0]
 
         # List of extensions to remove
@@ -127,7 +120,7 @@ class Test_Deep_Learning_Mapper(TestCase):
             file_path = base_name + ext
             if os.path.exists(file_path):
                 os.remove(file_path)
-            #os.remove(folder_path_pred_vector)
+            # os.remove(folder_path_pred_vector)
 
         # Remove CSV
         if os.path.exists(folder_path_pred_iou):

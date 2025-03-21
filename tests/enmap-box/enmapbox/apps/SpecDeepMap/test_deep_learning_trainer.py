@@ -6,6 +6,7 @@ from pathlib import Path
 
 import lightning as L
 import torch
+from processing import Processing
 from torchvision import transforms
 from torchvision.transforms import v2
 
@@ -14,7 +15,6 @@ from enmapbox.apps.SpecDeepMap import DL_Trainer
 from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer_remap_classes import MyModel
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
-from processing import Processing
 
 start_app()
 
@@ -93,7 +93,7 @@ class Test_Deep_Learning_Trainer(TestCase):
 
         # 2. Test check if model has subclass, pytorch lightning Module
         is_inherited = isinstance(model_loaded, L.LightningModule)
-        assert is_inherited == True, "Model did not inherit Lightning Module"
+        assert is_inherited is True, "Model did not inherit Lightning Module"
 
         # 3. Test: check if hparams used in training have been passed correctly to class and checkpoint saver
 
@@ -155,7 +155,7 @@ class Test_Deep_Learning_Trainer(TestCase):
 
         # 2. Test check if model has subclass, pytorch lightning Module
         is_inherited = isinstance(model_loaded, L.LightningModule)
-        assert is_inherited == True, "Model did not inherite Lightning Module"
+        assert is_inherited is True, "Model did not inherite Lightning Module"
 
         # 3. Test: check if hparams used in training have been passed correctly to class and checkpoint saver
 

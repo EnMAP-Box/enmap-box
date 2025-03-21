@@ -8,7 +8,10 @@ from qgis.core import QgsProcessingAlgorithm
 
 from enmapbox import exampledata
 from enmapbox.apps.SpecDeepMap.processing_algorithm_raster_splitter import RasterSplitter
+from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
+
+start_app()
 
 
 class TestRasterSplitter(TestCase):

@@ -1,22 +1,16 @@
+import glob
+import os
+import re
 from os.path import join, dirname
-from qgis.core import QgsProcessingFeedback, QgsApplication, QgsProcessingAlgorithm
-from processing.core.Processing import Processing
+
 import pandas as pd
+from processing.core.Processing import Processing
 
 from enmapbox.apps.SpecDeepMap.processing_algorithm_tester import DL_Tester
-from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import MyModel
-from enmapbox import exampledata
-import glob
+from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
-import lightning as L
-import re
-import os
-import torch
-from torchvision import transforms
-from torchvision.transforms import v2
-from osgeo import gdal
 
-
+start_app()
 
 
 def best_ckpt_path(checkpoint_dir):
@@ -49,12 +43,12 @@ class Test_Deep_Learning_Tester(TestCase):
         ckpt_path = best_ckpt_path(checkpoint_dir)
 
         io = {alg.P_test_data_csv: folder_path_test_csv,
-                alg.P_model_checkpoint: ckpt_path,
-                alg.P_acc_device:0,
-                alg.P_csv_output_tester:folder_path_test_iou,
-                alg.P_folder_preds:folder_path_test_preds,
-                alg.P_no_data_label_mask: True,
-                }
+              alg.P_model_checkpoint: ckpt_path,
+              alg.P_acc_device: 0,
+              alg.P_csv_output_tester: folder_path_test_iou,
+              alg.P_folder_preds: folder_path_test_preds,
+              alg.P_no_data_label_mask: True,
+              }
 
         result = Processing.runAlgorithm(alg, parameters=io)
 
@@ -65,11 +59,11 @@ class Test_Deep_Learning_Tester(TestCase):
         df = pd.read_csv(folder_path_test_iou)
 
         unique_classes = df['Class'].nunique()  # Count unique classes
-        assert unique_classes == 6 + 1 , f"Error: Expected 7 values, 6 classes and 1 mean but found 1 mean and {unique_classes}"
+        assert unique_classes == 6 + 1, f"Error: Expected 7 values, 6 classes and 1 mean but found 1 mean and {unique_classes}"
 
         # 2. Test if Tester predicts and exports
         tiff_files = glob.glob(f"{folder_path_test_preds}/*.tif")
-        tiff_len = len(tiff_files)# List all .tif files
+        tiff_len = len(tiff_files)  # List all .tif files
         assert tiff_len == 2, f"Error: Expected 2 tiff predicted & exported but found {tiff_len}"
 
         # After test clean up
@@ -78,6 +72,6 @@ class Test_Deep_Learning_Tester(TestCase):
         if os.path.exists(folder_path_test_iou):
             os.remove(folder_path_test_iou)
 
-        ## Remove Tiffs
+        # Remove Tiffs
         for tiff in tiff_files:
             os.remove(tiff)
