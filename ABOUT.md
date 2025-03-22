@@ -1,18 +1,23 @@
 The EnMAP-Box is a QGIS plug-in to visualize and process remote sensing data.
 It has been particularly developed to handle data and products from the imaging spectrometer
-EnMAP (Environmental Mappung and Analysis Program, [www.enmap.org](https://www.enmap.org/)).
+EnMAP (Environmental Mapping and Analysis Program, [www.enmap.org](https://www.enmap.org/)).
 
-#### Project Website
+#### References
 
-[enmap-box.readthedocs.io](https://enmap-box.readthedocs.io)
+Project: [https://enmap-box.readthedocs.io](https://enmap-box.readthedocs.io).
 
-#### Licenced under the GNU General Public Licence 3
+Source Code: [https://github.com/EnMAP-Box/enmap-box](https://github.com/EnMAP-Box/enmap-box).
 
-[www.gnu.org/licenses/gpl-3.0](https://www.gnu.org/licenses/gpl-3.0)
+Publication: Jakimow, B., Janz, A., Thiel, F., Okujeni, A., Hostert, P., van der Linden, S., 2023. EnMAP-Box:
+Imaging spectroscopy in QGIS. SoftwareX 23, 101507,
+doi [10.1016/j.softx.2023.101507](https://doi.org/https://doi.org/10.1016/j.softx.2023.101507).
 
-#### Environmental Mapping and Analysis Program (EnMAP)
+Environmental Mapping and Analysis Program (EnMAP): [https://www.enmap.org](https://www.enmap.org).
 
-[www.enmap.org](https://www.enmap.org)
+#### Licence
+
+The EnMAP-Box is licensed under the GNU General Public
+Licence. [https://www.gnu.org/licenses/gpl-3.0](https://www.gnu.org/licenses/gpl-3.0).
 
 #### Acknowledgements
 
