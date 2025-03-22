@@ -17,6 +17,9 @@ _This release was tested under QGIS 3.40 (LTR) and 3.42 (latest release)._
 * fixed saving of spectral library modification in editor widget.
   view [#1080](https://github.com/EnMAP-Box/enmap-box/issues/1080)
 
+* EnMAP-Box now comes with own typeguard package to avoid errors related
+  to typeguard > version 2 [#1096](https://github.com/EnMAP-Box/enmap-box/issues/1096)
+
 ## Version 3.15 (2024-10-01)
 
 _This release was tested under QGIS 3.34 (LTR) and 3.38 (latest release)._
