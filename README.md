@@ -208,7 +208,7 @@ Replace it with your own EnMAP-Box fork from which you can create pull requests.
 
    Doing so automatically when pulling the EnMAP-Box project can be enabled by:
     ````bash
-    git config --set submodule.recurse true
+    git config set submodule.recurse true
     ````
 
    This setting (and maybe more in future) is already defined in the `.gitconfig`.

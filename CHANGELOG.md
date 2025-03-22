@@ -2,13 +2,20 @@
 
 ## Version 3.16 (2025-03-19)
 
-* removed dependency on gdal.const.DMD_CREATIONFIELDDATASUBTYPES
+_This release was tested under QGIS 3.40 (LTR) and 3.42 (latest release)._
+
+* added SpecDeepMap, an application that provides basic steps to implement deep learning segmentation models.
+
+* removed dependency on gdal.const.DMD_CREATIONFIELDDATASUBTYPES.
   [#986](https://github.com/EnMAP-Box/enmap-box/issues/986)
   [#858](https://github.com/EnMAP-Box/enmap-box/issues/858),
   [#886](https://github.com/EnMAP-Box/enmap-box/issues/886),
   [#843](https://github.com/EnMAP-Box/enmap-box/issues/843)
 
 * fixed copy & paste of layer rendering styles [#qps 86](https://github.com/EnMAP-Box/qgispluginsupport/issues/86)
+
+* fixed saving of spectral library modification in editor widget.
+  view [#1080](https://github.com/EnMAP-Box/enmap-box/issues/1080)
 
 ## Version 3.15 (2024-10-01)
 
