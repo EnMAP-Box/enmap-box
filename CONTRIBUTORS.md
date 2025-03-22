@@ -3,6 +3,7 @@ People who made large contributions to the EnMAP-Box (in alphabetical order).
 ### Earth Observation Lab, Humboldt-Universität zu Berlin, Germany
 
 * Andreas Janz <andreas.janz@geo.hu-berlin.de>
+* Aryan Goswami
 * Akpona Okujeni
 * Benjamin Jakimow <benjamin.jakimow@geo.hu-berlin.de>
 * Franz Schug
@@ -12,6 +13,10 @@ People who made large contributions to the EnMAP-Box (in alphabetical order).
 * Matthias Held
 * Sam Cooper
 * Stefan Ernst
+
+### Department of Agricultural Sciences, University of Helsinki, Finland
+
+* Leon-Friedrich Thomas <leon-friedrich.thomas@helsinki.fi>
 
 ### Earth Observation and Geoinformation Science Lab, University of Greifswald, Germany
 

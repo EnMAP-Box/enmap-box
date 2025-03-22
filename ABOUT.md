@@ -1,5 +1,5 @@
-The EnMAP-Box is a QGIS plug-in to visualize and process remote sensing data. 
-It has been particularly developed to handle data and products from the imaging spectrometer 
+The EnMAP-Box is a QGIS plug-in to visualize and process remote sensing data.
+It has been particularly developed to handle data and products from the imaging spectrometer
 EnMAP (Environmental Mappung and Analysis Program, [www.enmap.org](https://www.enmap.org/)).
 
 #### Project Website
@@ -19,5 +19,6 @@ EnMAP (Environmental Mappung and Analysis Program, [www.enmap.org](https://www.e
 The EnMAP-Box is developed at Humboldt-Universität zu Berlin under contract by the Helmholtz Centre
 Potsdam GFZ and is part of the EnMAP Core Science Team activities.
 It is funded by the German Aerospace Centre (DLR) - Project Management Agency,
-granted by the Federal Ministry of Economic Affairs and Energy 
-(BMWi; grant no. [50EE1923](https://foerderportal.bund.de/foekat/jsp/SucheAction.do?actionMode=view&fkz=50EE1923)).
+granted by the Federal Ministry for Economic Affairs and Climate Action
+(BMWK; grant no. [50EE2401A](https://foerderportal.bund.de/foekat/jsp/SucheAction.do?actionMode=view&fkz=50EE2401A)).
+
