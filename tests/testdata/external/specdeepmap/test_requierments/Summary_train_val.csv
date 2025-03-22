@@ -1,0 +1,7 @@
+Class ID,Train Count,Train Percentage,Validation Count,Validation Percentage,Test Count,Test Percentage,Class Train Weight,Scaler,Ignored Background : Class Zero
+1,402,10.56,48,3.98,55,8.33,0.8944,None,Yes
+2,704,18.5,103,8.54,146,22.12,0.815,None,Yes
+3,847,22.25,532,44.11,315,47.73,0.7775,None,Yes
+4,1660,43.62,286,23.71,124,18.79,0.5638,None,Yes
+5,41,1.08,30,2.49,20,3.03,0.9892,None,Yes
+6,152,3.99,207,17.16,0,0.0,0.9601,None,Yes

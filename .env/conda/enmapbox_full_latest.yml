@@ -8,7 +8,7 @@
 channels:
 - conda-forge
 dependencies:
-- qgis>=3.40.3
+- qgis>=3.42.0
 - astropy
 - catboost
 - cdsapi
@@ -37,6 +37,16 @@ dependencies:
 - pip:
   - enpt-enmapboxapp
   - flake8-qgis
+    # SpecDeepMap additional packages
+  - lightning
+  - torch
+  - torchmetrics
+  - segmentation-models-pytorch
+  - torchvision
+  - pandas
+  - albumentations
+  - tensorboard
+  - tqdm
 name: enmapbox_full_latest
 variables:
   QT_MAC_WANTS_LAYER: 1
