@@ -59,32 +59,6 @@ URL_TESTDATA = 'https://github.com/EnMAP-Box/enmap-box-exampledata/releases/down
 URL_INSTALLATION = r'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html#install-required-python-packages'
 URL_QGIS_RESOURCES = r'https://box.hu-berlin.de/f/6949ab1099044018a5e4/?dl=1'
 PLUGIN_DEPENDENCIES = ['vrtbuilderplugin>=0.9']
-ABOUT = """
-<p align="center">
-The EnMAP-Box is a QGIS plug-in to visualize and process remote sensing data, and particularly developed to
-handle EnMAP products. It was particularly developed to handle imaging spectroscopy data
-from the upcoming EnMAP sensor
-</p>
-
-<p align="center">Project Website<br/>
-<a href="https://enmap-box.readthedocs.io"><span style=" text-decoration: underline; color:#0000ff;">
-https://enmap-box.readthedocs.io</span></a></p>
-
-<p align="center">Licenced under the GNU General Public Licence<br/>
-<a href="https://www.gnu.org/licenses/"><span style=" text-decoration: underline; color:#0000ff;">
-https://www.gnu.org/licenses/</span></a></p>
-
-<p align="center">Environmental Mapping and Analysis Program (EnMAP)<br/>
-<a href="https://www.enmap.org"><span style=" text-decoration: underline; color:#0000ff;">
-https://www.enmap.org</span></a></p>
-
-<p align="center">
-The EnMAP-Box is developed at Humboldt-Universität zu Berlin under contract by the Helmholtz Centre
-Potsdam GFZ and is part of the EnMAP Core Science Team activities.
-It is funded by the German Aerospace Centre (DLR) - Project Management Agency,
-granted by the Federal Ministry of Economic Affairs and Energy (BMWi; grant no. 50EE1529).
-</p>
-"""
 
 DIR_ENMAPBOX = os.path.dirname(__file__)
 DIR_REPO = os.path.dirname(DIR_ENMAPBOX)
