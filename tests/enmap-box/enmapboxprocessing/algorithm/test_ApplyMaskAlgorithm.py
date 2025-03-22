@@ -1,13 +1,17 @@
-import numpy as np
+import unittest
 
-from enmapboxtestdata import enmap, landcover_polygon
+import numpy as np
+from osgeo import gdal
+
 from enmapboxprocessing.algorithm.applymaskalgorithm import ApplyMaskAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxtestdata import enmap, landcover_polygon
 
 
-class TestLayerToMaskAlgorithm(TestCase):
+class TestApplyMaskAlgorithm(TestCase):
 
+    @unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
     def test_raster(self):
         alg = ApplyMaskAlgorithm()
         alg.initAlgorithm()

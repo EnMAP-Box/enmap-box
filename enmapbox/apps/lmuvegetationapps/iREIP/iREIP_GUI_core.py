@@ -19,12 +19,11 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this software. If not, see <http://www.gnu.org/licenses/>.
+    along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
 """
 from qgis.gui import QgsMapLayerComboBox
 from qgis.core import QgsMapLayerProxyModel
-
 
 from _classic.hubflow.core import *
 import numpy as np
@@ -58,7 +57,6 @@ class iREIP_GUI(QDialog):
         self.rangeView.scene().sendHoverEvents = self.onHoverEvent
         self.firstDerivView.scene().sendHoverEvents = self.onHoverEvent
         self.secondDerivView.scene().sendHoverEvents = self.onHoverEvent
-
 
         self.plotItems = (self.rangeView.getPlotItem(), self.firstDerivView.getPlotItem(),
                           self.secondDerivView.getPlotItem())
@@ -221,7 +219,7 @@ class iREIP:
             self.dtype = meta[4]
         if self.dtype == 2 or self.dtype == 3 or self.dtype == 4 or self.dtype == 5:
             QMessageBox.information(self.gui, "Integer Input",
-                                        "Integer input image:\nTool requires float [0.0-1.0]:\nDivision factor set to 10000")
+                                    "Integer input image:\nTool requires float [0.0-1.0]:\nDivision factor set to 10000")
             self.division_factor = 10000
             self.gui.spinDivisionFactor.setText(str(self.division_factor))
         if None in meta:
@@ -261,8 +259,6 @@ class iREIP:
         self.max_ndvi_pos = None
         self.init_plot()
         self.image = None
-
-
 
     def limits_changed(self, textfeld):
         if self.image is None:
@@ -460,7 +456,8 @@ class iREIP:
             try:
                 self.division_factor = float(self.gui.spinDivisionFactor.text())
             except:
-                QMessageBox.critical(self.gui, "Error", "'%s' is not a valid division factor!" % self.gui.spinDivisionFactor.text())
+                QMessageBox.critical(self.gui, "Error",
+                                     "'%s' is not a valid division factor!" % self.gui.spinDivisionFactor.text())
                 return
 
             if not self.max_ndvi_pos:
@@ -473,7 +470,7 @@ class iREIP:
                 self.main.prg_widget.gui.show()
                 self.main.qgis_app.processEvents()
 
-            #   try:
+                #   try:
                 self.core = iREIP_core(nodat_val=self.nodat, division_factor=self.division_factor,
                                        max_ndvi_pos=self.max_ndvi_pos, ndvi_spec=self.ndvi_spec)
 
@@ -483,12 +480,12 @@ class iREIP:
                                            neighbors=self.neighbors, mode='find')
                 self.core.in_raster = self.core.read_image(image=self.image)
 
-            #   except MemoryError:
-            #   QMessageBox.critical(self.gui, 'error', "File too large to read. More RAM needed")
-            #    self.main.prg_widget.gui.allow_cancel = True
-            #    self.main.prg_widget.gui.close()
-            #   except ValueError as e:
-            #    QMessageBox.critical(self.gui, 'error', str(e))
+                #   except MemoryError:
+                #   QMessageBox.critical(self.gui, 'error', "File too large to read. More RAM needed")
+                #    self.main.prg_widget.gui.allow_cancel = True
+                #    self.main.prg_widget.gui.close()
+                #   except ValueError as e:
+                #    QMessageBox.critical(self.gui, 'error', str(e))
 
                 self.max_ndvi_pos, self.ndvi_spec = self.core.findHighestNDVIindex(
                     in_raster=self.core.in_raster,
@@ -500,13 +497,11 @@ class iREIP:
             else:
 
                 self.core = iREIP_core(nodat_val=self.nodat, division_factor=self.division_factor,
-                                     max_ndvi_pos=self.max_ndvi_pos, ndvi_spec=self.ndvi_spec)
+                                       max_ndvi_pos=self.max_ndvi_pos, ndvi_spec=self.ndvi_spec)
                 self.core.initialize_iREIP(input=self.image, output=None,
                                            limits=self.limits, deriv=self.calc_deriv_flag,
                                            useSavgolay=self.useSavgolay, neighbors=self.neighbors,
                                            mode='find')
-
-
 
         if mode == 'run':
             if self.image is None:
@@ -615,10 +610,11 @@ class iREIP:
             self.main.prg_widget.gui.close()
 
             QMessageBox.information(self.gui, "Finish", "Calculation finished successfully")
-            #self.gui.close()
+            # self.gui.close()
 
     def abort(self, message):
         QMessageBox.critical(self.gui, "Error", message)
+
 
 class iREIP_core:
 
@@ -635,7 +631,7 @@ class iREIP_core:
         self.delta = 0
         self.pixel_total = None
         self.grid, self.nrows, self.ncols, self.nbands = (
-        None, None, None, None)
+            None, None, None, None)
         self.default_exclude = [i for j in
                                 (range(983, 1129), range(1430, 1650), range(2050, 2151))
                                 for i in j]
@@ -666,7 +662,6 @@ class iREIP_core:
         self.valid_wl = [int(round(i, 0)) for i in self.valid_wl]
 
         self.valid_bands = [i for i, x in enumerate(self.wl) if x in list(self.valid_wl)]
-
 
     def read_image(self, image):
         dataset = openRasterDataset(image)
@@ -744,14 +739,15 @@ class iREIP_core:
     def write_deriv_image(self, deriv, mode):  #
 
         if mode == "first":
-            band_string_nr = ['band ' + str(x+1) for x, i in enumerate(self.valid_bands)]
+            band_string_nr = ['band ' + str(x + 1) for x, i in enumerate(self.valid_bands)]
             deriv_output = self.output.split(".")
 
             for row in range(deriv.shape[1]):
                 for col in range(deriv.shape[2]):
                     if np.mean(deriv[:, row, col]) == 0:
                         deriv[:, row, col] = self.nodat[1]
-                    else: continue
+                    else:
+                        continue
 
             deriv_output = deriv_output[0] + "_1st_deriv" + "." + deriv_output[1]
             output = Raster.fromArray(array=deriv, filename=deriv_output, grid=self.grid)
@@ -767,7 +763,7 @@ class iREIP_core:
             output.dataset().setMetadataItem(key='wavelength units', value='Nanometers', domain='ENVI')
 
         if mode == "second":
-            band_string_nr = ['band ' + str(x+1) for x, i in enumerate(self.valid_bands)]
+            band_string_nr = ['band ' + str(x + 1) for x, i in enumerate(self.valid_bands)]
             deriv_output = self.output.split(".")
             deriv_output = deriv_output[0] + "_2nd_deriv" + "." + deriv_output[1]
 
@@ -775,8 +771,9 @@ class iREIP_core:
                 for col in range(deriv.shape[2]):
                     if np.mean(deriv[:, row, col]) == 0:
                         deriv[:, row, col] = self.nodat[1]
-                    else: continue
-                    
+                    else:
+                        continue
+
             output = Raster.fromArray(array=deriv, filename=deriv_output, grid=self.grid)
 
             output.dataset().setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
@@ -811,7 +808,8 @@ class iREIP_core:
         x = np.arange(len(in_matrix))
         try:
             in_matrix[self.default_exclude] = 0
-        except: pass
+        except:
+            pass
         self.res3d = np.empty(shape=np.shape(in_matrix))
         for row in range(in_matrix.shape[1]):
             for col in range(in_matrix.shape[2]):
@@ -843,7 +841,7 @@ class iREIP_core:
             val_2 = (window[reip_index_2])
             reip_pos_1 = int(self.valid_wl[reip_index_1])
             reip_pos_2 = int(self.valid_wl[reip_index_2])
-            steps = (reip_pos_2 - reip_pos_1)**2 + 100
+            steps = (reip_pos_2 - reip_pos_1) ** 2 + 100
             pos_wl, tracker = list(zip(*(list(zip(*(
                 np.linspace(reip_pos_1, reip_pos_2, steps), np.linspace(val_1, val_2, steps)))))))
             reip_pos_index = (np.abs(list(tracker))).argmin()
@@ -869,25 +867,25 @@ class iREIP_core:
                                               window_length=self.neighbors, polyorder=2, axis=0)
             except:
                 QMessageBox.information(self.prg.gui, "Warning",
-                                 "Savitzky-Golay-Filter Error. Neighbors have been set -2.")
+                                        "Savitzky-Golay-Filter Error. Neighbors have been set -2.")
                 try:
                     smooth_matrix = savgol_filter(in_matrix,
-                                                  window_length=self.neighbors-2, polyorder=2, axis=0)
+                                                  window_length=self.neighbors - 2, polyorder=2, axis=0)
                 except:
                     try:
                         QMessageBox.information(self.prg.gui, "Warning",
                                                 "Savitzky-Golay-Filter Error. Last try: Neighbors have been set -2 once more.")
                         smooth_matrix = savgol_filter(in_matrix,
-                                                      window_length=self.neighbors-2, polyorder=2, axis=0)
-                    except: ValueError("Savitzky-Golay-Filter could not be applied. Try to uncheck filtering.")
+                                                      window_length=self.neighbors - 2, polyorder=2, axis=0)
+                    except:
+                        ValueError("Savitzky-Golay-Filter could not be applied. Try to uncheck filtering.")
 
         else:
-            smooth_matrix = in_matrix # no Filter applied.
+            smooth_matrix = in_matrix  # no Filter applied.
 
         smooth_matrix = smooth_matrix[self.valid_bands]
         d1 = np.gradient(smooth_matrix, axis=0)
         d2 = np.gradient(d1, axis=0)
-
 
         for row in range(in_matrix.shape[1]):
             for col in range(in_matrix.shape[2]):
@@ -1006,7 +1004,7 @@ class iREIP_core:
                 raise ValueError("Calculation canceled")
             self.prg.gui.prgBar.setValue(
                 pixel_no * 100 // self.pixel_total)  # progress value is index-orientated
-            #self.prg.gui.lblCaption_l.setText("Processing...")
+            # self.prg.gui.lblCaption_l.setText("Processing...")
             if pixel_no % 100 == 0:
                 self.prg.gui.lblCaption_r.setText("pixel %i of %i" % (pixel_no, self.pixel_total))
             self.qgis_app.processEvents()
@@ -1079,8 +1077,8 @@ class MainUiFunc:
 
 if __name__ == '__main__':
     from enmapbox.testing import start_app
+
     app = start_app()
     m = MainUiFunc()
     m.show()
     sys.exit(app.exec_())
-
