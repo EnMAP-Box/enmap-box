@@ -450,11 +450,8 @@ class SensorProducts(object):
             )
             S2B_L2A_MsiL1CXml = join(S2B_L2A, 'MTD_MSIL2A.xml')
 
-        class UsgsSplib07(object):
-            folder = join(sensorProductsRoot(), 'usgs_splib07')
-
 
 class SpeclibProducts(object):
     if speclibProductsRoot() is not None:
         class UsgsSplib07(object):
-            folder = join(sensorProductsRoot(), 'usgs_splib07')
+            folder = join(speclibProductsRoot(), 'usgs_splib07')
