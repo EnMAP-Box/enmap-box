@@ -1,10 +1,8 @@
 from enmapbox import initAll
-from enmapbox.testing import start_app
-from qgis.core import QgsVectorLayer
-
 from enmapboxprocessing.algorithm.importusgsspeclib07algorithm import ImportUsgsSpeclib07Algorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import SensorProducts, speclibProductsRoot, SpeclibProducts
+from qgis.core import QgsVectorLayer
 
 
 class TestImportUsgsSpeclib07Algorithm(TestCase):
