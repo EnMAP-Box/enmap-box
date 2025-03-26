@@ -1,8 +1,10 @@
+from enmapbox import initAll
+from enmapbox.testing import start_app
 from qgis.core import QgsVectorLayer
 
 from enmapboxprocessing.algorithm.importusgsspeclib07algorithm import ImportUsgsSpeclib07Algorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxtestdata import SensorProducts, speclibProductsRoot
+from enmapboxtestdata import SensorProducts, speclibProductsRoot, SpeclibProducts
 
 
 class TestImportUsgsSpeclib07Algorithm(TestCase):
@@ -11,9 +13,12 @@ class TestImportUsgsSpeclib07Algorithm(TestCase):
         if speclibProductsRoot() is None or self.skipProductImport:
             return
 
+        start_app()
+        initAll()
+
         alg = ImportUsgsSpeclib07Algorithm()
         parameters = {
-            alg.P_FOLDER: SensorProducts.UsgsSplib07.folder,
+            alg.P_FOLDER: SpeclibProducts.UsgsSplib07.folder,
             alg.P_SPECTROMETER: [alg.AsdSpectrometer],
             alg.P_CHAPTER: [alg.VegetationChapter],
             alg.P_OUTPUT_LIBRARY: self.filename('usgsSplib07.gpkg')
