@@ -13,7 +13,6 @@ class TestImportUsgsSpeclib07Algorithm(TestCase):
         if speclibProductsRoot() is None or self.skipProductImport:
             return
 
-        start_app()
         initAll()
 
         alg = ImportUsgsSpeclib07Algorithm()
@@ -30,6 +29,8 @@ class TestImportUsgsSpeclib07Algorithm(TestCase):
     def test_all(self):
         if speclibProductsRoot() is None or self.skipProductImport:
             return
+
+        initAll()
 
         alg = ImportUsgsSpeclib07Algorithm()
         parameters = {
