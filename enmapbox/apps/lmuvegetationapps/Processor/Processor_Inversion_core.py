@@ -214,15 +214,15 @@ class MLRATraining:
         # fit a model on RTM-data but evaluate performance on insitu data or previous test set
         # (e.g. retraining case after AL)
         stds = []
-        np.savetxt("C:\Data\Daten\Testdaten\LUT/x_train_retrain.txt", X, delimiter="\t")
-        np.savetxt("C:\Data\Daten\Testdaten\LUT/y_train_retrain.txt", y, delimiter="\t")
-        np.savetxt("C:\Data\Daten\Testdaten\LUT/x_test_retrain.txt", X_val, delimiter="\t")
+        # np.savetxt("C:\Data\Daten\Testdaten\LUT/x_train_retrain.txt", X, delimiter="\t")
+        # np.savetxt("C:\Data\Daten\Testdaten\LUT/y_train_retrain.txt", y, delimiter="\t")
+        # np.savetxt("C:\Data\Daten\Testdaten\LUT/x_test_retrain.txt", X_val, delimiter="\t")
         model.fit(X, y)
         if isinstance(model, GaussianProcessRegressor):
             predictions, stds = model.predict(X_val, return_std=True)
         else:
             predictions = model.predict(X_val)
-        score = mean_squared_error(y_val, predictions, squared=False)
+        score = np.sqrt(mean_squared_error(y_val, predictions))#, squared=False)
 
         yield {'type': 'result', 'model': model, 'performances': score, 'predictions': predictions, 'stds': stds,
                'X_val': X_val, 'y_val': y_val}
@@ -248,7 +248,7 @@ class MLRATraining:
         best_hyperparams = model.best_params_
         best_score = model.best_score_
         yield {"type": "hyperparameters", "best_hyperparams": best_hyperparams, "best_score": best_score}
-        score = mean_squared_error(test_y, predictions, squared=False)
+        score = np.sqrt(mean_squared_error(test_y, predictions))#, squared=False)
         yield {'type': 'result', 'model': model, 'performances': score, 'predictions': predictions, 'stds': stds,
                'X_val': test_X, 'y_val': test_y}
 
@@ -264,7 +264,7 @@ class MLRATraining:
                 predictions, stds = model.predict(test_X, return_std=True)
             else:
                 predictions = model.predict(test_X)
-            score = mean_squared_error(test_y, predictions, squared=False)
+            score = np.sqrt(mean_squared_error(test_y, predictions))#, squared=False)
             model.fit(X, y)
 
             yield {'type': 'result', 'model': model, 'performances': score, 'predictions': predictions, 'stds': stds,
@@ -276,14 +276,14 @@ class MLRATraining:
             if isinstance(model, GaussianProcessRegressor):
                 # If the model is a GaussianProcessRegressor, also get the standard deviations of the predictions
                 predictions, stds = MLRATraining.cross_val_predict_with_std(X, y, model, cv=kfolds)
-                score = mean_squared_error(y, predictions, squared=False)
+                score = np.sqrt(mean_squared_error(y, predictions))#, squared=False)
                 yield {"type": "progress", "progress": 100, "loop_counter": 1}  # Indicate end of process
                 yield {'type': 'result', 'model': model, 'performances': score,
                        'predictions': predictions, 'stds': stds, 'X_val': X, 'y_val': y}
             else:
                 # If the model is not a GaussianProcessRegressor, get the predictions without standard deviations
                 predictions = cross_val_predict(model, X, y, cv=kfolds)
-                score = mean_squared_error(y, predictions, squared=False)
+                score = np.sqrt(mean_squared_error(y, predictions))#, squared=False)
                 yield {"type": "progress", "progress": 100, "loop_counter": 1}  # Indicate end of process
                 yield {'type': 'result', 'model': model, 'performances': score,
                        'predictions': predictions, 'X_val': X, 'y_val': y}
@@ -338,7 +338,7 @@ class MLRATraining:
                     yield output
             loop_counter += 1
 
-        np.savetxt("C:\Data\Daten\Testdaten\LUT/training_indices_AL_internal.txt", al_training_indices, delimiter="\t")
+        # np.savetxt("C:\Data\Daten\Testdaten\LUT/training_indices_AL_internal.txt", al_training_indices, delimiter="\t")
 
         yield {'type': 'result', 'model': model, 'al_training_indices': al_training_indices,
                'performances': all_performances, 'predictions': all_preds, 'stds': all_stds, 'X_val': X_val,
@@ -367,7 +367,7 @@ class MLRATraining:
         performances = []  # initialize performances list
 
         initial_pred = model.predict(X_val)  # predict first model on validation set (insitu or test split)
-        best_score = mean_squared_error(y_val, initial_pred, squared=False)  # calculate first score (RMSE)
+        best_score = np.sqrt(mean_squared_error(y_val, initial_pred))#, squared=False)  # calculate first score (RMSE)
         performances.append(best_score)  # save first RMSE
 
         # update remaining indices -> all indices (n_samples) minus current training indices
@@ -392,7 +392,7 @@ class MLRATraining:
             model.fit(X_initial, y_initial)
 
             pred = model.predict(X_val)
-            score = mean_squared_error(y_val, pred, squared=False)
+            score = np.sqrt(mean_squared_error(y_val, pred))#, squared=False)
             performances.append(score)
 
             progress = (total_remaining - len(remaining_indices)) / total_remaining * 100
@@ -422,10 +422,10 @@ class MLRATraining:
 
             remaining_indices = np.delete(remaining_indices, query_indices)
 
-        np.savetxt("C:\Data\Daten\Testdaten\LUT/x_train.txt", X_initial, delimiter="\t")
-        np.savetxt("C:\Data\Daten\Testdaten\LUT/y_train.txt", y_initial, delimiter="\t")
-        np.savetxt("C:\Data\Daten\Testdaten\LUT/x_test.txt", X_val, delimiter="\t")
-        np.savetxt("C:\Data\Daten\Testdaten\LUT/training_indices_AL.txt", al_training_indices, delimiter="\t")
+        # np.savetxt("C:\Data\Daten\Testdaten\LUT/x_train.txt", X_initial, delimiter="\t")
+        # np.savetxt("C:\Data\Daten\Testdaten\LUT/y_train.txt", y_initial, delimiter="\t")
+        # np.savetxt("C:\Data\Daten\Testdaten\LUT/x_test.txt", X_val, delimiter="\t")
+        # np.savetxt("C:\Data\Daten\Testdaten\LUT/training_indices_AL.txt", al_training_indices, delimiter="\t")
 
         yield {'type': 'result', 'model': model, 'al_training_indices': al_training_indices, 'performances': performances,
                'X_val': X_val, 'y_val': y_val, 'final_X': X_initial, 'final_y': y_initial}
@@ -700,8 +700,10 @@ class ProcessorTraining:
                                         temp_dict['stds'] = stds
                                     if self.use_al:
                                         al_training_indices = result_dict["al_training_indices"]
-                                        split_training_indices = result_dict["split_training_indices"]
-                                        test_indices = result_dict["test_indices"]
+                                        # split_training_indices = result_dict["split_training_indices"]
+                                        split_training_indices = result_dict.get("split_training_indices", [])
+                                        # test_indices = result_dict["test_indices"]
+                                        test_indices = result_dict.get("test_indices", [])
                                     temp_dict["al_training_indices"] = al_training_indices
                                     temp_dict["split_training_indices"] = split_training_indices
                                     temp_dict["test_indices"] = test_indices
