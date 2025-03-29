@@ -222,7 +222,7 @@ class MLRATraining:
             predictions, stds = model.predict(X_val, return_std=True)
         else:
             predictions = model.predict(X_val)
-        score = np.sqrt(mean_squared_error(y_val, predictions))#, squared=False) #rmse
+        score = np.sqrt(mean_squared_error(y_val, predictions))#, squared=False)
 
         yield {'type': 'result', 'model': model, 'performances': score, 'predictions': predictions, 'stds': stds,
                'X_val': X_val, 'y_val': y_val}
