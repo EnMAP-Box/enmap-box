@@ -171,8 +171,8 @@ class FeatureClusteringHierarchicalAlgorithm(EnMAPProcessingAlgorithm):
                 plt.xlabel('squared Spearman rank-order correlation')
                 plt.ylabel('number of clusters')
                 ax.boxplot(inter_cluster_correlation,
-                           vert=False, sym='',
-                           labels=[f'n={i + 1}' for i in range(len(features) - 1)],
+                           orientation='vertical', sym='',
+                           tick_labels=[f'n={i + 1}' for i in range(len(features) - 1)],
                            )
                 fig.tight_layout()
                 filenameFig3 = filename + '.fig3.svg'
@@ -190,8 +190,8 @@ class FeatureClusteringHierarchicalAlgorithm(EnMAPProcessingAlgorithm):
                 plt.xlabel('squared Spearman rank-order correlation')
                 plt.ylabel('number of clusters')
                 ax.boxplot(intra_cluster_correlation,
-                           vert=False, sym='',
-                           labels=[f'n={i + 1}' for i in range(len(features) - 1)],
+                           orientation='vertical', sym='',
+                           tick_labels=[f'n={i + 1}' for i in range(len(features) - 1)],
                            )
                 fig.tight_layout()
                 filenameFig4 = filename + '.fig4.svg'

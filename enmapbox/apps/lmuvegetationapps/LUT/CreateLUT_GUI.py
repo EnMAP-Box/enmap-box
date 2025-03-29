@@ -19,7 +19,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this software. If not, see <http://www.gnu.org/licenses/>.
+    along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
 """
 
@@ -76,6 +76,7 @@ class SensorEditorGUI(QDialog):
         super(SensorEditorGUI, self).__init__(parent)
         loadUi(pathUI5_sensor, self)
 
+
 class PRG_GUI(QDialog):
     def __init__(self, parent=None):
         super(PRG_GUI, self).__init__(parent)
@@ -115,10 +116,10 @@ class LUT:
         self.main = main
         self.gui = LUT_GUI()
         self._filter = Filter(gui=self.gui, lut=self)
-        self.special_chars()    # place special characters that could not be set in Qt Designer
-        self.initial_values()   # Define initial values
-        self.dictchecks()       # Create dictionaries for all objects in the GUI
-        self.connections()      # Connect buttons (etc) with action
+        self.special_chars()  # place special characters that could not be set in Qt Designer
+        self.initial_values()  # Define initial values
+        self.dictchecks()  # Create dictionaries for all objects in the GUI
+        self.connections()  # Connect buttons (etc) with action
 
         # self.dict_objects is a dictionary with parameters as keys and all related objects in the GUI stored in lists
         for para in self.dict_objects:
@@ -128,7 +129,7 @@ class LUT:
                 self.dict_objects["cp"][obj].setDisabled(True)
                 self.dict_objects["cbc"][obj].setDisabled(True)
 
-        self.set_boundaries()   # Define lower and upper limits for variables in the GUI
+        self.set_boundaries()  # Define lower and upper limits for variables in the GUI
         self.init_sensorlist()  # Fill the list of sensors to choose from
 
     def special_chars(self):
@@ -153,7 +154,7 @@ class LUT:
         self.npara_flat = len(self.para_flat)  # number of parameters in total (independent of chosen Prospect)
 
         self.N, self.cab, self.cw, self.cm, self.car, self.cbrown, self.anth, self.cp, self.cbc, \
-        self.LAI, self.LIDF, self.hspot, self.tto, self.tts, self.psi, self.psoil, self.LAIu, self.sd, self.h, self.cd \
+            self.LAI, self.LIDF, self.hspot, self.tto, self.tts, self.psi, self.psoil, self.LAIu, self.sd, self.h, self.cd \
             = ([] for _ in range(self.npara_flat))  # all parameters are initialized as empty lists
 
         self.depends = 0  # 0: no dependency of car-cab; 1: dependency is turned on
@@ -206,113 +207,128 @@ class LUT:
 
         # Store pointers to the objects in a dictionary to allow iterations
         self.dict_objects = {"N": [self.gui.radio_fix_N, self.gui.radio_gauss_N, self.gui.radio_uni_N,
-                                 self.gui.radio_log_N, self.gui.txt_fix_N, self.gui.txt_gauss_min_N,
-                                 self.gui.txt_gauss_max_N, self.gui.txt_gauss_mean_N, self.gui.txt_gauss_std_N,
-                                 self.gui.txt_log_min_N, self.gui.txt_log_max_N, self.gui.txt_log_steps_N,
-                                 self.gui.viewN],
-                            "cab": [self.gui.radio_fix_chl, self.gui.radio_gauss_chl, self.gui.radio_uni_chl,
-                                 self.gui.radio_log_chl, self.gui.txt_fix_chl, self.gui.txt_gauss_min_chl,
-                                 self.gui.txt_gauss_max_chl, self.gui.txt_gauss_mean_chl, self.gui.txt_gauss_std_chl,
-                                 self.gui.txt_log_min_chl, self.gui.txt_log_max_chl, self.gui.txt_log_steps_chl,
-                                 self.gui.viewChl],
-                            "cw": [self.gui.radio_fix_cw, self.gui.radio_gauss_cw, self.gui.radio_uni_cw,
-                                 self.gui.radio_log_cw, self.gui.txt_fix_cw, self.gui.txt_gauss_min_cw,
-                                 self.gui.txt_gauss_max_cw, self.gui.txt_gauss_mean_cw, self.gui.txt_gauss_std_cw,
-                                 self.gui.txt_log_min_cw, self.gui.txt_log_max_cw, self.gui.txt_log_steps_cw,
-                                 self.gui.viewCw],
-                            "cm": [self.gui.radio_fix_cm, self.gui.radio_gauss_cm, self.gui.radio_uni_cm,
-                                 self.gui.radio_log_cm, self.gui.txt_fix_cm, self.gui.txt_gauss_min_cm,
-                                 self.gui.txt_gauss_max_cm, self.gui.txt_gauss_mean_cm, self.gui.txt_gauss_std_cm,
-                                 self.gui.txt_log_min_cm, self.gui.txt_log_max_cm, self.gui.txt_log_steps_cm,
-                                 self.gui.viewCm],
-                            "car": [self.gui.radio_fix_car, self.gui.radio_gauss_car, self.gui.radio_uni_car,
-                                 self.gui.radio_log_car, self.gui.txt_fix_car, self.gui.txt_gauss_min_car,
-                                 self.gui.txt_gauss_max_car, self.gui.txt_gauss_mean_car, self.gui.txt_gauss_std_car,
-                                 self.gui.txt_log_min_car, self.gui.txt_log_max_car, self.gui.txt_log_steps_car,
-                                 self.gui.viewCar],
-                            "cbrown": [self.gui.radio_fix_cbr, self.gui.radio_gauss_cbr, self.gui.radio_uni_cbr,
-                                 self.gui.radio_log_cbr, self.gui.txt_fix_cbr, self.gui.txt_gauss_min_cbr,
-                                 self.gui.txt_gauss_max_cbr, self.gui.txt_gauss_mean_cbr, self.gui.txt_gauss_std_cbr,
-                                 self.gui.txt_log_min_cbr, self.gui.txt_log_max_cbr, self.gui.txt_log_steps_cbr,
-                                 self.gui.viewCbr],
-                            "anth": [self.gui.radio_fix_canth, self.gui.radio_gauss_canth, self.gui.radio_uni_canth,
-                                       self.gui.radio_log_canth, self.gui.txt_fix_canth, self.gui.txt_gauss_min_canth,
-                                       self.gui.txt_gauss_max_canth, self.gui.txt_gauss_mean_canth, self.gui.txt_gauss_std_canth,
-                                       self.gui.txt_log_min_canth, self.gui.txt_log_max_canth, self.gui.txt_log_steps_canth,
-                                       self.gui.viewCanth],
-                            "cp": [self.gui.radio_fix_cp, self.gui.radio_gauss_cp, self.gui.radio_uni_cp,
-                                       self.gui.radio_log_cp, self.gui.txt_fix_cp, self.gui.txt_gauss_min_cp,
-                                       self.gui.txt_gauss_max_cp, self.gui.txt_gauss_mean_cp,
-                                       self.gui.txt_gauss_std_cp,
-                                       self.gui.txt_log_min_cp, self.gui.txt_log_max_cp,
-                                       self.gui.txt_log_steps_cp,
-                                       self.gui.viewCp],
-                            "cbc": [self.gui.radio_fix_cbc, self.gui.radio_gauss_cbc, self.gui.radio_uni_cbc,
-                                       self.gui.radio_log_cbc, self.gui.txt_fix_cbc, self.gui.txt_gauss_min_cbc,
-                                       self.gui.txt_gauss_max_cbc, self.gui.txt_gauss_mean_cbc,
-                                       self.gui.txt_gauss_std_cbc,
-                                       self.gui.txt_log_min_cbc, self.gui.txt_log_max_cbc,
-                                       self.gui.txt_log_steps_cbc,
-                                       self.gui.viewCbc],
-                            "LAI": [self.gui.radio_fix_lai, self.gui.radio_gauss_lai, self.gui.radio_uni_lai,
-                                 self.gui.radio_log_lai, self.gui.txt_fix_lai, self.gui.txt_gauss_min_lai,
-                                 self.gui.txt_gauss_max_lai, self.gui.txt_gauss_mean_lai, self.gui.txt_gauss_std_lai,
-                                 self.gui.txt_log_min_lai, self.gui.txt_log_max_lai, self.gui.txt_log_steps_lai,
-                                 self.gui.viewLAI],
-                            "LIDF": [self.gui.radio_fix_alia, self.gui.radio_gauss_alia, self.gui.radio_uni_alia,
-                                     self.gui.radio_log_alia, self.gui.txt_fix_alia, self.gui.txt_gauss_min_alia,
-                                     self.gui.txt_gauss_max_alia, self.gui.txt_gauss_mean_alia, self.gui.txt_gauss_std_alia,
-                                     self.gui.txt_log_min_alia, self.gui.txt_log_max_alia, self.gui.txt_log_steps_alia,
-                                     self.gui.viewALIA],
-                            "hspot": [self.gui.radio_fix_hspot, self.gui.radio_gauss_hspot, self.gui.radio_uni_hspot,
-                                 self.gui.radio_log_hspot, self.gui.txt_fix_hspot, self.gui.txt_gauss_min_hspot,
-                                 self.gui.txt_gauss_max_hspot, self.gui.txt_gauss_mean_hspot, self.gui.txt_gauss_std_hspot,
-                                 self.gui.txt_log_min_hspot, self.gui.txt_log_max_hspot, self.gui.txt_log_steps_hspot,
-                                 self.gui.viewHspot],
-                            "tto": [self.gui.radio_fix_oza, self.gui.radio_gauss_oza, self.gui.radio_uni_oza,
-                                 self.gui.radio_log_oza, self.gui.txt_fix_oza, self.gui.txt_gauss_min_oza,
-                                 self.gui.txt_gauss_max_oza, self.gui.txt_gauss_mean_oza, self.gui.txt_gauss_std_oza,
-                                 self.gui.txt_log_min_oza, self.gui.txt_log_max_oza, self.gui.txt_log_steps_oza,
-                                 self.gui.viewOZA],
-                            "tts": [self.gui.radio_fix_sza, self.gui.radio_gauss_sza, self.gui.radio_uni_sza,
-                                 self.gui.radio_log_sza, self.gui.txt_fix_sza, self.gui.txt_gauss_min_sza,
-                                 self.gui.txt_gauss_max_sza, self.gui.txt_gauss_mean_sza, self.gui.txt_gauss_std_sza,
-                                 self.gui.txt_log_min_sza, self.gui.txt_log_max_sza, self.gui.txt_log_steps_sza,
-                                 self.gui.viewSZA],
-                            "psi": [self.gui.radio_fix_raa, self.gui.radio_gauss_raa, self.gui.radio_uni_raa,
-                                 self.gui.radio_log_raa, self.gui.txt_fix_raa, self.gui.txt_gauss_min_raa,
-                                 self.gui.txt_gauss_max_raa, self.gui.txt_gauss_mean_raa, self.gui.txt_gauss_std_raa,
-                                 self.gui.txt_log_min_raa, self.gui.txt_log_max_raa, self.gui.txt_log_steps_raa,
-                                 self.gui.viewRAA],
-                            "psoil": [self.gui.radio_fix_psoil, self.gui.radio_gauss_psoil, self.gui.radio_uni_psoil,
-                                 self.gui.radio_log_psoil, self.gui.txt_fix_psoil, self.gui.txt_gauss_min_psoil,
-                                 self.gui.txt_gauss_max_psoil, self.gui.txt_gauss_mean_psoil, self.gui.txt_gauss_std_psoil,
-                                 self.gui.txt_log_min_psoil, self.gui.txt_log_max_psoil, self.gui.txt_log_steps_psoil,
-                                 self.gui.viewPsoil],
-                            "LAIu": [self.gui.radio_fix_laiu, self.gui.radio_gauss_laiu, self.gui.radio_uni_laiu,
-                                 self.gui.radio_log_laiu, self.gui.txt_fix_laiu, self.gui.txt_gauss_min_laiu,
-                                 self.gui.txt_gauss_max_laiu, self.gui.txt_gauss_mean_laiu, self.gui.txt_gauss_std_laiu,
-                                 self.gui.txt_log_min_laiu, self.gui.txt_log_max_laiu, self.gui.txt_log_steps_laiu,
-                                 self.gui.viewLAIu],
-                            "sd": [self.gui.radio_fix_sd, self.gui.radio_gauss_sd, self.gui.radio_uni_sd,
-                                 self.gui.radio_log_sd, self.gui.txt_fix_sd, self.gui.txt_gauss_min_sd,
-                                 self.gui.txt_gauss_max_sd, self.gui.txt_gauss_mean_sd, self.gui.txt_gauss_std_sd,
-                                 self.gui.txt_log_min_sd, self.gui.txt_log_max_sd, self.gui.txt_log_steps_sd,
-                                 self.gui.viewSD],
-                            "h": [self.gui.radio_fix_h, self.gui.radio_gauss_h, self.gui.radio_uni_h,
-                                 self.gui.radio_log_h, self.gui.txt_fix_h, self.gui.txt_gauss_min_h,
-                                 self.gui.txt_gauss_max_h, self.gui.txt_gauss_mean_h, self.gui.txt_gauss_std_h,
-                                 self.gui.txt_log_min_h, self.gui.txt_log_max_h, self.gui.txt_log_steps_h,
-                                 self.gui.viewH],
-                            "cd": [self.gui.radio_fix_cd, self.gui.radio_gauss_cd, self.gui.radio_uni_cd,
-                                 self.gui.radio_log_cd, self.gui.txt_fix_cd, self.gui.txt_gauss_min_cd,
-                                 self.gui.txt_gauss_max_cd, self.gui.txt_gauss_mean_cd, self.gui.txt_gauss_std_cd,
-                                 self.gui.txt_log_min_cd, self.gui.txt_log_max_cd, self.gui.txt_log_steps_cd,
-                                 self.gui.viewCD]}
+                                   self.gui.radio_log_N, self.gui.txt_fix_N, self.gui.txt_gauss_min_N,
+                                   self.gui.txt_gauss_max_N, self.gui.txt_gauss_mean_N, self.gui.txt_gauss_std_N,
+                                   self.gui.txt_log_min_N, self.gui.txt_log_max_N, self.gui.txt_log_steps_N,
+                                   self.gui.viewN],
+                             "cab": [self.gui.radio_fix_chl, self.gui.radio_gauss_chl, self.gui.radio_uni_chl,
+                                     self.gui.radio_log_chl, self.gui.txt_fix_chl, self.gui.txt_gauss_min_chl,
+                                     self.gui.txt_gauss_max_chl, self.gui.txt_gauss_mean_chl,
+                                     self.gui.txt_gauss_std_chl,
+                                     self.gui.txt_log_min_chl, self.gui.txt_log_max_chl, self.gui.txt_log_steps_chl,
+                                     self.gui.viewChl],
+                             "cw": [self.gui.radio_fix_cw, self.gui.radio_gauss_cw, self.gui.radio_uni_cw,
+                                    self.gui.radio_log_cw, self.gui.txt_fix_cw, self.gui.txt_gauss_min_cw,
+                                    self.gui.txt_gauss_max_cw, self.gui.txt_gauss_mean_cw, self.gui.txt_gauss_std_cw,
+                                    self.gui.txt_log_min_cw, self.gui.txt_log_max_cw, self.gui.txt_log_steps_cw,
+                                    self.gui.viewCw],
+                             "cm": [self.gui.radio_fix_cm, self.gui.radio_gauss_cm, self.gui.radio_uni_cm,
+                                    self.gui.radio_log_cm, self.gui.txt_fix_cm, self.gui.txt_gauss_min_cm,
+                                    self.gui.txt_gauss_max_cm, self.gui.txt_gauss_mean_cm, self.gui.txt_gauss_std_cm,
+                                    self.gui.txt_log_min_cm, self.gui.txt_log_max_cm, self.gui.txt_log_steps_cm,
+                                    self.gui.viewCm],
+                             "car": [self.gui.radio_fix_car, self.gui.radio_gauss_car, self.gui.radio_uni_car,
+                                     self.gui.radio_log_car, self.gui.txt_fix_car, self.gui.txt_gauss_min_car,
+                                     self.gui.txt_gauss_max_car, self.gui.txt_gauss_mean_car,
+                                     self.gui.txt_gauss_std_car,
+                                     self.gui.txt_log_min_car, self.gui.txt_log_max_car, self.gui.txt_log_steps_car,
+                                     self.gui.viewCar],
+                             "cbrown": [self.gui.radio_fix_cbr, self.gui.radio_gauss_cbr, self.gui.radio_uni_cbr,
+                                        self.gui.radio_log_cbr, self.gui.txt_fix_cbr, self.gui.txt_gauss_min_cbr,
+                                        self.gui.txt_gauss_max_cbr, self.gui.txt_gauss_mean_cbr,
+                                        self.gui.txt_gauss_std_cbr,
+                                        self.gui.txt_log_min_cbr, self.gui.txt_log_max_cbr, self.gui.txt_log_steps_cbr,
+                                        self.gui.viewCbr],
+                             "anth": [self.gui.radio_fix_canth, self.gui.radio_gauss_canth, self.gui.radio_uni_canth,
+                                      self.gui.radio_log_canth, self.gui.txt_fix_canth, self.gui.txt_gauss_min_canth,
+                                      self.gui.txt_gauss_max_canth, self.gui.txt_gauss_mean_canth,
+                                      self.gui.txt_gauss_std_canth,
+                                      self.gui.txt_log_min_canth, self.gui.txt_log_max_canth,
+                                      self.gui.txt_log_steps_canth,
+                                      self.gui.viewCanth],
+                             "cp": [self.gui.radio_fix_cp, self.gui.radio_gauss_cp, self.gui.radio_uni_cp,
+                                    self.gui.radio_log_cp, self.gui.txt_fix_cp, self.gui.txt_gauss_min_cp,
+                                    self.gui.txt_gauss_max_cp, self.gui.txt_gauss_mean_cp,
+                                    self.gui.txt_gauss_std_cp,
+                                    self.gui.txt_log_min_cp, self.gui.txt_log_max_cp,
+                                    self.gui.txt_log_steps_cp,
+                                    self.gui.viewCp],
+                             "cbc": [self.gui.radio_fix_cbc, self.gui.radio_gauss_cbc, self.gui.radio_uni_cbc,
+                                     self.gui.radio_log_cbc, self.gui.txt_fix_cbc, self.gui.txt_gauss_min_cbc,
+                                     self.gui.txt_gauss_max_cbc, self.gui.txt_gauss_mean_cbc,
+                                     self.gui.txt_gauss_std_cbc,
+                                     self.gui.txt_log_min_cbc, self.gui.txt_log_max_cbc,
+                                     self.gui.txt_log_steps_cbc,
+                                     self.gui.viewCbc],
+                             "LAI": [self.gui.radio_fix_lai, self.gui.radio_gauss_lai, self.gui.radio_uni_lai,
+                                     self.gui.radio_log_lai, self.gui.txt_fix_lai, self.gui.txt_gauss_min_lai,
+                                     self.gui.txt_gauss_max_lai, self.gui.txt_gauss_mean_lai,
+                                     self.gui.txt_gauss_std_lai,
+                                     self.gui.txt_log_min_lai, self.gui.txt_log_max_lai, self.gui.txt_log_steps_lai,
+                                     self.gui.viewLAI],
+                             "LIDF": [self.gui.radio_fix_alia, self.gui.radio_gauss_alia, self.gui.radio_uni_alia,
+                                      self.gui.radio_log_alia, self.gui.txt_fix_alia, self.gui.txt_gauss_min_alia,
+                                      self.gui.txt_gauss_max_alia, self.gui.txt_gauss_mean_alia,
+                                      self.gui.txt_gauss_std_alia,
+                                      self.gui.txt_log_min_alia, self.gui.txt_log_max_alia, self.gui.txt_log_steps_alia,
+                                      self.gui.viewALIA],
+                             "hspot": [self.gui.radio_fix_hspot, self.gui.radio_gauss_hspot, self.gui.radio_uni_hspot,
+                                       self.gui.radio_log_hspot, self.gui.txt_fix_hspot, self.gui.txt_gauss_min_hspot,
+                                       self.gui.txt_gauss_max_hspot, self.gui.txt_gauss_mean_hspot,
+                                       self.gui.txt_gauss_std_hspot,
+                                       self.gui.txt_log_min_hspot, self.gui.txt_log_max_hspot,
+                                       self.gui.txt_log_steps_hspot,
+                                       self.gui.viewHspot],
+                             "tto": [self.gui.radio_fix_oza, self.gui.radio_gauss_oza, self.gui.radio_uni_oza,
+                                     self.gui.radio_log_oza, self.gui.txt_fix_oza, self.gui.txt_gauss_min_oza,
+                                     self.gui.txt_gauss_max_oza, self.gui.txt_gauss_mean_oza,
+                                     self.gui.txt_gauss_std_oza,
+                                     self.gui.txt_log_min_oza, self.gui.txt_log_max_oza, self.gui.txt_log_steps_oza,
+                                     self.gui.viewOZA],
+                             "tts": [self.gui.radio_fix_sza, self.gui.radio_gauss_sza, self.gui.radio_uni_sza,
+                                     self.gui.radio_log_sza, self.gui.txt_fix_sza, self.gui.txt_gauss_min_sza,
+                                     self.gui.txt_gauss_max_sza, self.gui.txt_gauss_mean_sza,
+                                     self.gui.txt_gauss_std_sza,
+                                     self.gui.txt_log_min_sza, self.gui.txt_log_max_sza, self.gui.txt_log_steps_sza,
+                                     self.gui.viewSZA],
+                             "psi": [self.gui.radio_fix_raa, self.gui.radio_gauss_raa, self.gui.radio_uni_raa,
+                                     self.gui.radio_log_raa, self.gui.txt_fix_raa, self.gui.txt_gauss_min_raa,
+                                     self.gui.txt_gauss_max_raa, self.gui.txt_gauss_mean_raa,
+                                     self.gui.txt_gauss_std_raa,
+                                     self.gui.txt_log_min_raa, self.gui.txt_log_max_raa, self.gui.txt_log_steps_raa,
+                                     self.gui.viewRAA],
+                             "psoil": [self.gui.radio_fix_psoil, self.gui.radio_gauss_psoil, self.gui.radio_uni_psoil,
+                                       self.gui.radio_log_psoil, self.gui.txt_fix_psoil, self.gui.txt_gauss_min_psoil,
+                                       self.gui.txt_gauss_max_psoil, self.gui.txt_gauss_mean_psoil,
+                                       self.gui.txt_gauss_std_psoil,
+                                       self.gui.txt_log_min_psoil, self.gui.txt_log_max_psoil,
+                                       self.gui.txt_log_steps_psoil,
+                                       self.gui.viewPsoil],
+                             "LAIu": [self.gui.radio_fix_laiu, self.gui.radio_gauss_laiu, self.gui.radio_uni_laiu,
+                                      self.gui.radio_log_laiu, self.gui.txt_fix_laiu, self.gui.txt_gauss_min_laiu,
+                                      self.gui.txt_gauss_max_laiu, self.gui.txt_gauss_mean_laiu,
+                                      self.gui.txt_gauss_std_laiu,
+                                      self.gui.txt_log_min_laiu, self.gui.txt_log_max_laiu, self.gui.txt_log_steps_laiu,
+                                      self.gui.viewLAIu],
+                             "sd": [self.gui.radio_fix_sd, self.gui.radio_gauss_sd, self.gui.radio_uni_sd,
+                                    self.gui.radio_log_sd, self.gui.txt_fix_sd, self.gui.txt_gauss_min_sd,
+                                    self.gui.txt_gauss_max_sd, self.gui.txt_gauss_mean_sd, self.gui.txt_gauss_std_sd,
+                                    self.gui.txt_log_min_sd, self.gui.txt_log_max_sd, self.gui.txt_log_steps_sd,
+                                    self.gui.viewSD],
+                             "h": [self.gui.radio_fix_h, self.gui.radio_gauss_h, self.gui.radio_uni_h,
+                                   self.gui.radio_log_h, self.gui.txt_fix_h, self.gui.txt_gauss_min_h,
+                                   self.gui.txt_gauss_max_h, self.gui.txt_gauss_mean_h, self.gui.txt_gauss_std_h,
+                                   self.gui.txt_log_min_h, self.gui.txt_log_max_h, self.gui.txt_log_steps_h,
+                                   self.gui.viewH],
+                             "cd": [self.gui.radio_fix_cd, self.gui.radio_gauss_cd, self.gui.radio_uni_cd,
+                                    self.gui.radio_log_cd, self.gui.txt_fix_cd, self.gui.txt_gauss_min_cd,
+                                    self.gui.txt_gauss_max_cd, self.gui.txt_gauss_mean_cd, self.gui.txt_gauss_std_cd,
+                                    self.gui.txt_log_min_cd, self.gui.txt_log_max_cd, self.gui.txt_log_steps_cd,
+                                    self.gui.viewCD]}
 
     def connections(self):
         # Sensor Type (Dropdown)
-        self.gui.SType_combobox.currentIndexChanged.\
+        self.gui.SType_combobox.currentIndexChanged. \
             connect(lambda: self.select_s2s(sensor_index=self.gui.SType_combobox.currentIndex()))
 
         # Models
@@ -320,7 +336,8 @@ class LUT:
         self.gui.B_Prospect5.clicked.connect(lambda: self.select_model(lop="prospect5", canopy_arch=self.canopy_arch))
         self.gui.B_Prospect5b.clicked.connect(lambda: self.select_model(lop="prospect5B", canopy_arch=self.canopy_arch))
         self.gui.B_ProspectD.clicked.connect(lambda: self.select_model(lop="prospectD", canopy_arch=self.canopy_arch))
-        self.gui.B_ProspectPro.clicked.connect(lambda: self.select_model(lop="prospectPro", canopy_arch=self.canopy_arch))
+        self.gui.B_ProspectPro.clicked.connect(
+            lambda: self.select_model(lop="prospectPro", canopy_arch=self.canopy_arch))
 
         self.gui.B_LeafModelOnly.clicked.connect(lambda: self.select_model(lop=self.lop, canopy_arch="None"))
         self.gui.B_4Sail.clicked.connect(lambda: self.select_model(lop=self.lop, canopy_arch="sail"))
@@ -500,7 +517,7 @@ class LUT:
         if self.dict_objects[para][0].isChecked():  # fix
             try:
                 vals = [float(self.dict_objects[para][4].text())]  # needs to be of type "list"
-                                                                       # (even single values)
+                # (even single values)
                 ns = self.gui.spinNS.value()
                 bar = pg.BarGraphItem(x=vals, height=ns, width=0.01)
                 self.dict_objects[para][12].addItem(bar)
@@ -515,7 +532,7 @@ class LUT:
                 xIncr = (vals[1] - vals[0]) / 100.0
                 xVals = np.arange(vals[0], vals[1], xIncr)
                 self.dict_objects[para][12].plot(xVals, norm.pdf(xVals, loc=vals[2], scale=vals[3]),
-                                                     clear=True)
+                                                 clear=True)
             except:
                 pass
 
@@ -525,7 +542,7 @@ class LUT:
                 xIncr = (vals[1] - vals[0]) / 100.0
                 xVals = np.arange(vals[0], vals[1], xIncr)
                 self.dict_objects[para][12].plot(xVals, uniform.pdf(xVals, loc=vals[0], scale=vals[1]),
-                                                     clear=True)
+                                                 clear=True)
             except:
                 pass
 
@@ -534,7 +551,7 @@ class LUT:
                 vals = [float(self.dict_objects[para][i].text()) for i in [9, 10, 11]]
                 xVals = np.linspace(start=vals[0], stop=vals[1], num=int(vals[2]))
                 ns = self.gui.spinNS.value()
-                width = (xVals[1]-xVals[0]) / 8
+                width = (xVals[1] - xVals[0]) / 8
                 bar = pg.BarGraphItem(x=xVals, height=ns, width=width)
                 self.dict_objects[para][12].addItem(bar)
                 self.dict_objects[para][12].plot(clear=True)
@@ -660,7 +677,8 @@ class LUT:
     def init_cp_cbc_dependency(self):
         if self.gui.CpCBCCheck.isChecked():
             self.depends_cp_cbc = 1
-        else: self.depends_cp_cbc = 0
+        else:
+            self.depends_cp_cbc = 0
 
     def reset_dependency(self):
         self.gui.CarCabCheck.setChecked(False)
@@ -670,27 +688,27 @@ class LUT:
 
     def set_boundaries(self):
         # min / max allowed
-        self.dict_boundaries = {"N": [1.0, 3.0],       # 0
-                                "cab": [0.0, 100.0],   # 1
-                                "cw": [0.0002, 0.7],    # 2
+        self.dict_boundaries = {"N": [1.0, 3.0],  # 0
+                                "cab": [0.0, 100.0],  # 1
+                                "cw": [0.0002, 0.7],  # 2
                                 "cm": [0.0001, 0.02],  # 3
-                                "car": [0.0, 30.0],    # 4
-                                "cbrown": [0.0, 1.0],     # 5
+                                "car": [0.0, 30.0],  # 4
+                                "cbrown": [0.0, 1.0],  # 5
                                 "anth": [0.0, 10.0],  # 6
-                                "LAI": [0.01, 10.0],   # 7
-                                "cp": [0.0, 0.005],     # 8
-                                "cbc": [0.0, 0.09],    # 9
-                                "LIDF": [0.0, 90.0],   # 10
-                                "hspot": [0.0, 1.0],   # 11
-                                "tto": [0.0, 89.0],    # 12
-                                "tts": [0.0, 89.0],    # 13
-                                "psi": [0.0, 180.0],   # 14
-                                "psoil": [0.0, 1.0],   # 15 vv forest parameters vv
+                                "LAI": [0.01, 10.0],  # 7
+                                "cp": [0.0, 0.005],  # 8
+                                "cbc": [0.0, 0.09],  # 9
+                                "LIDF": [0.0, 90.0],  # 10
+                                "hspot": [0.0, 1.0],  # 11
+                                "tto": [0.0, 89.0],  # 12
+                                "tts": [0.0, 89.0],  # 13
+                                "psi": [0.0, 180.0],  # 14
+                                "psoil": [0.0, 1.0],  # 15 vv forest parameters vv
                                 "LAIu": [0.01, 10.0],  # 16
-                                "sd": [0.0, 5000.0],   # 17
-                                "h": [0.0, 50.0],      # 18
-                                "cd": [0.0, 30.0]}     # 19
-                                                       # xx ^^ forest parameters ^^
+                                "sd": [0.0, 5000.0],  # 17
+                                "h": [0.0, 50.0],  # 18
+                                "cd": [0.0, 30.0]}  # 19
+        # xx ^^ forest parameters ^^
 
     def select_s2s(self, sensor_index):
         # function is called when a new sensor is chosen from the dropdown
@@ -748,11 +766,11 @@ class LUT:
                     self.dict_objects[para][obj].setDisabled(False)
             for obj in range(12):
                 self.dict_objects["cm"][obj].setDisabled(True)
-            self.txt_enables(para="car",   mode=self.dict_checks["car"])
-            self.txt_enables(para="cbrown",   mode=self.dict_checks["cbrown"])
+            self.txt_enables(para="car", mode=self.dict_checks["car"])
+            self.txt_enables(para="cbrown", mode=self.dict_checks["cbrown"])
             self.txt_enables(para="anth", mode=self.dict_checks["anth"])
-            self.txt_enables(para="cp",    mode=self.dict_checks["cp"])
-            self.txt_enables(para="cbc",   mode=self.dict_checks["cbc"])
+            self.txt_enables(para="cp", mode=self.dict_checks["cp"])
+            self.txt_enables(para="cbc", mode=self.dict_checks["cbc"])
 
         elif lop == "prospectD":
             for para in self.para_list[0]:
@@ -762,8 +780,8 @@ class LUT:
                 self.dict_objects["cp"][obj].setDisabled(True)
                 self.dict_objects["cbc"][obj].setDisabled(True)
 
-            self.txt_enables(para="car",   mode=self.dict_checks["car"])
-            self.txt_enables(para="cbrown",   mode=self.dict_checks["cbrown"])
+            self.txt_enables(para="car", mode=self.dict_checks["car"])
+            self.txt_enables(para="cbrown", mode=self.dict_checks["cbrown"])
             self.txt_enables(para="anth", mode=self.dict_checks["anth"])
             self.txt_enables(para="cm", mode=self.dict_checks["cm"])
 
@@ -872,23 +890,23 @@ class LUT:
 
             elif len(self.dict_vals[self.para_list[0][i]]) > 3:  # gauss distribution, out of range?
                 if self.dict_vals[self.para_list[0][i]][2] > self.dict_vals[self.para_list[0][i]][1] or \
-                                self.dict_vals[self.para_list[0][i]][2] < self.dict_vals[self.para_list[0][i]][0]:
+                        self.dict_vals[self.para_list[0][i]][2] < self.dict_vals[self.para_list[0][i]][0]:
                     self.abort(message='Parameter %s: mean value must lie between min and max' % self.para_list[0][i])
                     return False
                 elif self.dict_vals[self.para_list[0][i]][0] < self.dict_boundaries[key][0] or \
-                                self.dict_vals[self.para_list[0][i]][1] > self.dict_boundaries[key][1]:
+                        self.dict_vals[self.para_list[0][i]][1] > self.dict_boundaries[key][1]:
                     self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[0][i])
                     return False
 
             elif len(self.dict_vals[self.para_list[0][i]]) > 1:  # uniform distribution, out of range?
                 if self.dict_vals[self.para_list[0][i]][0] < self.dict_boundaries[key][0] or \
-                                self.dict_vals[self.para_list[0][i]][1] > self.dict_boundaries[key][1]:
+                        self.dict_vals[self.para_list[0][i]][1] > self.dict_boundaries[key][1]:
                     self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[0][i])
                     return False
 
             elif len(self.dict_vals[self.para_list[0][i]]) > 0:  # fixed value our of range?
                 if self.dict_vals[self.para_list[0][i]][0] < self.dict_boundaries[key][0] or \
-                                self.dict_vals[self.para_list[0][i]][0] > self.dict_boundaries[key][1]:
+                        self.dict_vals[self.para_list[0][i]][0] > self.dict_boundaries[key][1]:
                     self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[0][i])
                     return False
 
@@ -899,48 +917,49 @@ class LUT:
 
                 elif len(self.dict_vals[self.para_list[1][i]]) > 3:  # gauss distribution, out of range?
                     if self.dict_vals[self.para_list[1][i]][2] > self.dict_vals[self.para_list[1][i]][1] or \
-                                    self.dict_vals[self.para_list[1][i]][2] < self.dict_vals[self.para_list[1][i]][0]:
-                        self.abort(message='Parameter %s: mean value must lie between min and max' % self.para_list[1][i])
+                            self.dict_vals[self.para_list[1][i]][2] < self.dict_vals[self.para_list[1][i]][0]:
+                        self.abort(
+                            message='Parameter %s: mean value must lie between min and max' % self.para_list[1][i])
                         return False
                     elif self.dict_vals[self.para_list[1][i]][0] < self.dict_boundaries[key][0] or \
-                                    self.dict_vals[self.para_list[1][i]][1] > self.dict_boundaries[key][1]:
+                            self.dict_vals[self.para_list[1][i]][1] > self.dict_boundaries[key][1]:
                         self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[1][i])
                         return False
 
                 elif len(self.dict_vals[self.para_list[1][i]]) > 1:  # uniform distribution, out of range?
                     if self.dict_vals[self.para_list[1][i]][0] < self.dict_boundaries[key][0] or \
-                                    self.dict_vals[self.para_list[1][i]][1] > self.dict_boundaries[key][1]:
+                            self.dict_vals[self.para_list[1][i]][1] > self.dict_boundaries[key][1]:
                         self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[1][i])
                         return False
                 elif len(self.dict_vals[self.para_list[1][i]]) > 0:  # fixed value our of range?
                     if self.dict_vals[self.para_list[1][i]][0] < self.dict_boundaries[key][0] or \
-                                    self.dict_vals[self.para_list[1][i]][0] > self.dict_boundaries[key][1]:
+                            self.dict_vals[self.para_list[1][i]][0] > self.dict_boundaries[key][1]:
                         self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[1][i])
                         return False
 
         # Check Prospect properties
         if self.lop == "prospectPro":
-            if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in range(len(self.para_list[0])-1)):
+            if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in range(len(self.para_list[0]) - 1)):
                 self.abort(message='Leaf Optical Properties parameter(s) missing')
                 return False
 
         elif self.lop == "prospectD":
-            if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in range(len(self.para_list[0])-2)):
+            if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in range(len(self.para_list[0]) - 2)):
                 self.abort(message='Leaf Optical Properties parameter(s) missing')
                 return False
 
         elif self.lop == "prospect5B":
-            if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in range(len(self.para_list[0])-3)):
+            if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in range(len(self.para_list[0]) - 3)):
                 self.abort(message='Leaf Optical Properties parameter(s) missing')
                 return False
 
         elif self.lop == "prospect5":
-            if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in range(len(self.para_list[0])-4)):
+            if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in range(len(self.para_list[0]) - 4)):
                 self.abort(message='Leaf Optical Properties parameter(s) missing')
                 return False
 
         elif self.lop == "prospect4":
-            if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in range(len(self.para_list[0])-5)):
+            if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in range(len(self.para_list[0]) - 5)):
                 self.abort(message='Leaf Optical Properties parameter(s) missing')
                 return False
 
@@ -951,7 +970,7 @@ class LUT:
                 return False
 
         if self.canopy_arch == "sail" and self.bg_type == "load":
-            if any(len(self.dict_vals[self.para_list[1][i]]) < 1 for i in range(len(self.para_list[1])-1)):
+            if any(len(self.dict_vals[self.para_list[1][i]]) < 1 for i in range(len(self.para_list[1]) - 1)):
                 self.abort(message='Canopy Architecture parameter(s) missing')
                 return False
 
@@ -1006,11 +1025,11 @@ class LUT:
         model_I = mod.InitModel(lop=self.lop, canopy_arch=self.canopy_arch, nodat=self.nodat,
                                 int_boost=self.intboost, s2s=self.sensor)
         time50x = model_I.initialize_vectorized(LUT_dir=None, LUT_name=None, ns=100, tts=[20.0, 60.0], tto=[0.0, 40.0],
-                                    psi=[0.0, 180.0], N=[1.1, 2.5], cab=[0.0, 80.0], cw=[0.0002, 0.02],
-                                    cm=[0.0001, 0.005], LAI=[0.5, 8.0], LIDF=[10.0, 80.0], typeLIDF=[2],
-                                    hspot=[0.1], psoil=[0.5], car=[0.0, 12.0],
-                                    cbrown=[0.0, 1.0], anth=[0.0, 10.0], cp=[0.001], cbc=[0.01],
-                                    soil=[0.1]*2101, depends=0, testmode=True)
+                                                psi=[0.0, 180.0], N=[1.1, 2.5], cab=[0.0, 80.0], cw=[0.0002, 0.02],
+                                                cm=[0.0001, 0.005], LAI=[0.5, 8.0], LIDF=[10.0, 80.0], typeLIDF=[2],
+                                                hspot=[0.1], psoil=[0.5], car=[0.0, 12.0],
+                                                cbrown=[0.0, 1.0], anth=[0.0, 10.0], cp=[0.001], cbc=[0.01],
+                                                soil=[0.1] * 2101, depends=0, testmode=True)
 
         return time50x / 2  # It will remain a miracle, why the time is factor 2, but it IS!
 
@@ -1032,7 +1051,6 @@ class LUT:
         self.main.prg_widget.gui.show()
         self.main.qgis_app.processEvents()
 
-
         try:
             # Create an instance of PROSAIL, first initialize
             model_I = mod.InitModel(lop=self.lop, canopy_arch=self.canopy_arch, nodat=self.nodat,
@@ -1044,18 +1062,18 @@ class LUT:
             return
 
         # try:
-            # Set up the model and parse all parameters
+        # Set up the model and parse all parameters
         model_I.initialize_vectorized(LUT_dir=self.path, LUT_name=self.LUT_name, ns=self.ns,
-                                    tts=self.dict_vals['tts'], tto=self.dict_vals['tto'], psi=self.dict_vals['psi'],
-                                    N=self.dict_vals['N'], cab=self.dict_vals['cab'], cw=self.dict_vals['cw'],
-                                    cm=self.dict_vals['cm'], LAI=self.dict_vals['LAI'], LIDF=self.dict_vals['LIDF'],
-                                    typeLIDF=[2], hspot=self.dict_vals['hspot'], psoil=self.dict_vals['psoil'],
-                                    car=self.dict_vals['car'], cbrown=self.dict_vals['cbrown'], soil=self.bg_spec,
-                                    anth=self.dict_vals['anth'], cp=self.dict_vals['cp'],
-                                    cbc=self.dict_vals['cbc'], LAIu=self.dict_vals['LAIu'],
-                                    cd=self.dict_vals['cd'], sd=self.dict_vals['sd'], h=self.dict_vals['h'],
-                                    prgbar_widget=self.main.prg_widget, qgis_app=self.main.qgis_app,
-                                    depends=self.depends, depends_cp_cbc=self.depends_cp_cbc)
+                                      tts=self.dict_vals['tts'], tto=self.dict_vals['tto'], psi=self.dict_vals['psi'],
+                                      N=self.dict_vals['N'], cab=self.dict_vals['cab'], cw=self.dict_vals['cw'],
+                                      cm=self.dict_vals['cm'], LAI=self.dict_vals['LAI'], LIDF=self.dict_vals['LIDF'],
+                                      typeLIDF=[2], hspot=self.dict_vals['hspot'], psoil=self.dict_vals['psoil'],
+                                      car=self.dict_vals['car'], cbrown=self.dict_vals['cbrown'], soil=self.bg_spec,
+                                      anth=self.dict_vals['anth'], cp=self.dict_vals['cp'],
+                                      cbc=self.dict_vals['cbc'], LAIu=self.dict_vals['LAIu'],
+                                      cd=self.dict_vals['cd'], sd=self.dict_vals['sd'], h=self.dict_vals['h'],
+                                      prgbar_widget=self.main.prg_widget, qgis_app=self.main.qgis_app,
+                                      depends=self.depends, depends_cp_cbc=self.depends_cp_cbc)
 
         # except ValueError as e:
         #     self.abort(message="An error occurred while creating the LUT: %s" % str(e))
@@ -1067,7 +1085,6 @@ class LUT:
         self.main.prg_widget.gui.lblCancel.setText("")
         self.main.prg_widget.gui.allow_cancel = True
         self.main.prg_widget.gui.close()
-
 
     def abort(self, message):
         QMessageBox.critical(self.gui, "Error", message)
@@ -1106,7 +1123,7 @@ class SensorEditor:
         self.filenamesIn, self.wl_filename = (None, None)
         self.image = None
         self.current_path = APP_DIR + "/Resources/Spec2Sensor/srf"  # change this, if the relative path
-                                                                    # of the srfs changes
+        # of the srfs changes
         self.flag_wl, self.flag_srf, self.flag_image = (False, False, False)
         self.delimiter_str = ["Tab", "Space", ",", ";"]  # delimiters can be added here
         self.wlunit_str = ["nm", "µm"]
@@ -1152,8 +1169,9 @@ class SensorEditor:
 
     def read_file(self):
         # BuildTrueSRF is a Spec2Sensor class
-        self.build_true_srf = BuildTrueSRF(srf_files=self.filenamesIn, header_bool=self.header_bool, delimiter=self.delimiter,
-                                  wl_convert=self.wl_convert)
+        self.build_true_srf = BuildTrueSRF(srf_files=self.filenamesIn, header_bool=self.header_bool,
+                                           delimiter=self.delimiter,
+                                           wl_convert=self.wl_convert)
         return_flag, self.srf_list = self.build_true_srf.dframe_from_txt()
         if not return_flag:
             self.houston(message=self.srf_list, reset_table_preview=True)
@@ -1207,7 +1225,7 @@ class SensorEditor:
 
         for row in range(nrows):
             for col in range(0, ncols, 2):  # in the QTablePreview Widget, cols are doubled (wl, weight),
-                                            # in the array, they are not
+                # in the array, they are not
                 wl = new_srf[row, col // 2, 0]
 
                 # most bands have shorter lengths in srf_nbands, these are filled with np.nan -> sort them out
@@ -1217,8 +1235,8 @@ class SensorEditor:
                 else:
                     item_wl = QTableWidgetItem(str(new_srf[row, col // 2, 0]))
                     item_weigh = QTableWidgetItem(str(new_srf[row, col // 2, 1]))
-                self.gui.tablePreview.setItem(row, col, item_wl)          # place wavelength item
-                self.gui.tablePreview.setItem(row, col + 1, item_weigh)   # place weight item
+                self.gui.tablePreview.setItem(row, col, item_wl)  # place wavelength item
+                self.gui.tablePreview.setItem(row, col + 1, item_weigh)  # place weight item
 
         self.gui.tablePreview.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.flag_srf = True
@@ -1266,7 +1284,7 @@ class SensorEditor:
         self.gui.mLayer.setEnabled(True)
         self.check_flags()
 
-    def image_read(self): # read only necessary info: fwhm and center wavelengths
+    def image_read(self):  # read only necessary info: fwhm and center wavelengths
         inras = self.image
         image = openRasterDataset(inras)
         meta = image.metadataDict()
@@ -1380,7 +1398,8 @@ class SensorEditor:
             text = "Create Generic SRF from Imagery OK: " + str(len(self.x[:, 0])) + " Bands."
             self.gui.label.setText(text)
             if len(self.outreach) > 0:
-                text = "Create Generic SRF from Imagery OK with " + str(len(self.x[:, 0])) + " Bands but Caution! " + str(len(self.outreach)) + \
+                text = "Create Generic SRF from Imagery OK with " + str(
+                    len(self.x[:, 0])) + " Bands but Caution! " + str(len(self.outreach)) + \
                        " wavelengths outside PROSAIL range will be deleted!"
                 self.gui.label.setStyleSheet("color: rgb(170, 130, 0);")
                 self.gui.label.setText(text)
@@ -1407,7 +1426,8 @@ class SensorEditor:
                 self.houston(message=sensor_name)
                 return
             else:
-                QMessageBox.information(self.gui, "Done", "SRF-file created. It can be now used within IVVRM and CreateLUT")
+                QMessageBox.information(self.gui, "Done",
+                                        "SRF-file created. It can be now used within IVVRM and CreateLUT")
             self.main.LUT.init_sensorlist()
             # set index of the combobox to new sensor
             sensor_index = self.main.LUT.gui.SType_combobox.findText(sensor_name)
@@ -1421,7 +1441,8 @@ class SensorEditor:
                 self.houston(message=sensor_name)
                 return
             else:
-                QMessageBox.information(self.gui, "Done", "SRF-file created. It can be now used within IVVRM and CreateLUT")
+                QMessageBox.information(self.gui, "Done",
+                                        "SRF-file created. It can be now used within IVVRM and CreateLUT")
                 self.main.LUT.init_sensorlist()
 
 
@@ -1441,7 +1462,7 @@ class LoadTxtFile:
         self.gui.cmdInputFile.clicked.connect(lambda: self.open_file())
         self.gui.radioHeader.toggled.connect(lambda: self.change_radioHeader())
         self.gui.cmbDelimiter.activated.connect(lambda: self.change_cmbDelimiter())  # "activated" signal is only called
-                                                                                     # for user activity, not code call
+        # for user activity, not code call
         self.gui.spinDivisionFactor.valueChanged.connect(lambda: self.change_division())
 
     def initial_values(self):
@@ -1548,7 +1569,8 @@ class LoadTxtFile:
         if self.header_bool:
             header = data[0]  # if file has a header, first row is taken as header
             if not len(header) == len(data[1]):  # header needs to have as many columns as the rest of the data
-                self.houston(message="Error: Data has %i columns, but header has %i columns" % (len(data[1]), len(header)))
+                self.houston(
+                    message="Error: Data has %i columns, but header has %i columns" % (len(data[1]), len(header)))
                 return
             header_offset += 1
             n_entries -= 1
@@ -1772,9 +1794,11 @@ class MainUiFunc:
 
 if __name__ == '__main__':
     import warnings
+
     warnings.filterwarnings("ignore", category=DeprecationWarning)
 
     from enmapbox.testing import start_app
+
     app = start_app()
     m = MainUiFunc()
     m.show()

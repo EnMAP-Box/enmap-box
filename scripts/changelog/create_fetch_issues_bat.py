@@ -1,4 +1,4 @@
-nIssues = 1000
+nIssues = 2000
 
 # create fetch_issues.bat
 with open('fetch_issues.bat', 'w') as file:
@@ -13,10 +13,3 @@ with open('fetch_issues.bat', 'w') as file:
 # init fetch_issues.txt
 with open('fetch_issues.txt', 'w') as file:
     pass
-
-# 1. Manually execute fetch_issues.bat from inside the EnMAP-Box Repo folder
-# e.g. D:\source\QGISPlugIns\enmap-box> .\scripts\changelog\fetch_issues.bat
-# This will create two files:
-#   fetch_issues.txt
-#   fetch_releases.txt
-# 2. Use create_changelog.py to build the changelog.

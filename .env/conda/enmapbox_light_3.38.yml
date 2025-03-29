@@ -7,7 +7,7 @@
 channels:
 - conda-forge
 dependencies:
-- qgis=3.38.1
+- qgis=3.38.2
 - docutils
 - enpt
 - flake8
@@ -19,7 +19,6 @@ dependencies:
 - pytest-cov
 - pytest-xdist
 - scikit-learn>=1
-- typeguard=2
 - pip:
   - flake8-qgis
 name: enmapbox_light_3.38

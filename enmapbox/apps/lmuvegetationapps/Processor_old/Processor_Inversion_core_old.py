@@ -20,7 +20,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this software. If not, see <http://www.gnu.org/licenses/>.
+    along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
 
 This script uses pre-trained Machine Learning (ML) algorithms to predict / estimate PROSAIL parameters
@@ -38,6 +38,7 @@ from sklearn.decomposition import PCA
 from sklearn.neural_network import MLPRegressor
 from sklearn.preprocessing import StandardScaler
 import joblib
+
 
 # Class MLRATraining will only be used for training new models, not for predictions!
 class MLRATraining:
@@ -240,7 +241,7 @@ class ProcessorTraining:
 
         # Which scaler should be user?
         self.scaler = StandardScaler()  # create instance of scaler; also: RobustScaler(),
-                                        #                                  MinMaxScaler() -> need to be imported
+        #                                  MinMaxScaler() -> need to be imported
         if npca > 0:
             self.pca = PCA(npca)  # create an instance of the PCA for the desired number of components
         else:
@@ -285,7 +286,7 @@ class ProcessorTraining:
                         else:  # if no progress bar exists, e.g. code is run from _exec.py
                             print("Training {} Noise {:d}-{:d} | {} | Geo {:d} of {:d}".format(
                                 self.algorithm, self.noise_type, self.sigma, para, geo_ensemble + 1,
-                                self.ntts * self.ntto * self.npsi))
+                                                                                   self.ntts * self.ntto * self.npsi))
 
                         self.init_model(var=para)  # initialize the model with the given settings
 
@@ -348,7 +349,7 @@ class ProcessorTraining:
     def read_lut(self, geo):
         # open a lut-file and reads the content; loads all splits of one geo-ensemble which is passed into the method
         lut = np.hstack([np.load(self.lut_base + '_{:d}_{:d}'.format(geo, split) + ".npy")
-                        for split in range(self.splits)])  # load all splits of the current geo_ensembles
+                         for split in range(self.splits)])  # load all splits of the current geo_ensembles
         # only select the rows with correct band information, then transpose into columns
         X = np.asarray(lut[self.subset_bands_lut, :]).T
         y = np.zeros(shape=(lut.shape[1], len(self.para_list)))  # open up a new array for PROSAIL parameters
@@ -367,9 +368,9 @@ class ProcessorTraining:
 
         # sigma (strength of the noise) is provided as %, so it needs to be converted to relative values
         # and optionally multiplied with the conversion factor to match reflectance value ranges for additive noise
-        sigma_c = (sigma/100) * conversion  # sigma converted (e.g. 0...1 -> 0...10000)
+        sigma_c = (sigma / 100) * conversion  # sigma converted (e.g. 0...1 -> 0...10000)
 
-        if noise_type == 0:    # no noise
+        if noise_type == 0:  # no noise
             return ref_list
         elif noise_type == 1:  # additive noise
             ref_noisy = np.random.normal(loc=0.0, scale=sigma_c, size=ref_list.shape) + ref_list
@@ -402,11 +403,11 @@ class ProcessorTraining:
                     self.ann_solver = 'lbfgs'  # adam, lbfgs, sgd
                     self.ann_alpha = 0.1
                     self.ann_max_iter = 10000  # 1000
-                else:    # hyperparameters best suited to estimate LAI and all others
+                else:  # hyperparameters best suited to estimate LAI and all others
                     self.ann_activation = 'logistic'  # logistic, relu, identity, tanh
                     self.ann_solver = 'lbfgs'  # adam, lbfgs, sgd
                     self.ann_alpha = 1.0
-                    self.ann_max_iter = 10000  #5000
+                    self.ann_max_iter = 10000  # 5000
 
             # make a dictionary from the hyperparams
             self.ml_params = {'activation': self.ann_activation, 'solver': self.ann_solver,
@@ -562,13 +563,13 @@ class ProcessorPrediction:
         # In Sklearn, prediction of multiple data inputs at once is possible, but not as a 2D-array
         # We need to "collapse" the second dimension and create one long dim as follows:
         image = image.reshape((nbands, -1))  # collapse rows and cols into 1 dimension
-        image = np.swapaxes(image, 0, 1)     # place predictors into the right position (where sklearn expects them)
+        image = np.swapaxes(image, 0, 1)  # place predictors into the right position (where sklearn expects them)
 
         # Do this for each PROSAIL parameter after another
         for ipara, para in enumerate(self.paras):
             if prg_widget:
                 prg_widget.gui.lblCaption_r.setText('Predicting {} (parameter {:d} of {:d})...'
-                                                    .format(para, ipara+1, len(self.paras)))
+                                                    .format(para, ipara + 1, len(self.paras)))
                 qgis_app.processEvents()
 
             # Load the right model from drive; it's actually a .npz file, so the arrays of .proc can be

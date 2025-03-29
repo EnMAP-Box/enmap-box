@@ -1,0 +1,3 @@
+image,mask
+images/enmap_potsdam_tile_160_96.tif,labels/enmap_potsdam_tile_160_96.tif
+images/enmap_potsdam_tile_96_32.tif,labels/enmap_potsdam_tile_96_32.tif

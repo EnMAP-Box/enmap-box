@@ -9,10 +9,12 @@ from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibraryrasterdataprovid
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import SpectralSetting
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprocessingdialog import SpectralProcessingDialog
-from enmapbox.testing import EnMAPBoxTestCase, TestObjects
+from enmapbox.testing import EnMAPBoxTestCase, TestObjects, start_app
 from qgis.PyQt.QtWidgets import QDialogButtonBox
 from qgis.core import QgsApplication, QgsProject
 from qgis.core import QgsVectorLayer, QgsProcessingRegistry, QgsProcessingAlgorithm
+
+start_app()
 
 site.addsitedir(pathlib.Path(DIR_ENMAPBOX) / 'coreapps')
 site.addsitedir(pathlib.Path(DIR_ENMAPBOX) / 'eo4qapps')

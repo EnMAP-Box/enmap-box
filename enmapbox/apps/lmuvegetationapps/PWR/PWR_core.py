@@ -19,7 +19,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this software. If not, see <http://www.gnu.org/licenses/>.
+    along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
 """
 
@@ -31,6 +31,8 @@ import numpy as np
 import os
 
 from scipy.optimize import minimize_scalar
+
+
 # from scipy.interpolate import interp1d
 # from scipy.interpolate import interp1d
 # from numba import jit
@@ -92,10 +94,12 @@ class PWR_core:
         #     wl_enmap_corr = np.delete(self.wl, 82)  # delete band 82 (944 nm) to avoid duplicate using enumerate
         #
         #     self.valid_bands = [i for i, x in enumerate(wl_enmap_corr) if x in list(self.valid_wl)]
-        #else:
-        self.valid_bands = [i for i, x in enumerate(self.wl) if x in list(self.valid_wl)]  # indices of input image bands used
+        # else:
+        self.valid_bands = [i for i, x in enumerate(self.wl) if
+                            x in list(self.valid_wl)]  # indices of input image bands used
 
-        self.abs_coef = np.asarray([self.get_abscoef[self.valid_wl[i]] for i in range(len(self.valid_wl))]) # abs coefficients of water for bands used
+        self.abs_coef = np.asarray([self.get_abscoef[self.valid_wl[i]] for i in
+                                    range(len(self.valid_wl))])  # abs coefficients of water for bands used
 
         NDVI_closest = [self.find_closest(lambd=827), self.find_closest(lambd=668)]
         self.NDVI_bands = [i for i, x in enumerate(self.wl) if x in NDVI_closest]
@@ -128,13 +132,14 @@ class PWR_core:
                 ['micrometers', 'µm', 'micrometer']:
             wave_convert = 1000
         else:
-            raise ValueError("Wavelength units must be nanometers or micrometers. Got '%s' instead" % metadict['ENVI']['wavelength units'])
+            raise ValueError("Wavelength units must be nanometers or micrometers. Got '%s' instead" % metadict['ENVI'][
+                'wavelength units'])
 
         in_matrix = dataset.readAsArray()
-        
+
         if self.division_factor != 1.0:
             in_matrix = in_matrix / self.division_factor
-            
+
         wl = [float(item) * wave_convert for item in wave_dict]
         wl = [int(i) for i in wl]
 
@@ -149,13 +154,13 @@ class PWR_core:
         R827 = self.in_raster[self.NDVI_bands[0], row, col]
 
         try:
-            NDVI = float(R668-R827)/float(R668+R827)
+            NDVI = float(R668 - R827) / float(R668 + R827)
         except ZeroDivisionError:
             NDVI = 0.0
 
         return NDVI
-    
-    #@jit(nopython=True)
+
+    # @jit(nopython=True)
     def execute_PWR(self, prg_widget=None, qgis_app=None):
         self.prg = prg_widget
         self.qgis_app = qgis_app
@@ -175,11 +180,11 @@ class PWR_core:
                 res = minimize_scalar(self.lambert_beer_ob_fun, d, args=[row, col], method='bounded', bounds=(0.0, 1.0))
                 res = res.x  # result in [cm] optically active water
                 res_raster[:, row, col] = res
-                self.prgbar_process(pixel_no=row*self.ncols+col)
+                self.prgbar_process(pixel_no=row * self.ncols + col)
 
         res_raster[np.isnan(res_raster)] = self.nodat_val[1]
         return res_raster
-    
+
     def lambert_beer_ob_fun(self, d, *args):
         '''
         :param d: spectrally active waterlayer in [mm]
@@ -213,7 +218,7 @@ class PWR_core:
                 self.prg.gui.lblCancel.setText("")
                 self.prg.gui.cmdCancel.setDisabled(False)
                 raise ValueError("Calculation cancelled")
-            self.prg.gui.prgBar.setValue(pixel_no*100 // self.pixel_total)  # progress value is index-orientated
+            self.prg.gui.prgBar.setValue(pixel_no * 100 // self.pixel_total)  # progress value is index-orientated
             self.prg.gui.lblCaption_l.setText("Calculating Water Content")
             if pixel_no % 100 == 0:
                 self.prg.gui.lblCaption_r.setText("pixel %i of %i" % (pixel_no, self.pixel_total))

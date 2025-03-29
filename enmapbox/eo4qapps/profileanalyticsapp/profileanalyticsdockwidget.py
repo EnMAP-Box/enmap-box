@@ -438,9 +438,6 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                     selectedFeatureCount = polygonLayer.selectedFeatureCount()
                     if selectedFeatureCount == 0:
                         return
-                    elif selectedFeatureCount > 1:
-                        warnings.warn('handling multiple shapes is not yet implemented')
-                        return
 
                     polygonId = polygonLayer.selectedFeatureIds()[0]
                     name = f'{layer.name()} [band {bandNo}, polygon ID {polygonId}]'
@@ -461,7 +458,7 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                     # 2. Create the values
                     reader2 = RasterReader(raster2)
                     name = f'{layer.name()} [polygon ID {polygonId}]'
-                    yValues = np.nanmean(np.array(reader2.array()), axis=(1, 2))
+                    yValues = np.nanmedian(np.array(reader2.array()), axis=(1, 2))
                     yMaskValues = reader.maskArray(np.array(yValues))
                     if self.mXUnit.currentIndex() == self.NumberUnits:
                         xUnit = 'band numbers'
