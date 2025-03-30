@@ -1,0 +1,25 @@
+name=TestLUT_2000_CpCBCcheck
+lop_model=prospectPro
+canopy_architecture_model=sail
+Cab-Car-Dependency=1# Dependency is True
+N=[1.0, 3.0]# Uniform statistical distribution with min=1.000000, max=3.000000
+cab=[0.0, 60.0]# Uniform statistical distribution with min=0.000000, max=60.000000
+car=[15.0]# Fixed value = 15.000000
+anth=[0.0, 2.0]# Uniform statistical distribution with min=0.000000, max=2.000000
+cbrown=[0.0, 0.5]# Uniform statistical distribution with min=0.000000, max=0.500000
+cw=[0.001, 0.06]# Uniform statistical distribution with min=0.001000, max=0.060000
+cm=[0.005]# Fixed value = 0.005000
+cp=[0.0, 0.0025]# Uniform statistical distribution with min=0.000000, max=0.002500
+cbc=[0.0, 0.03, 0.01, 0.02]# Gauss-normal statistical distribution with min=0.000000, max=0.030000, mean=0.010000, std=0.020000
+LAI=[0.01, 6.5, 4.0, 2.0]# Gauss-normal statistical distribution with min=0.010000, max=6.500000, mean=4.000000, std=2.000000
+typeLIDF=[2]# Fixed value = 2.000000
+LIDF=[30.0, 70.0]# Uniform statistical distribution with min=30.000000, max=70.000000
+hspot=[0.01, 0.5]# Uniform statistical distribution with min=0.010000, max=0.500000
+psoil=[0.0, 1.0]# Uniform statistical distribution with min=0.000000, max=1.000000
+tts=[40.0]# Fixed value = 40.000000
+tto=[0.0]# Fixed value = 0.000000
+psi=[0.0]# Fixed value = 0.000000
+LAIu=[1.0]# Fixed value = 1.000000
+cd=[15.0]# Fixed value = 15.000000
+sd=[500.0]# Fixed value = 500.000000
+h=[20.0]# Fixed value = 20.000000
