@@ -1,5 +1,8 @@
 import unittest
-from enmapbox.testing import EnMAPBoxTestCase
+
+from enmapbox.testing import EnMAPBoxTestCase, start_app
+
+start_app()
 
 
 class TestCasesAboutDialog(EnMAPBoxTestCase):

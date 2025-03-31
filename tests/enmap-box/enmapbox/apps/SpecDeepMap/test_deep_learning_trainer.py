@@ -3,20 +3,23 @@ import os
 import re
 from os.path import dirname, join
 from pathlib import Path
+import unittest
 
-import lightning as L
-import torch
 from processing import Processing
-from torchvision import transforms
-from torchvision.transforms import v2
-
 from enmapbox import DIR_UNITTESTS
-from enmapbox.apps.SpecDeepMap import DL_Trainer
-from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer_remap_classes_seg_former import MyModel
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
+from enmapbox.apps.SpecDeepMap import import_error
 
-start_app()
+if not import_error:
+    import lightning as L
+    import torch
+    from torchvision import transforms
+    from torchvision.transforms import v2
+    from enmapbox.apps.SpecDeepMap import DL_Trainer
+    from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer_remap_classes_seg_former import MyModel
+
+    start_app()
 
 BASE_TESTDATA = Path(DIR_UNITTESTS) / 'testdata/external/specdeepmap'
 
@@ -29,6 +32,7 @@ def best_ckpt_path(checkpoint_dir):
     )
 
 
+@unittest.skipIf(import_error, f'Missing modules to run SpecDeepMap: {import_error}')
 class Test_Deep_Learning_Trainer(TestCase):
 
     def test_Justo_simple_unet(self):

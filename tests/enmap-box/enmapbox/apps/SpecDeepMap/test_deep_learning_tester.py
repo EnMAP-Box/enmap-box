@@ -1,17 +1,20 @@
 import glob
 import os
 import re
+import unittest
 from pathlib import Path
 
-import pandas as pd
 from processing.core.Processing import Processing
-
 from enmapbox import DIR_UNITTESTS
-from enmapbox.apps.SpecDeepMap.processing_algorithm_tester import DL_Tester
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
+from enmapbox.apps.SpecDeepMap import import_error
 
-start_app()
+if not import_error:
+    import pandas as pd
+    from enmapbox.apps.SpecDeepMap.processing_algorithm_tester import DL_Tester
+
+    start_app()
 
 
 def best_ckpt_path(checkpoint_dir):
@@ -22,6 +25,7 @@ def best_ckpt_path(checkpoint_dir):
     )
 
 
+@unittest.skipIf(import_error, f'Missing modules to run SpecDeepMap: {import_error}')
 class Test_Deep_Learning_Tester(TestCase):
 
     def test_dl_tester_iou(self):
