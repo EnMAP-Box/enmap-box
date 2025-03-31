@@ -230,7 +230,7 @@ def renderImageData(task: QgsTask, dump):
 
                 def onSetBand(b: int):
                     nonlocal renderer
-                    nonlocal lyr
+                    # nonlocal lyr
                     renderer = QgsPalettedRasterRenderer(lyr.dataProvider(), b, renderer.classes())
                     lyr.setRenderer(renderer)
 
@@ -387,10 +387,10 @@ class ImageCubeRenderJob(object):
             return False
         else:
             return self.mID == other.mID and \
-                   self.mUri == other.mUri and \
-                   self.mRendererXML == other.mRendererXML and \
-                   self.mExtent == other.mExtent and \
-                   self.mMaxBytes == other.mMaxBytes
+                self.mUri == other.mUri and \
+                self.mRendererXML == other.mRendererXML and \
+                self.mExtent == other.mExtent and \
+                self.mMaxBytes == other.mMaxBytes
 
     def __hash__(self):
         return hash((self.mID, self.mUri, self.mRendererXML))
