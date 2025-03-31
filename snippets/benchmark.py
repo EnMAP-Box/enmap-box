@@ -18,7 +18,7 @@ t0 = np.datetime64('now')
 
 
 def callbackTest():
-    global t0
+    # global t0
     from multiprocessing import Pool
 
     def checkpoint(msg):
