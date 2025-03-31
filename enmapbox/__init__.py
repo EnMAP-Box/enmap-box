@@ -274,7 +274,7 @@ def registerMapLayerConfigWidgetFactories():
     Registers widgets to be shown into the QGIS layer properties dialog
     """
     debugLog('started initMapLayerConfigWidgetFactories')
-    global _ENMAPBOX_MAPLAYER_CONFIG_WIDGET_FACTORIES
+    # global _ENMAPBOX_MAPLAYER_CONFIG_WIDGET_FACTORIES
     from enmapbox.qgispluginsupport.qps import registerMapLayerConfigWidgetFactory
 
     from enmapbox.qgispluginsupport.qps.layerconfigwidgets.rasterbands import RasterBandConfigWidgetFactory
