@@ -1,4 +1,5 @@
 import os
+import unittest
 from pathlib import Path
 
 from qgis.core import QgsApplication
@@ -10,6 +11,7 @@ DIR_TESTDATA = Path(__file__).parent / 'data'
 
 class LMUTests_Processor(TestCase):
 
+    @unittest.skipIf(TestCase.runsInCI(), 'Takes too long. Local test only.')
     def test_processor_training(self):
         path_lut = DIR_TESTDATA / 'TestLUT_2000_CpCBCcheck_00meta.lut'
 
