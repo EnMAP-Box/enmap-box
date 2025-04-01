@@ -2,6 +2,7 @@ import unittest
 
 from osgeo import gdal
 
+from enmapbox.qgispluginsupport.qps.qgsrasterlayerproperties import QgsRasterLayerSpectralProperties
 from enmapboxprocessing.algorithm.libraryfromregressiondatasetalgorithm import LibraryFromRegressionDatasetAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousvectoralgorithm import \
     PrepareRegressionDatasetFromContinuousVectorAlgorithm
@@ -77,6 +78,9 @@ class TestPrepareRegressionDatasetFromContinuousVectorAlgorithm(TestCase):
 
     def test_excludeBadBands(self):
         alg = PrepareRegressionDatasetFromContinuousVectorAlgorithm()
+
+        props = QgsRasterLayerSpectralProperties.fromRasterLayer(enmap_potsdam)
+        s = ""
         parameters = {
             alg.P_FEATURE_RASTER: enmap_potsdam,
             alg.P_CONTINUOUS_VECTOR: landcover_potsdam_point,

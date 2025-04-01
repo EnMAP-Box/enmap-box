@@ -38,18 +38,15 @@ warnings.filterwarnings('ignore', category=UserWarning)
 
 if not sys.warnoptions:
     warnings.simplefilter("ignore")
-    os.environ["PYTHONWARNINGS"] = "ignore" # Also affect subprocesses
-
+    os.environ["PYTHONWARNINGS"] = "ignore"  # Also affect subprocesses
 
 from _classic.hubflow.core import *
 import numpy as np
-from PyQt5 import QtCore
 
 from lmuvegetationapps.Processor.Processor_Training_MLRA_defaults import MLRA_defaults
 
 from sklearn.neural_network import MLPRegressor
 from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process import kernels
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm import SVR
 from sklearn.kernel_ridge import KernelRidge
@@ -59,7 +56,7 @@ from sklearn.model_selection import RandomizedSearchCV
 
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_squared_error
 
 from sklearn.metrics import pairwise_distances
 from sklearn.model_selection import KFold, train_test_split
@@ -74,17 +71,20 @@ from sklearn.exceptions import ConvergenceWarning
 import joblib
 from joblib import Parallel, delayed
 
+
 def squeeze_first_dim(arr):
-  """Squeezes a numpy array only if its first dimension is 1.
-  Args:
-    arr: The numpy array to be squeezed.
-  Returns:
-    The squeezed array if the first dimension was 1, otherwise the original array.
-  """
-  if arr.shape[0] == 1:
-    return np.squeeze(arr, axis=0)
-  else:
-    return arr
+    """Squeezes a numpy array only if its first dimension is 1.
+    Args:
+      arr: The numpy array to be squeezed.
+    Returns:
+      The squeezed array if the first dimension was 1, otherwise the original array.
+    """
+    if arr.shape[0] == 1:
+        return np.squeeze(arr, axis=0)
+    else:
+        return arr
+
+
 def max_euclidean_distances(unlabeled, train, n):
     """
     Find n indices from unlabeled that are furthest from train using squared Euclidean distance.
@@ -103,6 +103,7 @@ def max_euclidean_distances(unlabeled, train, n):
     # Convert to set and back to list to remove duplicates
     # unique_indices = list(set(indices_arr1.tolist()))
     return indices_arr1.tolist()
+
 
 @ignore_warnings(category=ConvergenceWarning)
 def pool_active_learning(X_train, y_train, X_unlabeled, model, n, k, n_jobs):
@@ -152,7 +153,8 @@ def pool_active_learning(X_train, y_train, X_unlabeled, model, n, k, n_jobs):
     subset_indices_list = [np.random.choice(n_samples, size=subset_size, replace=False) for _ in range(k)]
 
     # Parallelize the training and predicting steps
-    predictions = Parallel(n_jobs=n_jobs)(delayed(train_and_predict)(subset) for subset in subset_indices_list)
+    predictions = Parallel(n_jobs=n_jobs, prefer='threads')(
+        delayed(train_and_predict)(subset) for subset in subset_indices_list)
 
     # Convert list of predictions into an array [n_samples, n_models]
     predictions_array = np.array(predictions).T
@@ -222,7 +224,7 @@ class MLRATraining:
             predictions, stds = model.predict(X_val, return_std=True)
         else:
             predictions = model.predict(X_val)
-        score = np.sqrt(mean_squared_error(y_val, predictions))#, squared=False)
+        score = np.sqrt(mean_squared_error(y_val, predictions))  # , squared=False)
 
         yield {'type': 'result', 'model': model, 'performances': score, 'predictions': predictions, 'stds': stds,
                'X_val': X_val, 'y_val': y_val}
@@ -248,7 +250,7 @@ class MLRATraining:
         best_hyperparams = model.best_params_
         best_score = model.best_score_
         yield {"type": "hyperparameters", "best_hyperparams": best_hyperparams, "best_score": best_score}
-        score = np.sqrt(mean_squared_error(test_y, predictions))#, squared=False)
+        score = np.sqrt(mean_squared_error(test_y, predictions))  # , squared=False)
         yield {'type': 'result', 'model': model, 'performances': score, 'predictions': predictions, 'stds': stds,
                'X_val': test_X, 'y_val': test_y}
 
@@ -264,7 +266,7 @@ class MLRATraining:
                 predictions, stds = model.predict(test_X, return_std=True)
             else:
                 predictions = model.predict(test_X)
-            score = np.sqrt(mean_squared_error(test_y, predictions))#, squared=False)
+            score = np.sqrt(mean_squared_error(test_y, predictions))  # , squared=False)
             model.fit(X, y)
 
             yield {'type': 'result', 'model': model, 'performances': score, 'predictions': predictions, 'stds': stds,
@@ -276,14 +278,14 @@ class MLRATraining:
             if isinstance(model, GaussianProcessRegressor):
                 # If the model is a GaussianProcessRegressor, also get the standard deviations of the predictions
                 predictions, stds = MLRATraining.cross_val_predict_with_std(X, y, model, cv=kfolds)
-                score = np.sqrt(mean_squared_error(y, predictions))#, squared=False)
+                score = np.sqrt(mean_squared_error(y, predictions))  # , squared=False)
                 yield {"type": "progress", "progress": 100, "loop_counter": 1}  # Indicate end of process
                 yield {'type': 'result', 'model': model, 'performances': score,
                        'predictions': predictions, 'stds': stds, 'X_val': X, 'y_val': y}
             else:
                 # If the model is not a GaussianProcessRegressor, get the predictions without standard deviations
                 predictions = cross_val_predict(model, X, y, cv=kfolds)
-                score = np.sqrt(mean_squared_error(y, predictions))#, squared=False)
+                score = np.sqrt(mean_squared_error(y, predictions))  # , squared=False)
                 yield {"type": "progress", "progress": 100, "loop_counter": 1}  # Indicate end of process
                 yield {'type': 'result', 'model': model, 'performances': score,
                        'predictions': predictions, 'X_val': X, 'y_val': y}
@@ -367,7 +369,8 @@ class MLRATraining:
         performances = []  # initialize performances list
 
         initial_pred = model.predict(X_val)  # predict first model on validation set (insitu or test split)
-        best_score = np.sqrt(mean_squared_error(y_val, initial_pred))#, squared=False)  # calculate first score (RMSE)
+        best_score = np.sqrt(
+            mean_squared_error(y_val, initial_pred))  # , squared=False)  # calculate first score (RMSE)
         performances.append(best_score)  # save first RMSE
 
         # update remaining indices -> all indices (n_samples) minus current training indices
@@ -392,7 +395,7 @@ class MLRATraining:
             model.fit(X_initial, y_initial)
 
             pred = model.predict(X_val)
-            score = np.sqrt(mean_squared_error(y_val, pred))#, squared=False)
+            score = np.sqrt(mean_squared_error(y_val, pred))  # , squared=False)
             performances.append(score)
 
             progress = (total_remaining - len(remaining_indices)) / total_remaining * 100
@@ -427,7 +430,8 @@ class MLRATraining:
         # np.savetxt("C:\Data\Daten\Testdaten\LUT/x_test.txt", X_val, delimiter="\t")
         # np.savetxt("C:\Data\Daten\Testdaten\LUT/training_indices_AL.txt", al_training_indices, delimiter="\t")
 
-        yield {'type': 'result', 'model': model, 'al_training_indices': al_training_indices, 'performances': performances,
+        yield {'type': 'result', 'model': model, 'al_training_indices': al_training_indices,
+               'performances': performances,
                'X_val': X_val, 'y_val': y_val, 'final_X': X_initial, 'final_y': y_initial}
 
 
@@ -634,7 +638,6 @@ class ProcessorTraining:
                             x = np.vstack((x, soils_x))
                             y = np.vstack((y, soils_y))
 
-
                         if self.val_data:
                             self.insitu_data_setup(self.val_data)
 
@@ -741,7 +744,7 @@ class ProcessorTraining:
 
                         else:  # no performance evaluation means just fitting the model without feedback
                             model = self.ml_model(X=x, y=y[:, ipara], model=self.mlra)
-                            test_indices = [] #make sure 'test_indices' is always defined, even when self.perf_eval is False
+                            test_indices = []  # make sure 'test_indices' is always defined, even when self.perf_eval is False
 
                         if not self.use_al and len(self.para_list) > 1:
                             prgbar_widget.gui.prgBar.setMaximum(100)
@@ -856,6 +859,7 @@ class ProcessorTraining:
         if self.pca:
             self.pca.fit(X_val)  # , y[:, ipara])
             self.X_val = self.pca.transform(X_val)
+
     # for __main__ use only
 
     def init_model(self, var, hyperparams=None):
@@ -1170,8 +1174,9 @@ class ProcessorPrediction:
         # self.predict does the actual prediction and returns a matrix that overwrites self.out_matrix
         # it seems confusing to prepare a matrix and then overwrite it, but self.predict needs self.out_matrix
         # as an argument!
-        self.out_matrix, self.out_matrix_std = self.predict(image=in_matrix, whichModel_coords=whichModel_coords, out_matrix=self.out_matrix,
-                                       prg_widget=prg_widget, qgis_app=qgis_app)
+        self.out_matrix, self.out_matrix_std = self.predict(image=in_matrix, whichModel_coords=whichModel_coords,
+                                                            out_matrix=self.out_matrix,
+                                                            prg_widget=prg_widget, qgis_app=qgis_app)
 
     def write_prediction(self):
         # Write the estimated parameters to file
@@ -1241,7 +1246,7 @@ class ProcessorPrediction:
 
                 if isinstance(mod[imodel], GaussianProcessRegressor):
                     result, result_std = mod[imodel].predict(image_copy[whichModel_coords[i_imodel][0],
-                                                 whichModel_coords[i_imodel][1], :], return_std=True)
+                                                             whichModel_coords[i_imodel][1], :], return_std=True)
                     out_matrix_std = np.copy(out_matrix)
                     out_matrix_std[ipara, whichModel_coords[i_imodel][0], whichModel_coords[i_imodel][
                         1]] = result_std
@@ -1249,10 +1254,10 @@ class ProcessorPrediction:
                 else:
                     # This is the core "predict" command in which the algorithm is asked to estimate from what it has learnt
                     result = mod[imodel].predict(image_copy[whichModel_coords[i_imodel][0],
-                                             whichModel_coords[i_imodel][1], :])
+                                                 whichModel_coords[i_imodel][1], :])
 
                 out_matrix[ipara, whichModel_coords[i_imodel][0], whichModel_coords[i_imodel][
-                        1]] = result  # / self.m.func.conv[para][2]
+                    1]] = result  # / self.m.func.conv[para][2]
 
                 # Convert the results and put it into the right position
                 # out_matrix[parameter, row, col], row and col is stored in the coordinates of whichModel
@@ -1384,7 +1389,6 @@ class Functions:
     def get_random_normal(loc, scale, size, random_state=42):
         rng = np.random.default_rng(random_state)
         return rng.normal(loc=loc, scale=scale, size=size)
-
 
 
 class ProcessorMainFunction:
