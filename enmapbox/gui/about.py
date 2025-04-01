@@ -17,16 +17,16 @@
 *                                                                         *
 ***************************************************************************
 """
-import pathlib
+import re
 import webbrowser
+from pathlib import Path
 from typing import Union
 
-from qgis.PyQt.QtCore import QUrl
-from qgis.PyQt.QtWidgets import QTextBrowser
-from qgis.PyQt.QtCore import Qt
 from enmapbox import DIR_REPO, REPOSITORY
 from enmapbox.gui.utils import loadUi
-from qgis.PyQt.QtWidgets import QDialog
+from qgis.PyQt.QtCore import Qt, QUrl
+from qgis.PyQt.QtGui import QPixmap
+from qgis.PyQt.QtWidgets import QDialog, QTextBrowser
 
 
 def anchorClicked(url: QUrl):
@@ -40,7 +40,8 @@ class AboutDialog(QDialog):
         """Constructor."""
         super().__init__(*args, **kwds)
         from enmapbox import DIR_UIFILES
-        pathUi = pathlib.Path(DIR_UIFILES) / 'aboutdialog.ui'
+        pathUi = Path(DIR_UIFILES) / 'aboutdialog.ui'
+
         loadUi(pathUi, self)
         self.setWindowFlag(Qt.WindowContextHelpButtonHint, False)
         self.tbAbout: QTextBrowser
@@ -48,6 +49,9 @@ class AboutDialog(QDialog):
         self.tbCredits: QTextBrowser
         self.tbContributors: QTextBrowser
         self.tbChanges: QTextBrowser
+
+        path_logo = Path(DIR_UIFILES) / 'logo/logo_enmapbox.png'
+        self.labelLogo.setPixmap(QPixmap(path_logo.as_posix()))
 
         for tb in [self.tbAbout, self.tbLicense, self.tbCredits, self.tbContributors, self.tbChanges]:
             tb: QTextBrowser
@@ -70,32 +74,42 @@ class AboutDialog(QDialog):
         self.labelVersion.setText(info)
         self.setAboutTitle()
 
-        def loadMDAndremoveDetailsSection(p: Union[str, pathlib.Path]):  # see issue #990
+        def loadChangelogMD(p: Union[str, Path]):  # see issue #990
             with open(p, 'r', encoding='utf-8') as f:
-                md = f.readlines()
-            md = [l for l in md if 'details>' not in l]
+                md = f.read()
+
+                # skip start comment
+                rxComments = re.compile(r'^.*(?=# CHANGELOG)', re.DOTALL)
+                md = rxComments.sub('', md)
+
+                # skip details lines
+                rxDetails = re.compile(r'</?details.*')
+                md = rxDetails.sub('', md)
+
+            # md = [l for l in md if 'details>' not in l]
             return ''.join(md)
 
-        def loadMD(p: Union[str, pathlib.Path]):
-            p = pathlib.Path(p)
+        def loadMD(p: Union[str, Path]):
+            p = Path(p)
 
             try:
                 assert p.is_file()
                 assert p.name.endswith('.md')
                 with open(p, 'r', encoding='utf-8') as f:
                     md = f.read()
+
             except (AssertionError, FileNotFoundError) as ex:
                 md = f'Unable to load "{p}"\n{ex}'
             return md
 
-        r = pathlib.Path(DIR_REPO)
+        r = Path(DIR_REPO)
 
         # self.labelAboutText.setText(f'<html><head/><body>{ABOUT}</body></html>')
         self.tbAbout.setMarkdown(loadMD(r / 'ABOUT.md'))
         self.tbLicense.setMarkdown(loadMD(r / 'LICENSE.md'))
         self.tbCredits.setMarkdown(loadMD(r / 'CREDITS.md'))
         self.tbContributors.setMarkdown(loadMD(r / 'CONTRIBUTORS.md'))
-        self.tbChanges.setMarkdown(loadMDAndremoveDetailsSection(r / 'CHANGELOG.md'))
+        self.tbChanges.setMarkdown(loadChangelogMD(r / 'CHANGELOG.md'))
 
     def setAboutTitle(self, suffix: str = None):
         """
