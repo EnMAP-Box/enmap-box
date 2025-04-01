@@ -366,7 +366,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../qgispluginsupport/qps/qpsresources.qrc">
      <normaloff>:/qps/ui/icons/select_location.svg</normaloff>
      <normalon>:/enmapbox/icons/mActionIdentify.svg</normalon>:/qps/ui/icons/select_location.svg</iconset>
    </property>
@@ -434,7 +434,7 @@
      <normaloff>:/enmapbox/gui/ui/icons/metadata.svg</normaloff>:/enmapbox/gui/ui/icons/metadata.svg</iconset>
    </property>
    <property name="text">
-    <string>About</string>
+    <string>About EnMAP-Box</string>
    </property>
   </action>
   <action name="optionIdentifyCursorLocation">
@@ -550,7 +550,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../qgispluginsupport/qps/qpsresources.qrc">
      <normaloff>:/qps/ui/icons/pan_center.svg</normaloff>:/qps/ui/icons/pan_center.svg</iconset>
    </property>
    <property name="text">
@@ -619,7 +619,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="../../../../qgispluginsupport/qps/qpsresources.qrc">
      <normaloff>:/qps/ui/icons/profile.svg</normaloff>:/qps/ui/icons/profile.svg</iconset>
    </property>
    <property name="text">
