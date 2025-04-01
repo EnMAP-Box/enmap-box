@@ -43,4 +43,4 @@ jobs:
             https://.*,https://bitbucket.org/hu-geomatics/enmap-box/issues//422,http://mrcc.com/qgis.dtd,http://www.wtfpl.net/,https://www.gnu.org/licenses/
 
           exclude_patterns:
-            https://www.gnu.org/,http://ecn.t3.tiles.virtualearth.net/,%7Bz%7D/%7By%7D/%7Bx%7D,%7Bz%7D/%7Bx%7D/%7By%7D,x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D,https://fbinter.stadt-berlin.de/,https://tiles.wmflabs.org/
+            https://www.gnu.org/,http://ecn.t3.tiles.virtualearth.net/,%7Bz%7D/%7By%7D/%7Bx%7D,%7Bz%7D/%7Bx%7D/%7By%7D,x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D,https://fbinter.stadt-berlin.de/,https://tiles.wmflabs.org/,https://nominatim.openstreetmap.org
