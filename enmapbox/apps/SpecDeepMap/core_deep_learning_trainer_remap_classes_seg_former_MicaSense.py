@@ -217,6 +217,7 @@ class CustomDataset(Dataset):
             remove: Optional = None,
             scaler_loader: Optional = None,
             remap: Optional = None,
+            device_acc: Optional = None
             # Use A.Compose for transforms
     ):
         """
@@ -235,6 +236,7 @@ class CustomDataset(Dataset):
         self.remove = remove
         self.scaler_loader = scaler_loader
         self.remap = remap
+        self.device_acc = device_acc
 
     def __len__(self):
         return len(self.data)
@@ -245,17 +247,17 @@ class CustomDataset(Dataset):
         img_path = self.data.loc[idx, 'image']  # Access the 'image' column
         mask_path = self.data.loc[idx, 'mask']  # Access the 'mask' column
 
-        data = gdal.Open(img_path)
 
+        data = gdal.Open(img_path)
         mask = gdal.Open(mask_path)
         # channel first
         data_array = data.ReadAsArray().astype(np.float32)
         mask_array = mask.ReadAsArray().astype(np.float32)
-        mask = torch.as_tensor(mask_array, dtype=torch.int64)
 
+        mask_array = torch.as_tensor(mask_array, dtype=torch.int64)
+
+        self.remap = self.remap.to('cpu')
         # ensure remap according to look up table
-
-        mask_array = mask
         mask_array = torch.take(self.remap, mask_array)
 
         # mask_array = mask -1 # -1 because mask values from gt start at 1 upwards, to ensure class values below layer number -1 just works for continues classes
@@ -358,7 +360,8 @@ class MyModel(L.LightningModule):
             preprocess_input=self.preprocess,
             remove=self.remove_b,
             scaler_loader=self.scaler,
-            remap=self.reclass_look_up_table
+            remap=self.reclass_look_up_table,
+            device_acc = self.acc
 
         )
 
@@ -369,7 +372,8 @@ class MyModel(L.LightningModule):
             preprocess_input=self.preprocess,
             remove=self.remove_b,
             scaler_loader=self.scaler,
-            remap=self.reclass_look_up_table
+            remap=self.reclass_look_up_table,
+            device_acc=self.acc
         )
 
         self.model = self._prepare_model()
