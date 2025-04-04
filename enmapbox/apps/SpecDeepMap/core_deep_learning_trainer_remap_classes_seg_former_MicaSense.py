@@ -606,6 +606,35 @@ class MyModel(L.LightningModule):
                 )
                 model.encoder.load_state_dict(state_dict_mod)
 
+
+            elif self.weights == "MicaSense_Swin_s3_tiny":
+                assert self.in_channels == 7, f'Input channels should be equal to 7 , but is {self.in_channels}'
+                self.backbone = 'tu-swin_s3_tiny_224'
+                path = "C:/test_cursor/version_19_10epoch_10and50m_mocov3_swintiny/checkpoints/epoch=8-step=2925.ckpt"
+                checkpoint = torch.load(path, map_location=torch.device('cpu'))
+                print(checkpoint['hyper_parameters'])
+
+                state_dict_mod = checkpoint['state_dict']
+                print("Keys in state dict modified:", state_dict_mod.keys())
+                # Get only the backbone keys (not backbone_momentum)
+                state_dict_mod = OrderedDict(
+                    {k: v for k, v in state_dict_mod.items() if
+                     k.startswith('backbone.') and not k.startswith('backbone_momentum')})
+                # Remove the 'backbone.' prefix to match the target model's keys
+                state_dict_mod = OrderedDict(
+                    {k.replace('backbone.', 'model.'): v for k, v in state_dict_mod.items()}
+                )
+
+                state_dict_mod = {re.sub(r'(?<=layers).', '_', k): v for k, v in state_dict_mod.items()}
+
+                print("Keys in state dict modified:", state_dict_mod.keys())
+                # load whole model with weights
+                ignore_keys = {"model.norm.weight", "model.norm.bias"}
+
+                # Filter out unwanted keys
+                state_dict_mod = {k: v for k, v in state_dict_mod.items() if k not in ignore_keys}
+                model.encoder.load_state_dict(state_dict_mod)
+
         if self.freeze_encoder == True:
             # Freeze encoder weights
             for param in model.encoder.parameters():

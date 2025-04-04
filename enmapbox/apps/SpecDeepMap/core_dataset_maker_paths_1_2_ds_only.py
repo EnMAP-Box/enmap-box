@@ -105,7 +105,7 @@ def find_best_split(label_histograms, num_permutations, train_perc, test_perc, v
     # Calculate dataset sizes based on percentages
     num_test = math.ceil(num_files * test_perc) if test_perc > 0 else 0
     num_val = math.ceil(num_files * val_perc) if val_perc > 0 else 0
-    
+
     # Original train set calculation
     num_train = min(math.ceil(num_files * train_perc), num_files - (num_test + num_val))
 
@@ -116,23 +116,26 @@ def find_best_split(label_histograms, num_permutations, train_perc, test_perc, v
     for _ in range(num_permutations):
         progress_counter += 1
         progress = (progress_counter / progress_counter_total) * 100
-        
+
         if isinstance(feedback, QgsProcessingFeedback):
             feedback.setProgress(progress)
             if feedback.isCanceled():
                 break
 
         perm = rng.permutation(idx)
-        
+
         # Initialize histograms
-        test_hist = np.zeros_like(label_histograms[0]) if num_test == 0 else np.sum(label_histograms[perm[:num_test]], axis=0)
-        val_hist = np.zeros_like(label_histograms[0]) if num_val == 0 else np.sum(label_histograms[perm[num_test:num_test + num_val]], axis=0)
-        train_hist = np.zeros_like(label_histograms[0]) if num_train == 0 else np.sum(label_histograms[perm[num_test + num_val:num_val + num_test + num_train]], axis=0)
+        test_hist = np.zeros_like(label_histograms[0]) if num_test == 0 else np.sum(label_histograms[perm[:num_test]],
+                                                                                    axis=0)
+        val_hist = np.zeros_like(label_histograms[0]) if num_val == 0 else np.sum(
+            label_histograms[perm[num_test:num_test + num_val]], axis=0)
+        train_hist = np.zeros_like(label_histograms[0]) if num_train == 0 else np.sum(
+            label_histograms[perm[num_test + num_val:num_val + num_test + num_train]], axis=0)
 
         # Check minimum requirements only for non-empty datasets
         if (num_test > 0 and np.any(test_hist < min_per_class)) or \
-           (num_val > 0 and np.any(val_hist < min_per_class)) or \
-           (num_train > 0 and np.any(train_hist < min_per_class)):
+                (num_val > 0 and np.any(val_hist < min_per_class)) or \
+                (num_train > 0 and np.any(train_hist < min_per_class)):
             continue
 
         # Calculate EMD only for existing datasets

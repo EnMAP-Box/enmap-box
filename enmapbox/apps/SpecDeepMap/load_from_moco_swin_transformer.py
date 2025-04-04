@@ -1,70 +1,11 @@
+import re
 from collections import OrderedDict
 
 import torch
 
-
-def extract_backbone(path: str) -> tuple[str, 'OrderedDict[str, Tensor]']:
-    """Extracts a backbone from a lightning checkpoint file.
-
-    Args:
-        path: path to checkpoint file (.ckpt)
-
-    Returns:
-        tuple containing model name and state dict
-
-    Raises:
-        ValueError: if 'model' or 'backbone' not in
-            checkpoint['hyper_parameters']
-
-    .. versionchanged:: 0.4
-        Renamed from *extract_encoder* to *extract_backbone*
-    """
-    checkpoint = torch.load(path, map_location=torch.device('cpu'))
-    if 'model' in checkpoint['hyper_parameters']:
-        name = checkpoint['hyper_parameters']['model']
-        state_dict = checkpoint['state_dict']
-        state_dict = OrderedDict({k: v for k, v in state_dict.items() if 'model.' in k})
-        # state_dict = OrderedDict(
-        #   {k.replace('model.', ''): v for k, v in state_dict.items()}
-        # )
-    elif 'backbone' in checkpoint['hyper_parameters']:
-        name = checkpoint['hyper_parameters']['backbone']
-        state_dict = checkpoint['state_dict']
-        state_dict = OrderedDict(
-            {k: v for k, v in state_dict.items() if 'model.backbone.model' in k}
-        )
-        state_dict = OrderedDict(
-            {k.replace('model.backbone.model.', ''): v for k, v in state_dict.items()}
-        )
-    else:
-        raise ValueError(
-            'Unknown checkpoint task. Only backbone or model extraction is supported'
-        )
-
-    return name, state_dict
-
-
-name, state_dict = extract_backbone(
-    "C:/test_cursor/version_19_10epoch_10and50m_mocov3_swintiny/checkpoints/epoch=8-step=2925.ckpt")
-
-print('name', name)
-
 path = "C:/test_cursor/version_19_10epoch_10and50m_mocov3_swintiny/checkpoints/epoch=8-step=2925.ckpt"
 checkpoint = torch.load(path, map_location=torch.device('cpu'))
 print(checkpoint['hyper_parameters'])
-
-# print(checkpoint['weights'])
-# print('state_dict', state_dict)
-# Print the keys from your loaded state dict
-# print("Keys in loaded state dict:", state_dict.keys())
-
-# Print the keys expected by the model
-
-
-# this is from torchgeo moco task trained a renset 18
-
-
-checkpoint = torch.load(path, map_location=torch.device('cpu'))
 
 state_dict_mod = checkpoint['state_dict']
 print("Keys in state dict modified:", state_dict_mod.keys())
@@ -75,7 +16,6 @@ state_dict_mod = OrderedDict(
 state_dict_mod = OrderedDict(
     {k.replace('backbone.', 'model.'): v for k, v in state_dict_mod.items()}
 )
-import re
 
 state_dict_mod = {re.sub(r'(?<=layers).', '_', k): v for k, v in state_dict_mod.items()}
 
@@ -104,7 +44,6 @@ model.encoder.load_state_dict(state_dict_mod)
 
 
 import torch
-from torch import Tensor
 
 # print(checkpoint['weights'])
 # print('state_dict', state_dict)
