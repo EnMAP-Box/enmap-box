@@ -1,6 +1,6 @@
 from math import nan
 from os import listdir
-from os.path import join, exists
+from os.path import join
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
@@ -21,8 +21,8 @@ class ImportUsgsSpeclib07Algorithm(EnMAPProcessingAlgorithm):
         'Vegetation'
     )
     AllChapters = (
-    ArtificialMaterialsChapter, CoatingsChapter, LiquidsChapter, MineralsChapter, OrganicCompoundsChapter,
-    SoilsAndMixturesChapter, VegetationChapter) = list(range(7))
+        ArtificialMaterialsChapter, CoatingsChapter, LiquidsChapter, MineralsChapter, OrganicCompoundsChapter,
+        SoilsAndMixturesChapter, VegetationChapter) = list(range(7))
     P_SPECTROMETER, _SPECTROMETER = 'spectrometer', 'Selected spectrometers'
     O_SPECTROMETER = (
         'Beckman 5270 (0.2 to 3 µm)', 'hi-resNG ASD (0.35 to 2.5 µm', 'Nicolet FTIR (0.1 to 21.6 µm',
@@ -143,11 +143,9 @@ class ImportUsgsSpeclib07Algorithm(EnMAPProcessingAlgorithm):
                         'record': record,
                         'basename': spectrum
                     }
-                    if not exists(values['html']):
-                        a = 1
                     data.append(values)
 
-            writer = LibraryDriver().createFromData('USGS Speclib Library Version 7', data)
+            writer = LibraryDriver().createFromData(data, None, 'USGS Speclib Library Version 7')
             writer.writeToSource(filename)
             library = QgsVectorLayer(filename)
             library.loadNamedStyle(__file__.replace('.py', '.qml'))
