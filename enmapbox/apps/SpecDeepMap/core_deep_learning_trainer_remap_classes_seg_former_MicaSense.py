@@ -1,4 +1,5 @@
 import math
+import re
 from collections import OrderedDict
 from pathlib import Path
 from typing import Optional
@@ -607,7 +608,7 @@ class MyModel(L.LightningModule):
                 model.encoder.load_state_dict(state_dict_mod)
 
 
-            elif self.weights == "MicaSense_Swin_s3_tiny":
+            elif self.weights == "MicaSense_SR_Swin_s3_tiny":
                 assert self.in_channels == 7, f'Input channels should be equal to 7 , but is {self.in_channels}'
                 self.backbone = 'tu-swin_s3_tiny_224'
                 path = "C:/test_cursor/version_19_10epoch_10and50m_mocov3_swintiny/checkpoints/epoch=8-step=2925.ckpt"
@@ -695,7 +696,8 @@ def dl_train(
 
     pretrained_weights_options = ['imagenet', None, 'Sentinel_2_TOA_Resnet18',
                                   'Sentinel_2_TOA_Resnet50',
-                                  'MicaSense_SR_Resnet18']  # ,'LANDSAT_TM_TOA_Resnet18','LANDSAT_ETM_TOA_Resnet18','LANDSAT_OLI_TIRS_TOA_Resnet18','LANDSAT_ETM_SR_Resnet18','LANDSAT_OLI_SR_Resnet18']
+                                  'MicaSense_SR_Resnet18',
+                                  'MicaSense_SR_Swin_s3_tiny']  # ,'LANDSAT_TM_TOA_Resnet18','LANDSAT_ETM_TOA_Resnet18','LANDSAT_OLI_TIRS_TOA_Resnet18','LANDSAT_ETM_SR_Resnet18','LANDSAT_OLI_SR_Resnet18']
     pretrained_weights = pretrained_weights_options[pretrained_weights_index]
 
     if pretrained_weights == 'Sentinel_2_TOA_Resnet18':

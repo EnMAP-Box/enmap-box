@@ -184,7 +184,8 @@ class DL_Trainer(QgsProcessingAlgorithm):
             name=self.backbone, description='Model backbone', defaultValue='resnet18'))
         self.addParameter(QgsProcessingParameterEnum(
             name=self.pretrained_weights, description='Load pretrained weights',
-            options=['imagenet', 'None', 'Sentinel_2_TOA_Resnet18', 'Sentinel_2_TOA_Resnet50', 'MicaSense_SR_Resnet18'],
+            options=['imagenet', 'None', 'Sentinel_2_TOA_Resnet18', 'Sentinel_2_TOA_Resnet50', 'MicaSense_SR_Resnet18',
+                     'MicaSense_SR_Swin_s3_tiny'],
             defaultValue=0))
         self.addParameter(
             QgsProcessingParameterFile(self.checkpoint, description='Load model from path', optional=True))
