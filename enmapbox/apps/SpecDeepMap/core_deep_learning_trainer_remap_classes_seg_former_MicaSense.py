@@ -251,12 +251,14 @@ class CustomDataset(Dataset):
         # channel first
         data_array = data.ReadAsArray().astype(np.float32)
         mask_array = mask.ReadAsArray().astype(np.float32)
+        mask = torch.as_tensor(mask_array, dtype=torch.int64)
+
         mask_array = torch.as_tensor(mask_array, dtype=torch.int64)
 
+        self.remap = self.remap.to('cpu')
         # ensure remap according to look up table
 
-        self.remap = self.remap.to('cpu')
-
+        mask_array = mask
         mask_array = torch.take(self.remap, mask_array)
 
         # mask_array = mask -1 # -1 because mask values from gt start at 1 upwards, to ensure class values below layer number -1 just works for continues classes
