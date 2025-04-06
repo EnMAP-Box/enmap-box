@@ -258,7 +258,6 @@ class CustomDataset(Dataset):
         self.remap = self.remap.to('cpu')
         # ensure remap according to look up table
 
-        mask_array = mask
         mask_array = torch.take(self.remap, mask_array)
 
         # mask_array = mask -1 # -1 because mask values from gt start at 1 upwards, to ensure class values below layer number -1 just works for continues classes
