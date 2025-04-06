@@ -4,7 +4,7 @@
 
 from qgis._core import QgsProcessingFeedback
 
-from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import MyModel
+from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer_remap_classes_seg_former import MyModel
 import os
 import numpy as np
 import torch
@@ -30,6 +30,10 @@ def compute_iou_per_class(pred, gt, cls_values):
 
 def load_model_and_tile_size(model_checkpoint, acc):
     # Load the model checkpoint
+
+    if acc == 'gpu':
+        acc= 'cuda'
+
     checkpoint = torch.load(model_checkpoint, map_location=torch.device(acc), weights_only=False)
 
     # Retrieve hyperparameters from the checkpoint
@@ -212,13 +216,16 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
 
             image = np.expand_dims(tile, axis=0)
 
-            # Make prediction using the model
+            # Make prediction using the model 3
             image = image.astype(np.float32)
-
+            image = torch.as_tensor(image, dtype=torch.float32)
+            if acc=='gpu':
+                image = image.to('cuda')
             preds = model.predict(image)
 
             #preds = preds
-
+            if acc=='gpu':
+                preds =preds.cpu()
             pred_classes = preds.squeeze(0)  # Shape becomes [H, W]
 
             # Convert to numpy for further use outside PyTorch
