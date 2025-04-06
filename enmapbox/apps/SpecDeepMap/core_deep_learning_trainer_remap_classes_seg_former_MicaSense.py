@@ -251,11 +251,12 @@ class CustomDataset(Dataset):
         # channel first
         data_array = data.ReadAsArray().astype(np.float32)
         mask_array = mask.ReadAsArray().astype(np.float32)
-        mask = torch.as_tensor(mask_array, dtype=torch.int64)
+        mask_array = torch.as_tensor(mask_array, dtype=torch.int64)
 
         # ensure remap according to look up table
 
-        mask_array = mask
+        self.remap = self.remap.to('cpu')
+
         mask_array = torch.take(self.remap, mask_array)
 
         # mask_array = mask -1 # -1 because mask values from gt start at 1 upwards, to ensure class values below layer number -1 just works for continues classes
@@ -738,64 +739,29 @@ def dl_train(
     print('remove zero class', remove_zero_class)
 
     # create extra no-data class layer if yes
+
+    # dynamic remapping of labeled data (handles uncontinious data labels , ignores 0 in class_values, important for iou calc in mapper/tester)
+    original_values = sorted(summary_data['Class ID'].unique().tolist())
+
     if remove_zero_class == 'Yes':
-        n_classes = len(summary_data['Class ID'].tolist()) + 1
-        # Create a remapping dictionary
-        print('removed:', n_classes)
-        # Create a remapping dictionary
-        class_ids = summary_data['Class ID'].tolist()
-        reclass_dict = {0: 0}  # Keep 0 as 0
-        reclass_dict.update({class_ids[i]: i + 1 for i in range(len(class_ids))})
-        # Now create the lookup table
-        max_class_id = max(reclass_dict.keys())  # Find the maximum class ID
-        lookup_table = np.zeros(max_class_id + 1, dtype=np.int64)  # Initialize with zeros
-        # Fill the lookup table
-        for key, value in reclass_dict.items():
-            lookup_table[key] = value
+        original_values = [0] + original_values
 
-        print('reclass dict', reclass_dict)
-        # Convert lookup_table to a torch tensor
-        lookup_table_tensor = torch.tensor(lookup_table, dtype=torch.int64)
-        print('lookup_table_tensor', lookup_table_tensor)
-    # remapping look up tables for train and prediction
+    cls_values = original_values
 
-    elif remove_zero_class == 'No':
-        print('remove', remove_zero_class)
-        n_classes = len(summary_data['Class ID'].tolist())
-        print(n_classes)
+    mapped_values = list(range(len(original_values)))  # 0 to n-1
+    # Create forward lookup table (original -> mapped)
+    max_original = max(original_values)
+    lookup_table = torch.zeros(max_original + 1, dtype=torch.long)
+    lookup_table[torch.tensor(original_values)] = torch.tensor(mapped_values)
 
-        # Create a remapping dictionary
-        class_ids = summary_data['Class ID'].tolist()
-        reclass_dict = {class_ids[i]: i for i in range(len(class_ids))}
-        max_class_id = max(reclass_dict.keys())  # Find the maximum class ID
-        lookup_table = np.zeros(max_class_id + 1, dtype=np.int64)
-        print('reclass dict', reclass_dict)  # Initialize with zeros
+    # Create reverse lookup table (mapped -> original)
+    max_mapped = max(mapped_values)
+    reverse_lookup_table = torch.zeros(max_mapped + 1, dtype=torch.long)
+    reverse_lookup_table[torch.tensor(mapped_values)] = torch.tensor(original_values)
 
-        # Fill the lookup table
-        for key, value in reclass_dict.items():
-            lookup_table[key] = value
+    if 0 in cls_values:
+        cls_values.remove(0)
 
-        # Convert lookup_table to a torch tensor
-        lookup_table_tensor = torch.tensor(lookup_table, dtype=torch.int64)
-        print('lookup_table_tensor', lookup_table_tensor)
-    # Create reverse mapping for decoding (continuous → original)
-    reverse_reclass_dict = {v: k for k, v in reclass_dict.items()}
-
-    # Reverse lookup table for decoding
-    max_reclass_id = max(reverse_reclass_dict.keys())  # Max original class ID
-    reverse_lookup_table = np.zeros(max_reclass_id + 1, dtype=np.int64)
-    print('reverse_class_dict', reverse_reclass_dict)
-    for key, value in reverse_reclass_dict.items():
-        reverse_lookup_table[key] = value
-
-    cls_values = list(reclass_dict.keys())
-    print('class_values_reclass dict', cls_values)
-    cls_values = [cls for cls in cls_values if cls != 0]
-    print('filtered 0 from cls_values', cls_values)
-
-    # Convert to PyTorch tensors
-    reverse_lookup_table_tensor = torch.tensor(reverse_lookup_table, dtype=torch.int64)
-    print('reverse lookup_table_tensor', reverse_lookup_table_tensor)
     #  until here remapping look up tables for train and prediction
 
     scaler_list = summary_data['Scaler'].tolist()
@@ -831,8 +797,8 @@ def dl_train(
     acc_type = acc_type_options[acc_type_index]
 
     if acc_type == 'gpu':
-        lookup_table_tensor = torch.tensor(lookup_table, dtype=torch.int64).cuda()
-        reverse_lookup_table_tensor = torch.tensor(reverse_lookup_table, dtype=torch.int64).cuda()
+        lookup_table = torch.tensor(lookup_table, dtype=torch.int64).cuda()
+        reverse_lookup_table = torch.tensor(reverse_lookup_table, dtype=torch.int64).cuda()
     # balanced training #
     if class_weights_balanced == True:
 
@@ -897,8 +863,8 @@ def dl_train(
             "preprocess": preprocess_input,
             "remove_background_class": remove_zero_class,
             "scaler": scaler_value,
-            "look_up_table": lookup_table_tensor,
-            "reverse_look_up_table": reverse_lookup_table_tensor,
+            "look_up_table": lookup_table,
+            "reverse_look_up_table": reverse_lookup_table,
             "class_values": cls_values
 
         }
@@ -931,8 +897,8 @@ def dl_train(
                                                       "preprocess": preprocess_input,
                                                       "remove_background_class": remove_zero_class,
                                                       "scaler": scaler_value,
-                                                      "look_up_table": lookup_table_tensor,
-                                                      "reverse_look_up_tabe": reverse_lookup_table_tensor,
+                                                      "look_up_table": lookup_table,
+                                                      "reverse_look_up_tabe": reverse_lookup_table,
                                                       "class_values": cls_values},
                                              map_location=acc_type
                                              )
