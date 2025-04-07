@@ -26,7 +26,11 @@ transforms_v2 = v2.Compose([
 
 def load_model_and_tile_size(model_checkpoint, acc):
     # Load the model checkpoint
-    checkpoint = torch.load(model_checkpoint, map_location=torch.device(acc), weights_only=False)
+    if acc =='gpu':
+        acc_d = 'cuda'
+    else:
+        acc_d='cpu'
+    checkpoint = torch.load(model_checkpoint, map_location=torch.device(acc_d), weights_only=False)
 
     # Retrieve hyperparameters from the checkpoint
     hyperpara = checkpoint['hyper_parameters']
@@ -136,7 +140,14 @@ def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_
                             no_data_label_mask=False, feedback: Optional[QgsProcessingFeedback] = None):
     acc_options = ['cpu', 'gpu']
     acc = acc_options[acc_device]
+
+
     model, _, _, num_classes, remove_c, cls_values = load_model_and_tile_size(model_checkpoint, acc)
+    if acc =='gpu':
+        acc_d = 'cuda'
+    else:
+        acc_d='cpu'
+    model.to(acc_d)
 
     print(num_classes)
 
