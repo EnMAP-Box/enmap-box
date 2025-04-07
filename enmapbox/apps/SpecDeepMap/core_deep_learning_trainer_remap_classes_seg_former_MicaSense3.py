@@ -748,10 +748,11 @@ def dl_train(
 
     # dynamic remapping of labeled data (handles uncontinious data labels , ignores 0 in class_values, important for iou calc in mapper/tester)
     original_values = sorted(summary_data['Class ID'].unique().tolist())
+    n_classes = len(original_values)
 
     if remove_zero_class == 'Yes':
         original_values = [0] + original_values
-
+        n_classes = len(original_values) + 1
     cls_values = original_values
 
     forward_mapping = {original: idx for idx, original in enumerate(original_values)}
