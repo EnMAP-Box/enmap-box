@@ -4,7 +4,8 @@
 
 from qgis._core import QgsProcessingFeedback
 
-from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer_remap_classes_seg_former import MyModel
+from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer_remap_classes_seg_former_MicaSenseLUT import MyModel
+from enmapbox.apps.SpecDeepMap.core_tester_remap_classes import load_model_and_tile_size
 import os
 import numpy as np
 import torch
@@ -27,52 +28,6 @@ def compute_iou_per_class(pred, gt, cls_values):
             ious.append(intersection / union)
 
     return ious
-
-def load_model_and_tile_size(model_checkpoint, acc):
-    # Load the model checkpoint
-
-    if acc == 'gpu':
-        acc= 'cuda'
-
-    checkpoint = torch.load(model_checkpoint, map_location=torch.device(acc), weights_only=False)
-
-    # Retrieve hyperparameters from the checkpoint
-    hyperpara = checkpoint['hyper_parameters']
-
-    # Extract tile size and other relevant hyperparameters
-    tile_size_x = hyperpara['img_x']
-    tile_size_y = hyperpara['img_y']
-    num_classes = hyperpara['classes']
-
-    in_channels = hyperpara["in_channels"]
-    architecture_used = hyperpara['architecture']
-    backbone_used = hyperpara['backbone']
-    pre_process = hyperpara['preprocess']
-    remove_c = hyperpara['remove_background_class']
-    cls_values = hyperpara["class_values"]
-
-    # Load the model with the extracted hyperparameters
-    model = MyModel.load_from_checkpoint(
-        model_checkpoint,
-        hparams={
-            "architecture": architecture_used,
-            "backbone": backbone_used,
-            "transform": None,
-            "class_weights_balanced": False,
-            "acc_type": acc,
-            "batch_size": 1,
-            "classes": num_classes,
-            "in_channels": in_channels,
-            "preprocess": pre_process,
-            'remove_background_class':remove_c
-        }
-    )
-
-    # Set the model to evaluation mode
-    model.eval()
-
-    # Return the model and tile sizes
-    return model, tile_size_x, tile_size_y, num_classes, remove_c, cls_values
 
 
 
@@ -193,6 +148,13 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
 
     model, tile_size_x, tile_size_y, num_classes, remove_c, cls_values = load_model_and_tile_size(model_checkpoint, acc=acc)
 
+    if acc == 'gpu':
+        acc_d = 'cuda'
+    else:
+        acc_d = 'cpu'
+
+    model.to(acc_d)
+
     stride_x, stride_y, overlap_x, overlap_y = calculate_stride_and_overlap(tile_size_x, tile_size_y,
                                                                             overlap_percentage=overlap)
 
@@ -223,13 +185,13 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
                 image = image.to('cuda')
             preds = model.predict(image)
 
-            #preds = preds
-            if acc=='gpu':
-                preds =preds.cpu()
-            pred_classes = preds.squeeze(0)  # Shape becomes [H, W]
+            pred_flat = preds.astype("uint8")
+            #if acc=='gpu':
+             #   preds =preds.cpu()
+            #pred_classes = preds.squeeze(0)  # Shape becomes [H, W]
 
             # Convert to numpy for further use outside PyTorch
-            pred_flat = pred_classes.detach().numpy().astype("uint8")
+            #pred_flat = pred_classes.detach().numpy().astype("uint8")
 
             # Determine crop coordinates within the tile
             if x == 0:
