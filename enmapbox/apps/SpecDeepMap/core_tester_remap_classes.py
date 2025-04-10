@@ -11,7 +11,7 @@ from qgis._core import QgsProcessingFeedback
 from torchvision.transforms import v2
 
 from enmapbox.apps.SpecDeepMap.core_deep_learning_mapper import load_model_and_tile_size
-from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import MyModel
+from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer_remap_classes_seg_former_MicaSenseLUT import MyModel
 
 # import albumentations as A
 
@@ -46,6 +46,9 @@ def load_model_and_tile_size(model_checkpoint, acc):
     pre_process = hyperpara['preprocess']
     remove_c = hyperpara['remove_background_class']
     cls_values = hyperpara["class_values"]
+    reverse_mapping = hyperpara["reverse_mapping"]
+
+    print('reverse mapping',reverse_mapping)
 
     # Load the model with the extracted hyperparameters
     model = MyModel.load_from_checkpoint(
@@ -60,7 +63,9 @@ def load_model_and_tile_size(model_checkpoint, acc):
             "classes": num_classes,
             "in_channels": in_channels,
             "preprocess": pre_process,
-            'remove_background_class': remove_c
+            'remove_background_class': remove_c,
+            "reverse_mapping": reverse_mapping,
+
         }
     )
 
@@ -120,7 +125,11 @@ def compute_iou_per_class(pred, gt, cls_values):
     """Compute IoU for each class given a list of class values."""
     ious = []  # Use a list to store IoU values
 
+
+    gt = gt.astype(pred.dtype)
+
     for cls in cls_values:
+
         pred_cls = (pred == cls)
         gt_cls = (gt == cls)
         intersection = np.logical_and(pred_cls, gt_cls).sum()
@@ -143,6 +152,8 @@ def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_
 
 
     model, _, _, num_classes, remove_c, cls_values = load_model_and_tile_size(model_checkpoint, acc)
+
+
     if acc =='gpu':
         acc_d = 'cuda'
     else:
@@ -190,23 +201,40 @@ def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_
         # Make prediction using the model
         image = image.astype(np.float32)
 
-        preds = model.predict(image)
+        image = torch.tensor(image).to(acc_d)
 
-        preds = preds  ## adjsut
+        full_prediction = model.predict(image)
+        full_prediction_iou = full_prediction
+        #preds = preds  ## adjsut
 
-        pred_np = preds.cpu().numpy()
+        #pred_np = preds.cpu().numpy()
 
         # Store the predictions for this image
-        full_prediction[:, :] = pred_np  # Directly copy the entire predicted image
+        #full_prediction[:, :] = pred_np  # Directly copy the entire predicted image
 
         # Load the ground truth mask
         mask, _, _, _, _ = read_image_with_gdal(mask_path)
 
         # Overwrite predictions where the mask is 0 if `no_data_label_mask` is True
 
-        full_prediction_iou = full_prediction[mask == 0] = 0  # no_data_value
+        if remove_c == 'Yes':
+            full_prediction_iou[mask == 0] = 0
+
+        if no_data_label_mask == True:
+            full_prediction[mask == 0] = 0
+
+            #full_prediction_iou = full_prediction[mask == 0] = 0  # no_data_value
 
         # Calculate IoU per class
+        #print('pred_dtype',full_prediction_iou)
+        print('gt_dtype',mask.dtype)
+        full_prediction = full_prediction.astype(np.int64)
+        mask = mask.astype(np.int64)
+        print('mask UNIQUE',np.unique(mask))
+        print('mask shape', np.shape(mask))
+        print('full_dtype', full_prediction.dtype)
+        print('full_unique', np.unique(full_prediction))
+        print('full_shape', np.shape(full_prediction))
         ious = compute_iou_per_class(full_prediction_iou, mask, cls_values)
         print(cls_values)
         print(ious)

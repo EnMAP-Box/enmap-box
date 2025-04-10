@@ -15,7 +15,7 @@ from qgis.core import (QgsProcessingAlgorithm,
                        QgsProcessingParameterEnum)
 
 # from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import dl_train
-from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer_remap_classes_seg_former_MicaSense import dl_train
+from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer_remap_classes_seg_former_MicaSenseLUT import dl_train
 
 
 def best_ckpt_path(checkpoint_dir):
