@@ -87,23 +87,20 @@ class DL_Tester(QgsProcessingAlgorithm):
 
     def shortHelpString(self):
         html = '' \
-               '<p>This algorithm loads a trained deep learning model and uses it for prediction. The algorithm can load complete satelite szences and splits it on the fly in small tiles predicts on them and stich them back together. The prediction is saves as a raster and can also be saved as a vector layer. If a ground truth mask is given the performance metric,Intersection over Union is calculated per class and a general mean.</p>' \
-               '<h3>Input Raster</h3>' \
-               '<p>Input spectral raster, which should be predicted</p>' \
-               '<h3>Ground truth raster (Optional)</h3>' \
-               '<p>Ground truth label raster, which can be used to asses the model performances. If this is given an Intersection Union metric per class as well as a mean is calculated.</p>' \
-               '<h3>Model checkpoint</h3>' \
-               '<p>The file path from which to load the trained model.</p>' \
-               '<h3>Minimum overlap of tiles in Pixel Unit</h3>' \
-               '<p>As this algorithm loads the input raster in small tiles, an can be defined with this parameter. This overlap is cropped from each predicted tile in directions to other tiles, so that there is no actual overlap in the prediction, but boundary effect are minimized. A good suggestion is 5-10% of image size. If the overlap doesnt lead to full coverage, the overlap is adjusted to next possible solution, to give full coverage of prediction </p>' \
-               '<h3>Ignore Index (Optional)</h3>' \
-               '<p>This exculdes the specified class from the individual class metrics and from the mean IoU calculation</p>' \
-               '<h3>Export prediction as VectorLayer</h3>' \
-               '<p>If this is checked than the predcition will also be saved as Vector Layer in the output folder. </p>' \
-               '<h3>Device</h3>' \
-               '<p>Define if you use CPU or GPU for the prediction</p>' \
-               '<h3>Output folder</h3>' \
-               '<p>The prediction will be saved in this folder as raster and as shapefile, if wanted. Further a the individual class Intersection over Unionin scores as well as a mean (IoU) are saved as a csv file.  </p>'
+               '<p>This algorithm loads a trained deep learning model and uses it for prediction on the test dataset. The Intersection over Union (IoU) score per class as well as overall mean is saved as csv-file. Optionally all predicted chips can be exported and saved as tiff files.</p>' \
+               '<h3>Test dataset</h3>' \
+               '<p>Load the test_files.csv created by the Dataset Maker</p>' \
+               '<h3>Model Checkpoint</h3>' \
+               '<p>Load the model checkpoint file of saved model during training (choose the one with highest IoU on val dataset - is written in checkpoint name) </p>' \
+               '<h3>Device </h3>' \
+               '<p>Can be run on CPU or GPU, if GPU available and correctly installed</p>' \
+               '<h3>Crop unclassified-labels from prediction</h3>' \
+               '<p>If this is true, unclassified values indicated by 0 are cropped from prediction before the image chips are exported. Unclassified labels with value 0 are always ignore in score calculation. So this is just relevant if you want to export tiles intersecting image boundaries or have sparse labels.  </p>' \
+               '<h3>IoU CSV</h3>' \
+               '<p>Location where IoU score csv-file will be created</p>' \
+               '<h3>Save and export prediction image to folder (optional)</h3>' \
+               '<p>If a folder location is specified all prediction images will be saved in given folder</p>' \
+
         return html
 
     def initAlgorithm(self, config=None):
@@ -131,7 +128,7 @@ class DL_Tester(QgsProcessingAlgorithm):
             )
         )
         self.addParameter(QgsProcessingParameterBoolean(
-            name=self.P_no_data_label_mask, description='Crop no_data values from predictions',
+            name=self.P_no_data_label_mask, description='Crop unclassified-labels from prediction',
             defaultValue=True))
 
         self.addParameter(QgsProcessingParameterFolderDestination(
