@@ -29,6 +29,7 @@ def load_model_and_tile_size(model_checkpoint, acc):
     pre_process = hyperpara['preprocess']
     remove_c = hyperpara['remove_background_class']
 
+
     # Load the model with the extracted hyperparameters
     model = MyModel.load_from_checkpoint(
         model_checkpoint,

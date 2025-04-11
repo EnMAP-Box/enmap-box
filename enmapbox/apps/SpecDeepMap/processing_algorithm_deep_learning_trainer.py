@@ -13,7 +13,7 @@ from qgis.core import (QgsProcessingAlgorithm,
                        QgsProcessingParameterEnum)
 
 #from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import dl_train
-from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import dl_train
+from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer_develop_MicaSense dl_train
 
 import os
 import re

@@ -90,21 +90,7 @@ _model_weights = {
 
 
 def get_weight(name: str) -> WeightsEnum:
-    """Get the weights enum value by its full name.
 
-    .. versionadded:: 0.4
-
-    Args:
-        name: Name of the weight enum entry.
-
-    Returns:
-        The requested weight enum.
-
-    Raises:
-        ValueError: If *name* is not a valid WeightsEnum.
-
-
-    """
     if name is None:
         return None
 
@@ -241,8 +227,8 @@ class CustomDataset(Dataset):
     def __getitem__(self, idx: int):
 
         # id = self.data.loc[idx]
-        img_path = self.data.loc[idx, 'image']  # Access the 'image' column
-        mask_path = self.data.loc[idx, 'mask']  # Access the 'mask' column
+        img_path = self.data.loc[idx, 'image']
+        mask_path = self.data.loc[idx, 'mask']
 
         data = gdal.Open(img_path)
 
@@ -256,26 +242,16 @@ class CustomDataset(Dataset):
         for old, new in self.remap.items():
             forward_array[mask_array == old] = new
 
-        #mask_array = self.remap(mask_array)
-        # mask = torch.as_tensor(mask_array, dtype=torch.int64)
-
         del mask_array
 
         mask_array = torch.as_tensor(forward_array, dtype=torch.int64)
-
-        # self.remap = self.remap.to('cpu')
-        # ensure remap according to look up table
-
-        # mask_array = torch.take(self.remap, mask_array)
-
-        # mask_array = mask -1 # -1 because mask values from gt start at 1 upwards, to ensure class values below layer number -1 just works for continues classes
 
         if self.transform != None:
             mask_array = np.array(mask_array)
             data_array = np.array(data_array)
 
             data_array, mask_array = self.transform(data_array, mask_array)
-            # data_array, mask_array = augmented['image'], augmented['mask'] # old dataaug
+
         else:
             data_array = torch.as_tensor(data_array, dtype=torch.float32)
             mask_array = torch.as_tensor(mask_array, dtype=torch.float32)
@@ -286,7 +262,6 @@ class CustomDataset(Dataset):
         if self.preprocess_input != None:
             data_array = torch.as_tensor(data_array, dtype=torch.float32)
             mask_array = torch.as_tensor(mask_array, dtype=torch.float32)
-            # do preprcoessing for imagnet with this
             data_array = self.preprocess_input(data_array)
 
         item = {'image': data_array, 'mask': mask_array}
@@ -314,23 +289,18 @@ class MyModel(L.LightningModule):
         self.hparams.update(hparams)
         self.save_hyperparameters()
 
-        # required
-        # self.bands = bands
-
         # optional modeling params
-        self.architecture = self.hparams.get("architecture", 'Unet')  # Unet, Unet++, DeepLabV3+, MAnet
-        self.backbone = self.hparams.get("backbone", 'resnet18')  # resnet50
-        self.weights = self.hparams.get("weights", None)  # ("weights", "imagenet")
+        self.architecture = self.hparams.get("architecture", 'Unet')
+        self.backbone = self.hparams.get("backbone", 'resnet18')
+        self.weights = self.hparams.get("weights", None)
         self.learning_rate = self.hparams.get("lr", None)
         self.num_workers = self.hparams.get("num_workers", 0)
         self.batch_size = self.hparams.get("batch_size", None)
         self.acc = self.hparams.get("acc", 'gpu')
-        self.transform = self.hparams.get("transform")  ##### changed after run test.
+        self.transform = self.hparams.get("transform")
         self.in_channels = self.hparams.get("in_channels")
         self.classes = self.hparams.get("classes")
-        # self.ignore_index = self.hparams.get("ignore_index",None)
         self.class_weights = self.hparams.get("class_weights")
-        # self.loss_type =  self.hparams.get("loss", 'Balanced_MSE')
         self.checkpoint_path = self.hparams.get("checkpoint_path")
         self.freeze_encoder = self.hparams.get("freeze_backbone")
         self.img_x = self.hparams.get("img_x")
@@ -339,8 +309,6 @@ class MyModel(L.LightningModule):
         self.counter = 0
         self.remove_b = self.hparams.get("remove_background_class")
         self.scaler = self.hparams.get("scaler")
-        #self.reclass_look_up_table = self.hparams.get("look_up_table")
-        #self.reverse_look_up_table = self.hparams.get("reverse_look_up_table")
         self.class_values = self.hparams.get("class_values")
         self.forward_mapping = self.hparams.get("forward_mapping")
         self.reverse_mapping = self.hparams.get("reverse_mapping")
@@ -356,8 +324,6 @@ class MyModel(L.LightningModule):
             self.iou = JaccardIndex(task="multiclass", num_classes=self.classes, ignore_index=0)
             self.val_iou = JaccardIndex(task="multiclass", num_classes=self.classes, ignore_index=0)
         else:
-            # self.iou = JaccardIndex(task="multiclass",num_classes=self.classes, ignore_index=self.ignore_index)
-            # self.val_iou = JaccardIndex(task="multiclass",num_classes=self.classes, ignore_index=self.ignore_index)
             self.iou = JaccardIndex(task="multiclass", num_classes=self.classes)
             self.val_iou = JaccardIndex(task="multiclass", num_classes=self.classes)
 
@@ -503,20 +469,17 @@ class MyModel(L.LightningModule):
             image = torch.as_tensor(image)
 
         logits = self(image)
+
         pred1 = torch.softmax(logits, dim=1)
 
         pred2 = torch.argmax(pred1, dim=1)
-        # Take the class with the highest probability
 
-        # remap to org class values        pred3 = mask_aray = torch.take(self.reverse_look_up_table, pred2)
-        # pred3 = torch.take(self.reverse_look_up_table, pred2)
         pred2 = pred2.squeeze()
 
         pred2= pred2.cpu().numpy()
         #
         reverse_array = pred2.copy()
-        #Reverse mapping
-        #reverse_array = np.array(pred2).cpu().copy()
+
 
         for old, new in self.reverse_mapping.items():
             reverse_array[pred2 == old] = new
@@ -559,8 +522,14 @@ class MyModel(L.LightningModule):
 
     def _prepare_model(self):
 
-        # weights selection and  backbone overwrite if miss match between pretrained weights and backbone
-        weights = None
+
+        # overwrite wrong backbone if pretrained weights
+        if self.weights == 'Sentinel_2_TOA_Resnet18':
+            self.backbone = 'resnet18'
+        elif self.weights == 'Sentinel_2_TOA_Resnet50':
+            self.backbone = 'resnet50'
+
+        # build arch.
 
         if self.architecture == 'Unet':
             model = smp.Unet(
@@ -603,63 +572,17 @@ class MyModel(L.LightningModule):
             if self.weights == 'Sentinel_2_TOA_Resnet18':
                 assert self.in_channels == 13, f'Input channels should be equal to 13 , but is {self.in_channels}'
                 weights = ResNet18_Weights.SENTINEL2_ALL_MOCO
-                self.backbone = 'resnet18'
+                #self.backbone = 'resnet18'
                 state_dict = weights.get_state_dict(progress=True)
                 model.encoder.load_state_dict(state_dict)
 
             elif self.weights == 'Sentinel_2_TOA_Resnet50':
                 assert self.in_channels == 13, f'Input channels should be equal to 13 , but is {self.in_channels}'
                 weights = ResNet50_Weights.SENTINEL2_ALL_MOCO
-                self.backbone = 'resnet50'
+                #self.backbone = 'resnet50'
                 state_dict = weights.get_state_dict(progress=True)
                 model.encoder.load_state_dict(state_dict)
 
-            elif self.weights == 'MicaSense_SR_Resnet18':
-                assert self.in_channels == 7, f'Input channels should be equal to 7 , but is {self.in_channels}'
-                self.backbone = 'resnet18'
-                # path = "C:/test_cursor/version_3_50m_only/checkpoints/epoch=199-step=17600.ckpt"
-                path = "C:/test_cursor/version_4_50m_and_10m_mocov3/checkpoints/epoch=199-step=21400.ckpt"
-                checkpoint = torch.load(path, map_location=torch.device(self.acc))
-
-                state_dict_mod = checkpoint['state_dict']
-                # Get only the backbone keys (not backbone_momentum)
-                state_dict_mod = OrderedDict(
-                    {k: v for k, v in state_dict_mod.items() if
-                     k.startswith('backbone.') and not k.startswith('backbone_momentum')})
-                # Remove the 'backbone.' prefix to match the target model's keys
-                state_dict_mod = OrderedDict(
-                    {k.replace('backbone.', ''): v for k, v in state_dict_mod.items()}
-                )
-                model.encoder.load_state_dict(state_dict_mod)
-
-
-            elif self.weights == "MicaSense_SR_Swin_s3_tiny":
-                assert self.in_channels == 7, f'Input channels should be equal to 7 , but is {self.in_channels}'
-                self.backbone = 'tu-swin_s3_tiny_224'
-                path = "C:/test_cursor/version_19_10epoch_10and50m_mocov3_swintiny/checkpoints/epoch=8-step=2925.ckpt"
-                checkpoint = torch.load(path, map_location=torch.device('cpu'))
-                print(checkpoint['hyper_parameters'])
-
-                state_dict_mod = checkpoint['state_dict']
-                print("Keys in state dict modified:", state_dict_mod.keys())
-                # Get only the backbone keys (not backbone_momentum)
-                state_dict_mod = OrderedDict(
-                    {k: v for k, v in state_dict_mod.items() if
-                     k.startswith('backbone.') and not k.startswith('backbone_momentum')})
-                # Remove the 'backbone.' prefix to match the target model's keys
-                state_dict_mod = OrderedDict(
-                    {k.replace('backbone.', 'model.'): v for k, v in state_dict_mod.items()}
-                )
-
-                state_dict_mod = {re.sub(r'(?<=layers).', '_', k): v for k, v in state_dict_mod.items()}
-
-                print("Keys in state dict modified:", state_dict_mod.keys())
-                # load whole model with weights
-                ignore_keys = {"model.norm.weight", "model.norm.bias"}
-
-                # Filter out unwanted keys
-                state_dict_mod = {k: v for k, v in state_dict_mod.items() if k not in ignore_keys}
-                model.encoder.load_state_dict(state_dict_mod)
 
         if self.freeze_encoder == True:
             # Freeze encoder weights
@@ -697,7 +620,7 @@ class FeedbackCallback(L.Callback):
         if self.feedback:
             self.feedback.setProgress((epoch + 1) / max_epochs * 100)
             self.feedback.pushInfo(log_message)
-            # Allow user to cancel the process
+
             # Check if the user canceled the process
             if self.feedback.isCanceled():
                 trainer.should_stop = True
@@ -720,9 +643,7 @@ def dl_train(
     arch = arch_index_options[arch_index]
 
     pretrained_weights_options = ['imagenet', None, 'Sentinel_2_TOA_Resnet18',
-                                  'Sentinel_2_TOA_Resnet50',
-                                  'MicaSense_SR_Resnet18',
-                                  'MicaSense_SR_Swin_s3_tiny']  # ,'LANDSAT_TM_TOA_Resnet18','LANDSAT_ETM_TOA_Resnet18','LANDSAT_OLI_TIRS_TOA_Resnet18','LANDSAT_ETM_SR_Resnet18','LANDSAT_OLI_SR_Resnet18']
+                                  'Sentinel_2_TOA_Resnet50']                   #  ,'LANDSAT_TM_TOA_Resnet18','LANDSAT_ETM_TOA_Resnet18','LANDSAT_OLI_TIRS_TOA_Resnet18','LANDSAT_ETM_SR_Resnet18','LANDSAT_OLI_SR_Resnet18']
     pretrained_weights = pretrained_weights_options[pretrained_weights_index]
 
     if pretrained_weights == 'Sentinel_2_TOA_Resnet18':
@@ -760,7 +681,6 @@ def dl_train(
 
     # read from csv
     remove_zero_class = summary_data['Ignored Background : Class Zero'].tolist()[0]
-    print('remove zero class', remove_zero_class)
 
     # create extra no-data class layer if yes
 
@@ -777,8 +697,8 @@ def dl_train(
 
     # Create reverse mapping (new indices -> original)
     reverse_mapping = {idx: original for original, idx in forward_mapping.items()}
-    print('forward',forward_mapping)
-    print('reverse',reverse_mapping)
+    print('forward mapping',forward_mapping)
+    print('backward mapping',reverse_mapping)
 
     if 0 in cls_values:
         cls_values.remove(0)
@@ -787,8 +707,6 @@ def dl_train(
 
     scaler_list = summary_data['Scaler'].tolist()
     scaler = scaler_list[0]
-    print('scaler', scaler)
-    print(f"Initial scaler: {scaler} (type: {type(scaler)})")
 
     ignore_scaler_list = ([
         'Sentinel_2_TOA_Resnet18', 'Sentinel_2_TOA_Resnet50'])
@@ -817,9 +735,6 @@ def dl_train(
     acc_type_options = ['cpu', 'gpu']
     acc_type = acc_type_options[acc_type_index]
 
-    # if acc_type == 'gpu':
-    #   lookup_table = torch.tensor(lookup_table, dtype=torch.int64).cuda()
-    #  reverse_lookup_table = torch.tensor(reverse_lookup_table, dtype=torch.int64).cuda()
     # balanced training #
     if class_weights_balanced == True:
 
@@ -876,7 +791,6 @@ def dl_train(
             'num_workers': num_workers,
             'acc': acc_type,
             'freeze_backbone': freeze_encoder,
-            # "ignore_index": ignore_index,
             "class_weights": weights_tensor,
             'checkpoint_path': None,
             "img_x": first_img_x,
@@ -897,12 +811,9 @@ def dl_train(
         model = MyModel.load_from_checkpoint(checkpoint_path, train_data=train_data, val_data=val_data,
                                              hparams={'in_channels': in_channels,
                                                       'architecture': arch,
-                                                      ### take out as shoul have been devined already
                                                       'classes': n_classes,
-                                                      ### take out as shoul have been devined already
                                                       'batch_size': batch_size,
                                                       'backbone': backbone,
-                                                      ### take out as shoul have been devined already
                                                       'weights': pretrained_weights,
                                                       'epochs': n_epochs,
                                                       'transform': transform,
@@ -910,7 +821,6 @@ def dl_train(
                                                       'num_workers': num_workers,
                                                       'acc': acc_type,
                                                       'freeze_backbone': freeze_encoder,
-                                                      # "ignore_index": ignore_index,
                                                       "class_weights": weights_tensor,
                                                       'checkpoint_path': None,
                                                       "img_x": first_img_x,
@@ -965,7 +875,6 @@ def dl_train(
     else:
 
         checkpoint_callback = ModelCheckpoint(dirpath=logdirpath_model, monitor='val_iou_epoch',
-                                              # ,monitor='val_iou_epoch'
                                               filename='{epoch:05d}-val_iou_{val_iou_epoch:.4f}', save_top_k=num_models,
                                               auto_insert_metric_name=False)
 

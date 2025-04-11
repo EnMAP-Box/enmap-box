@@ -7,7 +7,7 @@ from qgis.core import (QgsProcessingAlgorithm,
                        QgsProcessingParameterFolderDestination,
                        QgsProcessingParameterBoolean)
 
-from enmapbox.apps.SpecDeepMap.core_dataset_maker_paths_1_2_ds_only import create_train_validation_csv_balance
+from enmapbox.apps.SpecDeepMap.core_dataset_maker_paths_develop_MicaSense import create_train_validation_csv_balance
 
 
 class DatasetMaker(QgsProcessingAlgorithm):

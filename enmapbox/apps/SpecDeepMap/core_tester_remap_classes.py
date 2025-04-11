@@ -108,7 +108,7 @@ def read_image_with_gdal(image_path):
 
 def save_prediction_as_geotiff(pred_array, geotransform, projection, output_path, no_data_value, no_data_mask):
     driver = gdal.GetDriverByName('GTiff')
-    out_raster = driver.Create(output_path, pred_array.shape[1], pred_array.shape[0], 1, gdal.GDT_Byte)
+    out_raster = driver.Create(output_path, pred_array.shape[1], pred_array.shape[0], 1)
     out_raster.SetGeoTransform(geotransform)
     out_raster.SetProjection(projection)
     out_band = out_raster.GetRasterBand(1)

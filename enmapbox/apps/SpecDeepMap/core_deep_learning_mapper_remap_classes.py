@@ -185,7 +185,7 @@ def pred_mapper(input_raster=None, model_checkpoint=None, overlap=10, gt_path=No
                 image = image.to('cuda')
             preds = model.predict(image)
 
-            pred_flat = preds.astype("uint8")
+            pred_flat = preds # .astype("uint8")
             #if acc=='gpu':
              #   preds =preds.cpu()
             #pred_classes = preds.squeeze(0)  # Shape becomes [H, W]
