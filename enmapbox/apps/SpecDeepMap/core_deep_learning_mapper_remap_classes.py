@@ -4,8 +4,8 @@
 
 from qgis._core import QgsProcessingFeedback
 
-from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer_remap_classes_seg_former_MicaSenseLUT import MyModel
-from enmapbox.apps.SpecDeepMap.core_tester_remap_classes import load_model_and_tile_size
+from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import MyModel
+from enmapbox.apps.SpecDeepMap.core_tester import load_model_and_tile_size
 import os
 import numpy as np
 import torch

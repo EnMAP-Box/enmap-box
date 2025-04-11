@@ -10,7 +10,7 @@ from osgeo import gdal
 from qgis._core import QgsProcessingFeedback
 from torchvision.transforms import v2
 
-from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer_remap_classes_seg_former_MicaSenseLUT import MyModel
+from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import MyModel
 
 # import albumentations as A
 
