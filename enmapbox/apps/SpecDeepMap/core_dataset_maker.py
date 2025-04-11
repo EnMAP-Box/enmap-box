@@ -300,6 +300,7 @@ def calculate_class_weights_from_counts(class_counts):
 
     # normalized to 1 for more model stability https://naadispeaks.blog/2021/07/31/handling-imbalanced-classes-with-weighted-loss-in-pytorch/
 
+    #
     class_weights = {cls: 1 - (count / total_samples) for cls, count in class_counts.items() if count > 0}
 
     return class_weights
