@@ -5,17 +5,19 @@ Created on Thu Feb 22 11:46:35 2024
 @author: leon-
 """
 
-from qgis._core import QgsProcessingFeedback
-from osgeo import gdal
-import numpy as np
-import glob
-import pandas as pd
-
-from scipy.stats import wasserstein_distance
-from collections import Counter
-import os
 import math
-#from tqdm import tqdm
+import os
+from collections import Counter
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+from osgeo import gdal
+from qgis._core import QgsProcessingFeedback
+from scipy.stats import wasserstein_distance
+
+
+# from tqdm import tqdm
 
 # set progress counter for two main loops
 
@@ -34,15 +36,22 @@ def set_progress_counter(num_permutations, file_paths, val_perc, test_perc, norm
 
 def identify_unique_classes(input_folder):
     # Path to the label images
-    input_folder_f = fix_path(input_folder)
-    paths = os.path.join(input_folder_f, 'labels/*.tif')
-    file_paths = glob.glob(paths)
+    # input_folder_f = fix_path(input_folder)
+    # paths = os.path.join(input_folder_f, 'labels/*.tif')
+
+    # file_paths = glob.glob(paths)
+
+    input_folder = Path(input_folder)  # Define the base folder
+    files = list(input_folder.glob("labels/*.tif"))  # Get list of .tif files
+
+    # Convert to strings and print
+    file_paths = [str(path) for path in files]
 
     # Set to store unique labels across all images
     unique_labels = set()
 
     # Loop through each file
-    #for path in tqdm(file_paths, desc="Processing label images"):
+    # for path in tqdm(file_paths, desc="Processing label images"):
     for path in file_paths:
         try:
             # Open the image file
@@ -66,10 +75,16 @@ def identify_unique_classes(input_folder):
 # calculate equal data distribution across datasets
 
 def read_label_images_and_create_histograms(input_folder, num_labels):
-    paths = os.path.join(input_folder, 'labels/*.tif')
-    file_paths = glob.glob(paths)
+    # paths = os.path.join(input_folder, 'labels/*.tif')
+    # file_paths = glob.glob(paths)
+    input_folder = Path(input_folder)  # Define the base folder
+    files = list(input_folder.glob("labels/*.tif"))  # Get list of .tif files
+
+    # Convert to strings and print
+    file_paths = [str(path) for path in files]
+
     label_histograms = []
-    #for path in tqdm(file_paths, desc="Reading label images"):
+    # for path in tqdm(file_paths, desc="Reading label images"):
     for path in file_paths:
         labels = gdal.Open(path).ReadAsArray()
         # Adjust histogram to ignore label 0 and include only relevant labels
@@ -97,13 +112,12 @@ def find_best_split(label_histograms, num_permutations, train_perc, test_perc, v
     # Compute train set (rounded up) but ensuring no overlap
     num_train = min(math.ceil(num_files * train_perc), num_files - (num_test + num_val))
 
-
     best_emd = np.inf
     best_perm = None  # To store the best permutation
 
     progress_counter = 0
 
-    #for _ in tqdm(range(num_permutations), desc="Evaluating permutations"):
+    # for _ in tqdm(range(num_permutations), desc="Evaluating permutations"):
     for _ in range(num_permutations):
         # for _ in range(num_permutations):
         progress_counter += 1
@@ -174,16 +188,36 @@ def replace_last_labels_with_images(file_paths):
 
 def save_splits_to_csv(file_paths, best_perm, num_train, num_test, num_val, out_folder_path):
     # Convert file paths using the fix_path function before processing
-    fixed_file_paths = [fix_path(path) for path in file_paths]
+    # fixed_file_paths = [fix_path(path) for path in file_paths]
+
+    # Extract the file names (e.g., 'image1.tif', 'image2.tif')
+    file_names = [Path(path).name for path in file_paths]
+
+    # Construct the new paths for 'labels/' and 'images/'
+    labels_paths = [Path("labels") / file_name for file_name in file_names]
+    images_paths = [Path("images") / file_name for file_name in file_names]
+
+    # Convert to strings
+    # labels_paths_str = [str(path) for path in labels_paths]
+    # images_paths_str = [str(path) for path in images_paths]
+
+    # Convert to strings and replace backslashes with forward slashes for Windows compatibility
+    labels_paths_str = [str(path).replace("\\", "/") for path in labels_paths]
+    images_paths_str = [str(path).replace("\\", "/") for path in images_paths]
 
     # Extract paths based on the permutation indices
-    test_files = [fixed_file_paths[i] for i in best_perm[:num_test]]
-    val_files = [fixed_file_paths[i] for i in best_perm[num_test:num_val + num_test]]
-    train_files = [fixed_file_paths[i] for i in best_perm[num_val + num_test: num_val + num_test + num_train]]
+    test_files = [labels_paths_str[i] for i in best_perm[:num_test]]
+    val_files = [labels_paths_str[i] for i in best_perm[num_test:num_val + num_test]]
+    train_files = [labels_paths_str[i] for i in best_perm[num_val + num_test: num_val + num_test + num_train]]
 
-    test_images = replace_last_labels_with_images(test_files)
-    val_images = replace_last_labels_with_images(val_files)
-    train_images = replace_last_labels_with_images(train_files)
+    # Extract paths based on the permutation indices
+    test_images = [images_paths_str[i] for i in best_perm[:num_test]]
+    val_images = [images_paths_str[i] for i in best_perm[num_test:num_val + num_test]]
+    train_images = [images_paths_str[i] for i in best_perm[num_val + num_test: num_val + num_test + num_train]]
+
+    # test_images = replace_last_labels_with_images(test_files)
+    # val_images = replace_last_labels_with_images(val_files)
+    # train_images = replace_last_labels_with_images(train_files)
 
     # Create DataFrames with two columns: 'image' and 'mask'
     test_df = pd.DataFrame({'image': test_images, 'mask': test_files})
@@ -208,12 +242,16 @@ def save_splits_to_csv(file_paths, best_perm, num_train, num_test, num_val, out_
 
 # create summary csv with distribution absolute count and counts in percentage, as well as class weights
 
-def calculate_class_distribution_from_csv(csv_path):
+def calculate_class_distribution_from_csv(input_folder, csv_path):
     df = pd.read_csv(csv_path)
     label_image_paths = df['mask'].tolist()
     class_counts = Counter()
 
-    for path in label_image_paths:
+    absolute_path = [input_folder / Path(path) for path in label_image_paths]
+    absolute_path = [str(path) for path in absolute_path]
+
+    for path in absolute_path:
+
         dataset = gdal.Open(path)
         if dataset is None:
             continue
@@ -231,22 +269,22 @@ def calculate_class_distribution_from_csv(csv_path):
     return class_counts, class_percentages
 
 
-#def calculate_class_weights_from_counts(class_counts):
-    # Remove class '0' if present
- #   if 0 in class_counts:
-  #      del class_counts[0]
+# def calculate_class_weights_from_counts(class_counts):
+# Remove class '0' if present
+#   if 0 in class_counts:
+#      del class_counts[0]
 
-  #  total_counts = sum(class_counts.values())
-   # class_weights = {cls: total_counts / count  for cls, count in class_counts.items() if count >0}
+#  total_counts = sum(class_counts.values())
+# class_weights = {cls: total_counts / count  for cls, count in class_counts.items() if count >0}
 
-    # Normalize weights so that the sum of weights equals the number of classes
-    #num_classes = len(class_weights)
-    #norm_factor = num_classes / sum(class_weights.values())
-    #class_weights = {cls: weight * norm_factor for cls, weight in class_weights.items()}
-    # as in sklearn
+# Normalize weights so that the sum of weights equals the number of classes
+# num_classes = len(class_weights)
+# norm_factor = num_classes / sum(class_weights.values())
+# class_weights = {cls: weight * norm_factor for cls, weight in class_weights.items()}
+# as in sklearn
 
 
-    #return class_weights
+# return class_weights
 
 # sklearn implementation
 def calculate_class_weights_from_counts(class_counts):
@@ -257,19 +295,20 @@ def calculate_class_weights_from_counts(class_counts):
     num_classes = len(class_counts)  # Remaining number of classes (excluding class 0)
     total_samples = sum(class_counts.values())
 
-    # Compute weights using n_samples / (n_classes * np.bincount(y)) logic
-    class_weights = {cls: total_samples / (num_classes * count) for cls, count in class_counts.items() if count > 0}
+    # Compute weights using n_samples / (n_classes * np.bincount(y)) logic sklearn calc for weights
+    # class_weights = {cls: total_samples / (num_classes * count) for cls, count in class_counts.items() if count > 0}
 
-    # Normalize weights so that the sum of weights equals the number of classes
-    #norm_factor = num_classes / sum(class_weights.values())
-    #class_weights = {cls: weight * norm_factor for cls, weight in class_weights.items()}
+    # normalized to 1 for more model stability https://naadispeaks.blog/2021/07/31/handling-imbalanced-classes-with-weighted-loss-in-pytorch/
+
+    class_weights = {cls: 1 - (count / total_samples) for cls, count in class_counts.items() if count > 0}
 
     return class_weights
 
-def create_summary_csv(train_csv, val_csv, test_csv, out_folder_path, scaler, zero_class_removed):
-    train_counts, train_percentages = calculate_class_distribution_from_csv(train_csv)
-    val_counts, val_percentages = calculate_class_distribution_from_csv(val_csv)
-    test_counts, test_percentages = calculate_class_distribution_from_csv(test_csv)
+
+def create_summary_csv(input_folder, train_csv, val_csv, test_csv, out_folder_path, scaler, zero_class_removed):
+    train_counts, train_percentages = calculate_class_distribution_from_csv(input_folder, train_csv)
+    val_counts, val_percentages = calculate_class_distribution_from_csv(input_folder, val_csv)
+    test_counts, test_percentages = calculate_class_distribution_from_csv(input_folder, test_csv)
 
     # Gather all classes seen in any dataset
     all_classes = sorted(set(train_counts.keys()) | set(val_counts.keys()) | set(test_counts.keys()))
@@ -306,15 +345,13 @@ def create_summary_csv(train_csv, val_csv, test_csv, out_folder_path, scaler, ze
 
 # Create additional Normalization Mean Std Normalizer, which ignores No-data value if no-data defined
 
-def read_no_data_value(train_csv_path):
+def read_no_data_value(input_folder, train_csv_path):
     df_train = pd.read_csv(train_csv_path)
     train_image_paths = df_train['image'].tolist()
 
-    if not train_image_paths:
-        print("No image paths provided.")
-        return None
+    train_image_paths_abs = [input_folder / Path(rel_path) for rel_path in train_image_paths]
 
-    first_image = gdal.Open(train_image_paths[0])
+    first_image = gdal.Open(str(train_image_paths_abs[0]))
     if not first_image:
         print("Failed to open the first image.")
         return None
@@ -324,13 +361,15 @@ def read_no_data_value(train_csv_path):
     return no_data_value
 
 
-def calculate_summed_statistics(train_csv_path, progress_counter, progress_counter_total, scaler,
+def calculate_summed_statistics(input_folder, train_csv_path, progress_counter, progress_counter_total, scaler,
                                 no_data_value=None, feedback: QgsProcessingFeedback = None, ):
     df_train = pd.read_csv(train_csv_path)
     train_image_paths = df_train['image'].tolist()
 
     train_length = len(train_image_paths)
     print(train_length)
+
+    train_image_paths_abs = [input_folder / Path(rel_path) for rel_path in train_image_paths]
 
     summed_values_per_channel = None
     pixel_counts_per_channel = None
@@ -340,8 +379,8 @@ def calculate_summed_statistics(train_csv_path, progress_counter, progress_count
     progress_counter_total = progress_counter_total
 
     # Process each image
-    for path in train_image_paths:
-        dataset = gdal.Open(path)
+    for path in train_image_paths_abs:
+        dataset = gdal.Open(str(path))
         progress_counter += 1
         progress = (progress_counter / progress_counter_total) * 100
         if isinstance(feedback, QgsProcessingFeedback):
@@ -381,8 +420,8 @@ def calculate_summed_statistics(train_csv_path, progress_counter, progress_count
     squared_diffs_per_channel = np.zeros(bands)
 
     # Calculate squared differences for standard deviation
-    for path in train_image_paths:
-        dataset = gdal.Open(path)
+    for path in train_image_paths_abs:
+        dataset = gdal.Open(str(path))
         progress_counter1 += 1
         progress = (progress_counter1 / progress_counter_total) * 100
         # print(progress)
@@ -430,9 +469,11 @@ def calculate_summed_statistics(train_csv_path, progress_counter, progress_count
     return norm_df
 
 
-def save_normalized_band_data(train_csv_path, out_folder_path, progress_counter, progress_counter_total, scaler,
+def save_normalized_band_data(input_folder, train_csv_path, out_folder_path, progress_counter, progress_counter_total,
+                              scaler,
                               no_data_value=None, feedback: QgsProcessingFeedback = None):
-    norm_df = calculate_summed_statistics(train_csv_path, progress_counter, progress_counter_total, scaler,
+    norm_df = calculate_summed_statistics(input_folder, train_csv_path, progress_counter, progress_counter_total,
+                                          scaler,
                                           no_data_value, feedback)
     norm_csv = os.path.join(out_folder_path, 'Normalize_Bands.csv')
     norm_df.to_csv(norm_csv, index=False)
@@ -441,25 +482,26 @@ def save_normalized_band_data(train_csv_path, out_folder_path, progress_counter,
 
 def create_train_validation_csv_balance(input_folder, out_folder_path, train_int_perc, test_int_perc, val_int_perc,
                                         scaler,
-                                        random_seed_gen,  normalize=True,
+                                        random_seed_gen, normalize=True,
                                         feedback: QgsProcessingFeedback = None, min_perc=0.01, num_permutations=10000):
     assert train_int_perc + val_int_perc + test_int_perc <= 100, "The sum of train, validation, and test percentages exceeds 100%. Reduce percentages number of datasets so sum is max 100%!"
 
-    #rng = np.random.default_rng(seed=random_seed_gen)
+    # rng = np.random.default_rng(seed=random_seed_gen)
     train_perc = train_int_perc / 100
     test_perc = test_int_perc / 100  ## orig 0.1
     val_perc = val_int_perc / 100
 
     print('scaler', scaler)
     # Make sure the folder path uses forward slashes
-    folder_path = fix_path(input_folder)
+    # folder_path = fix_path(input_folder)
+    folder_path = input_folder
     print(folder_path)
     print(out_folder_path)
     # Get the image files and fix the paths
-    #data_type_options = ['tif', 'jpg', 'jpeg', 'png']
-    #datatyp = data_type_options[datatyp_index]
+    # data_type_options = ['tif', 'jpg', 'jpeg', 'png']
+    # datatyp = data_type_options[datatyp_index]
 
-    #img_files = glob.glob(os.path.join(folder_path, 'images', f'*.{datatyp}'))
+    # img_files = glob.glob(os.path.join(folder_path, 'images', f'*.{datatyp}'))
 
     num_classes, unique_labels = identify_unique_classes(folder_path)
 
@@ -488,14 +530,12 @@ def create_train_validation_csv_balance(input_folder, out_folder_path, train_int
                                                                      num_val,
                                                                      out_folder_path)
 
-    create_summary_csv(train_csv_path, val_csv_path, test_csv_path, out_folder_path, scaler, zero_class_removed)
+    create_summary_csv(input_folder, train_csv_path, val_csv_path, test_csv_path, out_folder_path, scaler,
+                       zero_class_removed)
     if normalize == True:
-        no_data_value = read_no_data_value(train_csv_path)
-        save_normalized_band_data(train_csv_path, out_folder_path, progress_counter, progress_counter_total, scaler,
+        no_data_value = read_no_data_value(input_folder, train_csv_path)
+        save_normalized_band_data(input_folder, train_csv_path, out_folder_path, progress_counter,
+                                  progress_counter_total, scaler,
                                   no_data_value, feedback)
 
     return b
-
-
-
-
