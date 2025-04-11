@@ -1,10 +1,19 @@
-from enmapbox.apps.SpecDeepMap.processing_algorithm_dataset_maker import DatasetMaker
-from enmapbox.apps.SpecDeepMap.processing_algorithm_deep_learning_mapper import DL_Mapper
-from enmapbox.apps.SpecDeepMap.processing_algorithm_deep_learning_trainer_MicaSense import DL_Trainer
-from enmapbox.apps.SpecDeepMap.processing_algorithm_raster_splitter import RasterSplitter
-from enmapbox.apps.SpecDeepMap.processing_algorithm_tensorboard_visualizer import Tensorboard_visualizer
-from enmapbox.apps.SpecDeepMap.processing_algorithm_tester import DL_Tester
 from enmapbox.gui.applications import EnMAPBoxApplication
+
+try:
+    from enmapbox.apps.SpecDeepMap.processing_algorithm_dataset_maker import DatasetMaker
+    from enmapbox.apps.SpecDeepMap.processing_algorithm_raster_splitter import RasterSplitter
+    from enmapbox.apps.SpecDeepMap.processing_algorithm_deep_learning_trainer import DL_Trainer
+    from enmapbox.apps.SpecDeepMap.processing_algorithm_deep_learning_mapper import DL_Mapper
+    from enmapbox.apps.SpecDeepMap.processing_algorithm_tensorboard_visualizer import Tensorboard_visualizer
+    from enmapbox.apps.SpecDeepMap.processing_algorithm_tester import DL_Tester
+    import psutil
+
+    wrongEnv = False
+    import_error = None
+except Exception as ex:
+    wrongEnv = True
+    import_error = ex
 
 
 # test
@@ -23,5 +32,9 @@ class SpecDeepMap(EnMAPBoxApplication):
 
     # returns a list of EnMAPBoxApplications
     def processingAlgorithms(self):
-        return [RasterSplitter(), DatasetMaker(), DL_Trainer(), DL_Mapper(), Tensorboard_visualizer(),
-                DL_Tester()]  # ,DL_Train_MOD()] #DL_Train()#DatasetSplitter() #,,DatasetSplitter(),DL_Train(),RasterSplitterR(),DatasetSplitter(),RasterSplitterRP()
+
+        if wrongEnv:
+            return []
+        else:
+            return [RasterSplitter(), DatasetMaker(), DL_Trainer(), DL_Mapper(), Tensorboard_visualizer(),
+                    DL_Tester()]  # ,DL_Train_MOD()] #DL_Train()#DatasetSplitter() #,,DatasetSplitter(),DL_Train(),RasterSplitterR(),DatasetSplitter(),RasterSplitterRP()
