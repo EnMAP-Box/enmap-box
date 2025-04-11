@@ -10,7 +10,6 @@ from osgeo import gdal
 from qgis._core import QgsProcessingFeedback
 from torchvision.transforms import v2
 
-from enmapbox.apps.SpecDeepMap.core_deep_learning_mapper import load_model_and_tile_size
 from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer_remap_classes_seg_former_MicaSenseLUT import MyModel
 
 # import albumentations as A
