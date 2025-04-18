@@ -1,4 +1,7 @@
 import math
+import re
+from collections import OrderedDict
+from pathlib import Path
 from typing import Optional
 
 # import albumentations as A
@@ -13,7 +16,7 @@ from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 from lightning.pytorch.loggers import TensorBoardLogger
 from lightning.pytorch.tuner import Tuner
 from osgeo import gdal  # Import the gdal module
-from qgis.core import QgsProcessingFeedback
+from qgis._core import QgsProcessingFeedback
 from torch.utils.data import Dataset
 from torchmetrics import JaccardIndex
 from torchvision import transforms
@@ -87,21 +90,7 @@ _model_weights = {
 
 
 def get_weight(name: str) -> WeightsEnum:
-    """Get the weights enum value by its full name.
 
-    .. versionadded:: 0.4
-
-    Args:
-        name: Name of the weight enum entry.
-
-    Returns:
-        The requested weight enum.
-
-    Raises:
-        ValueError: If *name* is not a valid WeightsEnum.
-
-
-    """
     if name is None:
         return None
 
@@ -213,6 +202,7 @@ class CustomDataset(Dataset):
             preprocess_input: Optional = None,
             remove: Optional = None,
             scaler_loader: Optional = None,
+            remap: Optional = None,
             # Use A.Compose for transforms
     ):
         """
@@ -230,15 +220,15 @@ class CustomDataset(Dataset):
         self.preprocess_input = preprocess_input
         self.remove = remove
         self.scaler_loader = scaler_loader
-
+        self.remap = remap
     def __len__(self):
         return len(self.data)
 
     def __getitem__(self, idx: int):
 
         # id = self.data.loc[idx]
-        img_path = self.data.loc[idx, 'image']  # Access the 'image' column
-        mask_path = self.data.loc[idx, 'mask']  # Access the 'mask' column
+        img_path = self.data.loc[idx, 'image']
+        mask_path = self.data.loc[idx, 'mask']
 
         data = gdal.Open(img_path)
 
@@ -246,22 +236,22 @@ class CustomDataset(Dataset):
         # channel first
         data_array = data.ReadAsArray().astype(np.float32)
         mask_array = mask.ReadAsArray().astype(np.float32)
-        mask = torch.as_tensor(mask_array, dtype=torch.int64)
 
-        # ensure vales smaller then classes
+        # remap using dict
+        forward_array = mask_array.copy()
+        for old, new in self.remap.items():
+            forward_array[mask_array == old] = new
 
-        if self.remove == 'Yes':
-            mask_array = mask
+        del mask_array
 
-        elif self.remove == 'No':
-            mask_array = mask - 1  # -1 because mask values from gt start at 1 upwards, to ensure same layering need to be -1
+        mask_array = torch.as_tensor(forward_array, dtype=torch.int64)
 
         if self.transform != None:
             mask_array = np.array(mask_array)
             data_array = np.array(data_array)
 
             data_array, mask_array = self.transform(data_array, mask_array)
-            # data_array, mask_array = augmented['image'], augmented['mask'] # old dataaug
+
         else:
             data_array = torch.as_tensor(data_array, dtype=torch.float32)
             mask_array = torch.as_tensor(mask_array, dtype=torch.float32)
@@ -272,7 +262,6 @@ class CustomDataset(Dataset):
         if self.preprocess_input != None:
             data_array = torch.as_tensor(data_array, dtype=torch.float32)
             mask_array = torch.as_tensor(mask_array, dtype=torch.float32)
-            # do preprcoessing for imagnet with this
             data_array = self.preprocess_input(data_array)
 
         item = {'image': data_array, 'mask': mask_array}
@@ -300,23 +289,18 @@ class MyModel(L.LightningModule):
         self.hparams.update(hparams)
         self.save_hyperparameters()
 
-        # required
-        # self.bands = bands
-
         # optional modeling params
-        self.architecture = self.hparams.get("architecture", 'Unet')  # Unet, Unet++, DeepLabV3+, MAnet
-        self.backbone = self.hparams.get("backbone", 'resnet18')  # resnet50
-        self.weights = self.hparams.get("weights", None)  # ("weights", "imagenet")
+        self.architecture = self.hparams.get("architecture", 'Unet')
+        self.backbone = self.hparams.get("backbone", 'resnet18')
+        self.weights = self.hparams.get("weights", None)
         self.learning_rate = self.hparams.get("lr", None)
         self.num_workers = self.hparams.get("num_workers", 0)
         self.batch_size = self.hparams.get("batch_size", None)
         self.acc = self.hparams.get("acc", 'gpu')
-        self.transform = self.hparams.get("transform")  ##### changed after run test.
+        self.transform = self.hparams.get("transform")
         self.in_channels = self.hparams.get("in_channels")
         self.classes = self.hparams.get("classes")
-        # self.ignore_index = self.hparams.get("ignore_index",None)
         self.class_weights = self.hparams.get("class_weights")
-        # self.loss_type =  self.hparams.get("loss", 'Balanced_MSE')
         self.checkpoint_path = self.hparams.get("checkpoint_path")
         self.freeze_encoder = self.hparams.get("freeze_backbone")
         self.img_x = self.hparams.get("img_x")
@@ -325,6 +309,9 @@ class MyModel(L.LightningModule):
         self.counter = 0
         self.remove_b = self.hparams.get("remove_background_class")
         self.scaler = self.hparams.get("scaler")
+        self.class_values = self.hparams.get("class_values")
+        self.forward_mapping = self.hparams.get("forward_mapping")
+        self.reverse_mapping = self.hparams.get("reverse_mapping")
 
         if self.classes == 1:
             # self.iou = JaccardIndex(task="binary",num_classes=self.classes, ignore_index=self.ignore_index)
@@ -337,8 +324,6 @@ class MyModel(L.LightningModule):
             self.iou = JaccardIndex(task="multiclass", num_classes=self.classes, ignore_index=0)
             self.val_iou = JaccardIndex(task="multiclass", num_classes=self.classes, ignore_index=0)
         else:
-            # self.iou = JaccardIndex(task="multiclass",num_classes=self.classes, ignore_index=self.ignore_index)
-            # self.val_iou = JaccardIndex(task="multiclass",num_classes=self.classes, ignore_index=self.ignore_index)
             self.iou = JaccardIndex(task="multiclass", num_classes=self.classes)
             self.val_iou = JaccardIndex(task="multiclass", num_classes=self.classes)
 
@@ -350,7 +335,8 @@ class MyModel(L.LightningModule):
             num_classes=self.classes,  #
             preprocess_input=self.preprocess,
             remove=self.remove_b,
-            scaler_loader=self.scaler
+            scaler_loader=self.scaler,
+            remap=self.forward_mapping
 
         )
 
@@ -360,7 +346,8 @@ class MyModel(L.LightningModule):
             num_classes=self.classes,
             preprocess_input=self.preprocess,
             remove=self.remove_b,
-            scaler_loader=self.scaler
+            scaler_loader=self.scaler,
+            remap=self.forward_mapping
         )
 
         self.model = self._prepare_model()
@@ -485,9 +472,22 @@ class MyModel(L.LightningModule):
 
         pred1 = torch.softmax(logits, dim=1)
 
-        pred2 = torch.argmax(pred1, dim=1)  # Take the class with the highest probability
+        pred2 = torch.argmax(pred1, dim=1)
 
-        return pred2
+        pred2 = pred2.squeeze()
+
+        pred2= pred2.cpu().numpy()
+        #
+        reverse_array = pred2.copy()
+
+
+        for old, new in self.reverse_mapping.items():
+            reverse_array[pred2 == old] = new
+
+        # Cleanup memory
+        del pred2
+
+        return reverse_array
 
     def train_dataloader(self):
         # DataLoader class for training
@@ -500,7 +500,6 @@ class MyModel(L.LightningModule):
             drop_last=True
         )
 
-    #
     def val_dataloader(self):
         # DataLoader class for validation
         return torch.utils.data.DataLoader(
@@ -523,8 +522,14 @@ class MyModel(L.LightningModule):
 
     def _prepare_model(self):
 
-        # weights selection and  backbone overwrite if miss match between pretrained weights and backbone
-        weights = None
+
+        # overwrite wrong backbone if pretrained weights
+        if self.weights == 'Sentinel_2_TOA_Resnet18':
+            self.backbone = 'resnet18'
+        elif self.weights == 'Sentinel_2_TOA_Resnet50':
+            self.backbone = 'resnet50'
+
+        # build arch.
 
         if self.architecture == 'Unet':
             model = smp.Unet(
@@ -548,6 +553,14 @@ class MyModel(L.LightningModule):
                 classes=self.classes
             )
 
+        elif self.architecture == 'SegFormer':
+            model = smp.Segformer(
+                encoder_name=self.backbone,
+                encoder_weights='imagenet' if self.weights == 'imagenet' else None,
+                in_channels=self.in_channels,
+                classes=self.classes
+            )
+
         elif self.architecture == 'JustoUNetSimple':
 
             model = model_2D_Justo_UNet_Simple(input_channels=self.in_channels, num_classes=self.classes)
@@ -559,16 +572,17 @@ class MyModel(L.LightningModule):
             if self.weights == 'Sentinel_2_TOA_Resnet18':
                 assert self.in_channels == 13, f'Input channels should be equal to 13 , but is {self.in_channels}'
                 weights = ResNet18_Weights.SENTINEL2_ALL_MOCO
-                self.backbone = 'resnet18'
+                #self.backbone = 'resnet18'
                 state_dict = weights.get_state_dict(progress=True)
                 model.encoder.load_state_dict(state_dict)
 
             elif self.weights == 'Sentinel_2_TOA_Resnet50':
                 assert self.in_channels == 13, f'Input channels should be equal to 13 , but is {self.in_channels}'
                 weights = ResNet50_Weights.SENTINEL2_ALL_MOCO
-                self.backbone = 'resnet50'
+                #self.backbone = 'resnet50'
                 state_dict = weights.get_state_dict(progress=True)
                 model.encoder.load_state_dict(state_dict)
+
 
         if self.freeze_encoder == True:
             # Freeze encoder weights
@@ -606,7 +620,7 @@ class FeedbackCallback(L.Callback):
         if self.feedback:
             self.feedback.setProgress((epoch + 1) / max_epochs * 100)
             self.feedback.pushInfo(log_message)
-            # Allow user to cancel the process
+
             # Check if the user canceled the process
             if self.feedback.isCanceled():
                 trainer.should_stop = True
@@ -625,11 +639,11 @@ def dl_train(
         normalization_bool=True,
         num_workers=0, num_models=1, acc_type_index=None, acc_type_numbers=1, logdirpath_model=None,
         logdirpath='./logs', tune=True, feedback: QgsProcessingFeedback = None):
-    arch_index_options = ['Unet', 'Unet++', 'DeepLabV3+', 'JustoUNetSimple']
+    arch_index_options = ['Unet', 'Unet++', 'DeepLabV3+', 'SegFormer', 'JustoUNetSimple']
     arch = arch_index_options[arch_index]
 
     pretrained_weights_options = ['imagenet', None, 'Sentinel_2_TOA_Resnet18',
-                                  'Sentinel_2_TOA_Resnet50']  # ,'LANDSAT_TM_TOA_Resnet18','LANDSAT_ETM_TOA_Resnet18','LANDSAT_OLI_TIRS_TOA_Resnet18','LANDSAT_ETM_SR_Resnet18','LANDSAT_OLI_SR_Resnet18']
+                                  'Sentinel_2_TOA_Resnet50']                   #  ,'LANDSAT_TM_TOA_Resnet18','LANDSAT_ETM_TOA_Resnet18','LANDSAT_OLI_TIRS_TOA_Resnet18','LANDSAT_ETM_SR_Resnet18','LANDSAT_OLI_SR_Resnet18']
     pretrained_weights = pretrained_weights_options[pretrained_weights_index]
 
     if pretrained_weights == 'Sentinel_2_TOA_Resnet18':
@@ -653,29 +667,46 @@ def dl_train(
     val_data_path = folder_path + '/validation_files.csv'
     summary_data_path = folder_path + '/Summary_train_val.csv'
 
-    train_data = pd.read_csv(train_data_path)  # relative zu standort csv prüfen
-    val_data = pd.read_csv(val_data_path)
-    summary_data = pd.read_csv(summary_data_path)
+    train_data = pd.read_csv(train_data_path)
+    for col in ["image", "mask"]:
+        train_data[col] = train_data[col].apply(lambda rel_path: str(folder_path / Path(rel_path)))
 
-    # from pathlib import Path
+    val_data = pd.read_csv(val_data_path)
+    for col in ["image", "mask"]:
+        val_data[col] = val_data[col].apply(lambda rel_path: str(folder_path / Path(rel_path)))
+
+    print(val_data.head())
+
+    summary_data = pd.read_csv(summary_data_path)
 
     # read from csv
     remove_zero_class = summary_data['Ignored Background : Class Zero'].tolist()[0]
-    print('remove zero class', remove_zero_class)
+
+    # create extra no-data class layer if yes
+
+    # dynamic remapping of labeled data (handles uncontinious data labels , ignores 0 in class_values, important for iou calc in mapper/tester)
+    original_values = sorted(summary_data['Class ID'].unique().tolist())
+    n_classes = len(original_values)
 
     if remove_zero_class == 'Yes':
-        n_classes = len(summary_data['Class ID'].tolist()) + 1
-        print(n_classes)
-        print('removed:', n_classes)
-    elif remove_zero_class == 'No':
-        print('remove', remove_zero_class)
-        n_classes = len(summary_data['Class ID'].tolist())
-        print('not removed:', n_classes)
+        original_values = [0] + original_values
+        n_classes = len(original_values)
+    cls_values = original_values
+
+    forward_mapping = {original: idx for idx, original in enumerate(original_values)}
+
+    # Create reverse mapping (new indices -> original)
+    reverse_mapping = {idx: original for original, idx in forward_mapping.items()}
+    print('forward mapping',forward_mapping)
+    print('backward mapping',reverse_mapping)
+
+    if 0 in cls_values:
+        cls_values.remove(0)
+
+    #  until here remapping look up tables for train and prediction
 
     scaler_list = summary_data['Scaler'].tolist()
     scaler = scaler_list[0]
-    print('scaler', scaler)
-    print(f"Initial scaler: {scaler} (type: {type(scaler)})")
 
     ignore_scaler_list = ([
         'Sentinel_2_TOA_Resnet18', 'Sentinel_2_TOA_Resnet50'])
@@ -719,6 +750,7 @@ def dl_train(
 
         elif acc_type == 'cpu':
             weights_tensor = torch.as_tensor(weights_list, dtype=torch.float32)
+
     else:
         weights_tensor = None
 
@@ -759,14 +791,17 @@ def dl_train(
             'num_workers': num_workers,
             'acc': acc_type,
             'freeze_backbone': freeze_encoder,
-            # "ignore_index": ignore_index,
             "class_weights": weights_tensor,
             'checkpoint_path': None,
             "img_x": first_img_x,
             "img_y": first_img_y,
             "preprocess": preprocess_input,
             "remove_background_class": remove_zero_class,
-            "scaler": scaler_value
+            "scaler": scaler_value,
+            "forward_mapping": forward_mapping,
+            "reverse_mapping": reverse_mapping,
+            "class_values": cls_values
+
         }
         # feedback = feedback
     )
@@ -776,12 +811,9 @@ def dl_train(
         model = MyModel.load_from_checkpoint(checkpoint_path, train_data=train_data, val_data=val_data,
                                              hparams={'in_channels': in_channels,
                                                       'architecture': arch,
-                                                      ### take out as shoul have been devined already
                                                       'classes': n_classes,
-                                                      ### take out as shoul have been devined already
                                                       'batch_size': batch_size,
                                                       'backbone': backbone,
-                                                      ### take out as shoul have been devined already
                                                       'weights': pretrained_weights,
                                                       'epochs': n_epochs,
                                                       'transform': transform,
@@ -789,14 +821,16 @@ def dl_train(
                                                       'num_workers': num_workers,
                                                       'acc': acc_type,
                                                       'freeze_backbone': freeze_encoder,
-                                                      # "ignore_index": ignore_index,
                                                       "class_weights": weights_tensor,
                                                       'checkpoint_path': None,
                                                       "img_x": first_img_x,
                                                       "img_y": first_img_y,
                                                       "preprocess": preprocess_input,
                                                       "remove_background_class": remove_zero_class,
-                                                      "scaler": scaler_value},
+                                                      "scaler": scaler_value,
+                                                      "forward_mapping": forward_mapping,
+                                                      "reverse_mapping": reverse_mapping,
+                                                      "class_values": cls_values},
                                              map_location=acc_type
                                              )
 
@@ -834,12 +868,13 @@ def dl_train(
             # update hparams of the model
             model.hparams.lr = new_lr
 
+            feedback.pushInfo(f"learning rate finder suggested and used: {new_lr} as learning rate for training")
+
         trainer.fit(model)
 
     else:
 
         checkpoint_callback = ModelCheckpoint(dirpath=logdirpath_model, monitor='val_iou_epoch',
-                                              # ,monitor='val_iou_epoch'
                                               filename='{epoch:05d}-val_iou_{val_iou_epoch:.4f}', save_top_k=num_models,
                                               auto_insert_metric_name=False)
 
@@ -870,4 +905,8 @@ def dl_train(
             # update hparams of the model
             model.hparams.lr = new_lr
 
+            feedback.pushInfo(f"learning rate finder suggested and used: {new_lr} as learning rate for training")
+
         trainer.fit(model)
+
+    return model

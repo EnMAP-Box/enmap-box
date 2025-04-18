@@ -17,7 +17,7 @@ if not import_error:
     from torchvision import transforms
     from torchvision.transforms import v2
     from enmapbox.apps.SpecDeepMap import DL_Trainer
-    from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer_remap_classes_seg_former import MyModel
+    from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import MyModel
 
     start_app()
 
