@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>679</width>
-    <height>587</height>
+    <width>517</width>
+    <height>468</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -206,11 +206,26 @@ test-align:center;</string>
            </property>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout">
+             <property name="spacing">
+              <number>0</number>
+             </property>
              <property name="topMargin">
               <number>0</number>
              </property>
              <item>
-              <widget class="QLabel" name="labelLogo">
+              <widget class="ResizableImageLabel" name="labelLogo">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>1</horstretch>
+                 <verstretch>1</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>150</height>
+                </size>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -222,6 +237,12 @@ test-align:center;</string>
                </property>
                <property name="scaledContents">
                 <bool>false</bool>
+               </property>
+               <property name="margin">
+                <number>-10</number>
+               </property>
+               <property name="indent">
+                <number>0</number>
                </property>
               </widget>
              </item>
@@ -255,30 +276,6 @@ test-align:center;</string>
                 <property name="bottomMargin">
                  <number>0</number>
                 </property>
-                <item>
-                 <widget class="QLabel" name="labelTitle">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                    <horstretch>2</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <family>Verdana</family>
-                    <pointsize>20</pointsize>
-                    <weight>75</weight>
-                    <bold>true</bold>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>EnMAP-Box 3</string>
-                  </property>
-                  <property name="textFormat">
-                   <enum>Qt::RichText</enum>
-                  </property>
-                 </widget>
-                </item>
                 <item>
                  <widget class="QLabel" name="labelVersion">
                   <property name="text">
@@ -612,6 +609,13 @@ p, li { white-space: pre-wrap; }
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ResizableImageLabel</class>
+   <extends>QLabel</extends>
+   <header>enmapbox.qgispluginsupport.qps.simplewidgets</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../enmapboxresources.qrc"/>
  </resources>

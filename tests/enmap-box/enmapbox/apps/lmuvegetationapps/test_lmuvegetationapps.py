@@ -27,14 +27,13 @@ def has_package(name: str):
         return False
 
 
-class test_applications(EnMAPBoxTestCase):
+@unittest.skipIf(not has_package('scipy'), 'scipy is not installed')
+class test_lmuvegetationapplications(EnMAPBoxTestCase):
 
-    @unittest.skipIf(not has_package('scipy'), 'scipy is not installed')
     def test_MainUiFunc(self):
         m = MainUiFunc()
         self.showGui(m)
 
-    @unittest.skipIf(not has_package('scipy'), 'scipy is not installed')
     def test_application(self):
         EB = EnMAPBox.instance()
         if EB is None:
