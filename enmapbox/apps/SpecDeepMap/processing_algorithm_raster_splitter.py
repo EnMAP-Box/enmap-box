@@ -90,9 +90,9 @@ class RasterSplitter(QgsProcessingAlgorithm):
         html = '' \
                '<p>This algorithm splits a spectral imaging raster and a corresponding classification label raster into smaller image tiles(chips). Label raster must be given in Integer format.  The value zero is fixed as unclassified. Additionally, if the number of class-labels on image tiles falls below a user-specified percentage threshold, the tiles are skipped and excluded from further processing.  </p>' \
                '<h3>Raster image</h3>' \
-               '<p>Input raster image.</p>' \
+               '<p>Input image raster in form of TIFF file. Accepts any data ranges. If No data value in raster defined, it is used to automatically set corresponindg labels in the label raster image to 0. </p>' \
                '<h3>Raster labels </h3>' \
-               '<p>Input raster labels.</p>' \
+               '<p>Input label raster in form of TIFF file. Labels are expected to be Integers in range 0-255. The value 0 is reserved for no-data class or unclassified. If label raster has zero values they will be interpreted as unclassified and masked & ignored throughout the Specdeepmap workflow. </p>' \
                '<h3>tile size X </h3>' \
                '<p>Tile size in X direction in pixel units.</p>' \
                '<h3>Tile size Y </h3>' \

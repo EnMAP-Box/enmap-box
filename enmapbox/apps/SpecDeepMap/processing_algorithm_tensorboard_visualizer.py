@@ -82,7 +82,7 @@ class Tensorboard_visualizer(QgsProcessingAlgorithm):
     def shortHelpString(self):
 
         html = '' \
-               '<p>This algorithm opens a Tensoboard (currently only for Windows system available). A Tensorboard is an interactive visualization tool to explore the trainings and validations metrics and losses.</p>' \
+               '<p>This algorithm opens a Tensoboard (currently only for Windows system available, if used on linux, open a different port everytime you want to initate a tesnorboard). A Tensorboard is an interactive visualization tool to explore the trainings and validations metrics and losses.</p>' \
                '<h3>TensorBoard Log Directory</h3>' \
                '<p>The path which was defined during training to save model and logs.</p>' \
                '<h3>TensorBoard Port (Optional) </h3>' \

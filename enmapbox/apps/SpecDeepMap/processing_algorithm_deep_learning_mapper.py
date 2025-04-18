@@ -110,7 +110,7 @@ class DL_Mapper(QgsProcessingAlgorithm):
                '<h3>Device</h3>' \
                '<p>CPU or GPU can be used, for GPU use Cuda needs to be installed correctly for given python environment</p>' \
                '<h3>Prediction as Raster </h3>' \
-               '<p> Prediction can be saved as Tiffile with this parameter</p>' \
+               '<p> Prediction can be saved as TIFF file with this parameter</p>' \
                '<h3>Prediction as Vector Output</h3>' \
                '<p>The prediction can be optionally also exported as Shapefile</p>' \
                '<h3>IoU CSV</h3>' \
