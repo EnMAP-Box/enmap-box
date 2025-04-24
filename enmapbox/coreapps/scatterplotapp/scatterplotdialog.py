@@ -11,6 +11,7 @@ from scipy.stats import binned_statistic_2d, pearsonr
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import MarkerSymbolComboBox, MarkerSymbol
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget, ImageItem, mkPen
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
@@ -24,7 +25,6 @@ from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsMapSettings, Qgs
     QgsFieldProxyModel, QgsMapLayer
 from qgis.gui import QgsMapLayerComboBox, QgsMapCanvas, QgsRasterBandComboBox, QgsColorButton, QgsColorRampButton, \
     QgsFilterLineEdit, QgsFieldComboBox
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -318,6 +318,9 @@ class ScatterPlotDialog(QMainWindow):
         layerY = self.currentLayerY()
 
         if layerX is None or layerY is None:
+            return
+
+        if self.mMapCanvas is None:
             return
 
         bandNoX = self.currentBandX()
