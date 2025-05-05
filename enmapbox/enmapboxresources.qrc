@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="enmapbox">
+    <file>gui/ui/logo/logo_enmapbox.png</file>
     <file>gui/ui/icons/sensor.png</file>
     <file>gui/ui/icons/viewlist_attributetabledock.svg</file>
     <file>gui/ui/icons/ActionIdentifyTimeSeries.svg</file>

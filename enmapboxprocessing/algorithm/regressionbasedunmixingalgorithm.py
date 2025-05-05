@@ -14,6 +14,7 @@ from enmapboxprocessing.algorithm.prepareregressiondatasetfromsynthmixalgorithm 
     PrepareRegressionDatasetFromSynthMixAlgorithm
 from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import RasterMathAlgorithm
 from enmapboxprocessing.algorithm.stackrasterlayersalgorithm import StackRasterLayersAlgorithm
+from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import ClassifierDump
@@ -232,7 +233,14 @@ class RegressionBasedUnmixingAlgorithm(EnMAPProcessingAlgorithm):
             else:
                 filename2 = filename
 
-            ds = gdal.Translate(filenameFraction, filename2)
+            alg = TranslateRasterAlgorithm()
+            parameters = {
+                alg.P_RASTER: filename2,
+                alg.P_OUTPUT_RASTER: filenameFraction
+            }
+            self.runAlg(alg, parameters, None, feedback2, context, True)
+            ds = gdal.Open(filenameFraction)
+
             writer = RasterWriter(ds)
             for bandNo, category in enumerate(categories, 1):
                 writer.setBandName(category.name, bandNo)
@@ -249,7 +257,15 @@ class RegressionBasedUnmixingAlgorithm(EnMAPProcessingAlgorithm):
                     alg.P_OUTPUT_RASTER: filename
                 }
                 self.runAlg(alg, parameters, None, feedback2, context, True)
-                ds = gdal.Translate(filenameVariation, filename)
+
+                alg = TranslateRasterAlgorithm()
+                parameters = {
+                    alg.P_RASTER: filename,
+                    alg.P_OUTPUT_RASTER: filenameVariation
+                }
+                self.runAlg(alg, parameters, None, feedback2, context, True)
+                ds = gdal.Open(filenameVariation)
+
                 writer = RasterWriter(ds)
                 for bandNo, category in enumerate(categories, 1):
                     writer.setBandName(category.name, bandNo)

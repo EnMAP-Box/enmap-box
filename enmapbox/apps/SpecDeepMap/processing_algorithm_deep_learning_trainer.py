@@ -152,7 +152,7 @@ class DL_Trainer(QgsProcessingAlgorithm):
                '<h3>Learning rate</h3>' \
                '<p>This defines the Learning rate for the Adam optimizer of the model. </p>' \
                '<h3>Automatic learning rate finder</h3>' \
-               '<p>If activated this parameter runs a learning rate finder, meaning it test 100 learning rates before training and picks the one with the most stable learning for training. If chosen this overwrites the manual defined learning rate . </p>' \
+               '<p>If activated this parameter runs a learning rate finder, meaning it test 100 learning rates before training and picks the one with the most stable learning for training. If chosen this overwrites the manual defined learning rate. The found and implemented  learningrate is printed to log interface. </p>' \
                '<h3>Number of workers</h3>' \
                '<p>This defines number of cpus used for data loading and augmentation and supports your training speed.</p>' \
                '<h3>Type of device</h3>' \
@@ -160,7 +160,7 @@ class DL_Trainer(QgsProcessingAlgorithm):
                '<h3>Number of devices</h3>' \
                '<p> For distributated training you can also here define how many GPUs you want to use. </p>' \
                '<h3>Number of models</h3>' \
-               '<p> Defines how many models should be saved. -1 means each epoch a model is saved. Other integer define a limited number of models, which are saved by performances on Iou metric e.g. 5 best performing models.  </p>' \
+               '<p> Defines how many models should be saved. -1 means each epoch a model is saved. Other integer define a limited number of models.  </p>' \
                '<h3>Path for saving Tensorboard logger</h3>' \
                '<p>Define folder where Tensorboard logger is saved. </p>'\
                '<h3>Path for saving model</h3>' \
