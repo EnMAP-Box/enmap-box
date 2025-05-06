@@ -88,12 +88,12 @@ class RasterSplitter(QgsProcessingAlgorithm):
 
     def shortHelpString(self):
         html = '' \
-               '<p>This algorithm splits a spectral imaging raster and a corresponding classification label raster into smaller image tiles. Image and labels tiles which have no valid labels can be excluded from further processing. Additionally, if the number of valid labels on image tiles falls below a user-specified percentage threshold, these are as well excluded from further processing.</p>' \
+               '<p>This algorithm splits a spectral imaging raster and a corresponding classification label raster into smaller image tiles(chips). Label raster must be given in Integer format.  The value zero is fixed as unclassified. Additionally, if the number of class-labels on image tiles falls below a user-specified percentage threshold, the tiles are skipped and excluded from further processing.  </p>' \
                '<h3>Raster image</h3>' \
-               '<p>Input raster image.</p>' \
+               '<p>Input image raster in form of TIFF file. Accepts any data ranges. If No data value in raster defined, it is used to automatically set corresponindg labels in the label raster image to 0. </p>' \
                '<h3>Raster labels </h3>' \
-               '<p>Input raster labels.</p>' \
-               '<h3>Tile size X </h3>' \
+               '<p>Input label raster in form of TIFF file. Labels are expected to be Integers in range 0-255. The value 0 is reserved for no-data class or unclassified. If label raster has zero values they will be interpreted as unclassified and masked & ignored throughout the Specdeepmap workflow. </p>' \
+               '<h3>tile size X </h3>' \
                '<p>Tile size in X direction in pixel units.</p>' \
                '<h3>Tile size Y </h3>' \
                '<p>Tile size in Y direction in pixel units.</p>' \
@@ -101,8 +101,8 @@ class RasterSplitter(QgsProcessingAlgorithm):
                '<p>Step size in X direction in pixel units.</p>' \
                '<h3>Step size Y </h3>' \
                '<p>Step size in Y direction in pixel units.</p>' \
-               '<h3>Minium percent of valid labels per tile</h3>' \
-               '<p>If the defined minimum percentage of valid labels per image tile is not reached, the tile will be skipped and excluded from further processing. The fiexed label value indicating no data is 0. The no data label 0 will continously be masked during training and prediction, so the model will ignore the pixels classified as 0. </p>' \
+               '<h3>Minium Class-Label Coverage per tile</h3>' \
+               '<p>If the defined minimum percentage of class-labels per image tile is not reached, the tile will be skipped and excluded from further processing. The fixed label value indicating no data. or unclassified  is 0. The no data label 0 will continously be masked during training and prediction, so the model will ignore the all label pixels with the value 0. </p>' \
                '<h3>Output folder</h3>' \
                '<p>Location of output folder. In the output folder two subfolder will be created. One images and one labels. Corresponding images and labels tiles have same name.</p>'
         return html
