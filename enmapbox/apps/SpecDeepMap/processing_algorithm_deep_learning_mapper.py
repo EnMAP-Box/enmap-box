@@ -8,7 +8,7 @@ from qgis.core import (QgsProcessingAlgorithm,
                        QgsProcessingParameterVectorDestination,
                        QgsProcessingParameterFileDestination)
 
-from enmapbox.apps.SpecDeepMap.core_deep_learning_mapper_remap_classes import pred_mapper
+from enmapbox.apps.SpecDeepMap.core_deep_learning_mapper import pred_mapper
 
 
 class DL_Mapper(QgsProcessingAlgorithm):
@@ -98,23 +98,23 @@ class DL_Mapper(QgsProcessingAlgorithm):
 
     def shortHelpString(self):
         html = '' \
-               '<p>This algorithm loads a trained deep learning model and uses it for prediction. The algorithm can load complete satelite szences and splits it on the fly in small tiles predicts on them and stich them back together. The prediction is saves as a raster and can also be saved as a vector layer. If a ground truth mask is given the performance metric,Intersection over Union is calculated per class and a general mean.</p>' \
+               '<p>This algorithm loads a trained deep learning model and uses it for prediction. The algorithm can load complete satellite scences and splits it on the fly in small tiles predicts on them and combine them back together. The prediction is saves as a raster and can also be saved as a vector layer. If a ground truth mask is given the performance metric,Intersection over Union (IoU) is calculated per class and a general mean.</p>' \
                '<h3>Input Raster</h3>' \
                '<p>Input spectral raster, which should be predicted</p>' \
                '<h3>Ground truth raster (Optional)</h3>' \
                '<p>Ground truth label raster, which can be used to asses the model performances. If this is given an Intersection Union metric per class as well as a mean is calculated.</p>' \
                '<h3>Model checkpoint</h3>' \
-               '<p>The file path from which to load the trained model.</p>' \
+               '<p>The file path from which to load the trained model, if several model were saved during training choose the one with the highest IoU on validation datatset ( value is specified in checkpoint names).</p>' \
                '<h3>Minimum overlap of tiles in Pixel Unit</h3>' \
                '<p>As this algorithm loads the input raster in small tiles, an can be defined with this parameter. This overlap is cropped from each predicted tile in directions to other tiles, so that there is no actual overlap in the prediction, but boundary effect are minimized. A good suggestion is 5-10% of image size. If the overlap doesnt lead to full coverage, the overlap is adjusted to next possible solution, to give full coverage of prediction </p>' \
-               '<h3>Ignore Index (Optional)</h3>' \
-               '<p>This exculdes the specified class from the individual class metrics and from the mean IoU calculation</p>' \
-               '<h3>Export prediction as VectorLayer</h3>' \
-               '<p>If this is checked than the predcition will also be saved as Vector Layer in the output folder. </p>' \
                '<h3>Device</h3>' \
-               '<p>Define if you use CPU or GPU for the prediction</p>' \
-               '<h3>Output folder</h3>' \
-               '<p>The prediction will be saved in this folder as raster and as shapefile, if wanted. Further a the individual class Intersection over Unionin scores as well as a mean (IoU) are saved as a csv file.  </p>'
+               '<p>CPU or GPU can be used, for GPU use Cuda needs to be installed correctly for given python environment</p>' \
+               '<h3>Prediction as Raster </h3>' \
+               '<p> Prediction can be saved as TIFF file with this parameter</p>' \
+               '<h3>Prediction as Vector Output</h3>' \
+               '<p>The prediction can be optionally also exported as Shapefile</p>' \
+               '<h3>IoU CSV</h3>' \
+               '<p>The Algorithm can calculate the Intersection over Union score (IoU) per class and mean IoU if a ground truth raster is provided, the IoU score can be saved as csv file (with this parameter the location can be defined ).</p>'
         return html
 
     def initAlgorithm(self, config=None):
