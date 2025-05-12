@@ -1,3 +1,5 @@
+import unittest
+
 from qgis.PyQt.QtCore import QMetaType
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import QgsFields, QgsField, Qgis, QgsProject
@@ -13,6 +15,7 @@ initAll()
 
 class Issue887Tests(TestCase):
 
+    @unittest.skipIf(TestCase.runsInCI(), 'GUI use only')
     def test_start_box(self):
         emb = EnMAPBox()
         emb.addSource(landcover_polygon)
@@ -39,3 +42,4 @@ class Issue887Tests(TestCase):
         self.showGui(emb.ui)
 
         emb.close()
+        QgsProject.instance().removeAllMapLayers()
