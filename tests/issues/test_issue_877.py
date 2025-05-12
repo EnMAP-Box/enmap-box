@@ -1,6 +1,6 @@
-from PyQt5.QtCore import QMetaType
-from PyQt5.QtWidgets import QApplication
-from qgis._core import QgsFields, QgsField, Qgis, QgsProject
+from qgis.PyQt.QtCore import QMetaType
+from qgis.PyQt.QtWidgets import QApplication
+from qgis.core import QgsFields, QgsField, Qgis, QgsProject
 
 from enmapbox import initAll
 from enmapbox.exampledata import landcover_polygon
@@ -15,8 +15,8 @@ class Issue887Tests(TestCase):
 
     def test_start_box(self):
         emb = EnMAPBox()
-        self.showGui(emb)
         emb.addSource(landcover_polygon)
+        self.showGui(emb.ui)
         emb.close()
 
     def test_kill_qgis_layer(self):

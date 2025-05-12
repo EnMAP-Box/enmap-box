@@ -1,4 +1,3 @@
-import datetime
 import os
 import pathlib
 import pickle
@@ -6,10 +5,11 @@ import re
 import warnings
 import webbrowser
 from os.path import dirname, exists, sep
+from pathlib import Path
 from typing import Any, Dict, List, Union
 
 import numpy as np
-from qgis.PyQt.QtCore import pyqtSignal, QAbstractItemModel, QFile, QFileInfo, QItemSelectionModel, QMimeData, \
+from qgis.PyQt.QtCore import pyqtSignal, QAbstractItemModel, QItemSelectionModel, QMimeData, \
     QModelIndex, QSortFilterProxyModel, Qt, QTimer, QUrl
 from qgis.PyQt.QtGui import QContextMenuEvent, QDesktopServices
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QApplication, QDialog, QMenu, QTreeView, QWidget
@@ -26,7 +26,7 @@ from enmapbox.qgispluginsupport.qps.models import PyObjectTreeNode, TreeModel, T
 from enmapbox.qgispluginsupport.qps.utils import bandClosestToWavelength, defaultBands, loadUi, qgisAppQgisInterface
 from enmapbox.typeguard import typechecked
 from .datasources import DataSource, FileDataSource, LayerItem, ModelDataSource, RasterDataSource, SpatialDataSource, \
-    VectorDataSource
+    VectorDataSource, dataItemToLayer
 from .metadata import RasterBandTreeNode
 from ..dataviews.docks import Dock
 from ..mapcanvas import MapCanvas
@@ -52,7 +52,7 @@ class DataSourceManager(TreeModel):
         QgsProject.instance().layersWillBeRemoved.connect(self.onQGISLayerWillBeRemoved)
 
         self.mUpdateTimer: QTimer = QTimer()
-        self.mUpdateTimer.setInterval(500)
+        self.mUpdateTimer.setInterval(2000)
         self.mUpdateTimer.timeout.connect(self.updateSourceNodes)
         self.mUpdateTimer.start()
         self.mUpdateState: dict = dict()
@@ -71,12 +71,10 @@ class DataSourceManager(TreeModel):
         self.mProject = enmapbox.project()
 
     def onQGISLayerWillBeRemoved(self, layer_ids: List[str]):
-        # remove any source that links to a layer that will be removed from the QGIS project
+        # remove any source that refers to the layer to be deleted soon
         to_remove = []
         for source in self.dataSources():
-            dataItem: QgsDataItem = source.dataItem()
-            lyr = dataItem.referenceLayer()
-            if isinstance(lyr, QgsMapLayer) and lyr.id() in layer_ids:
+            if isinstance(source, LayerItem) and source.layerId() in layer_ids:
                 to_remove.append(source)
 
         if len(to_remove) > 0:
@@ -216,7 +214,7 @@ class DataSourceManager(TreeModel):
         layers = []
         for ds in self.dataSources():
             dataItem = ds.dataItem()
-            if isinstance(dataItem, LayerItem) and isinstance(dataItem.referenceLayer(), QgsMapLayer):
+            if isinstance(dataItem, LayerItem) and dataItem.hasReferenceLayer():
                 layers.append(dataItem.referenceLayer())
         return layers
 
@@ -280,18 +278,19 @@ class DataSourceManager(TreeModel):
             path = source.source()
 
             if os.path.isfile(path):
-                info = QFileInfo(path)
-                modificationTime = info.fileTime(QFile.FileModificationTime).toString(Qt.ISODate)
-                updateState = datetime.datetime.fromisoformat(modificationTime)
+                updateState = Path(path).stat().st_mtime_ns
             else:
                 dataItem: QgsDataItem = source.dataItem()
-                if isinstance(dataItem, LayerItem) and isinstance(dataItem.referenceLayer(), QgsMapLayer):
-                    lyr = dataItem.referenceLayer()
+                if isinstance(dataItem, LayerItem):
+                    lyr = dataItemToLayer(dataItem, project=self.project())
+
                     if isinstance(lyr, QgsVectorLayer):
                         updateState = f'{lyr.isValid()}|{lyr.name()}|' \
                                       f'{lyr.featureCount()}|' \
                                       f'{lyr.geometryType()}|' \
                                       f'{is_spectral_library(lyr)}'
+                    elif isinstance(lyr, QgsRasterLayer):
+                        updateState = f'{lyr.name()}|{lyr.bandCount()}x{lyr.height()}x{lyr.width()}'
 
             oldInfo = self.mUpdateState.get(sid, None)
             if oldInfo is None:
