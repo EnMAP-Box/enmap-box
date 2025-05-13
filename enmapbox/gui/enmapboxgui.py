@@ -25,9 +25,37 @@ import warnings
 from os.path import basename, dirname
 from typing import Optional, Dict, Union, Any, List, Sequence
 
+import qgis.utils
+from processing.ProcessingPlugin import ProcessingPlugin
+from processing.gui.AlgorithmDialog import AlgorithmDialog
+from processing.gui.ProcessingToolbox import ProcessingToolbox
+from qgis import utils as qgsUtils
+from qgis.PyQt.QtCore import QUrl
+from qgis.PyQt.QtCore import pyqtSignal, Qt, QObject, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
+from qgis.PyQt.QtGui import QDesktopServices
+from qgis.PyQt.QtGui import QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QColor, QIcon, \
+    QKeyEvent, \
+    QCloseEvent, QGuiApplication
+from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, QMainWindow, QApplication, QSizePolicy, \
+    QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
+    QProgressBar, QMessageBox
+from qgis.PyQt.QtXml import QDomDocument
+from qgis.core import QgsExpressionContextGenerator, QgsExpressionContext, QgsProcessingContext, \
+    QgsExpressionContextUtils
+from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
+    QgsProcessingAlgorithm, Qgis, QgsCoordinateReferenceSystem, QgsWkbTypes, \
+    QgsPointXY, QgsLayerTree, QgsLayerTreeLayer, QgsVectorLayerTools, \
+    QgsZipUtils, QgsProjectArchive, QgsSettings, \
+    QgsStyle, QgsSymbolLegendNode, QgsSymbol, QgsTaskManager, QgsApplication, QgsProcessingAlgRunnerTask
+from qgis.core import QgsRectangle
+from qgis.gui import QgsMapCanvas, QgsMapTool, QgisInterface, QgsMessageBar, QgsMessageViewer, QgsMessageBarItem, \
+    QgsMapLayerConfigWidgetFactory, QgsAttributeTableFilterModel, QgsSymbolSelectorDialog, \
+    QgsSymbolWidgetContext
+from qgis.gui import QgsProcessingAlgorithmDialogBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog, \
+    QgsNewVectorLayerDialog, QgsProcessingContextGenerator
+
 import enmapbox
 import enmapbox.gui.datasources.manager
-import qgis.utils
 from enmapbox import messageLog, debugLog, DEBUG
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
 from enmapbox.gui.dataviews.dockmanager import DockManagerTreeModel, MapDockTreeNode
@@ -57,32 +85,6 @@ from enmapboxprocessing.algorithm.importprismal2calgorithm import ImportPrismaL2
 from enmapboxprocessing.algorithm.importprismal2dalgorithm import ImportPrismaL2DAlgorithm
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
-from processing.ProcessingPlugin import ProcessingPlugin
-from processing.gui.AlgorithmDialog import AlgorithmDialog
-from processing.gui.ProcessingToolbox import ProcessingToolbox
-from qgis import utils as qgsUtils
-from qgis.PyQt.QtCore import QUrl
-from qgis.PyQt.QtCore import pyqtSignal, Qt, QObject, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
-from qgis.PyQt.QtGui import QDesktopServices
-from qgis.PyQt.QtGui import QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QColor, QIcon, \
-    QKeyEvent, \
-    QCloseEvent, QGuiApplication
-from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, QMainWindow, QApplication, QSizePolicy, QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
-    QProgressBar, QMessageBox
-from qgis.PyQt.QtXml import QDomDocument
-from qgis.core import QgsExpressionContextGenerator, QgsExpressionContext, QgsProcessingContext, \
-    QgsExpressionContextUtils
-from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
-    QgsProcessingAlgorithm, Qgis, QgsCoordinateReferenceSystem, QgsWkbTypes, \
-    QgsPointXY, QgsLayerTree, QgsLayerTreeLayer, QgsVectorLayerTools, \
-    QgsZipUtils, QgsProjectArchive, QgsSettings, \
-    QgsStyle, QgsSymbolLegendNode, QgsSymbol, QgsTaskManager, QgsApplication, QgsProcessingAlgRunnerTask
-from qgis.core import QgsRectangle
-from qgis.gui import QgsMapCanvas, QgsMapTool, QgisInterface, QgsMessageBar, QgsMessageViewer, QgsMessageBarItem, \
-    QgsMapLayerConfigWidgetFactory, QgsAttributeTableFilterModel, QgsSymbolSelectorDialog, \
-    QgsSymbolWidgetContext
-from qgis.gui import QgsProcessingAlgorithmDialogBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog, \
-    QgsNewVectorLayerDialog, QgsProcessingContextGenerator
 from .contextmenuprovider import EnMAPBoxContextMenuProvider
 from .contextmenus import EnMAPBoxContextMenuRegistry
 from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
@@ -953,7 +955,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     def syncProjects(self):
         """
-        Ensures that the layers in the EnMAP-Box are a subset of the QgsProject.instance() layers
+        Ensures that layers in the EnMAP-Box are a subset of the QgsProject.instance() layers
+        Relates to: #877
+
         :return:
         """
         SYNC_WITH_QGIS = True
@@ -972,6 +976,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             if lyr.project() is None:
                 self.project().addMapLayer(lyr)
             elif lyr.project() != EMB:
+                # layer is owned by another project
+                pass
                 s = ""
 
         to_remove_lyrs = [lyr for lyr in EMB.mapLayers().values() if lyr not in emb_layers]
@@ -986,10 +992,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         if len(to_remove_lyrs) > 0:
             for lyr in to_remove_lyrs:
                 # remove from project, but do not delete C++ object
-                # this is done by PyQt/SIP when loosing the last Python reference
+                # this is done by PyQt/SIP when losing the last Python reference
                 EMB.takeMapLayer(lyr)
-                s = ""
-                # EMB.removeMapLayers(to_remove)
 
         qgs_layers_new: typing.List[QgsMapLayer] = \
             [lyr for lid, lyr in EMB.mapLayers().items() if lyr.project() == EMB]
@@ -998,12 +1002,15 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         to_add = [lyr for lyr in qgs_layers_new if lyr not in qgs_layers_old]
 
         if SYNC_WITH_QGIS:
+            # sync QGIS Project with EnMAP-Box layers
             # QGIS.removeMapLayers([lyr.id() for lyr in to_remove])
             for lyr in to_remove:
                 QGIS.takeMapLayer(lyr)
 
             QGIS.addMapLayers(to_add, False)
             for lyr in to_add:
+                # let the parent project be the EnMAP-Box project
+                # and hope that QGIS will not delete the layer references
                 assert lyr.project() == QGIS
                 lyr.setParent(EMB.layerStore())
                 assert lyr.project() == EMB
@@ -1458,7 +1465,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     def onTaskAdded(self, taskID: int):
         """
-        Connects QgsTasks that have been added to the QgsTaskManager with signales, e.g. to react in outputs.
+        Connects QgsTasks that have been added to the QgsTaskManager with signals, e.g. to react in outputs.
         :param taskID:
         :return:
         """
@@ -1474,6 +1481,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         :param results:
         :return:
         """
+        sender = self.sender()
         if ok:
             if isinstance(results, dict):
                 self.addSources(list(results.values()))
