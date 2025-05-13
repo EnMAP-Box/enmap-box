@@ -99,7 +99,8 @@ class PrepareRegressionDatasetFromContinuousVectorAlgorithm(EnMAPProcessingAlgor
                 }
                 self.runAlg(alg, parameters, None, feedback2, context, True)
                 filenames.append(parameters[alg.P_OUTPUT_RASTER])
-            ds = gdal.BuildVRT(vrtFilename, filenames, separate=True)
+            options = gdal.BuildVRTOptions(separate=True, srcNodata=noDataValue)
+            ds = gdal.BuildVRT(vrtFilename, filenames, options=options)
             writer = RasterWriter(ds)
             writer.setNoDataValue(noDataValue)
             writer.close()

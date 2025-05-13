@@ -2,6 +2,7 @@ import unittest
 
 from osgeo import gdal
 
+from enmapbox import initAll
 from enmapbox.qgispluginsupport.qps.qgsrasterlayerproperties import QgsRasterLayerSpectralProperties
 from enmapboxprocessing.algorithm.libraryfromregressiondatasetalgorithm import LibraryFromRegressionDatasetAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousvectoralgorithm import \
@@ -9,13 +10,14 @@ from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousvectoral
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import enmap_potsdam, landcover_potsdam_point
+from enmapboxtestdata import enmap_potsdam, landcover_potsdam_point, veg_cover_fraction_potsdam_point
 from enmapboxtestdata import fraction_point_multitarget, fraction_point_singletarget, enmap, landcover_polygon
 from qgis.core import QgsVectorLayer, QgsProcessingException
 
+initAll()
 
-@unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
-class TestPrepareRegressionDatasetFromContinuousVectorAlgorithm(TestCase):
+
+class TestPrepareRegressionDatasetFromContinuousVectorAlgorithm_2(TestCase):
 
     def test_styled_multitarget(self):
 
@@ -83,8 +85,8 @@ class TestPrepareRegressionDatasetFromContinuousVectorAlgorithm(TestCase):
         s = ""
         parameters = {
             alg.P_FEATURE_RASTER: enmap_potsdam,
-            alg.P_CONTINUOUS_VECTOR: landcover_potsdam_point,
-            alg.P_TARGET_FIELDS: ['level_1', 'level_2'],
+            alg.P_CONTINUOUS_VECTOR: veg_cover_fraction_potsdam_point,
+            alg.P_TARGET_FIELDS: ['vegetation_fraction'],
             alg.P_EXCLUDE_BAD_BANDS: True,
             alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
         }
