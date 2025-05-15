@@ -262,7 +262,7 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
             if unsetSrcNoDataValue:
                 srcNoDataValue = 'none'  # unset no data value
             if unsetDstNoDataValue:
-                dstNoDataValue = 'none'  # unset no data value
+                dstNoDataValue = None
 
             infoTail = f' [{width}x{height}x{nBands}]({Utils.qgisDataTypeName(dataType)})'
             if format is not None:
@@ -338,9 +338,12 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                 assert outGdalDataset is not None
 
             del outGdalDataset  # close and reopen to write metadata to aux.xml
-            outGdalDataset = gdal.Open(filename)
+            outGdalDataset = gdal.Open(filename, gdal.GA_Update)
 
             writer = RasterWriter(outGdalDataset)
+            if unsetDstNoDataValue:
+                for bandNo in writer.bandNumbers():
+                    writer.deleteNoDataValue(bandNo)
             if bandList is None:
                 bandList = range(1, reader.bandCount() + 1)
             metadata = reader.metadata()
