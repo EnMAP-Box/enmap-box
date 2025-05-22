@@ -275,7 +275,7 @@ class DL_Trainer(QgsProcessingAlgorithm):
         print_detail =self.parameterAsBool(parameters, self.print_detail_log, context)
 
         if print_detail==False:
-        # Save original stdout and stderr
+        # Save original stdout and stderr#
             original_stdout = sys.stdout
             original_stderr = sys.stderr
 

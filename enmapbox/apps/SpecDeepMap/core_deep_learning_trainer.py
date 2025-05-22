@@ -627,7 +627,7 @@ class FeedbackCallback(L.Callback):
 
             # Check if the user canceled the process
             #if self.feedback.isCanceled():
-             #   trainer.should_stop = True
+             #   trainer.should_stop = True#
               #  raise KeyboardInterrupt("Training canceled by user.")
 
         print(log_message)
