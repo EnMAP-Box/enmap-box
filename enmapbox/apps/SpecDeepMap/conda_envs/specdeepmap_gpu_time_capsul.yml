@@ -1,14 +1,9 @@
-name: specdeepmap_cuda
+name: specdeepmap_gpu_time_capsul
 channels:
   - conda-forge
-  - defaults
-  - https://repo.anaconda.com/pkgs/main
-  - https://repo.anaconda.com/pkgs/r
-  - https://repo.anaconda.com/pkgs/msys2
 dependencies:
   - _libavif_api=1.3.0=h57928b3_0
   - _openmp_mutex=4.5=2_gnu
-  - absl-py=2.2.0=pyhd8ed1ab_0
   - aom=3.9.1=he0c23c2_0
   - aws-c-auth=0.9.0=h5e0e64b_7
   - aws-c-cal=0.9.0=hd8a8e38_1
@@ -44,7 +39,6 @@ dependencies:
   - dav1d=1.2.1=hcfcfb64_0
   - docutils=0.21.2=pyhd8ed1ab_1
   - draco=1.5.7=h181d51b_0
-  - efficientnet-pytorch=0.7.1=pyhd8ed1ab_1
   - eigen=3.4.0=h91493d7_0
   - exceptiongroup=1.3.0=pyhd8ed1ab_0
   - execnet=2.1.1=pyhd8ed1ab_1
@@ -69,7 +63,6 @@ dependencies:
   - geos=3.13.1=h9ea8674_0
   - geotiff=1.7.4=h86c3423_2
   - gflags=2.2.2=he0c23c2_1005
-  - giflib=5.2.2=h64bf75a_0
   - git-lfs=3.6.1=h86e1c39_0
   - gitdb=4.0.12=pyhd8ed1ab_0
   - gitpython=3.1.44=pyhff2d567_0
@@ -78,7 +71,6 @@ dependencies:
   - glog=0.7.1=h3ff59bf_0
   - gmp=6.3.0=hfeafd45_2
   - graphite2=1.3.13=h63175ca_1003
-  - grpcio=1.71.0=py312h18946f6_1
   - gsl=2.7=hdfb1a43_0
   - gst-plugins-base=1.24.11=h3fe0a9e_0
   - gstreamer=1.24.11=h233a61a_0
@@ -88,12 +80,10 @@ dependencies:
   - hdf5=1.14.6=nompi_hd5d9e70_101
   - hpack=4.1.0=pyhd8ed1ab_0
   - httplib2=0.22.0=pyhd8ed1ab_1
-  - huggingface_hub=0.30.2=pyhd8ed1ab_0
   - hyperframe=6.1.0=pyhd8ed1ab_0
   - icu=75.1=he0c23c2_0
   - idna=3.10=pyhd8ed1ab_1
   - imath=3.1.12=hbb528cf_0
-  - importlib-metadata=8.6.1=pyha770c72_0
   - iniconfig=2.0.0=pyhd8ed1ab_1
   - intel-openmp=2024.2.1=h57928b3_1083
   - jasper=4.2.5=h99a1cce_0
@@ -123,7 +113,7 @@ dependencies:
   - libcblas=3.9.0=31_h5e41251_mkl
   - libccolamd=3.3.4=h8c1c262_7100102
   - libcholmod=5.3.1=hdf2ebef_7100102
-  - libclang13=20.1.4=default_h6e92b77_0
+  - libclang13=20.1.5=default_h6e92b77_1
   - libcolamd=3.3.4=h8c1c262_7100102
   - libcrc32c=1.1.2=h0e60522_0
   - libcurl=8.13.0=h88aaa65_0
@@ -136,20 +126,20 @@ dependencies:
   - libfreetype6=2.13.3=h0b5ce68_1
   - libgcc=15.1.0=h1383e82_2
   - libgdal=3.10.3=hc25ceda_9
-  - libgdal-arrow-parquet=3.10.3=hd08171e_8
-  - libgdal-core=3.10.3=hf0d8561_8
-  - libgdal-fits=3.10.3=h6ffb003_8
-  - libgdal-grib=3.10.3=hbfaa95b_8
-  - libgdal-hdf4=3.10.3=h95c155c_8
-  - libgdal-hdf5=3.10.3=h7fa7d29_8
-  - libgdal-jp2openjpeg=3.10.3=h137fd1a_8
-  - libgdal-kea=3.10.3=hb7b27b9_8
-  - libgdal-netcdf=3.10.3=h7141178_8
-  - libgdal-pdf=3.10.3=ha3b3649_8
-  - libgdal-pg=3.10.3=hc8f1838_8
-  - libgdal-postgisraster=3.10.3=hc8f1838_8
-  - libgdal-tiledb=3.10.3=h3a66d27_8
-  - libgdal-xls=3.10.3=h2c61a36_8
+  - libgdal-arrow-parquet=3.10.3=hd08171e_9
+  - libgdal-core=3.10.3=heb20a2f_9
+  - libgdal-fits=3.10.3=h6ffb003_9
+  - libgdal-grib=3.10.3=hbfaa95b_9
+  - libgdal-hdf4=3.10.3=h95c155c_9
+  - libgdal-hdf5=3.10.3=h7fa7d29_9
+  - libgdal-jp2openjpeg=3.10.3=h137fd1a_9
+  - libgdal-kea=3.10.3=hb7b27b9_9
+  - libgdal-netcdf=3.10.3=h7141178_9
+  - libgdal-pdf=3.10.3=ha3b3649_9
+  - libgdal-pg=3.10.3=hc8f1838_9
+  - libgdal-postgisraster=3.10.3=hc8f1838_9
+  - libgdal-tiledb=3.10.3=hd399c86_9
+  - libgdal-xls=3.10.3=h2c61a36_9
   - libgettextpo=0.22.5=h5728263_3
   - libglib=2.84.1=hbc94333_1
   - libgomp=15.1.0=h1383e82_2
@@ -185,17 +175,17 @@ dependencies:
   - libopus=1.5.2=h2466b09_0
   - libparquet=20.0.0=ha850022_3_cuda
   - libparu=1.0.0=hd80212b_7100102
-  - libpdal=2.8.4=hb3590ec_5
-  - libpdal-arrow=2.8.4=h6c57e06_5
-  - libpdal-core=2.8.4=h6f06235_5
-  - libpdal-draco=2.8.4=ha763671_5
-  - libpdal-e57=2.8.4=h482c529_5
-  - libpdal-hdf=2.8.4=h2520430_5
-  - libpdal-icebridge=2.8.4=h2520430_5
-  - libpdal-nitf=2.8.4=h1b836ec_5
-  - libpdal-pgpointcloud=2.8.4=hb7c6058_5
-  - libpdal-tiledb=2.8.4=h31f2eba_5
-  - libpdal-trajectory=2.8.4=h82545d7_5
+  - libpdal=2.8.4=hb3590ec_6
+  - libpdal-arrow=2.8.4=h6c57e06_6
+  - libpdal-core=2.8.4=h6f06235_6
+  - libpdal-draco=2.8.4=ha763671_6
+  - libpdal-e57=2.8.4=h482c529_6
+  - libpdal-hdf=2.8.4=h2520430_6
+  - libpdal-icebridge=2.8.4=h2520430_6
+  - libpdal-nitf=2.8.4=h1b836ec_6
+  - libpdal-pgpointcloud=2.8.4=hb7c6058_6
+  - libpdal-tiledb=2.8.4=hc4b2a02_6
+  - libpdal-trajectory=2.8.4=h82545d7_6
   - libpng=1.6.47=h7a4582a_0
   - libpq=17.5=h9087029_0
   - libprotobuf=5.29.3=he9d8c4a_1
@@ -212,34 +202,26 @@ dependencies:
   - libsuitesparseconfig=7.10.1=h0795de7_7100102
   - libthrift=0.21.0=hbe90ef8_0
   - libtiff=4.7.0=h05922d8_5
-  - libtorch=2.6.0=cpu_mkl_h2287ae9_102
   - libumfpack=6.3.5=h4ca129d_7100102
-  - libusb=1.0.28=h2466b09_0
+  - libusb=1.0.28=h1839187_1
   - libutf8proc=2.10.0=hf9b99b7_0
-  - libuv=1.50.0=h2466b09_0
   - libvorbis=1.3.7=h0e60522_0
   - libwebp-base=1.5.0=h3b0e114_0
   - libwinpthread=12.0.0.r4.gg4f2fc60ca=h57928b3_9
-  - libxcb=1.17.0=h0e4246c_0
   - libxml2=2.13.8=h442d1da_0
   - libxslt=1.1.39=h3df6e99_0
   - libzip=1.11.2=h3135430_0
   - libzlib=1.3.1=h2466b09_2
-  - lightning=2.5.1.post0=pyhd8ed1ab_0
-  - lightning-utilities=0.14.3=pyhd8ed1ab_0
   - lxml=5.4.0=py312hef2e38f_0
   - lz4-c=1.10.0=h2466b09_1
   - lzo=2.10=hcfcfb64_1001
-  - markdown=3.8=pyhd8ed1ab_0
   - mccabe=0.7.0=pyhd8ed1ab_1
   - metis=5.1.0=h17e2fc9_1007
   - minizip=4.0.10=h9fa1bad_0
   - mkl=2024.2.2=h66d3029_15
   - mock=5.2.0=pyhd8ed1ab_0
   - mpfr=4.2.1=hbc20e70_3
-  - mpmath=1.3.0=pyhd8ed1ab_1
-  - munch=4.0.0=pyhd8ed1ab_1
-  - narwhals=1.39.0=pyhe01879c_0
+  - narwhals=1.40.0=pyhe01879c_0
   - nitro=2.7.dev8=h1537add_0
   - nose2=0.9.2=py_0
   - opencl-headers=2024.10.24=he0c23c2_0
@@ -248,31 +230,24 @@ dependencies:
   - openh264=2.6.0=hb17fa0b_0
   - openjpeg=2.5.3=h4d64b90_0
   - openssl=3.5.0=ha4e3fda_1
-  - optree=0.15.0=py312hd5eb7cc_0
   - orc=2.1.2=h35764e3_0
   - owslib=0.33.0=pyhd8ed1ab_0
-  - packaging=24.2=pyhd8ed1ab_2
   - pandas=2.2.3=py312h72972c8_3
   - pango=1.56.3=h0c53d3b_1
   - pcre2=10.45=h99c9b8b_0
   - pip=25.1.1=pyh8b19718_0
   - pixman=0.46.0=had0cd8c_0
-  - plotly=6.0.1=pyhd8ed1ab_0
-  - pluggy=1.5.0=pyhd8ed1ab_1
+  - plotly=6.1.0=pyhd8ed1ab_0
+  - pluggy=1.6.0=pyhd8ed1ab_0
   - ply=3.11=pyhd8ed1ab_3
   - poppler=24.12.0=heaa0bce_2
   - poppler-data=0.4.12=hd8ed1ab_0
   - postgresql=17.5=h176b716_0
-  - pretrainedmodels=0.7.4=pyhd8ed1ab_2
   - proj=9.6.0=h4f671f6_1
-  - protobuf=5.29.3=py312h275cf98_0
   - psutil=7.0.0=py312h4389bb4_0
-  - psycopg2=2.9.9=py312h16142e3_2
-  - pthread-stubs=0.4=h0e40799_1002
+  - psycopg2=2.9.10=py312h16142e3_0
   - pugixml=1.15=h372dad0_0
   - py-opencv=4.11.0=headless_py312h7c91e45_7
-  - pybind11=2.13.6=pyh1ec8472_2
-  - pybind11-global=2.13.6=pyhab904b8_2
   - pycodestyle=2.13.0=pyhd8ed1ab_0
   - pycparser=2.22=pyh29332c3_1
   - pyflakes=3.3.2=pyhd8ed1ab_0
@@ -290,7 +265,6 @@ dependencies:
   - python-dateutil=2.9.0.post0=pyhff2d567_1
   - python-tzdata=2025.2=pyhd8ed1ab_0
   - python_abi=3.12=7_cp312
-  - pytorch-lightning=2.5.1.post0=pyh2a12c56_0
   - pytz=2025.2=pyhd8ed1ab_0
   - pyyaml=6.0.2=py312h31fea79_2
   - qca=2.3.10=hcfd1de8_0
@@ -304,15 +278,12 @@ dependencies:
   - rav1e=0.7.1=ha073cba_3
   - re2=2024.07.02=haf4117d_3
   - requests=2.32.3=pyhd8ed1ab_1
-  - safetensors=0.5.3=py312h2615798_0
   - scikit-learn=1.6.1=py312h816cc57_0
   - scipy=1.15.2=py312h451d5c4_0
   - sdl2=2.32.54=he0c23c2_0
-  - sdl3=3.2.12=ha4196fd_2
-  - segmentation-models-pytorch=0.5.0=pyh2a12c56_0
+  - sdl3=3.2.14=ha4196fd_0
   - sip=6.7.12=py312h53d5487_0
   - six=1.17.0=pyhd8ed1ab_0
-  - sleef=3.8=h7e360cc_0
   - smmap=5.0.2=pyhd8ed1ab_0
   - snappy=1.2.1=h500f7fa_1
   - spdlog=1.15.3=ha881ca7_0
@@ -320,16 +291,11 @@ dependencies:
   - suitesparse=7.10.1=hfa24a04_7100102
   - svt-av1=3.0.2=he0c23c2_0
   - tbb=2021.13.0=h62715c5_1
-  - tensorboard=2.19.0=pyhd8ed1ab_0
-  - tensorboard-data-server=0.7.0=py312h2e8e312_2
   - threadpoolctl=3.6.0=pyhecae5ae_0
-  - tiledb=2.27.2=hfef3e3b_7
-  - timm=1.0.15=pyhd8ed1ab_0
+  - tiledb=2.28.0=hfef3e3b_0
   - tk=8.6.13=h5226925_1
   - toml=0.10.2=pyhd8ed1ab_1
   - tomli=2.2.1=pyhd8ed1ab_1
-  - torchmetrics=1.7.1=pyhd8ed1ab_0
-  - tqdm=4.67.1=pyhd8ed1ab_1
   - tzdata=2025b=h78e105d_0
   - ucrt=10.0.22621.0=h57928b3_1
   - uriparser=0.9.8=h5a68840_0
@@ -337,35 +303,57 @@ dependencies:
   - vc=14.3=h2b53caa_26
   - vc14_runtime=14.42.34438=hfd919c2_26
   - vs2015_runtime=14.42.34438=h7142326_26
-  - werkzeug=3.1.3=pyhd8ed1ab_1
   - wheel=0.45.1=pyhd8ed1ab_1
   - win_inet_pton=1.1.0=pyh7428d3b_8
   - x264=1!164.3095=h8ffe710_2
   - x265=3.5=h2d74725_3
   - xerces-c=3.2.5=he0c23c2_2
-  - xorg-libxau=1.0.12=h0e40799_0
-  - xorg-libxdmcp=1.1.5=h0e40799_0
   - yaml=0.2.5=h8ffe710_2
-  - zipp=3.21.0=pyhd8ed1ab_1
   - zlib=1.3.1=h2466b09_2
   - zstandard=0.23.0=py312h4389bb4_2
   - zstd=1.5.7=hbeecb71_2
   - pip:
-      - astor==0.8.1
+      - absl-py==2.2.2
+      - aiohappyeyeballs==2.6.1
+      - aiohttp==3.11.18
+      - aiosignal==1.3.2
+      - attrs==25.3.0
       - filelock==3.13.1
-      - flake8-qgis==1.0.0
+      - flake8-qgis==1.1.0
+      - frozenlist==1.6.0
       - fsspec==2024.6.1
+      - grpcio==1.71.0
+      - huggingface-hub==0.31.4
       - jinja2==3.1.4
+      - lightning==2.5.1.post0
+      - lightning-utilities==0.14.3
+      - markdown==3.8
       - markupsafe==2.1.5
+      - mpmath==1.3.0
+      - multidict==6.4.4
       - networkx==3.3
       - numpy==2.1.2
+      - packaging==24.2
       - pillow==11.0.0
+      - propcache==0.3.1
+      - protobuf==6.31.0
+      - pytorch-lightning==2.5.1.post0
+      - safetensors==0.5.3
+      - segmentation-models-pytorch==0.5.0
       - setuptools==70.2.0
       - sympy==1.13.1
-      - torch==2.6.0+cu124
-      - torchaudio==2.6.0+cu124
-      - torchvision==0.21.0+cu124
+      - tensorboard==2.19.0
+      - tensorboard-data-server==0.7.2
+      - timm==1.0.15
+      - torchmetrics==1.7.1
+      - tqdm==4.67.1
       - typing-extensions==4.12.2
+      - werkzeug==3.1.3
+      - yarl==1.20.0
+      - torch==2.6.0
+      - torchvision==0.21.0
+      - torchaudio==2.6.0
+      - --extra-index-url=https://download.pytorch.org/whl/cu124
 variables:
   QT_MAC_WANTS_LAYER: 1
-prefix: C:\Users\thoma\miniconda3\envs\specdeepmap_2
+prefix: C:\Users\thoma\miniforge3\envs\specdeepmap_cpu_time_capsul_togpu
