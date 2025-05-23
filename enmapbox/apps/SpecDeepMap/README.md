@@ -26,7 +26,7 @@ Git Repository: https://github.com/EnMAP-Box/enmap-box/tree/main/enmapbox/apps/S
 SpecDeepMap Application is available in the QGIS Plugin EnMAP-Box version 3.16 and can be installed from the QGIS Plugin Manager.
 To install EnMAP-Box, follow the official guide:
 
-[https://enmap-box.readthedocs.io/en/latest/usr\_section/usr\_installation.html](https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html)
+[https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html](https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html)
 
 
 # Install QGIS & SpecDeepMap via Miniforge/Conda (Cross-Platform)
