@@ -44,7 +44,7 @@ It is strongly recommended to use Miniforge, a minimal installer for conda speci
 
 3.1 Run the following command to create the SpecDeepMap environment with limited EnMAP-box function
 ```bash
-conda env create -n specdeepmap --file=https://raw.github.com/thomaslfEO/enmap-box-fork/main/enmapbox/apps/SpecDeepMap/conda_envs/enmapbox_specdeepmap.yml
+conda env create -n specdeepmap --file=https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/enmapbox/apps/SpecDeepMap/conda_envs/enmapbox_specdeepmap.yml
 ```
 
 or 
@@ -52,7 +52,7 @@ or
 3.2 Run the following command to create the SpecDeepMap environment with full EnMAP-box function:
 
 ```bash
-conda env create -n specdeepmap --file=https://raw.github.com/thomaslfEO/enmap-box-fork/main/enmapbox/apps/SpecDeepMap/conda_envs/enmapbox_full_latest.yml
+conda env create -n specdeepmap --file=https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/enmapbox/apps/SpecDeepMap/conda_envs/enmapbox_full_latest.yml
 ```
 
 4. Activate the environment & start qgis:
@@ -98,13 +98,13 @@ These files ensure full reproducibility by pinning exact package versions of the
 ### CPU-Only Environment
 
 ```bash
-conda env create -n specdeepmap_cpu_time_capsul --file=https://raw.github.com/thomaslfEO/enmap-box-fork/main/enmapbox/apps/SpecDeepMap/conda_envs/specdeepmap_cpu_time_capsul.yml
+conda env create -n specdeepmap_cpu_time_capsul --file=https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/enmapbox/apps/SpecDeepMap/conda_envs/specdeepmap_cpu_time_capsul.yml
 ```
 
 ### GPU Environment (CUDA 12.4)
 
 ```bash
-conda env create -n specdeepmap_gpu_time_capsul --file=https://raw.github.com/thomaslfEO/enmap-box-fork/main/enmapbox/apps/SpecDeepMap/conda_envs/specdeepmap_gpu_time_capsul.yml
+conda env create -n specdeepmap_gpu_time_capsul --file=https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/enmapbox/apps/SpecDeepMap/conda_envs/specdeepmap_gpu_time_capsul.yml
 ```
 
 If you want to use a newer CUDA version, you can first create the CPU environment, then manually re-install PyTorch using the appropriate pip install command (as shown in Step 2: Install PyTorch with CUDA).
