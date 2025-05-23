@@ -123,7 +123,7 @@ TorchGeo is licensed under the MIT License, full license with Notice here [https
 Main developer: 
 
 * Leon-Friedrich Thomas
-* mail: leon-friedrich.thomas@helsinki.fi
+* email: leon-friedrich.thomas@helsinki.fi
 
 
 
