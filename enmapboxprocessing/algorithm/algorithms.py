@@ -237,6 +237,7 @@ from enmapboxprocessing.algorithm.spectralresamplingtosentinel2algorithm import 
     SpectralResamplingToSentinel2bAlgorithm
 from enmapboxprocessing.algorithm.stackrasterlayersalgorithm import StackRasterLayersAlgorithm
 from enmapboxprocessing.algorithm.subsetrasterbandsalgorithm import SubsetRasterBandsAlgorithm
+from enmapboxprocessing.algorithm.tileenmapl2aalgorithm import TileEnmapL2AAlgorithm
 from enmapboxprocessing.algorithm.tilerasteralgorithm import TileRasterAlgorithm
 from enmapboxprocessing.algorithm.transformrasteralgorithm import TransformRasterAlgorithm
 from enmapboxprocessing.algorithm.translatecategorizedrasteralgorithm import TranslateCategorizedRasterAlgorithm
@@ -432,6 +433,7 @@ def algorithms():
         StackRasterLayersAlgorithm(),
         SubsetRasterBandsAlgorithm(),
         PrepareRegressionDatasetFromSynthMixAlgorithm(),
+        TileEnmapL2AAlgorithm(),
         TileRasterAlgorithm(),
         TranslateCategorizedRasterAlgorithm(),
         TranslateRasterAlgorithm(),

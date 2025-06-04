@@ -88,7 +88,7 @@ class TileRasterAlgorithm(EnMAPProcessingAlgorithm):
         tmpFolderName = join(folderName, '_tmp', id_generator())
         if not exists(tmpFolderName):
             makedirs(tmpFolderName)
-        logFileName = join(tmpFolderName, baseName + '.log')
+        logFileName = join(tmpFolderName, 'info.log')
 
         with open(logFileName, 'w') as logfile:
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
@@ -129,6 +129,7 @@ class TileRasterAlgorithm(EnMAPProcessingAlgorithm):
             alg = RasterBoundingPolygonAlgorithm()
             parameters = {
                 alg.P_RASTER: filenameWarpedRaster,
+                alg.P_BAND: 1,
                 alg.P_GEOMETRY_TYPE: alg.MinimumOrientedRectangle,
                 alg.P_OUTPUT_VECTOR: join(tmpFolderName, 'warpedRasterBoundingPolygon.gpkg')
             }
