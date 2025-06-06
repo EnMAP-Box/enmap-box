@@ -27,14 +27,13 @@ DEPENDENCIES = {
              'pyhdf', 'xarray', 'astropy', 'catboost', 'matplotlib', 'astropy', 'numba>=0.56.4',
              'sympy', 'pyopengl', 'h5py',
              # requirements specdeepmap
-            'opencv[build=headless*]', 'pandas=2.2.3',
-             {'pip':['torch==2.6.0', 'lightning==2.5.0.post0', 'tensorboard==2.19.0',
-                     'torchvision==0.21.0', 'segmentation-models-pytorch==0.5.0']}
+             'opencv[build=headless*]', 'pandas=2.2.3',
+             {'pip': ['torch==2.6.0', 'lightning==2.5.0.post0', 'tensorboard==2.19.0',
+                      'torchvision==0.21.0', 'segmentation-models-pytorch==0.5.0']}
              ],
     'dev': ['gitpython', 'git-lfs', 'pytest', 'pytest-cov', 'pytest-xdist', 'docutils',
             {'conda': 'flake8', 'pip': 'flake8-qgis'},
             ]
-
 
 }
 
@@ -45,11 +44,12 @@ DEPENDENCIES = {
       - torch==2.6.0
       - lightning==2.5.0.post0
       - tensorboard==2.19.0
-      - torchvision==0.21.0 
+      - torchvision==0.21.0
       - segmentation-models-pytorch==0.5.0
       - pandas==2.2.3
 
 """
+
 
 def restructure_dependencies(d: dict) -> Dict[str, List[Dict[str, List[str]]]]:
     restructured = dict()
