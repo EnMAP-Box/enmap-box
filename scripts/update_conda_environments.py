@@ -21,15 +21,34 @@ BRANCH_NAME_LOOKUP = {
 
 DEPENDENCIES = {
     # define dependencies as: [<conda package name> | {<'conda'|'pip'>:<package name>, ...}, ...]
-    'light': ['pip', 'scikit-learn>=1', 'matplotlib', 'enpt'],
+    'light': ['python>=3.10', 'pip', 'scikit-learn>=1', 'matplotlib', 'enpt'],
     'full': [{'conda': 'enpt', 'pip': 'enpt-enmapboxapp'}, 'xgboost', 'lightgbm', 'cdsapi', 'cython', 'netcdf4',
              'pygrib',
              'pyhdf', 'xarray', 'astropy', 'catboost', 'matplotlib', 'astropy', 'numba>=0.56.4',
-             'sympy', 'pyopengl', 'h5py'],
-    'dev': ['gitpython', 'git-lfs', 'pytest', 'pytest-cov', 'pytest-xdist',
+             'sympy', 'pyopengl', 'h5py',
+             # requirements specdeepmap
+             'opencv[build=headless*]', 'pandas=2.2.3',
+             {'pip': ['torch==2.6.0', 'lightning==2.5.0.post0', 'tensorboard==2.19.0',
+                      'torchvision==0.21.0', 'segmentation-models-pytorch==0.5.0']}
+             ],
+    'dev': ['gitpython', 'git-lfs', 'pytest', 'pytest-cov', 'pytest-xdist', 'docutils',
             {'conda': 'flake8', 'pip': 'flake8-qgis'},
-            'docutils']
+            ]
+
 }
+
+"""
+  opencv[build=headless*]
+  - pip:
+      - flake8-qgis
+      - torch==2.6.0
+      - lightning==2.5.0.post0
+      - tensorboard==2.19.0
+      - torchvision==0.21.0
+      - segmentation-models-pytorch==0.5.0
+      - pandas==2.2.3
+
+"""
 
 
 def restructure_dependencies(d: dict) -> Dict[str, List[Dict[str, List[str]]]]:
@@ -124,7 +143,10 @@ def update_yaml(dir_yaml, branch, version, full: bool = False):
     deps_conda = []
     deps_pip = []
 
-    variables = {'QT_MAC_WANTS_LAYER': 1}
+    variables = {
+        'QT_MAC_WANTS_LAYER': 1,
+        'PYQTGRAPH_QT_LIB': 'PyQt5'
+    }
 
     for d in DEPS:
         d: dict

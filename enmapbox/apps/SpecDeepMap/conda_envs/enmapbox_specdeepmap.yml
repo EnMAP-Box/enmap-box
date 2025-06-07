@@ -9,10 +9,12 @@ name: specdeepmap
 channels:
   - conda-forge
 dependencies:
-  - qgis>=3.40.1
+  - python>=3.10
+  - qgis
   - docutils
   - flake8
   - git-lfs
+  - matplotlib
   - gitpython
   - pip
   - pytest
@@ -36,3 +38,4 @@ dependencies:
 
 variables:
   QT_MAC_WANTS_LAYER: 1
+  PYQTGRAPH_QT_LIB: 'PyQt5'

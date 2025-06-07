@@ -8,7 +8,7 @@
 channels:
 - conda-forge
 dependencies:
-- qgis>=3.42.0
+- qgis>=3.42.2
 - docutils
 - enpt
 - flake8
@@ -19,9 +19,11 @@ dependencies:
 - pytest
 - pytest-cov
 - pytest-xdist
+- python>=3.10
 - scikit-learn>=1
 - pip:
   - flake8-qgis
 name: enmapbox_light_longterm
 variables:
+  PYQTGRAPH_QT_LIB: PyQt5
   QT_MAC_WANTS_LAYER: 1

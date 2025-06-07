@@ -3,7 +3,9 @@ import unittest
 
 from qgis.core import QgsApplication, QgsProcessingRegistry, QgsProcessingAlgorithm, QgsProcessingProvider
 
-from enmapbox.testing import TestCase, TestObjects
+from enmapbox.testing import TestCase, TestObjects, start_app
+
+start_app()
 
 
 class ProcessingProviderTests(TestCase):
