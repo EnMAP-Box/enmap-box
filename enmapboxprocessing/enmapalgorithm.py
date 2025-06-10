@@ -7,8 +7,8 @@ from time import time
 from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple
 
 import numpy as np
-from osgeo import gdal
 import processing
+from osgeo import gdal
 from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import (Qgis, QgsCategorizedSymbolRenderer, QgsCoordinateReferenceSystem, QgsMapLayer,
@@ -99,7 +99,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         return nameId
 
     def groupId(self) -> str:
-        return self._generateId(self.group())
+        return self._generateId(self.group()).lower()
 
     def name(self) -> str:
         return self._generateId(self.displayName())

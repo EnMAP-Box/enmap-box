@@ -2,9 +2,15 @@ from os.path import exists, splitext
 from typing import List, Union
 
 import numpy as np
+import qgis.utils
+from qgis.PyQt.QtCore import Qt, QObject, QPoint, QModelIndex
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QMenu, QWidgetAction, QApplication, QAction
+from qgis.core import QgsWkbTypes, QgsPointXY, QgsRasterLayer, QgsMapLayerProxyModel, QgsMessageLog, Qgis, \
+    QgsProject, QgsLayerTree, QgsVectorLayer, QgsLayerTreeNode, QgsMapLayer, QgsLayerTreeLayer, QgsLayerTreeGroup
+from qgis.gui import QgsMapCanvas, QgisInterface, QgsMapLayerComboBox
 
 import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
-import qgis.utils
 from enmapbox import messageLog
 from enmapbox.gui.contextmenus import EnMAPBoxAbstractContextMenuProvider
 from enmapbox.gui.datasources.datasources import DataSource, RasterDataSource, VectorDataSource, ModelDataSource
@@ -20,12 +26,6 @@ from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDi
 from enmapbox.qgispluginsupport.qps.models import TreeNode
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibraryplotwidget import SpectralProfilePlotModel
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent, findParent
-from qgis.PyQt.QtCore import Qt, QObject, QPoint, QModelIndex
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QWidgetAction, QApplication, QAction
-from qgis.core import QgsWkbTypes, QgsPointXY, QgsRasterLayer, QgsMapLayerProxyModel, QgsMessageLog, Qgis, \
-    QgsProject, QgsLayerTree, QgsVectorLayer, QgsLayerTreeNode, QgsMapLayer, QgsLayerTreeLayer, QgsLayerTreeGroup
-from qgis.gui import QgsMapCanvas, QgisInterface, QgsMapLayerComboBox
 
 
 class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
@@ -122,19 +122,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
         cb = QgsMapLayerComboBox()
         cb.setFilters(QgsMapLayerProxyModel.RasterLayer)
         cb.setAllowEmptyLayer(True)
-
-        # list each source only once
-        all_layers = QgsProject.instance().mapLayers().values()
-        all_layers = sorted(all_layers, key=lambda lyr: not lyr.title().startswith('[EnMAP-Box]'))
-
-        excepted_layers = []
-        sources = []
-        for lyr in all_layers:
-            if lyr.source() in sources:
-                excepted_layers.append(lyr)
-            else:
-                sources.append(lyr.source())
-        cb.setExceptedLayerList(excepted_layers)
+        cb.setProject(mapCanvas.project())
 
         for i in range(cb.count()):
             lyr = cb.layer(i)
