@@ -34,7 +34,6 @@ import typing
 import warnings
 
 from osgeo import gdal
-
 from qgis.PyQt.QtCore import QSettings
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import Qgis, QgsApplication, QgsProcessingAlgorithm, QgsProcessingProvider, QgsProcessingRegistry
@@ -214,10 +213,11 @@ def collectEnMAPBoxAlgorithms() -> typing.List[QgsProcessingAlgorithm]:
 
     try:
         from enmapbox.qgispluginsupport.qps.speclib.processing.aggregateprofiles import AggregateProfiles
-        algs.append(AggregateProfiles())
+        from enmapbox.qgispluginsupport.qps.speclib.processing.importspectralprofiles import ImportSpectralProfiles
+        algs.extend([AggregateProfiles(), ImportSpectralProfiles()])
     except Exception as ex:
         traceback.print_exc()
-        info = 'Unable to load enmapbox.qgispluginsupport.qps.speclib.processing.aggregateprofiles'
+        info = f'Unable to load processing algorithms: {ex}'
         info += '\n' + str(ex)
         messageLog(info, Qgis.Critical)
 
