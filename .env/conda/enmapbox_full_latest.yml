@@ -8,7 +8,7 @@
 channels:
 - conda-forge
 dependencies:
-- qgis>=3.40
+- qgis>=3.42.2
 - astropy
 - catboost
 - cdsapi
