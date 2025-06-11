@@ -201,6 +201,9 @@ def extractMapLayers(mimeData: QMimeData,
             for dataSource in dataSources:
                 if isinstance(dataSource, SpatialDataSource):
                     lyr = dataSource.asMapLayer(project=project)
+                    if lyr is None and project != QgsProject.instance():
+                        lyr = dataSource.asMapLayer(project=QgsProject.instance())
+
                     if isinstance(lyr, QgsMapLayer):
                         # if isinstance(lyr, QgsRasterLayer):
                         #     lyr.setRenderer(defaultRasterRenderer(lyr))

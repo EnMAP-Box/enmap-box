@@ -23,6 +23,21 @@ import uuid
 from os.path import basename, dirname
 from typing import Optional, List, Dict, Union
 
+from qgis.PyQt.QtCore import Qt, QMimeData, QModelIndex, QObject, QTimer, pyqtSignal, QEvent, \
+    QSortFilterProxyModel, QCoreApplication
+from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDropEvent, QDragLeaveEvent
+from qgis.PyQt.QtWidgets import QHeaderView, QMenu, QAbstractItemView, QApplication, QWidget, QToolButton, QAction
+from qgis.PyQt.QtXml import QDomDocument, QDomElement
+from qgis.core import Qgis, QgsCoordinateReferenceSystem, QgsMapLayer, QgsVectorLayer, QgsRasterLayer, \
+    QgsProject, QgsReadWriteContext, \
+    QgsLayerTreeLayer, QgsLayerTreeNode, QgsLayerTreeGroup, \
+    QgsLayerTreeModelLegendNode, QgsLayerTree, QgsLayerTreeModel, QgsLayerTreeUtils, \
+    QgsPalettedRasterRenderer
+from qgis.core import QgsWkbTypes
+from qgis.gui import QgsLayerTreeProxyModel
+from qgis.gui import QgsLayerTreeView, \
+    QgsMapCanvas, QgsLayerTreeViewMenuProvider, QgsLayerTreeMapCanvasBridge, QgsDockWidget, QgsMessageBar
+
 from enmapbox import debugLog
 from enmapbox.gui import \
     SpectralLibraryWidget, SpatialExtent
@@ -42,20 +57,6 @@ from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library, pro
 from enmapbox.qgispluginsupport.qps.utils import loadUi
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtCore import Qt, QMimeData, QModelIndex, QObject, QTimer, pyqtSignal, QEvent, \
-    QSortFilterProxyModel, QCoreApplication
-from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDropEvent, QDragLeaveEvent
-from qgis.PyQt.QtWidgets import QHeaderView, QMenu, QAbstractItemView, QApplication, QWidget, QToolButton, QAction
-from qgis.PyQt.QtXml import QDomDocument, QDomElement
-from qgis.core import Qgis, QgsCoordinateReferenceSystem, QgsMapLayer, QgsVectorLayer, QgsRasterLayer, \
-    QgsProject, QgsReadWriteContext, \
-    QgsLayerTreeLayer, QgsLayerTreeNode, QgsLayerTreeGroup, \
-    QgsLayerTreeModelLegendNode, QgsLayerTree, QgsLayerTreeModel, QgsLayerTreeUtils, \
-    QgsPalettedRasterRenderer
-from qgis.core import QgsWkbTypes
-from qgis.gui import QgsLayerTreeProxyModel
-from qgis.gui import QgsLayerTreeView, \
-    QgsMapCanvas, QgsLayerTreeViewMenuProvider, QgsLayerTreeMapCanvasBridge, QgsDockWidget, QgsMessageBar
 
 
 class LayerTreeNode(QgsLayerTree):
@@ -941,7 +942,7 @@ class DockManagerTreeModel(QgsLayerTreeModel):
         return None
 
     def columnCount(self, index) -> int:
-        node = self.index2node(index)
+        # node = self.index2node(index)
         return 1
         #  if type(node) in [DockTreeNode, QgsLayerTreeGroup, QgsLayerTreeLayer]:
         #      return 1
