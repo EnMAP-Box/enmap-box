@@ -19,7 +19,7 @@ alg = ImportSpectralProfiles()
 alg.initAlgorithm({})
 
 path_input_dir = Path(r'C:\<input directory>')
-path_output = path_input_dir / 'spectral_library3.gpkg'
+path_output = path_input_dir / 'spectral_library.gpkg'
 
 parameters = {
     alg.P_INPUT: str(path_input_dir),
