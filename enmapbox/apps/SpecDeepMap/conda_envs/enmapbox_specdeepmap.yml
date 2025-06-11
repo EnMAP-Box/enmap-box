@@ -1,0 +1,41 @@
+# EnMAP-Box conda environment
+# run to install: conda env create -n specdeepmap --file=enmapbox_specdeepmap.yml
+# run to update : conda env update -n specdeepmap --file=enmapbox_specdeepmap.yml --prune
+# run to delete : conda env remove -n specdeepmap
+# see also https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
+# in any case: ensure that qt6 is not installed, as this will mess up the qt5-based QGIS installation
+
+name: specdeepmap
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.10
+  - qgis
+  - docutils
+  - flake8
+  - git-lfs
+  - matplotlib
+  - gitpython
+  - pip
+  - pytest
+  - pytest-cov
+  - pytest-xdist
+  - scikit-learn>=1
+  - pytest
+  - pytest-cov
+  - pytest-xdist
+  - psutil
+  - opencv[build=headless*]
+
+  - pip:
+      - flake8-qgis
+      - torch==2.6.0
+      - lightning==2.5.0.post0
+      - tensorboard==2.19.0
+      - torchvision==0.21.0 
+      - segmentation-models-pytorch==0.5.0
+      - pandas==2.2.3
+
+variables:
+  QT_MAC_WANTS_LAYER: 1
+  PYQTGRAPH_QT_LIB: 'PyQt5'
