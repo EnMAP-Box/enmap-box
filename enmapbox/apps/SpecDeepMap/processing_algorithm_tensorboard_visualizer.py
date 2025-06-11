@@ -10,13 +10,7 @@ from qgis.core import (QgsProcessingAlgorithm,
 
 class Tensorboard_visualizer(QgsProcessingAlgorithm):
     """
-    This is an example algorithm that takes a vector layer and
-    creates a new identical one.
-
-    It is meant to be used as an example of how to create your own
-    algorithms and explain methods and variables used to do it. An
-    algorithm like this will be available in all elements, and there
-    is not need for additional work.
+    This is an example algorithm display.
 
     All Processing algorithms should extend the QgsProcessingAlgorithm
     class.
@@ -45,14 +39,14 @@ class Tensorboard_visualizer(QgsProcessingAlgorithm):
         lowercase alphanumeric characters only and no spaces or other
         formatting characters.
         """
-        return 'Tensorboard'
+        return 'TensorBoard Visualizer'
 
     def displayName(self):
         """
         Returns the translated algorithm name, which should be used for any
         user-visible display of the algorithm name.
         """
-        return self.tr('Tensorboard')
+        return self.tr('TensorBoard Visualizer')
 
     def group(self):
         """
@@ -82,11 +76,11 @@ class Tensorboard_visualizer(QgsProcessingAlgorithm):
     def shortHelpString(self):
 
         html = '' \
-               '<p>This algorithm opens a Tensoboard (currently only for Windows system available, if used on linux, open a different port everytime you want to initate a tesnorboard). A Tensorboard is an interactive visualization tool to explore the trainings and validations metrics and losses.</p>' \
+               '<p>This algorithm opens a TensorBoard (currently only for Windows system available, if used on linux, open a different port everytime you want to launch a TensorBoard). A TensorBoard is an interactive visualization tool to explore the trainings and validations metrics and losses. More details on TensorBoard you can find here: https://www.tensorflow.org/tensorboard  </p>' \
                '<h3>TensorBoard Log Directory</h3>' \
                '<p>The path which was defined during training to save model and logs.</p>' \
                '<h3>TensorBoard Port (Optional) </h3>' \
-               '<p>Here you can define an additional local port to open a Tensorboard. When opening the Tensorboard it is checked if the defined port is already used for a tensorboard, if so its closed and the new tensorboard is initalized instead </p>'
+               '<p>Here you can define an additional local port to open a TensorBoard. When opening the TensorBoard it is checked if the defined port is already used for a TensorBoard, if so its closed and the new TensorBoard is launched instead </p>'
         return html
 
     def initAlgorithm(self, config=None):

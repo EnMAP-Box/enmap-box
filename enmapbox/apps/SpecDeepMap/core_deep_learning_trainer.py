@@ -597,10 +597,14 @@ class FeedbackCallback(L.Callback):
         super().__init__()
         self.feedback = feedback
 
-    def on_batch_end(self, trainer, pl_module):
+    def on_train_batch_end(self,trainer, *args, **kwargs):
         # Check for cancellation after every batch
         if self.feedback and self.feedback.isCanceled():
-            raise KeyboardInterrupt("Training canceled by user.")
+            trainer.should_stop = True
+            self.feedback.pushInfo("TRAINING CANCELED BY USER !!!")
+            raise KeyboardInterrupt("TRAINING CANCELED BY USER !!!")
+
+            #raise KeyboardInterrupt("Training canceled by user.")
 
     def on_train_epoch_end(self, trainer, pl_module):
         epoch = trainer.current_epoch
@@ -612,20 +616,19 @@ class FeedbackCallback(L.Callback):
         val_iou = trainer.callback_metrics.get('val_iou')
 
         log_message = (
-            f'Epoch {epoch + 1}/{max_epochs} - '
+            f'Epoch {epoch }/{max_epochs-1} - '
             f'Train Loss: {train_loss:.4f}, Train IoU: {train_iou:.4f}, '
             f'Val Loss: {val_loss:.4f}, Val IoU: {val_iou:.4f}'
         )
 
         if self.feedback:
-            self.feedback.setProgress((epoch + 1) / max_epochs * 100)
+            self.feedback.setProgress((epoch+1)/ max_epochs * 100)
             self.feedback.pushInfo(log_message)
 
             # Check if the user canceled the process
-            if self.feedback.isCanceled():
-                trainer.should_stop = True
-                self.feedback.pushInfo('Training canceled by user')
-                raise KeyboardInterrupt("Training canceled by user.")
+            #if self.feedback.isCanceled():
+             #   trainer.should_stop = True#
+              #  raise KeyboardInterrupt("Training canceled by user.")
 
         print(log_message)
 
