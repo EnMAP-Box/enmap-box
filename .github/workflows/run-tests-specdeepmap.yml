@@ -31,7 +31,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        mamba_env: [ enmapbox_specdeepmap ]
+        mamba_env: [ "enmapbox/apps/SpecDeepMap/conda_envs/enmapbox_specdeepmap.yml" ]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -45,7 +45,7 @@ jobs:
       - name: Conda environment file
         run: |
           echo "conda environment file: ${{matrix.mamba_env}}.yml"
-          cat .env/conda/${{matrix.mamba_env}}.yml
+          cat ${{matrix.mamba_env}}
 
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v3
@@ -55,7 +55,7 @@ jobs:
           channels: conda-forge,defaults
           channel-priority: true
           activate-environment: ${{matrix.mamba_env}}
-          environment-file: .env/conda/${{matrix.mamba_env}}.yml
+          environment-file: ${{matrix.mamba_env}}
           clean-patched-environment-file: false
           # use-mamba: true
           # auto-activate-base: false
