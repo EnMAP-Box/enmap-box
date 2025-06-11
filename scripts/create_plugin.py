@@ -35,13 +35,13 @@ from typing import Union
 
 import docutils.core
 import markdown
+from qgis.core import QgsFileUtils, QgsUserProfile, QgsUserProfileManager
+from qgis.testing import start_app
 
 import enmapbox
 from enmapbox import DIR_REPO
 from enmapbox.qgispluginsupport.qps.make.deploy import QGISMetadataFileWriter, userProfileManager
 from enmapbox.qgispluginsupport.qps.utils import zipdir
-from qgis.core import QgsFileUtils, QgsUserProfile, QgsUserProfileManager
-from qgis.testing import start_app
 
 app = start_app()
 # consider default Git location on Windows systems to avoid creating a Start-Up Script
@@ -421,7 +421,6 @@ def createCHANGELOG(dirPlugin: Path) -> str:
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(description='Install testdata', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-t', '--testdata',
                         required=False,
@@ -469,29 +468,3 @@ if __name__ == "__main__":
                                   create_zip=not args.skip_zip,
                                   copy_to_profile=args.profile,
                                   build_name=args.build_name)
-
-    if True:
-        message = \
-            r"""
-            Very important checklist. Do not remove!!!
-            Checklist for release:
-            Change log up-to-date?
-            Processing algo documentation up-to-date (run create_processing_rst)?
-            Run weblink checker (in doc folder make linkcheck).
-            Check if box runs without optional dependencies (see tests/non-blocking-dependencies/readme.txt).
-            Version number increased? (see .plugin.ini version = 3.x.y)
-            QGIS Min-Version? (enmapbox/__init__.py -> MIN_VERSION_QGIS)
-            Install ZIP and quick-test under the LTR and latest QGIS versions and OS, e.g.:
-                Andreas: latest Windows Conda QGIS
-                Fabian: Linux QGIS used in Greifswald-Teaching
-                Benjamin: latest OSGeo4W (maybe also MacOS?) QGIS
-                Plugin promotion (Slack, Email, ...)
-                  RTD
-                  Email an Saskia: update auf enmap.org (enmap news + enmap news letter)
-                  Email an enmap_wiss@gfz-potsdam.de
-                  Email an Ettore: reach out to PRISMA community
-                  EOL Slack + EnMAP Slack
-                  EOL Twitter
-            """
-
-        print(message)
