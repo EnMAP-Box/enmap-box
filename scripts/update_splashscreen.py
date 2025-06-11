@@ -11,7 +11,7 @@ import shutil
 import subprocess
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from typing import Match
+from typing import Match, Union
 
 from enmapbox import DIR_REPO
 from enmapbox.gui.splashscreen.splashscreen import PATH_SPLASHSCREEN
@@ -37,7 +37,9 @@ def inkscapeBin() -> Path:
     return path
 
 
-def update_splashscreen(version: str = None, path_png=None):
+def update_splashscreen(version: str = None,
+                        pure: bool = False,
+                        path_png: Union[str, Path] = None):
     assert PATH_SVG.is_file()
     PATH_INKSCAPE = inkscapeBin()
 
@@ -71,6 +73,7 @@ def update_splashscreen(version: str = None, path_png=None):
     for prefix, namespace in namespaces.items():
         ET.register_namespace(prefix, namespace)
 
+    # set version number
     node_major = root.find(".//*[@inkscape:label='maj_version']/*", namespaces)
     node_minor = root.find(".//*[@inkscape:label='min_version']/*", namespaces)
     assert isinstance(node_major, ET.Element), 'SVG misses tspan element below inkscape:label = "maj_version"'
@@ -78,6 +81,11 @@ def update_splashscreen(version: str = None, path_png=None):
 
     node_major.text = txt_major
     node_minor.text = txt_minor
+
+    if pure:
+        # disable lower bar
+        node_bar = root.find(".//*[@inkscape:label='LowerBar']", namespaces)
+        node_bar.attrib['style'] = 'display:none'
 
     PATH_EXPORT_TMP = PATH_SVG.parent / 'splashscreen_tmp.svg'
 
@@ -101,7 +109,6 @@ def update_splashscreen(version: str = None, path_png=None):
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(description='Update the EnMAP-Box splashscreen.',
                                      formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-v', '--version',
@@ -109,10 +116,16 @@ if __name__ == "__main__":
                         default=None,
                         help='A version string with major and minor version, like "3.12"')
 
+    parser.add_argument('-p', '--pure',
+                        required=False,
+                        default=False,
+                        action='store_true',
+                        help='Pure splashscreen, without the lower bar to show the loading status.')
+
     parser.add_argument('--png',
                         required=False,
                         default=PATH_SPLASHSCREEN,
                         help=f'Path of PNG file to create. Defaults to {PATH_SPLASHSCREEN}')
 
     args = parser.parse_args()
-    update_splashscreen(version=args.version)
+    update_splashscreen(version=args.version, pure=args.pure)
