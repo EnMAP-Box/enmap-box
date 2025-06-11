@@ -54,7 +54,7 @@ jobs:
           # miniforge-version: latest
           channels: conda-forge,defaults
           channel-priority: true
-          activate-environment: ${{matrix.mamba_env}}
+          activate-environment: specdeepmap
           environment-file: ${{matrix.mamba_env}}
           clean-patched-environment-file: false
           # use-mamba: true
