@@ -35,7 +35,7 @@ import warnings
 
 from osgeo import gdal
 
-from qgis.PyQt.QtCore import QSettings
+from qgis.PyQt.QtCore import QSettings, PYQT_VERSION_STR
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import Qgis, QgsApplication, QgsProcessingAlgorithm, QgsProcessingProvider, QgsProcessingRegistry
 from qgis.gui import QgisInterface, QgsMapLayerConfigWidgetFactory
