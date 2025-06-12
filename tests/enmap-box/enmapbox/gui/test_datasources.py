@@ -12,15 +12,15 @@ __date__ = '2017-07-17'
 __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
 import datetime
-import os
 import pathlib
 import tempfile
 import unittest
+from pathlib import Path
 from time import sleep
 
-from osgeo import ogr, gdal
+from osgeo import ogr
 from qgis.PyQt import sip
-from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, QgsRasterRenderer, QgsRasterDataProvider
+from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, QgsRasterRenderer, edit
 from qgis.gui import QgsMapCanvas
 
 from enmapbox.exampledata import enmap, hires, landcover_polygon
@@ -28,53 +28,13 @@ from enmapbox.gui.datasources.datasources import SpatialDataSource, DataSource, 
     FileDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager, DataSourceManagerPanelUI, DataSourceFactory
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
+from enmapbox.testing import start_app
 from enmapboxtestdata import classifierDumpPkl, library_berlin, enmap_srf_library
+
+start_app()
 
 
 class DataSourceTests(EnMAPBoxTestCase):
-
-    def test_rasterVersioning(self):
-
-        p = r'N:\thielfab\nb_ml\full_growing_season\metrics\fraction\mosaic\NEWFILE_MLP.vrt'
-
-        if os.path.isfile(p):
-            ds1 = DataSourceFactory.create(p)[0]
-            self.assertIsInstance(ds1, RasterDataSource)
-
-            lyr = ds1.createUnregisteredMapLayer()
-            dp = lyr.dataProvider()
-            self.assertIsInstance(dp, QgsRasterDataProvider)
-            stats = dp.bandStatistics(1)
-
-            ds2 = DataSourceFactory.create(p)[0]
-            self.assertIsInstance(ds1, RasterDataSource)
-
-            self.assertTrue(ds1.isSameSource(ds2))
-            self.assertFalse(ds1.isNewVersionOf(ds2))
-            self.assertFalse(ds2.isNewVersionOf(ds1))
-
-    def test_subdatasets(self):
-        path = r'H:\Processing_BJ\01_Data\Sentinel2\T21LWL\S2B_MSIL1C_20191208T140049_N0208_R067_T21LWL_20191208T153903.SAFE\MTD_MSIL1C.xml'
-        dsm = DataSourceManager()
-        if os.path.isfile(path):
-
-            ds = gdal.Open(path)
-            assert isinstance(ds, gdal.Dataset)
-            subs = ds.GetSubDatasets()
-            import datetime
-            for (name, descr) in subs:
-                t0 = datetime.datetime.now()
-                lyr = QgsRasterLayer(name)
-                self.assertTrue(lyr.isValid())
-                dt1 = datetime.datetime.now() - t0
-                t0 = datetime.datetime.now()
-
-                ds = DataSourceFactory.create(name)
-                dt2 = datetime.datetime.now() - t0
-
-                self.assertIsInstance(ds, list)
-                self.assertTrue(len(ds) == 1)
-                self.assertIsInstance(ds[0], RasterDataSource)
 
     def createTestSources(self) -> list:
 
@@ -147,41 +107,56 @@ class DataSourceTests(EnMAPBoxTestCase):
         DM = DataSourceManager()
         DM.mUpdateTimer.stop()
 
-        lyr: QgsVectorLayer = TestObjects.createSpectralLibrary()
+        lyrV: QgsVectorLayer = TestObjects.createSpectralLibrary()
+
         testDir = self.createTestOutputDirectory()
+
+        path_rl = testDir / 'test_raster.tiff'
+
+        lyrR = TestObjects.createRasterLayer(path=path_rl)
+
+        DM.project().addMapLayer(lyrV)
+        DM.project().addMapLayer(lyrR)
+
         pathTxt = testDir / 'example.txt'
         with open(pathTxt, 'w', encoding='utf-8') as f:
             f.write('Test')
 
-        DM.addDataSources([lyr, pathTxt])
+        DM.addDataSources([lyrV, lyrR, pathTxt])
         DM.updateSourceNodes()
 
         sources = DM.dataSources()
-        self.assertTrue(len(sources) == 2)
+        self.assertTrue(len(sources) == 3)
         for ds in sources:
             self.assertIsInstance(ds.updateTime(), datetime.datetime)
 
-        ds1 = sources[0]
-        ds2 = sources[1]
-        self.assertIsInstance(ds1, VectorDataSource)
-        self.assertIsInstance(ds2, FileDataSource)
+        ds1, ds2, ds3 = sources
+        self.assertIsInstance(ds1, RasterDataSource)
+        self.assertIsInstance(ds2, VectorDataSource)
+        self.assertIsInstance(ds3, FileDataSource)
         t0_1 = ds1.updateTime()
         t0_2 = ds2.updateTime()
+        t0_3 = ds3.updateTime()
 
-        lyr = ds1.dataItem().referenceLayer()
-        lyr.startEditing()
-        fids = lyr.allFeatureIds()
-        lyr.deleteFeatures(fids[0:1])
-        self.assertTrue(lyr.commitChanges())
+        with edit(lyrV):
+            fids = lyrV.allFeatureIds()
+            lyrV.deleteFeatures(fids[0:1])
+
+        DM.updateSourceNodes()
+        self.assertTrue(ds1.updateTime() == t0_1)
+        self.assertTrue(ds2.updateTime() > t0_2)
+        self.assertTrue(ds3.updateTime() == t0_3)
+
         sleep(1)
+        # touch the raster file and the text file
+        # to change the file modification time
+        Path(ds1.source()).touch()
+        Path(ds3.source()).touch()
+
         DM.updateSourceNodes()
         self.assertTrue(ds1.updateTime() > t0_1)
-        self.assertTrue(ds2.updateTime() == t0_2)
-        with open(pathTxt, 'w', encoding='utf-8') as f:
-            f.write('Modified text')
-        sleep(1)
-        DM.updateSourceNodes()
-        self.assertTrue(ds2.updateTime() > t0_2)
+        self.assertTrue(ds3.updateTime() > t0_3)
+        DM.project().removeAllMapLayers()
 
     def test_DataSourceModel(self):
 
