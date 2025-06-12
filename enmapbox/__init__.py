@@ -34,6 +34,7 @@ import typing
 import warnings
 
 from osgeo import gdal
+
 from qgis.PyQt.QtCore import QSettings
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import Qgis, QgsApplication, QgsProcessingAlgorithm, QgsProcessingProvider, QgsProcessingRegistry
@@ -72,6 +73,9 @@ ENMAP_BOX_KEY = 'EnMAP-Box'
 _ENMAPBOX_MAPLAYER_CONFIG_WIDGET_FACTORIES: typing.List[QgsMapLayerConfigWidgetFactory] = []
 
 gdal.SetConfigOption('GDAL_VRT_ENABLE_PYTHON', 'YES')
+
+# ensure that PyQtGraph uses the same PyQt as QGIS
+os.environ.setdefault('PYQTGRAPH_QT_LIB', f'PyQt{PYQT_VERSION_STR[0]}')
 
 # test if PyQtGraph is available
 try:
