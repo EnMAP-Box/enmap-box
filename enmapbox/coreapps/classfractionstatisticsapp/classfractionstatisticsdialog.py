@@ -14,9 +14,9 @@ from classfractionstatisticsapp.classfractionrenderer import ClassFractionRender
 from enmapbox.qgispluginsupport.qps.layerproperties import rendererFromXml
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -164,9 +164,12 @@ class ClassFractionStatisticsDialog(QMainWindow):
             )
             return
 
-        for row, category in zip(range(self.mTable.rowCount()), categories):
+        for row in range(self.mTable.rowCount()):
             w: QgsColorButton = self.mTable.cellWidget(row, 1)
-            w.setColor(QColor(category.color))
+            className = self.mTable.cellWidget(row, 0).text()
+            for category in categories:
+                if className == category.name:
+                    w.setColor(QColor(category.color))
         self.onLiveUpdate()
 
     def currentItemValues(self):
