@@ -1,3 +1,4 @@
+from enmapboxprocessing.algorithm.aggregateardrastersalgorithm import AggregateArdRastersAlgorithm
 from enmapboxprocessing.algorithm.aggregaterasterbandsalgorithm import AggregateRasterBandsAlgorithm
 from enmapboxprocessing.algorithm.aggregaterastersalgorithm import AggregateRastersAlgorithm
 from enmapboxprocessing.algorithm.applymaskalgorithm import ApplyMaskAlgorithm
@@ -250,6 +251,7 @@ def algorithms():
     algos = [
         AggregateRasterBandsAlgorithm(),
         AggregateRastersAlgorithm(),
+        AggregateArdRastersAlgorithm(),
         ApplyMaskAlgorithm(),
         Build3dCubeAlgorithm(),
         ClassFractionFromCategorizedLayerAlgorithm(),
