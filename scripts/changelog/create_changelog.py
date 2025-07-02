@@ -124,7 +124,9 @@ for issue in issues:
 
 filename = abspath(join(__file__, '../../..', 'CHANGELOG.md'))
 with open(filename, 'w') as file:
-    file.write(r'''
+    includeComment = False
+    if includeComment:
+        file.write(r'''
 [//]: # (
 Note: This file is auto-generated. All edits will be overwritten.
 -----------------------

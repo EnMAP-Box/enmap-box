@@ -1,29 +1,3 @@
-
-[//]: # (
-Note: This file is auto-generated. All edits will be overwritten.
------------------------
-How to update this file
-  1. Run create_fetch_issues_bat.py to create fetch_issues.bat.
-  2. Run fetch_issues.bat from inside the EnMAP-Box Repo folder.
-     E.g. D:\source\QGISPlugIns\enmap-box> .\scripts\changelog\fetch_issues.bat
-     This will create two files:
-       fetch_issues.txt
-       fetch_releases.txt
-  3. Use create_changelog.py to build the changelog.
--------------------------------
-How to properly annotate issues
-  The content of the changelog is generated from the GitHub issue tracker:
-    - choose a meaningful issue title, it will be displayed inside the changelog
-    - use Labels to place an issue inside the correct changelog section, i.e. "feature request", "bug", 'qpa",
-      "application", "data/metadata", "ci"
-    - issues labeled as "task" or "invalid" won't be reported
-    - use Milestones to properly assign an issue to it's correct EnMAP-Box release
-    - look at the current changelog for best practice examples
----------------------------
-How to provide manual edits
-  In some cases, you may want to provide additional information for an issue or you want to group multiple issues,
-  which are related to each other. You can do this by editing the MANUAL_EDITS.md file.
-)
 # CHANGELOG
 ## Version 3.16 (2025-03-24)
 _This release was tested under QGIS 3.40 (LTR) and 3.42 (latest release)._
@@ -38,6 +12,7 @@ _This release was tested under QGIS 3.40 (LTR) and 3.42 (latest release)._
 * [Create spectral indices] add soil organic carbon index [#1009](https://github.com/EnMAP-Box/enmap-box/issues/1009)
 #### Miscellaneous
 * [Import Spectral Profiles] add support for Spectra Vista Corp-SVC Field Spectrometers [#662](https://github.com/EnMAP-Box/enmap-box/issues/662)
+* add QLabel that scales pixmaps while keeping aspect ration [#1114](https://github.com/EnMAP-Box/enmap-box/issues/1114)
 ### Fixed Bugs
 <details><summary>Show all (7)</summary>
 
@@ -82,6 +57,7 @@ _This release was tested under QGIS 3.34 (LTR) and 3.38 (latest release)._
 * in all algorithms with VRT raster output, also support GTiff and ENVI outputs [#977](https://github.com/EnMAP-Box/enmap-box/issues/977)
 #### Miscellaneous
 * implement auto-generated changelog [#938](https://github.com/EnMAP-Box/enmap-box/issues/938)
+* update script conda environments [#951](https://github.com/EnMAP-Box/enmap-box/issues/951)
 ### Fixed Bugs
 <details><summary>Show all (9)</summary>
 
@@ -325,7 +301,7 @@ _This release was tested under QGIS 3.28 (LTR)._
 * Reporting [#258](https://github.com/EnMAP-Box/enmap-box/issues/258)
 * make typeguard optional [#345](https://github.com/EnMAP-Box/enmap-box/issues/345)
 ### Fixed Bugs
-<details><summary>Show all (68)</summary>
+<details><summary>Show all (70)</summary>
 
 * The setup for testing non-blocking-dependencies is gone. [#176](https://github.com/EnMAP-Box/enmap-box/issues/176)
 * CatBootRegressor issue [#189](https://github.com/EnMAP-Box/enmap-box/issues/189)
@@ -335,6 +311,7 @@ _This release was tested under QGIS 3.28 (LTR)._
 * [GEE TSE] data is not scaled before index calculation [#210](https://github.com/EnMAP-Box/enmap-box/issues/210)
 * [Raster Layer Styling] error when changing from multiband to singleband raster [#213](https://github.com/EnMAP-Box/enmap-box/issues/213)
 * [Sensor Product Import] cancelling the import algo will still open the metadata file [#214](https://github.com/EnMAP-Box/enmap-box/issues/214)
+* [flatpak] Box won't start - KeyError: '__file__' [#215](https://github.com/EnMAP-Box/enmap-box/issues/215)
 * glossary links are missing in algorithm descriptions [#233](https://github.com/EnMAP-Box/enmap-box/issues/233)
 * [Raster math] using vector fields not working [#236](https://github.com/EnMAP-Box/enmap-box/issues/236)
 * [GEE TSE] data stretch is not working in Composite Mode [#244](https://github.com/EnMAP-Box/enmap-box/issues/244)
@@ -380,6 +357,7 @@ _This release was tested under QGIS 3.28 (LTR)._
 * [QPS] SpectralLibrary class is deprecated, replace usages with SpectralLibraryUtils [#417](https://github.com/EnMAP-Box/enmap-box/issues/417)
 * [qps] Can not read HDF4 error while Box is not opened/used [#418](https://github.com/EnMAP-Box/enmap-box/issues/418)
 * [Spectral View] content of GeoJSON file not correctly recognized [#422](https://github.com/EnMAP-Box/enmap-box/issues/422)
+* [SpecMixApp] is broken [#426](https://github.com/EnMAP-Box/enmap-box/issues/426)
 * several icons aren't available anymore [#429](https://github.com/EnMAP-Box/enmap-box/issues/429)
 * ValueError: unsupported data type: int64 [#433](https://github.com/EnMAP-Box/enmap-box/issues/433)
 * SpectralLibrary class was removed and replaced by QgsVectorLayer, which causes unittests to fail [#434](https://github.com/EnMAP-Box/enmap-box/issues/434)

@@ -1,8 +1,8 @@
 import json
 from os.path import abspath, join
 
-startDate = '2024-01-01'  # inclusive
-endDate = '2024-07-01'  # exclusive
+startDate = '2025-01-01'  # inclusive
+endDate = '2025-07-01'  # exclusive
 
 with open('fetch_releases.txt') as file:
     releases = json.loads(file.read())
