@@ -11,21 +11,20 @@ import re
 import unittest
 import urllib.request
 import xml.etree.ElementTree as etree
-from typing import List, Dict
+from typing import Dict, List
 
 import pandas as pd
 import requests
-from qgis.PyQt.QtWidgets import QMenu
-from qgis.core import QgsProcessing, QgsProcessingParameterRasterLayer, QgsProcessingParameterRasterDestination, \
-    QgsProcessingOutputVectorLayer, QgsProcessingParameterFeatureSink, QgsProcessingParameterFeatureSource, \
-    QgsProcessingOutputRasterLayer, QgsProcessingParameterVectorLayer, QgsProcessingParameterVectorDestination, \
-    QgsProcessingParameterMapLayer, QgsProcessingParameterMultipleLayers, QgsProcessingParameterFile, \
-    QgsProcessingOutputFile, QgsProcessingParameterFolderDestination, QgsProcessingOutputFolder, \
-    QgsProcessingParameterFileDestination, QgsProcessingOutputHtml, QgsProcessingParameterEnum, \
-    QgsProcessingParameterBoolean, QgsProcessingAlgorithm
 
-from enmapbox import DIR_REPO_TMP
-from enmapbox import initAll
+from qgis.PyQt.QtWidgets import QMenu
+from qgis.core import QgsProcessing, QgsProcessingAlgorithm, QgsProcessingOutputFile, QgsProcessingOutputFolder, \
+    QgsProcessingOutputHtml, QgsProcessingOutputRasterLayer, QgsProcessingOutputVectorLayer, \
+    QgsProcessingParameterBoolean, QgsProcessingParameterEnum, QgsProcessingParameterFeatureSink, \
+    QgsProcessingParameterFeatureSource, QgsProcessingParameterFile, QgsProcessingParameterFileDestination, \
+    QgsProcessingParameterFolderDestination, QgsProcessingParameterMapLayer, QgsProcessingParameterMultipleLayers, \
+    QgsProcessingParameterRasterDestination, QgsProcessingParameterRasterLayer, QgsProcessingParameterVectorDestination, \
+    QgsProcessingParameterVectorLayer
+from enmapbox import DIR_REPO_TMP, initAll
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
 from enmapbox.gui.applications import ApplicationWrapper, EnMAPBoxApplication
 from enmapbox.gui.enmapboxgui import EnMAPBox
@@ -250,7 +249,6 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
         assert 'GITHUB_TOKEN' in os.environ, 'GITHUB_TOKEN is not set. ' \
                                              'Read https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens for details.'
         token = os.environ['GITHUB_TOKEN']
-
         # Create a session and set the authorization header
         session = requests.Session()
         session.headers.update({'Authorization': f'token {token}'})
@@ -382,7 +380,7 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
          \hline
          Gesamt      & {cntA['total']} & {cntA['open']} & {cntA['closed']} & {cntA['duplicate']} & {cntA['wontfix']} \\
     \end{{tabular}}
-    \caption{{Zusammenfassung \EnMAPBox Issue-Tracker (\url{{https://github.com/EnMAP-Box/enmap-box/issues}}), Stand {today.strftime("%d.%m.%Y")} }}
+    \caption{{Zusammenfassung \EnMAPBox Issue-Tracker\footnote{{\url{{https://github.com/EnMAP-Box/enmap-box/issues}}}}, Stand {today.strftime("%d.%m.%Y")} }}
     \label{{tab:enmapbox_issues}}
 \end{{table}}
 """
@@ -493,12 +491,14 @@ def report_processingalgorithms() -> pd.DataFrame:
 
 
 class TestCases(unittest.TestCase):
+    start_date = '2025-01-01'
+    end_date = '2025-06-30'
 
     def test_github_EnMAPBox(self):
-        report_github_issues_EnMAPBox(start_date='2024-07-01', end_date='2024-12-31')
+        report_github_issues_EnMAPBox(start_date=self.start_date, end_date=self.end_date)
 
     def test_github_QGIS(self):
-        report_github_issues_QGIS(authors=['jakimowb'], start_date='2024-07-01', end_date='2024-12-31')
+        report_github_issues_QGIS(authors=['jakimowb'], start_date=self.start_date, end_date=self.end_date)
 
     def test_report_downloads(self):
         df = report_downloads()
