@@ -1,6 +1,7 @@
 from math import isnan
 
 import numpy as np
+from qgis.core import QgsRasterLayer, QgsMapLayer, QgsProcessingException
 
 from enmapboxprocessing.algorithm.classificationperformancesimplealgorithm import \
     ClassificationPerformanceSimpleAlgorithm, accuracyAssessment
@@ -10,7 +11,6 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import landcover_map_l3
-from qgis.core import QgsRasterLayer, QgsMapLayer, QgsProcessingException
 
 
 class TestClassificationPerformanceSimpleAlgorithm(TestCase):
