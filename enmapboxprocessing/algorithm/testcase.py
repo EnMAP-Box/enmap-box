@@ -14,7 +14,7 @@ class ProcessingFeedback(QgsProcessingFeedback):
 
 
 class TestCase(enmapboxprocessing.testcase.TestCase):
-    openReport = False
+    openReport = not True
     skipProductImport = False
 
     @staticmethod

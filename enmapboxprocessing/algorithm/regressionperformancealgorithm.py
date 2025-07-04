@@ -97,6 +97,9 @@ class RegressionPerformanceAlgorithm(EnMAPProcessingAlgorithm):
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_REPORT, context)
         openReport = self.parameterAsBoolean(parameters, self.P_OPEN_REPORT, context)
 
+        sourcePredicted = regression.source()
+        sourceObserved = reference.source()
+
         with open(filename + '.log', 'w') as logfile:
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)
@@ -185,7 +188,7 @@ class RegressionPerformanceAlgorithm(EnMAPProcessingAlgorithm):
 
             Utils.jsonDump(statss, filename + '.json')
             feedback.pushInfo('Create report')
-            self.writeReport(filename, statss)
+            self.writeReport(filename, statss, sourcePredicted, sourceObserved)
             result = {self.P_OUTPUT_REPORT: filename}
 
             if openReport:
@@ -196,7 +199,7 @@ class RegressionPerformanceAlgorithm(EnMAPProcessingAlgorithm):
         return result
 
     @classmethod
-    def writeReport(cls, filename: str, statss: Dict[str, 'AccuracyAssessmentResult']):
+    def writeReport(cls, filename: str, statss: Dict[str, 'AccuracyAssessmentResult'], sourcePredicted, sourceObserved):
 
         def smartRound(obj, ndigits):
             if isinstance(obj, list):
@@ -215,6 +218,11 @@ class RegressionPerformanceAlgorithm(EnMAPProcessingAlgorithm):
         with open(filename, 'w') as fileHtml, open(filename + '.csv', 'w') as fileCsv:
             report = MultiReportWriter([HtmlReportWriter(fileHtml), CsvReportWriter(fileCsv)])
             report.writeHeader('Regression layer accuracy report')
+
+            report.writeParagraph(
+                f'Prediction: {sourcePredicted}<br>'
+                f'Observation: {sourceObserved}'
+            )
 
             report.writeParagraph(f'Sample size: {list(statss.values())[0].n} px')
 

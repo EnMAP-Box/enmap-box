@@ -112,6 +112,10 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_REPORT, context)
         openReport = self.parameterAsBoolean(parameters, self.P_OPEN_REPORT, context)
 
+        sourcePredicted = classification.source()
+        sourceObserved = reference.source()
+        sourceStratification = stratification.source()
+
         with open(filename + '.log', 'w') as logfile:
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)
@@ -213,7 +217,8 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
             pixelArea = classification.rasterUnitsPerPixelX() * classification.rasterUnitsPerPixelY()
 
             self.writeReport(
-                filename, stats, pixelUnits=pixelUnits, pixelArea=pixelArea, classNamesMatching=classNamesMatching
+                filename, stats, pixelUnits, pixelArea, classNamesMatching, sourcePredicted, sourceObserved,
+                sourceStratification
             )
             # dump json
             with open(filename + '.json', 'w') as file:
@@ -230,7 +235,8 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
     @classmethod
     def writeReport(
             cls, filename: str, stats: 'StratifiedAccuracyAssessmentResult', pixelUnits='pixel', pixelArea=1.,
-            classNamesMatching: list = None
+            classNamesMatching: list = None, sourcePredicted: str = None, sourceObserved: str = None,
+            sourceStratification: str = None
     ):
 
         def smartRound(obj, ndigits):
@@ -259,8 +265,16 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
             report = MultiReportWriter([HtmlReportWriter(fileHtml), CsvReportWriter(fileCsv)])
             report.writeHeader('Classification layer accuracy and area report')
 
-            report.writeParagraph(f'Sample size: {stats.n} px')
-            report.writeParagraph(f'Area size: {smartRound(stats.N, 2)} {pixelUnits}')
+            report.writeParagraph(
+                f'Prediction: {sourcePredicted}<br>'
+                f'Observation: {sourceObserved}<br>'
+                f'Stratification: {sourceStratification}'
+            )
+
+            report.writeParagraph(
+                f'Sample size: {stats.n} px<br>'
+                f'Area size: {smartRound(stats.N, 2)} {pixelUnits}'
+            )
 
             if classNamesMatching is not None:
                 report.writeTable(classNamesMatching, 'Class matching', ['predicted', 'observed'])

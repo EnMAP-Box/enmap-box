@@ -61,6 +61,9 @@ class ClassificationPerformanceSimpleAlgorithm(EnMAPProcessingAlgorithm):
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_REPORT, context)
         openReport = self.parameterAsBoolean(parameters, self.P_OPEN_REPORT, context)
 
+        sourcePredicted = classification.source()
+        sourceObserved = reference.source()
+
         with open(filename + '.log', 'w') as logfile:
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)
@@ -129,7 +132,7 @@ class ClassificationPerformanceSimpleAlgorithm(EnMAPProcessingAlgorithm):
                 raise QgsProcessingException('Predicted values not matching reference classes.')
             stats = accuracyAssessment(yReference, yMap, classNames, classValues)
 
-            self.writeReport(filename, stats, classNamesMatching)
+            self.writeReport(filename, stats, classNamesMatching, sourcePredicted, sourceObserved)
             # dump json
             with open(filename + '.json', 'w') as file:
                 file.write(json.dumps(stats.__dict__, indent=4))
@@ -144,7 +147,8 @@ class ClassificationPerformanceSimpleAlgorithm(EnMAPProcessingAlgorithm):
 
     @classmethod
     def writeReport(
-            cls, filename: str, stats: 'AccuracyAssessmentResult', classNamesMatching: list = None
+            cls, filename: str, stats: 'AccuracyAssessmentResult', classNamesMatching: list = None,
+            sourcePredicted: str = None, sourceObserved: str = None
     ):
 
         def smartRound(obj, ndigits):
@@ -166,9 +170,14 @@ class ClassificationPerformanceSimpleAlgorithm(EnMAPProcessingAlgorithm):
             makedirs(dirname(filename))
         with open(filename, 'w') as fileHtml, open(filename + '.csv', 'w') as fileCsv:
             report = MultiReportWriter([HtmlReportWriter(fileHtml), CsvReportWriter(fileCsv)])
-            report.writeHeader('Classification layer accuracy')
-
-            report.writeParagraph(f'Sample size: {stats.sampleSize}')
+            report.writeHeader('Classification layer accuracy report')
+            report.writeParagraph(
+                f'Prediction: {sourcePredicted}<br>'
+                f'Observation: {sourceObserved}'
+            )
+            report.writeParagraph(
+                f'Sample size: {stats.sampleSize}'
+            )
 
             if classNamesMatching is not None:
                 report.writeTable(classNamesMatching, 'Class matching', ['predicted', 'observed'])

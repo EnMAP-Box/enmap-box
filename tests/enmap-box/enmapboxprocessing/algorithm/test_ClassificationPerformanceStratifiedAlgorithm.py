@@ -1,7 +1,5 @@
-import unittest
-
 import numpy as np
-from osgeo import gdal
+from qgis.core import QgsRasterLayer, QgsVectorLayer, QgsMapLayer
 
 from enmapboxprocessing.algorithm.classificationperformancestratifiedalgorithm import (
     stratifiedAccuracyAssessment, ClassificationPerformanceStratifiedAlgorithm
@@ -11,7 +9,6 @@ from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import landcover_map_l3
 from enmapboxtestdata import landcover_polygon
-from qgis.core import QgsRasterLayer, QgsVectorLayer, QgsMapLayer
 
 
 class Test_aa_stratified(TestCase):
@@ -90,7 +87,7 @@ class Test_aa_stratified(TestCase):
         self.assertTrue(np.isnan(result.overall_accuracy_se))
 
 
-@unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
+# @unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
 class TestClassificationPerformanceStratifiedAlgorithm(TestCase):
 
     def test_withStratification(self):

@@ -8,6 +8,7 @@ class HtmlReportWriter(object):
 
     def __init__(self, file: TextIO):
         self.file = file
+        file.write(r"<head><style>@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');body {font-family: 'Roboto', sans-serif;}</style></head>" + '\n')
 
     def writeHeader(self, value):
         self.file.writelines(['<h1>', value, '</h1>', '\n'])

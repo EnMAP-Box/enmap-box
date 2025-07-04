@@ -66,10 +66,12 @@ class RegressorPerformanceAlgorithm(EnMAPProcessingAlgorithm):
             feedback.pushInfo(f'Load sample data: X{list(sample.X.shape)} y{list(sample.y.shape)}')
 
             if nfold is None:
+                title = 'Regressor performance report'
                 feedback.pushInfo('Evaluate regressor test performance')
                 y2 = dump.regressor.predict(sample.X)
                 y2 = np.reshape(y2, (len(dump.targets), -1, 1))
             else:
+                title = 'Regressor cross-validation performance report'
                 feedback.pushInfo('Evaluate cross-validation performance')
                 from sklearn.model_selection import cross_val_predict
                 if sample.y.shape[1] == 1 and not isinstance(dump.regressor, MultiOutputRegressor):
@@ -105,6 +107,16 @@ class RegressorPerformanceAlgorithm(EnMAPProcessingAlgorithm):
                 alg.P_OUTPUT_REPORT: filename,
             }
             self.runAlg(alg, parameters, None, feedback2, context, True)
+
+            # edit report
+            with open(filename) as file:
+                lines = file.readlines()
+            lines[1] = f'<h1>{title}</h1>'
+            lines[2] = f'<p>Regressor: {filenameRegressor}<br>Test dataset: {filenameSample}</p>'
+            if nfold is not None and nfold >= 2:
+                lines.insert(3, f'<p>Number of cross-validation folds: {nfold}</p>')
+            with open(filename, 'w') as file:
+                file.writelines(lines)
 
             result = {self.P_OUTPUT_REPORT: filename}
 

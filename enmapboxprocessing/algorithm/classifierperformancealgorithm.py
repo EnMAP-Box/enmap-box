@@ -2,6 +2,7 @@ import webbrowser
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsMapLayer, QgsProcessingException)
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.classificationperformancesimplealgorithm import \
@@ -10,7 +11,6 @@ from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsMapLayer, QgsProcessingException)
 
 
 @typechecked
@@ -69,9 +69,11 @@ class ClassifierPerformanceAlgorithm(EnMAPProcessingAlgorithm):
             feedback.pushInfo(f'Load sample data: X{list(sample.X.shape)} y{list(sample.y.shape)}')
 
             if nfold is None:
+                title = 'Classifier performance report'
                 feedback.pushInfo('Evaluate classifier test performance')
                 y2 = classifier.predict(sample.X)
             elif nfold == 1:
+                title = 'Classifier out-of-bag performance report'
                 feedback.pushInfo('Evaluate classifier out-of-bag (OOB) performance')
                 classifier.fit(sample.X, sample.y.ravel())
                 assert classifier.classes_.tolist() == list(range(1, len(classifier.classes_) + 1))
@@ -80,6 +82,7 @@ class ClassifierPerformanceAlgorithm(EnMAPProcessingAlgorithm):
                 except Exception:
                     raise QgsProcessingException('classifier not supporting out-of-bag estimates\n' + str(classifier))
             else:
+                title = 'Classifier cross-validation performance report'
                 feedback.pushInfo('Evaluate cross-validation performance')
                 from sklearn.model_selection import cross_val_predict
                 y2 = cross_val_predict(classifier, X=sample.X, y=sample.y.ravel(), cv=nfold)
@@ -108,6 +111,16 @@ class ClassifierPerformanceAlgorithm(EnMAPProcessingAlgorithm):
                 alg.P_OUTPUT_REPORT: filename,
             }
             self.runAlg(alg, parameters, None, feedback2, context, True)
+
+            # edit report
+            with open(filename) as file:
+                lines = file.readlines()
+            lines[1] = f'<h1>{title}</h1>'
+            lines[2] = f'<p>Classifier: {filenameClassifier}<br>Test dataset: {filenameSample}</p>'
+            if nfold is not None and nfold >= 2:
+                lines.insert(3, f'<p>Number of cross-validation folds: {nfold}</p>')
+            with open(filename, 'w') as file:
+                file.writelines(lines)
 
             result = {self.P_OUTPUT_REPORT: filename}
 
