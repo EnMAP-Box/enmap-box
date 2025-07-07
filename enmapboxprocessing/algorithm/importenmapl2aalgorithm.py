@@ -96,7 +96,8 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
             # check filename
             # e.g. 'ENMAP01-____L2A-DT000326721_20170626T102020Z_001_V000204_20200406T201930Z-METADATA.XML'
             if not self.isValidFile(xmlFilename):
-                message = f'not a valid EnMAP L2A product: {xmlFilename}'
+                message = (f'not a valid EnMAP L2A product: {xmlFilename}\n'
+                           f'Hint: relocating the product to a directory with a shorter path may help in some cases.')
                 feedback.reportError(message, True)
                 raise QgsProcessingException(message)
 
