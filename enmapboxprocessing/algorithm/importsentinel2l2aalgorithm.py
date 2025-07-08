@@ -2,16 +2,15 @@ from os.path import basename, dirname, join
 from typing import Dict, Any, List, Tuple
 
 from osgeo import gdal
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer, QgsMapLayer
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.algorithm.preparerasteralgorithm import PrepareRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-from enmapboxprocessing.gdalutils import GdalUtils
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer, QgsMapLayer
 
 
 @typechecked
@@ -134,11 +133,16 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
             isVrt = filename.endswith('.vrt')
             if isVrt:
                 ds: gdal.Dataset = gdal.BuildVRT(filename, filenames, options=options)
+                feedback.pushWarning(
+                    "Due to a performance issue, raster data stored as VRT won't be scaled between 0 and 1. "
+                    "See https://github.com/qgis/qgis/issues/59461 for details."
+                )
             else:
-                gdal.BuildVRT(filename + '.vrt', filenames, options=options)
+                tmpFilename = Utils.tmpFilename(filename, 'stack.vrt')
+                gdal.BuildVRT(tmpFilename, filenames, options=options)
                 alg = PrepareRasterAlgorithm()
                 parameters = {
-                    alg.P_RASTER: filename + '.vrt',
+                    alg.P_RASTER: tmpFilename,
                     alg.P_SCALE: 0.0001,
                     alg.P_DATA_TYPE: self.Float32,
                     alg.P_OUTPUT_RASTER: filename
@@ -151,9 +155,6 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
             for bandNo, name in enumerate(bandNames, 1):
                 rb: gdal.Band = ds.GetRasterBand(bandNo)
                 rb.SetDescription(name)
-                if isVrt:
-                    rb.SetScale(1e-4)
-                    GdalUtils().calculateDefaultHistrogram(ds, inMemory=False, feedback=feedback)
 
             # copy metadata (see issue #269)
             writer = RasterWriter(ds)
@@ -167,27 +168,28 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
             writer.close()
             del writer
 
-            # setup default renderer
-            layer = QgsRasterLayer(filename)
-            reader = RasterReader(layer)
-            redBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['R'][0])
-            greenBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['G'][0])
-            blueBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['B'][0])
-            redMin, redMax = reader.provider.cumulativeCut(
-                redBandNo, 0.02, 0.98, sampleSize=int(QgsRasterLayer.SAMPLE_SIZE)
-            )
-            greenMin, greenMax = reader.provider.cumulativeCut(
-                greenBandNo, 0.02, 0.98, sampleSize=int(QgsRasterLayer.SAMPLE_SIZE)
-            )
-            blueMin, blueMax = reader.provider.cumulativeCut(
-                blueBandNo, 0.02, 0.98, sampleSize=int(QgsRasterLayer.SAMPLE_SIZE)
-            )
-            renderer = Utils().multiBandColorRenderer(
-                reader.provider, [redBandNo, greenBandNo, blueBandNo], [redMin, greenMin, blueMin],
-                [redMax, greenMax, blueMax]
-            )
-            layer.setRenderer(renderer)
-            layer.saveDefaultStyle(QgsMapLayer.StyleCategory.Rendering)
+            if 0:
+                # setup default renderer
+                layer = QgsRasterLayer(filename)
+                reader = RasterReader(layer)
+                redBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['R'][0])
+                greenBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['G'][0])
+                blueBandNo = reader.findWavelength(CreateSpectralIndicesAlgorithm.WavebandMapping['B'][0])
+                redMin, redMax = reader.provider.cumulativeCut(
+                    redBandNo, 0.02, 0.98, sampleSize=int(QgsRasterLayer.SAMPLE_SIZE)
+                )
+                greenMin, greenMax = reader.provider.cumulativeCut(
+                    greenBandNo, 0.02, 0.98, sampleSize=int(QgsRasterLayer.SAMPLE_SIZE)
+                )
+                blueMin, blueMax = reader.provider.cumulativeCut(
+                    blueBandNo, 0.02, 0.98, sampleSize=int(QgsRasterLayer.SAMPLE_SIZE)
+                )
+                renderer = Utils().multiBandColorRenderer(
+                    reader.provider, [redBandNo, greenBandNo, blueBandNo], [redMin, greenMin, blueMin],
+                    [redMax, greenMax, blueMax]
+                )
+                layer.setRenderer(renderer)
+                layer.saveDefaultStyle(QgsMapLayer.StyleCategory.Rendering)
 
             result = {self.P_OUTPUT_RASTER: filename}
             self.toc(feedback, result)

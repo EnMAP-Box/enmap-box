@@ -280,7 +280,7 @@ def sensorProductsRoot() -> Optional[str]:
     root = None
     try:
         root = {
-            'Andreas@PC-21-0602': r'd:\data\sensors'
+            'janzandr@PC-25-0201': r'd:\data\sensors'
         }.get(os.getlogin() + '@' + platform.node())
     except OSError as ex:
         warnings.warn(f'Exception raised in sensorProductsRoot():\n{ex}')
