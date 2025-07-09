@@ -512,7 +512,8 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                         exec(code, namespace)
                         userFunction = namespace['updatePlot']
                     except Exception:
-                        pass
+                        traceback.print_exc()
+
                 userFunctionEditor = w.dialog
                 xValues = [float(v) for v in xValues]
                 yValues = [float(v) for v in yValues]
@@ -558,7 +559,7 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                         exec(code, namespace)
                         userFunction = namespace['updatePlot']
                     except Exception:
-                        pass
+                        traceback.print_exc()
                 userFunctionEditor = w.dialog
                 xValues = [float(v) for v in xValues]
                 yValues = [float(v) for v in yValues]
