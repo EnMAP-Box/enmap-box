@@ -219,7 +219,7 @@ def renderImageData(task: QgsTask, dump):
             h, w = samplingGrid(lyr, ext, max_size=job.mMaxBytes, ncb=nb)
 
             if isinstance(renderer, QgsSingleBandGrayRenderer):
-                setBand = renderer.setGrayBand
+                setBand = renderer.setInputBand
             elif isinstance(renderer, QgsSingleBandPseudoColorRenderer):
                 setBand = renderer.setBand
             elif isinstance(renderer, QgsSingleBandColorDataRenderer):
@@ -1281,7 +1281,7 @@ class ImageCubeWidget(QMainWindow):
                     renderer.setBand(self.z())
                     l2.setRenderer(renderer)
                 elif isinstance(renderer, QgsSingleBandGrayRenderer):
-                    renderer.setGrayBand(self.z())
+                    renderer.setInputBand(self.z())
                     l2.setRenderer(renderer)
                 elif isinstance(renderer, QgsMultiBandColorRenderer):
                     l2.setRenderer(QgsRasterLayer(l2.source(), '', l2.dataProvider().name()).renderer())

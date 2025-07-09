@@ -3094,7 +3094,7 @@ class RasterLayer(object):
         '''Initialize a SingleBandGrayRenderer.'''
         from qgis.core import QgsSingleBandGrayRenderer, QgsContrastEnhancement
 
-        qgsRenderer = QgsSingleBandGrayRenderer(input=self.qgsLayer().dataProvider(), grayBand=grayIndex + 1)
+        qgsRenderer = QgsSingleBandGrayRenderer(input=self.qgsLayer().dataProvider(), inputBand=grayIndex + 1)
         self.qgsLayer().setRenderer(qgsRenderer)
         qgsRenderer = self.qgsLayer().renderer()
 

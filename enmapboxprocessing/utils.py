@@ -337,7 +337,7 @@ class Utils(object):
         if isinstance(renderer, QgsCategorizedSymbolRenderer):
             return Utils.categoriesFromCategorizedSymbolRenderer(renderer)
         if isinstance(renderer, QgsSingleBandGrayRenderer):
-            return Utils.categoriesFromRasterBand(layer, renderer.grayBand())
+            return Utils.categoriesFromRasterBand(layer, renderer.inputBand())
 
     @classmethod
     def categoriesFromRasterBand(cls, raster: QgsRasterLayer, bandNo: int) -> Categories:

@@ -164,7 +164,7 @@ class TestUtils(TestCase):
     def test_singleBandGrayRenderer(self):
         layer = QgsRasterLayer(enmap)
         renderer = Utils.singleBandGrayRenderer(layer.dataProvider(), 1, 2, 3)
-        self.assertEqual(1, renderer.grayBand())
+        self.assertEqual(1, renderer.inputBand())
         self.assertEqual(2, renderer.contrastEnhancement().minimumValue())
         self.assertEqual(3, renderer.contrastEnhancement().maximumValue())
 

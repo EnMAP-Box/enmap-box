@@ -98,7 +98,7 @@ class TemporalRasterStackControllerApp(EnMAPBoxApplication):
 
             renderer = layer.renderer()
             if isinstance(renderer, QgsSingleBandGrayRenderer):
-                renderer.setGrayBand(bandNo)
+                renderer.setInputBand(bandNo)
             elif isinstance(renderer, QgsSingleBandPseudoColorRenderer):
                 renderer.setBand(bandNo)
             elif isinstance(renderer, QgsPalettedRasterRenderer):

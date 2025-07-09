@@ -350,7 +350,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
             with BlockSignals(self.mGrayBand.mMin, self.mGrayBand.mMax, self.mGrayBand.mBandNo):
                 self.mGrayBand.mMin.setText(str(ce.minimumValue()))
                 self.mGrayBand.mMax.setText(str(ce.maximumValue()))
-                self.mGrayBand.mBandNo.setBand(renderer.grayBand())
+                self.mGrayBand.mBandNo.setBand(renderer.inputBand())
 
         elif self.mRenderer.currentIndex() == self.PseudoRendererTab:
             self.mPseudoBand.mBandNo.setLayer(layer)
@@ -490,7 +490,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 self.mBlueBand.mBandNo.setBand(renderer.blueBand())
         elif isinstance(renderer, QgsSingleBandGrayRenderer):
             with BlockSignals(self.mGrayBand):
-                self.mGrayBand.mBandNo.setBand(renderer.grayBand())
+                self.mGrayBand.mBandNo.setBand(renderer.inputBand())
         elif isinstance(renderer, QgsSingleBandPseudoColorRenderer):
             with BlockSignals(self.mPseudoBand.mBandNo):
                 self.mPseudoBand.mBandNo.setBand(renderer.band())
@@ -608,7 +608,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
         elif self.mRenderer.currentIndex() == self.GrayRendererTab:
             bandNo = self.mGrayBand.mBandNo.currentBand()
             renderer: QgsSingleBandGrayRenderer = layer.renderer()
-            renderer.setGrayBand(bandNo)
+            renderer.setInputBand(bandNo)
             ce = renderer.contrastEnhancement()
             ce.setMinimumValue(tofloat(self.mGrayBand.mMin.text()))
             ce.setMaximumValue(tofloat(self.mGrayBand.mMax.text()))
@@ -821,7 +821,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 w.setText(str(tofloat(redMax)))
 
                 renderer2 = renderer.clone()
-                renderer2.setGrayBand(bandNo)
+                renderer2.setInputBand(bandNo)
                 ce2 = QgsContrastEnhancement(provider2.dataType(bandNo))
                 ce2.setMinimumValue(redMin)
                 ce2.setMaximumValue(redMax)
