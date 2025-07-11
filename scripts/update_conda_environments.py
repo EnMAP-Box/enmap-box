@@ -3,7 +3,7 @@ import json
 import os
 import re
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import requests
 import yaml
@@ -15,26 +15,33 @@ os.makedirs(DIR_TMP, exist_ok=True)
 
 # define how QGIS branches with be named in the yml file names
 BRANCH_NAME_LOOKUP = {
-    'stable': 'longterm',
-    'latest': 'latest'
+    'stable': 'ltr',
+    'latest': ''
 }
 
+# define packages to be installed in the different *.yml files
+# only define root packages, the
 DEPENDENCIES = {
     # define dependencies as: [<conda package name> | {<'conda'|'pip'>:<package name>, ...}, ...]
+    # light = minimum requirements
     'light': ['python>=3.10', 'pip', 'scikit-learn>=1', 'matplotlib', 'enpt'],
+    # full = all other packages to enjoy the full EnMAP-Box experience (on cost of disk space)
     'full': [{'conda': 'enpt', 'pip': 'enpt-enmapboxapp'}, 'xgboost', 'lightgbm', 'cdsapi', 'cython', 'netcdf4',
              'pygrib',
              'pyhdf', 'xarray', 'astropy', 'catboost', 'matplotlib', 'astropy', 'numba>=0.56.4',
              'sympy', 'pyopengl', 'h5py',
-             # requirements specdeepmap
+             # requirements by specdeepmap
              'opencv[build=headless*]', 'pandas=2.2.3',
-             {'pip': ['torch==2.6.0', 'lightning==2.5.0.post0', 'tensorboard==2.19.0',
-                      'torchvision==0.21.0', 'segmentation-models-pytorch==0.5.0']}
+             {'pip': ['torch==2.6.0',
+                      'lightning==2.5.0.post0',
+                      'tensorboard==2.19.0',
+                      'torchvision==0.21.0',
+                      'segmentation-models-pytorch==0.5.0']}
              ],
+    # required by developers
     'dev': ['gitpython', 'git-lfs', 'pytest', 'pytest-cov', 'pytest-xdist', 'docutils',
             {'conda': 'flake8', 'pip': 'flake8-qgis'},
             ]
-
 }
 
 """
@@ -77,7 +84,10 @@ def restructure_dependencies(d: dict) -> Dict[str, List[Dict[str, List[str]]]]:
 DEPENDENCIES = restructure_dependencies(DEPENDENCIES)
 
 
-def get_current_versions() -> dict:
+def get_current_qgis_versions() -> dict:
+    """
+    Reads from qgis.org the version numbers of the current LTR and LR releases.
+    """
     base_url = 'https://qgis.org/resources/roadmap'
     response = requests.get(base_url)
     if response.status_code != 200:
@@ -98,7 +108,7 @@ def get_conda_qgis_versions() -> dict:
     path_repodata = DIR_TMP / f'condaforge-repodata-{str(datetime.date.today())}.json'
 
     if not path_repodata.is_file():
-
+        # osx-64
         base_url = 'https://conda.anaconda.org/conda-forge/win-64/repodata.json'
         print(f'Download {base_url}')
         response = requests.get(base_url)
@@ -109,6 +119,7 @@ def get_conda_qgis_versions() -> dict:
         repodata = response.json()
         with open(path_repodata, 'w') as f:
             json.dump(repodata, f)
+
     print(f'Read {path_repodata}')
     with open(path_repodata, 'r') as f:
         repodata = json.load(f)
@@ -121,41 +132,53 @@ def get_conda_qgis_versions() -> dict:
     return qgis_versions
 
 
-def update_yaml(dir_yaml, branch, version, full: bool = False):
-    variant = 'full' if full else 'light'
-    name = f'enmapbox_{variant}_{branch}'
+def update_yaml(dir_yaml,
+                ltr_version: Optional[str] = None,
+                all_deps: bool = False):
+    variant = 'full' if all_deps else 'light'
+
+    name = f'enmapbox_{variant}'
+
+    if ltr_version:
+        name += '_ltr'
 
     path_yml = dir_yaml / f'{name}.yml'
 
-    header = f"""# EnMAP-Box conda environment
-# generated with scripts/update_conda_environemts.py (MANUAL CHANGES WILL BE OVERWRITTEN!)
+    header = f"""# EnMAP-Box conda environment (generated {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
 # run to install: conda env create -n {name} --file={path_yml.name}
 # run to update : conda env update -n {name} --file={path_yml.name} --prune
 # run to delete : conda env remove -n {name}
-# see also https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
+# see https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
+# created with scripts/update_conda_environments.py (MANUAL CHANGES WILL BE OVERWRITTEN!)
 """
-
     DEPS = DEPENDENCIES['light'].copy()
-    if full:
+    if all_deps:
         DEPS.extend(DEPENDENCIES['full'])
     DEPS.extend(DEPENDENCIES['dev'])
-
-    deps_conda = []
-    deps_pip = []
 
     variables = {
         'QT_MAC_WANTS_LAYER': 1,
         'PYQTGRAPH_QT_LIB': 'PyQt5'
     }
 
+    deps_conda = []
+    deps_pip = []
+
     for d in DEPS:
         d: dict
         if 'conda' in d:
             deps_conda.extend(d['conda'])
+
         if 'pip' in d:
             deps_pip.extend(d['pip'])
-    deps_conda = [f'qgis>={version}'] + sorted(set(deps_conda))
+
+    deps_conda += sorted(set(deps_conda))
     deps_pip = sorted(set(deps_pip))
+
+    if ltr_version:
+        deps_conda.insert(0, f'qgis={ltr_version}')
+    else:
+        deps_conda.insert(0, 'qgis')
 
     environment = {
         'name': name,
@@ -194,7 +217,7 @@ def update_yaml(dir_yaml, branch, version, full: bool = False):
 
 
 def update_yamls():
-    current_versions = get_current_versions()
+    current_versions = get_current_qgis_versions()
     conda_versions = get_conda_qgis_versions()
     s = ""
 
@@ -203,13 +226,21 @@ def update_yamls():
         # latest_version_fix = max([v for v in conda_versions if v.startswith(current_version)])
 
         branch_name = BRANCH_NAME_LOOKUP.get(branch, branch)
-        update_yaml(DIR_YAML, branch_name, latest_version_fix, full=True)
-        update_yaml(DIR_YAML, branch_name, latest_version_fix, full=False)
+
+        if branch_name == 'ltr':
+            # skip the hotfix version, just use the major.minor part to
+            # set the LTR version.
+            ltr_version = current_version
+        else:
+            ltr_version = None
+
+        update_yaml(DIR_YAML, ltr_version=ltr_version, all_deps=True)
+        update_yaml(DIR_YAML, ltr_version=ltr_version, all_deps=False)
 
 
 def generate_environment_file(lr_version, ltr_version):
     """
-    Generates an environment.yml file to install QGIS in a Conda environment.
+    Generates an environment.yml file to install QGIS + EnMAP-Box dependencies in a Conda environment.
 
     Args:
     lr_version (str): The latest version of QGIS LR.
