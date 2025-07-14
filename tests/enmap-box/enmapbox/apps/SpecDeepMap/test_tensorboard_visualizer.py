@@ -44,7 +44,6 @@ class Test_Tensorboard(TestCase):
 
         result = Processing.runAlgorithm(alg, parameters=io)
 
-
         process_exist = result['Process_exist']
         process_runs = result['process_runs']
 
@@ -53,7 +52,8 @@ class Test_Tensorboard(TestCase):
 
         time.sleep(15)
         # if process still exist terminate
-        if psutil.pid_exists(result['PID']) == True:
+        cond = psutil.pid_exists(result['PID'])
+        if cond is True:
             process = psutil.Process(result['PID'])
             # terminate possible childe process and main process
             for child in process.children(recursive=True):
