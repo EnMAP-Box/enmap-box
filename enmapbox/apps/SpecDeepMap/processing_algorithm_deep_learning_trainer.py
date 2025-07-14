@@ -74,7 +74,7 @@ class DL_Trainer(QgsProcessingAlgorithm):
     tensorboard = 'tensorboard'
     num_models = 'num_models'
     logdirpath_model = 'logdirpath_model'
-    print_detail_log = 'print_detail_log'
+    #print_detail_log = 'print_detail_log'
 
     def tr(self, string):
         """
@@ -255,11 +255,11 @@ class DL_Trainer(QgsProcessingAlgorithm):
         p2.setFlags(p2.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
         self.addParameter(p2)
 
-        p3 = QgsProcessingParameterBoolean(
-            name=self.print_detail_log, description='Print detail train process in python console', optional=True,
-            defaultValue=False)
-        p3.setFlags(p3.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
-        self.addParameter(p3)
+        #p3 = QgsProcessingParameterBoolean(
+        #   name=self.print_detail_log, description='Print detail train process in python console', optional=True,
+        #    defaultValue=False)
+        #p3.setFlags(p3.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
+        #self.addParameter(p3)
 
         self.addParameter(QgsProcessingParameterFolderDestination(
             name=self.logdirpath, description='Path for saving Tensorboard logger'))
@@ -272,16 +272,16 @@ class DL_Trainer(QgsProcessingAlgorithm):
         Here is where the processing itself takes place.
         """
         # control print out in python consol or non
-        print_detail =self.parameterAsBool(parameters, self.print_detail_log, context)
+        #print_detail =self.parameterAsBool(parameters, self.print_detail_log, context)
 
-        if print_detail==False:
-        # Save original stdout and stderr#
-            original_stdout = sys.stdout
-            original_stderr = sys.stderr
+        #if print_detail==False:
+        # Save original stdout and stderr
+        original_stdout = sys.stdout
+        original_stderr = sys.stderr
 
-            # Redirect stdout and stderr to null handler to suppress output
-            sys.stdout = NullIO()
-            sys.stderr = NullIO()
+        # Redirect stdout and stderr to null handler to suppress output
+        sys.stdout = NullIO()
+        sys.stderr = NullIO()
 
         #main function
 
@@ -352,13 +352,13 @@ class DL_Trainer(QgsProcessingAlgorithm):
         outputs = {self.logdirpath: out, self.logdirpath_model: best_iou_model}
 
         # set variable print variable back
-        if print_detail==False:
+        #if print_detail==False:
             # Restore original stdout and stderr
-            sys.stdout = original_stdout
-            sys.stderr = original_stderr
+        sys.stdout = original_stdout
+        sys.stderr = original_stderr
             # Ensure flush of any buffered output
-            sys.stdout.flush()
-            sys.stderr.flush()
+            #sys.stdout.flush()
+            #sys.stderr.flush()
 
         return outputs
     # 6
