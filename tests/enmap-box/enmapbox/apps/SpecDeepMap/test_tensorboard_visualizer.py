@@ -10,6 +10,7 @@ from enmapbox import DIR_UNITTESTS
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
 from enmapbox.apps.SpecDeepMap import import_error
+import time
 
 if not import_error:
     from enmapbox.apps.SpecDeepMap.processing_algorithm_tensorboard_visualizer import Tensorboard_visualizer
@@ -44,7 +45,7 @@ class Test_Tensorboard(TestCase):
         result = Processing.runAlgorithm(alg, parameters=io)
 
         print(result)
-
+        time.sleep(20)
         # Get the process with the given PID
         process = psutil.Process(result['PID'])
 
