@@ -44,27 +44,21 @@ class Test_Tensorboard(TestCase):
 
         result = Processing.runAlgorithm(alg, parameters=io)
 
-        print('results',result)
-        # Get the process with the given PID
-        pid = result['PID']
-        print('pid',pid)
+
         process_exist = result['Process_exist']
         process_runs = result['process_runs']
-        print('exist', process_exist)
-        print('runs', process_runs)
 
         # Assert if the process is not existing or running
         assert process_exist == True or process_runs == True
+
         time.sleep(15)
         # if process still exist terminate
         if psutil.pid_exists(result['PID']) == True:
             process = psutil.Process(result['PID'])
-            # termninate possible childe process and main process
+            # terminate possible childe process and main process
             for child in process.children(recursive=True):
               child.kill()
             process.kill()
-
-        # Clean up
 
         # Remove logg folder
         folder_path_logs_out = BASE_DIR / "test_run" / "lightning_logs"
