@@ -12,7 +12,7 @@ The SpecDeepMap Application consists of six QGIS processing algorithms and is de
 
 * SpecDeepMap algorithm take geographical data characteristics into account as well as higher dimensional data structure common for multi & hyperspectral raster images.
 
-* Available Deep Learning architectures  U-Net, U-Net++, DeepLabV3+, and SegFormer with a variety of encoder backbones, such as ResNet-18 and -50, EfficientNet, MobileNet, ConvNext, and Swin-Transformer. 
+* Available Deep Learning architectures  U-Net, U-Net++, DeepLabV3+, and SegFormer with a variety of approximately 800 encoder backbones, such as ResNet-18 and -50, EfficientNet, MobileNet, ConvNext, and Swin-Transformer. 
 
 * Integration of the foundation model backbones ResNet-18 and ResNet-50 trained for Sentinel-2 Top of Atmosphere Reflectance Imagery. These pretrained weights stemm from : Wang, Yi et al. “SSL4EO-S12: A Large-Scale Multi-Modal, Multi-Temporal Dataset for Self-Supervised Learning in Earth Observation.” ArXiv abs/2211.07044 (2022): n. pag. 
 
@@ -23,10 +23,7 @@ Git Repository: https://github.com/EnMAP-Box/enmap-box/tree/main/enmapbox/apps/S
 
 # Install SpecDeepMap via QGIS
 
-SpecDeepMap Application is available in the QGIS Plugin EnMAP-Box version 3.16 and can be installed from the QGIS Plugin Manager.
-To install EnMAP-Box, follow the official guide:
-
-[https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html](https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html)
+SpecDeepMap is available by default in EnMAP-Box from 3.16 onwards until further notice, and has to be installed via Miniforge/Conda.
 
 
 # Install QGIS & SpecDeepMap via Miniforge/Conda (Cross-Platform)
@@ -59,7 +56,7 @@ conda env create -n specdeepmap --file=https://raw.githubusercontent.com/EnMAP-B
 
 4.1 activate environment
 ```bash
-activate specdeepmap
+conda activate specdeepmap
 ```
 4.2. start qgis and then open enmapbox in qgis interface via the enmapbox plugin icon
 ```bash
@@ -107,7 +104,7 @@ conda env create -n specdeepmap_cpu_time_capsul --file=https://raw.githubusercon
 conda env create -n specdeepmap_gpu_time_capsul --file=https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/enmapbox/apps/SpecDeepMap/conda_envs/specdeepmap_gpu_time_capsul.yml
 ```
 
-If you want to use a newer CUDA version or have problems installing the pytorch wheel for GPU, you can first create the CPU time capsul environment, then re-install PyTorch using the appropriate pip install command for cuda enabling (as shown in Step 2: Install PyTorch with CUDA (e.g. CUDA 12.4)).
+If you want to use a newer CUDA version or have problems installing the pytorch wheel for GPU, you can first create the CPU time capsul environment, then re-install PyTorch using the appropriate pip install command for cuda enabling (as shown in Step 2: Install PyTorch with CUDA (e.g. CUDA 12.4)). If you use a newer cuda version, keep in mind that it has to be compaitbel with pytorch/torch=2.6.0.
 Activate environment using conda activate specdeepmap_cpu_time_capsul or conda activate specdeepmap_cgu_time_capsul 
 
 # License
