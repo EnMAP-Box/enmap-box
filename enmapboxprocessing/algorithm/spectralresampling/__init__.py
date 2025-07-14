@@ -50,10 +50,10 @@ class SpectralSensors():
         responseFunctionFile = join(root, 'sentinel2a_msi.geojson')
         shortname = 'Sentinel-2A MSI'
         longname = 'Sentinel-2A MultiSpectral Instrument (MSI)'
-        website = 'https://sentinel.esa.int/web/sentinel/missions/sentinel-2'
+        website = 'https://www.esa.int/Applications/Observing_the_Earth/Copernicus/Sentinel-2'
 
     class Sentinel2b():
         responseFunctionFile = join(root, 'sentinel2b_msi.geojson')
         shortname = 'Sentinel-2B MSI'
         longname = 'Sentinel-2B MultiSpectral Instrument (MSI)'
-        website = 'https://sentinel.esa.int/web/sentinel/missions/sentinel-2'
+        website = 'https://www.esa.int/Applications/Observing_the_Earth/Copernicus/Sentinel-2'
