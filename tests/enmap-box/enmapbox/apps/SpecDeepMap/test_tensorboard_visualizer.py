@@ -48,7 +48,7 @@ class Test_Tensorboard(TestCase):
         process_runs = result['process_runs']
 
         # Assert if the process is not existing or running
-        assert process_exist == True or process_runs == True
+        assert process_exist is True or process_runs is True
 
         time.sleep(15)
         # if process still exist terminate
@@ -57,7 +57,7 @@ class Test_Tensorboard(TestCase):
             process = psutil.Process(result['PID'])
             # terminate possible childe process and main process
             for child in process.children(recursive=True):
-              child.kill()
+                child.kill()
             process.kill()
 
         # Remove logg folder
