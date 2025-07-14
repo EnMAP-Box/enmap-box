@@ -65,7 +65,6 @@ class Test_Tensorboard(TestCase):
 
         # Kill the main process
         process.kill()
-
         # Remove logg folder
         folder_path_logs_out = BASE_DIR / "test_run" / "lightning_logs"
 
