@@ -83,7 +83,7 @@ conda activate specdeepmap
 This download is large (\~4.5 GB).
 
 ```bash
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124 -y --force-reinstall
+pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cu124 --force-reinstall
 ```
 
 Note: It is also possible to setup  CUDA via the OSGeo4W Shell on Windows. First, install the CUDA Toolkit: [https://developer.nvidia.com/cuda-downloads](https://developer.nvidia.com/cuda-downloads), then run Step 2 in the OSGeo4W Shell.
@@ -101,14 +101,14 @@ These files ensure full reproducibility by pinning exact package versions of the
 conda env create -n specdeepmap_cpu_time_capsul --file=https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/enmapbox/apps/SpecDeepMap/conda_envs/specdeepmap_cpu_time_capsul.yml
 ```
 
-### GPU Environment (CUDA 12.4)
+### GPU Environment (CUDA 12.4) - tested on Windows
 
 ```bash
 conda env create -n specdeepmap_gpu_time_capsul --file=https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/enmapbox/apps/SpecDeepMap/conda_envs/specdeepmap_gpu_time_capsul.yml
 ```
 
-If you want to use a newer CUDA version, you can first create the CPU environment, then manually re-install PyTorch using the appropriate pip install command (as shown in Step 2: Install PyTorch with CUDA).
-Activate environment using conda activate specdeepmap_cpu_time_capsul or conda activate specdeepmap_cgu_time_capsul  
+If you want to use a newer CUDA version or have problems installing the pytorch wheel for GPU, you can first create the CPU time capsul environment, then re-install PyTorch using the appropriate pip install command for cuda enabling (as shown in Step 2: Install PyTorch with CUDA (e.g. CUDA 12.4)).
+Activate environment using conda activate specdeepmap_cpu_time_capsul or conda activate specdeepmap_cgu_time_capsul 
 
 # License
 
