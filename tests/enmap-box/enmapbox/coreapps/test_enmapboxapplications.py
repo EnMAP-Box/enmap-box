@@ -29,7 +29,7 @@ class TestEnMAPBoxApplications(EnMAPBoxTestCase):
             EB.initEnMAPBoxApplications()
         all_ids = [a.id() for a in QgsApplication.processingRegistry().algorithms()]
 
-        test_algs = [a for a in all_ids if a.startswith('enmapbox:CreateTest').lower()]
+        test_algs = [a for a in all_ids if a.startswith('enmapbox:CreateTest'.lower())]
 
         from processing.gui.AlgorithmDialog import AlgorithmDialog
         import time
