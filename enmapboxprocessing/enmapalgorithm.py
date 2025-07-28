@@ -98,7 +98,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         for c in '!?-+/*()[]{}':
             nameId = nameId.replace(c, '')
         nameId = ''.join([s.title() for s in nameId.split(' ')])
-        return nameId
+        return nameId.lower()
 
     def groupId(self) -> str:
         return self._generateId(self.group()).lower()
