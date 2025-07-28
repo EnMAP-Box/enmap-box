@@ -29,7 +29,6 @@ from ensomap import APP_DIR
 
 import sys
 sys.path.insert(0, APP_DIR)
-import hys
 # from ensomap_ui import ENSOMAP_UI
 
 from PyQt5.QtCore    import *
@@ -38,55 +37,8 @@ from PyQt5.QtGui     import *
 
 import numpy as np
 import time
-import hys
+
 import csv
-
-from hys.ui_map import *
-from hys.ui_msk import *
-from hys.ui_cal import *
-from hys.ui_val import *
-
-class ENSOMAP_UI(ui_map, ui_msk, ui_cal, ui_val, QWidget):
-
-    def __init__(self, dname, parent=None):
-        super(ENSOMAP_UI, self).__init__(parent=parent)
-        
-        self.app_name = "ENSOMAP"
-        self.app_version = hys.__version__
-
-        # =========================================================================================
-        # CREATE THE BASE
-        self.gui = hys.WIDGET(self, self.app_name + " - " + self.app_version)
-
-        # =========================================================================================
-        # CREATE THE BASE TAB
-        self.gui.widget_tab()
-
-        self.insert_map(dname)
-        self.insert_msk(dname)
-        self.insert_cal(dname)
-        self.insert_val(dname)
-
-        
-        self.gui.widget_tab_close()
-
-        # =========================================================================================
-        # CREATE THE LINE WITH BUTTON
-        self.gui.widget_add_spacing(10)
-        self.gui.widget_row_framed(alignment=Qt.AlignLeft, style = QFrame.StyledPanel | QFrame.Raised)
-        self.gui.widget_push_button('Close', action=self.quit)
-        self.gui.widget_row_framed_close()
-
-
-    def center(self):
-        qr = self.frameGeometry()
-        cp = QDesktopWidget().availableGeometry().center()
-        qr.moveCenter(cp)
-        self.move(qr.topLeft())
-    
-    def quit(self):
-        self.close()
-
 
 class EnSoMAP(EnMAPBoxApplication):
 
@@ -110,6 +62,51 @@ class EnSoMAP(EnMAPBoxApplication):
         return menu
     
     def startGUI(self, *args):
+        import hys
+        from hys.ui_map import ui_map
+        from hys.ui_msk import ui_msk
+        from hys.ui_cal import ui_cal
+        from hys.ui_val import ui_val
+
+        class ENSOMAP_UI(ui_map, ui_msk, ui_cal, ui_val, QWidget):
+
+            def __init__(self, dname, parent=None):
+                super(ENSOMAP_UI, self).__init__(parent=parent)
+
+                self.app_name = "ENSOMAP"
+                self.app_version = hys.__version__
+
+                # =========================================================================================
+                # CREATE THE BASE
+                self.gui = hys.WIDGET(self, self.app_name + " - " + self.app_version)
+
+                # =========================================================================================
+                # CREATE THE BASE TAB
+                self.gui.widget_tab()
+
+                self.insert_map(dname)
+                self.insert_msk(dname)
+                self.insert_cal(dname)
+                self.insert_val(dname)
+
+                self.gui.widget_tab_close()
+
+                # =========================================================================================
+                # CREATE THE LINE WITH BUTTON
+                self.gui.widget_add_spacing(10)
+                self.gui.widget_row_framed(alignment=Qt.AlignLeft, style=QFrame.StyledPanel | QFrame.Raised)
+                self.gui.widget_push_button('Close', action=self.quit)
+                self.gui.widget_row_framed_close()
+
+            def center(self):
+                qr = self.frameGeometry()
+                cp = QDesktopWidget().availableGeometry().center()
+                qr.moveCenter(cp)
+                self.move(qr.topLeft())
+
+            def quit(self):
+                self.close()
+
         homedir = os.path.expanduser('~')
         w = ENSOMAP_UI(homedir)
         w.show()
