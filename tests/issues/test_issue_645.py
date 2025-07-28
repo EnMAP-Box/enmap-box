@@ -16,7 +16,7 @@ class Issue645Tests(TestCase):
         speclib: QgsVectorLayer
         speclib.startEditing()
         procw = SpectralProcessingDialog(speclib=speclib)
-        procw.setAlgorithm('enmapbox:SpectralResamplingToWavelength')
+        procw.setAlgorithm('enmapbox:SpectralResamplingToWavelength'.lower())
         self.showGui(procw)
 
     def test_issue_645(self):
@@ -25,5 +25,5 @@ class Issue645Tests(TestCase):
         sl = QgsVectorLayer(library_berlin)
         sl.startEditing()
         d = SpectralProcessingDialog(speclib=sl)
-        d.setAlgorithm('enmapbox:TranslateRasterLayer')
+        d.setAlgorithm('enmapbox:TranslateRasterLayer'.lower())
         self.showGui(d)
