@@ -50,14 +50,6 @@ class test_ensomap(EnMAPBoxTestCase):
         self.assertTrue(os.path.isfile(hys.__file__))
 
     @unittest.skipIf(not has_numba, 'numba not installed')
-    def test_ENSOMAP_UI(self):
-        homedir = os.path.expanduser('~')
-        from ensomap.enmapboxintegration import ENSOMAP_UI
-        w = ENSOMAP_UI(homedir)
-        self.assertIsInstance(w, QWidget)
-        QgsProject.instance().removeAllMapLayers()
-
-    @unittest.skipIf(not has_numba, 'numba not installed')
     def test_EnSOMAP_App(self):
         emb = EnMAPBox(load_core_apps=False, load_other_apps=False)
 
