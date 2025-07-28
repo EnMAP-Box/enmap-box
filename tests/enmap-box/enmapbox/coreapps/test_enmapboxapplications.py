@@ -29,7 +29,7 @@ class TestEnMAPBoxApplications(EnMAPBoxTestCase):
             EB.initEnMAPBoxApplications()
         all_ids = [a.id() for a in QgsApplication.processingRegistry().algorithms()]
 
-        test_algs = [a for a in all_ids if a.startswith('enmapbox:CreateTest')]
+        test_algs = [a for a in all_ids if a.startswith('enmapbox:CreateTest').lower()]
 
         from processing.gui.AlgorithmDialog import AlgorithmDialog
         import time
@@ -81,7 +81,7 @@ class TestEnMAPBoxApplications(EnMAPBoxTestCase):
     def test_Resampling(self):
         registerDataProvider()
 
-        aid = 'enmapbox:SpectralResamplingToLandsat89Oli'
+        aid = 'enmapbox:SpectralResamplingToLandsat89Oli'.lower()
         reg: QgsProcessingRegistry = QgsApplication.instance().processingRegistry()
         alg = reg.algorithmById(aid)
         if not isinstance(alg, QgsProcessingAlgorithm):

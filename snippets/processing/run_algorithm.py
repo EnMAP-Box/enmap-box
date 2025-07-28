@@ -6,7 +6,7 @@ start_app()
 initAll()
 
 # prepare dataset
-algName = 'enmapbox:TranslateRasterLayer'
+algName = 'enmapbox:TranslateRasterLayer'.lower()
 parameters = {
     'raster': r'D:\source\QGISPlugIns\enmap-box\enmapbox\exampledata\enmap_potsdam.tif',
     'outputTranslatedRaster': 'c:/test/copy.tif'

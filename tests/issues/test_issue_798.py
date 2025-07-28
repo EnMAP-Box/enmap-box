@@ -55,7 +55,7 @@ class TestIssue764(EnMAPBoxTestCase):
 
         alg = FitPcaAlgorithm()
 
-        algorithmId = 'enmapbox:FitPca'
+        algorithmId = 'enmapbox:FitPca'.lower()
         parameters = {'featureRaster': 'profile0'}
 
         def checkOutputs(outputs):
