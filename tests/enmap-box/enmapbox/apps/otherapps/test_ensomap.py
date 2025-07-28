@@ -16,8 +16,6 @@ __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
 import unittest
 
-from qgis.PyQt.QtWidgets import QWidget
-
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.applications import EnMAPBoxApplication
 
