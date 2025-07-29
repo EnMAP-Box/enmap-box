@@ -351,6 +351,16 @@ class TestRasterReader(TestCase):
         self.assertEqual('Micrometers', reader.wavelengthUnits(1))
         self.assertEqual(42 * 1000, reader.wavelength(1))
 
+    def test_wavelengthFromTanager(self):  # issue #1208
+
+        writer = self.rasterFromArray(np.zeros((1, 1, 1)))
+        writer.setMetadataItem('/HDFEOS/SWATHS/HYP/Data Fields/toa_radiance#wavelengths', [42])
+        writer.setMetadataItem('/HDFEOS/SWATHS/HYP/Data Fields/toa_radiance#wavelengths_units', 'nm')
+        writer.close()
+        reader = RasterReader(writer.source())
+        self.assertEqual('Nanometers', reader.wavelengthUnits(1))
+        self.assertEqual(42, reader.wavelength(1))
+
     def test_findWavelength(self):
         writer = self.rasterFromArray(np.zeros((5, 1, 1)))
         writer.setWavelength(100, 1)
