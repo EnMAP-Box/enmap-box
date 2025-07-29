@@ -605,7 +605,8 @@ class RasterReader(object):
         for key in [
             'wavelength_units',
             'Wavelength_unit',  # support for FORCE BOA files
-            'wavelength units'  # support for GDAL Metadata Editor dialog (by @jakimow)
+            'wavelength units',  # support for GDAL Metadata Editor dialog (by @jakimow)
+            '/HDFEOS/SWATHS/HYP/Data Fields/toa_radiance#wavelengths_units',  # support for tanager (#1208)
         ]:
             # check band-level domains
             for domain in set(self.metadataDomainKeys(bandNo) + ['']):
@@ -668,7 +669,8 @@ class RasterReader(object):
 
         for key in [
             'wavelength',
-            'Wavelength'  # support for FORCE BOA files
+            'Wavelength',  # support for FORCE BOA files
+            '/HDFEOS/SWATHS/HYP/Data Fields/toa_radiance#wavelengths'  # support for tanager (issue #1208)
         ]:
             # check band-level domains
             for domain in set(self.metadataDomainKeys(bandNo) + ['']):
