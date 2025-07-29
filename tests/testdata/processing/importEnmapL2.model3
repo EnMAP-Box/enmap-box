@@ -1,10 +1,10 @@
 <!DOCTYPE model>
 <Option type="Map">
   <Option type="Map" name="children">
-    <Option type="Map" name="enmapbox:ImportEnmapL2AProduct_1">
+    <Option type="Map" name="enmapbox:importenmapl2aproduct_1">
       <Option type="bool" value="true" name="active"/>
       <Option name="alg_config"/>
-      <Option type="QString" value="enmapbox:ImportEnmapL2AProduct" name="alg_id"/>
+      <Option type="QString" value="enmapbox:importenmapl2aproduct" name="alg_id"/>
       <Option type="QString" value="" name="color"/>
       <Option type="Map" name="comment">
         <Option type="QString" value="" name="color"/>
@@ -22,10 +22,10 @@
       <Option type="double" value="286" name="component_pos_y"/>
       <Option type="double" value="200" name="component_width"/>
       <Option name="dependencies"/>
-      <Option type="QString" value="enmapbox:ImportEnmapL2AProduct_1" name="id"/>
+      <Option type="QString" value="enmapbox:importenmapl2aproduct_1" name="id"/>
       <Option type="Map" name="outputs">
         <Option type="Map" name="EnMAP L2 Raster">
-          <Option type="QString" value="enmapbox:ImportEnmapL2AProduct_1" name="child_id"/>
+          <Option type="QString" value="enmapbox:importenmapl2aproduct_1" name="child_id"/>
           <Option type="QString" value="" name="color"/>
           <Option type="Map" name="comment">
             <Option type="QString" value="" name="color"/>
@@ -98,7 +98,7 @@
       <Option type="int" value="0" name="flags"/>
       <Option type="QString" value="" name="help"/>
       <Option type="Map" name="metadata">
-        <Option type="QString" value="enmapbox:ImportEnmapL2AProduct_1" name="_modelChildId"/>
+        <Option type="QString" value="enmapbox:importenmapl2aproduct_1" name="_modelChildId"/>
         <Option type="QString" value="EnMAP L2 Raster" name="_modelChildOutputName"/>
         <Option type="QString" value="enmapbox" name="_modelChildProvider"/>
       </Option>

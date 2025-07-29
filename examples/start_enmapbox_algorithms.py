@@ -57,7 +57,7 @@ params = {
     'outputTranslatedRaster': path_translated.as_posix()
 }
 
-results = processing.run("enmapbox:TranslateRasterLayer", params, onFinish=onFinish)
+results = processing.run("enmapbox:TranslateRasterLayer".lower(), params, onFinish=onFinish)
 
 print('Results:')
 print(results)

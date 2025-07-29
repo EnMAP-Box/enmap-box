@@ -16,7 +16,7 @@ class TestIssue764(EnMAPBoxTestCase):
         initAll()
 
         speclib = TestObjects.createSpectralLibrary(2)
-        algorithmId = 'enmapbox:RasterMath'
+        algorithmId = 'enmapbox:RasterMath'.lower()
 
         parameters = {'code': 'my code input'}
 

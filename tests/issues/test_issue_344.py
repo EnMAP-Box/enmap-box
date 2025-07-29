@@ -11,7 +11,7 @@ from qgis.core import QgsProcessingRegistry, QgsApplication, QgsProcessingContex
 class EnMAPBoxTestCaseExample(EnMAPBoxTestCase):
 
     def test_parameterization_strings(self):
-        aid = 'enmapbox:SpectralResamplingToPrisma'
+        aid = 'enmapbox:SpectralResamplingToPrisma'.lower()
         reg: QgsProcessingRegistry = QgsApplication.instance().processingRegistry()
         alg: QgsProcessingAlgorithm = reg.algorithmById(aid)
 
