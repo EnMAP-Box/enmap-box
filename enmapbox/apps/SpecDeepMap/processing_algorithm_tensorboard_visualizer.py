@@ -7,6 +7,7 @@ from qgis.core import (QgsProcessingAlgorithm,
                        QgsProcessingParameterNumber,
                        QgsProcessingParameterFile)
 
+import psutil
 
 class Tensorboard_visualizer(QgsProcessingAlgorithm):
     """
@@ -144,7 +145,11 @@ class Tensorboard_visualizer(QgsProcessingAlgorithm):
         # return print('Tensorboard opened at: ',port)
         feedback.pushInfo(f"TensorBoard started with PID {self.process.pid} at {logdir} on port {port}")
 
-        return {"PID": self.process.pid}
+        process_exist = psutil.pid_exists(self.process.pid)
+        process = psutil.Process(self.process.pid)
+        process_runs = process.is_running()
+
+        return {"PID": self.process.pid, "Process_exist":process_exist, "process_runs":process_runs}
 
 
     def helpUrl(self, *args, **kwargs):

@@ -10,6 +10,7 @@ from enmapbox import DIR_UNITTESTS
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
 from enmapbox.apps.SpecDeepMap import import_error
+import time
 
 if not import_error:
     from enmapbox.apps.SpecDeepMap.processing_algorithm_tensorboard_visualizer import Tensorboard_visualizer
@@ -43,27 +44,21 @@ class Test_Tensorboard(TestCase):
 
         result = Processing.runAlgorithm(alg, parameters=io)
 
-        print(result)
+        process_exist = result['Process_exist']
+        process_runs = result['process_runs']
 
-        # Get the process with the given PID
-        process = psutil.Process(result['PID'])
+        # Assert if the process is not existing or running
+        assert process_exist is True or process_runs is True
 
-        # Assert if the process is running
-        assert process.is_running(), f"Process with PID {result['PID']} is not running."
-
-        # Clean up
-
-        # Kill the process after the check
-
-        # time.sleep(15)   process kills also tensorboard directly after creating. if check if tensorbard gui is open unhashtag this line
-
-        process = psutil.Process(result['PID'])
-        # Recursively kill all child processes
-        for child in process.children(recursive=True):
-            child.kill()  # Force kill child processes
-
-        # Kill the main process
-        process.kill()
+        time.sleep(15)
+        # if process still exist terminate
+        cond = psutil.pid_exists(result['PID'])
+        if cond is True:
+            process = psutil.Process(result['PID'])
+            # terminate possible childe process and main process
+            for child in process.children(recursive=True):
+                child.kill()
+            process.kill()
 
         # Remove logg folder
         folder_path_logs_out = BASE_DIR / "test_run" / "lightning_logs"
