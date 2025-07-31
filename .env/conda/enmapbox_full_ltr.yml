@@ -1,10 +1,9 @@
-# EnMAP-Box conda environment
-# run to install: conda env create -n enmapbox_full_3.40 --file=enmapbox_full_3.40.yml
-# run to update : conda env update -n enmapbox_full_3.40 --file=enmapbox_full_3.40.yml --prune
-# run to delete : conda env remove -n enmapbox_full_3.40
+# EnMAP-Box conda environment (generated 2025-07-11 12:17:27)
+# run to install: conda env create -n enmapbox_full_ltr --file=enmapbox_full_ltr.yml
+# run to update : conda env update -n enmapbox_full_ltr --file=enmapbox_full_ltr.yml --prune
+# run to delete : conda env remove -n enmapbox_full_ltr
 # see https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
-# This file was with scripts/update_conda_environments.py (MANUAL CHANGES WILL BE OVERWRITTEN!)
-# Last update: 2025-07-11 12:15:02
+# created with scripts/update_conda_environments.py (MANUAL CHANGES WILL BE OVERWRITTEN!) 
 
 channels:
 - conda-forge
@@ -77,7 +76,7 @@ dependencies:
   - tensorboard==2.19.0
   - torch==2.6.0
   - torchvision==0.21.0
-name: enmapbox_full_3.40
+name: enmapbox_full_ltr
 variables:
   PYQTGRAPH_QT_LIB: PyQt5
   QT_MAC_WANTS_LAYER: 1
