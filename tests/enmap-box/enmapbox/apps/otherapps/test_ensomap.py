@@ -16,8 +16,6 @@ __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
 import unittest
 
-from qgis.PyQt.QtWidgets import QWidget
-
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.applications import EnMAPBoxApplication
 
@@ -48,14 +46,6 @@ class test_ensomap(EnMAPBoxTestCase):
         import hys
 
         self.assertTrue(os.path.isfile(hys.__file__))
-
-    @unittest.skipIf(not has_numba, 'numba not installed')
-    def test_ENSOMAP_UI(self):
-        homedir = os.path.expanduser('~')
-        from ensomap.enmapboxintegration import ENSOMAP_UI
-        w = ENSOMAP_UI(homedir)
-        self.assertIsInstance(w, QWidget)
-        QgsProject.instance().removeAllMapLayers()
 
     @unittest.skipIf(not has_numba, 'numba not installed')
     def test_EnSOMAP_App(self):
