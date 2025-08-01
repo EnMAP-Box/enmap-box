@@ -6,12 +6,14 @@ on:
       - main
       - release-**
       - release_**
+      - release_3.16
 
   pull_request:
     branches:
       - main
       - release-**
       - release_**
+      - release_3.16
 
   release:
     types: [ published ]
