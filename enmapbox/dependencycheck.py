@@ -35,31 +35,29 @@ import time
 import traceback
 import typing
 import warnings
-from contextlib import redirect_stdout, redirect_stderr
+import logging
+from contextlib import redirect_stderr, redirect_stdout
 from importlib.machinery import ModuleSpec
 from io import StringIO
 from pathlib import Path
-from typing import List, Match, Iterator, Any, Dict, Tuple, Optional
+from typing import Any, Dict, Iterator, List, Match, Optional, Tuple
 
 from pip._internal.cli.main_parser import parse_command
 from pip._internal.commands import create_command
 from pip._internal.utils.misc import get_prog
 from qgis.PyQt import sip
-from qgis.PyQt.QtCore import QProcess
-from qgis.PyQt.QtCore import \
-    pyqtSignal, Qt, \
-    QAbstractTableModel, QModelIndex, QSortFilterProxyModel, QUrl
-from qgis.PyQt.QtGui import QContextMenuEvent, QColor, QDesktopServices
-from qgis.PyQt.QtWidgets import \
-    QMessageBox, QStyledItemDelegate, QApplication, QTableView, QMenu, \
-    QDialogButtonBox, QWidget
-from qgis.core import Qgis
-from qgis.core import QgsTask, QgsApplication, QgsTaskManager, QgsAnimatedIcon
+from qgis.PyQt.QtCore import pyqtSignal, QAbstractTableModel, QModelIndex, QProcess, QSortFilterProxyModel, Qt, QUrl
+from qgis.PyQt.QtGui import QColor, QContextMenuEvent, QDesktopServices
+from qgis.PyQt.QtWidgets import QApplication, QDialogButtonBox, QMenu, QMessageBox, QStyledItemDelegate, QTableView, \
+    QWidget
+from qgis.core import Qgis, QgsAnimatedIcon, QgsApplication, QgsTask, QgsTaskManager
 from qgis.gui import QgsFileDownloaderDialog
 
 from enmapbox import REQUIREMENTS_CSV
 from enmapbox.enmapboxsettings import EnMAPBoxSettings
 from enmapbox.qgispluginsupport.qps.utils import qgisAppQgisInterface
+
+logger = logging.getLogger(__name__)
 
 URL_PACKAGE_HELP = r"https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html#install-required-python-packages"
 
@@ -213,7 +211,7 @@ class PIPPackage(object):
         noWarning = self.packagesWithoutWarning()
         if b and self.pipPkgName in noWarning:
             noWarning.remove(self.pipPkgName)
-        elif not b and self.pyPkgName not in noWarning:
+        elif not b and self.pipPkgName not in noWarning:
             noWarning.append(self.pipPkgName)
         noWarning = [p for p in noWarning if isinstance(p, str)]
         EnMAPBoxSettings().setValue(self.KEY_SKIP_WARNINGS, ','.join(noWarning))
@@ -500,6 +498,7 @@ class PIPPackageInfoTask(QgsTask):
             self.sigMessage.emit('Search for available updates...', Qgis.MessageLevel.Info)
             try:
                 success, msg, err = call_pip_command(['list', '-o', '--format', 'json'])
+
                 if success:
                     pkg_updates = json.loads(msg)
                     self.sigPackageUpdates.emit(pkg_updates)
