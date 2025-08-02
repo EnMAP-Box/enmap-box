@@ -20,15 +20,14 @@ import uuid
 from time import sleep
 from typing import List, Tuple
 
-from enmapbox.dependencycheck import PIPPackage, requiredPackages, PIPPackageInstaller, PIPPackageInfoTask, \
-    localPythonExecutable, missingPackageInfo, checkGDALIssues, PIPPackageInstallerTableModel, \
-    call_pip_command, localPipExecutable
+from enmapbox.dependencycheck import call_pip_command, checkGDALIssues, localPipExecutable, localPythonExecutable, \
+    missingPackageInfo, PIPPackage, PIPPackageInfoTask, PIPPackageInstaller, PIPPackageInstallerTableModel, \
+    requiredPackages
 from enmapbox.testing import EnMAPBoxTestCase, start_app
 from qgis.PyQt.QtCore import QProcess
 from qgis.PyQt.QtGui import QMovie
-from qgis.PyQt.QtWidgets import QApplication, QTableView, QLabel
-from qgis.core import Qgis, QgsTaskManager, QgsTask
-from qgis.core import QgsApplication
+from qgis.PyQt.QtWidgets import QApplication, QLabel, QTableView
+from qgis.core import Qgis, QgsApplication, QgsTask, QgsTaskManager
 
 start_app()
 
@@ -158,6 +157,8 @@ class test_dependencycheck(EnMAPBoxTestCase):
         last_progress = -1
         is_completed = False
 
+        MESSAGES = dict()
+
         def onPackageList(info: list):
             for p in info:
                 ALL_PKG[p['name']] = p
@@ -201,10 +202,13 @@ class test_dependencycheck(EnMAPBoxTestCase):
             self.assertIsInstance(msg, str)
             self.assertIsInstance(msg_level, Qgis.MessageLevel)
             self.assertTrue(len(msg) > 0)
+            MESSAGES[msg_level] = MESSAGES.get(msg_level, []) + [msg]
 
         def onCompleted(result, task):
             nonlocal is_completed
-            self.assertTrue(result)
+            infos = ['Errors:']
+            infos.extend(MESSAGES.get(Qgis.MessageLevel.Critical, []))
+            self.assertTrue(result, msg='\n'.join(infos))
             is_completed = True
             s = ""
 
