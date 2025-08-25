@@ -170,7 +170,7 @@ _This release was tested under QGIS 3.28 (LTR), 3.32 and 3.34 (latest release)._
 #### Processing Algorithms
 * make feature name matching optional and not the default in ML predictions [#297](https://github.com/EnMAP-Box/enmap-box/issues/297)
 * use direct assignment between band number and detector in EnMAP L2A product specified in the METADATA.XML [#415](https://github.com/EnMAP-Box/enmap-box/issues/415)
-* [Spectral Index Creator] add support for formulars with input bands given by center wavelength [#456](https://github.com/EnMAP-Box/enmap-box/issues/456)
+* [Spectral Index Creator] add support for formulas with input bands given by center wavelength [#456](https://github.com/EnMAP-Box/enmap-box/issues/456)
 * [Import EnMAP L2A product] add "Exclude bad bands" option [#461](https://github.com/EnMAP-Box/enmap-box/issues/461)
 * [Classification workflow algo] the default feature matching by name is causing problems in case of duplicated names [#467](https://github.com/EnMAP-Box/enmap-box/issues/467)
 * implement algorithms for calculating spectral similarity between classes [#469](https://github.com/EnMAP-Box/enmap-box/issues/469)

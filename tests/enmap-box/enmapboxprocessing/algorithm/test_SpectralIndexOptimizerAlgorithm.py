@@ -29,12 +29,12 @@ class TestSpectralIndexOptimizerAlgorithm(TestCase):
             alg.P_F1: 1,
             alg.P_F2: 1,
             alg.P_F3: 1,
-            alg.P_FORMULAR: 'A+B-F1-F2-F3',
+            alg.P_FORMULA: 'A+B-F1-F2-F3',
             alg.P_OUTPUT_MATRIX: self.filename('scores.tif')
         }
         self.runalg(alg, parameters)
 
-    def test_formularEvalsTo_notFinite_forSomeInputs(self):
+    def test_formulaEvalsTo_notFinite_forSomeInputs(self):
         filenameFeatures, filenameLabels = classificationDatasetAsForceFile
         alg = PrepareRegressionDatasetFromFilesAlgorithm()
         parameters = {

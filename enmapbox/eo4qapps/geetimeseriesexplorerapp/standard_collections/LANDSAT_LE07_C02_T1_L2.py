@@ -20,5 +20,5 @@ bandColors = {
     'TCB': '#ff0000', 'TCG': '#00ff00', 'TCW': '#0000ff', 'TCDI': '#ffff00'
 }
 
-# mapping from spectral index formular identifiers to image bands
+# mapping from spectral index formula identifiers to image bands
 wavebandMapping = {'B': 'SR_B1', 'G': 'SR_B2', 'R': 'SR_B3', 'N': 'SR_B4', 'S1': 'SR_B5', 'S2': 'SR_B7', 'T1': 'SR_B6'}

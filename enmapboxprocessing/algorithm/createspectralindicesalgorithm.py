@@ -20,7 +20,7 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessin
 class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_INDICES, _INDICES = 'indices', 'Indices'
-    P_JSON_FILE, _JSON_FILE = 'formulars', 'Formulars'
+    P_JSON_FILE, _JSON_FILE = 'formulas', 'Formulas'
     P_SCALE, _SCALE = 'scale', 'Scale factor'
 
     P_A, _A = 'A', 'Aerosols band'
@@ -100,7 +100,7 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
                             'Create stack of NDVI and EVI: <code>NDVI, EVI</code>\n'
                             'Create custom index: <code>MyNDVI = (N - R) / (N + R)</code>\n'
                             f'See the full list of predefined  {self.linkAwesomeSpectralIndices}.'),
-            (self._JSON_FILE, 'A JSON file with additional spectral index formulars to be used.\n'
+            (self._JSON_FILE, 'A JSON file with additional spectral index formulas to be used.\n'
                               f'See {link} for the expected format.'),
             (self._SCALE, 'Spectral reflectance scale factor. '
                           'Some indices require data to be scaled into the 0 to 1 range. '
@@ -164,7 +164,7 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
                     bandNo = self.findBroadBand(raster, name, True)
                 bandNos[name] = bandNo
 
-            # add user-defined formulars
+            # add user-defined formulas
             IndexDatabase = deepcopy(self.IndexDatabase)
             if jsonFile is not None:
                 IndexDatabase.update(  # more indices
@@ -181,7 +181,7 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
                         raise QgsProcessingException(
                             f'custom index name already exists as a predefined index: {short_name}'
                         )
-                    # derive bands from formular
+                    # derive bands from formula
                     formula_ = formula
                     bands = list()
                     for name in sorted(self.WavebandMapping.keys(), key=len, reverse=True):  # long names first!
@@ -202,7 +202,7 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
 
                 bandList = [bandNos[name] for name in bands]
 
-                # derive bands given by nanometers from formular (see #456)
+                # derive bands given by nanometers from formula (see #456)
                 for key in set(re.findall(r'r\d+', formula)):
                     wavelength = float(key[1:])  # remove leading 'R'
                     bandNo = reader.findWavelength(wavelength)
