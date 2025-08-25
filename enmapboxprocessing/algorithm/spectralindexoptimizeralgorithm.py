@@ -2,19 +2,19 @@ from math import nan
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
 class SpectralIndexOptimizerAlgorithm(EnMAPProcessingAlgorithm):
     P_DATASET, _DATASET = 'dataset', 'Training dataset'
-    P_FORMULAR, _FORMULAR = 'formular', 'Formular'
+    P_FORMULA, _FORMULA = 'formula', 'Formula'
     P_MAX_FEATURES, _MAX_FEATURES = 'maxFeatures', 'Max. features'
     P_F1, _F1 = 'f1', 'Fixed feature F1'
     P_F2, _F2 = 'f2', 'Fixed feature F2'
@@ -32,12 +32,12 @@ class SpectralIndexOptimizerAlgorithm(EnMAPProcessingAlgorithm):
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
             (self._DATASET, 'The regression dataset.'),
-            (self._FORMULAR, 'The formular with variable features A and B to be optimized, '
-                             'and up to three fixed features F1, F2 and F3.'),
+            (self._FORMULA, 'The formula with variable features A and B to be optimized, '
+                            'and up to three fixed features F1, F2 and F3.'),
             (self._MAX_FEATURES, 'Limit the number of features to be evaluated. Default is to use all features.'),
-            (self._F1, 'Specify to use a fixed feature F1 in the formular.'),
-            (self._F2, 'Specify to use a fixed feature F2 in the formular.'),
-            (self._F3, 'Specify to use a fixed feature F3 in the formular.'),
+            (self._F1, 'Specify to use a fixed feature F1 in the formula.'),
+            (self._F2, 'Specify to use a fixed feature F2 in the formula.'),
+            (self._F3, 'Specify to use a fixed feature F3 in the formula.'),
             (self._OUTPUT_MATRIX, self.RasterFileDestination)
         ]
 
@@ -46,7 +46,7 @@ class SpectralIndexOptimizerAlgorithm(EnMAPProcessingAlgorithm):
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRegressionDataset(self.P_DATASET, self._DATASET)
-        self.addParameterString(self.P_FORMULAR, self._FORMULAR, '(A-B) / (A+B)')
+        self.addParameterString(self.P_FORMULA, self._FORMULA, '(A-B) / (A+B)')
         self.addParameterInt(self.P_MAX_FEATURES, self._MAX_FEATURES, None, True, 2, None, True)
         self.addParameterInt(self.P_F1, self._F1, None, True, 1, None, True)
         self.addParameterInt(self.P_F2, self._F2, None, True, 1, None, True)
@@ -60,7 +60,7 @@ class SpectralIndexOptimizerAlgorithm(EnMAPProcessingAlgorithm):
         from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 
         filenameDataset = self.parameterAsFile(parameters, self.P_DATASET, context)
-        formular = self.parameterAsString(parameters, self.P_FORMULAR, context)
+        formula = self.parameterAsString(parameters, self.P_FORMULA, context)
         maxFeatures = self.parameterAsInt(parameters, self.P_MAX_FEATURES, context)
         f1No = self.parameterAsInt(parameters, self.P_F1, context)
         f2No = self.parameterAsInt(parameters, self.P_F2, context)
@@ -105,11 +105,11 @@ class SpectralIndexOptimizerAlgorithm(EnMAPProcessingAlgorithm):
                 for bi in range(ai + 1, nfeatures):
                     B = X[:, bi]
                     for yi in range(ntargets):
-                        S = eval(formular, {'A': A, 'B': B, 'F1': F1, 'F2': F2, 'F3': F3})
+                        S = eval(formula, {'A': A, 'B': B, 'F1': F1, 'F2': F2, 'F3': F3})
                         assert isinstance(S, np.ndarray)
                         Y = y[:, yi].flatten()
 
-                        # formular may eval to not finite values
+                        # formula may eval to not finite values
                         valid = np.isfinite(S)
                         S = S[valid]
                         Y = Y[valid]

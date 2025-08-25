@@ -8,7 +8,7 @@ bandColors = {
     'NDVI': '#aaff00'
 }
 
-# mapping from spectral index formular identifiers to image bands
+# mapping from spectral index formula identifiers to image bands
 wavebandMapping = {
     'R': 'sur_refl_b01',
     'N': 'sur_refl_b02'

@@ -9,7 +9,7 @@ bandColors = {
     'NDWI': '#0000ff',
 }
 
-# mapping from spectral index formular identifiers to image bands
+# mapping from spectral index formula identifiers to image bands
 wavebandMapping = {
     'A': 'Oa03_radiance', 'B': 'Oa04_radiance', 'G': 'Oa06_radiance', 'R': 'Oa08_radiance', 'N': 'Oa17_radiance'
 }

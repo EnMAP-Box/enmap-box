@@ -490,9 +490,9 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                 style = w.plotStyle()
 
                 w: QLineEdit = self.mRasterTable.cellWidget(row, 3)
-                formular = w.text()
+                formula = w.text()
                 try:
-                    offset, tmp = formular.split('+')
+                    offset, tmp = formula.split('+')
                     scale, _ = tmp.split('*')
                     offset = float(offset)
                     scale = float(scale)
@@ -537,9 +537,9 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                 style = w.plotStyle()
 
                 w: QLineEdit = self.mGeeRasterTable.cellWidget(row, 2)
-                formular = w.text()
+                formula = w.text()
                 try:
-                    offset, tmp = formular.split('+')
+                    offset, tmp = formula.split('+')
                     scale, _ = tmp.split('*')
                     offset = float(offset)
                     scale = float(scale)

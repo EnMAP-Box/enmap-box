@@ -538,9 +538,15 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def parameterAsMatrix(
             self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext
     ) -> Optional[List[Any]]:
+
         value = parameters.get(name)
+
+        if value is None:
+            value = super().parameterAsMatrix(parameters, name, context)
+
         if value == [QVariant()]:
-            return None
+            value = None
+
         return value
 
     def parameterIsNone(self, parameters: Dict[str, Any], name: str):

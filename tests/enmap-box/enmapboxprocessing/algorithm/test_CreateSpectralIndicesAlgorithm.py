@@ -112,7 +112,7 @@ class TestCreateSpectralIndicesAlgorithm(TestCase):
 
     def test_indicesFromFile(self):
 
-        formulars = {
+        formulas = {
             "SpectralIndices": {
                 "MY_INDEX": {
                     "bands": [
@@ -129,14 +129,14 @@ class TestCreateSpectralIndicesAlgorithm(TestCase):
             }
         }
 
-        Utils().jsonDump(formulars, self.filename('formulars.json'))
+        Utils().jsonDump(formulas, self.filename('formulas.json'))
 
         alg = CreateSpectralIndicesAlgorithm()
         alg.initAlgorithm()
         parameters = {
             alg.P_RASTER: enmap,
             alg.P_INDICES: 'MY_INDEX',
-            alg.P_JSON_FILE: self.filename('formulars.json'),
+            alg.P_JSON_FILE: self.filename('formulas.json'),
             alg.P_OUTPUT_RASTER: self.filename('index.vrt'),
         }
         self.runalg(alg, parameters)
