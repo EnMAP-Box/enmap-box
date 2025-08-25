@@ -3,9 +3,15 @@ from os.path import exists
 from typing import Iterable, List, Union, Optional, Tuple, Iterator
 
 import numpy as np
-from osgeo import gdal
-
 import processing
+from osgeo import gdal
+from qgis.PyQt.QtCore import QSizeF, QDateTime, QDate, QPoint
+from qgis.PyQt.QtGui import QColor
+from qgis.core import (QgsRasterLayer, QgsRasterDataProvider, QgsCoordinateReferenceSystem, QgsRectangle,
+                       QgsRasterRange, QgsPoint, QgsRasterBlockFeedback, QgsRasterBlock, QgsPointXY,
+                       QgsProcessingFeedback, QgsRasterBandStats, Qgis, QgsGeometry, QgsVectorLayer, QgsWkbTypes,
+                       QgsFeature, QgsRasterPipe, QgsRasterProjector)
+
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.gridwalker import GridWalker
@@ -13,12 +19,6 @@ from enmapboxprocessing.numpyutils import NumpyUtils
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.typing import RasterSource, Array3d, Metadata, MetadataValue, MetadataDomain, Array2d
 from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtCore import QSizeF, QDateTime, QDate, QPoint
-from qgis.PyQt.QtGui import QColor
-from qgis.core import (QgsRasterLayer, QgsRasterDataProvider, QgsCoordinateReferenceSystem, QgsRectangle,
-                       QgsRasterRange, QgsPoint, QgsRasterBlockFeedback, QgsRasterBlock, QgsPointXY,
-                       QgsProcessingFeedback, QgsRasterBandStats, Qgis, QgsGeometry, QgsVectorLayer, QgsWkbTypes,
-                       QgsFeature, QgsRasterPipe, QgsRasterProjector)
 
 
 @typechecked
@@ -27,7 +27,7 @@ class RasterReader(object):
     Micrometers = 'Micrometers'
 
     def __init__(
-            self, source: RasterSource, openWithGdal: bool = True,
+            self, source: RasterSource, openWithGdal: bool = None,
             crs: QgsCoordinateReferenceSystem = None
     ):
         self.maskReader: Optional[RasterReader] = None
@@ -49,7 +49,7 @@ class RasterReader(object):
         if isinstance(source, gdal.Dataset):
             gdalDataset = source
         else:
-            if openWithGdal:
+            if openWithGdal or self.provider.name() == 'gdal':
                 gdalDataset: gdal.Dataset = gdal.Open(self.provider.dataSourceUri(), gdal.GA_ReadOnly)
             else:
                 gdalDataset = None
@@ -287,10 +287,12 @@ class RasterReader(object):
     ) -> Array3d:
         """Return data for given pixel offset and size."""
         if self.crs().isValid():
-            p1 = QgsPoint(xOffset, yOffset)
-            p2 = QgsPoint(xOffset + width, yOffset + height)
-            p1 = QgsPointXY(self.provider.transformCoordinates(p1, QgsRasterDataProvider.TransformImageToLayer))
-            p2 = QgsPointXY(self.provider.transformCoordinates(p2, QgsRasterDataProvider.TransformImageToLayer))
+            p1_ = QgsPoint(xOffset, yOffset)
+            p2_ = QgsPoint(xOffset + width, yOffset + height)
+            p1 = QgsPointXY(self.provider.transformCoordinates(p1_, QgsRasterDataProvider.TransformImageToLayer))
+            p2 = QgsPointXY(self.provider.transformCoordinates(p2_, QgsRasterDataProvider.TransformImageToLayer))
+            assert not p1.isEmpty()
+            assert not p2.isEmpty()
         else:
             assert self.rasterUnitsPerPixel() == QSizeF(1, 1)
             p1 = QgsPointXY(xOffset, - yOffset)

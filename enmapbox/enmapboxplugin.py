@@ -167,6 +167,7 @@ class EnMAPBoxPlugin(object):
         self.initProfileAnalyticsGui()
         self.initRasterBandStackingGui()
         self.initSensorProductImportGui()
+        self.initSpectralIndexExplorerGui()
         self.initTemporalRasterStackControllerGui()
 
     def initCurrentLocationMapTool(self):
@@ -254,6 +255,16 @@ class EnMAPBoxPlugin(object):
         # add items to be removed when unload the plugin
         self.pluginToolbarActions.append(self.sensorProductImportApp.actionToggleDock)
         self.dockWidgets.append(self.sensorProductImportApp.dock)
+
+    def initSpectralIndexExplorerGui(self):
+        from qgis.utils import iface
+        from spectralindexexplorerapp import SpectralIndexExplorerApp
+
+        self.spectralIndexExplorApp = SpectralIndexExplorerApp(None, iface)
+
+        # add items to be removed when unload the plugin
+        self.pluginToolbarActions.append(self.spectralIndexExplorApp.actionToggleDock)
+        self.dockWidgets.append(self.spectralIndexExplorApp.dock)
 
     def initTemporalRasterStackControllerGui(self):
         from temporalrasterstackcontrollerapp import TemporalRasterStackControllerApp
