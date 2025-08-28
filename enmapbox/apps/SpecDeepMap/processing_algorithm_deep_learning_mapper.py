@@ -8,8 +8,6 @@ from qgis.core import (QgsProcessingAlgorithm,
                        QgsProcessingParameterVectorDestination,
                        QgsProcessingParameterFileDestination)
 
-from enmapbox.apps.SpecDeepMap.core_deep_learning_mapper import pred_mapper
-
 
 class DL_Mapper(QgsProcessingAlgorithm):
     """DL_Train
@@ -37,7 +35,7 @@ class DL_Mapper(QgsProcessingAlgorithm):
     # P_tile_size_y = 'tile_size_y'
     P_overlap = 'overlap'
     P_gt_path = 'gt_path'
-    #P_ignore_index = 'ignore_index'
+    # P_ignore_index = 'ignore_index'
     P_vector = 'vector'
     # P_no_data_value = 'no_data_value'
     P_acc = 'acc'
@@ -140,7 +138,6 @@ class DL_Mapper(QgsProcessingAlgorithm):
         self.addParameter(QgsProcessingParameterEnum(
             name=self.P_acc, description='Device', options=['cpu', 'gpu'], defaultValue=0))
 
-
         self.addParameter(
             QgsProcessingParameterRasterDestination(
                 self.P_raster_output,
@@ -173,6 +170,8 @@ class DL_Mapper(QgsProcessingAlgorithm):
 
         # feedback.setProgress(42)
         # feedback.pushInfo('Hello World')
+
+        from enmapbox.apps.SpecDeepMap.core_deep_learning_mapper import pred_mapper
 
         pred_mapper(input_raster=self.parameterAsRasterLayer(parameters, self.P_input_raster, context).source(),
                     model_checkpoint=self.parameterAsFile(parameters, self.P_model_checkpoint, context),
