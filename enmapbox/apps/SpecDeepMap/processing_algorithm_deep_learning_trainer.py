@@ -1,7 +1,10 @@
+import os
+import re
 import subprocess
+import sys
 import time
 import webbrowser
-import sys
+
 from qgis.PyQt.QtCore import QCoreApplication
 from qgis._core import QgsProcessingParameterDefinition
 from qgis.core import (QgsProcessingAlgorithm,
@@ -12,11 +15,6 @@ from qgis.core import (QgsProcessingAlgorithm,
                        QgsProcessingParameterString,
                        QgsProcessingParameterEnum)
 
-#from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import dl_train
-from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import dl_train
-
-import os
-import re
 
 def best_ckpt_path(checkpoint_dir):
     pattern = re.compile(r'val_iou_(\d+\.\d{4})')
@@ -25,12 +23,14 @@ def best_ckpt_path(checkpoint_dir):
         key=lambda f: float(pattern.search(f).group(1))
     )
 
+
 class NullIO:
     def write(self, *args, **kwargs):
         pass
 
     def flush(self, *args, **kwargs):
         pass
+
 
 class DL_Trainer(QgsProcessingAlgorithm):
     """DL_Train
@@ -49,7 +49,6 @@ class DL_Trainer(QgsProcessingAlgorithm):
     # Constants used to refer to parameters and outputs. They will be
     # used when calling the algorithm from another algorithm, or when
     # calling from the QGIS console.
-
 
     train_val_input_folder = 'input_folder'
     arch = 'arch'
@@ -74,7 +73,8 @@ class DL_Trainer(QgsProcessingAlgorithm):
     tensorboard = 'tensorboard'
     num_models = 'num_models'
     logdirpath_model = 'logdirpath_model'
-    #print_detail_log = 'print_detail_log'
+
+    # print_detail_log = 'print_detail_log'
 
     def tr(self, string):
         """
@@ -148,7 +148,7 @@ class DL_Trainer(QgsProcessingAlgorithm):
                '<h3>Early stopping</h3>' \
                '<p>This stops the model when validation loss is not imporving for 50 epochs.  </p>' \
                '<h3>Balanced Training using Class Weights</h3>' \
-               '<p>This parameter enables balanced training, for this the precomputed class weights based on the training dataset are used, which are listed in the summary csv file.</p>'\
+               '<p>This parameter enables balanced training, for this the precomputed class weights based on the training dataset are used, which are listed in the summary csv file.</p>' \
                '<h3>Data Normalization</h3>' \
                '<p>This parameter normalizes the image data with mean and std. per channel. To use this parameter the normalization statistic had to be cretaed using the Dataset Maker.</p>' \
                '<h3>Open Tensorboard after Training</h3>' \
@@ -172,7 +172,7 @@ class DL_Trainer(QgsProcessingAlgorithm):
                '<h3>Print detail train process in python console</h3>' \
                '<p> To print detailed training progress by batch (sub-epoch), you can activate this paramter, to print the process open the qgis python console. This is just interesting for large data-volumes, otherwise just inspect training progress in processing logger window, which prints progress per epoch.  </p>' \
                '<h3>Path for saving Tensorboard logger</h3>' \
-               '<p>Define folder where Tensorboard logger is saved. </p>'\
+               '<p>Define folder where Tensorboard logger is saved. </p>' \
                '<h3>Path for saving model</h3>' \
                '<p>Define folder where models are saved </p>'
 
@@ -189,7 +189,7 @@ class DL_Trainer(QgsProcessingAlgorithm):
             behavior=QgsProcessingParameterFile.Behavior.Folder))
         self.addParameter(QgsProcessingParameterEnum(
             name=self.arch, description='Model architecture',
-            options=['U-Net', 'U-Net++', 'DeepLabV3+','SegFormer','2D-Justo-UNet-Simple'], defaultValue=0))
+            options=['U-Net', 'U-Net++', 'DeepLabV3+', 'SegFormer', '2D-Justo-UNet-Simple'], defaultValue=0))
         self.addParameter(QgsProcessingParameterString(
             name=self.backbone, description='Model backbone', defaultValue='resnet18'))
         self.addParameter(QgsProcessingParameterEnum(
@@ -255,11 +255,11 @@ class DL_Trainer(QgsProcessingAlgorithm):
         p2.setFlags(p2.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
         self.addParameter(p2)
 
-        #p3 = QgsProcessingParameterBoolean(
+        # p3 = QgsProcessingParameterBoolean(
         #   name=self.print_detail_log, description='Print detail train process in python console', optional=True,
         #    defaultValue=False)
-        #p3.setFlags(p3.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
-        #self.addParameter(p3)
+        # p3.setFlags(p3.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
+        # self.addParameter(p3)
 
         self.addParameter(QgsProcessingParameterFolderDestination(
             name=self.logdirpath, description='Path for saving Tensorboard logger'))
@@ -272,9 +272,9 @@ class DL_Trainer(QgsProcessingAlgorithm):
         Here is where the processing itself takes place.
         """
         # control print out in python consol or non
-        #print_detail =self.parameterAsBool(parameters, self.print_detail_log, context)
+        # print_detail =self.parameterAsBool(parameters, self.print_detail_log, context)
 
-        #if print_detail==False:
+        # if print_detail==False:
         # Save original stdout and stderr
         original_stdout = sys.stdout
         original_stderr = sys.stderr
@@ -283,9 +283,10 @@ class DL_Trainer(QgsProcessingAlgorithm):
         sys.stdout = NullIO()
         sys.stderr = NullIO()
 
-        #main function
+        # main function
+        from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import dl_train
 
-        model= dl_train(
+        model = dl_train(
             input_folder=self.parameterAsString(parameters, self.train_val_input_folder, context),
             arch_index=self.parameterAsEnum(parameters, self.arch, context),
             backbone=self.parameterAsString(parameters, self.backbone, context),
@@ -352,15 +353,16 @@ class DL_Trainer(QgsProcessingAlgorithm):
         outputs = {self.logdirpath: out, self.logdirpath_model: best_iou_model}
 
         # set variable print variable back
-        #if print_detail==False:
-            # Restore original stdout and stderr
+        # if print_detail==False:
+        # Restore original stdout and stderr
         sys.stdout = original_stdout
         sys.stderr = original_stderr
-            # Ensure flush of any buffered output
-            #sys.stdout.flush()
-            #sys.stderr.flush()
+        # Ensure flush of any buffered output
+        # sys.stdout.flush()
+        # sys.stderr.flush()
 
         return outputs
+
     # 6
     def helpUrl(self, *args, **kwargs):
         return ''

@@ -6,8 +6,6 @@ from qgis.core import (QgsProcessingAlgorithm,
                        QgsProcessingParameterBoolean,
                        QgsProcessingParameterFileDestination)
 
-from enmapbox.apps.SpecDeepMap.core_tester import process_images_from_csv
-
 
 class DL_Tester(QgsProcessingAlgorithm):
     """DL_Train
@@ -99,8 +97,7 @@ class DL_Tester(QgsProcessingAlgorithm):
                '<h3>IoU CSV</h3>' \
                '<p>Location where IoU score csv-file will be created</p>' \
                '<h3>Save and export prediction image to folder (optional)</h3>' \
-               '<p>If a folder location is specified all prediction images will be saved in given folder</p>' \
-
+               '<p>If a folder location is specified all prediction images will be saved in given folder</p>'
         return html
 
     def initAlgorithm(self, config=None):
@@ -140,6 +137,7 @@ class DL_Tester(QgsProcessingAlgorithm):
         Here is where the processing itself takes place.
         """
 
+        from enmapbox.apps.SpecDeepMap.core_tester import process_images_from_csv
 
         process_images_from_csv(csv_file=self.parameterAsFile(parameters, self.P_test_data_csv, context),
                                 model_checkpoint=self.parameterAsFile(parameters, self.P_model_checkpoint, context),

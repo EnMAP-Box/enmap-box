@@ -5,10 +5,19 @@ import unittest
 from pathlib import Path
 
 from processing.core.Processing import Processing
+
 from enmapbox import DIR_UNITTESTS
+from enmapbox.apps.SpecDeepMap import import_error
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
-from enmapbox.apps.SpecDeepMap import import_error
+
+if import_error is None:
+    try:
+        import lightning
+
+        print(lightning)
+    except Exception as error:
+        import_error = error
 
 if not import_error:
     import pandas as pd
