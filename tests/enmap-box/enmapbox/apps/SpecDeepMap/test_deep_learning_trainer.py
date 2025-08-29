@@ -12,10 +12,13 @@ from enmapbox.apps.SpecDeepMap import import_error
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
 
-try:
-    import lightning
-except Exception as error:
-    import_error = error
+if import_error is None:
+    try:
+        import lightning
+
+        print(lightning)
+    except Exception as error:
+        import_error = error
 
 if not import_error:
     import lightning as L

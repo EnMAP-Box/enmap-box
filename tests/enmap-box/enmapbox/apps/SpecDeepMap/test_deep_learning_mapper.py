@@ -11,21 +11,19 @@ from enmapbox.apps.SpecDeepMap import import_error
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
 
-try:
-    import lightning
-except Exception as error:
-    import_error = error
+if import_error is None:
+    try:
+        import lightning
+
+        print(lightning)
+    except Exception as error:
+        import_error = error
 
 if not import_error:
     import pandas as pd
     from enmapbox.apps.SpecDeepMap.processing_algorithm_deep_learning_mapper import DL_Mapper
 
     start_app()
-
-try:
-    import lightning
-except Exception as error:
-    import_error = error
 
 
 def best_ckpt_path(checkpoint_dir):
