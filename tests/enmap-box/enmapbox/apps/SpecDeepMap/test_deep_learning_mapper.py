@@ -4,18 +4,28 @@ import unittest
 from pathlib import Path
 
 from osgeo import gdal, ogr
-
 from processing.core.Processing import Processing
+
 from enmapbox import DIR_UNITTESTS, exampledata
+from enmapbox.apps.SpecDeepMap import import_error
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
-from enmapbox.apps.SpecDeepMap import import_error
+
+try:
+    import lightning
+except Exception as error:
+    import_error = error
 
 if not import_error:
     import pandas as pd
     from enmapbox.apps.SpecDeepMap.processing_algorithm_deep_learning_mapper import DL_Mapper
 
     start_app()
+
+try:
+    import lightning
+except Exception as error:
+    import_error = error
 
 
 def best_ckpt_path(checkpoint_dir):

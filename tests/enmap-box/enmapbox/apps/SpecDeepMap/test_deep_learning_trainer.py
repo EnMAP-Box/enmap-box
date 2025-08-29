@@ -1,15 +1,21 @@
 import glob
 import os
 import re
+import unittest
 from os.path import dirname, join
 from pathlib import Path
-import unittest
 
 from processing import Processing
+
 from enmapbox import DIR_UNITTESTS
+from enmapbox.apps.SpecDeepMap import import_error
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
-from enmapbox.apps.SpecDeepMap import import_error
+
+try:
+    import lightning
+except Exception as error:
+    import_error = error
 
 if not import_error:
     import lightning as L

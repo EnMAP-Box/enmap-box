@@ -1,20 +1,31 @@
 import glob
 import os
+import unittest
 from os.path import join
 from pathlib import Path
-import unittest
 
 from processing.core.Processing import Processing
+
 from enmapbox import DIR_UNITTESTS
+from enmapbox.apps.SpecDeepMap import import_error
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
-from enmapbox.apps.SpecDeepMap import import_error
+
+try:
+    import lightning
+except Exception as error:
+    import_error = error
 
 if not import_error:
     import pandas as pd
     from enmapbox.apps.SpecDeepMap.processing_algorithm_dataset_maker import DatasetMaker
 
     start_app()
+
+try:
+    import lightning
+except Exception as error:
+    import_error = error
 
 BASE_TESTDATA = Path(DIR_UNITTESTS) / 'testdata/external/specdeepmap'
 
