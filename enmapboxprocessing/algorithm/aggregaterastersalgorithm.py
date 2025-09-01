@@ -1,30 +1,41 @@
+from math import ceil, nan, inf
 from os import makedirs
-from os.path import join, exists
+from os.path import join, exists, splitext
 from typing import Dict, Any, List, Tuple
 
+import numpy as np
 from osgeo import gdal
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsProcessing, \
+    QgsRasterLayer, Qgis
 
 from enmapbox.typeguard import typechecked
-from enmapboxprocessing.algorithm.aggregaterasterbandsalgorithm import AggregateRasterBandsAlgorithm
-from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
-from enmapboxprocessing.algorithm.stackrasterlayersalgorithm import StackRasterLayersAlgorithm
-from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
+from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from enmapboxprocessing.numpyutils import NumpyUtils
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
-from processing.core.Processing import Processing
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsProcessing, QgsRasterLayer
+from enmapboxprocessing.utils import Utils
 
 
 @typechecked
 class AggregateRastersAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTERS, _RASTERS = 'rasters', 'Raster layers'
     P_FUNCTION, _FUNCTION = 'function', 'Aggregation functions'
-    P_BANDWISE, _BANDWISE = 'aggregateBandWise', 'Aggregate band-wise'
+    P_GRID, _GRID = 'grid', 'Grid'
     P_OUTPUT_BASENAME, _OUTPUT_BASENAME = 'outputBasename', 'Output basename'
     P_OUTPUT_FOLDER, _OUTPUT_FOLDER = 'outputFolder', 'Output folder'
-    O_FUNCTION = AggregateRasterBandsAlgorithm.O_FUNCTION
-    P0 = AggregateRasterBandsAlgorithm.P0
+
+    O_FUNCTION = [
+        'arithmetic mean', 'standard deviation', 'variance', 'minimum', 'median', 'maximum', 'sum', 'product',
+        'range', 'interquartile range', 'any true', 'all true', 'arg minimum', 'arg maximum'
+    ]
+    (
+        ArithmeticMeanFunction, StandardDeviationFunction, VarianceFunction, MinimumFunction, MedianFunction,
+        MaximumFunction, SumFunction, ProductFunction, RangeFunction, InterquartileRangeFunction, AnyTrueFunction,
+        AllTrueFunction, ArgMinimumFunction, ArgMaximumFunction
+    ) = range(len(O_FUNCTION))
+    P0 = len(O_FUNCTION)
+    O_FUNCTION.extend([f'{i}-th percentile' for i in range(101)])
 
     def displayName(self) -> str:
         return 'Aggregate raster layers'
@@ -36,11 +47,11 @@ class AggregateRastersAlgorithm(EnMAPProcessingAlgorithm):
         return [
             (self._RASTERS, 'A list of raster layers with bands to be aggregated.'),
             (self._FUNCTION, 'Functions to be used.'),
-            (self._BANDWISE, 'Whether to aggregate band-wise.'),
+            (self._GRID, 'Reference grid specifying the destination extent, pixel size and projection. '
+                         'If not defined, first raster is used as grid.'),
             (self._OUTPUT_BASENAME, 'The output basename used to write into the output folder. '
-                                    'When using a standard name like "myRaster.tif", all outputs are written into a '
-                                    'single file. When using a pattern like "myRaster_{function}.tif", the different '
-                                    'types of aggregations are written into individual files.'),
+                                    'For a basename like "myRaster.tif", each aggregation is written into an '
+                                    'individual file named "myRaster.{function}.tif".'),
             (self._OUTPUT_FOLDER, self.FolderDestination)
         ]
 
@@ -50,7 +61,7 @@ class AggregateRastersAlgorithm(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterMultipleLayers(self.P_RASTERS, self._RASTERS, QgsProcessing.SourceType.TypeRaster)
         self.addParameterEnum(self.P_FUNCTION, self._FUNCTION, self.O_FUNCTION, True, None)
-        self.addParameterBoolean(self.P_BANDWISE, self._BANDWISE, True, True)
+        self.addParameterRasterLayer(self.P_GRID, self._GRID, None, True, True)
         self.addParameterString(self.P_OUTPUT_BASENAME, self._OUTPUT_BASENAME)
         self.addParameterFolderDestination(self.P_OUTPUT_FOLDER, self._OUTPUT_FOLDER)
 
@@ -58,151 +69,131 @@ class AggregateRastersAlgorithm(EnMAPProcessingAlgorithm):
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         rasters: List[QgsRasterLayer] = self.parameterAsLayerList(parameters, self.P_RASTERS, context)
+        grid = self.parameterAsRasterLayer(parameters, self.P_GRID, context)
         functionIndices = self.parameterAsEnums(parameters, self.P_FUNCTION, context)
-        aggregateBandWise = self.parameterAsBoolean(parameters, self.P_BANDWISE, context)
         basename = self.parameterAsString(parameters, self.P_OUTPUT_BASENAME, context)
-        writeFunctionWise = '{function}' in basename
         foldername = self.parameterAsFileOutput(parameters, self.P_OUTPUT_FOLDER, context)
-        tmpfoldername = join(foldername, 'tmp')
-        if not exists(tmpfoldername):
-            makedirs(tmpfoldername)
-        logfilename = join(tmpfoldername, basename.replace('{function}', '') + '.log')
 
-        with open(logfilename, 'w') as logfile:
+        if grid is None:
+            grid = rasters[0]
+        gridReader = RasterReader(grid)
+
+        if not exists(foldername):
+            makedirs(foldername)
+
+        with (open(join(basename + '.log'), 'w') as logfile):
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)
 
-            if aggregateBandWise:
-                for raster in rasters:
-                    if raster.bandCount() != rasters[0].bandCount():
-                        raise QgsProcessingException(
-                            f'Number of raster bands do not match.\n{rasters[0].source()}\n{raster.source()} '
-                        )
+            bandCount = rasters[0].bandCount()
+            readers: List[RasterReader] = list()
+            for raster in rasters:
+                if raster.bandCount() != bandCount:
+                    raise QgsProcessingException(
+                        'Band count mismatch: all rasters must contain the same number of bands.'
+                    )
+                readers.append(RasterReader(raster, crs=grid.crs()))
 
-                # stack and aggregate band-wise
-                filenames = list()
-                for bandNo in range(1, rasters[0].bandCount() + 1):
-                    alg1 = StackRasterLayersAlgorithm()
-                    parameters1 = {
-                        alg1.P_RASTERS: rasters,
-                        alg1.P_BAND: bandNo,
-                        alg1.P_OUTPUT_RASTER: join(tmpfoldername, f'band_{bandNo}.vrt')
-                    }
-                    Processing.runAlgorithm(alg1, parameters1, None, feedback2, context)
+            noDataValue = Utils.defaultNoDataValue(np.float32)
+            writers: List[RasterWriter] = list()
+            for functionIndex in functionIndices:
+                functionName = self.O_FUNCTION[functionIndex].replace(' ', '_')
+                filename = join(foldername, f'{splitext(basename)[0]}.{functionName}{splitext(basename)[1]}')
+                writer = Driver(filename, feedback=feedback).createLike(
+                    gridReader, Qgis.DataType.Float32, bandCount
+                )
+                writer.setNoDataValue(noDataValue)
+                for bandNo in readers[0].bandNumbers():
+                    writer.setBandName(readers[0].bandName(bandNo), bandNo)
+                    writer.setWavelength(readers[0].wavelength(bandNo), bandNo)
+                writers.append(writer)
 
-                    alg2 = AggregateRasterBandsAlgorithm()
-                    parameters = {
-                        alg2.P_RASTER: parameters1[alg1.P_OUTPUT_RASTER],
-                        alg2.P_FUNCTION: functionIndices,
-                        alg2.P_OUTPUT_RASTER: join(tmpfoldername, f'aggregation_{bandNo}.tif')
-                    }
-                    Processing.runAlgorithm(alg2, parameters, None, feedback2, context)
-                    filenames.append(parameters[alg2.P_OUTPUT_RASTER])
+            lineMemoryUsage = gridReader.lineMemoryUsage(len(writers) + len(readers), 4)
+            blockSizeY = min(raster.height(), ceil(gdal.GetCacheMax() / lineMemoryUsage))
+            blockSizeX = raster.width()
+            for bandNo in readers[0].bandNumbers():
+                for block in gridReader.walkGrid(blockSizeX, blockSizeY, feedback):
+                    array = list()
+                    mask = list()
+                    for reader in readers:
+                        iarray = reader.arrayFromBlock(block, [bandNo])
+                        imask = reader.maskArray(iarray, [bandNo])
+                        array.append(iarray[0])
+                        mask.append(imask[0])
+                    array = np.array(array, np.float32)
+                    invalid = np.logical_not(np.any(mask, axis=0))  # whole pixel is no data
+                    array[np.logical_not(mask)] = nan
 
-                if writeFunctionWise:
-                    for bandNo, functionIndex in enumerate(functionIndices, 1):
-                        # all band for current function
-                        alg1 = StackRasterLayersAlgorithm()
-                        parameters1 = {
-                            alg1.P_RASTERS: filenames,
-                            alg1.P_BAND: bandNo,
-                            alg1.P_OUTPUT_RASTER: join(
-                                tmpfoldername,
-                                basename.replace('{function}', self.O_FUNCTION[functionIndex]).replace(' ', '_')
-                            ) + '.vrt'
+                    if self.AnyTrueFunction in functionIndices or self.AllTrueFunction in functionIndices:
+                        arrayAsBool = np.logical_and(np.isfinite(array), array)  # take care of NaN and Inf values
 
-                        }
-                        Processing.runAlgorithm(alg1, parameters1, None, feedback2, context)
+                    # Calculate all percentiles at once.
+                    q = [i - self.P0 for i in functionIndices if i >= self.P0]
+                    for i, outarray in enumerate(NumpyUtils.nanpercentile(array, q)):
+                        writer = writers[functionIndices.index(q[i] + self.P0)]
+                        outarray[np.isnan(outarray)] = noDataValue
+                        outarray[invalid] = noDataValue
+                        writer.writeArray2d(outarray, bandNo, xOffset=block.xOffset, yOffset=block.yOffset)
 
-                        reader = RasterReader(rasters[0])
-                        ds: gdal.Dataset = gdal.Open(parameters1[alg2.P_OUTPUT_RASTER], gdal.GA_Update)
-                        writer = RasterWriter(ds)
-                        for bandNo in reader.bandNumbers():
-                            writer.setBandName(reader.bandName(bandNo), bandNo)
-                        writer.close()
-                        del ds
+                    # Calculate all other indices individually.
+                    for functionIndex, writer in zip(functionIndices, writers):
+                        if functionIndex >= self.P0:  # skip percentiles
+                            continue
+                        elif functionIndex == self.ArithmeticMeanFunction:
+                            outarray = np.nanmean(array, axis=0)
+                        elif functionIndex == self.StandardDeviationFunction:
+                            outarray = np.nanstd(array, axis=0)
+                        elif functionIndex == self.VarianceFunction:
+                            outarray = np.nanvar(array, axis=0)
+                        elif functionIndex == self.MinimumFunction:
+                            outarray = np.nanmin(array, axis=0)
+                        elif functionIndex == self.MedianFunction:
+                            outarray = np.nanmedian(array, axis=0)
+                        elif functionIndex == self.MaximumFunction:
+                            outarray = np.nanmax(array, axis=0)
+                        elif functionIndex == self.SumFunction:
+                            outarray = np.nansum(array, axis=0)
+                        elif functionIndex == self.ProductFunction:
+                            outarray = np.nanprod(array, axis=0)
+                        elif functionIndex == self.RangeFunction:
+                            outarray = np.nanmax(array, axis=0) - np.nanmin(array, axis=0)
+                        elif functionIndex == self.InterquartileRangeFunction:
+                            p25, p75 = NumpyUtils.nanpercentile(array, [25, 75])
+                            outarray = p75 - p25
+                        elif functionIndex == self.AnyTrueFunction:
+                            outarray = np.any(arrayAsBool, axis=0).astype(np.float32)
+                        elif functionIndex == self.AllTrueFunction:
+                            outarray = np.all(arrayAsBool, axis=0).astype(np.float32)
+                        elif functionIndex == self.ArgMinimumFunction:
+                            # Numpy nanargmin will throw an All-NaN slice encountered ValueError, instead of just a warning.
+                            # Append a inf band to prevent this.
+                            array2 = list(array)
+                            array2.append(np.full_like(array[0], inf))
+                            outarray = np.nanargmin(array2, axis=0).astype(np.float32)
+                            # Now, set All-NaN slice pixel to nan.
+                            outarray[outarray == len(array)] = nan
+                        elif functionIndex == self.ArgMaximumFunction:
+                            # Numpy nanargmax will throw an All-NaN slice encountered ValueError, instead of just a warning.
+                            # Append a -inf band to prevent this.
+                            array2 = list(array)
+                            array2.append(np.full_like(array[0], -inf))
+                            outarray = np.nanargmax(array2, axis=0).astype(np.float32)
+                            # Now, set All-NaN slice pixel to nan.
+                            outarray[outarray == len(array)] = nan
+                        else:
+                            raise ValueError()
 
-                        alg2 = SaveRasterAsAlgorithm()
-                        parameters2 = {
-                            alg2.P_RASTER: parameters1[alg1.P_OUTPUT_RASTER],
-                            alg2.P_COPY_STYLE: False,
-                            alg2.P_COPY_METADATA: False,
-                            alg2.P_OUTPUT_RASTER: join(
-                                foldername,
-                                basename.replace('{function}', self.O_FUNCTION[functionIndex].replace(' ', '_'))
-                            )
-                        }
-                        Processing.runAlgorithm(alg2, parameters2, None, feedback2, context)
+                        # replace nan values by no data values
+                        outarray[np.isnan(outarray)] = noDataValue
 
-                else:
+                        # explicitely mask pixel with all-no-data (see #1424)
+                        outarray[invalid] = noDataValue
 
-                    alg1 = StackRasterLayersAlgorithm()
-                    parameters1 = {
-                        alg1.P_RASTERS: filenames,
-                        alg1.P_OUTPUT_RASTER: join(tmpfoldername, basename) + '.vrt'
-                    }
-                    Processing.runAlgorithm(alg1, parameters1, None, feedback2, context)
+                        # write result
+                        writer.writeArray2d(outarray, bandNo, xOffset=block.xOffset, yOffset=block.yOffset)
 
-                    reader = RasterReader(rasters[0])
-                    ds: gdal.Dataset = gdal.Open(parameters1[alg2.P_OUTPUT_RASTER], gdal.GA_Update)
-                    writer = RasterWriter(ds)
-                    bandNo = 1
-                    for bandNo2 in reader.bandNumbers():
-                        for functionIndex in functionIndices:
-                            writer.setBandName(reader.bandName(bandNo2) + ' - ' + self.O_FUNCTION[functionIndex],
-                                               bandNo)
-                            bandNo += 1
-                    writer.close()
-                    del ds
-
-                    alg2 = SaveRasterAsAlgorithm()
-                    parameters2 = {
-                        alg2.P_RASTER: parameters1[alg1.P_OUTPUT_RASTER],
-                        alg2.P_COPY_STYLE: False,
-                        alg2.P_COPY_METADATA: False,
-                        alg2.P_OUTPUT_RASTER: join(foldername, basename)
-                    }
-                    Processing.runAlgorithm(alg2, parameters2, None, feedback2, context)
-            else:
-                # stack and aggregate all bands
-                alg1 = StackRasterLayersAlgorithm()
-                parameters1 = {
-                    alg1.P_RASTERS: rasters,
-                    alg1.P_OUTPUT_RASTER: join(tmpfoldername, 'bands.vrt')
-                }
-                Processing.runAlgorithm(alg1, parameters1, None, feedback2, context)
-
-                alg2 = AggregateRasterBandsAlgorithm()
-                parameters2 = {
-                    alg2.P_RASTER: parameters1[alg1.P_OUTPUT_RASTER],
-                    alg2.P_FUNCTION: functionIndices,
-                    alg2.P_OUTPUT_RASTER: join(tmpfoldername, 'aggregation.tif')
-                }
-                Processing.runAlgorithm(alg2, parameters2, None, feedback2, context)
-
-                if writeFunctionWise:
-                    for bandNo, functionIndex in enumerate(functionIndices, 1):
-                        alg3 = TranslateRasterAlgorithm()
-                        parameters3 = {
-                            alg3.P_RASTER: parameters2[alg1.P_OUTPUT_RASTER],
-                            alg3.P_BAND_LIST: [bandNo],
-                            alg3.P_COPY_STYLE: False,
-                            alg3.P_COPY_METADATA: False,
-                            alg3.P_OUTPUT_RASTER: join(
-                                foldername,
-                                basename.replace('{function}', self.O_FUNCTION[functionIndex].replace(' ', '_'))
-                            )
-                        }
-                        Processing.runAlgorithm(alg3, parameters3, None, feedback2, context)
-                else:
-                    alg3 = TranslateRasterAlgorithm()
-                    parameters3 = {
-                        alg3.P_RASTER: parameters2[alg1.P_OUTPUT_RASTER],
-                        alg3.P_COPY_STYLE: False,
-                        alg3.P_COPY_METADATA: False,
-                        alg3.P_OUTPUT_RASTER: join(foldername, basename)
-                    }
-                    Processing.runAlgorithm(alg3, parameters3, None, feedback2, context)
+            for writer in writers:
+                writer.close()
 
             result = {self.P_OUTPUT_FOLDER: foldername}
             self.toc(feedback, result)
