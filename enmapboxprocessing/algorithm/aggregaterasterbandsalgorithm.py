@@ -66,7 +66,7 @@ class AggregateRasterBandsAlgorithm(EnMAPProcessingAlgorithm):
 
             reader = RasterReader(raster)
             bandCount = len(functionIndices)
-            writer = Driver(filename, feedback=feedback).createLike(reader, Qgis.Float32, bandCount)
+            writer = Driver(filename, feedback=feedback).createLike(reader, Qgis.DataType.Float32, bandCount)
             noDataValue = Utils.defaultNoDataValue(np.float32)
             lineMemoryUsage = reader.lineMemoryUsage(reader.bandCount() + bandCount, 4)
             blockSizeY = min(raster.height(), ceil(gdal.GetCacheMax() / lineMemoryUsage))
