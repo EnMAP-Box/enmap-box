@@ -20,6 +20,7 @@ from enmapboxprocessing.utils import Utils
 @typechecked
 class AggregateRastersAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTERS, _RASTERS = 'rasters', 'Raster layers'
+    P_MASKS, _MASKS = 'masks', 'Mask layers'
     P_FUNCTION, _FUNCTION = 'function', 'Aggregation functions'
     P_GRID, _GRID = 'grid', 'Grid'
     P_OUTPUT_BASENAME, _OUTPUT_BASENAME = 'outputBasename', 'Output basename'
@@ -47,11 +48,12 @@ class AggregateRastersAlgorithm(EnMAPProcessingAlgorithm):
         return [
             (self._RASTERS, 'A list of raster layers with bands to be aggregated.'),
             (self._FUNCTION, 'Functions to be used.'),
-            (self._GRID, 'Reference grid specifying the destination extent, pixel size and projection. '
-                         'If not defined, first raster is used as grid.'),
             (self._OUTPUT_BASENAME, 'The output basename used to write into the output folder. '
                                     'For a basename like "myRaster.tif", each aggregation is written into an '
                                     'individual file named "myRaster.{function}.tif".'),
+            (self._GRID, 'Reference grid specifying the destination extent, pixel size and projection. '
+                         'If not defined, first raster is used as grid.'),
+            (self._MASKS, 'A list of external raster mask layers.'),
             (self._OUTPUT_FOLDER, self.FolderDestination)
         ]
 
@@ -61,18 +63,25 @@ class AggregateRastersAlgorithm(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterMultipleLayers(self.P_RASTERS, self._RASTERS, QgsProcessing.SourceType.TypeRaster)
         self.addParameterEnum(self.P_FUNCTION, self._FUNCTION, self.O_FUNCTION, True, None)
-        self.addParameterRasterLayer(self.P_GRID, self._GRID, None, True, True)
         self.addParameterString(self.P_OUTPUT_BASENAME, self._OUTPUT_BASENAME)
+        self.addParameterMultipleLayers(
+            self.P_MASKS, self._MASKS, QgsProcessing.SourceType.TypeRaster, None, True, True
+        )
+        self.addParameterRasterLayer(self.P_GRID, self._GRID, None, True, True)
         self.addParameterFolderDestination(self.P_OUTPUT_FOLDER, self._OUTPUT_FOLDER)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         rasters: List[QgsRasterLayer] = self.parameterAsLayerList(parameters, self.P_RASTERS, context)
+        masks: List[QgsRasterLayer] = self.parameterAsLayerList(parameters, self.P_MASKS, context)
         grid = self.parameterAsRasterLayer(parameters, self.P_GRID, context)
         functionIndices = self.parameterAsEnums(parameters, self.P_FUNCTION, context)
         basename = self.parameterAsString(parameters, self.P_OUTPUT_BASENAME, context)
         foldername = self.parameterAsFileOutput(parameters, self.P_OUTPUT_FOLDER, context)
+
+        if masks is not None and len(masks) != len(rasters):
+            raise QgsProcessingFeedback('Number of masks does not match number of rasters.')
 
         if grid is None:
             grid = rasters[0]
@@ -87,12 +96,17 @@ class AggregateRastersAlgorithm(EnMAPProcessingAlgorithm):
 
             bandCount = rasters[0].bandCount()
             readers: List[RasterReader] = list()
-            for raster in rasters:
+            mreaders: List[RasterReader] = list()
+            for i, raster in enumerate(rasters):
                 if raster.bandCount() != bandCount:
                     raise QgsProcessingException(
                         'Band count mismatch: all rasters must contain the same number of bands.'
                     )
                 readers.append(RasterReader(raster, crs=grid.crs()))
+                if masks is not None:
+                    if masks[i].bandCount() != 1:
+                        raise QgsProcessingException('All masks must be single band rasters.')
+                    mreaders.append(RasterReader(masks[i], crs=grid.crs()))
 
             noDataValue = Utils.defaultNoDataValue(np.float32)
             writers: List[RasterWriter] = list()
@@ -111,13 +125,23 @@ class AggregateRastersAlgorithm(EnMAPProcessingAlgorithm):
             lineMemoryUsage = gridReader.lineMemoryUsage(len(writers) + len(readers), 4)
             blockSizeY = min(raster.height(), ceil(gdal.GetCacheMax() / lineMemoryUsage))
             blockSizeX = raster.width()
-            for bandNo in readers[0].bandNumbers():
-                for block in gridReader.walkGrid(blockSizeX, blockSizeY, feedback):
+            for block in gridReader.walkGrid(blockSizeX, blockSizeY, feedback):
+
+                if masks is not None:
+                    externalMasks = list()
+                    for mreader in mreaders:
+                        a = mreader.arrayFromBlock(block)
+                        m = mreader.maskArray(a, defaultNoDataValue=0)
+                        externalMasks.append(m)
+
+                for bandNo in readers[0].bandNumbers():
                     array = list()
                     mask = list()
-                    for reader in readers:
+                    for i, reader in enumerate(readers):
                         iarray = reader.arrayFromBlock(block, [bandNo])
                         imask = reader.maskArray(iarray, [bandNo])
+                        if masks is not None:
+                            imask = np.logical_and(imask, externalMasks[i])
                         array.append(iarray[0])
                         mask.append(imask[0])
                     array = np.array(array, np.float32)
