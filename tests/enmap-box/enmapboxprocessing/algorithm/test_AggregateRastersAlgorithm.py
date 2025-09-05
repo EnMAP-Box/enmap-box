@@ -41,7 +41,34 @@ class TestAggregateRastersAlgorithm(TestCase):
         self.assertEqual(3, reader.array()[0], [0, 0])
         self.assertEqual('A', reader.bandName(1))
 
-    def test_realData(self):
+    def test_withMasks(self):
+        writer1 = self.rasterFromValue((1, 1, 1), 1)
+        writer1.close()
+        writer2 = self.rasterFromValue((1, 1, 1), 2)
+        writer2.close()
+
+        mwriter1 = self.rasterFromValue((1, 1, 1), 1)
+        mwriter1.close()
+        mwriter2 = self.rasterFromValue((1, 1, 1), 0)
+        mwriter2.close()
+
+        rasters = [writer1.source(), writer2.source()]
+        masks = [mwriter1.source(), mwriter2.source()]
+
+        alg = AggregateRastersAlgorithm()
+        parameters = {
+            alg.P_RASTERS: rasters,
+            alg.P_MASKS: masks,
+            alg.P_FUNCTION: [AggregateRasterBandsAlgorithm().ArithmeticMeanFunction],
+            alg.P_OUTPUT_BASENAME: 'aggregation.tif',
+            alg.P_OUTPUT_FOLDER: self.createTestOutputFolder()
+        }
+        self.runalg(alg, parameters)
+
+        reader = RasterReader(join(parameters[alg.P_OUTPUT_FOLDER], 'aggregation.arithmetic_mean.tif'))
+        self.assertEqual(1, reader.array()[0], [0, 0])
+
+    def test_realData2(self):
         root = r'D:\data\EnFireMap\cube\X0005_Y0012'
         if not exists(root):
             return
