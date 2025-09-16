@@ -217,7 +217,11 @@ class RasterizeCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
         # calculate class ids [1..nCategories]
         vector2 = QgsVectorLayer(filename)
         fieldIndex = vector2.fields().indexOf(classFieldName)
-        idOfValue = {value: id for id, value in enumerate(values, 1)}
+        idOfValue = dict()
+        for id, value in enumerate(values, 1):
+            idOfValue[value] = id
+            if value.isnumeric():
+                idOfValue[value + '.0'] = id
 
         n = vector2.featureCount()
         with edit(vector2):
