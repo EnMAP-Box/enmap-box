@@ -11,7 +11,6 @@ from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.typeguard import typechecked
 from spectralindexexplorerapp.spectralindexexplorerdockwidget import SpectralIndexExplorerDockWidget
 from spectralindexexplorerapp.spectralindexlayeralgorithm import SpectralIndexLayerAlgorithm
-from spectralindexexplorerapp.spectralindexprovider import register_data_provider
 
 
 def enmapboxApplicationFactory(enmapBox: EnMAPBox):
@@ -33,8 +32,6 @@ class SpectralIndexExplorerApp(EnMAPBoxApplication):
         self.name = SpectralIndexExplorerApp.__name__
         self.version = 'dev'
         self.licence = 'GNU GPL-3'
-
-        register_data_provider()
         self.initGui()
 
     @classmethod

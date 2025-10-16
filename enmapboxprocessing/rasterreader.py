@@ -17,7 +17,7 @@ from enmapbox.typeguard import typechecked
 from enmapboxprocessing.gridwalker import GridWalker
 from enmapboxprocessing.numpyutils import NumpyUtils
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
-from enmapboxprocessing.typing import RasterSource, Array3d, Metadata, MetadataValue, MetadataDomain, Array2d
+from enmapboxprocessing.typing import (RasterSource, Array3d, Metadata, MetadataValue, MetadataDomain, Array2d)
 from enmapboxprocessing.utils import Utils
 
 
@@ -959,3 +959,20 @@ class RasterReader(object):
 
     def gdalBand(self, bandNo: int = None) -> gdal.Band:
         return self._gdalObject(bandNo)
+
+    def saveAs(
+            self, filename: str, format: str = None, options=None, feedback: QgsProcessingFeedback = None
+    ):
+        from enmapboxprocessing.driver import Driver
+
+        array = self.array()
+        writer = Driver(filename, format, options, feedback).createFromArray(array, self.extent(), self.crs())
+        writer.setMetadata(self.metadata())
+        for bandNo in self.bandNumbers():
+            writer.setMetadata(self.metadata(bandNo), bandNo)
+            writer.setBandName(self.bandName(bandNo), bandNo)
+            writer.setNoDataValue(self.noDataValue(bandNo), bandNo)
+            writer.setWavelength(self.wavelength(bandNo), bandNo)
+            writer.setFwhm(self.fwhm(bandNo), bandNo)
+            writer.setBadBandMultiplier(self.badBandMultiplier(bandNo), bandNo)
+        writer.close()

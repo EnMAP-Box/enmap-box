@@ -23,7 +23,7 @@ from enmapboxprocessing.algorithm.convexhullalgorithm import ConvexHullAlgorithm
 from enmapboxprocessing.algorithm.createdefaultpalettedrasterrendereralgorithm import \
     CreateDefaultPalettedRasterRendererAlgorithm
 from enmapboxprocessing.algorithm.creategridalgorithm import CreateGridAlgorithm
-from enmapboxprocessing.algorithm.createmaskalgorithm import CreateMaskAlgorithm
+from enmapboxprocessing.algorithm.createmaskalgorithm import CreateMaskAlgorithm, CreateMaskVirtualAlgorithm
 from enmapboxprocessing.algorithm.creatergbimagefromclassprobabilityalgorithm import \
     CreateRgbImageFromClassProbabilityAlgorithm
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
@@ -270,6 +270,7 @@ def algorithms():
         CreateDefaultPalettedRasterRendererAlgorithm(),
         CreateGridAlgorithm(),
         CreateMaskAlgorithm(),
+        CreateMaskVirtualAlgorithm(),
         CreateRgbImageFromClassProbabilityAlgorithm(),
         EditRasterSourceBandPropertiesAlgorithm(),
         ExportDatasetToFilesAlgorithm(),
