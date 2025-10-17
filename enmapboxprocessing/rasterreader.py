@@ -10,7 +10,7 @@ from qgis.PyQt.QtGui import QColor
 from qgis.core import (QgsRasterLayer, QgsRasterDataProvider, QgsCoordinateReferenceSystem, QgsRectangle,
                        QgsRasterRange, QgsPoint, QgsRasterBlockFeedback, QgsRasterBlock, QgsPointXY,
                        QgsProcessingFeedback, QgsRasterBandStats, Qgis, QgsGeometry, QgsVectorLayer, QgsWkbTypes,
-                       QgsFeature, QgsRasterPipe, QgsRasterProjector)
+                       QgsFeature, QgsRasterPipe, QgsRasterProjector, QgsMapLayer)
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.typeguard import typechecked
@@ -961,18 +961,27 @@ class RasterReader(object):
         return self._gdalObject(bandNo)
 
     def saveAs(
-            self, filename: str, format: str = None, options=None, feedback: QgsProcessingFeedback = None
+            self, filename: str, format: str = None, options=None, copyStyle=False, copyMetadata=False,
+            feedback: QgsProcessingFeedback = None
     ):
         from enmapboxprocessing.driver import Driver
 
         array = self.array()
         writer = Driver(filename, format, options, feedback).createFromArray(array, self.extent(), self.crs())
-        writer.setMetadata(self.metadata())
-        for bandNo in self.bandNumbers():
-            writer.setMetadata(self.metadata(bandNo), bandNo)
-            writer.setBandName(self.bandName(bandNo), bandNo)
-            writer.setNoDataValue(self.noDataValue(bandNo), bandNo)
-            writer.setWavelength(self.wavelength(bandNo), bandNo)
-            writer.setFwhm(self.fwhm(bandNo), bandNo)
-            writer.setBadBandMultiplier(self.badBandMultiplier(bandNo), bandNo)
-        writer.close()
+
+        if copyMetadata:
+            writer.setMetadata(self.metadata())
+            for bandNo in self.bandNumbers():
+                writer.setMetadata(self.metadata(bandNo), bandNo)
+                writer.setBandName(self.bandName(bandNo), bandNo)
+                writer.setNoDataValue(self.noDataValue(bandNo), bandNo)
+                writer.setWavelength(self.wavelength(bandNo), bandNo)
+                writer.setFwhm(self.fwhm(bandNo), bandNo)
+                writer.setBadBandMultiplier(self.badBandMultiplier(bandNo), bandNo)
+            writer.close()
+
+        if copyStyle:
+            renderer = self.layer.renderer().clone()
+            outraster = QgsRasterLayer(filename)
+            outraster.setRenderer(renderer)
+            outraster.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
