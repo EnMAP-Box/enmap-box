@@ -325,11 +325,12 @@ def initAll():
     Calls other init routines required to run the EnMAP-Box properly
     """
     initEnMAPBoxResources()
-    from enmapbox.qgispluginsupport.qps import \
-        registerSpectralLibraryIOs, \
-        registerSpectralLibraryPlotFactories
+    from enmapbox.qgispluginsupport.qps import registerSpectralLibraryIOs, registerSpectralLibraryPlotFactories
     registerSpectralLibraryIOs()
     registerSpectralLibraryPlotFactories()
+
+    from enmapbox.provider.maskrasterdataprovider import register_data_provider
+    register_data_provider()
 
     registerEditorWidgets()
     registerExpressionFunctions()
