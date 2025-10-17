@@ -7,9 +7,10 @@ from osgeo import gdal, gdal_array
 from enmapbox import initPythonPaths
 from enmapbox.exampledata import enmap as pathEnMAP
 from enmapbox.exampledata import hires as pathHyMap
-from enmapbox.testing import EnMAPBoxTestCase
+from enmapbox.testing import EnMAPBoxTestCase, start_app
 from qgis.core import QgsRasterLayer, QgsProject, QgsRasterRenderer, QgsRectangle, QgsCoordinateReferenceSystem
 
+start_app()
 initPythonPaths()
 
 try:
