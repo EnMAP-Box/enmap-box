@@ -27,6 +27,9 @@ class TestReportWriter(TestCase):
                 caption='Table with Double Column Header'
             )
 
+            # Explicitly close the report *before* the 'with' block ends
+            report.close()
+
     def test2(self):
         import csv
         with open(self.filename('eggs.csv'), 'w', newline='') as csvfile:
