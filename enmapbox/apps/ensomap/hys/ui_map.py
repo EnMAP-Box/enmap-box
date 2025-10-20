@@ -21,6 +21,7 @@ import hys.feat_specind_fe1   as fe1
 import hys.feat_specan_oc1    as oc1
 import hys.feat_specan_oc2    as oc2
 import hys.feat_specan_oc3    as oc3
+import hys.feat_specan_oc4    as oc4
 import hys.feat_specind_nsmi  as nsmi
 # import hys.feat_specan_smgm   as smgm
 import hys.feat_specind_ndgi  as ndgi
@@ -123,6 +124,7 @@ class ui_map:
         self.add_soil('OC1Check', oc1, 'oc1')
         self.add_soil('OC2Check', oc2, 'oc2')
         self.add_soil('OC3Check', oc3, 'oc3')
+        self.add_soil('OC4Check', oc4, 'oc4')
         self.gui.widget_tab_page_close()
 
         self.gui.widget_tab_page('Gypsum')
