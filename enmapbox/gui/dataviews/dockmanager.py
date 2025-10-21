@@ -23,21 +23,6 @@ import uuid
 from os.path import basename, dirname
 from typing import Optional, List, Dict, Union
 
-from qgis.PyQt.QtCore import Qt, QMimeData, QModelIndex, QObject, QTimer, pyqtSignal, QEvent, \
-    QSortFilterProxyModel, QCoreApplication
-from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDropEvent, QDragLeaveEvent
-from qgis.PyQt.QtWidgets import QHeaderView, QMenu, QAbstractItemView, QApplication, QWidget, QToolButton, QAction
-from qgis.PyQt.QtXml import QDomDocument, QDomElement
-from qgis.core import Qgis, QgsCoordinateReferenceSystem, QgsMapLayer, QgsVectorLayer, QgsRasterLayer, \
-    QgsProject, QgsReadWriteContext, \
-    QgsLayerTreeLayer, QgsLayerTreeNode, QgsLayerTreeGroup, \
-    QgsLayerTreeModelLegendNode, QgsLayerTree, QgsLayerTreeModel, QgsLayerTreeUtils, \
-    QgsPalettedRasterRenderer
-from qgis.core import QgsWkbTypes
-from qgis.gui import QgsLayerTreeProxyModel
-from qgis.gui import QgsLayerTreeView, \
-    QgsMapCanvas, QgsLayerTreeViewMenuProvider, QgsLayerTreeMapCanvasBridge, QgsDockWidget, QgsMessageBar
-
 from enmapbox import debugLog
 from enmapbox.gui import \
     SpectralLibraryWidget, SpatialExtent
@@ -57,6 +42,20 @@ from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library, pro
 from enmapbox.qgispluginsupport.qps.utils import loadUi
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtCore import Qt, QMimeData, QModelIndex, QObject, QTimer, pyqtSignal, QEvent, \
+    QSortFilterProxyModel, QCoreApplication
+from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDropEvent, QDragLeaveEvent
+from qgis.PyQt.QtWidgets import QHeaderView, QMenu, QAbstractItemView, QApplication, QWidget, QToolButton, QAction
+from qgis.PyQt.QtXml import QDomDocument, QDomElement
+from qgis.core import Qgis, QgsCoordinateReferenceSystem, QgsMapLayer, QgsVectorLayer, QgsRasterLayer, \
+    QgsProject, QgsReadWriteContext, \
+    QgsLayerTreeLayer, QgsLayerTreeNode, QgsLayerTreeGroup, \
+    QgsLayerTreeModelLegendNode, QgsLayerTree, QgsLayerTreeModel, QgsLayerTreeUtils, \
+    QgsPalettedRasterRenderer
+from qgis.core import QgsWkbTypes
+from qgis.gui import QgsLayerTreeProxyModel
+from qgis.gui import QgsLayerTreeView, \
+    QgsMapCanvas, QgsLayerTreeViewMenuProvider, QgsLayerTreeMapCanvasBridge, QgsDockWidget, QgsMessageBar
 
 
 class LayerTreeNode(QgsLayerTree):
@@ -798,18 +797,19 @@ class DockManager(QObject):
             if isinstance(speclib, QgsVectorLayer):
                 kwds['name'] = speclib.name()
             dock = SpectralLibraryDock(*args, **kwds)
-            dock.speclib().willBeDeleted.connect(lambda *args, d=dock: self.removeDock(d))
+            # dock.speclib().willBeDeleted.connect(lambda *args, d=dock: self.removeDock(d))
             if isinstance(self.mMessageBar, QgsMessageBar):
                 dock.mSpeclibWidget.setMainMessageBar(self.mMessageBar)
             dock.speclibWidget().setProject(self.project())
-            self.dataSourceManager().addDataSources(dock.speclib())
 
-            if speclib is None:
-                sl = dock.speclib()
-                # speclib did not exists before and is an in-memory layer?
-                # remove source after closing the dock
-                if isinstance(sl, QgsVectorLayer) and sl.providerType() == 'memory':
-                    dock.sigClosed.connect(lambda *args, slib=sl: self.dataSourceManager().removeDataSources([sl]))
+            # self.dataSourceManager().addDataSources(dock.speclib())
+
+            # if speclib is None:
+            #    sl = dock.speclib()
+            #    # speclib did not exists before and is an in-memory layer?
+            #    # remove source after closing the dock
+            #    if isinstance(sl, QgsVectorLayer) and sl.providerType() == 'memory':
+            #        dock.sigClosed.connect(lambda *args, slib=sl: self.dataSourceManager().removeDataSources([sl]))
 
         elif cls == AttributeTableDock:
             layer = kwds.pop('layer', None)
@@ -918,9 +918,9 @@ class DockManagerTreeModel(QgsLayerTreeModel):
 
     def findDockNode(self,
                      object: Union[str, QgsMapCanvas, QgsRasterLayer, QgsVectorLayer, SpectralLibraryWidget]) \
-            -> DockTreeNode:
+            -> Optional[DockTreeNode]:
         """
-        Returns the dock that contains the given object
+        Returns a dock that contains the given object
         :param object:
         :return:
         """
@@ -934,6 +934,9 @@ class DockManagerTreeModel(QgsLayerTreeModel):
             for node in self.dockTreeNodes():
                 if isinstance(node, MapDockTreeNode) and node.findLayer(object):
                     return node
+                elif isinstance(node, SpeclibDockTreeNode):
+                    if object in node.speclibWidget().plotModel().sourceLayers():
+                        return node
 
         else:
             node = self.rootNode.findGroup(str(object))

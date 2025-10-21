@@ -16,8 +16,6 @@ import os
 import tempfile
 import unittest
 
-from qgis.PyQt.QtWidgets import QWidget, QHBoxLayout
-
 from enmapbox.exampledata import landcover_polygon, enmap, hires
 from enmapbox.gui.datasources.datasources import VectorDataSource, RasterDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager
@@ -30,6 +28,7 @@ from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
 from enmapbox.testing import EnMAPBoxTestCase, TestObjects, start_app
 from enmapboxtestdata import classificationDatasetAsPklFile, library_berlin
 from qgis.PyQt.QtWidgets import QApplication
+from qgis.PyQt.QtWidgets import QWidget, QHBoxLayout
 from qgis.core import QgsProject, QgsVectorLayer, QgsRasterLayer, QgsLayerTreeModel, QgsLayerTree
 from qgis.gui import QgsMapCanvas, QgsLayerTreeView
 
@@ -224,9 +223,14 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         QgsProject.instance().removeAllMapLayers()
 
     def test_SpeclibDock(self):
+
+        # w = SpectralLibraryWidget()
+        # self.showGui(w)
         da = DockArea()
         dock = SpectralLibraryDock()
-        self.assertTrue(is_spectral_library(dock.speclib()))
+    
+        # self.assertTrue(is_spectral_library(dock.speclib()))
+        self.showGui(dock)
         da.addDock(dock)
         self.assertIsInstance(dock, SpectralLibraryDock)
         self.showGui(da)

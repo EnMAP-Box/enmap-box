@@ -24,6 +24,15 @@ import uuid
 from math import ceil
 from typing import List
 
+from enmapbox.gui import SpectralLibraryWidget
+from enmapbox.gui.mapcanvas import MapCanvas, CanvasLink
+from enmapbox.gui.utils import enmapboxUiPath
+from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea import DockArea as pgDockArea
+from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.Dock import Dock as pgDock
+from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.Dock import DockLabel as pgDockLabel
+from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.DockArea import TempAreaWindow
+from enmapbox.qgispluginsupport.qps.utils import loadUi
+from enmapboxprocessing.utils import Utils
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtCore import pyqtSignal, QSettings, Qt, QMimeData, QPoint, QUrl, QObject, QSize, QByteArray
 from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QResizeEvent, \
@@ -35,16 +44,6 @@ from qgis.core import QgsLayerTree
 from qgis.core import QgsLayerTreeLayer
 from qgis.core import QgsVectorLayer
 from qgis.gui import QgsMapCanvas
-
-from enmapbox.gui import SpectralLibraryWidget
-from enmapbox.gui.mapcanvas import MapCanvas, CanvasLink
-from enmapbox.gui.utils import enmapboxUiPath
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea import DockArea as pgDockArea
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.Dock import Dock as pgDock
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.Dock import DockLabel as pgDockLabel
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.DockArea import TempAreaWindow
-from enmapbox.qgispluginsupport.qps.utils import loadUi
-from enmapboxprocessing.utils import Utils
 
 RX_HTML_FILE = re.compile(r'\.(html|html|xhtml)$', re.I)
 
@@ -804,19 +803,19 @@ class SpectralLibraryDock(Dock):
         super(SpectralLibraryDock, self).__init__(*args, **kwds)
 
         self.mSpeclibWidget: SpectralLibraryWidget = SpectralLibraryWidget(parent=self, speclib=speclib)
-        self.mSpeclibWidget.spectralLibraryPlotWidget().optionShowVisualizationSettings.setChecked(False)
+        # self.mSpeclibWidget.spectralLibraryPlotWidget().optionShowVisualizationSettings.setChecked(False)
         self.mSpeclibWidget.sigLoadFromMapRequest.connect(self.sigLoadFromMapRequest)
         self.layout.addWidget(self.mSpeclibWidget)
 
-        speclib: QgsVectorLayer = self.mSpeclibWidget.speclib()
+        # speclib: QgsVectorLayer = self.mSpeclibWidget.speclib()
 
-        name = kwds.get('name')
-        if isinstance(name, str):
-            speclib.setName(name)
+        # name = kwds.get('name')
+        # if isinstance(name, str):
+        #    speclib.setName(name)
 
-        self.setTitle(speclib.name())
-        speclib.nameChanged.connect(lambda slib=speclib: self.setTitle(slib.name()))
-        self.sigTitleChanged.connect(speclib.setName)
+        # self.setTitle(speclib.name())
+        # speclib.nameChanged.connect(lambda slib=speclib: self.setTitle(slib.name()))
+        # self.sigTitleChanged.connect(speclib.setName)
 
     def speclibWidget(self) -> SpectralLibraryWidget:
         """
@@ -825,9 +824,9 @@ class SpectralLibraryDock(Dock):
         """
         return self.mSpeclibWidget
 
-    def speclib(self) -> QgsVectorLayer:
-        """Returns the underlying spectral library"""
-        return self.mSpeclibWidget.speclib()
+    # def speclib(self) -> QgsVectorLayer:
+    #    """Returns the underlying spectral library"""
+    #    return self.mSpeclibWidget.speclib()
 
     def populateContextMenu(self, menu: QMenu):
         """

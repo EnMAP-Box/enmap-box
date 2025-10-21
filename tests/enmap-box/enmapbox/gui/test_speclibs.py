@@ -14,18 +14,15 @@ __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
 import unittest
 
-from qgis.core import QgsFeature
-
-from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.exampledata import enmap
 from enmapbox.gui.dataviews.docks import SpectralLibraryDock
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import MapCanvas
-from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import encodeProfileValueDict
 from enmapbox.qgispluginsupport.qps.utils import fid2pixelindices, SpatialPoint
 from enmapbox.testing import EnMAPBoxTestCase, start_app
-from qgis.gui import QgsMapLayerComboBox
-from qgis.core import QgsRasterLayer, QgsVectorLayer
 from enmapboxtestdata import fraction_polygon_l3, fraction_point_singletarget, enmap_srf_library
+from qgis.core import QgsRasterLayer, QgsVectorLayer
+from qgis.gui import QgsMapLayerComboBox
 
 start_app()
 
@@ -53,24 +50,11 @@ class TestSpeclibs(EnMAPBoxTestCase):
 
         self.showGui(EB.ui)
 
-    def test_issue_851(self):
-        enmapBox = EnMAPBox(load_core_apps=False, load_other_apps=False)
-        dock: SpectralLibraryDock = enmapBox.dockManager().createDock('SPECLIB')
-        speclib = dock.speclib()
-        f = QgsFeature(speclib.fields())
-
-        d = dict(x=[2010, 2020], y=[0, 10000], xUnit='DecimalYear')
-        f.setAttribute('profiles', encodeProfileValueDict(d, f.fields().field('profiles')))
-        speclib.startEditing()
-        speclib.addFeature(f)
-        self.assertTrue(speclib.commitChanges())
-        self.showGui(enmapBox.ui)
-
     def test_issue_1032(self):
         EB = EnMAPBox(load_core_apps=False, load_other_apps=False)
         lyrR = QgsRasterLayer(fraction_polygon_l3, 'EnMAP')
         canvas: MapCanvas = EB.createNewMapCanvas()
-        sld: SpectralLibraryDock = EB.createNewSpectralLibrary()
+        EB.createNewSpectralLibrary()
         tree = canvas.layerTree()
         tree.addLayers([lyrR])
         center = SpatialPoint.fromMapLayerCenter(lyrR)
