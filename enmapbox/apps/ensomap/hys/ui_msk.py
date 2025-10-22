@@ -360,7 +360,7 @@ class ui_msk:
         vNCAI  = self.gui.gui['msk_set_ncai'].isChecked()
         if not vWater and not vNDVI and not vNCAI:
             msg = "Select at least a soil mask"
-            hsy.display_error(self, msg)
+            hys.display_error(self, msg)
             return
         
         # calculate tile
