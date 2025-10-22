@@ -12,6 +12,7 @@ import numba as nb
 
 __bands__    = [660, 800]
 __filename__ = "_ndvi"
+__th_default__ = 0.24
 
 
 

@@ -12,6 +12,7 @@ import numba as nb
 
 __bands__    = [2000, 2100, 2200]
 __filename__ = "_ncai"
+__th_default__ = 0.03
 
 
 @nb.jit(nopython=True)

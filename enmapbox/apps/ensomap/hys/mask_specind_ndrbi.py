@@ -10,6 +10,7 @@ import numba as nb
 
 __bands__    = [460, 660]
 __filename__ = "_water"
+__th_default__ = 1.0
 
 
 # def check_bands(ubands, wvl):
