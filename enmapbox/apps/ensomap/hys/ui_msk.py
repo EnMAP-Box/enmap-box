@@ -72,20 +72,31 @@ class ui_msk:
 
         # NDRBI
         self.gui.widget_row()
-        self.gui.widget_check_button('Mask water areas using NDRBI:', ID='msk_set_ndrbi', width = 270, action=self.msk_select_ndrbi)
+        self.gui.widget_check_button('Mask water areas using NDRBI*:',
+                                     ID='msk_set_ndrbi', width = 270, action=self.msk_select_ndrbi)
         self.gui.widget_text(ID='msk_ndrbi')
         self.gui.widget_row_close()
 
         # NDVI
         self.gui.widget_row()
-        self.gui.widget_check_button('Mask green vegetated areas using NDVI:', ID='msk_set_ndvi', width = 270, action=self.msk_select_ndvi)
+        self.gui.widget_check_button('Mask green vegetated areas using NDVI*:',
+                                     ID='msk_set_ndvi', width = 270, action=self.msk_select_ndvi)
         self.gui.widget_text(ID = 'msk_ndvi')
         self.gui.widget_row_close()
 
         # NCAI
         self.gui.widget_row()
-        self.gui.widget_check_button('Mask dry vegetated areas using nCAI:', ID='msk_set_ncai', width = 270, action=self.msk_select_ncai)
+        self.gui.widget_check_button('Mask dry vegetated areas using nCAI*:',
+                                     ID='msk_set_ncai', width = 270, action=self.msk_select_ncai)
         self.gui.widget_text(ID = 'msk_ncai')
+        self.gui.widget_row_close()
+
+        self.gui.widget_add_spacing(5)
+        self.gui.widget_row()
+        self.gui.widget_label(text='     * '
+                                   'NRDBI = Normalized Difference Red Blue Index;  '
+                                   'NDVI = Normalized Difference Vegetation Index;  '
+                                   'nCAI = normalized Cellulose Absorption Index')
         self.gui.widget_row_close()
 
         self.gui.widget_group_box_close()
@@ -100,20 +111,20 @@ class ui_msk:
         self.gui.widget_row_close()
 
         self.gui.widget_row(alignment=Qt.AlignLeft)
-        self.gui.widget_label(text=' - NDRBI (Normalized Difference Red Blue Index - common range: 1.0):',
-                              width=400)
+        self.gui.widget_label(text=' - NDRBI (common threshold range: around 1.0):',
+                              width=270)
         self.gui.widget_text(ID='msk_txt_th_ndrbi', text=str(ndrbi.__th_default__), edit=True, width=40)
         self.gui.widget_row_close()
 
         self.gui.widget_row(alignment=Qt.AlignLeft)
-        self.gui.widget_label(text=' - NDVI (Normalized Difference Vegetation Index - common range: 0.2 - 0.4):',
-                              width=400)
+        self.gui.widget_label(text=' - NDVI (common threshold range: 0.2 - 0.4):',
+                              width=270)
         self.gui.widget_text(ID='msk_txt_th_ndvi', text=str(ndvi.__th_default__), edit=True, width=40)
         self.gui.widget_row_close()
 
         self.gui.widget_row(alignment=Qt.AlignLeft)
-        self.gui.widget_label(text=' - nCAI (normalized Cellulose Absorption Index - common range: 0.01 - 0.04):',
-                              width=400)
+        self.gui.widget_label(text=' - nCAI (common threshold range: 0.01 - 0.04):',
+                              width=270)
         self.gui.widget_text(ID='msk_txt_th_ncai', text=str(ncai.__th_default__), edit=True, width=40)
         self.gui.widget_row_close()
 
