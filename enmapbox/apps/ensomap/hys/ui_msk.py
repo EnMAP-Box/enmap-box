@@ -369,7 +369,7 @@ class ui_msk:
         # define output filename
         dname = self.msk_dname + os.path.sep
 
-        # intialize the progress bar
+        # initialize the progress bar
         t1 = time.time()
         self.gui.gui['msk_prog_bar'].setMinimum(0)
         self.gui.gui['msk_prog_bar'].setMaximum(self.msk_cube.bn)
