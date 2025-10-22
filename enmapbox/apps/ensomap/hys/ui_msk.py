@@ -94,7 +94,7 @@ class ui_msk:
         self.gui.widget_add_spacing(5)
         self.gui.widget_row()
         self.gui.widget_label(text='     * '
-                                   'NRDBI = Normalized Difference Red Blue Index;  '
+                                   'NDRBI = Normalized Difference Red Blue Index;  '
                                    'NDVI = Normalized Difference Vegetation Index;  '
                                    'nCAI = normalized Cellulose Absorption Index')
         self.gui.widget_row_close()
