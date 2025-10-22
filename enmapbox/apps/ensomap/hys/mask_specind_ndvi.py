@@ -17,13 +17,13 @@ __th_default__ = 0.24
 
 
 @nb.jit(nopython=True)
-def process(cube):
+def process(cube, threshold):
     ny = cube.shape[1]
     nx = cube.shape[2]
     prod = np.zeros((ny, nx), dtype = np.float32)
     mask = np.zeros((ny, nx), dtype = np.int32)
     lim1 = -1.0
-    lim2 = 0.3
+    lim2 = threshold
     for ky in range(ny):
         for kx in range(nx):
             B0800 = cube[1, ky, kx]

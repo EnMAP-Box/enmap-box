@@ -434,17 +434,17 @@ class ui_msk:
             im = self.msk_cube.read(tile=k)
             omsk = np.ones((im.shape[1], im.shape[2]), dtype=np.int16)
             if vWater:
-                prod, mask = ndrbi.process(im[bind_water, :, :])
+                prod, mask = ndrbi.process(im[bind_water, :, :], th_ndrbi)
                 p_water.write(np.asarray(prod), tile=k)
                 m_water.write(np.asarray(mask).astype(np.int16), tile=k)
                 omsk *= np.asarray(mask).astype(np.int16)
             if vNDVI:
-                prod, mask = ndvi.process(im[bind_ndvi, :, :])
+                prod, mask = ndvi.process(im[bind_ndvi, :, :], th_ndvi)
                 p_ndvi.write(np.asarray(prod), tile=k)
                 m_ndvi.write(np.asarray(mask).astype(np.int16), tile=k)
                 omsk *= np.asarray(mask).astype(np.int16)
             if vNCAI:
-                prod, mask = ncai.process(im[bind_ncai, :, :])
+                prod, mask = ncai.process(im[bind_ncai, :, :], th_ncai)
                 p_ncai.write(np.asarray(prod), tile=k)
                 m_ncai.write(np.asarray(mask).astype(np.int16), tile=k)
                 omsk *= np.asarray(mask).astype(np.int16)
