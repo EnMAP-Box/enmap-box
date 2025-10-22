@@ -362,7 +362,18 @@ class ui_msk:
             msg = "Select at least a soil mask"
             hys.display_error(self, msg)
             return
-        
+
+        th_ndrbi = self.gui.gui['msk_txt_th_ndrbi'].text()
+        th_ndvi = self.gui.gui['msk_txt_th_ndvi'].text()
+        th_ncai = self.gui.gui['msk_txt_th_ncai'].text()
+        for i, n in zip([th_ndrbi, th_ndvi, th_ncai], ['NDRBI', 'NDVI', 'nCAI']):
+            if i.replace('-', '', 1).replace('.', '', 1).isdigit() is False:
+                hys.display_error(self, n + ' threshold is not valid!')
+                return
+        th_ndrbi = np.float32(th_ndrbi)
+        th_ndvi = np.float32(th_ndvi)
+        th_ncai = np.float32(th_ncai)
+
         # calculate tile
         self.msk_cube.tile_data()
 
