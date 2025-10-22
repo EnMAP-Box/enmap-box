@@ -84,7 +84,7 @@ class ui_msk:
 
         # NCAI
         self.gui.widget_row()
-        self.gui.widget_check_button('Mask dry vegetated areas using NCAI:', ID='msk_set_ncai', width = 270, action=self.msk_select_ncai)
+        self.gui.widget_check_button('Mask dry vegetated areas using nCAI:', ID='msk_set_ncai', width = 270, action=self.msk_select_ncai)
         self.gui.widget_text(ID = 'msk_ncai')
         self.gui.widget_row_close()
 
