@@ -450,7 +450,7 @@ class ui_msk:
                 omsk *= np.asarray(mask).astype(np.int16)
             self.msk_mask.write(omsk, tile=k)
         
-        # ipdate information
+        # update information
         msg = "Processing complete in %8.2f seconds"%(time.time() - t1)
         hys.display_information(self, msg)
         self.gui.gui['msk_prog_bar'].setValue(0)
