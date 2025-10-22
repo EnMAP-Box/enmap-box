@@ -91,6 +91,37 @@ class ui_msk:
         self.gui.widget_group_box_close()
 
         # -----------------------------------------------------------------------------------------
+        # GROUP BOX: ADVANCED OPTIONS
+        self.gui.widget_add_spacing(10)
+        self.gui.widget_group_box('ADVANCED OPTIONS')
+
+        self.gui.widget_row()
+        self.gui.widget_label(text='Refine threshold values:', height=15)
+        self.gui.widget_row_close()
+
+        self.gui.widget_row(alignment=Qt.AlignLeft)
+        self.gui.widget_label(text=' - NDRBI (Normalized Difference Red Blue Index - common range: 1.0):',
+                              width=400)
+        self.gui.widget_text(ID='msk_txt_th_ndrbi', text='1.0', edit=True, width=40)
+        self.gui.widget_row_close()
+
+        self.gui.widget_row(alignment=Qt.AlignLeft)
+        self.gui.widget_label(text=' - NDVI (Normalized Difference Vegetation Index - common range: 0.2 - 0.4):',
+                              width=400)
+        self.gui.widget_text(ID='msk_txt_th_ndvi', text='0.24', edit=True, width=40)
+        self.gui.widget_row_close()
+
+        self.gui.widget_row(alignment=Qt.AlignLeft)
+        self.gui.widget_label(text=' - nCAI (normalized Cellulose Absorption Index - common range: 0.01 - 0.04):',
+                              width=400)
+        self.gui.widget_text(ID='msk_txt_th_ncai', text='0.03', edit=True, width=40)
+        self.gui.widget_row_close()
+
+        # self.gui.widget_tool_button(text='Reset', action=self.cal_clear_gain_offset)
+
+        self.gui.widget_group_box_close()
+
+        # -----------------------------------------------------------------------------------------
         # GROUP BOX: INFORMATION
         self.gui.widget_add_spacing(10)
         self.gui.widget_group_box('INFORMATION')
