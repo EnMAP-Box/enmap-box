@@ -92,20 +92,27 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         self.assertIsInstance(EnMAPBox.instance(), EnMAPBox)
         self.assertEqual(EMB, EnMAPBox.instance())
 
-        widgets = [qgis.utils.iface.mainWindow(), EMB.ui]
+        mw = qgis.utils.iface.mainWindow()
+        windows = [mw, EMB.ui]
 
         if True:
+            w = QWidget()
+            w.setWindowTitle('QProject layers')
+            l = QGridLayout()
+            w.setLayout(l)
             cbQGIS = QgsMapLayerComboBox()
-            cbQGIS.setWindowTitle('QGIS Layers')
-            widgets.append(cbQGIS)
+            l.addWidget(QLabel('QGIS Layers'), 0, 0)
+            l.addWidget(cbQGIS, 0, 1)
 
             if Qgis.versionInt() > 32400:
                 cbEMB = QgsMapLayerComboBox()
                 cbEMB.setWindowTitle('EnMAP-Box Layers')
                 cbEMB.setProject(EMB.project())
-                widgets.append(cbEMB)
 
-        self.showGui(widgets)
+                l.addWidget(QLabel('EnMAP-Box Layers'), 1, 0)
+                l.addWidget(cbEMB, 1, 1)
+            windows.append(w)
+        self.showGui(windows)
         EMB.close()
         QgsProject.instance().removeAllMapLayers()
 
@@ -386,9 +393,7 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         self.assertIsInstance(speclibDock, SpectralLibraryDock)
         slw = speclibDock.speclibWidget()
         self.assertIsInstance(slw, SpectralLibraryWidget)
-        self.assertTrue(len(slw.speclib()) == 0)
-        center = SpatialPoint.fromMapCanvasCenter(mapDock.mapCanvas())
-
+        self.showGui(EMB.ui)
         EMB.close()
         QgsProject.instance().removeAllMapLayers()
 

@@ -20,11 +20,12 @@ from enmapbox.exampledata import landcover_polygon, enmap, hires
 from enmapbox.gui.datasources.datasources import VectorDataSource, RasterDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager
 from enmapbox.gui.dataviews.dockmanager import DockManager, SpeclibDockTreeNode, MapDockTreeNode, \
-    DockTreeView, DockManagerTreeModel
+    DockTreeView, DockManagerTreeModel, createDockTreeNode
 from enmapbox.gui.dataviews.docks import MapDock, DockArea, MimeDataDock, TextDock, SpectralLibraryDock, TextDockWidget
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.Dock import Dock as pgDock
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
+from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.testing import EnMAPBoxTestCase, TestObjects, start_app
 from enmapboxtestdata import classificationDatasetAsPklFile, library_berlin
 from qgis.PyQt.QtWidgets import QApplication
@@ -103,7 +104,8 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         self.assertIsInstance(TV, QgsLayerTreeView)
         speclibDock: SpectralLibraryDock = dm.createDock(SpectralLibraryDock)
 
-        speclibDockNode: SpeclibDockTreeNode = model.findDockNode(speclibDock.speclib())
+        node1: SpeclibDockTreeNode = model.findDockNode(speclibDock)
+        node2: SpeclibDockTreeNode = model.findDockNode(speclibDock.speclibWidget())
 
         w = QWidget()
         l = QHBoxLayout()
@@ -228,7 +230,7 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         # self.showGui(w)
         da = DockArea()
         dock = SpectralLibraryDock()
-    
+
         # self.assertTrue(is_spectral_library(dock.speclib()))
         self.showGui(dock)
         da.addDock(dock)
@@ -248,6 +250,19 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         del da, dock
 
         QgsProject.instance().removeAllMapLayers()
+
+    def test_SpeclibDockTreeNode(self):
+
+        sl1 = TestObjects.createSpectralLibrary(name='speclib1')
+        sl2 = TestObjects.createSpectralLibrary(name='speclib2')
+
+        dock = SpectralLibraryDock()
+        node = createDockTreeNode(dock)
+        self.assertIsInstance(node, SpeclibDockTreeNode)
+        slw = node.speclibWidget()
+        slw.plotModel()
+        self.assertIsInstance(slw, SpectralLibraryWidget)
+        s = ""
 
     def test_MapDockLayerHandling(self):
 

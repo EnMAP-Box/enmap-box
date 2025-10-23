@@ -218,7 +218,10 @@ def collectEnMAPBoxAlgorithms() -> typing.List[QgsProcessingAlgorithm]:
     try:
         from enmapbox.qgispluginsupport.qps.speclib.processing.aggregateprofiles import AggregateProfiles
         from enmapbox.qgispluginsupport.qps.speclib.processing.importspectralprofiles import ImportSpectralProfiles
-        algs.extend([AggregateProfiles(), ImportSpectralProfiles()])
+        from enmapbox.qgispluginsupport.qps.speclib.processing.exportspectralprofiles import ExportSpectralProfiles
+        from enmapbox.qgispluginsupport.qps.speclib.processing.extractspectralprofiles import ExtractSpectralProfiles
+
+        algs.extend([AggregateProfiles(), ImportSpectralProfiles(), ExportSpectralProfiles(), ExtractSpectralProfiles()])
     except Exception as ex:
         traceback.print_exc()
         info = f'Unable to load processing algorithms: {ex}'

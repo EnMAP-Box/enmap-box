@@ -48,4 +48,4 @@ class LibraryWriter(object):
             assert self.library.addFeature(feature)
 
     def writeToSource(self, filename: str) -> List[str]:
-        return SpectralLibraryUtils.writeToSource(self.library, filename)
+        return [str(p) for p in SpectralLibraryUtils.writeToSource(self.library, filename)]

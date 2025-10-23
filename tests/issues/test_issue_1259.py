@@ -6,7 +6,8 @@ from enmapboxprocessing.rasterreader import RasterReader
 from qgis.core import QgsProject
 from enmapbox import initAll
 from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog
-from enmapbox.qgispluginsupport.qps.qgsrasterlayerproperties import QgsRasterLayerSpectralProperties
+from enmapbox.qgispluginsupport.qps.qgsrasterlayerproperties import QgsRasterLayerSpectralProperties, \
+    SpectralPropertyKeys
 from enmapbox.testing import TestCase, start_app
 from qgis.core import QgsRasterLayer
 from osgeo import gdal
@@ -37,7 +38,7 @@ class TestIssue1259SlowReading(TestCase):
         lyr = QgsRasterLayer(path_toa, 'tanager')
         getTime('Open Layer')
         prop = QgsRasterLayerSpectralProperties.fromRasterLayer(lyr)
-        wl1 = prop.wavelengths()
+        wl1 = prop.bandValues(42, SpectralPropertyKeys.Wavelength)
         wlu1 = prop.wavelengthUnits()
 
         getTime('Read spectral properties (QPS)')

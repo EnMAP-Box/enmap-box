@@ -747,16 +747,32 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             # open layer styling dock
             pass
 
-    def showAttributeTable(self, lyr: QgsVectorLayer,
+    def showAttributeTable(self, lyr: Union[None, QgsVectorLayer, str],
                            filerExpression: str = "",
                            filterMode: QgsAttributeTableFilterModel.FilterMode = None):
+        """
+        Opens the attribute table for the given layer.
+        """
 
         if lyr is None:
             lyr = self.currentLayer()
-        if is_spectral_library(lyr):
-            dock = self.createDock(SpectralLibraryDock, speclib=lyr)
-        elif isinstance(lyr, QgsVectorLayer):
-            dock = self.createDock(AttributeTableDock, layer=lyr)
+        elif isinstance(lyr, str):
+            lyr = self.project().mapLayer(lyr)
+
+        # if is_spectral_library(lyr):
+        #     dock = self.createDock(SpectralLibraryDock, speclib=lyr)
+        if isinstance(lyr, QgsVectorLayer) and lyr.isValid():
+            # check if a dock already exists for this layer
+            d = None
+            for dock in self.docks(AttributeTableDock):
+                dock: AttributeTableDock
+                if dock.vectorLayer() == lyr:
+                    d = dock
+                    break
+            if isinstance(d, AttributeTableDock):
+                d.show()
+            else:
+                self.createDock(AttributeTableDock, layer=lyr)
 
     def showPackageInstaller(self):
         """
@@ -1148,7 +1164,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         self.ui.spectralProfileSourcePanel.addSources(sources)
         self.ui.spectralProfileSourcePanel.setDefaultSource(sources[0])
+        self.ui.spectralProfileSourcePanel.spectralProfileBridge().setProject(self.project())
         self.sigMapCanvasKeyPressed.connect(self.onMapCanvasKeyPressed)
+
 
         import processing.gui.ProcessingToolbox
         if processing.gui.ProcessingToolbox.iface is None:
@@ -1489,12 +1507,20 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         assert isinstance(dock, Dock)
 
         if isinstance(dock, SpectralLibraryDock):
-            dock.sigLoadFromMapRequest.connect(lambda: self.setMapTool(MapTools.SpectralProfile))
             slw = dock.speclibWidget()
             assert isinstance(slw, SpectralLibraryWidget)
-            slw.plotWidget().backgroundBrush().setColor(QColor('black'))
+            slw.setProject(self.project())
+            # open attributes tables and property dialogs is handle by EnMAP-Box
+            slw.setDelegateOpenRequests(True)
+
+            slw.sigLoadFromMapRequest.connect(lambda: self.setMapTool(MapTools.SpectralProfile))
+
+            slw.sigOpenAttributeTableRequest.connect(self.showAttributeTable)
+            slw.sigOpenLayerPropertiesRequest.connect(self.showLayerProperties)
+            # slw.plotWidget().backgroundBrush().setColor(QColor('black'))
             self.spectralProfileSourcePanel().addSpectralLibraryWidgets(slw)
             slw.sigFilesCreated.connect(self.addSources)
+            self.dataSourceManager().addDataSources(slw.sourceLayers())
             # self.dataSourceManager().addSource(slw.speclib())
             # self.mapLayerStore().addMapLayer(slw.speclib(), addToLegend=False)
 
@@ -1528,7 +1554,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             dock.attributeTableWidget.setVectorLayerTools(self.mVectorLayerTools)
 
         if isinstance(dock, SpectralLibraryDock):
-            dock.speclibWidget().setVectorLayerTools(self.mVectorLayerTools)
+            slw = dock.speclibWidget()
+            # slw.sigMapCenterRequested.connect(self.mVectorLayerTools.sigPanRequest)
+            # dock.speclibWidget().setVectorLayerTools(self.mVectorLayerTools)
 
         self.sigDockAdded.emit(dock)
 
@@ -1561,12 +1589,18 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             panel.setProperty('has_been_shown_once', True)
 
         if len(self.docks(SpectralLibraryDock)) == 0:
-            dock = self.createDock(SpectralLibraryDock)
-            if isinstance(dock, SpectralLibraryDock):
-                slw: SpectralLibraryWidget = dock.speclibWidget()
-                slw.setViewVisibility(SpectralLibraryWidget.ViewType.ProfileView)
+            self.createDock(SpectralLibraryDock)
 
         if len(panel.mBridge) == 0:
+            speclibs = self.spectralLibraries()
+            if len(speclibs) == 0:
+                # create an empty, temporary spectral library to store pixel profiles
+                from enmapbox.testing import TestObjects
+                sl = TestObjects.createSpectralLibrary(n=0)
+                self.addSources([sl])
+                self.project().addMapLayer(sl)
+                s = ""
+
             panel.createRelation()
 
         panel.loadCurrentMapSpectra(spatialPoint, mapCanvas=mapCanvas, runAsync=runAsync)
@@ -2419,6 +2453,17 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
     def iconSize(self, dockedToolbar=False):
         # return self.ui.mActionAddDataSource.icon().availableSizes()[0]
         return QSize(16, 16)
+
+    def spectralLibraries(self) -> List[QgsVectorLayer]:
+        """
+        Returns a list of QgsVectorLayer objects that represent a spectral library, i.e. have one
+        or more fields that can store spectral profiles.
+        """
+        results = []
+        for lyr in self.project().mapLayers().values():
+            if isinstance(lyr, QgsVectorLayer) and is_spectral_library(lyr):
+                results.append(lyr)
+        return results
 
     def spectralLibraryWidgets(self) -> typing.List[SpectralLibraryWidget]:
         """
