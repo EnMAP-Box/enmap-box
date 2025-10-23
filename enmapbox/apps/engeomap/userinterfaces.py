@@ -22,7 +22,7 @@ Changelog
 EnGeoMAP Version 3.2
 Date: February 2023
 Author: Helge L. C. Daempfling
-Email: hdaemp@gfz-potsdam.de
+Email: hdaemp@gfz.de
 
 See algorithms.py and engeomap_aux_funcul.py
 
