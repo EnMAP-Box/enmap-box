@@ -278,10 +278,12 @@ class DataSourceManager(TreeModel):
             updateState = None
             path = source.source()
             lyr = None
+            dataItem: QgsDataItem = source.dataItem()
+
             if os.path.isfile(path):
                 updateState = Path(path).stat().st_mtime_ns
             else:
-                dataItem: QgsDataItem = source.dataItem()
+
                 if isinstance(dataItem, LayerItem):
                     lyr = dataItemToLayer(dataItem, project=self.project())
 
@@ -298,13 +300,14 @@ class DataSourceManager(TreeModel):
                 source.updateNodes()
             elif oldInfo != updateState:
                 self.mUpdateState[sid] = updateState
-                if dataItem.mapLayerType() == QgsMapLayerType.VectorLayer and isinstance(lyr, QgsVectorLayer):
-                    if updateState[-1]:
-                        # is spectral library
-                        icon = QIcon(r':/qps/ui/icons/speclib.svg')
-                    else:
-                        icon = QgsIconUtils.iconForLayer(lyr)
-                    dataItem.setIcon(icon)
+                if isinstance(dataItem, LayerItem):
+                    if dataItem.mapLayerType() == QgsMapLayerType.VectorLayer and isinstance(lyr, QgsVectorLayer):
+                        if updateState[-1]:
+                            # is spectral library
+                            icon = QIcon(r':/qps/ui/icons/speclib.svg')
+                        else:
+                            icon = QgsIconUtils.iconForLayer(lyr)
+                        dataItem.setIcon(icon)
                 source.updateNodes()
 
     def removeDataSources(self,
@@ -759,8 +762,8 @@ class DataSourceFactory(object):
     def create(source: any,
                name: str = None,
                show_dialogs: bool = True,
-               project: QgsProject = None,
-               parent: QWidget = None) -> List[DataSource]:
+               project: Optional[QgsProject] = None,
+               parent: Optional[QWidget] = None) -> List[DataSource]:
         """
         Searches the input for DataSources
         """
