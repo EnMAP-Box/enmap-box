@@ -47,7 +47,7 @@ class TestSpeclibs(EnMAPBoxTestCase):
         testDir = self.createTestOutputDirectory()
         path_fids = testDir / 'fid.tif'
         array, no_fid = fid2pixelindices(lyrR, lyrV, raster_fids=path_fids)
-
+        EB.removeSources()
         self.showGui(EB.ui)
 
     def test_issue_1032(self):
