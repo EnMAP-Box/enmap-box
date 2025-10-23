@@ -31,7 +31,7 @@ People who made large contributions to the EnMAP-Box (in alphabetical order).
 * Stefanie Steinhauser <stefanie.steinhauser@lmu.de>
 * Tobias Hank <tobias.hank@lmu.de>
 
-### GFZ German Research Centre For Geosciences, Potsdam, Germany
+### GFZ Helmholtz Centre for Geosciences, Potsdam, Germany
 
 * André Hollstein
 * Christian Mielke
