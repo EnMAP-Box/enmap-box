@@ -728,7 +728,7 @@ class DockManager(QObject):
         existingNames = [d.title() for d in existingDocks]
         n = len(existingDocks) + 1
         dockTypes = [MapDock, TextDock, MimeDataDock, WebViewDock, SpectralLibraryDock, AttributeTableDock]
-        dockBaseNames = ['Map', 'Text', 'MimeData', 'HTML Viewer', 'SpectralLibrary', 'Attribute Table']
+        dockBaseNames = ['Map', 'Text', 'MimeData', 'HTML Viewer', 'Profiles', 'Attribute Table']
         baseName = 'Dock'
         if cls in dockTypes:
             baseName = dockBaseNames[dockTypes.index(cls)]

@@ -221,7 +221,11 @@ def collectEnMAPBoxAlgorithms() -> typing.List[QgsProcessingAlgorithm]:
         from enmapbox.qgispluginsupport.qps.speclib.processing.exportspectralprofiles import ExportSpectralProfiles
         from enmapbox.qgispluginsupport.qps.speclib.processing.extractspectralprofiles import ExtractSpectralProfiles
 
-        algs.extend([AggregateProfiles(), ImportSpectralProfiles(), ExportSpectralProfiles(), ExtractSpectralProfiles()])
+        algs.extend([AggregateProfiles(),
+                     ImportSpectralProfiles(),
+                     ExportSpectralProfiles(),
+                     ExtractSpectralProfiles()
+                     ])
     except Exception as ex:
         traceback.print_exc()
         info = f'Unable to load processing algorithms: {ex}'
@@ -266,6 +270,7 @@ def registerEnMAPBoxProcessingProvider():
 
 def unregisterEnMAPBoxProcessingProvider():
     """Removes the EnMAPBoxProcessingProvider"""
+    return
     from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider, ID
     registry = QgsApplication.instance().processingRegistry()
     provider = registry.providerById(ID)

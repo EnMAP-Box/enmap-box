@@ -2146,7 +2146,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         """
         return self.mDataSourceManager.addDataSources(source, name=name, show_dialogs=show_dialogs)
 
-    def removeSources(self, dataSourceList: list = None):
+    def removeSources(self, dataSourceList: Optional[list] = None):
         """
         Removes data sources.
         Removes all sources available if `dataSourceList` remains unspecified.

@@ -797,6 +797,7 @@ class SpectralLibraryDock(Dock):
     """
     A Dock to show SpectralProfiles
     """
+
     # sigLoadFromMapRequest = pyqtSignal()
 
     def __init__(self, *args,
@@ -805,7 +806,8 @@ class SpectralLibraryDock(Dock):
                  **kwds):
         super(SpectralLibraryDock, self).__init__(*args, **kwds)
 
-        self.mSpeclibWidget: SpectralLibraryWidget = SpectralLibraryWidget(parent=self, speclib=speclib, project=project)
+        self.mSpeclibWidget: SpectralLibraryWidget = SpectralLibraryWidget(parent=self, speclib=speclib,
+                                                                           project=project)
         self.mSpeclibWidget.setDelegateOpenRequests(True)
         # self.mSpeclibWidget.spectralLibraryPlotWidget().optionShowVisualizationSettings.setChecked(False)
         # self.mSpeclibWidget.sigLoadFromMapRequest.connect(self.sigLoadFromMapRequest)
@@ -841,12 +843,6 @@ class SpectralLibraryDock(Dock):
 
         # here we might add Spectral Library Widget specific action
         # speclib / vector layer specific ones are accessible via the lower node
-
-        slw = self.speclibWidget()
-        if isinstance(slw, SpectralLibraryWidget):
-            menu.addSeparator()
-            for action in slw.tbSpeclibAction.actions():
-                menu.addAction(action)
 
 
 class MapDockLabel(DockLabel):
