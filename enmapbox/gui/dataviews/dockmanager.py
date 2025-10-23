@@ -1601,7 +1601,7 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         view: DockTreeView = self.mDockTreeView
         node = view.currentNode()
         if node is None or node == self.mDockTreeView.layerTreeModel().rootGroup():
-            return
+            return QMenu()
 
         menu = QMenu()
         menu.setToolTipsVisible(True)
@@ -1609,7 +1609,7 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         from enmapbox.gui.contextmenus import EnMAPBoxContextMenuRegistry
         EnMAPBoxContextMenuRegistry.instance().populateDataViewMenu(menu, view, node)
 
-        # last chance to add other menu actions
+        # a last chance to add other menu actions
         # self.mSignals.sigPopulateContextMenu.emit(menu)
         view.sigPopulateContextMenu.emit(menu)
 

@@ -977,7 +977,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         """
         SYNC_WITH_QGIS = True
 
-        # 1. sync own project to layer tree
+        # 1. sync own project to a layer tree
         EMB: EnMAPBoxProject = self.project()
 
         emb_layers = self.mapLayers()
@@ -988,11 +988,13 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             [lyr for lid, lyr in QGIS.mapLayers().items() if lyr.project() == EMB]
 
         for lyr in emb_layers:
-            if lyr.project() is None:
-                self.project().addMapLayer(lyr)
-            elif lyr.project() != EMB:
-                # layer is owned by another project
-                pass
+            if isinstance(lyr, QgsMapLayer):
+                if lyr.project() is None:
+                    self.project().addMapLayer(lyr)
+                elif lyr.project() != EMB:
+                    # layer is owned by another project
+                    pass
+            else:
                 s = ""
 
         to_remove_lyrs = [lyr for lyr in EMB.mapLayers().values() if lyr not in emb_layers]
@@ -2182,13 +2184,15 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         """
         return self.ui.menusWithTitle(title)
 
-    def showLayerProperties(self, mapLayer: QgsMapLayer):
+    def showLayerProperties(self, mapLayer: Union[None, str, QgsMapLayer] = None, **kwargs):
         """
         Show a map layer property dialog
         :param mapLayer:
         :return:
         """
-        if mapLayer is None:
+        if isinstance(mapLayer, str):
+            mapLayer = self.project().mapLayer(mapLayer)
+        elif mapLayer is None:
             mapLayer = self.currentLayer()
 
         if isinstance(mapLayer, (QgsVectorLayer, QgsRasterLayer)):

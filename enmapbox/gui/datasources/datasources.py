@@ -8,7 +8,6 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.core import QgsCoordinateReferenceSystem, QgsUnitTypes, \
     QgsMapLayerType, QgsVectorLayer, Qgis, QgsWkbTypes, QgsField, QgsProject
 from qgis.core import QgsDataItem, QgsLayerItem, QgsMapLayer, QgsRasterLayer
-
 from .metadata import CRSLayerTreeNode, RasterBandTreeNode, DataSourceSizesTreeNode
 from ...qgispluginsupport.qps.classification.classificationscheme import ClassificationScheme
 from ...qgispluginsupport.qps.models import TreeNode, PyObjectTreeNode
@@ -33,9 +32,13 @@ class LayerItem(QgsLayerItem):
     def hasReferenceLayer(self) -> bool:
         return isinstance(self.mLayerProject, QgsProject) and isinstance(self.mLayerID, str)
 
-    def setReferenceLayer(self, layer: QgsMapLayer):
+    def setReferenceLayer(self, layer: QgsMapLayer, project: QgsProject = None):
         assert isinstance(layer, QgsMapLayer)
-        self.mLayerProject = layer.project()
+        if project is None:
+            project = layer.project()
+        if project is None:
+            project = QgsProject.instance()
+        self.mLayerProject = project
         self.mLayerID = layer.id()
 
     def referenceLayer(self) -> Optional[QgsMapLayer]:
