@@ -22,7 +22,7 @@ from enmapbox.gui.mapcanvas import MapCanvas
 from enmapbox.qgispluginsupport.qps.utils import fid2pixelindices, SpatialPoint
 from enmapbox.testing import EnMAPBoxTestCase, start_app
 from enmapboxtestdata import fraction_polygon_l3, fraction_point_singletarget, enmap_srf_library
-from qgis._core import QgsProject
+from qgis.core import QgsProject
 from qgis.core import QgsRasterLayer, QgsVectorLayer
 from qgis.gui import QgsMapLayerComboBox
 
