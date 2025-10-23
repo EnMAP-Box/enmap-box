@@ -37,10 +37,8 @@ class TestIssue1259SlowReading(TestCase):
             s = ""
         lyr = QgsRasterLayer(path_toa, 'tanager')
         getTime('Open Layer')
-        prop = QgsRasterLayerSpectralProperties.fromRasterLayer(lyr)
-        wl1 = prop.bandValues(42, SpectralPropertyKeys.Wavelength)
-        wlu1 = prop.wavelengthUnits()
 
+        prop = QgsRasterLayerSpectralProperties.fromRasterLayer(lyr)
         getTime('Read spectral properties (QPS)')
 
         reader = RasterReader(lyr)
