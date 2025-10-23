@@ -1946,6 +1946,12 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                 if dataSource.isSpectralLibrary():
                     self.sigSpectralLibraryRemoved[str].emit(dataSource.source())
                     self.sigSpectralLibraryRemoved[VectorDataSource].emit(dataSource)
+                to_remove = []
+                for lid, lyr in self.project().mapLayers().items():
+                    if lyr.source() == dataSource.source():
+                        to_remove.append(lyr)
+                for lyr in to_remove:
+                    self.project().takeMapLayer(lyr)
 
         self.syncProjects()
 
