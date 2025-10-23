@@ -30,9 +30,10 @@ class LayerItem(QgsLayerItem):
         return self.mLayerID
 
     def hasReferenceLayer(self) -> bool:
-        return isinstance(self.mLayerProject, QgsProject) and isinstance(self.mLayerID, str)
+        return isinstance(self.mLayerProject, QgsProject) and isinstance(self.mLayerID,
+                                                                         str) and self.mLayerID in self.mLayerProject.mapLayers()
 
-    def setReferenceLayer(self, layer: QgsMapLayer, project: QgsProject = None):
+    def setReferenceLayer(self, layer: QgsMapLayer, project: Optional[QgsProject] = None):
         assert isinstance(layer, QgsMapLayer)
         if project is None:
             project = layer.project()
@@ -51,7 +52,7 @@ class LayerItem(QgsLayerItem):
 
 
 def dataItemToLayer(dataItem: QgsDataItem,
-                    project: QgsProject = None) -> Optional[QgsMapLayer]:
+                    project: Optional[QgsProject] = None) -> Optional[QgsMapLayer]:
     if project is None:
         project = QgsProject.instance()
 
@@ -145,7 +146,7 @@ class SpatialDataSource(DataSource):
         self.mNodeSize.appendChildNodes([self.nodeExtXmu, self.nodeExtYmu])
         self.appendChildNodes(self.nodeCRS)
 
-    def asMapLayer(self, project: QgsProject = None) -> QgsMapLayer:
+    def asMapLayer(self, project: Optional[QgsProject] = None) -> QgsMapLayer:
         if project is None:
             project = QgsProject.instance()
         return dataItemToLayer(self.dataItem(), project=project)
