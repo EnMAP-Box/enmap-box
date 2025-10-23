@@ -22,7 +22,7 @@ import os
 import re
 import uuid
 from math import ceil
-from typing import List
+from typing import List, Optional
 
 from enmapbox.gui import SpectralLibraryWidget
 from enmapbox.gui.mapcanvas import MapCanvas, CanvasLink
@@ -39,7 +39,7 @@ from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDragLeaveEv
     QContextMenuEvent, QTextCursor
 from qgis.PyQt.QtWidgets import QToolButton, QMenu, QMainWindow, QFileDialog, QWidget, QMessageBox, QWidgetItem, \
     QApplication, QStyle, QProgressBar, QTextEdit
-from qgis.core import QgsCoordinateReferenceSystem, QgsMapLayer
+from qgis.core import QgsCoordinateReferenceSystem, QgsMapLayer, QgsProject
 from qgis.core import QgsLayerTree
 from qgis.core import QgsLayerTreeLayer
 from qgis.core import QgsVectorLayer
@@ -797,14 +797,18 @@ class SpectralLibraryDock(Dock):
     """
     A Dock to show SpectralProfiles
     """
-    sigLoadFromMapRequest = pyqtSignal()
+    # sigLoadFromMapRequest = pyqtSignal()
 
-    def __init__(self, *args, speclib: QgsVectorLayer = None, **kwds):
+    def __init__(self, *args,
+                 speclib: Optional[QgsVectorLayer] = None,
+                 project: Optional[QgsProject] = None,
+                 **kwds):
         super(SpectralLibraryDock, self).__init__(*args, **kwds)
 
-        self.mSpeclibWidget: SpectralLibraryWidget = SpectralLibraryWidget(parent=self, speclib=speclib)
+        self.mSpeclibWidget: SpectralLibraryWidget = SpectralLibraryWidget(parent=self, speclib=speclib, project=project)
+        self.mSpeclibWidget.setDelegateOpenRequests(True)
         # self.mSpeclibWidget.spectralLibraryPlotWidget().optionShowVisualizationSettings.setChecked(False)
-        self.mSpeclibWidget.sigLoadFromMapRequest.connect(self.sigLoadFromMapRequest)
+        # self.mSpeclibWidget.sigLoadFromMapRequest.connect(self.sigLoadFromMapRequest)
         self.layout.addWidget(self.mSpeclibWidget)
 
         # speclib: QgsVectorLayer = self.mSpeclibWidget.speclib()
