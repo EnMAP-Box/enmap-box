@@ -11,6 +11,7 @@ from qgis.core import QgsProject, edit
 start_app()
 initAll()
 
+
 class TestProcessingAlgorithm(QgsProcessingAlgorithm):
 
     def __init__(self):
@@ -49,8 +50,6 @@ class TestProcessingAlgorithm(QgsProcessingAlgorithm):
 class TestIssue764(EnMAPBoxTestCase):
 
     def test_SpectralProcessing_Logging(self):
-
-
         speclib = TestObjects.createSpectralLibrary(2)
 
         alg = FitPcaAlgorithm()

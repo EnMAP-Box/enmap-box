@@ -1167,7 +1167,6 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.ui.spectralProfileSourcePanel.spectralProfileBridge().setProject(self.project())
         self.sigMapCanvasKeyPressed.connect(self.onMapCanvasKeyPressed)
 
-
         import processing.gui.ProcessingToolbox
         if processing.gui.ProcessingToolbox.iface is None:
             processing.gui.ProcessingToolbox.iface = qgis.utils.iface

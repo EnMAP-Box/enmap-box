@@ -16,11 +16,11 @@
 *                                                                         *
 ***************************************************************************
 """
+import logging
 import os
 import re
 import time
 import uuid
-import logging
 from os.path import basename, dirname
 from typing import Optional, List, Dict, Union, Any
 
@@ -38,7 +38,7 @@ from enmapbox.gui.mimedata import \
     extractMapLayers, containsMapLayers
 from enmapbox.gui.utils import enmapboxUiPath
 from enmapbox.qgispluginsupport.qps.layerproperties import pasteStyleFromClipboard, pasteStyleToClipboard
-from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library, profile_field_list
+from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
 from enmapbox.qgispluginsupport.qps.utils import loadUi
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.utils import Utils
@@ -58,6 +58,7 @@ from qgis.gui import QgsLayerTreeView, \
     QgsMapCanvas, QgsLayerTreeViewMenuProvider, QgsLayerTreeMapCanvasBridge, QgsDockWidget, QgsMessageBar
 
 logger = logging.getLogger(__name__)
+
 
 class LayerTreeNode(QgsLayerTree):
     sigIconChanged = pyqtSignal()
@@ -283,7 +284,6 @@ class SpeclibDockTreeNode(DockTreeNode):
         # self.addChildNode(self.controlNode)
 
         # speclib = self.speclib()
-
 
     def _update_legend_nodes(self):
         if isinstance(self.speclibNode, QgsLayerTreeLayer):
@@ -705,7 +705,8 @@ class DockManager(QObject):
             return True
         return False
 
-    def createDock(self, dockType: Union[str,type, Any], *args, cls=None, position='bottom', relativeTo=None, **kwds) -> Dock:
+    def createDock(self, dockType: Union[str, type, Any], *args, cls=None, position='bottom', relativeTo=None,
+                   **kwds) -> Dock:
         """
         Creates and returns a new Dock
         :param cls:
@@ -780,7 +781,6 @@ class DockManager(QObject):
             # dock.speclib().willBeDeleted.connect(lambda *args, d=dock: self.removeDock(d))
             if isinstance(self.mMessageBar, QgsMessageBar):
                 dock.mSpeclibWidget.setMainMessageBar(self.mMessageBar)
-
 
             # self.dataSourceManager().addDataSources(dock.speclib())
 

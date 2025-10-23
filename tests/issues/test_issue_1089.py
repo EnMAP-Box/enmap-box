@@ -10,6 +10,7 @@ from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProject
 start_app()
 initAll()
 
+
 class TestIssue1089(EnMAPBoxTestCase):
 
     def test_memoryConversion(self):

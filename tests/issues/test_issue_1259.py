@@ -1,22 +1,22 @@
 import datetime
+import os
 import unittest
 from pathlib import Path
 
-from enmapboxprocessing.rasterreader import RasterReader
-from qgis.core import QgsProject
-from enmapbox import initAll
-from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog
-from enmapbox.qgispluginsupport.qps.qgsrasterlayerproperties import QgsRasterLayerSpectralProperties, \
-    SpectralPropertyKeys
-from enmapbox.testing import TestCase, start_app
-from qgis.core import QgsRasterLayer
 from osgeo import gdal
 
-from rasterlayerstylingapp import RasterLayerStylingPanel
+from enmapbox import initAll
+from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog
+from enmapbox.qgispluginsupport.qps.qgsrasterlayerproperties import QgsRasterLayerSpectralProperties
+from enmapbox.testing import TestCase, start_app
+from enmapboxprocessing.rasterreader import RasterReader
+from qgis.core import QgsProject
+from qgis.core import QgsRasterLayer
 
 start_app()
 initAll()
-path_tanager = Path(r'/home/jakimowb/Downloads/20250510_005001_00_4001_basic_radiance.h5')
+path_tanager = Path(os.environ.get('PATH_TANAGER_EXAMPLE', ''))
+
 
 class TestIssue1259SlowReading(TestCase):
 
@@ -26,13 +26,14 @@ class TestIssue1259SlowReading(TestCase):
 
         TIMES = {}
         t0 = datetime.datetime.now()
+
         def getTime(msg: str):
             nonlocal t0
             TIMES[msg] = datetime.datetime.now() - t0
             t0 = datetime.datetime.now()
 
         ds = gdal.Open(path_toa)
-        for b in range(1, ds.RasterCount+1):
+        for b in range(1, ds.RasterCount + 1):
             band = ds.GetRasterBand(b)
             s = ""
         lyr = QgsRasterLayer(path_toa, 'tanager')
@@ -44,12 +45,10 @@ class TestIssue1259SlowReading(TestCase):
         reader = RasterReader(lyr)
         wl2 = []
         wlu2 = []
-        for b in range(1, lyr.bandCount()+1):
+        for b in range(1, lyr.bandCount() + 1):
             wl2.append(reader.wavelength(b))
             wlu2.append(reader.wavelengthUnits(b))
         getTime('Read spectral properties (RasterReader')
-
-
 
         dialog = showLayerPropertiesDialog(lyr, modal=False)
         getTime('Open properties dialog')
