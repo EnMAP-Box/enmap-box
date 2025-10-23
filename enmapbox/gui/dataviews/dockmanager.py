@@ -1017,10 +1017,8 @@ class DockManagerTreeModel(QgsLayerTreeModel):
                             and node.dock.vectorLayer().source() == d.source():
                         docks_to_close.append(node.dock)
 
-                    elif isinstance(node, SpeclibDockTreeNode) \
-                            and isinstance(node.speclib(), QgsVectorLayer) \
-                            and node.speclib().source() == d.source():
-                        docks_to_close.append(node.dock)
+                    elif isinstance(node, SpeclibDockTreeNode):
+                        pass
 
         for dock in docks_to_close:
             self.mDockManager.removeDock(dock)

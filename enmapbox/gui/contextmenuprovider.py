@@ -3,6 +3,7 @@ from typing import List, Union
 
 import numpy as np
 import qgis.utils
+import logging
 from qgis.PyQt.QtCore import Qt, QObject, QPoint, QModelIndex
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu, QWidgetAction, QApplication, QAction
@@ -11,7 +12,6 @@ from qgis.core import QgsWkbTypes, QgsPointXY, QgsRasterLayer, QgsMapLayerProxyM
 from qgis.gui import QgsMapCanvas, QgisInterface, QgsMapLayerComboBox
 
 import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
-from enmapbox import messageLog
 from enmapbox.gui.contextmenus import EnMAPBoxAbstractContextMenuProvider
 from enmapbox.gui.datasources.datasources import DataSource, RasterDataSource, VectorDataSource, ModelDataSource
 from enmapbox.gui.datasources.datasourcesets import DataSourceSet
@@ -27,6 +27,7 @@ from enmapbox.qgispluginsupport.qps.models import TreeNode
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibraryplotwidget import SpectralProfilePlotModel
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent, findParent
 
+logger = logging.getLogger(__name__)
 
 class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
     """
@@ -188,13 +189,18 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
 
             slws = emb.spectralLibraryWidgets()
             if len(slws) > 0:
-                m = menu.addMenu('Add Spectral Library')
+                m: QMenu = menu.addMenu('Add Spectral Library')
+                m.setToolTipsVisible(True)
+                speclibs = []
                 for slw in slws:
-                    speclib = slw.speclib()
-                    if isinstance(speclib, QgsVectorLayer):
-                        a = m.addAction(speclib.name())
-                        a.setToolTip(speclib.source())
-                        a.triggered.connect(lambda *args, sl=speclib, n=node: node.insertLayer(0, sl))
+                    for sl in slw.spectralLibraries():
+                        if sl not in speclibs:
+                            speclibs.append(sl)
+
+                            a = m.addAction(sl.name())
+                            tt = f'Layer {sl.name()} id {sl.id()}<br>Layer Source: {sl.source()}'
+                            a.setToolTip(tt)
+                            a.triggered.connect(lambda *args, sl=sl, n=node: node.insertLayer(0, sl))
         menu.addSeparator()
         s = ""
 
@@ -552,8 +558,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                 msg = 'Failed to create full layer context menu ' \
                       'due to the following missing packages: {}'.format(','.join(missing))
 
-                messageLog(msg)
-                QgsMessageLog.logMessage(msg, level=Qgis.MessageLevel.Warning)
+                logger.error(msg)
 
         return menu
 
