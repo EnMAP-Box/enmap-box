@@ -10,6 +10,7 @@ import numba as nb
 
 __bands__    = [460, 660]
 __filename__ = "_water"
+__th_default__ = 1.0
 
 
 # def check_bands(ubands, wvl):
@@ -23,13 +24,13 @@ __filename__ = "_water"
 
 
 @nb.jit(nopython=True)
-def process(cube):
+def process(cube, threshold):
     ny = cube.shape[1]
     nx = cube.shape[2]
     prod = np.zeros((ny, nx), dtype = np.float32)
     mask = np.zeros((ny, nx), dtype = np.int32)
     lim1 = 0.0
-    lim2 = 1.00001
+    lim2 = threshold
     for ky in range(ny):
         for kx in range(nx):
             B0660 = cube[1, ky, kx]
