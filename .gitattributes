@@ -12,4 +12,4 @@
 *.css text eol=lf
 *.html text eol=lf
 *.json text eol=lf
-
+*.ini text eol=lf
