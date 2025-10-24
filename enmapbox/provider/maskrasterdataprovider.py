@@ -2,10 +2,10 @@ from typing import Optional
 from urllib.parse import parse_qsl
 
 import numpy as np
-from PyQt5.QtCore import QObject
 
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtCore import QObject
 from qgis.core import QgsRasterLayer, QgsRectangle, QgsRasterBlockFeedback, QgsProviderMetadata, QgsProviderRegistry, \
     QgsRasterDataProvider, QgsRasterBlock, Qgis, QgsMessageLog
 
