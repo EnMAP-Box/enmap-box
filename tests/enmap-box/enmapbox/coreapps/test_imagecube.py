@@ -1,20 +1,24 @@
 import os
 import unittest
+import uuid
 
 import numpy as np
 from osgeo import gdal, gdal_array
 
-from enmapbox import initPythonPaths
+from enmapbox import initAll
 from enmapbox.exampledata import enmap as pathEnMAP
 from enmapbox.exampledata import hires as pathHyMap
 from enmapbox.testing import EnMAPBoxTestCase, start_app
 from qgis.core import QgsRasterLayer, QgsProject, QgsRasterRenderer, QgsRectangle, QgsCoordinateReferenceSystem
 
 start_app()
-initPythonPaths()
+initAll()
 
+HAS_OPENGL = False
 try:
     from imagecubeapp.imagecube import samplingGrid, ImageCubeRenderJob, ImageCubeWidget, GLItem
+
+    HAS_OPENGL = True
 except ModuleNotFoundError as ex:
     if ex.name == 'OpenGL':
         raise unittest.SkipTest('Missing OpenGL module. Skip all imagecube tests')
@@ -22,11 +26,12 @@ except ModuleNotFoundError as ex:
         raise ex
 
 
+@unittest.skipIf(not HAS_OPENGL, 'Missing OpenGL module. Skip all imagecube tests')
 class ImageCubeTests(EnMAPBoxTestCase):
 
     def createImageCube(self, nb=10, ns=20, nl=30, crs='EPSG.32633') -> QgsRasterLayer:
 
-        path = '/vsimem/imagecube.tiff'
+        path = f'/vsimem/imagecube{uuid.uuid4()}.tiff'
 
         array = np.fromfunction(lambda i, j, k: i + j + k, (nb, nl, ns), dtype=np.uint32)
         # array = array * 10
@@ -89,14 +94,18 @@ class ImageCubeTests(EnMAPBoxTestCase):
         self.assertEqual(job.extent(), lyr.extent())
 
         del job
+        src = lyr.source()
         QgsProject.instance().removeAllMapLayers()
+        gdal.Unlink(src)
 
     def test_widget(self):
 
         W = ImageCubeWidget()
         W.show()
 
-        layers = [self.createImageCube(ns=100, nl=200)]
+        lyrCube = self.createImageCube(ns=100, nl=200)
+
+        layers = [lyrCube]
         pathes = [pathEnMAP, pathHyMap]
         for p in pathes:
             if os.path.isfile(p):
@@ -149,6 +158,8 @@ class ImageCubeTests(EnMAPBoxTestCase):
 
         self.showGui(W)
         del W
+        src = lyrCube.source()
+        gdal.Unlink(src)
         QgsProject.instance().removeAllMapLayers()
 
     def test_noLayers(self):
@@ -166,13 +177,10 @@ class ImageCubeTests(EnMAPBoxTestCase):
         from enmapbox.exampledata import enmap as pathEnMAP
         from enmapbox.exampledata import hires as pathHyMap
 
-        pathLargeImage = r'R:\temp\temp_bj\Cerrado\cerrado_evi.vrt'
-        pathLargeImage = r'Q:\Processing_BJ\01_Data\level2\X0016_Y0046\20140803_LEVEL2_LND07_BOA.tif'
-
-        layers = [self.createImageCube(nb=177, ns=200, nl=400)]
+        lyrCube = self.createImageCube(nb=177, ns=200, nl=400)
+        layers = [lyrCube]
         # layers = []
-        pathes = [pathEnMAP, pathHyMap, pathLargeImage]
-        for p in pathes:
+        for p in [pathEnMAP, pathHyMap]:
             if os.path.isfile(p):
                 layers.append(QgsRasterLayer(p, os.path.basename(p)))
 
@@ -211,8 +219,11 @@ class ImageCubeTests(EnMAPBoxTestCase):
         W.startDataLoading()
 
         self.showGui(W)
+
+        src = lyrCube.source()
         del W
         QgsProject.instance().removeAllMapLayers()
+        gdal.Unlink(src)
 
 
 if __name__ == "__main__":
