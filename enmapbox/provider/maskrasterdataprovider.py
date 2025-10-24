@@ -2,16 +2,16 @@ from typing import Optional
 from urllib.parse import parse_qsl
 
 import numpy as np
-from qgis.PyQt import sip
-from qgis.core import QgsRasterLayer, QgsRectangle, QgsRasterBlockFeedback, QgsProviderMetadata, QgsProviderRegistry, \
-    QgsRasterDataProvider, QgsRasterBlock, Qgis, QgsMessageLog
+from PyQt5.QtCore import QObject
 
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+from qgis.core import QgsRasterLayer, QgsRectangle, QgsRasterBlockFeedback, QgsProviderMetadata, QgsProviderRegistry, \
+    QgsRasterDataProvider, QgsRasterBlock, Qgis, QgsMessageLog
 
 
 class MaskRasterDataProvider(QgsRasterDataProvider):
-    ALL_INSTANCES = dict()
+    # ALL_INSTANCES = dict()
     NAME = 'MaskRasterDataProvider'
     DESCRIPTION = 'mask raster data provider'
 
@@ -24,12 +24,14 @@ class MaskRasterDataProvider(QgsRasterDataProvider):
     P_MaskValueRanges = 'maskValueRanges'
     P_MaskBits = 'maskBits'
 
-    @staticmethod
-    def _release_sip_deleted():
-        to_delete = {k for k, o in MaskRasterDataProvider.ALL_INSTANCES.items()
-                     if sip.isdeleted(o)}
-        for k in to_delete:
-            MaskRasterDataProvider.ALL_INSTANCES.pop(k)
+    PARENT = QObject()
+
+    # @staticmethod
+    # def _release_sip_deleted():
+    #     to_delete = {k for k, o in MaskRasterDataProvider.ALL_INSTANCES.items()
+    #                  if sip.isdeleted(o)}
+    #     for k in to_delete:
+    #         MaskRasterDataProvider.ALL_INSTANCES.pop(k)
 
     def __init__(self, uri):
         super().__init__()
@@ -60,8 +62,9 @@ class MaskRasterDataProvider(QgsRasterDataProvider):
         provider = MaskRasterDataProvider(uri)
 
         # keep a python reference on each new provider instance
-        cls.ALL_INSTANCES[id(provider)] = provider
-        cls._release_sip_deleted()
+        # cls.ALL_INSTANCES[id(provider)] = provider
+        # cls._release_sip_deleted()
+        provider.setParent(cls.PARENT)
         return provider
 
     def description(self):
