@@ -1,22 +1,22 @@
-# What is HYSOMA/ENSOMAP
+# What is HYSOMA/EnSoMAP
 
 
 
-The HYSOMA (Hyperspectral SOil MApper) / ENSOMAP (EnMAP Soil Mapper) is a software interface currently developed at the GFZ Helmholtz Centre for Geosciences. It is an experimental platform for soil mapping applications of hyperspectral imagery that al-lows easy implementation in the hyperspectral and non-hyperspectral communities and gives the choice of multiple algorithms for each soil parameter. The main motivation for HYSOMA/ENSOMAP development is to provide experts and non-expert users with a suite of tools that can be used for soil applications. The algorithms focus on the fully automatic generation of semi-quantitative soil maps for key soil parameters such as soil moisture, soil organic carbon, and soil minerals (iron oxides, clay minerals, carbonates). Additional soil analyses tools were implemented to allow e.g. the derivation of quantitative maps based on in-situ data sets.
+The HYSOMA (Hyperspectral SOil MApper) / EnSoMAP (EnMAP Soil Mapper) is a software interface currently developed at the GFZ German Research Center for Geosciences. It is an experimental platform for soil mapping applications of hyperspectral imagery that al-lows easy implementation in the hyperspectral and non-hyperspectral communities and gives the choice of multiple algorithms for each soil parameter. The main motivation for HYSOMA/EnSoMAP development is to provide experts and non-expert users with a suite of tools that can be used for soil applications. The algorithms focus on the fully automatic generation of semi-quantitative soil maps for key soil parameters such as soil moisture, soil organic carbon, and soil minerals (iron oxides, clay minerals, carbonates). Additional soil analyses tools were implemented to allow e.g. the derivation of quantitative maps based on in-situ data sets.
 
-In HYSOMA/ENSOMAP you can:
+In HYSOMA/EnSoMAP you can:
 * Map soil feature based on the consolidated algorithm.
 * Generate soil mask to remove areas cover with vegetation/water
 * Calibrate your data using field measurement.
 * Validate your results using field measurement.
 
-# HYSOMA/ENSOMAP Structure
+# HYSOMA/EnSoMAP Structure
 
 The HYSOMA workflow, from ortho-rectified reflectance to soil attributes maps is schemat-ically presented here:
 
 1. HYSOMA reduces the spectral range to the number of bands, which are suitable for any of the further analyses. Bands which do not provide meaningful values are ex-cluded from the available band list.
 
-2. The software selects spectrally soil dominated pixels and eliminates from the image all pixels which are not dominated by a soil signature. This is realized in HYSO-MA/ENSOMAP by masking and excluding water pixels and vegetation pixels, in both vi-tal and dry condition. Water dominated pixels are excluded per default through the Normalised Difference Red Blue Index (NDRBI) as suggested by Carter (1991) and Zaka-luk and Ranjan (2008), which simply uses the ratio of the difference and the sum be-tween the red (660 nm by default) and blue band (460 nm by default). To mask the remaining non-soil pixels, HYSOMA identifies vegetation dominated re-gions and excludes them from further processing. 
+2. The software selects spectrally soil dominated pixels and eliminates from the image all pixels which are not dominated by a soil signature. This is realized in HYSOMA/EnSoMAP by masking and excluding water pixels and vegetation pixels, in both vi-tal and dry condition. Water dominated pixels are excluded per default through the Normalised Difference Red Blue Index (NDRBI) as suggested by Carter (1991) and Zaka-luk and Ranjan (2008), which simply uses the ratio of the difference and the sum be-tween the red (660 nm by default) and blue band (460 nm by default). To mask the remaining non-soil pixels, HYSOMA identifies vegetation dominated re-gions and excludes them from further processing. 
 
 3. Finally, the HYSOMA Soil Mapping module performs soil functions, and produces soil maps based on the spectrally soil dominant pixels, which remain from the soil mask-ing procedure. The one-dimensional grey value maps can easily be imported and visu-alized in any image processing software. In total, for the six-soil selected parameter, 11 algorithms are proposed (see Table) and 11 soil map files are created, plus the map file associated with the soil quality layer. Additionally, map files associated with the soil selection procedure (water map, NDVI map, CAI map, soil dominant pixels map) are saved. Also, a HYSOMA  run report file can be uploaded.
 
@@ -42,7 +42,7 @@ Table 2.1:	Overview of HYSOMA automatic soil functions for identification and se
 |**Gypsum** | NDGI | | |
 
 # Soil Analyses Tools
-* **Calibration**: This option allows experimented users to perform fully quantitative mapping using input field data for calibration. This input field data option allows cali-brating automatically generated soil semi-quantified maps (HYSOMA automatic soil functions) with field measurements. Three methods are proposed. Either the users enter directly a field measurement file with name of field location, coordinates X,Y and absolute value of soil parameter, and HYSOMA/ENSOMAP performs the calibration and delivers as output a quantitative soil map file, or you select a spectral library re-sults together with an absolute value of the soil parameter and HYSOMA/ENSOMAP performs the calibration and delivers the gain and offsets for calibration, or the users give as input already calculated gains and offsets for calibration. 
+* **Calibration**: This option allows experimented users to perform fully quantitative mapping using input field data for calibration. This input field data option allows cali-brating automatically generated soil semi-quantified maps (HYSOMA automatic soil functions) with field measurements. Three methods are proposed. Either the users enter directly a field measurement file with name of field location, coordinates X,Y and absolute value of soil parameter, and HYSOMA/EnSoMAP performs the calibration and delivers as output a quantitative soil map file, or you select a spectral library re-sults together with an absolute value of the soil parameter and HYSOMA/EnSoMAP performs the calibration and delivers the gain and offsets for calibration, or the users give as input already calculated gains and offsets for calibration. 
 
 * **Validation**: This option allows the users to extract from HYSOMA output soil maps the soil parameter values of individual points based on their geographic coordinates.
 

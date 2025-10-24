@@ -29,7 +29,7 @@ from ensomap import APP_DIR
 
 import sys
 sys.path.insert(0, APP_DIR)
-# from ensomap_ui import ENSOMAP_UI
+# from ensomap_ui import EnSoMAP_UI
 
 from PyQt5.QtCore    import *
 from PyQt5.QtWidgets import *
@@ -68,12 +68,12 @@ class EnSoMAP(EnMAPBoxApplication):
         from hys.ui_cal import ui_cal
         from hys.ui_val import ui_val
 
-        class ENSOMAP_UI(ui_map, ui_msk, ui_cal, ui_val, QWidget):
+        class EnSoMAP_UI(ui_map, ui_msk, ui_cal, ui_val, QWidget):
 
             def __init__(self, dname, parent=None):
-                super(ENSOMAP_UI, self).__init__(parent=parent)
+                super(EnSoMAP_UI, self).__init__(parent=parent)
 
-                self.app_name = "ENSOMAP"
+                self.app_name = "EnSoMAP"
                 self.app_version = hys.__version__
 
                 # =========================================================================================
@@ -108,7 +108,7 @@ class EnSoMAP(EnMAPBoxApplication):
                 self.close()
 
         homedir = os.path.expanduser('~')
-        w = ENSOMAP_UI(homedir)
+        w = EnSoMAP_UI(homedir)
         w.show()
         w.center()
         
