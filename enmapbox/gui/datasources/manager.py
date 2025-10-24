@@ -22,8 +22,9 @@ from qgis.PyQt.QtGui import QContextMenuEvent, QDesktopServices
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QApplication, QDialog, QMenu, QTreeView, QWidget
 from qgis.core import Qgis, QgsDataItem, QgsLayerItem, QgsLayerTreeGroup, QgsLayerTreeLayer, QgsMapLayer, \
-    QgsMimeDataUtils, QgsProject, QgsProviderRegistry, QgsProviderSublayerDetails, QgsRasterDataProvider, \
+    QgsMimeDataUtils, QgsProject, QgsProviderSublayerDetails, QgsRasterDataProvider, \
     QgsRasterLayer, QgsRasterRenderer, QgsVectorLayer, QgsMapLayerType, QgsIconUtils
+from qgis.core import QgsProviderRegistry
 from qgis.gui import QgisInterface, QgsDockWidget, QgsMapCanvas
 from .datasources import DataSource, FileDataSource, LayerItem, ModelDataSource, RasterDataSource, SpatialDataSource, \
     VectorDataSource, dataItemToLayer
@@ -32,7 +33,7 @@ from ..dataviews.docks import Dock
 from ..mapcanvas import MapCanvas
 from ..mimedata import extractMapLayers, fromDataSourceList, MDF_URILIST, QGIS_URILIST_MIMETYPE
 from ...qgispluginsupport.qps.speclib.core import is_spectral_library
-from ...qgispluginsupport.qps.subdatasets import SubDatasetSelectionDialog
+from ...qgispluginsupport.qps.subdatasets import SubDatasetSelectionDialog, subLayerDetails
 
 
 class DataSourceManager(TreeModel):
@@ -833,15 +834,12 @@ class DataSourceFactory(object):
                     if re.search(r'\.(pkl)$', source, re.I):
                         dataItem = QgsDataItem(Qgis.BrowserItemType.Custom, None, name, source, 'special:pkl')
                     else:
-                        try:
-                            sublayerDetails = QgsProviderRegistry.instance().querySublayers(source)
-                        except Exception as ex:
-                            sublayerDetails = QgsProviderRegistry.instance().querySublayers(source,
-                                                                                            flags=Qgis.SublayerQueryFlag.FastScan)
-
-                        if len(sublayerDetails) == 1:
-                            return DataSourceFactory.create(sublayerDetails[0])
-                        elif len(sublayerDetails) > 1:
+                        providers = ['gdal', 'ogr']
+                        providers = QgsProviderRegistry.instance().providerList()
+                        sDetails = subLayerDetails(source, providers=providers)
+                        if len(sDetails) == 1:
+                            return DataSourceFactory.create(sDetails[0])
+                        elif len(sDetails) > 1:
                             if show_dialogs:
                                 # show sublayer selection dialog
                                 d = SubDatasetSelectionDialog()
@@ -849,7 +847,7 @@ class DataSourceFactory(object):
                                 from enmapbox import icon as enmapBoxIcon
                                 d.setWindowIcon(enmapBoxIcon())
                                 d.showMultiFiles(False)
-                                d.setSubDatasetDetails(sublayerDetails)
+                                d.setSubDatasetDetails(sDetails)
                                 if d.exec_() == QDialog.Accepted:
                                     return DataSourceFactory.create(d.selectedSublayerDetails())
                                 else:
