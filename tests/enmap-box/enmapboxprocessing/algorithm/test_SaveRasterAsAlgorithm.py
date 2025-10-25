@@ -1,10 +1,10 @@
 import numpy as np
+from qgis.core import QgsRasterLayer
 
-from enmapboxtestdata import enmap, hires
 from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
-from qgis.core import QgsRasterLayer
+from enmapboxtestdata import enmap, hires
 
 
 class TestSaveRasterAsAlgorithm(TestCase):
@@ -17,6 +17,19 @@ class TestSaveRasterAsAlgorithm(TestCase):
         }
         result = self.runalg(alg, parameters)
         gold = RasterReader(enmap).array()
+        lead = RasterReader(result[alg.P_OUTPUT_RASTER]).array()
+        self.assertEqual(gold[0].dtype, lead[0].dtype)
+        self.assertEqual(np.sum(gold), np.sum(lead))
+
+    def test_mode(self):
+        alg = SaveRasterAsAlgorithm()
+        parameters = {
+            alg.P_RASTER: QgsRasterLayer(hires),
+            alg.P_MODE: alg.QgisMode,
+            alg.P_OUTPUT_RASTER: self.filename('raster.tif')
+        }
+        result = self.runalg(alg, parameters)
+        gold = RasterReader(hires).array()
         lead = RasterReader(result[alg.P_OUTPUT_RASTER]).array()
         self.assertEqual(gold[0].dtype, lead[0].dtype)
         self.assertEqual(np.sum(gold), np.sum(lead))
