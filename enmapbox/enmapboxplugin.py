@@ -42,7 +42,7 @@ class EnMAPBoxPlugin(object):
         self.dockWidgets: typing.List[QgsDockWidget] = []
 
         if QOperatingSystemVersion.current().name() == 'macOS':
-            # os.environ['SKLEARN_SITE_JOBLIB']='True'True
+            # os.environ['SKLEARN_SITE_JOBLIB']='True'
             # fix for issue #221
             os.environ['JOBLIB_MULTIPROCESSING'] = '0'
 

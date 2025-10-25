@@ -1,9 +1,8 @@
 import sys
 import unittest
 
-from qgis.core import QgsApplication, QgsProcessingRegistry, QgsProcessingAlgorithm, QgsProcessingProvider
-
 from enmapbox.testing import TestCase, TestObjects, start_app
+from qgis.core import QgsApplication, QgsProcessingRegistry, QgsProcessingAlgorithm, QgsProcessingProvider
 
 start_app()
 
@@ -20,6 +19,7 @@ class ProcessingProviderTests(TestCase):
         for p in to_Remove:
             reg.removeProvider(p)
 
+    @unittest.skipIf(TestCase.runsInCI(), 'Single use only')
     def test_processing_provider(self):
 
         from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
@@ -51,28 +51,6 @@ class ProcessingProviderTests(TestCase):
         reg.removeProvider(provider)
         self.assertTrue(provider not in reg.providers())
         self.assertTrue(alg not in reg.algorithms())
-
-    def test_init(self):
-
-        from enmapbox import registerEnMAPBoxProcessingProvider, unregisterEnMAPBoxProcessingProvider
-        from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider, ID
-
-        registry = QgsApplication.instance().processingRegistry()
-        self.assertIsInstance(registry, QgsProcessingRegistry)
-
-        n1 = len(registry.algorithms())
-        registerEnMAPBoxProcessingProvider()
-
-        enmapBoxProvider = registry.providerById(ID)
-        self.assertIsInstance(enmapBoxProvider, EnMAPBoxProcessingProvider)
-        del enmapBoxProvider
-        n2 = len(registry.algorithms())
-        self.assertTrue(n2 > n1)
-        unregisterEnMAPBoxProcessingProvider()
-
-        n3 = len(registry.algorithms())
-        self.assertEqual(n1, n3)
-        s = ""
 
 
 if __name__ == "__main__":

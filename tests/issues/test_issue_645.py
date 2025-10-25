@@ -5,11 +5,12 @@ from enmapboxprocessing.testcase import TestCase
 from enmapboxtestdata import library_berlin
 from qgis.core import QgsVectorLayer
 
+initAll()
+
 
 class Issue645Tests(TestCase):
 
     def test_issue647(self):
-        initAll()
         n_bands = [256]
         n_features = 20
         speclib = TestObjects.createSpectralLibrary(n=n_features, n_bands=n_bands)
@@ -20,8 +21,6 @@ class Issue645Tests(TestCase):
         self.showGui(procw)
 
     def test_issue_645(self):
-
-        initAll()
         sl = QgsVectorLayer(library_berlin)
         sl.startEditing()
         d = SpectralProcessingDialog(speclib=sl)

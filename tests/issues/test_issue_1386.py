@@ -3,11 +3,16 @@ This is a template to create an EnMAP-Box test
 """
 import unittest
 
+from enmapbox import initAll
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyleButton
 from enmapbox.testing import EnMAPBoxTestCase
+from enmapbox.testing import start_app
 from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QMenu, QWidgetAction, QToolButton
 from qgis.core import QgsProject
 from qgis.gui import QgsColorButton
+
+start_app()
+initAll()
 
 
 class TestCaseIssue1386(EnMAPBoxTestCase):

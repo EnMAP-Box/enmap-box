@@ -10,9 +10,12 @@ from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import MapCanvas
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.testing import EnMAPBoxTestCase
+from enmapbox.testing import start_app
 from qgis.PyQt import Qt
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 from qgis.core import Qgis, QgsProject
+
+start_app()
 
 
 class ExampleClass(QObject):

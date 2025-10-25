@@ -107,6 +107,7 @@ class TestSpectralResamplingByWavelengthAndFwhmAlgorithm(TestCase):
             alg.P_OUTPUT_RASTER: self.filename('resampled_10.tif')
         }
         result = self.runalg(alg, parameters)
-        self.assertEqual(-36108144.0, np.round(np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array()[0])))
+        sum = float(np.round(np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array()[0])))
+        self.assertAlmostEqual(-36108144.0, sum, 5)
         srf = Utils().jsonLoad(result[alg.P_OUTPUT_LIBRARY])
         self.assertEqual(224, len(srf['features']))

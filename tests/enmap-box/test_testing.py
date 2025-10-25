@@ -12,13 +12,17 @@ __author__ = 'benjamin.jakimow@geo.hu-berlin.de'
 
 import unittest
 
+from osgeo import gdal, ogr
+
+from enmapbox import initAll
+from enmapbox.testing import EnMAPBoxTestCase, TestObjects, start_app
 from qgis.PyQt.QtGui import QGuiApplication
 from qgis.PyQt.QtWidgets import QMenu
-from osgeo import gdal, ogr
-from qgis.gui import QgisInterface
 from qgis.core import QgsProcessingAlgorithm, QgsApplication
+from qgis.gui import QgisInterface
 
-from enmapbox.testing import EnMAPBoxTestCase, TestObjects
+start_app()
+initAll()
 
 
 class Tests(EnMAPBoxTestCase):

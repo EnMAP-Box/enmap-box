@@ -4,12 +4,12 @@ import unittest
 from pathlib import Path
 
 from osgeo import gdal, ogr
-from processing.core.Processing import Processing
 
 from enmapbox import DIR_UNITTESTS, exampledata
 from enmapbox.apps.SpecDeepMap import import_error
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
+from processing.core.Processing import Processing
 
 if import_error is None:
     try:
@@ -35,7 +35,9 @@ def best_ckpt_path(checkpoint_dir):
 
 
 BASE_TESTDATA = Path(DIR_UNITTESTS) / 'testdata/external/specdeepmap'
-BASE_DIR = Path(__file__).parent
+
+
+# BASE_DIR = Path(__file__).parent
 
 
 @unittest.skipIf(import_error, f'Missing modules to run SpecDeepMap: {import_error}')
@@ -51,7 +53,7 @@ class Test_Deep_Learning_Mapper(TestCase):
 
         # Get the script's directory (makes paths relative)
         # BASE_DIR = dirname(__file__)
-
+        BASE_DIR = self.createTestOutputDirectory()
         folder_path_pred_raster = BASE_DIR / "pred_raster.tif"
         folder_path_pred_iou = BASE_DIR / "pred_iou.csv"
         folder_path_pred_vector = BASE_DIR / "pred_vector.shp"

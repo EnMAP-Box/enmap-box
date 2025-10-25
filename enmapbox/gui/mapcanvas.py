@@ -973,6 +973,7 @@ class MapCanvas(QgsMapCanvas):
             event = QgsMapMouseEvent(self, event)
         assert isinstance(menu, QMenu)
         assert isinstance(event, QgsMapMouseEvent)
+        menu.setToolTipsVisible(True)
         mapSettings = self.mapSettings()
         assert isinstance(mapSettings, QgsMapSettings)
         pos: QPointF = event.pos()

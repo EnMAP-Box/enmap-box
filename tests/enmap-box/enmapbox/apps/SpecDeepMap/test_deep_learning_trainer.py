@@ -2,15 +2,13 @@ import glob
 import os
 import re
 import unittest
-from os.path import dirname, join
 from pathlib import Path
-
-from processing import Processing
 
 from enmapbox import DIR_UNITTESTS
 from enmapbox.apps.SpecDeepMap import import_error
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
+from processing import Processing
 
 if import_error is None:
     try:
@@ -50,11 +48,12 @@ class Test_Deep_Learning_Trainer(TestCase):
         alg = DL_Trainer()
 
         # Get the script's directory (makes paths relative)
-        BASE_DIR = Path(__file__).parent
-
+        # BASE_DIR = Path(__file__).parent
+        # BASE_DIR = self.createTestOutputDirectory()
         folder_path_input = BASE_TESTDATA / 'test_requierments'
         self.assertTrue(folder_path_input.is_dir())
-        folder_path = BASE_DIR / "test_run"
+        # folder_path = BASE_DIR / "test_run"
+        folder_path = self.createTestOutputDirectory()
         self.assertTrue(folder_path.is_dir(), msg=f'Dir does not exists: {folder_path}')
 
         folder_path = folder_path.as_posix()
@@ -132,13 +131,13 @@ class Test_Deep_Learning_Trainer(TestCase):
         alg = DL_Trainer()
 
         # Get the script's directory (makes paths relative)
-        BASE_DIR = dirname(__file__)
-
-        folder_path = join(BASE_DIR, "test_run")
-        folder_path_input = join(BASE_DIR, "../../../../testdata/external/specdeepmap/test_requierments")
+        # BASE_DIR = dirname(__file__)
+        # folder_path = join(BASE_DIR, "test_run")
+        folder_path = self.createTestOutputDirectory()
+        folder_path_input = BASE_TESTDATA / 'test_requierments'
 
         # 4. Test check if pretrained model runs needs 13 channel adjust indexing before splitting raster
-        io = {alg.train_val_input_folder: folder_path_input,
+        io = {alg.train_val_input_folder: folder_path_input.as_posix(),
               alg.arch: 0,
               alg.backbone: 'resnet18',
               alg.pretrained_weights: 0,
@@ -156,8 +155,8 @@ class Test_Deep_Learning_Trainer(TestCase):
               alg.device_numbers: 1,
               alg.num_models: -1,
               alg.tensorboard: False,
-              alg.logdirpath: folder_path,
-              alg.logdirpath_model: folder_path,
+              alg.logdirpath: folder_path.as_posix(),
+              alg.logdirpath_model: folder_path.as_posix(),
               }
 
         result = Processing.runAlgorithm(alg, parameters=io)

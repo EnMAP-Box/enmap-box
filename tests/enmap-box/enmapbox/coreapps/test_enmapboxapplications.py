@@ -4,9 +4,9 @@ import unittest
 
 from enmapbox import DIR_ENMAPBOX
 from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.qgispluginsupport.qps.qgsrasterlayerproperties import QgsRasterLayerSpectralProperties
 from enmapbox.qgispluginsupport.qps.speclib.core import profile_field_list
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibraryrasterdataprovider import registerDataProvider
-from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import SpectralSetting
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprocessingdialog import SpectralProcessingDialog
 from enmapbox.testing import EnMAPBoxTestCase, TestObjects, start_app
@@ -110,10 +110,12 @@ class TestEnMAPBoxApplications(EnMAPBoxTestCase):
         procw.runAlgorithm(fail_fast=True)
         tempFiles = procw.temporaryRaster()
         for file in tempFiles:
-            setting = SpectralSetting.fromRasterLayer(file)
-            assert setting.xUnit() not in [None, '']
+            props = QgsRasterLayerSpectralProperties.fromRasterLayer(file)
+            wlu = props.wavelengthUnits()
+            assert wlu[0] not in [None, '']
 
         self.showGui([slw, procw])
+        QgsProject.instance().removeAllMapLayers()
 
 
 if __name__ == "__main__":

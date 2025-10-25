@@ -1,9 +1,8 @@
-import typing
-
-from qgis.PyQt.QtGui import QIcon
-from qgis.core import QgsApplication
+from typing import List, Union
 
 from enmapbox.qgispluginsupport.qps.models import TreeNode
+from qgis.PyQt.QtGui import QIcon
+from qgis.core import QgsApplication
 from .datasources import DataSource, VectorDataSource, RasterDataSource, ModelDataSource, \
     FileDataSource
 
@@ -29,17 +28,18 @@ class DataSourceSet(TreeNode):
 
         self.setName(f'{self.mSetName} ({len(self.dataSources())})')
 
-    def sources(self) -> typing.List[str]:
+    def sources(self) -> List[str]:
         sources = []
+
         for s in self.dataSources():
             sources.append(s.source())
         return sources
 
-    def dataSources(self) -> typing.List[DataSource]:
+    def dataSources(self) -> List[DataSource]:
         return self.childNodes()
 
-    def removeDataSources(self, dataSources: typing.Union[DataSource, typing.List[DataSource]]) -> \
-            typing.List[DataSource]:
+    def removeDataSources(self, dataSources: Union[DataSource, List[DataSource]]) -> \
+            List[DataSource]:
         if isinstance(dataSources, DataSource):
             dataSources = [dataSources]
         owned = self.dataSources()
@@ -50,7 +50,7 @@ class DataSourceSet(TreeNode):
             self.updateName()
         return toremove
 
-    def addDataSources(self, dataSources: typing.Union[DataSource, typing.List[DataSource]]) -> typing.List[DataSource]:
+    def addDataSources(self, dataSources: Union[DataSource, List[DataSource]]) -> List[DataSource]:
         if isinstance(dataSources, DataSource):
             dataSources = [dataSources]
 

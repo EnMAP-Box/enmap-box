@@ -4,16 +4,16 @@ import unittest
 from os.path import join
 from pathlib import Path
 
-from processing.core.Processing import Processing
-
 from enmapbox import DIR_UNITTESTS
 from enmapbox.apps.SpecDeepMap import import_error
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
+from processing.core.Processing import Processing
 
 if import_error is None:
     try:
         import lightning
+
         print(lightning)
     except Exception as error:
         import_error = error
@@ -26,7 +26,8 @@ if not import_error:
 
 BASE_TESTDATA = Path(DIR_UNITTESTS) / 'testdata/external/specdeepmap'
 
-BASE_DIR = Path(__file__).parent
+
+# BASE_DIR = Path(__file__).parent
 
 
 @unittest.skipIf(import_error, f'Missing modules to run SpecDeepMap: {import_error}')
@@ -49,7 +50,7 @@ class Test_Dataset_Maker(TestCase):
         # BASE_DIR = dirname(__file__)
 
         folder_path_in = BASE_TESTDATA / 'test_requierments'
-        folder_path_out = BASE_DIR / "test_run"
+        folder_path_out = self.createTestOutputDirectory().as_posix()
 
         io = {alg.Train_Val_folder: str(folder_path_in),
               alg.N_train: 80,
