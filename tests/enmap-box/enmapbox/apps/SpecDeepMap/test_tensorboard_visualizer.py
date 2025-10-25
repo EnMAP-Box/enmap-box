@@ -1,16 +1,16 @@
 import os
 import shutil
-from pathlib import Path
+import time
 import unittest
+from pathlib import Path
 
 import psutil
 
-from processing.core.Processing import Processing
 from enmapbox import DIR_UNITTESTS
+from enmapbox.apps.SpecDeepMap import import_error
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
-from enmapbox.apps.SpecDeepMap import import_error
-import time
+from processing.core.Processing import Processing
 
 if not import_error:
     from enmapbox.apps.SpecDeepMap.processing_algorithm_tensorboard_visualizer import Tensorboard_visualizer
@@ -18,7 +18,7 @@ if not import_error:
     start_app()
 
 
-@unittest.skipIf(import_error, f'Missing modules to run SpecDeepMap: {import_error}')
+@unittest.skipIf(import_error or TestCase.runsInCI(), f'Missing modules to run SpecDeepMap: {import_error}')
 class Test_Tensorboard(TestCase):
 
     def test_init(self):

@@ -4,12 +4,11 @@ import re
 import unittest
 from pathlib import Path
 
-from processing.core.Processing import Processing
-
 from enmapbox import DIR_UNITTESTS
 from enmapbox.apps.SpecDeepMap import import_error
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
+from processing.core.Processing import Processing
 
 if import_error is None:
     try:
@@ -46,13 +45,14 @@ class Test_Deep_Learning_Tester(TestCase):
         alg = DL_Tester()
 
         # Get the script's directory (makes paths relative)
-        BASE_DIR = Path(__file__).parent
-
+        # BASE_DIR = Path(__file__).parent
+        BASE_DIR = self.createTestOutputDirectory()
         BASE_TESTDATA = Path(DIR_UNITTESTS) / 'testdata/external/specdeepmap'
 
         folder_path_test_csv = BASE_TESTDATA / "test_requierments" / "test_files.csv"
-        folder_path_test_iou = BASE_DIR / "test_run" / "test_iou.csv"
-        folder_path_test_preds = BASE_DIR / "test_run" / "preds"
+        folder_path_test_iou = BASE_DIR / "test_iou.csv"
+        folder_path_test_preds = BASE_DIR / "preds"
+        os.makedirs(folder_path_test_preds, exist_ok=True)
         checkpoint_dir = BASE_TESTDATA / "test_requierments"
 
         ckpt_path = best_ckpt_path(checkpoint_dir)
