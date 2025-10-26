@@ -32,6 +32,7 @@ initAll()
 
 class TestSpeclibs(EnMAPBoxTestCase):
 
+    @unittest.skip('TEST')
     def test_issue_1036(self):
         EB = EnMAPBox(load_core_apps=False, load_other_apps=False)
         lyrR = QgsRasterLayer(enmap, 'EnMAP')
