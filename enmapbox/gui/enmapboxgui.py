@@ -1024,13 +1024,14 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             for lyr in to_remove:
                 QGIS.takeMapLayer(lyr)
 
-            QGIS.addMapLayers(to_add, False)
-            for lyr in to_add:
-                # let the parent project be the EnMAP-Box project
-                # and hope that QGIS will not delete the layer references
-                assert lyr.project() == QGIS
-                lyr.setParent(EMB.layerStore())
-                assert lyr.project() == EMB
+            if len(to_add) > 0:
+                QGIS.addMapLayers(to_add, False)
+                for lyr in to_add:
+                    # let the parent project be the EnMAP-Box project
+                    # and hope that QGIS will not delete the layer references
+                    assert lyr.project() == QGIS
+                    lyr.setParent(EMB.layerStore())
+                    assert lyr.project() == EMB
 
         if os.environ.get('DEBUG', '').lower() in ['1', 'true']:
             EMB.debugPrint('synProjects')
@@ -1046,7 +1047,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         layersTM = self.dockManagerTreeModel().mapLayers()
         layersTM_ids = [lyr.id() for lyr in layers if isinstance(lyr, QgsMapLayer) and lyr in layersTM]
         self.dockManagerTreeModel().removeLayers(layersTM_ids)
-        # self.project().removeMapLayers(layersTM_ids)
+        self.project().removeMapLayers(layersTM_ids)
         # self.syncProjects()
 
     def updateCurrentLayerActions(self, *args):
