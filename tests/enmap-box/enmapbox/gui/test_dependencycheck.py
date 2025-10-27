@@ -33,6 +33,7 @@ from qgis.core import QgsApplication
 start_app()
 
 
+# @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'Skipped, takes too much time')
 class test_dependencycheck(EnMAPBoxTestCase):
 
     def test_gdalissues(self):
