@@ -14,28 +14,27 @@ __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 import pathlib
 import unittest
 
-from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox import initAll
 from enmapbox.exampledata import enmap, hires, landcover_polygon
 from enmapbox.gui.dataviews.dockmanager import MapDockTreeNode
 from enmapbox.gui.dataviews.docks import MapDock
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import CanvasLink, MapCanvas, KEY_LAST_CLICKED, LINK_ON_CENTER
 from enmapbox.qgispluginsupport.qps.maptools import CursorLocationMapTool, MapTools
 from enmapbox.testing import EnMAPBoxTestCase
 from enmapbox.testing import TestObjects
+from enmapbox.testing import start_app
 from enmapboxtestdata import library_berlin
 from qgis.PyQt.QtCore import QMimeData, QUrl
 from qgis.PyQt.QtGui import QKeyEvent
 from qgis.PyQt.QtWidgets import QMenu, QAction
 from qgis.core import QgsPointXY, QgsProject, QgsRasterLayer
 
-from enmapbox.testing import start_app
 start_app()
+initAll()
 
 
 class MapCanvasTests(EnMAPBoxTestCase):
-
-    def setUp(self) -> None:
-        QgsProject.instance().removeAllMapLayers()
 
     def test_mapDock(self):
         dock = MapDock()

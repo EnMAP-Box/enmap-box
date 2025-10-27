@@ -9,10 +9,17 @@ import pickle
 import sys
 import time
 import typing
+from typing import Optional
+
 import numpy as np
 from OpenGL.GL import glEnd, glVertex3f, glColor4f, glLineWidth, GL_LINE_SMOOTH, GL_LINE_SMOOTH_HINT, GL_NICEST, \
     glEnable, glHint, glBegin, GL_LINES
 
+import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.opengl as gl
+from enmapbox.gui import SliderSpinBox, DoubleSliderSpinBox, SpatialExtentMapTool
+from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog, rendererFromXml, rendererToXml
+from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem, GLOptions
+from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.opengl.GLViewWidget import GLViewWidget
 from enmapbox.qgispluginsupport.qps.utils import loadUi, SpatialExtent
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtGui import QColor, QVector3D, QMatrix4x4
@@ -22,12 +29,6 @@ from qgis.core import QgsRasterLayer, Qgis, QgsRasterRenderer, QgsRectangle, Qgs
     QgsContrastEnhancement, QgsSingleBandPseudoColorRenderer, QgsRasterMinMaxOrigin, QgsProject, \
     QgsTask, QgsMapLayerProxyModel, QgsRasterBlock, QgsRasterBlockFeedback, QgsSingleBandColorDataRenderer
 from qgis.gui import QgsMapCanvas, QgsMapLayerComboBox
-
-from enmapbox.gui import SliderSpinBox, DoubleSliderSpinBox, SpatialExtentMapTool
-import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.opengl as gl
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem, GLOptions
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.opengl.GLViewWidget import GLViewWidget
-from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog, rendererFromXml, rendererToXml
 from . import NAME, VERSION
 
 KEY_GL_ITEM_GROUP = 'CUBEVIEW/GL_ITEM_GROUP'
@@ -127,12 +128,10 @@ def samplingGrid(layer: QgsRasterLayer, extent: QgsRectangle, ncb: int = 1, max_
     """
     :param layer:
     :param extent: QgsRectangles extent to show from image
-    :param nl: original image number of lines
-    :param ns: original image number of samples
     :param ncb: number of color bands to return. Will be multiplied by 4 for RGBA
                 1 = standard RGB image, 144 = for 144 input bands (cube)
     :param max_size: max. size in bytes
-    :return: nnl, nns = lines an sample to sample the extent
+    :return: nnl, nns = lines a sample to sample the extent
     """
     assert ncb >= 1
 
@@ -300,21 +299,19 @@ def renderImageData(task: QgsTask, dump):
     task.setProgress(100)
     return pickle.dumps(results)
 
-    pass
-
 
 class ImageCubeAxisItem(gl.GLAxisItem):
     """
     **Bases:** :class:`GLGraphicsItem <pyqtgraph.opengl.GLGraphicsItem>`
 
-    Displays three lines indicating origin and orientation of local coordinate system.
+    Displays three lines indicating the origin and orientation of a local coordinate system.
 
     """
 
     def __init__(self, *args, **kwds):
         super(ImageCubeAxisItem, self).__init__(*args, **kwds)
         self.mLineWidth = 2.0
-
+        self.antialias = True
         self.mColorZ = QColor('green')
         self.mColorY = QColor('yellow')
         self.mColorX = QColor('blue')
@@ -435,8 +432,10 @@ class ImageCubeWidget(QMainWindow):
         self.mCanvas = QgsMapCanvas()
         self.mCanvas.setVisible(False)
         self.mMapTools: typing.List[SpatialExtentMapTool] = []
-        self.mSliceRenderer: QgsRasterRenderer = None
-        self.mTopPlaneRenderer: QgsRasterRenderer = None
+        self.mSliceRenderer: Optional[QgsRasterRenderer] = None
+        self.mTopPlaneRenderer: Optional[QgsRasterRenderer] = None
+
+        self.mProject: QgsProject = QgsProject.instance()
 
         self.mBandScaleFactor = 1
 
@@ -543,6 +542,13 @@ class ImageCubeWidget(QMainWindow):
         # hide slices
         # .setSlicesVisibility(False)
 
+    def setProject(self, project: QgsProject):
+        self.mProject = project
+        self.mMapLayerComboBox.setProject(project)
+
+    def project(self) -> QgsProject:
+        return self.mProject
+
     def setSlicesVisibility(self, b: bool):
         for cb in [self.cbShowSliceX, self.cbShowSliceY, self.cbShowSliceZ]:
             cb.setChecked(b)
@@ -603,19 +609,6 @@ class ImageCubeWidget(QMainWindow):
         else:
             return (None, None, None)
 
-    def layerSubsetDims(self) -> tuple:
-        """
-        Returns the dimensions of the layer subset in pixel / band coordinates
-        :return: (ns0, ns1, nl0, nl1)
-        """
-
-        lyr = self.rasterLayer()
-        if isinstance(lyr, QgsRasterLayer):
-            ext = self.spatialExtent().toCrs(lyr.crs())
-            s = ""
-
-        return
-
     def cubeDims(self) -> tuple:
         """
         Returns the cube dimensions in (nb, nl, ns) order
@@ -625,7 +618,7 @@ class ImageCubeWidget(QMainWindow):
             nns, nnl, nnb = self.mRGBACube.shape[0:3]
             return nnb, nnl, nns
         else:
-            return (None, None, None)
+            return None, None, None
 
     def topPlaneDims(self) -> tuple:
         """
@@ -945,6 +938,8 @@ class ImageCubeWidget(QMainWindow):
             nns, nnl, _, _ = rgba.shape
         elif rgba.ndim == 3:
             nns, nnl, _ = rgba.shape
+        else:
+            raise Exception('Error: {}.ndim must be 3 or 4'.format(rgba))
 
         ns, nl, nb = lyr.width(), lyr.height(), lyr.bandCount()
 
@@ -976,23 +971,22 @@ class ImageCubeWidget(QMainWindow):
         self.mRGBACube = rgba
         self.mRGBACubeExtent = extent
 
-        # set allowed slices ranges to extent subset range
-        if True:
-            ox, oy, ob, sx, sy, sb = self.subsetDimensions(self.rasterLayer(), self.mRGBACubeExtent, self.mRGBACube)
-            # layer and cube dimensions
-            nns, nnl, nnb = self.mRGBACube.shape[0:3]
-            nb, nl, ns = self.layerDims()
+        # set allowed slices ranges to extend subset range
+        ox, oy, ob, sx, sy, sb = self.subsetDimensions(self.rasterLayer(), self.mRGBACubeExtent, self.mRGBACube)
+        # layer and cube dimensions
+        nns, nnl, nnb = self.mRGBACube.shape[0:3]
+        nb, nl, ns = self.layerDims()
 
-            rangeX = [int(ox + 1), int(ox + nns * sx)]
-            rangeY = [int(oy + 1), int(oy + nnl * sy)]
-            rangeZ = [int(ob + 1), int(ob + nnb * sb)]
-            self.spinBoxX.setRange(*rangeX)
-            self.spinBoxY.setRange(*rangeY)
-            self.spinBoxZ.setRange(*rangeZ)
+        rangeX = [int(ox + 1), int(ox + nns * sx)]
+        rangeY = [int(oy + 1), int(oy + nnl * sy)]
+        rangeZ = [int(ob + 1), int(ob + nnb * sb)]
+        self.spinBoxX.setRange(*rangeX)
+        self.spinBoxY.setRange(*rangeY)
+        self.spinBoxZ.setRange(*rangeZ)
 
-            self.spinBoxX.slider.setPageStep(int(nns * 0.1))
-            self.spinBoxY.slider.setPageStep(int(nnl * 0.1))
-            self.spinBoxZ.slider.setPageStep(int(nnb * 0.1))
+        self.spinBoxX.slider.setPageStep(int(nns * 0.1))
+        self.spinBoxY.slider.setPageStep(int(nnl * 0.1))
+        self.spinBoxZ.slider.setPageStep(int(nnb * 0.1))
 
         if True:
             # show subset extent range plot item

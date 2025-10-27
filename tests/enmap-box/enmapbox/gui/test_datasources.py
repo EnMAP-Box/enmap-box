@@ -19,9 +19,6 @@ from pathlib import Path
 from time import sleep
 
 from osgeo import ogr
-from qgis.PyQt import sip
-from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, QgsRasterRenderer, edit
-from qgis.gui import QgsMapCanvas
 
 from enmapbox.exampledata import enmap, hires, landcover_polygon
 from enmapbox.gui.datasources.datasources import SpatialDataSource, DataSource, RasterDataSource, VectorDataSource, \
@@ -30,6 +27,9 @@ from enmapbox.gui.datasources.manager import DataSourceManager, DataSourceManage
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
 from enmapbox.testing import start_app
 from enmapboxtestdata import classifierDumpPkl, library_berlin, enmap_srf_library
+from qgis.PyQt import sip
+from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, QgsRasterRenderer, edit
+from qgis.gui import QgsMapCanvas
 
 start_app()
 
@@ -187,7 +187,7 @@ class DataSourceTests(EnMAPBoxTestCase):
         project = QgsProject()
         project.addMapLayer(lyr1)
 
-        sources = DataSourceFactory.create(lyr1)
+        sources = DataSourceFactory.create(lyr1, project=project)
         self.assertTrue(len(sources) == 1)
         ds1 = sources[0]
 
