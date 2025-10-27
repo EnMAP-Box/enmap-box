@@ -360,7 +360,9 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
 
         # remove duplicate sources
         identifiers = list()
-        for registryName, layer in QgsProject.instance().mapLayers().items():
+        from enmapbox.gui.enmapboxgui import EnMAPBox
+        emb = EnMAPBox.instance()
+        for registryName, layer in emb.project().mapLayers().items():
             if isinstance(layer, (QgsRasterLayer, QgsVectorLayer)):
                 identifier = (layer.source(), layer.name())
                 if identifier in identifiers:

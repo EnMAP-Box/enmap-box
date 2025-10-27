@@ -91,7 +91,7 @@ from .mapcanvas import MapCanvas
 from .splashscreen.splashscreen import EnMAPBoxSplashScreen
 from .utils import enmapboxUiPath
 from ..enmapboxsettings import EnMAPBoxSettings
-from ..qgispluginsupport.qps.processing.algorithmdialog import executeAlgorithm
+from ..qgispluginsupport.qps.processing.algorithmdialog import executeAlgorithm, AlgorithmDialog
 
 MAX_MISSING_DEPENDENCY_WARNINGS = 3
 KEY_MISSING_DEPENDENCY_VERSION = 'MISSING_PACKAGE_WARNING_VERSION'
@@ -2379,11 +2379,12 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
     def actionZoomOut(self):
         return self.ui.mActionZoomOut
 
-    @staticmethod
-    def showProcessingAlgorithmDialog(
-            algorithmName: Union[str, QgsProcessingAlgorithm], parameters: Dict = None, show: bool = True,
-            modal: bool = False, wrapper: type = None, autoRun: bool = False, parent: QWidget = None
-    ) -> AlgorithmDialog:
+    def showProcessingAlgorithmDialog(self,
+                                      algorithmName: Union[str, QgsProcessingAlgorithm], parameters: Dict = None,
+                                      show: bool = True,
+                                      modal: bool = False, wrapper: type = None, autoRun: bool = False,
+                                      parent: QWidget = None
+                                      ) -> AlgorithmDialog:
         """
         Create an algorithm dialog.
 
@@ -2399,6 +2400,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                         # do something useful
 
         """
+
         if parent is None:
             from enmapbox.gui.enmapboxgui import EnMAPBox
             if EnMAPBox.instance() is not None:
@@ -2435,7 +2437,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         dlg = algorithm.createCustomParametersWidget(parent)
         if not dlg:
             if wrapper is None:
-                dlg = AlgorithmDialog(algorithm.create(), parent=parent)
+                context = self.processingContext()
+                dlg = AlgorithmDialog(algorithm.create(), parent=parent, context=context, iface=self)
             else:
                 dlg = wrapper(algorithm.create(), parent=parent)
         else:

@@ -1341,7 +1341,7 @@ class ImageCubeWidget(QMainWindow):
 
         if isinstance(lyr, QgsRasterLayer):
             if lyr != self.rasterLayer():
-                QgsProject.instance().addMapLayer(lyr)
+                self.project().addMapLayer(lyr)
                 self.mMapLayerComboBox.setLayer(lyr)
 
         if lyr is None:
