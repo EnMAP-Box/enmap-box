@@ -139,6 +139,7 @@ class test_dependencycheck(EnMAPBoxTestCase):
 
         self.showGui(w)
 
+    @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'Skipped, demo only')
     def test_AnimatedIcon(self):
         label = QLabel()
         p = QgsApplication.iconPath("/mIconLoading.gif")

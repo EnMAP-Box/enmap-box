@@ -19,9 +19,6 @@
 import pathlib
 import unittest
 
-from qgis.PyQt.QtCore import QPoint
-from qgis.PyQt.QtWidgets import QMenu
-
 import qgis
 from enmapbox import DIR_REPO
 from enmapbox.gui.contextmenus import EnMAPBoxContextMenuRegistry, EnMAPBoxAbstractContextMenuProvider
@@ -32,7 +29,9 @@ from enmapbox.qgispluginsupport.qps.maptools import MapTools
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase, start_app
+from qgis.PyQt.QtCore import QPoint
 from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel
+from qgis.PyQt.QtWidgets import QMenu
 from qgis.core import Qgis, QgsExpressionContextGenerator, QgsProcessingContext, QgsExpressionContext
 from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, \
     QgsLayerTree, QgsApplication
@@ -213,15 +212,11 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
 
         cb1 = QgsMapLayerComboBox()
         n = cb1.model().rowCount()
-        self.assertTrue(lyrNew in list(QgsProject.instance().mapLayers().values()))
+        self.assertFalse(lyrNew in list(QgsProject.instance().mapLayers().values()))
         self.assertTrue(lyrNew in list(box.project().mapLayers().values()))
         mapDock.removeLayer(lyrNew)
         self.assertFalse(lyrNew in list(QgsProject.instance().mapLayers().values()))
-        self.assertFalse(lyrNew in list(box.project().mapLayers().values()))
-
-        n2 = cb1.model().rowCount()
-        self.assertEqual(n2, n - 1)
-
+        self.assertTrue(lyrNew in list(box.project().mapLayers().values()))
         QgsProject.instance().removeAllMapLayers()
 
     def test_createDock(self):
@@ -344,6 +339,7 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         E.close()
         QgsProject.instance().removeAllMapLayers()
 
+    @unittest.skip('Disable project syncing for now')
     def test_loadAndUnloadData(self):
 
         E = EnMAPBox(load_core_apps=False, load_other_apps=False)

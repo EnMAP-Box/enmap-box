@@ -3,10 +3,11 @@ from typing import Optional
 
 from osgeo import gdal
 
-from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.dataviews.dockmanager import DockPanelUI
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import MapCanvas
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
+from enmapbox.typeguard import typechecked
 from enmapbox.utils import BlockSignals
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
@@ -23,7 +24,6 @@ from qgis.gui import (
 )
 from rasterlayerstylingapp.rasterlayerstylingbandwidget import RasterLayerStylingBandWidget
 from rasterlayerstylingapp.rasterlayerstylingpercentileswidget import RasterLayerStylingPercentilesWidget
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -80,6 +80,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
         uic.loadUi(__file__.replace('.py', '.ui'), self)
         self.enmapBox = enmapBox
         self.originalRenderer: Optional[QgsRasterRenderer] = None
+        self.mLayer.setProject(self.enmapBox.project())
         self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
         self.mLayer.setExcludedProviders(['wms'])
         self.cache = dict()
