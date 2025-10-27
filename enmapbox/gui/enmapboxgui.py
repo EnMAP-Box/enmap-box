@@ -57,7 +57,6 @@ from enmapboxprocessing.algorithm.importprismal2calgorithm import ImportPrismaL2
 from enmapboxprocessing.algorithm.importprismal2dalgorithm import ImportPrismaL2DAlgorithm
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
-from processing.ProcessingPlugin import ProcessingPlugin
 from processing.gui.AlgorithmDialog import AlgorithmDialog
 from processing.gui.ProcessingToolbox import ProcessingToolbox
 from qgis import utils as qgsUtils
@@ -92,6 +91,7 @@ from .mapcanvas import MapCanvas
 from .splashscreen.splashscreen import EnMAPBoxSplashScreen
 from .utils import enmapboxUiPath
 from ..enmapboxsettings import EnMAPBoxSettings
+from ..qgispluginsupport.qps.processing.algorithmdialog import executeAlgorithm
 
 MAX_MISSING_DEPENDENCY_WARNINGS = 3
 KEY_MISSING_DEPENDENCY_VERSION = 'MISSING_PACKAGE_WARNING_VERSION'
@@ -420,7 +420,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             splash.show()
 
         splash.showMessage('Load UI')
-        QApplication.processEvents()
+        # QApplication.processEvents()
 
         QgisInterface.__init__(self)
 
@@ -525,8 +525,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.ui.cursorLocationValuePanel.sigLocationRequest.connect(lambda: self.setMapTool(MapTools.CursorLocation))
 
         # Processing Toolbox
-        if Qgis.QGIS_VERSION_INT >= 32400:
-            self.processingToolbox().executeWithGui.connect(self.executeAlgorithm)
+        self.processingToolbox().executeWithGui.connect(self.executeAlgorithm)
 
         # load EnMAP-Box applications
         splash.showMessage('Load EnMAPBoxApplications...')
@@ -619,9 +618,14 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.onReloadProject()
 
     def executeAlgorithm(self, alg_id, parent, in_place=False, as_batch=False):
-        from qgis.utils import iface
-        processingPlugin = qgis.utils.plugins.get('processing', ProcessingPlugin(iface))
-        processingPlugin.executeAlgorithm(alg_id, parent, in_place=in_place, as_batch=as_batch)
+        if False:
+            from qgis.utils import iface
+            processingPlugin = qgis.utils.plugins.get('processing', ProcessingPlugin(iface))
+            processingPlugin.executeAlgorithm(alg_id, parent, in_place=in_place, as_batch=as_batch)
+        else:
+            context = self.processingContext()
+            executeAlgorithm(alg_id, parent, in_place=in_place, as_batch=as_batch,
+                             iface=self, context=context)
 
     def createExpressionContext(self) -> QgsExpressionContext:
         """
@@ -975,6 +979,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         :return:
         """
+        return
         SYNC_WITH_QGIS = True
 
         # 1. sync own project to a layer tree
