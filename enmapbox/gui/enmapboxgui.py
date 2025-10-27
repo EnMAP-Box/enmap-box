@@ -2253,7 +2253,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             self.dockManager().clear()
             self.dataSourceManager().clear()
             self.spectralProfileSourcePanel().mBridge.removeAllSources()
-
+            self.project().removeAllMapLayers()
         except Exception as ex:
             messageLog(str(ex), Qgis.Critical)
 
@@ -2263,12 +2263,13 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         self.disconnectQGISSignals()
 
-        try:
-            import gc
-            gc.collect()
-        except Exception as ex:
-            print(f'Errors when closing the EnMAP-Box: {ex}', file=sys.stderr)
-            pass
+        if False:
+            try:
+                import gc
+                gc.collect()
+            except Exception as ex:
+                print(f'Errors when closing the EnMAP-Box: {ex}', file=sys.stderr)
+                pass
 
         QgsApplication.processEvents()
         EnMAPBox._instance = None

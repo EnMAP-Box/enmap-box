@@ -1,9 +1,10 @@
 import os
+
+import qgis.utils
+from enmapbox.gui.applications import EnMAPBoxApplication
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from qgis.PyQt.QtWidgets import QAction, QMenu, QMessageBox
 from qgis.gui import QgisInterface
-import qgis.utils
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.gui.applications import EnMAPBoxApplication
 
 NAME = 'Image Cube'
 VERSION = '0.2'
@@ -52,6 +53,7 @@ class ImageCubeApplication(EnMAPBoxApplication):
             from imagecubeapp.imagecube import ImageCubeWidget
             # if not isinstance(self.mImageCubeWidget, ImageCubeWidget):
             mImageCubeWidget = ImageCubeWidget()
+            mImageCubeWidget.setProject(self.enmapbox.project())
             mImageCubeWidget.setWindowTitle(self.name)
             mImageCubeWidget.setWindowIcon(self.icon())
             mImageCubeWidget.sigExtentRequested.connect(self.onExtentRequested)
