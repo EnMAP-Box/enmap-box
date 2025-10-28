@@ -1,10 +1,7 @@
 from os.path import basename, join, dirname
 
-from enmapboxprocessing.algorithm.prepareregressiondatasetfromjsonalgorithm import \
-    PrepareRegressionDatasetFromJsonAlgorithm
-from qgis.PyQt.uic import loadUi
-
 from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.qgispluginsupport.qps.processing.algorithmdialog import AlgorithmDialog
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcodealgorithm import \
     PrepareRegressionDatasetFromCodeAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuouslibraryalgorithm import \
@@ -17,14 +14,16 @@ from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousvectoran
     PrepareRegressionDatasetFromContinuousVectorAndFieldsAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromfilesalgorithm import \
     PrepareRegressionDatasetFromFilesAlgorithm
+from enmapboxprocessing.algorithm.prepareregressiondatasetfromjsonalgorithm import \
+    PrepareRegressionDatasetFromJsonAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromtablealgorithm import \
     PrepareRegressionDatasetFromTableAlgorithm
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
-from processing import AlgorithmDialog
 from processing.gui.wrappers import WidgetWrapper
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QMenu, QMessageBox
+from qgis.PyQt.uic import loadUi
 from qgis.gui import QgsFileWidget
 
 
@@ -156,6 +155,9 @@ class ProcessingParameterPickleFileRegressionDatasetWidgetWrapper(WidgetWrapper)
 
     def createWidget(self):
         return ProcessingParameterPickleFileRegressionDatasetWidget()
+
+    def setWidgetContext(self, context):
+        self.widget.setProject(context.project())
 
     def setValue(self, value):
         self.widget.setValue(value)
