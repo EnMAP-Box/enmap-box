@@ -140,6 +140,9 @@ class RasterLayerStylingPanel(QgsDockWidget):
         # init GUI
         self.mRenderer.setCurrentIndex(self.DefaultRendererTab)
 
+    def project(self) -> QgsProject:
+        return self.enmapBox.project()
+
     def onOpenStateChanged(self, wasOpened: bool):
         panel: DockPanelUI = self.enmapBox.ui.dockPanel
         panel.mRasterLayerStyling.setChecked(wasOpened)
@@ -449,8 +452,8 @@ class RasterLayerStylingPanel(QgsDockWidget):
 
         # find all layers with same source
         layers = list()
-        for layerId in QgsProject.instance().mapLayers():
-            aLayer = QgsProject.instance().mapLayer(layerId)
+        for layerId in self.project().mapLayers():
+            aLayer = self.project().mapLayer(layerId)
             if not isinstance(aLayer, QgsRasterLayer):
                 continue
             if aLayer.dataProvider().name() != 'gdal':

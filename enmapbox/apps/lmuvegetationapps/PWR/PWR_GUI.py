@@ -22,16 +22,16 @@
     along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
 """
-from qgis.gui import QgsMapLayerComboBox
-from qgis.core import QgsMapLayerProxyModel
 import sys
-import os
-from PyQt5.QtCore import Qt
-from qgis.PyQt.QtWidgets import *
-from PyQt5.QtGui import QPixmap
+
 from _classic.hubflow.core import *
-from lmuvegetationapps.PWR.PWR_core import PWR_core
 from lmuvegetationapps import APP_DIR
+from lmuvegetationapps.PWR.PWR_core import PWR_core
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QPixmap
+from qgis.PyQt.QtWidgets import *
+from qgis.core import QgsMapLayerProxyModel
+from qgis.gui import QgsMapLayerComboBox
 
 pathUI_pwr = os.path.join(APP_DIR, 'Resources/UserInterfaces/PWR.ui')
 pathUI_nodat = os.path.join(APP_DIR, 'Resources/UserInterfaces/Nodat.ui')
@@ -94,6 +94,11 @@ class PWR:
         self.NDWI_th = -0.9
         self.out_path = None
         self.addItem = []
+
+        from enmapbox.gui.enmapboxgui import EnMAPBox
+        emb = EnMAPBox.instance()
+        if isinstance(emb, EnMAPBox):
+            self.gui.mLayer.setProject(emb.project())
         self.gui.mLayer.setLayer(None)
 
     def connections(self):
