@@ -141,7 +141,7 @@ def find_best_split(label_histograms, num_permutations, train_perc, test_perc, v
         # Calculate EMD only for existing datasets
         emd_sum = 0
         num_comparisons = 0
-
+        #
         # Normalize histograms for non-empty datasets
         if num_test > 0:
             test_hist = test_hist / np.sum(test_hist)
