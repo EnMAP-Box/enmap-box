@@ -29,18 +29,20 @@ retrieval of biochemical vegetation traits. International Journal of Applied Ear
 https://doi.org/10.1016/j.jag.2020.102219
 """
 
-from qgis.gui import QgsMapLayerComboBox
-from qgis.core import QgsMapLayerProxyModel
+import os
+import sys
+
+from scipy.interpolate import *
 
 from _classic.hubflow.core import *
-from qgis.PyQt.QtWidgets import *
-from qgis.PyQt.QtGui import *
-from enmapbox.qgispluginsupport.qps.pyqtgraph import pyqtgraph as pg
-import sys, os
-from lmuvegetationapps.ASI.peakdetect import *
-from lmuvegetationapps import APP_DIR
-from scipy.interpolate import *
 from enmapbox.gui.utils import loadUi
+from enmapbox.qgispluginsupport.qps.pyqtgraph import pyqtgraph as pg
+from lmuvegetationapps import APP_DIR
+from lmuvegetationapps.ASI.peakdetect import *
+from qgis.PyQt.QtGui import *
+from qgis.PyQt.QtWidgets import *
+from qgis.core import QgsMapLayerProxyModel
+from qgis.gui import QgsMapLayerComboBox
 
 pathUI = os.path.join(APP_DIR, 'Resources/UserInterfaces/ASI.ui')
 pathUI2 = os.path.join(APP_DIR, 'Resources/UserInterfaces/Nodat.ui')
@@ -54,6 +56,12 @@ class ASI_GUI(QDialog):
         super(ASI_GUI, self).__init__(parent)
         loadUi(pathUI, self)
         QApplication.instance().installEventFilter(self)
+
+        from enmapbox.gui.enmapboxgui import EnMAPBox
+        emb = EnMAPBox.instance()
+        if isinstance(emb, EnMAPBox):
+            self.mLayer.setProject(emb.project())
+
         self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
 
         # fix the sendHoverEvent crash by replacing the slot function
@@ -1079,7 +1087,7 @@ class ASI_core:
 
                             absorb_area[j, row, col] = np.nansum(np.log(1 / in_matrix[k:i, row, col]) -
                                                                  np.log(1 / contiguous_hull_x[
-                                                                            k:i]))  # / np.nansum(contiguous_hull_x[k:i])
+                                                                     k:i]))  # / np.nansum(contiguous_hull_x[k:i])
                             # hull_area[j, row, col] = np.nansum(np.log(1 / in_matrix[k:fixed_end, row, col]))
                             hull_area[j, row, col] = np.nansum(np.log(1 / contiguous_hull_x[k:fixed_end]))
                             # res3band[j, row, col] = absorb_area[j, row, col] / hull_area[j, row, col]

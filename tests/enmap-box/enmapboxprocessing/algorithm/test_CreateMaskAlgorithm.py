@@ -62,17 +62,18 @@ class TestCreateMaskAlgorithm(TestCase):
         writer = self.rasterFromArray([[[0, 1, 2, 3]]])
         writer.close()
 
-        alg = CreateMaskAlgorithm()
-        parameters = {
-            alg.P_RASTER: writer.source(),
-            alg.P_BAND: 1,
-            alg.P_MASK_VALUE_RANGES: ['-10', '-5',
-                                      '-1', '0',
-                                      '3', '10'],
-            alg.P_OUTPUT_MASK: self.filename('mask.tif'),
-        }
-        result = self.runalg(alg, parameters)
-        self.assertListEqual([0, 1, 1, 0], RasterReader(result[alg.P_OUTPUT_MASK]).array()[0][0].tolist())
+        for Alg in self.Algorithms:
+            alg = Alg()
+            parameters = {
+                alg.P_RASTER: writer.source(),
+                alg.P_BAND: 1,
+                alg.P_MASK_VALUE_RANGES: ['-10', '-5',
+                                          '-1', '0',
+                                          '3', '10'],
+                alg.P_OUTPUT_MASK: self.filename('mask.tif'),
+            }
+            result = self.runalg(alg, parameters)
+            self.assertListEqual([0, 1, 1, 0], RasterReader(result[alg.P_OUTPUT_MASK]).array()[0][0].tolist())
 
     def test_bitMask(self):
         writer = self.rasterFromArray([[[

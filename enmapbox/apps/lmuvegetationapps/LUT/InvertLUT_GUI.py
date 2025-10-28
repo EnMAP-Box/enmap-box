@@ -22,18 +22,18 @@
     along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
 """
-from qgis._gui import QgsMapLayerComboBox
-from qgis._core import QgsMapLayerProxyModel
-
-import sys
 import os
+import sys
+
+from osgeo import gdal
+
+import lmuvegetationapps.LUT.InvertLUT_core as Inverse
+from enmapbox.gui.utils import loadUi
+from lmuvegetationapps import APP_DIR
 # ensure to call QGIS before PyQtGraph
 from qgis.PyQt.QtWidgets import *
-from osgeo import gdal
-import lmuvegetationapps.LUT.InvertLUT_core as Inverse
-from lmuvegetationapps import APP_DIR
-from enmapbox.gui.utils import loadUi
-import numpy as np
+from qgis.core import QgsMapLayerProxyModel
+from qgis.gui import QgsMapLayerComboBox
 
 pathUI_inversion = os.path.join(APP_DIR, 'Resources/UserInterfaces/InvertLUT.ui')
 pathUI_wavelengths = os.path.join(APP_DIR, 'Resources/UserInterfaces/Select_Wavelengths.ui')
@@ -49,6 +49,13 @@ class GlobalInversionGUI(QDialog):
     def __init__(self, parent=None):
         super(GlobalInversionGUI, self).__init__(parent)
         loadUi(pathUI_inversion, self)
+
+        from enmapbox.gui.enmapboxgui import EnMAPBox
+        emb = EnMAPBox.instance()
+        if isinstance(emb, EnMAPBox):
+            for cb in [self.mLayerImage, self.mLayerGeometry, self.mLayerMask]:
+                cb.setProject(emb.project())
+
         self.mLayerImage.setFilters(QgsMapLayerProxyModel.RasterLayer)
         self.mLayerGeometry.setFilters(QgsMapLayerProxyModel.RasterLayer)
         self.mLayerMask.setFilters(QgsMapLayerProxyModel.RasterLayer)

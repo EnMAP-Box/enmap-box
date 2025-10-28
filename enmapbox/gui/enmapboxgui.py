@@ -57,7 +57,6 @@ from enmapboxprocessing.algorithm.importprismal2calgorithm import ImportPrismaL2
 from enmapboxprocessing.algorithm.importprismal2dalgorithm import ImportPrismaL2DAlgorithm
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
-from processing.gui.AlgorithmDialog import AlgorithmDialog
 from processing.gui.ProcessingToolbox import ProcessingToolbox
 from qgis import utils as qgsUtils
 from qgis.PyQt.QtCore import QUrl
@@ -70,6 +69,7 @@ from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, Q
     QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
     QProgressBar, QMessageBox
 from qgis.PyQt.QtXml import QDomDocument
+from qgis.core import QgsBrowserModel
 from qgis.core import QgsExpressionContextGenerator, QgsExpressionContext, QgsProcessingContext, \
     QgsExpressionContextUtils
 from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
@@ -91,7 +91,7 @@ from .mapcanvas import MapCanvas
 from .splashscreen.splashscreen import EnMAPBoxSplashScreen
 from .utils import enmapboxUiPath
 from ..enmapboxsettings import EnMAPBoxSettings
-from ..qgispluginsupport.qps.processing.algorithmdialog import executeAlgorithm
+from ..qgispluginsupport.qps.processing.algorithmdialog import executeAlgorithm, AlgorithmDialog
 
 MAX_MISSING_DEPENDENCY_WARNINGS = 3
 KEY_MISSING_DEPENDENCY_VERSION = 'MISSING_PACKAGE_WARNING_VERSION'
@@ -2280,6 +2280,11 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.dockManager()
         self.ui.close()
 
+    def browserModel(self) -> QgsBrowserModel:
+
+        from qgis.utils import iface as iface0
+        return iface0.browserModel()
+
     def __del__(self):
         EnMAPBox._instance = None
 
@@ -2379,11 +2384,12 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
     def actionZoomOut(self):
         return self.ui.mActionZoomOut
 
-    @staticmethod
-    def showProcessingAlgorithmDialog(
-            algorithmName: Union[str, QgsProcessingAlgorithm], parameters: Dict = None, show: bool = True,
-            modal: bool = False, wrapper: type = None, autoRun: bool = False, parent: QWidget = None
-    ) -> AlgorithmDialog:
+    def showProcessingAlgorithmDialog(self,
+                                      algorithmName: Union[str, QgsProcessingAlgorithm], parameters: Dict = None,
+                                      show: bool = True,
+                                      modal: bool = False, wrapper: type = None, autoRun: bool = False,
+                                      parent: QWidget = None
+                                      ) -> AlgorithmDialog:
         """
         Create an algorithm dialog.
 
@@ -2399,6 +2405,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                         # do something useful
 
         """
+
         if parent is None:
             from enmapbox.gui.enmapboxgui import EnMAPBox
             if EnMAPBox.instance() is not None:
@@ -2434,10 +2441,11 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         dlg = algorithm.createCustomParametersWidget(parent)
         if not dlg:
+            context = self.processingContext()
             if wrapper is None:
-                dlg = AlgorithmDialog(algorithm.create(), parent=parent)
+                dlg = AlgorithmDialog(algorithm.create(), parent=parent, context=context, iface=self)
             else:
-                dlg = wrapper(algorithm.create(), parent=parent)
+                dlg = wrapper(algorithm.create(), parent=parent, context=context, iface=self)
         else:
             assert wrapper is None  # todo: dialog wrapper for custom parameter widget
         assert isinstance(dlg, QgsProcessingAlgorithmDialogBase)

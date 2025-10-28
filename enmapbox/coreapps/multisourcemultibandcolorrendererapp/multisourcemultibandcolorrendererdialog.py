@@ -56,6 +56,7 @@ class MultiSourceMultiBandColorRendererDialog(QMainWindow):
         for mLayer in [self.mLayer1, self.mLayer2, self.mLayer3]:
             mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
             mLayer.setExcludedProviders(['wms'])
+            mLayer.setProject(self.enmapBox.project())
 
         self.mP1.setClearValue(self.mP1.value())
         self.mP2.setClearValue(self.mP2.value())
