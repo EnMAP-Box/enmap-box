@@ -158,7 +158,7 @@ class DL_Trainer(QgsProcessingAlgorithm):
                '<h3>Epochs</h3>' \
                '<p>This defines the number of Epochs which are used to train a model. One epochs means the model is trained once on the whole training dataset. Epochs are 0 indexed so the first training epoch is epoch-0. </p>' \
                '<h3>Learning rate</h3>' \
-               '<p>This defines the Learning rate for the Adam optimizer of the model. </p>' \
+               '<p>This defines the Learning rate for the Adam optimizer of the model. Learning rate is decreasing during training using CosineAnnealingLR using defined epochs value as T_max value, so lr decreases steadily towards near zero during whole training run ( min lr: 1e-6 ). ( More detail see here:https://docs.pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.CosineAnnealingLR.html )  </p>' \
                '<h3>Automatic learning rate finder</h3>' \
                '<p>If activated this parameter runs a learning rate finder, meaning it test 100 learning rates before training and picks the one with the most stable learning for training. If chosen this overwrites the manual defined learning rate. The found and implemented  learningrate is printed to log interface. </p>' \
                '<h3>Number of workers</h3>' \
