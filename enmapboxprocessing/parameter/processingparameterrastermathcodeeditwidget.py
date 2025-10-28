@@ -327,7 +327,7 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
 
     def getRasterSources(self) -> Dict:
         sources = {k: v for k, v in self.getSources().items()
-                   if isinstance(QgsProject.instance().mapLayer(v), QgsRasterLayer)}
+                   if isinstance(self.mProject.mapLayer(v), QgsRasterLayer)}
         return sources
 
     def insertIdentifier(self, identifier: str = None):
@@ -451,11 +451,18 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
         for identifier, registryName in self.getSources().items():
             if identifier not in code:
                 continue
-            layer = QgsProject.instance().mapLayer(registryName)
-            if isinstance(layer, QgsRasterLayer):
-                text += f'# {identifier} := QgsRasterLayer("{layer.source()}")\n'
-            if isinstance(layer, QgsVectorLayer):
-                text += f'# {identifier} := QgsVectorLayer("{layer.source()}")\n'
+            # from enmapbox.gui.enmapboxgui import EnMAPBox
+            # mp2 = EnMAPBox.instance().project()
+            # assert mp2 == self.mProject, 'project mismatch'
+            for prj in [self.mProject, QgsProject.instance()]:
+                assert isinstance(prj, QgsProject)
+                layer = prj.mapLayer(registryName)
+                if isinstance(layer, QgsRasterLayer):
+                    text += f'# {identifier} := QgsRasterLayer("{layer.source()}")\n'
+                    break
+                if isinstance(layer, QgsVectorLayer):
+                    text += f'# {identifier} := QgsVectorLayer("{layer.source()}")\n'
+                    break
         # append the actual code
         text += self.mCode.value()
         return text
