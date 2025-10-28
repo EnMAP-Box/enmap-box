@@ -72,21 +72,63 @@ class ui_msk:
 
         # NDRBI
         self.gui.widget_row()
-        self.gui.widget_check_button('Mask water areas using NDRBI:', ID='msk_set_ndrbi', width = 270, action=self.msk_select_ndrbi)
+        self.gui.widget_check_button('Mask water areas using NDRBI*:',
+                                     ID='msk_set_ndrbi', width = 270, action=self.msk_select_ndrbi)
         self.gui.widget_text(ID='msk_ndrbi')
         self.gui.widget_row_close()
 
         # NDVI
         self.gui.widget_row()
-        self.gui.widget_check_button('Mask green vegetated areas using NDVI:', ID='msk_set_ndvi', width = 270, action=self.msk_select_ndvi)
+        self.gui.widget_check_button('Mask green vegetated areas using NDVI*:',
+                                     ID='msk_set_ndvi', width = 270, action=self.msk_select_ndvi)
         self.gui.widget_text(ID = 'msk_ndvi')
         self.gui.widget_row_close()
 
         # NCAI
         self.gui.widget_row()
-        self.gui.widget_check_button('Mask dry vegetated areas using NCAI:', ID='msk_set_ncai', width = 270, action=self.msk_select_ncai)
+        self.gui.widget_check_button('Mask dry vegetated areas using nCAI*:',
+                                     ID='msk_set_ncai', width = 270, action=self.msk_select_ncai)
         self.gui.widget_text(ID = 'msk_ncai')
         self.gui.widget_row_close()
+
+        self.gui.widget_add_spacing(5)
+        self.gui.widget_row()
+        self.gui.widget_label(text='     * '
+                                   'NDRBI = Normalized Difference Red Blue Index;  '
+                                   'NDVI = Normalized Difference Vegetation Index;  '
+                                   'nCAI = normalized Cellulose Absorption Index')
+        self.gui.widget_row_close()
+
+        self.gui.widget_group_box_close()
+
+        # -----------------------------------------------------------------------------------------
+        # GROUP BOX: ADVANCED OPTIONS
+        self.gui.widget_add_spacing(10)
+        self.gui.widget_group_box('ADVANCED OPTIONS')
+
+        self.gui.widget_row()
+        self.gui.widget_label(text='Refine threshold values:', height=15)
+        self.gui.widget_row_close()
+
+        self.gui.widget_row(alignment=Qt.AlignLeft)
+        self.gui.widget_label(text=' - NDRBI (common threshold range: around 1.0):',
+                              width=270)
+        self.gui.widget_text(ID='msk_txt_th_ndrbi', text=str(ndrbi.__th_default__), edit=True, width=40)
+        self.gui.widget_row_close()
+
+        self.gui.widget_row(alignment=Qt.AlignLeft)
+        self.gui.widget_label(text=' - NDVI (common threshold range: 0.2 - 0.4):',
+                              width=270)
+        self.gui.widget_text(ID='msk_txt_th_ndvi', text=str(ndvi.__th_default__), edit=True, width=40)
+        self.gui.widget_row_close()
+
+        self.gui.widget_row(alignment=Qt.AlignLeft)
+        self.gui.widget_label(text=' - nCAI (common threshold range: 0.01 - 0.04):',
+                              width=270)
+        self.gui.widget_text(ID='msk_txt_th_ncai', text=str(ncai.__th_default__), edit=True, width=40)
+        self.gui.widget_row_close()
+
+        # self.gui.widget_tool_button(text='Reset', action=self.cal_clear_gain_offset)
 
         self.gui.widget_group_box_close()
 
@@ -329,16 +371,27 @@ class ui_msk:
         vNCAI  = self.gui.gui['msk_set_ncai'].isChecked()
         if not vWater and not vNDVI and not vNCAI:
             msg = "Select at least a soil mask"
-            hsy.display_error(self, msg)
+            hys.display_error(self, msg)
             return
-        
+
+        th_ndrbi = self.gui.gui['msk_txt_th_ndrbi'].text()
+        th_ndvi = self.gui.gui['msk_txt_th_ndvi'].text()
+        th_ncai = self.gui.gui['msk_txt_th_ncai'].text()
+        for i, n in zip([th_ndrbi, th_ndvi, th_ncai], ['NDRBI', 'NDVI', 'nCAI']):
+            if i.replace('-', '', 1).replace('.', '', 1).isdigit() is False:
+                hys.display_error(self, n + ' threshold is not valid!')
+                return
+        th_ndrbi = np.float32(th_ndrbi)
+        th_ndvi = np.float32(th_ndvi)
+        th_ncai = np.float32(th_ncai)
+
         # calculate tile
         self.msk_cube.tile_data()
 
         # define output filename
         dname = self.msk_dname + os.path.sep
 
-        # intialize the progress bar
+        # initialize the progress bar
         t1 = time.time()
         self.gui.gui['msk_prog_bar'].setMinimum(0)
         self.gui.gui['msk_prog_bar'].setMaximum(self.msk_cube.bn)
@@ -392,23 +445,23 @@ class ui_msk:
             im = self.msk_cube.read(tile=k)
             omsk = np.ones((im.shape[1], im.shape[2]), dtype=np.int16)
             if vWater:
-                prod, mask = ndrbi.process(im[bind_water, :, :])
+                prod, mask = ndrbi.process(im[bind_water, :, :], th_ndrbi)
                 p_water.write(np.asarray(prod), tile=k)
                 m_water.write(np.asarray(mask).astype(np.int16), tile=k)
                 omsk *= np.asarray(mask).astype(np.int16)
             if vNDVI:
-                prod, mask = ndvi.process(im[bind_ndvi, :, :])
+                prod, mask = ndvi.process(im[bind_ndvi, :, :], th_ndvi)
                 p_ndvi.write(np.asarray(prod), tile=k)
                 m_ndvi.write(np.asarray(mask).astype(np.int16), tile=k)
                 omsk *= np.asarray(mask).astype(np.int16)
             if vNCAI:
-                prod, mask = ncai.process(im[bind_ncai, :, :])
+                prod, mask = ncai.process(im[bind_ncai, :, :], th_ncai)
                 p_ncai.write(np.asarray(prod), tile=k)
                 m_ncai.write(np.asarray(mask).astype(np.int16), tile=k)
                 omsk *= np.asarray(mask).astype(np.int16)
             self.msk_mask.write(omsk, tile=k)
         
-        # ipdate information
+        # update information
         msg = "Processing complete in %8.2f seconds"%(time.time() - t1)
         hys.display_information(self, msg)
         self.gui.gui['msk_prog_bar'].setValue(0)

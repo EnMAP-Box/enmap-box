@@ -3,16 +3,16 @@
 # This module handles the GUI of the Vegetation Index Toolbox
 
 import sys
-# import os
 
-from qgis.gui import QgsMapLayerComboBox
-from qgis.core import QgsMapLayerProxyModel
-
-from qgis.PyQt.QtWidgets import *
-from _classic.hubflow.core import *
 import lmuvegetationapps.VIT.VIT_core
-from lmuvegetationapps import APP_DIR
+from _classic.hubflow.core import *
 from enmapbox.gui.utils import loadUi
+from lmuvegetationapps import APP_DIR
+from qgis.PyQt.QtWidgets import *
+from qgis.core import QgsMapLayerProxyModel
+from qgis.gui import QgsMapLayerComboBox
+
+# import os
 
 pathUI_vit = os.path.join(APP_DIR, 'Resources/UserInterfaces/VIT.ui')
 pathUI_nodat = os.path.join(APP_DIR, 'Resources/UserInterfaces/Nodat.ui')
@@ -21,17 +21,24 @@ pathUI_prgbar = os.path.join(APP_DIR, 'Resources/UserInterfaces/ProgressBar.ui')
 
 class VIT_GUI(QDialog):
     mLayer: QgsMapLayerComboBox
-    def __init__(self, parent=None):
 
+    def __init__(self, parent=None):
         super(VIT_GUI, self).__init__(parent)
         loadUi(pathUI_vit, self)
 
+        from enmapbox.gui.enmapboxgui import EnMAPBox
+        emb = EnMAPBox.instance()
+        if isinstance(emb, EnMAPBox):
+            self.mLayer.setProject(emb.project())
+
         self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+
 
 class NodatGUI(QDialog):
     def __init__(self, parent=None):
         super(NodatGUI, self).__init__(parent)
         loadUi(pathUI_nodat, self)
+
 
 class PRG_GUI(QDialog):
     def __init__(self, parent=None):
@@ -130,7 +137,7 @@ class VIT:
     def dictchecks(self):
         # a dictionary for all the checkboxes, so they can be addressed in functions
         self.dict_structural = {0: self.gui.box_hndvi_opp, 1: self.gui.box_ndvi_apa, 2: self.gui.box_ndvi_dat,
-                                3: self.gui.box_ndvi_hab,  4: self.gui.box_ndvi_zar, 5: self.gui.box_mcari1,
+                                3: self.gui.box_ndvi_hab, 4: self.gui.box_ndvi_zar, 5: self.gui.box_mcari1,
                                 6: self.gui.box_mcari2, 7: self.gui.box_msavi, 8: self.gui.box_mtvi1,
                                 9: self.gui.box_mtvi2, 10: self.gui.box_osavi, 11: self.gui.box_rdvi,
                                 12: self.gui.box_spvi}
@@ -252,7 +259,6 @@ class VIT:
             self.gui.lblNodatImage.setText(str(meta[0]))
             self.gui.txtNodatOutput.setText(str(meta[0]))
             self.nodat[0] = meta[0]
-
 
     def get_image_meta(self, image, image_type):
         dataset = openRasterDataset(image)
@@ -437,6 +443,7 @@ class MainUiFunc:
 
 if __name__ == '__main__':
     from enmapbox.testing import start_app
+
     app = start_app()
     m = MainUiFunc()
     m.show()

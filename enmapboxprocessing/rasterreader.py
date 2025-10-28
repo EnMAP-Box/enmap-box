@@ -26,6 +26,9 @@ class RasterReader(object):
     Nanometers = 'Nanometers'
     Micrometers = 'Micrometers'
 
+    disableStac = True  # see issue #1259
+    disableQgisPam = True
+
     def __init__(
             self, source: RasterSource, openWithGdal: bool = None,
             crs: QgsCoordinateReferenceSystem = None
@@ -58,17 +61,18 @@ class RasterReader(object):
 
         self.setRasterPipeCrs(crs)
 
-        # prepare STAC metadata
-        if exists(self.layer.source() + '.stac.json'):
-            self.stacMetadata = Utils().jsonLoad(self.layer.source() + '.stac.json')
-        else:
-            self.stacMetadata = {}
-        if 'properties' not in self.stacMetadata:
-            self.stacMetadata['properties'] = {}
-        if 'eo:bands' not in self.stacMetadata['properties']:
-            self.stacMetadata['properties']['eo:bands'] = [{} for i in self.bandNumbers()]
-        if 'envi:metadata' not in self.stacMetadata['properties']:
-            self.stacMetadata['properties']['envi:metadata'] = {}
+        if not self.disableStac:
+            # prepare STAC metadata
+            if exists(self.layer.source() + '.stac.json'):
+                self.stacMetadata = Utils().jsonLoad(self.layer.source() + '.stac.json')
+            else:
+                self.stacMetadata = {}
+            if 'properties' not in self.stacMetadata:
+                self.stacMetadata['properties'] = {}
+            if 'eo:bands' not in self.stacMetadata['properties']:
+                self.stacMetadata['properties']['eo:bands'] = [{} for i in self.bandNumbers()]
+            if 'envi:metadata' not in self.stacMetadata['properties']:
+                self.stacMetadata['properties']['envi:metadata'] = {}
 
         # prepare R terra (https://github.com/rspatial/terra) metadata, also see #907
         if exists(self.layer.source() + '.aux.json'):
@@ -101,14 +105,15 @@ class RasterReader(object):
     def bandName(self, bandNo: int) -> str:
         """Return band name."""
 
-        # check STAC
-        bandName = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('name')
-        if bandName is not None:
-            return bandName
+        if not self.disableStac:
+            # check STAC
+            bandName = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('name')
+            if bandName is not None:
+                return bandName
 
-        bandName = self.stacMetadata['properties']['envi:metadata'].get('band_names')
-        if bandName is not None:
-            return bandName[bandNo - 1]
+            bandName = self.stacMetadata['properties']['envi:metadata'].get('band_names')
+            if bandName is not None:
+                return bandName[bandNo - 1]
 
         # check QGIS
         return ': '.join(self.layer.bandName(bandNo).split(': ')[1:])  # removes the "Band 042: " prefix
@@ -509,32 +514,34 @@ class RasterReader(object):
 
         key2 = key.replace(' ', '_')
 
-        # check STAC
-        if domain == 'envi':
-            value = self.stacMetadata['properties']['envi:metadata'].get(key)
-            if value is not None:
+        if not self.disableStac:
+            # check STAC
+            if domain == 'envi':
+                value = self.stacMetadata['properties']['envi:metadata'].get(key)
+                if value is not None:
+                    if bandNo is not None:
+                        value = value[bandNo - 1]
+            else:
                 if bandNo is not None:
-                    value = value[bandNo - 1]
-        else:
-            if bandNo is not None:
-                value = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get(key)
-            else:
-                value = self.stacMetadata['properties'].get(key)
-        if value is not None:
-            return value
+                    value = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get(key)
+                else:
+                    value = self.stacMetadata['properties'].get(key)
+            if value is not None:
+                return value
 
-        # check QGISPAM
-        if checkCustomProperties:
-            if bandNo is None:
-                string = self.layer.customProperty(f'QGISPAM/dataset/{domain}/{key}')
-                if string is None:
-                    string = self.layer.customProperty(f'QGISPAM/dataset/{domain}/{key2}')
-            else:
-                string = self.layer.customProperty(f'QGISPAM/band/{bandNo}/{domain}/{key}')
-                if string is None:
-                    string = self.layer.customProperty(f'QGISPAM/band/{bandNo}/{domain}/{key2}')
-            if string is not None:
-                return Utils.stringToMetadateValue(str(string))
+        if not self.disableQgisPam:
+            # check QGISPAM
+            if checkCustomProperties:
+                if bandNo is None:
+                    string = self.layer.customProperty(f'QGISPAM/dataset/{domain}/{key}')
+                    if string is None:
+                        string = self.layer.customProperty(f'QGISPAM/dataset/{domain}/{key2}')
+                else:
+                    string = self.layer.customProperty(f'QGISPAM/band/{bandNo}/{domain}/{key}')
+                    if string is None:
+                        string = self.layer.customProperty(f'QGISPAM/band/{bandNo}/{domain}/{key2}')
+                if string is not None:
+                    return Utils.stringToMetadateValue(str(string))
 
         if self.gdalDataset is None:
             return None
@@ -592,13 +599,14 @@ class RasterReader(object):
     def wavelengthUnits(self, bandNo: int, guess=True) -> Optional[str]:
         """Return wavelength units."""
 
-        # check STAC
-        if 'center_wavelength' in self.stacMetadata['properties']['eo:bands'][bandNo - 1]:
-            return self.Micrometers  # STAC EO Extension always uses Micrometers
-        if 'full_width_half_max' in self.stacMetadata['properties']['eo:bands'][bandNo - 1]:
-            return self.Micrometers  # STAC EO Extension always uses Micrometers
-        if 'wavelength_units' in self.stacMetadata['properties']['envi:metadata']:
-            return self.stacMetadata['properties']['envi:metadata']['wavelength_units']
+        if not self.disableStac:
+            # check STAC
+            if 'center_wavelength' in self.stacMetadata['properties']['eo:bands'][bandNo - 1]:
+                return self.Micrometers  # STAC EO Extension always uses Micrometers
+            if 'full_width_half_max' in self.stacMetadata['properties']['eo:bands'][bandNo - 1]:
+                return self.Micrometers  # STAC EO Extension always uses Micrometers
+            if 'wavelength_units' in self.stacMetadata['properties']['envi:metadata']:
+                return self.stacMetadata['properties']['envi:metadata']['wavelength_units']
 
         # check GDAL
         if self.metadataItem('CENTRAL_WAVELENGTH_UM', 'IMAGERY', bandNo) is not None:
@@ -655,14 +663,15 @@ class RasterReader(object):
 
             conversionFactor = Utils.wavelengthUnitsConversionFactor(wavelength_units, units)
 
-        # check STAC
-        wavelength = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('center_wavelength')
-        if wavelength is not None:
-            return conversionFactor * float(wavelength)
+        if not self.disableStac:
+            # check STAC
+            wavelength = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('center_wavelength')
+            if wavelength is not None:
+                return conversionFactor * float(wavelength)
 
-        wavelength = self.stacMetadata['properties']['envi:metadata'].get('wavelength')
-        if wavelength is not None:
-            return conversionFactor * float(wavelength[bandNo - 1])
+            wavelength = self.stacMetadata['properties']['envi:metadata'].get('wavelength')
+            if wavelength is not None:
+                return conversionFactor * float(wavelength[bandNo - 1])
 
         # check GDAL
         wavelength = self.metadataItem('CENTRAL_WAVELENGTH_UM', 'IMAGERY', bandNo)
@@ -670,18 +679,18 @@ class RasterReader(object):
             return conversionFactor * float(wavelength)
 
         for key in [
+            'wavelengths'  # support for Tanager
             'wavelength',
             'Wavelength',  # support for FORCE BOA files
-            '/HDFEOS/SWATHS/HYP/Data Fields/toa_radiance#wavelengths'  # support for tanager (issue #1208)
         ]:
             # check band-level domains
-            for domain in set(self.metadataDomainKeys(bandNo) + ['']):
+            for domain in set([''] + self.metadataDomainKeys(bandNo)):
                 wavelength = self.metadataItem(key, domain, bandNo)
                 if wavelength is not None:
                     return conversionFactor * float(wavelength)
 
             # check dataset-level domains
-            for domain in set(self.metadataDomainKeys() + ['']):
+            for domain in set([''] + self.metadataDomainKeys()):
                 wavelengths = self.metadataItem(key, domain)
                 if wavelengths is not None:
                     wavelength = wavelengths[bandNo - 1]
@@ -721,14 +730,15 @@ class RasterReader(object):
 
         conversionFactor = Utils.wavelengthUnitsConversionFactor(wavelength_units, units)
 
-        # check STAC
-        fwhm = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('full_width_half_max')
-        if fwhm is not None:
-            return conversionFactor * float(fwhm)
+        if not self.disableStac:
+            # check STAC
+            fwhm = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('full_width_half_max')
+            if fwhm is not None:
+                return conversionFactor * float(fwhm)
 
-        fwhm = self.stacMetadata['properties']['envi:metadata'].get('fwhm')
-        if fwhm is not None:
-            return conversionFactor * float(fwhm[bandNo - 1])
+            fwhm = self.stacMetadata['properties']['envi:metadata'].get('fwhm')
+            if fwhm is not None:
+                return conversionFactor * float(fwhm[bandNo - 1])
 
         # check GDAL
         wavelength = self.metadataItem('FWHM_UM', 'IMAGERY', bandNo)
@@ -756,14 +766,17 @@ class RasterReader(object):
         if self.gdalDataset is None:
             return 1
 
-        # check STAC
-        badBandMultiplier = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('enmapbox:bad_band_multiplier')
-        if badBandMultiplier is not None:
-            return int(badBandMultiplier)
+        if not self.disableStac:
+            # check STAC
+            badBandMultiplier = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get(
+                'enmapbox:bad_band_multiplier'
+            )
+            if badBandMultiplier is not None:
+                return int(badBandMultiplier)
 
-        badBandMultiplier = self.stacMetadata['properties']['envi:metadata'].get('bbl')
-        if badBandMultiplier is not None:
-            return int(badBandMultiplier[bandNo - 1])
+            badBandMultiplier = self.stacMetadata['properties']['envi:metadata'].get('bbl')
+            if badBandMultiplier is not None:
+                return int(badBandMultiplier[bandNo - 1])
 
         # check band-level domains
         for domain in set(self.metadataDomainKeys(bandNo) + ['']):
@@ -792,22 +805,23 @@ class RasterReader(object):
                     decimalYear = float(self.metadataItem('wavelength', '', bandNo))
                     return Utils.decimalYearToDateTime(decimalYear)
 
-            # check STAC
-            dateTime = self.stacMetadata['properties']['envi:metadata'].get('eo:start_datetime')
-            if dateTime is not None:
-                return Utils.parseDateTime(dateTime[bandNo - 1])
+            if not self.disableStac:
+                # check STAC
+                dateTime = self.stacMetadata['properties']['envi:metadata'].get('eo:start_datetime')
+                if dateTime is not None:
+                    return Utils.parseDateTime(dateTime[bandNo - 1])
 
-            dateTime = self.stacMetadata['properties']['envi:metadata'].get('eo:datetime')
-            if dateTime is not None:
-                return Utils.parseDateTime(dateTime[bandNo - 1])
+                dateTime = self.stacMetadata['properties']['envi:metadata'].get('eo:datetime')
+                if dateTime is not None:
+                    return Utils.parseDateTime(dateTime[bandNo - 1])
 
-            dateTime = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('start_datetime')
-            if dateTime is not None:
-                return Utils.parseDateTime(dateTime)
+                dateTime = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('start_datetime')
+                if dateTime is not None:
+                    return Utils.parseDateTime(dateTime)
 
-            dateTime = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('datetime')
-            if dateTime is not None:
-                return Utils.parseDateTime(dateTime)
+                dateTime = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('datetime')
+                if dateTime is not None:
+                    return Utils.parseDateTime(dateTime)
 
             # check band-level default-domain
             dateTime = self.metadataItem('start_time', '', bandNo)
@@ -861,10 +875,11 @@ class RasterReader(object):
                     else:
                         raise NotImplementedError(self.terraMetadata['timestep'])
 
-        # check STAC
-        dateTime = self.stacMetadata['properties']['envi:metadata'].get('acquisition_time')
-        if dateTime is not None:
-            return Utils.parseDateTime(dateTime)
+        if not self.disableStac:
+            # check STAC
+            dateTime = self.stacMetadata['properties']['envi:metadata'].get('acquisition_time')
+            if dateTime is not None:
+                return Utils.parseDateTime(dateTime)
 
         # check dataset-level default-domain
         dateTime = self.metadataItem('start_time')
@@ -886,15 +901,16 @@ class RasterReader(object):
     def endTime(self, bandNo: int = None) -> Optional[QDateTime]:
         """Return raster / band end time."""
 
-        # check STAC
-        if bandNo is not None:
-            dateTime = self.stacMetadata['properties']['envi:metadata'].get('eo:end_datetime')
-            if dateTime is not None:
-                return Utils.parseDateTime(dateTime[bandNo - 1])
+        if not self.disableStac:
+            # check STAC
+            if bandNo is not None:
+                dateTime = self.stacMetadata['properties']['envi:metadata'].get('eo:end_datetime')
+                if dateTime is not None:
+                    return Utils.parseDateTime(dateTime[bandNo - 1])
 
-            dateTime = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('end_datetime')
-            if dateTime is not None:
-                return Utils.parseDateTime(dateTime)
+                dateTime = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('end_datetime')
+                if dateTime is not None:
+                    return Utils.parseDateTime(dateTime)
 
         # check band-level domain
         if bandNo is not None:
@@ -978,7 +994,8 @@ class RasterReader(object):
                 writer.setWavelength(self.wavelength(bandNo), bandNo)
                 writer.setFwhm(self.fwhm(bandNo), bandNo)
                 writer.setBadBandMultiplier(self.badBandMultiplier(bandNo), bandNo)
-            writer.close()
+
+        writer.close()
 
         if copyStyle:
             renderer = self.layer.renderer().clone()

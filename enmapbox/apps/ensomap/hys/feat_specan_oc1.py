@@ -13,7 +13,7 @@ from hys.tools import get_continuum_line
 
 __bands__    = [400, 700]
 __filename__ = "_OC_SUM_400_700"
-__gui__      = "SOC Index: 1/sum 400 - 700"
+__gui__      = "SOC Index: 1/sum(R400 - R700)"
 __info__     = "Organic matter content: \n"+\
     "Calculate the inverse of the sum of the total reflectance \n"+\
     "minus the continuum removed function:\n\n"+\

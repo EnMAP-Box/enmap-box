@@ -21,8 +21,8 @@ Licence. [https://www.gnu.org/licenses/gpl-3.0](https://www.gnu.org/licenses/gpl
 
 #### Acknowledgements
 
-The EnMAP-Box is developed at Humboldt-Universität zu Berlin under contract by the Helmholtz Centre
-Potsdam GFZ and is part of the EnMAP Core Science Team activities.
+The EnMAP-Box is developed at Humboldt-Universität zu Berlin under contract by the GFZ Helmholtz Centre 
+for Geosciences and is part of the EnMAP Core Science Team activities.
 It is funded by the German Aerospace Centre (DLR) - Project Management Agency,
 granted by the [Federal Ministry of Research, Technology and Space](https://www.bmbf.de)
 (BMFTR; grant no. [50EE2401A](https://foerderportal.bund.de/foekat/jsp/SucheAction.do?actionMode=view&fkz=50EE2401A)).

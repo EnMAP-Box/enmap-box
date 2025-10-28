@@ -33,6 +33,7 @@ from qgis.core import QgsApplication
 start_app()
 
 
+# @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'Skipped, takes too much time')
 class test_dependencycheck(EnMAPBoxTestCase):
 
     def test_gdalissues(self):
@@ -139,6 +140,7 @@ class test_dependencycheck(EnMAPBoxTestCase):
 
         self.showGui(w)
 
+    @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'Skipped, demo only')
     def test_AnimatedIcon(self):
         label = QLabel()
         p = QgsApplication.iconPath("/mIconLoading.gif")
