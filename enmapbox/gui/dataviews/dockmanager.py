@@ -835,7 +835,7 @@ class DockManagerTreeModel(QgsLayerTreeModel):
         if isinstance(dockManager.project(), QgsProject):
             self.mProject = dockManager.project()
         else:
-            self.mProject: QgsProject.instance()
+            self.mProject = QgsProject.instance()
 
         if True:
             """
