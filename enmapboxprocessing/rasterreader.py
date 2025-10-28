@@ -766,14 +766,15 @@ class RasterReader(object):
         if self.gdalDataset is None:
             return 1
 
-        # check STAC
-        badBandMultiplier = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('enmapbox:bad_band_multiplier')
-        if badBandMultiplier is not None:
-            return int(badBandMultiplier)
+        if not self.disableStac:
+            # check STAC
+            badBandMultiplier = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('enmapbox:bad_band_multiplier')
+            if badBandMultiplier is not None:
+                return int(badBandMultiplier)
 
-        badBandMultiplier = self.stacMetadata['properties']['envi:metadata'].get('bbl')
-        if badBandMultiplier is not None:
-            return int(badBandMultiplier[bandNo - 1])
+            badBandMultiplier = self.stacMetadata['properties']['envi:metadata'].get('bbl')
+            if badBandMultiplier is not None:
+                return int(badBandMultiplier[bandNo - 1])
 
         # check band-level domains
         for domain in set(self.metadataDomainKeys(bandNo) + ['']):
@@ -802,22 +803,23 @@ class RasterReader(object):
                     decimalYear = float(self.metadataItem('wavelength', '', bandNo))
                     return Utils.decimalYearToDateTime(decimalYear)
 
-            # check STAC
-            dateTime = self.stacMetadata['properties']['envi:metadata'].get('eo:start_datetime')
-            if dateTime is not None:
-                return Utils.parseDateTime(dateTime[bandNo - 1])
+            if not self.disableStac:
+                # check STAC
+                dateTime = self.stacMetadata['properties']['envi:metadata'].get('eo:start_datetime')
+                if dateTime is not None:
+                    return Utils.parseDateTime(dateTime[bandNo - 1])
 
-            dateTime = self.stacMetadata['properties']['envi:metadata'].get('eo:datetime')
-            if dateTime is not None:
-                return Utils.parseDateTime(dateTime[bandNo - 1])
+                dateTime = self.stacMetadata['properties']['envi:metadata'].get('eo:datetime')
+                if dateTime is not None:
+                    return Utils.parseDateTime(dateTime[bandNo - 1])
 
-            dateTime = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('start_datetime')
-            if dateTime is not None:
-                return Utils.parseDateTime(dateTime)
+                dateTime = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('start_datetime')
+                if dateTime is not None:
+                    return Utils.parseDateTime(dateTime)
 
-            dateTime = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('datetime')
-            if dateTime is not None:
-                return Utils.parseDateTime(dateTime)
+                dateTime = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('datetime')
+                if dateTime is not None:
+                    return Utils.parseDateTime(dateTime)
 
             # check band-level default-domain
             dateTime = self.metadataItem('start_time', '', bandNo)
@@ -871,10 +873,11 @@ class RasterReader(object):
                     else:
                         raise NotImplementedError(self.terraMetadata['timestep'])
 
-        # check STAC
-        dateTime = self.stacMetadata['properties']['envi:metadata'].get('acquisition_time')
-        if dateTime is not None:
-            return Utils.parseDateTime(dateTime)
+        if not self.disableStac:
+            # check STAC
+            dateTime = self.stacMetadata['properties']['envi:metadata'].get('acquisition_time')
+            if dateTime is not None:
+                return Utils.parseDateTime(dateTime)
 
         # check dataset-level default-domain
         dateTime = self.metadataItem('start_time')
@@ -896,15 +899,16 @@ class RasterReader(object):
     def endTime(self, bandNo: int = None) -> Optional[QDateTime]:
         """Return raster / band end time."""
 
-        # check STAC
-        if bandNo is not None:
-            dateTime = self.stacMetadata['properties']['envi:metadata'].get('eo:end_datetime')
-            if dateTime is not None:
-                return Utils.parseDateTime(dateTime[bandNo - 1])
+        if not self.disableStac:
+            # check STAC
+            if bandNo is not None:
+                dateTime = self.stacMetadata['properties']['envi:metadata'].get('eo:end_datetime')
+                if dateTime is not None:
+                    return Utils.parseDateTime(dateTime[bandNo - 1])
 
-            dateTime = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('end_datetime')
-            if dateTime is not None:
-                return Utils.parseDateTime(dateTime)
+                dateTime = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('end_datetime')
+                if dateTime is not None:
+                    return Utils.parseDateTime(dateTime)
 
         # check band-level domain
         if bandNo is not None:

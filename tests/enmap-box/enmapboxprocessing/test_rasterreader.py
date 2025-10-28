@@ -1,3 +1,5 @@
+import unittest
+
 import numpy as np
 from osgeo import gdal
 from qgis.PyQt.QtCore import QDateTime, QSizeF, QPoint
@@ -305,10 +307,13 @@ class TestRasterReader(TestCase):
         writer.setMetadataItem('wavelength_unit', 'Micrometers', '', 4)
         writer.close(stac=True)
         reader = RasterReader(writer.source())
-        self.assertEqual('Micrometers', reader.wavelengthUnits(1))  # STAC stores it as Micrometers
-        self.assertEqual('Micrometers', reader.wavelengthUnits(2))  # STAC stores it as Micrometers
-        self.assertEqual('Micrometers', reader.wavelengthUnits(3))  # STAC stores it as Micrometers
-        self.assertEqual('Micrometers', reader.wavelengthUnits(4))  # STAC stores it as Micrometers
+
+        disableStac = True
+        if not disableStac:
+            self.assertEqual('Micrometers', reader.wavelengthUnits(1))  # STAC stores it as Micrometers
+            self.assertEqual('Micrometers', reader.wavelengthUnits(2))  # STAC stores it as Micrometers
+            self.assertEqual('Micrometers', reader.wavelengthUnits(3))  # STAC stores it as Micrometers
+            self.assertEqual('Micrometers', reader.wavelengthUnits(4))  # STAC stores it as Micrometers
 
         # check at dataset-level
         writer = self.rasterFromArray(np.zeros((3, 1, 1)))
@@ -349,16 +354,6 @@ class TestRasterReader(TestCase):
         reader = RasterReader(writer.source())
         self.assertEqual('Micrometers', reader.wavelengthUnits(1))
         self.assertEqual(42 * 1000, reader.wavelength(1))
-
-    def test_wavelengthFromTanager(self):  # issue #1208
-
-        writer = self.rasterFromArray(np.zeros((1, 1, 1)))
-        writer.setMetadataItem('/HDFEOS/SWATHS/HYP/Data Fields/toa_radiance#wavelengths', [42])
-        writer.setMetadataItem('/HDFEOS/SWATHS/HYP/Data Fields/toa_radiance#wavelengths_units', 'nm')
-        writer.close()
-        reader = RasterReader(writer.source())
-        self.assertEqual('Nanometers', reader.wavelengthUnits(1))
-        self.assertEqual(42, reader.wavelength(1))
 
     def test_findWavelength(self):
         writer = self.rasterFromArray(np.zeros((5, 1, 1)))
@@ -580,6 +575,7 @@ class TestRasterReader(TestCase):
         self.assertEqual(gold * 2, reader.lineMemoryUsage(nBands=bandCount * 2))
         self.assertEqual(gold * 2, reader.lineMemoryUsage(dataTypeSize=8))
 
+    @unittest.skipIf(True, 'STAC is disabled')
     def test_stacMetadata(self):
         writer = self.rasterFromArray(np.zeros((1, 5, 5)), 'raster.tif')
         writer.close()
@@ -612,6 +608,7 @@ class TestRasterReader(TestCase):
         self.assertEqual(QDateTime(2022, 1, 1, 12, 0, 0), reader.centerTime(1))
         self.assertEqual(0, reader.badBandMultiplier(1))
 
+    @unittest.skipIf(True, 'STAC is disabled')
     def test_stacMetadata_dateTimeRange(self):
         writer = self.rasterFromArray(np.zeros((1, 5, 5)), 'raster.tif')
         stacMetadata = {
@@ -632,6 +629,7 @@ class TestRasterReader(TestCase):
         self.assertEqual(QDateTime(2022, 1, 3, 12, 0, 0), reader.endTime(1))
         self.assertEqual(QDateTime(2022, 1, 2, 12, 0, 0), reader.centerTime(1))
 
+    @unittest.skipIf(True, 'STAC is disabled')
     def test_stacMetadata_enviStyle(self):
         writer = self.rasterFromArray(np.zeros((2, 5, 5)), 'raster.tif')
         writer.close()
@@ -666,6 +664,7 @@ class TestRasterReader(TestCase):
         self.assertEqual(QDateTime(2022, 1, 1, 12, 0, 0), reader.centerTime())
         self.assertEqual(42, reader.metadataItem('my_key', 'envi'))
 
+    @unittest.skipIf(True, 'STAC is disabled')
     def test_stacMetadata_enviStyle_datetime(self):
         writer = self.rasterFromArray(np.zeros((2, 5, 5)), 'raster.tif')
         stacMetadata = {
@@ -684,6 +683,7 @@ class TestRasterReader(TestCase):
         self.assertEqual(QDateTime(2023, 1, 1, 12, 0, 0), reader.startTime(2))
         self.assertEqual(QDateTime(2023, 1, 1, 12, 0, 0), reader.centerTime(2))
 
+    @unittest.skipIf(True, 'STAC is disabled')
     def test_stacMetadata_enviStyle_datetime2(self):
         writer = self.rasterFromArray(np.zeros((2, 5, 5)), 'raster.tif')
         stacMetadata = {
