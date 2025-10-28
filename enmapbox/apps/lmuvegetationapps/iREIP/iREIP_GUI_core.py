@@ -22,23 +22,22 @@
     along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
 """
-from qgis.gui import QgsMapLayerComboBox
-from qgis.core import QgsMapLayerProxyModel
-
-from _classic.hubflow.core import *
-import numpy as np
-from qgis.PyQt.QtWidgets import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtCore import Qt
-from lmuvegetationapps import APP_DIR
-import warnings
-
-import sys
 import os
+import sys
+
+import numpy as np
 from scipy.interpolate import *
 from scipy.signal import savgol_filter
-from enmapbox.qgispluginsupport.qps.pyqtgraph import pyqtgraph as pg
+
+from _classic.hubflow.core import *
 from enmapbox.gui.utils import loadUi
+from enmapbox.qgispluginsupport.qps.pyqtgraph import pyqtgraph as pg
+from lmuvegetationapps import APP_DIR
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import *
+from qgis.PyQt.QtWidgets import *
+from qgis.core import QgsMapLayerProxyModel
+from qgis.gui import QgsMapLayerComboBox
 
 pathUI_ireip = os.path.join(APP_DIR, 'Resources/UserInterfaces/iREIP.ui')
 pathUI_nodat = os.path.join(APP_DIR, 'Resources/UserInterfaces/Nodat.ui')
@@ -52,6 +51,12 @@ class iREIP_GUI(QDialog):
         super(iREIP_GUI, self).__init__(parent)
         loadUi(pathUI_ireip, self)
         QApplication.instance().installEventFilter(self)
+
+        from enmapbox.gui.enmapboxgui import EnMAPBox
+        emb = EnMAPBox.instance()
+        if isinstance(emb, EnMAPBox):
+            self.mLayer.setProject(emb.project())
+
         self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
         # fix the sendHoverEvent crash by replacing the slot function
         self.rangeView.scene().sendHoverEvents = self.onHoverEvent

@@ -28,17 +28,16 @@ ANNs are implemented, but the structure is flexible so that new algorithms can a
 add a model selection frame to the GUI in QtDesigner then.
 
 """
-from qgis.gui import QgsMapLayerComboBox
-from qgis.core import QgsMapLayerProxyModel
-
 import sys
-import os
-# ensure to call QGIS before PyQtGraph
-from qgis.PyQt.QtWidgets import *
+
 import lmuvegetationapps.Processor_old.Processor_Inversion_core_old as processor
-from lmuvegetationapps import APP_DIR
 from _classic.hubflow.core import *
 from enmapbox.gui.utils import loadUi
+from lmuvegetationapps import APP_DIR
+# ensure to call QGIS before PyQtGraph
+from qgis.PyQt.QtWidgets import *
+from qgis.core import QgsMapLayerProxyModel
+from qgis.gui import QgsMapLayerComboBox
 
 pathUI_processor = os.path.join(APP_DIR, 'Resources/UserInterfaces/Processor_Inversion_old.ui')
 pathUI_nodat = os.path.join(APP_DIR, 'Resources/UserInterfaces/Nodat.ui')
@@ -53,6 +52,13 @@ class MLInversionGUI(QDialog):
         mLayerMask: QgsMapLayerComboBox
         super(MLInversionGUI, self).__init__(parent)
         loadUi(pathUI_processor, self)
+
+        from enmapbox.gui.enmapboxgui import EnMAPBox
+        emb = EnMAPBox.instance()
+        if isinstance(emb, EnMAPBox):
+            for cb in [self.mLayerImage, self.mLayerGeometry, self.mLayerMask]:
+                cb.setProject(emb.project())
+
         self.mLayerImage.setFilters(QgsMapLayerProxyModel.RasterLayer)
         self.mLayerGeometry.setFilters(QgsMapLayerProxyModel.RasterLayer)
         self.mLayerMask.setFilters(QgsMapLayerProxyModel.RasterLayer)
