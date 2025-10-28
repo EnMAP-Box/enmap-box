@@ -2441,11 +2441,11 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         dlg = algorithm.createCustomParametersWidget(parent)
         if not dlg:
+            context = self.processingContext()
             if wrapper is None:
-                context = self.processingContext()
                 dlg = AlgorithmDialog(algorithm.create(), parent=parent, context=context, iface=self)
             else:
-                dlg = wrapper(algorithm.create(), parent=parent)
+                dlg = wrapper(algorithm.create(), parent=parent, context=context, iface=self)
         else:
             assert wrapper is None  # todo: dialog wrapper for custom parameter widget
         assert isinstance(dlg, QgsProcessingAlgorithmDialogBase)
