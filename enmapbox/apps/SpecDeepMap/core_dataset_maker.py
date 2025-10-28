@@ -95,77 +95,92 @@ def read_label_images_and_create_histograms(input_folder, num_labels):
 
 def find_best_split(label_histograms, num_permutations, train_perc, test_perc, val_perc, min_perc, random_seed_gen,
                     progress_counter_total, feedback: QgsProcessingFeedback = None):
-    num_files = len(label_histograms)  # Total number of images
-    num_per_class = np.sum(label_histograms, axis=0)  # Sum of labels per class
-    min_per_class = num_per_class * min_perc  # Minimum instances per class based on min_perc
+    num_files = len(label_histograms)
+    num_per_class = np.sum(label_histograms, axis=0)
+    min_per_class = num_per_class * min_perc
 
     idx = np.arange(num_files)
+    rng = np.random.default_rng(seed=random_seed_gen)
 
-    rng = np.random.default_rng(seed=random_seed_gen)  # Random number generator with seed
+    # Calculate dataset sizes based on percentages
+    num_test = math.ceil(num_files * test_perc) if test_perc > 0 else 0
+    num_val = math.ceil(num_files * val_perc) if val_perc > 0 else 0
 
-    # new ensure correct rounding
-
-    # Compute test and validation first (rounded up)
-    num_test = math.ceil(num_files * test_perc)
-    num_val = math.ceil(num_files * val_perc)
-
-    # Compute train set (rounded up) but ensuring no overlap
+    # Original train set calculation
     num_train = min(math.ceil(num_files * train_perc), num_files - (num_test + num_val))
 
     best_emd = np.inf
-    best_perm = None  # To store the best permutation
-
+    best_perm = None
     progress_counter = 0
 
-    # for _ in tqdm(range(num_permutations), desc="Evaluating permutations"):
     for _ in range(num_permutations):
-        # for _ in range(num_permutations):
         progress_counter += 1
         progress = (progress_counter / progress_counter_total) * 100
-        # print(progress)
+
         if isinstance(feedback, QgsProcessingFeedback):
             feedback.setProgress(progress)
-
-            # Allow user to cancel the process
             if feedback.isCanceled():
                 break
-        perm = rng.permutation(idx)  # Random permutation of the dataset
-        test_hist = np.sum(label_histograms[perm[:num_test]], axis=0)
-        val_hist = np.sum(label_histograms[perm[num_test:num_test + num_val]], axis=0)
-        train_hist = np.sum(label_histograms[perm[num_test + num_val:num_val + num_test + num_train]], axis=0)
-        # Ensure counts are not less than the minimum required and the sums are not zero
-        if np.any(test_hist < min_per_class) or np.any(train_hist < min_per_class) or np.any(val_hist < min_per_class):
+
+        perm = rng.permutation(idx)
+
+        # Initialize histograms
+        test_hist = np.zeros_like(label_histograms[0]) if num_test == 0 else np.sum(label_histograms[perm[:num_test]],
+                                                                                    axis=0)
+        val_hist = np.zeros_like(label_histograms[0]) if num_val == 0 else np.sum(
+            label_histograms[perm[num_test:num_test + num_val]], axis=0)
+        train_hist = np.zeros_like(label_histograms[0]) if num_train == 0 else np.sum(
+            label_histograms[perm[num_test + num_val:num_val + num_test + num_train]], axis=0)
+
+        # Check minimum requirements only for non-empty datasets
+        if (num_test > 0 and np.any(test_hist < min_per_class)) or \
+                (num_val > 0 and np.any(val_hist < min_per_class)) or \
+                (num_train > 0 and np.any(train_hist < min_per_class)):
             continue
 
-        sum_test_hist = np.sum(test_hist).astype(float)
-        sum_val_hist = np.sum(val_hist).astype(float)
-        sum_train_hist = np.sum(train_hist).astype(float)
+        # Calculate EMD only for existing datasets
+        emd_sum = 0
+        num_comparisons = 0
 
-        if sum_test_hist == 0 or sum_val_hist == 0 or sum_train_hist == 0:
-            continue
+        # Normalize histograms for non-empty datasets
+        if num_test > 0:
+            test_hist = test_hist / np.sum(test_hist)
+        if num_val > 0:
+            val_hist = val_hist / np.sum(val_hist)
+        if num_train > 0:
+            train_hist = train_hist / np.sum(train_hist)
 
-        test_hist = test_hist / sum_test_hist
-        val_hist = val_hist / sum_val_hist
-        train_hist = train_hist / sum_train_hist
+        # Calculate EMD between existing datasets
+        if num_test > 0 and num_train > 0:
+            emd_sum += wasserstein_distance(test_hist, train_hist)
+            num_comparisons += 1
+        if num_val > 0 and num_train > 0:
+            emd_sum += wasserstein_distance(val_hist, train_hist)
+            num_comparisons += 1
+        if num_test > 0 and num_val > 0:
+            emd_sum += wasserstein_distance(test_hist, val_hist)
+            num_comparisons += 1
 
-        emd_test_train = wasserstein_distance(test_hist, train_hist)
-        emd_val_train = wasserstein_distance(val_hist, train_hist)
-        emd_test_val = wasserstein_distance(test_hist, val_hist)
-
-        avg_emd = (emd_test_train + emd_val_train + emd_test_val) / 3
+        # Calculate average EMD if there are comparisons
+        avg_emd = emd_sum / num_comparisons if num_comparisons > 0 else 0
 
         if avg_emd < best_emd:
             best_emd = avg_emd
-            best_perm = perm  # Store the best permutation
+            best_perm = perm
 
-        # print('permute ', progress_counter)
+    # Calculate percentages for existing datasets
+    perc_train = (num_train / num_files) * 100 if num_train > 0 else 0
+    perc_val = (num_val / num_files) * 100 if num_val > 0 else 0
+    perc_test = (num_test / num_files) * 100 if num_test > 0 else 0
 
-    # Calculate percentages
-    perc_train = (num_train / num_files) * 100
-    perc_val = (num_val / num_files) * 100
-    perc_test = (num_test / num_files) * 100
-
-    b = f"Final dataset split: Training dataset: {num_train} images ({perc_train:.2f}%), Validation dataset: {num_val} images ({perc_val:.2f}%),Test dataset: {num_test} images ({perc_test:.2f}%)."
+    b = "Final dataset split: "
+    if num_train > 0:
+        b += f"Training dataset: {num_train} images ({perc_train:.2f}%), "
+    if num_val > 0:
+        b += f"Validation dataset: {num_val} images ({perc_val:.2f}%), "
+    if num_test > 0:
+        b += f"Test dataset: {num_test} images ({perc_test:.2f}%)"
+    b = b.rstrip(", ") + "."
 
     return best_perm, num_train, num_test, num_val, progress_counter, progress_counter_total, b, feedback
 
@@ -282,7 +297,7 @@ def calculate_class_distribution_from_csv(input_folder, csv_path):
 # norm_factor = num_classes / sum(class_weights.values())
 # class_weights = {cls: weight * norm_factor for cls, weight in class_weights.items()}
 # as in sklearn
-#
+
 
 # return class_weights
 
@@ -300,7 +315,6 @@ def calculate_class_weights_from_counts(class_counts):
 
     # normalized to 1 for more model stability https://naadispeaks.blog/2021/07/31/handling-imbalanced-classes-with-weighted-loss-in-pytorch/
 
-    #
     class_weights = {cls: 1 - (count / total_samples) for cls, count in class_counts.items() if count > 0}
 
     return class_weights
