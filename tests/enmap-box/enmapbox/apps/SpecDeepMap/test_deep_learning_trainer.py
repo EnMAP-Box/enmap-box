@@ -141,7 +141,6 @@ class Test_Deep_Learning_Trainer(TestCase):
                 file_path = os.path.join(folder_path_unet, filename)
                 os.remove(file_path)
 
-
         folder_path_input = BASE_TESTDATA / 'test_requierments'
 
         # 4. Test check if pretrained model runs needs 13 channel adjust indexing before splitting raster
