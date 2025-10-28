@@ -1,16 +1,17 @@
 from math import inf
 from typing import Optional
 
-import processing
-from enmapbox.typeguard import typechecked
-from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
-from enmapboxprocessing.rasterreader import RasterReader
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QTableWidget, QListWidget, \
     QListWidgetItem, QLabel, QCheckBox, QLineEdit
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsProcessing, QgsRasterBandStats
 from qgis.gui import QgsRasterBandComboBox, QgsMapLayerComboBox, QgsFilterLineEdit, QgsDoubleSpinBox, QgsFileWidget
+
+import processing
+from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
+from enmapboxprocessing.rasterreader import RasterReader
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -62,7 +63,6 @@ class SpectralIndexCreatorDialog(QMainWindow):
         lineEdit.clearValue()
 
         # connect signals
-        self.mLayer.setProject(self.enmapBox.project())
         self.mLayer.layerChanged.connect(self.onLayerChanged)
         self.mEstimateReflectanceScaleFactor.clicked.connect(self.onEstimateReflectanceScaleFactorClicked)
         self.mSelectAll.clicked.connect(self.onSelectAllClicked)

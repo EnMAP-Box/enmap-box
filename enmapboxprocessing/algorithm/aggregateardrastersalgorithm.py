@@ -138,7 +138,6 @@ class AggregateArdRastersAlgorithm(EnMAPProcessingAlgorithm):
             parameters = {
                 alg.P_RASTERS: filenames,
                 alg.P_FUNCTION: functionIndices,
-                alg.P_BANDWISE: True,
                 alg.P_OUTPUT_BASENAME: outputBasename,
                 alg.P_OUTPUT_FOLDER: join(outputDataCube, tilename)
             }

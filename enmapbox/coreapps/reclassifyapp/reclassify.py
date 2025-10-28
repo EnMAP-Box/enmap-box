@@ -24,7 +24,6 @@ import pathlib
 import re
 import typing
 from difflib import SequenceMatcher
-from typing import Optional
 
 from osgeo import gdal
 
@@ -463,7 +462,7 @@ class ReclassifyDialog(QDialog):
         assert isinstance(self.mapLayerComboBox, ClassificationMapLayerComboBox)
         assert isinstance(self.tableView, QTableView)
         assert isinstance(self.dstClassificationSchemeWidget, ClassificationSchemeWidget)
-        self.mProject = QgsProject.instance()
+
         self.mModel = ReclassifyTableModel()
         self.mProxyModel = QSortFilterProxyModel()
         self.mProxyModel.setSourceModel(self.mModel)
@@ -499,10 +498,6 @@ class ReclassifyDialog(QDialog):
         self.actionAddRasterSource.triggered.connect(onAddRaster)
         self.onSourceRasterChanged()
 
-    def setProject(self, project: QgsProject):
-        self.mProject = project
-        self.mapLayerComboBox.setProject(project)
-
     def onSourceRasterChanged(self):
         lyr = self.mapLayerComboBox.currentLayer()
         cs_final = ClassificationScheme()
@@ -535,7 +530,7 @@ class ReclassifyDialog(QDialog):
         """
         return self.dstClassificationSchemeWidget.classificationScheme()
 
-    def srcRasterLayer(self) -> Optional[QgsRasterLayer]:
+    def srcRasterLayer(self) -> QgsRasterLayer:
         lyr = self.mapLayerComboBox.currentLayer()
         if isinstance(lyr, QgsRasterLayer):
             return lyr
@@ -560,7 +555,7 @@ class ReclassifyDialog(QDialog):
         :return:
         """
         assert isinstance(src, QgsRasterLayer)
-        self.mProject.addMapLayer(src)
+        QgsProject.instance().addMapLayer(src)
         assert isinstance(self.mapLayerComboBox, QgsMapLayerComboBox)
         for i in range(self.mapLayerComboBox.count()):
             if self.mapLayerComboBox.layer(i) == src:
@@ -568,7 +563,7 @@ class ReclassifyDialog(QDialog):
                 return True
         return False
 
-    def srcClassificationScheme(self) -> Optional[ClassificationScheme]:
+    def srcClassificationScheme(self) -> ClassificationScheme:
         """
         Reuturns the ClassificationScheme of the selected source raster
         :return: ClassificationScheme
@@ -634,7 +629,6 @@ class ReclassifyTool(EnMAPBoxApplication):
 
     def startGUI(self, *args):
         uiDialog = ReclassifyDialog(self.enmapbox.ui)
-        uiDialog.setProject(self.enmapbox.project())
         uiDialog.show()
         uiDialog.accepted.connect(lambda: self.runReclassification(**uiDialog.reclassificationSettings()))
         self.m_dialogs.append(uiDialog)

@@ -24,7 +24,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsProcessing,
-                       QgsProcessingParameterString, QgsRasterLayer, Qgis, QgsVectorLayer, QgsFields)
+                       QgsProcessingParameterString, QgsProject, QgsRasterLayer, Qgis, QgsVectorLayer, QgsFields)
 
 
 @typechecked
@@ -147,7 +147,7 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
     def prepareAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> bool:
-        self.mapLayers = {k: v for k, v in context.project().mapLayers().items() if k in parameters[self.P_CODE]}
+        self.mapLayers = {k: v for k, v in QgsProject.instance().mapLayers().items() if k in parameters[self.P_CODE]}
         return True
 
     def processAlgorithm(

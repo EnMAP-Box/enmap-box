@@ -2,24 +2,24 @@ from math import ceil, sqrt
 from typing import Optional, List
 
 import numpy as np
-from osgeo import gdal
-
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget, GraphicsObject, mkBrush, mkPen
-from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapbox.typeguard import typechecked
-from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
-from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxprocessing.typing import Category
-from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtCore import Qt, QRectF
 from qgis.PyQt.QtGui import QMouseEvent, QColor, QPicture, QPainter
 from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QTableWidget, QComboBox, QCheckBox, \
     QTableWidgetItem
 from qgis.PyQt.uic import loadUi
-from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsMapSettings, QgsPalettedRasterRenderer, QgsRasterRange, \
-    QgsRectangle, QgsFeature, QgsCoordinateTransform, \
+from osgeo import gdal
+from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsMapSettings, QgsPalettedRasterRenderer, QgsProject, \
+    QgsRasterRange, QgsRectangle, QgsFeature, QgsCoordinateTransform, \
     QgsVectorLayer, QgsVectorFileWriter, QgsUnitTypes
 from qgis.gui import QgsMapLayerComboBox, QgsMapCanvas, QgsFieldComboBox, QgsFeaturePickerWidget
+
+from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget, GraphicsObject, mkBrush, mkPen
+from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
+from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
+from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxprocessing.typing import Category
+from enmapboxprocessing.utils import Utils
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -54,10 +54,8 @@ class ClassificationStatisticsDialog(QMainWindow):
         self.enmapBox = EnMAPBox.instance()
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None
-        self.mProject = self.enmapBox.project()
-        self.mLayer.setProject(self.mProject)
         self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
-        exceptedLayers = [layer for layer in self.mProject.mapLayers().values()
+        exceptedLayers = [layer for layer in QgsProject.instance().mapLayers().values()
                           if not isinstance(layer.renderer(), QgsPalettedRasterRenderer)]
         self.mLayer.setExceptedLayerList(exceptedLayers)
         self.mTable.horizontalHeader().setSectionsMovable(True)
@@ -339,10 +337,10 @@ class ClassificationStatisticsDialog(QMainWindow):
         layer = self.currentLayer()
 
         filename = '/vsimem/ClassificationStatistics/roi.gpkg'
-        transformContext = self.mProject.transformContext()
+        transformContext = QgsProject.instance().transformContext()
         saveVectorOptions = QgsVectorFileWriter.SaveVectorOptions()
         saveVectorOptions.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteFile
-        saveVectorOptions.ct = QgsCoordinateTransform(roiLayer.crs(), layer.crs(), self.mProject)
+        saveVectorOptions.ct = QgsCoordinateTransform(roiLayer.crs(), layer.crs(), QgsProject.instance())
         saveVectorOptions.onlySelectedFeatures = True
         saveVectorOptions.skipAttributeCreation = True
         saveVectorOptions.layerName = 'ROI'

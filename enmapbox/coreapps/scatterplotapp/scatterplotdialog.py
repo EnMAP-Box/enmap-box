@@ -96,8 +96,6 @@ class ScatterPlotDialog(QMainWindow):
 
         # init gui
         self.mMapCanvas: Optional[QgsMapCanvas] = None
-        self.mLayerX.setProject(self.enmapBox.project())
-        self.mLayerY.setProject(self.enmapBox.project())
         self.mLayerX.setFilters(QgsMapLayerProxyModel.RasterLayer)
         self.mFieldY.setFilters(QgsFieldProxyModel.Numeric)
 
@@ -107,9 +105,8 @@ class ScatterPlotDialog(QMainWindow):
         self.mMaximumY.clearValue()
 
         colorRamp: QgsColorRamp = QgsStyle().defaultStyle().colorRamp('Spectral')
-        if isinstance(colorRamp, QgsColorRamp):
-            colorRamp.invert()
-            self.mColoringRamp.setColorRamp(colorRamp)
+        colorRamp.invert()
+        self.mColoringRamp.setColorRamp(colorRamp)
         self.mFieldY.hide()
         self.mSwapAxes.hide()
         self.mColoringSymbol.setMarkerSymbol(MarkerSymbol.No_Symbol)
