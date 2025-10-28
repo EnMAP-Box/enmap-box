@@ -1,7 +1,10 @@
 from os.path import basename, join, dirname
 
+from enmapboxprocessing.algorithm.prepareclassificationdatasetfromjsonalgorithm import \
+    PrepareClassificationDatasetFromJsonAlgorithm
+from qgis.PyQt.uic import loadUi
+
 from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.qgispluginsupport.qps.processing.algorithmdialog import AlgorithmDialog
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedlibraryalgorithm import \
     PrepareClassificationDatasetFromCategorizedLibraryAlgorithm
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedrasteralgorithm import \
@@ -14,16 +17,14 @@ from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcodealgorithm 
     PrepareClassificationDatasetFromCodeAlgorithm
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromfilesalgorithm import \
     PrepareClassificationDatasetFromFilesAlgorithm
-from enmapboxprocessing.algorithm.prepareclassificationdatasetfromjsonalgorithm import \
-    PrepareClassificationDatasetFromJsonAlgorithm
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromtablealgorithm import \
     PrepareClassificationDatasetFromTableAlgorithm
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
+from processing import AlgorithmDialog
 from processing.gui.wrappers import WidgetWrapper
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QMenu, QMessageBox
-from qgis.PyQt.uic import loadUi
 from qgis.gui import QgsFileWidget
 
 

@@ -2,14 +2,14 @@ from typing import Optional
 
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtGui import QMouseEvent, QColor
 from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QTableWidget, QComboBox, QCheckBox, \
     QLabel
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsRasterDataProvider, QgsRasterBandStats, \
-    QgsRasterHistogram, QgsMapSettings, QgsRasterRenderer, Qgis
+    QgsRasterHistogram, QgsMapSettings, QgsRasterRenderer
 from qgis.gui import QgsRasterBandComboBox, QgsMapLayerComboBox, QgsFilterLineEdit, QgsSpinBox, QgsMapCanvas
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -43,7 +43,6 @@ class BandStatisticsDialog(QMainWindow):
         self.enmapBox = EnMAPBox.instance()
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None
-        self.mLayer.setProject(self.enmapBox.project())
         self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
         self.mHistogramBinCount.setClearValue(self.mHistogramBinCount.value())
         self.mHistogramMinimum.clearValue()
@@ -199,8 +198,7 @@ class BandStatisticsDialog(QMainWindow):
                 continue
 
             # calculate stats
-            stats: QgsRasterBandStats = provider.bandStatistics(bandNo, Qgis.RasterBandStatistic.All, extent,
-                                                                sampleSize)
+            stats: QgsRasterBandStats = provider.bandStatistics(bandNo, QgsRasterBandStats.All, extent, sampleSize)
 
             if self.mHistogramMinimum.isNull():
                 minimum = stats.minimumValue

@@ -1,7 +1,6 @@
 from os.path import basename, join, dirname
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.qgispluginsupport.qps.processing.algorithmdialog import AlgorithmDialog
 from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromcodealgorithm import \
     PrepareUnsupervisedDatasetFromCodeAlgorithm
 from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromfilealgorithm import \
@@ -16,6 +15,7 @@ from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromvectorandfieldsa
     PrepareUnsupervisedDatasetFromVectorAndFieldsAlgorithm
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
+from processing import AlgorithmDialog
 from processing.gui.wrappers import WidgetWrapper
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QMenu, QMessageBox

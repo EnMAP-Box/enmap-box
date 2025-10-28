@@ -41,7 +41,6 @@ class EnhancedMultiBandColorDialog(QMainWindow):
         self.cache = dict()
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None
-        self.mLayer.setProject(self.enmapBox.project())
         self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
 
         self.mLayer.layerChanged.connect(self.onLayerChanged)
