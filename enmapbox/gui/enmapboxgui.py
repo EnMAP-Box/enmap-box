@@ -69,6 +69,7 @@ from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, Q
     QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
     QProgressBar, QMessageBox
 from qgis.PyQt.QtXml import QDomDocument
+from qgis.core import QgsBrowserModel
 from qgis.core import QgsExpressionContextGenerator, QgsExpressionContext, QgsProcessingContext, \
     QgsExpressionContextUtils
 from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
@@ -2278,6 +2279,11 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.disconnectQGISSignals()
         self.dockManager()
         self.ui.close()
+
+    def browserModel(self) -> QgsBrowserModel:
+
+        from qgis.utils import iface as iface0
+        return iface0.browserModel()
 
     def __del__(self):
         EnMAPBox._instance = None
