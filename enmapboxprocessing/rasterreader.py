@@ -768,7 +768,9 @@ class RasterReader(object):
 
         if not self.disableStac:
             # check STAC
-            badBandMultiplier = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('enmapbox:bad_band_multiplier')
+            badBandMultiplier = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get(
+                'enmapbox:bad_band_multiplier'
+            )
             if badBandMultiplier is not None:
                 return int(badBandMultiplier)
 
@@ -992,7 +994,8 @@ class RasterReader(object):
                 writer.setWavelength(self.wavelength(bandNo), bandNo)
                 writer.setFwhm(self.fwhm(bandNo), bandNo)
                 writer.setBadBandMultiplier(self.badBandMultiplier(bandNo), bandNo)
-            writer.close()
+
+        writer.close()
 
         if copyStyle:
             renderer = self.layer.renderer().clone()
