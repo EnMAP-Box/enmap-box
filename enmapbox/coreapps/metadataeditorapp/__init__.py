@@ -20,10 +20,9 @@
 """
 
 import os
-
-from enmapbox.gui.applications import EnMAPBoxApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu, QAction
+from enmapbox.gui.applications import EnMAPBoxApplication
 
 APP_DIR = os.path.dirname(__file__)
 APP_NAME = 'Metadata Viewer'
@@ -81,7 +80,7 @@ class MetaDataEditorApp(EnMAPBoxApplication):
 
     def startGUI(self):
         from metadataeditorapp.metadataeditor import MetadataEditorDialog
-        d = MetadataEditorDialog(parent=self.enmapbox.ui, project=self.enmapbox.project())
+        d = MetadataEditorDialog(parent=self.enmapbox.ui)
         d.setEnMAPBox(self.enmapbox)
         d.show()
 

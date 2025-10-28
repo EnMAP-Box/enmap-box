@@ -19,29 +19,26 @@
 ***************************************************************************
 """
 import pathlib
-from typing import Dict, Optional
+from typing import Dict
 
 from enmapbox.gui.datasources.datasources import DataSourceTypes
-from enmapbox.gui.enmapboxgui import EnMAPBox, SpatialDataSource
-from enmapbox.gui.utils import loadUi
-from enmapbox.qgispluginsupport.qps.layerconfigwidgets.gdalmetadata import GDALMetadataModelConfigWidget
-from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QVBoxLayout, QDialogButtonBox, QDialog
+from qgis.PyQt.QtCore import Qt
+from enmapbox.qgispluginsupport.qps.layerconfigwidgets.gdalmetadata import GDALMetadataModelConfigWidget
+from enmapbox.gui.utils import loadUi
+from enmapbox.gui.enmapboxgui import EnMAPBox, SpatialDataSource
+
 from qgis.core import QgsProject, QgsMapLayer, QgsVectorLayer, QgsRasterLayer
 from qgis.gui import QgsMapLayerComboBox
 
 
 class MetadataEditorDialogProject(QgsProject):
 
-    def __init__(self, *args, project: Optional[QgsProject] = None, **kwds):
+    def __init__(self, *args, **kwds):
         super().__init__(*args, **kwds)
+        QgsProject.instance().layersAdded.connect(self.updateSources)
+        QgsProject.instance().layersRemoved.connect(self.updateSources)
 
-        if project is None:
-            project = QgsProject.instance()
-
-        project.layersAdded.connect(self.updateSources)
-        project.layersRemoved.connect(self.updateSources)
-        self.mProject = project
         self.mEnMAPBox = None
         self.mDataSources: Dict[str, QgsMapLayer] = dict()
         self.mDataSourceLayerInstances: Dict[str, int] = dict()
@@ -69,7 +66,7 @@ class MetadataEditorDialogProject(QgsProject):
                     if lyr.isValid():
                         layers.append(lyr)
         else:
-            layers = list(self.mProject.mapLayers().values())
+            layers = list(QgsProject.instance().mapLayers().values())
 
         for layer in layers:
             if isinstance(layer, (QgsRasterLayer, QgsVectorLayer)) \
@@ -88,7 +85,7 @@ class MetadataEditorDialogProject(QgsProject):
         self.mDataSources.update(datasource_layers)
 
         self.mDataSourceLayerInstances.clear()
-        for lyr in self.mProject.mapLayers().values():
+        for lyr in QgsProject.instance().mapLayers().values():
             if lyr.isValid():
                 uri = lyr.dataProvider().dataSourceUri()
                 self.mDataSourceLayerInstances[uri] = self.mDataSourceLayerInstances.get(uri, 0) + 1
@@ -97,13 +94,13 @@ class MetadataEditorDialogProject(QgsProject):
 class MetadataEditorDialog(QDialog):
     """Constructor."""
 
-    def __init__(self, parent=None, project: Optional[QgsProject] = None):
+    def __init__(self, parent=None):
         super(MetadataEditorDialog, self).__init__(parent, Qt.Window)
         path = pathlib.Path(__file__).parent / 'metadataeditor.ui'
         loadUi(path, self)
         assert isinstance(self.cbSource, QgsMapLayerComboBox)
 
-        self.mProject = MetadataEditorDialogProject(project=project)
+        self.mProject = MetadataEditorDialogProject()
         self.cbSource: QgsMapLayerComboBox
         self.cbSource.setAllowEmptyLayer(True)
         self.cbSource.setProject(self.mProject)

@@ -3,6 +3,8 @@ import unittest
 import numpy as np
 
 from osgeo import gdal
+from qgis.PyQt.QtCore import QDateTime, QSizeF, QPoint
+from qgis.core import QgsRasterRange, QgsRasterLayer, Qgis, QgsRectangle, QgsCoordinateReferenceSystem
 
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.rasterreader import RasterReader
@@ -10,8 +12,6 @@ from enmapboxprocessing.testcase import TestCase
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import enmap, r_terra_timeseries_days, r_terra_timeseries_seconds, netCDF_timeseries_days
 from enmapboxtestdata import fraction_polygon_l3
-from qgis.PyQt.QtCore import QDateTime, QSizeF, QPoint
-from qgis.core import QgsRasterRange, QgsRasterLayer, Qgis, QgsRectangle, QgsCoordinateReferenceSystem
 
 
 class TestRasterReader(TestCase):
@@ -348,7 +348,6 @@ class TestRasterReader(TestCase):
         self.assertEqual(500, reader.wavelength(2))
 
     def test_wavelengthFromGdalImageryDomain(self):
-
         writer = self.rasterFromArray(np.zeros((1, 1, 1)))
         writer.setMetadataItem('CENTRAL_WAVELENGTH_UM', 42, 'IMAGERY', 1)
         writer.close()
