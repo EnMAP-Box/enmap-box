@@ -155,7 +155,7 @@ class DL_Trainer(QgsProcessingAlgorithm):
                '<h3>Epochs</h3>' \
                '<p>This defines the number of Epochs which are used to train a model. One epochs means the model is trained once on the whole training dataset. Epochs are 0 indexed so the first training epoch is epoch-0. </p>' \
                '<h3>Learning rate</h3>' \
-               '<p>This defines the Learning rate for the Adam optimizer of the model. Learning rate is decreasing during training using CosineAnnealingLR using defined epochs value as T_max value, so lr decreases steadily towards near zero during whole training run ( min lr: 1e-6 ). ( More detail see here:https://docs.pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.CosineAnnealingLR.html )  </p>' \
+               '<p>This defines the Learning rate for the Adam optimizer of the model. Learning rate is decreasing during training using CosineAnnealingLR using defined epochs value as T_max value, so lr decreases steadily towards near zero during whole training run ( min lr: 1e-6 ). ( More detail see here: https://docs.pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.CosineAnnealingLR.html )  </p>' \
                '<h3>Automatic learning rate finder</h3>' \
                '<p>If activated this parameter runs a learning rate finder, meaning it test 100 learning rates before training and picks the one with the most stable learning for training. If chosen this overwrites the manual defined learning rate. The found and implemented  learningrate is printed to log interface. </p>' \
                '<h3>Number of workers</h3>' \
@@ -166,8 +166,6 @@ class DL_Trainer(QgsProcessingAlgorithm):
                '<p> For distributated training you can also here define how many GPUs you want to use. </p>' \
                '<h3>Number of models</h3>' \
                '<p> Defines how many models should be saved. -1 means each epoch a model is saved. Other integer define a limited number of models.  </p>' \
-               '<h3>Print detail train process in python console</h3>' \
-               '<p> To print detailed training progress by batch (sub-epoch), you can activate this paramter, to print the process open the qgis python console. This is just interesting for large data-volumes, otherwise just inspect training progress in processing logger window, which prints progress per epoch.  </p>' \
                '<h3>Path for saving Tensorboard logger</h3>' \
                '<p>Define folder where Tensorboard logger is saved. </p>' \
                '<h3>Path for saving model</h3>' \
