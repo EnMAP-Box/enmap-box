@@ -306,7 +306,7 @@ class DL_Trainer(QgsProcessingAlgorithm):
 
         out = self.parameterAsString(parameters, self.logdirpath, context)
         out_m = self.parameterAsString(parameters, self.logdirpath_model, context)
-
+        #
         # select best iou model automatic so can be used in model builder
         best_iou_model = best_ckpt_path(out_m)
 
