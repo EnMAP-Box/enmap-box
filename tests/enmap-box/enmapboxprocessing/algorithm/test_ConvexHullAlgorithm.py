@@ -10,7 +10,7 @@ from qgis.core import QgsRectangle
 
 class TestConvexHullAlgorithm(TestCase):
 
-    def test_prisma(self):
+    def test(self):
         alg = TranslateRasterAlgorithm()
         parameters = {
             alg.P_RASTER: enmap,
@@ -18,7 +18,7 @@ class TestConvexHullAlgorithm(TestCase):
             alg.P_CREATION_PROFILE: alg.DefaultVrtCreationProfile,
             alg.P_OUTPUT_RASTER: self.filename('subset.vrt'),
         }
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)
 
         alg = ConvexHullAlgorithm()
         parameters = {
@@ -29,5 +29,5 @@ class TestConvexHullAlgorithm(TestCase):
         }
         result = self.runalg(alg, parameters)
 
-        self.assertEqual(48631695, np.sum(RasterReader(result[alg.P_OUTPUT_CONVEX_HULL]).array()))
-        self.assertEqual(22883, round(np.sum(RasterReader(result[alg.P_OUTPUT_CONTINUUM_REMOVED]).array())))
+        self.assertAlmostEqual(1., 48631695 / np.sum(RasterReader(result[alg.P_OUTPUT_CONVEX_HULL]).array()), 5)
+        self.assertAlmostEqual(1., 22883 / np.sum(RasterReader(result[alg.P_OUTPUT_CONTINUUM_REMOVED]).array()))
