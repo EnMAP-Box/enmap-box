@@ -27,7 +27,6 @@ from enmapbox.apps.SpecDeepMap.utils_resnet import ResNet18_Weights, ResNet50_We
 # Data augmentation
 
 transforms_v2 = v2.Compose([
-    v2.RandomRotation(degrees=45),
     v2.RandomHorizontalFlip(p=0.5),
     v2.RandomVerticalFlip(p=0.5),
 ])

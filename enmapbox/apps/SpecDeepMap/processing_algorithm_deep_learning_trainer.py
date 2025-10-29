@@ -142,8 +142,8 @@ class DL_Trainer(QgsProcessingAlgorithm):
                '<p>Load model from path for continuing training or to initalize a model. Restriction is that model must be compatibel with training scheme and input data type.</p>' \
                '<h3>Freeze backbone </h3>' \
                '<p>This freezes the weight of the backbone for training. This is a routine step for transferlearning where in the first step a model is trained on new classes with a frozen backbone and in a second training step it is finetuned with an unfrozen backbone. To achieve this here, train first with frozen backbone and then load trained model again and train with unfrozen backbone. </p>' \
-               '<h3>Data augmentation (random flip & rotate by 45°) </h3>' \
-               '<p>This apply data augmentation. Random vertical and horizontal flip as well as ranodm rotate with 45°. Each augmentation has a propability of occuring of 50 %. This data augmentation is happening on the fly and prevents overfitting of the model.</p>' \
+               '<h3>Data augmentation (random flip ) </h3>' \
+               '<p>This apply data augmentation. Random vertical and horizontal flip. Each augmentation has a propability of occuring of 50 %. This data augmentation is happening on the fly and prevents overfitting of the model.</p>' \
                '<h3>Early stopping</h3>' \
                '<p>This stops the model when validation loss is not imporving for 50 epochs.  </p>' \
                '<h3>Balanced Training using Class Weights</h3>' \
