@@ -679,7 +679,7 @@ class RasterReader(object):
             return conversionFactor * float(wavelength)
 
         for key in [
-            'wavelengths'  # support for Tanager
+            'wavelengths',  # support for Tanager
             'wavelength',
             'Wavelength',  # support for FORCE BOA files
         ]:
