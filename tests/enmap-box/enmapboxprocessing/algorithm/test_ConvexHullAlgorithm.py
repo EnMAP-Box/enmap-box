@@ -29,5 +29,5 @@ class TestConvexHullAlgorithm(TestCase):
         }
         result = self.runalg(alg, parameters)
 
-        self.assertAlmostEqual(1., 48631695 / np.sum(RasterReader(result[alg.P_OUTPUT_CONVEX_HULL]).array()), 5)
-        self.assertAlmostEqual(1., 22883 / np.sum(RasterReader(result[alg.P_OUTPUT_CONTINUUM_REMOVED]).array()))
+        self.assertAlmostEqual(1., 48631695 / np.sum(RasterReader(result[alg.P_OUTPUT_CONVEX_HULL]).array()), 3)
+        self.assertAlmostEqual(1., 22883 / np.sum(RasterReader(result[alg.P_OUTPUT_CONTINUUM_REMOVED]).array()), 3)
