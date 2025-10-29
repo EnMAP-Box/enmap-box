@@ -82,7 +82,6 @@ class Test_Deep_Learning_Trainer(TestCase):
               alg.num_workers: 0,
               alg.device_numbers: 1,
               alg.num_models: -1,
-              alg.tensorboard: False,
               alg.logdirpath: folder_path,
               alg.logdirpath_model: folder_path,
               }
@@ -161,7 +160,6 @@ class Test_Deep_Learning_Trainer(TestCase):
               alg.num_workers: 0,
               alg.device_numbers: 1,
               alg.num_models: -1,
-              alg.tensorboard: False,
               alg.logdirpath: folder_path_unet,
               alg.logdirpath_model: folder_path_unet,
               }
