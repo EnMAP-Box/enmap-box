@@ -70,7 +70,6 @@ class DL_Trainer(QgsProcessingAlgorithm):
     logdirpath = 'logdirpath '
     checkpoint = 'checkpoint'
     n_classes = 'n_classes'
-    tensorboard = 'tensorboard'
     num_models = 'num_models'
     logdirpath_model = 'logdirpath_model'
 
@@ -151,8 +150,6 @@ class DL_Trainer(QgsProcessingAlgorithm):
                '<p>This parameter enables balanced training, for this the precomputed class weights based on the training dataset are used, which are listed in the summary csv file.</p>' \
                '<h3>Data Normalization</h3>' \
                '<p>This parameter normalizes the image data with mean and std. per channel. To use this parameter the normalization statistic had to be cretaed using the Dataset Maker.</p>' \
-               '<h3>Open Tensorboard after Training</h3>' \
-               '<p>This parameter opens a Tensorboard after training, which is a graphical user interface in which the Loss and IoU metric can be interactively explored. This parameter works currently only for windows systems.</p>' \
                '<h3>Batch size</h3>' \
                '<p>This defines the number of images which are porcessed in batches. </p>' \
                '<h3>Epochs</h3>' \
@@ -211,10 +208,6 @@ class DL_Trainer(QgsProcessingAlgorithm):
                                           defaultValue=True))
         self.addParameter(
             QgsProcessingParameterBoolean(self.normalization_flag, self.tr('Data Normalization'), defaultValue=False))
-        self.addParameter(QgsProcessingParameterBoolean(
-            name=self.tensorboard, description='Open Tensorboard after training',
-            defaultValue=False))
-
         self.addParameter(QgsProcessingParameterNumber(
             name=self.batch_size, description='Batch size', type=QgsProcessingParameterNumber.Integer,
             defaultValue=2, minValue=1))
@@ -313,39 +306,6 @@ class DL_Trainer(QgsProcessingAlgorithm):
 
         out = self.parameterAsString(parameters, self.logdirpath, context)
         out_m = self.parameterAsString(parameters, self.logdirpath_model, context)
-
-        tensorboard_open = self.parameterAsBool(parameters, self.tensorboard, context)
-
-        if tensorboard_open == True:
-
-            port = 6006
-
-            tensorboard_command = f"tensorboard --logdir={out} --port={port}"
-
-            # Use netstat to find any process using the specified port and get the PID
-            cmd_find_pid = f"netstat -aon | findstr :{port}"
-            result = subprocess.run(cmd_find_pid, shell=True, capture_output=True, text=True)
-
-            if result.stdout:
-                lines = result.stdout.strip().split('\n')
-                for line in lines:
-                    parts = line.strip().split()
-                    if len(parts) > 4 and parts[1].endswith(f":{port}"):
-                        pid = parts[4]  # PID is the fifth element
-                        # Kill the process using the PID
-                        cmd_kill = f"taskkill /PID {pid} /F"
-                        subprocess.run(cmd_kill, shell=True)
-                        feedback.pushInfo(
-                            f"Killed process on port {port} with PID {pid}, and initalizied Tensorboard on same port")
-            else:
-                feedback.pushInfo(f"No process is running on port {port},initalizied Tensorboard on same port")
-
-            # Start the TensorBoard process
-            self.process = subprocess.Popen(tensorboard_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                            shell=True)
-            time.sleep(10)
-            url = f"http://localhost:{port}"
-            webbrowser.open_new(url)
 
         # select best iou model automatic so can be used in model builder
         best_iou_model = best_ckpt_path(out_m)
