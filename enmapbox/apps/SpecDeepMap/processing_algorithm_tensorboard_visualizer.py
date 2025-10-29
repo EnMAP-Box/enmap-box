@@ -9,6 +9,8 @@ from qgis.core import (QgsProcessingAlgorithm,
                        QgsProcessingParameterFile)
 
 import psutil
+from tensorboard import program
+import webbrowser
 
 class Tensorboard_visualizer(QgsProcessingAlgorithm):
     """
@@ -109,11 +111,6 @@ class Tensorboard_visualizer(QgsProcessingAlgorithm):
 
     def processAlgorithm(self, parameters, context, feedback):
 
-        from qgis.PyQt.QtCore import QTimer
-        from tensorboard import program
-        import webbrowser
-
-
         logdir = self.parameterAsString(parameters, self.TENSORBOARD_LOGDIR, context)
         port = self.parameterAsInt(parameters, self.TENSORBOARD_PORT, context)
 
@@ -138,9 +135,6 @@ class Tensorboard_visualizer(QgsProcessingAlgorithm):
         webbrowser.open_new(url)
 
             # Timer to check cancel periodically
-
-
-
 
         return {"TensorBoard_run": tb_run}
 
