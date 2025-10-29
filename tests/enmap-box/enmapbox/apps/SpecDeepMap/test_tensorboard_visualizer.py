@@ -44,24 +44,10 @@ class Test_Tensorboard(TestCase):
 
         result = Processing.runAlgorithm(alg, parameters=io)
 
-        process_exist = result['Process_exist']
-        process_runs = result['process_runs']
+        # "TensorBoard_run": tb_run
+        result_tb_run = result["TensorBoard_run"]
 
-        # Assert if the process is not existing or running
-        assert process_exist is True or process_runs is True
+        # Assert if the process did not create url correctly
+        assert result_tb_run is True
 
-        time.sleep(15)
-        # if process still exist terminate
-        cond = psutil.pid_exists(result['PID'])
-        if cond is True:
-            process = psutil.Process(result['PID'])
-            # terminate possible childe process and main process
-            for child in process.children(recursive=True):
-                child.kill()
-            process.kill()
 
-        # Remove logg folder
-        folder_path_logs_out = BASE_DIR / "test_run" / "lightning_logs"
-
-        if os.path.exists(str(folder_path_logs_out)):
-            shutil.rmtree(str(folder_path_logs_out))
