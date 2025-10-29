@@ -10,7 +10,8 @@ from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.testcase import TestCase
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import enmap, r_terra_timeseries_days, r_terra_timeseries_seconds, netCDF_timeseries_days
+from enmapboxtestdata import enmap, r_terra_timeseries_days, r_terra_timeseries_seconds, netCDF_timeseries_days, \
+    SensorProducts
 from enmapboxtestdata import fraction_polygon_l3
 
 
@@ -354,6 +355,10 @@ class TestRasterReader(TestCase):
         reader = RasterReader(writer.source())
         self.assertEqual('Micrometers', reader.wavelengthUnits(1))
         self.assertEqual(42 * 1000, reader.wavelength(1))
+
+    def test_wavelengthTanager(self):
+        reader = RasterReader(SensorProducts.Tanager.basic_radiance_toa_radiance)
+        self.assertEqual(376.44, reader.wavelength(1, raw=True))  # raw
 
     def test_findWavelength(self):
         writer = self.rasterFromArray(np.zeros((5, 1, 1)))
