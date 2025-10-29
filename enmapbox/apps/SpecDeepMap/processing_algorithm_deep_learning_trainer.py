@@ -189,7 +189,7 @@ class DL_Trainer(QgsProcessingAlgorithm):
             name=self.backbone, description='Model backbone', defaultValue='resnet18'))
         self.addParameter(QgsProcessingParameterEnum(
             name=self.pretrained_weights, description='Load pretrained weights',
-            options=['imagenet', 'None', 'Sentinel_2_TOA_Resnet18', 'Sentinel_2_TOA_Resnet50'], defaultValue=0))
+            options=['imagenet', 'None', 'Sentinel_2_TOA_Resnet18', 'Sentinel_2_TOA_Resnet50'], defaultValue=1))
         self.addParameter(
             QgsProcessingParameterFile(self.checkpoint, description='Load model from path', optional=True))
         self.addParameter(QgsProcessingParameterBoolean(
@@ -277,6 +277,8 @@ class DL_Trainer(QgsProcessingAlgorithm):
         # main function
         from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import dl_train
 
+        feedback.pushInfo("If you use pretrained weights of specific backbone for the first time, they will be downloaded before the training starts.")
+
         model = dl_train(
             input_folder=self.parameterAsString(parameters, self.train_val_input_folder, context),
             arch_index=self.parameterAsEnum(parameters, self.arch, context),
@@ -299,6 +301,7 @@ class DL_Trainer(QgsProcessingAlgorithm):
             logdirpath=self.parameterAsString(parameters, self.logdirpath, context),
             logdirpath_model=self.parameterAsString(parameters, self.logdirpath_model, context),
             feedback=feedback)
+
 
         feedback.pushInfo("Training completed.")
 
