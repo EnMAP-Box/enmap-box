@@ -11,7 +11,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.testcase import TestCase
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import enmap, r_terra_timeseries_days, r_terra_timeseries_seconds, netCDF_timeseries_days, \
-    SensorProducts
+    SensorProducts, sensorProductsRoot
 from enmapboxtestdata import fraction_polygon_l3
 
 
@@ -357,6 +357,8 @@ class TestRasterReader(TestCase):
         self.assertEqual(42 * 1000, reader.wavelength(1))
 
     def test_wavelengthTanager(self):
+        if sensorProductsRoot() is None:
+            return
         reader = RasterReader(SensorProducts.Tanager.basic_radiance_toa_radiance)
         self.assertEqual(376.44, reader.wavelength(1, raw=True))  # raw
 
