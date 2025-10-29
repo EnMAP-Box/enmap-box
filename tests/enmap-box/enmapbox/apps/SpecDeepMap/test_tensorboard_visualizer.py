@@ -49,5 +49,3 @@ class Test_Tensorboard(TestCase):
 
         # Assert if the process did not create url correctly
         assert result_tb_run is True
-
-
