@@ -1,11 +1,6 @@
-import os
-import shutil
-import time
+
 import unittest
 from pathlib import Path
-
-import psutil
-
 from enmapbox import DIR_UNITTESTS
 from enmapbox.apps.SpecDeepMap import import_error
 from enmapbox.testing import start_app
