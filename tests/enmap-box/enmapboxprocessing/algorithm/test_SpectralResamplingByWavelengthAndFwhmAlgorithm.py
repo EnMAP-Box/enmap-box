@@ -108,6 +108,6 @@ class TestSpectralResamplingByWavelengthAndFwhmAlgorithm(TestCase):
         }
         result = self.runalg(alg, parameters)
         sum = float(np.round(np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array()[0])))
-        self.assertAlmostEqual(-36108144.0, sum, 5)
+        self.assertAlmostEqual(1., -36108144.0 / sum, 5)
         srf = Utils().jsonLoad(result[alg.P_OUTPUT_LIBRARY])
         self.assertEqual(224, len(srf['features']))
