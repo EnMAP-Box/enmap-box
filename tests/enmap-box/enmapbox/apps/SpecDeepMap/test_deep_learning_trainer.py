@@ -95,7 +95,7 @@ class Test_Deep_Learning_Trainer(TestCase):
         ckpt_len = len(ckpt_file)  # List all .tif files
         assert ckpt_len == 2, "Error: Expected 2 saved checkpoints, as 2 epochs were trained with every epoch saving"
 
-        # test model load:
+        # test model load
 
         # select best ckpt
         best = best_ckpt_path(folder_path)

@@ -44,7 +44,7 @@ class Test_Tensorboard(TestCase):
 
         result = Processing.runAlgorithm(alg, parameters=io)
 
-        # "TensorBoard_run": tb_run
+        # "TensorBoard_run": tb_ru
         result_tb_run = result["TensorBoard_run"]
 
         # Assert if the process did not create url correctly
