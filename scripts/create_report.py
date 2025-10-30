@@ -16,6 +16,11 @@ from typing import Dict, List
 import pandas as pd
 import requests
 
+from enmapbox import DIR_REPO_TMP, initAll
+from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
+from enmapbox.gui.applications import ApplicationWrapper, EnMAPBoxApplication
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.testing import start_app
 from qgis.PyQt.QtWidgets import QMenu
 from qgis.core import QgsProcessing, QgsProcessingAlgorithm, QgsProcessingOutputFile, QgsProcessingOutputFolder, \
     QgsProcessingOutputHtml, QgsProcessingOutputRasterLayer, QgsProcessingOutputVectorLayer, \
@@ -24,11 +29,6 @@ from qgis.core import QgsProcessing, QgsProcessingAlgorithm, QgsProcessingOutput
     QgsProcessingParameterFolderDestination, QgsProcessingParameterMapLayer, QgsProcessingParameterMultipleLayers, \
     QgsProcessingParameterRasterDestination, QgsProcessingParameterRasterLayer, QgsProcessingParameterVectorDestination, \
     QgsProcessingParameterVectorLayer
-from enmapbox import DIR_REPO_TMP, initAll
-from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
-from enmapbox.gui.applications import ApplicationWrapper, EnMAPBoxApplication
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.testing import start_app
 
 
 def linesOfCode(path) -> int:
@@ -57,6 +57,9 @@ def report_downloads() -> pd.DataFrame:
     html = re.sub(r'&nbsp;', '', html)
     html = re.sub(r'xmlns=".*"', '', html)
     html = re.sub(r'>&times;<', '><', html)
+    html = re.sub(r'<form>.*</form>', '', html)
+    html = re.sub(r'QGIS <=', 'QGIS max', html)
+    html = re.sub(r'QGIS >=', 'QGIS min', html)
     tree = etree.fromstring(html)
     table = tree
     #  table = tree.find('.//table[@class="table table-striped plugins"]')
@@ -64,20 +67,24 @@ def report_downloads() -> pd.DataFrame:
     for tr in table.findall('.//tbody/tr'):
         tds = list(tr.findall('td'))
         """
-        <td><a title="Version details" href="/plugins/enmapboxplugin/version/3.11.0/">3.11.0</a></td>
-        <td>no</td>
-        <td>3.24.0</td>
-        <td>1668</td>
-        <td><a href="/plugins/user/janzandr/admin">janzandr</a></td>
-        <td><span class="user-timezone">2022-10-09T22:36:01.698509+00:00</span></td>
+    <tr>
+        <td class="has-text-centered"><a href="/plugins/enmapboxplugin/version/3.16.4/">3.16.4</a></td>
+        <td class="has-text-centered"> -</td>
+        <td class="has-text-centered">3.38.0</td>
+        <td class="has-text-centered">3.99.0</td>
+        <td class="downloads">3817</td>
+        <td class="has-text-centered"><a href="/plugins/user/jakimowb/admin">jakimowb</a></td>
+        <td class="has-text-centered" data-order="2025-08-02T12:57:54.528578"><span class="user-timezone">2025-08-02T17:57:54.528578+00:00</span>
+        </td>
+    </tr>
         """
         s = ""
         versionEMB = tds[0].find('.//a').text
         versionQGIS = tds[2].text
         experimental = tds[1].text.lower() == 'yes'
-        downloads = int(tds[3].text)
-        uploader = tds[4].find('a').text
-        datetime = tds[5].find('span').text
+        downloads = int(tds[4].text)
+        uploader = tds[5].find('a').text
+        datetime = tds[6].find('span').text
         DATA['version'].append(versionEMB)
         DATA['minQGIS'].append(versionQGIS)
         DATA['experimental'].append(experimental)
@@ -491,8 +498,8 @@ def report_processingalgorithms() -> pd.DataFrame:
 
 
 class TestCases(unittest.TestCase):
-    start_date = '2025-01-01'
-    end_date = '2025-06-30'
+    start_date = '2025-04-01'
+    end_date = '2025-10-30'
 
     def test_github_EnMAPBox(self):
         report_github_issues_EnMAPBox(start_date=self.start_date, end_date=self.end_date)

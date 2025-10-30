@@ -38,7 +38,7 @@ from enmapbox.qgispluginsupport.qps.maptools import QgsMapToolSelectionHandler, 
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprofilesources import SpectralProfileSourcePanel, \
-    MapCanvasLayerProfileSource
+    MapCanvasLayerProfileSource, SpectralFeatureGeneratorNode, SpectralProfileBridge
 from enmapbox.qgispluginsupport.qps.subdatasets import SubDatasetSelectionDialog
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, loadUi, SpatialExtent, file_search
 from enmapbox.typeguard import typechecked
@@ -1591,6 +1591,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         """
 
         panel: SpectralProfileSourcePanel = self.spectralProfileSourcePanel()
+        bridge: SpectralProfileBridge = panel.mBridge
         if not panel.property('has_been_shown_once'):
             panel.setUserVisible(True)
             panel.setProperty('has_been_shown_once', True)
@@ -1598,17 +1599,31 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         if len(self.docks(SpectralLibraryDock)) == 0:
             self.createDock(SpectralLibraryDock)
 
-        if len(panel.mBridge) == 0:
-            speclibs = self.spectralLibraries()
+        if len(bridge) == 0:
+            # if undefined, use an in-memory speclib to store profiles
+            def is_temporary(sl: QgsVectorLayer):
+                if not is_spectral_library(sl):
+                    return False
+                dpn = sl.dataProvider().name()
+                if dpn == 'memory':
+                    return True
+                return False
+
+            speclibs = [sl for sl in self.spectralLibraries() if is_temporary(sl)]
+
             if len(speclibs) == 0:
                 # create an empty, temporary spectral library to store pixel profiles
                 from enmapbox.testing import TestObjects
                 sl = TestObjects.createSpectralLibrary(n=0)
+                sl.setName('Collected Profiles')
                 self.addSources([sl])
                 self.project().addMapLayer(sl)
-                s = ""
+                speclibs = [sl]
 
-            panel.createRelation()
+            if len(speclibs) > 0:
+                node: SpectralFeatureGeneratorNode = bridge.createFeatureGenerator()
+                node.setSpeclib(speclibs[0])
+                bridge.setDefaultSources(node)
 
         panel.loadCurrentMapSpectra(spatialPoint, mapCanvas=mapCanvas, runAsync=runAsync)
 
