@@ -4,6 +4,7 @@ from xml.etree import ElementTree
 
 import numpy as np
 from osgeo import gdal
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer, QgsMapLayer
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
@@ -17,7 +18,6 @@ from enmapboxprocessing.gdalutils import GdalUtils
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer, QgsMapLayer
 
 
 @typechecked
@@ -31,7 +31,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
         'SWIR only'
     ]
     OrderByDetectorOverlapOption, OrderByWavelengthOverlapOption, MovingAverageFilterOverlapOption, \
-    VnirOnlyOverlapOption, SwirOnlyOverlapOption = range(5)
+        VnirOnlyOverlapOption, SwirOnlyOverlapOption = range(5)
     P_OUTPUT_RASTER, _OUTPUT_RASTER = 'outputEnmapL2ARaster', 'Output raster layer'
 
     def displayName(self):
@@ -70,13 +70,16 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
 
     def isValidFile(self, file: str) -> bool:
         return basename(file).startswith('ENMAP') & \
-               basename(file).endswith('METADATA.XML') & \
-               ('L2A' in basename(file))
+            (basename(file).endswith('METADATA.XML') or basename(file).endswith('METADATA.xml')) & \
+            ('L2A' in basename(file))
 
     def defaultParameters(self, xmlFilename: str):
+        filename = xmlFilename
+        filename = filename.replace('METADATA.XML', 'SPECTRAL_IMAGE_.tif')
+        filename = filename.replace('METADATA.xml', 'SPECTRAL_IMAGE_.tif')
         return {
             self.P_FILE: xmlFilename,
-            self.P_OUTPUT_RASTER: xmlFilename.replace('METADATA.XML', 'SPECTRAL_IMAGE_.tif'),
+            self.P_OUTPUT_RASTER: filename
         }
 
     def processAlgorithm(
@@ -118,7 +121,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
             vrtTempFilename = Utils.tmpFilename(filename, 'stack.vrt')
 
             spectralImageFilename = ImportEnmapL1BAlgorithm.findFilename(
-                xmlFilename.replace('-METADATA.XML', '-SPECTRAL_IMAGE')
+                xmlFilename.replace('-METADATA.XML', '-SPECTRAL_IMAGE').replace('-METADATA.xml', '-SPECTRAL_IMAGE')
             )
             interleave = gdal.Open(spectralImageFilename).GetMetadataItem('INTERLEAVE', 'IMAGE_STRUCTURE')
             if interleave == 'PIXEL':  # need to convert first, otherwise it is painfully slow
