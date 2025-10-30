@@ -2,15 +2,13 @@ import glob
 import os
 import re
 import unittest
-from os.path import dirname, join
 from pathlib import Path
-
-from processing import Processing
 
 from enmapbox import DIR_UNITTESTS
 from enmapbox.apps.SpecDeepMap import import_error
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
+from processing import Processing
 
 if import_error is None:
     try:
@@ -50,11 +48,12 @@ class Test_Deep_Learning_Trainer(TestCase):
         alg = DL_Trainer()
 
         # Get the script's directory (makes paths relative)
-        BASE_DIR = Path(__file__).parent
-
+        # BASE_DIR = Path(__file__).parent
+        # BASE_DIR = self.createTestOutputDirectory()
         folder_path_input = BASE_TESTDATA / 'test_requierments'
         self.assertTrue(folder_path_input.is_dir())
-        folder_path = BASE_DIR / "test_run"
+        # folder_path = BASE_DIR / "test_run"
+        folder_path = self.createTestOutputDirectory(cleanup=True)
         self.assertTrue(folder_path.is_dir(), msg=f'Dir does not exists: {folder_path}')
 
         folder_path = folder_path.as_posix()
@@ -83,7 +82,6 @@ class Test_Deep_Learning_Trainer(TestCase):
               alg.num_workers: 0,
               alg.device_numbers: 1,
               alg.num_models: -1,
-              alg.tensorboard: False,
               alg.logdirpath: folder_path,
               alg.logdirpath_model: folder_path,
               }
@@ -97,7 +95,7 @@ class Test_Deep_Learning_Trainer(TestCase):
         ckpt_len = len(ckpt_file)  # List all .tif files
         assert ckpt_len == 2, "Error: Expected 2 saved checkpoints, as 2 epochs were trained with every epoch saving"
 
-        # test model load:
+        # test model load
 
         # select best ckpt
         best = best_ckpt_path(folder_path)
@@ -132,13 +130,20 @@ class Test_Deep_Learning_Trainer(TestCase):
         alg = DL_Trainer()
 
         # Get the script's directory (makes paths relative)
-        BASE_DIR = dirname(__file__)
+        # BASE_DIR = dirname(__file__)
+        # folder_path = join(BASE_DIR, "test_run")
+        folder_path_unet = self.createTestOutputDirectory(cleanup=True)
+        folder_path_unet = folder_path_unet.as_posix()
 
-        folder_path = join(BASE_DIR, "test_run")
-        folder_path_input = join(BASE_DIR, "../../../../testdata/external/specdeepmap/test_requierments")
+        for filename in os.listdir(folder_path_unet):
+            if filename.endswith(".ckpt"):  # Assuming checkpoint files have a .ckpt extension
+                file_path = os.path.join(folder_path_unet, filename)
+                os.remove(file_path)
+
+        folder_path_input = BASE_TESTDATA / 'test_requierments'
 
         # 4. Test check if pretrained model runs needs 13 channel adjust indexing before splitting raster
-        io = {alg.train_val_input_folder: folder_path_input,
+        io = {alg.train_val_input_folder: folder_path_input.as_posix(),
               alg.arch: 0,
               alg.backbone: 'resnet18',
               alg.pretrained_weights: 0,
@@ -155,14 +160,13 @@ class Test_Deep_Learning_Trainer(TestCase):
               alg.num_workers: 0,
               alg.device_numbers: 1,
               alg.num_models: -1,
-              alg.tensorboard: False,
-              alg.logdirpath: folder_path,
-              alg.logdirpath_model: folder_path,
+              alg.logdirpath: folder_path_unet,
+              alg.logdirpath_model: folder_path_unet,
               }
 
         result = Processing.runAlgorithm(alg, parameters=io)
 
-        best = best_ckpt_path(folder_path)
+        best = best_ckpt_path(folder_path_unet)
 
         model_loaded = MyModel.load_from_checkpoint(best)
 
@@ -187,7 +191,7 @@ class Test_Deep_Learning_Trainer(TestCase):
         # assert frozen, "Error: The model's backbone is not frozen."
 
         # delete checkpoint files from previous test
-        for filename in os.listdir(folder_path):
+        for filename in os.listdir(folder_path_unet):
             if filename.endswith(".ckpt"):  # Assuming checkpoint files have a .ckpt extension
-                file_path = os.path.join(folder_path, filename)
+                file_path = os.path.join(folder_path_unet, filename)
                 os.remove(file_path)

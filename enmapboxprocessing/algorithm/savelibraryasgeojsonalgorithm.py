@@ -68,14 +68,14 @@ class SaveLibraryAsGeoJsonAlgorithm(EnMAPProcessingAlgorithm):
                             data['features'][i]['properties'][field.name()] = profileDict
 
                 Utils.jsonDump(data, filename)
-
                 result = {self.P_OUTPUT_FILE: filename}
             else:
-                from enmapbox.qgispluginsupport.qps.speclib.io.geojson import GeoJsonSpectralLibraryIO
+                from enmapbox.qgispluginsupport.qps.speclib.io.geojson import GeoJSONSpectralLibraryWriter
 
-                r = GeoJsonSpectralLibraryIO.exportProfiles(filename, library, feedback=feedback)
+                writer = GeoJSONSpectralLibraryWriter(crs=library.crs())
+                r = writer.writeFeatures(filename, library.getFeatures(), feedback=feedback)
                 if isinstance(r, list) and len(r) > 0:
-                    result = {self.P_OUTPUT_FILE: filename}
+                    result = {self.P_OUTPUT_FILE: r[0].as_posix()}
                 else:
                     result = {}
 

@@ -218,7 +218,14 @@ def collectEnMAPBoxAlgorithms() -> typing.List[QgsProcessingAlgorithm]:
     try:
         from enmapbox.qgispluginsupport.qps.speclib.processing.aggregateprofiles import AggregateProfiles
         from enmapbox.qgispluginsupport.qps.speclib.processing.importspectralprofiles import ImportSpectralProfiles
-        algs.extend([AggregateProfiles(), ImportSpectralProfiles()])
+        from enmapbox.qgispluginsupport.qps.speclib.processing.exportspectralprofiles import ExportSpectralProfiles
+        from enmapbox.qgispluginsupport.qps.speclib.processing.extractspectralprofiles import ExtractSpectralProfiles
+
+        algs.extend([AggregateProfiles(),
+                     ImportSpectralProfiles(),
+                     ExportSpectralProfiles(),
+                     ExtractSpectralProfiles()
+                     ])
     except Exception as ex:
         traceback.print_exc()
         info = f'Unable to load processing algorithms: {ex}'
@@ -263,6 +270,7 @@ def registerEnMAPBoxProcessingProvider():
 
 def unregisterEnMAPBoxProcessingProvider():
     """Removes the EnMAPBoxProcessingProvider"""
+    return
     from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider, ID
     registry = QgsApplication.instance().processingRegistry()
     provider = registry.providerById(ID)
@@ -325,11 +333,11 @@ def initAll():
     Calls other init routines required to run the EnMAP-Box properly
     """
     initEnMAPBoxResources()
-    from enmapbox.qgispluginsupport.qps import \
-        registerSpectralLibraryIOs, \
-        registerSpectralLibraryPlotFactories
-    registerSpectralLibraryIOs()
-    registerSpectralLibraryPlotFactories()
+    from enmapbox.qgispluginsupport.qps import registerDataProviders
+    registerDataProviders()
+
+    from enmapbox.provider.maskrasterdataprovider import register_data_provider
+    register_data_provider()
 
     registerEditorWidgets()
     registerExpressionFunctions()

@@ -11,7 +11,7 @@ Remote Sens. 2016, 8, 127.
     ---------------------
     Date                 : Juli 2019
     Copyright            : (C) 2019 by Christian Mielke
-    Email                : christian.mielke@gfz-potsdam.de
+    Email                : christian.mielke@gfz.de
 ***************************************************************************
 *                                                                         *
 *   This program is free software; you can redistribute it and/or modify  *
@@ -25,7 +25,7 @@ Changelog
 EnGeoMAP Version 3.2
 Date: February 2023
 Author: Helge L. C. Daempfling
-Email: hdaemp@gfz-potsdam.de
+Email: hdaemp@gfz.de
 
 The following modifications to the EnGeoMAP 3.1 release were realized:
 

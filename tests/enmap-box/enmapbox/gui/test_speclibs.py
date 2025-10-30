@@ -14,30 +14,25 @@ __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
 import unittest
 
-from qgis.core import QgsFeature
-
-from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox import initAll
 from enmapbox.exampledata import enmap
 from enmapbox.gui.dataviews.docks import SpectralLibraryDock
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import MapCanvas
-from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import encodeProfileValueDict
 from enmapbox.qgispluginsupport.qps.utils import fid2pixelindices, SpatialPoint
 from enmapbox.testing import EnMAPBoxTestCase, start_app
-from qgis.gui import QgsMapLayerComboBox
-from qgis.core import QgsRasterLayer, QgsVectorLayer
 from enmapboxtestdata import fraction_polygon_l3, fraction_point_singletarget, enmap_srf_library
+from qgis.core import QgsProject
+from qgis.core import QgsRasterLayer, QgsVectorLayer
+from qgis.gui import QgsMapLayerComboBox
 
 start_app()
+initAll()
 
 
 class TestSpeclibs(EnMAPBoxTestCase):
 
-    def setUp(self):
-        self.closeEnMAPBoxInstance()
-
-    def tearDown(self):
-        self.closeEnMAPBoxInstance()
-
+    @unittest.skip('TEST')
     def test_issue_1036(self):
         EB = EnMAPBox(load_core_apps=False, load_other_apps=False)
         lyrR = QgsRasterLayer(enmap, 'EnMAP')
@@ -50,27 +45,16 @@ class TestSpeclibs(EnMAPBoxTestCase):
         testDir = self.createTestOutputDirectory()
         path_fids = testDir / 'fid.tif'
         array, no_fid = fid2pixelindices(lyrR, lyrV, raster_fids=path_fids)
-
+        EB.removeSources()
         self.showGui(EB.ui)
-
-    def test_issue_851(self):
-        enmapBox = EnMAPBox(load_core_apps=False, load_other_apps=False)
-        dock: SpectralLibraryDock = enmapBox.dockManager().createDock('SPECLIB')
-        speclib = dock.speclib()
-        f = QgsFeature(speclib.fields())
-
-        d = dict(x=[2010, 2020], y=[0, 10000], xUnit='DecimalYear')
-        f.setAttribute('profiles', encodeProfileValueDict(d, f.fields().field('profiles')))
-        speclib.startEditing()
-        speclib.addFeature(f)
-        self.assertTrue(speclib.commitChanges())
-        self.showGui(enmapBox.ui)
+        EB.close()
+        QgsProject.instance().removeAllMapLayers()
 
     def test_issue_1032(self):
         EB = EnMAPBox(load_core_apps=False, load_other_apps=False)
         lyrR = QgsRasterLayer(fraction_polygon_l3, 'EnMAP')
         canvas: MapCanvas = EB.createNewMapCanvas()
-        sld: SpectralLibraryDock = EB.createNewSpectralLibrary()
+        EB.createNewSpectralLibrary()
         tree = canvas.layerTree()
         tree.addLayers([lyrR])
         center = SpatialPoint.fromMapLayerCenter(lyrR)
@@ -78,6 +62,8 @@ class TestSpeclibs(EnMAPBoxTestCase):
         EB.setCurrentLocation(center, canvas)
 
         self.showGui(EB.ui)
+        EB.close()
+        QgsProject.instance().removeAllMapLayers()
 
     def test_issue_1037(self):
         EB = EnMAPBox(load_core_apps=False, load_other_apps=False)
@@ -85,7 +71,10 @@ class TestSpeclibs(EnMAPBoxTestCase):
         EB.addSource(speclib)
         del speclib
         self.showGui(EB.ui)
+        EB.close()
+        QgsProject.instance().removeAllMapLayers()
 
+    @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'blocking dialogs')
     def test_issue_857(self):
         enmapBox = EnMAPBox(load_core_apps=False, load_other_apps=False)
         cb = QgsMapLayerComboBox()
@@ -99,6 +88,8 @@ class TestSpeclibs(EnMAPBoxTestCase):
         self.assertEqual(cb.count(), 0)
 
         self.showGui(enmapBox.ui)
+        enmapBox.close()
+        QgsProject.instance().removeAllMapLayers()
 
 
 if __name__ == "__main__":

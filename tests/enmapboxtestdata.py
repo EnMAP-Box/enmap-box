@@ -450,6 +450,12 @@ class SensorProducts(object):
             )
             S2B_L2A_MsiL1CXml = join(S2B_L2A, 'MTD_MSIL2A.xml')
 
+        class Tanager(object):
+            basic_radiance_h5 = join(sensorProductsRoot(), 'tanager', '20250224_145149_32_4001_basic_radiance.h5')
+            basic_radiance_toa_radiance = f'HDF5:"{basic_radiance_h5}"://HDFEOS/SWATHS/HYP/Data_Fields/toa_radiance'
+            # basic_sr = join(sensorProductsRoot(), 'tanager', '20250503_112046_16_4001_basic_sr.h5')
+            # ortho_sr = join(sensorProductsRoot(), 'tanager', '20250503_112046_16_4001_ortho_sr.h5')
+
 
 class SpeclibProducts(object):
     if speclibProductsRoot() is not None:

@@ -1060,6 +1060,11 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def runAlg(algOrName, parameters, onFinish=None, feedback=None, context=None, is_child_algorithm=False) -> Dict:
         return processing.run(algOrName, parameters, onFinish, feedback, context, is_child_algorithm)
 
+    @staticmethod
+    def runAlgorithm(algOrName, parameters, onFinish=None, feedback=None, context=None) -> Dict:
+        from processing.core.Processing import Processing
+        return Processing.runAlgorithm(algOrName, parameters, onFinish, feedback, context)
+
 
 class Group(Enum):
     AccuracyAssessment = 'Accuracy Assessment'

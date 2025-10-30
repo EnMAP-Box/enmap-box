@@ -28,45 +28,40 @@ because the user may not change the important hyperparameters on his own. There 
 models on basis of individual Lookup-Tables.
 
 """
+import csv
 import sys
-# import os
-# import logging
+import warnings
 
-# import numpy as np
-# import pandas as pd
+import joblib
+import matplotlib.pyplot as plt
+from PyQt5.QtWidgets import QVBoxLayout
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.figure import Figure
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
 
-from qgis.gui import QgsMapLayerComboBox
-from qgis.core import QgsMapLayerProxyModel
-# from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
-from qgis.core import QgsVectorLayer
-
-# import LUT.CreateLUT_GUI
-# ensure to call QGIS before PyQtGraph
-from qgis.PyQt.QtWidgets import *
 # from PyQt5.QtGui import QIntValidator
 # from PyQt5.QtCore import QThread, pyqtSignal
 # from PyQt5.QtCore import QTimer
 import lmuvegetationapps.Processor.Processor_Inversion_core as processor
+from _classic.hubflow.core import *
+from enmapbox.gui.utils import loadUi
 # import lmuvegetationapps.LUT.CreateLUT_GUI
 from lmuvegetationapps import APP_DIR
-from _classic.hubflow.core import *
-import csv
-import joblib
-import json
+# import LUT.CreateLUT_GUI
+# ensure to call QGIS before PyQtGraph
+from qgis.PyQt.QtWidgets import *
+from qgis.core import QgsMapLayerProxyModel
+# from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
+from qgis.core import QgsVectorLayer
+from qgis.gui import QgsMapLayerComboBox
 
-from enmapbox.gui.utils import loadUi
-
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
-from PyQt5.QtWidgets import QVBoxLayout
-
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import r2_score
-from mpl_toolkits.axes_grid1 import make_axes_locatable
-
-import warnings
+# import os
+# import logging
+# import numpy as np
+# import pandas as pd
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 warnings.filterwarnings('ignore', category=UserWarning)
@@ -84,6 +79,12 @@ class MLTrainingGUI(QDialog):
         mLayerSpeclib: QgsMapLayerComboBox
         super(MLTrainingGUI, self).__init__(parent)
         loadUi(pathUI_train, self)
+
+        from enmapbox.gui.enmapboxgui import EnMAPBox
+        emb = EnMAPBox.instance()
+        if isinstance(emb, EnMAPBox):
+            self.mLayerSpeclib.setProject(emb.project())
+
         self.mLayerSpeclib.setFilters(QgsMapLayerProxyModel.PointLayer)
 
 
@@ -1328,12 +1329,12 @@ class SelectWavelengths:
             if i in default_exclude:
                 str_band_no = '{num:0{width}}'.format(num=i + 1, width=width)
                 label = "band %s: %6.2f %s" % (
-                str_band_no, self.main.mlra_training.wl[i], self.main.mlra_training.wunit)
+                    str_band_no, self.main.mlra_training.wl[i], self.main.mlra_training.wunit)
                 self.gui.lstExcluded.addItem(label)
             else:
                 str_band_no = '{num:0{width}}'.format(num=i + 1, width=width)
                 label = "band %s: %6.2f %s" % (
-                str_band_no, self.main.mlra_training.wl[i], self.main.mlra_training.wunit)
+                    str_band_no, self.main.mlra_training.wl[i], self.main.mlra_training.wunit)
                 self.gui.lstIncluded.addItem(label)
 
     def send(self, direction):
@@ -1461,8 +1462,8 @@ if __name__ == '__main__':
     app = start_app()
     m = MainUiFunc()
     m.show()
-    #lut_path = r"C:\Data\Daten\Testdaten\LUT\testLUT_1000_CpCBCcheck_00meta.lut"
-    #m.mlra_training.open_lut(lutpath=lut_path)
-    #out_folder = r"C:\Data\Daten\Testdaten\Model_TEST/"
-    #m.mlra_training.get_folder(path=out_folder)
+    # lut_path = r"C:\Data\Daten\Testdaten\LUT\testLUT_1000_CpCBCcheck_00meta.lut"
+    # m.mlra_training.open_lut(lutpath=lut_path)
+    # out_folder = r"C:\Data\Daten\Testdaten\Model_TEST/"
+    # m.mlra_training.get_folder(path=out_folder)
     sys.exit(app.exec_())

@@ -1,15 +1,15 @@
 import glob
 import os
 import shutil
-from pathlib import Path
 import unittest
+from pathlib import Path
 
-from processing.core.Processing import Processing
-from qgis.core import QgsProcessingAlgorithm
 from enmapbox import DIR_UNITTESTS, exampledata
+from enmapbox.apps.SpecDeepMap import import_error
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
-from enmapbox.apps.SpecDeepMap import import_error
+from processing.core.Processing import Processing
+from qgis.core import QgsProcessingAlgorithm
 
 if not import_error:
     from enmapbox.apps.SpecDeepMap.processing_algorithm_raster_splitter import RasterSplitter
@@ -36,20 +36,20 @@ class TestRasterSplitter(TestCase):
 
         # Get the script's directory (makes paths relative)
         # Get the script's directory (makes paths relative)
-        BASE_DIR = Path(__file__).parent
-
+        # BASE_DIR = Path(__file__).parent
+        BASE_DIR = self.createTestOutputDirectory()
         BASE_TESTDATA = Path(DIR_UNITTESTS) / 'testdata/external/specdeepmap'
 
         folder_path_test_csv = BASE_TESTDATA / "test_requierments" / "test_files.csv"
-        folder_path_test_iou = BASE_DIR / "test_run" / "test_iou.csv"
-        folder_path_test_preds = BASE_DIR / "test_run" / "preds"
+        folder_path_test_iou = BASE_DIR / "test_iou.csv"
+        folder_path_test_preds = BASE_DIR / "preds"
         checkpoint_dir = BASE_TESTDATA / "test_requierments"
 
         # Define paths using relative references
         input_l_path = BASE_TESTDATA / "test_requierments" / "enmap_landcover_unstyled.tif"
-        folder_path = BASE_DIR / "test_run"
+        folder_path = BASE_DIR
 
-        folder_path_images = BASE_DIR / "test_run" / "images"
+        folder_path_images = BASE_DIR / "images"
 
         io = {alg.INPUT_I: exampledata.enmap,
               alg.INPUT_L: str(input_l_path),

@@ -1,3 +1,4 @@
+
 import subprocess
 import time
 import webbrowser
@@ -8,6 +9,8 @@ from qgis.core import (QgsProcessingAlgorithm,
                        QgsProcessingParameterFile)
 
 import psutil
+from tensorboard import program
+import webbrowser
 
 class Tensorboard_visualizer(QgsProcessingAlgorithm):
     """
@@ -77,11 +80,11 @@ class Tensorboard_visualizer(QgsProcessingAlgorithm):
     def shortHelpString(self):
 
         html = '' \
-               '<p>This algorithm opens a TensorBoard (currently only for Windows system available, if used on linux, open a different port everytime you want to launch a TensorBoard). A TensorBoard is an interactive visualization tool to explore the trainings and validations metrics and losses. More details on TensorBoard you can find here: https://www.tensorflow.org/tensorboard  </p>' \
+               '<p>This algorithm launches TensorBoard, an interactive visualization tool for exploring training and validation metrics and losses. More details on TensorBoard you can find here: https://www.tensorflow.org/tensorboard . Once started, TensorBoard runs in the background on your local host until QGIS is closed. Running TensorBoard will not affect the performance of other algorithms. If the chosen port is already in use, please select a different one.</p>' \
                '<h3>TensorBoard Log Directory</h3>' \
-               '<p>The path which was defined during training to save model and logs.</p>' \
+               '<p> Select the folder that was defined during training to save TensorBoard logs.This directory usually contains a lightning_logs subfolder.However, the algorithm also works if you provide the main training output folder where the logs are stored. </p>'\
                '<h3>TensorBoard Port (Optional) </h3>' \
-               '<p>Here you can define an additional local port to open a TensorBoard. When opening the TensorBoard it is checked if the defined port is already used for a TensorBoard, if so its closed and the new TensorBoard is launched instead </p>'
+               '<p> You can specify a local port number for launching a TensorBoard.If the chosen port is already in use, please select another port within the range 6006–65535. A new TensorBoard instance will then be started on that port.All TensorBoard ports are automatically released/closed when QGIS is closed.< / p >'
         return html
 
     def initAlgorithm(self, config=None):
@@ -105,52 +108,35 @@ class Tensorboard_visualizer(QgsProcessingAlgorithm):
                 optional=True
             )
         )
-        self.process = None
 
     def processAlgorithm(self, parameters, context, feedback):
-        """
-        Here is where the processing itself takes place.
-        """
 
         logdir = self.parameterAsString(parameters, self.TENSORBOARD_LOGDIR, context)
         port = self.parameterAsInt(parameters, self.TENSORBOARD_PORT, context)
 
-        tensorboard_command = f"tensorboard --logdir={logdir} --port={port}"
+        tb_run = False
 
-        # Use netstat to find any process using the specified port and get the PID
-        cmd_find_pid = f"netstat -aon | findstr :{port}"
-        result = subprocess.run(cmd_find_pid, shell=True, capture_output=True, text=True)
+            # Start TensorBoard
+        tb = program.TensorBoard()
+        tb.configure(argv=[
+                None,
+                "--logdir", logdir,
+                "--port", str(port),
+                "--host", "127.0.0.1",
+            ])
+        url = tb.launch()
 
-        if result.stdout:
-            lines = result.stdout.strip().split('\n')
-            for line in lines:
-                parts = line.strip().split()
-                if len(parts) > 4 and parts[1].endswith(f":{port}"):
-                    pid = parts[4]  # PID is the fifth element
-                    # Kill the process using the PID
-                    cmd_kill = f"taskkill /PID {pid} /F"
-                    subprocess.run(cmd_kill, shell=True)
-                    feedback.pushInfo(f"Killed process on port {port} with PID {pid}")
+        if url:
+            tb_run = True
 
-        else:
-            feedback.pushInfo(f"No process is running on port {port}")
-
-        # Start the TensorBoard process
-        self.process = subprocess.Popen(tensorboard_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        time.sleep(10)
-
-        url = f"http://localhost:{port}"
+        feedback.pushInfo(f"TensorBoard running in background at {url}. If not directly opened you can open TensorBoard by copying: {url} in your browser.")
+        feedback.pushInfo(f"TensorBoard will run in background until QGIS is closed, but will not interfere with other algorithms performances and can be ignored.")
+        feedback.pushInfo(f"If you want to initalize a different TensorBoard, just change the port number and run the algorithm again.")
         webbrowser.open_new(url)
 
-        # return print('Tensorboard opened at: ',port)
-        feedback.pushInfo(f"TensorBoard started with PID {self.process.pid} at {logdir} on port {port}")
+            # Timer to check cancel periodically
 
-        process_exist = psutil.pid_exists(self.process.pid)
-        process = psutil.Process(self.process.pid)
-        process_runs = process.is_running()
-
-        return {"PID": self.process.pid, "Process_exist":process_exist, "process_runs":process_runs}
-
+        return {"TensorBoard_run": tb_run}
 
     def helpUrl(self, *args, **kwargs):
         return ''
