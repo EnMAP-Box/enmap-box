@@ -20,7 +20,7 @@ class HtmlReportWriter(object):
       /* 1. Base setup (from The Cascade) */
       :root {
         /* EnMAP-Box inspired colors (offline-friendly) */
-        --color-primary: #004b5a; /* A dark teal */
+        --color-primary: #000000; /* A dark teal */
         --color-text: #333;
         --color-bg: #ffffff;
         --color-bg-secondary: #f4f4f4;
