@@ -855,7 +855,7 @@ class DataSourceFactory(object):
                             else:
                                 # create a data source for each sublayer
                                 results = []
-                                for d in sublayerDetails:
+                                for d in sDetails:
                                     results.extend(DataSourceFactory.create(d))
                                 return results
 
