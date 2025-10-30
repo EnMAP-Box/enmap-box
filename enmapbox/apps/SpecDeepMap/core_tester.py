@@ -46,6 +46,7 @@ def load_model_and_tile_size(model_checkpoint, acc):
     remove_c = hyperpara['remove_background_class']
     cls_values = hyperpara["class_values"]
     reverse_mapping = hyperpara["reverse_mapping"]
+    scaler = hyperpara.get("scaler", None)
 
     print('reverse mapping',reverse_mapping)
 
@@ -64,6 +65,7 @@ def load_model_and_tile_size(model_checkpoint, acc):
             "preprocess": pre_process,
             'remove_background_class': remove_c,
             "reverse_mapping": reverse_mapping,
+            "scaler": scaler,
 
         }
     )
@@ -199,6 +201,8 @@ def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_
 
         # Make prediction using the model
         image = image.astype(np.float32)
+
+        image = image
 
         image = torch.tensor(image).to(acc_d)
 

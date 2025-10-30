@@ -70,7 +70,6 @@ class DL_Trainer(QgsProcessingAlgorithm):
     logdirpath = 'logdirpath '
     checkpoint = 'checkpoint'
     n_classes = 'n_classes'
-    tensorboard = 'tensorboard'
     num_models = 'num_models'
     logdirpath_model = 'logdirpath_model'
 
@@ -143,22 +142,20 @@ class DL_Trainer(QgsProcessingAlgorithm):
                '<p>Load model from path for continuing training or to initalize a model. Restriction is that model must be compatibel with training scheme and input data type.</p>' \
                '<h3>Freeze backbone </h3>' \
                '<p>This freezes the weight of the backbone for training. This is a routine step for transferlearning where in the first step a model is trained on new classes with a frozen backbone and in a second training step it is finetuned with an unfrozen backbone. To achieve this here, train first with frozen backbone and then load trained model again and train with unfrozen backbone. </p>' \
-               '<h3>Data augmentation (random flip & rotate by 45°) </h3>' \
-               '<p>This apply data augmentation. Random vertical and horizontal flip as well as ranodm rotate with 45°. Each augmentation has a propability of occuring of 50 %. This data augmentation is happening on the fly and prevents overfitting of the model.</p>' \
+               '<h3>Data augmentation (random flip ) </h3>' \
+               '<p>This apply data augmentation. Random vertical and horizontal flip. Each augmentation has a propability of occuring of 50 %. This data augmentation is happening on the fly and prevents overfitting of the model.</p>' \
                '<h3>Early stopping</h3>' \
                '<p>This stops the model when validation loss is not imporving for 50 epochs.  </p>' \
                '<h3>Balanced Training using Class Weights</h3>' \
                '<p>This parameter enables balanced training, for this the precomputed class weights based on the training dataset are used, which are listed in the summary csv file.</p>' \
                '<h3>Data Normalization</h3>' \
                '<p>This parameter normalizes the image data with mean and std. per channel. To use this parameter the normalization statistic had to be cretaed using the Dataset Maker.</p>' \
-               '<h3>Open Tensorboard after Training</h3>' \
-               '<p>This parameter opens a Tensorboard after training, which is a graphical user interface in which the Loss and IoU metric can be interactively explored. This parameter works currently only for windows systems.</p>' \
                '<h3>Batch size</h3>' \
                '<p>This defines the number of images which are porcessed in batches. </p>' \
                '<h3>Epochs</h3>' \
                '<p>This defines the number of Epochs which are used to train a model. One epochs means the model is trained once on the whole training dataset. Epochs are 0 indexed so the first training epoch is epoch-0. </p>' \
                '<h3>Learning rate</h3>' \
-               '<p>This defines the Learning rate for the Adam optimizer of the model. </p>' \
+               '<p>This defines the Learning rate for the Adam optimizer of the model. Learning rate is decreasing during training using CosineAnnealingLR using defined epochs value as T_max value, so lr decreases steadily towards near zero during whole training run ( min lr: 1e-6 ). ( More detail see here: https://docs.pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.CosineAnnealingLR.html )  </p>' \
                '<h3>Automatic learning rate finder</h3>' \
                '<p>If activated this parameter runs a learning rate finder, meaning it test 100 learning rates before training and picks the one with the most stable learning for training. If chosen this overwrites the manual defined learning rate. The found and implemented  learningrate is printed to log interface. </p>' \
                '<h3>Number of workers</h3>' \
@@ -169,8 +166,6 @@ class DL_Trainer(QgsProcessingAlgorithm):
                '<p> For distributated training you can also here define how many GPUs you want to use. </p>' \
                '<h3>Number of models</h3>' \
                '<p> Defines how many models should be saved. -1 means each epoch a model is saved. Other integer define a limited number of models.  </p>' \
-               '<h3>Print detail train process in python console</h3>' \
-               '<p> To print detailed training progress by batch (sub-epoch), you can activate this paramter, to print the process open the qgis python console. This is just interesting for large data-volumes, otherwise just inspect training progress in processing logger window, which prints progress per epoch.  </p>' \
                '<h3>Path for saving Tensorboard logger</h3>' \
                '<p>Define folder where Tensorboard logger is saved. </p>' \
                '<h3>Path for saving model</h3>' \
@@ -194,7 +189,7 @@ class DL_Trainer(QgsProcessingAlgorithm):
             name=self.backbone, description='Model backbone', defaultValue='resnet18'))
         self.addParameter(QgsProcessingParameterEnum(
             name=self.pretrained_weights, description='Load pretrained weights',
-            options=['imagenet', 'None', 'Sentinel_2_TOA_Resnet18', 'Sentinel_2_TOA_Resnet50'], defaultValue=0))
+            options=['imagenet', 'None', 'Sentinel_2_TOA_Resnet18', 'Sentinel_2_TOA_Resnet50'], defaultValue=1))
         self.addParameter(
             QgsProcessingParameterFile(self.checkpoint, description='Load model from path', optional=True))
         self.addParameter(QgsProcessingParameterBoolean(
@@ -211,10 +206,6 @@ class DL_Trainer(QgsProcessingAlgorithm):
                                           defaultValue=True))
         self.addParameter(
             QgsProcessingParameterBoolean(self.normalization_flag, self.tr('Data Normalization'), defaultValue=False))
-        self.addParameter(QgsProcessingParameterBoolean(
-            name=self.tensorboard, description='Open Tensorboard after training',
-            defaultValue=False))
-
         self.addParameter(QgsProcessingParameterNumber(
             name=self.batch_size, description='Batch size', type=QgsProcessingParameterNumber.Integer,
             defaultValue=2, minValue=1))
@@ -286,6 +277,8 @@ class DL_Trainer(QgsProcessingAlgorithm):
         # main function
         from enmapbox.apps.SpecDeepMap.core_deep_learning_trainer import dl_train
 
+        feedback.pushInfo("If you use pretrained weights of specific backbone for the first time, they will be downloaded before the training starts.")
+
         model = dl_train(
             input_folder=self.parameterAsString(parameters, self.train_val_input_folder, context),
             arch_index=self.parameterAsEnum(parameters, self.arch, context),
@@ -309,44 +302,12 @@ class DL_Trainer(QgsProcessingAlgorithm):
             logdirpath_model=self.parameterAsString(parameters, self.logdirpath_model, context),
             feedback=feedback)
 
+
         feedback.pushInfo("Training completed.")
 
         out = self.parameterAsString(parameters, self.logdirpath, context)
         out_m = self.parameterAsString(parameters, self.logdirpath_model, context)
-
-        tensorboard_open = self.parameterAsBool(parameters, self.tensorboard, context)
-
-        if tensorboard_open == True:
-
-            port = 6006
-
-            tensorboard_command = f"tensorboard --logdir={out} --port={port}"
-
-            # Use netstat to find any process using the specified port and get the PID
-            cmd_find_pid = f"netstat -aon | findstr :{port}"
-            result = subprocess.run(cmd_find_pid, shell=True, capture_output=True, text=True)
-
-            if result.stdout:
-                lines = result.stdout.strip().split('\n')
-                for line in lines:
-                    parts = line.strip().split()
-                    if len(parts) > 4 and parts[1].endswith(f":{port}"):
-                        pid = parts[4]  # PID is the fifth element
-                        # Kill the process using the PID
-                        cmd_kill = f"taskkill /PID {pid} /F"
-                        subprocess.run(cmd_kill, shell=True)
-                        feedback.pushInfo(
-                            f"Killed process on port {port} with PID {pid}, and initalizied Tensorboard on same port")
-            else:
-                feedback.pushInfo(f"No process is running on port {port},initalizied Tensorboard on same port")
-
-            # Start the TensorBoard process
-            self.process = subprocess.Popen(tensorboard_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                            shell=True)
-            time.sleep(10)
-            url = f"http://localhost:{port}"
-            webbrowser.open_new(url)
-
+        #
         # select best iou model automatic so can be used in model builder
         best_iou_model = best_ckpt_path(out_m)
 

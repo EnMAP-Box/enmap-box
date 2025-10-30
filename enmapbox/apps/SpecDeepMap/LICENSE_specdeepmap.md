@@ -11,7 +11,7 @@ license document, but changing it is not allowed.
 ### Preamble
 
 The GNU General Public License is a free, copyleft license for
-software and other kinds of works.
+software and other kinds of works. 
 
 The licenses for most software and other practical works are designed
 to take away your freedom to share and change the works. By contrast,

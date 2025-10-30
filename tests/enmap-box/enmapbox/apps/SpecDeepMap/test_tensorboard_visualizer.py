@@ -1,11 +1,6 @@
-import os
-import shutil
-import time
+
 import unittest
 from pathlib import Path
-
-import psutil
-
 from enmapbox import DIR_UNITTESTS
 from enmapbox.apps.SpecDeepMap import import_error
 from enmapbox.testing import start_app
@@ -44,24 +39,8 @@ class Test_Tensorboard(TestCase):
 
         result = Processing.runAlgorithm(alg, parameters=io)
 
-        process_exist = result['Process_exist']
-        process_runs = result['process_runs']
+        # "TensorBoard_run": tb_ru
+        result_tb_run = result["TensorBoard_run"]
 
-        # Assert if the process is not existing or running
-        assert process_exist is True or process_runs is True
-
-        time.sleep(15)
-        # if process still exist terminate
-        cond = psutil.pid_exists(result['PID'])
-        if cond is True:
-            process = psutil.Process(result['PID'])
-            # terminate possible childe process and main process
-            for child in process.children(recursive=True):
-                child.kill()
-            process.kill()
-
-        # Remove logg folder
-        folder_path_logs_out = BASE_DIR / "test_run" / "lightning_logs"
-
-        if os.path.exists(str(folder_path_logs_out)):
-            shutil.rmtree(str(folder_path_logs_out))
+        # Assert if the process did not create url correctly
+        assert result_tb_run is True

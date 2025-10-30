@@ -27,7 +27,6 @@ from enmapbox.apps.SpecDeepMap.utils_resnet import ResNet18_Weights, ResNet50_We
 # Data augmentation
 
 transforms_v2 = v2.Compose([
-    v2.RandomRotation(degrees=45),
     v2.RandomHorizontalFlip(p=0.5),
     v2.RandomVerticalFlip(p=0.5),
 ])
@@ -312,6 +311,7 @@ class MyModel(L.LightningModule):
         self.class_values = self.hparams.get("class_values")
         self.forward_mapping = self.hparams.get("forward_mapping")
         self.reverse_mapping = self.hparams.get("reverse_mapping")
+        self.n_epochs = self.hparams.get("epochs")
 
         if self.classes == 1:
             # self.iou = JaccardIndex(task="binary",num_classes=self.classes, ignore_index=self.ignore_index)
@@ -513,7 +513,7 @@ class MyModel(L.LightningModule):
 
     def configure_optimizers(self):
         opt = torch.optim.Adam(self.model.parameters(), lr=self.learning_rate)
-        sch = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=10)
+        sch = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=self.n_epochs, eta_min=1e-6)
         return [opt], [sch]
 
     def on_train_epoch_end(self):
