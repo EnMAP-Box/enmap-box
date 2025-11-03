@@ -3,6 +3,7 @@ from typing import Dict, Any, List, Tuple
 from osgeo import gdal
 
 import processing
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.creategridalgorithm import CreateGridAlgorithm
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import RasterMathAlgorithm
@@ -11,13 +12,12 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import HexColor, Category
 from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QMetaType
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsRectangle,
                        QgsCoordinateReferenceSystem, QgsVectorFileWriter,
                        QgsProject, QgsField, QgsCoordinateTransform, QgsRasterLayer, QgsProcessingException,
                        QgsMapLayer)
 from qgis.core import edit
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -27,7 +27,7 @@ class RasterizeCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
     P_COVERAGE, _COVERAGE = 'coverage', 'Minimum pixel coverage [%]'
     P_MAJORITY_VOTING, _MAJORITY_VOTING = 'majorityVoting', 'Majority voting'
     P_OUTPUT_CATEGORIZED_RASTER, _OUTPUT_CATEGORIZED_RASTER = 'outputRasterizedCategories', \
-                                                              'Output categorized raster layer'
+        'Output categorized raster layer'
 
     def displayName(self):
         return 'Rasterize categorized vector layer'
@@ -225,7 +225,7 @@ class RasterizeCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
 
         n = vector2.featureCount()
         with edit(vector2):
-            vector2.addAttribute(QgsField(fieldName, QVariant.Int))
+            vector2.addAttribute(QgsField(fieldName, QMetaType.Int))
             vector2.updateFields()
             for i, feature in enumerate(vector2.getFeatures(), 1):
                 feedback.setProgress(i / n * 100)
