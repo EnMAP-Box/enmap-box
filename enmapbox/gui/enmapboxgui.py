@@ -2400,9 +2400,11 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         return self.ui.mActionZoomOut
 
     def showProcessingAlgorithmDialog(self,
-                                      algorithmName: Union[str, QgsProcessingAlgorithm], parameters: Dict = None,
+                                      algorithmName: Union[str, QgsProcessingAlgorithm],
+                                      parameters: Dict = None,
                                       show: bool = True,
-                                      modal: bool = False, wrapper: type = None, autoRun: bool = False,
+                                      modal: bool = False, wrapper: type = None,
+                                      autoRun: bool = False,
                                       parent: QWidget = None
                                       ) -> AlgorithmDialog:
         """

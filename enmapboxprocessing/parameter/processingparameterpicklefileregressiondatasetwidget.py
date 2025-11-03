@@ -1,6 +1,7 @@
 from os.path import basename, join, dirname
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.qgispluginsupport.qps.processing.algorithmdialog import AlgorithmDialog
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcodealgorithm import \
     PrepareRegressionDatasetFromCodeAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuouslibraryalgorithm import \
