@@ -555,10 +555,17 @@ class RasterReader(object):
 
     def metadataDomain(self, domain: str = '', bandNo: int = None) -> MetadataDomain:
         """Return domain metadata."""
-        metadata = {
-            key: Utils.stringToMetadateValue(value)
-            for key, value in self._gdalObject(bandNo).GetMetadata(domain).items()
-        }
+
+        gdalValue = self._gdalObject(bandNo).GetMetadata(domain)
+
+        if isinstance(gdalValue, list):
+            metadata = {}  # see https://github.com/EnMAP-Box/enmap-box/issues/1302
+        else:
+            metadata = {
+                key: Utils.stringToMetadateValue(value)
+                for key, value in gdalValue.items()
+            }
+
         return metadata
 
     def metadata(self, bandNo: int = None) -> Metadata:
