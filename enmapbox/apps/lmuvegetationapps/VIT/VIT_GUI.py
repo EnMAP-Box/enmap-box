@@ -2,13 +2,13 @@
 
 # This module handles the GUI of the Vegetation Index Toolbox
 
+import os
 import sys
 
 import lmuvegetationapps.VIT.VIT_core
-from _classic.hubflow.core import *
 from enmapbox.gui.utils import loadUi
 from lmuvegetationapps import APP_DIR
-from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.QtWidgets import QDialog, QCheckBox, QFileDialog, QMessageBox
 from qgis.core import QgsMapLayerProxyModel
 from qgis.gui import QgsMapLayerComboBox
 
