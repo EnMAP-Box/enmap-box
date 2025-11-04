@@ -2521,7 +2521,15 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         return self.dockTreeView().mapCanvases()
 
     def mapCanvas(self) -> MapCanvas:
-        return self.currentMapCanvas()
+        """
+        Returns the last touched mapcanvas. In case no mapcavas exists, this will return the QGIS map canvas
+        """
+        c = self.currentMapCanvas()
+        if c is None:
+            # create dummy canvas
+            from qgis.utils import iface
+            c = iface.mapCanvas()
+        return c
 
     def firstRightStandardMenu(self) -> QMenu:
         return self.ui.menuApplications
@@ -2715,7 +2723,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     def currentMapCanvas(self) -> Optional[MapCanvas]:
         """
-        Returns the active map canvas, i.e. the MapCanvas that was clicked last.
+        Returns the active map canvas, i.e., the MapCanvas that was clicked last.
         :return: MapCanvas
         """
         return self.dockTreeView().currentMapCanvas()
