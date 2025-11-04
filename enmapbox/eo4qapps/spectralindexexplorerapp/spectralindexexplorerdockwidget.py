@@ -1,15 +1,14 @@
 import traceback
 
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.typeguard import typechecked
+from enmapboxprocessing.rasterreader import RasterReader
 from qgis.PyQt import uic
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QTableWidget, QComboBox, QLineEdit, QCheckBox, QTableWidgetItem, QLabel, QToolButton
 from qgis.core import QgsMapLayerProxyModel, QgsProcessingContext, QgsProject
 from qgis.gui import QgsMapLayerComboBox, QgsCheckableComboBox, QgsRasterBandComboBox, QgsFilterLineEdit, QgsDockWidget, \
     QgisInterface, QgsMessageBar
-
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.typeguard import typechecked
-from enmapboxprocessing.rasterreader import RasterReader
 
 
 @typechecked
@@ -62,6 +61,7 @@ class SpectralIndexExplorerDockWidget(QgsDockWidget):
         self.interface = interface
         if isinstance(interface, EnMAPBox):
             self.interfaceType = 0
+            self.mLayer.setProject(interface.project())
         elif isinstance(interface, QgisInterface):
             self.interfaceType = 1
         else:
