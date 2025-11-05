@@ -497,7 +497,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 self.mGrayBand.mBandNo.setBand(renderer.inputBand())
         elif isinstance(renderer, QgsSingleBandPseudoColorRenderer):
             with BlockSignals(self.mPseudoBand.mBandNo):
-                self.mPseudoBand.mBandNo.setBand(renderer.band())
+                self.mPseudoBand.mBandNo.setBand(renderer.inputBand())
         else:
             pass
 
