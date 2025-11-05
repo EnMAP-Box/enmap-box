@@ -2408,7 +2408,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                                       parent: QWidget = None
                                       ) -> AlgorithmDialog:
         """
-        Create an algorithm dialog.
+        Create an algorithm dialog that uses the EnMAP-Box to set the context in which
+        processing algorithms are executed.
 
         Optionally, provide a wrapper class to get full control over individual components like the feedback or results.
         E.g. to get a handle on the results do something like that:
