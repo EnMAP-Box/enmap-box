@@ -25,6 +25,7 @@ import enum
 import importlib
 import io
 import json
+import logging
 import os
 import pathlib
 import platform
@@ -35,7 +36,6 @@ import time
 import traceback
 import typing
 import warnings
-import logging
 from contextlib import redirect_stderr, redirect_stdout
 from importlib.machinery import ModuleSpec
 from io import StringIO
@@ -656,6 +656,10 @@ def requiredPackages(return_tuples: bool = False) -> List[PIPPackage]:
                     del row[k]
 
             pip_name = row['pip_name']
+
+            if pip_name.startswith('#'):
+                continue
+
             pkg = PIPPackage(pip_name,
                              py_name=row.get('py_name', pip_name),
                              min_version=row.get('min_version'),
