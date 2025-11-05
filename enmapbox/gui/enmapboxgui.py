@@ -1955,6 +1955,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.spectralProfileSourcePanel().removeSources([ds.source() for ds in dataSources])
         self.dockManagerTreeModel().removeDataSources(dataSources)
 
+        removed_sources = [d.source() for d in dataSources]
         # emit signals that are connected to single datasource types
         for dataSource in dataSources:
             if isinstance(dataSource, RasterDataSource):
@@ -1968,12 +1969,13 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                 if dataSource.isSpectralLibrary():
                     self.sigSpectralLibraryRemoved[str].emit(dataSource.source())
                     self.sigSpectralLibraryRemoved[VectorDataSource].emit(dataSource)
-                to_remove = []
-                for lid, lyr in self.project().mapLayers().items():
-                    if lyr.source() == dataSource.source():
-                        to_remove.append(lyr)
-                for lyr in to_remove:
-                    self.project().takeMapLayer(lyr)
+
+        to_remove = []
+        for lid, lyr in self.project().mapLayers().items():
+            if lyr.source() in removed_sources:
+                to_remove.append(lyr)
+        for lyr in to_remove:
+            self.project().takeMapLayer(lyr)
 
         self.syncProjects()
 
