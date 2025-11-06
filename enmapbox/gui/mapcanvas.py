@@ -18,7 +18,6 @@
 """
 import os
 import time
-import typing
 import warnings
 from _weakrefset import WeakSet
 from typing import List
@@ -1075,7 +1074,7 @@ class MapCanvas(QgsMapCanvas):
 
         super(MapCanvas, self).keyPressEvent(e)
 
-    def layerPaths(self) -> typing.List[str]:
+    def layerPaths(self) -> List[str]:
         """
         Returns the paths/URIs of presented QgsMapLayers
         :return:
@@ -1307,7 +1306,7 @@ class MapCanvas(QgsMapCanvas):
             for canvas in cLink.canvases:
                 canvas.removeCanvasLink(cLink)
 
-    def setLayers(self, mapLayers: typing.List[QgsMapLayer]):
+    def setLayers(self, mapLayers: List[QgsMapLayer]):
         """
         Sets the list of mapLayers to show in the map canvas
         :param mapLayers: QgsMapLayer or [list-of-QgsMapLayers]
