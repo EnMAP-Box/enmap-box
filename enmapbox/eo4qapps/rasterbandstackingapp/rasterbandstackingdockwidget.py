@@ -48,6 +48,8 @@ class RasterBandStackingDockWidget(QgsDockWidget):
         QgsDockWidget.__init__(self, parent)
         uic.loadUi(__file__.replace('.py', '.ui'), self)
 
+        self.mProject = QgsProject.instance()
+
         self.currentLocationMapTool = currentLocationMapTool
         self.mFile.setFilePath('bandStack.vrt')
         self.mGridRaster.setFilters(QgsMapLayerProxyModel.RasterLayer)
@@ -108,6 +110,11 @@ class RasterBandStackingDockWidget(QgsDockWidget):
             return True
         return False
 
+    def setProject(self, project: QgsProject):
+
+        self.mProject = project
+        self.mGridRaster.setProject(project)
+
     def enmapBoxInterface(self) -> EnMAPBox:
         return self.interface
 
@@ -118,6 +125,7 @@ class RasterBandStackingDockWidget(QgsDockWidget):
         self.interface = interface
         if isinstance(interface, EnMAPBox):
             self.interfaceType = 0
+            self.setProject(interface.project())
         elif isinstance(interface, QgisInterface):
             self.interfaceType = 1
         else:

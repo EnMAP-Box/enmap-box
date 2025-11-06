@@ -59,10 +59,10 @@ class EnMAPBoxTestCase(TestCase):
         from enmapbox import DIR_REPO
         DIR_TESTS = pathlib.Path(DIR_REPO) / 'tests'
         if DIR_TESTS.is_dir():
-            site.addsitedir(DIR_TESTS)
+            site.addsitedir(str(DIR_TESTS))
 
-        import enmapbox
-        enmapbox.initAll()
+        # import enmapbox
+        # enmapbox.initAll()
 
     @classmethod
     def closeEnMAPBoxInstance(cls):

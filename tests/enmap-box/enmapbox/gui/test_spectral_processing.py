@@ -1,21 +1,18 @@
 import unittest
 
+from enmapbox import initAll
+from enmapbox.gui.dataviews.docks import DockTypes, SpectralLibraryDock
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
+from enmapbox.testing import EnMAPBoxTestCase, start_app
 from enmapboxtestdata import library_berlin
 from qgis.core import QgsVectorLayer
 
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.gui.dataviews.docks import DockTypes, SpectralLibraryDock
-from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
-from enmapbox.testing import EnMAPBoxTestCase
+start_app()
+initAll()
 
 
 class TestSpectralProcessing(EnMAPBoxTestCase):
-
-    def setUp(self):
-        self.closeEnMAPBoxInstance()
-
-    def tearDown(self):
-        self.closeEnMAPBoxInstance()
 
     @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'blocking dialog')
     def test_spectralProcessingDialog(self):
@@ -25,5 +22,5 @@ class TestSpectralProcessing(EnMAPBoxTestCase):
         speclib.startEditing()
         SLD: SpectralLibraryDock = EMB.createDock(DockTypes.SpectralLibraryDock, speclib=speclib)
         SLW: SpectralLibraryWidget = SLD.speclibWidget()
-        SLW.showSpectralProcessingWidget()
+        SLW.openSpectralProcessingWidget()
         self.showGui(EMB.ui)

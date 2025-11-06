@@ -51,7 +51,7 @@ class PredefinedWmsApp(EnMAPBoxApplication):
         ('Open Weather Map Wind Speed',
          'referer=Map%20tiles%20by%20OpenWeatherMap,%20under%20CC%20BY-SA%204.0&type=xyz&url=http://tile.openweathermap.org/map/wind_new/%7Bz%7D/%7Bx%7D/%7By%7D.png?APPID%3Df9d0069aa69438d52276ae25c1ee9893&zmax=19&zmin=0'),
         ('OpenStreetMap',
-         'type=xyz&url=https://tile.openstreetmap.org/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=19&zmin=0'),
+         'tilePixelRatio=1&type=xyz&url=https://tile.openstreetmap.org/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=19&zmin=0'),
         ('OpenStreetMap Standard',
          'referer=OpenStreetMap%20contributors,%20CC-BY-SA&type=xyz&url=http://tile.openstreetmap.org/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=19&zmin=0'),
         ('OpenTopoMap',

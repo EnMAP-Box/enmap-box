@@ -9,6 +9,7 @@ from osgeo import gdal
 from scipy.stats import binned_statistic_2d, pearsonr
 
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import MarkerSymbolComboBox, MarkerSymbol
+from enmapbox.qgispluginsupport.qps.processing.algorithmdialog import AlgorithmDialog
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget, ImageItem, mkPen
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from enmapbox.typeguard import typechecked
@@ -16,7 +17,6 @@ from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVecto
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
-from processing import AlgorithmDialog
 from qgis.PyQt.QtCore import QRectF, QPointF, Qt
 from qgis.PyQt.QtGui import QMouseEvent, QColor
 from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QComboBox, QCheckBox, QDoubleSpinBox, QPlainTextEdit, QSpinBox
@@ -96,6 +96,8 @@ class ScatterPlotDialog(QMainWindow):
 
         # init gui
         self.mMapCanvas: Optional[QgsMapCanvas] = None
+        self.mLayerX.setProject(self.enmapBox.project())
+        self.mLayerY.setProject(self.enmapBox.project())
         self.mLayerX.setFilters(QgsMapLayerProxyModel.RasterLayer)
         self.mFieldY.setFilters(QgsFieldProxyModel.Numeric)
 
@@ -105,8 +107,9 @@ class ScatterPlotDialog(QMainWindow):
         self.mMaximumY.clearValue()
 
         colorRamp: QgsColorRamp = QgsStyle().defaultStyle().colorRamp('Spectral')
-        colorRamp.invert()
-        self.mColoringRamp.setColorRamp(colorRamp)
+        if isinstance(colorRamp, QgsColorRamp):
+            colorRamp.invert()
+            self.mColoringRamp.setColorRamp(colorRamp)
         self.mFieldY.hide()
         self.mSwapAxes.hide()
         self.mColoringSymbol.setMarkerSymbol(MarkerSymbol.No_Symbol)

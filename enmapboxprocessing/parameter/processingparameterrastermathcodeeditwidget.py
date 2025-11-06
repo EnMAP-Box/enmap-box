@@ -38,6 +38,7 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
         QWidget.__init__(self, parent)
         loadUi(__file__.replace('.py', '.ui'), self)
 
+        self.mProject: QgsProject = QgsProject.instance()
         self.updateSources()
         # QgsProject.instance().layersAdded.connect(self.updateSources)  # better not auto-update sources, because when adding a result layer to a map view, it will be added with the basename equal to the identifier already used in the snippet
         self.mSourcesRefresh.clicked.connect(self.updateSources)
@@ -83,6 +84,10 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
         self.mSnippetRefresh.clicked.connect(self.parseSnippets)
 
         self._lastDoubleClickTime = 0.  # required for a workaround
+
+    def setProject(self, project: QgsProject):
+        self.mProject = project
+        self.updateSources()
 
     def parseSnippets(self):
         from enmapboxprocessing.algorithm import rastermathalgorithm
@@ -322,7 +327,7 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
 
     def getRasterSources(self) -> Dict:
         sources = {k: v for k, v in self.getSources().items()
-                   if isinstance(QgsProject.instance().mapLayer(v), QgsRasterLayer)}
+                   if isinstance(self.mProject.mapLayer(v), QgsRasterLayer)}
         return sources
 
     def insertIdentifier(self, identifier: str = None):
@@ -360,7 +365,8 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
 
         # remove duplicate sources
         identifiers = list()
-        for registryName, layer in QgsProject.instance().mapLayers().items():
+
+        for registryName, layer in self.mProject.mapLayers().items():
             if isinstance(layer, (QgsRasterLayer, QgsVectorLayer)):
                 identifier = (layer.source(), layer.name())
                 if identifier in identifiers:
@@ -445,11 +451,18 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
         for identifier, registryName in self.getSources().items():
             if identifier not in code:
                 continue
-            layer = QgsProject.instance().mapLayer(registryName)
-            if isinstance(layer, QgsRasterLayer):
-                text += f'# {identifier} := QgsRasterLayer("{layer.source()}")\n'
-            if isinstance(layer, QgsVectorLayer):
-                text += f'# {identifier} := QgsVectorLayer("{layer.source()}")\n'
+            # from enmapbox.gui.enmapboxgui import EnMAPBox
+            # mp2 = EnMAPBox.instance().project()
+            # assert mp2 == self.mProject, 'project mismatch'
+            for prj in [self.mProject, QgsProject.instance()]:
+                assert isinstance(prj, QgsProject)
+                layer = prj.mapLayer(registryName)
+                if isinstance(layer, QgsRasterLayer):
+                    text += f'# {identifier} := QgsRasterLayer("{layer.source()}")\n'
+                    break
+                if isinstance(layer, QgsVectorLayer):
+                    text += f'# {identifier} := QgsVectorLayer("{layer.source()}")\n'
+                    break
         # append the actual code
         text += self.mCode.value()
         return text
@@ -467,6 +480,9 @@ class ProcessingParameterRasterMathCodeEditWidgetWrapper(WidgetWrapper):
         #    raise NotImplementedError()
         # else:
         return ProcessingParameterRasterMathCodeEdit()
+
+    def setWidgetContext(self, context):
+        self.widget.setProject(context.project())
 
     def setValue(self, value):
         # if self.dialogType == DIALOG_MODELER:

@@ -3,6 +3,7 @@ from os.path import join, dirname, exists, basename, isdir, isfile
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mimedata import MDF_URILIST
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.importdesisl1balgorithm import ImportDesisL1BAlgorithm
 from enmapboxprocessing.algorithm.importdesisl1calgorithm import ImportDesisL1CAlgorithm
 from enmapboxprocessing.algorithm.importdesisl2aalgorithm import ImportDesisL2AAlgorithm
@@ -24,7 +25,6 @@ from qgis.PyQt.QtWidgets import QLabel
 from qgis.core import QgsProject
 from qgis.core import QgsRasterLayer
 from qgis.gui import QgsDockWidget, QgisInterface
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -53,8 +53,7 @@ class SensorProductImportDockWidget(QgsDockWidget):
 
             if MDF_URILIST in mimeData.formats():
                 for url in mimeData.urls():
-                    url = url.url().replace('file:///', '')
-                    self.openProduct(url)
+                    self.openProduct(url.path())
                     break  # diguest only one file
             return True
         return False

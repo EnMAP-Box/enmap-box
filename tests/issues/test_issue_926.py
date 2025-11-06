@@ -1,11 +1,11 @@
-from enmapbox.qgispluginsupport.qps import registerSpectralLibraryIOs
+from enmapbox import initAll
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
 from enmapbox.testing import start_app, TestCase
 from enmapboxtestdata import landcover_point
 from qgis.core import QgsVectorLayer
 
 start_app()
-registerSpectralLibraryIOs()
+initAll()
 
 
 class TestCaseIssue926(TestCase):

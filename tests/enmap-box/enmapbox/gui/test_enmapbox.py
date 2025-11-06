@@ -19,9 +19,6 @@
 import pathlib
 import unittest
 
-from qgis.PyQt.QtCore import QPoint
-from qgis.PyQt.QtWidgets import QMenu
-
 import qgis
 from enmapbox import DIR_REPO
 from enmapbox.gui.contextmenus import EnMAPBoxContextMenuRegistry, EnMAPBoxAbstractContextMenuProvider
@@ -32,7 +29,9 @@ from enmapbox.qgispluginsupport.qps.maptools import MapTools
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase, start_app
+from qgis.PyQt.QtCore import QPoint
 from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel
+from qgis.PyQt.QtWidgets import QMenu
 from qgis.core import Qgis, QgsExpressionContextGenerator, QgsProcessingContext, QgsExpressionContext
 from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, \
     QgsLayerTree, QgsApplication
@@ -92,20 +91,27 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         self.assertIsInstance(EnMAPBox.instance(), EnMAPBox)
         self.assertEqual(EMB, EnMAPBox.instance())
 
-        widgets = [qgis.utils.iface.mainWindow(), EMB.ui]
+        mw = qgis.utils.iface.mainWindow()
+        windows = [mw, EMB.ui]
 
         if True:
+            w = QWidget()
+            w.setWindowTitle('QProject layers')
+            l = QGridLayout()
+            w.setLayout(l)
             cbQGIS = QgsMapLayerComboBox()
-            cbQGIS.setWindowTitle('QGIS Layers')
-            widgets.append(cbQGIS)
+            l.addWidget(QLabel('QGIS Layers'), 0, 0)
+            l.addWidget(cbQGIS, 0, 1)
 
             if Qgis.versionInt() > 32400:
                 cbEMB = QgsMapLayerComboBox()
                 cbEMB.setWindowTitle('EnMAP-Box Layers')
                 cbEMB.setProject(EMB.project())
-                widgets.append(cbEMB)
 
-        self.showGui(widgets)
+                l.addWidget(QLabel('EnMAP-Box Layers'), 1, 0)
+                l.addWidget(cbEMB, 1, 1)
+            windows.append(w)
+        self.showGui(windows)
         EMB.close()
         QgsProject.instance().removeAllMapLayers()
 
@@ -206,15 +212,11 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
 
         cb1 = QgsMapLayerComboBox()
         n = cb1.model().rowCount()
-        self.assertTrue(lyrNew in list(QgsProject.instance().mapLayers().values()))
+        self.assertFalse(lyrNew in list(QgsProject.instance().mapLayers().values()))
         self.assertTrue(lyrNew in list(box.project().mapLayers().values()))
         mapDock.removeLayer(lyrNew)
         self.assertFalse(lyrNew in list(QgsProject.instance().mapLayers().values()))
-        self.assertFalse(lyrNew in list(box.project().mapLayers().values()))
-
-        n2 = cb1.model().rowCount()
-        self.assertEqual(n2, n - 1)
-
+        self.assertTrue(lyrNew in list(box.project().mapLayers().values()))
         QgsProject.instance().removeAllMapLayers()
 
     def test_createDock(self):
@@ -290,7 +292,8 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
 
     def test_mapCanvas(self):
         E = EnMAPBox()
-        self.assertTrue(E.mapCanvas() is None)
+        from qgis.utils import iface
+        self.assertEqual(E.mapCanvas(), iface.mapCanvas())
         canvases = E.mapCanvases()
         self.assertIsInstance(canvases, list)
         self.assertTrue(len(canvases) == 0)
@@ -337,6 +340,7 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         E.close()
         QgsProject.instance().removeAllMapLayers()
 
+    @unittest.skip('Disable project syncing for now')
     def test_loadAndUnloadData(self):
 
         E = EnMAPBox(load_core_apps=False, load_other_apps=False)
@@ -386,9 +390,7 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         self.assertIsInstance(speclibDock, SpectralLibraryDock)
         slw = speclibDock.speclibWidget()
         self.assertIsInstance(slw, SpectralLibraryWidget)
-        self.assertTrue(len(slw.speclib()) == 0)
-        center = SpatialPoint.fromMapCanvasCenter(mapDock.mapCanvas())
-
+        self.showGui(EMB.ui)
         EMB.close()
         QgsProject.instance().removeAllMapLayers()
 

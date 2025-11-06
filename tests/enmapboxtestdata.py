@@ -359,7 +359,7 @@ class SensorProducts(object):
             )
             L2A_ARD = join(sensorProductsRoot(), 'enmap', 'ard')
             L2A_ARD_MetadataXml = join(
-                L2A_ARD, 'ENMAP01-____L2A-DT0000071543_20240502T105133Z_003_V010402_20240505T210636Z-METADATA.XML'
+                L2A_ARD, 'ENMAP01-____L2A-DT0000071543_20240502T105133Z_003_V010402_20240505T210636Z-METADATA.xml'
             )
 
         class Landsat(object):  # collection 2 only
@@ -449,6 +449,12 @@ class SensorProducts(object):
                 sensorProductsRoot(), 'sentinel2', 'S2B_MSIL2A_20211028T102039_N0301_R065_T33UUU_20211028T121942.SAFE'
             )
             S2B_L2A_MsiL1CXml = join(S2B_L2A, 'MTD_MSIL2A.xml')
+
+        class Tanager(object):
+            basic_radiance_h5 = join(sensorProductsRoot(), 'tanager', '20250224_145149_32_4001_basic_radiance.h5')
+            basic_radiance_toa_radiance = f'HDF5:"{basic_radiance_h5}"://HDFEOS/SWATHS/HYP/Data_Fields/toa_radiance'
+            # basic_sr = join(sensorProductsRoot(), 'tanager', '20250503_112046_16_4001_basic_sr.h5')
+            # ortho_sr = join(sensorProductsRoot(), 'tanager', '20250503_112046_16_4001_ortho_sr.h5')
 
 
 class SpeclibProducts(object):

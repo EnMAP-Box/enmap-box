@@ -2,14 +2,6 @@ import traceback
 from random import randint
 from typing import Optional, List
 
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import QMouseEvent, QColor
-from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QCheckBox, QTableWidget, QSpinBox, QComboBox, QApplication, \
-    QMessageBox
-from qgis.PyQt.uic import loadUi
-from qgis.core import QgsRasterLayer, QgsRasterDataProvider, QgsRasterHistogram, QgsMapLayerProxyModel, QgsMapSettings
-from qgis.gui import QgsMapCanvas, QgsMapLayerComboBox, QgsColorButton
-
 from classfractionstatisticsapp.classfractionrenderer import ClassFractionRenderer
 from enmapbox.qgispluginsupport.qps.layerproperties import rendererFromXml
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget
@@ -17,6 +9,13 @@ from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QMouseEvent, QColor
+from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QCheckBox, QTableWidget, QSpinBox, QComboBox, QApplication, \
+    QMessageBox
+from qgis.PyQt.uic import loadUi
+from qgis.core import QgsRasterLayer, QgsRasterDataProvider, QgsRasterHistogram, QgsMapLayerProxyModel, QgsMapSettings
+from qgis.gui import QgsMapCanvas, QgsMapLayerComboBox, QgsColorButton
 
 
 @typechecked
@@ -45,6 +44,7 @@ class ClassFractionStatisticsDialog(QMainWindow):
         self.enmapBox = EnMAPBox.instance()
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None
+        self.mLayer.setProject(self.enmapBox.project())
         self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
 
         self.mLayer.layerChanged.connect(self.onLayerChanged)
