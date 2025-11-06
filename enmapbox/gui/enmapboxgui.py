@@ -624,8 +624,14 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             processingPlugin.executeAlgorithm(alg_id, parent, in_place=in_place, as_batch=as_batch)
         else:
             context = self.processingContext()
-            executeAlgorithm(alg_id, parent, in_place=in_place, as_batch=as_batch,
-                             iface=self, context=context)
+            executeAlgorithm(alg_id, parent,
+                             in_place=in_place,
+                             as_batch=as_batch,
+                             iface=self,
+                             context=context,
+                             on_results=self.onProcessingAlgTaskCompleted)
+
+            s = ""
 
     def createExpressionContext(self) -> QgsExpressionContext:
         """
