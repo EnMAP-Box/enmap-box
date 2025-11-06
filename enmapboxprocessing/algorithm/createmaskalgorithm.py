@@ -1,12 +1,11 @@
 from typing import Dict, Any, List, Tuple
 from urllib.parse import urlencode
 
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessingOutputRasterLayer
-
 from enmapbox.provider.maskrasterdataprovider import MaskRasterDataProvider
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessingOutputRasterLayer
 
 
 @typechecked
@@ -105,6 +104,8 @@ class CreateMaskVirtualAlgorithm(CreateMaskAlgorithmBase):
         layer = QgsRasterLayer(uri, layerName, p.NAME)
         assert layer.isValid()
         context.temporaryLayerStore().addMapLayer(layer)
+        context.addLayerToLoadOnCompletion(layer.id(), QgsProcessingContext.LayerDetails(layerName, context.project(),
+                                                                                         self.P_OUTPUT_MASK))
         result = {self.P_OUTPUT_MASK: layer.id()}
         return result
 
@@ -133,7 +134,6 @@ class CreateMaskAlgorithm(CreateMaskAlgorithmBase):
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
-
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_MASK, context)
         alg = CreateMaskVirtualAlgorithm()
         result = self.runAlgorithm(alg, parameters, None, None, context)
