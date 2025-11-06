@@ -42,9 +42,9 @@ from io import StringIO
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Match, Optional, Tuple
 
-from pip._internal.cli.main_parser import parse_command
-from pip._internal.commands import create_command
-from pip._internal.utils.misc import get_prog
+from enmapbox import REQUIREMENTS_CSV
+from enmapbox.enmapboxsettings import EnMAPBoxSettings
+from enmapbox.qgispluginsupport.qps.utils import qgisAppQgisInterface
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import pyqtSignal, QAbstractTableModel, QModelIndex, QProcess, QSortFilterProxyModel, Qt, QUrl
 from qgis.PyQt.QtGui import QColor, QContextMenuEvent, QDesktopServices
@@ -52,10 +52,6 @@ from qgis.PyQt.QtWidgets import QApplication, QDialogButtonBox, QMenu, QMessageB
     QWidget
 from qgis.core import Qgis, QgsAnimatedIcon, QgsApplication, QgsTask, QgsTaskManager
 from qgis.gui import QgsFileDownloaderDialog
-
-from enmapbox import REQUIREMENTS_CSV
-from enmapbox.enmapboxsettings import EnMAPBoxSettings
-from enmapbox.qgispluginsupport.qps.utils import qgisAppQgisInterface
 
 logger = logging.getLogger(__name__)
 
@@ -303,9 +299,22 @@ class PIPPackage(object):
 _LOCAL_PIPEXE: Path = None
 
 
+def get_prog() -> str:
+    try:
+        prog = os.path.basename(sys.argv[0])
+        if prog in ("__main__.py", "-c"):
+            return f"{sys.executable} -m pip"
+        else:
+            return prog
+    except (AttributeError, TypeError, IndexError):
+        pass
+    return "pip"
+
+
 def localPipExecutable() -> Path:
     global _LOCAL_PIPEXE
     if _LOCAL_PIPEXE is None:
+
         pipexe = Path(get_prog())
         if not pipexe.is_file():
             pipexe = None
@@ -422,6 +431,9 @@ def call_pip_command(pipArgs):
         msgErr = None
         success = False
         try:
+            from pip._internal.cli.main_parser import parse_command
+            from pip._internal.commands import create_command
+
             cmd_name, cmd_args = parse_command(pipArgs)
             cmd = create_command(cmd_name, isolated=("--isolated" in cmd_args))
             result = cmd.main(cmd_args)
@@ -641,7 +653,7 @@ def requiredPackages(return_tuples: bool = False) -> List[PIPPackage]:
     """
 
     # see https://pip.pypa.io/en/stable/reference/pip_install/#requirements-file-format
-    # for details of requirements format
+    # for details of the requirements format
 
     file = REQUIREMENTS_CSV
     assert file.is_file(), '{} does not exist'.format(file)
@@ -649,16 +661,15 @@ def requiredPackages(return_tuples: bool = False) -> List[PIPPackage]:
     # rxPipPkg = re.compile(r'^[a-zA-Z_-][a-zA-Z0-9_-]*')
 
     with open(file, 'r', newline='') as csv_file:
-        reader = csv.DictReader(csv_file, delimiter=',', quotechar='"')
+        lines = [l.strip() for l in csv_file.read().splitlines()]
+        lines = [l for l in lines if not l.startswith('#')]
+        reader = csv.DictReader(lines, delimiter=',', quotechar='"')
         for row in reader:
             for k in list(row.keys()):
                 if row[k] == '':
                     del row[k]
 
             pip_name = row['pip_name']
-
-            if pip_name.startswith('#'):
-                continue
 
             pkg = PIPPackage(pip_name,
                              py_name=row.get('py_name', pip_name),
