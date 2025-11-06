@@ -309,7 +309,9 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                         layer = self.qgisInterface().activeLayer()
                     if not isinstance(layer, QgsRasterLayer):
                         return
+                    w.blockSignals(True)
                     w.setLayer(layer)
+                    w.blockSignals(False)
                 if layer is None:
                     return
 
