@@ -624,6 +624,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             processingPlugin.executeAlgorithm(alg_id, parent, in_place=in_place, as_batch=as_batch)
         else:
             context = self.processingContext()
+            if parent is None:
+                parent = self.ui
             executeAlgorithm(alg_id, parent,
                              in_place=in_place,
                              as_batch=as_batch,

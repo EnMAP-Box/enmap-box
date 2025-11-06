@@ -25,3 +25,11 @@ class TestProcessingFramework(TestCase):
         EMB.loadExampleData()
         EMB.executeAlgorithm('native:virtualrastercalc', EMB.ui)
         self.showGui(EMB.ui)
+
+    @unittest.skipIf(TestCase.runsInCI(), 'Blocking Dialog')
+    def test_mask_rasterlayer_virtual(self):
+        EMB = EnMAPBox(load_core_apps=False, load_other_apps=False)
+        EMB.loadExampleData()
+        EMB.executeAlgorithm('enmapbox:createmaskrasterlayervirtual', EMB.ui)
+        self.showGui(EMB.ui)
+        QgsProject.instance().removeAllMapLayers()
