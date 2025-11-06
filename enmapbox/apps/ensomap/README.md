@@ -36,9 +36,9 @@ Table 2.1:	Overview of EnSoMAP automatic soil functions for identification and s
 | **Carbonates**<br>Mg-OH content | Carbonate absorp-tion depth SWIR | 2300 – 2400 | Carbonate content |
 |**Soil Moisture** | Moisture index (NSMI) | 1800, 2119 | Soil moisture content (Haubrock et al. 2008a/b)|
 | | Gaussian modelling (SMGM | ~1500 – 2500 | Soil moisture content (Whiting et al. 2004) |
-| **Soil Organic Carbon** | Band analysis SOC 1 | 400 – 700 | Organic matter content (Bartholomeus et al. 2008) |
-| | Band analysis SOC 2 | 400, 600 | Organic matter content (Bartholomeus et al. 2008) |
-| | Band analysis SOC 3 | 2138 – 2209 | Organic matter content (Bartholomeus et al. 2008) |
+| **Soil Organic Carbon** | Band analysis SOC 1 | 400 – 700 | Organic carbon content (Bartholomeus et al. 2008) |
+| | Band analysis SOC 2 | 400, 600 | Organic carbon content (Bartholomeus et al. 2008) |
+| | Band analysis SOC 3 | 2138 – 2209 | Organic carbon content (Bartholomeus et al. 2008) |
 |**Gypsum** | NDGI | | |
 
 # Soil Analyses Tools
