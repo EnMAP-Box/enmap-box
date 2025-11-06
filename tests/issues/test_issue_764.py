@@ -33,6 +33,8 @@ class TestIssue764(EnMAPBoxTestCase):
                 self.assertEqual(w.value(), v)
 
             s = ""
+            spd.runButton().animateClick(0)
+
             self.showGui([spd, slw])
 
         QgsProject.instance().removeAllMapLayers()

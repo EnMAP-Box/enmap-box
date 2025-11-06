@@ -292,7 +292,8 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
 
     def test_mapCanvas(self):
         E = EnMAPBox()
-        self.assertTrue(E.mapCanvas() is None)
+        from qgis.utils import iface
+        self.assertEqual(E.mapCanvas(), iface.mapCanvas())
         canvases = E.mapCanvases()
         self.assertIsInstance(canvases, list)
         self.assertTrue(len(canvases) == 0)

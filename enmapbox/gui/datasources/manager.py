@@ -1,3 +1,4 @@
+import logging
 import os
 import pickle
 import re
@@ -35,6 +36,8 @@ from ..mimedata import extractMapLayers, fromDataSourceList, MDF_URILIST, QGIS_U
 from ...qgispluginsupport.qps.speclib.core import is_spectral_library
 from ...qgispluginsupport.qps.subdatasets import SubDatasetSelectionDialog, subLayerDetails
 
+logger = logging.getLogger(__name__)
+
 
 class DataSourceManager(TreeModel):
     sigDataSourcesRemoved = pyqtSignal(list)
@@ -52,6 +55,7 @@ class DataSourceManager(TreeModel):
 
         QgsProject.instance().layersWillBeRemoved.connect(self.onQGISLayerWillBeRemoved)
 
+        self.mNodeUpdateExceptions: List[str] = []
         self.mUpdateTimer: QTimer = QTimer()
         self.mUpdateTimer.setInterval(2000)
         self.mUpdateTimer.timeout.connect(self.updateSourceNodes)
@@ -270,46 +274,55 @@ class DataSourceManager(TreeModel):
         return self.removeDataSources(*args, **kwds)
 
     def updateSourceNodes(self):
+        self.mUpdateTimer.stop()
+        try:
+            for source in self.dataSources():
+                assert isinstance(source, DataSource)
+                sid = source.source()
 
-        for source in self.dataSources():
-            assert isinstance(source, DataSource)
-            sid = source.source()
+                # save a state that changes with modifications, e.g. modification time
+                updateState = None
+                path = source.source()
+                lyr = None
+                dataItem: QgsDataItem = source.dataItem()
 
-            # save a state that changes with modifications, e.g. modification time
-            updateState = None
-            path = source.source()
-            lyr = None
-            dataItem: QgsDataItem = source.dataItem()
+                if os.path.isfile(path):
+                    updateState = Path(path).stat().st_mtime_ns
+                else:
 
-            if os.path.isfile(path):
-                updateState = Path(path).stat().st_mtime_ns
-            else:
+                    if isinstance(dataItem, LayerItem):
+                        lyr = dataItemToLayer(dataItem, project=self.project())
 
-                if isinstance(dataItem, LayerItem):
-                    lyr = dataItemToLayer(dataItem, project=self.project())
-
-                    if isinstance(lyr, QgsVectorLayer):
-                        updateState = [lyr.isValid(), lyr.name(), lyr.featureCount(), lyr.geometryType(),
-                                       is_spectral_library(lyr)]
-                    elif isinstance(lyr, QgsRasterLayer):
-                        updateState = [lyr.bandCount(), lyr.height(), lyr.width()]
-                    else:
-                        s = ""
-            oldInfo = self.mUpdateState.get(sid, None)
-            if oldInfo is None:
-                self.mUpdateState[sid] = updateState
-                source.updateNodes()
-            elif oldInfo != updateState:
-                self.mUpdateState[sid] = updateState
-                if isinstance(dataItem, LayerItem):
-                    if dataItem.mapLayerType() == QgsMapLayerType.VectorLayer and isinstance(lyr, QgsVectorLayer):
-                        if updateState[-1]:
-                            # is spectral library
-                            icon = QIcon(r':/qps/ui/icons/speclib.svg')
+                        if isinstance(lyr, QgsVectorLayer):
+                            updateState = [lyr.isValid(), lyr.name(), lyr.featureCount(), lyr.geometryType(),
+                                           is_spectral_library(lyr)]
+                        elif isinstance(lyr, QgsRasterLayer):
+                            updateState = [lyr.bandCount(), lyr.height(), lyr.width()]
                         else:
-                            icon = QgsIconUtils.iconForLayer(lyr)
-                        dataItem.setIcon(icon)
-                source.updateNodes()
+                            s = ""
+                oldInfo = self.mUpdateState.get(sid, None)
+                if oldInfo is None:
+                    self.mUpdateState[sid] = updateState
+                    source.updateNodes()
+                elif oldInfo != updateState:
+                    self.mUpdateState[sid] = updateState
+                    if isinstance(dataItem, LayerItem):
+                        if dataItem.mapLayerType() == QgsMapLayerType.VectorLayer and isinstance(lyr, QgsVectorLayer):
+                            if updateState[-1]:
+                                # is spectral library
+                                icon = QIcon(r':/qps/ui/icons/speclib.svg')
+                            else:
+                                icon = QgsIconUtils.iconForLayer(lyr)
+                            dataItem.setIcon(icon)
+                    source.updateNodes()
+        except Exception as ex:
+            info = str(ex)
+            if info not in self.mNodeUpdateExceptions:
+                self.mNodeUpdateExceptions.append(info)
+                info += "\n This warning will not be shown again."
+                logger.error(info)
+            pass
+        self.mUpdateTimer.start()
 
     def removeDataSources(self,
                           dataSources: Union[DataSource, List[DataSource]]) -> List[DataSource]:

@@ -16,7 +16,7 @@ from enmapboxprocessing.utils import Utils
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QDoubleSpinBox, QComboBox, QCheckBox, QToolButton, QLabel, QTabWidget, \
     QLineEdit, QTableWidget, QSpinBox
-from qgis.core import QgsRasterLayer, QgsSingleBandGrayRenderer, QgsRectangle, \
+from qgis.core import QgsRasterLayer, QgsSingleBandGrayRenderer, QgsRectangle, QgsMapLayer, \
     QgsContrastEnhancement, QgsRasterRenderer, QgsMultiBandColorRenderer, QgsSingleBandPseudoColorRenderer, \
     QgsMapLayerProxyModel, QgsRasterDataProvider, QgsRasterShader, QgsProject, QgsRasterTransparency
 from qgis.gui import (
@@ -159,6 +159,12 @@ class RasterLayerStylingPanel(QgsDockWidget):
 
         w = QgsMapLayerComboBox()  # raster layer
         w.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        w.setProject(self.project())
+
+        cl = self.mLayer.currentLayer()
+        if isinstance(cl, QgsMapLayer):
+            w.setExceptedLayerList([cl])
+
         w.setAllowEmptyLayer(True)
         w.setLayer(None)
         w.row = row
@@ -372,7 +378,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
             with BlockSignals(self.mPseudoBand.mMin, self.mPseudoBand.mMax, self.mPseudoBand.mBandNo):
                 self.mPseudoBand.mMin.setText(str(shader.minimumValue()))
                 self.mPseudoBand.mMax.setText(str(shader.maximumValue()))
-                self.mPseudoBand.mBandNo.setBand(renderer.band())
+                self.mPseudoBand.mBandNo.setBand(renderer.inputBand())
 
         elif self.mRenderer.currentIndex() == self.DefaultRendererTab:
             layer.setRenderer(self.originalRenderer.clone())
@@ -497,7 +503,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 self.mGrayBand.mBandNo.setBand(renderer.inputBand())
         elif isinstance(renderer, QgsSingleBandPseudoColorRenderer):
             with BlockSignals(self.mPseudoBand.mBandNo):
-                self.mPseudoBand.mBandNo.setBand(renderer.band())
+                self.mPseudoBand.mBandNo.setBand(renderer.inputBand())
         else:
             pass
 

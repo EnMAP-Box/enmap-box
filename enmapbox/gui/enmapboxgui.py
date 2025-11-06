@@ -2410,7 +2410,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                                       parent: QWidget = None
                                       ) -> AlgorithmDialog:
         """
-        Create an algorithm dialog.
+        Create an algorithm dialog that uses the EnMAP-Box to set the context in which
+        processing algorithms are executed.
 
         Optionally, provide a wrapper class to get full control over individual components like the feedback or results.
         E.g. to get a handle on the results do something like that:
@@ -2523,7 +2524,15 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         return self.dockTreeView().mapCanvases()
 
     def mapCanvas(self) -> MapCanvas:
-        return self.currentMapCanvas()
+        """
+        Returns the last touched mapcanvas. In case no mapcavas exists, this will return the QGIS map canvas
+        """
+        c = self.currentMapCanvas()
+        if c is None:
+            # create dummy canvas
+            from qgis.utils import iface
+            c = iface.mapCanvas()
+        return c
 
     def firstRightStandardMenu(self) -> QMenu:
         return self.ui.menuApplications
@@ -2717,7 +2726,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     def currentMapCanvas(self) -> Optional[MapCanvas]:
         """
-        Returns the active map canvas, i.e. the MapCanvas that was clicked last.
+        Returns the active map canvas, i.e., the MapCanvas that was clicked last.
         :return: MapCanvas
         """
         return self.dockTreeView().currentMapCanvas()
