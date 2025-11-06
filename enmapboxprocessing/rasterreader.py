@@ -1,4 +1,4 @@
-from math import isnan, ceil
+from math import isnan, ceil, nan
 from os.path import exists
 from typing import Iterable, List, Union, Optional, Tuple, Iterator
 
@@ -673,6 +673,8 @@ class RasterReader(object):
         # check cache
         wavelength = self._cachedWavelength(bandNo)
         if wavelength is not None:
+            if isnan(wavelength):
+                return None
             conversionFactor = Utils.wavelengthUnitsConversionFactor('nm', units)
             return conversionFactor * wavelength
 
@@ -680,6 +682,8 @@ class RasterReader(object):
         enviDescription = self.metadataItem('description', 'ENVI')
         if enviDescription is not None:
             if enviDescription[0].startswith('FORCE') and enviDescription[0].endswith('Time Series Analysis'):
+                if not raw:
+                    self._setCachedWavelength(nan, bandNo)
                 return None
 
         if raw:
@@ -688,6 +692,8 @@ class RasterReader(object):
         else:
             wavelength_units = self.wavelengthUnits(bandNo)
             if wavelength_units is None:
+                if not raw:
+                    self._setCachedWavelength(nan, bandNo)
                 return None
 
             conversionFactor = Utils.wavelengthUnitsConversionFactor(wavelength_units, units)
@@ -736,6 +742,8 @@ class RasterReader(object):
                         self._setCachedWavelength(conversionFactorToNanometers * float(wavelength), bandNo)
                     return conversionFactor * float(wavelength)
 
+        if not raw:
+            self._setCachedWavelength(nan, bandNo)
         return None
 
     def findWavelength(self, wavelength: Optional[float], units: str = None) -> Optional[int]:
