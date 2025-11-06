@@ -13,7 +13,7 @@ import numba as nb
 __bands__    = [400, 600]
 __filename__ = "_OC_SLOPE_400_600"
 __gui__      = "SOC Index: 1/slope(R400 - R600)"
-__info__     = "Organic matter content: \n"+\
+__info__     = "Organic carbon content: \n"+\
     "Calculate the inverse of the slope of a straight line defined\n"+\
     "between the reflectance value at the start of the absorption feature \n"+\
     "and the reflectance value at the centre of the absorption feature:\n\n"+\

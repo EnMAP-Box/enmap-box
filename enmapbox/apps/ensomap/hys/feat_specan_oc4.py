@@ -11,7 +11,7 @@ import numba as nb
 __bands__    = [478, 546, 659]
 __filename__ = "_OC_VISonly_478_546_659"
 __gui__      = "SOC Index: R478 / (R659 * R546)"
-__info__     = "Organic matter content: \n"+\
+__info__     = "Organic carbon content: \n"+\
     "Calculate a SOC index based solely on visible wavelengths: \n\n"+\
     "ind = R_478 / (R_659 * R_546)\n\n"+\
     "Thaler, E.A., Larsen, I.J., Yu, Q., 2019. \n"+\
