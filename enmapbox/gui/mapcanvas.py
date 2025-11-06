@@ -20,7 +20,7 @@ import os
 import time
 import warnings
 from _weakrefset import WeakSet
-from typing import List
+from typing import List, Optional
 
 from enmapbox import enmapboxSettings
 from enmapbox.enmapboxsettings import EnMAPBoxSettings
@@ -995,7 +995,7 @@ class MapCanvas(QgsMapCanvas):
         else:
             self.setLayers([])
 
-    def layerTree(self) -> typing.Optional['MapDockTreeNode']:  # noqa: F821
+    def layerTree(self) -> Optional['MapDockTreeNode']:  # noqa: F821
         """
         Returns the MapDockTreeNode that is linked to this MapCanvas by a QgsLayerTreeMapCanvasBridge.
         Can be None
