@@ -15,7 +15,7 @@ from enmapbox.gui.datasources.datasourcesets import DataSourceSet, FileDataSourc
 from enmapbox.gui.utils import enmapboxUiPath
 from enmapbox.qgispluginsupport.qps.layerproperties import defaultRasterRenderer
 from enmapbox.qgispluginsupport.qps.models import PyObjectTreeNode, TreeModel, TreeNode, TreeView
-from enmapbox.qgispluginsupport.qps.utils import bandClosestToWavelength, defaultBands, loadUi, qgisAppQgisInterface
+from enmapbox.qgispluginsupport.qps.utils import bandClosestToWavelength, defaultBands, loadUi
 from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtCore import pyqtSignal, QAbstractItemModel, QItemSelectionModel, QMimeData, \
     QModelIndex, QSortFilterProxyModel, Qt, QTimer, QUrl
@@ -28,7 +28,7 @@ from qgis.core import Qgis, QgsDataItem, QgsLayerItem, QgsLayerTreeGroup, QgsLay
 from qgis.core import QgsProviderRegistry
 from qgis.gui import QgisInterface, QgsDockWidget, QgsMapCanvas
 from .datasources import DataSource, FileDataSource, LayerItem, ModelDataSource, RasterDataSource, SpatialDataSource, \
-    VectorDataSource, dataItemToLayer
+    VectorDataSource
 from .metadata import RasterBandTreeNode
 from ..dataviews.docks import Dock
 from ..mapcanvas import MapCanvas
@@ -282,24 +282,26 @@ class DataSourceManager(TreeModel):
 
                 # save a state that changes with modifications, e.g. modification time
                 updateState = None
-                path = source.source()
+                uri = source.source()
                 lyr = None
                 dataItem: QgsDataItem = source.dataItem()
 
-                if os.path.isfile(path):
-                    updateState = Path(path).stat().st_mtime_ns
+                filepath = uri.split('|')[0]
+                if os.path.isfile(filepath):
+                    updateState = Path(filepath).stat().st_mtime_ns
                 else:
+                    # not a file source
+                    for lyr in self.project().mapLayers().values():
+                        if lyr.source() == uri:
+                            if isinstance(lyr, QgsVectorLayer):
+                                updateState = [lyr.isValid(), lyr.name(), lyr.featureCount(), lyr.geometryType(),
+                                               is_spectral_library(lyr)]
+                            elif isinstance(lyr, QgsRasterLayer):
+                                updateState = [lyr.bandCount(), lyr.height(), lyr.width()]
+                            else:
+                                # do not update
+                                s = ""
 
-                    if isinstance(dataItem, LayerItem):
-                        lyr = dataItemToLayer(dataItem, project=self.project())
-
-                        if isinstance(lyr, QgsVectorLayer):
-                            updateState = [lyr.isValid(), lyr.name(), lyr.featureCount(), lyr.geometryType(),
-                                           is_spectral_library(lyr)]
-                        elif isinstance(lyr, QgsRasterLayer):
-                            updateState = [lyr.bandCount(), lyr.height(), lyr.width()]
-                        else:
-                            s = ""
                 oldInfo = self.mUpdateState.get(sid, None)
                 if oldInfo is None:
                     self.mUpdateState[sid] = updateState
@@ -483,7 +485,7 @@ class DataSourceManagerTreeView(TreeView):
                   dataSource: Union[VectorDataSource, RasterDataSource, QgsMapLayer],
                   target: Union[None, QgsMapCanvas, QgsProject, Dock] = None,
                   rgb=None,
-                  sampleSize: int = None) -> QgsMapLayer:
+                  sampleSize: int = None) -> Optional[QgsMapLayer]:
         """
         Add a SpatialDataSource as QgsMapLayer to a mapCanvas.
         :param target:
@@ -498,7 +500,7 @@ class DataSourceManagerTreeView(TreeView):
 
         lyr = None
         if isinstance(dataSource, (VectorDataSource, RasterDataSource)):
-            # loads the layer with default style (wherever it is defined)
+            # loads the layer with the default style (wherever it is defined)
             lyr = dataSource.asMapLayer()
         elif isinstance(dataSource, QgsMapLayer):
             lyr = dataSource
@@ -690,10 +692,13 @@ class DataSourceManagerPanelUI(QgsDockWidget):
 
         self.tbFilterText.textChanged.connect(self.setFilter)
         # self.tbFilterText.hide()  # see #167
-        hasQGIS = qgisAppQgisInterface() is not None
-        self.actionSyncWithQGIS.setEnabled(hasQGIS)
-
+        # hasQGIS = qgisAppQgisInterface() is not None
+        # self.actionSyncWithQGIS.setEnabled(hasQGIS)
+        grp = QgsProject.instance().layerTreeRoot()
+        grp.addedChildren.connect(lambda *args: self.updateActions())
+        grp.removedChildren.connect(lambda *args: self.updateActions())
         self.initActions()
+        self.updateActions()
 
     def dataSourceManagerTreeView(self) -> DataSourceManagerTreeView:
         return self.mDataSourceManagerTreeView
@@ -704,6 +709,14 @@ class DataSourceManagerPanelUI(QgsDockWidget):
     def onSyncToQGIS(self, *args):
         if isinstance(self.mDataSourceManager, DataSourceManager):
             self.mDataSourceManager.importQGISLayers()
+
+    def updateActions(self):
+
+        from qgis.utils import iface
+        if isinstance(iface, QgisInterface):
+            model = iface.layerTreeView().layerTreeModel()
+            b = any(model.rootGroup().findLayerIds())
+            self.actionSyncWithQGIS.setEnabled(b)
 
     def initActions(self):
 
