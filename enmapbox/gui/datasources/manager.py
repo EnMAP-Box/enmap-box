@@ -15,7 +15,7 @@ from enmapbox.gui.datasources.datasourcesets import DataSourceSet, FileDataSourc
 from enmapbox.gui.utils import enmapboxUiPath
 from enmapbox.qgispluginsupport.qps.layerproperties import defaultRasterRenderer
 from enmapbox.qgispluginsupport.qps.models import PyObjectTreeNode, TreeModel, TreeNode, TreeView
-from enmapbox.qgispluginsupport.qps.utils import bandClosestToWavelength, defaultBands, loadUi, qgisAppQgisInterface
+from enmapbox.qgispluginsupport.qps.utils import bandClosestToWavelength, defaultBands, loadUi
 from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtCore import pyqtSignal, QAbstractItemModel, QItemSelectionModel, QMimeData, \
     QModelIndex, QSortFilterProxyModel, Qt, QTimer, QUrl
@@ -692,10 +692,13 @@ class DataSourceManagerPanelUI(QgsDockWidget):
 
         self.tbFilterText.textChanged.connect(self.setFilter)
         # self.tbFilterText.hide()  # see #167
-        hasQGIS = qgisAppQgisInterface() is not None
-        self.actionSyncWithQGIS.setEnabled(hasQGIS)
-
+        # hasQGIS = qgisAppQgisInterface() is not None
+        # self.actionSyncWithQGIS.setEnabled(hasQGIS)
+        grp = QgsProject.instance().layerTreeRoot()
+        grp.addedChildren.connect(lambda *args: self.updateActions())
+        grp.removedChildren.connect(lambda *args: self.updateActions())
         self.initActions()
+        self.updateActions()
 
     def dataSourceManagerTreeView(self) -> DataSourceManagerTreeView:
         return self.mDataSourceManagerTreeView
@@ -706,6 +709,14 @@ class DataSourceManagerPanelUI(QgsDockWidget):
     def onSyncToQGIS(self, *args):
         if isinstance(self.mDataSourceManager, DataSourceManager):
             self.mDataSourceManager.importQGISLayers()
+
+    def updateActions(self):
+
+        from qgis.utils import iface
+        if isinstance(iface, QgisInterface):
+            model = iface.layerTreeView().layerTreeModel()
+            b = any(model.rootGroup().findLayerIds())
+            self.actionSyncWithQGIS.setEnabled(b)
 
     def initActions(self):
 
