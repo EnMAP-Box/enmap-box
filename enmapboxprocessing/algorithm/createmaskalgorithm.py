@@ -100,12 +100,17 @@ class CreateMaskVirtualAlgorithm(CreateMaskAlgorithmBase):
                 for first, count, values in zip(maskBits[0::3], maskBits[1::3], maskBits[2::3])
             ]
 
+        if layerName in [None, '']:
+            layerName = f'{raster.name()} mask'
+
         uri = '?' + urlencode(parameters)
         layer = QgsRasterLayer(uri, layerName, p.NAME)
         assert layer.isValid()
         context.temporaryLayerStore().addMapLayer(layer)
-        context.addLayerToLoadOnCompletion(layer.id(), QgsProcessingContext.LayerDetails(layerName, context.project(),
-                                                                                         self.P_OUTPUT_MASK))
+        context.addLayerToLoadOnCompletion(layer.id(),
+                                           QgsProcessingContext.LayerDetails(layerName,
+                                                                             context.project(),
+                                                                             self.P_OUTPUT_MASK))
         result = {self.P_OUTPUT_MASK: layer.id()}
         return result
 
