@@ -1,6 +1,70 @@
 # CHANGELOG
 
-## Version 3.17 (2025-11-08)
+## Version 3.17 (2025-11-09)
+_This release was tested under QGIS 3.40 (LTR) and 3.44 (latest release)._
+### New Features
+#### Applications
+* [Spectral Index Explorer] overhaul the Spectral Index Creator and make it an EO4Q app [#1199](https://github.com/EnMAP-Box/enmap-box/issues/1199)
+* [EnSoMAP] Add new “SOC Index: R478/(R659*R546)” [#1250](https://github.com/EnMAP-Box/enmap-box/issues/1250)
+#### Processing Algorithms
+* [Analysis ready data] add algorithm for raster aggregation [#957](https://github.com/EnMAP-Box/enmap-box/issues/957)
+* [Analysis ready data] add algorithm for EnMAP L2A raster tiling [#1159](https://github.com/EnMAP-Box/enmap-box/issues/1159)
+* [Classification/Regression accuracy report] add data sources to report [#1177](https://github.com/EnMAP-Box/enmap-box/issues/1177)
+* [Aggregate raster layers] improve performance [#1231](https://github.com/EnMAP-Box/enmap-box/issues/1231)
+* [Aggregate raster layers] support external masks [#1233](https://github.com/EnMAP-Box/enmap-box/issues/1233)
+* [Create mask raster layer] add support for in-memory output [#1237](https://github.com/EnMAP-Box/enmap-box/issues/1237)
+* [Save raster layer as] add support for layer with non-GDAL provider [#1248](https://github.com/EnMAP-Box/enmap-box/issues/1248)
+#### Miscellaneous
+* [Changelog] add support for manual editing [#1119](https://github.com/EnMAP-Box/enmap-box/issues/1119)
+* [Class Fraction/Probability Renderer] match categories by name when pasting a style  [#1178](https://github.com/EnMAP-Box/enmap-box/issues/1178)
+* add algorithm for converting absolute filenames into relative filenames inside a VRT [#1195](https://github.com/EnMAP-Box/enmap-box/issues/1195)
+* [Testdata] add support for testdata management in stand-alone QGIS [#1227](https://github.com/EnMAP-Box/enmap-box/issues/1227)
+* Update HTML report style [#1247](https://github.com/EnMAP-Box/enmap-box/issues/1247)
+* Use EnMAPBox.project() [#1272](https://github.com/EnMAP-Box/enmap-box/issues/1272)
+### Fixed Bugs
+<details><summary>Show all (32)</summary>
+
+* [Data sources] Drag & Drop of temporary vector layers not working [#877](https://github.com/EnMAP-Box/enmap-box/issues/877)
+* [SpectralLibraryUtils] SpectralLibraryUtils.writeToSource crashes, when using *.geojson filenames [#926](https://github.com/EnMAP-Box/enmap-box/issues/926)
+*  GDAL Metadata widget: Paste option is always greyed [#1059](https://github.com/EnMAP-Box/enmap-box/issues/1059)
+* Import of USGS Spectral Library Version 7 failed [#1094](https://github.com/EnMAP-Box/enmap-box/issues/1094)
+* [Regression-based Unmixing] fails to save output files as .bsq [#1134](https://github.com/EnMAP-Box/enmap-box/issues/1134)
+* [Scatter Plot] AttributeError: 'NoneType' object has no attribute 'mapSettings' [#1141](https://github.com/EnMAP-Box/enmap-box/issues/1141)
+* [CI] TestPrepareRegressionDatasetFromContinuousVectorAlgorithm.test_excludeBadBands fails with AssertionError: 218 != 0 [#1153](https://github.com/EnMAP-Box/enmap-box/issues/1153)
+* test_TranslateRasterAlgorithm fails with: assert outGdalDataset is not None [#1156](https://github.com/EnMAP-Box/enmap-box/issues/1156)
+* [Import Sentinel-2 L2A product] missing CRS [#1163](https://github.com/EnMAP-Box/enmap-box/issues/1163)
+* Error Importing L2A EnMAP file, when Windows Path is too long [#1166](https://github.com/EnMAP-Box/enmap-box/issues/1166)
+* [Profile Analytics] UDF error messages aren't printed correctly [#1188](https://github.com/EnMAP-Box/enmap-box/issues/1188)
+* Raster Layer Styling does not read tanager wavelengths [#1208](https://github.com/EnMAP-Box/enmap-box/issues/1208)
+* Drag & Drop Tanager .h5 file fails [#1209](https://github.com/EnMAP-Box/enmap-box/issues/1209)
+* ENVI spectra library reading: GDAL_VRT_RAWRASTERBAND_ALLOWED_SOURCE  GDAL 3.12+ [#1214](https://github.com/EnMAP-Box/enmap-box/issues/1214)
+* PyPI Package Info: unable to disable missing package warning for enpt-enmapbox app [#1221](https://github.com/EnMAP-Box/enmap-box/issues/1221)
+* Dependency list requires updating [#1224](https://github.com/EnMAP-Box/enmap-box/issues/1224)
+* [Data Sources panel] in-memory output layer not correctly opened [#1226](https://github.com/EnMAP-Box/enmap-box/issues/1226)
+* EnMap-Plugin fails to load on macOS QGIS 3.40.5 – Bratislava [#1236](https://github.com/EnMAP-Box/enmap-box/issues/1236)
+* [Classification workflow] AssertionError: empty strata detected: {1, 2, 3, 4} [#1240](https://github.com/EnMAP-Box/enmap-box/issues/1240)
+* Tanager Core Imagery Sample raises exception [#1257](https://github.com/EnMAP-Box/enmap-box/issues/1257)
+* [PyPi Package Info] don't show a warning for missing packages, which aren't included in the requirements_osgeo4w.txt [#1258](https://github.com/EnMAP-Box/enmap-box/issues/1258)
+* RasterReader fails to read Tanager wavelength information [#1259](https://github.com/EnMAP-Box/enmap-box/issues/1259)
+* ImportEnmapL2AAlgorithm can't deal with "_COG.TIF" for Level2A EnMap Data from DLR Geoservice STAC [#1260](https://github.com/EnMAP-Box/enmap-box/issues/1260)
+* Import EnMAP L2A product [#1262](https://github.com/EnMAP-Box/enmap-box/issues/1262)
+* [CI] test_SpectralResamplingByWavelengthAndFwhmAlgorithm: AssertionError: -36108144.0 != np.float32(-3.610814e+07) [#1266](https://github.com/EnMAP-Box/enmap-box/issues/1266)
+* test_ConvexHullAlgorithm fail [#1267](https://github.com/EnMAP-Box/enmap-box/issues/1267)
+* MaskRasterDataProvider causes SegFaults [#1268](https://github.com/EnMAP-Box/enmap-box/issues/1268)
+* RasterLayerStyling Panel causes QGIS crash by segfault [#1271](https://github.com/EnMAP-Box/enmap-box/issues/1271)
+* [CI] test_CreateMaskAlgorithm.py several tests fail [#1276](https://github.com/EnMAP-Box/enmap-box/issues/1276)
+* Sensor Import Panel fails on linux & macOS [#1295](https://github.com/EnMAP-Box/enmap-box/issues/1295)
+* [Processing] AttributeError: 'NoneType' object has no attribute 'mapTool' [#1300](https://github.com/EnMAP-Box/enmap-box/issues/1300)
+* Raster Band stacking fails to stack Sentinel-2 bands [#1302](https://github.com/EnMAP-Box/enmap-box/issues/1302)
+</details>
+
+### MANUAL EDITS By Benjamin
+
+TODO: include manual edits into the changelog above
+
+TODO: include the references to the feature/bug issues (e.g. #42)
+
+<details><summary>MANUAL EDITS</summary>
 
 ### New Features
 
@@ -33,6 +97,8 @@
 * added *Import Spectral Profiles*
 * added *Export Spectral Profiles*
 * added *Extract Spectral Profiles from raster layer*
+
+</details>
 
 ## Version 3.16 (2025-03-24)
 
