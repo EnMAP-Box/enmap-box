@@ -4,8 +4,8 @@ from collections import defaultdict
 from os.path import abspath, join
 
 currentDevVersion = '3.17'
-currentDevReleaseDate = '2024-03-21'
-skipDevVersion = True
+currentDevReleaseDate = '2025-11-09'
+skipDevVersion = False
 
 releaseHeader = {}
 
@@ -122,7 +122,7 @@ for issue in issues:
     else:
         featuresByVersion[version].append(issue)
 
-filename = abspath(join(__file__, '../../..', 'CHANGELOG.md'))
+filename = abspath(join(__file__, '..', 'CHANGELOG-AUTO.md'))
 with open(filename, 'w') as file:
     includeComment = False
     if includeComment:
@@ -165,7 +165,7 @@ How to provide manual edits
                 if release['tagName'] == 'v' + version + '.0':
                     releaseDate = release['publishedAt'][:10]
             if releaseDate is None:
-                assert 0
+                releaseDate = {'3.11': '2022-10-09'}[version]
             file.write(f'## Version {version} ({releaseDate})\n')
         file.write(releaseHeader[version] + '\n')
         file.write('### New Features\n')
