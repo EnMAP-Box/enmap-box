@@ -1,3 +1,6 @@
+# Version 3.17
+_This release was tested under QGIS 3.40 (LTR) and 3.44 (latest release)._
+
 # Version 3.16
 _This release was tested under QGIS 3.40 (LTR) and 3.42 (latest release)._
 
