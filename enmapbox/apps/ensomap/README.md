@@ -63,4 +63,6 @@ Madeira, J., Bedidi, A., Cervelle, B., Pouget, M. and Flay, N. 1997. Visible spe
 
 Mathieu, R., Pouget, M., Cervelle, B. and Escadafal, R. 1998. Relationships between satellite-based radiometric indices simulated using laboratory reflectance data and typic soil color of an arid environment. Remote Sens. Environ. 66: 17-28. 
 
+Thaler, E.A., Larsen, I.J., Yu, Q., 2019. A new index for remote sensing of soil organic carbon based solely on visible wavelengths. Soil Sci. Soc. Am. J. 83 (5), 1443–1450.
+
 Whiting, M.L., Li, L., and Ustin, S.L. (2004), Predicting water content using Gaussian model on soil spectra, Remote Sensing of the Environment, 89, 535-552.
