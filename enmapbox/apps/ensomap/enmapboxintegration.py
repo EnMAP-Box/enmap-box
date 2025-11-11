@@ -26,11 +26,11 @@ from qgis.PyQt.QtWidgets import QMenu, QAction
 from enmapbox.gui.applications import EnMAPBoxApplication
 
 from ensomap import APP_DIR
-from hys import __version__
 
 import sys
 sys.path.insert(0, APP_DIR)
 # from ensomap_ui import EnSoMAP_UI
+from hys import __version__
 
 from PyQt5.QtCore    import *
 from PyQt5.QtWidgets import *
