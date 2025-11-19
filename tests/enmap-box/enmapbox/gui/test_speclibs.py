@@ -19,6 +19,7 @@ from enmapbox.exampledata import enmap
 from enmapbox.gui.dataviews.docks import SpectralLibraryDock
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import MapCanvas
+from enmapbox.qgispluginsupport.qps.maptools import MapTools
 from enmapbox.qgispluginsupport.qps.utils import fid2pixelindices, SpatialPoint
 from enmapbox.testing import EnMAPBoxTestCase, start_app
 from enmapboxtestdata import fraction_polygon_l3, fraction_point_singletarget, enmap_srf_library
@@ -31,6 +32,15 @@ initAll()
 
 
 class TestSpeclibs(EnMAPBoxTestCase):
+
+    @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'development only')
+    def test_load_image_profiles(self):
+        EB = EnMAPBox(load_core_apps=False, load_other_apps=False)
+        EB.loadExampleData()
+        EB.setMapTool(MapTools.SpectralProfile)
+        self.showGui(EB.ui)
+        EB.close()
+        QgsProject.instance().removeAllMapLayers()
 
     @unittest.skip('TEST')
     def test_issue_1036(self):
