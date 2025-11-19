@@ -8,6 +8,7 @@ from tempfile import gettempdir
 from typing import Optional, List, Tuple, Dict
 
 import numpy as np
+from PyQt5.QtWidgets import QDockWidget
 
 import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyle, MarkerSymbol
@@ -38,7 +39,7 @@ from enmapbox.typeguard import typechecked
 
 
 @typechecked
-class GeeTemporalProfileDockWidget(QgsDockWidget):
+class GeeTemporalProfileDockWidget(QDockWidget):
     mMessageBar: QgsMessageBar
     mIdentify: QToolButton
     mLocation: QLineEdit
