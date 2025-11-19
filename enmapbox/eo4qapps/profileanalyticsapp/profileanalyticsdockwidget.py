@@ -6,9 +6,14 @@ from shutil import copyfile
 from typing import Optional, List, Dict
 
 import numpy as np
+import processing
+from qgis.PyQt import uic
+from qgis.PyQt.QtWidgets import QComboBox, QTableWidget, QCheckBox, QToolButton, QLineEdit, QWidget, QLabel, QDockWidget
+from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsVectorLayer, QgsProcessingFeatureSourceDefinition, \
+    QgsFeatureRequest, QgsWkbTypes, QgsFeature, QgsProject
+from qgis.gui import QgsMapLayerComboBox, QgsFileWidget, QgsRasterBandComboBox, QgsDockWidget, QgisInterface
 
 import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
-import processing
 from enmapbox.gui.dataviews.docks import SpectralLibraryDock
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyleButton, PlotStyle
@@ -21,15 +26,10 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp import MapTool, GeeTimeseriesExplorerDockWidget, GeeTemporalProfileDockWidget
 from profileanalyticsapp.profileanalyticseditorwidget import ProfileAnalyticsEditorWidget
-from qgis.PyQt import uic
-from qgis.PyQt.QtWidgets import QComboBox, QTableWidget, QCheckBox, QToolButton, QLineEdit, QWidget, QLabel
-from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsVectorLayer, QgsProcessingFeatureSourceDefinition, \
-    QgsFeatureRequest, QgsWkbTypes, QgsFeature, QgsProject
-from qgis.gui import QgsMapLayerComboBox, QgsFileWidget, QgsRasterBandComboBox, QgsDockWidget, QgisInterface
 
 
 @typechecked
-class ProfileAnalyticsDockWidget(QgsDockWidget):
+class ProfileAnalyticsDockWidget(QDockWidget):
     mGraphicsLayoutWidget: pg.GraphicsLayoutWidget
 
     # data tab
@@ -302,7 +302,7 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
         if self.interface is None:  # not yet initialized
             return
 
-        if not self.isUserVisible():
+        if not self.isVisible():
             return
 
         self.mPlotWidget.clear()

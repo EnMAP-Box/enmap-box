@@ -2,9 +2,16 @@ import pickle
 from os.path import join, basename, isabs
 from typing import Optional
 
-from osgeo import gdal
-
 import processing
+from osgeo import gdal
+from qgis.PyQt import uic
+from qgis.PyQt.QtCore import QEvent
+from qgis.PyQt.QtWidgets import QToolButton, QTableWidget, QRadioButton, QCheckBox, QDockWidget
+from qgis.PyQt.QtXml import QDomDocument
+from qgis.core import QgsMimeDataUtils, QgsReadWriteContext, QgsLayerTree, QgsProject, QgsMapLayerProxyModel, \
+    QgsRasterLayer
+from qgis.gui import QgsMapLayerComboBox, QgsDockWidget, QgisInterface, QgsFileWidget
+
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mimedata import MDF_RASTERBANDS, QGIS_URILIST_MIMETYPE, MDF_ENMAPBOX_LAYERTREEMODELDATA, \
     MDF_QGIS_LAYERTREEMODELDATA, MDF_QGIS_LAYERTREEMODELDATA_XML, MDF_URILIST
@@ -16,17 +23,10 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp import MapTool
-from qgis.PyQt import uic
-from qgis.PyQt.QtCore import QEvent
-from qgis.PyQt.QtWidgets import QToolButton, QTableWidget, QRadioButton, QCheckBox
-from qgis.PyQt.QtXml import QDomDocument
-from qgis.core import QgsMimeDataUtils, QgsReadWriteContext, QgsLayerTree, QgsProject, QgsMapLayerProxyModel, \
-    QgsRasterLayer
-from qgis.gui import QgsMapLayerComboBox, QgsDockWidget, QgisInterface, QgsFileWidget
 
 
 @typechecked
-class RasterBandStackingDockWidget(QgsDockWidget):
+class RasterBandStackingDockWidget(QDockWidget):
     mRasterTable: QTableWidget
     mAddRaster: QToolButton
     mRemoveRaster: QToolButton
