@@ -8,21 +8,11 @@ from tempfile import gettempdir
 from typing import Optional, List, Tuple, Dict
 
 import numpy as np
-from PyQt5.QtWidgets import QDockWidget
-
-import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
-from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyle, MarkerSymbol
-from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
-from enmapbox.utils import importEarthEngine
-from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
-from geetimeseriesexplorerapp.geetimeseriesexplorerdockwidget import GeeTimeseriesExplorerDockWidget
-from geetimeseriesexplorerapp.tasks.buildimagechipvrtstask import BuildImageChipVrtsTask
-from geetimeseriesexplorerapp.tasks.downloadimagechiptask import DownloadImageChipTask, DownloadImageChipBandTask
-from geetimeseriesexplorerapp.tasks.downloadprofiletask import DownloadProfileTask
 from qgis.PyQt import QtGui
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt, QDateTime, QDate, QModelIndex, QRectF, QStandardPaths, pyqtSignal, QCoreApplication
 from qgis.PyQt.QtGui import QColor, QPen, QBrush, QIcon, QPixmap
+from qgis.PyQt.QtWidgets import QDockWidget
 from qgis.PyQt.QtWidgets import (QToolButton, QListWidget, QApplication, QSpinBox,
                                  QColorDialog, QComboBox, QCheckBox, QLineEdit,
                                  QFileDialog, QListWidgetItem, QSlider, QTableWidget, QProgressBar,
@@ -35,7 +25,17 @@ from qgis.gui import (
     QgsDockWidget, QgsFeaturePickerWidget, QgsMapLayerComboBox, QgsFieldComboBox, QgsMessageBar, QgsColorButton,
     QgsFileWidget, QgsCheckableComboBox, QgsMapMouseEvent
 )
+
+import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
+from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyle, MarkerSymbol
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.typeguard import typechecked
+from enmapbox.utils import importEarthEngine
+from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
+from geetimeseriesexplorerapp.geetimeseriesexplorerdockwidget import GeeTimeseriesExplorerDockWidget
+from geetimeseriesexplorerapp.tasks.buildimagechipvrtstask import BuildImageChipVrtsTask
+from geetimeseriesexplorerapp.tasks.downloadimagechiptask import DownloadImageChipTask, DownloadImageChipBandTask
+from geetimeseriesexplorerapp.tasks.downloadprofiletask import DownloadProfileTask
 
 
 @typechecked
