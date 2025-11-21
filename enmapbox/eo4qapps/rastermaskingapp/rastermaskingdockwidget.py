@@ -1,13 +1,14 @@
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.typeguard import typechecked
 from qgis.PyQt import uic
-from qgis.PyQt.QtWidgets import QTableWidget, QToolButton, QComboBox, QLineEdit
+from qgis.PyQt.QtWidgets import QTableWidget, QToolButton, QComboBox, QLineEdit, QDockWidget
 from qgis.core import QgsMapLayerProxyModel
 from qgis.gui import QgsMapLayerComboBox, QgsRasterBandComboBox, QgsDockWidget, QgisInterface
 
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.typeguard import typechecked
+
 
 @typechecked
-class RasterMaskingDockWidget(QgsDockWidget):
+class RasterMaskingDockWidget(QDockWidget):
     mRaster: QgsMapLayerComboBox
     mThresholdingTable: QTableWidget
     mThresholdingAdd: QToolButton

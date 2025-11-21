@@ -2136,8 +2136,8 @@ class DockPanelUI(QgsDockWidget):
         if panel is None:
             return
 
-        panel.setUserVisible(self.mRasterLayerStyling.isChecked())
-        if panel.isUserVisible():
+        panel.setVisible(self.mRasterLayerStyling.isChecked())
+        if panel.isVisible():
             from enmapbox.gui.enmapboxgui import EnMAPBox
             enmapBox = EnMAPBox.instance()
             panel.mLayer.setLayer(enmapBox.currentLayer())

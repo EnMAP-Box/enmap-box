@@ -481,7 +481,7 @@ class PIPPackageInfoTask(QgsTask):
         msg = err = ''
         try:
             success, msg, err = call_pip_command(['list', '-v', '--format', 'json'])
-            if success:
+            if success and msg not in ['', None]:
                 pkg_all = json.loads(msg)
 
                 pkg_names = [pkg['name'] for pkg in pkg_all]
@@ -511,7 +511,7 @@ class PIPPackageInfoTask(QgsTask):
             try:
                 success, msg, err = call_pip_command(['list', '-o', '--format', 'json'])
 
-                if success:
+                if success and msg not in ['', None]:
                     pkg_updates = json.loads(msg)
                     self.sigPackageUpdates.emit(pkg_updates)
                 else:
