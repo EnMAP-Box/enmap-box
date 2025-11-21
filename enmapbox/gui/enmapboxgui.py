@@ -92,6 +92,7 @@ from .splashscreen.splashscreen import EnMAPBoxSplashScreen
 from .utils import enmapboxUiPath
 from ..enmapboxsettings import EnMAPBoxSettings
 from ..qgispluginsupport.qps.processing.algorithmdialog import executeAlgorithm, AlgorithmDialog
+from ..qgispluginsupport.qps.speclib.gui.spectralprofilecandidates import SpectralProfileCandidates
 
 MAX_MISSING_DEPENDENCY_WARNINGS = 3
 KEY_MISSING_DEPENDENCY_VERSION = 'MISSING_PACKAGE_WARNING_VERSION'
@@ -1309,6 +1310,23 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         initMapToolAction(self.ui.mActionSelectFeatures, MapTools.SelectFeature)
         initMapToolAction(self.ui.mActionAddFeature, MapTools.AddFeature)
 
+        def onIdentifyProfileToggled(b: bool):
+            """
+            Remove profile candidates if the optionIdentifyProfile gets disabled
+            """
+            if not b:
+                layers = []
+                for dock in self.docks(SpectralLibraryDock):
+                    dock: SpectralLibraryDock
+                    for sl in dock.speclibWidget().spectralLibraries():
+                        if sl not in layers and SpectralProfileCandidates.hasProfileCandidates(sl):
+                            layers.append(sl)
+
+                if len(layers) > 0:
+                    SpectralProfileCandidates.removeProfileCandidates(layers)
+
+        self.ui.optionIdentifyProfile.toggled.connect(onIdentifyProfileToggled)
+
         def onEditingToggled(b: bool):
             lyr = self.currentLayer()
             if b:
@@ -1591,12 +1609,18 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         #     self.mapLayerStore().removeMapLayer(lid)
 
     @pyqtSlot(SpatialPoint, QgsMapCanvas)
-    def loadCurrentMapSpectra(self, spatialPoint: SpatialPoint, mapCanvas: QgsMapCanvas = None, runAsync: bool = None):
+    def loadCurrentMapSpectra(self,
+                              spatialPoint: SpatialPoint,
+                              mapCanvas: Optional[QgsMapCanvas] = None,
+                              runAsync: bool = None):
         """
         Loads SpectralProfiles from a location defined by `spatialPoint`
         :param spatialPoint: SpatialPoint
         :param mapCanvas: QgsMapCanvas
         """
+
+        if mapCanvas is None:
+            mapCanvas = self.currentMapCanvas()
 
         panel: SpectralProfileSourcePanel = self.spectralProfileSourcePanel()
         bridge: SpectralProfileBridge = panel.mBridge
@@ -2302,7 +2326,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     def close(self):
         self.disconnectQGISSignals()
-        self.dockManager()
+        self.dockManager().clear()
         self.ui.close()
 
     def browserModel(self) -> QgsBrowserModel:
