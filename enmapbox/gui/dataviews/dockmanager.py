@@ -20,7 +20,6 @@ import logging
 import os
 import re
 import time
-import uuid
 from os.path import basename, dirname
 from typing import Optional, List, Dict, Union, Any
 
@@ -70,13 +69,11 @@ class LayerTreeNode(QgsLayerTree):
         super(LayerTreeNode, self).__init__()
         # assert name is not None and len(str(name)) > 0
 
-        self.mParent = None
+        # self.mParent = None
         self.mModel: Optional[QgsLayerTreeModel] = None
         self.mTooltip: Optional[str] = None
         self.mValue = None
         self.mIcon: Optional[QIcon] = None
-
-        self.mXmlTag = 'tree-node'
 
         self.setName(name)
         self.setValue(value)
@@ -95,9 +92,6 @@ class LayerTreeNode(QgsLayerTree):
         d = super(LayerTreeNode, self).dump()
         d += '{}:"{}":"{}"\n'.format(self.__class__.__name__, self.name(), self.value())
         return d
-
-    def xmlTag(self) -> str:
-        return self.mXmlTag
 
     def _removeSubNode(self, node):
         if node in self.children():
@@ -200,8 +194,8 @@ class DockTreeNode(LayerTreeNode):
 
     def __init__(self, dock: Dock):
         assert isinstance(dock, Dock)
-        self.dock = dock
-        super(DockTreeNode, self).__init__('<dockname not available>')
+        # self.dock = dock
+        super().__init__('<dockname not available>')
 
         self.mIcon = QIcon(':/enmapbox/gui/ui/icons/viewlist_dock.svg')
         self.dock = dock
@@ -509,8 +503,8 @@ class DockManager(QObject):
     sigDockWillBeRemoved = pyqtSignal(Dock)
     sigDockTitleChanged = pyqtSignal(Dock)
 
-    def __init__(self):
-        QObject.__init__(self)
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
         self.mConnectedDockAreas = []
         self.mDocks: List[Dock] = list()
         self.mDataSourceManager: Optional[DataSourceManager] = None
@@ -676,19 +670,8 @@ class DockManager(QObject):
         if dockType is None:
             return self.mDocks[:]
         else:
-            # handle wrapper types, e.g. when calling .dock(MapDock)
+            # handle wrapper types, e.g., when calling .dock(MapDock)
             return [d for d in self.mDocks if dockType.__name__ == d.__class__.__name__]
-
-    def getDockWithUUID(self, uuid_):
-        if isinstance(uuid_, str):
-            uuid_ = uuid.UUID(uuid_)
-        assert isinstance(uuid_, uuid.UUID)
-        for dock in list(self.mDocks):
-            assert isinstance(dock, Dock)
-            if dock.uuid == uuid_:
-                return dock
-
-        return None
 
     def removeDock(self, dock):
         """
@@ -1101,6 +1084,7 @@ class DockManagerTreeModel(QgsLayerTreeModel):
         for n in nodes:
             if isinstance(n, QgsLayerTreeNode) and isinstance(n.parent(), QgsLayerTreeNode):
                 n.parent().takeChild(n)
+                n.setParent(None)
 
     def removeDockNode(self, node):
         self.removeNodes([node])
