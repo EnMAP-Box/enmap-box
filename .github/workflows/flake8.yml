@@ -25,6 +25,6 @@ jobs:
         with:
           checkName: 'Python Lint'
           plugins: flake8-qgis
-          config: .flake8
+          config: tox.ini
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
