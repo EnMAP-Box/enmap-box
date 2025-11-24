@@ -570,11 +570,13 @@ class RasterLayerStylingPanel(QgsDockWidget):
         layer: QgsRasterLayer = self.mLayer.currentLayer()
         if layer is None:
             return
+        extent = self.currentExtent(layer, self.mExtent.currentIndex())
+        if extent is None:
+            return
 
         def setCumulativeCut(bandNo: int, mBandMin: QLineEdit, mBandMax: QLineEdit):
             vmin, vmax = layer.dataProvider().cumulativeCut(
-                bandNo, self.mP1.value() / 100., self.mP2.value() / 100.,
-                self.currentExtent(layer, self.mExtent.currentIndex()),
+                bandNo, self.mP1.value() / 100., self.mP2.value() / 100., extent,
                 self.currentSampleSize(self.mAccuracy.currentIndex())
             )
 
@@ -896,22 +898,24 @@ class RasterLayerStylingPanel(QgsDockWidget):
         else:
             self.mGroupBoxTransparency.hide()
 
-    def currentExtent(self, layer: QgsRasterLayer, statisticsType: int) -> QgsRectangle:
+    def currentExtent(self, layer: QgsRasterLayer, statisticsType: int) -> Optional[QgsRectangle]:
 
         if statisticsType == self.WholeRasterStatistics:
             return layer.extent()
         elif statisticsType == self.CurrentCanvasStatistics:
             mapCanvas = self.currentMapCanvas(layer)
+            if mapCanvas is None:
+                return None
             return SpatialExtent(mapCanvas.crs(), mapCanvas.extent()).toCrs(layer.crs())
         else:
             raise ValueError()
 
-    def currentMapCanvas(self, layer: QgsRasterLayer) -> MapCanvas:
+    def currentMapCanvas(self, layer: QgsRasterLayer) -> Optional[MapCanvas]:
 
         for mapDock in self.enmapBox.dockManager().mapDocks():
             if layer in mapDock.mapCanvas().layers():
                 return mapDock.mapCanvas()
-        raise ValueError()
+        return None
 
     def currentSampleSize(self, accuracyType: int) -> int:
         if accuracyType == self.EstimatedAccuracy:
