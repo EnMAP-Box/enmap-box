@@ -664,7 +664,7 @@ class DataSourceManagerTreeView(TreeView):
         from enmapbox.gui.dataviews.docks import AttributeTableDock
         from enmapbox.gui.enmapboxgui import EnMAPBox
         emb = self.enmapboxInstance()
-        if isinstance(emb, EnMAPBox):
+        if isinstance(emb, EnMAPBox) and isinstance(vectorLayer, QgsVectorLayer):
             emb.dockManager().createDock(AttributeTableDock, layer=vectorLayer)
 
 

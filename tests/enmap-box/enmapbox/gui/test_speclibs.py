@@ -14,12 +14,16 @@ __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
 import unittest
 
+from PyQt5.QtWidgets import QDialog
+
 from enmapbox import initAll
 from enmapbox.exampledata import enmap
 from enmapbox.gui.dataviews.docks import SpectralLibraryDock
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import MapCanvas
+from enmapbox.gui.widgets.createspeclibdialog import CreateSpectralLibraryDialog
 from enmapbox.qgispluginsupport.qps.maptools import MapTools
+from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
 from enmapbox.qgispluginsupport.qps.utils import fid2pixelindices, SpatialPoint
 from enmapbox.testing import EnMAPBoxTestCase, start_app
 from enmapboxtestdata import fraction_polygon_l3, fraction_point_singletarget, enmap_srf_library
@@ -41,6 +45,16 @@ class TestSpeclibs(EnMAPBoxTestCase):
         self.showGui(EB.ui)
         EB.close()
         QgsProject.instance().removeAllMapLayers()
+
+    def test_create_spectrallibrary(self):
+        d = CreateSpectralLibraryDialog()
+
+        if d.exec_() == QDialog.Accepted:
+            sl = d.create_speclib()
+            self.assertIsInstance(sl, QgsVectorLayer)
+            self.assertTrue(SpectralLibraryUtils.isSpectralLibrary(sl))
+
+        self.showGui(d)
 
     @unittest.skip('TEST')
     def test_issue_1036(self):

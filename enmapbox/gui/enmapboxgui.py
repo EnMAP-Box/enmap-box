@@ -90,6 +90,7 @@ from .dataviews.docks import DockTypes
 from .mapcanvas import MapCanvas
 from .splashscreen.splashscreen import EnMAPBoxSplashScreen
 from .utils import enmapboxUiPath
+from .widgets.createspeclibdialog import CreateSpectralLibraryDialog
 from ..enmapboxsettings import EnMAPBoxSettings
 from ..qgispluginsupport.qps.processing.algorithmdialog import executeAlgorithm, AlgorithmDialog
 from ..qgispluginsupport.qps.speclib.gui.spectralprofilecandidates import SpectralProfileCandidates
@@ -1291,6 +1292,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.ui.mActionCreateNewMemoryLayer.triggered.connect(lambda *args: self.createNewLayer('memory'))
         self.ui.mActionCreateNewGeoPackageLayer.triggered.connect(lambda *args: self.createNewLayer('gpkg'))
         self.ui.mActionCreateNewShapefileLayer.triggered.connect(lambda *args: self.createNewLayer('shapefile'))
+        self.ui.mActionCreateNewSpeclib.triggered.connect(lambda *args: self.createNewLayer('speclib'))
 
         # activate map tools
 
@@ -1395,8 +1397,18 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         layertype = layertype.lower()
         layers = []
-        assert layertype in ['gpkg', 'memory', 'shapefile']
-        if layertype == 'gpkg':
+        assert layertype in ['gpkg', 'memory', 'shapefile', 'speclib']
+
+        if layertype == 'speclib':
+            s = ""
+            d = CreateSpectralLibraryDialog(self.ui)
+            if d.exec_() == QDialog.Accepted:
+                sl = d.create_speclib()
+                if isinstance(sl, QgsVectorLayer):
+                    self.project().addMapLayer(sl, False)
+                    layers.append(sl)
+
+        elif layertype == 'gpkg':
             d = QgsNewGeoPackageLayerDialog(self.ui)
             d.setCrs(defaultCrs)
             d.setAddToProject(False)
