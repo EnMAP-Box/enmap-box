@@ -662,6 +662,7 @@ class RasterReader(object):
         cache = self.layer.customProperty(key)
         if cache is None:
             return None
+
         return cache['wavelength'].get(bandNo)
 
     def wavelength(self, bandNo: int, units: str = None, raw=False) -> Optional[float]:
