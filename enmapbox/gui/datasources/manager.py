@@ -786,7 +786,7 @@ class DataSourceManagerPanelUI(QgsDockWidget):
 class DataSourceFactory(object):
 
     @staticmethod
-    def create(source: any,
+    def create(source: Any,
                name: str = None,
                show_dialogs: bool = True,
                project: Optional[QgsProject] = None,
@@ -895,6 +895,8 @@ class DataSourceFactory(object):
                     if dataItem.providerKey() in ['memory']:
                         # get a reference to the layer
                         if isinstance(source, QgsVectorLayer):
+                            if source.id() not in project.mapLayers():
+                                project.addMapLayer(source, False)
                             dataItem.setReferenceLayer(source, project)
                         elif isinstance(source, QgsMimeDataUtils.Uri):
                             rx_uid = re.compile(r'uid={(?P<uid>[^}].*)}')
