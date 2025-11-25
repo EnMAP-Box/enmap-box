@@ -323,8 +323,9 @@ class RasterLayerStylingPanel(QgsDockWidget):
 
         if self.mRenderer.currentIndex() == self.RgbRendererTab:
             for mBand in [self.mRedBand, self.mGreenBand, self.mBlueBand]:
-                mBand.mBandNo.setLayer(layer)
-                mBand.mSlider.setRange(1, layer.bandCount())
+                with BlockSignals(mBand.mBandNo, mBand.mSlider):
+                    mBand.mBandNo.setLayer(layer)
+                    mBand.mSlider.setRange(1, layer.bandCount())
 
             renderer: QgsMultiBandColorRenderer = layer.renderer()
             if not isinstance(layer.renderer(), QgsMultiBandColorRenderer):
@@ -343,6 +344,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
                     mBand.mMin.setText(str(ce.minimumValue()))
                     mBand.mMax.setText(str(ce.maximumValue()))
                     mBand.mBandNo.setBand(bandNo)
+                    mBand.mSlider.setValue(bandNo)
 
         elif self.mRenderer.currentIndex() == self.GrayRendererTab:
             self.mGrayBand.mBandNo.setLayer(layer)
@@ -361,6 +363,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 self.mGrayBand.mMin.setText(str(ce.minimumValue()))
                 self.mGrayBand.mMax.setText(str(ce.maximumValue()))
                 self.mGrayBand.mBandNo.setBand(renderer.inputBand())
+                self.mGrayBand.mSlider.setValue(renderer.inputBand())
 
         elif self.mRenderer.currentIndex() == self.PseudoRendererTab:
             self.mPseudoBand.mBandNo.setLayer(layer)
@@ -379,6 +382,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 self.mPseudoBand.mMin.setText(str(shader.minimumValue()))
                 self.mPseudoBand.mMax.setText(str(shader.maximumValue()))
                 self.mPseudoBand.mBandNo.setBand(renderer.inputBand())
+                self.mPseudoBand.mSlider.setValue(renderer.inputBand())
 
         elif self.mRenderer.currentIndex() == self.DefaultRendererTab:
             layer.setRenderer(self.originalRenderer.clone())
@@ -498,12 +502,17 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 self.mRedBand.mBandNo.setBand(renderer.redBand())
                 self.mGreenBand.mBandNo.setBand(renderer.greenBand())
                 self.mBlueBand.mBandNo.setBand(renderer.blueBand())
+                self.mRedBand.mSlider.setValue(renderer.redBand())
+                self.mGreenBand.mSlider.setValue(renderer.greenBand())
+                self.mBlueBand.mSlider.setValue(renderer.blueBand())
         elif isinstance(renderer, QgsSingleBandGrayRenderer):
             with BlockSignals(self.mGrayBand):
                 self.mGrayBand.mBandNo.setBand(renderer.inputBand())
+                self.mGrayBand.mSlider.setValue(renderer.inputBand())
         elif isinstance(renderer, QgsSingleBandPseudoColorRenderer):
             with BlockSignals(self.mPseudoBand.mBandNo):
                 self.mPseudoBand.mBandNo.setBand(renderer.inputBand())
+                self.mPseudoBand.mSlider.setValue(renderer.inputBand())
         else:
             pass
 
