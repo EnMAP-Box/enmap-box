@@ -1,10 +1,10 @@
 from typing import List
 
-from PyQt5.QtWidgets import QFileDialog, QDialogButtonBox, QPushButton, QLineEdit, QHBoxLayout, QLabel, QRadioButton, \
-    QButtonGroup, QVBoxLayout, QDialog
-
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
-from qgis._core import QgsVectorLayer
+from qgis.PyQt.QtWidgets import QFileDialog, QDialogButtonBox, QPushButton, QLineEdit, QHBoxLayout, QLabel, \
+    QRadioButton, \
+    QButtonGroup, QVBoxLayout, QDialog
+from qgis.core import QgsVectorLayer
 
 
 class CreateSpectralLibraryDialog(QDialog):
