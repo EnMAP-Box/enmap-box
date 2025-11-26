@@ -1578,16 +1578,27 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             slw.createProfileVisualization(sl, 'profiles')
             self.dataSourceManager().addDataSources(slw.sourceLayers())
 
-            def updateLayerName(d: SpectralLibraryDock):
-                sid = d.defaultSpeclib()
-                lyr = self.project().mapLayer(sid)
-                if isinstance(lyr, QgsVectorLayer) and lyr.name() != d.title():
-                    lyr.setName(d.title())
+            def updateName():
+                """Updates the name of the dock or default layer if the other has changed its name"""
+                s = self.sender()
+                if isinstance(s, SpectralLibraryDock):
+                    # change the layer name
+                    title = s.title()
+                    sid = s.defaultSpeclib()
+                    lyr = self.project().mapLayer(sid)
+                    if isinstance(lyr, QgsVectorLayer) and lyr.name() != title:
+                        lyr.setName(title)
+                elif isinstance(s, QgsVectorLayer):
+                    # change the dock title
+                    sid = s.id()
+                    title = s.name()
+                    for dock in self.docks(SpectralLibraryDock):
+                        assert isinstance(dock, SpectralLibraryDock)
+                        if dock.defaultSpeclib() == sid and dock.title() != title:
+                            dock.setTitle(title)
 
-            # changes of the dock name should change the name of the associated spectral library
-            # and vice versa
-            dock.sigTitleChanged.connect(lambda *args, d=dock: updateLayerName(d))
-            sl.nameChanged.connect(lambda n, d=dock: dock.setTitle(n))
+            dock.sigTitleChanged.connect(updateName)
+            sl.nameChanged.connect(updateName)
 
             bridge = self.spectralProfileSourcePanel().mBridge
             bridge.addSpectralLibraryWidgets(slw)
