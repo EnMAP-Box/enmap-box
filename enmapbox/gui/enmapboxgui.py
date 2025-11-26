@@ -986,11 +986,23 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     def syncProjects(self):
         """
-        Ensures that layers in the EnMAP-Box are a subset of the QgsProject.instance() layers
-        Relates to: #877
-
-        :return:
+        Ensures that the EnMAPBox.project() contains only layer instances which are used in maps or spectral library widgets
         """
+
+        project_ids = set(self.project().mapLayers().keys())
+        gui_ids = set()
+        for node in self.dockManagerTreeModel().dockTreeNodes():
+            gui_ids.update(node.findLayerIds())
+
+        if project_ids != gui_ids:
+            not_in_gui = project_ids.difference(gui_ids)
+            for lid in not_in_gui:
+                lyr = self.project().mapLayer(lid)
+                if isinstance(lyr, QgsMapLayer):
+                    if lyr.dataProvider().name() == 'memory':
+                        continue
+                    self.project().takeMapLayer(lyr)
+        s = ""
         return
         SYNC_WITH_QGIS = True
 
@@ -1568,6 +1580,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             self.spectralProfileSourcePanel().addSpectralLibraryWidgets(slw)
             slw.sigFilesCreated.connect(self.addSources)
 
+            sl = None
             # create a standard in-memory library shown in the dock
             if len(slw.sourceLayers()) == 0:
                 sl = SpectralLibraryUtils.createSpectralLibrary(['profiles'])
@@ -1604,9 +1617,11 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
             bridge = self.spectralProfileSourcePanel().mBridge
             bridge.addSpectralLibraryWidgets(slw)
-            node: SpectralFeatureGeneratorNode = bridge.createFeatureGenerator()
-            node.setSpeclib(sl)
-            bridge.setDefaultSources(node)
+
+            if sl:
+                node: SpectralFeatureGeneratorNode = bridge.createFeatureGenerator()
+                node.setSpeclib(sl)
+                bridge.setDefaultSources(node)
 
         if isinstance(dock, MapDock):
             canvas = dock.mapCanvas()
@@ -1703,7 +1718,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
             speclibs = [sl for sl in self.spectralLibraries() if is_temporary(sl)]
 
-            if len(speclibs) == 0:
+            if False and len(speclibs) == 0:
                 # create an empty, temporary spectral library to store pixel profiles
                 from enmapbox.testing import TestObjects
                 sl = TestObjects.createSpectralLibrary(n=0)

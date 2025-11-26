@@ -38,9 +38,11 @@ from enmapbox.gui.mimedata import \
 from enmapbox.gui.utils import enmapboxUiPath
 from enmapbox.qgispluginsupport.qps.layerproperties import pasteStyleFromClipboard, pasteStyleToClipboard
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
+from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibraryplotmodelitems import ProfileVisualizationGroup
 from enmapbox.qgispluginsupport.qps.utils import loadUi
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtCore import QSize
 from qgis.PyQt.QtCore import Qt, QMimeData, QModelIndex, QObject, QTimer, pyqtSignal, QEvent, \
     QSortFilterProxyModel, QCoreApplication
 from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDropEvent, QDragLeaveEvent
@@ -256,6 +258,9 @@ class AttributeTableDockTreeNode(DockTreeNode):
         super(AttributeTableDockTreeNode, self).__init__(dock)
         self.setIcon(QIcon(r':/enmapbox/gui/ui/icons/viewlist_attributetabledock.svg'))
 
+    def findLayerIds(self) -> List[str]:
+        return [self.dock.attributeTableWidget.mLayer.id()]
+
 
 class SpeclibDockTreeNode(DockTreeNode):
     def __init__(self, dock: SpectralLibraryDock):
@@ -264,34 +269,19 @@ class SpeclibDockTreeNode(DockTreeNode):
 
         self.setIcon(QIcon(':/enmapbox/gui/ui/icons/viewlist_spectrumdock.svg'))
         # self.mSpeclibWidget: SpectralLibraryWidget = None
-        self.profilesNode: LayerTreeNode = LayerTreeNode('Spectral Libraries')
-        self.profilesNode.setIcon(QIcon(':/qps/ui/icons/profile.svg'))
+        # self.profilesNode: LayerTreeNode = LayerTreeNode('Sources')
+        # self.profilesNode.setIcon(QIcon(':/qps/ui/icons/profile.svg'))
 
-        # self.controlNode = LayerTreeNode('Show')
-        # self.mPROFILES: Dict[str, int] = dict()
+        self.mPlotVisSettings = list()
+        self.mViewNodes: Dict = dict()
 
-        # self.mSpeclibWidget = dock.mSpeclibWidget
-        # assert isinstance(self.mSpeclibWidget, SpectralLibraryWidget)
-
-        # self.speclibNode = QgsLayerTreeLayer(self.speclib())
-
-        # self.addChildNode(self.controlNode)
-
+        if slw := self.speclibWidget():
+            slw.plotModel().rowsInserted.connect(self._onModelUpdated)
+            slw.plotModel().rowsRemoved.connect(self._onModelUpdated)
+            slw.plotModel().itemChanged.connect(self._onModelUpdated)
+            self._onModelUpdated()
+            # self.initNodes()
         # speclib = self.speclib()
-
-    def _update_legend_nodes(self):
-        if isinstance(self.speclibNode, QgsLayerTreeLayer):
-            rootNode = self.parent()
-            model = rootNode.model()
-            if isinstance(rootNode, QgsLayerTree) and isinstance(model, QgsLayerTreeModel):
-                # find all QgsLayerTreeLayers
-                nodes = [n for n in rootNode.findLayers() if n.layerId() == self.speclibNode.layerId()]
-                if len(nodes) > 1:
-                    # start with 2nd node.
-                    # legend of 1st node is already handled by QgsLayerTreeModel
-                    for node in nodes[1:]:
-                        if isinstance(node, QgsLayerTreeLayer):
-                            model.refreshLayerLegend(node)
 
     def speclibWidget(self) -> SpectralLibraryWidget:
         return self.dock.speclibWidget()
@@ -302,11 +292,58 @@ class SpeclibDockTreeNode(DockTreeNode):
         """
         return self.speclibWidget().plotModel().sourceLayers()
 
-    def updateNodes(self):
+    def _onModelUpdated(self):
+
+        slw = self.speclibWidget()
+        if slw:
+            model = slw.plotModel()
+            visSettings = model.settingsMap().get('visualizations', [])
+
+            # bc = QColor(self.plotControl().generalSettings().backgroundColor())
+
+            if visSettings != self.mPlotVisSettings:
+                self.removeAllChildren()
+                nodes = []
+                for vis in model.visualizations():
+                    ps = vis.plotStyle()
+                    icon = QIcon(ps.createPixmap(QSize(24, 24), hline=True))
+                    if False:
+                        n = LayerTreeNode(vis.text(), icon=icon)
+                        n.setValue({'vis_id': id(vis)})
+                        n.setItemVisibilityChecked(vis.isVisible())
+                    else:
+                        n = SpeclibProfileVisualizationGroupNode(vis)
+
+                    nodes.append(n)
+                if len(nodes) > 0:
+                    self.insertChildNodes(0, nodes)
+                self.mPlotVisSettings = visSettings
+            s = ""
+
+        s = ""
+
+    def findLayerIds(self):
+        """
+        Returns the layer ids of the spectral libraries used in the speclib widget's visualizations
+        """
+        layer_ids = []
+        if slw := self.speclibWidget():
+            for sl in slw.spectralLibraries():
+                layer_ids.append(sl.id())
+        return layer_ids
+
+    def updateNodes(self, index, r1, r2):
 
         PROFILES = dict()
+
         logger.info('update speclib nodes')
         slw = self.speclibWidget()
+        if slw:
+            for vis in slw.plotModel().visualizations():
+                vis.isVisible()
+
+        settings = slw.plotModel().settingsMap()
+
         # if isinstance(self.mSpeclibWidget, SpectralLibraryWidget):
         #     sl: QgsVectorLayer = self.mSpeclibWidget.speclib()
         #     if is_spectral_library(sl):
@@ -2324,3 +2361,30 @@ class LayerTreeViewMenuProvider(QgsLayerTreeViewMenuProvider):
             return self.currentNode().populateContextMenu()
         else:
             return QMenu()
+
+
+class SpeclibProfileVisualizationGroupNode(CheckableLayerTreeNode):
+
+    def __init__(self, vis, **kwds):
+        assert isinstance(vis, ProfileVisualizationGroup)
+        super().__init__(name=vis.text(), **kwds)
+        self.mVis = vis
+
+    def vis(self) -> ProfileVisualizationGroup:
+        return self.mVis
+
+    def name(self):
+        return self.mVis.text()
+
+    def tooltip(self):
+        return self.mVis.name()
+
+    def icon(self):
+        ps = self.vis().plotStyle()
+        return QIcon(ps.createPixmap(QSize(16, 16), hline=True))
+
+    def setCheckState(self, checkState):
+        self.vis().setCheckState(checkState)
+
+    def checkState(self):
+        return Qt.Checked if self.vis().isVisible() else Qt.Unchecked
