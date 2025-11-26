@@ -198,7 +198,7 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         QgsApplication.processEvents()
 
         self.assertEqual(len(box.dataSources()), nQGIS)
-        self.showGui([box, iface.mainWindow()])
+        # self.showGui([box, iface.mainWindow()])
 
         layers_qgis = list(QgsProject.instance().mapLayers().values())
 
@@ -216,7 +216,7 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         self.assertTrue(lyrNew in list(box.project().mapLayers().values()))
         mapDock.removeLayer(lyrNew)
         self.assertFalse(lyrNew in list(QgsProject.instance().mapLayers().values()))
-        self.assertTrue(lyrNew in list(box.project().mapLayers().values()))
+        self.assertFalse(lyrNew in list(box.project().mapLayers().values()))
         QgsProject.instance().removeAllMapLayers()
 
     def test_createDock(self):
@@ -292,7 +292,8 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
 
     def test_mapCanvas(self):
         E = EnMAPBox()
-        self.assertTrue(E.mapCanvas() is None)
+        from qgis.utils import iface
+        self.assertEqual(E.mapCanvas(), iface.mapCanvas())
         canvases = E.mapCanvases()
         self.assertIsInstance(canvases, list)
         self.assertTrue(len(canvases) == 0)

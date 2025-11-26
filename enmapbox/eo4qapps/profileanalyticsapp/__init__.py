@@ -1,14 +1,15 @@
 from typing import Optional
 
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.gui.applications import EnMAPBoxApplication
 from geetimeseriesexplorerapp.maptool import MapTool
 from profileanalyticsapp.profileanalyticsdockwidget import ProfileAnalyticsDockWidget
+
+from enmapbox.gui.applications import EnMAPBoxApplication
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from qgis.gui import QgisInterface
-from enmapbox.typeguard import typechecked
 
 
 def enmapboxApplicationFactory(enmapBox: EnMAPBox):
@@ -51,12 +52,14 @@ class ProfileAnalyticsApp(EnMAPBoxApplication):
 
         # add main dock and toolbar button
         self.dock = ProfileAnalyticsDockWidget(self.currentLocationMapTool, parent=self.parent())
+
         interface.addDockWidget(Qt.TopDockWidgetArea, self.dock)
         self.dock.setWindowIcon(self.icon())
         self.dock.hide()
 
         if self.isEnmapInterface:
             interface.ui.mEo4qToolbar.addAction(self.actionToggleDock)
+            self.dock.setProject(interface.project())
         else:
             interface.addToolBarIcon(self.actionToggleDock)
 
@@ -69,5 +72,5 @@ class ProfileAnalyticsApp(EnMAPBoxApplication):
             self.interface.mapCanvas().unsetMapTool(self.currentLocationMapTool)
 
     def toggleDockVisibility(self):
-        self.dock.setUserVisible(not self.dock.isUserVisible())
+        self.dock.setVisible(not self.dock.isVisible())
         self.dock.onApplyClicked()

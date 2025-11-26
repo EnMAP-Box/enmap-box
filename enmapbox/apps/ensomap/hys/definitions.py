@@ -13,7 +13,7 @@ import numpy as np
 def display_error(parent, msg):
     QMessageBox.critical(
         parent,
-        "HYSOMA - Error",
+        "EnSoMAP - Error",
         msg,
         QMessageBox.Ok,
         QMessageBox.Ok
@@ -26,7 +26,7 @@ def display_error(parent, msg):
 def display_information(parent, msg):
     QMessageBox.information(
         parent,
-        "HYSOMA - Information",
+        "EnSoMAP - Information",
         msg,
         QMessageBox.Ok,
         QMessageBox.Ok
@@ -158,7 +158,7 @@ class report:
     
     def set_product_sel_bands(self, id, ubands):
         if ubands[0] < 100: ubands *= 1000.
-        msg = "Hysoma selected bands:   "
+        msg = "EnSoMAP selected bands:   "
         msg += " ".join(str(int(x)) for x in ubands)
         self.soil_products[id]['ubands'] = msg
     

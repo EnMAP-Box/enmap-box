@@ -1,4 +1,4 @@
-from math import isnan, ceil
+from math import isnan, ceil, nan
 from os.path import exists
 from typing import Iterable, List, Union, Optional, Tuple, Iterator
 
@@ -555,10 +555,17 @@ class RasterReader(object):
 
     def metadataDomain(self, domain: str = '', bandNo: int = None) -> MetadataDomain:
         """Return domain metadata."""
-        metadata = {
-            key: Utils.stringToMetadateValue(value)
-            for key, value in self._gdalObject(bandNo).GetMetadata(domain).items()
-        }
+
+        gdalValue = self._gdalObject(bandNo).GetMetadata(domain)
+
+        if isinstance(gdalValue, list):
+            metadata = {}  # see https://github.com/EnMAP-Box/enmap-box/issues/1302
+        else:
+            metadata = {
+                key: Utils.stringToMetadateValue(value)
+                for key, value in gdalValue.items()
+            }
+
         return metadata
 
     def metadata(self, bandNo: int = None) -> Metadata:
@@ -642,40 +649,76 @@ class RasterReader(object):
 
         return None
 
+    def _setCachedWavelength(self, nanometers: float, bandNo: int):
+        key = 'EnMAP-Box/cache'
+        cache = self.layer.customProperty(key)
+        if cache is None:
+            cache = {'wavelength': {}}
+        cache['wavelength'][bandNo] = nanometers
+        self.layer.setCustomProperty(key, cache)
+
+    def _cachedWavelength(self, bandNo: int) -> Optional[float]:
+        key = 'EnMAP-Box/cache'
+        cache = self.layer.customProperty(key)
+        if cache is None:
+            return None
+
+        return cache['wavelength'].get(bandNo)
+
     def wavelength(self, bandNo: int, units: str = None, raw=False) -> Optional[float]:
         """Return band center wavelength in nanometers. Optionally, specify destination units."""
+
+        if units is None:
+            units = self.Nanometers
+
+        # check cache
+        wavelength = self._cachedWavelength(bandNo)
+        if wavelength is not None:
+            if isnan(wavelength):
+                return None
+            conversionFactor = Utils.wavelengthUnitsConversionFactor('nm', units)
+            return conversionFactor * wavelength
 
         # special handling: FORCE TSI raster
         enviDescription = self.metadataItem('description', 'ENVI')
         if enviDescription is not None:
             if enviDescription[0].startswith('FORCE') and enviDescription[0].endswith('Time Series Analysis'):
+                if not raw:
+                    self._setCachedWavelength(nan, bandNo)
                 return None
 
         if raw:
             conversionFactor = 1.
+            conversionFactorToNanometers = None
         else:
-            if units is None:
-                units = self.Nanometers
-
             wavelength_units = self.wavelengthUnits(bandNo)
             if wavelength_units is None:
+                if not raw:
+                    self._setCachedWavelength(nan, bandNo)
                 return None
 
             conversionFactor = Utils.wavelengthUnitsConversionFactor(wavelength_units, units)
+            conversionFactorToNanometers = Utils.wavelengthUnitsConversionFactor(wavelength_units, self.Nanometers)
 
         if not self.disableStac:
             # check STAC
             wavelength = self.stacMetadata['properties']['eo:bands'][bandNo - 1].get('center_wavelength')
             if wavelength is not None:
+                if not raw:
+                    self._setCachedWavelength(conversionFactorToNanometers * float(wavelength), bandNo)
                 return conversionFactor * float(wavelength)
 
             wavelength = self.stacMetadata['properties']['envi:metadata'].get('wavelength')
             if wavelength is not None:
+                if not raw:
+                    self._setCachedWavelength(conversionFactorToNanometers * float(wavelength[bandNo - 1]), bandNo)
                 return conversionFactor * float(wavelength[bandNo - 1])
 
         # check GDAL
         wavelength = self.metadataItem('CENTRAL_WAVELENGTH_UM', 'IMAGERY', bandNo)
         if wavelength is not None:
+            if not raw:
+                self._setCachedWavelength(conversionFactorToNanometers * float(wavelength), bandNo)
             return conversionFactor * float(wavelength)
 
         for key in [
@@ -687,6 +730,8 @@ class RasterReader(object):
             for domain in set([''] + self.metadataDomainKeys(bandNo)):
                 wavelength = self.metadataItem(key, domain, bandNo)
                 if wavelength is not None:
+                    if not raw:
+                        self._setCachedWavelength(conversionFactorToNanometers * float(wavelength), bandNo)
                     return conversionFactor * float(wavelength)
 
             # check dataset-level domains
@@ -694,8 +739,12 @@ class RasterReader(object):
                 wavelengths = self.metadataItem(key, domain)
                 if wavelengths is not None:
                     wavelength = wavelengths[bandNo - 1]
+                    if not raw:
+                        self._setCachedWavelength(conversionFactorToNanometers * float(wavelength), bandNo)
                     return conversionFactor * float(wavelength)
 
+        if not raw:
+            self._setCachedWavelength(nan, bandNo)
         return None
 
     def findWavelength(self, wavelength: Optional[float], units: str = None) -> Optional[int]:

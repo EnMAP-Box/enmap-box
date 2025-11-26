@@ -60,11 +60,7 @@ class MaskRasterDataProvider(QgsRasterDataProvider):
     @classmethod
     def createProvider(cls, uri, providerOptions, *args, **kwargs):
         provider = MaskRasterDataProvider(uri)
-
-        # keep a python reference on each new provider instance
-        # cls.ALL_INSTANCES[id(provider)] = provider
-        # cls._release_sip_deleted()
-        provider.setParent(cls.PARENT)
+        provider.setParent(cls.PARENT)  # <-- super important!
         return provider
 
     def description(self):
@@ -147,6 +143,7 @@ class MaskRasterDataProvider(QgsRasterDataProvider):
 
     def clone(self):
         provider = MaskRasterDataProvider(self.uri)
+        provider.setParent(self.PARENT)  # <-- super important!
         return provider
 
 

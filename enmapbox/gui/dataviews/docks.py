@@ -20,7 +20,6 @@
 import codecs
 import os
 import re
-import uuid
 from math import ceil
 from typing import List, Optional
 
@@ -93,7 +92,7 @@ class Dock(pgDock):
             pass
 
         self.progressBar = self.label.progressBar
-        self.uuid = uuid.uuid4()
+        # self.uuid = uuid.uuid4()
 
         # self.raiseOverlay()
 
@@ -149,7 +148,7 @@ class Dock(pgDock):
 
     def setTitle(self, title):
         """
-        Override setTitle to emit a signal after title was changed
+        Override setTitle to emit a signal after the title was changed
         :param title:
         :return:
         """
@@ -775,7 +774,7 @@ class AttributeTableDock(Dock):
 
     def updateTitle(self, title: str):
         # we need to get a short name, not the entire title
-        self.setTitle(title.split('::')[0])
+        self.setTitle(title.split('::')[0].strip())
 
     def vectorLayer(self) -> QgsVectorLayer:
         return self.attributeTableWidget.mLayer
@@ -806,15 +805,14 @@ class SpectralLibraryDock(Dock):
                  **kwds):
         super(SpectralLibraryDock, self).__init__(*args, **kwds)
 
-        self.mSpeclibWidget: SpectralLibraryWidget = SpectralLibraryWidget(parent=self, speclib=speclib,
+        self.mSpeclibWidget: SpectralLibraryWidget = SpectralLibraryWidget(speclib=speclib,
                                                                            project=project)
         self.mSpeclibWidget.setDelegateOpenRequests(True)
         # self.mSpeclibWidget.spectralLibraryPlotWidget().optionShowVisualizationSettings.setChecked(False)
         # self.mSpeclibWidget.sigLoadFromMapRequest.connect(self.sigLoadFromMapRequest)
         self.layout.addWidget(self.mSpeclibWidget)
-
+        s = ""
         # speclib: QgsVectorLayer = self.mSpeclibWidget.speclib()
-
         # name = kwds.get('name')
         # if isinstance(name, str):
         #    speclib.setName(name)
@@ -822,6 +820,23 @@ class SpectralLibraryDock(Dock):
         # self.setTitle(speclib.name())
         # speclib.nameChanged.connect(lambda slib=speclib: self.setTitle(slib.name()))
         # self.sigTitleChanged.connect(speclib.setName)
+        self.mDefaultSpeclib: str = ''
+
+    def setDefaultSpeclib(self, speclibID: str):
+        assert isinstance(speclibID, str)
+        self.mDefaultSpeclib = speclibID
+
+    def defaultSpeclib(self) -> Optional[str]:
+        return self.mDefaultSpeclib
+
+    def close(self):
+        self.mSpeclibWidget.plotModel().close()
+        super().close()
+        # self.layout.removeWidget(self.mSpeclibWidget)
+        # self.mSpeclibWidget.plotModel().close()
+        # self.mSpeclibWidget = None
+
+        #     self.mSpeclibWidget = None
 
     def speclibWidget(self) -> SpectralLibraryWidget:
         """
