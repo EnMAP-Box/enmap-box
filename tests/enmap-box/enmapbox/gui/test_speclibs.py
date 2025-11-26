@@ -55,6 +55,7 @@ class TestSpeclibs(EnMAPBoxTestCase):
 
         self.showGui(d)
 
+    @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'for gui testing only')
     def test_create_testobject(self):
         from enmapbox.gui.enmapboxgui import EnMAPBox
         from enmapbox.testing import TestObjects
@@ -65,6 +66,24 @@ class TestSpeclibs(EnMAPBoxTestCase):
         assert SpectralLibraryUtils.isSpectralLibrary(library)
         enmapBox.addSources([library])
         self.showGui(enmapBox.ui)
+        enmapBox.close()
+
+    def test_visualization_nodes(self):
+        from enmapbox.gui.enmapboxgui import EnMAPBox
+        from enmapbox.testing import TestObjects
+
+        enmapBox = EnMAPBox(load_core_apps=False, load_other_apps=False)
+        sl = TestObjects.createSpectralLibrary(profile_field_names=['profiles'], wlu='nanometers')
+        sl.setName('MySpeclib')
+
+        sl2 = TestObjects.createSpectralLibrary(profile_field_names=['profiles'], wlu='nanometers')
+        sl2.setName('MySpeclib2')
+        source = sl.source()
+        enmapBox.createSpectralLibraryDock(speclib=sl)
+        enmapBox.addSources([sl2])
+
+        self.showGui(enmapBox.ui)
+        enmapBox.close()
 
     @unittest.skip('TEST')
     def test_issue_1036(self):
