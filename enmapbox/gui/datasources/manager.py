@@ -263,7 +263,7 @@ class DataSourceManager(TreeModel):
                         foundSources.append(ds)
             elif isinstance(input, str):
                 for ds in allDataSources:
-                    if ds.dataItem().path() == input:
+                    if input in [ds.source(), ds.dataItem().path()]:
                         foundSources.append(ds)
 
         return foundSources

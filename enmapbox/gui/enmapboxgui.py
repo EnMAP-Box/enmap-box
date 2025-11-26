@@ -1651,6 +1651,14 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         if isinstance(dock, SpectralLibraryDock):
             self.spectralProfileSourcePanel().removeSpectralLibraryWidgets(dock.speclibWidget())
+
+            sid = dock.defaultSpeclib()
+            lyr = self.project().mapLayer(sid)
+            if isinstance(lyr, QgsVectorLayer) and lyr.dataProvider().name() == 'memory':
+                to_remove = [s for s in self.dataSources() if s == lyr.source()]
+                if len(to_remove) > 0:
+                    self.removeSources(to_remove)
+
         self.syncProjects()
 
         # lid = dock.speclib().id()
@@ -2154,17 +2162,17 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
     def dataSourceManagerTreeView(self):
         return self.ui.dataSourcePanel.dataSourceManagerTreeView()
 
-    def dataSources(self, sourceType='ALL', onlyUri: bool = True) -> Union[str, DataSource]:
+    def dataSources(self, sourceType='ALL', return_uri: bool = True) -> List[Union[str, DataSource]]:
         """
         Returns a list of URIs to the data sources of type "sourceType" opened in the EnMAP-Box
         :param sourceType: ['ALL', 'RASTER', 'VECTOR', 'MODEL'],
-        :param onlyUri: bool, set on False to return the DataSource object instead of the uri only.
+        :param return_uri: bool, set to False to return the DataSource object instead of the uri string.
         :return: [list-of-datasource-URIs (str)] or [list-of-DataSource instance] if onlyUri=False
         """
         if sourceType == 'ALL':
             sourceType = None
         sources = self.mDataSourceManager.dataSources(filter=sourceType)
-        if onlyUri:
+        if return_uri:
             sources = [s.source() for s in sources]
         return sources
 
