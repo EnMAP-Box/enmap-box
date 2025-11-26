@@ -97,6 +97,12 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
 
     def test_dock_cleanup(self):
 
+        import gc
+        gc.collect()
+        for d in [d for d in gc.get_objects() if
+                  isinstance(d, (Dock, DockTreeNode, SpectralLibraryWidget))]:
+            self.fail(f'Instance not garbage collected: {type(d)} = {d}')
+
         eb = EnMAPBox(load_core_apps=False, load_other_apps=False)
         eb.loadExampleData()
         QApplication.processEvents()
@@ -106,8 +112,6 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
             eb.setCurrentLocation(pt)
         eb.createSpectralLibraryDock(name='SL1')
 
-        # self.showGui(eb.ui)
-        # eb.close()
         for dock in eb.dockManager().docks():
             eb.dockManager().removeDock(dock)
             del dock
@@ -116,7 +120,7 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
 
         assert len(eb.docks()) == 0
         QApplication.processEvents()
-        import gc
+
         gc.collect()
         for d in [d for d in gc.get_objects() if
                   isinstance(d, (Dock, DockTreeNode, SpectralLibraryWidget))]:

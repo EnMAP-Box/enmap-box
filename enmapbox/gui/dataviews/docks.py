@@ -148,7 +148,7 @@ class Dock(pgDock):
 
     def setTitle(self, title):
         """
-        Override setTitle to emit a signal after title was changed
+        Override setTitle to emit a signal after the title was changed
         :param title:
         :return:
         """
@@ -774,7 +774,7 @@ class AttributeTableDock(Dock):
 
     def updateTitle(self, title: str):
         # we need to get a short name, not the entire title
-        self.setTitle(title.split('::')[0])
+        self.setTitle(title.split('::')[0].strip())
 
     def vectorLayer(self) -> QgsVectorLayer:
         return self.attributeTableWidget.mLayer
@@ -813,7 +813,6 @@ class SpectralLibraryDock(Dock):
         self.layout.addWidget(self.mSpeclibWidget)
         s = ""
         # speclib: QgsVectorLayer = self.mSpeclibWidget.speclib()
-
         # name = kwds.get('name')
         # if isinstance(name, str):
         #    speclib.setName(name)
@@ -821,6 +820,14 @@ class SpectralLibraryDock(Dock):
         # self.setTitle(speclib.name())
         # speclib.nameChanged.connect(lambda slib=speclib: self.setTitle(slib.name()))
         # self.sigTitleChanged.connect(speclib.setName)
+        self.mDefaultSpeclib: str = ''
+
+    def setDefaultSpeclib(self, speclibID: str):
+        assert isinstance(speclibID, str)
+        self.mDefaultSpeclib = speclibID
+
+    def defaultSpeclib(self) -> Optional[str]:
+        return self.mDefaultSpeclib
 
     def close(self):
         self.mSpeclibWidget.plotModel().close()

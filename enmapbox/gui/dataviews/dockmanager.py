@@ -760,19 +760,9 @@ class DockManager(QObject):
                 kwds['name'] = speclib.name()
             kwds['project'] = self.project()
             dock = SpectralLibraryDock(*args, **kwds)
-            # dock.speclibWidget().setProject(self.project())
-            # dock.speclib().willBeDeleted.connect(lambda *args, d=dock: self.removeDock(d))
+
             if isinstance(self.mMessageBar, QgsMessageBar):
                 dock.mSpeclibWidget.setMainMessageBar(self.mMessageBar)
-
-            # self.dataSourceManager().addDataSources(dock.speclib())
-
-            # if speclib is None:
-            #    sl = dock.speclib()
-            #    # speclib did not exists before and is an in-memory layer?
-            #    # remove source after closing the dock
-            #    if isinstance(sl, QgsVectorLayer) and sl.providerType() == 'memory':
-            #        dock.sigClosed.connect(lambda *args, slib=sl: self.dataSourceManager().removeDataSources([sl]))
 
         elif cls == AttributeTableDock:
             layer = kwds.pop('layer', None)

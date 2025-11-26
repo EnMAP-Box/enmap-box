@@ -59,6 +59,7 @@ from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSenti
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
 from processing.gui.ProcessingToolbox import ProcessingToolbox
 from qgis import utils as qgsUtils
+from qgis.PyQt.QtCore import QMetaType
 from qgis.PyQt.QtCore import QUrl
 from qgis.PyQt.QtCore import pyqtSignal, Qt, QObject, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
 from qgis.PyQt.QtGui import QDesktopServices
@@ -69,7 +70,7 @@ from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, Q
     QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
     QProgressBar, QMessageBox
 from qgis.PyQt.QtXml import QDomDocument
-from qgis.core import QgsBrowserModel
+from qgis.core import QgsBrowserModel, edit
 from qgis.core import QgsExpressionContextGenerator, QgsExpressionContext, QgsProcessingContext, \
     QgsExpressionContextUtils
 from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
@@ -77,7 +78,7 @@ from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
     QgsPointXY, QgsLayerTree, QgsLayerTreeLayer, QgsVectorLayerTools, \
     QgsZipUtils, QgsProjectArchive, QgsSettings, \
     QgsStyle, QgsSymbolLegendNode, QgsSymbol, QgsTaskManager, QgsApplication, QgsProcessingAlgRunnerTask
-from qgis.core import QgsRectangle
+from qgis.core import QgsRectangle, QgsField
 from qgis.gui import QgsMapCanvas, QgsMapTool, QgisInterface, QgsMessageBar, QgsMessageViewer, QgsMessageBarItem, \
     QgsMapLayerConfigWidgetFactory, QgsAttributeTableFilterModel, QgsSymbolSelectorDialog, \
     QgsSymbolWidgetContext
@@ -90,8 +91,10 @@ from .dataviews.docks import DockTypes
 from .mapcanvas import MapCanvas
 from .splashscreen.splashscreen import EnMAPBoxSplashScreen
 from .utils import enmapboxUiPath
+from .widgets.createspeclibdialog import CreateSpectralLibraryDialog
 from ..enmapboxsettings import EnMAPBoxSettings
 from ..qgispluginsupport.qps.processing.algorithmdialog import executeAlgorithm, AlgorithmDialog
+from ..qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
 from ..qgispluginsupport.qps.speclib.gui.spectralprofilecandidates import SpectralProfileCandidates
 
 MAX_MISSING_DEPENDENCY_WARNINGS = 3
@@ -1291,6 +1294,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.ui.mActionCreateNewMemoryLayer.triggered.connect(lambda *args: self.createNewLayer('memory'))
         self.ui.mActionCreateNewGeoPackageLayer.triggered.connect(lambda *args: self.createNewLayer('gpkg'))
         self.ui.mActionCreateNewShapefileLayer.triggered.connect(lambda *args: self.createNewLayer('shapefile'))
+        self.ui.mActionCreateNewSpeclib.triggered.connect(lambda *args: self.createNewLayer('speclib'))
 
         # activate map tools
 
@@ -1395,8 +1399,18 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         layertype = layertype.lower()
         layers = []
-        assert layertype in ['gpkg', 'memory', 'shapefile']
-        if layertype == 'gpkg':
+        assert layertype in ['gpkg', 'memory', 'shapefile', 'speclib']
+
+        if layertype == 'speclib':
+            s = ""
+            d = CreateSpectralLibraryDialog(self.ui)
+            if d.exec_() == QDialog.Accepted:
+                sl = d.create_speclib()
+                if isinstance(sl, QgsVectorLayer):
+                    self.project().addMapLayer(sl, False)
+                    layers.append(sl)
+
+        elif layertype == 'gpkg':
             d = QgsNewGeoPackageLayerDialog(self.ui)
             d.setCrs(defaultCrs)
             d.setAddToProject(False)
@@ -1553,9 +1567,44 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             # slw.plotWidget().backgroundBrush().setColor(QColor('black'))
             self.spectralProfileSourcePanel().addSpectralLibraryWidgets(slw)
             slw.sigFilesCreated.connect(self.addSources)
+
+            # create a standard in-memory library shown in the dock
+            sl = SpectralLibraryUtils.createSpectralLibrary(['profiles'])
+            sl.setName(f'{dock.name()}')
+            with edit(sl):
+                sl.addAttribute(QgsField('name', QMetaType.QString))
+            self.dataSourceManager().addDataSources([sl])
+            dock.setDefaultSpeclib(sl.id())
+            slw.createProfileVisualization(sl, 'profiles')
             self.dataSourceManager().addDataSources(slw.sourceLayers())
-            # self.dataSourceManager().addSource(slw.speclib())
-            # self.mapLayerStore().addMapLayer(slw.speclib(), addToLegend=False)
+
+            def updateName():
+                """Updates the name of the dock or default layer if the other has changed its name"""
+                s = self.sender()
+                if isinstance(s, SpectralLibraryDock):
+                    # change the layer name
+                    title = s.title()
+                    sid = s.defaultSpeclib()
+                    lyr = self.project().mapLayer(sid)
+                    if isinstance(lyr, QgsVectorLayer) and lyr.name() != title:
+                        lyr.setName(title)
+                elif isinstance(s, QgsVectorLayer):
+                    # change the dock title
+                    sid = s.id()
+                    title = s.name()
+                    for dock in self.docks(SpectralLibraryDock):
+                        assert isinstance(dock, SpectralLibraryDock)
+                        if dock.defaultSpeclib() == sid and dock.title() != title:
+                            dock.setTitle(title)
+
+            dock.sigTitleChanged.connect(updateName)
+            sl.nameChanged.connect(updateName)
+
+            bridge = self.spectralProfileSourcePanel().mBridge
+            bridge.addSpectralLibraryWidgets(slw)
+            node: SpectralFeatureGeneratorNode = bridge.createFeatureGenerator()
+            node.setSpeclib(sl)
+            bridge.setDefaultSources(node)
 
         if isinstance(dock, MapDock):
             canvas = dock.mapCanvas()
@@ -1602,6 +1651,14 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         if isinstance(dock, SpectralLibraryDock):
             self.spectralProfileSourcePanel().removeSpectralLibraryWidgets(dock.speclibWidget())
+
+            sid = dock.defaultSpeclib()
+            lyr = self.project().mapLayer(sid)
+            if isinstance(lyr, QgsVectorLayer) and lyr.dataProvider().name() == 'memory':
+                to_remove = [s for s in self.dataSources() if s == lyr.source()]
+                if len(to_remove) > 0:
+                    self.removeSources(to_remove)
+
         self.syncProjects()
 
         # lid = dock.speclib().id()
@@ -1628,6 +1685,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             panel.setUserVisible(True)
             panel.setProperty('has_been_shown_once', True)
 
+        # create a new dock if none exists
         if len(self.docks(SpectralLibraryDock)) == 0:
             self.createDock(SpectralLibraryDock)
 
@@ -2104,17 +2162,17 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
     def dataSourceManagerTreeView(self):
         return self.ui.dataSourcePanel.dataSourceManagerTreeView()
 
-    def dataSources(self, sourceType='ALL', onlyUri: bool = True) -> Union[str, DataSource]:
+    def dataSources(self, sourceType='ALL', return_uri: bool = True) -> List[Union[str, DataSource]]:
         """
         Returns a list of URIs to the data sources of type "sourceType" opened in the EnMAP-Box
         :param sourceType: ['ALL', 'RASTER', 'VECTOR', 'MODEL'],
-        :param onlyUri: bool, set on False to return the DataSource object instead of the uri only.
+        :param return_uri: bool, set to False to return the DataSource object instead of the uri string.
         :return: [list-of-datasource-URIs (str)] or [list-of-DataSource instance] if onlyUri=False
         """
         if sourceType == 'ALL':
             sourceType = None
         sources = self.mDataSourceManager.dataSources(filter=sourceType)
-        if onlyUri:
+        if return_uri:
             sources = [s.source() for s in sources]
         return sources
 
