@@ -237,13 +237,6 @@ class PIPPackage(object):
         """
         return ' '.join(self.installArgs(*args, **kwds))
 
-    def updateCommand(self) -> str:
-        """
-        Returns the update command as string
-        :return: str
-        """
-        return self.installCommand(upgrade=True)
-
     def isInstalled(self) -> bool:
         """
         Returns True if the package is installed and can be imported in python
@@ -401,7 +394,12 @@ def call_pip_command(pipArgs) -> Tuple[bool, Optional[str], Optional[str]]:
             sys.stdout = _std_out
             sys.stderr = _std_err
 
-        return success, msgOut.replace('\r\n', '\n'), msgErr.replace('\r\n', '\n')
+    if msgOut:
+        msgOut.replace('\r\n', '\n')
+
+    if msgErr:
+        msgErr.replace('\r\n', '\n')
+
     return success, msgOut, msgErr
 
 
@@ -631,13 +629,13 @@ def missingPackageInfo(missing_packages: List[PIPPackage], html=True) -> str:
     missing_packages = [p for p in missing_packages if isinstance(p, PIPPackage) and not p.isInstalled()]
     n = len(missing_packages)
     if n == 0:
-        return None
+        return ''
 
     from enmapbox import URL_INSTALLATION
     info = ['The following {} package(s) are not installed:'.format(n), '<ol>']
     for i, pkg in enumerate(missing_packages):
         assert isinstance(pkg, PIPPackage)
-        info.append('\t<li>{} (install by "{}")</li>'.format(pkg.pyPkgName, pkg.installCommand()))
+        info.append(f'\t<li>{pkg.pyPkgName} (pip install {pkg.pipPkgName})</li>')
 
     info.append('</ol>')
     info.append('<p>Please follow the installation guide <a href="{0}">{0}</a><br/>'.format(URL_INSTALLATION))
