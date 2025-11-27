@@ -25,7 +25,6 @@ from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import Spectral
 from enmapbox.qgispluginsupport.qps.utils import fid2pixelindices, SpatialPoint
 from enmapbox.testing import EnMAPBoxTestCase, start_app
 from enmapboxtestdata import fraction_polygon_l3, fraction_point_singletarget, enmap_srf_library
-from qgis.PyQt.QtWidgets import QDialog
 from qgis.core import QgsProject
 from qgis.core import QgsRasterLayer, QgsVectorLayer
 from qgis.gui import QgsMapLayerComboBox
@@ -48,10 +47,28 @@ class TestSpeclibs(EnMAPBoxTestCase):
     @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'blocking dialog')
     def test_create_spectrallibrary(self):
         d = CreateSpectralLibraryDialog()
-        if d.exec_() == QDialog.Accepted:
-            sl = d.create_speclib()
-            self.assertIsInstance(sl, QgsVectorLayer)
-            self.assertTrue(SpectralLibraryUtils.isSpectralLibrary(sl))
+
+        d.layer_name.setText('MyLayer')
+        d.radio_memory.setChecked(True)
+
+        sl = d.create_speclib()
+        self.assertIsInstance(sl, QgsVectorLayer)
+        self.assertEqual('MyLayer', sl.name())
+        self.assertTrue(SpectralLibraryUtils.isSpectralLibrary(sl))
+
+        d.radio_file.setChecked(True)
+
+        test_dir = self.createTestOutputDirectory()
+        path = test_dir / 'speclib.gpkg'
+        d.file_path.setText(str(path))
+
+        sl2 = d.create_speclib()
+        self.assertTrue(SpectralLibraryUtils.isSpectralLibrary(sl2))
+
+        from osgeo import gdal
+        ds = gdal.OpenEx(sl2.source(), gdal.OF_READONLY | gdal.OF_VECTOR)
+        self.assertEqual('MyLayer', ds.GetLayer(0).GetName())
+        self.assertEqual('MyLayer', sl2.name())
 
     @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'for gui testing only')
     def test_create_testobject(self):
