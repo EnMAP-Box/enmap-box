@@ -177,6 +177,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
         action = menu.addAction('Set CRS...')
         action.triggered.connect(mapCanvas.setCRSfromDialog)
 
+        menu.addSeparator()
         action = menu.addAction('Set background color')
         action.triggered.connect(mapCanvas.setBackgroundColorFromDialog)
 
