@@ -53,8 +53,6 @@ class TestSpeclibs(EnMAPBoxTestCase):
             self.assertIsInstance(sl, QgsVectorLayer)
             self.assertTrue(SpectralLibraryUtils.isSpectralLibrary(sl))
 
-        self.showGui(d)
-
     @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'for gui testing only')
     def test_create_testobject(self):
         from enmapbox.gui.enmapboxgui import EnMAPBox

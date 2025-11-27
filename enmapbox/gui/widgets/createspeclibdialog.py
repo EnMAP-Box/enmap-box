@@ -1,10 +1,11 @@
-from typing import List
+import os
+from typing import List, Optional
 
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
 from qgis.PyQt.QtWidgets import QFileDialog, QDialogButtonBox, QPushButton, QLineEdit, QHBoxLayout, QLabel, \
     QRadioButton, \
     QButtonGroup, QVBoxLayout, QDialog
-from qgis.core import QgsVectorLayer
+from qgis.core import QgsVectorLayer, QgsVectorFileWriter, QgsProject, QgsMapLayer
 
 
 class CreateSpectralLibraryDialog(QDialog):
@@ -25,6 +26,15 @@ class CreateSpectralLibraryDialog(QDialog):
 
     def _setup_ui(self):
         layout = QVBoxLayout()
+
+        # Layer Name input
+        name_layout = QVBoxLayout()
+        name_label = QLabel("Layer Name:")
+        self.name_input = QLineEdit("Spectral Library")
+        self.name_input.setPlaceholderText("Enter layer name")
+        name_layout.addWidget(name_label)
+        name_layout.addWidget(self.name_input)
+        layout.addLayout(name_layout)
 
         # Profile field names input
         field_layout = QVBoxLayout()
@@ -103,7 +113,17 @@ class CreateSpectralLibraryDialog(QDialog):
             list: List of field names, empty list if no input.
         """
         text = self.field_input.text().strip()
-        return list(set([name.strip() for name in text.split(',') if name.strip()]))
+        fields = [n.strip() for n in text.split(',')]
+        return list(set(fields))
+
+    def get_layer_name(self) -> str:
+        """
+        Returns the layer name from user input.
+
+        Returns:
+            str: Layer name.
+        """
+        return self.name_input.text().strip()
 
     def is_memory_storage(self) -> bool:
         """
@@ -114,7 +134,7 @@ class CreateSpectralLibraryDialog(QDialog):
         """
         return self._storage_in_memory
 
-    def get_file_path(self):
+    def get_file_path(self) -> Optional[str]:
         """
         Returns the file path if file storage is selected.
 
@@ -123,12 +143,30 @@ class CreateSpectralLibraryDialog(QDialog):
         """
         if self._storage_in_memory:
             return None
-        return self.file_path_input.text().strip() or None
+        else:
+            return self.file_path_input.text().strip()
 
     def create_speclib(self) -> QgsVectorLayer:
 
         profile_fields = self.get_profile_field_names()
         path = self.get_file_path()
-        sl = SpectralLibraryUtils.createSpectralLibrary(profile_fields=profile_fields)
+        layer_name = self.get_layer_name()
+        sl = SpectralLibraryUtils.createSpectralLibrary(profile_fields=profile_fields, name=layer_name)
+        if path:
+            ext = os.path.splitext(path)[1].lower()
+            options = QgsVectorFileWriter.SaveVectorOptions()
+            options.driverName = QgsVectorFileWriter.driverForExtension(ext)
+            r, errMsg, newPath, newLayer = QgsVectorFileWriter.writeAsVectorFormatV3(
+                sl,
+                path,
+                QgsProject.instance().transformContext(),
+                options
+            )
 
+            if not r == QgsVectorFileWriter.NoError:
+                raise Exception(f'Unable to create {path}\n{errMsg}')
+            slNew = QgsVectorLayer(newPath)
+            SpectralLibraryUtils.copyEditorWidgetSetup(slNew, sl)
+            slNew.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
+            sl = slNew
         return sl
