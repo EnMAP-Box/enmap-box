@@ -1,4 +1,4 @@
-from qgis._core import QgsFeature
+from qgis.core import QgsFeature
 
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
