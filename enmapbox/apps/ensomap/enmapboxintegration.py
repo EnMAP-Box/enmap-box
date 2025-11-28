@@ -30,7 +30,6 @@ from ensomap import APP_DIR
 import sys
 sys.path.insert(0, APP_DIR)
 # from ensomap_ui import EnSoMAP_UI
-from hys import __version__
 
 from PyQt5.QtCore    import *
 from PyQt5.QtWidgets import *
@@ -46,7 +45,7 @@ class EnSoMAP(EnMAPBoxApplication):
     def __init__(self, enmapBox, parent=None):
         super(EnSoMAP, self).__init__(enmapBox, parent=parent)
         self.name = 'EnSoMAP'
-        self.version = __version__
+        self.version = ''  # removed hys.__version__ (see https://github.com/EnMAP-Box/enmap-box/issues/1205)
         self.licence = 'TBD'
     
     def icon(self):
@@ -54,10 +53,11 @@ class EnSoMAP(EnMAPBoxApplication):
         return QIcon(pathIcon)
 
     def menu(self, appMenu):
+        import hys
         appMenu = self.enmapbox.menu('Applications')
         menu = appMenu.addMenu('Soil Applications')
         menu.setIcon(self.icon())
-        a = menu.addAction(f'EnSoMAP {self.version}')
+        a = menu.addAction(f'EnSoMAP {hys.__version__}')
         a.triggered.connect(self.startGUI)
         appMenu.addMenu(menu)
         return menu
