@@ -8,6 +8,8 @@ from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple
 
 import numpy as np
 import processing
+from PyQt5.QtGui import QTextDocument
+from PyQt5.QtWidgets import QApplication
 from osgeo import gdal
 from qgis.PyQt.QtCore import QVariant, QDateTime, QDate
 from qgis.PyQt.QtGui import QIcon
@@ -640,7 +642,12 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         return None
 
     def shortHelpString(self):
-        text = '<p>' + injectGlossaryLinks(self.shortDescription()) + '</p>'
+        headless = 'help' in QApplication.instance().arguments()
+
+        text = ''
+        if not headless:
+            text += '<p>' + injectGlossaryLinks(self.shortDescription()) + '</p>'
+
         if self.helpHeader() is not None:
             title, text2 = self.helpHeader()
             text += f' <i><h3>{title}</h3> </i><p>{injectGlossaryLinks(text2)}</p>'
@@ -648,6 +655,12 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             if text2 == '':
                 continue
             text += f'<h3>{name}</h3><p>{injectGlossaryLinks(text2)}</p>'
+
+        if headless:  # convert to plain text (see https://github.com/EnMAP-Box/enmap-box/issues/1348)
+            doc = QTextDocument()
+            doc.setHtml(text)
+            text = doc.toPlainText()
+
         return text
 
     def helpString(self):
