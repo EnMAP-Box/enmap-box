@@ -21,33 +21,27 @@
 """
 
 import os
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QAction
-from enmapbox.gui.applications import EnMAPBoxApplication
+import sys
 
+from enmapbox.gui.applications import EnMAPBoxApplication
 from ensomap import APP_DIR
 
-import sys
 sys.path.insert(0, APP_DIR)
 # from ensomap_ui import EnSoMAP_UI
 
-from PyQt5.QtCore    import *
+from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui     import *
+from PyQt5.QtGui import *
 
-import numpy as np
-import time
-
-import csv
 
 class EnSoMAP(EnMAPBoxApplication):
 
     def __init__(self, enmapBox, parent=None):
         super(EnSoMAP, self).__init__(enmapBox, parent=parent)
         self.name = 'EnSoMAP'
-        self.version = ''  # removed hys.__version__ (see https://github.com/EnMAP-Box/enmap-box/issues/1205)
+        self.version = 'undefined'  # removed hys.__version__ (see https://github.com/EnMAP-Box/enmap-box/issues/1205)
         self.licence = 'TBD'
-    
+
     def icon(self):
         pathIcon = os.path.join(APP_DIR, 'icon.png')
         return QIcon(pathIcon)
@@ -61,7 +55,7 @@ class EnSoMAP(EnMAPBoxApplication):
         a.triggered.connect(self.startGUI)
         appMenu.addMenu(menu)
         return menu
-    
+
     def startGUI(self, *args):
         import hys
         from hys.ui_map import ui_map
@@ -112,4 +106,3 @@ class EnSoMAP(EnMAPBoxApplication):
         w = EnSoMAP_UI(homedir)
         w.show()
         w.center()
-        
