@@ -95,6 +95,7 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
 
         QgsProject.instance().removeAllMapLayers()
 
+    @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'Manual testing only')
     def test_dock_cleanup(self):
 
         import gc

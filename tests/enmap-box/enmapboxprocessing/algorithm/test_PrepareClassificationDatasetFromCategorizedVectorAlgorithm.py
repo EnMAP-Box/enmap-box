@@ -116,10 +116,15 @@ class TestPrepareClassificationDatasetFromCategorizedVectorAlgorithm(TestCase):
 
     def test_sample_in_noDataRegion(self):
         alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
+
+        testdir = self.createTestOutputDirectory(max_length=100)
+        # filename0 = self.filename('sample.pkl')
+        filename = testdir / 'sample.pkl'
+
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
             alg.P_CATEGORIZED_VECTOR: points_in_no_data_region,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: str(filename)
         }
         self.runalg(alg, parameters)
         dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))

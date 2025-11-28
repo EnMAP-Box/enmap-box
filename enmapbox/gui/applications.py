@@ -427,7 +427,7 @@ class ApplicationRegistry(QObject):
             print('Check requirements...')
         isOk, errorMessages = EnMAPBoxApplication.checkRequirements(app)
         if not isOk:
-            self.sigLoadingInfo.emit(f'Unable to load {appWrapper.appId}', False)
+            self.sigLoadingInfo.emit(f'Unable to load {appWrapper.appId}')
             raise Exception(
                 'Unable to load EnMAPBoxApplication "{}"\n{}.'.format(appWrapper.appId, '\n\t'.join(errorMessages)))
         if appWrapper.appId in self.mAppWrapper.keys():
@@ -538,5 +538,5 @@ class ApplicationRegistry(QObject):
 
         import enmapbox.algorithmprovider
         provider = enmapbox.algorithmprovider.instance()
-        assert isinstance(provider, EnMAPBoxProcessingProvider)
-        provider.removeAlgorithms(appWrapper.processingAlgorithms)
+        if isinstance(provider, EnMAPBoxProcessingProvider):
+            provider.removeAlgorithms(appWrapper.processingAlgorithms)
