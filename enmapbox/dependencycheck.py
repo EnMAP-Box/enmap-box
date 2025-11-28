@@ -28,6 +28,7 @@ import logging
 import os
 import platform
 import re
+import subprocess
 import sys
 import time
 import traceback
@@ -357,12 +358,34 @@ def call_pip_command(pipArgs) -> Tuple[bool, Optional[str], Optional[str]]:
 
     success = 0
     msgOut = msgErr = None
-
     if True:
         pipexe = localPipExecutable()
+        cmd = [str(pipexe)] + pipArgs
+
+        kwargs = {}
+        if sys.platform == "win32":
+            # Prevent opening a console window
+            kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
+
+        result = subprocess.run(cmd,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE,
+                                text=True,
+                                **kwargs,
+                                )
+        success = result.returncode == 0
+        msgOut = result.stdout
+        msgErr = result.stderr
+        if success:
+            return success, msgOut, msgErr
+
+    if False:
+        pipexe = localPipExecutable()
         process = QProcess()
+        process.readyRead()
         process.start(f'{pipexe}' + ' '.join(pipArgs))
         process.waitForFinished()
+
         msgOut = decode_bytes(process.readAllStandardOutput().data())
         msgErr = decode_bytes(process.readAllStandardError().data())
         success = process.exitCode() == 0
