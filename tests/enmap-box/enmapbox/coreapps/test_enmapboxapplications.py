@@ -23,10 +23,7 @@ site.addsitedir(pathlib.Path(DIR_ENMAPBOX) / 'eo4qapps')
 class TestEnMAPBoxApplications(EnMAPBoxTestCase):
 
     def test_createtestdata(self):
-        EB: EnMAPBox = EnMAPBox.instance()
-        if not isinstance(EB, EnMAPBox):
-            EB = EnMAPBox()
-            EB.initEnMAPBoxApplications()
+        EB = EnMAPBox()
         all_ids = [a.id() for a in QgsApplication.processingRegistry().algorithms()]
 
         test_algs = [a for a in all_ids if a.startswith('enmapbox:CreateTest'.lower())]
