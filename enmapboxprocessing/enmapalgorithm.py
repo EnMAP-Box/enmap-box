@@ -8,11 +8,10 @@ from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple
 
 import numpy as np
 import processing
-from PyQt5.QtGui import QTextDocument
-from PyQt5.QtWidgets import QApplication
 from osgeo import gdal
 from qgis.PyQt.QtCore import QVariant, QDateTime, QDate
-from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtGui import QTextDocument, QIcon
+from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import (Qgis, QgsCategorizedSymbolRenderer, QgsCoordinateReferenceSystem, QgsMapLayer,
                        QgsPalettedRasterRenderer, QgsProcessing, QgsProcessingAlgorithm, QgsProcessingContext,
                        QgsProcessingException, QgsProcessingFeedback, QgsProcessingOutputLayerDefinition,
