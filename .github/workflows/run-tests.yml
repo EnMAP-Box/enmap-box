@@ -49,4 +49,4 @@ jobs:
         run: |
           chmod +x .env/docker/run_docker_tests.sh
           ls -la .env/docker
-          docker compose -f .env/docker/docker-compose.gh.yml run qgis /usr/src/.env/docker/run_docker_tests.sh -n auto --maxfail=2
+          docker compose -f .env/docker/docker-compose.gh.yml run qgis /usr/src/.env/docker/run_docker_tests.sh --maxfail=2
