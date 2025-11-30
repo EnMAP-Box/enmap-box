@@ -20,7 +20,6 @@
 import codecs
 import os
 import re
-import uuid
 from math import ceil
 from typing import List, Optional
 
@@ -31,18 +30,17 @@ from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea import DockArea
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.Dock import Dock as pgDock
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.Dock import DockLabel as pgDockLabel
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.DockArea import TempAreaWindow
+from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
 from enmapbox.qgispluginsupport.qps.utils import loadUi
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt import QtCore
-from qgis.PyQt.QtCore import pyqtSignal, QSettings, Qt, QMimeData, QPoint, QUrl, QObject, QSize, QByteArray
+from qgis.PyQt.QtCore import pyqtSignal, QSettings, Qt, QMimeData, QPoint, QUrl, QObject, QSize, QByteArray, QMetaType
 from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QResizeEvent, \
     QContextMenuEvent, QTextCursor
 from qgis.PyQt.QtWidgets import QToolButton, QMenu, QMainWindow, QFileDialog, QWidget, QMessageBox, QWidgetItem, \
     QApplication, QStyle, QProgressBar, QTextEdit
-from qgis.core import QgsCoordinateReferenceSystem, QgsMapLayer, QgsProject
-from qgis.core import QgsLayerTree
-from qgis.core import QgsLayerTreeLayer
-from qgis.core import QgsVectorLayer
+from qgis.core import QgsCoordinateReferenceSystem, QgsMapLayer, QgsProject, edit, QgsField, QgsLayerTree, \
+    QgsLayerTreeLayer, QgsVectorLayer
 from qgis.gui import QgsMapCanvas
 
 RX_HTML_FILE = re.compile(r'\.(html|html|xhtml)$', re.I)
@@ -93,7 +91,7 @@ class Dock(pgDock):
             pass
 
         self.progressBar = self.label.progressBar
-        self.uuid = uuid.uuid4()
+        # self.uuid = uuid.uuid4()
 
         # self.raiseOverlay()
 
@@ -149,7 +147,7 @@ class Dock(pgDock):
 
     def setTitle(self, title):
         """
-        Override setTitle to emit a signal after title was changed
+        Override setTitle to emit a signal after the title was changed
         :param title:
         :return:
         """
@@ -775,7 +773,7 @@ class AttributeTableDock(Dock):
 
     def updateTitle(self, title: str):
         # we need to get a short name, not the entire title
-        self.setTitle(title.split('::')[0])
+        self.setTitle(title.split('::')[0].strip())
 
     def vectorLayer(self) -> QgsVectorLayer:
         return self.attributeTableWidget.mLayer
@@ -806,15 +804,14 @@ class SpectralLibraryDock(Dock):
                  **kwds):
         super(SpectralLibraryDock, self).__init__(*args, **kwds)
 
-        self.mSpeclibWidget: SpectralLibraryWidget = SpectralLibraryWidget(parent=self, speclib=speclib,
+        self.mSpeclibWidget: SpectralLibraryWidget = SpectralLibraryWidget(speclib=speclib,
                                                                            project=project)
         self.mSpeclibWidget.setDelegateOpenRequests(True)
         # self.mSpeclibWidget.spectralLibraryPlotWidget().optionShowVisualizationSettings.setChecked(False)
         # self.mSpeclibWidget.sigLoadFromMapRequest.connect(self.sigLoadFromMapRequest)
         self.layout.addWidget(self.mSpeclibWidget)
-
+        s = ""
         # speclib: QgsVectorLayer = self.mSpeclibWidget.speclib()
-
         # name = kwds.get('name')
         # if isinstance(name, str):
         #    speclib.setName(name)
@@ -822,6 +819,57 @@ class SpectralLibraryDock(Dock):
         # self.setTitle(speclib.name())
         # speclib.nameChanged.connect(lambda slib=speclib: self.setTitle(slib.name()))
         # self.sigTitleChanged.connect(speclib.setName)
+        self.mDefaultSpeclibId: str = ''
+
+    def createDefaultSpeclib(self) -> QgsVectorLayer:
+        """
+        Creates an in-memory spectral library whose layer name is linked to the dock's name
+        """
+        sl = SpectralLibraryUtils.createSpectralLibrary(['profiles'])
+        sl.setName(f'{self.name()}')
+        with edit(sl):
+            sl.addAttribute(QgsField('name', QMetaType.QString))
+        self.speclibWidget().project().addMapLayer(sl)
+        # self.dataSourceManager().addDataSources([sl])
+        self.mDefaultSpeclibId = sl.id()
+        self.speclibWidget().createProfileVisualization(sl, 'profiles')
+
+        def updateName():
+            """Updates the name of the dock or default layer if the other has changed its name"""
+            s = self.sender()
+            if isinstance(s, SpectralLibraryDock):
+                # change the layer name
+                title = s.title()
+                lyr = s.defaultSpeclib()
+                if isinstance(lyr, QgsVectorLayer) and lyr.name() != title:
+                    lyr.setName(title)
+            elif isinstance(s, QgsVectorLayer):
+                # change the dock title
+                sid = s.id()
+                title = s.name()
+                for dock in self.docks(SpectralLibraryDock):
+                    assert isinstance(dock, SpectralLibraryDock)
+                    if dock.mDefaultSpeclibId == sid and dock.title() != title:
+                        dock.setTitle(title)
+
+        self.sigTitleChanged.connect(updateName)
+        sl.nameChanged.connect(updateName)
+        return sl
+
+    def defaultSpeclib(self) -> Optional[QgsVectorLayer]:
+        """
+        Returns the default speclib
+        """
+        return self.speclibWidget().project().mapLayer(self.mDefaultSpeclibId)
+
+    def close(self):
+        self.mSpeclibWidget.plotModel().close()
+        super().close()
+        # self.layout.removeWidget(self.mSpeclibWidget)
+        # self.mSpeclibWidget.plotModel().close()
+        # self.mSpeclibWidget = None
+
+        #     self.mSpeclibWidget = None
 
     def speclibWidget(self) -> SpectralLibraryWidget:
         """

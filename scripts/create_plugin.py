@@ -35,13 +35,13 @@ from typing import Union
 
 import docutils.core
 import markdown
-from qgis.core import QgsFileUtils, QgsUserProfile, QgsUserProfileManager
-from qgis.testing import start_app
 
 import enmapbox
 from enmapbox import DIR_REPO
 from enmapbox.qgispluginsupport.qps.make.deploy import QGISMetadataFileWriter, userProfileManager
 from enmapbox.qgispluginsupport.qps.utils import zipdir
+from qgis.core import QgsFileUtils, QgsUserProfile, QgsUserProfileManager
+from qgis.testing import start_app
 
 app = start_app()
 # consider default Git location on Windows systems to avoid creating a Start-Up Script
@@ -71,7 +71,7 @@ except (ImportError, ModuleNotFoundError) as ex:
 
 DIR_REPO = Path(DIR_REPO)
 
-PATH_CONFIG_FILE = DIR_REPO / '.plugin.ini'
+PATH_CONFIG_FILE = DIR_REPO / 'tox.ini'
 assert PATH_CONFIG_FILE.is_file()
 
 
@@ -123,7 +123,7 @@ def create_enmapbox_plugin(include_testdata: bool = False,
     config = configparser.ConfigParser()
     config.read(PATH_CONFIG_FILE)
 
-    MAX_PLUGIN_SIZE = int(config['plugin']['max_size_mb'])
+    MAX_PLUGIN_SIZE = int(config['enmapbox:plugin']['max_size_mb'])
     DIR_DEPLOY_LOCAL = DIR_REPO / 'deploy'
     DIR_QGIS_USERPROFILE: Path = None
 
@@ -148,7 +148,7 @@ def create_enmapbox_plugin(include_testdata: bool = False,
 
     REPO = git.Repo(DIR_REPO)
     active_branch = REPO.active_branch.name
-    VERSION = config['metadata']['version']
+    VERSION = config['enmapbox:metadata']['version']
     VERSION_SHA = REPO.active_branch.commit.hexsha
     lastCommitDate = REPO.active_branch.commit.authored_datetime
     timestamp = re.split(r'[.+]', lastCommitDate.isoformat())[0]
@@ -184,18 +184,18 @@ def create_enmapbox_plugin(include_testdata: bool = False,
 
     # set QGIS Metadata file values
     MD = QGISMetadataFileWriter()
-    MD.mName = config['metadata']['name']
-    MD.mDescription = config['metadata']['description']
-    MD.mTags = config['metadata']['tags'].strip().split('\n')
-    MD.mCategory = config['metadata']['category']
-    MD.mAuthor = config['metadata']['authors'].strip().split('\n')
-    MD.mIcon = config['metadata']['icon']
-    MD.mHomepage = config['metadata']['homepage']
-    MD.mAbout = markdownToHTML(pathAbout)
+    MD.mName = config['enmapbox:metadata']['name']
+    MD.mDescription = config['enmapbox:metadata']['description']
+    MD.mTags = config['enmapbox:metadata']['tags'].strip().split('\n')
+    MD.mCategory = config['enmapbox:metadata']['category']
+    MD.mAuthor = config['enmapbox:metadata']['authors'].strip().split('\n')
+    MD.mIcon = config['enmapbox:metadata']['icon']
+    MD.mHomepage = config['enmapbox:metadata']['homepage']
+    MD.mAbout = config.get('enmapbox:metadata', 'about').splitlines()
     MD.mTracker = enmapbox.ISSUE_TRACKER
     MD.mRepository = enmapbox.REPOSITORY
-    MD.mQgisMinimumVersion = config['metadata']['qgisMinimumVersion']
-    MD.mEmail = config['metadata']['email']
+    MD.mQgisMinimumVersion = config['enmapbox:metadata']['qgisMinimumVersion']
+    MD.mEmail = config['enmapbox:metadata']['email']
     MD.mHasProcessingProvider = True
     MD.mPlugin_dependencies = ['Google Earth Engine']  # the best way to make sure that the 'ee' module is available
 
@@ -207,16 +207,16 @@ def create_enmapbox_plugin(include_testdata: bool = False,
     compileEnMAPBoxResources()
 
     # copy EnMAP-Box icon source
-    path_icon_source = DIR_REPO / config['files']['icon']
-    path_icon_plugin = PLUGIN_DIR / config['metadata']['icon']
+    path_icon_source = DIR_REPO / config['enmapbox:files']['icon']
+    path_icon_plugin = PLUGIN_DIR / config['enmapbox:metadata']['icon']
     assert path_icon_source.is_file(), f'Icon source does not exists: {path_icon_source}'
     shutil.copy(path_icon_source, path_icon_plugin)
 
     # copy python and other resource files
     root = DIR_REPO.as_posix()
-    ignore_rx = [fileRegex(None, p) for p in config['files'].get('ignore').split()]
-    include_rx = [fileRegex(root, p) for p in config['files'].get('include').split()]
-    exclude_rx = [fileRegex(root, p) for p in config['files'].get('exclude').split()]
+    ignore_rx = [fileRegex(None, p) for p in config['enmapbox:files'].get('ignore').split()]
+    include_rx = [fileRegex(root, p) for p in config['enmapbox:files'].get('include').split()]
+    exclude_rx = [fileRegex(root, p) for p in config['enmapbox:files'].get('exclude').split()]
 
     files = []
     for file in scanfiles(DIR_REPO):

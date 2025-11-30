@@ -16,16 +16,20 @@ import os
 import tempfile
 import unittest
 
+from enmapbox import initEnMAPBoxResources
 from enmapbox.exampledata import landcover_polygon, enmap, hires
 from enmapbox.gui.datasources.datasources import VectorDataSource, RasterDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager
 from enmapbox.gui.dataviews.dockmanager import DockManager, SpeclibDockTreeNode, MapDockTreeNode, \
-    DockTreeView, DockManagerTreeModel, createDockTreeNode
-from enmapbox.gui.dataviews.docks import MapDock, DockArea, MimeDataDock, TextDock, SpectralLibraryDock, TextDockWidget
+    DockTreeView, DockManagerTreeModel, createDockTreeNode, DockTreeNode
+from enmapbox.gui.dataviews.docks import MapDock, DockArea, MimeDataDock, TextDock, SpectralLibraryDock, TextDockWidget, \
+    Dock
 from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.qgispluginsupport.qps.maptools import MapTools
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.Dock import Dock as pgDock
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.testing import EnMAPBoxTestCase, TestObjects, start_app
 from enmapboxtestdata import classificationDatasetAsPklFile, library_berlin
 from qgis.PyQt.QtWidgets import QApplication
@@ -34,6 +38,7 @@ from qgis.core import QgsProject, QgsVectorLayer, QgsRasterLayer, QgsLayerTreeMo
 from qgis.gui import QgsMapCanvas, QgsLayerTreeView
 
 start_app()
+initEnMAPBoxResources()
 
 
 class TestDocksAndDataSources(EnMAPBoxTestCase):
@@ -89,6 +94,45 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
                 DSM.removeDataSources(sources)
 
         QgsProject.instance().removeAllMapLayers()
+
+    @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'Manual testing only')
+    def test_dock_cleanup(self):
+
+        import gc
+        gc.collect()
+        for d in [d for d in gc.get_objects() if
+                  isinstance(d, (Dock, DockTreeNode, SpectralLibraryWidget))]:
+            self.fail(f'Instance not garbage collected: {type(d)} = {d}')
+
+        eb = EnMAPBox(load_core_apps=False, load_other_apps=False)
+        eb.loadExampleData()
+        QApplication.processEvents()
+        if True:
+            pt = SpatialPoint.fromMapCanvasCenter(eb.mapCanvas())
+            eb.setMapTool(MapTools.SpectralProfile)
+            eb.setCurrentLocation(pt)
+        eb.createSpectralLibraryDock(name='SL1')
+
+        for dock in eb.dockManager().docks():
+            eb.dockManager().removeDock(dock)
+            del dock
+
+        QApplication.processEvents()
+
+        assert len(eb.docks()) == 0
+        QApplication.processEvents()
+
+        gc.collect()
+        for d in [d for d in gc.get_objects() if
+                  isinstance(d, (Dock, DockTreeNode, SpectralLibraryWidget))]:
+            for r in gc.get_referrers(d):
+                for r2 in gc.get_referrers(r):
+                    for r3 in gc.get_referrers(r2):
+                        s = ""
+
+            raise Exception(f'Instance not garbage collected: {type(d)} = {d}')
+
+        self.showGui(eb.ui)
 
     def test_SpeclibDockNodes(self):
 

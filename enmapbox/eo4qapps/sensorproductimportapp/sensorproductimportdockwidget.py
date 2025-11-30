@@ -1,6 +1,12 @@
 from os import listdir
 from os.path import join, dirname, exists, basename, isdir, isfile
 
+from qgis.PyQt import uic
+from qgis.PyQt.QtCore import QEvent
+from qgis.PyQt.QtWidgets import QDockWidget, QLabel
+from qgis.core import QgsRasterLayer, QgsProject
+from qgis.gui import QgsDockWidget, QgisInterface
+
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mimedata import MDF_URILIST
 from enmapbox.typeguard import typechecked
@@ -19,16 +25,10 @@ from enmapboxprocessing.algorithm.importprismal2calgorithm import ImportPrismaL2
 from enmapboxprocessing.algorithm.importprismal2dalgorithm import ImportPrismaL2DAlgorithm
 from enmapboxprocessing.algorithm.importproductsdraganddropsupport import AlgorithmDialogWrapper
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
-from qgis.PyQt import uic
-from qgis.PyQt.QtCore import QEvent
-from qgis.PyQt.QtWidgets import QLabel
-from qgis.core import QgsProject
-from qgis.core import QgsRasterLayer
-from qgis.gui import QgsDockWidget, QgisInterface
 
 
 @typechecked
-class SensorProductImportDockWidget(QgsDockWidget):
+class SensorProductImportDockWidget(QDockWidget):
     mDropArea: QLabel
 
     EnmapBoxInterface, QgisInterface = 0, 1

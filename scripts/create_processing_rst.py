@@ -4,11 +4,12 @@ import json
 import os
 import re
 import subprocess
+import sys
 import warnings
 from concurrent.futures.thread import ThreadPoolExecutor
 from os import makedirs
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Tuple
 
 import enmapbox
 from enmapbox import DIR_REPO_TMP
@@ -321,19 +322,37 @@ def collectQgsProcessAlgorithmHelp(algorithms: List[QgsProcessingAlgorithm], run
     results = dict()
     n = len(algorithms)
 
+    result = subprocess.run(['qgis_process', 'plugins', 'enable', 'enmapboxplugin'],
+                            env=QGIS_PROCESS_ENV,
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE
+                            )
+    s = ""
+
+    def process_algorithm_help(alg) -> Tuple[bool, str, str]:
+        aid = alg.id()
+        try:
+            help = qgisProcessHelp(alg)
+        except Exception as ex:
+            return False, aid, str(ex)
+        return True, aid, help
+
     if not run_async:
         for alg in algorithms:
-            results[alg.id()] = qgisProcessHelp(alg)
+            success, aid, help_text = process_algorithm_help(alg)
+            if success:
+                results[alg.id()] = qgisProcessHelp(alg)
+            else:
+                print(f'Error processing algorithm {aid}: {help_text}', file=sys.stderr)
     else:
-        def process_algorithm(alg):
-            return alg.id(), qgisProcessHelp(alg)
 
         with ThreadPoolExecutor(max_workers=min(10, os.cpu_count())) as executor:
-            futures = executor.map(process_algorithm, algorithms)
+            futures = executor.map(process_algorithm_help, algorithms)
 
-        for alg_id, help_text in futures:
-            results[alg_id] = help_text
-
+        for success, alg_id, help_text in futures:
+            if success:
+                results[alg_id] = help_text
+            else:
+                print(f'Error processing algorithm {alg_id}: {help_text}', file=sys.stderr)
     return results
 
 

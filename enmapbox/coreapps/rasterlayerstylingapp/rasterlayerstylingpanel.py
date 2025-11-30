@@ -323,8 +323,9 @@ class RasterLayerStylingPanel(QgsDockWidget):
 
         if self.mRenderer.currentIndex() == self.RgbRendererTab:
             for mBand in [self.mRedBand, self.mGreenBand, self.mBlueBand]:
-                mBand.mBandNo.setLayer(layer)
-                mBand.mSlider.setRange(1, layer.bandCount())
+                with BlockSignals(mBand.mBandNo, mBand.mSlider):
+                    mBand.mBandNo.setLayer(layer)
+                    mBand.mSlider.setRange(1, layer.bandCount())
 
             renderer: QgsMultiBandColorRenderer = layer.renderer()
             if not isinstance(layer.renderer(), QgsMultiBandColorRenderer):
@@ -343,6 +344,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
                     mBand.mMin.setText(str(ce.minimumValue()))
                     mBand.mMax.setText(str(ce.maximumValue()))
                     mBand.mBandNo.setBand(bandNo)
+                    mBand.mSlider.setValue(bandNo)
 
         elif self.mRenderer.currentIndex() == self.GrayRendererTab:
             self.mGrayBand.mBandNo.setLayer(layer)
@@ -361,6 +363,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 self.mGrayBand.mMin.setText(str(ce.minimumValue()))
                 self.mGrayBand.mMax.setText(str(ce.maximumValue()))
                 self.mGrayBand.mBandNo.setBand(renderer.inputBand())
+                self.mGrayBand.mSlider.setValue(renderer.inputBand())
 
         elif self.mRenderer.currentIndex() == self.PseudoRendererTab:
             self.mPseudoBand.mBandNo.setLayer(layer)
@@ -379,6 +382,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 self.mPseudoBand.mMin.setText(str(shader.minimumValue()))
                 self.mPseudoBand.mMax.setText(str(shader.maximumValue()))
                 self.mPseudoBand.mBandNo.setBand(renderer.inputBand())
+                self.mPseudoBand.mSlider.setValue(renderer.inputBand())
 
         elif self.mRenderer.currentIndex() == self.DefaultRendererTab:
             layer.setRenderer(self.originalRenderer.clone())
@@ -498,12 +502,17 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 self.mRedBand.mBandNo.setBand(renderer.redBand())
                 self.mGreenBand.mBandNo.setBand(renderer.greenBand())
                 self.mBlueBand.mBandNo.setBand(renderer.blueBand())
+                self.mRedBand.mSlider.setValue(renderer.redBand())
+                self.mGreenBand.mSlider.setValue(renderer.greenBand())
+                self.mBlueBand.mSlider.setValue(renderer.blueBand())
         elif isinstance(renderer, QgsSingleBandGrayRenderer):
             with BlockSignals(self.mGrayBand):
                 self.mGrayBand.mBandNo.setBand(renderer.inputBand())
+                self.mGrayBand.mSlider.setValue(renderer.inputBand())
         elif isinstance(renderer, QgsSingleBandPseudoColorRenderer):
             with BlockSignals(self.mPseudoBand.mBandNo):
                 self.mPseudoBand.mBandNo.setBand(renderer.inputBand())
+                self.mPseudoBand.mSlider.setValue(renderer.inputBand())
         else:
             pass
 
@@ -570,11 +579,13 @@ class RasterLayerStylingPanel(QgsDockWidget):
         layer: QgsRasterLayer = self.mLayer.currentLayer()
         if layer is None:
             return
+        extent = self.currentExtent(layer, self.mExtent.currentIndex())
+        if extent is None:
+            return
 
         def setCumulativeCut(bandNo: int, mBandMin: QLineEdit, mBandMax: QLineEdit):
             vmin, vmax = layer.dataProvider().cumulativeCut(
-                bandNo, self.mP1.value() / 100., self.mP2.value() / 100.,
-                self.currentExtent(layer, self.mExtent.currentIndex()),
+                bandNo, self.mP1.value() / 100., self.mP2.value() / 100., extent,
                 self.currentSampleSize(self.mAccuracy.currentIndex())
             )
 
@@ -896,22 +907,24 @@ class RasterLayerStylingPanel(QgsDockWidget):
         else:
             self.mGroupBoxTransparency.hide()
 
-    def currentExtent(self, layer: QgsRasterLayer, statisticsType: int) -> QgsRectangle:
+    def currentExtent(self, layer: QgsRasterLayer, statisticsType: int) -> Optional[QgsRectangle]:
 
         if statisticsType == self.WholeRasterStatistics:
             return layer.extent()
         elif statisticsType == self.CurrentCanvasStatistics:
             mapCanvas = self.currentMapCanvas(layer)
+            if mapCanvas is None:
+                return None
             return SpatialExtent(mapCanvas.crs(), mapCanvas.extent()).toCrs(layer.crs())
         else:
             raise ValueError()
 
-    def currentMapCanvas(self, layer: QgsRasterLayer) -> MapCanvas:
+    def currentMapCanvas(self, layer: QgsRasterLayer) -> Optional[MapCanvas]:
 
         for mapDock in self.enmapBox.dockManager().mapDocks():
             if layer in mapDock.mapCanvas().layers():
                 return mapDock.mapCanvas()
-        raise ValueError()
+        return None
 
     def currentSampleSize(self, accuracyType: int) -> int:
         if accuracyType == self.EstimatedAccuracy:

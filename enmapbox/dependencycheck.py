@@ -22,12 +22,10 @@
 import csv
 import datetime
 import enum
-import importlib
-import io
+import importlib.util
 import json
 import logging
 import os
-import pathlib
 import platform
 import re
 import subprocess
@@ -35,8 +33,6 @@ import sys
 import time
 import traceback
 import typing
-import warnings
-from contextlib import redirect_stderr, redirect_stdout
 from importlib.machinery import ModuleSpec
 from io import StringIO
 from pathlib import Path
@@ -100,7 +96,7 @@ for k in PACKAGE_LOOKUP.keys():
 class PIPPackage(object):
 
     @staticmethod
-    def fromDict(info) -> 'PIPPackage':
+    def fromDict(info) -> Optional['PIPPackage']:
         """
         Create a PIPPackage from data stored in a dictionary.
         :param info: dict
@@ -220,34 +216,6 @@ class PIPPackage(object):
             return False
         return self.pyPkgName == other.pyPkgName
 
-    def installPackage(self, *args, **kwds):
-        warnings.warn(DeprecationWarning('installPackage was deactivated'))
-        return
-
-        self.stderrMsg = ''
-        self.stdoutMsg = ''
-
-        if self.pipPkgName in INSTALLATION_BLOCK.keys():
-            self.stdoutMsg = ''
-            self.stderrMsg = 'Blocked pip install {}'.format(self.pipPkgName) + \
-                             '\nReason: {}'.format(INSTALLATION_BLOCK[self.pipPkgName]) + \
-                             '\nPlease install manually with your local package manager'
-        else:
-            args = self.installArgs(*args, **kwds)
-            cmd = ' '.join(args)
-            try:
-                process = subprocess.run(cmd,
-                                         check=True,
-                                         shell=True,
-                                         stdout=subprocess.PIPE,
-                                         stderr=subprocess.PIPE,
-                                         universal_newlines=True)
-                self.stdoutMsg = str(process.stdout)
-            except subprocess.CalledProcessError as ex:
-                self.stderrMsg = ex.stderr
-            except Exception as ex2:
-                self.stderrMsg = str(ex2)
-
     def installArgs(self, user: bool = True, upgrade: bool = False) -> List[str]:
 
         # find path of local pip executable
@@ -270,13 +238,6 @@ class PIPPackage(object):
         """
         return ' '.join(self.installArgs(*args, **kwds))
 
-    def updateCommand(self) -> str:
-        """
-        Returns the update command as string
-        :return: str
-        """
-        return self.installCommand(upgrade=True)
-
     def isInstalled(self) -> bool:
         """
         Returns True if the package is installed and can be imported in python
@@ -296,7 +257,7 @@ class PIPPackage(object):
         return self.mIsInstalled is True
 
 
-_LOCAL_PIPEXE: Path = None
+_LOCAL_PIPEXE: Optional[Path] = None
 
 
 def get_prog() -> str:
@@ -354,15 +315,15 @@ def localPipExecutable() -> Path:
     return _LOCAL_PIPEXE
 
 
-def localPythonExecutable() -> pathlib.Path:
+def localPythonExecutable() -> Optional[Path]:
     """
     Searches for the local python executable
     :return:
     """
-    candidates = [pathlib.Path(sys.executable)]
+    candidates = [Path(sys.executable)]
     pythonhome = os.environ.get('PYTHONHOME', None)
     if pythonhome:
-        pythonhome = pathlib.Path(pythonhome)
+        pythonhome = Path(pythonhome)
         ext = ''
         if 'windows' in platform.uname().system.lower():
             ext = '.exe'
@@ -373,14 +334,16 @@ def localPythonExecutable() -> pathlib.Path:
             ])
 
     for c in candidates:
-        c = pathlib.Path(c.resolve())
+        c = Path(c.resolve())
         if c.is_file() and 'python' in c.name.lower():
             return c
 
     return None
 
 
-def decode_bytes(bytes_str, encodings=['utf-8', 'latin-1', 'ascii']):
+def decode_bytes(bytes_str, encodings=None):
+    if encodings is None:
+        encodings = ['utf-8', 'latin-1', 'ascii']
     for encoding in encodings:
         try:
             return bytes_str.decode(encoding)
@@ -390,37 +353,44 @@ def decode_bytes(bytes_str, encodings=['utf-8', 'latin-1', 'ascii']):
     return None
 
 
-def call_pip_command(pipArgs):
+def call_pip_command(pipArgs) -> Tuple[bool, Optional[str], Optional[str]]:
     assert isinstance(pipArgs, list)
 
     success = 0
     msgOut = msgErr = None
-
     if True:
         pipexe = localPipExecutable()
+        cmd = [str(pipexe)] + pipArgs
+
+        kwargs = {}
+        if sys.platform == "win32":
+            # Prevent opening a console window
+            kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
+
+        result = subprocess.run(cmd,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE,
+                                text=True,
+                                **kwargs,
+                                )
+        success = result.returncode == 0
+        msgOut = result.stdout
+        msgErr = result.stderr
+        if success:
+            return success, msgOut, msgErr
+
+    if False:
+        pipexe = localPipExecutable()
         process = QProcess()
-        process.start(f'{pipexe} ' + ' '.join(pipArgs))
+        process.readyRead()
+        process.start(f'{pipexe}' + ' '.join(pipArgs))
         process.waitForFinished()
+
         msgOut = decode_bytes(process.readAllStandardOutput().data())
         msgErr = decode_bytes(process.readAllStandardError().data())
         success = process.exitCode() == 0
         if success or msgErr != '':
             return success, msgOut.replace('\r\n', '\n'), msgErr.replace('\r\n', '\n')
-
-    if False:
-        with redirect_stdout(io.StringIO()) as f_out, redirect_stderr(io.StringIO) as f_err:
-            try:
-                cmd_name, cmd_args = parse_command(pipArgs)
-                cmd = create_command(cmd_name, isolated=("--isolated" in cmd_args))
-                result = cmd.main(cmd_args)
-                msgOut = f_out.getvalue()
-                msgErr = f_err.getvalue()
-                success = result == 0
-            except Exception as ex:
-                success = False
-                msgErr = str(ex)
-
-        return success, msgOut, msgErr
 
     if True:
         _std_out = sys.stdout
@@ -447,7 +417,13 @@ def call_pip_command(pipArgs):
             sys.stdout = _std_out
             sys.stderr = _std_err
 
-        return success, msgOut.replace('\r\n', '\n'), msgErr.replace('\r\n', '\n')
+    if msgOut:
+        msgOut.replace('\r\n', '\n')
+
+    if msgErr:
+        msgErr.replace('\r\n', '\n')
+
+    return success, msgOut, msgErr
 
 
 class PIPPackageInfoTask(QgsTask):
@@ -458,15 +434,19 @@ class PIPPackageInfoTask(QgsTask):
     sigPackageInfo = pyqtSignal(list)
 
     def __init__(self, description: str = 'Update PyPI Status',
-                 packages_of_interest: List[str] = [],
+                 packages_of_interest=None,
                  batch_size: int = 20,
                  poi_only: bool = False,
                  search_updates: bool = True,
                  search_info: bool = True,
                  callback=None):
         super().__init__(description, QgsTask.CanCancel)
+
+        if packages_of_interest is None:
+            packages_of_interest = []
         for p in packages_of_interest:
             assert isinstance(p, str)
+
         self._pois: List[str] = packages_of_interest
         self._callback = callback
         self._messages: Dict[str, Tuple[bool, str, str]] = dict()
@@ -597,48 +577,16 @@ class InstallationState(enum.Enum):
     LoadingError = '<loading error>'
 
 
-class PIPInstallCommandTask(QgsTask):
-    sigMessage = pyqtSignal(str, bool)
-
-    def __init__(self, description: str, packages: List[PIPPackage], upgrade=True, user=True, callback=None):
-        super().__init__(description, QgsTask.CanCancel)
-        self.packages: List[PIPPackage] = packages
-        self.callback = callback
-        self.mUpgrade: bool = upgrade
-        self.mUser: bool = user
-
-    def run(self):
-        n = len(self.packages)
-        for i, pkg in enumerate(self.packages):
-            assert isinstance(pkg, PIPPackage)
-            self.sigMessage.emit(pkg.installCommand(user=self.mUser, upgrade=self.mUpgrade), False)
-            pkg.installPackage(user=self.mUser, upgrade=self.mUpgrade)
-            if len(pkg.stdoutMsg) > 0:
-                self.sigMessage.emit(pkg.stdoutMsg, False)
-            if len(pkg.stderrMsg) > 0:
-                self.sigMessage.emit(pkg.stderrMsg, True)
-
-            if self.isCanceled():
-                return False
-            self.setProgress(i + 1)
-        return True
-
-    def finished(self, result):
-
-        if self.callback is not None:
-            self.callback(result, self)
-
-
 def checkGDALIssues() -> List[str]:
     """
     Tests for known GDAL issues
     :return: list of errors / known problems
     """
-    from osgeo import ogr
+    from osgeo import gdal
     issues = []
-    drv = ogr.GetDriverByName('GPKG')
+    drv = gdal.GetDriverByName('GPKG')
 
-    if not isinstance(drv, ogr.Driver):
+    if not isinstance(drv, gdal.Driver):
         info = 'GDAL/OGR installation does not support the GeoPackage (GPKG) vector driver'
         info += '(https://gdal.org/drivers/vector/gpkg.html).\n'
         issues.append(info)
@@ -704,13 +652,13 @@ def missingPackageInfo(missing_packages: List[PIPPackage], html=True) -> str:
     missing_packages = [p for p in missing_packages if isinstance(p, PIPPackage) and not p.isInstalled()]
     n = len(missing_packages)
     if n == 0:
-        return None
+        return ''
 
     from enmapbox import URL_INSTALLATION
     info = ['The following {} package(s) are not installed:'.format(n), '<ol>']
     for i, pkg in enumerate(missing_packages):
         assert isinstance(pkg, PIPPackage)
-        info.append('\t<li>{} (install by "{}")</li>'.format(pkg.pyPkgName, pkg.installCommand()))
+        info.append(f'\t<li>{pkg.pyPkgName} (pip install {pkg.pipPkgName})</li>')
 
     info.append('</ol>')
     info.append('<p>Please follow the installation guide <a href="{0}">{0}</a><br/>'.format(URL_INSTALLATION))
@@ -753,8 +701,9 @@ def installTestData(overwrite_existing: bool = False, ask: bool = True):
         app = start_app()
     from enmapbox import URL_TESTDATA
     from enmapbox import DIR_EXAMPLEDATA
-    if ask is True:
-        btn = QMessageBox.question(None, 'Testdata is missing or outdated',
+    if ask:
+        btn = QMessageBox.question(None,
+                                   'Testdata is missing or outdated',
                                    'Download testdata from \n{}\n?'.format(URL_TESTDATA))
         if btn != QMessageBox.Yes:
             print('Canceled')
@@ -773,7 +722,7 @@ def installTestData(overwrite_existing: bool = False, ask: bool = True):
         print('Download completed')
         print('Unzip {}...'.format(pathLocalZip))
 
-        targetDir = pathlib.Path(DIR_EXAMPLEDATA)
+        targetDir = Path(DIR_EXAMPLEDATA)
         examplePkgName = targetDir.name
         os.makedirs(targetDir, exist_ok=True)
         import zipfile
@@ -788,7 +737,7 @@ def installTestData(overwrite_existing: bool = False, ask: bool = True):
             if not n.endswith('/'):
                 m = rx.match(n)
                 if isinstance(m, Match):
-                    subPaths.append(pathlib.Path(m.group(1)))
+                    subPaths.append(Path(m.group(1)))
 
         assert len(subPaths) > 0, \
             f'Downloaded zip file does not contain data with sub-paths {examplePkgName}/*:\n\t{pathLocalZip}'
@@ -1177,7 +1126,7 @@ class PIPPackageInstaller(QWidget):
         super().__init__(*args, **kwds)
         from enmapbox.gui.utils import loadUi
         from enmapbox import DIR_UIFILES
-        path = pathlib.Path(DIR_UIFILES) / 'pippackageinstaller.ui'
+        path = Path(DIR_UIFILES) / 'pippackageinstaller.ui'
         loadUi(path, self)
 
         self.mWarned = False
@@ -1233,43 +1182,11 @@ class PIPPackageInstaller(QWidget):
         p = int(progress)
         self.progressBar.setValue(p)
 
-    def onCompleted(self, result: bool, task: PIPInstallCommandTask):
-        if isinstance(task, PIPInstallCommandTask) and not sip.isdeleted(task):
-            for pkg in task.packages:
-                self.model.updatePackage(pkg)
-
-            self.onRemoveTask(id(task))
-            self.loadPIPVersionInfo(task.packages, load_latest_versions=False)
-        elif isinstance(task, PIPPackageInfoTask) and not sip.isdeleted(task):
-            s = ""
+    def onCompleted(self, result: bool, task: QgsTask):
+        if isinstance(task, PIPPackageInfoTask) and not sip.isdeleted(task):
             self.onRemoveTask(id(task))
 
         self.progressBar.setValue(0)
-
-    def installAll(self):
-        warnings.warn(DeprecationWarning(), stacklevel=2)
-        return
-        self.installPackages([p for p in self.model if not p.isInstalled()])
-
-    def installPackages(self, packages: List[PIPPackage]):
-        warnings.warn(DeprecationWarning(), stacklevel=2)
-        return
-
-        if not self.showWarning():
-            return
-        for p in packages:
-            assert isinstance(p, PIPPackage)
-        pkgs = []
-        for p in packages:
-            if p not in pkgs:
-                pkgs.append(p)
-        # pkgs = [copy.deepcopy(p) for p in packages]
-        pkgs = packages
-        self.progressBar.setRange(0, len(pkgs))
-        self.progressBar.setValue(-1)
-
-        qgsTask = PIPInstallCommandTask('PIP installation', pkgs, callback=self.onCompleted)
-        self.startTask(qgsTask)
 
     def reloadPythonPackages(self, pipPackages: List[PIPPackage]):
         import importlib

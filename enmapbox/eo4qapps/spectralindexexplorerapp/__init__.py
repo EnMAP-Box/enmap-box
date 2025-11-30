@@ -61,7 +61,7 @@ class SpectralIndexExplorerApp(EnMAPBoxApplication):
         self.dock.setInterface(interface)
 
     def toggleDockVisibility(self):
-        self.dock.setUserVisible(not self.dock.isUserVisible())
+        self.dock.setVisible(not self.dock.isVisible())
 
     def processingAlgorithms(self) -> List[QgsProcessingAlgorithm]:
         return [SpectralIndexLayerAlgorithm()]

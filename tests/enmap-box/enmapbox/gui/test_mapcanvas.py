@@ -133,10 +133,10 @@ class MapCanvasTests(EnMAPBoxTestCase):
 
     def test_mapCrosshairDistance(self):
 
-        lyrWorld = QgsRasterLayer(TestObjects.uriWMS(), 'Background', 'wms')
+        # lyrWorld = QgsRasterLayer(TestObjects.uriWMS(), 'Background', 'wms')
         lyrEnMAP = TestObjects.createRasterLayer()
         assert lyrEnMAP.isValid()
-        layers = [lyrEnMAP, lyrWorld]
+        layers = [lyrEnMAP]
 
         canvas = MapCanvas()
         canvas.setProject(QgsProject.instance())

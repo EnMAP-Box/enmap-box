@@ -6,14 +6,19 @@ from shutil import copyfile
 from typing import Optional, List, Dict
 
 import numpy as np
+import processing
+from qgis.PyQt import uic
+from qgis.PyQt.QtWidgets import QComboBox, QTableWidget, QCheckBox, QToolButton, QLineEdit, QWidget, QLabel, QDockWidget
+from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsVectorLayer, QgsProcessingFeatureSourceDefinition, \
+    QgsFeatureRequest, QgsWkbTypes, QgsFeature, QgsProject
+from qgis.gui import QgsMapLayerComboBox, QgsFileWidget, QgsRasterBandComboBox, QgsDockWidget, QgisInterface
 
 import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
-import processing
-from enmapbox.gui.dataviews.docks import SpectralLibraryDock
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyleButton, PlotStyle
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import prepareProfileValueDict
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
+from enmapbox.testing import TestObjects
 from enmapbox.typeguard import typechecked, check_type
 from enmapbox.utils import findEnmapBoxGuiWidgets, findQgisGuiWidgets
 from enmapboxprocessing.algorithm.subsetrasterbandsalgorithm import SubsetRasterBandsAlgorithm
@@ -21,15 +26,10 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp import MapTool, GeeTimeseriesExplorerDockWidget, GeeTemporalProfileDockWidget
 from profileanalyticsapp.profileanalyticseditorwidget import ProfileAnalyticsEditorWidget
-from qgis.PyQt import uic
-from qgis.PyQt.QtWidgets import QComboBox, QTableWidget, QCheckBox, QToolButton, QLineEdit, QWidget, QLabel
-from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsVectorLayer, QgsProcessingFeatureSourceDefinition, \
-    QgsFeatureRequest, QgsWkbTypes, QgsFeature, QgsProject
-from qgis.gui import QgsMapLayerComboBox, QgsFileWidget, QgsRasterBandComboBox, QgsDockWidget, QgisInterface
 
 
 @typechecked
-class ProfileAnalyticsDockWidget(QgsDockWidget):
+class ProfileAnalyticsDockWidget(QDockWidget):
     mGraphicsLayoutWidget: pg.GraphicsLayoutWidget
 
     # data tab
@@ -58,6 +58,8 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
     GeeTemporalProfileType, GeePixelProfileType = 0, 1
     NumberUnits, NanometerUnits, DecimalYearUnits = 0, 1, 2
     EnmapBoxInterface, QgisInterface = 0, 1
+
+    mLibrary: Optional[QgsVectorLayer] = None
 
     def __init__(self, currentLocationMapTool: Optional[MapTool], parent=None):
         QgsDockWidget.__init__(self, parent)
@@ -302,8 +304,14 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
         if self.interface is None:  # not yet initialized
             return
 
-        if not self.isUserVisible():
+        if not self.isVisible():
             return
+
+        if self.mLibrary is None:
+            if self.interfaceType == self.EnmapBoxInterface:
+                self.mLibrary = TestObjects.createSpectralLibrary(profile_field_names=['profiles'], wlu='nanometers')
+                self.mLibrary.setName('Profile Analytics')
+                self.enmapBoxInterface().addSources([self.mLibrary])
 
         self.mPlotWidget.clear()
 
@@ -613,25 +621,20 @@ class ProfileAnalyticsDockWidget(QgsDockWidget):
                     assert isinstance(dialog, ProfileAnalyticsEditorWidget)
                     dialog.mLog.setText(msg)
 
-        # link profiles into Spectral Views (see #530)
-        if self.mShowInSpectralView.isChecked():
-            for dock in self.enmapBoxInterface().docks():
-                if isinstance(dock, SpectralLibraryDock):
-                    currentProfiles = list()
-                    currentStyles = dict()
-                    allProfiles = profiles + ufuncProfiles
-                    for id, profile in enumerate(allProfiles):
-                        profileValueDict = prepareProfileValueDict(
-                            profile.xValues, profile.yValues, profile.xUnit)
-                        feature = QgsFeature()
-                        feature.setId(id)
-                        feature.setFields(dock.speclib().fields())
-                        feature.setAttribute('name', profile.name)
-                        feature.setAttribute('profiles', profileValueDict)
-                        currentStyles[(feature.id(), 'profiles')] = profile.style
-                        currentProfiles.append(feature)
-
-                    dock.speclibWidget().setCurrentProfiles(currentProfiles, None, currentStyles)
+        # add profiles to library (for potential visualization in a Spectral View)
+        allProfiles = profiles + ufuncProfiles
+        self.mLibrary.dataProvider().truncate()  # delete all features
+        self.mLibrary.startEditing()
+        for id, profile in enumerate(allProfiles):
+            profileValueDict = prepareProfileValueDict(
+                profile.xValues, profile.yValues, profile.xUnit)
+            feature = QgsFeature()
+            feature.setId(id)
+            feature.setFields(self.mLibrary.fields())
+            feature.setAttribute('name', profile.name)
+            feature.setAttribute('profiles', profileValueDict)
+            self.mLibrary.addFeatures([feature])
+        self.mLibrary.commitChanges()
 
         # set x axis title
         if self.mSourceType.currentIndex() == self.RasterLayerSource:

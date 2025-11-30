@@ -177,6 +177,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
         action = menu.addAction('Set CRS...')
         action.triggered.connect(mapCanvas.setCRSfromDialog)
 
+        menu.addSeparator()
         action = menu.addAction('Set background color')
         action.triggered.connect(mapCanvas.setBackgroundColorFromDialog)
 
@@ -382,13 +383,13 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                                 treeView.openInMap(s, d))
                     else:
                         sub.setEnabled(False)
-
+                project = self.enmapBox().project()
                 a = menu.addAction('Open Spectral Library Viewer')
                 a.triggered.connect(
-                    lambda *args, s=node: treeView.openInSpeclibEditor(node.asMapLayer()))
+                    lambda *args, s=node: treeView.openInSpeclibEditor(node.asMapLayer(project=project)))
 
                 a = menu.addAction('Open Attribute Table')
-                a.triggered.connect(lambda *args, s=node: treeView.openInAttributeEditor(s.asMapLayer()))
+                a.triggered.connect(lambda *args, s=node: treeView.openInAttributeEditor(s.asMapLayer(project=project)))
 
                 a = menu.addAction('Open in QGIS')
                 if isinstance(qgis.utils.iface, QgisInterface):

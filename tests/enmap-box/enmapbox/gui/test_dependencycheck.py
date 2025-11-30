@@ -22,7 +22,7 @@ from typing import List, Tuple
 
 from enmapbox.dependencycheck import PIPPackage, requiredPackages, PIPPackageInstaller, PIPPackageInfoTask, \
     localPythonExecutable, missingPackageInfo, checkGDALIssues, PIPPackageInstallerTableModel, \
-    call_pip_command, localPipExecutable
+    call_pip_command, localPipExecutable, installTestData
 from enmapbox.testing import EnMAPBoxTestCase, start_app
 from qgis.PyQt.QtCore import QProcess
 from qgis.PyQt.QtGui import QMovie
@@ -41,6 +41,11 @@ class test_dependencycheck(EnMAPBoxTestCase):
         self.assertIsInstance(issues, list)
         for i in issues:
             self.assertIsInstance(i, str)
+
+    @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'Skipped, manual testing only and blocking dialog')
+    def test_installTestData(self):
+
+        installTestData(overwrite_existing=True, ask=True)
 
     def test_pip_call(self):
 
@@ -77,12 +82,9 @@ class test_dependencycheck(EnMAPBoxTestCase):
         pkg = PIPPackage('GDAL', py_name='osgeo.gdal')
 
         self.assertTrue(pkg.isInstalled())
-        self.assertIsInstance(pkg.installCommand(), str)
-        pkg.installPackage()
 
         pkg = PIPPackage(self.nonexistingPackageName())
         self.assertFalse(pkg.isInstalled())
-        self.assertIsInstance(pkg.installCommand(), str)
 
     def test_pippackagemodel(self):
         model = PIPPackageInstallerTableModel()

@@ -66,4 +66,4 @@ class SensorProductImportApp(EnMAPBoxApplication):
             self.interface.mapCanvas().unsetMapTool(self.currentLocationMapTool)
 
     def toggleDockVisibility(self):
-        self.dock.setUserVisible(not self.dock.isUserVisible())
+        self.dock.setVisible(not self.dock.isVisible())
