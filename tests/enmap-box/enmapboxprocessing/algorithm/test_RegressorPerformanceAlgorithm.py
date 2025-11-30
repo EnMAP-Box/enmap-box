@@ -1,6 +1,9 @@
+from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.regressorperformancealgorithm import RegressorPerformanceAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import regressorDumpPkl, regressorDumpSingleTargetPkl
+
+start_app()
 
 
 # @unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
