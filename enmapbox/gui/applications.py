@@ -338,6 +338,17 @@ class ApplicationRegistry(QObject):
                 appPkgRoot = app_folder.parent
                 pkgFile = os.path.join(app_folder, '__init__.py')
 
+                if appPkgName in [  # 'spectralindexexplorerapp',
+                    # 'rasterbandstackingapp',
+                    # 'geetimeseriesexplorerapp',
+                    'profileanalyticsapp',
+                    # 'rastermaskingapp',
+                    # 'locationbrowserapp',
+                    # 'temporalrasterstackcontrollerapp',
+                    # 'sensorproductimportapp'
+                ]:
+                    return False
+
                 blacklist = os.environ.get('EMB_APP_BLACKLIST', '').split(',')
                 if appPkgName in blacklist:
                     raise Exception('Skipped loading EnMAPBoxApplication "{}"'.format(appPkgName))
@@ -375,6 +386,9 @@ class ApplicationRegistry(QObject):
                 foundValidApps = False
 
                 for app in apps:
+
+                    # DEBUG
+
                     if not isinstance(app, EnMAPBoxApplication):
                         raise Exception('Not an EnMAPBoxApplication instance: {}'.format(app.__module__))
                     else:
