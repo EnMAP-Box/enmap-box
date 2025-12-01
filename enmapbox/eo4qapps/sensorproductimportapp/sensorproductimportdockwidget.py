@@ -1,6 +1,12 @@
 from os import listdir
 from os.path import join, dirname, exists, basename, isdir, isfile
 
+from qgis.PyQt import uic
+from qgis.PyQt.QtCore import QEvent
+from qgis.PyQt.QtWidgets import QDockWidget, QLabel
+from qgis.core import QgsRasterLayer, QgsProject
+from qgis.gui import QgsDockWidget, QgisInterface
+
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mimedata import MDF_URILIST
 from enmapbox.typeguard import typechecked

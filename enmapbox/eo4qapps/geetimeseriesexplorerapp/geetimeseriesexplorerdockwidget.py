@@ -153,7 +153,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
     @staticmethod
     def qgisInstance() -> Optional['GeeTimeseriesExplorerDockWidget']:
         from qgis.utils import iface
-        for dockWidget in iface.mapCanvas().parent().parent().parent().findChildren(QgsDockWidget):
+        for dockWidget in iface.mapCanvas().parent().parent().parent().findChildren(QDockWidget):
             if isinstance(dockWidget, GeeTimeseriesExplorerDockWidget):
                 return dockWidget
 
