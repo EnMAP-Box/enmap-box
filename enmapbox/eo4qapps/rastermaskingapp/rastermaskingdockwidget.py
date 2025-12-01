@@ -1,7 +1,7 @@
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QTableWidget, QToolButton, QComboBox, QLineEdit, QDockWidget
 from qgis.core import QgsMapLayerProxyModel
-from qgis.gui import QgsMapLayerComboBox, QgsRasterBandComboBox, QgsDockWidget, QgisInterface
+from qgis.gui import QgsMapLayerComboBox, QgsRasterBandComboBox, QgisInterface
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.typeguard import typechecked
@@ -19,7 +19,7 @@ class RasterMaskingDockWidget(QDockWidget):
     EnmapBoxInterface, QgisInterface = 0, 1
 
     def __init__(self, parent=None):
-        QgsDockWidget.__init__(self, parent)
+        QDockWidget.__init__(self, parent)
         uic.loadUi(__file__.replace('.py', '.ui'), self)
 
         # set from outside

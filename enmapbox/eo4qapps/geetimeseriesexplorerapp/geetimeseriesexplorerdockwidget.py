@@ -19,7 +19,7 @@ from qgis.PyQt.QtWidgets import (QToolButton, QApplication, QComboBox, QLineEdit
 from qgis.core import QgsRasterLayer, QgsCoordinateReferenceSystem, QgsMapLayer, QgsMapSettings, QgsColorRamp, \
     QgsApplication
 from qgis.gui import (
-    QgsDockWidget, QgsMessageBar, QgsColorRampButton, QgsSpinBox, QgsMapCanvas, QgisInterface
+    QgsMessageBar, QgsColorRampButton, QgsSpinBox, QgsMapCanvas, QgisInterface
 )
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
@@ -154,14 +154,14 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
     @staticmethod
     def qgisInstance() -> Optional['GeeTimeseriesExplorerDockWidget']:
         from qgis.utils import iface
-        for dockWidget in iface.mapCanvas().parent().parent().parent().findChildren(QgsDockWidget):
+        for dockWidget in iface.mapCanvas().parent().parent().parent().findChildren(QDockWidget):
             if isinstance(dockWidget, GeeTimeseriesExplorerDockWidget):
                 return dockWidget
 
     def __init__(self, parent=None):
         # eeImported, ee = importEarthEngine(False)
 
-        QgsDockWidget.__init__(self, parent)
+        QDockWidget.__init__(self, parent)
         uic.loadUi(__file__.replace('.py', '.ui'), self)
 
         # those are set from outside

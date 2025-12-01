@@ -5,7 +5,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QEvent
 from qgis.PyQt.QtWidgets import QDockWidget, QLabel
 from qgis.core import QgsRasterLayer, QgsProject
-from qgis.gui import QgsDockWidget, QgisInterface
+from qgis.gui import QgisInterface
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mimedata import MDF_URILIST
@@ -34,7 +34,7 @@ class SensorProductImportDockWidget(QDockWidget):
     EnmapBoxInterface, QgisInterface = 0, 1
 
     def __init__(self, parent=None):
-        QgsDockWidget.__init__(self, parent)
+        QDockWidget.__init__(self, parent)
         uic.loadUi(__file__.replace('.py', '.ui'), self)
 
         # set from outside

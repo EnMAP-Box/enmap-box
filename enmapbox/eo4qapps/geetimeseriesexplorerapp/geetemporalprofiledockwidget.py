@@ -22,7 +22,7 @@ from qgis.core import (
     QgsVectorLayer, QgsMapLayerProxyModel, QgsFields, QgsApplication
 )
 from qgis.gui import (
-    QgsDockWidget, QgsFeaturePickerWidget, QgsMapLayerComboBox, QgsFieldComboBox, QgsMessageBar, QgsColorButton,
+    QgsFeaturePickerWidget, QgsMapLayerComboBox, QgsFieldComboBox, QgsMessageBar, QgsColorButton,
     QgsFileWidget, QgsCheckableComboBox, QgsMapMouseEvent
 )
 
@@ -113,7 +113,7 @@ class GeeTemporalProfileDockWidget(QDockWidget):
     sigDataChanged = pyqtSignal()
 
     def __init__(self, mainDock: GeeTimeseriesExplorerDockWidget, parent=None):
-        QgsDockWidget.__init__(self, parent)
+        QDockWidget.__init__(self, parent)
         uic.loadUi(__file__.replace('.py', '.ui'), self)
 
         self.mainDock = mainDock

@@ -6,7 +6,7 @@ from typing import Optional
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QListWidgetItem, QToolButton, QDockWidget
 from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPointXY, QgsProject
-from qgis.gui import QgsFilterLineEdit, QgsDockWidget, QgisInterface
+from qgis.gui import QgsFilterLineEdit, QgisInterface
 
 import requests
 from enmapbox.gui.enmapboxgui import EnMAPBox
@@ -27,7 +27,7 @@ class LocationBrowserDockWidget(QDockWidget):
     EnmapBoxInterface, QgisInterface = 0, 1
 
     def __init__(self, currentLocationMapTool: Optional[MapTool], parent=None):
-        QgsDockWidget.__init__(self, parent)
+        QDockWidget.__init__(self, parent)
         uic.loadUi(__file__.replace('.py', '.ui'), self)
 
         self.currentLocationMapTool = currentLocationMapTool
