@@ -10,7 +10,7 @@ from qgis.PyQt.QtWidgets import QToolButton, QTableWidget, QRadioButton, QCheckB
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsMimeDataUtils, QgsReadWriteContext, QgsLayerTree, QgsProject, QgsMapLayerProxyModel, \
     QgsRasterLayer
-from qgis.gui import QgsMapLayerComboBox, QgsDockWidget, QgisInterface, QgsFileWidget
+from qgis.gui import QgsMapLayerComboBox, QgisInterface, QgsFileWidget
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mimedata import MDF_RASTERBANDS, QGIS_URILIST_MIMETYPE, MDF_ENMAPBOX_LAYERTREEMODELDATA, \
@@ -45,7 +45,7 @@ class RasterBandStackingDockWidget(QDockWidget):
     AutomaticGridType, RasterGridType = 0, 1
 
     def __init__(self, currentLocationMapTool: Optional[MapTool], parent=None):
-        QgsDockWidget.__init__(self, parent)
+        QDockWidget.__init__(self, parent)
         uic.loadUi(__file__.replace('.py', '.ui'), self)
 
         self.mProject = QgsProject.instance()
