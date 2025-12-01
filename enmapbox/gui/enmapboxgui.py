@@ -1581,7 +1581,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             sl = None
             # create a standard in-memory library shown in the dock
             if len(slw.sourceLayers()) == 0:
-                dock.createDefaultSpeclib()
+                sl = dock.createDefaultSpeclib()
 
             self.dataSourceManager().addDataSources(slw.sourceLayers())
 
