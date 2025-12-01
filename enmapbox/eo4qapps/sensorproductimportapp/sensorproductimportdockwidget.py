@@ -1,12 +1,6 @@
 from os import listdir
 from os.path import join, dirname, exists, basename, isdir, isfile
 
-from qgis.PyQt import uic
-from qgis.PyQt.QtCore import QEvent
-from qgis.PyQt.QtWidgets import QDockWidget, QLabel
-from qgis.core import QgsRasterLayer, QgsProject
-from qgis.gui import QgisInterface
-
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mimedata import MDF_URILIST
 from enmapbox.typeguard import typechecked
@@ -25,6 +19,11 @@ from enmapboxprocessing.algorithm.importprismal2calgorithm import ImportPrismaL2
 from enmapboxprocessing.algorithm.importprismal2dalgorithm import ImportPrismaL2DAlgorithm
 from enmapboxprocessing.algorithm.importproductsdraganddropsupport import AlgorithmDialogWrapper
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
+from qgis.PyQt import uic
+from qgis.PyQt.QtCore import QEvent
+from qgis.PyQt.QtWidgets import QDockWidget, QLabel
+from qgis.core import QgsRasterLayer, QgsProject
+from qgis.gui import QgisInterface
 
 
 @typechecked
@@ -34,7 +33,8 @@ class SensorProductImportDockWidget(QDockWidget):
     EnmapBoxInterface, QgisInterface = 0, 1
 
     def __init__(self, parent=None):
-        QDockWidget.__init__(self, parent)
+        # QgsDockWidget.__init__(self, parent)
+        super().__init__(parent)
         uic.loadUi(__file__.replace('.py', '.ui'), self)
 
         # set from outside
