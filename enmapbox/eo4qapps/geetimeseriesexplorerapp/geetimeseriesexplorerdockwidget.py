@@ -30,9 +30,7 @@ from qgis.PyQt.QtWidgets import (QToolButton, QApplication, QComboBox, QLineEdit
                                  QListWidgetItem, QProgressBar, QFrame, QDockWidget)
 from qgis.core import QgsRasterLayer, QgsCoordinateReferenceSystem, QgsMapLayer, QgsMapSettings, QgsColorRamp, \
     QgsApplication
-from qgis.gui import (
-    QgsDockWidget, QgsMessageBar, QgsColorRampButton, QgsSpinBox, QgsMapCanvas, QgisInterface
-)
+from qgis.gui import (QgsMessageBar, QgsColorRampButton, QgsSpinBox, QgsMapCanvas, QgisInterface)
 
 
 @typechecked
