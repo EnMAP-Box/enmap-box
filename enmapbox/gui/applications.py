@@ -87,9 +87,16 @@ class EnMAPBoxApplication(QObject):
         self.version: str = None
         self.licence: str = 'GNU GPL-3'
 
-        # optional attributes, can be None
+        # optional attributes, these can be None
         self.projectWebsite: str = None
         self.description: str = None
+
+    def close(self):
+        """
+        Will be called when the EnMAP-Box is shutting down.
+        Overwrite to remove components of your application when this app is disabled.
+        """
+        pass
 
     def removeApplication(self):
         """
@@ -451,6 +458,7 @@ class ApplicationRegistry(QObject):
 
         t0 = datetime.datetime.now()
         appWrapper = ApplicationWrapper(app)
+        app.setParent(self.mEnMAPBox)
         self.sigLoadingInfo.emit(f'Load {appWrapper.app.name} ...')
         if DEBUG:
             print('Check requirements...')
