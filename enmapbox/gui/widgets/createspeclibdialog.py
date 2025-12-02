@@ -15,7 +15,7 @@ class CreateSpectralLibraryDialog(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Create Spectral Library")
+        self.setWindowTitle("New Spectral Library")
         self.setMinimumWidth(400)
 
         # Storage type selection
@@ -39,7 +39,7 @@ class CreateSpectralLibraryDialog(QDialog):
 
         # Profile field names input
         field_layout = QVBoxLayout()
-        field_label = QLabel("Profile Field Names (comma or space separated):")
+        field_label = QLabel("Profile Field Names (comma separated):")
         self.field_input = QLineEdit('profiles')
         self.field_input.setPlaceholderText("e.g., profiles, reflectance, transmittance")
         field_layout.addWidget(field_label)
