@@ -1787,7 +1787,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     def initEnMAPBoxApplications(self,
                                  load_core_apps: bool = True,
-                                 load_other_apps: bool = True):
+                                 load_other_apps: bool = True,
+                                 whitelist: Optional[List[str]] = None,
+                                 blacklist: Optional[List[str]] = None):
         """
         Initialized EnMAPBoxApplications
         """
@@ -1797,6 +1799,11 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         INTERNAL_APPS = DIR_ENMAPBOX / 'coreapps'
         EO4Q_APPS = DIR_ENMAPBOX / 'eo4qapps'
         EXTERNAL_APPS = DIR_ENMAPBOX / 'apps'
+
+        if isinstance(whitelist, list):
+            self.applicationRegistry.setWhitelist(whitelist)
+        elif isinstance(blacklist, list):
+            self.applicationRegistry.setBlacklist(blacklist)
 
         # load internal "core" apps
         if load_core_apps:
@@ -2006,6 +2013,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
                 for lyr in lyrs:
                     dock.layerTree().addLayer(lyr)
+
                 dock.mapCanvas().zoomToFullExtent()
 
         if testData:

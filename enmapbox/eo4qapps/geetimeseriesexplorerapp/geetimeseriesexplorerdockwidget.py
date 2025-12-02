@@ -9,19 +9,6 @@ from os.path import join, exists, dirname, basename, splitext
 from traceback import print_exc
 from typing import Optional, Dict, List, Tuple
 
-from qgis.PyQt import QtGui, uic
-from qgis.PyQt.QtCore import Qt, QLocale, QDate, pyqtSignal, QModelIndex, QDateTime, QUrl
-from qgis.PyQt.QtGui import QPixmap, QColor, QIcon, QDesktopServices
-from qgis.PyQt.QtWidgets import (QToolButton, QApplication, QComboBox, QLineEdit,
-                                 QTableWidget, QDateEdit, QRadioButton, QListWidget, QCheckBox, QTableWidgetItem,
-                                 QPlainTextEdit, QTreeWidget, QTreeWidgetItem, QTabWidget, QLabel, QMainWindow,
-                                 QListWidgetItem, QProgressBar, QFrame, QDockWidget)
-from qgis.core import QgsRasterLayer, QgsCoordinateReferenceSystem, QgsMapLayer, QgsMapSettings, QgsColorRamp, \
-    QgsApplication
-from qgis.gui import (
-    QgsMessageBar, QgsColorRampButton, QgsSpinBox, QgsMapCanvas, QgisInterface
-)
-
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
 from enmapbox.typeguard import typechecked
@@ -34,6 +21,16 @@ from geetimeseriesexplorerapp.externals.ee_plugin.provider import GeetseEarthEng
 from geetimeseriesexplorerapp.imageinfo import ImageInfo
 from geetimeseriesexplorerapp.tasks.queryavailableimagestask import QueryAvailableImagesTask
 from geetimeseriesexplorerapp.utils import utilsMsecToDateTime
+from qgis.PyQt import QtGui, uic
+from qgis.PyQt.QtCore import Qt, QLocale, QDate, pyqtSignal, QModelIndex, QDateTime, QUrl
+from qgis.PyQt.QtGui import QPixmap, QColor, QIcon, QDesktopServices
+from qgis.PyQt.QtWidgets import (QToolButton, QApplication, QComboBox, QLineEdit,
+                                 QTableWidget, QDateEdit, QRadioButton, QListWidget, QCheckBox, QTableWidgetItem,
+                                 QPlainTextEdit, QTreeWidget, QTreeWidgetItem, QTabWidget, QLabel, QMainWindow,
+                                 QListWidgetItem, QProgressBar, QFrame, QDockWidget)
+from qgis.core import QgsRasterLayer, QgsCoordinateReferenceSystem, QgsMapLayer, QgsMapSettings, QgsColorRamp, \
+    QgsApplication
+from qgis.gui import (QgsMessageBar, QgsColorRampButton, QgsSpinBox, QgsMapCanvas, QgisInterface)
 
 
 @typechecked
@@ -160,8 +157,8 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
 
     def __init__(self, parent=None):
         # eeImported, ee = importEarthEngine(False)
-
-        QDockWidget.__init__(self, parent)
+        super().__init__(parent)
+        # QgsDockWidget.__init__(self, parent)
         uic.loadUi(__file__.replace('.py', '.ui'), self)
 
         # those are set from outside
