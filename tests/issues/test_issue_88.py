@@ -31,6 +31,9 @@ class EnMAPBoxTestCaseExample(EnMAPBoxTestCase):
         px_y = 1
         gt = ds.GetGeoTransform()
 
+        trans2px = gdal.Transformer(ds, None, [])
+        success, xyz1 = trans2px.TransformPoint(False, px_x, px_y)
+
         # Convert pixel coordinates to geographic coordinates
         geo_x = gt[0] + px_x * gt[1] + px_y * gt[2]
         geo_y = gt[3] + px_x * gt[4] + px_y * gt[5]
@@ -40,9 +43,13 @@ class EnMAPBoxTestCaseExample(EnMAPBoxTestCase):
         pointA = SpatialPoint(layer.crs(), geo_x, geo_y)
         pixelA = pointA.toPixelPosition(layer)
 
+        success, (x, y, z) = trans2px.TransformPoint(True, pointA.x(), pointA.y())
+        x = int(x)
+        y = int(y)
+
         self.assertIsInstance(pixelA, QPoint)
-        self.assertEqual(pixelA.x(), px_x)
-        self.assertEqual(pixelA.y(), px_y)
+        self.assertEqual(pixelA.x(), x)
+        self.assertEqual(pixelA.y(), y)
 
         pointB = pointA.toCrs(QgsCoordinateReferenceSystem('EPSG:4326'))
         pointA2 = pointB.toCrs(pointA.crs())
