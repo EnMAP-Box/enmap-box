@@ -21,7 +21,8 @@ class EniccsCloudMaskAlgorithm(EnMAPProcessingAlgorithm):
         return 'EnICCS - EnMAP L2A cloud and cloud shadow mask'
 
     def shortDescription(self) -> str:
-        return 'EnICCS - a tool for generating improved EnMAP L2A cloud and cloud shadow masks.'
+        return ('EnICCS - a tool for generating improved EnMAP L2A cloud and cloud shadow masks. '
+                'See https://github.com/leleist/eniccs for more details.')
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [

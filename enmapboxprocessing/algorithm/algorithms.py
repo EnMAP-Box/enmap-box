@@ -28,7 +28,6 @@ from enmapboxprocessing.algorithm.creatergbimagefromclassprobabilityalgorithm im
     CreateRgbImageFromClassProbabilityAlgorithm
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.algorithm.editrastersourcebandpropertiesalgorithm import EditRasterSourceBandPropertiesAlgorithm
-from enmapboxprocessing.algorithm.eniccscloudmaskalgorithm import EniccsCloudMaskAlgorithm
 from enmapboxprocessing.algorithm.exportdatasettofilesalgorithm import ExportDatasetToFilesAlgorithm
 from enmapboxprocessing.algorithm.featureclusteringhierarchicalalgorithm import FeatureClusteringHierarchicalAlgorithm
 from enmapboxprocessing.algorithm.fitaffinitypropagationalgorithm import FitAffinityPropagationAlgorithm
@@ -274,7 +273,6 @@ def algorithms():
         CreateMaskVirtualAlgorithm(),
         CreateRgbImageFromClassProbabilityAlgorithm(),
         EditRasterSourceBandPropertiesAlgorithm(),
-        EniccsCloudMaskAlgorithm(),
         ExportDatasetToFilesAlgorithm(),
         FitGaussianProcessClassifierAlgorithm(),
         FitGenericClassifierAlgorithm(),
