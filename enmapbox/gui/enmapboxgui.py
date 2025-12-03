@@ -2372,6 +2372,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         event.accept()
 
     def close(self):
+        for appWrapper in self.applicationRegistry:
+            appWrapper.app.close()
         self.disconnectQGISSignals()
         self.dockManager().clear()
         self.ui.close()
