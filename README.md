@@ -294,6 +294,32 @@ flake8 $(git status -s | grep -E '\.py$' | cut -c 4-)
 Run `scripts/runtests.sh` (Linux/macOS) or `scripts\runtests.bat` (Win)
 to start the tests defined in `/tests/`.
 
+You can provide additional arguments to the test runner, e.g., to run the tests in parallel or
+run a specific test directory, -module, -class or -method only
+
+````bash
+scripts/runtests.sh -n auto
+
+scripts/runtests.sh -n auto tests/enmap-box/enmapbox/gui/test_mapcanvas.py::MapCanvasTests::test_mapCrosshairDistance
+````
+
+To test with docker, run:
+
+````bash
+QGIS_TEST_VERSION=3.44 docker compose \
+  -f .env/docker/docker-compose.gh.yml \
+  run --rm --build --user $(id -u):$(id -g) qgis \
+  /usr/src/.env/docker/run_docker_tests.sh -n auto
+````
+
+`--rm` removes the container after the tests are finished.
+
+`--build` forces a rebuild of the container
+
+`--user` sets the user id and group id of the container to the current user
+
+`-n auto` runs the tests in parallel (using pytest xdist)`
+
 # License
 
 The EnMAP-Box is released under the GNU Public License (GPL) Version 3 or above. A copy of this licence can be found in
