@@ -26,8 +26,8 @@ DEPENDENCIES = {
     # light = minimum requirements
     'light': ['python>=3.10', 'pip', 'scikit-learn>=1', 'matplotlib', 'enpt'],
     # full = all other packages to enjoy the full EnMAP-Box experience (on cost of disk space)
-    'full': [{'conda': 'enpt', 'pip': 'enpt-enmapboxapp'}, 'xgboost', 'lightgbm', 'cdsapi', 'cython', 'netcdf4',
-             'pygrib',
+    'full': [{'conda': 'enpt', 'pip': 'enpt-enmapboxapp'}, 'enfrosp_enmapboxapp>=0.1.1', 'xgboost', 'lightgbm',
+             'cdsapi', 'cython', 'netcdf4', 'pygrib',
              'pyhdf', 'xarray', 'astropy', 'catboost', 'matplotlib', 'astropy', 'numba>=0.56.4',
              'sympy', 'pyopengl', 'h5py',
              # requirements by specdeepmap
