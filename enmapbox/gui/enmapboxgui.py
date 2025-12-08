@@ -59,7 +59,6 @@ from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSenti
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
 from processing.gui.ProcessingToolbox import ProcessingToolbox
 from qgis import utils as qgsUtils
-from qgis.PyQt.QtCore import QMetaType
 from qgis.PyQt.QtCore import QUrl
 from qgis.PyQt.QtCore import pyqtSignal, Qt, QObject, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
 from qgis.PyQt.QtGui import QDesktopServices
@@ -70,7 +69,7 @@ from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, Q
     QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
     QProgressBar, QMessageBox
 from qgis.PyQt.QtXml import QDomDocument
-from qgis.core import QgsBrowserModel, edit
+from qgis.core import QgsBrowserModel
 from qgis.core import QgsExpressionContextGenerator, QgsExpressionContext, QgsProcessingContext, \
     QgsExpressionContextUtils
 from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
@@ -78,7 +77,7 @@ from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
     QgsPointXY, QgsLayerTree, QgsLayerTreeLayer, QgsVectorLayerTools, \
     QgsZipUtils, QgsProjectArchive, QgsSettings, \
     QgsStyle, QgsSymbolLegendNode, QgsSymbol, QgsTaskManager, QgsApplication, QgsProcessingAlgRunnerTask
-from qgis.core import QgsRectangle, QgsField
+from qgis.core import QgsRectangle
 from qgis.gui import QgsMapCanvas, QgsMapTool, QgisInterface, QgsMessageBar, QgsMessageViewer, QgsMessageBarItem, \
     QgsMapLayerConfigWidgetFactory, QgsAttributeTableFilterModel, QgsSymbolSelectorDialog, \
     QgsSymbolWidgetContext
@@ -94,7 +93,6 @@ from .utils import enmapboxUiPath
 from .widgets.createspeclibdialog import CreateSpectralLibraryDialog
 from ..enmapboxsettings import EnMAPBoxSettings
 from ..qgispluginsupport.qps.processing.algorithmdialog import executeAlgorithm, AlgorithmDialog
-from ..qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
 from ..qgispluginsupport.qps.speclib.gui.spectralprofilecandidates import SpectralProfileCandidates
 
 MAX_MISSING_DEPENDENCY_WARNINGS = 3
@@ -1583,35 +1581,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             sl = None
             # create a standard in-memory library shown in the dock
             if len(slw.sourceLayers()) == 0:
-                sl = SpectralLibraryUtils.createSpectralLibrary(['profiles'])
-                sl.setName(f'{dock.name()}')
-                with edit(sl):
-                    sl.addAttribute(QgsField('name', QMetaType.QString))
-                self.dataSourceManager().addDataSources([sl])
-                dock.setDefaultSpeclib(sl.id())
-                slw.createProfileVisualization(sl, 'profiles')
-
-                def updateName():
-                    """Updates the name of the dock or default layer if the other has changed its name"""
-                    s = self.sender()
-                    if isinstance(s, SpectralLibraryDock):
-                        # change the layer name
-                        title = s.title()
-                        sid = s.defaultSpeclib()
-                        lyr = self.project().mapLayer(sid)
-                        if isinstance(lyr, QgsVectorLayer) and lyr.name() != title:
-                            lyr.setName(title)
-                    elif isinstance(s, QgsVectorLayer):
-                        # change the dock title
-                        sid = s.id()
-                        title = s.name()
-                        for dock in self.docks(SpectralLibraryDock):
-                            assert isinstance(dock, SpectralLibraryDock)
-                            if dock.defaultSpeclib() == sid and dock.title() != title:
-                                dock.setTitle(title)
-
-                dock.sigTitleChanged.connect(updateName)
-                sl.nameChanged.connect(updateName)
+                sl = dock.createDefaultSpeclib()
 
             self.dataSourceManager().addDataSources(slw.sourceLayers())
 
@@ -1669,8 +1639,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         if isinstance(dock, SpectralLibraryDock):
             self.spectralProfileSourcePanel().removeSpectralLibraryWidgets(dock.speclibWidget())
 
-            sid = dock.defaultSpeclib()
-            lyr = self.project().mapLayer(sid)
+            lyr = dock.defaultSpeclib()
             if isinstance(lyr, QgsVectorLayer) and lyr.dataProvider().name() == 'memory':
                 to_remove = [s for s in self.dataSources() if s == lyr.source()]
                 if len(to_remove) > 0:
@@ -1706,30 +1675,25 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         if len(self.docks(SpectralLibraryDock)) == 0:
             self.createDock(SpectralLibraryDock)
 
+        # if no connection exists between sources and destination, create at least on
         if len(bridge) == 0:
             # if undefined, use an in-memory speclib to store profiles
-            def is_temporary(sl: QgsVectorLayer):
-                if not is_spectral_library(sl):
-                    return False
-                dpn = sl.dataProvider().name()
-                if dpn == 'memory':
-                    return True
-                return False
+            sl = None
+            for d in self.docks(SpectralLibraryDock):
+                d: SpectralLibraryDock
+                if lyr := d.defaultSpeclib():
+                    sl = lyr
+                    break
 
-            speclibs = [sl for sl in self.spectralLibraries() if is_temporary(sl)]
+            if sl is None:
+                for d in self.docks(SpectralLibraryDock):
+                    d: SpectralLibraryDock
+                    sl = d.createDefaultSpeclib()
+                    self.dataSourceManager().addDataSources([sl])
 
-            if False and len(speclibs) == 0:
-                # create an empty, temporary spectral library to store pixel profiles
-                from enmapbox.testing import TestObjects
-                sl = TestObjects.createSpectralLibrary(n=0)
-                sl.setName('Collected Profiles')
-                self.addSources([sl])
-                self.project().addMapLayer(sl)
-                speclibs = [sl]
-
-            if len(speclibs) > 0:
+            if isinstance(sl, QgsVectorLayer):
                 node: SpectralFeatureGeneratorNode = bridge.createFeatureGenerator()
-                node.setSpeclib(speclibs[0])
+                node.setSpeclib(sl)
                 bridge.setDefaultSources(node)
 
         panel.loadCurrentMapSpectra(spatialPoint, mapCanvas=mapCanvas, runAsync=runAsync)
@@ -1823,7 +1787,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     def initEnMAPBoxApplications(self,
                                  load_core_apps: bool = True,
-                                 load_other_apps: bool = True):
+                                 load_other_apps: bool = True,
+                                 whitelist: Optional[List[str]] = None,
+                                 blacklist: Optional[List[str]] = None):
         """
         Initialized EnMAPBoxApplications
         """
@@ -1833,6 +1799,11 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         INTERNAL_APPS = DIR_ENMAPBOX / 'coreapps'
         EO4Q_APPS = DIR_ENMAPBOX / 'eo4qapps'
         EXTERNAL_APPS = DIR_ENMAPBOX / 'apps'
+
+        if isinstance(whitelist, list):
+            self.applicationRegistry.setWhitelist(whitelist)
+        elif isinstance(blacklist, list):
+            self.applicationRegistry.setBlacklist(blacklist)
 
         # load internal "core" apps
         if load_core_apps:
@@ -2042,6 +2013,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
                 for lyr in lyrs:
                     dock.layerTree().addLayer(lyr)
+
                 dock.mapCanvas().zoomToFullExtent()
 
         if testData:
@@ -2400,6 +2372,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         event.accept()
 
     def close(self):
+        for appWrapper in self.applicationRegistry:
+            appWrapper.app.close()
         self.disconnectQGISSignals()
         self.dockManager().clear()
         self.ui.close()

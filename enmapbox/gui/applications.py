@@ -87,9 +87,16 @@ class EnMAPBoxApplication(QObject):
         self.version: str = None
         self.licence: str = 'GNU GPL-3'
 
-        # optional attributes, can be None
+        # optional attributes, these can be None
         self.projectWebsite: str = None
         self.description: str = None
+
+    def close(self):
+        """
+        Will be called when the EnMAP-Box is shutting down.
+        Overwrite to remove components of your application when this app is disabled.
+        """
+        pass
 
     def removeApplication(self):
         """
@@ -206,15 +213,35 @@ class ApplicationRegistry(QObject):
     sigLoadingInfo = pyqtSignal(str)
     sigLoadingFinished = pyqtSignal(bool, str)
 
-    def __init__(self, enmapBox, parent=None):
+    def __init__(self, enmapBox, parent=None,
+                 whitelist: Optional[List[str]] = None,
+                 blackList: Optional[List[str]] = None):
         super(ApplicationRegistry, self).__init__(parent)
         self.appPackageRootFolders = []
         assert isinstance(enmapBox, EnMAPBox)
+
+        self.mWhitelist: Optional[List[str]] = None
+        self.mBlacklist: Optional[List[str]] = None
+
+        if whitelist:
+            assert blackList is None
+            self.setWhitelist(whitelist)
+        elif blackList:
+            assert whitelist is None
+            self.setBlacklist(blackList)
 
         self.mEnMAPBox = enmapBox
         self.mAppWrapper: OrderedDict[str, ApplicationWrapper] = collections.OrderedDict()
 
         self.mAppInitializationMessages = collections.OrderedDict()
+
+    def setWhitelist(self, whitelist: List[str]):
+        self.mBlacklist = None
+        self.mWhitelist = whitelist
+
+    def setBlacklist(self, blacklist: List[str]):
+        self.mWhitelist = None
+        self.mBlacklist = blacklist
 
     def __len__(self):
         return len(self.mAppWrapper)
@@ -347,7 +374,7 @@ class ApplicationRegistry(QObject):
                 if not os.path.isfile(pkgFile):
                     raise Exception('File does not exist: "{}"'.format(pkgFile))
 
-                site.addsitedir(appPkgRoot)
+                site.addsitedir(str(appPkgRoot))
 
                 # do not use __import__
                 # appModule = __import__(appPkgName)
@@ -375,11 +402,14 @@ class ApplicationRegistry(QObject):
                 foundValidApps = False
 
                 for app in apps:
+
+                    # DEBUG
+
                     if not isinstance(app, EnMAPBoxApplication):
                         raise Exception('Not an EnMAPBoxApplication instance: {}'.format(app.__module__))
                     else:
-                        result = self.addApplication(app)
-                        foundValidApps = True
+                        if self.addApplication(app):
+                            foundValidApps = True
 
                 if foundValidApps:
                     # return True if app  factory returned a valid EnMAPBoxApplication
@@ -416,18 +446,25 @@ class ApplicationRegistry(QObject):
         Adds a single EnMAP-Box application, i.a. a class that implemented the EnMAPBoxApplication Interface
         :param app: EnMAPBoxApplication
         """
-        if DEBUG:
-            print('addApplication({})'.format(str(app)))
+
         assert isinstance(app, EnMAPBoxApplication)
+
+        if isinstance(self.mWhitelist, list):
+            if not (app.name in self.mWhitelist or app.name.lower() in self.mWhitelist):
+                return False
+        elif isinstance(self.mBlacklist, list):
+            if app.name in self.mBlacklist or app.name.lower() in self.mBlacklist:
+                return False
 
         t0 = datetime.datetime.now()
         appWrapper = ApplicationWrapper(app)
+        app.setParent(self.mEnMAPBox)
         self.sigLoadingInfo.emit(f'Load {appWrapper.app.name} ...')
         if DEBUG:
             print('Check requirements...')
         isOk, errorMessages = EnMAPBoxApplication.checkRequirements(app)
         if not isOk:
-            self.sigLoadingInfo.emit(f'Unable to load {appWrapper.appId}', False)
+            self.sigLoadingInfo.emit(f'Unable to load {appWrapper.appId}')
             raise Exception(
                 'Unable to load EnMAPBoxApplication "{}"\n{}.'.format(appWrapper.appId, '\n\t'.join(errorMessages)))
         if appWrapper.appId in self.mAppWrapper.keys():
@@ -538,5 +575,5 @@ class ApplicationRegistry(QObject):
 
         import enmapbox.algorithmprovider
         provider = enmapbox.algorithmprovider.instance()
-        assert isinstance(provider, EnMAPBoxProcessingProvider)
-        provider.removeAlgorithms(appWrapper.processingAlgorithms)
+        if isinstance(provider, EnMAPBoxProcessingProvider):
+            provider.removeAlgorithms(appWrapper.processingAlgorithms)

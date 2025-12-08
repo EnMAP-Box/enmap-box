@@ -173,7 +173,6 @@ class test_applications(EnMAPBoxTestCase):
         EB.close()
         QgsProject.instance().removeAllMapLayers()
 
-    # @unittest.skip('unknown reason')
     def test_deployed_apps(self):
 
         pathCoreApps = pathlib.Path(DIR_ENMAPBOX) / 'coreapps'

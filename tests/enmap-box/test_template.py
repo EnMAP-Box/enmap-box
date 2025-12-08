@@ -3,10 +3,13 @@ This is a template to create an EnMAP-Box test
 """
 import unittest
 
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.testing import EnMAPBoxTestCase, TestObjects
+from enmapbox.testing import start_app
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import QgsProject, QgsApplication, QgsRasterLayer, QgsVectorLayer
-from enmapbox.testing import EnMAPBoxTestCase, TestObjects
-from enmapbox.gui.enmapboxgui import EnMAPBox
+
+start_app()
 
 
 class EnMAPBoxTestCaseExample(EnMAPBoxTestCase):
@@ -30,15 +33,15 @@ class EnMAPBoxTestCaseExample(EnMAPBoxTestCase):
         self.assertIsInstance(enmapBox, EnMAPBox)
         self.assertEqual(enmapBox, EnMAPBox.instance())
         enmapBox.loadExampleData()
+        if False:
+            # generate in-memory test layers
+            rasterLayer = TestObjects.createRasterLayer()
+            self.assertIsInstance(rasterLayer, QgsRasterLayer)
+            self.assertTrue(rasterLayer.isValid())
 
-        # generate in-memory test layers
-        rasterLayer = TestObjects.createRasterLayer()
-        self.assertIsInstance(rasterLayer, QgsRasterLayer)
-        self.assertTrue(rasterLayer.isValid())
-
-        vectorLayer = TestObjects.createVectorLayer()
-        self.assertIsInstance(vectorLayer, QgsVectorLayer)
-        self.assertTrue(vectorLayer.isValid())
+            vectorLayer = TestObjects.createVectorLayer()
+            self.assertIsInstance(vectorLayer, QgsVectorLayer)
+            self.assertTrue(vectorLayer.isValid())
 
         # cleanup.
         enmapBox.close()

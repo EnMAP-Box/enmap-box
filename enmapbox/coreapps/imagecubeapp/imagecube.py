@@ -4,11 +4,11 @@ Demonstrates GLVolumeItem for displaying volumetric data.
 
 """
 import enum
-import pathlib
 import pickle
 import sys
 import time
 import typing
+from pathlib import Path
 from typing import Optional
 
 import numpy as np
@@ -220,7 +220,7 @@ def renderImageData(task: QgsTask, dump):
             if isinstance(renderer, QgsSingleBandGrayRenderer):
                 setBand = renderer.setInputBand
             elif isinstance(renderer, QgsSingleBandPseudoColorRenderer):
-                setBand = renderer.setBand
+                setBand = renderer.setInputBand
             elif isinstance(renderer, QgsSingleBandColorDataRenderer):
                 setBand = lambda *args: None
             elif isinstance(renderer, QgsMultiBandColorRenderer):
@@ -424,9 +424,8 @@ class ImageCubeWidget(QMainWindow):
     sigExtentRequested = pyqtSignal(QMainWindow)
 
     def __init__(self, *args, **kwds):
-
-        super(ImageCubeWidget, self).__init__(*args, **kwds)
-        pathUi = pathlib.Path(__file__).parent / 'imagecube.ui'
+        super().__init__(*args, **kwds)
+        pathUi = Path(__file__).parent / 'imagecube.ui'
         loadUi(pathUi, self)
         self.setWindowTitle('Image Cube')
         self.mCanvas = QgsMapCanvas()
@@ -631,7 +630,7 @@ class ImageCubeWidget(QMainWindow):
         else:
             return None, None
 
-    def rasterLayer(self) -> QgsRasterLayer:
+    def rasterLayer(self) -> Optional[QgsRasterLayer]:
         return self.mMapLayerComboBox.currentLayer()
 
     def sliceRenderer(self) -> QgsRasterRenderer:
@@ -1346,3 +1345,7 @@ class ImageCubeWidget(QMainWindow):
 
         if lyr is None:
             self.mMapLayerComboBox.setLayer(None)
+
+    def close(self):
+        self.mMapLayerComboBox.setLayer(None)
+        super().close()
