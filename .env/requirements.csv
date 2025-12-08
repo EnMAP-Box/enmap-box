@@ -4,6 +4,7 @@ PyOpenGL,OpenGL,,Required by imageCube application
 xgboost,,,
 lightgbm,,,
 sympy,,,
+enfrosp_enmapboxapp,,0.1.1,required by EnFROSP
 enpt-enmapboxapp,enpt_enmapboxapp,,required by EnPT
 scikit-learn,sklearn,1.0,
 numba,,0.57
@@ -16,4 +17,4 @@ numpy,,,Installed with QGIS
 # torchvision,,,Required by SpecDeepMap application
 # segmentation-models-pytorch,segmentation_models_pytorch,,Required by SpecDeepMap application
 # pandas,,,Required by SpecDeepMap application
-
+,,,
