@@ -17,4 +17,3 @@ numpy,,,Installed with QGIS
 # torchvision,,,Required by SpecDeepMap application
 # segmentation-models-pytorch,segmentation_models_pytorch,,Required by SpecDeepMap application
 # pandas,,,Required by SpecDeepMap application
-,,,
