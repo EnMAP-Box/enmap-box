@@ -14,7 +14,7 @@ dependencies:
 - scikit-learn>=1
 - matplotlib
 - enpt
-- enpt
+- enfrosp_enmapboxapp>=0.1.1
 - xgboost
 - lightgbm
 - cdsapi
