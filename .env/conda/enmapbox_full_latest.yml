@@ -15,6 +15,7 @@ dependencies:
 - cython
 - docutils
 - enpt
+- enfrosp_enmapboxapp>=0.1.1
 - flake8
 - git-lfs
 - gitpython
