@@ -8,13 +8,13 @@
 channels:
 - conda-forge
 dependencies:
-- qgis=3.42.2
+- qgis>=3.42.2
 - astropy
 - catboost
 - cdsapi
 - cython
 - docutils
-- enpt=1.1.2
+- enpt
 - flake8
 - git-lfs
 - gitpython
@@ -24,7 +24,7 @@ dependencies:
 - netcdf4
 - numba>=0.56.4
 - opencv[build=headless*]
-- pandas  # =2.2.3
+- pandas=2.2.3
 - pip
 - pygrib
 - pyhdf
@@ -32,19 +32,19 @@ dependencies:
 - pytest
 - pytest-cov
 - pytest-xdist
-- python>=3.12
+- python>=3.10
 - scikit-learn>=1
 - sympy
 - xarray
 - xgboost
-- enpt_enmapboxapp
-- lightning  # ==2.5.0.post0
-- segmentation-models-pytorch==0.5.0
-- tensorboard  # ==2.19.0
-- pytorch  # ==2.6.0
-- torchvision  # ==0.21.0
 - pip:
+  - enpt-enmapboxapp
   - flake8-qgis
+  - lightning==2.5.0.post0
+  - segmentation-models-pytorch==0.5.0
+  - tensorboard==2.19.0
+  - torch==2.6.0
+  - torchvision==0.21.0
 name: enmapbox_full_latest
 variables:
   PYQTGRAPH_QT_LIB: PyQt5
