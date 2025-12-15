@@ -79,12 +79,14 @@ class test_dependencycheck(EnMAPBoxTestCase):
         self.assertTrue(pipName in info)
 
     def test_pippackage(self):
-        pkg = PIPPackage('GDAL', py_name='osgeo.gdal')
+        pkg = PIPPackage('GDAL', py_name='osgeo.gdal', required_by='core')
 
         self.assertTrue(pkg.isInstalled())
+        self.assertTrue(pkg.isCoreRequirement())
 
         pkg = PIPPackage(self.nonexistingPackageName())
         self.assertFalse(pkg.isInstalled())
+        self.assertFalse(pkg.isCoreRequirement())
 
     def test_pippackagemodel(self):
         model = PIPPackageInstallerTableModel()
@@ -130,15 +132,26 @@ class test_dependencycheck(EnMAPBoxTestCase):
 
     @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'Skipped, would take too long')
     def test_PIPInstaller(self):
-        pkgs = [PIPPackage(self.nonexistingPackageName()),
+        pkgs = [PIPPackage(self.nonexistingPackageName(), required_by='core'),
                 PIPPackage(self.nonexistingPackageName()),
                 PIPPackage(self.nonexistingPackageName())]
+        pkgs = []
         pkgs += requiredPackages()
         w = PIPPackageInstaller()
 
-        w.addPackages(pkgs, required=True)
-        # w.installAll()
-        # w.model.installAll()
+        w.addPackages(pkgs)
+        w.setPrimaryFilter('all')
+
+        n_total = w.proxyModel.rowCount()
+        self.assertEqual(n_total, w.model.rowCount())
+
+        w.setPrimaryFilter('required')
+        n_required = w.proxyModel.rowCount()
+
+        w.setPrimaryFilter('missing')
+        n_missing = w.proxyModel.rowCount()
+
+        # self.assertTrue(n_total > n_required > n_missing)
 
         self.showGui(w)
 
