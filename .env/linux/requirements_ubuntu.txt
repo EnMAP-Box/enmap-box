@@ -1,3 +1,5 @@
+colorama # required by PyQtGraph
+
 # required by parts of EnMAP-Box Core
 astropy # required for convolution
 PyOpenGL # required by ImageCube app

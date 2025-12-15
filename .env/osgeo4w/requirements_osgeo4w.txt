@@ -1,3 +1,5 @@
+colorama # required by PyQtGraph
+
 # required by parts of EnMAP-Box Core
 astropy # required for convolution
 xgboost # required by XGBoost classifier/regressor, see #960
@@ -11,3 +13,4 @@ netCDF4 # required by ONNS
 enpt-enmapboxapp # required by EnPT
 scikit-learn>=1.0
 PyOpenGL
+
