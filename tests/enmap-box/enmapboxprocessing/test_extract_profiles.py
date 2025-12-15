@@ -1,10 +1,8 @@
-import unittest
-
 from enmapbox import initAll
 from enmapbox.qgispluginsupport.qps.processing.algorithmdialog import AlgorithmDialog
 from enmapbox.qgispluginsupport.qps.speclib.processing.extractspectralprofiles import ExtractSpectralProfiles
 from enmapbox.testing import EnMAPBoxTestCase, start_app
-from qgis._core import QgsProject, QgsRasterLayer, QgsVectorLayer
+from qgis.core import QgsProject, QgsRasterLayer, QgsVectorLayer, QgsApplication, QgsTaskManager
 
 start_app()
 initAll()
@@ -12,7 +10,6 @@ initAll()
 
 class ExtractProfilesTests(EnMAPBoxTestCase):
 
-    @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'GUI Testing only')
     def test_extractProfiles(self):
         alg = ExtractSpectralProfiles()
         alg.initAlgorithm({})
@@ -28,8 +25,17 @@ class ExtractProfilesTests(EnMAPBoxTestCase):
         context.setProject(project)
 
         d = AlgorithmDialog(alg, context=context)
+        if EnMAPBoxTestCase.runsInCI():
+            d.runButton().click()
+            # d.runAlgorithm()
+            tm: QgsTaskManager = QgsApplication.taskManager()
+            while len(tm.activeTasks()) > 0:
+                QgsApplication.processEvents()
+        else:
+            d.exec_()
 
-        d.exec_()
-
-        results = d.results()
-        self.assertTrue(len(results) > 0)
+        if d.wasExecuted():
+            results = d.results()
+            lyr = results.get(ExtractSpectralProfiles.P_OUTPUT)
+            self.assertIsInstance(lyr, QgsVectorLayer)
+            self.assertTrue(lyr.featureCount() > 0)
