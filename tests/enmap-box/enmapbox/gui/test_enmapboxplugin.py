@@ -21,7 +21,7 @@ import site
 import unittest
 
 from enmapbox import DIR_REPO
-from enmapbox.testing import TestCase, start_app
+from enmapbox.testing import TestCase, start_app, EnMAPBoxTestCase
 from qgis.core import QgsProject
 from qgis.utils import iface
 
@@ -52,6 +52,7 @@ class TestEnMAPBoxPlugin(TestCase):
         self.assertTrue(parser.get('general', 'email') != '')
         self.assertTrue(parser.get('general', 'repository') != '')
 
+    @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'Single use only')
     def test_loadplugin(self):
         from enmapbox.enmapboxplugin import EnMAPBoxPlugin
 
@@ -59,7 +60,6 @@ class TestEnMAPBoxPlugin(TestCase):
         self.assertIsInstance(plugin, EnMAPBoxPlugin)
         plugin.initGui()
         plugin.unload()
-
         QgsProject.instance().removeAllMapLayers()
 
     @unittest.skipIf(TestCase.runsInCI() or not deploy_folder.is_dir(), 'CI/Missing deploy folder')
