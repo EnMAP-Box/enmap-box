@@ -1,3 +1,6 @@
+import unittest
+
+import sklearn
 from sklearn.base import RegressorMixin
 
 from enmapboxprocessing.algorithm.fitcatboostregressoralgorithm import FitCatBoostRegressorAlgorithm
@@ -10,6 +13,9 @@ from enmapboxprocessing.algorithm.fitrandomforestregressoralgorithm import FitRa
 from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import regressorDumpSingleTargetPkl, regressorDumpPkl, regressorDumpMultiTargetPkl
+
+SKLEARN_VERSION = list(map(int, sklearn.__version__.split('.')))
+SKLEARN_VERSION_NUMBER = SKLEARN_VERSION[0] + SKLEARN_VERSION[1] / 10
 
 
 class FitTestRegressorAlgorithm(FitRegressorAlgorithmBase):
@@ -94,7 +100,8 @@ class TestFitRegressorAlgorithm(TestCase):
         }
         self.runalg(alg, parameters)
 
-    def _test_issue790(self):
+    @unittest.skipIf(SKLEARN_VERSION_NUMBER >= 1.8, 'CatBoost not compatible with sklearn >= 1.8')
+    def test_issue790(self):
         alg = FitCatBoostRegressorAlgorithm()
         parameters = {
             alg.P_DATASET: regressorDumpSingleTargetPkl,

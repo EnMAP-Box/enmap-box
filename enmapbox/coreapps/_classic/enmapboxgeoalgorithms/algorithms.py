@@ -3,8 +3,6 @@ from tempfile import gettempdir
 
 from qgis.core import *
 
-#from enmapbox.qgispluginsupport.qps.speclib import EnviSpectralLibraryIO
-from enmapbox.qgispluginsupport.qps.speclib.io.envi import EnviSpectralLibraryIO
 from _classic.hubdsm.processing.aggregatebands import AggregateBands
 from _classic.hubdsm.processing.classificationstatistics import ClassificationStatistics
 from _classic.hubdsm.processing.importdesisl2a import ImportDesisL2A
