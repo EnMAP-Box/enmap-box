@@ -1,5 +1,6 @@
 import unittest
 
+import sklearn
 from osgeo import gdal
 from sklearn.base import RegressorMixin
 
@@ -12,6 +13,9 @@ from enmapboxprocessing.algorithm.regressionworkflowalgorithm import RegressionW
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import enmap, enmap_potsdam, veg_cover_fraction_potsdam_point, regressorDumpSingleTargetPkl
 from enmapboxtestdata import regressorDumpMultiTargetPkl
+
+SKLEARN_VERSION = list(map(int, sklearn.__version__.split('.')))
+SKLEARN_VERSION_NUMBER = SKLEARN_VERSION[0] + SKLEARN_VERSION[1] / 10
 
 
 class FitTestRegressorAlgorithm(FitClassifierAlgorithmBase):
@@ -48,6 +52,7 @@ class TestRegressionWorkflowAlgorithm(TestCase):
         }
         self.runalg(alg, parameters)
 
+    @unittest.skipIf(SKLEARN_VERSION_NUMBER >= 1.8, 'CatBoost not compatible with sklearn >= 1.8')
     def test_catBoost_singleTarget(self):
 
         try:
@@ -70,6 +75,7 @@ class TestRegressionWorkflowAlgorithm(TestCase):
         }
         self.runalg(alg, parameters)
 
+    @unittest.skipIf(SKLEARN_VERSION_NUMBER >= 1.8, 'CatBoost not compatible with sklearn >= 1.8')
     def test_catBoost_multiTarget(self):
         try:
             import catboost
