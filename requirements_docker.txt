@@ -22,6 +22,7 @@ typeguard==2.13.3  # version 3.x created several problems
 numba>=0.54.1
 netCDF4>=1.5.7
 enpt-enmapboxapp # required by EnPT
+enfrosp_enmapboxapp>=0.1.1 # required by EnFROSP
 
 # automatically flagged as missing imports form IDE
 mock>=4.0.3
