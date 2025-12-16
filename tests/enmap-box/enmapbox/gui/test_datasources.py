@@ -20,10 +20,12 @@ from time import sleep
 
 from osgeo import ogr
 
+from enmapbox import initAll, DIR_REPO
 from enmapbox.exampledata import enmap, hires, landcover_polygon
 from enmapbox.gui.datasources.datasources import SpatialDataSource, DataSource, RasterDataSource, VectorDataSource, \
     FileDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager, DataSourceManagerPanelUI, DataSourceFactory
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
 from enmapbox.testing import start_app
 from enmapboxtestdata import classifierDumpPkl, library_berlin, enmap_srf_library
@@ -32,6 +34,7 @@ from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, Q
 from qgis.gui import QgsMapCanvas
 
 start_app()
+initAll()
 
 
 class DataSourceTests(EnMAPBoxTestCase):
@@ -196,6 +199,27 @@ class DataSourceTests(EnMAPBoxTestCase):
         lyr2 = ds1.asMapLayer(project=project)
 
         self.assertEqual(lyr1, lyr2)
+
+    def test_file_types(self):
+        # can we drag & drop ENVI BSQ images?
+        # see https://github.com/EnMAP-Box/enmap-box/issues/1382
+
+        from enmapbox.exampledata import enmap
+
+        testdata = Path(DIR_REPO) / 'enmapbox/qgispluginsupport/qpstestdata/wavelength'
+        assert testdata.is_dir()
+
+        files = [enmap, hires,
+                 testdata / 'envi_wl_fwhm.bsq']
+
+        EMB = EnMAPBox(load_core_apps=False, load_other_apps=False)
+
+        for i, file in enumerate(files):
+            self.assertTrue(Path(file).is_file())
+            EMB.addSource(file)
+            self.assertEqual(i + 1, len(EMB.dataSources('RASTER')))
+        self.showGui(EMB.ui)
+        EMB.close()
 
     def test_datasourcemanager(self):
         reg = QgsProject.instance()
