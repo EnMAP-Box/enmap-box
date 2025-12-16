@@ -20,11 +20,12 @@ BRANCH_NAME_LOOKUP = {
 }
 
 # define packages to be installed in the different *.yml files
+# compare with .env/requirements.csv
 # only define root packages, the
 DEPENDENCIES = {
     # define dependencies as: [<conda package name> | {<'conda'|'pip'>:<package name>, ...}, ...]
     # light = minimum requirements
-    'light': ['python>=3.10', 'pip', 'scikit-learn>=1', 'matplotlib', 'enpt'],
+    'light': ['python>=3.10', 'pip', 'scikit-learn>=1', 'matplotlib', 'enpt', 'colorama'],
     # full = all other packages to enjoy the full EnMAP-Box experience (on cost of disk space)
     'full': [{'conda': 'enpt', 'pip': 'enpt-enmapboxapp'}, 'xgboost', 'lightgbm', 'cdsapi', 'cython', 'netcdf4',
              'pygrib',
@@ -173,6 +174,9 @@ def update_yaml(dir_yaml,
             deps_pip.extend(d['pip'])
 
     deps_conda += sorted(set(deps_conda))
+    deps_pip = sorted(set(deps_pip))
+
+    deps_conda = sorted(set(deps_conda))
     deps_pip = sorted(set(deps_pip))
 
     if ltr_version:
