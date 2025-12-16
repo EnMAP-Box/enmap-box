@@ -145,6 +145,8 @@ have been completely redesigned (qps issues [100](https://github.com/EnMAP-Box/q
   updated [#1345](https://github.com/EnMAP-Box/enmap-box/issues/1345)
 * processing algorithm CLI help text contain HTML tags [#1348](https://github.com/EnMAP-Box/enmap-box/issues/1348)
 * ENVI BSQ files can be opened by drag and drop [#1382](https://github.com/EnMAP-Box/enmap-box/issues/1382)
+* [Spectral View] fixed extraction of profiles from raster
+  image [#1383](https://github.com/EnMAP-Box/enmap-box/issues/1383)
 
 </details>
 
