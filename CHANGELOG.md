@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Version 3.17 (2025-12-09)
+## Version 3.17 (2025-11-09)
 
 _This release was tested under QGIS 3.40 (LTR) and 3.44 (latest release)._
 
@@ -144,6 +144,7 @@ have been completely redesigned (qps issues [100](https://github.com/EnMAP-Box/q
 * [Spectral View] when adding a feature in a visualized speclib, the plot is not
   updated [#1345](https://github.com/EnMAP-Box/enmap-box/issues/1345)
 * processing algorithm CLI help text contain HTML tags [#1348](https://github.com/EnMAP-Box/enmap-box/issues/1348)
+* ENVI BSQ files can be opened by drag and drop [#1382](https://github.com/EnMAP-Box/enmap-box/issues/1382)
 * [Spectral View] fixed extraction of profiles from raster
   image [#1383](https://github.com/EnMAP-Box/enmap-box/issues/1383)
 
