@@ -169,6 +169,7 @@ class ImageCubeTests(EnMAPBoxTestCase):
         del w
         QgsProject.instance().removeAllMapLayers()
 
+    @unittest.skipIf(os.environ.get('QT_QPA_PLATFORM') == 'offscreen', "missing OpenGL")
     def test_extent(self):
 
         W = ImageCubeWidget()

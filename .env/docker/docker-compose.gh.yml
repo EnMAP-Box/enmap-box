@@ -1,4 +1,3 @@
-version: '3'
 services:
 
   qgis:
@@ -9,5 +8,5 @@ services:
         QGIS_TEST_VERSION: ${QGIS_TEST_VERSION}
     tty: true
     volumes:
-      - ${GITHUB_WORKSPACE}:/usr/src
-      #- ${PWD}/:/usr/src
+      # - ${GITHUB_WORKSPACE}:/usr/src
+      - ${PWD}/:/usr/src
