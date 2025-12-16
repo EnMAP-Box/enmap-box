@@ -173,9 +173,6 @@ def update_yaml(dir_yaml,
         if 'pip' in d:
             deps_pip.extend(d['pip'])
 
-    deps_conda += sorted(set(deps_conda))
-    deps_pip = sorted(set(deps_pip))
-
     deps_conda = sorted(set(deps_conda))
     deps_pip = sorted(set(deps_pip))
 
