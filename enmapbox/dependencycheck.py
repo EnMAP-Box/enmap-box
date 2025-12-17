@@ -170,7 +170,8 @@ class PIPPackage(object):
             if self.version_latest == '':
                 self.version_latest = self.version
 
-        self.required_by = info.get('required_by', None)
+        if 'required_by' in info:
+            self.required_by = info['required_by']
 
         if 'summary' in info:
             self.summary = info['summary']
@@ -614,7 +615,7 @@ def checkGDALIssues() -> List[str]:
 
 def requiredPackages(return_tuples: bool = False) -> List[PIPPackage]:
     """
-    Returns a list of pip packages that should be installable according to the `requirements.csv` file
+    Returns a list of pip packages that should be installable, according to the `requirements.csv` file
     :return: [list of strings]
     :rtype: list
     """
@@ -638,6 +639,8 @@ def requiredPackages(return_tuples: bool = False) -> List[PIPPackage]:
 
             pip_name = row['pip_name']
             required_by = row.get('required_by', None)
+            if required_by:
+                s = ""
             pkg = PIPPackage(pip_name,
                              required_by=required_by,
                              py_name=row.get('py_name', pip_name),
@@ -835,12 +838,14 @@ class PIPPackageFilterModel(QSortFilterProxyModel):
 
         if isinstance(pkg, PIPPackage):
             if self.mFilter1 == 'required':
-                if not pkg.isCoreRequirement():
+                if pkg.required_by is None:
                     return False
                 else:
                     s = ""
             elif self.mFilter1 == 'missing':
-                if not pkg.isMissing():
+                if pkg.required_by is None:
+                    return False
+                if pkg.isInstalled():
                     return False
 
         result = super().filterAcceptsRow(sourceRow, sourceParent)
@@ -926,7 +931,7 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
             self.dataChanged.emit(idx0, idx1, [role, Qt.ForegroundRole])
         return changed
 
-    def updatePackages(self, updates: List[Dict[str, Any]]) -> Tuple[List[PIPPackage], Tuple[List[PIPPackage]]]:
+    def updatePackages(self, updates: List[Dict[str, Any]]) -> Tuple[List[PIPPackage], List[PIPPackage]]:
 
         updated_packages = []
         new_packages = []

@@ -592,7 +592,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         from ..dependencycheck import requiredPackages
 
-        if len([p for p in requiredPackages() if not p.isInstalled() and not p.skipStartupWarning()]) > 0:
+        required = requiredPackages()
+        if len([p for p in required if
+                p.isCoreRequirement() and not p.isInstalled() and not p.skipStartupWarning()]) > 0:
             title = 'Missing Python Package(s)!'
 
             a = QAction('Show missing')
