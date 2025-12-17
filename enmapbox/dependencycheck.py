@@ -553,7 +553,7 @@ class PIPPackageInfoTask(QgsTask):
                     j = min(n, i + batch_size)
                     batch = pkg_all[i:j]
                     success, msg, err = call_pip_command(['show'] + [p['name'] for p in batch])
-                    if success:
+                    if success and msg not in ['', None]:
                         infoLinesAll = rxBlock.split(msg)
                         infoBatch = []
                         for infoLines in infoLinesAll:

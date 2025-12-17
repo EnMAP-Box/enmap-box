@@ -13,10 +13,10 @@ __date__ = '2017-07-17'
 __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
 import os
-import pathlib
 import sys
 import unittest
 import uuid
+from pathlib import Path
 from time import sleep
 from typing import List, Tuple
 
@@ -275,9 +275,15 @@ class test_dependencycheck(EnMAPBoxTestCase):
 
         s = ""
 
+    def test_find_pipexe(self):
+
+        p = localPipExecutable()
+        self.assertIsInstance(p, Path)
+        self.assertTrue(p.is_file())
+
     def test_findpython(self):
         p = localPythonExecutable()
-        self.assertIsInstance(p, pathlib.Path)
+        self.assertIsInstance(p, Path)
         self.assertTrue(p.is_file())
         self.assertTrue('python' in p.name.lower())
 
