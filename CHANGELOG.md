@@ -147,6 +147,8 @@ have been completely redesigned (qps issues [100](https://github.com/EnMAP-Box/q
 * ENVI BSQ files can be opened by drag and drop [#1382](https://github.com/EnMAP-Box/enmap-box/issues/1382)
 * [Spectral View] fixed extraction of profiles from raster
   image [#1383](https://github.com/EnMAP-Box/enmap-box/issues/1383)
+* [Spectral View] export spectral profiles uses current speclib and field
+  as default input [#1401](https://github.com/EnMAP-Box/enmap-box/issues/1401)
 
 </details>
 
