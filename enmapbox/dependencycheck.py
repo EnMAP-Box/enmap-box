@@ -293,8 +293,9 @@ def get_prog() -> str:
     return "pip"
 
 
-def localPipExecutable() -> Path:
+def localPipExecutable() -> Optional[Path]:
     global _LOCAL_PIPEXE
+
     if _LOCAL_PIPEXE is None:
 
         pipexe = Path(get_prog())
@@ -379,8 +380,8 @@ def call_pip_command(pipArgs) -> Tuple[bool, Optional[str], Optional[str]]:
 
     success = 0
     msgOut = msgErr = None
-    if True:
-        pipexe = localPipExecutable()
+    pipexe = localPipExecutable()
+    if pipexe:
         cmd = [str(pipexe)] + pipArgs
 
         kwargs = {}
@@ -1277,6 +1278,7 @@ class PIPPackageInstaller(QWidget):
     def onTaskMessage(self, msg: str, msg_type: Qgis.MessageLevel):
         if msg_type in [Qgis.MessageLevel.Critical]:
             self.addText(msg, QColor('red'))
+            self.tabWidget.setCurrentWidget(self.tabLog)
         else:
             self.addText(msg)
 
@@ -1313,7 +1315,7 @@ class PIPPackageInstaller(QWidget):
         n = self.proxyModel.rowCount()
         s = ""
 
-    def addText(self, text: str, color: QColor = None):
+    def addText(self, text: str, color: Optional[QColor] = None):
 
         c = self.tbLog.textColor()
         if isinstance(color, QColor):
