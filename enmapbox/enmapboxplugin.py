@@ -21,15 +21,14 @@ import sys
 import typing
 from os.path import basename, splitext
 
+from enmapbox.dependencycheck import missingTestData, installTestData
+from enmapbox.enmapboxprojectsettings import EnMAPBoxProjectSettings
 from qgis.PyQt.QtCore import QOperatingSystemVersion
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsRasterLayer, QgsVectorLayer, QgsProject, Qgis
 from qgis.gui import QgisInterface, QgsDockWidget
-
-from enmapbox.dependencycheck import missingTestData, installTestData
-from enmapbox.enmapboxprojectsettings import EnMAPBoxProjectSettings
 
 
 class EnMAPBoxPlugin(object):
@@ -78,7 +77,7 @@ class EnMAPBoxPlugin(object):
         """
         from enmapbox import messageLog
         from enmapbox.dependencycheck import missingPackageInfo, requiredPackages
-        missing = [p for p in requiredPackages() if not p.isInstalled()]
+        missing = [p for p in requiredPackages() if p.isCoreRequirement() and not p.isInstalled()]
         if len(missing) > 0:
             info = missingPackageInfo(missing, html=False)
             # warnings.warn(info, ImportWarning)

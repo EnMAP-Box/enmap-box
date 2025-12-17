@@ -1,21 +1,22 @@
 pip_name,py_name,min_version,required_by,comment
-astropy,,,,
-PyOpenGL,OpenGL,,,required by imageCube application
-xgboost,,,,
-lightgbm,,,,
-sympy,,,,
-enpt-enmapboxapp,enpt_enmapboxapp,,,required by EnPT
-scikit-learn,sklearn,1.0,core,required to run several EnMAP-Box algorithms
-numba,,0.57,"",
-netCDF4,,,,required by ONNS
-GDAL,osgeo.gdal,,core,installed with QGIS
-numpy,,,core,installed with QGIS
-torch,,,,required by SpecDeepMap application
-lightning,,,,required by SpecDeepMap application
-tensorboard,,,,required by SpecDeepMap application
-torchvision,,,,required by SpecDeepMap application
-segmentation-models-pytorch,segmentation_models_pytorch,,,required by SpecDeepMap application
-pandas,,,,required by SpecDeepMap application
+astropy,,,full,provides concolution filters
 colorama,colorama,,core,required by pyqtgraph
-matplotlib,,,core,installed with QGIS
-enpt,,,,
+enpt,,,enpt,required by EnPT
+enpt-enmapboxapp,enpt_enmapboxapp,,enpt,required by EnPT
+GDAL,osgeo.gdal,,core,usually already installed with QGIS
+lightgbm,,,full,required by LGBM estimators
+lightning,,,specdeepmap,required by SpecDeepMap
+matplotlib,,,core,usually already installed with QGIS
+netCDF4,,,full,required by ONNS
+numba,,0.57,full,required by EnSoMap
+numpy,,,core,usually already installed with QGIS
+pandas,,,specdeepmap,required by SpecDeepMap
+PyOpenGL,OpenGL,,imagecube,required by imageCube application
+scikit-learn,sklearn,1.0,core,required to run several EnMAP-Box algorithms
+scipy,,,core,required by multiple tools
+segmentation-models-pytorch,segmentation_models_pytorch,,specdeepmap,required by SpecDeepMap
+sympy,,,specdeepmap,required by SpecDeepMap
+tensorboard,,,specdeepmap,required by SpecDeepMap
+torch,,,specdeepmap,required by SpecDeepMap
+torchvision,,,specdeepmap,required by SpecDeepMap
+xgboost,,,full,required by CatBoost estimator

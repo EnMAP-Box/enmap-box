@@ -138,6 +138,7 @@ class PIPPackage(object):
         self.location: str = ''
         self.stderrMsg: str = ''
         self.stdoutMsg: str = ''
+        self.comment: Optional[str] = comment
 
         self.version_latest: str = ''
         self.version: str = ''
@@ -170,7 +171,8 @@ class PIPPackage(object):
             if self.version_latest == '':
                 self.version_latest = self.version
 
-        self.required_by = info.get('required_by', None)
+        if 'required_by' in info:
+            self.required_by = info['required_by']
 
         if 'summary' in info:
             self.summary = info['summary']
@@ -551,7 +553,7 @@ class PIPPackageInfoTask(QgsTask):
                     j = min(n, i + batch_size)
                     batch = pkg_all[i:j]
                     success, msg, err = call_pip_command(['show'] + [p['name'] for p in batch])
-                    if success:
+                    if success and msg not in ['', None]:
                         infoLinesAll = rxBlock.split(msg)
                         infoBatch = []
                         for infoLines in infoLinesAll:
@@ -614,7 +616,7 @@ def checkGDALIssues() -> List[str]:
 
 def requiredPackages(return_tuples: bool = False) -> List[PIPPackage]:
     """
-    Returns a list of pip packages that should be installable according to the `requirements.csv` file
+    Returns a list of pip packages that should be installable, according to the `requirements.csv` file
     :return: [list of strings]
     :rtype: list
     """
@@ -638,6 +640,8 @@ def requiredPackages(return_tuples: bool = False) -> List[PIPPackage]:
 
             pip_name = row['pip_name']
             required_by = row.get('required_by', None)
+            if required_by:
+                s = ""
             pkg = PIPPackage(pip_name,
                              required_by=required_by,
                              py_name=row.get('py_name', pip_name),
@@ -835,12 +839,14 @@ class PIPPackageFilterModel(QSortFilterProxyModel):
 
         if isinstance(pkg, PIPPackage):
             if self.mFilter1 == 'required':
-                if not pkg.isCoreRequirement():
+                if pkg.required_by is None:
                     return False
                 else:
                     s = ""
             elif self.mFilter1 == 'missing':
-                if not pkg.isMissing():
+                if pkg.required_by is None:
+                    return False
+                if pkg.isInstalled():
                     return False
 
         result = super().filterAcceptsRow(sourceRow, sourceParent)
@@ -851,12 +857,13 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
     CN_PIP = 0
     CN_VERSION = 1
     CN_LATEST_VERSION = 2
-    CN_SUMMARY = 3
-    CN_LOCATION = 4
-    CN_INSTALLER = 5
-    CN_LICENSE = 6
-    CN_HOMEPAGE = 7
-    CN_REQUIRES = 8
+    CN_COMMENT = 3
+    CN_SUMMARY = 4
+    CN_LOCATION = 5
+    CN_INSTALLER = 6
+    CN_LICENSE = 7
+    CN_HOMEPAGE = 8
+    CN_REQUIRES = 9
 
     def __init__(self, *args, **kwds):
         super().__init__(*args, **kwds)
@@ -865,6 +872,7 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
             self.CN_PIP: 'Package',
             self.CN_VERSION: 'Version',
             self.CN_LATEST_VERSION: 'Latest',
+            self.CN_COMMENT: 'Comment',
             self.CN_SUMMARY: 'Summary',
             self.CN_LOCATION: 'Location',
             self.CN_INSTALLER: 'Installer',
@@ -877,7 +885,8 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
             self.CN_PIP: 'PyPI package name. <br>Uncheck to skip a "missing package" warning at EnMAP-Box startup.',
             self.CN_VERSION: 'Installed Version',
             self.CN_LATEST_VERSION: 'Latest Version',
-            self.CN_SUMMARY: 'Package Summary',
+            self.CN_COMMENT: 'Comment',
+            self.CN_SUMMARY: 'PyPi Package Summary',
             self.CN_LOCATION: 'Install Location',
             self.CN_INSTALLER: 'The installer that installed the package',
             self.CN_LICENSE: 'Package License',
@@ -900,7 +909,8 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
         flags = Qt.ItemIsEnabled | Qt.ItemIsSelectable
         if index.column() == self.CN_PIP:
             pkg = self.mPackages[index.row()]
-            if pkg.isCoreRequirement() and pkg.isMissing():
+            # if pkg.isCoreRequirement():  # and pkg.isMissing():
+            if pkg.required_by == 'core':
                 flags = flags | Qt.ItemIsUserCheckable
         return flags
 
@@ -926,7 +936,7 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
             self.dataChanged.emit(idx0, idx1, [role, Qt.ForegroundRole])
         return changed
 
-    def updatePackages(self, updates: List[Dict[str, Any]]) -> Tuple[List[PIPPackage], Tuple[List[PIPPackage]]]:
+    def updatePackages(self, updates: List[Dict[str, Any]]) -> Tuple[List[PIPPackage], List[PIPPackage]]:
 
         updated_packages = []
         new_packages = []
@@ -1000,7 +1010,8 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
         pkg_license = package.license.splitlines()[0] if len(package.license) > 0 else ''
 
         html += f"""<br>
-        <b>Summary:</b>{package.summary}<br>
+        <b>Comment:</b> {package.comment}<br>
+        <b>Summary:</b> {package.summary}<br>
         <b>Installed Version:</b> {package.version}<br>
         <b>Latest Version:</b> {package.version_latest}<br>
         <b>Homepage:</b> <a href="{package.homepage}">{package.homepage}</a><br>
@@ -1029,6 +1040,9 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
 
             if col == self.CN_LATEST_VERSION:
                 return pkg.version_latest
+
+            if col == self.CN_COMMENT:
+                return pkg.comment
 
             if col == self.CN_SUMMARY:
                 return pkg.summary
