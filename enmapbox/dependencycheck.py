@@ -138,6 +138,7 @@ class PIPPackage(object):
         self.location: str = ''
         self.stderrMsg: str = ''
         self.stdoutMsg: str = ''
+        self.comment: Optional[str] = comment
 
         self.version_latest: str = ''
         self.version: str = ''
@@ -856,12 +857,13 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
     CN_PIP = 0
     CN_VERSION = 1
     CN_LATEST_VERSION = 2
-    CN_SUMMARY = 3
-    CN_LOCATION = 4
-    CN_INSTALLER = 5
-    CN_LICENSE = 6
-    CN_HOMEPAGE = 7
-    CN_REQUIRES = 8
+    CN_COMMENT = 3
+    CN_SUMMARY = 4
+    CN_LOCATION = 5
+    CN_INSTALLER = 6
+    CN_LICENSE = 7
+    CN_HOMEPAGE = 8
+    CN_REQUIRES = 9
 
     def __init__(self, *args, **kwds):
         super().__init__(*args, **kwds)
@@ -870,6 +872,7 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
             self.CN_PIP: 'Package',
             self.CN_VERSION: 'Version',
             self.CN_LATEST_VERSION: 'Latest',
+            self.CN_COMMENT: 'Comment',
             self.CN_SUMMARY: 'Summary',
             self.CN_LOCATION: 'Location',
             self.CN_INSTALLER: 'Installer',
@@ -882,7 +885,8 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
             self.CN_PIP: 'PyPI package name. <br>Uncheck to skip a "missing package" warning at EnMAP-Box startup.',
             self.CN_VERSION: 'Installed Version',
             self.CN_LATEST_VERSION: 'Latest Version',
-            self.CN_SUMMARY: 'Package Summary',
+            self.CN_COMMENT: 'Comment',
+            self.CN_SUMMARY: 'PyPi Package Summary',
             self.CN_LOCATION: 'Install Location',
             self.CN_INSTALLER: 'The installer that installed the package',
             self.CN_LICENSE: 'Package License',
@@ -905,7 +909,8 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
         flags = Qt.ItemIsEnabled | Qt.ItemIsSelectable
         if index.column() == self.CN_PIP:
             pkg = self.mPackages[index.row()]
-            if pkg.isCoreRequirement() and pkg.isMissing():
+            # if pkg.isCoreRequirement():  # and pkg.isMissing():
+            if pkg.required_by == 'core':
                 flags = flags | Qt.ItemIsUserCheckable
         return flags
 
@@ -1005,7 +1010,8 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
         pkg_license = package.license.splitlines()[0] if len(package.license) > 0 else ''
 
         html += f"""<br>
-        <b>Summary:</b>{package.summary}<br>
+        <b>Comment:</b> {package.comment}<br>
+        <b>Summary:</b> {package.summary}<br>
         <b>Installed Version:</b> {package.version}<br>
         <b>Latest Version:</b> {package.version_latest}<br>
         <b>Homepage:</b> <a href="{package.homepage}">{package.homepage}</a><br>
@@ -1034,6 +1040,9 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
 
             if col == self.CN_LATEST_VERSION:
                 return pkg.version_latest
+
+            if col == self.CN_COMMENT:
+                return pkg.comment
 
             if col == self.CN_SUMMARY:
                 return pkg.summary

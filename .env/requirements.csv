@@ -1,22 +1,22 @@
 pip_name,py_name,min_version,required_by,comment
-astropy,,,full,
+astropy,,,full,provides concolution filters
 colorama,colorama,,core,required by pyqtgraph
-enpt,,,enpt,
+enpt,,,enpt,required by EnPT
 enpt-enmapboxapp,enpt_enmapboxapp,,enpt,required by EnPT
-GDAL,osgeo.gdal,,core,installed with QGIS
-lightgbm,,,full,
-lightning,,,specdeepmap,required by SpecDeepMap application
-matplotlib,,,core,installed with QGIS
+GDAL,osgeo.gdal,,core,usually already installed with QGIS
+lightgbm,,,full,required by LGBM estimators
+lightning,,,specdeepmap,required by SpecDeepMap
+matplotlib,,,core,usually already installed with QGIS
 netCDF4,,,full,required by ONNS
-numba,,0.57,full,
-numpy,,,core,installed with QGIS
-pandas,,,specdeepmap,required by SpecDeepMap application
+numba,,0.57,full,required by EnSoMap
+numpy,,,core,usually already installed with QGIS
+pandas,,,specdeepmap,required by SpecDeepMap
 PyOpenGL,OpenGL,,imagecube,required by imageCube application
 scikit-learn,sklearn,1.0,core,required to run several EnMAP-Box algorithms
-scipy,,,core,
-segmentation-models-pytorch,segmentation_models_pytorch,,specdeepmap,required by SpecDeepMap application
-sympy,,,full,
-tensorboard,,,specdeepmap,required by SpecDeepMap application
-torch,,,specdeepmap,required by SpecDeepMap application
-torchvision,,,specdeepmap,required by SpecDeepMap application
-xgboost,,,full,
+scipy,,,core,required by multiple tools
+segmentation-models-pytorch,segmentation_models_pytorch,,specdeepmap,required by SpecDeepMap
+sympy,,,specdeepmap,required by SpecDeepMap
+tensorboard,,,specdeepmap,required by SpecDeepMap
+torch,,,specdeepmap,required by SpecDeepMap
+torchvision,,,specdeepmap,required by SpecDeepMap
+xgboost,,,full,required by CatBoost estimator
