@@ -44,8 +44,8 @@ from enmapbox.qgispluginsupport.qps.utils import qgisAppQgisInterface
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import pyqtSignal, QAbstractTableModel, QModelIndex, QProcess, QSortFilterProxyModel, Qt, QUrl
 from qgis.PyQt.QtGui import QColor, QContextMenuEvent, QDesktopServices
-from qgis.PyQt.QtWidgets import QApplication, QDialogButtonBox, QMenu, QMessageBox, QStyledItemDelegate, QTableView, \
-    QWidget
+from qgis.PyQt.QtWidgets import (QApplication, QDialogButtonBox, QMenu, QMessageBox,
+                                 QStyledItemDelegate, QTableView, QWidget)
 from qgis.core import Qgis, QgsAnimatedIcon, QgsApplication, QgsTask, QgsTaskManager
 from qgis.gui import QgsFileDownloaderDialog
 
@@ -1158,7 +1158,7 @@ class PIPPackageInstallerTableView(QTableView):
 class PIPPackageInstaller(QWidget):
 
     def __init__(self, *args, **kwds):
-        super().__init__(*args, **kwds)
+        super().__init__(*args, flags=Qt.Window, **kwds)
         from enmapbox.gui.utils import loadUi
         from enmapbox import DIR_UIFILES
         path = Path(DIR_UIFILES) / 'pippackageinstaller.ui'

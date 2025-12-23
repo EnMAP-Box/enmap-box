@@ -796,7 +796,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         """
         from ..dependencycheck import PIPPackageInstaller, requiredPackages
 
-        w = PIPPackageInstaller()
+        w = PIPPackageInstaller(parent=self.ui)
         w.addPackages(requiredPackages())
         w.show()
 
