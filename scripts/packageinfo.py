@@ -7,6 +7,7 @@ python scripts/packageinfo.py --tag=conda
 import argparse
 import csv
 import platform
+import site
 from datetime import datetime
 from importlib import metadata
 from pathlib import Path
@@ -18,7 +19,16 @@ from qgis.core import Qgis
 def get_package_info():
     """Returns a dictionary of {package_name: version} for the current environment."""
     packages = {}
+    user_site = Path(site.getusersitepackages()).resolve()
     for dist in metadata.distributions():
+        dist_path = Path(dist.locate_file('')).resolve()
+        try:
+            dist_path.relative_to(user_site)
+            # If no error, it is inside the user site-packages; skip it
+            continue
+        except ValueError:
+            pass
+
         name = dist.metadata["Name"]
         packages[name] = dist.version
     return packages
