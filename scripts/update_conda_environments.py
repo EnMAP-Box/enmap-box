@@ -19,6 +19,10 @@ BRANCH_NAME_LOOKUP = {
     'latest': ''
 }
 
+# QGIS conda versions that are known to have problems
+# e.g., https://github.com/conda-forge/qgis-feedstock/issues/570
+EXCLUDED_QGIS_VERSIONS = ['<3.44.3']
+
 # define packages to be installed in the different *.yml files
 # compare with .env/requirements.csv
 # only define root packages, the
@@ -105,7 +109,7 @@ def get_current_qgis_versions() -> dict:
     return VERSIONS
 
 
-def get_conda_qgis_versions() -> dict:
+def get_conda_qgis_versions() -> List[str]:
     path_repodata = DIR_TMP / f'condaforge-repodata-{str(datetime.date.today())}.json'
 
     if not path_repodata.is_file():
@@ -130,6 +134,7 @@ def get_conda_qgis_versions() -> dict:
     qgis_builds += [v for k, v in repodata['packages'].items() if rxPkg.match(k)]
     qgis_builds += [v for k, v in repodata['packages.conda'].items() if rxPkg.match(k)]
     qgis_versions = sorted(set([build['version'] for build in qgis_builds]))
+
     return qgis_versions
 
 
@@ -176,11 +181,13 @@ def update_yaml(dir_yaml,
     deps_conda = sorted(set(deps_conda))
     deps_pip = sorted(set(deps_pip))
 
-    if ltr_version:
-        deps_conda.insert(0, f'qgis={ltr_version}')
-    else:
-        deps_conda.insert(0, 'qgis')
+    qgis_version = f'qgis={ltr_version}' if ltr_version else 'qgis'
+    for v in EXCLUDED_QGIS_VERSIONS:
+        if re.search(r'\d+$', qgis_version) and not v.startswith(','):
+            qgis_version += ','
+        qgis_version += v
 
+    deps_conda.insert(0, qgis_version)
     environment = {
         'name': name,
         'channels': ['conda-forge'],

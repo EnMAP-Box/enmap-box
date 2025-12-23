@@ -9,6 +9,7 @@
 *.js text eol=lf
 *.py text eol=lf
 *.ts text eol=lf
+*.ui text eol=lf
 *.css text eol=lf
 *.html text eol=lf
 *.json text eol=lf
