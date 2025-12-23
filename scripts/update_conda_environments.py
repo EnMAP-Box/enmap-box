@@ -21,7 +21,7 @@ BRANCH_NAME_LOOKUP = {
 
 # QGIS conda versions that are known to have problems
 # e.g., https://github.com/conda-forge/qgis-feedstock/issues/570
-EXCLUDED_QGIS_VERSIONS = ['3.44.4', '3.44.5']
+EXCLUDED_QGIS_VERSIONS = ['<3.44.3']
 
 # define packages to be installed in the different *.yml files
 # compare with .env/requirements.csv
@@ -183,9 +183,9 @@ def update_yaml(dir_yaml,
 
     qgis_version = f'qgis={ltr_version}' if ltr_version else 'qgis'
     for v in EXCLUDED_QGIS_VERSIONS:
-        if re.search(r'\d+$', qgis_version):
+        if re.search(r'\d+$', qgis_version) and not v.startswith(','):
             qgis_version += ','
-        qgis_version += f'!={v}'
+        qgis_version += v
 
     deps_conda.insert(0, qgis_version)
     environment = {
