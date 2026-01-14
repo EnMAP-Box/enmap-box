@@ -60,10 +60,14 @@ have been completely redesigned (qps issues [100](https://github.com/EnMAP-Box/q
   QGIS [#1227](https://github.com/EnMAP-Box/enmap-box/issues/1227)
 * Update HTML report style [#1247](https://github.com/EnMAP-Box/enmap-box/issues/1247)
 * Use EnMAPBox.project() [#1272](https://github.com/EnMAP-Box/enmap-box/issues/1272)
+* [Spectral View] can't create a new and empty spectral view [#1310](https://github.com/EnMAP-Box/enmap-box/issues/1310)
+* [Spectral View] deactivated candidate profile is still
+  displayed [#1330](https://github.com/EnMAP-Box/enmap-box/issues/1330)
+* unified config files [#1332](https://github.com/EnMAP-Box/enmap-box/issues/1332)
 
 ### Fixed Bugs
 
-<details><summary>Show all (32)</summary>
+<details><summary>Show all (48)</summary>
 
 * [Data sources] Drag & Drop of temporary vector layers not
   working [#877](https://github.com/EnMAP-Box/enmap-box/issues/877)
@@ -84,6 +88,7 @@ have been completely redesigned (qps issues [100](https://github.com/EnMAP-Box/q
   long [#1166](https://github.com/EnMAP-Box/enmap-box/issues/1166)
 * [Profile Analytics] UDF error messages aren't printed
   correctly [#1188](https://github.com/EnMAP-Box/enmap-box/issues/1188)
+* Error executing python [#1200](https://github.com/EnMAP-Box/enmap-box/issues/1200)
 * Raster Layer Styling does not read tanager wavelengths [#1208](https://github.com/EnMAP-Box/enmap-box/issues/1208)
 * Drag & Drop Tanager .h5 file fails [#1209](https://github.com/EnMAP-Box/enmap-box/issues/1209)
 * ENVI spectra library reading: GDAL_VRT_RAWRASTERBAND_ALLOWED_SOURCE GDAL
@@ -97,6 +102,7 @@ have been completely redesigned (qps issues [100](https://github.com/EnMAP-Box/q
   Bratislava [#1236](https://github.com/EnMAP-Box/enmap-box/issues/1236)
 * [Classification workflow] AssertionError: empty strata detected: {1, 2, 3,
   4} [#1240](https://github.com/EnMAP-Box/enmap-box/issues/1240)
+* Another value error in raster layer styling panel [#1245](https://github.com/EnMAP-Box/enmap-box/issues/1245)
 * Tanager Core Imagery Sample raises exception [#1257](https://github.com/EnMAP-Box/enmap-box/issues/1257)
 * [PyPi Package Info] don't show a warning for missing packages, which aren't included in the
   requirements_osgeo4w.txt [#1258](https://github.com/EnMAP-Box/enmap-box/issues/1258)
@@ -110,10 +116,39 @@ have been completely redesigned (qps issues [100](https://github.com/EnMAP-Box/q
 * MaskRasterDataProvider causes SegFaults [#1268](https://github.com/EnMAP-Box/enmap-box/issues/1268)
 * RasterLayerStyling Panel causes QGIS crash by segfault [#1271](https://github.com/EnMAP-Box/enmap-box/issues/1271)
 * [CI] test_CreateMaskAlgorithm.py several tests fail [#1276](https://github.com/EnMAP-Box/enmap-box/issues/1276)
+* several apps define a QDockWidget inside the UI file but refer to it as a QgsDockWidget in the PY
+  file [#1283](https://github.com/EnMAP-Box/enmap-box/issues/1283)
 * Sensor Import Panel fails on linux & macOS [#1295](https://github.com/EnMAP-Box/enmap-box/issues/1295)
 * [Processing] AttributeError: 'NoneType' object has no attribute '
   mapTool' [#1300](https://github.com/EnMAP-Box/enmap-box/issues/1300)
+* [Processing] layer list shows old layers, which aren't available
+  anymore [#1301](https://github.com/EnMAP-Box/enmap-box/issues/1301)
 * Raster Band stacking fails to stack Sentinel-2 bands [#1302](https://github.com/EnMAP-Box/enmap-box/issues/1302)
+* [Profile Analytics] RecursionError: maximum recursion depth
+  exceeded [#1309](https://github.com/EnMAP-Box/enmap-box/issues/1309)
+* [Data Sources] the node to the actual speclib is missing [#1311](https://github.com/EnMAP-Box/enmap-box/issues/1311)
+* [Profile Analytics] AttributeError: 'SpectralLibraryDock' object has no attribute '
+  speclib' [#1323](https://github.com/EnMAP-Box/enmap-box/issues/1323)
+* candidate profiles aren't plotted correctly in second Spectral
+  View [#1325](https://github.com/EnMAP-Box/enmap-box/issues/1325)
+* candidate profile not plotted correctly and profile wrongly added to source (edits file on
+  disk) [#1326](https://github.com/EnMAP-Box/enmap-box/issues/1326)
+* [Spectral View] deactivated candidate profile is still
+  displayed [#1330](https://github.com/EnMAP-Box/enmap-box/issues/1330)
+* [Spectral View] default candidate profile style changes after adding new
+  visualization [#1331](https://github.com/EnMAP-Box/enmap-box/issues/1331)
+* Plugin metadata.txt about text [#1333](https://github.com/EnMAP-Box/enmap-box/issues/1333)
+* Remove closed dock instances [#1336](https://github.com/EnMAP-Box/enmap-box/issues/1336)
+* Raster Layer Styling panel fails to initialize slider
+  positions [#1339](https://github.com/EnMAP-Box/enmap-box/issues/1339)
+* [Spectral View] when adding a feature in a visualized speclib, the plot is not
+  updated [#1345](https://github.com/EnMAP-Box/enmap-box/issues/1345)
+* processing algorithm CLI help text contain HTML tags [#1348](https://github.com/EnMAP-Box/enmap-box/issues/1348)
+* ENVI BSQ files can be opened by drag and drop [#1382](https://github.com/EnMAP-Box/enmap-box/issues/1382)
+* [Spectral View] fixed extraction of profiles from raster
+  image [#1383](https://github.com/EnMAP-Box/enmap-box/issues/1383)
+* [Spectral View] export spectral profiles uses current speclib and field
+  as default input [#1401](https://github.com/EnMAP-Box/enmap-box/issues/1401)
 
 </details>
 

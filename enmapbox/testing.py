@@ -42,12 +42,12 @@ start_app = start_app
 class EnMAPBoxTestCase(TestCase):
 
     def tearDown(self):
-        super().tearDown()
         from .gui.enmapboxgui import EnMAPBox
         emb = EnMAPBox.instance()
         if emb:
             emb.close()
             EnMAPBox._instance = None
+        super().tearDown()
 
     @classmethod
     def setUpClass(cls, resources=[]):
@@ -75,6 +75,7 @@ class EnMAPBoxTestCase(TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.closeEnMAPBoxInstance()
+        super().tearDownClass()
 
     def tempDir(self, subdir: str = None, cleanup: bool = False) -> pathlib.Path:
         """

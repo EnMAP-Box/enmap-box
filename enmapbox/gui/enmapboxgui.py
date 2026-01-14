@@ -592,7 +592,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         from ..dependencycheck import requiredPackages
 
-        if len([p for p in requiredPackages() if not p.isInstalled() and not p.skipStartupWarning()]) > 0:
+        required = requiredPackages()
+        if len([p for p in required if
+                p.isCoreRequirement() and not p.isInstalled() and not p.skipStartupWarning()]) > 0:
             title = 'Missing Python Package(s)!'
 
             a = QAction('Show missing')
@@ -794,8 +796,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         """
         from ..dependencycheck import PIPPackageInstaller, requiredPackages
 
-        w = PIPPackageInstaller()
-        w.addPackages(requiredPackages(), required=True)
+        w = PIPPackageInstaller(parent=self.ui)
+        w.addPackages(requiredPackages())
         w.show()
 
     def showResourceBrowser(self, *args):
@@ -1581,7 +1583,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             sl = None
             # create a standard in-memory library shown in the dock
             if len(slw.sourceLayers()) == 0:
-                dock.createDefaultSpeclib()
+                sl = dock.createDefaultSpeclib()
 
             self.dataSourceManager().addDataSources(slw.sourceLayers())
 
@@ -1787,7 +1789,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     def initEnMAPBoxApplications(self,
                                  load_core_apps: bool = True,
-                                 load_other_apps: bool = True):
+                                 load_other_apps: bool = True,
+                                 whitelist: Optional[List[str]] = None,
+                                 blacklist: Optional[List[str]] = None):
         """
         Initialized EnMAPBoxApplications
         """
@@ -1797,6 +1801,11 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         INTERNAL_APPS = DIR_ENMAPBOX / 'coreapps'
         EO4Q_APPS = DIR_ENMAPBOX / 'eo4qapps'
         EXTERNAL_APPS = DIR_ENMAPBOX / 'apps'
+
+        if isinstance(whitelist, list):
+            self.applicationRegistry.setWhitelist(whitelist)
+        elif isinstance(blacklist, list):
+            self.applicationRegistry.setBlacklist(blacklist)
 
         # load internal "core" apps
         if load_core_apps:
@@ -2006,6 +2015,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
                 for lyr in lyrs:
                     dock.layerTree().addLayer(lyr)
+
                 dock.mapCanvas().zoomToFullExtent()
 
         if testData:
@@ -2364,6 +2374,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         event.accept()
 
     def close(self):
+        for appWrapper in self.applicationRegistry:
+            appWrapper.app.close()
         self.disconnectQGISSignals()
         self.dockManager().clear()
         self.ui.close()

@@ -31,7 +31,8 @@ class SpectralIndexExplorerDockWidget(QgsDockWidget):
     EnmapBoxInterface, QgisInterface = 0, 1
 
     def __init__(self, parent=None):
-        QgsDockWidget.__init__(self, parent)
+        # QgsDockWidget.__init__(self, parent)
+        super().__init__(parent)
         uic.loadUi(__file__.replace('.py', '.ui'), self)
 
         # set from outside

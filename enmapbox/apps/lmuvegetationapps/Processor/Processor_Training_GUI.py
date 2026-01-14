@@ -33,10 +33,8 @@ import sys
 import warnings
 
 import joblib
-import matplotlib.pyplot as plt
-from PyQt5.QtWidgets import QVBoxLayout
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qtagg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from sklearn.linear_model import LinearRegression
