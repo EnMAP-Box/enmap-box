@@ -5,7 +5,7 @@
    viewBox="0 0 85.03937 85.03937"
    id="svg2"
    version="1.1"
-   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
+   inkscape:version="1.4.2 (ebf0e940, 2025-05-08)"
    sodipodi:docname="viewlist_textview_2nd.svg"
    inkscape:export-filename="C:\Users\geo_mahe\Desktop\buttons\Benni_19_10_2016\viewlist_dock_2nd.png"
    inkscape:export-xdpi="90"
@@ -26,16 +26,16 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1920"
-     inkscape:window-height="1131"
+     inkscape:window-width="1392"
+     inkscape:window-height="900"
      id="namedview576"
      showgrid="false"
      inkscape:zoom="5.3285232"
      inkscape:cx="44.759118"
-     inkscape:cy="43.539268"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
+     inkscape:cy="43.445434"
+     inkscape:window-x="215"
+     inkscape:window-y="39"
+     inkscape:window-maximized="0"
      inkscape:current-layer="svg2"
      showguides="false"
      inkscape:guide-bbox="true"
@@ -213,9 +213,15 @@
      inkscape:export-xdpi="90"
      inkscape:export-ydpi="90"
      transform="matrix(0.99999999,1.1790854e-4,-1.2027892e-4,0.99999999,0,0)" />
-  <path
-     style="font-size:40px;line-height:125%;font-family:Monospace;-inkscape-font-specification:'Monospace, @wght=700';font-variation-settings:'wght' 700;letter-spacing:0px;word-spacing:0px;stroke:#ffffff;stroke-width:1.35354"
-     d="m 16.695442,61.039371 v -23.56 H 8.8154423 v -5 H 30.415442 v 5 h -7.92 v 23.56 z m 15.720016,0 7.72,-11.12 -7.36,-10.72 h 6.96 l 3.96,6.88 4.16,-6.88 h 6.96 l -7.52,10.72 7.52,11.12 h -6.96 l -4.12,-7.2 -4.36,7.2 z m 38.840015,0.4 q -2.8,0 -4.72,-0.8 -1.88,-0.84 -2.84,-2.56 -0.96,-1.76 -0.96,-4.56 v -9.52 h -5 v -3.6 l 5.44,-1.2 0.96,-5.44 h 4.4 v 5.44 h 8.2 v 4.8 h -8.2 v 8.92 q 0,1.56 0.52,2.36 0.52,0.76 1.4,1.04 0.88,0.28 1.92,0.28 0.96,0 1.96,-0.16 1,-0.16 2.6,-0.44 v 4.56 q -1.48,0.48 -2.92,0.68 -1.4,0.2 -2.76,0.2 z"
-     id="text3898"
-     aria-label="Txt" />
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:Verdana;-inkscape-font-specification:'Verdana, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:1.35354327;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-dasharray:none"
+     x="9.5507812"
+     y="61.039371"
+     id="text3898"><tspan
+       sodipodi:role="line"
+       id="tspan3900"
+       x="9.5507812"
+       y="61.039371"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:Verdana;-inkscape-font-specification:'Verdana, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-opacity:1;stroke-width:1.35354327;stroke-dasharray:none">Txt</tspan></text>
 </svg>
