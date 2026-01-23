@@ -739,5 +739,5 @@ class TestRasterReader(TestCase):
         )
         array = reader.arrayFromBoundingBoxAndSize(extent4326, 10, 10, [1])
         print(array)
-
+        # 
         # self.assertTrue(np.all(np.equal(reader.noDataValue(1), lead)))
