@@ -216,8 +216,8 @@ class SpectralIndexExplorerDockWidget(QgsDockWidget):
             tooltip += f"<p><strong>Short Name</strong><br>{v['short_name']}</p>"
             tooltip += f"<p><strong>Formula</strong><br><code>{v['formula']}</code></p>"
             tooltip += f"<p><strong>Application Domain</strong><br>{v['application_domain']}</p>"
-            tooltip += f"<p><strong>Platforms</strong><br>{", ".join(v['platforms'])}</p>"
-            tooltip += f"<p><strong>Bands</strong><br>{", ".join(v['bands'])}</p>"
+            tooltip += f"<p><strong>Platforms</strong><br>{', '.join(v['platforms'])}</p>"
+            tooltip += f"<p><strong>Bands</strong><br>{', '.join(v['bands'])}</p>"
             tooltip += '</div>'
 
             self.mTableIndices.setItem(i, 0, QTableWidgetItem(v['formula'])),
