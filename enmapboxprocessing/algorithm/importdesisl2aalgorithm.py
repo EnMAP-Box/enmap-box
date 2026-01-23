@@ -2,15 +2,13 @@ from os.path import basename
 from typing import Dict, Any, List, Tuple
 
 from osgeo import gdal
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer, QgsMapLayer
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
-from enmapboxprocessing.algorithm.preparerasteralgorithm import PrepareRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-from enmapboxprocessing.gdalutils import GdalUtils
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer, QgsMapLayer
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -45,7 +43,7 @@ class ImportDesisL2AAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFile(
             self.P_FILE, self._FILE, extension='xml', fileFilter='Metadata file (*-METADATA.xml);;All files (*.*)'
         )
-        self.addParameterVrtDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER, defaultFileExtension='tif')
+        self.addParameterVrtDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 
     def isValidFile(self, file: str) -> bool:
         return basename(file).startswith('DESIS-HSI-L2A') & basename(file).endswith('METADATA.xml')
@@ -53,7 +51,7 @@ class ImportDesisL2AAlgorithm(EnMAPProcessingAlgorithm):
     def defaultParameters(self, xmlFilename: str):
         return {
             self.P_FILE: xmlFilename,
-            self.P_OUTPUT_RASTER: xmlFilename.replace('METADATA.xml', 'SPECTRAL_IMAGE_.tif'),
+            self.P_OUTPUT_RASTER: xmlFilename.replace('METADATA.xml', 'SPECTRAL_IMAGE.vrt'),
         }
 
     def processAlgorithm(
@@ -95,24 +93,8 @@ class ImportDesisL2AAlgorithm(EnMAPProcessingAlgorithm):
             offsets = getMetadataAsList('data offset values', text)
 
             # create VRTs
-            isVrt = filename.endswith('.vrt')
-            if isVrt:
-                ds = gdal.Open(xmlFilename.replace('-METADATA.xml', '-SPECTRAL_IMAGE.TIF'))
-                options = gdal.TranslateOptions(outputType=gdal.GDT_Int16)
-                ds: gdal.Dataset = gdal.Translate(destName=filename, srcDS=ds, options=options)
-            else:
-
-                alg = PrepareRasterAlgorithm()
-                parameters = {
-                    alg.P_RASTER: xmlFilename.replace('-METADATA.xml', '-SPECTRAL_IMAGE.TIF'),
-                    alg.P_SCALE: 0.0001,
-                    alg.P_DATA_TYPE: self.Float32,
-                    alg.P_MONOLITHIC: True,
-                    alg.P_OUTPUT_RASTER: filename
-                }
-                alg.runAlg(alg, parameters, None, feedback)
-                ds: gdal.Dataset = gdal.Open(filename)
-
+            ds = gdal.Open(xmlFilename.replace('-METADATA.xml', '-SPECTRAL_IMAGE.TIF'))
+            ds: gdal.Dataset = gdal.Translate(destName=filename, srcDS=ds)
             ds.SetMetadataItem('wavelength', wavelength, 'ENVI')
             ds.SetMetadataItem('wavelength_units', 'nanometers', 'ENVI')
             ds.SetMetadataItem('fwhm', fwhm, 'ENVI')
@@ -121,13 +103,9 @@ class ImportDesisL2AAlgorithm(EnMAPProcessingAlgorithm):
             wavelength = wavelength[1:-1].split(',')
             for i, rasterBand in enumerate(rasterBands):
                 rasterBand.SetDescription(f'band {i + 1} ({wavelength[i]} Nanometers)')
-                if isVrt:
-                    rasterBand.SetScale(float(gains[i]))
-                    rasterBand.SetOffset(float(offsets[i]))
+                rasterBand.SetScale(float(gains[i]))
+                rasterBand.SetOffset(float(offsets[i]))
                 rasterBand.FlushCache()
-
-            if isVrt:
-                GdalUtils().calculateDefaultHistrogram(ds, inMemory=True, feedback=feedback)
 
             del ds
 
