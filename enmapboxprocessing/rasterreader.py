@@ -84,7 +84,7 @@ class RasterReader(object):
         self.maskReader = RasterReader(layer)
 
     def bandCount(self) -> int:
-        """Return iterator over all band numbers."""
+        """Return band count."""
         return self.provider.bandCount()
 
     def bandNumbers(self) -> Iterator[int]:
