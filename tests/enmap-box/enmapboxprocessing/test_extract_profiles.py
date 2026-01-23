@@ -39,3 +39,4 @@ class ExtractProfilesTests(EnMAPBoxTestCase):
             lyr = results.get(ExtractSpectralProfiles.P_OUTPUT)
             self.assertIsInstance(lyr, QgsVectorLayer)
             self.assertTrue(lyr.featureCount() > 0)
+        d.close()
