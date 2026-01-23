@@ -20,7 +20,6 @@ from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.typing import (RasterSource, Array3d, Metadata, MetadataValue, MetadataDomain, Array2d)
 from enmapboxprocessing.utils import Utils
 
-
 @typechecked
 class RasterReader(object):
     Nanometers = 'Nanometers'
@@ -1016,7 +1015,7 @@ class RasterReader(object):
         return self.width() * nBands * dataTypeSize
 
     def _gdalObject(self, bandNo: int = None) -> Union[gdal.Band, gdal.Dataset]:
-        if bandNo is None:
+        if bandNo is None or bandNo >= self.gdalDataset.RasterCount:  # handle case where GDAL band count != QGIS band count
             gdalObject = self.gdalDataset
         else:
             gdalObject = self.gdalDataset.GetRasterBand(bandNo)
