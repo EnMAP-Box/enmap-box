@@ -6,8 +6,7 @@ from pathlib import Path
 from typing import List
 
 from osgeo import gdal
-from qgis._core import QgsRectangle
-from qgis.core import QgsProcessingFeedback
+from qgis.core import QgsRectangle, QgsProcessingFeedback
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
