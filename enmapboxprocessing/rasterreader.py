@@ -20,6 +20,7 @@ from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.typing import (RasterSource, Array3d, Metadata, MetadataValue, MetadataDomain, Array2d)
 from enmapboxprocessing.utils import Utils
 
+
 @typechecked
 class RasterReader(object):
     Nanometers = 'Nanometers'
