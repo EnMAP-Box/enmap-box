@@ -746,6 +746,7 @@ class TestRasterReader(TestCase):
         filename = r'D:\data\software\gdal\alphaBand.tif'
         if not exists(filename):
             return
+        # filename = enmap
         reader = RasterReader(filename)
         lastBand = reader.bandCount()
         print(reader.wavelength(lastBand))
