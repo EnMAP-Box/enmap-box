@@ -731,6 +731,8 @@ class RasterReader(object):
                 wavelength = self.metadataItem(key, domain, bandNo)
                 if wavelength is not None:
                     if not raw:
+                        if isinstance(wavelength, list):
+                            return
                         self._setCachedWavelength(conversionFactorToNanometers * float(wavelength), bandNo)
                     return conversionFactor * float(wavelength)
 
