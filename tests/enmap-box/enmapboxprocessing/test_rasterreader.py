@@ -1,7 +1,7 @@
 import unittest
+from os.path import exists
 
 import numpy as np
-
 from osgeo import gdal
 from qgis.PyQt.QtCore import QDateTime, QSizeF, QPoint
 from qgis.core import QgsRasterRange, QgsRasterLayer, Qgis, QgsRectangle, QgsCoordinateReferenceSystem
@@ -741,3 +741,20 @@ class TestRasterReader(TestCase):
         print(array)
 
         # self.assertTrue(np.all(np.equal(reader.noDataValue(1), lead)))
+
+    def test_rasterWithAlphaBand(self):
+        filename = r'D:\data\software\gdal\alphaBand.tif'
+        if not exists(filename):
+            return
+        reader = RasterReader(filename)
+        lastBand = reader.bandCount()
+        print(reader.wavelength(lastBand))
+        print(reader.bandName(lastBand))
+        print(reader.bandScale(lastBand))
+        print(reader.bandOffset(lastBand))
+        print(reader.bandColor(lastBand))
+        print(reader.badBandMultiplier(lastBand))
+
+        print(reader.startTime(lastBand))
+        print(reader.centerTime(lastBand))
+        print(reader.endTime(lastBand))
