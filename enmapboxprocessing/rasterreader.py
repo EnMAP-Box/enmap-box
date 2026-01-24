@@ -731,6 +731,8 @@ class RasterReader(object):
                 wavelength = self.metadataItem(key, domain, bandNo)
                 if wavelength is not None:
                     if not raw:
+                        if isinstance(wavelength, list):
+                            return
                         self._setCachedWavelength(conversionFactorToNanometers * float(wavelength), bandNo)
                     return conversionFactor * float(wavelength)
 
@@ -1016,7 +1018,7 @@ class RasterReader(object):
         return self.width() * nBands * dataTypeSize
 
     def _gdalObject(self, bandNo: int = None) -> Union[gdal.Band, gdal.Dataset]:
-        if bandNo is None:
+        if bandNo is None or bandNo > self.gdalDataset.RasterCount:  # handle case where GDAL band count != QGIS band count
             gdalObject = self.gdalDataset
         else:
             gdalObject = self.gdalDataset.GetRasterBand(bandNo)
