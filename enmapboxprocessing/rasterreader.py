@@ -1,3 +1,4 @@
+import json
 from math import isnan, ceil, nan
 from os.path import exists
 from typing import Iterable, List, Union, Optional, Tuple, Iterator
@@ -84,7 +85,7 @@ class RasterReader(object):
         self.maskReader = RasterReader(layer)
 
     def bandCount(self) -> int:
-        """Return iterator over all band numbers."""
+        """Return band count."""
         return self.provider.bandCount()
 
     def bandNumbers(self) -> Iterator[int]:
@@ -654,14 +655,17 @@ class RasterReader(object):
         cache = self.layer.customProperty(key)
         if cache is None:
             cache = {'wavelength': {}}
+        else:
+            cache = json.loads(cache)
         cache['wavelength'][bandNo] = nanometers
-        self.layer.setCustomProperty(key, cache)
+        self.layer.setCustomProperty(key, json.dumps(cache))
 
     def _cachedWavelength(self, bandNo: int) -> Optional[float]:
         key = 'EnMAP-Box/cache'
         cache = self.layer.customProperty(key)
         if cache is None:
             return None
+        cache = json.loads(cache)
 
         return cache['wavelength'].get(bandNo)
 
@@ -731,6 +735,8 @@ class RasterReader(object):
                 wavelength = self.metadataItem(key, domain, bandNo)
                 if wavelength is not None:
                     if not raw:
+                        if isinstance(wavelength, list):
+                            return
                         self._setCachedWavelength(conversionFactorToNanometers * float(wavelength), bandNo)
                     return conversionFactor * float(wavelength)
 
@@ -1016,7 +1022,7 @@ class RasterReader(object):
         return self.width() * nBands * dataTypeSize
 
     def _gdalObject(self, bandNo: int = None) -> Union[gdal.Band, gdal.Dataset]:
-        if bandNo is None:
+        if bandNo is None or bandNo > self.gdalDataset.RasterCount:  # handle case where GDAL band count != QGIS band count
             gdalObject = self.gdalDataset
         else:
             gdalObject = self.gdalDataset.GetRasterBand(bandNo)

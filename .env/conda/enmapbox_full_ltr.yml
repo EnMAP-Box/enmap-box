@@ -1,4 +1,4 @@
-# EnMAP-Box conda environment (generated 2025-12-15 15:54:09)
+# EnMAP-Box conda environment (generated 2026-01-26 17:42:24)
 # run to install: conda env create -n enmapbox_full_ltr --file=enmapbox_full_ltr.yml
 # run to update : conda env update -n enmapbox_full_ltr --file=enmapbox_full_ltr.yml --prune
 # run to delete : conda env remove -n enmapbox_full_ltr
