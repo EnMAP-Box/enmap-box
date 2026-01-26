@@ -1,14 +1,14 @@
-# EnMAP-Box conda environment (generated 2026-01-26 17:41:47)
-# run to install: conda env create -n enmapbox_full_3.40 --file=enmapbox_full_3.40.yml
-# run to update : conda env update -n enmapbox_full_3.40 --file=enmapbox_full_3.40.yml --prune
-# run to delete : conda env remove -n enmapbox_full_3.40
+# EnMAP-Box conda environment (generated 2025-12-23 10:15:48)
+# run to install: conda env create -n enmapbox_full_3.44 --file=enmapbox_full_3.44.yml
+# run to update : conda env update -n enmapbox_full_3.44 --file=enmapbox_full_3.44.yml --prune
+# run to delete : conda env remove -n enmapbox_full_3.44
 # see https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
 # created with scripts/update_conda_environments.py (MANUAL CHANGES WILL BE OVERWRITTEN!)
 
 channels:
 - conda-forge
 dependencies:
-- qgis=3.40
+- qgis<3.44.3
 - astropy
 - catboost
 - cdsapi
@@ -46,7 +46,7 @@ dependencies:
   - tensorboard==2.19.0
   - torch==2.6.0
   - torchvision==0.21.0
-name: enmapbox_full_3.40
+name: enmapbox_full_3.44
 variables:
   PYQTGRAPH_QT_LIB: PyQt5
   QT_MAC_WANTS_LAYER: 1
