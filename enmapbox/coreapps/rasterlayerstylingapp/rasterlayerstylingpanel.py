@@ -118,6 +118,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 mWaveband.clicked.connect(self.onWavebandClicked)
 
         # min / max value settings
+        self.mMinMaxPercentile.toggled.connect(self.updateMinMax)
         self.mP1.valueChanged.connect(self.updateMinMax)
         self.mP2.valueChanged.connect(self.updateMinMax)
         self.mExtent.currentIndexChanged.connect(self.onStatisticsChanged)
@@ -282,6 +283,8 @@ class RasterLayerStylingPanel(QgsDockWidget):
 
         if self.isHidden():  # do nothing if panel is hidden
             return
+
+        self.mMinMaxUser.setChecked(True)
 
         layer: QgsRasterLayer = self.mLayer.currentLayer()
         if not isinstance(layer, QgsRasterLayer) or layer.dataProvider().name() in ['wms']:
