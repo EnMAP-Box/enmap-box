@@ -21,7 +21,7 @@ BRANCH_NAME_LOOKUP = {
 
 # QGIS conda versions that are known to have problems
 # e.g., https://github.com/conda-forge/qgis-feedstock/issues/570
-EXCLUDED_QGIS_VERSIONS = ['<3.44.3']
+EXCLUDED_QGIS_VERSIONS = ['!3.44.3']
 
 # define packages to be installed in the different *.yml files
 # compare with .env/requirements.csv
