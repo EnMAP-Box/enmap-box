@@ -21,7 +21,7 @@ BRANCH_NAME_LOOKUP = {
 
 # QGIS conda versions that are known to have problems
 # e.g., https://github.com/conda-forge/qgis-feedstock/issues/570
-EXCLUDED_QGIS_VERSIONS = ['!3.44.3']
+EXCLUDED_QGIS_VERSIONS = []
 
 # define packages to be installed in the different *.yml files
 # compare with .env/requirements.csv
@@ -48,19 +48,6 @@ DEPENDENCIES = {
             {'conda': 'flake8', 'pip': 'flake8-qgis'},
             ]
 }
-
-"""
-  opencv[build=headless*]
-  - pip:
-      - flake8-qgis
-      - torch==2.6.0
-      - lightning==2.5.0.post0
-      - tensorboard==2.19.0
-      - torchvision==0.21.0
-      - segmentation-models-pytorch==0.5.0
-      - pandas==2.2.3
-
-"""
 
 
 def restructure_dependencies(d: dict) -> Dict[str, List[Dict[str, List[str]]]]:

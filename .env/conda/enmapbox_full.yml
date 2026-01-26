@@ -1,4 +1,4 @@
-# EnMAP-Box conda environment (generated 2026-01-26 17:00:04)
+# EnMAP-Box conda environment (generated 2026-01-26 17:42:24)
 # run to install: conda env create -n enmapbox_full --file=enmapbox_full.yml
 # run to update : conda env update -n enmapbox_full --file=enmapbox_full.yml --prune
 # run to delete : conda env remove -n enmapbox_full
@@ -8,7 +8,7 @@
 channels:
 - conda-forge
 dependencies:
-- qgis!3.44.3
+- qgis
 - astropy
 - catboost
 - cdsapi
