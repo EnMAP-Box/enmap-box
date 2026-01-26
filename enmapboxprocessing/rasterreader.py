@@ -1,3 +1,4 @@
+import json
 from math import isnan, ceil, nan
 from os.path import exists
 from typing import Iterable, List, Union, Optional, Tuple, Iterator
@@ -654,14 +655,17 @@ class RasterReader(object):
         cache = self.layer.customProperty(key)
         if cache is None:
             cache = {'wavelength': {}}
+        else:
+            cache = json.loads(cache)
         cache['wavelength'][bandNo] = nanometers
-        self.layer.setCustomProperty(key, cache)
+        self.layer.setCustomProperty(key, json.dumps(cache))
 
     def _cachedWavelength(self, bandNo: int) -> Optional[float]:
         key = 'EnMAP-Box/cache'
         cache = self.layer.customProperty(key)
         if cache is None:
             return None
+        cache = json.loads(cache)
 
         return cache['wavelength'].get(bandNo)
 
