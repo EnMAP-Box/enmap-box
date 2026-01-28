@@ -452,6 +452,8 @@ class RasterLayerStylingPanel(QgsDockWidget):
                     layer.dataProvider(), bandNo, self.initMinMax, self.initMinMax, None
                 )
                 layer.setRenderer(renderer)
+        elif self.mRenderer.currentIndex() == self.DefaultRendererTab:
+            pass
         else:
             raise ValueError()
 
