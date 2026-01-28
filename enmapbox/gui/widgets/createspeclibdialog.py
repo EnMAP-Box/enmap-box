@@ -1,6 +1,7 @@
 import os
 from typing import List, Optional
 
+from enmapbox.qgispluginsupport.qps.fieldvalueconverter import GenericFieldValueConverter
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
 from qgis.PyQt.QtWidgets import QFileDialog, QDialogButtonBox, QPushButton, QLineEdit, QHBoxLayout, QLabel, \
     QRadioButton, \
@@ -158,7 +159,11 @@ class CreateSpectralLibraryDialog(QDialog):
         if path:
             ext = os.path.splitext(path)[1].lower()
             options = QgsVectorFileWriter.SaveVectorOptions()
-            options.driverName = QgsVectorFileWriter.driverForExtension(ext)
+            driver = QgsVectorFileWriter.driverForExtension(ext)
+            dst_fields = GenericFieldValueConverter.compatibleTargetFields(sl.fields(), driver)
+
+            options.fieldValueConverter = GenericFieldValueConverter(sl.fields(), dst_fields)
+            options.driverName = driver
             options.layerName = layer_name
             r, errMsg, newPath, newLayer = QgsVectorFileWriter.writeAsVectorFormatV3(
                 sl,
