@@ -7,7 +7,7 @@ from qgis.PyQt.QtCore import QDateTime, QSizeF, QPoint
 from qgis.core import QgsRasterRange, QgsRasterLayer, Qgis, QgsRectangle, QgsCoordinateReferenceSystem
 
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
-from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxprocessing.rasterreader import RasterReader, setMetadataCache, metadataCache
 from enmapboxprocessing.testcase import TestCase
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import enmap, r_terra_timeseries_days, r_terra_timeseries_seconds, netCDF_timeseries_days, \
@@ -759,3 +759,26 @@ class TestRasterReader(TestCase):
         print(reader.startTime(lastBand))
         print(reader.centerTime(lastBand))
         print(reader.endTime(lastBand))
+
+    def test_metadataCache(self):
+        writer = self.rasterFromValue((3, 1, 1), 0, 'raster.tif')
+        writer.close()
+        layer = QgsRasterLayer(writer.source())
+
+        # check no cache
+        reader = RasterReader(layer)
+        self.assertIsNone(reader.metadataCache)
+        self.assertIsNone(reader.metadataCache)
+
+        # check valid cache
+        cache = {
+            'wavelength': [10, None, 30]
+        }
+        setMetadataCache(layer, cache)
+        reader = RasterReader(layer)
+        self.assertDictEqual(cache, metadataCache(layer))
+        self.assertDictEqual(cache, reader.metadataCache)
+
+        self.assertEqual(cache['wavelength'][0], reader.wavelength(1))
+        self.assertIsNone(reader.wavelength(2))
+        self.assertEqual(cache['wavelength'][2], reader.wavelength(3))
