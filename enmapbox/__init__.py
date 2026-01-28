@@ -58,7 +58,6 @@ DOCUMENTATION = 'https://enmap-box.readthedocs.io/'
 URL_TESTDATA = 'https://github.com/EnMAP-Box/enmap-box-exampledata/releases/download/v1.1.1/exampledata.zip'
 URL_INSTALLATION = r'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html#install-required-python-packages'
 URL_QGIS_RESOURCES = r'https://github.com/EnMAP-Box/qgispluginsupport/releases/download/qgisresources.zip_2025-11-07/qgisresources.zip'
-PLUGIN_DEPENDENCIES = ['vrtbuilderplugin>=0.9']
 
 DIR_ENMAPBOX = os.path.dirname(__file__)
 DIR_REPO = os.path.dirname(DIR_ENMAPBOX)

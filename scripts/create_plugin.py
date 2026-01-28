@@ -197,7 +197,6 @@ def create_enmapbox_plugin(include_testdata: bool = False,
     MD.mQgisMinimumVersion = config['enmapbox:metadata']['qgisMinimumVersion']
     MD.mEmail = config['enmapbox:metadata']['email']
     MD.mHasProcessingProvider = True
-    MD.mPlugin_dependencies = ['Google Earth Engine']  # the best way to make sure that the 'ee' module is available
 
     MD.mVersion = VERSION
     MD.writeMetadataTxt(PATH_METADATAFILE)
