@@ -432,7 +432,6 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                         'DISTANCE': samplingDistance,
                         'START_OFFSET': 0,
                         'END_OFFSET': 0,
-                        # 'OUTPUT': r'C:\Users\Andreas\Downloads\points.gpkg'  # 'TEMPORARY_OUTPUT'
                         'OUTPUT': 'TEMPORARY_OUTPUT'
                     }
                     pointLayer = processing.run(alg, parameters)['OUTPUT']
@@ -453,7 +452,6 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                         'RASTERCOPY': rasterLayer,
                         'COLUMN_PREFIX': 'SAMPLE_',
                         'OUTPUT': 'TEMPORARY_OUTPUT'
-                        # 'OUTPUT': r'C:\Users\Andreas\Downloads\sample.gpkg' # 'TEMPORARY_OUTPUT'
                     }
                     pointLayer2: QgsVectorLayer = processing.run(alg, parameters)['OUTPUT']
                     xValues = [feature['distance'] for feature in pointLayer2.getFeatures()]
@@ -474,7 +472,6 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                         return
 
                     polygonId = polygonLayer.selectedFeatureIds()[0]
-                    name = f'{layer.name()} [band {bandNo}, polygon ID {polygonId}]'
 
                     # 1. extract region of interest from raster
                     alg = 'gdal:cliprasterbymasklayer'
@@ -484,6 +481,7 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                             polygonLayer.source(), selectedFeaturesOnly=True, featureLimit=-1,
                             geometryCheck=QgsFeatureRequest.InvalidGeometryCheck.GeometryAbortOnInvalid),
                         'TARGET_CRS': layer.crs(),
+                        "DATA_TYPE": 6,
                         'NODATA': np.nan,
                         'OUTPUT': 'TEMPORARY_OUTPUT'
                     }
@@ -548,7 +546,7 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                     except Exception:
                         traceback.print_exc()
 
-                userFunctionEditor = w.dialog
+                userFunctionEditor = getattr(w, 'dialog', None)
                 xValues = [float(v) for v in xValues]
                 yValues = [float(v) for v in yValues]
                 profile = Profile(xValues, yValues, xUnit, name, style)
@@ -634,19 +632,20 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                     dialog.mLog.setText(msg)
 
         # add profiles to library (for potential visualization in a Spectral View)
-        allProfiles = profiles + ufuncProfiles
-        self.mLibrary.dataProvider().truncate()  # delete all features
-        self.mLibrary.startEditing()
-        for id, profile in enumerate(allProfiles):
-            profileValueDict = prepareProfileValueDict(
-                profile.xValues, profile.yValues, profile.xUnit)
-            feature = QgsFeature()
-            feature.setId(id)
-            feature.setFields(self.mLibrary.fields())
-            feature.setAttribute('name', profile.name)
-            feature.setAttribute('profiles', profileValueDict)
-            self.mLibrary.addFeatures([feature])
-        self.mLibrary.commitChanges()
+        if self.mLibrary is not None:
+            allProfiles = profiles + ufuncProfiles
+            self.mLibrary.dataProvider().truncate()  # delete all features
+            self.mLibrary.startEditing()
+            for id, profile in enumerate(allProfiles):
+                profileValueDict = prepareProfileValueDict(
+                    profile.xValues, profile.yValues, profile.xUnit)
+                feature = QgsFeature()
+                feature.setId(id)
+                feature.setFields(self.mLibrary.fields())
+                feature.setAttribute('name', profile.name)
+                feature.setAttribute('profiles', profileValueDict)
+                self.mLibrary.addFeatures([feature])
+            self.mLibrary.commitChanges()
 
         # set x axis title
         if self.mSourceType.currentIndex() == self.RasterLayerSource:
