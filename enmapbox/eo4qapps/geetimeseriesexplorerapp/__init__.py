@@ -94,7 +94,14 @@ class GeeTimeseriesExplorerApp(EnMAPBoxApplication):
         if not isEarthEngineModuleInstalled():
             self.mainDock.setVisible(False)
             self.profileDock.setVisible(False)
-            QgsMessageLog.logMessage("Can't import ee (Earth Engine) package.", level=Qgis.MessageLevel.Warning)
+            title = 'Missing Plugin Dependency'
+            text = "install Google Earth Engine QGIS Plugin via the Plugin Manager."
+            QgsMessageLog.logMessage(text, level=Qgis.MessageLevel.Warning)
+            if isinstance(self.interface, EnMAPBox):
+                self.interface.messageBar().pushWarning(title, text)
+            else:
+                from qgis.utils import iface
+                iface.messageBar().pushWarning(title, text)
             return
 
         self.mainDock.setVisible(not self.mainDock.isVisible())
