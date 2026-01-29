@@ -3,16 +3,21 @@ from typing import List, Optional
 
 from enmapbox.qgispluginsupport.qps.fieldvalueconverter import GenericFieldValueConverter
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
-from qgis.PyQt.QtWidgets import QFileDialog, QDialogButtonBox, QPushButton, QLineEdit, QHBoxLayout, QLabel, \
+from qgis.PyQt.QtWidgets import QFileDialog, QDialogButtonBox, QLineEdit, QHBoxLayout, QLabel, \
     QRadioButton, \
     QButtonGroup, QVBoxLayout, QDialog
-from qgis.core import QgsVectorLayer, QgsVectorFileWriter, QgsProject, QgsMapLayer
+from qgis.core import QgsFeature, QgsVectorLayer, QgsVectorFileWriter, QgsProject, QgsMapLayer, edit
+from qgis.gui import QgsFileWidget
 
 
 class CreateSpectralLibraryDialog(QDialog):
     """
     Dialog to create a new spectral library with user-specified profile fields.
     """
+
+    LAST_LAYER_NAME = 'SpectralLibrary'
+    LAST_FILE_PATH = None
+    LAST_PROFILE_FIELDS = ['profiles']
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -34,6 +39,9 @@ class CreateSpectralLibraryDialog(QDialog):
         name_label = QLabel("Layer Name:")
         self.layer_name = QLineEdit("Spectral Library")
         self.layer_name.setPlaceholderText("Enter layer name")
+        if isinstance(CreateSpectralLibraryDialog.LAST_LAYER_NAME, str):
+            self.layer_name.setText(CreateSpectralLibraryDialog.LAST_LAYER_NAME)
+
         name_layout.addWidget(name_label)
         name_layout.addWidget(self.layer_name)
         layout.addLayout(name_layout)
@@ -41,8 +49,12 @@ class CreateSpectralLibraryDialog(QDialog):
         # Profile field names input
         field_layout = QVBoxLayout()
         field_label = QLabel("Profile Field Names (comma separated):")
+
         self.field_input = QLineEdit('profiles')
         self.field_input.setPlaceholderText("e.g., profiles, reflectance, transmittance")
+        if isinstance(CreateSpectralLibraryDialog.LAST_PROFILE_FIELDS, list):
+            self.field_input.setText(','.join(CreateSpectralLibraryDialog.LAST_PROFILE_FIELDS))
+
         field_layout.addWidget(field_label)
         field_layout.addWidget(self.field_input)
         layout.addLayout(field_layout)
@@ -64,18 +76,32 @@ class CreateSpectralLibraryDialog(QDialog):
 
         # File selection layout
         file_layout = QHBoxLayout()
+
         file_layout.addWidget(self.radio_file)
-        self.file_path = QLineEdit()
-        self.file_path.setEnabled(False)
-        self.file_path.setPlaceholderText("Select output file...")
-        self.file_path.textChanged.connect(self.validate)
 
-        self.browse_button = QPushButton("Browse...")
-        self.browse_button.setEnabled(False)
-        self.browse_button.clicked.connect(self._browse_file)
+        self.file_widget = QgsFileWidget()
+        self.file_widget.setDialogTitle('Create empty spectral library')
+        self.file_widget.setFilter('GeoPackage (*.gpkg);;GeoJSON (*.geojson)')
+        self.file_widget.setStorageMode(QgsFileWidget.StorageMode.SaveFile)
 
-        file_layout.addWidget(self.file_path)
-        file_layout.addWidget(self.browse_button)
+        if isinstance(CreateSpectralLibraryDialog.LAST_FILE_PATH, str):
+            self.radio_file.setChecked(True)
+            self.file_widget.setFilePath(CreateSpectralLibraryDialog.LAST_FILE_PATH)
+
+        self.file_widget.fileChanged.connect(self.validate)
+        file_layout.addWidget(self.file_widget)
+        # self.file_path = QLineEdit()
+        # self.file_path.setEnabled(False)
+        # self.file_path.setPlaceholderText("Select output file...")
+        # self.file_path.textChanged.connect(self.validate)
+        #
+        # self.browse_button = QPushButton("Browse...")
+        # self.browse_button.setEnabled(False)
+        # self.browse_button.clicked.connect(self._browse_file)
+        #
+        # file_layout.addWidget(self.file_path)
+        # file_layout.addWidget(self.browse_button)
+        #
         layout.addLayout(file_layout)
 
         # Connect radio button signals
@@ -90,6 +116,8 @@ class CreateSpectralLibraryDialog(QDialog):
         self.button_box = button_box
         self.setLayout(layout)
 
+        self._on_storage_type_changed()
+
     def validate(self):
 
         v = True
@@ -101,18 +129,27 @@ class CreateSpectralLibraryDialog(QDialog):
     def _on_storage_type_changed(self):
         """Enable/disable file selection based on storage type."""
         is_file = self.radio_file.isChecked()
-        self.file_path.setEnabled(is_file)
-        self.browse_button.setEnabled(is_file)
+        self.file_widget.setEnabled(is_file)
+        # self.file_path.setEnabled(is_file)
+        # self.browse_button.setEnabled(is_file)
         self._storage_in_memory = not is_file
         self.validate()
 
     def _browse_file(self):
         """Open file dialog to select output file."""
-        file_path, _ = QFileDialog.getSaveFileName(
+
+        from qgis.gui import QgsFileWidget
+
+        w = QgsFileWidget(self)
+        w.setDialogTitle('Create empty spectral library')
+        w.setFilter('GeoPackage (*.gpkg);;GeoJSON (*.geojson)')
+        if w.exec_() == QDialog.Accepted:
+            s = ""
+        file_path, tmp = QFileDialog.getSaveFileName(
             self,
             "Save Spectral Library",
             "",
-            "GeoPackage (*.gpkg);;GeoJSON (*.geojson);;All Files (*)"
+            "GeoPackage (*.gpkg);;GeoJSON (*.geojson)"
         )
         if file_path:
             self.file_path.setText(file_path)
@@ -129,7 +166,12 @@ class CreateSpectralLibraryDialog(QDialog):
         """
         text = self.field_input.text().strip()
         fields = [n.strip() for n in text.split(',')]
-        return list(set(fields))
+
+        names = []
+        for n in fields:
+            if n not in names:
+                names.append(n)
+        return names
 
     def layerName(self) -> str:
         """
@@ -148,7 +190,8 @@ class CreateSpectralLibraryDialog(QDialog):
         if self.radio_memory.isChecked():
             return None
         else:
-            return self.file_path.text().strip()
+            # return self.file_path.text().strip()
+            return self.file_widget.filePath()
 
     def create_speclib(self) -> QgsVectorLayer:
 
@@ -161,6 +204,12 @@ class CreateSpectralLibraryDialog(QDialog):
             options = QgsVectorFileWriter.SaveVectorOptions()
             driver = QgsVectorFileWriter.driverForExtension(ext)
             dst_fields = GenericFieldValueConverter.compatibleTargetFields(sl.fields(), driver)
+
+            if driver == 'GeoJSON':
+                # add dummy profiles
+                with edit(sl):
+                    feat = QgsFeature(sl.fields())
+                    sl.addFeature(feat)
 
             options.fieldValueConverter = GenericFieldValueConverter(sl.fields(), dst_fields)
             options.driverName = driver
@@ -180,4 +229,8 @@ class CreateSpectralLibraryDialog(QDialog):
             SpectralLibraryUtils.copyEditorWidgetSetup(slNew, sl)
             slNew.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)
             sl = slNew
+
+        CreateSpectralLibraryDialog.LAST_LAYER_NAME = layer_name
+        CreateSpectralLibraryDialog.LAST_FILE_PATH = path
+        CreateSpectralLibraryDialog.LAST_PROFILE_FIELDS = profile_fields
         return sl
