@@ -2,17 +2,6 @@ from math import nan, inf
 from typing import Optional
 
 from osgeo import gdal
-
-from enmapbox.gui.dataviews.dockmanager import DockPanelUI
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.gui.mapcanvas import MapCanvas
-from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapbox.typeguard import typechecked
-from enmapbox.utils import BlockSignals
-from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
-from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxprocessing.rasterwriter import RasterWriter
-from enmapboxprocessing.utils import Utils
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QDoubleSpinBox, QComboBox, QCheckBox, QToolButton, QLabel, QTabWidget, \
     QLineEdit, QTableWidget, QSpinBox
@@ -22,6 +11,17 @@ from qgis.core import QgsRasterLayer, QgsSingleBandGrayRenderer, QgsRectangle, Q
 from qgis.gui import (
     QgsDockWidget, QgsMapLayerComboBox, QgsCollapsibleGroupBox, QgsColorRampButton, QgsRangeSlider
 )
+
+from enmapbox.gui.dataviews.dockmanager import DockPanelUI
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.gui.mapcanvas import MapCanvas
+from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
+from enmapbox.typeguard import typechecked
+from enmapbox.utils import BlockSignals
+from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
+from enmapboxprocessing.rasterreader import RasterReader, metadataCache, setMetadataCache, buildMetadataCache
+from enmapboxprocessing.rasterwriter import RasterWriter
+from enmapboxprocessing.utils import Utils
 from rasterlayerstylingapp.rasterlayerstylingbandwidget import RasterLayerStylingBandWidget
 from rasterlayerstylingapp.rasterlayerstylingpercentileswidget import RasterLayerStylingPercentilesWidget
 
@@ -140,6 +140,8 @@ class RasterLayerStylingPanel(QgsDockWidget):
 
         # init GUI
         self.mRenderer.setCurrentIndex(self.DefaultRendererTab)
+
+        self.initMinMax = 0
 
     def project(self) -> QgsProject:
         return self.enmapBox.project()
@@ -291,6 +293,11 @@ class RasterLayerStylingPanel(QgsDockWidget):
             self.disableGui()
             return
 
+        hasNoMetadataCache = metadataCache(layer) is None
+        if hasNoMetadataCache:
+            cache = buildMetadataCache(layer)
+            setMetadataCache(layer, cache)
+
         try:
             layer.rendererChanged.disconnect(self.onLayerRendererChanged)
         except Exception:
@@ -335,7 +342,9 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 if isinstance(self.originalRenderer, QgsMultiBandColorRenderer):
                     renderer = self.originalRenderer.clone()
                 else:
-                    renderer = Utils.multiBandColorRenderer(layer.dataProvider(), [1] * 3, [nan] * 3, [nan] * 3)
+                    renderer = Utils.multiBandColorRenderer(
+                        layer.dataProvider(), [1] * 3, [self.initMinMax] * 3, [self.initMinMax] * 3
+                    )
                 layer.setRenderer(renderer)
 
             for mBand, ce, bandNo in [
@@ -358,7 +367,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 if isinstance(self.originalRenderer, QgsSingleBandGrayRenderer):
                     renderer = self.originalRenderer.clone()
                 else:
-                    renderer = Utils.singleBandGrayRenderer(layer.dataProvider(), 1, nan, nan)
+                    renderer = Utils.singleBandGrayRenderer(layer.dataProvider(), 1, self.initMinMax, self.initMinMax)
                 layer.setRenderer(renderer)
             ce: QgsContrastEnhancement = renderer.contrastEnhancement()
 
@@ -377,13 +386,16 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 if isinstance(self.originalRenderer, QgsSingleBandPseudoColorRenderer):
                     renderer = self.originalRenderer.clone()
                 else:
-                    renderer = Utils.singleBandPseudoColorRenderer(layer.dataProvider(), 1, nan, nan, None)
+                    renderer = Utils.singleBandPseudoColorRenderer(
+                        layer.dataProvider(), 1, self.initMinMax, self.initMinMax, None
+                    )
                 layer.setRenderer(renderer)
             shader: QgsRasterShader = renderer.shader()
+            shaderFunction = shader.rasterShaderFunction()
 
             with BlockSignals(self.mPseudoBand.mMin, self.mPseudoBand.mMax, self.mPseudoBand.mBandNo):
-                self.mPseudoBand.mMin.setText(str(shader.minimumValue()))
-                self.mPseudoBand.mMax.setText(str(shader.maximumValue()))
+                self.mPseudoBand.mMin.setText(str(shaderFunction.minimumValue()))
+                self.mPseudoBand.mMax.setText(str(shaderFunction.maximumValue()))
                 self.mPseudoBand.mBandNo.setBand(renderer.inputBand())
                 self.mPseudoBand.mSlider.setValue(renderer.inputBand())
 
@@ -427,16 +439,22 @@ class RasterLayerStylingPanel(QgsDockWidget):
         # If so, create a new renderer with correct type.
         if self.mRenderer.currentIndex() == self.RgbRendererTab:
             if not isinstance(layer.renderer(), QgsMultiBandColorRenderer):
-                renderer = Utils.multiBandColorRenderer(layer.dataProvider(), [bandNo] * 3, [nan] * 3, [nan] * 3)
+                renderer = Utils.multiBandColorRenderer(
+                    layer.dataProvider(), [bandNo] * 3, [self.initMinMax] * 3, [self.initMinMax] * 3
+                )
                 layer.setRenderer(renderer)
         elif self.mRenderer.currentIndex() == self.GrayRendererTab:
             if not isinstance(layer.renderer(), QgsSingleBandGrayRenderer):
-                renderer = Utils.singleBandGrayRenderer(layer.dataProvider(), bandNo, nan, nan)
+                renderer = Utils.singleBandGrayRenderer(layer.dataProvider(), bandNo, self.initMinMax, self.initMinMax)
                 layer.setRenderer(renderer)
         elif self.mRenderer.currentIndex() == self.PseudoRendererTab:
             if not isinstance(layer.renderer(), QgsSingleBandPseudoColorRenderer):
-                renderer = Utils.singleBandPseudoColorRenderer(layer.dataProvider(), bandNo, nan, nan, None)
+                renderer = Utils.singleBandPseudoColorRenderer(
+                    layer.dataProvider(), bandNo, self.initMinMax, self.initMinMax, None
+                )
                 layer.setRenderer(renderer)
+        elif self.mRenderer.currentIndex() == self.DefaultRendererTab:
+            pass
         else:
             raise ValueError()
 
@@ -534,6 +552,8 @@ class RasterLayerStylingPanel(QgsDockWidget):
             lower, upper = provider.cumulativeCut(
                 bandNo, max(p1, 0) / 100., min(p2, 100) / 100., layer.extent(), int(QgsRasterLayer.SAMPLE_SIZE)
             )
+            if lower is nan or upper is nan:
+                lower = upper = 0
         if p1 == 0:
             self.mTransparencyLower.setText('')
         else:
@@ -591,6 +611,8 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 bandNo, self.mP1.value() / 100., self.mP2.value() / 100., extent,
                 self.currentSampleSize(self.mAccuracy.currentIndex())
             )
+            if vmin is nan or vmax is nan:
+                vmin = vmax = 0
 
             with BlockSignals(mBandMin, mBandMax):
                 mBandMin.setText(str(vmin))
@@ -757,6 +779,13 @@ class RasterLayerStylingPanel(QgsDockWidget):
                         self.currentSampleSize(accuracyType)
                     )
 
+                    if redMin is nan or redMax is nan:
+                        redMin = redMax = 0
+                    if greenMin is nan or greenMax is nan:
+                        greenMin = greenMax = 0
+                    if blueMin is nan or blueMax is nan:
+                        blueMin = blueMax = 0
+
                 elif stretchType == self.ReferenceLayerStrech:
                     ce: QgsContrastEnhancement = renderer.redContrastEnhancement()
                     redMin = ce.minimumValue()
@@ -831,6 +860,8 @@ class RasterLayerStylingPanel(QgsDockWidget):
                         bandNo, p1 / 100., p2 / 100., self.currentExtent(layer2, statisticsType),
                         self.currentSampleSize(accuracyType)
                     )
+                    if redMin is nan or redMax is nan:
+                        redMin = redMax = 0
 
                 elif stretchType == self.ReferenceLayerStrech:
                     ce: QgsContrastEnhancement = renderer.contrastEnhancement()
@@ -871,6 +902,8 @@ class RasterLayerStylingPanel(QgsDockWidget):
                         bandNo, p1 / 100., p2 / 100., self.currentExtent(layer2, statisticsType),
                         self.currentSampleSize(accuracyType)
                     )
+                    if redMin is nan or redMax is nan:
+                        redMin = redMax = 0
                 elif stretchType == self.ReferenceLayerStrech:
                     shader: QgsRasterShader = renderer.shader()
                     redMin = shader.minimumValue()
@@ -953,6 +986,10 @@ class RasterLayerStylingPanel(QgsDockWidget):
 # utils
 def tofloat(text: str) -> float:
     try:
-        return float(text)
+        value = float(text)
+        if value is nan:
+            value = 0
     except Exception:
-        return nan
+        value = 0
+
+    return value
