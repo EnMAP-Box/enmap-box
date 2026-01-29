@@ -124,7 +124,10 @@ class DataSource(TreeNode):
         self.mUpdateTime = datetime.datetime.now()
         dataItem: QgsDataItem = self.dataItem()
         self.setName(dataItem.name())
-        self.setToolTip(dataItem.toolTip())
+        tt = dataItem.toolTip()
+        if tt is None or len(tt) == 0:
+            tt = dataItem.path()
+        self.setToolTip(tt)
         self.setIcon(dataItem.icon())
 
         self.mNodePath.setValue(dataItem.path())
@@ -271,6 +274,7 @@ class RasterDataSource(SpatialDataSource):
         self.mWavelength = None
 
         self.updateNodes()
+        s = ""
 
     def updateNodes(self) -> dict:
         MD = super().updateNodes()
