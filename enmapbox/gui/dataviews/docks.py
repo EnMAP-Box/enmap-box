@@ -847,10 +847,8 @@ class SpectralLibraryDock(Dock):
                 # change the dock title
                 sid = s.id()
                 title = s.name()
-                for dock in self.docks(SpectralLibraryDock):
-                    assert isinstance(dock, SpectralLibraryDock)
-                    if dock.mDefaultSpeclibId == sid and dock.title() != title:
-                        dock.setTitle(title)
+                if self.mDefaultSpeclibId == sid and self.title() != title:
+                    self.setTitle(title)
 
         self.sigTitleChanged.connect(updateName)
         sl.nameChanged.connect(updateName)

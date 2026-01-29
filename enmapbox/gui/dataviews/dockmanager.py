@@ -2377,7 +2377,7 @@ class SpeclibProfileVisualizationGroupNode(CheckableLayerTreeNode):
         return self.mVis.text()
 
     def tooltip(self):
-        return self.mVis.name()
+        return self.mVis.data(Qt.ItemDataRole.ToolTipRole)
 
     def icon(self):
         ps = self.vis().plotStyle()

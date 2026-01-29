@@ -743,16 +743,16 @@ class CanvasLink(QObject):
 
         scaledWidth = mapUnitsPerPx_x * dstCanvas.width()
         scaledHeight = mapUnitsPerPx_y * dstCanvas.height()
-        scaledBoxCenterDst = SpatialExtent(dstCrs, scaledWidth, scaledHeight).setCenter(centerDst)
-        scaledBoxCenterSrc = SpatialExtent(dstCrs, scaledWidth, scaledHeight).setCenter(centerSrc.toCrs(dstCrs))
+
         if self.linkType == LINK_ON_CENTER:
-            dstCanvas.setCenter(centerT)
+            dstCanvas.setCenter(centerSrc.toCrs(dstCrs))
 
         elif self.linkType == LINK_ON_SCALE:
-
+            scaledBoxCenterDst = SpatialExtent(dstCrs, scaledWidth, scaledHeight).setCenter(centerDst)
             dstCanvas.zoomToFeatureExtent(scaledBoxCenterDst)
 
         elif self.linkType == LINK_ON_CENTER_SCALE:
+            scaledBoxCenterSrc = SpatialExtent(dstCrs, scaledWidth, scaledHeight).setCenter(centerSrc.toCrs(dstCrs))
             dstCanvas.zoomToFeatureExtent(scaledBoxCenterSrc)
 
         else:
