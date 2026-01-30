@@ -391,10 +391,11 @@ class RasterLayerStylingPanel(QgsDockWidget):
                     )
                 layer.setRenderer(renderer)
             shader: QgsRasterShader = renderer.shader()
+            shaderFunction = shader.rasterShaderFunction()
 
             with BlockSignals(self.mPseudoBand.mMin, self.mPseudoBand.mMax, self.mPseudoBand.mBandNo):
-                self.mPseudoBand.mMin.setText(str(shader.minimumValue()))
-                self.mPseudoBand.mMax.setText(str(shader.maximumValue()))
+                self.mPseudoBand.mMin.setText(str(shaderFunction.minimumValue()))
+                self.mPseudoBand.mMax.setText(str(shaderFunction.maximumValue()))
                 self.mPseudoBand.mBandNo.setBand(renderer.inputBand())
                 self.mPseudoBand.mSlider.setValue(renderer.inputBand())
 

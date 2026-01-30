@@ -59,9 +59,14 @@ class TestSpeclibs(EnMAPBoxTestCase):
         d.radio_file.setChecked(True)
 
         test_dir = self.createTestOutputDirectory()
-        path = test_dir / 'speclib.gpkg'
-        d.file_path.setText(str(path))
 
+        path = test_dir / 'speclib2.geojson'
+        d.file_widget.setFilePath(str(path))
+        sl2 = d.create_speclib()
+        self.assertTrue(SpectralLibraryUtils.isSpectralLibrary(sl2))
+
+        path = test_dir / 'speclib.gpkg'
+        d.file_widget.setFilePath(str(path))
         sl2 = d.create_speclib()
         self.assertTrue(SpectralLibraryUtils.isSpectralLibrary(sl2))
 
