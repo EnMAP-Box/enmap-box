@@ -23,24 +23,23 @@
 ***************************************************************************
 """
 
-import sys
 import os
+import sys
+import warnings
+
 import numpy as np
 from scipy.interpolate import interp1d
-# from qgis.gui import *
 
+from enmapbox.coreapps._classic.hubflow.core import openRasterDataset
 # ensure to call QGIS before PyQtGraph
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
 from enmapbox.qgispluginsupport.qps.pyqtgraph import pyqtgraph as pg
+from lmuvegetationapps import APP_DIR
 from lmuvegetationapps.Resources.PROSAIL import call_model as mod
 from lmuvegetationapps.Resources.Spec2Sensor.Spec2Sensor_core import Spec2Sensor, BuildTrueSRF, BuildGenericSRF
-from lmuvegetationapps import APP_DIR
-
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QHeaderView, QTableWidgetItem, QMessageBox, QApplication, \
+    QWidgetAction, QWidget, QLabel, QGridLayout
 from qgis.gui import QgsMapLayerComboBox
-from _classic.hubflow.core import *
-
-import warnings
 
 warnings.filterwarnings('ignore')  # ignore warnings, like ZeroDivision
 
@@ -1022,6 +1021,7 @@ class SensorEditor:
 
     def image_read(self):  # read only necessary info: fwhm and center wavelengths
         inras = self.image
+
         image = openRasterDataset(inras)
         meta = image.metadataDict()
         try:
