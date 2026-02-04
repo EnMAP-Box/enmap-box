@@ -16,7 +16,9 @@ import unittest
 
 from enmapbox.apps.lmuvegetationapps.IVVRM.IVVRM_GUI import IVVRM_GUI, MainUiFunc
 from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.testing import EnMAPBoxTestCase
+from enmapbox.testing import EnMAPBoxTestCase, start_app
+
+start_app()
 
 
 def has_package(name: str):
@@ -35,17 +37,13 @@ class test_lmuvegetationapplications(EnMAPBoxTestCase):
         self.showGui(m)
 
     def test_application(self):
-        EB = EnMAPBox.instance()
-        if EB is None:
-            EB = EnMAPBox()
-        EB.ui.hide()
+        EB = EnMAPBox(load_core_apps=False, load_other_apps=False)
+        EB.ui.show()
 
         w = IVVRM_GUI()
         self.showGui(w)
-        # app = LMU_EnMAPBoxApp(EB)
-        # app.start_GUI_IVVRM()
-
-        self.showGui(EB.ui)
+        w.close()
+        EB.close()
 
 
 if __name__ == "__main__":
