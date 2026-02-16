@@ -1,13 +1,14 @@
-from os.path import basename, exists
+import zipfile
+from os.path import basename, exists, splitext
 from typing import Dict, Any, List, Tuple
 from xml.etree import ElementTree
 
 from osgeo import gdal
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.gdalutils import GdalUtils
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -45,8 +46,8 @@ class ImportEnmapL1BAlgorithm(EnMAPProcessingAlgorithm):
 
     def isValidFile(self, file: str) -> bool:
         return basename(file).startswith('ENMAP') & \
-               basename(file).endswith('METADATA.XML') & \
-               ('L1B' in basename(file))
+            basename(file).endswith('METADATA.XML') & \
+            ('L1B' in basename(file))
 
     def defaultParameters(self, xmlFilename: str):
         return {
@@ -82,13 +83,13 @@ class ImportEnmapL1BAlgorithm(EnMAPProcessingAlgorithm):
             offsets = [item.text for item in root.findall('specific/bandCharacterisation/bandID/OffsetOfBand')]
 
             # create VRTs
-            ds = gdal.Open(self.findFilename(xmlFilename.replace('-METADATA.XML', '-SPECTRAL_IMAGE_VNIR')))
+            ds = gdal.Open(self.findSpectralImageFilename(xmlFilename, '-SPECTRAL_IMAGE_VNIR'))
             dsVnir: gdal.Dataset = gdal.Translate(filename1, ds)
             dsVnir.SetMetadataItem('wavelength', '{' + ', '.join(wavelength[:dsVnir.RasterCount]) + '}', 'ENVI')
             dsVnir.SetMetadataItem('wavelength_units', 'nanometers', 'ENVI')
             dsVnir.SetMetadataItem('fwhm', '{' + ', '.join(fwhm[:dsVnir.RasterCount]) + '}', 'ENVI')
 
-            ds = gdal.Open(self.findFilename(xmlFilename.replace('-METADATA.XML', '-SPECTRAL_IMAGE_SWIR')))
+            ds = gdal.Open(self.findSpectralImageFilename(xmlFilename, '-SPECTRAL_IMAGE_SWIR'))
             dsSwir: gdal.Dataset = gdal.Translate(filename2, ds)
             dsSwir.SetMetadataItem('wavelength', '{' + ', '.join(wavelength[dsVnir.RasterCount:]) + '}', 'ENVI')
             dsSwir.SetMetadataItem('wavelength_units', 'nanometers', 'ENVI')
@@ -121,10 +122,23 @@ class ImportEnmapL1BAlgorithm(EnMAPProcessingAlgorithm):
         return result
 
     @staticmethod
-    def findFilename(basename: str):
+    def findSpectralImageFilename(xmlOrZipFilename: str, cubeName: str) -> str:
+        isZip = xmlOrZipFilename.lower().endswith('.zip')
         extensions = ['.TIF', '.GEOTIFF', '.BSQ', '.BIL', '.BIP', 'JPEG2000', '.JP2', '.jp2', '_COG.tiff', '_COG.TIF']
         for extention in extensions:
-            filename = basename + extention
-            if exists(filename):
-                return filename
-        raise QgsProcessingException(f'Spectral cube not found: {basename}')
+            if isZip:
+                productName = splitext(basename(xmlOrZipFilename))[0]
+                with (zipfile.ZipFile(xmlOrZipFilename) as z):
+                    archiveMemberPath = productName + '/' + productName + cubeName + extention
+                    if archiveMemberPath in z.namelist():
+                        filename = '/vsizip/' + xmlOrZipFilename + '/' + productName + '/' + productName + cubeName + extention
+                        return filename
+            else:
+                xmlFilename = xmlOrZipFilename
+                filename = xmlFilename.replace('-METADATA.XML', cubeName)
+                filename = filename.replace('-METADATA.xml', cubeName)
+                filename += extention
+
+                if exists(filename):
+                    return filename
+        raise QgsProcessingException(f'Spectral cube not found: {xmlOrZipFilename}')
