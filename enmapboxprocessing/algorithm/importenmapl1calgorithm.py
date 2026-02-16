@@ -78,9 +78,7 @@ class ImportEnmapL1CAlgorithm(EnMAPProcessingAlgorithm):
             offsets = [item.text for item in root.findall('specific/bandCharacterisation/bandID/OffsetOfBand')]
 
             # create VRTs
-            ds = gdal.Open(ImportEnmapL1BAlgorithm.findFilename(
-                xmlFilename.replace('-METADATA.XML', '-SPECTRAL_IMAGE'))
-            )
+            ds = gdal.Open(ImportEnmapL1BAlgorithm.findSpectralImageFilename(xmlFilename, '-SPECTRAL_IMAGE'))
             ds: gdal.Dataset = gdal.Translate(filename, ds)
             ds.SetMetadataItem('wavelength', '{' + ', '.join(wavelength[:ds.RasterCount]) + '}', 'ENVI')
             ds.SetMetadataItem('wavelength_units', 'nanometers', 'ENVI')

@@ -1,4 +1,5 @@
-from os.path import basename
+import zipfile
+from os.path import basename, splitext
 from typing import Dict, Any, List, Tuple
 from xml.etree import ElementTree
 
@@ -18,7 +19,7 @@ from enmapboxprocessing.utils import Utils
 
 @typechecked
 class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
-    P_FILE, _FILE = 'file', 'Metadata file'
+    P_FILE, _FILE = 'file', 'Metadata file or ZIP file'
     P_EXCLUDE_NO_DATA_BANDS, _EXCLUDE_NO_DATA_BANDS, = 'excludeNoDataBands', 'Exclude no data bands'
     P_DETECTOR_OVERLAP, _DETECTOR_OVERLAP = 'detectorOverlap', 'Detector overlap region'
     O_DETECTOR_OVERLAP = [
@@ -37,7 +38,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._FILE, 'The metadata XML file associated with the product.\n'
+            (self._FILE, 'The metadata XML file or the ZIP file associated with the product.\n'
                          'Instead of executing this algorithm, '
                          'you may drag&drop the metadata XML file directly from your system file browser '
                          'a) onto the EnMAP-Box map view area, or b) onto the Sensor Product Import panel.'),
@@ -52,7 +53,8 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterFile(
-            self.P_FILE, self._FILE, extension='XML', fileFilter='Metadata file (*-METADATA.XML);;All files (*.*)'
+            self.P_FILE, self._FILE, extension='XML',
+            fileFilter='Metadata or ZIP file (*-METADATA.XML *.ZIP);;All files (*.*)'
         )
         self.addParameterBoolean(self.P_EXCLUDE_NO_DATA_BANDS, self._EXCLUDE_NO_DATA_BANDS, True, True)
         self.addParameterEnum(
@@ -61,23 +63,31 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterVrtDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 
     def isValidFile(self, file: str) -> bool:
-        return basename(file).startswith('ENMAP') & \
-            (basename(file).endswith('METADATA.XML') or basename(file).endswith('METADATA.xml')) & \
-            ('L2A' in basename(file))
+        isValid = basename(file).startswith('ENMAP')
+        if file.lower().endswith('.xml'):
+            isValid &= basename(file).endswith('METADATA.XML') or basename(file).endswith('METADATA.xml')
+        elif file.lower().endswith('.zip'):
+            pass
+        else:
+            isValid = False
+        isValid &= 'L2A' in basename(file)
+        return isValid
 
-    def defaultParameters(self, xmlFilename: str):
-        filename = xmlFilename
+    def defaultParameters(self, xmlOrZipFilename: str):
+        if xmlOrZipFilename.lower().endswith('.zip'):
+            raise NotImplementedError()
+        filename = xmlOrZipFilename
         filename = filename.replace('METADATA.XML', 'SPECTRAL_IMAGE.vrt')
         filename = filename.replace('METADATA.xml', 'SPECTRAL_IMAGE.vrt')
         return {
-            self.P_FILE: xmlFilename,
+            self.P_FILE: xmlOrZipFilename,
             self.P_OUTPUT_RASTER: filename
         }
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
-        xmlFilename = self.parameterAsFile(parameters, self.P_FILE, context)
+        xmlOrZipFilename = self.parameterAsFile(parameters, self.P_FILE, context)
         excludeNoDataBands = self.parameterAsBoolean(parameters, self.P_EXCLUDE_NO_DATA_BANDS, context)
         detectorOverlap = self.parameterAsEnum(parameters, self.P_DETECTOR_OVERLAP, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_RASTER, context)
@@ -88,14 +98,22 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
 
             # check filename
             # e.g. 'ENMAP01-____L2A-DT000326721_20170626T102020Z_001_V000204_20200406T201930Z-METADATA.XML'
-            if not self.isValidFile(xmlFilename):
-                message = (f'not a valid EnMAP L2A product: {xmlFilename}\n'
+            if not self.isValidFile(xmlOrZipFilename):
+                message = (f'not a valid EnMAP L2A product: {xmlOrZipFilename}\n'
                            f'Hint: relocating the product to a directory with a shorter path may help in some cases.')
                 feedback.reportError(message, True)
                 raise QgsProcessingException(message)
 
             # read metadata
-            root = ElementTree.parse(xmlFilename).getroot()
+            isZip = xmlOrZipFilename.lower().endswith('.zip')
+            if isZip:
+                with zipfile.ZipFile(xmlOrZipFilename) as z:
+                    productName = splitext(basename(xmlOrZipFilename))[0]
+                    with z.open(productName + '/' + productName + '-METADATA.XML') as f:
+                        tree = ElementTree.parse(f)
+                        root = tree.getroot()
+            else:
+                root = ElementTree.parse(xmlOrZipFilename).getroot()
             wavelength = [float(item.text) for item in
                           root.findall('specific/bandCharacterisation/bandID/wavelengthCenterOfBand')]
             fwhm = [item.text for item in root.findall('specific/bandCharacterisation/bandID/FWHMOfBand')]
@@ -108,8 +126,8 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
             values = np.array(wavelength, float)
             assert np.all(values[:-1] <= values[1:]), 'wavelength are assumed to be sorted'
 
-            spectralImageFilename = ImportEnmapL1BAlgorithm.findFilename(
-                xmlFilename.replace('-METADATA.XML', '-SPECTRAL_IMAGE').replace('-METADATA.xml', '-SPECTRAL_IMAGE')
+            spectralImageFilename = ImportEnmapL1BAlgorithm.findSpectralImageFilename(
+                xmlOrZipFilename, '-SPECTRAL_IMAGE'
             )
 
             # make sure, that EOLab ARD products are not imported as VRT
