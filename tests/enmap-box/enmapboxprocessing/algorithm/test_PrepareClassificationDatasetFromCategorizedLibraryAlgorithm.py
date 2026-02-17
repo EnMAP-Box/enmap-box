@@ -118,7 +118,7 @@ class TestPrepareClassificationDatasetFromCategorizedLibrary(TestCase):
         )
         self.assertEqual((1, 2), tuple(dump.locations[0]))
 
-    def test_BUG(self):
+    def _test_BUG(self):
         alg = PrepareClassificationDatasetFromCategorizedLibraryAlgorithm()
         parameters = {
             alg.P_CATEGORIZED_LIBRARY: r'C:\Users\janzandr\Downloads\library.geojson',
