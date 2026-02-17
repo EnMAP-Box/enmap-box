@@ -983,8 +983,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         layers = [self.project().mapLayer(lid) for lid in layerIDs]
 
-        layers = [lyr for lyr in layers if isinstance(lyr, QgsMapLayer) and
-                  not lyr.customProperty(TemporaryGlobalLayerContext.LAYER_PROPERTY_KEY, False)]
+        layers = [lyr for lyr in layers if isinstance(lyr, QgsMapLayer)
+                  and not lyr.customProperty(TemporaryGlobalLayerContext.LAYER_PROPERTY_KEY, False)]
         self.removeMapLayers(layers)
 
     def syncProjects(self):
