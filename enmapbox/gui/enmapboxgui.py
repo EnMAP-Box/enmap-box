@@ -83,6 +83,7 @@ from qgis.gui import QgsMapCanvas, QgsMapTool, QgisInterface, QgsMessageBar, Qgs
     QgsSymbolWidgetContext
 from qgis.gui import QgsProcessingAlgorithmDialogBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog, \
     QgsNewVectorLayerDialog, QgsProcessingContextGenerator
+from qps.utils import TemporaryGlobalLayerContext
 from .contextmenuprovider import EnMAPBoxContextMenuProvider
 from .contextmenus import EnMAPBoxContextMenuRegistry
 from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
@@ -981,7 +982,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         assert isinstance(layerIDs, list)
 
         layers = [self.project().mapLayer(lid) for lid in layerIDs]
-        layers = [lyr for lyr in layers if isinstance(lyr, QgsMapLayer)]
+
+        layers = [lyr for lyr in layers if isinstance(lyr, QgsMapLayer) and
+                  not lyr.customProperty(TemporaryGlobalLayerContext.LAYER_PROPERTY_KEY, False)]
         self.removeMapLayers(layers)
 
     def syncProjects(self):
