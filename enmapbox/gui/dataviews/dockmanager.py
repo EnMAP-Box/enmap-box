@@ -804,6 +804,7 @@ class DockManager(QObject):
         elif cls == AttributeTableDock:
             layer = kwds.pop('layer', None)
             assert isinstance(layer, QgsVectorLayer), 'QgsVectorLayer "layer" is not defined'
+            self.project().addMapLayer(layer)
             dock = AttributeTableDock(layer, *args, **kwds)
             layer.willBeDeleted.connect(lambda *args, d=dock: self.removeDock(d))
             if isinstance(self.mMessageBar, QgsMessageBar):
