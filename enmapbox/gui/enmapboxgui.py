@@ -83,7 +83,6 @@ from qgis.gui import QgsMapCanvas, QgsMapTool, QgisInterface, QgsMessageBar, Qgs
     QgsSymbolWidgetContext
 from qgis.gui import QgsProcessingAlgorithmDialogBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog, \
     QgsNewVectorLayerDialog, QgsProcessingContextGenerator
-from qps.utils import TemporaryGlobalLayerContext
 from .contextmenuprovider import EnMAPBoxContextMenuProvider
 from .contextmenus import EnMAPBoxContextMenuRegistry
 from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
@@ -95,6 +94,7 @@ from .widgets.createspeclibdialog import CreateSpectralLibraryDialog
 from ..enmapboxsettings import EnMAPBoxSettings
 from ..qgispluginsupport.qps.processing.algorithmdialog import executeAlgorithm, AlgorithmDialog
 from ..qgispluginsupport.qps.speclib.gui.spectralprofilecandidates import SpectralProfileCandidates
+from ..qgispluginsupport.qps.utils import TemporaryGlobalLayerContext
 
 MAX_MISSING_DEPENDENCY_WARNINGS = 3
 KEY_MISSING_DEPENDENCY_VERSION = 'MISSING_PACKAGE_WARNING_VERSION'
