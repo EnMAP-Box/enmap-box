@@ -135,8 +135,12 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
                 y.append(yi)
                 X.append(Xi)
 
-                point = feature.geometry().asPoint()
-                locations.append((point.x(), point.y()))
+                geometry = feature.geometry()
+                if geometry.isEmpty():
+                    locations.append((None, None))
+                else:
+                    point = geometry.asPoint()
+                    locations.append((point.x(), point.y()))
 
             if len(set(map(len, X))) != 1:
                 raise QgsProcessingException('Number of features do not match across all spectral profiles.')
