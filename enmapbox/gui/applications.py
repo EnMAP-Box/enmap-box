@@ -367,7 +367,7 @@ class ApplicationRegistry(QObject):
 
                 blacklist = os.environ.get('EMB_APP_BLACKLIST', '').split(',')
                 if appPkgName in blacklist:
-                    raise Exception('Skipped loading EnMAPBoxApplication "{}"'.format(appPkgName))
+                    raise Exception(f'Skipped loading EnMAPBoxApplication "{appPkgName}"')
 
                 print('Load EnMAPBoxApplication(s) from "{}" ... '.format(appPkgName), end='')
                 t0 = datetime.datetime.now()

@@ -1,4 +1,4 @@
-# EnMAP-Box conda environment (generated 2026-01-29 16:28:00)
+# EnMAP-Box conda environment (generated 2026-02-18 10:54:28)
 # run to install: conda env create -n enmapbox_light_ltr --file=enmapbox_light_ltr.yml
 # run to update : conda env update -n enmapbox_light_ltr --file=enmapbox_light_ltr.yml --prune
 # run to delete : conda env remove -n enmapbox_light_ltr
@@ -11,7 +11,6 @@ dependencies:
 - qgis=3.40
 - colorama
 - docutils
-- enpt
 - flake8
 - git-lfs
 - gitpython
@@ -20,7 +19,7 @@ dependencies:
 - pytest
 - pytest-cov
 - pytest-xdist
-- python>=3.12
+- python=3.12
 - scikit-learn>=1
 - pip:
   - flake8-qgis

@@ -29,19 +29,24 @@ EXCLUDED_QGIS_VERSIONS = []
 DEPENDENCIES = {
     # define dependencies as: [<conda package name> | {<'conda'|'pip'>:<package name>, ...}, ...]
     # light = minimum requirements
-    'light': ['python>=3.12', 'pip', 'scikit-learn>=1', 'matplotlib', 'enpt', 'colorama'],
+    'light': ['python=3.12', 'pip', 'scikit-learn>=1', 'matplotlib', 'colorama'],
     # full = all other packages to enjoy the full EnMAP-Box experience (on cost of disk space)
-    'full': [{'conda': 'enpt', 'pip': 'enpt-enmapboxapp'}, 'xgboost', 'lightgbm', 'cdsapi', 'cython', 'netcdf4',
+    'full': [{'conda': 'enpt', 'pip': 'enpt-enmapboxapp'},
+             {'conda': 'enfrosp', 'pip': 'enfrosp-enmapboxapp'},
+             'xgboost', 'lightgbm', 'cdsapi', 'cython', 'netcdf4',
              'pygrib',
              'pyhdf', 'xarray', 'astropy', 'catboost', 'matplotlib', 'astropy', 'numba>=0.56.4',
              'sympy', 'pyopengl', 'h5py',
              # requirements by specdeepmap
              'opencv[build=headless*]', 'pandas=2.2.3',
-             {'pip': ['torch==2.6.0',
-                      'lightning==2.5.0.post0',
-                      'tensorboard==2.19.0',
-                      'torchvision==0.21.0',
-                      'segmentation-models-pytorch==0.5.0']}
+             # requirements by specdeepmap
+             'lightning', 'pytorch', 'tensorboard', 'torchvision', 'segmentation-models-pytorch',
+             'setuptools<=81',  # due to https://github.com/tensorflow/tensorboard/issues/7003
+             # {'pip': ['torch==2.6.0',
+             #         'lightning==2.5.0.post0',
+             #         'tensorboard==2.19.0',
+             #         'torchvision==0.21.0',
+             #         'segmentation-models-pytorch==0.5.0']}
              ],
     # required by developers
     'dev': ['gitpython', 'git-lfs', 'pytest', 'pytest-cov', 'pytest-xdist', 'docutils',
