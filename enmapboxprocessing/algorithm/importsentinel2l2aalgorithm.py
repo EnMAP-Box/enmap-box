@@ -97,8 +97,6 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
                 feedback.reportError(message, True)
                 raise QgsProcessingException(message)
 
-            isZip = xmlOrZipFilename.endswith('.zip')
-
             # open subdatasets
             ds = gdal.Open(xmlOrZipFilename)
             f10 = ds.GetSubDatasets()[0][0]
@@ -144,13 +142,8 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
             if isVrt:
                 GdalUtils.stackBands(filename, filenames, bandNumbers, width, height)
             else:
-                raise NotImplementedError()
-                GdalUtils.stackBands(filename + '.vrt', filenames, bandNumbers)
-                RasterReader(filename + '.')
-                ds: gdal.Dataset = gdal.BuildVRT(filename, filenames, options=options)
-                for bandNo, name in enumerate(bandNames, 1):
-                    rb: gdal.Band = ds.GetRasterBand(bandNo)
-                    rb.SetScale(0.0001)
+                GdalUtils.stackBands(filename + '.vrt', filenames, bandNumbers, width, height)
+                RasterReader(filename + '.vrt').saveAs(filename)
 
             ds = gdal.Open(filename)
             ds.SetMetadata(ds10.GetMetadata())
@@ -161,17 +154,6 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
                 rb.SetDescription(name)
                 rb.SetScale(0.0001)
             del ds
-            # copy metadata (see issue #269)
-            #            writer = RasterWriter(ds)
-            #           for bandNo, filename_ in enumerate(filenames, 1):
-            #              reader = RasterReader(filename_)
-            #             metadata = reader.metadata(1)
-            #                writer.setMetadata(metadata, bandNo)
-            #                if bandNo == 1:
-            #                    metadata = reader.metadataDomain('')
-            #                    writer.setMetadataDomain(metadata, '')
-            #            writer.close()
-            #            del writer
 
             # setup default renderer
             layer = QgsRasterLayer(filename)

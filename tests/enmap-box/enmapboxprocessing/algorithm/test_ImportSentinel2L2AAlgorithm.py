@@ -23,7 +23,7 @@ class TestImportSentinel2L2AAlgorithm(TestCase):
         alg = ImportSentinel2L2AAlgorithm()
         parameters = {
             alg.P_FILE: SensorProducts.Sentinel2.S2B_L2A_MsiL1CXml,
-            alg.P_OUTPUT_RASTER: self.filename('sentinel2L2A_3.tif'),
+            alg.P_OUTPUT_RASTER: self.filename('sentinel2L2A.tif'),
         }
         self.runalg(alg, parameters)
 
