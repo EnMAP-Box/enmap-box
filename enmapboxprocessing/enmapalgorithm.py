@@ -791,7 +791,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         self.flagParameterAsAdvanced(name, advanced)
 
     def addParameterVectorLayer(
-            self, name: str, description: str, types=(QgsProcessing.SourceType.TypeVectorAnyGeometry,),
+            self, name: str, description: str, types=(QgsProcessing.SourceType.TypeVector,),
             defaultValue=None, optional=False, advanced=False
     ):
         if types is None:
