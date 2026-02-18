@@ -29,7 +29,7 @@ EXCLUDED_QGIS_VERSIONS = []
 DEPENDENCIES = {
     # define dependencies as: [<conda package name> | {<'conda'|'pip'>:<package name>, ...}, ...]
     # light = minimum requirements
-    'light': ['python>=3.12', 'pip', 'scikit-learn>=1', 'matplotlib', 'colorama'],
+    'light': ['python=3.12', 'pip', 'scikit-learn>=1', 'matplotlib', 'colorama'],
     # full = all other packages to enjoy the full EnMAP-Box experience (on cost of disk space)
     'full': [{'conda': 'enpt', 'pip': 'enpt-enmapboxapp'},
              {'conda': 'enfrosp', 'pip': 'enfrosp-enmapboxapp'},
