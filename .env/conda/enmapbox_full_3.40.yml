@@ -1,4 +1,4 @@
-# EnMAP-Box conda environment (generated 2026-02-18 09:25:33)
+# EnMAP-Box conda environment (generated 2026-02-18 09:52:34)
 # run to install: conda env create -n enmapbox_full_3.40 --file=enmapbox_full_3.40.yml
 # run to update : conda env update -n enmapbox_full_3.40 --file=enmapbox_full_3.40.yml --prune
 # run to delete : conda env remove -n enmapbox_full_3.40
@@ -36,12 +36,12 @@ dependencies:
 - pytest-cov
 - pytest-xdist
 - python>=3.12
+- pytorch
 - scikit-learn>=1
 - segmentation-models-pytorch
 - setuptools<=81
 - sympy
 - tensorboard
-- torch
 - torchvision
 - xarray
 - xgboost
