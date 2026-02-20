@@ -165,7 +165,7 @@ def create_enmapbox_plugin(include_testdata: bool = False,
         BUILD_NAME = build_name
 
     if REPO.is_dirty():
-        if BUILD_NAME == VERSION:
+        if BUILD_NAME == VERSION and build_name is None:
             raise Exception('Repository has uncommitted changes!\n'
                             'Commit / rollback them first to ensure a valid VERSION_SHA for release builds!')
         else:
@@ -376,7 +376,6 @@ def createCHANGELOG(dirPlugin: Path) -> str:
 
     html = markdownToHTML(pathMD)
     if False:
-        from xml.dom import minidom
         xml = minidom.parseString(html)
         #  remove headline
         for i, node in enumerate(xml.getElementsByTagName('h1')):
