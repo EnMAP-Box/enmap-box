@@ -11,8 +11,8 @@ __author__ = 'benjamin.jakimow@geo.hu-berlin.de'
 __date__ = '2017-07-17'
 __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
-import pathlib
 import unittest
+from pathlib import Path
 
 from enmapbox import initAll
 from enmapbox.exampledata import enmap, hires, landcover_polygon
@@ -50,10 +50,10 @@ class MapCanvasTests(EnMAPBoxTestCase):
     def test_mapCanvas(self):
         box = EnMAPBox()
 
+        p = QgsProject()
         mapCanvas = MapCanvas()
         lyr = TestObjects.createRasterLayer()
-        self.assertTrue(lyr not in QgsProject.instance().mapLayers().values())
-        QgsProject.instance().addMapLayer(lyr)
+        p.addMapLayer(lyr)
         mapCanvas.setLayers([lyr])
         mapCanvas.setDestinationCrs(lyr.crs())
         mapCanvas.zoomToFullExtent()
@@ -78,8 +78,8 @@ class MapCanvasTests(EnMAPBoxTestCase):
         mapCanvas.keyPressed.connect(onKeyPressed)
 
         self.showGui(mapCanvas)
+        p.removeAllMapLayers()
         box.close()
-        QgsProject.instance().removeAllMapLayers()
 
     # @unittest.skip("Skipped to check if GH CI finishes")
     def test_canvaslinks(self):
@@ -189,14 +189,14 @@ class MapCanvasTests(EnMAPBoxTestCase):
 
         layerSources = []
         for p in mapCanvas.layerPaths():
-            p = pathlib.Path(p)
+            p = Path(p)
             if '|' in p.name:
                 p = p.parent / p.name.split('|')[0]
             layerSources.append(p)
 
         for p in spatialFiles:
-            p2 = pathlib.Path(p)
-            self.assertTrue(pathlib.Path(p) in layerSources, msg=f'Failed to drop {p}')
+            p2 = Path(p)
+            self.assertTrue(Path(p) in layerSources, msg=f'Failed to drop {p}')
 
 
 if __name__ == "__main__":
