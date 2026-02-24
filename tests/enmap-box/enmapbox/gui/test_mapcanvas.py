@@ -37,7 +37,7 @@ initAll()
 # @unittest.skip("Skipped to check if GH CI finishes")
 class MapCanvasTests(EnMAPBoxTestCase):
 
-    @unittest.skip("Skipped to check if GH CI finishes")
+    # @unittest.skip("Skipped to check if GH CI finishes")
     def test_mapDock(self):
         dock = MapDock()
         self.assertIsInstance(dock, MapDock)
