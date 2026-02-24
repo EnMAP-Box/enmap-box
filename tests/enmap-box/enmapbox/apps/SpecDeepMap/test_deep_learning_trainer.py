@@ -100,7 +100,7 @@ class Test_Deep_Learning_Trainer(TestCase):
         # select best ckpt
         best = best_ckpt_path(folder_path)
 
-        model_loaded = MyModel.load_from_checkpoint(best)
+        model_loaded = MyModel.load_from_checkpoint(best, weights_only=False)
 
         # 2. Test check if model has subclass, pytorch lightning Module
         is_inherited = isinstance(model_loaded, L.LightningModule)
@@ -168,7 +168,7 @@ class Test_Deep_Learning_Trainer(TestCase):
 
         best = best_ckpt_path(folder_path_unet)
 
-        model_loaded = MyModel.load_from_checkpoint(best)
+        model_loaded = MyModel.load_from_checkpoint(best, weights_only=False)
 
         # 2. Test check if model has subclass, pytorch lightning Module
         is_inherited = isinstance(model_loaded, L.LightningModule)

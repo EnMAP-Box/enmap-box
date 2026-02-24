@@ -81,4 +81,4 @@ jobs:
       - name: Test EnMAP-Box in ${{matrix.mamba_env}}
         run: |
           chmod +x scripts/runtests.sh
-          bash ./scripts/runtests.sh -n auto --maxfail=2
+          bash ./scripts/runtests.sh -x -n 1 --maxfail=2

@@ -25,7 +25,7 @@ class ImportUsgsSpeclib07Algorithm(EnMAPProcessingAlgorithm):
         SoilsAndMixturesChapter, VegetationChapter) = list(range(7))
     P_SPECTROMETER, _SPECTROMETER = 'spectrometer', 'Selected spectrometers'
     O_SPECTROMETER = (
-        'Beckman 5270 (0.2 to 3 µm)', 'hi-resNG ASD (0.35 to 2.5 µm', 'Nicolet FTIR (0.1 to 21.6 µm',
+        'Beckman 5270 (0.2 to 3 µm)', 'hi-resNG ASD (0.35 to 2.5 µm)', 'Nicolet FTIR (1 to 216 µm)',
         'AVIRIS (0.37 to 2.5 µm)'
     )
     AllSpectrometers = BeckmanSpectrometer, AsdSpectrometer, NicoletSpectrometer, AvirisSpectrometer = list(range(4))
@@ -87,8 +87,7 @@ class ImportUsgsSpeclib07Algorithm(EnMAPProcessingAlgorithm):
             for name, filenameSensor in sensors.items():
                 with open(filenameSensor) as file:
                     text = file.readlines()
-                factor = 0.1 if name == 'NIC' else 1
-                wavelength[name] = [float(v) * factor for v in text[1:]]
+                wavelength[name] = [float(v) for v in text[1:]]
             xUnit = 'Micrometers'
 
             data = []

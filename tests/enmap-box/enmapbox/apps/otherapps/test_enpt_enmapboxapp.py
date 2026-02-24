@@ -12,11 +12,13 @@ __date__ = '2017-07-17'
 __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
 import unittest
-from enmapbox import initPythonPaths
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.testing import EnMAPBoxTestCase
 
-initPythonPaths()
+from enmapbox import initAll
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.testing import start_app, EnMAPBoxTestCase
+
+start_app()
+initAll()
 
 try:
     from enpt_enmapboxapp.enpt_enmapboxapp import EnPTEnMAPBoxApp
@@ -39,6 +41,7 @@ class EnPTTestCases(EnMAPBoxTestCase):
         self.assertIsInstance(app, EnPTEnMAPBoxApp)
         # app.startGUI()
         self.showGui(EB.ui)
+        EB.close()
 
 
 if __name__ == "__main__":

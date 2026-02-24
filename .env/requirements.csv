@@ -3,6 +3,7 @@ astropy,,,full,provides concolution filters
 colorama,colorama,,core,required by pyqtgraph
 enpt,,,enpt,required by EnPT
 enpt-enmapboxapp,enpt_enmapboxapp,,enpt,required by EnPT
+enfrosp-enmapboxapp, enfrosp_enmapboxapp,0.1.1, , EnFROSP
 GDAL,osgeo.gdal,,core,usually already installed with QGIS
 lightgbm,,,full,required by LGBM estimators
 lightning,,,specdeepmap,required by SpecDeepMap

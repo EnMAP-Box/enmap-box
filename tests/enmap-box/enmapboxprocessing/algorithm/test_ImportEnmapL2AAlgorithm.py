@@ -129,3 +129,16 @@ class TestImportEnmapL2AAlgorithm(TestCase):
         ds: gdal.Dataset = gdal.Open(result[alg.P_OUTPUT_RASTER])
         driver: gdal.Driver = ds.GetDriver()
         self.assertEqual('GeoTIFF', driver.LongName)
+
+    def test_zip(self):
+        if sensorProductsRoot() is None or self.skipProductImport:
+            return
+
+        alg = ImportEnmapL2AAlgorithm()
+        parameters = {
+            alg.P_FILE: SensorProducts.Enmap.L2A_Zip,
+            alg.P_OUTPUT_RASTER: self.filename('enmapL2A_fromZip.vrt'),
+        }
+        result = self.runalg(alg, parameters)
+        reader = RasterReader(result[alg.P_OUTPUT_RASTER])
+        self.assertEqual(190, reader.bandCount())
