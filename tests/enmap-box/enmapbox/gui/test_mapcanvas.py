@@ -81,7 +81,7 @@ class MapCanvasTests(EnMAPBoxTestCase):
         box.close()
         QgsProject.instance().removeAllMapLayers()
 
-    @unittest.skip("Skipped to check if GH CI finishes")
+    # @unittest.skip("Skipped to check if GH CI finishes")
     def test_canvaslinks(self):
         canvases = []
         for i in range(3):
