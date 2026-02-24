@@ -46,7 +46,7 @@ class MapCanvasTests(EnMAPBoxTestCase):
         self.assertIsInstance(m, QMenu)
         self.assertTrue(m == m1)
 
-    @unittest.skip("Skipped to check if GH CI finishes")
+    # @unittest.skip("Skipped to check if GH CI finishes")
     def test_mapCanvas(self):
         box = EnMAPBox()
 
