@@ -297,7 +297,7 @@ def speclibProductsRoot() -> Optional[str]:
     root = None
     try:
         root = {
-            'Andreas@PC-21-0602': r'd:\data\speclibs'
+            'janzandr@PC-25-0201': r'd:\data\speclibs'
         }.get(os.getlogin() + '@' + platform.node())
     except OSError as ex:
         warnings.warn(f'Exception raised in sensorProductsRoot():\n{ex}')
