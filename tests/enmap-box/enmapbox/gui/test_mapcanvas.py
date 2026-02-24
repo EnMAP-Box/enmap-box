@@ -34,9 +34,10 @@ start_app()
 initAll()
 
 
-@unittest.skip("Skipped to check if GH CI finishes")
+# @unittest.skip("Skipped to check if GH CI finishes")
 class MapCanvasTests(EnMAPBoxTestCase):
 
+    @unittest.skip("Skipped to check if GH CI finishes")
     def test_mapDock(self):
         dock = MapDock()
         self.assertIsInstance(dock, MapDock)
@@ -45,6 +46,7 @@ class MapCanvasTests(EnMAPBoxTestCase):
         self.assertIsInstance(m, QMenu)
         self.assertTrue(m == m1)
 
+    @unittest.skip("Skipped to check if GH CI finishes")
     def test_mapCanvas(self):
         box = EnMAPBox()
 
@@ -79,6 +81,7 @@ class MapCanvasTests(EnMAPBoxTestCase):
         box.close()
         QgsProject.instance().removeAllMapLayers()
 
+    @unittest.skip("Skipped to check if GH CI finishes")
     def test_canvaslinks(self):
         canvases = []
         for i in range(3):
@@ -132,6 +135,7 @@ class MapCanvasTests(EnMAPBoxTestCase):
 
         QgsProject.instance().removeAllMapLayers()
 
+    # @unittest.skip("Skipped to check if GH CI finishes")
     def test_mapCrosshairDistance(self):
 
         # lyrWorld = QgsRasterLayer(TestObjects.uriWMS(), 'Background', 'wms')
@@ -154,6 +158,7 @@ class MapCanvasTests(EnMAPBoxTestCase):
 
         QgsProject.instance().removeAllMapLayers()
 
+    # @unittest.skip("Skipped to check if GH CI finishes")
     def test_mapLinking(self):
 
         enmapBox = EnMAPBox(load_core_apps=False, load_other_apps=False)
@@ -163,7 +168,9 @@ class MapCanvasTests(EnMAPBoxTestCase):
         link = map1.linkWithMapDock(mapDock=map2, linkType=LINK_ON_CENTER)
         self.assertIsInstance(link, CanvasLink)
         self.showGui(enmapBox.ui)
+        enmapBox.close()
 
+    # @unittest.skip("Skipped to check if GH CI finishes")
     def test_dropEvents(self):
 
         mapDock = MapDock()
