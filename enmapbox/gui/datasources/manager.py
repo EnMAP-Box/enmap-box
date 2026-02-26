@@ -28,7 +28,7 @@ from qgis.core import Qgis, QgsDataItem, QgsLayerItem, QgsLayerTreeGroup, QgsLay
 from qgis.core import QgsProviderRegistry
 from qgis.gui import QgisInterface, QgsDockWidget, QgsMapCanvas
 from .datasources import DataSource, FileDataSource, LayerItem, ModelDataSource, RasterDataSource, SpatialDataSource, \
-    VectorDataSource
+    VectorDataSource, VectorTileDataSource
 from .metadata import RasterBandTreeNode
 from ..dataviews.docks import Dock
 from ..mapcanvas import MapCanvas
@@ -912,6 +912,9 @@ class DataSourceFactory(object):
                         ds = RasterDataSource(dataItem)
                     elif dataItem.mapLayerType() == QgsMapLayer.VectorLayer:
                         ds = VectorDataSource(dataItem)
+                    elif dataItem.mapLayerType() == QgsMapLayer.VectorTileLayer:
+                        ds = VectorTileDataSource(dataItem)
+
                 elif dataItem.providerKey() == 'special:pkl':
                     ds = ModelDataSource(dataItem)
                 elif dataItem.providerKey() == 'special:file':

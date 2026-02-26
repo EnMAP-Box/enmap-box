@@ -177,6 +177,14 @@ class SpatialDataSource(DataSource):
         return MD
 
 
+class VectorTileDataSource(SpatialDataSource):
+
+    def __init__(self, dataItem: QgsLayerItem):
+        super().__init__(dataItem)
+        assert isinstance(dataItem, QgsLayerItem)
+        assert dataItem.mapLayerType() == QgsMapLayerType.VectorTileLayer
+
+
 class VectorDataSource(SpatialDataSource):
 
     def __init__(self, dataItem: QgsLayerItem):
