@@ -1,13 +1,19 @@
 import os.path
 import unittest
+from pathlib import Path
 
 from osgeo import gdal
 
 from engeomap.enmapboxintegration import EnGeoMAP
 from engeomap.userinterfaces import EnGeoMAPGUI, Worker
+from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
-from qgis.core import QgsRasterLayer, QgsFileUtils
 from enmapbox.testing import EnMAPBoxTestCase
+from enmapbox.testing import start_app
+from qgis.core import QgsRasterLayer, QgsFileUtils
+
+start_app()
+initAll()
 
 
 class EnGeoMAPTests(EnMAPBoxTestCase):
@@ -17,6 +23,7 @@ class EnGeoMAPTests(EnMAPBoxTestCase):
 
         EGM = EnGeoMAP(enmapBox)
         EGM.startGUI()
+        self.showGui(enmapBox.ui)
 
     def test_ui(self):
         ui = EnGeoMAPGUI()
@@ -27,17 +34,17 @@ class EnGeoMAPTests(EnMAPBoxTestCase):
             engeomap_gamsberg_field_library, engeomap_gamesberg_field_library_color_mod
 
         ui = EnGeoMAPGUI()
-        ui.input_image.setText(engeomap_cubus_gamsberg_subset.as_posix())
-        ui.speclib.setText(engeomap_gamsberg_field_library.as_posix())
-        ui.colormap.setText(engeomap_gamesberg_field_library_color_mod.as_posix())
+        ui.input_image.setText(str(engeomap_cubus_gamsberg_subset))
+        ui.speclib.setText(str(engeomap_gamsberg_field_library))
+        ui.colormap.setText(str(engeomap_gamesberg_field_library_color_mod))
 
         params = ui.collectParameters()
 
         worker = Worker()
         worker.run()
 
-        root = engeomap_cubus_gamsberg_subset.parent
-        bn = os.path.basename(engeomap_cubus_gamsberg_subset.name)
+        root = Path(engeomap_cubus_gamsberg_subset).parent
+        bn = os.path.basename(Path(engeomap_cubus_gamsberg_subset).name)
 
         to_delete = []
         for suffix in ['abundance_result',
@@ -47,7 +54,7 @@ class EnGeoMAPTests(EnMAPBoxTestCase):
                        'bestmatches_correlation__best_fit_coleur_class_geotiff.tif',
                        'correlation_result']:
             path = root / f'{bn}_{suffix}'
-            self.assertTrue(path.is_file())
+            self.assertTrue(path.is_file(), msg=f'{path} does not exist')
 
             lyr: QgsRasterLayer = QgsRasterLayer(path.as_posix())
             self.assertTrue(lyr.isValid())
