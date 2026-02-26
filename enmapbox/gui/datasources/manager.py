@@ -24,7 +24,7 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QApplication, QDialog, QMenu, QTreeView, QWidget
 from qgis.core import Qgis, QgsDataItem, QgsLayerItem, QgsLayerTreeGroup, QgsLayerTreeLayer, QgsMapLayer, \
     QgsMimeDataUtils, QgsProject, QgsProviderSublayerDetails, QgsRasterDataProvider, \
-    QgsRasterLayer, QgsRasterRenderer, QgsVectorLayer, QgsMapLayerType, QgsIconUtils
+    QgsRasterLayer, QgsRasterRenderer, QgsVectorLayer, QgsMapLayerType, QgsIconUtils, QgsLayerDefinition
 from qgis.core import QgsProviderRegistry
 from qgis.gui import QgisInterface, QgsDockWidget, QgsMapCanvas
 from .datasources import DataSource, FileDataSource, LayerItem, ModelDataSource, RasterDataSource, SpatialDataSource, \
@@ -819,6 +819,10 @@ class DataSourceFactory(object):
                     dtype = QgsLayerItem.Vector
                     dataItem = LayerItem(None, source.name, source.uri, source.uri, dtype, source.providerKey)
 
+                elif source.layerType == 'vector-tile':
+                    dtype = QgsLayerItem.VectorTile
+                    dataItem = LayerItem(None, source.name, source.uri, source.uri, dtype, source.providerKey)
+
                 elif source.providerKey in ['special:file', 'special:pkl']:
                     name = source.name
                     source = source.uri
@@ -852,7 +856,13 @@ class DataSourceFactory(object):
                     if isinstance(lyr, QgsMapLayer):
                         return DataSourceFactory.create(lyr)
 
-                    source = Path(source).as_posix()
+                    source_path = Path(source)
+                    source = source_path.as_posix()
+
+                    if source_path.suffix == '.qlr':
+                        layers = QgsLayerDefinition.loadLayerDefinitionLayers(source_path.as_posix())
+                        if len(layers) > 0:
+                            return DataSourceFactory.create(layers)
 
                     if name is None:
                         name = Path(source).name
