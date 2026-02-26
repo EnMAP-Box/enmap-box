@@ -6,7 +6,7 @@ from typing import Optional
 
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import QgsCoordinateReferenceSystem, QgsUnitTypes, \
-    QgsMapLayerType, QgsVectorLayer, Qgis, QgsWkbTypes, QgsField, QgsProject
+    QgsMapLayerType, QgsVectorLayer, QgsVectorTileLayer, Qgis, QgsWkbTypes, QgsField, QgsProject
 from qgis.core import QgsDataItem, QgsLayerItem, QgsMapLayer, QgsRasterLayer
 from .metadata import CRSLayerTreeNode, RasterBandTreeNode, DataSourceSizesTreeNode
 from ...qgispluginsupport.qps.classification.classificationscheme import ClassificationScheme
@@ -72,6 +72,11 @@ def dataItemToLayer(dataItem: QgsDataItem,
 
         elif dataItem.mapLayerType() == QgsMapLayerType.RasterLayer:
             lyr = QgsRasterLayer(dataItem.path(), dataItem.name(), dataItem.providerKey())
+            lyr.loadDefaultStyle()
+            return lyr
+
+        elif dataItem.mapLayerType() == QgsMapLayerType.VectorTileLayer:
+            lyr = QgsVectorTileLayer(dataItem.path(), dataItem.name())
             lyr.loadDefaultStyle()
             return lyr
 
@@ -175,6 +180,14 @@ class SpatialDataSource(DataSource):
             self.nodeExtXmu.setValue(None)
             self.nodeExtYmu.setValue(None)
         return MD
+
+
+class VectorTileDataSource(SpatialDataSource):
+
+    def __init__(self, dataItem: QgsLayerItem):
+        super().__init__(dataItem)
+        assert isinstance(dataItem, QgsLayerItem)
+        assert dataItem.mapLayerType() == QgsMapLayerType.VectorTileLayer
 
 
 class VectorDataSource(SpatialDataSource):

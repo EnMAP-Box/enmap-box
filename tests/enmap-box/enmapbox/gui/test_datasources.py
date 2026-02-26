@@ -30,7 +30,8 @@ from enmapbox.testing import TestObjects, EnMAPBoxTestCase
 from enmapbox.testing import start_app
 from enmapboxtestdata import classifierDumpPkl, library_berlin, enmap_srf_library
 from qgis.PyQt import sip
-from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, QgsRasterRenderer, edit
+from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, QgsRasterRenderer, edit, \
+    QgsVectorTileLayer
 from qgis.gui import QgsMapCanvas
 
 start_app()
@@ -51,6 +52,19 @@ class DataSourceTests(EnMAPBoxTestCase):
                 TestObjects.createVectorLayer(ogr.wkbPoint),
                 TestObjects.createVectorLayer(ogr.wkbPolygon),
                 TestObjects.createSpectralLibrary(10)]
+
+    def test_vectortilelayer(self):
+        uri = 'styleUrl=https://sgx.geodatenzentrum.de/gdz_basemapde_vektor/styles/bm_web_col.json&type=xyz&url=https://sgx.geodatenzentrum.de/gdz_basemapde_vektor/tiles/v2/bm_web_de_3857/%7Bz%7D/%7Bx%7D/%7By%7D.pbf&zmax=15&zmin=0&http-header:referer='
+        lyr = QgsVectorTileLayer(uri)
+        lyr.setName('Basemap.de')
+        self.assertTrue(lyr.isValid())
+
+        emb = EnMAPBox(load_core_apps=False, load_other_apps=False)
+        emb.addSource(lyr)
+
+        self.assertTrue(len(emb.dataSources()) == 1)
+
+        self.showGui(emb.ui)
 
     def test_testSources(self):
 
