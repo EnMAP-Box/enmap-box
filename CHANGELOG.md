@@ -20,11 +20,14 @@ have been completely redesigned (qps issues [100](https://github.com/EnMAP-Box/q
 
 * faster reading and visualization of spectral profiles
 * a single viewer can visualize profiles from different vector layers
-* added interactive legend that allows to hide/show single profiles
+* added interactive legend that allows hiding / showing single profiles
 * added profile statistics, e.g. mean and stddev profiles
 * import and export of spectral profiles has been completely revised and
-  is now implemented as QGIS Processing Algorithms (see below)
+  is now implemented as QGIS Processing Algorithms (see below) 
 * supports import of ECOSTRESS data
+* new "Data" field allows modifying x and y values, e.g., to scale profile values [#1459](https://github.com/EnMAP-Box/enmap-box/issues/1459)
+* fixed several visual glitches in the plot settings and profile source trees (text colors, sizes)
+* Attribute table, form view: JSON viewer shows list values in one line, fixed saving and loading of changed profile data
 
 #### Applications
 
