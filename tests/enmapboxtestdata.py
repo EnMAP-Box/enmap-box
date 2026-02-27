@@ -466,3 +466,6 @@ class SpeclibProducts(object):
     if speclibProductsRoot() is not None:
         class UsgsSplib07(object):
             folder = join(speclibProductsRoot(), 'usgs_splib07')
+            ASCIIdata_splib07b_rsLandsat8 = join(
+                speclibProductsRoot(), 'usgs_splib07_childItems', 'ASCIIdata_splib07b_rsLandsat8'
+            )
