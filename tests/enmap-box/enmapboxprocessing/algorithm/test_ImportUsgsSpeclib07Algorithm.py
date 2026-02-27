@@ -19,6 +19,7 @@ class TestImportUsgsSpeclib07Algorithm(TestCase):
             alg.P_FOLDER: SpeclibProducts.UsgsSplib07.folder,
             alg.P_SPECTROMETER: [alg.AsdSpectrometer],
             alg.P_CHAPTER: [alg.VegetationChapter],
+            alg.P_SPECTRAL_CHARACTERISTIC: alg.OriginalSamplingPositionsCharacteristic,
             alg.P_OUTPUT_LIBRARY: self.filename('usgsSplib07.gpkg')
         }
         self.runalg(alg, parameters)
@@ -36,6 +37,7 @@ class TestImportUsgsSpeclib07Algorithm(TestCase):
             alg.P_FOLDER: SpeclibProducts.UsgsSplib07.folder,
             alg.P_SPECTROMETER: alg.AllSpectrometers,
             alg.P_CHAPTER: alg.AllChapters,
+            alg.P_SPECTRAL_CHARACTERISTIC: alg.OriginalSamplingPositionsCharacteristic,
             alg.P_OUTPUT_LIBRARY: self.filename('usgsSplib07.gpkg')
         }
         self.runalg(alg, parameters)
@@ -97,3 +99,19 @@ class TestImportUsgsSpeclib07Algorithm(TestCase):
             }
             self.runalg(alg, parameters)
             library = QgsVectorLayer(parameters[alg.P_OUTPUT_LIBRARY])
+
+    def test_child_node_OriginalSamplingPositionsCharacteristic(self):
+        if speclibProductsRoot() is None or self.skipProductImport:
+            return
+
+        initAll()
+
+        alg = ImportUsgsSpeclib07Algorithm()
+        parameters = {
+            alg.P_FOLDER: SpeclibProducts.UsgsSplib07.ASCIIdata_splib07b_rsLandsat8,
+            alg.P_SPECTROMETER: alg.AsdSpectrometer,
+            alg.P_CHAPTER: alg.VegetationChapter,
+            alg.P_OUTPUT_LIBRARY: self.filename('library.gpkg')
+        }
+        self.runalg(alg, parameters)
+        library = QgsVectorLayer(parameters[alg.P_OUTPUT_LIBRARY])

@@ -53,12 +53,13 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     JsonFileFilter = 'JSON files (*.json)'
     JsonFileExtension = 'json'
     JsonFileDestination = 'JSON file destination.'
-    GeoJsonFileFilter = 'GEOJSON files (*.geojson)'
+    GeoJsonFileFilter = 'GeoJSON files (*.geojson)'
     GeoJsonFileExtension = 'geojson'
-    GeoJsonFileDestination = 'GEOJSON file destination.'
+    GeoJsonFileDestination = 'GeoJSON file destination.'
     GpkgFileFilter = 'GeoPackage files (*.gpkg)'
     GpkgFileExtension = 'gpkg'
     GpkgFileDestination = 'GeoPackage file destination.'
+    SpeclibFileFilter = GeoJsonFileFilter + ';;' + GpkgFileFilter
     CsvFileFilter = 'CSV files (*.csv)'
     CsvFileExtension = 'cvs'
     CsvFileDestination = 'CSV file destination.'
@@ -292,7 +293,9 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         dump = ClustererDump.fromDict(dump)
         return dump
 
-    def parameterAsEnum(self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext) -> int:
+    def parameterAsEnum(self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext) -> Optional[int]:
+        if name not in parameters:
+            return None
         return super().parameterAsEnum(parameters, name, context)
 
     def parameterAsEnums(self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext) -> List[int]:

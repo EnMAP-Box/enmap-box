@@ -1,11 +1,11 @@
 from math import nan
 from os import listdir
-from os.path import join
+from os.path import join, exists, basename
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
 from qgis.core import QgsVectorLayer, QgsMapLayer, QgsProcessingContext, QgsProcessingFeedback, \
-    QgsProcessingParameterFile
+    QgsProcessingParameterFile, QgsProcessingException
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
@@ -121,9 +121,9 @@ class ImportUsgsSpeclib07Algorithm(EnMAPProcessingAlgorithm):
         self.addParameterEnum(self.P_SPECTROMETER, self._SPECTROMETER, self.O_SPECTROMETER, True, None, False)
         self.addParameterEnum(
             self.P_SPECTRAL_CHARACTERISTIC, self._SPECTRAL_CHARACTERISTIC, self.O_SPECTRAL_CHARACTERISTIC, False,
-            self.OriginalSamplingPositionsCharacteristic, False
+            None, True
         )
-        self.addParameterFileDestination(self.P_OUTPUT_LIBRARY, self._OUTPUT_LIBRARY, self.GeoJsonFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_LIBRARY, self._OUTPUT_LIBRARY, self.SpeclibFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
@@ -137,8 +137,29 @@ class ImportUsgsSpeclib07Algorithm(EnMAPProcessingAlgorithm):
         with open(filename + '.log', 'w') as logfile:
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)
+
+            isChildItem = not exists(join(folder, 'USGS_Spectral_Library_Version_7_Data.xml'))
+            if isChildItem:
+                if selectedCharacteristic is not None:
+                    raise QgsProcessingException('Cannot select a spectral characteristic for a library child item folder.')
+                # find selected characteristic
+                if basename(folder) == 'ASCIIdata_splib07a':
+                    selectedCharacteristic = self.OriginalSamplingPositionsCharacteristic
+                elif basename(folder) == 'ASCIIdata_splib07b':
+                    selectedCharacteristic = self.OversampledCubicSplineInterpolationCharacteristic
+                else:
+                    keys = [k.split(' ')[0] for k in self.O_SPECTRAL_CHARACTERISTIC]
+                    key = basename(folder).split('_')[2]
+                    selectedCharacteristic = keys.index(key)
+            else:
+                if selectedCharacteristic is None:
+                    raise QgsProcessingException('Must select a spectral characteristic.')
+
             if selectedCharacteristic == self.OriginalSamplingPositionsCharacteristic:
-                folder2 = join(folder, 'ASCIIdata', 'ASCIIdata_splib07a')
+                if isChildItem:
+                    folder2 = folder
+                else:
+                    folder2 = join(folder, 'ASCIIdata', 'ASCIIdata_splib07a')
                 sensors = {
                     'BEC': join(folder2, 'splib07a_Wavelengths_BECK_Beckman_0.2-3.0_microns.txt'),
                     'ASD': join(folder2, 'splib07a_Wavelengths_ASD_0.35-2.5_microns_2151_ch.txt'),
@@ -147,7 +168,10 @@ class ImportUsgsSpeclib07Algorithm(EnMAPProcessingAlgorithm):
                 }
 
             elif selectedCharacteristic == self.OversampledCubicSplineInterpolationCharacteristic:
-                folder2 = join(folder, 'ASCIIdata', 'ASCIIdata_splib07b')
+                if isChildItem:
+                    folder2 = folder
+                else:
+                    folder2 = join(folder, 'ASCIIdata', 'ASCIIdata_splib07b')
                 sensors = {
                     'BEC': join(folder2, 'splib07b_Wavelengths_BECK_Beckman_interp._3961_ch.txt'),
                     'ASD': join(folder2, 'splib07b_Wavelengths_ASDFR_0.35-2.5microns_2151ch.txt'),
@@ -155,8 +179,12 @@ class ImportUsgsSpeclib07Algorithm(EnMAPProcessingAlgorithm):
                     'AVI': join(folder2, 'splib07b_Wavelengths_AVIRIS_1996_interp_to_2203ch.txt'),
                 }
             else:
-                folder2 = join(folder, 'ASCIIdata', 'ASCIIdata_splib07b_')
-                folder2 += self.O_SPECTRAL_CHARACTERISTIC[selectedCharacteristic].split(' ')[0]
+                if isChildItem:
+                    folder2 = folder
+                else:
+                    folder2 = join(folder, 'ASCIIdata', 'ASCIIdata_splib07b_')
+                    folder2 += self.O_SPECTRAL_CHARACTERISTIC[selectedCharacteristic].split(' ')[0]
+
                 # find wavelength file
                 for entry in listdir(folder2):
                     if 'wavelength' in entry.lower() and entry.endswith('.txt'):
@@ -208,9 +236,12 @@ class ImportUsgsSpeclib07Algorithm(EnMAPProcessingAlgorithm):
                     name = ' '.join([s for s in tmp2.split(' ') if s != ''])
                     record = int(tmp1.split('=')[1])
                     *tmp3, sensor, ref = tmp2.strip().split(' ')
-                    html = '_'.join([s for s in tmp2.strip().split(' ') if s != ''])
-                    html = html.replace('<', 'lt').replace('/', '-').replace('>', 'gt')
-                    html = join(folder, 'HTMLmetadata', html + '.html')
+                    if isChildItem:
+                        html = ''
+                    else:
+                        html = '_'.join([s for s in tmp2.strip().split(' ') if s != ''])
+                        html = html.replace('<', 'lt').replace('/', '-').replace('>', 'gt')
+                        html = join(folder, 'HTMLmetadata', html + '.html')
                     sensorKey = sensor[:3]
                     sensorId = sensorIds[sensorKey]
                     if sensorId not in selectedSensors:
