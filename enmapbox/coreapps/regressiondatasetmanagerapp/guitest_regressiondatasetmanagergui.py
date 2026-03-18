@@ -14,4 +14,4 @@ enmapBox.addSource('regressor.pkl')
 widget = RegressionDatasetManagerGui(enmapBox.ui)
 widget.show()
 
-qgsApp.exec_()
+qgsApp.exec()

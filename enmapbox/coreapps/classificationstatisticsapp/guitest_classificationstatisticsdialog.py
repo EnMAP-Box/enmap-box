@@ -24,4 +24,4 @@ widget = ClassificationStatisticsDialog(enmapBox.ui)
 widget.show()
 widget.mLayer.setLayer(layer)
 
-qgsApp.exec_()
+qgsApp.exec()

@@ -18,4 +18,4 @@ widget.mLayer.setLayer(layer)
 
 widget.show()
 
-qgsApp.exec_()
+qgsApp.exec()

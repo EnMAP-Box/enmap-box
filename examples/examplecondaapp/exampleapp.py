@@ -22,13 +22,13 @@
 
 import os
 
+from enmapbox.gui.applications import EnMAPBoxApplication
 from examples.exampleapp.enmapboxintegration import ExampleEnMAPBoxApp
 from qgis.PyQt.QtCore import QProcess, QProcessEnvironment
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QAction, QWidget, QVBoxLayout, QFrame, QGridLayout, QLineEdit, QLabel, QHBoxLayout, \
+from qgis.PyQt.QtWidgets import QMenu, QAction, QWidget, QVBoxLayout, QFrame, QGridLayout, QLineEdit, QLabel, \
+    QHBoxLayout, \
     QDialogButtonBox
-
-from enmapbox.gui.applications import EnMAPBoxApplication
 from qgis.core import QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer, QgsProcessingParameterNumber, \
     QgsProcessingParameterRasterDestination, QgsProcessingContext, QgsProcessingFeedback
 from qgis.gui import QgsFileWidget
@@ -297,6 +297,7 @@ if __name__ == '__main__':
 
     from enmapbox.gui.mimedata import textFromByteArray
 
+
     def readStdOut(p):
         assert isinstance(p, QProcess)
 
@@ -305,6 +306,7 @@ if __name__ == '__main__':
 
         print(s)
 
+
     def readStdErr(process):
         assert isinstance(process, QProcess)
 
@@ -312,6 +314,7 @@ if __name__ == '__main__':
         s = str(textFromByteArray(ba)).strip()
         import sys
         print(s, file=sys.stderr)
+
 
     pathPythonScript = os.path.join(APP_DIR, *['conda_code', 'condacodeexamples.py'])
     assert os.path.isfile(pathPythonScript)
@@ -350,7 +353,6 @@ if __name__ == '__main__':
         w.show()
 
     else:
-        from enmapbox.gui.enmapboxgui import EnMAPBox
 
         EB = EnMAPBox(None)
         EB.run()
@@ -359,4 +361,4 @@ if __name__ == '__main__':
         EB.addApplication(app)
 
     # start the GUI thread
-    qgsApp.exec_()
+    qgsApp.exec()

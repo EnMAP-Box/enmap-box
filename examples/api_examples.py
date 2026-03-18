@@ -54,7 +54,7 @@ class Examples(unittest.TestCase):
         enmapBox = EnMAPBox.instance()
         enmapBox.close()
 
-        qgsApp.exec_()
+        qgsApp.exec()
 
     def test_Ex2_DataSources(self):
 
@@ -103,7 +103,7 @@ class Examples(unittest.TestCase):
 
         # pro tip: access the DataSource objects directly
 
-        qgsApp.exec_()
+        qgsApp.exec()
 
     def test_Ex2_UniqueDataSources(self):
 
@@ -189,7 +189,7 @@ class Examples(unittest.TestCase):
             assert isinstance(dock, Dock)
             print(dock)
 
-        qgsApp.exec_()
+        qgsApp.exec()
 
     def test_Ex4_MapTools(self):
 
@@ -225,7 +225,7 @@ class Examples(unittest.TestCase):
 
         lastPosition = enmapBox.currentLocation()
 
-        qgsApp.exec_()
+        qgsApp.exec()
 
     def test_ActivateMapToolsFromExternalApplication(self):
 
@@ -277,7 +277,7 @@ class Examples(unittest.TestCase):
         myApp = MyApp(enmapBox)
         myApp.show()
 
-        qgsApp.exec_()
+        qgsApp.exec()
 
     def test_Ex5_PointsAndExtents(self):
 

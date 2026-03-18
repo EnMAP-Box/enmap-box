@@ -32,7 +32,7 @@ class ExtractProfilesTests(EnMAPBoxTestCase):
             while len(tm.activeTasks()) > 0:
                 QgsApplication.processEvents()
         else:
-            d.exec_()
+            d.exec()
 
         if d.wasExecuted():
             results = d.results()

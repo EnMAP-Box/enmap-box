@@ -16,4 +16,4 @@ widget = ColorSpaceExplorerDialog()
 widget.show()
 widget.mLayer.setLayer(layer)
 
-qgsApp.exec_()
+qgsApp.exec()

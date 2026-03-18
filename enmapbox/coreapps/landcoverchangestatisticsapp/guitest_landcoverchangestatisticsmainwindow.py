@@ -22,4 +22,4 @@ widget.show()
 widget.mSettingsDock.mLayers.setCurrentLayers(layers)
 widget.onLayersChanged()
 
-qgsApp.exec_()
+qgsApp.exec()

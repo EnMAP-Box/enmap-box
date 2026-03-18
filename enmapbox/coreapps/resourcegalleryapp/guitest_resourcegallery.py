@@ -18,4 +18,4 @@ widget.show()
 widget.mLayer.setLayer(layer)
 widget.mAddRendererBands.click()
 
-qgsApp.exec_()
+qgsApp.exec()

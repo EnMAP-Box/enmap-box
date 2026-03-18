@@ -40,4 +40,4 @@ class LMUTests_Processor(TestCase):
         if True:
             training.run_training()
         self.showGui(gui)
-        QgsApplication.exec_()
+        QgsApplication.exec()

@@ -65,4 +65,4 @@ class TestClassificationStatistics(TestCase):
                 layer=layer
             )
             widget.show()
-            qgsApp.exec_()
+            qgsApp.exec()

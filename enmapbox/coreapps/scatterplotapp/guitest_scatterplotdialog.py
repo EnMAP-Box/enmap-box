@@ -33,4 +33,4 @@ widget.mLayerY.setLayer(layer)
 widget.mBandX.setBand(1)
 widget.mBandY.setBand(1)
 
-qgsApp.exec_()
+qgsApp.exec()

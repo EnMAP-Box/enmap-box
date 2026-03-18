@@ -30,7 +30,7 @@ app.profileDock.mDownloadFolder.setFilePath(r'C:\Users\Andreas\Downloads\Profile
 # app.dockWidget.mCompositeDateStart.setDate(QDate(2020, 8, 1))
 # app.dockWidget.mCompositeDateEnd.setDate(QDate(2020, 8, 2))
 # app.dockWidget.mCreateComposite.clicked.emit()
-qgsApp.exec_()
+qgsApp.exec()
 
 # use this code for the QGIS version!!!
 """class EventFilter(QObject):

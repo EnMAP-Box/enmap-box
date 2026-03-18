@@ -19,4 +19,4 @@ widget.mBand1.setBand(1)
 widget.mBand2.setBand(2)
 widget.mBand3.setBand(3)
 
-qgsApp.exec_()
+qgsApp.exec()

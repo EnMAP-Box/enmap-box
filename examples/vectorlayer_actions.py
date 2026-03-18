@@ -27,10 +27,11 @@
 *                                                                         *
 ***************************************************************************
 """
-from qgis.PyQt.QtCore import QVariant, QSize
-from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QCheckBox
+from PyQt5.QtCore import QMetaType
 
 from enmapbox.testing import start_app
+from qgis.PyQt.QtCore import QSize
+from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QCheckBox
 from qgis.core import QgsPythonRunner, QgsFeature, QgsField, QgsVectorLayer, QgsAttributeTableConfig, QgsActionManager, \
     QgsAction, QgsProject
 from qgis.gui import QgsMapCanvas, QgsDualView
@@ -45,9 +46,9 @@ assert QgsPythonRunner.isValid()  # this! is important to run QgsAction of type 
 def create_vectordataset() -> QgsVectorLayer:
     vl = QgsVectorLayer("Point?crs=EPSG:4326", 'test_layer', "memory")
     vl.startEditing()
-    vl.addAttribute(QgsField(name='fString', type=QVariant.String, typeName='varchar', len=50))
-    vl.addAttribute(QgsField(name='fInt', type=QVariant.Int, typeName='int'))
-    vl.addAttribute(QgsField(name='fDouble', type=QVariant.Double))
+    vl.addAttribute(QgsField(name='fString', type=QMetaType.QString, typeName='varchar', len=50))
+    vl.addAttribute(QgsField(name='fInt', type=QMetaType.Int, typeName='int'))
+    vl.addAttribute(QgsField(name='fDouble', type=QMetaType.Double))
     vl.addFeature(QgsFeature(vl.fields()))
     vl.commitChanges()
 
@@ -128,4 +129,4 @@ dualView.init(layer, canvas)
 dualView.setAttributeTableConfig(layer.attributeTableConfig())
 layer.startEditing()
 
-APP.exec_()
+APP.exec()

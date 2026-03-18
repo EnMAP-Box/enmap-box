@@ -1,8 +1,7 @@
-from qgis.PyQt.QtWidgets import QApplication
-
 from enmapbox.testing import TestObjects, start_app
-from qgis.gui import QgsMapCanvas
+from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import QgsProject
+from qgis.gui import QgsMapCanvas
 
 app = start_app()
 lyr = TestObjects.createRasterLayer()
@@ -50,5 +49,5 @@ else:
 QApplication.processEvents()
 c.show()
 QApplication.processEvents()
-app.exec_()
+app.exec()
 print('Done')

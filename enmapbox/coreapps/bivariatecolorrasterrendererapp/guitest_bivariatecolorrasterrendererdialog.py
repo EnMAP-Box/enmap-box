@@ -1,9 +1,8 @@
-from qgis.PyQt.QtGui import QColor
-
 from bivariatecolorrasterrendererapp.bivariatecolorrasterrendererdialog import BivariateColorRasterRendererDialog
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
+from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsRasterLayer
 
 qgsApp = start_app()
@@ -38,4 +37,4 @@ elif case == 2:  # Tree and Water fractions
 else:
     raise ValueError()
 
-qgsApp.exec_()
+qgsApp.exec()

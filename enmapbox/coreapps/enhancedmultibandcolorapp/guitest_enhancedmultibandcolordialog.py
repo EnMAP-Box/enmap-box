@@ -17,4 +17,4 @@ widget = EnhancedMultiBandColorDialog()
 widget.show()
 widget.mLayer.setLayer(layer)
 
-qgsApp.exec_()
+qgsApp.exec()

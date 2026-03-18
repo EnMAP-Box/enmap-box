@@ -14,4 +14,4 @@ enmapBox.addSource(enmap)
 widget = RasterSourceBandPropertiesEditorDialog()
 widget.show()
 
-qgsApp.exec_()
+qgsApp.exec()

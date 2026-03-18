@@ -4,15 +4,9 @@ from os.path import exists
 from typing import Iterable, List, Union, Optional, Tuple, Iterator, Dict
 
 import numpy as np
-import processing
 from osgeo import gdal
-from qgis.PyQt.QtCore import QSizeF, QDateTime, QDate, QPoint
-from qgis.PyQt.QtGui import QColor
-from qgis.core import (QgsRasterLayer, QgsRasterDataProvider, QgsCoordinateReferenceSystem, QgsRectangle,
-                       QgsRasterRange, QgsPoint, QgsRasterBlockFeedback, QgsRasterBlock, QgsPointXY,
-                       QgsProcessingFeedback, QgsRasterBandStats, Qgis, QgsGeometry, QgsVectorLayer, QgsWkbTypes,
-                       QgsFeature, QgsRasterPipe, QgsRasterProjector, QgsMapLayer)
 
+import processing
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.gridwalker import GridWalker
@@ -20,6 +14,12 @@ from enmapboxprocessing.numpyutils import NumpyUtils
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.typing import (RasterSource, Array3d, Metadata, MetadataValue, MetadataDomain, Array2d)
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtCore import QSizeF, QDateTime, QDate, QPoint
+from qgis.PyQt.QtGui import QColor
+from qgis.core import (QgsRasterLayer, QgsRasterDataProvider, QgsCoordinateReferenceSystem, QgsRectangle,
+                       QgsRasterRange, QgsPoint, QgsRasterBlockFeedback, QgsRasterBlock, QgsPointXY,
+                       QgsProcessingFeedback, QgsRasterBandStats, Qgis, QgsGeometry, QgsVectorLayer, QgsWkbTypes,
+                       QgsFeature, QgsRasterPipe, QgsRasterProjector, QgsMapLayer, QgsProcessing)
 
 
 @typechecked
@@ -448,7 +448,7 @@ class RasterReader(object):
             'UNITS': 0, 'WIDTH': xsize2, 'HEIGHT': ysize2,
             'EXTENT': extent,
             'DATA_TYPE': 5,
-            'OUTPUT': 'TEMPORARY_OUTPUT'
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
         result = processing.run(alg, parameters)
 

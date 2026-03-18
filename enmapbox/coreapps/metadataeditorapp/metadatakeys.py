@@ -635,4 +635,4 @@ if __name__ == '__main__':
             s = ""
         s = ""
 
-    qgsApp.exec_()
+    qgsApp.exec()

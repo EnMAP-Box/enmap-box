@@ -25,8 +25,6 @@ from qgis.core import QgsProject, QgsApplication
 
 site.addsitedir(pathlib.Path(__file__).parents[1])
 
-qApp: QgsApplication = None
-
 
 def exitAll(*args):
     print('## Close all windows')

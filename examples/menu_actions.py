@@ -3,13 +3,16 @@ from qgis.PyQt.QtWidgets import QApplication, QMenu, QWidget, QVBoxLayout, QLabe
 if __name__ == '__main__':
     app = QApplication([])
 
+
     # minimal example of a QMenu with a QAction
 
     def myFunctionA():
         print('Function A called')
 
+
     def myFunctionB(*args):
         print('Function B arguments: {}'.format(args))
+
 
     menu = QMenu()
     a = menu.addAction('Do this')
@@ -20,8 +23,10 @@ if __name__ == '__main__':
 
     menu.show()
 
+
     def onButtonClicked():
         print('Button was pressed')
+
 
     w = QWidget()
     w.setLayout(QVBoxLayout())
@@ -33,4 +38,4 @@ if __name__ == '__main__':
     w.layout().addWidget(QLabel('(and check your command line)'))
     w.show()
 
-    app.exec_()
+    app.exec()

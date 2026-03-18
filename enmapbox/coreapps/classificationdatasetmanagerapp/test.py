@@ -14,4 +14,4 @@ enmapBox.addSource('classifier.pkl')
 widget = ClassificationDatasetManagerGui(enmapBox.ui)
 widget.show()
 
-qgsApp.exec_()
+qgsApp.exec()
