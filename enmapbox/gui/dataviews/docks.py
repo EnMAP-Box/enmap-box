@@ -31,6 +31,7 @@ from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea import DockArea
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.Dock import Dock as pgDock
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.Dock import DockLabel as pgDockLabel
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.DockArea import TempAreaWindow
+from enmapbox.qgispluginsupport.qps.speclib.core import profile_fields
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
 from enmapbox.qgispluginsupport.qps.utils import loadUi
 from enmapboxprocessing.utils import Utils
@@ -43,7 +44,6 @@ from qgis.PyQt.QtWidgets import QToolButton, QMenu, QMainWindow, QFileDialog, QW
 from qgis.core import QgsCoordinateReferenceSystem, QgsMapLayer, QgsProject, edit, QgsField, QgsLayerTree, \
     QgsLayerTreeLayer, QgsVectorLayer
 from qgis.gui import QgsMapCanvas
-from qps.speclib.core import profile_fields
 
 RX_HTML_FILE = re.compile(r'\.(html|html|xhtml)$', re.I)
 
