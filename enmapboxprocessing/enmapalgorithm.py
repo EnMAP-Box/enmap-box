@@ -7,9 +7,18 @@ from time import time
 from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple
 
 import numpy as np
-import processing
 from osgeo import gdal
-from qgis.PyQt.QtCore import QVariant, QDateTime, QDate
+
+import processing
+from enmapbox.typeguard import typechecked
+from enmapboxprocessing.driver import Driver
+from enmapboxprocessing.glossary import injectGlossaryLinks
+from enmapboxprocessing.parameter.processingparameterrasterdestination import ProcessingParameterRasterDestination
+from enmapboxprocessing.processingfeedback import ProcessingFeedback
+from enmapboxprocessing.typing import ClassifierDump, ClustererDump, CreationOptions, GdalResamplingAlgorithm, \
+    RegressorDump, TransformerDump
+from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtCore import QDateTime, QDate, NULL
 from qgis.PyQt.QtGui import QTextDocument, QIcon
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import (Qgis, QgsCategorizedSymbolRenderer, QgsCoordinateReferenceSystem, QgsMapLayer,
@@ -24,15 +33,6 @@ from qgis.core import (Qgis, QgsCategorizedSymbolRenderer, QgsCoordinateReferenc
                        QgsProcessingParameterVectorDestination, QgsProcessingParameterVectorLayer, QgsProcessingUtils,
                        QgsProject, QgsProperty, QgsRasterLayer, QgsRectangle, QgsVectorLayer,
                        QgsProcessingParameterDateTime)
-
-from enmapbox.typeguard import typechecked
-from enmapboxprocessing.driver import Driver
-from enmapboxprocessing.glossary import injectGlossaryLinks
-from enmapboxprocessing.parameter.processingparameterrasterdestination import ProcessingParameterRasterDestination
-from enmapboxprocessing.processingfeedback import ProcessingFeedback
-from enmapboxprocessing.typing import ClassifierDump, ClustererDump, CreationOptions, GdalResamplingAlgorithm, \
-    RegressorDump, TransformerDump
-from enmapboxprocessing.utils import Utils
 
 
 class AlgorithmCanceledException(Exception):
@@ -195,7 +195,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         # convert temporary scratch layer to OGR layer
         if layer.dataProvider().name() == 'memory' and convertFromMemoryToOgr:
             renderer = layer.renderer().clone()
-            parameters = {'INPUT': layer, 'OUTPUT': 'TEMPORARY_OUTPUT'}
+            parameters = {'INPUT': layer, 'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT}
             feedback = None
             result = self.runAlg('native:savefeatures', parameters, None, feedback, context, True)
             layer = QgsVectorLayer(result['OUTPUT'], layer.name())
@@ -548,7 +548,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         if value is None:
             value = super().parameterAsMatrix(parameters, name, context)
 
-        if value == [QVariant()]:
+        if value == [NULL]:
             value = None
 
         return value

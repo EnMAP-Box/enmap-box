@@ -538,7 +538,7 @@ class MLInversion:
                 # no dat not found or cannot be interpreted as intereg! No worries, the user can add it manually!
                 self.main.nodat_widget.init(image_type=image_type, image=image)
                 self.main.nodat_widget.gui.setModal(True)  # parent window is blocked
-                self.main.nodat_widget.gui.exec_()  # unlike .show(), .exec_() waits with execution of the code,
+                self.main.nodat_widget.gui.exec()  # unlike .show(), .exec() waits with execution of the code,
                 # until the app is closed
                 nodata = self.main.nodat_widget.nodat
 
@@ -732,4 +732,4 @@ if __name__ == '__main__':
     app = start_app()
     m = MainUiFunc()
     m.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

@@ -1464,4 +1464,4 @@ if __name__ == '__main__':
     # m.mlra_training.open_lut(lutpath=lut_path)
     # out_folder = r"C:\Data\Daten\Testdaten\Model_TEST/"
     # m.mlra_training.get_folder(path=out_folder)
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

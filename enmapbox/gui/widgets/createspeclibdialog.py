@@ -143,7 +143,7 @@ class CreateSpectralLibraryDialog(QDialog):
         w = QgsFileWidget(self)
         w.setDialogTitle('Create empty spectral library')
         w.setFilter('GeoPackage (*.gpkg);;GeoJSON (*.geojson)')
-        if w.exec_() == QDialog.Accepted:
+        if w.exec() == QDialog.Accepted:
             s = ""
         file_path, tmp = QFileDialog.getSaveFileName(
             self,

@@ -11,7 +11,7 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group, A
 from enmapboxprocessing.processingfeedback import ProcessingFeedback
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QMetaType
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsRasterLayer,
                        QgsFeature, QgsField, QgsProcessingFeatureSourceDefinition, QgsApplication,
                        QgsVectorDataProvider, QgsRasterDataProvider, QgsPoint)
@@ -109,7 +109,7 @@ class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
         # add image X, Y coordinates and find no data pixel
         rasterProvider = raster.dataProvider()
         vectorProvider: QgsVectorDataProvider = sample.dataProvider()
-        fields = [QgsField('PIXEL_X', QVariant.LongLong), QgsField('PIXEL_Y', QVariant.LongLong)]
+        fields = [QgsField('PIXEL_X', QMetaType.Type.LongLong), QgsField('PIXEL_Y', QMetaType.Type.LongLong)]
         vectorProvider.addAttributes(fields)
         sample.updateFields()
         noDataPixels = list()

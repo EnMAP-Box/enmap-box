@@ -192,7 +192,7 @@ class PWR:
         except:
             self.main.nodat_widget.init(image_type=image_type, image=image)
             self.main.nodat_widget.gui.setModal(True)  # parent window is blocked
-            self.main.nodat_widget.gui.exec_()  # unlike .show(), .exec_() waits with execution of the code, until the app is closed
+            self.main.nodat_widget.gui.exec()  # unlike .show(), .exec() waits with execution of the code, until the app is closed
             return self.main.nodat_widget.nodat, nbands, nrows, ncols, dtype
 
     def NDWI_th_change(self):
@@ -340,4 +340,4 @@ if __name__ == '__main__':
     app = start_app()
     m = MainUiFunc()
     m.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

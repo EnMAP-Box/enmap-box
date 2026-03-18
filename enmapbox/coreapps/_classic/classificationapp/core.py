@@ -131,7 +131,7 @@ class ClassificationWorkflowApp(QMainWindow):
         layout = QHBoxLayout(self.widget_)
         self.updateTotalSamples()
 
-        if self.uiTrainingType_.currentIndex() == 0: # raster
+        if self.uiTrainingType_.currentIndex() == 0:  # raster
             rasterLayer: QgsRasterLayer = self.uiType0Raster_.currentLayer()
             classificationLayer: QgsRasterLayer = self.uiType0Classification_.currentLayer()
             if rasterLayer is None or classificationLayer is None:
@@ -148,7 +148,7 @@ class ClassificationWorkflowApp(QMainWindow):
             )
 
             classification = Classification(filename=self.filenameTmpClassification())
-        elif self.uiTrainingType_.currentIndex() == 1: # vector
+        elif self.uiTrainingType_.currentIndex() == 1:  # vector
             rasterLayer: QgsRasterLayer = self.uiType1Raster_.currentLayer()
             vectorClassificationLayer: QgsVectorLayer = self.uiType1VectorClassification_.currentLayer()
             if rasterLayer is None or vectorClassificationLayer is None:
@@ -157,7 +157,7 @@ class ClassificationWorkflowApp(QMainWindow):
             if not isinstance(vectorClassificationLayer.renderer(), QgsCategorizedSymbolRenderer):
 
                 dlg = CategoryFieldSelectionDialog(layer=vectorClassificationLayer, parent=self)
-                if dlg.exec_():
+                if dlg.exec():
                     fieldName = dlg.field.currentField()
                     fields: QgsFields = vectorClassificationLayer.fields()
                     fieldIndex = fields.indexFromName(fieldName)
@@ -168,7 +168,7 @@ class ClassificationWorkflowApp(QMainWindow):
                         color = HubdsmColor.fromRandom()
                         color = QColor(color.red, color.green, color.blue).name()
                         symbol = QgsMarkerSymbol.createSimple(
-                        {'color': color, 'size': '2', 'outline_color': 'black'})
+                            {'color': color, 'size': '2', 'outline_color': 'black'})
                         categories.append(QgsRendererCategory(value, symbol, name, True))
                     renderer = QgsCategorizedSymbolRenderer(fieldName, categories)
                     vectorClassificationLayer.setRenderer(renderer)
@@ -201,7 +201,7 @@ class ClassificationWorkflowApp(QMainWindow):
             classification = Classification(filename=self.filenameTmpClassification())
             self.progressBar().setPercentage(0)
 
-        elif self.uiTrainingType_.currentIndex() == 2: # speclib
+        elif self.uiTrainingType_.currentIndex() == 2:  # speclib
             libraryLayer: QgsVectorLayer = self.uiType2Library_.currentLayer()
             if libraryLayer is None:
                 return
@@ -263,7 +263,6 @@ class ClassificationWorkflowApp(QMainWindow):
         self.names = list()
 
         for i in range(classification.classDefinition().classes()):
-
             layout1 = QVBoxLayout()
             layout2 = QHBoxLayout()
             color = QToolButton()
@@ -358,7 +357,7 @@ class ClassificationWorkflowApp(QMainWindow):
             filenameProbability = self.uiProbabilityFilename_.filePath()
             filenameReport = self.uiReportFilename_.filePath()
 
-            if self.uiTrainingType_.currentIndex() == 0: # raster
+            if self.uiTrainingType_.currentIndex() == 0:  # raster
                 qgsRaster = self.uiType0Raster_.currentLayer()
                 qgsClassification = self.uiType0Classification_.currentLayer()
                 if qgsRaster is None:
@@ -396,7 +395,7 @@ class ClassificationWorkflowApp(QMainWindow):
 
             classification = Classification(filename=self.filenameTmpClassification(), classDefinition=classDefinition)
 
-            #if not raster.grid().equal(other=classification.grid()):
+            # if not raster.grid().equal(other=classification.grid()):
             #    self.log('Error: raster and reference grids do not match')
             #    return
 
@@ -436,25 +435,25 @@ class ClassificationWorkflowApp(QMainWindow):
             self.uiExecute_.setEnabled(False)
 
             classificationWorkflow(sample=sample,
-                classifier=classifier,
-                raster=raster2,
-                mask=mask2,
-                n=n,
-                cv=cv,
-                saveSampledClassification=saveSampledClassification,
-                saveSampledClassificationComplement=saveSampledClassificationComplement,
-                saveModel=saveModel,
-                saveClassification=saveClassification,
-                saveProbability=saveProbability,
-                saveRGB=saveRGB,
-                saveReport=saveReport,
-                filenameSampledClassification=filenameSampledClassification,
-                filenameSampledClassificationComplement=filenameSampledClassificationComplement,
-                filenameModel=filenameModel,
-                filenameClassification=filenameClassification,
-                filenameProbability=filenameProbability,
-                filenameReport=filenameReport,
-                ui=self)
+                                   classifier=classifier,
+                                   raster=raster2,
+                                   mask=mask2,
+                                   n=n,
+                                   cv=cv,
+                                   saveSampledClassification=saveSampledClassification,
+                                   saveSampledClassificationComplement=saveSampledClassificationComplement,
+                                   saveModel=saveModel,
+                                   saveClassification=saveClassification,
+                                   saveProbability=saveProbability,
+                                   saveRGB=saveRGB,
+                                   saveReport=saveReport,
+                                   filenameSampledClassification=filenameSampledClassification,
+                                   filenameSampledClassificationComplement=filenameSampledClassificationComplement,
+                                   filenameModel=filenameModel,
+                                   filenameClassification=filenameClassification,
+                                   filenameProbability=filenameProbability,
+                                   filenameReport=filenameReport,
+                                   ui=self)
             self.log('Done!')
             self.progressBar().setPercentage(0)
             self.uiExecute_.setEnabled(True)
@@ -500,4 +499,4 @@ class CategoryFieldSelectionDialog(QDialog):
         dialog = showLayerPropertiesDialog(layer, parent=parent, modal=False)
         dialog.mOptionsListWidget.setCurrentRow(2)
         dialog.setModal(True)
-        dialog.exec_()
+        dialog.exec()

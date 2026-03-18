@@ -13,7 +13,6 @@ start_app()
 
 
 class MyExampleAlgorithm(QgsProcessingAlgorithm):
-
     INPUT_PATH = 'pathInput'
 
     def __init__(self):
@@ -116,7 +115,7 @@ class MyTestCases(TestCase):
         # the next line is equivalent to:
         # import os
         # if not os.environ['CI'].lower() in ['true',1]:
-        #     dialog.exec_()
+        #     dialog.exec()
 
         self.showGui(dialog)
 

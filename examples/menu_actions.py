@@ -5,7 +5,6 @@ if __name__ == '__main__':
 
 
     # minimal example of a QMenu with a QAction
-
     def myFunctionA():
         print('Function A called')
 

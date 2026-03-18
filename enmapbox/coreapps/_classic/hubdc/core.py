@@ -3047,7 +3047,7 @@ class MapViewer():
         if size is not None:
             self.canvas.resize(*size)
         self.canvas.show()
-        self.app.exec_()
+        self.app.exec()
 
     def save(self, filename):
         # implemented as described here https://gis.stackexchange.com/questions/245840/wait-for-canvas-to-finish-rendering-before-saving-image

@@ -24,7 +24,7 @@ from profileanalyticsapp.profileanalyticseditorwidget import ProfileAnalyticsEdi
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QComboBox, QTableWidget, QCheckBox, QToolButton, QLineEdit, QWidget, QLabel, QDockWidget
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsVectorLayer, QgsProcessingFeatureSourceDefinition, \
-    QgsFeatureRequest, QgsWkbTypes, QgsFeature, QgsProject
+    QgsFeatureRequest, QgsWkbTypes, QgsFeature, QgsProject, QgsProcessing
 from qgis.gui import QgsMapLayerComboBox, QgsFileWidget, QgsRasterBandComboBox, QgisInterface
 
 
@@ -420,7 +420,7 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                             lineLayer.source(), selectedFeaturesOnly=True, featureLimit=-1,
                             geometryCheck=QgsFeatureRequest.InvalidGeometryCheck.GeometryAbortOnInvalid),
                         'TARGET_CRS': reader.crs(),
-                        'OUTPUT': 'TEMPORARY_OUTPUT'
+                        'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
                     }
                     lineLayer2: QgsVectorLayer = processing.run(alg, parameters)['OUTPUT']
 
@@ -432,7 +432,7 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                         'DISTANCE': samplingDistance,
                         'START_OFFSET': 0,
                         'END_OFFSET': 0,
-                        'OUTPUT': 'TEMPORARY_OUTPUT'
+                        'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
                     }
                     pointLayer = processing.run(alg, parameters)['OUTPUT']
 
@@ -442,7 +442,7 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                     parameters = {
                         'raster': layer,
                         'bandList': [bandNo],
-                        'outputRaster': 'TEMPORARY_OUTPUT'
+                        'outputRaster': QgsProcessing.TEMPORARY_OUTPUT
                     }
                     rasterLayer = processing.run(alg, parameters)['outputRaster']
                     # b) sample values
@@ -451,7 +451,7 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                         'INPUT': pointLayer,
                         'RASTERCOPY': rasterLayer,
                         'COLUMN_PREFIX': 'SAMPLE_',
-                        'OUTPUT': 'TEMPORARY_OUTPUT'
+                        'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
                     }
                     pointLayer2: QgsVectorLayer = processing.run(alg, parameters)['OUTPUT']
                     xValues = [feature['distance'] for feature in pointLayer2.getFeatures()]
@@ -483,7 +483,7 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                         'TARGET_CRS': layer.crs(),
                         "DATA_TYPE": 6,
                         'NODATA': np.nan,
-                        'OUTPUT': 'TEMPORARY_OUTPUT'
+                        'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
                     }
                     raster2: QgsVectorLayer = processing.run(alg, parameters)['OUTPUT']
 

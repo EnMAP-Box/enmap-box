@@ -14,7 +14,8 @@ from _classic.hubdc.calculator.calculator import *
 import _classic.hubdc.const
 import _classic.hubdc.progressbar
 
-#gdal.UseExceptions()
+
+# gdal.UseExceptions()
 
 class ProgressBar(_classic.hubdc.progressbar.CUIProgressBar):
 
@@ -41,6 +42,7 @@ class ProgressBar(_classic.hubdc.progressbar.CUIProgressBar):
     def setProgress(self, progress):
         self.bar.setValue(progress)
 
+
 class IONode(QTreeWidgetItem):
 
     def name(self):
@@ -52,14 +54,16 @@ class IONode(QTreeWidgetItem):
     def input(self):
         pass
 
+
 class InputRasterNode(IONode):
 
     def options(self):
-        return {'noData' : eval(str(self.child(2).child(0).text(1))),
-                'resampleAlg' : eval('gdal.GRA_'+str(self.child(2).child(1).text(1)))}
+        return {'noData': eval(str(self.child(2).child(0).text(1))),
+                'resampleAlg': eval('gdal.GRA_' + str(self.child(2).child(1).text(1)))}
 
     def input(self):
         return InputRaster(filename=self.filename())
+
 
 class InputVectorNode(IONode):
 
@@ -70,13 +74,14 @@ class InputVectorNode(IONode):
         return InputVector(filename=self.filename(), layerNameOrIndex=self.layerNameOrIndex())
 
     def options(self):
-        options =  {'initValue' : float(self.child(2).child(0).text(1)),
-                    'burnValue': float(self.child(2).child(1).text(1)),
-                    'burnAttribute': eval(str(self.child(2).child(2).text(1))),
-                    'allTouched': eval('bool('+str(self.child(2).child(3).text(1))+')'),
-                    'filterSQL': eval(str(self.child(2).child(4).text(1))),
-                    'dtype': eval('numpy.'+str(self.child(2).child(5).text(1)))}
+        options = {'initValue': float(self.child(2).child(0).text(1)),
+                   'burnValue': float(self.child(2).child(1).text(1)),
+                   'burnAttribute': eval(str(self.child(2).child(2).text(1))),
+                   'allTouched': eval('bool(' + str(self.child(2).child(3).text(1)) + ')'),
+                   'filterSQL': eval(str(self.child(2).child(4).text(1))),
+                   'dtype': eval('numpy.' + str(self.child(2).child(5).text(1)))}
         return options
+
 
 class OutputRasterNode(IONode):
 
@@ -90,6 +95,7 @@ class OutputRasterNode(IONode):
         value = OutputRaster(filename=self.filename(), format=self.format(), creationOptions=self.options())
         return value
 
+
 class NumpyItem(QTreeWidgetItem):
 
     def __init__(self, name, doc, doubleClickInsert, dragInsert):
@@ -99,6 +105,7 @@ class NumpyItem(QTreeWidgetItem):
         self.doubleClickInsert = doubleClickInsert
         self.dragInsert = dragInsert
         self.setText(0, name)
+
 
 class WebItem(QTreeWidgetItem):
 
@@ -119,7 +126,7 @@ class CodeEdit(QsciScintilla):
         font.setFamily('Courier')
         font.setFixedPitch(True)
         font.setPointSize(10)
-#        font.setPixelSize(8)
+        #        font.setPixelSize(8)
 
         self.setFont(font)
         self.setMarginsFont(font)
@@ -130,6 +137,7 @@ class CodeEdit(QsciScintilla):
         self.setMarginWidth(0, fontmetrics.width("00000") + 6)
         self.setMarginLineNumbers(0, True)
         self.setMarginsBackgroundColor(QColor("#e3e3e3"))
+
 
 class CalculatorMainWindow(QMainWindow):
 
@@ -186,7 +194,7 @@ class CalculatorMainWindow(QMainWindow):
         self.uiInputs.itemDoubleClicked.connect(self.handleInputsDoubleClicked)
         self.uiOutputs.itemDoubleClicked.connect(self.handleOutputsDoubleClicked)
 
-        #todo drop self.uiInputs.dropEvent.connect(self.handleInputsDropEvent)
+        # todo drop self.uiInputs.dropEvent.connect(self.handleInputsDropEvent)
 
         self.uiButtonExecute.clicked.connect(self.handleExecute)
         self.uiFunctions.selectionModel().selectionChanged.connect(self.handleFunctionSelection)
@@ -215,8 +223,8 @@ class CalculatorMainWindow(QMainWindow):
                     print(fullName + ' not available')
                     continue
 
-                doubleClickInsert = fullName.replace('numpy.','') + '('
-                dragInsert = routine.__doc__.split('\n')[0] # take first line
+                doubleClickInsert = fullName.replace('numpy.', '') + '('
+                dragInsert = routine.__doc__.split('\n')[0]  # take first line
                 if packageName == 'numpy.ndarray':
                     doubleClickInsert = '.' + doubleClickInsert
                     dragInsert = dragInsert[1:]  # skip the "a" array
@@ -228,28 +236,35 @@ class CalculatorMainWindow(QMainWindow):
         def insertNdarrayAttributes(parent, parentName, attributeNames):
             parent[parentName] = list()
             for attributeName in attributeNames:
-
                 fullName = 'numpy.ndarray.{}'.format(attributeName)
                 attribute = eval(fullName)
                 parent[parentName].append(NumpyItem(name=attributeName, doc=attribute.__doc__,
-                                                    doubleClickInsert='.'+attributeName,
-                                                    dragInsert='.'+attributeName))
+                                                    doubleClickInsert='.' + attributeName,
+                                                    dragInsert='.' + attributeName))
 
         d = OrderedDict()
-        insertRoutine(d, 'Dataset interaction', 'noDataValue setNoDataValue metadata setMetadata'.split(), packageName=None)
+        insertRoutine(d, 'Dataset interaction', 'noDataValue setNoDataValue metadata setMetadata'.split(),
+                      packageName=None)
 
         d['The N-dimensional array (ndarray)'] = OrderedDict()
-        insertNdarrayAttributes(d['The N-dimensional array (ndarray)'], 'Array attributes', 'shape ndim size dtype T flat'.split())
+        insertNdarrayAttributes(d['The N-dimensional array (ndarray)'], 'Array attributes',
+                                'shape ndim size dtype T flat'.split())
 
         d['The N-dimensional array (ndarray)']['Array methods'] = di = OrderedDict()
         insertRoutine(di, 'Array conversion', 'astype copy view fill'.split(), packageName='numpy.ndarray')
-        insertRoutine(di, 'Shape manipulation', 'reshape resize transpose swapaxes flatten ravel'.split(), packageName='numpy.ndarray')
-        insertRoutine(di, 'Item selection and manipulation', 'take put repeat choose sort argsort partition argpartition searchsorted nonzero compress diagonal'.split(), packageName='numpy.ndarray')
-        insertRoutine(di, 'Calculation', 'argmax min argmin ptp clip conj round trace sum cumsum mean var std prod cumprod all any'.split(), packageName='numpy.ndarray')
+        insertRoutine(di, 'Shape manipulation', 'reshape resize transpose swapaxes flatten ravel'.split(),
+                      packageName='numpy.ndarray')
+        insertRoutine(di, 'Item selection and manipulation',
+                      'take put repeat choose sort argsort partition argpartition searchsorted nonzero compress diagonal'.split(),
+                      packageName='numpy.ndarray')
+        insertRoutine(di, 'Calculation',
+                      'argmax min argmin ptp clip conj round trace sum cumsum mean var std prod cumprod all any'.split(),
+                      packageName='numpy.ndarray')
 
         d[r'NumPy routines (numpy)'] = OrderedDict()
         d['NumPy routines (numpy)']['Array creation routines'] = di = OrderedDict()
-        insertRoutine(di, 'Ones and zeros', sorted('empty empty_like eye identity ones ones_like zeros zeros_like full full_like'.split()))
+        insertRoutine(di, 'Ones and zeros',
+                      sorted('empty empty_like eye identity ones ones_like zeros zeros_like full full_like'.split()))
         insertRoutine(di, 'From existing data', sorted('array asarray asmatrix copy'.split()))
         insertRoutine(di, 'Numerical ranges', sorted('arange linspace logspace geomspace meshgrid mgrid ogrid'.split()))
         insertRoutine(di, 'Building matrices', sorted('diag diagflat tri tril triu vander mat bmat'.split()))
@@ -257,19 +272,23 @@ class CalculatorMainWindow(QMainWindow):
         insertRoutine(di, 'Basic operations', 'copyto'.split())
         insertRoutine(di, 'Changing array shape', 'reshape ravel'.split())
         insertRoutine(di, 'Transpose-like operations', 'moveaxis rollaxis swapaxes transpose'.split())
-        insertRoutine(di, 'Changing number of dimensions', 'atleast_1d  atleast_2d atleast_3d broadcast broadcast_to broadcast_arrays expand_dims squeeze'.split())
-        insertRoutine(di, 'Changing kind of array', 'asarray  asanyarray asmatrix asfarray asarray_chkfinite asscalar require'.split())
+        insertRoutine(di, 'Changing number of dimensions',
+                      'atleast_1d  atleast_2d atleast_3d broadcast broadcast_to broadcast_arrays expand_dims squeeze'.split())
+        insertRoutine(di, 'Changing kind of array',
+                      'asarray  asanyarray asmatrix asfarray asarray_chkfinite asscalar require'.split())
         insertRoutine(di, 'Joining arrays', 'concatenate stack column_stack dstack hstack vstack'.split())
         insertRoutine(di, 'Splitting arrays', 'split  array_split dsplit hsplit vsplit'.split())
         insertRoutine(di, 'Tiling arrays', 'tile repeat'.split())
         insertRoutine(di, 'Adding and removing elements', 'delete insert append resize trim_zeros unique'.split())
         insertRoutine(di, 'Rearranging elements', 'flip  fliplr flipud reshape roll rot90'.split())
         d['NumPy routines (numpy)']['Binary operations'] = di = OrderedDict()
-        insertRoutine(di, 'Elementwise bit operations', 'bitwise_and bitwise_or bitwise_xor invert left_shift right_shift'.split())
+        insertRoutine(di, 'Elementwise bit operations',
+                      'bitwise_and bitwise_or bitwise_xor invert left_shift right_shift'.split())
         insertRoutine(di, 'Bit packing', 'packbits unpackbits'.split())
 
         d['NumPy routines (numpy)']['Indexing routines'] = di = OrderedDict()
-        insertRoutine(di, 'Generating index arrays', 'nonzero where indices ogrid diag_indices diag_indices_from mask_indices tril_indices tril_indices_from triu_indices triu_indices_from'.split())
+        insertRoutine(di, 'Generating index arrays',
+                      'nonzero where indices ogrid diag_indices diag_indices_from mask_indices tril_indices tril_indices_from triu_indices triu_indices_from'.split())
         insertRoutine(di, 'Indexing-like operations', 'take choose compress diag diagonal select'.split())
         insertRoutine(di, 'Inserting data into arrays', 'place put putmask fill_diagonal'.split())
         insertRoutine(di, 'Iterating over arrays', 'nditer ndenumerate flatiter'.split())
@@ -279,39 +298,51 @@ class CalculatorMainWindow(QMainWindow):
         insertRoutine(di, 'Array contents', 'isfinite isinf isnan isneginf isposinf'.split())
         insertRoutine(di, 'Array type testing', 'iscomplex iscomplexobj isreal isrealobj isscalar'.split())
         insertRoutine(di, 'Logical operations', 'logical_and logical_or logical_not logical_xor'.split())
-        insertRoutine(di, 'Comparison', 'allclose isclose array_equal array_equiv greater greater_equal less less_equal equal not_equal'.split())
+        insertRoutine(di, 'Comparison',
+                      'allclose isclose array_equal array_equiv greater greater_equal less less_equal equal not_equal'.split())
 
         d['NumPy routines (numpy)']['Mathematical functions'] = di = OrderedDict()
-        insertRoutine(di, 'Trigonometric functions', 'sin cos tan arcsin arccos arctan hypot arctan2 degrees radians unwrap deg2rad rad2deg'.split())
+        insertRoutine(di, 'Trigonometric functions',
+                      'sin cos tan arcsin arccos arctan hypot arctan2 degrees radians unwrap deg2rad rad2deg'.split())
         insertRoutine(di, 'Hyperbolic functions', 'sinh cosh tanh arcsinh arccosh arctanh'.split())
         insertRoutine(di, 'Rounding', 'around round_ rint fix floor ceil trunc'.split())
-        insertRoutine(di, 'Sums, products, differences', 'prod sum nanprod nansum cumprod cumsum nancumprod nancumsum diff ediff1d gradient cross trapz'.split())
-        insertRoutine(di, 'Exponents and logarithms', 'exp expm1 exp2 log log10 log2 log1p logaddexp logaddexp2'.split())
+        insertRoutine(di, 'Sums, products, differences',
+                      'prod sum nanprod nansum cumprod cumsum nancumprod nancumsum diff ediff1d gradient cross trapz'.split())
+        insertRoutine(di, 'Exponents and logarithms',
+                      'exp expm1 exp2 log log10 log2 log1p logaddexp logaddexp2'.split())
         insertRoutine(di, 'Other special functions', 'i0 sinc'.split())
         insertRoutine(di, 'Floating point routines', 'signbit copysign frexp ldexp nextafter spacing'.split())
-        insertRoutine(di, 'Arithmetic operations', 'add reciprocal negative multiply divide power subtract true_divide floor_divide float_power fmod mod modf remainder divmod'.split())
+        insertRoutine(di, 'Arithmetic operations',
+                      'add reciprocal negative multiply divide power subtract true_divide floor_divide float_power fmod mod modf remainder divmod'.split())
         insertRoutine(di, 'Handling complex numbers', 'angle real imag conj'.split())
-        insertRoutine(di, 'Miscellaneous', 'convolve clip sqrt cbrt square absolute fabs sign heaviside maximum minimum fmax fmin nan_to_num real_if_close interp'.split())
+        insertRoutine(di, 'Miscellaneous',
+                      'convolve clip sqrt cbrt square absolute fabs sign heaviside maximum minimum fmax fmin nan_to_num real_if_close interp'.split())
 
         d['NumPy routines (numpy)']['Random sampling (numpy.random)'] = di = OrderedDict()
-        insertRoutine(di, 'Simple random data', 'rand randn randint random_integers random_sample random ranf sample choice bytes'.split(), packageName='numpy.random')
+        insertRoutine(di, 'Simple random data',
+                      'rand randn randint random_integers random_sample random ranf sample choice bytes'.split(),
+                      packageName='numpy.random')
         insertRoutine(di, 'Permutations', 'shuffle permutation'.split(), packageName='numpy.random')
-        insertRoutine(di, 'Distributions', 'beta binomial chisquare dirichlet exponential f gamma geometric gumbel hypergeometric laplace logistic lognormal logseries multinomial  negative_binomial noncentral_chisquare noncentral_f normal pareto poisson power rayleigh standard_cauchy standard_exponential standard_gamma standard_normal standard_t triangular uniform vonmises wald weibull zipf'.split(), packageName='numpy.random')
+        insertRoutine(di, 'Distributions',
+                      'beta binomial chisquare dirichlet exponential f gamma geometric gumbel hypergeometric laplace logistic lognormal logseries multinomial  negative_binomial noncentral_chisquare noncentral_f normal pareto poisson power rayleigh standard_cauchy standard_exponential standard_gamma standard_normal standard_t triangular uniform vonmises wald weibull zipf'.split(),
+                      packageName='numpy.random')
 
         d['NumPy routines (numpy)']['Sorting, searching, and counting'] = di = OrderedDict()
         insertRoutine(di, 'Sorting', 'sort lexsort argsort  msort sort_complex partition argpartition'.split())
-        insertRoutine(di, 'Searching', 'argmax nanargmax argmin nanargmin argwhere nonzero flatnonzero where searchsorted extract'.split())
+        insertRoutine(di, 'Searching',
+                      'argmax nanargmax argmin nanargmin argwhere nonzero flatnonzero where searchsorted extract'.split())
         insertRoutine(di, 'Counting', 'count_nonzero'.split())
 
         d['NumPy routines (numpy)']['Statistics'] = di = OrderedDict()
         insertRoutine(di, 'Order statistics', 'amin amax nanmin nanmax ptp percentile nanpercentile'.split())
-        insertRoutine(di, 'Averages and variances', 'median average mean std var nanmedian nanmean nanstd nanvar'.split())
+        insertRoutine(di, 'Averages and variances',
+                      'median average mean std var nanmedian nanmean nanstd nanvar'.split())
         insertRoutine(di, 'Correlating', 'corrcoef correlate cov'.split())
         insertRoutine(di, 'Histograms', 'histogram histogram2d histogramdd bincount digitize'.split())
 
         d['Online documentations'] = [WebItem(name='NumPy reference', url='https://numpy.org/devdocs/reference/'),
-                                     WebItem(name='NumPy user guide', url='https://numpy.org/devdocs/user/'),
-                                     WebItem(name='SciPy documentation', url='http://scipy.github.io/devdocs')]
+                                      WebItem(name='NumPy user guide', url='https://numpy.org/devdocs/user/'),
+                                      WebItem(name='SciPy documentation', url='http://scipy.github.io/devdocs')]
 
         def createTree(d, parent):
             for name, child in d.items():
@@ -331,7 +362,8 @@ class CalculatorMainWindow(QMainWindow):
 
         createTree(d, self.uiFunctions)
         self.uiDoc.setUrl(QUrl('https://numpy.org/devdocs/reference'))
-#        self.createUIFunctionsNumpyGeneric()
+
+    #        self.createUIFunctionsNumpyGeneric()
 
     def createIdentifier(self, name):
         return ''.join([c if c.isalnum() else '_' for c in name.split('.')[0]])
@@ -413,8 +445,8 @@ class CalculatorMainWindow(QMainWindow):
         itemFilename.setText(0, 'filename')
         itemFilename.setText(1, filename)
 
-        names =  ['filename', 'layerNameOrIndex']
-        values = [filename,   str(layer)]
+        names = ['filename', 'layerNameOrIndex']
+        values = [filename, str(layer)]
         items = list()
         for name, value in zip(names, values):
             item = QTreeWidgetItem()
@@ -430,8 +462,8 @@ class CalculatorMainWindow(QMainWindow):
         itemOptions.setText(0, 'GDAL options')
         itemImage.addChild(itemOptions)
 
-        names =  ['initValue', 'burnValue', 'burnAttribute', 'allTouched', 'filterSQL', 'dtype']
-        values = ['0',         '1',         'None',          'False',      'None',      'float32']
+        names = ['initValue', 'burnValue', 'burnAttribute', 'allTouched', 'filterSQL', 'dtype']
+        values = ['0', '1', 'None', 'False', 'None', 'float32']
         items = list()
         for name, value in zip(names, values):
             item = QTreeWidgetItem()
@@ -444,7 +476,6 @@ class CalculatorMainWindow(QMainWindow):
         self.uiInputs.insertTopLevelItem(self.uiInputs.topLevelItemCount(), itemImage)
         itemOptions.setExpanded(True)
 
-
     def insertRasterOutput(self, name, filename):
 
         name = self.createIdentifier(name)
@@ -456,7 +487,6 @@ class CalculatorMainWindow(QMainWindow):
         itemImage.setText(0, name)
         itemImage.setIcon(0, QIcon(os.path.join(self.appdir, 'icons', 'raster.png')))
         itemImage.setFlags(itemImage.flags() | Qt.ItemIsEditable)
-
 
         names = ['filename', 'format', 'options']
         values = [filename, format, options]
@@ -513,7 +543,8 @@ class CalculatorMainWindow(QMainWindow):
 
     def extent(self):
         try:
-            return [float(ui.text()) for ui in (self.uiExtentXMin, self.uiExtentXMax, self.uiExtentYMin, self.uiExtentYMax)]
+            return [float(ui.text()) for ui in
+                    (self.uiExtentXMin, self.uiExtentXMax, self.uiExtentYMin, self.uiExtentYMax)]
         except:
             self.logText('Error: incorrect user defined extent')
 
@@ -548,8 +579,8 @@ class CalculatorMainWindow(QMainWindow):
         elif isinstance(ds, Layer):
             projection = str(ds.projection)
         else:
-             self.logText('Error: selected item is not an input raster/vector')
-             return
+            self.logText('Error: selected item is not an input raster/vector')
+            return
         self.setProjection(projection=projection)
         self.uiProjectionUser.click()
 
@@ -589,14 +620,14 @@ class CalculatorMainWindow(QMainWindow):
 
     def handleAddInputRaster(self):
         dialog = QFileDialog()
-        if dialog.exec_():
+        if dialog.exec():
             for filename in dialog.selectedFiles():
                 filename = str(filename)
                 self.insertRasterInput(name=os.path.basename(filename), filename=filename)
 
     def handleAddInputVector(self):
         dialog = QFileDialog()
-        if dialog.exec_():
+        if dialog.exec():
             for filename in dialog.selectedFiles():
                 filename = str(filename)
                 self.insertVectorInput(name=os.path.basename(filename), filename=filename)
@@ -631,7 +662,7 @@ class CalculatorMainWindow(QMainWindow):
             xSize = self.windowXSize()
             ySize = self.windowYSize()
             result = eval(code)
-            self.logText('= '+str(result))
+            self.logText('= ' + str(result))
             return
         except:
             pass
@@ -651,8 +682,8 @@ class CalculatorMainWindow(QMainWindow):
             try:
                 if code[index - 1].isalnum(): continue
                 if code[index - 1] == '_': continue
-                if code[index+len(key)].isalnum(): continue
-                if code[index+len(key)] == '_': continue
+                if code[index + len(key)].isalnum(): continue
+                if code[index + len(key)] == '_': continue
             except IndexError:
                 pass
 
@@ -736,7 +767,7 @@ class CalculatorMainWindow(QMainWindow):
             self.logText('')
             html = '<p style="color:red;">{}</p>'.format(error.message).replace('\n', '<br>')
             self.logText(text=html)
-            #for line in error.message.split('\n'):
+            # for line in error.message.split('\n'):
             #    if line.strip().startswith('File "<string>", line'):
             #        l = int(line.split(' ')[-1])-1
             #        self.uiCode.setSelection(l, 0, l, len(str(self.uiCode.text(l))))
@@ -745,14 +776,14 @@ class CalculatorMainWindow(QMainWindow):
         for index in selected.indexes():
             item = self.uiFunctions.itemFromIndex(index)
             if isinstance(item, NumpyItem):
-                html = r'<pre><code>'+item.doc+'</code></pre>'.replace('\n', '<br>')
+                html = r'<pre><code>' + item.doc + '</code></pre>'.replace('\n', '<br>')
                 self.uiDoc.setHtml(html)
             elif isinstance(item, WebItem):
                 self.uiDoc.setUrl(QUrl(item.url))
             else:
                 self.uiDoc.setHtml('')
 
-    def handleFunctionDoubleClicked(self,  item, column):
+    def handleFunctionDoubleClicked(self, item, column):
         if isinstance(item, NumpyItem):
             self.uiCode.replaceSelectedText(item.doubleClickInsert)
             self.uiCode.setFocus()
@@ -774,7 +805,8 @@ class CalculatorMainWindow(QMainWindow):
                     name = item.parent().parent().parent().text(0)
                     domain = item.parent().text(0)
                     key = item.text(0)
-                    self.uiCode.replaceSelectedText("metadata({name})['{domain}']['{key}']".format(name=name, domain=domain, key=key))
+                    self.uiCode.replaceSelectedText(
+                        "metadata({name})['{domain}']['{key}']".format(name=name, domain=domain, key=key))
                 elif item.text(0) == 'no data value':
                     name = item.parent().parent().text(0)
                     self.uiCode.replaceSelectedText('noDataValue({name})'.format(name=name))
@@ -788,8 +820,8 @@ class CalculatorMainWindow(QMainWindow):
             self.uiCode.replaceSelectedText(name)
             self.uiCode.setFocus()
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     import enmapboxtestdata
 
     app = QApplication(sys.argv)
@@ -800,13 +832,12 @@ if __name__ == '__main__':
     calculator.insertRasterInput(name='hymap', filename=enmapboxtestdata.hymap)
     calculator.insertVectorInput(name='landCover', filename=enmapboxtestdata.landcover)
     calculator.insertRasterOutput(name='result',
-                            filename=os.path.join(tempfile.gettempdir(), 'HUB-Datacube-Calculator', 'result.img'))
+                                  filename=os.path.join(tempfile.gettempdir(), 'HUB-Datacube-Calculator', 'result.img'))
     calculator.setCode(code='\n'.join(['result = enmap',
                                        'result[:, landCover[0] == 0] = noDataValue(enmap)',
                                        'setNoDataValue(result, noDataValue(enmap))',
                                        'setMetadata(result, metadata(enmap))']))
-    #calculator.setCode(code='(enmap)\nprint(landCover.max())\nresult = landCover')
+    # calculator.setCode(code='(enmap)\nprint(landCover.max())\nresult = landCover')
 
     calculator.show()
-    sys.exit(app.exec_())
-
+    sys.exit(app.exec())

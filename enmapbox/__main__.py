@@ -70,7 +70,7 @@ def run(
     if not qAppExists:
         print('Execute QgsApplication')
         # enmapBox.sigClosed.connect(exitAll)
-        exit_code = QgsApplication.instance().exec_()
+        exit_code = QgsApplication.instance().exec()
         QgsProject.instance().removeAllMapLayers()
         return exit_code
     else:

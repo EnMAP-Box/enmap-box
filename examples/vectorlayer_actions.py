@@ -27,9 +27,8 @@
 *                                                                         *
 ***************************************************************************
 """
-from PyQt5.QtCore import QMetaType
-
 from enmapbox.testing import start_app
+from qgis.PyQt.QtCore import QMetaType
 from qgis.PyQt.QtCore import QSize
 from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QCheckBox
 from qgis.core import QgsPythonRunner, QgsFeature, QgsField, QgsVectorLayer, QgsAttributeTableConfig, QgsActionManager, \

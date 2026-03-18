@@ -1273,7 +1273,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         d.setWindowTitle(title)
         d.setFileFilter(filter)
         d.setDefaultRoot(defaultRoot)
-        result = d.exec_()
+        result = d.exec()
 
         if result == QDialog.Accepted:
             subdatasets = d.selectedSublayerDetails()
@@ -1420,7 +1420,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         if layertype == 'speclib':
             s = ""
             d = CreateSpectralLibraryDialog(self.ui)
-            if d.exec_() == QDialog.Accepted:
+            if d.exec() == QDialog.Accepted:
                 sl = d.create_speclib()
                 if isinstance(sl, QgsVectorLayer):
                     self.project().addMapLayer(sl, False)
@@ -1430,7 +1430,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             d = QgsNewGeoPackageLayerDialog(self.ui)
             d.setCrs(defaultCrs)
             d.setAddToProject(False)
-            if d.exec_() == QDialog.Accepted:
+            if d.exec() == QDialog.Accepted:
                 layers.append(QgsVectorLayer(d.databasePath()))
 
         elif layertype == 'memory':
@@ -2569,7 +2569,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         if show and not modal:
             dlg.show()
         if show and modal:
-            dlg.exec_()
+            dlg.exec()
         return dlg
 
     def addLayerMenu(self):

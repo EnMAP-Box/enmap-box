@@ -132,4 +132,4 @@ if __name__ == '__main__':
     app = start_app()
     d = AboutDialog()
     d.show()
-    app.exec_()
+    app.exec()

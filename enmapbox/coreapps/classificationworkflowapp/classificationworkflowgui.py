@@ -101,7 +101,7 @@ def errorHandled(func=None, *, successMessage: str = None):
 
                 dialog = Dialog()
                 dialog.resize(800, 600)
-                dialog.exec_()
+                dialog.exec()
 
             widget = gui.mMessageBar.createMessage('Unexpected error', str(error))
             button = QPushButton(widget)

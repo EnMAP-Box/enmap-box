@@ -479,8 +479,8 @@ class GlobalInversion:
             except (AttributeError, ValueError):
                 self.main.nodat_widget.init(image_type=image_type, image=image)
                 self.main.nodat_widget.gui.setModal(True)  # parent window is blocked
-                # unlike .show(), .exec_() waits with execution of the code, until the app is closed
-                self.main.nodat_widget.gui.exec_()
+                # unlike .show(), .exec() waits with execution of the code, until the app is closed
+                self.main.nodat_widget.gui.exec()
                 nodata = self.main.nodat_widget.nodat
 
             if image_type == "Geometry Image":
@@ -762,4 +762,4 @@ if __name__ == '__main__':
     app = start_app()
     m = MainUiFunc()
     m.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
