@@ -1352,6 +1352,11 @@ class DockManagerTreeModel(QgsLayerTreeModel):
             if role == Qt.EditRole:
                 s = ""
 
+            if type(node) == QgsLayerTreeLayer and role == Qt.ToolTipRole:
+                tt = super(DockManagerTreeModel, self).data(index, role)
+                tt += f'<br>ID:<i>{node.layerId()}</i>'
+                return tt
+
             if isinstance(node, QgsLayerTree) and column > 0:
                 return None
 
