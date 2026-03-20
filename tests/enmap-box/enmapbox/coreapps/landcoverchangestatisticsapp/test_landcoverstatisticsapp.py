@@ -6,11 +6,14 @@ from osgeo import gdal
 from enmapbox import initAll
 from enmapbox.gui.dataviews.docks import MapDock
 from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.gui.widgets.multiplemaplayerselectionwidget.multiplemaplayerselectionwidget import \
+    MultipleMapLayerSelectionDialog
 from enmapbox.testing import start_app, TestCase
 from enmapboxprocessing.typing import Category
-from enmapboxtestdata import landcover_map_l2
+from enmapboxtestdata import landcover_map_l2, landcover_map_l3
 from landcoverchangestatisticsapp import LandCoverChangeStatisticsMainWindow
 from landcoverchangestatisticsapp.landcoverchangestatisticsmainwindow import LandCoverChangeSankeyPlotBuilder
+from qgis._core import QgsProject
 from qgis.core import QgsRasterLayer
 
 start_app()
@@ -46,6 +49,18 @@ class TestLandCoverStatisticsApp(TestCase):
     #     builder.readData(layers[0].extent(), 250000)
     #     fig = builder.sankeyPlot()
     #     fig.show()
+
+    def test_MultipleMapLayerSelectionDialog(self):
+        l1 = QgsRasterLayer(landcover_map_l2, 'landcover_map_l2')
+        l2 = QgsRasterLayer(landcover_map_l3, 'landcover_map_l3')
+        layers = [l1, l2]
+
+        p = QgsProject()
+        p.addMapLayers(layers)
+
+        d = MultipleMapLayerSelectionDialog(project=p)
+        self.assertEqual(2, d.mList.count())
+        self.showGui(d)
 
     def test_LandCoverChangeStatisticsMainWindow(self):
         tmp_dir = self.createTestOutputDirectory()

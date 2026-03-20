@@ -70,7 +70,7 @@ class MultipleMapLayerSelectionWidget(QWidget):
 
     def onButtonClicked(self):
         layers = MultipleMapLayerSelectionDialog.getLayers(
-            self, self.currentLayers(), self.allowRaster, self.allowVector
+            self, self.currentLayers(), self.allowRaster, self.allowVector, project=self.project()
         )
         if layers is not None:
             self.mLayers = layers
