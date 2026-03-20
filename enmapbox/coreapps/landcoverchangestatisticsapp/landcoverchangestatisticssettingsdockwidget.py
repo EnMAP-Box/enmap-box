@@ -5,6 +5,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtWidgets import QCheckBox, QComboBox
 from qgis.PyQt.QtWidgets import QToolButton
 from qgis.PyQt.uic import loadUi
+from qgis.core import QgsProject
 from qgis.gui import QgsDockWidget, QgsSpinBox, QgsColorButton
 
 
@@ -55,6 +56,9 @@ class LandCoverChangeStatisticsSettingsDockWidget(QgsDockWidget):
         # hide stuff that is not yet implemented
         self.mHighlightCurrentLocation.hide()
         self.mHighlightColor.hide()
+
+    def setProject(self, project: QgsProject):
+        self.mLayers.setProject(project)
 
     def onStateChanged(self):
         self.sigStateChanged.emit()

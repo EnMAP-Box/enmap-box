@@ -21,7 +21,7 @@ from qgis.PyQt.QtWebKitWidgets import QWebView
 from qgis.PyQt.QtWidgets import QStatusBar
 from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QCheckBox
 from qgis.PyQt.uic import loadUi
-from qgis.core import QgsRectangle, QgsPalettedRasterRenderer, QgsRasterLayer, QgsMapSettings, QgsUnitTypes
+from qgis.core import QgsRectangle, QgsPalettedRasterRenderer, QgsRasterLayer, QgsUnitTypes
 from qgis.gui import QgsMapCanvas
 
 
@@ -54,7 +54,7 @@ class LandCoverChangeStatisticsMainWindow(QMainWindow):
         self.mSettingsDock = LandCoverChangeStatisticsSettingsDockWidget(parent=self)
         self.mSettingsDock.sigStateChanged.connect(self.onLiveUpdate)
         self.mSettingsDock.sigLayersChanged.connect(self.onLayersChanged)
-
+        self.mSettingsDock.setProject(self.enmapBox.project())
         self.addDockWidget(Qt.BottomDockWidgetArea, self.mSettingsDock)
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None
@@ -74,8 +74,10 @@ class LandCoverChangeStatisticsMainWindow(QMainWindow):
         if self.mSettingsDock.mExtent.currentIndex() == ExtentType.WholeRaster:
             return SpatialExtent(grid.crs(), grid.extent())
         elif self.mSettingsDock.mExtent.currentIndex() == ExtentType.CurrentCanvas:
-            mapSettings: QgsMapSettings = self.mMapCanvas.mapSettings()
-            return SpatialExtent(mapSettings.destinationCrs(), self.mMapCanvas.extent()).toCrs(grid.crs())
+            if canvas := self.enmapBox.currentMapCanvas():
+                return SpatialExtent.fromMapCanvas(canvas, fullExtent=False)
+            else:
+                return None
         else:
             raise ValueError()
 
@@ -134,6 +136,9 @@ class LandCoverChangeStatisticsMainWindow(QMainWindow):
             return
 
         extent = self.currentExtent()
+        if extent is None:
+            return
+
         sampleSize = self.currentSampleSize()
         self.builder.setOptions(
             dict(
@@ -224,7 +229,7 @@ class LandCoverChangeSankeyPlotBuilder():
                 array, categories, categorySizes, categoryRelSizes = readLayer(layer)
             else:
                 array, categories, categorySizes, categoryRelSizes = array2, categories2, categorySizes2, \
-                                                                     categoryRelSizes2
+                    categoryRelSizes2
             array2, categories2, categorySizes2, categoryRelSizes2 = readLayer(nextLayer)
 
             levels = [[c.value for c in categories], [c.value for c in categories2]]

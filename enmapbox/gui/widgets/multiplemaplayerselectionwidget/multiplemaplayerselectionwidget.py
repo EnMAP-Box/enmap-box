@@ -27,9 +27,20 @@ class MultipleMapLayerSelectionWidget(QWidget):
         self.mLayers = list()
 
         self.mButton.clicked.connect(self.onButtonClicked)
-        QgsProject.instance().layersRemoved.connect(self.onLayersRemoved)
+        self.mProject: QgsProject = QgsProject.instance()
+        self.mProject.layersRemoved.connect(self.onLayersRemoved)
 
         self.updateInfo()
+
+    def setProject(self, project: QgsProject):
+        if isinstance(self.mProject, QgsProject) and self.mProject != project:
+            self.mProject.layersRemoved.disconnect(self.onLayersRemoved)
+
+        self.mProject = project
+        self.mProject.layersRemoved.connect(self.onLayersRemoved)
+
+    def project(self) -> QgsProject:
+        return self.mProject
 
     def setAllowRaster(self, bool):
         self.allowRaster = bool
@@ -66,7 +77,7 @@ class MultipleMapLayerSelectionWidget(QWidget):
             self.updateInfo()
 
     def onLayersRemoved(self, layerIds: List[str]):
-        self.mLayers = list(QgsProject.instance().mapLayers().values())
+        self.mLayers = list(self.project().mapLayers().values())
         self.updateInfo()
 
 
@@ -80,7 +91,8 @@ class MultipleMapLayerSelectionDialog(QDialog):
     mCancel: QToolButton
 
     def __init__(
-            self, parent=None, selection: List[QgsMapLayer] = None, allowRaster=True, allowVector=True
+            self, parent=None, selection: List[QgsMapLayer] = None,
+            allowRaster=True, allowVector=True, project: QgsProject = None,
     ):
         QWidget.__init__(self, parent)
         loadUi(__file__.replace('widget.py', 'dialog.ui'), self)
@@ -88,7 +100,9 @@ class MultipleMapLayerSelectionDialog(QDialog):
 
         # self.mLayers = list()
         layer: QgsMapLayer
-        for layer in QgsProject.instance().mapLayers().values():
+        if project is None:
+            project = QgsProject.instance()
+        for layer in project.mapLayers().values():
             if isinstance(layer, QgsRasterLayer) and not allowRaster:
                 continue
             if isinstance(layer, QgsVectorLayer) and not allowVector:
@@ -141,10 +155,15 @@ class MultipleMapLayerSelectionDialog(QDialog):
 
     @staticmethod
     def getLayers(
-            parent=None, selection: List[QgsMapLayer] = None, allowRaster=True, allowVector=True
+            parent=None,
+            selection: List[QgsMapLayer] = None,
+            allowRaster=True,
+            allowVector=True,
+            project: QgsProject = None,
     ) -> Optional[List[QgsMapLayer]]:
         w = MultipleMapLayerSelectionDialog(
-            parent, selection, allowRaster=allowRaster, allowVector=allowVector
+            parent, selection, allowRaster=allowRaster, allowVector=allowVector,
+            project=project,
         )
         w.exec()
 
