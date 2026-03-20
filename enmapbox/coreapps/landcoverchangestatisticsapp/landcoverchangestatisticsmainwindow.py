@@ -152,7 +152,8 @@ class LandCoverChangeStatisticsMainWindow(QMainWindow):
                 linkOpacity=self.mSettingsDock.mLinkOpacity.value()
             ))
         self.builder.readData(extent, sampleSize)
-        self.mDataFilteringDock.setRelativeClassSizes(np.array(self.builder.categoryRelSizess).tolist())
+        relativeClassSizes = [a.tolist() for a in self.builder.categoryRelSizess]
+        self.mDataFilteringDock.setRelativeClassSizes(relativeClassSizes)
         self.builder.setClassFilter(self.mDataFilteringDock.classFilter())
         fig = self.builder.sankeyPlot()
         html = fig.to_html(include_plotlyjs='cdn')

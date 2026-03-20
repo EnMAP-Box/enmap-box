@@ -46,7 +46,7 @@ class TestLandCoverStatisticsApp(TestCase):
 
     def test_LandCoverChangeStatisticsMainWindow(self):
         l1 = QgsRasterLayer(landcover_map_l2, 'landcover_map_l2')
-        l2 = QgsRasterLayer(landcover_map_l3, 'landcover_map_l3')
+        l2 = QgsRasterLayer(landcover_map_l2, 'landcover_map_l2')
         emb = EnMAPBox(load_core_apps=False, load_other_apps=False)
         layers = [l1, l2]
         dock: MapDock = emb.createMapDock('MAP')

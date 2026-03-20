@@ -57,6 +57,8 @@ class LandCoverChangeStatisticsDataFilteringDockWidget(QgsDockWidget):
         for column in range(1, self.mTableClasses.columnCount()):
             for row in range(self.mTableClasses.rowCount()):
                 w: QTableWidgetItem = self.mTableClasses.item(row, column)
+                if w is None:
+                    continue
                 font = w.font()
                 if self.relativeClassSizes[column - 1][row] == 0:
                     color = QColor(200, 200, 200)
@@ -120,10 +122,12 @@ class LandCoverChangeStatisticsDataFilteringDockWidget(QgsDockWidget):
         for column in range(1, self.mTableClasses.columnCount()):
             inames = list()
             for row in range(self.mTableClasses.rowCount()):
-                size = self.relativeClassSizes[column - 1][row]
                 w: QTableWidgetItem = self.mTableClasses.item(row, column)
+                if w is None:
+                    continue
                 if w.checkState() != Qt.Checked:  # filtered by local checkbox
                     continue
+                size = self.relativeClassSizes[column - 1][row]
                 if size < vmin or size > vmax:  # filtered by size
                     continue
                 inames.append(w.text())
