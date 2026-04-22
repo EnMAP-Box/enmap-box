@@ -2,6 +2,7 @@ import os
 
 import numpy as np
 from osgeo import gdal
+from qgis.core import QgsProject, QgsRasterLayer
 
 from enmapbox import initAll
 from enmapbox.gui.dataviews.docks import MapDock
@@ -13,8 +14,6 @@ from enmapboxprocessing.typing import Category
 from enmapboxtestdata import landcover_map_l2, landcover_map_l3
 from landcoverchangestatisticsapp import LandCoverChangeStatisticsMainWindow
 from landcoverchangestatisticsapp.landcoverchangestatisticsmainwindow import LandCoverChangeSankeyPlotBuilder
-from qgis._core import QgsProject
-from qgis.core import QgsRasterLayer
 
 start_app()
 initAll()

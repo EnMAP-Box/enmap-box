@@ -1,12 +1,13 @@
-from enmapbox.gui.widgets.multiplemaplayerselectionwidget.multiplemaplayerselectionwidget import \
-    MultipleMapLayerSelectionWidget
-from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtWidgets import QCheckBox, QComboBox
 from qgis.PyQt.QtWidgets import QToolButton
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsProject
 from qgis.gui import QgsDockWidget, QgsSpinBox, QgsColorButton
+
+from enmapbox.gui.widgets.multiplemaplayerselectionwidget.multiplemaplayerselectionwidget import \
+    MultipleMapLayerSelectionWidget
+from enmapbox.typeguard import typechecked
 
 
 @typechecked
