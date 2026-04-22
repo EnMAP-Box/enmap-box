@@ -7,7 +7,7 @@ from enmapbox import initAll
 from enmapbox.gui.dataviews.docks import MapDock
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.widgets.multiplemaplayerselectionwidget.multiplemaplayerselectionwidget import \
-    MultipleMapLayerSelectionDialog
+    MultipleMapLayerSelectionDialog, MultipleMapLayerSelectionWidget
 from enmapbox.testing import start_app, TestCase
 from enmapboxprocessing.typing import Category
 from enmapboxtestdata import landcover_map_l2, landcover_map_l3
@@ -49,6 +49,18 @@ class TestLandCoverStatisticsApp(TestCase):
     #     builder.readData(layers[0].extent(), 250000)
     #     fig = builder.sankeyPlot()
     #     fig.show()
+
+    def test_MultipleMapLayerSelectionWidget(self):
+        l1 = QgsRasterLayer(landcover_map_l2, 'landcover_map_l2')
+        l2 = QgsRasterLayer(landcover_map_l3, 'landcover_map_l3')
+        layers = [l1, l2]
+
+        p = QgsProject()
+        p.addMapLayers(layers)
+
+        d = MultipleMapLayerSelectionWidget()
+        d.setProject(p)
+        self.showGui(d)
 
     def test_MultipleMapLayerSelectionDialog(self):
         l1 = QgsRasterLayer(landcover_map_l2, 'landcover_map_l2')
@@ -103,7 +115,7 @@ class TestLandCoverStatisticsApp(TestCase):
 
     def test_LandCoverChangeStatisticsMainWindow_2(self):
         l1 = QgsRasterLayer(landcover_map_l2, 'landcover_map_l2')
-        l2 = QgsRasterLayer(landcover_map_l2, 'landcover_map_l2')
+        l2 = QgsRasterLayer(landcover_map_l3, 'landcover_map_l3')
         emb = EnMAPBox(load_core_apps=False, load_other_apps=False)
         layers = [l1, l2]
         dock: MapDock = emb.createMapDock('MAP')

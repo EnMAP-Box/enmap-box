@@ -1,8 +1,13 @@
+import tempfile
+import webbrowser
 from collections import defaultdict
+from os.path import join
 from typing import Optional, List
 
 import numpy as np
 import plotly.graph_objects as go
+from PyQt5.QtWebKit import QWebSettings
+from qgis._core import QgsNetworkAccessManager
 from scipy.stats._crosstab import crosstab
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent, SpatialPoint
@@ -59,6 +64,15 @@ class LandCoverChangeStatisticsMainWindow(QMainWindow):
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None
         self.enmapBox.sigCurrentLocationChanged.connect(self.onLiveUpdate)
+
+        # fix issue with QWebView
+        self.mWebView.page().setNetworkAccessManager(
+            QgsNetworkAccessManager.instance())
+        plot_view_settings = self.mWebView.settings()
+        plot_view_settings.setAttribute(QWebSettings.WebGLEnabled, True)
+        plot_view_settings.setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
+        plot_view_settings.setAttribute(QWebSettings.Accelerated2dCanvasEnabled, True)
+
 
         self.onApplyClicked()
 
@@ -156,8 +170,19 @@ class LandCoverChangeStatisticsMainWindow(QMainWindow):
         self.mDataFilteringDock.setRelativeClassSizes(relativeClassSizes)
         self.builder.setClassFilter(self.mDataFilteringDock.classFilter())
         fig = self.builder.sankeyPlot()
-        html = fig.to_html(include_plotlyjs='cdn')
-        self.mWebView.setHtml(html)
+        fig.show()
+
+        #html = fig.to_html(include_plotlyjs='cdn', full_html=True)
+        #self.mWebView.setHtml(html)
+
+        #TMP_HTML_PATH = join(tempfile.gettempdir(), 'sankey.html')
+        #TMP_PNG_PATH = join(tempfile.gettempdir(), 'sankey.png')
+
+        # Write HTML (overwrite same file every time)
+        #fig.write_image("sankey.png")
+
+        #fig.write_html(TMP_HTML_PATH)
+        #webbrowser.open(f"file://{TMP_PNG_PATH}", new=0)
 
     def onLiveUpdate(self):
         if not self.mLiveUpdate.isChecked():
