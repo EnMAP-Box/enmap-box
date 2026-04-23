@@ -1,13 +1,17 @@
-import tempfile
-import webbrowser
 from collections import defaultdict
-from os.path import join
 from typing import Optional, List
 
 import numpy as np
 import plotly.graph_objects as go
-from PyQt5.QtWebKit import QWebSettings
-from qgis._core import QgsNetworkAccessManager
+from qgis.PyQt.QtWebKit import QWebSettings
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWebKitWidgets import QWebView
+from qgis.PyQt.QtWidgets import QStatusBar
+from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QCheckBox
+from qgis.PyQt.uic import loadUi
+from qgis.core import QgsRectangle, QgsPalettedRasterRenderer, QgsRasterLayer, QgsUnitTypes, QgsNetworkAccessManager
+from qgis.gui import QgsMapCanvas
 from scipy.stats._crosstab import crosstab
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent, SpatialPoint
@@ -20,14 +24,6 @@ from landcoverchangestatisticsapp.landcoverchangestatisticsdatafilteringdockwidg
     LandCoverChangeStatisticsDataFilteringDockWidget
 from landcoverchangestatisticsapp.landcoverchangestatisticssettingsdockwidget import \
     LandCoverChangeStatisticsSettingsDockWidget
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWebKitWidgets import QWebView
-from qgis.PyQt.QtWidgets import QStatusBar
-from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QCheckBox
-from qgis.PyQt.uic import loadUi
-from qgis.core import QgsRectangle, QgsPalettedRasterRenderer, QgsRasterLayer, QgsUnitTypes
-from qgis.gui import QgsMapCanvas
 
 
 @typechecked
@@ -72,7 +68,6 @@ class LandCoverChangeStatisticsMainWindow(QMainWindow):
         plot_view_settings.setAttribute(QWebSettings.WebGLEnabled, True)
         plot_view_settings.setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
         plot_view_settings.setAttribute(QWebSettings.Accelerated2dCanvasEnabled, True)
-
 
         self.onApplyClicked()
 
@@ -172,17 +167,17 @@ class LandCoverChangeStatisticsMainWindow(QMainWindow):
         fig = self.builder.sankeyPlot()
         fig.show()
 
-        #html = fig.to_html(include_plotlyjs='cdn', full_html=True)
-        #self.mWebView.setHtml(html)
+        # html = fig.to_html(include_plotlyjs='cdn', full_html=True)
+        # self.mWebView.setHtml(html)
 
-        #TMP_HTML_PATH = join(tempfile.gettempdir(), 'sankey.html')
-        #TMP_PNG_PATH = join(tempfile.gettempdir(), 'sankey.png')
+        # TMP_HTML_PATH = join(tempfile.gettempdir(), 'sankey.html')
+        # TMP_PNG_PATH = join(tempfile.gettempdir(), 'sankey.png')
 
         # Write HTML (overwrite same file every time)
-        #fig.write_image("sankey.png")
+        # fig.write_image("sankey.png")
 
-        #fig.write_html(TMP_HTML_PATH)
-        #webbrowser.open(f"file://{TMP_PNG_PATH}", new=0)
+        # fig.write_html(TMP_HTML_PATH)
+        # webbrowser.open(f"file://{TMP_PNG_PATH}", new=0)
 
     def onLiveUpdate(self):
         if not self.mLiveUpdate.isChecked():
