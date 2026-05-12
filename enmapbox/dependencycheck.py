@@ -336,32 +336,6 @@ def localPipExecutable() -> Optional[Path]:
     return _LOCAL_PIPEXE
 
 
-def localPythonExecutable() -> Optional[Path]:
-    """
-    Searches for the local python executable
-    :return:
-    """
-    candidates = [Path(sys.executable)]
-    pythonhome = os.environ.get('PYTHONHOME', None)
-    if pythonhome:
-        pythonhome = Path(pythonhome)
-        ext = ''
-        if 'windows' in platform.uname().system.lower():
-            ext = '.exe'
-        for n in ['python3', 'python']:
-            candidates.extend([
-                pythonhome / f'{n}{ext}',
-                pythonhome / 'bin' / f'{n}{ext}'
-            ])
-
-    for c in candidates:
-        c = Path(c.resolve())
-        if c.is_file() and 'python' in c.name.lower():
-            return c
-
-    return None
-
-
 def decode_bytes(bytes_str, encodings=None):
     if encodings is None:
         encodings = ['utf-8', 'latin-1', 'ascii']
