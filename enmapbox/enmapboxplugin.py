@@ -18,14 +18,15 @@
 """
 import os
 import sys
-import typing
 from os.path import basename, splitext
+from typing import List
 
-from enmapbox.dependencycheck import missingTestData, installTestData
+from enmapbox.dependencycheck import missingTestData, installTestData, PIPPackage
 from enmapbox.enmapboxprojectsettings import EnMAPBoxProjectSettings
-from qgis.PyQt.QtCore import QOperatingSystemVersion
+from qgis.PyQt.QtCore import QOperatingSystemVersion, Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
+from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsRasterLayer, QgsVectorLayer, QgsProject, Qgis
 from qgis.gui import QgisInterface, QgsDockWidget
@@ -36,9 +37,10 @@ class EnMAPBoxPlugin(object):
     def __init__(self, *args, **kwds):
         # make site-packages available to python
         self.enmapBox = None
-        self.pluginToolbarActions: typing.List[QAction] = []
-        self.rasterMenuActions: typing.List[QAction] = []
-        self.dockWidgets: typing.List[QgsDockWidget] = []
+        self.pluginToolbarActions: List[QAction] = []
+        self.rasterMenuActions: List[QAction] = []
+        self.dockWidgets: List[QgsDockWidget] = []
+        self.mMissingCoreRequirements: List[PIPPackage] = []
 
         if QOperatingSystemVersion.current().name() == 'macOS':
             # os.environ['SKLEARN_SITE_JOBLIB']='True'
@@ -50,17 +52,26 @@ class EnMAPBoxPlugin(object):
         import enmapbox
         enmapbox.initPythonPaths()
         # run a minimum dependency check
-        self.initialDependencyCheck()
+        missing = self.initialDependencyCheck()
+        self.mMissingCoreRequirements.extend(missing)
 
         # initialize resources, processing provider etc.
-        enmapbox.initAll()
+        if self.corePackagesAvailable():
+            enmapbox.initAll()
+            self.mAddedSysPaths = [p for p in sys.path if p not in pathes]
 
-        self.mAddedSysPaths = [p for p in sys.path if p not in pathes]
+            # listen out for project save/restore, and update our state accordingly
+            # (adopted from Data Plotly plugin)
+            QgsProject.instance().writeProject.connect(self.writeProject)
+            QgsProject.instance().readProject.connect(self.readProject)
 
-        # listen out for project save/restore, and update our state accordingly
-        # (adopted from Data Plotly plugin)
-        QgsProject.instance().writeProject.connect(self.writeProject)
-        QgsProject.instance().readProject.connect(self.readProject)
+    def corePackagesAvailable(self) -> bool:
+        """
+        Returns True if all core packages are available
+        to provide basic EnMAP-Box functionality
+        :return: bool
+        """
+        return len(self.mMissingCoreRequirements) == 0
 
     def writeProject(self, document: QDomDocument):
         settings = EnMAPBoxProjectSettings()
@@ -70,9 +81,11 @@ class EnMAPBoxPlugin(object):
         settings = EnMAPBoxProjectSettings()
         settings.readFromProject(document)
 
-    def initialDependencyCheck(self):
+    def initialDependencyCheck(self) -> List[PIPPackage]:
         """
         Runs a check for availability of package dependencies and summarized error messages
+        Returns a list of missing core requirements without which the EnMAP-Box
+        cannot function properly.
         :return:
         """
         from enmapbox import messageLog
@@ -82,8 +95,29 @@ class EnMAPBoxPlugin(object):
             info = missingPackageInfo(missing, html=False)
             # warnings.warn(info, ImportWarning)
             messageLog(info, level=Qgis.Warning)
+        return missing
 
     def initGui(self):
+
+        if not self.corePackagesAvailable():
+
+            mbox = QMessageBox()
+            mbox.setWindowTitle('Missing Packages')
+            mbox.setTextFormat(Qt.TextFormat.RichText)
+
+            info = ('Congratulations, the EnMAP-Box is installed!<br>'
+                    'Unfortunately some Python packages still need to be installed:<br>')
+
+            for i, p in enumerate(self.mMissingCoreRequirements):
+                info += f'<br>{i + 1}: {p.pipPkgName}'
+                if len(p.comment) > 0:
+                    info += f' - {p.comment}'
+
+            info += '<br><br>Please visit <a href="https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html">EnMAP-Box installation guide</a> for advice.'
+
+            mbox.setText(info)
+            mbox.exec()
+            return
 
         import enmapbox
         from qgis.utils import iface
@@ -136,6 +170,16 @@ class EnMAPBoxPlugin(object):
         :return:
         :rtype:
         """
+        if not self.corePackagesAvailable():
+            info = 'Missing python package(s).\nPlease install: '
+            for i, p in enumerate(self.mMissingCoreRequirements):
+                info += f'\n{i + 1}: {p.pipPkgName}'
+                if p.comment:
+                    info += f' - {p.comment}'
+
+            info += '\n Please visit https://enmap-box.readthedocs.io for advice.'
+            raise ModuleNotFoundError(info)
+
         import enmapbox
         enmapbox.initPythonPaths()
 
@@ -150,6 +194,9 @@ class EnMAPBoxPlugin(object):
             self.enmapBox.ui.show()
 
     def unload(self):
+        if not self.corePackagesAvailable():
+            return
+
         from enmapbox.gui.enmapboxgui import EnMAPBox
         from qgis.utils import iface
         if isinstance(iface, QgisInterface):

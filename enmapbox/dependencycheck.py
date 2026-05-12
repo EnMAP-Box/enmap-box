@@ -40,7 +40,6 @@ from typing import Any, Dict, Iterator, List, Match, Optional, Tuple
 
 from enmapbox import REQUIREMENTS_CSV
 from enmapbox.enmapboxsettings import EnMAPBoxSettings
-from enmapbox.qgispluginsupport.qps.utils import qgisAppQgisInterface
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import pyqtSignal, QAbstractTableModel, QModelIndex, QProcess, QSortFilterProxyModel, Qt, QUrl
 from qgis.PyQt.QtGui import QColor, QContextMenuEvent, QDesktopServices
@@ -736,7 +735,8 @@ def installTestData(overwrite_existing: bool = False, ask: bool = True):
     pathLocalZip = os.path.join(os.path.dirname(DIR_EXAMPLEDATA), 'enmapboxexampledata.zip')
     url = QUrl(URL_TESTDATA)
     dialog = QgsFileDownloaderDialog(url, pathLocalZip, 'Download enmapboxexampledata.zip')
-    qgisMainApp = qgisAppQgisInterface()
+
+    # qgisMainApp = qgisAppQgisInterface()
 
     def onCanceled():
         print('Download canceled')
