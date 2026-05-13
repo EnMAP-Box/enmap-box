@@ -29,19 +29,33 @@ EXCLUDED_QGIS_VERSIONS = []
 DEPENDENCIES = {
     # define dependencies as: [<conda package name> | {<'conda'|'pip'>:<package name>, ...}, ...]
     # light = minimum requirements
-    'light': ['python', 'pip', 'scikit-learn', 'matplotlib', 'colorama'],
+    'light': ['python',
+              'pip',
+              'scikit-learn>=1.4',
+              'matplotlib-base',
+              'colorama'],
     # full = all other packages to enjoy the full EnMAP-Box experience (on cost of disk space)
-    'full': [{'conda': 'enpt>=1.2.1', 'pip': 'enpt-enmapboxapp>=1.0.2'},
-             {'conda': 'enfrosp', 'pip': 'enfrosp-enmapboxapp'},
-             'xgboost', 'lightgbm',
+    'full': ['enpt>=1.2.1',
+             'enpt_enmapboxapp>=1.0.2',
+             'enfrosp',
+             'enfrosp_enmapboxapp',
+             'xgboost',
+             'lightgbm',
+
              # 'cdsapi', 'cython', 'pyhdf', 'xarray', 'pygrib',
              'netcdf4',
-             'astropy', 'catboost', 'matplotlib', 'astropy', 'numba>=0.56.4',
+             'catboost',
+             'astropy-base',
+             'numba>=0.56.4',
              'sympy', 'pyopengl', 'h5py',
              # requirements by specdeepmap
              'opencv[build=headless*]', 'pandas',
              # requirements by specdeepmap
-             'lightning', 'pytorch', 'tensorboard', 'torchvision', 'segmentation-models-pytorch',
+             'lightning',
+             'pytorch',
+             'tensorboard',
+             'torchvision',
+             'segmentation-models-pytorch',
              'setuptools<=81',  # due to https://github.com/tensorflow/tensorboard/issues/7003
              # {'pip': ['torch==2.6.0',
              #         'lightning==2.5.0.post0',
@@ -51,7 +65,8 @@ DEPENDENCIES = {
              ],
     # required by developers
     'dev': ['gitpython', 'git-lfs', 'pytest', 'pytest-cov', 'pytest-xdist', 'docutils',
-            {'conda': 'flake8', 'pip': 'flake8-qgis'},
+            'flake8',
+            {'pip': 'flake8-qgis'},
             ]
 }
 
@@ -174,7 +189,7 @@ def update_yaml(dir_yaml,
     deps_conda = sorted(set(deps_conda))
     deps_pip = sorted(set(deps_pip))
 
-    qgis_version = f'qgis={ltr_version}' if ltr_version else 'qgis'
+    qgis_version = f'qgis={ltr_version}' if ltr_version else 'qgis<3.99'
     for v in EXCLUDED_QGIS_VERSIONS:
         if re.search(r'\d+$', qgis_version) and not v.startswith(','):
             qgis_version += ','
