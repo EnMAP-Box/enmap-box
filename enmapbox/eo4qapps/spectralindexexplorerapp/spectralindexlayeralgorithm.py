@@ -128,7 +128,7 @@ class SpectralIndexLayerAlgorithm(EnMAPProcessingAlgorithm):
 
         expression = self.asiFormulaToRasterCalcFormula(formula, raster, mapping)
         if formula in self.Indices:
-            feedback.pushInfo(f'ASI formula: {self.Indices[formula]['formula']}')
+            feedback.pushInfo(f'ASI formula: {self.Indices[formula]["formula"]}')
         else:
             feedback.pushInfo('ASI formula: ' + formula)
         feedback.pushInfo('Virtual raster expression: ' + expression)
