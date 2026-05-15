@@ -596,7 +596,7 @@ def requiredPackages(return_tuples: bool = False) -> List[PIPPackage]:
     """
 
     # see https://pip.pypa.io/en/stable/reference/pip_install/#requirements-file-format
-    # for details of the requirements format
+    # for details of the requirement format
 
     file = REQUIREMENTS_CSV
     assert file.is_file(), '{} does not exist'.format(file)

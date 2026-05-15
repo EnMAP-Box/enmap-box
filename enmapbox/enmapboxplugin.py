@@ -100,21 +100,10 @@ class EnMAPBoxPlugin(object):
     def initGui(self):
 
         if not self.corePackagesAvailable():
-
             mbox = QMessageBox()
             mbox.setWindowTitle('Missing Packages')
             mbox.setTextFormat(Qt.TextFormat.RichText)
-
-            info = ('Congratulations, the EnMAP-Box is installed!<br>'
-                    'Unfortunately some Python packages still need to be installed:<br>')
-
-            for i, p in enumerate(self.mMissingCoreRequirements):
-                info += f'<br>{i + 1}: {p.pipPkgName}'
-                if len(p.comment) > 0:
-                    info += f' - {p.comment}'
-
-            info += '<br><br>Please visit <a href="https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html">EnMAP-Box installation guide</a> for advice.'
-
+            info = self.missingPackageInfos(self.mMissingCoreRequirements)
             mbox.setText(info)
             mbox.exec()
             return
@@ -142,6 +131,40 @@ class EnMAPBoxPlugin(object):
 
         # init stand-alone apps, that can operate in QGIS GUI without EnMAP-Box
         self.initStandAloneAppGuis()
+
+    @staticmethod
+    def missingPackageInfos(missing_packages: List[PIPPackage], cli: bool = False) -> str:
+
+        if cli:
+            info = 'Missing python package(s).\nPlease install: '
+            for i, p in enumerate(missing_packages):
+                info += f'\n{i + 1}: {p.pipPkgName}'
+                if p.comment:
+                    info += f' - {p.comment}'
+
+            info += '\n Please visit https://enmap-box.readthedocs.io for advice.'
+        else:
+            # for GUI message dialog
+            info = ('<b>The EnMAP-Box is installed! &#x1F389;</b><br>'
+                    'To launch the basic EnMAP-Box, you just need to install a few remaining Python dependencies:<br>')
+
+            for i, p in enumerate(missing_packages):
+                info += f'<br>{i + 1}: {p.pipPkgName}'
+                if p.comment and len(p.comment) > 0:
+                    info += f' - {p.comment}'
+
+            info += ('<br><br><i>How to fix this:</i>'
+                     '<ol style="margin-left: 0px;"><li>Open your terminal/command prompt and run:'
+                     '<br><code>pip install &lt;missing packages&gt;</code>'
+                     '<br>(or <code>conda install &lt;missing packages&gt;</code>)</li>'
+                     '<li>Restart QGIS</li>'
+                     '</ol>'
+                     'Other EnMAP-Box features may require additional Python packages. '
+                     'For detailed instructions visit the '
+                     '<a href="https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html">EnMAP-Box installation guide</a>.'
+
+                     )
+        return info
 
     def showAboutDialog(self):
         from enmapbox.gui.about import AboutDialog
@@ -171,13 +194,7 @@ class EnMAPBoxPlugin(object):
         :rtype:
         """
         if not self.corePackagesAvailable():
-            info = 'Missing python package(s).\nPlease install: '
-            for i, p in enumerate(self.mMissingCoreRequirements):
-                info += f'\n{i + 1}: {p.pipPkgName}'
-                if p.comment:
-                    info += f' - {p.comment}'
-
-            info += '\n Please visit https://enmap-box.readthedocs.io for advice.'
+            info = self.missingPackageInfos(self.mMissingCoreRequirements, cli=True)
             raise ModuleNotFoundError(info)
 
         import enmapbox
