@@ -3,7 +3,7 @@ import json
 import os
 import re
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 import requests
 import yaml
@@ -12,12 +12,6 @@ REPO_ROOT = Path(__file__).parents[1]
 DIR_TMP = REPO_ROOT / 'tmp'
 DIR_YAML = REPO_ROOT / '.env/conda'
 os.makedirs(DIR_TMP, exist_ok=True)
-
-# define how QGIS branches with be named in the yml file names
-BRANCH_NAME_LOOKUP = {
-    'stable': 'ltr',
-    'latest': ''
-}
 
 # QGIS conda versions that are known to have problems
 # e.g., https://github.com/conda-forge/qgis-feedstock/issues/570
@@ -29,11 +23,12 @@ EXCLUDED_QGIS_VERSIONS = []
 DEPENDENCIES = {
     # define dependencies as: [<conda package name> | {<'conda'|'pip'>:<package name>, ...}, ...]
     # light = minimum requirements
-    'light': ['python',
-              'pip',
-              'scikit-learn>=1.4',
-              'matplotlib-base',
-              'colorama'],
+    'base': ['qgis<=3.99',
+             'python>=3.12',
+             'pip',
+             'scikit-learn>=1.4',
+             'matplotlib-base',
+             'colorama'],
     # full = all other packages to enjoy the full EnMAP-Box experience (on cost of disk space)
     'full': ['enpt>=1.2.1',
              'enpt_enmapboxapp>=1.0.2',
@@ -147,33 +142,20 @@ def get_conda_qgis_versions() -> List[str]:
 
 
 def update_yaml(dir_yaml,
-                ltr_version: Optional[str] = None,
-                all_deps: bool = False):
-    variant = 'full' if all_deps else 'light'
-
-    name = f'enmapbox_{variant}'
-
-    if ltr_version:
-        name += '_ltr'
-
+                name: str,
+                dependencies: List[str]):
     path_yml = dir_yaml / f'{name}.yml'
 
     header = f"""# EnMAP-Box conda environment (generated {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
 # run to install: conda env create -n {name} --file={path_yml.name}
-# run to update : conda env update -n {name} --file={path_yml.name} --prune
-# run to delete : conda env remove -n {name}
+# run to update: conda env update -n {name} --file={path_yml.name} --prune
+# run to delete: conda env remove -n {name} 
 # see https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
 # created with scripts/update_conda_environments.py (MANUAL CHANGES WILL BE OVERWRITTEN!)
 """
-    DEPS = DEPENDENCIES['light'].copy()
-    if all_deps:
-        DEPS.extend(DEPENDENCIES['full'])
-    DEPS.extend(DEPENDENCIES['dev'])
-
-    variables = {
-        'QT_MAC_WANTS_LAYER': 1,
-        'PYQTGRAPH_QT_LIB': 'PyQt5'
-    }
+    DEPS = []
+    for d in dependencies:
+        DEPS.extend(DEPENDENCIES[d])
 
     deps_conda = []
     deps_pip = []
@@ -186,16 +168,9 @@ def update_yaml(dir_yaml,
         if 'pip' in d:
             deps_pip.extend(d['pip'])
 
-    deps_conda = sorted(set(deps_conda))
-    deps_pip = sorted(set(deps_pip))
+    deps_conda = list(sorted(set(deps_conda)))
+    deps_pip = list(sorted(set(deps_pip)))
 
-    qgis_version = f'qgis={ltr_version}' if ltr_version else 'qgis<3.99'
-    for v in EXCLUDED_QGIS_VERSIONS:
-        if re.search(r'\d+$', qgis_version) and not v.startswith(','):
-            qgis_version += ','
-        qgis_version += v
-
-    deps_conda.insert(0, qgis_version)
     environment = {
         'name': name,
         'channels': ['conda-forge'],
@@ -204,25 +179,16 @@ def update_yaml(dir_yaml,
     if len(deps_pip) > 0:
         environment['dependencies'].append({'pip': deps_pip})
 
+    QT_LIB = 'PyQt6'
+    for d in environment['dependencies']:
+        if isinstance(d, str) and re.search(r'qgis[<>=]+3\..*', d):
+            QT_LIB = 'PyQt5'
+
+    variables = {
+        'QT_MAC_WANTS_LAYER': 1,
+        'PYQTGRAPH_QT_LIB': QT_LIB
+    }
     environment['variables'] = variables
-
-    if path_yml.is_file():
-        with open(path_yml, 'r') as f:
-            old_lines = f.read()
-            env_old = yaml.safe_load(old_lines)
-        rxVersion = re.compile(r'qgis[><=]+(?P<version>\d+\.\d+).*')
-        qgis_old = None
-        for d in env_old['dependencies']:
-            if isinstance(d, str) and (m := rxVersion.match(d)):
-                qgis_old = m.group('version')
-        if qgis_old:
-            archive_name = f'enmapbox_{variant}_{qgis_old}'
-            old_lines = old_lines.replace(env_old['name'], archive_name)
-            old_lines = old_lines.replace('qgis>=', 'qgis=')
-
-            archive_path = dir_yaml / f'{archive_name}.yml'
-            with open(archive_path, 'w') as f:
-                f.write(old_lines)
 
     lines = yaml.dump(environment, indent=2, default_flow_style=False)
 
@@ -237,44 +203,8 @@ def update_yamls():
     conda_versions = get_conda_qgis_versions()
     s = ""
 
-    for branch, (current_version, latest_fix) in current_versions.items():
-        latest_version_fix = sorted(conda_versions, key=lambda k: [int(v) for v in k.split('.')])[-1]
-        # latest_version_fix = max([v for v in conda_versions if v.startswith(current_version)])
-
-        branch_name = BRANCH_NAME_LOOKUP.get(branch, branch)
-
-        if branch_name == 'ltr':
-            # skip the hotfix version, just use the major.minor part to
-            # set the LTR version.
-            ltr_version = current_version
-        else:
-            ltr_version = None
-
-        update_yaml(DIR_YAML, ltr_version=ltr_version, all_deps=True)
-        update_yaml(DIR_YAML, ltr_version=ltr_version, all_deps=False)
-
-
-def generate_environment_file(lr_version, ltr_version):
-    """
-    Generates an environment.yml file to install QGIS + EnMAP-Box dependencies in a Conda environment.
-
-    Args:
-    lr_version (str): The latest version of QGIS LR.
-    ltr_version (str): The latest version of QGIS LTR.
-
-    Returns:
-    str: The content of the environment.yml file as a string.
-    """
-    environment = {
-        'name': 'qgis_env',
-        'channels': ['conda-forge'],
-        'dependencies': [
-            'qgis=' + lr_version,
-            'qgis-ltr=' + ltr_version
-        ]
-    }
-
-    return yaml.dump(environment, default_flow_style=False)
+    update_yaml(DIR_YAML, 'enmapbox-base', dependencies=['base', 'dev'])
+    update_yaml(DIR_YAML, 'enmapbox-full', dependencies=['base', 'full', 'dev'])
 
 
 if __name__ == '__main__':
