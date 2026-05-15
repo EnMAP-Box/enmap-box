@@ -149,7 +149,7 @@ def update_yaml(dir_yaml,
     header = f"""# EnMAP-Box conda environment (generated {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
 # run to install: conda env create -n {name} --file={path_yml.name}
 # run to update: conda env update -n {name} --file={path_yml.name} --prune
-# run to delete: conda env remove -n {name} 
+# run to delete: conda env remove -n {name}
 # see https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
 # created with scripts/update_conda_environments.py (MANUAL CHANGES WILL BE OVERWRITTEN!)
 """
