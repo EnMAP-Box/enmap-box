@@ -144,13 +144,19 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
         for i in range(model.rowCount()):
             idx = model.index(i, 0)
             lid = model.data(idx, role=Qt.UserRole + 1)
-            name = model.data(idx, role=Qt.DisplayRole)
+            name = str(model.data(idx, role=Qt.DisplayRole))
+            if lid is None:
+                continue
+            if name is None:
+                name = lid
+            assert isinstance(name, str)
             icon = model.data(idx, role=Qt.DecorationRole)
             tt = model.data(idx, role=Qt.ToolTipRole)
             if lid not in tt:
                 tt += f'<br>ID:<i>{lid}</i>'
-            cb.addItem(name, userData=lid)
+            cb.addItem(name)
             j = cb.count() - 1
+            cb.setItemData(j, lid, Qt.UserRole)
             cb.setItemData(j, tt, Qt.ToolTipRole)
             cb.setItemData(j, lid, Qt.UserRole)
             cb.setItemData(j, icon, Qt.DecorationRole)
