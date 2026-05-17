@@ -134,7 +134,7 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterBoolean(self.P_COPY_STYLE, self._COPY_STYLE, False)
         self.addParameterBoolean(self.P_EXCLUDE_BAD_BANDS, self._EXCLUDE_BAD_BANDS, False)
         self.addParameterBoolean(self.P_EXCLUDE_DERIVED_BAD_BANDS, self._EXCLUDE_DERIVED_BAD_BANDS, False)
-        self.addParameterBoolean(self.P_WRITE_ENVI_HEADER, self._WRITE_ENVI_HEADER, True)
+        self.addParameterBoolean(self.P_WRITE_ENVI_HEADER, self._WRITE_ENVI_HEADER, False)
         self.addParameterRasterLayer(self.P_SPECTRAL_RASTER, self._SPECTRAL_RASTER, None, True, True)
         self.addParameterBandList(
             self.P_SPECTRAL_BAND_LIST, self._SPECTRAL_BAND_LIST, None, self.P_SPECTRAL_RASTER, True, True
@@ -398,8 +398,8 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
             writer.close()
             del writer, outGdalDataset
 
-            # need to re-open the raster before setting the scal/offset (issue #501)
-            outGdalDataset = gdal.Open(filename)
+            # need to re-open the raster before setting the scale/offset (issue #501)
+            outGdalDataset = gdal.Open(filename, gdal.GA_Update)
             writer = RasterWriter(outGdalDataset)
             for dstBandNo, srcBandNo in enumerate(bandList, 1):
                 if offset is None:
@@ -410,8 +410,10 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                     writer.setScale(reader.scale(srcBandNo), dstBandNo)
                 else:
                     writer.setScale(scale, dstBandNo)
+
             writer.close()
-            del writer, outGdalDataset
+            del writer
+            del outGdalDataset
 
             if writeEnviHeader:
                 if driverShortName in ['GTiff', 'ENVI']:

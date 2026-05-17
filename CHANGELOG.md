@@ -33,8 +33,10 @@ have been completely redesigned (qps issues [100](https://github.com/EnMAP-Box/q
 * fixed several visual glitches in the plot settings and profile source trees (text colors, sizes)
 * Attribute table, form view: JSON viewer shows list values in one line, fixed saving and loading of changed profile
   data
-* vector sources can be dropped from data source pane onto the spectral library
+* vector sources can be dropped from data-source panel onto the spectral library
   viewer [#1501](https://github.com/EnMAP-Box/enmap-box/issues/1501)
+* increase the minimum size of spectral profile editor
+  widgets [#1509](https://github.com/EnMAP-Box/enmap-box/issues/1509)
 
 #### Applications
 

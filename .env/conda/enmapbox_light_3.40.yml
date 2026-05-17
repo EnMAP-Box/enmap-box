@@ -1,4 +1,4 @@
-# EnMAP-Box conda environment (generated 2026-02-26 14:36:55)
+# EnMAP-Box conda environment (generated 2026-02-26 14:39:22)
 # run to install: conda env create -n enmapbox_light_3.40 --file=enmapbox_light_3.40.yml
 # run to update : conda env update -n enmapbox_light_3.40 --file=enmapbox_light_3.40.yml --prune
 # run to delete : conda env remove -n enmapbox_light_3.40

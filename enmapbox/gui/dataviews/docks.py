@@ -805,9 +805,12 @@ class SpectralLibraryDock(Dock):
                  project: Optional[QgsProject] = None,
                  **kwds):
         super(SpectralLibraryDock, self).__init__(*args, **kwds)
-        self.setAcceptDrops(True)
+        # self.setAcceptDrops(True)
         self.mSpeclibWidget: SpectralLibraryWidget = SpectralLibraryWidget(speclib=speclib,
                                                                            project=project)
+
+        self.mSpeclibWidget.spectralLibraryPlotWidget().sigDragEnterEvent.connect(self.onSpeclibDragEnterEvent)
+        self.mSpeclibWidget.spectralLibraryPlotWidget().sigDropEvent.connect(self.onSpeclibDropEvent)
         self.mSpeclibWidget.setDelegateOpenRequests(True)
         # self.mSpeclibWidget.spectralLibraryPlotWidget().optionShowVisualizationSettings.setChecked(False)
         # self.mSpeclibWidget.sigLoadFromMapRequest.connect(self.sigLoadFromMapRequest)
@@ -825,22 +828,21 @@ class SpectralLibraryDock(Dock):
         if isinstance(speclib, QgsVectorLayer):
             self.mDefaultSpeclibId = speclib.id()
 
-    # forward to EnMAPBox
-    def dragEnterEvent(self, event: QDragEnterEvent):
-        event.setAccepted(True)
+    def onSpeclibDragEnterEvent(self, event: QDragEnterEvent):
+        # print(event.mimeData().formats())
+        supported_formats = [
+            'application/x-vnd.qgis.qgis.uri',
+            'text/uri-list',
+            'application/qgis.layertree.source',
+            'application/qgis.layertreemodeldata']
+
+        for f in event.mimeData().formats():
+            if f in supported_formats:
+                event.setAccepted(True)
+                return
 
     # forward to EnMAPBox
-    def dragMoveEvent(self, event):
-
-        pass
-
-    # forward to EnMAPBox
-    def dragLeaveEvent(self, event):
-
-        pass
-
-    # forward to EnMAPBox
-    def dropEvent(self, event):
+    def onSpeclibDropEvent(self, event):
 
         md = event.mimeData()
         slw = self.speclibWidget()
