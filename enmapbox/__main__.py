@@ -82,7 +82,14 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--debug', required=False, help='Debug mode with more outputs', action='store_true')
     # parser.add_argument('-x', '--no_exec', required=False, help='Close EnMAP-Box if QApplication is not existent',
     #                    action='store_true')
+    parser.add_argument('-c', '--core', required=False, help='Load core GUI only', action='store_true')
     args = parser.parse_args()
 
-    run(debug=args.debug, load_core_apps=True, load_other_apps=True)
+    load_core_apps = True
+    load_other_apps = True
+    if args.core:
+        load_core_apps = False
+        load_other_apps = False
+
+    run(debug=args.debug, load_core_apps=load_core_apps, load_other_apps=load_other_apps)
     s = ""
