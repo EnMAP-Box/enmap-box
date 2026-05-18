@@ -12,12 +12,13 @@ __author__ = 'benjamin.jakimow@geo.hu-berlin.de'
 
 import unittest
 
+from enmapbox.exampledata import enmap
+from enmapbox.gui.mapcanvas import MapCanvas
+from enmapbox.testing import EnMAPBoxTestCase, start_app
 from qgis.PyQt.QtWidgets import QMenu
 from qgis.core import QgsRasterLayer, QgsProject
 
-from enmapbox.exampledata import enmap
-from enmapbox.gui.mapcanvas import MapCanvas
-from enmapbox.testing import EnMAPBoxTestCase
+start_app()
 
 
 class CrosshairTests(EnMAPBoxTestCase):
@@ -26,19 +27,21 @@ class CrosshairTests(EnMAPBoxTestCase):
         # add site-packages to sys.path as done by enmapboxplugin.py
 
         lyr = QgsRasterLayer(enmap)
-        QgsProject.instance().addMapLayer(lyr)
+        project = QgsProject()
         refCanvas = MapCanvas()
+        refCanvas.setProject(project)
         refCanvas.setLayers([lyr])
         refCanvas.setExtent(lyr.extent())
         refCanvas.setDestinationCrs(lyr.crs())
         refCanvas.show()
+
         refCanvas.mCrosshairItem.setVisibility(True)
         menu = QMenu()
         refCanvas.populateContextMenu(menu, None)
         menu.show()
 
-        QgsProject.instance().addMapLayer(lyr)
-        QgsProject.instance().removeMapLayer(lyr)
+        project.addMapLayer(lyr)
+        project.removeMapLayer(lyr)
         del lyr
         self.assertTrue(refCanvas.mCrosshairItem.rasterGridLayer() is None)
 
@@ -46,7 +49,7 @@ class CrosshairTests(EnMAPBoxTestCase):
         refCanvas.populateContextMenu(menu, None)
         self.showGui([refCanvas, menu])
 
-        QgsProject.instance().removeAllMapLayers()
+        project.removeAllMapLayers()
 
 
 if __name__ == "__main__":

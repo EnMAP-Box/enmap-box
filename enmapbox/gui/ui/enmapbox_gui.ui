@@ -45,7 +45,7 @@
    <property name="styleSheet">
     <string notr="true"/>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="2,0">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,2">
     <property name="spacing">
      <number>0</number>
     </property>
@@ -61,6 +61,16 @@
     <property name="bottomMargin">
      <number>0</number>
     </property>
+    <item>
+     <widget class="DockArea" name="dockArea" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>2</horstretch>
+        <verstretch>2</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
+    </item>
     <item>
      <widget class="QgsMessageBar" name="messageBar">
       <property name="sizePolicy">
@@ -83,16 +93,6 @@
       </property>
      </widget>
     </item>
-    <item>
-     <widget class="DockArea" name="dockArea" native="true">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>2</horstretch>
-        <verstretch>2</verstretch>
-       </sizepolicy>
-      </property>
-     </widget>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -101,7 +101,7 @@
      <x>0</x>
      <y>0</y>
      <width>867</width>
-     <height>24</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuAbout">
@@ -261,6 +261,7 @@
    <addaction name="mActionZoomFullExtent"/>
    <addaction name="mActionIdentify"/>
    <addaction name="separator"/>
+   <addaction name="optionShowCrosshair"/>
    <addaction name="optionIdentifyCursorLocation"/>
    <addaction name="optionIdentifyProfile"/>
    <addaction name="optionMoveCenter"/>
@@ -847,6 +848,21 @@
    </property>
    <property name="toolTip">
     <string>Create a new spectral library</string>
+   </property>
+  </action>
+  <action name="optionShowCrosshair">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../../qgispluginsupport/qps/qpsresources.qrc">
+     <normaloff>:/qps/ui/icons/crosshair.svg</normaloff>:/qps/ui/icons/crosshair.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Show Crosshair</string>
+   </property>
+   <property name="toolTip">
+    <string>Show the crosshair</string>
    </property>
   </action>
  </widget>
