@@ -17,7 +17,7 @@ from landcoverchangestatisticsapp.landcoverchangestatisticssettingsdockwidget im
     LandCoverChangeStatisticsSettingsDockWidget
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWebKitWidgets import QWebView
+# from qgis.PyQt.QtWebKitWidgets import QWebView
 from qgis.PyQt.QtWidgets import QStatusBar
 from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QCheckBox
 from qgis.PyQt.uic import loadUi
@@ -27,7 +27,7 @@ from qgis.gui import QgsMapCanvas
 
 @typechecked
 class LandCoverChangeStatisticsMainWindow(QMainWindow):
-    mWebView: QWebView
+    # mWebView: QWebView
     mStatusBar: QStatusBar
 
     def __init__(self, *args, **kwds):

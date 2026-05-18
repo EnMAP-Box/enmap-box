@@ -21,7 +21,7 @@ from time import sleep
 from typing import List, Tuple
 
 from enmapbox.dependencycheck import PIPPackage, requiredPackages, PIPPackageInstaller, PIPPackageInfoTask, \
-    localPythonExecutable, missingPackageInfo, checkGDALIssues, PIPPackageInstallerTableModel, \
+    missingPackageInfo, checkGDALIssues, PIPPackageInstallerTableModel, \
     call_pip_command, localPipExecutable, installTestData
 from enmapbox.testing import EnMAPBoxTestCase, start_app
 from qgis.PyQt.QtCore import QProcess
@@ -280,23 +280,6 @@ class test_dependencycheck(EnMAPBoxTestCase):
         p = localPipExecutable()
         self.assertIsInstance(p, Path)
         self.assertTrue(p.is_file())
-
-    def test_findpython(self):
-        p = localPythonExecutable()
-        self.assertIsInstance(p, Path)
-        self.assertTrue(p.is_file())
-        self.assertTrue('python' in p.name.lower())
-
-        import subprocess
-        cmd = str(p) + ' --version'
-
-        process = subprocess.run(cmd,
-                                 check=True,
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE,
-                                 shell=True,
-                                 universal_newlines=True)
-        self.assertTrue(process.stdout.startswith('Python 3.'))
 
 
 if __name__ == "__main__":

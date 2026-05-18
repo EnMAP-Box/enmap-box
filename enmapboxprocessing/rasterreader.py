@@ -383,10 +383,11 @@ class RasterReader(object):
             maskArray.append(m)
         return maskArray
 
-    def pixelByPoint(self, point: Union[QgsPointXY, SpatialPoint]) -> QPoint:
+    def pixelByPoint(self, point: Union[QgsPointXY, SpatialPoint]) -> Optional[QPoint]:
         if isinstance(point, QgsPointXY):
             point = SpatialPoint(self.crs(), point)
-        return point.toPixelPosition(self.layer)
+        pixel = point.toPixelPosition(self.layer)
+        return pixel
 
     def pixelExtent(self, pixel: QPoint) -> QgsRectangle:
         xoff = self.extent().xMinimum()

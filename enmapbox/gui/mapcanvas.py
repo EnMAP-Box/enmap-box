@@ -922,7 +922,8 @@ class MapCanvas(QgsMapCanvas):
             ms = self.mapSettings()
             pointXY = ms.mapToPixel().toMapCoordinates(event.x(), event.y())
             spatialPoint = SpatialPoint(ms.destinationCrs(), pointXY)
-            self.setCrosshairPosition(spatialPoint)
+            self.sigCrosshairPositionChanged[object].emit(spatialPoint)
+            # self.setCrosshairPosition(spatialPoint)
 
     def setCrosshairPosition(self, spatialPoint: SpatialPoint, emitSignal: bool = True):
         """

@@ -40,7 +40,6 @@ from typing import Any, Dict, Iterator, List, Match, Optional, Tuple
 
 from enmapbox import REQUIREMENTS_CSV
 from enmapbox.enmapboxsettings import EnMAPBoxSettings
-from enmapbox.qgispluginsupport.qps.utils import qgisAppQgisInterface
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import pyqtSignal, QAbstractTableModel, QModelIndex, QProcess, QSortFilterProxyModel, Qt, QUrl
 from qgis.PyQt.QtGui import QColor, QContextMenuEvent, QDesktopServices
@@ -337,32 +336,6 @@ def localPipExecutable() -> Optional[Path]:
     return _LOCAL_PIPEXE
 
 
-def localPythonExecutable() -> Optional[Path]:
-    """
-    Searches for the local python executable
-    :return:
-    """
-    candidates = [Path(sys.executable)]
-    pythonhome = os.environ.get('PYTHONHOME', None)
-    if pythonhome:
-        pythonhome = Path(pythonhome)
-        ext = ''
-        if 'windows' in platform.uname().system.lower():
-            ext = '.exe'
-        for n in ['python3', 'python']:
-            candidates.extend([
-                pythonhome / f'{n}{ext}',
-                pythonhome / 'bin' / f'{n}{ext}'
-            ])
-
-    for c in candidates:
-        c = Path(c.resolve())
-        if c.is_file() and 'python' in c.name.lower():
-            return c
-
-    return None
-
-
 def decode_bytes(bytes_str, encodings=None):
     if encodings is None:
         encodings = ['utf-8', 'latin-1', 'ascii']
@@ -623,7 +596,7 @@ def requiredPackages(return_tuples: bool = False) -> List[PIPPackage]:
     """
 
     # see https://pip.pypa.io/en/stable/reference/pip_install/#requirements-file-format
-    # for details of the requirements format
+    # for details of the requirement format
 
     file = REQUIREMENTS_CSV
     assert file.is_file(), '{} does not exist'.format(file)
@@ -736,7 +709,8 @@ def installTestData(overwrite_existing: bool = False, ask: bool = True):
     pathLocalZip = os.path.join(os.path.dirname(DIR_EXAMPLEDATA), 'enmapboxexampledata.zip')
     url = QUrl(URL_TESTDATA)
     dialog = QgsFileDownloaderDialog(url, pathLocalZip, 'Download enmapboxexampledata.zip')
-    qgisMainApp = qgisAppQgisInterface()
+
+    # qgisMainApp = qgisAppQgisInterface()
 
     def onCanceled():
         print('Download canceled')

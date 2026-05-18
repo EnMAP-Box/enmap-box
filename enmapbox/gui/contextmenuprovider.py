@@ -1,6 +1,6 @@
 import logging
 from os.path import exists, splitext
-from typing import List, Union
+from typing import List, Union, Optional
 
 import numpy as np
 
@@ -22,10 +22,11 @@ from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibraryplotwidget import
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent, findParent
 from qgis.PyQt.QtCore import Qt, QObject, QPoint, QModelIndex
 from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QComboBox
 from qgis.PyQt.QtWidgets import QMenu, QWidgetAction, QApplication, QAction
 from qgis.core import QgsWkbTypes, QgsPointXY, QgsRasterLayer, QgsMapLayerProxyModel, QgsProject, QgsLayerTree, \
     QgsVectorLayer, QgsLayerTreeNode, QgsMapLayer, QgsLayerTreeLayer, QgsLayerTreeGroup
-from qgis.gui import QgsMapCanvas, QgisInterface, QgsMapLayerComboBox
+from qgis.gui import QgsMapCanvas, QgisInterface
 
 logger = logging.getLogger(__name__)
 
@@ -103,7 +104,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
 
         rasterLayers = [lyr for lyr in mapCanvas.layers() if isinstance(lyr, QgsRasterLayer) and lyr.isValid()]
 
-        def onShowRasterGrid(layer: QgsRasterLayer):
+        def onShowRasterGrid(layer: Optional[QgsRasterLayer]):
             mapCanvas.mCrosshairItem.setVisibility(True)
             mapCanvas.mCrosshairItem.crosshairStyle().setShowPixelBorder(True)
             mapCanvas.mCrosshairItem.setRasterGridLayer(layer)
@@ -121,17 +122,49 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
         mPxGrid.addSeparator()
         wa = QWidgetAction(mPxGrid)
 
-        cb = QgsMapLayerComboBox()
-        cb.setFilters(QgsMapLayerProxyModel.RasterLayer)
-        cb.setAllowEmptyLayer(True)
-        cb.setProject(mapCanvas.project())
+        model = QgsMapLayerProxyModel()
+        model.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        model.setProject(mapCanvas.project())
 
-        for i in range(cb.count()):
-            lyr = cb.layer(i)
-            if lyr == mapCanvas.mCrosshairItem.rasterGridLayer():
-                cb.setCurrentIndex(i)
-                break
-        cb.layerChanged.connect(onShowRasterGrid)
+        cb = QComboBox()
+
+        def onIndexChanged(i: int):
+            lid = cb.itemData(i, role=Qt.UserRole)
+            if isinstance(lid, str):
+                lyr = mapCanvas.project().mapLayer(lid)
+                if isinstance(lyr, QgsRasterLayer):
+                    onShowRasterGrid(lyr)
+            else:
+                onShowRasterGrid(None)
+
+        cb.addItem('')
+
+        clid = mapCanvas.mCrosshairItem.rasterGridLayerId()
+
+        for i in range(model.rowCount()):
+            idx = model.index(i, 0)
+            lid = model.data(idx, role=Qt.UserRole + 1)
+            name = str(model.data(idx, role=Qt.DisplayRole))
+            if lid is None:
+                continue
+            if name is None:
+                name = lid
+            assert isinstance(name, str)
+            icon = model.data(idx, role=Qt.DecorationRole)
+            tt = model.data(idx, role=Qt.ToolTipRole)
+            if lid not in tt:
+                tt += f'<br>ID:<i>{lid}</i>'
+            cb.addItem(name)
+            j = cb.count() - 1
+            cb.setItemData(j, lid, Qt.UserRole)
+            cb.setItemData(j, tt, Qt.ToolTipRole)
+            cb.setItemData(j, lid, Qt.UserRole)
+            cb.setItemData(j, icon, Qt.DecorationRole)
+
+            if lid == clid:
+                cb.setCurrentIndex(j)
+
+        cb.currentIndexChanged.connect(onIndexChanged)
         wa.setDefaultWidget(cb)
         mPxGrid.addAction(wa)
 

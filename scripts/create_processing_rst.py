@@ -362,7 +362,7 @@ def rst_label(algorithm: QgsProcessingAlgorithm) -> str:
     :param algorithm: QgsProcessingAlgorithm
     :return: str
     """
-    return f'alg-{algorithm.id().replace(':', '-')}'
+    return f"alg-{algorithm.id().replace(':', '-')}"
 
 
 def v3(alg: QgsProcessingAlgorithm, section_adds: dict = None, qgis_process_help: dict = None):
