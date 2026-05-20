@@ -1,8 +1,8 @@
+import xml.etree.ElementTree as ET
 from os.path import basename, dirname, join
 from typing import Dict, Any, List, Tuple
 
 from osgeo import gdal
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer, QgsMapLayer
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
@@ -10,6 +10,7 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.gdalutils import GdalUtils
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer, QgsMapLayer
 
 
 @typechecked
@@ -99,6 +100,29 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
 
             # open subdatasets
             ds = gdal.Open(xmlOrZipFilename)
+
+            xml = ds.GetMetadata_Dict('xml:SENTINEL2')
+            xml_string = '<?xml version=' + xml['<?xml version']
+            xml = ET.fromstring(xml_string)
+            baseline = xml.find('.//PROCESSING_BASELINE').text
+
+            BAND_INFOS = {}
+            BOA_ADD_OFFSETS = {e.attrib['band_id']: float(e.text) for e in xml.findall('.//BOA_ADD_OFFSET')}
+            BOA_QUANTIFICATION_VALUE = float(xml.find('.//BOA_QUANTIFICATION_VALUE').text)
+            for e in xml.findall('.//Spectral_Information'):
+                bid = e.attrib['bandId']
+                physicalBand = e.attrib['physicalBand']
+                info = {'bandId': bid,
+                        'physicalBand': physicalBand,
+                        'wl_min': float(e.find('Wavelength/MIN').text),
+                        'wl_max': float(e.find('Wavelength/MAX').text),
+                        'wl_center': float(e.find('Wavelength/CENTRAL').text),
+                        'scale': BOA_QUANTIFICATION_VALUE,
+                        'offset': BOA_ADD_OFFSETS.get(bid, 0)
+                        }
+                BAND_INFOS[physicalBand] = info
+                BAND_INFOS[bid] = info
+
             f10 = ds.GetSubDatasets()[0][0]
             f20 = ds.GetSubDatasets()[1][0]
             f60 = ds.GetSubDatasets()[2][0]
