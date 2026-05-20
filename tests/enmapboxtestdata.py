@@ -442,7 +442,7 @@ class SensorProducts(object):
             S2A_L2A = join(
                 sensorProductsRoot(), 'sentinel2', 'S2A_MSIL2A_20200816T101031_N0214_R022_T32UQD_20200816T130108.SAFE'
             )
-            S2A_L2A_MsiL1CXml = join(S2A_L2A, 'MTD_MSIL2A.xml')
+            S2A_L2A_MsiL2AXml = join(S2A_L2A, 'MTD_MSIL2A.xml')
 
             S2B_L1C = join(
                 sensorProductsRoot(), 'sentinel2', 'S2B_MSIL1C_20211028T102039_N0301_R065_T33UUU_20211028T110445.SAFE'
@@ -452,7 +452,7 @@ class SensorProducts(object):
             S2B_L2A = join(
                 sensorProductsRoot(), 'sentinel2', 'S2B_MSIL2A_20211028T102039_N0301_R065_T33UUU_20211028T121942.SAFE'
             )
-            S2B_L2A_MsiL1CXml = join(S2B_L2A, 'MTD_MSIL2A.xml')
+            S2B_L2A_MsiL2AXml = join(S2B_L2A, 'MTD_MSIL2A.xml')
             S2B_L2A_Zip = S2B_L2A + '.zip'
 
         class Tanager(object):
