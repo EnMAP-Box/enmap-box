@@ -9,7 +9,6 @@ from osgeo import gdal
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import sensorProductsRoot, SensorProducts
-from qps.qgsrasterlayerproperties import QgsRasterLayerSpectralProperties
 
 product_root = sensorProductsRoot()
 skip_tests = not (isinstance(product_root, str) and os.path.isdir(product_root))
@@ -52,6 +51,8 @@ class TestImportSentinel2L2AAlgorithm(TestCase):
         # Use XPath with namespace prefix
         bl1 = xml1.find('.//PROCESSING_BASELINE').text
         bl2 = xml2.find('.//PROCESSING_BASELINE').text
+
+        # ensure that we have the right test data
         self.assertTrue(bl1 < '04.00')
         self.assertTrue(bl2 > '04.00')
 
@@ -68,9 +69,11 @@ class TestImportSentinel2L2AAlgorithm(TestCase):
             xml = ET.fromstring(xml_string)
             baseline = xml.find('.//PROCESSING_BASELINE').text
 
-            BAND_INFOS = {}
+            BAND_INFO_XML = {}
+
             band_offsets = {e.attrib['band_id']: float(e.text) for e in xml.findall('.//BOA_ADD_OFFSET')}
             boa_quantification_value = float(xml.find('.//BOA_QUANTIFICATION_VALUE').text)
+
             for e in xml.findall('.//Spectral_Information'):
                 bid = e.attrib['bandId']
                 physicalBand = e.attrib['physicalBand']
@@ -81,12 +84,13 @@ class TestImportSentinel2L2AAlgorithm(TestCase):
                         'wl_min': float(e.find('Wavelength/MIN').text),
                         'wl_max': float(e.find('Wavelength/MAX').text),
                         'wl_center': float(e.find('Wavelength/CENTRAL').text),
+                        'wlu': e.find('Wavelength/CENTRAL').attrib['unit'],
                         'scale': scale,
                         'offset': offset,
                         }
 
-                BAND_INFOS[bid] = info
-                BAND_INFOS[physicalBand] = info
+                BAND_INFO_XML[bid] = info
+                BAND_INFO_XML[physicalBand] = info
 
             for path_sub, name_sub in ds.GetSubDatasets():
                 if not name_sub.startswith('Bands'):
@@ -118,10 +122,6 @@ class TestImportSentinel2L2AAlgorithm(TestCase):
                 profile_sub = ds_sub.ReadAsArray(px_x, px_y, 1, 1).flatten()
                 profile_box = ds_box.ReadAsArray(px_x, px_y, 1, 1).flatten()
 
-                spectral_settings = QgsRasterLayerSpectralProperties.fromGDALDataset(ds_box)
-                wl_center = spectral_settings.wavelengths()
-                wlu = spectral_settings.wavelengthUnits()
-
                 sub_bands = []
                 box_names = []
                 for b in range(ds_box.RasterCount):
@@ -130,11 +130,15 @@ class TestImportSentinel2L2AAlgorithm(TestCase):
                     prefix = name.split(',')[0]
                     assert prefix in SUB_BANDINFO, f'Band {name} not found in sub-dataset {path_sub}'
 
+                    band_info = BAND_INFO_XML[prefix]
+
                     box_names.append(name)
                     b_sub = SUB_BANDINFO[prefix]
                     sub_bands.append(b_sub)
-                    self.assertTrue(wlu[b] in ['nm', 'nanometers'])
-                    self.assertAlmostEqual(wl_center[b], BAND_INFOS[prefix]['wl_center'], 2)
+
+                    wl_um = float(band.GetMetadataItem('CENTRAL_WAVELENGTH_UM', 'IMAGERY'))
+                    wl_nm = wl_um * 1000
+                    self.assertAlmostEqual(wl_nm, band_info['wl_center'], places=2)
 
                 profile_sub = profile_sub[sub_bands]
                 self.assertTrue(np.array_equal(profile_sub, profile_box))
@@ -193,7 +197,7 @@ class TestImportSentinel2L2AAlgorithm(TestCase):
     def test_zip(self):
         alg = ImportSentinel2L2AAlgorithm()
         parameters = {
-            alg.P_FILE: SensorProducts.Sentinel2.S2B_L2A_Zip,
+            alg.P_FILE: SensorProducts.Sentinel2.S2B_L2A_N0500_ZIP,
             alg.P_OUTPUT_RASTER: self.filename('sentinel2L2A.vrt'),
         }
         self.runalg(alg, parameters)

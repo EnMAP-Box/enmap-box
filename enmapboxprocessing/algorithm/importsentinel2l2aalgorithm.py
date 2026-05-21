@@ -100,8 +100,16 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
 
             # open subdatasets
             ds = gdal.Open(xmlOrZipFilename)
-
+            if not isinstance(ds, gdal.Dataset):
+                message = f'unable to open {xmlOrZipFilename}'
+                feedback.reportError(message, True)
+                raise QgsProcessingException(message)
             xml = ds.GetMetadata_Dict('xml:SENTINEL2')
+            if len(xml) == 0:
+                message = f'not a valid Sentinel-2 L2A product: {xmlOrZipFilename}'
+                feedback.reportError(message, True)
+                raise QgsProcessingException(message)
+
             xml_string = '<?xml version=' + xml['<?xml version']
             xml = ET.fromstring(xml_string)
             baseline = xml.find('.//PROCESSING_BASELINE').text
@@ -136,26 +144,28 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
                 for i in range(ds.RasterCount):
                     bandNo = i + 1
                     rb: gdal.Band = ds.GetRasterBand(bandNo)
-                    key = rb.GetDescription().split(',')[0]
-                    info[key] = (f, bandNo, res)
+                    bandkey = rb.GetDescription().split(',')[0]
+                    info[bandkey] = (f, bandNo, res)
                     info2[res] = (ds.RasterXSize, ds.RasterYSize)
 
             # find selected bands
             filenames = list()
             bandNumbers = list()
+            bandKeys = list()
             pixelSizes = list()
             bandNames = list()
             wavelength = list()
             for i in bandListIndices:
                 name = self.O_BAND_LIST[i].split('[')[0]
-                key = name.split(',')[0]
-                f, bandNo, res = info[key]
+                bandKey = name.split(',')[0]
+                bandKeys.append(bandKey)
+                bandInfo = BAND_INFOS[bandKey]
+                f, bandNo, res = info[bandKey]
                 pixelSizes.append(res)
                 filenames.append(f)
                 bandNumbers.append([bandNo])
                 bandNames.append(name)
-                wl = name.split('(')[1].split(' ')[0]
-                wavelength.append(wl)
+                wavelength.append(str(bandInfo['wl_center']))
 
             # create band stack
             minPixelSize = min(pixelSizes)
@@ -174,9 +184,17 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
             ds.SetMetadataItem('wavelength', '{' + ', '.join(wavelength[:ds.RasterCount]) + '}', 'ENVI')
             ds.SetMetadataItem('wavelength_units', 'nanometers', 'ENVI')
             for bandNo, name in enumerate(bandNames, 1):
+                bandKey = bandKeys[bandNo - 1]
                 rb: gdal.Band = ds.GetRasterBand(bandNo)
                 rb.SetDescription(name)
-                rb.SetScale(0.0001)
+                wl_nm = BAND_INFOS[bandKey]['wl_center']
+                wl_um = wl_nm / 1000
+                rb.SetMetadataItem('CENTRAL_WAVELENGTH_UM', str(wl_um), 'IMAGERY')
+                scale = BAND_INFOS[bandKey]['scale']
+                # rb.SetScale(0.0001)
+                rb.SetScale(1 / scale)
+                offset = BAND_INFOS[bandKey]['offset']
+                rb.SetOffset(offset / scale)
             del ds
 
             # setup default renderer
