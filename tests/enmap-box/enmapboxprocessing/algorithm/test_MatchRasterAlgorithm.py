@@ -1,5 +1,8 @@
+from os.path import basename
+
 from enmapboxprocessing.algorithm.matchrasteralgorithm import MatchRasterAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
+from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import enmap_potsdam, hires_potsdom
 
 
@@ -37,3 +40,20 @@ class TestMatchRasterAlgorithm(TestCase):
             alg.P_OUTPUT_POINTS: self.filename('dataset.geojson')
         }
         self.runalg(alg, parameters)
+
+        d = Utils.jsonLoad(parameters[alg.P_OUTPUT_POINTS])
+        self.assertEqual(len(d['features']), 2)
+        p = d['features'][0]['properties']
+        p['match-source'] = basename(p['match-source'])
+        gold = {
+            'date': '2027-01-01', 'fid': 32, 'level_1': 'vegetation', 'level_2': 'low vegetation', 'match-pixel-x': 286,
+            'match-pixel-y': 171, 'match-source': 'enmap_potsdam.tif', 'match-temp-offet': -365
+        }
+        self.assertDictEqual(gold, p)
+        p = d['features'][1]['properties']
+        p['match-source'] = basename(p['match-source'])
+        gold = {
+            'fid': 73, 'level_1': 'vegetation', 'level_2': 'tree', 'date': '2027-01-01',
+            'match-source': 'aerial_potsdam.tif', 'match-pixel-x': 938, 'match-pixel-y': 5101, 'match-temp-offet': 0
+        }
+        self.assertEqual(gold, p)
