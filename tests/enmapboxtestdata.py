@@ -273,23 +273,26 @@ netCDF_timeseries_days = join(_root, _subdir, 'netcdf', 'Unevenly_spaced_time_se
 
 del _subdir, _root, _pklversion
 
-
 # external products
+_sensor_products_root = None
+
+
 def sensorProductsRoot() -> Optional[str]:
     # - let's have some developer-dependent default locations
-    root = None
-    try:
-        root = {
-            'janzandr@PC-25-0201': r'd:\data\sensors'
-        }.get(os.getlogin() + '@' + platform.node())
-    except OSError as ex:
-        warnings.warn(f'Exception raised in sensorProductsRoot():\n{ex}')
-
-    # - check environment variable
-    if root is None:
+    global _sensor_products_root
+    if _sensor_products_root is None:
         root = os.environ.get('ENMAPBOX_SENSOR_PRODUCT_ROOT')
 
-    return root
+        if root is None:
+            try:
+                root = {
+                    'janzandr@PC-25-0201': r'd:\data\sensors'
+                }.get(os.getlogin() + '@' + platform.node())
+            except OSError as ex:
+                warnings.warn(f'Exception raised in sensorProductsRoot():\n{ex}')
+        if root and os.path.isdir(root):
+            _sensor_products_root = root
+    return _sensor_products_root
 
 
 def speclibProductsRoot() -> Optional[str]:
@@ -442,18 +445,36 @@ class SensorProducts(object):
             S2A_L2A = join(
                 sensorProductsRoot(), 'sentinel2', 'S2A_MSIL2A_20200816T101031_N0214_R022_T32UQD_20200816T130108.SAFE'
             )
-            S2A_L2A_MsiL1CXml = join(S2A_L2A, 'MTD_MSIL2A.xml')
+            S2A_L2A_MsiL2AXml = join(S2A_L2A, 'MTD_MSIL2A.xml')
 
+            S2B_MSIL2A = join(
+                sensorProductsRoot(), 'sentinel2', 'S2B_MSIL2A_20250702T102559_N0511_R108_T32UNC_20250702T124602'
+            )
+
+            S2B_MSIL2A_MsiL2AXml = join(S2B_MSIL2A, 'MTD_MSIL2A.xml')
+            S2B_MSIL2A_Zip = join(
+                sensorProductsRoot(), 'sentinel2', 'raw',
+                'S2B_MSIL2A_20211028T102039_N0301_R065_T33UUU_20211028T110445.SAFE.zip'
+            )
             S2B_L1C = join(
                 sensorProductsRoot(), 'sentinel2', 'S2B_MSIL1C_20211028T102039_N0301_R065_T33UUU_20211028T110445.SAFE'
             )
             S2B_L1C_MsiL1CXml = join(S2B_L1C, 'MTD_MSIL1C.xml')
 
             S2B_L2A = join(
-                sensorProductsRoot(), 'sentinel2', 'S2B_MSIL2A_20211028T102039_N0301_R065_T33UUU_20211028T121942.SAFE'
+                sensorProductsRoot(), 'sentinel2', 'S2B_MSIL2A_20250702T102559_N0511_R108_T32UNC_20250702T124602'
             )
-            S2B_L2A_MsiL1CXml = join(S2B_L2A, 'MTD_MSIL2A.xml')
+            S2B_L2A_MsiL2AXml = join(S2B_L2A, 'MTD_MSIL2A.xml')
             S2B_L2A_Zip = S2B_L2A + '.zip'
+
+            S2B_L2A_N0214_XML = join(
+                sensorProductsRoot(), 'sentinel2', 'S2A_MSIL2A_20200816T101031_N0214_R022_T32UQD_20200816T130108.SAFE',
+                'MTD_MSIL2A.xml'
+            )
+            S2B_L2A_N0500_ZIP = join(
+                sensorProductsRoot(), 'sentinel2',
+                'S2A_MSIL2A_20200816T101031_N0500_R022_T32UQD_20230422T120802.SAFE.zip'
+            )
 
         class Tanager(object):
             basic_radiance_h5 = join(sensorProductsRoot(), 'tanager', '20250224_145149_32_4001_basic_radiance.h5')
