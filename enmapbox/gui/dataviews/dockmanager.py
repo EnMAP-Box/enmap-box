@@ -1745,7 +1745,16 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         from enmapboxprocessing.algorithm.predictregressionalgorithm import PredictRegressionAlgorithm
         from enmapboxprocessing.algorithm.transformrasteralgorithm import TransformRasterAlgorithm
 
+        # add apply model shortcuts
+        from enmapbox.gui.enmapboxgui import EnMAPBox
+        enmapBox = self.enmapboxInstance()
+
         menu.addSeparator()
+
+        submenu = menu.addMenu('Show spectral profile')
+        if isinstance(enmapBox, EnMAPBox):
+            enmapBox.showSpectralProfiles([lyr])
+
         # add application shortcuts
         submenu = menu.addMenu(QIcon(':/images/themes/default/styleicons/color.svg'), 'Statistics and Visualization')
 
@@ -1845,10 +1854,6 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
             alg.P_RASTER: lyr
         }
         action.triggered.connect(self.onRunProcessingAlgorithmClicked)
-
-        # add apply model shortcuts
-        from enmapbox.gui.enmapboxgui import EnMAPBox
-        enmapBox = self.enmapboxInstance()
 
         classifiers = list()
         regressors = list()

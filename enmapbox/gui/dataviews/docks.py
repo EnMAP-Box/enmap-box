@@ -853,11 +853,11 @@ class SpectralLibraryDock(Dock):
             for pfield in profile_fields(speclib):
                 slw.createProfileVisualization(speclib, pfield)
 
-    def createDefaultSpeclib(self) -> QgsVectorLayer:
+    def createDefaultSpeclib(self, profile_fields: List[str] = ['profiles']) -> QgsVectorLayer:
         """
         Creates an in-memory spectral library whose layer name is linked to the dock's name
         """
-        sl = SpectralLibraryUtils.createSpectralLibrary(['profiles'])
+        sl = SpectralLibraryUtils.createSpectralLibrary(profile_fields=profile_fields)
         sl.setName(f'{self.title()}')
         with edit(sl):
             sl.addAttribute(QgsField('name', QMetaType.QString))
@@ -914,7 +914,7 @@ class SpectralLibraryDock(Dock):
 
     def populateContextMenu(self, menu: QMenu):
         """
-        Returns the MapDock context menu
+        Returns the Spectral Library Dock context menu
         :return: QMenu
         """
         super(SpectralLibraryDock, self).populateContextMenu(menu)
