@@ -1172,7 +1172,8 @@ class DockManagerTreeModel(QgsLayerTreeModel):
 
                     if isinstance(node, CheckableLayerTreeNode):
                         flags = flags | Qt.ItemIsUserCheckable
-
+                    if isinstance(node, SpeclibProfileVisualizationGroupNode):
+                        flags = flags | Qt.ItemIsEditable
                 if column == 1:
                     pass
                     # mapCanvas Layer Tree Nodes
@@ -1426,7 +1427,15 @@ class DockManagerTreeModel(QgsLayerTreeModel):
             if role == Qt.EditRole and len(value) > 0:
                 node.dock.setTitle(value)
                 result = True
-
+        if isinstance(node, SpeclibProfileVisualizationGroupNode):
+            if role == Qt.EditRole:
+                vis: ProfileVisualizationGroup = node.vis()
+                if isinstance(value, str) and len(value.strip()) > 0:
+                    vis.mAutoName = False
+                    vis.setText(value)
+                else:
+                    vis.mAutoName = True
+            s = ""
         if isinstance(node, CheckableLayerTreeNode) and role == Qt.CheckStateRole:
             node.setCheckState(Qt.Unchecked if value in [False, 0, Qt.Unchecked] else Qt.Checked)
             return True
@@ -1723,13 +1732,6 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         action.triggered.connect(self.onRunProcessingAlgorithmClicked)
         menu.addSeparator()
 
-        action = menu.addAction('Open Attribute Table')
-        action.setToolTip('Opens the layer attribute table')
-        action.triggered.connect(lambda *args, _lyr=lyr: self.openAttributeTable(_lyr))
-        action = menu.addAction('Open Spectral Library Viewer')
-        action.setToolTip('Opens the vector layer in a spectral library view')
-        action.triggered.connect(lambda *args, _lyr=lyr: self.openSpectralLibraryView(_lyr))
-
     def addRasterLayerMenuItems(self, node: QgsLayerTreeLayer, menu: QMenu):
         """
         Adds QgsRasterLayer specific menu items
@@ -1752,8 +1754,20 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         menu.addSeparator()
 
         submenu = menu.addMenu('Show spectral profile')
+
         if isinstance(enmapBox, EnMAPBox):
-            enmapBox.showSpectralProfiles([lyr])
+
+            def showInNewDock(_lyr):
+                dock = enmapBox.createSpectralLibraryDock()
+                enmapBox.showSpectralProfiles(_lyr, dock=dock)
+
+            action = submenu.addAction('In new profile view')
+            action.triggered.connect(lambda *args, _lyr=lyr: showInNewDock(_lyr))
+
+            for dock in enmapBox.docks(SpectralLibraryDock):
+                action = submenu.addAction(f'In view "{dock.title()}"')
+                action.triggered.connect(
+                    lambda *args, _dock=dock, _lyr=lyr: enmapBox.showSpectralProfiles(_lyr, dock=_dock))
 
         # add application shortcuts
         submenu = menu.addMenu(QIcon(':/images/themes/default/styleicons/color.svg'), 'Statistics and Visualization')
@@ -2230,9 +2244,8 @@ class DockPanelUI(QgsDockWidget):
         assert self.mDockManagerTreeModel == m
         assert isinstance(m, QgsLayerTreeModel)
 
-        self.mMenuProvider: DockManagerLayerTreeModelMenuProvider = DockManagerLayerTreeModelMenuProvider(
-            self.dockTreeView)
-        self.dockTreeView.setMenuProvider(self.mMenuProvider)
+        # self.mMenuProvider = self.dockTreeView.menuProvider()
+        # self.dockTreeView.setMenuProvider(self.mMenuProvider)
 
     def dockManagerTreeModel(self) -> DockManagerTreeModel:
         return self.dockTreeView.layerTreeModel()

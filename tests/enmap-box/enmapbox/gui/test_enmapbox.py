@@ -60,7 +60,7 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         lyr2 = TestObjects.createRasterLayer(name='Layer2', nb=10, nl=20, ns=15)
         pt = SpatialPoint.fromMapLayerCenter(lyr2)
 
-        emb = EnMAPBox(load_core_apps=False, load_other_apps=False)
+        emb = EnMAPBox(load_core_apps=True, load_other_apps=False)
 
         dock = emb.createMapDock(name='MyMap')
         dock.addLayers([lyr1, lyr2])

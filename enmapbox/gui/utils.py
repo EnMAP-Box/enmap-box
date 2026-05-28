@@ -23,8 +23,11 @@ import re
 from pathlib import Path
 from typing import Optional
 
+from enmapbox.qgispluginsupport.qps.utils import loadUi
 from qgis.PyQt.QtGui import QColor
 from qgis.core import Qgis
+
+loadUi = loadUi
 
 QGIS_DATATYPE_INFO = {
     Qgis.UnknownDataType: ('UnknownDataType', 'Unknown or unspecified type'),

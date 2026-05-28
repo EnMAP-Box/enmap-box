@@ -798,6 +798,8 @@ class SpectralLibraryDock(Dock):
     A Dock to show SpectralProfiles
     """
 
+    DEFAULT_PROFILE_FIELD = 'profiles'
+
     # sigLoadFromMapRequest = pyqtSignal()
 
     def __init__(self, *args,
@@ -864,7 +866,9 @@ class SpectralLibraryDock(Dock):
         self.speclibWidget().project().addMapLayer(sl)
         # self.dataSourceManager().addDataSources([sl])
         self.mDefaultSpeclibId = sl.id()
-        self.speclibWidget().createProfileVisualization(sl, 'profiles')
+
+        # for n in profile_fields:
+        #    self.speclibWidget().createProfileVisualization(sl, n)
 
         def updateName():
             """Updates the name of the dock or default layer if the other has changed its name"""
