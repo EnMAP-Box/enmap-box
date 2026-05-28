@@ -17,22 +17,26 @@ class MatchRasterAlgorithm(EnMAPProcessingAlgorithm):
     P_POI, _POI = 'poi', 'Points of interest'
     P_DATE_FIELD, _DATE_FIELD = 'dateField', 'Date field'
     P_MAXIMUM_TEMPORAL_OFFSET, _MAXIMUM_TEMPORAL_OFFSET = 'maximumTemporalOffset', 'Maximum temporal offset (days)'
+    P_EXTRACT_PROFILE, _EXTRACT_PROFILE = 'extractProfile', 'Extract pixel profiles'
     P_OUTPUT_POINTS, _OUTPUT_POINTS = 'outputPoints', 'Output point layer'
 
     def displayName(self) -> str:
         return 'Match raster timeseries with points of interest'
 
     def shortDescription(self) -> str:
-        return 'Creates a new point layer with the same attributes of the input layer and the ' \
-               'raster values corresponding to the pixels covered by point location, ' \
-               'and temporally closest to the target date.'
+        return ('Creates a new point layer containing the attributes of the input layer together with raster matching '
+                'information for the pixel covered by each point and temporally closest to the target date. The output '
+                'includes the raster source (match-source), pixel coordinates (match-px, match-py), the extracted '
+                'pixel profile (match-profile), and the temporal offset to the target date (match-dt).')
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
             (self._TIMESERIES, 'A time series to sample data from.'),
             (self._POI, 'A vector point layer defining the locations to match and sample.'),
+            (self._DATE_FIELD, 'Field with target date.'),
             (self._MAXIMUM_TEMPORAL_OFFSET, 'Maximum allowed gap in days, '
                                             'between target date and image acquisition date'),
+            (self._EXTRACT_PROFILE, 'Whether to extract pixel profiles.'),
             (self._OUTPUT_POINTS, self.VectorFileDestination)
         ]
 
@@ -43,7 +47,8 @@ class MatchRasterAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFile(self.P_TIMESERIES, self._TIMESERIES)
         self.addParameterVectorLayer(self.P_POI, self._POI)
         self.addParameterField(self.P_DATE_FIELD, self._DATE_FIELD, None, self.P_POI)
-        self.addParameterInt(self.P_MAXIMUM_TEMPORAL_OFFSET, self._MAXIMUM_TEMPORAL_OFFSET, 0, True, 0)
+        self.addParameterInt(self.P_MAXIMUM_TEMPORAL_OFFSET, self._MAXIMUM_TEMPORAL_OFFSET, None, True, 0)
+        self.addParameterBoolean(self.P_EXTRACT_PROFILE, self._EXTRACT_PROFILE, False, True)
         self.addParameterVectorDestination(self.P_OUTPUT_POINTS, self._OUTPUT_POINTS)
 
     def processAlgorithm(
@@ -54,6 +59,7 @@ class MatchRasterAlgorithm(EnMAPProcessingAlgorithm):
         dateField = self.parameterAsField(parameters, self.P_DATE_FIELD, context)
         dateFieldIndex = poi.fields().indexFromName(dateField)
         maxTempOffset = self.parameterAsInt(parameters, self.P_MAXIMUM_TEMPORAL_OFFSET, context)
+        extractProfiles = self.parameterAsBoolean(parameters, self.P_EXTRACT_PROFILE, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_POINTS, context)
 
         with open(filename + '.log', 'w') as logfile:
@@ -62,8 +68,8 @@ class MatchRasterAlgorithm(EnMAPProcessingAlgorithm):
 
             pointInfos = list()
             geometries = list()
-            dateFirst = QDate(9999, 0, 0)
-            dateLast = QDate(0, 0, 0)
+            dateFirst = QDate(9999, 1, 1)
+            dateLast = QDate(0, 1, 1)
 
             for feature in poi.getFeatures():
                 point = feature.geometry().asPoint()
@@ -95,10 +101,11 @@ class MatchRasterAlgorithm(EnMAPProcessingAlgorithm):
                 extent = SpatialExtent.fromLayer(rasterReader.layer).toCrs(poi.crs())
 
                 # filter by dates
-                if date.addDays(maxTempOffset) < dateFirst:
-                    continue
-                if date.addDays(-1 * maxTempOffset) > dateLast:
-                    continue
+                if maxTempOffset is not None:
+                    if date.addDays(maxTempOffset) < dateFirst:
+                        continue
+                    if date.addDays(-1 * maxTempOffset) > dateLast:
+                        continue
 
                 # filter by extent
                 if not extent.intersects(poi.extent()):
@@ -140,18 +147,18 @@ class MatchRasterAlgorithm(EnMAPProcessingAlgorithm):
                     pointInRasterCrs = SpatialPoint(poi.crs(), point).toCrs(rasterReader.crs())
                     pixel = rasterReader.pixelByPoint(pointInRasterCrs)
                     attributesDict['match-source'] = rasterReader.source()
-                    attributesDict['match-pixel-x'] = pixel.x()
-                    attributesDict['match-pixel-y'] = pixel.y()
-                    attributesDict['match-temp-offet'] = targetDate.daysTo(date)
+                    attributesDict['match-px'] = pixel.x()
+                    attributesDict['match-py'] = pixel.y()
+                    attributesDict['match-dt'] = targetDate.daysTo(date)
                     data.append(attributesDict)
                     found = True
                     break
 
                 if not found:
                     attributesDict['match-source'] = ''
-                    attributesDict['match-pixel-x'] = -1
-                    attributesDict['match-pixel-y'] = -1
-                    attributesDict['match-temp-offet'] = -1
+                    attributesDict['match-px'] = -1
+                    attributesDict['match-py'] = -1
+                    attributesDict['match-dt'] = -1
                     data.append(attributesDict)
                     continue
 
