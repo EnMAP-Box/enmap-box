@@ -84,12 +84,12 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         settings = w.plotControl().settingsMap()
 
         vis = settings['visualizations']
-        self.assertEqual(len(vis), 2)
+        self.assertEqual(2, len(vis))
 
         expected_settings = [
-            {'layer_id': sl.id(), 'field_name': 'profiles1',
+            {'layer_id': sl.id(), 'field_name': 'profiles',
              'label_expression': f"'{lyr1.name()}'"},
-            {'layer_id': sl.id(), 'field_name': 'profiles2',
+            {'layer_id': sl.id(), 'field_name': 'profiles1',
              'label_expression': f"'{lyr2.name()}'"}
         ]
 
