@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## Version 3.17.7 (2026-05-29)
+
+* added short-cuts to visualize raster layer profiles in spectral
+  views ([#1534](https://github.com/EnMAP-Box/enmap-box/issues/1534))
+* fixed text color in spectral profile source panel
+
 ## Version 3.17 (2025-11-09)
 
 _This release was tested under QGIS 3.40 (LTR) and 3.44 (latest release)._
