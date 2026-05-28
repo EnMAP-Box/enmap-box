@@ -4,7 +4,7 @@ from enmapboxprocessing.algorithm.matchrasteralgorithm import MatchRasterAlgorit
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import enmap_potsdam, hires_potsdom
-
+import numpy as np
 
 class TestMatchRasterAlgorithm(TestCase):
 
@@ -36,6 +36,7 @@ class TestMatchRasterAlgorithm(TestCase):
             alg.P_TIMESERIES: timeseries,
             alg.P_POI: poi,
             alg.P_DATE_FIELD: 'date',
+            alg.P_EXTRACT_PROFILE: True,
             alg.P_OUTPUT_POINTS: self.filename('dataset.geojson')
         }
         self.runalg(alg, parameters)
@@ -44,6 +45,10 @@ class TestMatchRasterAlgorithm(TestCase):
         self.assertEqual(len(d['features']), 2)
         p = d['features'][0]['properties']
         p['match-source'] = basename(p['match-source'])
+        profile = p.pop('match-profile')
+        self.assertEqual(round(profile['y'][0], 5), 0.0125)
+        self.assertEqual(profile['x'][0], 418.24)
+
         gold = {
             'date': '2027-01-01', 'fid': 32, 'level_1': 'vegetation', 'level_2': 'low vegetation',
             'match-px': 286, 'match-py': 171, 'match-source': 'enmap_potsdam.tif', 'match-dt': -365
@@ -51,6 +56,7 @@ class TestMatchRasterAlgorithm(TestCase):
         self.assertDictEqual(gold, p)
         p = d['features'][1]['properties']
         p['match-source'] = basename(p['match-source'])
+        profile = p.pop('match-profile')
         gold = {
             'fid': 73, 'level_1': 'vegetation', 'level_2': 'tree', 'date': '2027-01-01',
             'match-source': 'aerial_potsdam.tif', 'match-px': 938, 'match-py': 5101, 'match-dt': 0
@@ -85,7 +91,7 @@ class TestMatchRasterAlgorithm(TestCase):
             alg.P_TIMESERIES: timeseries,
             alg.P_POI: poi,
             alg.P_DATE_FIELD: 'date',
-            alg.P_MAXIMUM_TEMPORAL_OFFSET: 10,
+            alg.P_MAXIMUM_TEMPORAL_OFFSET: 0,
             alg.P_OUTPUT_POINTS: self.filename('dataset.geojson')
         }
         self.runalg(alg, parameters)
@@ -94,6 +100,7 @@ class TestMatchRasterAlgorithm(TestCase):
         self.assertEqual(len(d['features']), 2)
         p = d['features'][0]['properties']
         p['match-source'] = basename(p['match-source'])
+        p.pop('match-profile')
         gold = {
             'date': '2027-01-01', 'fid': 32, 'level_1': 'vegetation', 'level_2': 'low vegetation',
             'match-px': -1, 'match-py': -1, 'match-source': '', 'match-dt': -1
@@ -101,6 +108,7 @@ class TestMatchRasterAlgorithm(TestCase):
         self.assertDictEqual(gold, p)
         p = d['features'][1]['properties']
         p['match-source'] = basename(p['match-source'])
+        p.pop('match-profile')
         gold = {
             'fid': 73, 'level_1': 'vegetation', 'level_2': 'tree', 'date': '2027-01-01',
             'match-source': 'aerial_potsdam.tif', 'match-px': 938, 'match-py': 5101, 'match-dt': 0

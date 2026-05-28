@@ -1,5 +1,6 @@
 from typing import Dict, Any, List, Tuple
 
+import numpy as np
 from qgis.PyQt.QtCore import QDate
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
@@ -150,8 +151,29 @@ class MatchRasterAlgorithm(EnMAPProcessingAlgorithm):
                     attributesDict['match-px'] = pixel.x()
                     attributesDict['match-py'] = pixel.y()
                     attributesDict['match-dt'] = targetDate.daysTo(date)
-                    data.append(attributesDict)
-                    found = True
+
+                    if extractProfiles:
+
+                        array = np.array(rasterReader.arrayFromPixelOffsetAndSize(pixel.x(), pixel.y(), 1, 1), float)
+                        mask = np.array(rasterReader.maskArray(array))
+                        array[~mask] = np.nan
+                        y = array.flatten().tolist()
+
+                        if rasterReader.isSpectralRasterLayer(False):
+                            x = [rasterReader.wavelength(bandNo) for bandNo in rasterReader.bandNumbers()]
+                            attributesDict['match-profile'] = {
+                                'y': y,
+                                'x': x,
+                                'xUnit': 'Nanometers'
+                            }
+                        else:
+                            attributesDict['match-profile'] = {
+                                'y': y
+                            }
+
+                        data.append(attributesDict)
+                        found = True
+
                     break
 
                 if not found:
@@ -159,6 +181,9 @@ class MatchRasterAlgorithm(EnMAPProcessingAlgorithm):
                     attributesDict['match-px'] = -1
                     attributesDict['match-py'] = -1
                     attributesDict['match-dt'] = -1
+                    attributesDict['match-profile'] = {
+                        "y": [],
+                    }
                     data.append(attributesDict)
                     continue
 
