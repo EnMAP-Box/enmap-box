@@ -58,16 +58,18 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
 
         lyr1 = TestObjects.createRasterLayer(name='Layer1', nb=20, nl=10, ns=10)
         lyr2 = TestObjects.createRasterLayer(name='Layer2', nb=10, nl=20, ns=15)
+        lyr3 = TestObjects.createRasterLayer(name='Layer3', nb=3, nl=4, ns=3)
         pt = SpatialPoint.fromMapLayerCenter(lyr2)
 
         emb = EnMAPBox(load_core_apps=True, load_other_apps=False)
 
         dock = emb.createMapDock(name='MyMap')
-        dock.addLayers([lyr1, lyr2])
+        dock.addLayers([lyr1, lyr2, lyr3])
         emb.setCurrentLocation(pt)
 
         emb.showSpectralProfiles(lyr1)
-        emb.showSpectralProfiles(lyr2, label_expression=f'\'{lyr2.name()}\'')
+        emb.showSpectralProfiles(lyr2)
+        emb.showSpectralProfiles(lyr3, label_expression=f'\'{lyr3.name()}\'')
 
         sl_dock = emb.docks(SpectralLibraryDock)
         self.assertEqual(len(sl_dock), 1)
@@ -84,13 +86,18 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         settings = w.plotControl().settingsMap()
 
         vis = settings['visualizations']
-        self.assertEqual(2, len(vis))
+        self.assertEqual(3, len(vis))
 
         expected_settings = [
             {'layer_id': sl.id(), 'field_name': 'profiles',
-             'label_expression': '"name"'},
+             'label_expression': '"profiles_name"'
+             },
             {'layer_id': sl.id(), 'field_name': 'profiles1',
-             'label_expression': f'\'{lyr2.name()}\''}
+             'label_expression': '"profiles1_name"'
+             },
+            {'layer_id': sl.id(), 'field_name': 'profiles2',
+             'label_expression': f'\'{lyr3.name()}\''
+             }
         ]
 
         for i, s in enumerate(expected_settings):

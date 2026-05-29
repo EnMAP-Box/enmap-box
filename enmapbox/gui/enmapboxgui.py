@@ -60,6 +60,7 @@ from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSenti
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
 from processing.gui.ProcessingToolbox import ProcessingToolbox
 from qgis import utils as qgsUtils
+from qgis.PyQt.QtCore import QMetaType
 from qgis.PyQt.QtCore import QUrl
 from qgis.PyQt.QtCore import pyqtSignal, Qt, QObject, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
 from qgis.PyQt.QtGui import QDesktopServices
@@ -70,7 +71,7 @@ from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, Q
     QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
     QProgressBar, QMessageBox
 from qgis.PyQt.QtXml import QDomDocument
-from qgis.core import QgsBrowserModel
+from qgis.core import QgsBrowserModel, QgsField
 from qgis.core import QgsExpressionContextGenerator, QgsExpressionContext, QgsProcessingContext, \
     QgsExpressionContextUtils
 from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
@@ -94,6 +95,7 @@ from .utils import enmapboxUiPath, high_contrast_random_color
 from .widgets.createspeclibdialog import CreateSpectralLibraryDialog
 from ..enmapboxsettings import EnMAPBoxSettings
 from ..qgispluginsupport.qps.processing.algorithmdialog import executeAlgorithm, AlgorithmDialog
+from ..qgispluginsupport.qps.speclib.core import profile_fields
 from ..qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
 from ..qgispluginsupport.qps.speclib.core.spectralprofile import ProfileEncoding
 from ..qgispluginsupport.qps.speclib.gui.spectrallibraryplotmodelitems import ProfileVisualizationGroup
@@ -853,17 +855,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             if node.mSpeclib == sl:
                 fg = node
 
-        has_name_field = False
         if fg is None:
             fg = SpectralFeatureGeneratorNode()
             fg.setSpeclib(sl)
-
-            fn = fg.fieldNode('name')
-            if isinstance(fn, StandardFieldGeneratorNode):
-                has_name_field = True
-                fn.setCheckState(Qt.Checked)
-                fn.setExpression("format('%0 %1,%2', @source_name, @px_x, @px_y)")
-
             sourceBridge.addFeatureGenerator(fg)
         assert isinstance(fg, SpectralFeatureGeneratorNode)
 
@@ -886,17 +880,33 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         if profile_field not in sl.fields().names():
             with edit(sl):
                 SpectralLibraryUtils.addSpectralProfileField(sl, profile_field, encoding=ProfileEncoding.Map)
+
             fg.updateFieldNodes()
 
         assert isinstance(profile_field, str)
 
-        # connect the feature generator node to collect from source into profile_field
-        for n in fg.spectralProfileGeneratorNodes():
-            assert isinstance(n, SpectralProfileGeneratorNode)
-            if n.field().name() == profile_field:
-                n.setProfileSource(source)
-                n.setSampling(ProfileSamplingMode())
-                break
+        # let the feature generator node collect from source into profile_field
+        node = fg.fieldNode(profile_field)
+        assert isinstance(node, SpectralProfileGeneratorNode)
+        node.setProfileSource(source)
+        node.setSampling(ProfileSamplingMode())
+
+        # create a field for the profile name
+        profile_field_name: str = profile_field + '_name'
+        if profile_field_name not in sl.fields().names():
+            with edit(sl):
+                sl.addAttribute(QgsField(profile_field_name, QMetaType.QString))
+            fg.updateFieldNodes()
+
+        src_suffix = profile_fields(sl).count() - 1
+        src_suffix = '' if src_suffix == 0 else str(src_suffix)
+        profile_name_expression = f"format('%0 %1,%2', @source_name{src_suffix}, @px_x{src_suffix}, @px_y{src_suffix})"
+
+        # let the feature generator node create a profile name
+        node = fg.fieldNode(profile_field_name)
+        if isinstance(node, StandardFieldGeneratorNode):
+            node.setExpression(profile_name_expression)
+            node.setCheckState(Qt.Checked)
 
         vis = None
 
@@ -916,8 +926,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         vis.setText(raster_layer.name())
 
         if label_expression is None:
-            if has_name_field:
-                label_expression = '"name"'
+            if profile_field_name in sl.fields().names():
+                label_expression = f'"{profile_field_name}"'
             else:
                 label_expression = f"'{raster_layer.name()}'"
         vis.setLabelExpression(label_expression)
@@ -2255,7 +2265,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                 self.sigRasterSourceAdded[str].emit(dataSource.source())
                 self.sigRasterSourceAdded[RasterDataSource].emit(dataSource)
 
-                self.spectralProfileSourcePanel().addSources(dataSource.asMapLayer())
+                lyr = dataSource.asMapLayer(self.project())
+                if isinstance(lyr, QgsRasterLayer) and lyr.isValid():
+                    profileSource = StandardLayerProfileSource(lyr)
+                    self.spectralProfileSourcePanel().addSources(profileSource)
 
             if isinstance(dataSource, VectorDataSource):
                 self.sigVectorSourceAdded[str].emit(dataSource.source())
