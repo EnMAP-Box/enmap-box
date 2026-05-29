@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        os: [ windows-latest ] # ubuntu-latest, macos-latest,  ]
         mamba_env: [ enmapbox-base ]
         include:
           - os: windows-latest
@@ -87,6 +87,7 @@ jobs:
           qgis --version || true
           gdalinfo --version || true
           python -c "from osgeo.gdal import VersionInfo; print(f\"Python-GDAL: {VersionInfo('')} {VersionInfo()}\")"
+          python -c "import sys; print('Python-Path:');[print(p) for p in sys.path]"
           python -c "from qgis.core import Qgis; print(f\"Python-QGIS: {Qgis.version()} \")"
 
       - name: Setup Repository
