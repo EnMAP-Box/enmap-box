@@ -530,6 +530,9 @@ class Utils(object):
         if isinstance(obj, QDateTime):
             return obj
 
+        if isinstance(obj, QDate):
+            return QDateTime(obj)
+
         if isinstance(obj, int):  # milliseconds since 1970
             return cls.msecToDateTime(obj)
 
