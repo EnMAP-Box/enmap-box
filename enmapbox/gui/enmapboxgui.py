@@ -98,6 +98,7 @@ from ..qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibrary
 from ..qgispluginsupport.qps.speclib.core.spectralprofile import ProfileEncoding
 from ..qgispluginsupport.qps.speclib.gui.spectrallibraryplotmodelitems import ProfileVisualizationGroup
 from ..qgispluginsupport.qps.speclib.gui.spectralprofilecandidates import SpectralProfileCandidates
+from ..qgispluginsupport.qps.speclib.gui.spectralprofilesources import StandardFieldGeneratorNode
 from ..qgispluginsupport.qps.utils import TemporaryGlobalLayerContext
 
 MAX_MISSING_DEPENDENCY_WARNINGS = 3
@@ -852,9 +853,17 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             if node.mSpeclib == sl:
                 fg = node
 
+        has_name_field = False
         if fg is None:
             fg = SpectralFeatureGeneratorNode()
             fg.setSpeclib(sl)
+
+            fn = fg.fieldNode('name')
+            if isinstance(fn, StandardFieldGeneratorNode):
+                has_name_field = True
+                fn.setCheckState(Qt.Checked)
+                fn.setExpression("format('%0 %1,%2', @source_name, @px_x, @px_y)")
+
             sourceBridge.addFeatureGenerator(fg)
         assert isinstance(fg, SpectralFeatureGeneratorNode)
 
@@ -907,8 +916,11 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         vis.setText(raster_layer.name())
 
         if label_expression is None:
-            label_expression = f"'{raster_layer.name()}'"
-            vis.setLabelExpression(label_expression)
+            if has_name_field:
+                label_expression = '"name"'
+            else:
+                label_expression = f"'{raster_layer.name()}'"
+        vis.setLabelExpression(label_expression)
 
         if color_expression is None:
             c = high_contrast_random_color(bg)

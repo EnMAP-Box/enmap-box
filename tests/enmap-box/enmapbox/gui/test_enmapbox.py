@@ -67,7 +67,7 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         emb.setCurrentLocation(pt)
 
         emb.showSpectralProfiles(lyr1)
-        emb.showSpectralProfiles(lyr2)
+        emb.showSpectralProfiles(lyr2, label_expression=f'\'{lyr2.name()}\'')
 
         sl_dock = emb.docks(SpectralLibraryDock)
         self.assertEqual(len(sl_dock), 1)
@@ -88,14 +88,16 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
 
         expected_settings = [
             {'layer_id': sl.id(), 'field_name': 'profiles',
-             'label_expression': f"'{lyr1.name()}'"},
+             'label_expression': '"name"'},
             {'layer_id': sl.id(), 'field_name': 'profiles1',
-             'label_expression': f"'{lyr2.name()}'"}
+             'label_expression': f'\'{lyr2.name()}\''}
         ]
 
         for i, s in enumerate(expected_settings):
             vis_i = vis[i]
             for k in s.keys():
+                if vis_i[k] != s[k]:
+                    s = ""
                 self.assertEqual(vis_i[k], s[k])
 
         self.showGui(emb.ui)
