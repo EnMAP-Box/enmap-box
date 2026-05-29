@@ -12,8 +12,8 @@ from enmapbox.gui.datasources.datasourcesets import DataSourceSet
 from enmapbox.gui.datasources.manager import DataSourceManager, DataSourceManagerTreeView
 from enmapbox.gui.datasources.metadata import RasterBandTreeNode
 from enmapbox.gui.dataviews.dockmanager import DockTreeNode, MapDockTreeNode, DockManagerLayerTreeModelMenuProvider, \
-    DockTreeView, LayerTreeNode
-from enmapbox.gui.dataviews.docks import Dock, MapDock
+    DockTreeView, LayerTreeNode, SpeclibProfileVisualizationGroupNode
+from enmapbox.gui.dataviews.docks import Dock, MapDock, AttributeTableDock, SpectralLibraryDock
 from enmapbox.gui.mapcanvas import MapCanvas, CanvasLink
 from enmapbox.qgispluginsupport.qps.crosshair.crosshair import CrosshairDialog
 from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog
@@ -502,6 +502,8 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
 
         dataView = viewNode.dock
 
+        enmapbox = self.enmapBox()
+
         if dataView.isVisible():
             a = menu.addAction('Hide View')
             a.triggered.connect(lambda: dataView.setVisible(False))
@@ -511,9 +513,10 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
 
         a = menu.addAction('Close View')
         a.triggered.connect(lambda: dataView.close())
+        menu.addSeparator()
 
-        lyr: QgsMapLayer = None
-        canvas: QgsMapCanvas = None
+        lyr: Optional[QgsMapLayer] = None
+        canvas: Optional[QgsMapCanvas] = None
         if isinstance(viewNode, MapDockTreeNode):
             assert isinstance(viewNode.dock, MapDock)
             canvas = viewNode.dock.mCanvas
@@ -536,6 +539,10 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
             action.setToolTip('Remove the layer group')
             action.triggered.connect(
                 lambda *arg, nodes=[node]: view.layerTreeModel().removeNodes(nodes))
+
+        if isinstance(node, SpeclibProfileVisualizationGroupNode):
+            vis = node.vis()
+            lyr = vis.layer()
 
         if type(node) is QgsLayerTreeLayer:
             # get parent dock node -> related map canvas
@@ -579,6 +586,18 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
         # let layer properties always be the last menu item
         if isinstance(lyr, QgsMapLayer):
             menu.addSeparator()
+
+            if isinstance(lyr, QgsVectorLayer):
+                action = menu.addAction('Open Attribute Table')
+                action.setToolTip('Opens the layer attribute table')
+                action.triggered.connect(lambda *args, _lyr=lyr: enmapbox.createDock(AttributeTableDock, layer=_lyr))
+
+                if not isinstance(node, SpeclibProfileVisualizationGroupNode):
+                    action = menu.addAction('Open Spectral Library Viewer')
+                    action.setToolTip('Opens the vector layer in a spectral library view')
+                    action.triggered.connect(
+                        lambda *args, _lyr=lyr: enmapbox.createDock(SpectralLibraryDock, speclib=_lyr))
+
             action = menu.addAction('Layer properties')
             action.setToolTip('Set layer properties')
             action.triggered.connect(lambda *args, _lyr=lyr, c=canvas: self.showLayerProperties(_lyr, c))

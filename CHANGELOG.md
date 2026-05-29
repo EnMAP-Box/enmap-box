@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## Version 3.17.7 (2026-05-29)
+
+* added short-cuts to visualize raster layer profiles in spectral
+  views ([#1534](https://github.com/EnMAP-Box/enmap-box/issues/1534))
+* fixed band statistics dialog ([#1513](https://github.com/EnMAP-Box/enmap-box/issues/1513))
+* tooltips related to map layers show the layer id ([#1505](https://github.com/EnMAP-Box/enmap-box/issues/1505))
+* fixed text color in spectral profile source panel
+* added button to enable/disable the crosshair in all maps ([#1335](https://github.com/EnMAP-Box/enmap-box/issues/1335))
+* fixed Sentinel-2 L2A wavelength ([#1532](https://github.com/EnMAP-Box/enmap-box/issues/1530))
+* update conda environments ([1518](https://github.com/EnMAP-Box/enmap-box/issues/1518))
+
 ## Version 3.17 (2025-11-09)
 
 _This release was tested under QGIS 3.40 (LTR) and 3.44 (latest release)._

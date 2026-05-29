@@ -18,10 +18,16 @@
 ***************************************************************************
 """
 import pathlib
+import random
 import re
+from pathlib import Path
+from typing import Optional
 
+from enmapbox.qgispluginsupport.qps.utils import loadUi
+from qgis.PyQt.QtGui import QColor
 from qgis.core import Qgis
-from ..qgispluginsupport.qps.utils import loadUi
+
+loadUi = loadUi
 
 QGIS_DATATYPE_INFO = {
     Qgis.UnknownDataType: ('UnknownDataType', 'Unknown or unspecified type'),
@@ -42,7 +48,7 @@ QGIS_DATATYPE_INFO = {
 }
 
 
-def dataTypeName(dataType: Qgis.DataType, verbose: bool = False):
+def dataTypeName(dataType: Qgis.DataType, verbose: bool = False) -> str:
     """
     Returns a description for a Qgis.DataType
     """
@@ -56,7 +62,7 @@ def dataTypeName(dataType: Qgis.DataType, verbose: bool = False):
         return 'Unknown'
 
 
-def enmapboxUiPath(name: str) -> pathlib.Path:
+def enmapboxUiPath(name: str) -> Path:
     """
     Translate a base name `name` into the absolute path of an ui-file
     :param name: str
@@ -70,7 +76,7 @@ def enmapboxUiPath(name: str) -> pathlib.Path:
     return path
 
 
-def guessDataProvider(src: str) -> str:
+def guessDataProvider(src: str) -> Optional[str]:
     """
     Get an str and guesses the QgsDataProvider for
     :param str: str
@@ -94,3 +100,29 @@ def guessDataProvider(src: str) -> str:
     elif re.search(r'url=https?.*wfs', src, re.I):
         return 'WFS'
     return None
+
+
+def high_contrast_random_color(c1: QColor) -> QColor:
+    """
+    Generates a random QColor that guarantees high contrast against c1
+    by ensuring opposite brightness (Value) levels.
+    """
+    # 1. Get the Hue, Saturation, and Value of the base color
+    h1, s1, v1, a1 = c1.getHsv()
+
+    # 2. Pick a completely random Hue (0 to 359 degrees)
+    random_hue = random.randint(0, 359)
+
+    # 3. Force a high-contrast Saturation and Value
+    # If c1 is dark, make the random color bright (and vice versa)
+    if v1 > 127:
+        # c1 is light -> Make the new color dark
+        random_value = random.randint(30, 80)
+        random_saturation = random.randint(180, 255)  # Richer colors stand out better on light
+    else:
+        # c1 is dark -> Make the new color bright
+        random_value = random.randint(200, 255)
+        random_saturation = random.randint(50, 150)  # Slightly pastel/vibrant stand out on dark
+
+    # 4. Return the new QColor
+    return QColor.fromHsv(random_hue, random_saturation, random_value)

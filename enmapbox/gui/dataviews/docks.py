@@ -798,6 +798,8 @@ class SpectralLibraryDock(Dock):
     A Dock to show SpectralProfiles
     """
 
+    DEFAULT_PROFILE_FIELD = 'profiles'
+
     # sigLoadFromMapRequest = pyqtSignal()
 
     def __init__(self, *args,
@@ -853,18 +855,20 @@ class SpectralLibraryDock(Dock):
             for pfield in profile_fields(speclib):
                 slw.createProfileVisualization(speclib, pfield)
 
-    def createDefaultSpeclib(self) -> QgsVectorLayer:
+    def createDefaultSpeclib(self, profile_fields: List[str] = ['profiles']) -> QgsVectorLayer:
         """
         Creates an in-memory spectral library whose layer name is linked to the dock's name
         """
-        sl = SpectralLibraryUtils.createSpectralLibrary(['profiles'])
+        sl = SpectralLibraryUtils.createSpectralLibrary(profile_fields=profile_fields)
         sl.setName(f'{self.title()}')
         with edit(sl):
             sl.addAttribute(QgsField('name', QMetaType.QString))
         self.speclibWidget().project().addMapLayer(sl)
         # self.dataSourceManager().addDataSources([sl])
         self.mDefaultSpeclibId = sl.id()
-        self.speclibWidget().createProfileVisualization(sl, 'profiles')
+
+        # for n in profile_fields:
+        #    self.speclibWidget().createProfileVisualization(sl, n)
 
         def updateName():
             """Updates the name of the dock or default layer if the other has changed its name"""
@@ -914,7 +918,7 @@ class SpectralLibraryDock(Dock):
 
     def populateContextMenu(self, menu: QMenu):
         """
-        Returns the MapDock context menu
+        Returns the Spectral Library Dock context menu
         :return: QMenu
         """
         super(SpectralLibraryDock, self).populateContextMenu(menu)
