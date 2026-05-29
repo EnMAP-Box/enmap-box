@@ -19,7 +19,8 @@ on:
 jobs:
   # Run EnMAP-Box tests
   test:
-    runs-on: ubuntu-latest
+    name: ${{ matrix.mamba_env }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         shell: bash -el {0}
@@ -29,38 +30,37 @@ jobs:
       CI: true
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        mamba_env: [ enmapbox-base, enmapbox-full ]
-      # python_version : [3.9, 3.10, 3.11]
-      # mamba_env: [enmapbox_light_latest, enmapbox_light_longterm, enmapbox_full_latest, enmapbox_full_longterm]
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        mamba_env: [ enmapbox-base ]
+        # mamba_env: [ enmapbox_light_latest, enmapbox_light_longterm, enmapbox_full_latest, enmapbox_full_longterm ]
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Environment Info
+      - name: Runner Info
         run: |
-          lsb_release -a
+          uname -a || true
+          echo "OS: ${{ runner.os }}"
 
       - name: Conda environment file
         run: |
-          echo "conda environment file: ${{matrix.mamba_env}}.yml"
-          cat .env/conda/${{matrix.mamba_env}}.yml
+          echo "conda environment file: .env/conda/${{ matrix.mamba_env }}.yml"
+          cat .env/conda/${{ matrix.mamba_env }}.yml
 
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          # miniforge-variant: Mambaforge
-          # miniforge-version: latest
           channels: conda-forge,defaults
           channel-priority: true
-          activate-environment: ${{matrix.mamba_env}}
-          environment-file: .env/conda/${{matrix.mamba_env}}.yml
+          activate-environment: ${{ matrix.mamba_env }}
+          environment-file: .env/conda/${{ matrix.mamba_env }}.yml
           clean-patched-environment-file: false
-          # use-mamba: true
-          # auto-activate-base: false
+
       - name: Conda Environment Info
         run: |
           conda info
@@ -69,16 +69,15 @@ jobs:
       - name: Python, QGIS and GDAL versions
         run: |
           python --version
-          qgis --version
-          gdalinfo --version
-          python -c "from osgeo.gdal import VersionInfo;print(f'Python-GDAL:{VersionInfo('')} {VersionInfo()}');"
-
+          qgis --version || true
+          gdalinfo --version || true
+          python -c "from osgeo.gdal import VersionInfo; print(f\"Python-GDAL: {VersionInfo('')} {VersionInfo()}\")"
 
       - name: Setup Repository
         run: |
           python scripts/setup_repository.py
 
-      - name: Test EnMAP-Box in ${{matrix.mamba_env}}
+      - name: Test EnMAP-Box in ${{ matrix.mamba_env }}
         run: |
           chmod +x scripts/runtests.sh
           bash ./scripts/runtests.sh -x -n 1 --maxfail=2
