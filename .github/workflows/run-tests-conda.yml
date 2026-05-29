@@ -61,11 +61,13 @@ jobs:
           clean-patched-environment-file: false
 
       - name: Conda Environment Info
+        shell: bash -el {0}
         run: |
           conda info
           conda list
 
       - name: Python, QGIS and GDAL versions
+        shell: bash -el {0}
         run: |
           python --version
           qgis --version || true
@@ -75,10 +77,12 @@ jobs:
           python -c "from qgis.core import Qgis; print(f\"Python-QGIS: {Qgis.version()} \")"
 
       - name: Setup Repository
+        shell: bash -el {0}
         run: |
           python scripts/setup_repository.py
 
       - name: Test EnMAP-Box in ${{ matrix.mamba_env }}
+        shell: bash -el {0}
         run: |
           chmod +x scripts/runtests.sh
           bash ./scripts/runtests.sh -x -n 1 --maxfail=2
