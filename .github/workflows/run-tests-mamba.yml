@@ -72,6 +72,7 @@ jobs:
           qgis --version || true
           gdalinfo --version || true
           python -c "from osgeo.gdal import VersionInfo; print(f\"Python-GDAL: {VersionInfo('')} {VersionInfo()}\")"
+          python -c "from qgis.core import Qgis; print(f\"Python-QGIS: {Qgis.version()} \")"
 
       - name: Setup Repository
         run: |
