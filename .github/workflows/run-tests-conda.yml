@@ -77,12 +77,6 @@ jobs:
 
       - name: Python, QGIS and GDAL versions
         run: |
-          if [ -n "${{ matrix.qgis_python_path }}" ]; then
-            export PYTHONPATH="${{ matrix.qgis_python_path }}:$PYTHONPATH"
-          fi
-          if [ -n "${{ matrix.qgis_bin_path }}" ]; then
-            export PATH="${{ matrix.qgis_bin_path }}:$PATH"
-          fi
           python --version
           qgis --version || true
           gdalinfo --version || true
