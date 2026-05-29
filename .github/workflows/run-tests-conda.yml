@@ -34,7 +34,16 @@ jobs:
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
         mamba_env: [ enmapbox-base ]
-        # mamba_env: [ enmapbox_light_latest, enmapbox_light_longterm, enmapbox_full_latest, enmapbox_full_longterm ]
+        include:
+          - os: windows-latest
+            qgis_python_path: $CONDA_PREFIX/Library/python
+            qgis_bin_path: $CONDA_PREFIX/Library/bin
+          - os: ubuntu-latest
+            qgis_python_path: ""
+            qgis_bin_path: ""
+          - os: macos-latest
+            qgis_python_path: ""
+            qgis_bin_path: ""
 
     steps:
       - name: Checkout
@@ -68,6 +77,12 @@ jobs:
 
       - name: Python, QGIS and GDAL versions
         run: |
+          if [ -n "${{ matrix.qgis_python_path }}" ]; then
+            export PYTHONPATH="${{ matrix.qgis_python_path }}:$PYTHONPATH"
+          fi
+          if [ -n "${{ matrix.qgis_bin_path }}" ]; then
+            export PATH="${{ matrix.qgis_bin_path }}:$PATH"
+          fi
           python --version
           qgis --version || true
           gdalinfo --version || true
@@ -76,9 +91,21 @@ jobs:
 
       - name: Setup Repository
         run: |
+          if [ -n "${{ matrix.qgis_python_path }}" ]; then
+            export PYTHONPATH="${{ matrix.qgis_python_path }}:$PYTHONPATH"
+          fi
+          if [ -n "${{ matrix.qgis_bin_path }}" ]; then
+            export PATH="${{ matrix.qgis_bin_path }}:$PATH"
+          fi
           python scripts/setup_repository.py
 
       - name: Test EnMAP-Box in ${{ matrix.mamba_env }}
         run: |
+          if [ -n "${{ matrix.qgis_python_path }}" ]; then
+            export PYTHONPATH="${{ matrix.qgis_python_path }}:$PYTHONPATH"
+          fi
+          if [ -n "${{ matrix.qgis_bin_path }}" ]; then
+            export PATH="${{ matrix.qgis_bin_path }}:$PATH"
+          fi
           chmod +x scripts/runtests.sh
           bash ./scripts/runtests.sh -x -n 1 --maxfail=2
