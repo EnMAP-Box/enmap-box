@@ -36,8 +36,8 @@ jobs:
         mamba_env: [ enmapbox-base ]
         include:
           - os: windows-latest
-            qgis_python_path: $CONDA_PREFIX/Library/python
-            qgis_bin_path: $CONDA_PREFIX/Library/bin
+            qgis_python_path: $CONDA_PREFIX\Library\python
+            qgis_bin_path: $CONDA_PREFIX\Library\bin
           - os: ubuntu-latest
             qgis_python_path: ""
             qgis_bin_path: ""
