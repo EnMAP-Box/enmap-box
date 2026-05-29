@@ -1778,7 +1778,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             # create a standard in-memory library shown in the dock
             if len(slw.sourceLayers()) == 0:
                 sl = dock.createDefaultSpeclib()
-
+                self.dataSourceManager().addDataSources([sl])
             self.dataSourceManager().addDataSources(slw.sourceLayers())
 
             bridge = self.spectralProfileSourcePanel().mBridge
