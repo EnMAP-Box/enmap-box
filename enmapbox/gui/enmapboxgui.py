@@ -35,7 +35,7 @@ from enmapbox.gui.dataviews.docks import SpectralLibraryDock, Dock, AttributeTab
 from enmapbox.qgispluginsupport.qps.cursorlocationvalue import CursorLocationInfoDock
 from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog
 from enmapbox.qgispluginsupport.qps.maptools import QgsMapToolSelectionHandler, MapTools
-from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library, profile_field_list
+from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprofilesources import SpectralProfileSourcePanel, \
     MapCanvasLayerProfileSource, SpectralFeatureGeneratorNode, SpectralProfileBridge, StandardLayerProfileSource, \
@@ -817,8 +817,6 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             if len(docks) == 0:
                 # create a spectral library widget
                 dock = self.createSpectralLibraryDock()
-                sl: QgsVectorLayer = dock.defaultSpeclib()
-                target_field = profile_field_list(sl)[0].name()
             else:
                 dock = docks[0]
 
@@ -831,10 +829,11 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         slw: SpectralLibraryWidget = dock.speclibWidget()
         model = slw.plotModel()
 
-        sl: QgsVectorLayer = dock.defaultSpeclib()
+        sl: Optional[QgsVectorLayer] = dock.defaultSpeclib()
 
         if sl is None:
             sl = dock.createDefaultSpeclib()
+            self.addSources([sl])
 
         assert isinstance(sl, QgsVectorLayer)
 
