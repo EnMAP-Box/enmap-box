@@ -195,6 +195,7 @@ def create_enmapbox_plugin(include_testdata: bool = False,
     MD.mTracker = enmapbox.ISSUE_TRACKER
     MD.mRepository = enmapbox.REPOSITORY
     MD.mQgisMinimumVersion = config['enmapbox:metadata']['qgisMinimumVersion']
+    MD.mQgisMaximumVersion = config['enmapbox:metadata'].get('qgisMaximumVersion', '3.99')
     MD.mEmail = config['enmapbox:metadata']['email']
     MD.mHasProcessingProvider = True
 

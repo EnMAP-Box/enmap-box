@@ -38,7 +38,8 @@ from enmapbox.qgispluginsupport.qps.maptools import QgsMapToolSelectionHandler, 
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprofilesources import SpectralProfileSourcePanel, \
-    MapCanvasLayerProfileSource, SpectralFeatureGeneratorNode, SpectralProfileBridge
+    MapCanvasLayerProfileSource, SpectralFeatureGeneratorNode, SpectralProfileBridge, StandardLayerProfileSource, \
+    ProfileSamplingMode, SpectralProfileGeneratorNode
 from enmapbox.qgispluginsupport.qps.subdatasets import SubDatasetSelectionDialog
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, loadUi, SpatialExtent, file_search
 from enmapbox.typeguard import typechecked
@@ -59,6 +60,7 @@ from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSenti
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
 from processing.gui.ProcessingToolbox import ProcessingToolbox
 from qgis import utils as qgsUtils
+from qgis.PyQt.QtCore import QMetaType
 from qgis.PyQt.QtCore import QUrl
 from qgis.PyQt.QtCore import pyqtSignal, Qt, QObject, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
 from qgis.PyQt.QtGui import QDesktopServices
@@ -69,7 +71,7 @@ from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, Q
     QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
     QProgressBar, QMessageBox
 from qgis.PyQt.QtXml import QDomDocument
-from qgis.core import QgsBrowserModel
+from qgis.core import QgsBrowserModel, QgsField
 from qgis.core import QgsExpressionContextGenerator, QgsExpressionContext, QgsProcessingContext, \
     QgsExpressionContextUtils
 from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
@@ -77,7 +79,7 @@ from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
     QgsPointXY, QgsLayerTree, QgsLayerTreeLayer, QgsVectorLayerTools, \
     QgsZipUtils, QgsProjectArchive, QgsSettings, \
     QgsStyle, QgsSymbolLegendNode, QgsSymbol, QgsTaskManager, QgsApplication, QgsProcessingAlgRunnerTask
-from qgis.core import QgsRectangle
+from qgis.core import QgsRectangle, edit
 from qgis.gui import QgsMapCanvas, QgsMapTool, QgisInterface, QgsMessageBar, QgsMessageViewer, QgsMessageBarItem, \
     QgsMapLayerConfigWidgetFactory, QgsAttributeTableFilterModel, QgsSymbolSelectorDialog, \
     QgsSymbolWidgetContext
@@ -89,11 +91,16 @@ from .datasources.datasources import DataSource, RasterDataSource, VectorDataSou
 from .dataviews.docks import DockTypes
 from .mapcanvas import MapCanvas
 from .splashscreen.splashscreen import EnMAPBoxSplashScreen
-from .utils import enmapboxUiPath
+from .utils import enmapboxUiPath, high_contrast_random_color
 from .widgets.createspeclibdialog import CreateSpectralLibraryDialog
 from ..enmapboxsettings import EnMAPBoxSettings
 from ..qgispluginsupport.qps.processing.algorithmdialog import executeAlgorithm, AlgorithmDialog
+from ..qgispluginsupport.qps.speclib.core import profile_fields
+from ..qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
+from ..qgispluginsupport.qps.speclib.core.spectralprofile import ProfileEncoding
+from ..qgispluginsupport.qps.speclib.gui.spectrallibraryplotmodelitems import ProfileVisualizationGroup
 from ..qgispluginsupport.qps.speclib.gui.spectralprofilecandidates import SpectralProfileCandidates
+from ..qgispluginsupport.qps.speclib.gui.spectralprofilesources import StandardFieldGeneratorNode
 from ..qgispluginsupport.qps.utils import TemporaryGlobalLayerContext
 
 MAX_MISSING_DEPENDENCY_WARNINGS = 3
@@ -771,6 +778,169 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         return self.ui.optionShowCrosshair.isChecked()
         s = ""
 
+    def showSpectralProfiles(self,
+                             raster_layer: QgsRasterLayer,
+                             dock: Optional[SpectralLibraryDock] = None,
+                             profile_field: Optional[str] = None,
+                             color_expression: Union[None, str, QColor] = None,
+                             label_expression: Optional[str] = None):
+        """
+        Shows the spectral profiles of the raster layer
+        :param raster_layer:
+        :return:
+        """
+        if not isinstance(raster_layer, QgsRasterLayer):
+            return
+
+        # set a collection of profiles from the layer's source into the spectral library
+        sourcePanel = self.spectralProfileSourcePanel()
+        sourcePanel.setHidden(False)
+        sourceBridge: SpectralProfileBridge = self.spectralProfileSourcePanel().spectralProfileBridge()
+
+        # activate the identify tool with an option to collect spectral profiles
+        self.ui.mActionIdentify.setChecked(True)
+        # self.ui.optionIdentifyCursorLocation.setChecked(True)
+        self.ui.optionIdentifyProfile.setChecked(True)
+
+        # ensure that the layer is added to the project
+        self.project().addMapLayer(raster_layer)
+        if len(self.mapCanvases()) == 0:
+            self.createNewMapCanvas()
+            mapDock: MapDock = self.createDock(MapDock)
+            mapDock.addLayers([raster_layer])
+
+        # get the profile view dock to show the layer profiles
+        if not isinstance(dock, SpectralLibraryDock):
+            docks = [d for d in self.docks(SpectralLibraryDock) if
+                     isinstance(d, SpectralLibraryDock) and d.defaultSpeclib()]
+
+            if len(docks) == 0:
+                # create a spectral library widget
+                dock = self.createSpectralLibraryDock()
+            else:
+                dock = docks[0]
+
+        # get the speclib vector layer to store the profiles
+        # use the default in-memory library
+        assert isinstance(dock, SpectralLibraryDock)
+        dock.setVisible(True)
+
+        # profile visualization
+        slw: SpectralLibraryWidget = dock.speclibWidget()
+        model = slw.plotModel()
+
+        sl: Optional[QgsVectorLayer] = dock.defaultSpeclib()
+
+        if sl is None:
+            sl = dock.createDefaultSpeclib()
+            self.addSources([sl])
+
+        assert isinstance(sl, QgsVectorLayer)
+
+        # check if there is already a raster-source - speclib field relation
+        # with the current speclib. If not, create one
+
+        source = None
+        for s in sourceBridge.sources():
+            if isinstance(s, StandardLayerProfileSource):
+                if s.layer().source() == raster_layer.source():
+                    source = s
+                    break
+        assert isinstance(source, StandardLayerProfileSource)
+
+        fg = None
+        for node in sourceBridge.featureGenerators():
+            node: SpectralFeatureGeneratorNode
+            if node.mSpeclib == sl:
+                fg = node
+
+        if fg is None:
+            fg = SpectralFeatureGeneratorNode()
+            fg.setSpeclib(sl)
+            sourceBridge.addFeatureGenerator(fg)
+        assert isinstance(fg, SpectralFeatureGeneratorNode)
+
+        if profile_field is None:
+            # create a new target field
+            # is there already a field used to collect profiles from this source?
+            for n in fg.spectralProfileGeneratorNodes():
+                if n.profileSource() in [None, source]:
+                    profile_field = n.field().name()
+                    break
+
+            # create a new field to save profiles from this source
+            if profile_field is None:
+                profile_field = 'profiles'
+                i = 1
+                while profile_field in sl.fields().names():
+                    profile_field = f'profiles{i}'
+                    i += 1
+
+        if profile_field not in sl.fields().names():
+            with edit(sl):
+                SpectralLibraryUtils.addSpectralProfileField(sl, profile_field, encoding=ProfileEncoding.Map)
+
+            fg.updateFieldNodes()
+
+        assert isinstance(profile_field, str)
+
+        # let the feature generator node collect from source into profile_field
+        node = fg.fieldNode(profile_field)
+        assert isinstance(node, SpectralProfileGeneratorNode)
+        node.setProfileSource(source)
+        node.setSampling(ProfileSamplingMode())
+
+        # create a field for the profile name
+        profile_field_name: str = profile_field + '_name'
+        if profile_field_name not in sl.fields().names():
+            with edit(sl):
+                sl.addAttribute(QgsField(profile_field_name, QMetaType.QString))
+            fg.updateFieldNodes()
+
+        src_suffix = profile_fields(sl).count() - 1
+        src_suffix = '' if src_suffix == 0 else str(src_suffix)
+        profile_name_expression = f"format('%0 %1,%2', @source_name{src_suffix}, @px_x{src_suffix}, @px_y{src_suffix})"
+
+        # let the feature generator node create a profile name
+        node = fg.fieldNode(profile_field_name)
+        if isinstance(node, StandardFieldGeneratorNode):
+            node.setExpression(profile_name_expression)
+            node.setCheckState(Qt.Checked)
+
+        vis = None
+
+        bg = model.generalSettings().backgroundColor()
+        model.generalSettings().setShowLegend(True)
+
+        for v in model.visualizations():
+            if v.fieldName() == profile_field and v.layerId() == sl.id():
+                vis = v
+        if vis is None:
+            vis = slw.spectralLibraryPlotWidget().createProfileVisualization(layer_id=sl.id(), field_name=profile_field)
+
+        if not isinstance(vis, ProfileVisualizationGroup):
+            return
+
+        vis.mAutoName = False
+        vis.setText(raster_layer.name())
+
+        if label_expression is None:
+            if profile_field_name in sl.fields().names():
+                label_expression = f'"{profile_field_name}"'
+            else:
+                label_expression = f"'{raster_layer.name()}'"
+        vis.setLabelExpression(label_expression)
+
+        if color_expression is None:
+            c = high_contrast_random_color(bg)
+            vis.setColor(c)
+            ps = vis.profileCandidateStyle()
+            ps.setLineColor(c)
+            ps.setMarkerColor(c)
+            vis.setCandidatePlotStyle(ps)
+
+        vis.setVisible(True)
+
     def showAttributeTable(self, lyr: Union[None, QgsVectorLayer, str],
                            filerExpression: str = "",
                            filterMode: QgsAttributeTableFilterModel.FilterMode = None):
@@ -1306,7 +1476,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.ui.mActionAddWebView.triggered.connect(lambda: self.mDockManager.createDock(DockTypes.WebViewDock))
         self.ui.mActionAddMimeView.triggered.connect(lambda: self.mDockManager.createDock(DockTypes.MimeDataDock))
         self.ui.mActionAddSpeclibView.triggered.connect(
-            lambda: self.mDockManager.createDock(DockTypes.SpectralLibraryDock))
+            # lambda: self.mDockManager.createDock(DockTypes.SpectralLibraryDock)
+            lambda: self.createSpectralLibraryDock(),
+        )
         self.ui.mActionLoadExampleData.triggered.connect(lambda: self.openExampleData(
             mapWindows=1 if len(self.mDockManager.docks(MapDock)) == 0 else 0))
         self.ui.mActionLoadExampleScene.triggered.connect(  # see issue #566
@@ -1605,13 +1777,13 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             # create a standard in-memory library shown in the dock
             if len(slw.sourceLayers()) == 0:
                 sl = dock.createDefaultSpeclib()
-
+                self.dataSourceManager().addDataSources([sl])
             self.dataSourceManager().addDataSources(slw.sourceLayers())
 
             bridge = self.spectralProfileSourcePanel().mBridge
             bridge.addSpectralLibraryWidgets(slw)
 
-            if sl:
+            if False and sl:
                 node: SpectralFeatureGeneratorNode = bridge.createFeatureGenerator()
                 node.setSpeclib(sl)
                 bridge.setDefaultSources(node)
@@ -2083,7 +2255,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         self.sigDataSourcesRemoved[list].emit(dataSources)
 
-    def onDataSourcesAdded(self, dataSources: typing.List[DataSource]):
+    def onDataSourcesAdded(self, dataSources: List[DataSource]):
 
         self.sigDataSourcesAdded[list].emit(dataSources)
 
@@ -2092,7 +2264,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                 self.sigRasterSourceAdded[str].emit(dataSource.source())
                 self.sigRasterSourceAdded[RasterDataSource].emit(dataSource)
 
-                self.spectralProfileSourcePanel().addSources(dataSource.asMapLayer())
+                lyr = dataSource.asMapLayer(self.project())
+                if isinstance(lyr, QgsRasterLayer) and lyr.isValid():
+                    profileSource = StandardLayerProfileSource(lyr)
+                    self.spectralProfileSourcePanel().addSources(profileSource)
 
             if isinstance(dataSource, VectorDataSource):
                 self.sigVectorSourceAdded[str].emit(dataSource.source())
@@ -2198,11 +2373,14 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         return self.createDock(MapDock, name=name, position=position, relativeTo=relativeTo)
 
     def createSpectralLibraryDock(self, *args,
-                                  speclib: QgsVectorLayer = None,
-                                  name='New Speclib',
+                                  speclib: Optional[QgsVectorLayer] = None,
+                                  name: Optional[str] = None,
                                   position='bottom', relativeTo=None) -> SpectralLibraryDock:
-        return self.createDock(SpectralLibraryDock, speclib=speclib, name=name, position=position,
-                               relativeTo=relativeTo)
+        dock: SpectralLibraryDock = self.createDock(SpectralLibraryDock,
+                                                    speclib=speclib, name=name, position=position,
+                                                    relativeTo=relativeTo)
+
+        return dock
 
     def createDock(self, *args, **kwds) -> Dock:
         """

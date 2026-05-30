@@ -1,0 +1,89 @@
+name: 🐍 Conda Environments
+
+on:
+  push:
+    branches:
+      - main
+      - release-**
+      - release_**
+
+  pull_request:
+    branches:
+      - main
+      - release-**
+      - release_**
+
+  release:
+    types: [ published ]
+
+jobs:
+  # Run EnMAP-Box tests
+  test:
+    name: ${{ matrix.mamba_env }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -el {0}
+
+    env:
+      QT_QPA_PLATFORM: offscreen
+      CI: true
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # windows-latest ,
+        os: [ ubuntu-latest, macos-latest ]
+        mamba_env: [ enmapbox-base ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Runner Info
+        run: |
+          uname -a || true
+          echo "OS: ${{ runner.os }}"
+
+      - name: Conda environment file
+        run: |
+          echo "conda environment file: .env/conda/${{ matrix.mamba_env }}.yml"
+          cat .env/conda/${{ matrix.mamba_env }}.yml
+
+      - name: Setup Miniconda
+        uses: conda-incubator/setup-miniconda@v4
+        with:
+          channels: conda-forge,defaults
+          channel-priority: true
+          activate-environment: ${{ matrix.mamba_env }}
+          environment-file: .env/conda/${{ matrix.mamba_env }}.yml
+          clean-patched-environment-file: false
+
+      - name: Conda Environment Info
+        shell: bash -el {0}
+        run: |
+          conda info
+          conda list
+
+      - name: Python, QGIS and GDAL versions
+        shell: bash -el {0}
+        run: |
+          python --version
+          qgis --version || true
+          gdalinfo --version || true
+          python -c "from osgeo.gdal import VersionInfo; print(f\"Python-GDAL: {VersionInfo('')} {VersionInfo()}\")"
+          python -c "import sys; print('Python-Path:');[print(p) for p in sys.path]"
+          python -c "from qgis.core import Qgis; print(f\"Python-QGIS: {Qgis.version()} \")"
+
+      - name: Setup Repository
+        shell: bash -el {0}
+        run: |
+          python scripts/setup_repository.py
+
+      - name: Test EnMAP-Box in ${{ matrix.mamba_env }}
+        shell: bash -el {0}
+        run: |
+          chmod +x scripts/runtests.sh
+          bash ./scripts/runtests.sh -x -n 1 --maxfail=2
