@@ -686,7 +686,10 @@ def missingTestData() -> bool:
 
 def installTestData(overwrite_existing: bool = False, ask: bool = True):
     """
-    Downloads and installs the EnMAP-Box Example Data
+    Downloads and installs the EnMAP-Box Example Data.
+    :param overwrite_existing: Set True to overwrite existing testdata
+    :param ask: Opens a dialog to confirm download
+    :return:
     """
     if not missingTestData() and not overwrite_existing:
         print('Testdata already installed and up to date.')
@@ -777,7 +780,7 @@ def installTestData(overwrite_existing: bool = False, ask: bool = True):
         QTimer.singleShot(5000, deleteFileDownloadedFile)
 
     def onDownloadProgress(received, total):
-        if not qgisMainApp and total > 0:
+        if not ask and total > 0:
             print('\r{:0.2f} %'.format(100. * received / total), end=' ', flush=True)
             time.sleep(0.1)
 

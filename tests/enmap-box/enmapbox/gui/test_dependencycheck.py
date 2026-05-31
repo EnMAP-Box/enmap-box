@@ -44,7 +44,7 @@ class test_dependencycheck(EnMAPBoxTestCase):
 
     @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'Skipped, manual testing only and blocking dialog')
     def test_installTestData(self):
-
+        installTestData(overwrite_existing=True, ask=False)
         installTestData(overwrite_existing=True, ask=True)
 
     def test_pip_call(self):
