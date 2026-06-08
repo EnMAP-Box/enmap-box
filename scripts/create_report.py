@@ -190,8 +190,10 @@ def report_github_issues_QGIS(authors=['jakimowb', 'janzandr'], start_date='2020
     # Filter issues within the date range
 
     created_in_report_period = [i for i in issues if start_date <= toDate(i['created_at']) <= end_date]
-    created_before_but_touched = [i for i in issues if toDate(i['created_at']) < start_date
-                                  and start_date <= toDate(i['updated_at']) <= end_date]
+    created_before_but_touched = [
+        i for i in issues
+        if toDate(i['created_at']) < start_date and start_date <= toDate(i['updated_at']) <= end_date
+    ]
 
     def printInfos(issues: List[dict], labels=['duplicate', 'wontfix']):
         is_closed = []
@@ -306,8 +308,10 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
     # Filter issues within the date range
 
     created_in_report_period = [i for i in issues if start_date <= toDate(i['created_at']) <= end_date]
-    created_before_but_touched = [i for i in issues if toDate(i['created_at']) < start_date
-                                  and start_date <= toDate(i['updated_at']) <= end_date]
+    created_before_but_touched = [
+        i for i in issues
+        if toDate(i['created_at']) < start_date and start_date <= toDate(i['updated_at']) <= end_date
+    ]
 
     s = ""
 

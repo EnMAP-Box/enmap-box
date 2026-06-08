@@ -85,8 +85,10 @@ INSTALLATION_BLOCK = {  # 'numba': 'should to be installed manually using the lo
 # pip package names: "name is the distribution name of your package.
 # This can be any name as long as only contains letters, numbers, _ , and -."
 rxPipPackageName = re.compile(r'^[a-zA-Z]+[a-zA-Z0-9-_]*')
-rxPipVersion = re.compile(r'([1-9][0-9]*!)?(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*((a|b|rc)(0|[1-9][0-9]*))?'
-                          + r'(\.post(0|[1-9][0-9]*))?(\.dev(0|[1-9][0-9]*))?')
+rxPipVersion = re.compile(
+    r'([1-9][0-9]*!)?(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*((a|b|rc)(0|[1-9][0-9]*))?'
+    r'(\.post(0|[1-9][0-9]*))?(\.dev(0|[1-9][0-9]*))?'
+)
 
 for k in PACKAGE_LOOKUP.keys():
     assert rxPipPackageName.search(k)

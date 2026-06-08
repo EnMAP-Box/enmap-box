@@ -174,8 +174,7 @@ class VRTBuilderAppContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
     def populateDataViewMenu(self, menu: QMenu, view: DockTreeView, node: QgsLayerTreeNode):
 
         selectedRasterLayers = [lyr for lyr in view.selectedLayers()
-                                if isinstance(lyr, QgsRasterLayer)
-                                and lyr.providerType() == 'gdal']
+                                if isinstance(lyr, QgsRasterLayer) and lyr.providerType() == 'gdal']
 
         self.addMenuForInputs(menu, selectedRasterLayers)
 
