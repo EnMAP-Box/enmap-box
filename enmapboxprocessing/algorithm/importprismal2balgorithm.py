@@ -101,8 +101,7 @@ class ImportPrismaL2BAlgorithm(EnMAPProcessingAlgorithm):
         }
 
     def isValidFile(self, file: str) -> bool:
-        return basename(file).startswith('PRS_L2B') & \
-               basename(file).endswith('.he5')
+        return basename(file).startswith('PRS_L2B') & basename(file).endswith('.he5')
 
     def openDataset(self, he5Filename: str, key: str) -> gdal.Dataset:
         key = key.replace(' ', '_')

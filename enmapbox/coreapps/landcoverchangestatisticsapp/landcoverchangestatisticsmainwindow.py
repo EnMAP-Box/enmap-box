@@ -223,8 +223,9 @@ class LandCoverChangeSankeyPlotBuilder():
             if i == 0:
                 array, categories, categorySizes, categoryRelSizes = readLayer(layer)
             else:
-                array, categories, categorySizes, categoryRelSizes = array2, categories2, categorySizes2, \
-                                                                     categoryRelSizes2
+                array, categories, categorySizes, categoryRelSizes = (
+                    array2, categories2, categorySizes2, categoryRelSizes2
+                )
             array2, categories2, categorySizes2, categoryRelSizes2 = readLayer(nextLayer)
 
             levels = [[c.value for c in categories], [c.value for c in categories2]]

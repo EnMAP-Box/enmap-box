@@ -55,10 +55,10 @@ class ColorSpaceExplorerDialog(QMainWindow):
             text = mRgb.text()
             tmp = text.split(' ')
             bands = tmp[-1][1:-1].split('-')
-            wavelengths = [str(CreateSpectralIndicesAlgorithm.WavebandMapping[
-                                   CreateSpectralIndicesAlgorithm.translateSentinel2Band(band)
-                               ][0]) + 'nm'
-                           for band in bands]
+            wavelengths = [
+                str(CreateSpectralIndicesAlgorithm.WavebandMapping[CreateSpectralIndicesAlgorithm.translateSentinel2Band(band)][0]) + 'nm'
+                for band in bands
+            ]
             name = ' '.join(tmp[:-1])
             name += '\n(' + '-'.join(wavelengths) + ')'
             mRgb.setText(name)
