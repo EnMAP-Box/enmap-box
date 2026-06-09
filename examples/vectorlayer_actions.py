@@ -29,11 +29,13 @@
 """
 from qgis.PyQt.QtCore import QVariant, QSize
 from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QCheckBox
+from qgis.core import (
+    QgsPythonRunner, QgsFeature, QgsField, QgsVectorLayer, QgsAttributeTableConfig, QgsActionManager, QgsAction,
+    QgsProject
+)
+from qgis.gui import QgsMapCanvas, QgsDualView
 
 from enmapbox.testing import start_app
-from qgis.core import QgsPythonRunner, QgsFeature, QgsField, QgsVectorLayer, QgsAttributeTableConfig, QgsActionManager, \
-    QgsAction, QgsProject
-from qgis.gui import QgsMapCanvas, QgsDualView
 
 # read https://github.com/qgis/QGIS/blob/master/tests/src/python/test_qgsactionmanager.py
 

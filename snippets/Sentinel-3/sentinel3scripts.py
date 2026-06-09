@@ -6,7 +6,10 @@ from qgis.core import QgsApplication
 
 #  ########### CONFIG SECTION ################
 # Ordner mit entpacken Sentinel-3 L1 Datensätzen:
-dirS3_L1 = r'D:\Temp\Sentinel-3\S3A_OL_1_EFR____20201008T234915_20201008T235215_20201010T044927_0179_063_344_1980_LN1_O_NT_002.SEN3'
+dirS3_L1 = (
+    r'D:\Temp\Sentinel-3'
+    r'\S3A_OL_1_EFR____20201008T234915_20201008T235215_20201010T044927_0179_063_344_1980_LN1_O_NT_002.SEN3'
+)
 
 #  ############################################
 

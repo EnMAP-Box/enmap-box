@@ -20,10 +20,13 @@ from enmapbox import initEnMAPBoxResources
 from enmapbox.exampledata import landcover_polygon, enmap, hires
 from enmapbox.gui.datasources.datasources import VectorDataSource, RasterDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager
-from enmapbox.gui.dataviews.dockmanager import DockManager, SpeclibDockTreeNode, MapDockTreeNode, \
-    DockTreeView, DockManagerTreeModel, createDockTreeNode, DockTreeNode
-from enmapbox.gui.dataviews.docks import MapDock, DockArea, MimeDataDock, TextDock, SpectralLibraryDock, TextDockWidget, \
-    Dock
+from enmapbox.gui.dataviews.dockmanager import (
+    DockManager, SpeclibDockTreeNode, MapDockTreeNode, DockTreeView, DockManagerTreeModel, createDockTreeNode,
+    DockTreeNode
+)
+from enmapbox.gui.dataviews.docks import (
+    MapDock, DockArea, MimeDataDock, TextDock, SpectralLibraryDock, TextDockWidget, Dock
+)
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.maptools import MapTools
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.Dock import Dock as pgDock
@@ -42,8 +45,14 @@ initEnMAPBoxResources()
 
 
 class TestDocksAndDataSources(EnMAPBoxTestCase):
-    wmsUri = r'crs=EPSG:3857&format&type=xyz&url=https://mt1.google.com/vt/lyrs%3Ds%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D&zmax=19&zmin=0'
-    wmsUri = 'referer=OpenStreetMap%20contributors,%20under%20ODbL&type=xyz&url=http://tiles.wmflabs.org/hikebike/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=17&zmin=1'
+    wmsUri = (
+        r'crs=EPSG:3857&format&type=xyz&url='
+        r'https://mt1.google.com/vt/lyrs%3Ds%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D&zmax=19&zmin=0'
+    )
+    wmsUri = (
+        'referer=OpenStreetMap%20contributors,%20under%20ODbL&type=xyz&url='
+        'http://tiles.wmflabs.org/hikebike/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=17&zmin=1'
+    )
 
     def test_dataSourceManager(self):
 

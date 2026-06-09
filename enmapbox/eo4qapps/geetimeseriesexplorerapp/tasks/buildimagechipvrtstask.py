@@ -33,7 +33,8 @@ class BuildImageChipVrtsTask(QgsTask):
                     if not folderLocation.is_dir():
                         continue
                     for folderChip in scandir(folderLocation.path):
-                        # e.g. <root>/chips/LANDSAT_LC09_C02_T1_L2/X0013.2867979971745_Y0052.5076947733707/LC09_192023_20211103
+                        # e.g. <root>/chips/LANDSAT_LC09_C02_T1_L2/X0013.2867979971745_Y0052.5076947733707
+                        # /LC09_192023_20211103
                         if not folderChip.is_dir():
                             continue
                         srcDss: List[gdal.Dataset] = [gdal.Open(f.path) for f in scandir(folderChip.path) if

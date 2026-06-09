@@ -21,15 +21,19 @@
 """
 
 import os
+
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu, QAction, QWidget, QHBoxLayout, QLabel, QPushButton
-from enmapbox.gui.applications import EnMAPBoxApplication
-from qgis.core import QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer, QgsProcessingParameterNumber, \
-    QgsProcessingParameterRasterDestination, QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterBand, \
-    QgsProcessingParameterVectorLayer, QgsProcessingParameterField, QgsProcessingParameterMapLayer, \
-    QgsProcessingParameterFile, QgsProcessingParameterString, QgsProcessingParameterBoolean, QgsProcessingParameterEnum, \
-    QgsProcessingParameterVectorDestination, QgsProcessingParameterFileDestination, \
+from qgis.core import (
+    QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer, QgsProcessingParameterNumber,
+    QgsProcessingParameterRasterDestination, QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterBand,
+    QgsProcessingParameterVectorLayer, QgsProcessingParameterField, QgsProcessingParameterMapLayer,
+    QgsProcessingParameterFile, QgsProcessingParameterString, QgsProcessingParameterBoolean, QgsProcessingParameterEnum,
+    QgsProcessingParameterVectorDestination, QgsProcessingParameterFileDestination,
     QgsProcessingParameterFolderDestination
+)
+
+from enmapbox.gui.applications import EnMAPBoxApplication
 
 VERSION = '0.0.1'
 LICENSE = 'GNU GPL-3'

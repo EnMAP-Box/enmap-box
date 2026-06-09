@@ -1,6 +1,8 @@
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCategorizedSymbolRenderer,
+                       QgsProcessingParameterField, QgsProcessingException, QgsFeature)
 
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import FIELD_VALUES
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
@@ -8,8 +10,6 @@ from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import checkSampleShape, ClassifierDump
 from enmapboxprocessing.utils import Utils
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCategorizedSymbolRenderer,
-                       QgsProcessingParameterField, QgsProcessingException, QgsFeature)
 
 
 @typechecked
@@ -25,14 +25,17 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
         return 'Create classification dataset (from categorized spectral library)'
 
     def shortDescription(self) -> str:
-        return 'Create a classification dataset from spectral profiles that matches the given categories ' \
-               'and store the result as a pickle file.\n' \
-               'If the spectral library is not categorized, or the field with class values is selected manually, ' \
-               'categories are derived from target data y. ' \
-               'To be more precise: ' \
-               'i) category values are derived from unique attribute values (after excluding no data or zero data values), ' \
-               'ii) category names are set equal to the category values, ' \
-               'and iii) category colors are picked randomly.'
+        return (
+            'Create a classification dataset from spectral profiles that matches the given categories '
+            'and store the result as a pickle file.\n'
+            'If the spectral library is not categorized, or the field with class values is selected manually, '
+            'categories are derived from target data y. '
+            'To be more precise: '
+            'i) category values are derived from unique attribute values '
+            '(after excluding no data or zero data values), '
+            'ii) category names are set equal to the category values, '
+            'and iii) category colors are picked randomly.'
+        )
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [

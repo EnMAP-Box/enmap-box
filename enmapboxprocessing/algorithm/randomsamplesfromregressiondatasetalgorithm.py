@@ -76,7 +76,9 @@ class RandomSamplesFromRegressionDatasetAlgorithm(EnMAPProcessingAlgorithm):
             self.tic(feedback, parameters, context)
 
             feedback.pushInfo(
-                f'Load dataset: X=array{list(np.shape(dump.X))} y=array{list(np.shape(dump.y))} targets={[t.name for t in dump.targets]}')
+                f'Load dataset: X=array{list(np.shape(dump.X))} y=array{list(np.shape(dump.y))} '
+                f'targets={[t.name for t in dump.targets]}'
+            )
 
             if seed is not None:
                 np.random.seed(seed)

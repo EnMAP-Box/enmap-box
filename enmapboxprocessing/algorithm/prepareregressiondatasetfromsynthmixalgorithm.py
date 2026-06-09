@@ -19,7 +19,9 @@ class PrepareRegressionDatasetFromSynthMixAlgorithm(EnMAPProcessingAlgorithm):
     P_BACKGROUND, _BACKGROUND = 'background', 'Proportion of background mixtures (%)'
     P_INCLUDE_ENDMEMBER, _INCLUDE_ENDMEMBER = 'includeEndmember', 'Include original endmembers'
     P_MIXING_PROBABILITIES, _MIXING_PROBABILITIES = 'mixingProbabilities', 'Mixing complexity probabilities'
-    P_ALLOW_WITHINCLASS_MIXTURES, _ALLOW_WITHINCLASS_MIXTURES = 'allowWithinClassMixtures', 'Allow within-class mixtures'
+    P_ALLOW_WITHINCLASS_MIXTURES, _ALLOW_WITHINCLASS_MIXTURES = (
+        'allowWithinClassMixtures', 'Allow within-class mixtures'
+    )
     P_CLASS_PROBABILITIES, _CLASS_PROBABILITIES = 'classProbabilities', 'Class probabilities'
     P_OUTPUT_FOLDER, _OUTPUT_FOLDER = 'outputFolder', 'Output folder'
 
@@ -80,7 +82,9 @@ class PrepareRegressionDatasetFromSynthMixAlgorithm(EnMAPProcessingAlgorithm):
             self.y = dump.y
             self.categories = dump.categories
             feedback.pushInfo(
-                f'Load classification dataset: X=array{list(self.X.shape)} y=array{list(self.y.shape)} categories={[c.name for c in self.categories]}')
+                f'Load classification dataset: X=array{list(self.X.shape)} y=array{list(self.y.shape)} '
+                f'categories={[c.name for c in self.categories]}'
+            )
 
             if self.classProbabilities is None:
                 self.classProbabilities = list()

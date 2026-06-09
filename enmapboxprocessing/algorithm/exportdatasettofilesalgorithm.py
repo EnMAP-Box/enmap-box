@@ -1,11 +1,11 @@
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.utils import Utils
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
 
 @typechecked
@@ -23,9 +23,11 @@ class ExportDatasetToFilesAlgorithm(EnMAPProcessingAlgorithm):
             "https://force-eo.readthedocs.io/en/latest/components/higher-level/smp/index.html",
             "FORCE Higher Level Sampling Submodule"
         )
-        return 'Export a classification/regression dataset to tabulated text files.\n' \
-               f'The format matches that of the {link}.\n' \
-               f'Example files (force_features.csv and force_labels.csv) can be found in the EnMAP-Box testdata folder).'
+        return (
+            'Export a classification/regression dataset to tabulated text files.\n'
+            f'The format matches that of the {link}.\n'
+            f'Example files (force_features.csv and force_labels.csv) can be found in the EnMAP-Box testdata folder.'
+        )
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [

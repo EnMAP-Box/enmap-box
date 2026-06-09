@@ -305,8 +305,9 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def parameterAsString(self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext) -> Optional[str]:
         string = super().parameterAsString(parameters, name, context)
         if string == '':
-            if isinstance(parameters.get(name),
-                          str):  # workaround a QGIS bug, where super().parameterAsString would return an empty string instead of the actual string
+            if isinstance(parameters.get(name), str):
+                # workaround a QGIS bug, where super().parameterAsString would return an empty string instead of
+                # the actual string
                 return parameters.get(name)
             return None
         return string
@@ -670,7 +671,10 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         return self.shortHelpString()
 
     def helpUrl(self, *args, **kwargs):
-        return 'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/processing_algorithms/processing_algorithms.html'
+        return (
+            'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/processing_algorithms'
+            '/processing_algorithms.html'
+        )
 
     def isRunnungInsideModeller(self):
         # hacky way to figure out if this algorithm is currently running inside the modeller

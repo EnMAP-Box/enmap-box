@@ -85,7 +85,8 @@ class Test_Dataset_Maker(TestCase):
             df = pd.read_csv(path_csv_file)
 
             row_count = df['image'].count()
-        assert row_count == expected_count, f"Error: Expected {expected_count} .tif files in {csv_file}, but found {row_count}"
+        assert row_count == expected_count, \
+            f"Error: Expected {expected_count} .tif files in {csv_file}, but found {row_count}"
 
         # 3 add test summary csv
 

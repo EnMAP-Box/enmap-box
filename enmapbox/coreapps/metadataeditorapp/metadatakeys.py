@@ -20,10 +20,10 @@ import re
 
 import numpy as np
 from osgeo import gdal, ogr
-
-from enmapbox.gui import ClassificationScheme
 from qgis.PyQt.QtCore import QDate
 from qgis.core import QgsCoordinateReferenceSystem
+
+from enmapbox.gui import ClassificationScheme
 
 IMMUTABLE_DOMAINS = ['IMAGE_STRUCTURE', 'SUBDATASETS', 'DERIVED_SUBDATASETS']
 
@@ -279,18 +279,20 @@ class MDKeyDomainString(MDKeyAbstract):
         if domain == '':
 
             if name == 'AREA_OR_POINT':
-                return MDKeyDomainString(obj, domain, name, isImmutable=True,
-                                         options=['Area', 'Point'],
-                                         tooltip='Indicates whether a pixel value should be assumed to represent a '
-                                                 'sampling over the region of the pixel or a point sample at the center '
-                                                 'of the pixel. This is not intended to influence interpretation of '
-                                                 'georeferencing which remains area oriented.',
-                                         **kwds)
+                return MDKeyDomainString(
+                    obj, domain, name, isImmutable=True,
+                    options=['Area', 'Point'],
+                    tooltip='Indicates whether a pixel value should be assumed to represent a sampling over the region '
+                            'of the pixel or a point sample at the center of the pixel. This is not intended to '
+                            'influence interpretation of georeferencing which remains area oriented.',
+                    **kwds
+                )
 
             if name == 'METADATATYPE':
-                return MDKeyDomainString(obj, domain, name, isImmutable=True,
-                                         tooltip='Describes the reader which processes the metadata if IMAGERY Domain is present.',
-                                         **kwds)
+                return MDKeyDomainString(
+                    obj, domain, name, isImmutable=True,
+                    tooltip='Describes the reader which processes the metadata if IMAGERY Domain is present.', **kwds
+                )
 
         if domain in IMMUTABLE_DOMAINS or domain.startswith('xml:'):
             return MDKeyDomainString(obj, domain, name, isImmutable=True, **kwds)

@@ -482,8 +482,9 @@ class Utils(object):
                 except Exception:
                     pass
                 try:
-                    def conversion(
-                            old):  # adopted from https://stackoverflow.com/questions/10852955/python-batch-convert-gps-positions-to-lat-lon-decimals
+                    def conversion(old):
+                        # adopted from https://stackoverflow.com/questions/10852955/
+                        # python-batch-convert-gps-positions-to-lat-lon-decimals
                         direction = {'N': 1, 'S': -1, 'E': 1, 'W': -1}
                         new = old.replace(u'°', ' ').replace('\'', ' ').replace('"', ' ')
                         new = new.split()

@@ -27,7 +27,10 @@ from qgis.core import Qgis, QgsRasterLayer, QgsCoordinateReferenceSystem, QgsPoi
 
 class TestEnMAPBoxUtils(EnMAPBoxTestCase):
     """Test resources work."""
-    wmsUri = r'crs=EPSG:3857&format&type=xyz&url=https://mt1.google.com/vt/lyrs%3Ds%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D&zmax=19&zmin=0'
+    wmsUri = (
+        r'crs=EPSG:3857&format&type=xyz&url='
+        r'https://mt1.google.com/vt/lyrs%3Ds%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D&zmax=19&zmin=0'
+    )
 
     def test_spatialObjects(self):
 

@@ -2,6 +2,8 @@ from math import ceil
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsPalettedRasterRenderer,
+                       QgsMapLayer)
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.translatecategorizedrasteralgorithm import TranslateCategorizedRasterAlgorithm
@@ -9,8 +11,6 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import SampleX, SampleY, Categories, checkSampleShape, ClassifierDump
 from enmapboxprocessing.utils import Utils
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsPalettedRasterRenderer,
-                       QgsMapLayer)
 
 
 @typechecked
@@ -26,14 +26,17 @@ class PrepareClassificationDatasetFromCategorizedRasterAlgorithm(EnMAPProcessing
         return 'Create classification dataset (from categorized raster layer and feature raster)'
 
     def shortDescription(self) -> str:
-        return 'Create a classification dataset by sampling data for pixels that match the given categories ' \
-               'and store the result as a pickle file. \n' \
-               'If the layer is not categorized, or the band with class values is selected manually, ' \
-               'categories are derived from sampled data itself. ' \
-               'To be more precise: ' \
-               'i) category values are derived from unique raster band values (after excluding no data or zero data pixel), ' \
-               'ii) category names are set equal to the category values, ' \
-               'and iii) category colors are picked randomly.'
+        return (
+            'Create a classification dataset by sampling data for pixels that match the given categories '
+            'and store the result as a pickle file. \n'
+            'If the layer is not categorized, or the band with class values is selected manually, '
+            'categories are derived from sampled data itself. '
+            'To be more precise: '
+            'i) category values are derived from unique raster band values '
+            '(after excluding no data or zero data pixel), '
+            'ii) category names are set equal to the category values, '
+            'and iii) category colors are picked randomly.'
+        )
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [

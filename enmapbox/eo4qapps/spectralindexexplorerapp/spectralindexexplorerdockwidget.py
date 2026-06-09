@@ -5,8 +5,10 @@ from qgis.PyQt.QtGui import QPalette
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.PyQt.QtWidgets import QTableWidget, QComboBox, QLineEdit, QCheckBox, QTableWidgetItem, QLabel, QToolButton
 from qgis.core import QgsMapLayerProxyModel, QgsProcessingContext, QgsProject
-from qgis.gui import QgsMapLayerComboBox, QgsCheckableComboBox, QgsRasterBandComboBox, QgsFilterLineEdit, QgsDockWidget, \
-    QgisInterface, QgsMessageBar
+from qgis.gui import (
+    QgsMapLayerComboBox, QgsCheckableComboBox, QgsRasterBandComboBox, QgsFilterLineEdit, QgsDockWidget, QgisInterface,
+    QgsMessageBar
+)
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.typeguard import typechecked

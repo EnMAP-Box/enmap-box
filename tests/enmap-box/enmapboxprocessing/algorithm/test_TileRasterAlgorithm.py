@@ -5,10 +5,22 @@ from enmapboxprocessing.algorithm.tilerasteralgorithm import TileRasterAlgorithm
 
 
 class TestTileRasterAlgorithm(TestCase):
-    rasterSpectral1 = r'D:\data\EnFireMap\data\nc_230302_01\ENMAP01-____L2A-DT0000009825_20230302T192610Z_001_V010111_20230303T231444Z-SPECTRAL_IMAGE.TIF'
-    rasterSpectral2 = r'D:\data\EnFireMap\data\nc_230302_02\ENMAP01-____L2A-DT0000009825_20230302T192615Z_002_V010111_20230303T231444Z-SPECTRAL_IMAGE.TIF'
-    rasterCloud1 = r'D:\data\EnFireMap\data\nc_230302_01\ENMAP01-____L2A-DT0000009825_20230302T192610Z_001_V010111_20230303T231444Z-QL_QUALITY_CLOUD.TIF'
-    rasterCloud2 = r'D:\data\EnFireMap\data\nc_230302_02\ENMAP01-____L2A-DT0000009825_20230302T192615Z_002_V010111_20230303T231444Z-QL_QUALITY_CLOUD.TIF'
+    rasterSpectral1 = (
+        r'D:\data\EnFireMap\data\nc_230302_01'
+        r'\ENMAP01-____L2A-DT0000009825_20230302T192610Z_001_V010111_20230303T231444Z-SPECTRAL_IMAGE.TIF'
+    )
+    rasterSpectral2 = (
+        r'D:\data\EnFireMap\data\nc_230302_02'
+        r'\ENMAP01-____L2A-DT0000009825_20230302T192615Z_002_V010111_20230303T231444Z-SPECTRAL_IMAGE.TIF'
+    )
+    rasterCloud1 = (
+        r'D:\data\EnFireMap\data\nc_230302_01'
+        r'\ENMAP01-____L2A-DT0000009825_20230302T192610Z_001_V010111_20230303T231444Z-QL_QUALITY_CLOUD.TIF'
+    )
+    rasterCloud2 = (
+        r'D:\data\EnFireMap\data\nc_230302_02'
+        r'\ENMAP01-____L2A-DT0000009825_20230302T192615Z_002_V010111_20230303T231444Z-QL_QUALITY_CLOUD.TIF'
+    )
     tilingScheme = r'D:\data\EnFireMap\cube\shp\grid_california.gpkg'
     dataAvailable = exists(rasterSpectral1)
 

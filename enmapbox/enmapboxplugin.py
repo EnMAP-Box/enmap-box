@@ -161,7 +161,8 @@ class EnMAPBoxPlugin(object):
                      '</ol>'
                      'Other EnMAP-Box features may require additional Python packages. '
                      'For detailed instructions visit the '
-                     '<a href="https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html">EnMAP-Box installation guide</a>.'
+                     '<a href="https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html">'
+                     'EnMAP-Box installation guide</a>.'
 
                      )
         return info

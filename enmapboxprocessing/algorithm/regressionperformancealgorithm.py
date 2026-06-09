@@ -8,7 +8,11 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 from osgeo import gdal
+from qgis.PyQt.QtGui import QColor
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer, \
+    QgsProcessingException
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
@@ -16,10 +20,6 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.reportwriter import MultiReportWriter, HtmlReportWriter, CsvReportWriter
 from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtGui import QColor
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer, \
-    QgsProcessingException
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -34,11 +34,14 @@ class RegressionPerformanceAlgorithm(EnMAPProcessingAlgorithm):
         return 'Regression layer accuracy report'
 
     def shortDescription(self) -> str:
-        return 'Estimates map accuracy.' \
-               'We use the formulas as described in ' \
-               '<a href="https://scikit-learn.org/stable/modules/model_evaluation.html#regression-metrics">Scikit-Learn Regression metrics</a> ' \
-               'user guide. ' \
-               'Observed and predicted target variables are matched by name.'
+        return (
+            'Estimates map accuracy.'
+            'We use the formulas as described in '
+            '<a href="https://scikit-learn.org/stable/modules/model_evaluation.html#regression-metrics">'
+            'Scikit-Learn Regression metrics</a> '
+            'user guide. '
+            'Observed and predicted target variables are matched by name.'
+        )
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [

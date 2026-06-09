@@ -2,13 +2,13 @@ from random import randint
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
+from qgis.PyQt.QtGui import QColor
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import Category, ClassifierDump
 from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtGui import QColor
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -26,10 +26,12 @@ class PrepareClassificationDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
             "https://force-eo.readthedocs.io/en/latest/components/higher-level/smp/index.html",
             "FORCE Higher Level Sampling Submodule"
         )
-        return 'Create a classification dataset from tabulated text files ' \
-               'and store the result as a pickle file. \n' \
-               f'The format matches that of the {link}.\n' \
-               f'Example files (force_features.csv and force_labels.csv) can be found in the EnMAP-Box testdata folder).'
+        return (
+            'Create a classification dataset from tabulated text files '
+            'and store the result as a pickle file. \n'
+            f'The format matches that of the {link}.\n'
+            f'Example files (force_features.csv and force_labels.csv) can be found in the EnMAP-Box testdata folder).'
+        )
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [

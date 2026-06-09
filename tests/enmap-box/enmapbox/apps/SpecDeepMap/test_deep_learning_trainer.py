@@ -111,12 +111,12 @@ class Test_Deep_Learning_Trainer(TestCase):
         print(model_loaded.hparams)
         assert 0.001 == model_loaded.hparams.lr, 'learning rate not passed correctly'
         assert 'JustoUNetSimple' == model_loaded.hparams.architecture, 'Model architecture not passed correctly'
-        assert isinstance(model_loaded.hparams.class_weights,
-                          torch.Tensor), f"class_weights is not a torch.Tensor, it is {type(model_loaded.hparams.class_weights)}"
-        assert isinstance(model_loaded.hparams.transform,
-                          v2.Compose), f'Data augmentation should be torchvision Compose, but is , it is {type(model_loaded.hparams.transform)}'
-        assert isinstance(model_loaded.hparams.preprocess,
-                          transforms.Compose), f'Preprocess should be torchvision Compose, but is , it is {type(model_loaded.hparams.preprocess)}'
+        assert isinstance(model_loaded.hparams.class_weights, torch.Tensor), \
+            f"class_weights is not a torch.Tensor, it is {type(model_loaded.hparams.class_weights)}"
+        assert isinstance(model_loaded.hparams.transform, v2.Compose), \
+            f'Data augmentation should be torchvision Compose, but is , it is {type(model_loaded.hparams.transform)}'
+        assert isinstance(model_loaded.hparams.preprocess, transforms.Compose), \
+            f'Preprocess should be torchvision Compose, but is , it is {type(model_loaded.hparams.preprocess)}'
 
         # delete checkpoint files from previous test
         for filename in os.listdir(folder_path):
@@ -181,7 +181,6 @@ class Test_Deep_Learning_Trainer(TestCase):
         assert 'Unet' == model_loaded.hparams.architecture, 'Model architecture not passed correctly'
         assert 'resnet18' == model_loaded.hparams.backbone, 'Model backbone not passed correctly'
         assert 'imagenet' == model_loaded.hparams.weights, 'Model backbone not passed correctly'
-        # assert all(not param.requires_grad for param in model_loaded.backbone.parameters()), "Error: The model's backbone is not frozen."
 
         # actual_backbone = getattr(model_loaded, 'backbone', None)  # Replace 'backbone_model' if needed
         # assert actual_backbone is not None, "Backbone model not found"

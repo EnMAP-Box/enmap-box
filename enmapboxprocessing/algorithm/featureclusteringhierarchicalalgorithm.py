@@ -228,8 +228,14 @@ class FeatureClusteringHierarchicalAlgorithm(EnMAPProcessingAlgorithm):
                     rowHeaders,
                 )
 
+                link = (
+                    "https://scikit-learn.org/stable/auto_examples/inspection"
+                    "/plot_permutation_importance_multicollinear.html#"
+                    "sphx-glr-auto-examples-inspection-plot-permutation-importance-multicollinear-py"
+                )
                 report.writeParagraph(
-                    f'Report design was inspired by {self.htmlLink("https://scikit-learn.org/stable/auto_examples/inspection/plot_permutation_importance_multicollinear.html#sphx-glr-auto-examples-inspection-plot-permutation-importance-multicollinear-py", "Permutation Importance with Multicollinear or Correlated Features")}.'
+                    f'Report design was inspired by '
+                    f'{self.htmlLink(link, "Permutation Importance with Multicollinear or Correlated Features")}.'
                 )
 
             if openReport:

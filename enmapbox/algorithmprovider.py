@@ -47,7 +47,8 @@ class EnMAPBoxProcessingProviderKeys(object):
 class EnMAPBoxProcessingProvider(QgsProcessingProvider):
     """
     The EnMAPBoxAlgorithmProvider contains the GeoAlgorithms under the umbrella of the EnMAP-Box.
-    It enhances the "standard" processing.core.AlgorithmProvider by functionality to add and remove GeoAlgorithms during runtime.
+    It enhances the "standard" processing.core.AlgorithmProvider by functionality to add and remove
+    GeoAlgorithms during runtime.
     """
 
     _ENMAPBOX_PROCESSING_PROVIDER = None

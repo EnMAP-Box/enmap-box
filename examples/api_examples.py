@@ -75,7 +75,10 @@ class Examples(unittest.TestCase):
         enmapBox.addSources([pathVectorSource, pathSpectralLibrary])
 
         # add some Web Services
-        wmsUri = 'referer=OpenStreetMap%20contributors,%20under%20ODbL&type=xyz&url=http://tiles.wmflabs.org/hikebike/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=17&zmin=1'
+        wmsUri = (
+            'referer=OpenStreetMap%20contributors,%20under%20ODbL&type=xyz&'
+            'url=http://tiles.wmflabs.org/hikebike/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=17&zmin=1'
+        )
         enmapBox.addSource(wmsUri, name="Open Street Map")
 
         # be informed over new data sources

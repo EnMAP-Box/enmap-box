@@ -33,7 +33,9 @@ class RegressionBasedUnmixingAlgorithm(EnMAPProcessingAlgorithm):
     P_BACKGROUND, _BACKGROUND = 'background', 'Proportion of background mixtures (%)'
     P_INCLUDE_ENDMEMBER, _INCLUDE_ENDMEMBER = 'includeEndmember', 'Include original endmembers'
     P_MIXING_PROBABILITIES, _MIXING_PROBABILITIES = 'mixingProbabilities', 'Mixing complexity probabilities'
-    P_ALLOW_WITHINCLASS_MIXTURES, _ALLOW_WITHINCLASS_MIXTURES = 'allowWithinClassMixtures', 'Allow within-class mixtures'
+    P_ALLOW_WITHINCLASS_MIXTURES, _ALLOW_WITHINCLASS_MIXTURES = (
+        'allowWithinClassMixtures', 'Allow within-class mixtures'
+    )
     P_CLASS_PROBABILITIES, _CLASS_PROBABILITIES = 'classProbabilities', 'Class probabilities'
     P_ENSEMBLE_SIZE, _ENSEMBLE_SIZE = 'ensembleSize', 'Ensemble size'
     P_ROBUST_FUSION, _ROBUST_FUSION = 'robustFusion', 'Robust decision fusion'

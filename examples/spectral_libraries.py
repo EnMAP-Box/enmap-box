@@ -26,8 +26,9 @@ from enmapbox import initAll
 # How to write a spectral library
 from enmapbox.qgispluginsupport.qps.speclib.core import profile_field_list, is_spectral_library
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
-from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import prepareProfileValueDict, encodeProfileValueDict, \
-    decodeProfileValueDict
+from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import (
+    prepareProfileValueDict, encodeProfileValueDict, decodeProfileValueDict
+)
 from enmapbox.testing import start_app
 from qgis.core import QgsVectorLayer, QgsField, QgsFeature, edit
 

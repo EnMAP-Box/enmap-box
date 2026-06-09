@@ -50,7 +50,8 @@ from qgis.gui import QgsFileDownloaderDialog
 
 logger = logging.getLogger(__name__)
 
-URL_PACKAGE_HELP = r"https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html#install-required-python-packages"
+URL_PACKAGE_HELP = (r"https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html#"
+                    r"install-required-python-packages")
 
 INFO_MESSAGE_BEFORE_PACKAGE_INSTALLATION = f"""
 <b>It might be necessary to install missing package(s) with your local package manager!</b>
@@ -78,7 +79,8 @@ INSTALLATION_BLOCK = {  # 'numba': 'should to be installed manually using the lo
     #         'https://numba.pydata.org/numba-doc/dev/user/installing.html</a> for details',
     'numpy': 'needs to be installed/updated manually with local package manager (e.g. OSGeo4W Setup under Windows)',
     'GDAL': 'needs to be installed/updated manually with local package manager (e.g. OSGeo4W Setup under Windows)',
-    'h5py': 'needs to be installed/updated manually with local package manager (e.g. OSGeo4W Setup under Windows); also see issue #868'
+    'h5py': 'needs to be installed/updated manually with local package manager (e.g. OSGeo4W Setup under Windows); '
+            'also see issue #868'
 }
 
 # https://packaging.python.org/tutorials/packaging-projects/#uploading-your-project-to-pypi

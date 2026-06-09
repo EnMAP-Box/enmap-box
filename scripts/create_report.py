@@ -14,21 +14,23 @@ import xml.etree.ElementTree as etree
 from typing import Dict, List
 
 import pandas as pd
-import requests
+from qgis.PyQt.QtWidgets import QMenu
+from qgis.core import (
+    QgsProcessing, QgsProcessingAlgorithm, QgsProcessingOutputFile, QgsProcessingOutputFolder,
+    QgsProcessingOutputHtml, QgsProcessingOutputRasterLayer, QgsProcessingOutputVectorLayer,
+    QgsProcessingParameterBoolean, QgsProcessingParameterEnum, QgsProcessingParameterFeatureSink,
+    QgsProcessingParameterFeatureSource, QgsProcessingParameterFile, QgsProcessingParameterFileDestination,
+    QgsProcessingParameterFolderDestination, QgsProcessingParameterMapLayer, QgsProcessingParameterMultipleLayers,
+    QgsProcessingParameterRasterDestination, QgsProcessingParameterRasterLayer, QgsProcessingParameterVectorDestination,
+    QgsProcessingParameterVectorLayer
+)
 
+import requests
 from enmapbox import DIR_REPO_TMP, initAll
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
 from enmapbox.gui.applications import ApplicationWrapper, EnMAPBoxApplication
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
-from qgis.PyQt.QtWidgets import QMenu
-from qgis.core import QgsProcessing, QgsProcessingAlgorithm, QgsProcessingOutputFile, QgsProcessingOutputFolder, \
-    QgsProcessingOutputHtml, QgsProcessingOutputRasterLayer, QgsProcessingOutputVectorLayer, \
-    QgsProcessingParameterBoolean, QgsProcessingParameterEnum, QgsProcessingParameterFeatureSink, \
-    QgsProcessingParameterFeatureSource, QgsProcessingParameterFile, QgsProcessingParameterFileDestination, \
-    QgsProcessingParameterFolderDestination, QgsProcessingParameterMapLayer, QgsProcessingParameterMultipleLayers, \
-    QgsProcessingParameterRasterDestination, QgsProcessingParameterRasterLayer, QgsProcessingParameterVectorDestination, \
-    QgsProcessingParameterVectorLayer
 
 
 def linesOfCode(path) -> int:
@@ -74,7 +76,8 @@ def report_downloads() -> pd.DataFrame:
         <td class="has-text-centered">3.99.0</td>
         <td class="downloads">3817</td>
         <td class="has-text-centered"><a href="/plugins/user/jakimowb/admin">jakimowb</a></td>
-        <td class="has-text-centered" data-order="2025-08-02T12:57:54.528578"><span class="user-timezone">2025-08-02T17:57:54.528578+00:00</span>
+        <td class="has-text-centered" data-order="2025-08-02T12:57:54.528578">
+        <span class="user-timezone">2025-08-02T17:57:54.528578+00:00</span>
         </td>
     </tr>
         """
@@ -129,8 +132,9 @@ def report_github_issues_QGIS(authors=['jakimowb', 'janzandr'], start_date='2020
     if not PATH_GH_JSON.is_file():
         os.makedirs(PATH_GH_JSON.parent, exist_ok=True)
         # Your GitHub personal access token
-        assert 'GITHUB_TOKEN' in os.environ, 'GITHUB_TOKEN is not set. ' \
-                                             'Read https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens for details.'
+        assert 'GITHUB_TOKEN' in os.environ, \
+            ('GITHUB_TOKEN is not set. Read https://docs.github.com/en/authentication/keeping-your-account-and-data-'
+             'secure/managing-your-personal-access-tokens for details.')
         token = os.environ['GITHUB_TOKEN']
 
         # Create a session and set the authorization header
@@ -255,8 +259,9 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
     if not PATH_GH_JSON.is_file():
         os.makedirs(PATH_GH_JSON.parent, exist_ok=True)
         # Your GitHub personal access token
-        assert 'GITHUB_TOKEN' in os.environ, 'GITHUB_TOKEN is not set. ' \
-                                             'Read https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens for details.'
+        assert 'GITHUB_TOKEN' in os.environ, \
+            ('GITHUB_TOKEN is not set. Read https://docs.github.com/en/authentication/keeping-your-account-and-data-'
+             'secure/managing-your-personal-access-tokens for details.')
         token = os.environ['GITHUB_TOKEN']
         # Create a session and set the authorization header
         session = requests.Session()
@@ -380,21 +385,26 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
 
     s_start_date = start_date.strftime('%d.%m.%Y')
     s_zeitraum = f"{s_start_date} - {end_date.strftime('%d.%m.%Y')}"
-    LaTeX = fr"""# LaTeX CODE:
-\begin{{table}}[h]
-    \centering
-    \begin{{tabular}}{{rc|cc|cc}}
-         \multicolumn{{2}}{{c|}}{{Erstellung}} & Offen & Geschlossen & Duplikat & Ungültig/nicht behebbar \\
-         \hline
-        {s_zeitraum} & {cntP['total']} & {cntP['open']} & {cntP['closed']} & {cntP['duplicate']} & {cntP['wontfix']} \\
-         vor {s_start_date} & {cntB['total']} & {cntB['open']} & {cntB['closed']} & {cntB['duplicate']} & {cntB['wontfix']} \\
-         \hline
-         Gesamt      & {cntA['total']} & {cntA['open']} & {cntA['closed']} & {cntA['duplicate']} & {cntA['wontfix']} \\
-    \end{{tabular}}
-    \caption{{Zusammenfassung \EnMAPBox Issue-Tracker\footnote{{\url{{https://github.com/EnMAP-Box/enmap-box/issues}}}}, Stand {today.strftime("%d.%m.%Y")} }}
-    \label{{tab:enmapbox_issues}}
-\end{{table}}
-"""
+    LaTeX = (
+        fr"# LaTeX CODE:\n"
+        fr"\begin{{table}}[h]\n"
+        fr"\centering\n"
+        fr"  \begin{{tabular}}{{rc|cc|cc}}\n"
+        fr"    \multicolumn{{2}}{{c|}}{{Erstellung}} & Offen & Geschlossen & Duplikat & Ungültig/nicht behebbar \\\n"
+        fr"    \hline\n"
+        fr"    {s_zeitraum} & {cntP['total']} & {cntP['open']} & {cntP['closed']} & {cntP['duplicate']} & "
+        fr"    {cntP['wontfix']} \\\n"
+        fr"    vor {s_start_date} & {cntB['total']} & {cntB['open']} & {cntB['closed']} & {cntB['duplicate']} & "
+        fr"    {cntB['wontfix']} \\\n"
+        fr"    \hline\n"
+        fr"    Gesamt      & {cntA['total']} & {cntA['open']} & {cntA['closed']} & {cntA['duplicate']} & "
+        fr"    {cntA['wontfix']} \\\n"
+        fr"    \end{{tabular}}\n"
+        fr"    \caption{{Zusammenfassung \EnMAPBox Issue-Tracker\footnote"
+        fr"{{\url{{https://github.com/EnMAP-Box/enmap-box/issues}}}}, Stand {today.strftime("%d.%m.%Y")} }}\n"
+        fr"    \label{{tab:enmapbox_issues}}\n"
+        fr"\end{{table}}\n"
+    )
     print(LaTeX)
     return None
 

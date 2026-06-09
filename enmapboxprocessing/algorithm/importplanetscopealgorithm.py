@@ -3,6 +3,10 @@ from os.path import basename, join, dirname, abspath, exists, splitext
 from typing import Dict, Any, List, Tuple
 
 from osgeo import gdal
+from qgis.core import (
+    QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer, QgsMapLayer, QgsRasterPipe,
+    QgsRasterFileWriter
+)
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
@@ -13,8 +17,6 @@ from enmapboxprocessing.gdalutils import GdalUtils
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer, QgsMapLayer, \
-    QgsRasterPipe, QgsRasterFileWriter
 
 
 @typechecked

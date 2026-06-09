@@ -22,16 +22,18 @@
 
 import os
 
-from examples.exampleapp.enmapboxintegration import ExampleEnMAPBoxApp
 from qgis.PyQt.QtCore import QProcess, QProcessEnvironment
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QAction, QWidget, QVBoxLayout, QFrame, QGridLayout, QLineEdit, QLabel, QHBoxLayout, \
-    QDialogButtonBox
+from qgis.PyQt.QtWidgets import (
+    QMenu, QAction, QWidget, QVBoxLayout, QFrame, QGridLayout, QLineEdit, QLabel, QHBoxLayout, QDialogButtonBox
+)
+from qgis.core import (
+    QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer, QgsProcessingParameterNumber,
+    QgsProcessingParameterRasterDestination, QgsProcessingContext, QgsProcessingFeedback
+)
+from qgis.gui import QgsFileWidget
 
 from enmapbox.gui.applications import EnMAPBoxApplication
-from qgis.core import QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer, QgsProcessingParameterNumber, \
-    QgsProcessingParameterRasterDestination, QgsProcessingContext, QgsProcessingFeedback
-from qgis.gui import QgsFileWidget
 
 VERSION = '0.0.1'
 LICENSE = 'GNU GPL-3'
@@ -285,6 +287,7 @@ class AnacondaCallingGeoAlgorithm(QgsProcessingAlgorithm):
 if __name__ == '__main__':
 
     from enmapbox.testing import start_app
+    from enmapbox.gui.mimedata import textFromByteArray
 
     # this will initialize the QApplication/QgsApplication which runs in the background
     # see https://qgis.org/api/classQgsApplication.html for details
@@ -294,8 +297,6 @@ if __name__ == '__main__':
     AI = AnacondaEnvironmentInfo(rootAnaconda)
 
     p = QProcess()
-
-    from enmapbox.gui.mimedata import textFromByteArray
 
     def readStdOut(p):
         assert isinstance(p, QProcess)

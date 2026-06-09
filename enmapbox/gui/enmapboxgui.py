@@ -25,9 +25,37 @@ import warnings
 from os.path import basename, dirname
 from typing import Optional, Dict, Union, Any, List, Sequence
 
+import qgis.utils
+from processing.gui.ProcessingToolbox import ProcessingToolbox
+from qgis import utils as qgsUtils
+from qgis.PyQt.QtCore import QMetaType
+from qgis.PyQt.QtCore import QUrl
+from qgis.PyQt.QtCore import pyqtSignal, Qt, QObject, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
+from qgis.PyQt.QtGui import QDesktopServices
+from qgis.PyQt.QtGui import QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QColor, QIcon, \
+    QKeyEvent, \
+    QCloseEvent, QGuiApplication
+from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, QMainWindow, QApplication, QSizePolicy, \
+    QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
+    QProgressBar, QMessageBox
+from qgis.PyQt.QtXml import QDomDocument
+from qgis.core import QgsBrowserModel, QgsField
+from qgis.core import QgsExpressionContextGenerator, QgsExpressionContext, QgsProcessingContext, \
+    QgsExpressionContextUtils
+from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
+    QgsProcessingAlgorithm, Qgis, QgsCoordinateReferenceSystem, QgsWkbTypes, \
+    QgsPointXY, QgsLayerTree, QgsLayerTreeLayer, QgsVectorLayerTools, \
+    QgsZipUtils, QgsProjectArchive, QgsSettings, \
+    QgsStyle, QgsSymbolLegendNode, QgsSymbol, QgsTaskManager, QgsApplication, QgsProcessingAlgRunnerTask
+from qgis.core import QgsRectangle, edit
+from qgis.gui import QgsMapCanvas, QgsMapTool, QgisInterface, QgsMessageBar, QgsMessageViewer, QgsMessageBarItem, \
+    QgsMapLayerConfigWidgetFactory, QgsAttributeTableFilterModel, QgsSymbolSelectorDialog, \
+    QgsSymbolWidgetContext
+from qgis.gui import QgsProcessingAlgorithmDialogBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog, \
+    QgsNewVectorLayerDialog, QgsProcessingContextGenerator
+
 import enmapbox
 import enmapbox.gui.datasources.manager
-import qgis.utils
 from enmapbox import messageLog, debugLog, DEBUG
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
 from enmapbox.gui.dataviews.dockmanager import DockManagerTreeModel, MapDockTreeNode
@@ -58,33 +86,6 @@ from enmapboxprocessing.algorithm.importprismal2calgorithm import ImportPrismaL2
 from enmapboxprocessing.algorithm.importprismal2dalgorithm import ImportPrismaL2DAlgorithm
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
-from processing.gui.ProcessingToolbox import ProcessingToolbox
-from qgis import utils as qgsUtils
-from qgis.PyQt.QtCore import QMetaType
-from qgis.PyQt.QtCore import QUrl
-from qgis.PyQt.QtCore import pyqtSignal, Qt, QObject, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
-from qgis.PyQt.QtGui import QDesktopServices
-from qgis.PyQt.QtGui import QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QColor, QIcon, \
-    QKeyEvent, \
-    QCloseEvent, QGuiApplication
-from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, QMainWindow, QApplication, QSizePolicy, \
-    QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
-    QProgressBar, QMessageBox
-from qgis.PyQt.QtXml import QDomDocument
-from qgis.core import QgsBrowserModel, QgsField
-from qgis.core import QgsExpressionContextGenerator, QgsExpressionContext, QgsProcessingContext, \
-    QgsExpressionContextUtils
-from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
-    QgsProcessingAlgorithm, Qgis, QgsCoordinateReferenceSystem, QgsWkbTypes, \
-    QgsPointXY, QgsLayerTree, QgsLayerTreeLayer, QgsVectorLayerTools, \
-    QgsZipUtils, QgsProjectArchive, QgsSettings, \
-    QgsStyle, QgsSymbolLegendNode, QgsSymbol, QgsTaskManager, QgsApplication, QgsProcessingAlgRunnerTask
-from qgis.core import QgsRectangle, edit
-from qgis.gui import QgsMapCanvas, QgsMapTool, QgisInterface, QgsMessageBar, QgsMessageViewer, QgsMessageBarItem, \
-    QgsMapLayerConfigWidgetFactory, QgsAttributeTableFilterModel, QgsSymbolSelectorDialog, \
-    QgsSymbolWidgetContext
-from qgis.gui import QgsProcessingAlgorithmDialogBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog, \
-    QgsNewVectorLayerDialog, QgsProcessingContextGenerator
 from .contextmenuprovider import EnMAPBoxContextMenuProvider
 from .contextmenus import EnMAPBoxContextMenuRegistry
 from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
@@ -1162,13 +1163,17 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         layers = [
             lyr for lyr in layers
-            if isinstance(lyr, QgsMapLayer) and not lyr.customProperty(TemporaryGlobalLayerContext.LAYER_PROPERTY_KEY, False)
+            if all(
+                isinstance(lyr, QgsMapLayer),
+                not lyr.customProperty(TemporaryGlobalLayerContext.LAYER_PROPERTY_KEY, False)
+            )
         ]
         self.removeMapLayers(layers)
 
     def syncProjects(self):
         """
-        Ensures that the EnMAPBox.project() contains only layer instances which are used in maps or spectral library widgets
+        Ensures that the EnMAPBox.project() contains only layer instances which are used in maps or
+        spectral library widgets
         """
 
         project_ids = set(self.project().mapLayers().keys())
@@ -1392,7 +1397,6 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
     def addApplication(self, app):
         """
         Adds an EnMAPBoxApplication
-        :param app: EnMAPBoxApplication or string to EnMAPBoxApplication folder or file with EnMAPBoxApplication listing.
         """
         from enmapbox.gui.applications import EnMAPBoxApplication
         if isinstance(app, EnMAPBoxApplication):
@@ -2439,7 +2443,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
     def addSources(self, sourceList) -> List[DataSource]:
         """
         :param sourceList:
-        :return: Returns a list of added DataSources or the list of DataSources that were derived from a single data source uri.
+        :return: Returns a list of added DataSources or the list of DataSources that were derived from a single data
+        source uri.
         """
         assert isinstance(sourceList, list)
         return self.mDataSourceManager.addDataSources(sourceList)

@@ -3,13 +3,13 @@ from os.path import basename
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.reportwriter import MultiReportWriter, HtmlReportWriter, CsvReportWriter
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -32,10 +32,14 @@ class ClassifierFeatureRankingPermutationImportanceAlgorithm(EnMAPProcessingAlgo
         return 'Classifier feature ranking (permutation importance)'
 
     def shortDescription(self) -> str:
-        return 'Permutation feature importance is a model inspection technique that is especially useful for non-linear or opaque estimators. ' \
-               'The permutation feature importance is defined to be the decrease in a model score when a single feature value is randomly shuffled. ' \
-               'This procedure breaks the relationship between the feature and the target, thus the drop in the model score is indicative of how much the model depends on the feature. ' \
-               'This technique benefits from being model agnostic and can be calculated many times with different permutations of the feature.'
+        return (
+            'Permutation feature importance is a model inspection technique that is especially useful for non-linear '
+            'or opaque estimators. The permutation feature importance is defined to be the decrease in a model score '
+            'when a single feature value is randomly shuffled. This procedure breaks the relationship between the '
+            'feature and the target, thus the drop in the model score is indicative of how much the model depends on '
+            'the feature. This technique benefits from being model agnostic and can be calculated many times with '
+            'different permutations of the feature.'
+        )
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
@@ -159,8 +163,9 @@ class ClassifierFeatureRankingPermutationImportanceAlgorithm(EnMAPProcessingAlgo
                     ['mean', 'standard deviation'],
                     np.array(features)[ordered].tolist(),
                 )
+                link = "https://scikit-learn.org/stable/modules/permutation_importance.html#permutation-importance"
                 report.writeParagraph(
-                    f'See {self.htmlLink("https://scikit-learn.org/stable/modules/permutation_importance.html#permutation-importance", "Permutation feature importance")} for further information.'
+                    f'See {self.htmlLink(link, "Permutation feature importance")} for further information.'
                 )
 
             result = {self.P_OUTPUT_REPORT: filename}

@@ -92,9 +92,7 @@ class BivariateColorRasterRendererDialog(QMainWindow):
         menu = QMenu()
         for name in self.predefinedColorPlanes:
             menu.addAction(name, self.onColorPlaneSelected)
-            # todo: make icons; see https://stackoverflow.com/questions/55394894/update-qpushbutton-icon-from-an-numpy-array-dont-work
         self.mMenu.setMenu(menu)
-
         self.mLayer.layerChanged.connect(self.onLayerChanged)
         self.mBand1.bandChanged.connect(self.onLiveUpdate)
         self.mBand2.bandChanged.connect(self.onLiveUpdate)

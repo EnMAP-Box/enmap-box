@@ -23,9 +23,10 @@ import re
 from pathlib import Path
 from typing import Optional
 
-from enmapbox.qgispluginsupport.qps.utils import loadUi
 from qgis.PyQt.QtGui import QColor
 from qgis.core import Qgis
+
+from enmapbox.qgispluginsupport.qps.utils import loadUi
 
 loadUi = loadUi
 
@@ -43,8 +44,10 @@ QGIS_DATATYPE_INFO = {
     Qgis.CFloat32: ('CFloat32', 'Complex Float32.'),
     Qgis.CFloat64: ('CFloat64', 'Complex Float64.'),
     Qgis.ARGB32: ('ARGB32', 'Color, alpha, red, green, blue, 4 bytes the same as QImage::Format_ARGB32.'),
-    Qgis.ARGB32_Premultiplied: ('ARGB32_Premultiplied',
-                                'Color, alpha, red, green, blue, 4 bytes the same as QImage::Format_ARGB32_Premultiplied.')
+    Qgis.ARGB32_Premultiplied: (
+        'ARGB32_Premultiplied',
+        'Color, alpha, red, green, blue, 4 bytes the same as QImage::Format_ARGB32_Premultiplied.'
+    )
 }
 
 

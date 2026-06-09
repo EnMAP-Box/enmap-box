@@ -25,11 +25,13 @@ class PrepareRegressionDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
             "FORCE Higher Level Sampling Submodule"
         )
         link2 = self.htmlLink(
-            "https://github.com/EnMAP-Box/enmap-box/blob/main/tests/testdata/ml/classification_dataset_force_features.csv",
+            "https://github.com/EnMAP-Box/enmap-box/blob/main/tests/testdata/ml"
+            "/classification_dataset_force_features.csv",
             "classification_dataset_force_features.csv"
         )
         link3 = self.htmlLink(
-            "https://github.com/EnMAP-Box/enmap-box/blob/main/tests/testdata/ml/classification_dataset_force_labels.csv",
+            "https://github.com/EnMAP-Box/enmap-box/blob/main/tests/testdata/ml"
+            "/classification_dataset_force_labels.csv",
             "classification_dataset_force_labels.csv"
         )
 

@@ -248,7 +248,9 @@ class ClassificationWorkflowGui(QMainWindow):
         QMainWindow.__init__(self, parent)
         loadUi(join(dirname(__file__), 'main.ui'), self)
         self.url = QUrl(
-            'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/applications.html#classification-workflow')
+            'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/applications.html#'
+            'classification-workflow'
+        )
         self.mMessageBar = QgsMessageBar()
         self.mMessageBar.setMaximumSize(9999999, 50)
         self.centralWidget().layout().addWidget(self.mMessageBar)
@@ -1112,12 +1114,17 @@ class ClassificationWorkflowGui(QMainWindow):
             self.mFileDataset.objectName(): 'Dataset/Creation/Output dataset',
             self.mFileTrainingDataset.objectName(): 'Dataset/Style and Split/Output training dataset',
             self.mFileTestDataset.objectName(): 'Dataset/Style and Split/Output test dataset',
-            self.mFileTrainingDatasetClustered.objectName(): 'Feature Selection/Clustering/Selection/Output training dataset (clustered)',
-            self.mFileTestDatasetClustered.objectName(): 'Feature Selection/Clustering/Selection/Output test dataset (clustered)',
-            self.mFileTrainingDatasetRanked.objectName(): 'Feature Selection/Ranking/Selection/Output training dataset (ranked)',
-            self.mFileTestDatasetRanked.objectName(): 'Feature Selection/Ranking/Selection/Output test dataset (ranked)',
+            self.mFileTrainingDatasetClustered.objectName(): 'Feature Selection/Clustering/Selection/Output training '
+                                                             'dataset (clustered)',
+            self.mFileTestDatasetClustered.objectName(): 'Feature Selection/Clustering/Selection/Output test dataset '
+                                                         '(clustered)',
+            self.mFileTrainingDatasetRanked.objectName(): 'Feature Selection/Ranking/Selection/Output training dataset '
+                                                          '(ranked)',
+            self.mFileTestDatasetRanked.objectName(): 'Feature Selection/Ranking/Selection/Output test dataset '
+                                                      '(ranked)',
             self.mFileClassifierFitted.objectName(): 'Model/Output classifier (fitted)',
-            self.mFileClusteringReport.objectName(): 'Feature Selection/Feature Clustering/Cluster Analysis/Output report',
+            self.mFileClusteringReport.objectName(): 'Feature Selection/Feature Clustering/Cluster Analysis/Output '
+                                                     'report',
             self.mFileRankingReport.objectName(): 'Feature Selection/Feature Ranking/Rank Analysis/Output report',
             self.mFilePredictedClassification.objectName(): 'Classification/Predict/Predicted classification layer'
         }

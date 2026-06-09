@@ -589,8 +589,8 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
     def onCollectionClicked(self):
 
         # https://earthengine-stac.storage.googleapis.com/catalog/catalog.json  # main catalog
-        #    https://earthengine-stac.storage.googleapis.com/catalog/LANDSAT/catalog.json  # sub catalog
-        #        https://earthengine-stac.storage.googleapis.com/catalog/LANDSAT/LANDSAT_LC08_C02_T1_L2.json  # collection
+        # https://earthengine-stac.storage.googleapis.com/catalog/LANDSAT/catalog.json  # sub catalog
+        # https://earthengine-stac.storage.googleapis.com/catalog/LANDSAT/LANDSAT_LC08_C02_T1_L2.json  # collection
 
         if isinstance(self.sender(), QToolButton):
             self.mUserCollection.clearSelection()

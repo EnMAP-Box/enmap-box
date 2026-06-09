@@ -24,8 +24,7 @@ def updatePlot(profile: Profile, profiles: List[Profile], plotWidget: pg.PlotIte
 
     # plot something
     style = PlotStyle()
-    style.setMarkerSymbol(
-        MarkerSymbol.No_Symbol)  # options: Circle, Triangle_Down, Triangle_Up, Triangle_Right, Triangle_Left, Pentagon, Hexagon, Square, Star, Plus, Diamond, Cross, ArrowUp, ArrowRight, ArrowDown, ArrowLeft, No_Symbol
+    style.setMarkerSymbol(MarkerSymbol.No_Symbol)
     style.markerBrush.setColor(QColor('#ff0000'))
     style.markerSize = 15
     style.linePen.setColor(QColor('#ff0000'))

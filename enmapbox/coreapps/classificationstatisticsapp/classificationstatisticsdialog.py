@@ -3,6 +3,16 @@ from typing import Optional, List
 
 import numpy as np
 from osgeo import gdal
+from qgis.PyQt.QtCore import Qt, QRectF
+from qgis.PyQt.QtGui import QMouseEvent, QColor, QPicture, QPainter
+from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QTableWidget, QComboBox, QCheckBox, \
+    QTableWidgetItem
+from qgis.PyQt.uic import loadUi
+from qgis.core import (
+    QgsMapLayerProxyModel, QgsRasterLayer, QgsMapSettings, QgsPalettedRasterRenderer, QgsRasterRange, QgsRectangle,
+    QgsFeature, QgsCoordinateTransform, QgsVectorLayer, QgsVectorFileWriter, QgsUnitTypes
+)
+from qgis.gui import QgsMapLayerComboBox, QgsMapCanvas, QgsFieldComboBox, QgsFeaturePickerWidget
 
 from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget, GraphicsObject, mkBrush, mkPen
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
@@ -11,15 +21,6 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtCore import Qt, QRectF
-from qgis.PyQt.QtGui import QMouseEvent, QColor, QPicture, QPainter
-from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QTableWidget, QComboBox, QCheckBox, \
-    QTableWidgetItem
-from qgis.PyQt.uic import loadUi
-from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsMapSettings, QgsPalettedRasterRenderer, QgsRasterRange, \
-    QgsRectangle, QgsFeature, QgsCoordinateTransform, \
-    QgsVectorLayer, QgsVectorFileWriter, QgsUnitTypes
-from qgis.gui import QgsMapLayerComboBox, QgsMapCanvas, QgsFieldComboBox, QgsFeaturePickerWidget
 
 
 @typechecked

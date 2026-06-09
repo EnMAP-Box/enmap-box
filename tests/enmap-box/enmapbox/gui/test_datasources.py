@@ -54,7 +54,11 @@ class DataSourceTests(EnMAPBoxTestCase):
                 TestObjects.createSpectralLibrary(10)]
 
     def test_vectortilelayer(self):
-        uri = 'styleUrl=https://sgx.geodatenzentrum.de/gdz_basemapde_vektor/styles/bm_web_col.json&type=xyz&url=https://sgx.geodatenzentrum.de/gdz_basemapde_vektor/tiles/v2/bm_web_de_3857/%7Bz%7D/%7Bx%7D/%7By%7D.pbf&zmax=15&zmin=0&http-header:referer='
+        uri = (
+            'styleUrl=https://sgx.geodatenzentrum.de/gdz_basemapde_vektor/styles/bm_web_col.json&type=xyz&'
+            'url=https://sgx.geodatenzentrum.de/gdz_basemapde_vektor/tiles/'
+            'v2/bm_web_de_3857/%7Bz%7D/%7Bx%7D/%7By%7D.pbf&zmax=15&zmin=0&http-header:referer='
+        )
         lyr = QgsVectorTileLayer(uri)
         lyr.setName('Basemap.de')
         self.assertTrue(lyr.isValid())
@@ -315,7 +319,10 @@ class DataSourceTests(EnMAPBoxTestCase):
                 reg.removeAllMapLayers()
                 self.assertTrue(len(mapCanvas.layers()) == 0)
 
-    sublayer_raster_file = r'R:/Rohdaten/EnMAP-Box external Sensor Products/sentinel2/S2A_MSIL2A_20200816T101031_N0214_R022_T32UQD_20200816T130108.SAFE/MTD_MSIL2A.xml'
+    sublayer_raster_file = (
+        r'R:/Rohdaten/EnMAP-Box external Sensor Products/sentinel2'
+        r'/S2A_MSIL2A_20200816T101031_N0214_R022_T32UQD_20200816T130108.SAFE/MTD_MSIL2A.xml'
+    )
 
     @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'Blocking Dialog')
     @unittest.skipIf(not pathlib.Path(sublayer_raster_file).is_file(), 'blocking dialog/Missing test file')

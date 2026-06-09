@@ -81,7 +81,8 @@ class RegressorPerformanceAlgorithm(EnMAPProcessingAlgorithm):
                 try:
                     y2 = cross_val_predict(dump.regressor, X=sample.X, y=y, cv=nfold)
                 except ValueError as error:
-                    if str(error) == 'y must have at least two dimensions for multi-output regression but has only one.':
+                    if str(error) == ('y must have at least two dimensions '
+                                      'for multi-output regression but has only one.'):
                         y2 = cross_val_predict(dump.regressor, X=sample.X, y=np.reshape(y, (-1, 1)), cv=nfold)
 
                 y2 = np.reshape(y2, (len(dump.targets), -1, 1))

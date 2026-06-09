@@ -35,8 +35,10 @@ class PredictClassificationAlgorithm(EnMAPProcessingAlgorithm):
         return [
             (self._RASTER, 'A raster layer with bands used as features. '
                            'Classifier features and raster bands are matched by name to allow for classifiers trained '
-                           'on a subset of the raster bands. If raster bands and classifier features are not matching by name, '
-                           'but overall number of bands and features do match, raster bands are used in original order.'),
+                           'on a subset of the raster bands. '
+                           'If raster bands and classifier features are not matching by name, '
+                           'but overall number of bands and features do match, '
+                           'raster bands are used in original order.'),
             (self._CLASSIFIER, 'A fitted classifier.'),
             (self._MATCH_BY_NAME, 'Whether to match raster bands and classifier features by name.'),
             (self._OUTPUT_CLASSIFICATION, self.RasterFileDestination)

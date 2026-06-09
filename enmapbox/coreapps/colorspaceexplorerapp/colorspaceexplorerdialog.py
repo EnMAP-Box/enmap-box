@@ -1,14 +1,15 @@
 from random import randint
 from typing import Optional
 
-from enmapbox.typeguard import typechecked
-from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QCheckBox, QMainWindow, QSpinBox, QGridLayout
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer, QgsMultiBandColorRenderer, QgsContrastEnhancement, QgsRasterMinMaxOrigin, \
     QgsMapLayerProxyModel
 from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsMapLayerComboBox
+
+from enmapbox.typeguard import typechecked
+from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 
 
 @typechecked
@@ -56,7 +57,11 @@ class ColorSpaceExplorerDialog(QMainWindow):
             tmp = text.split(' ')
             bands = tmp[-1][1:-1].split('-')
             wavelengths = [
-                str(CreateSpectralIndicesAlgorithm.WavebandMapping[CreateSpectralIndicesAlgorithm.translateSentinel2Band(band)][0]) + 'nm'
+                str(
+                    CreateSpectralIndicesAlgorithm.WavebandMapping[
+                        CreateSpectralIndicesAlgorithm.translateSentinel2Band(band)
+                    ][0]
+                ) + 'nm'
                 for band in bands
             ]
             name = ' '.join(tmp[:-1])

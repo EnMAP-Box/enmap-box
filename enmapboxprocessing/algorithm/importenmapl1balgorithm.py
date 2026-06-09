@@ -131,7 +131,8 @@ class ImportEnmapL1BAlgorithm(EnMAPProcessingAlgorithm):
                 with (zipfile.ZipFile(xmlOrZipFilename) as z):
                     archiveMemberPath = productName + '/' + productName + cubeName + extention
                     if archiveMemberPath in z.namelist():
-                        filename = '/vsizip/' + xmlOrZipFilename + '/' + productName + '/' + productName + cubeName + extention
+                        filename = '/vsizip/' + xmlOrZipFilename + '/' + productName
+                        filename += '/' + productName + cubeName + extention
                         return filename
             else:
                 xmlFilename = xmlOrZipFilename

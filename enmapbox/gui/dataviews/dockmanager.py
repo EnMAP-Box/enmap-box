@@ -652,9 +652,6 @@ class DockManager(QObject):
 
             new_sources = self.mDataSourceManager.addDataSources(layers + textfiles)
 
-            # dropped_speclibs = [s for s in new_sources if isinstance(s, VectorDataSource) and s.isSpectralLibrary()]
-            # dropped_maplayers = [s for s in new_sources if isinstance(s, SpatialDataSource) and s not in dropped_speclibs]
-
             dropped_speclibs = [lyr for lyr in layers if is_spectral_library(lyr)]
             dropped_maplayers = [lyr for lyr in layers if isinstance(lyr, QgsMapLayer) and lyr.isValid()]
 
@@ -858,10 +855,11 @@ class DockManagerTreeModel(QgsLayerTreeModel):
              // display flags
               ShowLegend                 = 0x0001,  //!< Add legend nodes for layer nodes
               ShowRasterPreviewIcon      = 0x0002,  //!< Will use real preview of raster layer as icon (may be slow)
-              ShowLegendAsTree           = 0x0004,  //!< For legends that support it, will show them in a tree instead of a list (needs also ShowLegend). Added in 2.8
+              ShowLegendAsTree           = 0x0004,  //!< For legends that support it, will show them in a tree instead
+                                                         of a list (needs also ShowLegend). Added in 2.8
               DeferredLegendInvalidation = 0x0008,  //!< Defer legend model invalidation
-              UseEmbeddedWidgets         = 0x0010,  //!< Layer nodes may optionally include extra embedded widgets (if used in QgsLayerTreeView). Added in 2.16
-
+              UseEmbeddedWidgets         = 0x0010,  //!< Layer nodes may optionally include extra embedded widgets
+                                                         (if used in QgsLayerTreeView). Added in 2.16
               // behavioral flags
               AllowNodeReorder           = 0x1000,  //!< Allow reordering with drag'n'drop
               AllowNodeRename            = 0x2000,  //!< Allow renaming of groups and layers
@@ -1179,11 +1177,10 @@ class DockManagerTreeModel(QgsLayerTreeModel):
                     # mapCanvas Layer Tree Nodes
             elif type(node) in [QgsLayerTreeLayer, QgsLayerTreeGroup]:
                 if column == 0:
-                    flags = flags | Qt.ItemIsUserCheckable | Qt.ItemIsEditable | Qt.ItemIsDropEnabled | Qt.ItemIsDragEnabled
-
-                # if isinstance(dockNode, MapDockTreeNode) and node != dockNode.layerNode:
-                # if isinstance(dockNode, MapDockTreeNode) and node != dockNode.layerNode:
-                #    flags = flags | Qt.ItemIsDragEnabled
+                    flags |= Qt.ItemIsUserCheckable
+                    flags |= Qt.ItemIsEditable
+                    flags |= Qt.ItemIsDropEnabled
+                    flags |= Qt.ItemIsDragEnabled
             elif not isinstance(node, QgsLayerTree):
                 s = ""
             else:

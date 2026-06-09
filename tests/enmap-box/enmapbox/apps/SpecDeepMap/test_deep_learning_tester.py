@@ -74,7 +74,8 @@ class Test_Deep_Learning_Tester(TestCase):
         df = pd.read_csv(str(folder_path_test_iou))
 
         unique_classes = df['Class'].nunique()  # Count unique classes
-        assert unique_classes == 6 + 1, f"Error: Expected 7 values, 6 classes and 1 mean but found 1 mean and {unique_classes}"
+        assert unique_classes == 6 + 1, \
+            f"Error: Expected 7 values, 6 classes and 1 mean but found 1 mean and {unique_classes}"
 
         # 2. Test if Tester predicts and exports
         tiff_files = glob.glob(f"{str(folder_path_test_preds)}/*.tif")

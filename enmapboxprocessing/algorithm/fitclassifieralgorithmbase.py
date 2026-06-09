@@ -94,7 +94,9 @@ class FitClassifierAlgorithmBase(EnMAPProcessingAlgorithm):
                 else:
                     dump = ClassifierDump(**Utils.pickleLoad(filenameDataset))
                 feedback.pushInfo(
-                    f'Load training dataset: X=array{list(dump.X.shape)} y=array{list(dump.y.shape)} categories={[c.name for c in dump.categories]}')
+                    f'Load training dataset: X=array{list(dump.X.shape)} y=array{list(dump.y.shape)} '
+                    f'categories={[c.name for c in dump.categories]}'
+                )
                 feedback.pushInfo('Fit classifier')
 
                 try:

@@ -141,7 +141,9 @@ class ImportUsgsSpeclib07Algorithm(EnMAPProcessingAlgorithm):
             isChildItem = not exists(join(folder, 'USGS_Spectral_Library_Version_7_Data.xml'))
             if isChildItem:
                 if selectedCharacteristic is not None:
-                    raise QgsProcessingException('Cannot select a spectral characteristic for a library child item folder.')
+                    raise QgsProcessingException(
+                        'Cannot select a spectral characteristic for a library child item folder.'
+                    )
                 # find selected characteristic
                 if basename(folder) == 'ASCIIdata_splib07a':
                     selectedCharacteristic = self.OriginalSamplingPositionsCharacteristic

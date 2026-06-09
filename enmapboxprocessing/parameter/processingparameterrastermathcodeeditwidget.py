@@ -40,7 +40,6 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
 
         self.mProject: QgsProject = QgsProject.instance()
         self.updateSources()
-        # QgsProject.instance().layersAdded.connect(self.updateSources)  # better not auto-update sources, because when adding a result layer to a map view, it will be added with the basename equal to the identifier already used in the snippet
         self.mSourcesRefresh.clicked.connect(self.updateSources)
 
         self.parseSnippets()
@@ -124,7 +123,8 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
     def onSnippetOpenFolderClicked(self):
         from enmapboxprocessing.algorithm import rastermathalgorithm
         root = join(dirname(rastermathalgorithm.__file__), 'snippet')
-        # taken from https://stackoverflow.com/questions/1795111/is-there-a-cross-platform-way-to-open-a-file-browser-in-python
+        # taken from https://stackoverflow.com/questions/1795111/is-there-a-cross-platform-way-to-open-a-file-
+        # browser-in-python
         if sys.platform == 'win32':
             # subprocess.Popen(['start', root], shell=True)
             webbrowser.open(root)
