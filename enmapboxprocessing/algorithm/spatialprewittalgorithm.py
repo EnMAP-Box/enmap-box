@@ -1,6 +1,6 @@
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.spatialfilterfunctionalgorithmbase import SpatialFilterFunctionAlgorithmBase
 from enmapboxprocessing.enmapalgorithm import Group
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -26,5 +26,4 @@ class SpatialPrewittAlgorithm(SpatialFilterFunctionAlgorithmBase):
     def code(cls):
         from scipy.ndimage.filters import prewitt
 
-        function = lambda array: prewitt(array, axis=0)
-        return function
+        return lambda array: prewitt(array, axis=0)

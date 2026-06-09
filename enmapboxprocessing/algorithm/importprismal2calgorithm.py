@@ -164,7 +164,8 @@ class ImportPrismaL2CAlgorithm(EnMAPProcessingAlgorithm):
         return result
 
     def writeSpectralCube(self, filenameSpectralCube, he5Filename, spectralRegion, feedback):
-        parseFloatList = lambda text: [float(item) for item in text.split()]
+        def parseFloatList(text):
+            return [float(item) for item in text.split()]
         array = list()
         metadata = dict()
         wavelength = list()
@@ -233,7 +234,10 @@ class ImportPrismaL2CAlgorithm(EnMAPProcessingAlgorithm):
     def writeSpectralErrorMatrix(self, filenameSpectralError, he5Filename, spectralRegion, feedback):
         if filenameSpectralError is None:
             return None
-        parseFloatList = lambda text: [float(item) for item in text.split()]
+
+        def parseFloatList(text):
+            [float(item) for item in text.split()]
+
         array = list()
         metadata = dict()
         wavelength = list()

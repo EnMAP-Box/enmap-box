@@ -32,6 +32,4 @@ class SpatialMorphologicalBinaryPropagationAlgorithm(SpatialFilterFunctionAlgori
 
         structure = generate_binary_structure(rank=2, connectivity=1)
         structure = iterate_structure(structure=structure, iterations=1)
-        function = lambda array: binary_propagation(array, structure=structure)
-
-        return function
+        return lambda array: binary_propagation(array, structure=structure)

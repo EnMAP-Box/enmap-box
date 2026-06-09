@@ -32,5 +32,4 @@ class SpatialMorphologicalBinaryFillHolesAlgorithm(SpatialFilterFunctionAlgorith
 
         structure = generate_binary_structure(rank=2, connectivity=1)
         structure = iterate_structure(structure=structure, iterations=1)
-        function = lambda array: binary_fill_holes(array, structure=structure)
-        return function
+        return lambda array: binary_fill_holes(array, structure=structure)

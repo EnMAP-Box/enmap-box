@@ -26,5 +26,4 @@ class SpatialMorphologicalWhiteTophatAlgorithm(SpatialFilterFunctionAlgorithmBas
     def code(cls):
         from scipy.ndimage import white_tophat
 
-        function = lambda array: white_tophat(array, size=(3, 3))
-        return function
+        return lambda array: white_tophat(array, size=(3, 3))

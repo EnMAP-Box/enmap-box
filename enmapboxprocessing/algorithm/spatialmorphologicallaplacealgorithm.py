@@ -27,5 +27,4 @@ class SpatialMorphologicalLaplaceAlgorithm(SpatialFilterFunctionAlgorithmBase):
     def code(cls):
         from scipy.ndimage import morphological_laplace
 
-        function = lambda array: morphological_laplace(array, size=(3, 3))
-        return function
+        return lambda array: morphological_laplace(array, size=(3, 3))

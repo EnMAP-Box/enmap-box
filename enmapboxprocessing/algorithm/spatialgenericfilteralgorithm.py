@@ -31,5 +31,4 @@ class SpatialGenericAlgorithm(SpatialFilterFunctionAlgorithmBase):
             outvalue = np.nansum(invalues)  # replace this line with your code!
             return outvalue
 
-        function = lambda array: generic_filter(array, function=filter_function, size=3)
-        return function
+        return lambda array: generic_filter(array, function=filter_function, size=3)

@@ -199,7 +199,10 @@ class ImportPrismaL2DAlgorithm(EnMAPProcessingAlgorithm):
             self, filenameSpectralCube, he5Filename, spectralRegion, badBandMultipliers: Optional[List[int]],
             feedback
     ):
-        parseFloatList = lambda text: [float(item) for item in text.split()]
+
+        def parseFloatList(text):
+            [float(item) for item in text.split()]
+
         array = list()
         metadata = dict()
         wavelength = list()
@@ -291,7 +294,10 @@ class ImportPrismaL2DAlgorithm(EnMAPProcessingAlgorithm):
     ) -> Optional[List[int]]:
         if filenameSpectralError is None:
             return None
-        parseFloatList = lambda text: [float(item) for item in text.split()]
+
+        def parseFloatList(text):
+            return [float(item) for item in text.split()]
+
         array = list()
         metadata = dict()
         wavelength = list()

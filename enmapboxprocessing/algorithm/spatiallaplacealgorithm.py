@@ -26,5 +26,4 @@ class SpatialLaplaceAlgorithm(SpatialFilterFunctionAlgorithmBase):
     def code(cls):
         from scipy.ndimage.filters import laplace
 
-        function = lambda array: laplace(array)
-        return function
+        return lambda array: laplace(array)

@@ -25,5 +25,4 @@ class SpatialGaussianGradientMagnitudeAlgorithm(SpatialFilterFunctionAlgorithmBa
     def code(cls):
         from scipy.ndimage.filters import gaussian_gradient_magnitude
 
-        function = lambda array: gaussian_gradient_magnitude(array, sigma=1)
-        return function
+        return lambda array: gaussian_gradient_magnitude(array, sigma=1)

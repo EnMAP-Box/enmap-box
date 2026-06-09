@@ -33,5 +33,4 @@ class SpatialMorphologicalBinaryClosingAlgorithm(SpatialFilterFunctionAlgorithmB
 
         structure = generate_binary_structure(rank=2, connectivity=1)
         structure = iterate_structure(structure=structure, iterations=1)
-        function = lambda array: binary_closing(array, structure=structure, iterations=1)
-        return function
+        return lambda array: binary_closing(array, structure=structure, iterations=1)
