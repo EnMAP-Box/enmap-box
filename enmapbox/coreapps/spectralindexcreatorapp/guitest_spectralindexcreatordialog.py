@@ -1,5 +1,6 @@
 from qgis.core import QgsRasterLayer
 
+from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 
 from enmapbox.exampledata import enmap

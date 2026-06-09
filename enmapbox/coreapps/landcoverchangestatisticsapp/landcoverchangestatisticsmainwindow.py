@@ -219,6 +219,7 @@ class LandCoverChangeSankeyPlotBuilder():
             categoryRelSizes = categorySizes / np.sum(categorySizes)
             return array, categories, categorySizes, categoryRelSizes
 
+        array2 = categories2 = categorySizes2 = categoryRelSizes2 = None
         for i, (layer, nextLayer) in enumerate(zip(self.layers, self.layers[1:])):
             if i == 0:
                 array, categories, categorySizes, categoryRelSizes = readLayer(layer)
@@ -417,7 +418,8 @@ class LandCoverChangeSankeyPlotBuilder():
                         links['target'].append(i2 + off2)
                         links['value'].append(p)
                         if locationValue1 == l1 and locationValue2 == l2:
-                            links['color'].append(makeRgba(highlightColor))
+                            links['color'].append(color)
+                            # links['color'].append(makeRgba(highlightColor))
                         else:
                             links['color'].append(color)
             off1 += len(categories1)

@@ -130,7 +130,6 @@ class TestReclassify(EnMAPBoxTestCase):
         self.assertIsInstance(csDst2, ClassificationScheme)
         self.assertEqual(csDst, csDst2)
 
-        enmapBox.close()
         QgsProject.instance().removeAllMapLayers()
 
     def test_transformation_table(self):

@@ -21,25 +21,25 @@
 """
 
 import importlib
-import uuid
 import os
-from typing import Union, List, Optional
+import uuid
+from typing import Union, List
 
+import qgis.utils
 from osgeo import gdal
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QMessageBox, QMainWindow, QMenu
+from qgis.core import QgsRasterLayer, QgsRasterRenderer, QgsLayerTreeNode
+from qgis.gui import QgsMapCanvas, QgisInterface
 
+from enmapbox.gui.applications import EnMAPBoxApplication
 from enmapbox.gui.contextmenuprovider import EnMAPBoxContextMenuProvider
 from enmapbox.gui.contextmenus import EnMAPBoxAbstractContextMenuProvider
 from enmapbox.gui.datasources.datasources import DataSource
 from enmapbox.gui.datasources.datasourcesets import DataSourceSet
-from qgis.PyQt.QtWidgets import QMessageBox, QMainWindow, QMenu
-from qgis.PyQt.QtGui import QIcon
-from qgis.core import QgsRasterLayer, QgsRasterRenderer, QgsLayerTreeNode
-from qgis.gui import QgsMapCanvas, QgisInterface
-import qgis.utils
-from enmapbox.gui.applications import EnMAPBoxApplication
-from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.datasources.manager import DataSourceManagerTreeView, RasterBandTreeNode
 from enmapbox.gui.dataviews.dockmanager import DockTreeView
+from enmapbox.gui.enmapboxgui import EnMAPBox
 
 APP_DIR = os.path.dirname(__file__)
 MIN_VERSION = '0.9'
@@ -169,6 +169,7 @@ class VRTBuilderAppContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
     """
     This class creates EnMAP-Box context menus to interact with the VRTBuilder
     """
+
     def __init__(self, vrtBuilderApp: VRTBuilderApp, *args, **kwds):
         super().__init__(*args, **kwds)
         self.vrtBuilderApp: VRTBuilderApp = vrtBuilderApp
@@ -203,7 +204,7 @@ class VRTBuilderAppContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
 
     def openVRT(self,
                 inputs: List[Union[QgsRasterLayer, QgsRasterRenderer, RasterBandTreeNode]],
-                builder: Optional[Union[bool, 'VRTBuilderWidget']],
+                builder,
                 mosaic: bool = False):
 
         from vrtbuilder.widgets import VRTBuilderWidget

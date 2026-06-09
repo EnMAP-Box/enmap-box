@@ -35,13 +35,13 @@ from typing import Union
 
 import docutils.core
 import markdown
+from qgis.core import QgsFileUtils, QgsUserProfile, QgsUserProfileManager
+from qgis.testing import start_app
 
 import enmapbox
 from enmapbox import DIR_REPO
 from enmapbox.qgispluginsupport.qps.make.deploy import QGISMetadataFileWriter, userProfileManager
 from enmapbox.qgispluginsupport.qps.utils import zipdir
-from qgis.core import QgsFileUtils, QgsUserProfile, QgsUserProfileManager
-from qgis.testing import start_app
 
 app = start_app()
 # consider default Git location on Windows systems to avoid creating a Start-Up Script
@@ -376,24 +376,6 @@ def createCHANGELOG(dirPlugin: Path) -> str:
     #    import sphinx.transforms
 
     html = markdownToHTML(pathMD)
-    if False:
-        xml = minidom.parseString(html)
-        #  remove headline
-        for i, node in enumerate(xml.getElementsByTagName('h1')):
-            if i == 0:
-                node.parentNode.removeChild(node)
-            else:
-                node.tagName = 'h4'
-
-        for node in xml.getElementsByTagName('link'):
-            node.parentNode.removeChild(node)
-
-        for node in xml.getElementsByTagName('meta'):
-            if node.getAttribute('name') == 'generator':
-                node.parentNode.removeChild(node)
-
-        xml = xml.getElementsByTagName('body')[0]
-        html = xml.toxml()
 
     if True:
         html_cleaned = html

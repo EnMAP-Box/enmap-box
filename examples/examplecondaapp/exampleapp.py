@@ -350,14 +350,5 @@ if __name__ == '__main__':
         w.setAnacondaRoot(rootAnaconda)
         w.show()
 
-    else:
-        from enmapbox.gui.enmapboxgui import EnMAPBox
-
-        EB = EnMAPBox(None)
-        EB.run()
-        EB.openExampleData(mapWindows=2)
-        app = ExampleEnMAPBoxApp(EB)
-        EB.addApplication(app)
-
     # start the GUI thread
     qgsApp.exec_()

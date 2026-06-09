@@ -631,11 +631,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.onReloadProject()
 
     def executeAlgorithm(self, alg_id, parent, in_place=False, as_batch=False):
-        if False:
-            from qgis.utils import iface
-            processingPlugin = qgis.utils.plugins.get('processing', ProcessingPlugin(iface))
-            processingPlugin.executeAlgorithm(alg_id, parent, in_place=in_place, as_batch=as_batch)
-        else:
+        if True:
             context = self.processingContext()
             if parent is None:
                 parent = self.ui

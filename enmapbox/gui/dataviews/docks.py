@@ -172,10 +172,10 @@ class Dock(pgDock):
         self.hStyle += style
         self.vStyle += style
 
-    def setEnMAPBox(self, enmapBox: 'EnMAPBox'):
+    def setEnMAPBox(self, enmapBox):
         self.mEnMAPBox = enmapBox
 
-    def enmapBox(self) -> 'EnMAPBox':
+    def enmapBox(self):
         return self.mEnMAPBox
 
     def addTempArea(self):

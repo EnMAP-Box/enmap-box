@@ -1625,7 +1625,7 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         self.mDockTreeView: DockTreeView = treeView
         # self.mSignals = DockManagerLayerTreeModelMenuProvider.Signals()
 
-    def enmapboxInstance(self) -> 'EnMAPBox':
+    def enmapboxInstance(self):
         return self.mDockTreeView.enmapBoxInstance()
 
     def createContextMenu(self) -> QMenu:

@@ -17,7 +17,7 @@ class EnMAPBoxAbstractContextMenuProvider(QObject):
     def __init__(self, parent: QObject = None):
         super().__init__(parent)
 
-    def enmapBox(self) -> 'EnMAPBox':
+    def enmapBox(self):
         from enmapbox.gui.enmapboxgui import EnMAPBox
         return EnMAPBox.instance()
 
