@@ -608,8 +608,8 @@ def requiredPackages(return_tuples: bool = False) -> List[PIPPackage]:
     # rxPipPkg = re.compile(r'^[a-zA-Z_-][a-zA-Z0-9_-]*')
 
     with open(file, 'r', newline='') as csv_file:
-        lines = [l.strip() for l in csv_file.read().splitlines()]
-        lines = [l for l in lines if not l.startswith('#')]
+        lines = [line.strip() for line in csv_file.read().splitlines()]
+        lines = [line for line in lines if not line.startswith('#')]
         reader = csv.DictReader(lines, delimiter=',', quotechar='"')
         for row in reader:
             for k in list(row.keys()):

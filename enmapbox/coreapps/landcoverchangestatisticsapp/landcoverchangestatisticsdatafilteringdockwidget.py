@@ -82,7 +82,7 @@ class LandCoverChangeStatisticsDataFilteringDockWidget(QgsDockWidget):
 
         self.mTableClasses.setColumnCount(len(layers) + 1)
         self.mTableClasses.setRowCount(len(uniqueCategories))
-        self.mTableClasses.setHorizontalHeaderLabels(['All'] + [l.name() for l in layers])
+        self.mTableClasses.setHorizontalHeaderLabels(['All'] + [layer.name() for layer in layers])
         for row, c in enumerate(uniqueCategories.values()):
             color = QColor(c.color)
             pixmap = QPixmap(16, 16)

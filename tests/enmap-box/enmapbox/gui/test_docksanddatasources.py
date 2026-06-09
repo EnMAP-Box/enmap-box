@@ -161,10 +161,10 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         node2: SpeclibDockTreeNode = model.findDockNode(speclibDock.speclibWidget())
 
         w = QWidget()
-        l = QHBoxLayout()
-        l.addWidget(TV)
-        l.addWidget(dockArea)
-        w.setLayout(l)
+        layout = QHBoxLayout()
+        layout.addWidget(TV)
+        layout.addWidget(dockArea)
+        w.setLayout(layout)
         self.showGui(w)
         QgsProject.instance().removeAllMapLayers()
 

@@ -155,19 +155,19 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         if True:
             w = QWidget()
             w.setWindowTitle('QProject layers')
-            l = QGridLayout()
-            w.setLayout(l)
+            layout = QGridLayout()
+            w.setLayout(layout)
             cbQGIS = QgsMapLayerComboBox()
-            l.addWidget(QLabel('QGIS Layers'), 0, 0)
-            l.addWidget(cbQGIS, 0, 1)
+            layout.addWidget(QLabel('QGIS Layers'), 0, 0)
+            layout.addWidget(cbQGIS, 0, 1)
 
             if Qgis.versionInt() > 32400:
                 cbEMB = QgsMapLayerComboBox()
                 cbEMB.setWindowTitle('EnMAP-Box Layers')
                 cbEMB.setProject(EMB.project())
 
-                l.addWidget(QLabel('EnMAP-Box Layers'), 1, 0)
-                l.addWidget(cbEMB, 1, 1)
+                layout.addWidget(QLabel('EnMAP-Box Layers'), 1, 0)
+                layout.addWidget(cbEMB, 1, 1)
             windows.append(w)
         self.showGui(windows)
         EMB.close()

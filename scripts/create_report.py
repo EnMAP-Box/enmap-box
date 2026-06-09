@@ -166,7 +166,7 @@ def report_github_issues_QGIS(authors=['jakimowb', 'janzandr'], start_date='2020
             rx = re.compile(r'<(.[^>]+)>; *rel="next"')
 
             # Extract the URL for the next page
-            link = [l.strip() for l in link_header.split(',') if 'rel="next"' in l]
+            link = [elem.strip() for elem in link_header.split(',') if 'rel="next"' in elem]
             if len(link) > 0:
                 link = link[0]
                 issues_url = rx.match(link).group(1)
@@ -289,7 +289,7 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
             rx = re.compile(r'<(.[^>]+)>; *rel="next"')
 
             # Extract the URL for the next page
-            link = [l.strip() for l in link_header.split(',') if 'rel="next"' in l]
+            link = [elem.strip() for elem in link_header.split(',') if 'rel="next"' in elem]
             if len(link) > 0:
                 link = link[0]
                 issues_url = rx.match(link).group(1)
