@@ -3,7 +3,7 @@ from typing import List, Optional
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QListWidget, QListWidgetItem, QDialog
 from qgis.PyQt.uic import loadUi
-from qgis.core import QgsRasterLayer, QgsMapLayer
+from qgis.core import QgsRasterLayer
 from qgis.gui import QgsRasterBandComboBox
 from enmapbox.typeguard import typechecked
 
@@ -88,7 +88,6 @@ class MultipleRasterBandSelectionDialog(QDialog):
 
         self.accepted = False
 
-        layer: QgsMapLayer
         for bandNo, bandName in enumerate(bandNames, 1):
             item = QListWidgetItem(bandName)
             item.bandNo = bandNo

@@ -23,7 +23,6 @@ class BuildImageChipVrtsTask(QgsTask):
             folderCollection: DirEntry
             folderLocation: DirEntry
             folderChip: DirEntry
-            f: DirEntry
             for folderCollection in scandir(join(self.root, 'chips')):
                 # e.g. <root>/chips/LANDSAT_LC09_C02_T1_L2'
                 if not folderCollection.is_dir():

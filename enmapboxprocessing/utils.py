@@ -323,7 +323,6 @@ class Utils(object):
 
     @classmethod
     def categoriesFromCategorizedSymbolRenderer(cls, renderer: QgsCategorizedSymbolRenderer) -> Categories:
-        c: QgsRendererCategory
         categories = [Category(c.value(), c.label(), c.symbol().color().name())
                       for c in renderer.categories()
                       if c.label() != '']

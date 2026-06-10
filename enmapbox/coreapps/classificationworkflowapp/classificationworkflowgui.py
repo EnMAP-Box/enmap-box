@@ -844,7 +844,7 @@ class ClassificationWorkflowGui(QMainWindow):
                 alg.P_RASTER: raster,
                 alg.P_OUTPUT_CLASSIFICATION: filenameClassification
             }
-            result = self.showAlgorithmDialog(alg, parameters)
+            self.showAlgorithmDialog(alg, parameters)
             self.mFilePredictedClassification.setFilePath(filenameClassification)
 
         if self.mCheckPredictedProbability.isChecked():

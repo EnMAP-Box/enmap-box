@@ -464,7 +464,6 @@ def utilsConvertHtmlLinksToRstLinks(text: str) -> str:
 
 
 def utilsFindHtmlWeblinks(text) -> List[str]:
-    match_: re.Match
     starts = [match_.start() for match_ in re.finditer('<a href="', text)]
     ends = [match_.start() + 4 for match_ in re.finditer('</a>', text)]
     assert len(starts) == len(ends)
