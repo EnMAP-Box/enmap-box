@@ -58,7 +58,7 @@ class GeeTimeseriesExplorerApp(EnMAPBoxApplication):
     def initGui(self):
         self.initEnmapOrQgisGui(self.interface)
 
-    def initEnmapOrQgisGui(self, interface: QgisInterface):
+    def initEnmapOrQgisGui(self, interface):
 
         # add toolbar button
         self.actionToggleMainDock = QAction(self.icon(), 'GEE Time Series Explorer')

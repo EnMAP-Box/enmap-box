@@ -44,7 +44,7 @@ class RasterBandStackingApp(EnMAPBoxApplication):
     def initGui(self):
         self.initEnmapOrQgisGui(self.interface)
 
-    def initEnmapOrQgisGui(self, interface: QgisInterface):
+    def initEnmapOrQgisGui(self, interface):
 
         # add toolbar button
         self.actionToggleDock = QAction(self.icon(), 'Raster Band Stacking')

@@ -259,7 +259,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
         assert isinstance(profileDock, GeeTemporalProfileDockWidget)
         self.profileDock = profileDock
 
-    def setInterface(self, interface: QgisInterface):
+    def setInterface(self, interface):
         self.interface = interface
         if isinstance(interface, EnMAPBox):
             self.interfaceType = 0
