@@ -105,7 +105,6 @@ class TestIssue747(EnMAPBoxTestCase):
         # tv.expand(model.node2idx(node))
         tv.resize(QSize(600, 600))
         tv.show()
-        s = ""
 
         self.showGui(tv)
 

@@ -22,13 +22,6 @@ import warnings
 from _weakrefset import WeakSet
 from typing import List, Optional
 
-from enmapbox import enmapboxSettings
-from enmapbox.enmapboxsettings import EnMAPBoxSettings
-from enmapbox.gui import MapTools, MapToolCenter, PixelScaleExtentMapTool, \
-    CursorLocationMapTool, FullExtentMapTool, QgsMapToolAddFeature, QgsMapToolSelect, \
-    CrosshairStyle, CrosshairMapCanvasItem
-from enmapbox.gui.mimedata import containsMapLayers, extractMapLayers
-from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
 from qgis.PyQt.QtCore import Qt, QObject, QCoreApplication, pyqtSignal, QEvent, QPointF, QMimeData, QTimer, QSize, \
     QModelIndex, QAbstractListModel
 from qgis.PyQt.QtGui import QMouseEvent, QIcon, QDragEnterEvent, QDropEvent, QResizeEvent, QKeyEvent, QColor
@@ -41,6 +34,14 @@ from qgis.core import QgsLayerTreeLayer, QgsCoordinateReferenceSystem, QgsRectan
 from qgis.gui import QgsColorDialog, QgsLayerTreeMapCanvasBridge, QgsMapTool
 from qgis.gui import QgsMapCanvas, QgisInterface, QgsMapToolZoom, QgsAdvancedDigitizingDockWidget, \
     QgsProjectionSelectionWidget, QgsMapToolIdentify, QgsMapToolPan, QgsMapToolCapture, QgsMapMouseEvent
+
+from enmapbox import enmapboxSettings
+from enmapbox.enmapboxsettings import EnMAPBoxSettings
+from enmapbox.gui import MapTools, MapToolCenter, PixelScaleExtentMapTool, \
+    CursorLocationMapTool, FullExtentMapTool, QgsMapToolAddFeature, QgsMapToolSelect, \
+    CrosshairStyle, CrosshairMapCanvasItem
+from enmapbox.gui.mimedata import containsMapLayers, extractMapLayers
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
 
 LINK_ON_SCALE = 'SCALE'
 LINK_ON_CENTER = 'CENTER'
@@ -199,11 +200,9 @@ class CanvasLinkDialog(QDialog):
     def onSourceCanvasChanged(self):
         pass
         self.setSourceCanvas(self.currentSourceCanvas())
-        s = ""
 
     def onTargetSelectionChanged(self):
-        sender = self.sender()
-        s = ""
+        self.sender()
 
     def addCanvas(self, canvas):
 
@@ -332,7 +331,7 @@ class CanvasLinkDialog(QDialog):
                 linkType = UNLINK
 
             if linkType not in self.mWidgetLUT[targetCanvas].keys():
-                s = ""
+                pass
 
             for btnLinkType, btn in self.mWidgetLUT[targetCanvas].items():
                 assert isinstance(btn, QToolButton)
@@ -346,10 +345,10 @@ class CanvasLinkDialog(QDialog):
         for btn in btnList:
             assert isinstance(btn, QToolButton)
             if btn == sender:
-                s = ""
+                pass
                 # todo: highlight activated function
             else:
-                s = ""
+                pass
                 # todo: de-highlight activated function
 
     pass
@@ -422,6 +421,7 @@ class CanvasLinkTargetWidget(QFrame):
         # get map center
         x = int(parentRect.width() / 2 - self.width() / 2)
         y = int(parentRect.height() / 2 - self.height() / 2)
+        del x, y
 
         mw = int(min([self.width(), self.height()]) * 0.9)
         mw = min([mw, 120])
@@ -486,9 +486,6 @@ class CanvasLink(QObject):
                 w.show()
                 CanvasLink.LINK_TARGET_WIDGETS.add(w)
                 # canvas_source.freeze()
-            s = ""
-
-        s = ""
 
     @staticmethod
     def linkMapCanvases(canvas1, canvas2, linktype):
@@ -731,6 +728,7 @@ class CanvasLink(QObject):
             return dstCanvas
 
         centerT = SpatialPoint(srcExt.crs(), srcExt.center())
+        del centerT
 
         srcWidth, srcHeight = srcCanvas.width(), srcCanvas.height()
         if srcWidth == 0:
@@ -844,11 +842,7 @@ class MapCanvasMapTools(QObject):
             self.mCanvas.setMapTool(self.mtAddFeature)
         elif mapToolKey == MapTools.SelectFeature:
             self.mCanvas.setMapTool(self.mtSelectFeature)
-
-            s = ""
-
         else:
-
             print('Unknown MapTool key: {}'.format(mapToolKey))
 
 
@@ -1012,6 +1006,7 @@ class MapCanvas(QgsMapCanvas):
         is_panning = bool(QApplication.mouseButtons() & Qt.MiddleButton)
         is_ctrl = bool(QApplication.keyboardModifiers() & Qt.ControlModifier)
         is_shift = bool(QApplication.keyboardModifiers() & Qt.ShiftModifier)
+        del is_shift
 
         if not is_panning and is_ctrl and e.key() in [Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down]:
             # find raster layer with a reference pixel grid

@@ -13,7 +13,7 @@ class TestRasterLayerZonalAggregationAlgorithm(TestCase):
             alg.P_CATEGORIZED_RASTER: landcover_map_l3,
             alg.P_OUTPUT_TABLE: self.filename('table.csv'),
         }
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)
 
     def _test_issue1406(self):
         alg = RasterLayerZonalAggregationAlgorithm()
@@ -22,4 +22,4 @@ class TestRasterLayerZonalAggregationAlgorithm(TestCase):
             alg.P_CATEGORIZED_RASTER: landcover_map_l3,
             alg.P_OUTPUT_TABLE: self.filename('table.gpkg'),
         }
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)

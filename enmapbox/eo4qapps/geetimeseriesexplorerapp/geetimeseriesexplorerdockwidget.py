@@ -555,7 +555,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
                     import json
                     with urllib.request.urlopen(jsonUrl) as url:
                         data = json.loads(url.read().decode())
-                except Exception as error:
+                except Exception:
                     # QgsMessageLog.logMessage(
                     #    f'url not found: {jsonUrl}', tag="GEE Time Series Explorer", level=Qgis.MessageLevel.Critical
                     # )
@@ -1156,7 +1156,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
 
         # composite
         eeReducers = self.eeReducers()
-        bandNames = self.eeFullCollectionInfo.bandNames + self.currentSpectralIndexBandNames()
+        # bandNames = self.eeFullCollectionInfo.bandNames + self.currentSpectralIndexBandNames()
 
         eeCompositeProfile = None
 

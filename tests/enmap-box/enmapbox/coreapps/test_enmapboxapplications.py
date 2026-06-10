@@ -89,7 +89,7 @@ class TestEnMAPBoxApplications(EnMAPBoxTestCase):
         speclib: QgsVectorLayer
 
         slw = SpectralLibraryWidget(speclib=speclib)
-        pFields = profile_field_list(speclib)
+        profile_field_list(speclib)
 
         speclib.startEditing()
         procw = SpectralProcessingDialog()
@@ -98,7 +98,7 @@ class TestEnMAPBoxApplications(EnMAPBoxTestCase):
         wrapper = procw.processingModelWrapper()
         cbInputField = wrapper.parameterWidget('raster')
         cbInputField.setCurrentIndex(1)
-        currentInputFieldName = cbInputField.currentText()
+        cbInputField.currentText()
 
         cb2 = wrapper.outputWidget('outputResampledRaster')
         cb2.setCurrentText('newfield')

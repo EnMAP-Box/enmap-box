@@ -31,7 +31,7 @@ def exitAll(*args):
     QApplication.closeAllWindows()
     QApplication.processEvents()
     print('## Quit QgsApplication')
-    r = QgsApplication.quit()
+    QgsApplication.quit()
     print('## QgsApplication down')
     # sys.exit(0)
 
@@ -67,7 +67,7 @@ def run(
                     lyr = source.asMapLAyer()
                     dock = enmapBox.createDock('MAP')
                     dock.addLayers([lyr])
-                except Exception as ex:
+                except Exception:
                     pass
 
     if not qAppExists:
@@ -97,4 +97,3 @@ if __name__ == '__main__':
 
     run(debug=args.debug, load_core_apps=load_core_apps, load_other_apps=load_other_apps,
         load_example_data=args.exampledata)
-    s = ""

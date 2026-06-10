@@ -14,7 +14,7 @@ class TestImportEnmapL1CAlgorithm(TestCase):
             alg.P_FILE: SensorProducts.Enmap.L1C_MetadataXml,
             alg.P_OUTPUT_RASTER: self.filename('enmapL1C.vrt'),
         }
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)
 
     def test_saveAsTif(self):
         if sensorProductsRoot() is None or self.skipProductImport:
@@ -25,4 +25,4 @@ class TestImportEnmapL1CAlgorithm(TestCase):
             alg.P_FILE: SensorProducts.Enmap.L1C_MetadataXml,
             alg.P_OUTPUT_RASTER: self.filename('enmapL1C.tif'),
         }
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)

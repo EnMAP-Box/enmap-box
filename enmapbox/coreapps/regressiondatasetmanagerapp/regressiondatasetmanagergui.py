@@ -44,7 +44,7 @@ class RegressionDatasetManagerGui(QDialog):
     def currentEdits(self):
         filename = self.mDataset.mFile.filePath()
         try:
-            dump = RegressorDump.fromDict(Utils.pickleLoad(filename))
+            RegressorDump.fromDict(Utils.pickleLoad(filename))
         except Exception:
             return
 
@@ -129,7 +129,7 @@ class RegressionDatasetManagerGui(QDialog):
         self.onSaveClicked(question=False)
         filename = self.mDataset.mFile.filePath()
         try:
-            dump = RegressorDump.fromDict(Utils.pickleLoad(filename))
+            RegressorDump.fromDict(Utils.pickleLoad(filename))
         except Exception:
             self.mTargetTable.setRowCount(0)
             return

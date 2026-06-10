@@ -94,7 +94,7 @@ class TestSpectralResamplingByWavelengthAndFwhmAlgorithm(TestCase):
         try:
             self.runalg(alg, parameters)
             assert 0, 'error not raised, something went wrong'
-        except Exception as error:
+        except Exception:
             pass
 
     def test_userFwhm(self):

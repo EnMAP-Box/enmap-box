@@ -197,7 +197,7 @@ class TestTranslateAlgorithm(TestCase):
             alg.P_CREATION_PROFILE: alg.DefaultGTiffCreationProfile,
             alg.P_OUTPUT_RASTER: self.filename('enmap.tif')
         }
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)
 
     def test_clipSourceGrid_byFullExtent(self):
         raster = QgsRasterLayer(enmap)
@@ -331,7 +331,6 @@ class TestTranslateAlgorithm(TestCase):
         }
         result = self.runalg(alg, parameters)
         reader = RasterReader(result[alg.P_OUTPUT_RASTER])
-        array = reader.array()[0]
         self.assertEqual(-1356439.5, reader.array()[0].sum())
 
     def test_unsetScrNoData(self):

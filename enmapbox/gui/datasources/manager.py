@@ -90,11 +90,11 @@ class DataSourceManager(TreeModel):
 
         assert isinstance(mimeData, QMimeData)
 
-        result = False
+        # result = False
         toAdd = []
         if action in [Qt.MoveAction, Qt.CopyAction]:
             # collect nodes
-            nodes = []
+            # nodes = []
 
             # add new data from external sources
             from enmapbox.gui.mimedata import MDF_QGIS_LAYERTREEMODELDATA
@@ -192,7 +192,6 @@ class DataSourceManager(TreeModel):
 
             for layerTree in root.findLayers():
                 assert isinstance(layerTree, QgsLayerTreeLayer)
-                s = ""
                 grp = layerTree
                 # grp.setCustomProperty('nodeHidden', 'true' if bHide else 'false')
                 lyr = layerTree.layer()
@@ -301,7 +300,7 @@ class DataSourceManager(TreeModel):
                                 updateState = [lyr.bandCount(), lyr.height(), lyr.width()]
                             else:
                                 # do not update
-                                s = ""
+                                pass
 
                 oldInfo = self.mUpdateState.get(sid, None)
                 if oldInfo is None:
@@ -346,7 +345,7 @@ class DataSourceManager(TreeModel):
         flags = super(DataSourceManager, self).flags(index)
         node = index.data(Qt.UserRole)
         if isinstance(node, RasterBandTreeNode):
-            s = ""
+            pass
         if isinstance(node, (DataSource, RasterBandTreeNode)):
             flags = flags | Qt.ItemIsDragEnabled
         return flags
@@ -586,12 +585,11 @@ class DataSourceManagerTreeView(TreeView):
 
         if isinstance(dataSource, RasterDataSource):
             parameters = {SaveRasterAsAlgorithm.P_RASTER: dataSource.source()}
-            dlg = emb.showProcessingAlgorithmDialog(SaveRasterAsAlgorithm(), parameters, parent=self)
+            emb.showProcessingAlgorithmDialog(SaveRasterAsAlgorithm(), parameters, parent=self)
 
         elif isinstance(dataSource, VectorDataSource):
             parameters = dict(INPUT=dataSource.source())
-            dlg = emb.showProcessingAlgorithmDialog('native:savefeatures', parameters, parent=self)
-            s = ""
+            emb.showProcessingAlgorithmDialog('native:savefeatures', parameters, parent=self)
 
     @typechecked
     def onOpenInExplorer(self, dataSource: DataSource):
@@ -814,7 +812,6 @@ class DataSourceFactory(object):
             if isinstance(source, DataSource):
                 return [source]
 
-                s = ""
             dataItem: Optional[QgsDataItem] = None
             if isinstance(source, QgsProviderSublayerDetails):
                 source = source.toMimeUri()

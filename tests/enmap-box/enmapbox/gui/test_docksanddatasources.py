@@ -137,7 +137,7 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
             for r in gc.get_referrers(d):
                 for r2 in gc.get_referrers(r):
                     for r3 in gc.get_referrers(r2):
-                        s = ""
+                        pass
 
             raise Exception(f'Instance not garbage collected: {type(d)} = {d}')
 
@@ -157,8 +157,8 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         self.assertIsInstance(TV, QgsLayerTreeView)
         speclibDock: SpectralLibraryDock = dm.createDock(SpectralLibraryDock)
 
-        node1: SpeclibDockTreeNode = model.findDockNode(speclibDock)
-        node2: SpeclibDockTreeNode = model.findDockNode(speclibDock.speclibWidget())
+        model.findDockNode(speclibDock)
+        model.findDockNode(speclibDock.speclibWidget())
 
         w = QWidget()
         layout = QHBoxLayout()
@@ -208,7 +208,7 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
             dock2 = manager.createDock('MAP', name='Tree2')
             widgets.extend([dock1, dock2])
         root = model.rootGroup().children()[0]
-        canvas = QgsMapCanvas()
+        QgsMapCanvas()
         # bridge = QgsLayerTreeMapCanvasBridge(root, canvas)
 
         # view = QgsLayerTreeView()
@@ -306,8 +306,8 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
 
     def test_SpeclibDockTreeNode(self):
 
-        sl1 = TestObjects.createSpectralLibrary(name='speclib1')
-        sl2 = TestObjects.createSpectralLibrary(name='speclib2')
+        TestObjects.createSpectralLibrary(name='speclib1')
+        TestObjects.createSpectralLibrary(name='speclib2')
 
         dock = SpectralLibraryDock()
         node = createDockTreeNode(dock)
@@ -315,7 +315,6 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         slw = node.speclibWidget()
         slw.plotModel()
         self.assertIsInstance(slw, SpectralLibraryWidget)
-        s = ""
 
     def test_MapDockLayerHandling(self):
 
@@ -323,7 +322,7 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         self.assertIsInstance(EnMAPBox.instance(), EnMAPBox)
         self.assertEqual(EMB, EnMAPBox.instance())
 
-        canvas1 = EMB.createNewMapCanvas('Canvas1')
+        EMB.createNewMapCanvas('Canvas1')
         canvas2 = EMB.createNewMapCanvas('Canvas2')
 
         mapNode = EMB.findDockTreeNode(canvas2)
@@ -380,7 +379,7 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         mapDock2 = eb.createDock('MAP')
         self.assertIsInstance(mapDock2, MapDock)
         eb.setCurrentMapCanvas(mapDock2.mapCanvas())
-        mapDocks = eb.dockManager().docks(MapDock)
+        eb.dockManager().docks(MapDock)
 
         self.assertIsInstance(tv, DockTreeView)
 

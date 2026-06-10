@@ -89,7 +89,7 @@ def create_generic_testfiles():
     start_app()
     site.addsitedir(DIR_UNITTESTS)
     import enmapboxtestdata as ed
-    tmp = str(ed)
+    str(ed)
 
 
 if __name__ == "__main__":

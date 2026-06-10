@@ -74,7 +74,7 @@ class TestEnMAPBoxUtils(EnMAPBoxTestCase):
 
         geoCoordinate = QgsPointXY(gt[0], gt[3])
         pxCoordinate = geo2px(geoCoordinate, gt)
-        pxCoordinate2 = geo2px(geoCoordinate, lyr)
+        # pxCoordinate2 = geo2px(geoCoordinate, lyr)
         self.assertEqual(pxCoordinate.x(), 0)
         self.assertEqual(pxCoordinate.y(), 0)
         # self.assertTrue(px2geo(pxCoordinate, gt) == geoCoordinate)

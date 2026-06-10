@@ -226,8 +226,6 @@ class DockArea(pgDockArea):
         super(DockArea, self).__init__(*args, **kwds)
         self.setAcceptDrops(True)
 
-        s = ""
-
     def makeContainer(self, typ):
         c = super(DockArea, self).makeContainer(typ)
         # c.apoptose = lambda x : DockArea.containerApoptose(c, x)
@@ -257,7 +255,7 @@ class DockArea(pgDockArea):
 
     def fixDock(self, dock):
 
-        s = ""
+        pass
     """
 
     def floatDock(self, dock):
@@ -294,7 +292,7 @@ class DockArea(pgDockArea):
                     self.home.removeTempArea(self)
             else:
                 pass
-        except Exception as ex:
+        except Exception:
             pass
 
     sigDockAdded = pyqtSignal(Dock)
@@ -323,7 +321,7 @@ class DockArea(pgDockArea):
             v = super(DockArea, self).addDock(dock=dock, position=position, relativeTo=relativeTo, **kwds)
             dock.setVisible(visibility)
             self.sigDockAdded.emit(dock)
-        except Exception as ex:
+        except Exception:
             pass
         return v
 
@@ -520,7 +518,7 @@ class MimeDataDockWidget(QWidget):
             path, filter = QFileDialog.getSaveFileName(self, 'Save file...',
                                                        directory=self.mFile,
                                                        filter=TextDockWidget.FILTERS)
-            s = ""
+
             if len(path) > 0:
                 self.mFile = path
 
@@ -626,11 +624,11 @@ class TextDockWidget(QWidget):
             try:
                 with open(path, 'r', 'utf-8') as file:
                     data = ''.join(file.readlines())
-            except Exception as ex:
+            except Exception:
                 try:
                     with open(path, 'r') as file:
                         data = ''.join(file.readlines())
-                except Exception as ex:
+                except Exception:
                     pass
 
             ext = os.path.splitext(path)[-1].lower()
@@ -692,12 +690,12 @@ class TextDockWidget(QWidget):
             path, filter = QFileDialog.getSaveFileName(self, 'Save file...',
                                                        directory=self.mFile,
                                                        filter=TextDockWidget.FILTERS)
-            s = ""
+
             if len(path) > 0:
                 self.mFile = path
 
         if self.mFile is not None and len(self.mFile) > 0:
-            ext = os.path.splitext(self.mFile)[-1].lower()
+            # ext = os.path.splitext(self.mFile)[-1].lower()
 
             with codecs.open(self.mFile, 'w', 'utf-8') as file:
                 file.write(self.mTextEdit.toPlainText())
@@ -817,7 +815,7 @@ class SpectralLibraryDock(Dock):
         # self.mSpeclibWidget.spectralLibraryPlotWidget().optionShowVisualizationSettings.setChecked(False)
         # self.mSpeclibWidget.sigLoadFromMapRequest.connect(self.sigLoadFromMapRequest)
         self.layout.addWidget(self.mSpeclibWidget)
-        s = ""
+
         # speclib: QgsVectorLayer = self.mSpeclibWidget.speclib()
         # name = kwds.get('name')
         # if isinstance(name, str):
@@ -956,7 +954,7 @@ class MapDock(Dock):
     sigRenderStateChanged = pyqtSignal()  # used by the progress bar
 
     def __init__(self, *args, **kwds):
-        initSrc = kwds.pop('initSrc', None)
+        # initSrc = kwds.pop('initSrc', None)
         super(MapDock, self).__init__(*args, **kwds)
         self.mBaseName = self.title()
 
@@ -1026,7 +1024,7 @@ class MapDock(Dock):
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-            s = ""
+            pass
         else:
             super(MapDock, self).mousePressEvent(event)
 

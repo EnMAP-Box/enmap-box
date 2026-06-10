@@ -306,7 +306,7 @@ class EnMAPBoxLayerTreeLayer(QgsLayerTreeLayer):
         if isinstance(self.mWidget, QWidget):
             try:
                 self.mWidget.windowTitleChanged.disconnect(self.updateLayerTitle)
-            except Exception as ex:
+            except Exception:
                 pass
         self.mWidget = widget
         if isinstance(self.mWidget, QgsMapCanvas):
@@ -642,8 +642,6 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                              context=context,
                              on_results=self.onProcessingAlgTaskCompleted)
 
-            s = ""
-
     def createExpressionContext(self) -> QgsExpressionContext:
         """
         Creates an expression context that considers the current state of the EnMAP-Box, like the
@@ -773,7 +771,6 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     def showCrosshair(self) -> bool:
         return self.ui.optionShowCrosshair.isChecked()
-        s = ""
 
     def showSpectralProfiles(self,
                              raster_layer: QgsRasterLayer,
@@ -1185,7 +1182,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                     if lyr.dataProvider().name() == 'memory':
                         continue
                     self.project().takeMapLayer(lyr)
-        s = ""
+
         return
         SYNC_WITH_QGIS = True
 
@@ -1207,7 +1204,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                     # layer is owned by another project
                     pass
             else:
-                s = ""
+                pass
 
         to_remove_lyrs = [lyr for lyr in EMB.mapLayers().values() if lyr not in emb_layers]
 
@@ -1606,7 +1603,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         assert layertype in ['gpkg', 'memory', 'shapefile', 'speclib']
 
         if layertype == 'speclib':
-            s = ""
+
             d = CreateSpectralLibraryDialog(self.ui)
             if d.exec_() == QDialog.Accepted:
                 sl = d.create_speclib()
@@ -1724,6 +1721,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         :param spatialPoint: SpatialPoint of the new Crosshair position
         """
         sender = self.sender()
+        del sender
         show = self.showCrosshair()
         for mapCanvas in self.mapCanvases():
             # if isinstance(mapCanvas, MapCanvas) and mapCanvas != sender:
@@ -1753,6 +1751,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         :return:
         """
         sender = self.sender()
+        del sender
         if ok:
             if isinstance(results, dict):
                 self.addSources(list(results.values()))
@@ -1937,7 +1936,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             mapToolKey = MapTools.CursorLocation
 
         if mapToolKey == MapTools.AddFeature:
-            s = ""
+            pass
 
         results = []
         if canvases is None:
@@ -2112,11 +2111,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         assert isinstance(mbar, QgsMessageBar)
         line1 = msgLines[0]
         showMore = '' if len(msgLines) == 1 else '\n'.join(msgLines[1:])
+        del showMore
 
-        if level == Qgis.Critical:
-            duration = 200
-        else:
-            duration = 50
         # self.showMessage()
         # mbar.pushMessage(tag, line1, showMore, level, duration)
         contains_html = re.search(r'<(html|br|a|p/?>)', message) is not None
@@ -2196,7 +2192,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                         oType = 3
                     try:
                         area = SpatialExtent.fromLayer(lyr).toCrs(canvas.mapSettings().destinationCrs()).area()
-                    except Exception as ex:
+                    except Exception:
                         pass
                     return oType, area
 
@@ -2321,7 +2317,6 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         if bSP:
             self.loadCurrentMapSpectra(spatialPoint, mapCanvas)
-            s = ""
 
     def currentLocation(self) -> Optional[SpatialPoint]:
         """
@@ -2638,6 +2633,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         elif isinstance(project, QgsProject):
             scope = 'HU-Berlin'
             key = 'EnMAP-Box'
+            print(scope, key)
 
             self.onReloadProject()
 
@@ -2953,7 +2949,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         canvas = self.currentMapCanvas()
         lyr = self.currentLayer()
         if isinstance(lyr, QgsVectorLayer) and isinstance(canvas, QgsMapCanvas):
-            s = ""
+            pass
 
     # ---------------- API Mock for QgsInterface follows -------------------
 

@@ -17,7 +17,7 @@ class TestImportDesisL2AAlgorithm(TestCase):
             alg.P_OUTPUT_RASTER: self.filename('desisL2A.vrt'),
         }
 
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)
 
     def test_saveAsTif(self):
         if sensorProductsRoot() is None or self.skipProductImport:

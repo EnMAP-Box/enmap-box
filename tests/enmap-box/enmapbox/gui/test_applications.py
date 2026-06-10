@@ -115,7 +115,7 @@ class test_applications(EnMAPBoxTestCase):
         EB = EnMAPBox(load_core_apps=False, load_other_apps=False)
 
         reg = ApplicationRegistry(EB)
-        testApp = TestObjects.enmapboxApplication()
+        TestObjects.enmapboxApplication()
         self.assertIsInstance(reg.applications(), list)
         self.assertTrue(len(reg.applications()) == 0)
 
@@ -280,11 +280,12 @@ class ExampleProcessingAlgorithm(QgsProcessingAlgorithm):
         self.addOutput(ExampleParameterDefinition('outfile2', 'Test MyOutput Image'))
 
     def processAlgorithm(self, progress):
+        pass
         # map processing framework parameters to that of you algorithm
-        infile = self.getParameterValue('infile')
-        outfile = self.getOutputValue('outfile')
-        outfile2 = self.getOutputValue('outfile2')
-        s = ""
+        # infile = self.getParameterValue('infile')
+        # outfile = self.getOutputValue('outfile')
+        # outfile2 = self.getOutputValue('outfile2')
+        # s = ""
         # define
         # todo:
 

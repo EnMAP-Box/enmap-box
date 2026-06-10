@@ -165,11 +165,9 @@ class AnacondaCallingGUI(QWidget):
         AI = AnacondaEnvironmentInfo(self.anacondaRoot())
         assert AI.isValid()
         self.mProcess.setWorkingDirectory(AI.rootFolder())
-        root = self.anacondaRoot()
+        self.anacondaRoot()
 
         self.mProcess = QProcess()
-
-        s = ""
 
     def setAnacondaRoot(self, path):
         if self.mAnacondaRoot.filePath() != path:
@@ -251,7 +249,6 @@ class AnacondaCallingGeoAlgorithm(QgsProcessingAlgorithm):
 
     def __init__(self):
         super(AnacondaCallingGeoAlgorithm, self).__init__()
-        s = ""
 
     def createInstance(self):
         return AnacondaCallingGeoAlgorithm()

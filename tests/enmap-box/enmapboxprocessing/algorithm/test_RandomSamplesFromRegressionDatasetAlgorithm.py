@@ -20,6 +20,5 @@ class TestRandomSamplesFromRegressionDatasetAlgorithm(TestCase):
         }
         self.runalg(alg, parameters)
 
-        dump = Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET])
         self.assertEqual((59, 177), Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET])['X'].shape)
         self.assertEqual((2500, 177), Utils.pickleLoad(parameters[alg.P_OUTPUT_COMPLEMENT])['X'].shape)

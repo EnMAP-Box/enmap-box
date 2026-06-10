@@ -220,7 +220,6 @@ class TestObjects(TestObjects):
 
             def __init__(self):
                 super(TestProcessingAlgorithm, self).__init__()
-                s = ""
 
             def createInstance(self):
                 return TestProcessingAlgorithm()
@@ -323,9 +322,8 @@ class PythonRunnerImpl(QgsPythonRunner):
 
     def evalCommand(self, cmd: str, result: str):
         try:
-            o = compile(cmd)
-        except Exception as ex:
-            result = str(ex)
+            compile(cmd)
+        except Exception:
             return False
         return True
 
@@ -334,9 +332,7 @@ class PythonRunnerImpl(QgsPythonRunner):
             o = compile(command, 'fakemodule', 'exec')
             exec(o)
         except Exception as ex:
-            messageOnError = str(ex)
             command = ['{}:{}'.format(i + 1, l) for i, l in enumerate(command.splitlines())]
             print('\n'.join(command), file=sys.stderr)
             raise ex
-            return False
         return True

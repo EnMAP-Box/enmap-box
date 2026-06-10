@@ -164,7 +164,7 @@ class Test_Deep_Learning_Trainer(TestCase):
               alg.logdirpath_model: folder_path_unet,
               }
 
-        result = Processing.runAlgorithm(alg, parameters=io)
+        Processing.runAlgorithm(alg, parameters=io)
 
         best = best_ckpt_path(folder_path_unet)
 

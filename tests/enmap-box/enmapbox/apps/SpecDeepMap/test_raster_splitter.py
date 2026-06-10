@@ -44,6 +44,7 @@ class TestRasterSplitter(TestCase):
         folder_path_test_iou = BASE_DIR / "test_iou.csv"
         folder_path_test_preds = BASE_DIR / "preds"
         checkpoint_dir = BASE_TESTDATA / "test_requierments"
+        print(folder_path_test_csv, folder_path_test_iou, folder_path_test_preds, checkpoint_dir)
 
         # Define paths using relative references
         input_l_path = BASE_TESTDATA / "test_requierments" / "enmap_landcover_unstyled.tif"

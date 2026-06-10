@@ -181,7 +181,7 @@ def renderImageData(task: QgsTask, dump):
     jobs = pickle.loads(dump)
 
     results = []
-    n = len(jobs)
+    # n = len(jobs)
 
     renderCallsTotal = 0
     renderCallsDone = 0
@@ -205,8 +205,8 @@ def renderImageData(task: QgsTask, dump):
         assert isinstance(renderer, QgsRasterRenderer)
 
         nb = lyr.bandCount()
-        ns = lyr.width()
-        nl = lyr.height()
+        # ns = lyr.width()
+        # nl = lyr.height()
 
         if job.id() == GLItem.Cube:
             feedback = QgsRasterBlockFeedback()
@@ -553,7 +553,6 @@ class ImageCubeWidget(QMainWindow):
     def setSlicesVisibility(self, b: bool):
         for cb in [self.cbShowSliceX, self.cbShowSliceY, self.cbShowSliceZ]:
             cb.setChecked(b)
-        s = ""
 
     def debug(self) -> bool:
         return self.cbDebug.isChecked()
@@ -676,7 +675,6 @@ class ImageCubeWidget(QMainWindow):
             if isinstance(r, QgsRasterRenderer):
                 lyr2.setRenderer(r)
             showLayerPropertiesDialog(lyr2, self.mCanvas)
-            s = ""
             self.setTopPlaneRenderer(lyr2.renderer())
 
         self.onValidate()
@@ -819,7 +817,7 @@ class ImageCubeWidget(QMainWindow):
     def onDataLoaded(self, _, dump):
 
         joblist = pickle.loads(dump)
-        n = len(joblist)
+        # n = len(joblist)
         for i, job in enumerate(joblist):
 
             assert isinstance(job, ImageCubeRenderJob)
@@ -942,7 +940,7 @@ class ImageCubeWidget(QMainWindow):
         else:
             raise Exception('Error: {}.ndim must be 3 or 4'.format(rgba))
 
-        ns, nl, nb = lyr.width(), lyr.height(), lyr.bandCount()
+        ns, nl = lyr.width(), lyr.height()
 
         ext = lyr.extent()
         assert isinstance(ext, QgsRectangle)
@@ -1007,7 +1005,7 @@ class ImageCubeWidget(QMainWindow):
         assert rgba.shape[3] == 4
         assert rgba.dtype == np.uint8
 
-        t0 = time.time()
+        # t0 = time.time()
 
         ox, oy, ob, sx, sy, sb = self.subsetDimensions(self.rasterLayer(), self.mRGBACubeExtent, self.mRGBACube)
 

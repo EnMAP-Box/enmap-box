@@ -11,6 +11,9 @@ from os import makedirs
 from pathlib import Path
 from typing import Dict, List, Union, Tuple
 
+from qgis.core import QgsApplication, QgsProcessingAlgorithm, QgsProcessingDestinationParameter, \
+    QgsProcessingParameterDefinition
+
 import enmapbox
 from enmapbox import DIR_REPO_TMP
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
@@ -18,8 +21,6 @@ from enmapbox.qgispluginsupport.qps.utils import file_search
 from enmapbox.testing import start_app
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.glossary import injectGlossaryLinks
-from qgis.core import QgsApplication, QgsProcessingAlgorithm, QgsProcessingDestinationParameter, \
-    QgsProcessingParameterDefinition
 
 rootCodeRepo = Path(__file__).parent.parent
 path_qgis_process_help = Path(DIR_REPO_TMP) / f'qgis_process_help_{datetime.datetime.now().date()}.json'
@@ -117,7 +118,7 @@ def create_or_update_rst(file, text: str) -> Path:
     text += '\n'  # final newline
 
     if '\t' in text:
-        s = ""
+        pass
 
     with open(file, 'w', encoding='utf-8', newline='') as f:
         f.write(text)
@@ -320,13 +321,12 @@ def escape_rst(text: str) -> str:
 
 def collectQgsProcessAlgorithmHelp(algorithms: List[QgsProcessingAlgorithm], run_async: bool = False) -> Dict[str, str]:
     results = dict()
-    n = len(algorithms)
-
-    result = subprocess.run(['qgis_process', 'plugins', 'enable', 'enmapboxplugin'],
-                            env=QGIS_PROCESS_ENV,
-                            stdout=subprocess.PIPE, stderr=subprocess.PIPE
-                            )
-    s = ""
+    len(algorithms)
+    subprocess.run(
+        ['qgis_process', 'plugins', 'enable', 'enmapboxplugin'],
+        env=QGIS_PROCESS_ENV,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
 
     def process_algorithm_help(alg) -> Tuple[bool, str, str]:
         aid = alg.id()
@@ -448,7 +448,7 @@ def qgisProcessHelp(algorithm: QgsProcessingAlgorithm) -> str:
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE
                             )
     if result.returncode != 0:
-        s = ""
+        pass
     assert result.returncode == 0, result.stderr.decode()
     helptext = result.stdout.decode('cp1252')
     return helptext

@@ -184,7 +184,7 @@ class TestUtils(TestCase):
 
     def test_categoriesFromCategorizedSymbolRenderer(self):
         layer = QgsVectorLayer(landcover_polygon)
-        fieldName = layer.renderer().classAttribute()
+        # fieldName = layer.renderer().classAttribute()
         categories = Utils.categoriesFromCategorizedSymbolRenderer(layer.renderer())
         self.assertEqual(6, len(categories))
         self.assertListEqual(

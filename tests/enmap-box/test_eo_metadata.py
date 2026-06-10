@@ -111,7 +111,7 @@ class EOMetadataReadingTests(TestCase):
         self.assertEqual(prop.wavelengths(), wl)
         self.assertEqual(prop.wavelengthUnits(), wlu)
 
-        reader = RasterReader(layer)
+        # reader = RasterReader(layer)
         for b in range(layer.bandCount()):
             pass
             # todo: raster reader tests
@@ -192,7 +192,7 @@ class EOMetadataReadingTests(TestCase):
         self.assertEqual(propsOriginal.fwhm(), fwhm)
         self.assertEqual(propsOriginal.wavelengthUnits(), ['μm', 'μm'])
 
-        reader = RasterReader(layer)
+        # reader = RasterReader(layer)
         for b in range(1, layer.bandCount() + 1):
             # todo: Raster Reader support for GDAL metadata
             # self.assertEqual(reader.wavelength(b), wl[b - 1])
@@ -214,7 +214,7 @@ class EOMetadataReadingTests(TestCase):
         self.assertEqual(propsChanged.fwhm(), fwhm2)
         self.assertEqual(propsChanged.wavelengthUnits(), wlu2)
 
-        reader = RasterReader(layer)
+        # reader = RasterReader(layer)
         for b in range(1, layer.bandCount() + 1):
             # todo: raster reader test
             pass

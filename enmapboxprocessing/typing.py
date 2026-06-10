@@ -9,7 +9,7 @@ from qgis.core import QgsRasterDataProvider, QgsRasterLayer
 try:  # scikit-learn is optional
     from sklearn.base import ClassifierMixin, RegressorMixin, TransformerMixin, ClusterMixin
     from sklearn.pipeline import Pipeline
-except Exception as error:
+except Exception:
     ClassifierMixin = Any
     RegressorMixin = Any
     TransformerMixin = Any

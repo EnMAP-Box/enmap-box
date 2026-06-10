@@ -24,7 +24,7 @@ class TestVrtBandMathAlgorithm(TestCase):
                         '    out_ar[:] = ndvi\n',
             alg.P_OUTPUT_VRT: self.filename('raster.vrt')
         }
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)
         # self.assertEqual(14908457369, np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array(), dtype=float))
         # self.assertEqual(self.filename('enmap.tif'), RasterReader(result[alg.P_OUTPUT_RASTER]).source())
 

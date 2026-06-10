@@ -156,7 +156,7 @@ class ReclassifyTableModel(QAbstractTableModel):
         with open(path, 'r', encoding='utf-8') as f:
             lines = [line.strip() for line in f.readlines()]
             rx = re.compile(r'^(?P<src>[^#;]+);(?P<dst>[^#;]+)$')
-            rxInt = re.compile(r'^\d+$')
+            # rxInt = re.compile(r'^\d+$')
 
             for line in lines:
                 match = rx.search(line)
@@ -331,7 +331,7 @@ class ReclassifyTableModel(QAbstractTableModel):
         col = index.column()
 
         if col == 0:
-            idx0 = self.mSrc.index(row, 0)
+            # idx0 = self.mSrc.index(row, 0)
             c = self.mSrc[row]
             assert isinstance(c, ClassInfo)
             if role == Qt.DisplayRole:
@@ -409,7 +409,7 @@ class ReclassifyTableViewDelegate(QStyledItemDelegate):
         return self.sortFilterProxyModel().sourceModel()
 
     def setItemDelegates(self, tableView: QTableView):
-        model = self.reclassifyModel()
+        # model = self.reclassifyModel()
         tableView.setItemDelegateForColumn(1, self)
 
     def createEditor(self, parent, option, index):

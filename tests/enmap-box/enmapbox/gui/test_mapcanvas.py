@@ -14,9 +14,13 @@ __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 import unittest
 from pathlib import Path
 
+from qgis.PyQt.QtCore import QMimeData, QUrl
+from qgis.PyQt.QtGui import QKeyEvent
+from qgis.PyQt.QtWidgets import QMenu, QAction
+from qgis.core import QgsPointXY, QgsProject, QgsRasterLayer
+
 from enmapbox import initAll
 from enmapbox.exampledata import enmap, hires, landcover_polygon
-from enmapbox.gui.dataviews.dockmanager import MapDockTreeNode
 from enmapbox.gui.dataviews.docks import MapDock
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import CanvasLink, MapCanvas, KEY_LAST_CLICKED, LINK_ON_CENTER
@@ -25,10 +29,6 @@ from enmapbox.testing import EnMAPBoxTestCase
 from enmapbox.testing import TestObjects
 from enmapbox.testing import start_app
 from enmapboxtestdata import library_berlin
-from qgis.PyQt.QtCore import QMimeData, QUrl
-from qgis.PyQt.QtGui import QKeyEvent
-from qgis.PyQt.QtWidgets import QMenu, QAction
-from qgis.core import QgsPointXY, QgsProject, QgsRasterLayer
 
 start_app()
 initAll()
@@ -174,7 +174,7 @@ class MapCanvasTests(EnMAPBoxTestCase):
     def test_dropEvents(self):
 
         mapDock = MapDock()
-        node = MapDockTreeNode(mapDock)
+        # node = MapDockTreeNode(mapDock)
         mapCanvas = mapDock.mapCanvas()
         allFiles = [enmap, hires, landcover_polygon, library_berlin]
         spatialFiles = [enmap, hires, landcover_polygon]
@@ -195,7 +195,6 @@ class MapCanvasTests(EnMAPBoxTestCase):
             layerSources.append(p)
 
         for p in spatialFiles:
-            p2 = Path(p)
             self.assertTrue(Path(p) in layerSources, msg=f'Failed to drop {p}')
 
 

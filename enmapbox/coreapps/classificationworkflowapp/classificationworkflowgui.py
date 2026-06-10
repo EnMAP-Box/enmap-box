@@ -80,7 +80,7 @@ def errorHandled(func=None, *, successMessage: str = None):
         gui.mMessageBar.clearWidgets()
         try:
             result = func(gui, *argsTail, **kwargs)
-        except MissingParameterError as error:
+        except MissingParameterError:
             return
         except CancelError:
             return
@@ -857,7 +857,7 @@ class ClassificationWorkflowGui(QMainWindow):
                 alg.P_RASTER: raster,
                 alg.P_OUTPUT_PROBABILITY: filenameProbability
             }
-            result = self.showAlgorithmDialog(alg, parameters)
+            self.showAlgorithmDialog(alg, parameters)
             self.mFilePredictedProbability.setFilePath(filenameProbability)
 
             # probability as RGB
@@ -868,7 +868,7 @@ class ClassificationWorkflowGui(QMainWindow):
                 alg.P_COLORS: colors,
                 alg.P_OUTPUT_RGB: filenameRgb
             }
-            result = self.showAlgorithmDialog(alg, parameters)
+            self.showAlgorithmDialog(alg, parameters)
 
     @errorHandled(successMessage='predicted maps')
     def runClassificationPerformance(self, *args):

@@ -116,7 +116,7 @@ class TestImportSentinel2L2AAlgorithm(TestCase):
                     alg.P_OUTPUT_RASTER: p_result,
                 }
 
-                results = self.runalg(alg, parameters)
+                self.runalg(alg, parameters)
                 ds_box: gdal.Dataset = gdal.Open(p_result)
                 px_x, px_y = int(0.5 * ds_sub.RasterXSize), int(0.5 * ds_sub.RasterYSize)
                 profile_sub = ds_sub.ReadAsArray(px_x, px_y, 1, 1).flatten()
@@ -177,10 +177,6 @@ class TestImportSentinel2L2AAlgorithm(TestCase):
         ds2 = gdal.Open(str(p2))
         sub2 = [p for p, _ in ds2.GetSubDatasets() if ':10m:' in p][0]
         ds2: gdal.Dataset = gdal.Open(sub2)
-
-        b1_1: gdal.Band = ds1.GetRasterBand(1)
-        b1_2: gdal.Band = ds2.GetRasterBand(1)
-        s = ""
 
     @unittest.skipIf(skip_tests,
                      'Sensor test data is missing. Use ENMAPBOX_SENSOR_PRODUCT_ROOT to define its location.')

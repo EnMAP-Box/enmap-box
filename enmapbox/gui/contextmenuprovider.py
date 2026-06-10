@@ -237,7 +237,6 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                             a.setToolTip(tt)
                             a.triggered.connect(lambda *args, sl=sl, n=node: node.insertLayer(0, sl))
         menu.addSeparator()
-        s = ""
 
     def onAddGroup(self, view: DockTreeView):
         """
@@ -475,7 +474,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                 a.triggered.connect(
                     lambda *args: pg.plot(range(1, len(array) + 1), array).setWindowTitle(f'Value Plot - {node.name()}')
                 )
-            except Exception as error:
+            except Exception:
                 pass
 
         # add the node-specific menu actions

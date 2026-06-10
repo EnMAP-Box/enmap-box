@@ -367,7 +367,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         string = string.replace('\n', '')
         try:
             values = eval(string, {'nan': nan})
-        except Exception as error:
+        except Exception:
             raise QgsProcessingException(f'Invalid value list: {self.parameterDefinition(name).description()}')
 
         if not isinstance(values, (tuple, list)):

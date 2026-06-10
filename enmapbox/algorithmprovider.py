@@ -28,7 +28,7 @@ from qgis.core import QgsProcessingProvider, QgsProcessingAlgorithm, QgsApplicat
 
 try:
     from processing.core.ProcessingConfig import ProcessingConfig, Setting
-except ModuleNotFoundError as merr:
+except ModuleNotFoundError:
     path = pathlib.Path(qgis.__file__)
     pathPlugins = os.path.abspath(path / '../../plugins')
     site.addsitedir(pathPlugins)

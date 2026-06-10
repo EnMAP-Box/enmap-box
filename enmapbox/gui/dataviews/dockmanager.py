@@ -319,9 +319,6 @@ class SpeclibDockTreeNode(DockTreeNode):
                 if len(nodes) > 0:
                     self.insertChildNodes(0, nodes)
                 self.mPlotVisSettings = visSettings
-            s = ""
-
-        s = ""
 
     def findLayerIds(self):
         """
@@ -335,7 +332,7 @@ class SpeclibDockTreeNode(DockTreeNode):
 
     def updateNodes(self, index, r1, r2):
 
-        PROFILES = dict()
+        # PROFILES = dict()
 
         logger.info('update speclib nodes')
         slw = self.speclibWidget()
@@ -343,7 +340,7 @@ class SpeclibDockTreeNode(DockTreeNode):
             for vis in slw.plotModel().visualizations():
                 vis.isVisible()
 
-        settings = slw.plotModel().settingsMap()
+        # settings = slw.plotModel().settingsMap()
 
         # if isinstance(self.mSpeclibWidget, SpectralLibraryWidget):
         #     sl: QgsVectorLayer = self.mSpeclibWidget.speclib()
@@ -471,7 +468,7 @@ class MapDockTreeNode(DockTreeNode):
                 if isinstance(lyr, QgsMapLayer):
                     lyrs.append(lyr)
                 else:
-                    s = ""  # logger.warning('QgsLayerTreeLayer.layer() is none')
+                    pass
         else:
             raise NotImplementedError()
 
@@ -517,7 +514,7 @@ class MapDockTreeNode(DockTreeNode):
         if isinstance(layerSource, QgsMapLayer):
             mapLayers.append(layerSource)
         else:
-            s = ""
+            pass
         emb = self.enmapBoxInstance()
         if isinstance(emb, EnMAPBox):
             emb.addSources(mapLayers)
@@ -650,7 +647,7 @@ class DockManager(QObject):
 
             # register datasources
 
-            new_sources = self.mDataSourceManager.addDataSources(layers + textfiles)
+            # new_sources = self.mDataSourceManager.addDataSources(layers + textfiles)
 
             dropped_speclibs = [lyr for lyr in layers if is_spectral_library(lyr)]
             dropped_maplayers = [lyr for lyr in layers if isinstance(lyr, QgsMapLayer) and lyr.isValid()]
@@ -1182,9 +1179,9 @@ class DockManagerTreeModel(QgsLayerTreeModel):
                     flags |= Qt.ItemIsDropEnabled
                     flags |= Qt.ItemIsDragEnabled
             elif not isinstance(node, QgsLayerTree):
-                s = ""
+                pass
             else:
-                s = ""
+                pass
 
             if not isinstance(dockNode, MapDockTreeNode):
                 flags = flags & ~Qt.ItemIsDragEnabled
@@ -1220,7 +1217,7 @@ class DockManagerTreeModel(QgsLayerTreeModel):
         # if isinstance(EnMAPBox.instance(), EnMAPBox):
         #    layerRegistry = EnMAPBox.instance().mapLayerStore()
 
-        parentNode = self.index2node(parentIndex)
+        # parentNode = self.index2node(parentIndex)
         # get parent DockNode
         dockNode = self.parentNodesFromIndices(parentIndex, nodeInstanceType=DockTreeNode)
 
@@ -1280,7 +1277,7 @@ class DockManagerTreeModel(QgsLayerTreeModel):
                     return True
 
         elif isinstance(dockNode, TextDockTreeNode):
-            s = ""
+            pass
 
         return False
 
@@ -1348,7 +1345,7 @@ class DockManagerTreeModel(QgsLayerTreeModel):
         elif type(node) in [QgsLayerTreeLayer, QgsLayerTreeGroup, QgsLayerTree]:
             # print(('QGSNODE', node, column, role))
             if role == Qt.EditRole:
-                s = ""
+                pass
 
             if type(node) is QgsLayerTreeLayer and role == Qt.ToolTipRole:
                 tt = super(DockManagerTreeModel, self).data(index, role)
@@ -1411,7 +1408,7 @@ class DockManagerTreeModel(QgsLayerTreeModel):
                     self.dataChanged.emit(index, index)
                 return result
 
-        parentNode = node.parent()
+        # parentNode = node.parent()
 
         result = False
         if isinstance(node, DockTreeNode) and isinstance(node.dock, Dock):
@@ -1432,7 +1429,7 @@ class DockManagerTreeModel(QgsLayerTreeModel):
                     vis.setText(value)
                 else:
                     vis.mAutoName = True
-            s = ""
+
         if isinstance(node, CheckableLayerTreeNode) and role == Qt.CheckStateRole:
             node.setCheckState(Qt.Unchecked if value in [False, 0, Qt.Unchecked] else Qt.Checked)
             return True
@@ -1956,11 +1953,11 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         if isinstance(layer, QgsRasterLayer):
             from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
             parameters = {SaveRasterAsAlgorithm.P_RASTER: layer}
-            dlg = emb.showProcessingAlgorithmDialog(SaveRasterAsAlgorithm(), parameters, parent=None)
+            emb.showProcessingAlgorithmDialog(SaveRasterAsAlgorithm(), parameters, parent=None)
 
         elif isinstance(layer, QgsVectorLayer):
             parameters = dict(INPUT=layer)
-            dlg = emb.showProcessingAlgorithmDialog('native:savefeatures', parameters, parent=None)
+            emb.showProcessingAlgorithmDialog('native:savefeatures', parameters, parent=None)
 
     def auxIsImpermanentLayer(self, layer: QgsMapLayer):
 
@@ -2023,7 +2020,7 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         if isinstance(ext, SpatialExtent):
             canvas.setExtent(ext)
         else:
-            s = ""
+            pass
 
     def openAttributeTable(self, layer: QgsVectorLayer):
         from enmapbox.gui.enmapboxgui import EnMAPBox
@@ -2345,8 +2342,8 @@ class ActionTreeNode(CheckableLayerTreeNode):
     def onActionChanged(self):
         if isinstance(self.mAction, QAction):
             # todo: how to activate/disable a QgsLayerTreeNode
-
-            state = 'enabled' if self.mAction.isEnabled() else 'disabled'
+            # state = 'enabled' if self.mAction.isEnabled() else 'disabled'
+            pass
 
         # self.setCustomProperty('tree-state', state)
 

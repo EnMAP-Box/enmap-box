@@ -283,7 +283,7 @@ class DataSourceTests(EnMAPBoxTestCase):
             dsm.addDataSources(p1)
             dsm.addDataSources(p2)
             self.assertTrue(len(dsm) == n, msg='DataSourceManager should not contain the same source multiple times')
-        except Exception as ex:
+        except Exception:
             pass
 
         # remove

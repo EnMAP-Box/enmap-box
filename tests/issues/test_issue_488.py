@@ -19,4 +19,4 @@ class Issue488Tests(TestCase):
         assert isinstance(renderer, QgsFeatureRenderer)
 
         from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibraryplotwidget import SpectralProfilePlotModel
-        model = SpectralProfilePlotModel()
+        SpectralProfilePlotModel()

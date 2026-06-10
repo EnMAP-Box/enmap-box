@@ -359,7 +359,7 @@ class MDKeyDomainString(MDKeyAbstract):
         if isinstance(obj, gdal.MajorObject) or isinstance(obj, ogr.MajorObject):
             value = obj.GetMetadataItem(name, domain)
             if domain == 'ENVI' and name == 'byte_order':
-                s = ""
+                pass
             if value is not None and len(value) > 0:
                 for t in [int, float, np.datetime64, str]:
                     try:
@@ -423,7 +423,7 @@ class MDKeyDomainString(MDKeyAbstract):
             if type(value) is not self.mType:
                 try:
                     value = self.mType(value)
-                except Exception as ex:
+                except Exception:
                     raise Exception('Value(s) need(s) to be of type {0} or convertible to {0}'.format(self.mType))
             return value
 
@@ -462,12 +462,12 @@ class MDKeyDomainString(MDKeyAbstract):
                 parts = [self.mType(p) for p in parts]
 
                 if len(parts) != self.mListLength:
-                    s = ""
+                    pass
 
                 # try to convert to target type
                 try:
                     parts2 = [self.mType(p) for p in parts]
-                except Exception as ex:
+                except Exception:
                     parts2 = parts
 
                 self.setValue(parts2)
@@ -633,8 +633,7 @@ if __name__ == '__main__':
         oli = None
         try:
             oli = MDKeyAbstract.object2oli(d)
-        except Exception as ex:
-            s = ""
-        s = ""
+        except Exception:
+            pass
 
     qgsApp.exec_()

@@ -81,7 +81,7 @@ def report_downloads() -> pd.DataFrame:
         </td>
     </tr>
         """
-        s = ""
+
         versionEMB = tds[0].find('.//a').text
         versionQGIS = tds[2].text
         experimental = tds[1].text.lower() == 'yes'
@@ -183,13 +183,14 @@ def report_github_issues_QGIS(authors=['jakimowb', 'janzandr'], start_date='2020
     # filter by authors
 
     pull_requests = [i for i in all_issues if 'pull_request' in i]
+    print(pull_requests)
     issues = [i for i in all_issues if 'pull_request' not in i]
     if True:
         for i in issues:
             if i['closed_at'] and toDate(i['closed_at']) > end_date:
                 i['closed_at'] = None
             else:
-                s = ""
+                pass
 
     # Filter issues within the date range
 
@@ -302,13 +303,14 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
     with open(PATH_GH_JSON, 'r') as f:
         all_issues = json.load(f)
     pull_requests = [i for i in all_issues if 'pull_request' in i]
+    print(pull_requests)
     issues = [i for i in all_issues if 'pull_request' not in i]
     if True:
         for i in issues:
             if i['closed_at'] and toDate(i['closed_at']) > end_date:
                 i['closed_at'] = None
             else:
-                s = ""
+                pass
 
     # Filter issues within the date range
 
@@ -317,8 +319,6 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
         i for i in issues
         if toDate(i['created_at']) < start_date and start_date <= toDate(i['updated_at']) <= end_date
     ]
-
-    s = ""
 
     def countIssues(issues: List[dict], labels=['duplicate', 'wontfix']) -> Dict[str, int]:
         is_closed = []
@@ -367,7 +367,7 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
             for label in labels:
                 print(f' {label}: {len(issues_by_label.get(label, []))}')
         else:
-            s = ""
+            pass
 
     print(f'By today: {today}')
     print(f'Issues created in reporting period: {start_date} to {end_date}:')
@@ -437,7 +437,8 @@ def report_EnMAPBoxApplications() -> pd.DataFrame:
         # DATA['title'].append(a..title())
 
         menu = app.menu(parentMenu)
-        s = ""
+        print(menu)
+
     df = pd.DataFrame.from_dict(DATA)
     df.sort_values(by=['name'], inplace=True)
     return df

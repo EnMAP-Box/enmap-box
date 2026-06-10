@@ -31,6 +31,7 @@ class Test_Tensorboard(TestCase):
 
         # Define paths
         BASE_DIR = Path(__file__).parent
+        print(BASE_DIR)
         BASE_TESTDATA = Path(DIR_UNITTESTS) / 'testdata/external/specdeepmap'
         folder_path_logs = BASE_TESTDATA / "test_requierments"
 

@@ -65,7 +65,7 @@ class TestPredictClassificationAlgorithm(TestCase):
             alg.P_CLASSIFIER: parametersFit[algFit.P_OUTPUT_CLASSIFIER],
             alg.P_OUTPUT_CLASSIFICATION: self.filename('classification.tif')
         }
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)
         # self.assertEqual(3277, np.sum(RasterReader(result[alg.P_OUTPUT_CLASSIFICATION]).array()))
 
     def test_vectorMask(self):
@@ -85,5 +85,5 @@ class TestPredictClassificationAlgorithm(TestCase):
             alg.P_CLASSIFIER: parametersFit[algFit.P_OUTPUT_CLASSIFIER],
             alg.P_OUTPUT_CLASSIFICATION: self.filename('classification.tif')
         }
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)
         # self.assertEqual(3277, np.sum(RasterReader(result[alg.P_OUTPUT_CLASSIFICATION]).array()))

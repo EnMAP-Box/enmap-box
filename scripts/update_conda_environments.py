@@ -202,8 +202,7 @@ def update_yaml(dir_yaml,
 def update_yamls():
     current_versions = get_current_qgis_versions()
     conda_versions = get_conda_qgis_versions()
-    s = ""
-
+    print(current_versions, conda_versions)
     update_yaml(DIR_YAML, 'enmapbox-base', dependencies=['base', 'dev'])
     update_yaml(DIR_YAML, 'enmapbox-full', dependencies=['base', 'full', 'dev'])
 

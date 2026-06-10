@@ -4,14 +4,13 @@ import unittest
 from pathlib import Path
 
 from osgeo import gdal
+from qgis.core import QgsProject
+from qgis.core import QgsRasterLayer
 
 from enmapbox import initAll
 from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog
-from enmapbox.qgispluginsupport.qps.qgsrasterlayerproperties import QgsRasterLayerSpectralProperties
 from enmapbox.testing import TestCase, start_app
 from enmapboxprocessing.rasterreader import RasterReader
-from qgis.core import QgsProject
-from qgis.core import QgsRasterLayer
 
 start_app()
 initAll()
@@ -34,12 +33,12 @@ class TestIssue1259SlowReading(TestCase):
 
         ds = gdal.Open(path_toa)
         for b in range(1, ds.RasterCount + 1):
-            band = ds.GetRasterBand(b)
-            s = ""
+            ds.GetRasterBand(b)
+
         lyr = QgsRasterLayer(path_toa, 'tanager')
         getTime('Open Layer')
 
-        prop = QgsRasterLayerSpectralProperties.fromRasterLayer(lyr)
+        # prop = QgsRasterLayerSpectralProperties.fromRasterLayer(lyr)
         getTime('Read spectral properties (QPS)')
 
         reader = RasterReader(lyr)
@@ -63,4 +62,3 @@ class TestIssue1259SlowReading(TestCase):
         self.showGui(widgets)
         del lyr
         QgsProject.instance().removeAllMapLayers()
-        s = ""

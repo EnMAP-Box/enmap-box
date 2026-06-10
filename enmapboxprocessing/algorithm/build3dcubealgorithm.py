@@ -1,16 +1,16 @@
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from osgeo import gdal
-
 import processing
+from osgeo import gdal
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRectangle
+
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRectangle
 
 
 @typechecked
@@ -57,6 +57,7 @@ class Build3dCubeAlgorithm(EnMAPProcessingAlgorithm):
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         spectralScale = self.parameterAsFloat(parameters, self.P_SPECTRAL_SCALE, context)
+        del spectralScale  # not used
         dx = self.parameterAsInt(parameters, self.P_DX, context)
         dy = self.parameterAsInt(parameters, self.P_DY, context)
         filename1 = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_FACE, context)

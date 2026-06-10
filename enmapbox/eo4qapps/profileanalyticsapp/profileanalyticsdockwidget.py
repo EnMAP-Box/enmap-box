@@ -184,7 +184,7 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                 if isinstance(lyr_old, QgsVectorLayer):
                     try:
                         lyr_old.selectionChanged.disconnect(self.onLayerSelectionChanged)
-                    except Exception as ex:
+                    except Exception:
                         pass
 
                 layer.selectionChanged.connect(self.onLayerSelectionChanged)

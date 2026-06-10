@@ -86,6 +86,7 @@ class AggregateArdRastersAlgorithm(EnMAPProcessingAlgorithm):
         baseNameFilter = self.parameterAsString(parameters, self.P_BASENAME_FILTER, context)
         functionIndices = self.parameterAsEnums(parameters, self.P_FUNCTION, context)
         externalMask = self.parameterAsString(parameters, self.P_EXTERNAL_MASK, context)
+        del externalMask  # not used
         startDate = self.parameterAsDateTime(parameters, self.P_START_DATE, context).date()
         endDate = self.parameterAsDateTime(parameters, self.P_END_DATE, context).date()
         startDay = self.parameterAsInt(parameters, self.P_START_DAY, context)

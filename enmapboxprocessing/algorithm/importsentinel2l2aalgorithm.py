@@ -112,7 +112,7 @@ class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
 
             xml_string = '<?xml version=' + xml['<?xml version']
             xml = ET.fromstring(xml_string)
-            baseline = xml.find('.//PROCESSING_BASELINE').text
+            xml.find('.//PROCESSING_BASELINE').text
 
             BAND_INFOS = {}
             BOA_ADD_OFFSETS = {e.attrib['band_id']: float(e.text) for e in xml.findall('.//BOA_ADD_OFFSET')}

@@ -93,7 +93,7 @@ class TestTransformRasterAlgorithm(TestCase):
             alg1.P_MATCH_BY_NAME: True,
             alg1.P_OUTPUT_RASTER: self.filename('transformation.tif')
         }
-        result = self.runalg(alg1, parameters)
+        self.runalg(alg1, parameters)
 
     def test_badBandsHandling_withoutNameMatching(self):
 
@@ -125,4 +125,4 @@ class TestTransformRasterAlgorithm(TestCase):
             alg1.P_MATCH_BY_NAME: False,
             alg1.P_OUTPUT_RASTER: self.filename('transformation.tif')
         }
-        result = self.runalg(alg1, parameters)
+        self.runalg(alg1, parameters)

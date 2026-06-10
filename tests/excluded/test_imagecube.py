@@ -15,7 +15,7 @@ class ImageCubeTestsMinimal(EnMAPBoxTestCase):
 
     @unittest.skipIf(os.environ.get('QT_QPA_PLATFORM') == 'offscreen', "missing OpenGL")
     def test_extent_mini(self):
-        lyrCube = QgsRasterLayer(pathEnMAP)
+        QgsRasterLayer(pathEnMAP)
         # self.assertTrue(lyrCube.isValid())
         W = ImageCubeWidget(
 

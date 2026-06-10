@@ -80,7 +80,6 @@ class ImageCubeTests(EnMAPBoxTestCase):
         f1 = ext1.width() / ext1.height()
         f2 = nns / nnl
         self.assertAlmostEqual(f1, f2, 1)
-        s = ""
 
     def test_renderJob(self):
         lyr = self.createImageCube()

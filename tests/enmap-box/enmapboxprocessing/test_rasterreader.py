@@ -273,11 +273,11 @@ class TestRasterReader(TestCase):
         self.assertEqual('0.460000', reader.metadataItem('wavelength', '', 1))
 
     def test_metadataDomain(self):
-        reader = RasterReader(enmap)
+        RasterReader(enmap)
         # self.assertEqual(20, len(reader.metadataDomain('ENVI')))
 
     def test_metadata(self):
-        reader = RasterReader(enmap)
+        RasterReader(enmap)
 
     def test_metadataDomainKeys(self):
         reader = RasterReader(enmap)

@@ -571,7 +571,7 @@ class ApplicationRegistry(QObject):
                 if isinstance(item, QMenu):
                     parent.removeAction(item.menuAction())
                 else:
-                    s = ""
+                    pass
 
         import enmapbox.algorithmprovider
         provider = enmapbox.algorithmprovider.instance()

@@ -161,7 +161,7 @@ class ClassificationDatasetManagerGui(QDialog):
         self.onSaveClicked(question=False)
         filename = self.mDataset.mFile.filePath()
         try:
-            dump = ClassifierDump.fromDict(Utils.pickleLoad(filename))
+            ClassifierDump.fromDict(Utils.pickleLoad(filename))
         except Exception:
             self.mCategoryTable.setRowCount(0)
             return

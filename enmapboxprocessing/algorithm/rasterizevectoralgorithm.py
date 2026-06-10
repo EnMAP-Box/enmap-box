@@ -82,7 +82,7 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
         burnFid = self.parameterAsBoolean(parameters, self.P_BURN_FID, context)
         addValue = self.parameterAsBoolean(parameters, self.P_ADD_VALUE, context)
         allTouched = self.parameterAsBoolean(parameters, self.P_ALL_TOUCHED, context)
-        format, options = self.GTiffFormat, self.DefaultGTiffCreationOptions
+        options = self.DefaultGTiffCreationOptions
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_RASTER, context)
 
         with open(filename + '.log', 'w') as logfile:
@@ -166,8 +166,6 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
                     ts_new = re.sub(r'\.\d+', '', ts_old)
                     cmdArgs = cmdArgs.replace(ts_old, ts_new)
                 GDALPA_Utils.runGdal([cmd, cmdArgs], feedback2)
-
-                s = ""
 
             result = {self.P_OUTPUT_RASTER: filename}
             self.toc(feedback, result)

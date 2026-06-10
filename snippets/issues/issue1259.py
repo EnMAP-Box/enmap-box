@@ -40,7 +40,7 @@ class TestIssueXSlowReading(TestCase):
 
         reader = RasterReader(lyr)
         wl2 = []
-        wlu2 = []
+        # wlu2 = []
         for b in range(1, lyr.bandCount() + 1):
             wl2.append(reader.wavelength(b, raw=True))
             # wlu2.append(reader.wavelengthUnits(b))

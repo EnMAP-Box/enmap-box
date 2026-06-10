@@ -192,8 +192,7 @@ def extractMapLayers(mimeData: QMimeData,
 
     elif MDF_ENMAPBOX_LAYERTREEMODELDATA in mimeData.formats():
         # this drop comes from the dock tree
-
-        s = ""
+        pass
 
     elif QGIS_URILIST_MIMETYPE in mimeData.formats():
         for uri in QgsMimeDataUtils.decodeUriList(mimeData):
@@ -238,7 +237,7 @@ def extractMapLayers(mimeData: QMimeData,
                     newMapLayers.extend(mapLayers)
 
     else:
-        s = ""
+        pass
 
     info = ['Extract map layers from QMimeData']
     info.append('Formats:' + ','.join(mimeData.formats()))

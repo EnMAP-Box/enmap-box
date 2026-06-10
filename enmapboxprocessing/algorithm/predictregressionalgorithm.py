@@ -46,7 +46,7 @@ class PredictRegressionAlgorithm(EnMAPProcessingAlgorithm):
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
         try:
-            dump = RegressorDump.fromDict(
+            RegressorDump.fromDict(
                 Utils.pickleLoad(self.parameterAsFile(parameters, self.P_REGRESSOR, context))
             )
         except TypeError:

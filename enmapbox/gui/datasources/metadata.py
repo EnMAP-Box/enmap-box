@@ -145,7 +145,7 @@ class DataSourceSizesTreeNode(TreeNode):
                 size = fileSizeString(size)
                 value.append(size)
                 childs += [TreeNode('File', size)]
-            except Exception as ex:
+            except Exception:
                 pass
 
         lyr = None

@@ -1,7 +1,6 @@
 from qgis.core import QgsVectorLayer, QgsProcessingException
 
 from enmapbox import initAll
-from enmapbox.qgispluginsupport.qps.qgsrasterlayerproperties import QgsRasterLayerSpectralProperties
 from enmapboxprocessing.algorithm.libraryfromregressiondatasetalgorithm import LibraryFromRegressionDatasetAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousvectoralgorithm import \
     PrepareRegressionDatasetFromContinuousVectorAlgorithm
@@ -62,8 +61,6 @@ class TestPrepareRegressionDatasetFromContinuousVectorAlgorithm_2(TestCase):
     def test_excludeBadBands(self):
         alg = PrepareRegressionDatasetFromContinuousVectorAlgorithm()
 
-        props = QgsRasterLayerSpectralProperties.fromRasterLayer(enmap_potsdam)
-        s = ""
         parameters = {alg.P_FEATURE_RASTER: enmap_potsdam, alg.P_CONTINUOUS_VECTOR: veg_cover_fraction_potsdam_point,
                       alg.P_TARGET_FIELDS: ['vegetation_fraction'], alg.P_EXCLUDE_BAD_BANDS: True,
                       alg.P_OUTPUT_DATASET: self.filename('sample.pkl')}

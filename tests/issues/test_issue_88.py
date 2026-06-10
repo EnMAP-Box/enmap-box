@@ -51,8 +51,8 @@ class EnMAPBoxTestCaseExample(EnMAPBoxTestCase):
         self.assertEqual(pixelA.x(), x)
         self.assertEqual(pixelA.y(), y)
 
-        pointB = pointA.toCrs(QgsCoordinateReferenceSystem('EPSG:4326'))
-        pointA2 = pointB.toCrs(pointA.crs())
+        # pointB = pointA.toCrs(QgsCoordinateReferenceSystem('EPSG:4326'))
+        # pointA2 = pointB.toCrs(pointA.crs())
 
         # check raster corners
         e = layer.extent()

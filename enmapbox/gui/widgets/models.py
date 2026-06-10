@@ -211,7 +211,7 @@ class OptionListModel(QAbstractListModel):
             return None
         option = self.idx2option(index)
         if not isinstance(option, Option):
-            s = ""
+            pass
         result = None
         if role == Qt.DisplayRole:
             result = '{}'.format(option.mName)
@@ -249,8 +249,6 @@ class TreeNode(QObject):
 
         if isinstance(parentNode, TreeNode):
             parentNode.appendChildNodes([self])
-
-        s = ""
 
     def clone(self, parent=None):
 
@@ -317,7 +315,6 @@ class TreeNode(QObject):
             self.mChildren.insert(index + i, node)
 
         self.sigAddedChildren.emit(self, index, idxLast)
-        s = ""
 
     def removeChildNode(self, node):
         assert node in self.mChildren
@@ -409,7 +406,6 @@ class TreeModel(QAbstractItemModel):
         self.mTreeView = None
         if isinstance(parent, QTreeView):
             self.connectTreeView(parent)
-        s = ""
 
     def rootNode(self):
         return self.mRootNode
@@ -584,7 +580,7 @@ class TreeModel(QAbstractItemModel):
         assert isinstance(index, QModelIndex)
         if not index.isValid():
             return Qt.NoItemFlags
-        node = self.idx2node(index)
+        self.idx2node(index)
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
 

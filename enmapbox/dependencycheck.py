@@ -132,7 +132,7 @@ class PIPPackage(object):
             py_name = PACKAGE_LOOKUP.get(pip_name, pip_name)
 
         if py_name is None:
-            s = ""
+            pass
         self.pyPkgName: str = py_name
         self.pipPkgName = pip_name
         self.required_by: Optional[str] = required_by
@@ -201,7 +201,6 @@ class PIPPackage(object):
             self.version_latest = info['latest_version']
 
         self.mIsInstalled = None
-        s = ""
 
     def isMissing(self) -> bool:
         return not self.isInstalled()
@@ -327,7 +326,7 @@ def localPipExecutable() -> Optional[Path]:
                     process.start(c)
                     process.waitForFinished()
                     msgOut = decode_bytes(process.readAllStandardOutput().data())
-                    msgErr = decode_bytes(process.readAllStandardError().data())
+                    # msgErr = decode_bytes(process.readAllStandardError().data())
                     success = process.exitCode() == 0
                     if success and len(msgOut) > 0:
                         lines = msgOut.splitlines()
@@ -619,7 +618,7 @@ def requiredPackages(return_tuples: bool = False) -> List[PIPPackage]:
             pip_name = row['pip_name']
             required_by = row.get('required_by', None)
             if required_by:
-                s = ""
+                pass
             pkg = PIPPackage(pip_name,
                              required_by=required_by,
                              py_name=row.get('py_name', pip_name),
@@ -824,7 +823,7 @@ class PIPPackageFilterModel(QSortFilterProxyModel):
                 if pkg.required_by is None:
                     return False
                 else:
-                    s = ""
+                    pass
             elif self.mFilter1 == 'missing':
                 if pkg.required_by is None:
                     return False
@@ -904,7 +903,7 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
 
         assert isinstance(pkg, PIPPackage)
         col = index.column()
-        cn = self.mColumnNames[col]
+        # cn = self.mColumnNames[col]
 
         changed = False
         if role == Qt.CheckStateRole:
@@ -1011,7 +1010,7 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
 
         assert isinstance(pkg, PIPPackage)
         col = index.column()
-        cn = self.mColumnNames[col]
+        # cn = self.mColumnNames[col]
 
         if role == Qt.DisplayRole:
             if col == self.CN_PIP:
@@ -1214,7 +1213,6 @@ class PIPPackageInstaller(QWidget):
                 self.addText(info, True)
             except Exception as ex:
                 self.addText(str(ex), True)
-        s = ""
 
     def loadPIPVersionInfo(self, pipPackages: List[PIPPackage], load_latest_versions: bool = True):
         if len(pipPackages) == 0:
@@ -1223,7 +1221,7 @@ class PIPPackageInstaller(QWidget):
             for p in pipPackages:
                 assert isinstance(p, PIPPackage)
         # get names
-        pipPackageNames = [p.pipPkgName for p in pipPackages]
+        # pipPackageNames = [p.pipPkgName for p in pipPackages]
 
         task = PIPPackageInfoTask('Get package information', callback=self.onCompleted)
 
@@ -1293,8 +1291,7 @@ class PIPPackageInstaller(QWidget):
 
     def setPrimaryFilter(self, mode: str):
         self.proxyModel.setPrimaryFilter(mode)
-        n = self.proxyModel.rowCount()
-        s = ""
+        # n = self.proxyModel.rowCount()
 
     def addText(self, text: str, color: Optional[QColor] = None):
 

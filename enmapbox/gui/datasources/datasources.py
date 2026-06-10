@@ -291,7 +291,6 @@ class RasterDataSource(SpatialDataSource):
         self.mWavelength = None
 
         self.updateNodes()
-        s = ""
 
     def updateNodes(self) -> dict:
         MD = super().updateNodes()
@@ -339,7 +338,7 @@ class ModelDataSource(DataSource):
         self.updateNodes()
 
     def updateNodes(self, **kwds) -> dict:
-        MD = super().updateNodes(**kwds)
+        super().updateNodes(**kwds)
 
         if isinstance(self.mObjectNode, PyObjectTreeNode):
             self.removeChildNodes([self.mObjectNode])

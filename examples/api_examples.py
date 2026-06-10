@@ -59,7 +59,7 @@ class Examples(unittest.TestCase):
     def test_Ex2_DataSources(self):
 
         from enmapbox.gui.enmapboxgui import EnMAPBox
-        EMB = EnMAPBox(None)
+        EnMAPBox(None)
 
         enmapBox = EnMAPBox.instance()
 
@@ -227,7 +227,7 @@ class Examples(unittest.TestCase):
         print('Last SpectralProfile: {}'.format(enmapBox.currentSpectra()))
 
         lastPosition = enmapBox.currentLocation()
-
+        print(lastPosition)
         qgsApp.exec_()
 
     def test_ActivateMapToolsFromExternalApplication(self):

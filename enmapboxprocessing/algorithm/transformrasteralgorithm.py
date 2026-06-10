@@ -57,7 +57,6 @@ class TransformRasterAlgorithm(EnMAPProcessingAlgorithm):
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         dump = self.parameterAsTransformerDump(parameters, self.P_TRANSFORMER, context)
         matchByName = self.parameterAsBoolean(parameters, self.P_MATCH_BY_NAME, context)
-        format, options = self.GTiffFormat, self.DefaultGTiffCreationOptions
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_RASTER, context)
         maximumMemoryUsage = gdal.GetCacheMax()
 
