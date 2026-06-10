@@ -31,10 +31,10 @@ class LayerItem(QgsLayerItem):
         return self.mLayerID
 
     def hasReferenceLayer(self) -> bool:
-        return all(
-            isinstance(self.mLayerProject, QgsProject),
-            isinstance(self.mLayerID, str),
-            self.mLayerID in self.mLayerProject.mapLayers()
+        return (
+            isinstance(self.mLayerProject, QgsProject)
+            and isinstance(self.mLayerID, str)
+            and self.mLayerID in self.mLayerProject.mapLayers()
         )
 
     def setReferenceLayer(self, layer: QgsMapLayer, project: Optional[QgsProject] = None):

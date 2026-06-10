@@ -26,4 +26,7 @@ class SpatialSobelAlgorithm(SpatialFilterFunctionAlgorithmBase):
     def code(cls):
         from scipy.ndimage.filters import sobel
 
-        return lambda array: sobel(array, axis=0)
+        def function(array):
+            return sobel(array, axis=0)
+
+        return function

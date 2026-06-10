@@ -25,4 +25,7 @@ class SpatialPercentileAlgorithm(SpatialFilterFunctionAlgorithmBase):
     def code(cls):
         from scipy.ndimage.filters import percentile_filter
 
-        return lambda array: percentile_filter(array, percentile=50, size=3)
+        def function(array):
+            return percentile_filter(array, percentile=50, size=3)
+
+        return function

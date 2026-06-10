@@ -26,4 +26,7 @@ class SpatialPrewittAlgorithm(SpatialFilterFunctionAlgorithmBase):
     def code(cls):
         from scipy.ndimage.filters import prewitt
 
-        return lambda array: prewitt(array, axis=0)
+        def function(array):
+            return prewitt(array, axis=0)
+
+        return function

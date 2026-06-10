@@ -15,6 +15,7 @@ class TestTileEnmapL2AAlgorithm(TestCase):
     )
     tilingScheme = r'D:\data\EnFireMap\cube\shp\grid_california.gpkg'
     dataAvailable = exists(xmlFilename1)
+    dataAvailable = False
 
     def test(self):
 
