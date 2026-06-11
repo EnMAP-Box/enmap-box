@@ -13,7 +13,6 @@ from functools import partial, wraps
 from inspect import Parameter, isclass, isfunction, isgeneratorfunction
 from io import BufferedIOBase, IOBase, RawIOBase, TextIOBase
 from traceback import extract_stack, print_stack
-from types import CodeType, FunctionType
 from typing import (
     IO, TYPE_CHECKING, AbstractSet, Any, AsyncIterable, AsyncIterator, BinaryIO, Callable, Dict,
     Generator, Iterable, Iterator, List, NewType, Optional, Sequence, Set, TextIO, Tuple, Type,
@@ -56,9 +55,11 @@ except ImportError:
 # Python 3.8+
 try:
     from typing import ForwardRef
+
     evaluate_forwardref = ForwardRef._evaluate
 except ImportError:
     from typing import _ForwardRef as ForwardRef
+
     evaluate_forwardref = ForwardRef._eval_type
 
 if sys.version_info >= (3, 10):
@@ -67,17 +68,18 @@ else:
     _typed_dict_meta_types = ()
     if sys.version_info >= (3, 8):
         from typing import _TypedDictMeta
+
         _typed_dict_meta_types += (_TypedDictMeta,)
 
     try:
         from typing_extensions import _TypedDictMeta
+
         _typed_dict_meta_types += (_TypedDictMeta,)
     except ImportError:
         pass
 
     def is_typeddict(tp) -> bool:
         return isinstance(tp, _typed_dict_meta_types)
-
 
 if TYPE_CHECKING:
     _F = TypeVar("_F")
@@ -88,9 +90,8 @@ if TYPE_CHECKING:
 else:
     from typing import no_type_check as typeguard_ignore
 
-
-_type_hints_map = WeakKeyDictionary()  # type: Dict[FunctionType, Dict[str, Any]]
-_functions_map = WeakValueDictionary()  # type: Dict[CodeType, FunctionType]
+_type_hints_map = WeakKeyDictionary()
+_functions_map = WeakValueDictionary()
 _missing = object()
 
 T_CallableOrType = TypeVar('T_CallableOrType', bound=Callable[..., Any])
@@ -272,8 +273,8 @@ def resolve_forwardref(maybe_ref, memo: _TypeCheckMemo):
 
 
 def get_type_name(type_):
-    name = (getattr(type_, '__name__', None) or getattr(type_, '_name', None) or
-            getattr(type_, '__forward_arg__', None))
+    name = (getattr(type_, '__name__', None) or getattr(type_, '_name', None)
+            or getattr(type_, '__forward_arg__', None))
     if name is None:
         origin = getattr(type_, '__origin__', None)
         name = getattr(origin, '_name', None)
@@ -388,8 +389,9 @@ def check_callable(argname: str, value, expected_type, memo: _TypeCheckMemo) -> 
 
             num_mandatory_args = len([
                 param.name for param in signature.parameters.values()
-                if param.kind in (Parameter.POSITIONAL_ONLY, Parameter.POSITIONAL_OR_KEYWORD) and
-                param.default is Parameter.empty])
+                if param.kind in (
+                    Parameter.POSITIONAL_ONLY, Parameter.POSITIONAL_OR_KEYWORD) and param.default is Parameter.empty]
+            )
             has_varargs = any(param for param in signature.parameters.values()
                               if param.kind == Parameter.VAR_POSITIONAL)
 
@@ -411,8 +413,10 @@ def check_dict(argname: str, value, expected_type, memo: _TypeCheckMemo) -> None
                         format(argname, qualified_name(value)))
 
     if expected_type is not dict:
-        if (hasattr(expected_type, "__args__") and
-                expected_type.__args__ not in (None, expected_type.__parameters__)):
+        if (
+                hasattr(expected_type, "__args__")
+                and expected_type.__args__ not in (None, expected_type.__parameters__)
+        ):
             key_type, value_type = expected_type.__args__
             if key_type is not Any or value_type is not Any:
                 for k, v in value.items():
@@ -773,8 +777,9 @@ def check_type(argname: str, value, expected_type, memo: Optional[_TypeCheckMemo
         elif getattr(expected_type, '_is_protocol', False):
             check_protocol(argname, value, expected_type)
         else:
-            expected_type = (getattr(expected_type, '__extra__', None) or origin_type or
-                             expected_type)
+            expected_type = (
+                getattr(expected_type, '__extra__', None) or origin_type or expected_type
+            )
 
             if expected_type is bytes:
                 # As per https://github.com/python/typing/issues/552
@@ -794,10 +799,12 @@ def check_type(argname: str, value, expected_type, memo: Optional[_TypeCheckMemo
     elif expected_type.__class__ is NewType:
         # typing.NewType on Python 3.10+
         return check_type(argname, value, expected_type.__supertype__, memo)
-    elif (isfunction(expected_type) and
-            getattr(expected_type, "__module__", None) == "typing" and
-            getattr(expected_type, "__qualname__", None).startswith("NewType.") and
-            hasattr(expected_type, "__supertype__")):
+    elif (
+        isfunction(expected_type)
+        and getattr(expected_type, "__module__", None) == "typing"
+        and getattr(expected_type, "__qualname__", None).startswith("NewType.")
+        and hasattr(expected_type, "__supertype__")
+    ):
         # typing.NewType on Python 3.9 and below
         return check_type(argname, value, expected_type.__supertype__, memo)
 
