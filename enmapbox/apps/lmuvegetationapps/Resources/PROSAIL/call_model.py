@@ -28,15 +28,17 @@
 """
 
 import os
+import time
+import warnings
+
 import numpy as np
 from scipy.stats import truncnorm
-import lmuvegetationapps.Resources.PROSAIL.SAIL as SAIL_v
+
 import lmuvegetationapps.Resources.PROSAIL.INFORM as INFORM_v
+import lmuvegetationapps.Resources.PROSAIL.SAIL as SAIL_v
 import lmuvegetationapps.Resources.PROSAIL.prospect as prospect_v
 from lmuvegetationapps.Resources.PROSAIL.dataSpec import lambd
 from lmuvegetationapps.Resources.Spec2Sensor.Spec2Sensor_core import Spec2Sensor
-import warnings
-import time
 
 warnings.filterwarnings('ignore')  # do not show warnings (set to 'all' if you want to see warnings, too)
 
@@ -281,7 +283,7 @@ class SetupMultiple:
     def uniform_distribution(self, para_name, min, max, multiply):
         try:
             return_list = np.tile(np.random.uniform(low=min, high=max, size=self.ns), multiply)
-        except:
+        except Exception:
             raise ValueError("Cannot create uniform distribution for parameter %s. Check values!" % para_name)
         return return_list
 
@@ -516,8 +518,9 @@ class InitModel:
                 # The double transpose of the matrix (.T) fits the paras in the necessary shape run_model expects
                 # The first "npara" rows are reserved for the parameter-values
                 # The rest is reserved for the spectral results of PROSAIL
-                save_array[npara:, :] = self.run_model(paras=
-                                                       dict(zip(self.para_names, para_grid[run:run + nruns, :].T))).T
+                save_array[npara:, :] = self.run_model(
+                    paras=dict(zip(self.para_names, para_grid[run:run + nruns, :].T))
+                ).T
                 save_array[:npara, :] = para_grid[run:run + nruns, :].T
                 if mask is not None:
                     save_array = save_array[:, mask]
