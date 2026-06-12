@@ -32,7 +32,8 @@ import numpy as np
 import pyqtgraph as pg
 from scipy.interpolate import interp1d
 
-from enmapbox.coreapps._classic.hubflow.core import openRasterDataset
+from enmapboxprocessing.rasterreader import RasterReader
+# from enmapbox.coreapps._classic.hubflow.core import openRasterDataset
 from lmuvegetationapps import APP_DIR
 from lmuvegetationapps.Resources.PROSAIL import call_model as mod
 from lmuvegetationapps.Resources.Spec2Sensor.Spec2Sensor_core import Spec2Sensor, BuildTrueSRF, BuildGenericSRF
@@ -1022,8 +1023,12 @@ class SensorEditor:
     def image_read(self):  # read only necessary info: fwhm and center wavelengths
         inras = self.image
 
-        image = openRasterDataset(inras)
-        meta = image.metadataDict()
+        #image = openRasterDataset(inras)
+        #meta = image.metadataDict()
+
+        reader = RasterReader(inras)
+        meta = reader.metadata()
+
         try:
             fwhm = meta['ENVI']['fwhm']
             wavelength = meta['ENVI']['wavelength']

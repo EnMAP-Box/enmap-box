@@ -23,7 +23,9 @@
 ***************************************************************************
 """
 
-from _classic.hubflow.core import *
+#from _classic.hubdc.core import openRasterDataset, RasterDataset
+#from _classic.hubflow.core import Raster
+
 # from osgeo import gdal
 # from osgeo.gdalconst import *
 import numpy as np

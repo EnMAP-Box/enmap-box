@@ -31,11 +31,14 @@ https://doi.org/10.1016/j.jag.2020.102219
 
 import sys
 
-import pyqtgraph as pg
+#import pyqtgraph as pg
 from scipy.interpolate import *
-
-from _classic.hubflow.core import *
+import numpy as np
+import os
+# from _classic.hubflow.core import openRasterDataset, RasterDataset, EnviDriver
 from enmapbox.gui.utils import loadUi
+from enmapboxprocessing.driver import Driver
+from enmapboxprocessing.rasterreader import RasterReader
 from lmuvegetationapps import APP_DIR
 from lmuvegetationapps.ASI.peakdetect import *
 from qgis.PyQt.QtGui import *
@@ -235,14 +238,19 @@ class ASI:
             self.nodat[0] = meta[0]
 
     def get_image_meta(self, image, image_type):
-        try:
-            dataset: RasterDataset = openRasterDataset(image)
-        except:
-            QMessageBox.critical(self.gui, 'Input Image',
-                                 'Image could not be read. Please make sure it is a valid ENVI image')
-            return
-        ds = dataset.gdalDataset()
-        metadict = dataset.metadataDict()
+        #try:
+        #    dataset: RasterDataset = openRasterDataset(image)
+        #except:
+        #    QMessageBox.critical(self.gui, 'Input Image',
+        #                         'Image could not be read. Please make sure it is a valid ENVI image')
+        #    return
+
+        reader = RasterReader(image)
+
+        #ds = dataset.gdalDataset()
+
+        ds = reader.gdalDataset
+        metadict = reader.metadata()
         nrows = ds.RasterYSize
         ncols = ds.RasterXSize
         nbands = ds.RasterCount
@@ -349,6 +357,7 @@ class ASI:
                 # self.plot_example(max_ndvi_pos=self.max_ndvi_pos)
 
     def init_plot(self):
+        import pyqtgraph as pg
         labelStyle = {'color': '#FFF', 'font-size': '12px'}
         self.gui.rangeView.setLabel('left', text="Reflectance [%]", **labelStyle)
         self.gui.rangeView.setLabel('bottom', text="Wavelength [nm]", **labelStyle)
@@ -368,6 +377,7 @@ class ASI:
         self.gui.lblPixelLocation.setText("")
 
     def plot_example(self, max_ndvi_pos):
+        import pyqtgraph as pg
         self.gui.lblPixelLocation.setText("Image pixel: row: %s | col: %s" % (
             str(max_ndvi_pos[1]), str(max_ndvi_pos[2])))
         self.gui.lblPixelLocation.setStyleSheet('color: green')
@@ -614,8 +624,13 @@ class ASI_core:
         self.valid_bands = [i for i, x in enumerate(self.wl) if x in list(self.valid_wl)]
 
     def read_image(self, image):
-        dataset = openRasterDataset(image)
-        raster = dataset.readAsArray()
+        #dataset = openRasterDataset(image)
+        #raster = dataset.readAsArray()
+
+        reader = RasterReader(image)
+        array = np.array(reader.array())
+        raster = array
+
         if len(self.wl) > 2000:
             try:
                 raster[self.default_exclude, :, :] = 0
@@ -626,8 +641,13 @@ class ASI_core:
         return raster
 
     def read_image_window(self, image):
-        dataset = openRasterDataset(image)
-        raster = dataset.readAsArray()
+        # dataset = openRasterDataset(image)
+        # raster = dataset.readAsArray()
+
+        reader = RasterReader(image)
+        array = np.array(reader.array())
+        raster = array
+
         if len(self.wl) > 2000:
             try:
                 raster[self.default_exclude, :, :] = 0
@@ -640,13 +660,21 @@ class ASI_core:
 
     @staticmethod
     def read_image_meta(image):
-        dataset: RasterDataset = openRasterDataset(image)
-        ds = dataset.gdalDataset()
-        if dataset.grid() is not None:
-            grid = dataset.grid()
-        else:
-            raise Warning('No coordinate system information provided in ENVI header file')
-        metadict = dataset.metadataDict()
+        #dataset: RasterDataset = openRasterDataset(image)
+
+        reader = RasterReader(image)
+
+        # ds = dataset.gdalDataset()
+
+        ds = reader.gdalDataset
+
+        #if dataset.grid() is not None:
+        #    grid = dataset.grid()
+        #else:
+        #    raise Warning('No coordinate system information provided in ENVI header file')
+
+        grid = reader.extent(), reader.crs()
+        metadict = reader.metadata()
         nrows = ds.RasterYSize
         ncols = ds.RasterXSize
         nbands = ds.RasterCount
@@ -677,46 +705,63 @@ class ASI_core:
         return grid, wl, nbands, nrows, ncols, dtype
 
     def write_integral_image(self, result):
-        # result = result.astype(float)
 
-        output = RasterDataset.fromArray(array=result, filename=self.output, grid=self.grid,
-                                         driver=EnviDriver())
+        #output = RasterDataset.fromArray(array=result, filename=self.output, grid=self.grid,
+        #                                 driver=EnviDriver())
 
-        output.setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
+        array = result
+        filename = self.output
+        extent, crs = self.grid
 
-        for band in output.bands():
-            band.setDescription('Spectral Integral: [%i nm - %i nm]' %
-                                (self.limits[0], self.limits[1]))
-            band.setNoDataValue(self.nodat[1])
+        writer = Driver(filename).createFromArray(array, extent, crs)
+        writer.setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
+
+        for bandNo in writer.bandNumbers():
+            writer.setBandName('Spectral Integral: [%i nm - %i nm]' %(self.limits[0], self.limits[1]), bandNo)
+            writer.setNoDataValue(self.nodat[1], bandNo)
+
+        writer.close()
 
     def write_crs_image(self, crs):  #
         # band_string_nr = ['band ' + str(x) for x in self.valid_bands + 1]
         crs_output = self.output.split(".")
         crs_output = crs_output[0] + "_crs" + "." + crs_output[1]
-        output = RasterDataset.fromArray(array=crs, filename=crs_output, grid=self.grid,
-                                         driver=EnviDriver())
 
-        output.setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
+        #output = RasterDataset.fromArray(array=crs, filename=crs_output, grid=self.grid,
+        #                                 driver=EnviDriver())
 
-        for i, band in enumerate(output.bands()):
-            # band.setDescription(band_string_nr[i])
-            band.setNoDataValue(self.nodat[1])
+        array = crs
+        filename = crs_output
+        extent, crs = self.grid
+        writer = Driver(filename).createFromArray(array, extent, crs)
 
-        output.setMetadataItem(key='wavelength', value=self.valid_wl, domain='ENVI')
-        output.setMetadataItem(key='wavelength units', value='Nanometers', domain='ENVI')
+        writer.setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
+
+        for bandNo in writer.bandNumbers():
+           writer.setNoDataValue(self.nodat[1], bandNo)
+
+        writer.setMetadataItem(key='wavelength', value=self.valid_wl, domain='ENVI')
+        writer.setMetadataItem(key='wavelength units', value='Nanometers', domain='ENVI')
+        writer.close()
 
     def write_3band_image(self, res3band):
         band_str_nr = ['Car/Cab', 'Cab', 'H2O']
         bands_output = self.output.split(".")
         bands_output = bands_output[0] + "_3band_car_cab_h2o" + "." + bands_output[1]
-        output = RasterDataset.fromArray(array=res3band, filename=bands_output, grid=self.grid,
-                                         driver=EnviDriver())
 
-        output.setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
+        #output = RasterDataset.fromArray(array=res3band, filename=bands_output, grid=self.grid,
+        #                                 driver=EnviDriver())
 
-        for i, band in enumerate(output.bands()):
-            band.setDescription(band_str_nr[i])
-            band.setNoDataValue(self.nodat[1])
+        array = res3band
+        filename = bands_output
+        extent, crs = self.grid
+        writer = Driver(filename).createFromArray(array, extent, crs)
+
+        writer.setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
+
+        for bandNo in writer.bandNumbers():
+            writer.setBandName(band_str_nr[bandNo - 1], bandNo)
+            writer.setNoDataValue(self.nodat[1], bandNo)
 
     def find_closest_wl(self, lambd):
         distances = [abs(lambd - self.wl[i]) for i in range(self.n_wl)]

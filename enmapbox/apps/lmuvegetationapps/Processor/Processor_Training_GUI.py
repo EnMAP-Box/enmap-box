@@ -28,6 +28,9 @@ because the user may not change the important hyperparameters on his own. There 
 models on basis of individual Lookup-Tables.
 
 """
+import os
+import numpy as np
+# from _classic.hubflow.core import EnviSpectralLibrary
 import csv
 import sys
 import warnings
@@ -44,7 +47,7 @@ from sklearn.metrics import r2_score
 # from PyQt5.QtCore import QThread, pyqtSignal
 # from PyQt5.QtCore import QTimer
 import lmuvegetationapps.Processor.Processor_Inversion_core as processor
-from _classic.hubflow.core import *
+
 from enmapbox.gui.utils import loadUi
 # import lmuvegetationapps.LUT.CreateLUT_GUI
 from lmuvegetationapps import APP_DIR
@@ -612,10 +615,14 @@ class ML_Training:
             self.soil_wavelengths = wl_values
             self.soil_specs = [list(row) for row in zip(*all_specs)]
         if os.path.splitext(self.speclib)[1] == ".sli":
-            speclib = EnviSpectralLibrary(filename=self.speclib)
-            raster = speclib.raster()
-            self.soil_wavelengths = raster.dataset().metadataItem(key='wavelength', domain='ENVI', dtype=float)
-            self.soil_specs = raster.dataset().array()[:, :, 0].tolist()
+            # speclib = EnviSpectralLibrary(filename=self.speclib)
+            # raster = speclib.raster()
+            # self.soil_wavelengths = raster.dataset().metadataItem(key='wavelength', domain='ENVI', dtype=float)
+            # self.soil_specs = raster.dataset().array()[:, :, 0].tolist()
+
+            raise NotImplemented('replace old code with QPS code')
+
+
 
     def check_and_assign(self):
         if not self.lut_path:

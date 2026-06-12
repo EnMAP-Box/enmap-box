@@ -25,11 +25,17 @@
 import sys
 
 import pyqtgraph as pg
+from osgeo import gdal
 from scipy.interpolate import *
 from scipy.signal import savgol_filter
-
-from _classic.hubflow.core import *
+import numpy as np
+import os
+#from _classic.hubdc.core import openRasterDataset, RasterDataset
+#from _classic.hubflow.core import Raster
 from enmapbox.gui.utils import loadUi
+from enmapboxprocessing.driver import Driver
+from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxprocessing.rasterwriter import RasterWriter
 from lmuvegetationapps import APP_DIR
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import *
@@ -235,14 +241,9 @@ class iREIP:
             self.nodat[0] = meta[0]
 
     def get_image_meta(self, image, image_type):
-        try:
-            dataset: RasterDataset = openRasterDataset(image)
-        except:
-            QMessageBox.critical(self.gui, 'Input Image',
-                                 'Image could not be read. Please make sure it is a valid ENVI image')
-            return
-        ds = dataset.gdalDataset()
-        metadict = dataset.metadataDict()
+        reader = RasterReader(image)
+        metadict = reader.metadata()
+        ds = reader.gdalDataset
         nrows = ds.RasterYSize
         ncols = ds.RasterXSize
         nbands = ds.RasterCount
@@ -667,8 +668,15 @@ class iREIP_core:
         self.valid_bands = [i for i, x in enumerate(self.wl) if x in list(self.valid_wl)]
 
     def read_image(self, image):
-        dataset = openRasterDataset(image)
-        raster = dataset.readAsArray()
+
+        # old code...
+        # dataset = openRasterDataset(image)
+        # raster = dataset.readAsArray()
+
+        reader = RasterReader(image)
+        array  = np.array(reader.array())
+        raster = array
+
         if len(self.wl) > 2000:
             try:
                 raster[self.default_exclude, :, :] = 0
@@ -679,8 +687,15 @@ class iREIP_core:
         return raster
 
     def read_image_window(self, image):
-        dataset = openRasterDataset(image)
-        raster = dataset.readAsArray()
+
+        # old code...
+        # dataset = openRasterDataset(image)
+        # raster = dataset.readAsArray()
+
+        reader = RasterReader(image)
+        array  = np.array(reader.array())
+        raster = array
+
         if len(self.wl) > 2000:
             try:
                 raster[self.default_exclude, :, :] = 0
@@ -693,13 +708,24 @@ class iREIP_core:
 
     @staticmethod
     def read_image_meta(image):
-        dataset: RasterDataset = openRasterDataset(image)
-        ds = dataset.gdalDataset()
-        if dataset.grid() is not None:
-            grid = dataset.grid()
-        else:
-            raise Warning('No coordinate system information provided in ENVI header file')
-        metadict = dataset.metadataDict()
+
+        # dataset: RasterDataset = openRasterDataset(image)
+        # ds = dataset.gdalDataset()
+
+        reader = RasterReader(image)
+        ds = reader.gdalDataset
+
+        # if dataset.grid() is not None:
+        #    grid = dataset.grid()
+        # else:
+        #    raise Warning('No coordinate system information provided in ENVI header file')
+
+        grid = reader.extent(), reader.crs()
+
+        # metadict = dataset.metadataDict()
+
+        metadict = reader.metadata()
+
         nrows = ds.RasterYSize
         ncols = ds.RasterXSize
         nbands = ds.RasterCount
@@ -730,14 +756,22 @@ class iREIP_core:
         return grid, wl, nbands, nrows, ncols, dtype
 
     def write_ireip_image(self, result):
-        output = Raster.fromArray(array=result, filename=self.output, grid=self.grid)
 
-        output.dataset().setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
+        # output = Raster.fromArray(array=result, filename=self.output, grid=self.grid)
 
-        for band in output.dataset().bands():
-            band.setDescription(
-                'Inflection point between %i and %i nm' % (self.limits[0], self.limits[1]))
-            band.setNoDataValue(self.nodat[1])
+        extent, crs = self.grid
+        array = result
+        filename = self.output
+        writer: RasterWriter = Driver(filename).createFromArray(array, extent, crs)
+
+        writer.setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
+        for bandNo in writer.bandNumbers():
+            writer.setBandName(
+                'Inflection point between %i and %i nm' % (self.limits[0], self.limits[1]), bandNo
+            )
+            writer.setNoDataValue(self.nodat[1], bandNo)
+
+        writer.close()
 
     def write_deriv_image(self, deriv, mode):  #
 
@@ -753,17 +787,22 @@ class iREIP_core:
                         continue
 
             deriv_output = deriv_output[0] + "_1st_deriv" + "." + deriv_output[1]
-            output = Raster.fromArray(array=deriv, filename=deriv_output, grid=self.grid)
 
-            output.dataset().setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
+            # output = Raster.fromArray(array=deriv, filename=deriv_output, grid=self.grid)
 
-            for i, band in enumerate(output.dataset().bands()):
-                band.setDescription(band_string_nr[i])
-                band.setNoDataValue(self.nodat[1])
+            filename = deriv_output
+            array = deriv
+            extent, crs = self.grid
+            writer = Driver(filename).createFromArray(array, extent, crs)
+            writer.setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
 
-            output.dataset().setMetadataItem(key='wavelength', value=self.valid_wl,
-                                             domain='ENVI')
-            output.dataset().setMetadataItem(key='wavelength units', value='Nanometers', domain='ENVI')
+            for bandNo in writer.bandNumbers():
+                writer.setBandName(band_string_nr[bandNo-1], bandNo)
+                writer.setNoDataValue(self.nodat[1], bandNo)
+
+            writer.setMetadataItem(key='wavelength', value=self.valid_wl, domain='ENVI')
+            writer.setMetadataItem(key='wavelength units', value='Nanometers', domain='ENVI')
+            writer.close()
 
         if mode == "second":
             band_string_nr = ['band ' + str(x + 1) for x, i in enumerate(self.valid_bands)]
@@ -777,16 +816,22 @@ class iREIP_core:
                     else:
                         continue
 
-            output = Raster.fromArray(array=deriv, filename=deriv_output, grid=self.grid)
+            # output = Raster.fromArray(array=deriv, filename=deriv_output, grid=self.grid)
 
-            output.dataset().setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
+            filename = deriv_output
+            array = deriv
+            extent, crs = self.grid
+            writer = Driver(filename).createFromArray(array, extent, crs)
+            writer.setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
 
-            for i, band in enumerate(output.dataset().bands()):
-                band.setDescription(band_string_nr[i])
-                band.setNoDataValue(self.nodat[1])
+            for bandNo in writer.bandNumbers():
+                writer.setBandName(band_string_nr[bandNo - 1], bandNo)
+                writer.setNoDataValue(self.nodat[1], bandNo)
 
-            output.dataset().setMetadataItem(key='wavelength', value=self.valid_wl, domain='ENVI')
-            output.dataset().setMetadataItem(key='wavelength units', value='Nanometers', domain='ENVI')
+            writer.setMetadataItem(key='wavelength', value=self.valid_wl, domain='ENVI')
+            writer.setMetadataItem(key='wavelength units', value='Nanometers', domain='ENVI')
+
+            writer.close()
 
     def find_closest(self, lambd):
         distances = [abs(lambd - self.wl[i]) for i in range(self.n_wl)]

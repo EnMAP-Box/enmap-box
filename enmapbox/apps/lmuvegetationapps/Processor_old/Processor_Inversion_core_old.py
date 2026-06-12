@@ -31,13 +31,17 @@ but new algorithms can always be created manually by updating the values in this
 can do both training and prediction, the GUIs are split into different scripts.
 
 """
-
-from _classic.hubflow.core import *
+import os
+# from _classic.hubdc.core import openRasterDataset, RasterDataset, EnviDriver
 import numpy as np
+from docutils.readers import ReReader
 from sklearn.decomposition import PCA
 from sklearn.neural_network import MLPRegressor
 from sklearn.preprocessing import StandardScaler
 import joblib
+
+from enmapboxprocessing.driver import Driver
+from enmapboxprocessing.rasterreader import RasterReader
 
 
 # Class MLRATraining will only be used for training new models, not for predictions!
@@ -95,10 +99,17 @@ class Functions:
     @staticmethod
     def _read_image(image, dtype=np.float16):
         # Method for loading bsq images, no bands are skipped anymore
-        dataset = openRasterDataset(image)
-        in_matrix = dataset.readAsArray().astype(dtype=dtype)
+        # dataset = openRasterDataset(image)
+        # in_matrix = dataset.readAsArray().astype(dtype=dtype)
+        # grid = dataset.grid()
+
+        reader = RasterReader()
+        array = np.array(reader.array())
+        in_matrix = array
+
         nbands, nrows, ncols = in_matrix.shape
-        grid = dataset.grid()
+
+        grid = reader.extent(), reader.crs()
 
         return nrows, ncols, nbands, grid, in_matrix  # return a tuple back to the last function (type "dtype")
 
@@ -106,25 +117,39 @@ class Functions:
     def write_image(out_matrix, image_out, grid, paras_out, nodat, out_mode):
         # Method for writing output to binary raster file
         if out_mode == 'single':  # write one single file with multiple bands
-            output = RasterDataset.fromArray(array=out_matrix, filename=image_out, grid=grid,
-                                             driver=EnviDriver())
-            output.setMetadataItem('data ignore value', nodat, 'ENVI')
+            #output = RasterDataset.fromArray(array=out_matrix, filename=image_out, grid=grid,
+            #                                 driver=EnviDriver())
 
-            for iband, band in enumerate(output.bands()):
-                band.setDescription(paras_out[iband])
-                band.setNoDataValue(nodat)
+            array = out_matrix
+            filename = image_out
+            extent, crs = grid
+            writer = Driver(filename).createFromArray(array, extent, crs)
+            writer.setMetadataItem('data ignore value', nodat, 'ENVI')
+
+            for bandNo in writer.bandNumber():
+                writer.setBandName(paras_out[bandNo - 1], bandNo)
+                writer.setNoDataValue(nodat, bandNo)
+
+            writer.close()
 
         else:  # write several files, one per parameters
             for ipara in range(len(paras_out)):
                 # naming convention: drop extension, add para name, add extension
                 base, ext = os.path.splitext(image_out)
                 image_out_individual = base + "_" + paras_out[ipara] + ext
-                output = RasterDataset.fromArray(array=out_matrix[ipara, :, :], filename=image_out_individual,
-                                                 grid=grid, driver=EnviDriver())
-                output.setMetadataItem('data ignore value', nodat, 'ENVI')
-                band = next(output.bands())  # output.bands() is a generator; here only one band
-                band.setDescription(paras_out[ipara])
-                band.setNoDataValue(nodat)
+                # output = RasterDataset.fromArray(array=out_matrix[ipara, :, :], filename=image_out_individual,
+                #                                 grid=grid, driver=EnviDriver())
+
+                array = out_matrix[ipara, :, :]
+                filename = image_out_individual
+                extent, crs = grid
+                writer = Driver(filename).createFromArray(array, extent, crs)
+                writer.setMetadataItem('data ignore value', nodat, 'ENVI')
+                bandNo = 1
+                writer.setBandName(paras_out[ipara], bandNo)
+                writer.setNoDataValue(nodat, bandNo)
+
+                writer.close()
 
     def read_geometry(self, geo_in):
         # Read geometry from input file (raster based)

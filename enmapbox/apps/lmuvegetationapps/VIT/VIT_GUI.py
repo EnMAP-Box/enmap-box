@@ -5,14 +5,15 @@
 import sys
 
 import lmuvegetationapps.VIT.VIT_core
-from _classic.hubflow.core import *
+# from _classic.hubdc.core import openRasterDataset
 from enmapbox.gui.utils import loadUi
+from enmapboxprocessing.rasterreader import RasterReader
 from lmuvegetationapps import APP_DIR
 from qgis.PyQt.QtWidgets import *
 from qgis.core import QgsMapLayerProxyModel
 from qgis.gui import QgsMapLayerComboBox
+import os
 
-# import os
 
 pathUI_vit = os.path.join(APP_DIR, 'Resources/UserInterfaces/VIT.ui')
 pathUI_nodat = os.path.join(APP_DIR, 'Resources/UserInterfaces/Nodat.ui')
@@ -261,13 +262,17 @@ class VIT:
             self.nodat[0] = meta[0]
 
     def get_image_meta(self, image, image_type):
-        dataset = openRasterDataset(image)
-        if dataset is None:
-            raise ValueError(
-                '%s could not be read. Please make sure it is a valid ENVI image' % image_type)
-        else:
-            metadict = dataset.metadataDict()
+        #dataset = openRasterDataset(image)
+        #if dataset is None:
+        #    raise ValueError(
+        #        '%s could not be read. Please make sure it is a valid ENVI image' % image_type)
+        #else:
+        #    metadict = dataset.metadataDict()
 
+        reader = RasterReader(image)
+        metadict = reader.metadata()
+
+        if True:
             nrows = int(metadict['ENVI']['lines'])
             ncols = int(metadict['ENVI']['samples'])
             nbands = int(metadict['ENVI']['bands'])
