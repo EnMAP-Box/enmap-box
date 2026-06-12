@@ -23,8 +23,10 @@
 ***************************************************************************
 """
 import sys
+import os
 
-from _classic.hubflow.core import *
+from enmapboxprocessing.rasterreader import RasterReader
+# from _classic.hubdc.core import openRasterDataset, RasterDataset
 from lmuvegetationapps import APP_DIR
 from lmuvegetationapps.PWR.PWR_core import PWR_core
 from qgis.PyQt.QtCore import Qt
@@ -172,14 +174,18 @@ class PWR:
             self.nodat[0] = meta[0]
 
     def get_image_meta(self, image, image_type):
-        try:
-            dataset: RasterDataset = openRasterDataset(image)
-        except:
-            QMessageBox.critical(self.gui, 'Input Image',
-                                 'Image could not be read. Please make sure it is a valid ENVI image')
-            return
-        ds = dataset.gdalDataset()
-        metadict = dataset.metadataDict()
+        #try:
+        #    dataset: RasterDataset = openRasterDataset(image)
+        #except:
+        #    QMessageBox.critical(self.gui, 'Input Image',
+        #                         'Image could not be read. Please make sure it is a valid ENVI image')
+        #    return
+
+        # ds = dataset.gdalDataset()
+
+        reader = RasterReader(image)
+        ds = reader.gdalDataset()
+        metadict = reader.metadata()
         nrows = ds.RasterYSize
         ncols = ds.RasterXSize
         nbands = ds.RasterCount

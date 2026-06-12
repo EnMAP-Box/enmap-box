@@ -23,18 +23,22 @@
 ***************************************************************************
 """
 
-# Fills and handles the GUI for creating LUTs in the EnMAP-Box
-
 import csv
+import os
 import sys
 
+# Fills and handles the GUI for creating LUTs in the EnMAP-Box
+import numpy as np
 # ensure to call QGIS before PyQtGraph
 import pyqtgraph as pg
+
+from enmapboxprocessing.rasterreader import RasterReader
+from qgis.PyQt.QtGui import QColor
 from scipy.interpolate import interp1d
 from scipy.stats import norm, uniform
 
 import lmuvegetationapps.Resources.PROSAIL.call_model as mod
-from _classic.hubflow.core import *
+# from _classic.hubflow.core import openRasterDataset
 from enmapbox.gui.utils import loadUi
 from lmuvegetationapps import APP_DIR
 from lmuvegetationapps.Resources.Spec2Sensor.Spec2Sensor_core import Spec2Sensor, BuildTrueSRF, BuildGenericSRF
@@ -1282,8 +1286,12 @@ class SensorEditor:
 
     def image_read(self):  # read only necessary info: fwhm and center wavelengths
         inras = self.image
-        image = openRasterDataset(inras)
-        meta = image.metadataDict()
+        #image = openRasterDataset(inras)
+        #meta = image.metadataDict()
+
+        reader = RasterReader(inras)
+        meta = reader.metadata()
+
         try:
             fwhm = meta['ENVI']['fwhm']
             wavelength = meta['ENVI']['wavelength']

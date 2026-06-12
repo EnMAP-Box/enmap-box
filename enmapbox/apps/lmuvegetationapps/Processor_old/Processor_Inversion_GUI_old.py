@@ -29,10 +29,12 @@ add a model selection frame to the GUI in QtDesigner then.
 
 """
 import sys
-
+import os
+import numpy as np
 import lmuvegetationapps.Processor_old.Processor_Inversion_core_old as processor
-from _classic.hubflow.core import *
+# from _classic.hubdc.core import openRasterDataset
 from enmapbox.gui.utils import loadUi
+from enmapboxprocessing.rasterreader import RasterReader
 from lmuvegetationapps import APP_DIR
 # ensure to call QGIS before PyQtGraph
 from qgis.PyQt.QtWidgets import *
@@ -521,13 +523,17 @@ class MLInversion:
 
     def get_image_meta(self, image, image_type):
         # extracts meta information from the spectral image
-        dataset = openRasterDataset(image)
-        if dataset is None:
-            raise ValueError(
-                '{} could not be read. Please make sure it is a valid ENVI image'.format(image_type))
-        else:
-            metadict = dataset.metadataDict()
+        # dataset = openRasterDataset(image)
+        #if dataset is None:
+        #    raise ValueError(
+        #        '{} could not be read. Please make sure it is a valid ENVI image'.format(image_type))
+        #else:
+        #    metadict = dataset.metadataDict()
 
+        reader = RasterReader(image)
+        metadict = reader.metadata()
+
+        if True:
             nrows = int(metadict['ENVI']['lines'])
             ncols = int(metadict['ENVI']['samples'])
             nbands = int(metadict['ENVI']['bands'])
