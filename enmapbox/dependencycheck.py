@@ -1304,3 +1304,13 @@ class PIPPackageInstaller(QWidget):
     def addPackages(self, packages: List[PIPPackage]):
         self.model.addPackages(packages)
         self.loadPIPVersionInfo(packages)
+
+
+if __name__ == '__main__':
+
+    missing = [p for p in requiredPackages() if p.isCoreRequirement() and not p.isInstalled()]
+    if len(missing) > 0:
+        info = missingPackageInfo(missing, html=False)
+        print(info)
+    else:
+        print('All required packages are installed')

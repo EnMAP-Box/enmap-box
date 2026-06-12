@@ -50,21 +50,36 @@ from enmapbox.testing import start_app, EnMAPBoxTestCase
 # Ensure the QGIS application is started for testing
 start_app()
 
+
 class MyFeatureTest(EnMAPBoxTestCase):
     def test_feature_logic(self):
         self.assertTrue(True)
+
 
 if __name__ == '__main__':
     unittest.main()
 ```
 
-### 3. Additional Development Information
+## 3. Development Guidelines
 
-* **Code Style**: The project follows PEP8. `flake8` is used for linting with the `flake8-qgis` plugin.
-    * Run linting: `flake8`
-* **Git Submodules**: This project heavily relies on git submodules located in `enmapbox/qgispluginsupport`,
-  `enmapbox/apps`, etc. Always ensure submodules are up to date.
+### Code Style
+
+- **Code Style**. Follow PEP 8. `flake8` is used for linting with the `flake8-qgis` plugin.
+    * Run linting: `flake8` use the settings in tox.ini.
+- Use explicit imports (avoid `from module import *`).
+- follow QGIS naming conventions where appropriate when interacting with the QGIS API, but generally adheres
+  to standard Python snake_case for internal logic.
+- use flake8 to check code style
+- use bandit to check security issues. Run like: `bandit --ini tox.ini <other bandit args>`
+
 * **QGIS Dependency**: Most of the core logic depends on the PyQGIS API. Ensure QGIS is correctly installed and
   accessible in your Python environment.
 * **Resource Files**: UI files (`.ui`) and resource files (`.qrc`) are used. Changes to `.qrc` files require re-running
   `scripts/setup_repository.py`.
+
+### Headless Testing
+
+- Always ensure tests can run with `QT_QPA_PLATFORM=offscreen`.
+- Use `self.showGui(widget)` within `TestCase` which respects the `CI` environment variable to skip
+  GUI display during automated runs.
+
