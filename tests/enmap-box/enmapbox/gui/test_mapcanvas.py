@@ -13,6 +13,7 @@ __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
 import unittest
 from pathlib import Path
+from typing import List
 
 from enmapbox import initAll
 from enmapbox.exampledata import enmap, hires, landcover_polygon
@@ -82,11 +83,13 @@ class MapCanvasTests(EnMAPBoxTestCase):
 
     # @unittest.skip("Skipped to check if GH CI finishes")
     def test_canvaslinks(self):
-        canvases = []
+        canvases: List[MapCanvas] = []
+        p = QgsProject()
         for i in range(3):
             c = MapCanvas()
+            c.setProject(p)
             lyr = QgsRasterLayer(enmap)
-            QgsProject.instance().addMapLayer(lyr)
+            p.addMapLayer(lyr)
             c.setLayers([lyr])
             c.setDestinationCrs(lyr.crs())
             c.setExtent(lyr.extent())
@@ -114,8 +117,8 @@ class MapCanvasTests(EnMAPBoxTestCase):
         center3.setX(center1.x() + 400)
 
         c1.extentsChanged.connect(lambda: print('Extent C1 changed'))
-        c2.extentsChanged.connect(lambda: print('Extent C1 changed'))
-        c3.extentsChanged.connect(lambda: print('Extent C1 changed'))
+        c2.extentsChanged.connect(lambda: print('Extent C2 changed'))
+        c3.extentsChanged.connect(lambda: print('Extent C3 changed'))
 
         c1.setCenter(center1)
         self.assertTrue(c1.center() == center1)

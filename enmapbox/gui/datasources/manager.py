@@ -1,10 +1,10 @@
+import json
 import logging
 import os
-import pickle
 import re
 import warnings
 import webbrowser
-from os.path import dirname, exists, sep
+from os.path import dirname, exists
 from pathlib import Path
 from typing import Any, Dict, List, Union, Optional
 
@@ -16,6 +16,7 @@ from enmapbox.gui.utils import enmapboxUiPath
 from enmapbox.qgispluginsupport.qps.layerproperties import defaultRasterRenderer
 from enmapbox.qgispluginsupport.qps.models import PyObjectTreeNode, TreeModel, TreeNode, TreeView
 from enmapbox.qgispluginsupport.qps.utils import bandClosestToWavelength, defaultBands, loadUi
+from enmapbox.qgispluginsupport.qps.utils import stringToByteArray
 from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtCore import pyqtSignal, QAbstractItemModel, QItemSelectionModel, QMimeData, \
     QModelIndex, QSortFilterProxyModel, Qt, QTimer, QUrl
@@ -88,8 +89,6 @@ class DataSourceManager(TreeModel):
 
     def dropMimeData(self, mimeData: QMimeData, action, row: int, column: int, parent: QModelIndex):
 
-        assert isinstance(mimeData, QMimeData)
-
         # result = False
         toAdd = []
         if action in [Qt.MoveAction, Qt.CopyAction]:
@@ -156,7 +155,8 @@ class DataSourceManager(TreeModel):
 
         if len(bandInfo) > 0:
             from enmapbox.gui.mimedata import MDF_RASTERBANDS
-            mimeData.setData(MDF_RASTERBANDS, pickle.dumps(bandInfo))
+            dump = stringToByteArray(json.dumps(bandInfo))
+            mimeData.setData(MDF_RASTERBANDS, dump)
 
         urls = [QUrl.fromLocalFile(s) if os.path.isfile(s) else QUrl(s) for s in sourceList]
         if len(urls) > 0:
@@ -187,11 +187,10 @@ class DataSourceManager(TreeModel):
 
         from qgis.utils import iface
         if isinstance(iface, QgisInterface):
-            root = iface.layerTreeView().layerTreeModel().rootGroup()
-            assert isinstance(root, QgsLayerTreeGroup)
+            root: QgsLayerTreeGroup = iface.layerTreeView().layerTreeModel().rootGroup()
 
             for layerTree in root.findLayers():
-                assert isinstance(layerTree, QgsLayerTreeLayer)
+                layerTree: QgsLayerTreeLayer
                 grp = layerTree
                 # grp.setCustomProperty('nodeHidden', 'true' if bHide else 'false')
                 lyr = layerTree.layer()
@@ -235,7 +234,8 @@ class DataSourceManager(TreeModel):
 
             if filter:
                 from .datasources import LUT_DATASOURCETYPES, DataSourceTypes
-                assert filter in LUT_DATASOURCETYPES.keys(), f'Unknown datasource filter "{filter}"'
+                if filter not in LUT_DATASOURCETYPES.keys():
+                    raise ValueError(f'Unknown datasource filter "{filter}"')
                 if filter == DataSourceTypes.SpectralLibrary:
                     dList = [ds for ds in dList if isinstance(ds, VectorDataSource) and ds.isSpectralLibrary()]
                 else:
@@ -257,9 +257,11 @@ class DataSourceManager(TreeModel):
 
                 for ds in allDataSources:
                     dataItem = ds.dataItem()
-                    if isinstance(ds, SpatialDataSource) \
-                            and dataItem.path() == input.source() \
-                            and dataItem.providerKey() == input.providerType():
+                    if (
+                        isinstance(ds, SpatialDataSource)
+                        and dataItem.path() == input.source()
+                        and dataItem.providerKey() == input.providerType()
+                    ):
                         foundSources.append(ds)
             elif isinstance(input, str):
                 for ds in allDataSources:
@@ -277,7 +279,7 @@ class DataSourceManager(TreeModel):
         self.mUpdateTimer.stop()
         try:
             for source in self.dataSources():
-                assert isinstance(source, DataSource)
+                source: DataSource
                 sid = source.source()
 
                 # save a state that changes with modifications, e.g. modification time
@@ -436,9 +438,6 @@ class DataSourceManagerTreeView(TreeView):
         Creates and shows the context menu created with a right-mouse-click.
         :param event: QContextMenuEvent
         """
-
-        assert isinstance(event, QContextMenuEvent)
-
         m: QMenu = QMenu()
         m.setToolTipsVisible(True)
         self.populateContextMenu(m)
@@ -516,15 +515,14 @@ class DataSourceManagerTreeView(TreeView):
             from enmapbox.gui.enmapboxgui import EnMAPBox
             if not isinstance(emb, EnMAPBox):
                 return None
-            dock = emb.createDock('MAP')
-
-            assert isinstance(dock, MapDock)
+            dock: MapDock = emb.createDock(MapDock)
             target = dock.mapCanvas()
 
         if isinstance(target, MapDock):
             target = target.mapCanvas()
 
-        assert isinstance(target, (QgsMapCanvas, QgsProject))
+        if not isinstance(target, (QgsMapCanvas, QgsProject)):
+            raise ValueError(f'Invalid target: {target}')
 
         if isinstance(lyr, QgsRasterLayer):
             if LOAD_DEFAULT_STYLE:
@@ -594,7 +592,6 @@ class DataSourceManagerTreeView(TreeView):
     @typechecked
     def onOpenInExplorer(self, dataSource: DataSource):
         """Open source in system file explorer."""
-        import platform
         filename = dataSource.source()
 
         # isolate filename; remove '|' options (see #678)
@@ -603,16 +600,16 @@ class DataSourceManagerTreeView(TreeView):
         if not exists(filename):
             return
 
-        system = platform.system()
+        # system = platform.system()
 
-        if system == 'Windows':
-            import subprocess
-            filename = filename.replace('/', sep)
-            cmd = rf'explorer.exe /select,"{filename}"'
-            subprocess.Popen(cmd)
-        else:
-            url = QUrl.fromLocalFile(dirname(filename))
-            QDesktopServices.openUrl(url)
+        # if system == 'Windows':
+        #     import subprocess
+        #     filename = filename.replace('/', sep)
+        #     cmd = rf'explorer.exe /select,"{filename}"'
+        #     subprocess.Popen(cmd)
+        # else:
+        url = QUrl.fromLocalFile(dirname(filename))
+        QDesktopServices.openUrl(url)
 
     @typechecked
     def onViewPklAsJson(self, modelDataSource: ModelDataSource):
@@ -671,9 +668,9 @@ class DataSourceManagerPanelUI(QgsDockWidget):
     def __init__(self, parent=None):
         super(DataSourceManagerPanelUI, self).__init__(parent)
         loadUi(enmapboxUiPath('datasourcemanagerpanel.ui'), self)
-        self.mDataSourceManager: DataSourceManager = None
+        self.mDataSourceManager: Optional[DataSourceManager] = None
         self.mDataSourceManagerProxyModel: DataSourceManagerProxyModel = DataSourceManagerProxyModel()
-        assert isinstance(self.mDataSourceManagerTreeView, DataSourceManagerTreeView)
+        self.mDataSourceManagerTreeView: DataSourceManagerTreeView
         self.mDataSourceManagerTreeView.setUniformRowHeights(True)
         self.mDataSourceManagerTreeView.setDragDropMode(QAbstractItemView.DragDrop)
 
@@ -733,8 +730,7 @@ class DataSourceManagerPanelUI(QgsDockWidget):
         self.btnCollapse.clicked.connect(lambda: self.dataSourceManagerTreeView().expandSelectedNodes(False))
         self.btnExpand.clicked.connect(lambda: self.dataSourceManagerTreeView().expandSelectedNodes(True))
 
-    def expandSelectedNodes(self, treeView, expand):
-        assert isinstance(treeView, QTreeView)
+    def expandSelectedNodes(self, treeView: QTreeView, expand):
 
         treeView.selectAll()
         indices = treeView.selectedIndexes()
@@ -750,7 +746,6 @@ class DataSourceManagerPanelUI(QgsDockWidget):
         Initializes the panel with a DataSourceManager
         :param dataSourceManager: DataSourceManager
         """
-        assert isinstance(dataSourceManager, DataSourceManager)
         self.mDataSourceManager = dataSourceManager
         self.mDataSourceManagerProxyModel.setSourceModel(self.mDataSourceManager)
         self.mDataSourceManagerTreeView.setModel(self.mDataSourceManagerProxyModel)
@@ -768,7 +763,7 @@ class DataSourceManagerPanelUI(QgsDockWidget):
         sources = set()
 
         for idx in self.dataSourceManagerTreeView().selectionModel().selectedIndexes():
-            assert isinstance(idx, QModelIndex)
+            idx: QModelIndex
             node = idx.data(Qt.UserRole)
             if isinstance(node, DataSource):
                 sources.add(node)

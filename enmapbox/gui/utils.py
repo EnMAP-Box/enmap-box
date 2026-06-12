@@ -23,10 +23,9 @@ import re
 from pathlib import Path
 from typing import Optional
 
+from enmapbox.qgispluginsupport.qps.utils import loadUi
 from qgis.PyQt.QtGui import QColor
 from qgis.core import Qgis
-
-from enmapbox.qgispluginsupport.qps.utils import loadUi
 
 loadUi = loadUi
 
@@ -55,7 +54,6 @@ def dataTypeName(dataType: Qgis.DataType, verbose: bool = False) -> str:
     """
     Returns a description for a Qgis.DataType
     """
-    assert isinstance(dataType, Qgis.DataType)
     if dataType in QGIS_DATATYPE_INFO.keys():
         if verbose:
             return QGIS_DATATYPE_INFO[dataType][1]
@@ -75,7 +73,8 @@ def enmapboxUiPath(name: str) -> Path:
     """
     from enmapbox import DIR_UIFILES
     path = pathlib.Path(DIR_UIFILES) / name
-    assert path.is_file()
+    if not path.is_file():
+        raise FileNotFoundError(f'Could not find ui-file {path}')
     return path
 
 
@@ -114,18 +113,20 @@ def high_contrast_random_color(c1: QColor) -> QColor:
     h1, s1, v1, a1 = c1.getHsv()
 
     # 2. Pick a completely random Hue (0 to 359 degrees)
-    random_hue = random.randint(0, 359)
+    random_hue = random.randint(0, 359)  # nosec: B311
 
     # 3. Force a high-contrast Saturation and Value
     # If c1 is dark, make the random color bright (and vice versa)
     if v1 > 127:
         # c1 is light -> Make the new color dark
-        random_value = random.randint(30, 80)
-        random_saturation = random.randint(180, 255)  # Richer colors stand out better on light
+        random_value = random.randint(30, 80)  # nosec: B311
+        # Richer colors stand out better on light
+        random_saturation = random.randint(180, 255)  # nosec: B311
     else:
         # c1 is dark -> Make the new color bright
-        random_value = random.randint(200, 255)
-        random_saturation = random.randint(50, 150)  # Slightly pastel/vibrant stand out on dark
+        random_value = random.randint(200, 255)  # nosec: B311
+        # Slightly pastel/vibrant stand out on dark
+        random_saturation = random.randint(50, 150)  # nosec: B311
 
     # 4. Return the new QColor
     return QColor.fromHsv(random_hue, random_saturation, random_value)

@@ -21,12 +21,12 @@ import datetime
 import importlib
 import inspect
 import os
-import pathlib
 import re
 import site
 import sys
 import traceback
 import typing
+from pathlib import Path
 from typing import Optional, List, OrderedDict, Union, Dict
 
 from enmapbox import messageLog
@@ -196,13 +196,12 @@ class ApplicationWrapper(QObject):
 
     def __init__(self, app: EnMAPBoxApplication, parent=None):
         super(ApplicationWrapper, self).__init__(parent)
-        assert isinstance(app, EnMAPBoxApplication)
         self.app: EnMAPBoxApplication = app
         self.appId: str = '{}.{}'.format(app.__class__, app.name)
         self.menuItems: List = []
         self.processingAlgorithms: List[QgsProcessingAlgorithm] = []
-        self.contextMenuProvider: EnMAPBoxContextMenuProvider = None
-        self.loading_time: datetime.timedelta = None
+        self.contextMenuProvider: Optional[EnMAPBoxContextMenuProvider] = None
+        self.loading_time: Optional[datetime.timedelta] = None
 
 
 class ApplicationRegistry(QObject):
@@ -213,21 +212,22 @@ class ApplicationRegistry(QObject):
     sigLoadingInfo = pyqtSignal(str)
     sigLoadingFinished = pyqtSignal(bool, str)
 
-    def __init__(self, enmapBox, parent=None,
+    def __init__(self, enmapBox: EnMAPBox, parent=None,
                  whitelist: Optional[List[str]] = None,
                  blackList: Optional[List[str]] = None):
         super(ApplicationRegistry, self).__init__(parent)
         self.appPackageRootFolders = []
-        assert isinstance(enmapBox, EnMAPBox)
 
         self.mWhitelist: Optional[List[str]] = None
         self.mBlacklist: Optional[List[str]] = None
 
         if whitelist:
-            assert blackList is None
+            if blackList is not None:
+                raise Exception('Only one of "whitelist" and "blacklist" can be defined')
             self.setWhitelist(whitelist)
         elif blackList:
-            assert whitelist is None
+            if whitelist is not None:
+                raise Exception('Only one of "whitelist" and "blacklist" can be defined')
             self.setBlacklist(blackList)
 
         self.mEnMAPBox = enmapBox
@@ -268,22 +268,23 @@ class ApplicationRegistry(QObject):
                         isinstance(w, ApplicationWrapper) and nameOrApp in [w.appId, w.app.name, w.app]]
         return wrappers
 
-    def addApplicationListing(self, path: Union[str, pathlib.Path]):
+    def addApplicationListing(self, path: Union[str, Path]):
         """
         Loads EnMAPBoxApplications from locations defined in a text file
         :param path: str, filepath to file with locations of EnMAPBoxApplications
         """
-        path = pathlib.Path(path)
-        assert os.path.isfile(path)
+        path = Path(path)
+        if not os.path.isfile(path):
+            raise FileNotFoundError(f'File does not exist: "{path}"')
 
         with open(path, 'r', encoding='utf-8') as file:
             app_locations = file.readlines()
             app_locations = [line.strip() for line in app_locations]
-            app_locations = [pathlib.Path(line) for line in app_locations if len(line) > 0 and not line.startswith('#')]
+            app_locations: List[Path] = [Path(line) for line in app_locations if
+                                         len(line) > 0 and not line.startswith('#')]
 
         app_folders = []
         for app_path in app_locations:
-            assert isinstance(app_path, pathlib.Path)
             if not app_path.is_absolute():
                 app_path = path.parent / app_path
             if app_path.is_dir():
@@ -292,13 +293,13 @@ class ApplicationRegistry(QObject):
         for app_folder in app_folders:
             self.addApplicationFolder(app_folder)
 
-    def isApplicationFolder(self, path: Union[str, pathlib.Path]) -> bool:
+    def isApplicationFolder(self, path: Union[str, Path]) -> bool:
         """
         Checks if the directory "appPackage" contains an '__init__.py' with an enmapboxApplicationFactory
         :param appPackage: path to directory
         :return: True | False
         """
-        path = pathlib.Path(path)
+        path = Path(path)
         if not path.is_dir():
             return False
 
@@ -316,14 +317,14 @@ class ApplicationRegistry(QObject):
         return re.search(r'def\s+enmapboxApplicationFactory\(.+\)\s*(->[^:]+)?:', lines) is not None
 
     def findApplicationFolders(self,
-                               rootDir: Union[str, pathlib.Path],
-                               max_deep: int = 2) -> typing.List[pathlib.Path]:
+                               rootDir: Union[str, Path],
+                               max_deep: int = 2) -> typing.List[Path]:
         """
         Searches for folders that contain an EnMAPBoxApplication
         :param rootDir: str, root path directory
         :return: [list-of-str]
         """
-        rootDir = pathlib.Path(rootDir)
+        rootDir = Path(rootDir)
         if max_deep < 0 or not rootDir.is_dir():
             return []
 
@@ -339,7 +340,7 @@ class ApplicationRegistry(QObject):
                     )
             return results
 
-    def addApplicationFolder(self, app_folder: Union[str, pathlib.Path]) -> bool:
+    def addApplicationFolder(self, app_folder: Union[str, Path]) -> bool:
         """
         Loads EnMAP-Box application from ann application folder.
         Searches in folder and each sub-folder for EnMAP-Box Applications
@@ -347,7 +348,7 @@ class ApplicationRegistry(QObject):
                                directory without any __init__.py which contains EnMAPBoxApplication folders
         :return: bool, True if any EnMAPBoxApplication was added
         """
-        app_folder = pathlib.Path(app_folder)
+        app_folder = Path(app_folder)
 
         self.sigLoadingInfo.emit(f'Load Applications from {app_folder}')
 
@@ -446,9 +447,6 @@ class ApplicationRegistry(QObject):
         Adds a single EnMAP-Box application, i.a. a class that implemented the EnMAPBoxApplication Interface
         :param app: EnMAPBoxApplication
         """
-
-        assert isinstance(app, EnMAPBoxApplication)
-
         if isinstance(self.mWhitelist, list):
             if not (app.name in self.mWhitelist or app.name.lower() in self.mWhitelist):
                 return False
@@ -497,7 +495,6 @@ class ApplicationRegistry(QObject):
 
     def loadProcessingAlgorithms(self, appWrapper: ApplicationWrapper):
         self.sigLoadingInfo.emit(f'Load QgsProcessingAlgorithms of {appWrapper.app.name}')
-        assert isinstance(appWrapper, ApplicationWrapper)
         processingAlgorithms = appWrapper.app.processingAlgorithms()
 
         if not isinstance(processingAlgorithms, list):
@@ -519,7 +516,6 @@ class ApplicationRegistry(QObject):
                 print('Can not find EnMAPBoxAlgorithmProvider')
 
     def loadContextMenuProviders(self, appWrapper: ApplicationWrapper):
-        assert isinstance(appWrapper, ApplicationWrapper)
         provider = appWrapper.app.contextMenuProvider()
         if isinstance(provider, EnMAPBoxContextMenuProvider):
             appWrapper.contextMenuProvider = provider
@@ -532,9 +528,7 @@ class ApplicationRegistry(QObject):
         :param parentMenuName:
         :return:
         """
-        assert isinstance(appWrapper, ApplicationWrapper)
-        app = appWrapper.app
-        assert isinstance(app, EnMAPBoxApplication)
+        app: EnMAPBoxApplication = appWrapper.app
         parentMenu = self.mEnMAPBox.menu(parentMenuName)
         items = app.menu(parentMenu)
 
@@ -548,7 +542,9 @@ class ApplicationRegistry(QObject):
         Reloads an EnMAP-Box Application
         :param appId: str
         """
-        assert appId in self.mAppWrapper.keys()
+        if appId not in self.mAppWrapper.keys():
+            raise Exception(f'Application "{appId}" not found')
+
         self.removeApplication(appId)
         self.addApplication(appId)
 
@@ -560,8 +556,7 @@ class ApplicationRegistry(QObject):
         if isinstance(appId, EnMAPBoxApplication):
             appId = ApplicationWrapper(appId).appId
 
-        appWrapper = self.mAppWrapper.pop(appId)
-        assert isinstance(appWrapper, ApplicationWrapper)
+        appWrapper: ApplicationWrapper = self.mAppWrapper.pop(appId)
 
         # remove menu item
         for item in appWrapper.menuItems:

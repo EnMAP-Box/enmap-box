@@ -1,14 +1,12 @@
 import datetime
-import json
-import pickle
 import warnings
 from typing import Optional
 
+from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import QgsCoordinateReferenceSystem, QgsUnitTypes, \
     QgsMapLayerType, QgsVectorLayer, QgsVectorTileLayer, Qgis, QgsWkbTypes, QgsField, QgsProject
 from qgis.core import QgsDataItem, QgsLayerItem, QgsMapLayer, QgsRasterLayer
-
 from .metadata import CRSLayerTreeNode, RasterBandTreeNode, DataSourceSizesTreeNode
 from ...qgispluginsupport.qps.classification.classificationscheme import ClassificationScheme
 from ...qgispluginsupport.qps.models import TreeNode, PyObjectTreeNode
@@ -31,14 +29,14 @@ class LayerItem(QgsLayerItem):
         return self.mLayerID
 
     def hasReferenceLayer(self) -> bool:
-        return (
+        result = (
             isinstance(self.mLayerProject, QgsProject)
             and isinstance(self.mLayerID, str)
             and self.mLayerID in self.mLayerProject.mapLayers()
         )
+        return result
 
     def setReferenceLayer(self, layer: QgsMapLayer, project: Optional[QgsProject] = None):
-        assert isinstance(layer, QgsMapLayer)
         if project is None:
             project = layer.project()
         if project is None:
@@ -94,8 +92,6 @@ class DataSource(TreeNode):
     MD_CRS = 'crs'
 
     def __init__(self, dataItem: QgsDataItem, **kwds):
-        assert isinstance(dataItem, QgsDataItem)
-
         super().__init__(dataItem.name(), icon=dataItem.icon(), toolTip=dataItem.path(), **kwds)
 
         self.mDataItem: QgsDataItem = dataItem
@@ -150,7 +146,6 @@ class SpatialDataSource(DataSource):
     def __init__(self, dataItem: LayerItem):
 
         super().__init__(dataItem)
-        assert isinstance(dataItem, LayerItem)
 
         self.nodeExtXmu: TreeNode = TreeNode('Width')
         self.nodeExtYmu: TreeNode = TreeNode('Height')
@@ -190,16 +185,19 @@ class VectorTileDataSource(SpatialDataSource):
 
     def __init__(self, dataItem: QgsLayerItem):
         super().__init__(dataItem)
-        assert isinstance(dataItem, QgsLayerItem)
-        assert dataItem.mapLayerType() == QgsMapLayerType.VectorTileLayer
+        if dataItem.mapLayerType() != QgsMapLayerType.VectorTileLayer:
+            raise ValueError(f'VectorTileDataSource can only be '
+                             f'created from a vector tile layer data item, not {dataItem}')
 
 
 class VectorDataSource(SpatialDataSource):
 
     def __init__(self, dataItem: QgsLayerItem):
         super().__init__(dataItem)
-        assert isinstance(dataItem, QgsLayerItem)
-        assert dataItem.mapLayerType() == QgsMapLayerType.VectorLayer
+        if dataItem.mapLayerType() != QgsMapLayerType.VectorLayer:
+            raise ValueError(f'VectorDataSource can only be '
+                             f'created from a vector layer data item, not {dataItem}')
+
         self.mIsSpectralLibrary: bool = False
         self.mWKBType = None
         self.mGeometryType = None
@@ -281,8 +279,10 @@ class RasterDataSource(SpatialDataSource):
 
     def __init__(self, dataItem: QgsLayerItem):
         super(RasterDataSource, self).__init__(dataItem)
-        assert isinstance(dataItem, QgsLayerItem)
-        assert dataItem.mapLayerType() == QgsMapLayerType.RasterLayer
+
+        if dataItem.mapLayerType() != QgsMapLayerType.RasterLayer:
+            raise ValueError(f'RasterDataSource can only be '
+                             f'created from a raster layer data item, not {dataItem}')
 
         self.mNodeBands: TreeNode = TreeNode('Bands', toolTip='Number of Raster Bands')
         self.appendChildNodes(self.mNodeBands)
@@ -331,7 +331,9 @@ class ModelDataSource(DataSource):
 
     def __init__(self, dataItem: QgsDataItem):
         super().__init__(dataItem)
-        assert dataItem.providerKey() == 'special:pkl'
+        if dataItem.providerKey() != 'special:pkl':
+            raise ValueError(f'ModelDataSource can only be '
+                             f'created from a special:pkl data item, not {dataItem}')
 
         self.mPklObject: object = None
         self.mObjectNode: PyObjectTreeNode = None
@@ -348,13 +350,9 @@ class ModelDataSource(DataSource):
         pkl_obj = None
         try:
             if source.endswith('.pkl'):
-                with open(source, 'rb') as f:
-                    pkl_obj = pickle.load(f)
+                pkl_obj = Utils().pickleLoad(source)
             elif source.endswith('.json'):
-                with open(source, 'r', encoding='utf-8') as f:
-                    pkl_obj = json.load(f)
-        except pickle.UnpicklingError as ex1:
-            error = f'{self}:: UnpicklingError: Unable to unpickle {source}:\nReason:{ex1}'
+                pkl_obj = Utils().jsonLoad(source)
         except Exception as ex:
             error = f'{self}:: Unable to load {source}: {ex}'
 
@@ -376,9 +374,11 @@ class ModelDataSource(DataSource):
 class FileDataSource(DataSource):
 
     def __init__(self, dataItem: QgsDataItem):
-        assert isinstance(dataItem, QgsDataItem)
         # assert dataItem.type() == QgsDataItem.NoType
-        assert dataItem.providerKey() == 'special:file'
+        if dataItem.providerKey() != 'special:file':
+            raise ValueError(f'FileDataSource can only be '
+                             f'created from a special:file data item, not {dataItem}')
+
         super(FileDataSource, self).__init__(dataItem)
 
         self.updateNodes()

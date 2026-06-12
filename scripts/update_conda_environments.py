@@ -62,6 +62,7 @@ DEPENDENCIES = {
     # required by developers
     'dev': ['gitpython', 'git-lfs', 'pytest', 'pytest-cov', 'pytest-xdist', 'docutils',
             'flake8',
+            'bandit',
             {'pip': 'flake8-qgis'},
             ]
 }

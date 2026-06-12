@@ -19,30 +19,32 @@
 
 
 import copy
+from typing import List
 
 from qgis.PyQt.QtCore import Qt, QObject, pyqtSignal, QModelIndex, QAbstractListModel, QAbstractItemModel
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QComboBox, QTreeView
 
 
-def currentComboBoxValue(comboBox):
-    assert isinstance(comboBox, QComboBox)
+def currentComboBoxValue(comboBox: QComboBox):
+    """
+    Returns the currentData values of a QComboBox
+    """
     if isinstance(comboBox.model(), OptionListModel):
         o = comboBox.currentData(Qt.UserRole)
-        assert isinstance(o, Option)
+        o: Option
         return o.mValue
     else:
         return comboBox.currentData()
 
 
-def setCurrentComboBoxValue(comboBox, value):
+def setCurrentComboBoxValue(comboBox: QComboBox, value):
     """
     Sets a QComboBox to the value `value`, if it exists in the underlying item list
     :param comboBox: QComboBox
     :param value: any type
     :return: True | False
     """
-    assert isinstance(comboBox, QComboBox)
     model = comboBox.model()
     if not isinstance(model, OptionListModel):
         i = comboBox.findData(value, role=Qt.DisplayRole)
@@ -107,8 +109,9 @@ class OptionListModel(QAbstractListModel):
     def addOption(self, option):
         self.insertOptions([option])
 
-    def addOptions(self, options):
-        assert isinstance(options, list)
+    def addOptions(self, options: List):
+        if not isinstance(options, list):
+            raise TypeError('options must be a list')
         self.insertOptions(options)
 
     sigOptionsInserted = pyqtSignal(list)
@@ -118,7 +121,8 @@ class OptionListModel(QAbstractListModel):
             return
         if not isinstance(options, list):
             options = [options]
-        assert isinstance(options, list)
+        if not isinstance(options, list):
+            raise TypeError('options must be a list')
 
         options = [self.o2o(o) for o in options]
 
@@ -194,7 +198,7 @@ class OptionListModel(QAbstractListModel):
 
         idx = self.createIndex(None, -1, 0)
         for i, o in enumerate(self.mOptions):
-            assert isinstance(o, Option)
+            o: Option
             if o.mValue == option:
                 idx.setRow(i)
                 break
@@ -259,7 +263,7 @@ class TreeNode(QObject):
         n.mToolTip = self.mToolTip
 
         for childNode in self.mChildren:
-            assert isinstance(childNode, TreeNode)
+            childNode: TreeNode
             childNode.clone(parent=n)
         return n
 
@@ -292,18 +296,17 @@ class TreeNode(QObject):
     def appendChildNodes(self, listOfChildNodes):
         self.insertChildNodes(len(self.mChildren), listOfChildNodes)
 
-    def insertChildNodes(self, index, listOfChildNodes):
-        assert index <= len(self.mChildren)
+    def insertChildNodes(self, index, listOfChildNodes: List['TreeNode']):
+        if not (index <= len(self.mChildren)):
+            raise AssertionError(f'index is out of range: {index}')
         if isinstance(listOfChildNodes, TreeNode):
             listOfChildNodes = [listOfChildNodes]
-        assert isinstance(listOfChildNodes, list)
         listOfChildNodes = [c for c in listOfChildNodes if c not in self.mChildren]
 
         nChildNodes = len(listOfChildNodes)
         idxLast = index + nChildNodes - 1
         self.sigWillAddChildren.emit(self, index, idxLast)
         for i, node in enumerate(listOfChildNodes):
-            assert isinstance(node, TreeNode)
             node.mParent = self
             # connect node signals
             node.sigWillAddChildren.connect(self.sigWillAddChildren)
@@ -317,7 +320,8 @@ class TreeNode(QObject):
         self.sigAddedChildren.emit(self, index, idxLast)
 
     def removeChildNode(self, node):
-        assert node in self.mChildren
+        if node not in self.mChildren:
+            raise AssertionError(f'node is not a child of this node: {node}')
         i = self.mChildren.index(node)
         self.removeChildNodes(i, 1)
 
@@ -348,8 +352,7 @@ class TreeNode(QObject):
     def parentNode(self):
         return self.mParent
 
-    def setParentNode(self, treeNode):
-        assert isinstance(treeNode, TreeNode)
+    def setParentNode(self, treeNode: 'TreeNode'):
         self.mParent = treeNode
 
     def setIcon(self, icon):
@@ -430,8 +433,7 @@ class TreeModel(QAbstractItemModel):
         self.dataChanged.emit(idxNode, idxNode)
         self.setColumnSpan(node)
 
-    def headerData(self, section, orientation, role):
-        assert isinstance(section, int)
+    def headerData(self, section: int, orientation, role):
 
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
 
@@ -509,8 +511,8 @@ class TreeModel(QAbstractItemModel):
         else:
             return QModelIndex()
 
-    def findParentNode(self, node, parentNodeType):
-        assert isinstance(node, TreeNode)
+    def findParentNode(self, node: TreeNode, parentNodeType):
+
         while True:
             if isinstance(node, parentNodeType):
                 return node
@@ -518,8 +520,7 @@ class TreeModel(QAbstractItemModel):
                 return None
             node = node.parentNode()
 
-    def indexes2nodes(self, indexes):
-        assert isinstance(indexes, list)
+    def indexes2nodes(self, indexes: List[QModelIndex]):
         nodes = []
         for idx in indexes:
             n = self.idx2node(idx)
@@ -527,8 +528,8 @@ class TreeModel(QAbstractItemModel):
                 nodes.append(n)
         return nodes
 
-    def expandNode(self, node, expand=True, recursive=True):
-        assert isinstance(node, TreeNode)
+    def expandNode(self, node: TreeNode, expand: bool = True, recursive: bool = True):
+
         if isinstance(self.mTreeView, QTreeView):
             idx = self.node2idx(node)
             self.mTreeView.setExpanded(idx, expand)
@@ -546,13 +547,14 @@ class TreeModel(QAbstractItemModel):
         else:
             return index.internalPointer()
 
-    def node2idx(self, node):
-        assert isinstance(node, TreeNode)
+    def node2idx(self, node: TreeNode):
+
         if node == self.mRootNode:
             return QModelIndex()
         else:
             parentNode = node.parentNode()
-            assert isinstance(parentNode, TreeNode)
+            if not isinstance(parentNode, TreeNode):
+                raise AssertionError('parentNode is not a TreeNode')
             if node not in parentNode.mChildren:
                 return QModelIndex()
             r = parentNode.mChildren.index(node)
@@ -576,8 +578,7 @@ class TreeModel(QAbstractItemModel):
             if role in [Qt.DisplayRole, Qt.EditRole] and len(node.values()) > i:
                 return str(node.values()[i])
 
-    def flags(self, index):
-        assert isinstance(index, QModelIndex)
+    def flags(self, index: QModelIndex):
         if not index.isValid():
             return Qt.NoItemFlags
         self.idx2node(index)

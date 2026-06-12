@@ -1,10 +1,9 @@
+import json
 import logging
-import pickle
-import typing
-import uuid
 from os.path import basename
-from typing import List
+from typing import List, Optional, Iterable, Dict
 
+from enmapbox.qgispluginsupport.qps.utils import stringFromByteArray
 from qgis.PyQt.QtCore import QMimeData, QUrl, QByteArray
 from qgis.PyQt.QtXml import QDomNamedNodeMap, QDomDocument
 from qgis.core import QgsLayerItem
@@ -16,9 +15,6 @@ from ..qgispluginsupport.qps.layerproperties import defaultRasterRenderer
 logger = logging.getLogger(__name__)
 
 MDF_RASTERBANDS = 'application/enmapbox.rasterbanddata'
-
-MDF_DATASOURCETREEMODELDATA = 'application/enmapbox.datasourcetreemodeldata'
-MDF_DATASOURCETREEMODELDATA_XML = 'data_source_tree_model_data'
 
 MDF_ENMAPBOX_LAYERTREEMODELDATA = 'application/enmapbox.layertreemodeldata'
 MDF_QGIS_LAYERTREEMODELDATA = 'application/qgis.layertreemodeldata'
@@ -35,26 +31,24 @@ MDF_QGIS_LAYER_STYLE = 'application/qgis.style'
 QGIS_URILIST_MIMETYPE = "application/x-vnd.qgis.qgis.uri"
 
 
-def attributesd2dict(attributes: QDomNamedNodeMap) -> str:
+def attributesd2dict(attributes: QDomNamedNodeMap) -> Dict[str, str]:
     d = {}
-    assert isinstance(attributes, QDomNamedNodeMap)
     for i in range(attributes.count()):
         attribute = attributes.item(i)
         d[attribute.nodeName()] = attribute.nodeValue()
     return d
 
 
-def fromDataSourceList(dataSources):
+def fromDataSourceList(dataSources: List[DataSource]):
     if not isinstance(dataSources, list):
         dataSources = [dataSources]
 
     from enmapbox.gui.datasources.datasources import DataSource
 
     uriList = []
-    urlList = []
     for ds in dataSources:
-
-        assert isinstance(ds, DataSource)
+        if not isinstance(ds, DataSource):
+            raise ValueError(f'Input must be a list of DataSource objects, not {ds}')
 
         dataItem = ds.dataItem()
         uris = dataItem.mimeUris()
@@ -74,9 +68,10 @@ def fromDataSourceList(dataSources):
     return mimeData
 
 
-def toDataSourceList(mimeData) -> typing.List[DataSource]:
-    assert isinstance(mimeData, QMimeData)
-
+def toDataSourceList(mimeData: QMimeData) -> List[DataSource]:
+    """
+    Returns the list of data sources contained in a QMimeData object
+    """
     uriList = QgsMimeDataUtils.decodeUriList(mimeData)
     dataSources = []
     from enmapbox.gui.datasources.manager import DataSourceFactory
@@ -85,20 +80,18 @@ def toDataSourceList(mimeData) -> typing.List[DataSource]:
     return dataSources
 
 
-def fromLayerList(mapLayers):
+def fromLayerList(mapLayers: Iterable[QgsMapLayer]):
     """
     Converts a list of QgsMapLayers into a QMimeData object
     :param mapLayers: [list-of-QgsMapLayers]
     :return: QMimeData
     """
-    for lyr in mapLayers:
-        assert isinstance(lyr, QgsMapLayer)
-
     tree = QgsLayerTree()
     mimeData = QMimeData()
 
     urls = []
     for lyr in mapLayers:
+        lyr: QgsMapLayer
         tree.addLayer(lyr)
         urls.append(QUrl.fromLocalFile(lyr.source()))
     doc = QDomDocument()
@@ -119,7 +112,7 @@ def containsMapLayers(mimeData: QMimeData) -> bool:
     :param mimeData:
     :return:
     """
-    valid = [MDF_RASTERBANDS, MDF_DATASOURCETREEMODELDATA, MDF_QGIS_LAYERTREEMODELDATA, QGIS_URILIST_MIMETYPE,
+    valid = [MDF_RASTERBANDS, MDF_QGIS_LAYERTREEMODELDATA, QGIS_URILIST_MIMETYPE,
              MDF_URILIST]
 
     for f in valid:
@@ -129,7 +122,7 @@ def containsMapLayers(mimeData: QMimeData) -> bool:
 
 
 def extractMapLayers(mimeData: QMimeData,
-                     project: QgsProject = None) -> List[QgsMapLayer]:
+                     project: Optional[QgsProject] = None) -> List[QgsMapLayer]:
     """
     Extracts QgsMapLayers from QMimeData
     :param mimeData:
@@ -138,9 +131,9 @@ def extractMapLayers(mimeData: QMimeData,
     """
     if project is None:
         project = QgsProject.instance()
-    assert isinstance(mimeData, QMimeData)
+    if not isinstance(mimeData, QMimeData):
+        raise ValueError(f'Input must be a QMimeData object, not {mimeData}')
 
-    from enmapbox.gui.datasources.datasources import DataSource
     from enmapbox.gui.datasources.datasources import SpatialDataSource
     from enmapbox.gui.datasources.manager import DataSourceFactory
 
@@ -167,28 +160,14 @@ def extractMapLayers(mimeData: QMimeData,
                 break
 
     elif MDF_RASTERBANDS in mimeData.formats():
-        data = pickle.loads(mimeData.data(MDF_RASTERBANDS))
+
+        data = json.loads(stringFromByteArray(mimeData.data(MDF_RASTERBANDS)))
 
         for t in data:
             uri, baseName, providerKey, band = t
             lyr = QgsRasterLayer(uri, baseName=baseName, providerType=providerKey)
             lyr.setRenderer(defaultRasterRenderer(lyr, bandIndices=[band]))
             newMapLayers.append(lyr)
-
-    elif MDF_DATASOURCETREEMODELDATA in mimeData.formats():
-        # this drop comes from the datasource tree
-        dsUUIDs = pickle.loads(mimeData.data(MDF_DATASOURCETREEMODELDATA))
-
-        for uuid4 in dsUUIDs:
-            assert isinstance(uuid4, uuid.UUID)
-            dataSource = DataSource.fromUUID(uuid4)
-
-            if isinstance(dataSource, SpatialDataSource):
-                lyr = dataSource.asMapLayer()
-                if isinstance(lyr, QgsMapLayer):
-                    if isinstance(lyr, QgsRasterLayer):
-                        lyr.setRenderer(defaultRasterRenderer(lyr))
-                    newMapLayers.append(lyr)
 
     elif MDF_ENMAPBOX_LAYERTREEMODELDATA in mimeData.formats():
         # this drop comes from the dock tree
@@ -262,12 +241,10 @@ def textToByteArray(text):
         return data
 
 
-def textFromByteArray(data):
+def textFromByteArray(data: QByteArray):
     """
     Decodes a QByteArray into a str
     :param data: QByteArray
     :return: str
     """
-    assert isinstance(data, QByteArray)
-    s = data.data().decode()
-    return s
+    return stringFromByteArray(data)

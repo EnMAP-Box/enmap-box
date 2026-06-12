@@ -1,4 +1,4 @@
-import pickle
+import json
 from os.path import join, basename, isabs
 from typing import Optional
 
@@ -10,6 +10,7 @@ from enmapbox.gui.mimedata import MDF_RASTERBANDS, QGIS_URILIST_MIMETYPE, MDF_EN
     MDF_QGIS_LAYERTREEMODELDATA, MDF_QGIS_LAYERTREEMODELDATA_XML, MDF_URILIST
 from enmapbox.gui.widgets.multiplerasterbandselectionwidget.multiplerasterbandselectionwidget import \
     MultipleRasterBandSelectionWidget
+from enmapbox.qgispluginsupport.qps.utils import stringFromByteArray
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
@@ -93,7 +94,7 @@ class RasterBandStackingDockWidget(QDockWidget):
                     if isinstance(layer, QgsRasterLayer):
                         self.onAddRasterClicked(layer=layer)
             elif MDF_RASTERBANDS in mimeData.formats():
-                data = pickle.loads(mimeData.data(MDF_RASTERBANDS))
+                data = json.loads(stringFromByteArray(mimeData.data(MDF_RASTERBANDS)))
                 for uri, baseName, providerKey, bandIndex in data:
                     self.onAddRasterClicked(uri=uri, bandNo=bandIndex + 1)
             elif QGIS_URILIST_MIMETYPE in mimeData.formats():
