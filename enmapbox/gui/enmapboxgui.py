@@ -1178,66 +1178,6 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                     self.project().takeMapLayer(lyr)
 
         return
-        # SYNC_WITH_QGIS = True
-        #
-        # # 1. sync own project to a layer tree
-        # EMB: EnMAPBoxProject = self.project()
-        #
-        # emb_layers = self.mapLayers()
-        # emb_layers.extend(self.dataSourceManager().sourceLayers())
-        #
-        # QGIS: QgsProject = QgsProject.instance()
-        # qgs_layers_old: List[QgsMapLayer] = \
-        #     [lyr for lid, lyr in QGIS.mapLayers().items() if lyr.project() == EMB]
-        #
-        # for lyr in emb_layers:
-        #     if isinstance(lyr, QgsMapLayer):
-        #         if lyr.project() is None:
-        #             self.project().addMapLayer(lyr)
-        #         elif lyr.project() != EMB:
-        #             # layer is owned by another project
-        #             pass
-        #     else:
-        #         pass
-        #
-        # to_remove_lyrs = [lyr for lyr in EMB.mapLayers().values() if lyr not in emb_layers]
-        #
-        # # prepare removal
-        # for lyr in to_remove_lyrs:
-        #     # todo: cancel / rollback changes?
-        #     if lyr.project() == EMB and isinstance(lyr, QgsVectorLayer) and lyr.isEditable():
-        #         lyr.rollBack()
-        #         lyr.commitChanges()
-        #
-        # if len(to_remove_lyrs) > 0:
-        #     for lyr in to_remove_lyrs:
-        #         # remove from project, but do not delete C++ object
-        #         # this is done by PyQt/SIP when losing the last Python reference
-        #         EMB.takeMapLayer(lyr)
-        #
-        # qgs_layers_new: List[QgsMapLayer] = \
-        #     [lyr for lid, lyr in EMB.mapLayers().items() if lyr.project() == EMB]
-        #
-        # to_remove = [lyr for lyr in qgs_layers_old if lyr not in qgs_layers_new]
-        # to_add = [lyr for lyr in qgs_layers_new if lyr not in qgs_layers_old]
-        #
-        # if SYNC_WITH_QGIS:
-        #     # sync QGIS Project with EnMAP-Box layers
-        #     # QGIS.removeMapLayers([lyr.id() for lyr in to_remove])
-        #     for lyr in to_remove:
-        #         QGIS.takeMapLayer(lyr)
-        #
-        #     if len(to_add) > 0:
-        #         QGIS.addMapLayers(to_add, False)
-        #         for lyr in to_add:
-        #             # let the parent project be the EnMAP-Box project
-        #             # and hope that QGIS will not delete the layer references
-        #             assert lyr.project() == QGIS
-        #             lyr.setParent(EMB.layerStore())
-        #             assert lyr.project() == EMB
-        #
-        # if os.environ.get('DEBUG', '').lower() in ['1', 'true']:
-        #     EMB.debugPrint('synProjects')
 
     def removeMapLayer(self, layer: QgsMapLayer):
         self.removeMapLayers([layer])
@@ -1304,9 +1244,9 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         return enmapbox.algorithmprovider.instance()
 
     def loadCursorLocationValueInfo(
-            self,
-            spatialPoint: SpatialPoint,
-            mapCanvas: MapCanvas):
+        self,
+        spatialPoint: SpatialPoint,
+        mapCanvas: MapCanvas):
         """
         Loads the cursor location info.
         :param spatialPoint: SpatialPoint
@@ -2727,7 +2667,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             else:
                 dlg = wrapper(algorithm.create(), parent=parent, context=context, iface=self)
         else:
-            # assert wrapper is None  # todo: dialog wrapper for custom parameter widget
+            # assert wrapper is None
             pass
 
         if not isinstance(dlg, QgsProcessingAlgorithmDialogBase):
