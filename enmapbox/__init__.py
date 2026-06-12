@@ -78,16 +78,6 @@ gdal.SetConfigOption('GDAL_VRT_ENABLE_PYTHON', 'YES')
 # ensure that PyQtGraph uses the same PyQt as QGIS
 os.environ.setdefault('PYQTGRAPH_QT_LIB', f'PyQt{PYQT_VERSION_STR[0]}')
 
-# test if PyQtGraph is available
-try:
-    import pyqtgraph  # noqa
-except ModuleNotFoundError:
-    # use PyQtGraph brought by QPS
-    pSrc = pathlib.Path(DIR_ENMAPBOX) / 'qgispluginsupport' / 'qps' / 'pyqtgraph'
-    assert pSrc.is_dir()
-    site.addsitedir(pSrc)
-    # import pyqtgraph
-
 
 def enmapboxSettings() -> QSettings:
     """

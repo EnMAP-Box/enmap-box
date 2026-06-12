@@ -1,10 +1,10 @@
 from typing import Optional
 
 import numpy as np
+from pyqtgraph import PlotWidget, ImageItem
 from scipy.interpolate import LinearNDInterpolator
 
 from bivariatecolorrasterrendererapp.bivariatecolorrasterrenderer import BivariateColorRasterRenderer
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget, ImageItem
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader

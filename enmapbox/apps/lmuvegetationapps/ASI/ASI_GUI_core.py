@@ -29,14 +29,13 @@ retrieval of biochemical vegetation traits. International Journal of Applied Ear
 https://doi.org/10.1016/j.jag.2020.102219
 """
 
-import os
 import sys
 
+import pyqtgraph as pg
 from scipy.interpolate import *
 
 from _classic.hubflow.core import *
 from enmapbox.gui.utils import loadUi
-from enmapbox.qgispluginsupport.qps.pyqtgraph import pyqtgraph as pg
 from lmuvegetationapps import APP_DIR
 from lmuvegetationapps.ASI.peakdetect import *
 from qgis.PyQt.QtGui import *

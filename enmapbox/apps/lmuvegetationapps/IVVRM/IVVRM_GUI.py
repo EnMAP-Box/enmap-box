@@ -28,11 +28,11 @@ import sys
 import warnings
 
 import numpy as np
+# ensure to call QGIS before PyQtGraph
+import pyqtgraph as pg
 from scipy.interpolate import interp1d
 
 from enmapbox.coreapps._classic.hubflow.core import openRasterDataset
-# ensure to call QGIS before PyQtGraph
-from enmapbox.qgispluginsupport.qps.pyqtgraph import pyqtgraph as pg
 from lmuvegetationapps import APP_DIR
 from lmuvegetationapps.Resources.PROSAIL import call_model as mod
 from lmuvegetationapps.Resources.Spec2Sensor.Spec2Sensor_core import Spec2Sensor, BuildTrueSRF, BuildGenericSRF

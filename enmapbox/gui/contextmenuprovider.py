@@ -3,8 +3,8 @@ from os.path import exists, splitext
 from typing import List, Union, Optional
 
 import numpy as np
+import pyqtgraph as pg
 
-import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
 import qgis.utils
 from enmapbox.gui.contextmenus import EnMAPBoxAbstractContextMenuProvider
 from enmapbox.gui.datasources.datasources import DataSource, RasterDataSource, VectorDataSource, ModelDataSource

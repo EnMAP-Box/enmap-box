@@ -12,6 +12,7 @@ netCDF4,,,full,required by ONNS
 numba,,0.57,full,required by EnSoMap
 numpy,,,core,usually already installed with QGIS
 pandas,,,specdeepmap,required by SpecDeepMap
+pyqtgraph,PyQtGraph,,core,required by EnMAP-Box GUI
 PyOpenGL,OpenGL,,imagecube,required by imageCube application
 scikit-learn,sklearn,1.0,core,required to run several EnMAP-Box algorithms
 scipy,,,core,required by multiple tools

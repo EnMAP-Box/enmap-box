@@ -1,4 +1,5 @@
 colorama # required by PyQtGraph
+pyqtgraph
 
 # required by parts of EnMAP-Box Core
 astropy # required for convolution

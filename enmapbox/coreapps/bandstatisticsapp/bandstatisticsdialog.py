@@ -1,7 +1,8 @@
 import warnings
 from typing import Optional
 
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget
+from pyqtgraph import PlotWidget
+
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtGui import QMouseEvent, QColor

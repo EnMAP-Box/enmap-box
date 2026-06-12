@@ -1,8 +1,9 @@
-# EnMAP-Box conda environment (generated 2026-05-15 11:00:54)
+# EnMAP-Box conda environment (generated 2026-06-11 15:10:14)
 # run to install: conda env create -n enmapbox-full --file=enmapbox-full.yml
 # run to update: conda env update -n enmapbox-full --file=enmapbox-full.yml --prune
-# run to delete: conda env remove -n enmapbox-full 
-# see https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
+# run to delete: conda env remove -n enmapbox-full
+# see https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#
+# creating-an-environment-from-an-environment-yml-file
 # created with scripts/update_conda_environments.py (MANUAL CHANGES WILL BE OVERWRITTEN!)
 
 channels:
@@ -29,6 +30,7 @@ dependencies:
 - pandas
 - pip
 - pyopengl
+- pyqtgraph
 - pytest
 - pytest-cov
 - pytest-xdist

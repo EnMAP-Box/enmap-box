@@ -8,8 +8,8 @@ from tempfile import gettempdir
 from typing import Optional, List, Tuple, Dict
 
 import numpy as np
+import pyqtgraph as pg
 
-import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyle, MarkerSymbol
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.typeguard import typechecked

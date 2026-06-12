@@ -6,8 +6,8 @@ from shutil import copyfile
 from typing import Optional, List, Dict
 
 import numpy as np
+import pyqtgraph as pg
 
-import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
 import processing
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyleButton, PlotStyle

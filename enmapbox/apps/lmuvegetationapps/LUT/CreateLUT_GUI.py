@@ -25,26 +25,22 @@
 
 # Fills and handles the GUI for creating LUTs in the EnMAP-Box
 
-import sys
-import os
-import numpy as np
-from scipy.interpolate import interp1d
-
-from qgis.gui import *
-# ensure to call QGIS before PyQtGraph
-from enmapbox.qgispluginsupport.qps.pyqtgraph import pyqtgraph as pg
-
-from qgis.PyQt.QtWidgets import *
-import lmuvegetationapps.Resources.PROSAIL.call_model as mod
-from lmuvegetationapps.Resources.Spec2Sensor.Spec2Sensor_core import Spec2Sensor, BuildTrueSRF, BuildGenericSRF
-from lmuvegetationapps import APP_DIR
-from scipy.stats import norm, uniform
 import csv
+import sys
 
-from qgis.gui import QgsMapLayerComboBox
+# ensure to call QGIS before PyQtGraph
+import pyqtgraph as pg
+from scipy.interpolate import interp1d
+from scipy.stats import norm, uniform
+
+import lmuvegetationapps.Resources.PROSAIL.call_model as mod
 from _classic.hubflow.core import *
-
 from enmapbox.gui.utils import loadUi
+from lmuvegetationapps import APP_DIR
+from lmuvegetationapps.Resources.Spec2Sensor.Spec2Sensor_core import Spec2Sensor, BuildTrueSRF, BuildGenericSRF
+from qgis.PyQt.QtWidgets import *
+from qgis.gui import *
+from qgis.gui import QgsMapLayerComboBox
 
 pathUI_LUT = os.path.join(APP_DIR, 'Resources/UserInterfaces/CreateLUT.ui')
 pathUI2_prgbar = os.path.join(APP_DIR, 'Resources/UserInterfaces/ProgressBar.ui')

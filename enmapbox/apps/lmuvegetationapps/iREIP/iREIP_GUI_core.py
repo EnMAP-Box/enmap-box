@@ -22,16 +22,14 @@
     along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
 """
-import os
 import sys
 
-import numpy as np
+import pyqtgraph as pg
 from scipy.interpolate import *
 from scipy.signal import savgol_filter
 
 from _classic.hubflow.core import *
 from enmapbox.gui.utils import loadUi
-from enmapbox.qgispluginsupport.qps.pyqtgraph import pyqtgraph as pg
 from lmuvegetationapps import APP_DIR
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import *

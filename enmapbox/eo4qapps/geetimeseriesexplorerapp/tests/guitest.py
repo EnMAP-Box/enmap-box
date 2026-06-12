@@ -1,12 +1,13 @@
-import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.examples
+import pyqtgraph.examples
+from tests.testdata import landcover_berlin_point_singlepart_3035_gpkg
+
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from geetimeseriesexplorerapp import GeeTimeseriesExplorerApp
 from qgis.core import QgsVectorLayer
-from tests.testdata import landcover_berlin_point_singlepart_3035_gpkg
 
-enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.examples.run()
+pyqtgraph.examples.run()
 
 qgsApp = start_app()
 initAll()

@@ -16,6 +16,8 @@ import os
 import tempfile
 import unittest
 
+from pyqtgraph.dockarea.Dock import Dock as pgDock
+
 from enmapbox import initEnMAPBoxResources
 from enmapbox.exampledata import landcover_polygon, enmap, hires
 from enmapbox.gui.datasources.datasources import VectorDataSource, RasterDataSource
@@ -29,7 +31,6 @@ from enmapbox.gui.dataviews.docks import (
 )
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.maptools import MapTools
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.Dock import Dock as pgDock
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint

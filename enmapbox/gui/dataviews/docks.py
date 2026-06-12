@@ -23,14 +23,15 @@ import re
 from math import ceil
 from typing import List, Optional
 
+from pyqtgraph.dockarea import DockArea as pgDockArea
+from pyqtgraph.dockarea.Dock import Dock as pgDock
+from pyqtgraph.dockarea.Dock import DockLabel as pgDockLabel
+from pyqtgraph.dockarea.DockArea import TempAreaWindow
+
 from enmapbox.gui import SpectralLibraryWidget
 from enmapbox.gui.mapcanvas import MapCanvas, CanvasLink
 from enmapbox.gui.mimedata import extractMapLayers
 from enmapbox.gui.utils import enmapboxUiPath
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea import DockArea as pgDockArea
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.Dock import Dock as pgDock
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.Dock import DockLabel as pgDockLabel
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.DockArea import TempAreaWindow
 from enmapbox.qgispluginsupport.qps.speclib.core import profile_fields
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
 from enmapbox.qgispluginsupport.qps.utils import loadUi

@@ -1,8 +1,9 @@
 from random import randint
 from typing import Optional, List, Tuple
 
+from pyqtgraph import PlotWidget
+
 from enhancedmultibandcolorapp.enhancedmultibandcolorrenderer import EnhancedMultiBandColorRenderer
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader

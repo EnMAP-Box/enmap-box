@@ -28,6 +28,7 @@ DEPENDENCIES = {
              'pip',
              'scikit-learn>=1.4',
              'matplotlib-base',
+             'pyqtgraph',
              'colorama'],
     # full = all other packages to enjoy the full EnMAP-Box experience (on cost of disk space)
     'full': ['enpt>=1.2.1',

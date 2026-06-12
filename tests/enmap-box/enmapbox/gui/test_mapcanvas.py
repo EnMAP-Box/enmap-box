@@ -14,11 +14,6 @@ __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 import unittest
 from pathlib import Path
 
-from qgis.PyQt.QtCore import QMimeData, QUrl
-from qgis.PyQt.QtGui import QKeyEvent
-from qgis.PyQt.QtWidgets import QMenu, QAction
-from qgis.core import QgsPointXY, QgsProject, QgsRasterLayer
-
 from enmapbox import initAll
 from enmapbox.exampledata import enmap, hires, landcover_polygon
 from enmapbox.gui.dataviews.docks import MapDock
@@ -29,6 +24,10 @@ from enmapbox.testing import EnMAPBoxTestCase
 from enmapbox.testing import TestObjects
 from enmapbox.testing import start_app
 from enmapboxtestdata import library_berlin
+from qgis.PyQt.QtCore import QMimeData, QUrl
+from qgis.PyQt.QtGui import QKeyEvent
+from qgis.PyQt.QtWidgets import QMenu, QAction
+from qgis.core import QgsPointXY, QgsProject, QgsRasterLayer
 
 start_app()
 initAll()
@@ -173,9 +172,11 @@ class MapCanvasTests(EnMAPBoxTestCase):
     # @unittest.skip("Skipped to check if GH CI finishes")
     def test_dropEvents(self):
 
+        project = QgsProject()
         mapDock = MapDock()
         # node = MapDockTreeNode(mapDock)
         mapCanvas = mapDock.mapCanvas()
+        mapCanvas.setProject(project)
         allFiles = [enmap, hires, landcover_polygon, library_berlin]
         spatialFiles = [enmap, hires, landcover_polygon]
 
@@ -195,6 +196,8 @@ class MapCanvasTests(EnMAPBoxTestCase):
             layerSources.append(p)
 
         for p in spatialFiles:
+            if not Path(p) in layerSources:
+                s = ""
             self.assertTrue(Path(p) in layerSources, msg=f'Failed to drop {p}')
 
 

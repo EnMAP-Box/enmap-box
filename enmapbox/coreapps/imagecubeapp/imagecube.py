@@ -12,8 +12,15 @@ from pathlib import Path
 from typing import Optional
 
 import numpy as np
+import pyqtgraph.opengl as gl
 from OpenGL.GL import glEnd, glVertex3f, glColor4f, glLineWidth, GL_LINE_SMOOTH, GL_LINE_SMOOTH_HINT, GL_NICEST, \
     glEnable, glHint, glBegin, GL_LINES
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem, GLOptions
+from pyqtgraph.opengl.GLViewWidget import GLViewWidget
+
+from enmapbox.gui import SliderSpinBox, DoubleSliderSpinBox, SpatialExtentMapTool
+from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog, rendererFromXml, rendererToXml
+from enmapbox.qgispluginsupport.qps.utils import loadUi, SpatialExtent
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtGui import QColor, QVector3D, QMatrix4x4
 from qgis.PyQt.QtWidgets import QMainWindow, QApplication, QCheckBox, QLineEdit
@@ -22,13 +29,6 @@ from qgis.core import QgsRasterLayer, Qgis, QgsRasterRenderer, QgsRectangle, Qgs
     QgsContrastEnhancement, QgsSingleBandPseudoColorRenderer, QgsRasterMinMaxOrigin, QgsProject, \
     QgsTask, QgsMapLayerProxyModel, QgsRasterBlock, QgsRasterBlockFeedback, QgsSingleBandColorDataRenderer
 from qgis.gui import QgsMapCanvas, QgsMapLayerComboBox
-
-import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.opengl as gl
-from enmapbox.gui import SliderSpinBox, DoubleSliderSpinBox, SpatialExtentMapTool
-from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog, rendererFromXml, rendererToXml
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem, GLOptions
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.opengl.GLViewWidget import GLViewWidget
-from enmapbox.qgispluginsupport.qps.utils import loadUi, SpatialExtent
 from . import NAME, VERSION
 
 KEY_GL_ITEM_GROUP = 'CUBEVIEW/GL_ITEM_GROUP'

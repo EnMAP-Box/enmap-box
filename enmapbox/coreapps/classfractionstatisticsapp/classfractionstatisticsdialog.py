@@ -2,9 +2,10 @@ import traceback
 from random import randint
 from typing import Optional, List
 
+from pyqtgraph import PlotWidget
+
 from classfractionstatisticsapp.classfractionrenderer import ClassFractionRenderer
 from enmapbox.qgispluginsupport.qps.layerproperties import rendererFromXml
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
