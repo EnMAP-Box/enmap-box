@@ -1,8 +1,10 @@
-from enmapbox.gui.applications import EnMAPBoxApplication
 from awi_ocpft.processingalgorithm import OCPFTProcessingAlgorithm
+from enmapbox.gui.applications import EnMAPBoxApplication
+
 
 def enmapboxApplicationFactory(enmapBox):
     return [OcpftApp(enmapBox)]
+
 
 class OcpftApp(EnMAPBoxApplication):
     def __init__(self, enmapBox, parent=None):

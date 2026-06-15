@@ -1,5 +1,6 @@
-from typing import Tuple
 import sys
+from typing import Tuple
+
 # from enmapboxprocessing.test.algorithm.testcase import TestCase
 from awi_ocpft.processingalgorithm import OCPFTProcessingAlgorithm
 from enmapboxprocessing.testcase import TestCase
@@ -32,7 +33,9 @@ class TestOCPFTProcessingAlgorithm(TestCase):
         alg.initAlgorithm()
         parameters = {
 
-            alg.P_FILE: '/home/alvarado/projects/typsynsat/data/sentinel3/bodensee/2020/08/16/S3A_OL_1_EFR____20200816T095809_20200816T100109_20200816T120938_0179_061_350_2160_MAR_O_NR_002.SEN3.nc',
+            alg.P_FILE: '/home/alvarado/projects/typsynsat/data/sentinel3/bodensee/2020/08/16/'
+                        'S3A_OL_1_EFR____20200816T095809_20200816T100109_20200816T120938_'
+                        '0179_061_350_2160_MAR_O_NR_002.SEN3.nc',
             alg.P_SENSOR: 'OLCI',
             alg.P_MODEL: 'LAKE CONSTANCE',
             alg.P_AC: 'ENPT ACWATER',
@@ -43,6 +46,5 @@ class TestOCPFTProcessingAlgorithm(TestCase):
         context, feedback = self.createProcessingContextFeedback()
         results = alg.processAlgorithm(parameters, context, feedback)
         self.assertTrue(len(results) > 0)
-        s = []
 
         # self.runalg(alg, parameters)
