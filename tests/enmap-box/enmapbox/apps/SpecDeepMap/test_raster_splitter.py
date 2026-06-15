@@ -68,7 +68,6 @@ class TestRasterSplitter(TestCase):
         # Change to your folder path
         tif_files = glob.glob(f"{str(folder_path_images)}/*.tif")
         num_tif_files = len(tif_files)  # List all .tif files
-        assert num_tif_files == 18, f"Error: Expected 18 .tif files, but found {num_tif_files}"
         self.assertEqual(num_tif_files, 18, f"Error: Expected 18 .tif files, but found {num_tif_files}")
 
         # Clean up

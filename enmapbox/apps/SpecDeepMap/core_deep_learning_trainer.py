@@ -1,6 +1,4 @@
 import math
-import re
-from collections import OrderedDict
 from pathlib import Path
 from typing import Optional
 
@@ -16,13 +14,14 @@ from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 from lightning.pytorch.loggers import TensorBoardLogger
 from lightning.pytorch.tuner import Tuner
 from osgeo import gdal  # Import the gdal module
-from qgis._core import QgsProcessingFeedback
 from torch.utils.data import Dataset
 from torchmetrics import JaccardIndex
 from torchvision import transforms
+from torchvision.models._api import WeightsEnum
 from torchvision.transforms import v2
 
 from enmapbox.apps.SpecDeepMap.utils_resnet import ResNet18_Weights, ResNet50_Weights
+from qgis._core import QgsProcessingFeedback
 
 # Data augmentation
 
@@ -31,10 +30,8 @@ transforms_v2 = v2.Compose([
     v2.RandomVerticalFlip(p=0.5),
 ])
 
+
 # preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
-
-
-from torchvision.models._api import WeightsEnum
 
 
 # Simple Model Unet
@@ -89,7 +86,6 @@ _model_weights = {
 
 
 def get_weight(name: str) -> WeightsEnum:
-
     if name is None:
         return None
 
@@ -172,13 +168,15 @@ def get_preprocessing_pipeline(pretrained_weights, channels, normalization, norm
         preprocessing = preprocessing_imagenet()
         print('preprocessing_imagenet')
     elif pretrained_weights == 'imagenet' and channels > 3:
-        assert normalization_path != None, "Normalization CSV must be computed to use imagenet for more then 3 channel to harmonize preprocessing."
+        if normalization_path is None:
+            raise AssertionError("Normalization CSV must be computed to use "
+                                 "imagenet for more then 3 channel to harmonize preprocessing.")
         preprocessing = preprocessing_imagenet_additional(normalization_path)
         print('preprocessing_imagenet_more channels')
     elif pretrained_weights == 'Sentinel_2_TOA_Resnet18' or pretrained_weights == 'Sentinel_2_TOA_Resnet50':
         preprocessing = preprocessing_sentinel2_TOA()
         print('preprocessing_sentinel')  # Sentinel-2 normalization for additional channels
-    elif pretrained_weights is None and normalization == True and normalization_path != None:
+    elif pretrained_weights is None and normalization is True and normalization_path is not None:
         preprocessing = preprocessing_normalization_csv(normalization_path)
         print('preprocessing_normalization')
     else:
@@ -194,15 +192,15 @@ class CustomDataset(Dataset):
     """
 
     def __init__(
-            self,
-            csv_paths_dataframe: pd.DataFrame,
-            transform: Optional = None,
-            num_classes: Optional[int] = None,
-            preprocess_input: Optional = None,
-            remove: Optional = None,
-            scaler_loader: Optional = None,
-            remap: Optional = None,
-            # Use A.Compose for transforms
+        self,
+        csv_paths_dataframe: pd.DataFrame,
+        transform: Optional = None,
+        num_classes: Optional[int] = None,
+        preprocess_input: Optional = None,
+        remove: Optional = None,
+        scaler_loader: Optional = None,
+        remap: Optional = None,
+        # Use A.Compose for transforms
     ):
         """
 
@@ -220,6 +218,7 @@ class CustomDataset(Dataset):
         self.remove = remove
         self.scaler_loader = scaler_loader
         self.remap = remap
+
     def __len__(self):
         return len(self.data)
 
@@ -245,7 +244,7 @@ class CustomDataset(Dataset):
 
         mask_array = torch.as_tensor(forward_array, dtype=torch.int64)
 
-        if self.transform != None:
+        if self.transform is not None:
             mask_array = np.array(mask_array)
             data_array = np.array(data_array)
 
@@ -255,10 +254,10 @@ class CustomDataset(Dataset):
             data_array = torch.as_tensor(data_array, dtype=torch.float32)
             mask_array = torch.as_tensor(mask_array, dtype=torch.float32)
 
-        if self.scaler_loader != None:
+        if self.scaler_loader is not None:
             data_array /= self.scaler_loader
 
-        if self.preprocess_input != None:
+        if self.preprocess_input is not None:
             data_array = torch.as_tensor(data_array, dtype=torch.float32)
             mask_array = torch.as_tensor(mask_array, dtype=torch.float32)
             data_array = self.preprocess_input(data_array)
@@ -269,14 +268,14 @@ class CustomDataset(Dataset):
 
 class MyModel(L.LightningModule):
     def __init__(
-            self,
-            # bands: List[str],
-            train_data: Optional[pd.DataFrame] = None,
-            # y_train: Optional[pd.DataFrame] = None,
-            val_data: Optional[pd.DataFrame] = None,
-            # y_val: Optional[pd.DataFrame] = None,
-            hparams: dict = None,
-            feedback: QgsProcessingFeedback = None
+        self,
+        # bands: List[str],
+        train_data: Optional[pd.DataFrame] = None,
+        # y_train: Optional[pd.DataFrame] = None,
+        val_data: Optional[pd.DataFrame] = None,
+        # y_val: Optional[pd.DataFrame] = None,
+        hparams: dict = None,
+        feedback: QgsProcessingFeedback = None
     ):
         """
 
@@ -318,7 +317,6 @@ class MyModel(L.LightningModule):
             # self.val_iou = JaccardIndex(task="binary",num_classes=self.classes, ignore_index=self.ignore_index)
             self.iou = JaccardIndex(task="binary", num_classes=self.classes)
             self.val_iou = JaccardIndex(task="binary", num_classes=self.classes)
-
 
         elif self.classes > 1 and self.remove_b == 'Yes':
             self.iou = JaccardIndex(task="multiclass", num_classes=self.classes, ignore_index=0)
@@ -398,9 +396,13 @@ class MyModel(L.LightningModule):
         # Compute IoU only on non-zero masked values
         train_iou = self.iou(preds, y)
 
-        self.log_dict({'train_loss': train_loss, 'train_iou': train_iou}
-                      , on_step=True, on_epoch=True, prog_bar=True, logger=True
-                      )
+        self.log_dict(
+            {
+                'train_loss': train_loss,
+                'train_iou': train_iou
+            },
+            on_step=True, on_epoch=True, prog_bar=True, logger=True
+        )
         # Accessing step-level and epoch-level metrics during training
 
         return {'loss': train_loss, 'train_iou': train_iou}
@@ -447,9 +449,12 @@ class MyModel(L.LightningModule):
         # Compute IoU only on non-zero masked values
         val_iou = self.iou(preds, y)
 
-        self.log_dict({'val_loss': val_loss, 'val_iou': val_iou}
-                      , on_step=True, on_epoch=True, prog_bar=True, logger=True
-                      )
+        self.log_dict(
+            {
+                'val_loss': val_loss,
+                'val_iou': val_iou},
+            on_step=True, on_epoch=True, prog_bar=True, logger=True
+        )
 
         return {'val_loss': val_loss, 'val_iou': val_iou}  # val_iou
 
@@ -458,10 +463,10 @@ class MyModel(L.LightningModule):
         self.model.eval()
         torch.set_grad_enabled(False)
 
-        if self.scaler != None:
+        if self.scaler is not None:
             image /= self.scaler
 
-        if self.preprocess != None:
+        if self.preprocess is not None:
             image = torch.as_tensor(image)
 
             image = self.preprocess(image)
@@ -476,10 +481,9 @@ class MyModel(L.LightningModule):
 
         pred2 = pred2.squeeze()
 
-        pred2= pred2.cpu().numpy()
+        pred2 = pred2.cpu().numpy()
         #
         reverse_array = pred2.copy()
-
 
         for old, new in self.reverse_mapping.items():
             reverse_array[pred2 == old] = new
@@ -521,7 +525,6 @@ class MyModel(L.LightningModule):
         self.log('counter', self.counter)
 
     def _prepare_model(self):
-
 
         # overwrite wrong backbone if pretrained weights
         if self.weights == 'Sentinel_2_TOA_Resnet18':
@@ -570,21 +573,22 @@ class MyModel(L.LightningModule):
         if self.weights not in ['imagenet', None]:
 
             if self.weights == 'Sentinel_2_TOA_Resnet18':
-                assert self.in_channels == 13, f'Input channels should be equal to 13 , but is {self.in_channels}'
+                if self.in_channels != 13:
+                    raise ValueError(f'Input channels should be equal to 13 , but is {self.in_channels}')
                 weights = ResNet18_Weights.SENTINEL2_ALL_MOCO
-                #self.backbone = 'resnet18'
+                # self.backbone = 'resnet18'
                 state_dict = weights.get_state_dict(progress=True)
                 model.encoder.load_state_dict(state_dict)
 
             elif self.weights == 'Sentinel_2_TOA_Resnet50':
-                assert self.in_channels == 13, f'Input channels should be equal to 13 , but is {self.in_channels}'
+                if self.in_channels != 13:
+                    raise ValueError(f'Input channels should be equal to 13 , but is {self.in_channels}')
                 weights = ResNet50_Weights.SENTINEL2_ALL_MOCO
-                #self.backbone = 'resnet50'
+                # self.backbone = 'resnet50'
                 state_dict = weights.get_state_dict(progress=True)
                 model.encoder.load_state_dict(state_dict)
 
-
-        if self.freeze_encoder == True:
+        if self.freeze_encoder is True:
             # Freeze encoder weights
             for param in model.encoder.parameters():
                 param.requires_grad = False
@@ -597,14 +601,14 @@ class FeedbackCallback(L.Callback):
         super().__init__()
         self.feedback = feedback
 
-    def on_train_batch_end(self,trainer, *args, **kwargs):
+    def on_train_batch_end(self, trainer, *args, **kwargs):
         # Check for cancellation after every batch
         if self.feedback and self.feedback.isCanceled():
             trainer.should_stop = True
             self.feedback.pushInfo("TRAINING CANCELED BY USER !!!")
             raise KeyboardInterrupt("TRAINING CANCELED BY USER !!!")
 
-            #raise KeyboardInterrupt("Training canceled by user.")
+            # raise KeyboardInterrupt("Training canceled by user.")
 
     def on_train_epoch_end(self, trainer, pl_module):
         epoch = trainer.current_epoch
@@ -616,37 +620,40 @@ class FeedbackCallback(L.Callback):
         val_iou = trainer.callback_metrics.get('val_iou')
 
         log_message = (
-            f'Epoch {epoch }/{max_epochs-1} - '
+            f'Epoch {epoch}/{max_epochs - 1} - '
             f'Train Loss: {train_loss:.4f}, Train IoU: {train_iou:.4f}, '
             f'Val Loss: {val_loss:.4f}, Val IoU: {val_iou:.4f}'
         )
 
         if self.feedback:
-            self.feedback.setProgress((epoch+1)/ max_epochs * 100)
+            self.feedback.setProgress((epoch + 1) / max_epochs * 100)
             self.feedback.pushInfo(log_message)
 
             # Check if the user canceled the process
-            #if self.feedback.isCanceled():
-             #   trainer.should_stop = True#
-              #  raise KeyboardInterrupt("Training canceled by user.")
+            # if self.feedback.isCanceled():
+            #   trainer.should_stop = True#
+            #  raise KeyboardInterrupt("Training canceled by user.")
 
         print(log_message)
 
 
 def dl_train(
-        input_folder,
-        arch_index, backbone='resnet18', pretrained_weights_index=0,
-        checkpoint_path=None,
-        freeze_encoder=True, data_aug=True, batch_size=16, n_epochs=100, lr=0.0001, early_stop=True,
-        class_weights_balanced=True,
-        normalization_bool=True,
-        num_workers=0, num_models=1, acc_type_index=None, acc_type_numbers=1, logdirpath_model=None,
-        logdirpath='./logs', tune=True, feedback: QgsProcessingFeedback = None):
+    input_folder,
+    arch_index, backbone='resnet18', pretrained_weights_index=0,
+    checkpoint_path=None,
+    freeze_encoder=True, data_aug=True, batch_size=16, n_epochs=100, lr=0.0001, early_stop=True,
+    class_weights_balanced=True,
+    normalization_bool=True,
+    num_workers=0, num_models=1, acc_type_index=None, acc_type_numbers=1, logdirpath_model=None,
+    logdirpath='./logs', tune=True, feedback: QgsProcessingFeedback = None
+):
     arch_index_options = ['Unet', 'Unet++', 'DeepLabV3+', 'SegFormer', 'JustoUNetSimple']
     arch = arch_index_options[arch_index]
 
     pretrained_weights_options = ['imagenet', None, 'Sentinel_2_TOA_Resnet18',
-                                  'Sentinel_2_TOA_Resnet50']                   #  ,'LANDSAT_TM_TOA_Resnet18','LANDSAT_ETM_TOA_Resnet18','LANDSAT_OLI_TIRS_TOA_Resnet18','LANDSAT_ETM_SR_Resnet18','LANDSAT_OLI_SR_Resnet18']
+                                  'Sentinel_2_TOA_Resnet50']
+    # ,'LANDSAT_TM_TOA_Resnet18','LANDSAT_ETM_TOA_Resnet18','LANDSAT_OLI_TIRS_TOA_Resnet18',
+    # 'LANDSAT_ETM_SR_Resnet18','LANDSAT_OLI_SR_Resnet18']
     pretrained_weights = pretrained_weights_options[pretrained_weights_index]
 
     if pretrained_weights == 'Sentinel_2_TOA_Resnet18':
@@ -687,7 +694,8 @@ def dl_train(
 
     # create extra no-data class layer if yes
 
-    # dynamic remapping of labeled data (handles uncontinious data labels , ignores 0 in class_values, important for iou calc in mapper/tester)
+    # dynamic remapping of labeled data (handles uncontinious data labels,
+    # ignores 0 in class_values, important for iou calc in mapper/tester)
     original_values = sorted(summary_data['Class ID'].unique().tolist())
     n_classes = len(original_values)
 
@@ -700,8 +708,8 @@ def dl_train(
 
     # Create reverse mapping (new indices -> original)
     reverse_mapping = {idx: original for original, idx in forward_mapping.items()}
-    print('forward mapping',forward_mapping)
-    print('backward mapping',reverse_mapping)
+    print('forward mapping', forward_mapping)
+    print('backward mapping', reverse_mapping)
 
     if 0 in cls_values:
         cls_values.remove(0)
@@ -714,7 +722,8 @@ def dl_train(
     ignore_scaler_list = ([
         'Sentinel_2_TOA_Resnet18', 'Sentinel_2_TOA_Resnet50'])
 
-    # 'LANDSAT_TM_TOA_Resnet18', 'LANDSAT_ETM_TOA_Resnet18','LANDSAT_OLI_TIRS_TOA_Resnet18', 'LANDSAT_ETM_SR_Resnet18', 'LANDSAT_OLI_SR_Resnet18'])
+    # 'LANDSAT_TM_TOA_Resnet18', 'LANDSAT_ETM_TOA_Resnet18','LANDSAT_OLI_TIRS_TOA_Resnet18',
+    # 'LANDSAT_ETM_SR_Resnet18', 'LANDSAT_OLI_SR_Resnet18'])
 
     scaler_value = None if pretrained_weights in ignore_scaler_list else summary_data['Scaler'].iloc[0]
 
@@ -725,7 +734,7 @@ def dl_train(
     print(f"Scaler after handling NaN: {scaler} (type: {type(scaler)})")
 
     # data aug:
-    if data_aug == True:
+    if data_aug is True:
         # Assuming transform setup here
         transform = v2.Compose([
             v2.RandomRotation(degrees=45),
@@ -739,7 +748,7 @@ def dl_train(
     acc_type = acc_type_options[acc_type_index]
 
     # balanced training #
-    if class_weights_balanced == True:
+    if class_weights_balanced is True:
 
         # Extract the 'weights' column as a list
         if remove_zero_class == 'Yes':
@@ -768,7 +777,7 @@ def dl_train(
         backbone = None
 
     # initalize preprocessing in regards to normalization or pretrained weights
-    if normalization_bool == True:
+    if normalization_bool is True:
         normalize_data_path = folder_path + '/Normalize_Bands.csv'
         preprocess_input = get_preprocessing_pipeline(pretrained_weights, channels=in_channels,
                                                       normalization=normalization_bool,
@@ -809,7 +818,7 @@ def dl_train(
         # feedback = feedback
     )
 
-    if checkpoint_path == True:
+    if checkpoint_path is True:
         print('loaded from checkpoint')
         model = MyModel.load_from_checkpoint(checkpoint_path, train_data=train_data, val_data=val_data,
                                              hparams={'in_channels': in_channels,
@@ -838,7 +847,7 @@ def dl_train(
                                              )
 
     # Callbacks
-    if early_stop == True:
+    if early_stop is True:
         early_stopping_callback = EarlyStopping("val_iou", mode="max", verbose=True, patience=20)
 
         checkpoint_callback = ModelCheckpoint(dirpath=logdirpath_model, monitor='val_iou_epoch',
@@ -858,7 +867,7 @@ def dl_train(
             callbacks=[checkpoint_callback, early_stopping_callback, feedback_callback],
         )
 
-        if tune == True:
+        if tune is True:
             tuner = Tuner(trainer)
 
             # Run learning rate finder
@@ -895,7 +904,7 @@ def dl_train(
 
         )
 
-        if tune == True:
+        if tune is True:
             tuner = Tuner(trainer)
 
             # Run learning rate finder

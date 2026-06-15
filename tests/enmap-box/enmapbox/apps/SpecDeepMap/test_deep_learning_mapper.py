@@ -82,25 +82,33 @@ class Test_Deep_Learning_Mapper(TestCase):
         df = pd.read_csv(str(folder_path_pred_iou))
 
         unique_classes = df['Class'].nunique()  # Count unique classes
-        assert unique_classes == 6 + 1, \
-            f"Error: Expected 7 values, 6 classes and 1 mean but found 1 mean and {unique_classes}"
+        self.assertTrue(
+            unique_classes == 6 + 1,
+            msg=f"Error: Expected 7 values, 6 classes and 1 mean but found 1 mean and {unique_classes}"
+        )
 
         # 2. Test if Mapper predicts and writes raster
 
         dataset = gdal.Open(str(folder_path_pred_raster))
         dataset_com = gdal.Open(exampledata.enmap)
-        assert dataset is not None, \
-            f"Error: {str(folder_path_pred_raster)} is not a valid raster file (couldn't be opened)."
+        self.assertTrue(
+            dataset is not None,
+            msg=f"Error: {str(folder_path_pred_raster)} is not a valid raster file (couldn't be opened)."
+        )
         # Check if the raster has at least one band
-        assert dataset.RasterCount > 0, \
-            f"Error: {str(folder_path_pred_raster)} has no bands (not a valid raster)."
+        self.assertTrue(
+            dataset.RasterCount > 0,
+            msg=f"Error: {str(folder_path_pred_raster)} has no bands (not a valid raster)."
+        )
         # Check if the raster has valid dimensions
         width = dataset.RasterXSize
         height = dataset.RasterYSize
 
-        assert width == dataset_com.RasterXSize and height == dataset_com.RasterYSize, \
-            (f"Error: {str(folder_path_pred_raster)} has invalid dimensions ({width}x{height}), "
-             f"should have ({dataset_com.RasterXSize}x {dataset_com.RasterYSize})")
+        self.assertTrue(
+            width == dataset_com.RasterXSize and height == dataset_com.RasterYSize,
+            msg=f"Error: {str(folder_path_pred_raster)} has invalid dimensions ({width}x{height}), "
+                f"should have ({dataset_com.RasterXSize}x {dataset_com.RasterYSize})"
+        )
 
         dataset = None  # Close the dataset
         dataset_com = None
@@ -108,17 +116,24 @@ class Test_Deep_Learning_Mapper(TestCase):
         # 3. Test if Mapper converts prediction to vector file
 
         datasource = ogr.Open(str(folder_path_pred_vector))
-        assert datasource is not None, \
-            f"Error: {str(folder_path_pred_vector)} is not a valid vector file (couldn't be opened)."
+        self.assertTrue(
+            datasource is not None,
+            msg=f"Error: {str(folder_path_pred_vector)} is not a valid vector file (couldn't be opened)."
+        )
 
         # Check if the vector has at least one layer
-        assert datasource.GetLayerCount() > 0, \
-            f"Error: {str(folder_path_pred_vector)} has no layers (invalid vector file)."
+        self.assertTrue(
+            datasource.GetLayerCount() > 0,
+            msg=f"Error: {str(folder_path_pred_vector)} has no layers (invalid vector file)."
+        )
 
         # Check if the layer contains features
         layer = datasource.GetLayer(0)
         feature_count = layer.GetFeatureCount()
-        assert feature_count > 0, f"Error: {str(folder_path_pred_vector)} has no features (empty vector file)."
+        self.assertTrue(
+            feature_count > 0,
+            msg=f"Error: {str(folder_path_pred_vector)} has no features (empty vector file)."
+        )
 
         datasource = None  # Close the datasource
 

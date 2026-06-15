@@ -13,8 +13,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from osgeo import gdal
-from qgis._core import QgsProcessingFeedback
 from scipy.stats import wasserstein_distance
+
+from qgis._core import QgsProcessingFeedback
 
 
 # from tqdm import tqdm
@@ -22,14 +23,14 @@ from scipy.stats import wasserstein_distance
 # set progress counter for two main loops
 
 def set_progress_counter(num_permutations, file_paths, val_perc, test_perc, normalize):
-    if normalize == False:
+    if normalize is False:
         progress_counter_total = num_permutations
 
     else:
         train_length = math.ceil(len(file_paths) * (1 - (val_perc + test_perc)))
         # Return the number of files found
         progress_counter_total = num_permutations + (
-                train_length * 2)  # because one loop mean, one loop std if normalization is choosen
+            train_length * 2)  # because one loop mean, one loop std if normalization is choosen
 
     return progress_counter_total
 
@@ -133,9 +134,11 @@ def find_best_split(label_histograms, num_permutations, train_perc, test_perc, v
             label_histograms[perm[num_test + num_val:num_val + num_test + num_train]], axis=0)
 
         # Check minimum requirements only for non-empty datasets
-        if (num_test > 0 and np.any(test_hist < min_per_class)) or \
-                (num_val > 0 and np.any(val_hist < min_per_class)) or \
-                (num_train > 0 and np.any(train_hist < min_per_class)):
+        if (
+            (num_test > 0 and np.any(test_hist < min_per_class))
+            or (num_val > 0 and np.any(val_hist < min_per_class))
+            or (num_train > 0 and np.any(train_hist < min_per_class))
+        ):
             continue
 
         # Calculate EMD only for existing datasets
@@ -307,13 +310,14 @@ def calculate_class_weights_from_counts(class_counts):
     if 0 in class_counts:
         del class_counts[0]
 
-    num_classes = len(class_counts)  # Remaining number of classes (excluding class 0)
+    # num_classes = len(class_counts)  # Remaining number of classes (excluding class 0)
     total_samples = sum(class_counts.values())
 
     # Compute weights using n_samples / (n_classes * np.bincount(y)) logic sklearn calc for weights
     # class_weights = {cls: total_samples / (num_classes * count) for cls, count in class_counts.items() if count > 0}
 
-    # normalized to 1 for more model stability https://naadispeaks.blog/2021/07/31/handling-imbalanced-classes-with-weighted-loss-in-pytorch/
+    # normalized to 1 for more model stability
+    # https://naadispeaks.blog/2021/07/31/handling-imbalanced-classes-with-weighted-loss-in-pytorch/
 
     class_weights = {cls: 1 - (count / total_samples) for cls, count in class_counts.items() if count > 0}
 
@@ -499,11 +503,13 @@ def create_train_validation_csv_balance(input_folder, out_folder_path, train_int
                                         scaler,
                                         random_seed_gen, normalize=True,
                                         feedback: QgsProcessingFeedback = None, min_perc=0.01, num_permutations=10000):
-    assert train_int_perc + val_int_perc + test_int_perc <= 100, "The sum of train, validation, and test percentages exceeds 100%. Reduce percentages number of datasets so sum is max 100%!"
+    if not (train_int_perc + val_int_perc + test_int_perc <= 100):
+        raise AssertionError("The sum of train, validation, and test percentages exceeds 100%. "
+                             "Reduce percentages number of datasets so sum is max 100%!")
 
     # rng = np.random.default_rng(seed=random_seed_gen)
     train_perc = train_int_perc / 100
-    test_perc = test_int_perc / 100  ## orig 0.1
+    test_perc = test_int_perc / 100  # # orig 0.1
     val_perc = val_int_perc / 100
 
     print('scaler', scaler)
@@ -547,7 +553,7 @@ def create_train_validation_csv_balance(input_folder, out_folder_path, train_int
 
     create_summary_csv(input_folder, train_csv_path, val_csv_path, test_csv_path, out_folder_path, scaler,
                        zero_class_removed)
-    if normalize == True:
+    if normalize is True:
         no_data_value = read_no_data_value(input_folder, train_csv_path)
         save_normalized_band_data(input_folder, train_csv_path, out_folder_path, progress_counter,
                                   progress_counter_total, scaler,

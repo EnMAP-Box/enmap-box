@@ -5,6 +5,7 @@
 
 import warnings
 from collections import OrderedDict
+from typing import Optional, Union, Tuple
 from typing import cast
 
 import torch
@@ -122,24 +123,24 @@ def load_state_dict(
     missing_keys, unexpected_keys = model.load_state_dict(state_dict, strict=False)
     return missing_keys, unexpected_keys
 
-# for python 3.10 ############################################################################
-#def reinit_initial_conv_layer(
- #   layer: Conv2d,
-  #  new_in_channels: int,
-   # keep_rgb_weights: bool,
-   # new_stride: int | tuple[int, int] | None = None,
-   # new_padding: str | int | tuple[int, int] | None = None,
-#) -> Conv2d:
 
-from typing import Optional, Union, Tuple
+# for python 3.10 ############################################################################
+# def reinit_initial_conv_layer(
+#   layer: Conv2d,
+#  new_in_channels: int,
+# keep_rgb_weights: bool,
+# new_stride: int | tuple[int, int] | None = None,
+# new_padding: str | int | tuple[int, int] | None = None,
+# ) -> Conv2d:
+
 
 def reinit_initial_conv_layer(
-            layer: Conv2d,
-            new_in_channels: int,
-            keep_rgb_weights: bool,
-            new_stride: Optional[Union[int, Tuple[int, int]]] = None,
-            new_padding: Optional[Union[str, int, Tuple[int, int]]] = None,
-    ) -> Conv2d:
+    layer: Conv2d,
+    new_in_channels: int,
+    keep_rgb_weights: bool,
+    new_stride: Optional[Union[int, Tuple[int, int]]] = None,
+    new_padding: Optional[Union[str, int, Tuple[int, int]]] = None,
+) -> Conv2d:
     """Clones a Conv2d layer while optionally retaining some of the original weights.
 
     When replacing the first convolutional layer in a model with one that operates over

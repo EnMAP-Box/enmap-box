@@ -1,6 +1,6 @@
-
 import unittest
 from pathlib import Path
+
 from enmapbox import DIR_UNITTESTS
 from enmapbox.apps.SpecDeepMap import import_error
 from enmapbox.testing import start_app
@@ -17,7 +17,6 @@ if not import_error:
 class Test_Tensorboard(TestCase):
 
     def test_init(self):
-
         # init QGIS
         # qgsApp = QgsApplication([], True)
         # qgsApp.initQgis()
@@ -44,4 +43,4 @@ class Test_Tensorboard(TestCase):
         result_tb_run = result["TensorBoard_run"]
 
         # Assert if the process did not create url correctly
-        assert result_tb_run is True
+        self.assertTrue(result_tb_run, msg="Tensorboard did not run correctly")

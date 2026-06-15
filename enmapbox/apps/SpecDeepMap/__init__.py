@@ -11,7 +11,8 @@ try:
     from enmapbox.apps.SpecDeepMap.processing_algorithm_deep_learning_mapper import DL_Mapper
     from enmapbox.apps.SpecDeepMap.processing_algorithm_tensorboard_visualizer import Tensorboard_visualizer
     from enmapbox.apps.SpecDeepMap.processing_algorithm_tester import DL_Tester
-    import psutil
+
+    # import psutil
 
     wrongEnv = False
     import_error = None
@@ -19,7 +20,8 @@ except Exception as ex:
     wrongEnv = True
     import_error = ex
 
-URL_ONLINE_DOCUMENTATION = 'https://enmap-box.readthedocs.io/en/latest/usr_section/application_tutorials/specdeepmap/tutorial_specdeepmap.html'
+URL_ONLINE_DOCUMENTATION = ('https://enmap-box.readthedocs.io/en/latest/usr_section/'
+                            'application_tutorials/specdeepmap/tutorial_specdeepmap.html')
 
 
 # test
@@ -75,4 +77,6 @@ class SpecDeepMap(EnMAPBoxApplication):
             return []
         else:
             return [RasterSplitter(), DatasetMaker(), DL_Trainer(), DL_Mapper(), Tensorboard_visualizer(),
-                    DL_Tester()]  # ,DL_Train_MOD()] #DL_Train()#DatasetSplitter() #,,DatasetSplitter(),DL_Train(),RasterSplitterR(),DatasetSplitter(),RasterSplitterRP()
+                    DL_Tester()]
+            # ,DL_Train_MOD()] #DL_Train()#DatasetSplitter() #,,DatasetSplitter(),
+            # DL_Train(),RasterSplitterR(),DatasetSplitter(),RasterSplitterRP()
