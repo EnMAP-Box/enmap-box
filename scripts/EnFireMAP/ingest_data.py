@@ -3,9 +3,9 @@ from collections import defaultdict
 from os import listdir, makedirs, sep
 from os.path import join, isdir, dirname, exists, normpath, basename
 from typing import Optional
-from xml.etree import ElementTree
 
 import numpy as np
+from defusedxml import ElementTree
 from osgeo import gdal
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
@@ -23,7 +23,8 @@ rootCube = r'D:\data\EnFireMap\cube'
 rootTmpWarped = r'D:\data\EnFireMap\data\_warped'
 rootTmpMosaics = r'D:\data\EnFireMap\data\_mosaics'
 tilingScheme = QgsVectorLayer(r'D:\data\EnFireMap\cube\shp\grid2.geojson')
-assert tilingScheme.isValid()
+if not tilingScheme.isValid():
+    raise ValueError(f'Invalid tiling scheme: {tilingScheme.source()}')
 idField = 'Tile_ID'
 goodWavelengthFile = join(dirname(__file__), 'good_wavelengths.txt')
 badWavelengthFile = join(dirname(__file__), 'bad_wavelengths.txt')
@@ -105,8 +106,10 @@ def ingestData():
     for scene in listdir(rootData):
         try:
             prefix, datestamp, sceneNo = scene.split('_')
-            assert prefix == 'nc'
-        except Exception:
+            if prefix != 'nc':
+                continue
+        except Exception as ex:
+            print(f'Error in {scene}: {ex}')
             continue
         scenesByDate[datestamp].append(scene)
 

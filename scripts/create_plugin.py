@@ -35,13 +35,13 @@ from typing import Union
 
 import docutils.core
 import markdown
-from qgis.core import QgsFileUtils, QgsUserProfile, QgsUserProfileManager
-from qgis.testing import start_app
 
 import enmapbox
 from enmapbox import DIR_REPO
 from enmapbox.qgispluginsupport.qps.make.deploy import QGISMetadataFileWriter, userProfileManager
 from enmapbox.qgispluginsupport.qps.utils import zipdir
+from qgis.core import QgsFileUtils, QgsUserProfile, QgsUserProfileManager
+from qgis.testing import start_app
 
 app = start_app()
 # consider default Git location on Windows systems to avoid creating a Start-Up Script
@@ -72,7 +72,8 @@ except (ImportError, ModuleNotFoundError) as ex:
 DIR_REPO = Path(DIR_REPO)
 
 PATH_CONFIG_FILE = DIR_REPO / 'tox.ini'
-assert PATH_CONFIG_FILE.is_file()
+if not PATH_CONFIG_FILE.is_file():
+    raise FileNotFoundError(f'Config file not found: {PATH_CONFIG_FILE}')
 
 
 def scanfiles(root: typing.Union[str, Path]) -> typing.Iterator[Path]:
@@ -119,7 +120,9 @@ def create_enmapbox_plugin(include_testdata: bool = False,
                            create_zip: bool = True,
                            copy_to_profile: bool = False,
                            build_name: str = None) -> typing.Optional[Path]:
-    assert (DIR_REPO / '.git').is_dir()
+    if not (DIR_REPO / '.git').is_dir():
+        raise NotADirectoryError(f'Not a git repository! {DIR_REPO}')
+
     config = configparser.ConfigParser()
     config.read(PATH_CONFIG_FILE)
 
@@ -129,13 +132,15 @@ def create_enmapbox_plugin(include_testdata: bool = False,
 
     if copy_to_profile:
         profileManager: QgsUserProfileManager = userProfileManager()
-        assert len(profileManager.allProfiles()) > 0
+        if len(profileManager.allProfiles()) == 0:
+            raise ValueError(f'No existing QGIS profiles found: {profileManager.allProfiles()}')
+
         if isinstance(copy_to_profile, str):
             profileName = copy_to_profile
         else:
             profileName = profileManager.defaultProfileName()
-        assert profileManager.profileExists(profileName), \
-            f'QGIS profiles "{profileName}" does not exist in {profileManager.allProfiles()}'
+        if not profileManager.profileExists(profileName):
+            raise ValueError(f'QGIS profile "{profileName}" does not exist in {profileManager.allProfiles()}')
 
         profileManager.setActiveUserProfile(profileName)
         profile: QgsUserProfile = profileManager.userProfile()
@@ -210,7 +215,9 @@ def create_enmapbox_plugin(include_testdata: bool = False,
     # copy EnMAP-Box icon source
     path_icon_source = DIR_REPO / config['enmapbox:files']['icon']
     path_icon_plugin = PLUGIN_DIR / config['enmapbox:metadata']['icon']
-    assert path_icon_source.is_file(), f'Icon source does not exists: {path_icon_source}'
+    if not path_icon_source.is_file():
+        raise FileNotFoundError(f'Icon source does not exists: {path_icon_source}')
+
     shutil.copy(path_icon_source, path_icon_plugin)
 
     # copy python and other resource files
@@ -235,7 +242,8 @@ def create_enmapbox_plugin(include_testdata: bool = False,
                 break
 
     for fileSrc in files:
-        assert fileSrc.is_file()
+        if not fileSrc.is_file():
+            raise FileNotFoundError(f'File not found: {fileSrc}')
         fileDst = PLUGIN_DIR / fileSrc.relative_to(DIR_REPO)
         os.makedirs(fileDst.parent, exist_ok=True)
         shutil.copy(fileSrc, fileDst.parent)
@@ -332,7 +340,9 @@ def markdownToHTML(path_md: Union[str, Path]) -> str:
 
     if path_md.name.endswith('.rst'):
 
-        assert path_md.is_file(), path_md
+        if not path_md.is_file():
+            raise FileNotFoundError(path_md)
+
         overrides = {'stylesheet': None,
                      'embed_stylesheet': False,
                      'output_encoding': 'utf-8',
@@ -373,8 +383,8 @@ def createCHANGELOG(dirPlugin: Path) -> str:
     pathCL = dirPlugin / 'CHANGELOG'
 
     os.makedirs(os.path.dirname(pathCL), exist_ok=True)
-    assert os.path.isfile(pathMD)
-    #    import sphinx.transforms
+    if not os.path.isfile(pathMD):
+        raise FileNotFoundError(f'File not found: {pathMD}')
 
     html = markdownToHTML(pathMD)
 

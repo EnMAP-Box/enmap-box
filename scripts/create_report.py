@@ -9,11 +9,17 @@ import os
 import pathlib
 import re
 import unittest
-import urllib.request
-import xml.etree.ElementTree as etree
 from typing import Dict, List
 
+import defusedxml.ElementTree as etree
 import pandas as pd
+import requests
+
+from enmapbox import DIR_REPO_TMP, initAll
+from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
+from enmapbox.gui.applications import ApplicationWrapper, EnMAPBoxApplication
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.testing import start_app
 from qgis.PyQt.QtWidgets import QMenu
 from qgis.core import (
     QgsProcessing, QgsProcessingAlgorithm, QgsProcessingOutputFile, QgsProcessingOutputFolder,
@@ -24,13 +30,6 @@ from qgis.core import (
     QgsProcessingParameterRasterDestination, QgsProcessingParameterRasterLayer, QgsProcessingParameterVectorDestination,
     QgsProcessingParameterVectorLayer
 )
-
-import requests
-from enmapbox import DIR_REPO_TMP, initAll
-from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
-from enmapbox.gui.applications import ApplicationWrapper, EnMAPBoxApplication
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.testing import start_app
 
 
 def linesOfCode(path) -> int:
@@ -50,10 +49,10 @@ def report_downloads() -> pd.DataFrame:
     url = r'https://plugins.qgis.org/plugins/enmapboxplugin'
 
     hdr = {'User-agent': 'Mozilla/5.0'}
-    req = urllib.request.Request(url, headers=hdr)
-    response = urllib.request.urlopen(req)
+    response = requests.get(url, headers=hdr, timeout=10)
+    response.raise_for_status()
 
-    html = response.read().decode('utf-8')
+    html = response.text
 
     html = re.search(r'<table .*</table>', re.sub('\n', ' ', html)).group()
     html = re.sub(r'&nbsp;', '', html)
@@ -132,10 +131,7 @@ def report_github_issues_QGIS(authors=['jakimowb', 'janzandr'], start_date='2020
     if not PATH_GH_JSON.is_file():
         os.makedirs(PATH_GH_JSON.parent, exist_ok=True)
         # Your GitHub personal access token
-        assert 'GITHUB_TOKEN' in os.environ, \
-            ('GITHUB_TOKEN is not set. Read https://docs.github.com/en/authentication/keeping-your-account-and-data-'
-             'secure/managing-your-personal-access-tokens for details.')
-        token = os.environ['GITHUB_TOKEN']
+        token = github_token()
 
         # Create a session and set the authorization header
         session = requests.Session()
@@ -238,6 +234,17 @@ def report_github_issues_QGIS(authors=['jakimowb', 'janzandr'], start_date='2020
     return None
 
 
+def github_token() -> str:
+    if 'GITHUB_TOKEN' not in os.environ:
+        raise Exception(
+            'GITHUB_TOKEN is not set. Read '
+            'https://docs.github.com/en/authentication/keeping-your-account-and-data-'
+            'secure/managing-your-personal-access-tokens for details.'
+        )
+
+    return str(os.environ['GITHUB_TOKEN'])
+
+
 def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31') -> pd.DataFrame:
     """
 
@@ -259,11 +266,7 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
 
     if not PATH_GH_JSON.is_file():
         os.makedirs(PATH_GH_JSON.parent, exist_ok=True)
-        # Your GitHub personal access token
-        assert 'GITHUB_TOKEN' in os.environ, \
-            ('GITHUB_TOKEN is not set. Read https://docs.github.com/en/authentication/keeping-your-account-and-data-'
-             'secure/managing-your-personal-access-tokens for details.')
-        token = os.environ['GITHUB_TOKEN']
+        token = github_token()
         # Create a session and set the authorization header
         session = requests.Session()
         session.headers.update({'Authorization': f'token {token}'})

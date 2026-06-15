@@ -9,6 +9,7 @@ import shutil
 import site
 import zipfile
 from pathlib import Path
+from typing import Optional, Union
 
 import requests
 
@@ -16,28 +17,33 @@ DIR_REPO = Path(__file__).parents[1].resolve()
 site.addsitedir(str(DIR_REPO))
 
 
-def install_zipfile(url: str, localPath: Path, zip_root: str = None):
+def install_zipfile(
+    url: str,
+    local_path: Union[str, Path],
+    zip_root: Optional[str] = None,
+    timeout: int = 60,
+):
     """
     Downloads and extracts a zip file
     """
-    assert isinstance(localPath, Path)
-    localPath = localPath.resolve()
 
-    print('Download {} \nto {}'.format(url, localPath))
+    local_path = Path(local_path).resolve()
 
-    response = requests.get(url, stream=True)
+    print('Download {} \nto {}'.format(url, local_path))
+
+    response = requests.get(url, stream=True, timeout=timeout)
 
     z = zipfile.ZipFile(io.BytesIO(response.content))
-    os.makedirs(localPath, exist_ok=True)
+    os.makedirs(local_path, exist_ok=True)
     for src in z.namelist():
         srcPath = Path(src)
         if isinstance(zip_root, str):
             if zip_root not in srcPath.parts:
                 continue
             i = srcPath.parts.index(zip_root)
-            dst = localPath / Path(*srcPath.parts[i + 1:])
+            dst = local_path / Path(*srcPath.parts[i + 1:])
         else:
-            dst = localPath / Path(*srcPath.parts)
+            dst = local_path / Path(*srcPath.parts)
         info = z.getinfo(src)
         if info.is_dir():
             if dst.exists():

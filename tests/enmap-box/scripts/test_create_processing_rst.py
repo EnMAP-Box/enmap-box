@@ -4,9 +4,9 @@ import shutil
 import subprocess
 import unittest
 
+from enmapbox import registerEnMAPBoxProcessingProvider
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
 from enmapbox.testing import start_app, TestCase
-from enmapbox import registerEnMAPBoxProcessingProvider
 from scripts.create_processing_rst import __file__ as path_processing_script, collectQgsProcessAlgorithmHelp, \
     escape_rst, \
     generateRST, QGIS_PROCESS_ENV, update_rst
@@ -109,12 +109,7 @@ class CreateProcessingRSTTestCases(TestCase):
         algs = EnMAPBoxProcessingProvider.instance().algorithms()
         algs = algs[0:100]
         t0 = datetime.datetime.now()
-        results1 = collectQgsProcessAlgorithmHelp(algs, run_async=True)
-        t1 = datetime.datetime.now()
-        results2 = collectQgsProcessAlgorithmHelp(algs, run_async=False)
-        t2 = datetime.datetime.now()
-        self.assertEqual(results1, results2)
-        print(f'Async: {t1 - t0}\nNormal: {t2 - t1}')
+        results1 = collectQgsProcessAlgorithmHelp(algs)
 
     def test_script(self):
         dir_tmp = self.createTestOutputDirectory()

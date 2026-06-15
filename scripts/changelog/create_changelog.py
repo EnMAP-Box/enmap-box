@@ -62,7 +62,9 @@ for edit in text.split('\n\n'):
         issueNumbers = [int(s[1:]) for s in title.split(' ') if s.startswith('#') and s[1:].isnumeric()]
         title = ' '.join([s for s in title.split(' ') if not (s.startswith('#') and s[1:].isnumeric())])
         if title == '$TITLE':
-            assert len(issueNumbers) > 0
+            if not len(issueNumbers) > 0:
+                raise ValueError('Missing issue number(s)')
+
             for issue in issues:
                 if issue.get('number') == issueNumbers[0]:
                     title = issue['title']

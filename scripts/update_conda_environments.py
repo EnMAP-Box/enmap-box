@@ -71,20 +71,23 @@ DEPENDENCIES = {
 def restructure_dependencies(d: dict) -> Dict[str, List[Dict[str, List[str]]]]:
     restructured = dict()
     for k, packages in d.items():
-        assert isinstance(packages, list)
         packages2: List[Dict[str, List[str]]] = []
         for pkg in packages:
             if isinstance(pkg, str):
                 pkg = {'conda': [pkg]}
-            assert isinstance(pkg, dict)
+            if not isinstance(pkg, dict):
+                raise ValueError(f'Invalid package dict: {pkg}')
             for repo in list(pkg.keys()):
-                assert repo in ['conda', 'pip'], f'Unknown package repo: {repo}'
+                if repo not in ['conda', 'pip']:
+                    raise ValueError(f'Package repo must be conda or pip: {repo}')
                 repoPkgs = pkg[repo]
                 if isinstance(repoPkgs, str):
                     repoPkgs = [repoPkgs]
-                assert isinstance(repoPkgs, list)
+                if not isinstance(repoPkgs, list):
+                    raise ValueError(f'Invalid package list: {repoPkgs}')
                 for v in repoPkgs:
-                    assert isinstance(v, str)
+                    if not isinstance(v, str):
+                        raise ValueError(f'Invalid package: {v}')
                 pkg[repo] = repoPkgs
             packages2.append(pkg)
         restructured[k] = packages2
@@ -99,7 +102,7 @@ def get_current_qgis_versions() -> dict:
     Reads from qgis.org the version numbers of the current LTR and LR releases.
     """
     base_url = 'https://qgis.org/resources/roadmap'
-    response = requests.get(base_url)
+    response = requests.get(base_url, timeout=10)
     if response.status_code != 200:
         raise RuntimeError(f"Failed to fetch data from {base_url}")
 
@@ -121,7 +124,7 @@ def get_conda_qgis_versions() -> List[str]:
         # osx-64
         base_url = 'https://conda.anaconda.org/conda-forge/win-64/repodata.json'
         print(f'Download {base_url}')
-        response = requests.get(base_url)
+        response = requests.get(base_url, timeout=5)
         if response.status_code != 200:
             raise RuntimeError(f"Failed to fetch data from {base_url}")
 
