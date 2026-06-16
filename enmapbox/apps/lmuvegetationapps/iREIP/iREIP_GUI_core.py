@@ -12,7 +12,6 @@
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
-                                                                                                                                                 *
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -22,24 +21,24 @@
     along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
 """
+import os
 import sys
 
-import pyqtgraph as pg
-from osgeo import gdal
-from scipy.interpolate import *
-from scipy.signal import savgol_filter
 import numpy as np
-import os
-#from _classic.hubdc.core import openRasterDataset, RasterDataset
-#from _classic.hubflow.core import Raster
+import pyqtgraph as pg
+from scipy.interpolate import interp1d
+from scipy.signal import savgol_filter
+
+# from _classic.hubdc.core import openRasterDataset, RasterDataset
+# from _classic.hubflow.core import Raster
 from enmapbox.gui.utils import loadUi
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from lmuvegetationapps import APP_DIR
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWidgets import QDialog, QApplication, QFileDialog, QMessageBox
 from qgis.core import QgsMapLayerProxyModel
 from qgis.gui import QgsMapLayerComboBox
 
@@ -76,8 +75,6 @@ class iREIP_GUI(QDialog):
 
         self.btnBackgroundColor.colorChanged.connect(self.set_background_color)
         self.btnAxisColor = QgsColorButton()
-        # self.btnAxisColor.colorChanged.connect([self.setAxisColor(canvas, QColor('white')) for canvas in self.plotItems])
-
         self.rangeView.setBackground(QColor('black'))
         self.firstDerivView.setBackground(QColor('black'))
         self.secondDerivView.setBackground(QColor('black'))
@@ -227,8 +224,10 @@ class iREIP:
         else:
             self.dtype = meta[4]
         if self.dtype == 2 or self.dtype == 3 or self.dtype == 4 or self.dtype == 5:
-            QMessageBox.information(self.gui, "Integer Input",
-                                    "Integer input image:\nTool requires float [0.0-1.0]:\nDivision factor set to 10000")
+            QMessageBox.information(
+                self.gui, "Integer Input",
+                "Integer input image:\nTool requires float [0.0-1.0]:\nDivision factor set to 10000"
+            )
             self.division_factor = 10000
             self.gui.spinDivisionFactor.setText(str(self.division_factor))
         if None in meta:
@@ -253,10 +252,11 @@ class iREIP:
         try:
             nodata = int(metadict['ENVI']['data ignore value'])
             return nodata, nbands, nrows, ncols, dtype
-        except:
+        except Exception:
             self.main.nodat_widget.init(image_type=image_type, image=image)
             self.main.nodat_widget.gui.setModal(True)  # parent window is blocked
-            self.main.nodat_widget.gui.exec_()  # unlike .show(), .exec_() waits with execution of the code, until the app is closed
+            self.main.nodat_widget.gui.exec_()
+            # unlike .show(), .exec_() waits with execution of the code, until the app is closed
             return self.main.nodat_widget.nodat, nbands, nrows, ncols, dtype
 
     def reset(self):
@@ -292,7 +292,7 @@ class iREIP:
                 self.limits[1] = int(str(self.gui.upWaveEdit.text()))
                 self.limits[0] = int(str(self.gui.lowWaveEdit.text()))
 
-            if self.max_ndvi_pos == None:
+            if self.max_ndvi_pos is None:
                 self.init_plot()
             else:
                 self.plot_example(self.max_ndvi_pos)
@@ -459,7 +459,7 @@ class iREIP:
                 return
             try:
                 self.division_factor = float(self.gui.spinDivisionFactor.text())
-            except:
+            except Exception:
                 QMessageBox.critical(self.gui, "Error",
                                      "'%s' is not a valid division factor!" % self.gui.spinDivisionFactor.text())
                 return
@@ -554,13 +554,13 @@ class iREIP:
             else:
                 try:
                     self.nodat[1] = int(self.gui.txtNodatOutput.text())
-                except:
+                except Exception:
                     QMessageBox.critical(self.gui, "Error",
                                          "'%s' is not a valid  No Data Value!" % self.gui.txtNodatOutput.text())
                     return
             try:
                 self.division_factor = float(self.gui.spinDivisionFactor.text())
-            except:
+            except Exception:
                 QMessageBox.critical(self.gui, "Error",
                                      "'%s' is not a valid division factor!" % self.gui.spinDivisionFactor.text())
                 return
@@ -570,7 +570,7 @@ class iREIP:
                 del self.core.in_raster
                 if self.division_factor != 1.0:
                     self.iiREIP.in_raster = np.divide(self.iiREIP.in_raster, self.division_factor)
-            except:
+            except Exception:
                 self.iiREIP.in_raster = self.iiREIP.read_image(image=self.image)
                 if self.division_factor != 1.0:
                     self.iiREIP.in_raster = np.divide(self.iiREIP.in_raster, self.division_factor)
@@ -579,7 +579,7 @@ class iREIP:
             result, first_deriv, second_deriv = self.iiREIP.execute_iREIP(
                 in_raster=self.iiREIP.in_raster,
                 prg_widget=self.main.prg_widget, qgis_app=self.main.qgis_app)
-            # except:
+            # except Exception:
             # QMessageBox.critical(self.gui, 'error', "Calculation cancelled.")
             # self.main.prg_widget.gui.allow_cancel = True
             # self.main.prg_widget.gui.close()
@@ -601,14 +601,6 @@ class iREIP:
                 self.main.qgis_app.processEvents()
 
                 self.iiREIP.write_deriv_image(deriv=second_deriv, mode="second")
-
-            # try:
-            #
-            # except:
-            #     #QMessageBox.critical(self.gui, 'error', "An unspecific error occured while trying to write image data")
-            #     self.main.prg_widget.gui.allow_cancel = True
-            #     self.main.prg_widget.gui.close()
-            #     return
 
             self.main.prg_widget.gui.allow_cancel = True
             self.main.prg_widget.gui.close()
@@ -674,13 +666,13 @@ class iREIP_core:
         # raster = dataset.readAsArray()
 
         reader = RasterReader(image)
-        array  = np.array(reader.array())
+        array = np.array(reader.array())
         raster = array
 
         if len(self.wl) > 2000:
             try:
                 raster[self.default_exclude, :, :] = 0
-            except:
+            except Exception:
                 pass
         if len(raster) == 242:  # temporary solution for overlapping EnMap-Testdata Bands
             raster = np.delete(raster, self.enmap_exclude, axis=0)  # temporary solution!
@@ -693,13 +685,13 @@ class iREIP_core:
         # raster = dataset.readAsArray()
 
         reader = RasterReader(image)
-        array  = np.array(reader.array())
+        array = np.array(reader.array())
         raster = array
 
         if len(self.wl) > 2000:
             try:
                 raster[self.default_exclude, :, :] = 0
-            except:
+            except Exception:
                 pass
         if len(raster) == 242:  # temporary solution for overlapping EnMap-Testdata Bands
             raster = np.delete(raster, self.enmap_exclude, axis=0)  # temporary solution!
@@ -733,7 +725,7 @@ class iREIP_core:
 
         try:
             wave_dict = metadict['ENVI']['wavelength']
-        except:
+        except Exception:
             raise ValueError('No wavelength units provided in ENVI header file')
 
         if metadict['ENVI']['wavelength'] is None:
@@ -797,7 +789,7 @@ class iREIP_core:
             writer.setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
 
             for bandNo in writer.bandNumbers():
-                writer.setBandName(band_string_nr[bandNo-1], bandNo)
+                writer.setBandName(band_string_nr[bandNo - 1], bandNo)
                 writer.setNoDataValue(self.nodat[1], bandNo)
 
             writer.setMetadataItem(key='wavelength', value=self.valid_wl, domain='ENVI')
@@ -856,7 +848,7 @@ class iREIP_core:
         x = np.arange(len(in_matrix))
         try:
             in_matrix[self.default_exclude] = 0
-        except:
+        except Exception:
             pass
         self.res3d = np.empty(shape=np.shape(in_matrix))
         for row in range(in_matrix.shape[1]):
@@ -895,9 +887,11 @@ class iREIP_core:
             reip_pos_index = (np.abs(list(tracker))).argmin()
             reip_pos = pos_wl[reip_pos_index]
 
-        except:
-            QMessageBox.information(self.prg.gui, "Warning",
-                                    "Inflection Point is not unique.\nUse Savitzky-Golay filter or decrease the range width.")
+        except Exception:
+            QMessageBox.information(
+                self.prg.gui, "Warning",
+                "Inflection Point is not unique.\nUse Savitzky-Golay filter or decrease the range width."
+            )
             reip_pos = None
 
         return smooth_array, first_deriv, second_deriv, reip_pos
@@ -913,19 +907,21 @@ class iREIP_core:
             try:
                 smooth_matrix = savgol_filter(in_matrix,
                                               window_length=self.neighbors, polyorder=2, axis=0)
-            except:
+            except Exception:
                 QMessageBox.information(self.prg.gui, "Warning",
                                         "Savitzky-Golay-Filter Error. Neighbors have been set -2.")
                 try:
                     smooth_matrix = savgol_filter(in_matrix,
                                                   window_length=self.neighbors - 2, polyorder=2, axis=0)
-                except:
+                except Exception:
                     try:
-                        QMessageBox.information(self.prg.gui, "Warning",
-                                                "Savitzky-Golay-Filter Error. Last try: Neighbors have been set -2 once more.")
+                        QMessageBox.information(
+                            self.prg.gui, "Warning", "Savitzky-Golay-Filter Error. Last try: Neighbors have been set "
+                                                     "-2 once more."
+                        )
                         smooth_matrix = savgol_filter(in_matrix,
                                                       window_length=self.neighbors - 2, polyorder=2, axis=0)
-                    except:
+                    except Exception:
                         ValueError("Savitzky-Golay-Filter could not be applied. Try to uncheck filtering.")
 
         else:
@@ -950,7 +946,7 @@ class iREIP_core:
                         try:
                             reip_index_1 = int(reip_index_1)
                             reip_index_2 = int(reip_index_2)
-                        except:
+                        except Exception:
                             reip_pos[:, row, col] = self.nodat[1]
                             continue
 
@@ -1084,7 +1080,7 @@ class Nodat:
         else:
             try:
                 nodat = int(float(self.gui.txtNodat.text()))
-            except:
+            except Exception:
                 QMessageBox.critical(self.gui, "No number",
                                      "'%s' is not a valid number" % self.gui.txtNodat.text())
                 self.gui.txtNodat.setText("")

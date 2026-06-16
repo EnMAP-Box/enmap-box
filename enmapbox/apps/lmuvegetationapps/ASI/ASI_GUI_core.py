@@ -240,7 +240,7 @@ class ASI:
     def get_image_meta(self, image, image_type):
         #try:
         #    dataset: RasterDataset = openRasterDataset(image)
-        #except:
+        #except Exception:
         #    QMessageBox.critical(self.gui, 'Input Image',
         #                         'Image could not be read. Please make sure it is a valid ENVI image')
         #    return
@@ -260,7 +260,7 @@ class ASI:
         try:
             nodata = int(metadict['ENVI']['data ignore value'])
             return nodata, nbands, nrows, ncols, dtype
-        except:
+        except Exception:
             self.main.nodat_widget.init(image_type=image_type, image=image)
             self.main.nodat_widget.gui.setModal(True)  # parent window is blocked
             self.main.nodat_widget.gui.exec_()  # unlike .show(), .exec_() waits with execution of the code, until the app is closed
@@ -428,7 +428,7 @@ class ASI:
                 return
             try:
                 self.division_factor = float(self.gui.spinDivisionFactor.text())
-            except:
+            except Exception:
                 QMessageBox.critical(self.gui, "Error",
                                      "'%s' is not a valid division factor!" % self.gui.spinDivisionFactor.text())
                 return
@@ -522,13 +522,13 @@ class ASI:
             else:
                 try:
                     self.nodat[1] = int(self.gui.txtNodatOutput.text())
-                except:
+                except Exception:
                     QMessageBox.critical(self.gui, "Error",
                                          "'%s' is not a valid  No Data Value!" % self.gui.txtNodatOutput.text())
                     return
             try:
                 self.division_factor = float(self.gui.spinDivisionFactor.text())
-            except:
+            except Exception:
                 QMessageBox.critical(self.gui, "Error",
                                      "'%s' is not a valid division factor!" % self.gui.spinDivisionFactor.text())
                 return
@@ -538,7 +538,7 @@ class ASI:
                     iASI.in_raster = np.divide(iASI.in_raster, self.division_factor)
 
                 del self.core.in_raster
-            except:
+            except Exception:
                 iASI.in_raster = iASI.read_image_window(image=self.image)
                 if self.division_factor != 1.0:
                     iASI.in_raster = np.divide(iASI.in_raster, self.division_factor)
@@ -547,7 +547,7 @@ class ASI:
             result, crs, res3band = iASI.execute_ASI(in_raster=iASI.in_raster,
                                                      prg_widget=self.main.prg_widget,
                                                      qgis_app=self.main.qgis_app)
-            # except:
+            # except Exception:
             #     QMessageBox.critical(self.gui, 'error', "Calculation cancelled.")
             #     self.main.prg_widget.gui.allow_cancel = True
             #     self.main.prg_widget.gui.close()
@@ -634,7 +634,7 @@ class ASI_core:
         if len(self.wl) > 2000:
             try:
                 raster[self.default_exclude, :, :] = 0
-            except:
+            except Exception:
                 pass
         if len(raster) == 242:  # temporary solution for overlapping EnMap-Testdata Bands
             raster = np.delete(raster, self.enmap_exclude, axis=0)  # temporary solution!
@@ -651,7 +651,7 @@ class ASI_core:
         if len(self.wl) > 2000:
             try:
                 raster[self.default_exclude, :, :] = 0
-            except:
+            except Exception:
                 pass
         if len(raster) == 242:  # temporary solution for overlapping EnMap-Testdata Bands
             raster = np.delete(raster, self.enmap_exclude, axis=0)  # temporary solution!
@@ -682,7 +682,7 @@ class ASI_core:
 
         try:
             wave_dict = metadict['ENVI']['wavelength']
-        except:
+        except Exception:
             raise ValueError('No wavelength units provided in ENVI header file')
 
         if metadict['ENVI']['wavelength'] is None:
@@ -790,7 +790,7 @@ class ASI_core:
         x = np.arange(len(in_matrix))
         try:
             in_matrix[self.default_exclude] = 0
-        except:
+        except Exception:
             pass
         self.res3d = np.empty(shape=np.shape(in_matrix))
         for row in range(in_matrix.shape[1]):
@@ -935,7 +935,7 @@ class ASI_core:
                             hull = self.convex_hull(valid_array)
                             try:
                                 hull_x, hull_y = list(zip(*hull))
-                            except:
+                            except Exception:
                                 hull_x = 0
                             full_hull_x = np.append(full_hull_x, hull_x)
                             x = i
@@ -1270,7 +1270,7 @@ class Nodat:
         else:
             try:
                 nodat = int(self.gui.txtNodat.text())
-            except:
+            except Exception:
 
                 QMessageBox.critical(self.gui, "No number", "'%s' is not a valid number" % self.gui.txtNodat.text())
                 self.gui.txtNodat.setText("")

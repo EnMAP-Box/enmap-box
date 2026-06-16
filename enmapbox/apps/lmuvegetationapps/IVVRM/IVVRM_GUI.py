@@ -781,7 +781,7 @@ class IVVRM:
                                      "\nmNSE: %.2f" % mnse +
                                      '\n' + u'R²: %.2f' % r_squared, (100, 200, 255),
                                      border="w", anchor=(1, 0))
-            except:
+            except Exception:
                 errors = pg.TextItem("RMSE: sensors mismatch" +
                                      "\nMAE: sensors mismatch " +
                                      "\nNSE: sensors mismatch" +
@@ -1073,7 +1073,7 @@ class SensorEditor:
 
         try:
             _ = np.loadtxt(file_choice)  # try to open the file
-        except:
+        except Exception:
             self.houston(message="Error loading file with wavelengths. "
                                  "Make sure to provide a single-column file without header")
             self.wl_filename = None
@@ -1267,7 +1267,7 @@ class LoadTxtFile:
                 # if the first row can be converted to int, it most likely does not contain a header
                 _ = int(next(raw)[0])
                 self.header_bool = False
-            except:
+            except Exception:
                 self.header_bool = True
             self.gui.radioHeader.setChecked(self.header_bool)
             self.read_file()  # now read the file for good with the information you have

@@ -12,7 +12,7 @@
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
-                                                                                                                                                 *
+
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -23,25 +23,13 @@
 ***************************************************************************
 """
 
-#from _classic.hubdc.core import openRasterDataset, RasterDataset
-#from _classic.hubflow.core import Raster
-
-# from osgeo import gdal
-# from osgeo.gdalconst import *
-import numpy as np
-# import struct
 import os
 
+import numpy as np
 from scipy.optimize import minimize_scalar
 
-
-# from scipy.interpolate import interp1d
-# from scipy.interpolate import interp1d
-# from numba import jit
-
-# ======================================================================================================================
-# function definitions
-# ======================================================================================================================
+from enmapboxprocessing.driver import Driver
+from enmapboxprocessing.rasterreader import RasterReader
 
 
 class PWR_core:
@@ -77,9 +65,6 @@ class PWR_core:
         # n_wl = len(wl)
         self.get_abscoef = dict(zip(wl, abs_coef))  # Dictionary mapping wavelength to absorption coefficient
 
-        # self.wl_closest = [self.find_closest(wl[i]) for i in range(n_wl) if wl[i] >= self.low_lim and wl[i] <= self.upp_lim] # wavelengths used for inversion that exist in image
-        # self.wl_closest = sorted(list(set(self.wl_closest)))
-
         self.valid_wl = [self.wl[i] for i in range(self.n_wl) if
                          self.wl[i] >= self.low_lim and self.wl[i] <= self.upp_lim]
         self.valid_wl = [int(round(i, 0)) for i in self.valid_wl]
@@ -111,18 +96,20 @@ class PWR_core:
         :param image:
         :return:
         '''
-        dataset: RasterDataset = openRasterDataset(image)
-        ds = dataset.gdalDataset()
+        # dataset: RasterDataset = openRasterDataset(image)
+        reader = RasterReader(image)
 
-        grid = dataset.grid()
-        metadict = dataset.metadataDict()
+        ds = reader.gdalDataset()
+
+        grid = reader.extent(), reader.crs()
+        metadict = reader.metadata()
         nrows = ds.RasterYSize
         ncols = ds.RasterXSize
         nbands = ds.RasterCount
 
         try:
             wave_dict = metadict['ENVI']['wavelength']
-        except:
+        except Exception:
             raise ValueError('No wavelength units provided in ENVI header file')
 
         if metadict['ENVI']['wavelength'] is None:
@@ -137,7 +124,7 @@ class PWR_core:
             raise ValueError("Wavelength units must be nanometers or micrometers. Got '%s' instead" % metadict['ENVI'][
                 'wavelength units'])
 
-        in_matrix = dataset.readAsArray()
+        in_matrix = np.array(reader.array())
 
         if self.division_factor != 1.0:
             in_matrix = in_matrix / self.division_factor
@@ -207,12 +194,17 @@ class PWR_core:
 
     def write_image(self, result):
 
-        output = Raster.fromArray(array=result, filename=self.output, grid=self.grid)
-        output.dataset().setMetadataItem('data ignore value', self.nodat_val[1], 'ENVI')
+        # output = Raster.fromArray(array=result, filename=self.output, grid=self.grid)
+        # output.dataset().setMetadataItem('data ignore value', self.nodat_val[1], 'ENVI')
+        array = result
+        filename = self.output
+        extent, crs = self.grid
+        writer = Driver(filename).createFromArray(array, extent, crs)
 
-        for band in output.dataset().bands():
-            band.setDescription('Plant Active Water [cm]')
-            band.setNoDataValue(self.nodat_val[1])
+        for bandNo in writer.bandNumbers():
+            writer.setBandName('Plant Active Water [cm]', bandNo)
+            writer.setNoDataValue(self.nodat_val[1], bandNo)
+        writer.close()
 
     def prgbar_process(self, pixel_no):
         if self.prg:

@@ -204,7 +204,7 @@ def peakdetect(y_axis, x_axis=None, lookahead=200, delta=0):
             mn = y
             mnpos = x
 
-        ####look for max####
+        ##look for max##
         if y < mx - delta and mx != np.inf:
             # Maxima peak candidate found
             # look ahead in signal to ensure that this is a peak and not jitter
@@ -222,7 +222,7 @@ def peakdetect(y_axis, x_axis=None, lookahead=200, delta=0):
                 #    mx = ahead
                 #    mxpos = x_axis[np.where(y_axis[index:index+lookahead]==mx)]
 
-        ####look for min####
+        ##look for min##
         if y > mn + delta and mn != -np.inf:
             # Minima peak candidate found
             # look ahead in signal to ensure that this is a peak and not jitter
@@ -301,14 +301,14 @@ def peakdetect_fft(y_axis, x_axis, pad_len=20):
     zero_indices = zero_crossings(y_axis, window_len=11)
     # select a n amount of periods
     last_indice = - 1 - (1 - len(zero_indices) & 1)
-    ###
+    #
     # Calculate the fft between the first and last zero crossing
     # this method could be ignored if the beginning and the end of the signal
     # are unnecessary as any errors induced from not using whole periods
     # should mainly manifest in the beginning and the end of the signal, but
     # not in the rest of the signal
     # this is also unnecessary if the given data is an amount of whole periods
-    ###
+    #
     fft_data = fft(y_axis[zero_indices[0]:zero_indices[last_indice]])
     padd = lambda x, c: x[:len(x) // 2] + [0] * c + x[len(x) // 2:]
     n = lambda x: int(log(x) / log(2)) + 1
@@ -767,7 +767,7 @@ def zero_crossings(y_axis, window_len=11,
     # return indices + np.asarray(30 * np.random.randn(len(indices)), int)
 
 
-############################Frequency calculation#############################
+##########Frequency calculation###########
 #    diff = np.diff(indices)
 #    time_p_period = diff.mean()
 #
@@ -777,7 +777,7 @@ def zero_crossings(y_axis, window_len=11,
 #
 #    #return frequency
 #    return 1.0 / time_p_period
-##############################################################################
+##########################
 
 
 def zero_crossings_sine_fit(y_axis, x_axis, fit_window=None, smooth_window=11):

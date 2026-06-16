@@ -533,7 +533,7 @@ class LUT:
                 xVals = np.arange(vals[0], vals[1], xIncr)
                 self.dict_objects[para][12].plot(xVals, norm.pdf(xVals, loc=vals[2], scale=vals[3]),
                                                  clear=True)
-            except:
+            except Exception:
                 pass
 
         elif self.dict_objects[para][2].isChecked():  # uniform
@@ -543,7 +543,7 @@ class LUT:
                 xVals = np.arange(vals[0], vals[1], xIncr)
                 self.dict_objects[para][12].plot(xVals, uniform.pdf(xVals, loc=vals[0], scale=vals[1]),
                                                  clear=True)
-            except:
+            except Exception:
                 pass
 
         elif self.dict_objects[para][3].isChecked():  # logical
@@ -557,7 +557,7 @@ class LUT:
                 self.dict_objects[para][12].plot(clear=True)
                 if vals[1] < 1.0:
                     self.dict_objects[para][12].setrange(xVals[0] - width * 2, xVals[-1] + width * 2)
-            except:
+            except Exception:
                 pass
 
         # return False so that the widget will also handle the actual event
@@ -599,7 +599,7 @@ class LUT:
                     para_modes.append('gauss')
                 else:
                     raise ValueError
-        except:
+        except Exception:
             self.abort(message="Could not import parameters from file. Please make sure you select an unchanged "
                                "_00paras.txt - file")
             return
@@ -1336,7 +1336,7 @@ class SensorEditor:
 
         try:
             _ = np.loadtxt(file_choice)  # try to open the file
-        except:
+        except Exception:
             self.houston(message="Error loading file with wavelengths. "
                                  "Make sure to provide a single-column file without header")
             self.wl_filename = None

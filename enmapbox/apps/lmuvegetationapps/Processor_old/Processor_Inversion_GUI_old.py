@@ -13,7 +13,7 @@
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
-                                                                                                                                                 *
+
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -28,18 +28,20 @@ ANNs are implemented, but the structure is flexible so that new algorithms can a
 add a model selection frame to the GUI in QtDesigner then.
 
 """
-import sys
 import os
+import sys
+
 import numpy as np
+
 import lmuvegetationapps.Processor_old.Processor_Inversion_core_old as processor
 # from _classic.hubdc.core import openRasterDataset
 from enmapbox.gui.utils import loadUi
 from enmapboxprocessing.rasterreader import RasterReader
 from lmuvegetationapps import APP_DIR
-# ensure to call QGIS before PyQtGraph
-from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox, QApplication
 from qgis.core import QgsMapLayerProxyModel
-from qgis.gui import QgsMapLayerComboBox
+
+# ensure to call QGIS before PyQtGraph
 
 pathUI_processor = os.path.join(APP_DIR, 'Resources/UserInterfaces/Processor_Inversion_old.ui')
 pathUI_nodat = os.path.join(APP_DIR, 'Resources/UserInterfaces/Nodat.ui')
@@ -49,9 +51,6 @@ pathUI_prgbar = os.path.join(APP_DIR, 'Resources/UserInterfaces/ProgressBar_old.
 class MLInversionGUI(QDialog):
 
     def __init__(self, parent=None):
-        mLayerImage: QgsMapLayerComboBox
-        mLayerGeometry: QgsMapLayerComboBox
-        mLayerMask: QgsMapLayerComboBox
         super(MLInversionGUI, self).__init__(parent)
         loadUi(pathUI_processor, self)
 
@@ -524,10 +523,10 @@ class MLInversion:
     def get_image_meta(self, image, image_type):
         # extracts meta information from the spectral image
         # dataset = openRasterDataset(image)
-        #if dataset is None:
+        # if dataset is None:
         #    raise ValueError(
         #        '{} could not be read. Please make sure it is a valid ENVI image'.format(image_type))
-        #else:
+        # else:
         #    metadict = dataset.metadataDict()
 
         reader = RasterReader(image)
@@ -540,7 +539,7 @@ class MLInversion:
 
             try:  # try and get no data value and convert it to integer
                 nodata = int(metadict['ENVI']['data ignore value'])
-            except:
+            except Exception:
                 # no dat not found or cannot be interpreted as intereg! No worries, the user can add it manually!
                 self.main.nodat_widget.init(image_type=image_type, image=image)
                 self.main.nodat_widget.gui.setModal(True)  # parent window is blocked
@@ -599,7 +598,7 @@ class MLInversion:
             values = [value.split(';') if ';' in value else value for value in values]
             meta_dict = dict(zip(keys, values))  # dictionary for they keys and values of the ML-meta file
             return meta_dict
-        except:
+        except Exception:
             return False
 
     def run_inversion(self):

@@ -2,18 +2,16 @@
 
 # This module handles the GUI of the Vegetation Index Toolbox
 
+import os
 import sys
 
 import lmuvegetationapps.VIT.VIT_core
-# from _classic.hubdc.core import openRasterDataset
 from enmapbox.gui.utils import loadUi
 from enmapboxprocessing.rasterreader import RasterReader
 from lmuvegetationapps import APP_DIR
-from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.QtWidgets import (QDialog, QCheckBox, QFileDialog, QMessageBox, QApplication)
 from qgis.core import QgsMapLayerProxyModel
 from qgis.gui import QgsMapLayerComboBox
-import os
-
 
 pathUI_vit = os.path.join(APP_DIR, 'Resources/UserInterfaces/VIT.ui')
 pathUI_nodat = os.path.join(APP_DIR, 'Resources/UserInterfaces/Nodat.ui')
@@ -234,7 +232,7 @@ class VIT:
             try:
                 _, self.outExtension = os.path.splitext(out_file)
                 self.outFileName = os.path.basename(out_file)
-            except:
+            except Exception:
                 self.outExtension = '.bsq'
                 self.outFileName = os.path.basename(out_file)
                 print(self.outFileName)
@@ -246,7 +244,8 @@ class VIT:
             self.dtype = meta[4]
             if self.dtype < 4 or self.dtype > 9:
                 QMessageBox.information(self.gui, "Integer Input",
-                                        "Integer input image:\nTool requires float [0.0-1.0]:\nDivision factor set to 10000")
+                                        "Integer input image:\nTool requires float [0.0-1.0]:\nDivision factor "
+                                        "set to 10000")
                 self.division_factor = 10000
                 self.gui.txtDivisionFactor.setText(str(self.division_factor))
         except ValueError as e:
@@ -262,11 +261,11 @@ class VIT:
             self.nodat[0] = meta[0]
 
     def get_image_meta(self, image, image_type):
-        #dataset = openRasterDataset(image)
-        #if dataset is None:
+        # dataset = openRasterDataset(image)
+        # if dataset is None:
         #    raise ValueError(
         #        '%s could not be read. Please make sure it is a valid ENVI image' % image_type)
-        #else:
+        # else:
         #    metadict = dataset.metadataDict()
 
         reader = RasterReader(image)
@@ -282,10 +281,11 @@ class VIT:
             try:
                 nodata = int(metadict['ENVI']['data ignore value'])
                 return nodata, nbands, nrows, ncols, dtype
-            except:
+            except Exception:
                 self.main.nodat_widget.init(image_type=image_type, image=image)
                 self.main.nodat_widget.gui.setModal(True)  # parent window is blocked
-                self.main.nodat_widget.gui.exec_()  # unlike .show(), .exec_() waits with execution of the code, until the app is closed
+                self.main.nodat_widget.gui.exec_()  # unlike .show(), .exec_() waits with execution of the code,
+                # until the app is closed
                 return self.main.nodat_widget.nodat, nbands, nrows, ncols, dtype
 
     def exit_gui(self):
@@ -359,7 +359,7 @@ class VIT:
         try:
             index_out_matrix = vit.calculate_VIT(prg_widget=self.main.prg_widget,
                                                  qgis_app=self.main.qgis_app)
-        except:
+        except Exception:
             QMessageBox.critical(self.gui, 'error', "An unspecific error occured.")
             self.main.prg_widget.gui.allow_cancel = True
             self.main.prg_widget.gui.close()
@@ -371,7 +371,7 @@ class VIT:
         # try:
         vit.write_out(index_out_matrix=index_out_matrix, out_dir=self.outDir, out_filename=self.outFileName,
                       out_single=self.out_single)
-        # except:
+        # except Exception:
         #     QMessageBox.critical(self.gui, 'error', "An unspecific error occured while trying to write image data")
         #     self.main.prg_widget.gui.allow_cancel = True
         #     return
@@ -408,7 +408,7 @@ class Nodat:
         else:
             try:
                 nodat = int(self.gui.txtNodat.text())
-            except:
+            except Exception:
                 QMessageBox.critical(self.gui, "No number",
                                      "'%s' is not a valid number" % self.gui.txtNodat.text())
                 self.gui.txtNodat.setText("")

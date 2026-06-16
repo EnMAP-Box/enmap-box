@@ -89,7 +89,7 @@ class PRG_GUI(QDialog):
             event.ignore()
 
 
-# class GlobalInversion manages the GUI for the inversion tool ###
+# class GlobalInversion manages the GUI for the inversion tool #
 class GlobalInversion:
 
     def __init__(self, main):

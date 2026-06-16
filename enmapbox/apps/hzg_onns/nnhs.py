@@ -113,7 +113,7 @@ class nnhs():
             print('input:', self.invar[i], 'out of range:', self.oorange[i])  # MH: 20181207 - python 3.0 ney syntax!
 
 
-#######################################################################
+#########################
 # test
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
