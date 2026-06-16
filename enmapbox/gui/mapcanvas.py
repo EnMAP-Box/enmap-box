@@ -22,7 +22,7 @@ import warnings
 from _weakrefset import WeakSet
 from typing import List, Optional, Dict
 
-from PyQt5.QtWidgets import QWidget
+from qgis.PyQt.QtWidgets import QWidget
 
 from enmapbox import enmapboxSettings
 from enmapbox.enmapboxsettings import EnMAPBoxSettings

@@ -1,25 +1,24 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright © 2019 Stéphane Guillaso
-# Licensed under the terms of 
+# Licensed under the terms of
 # (see ../../LICENSE.md for details)
 
-import numpy as np
-import hys
-import os # <-- to be removed
 # import importlib
 import numba as nb
+import numpy as np
 
-__bands__    = [2133, 2209, 2225]
+__bands__ = [2133, 2209, 2225]
 __filename__ = "_Clay_SWIRFI"
-__gui__      = "Clay Content SWIR Fine particle Index"
-__info__     = "This parameter estimates the clay mineral content:\n\n" + \
-    "           R_2133^2       \n" + \
-    " ind = ------------------\n" + \
-    "        R_2225 . R_2209^3  \n\n" + \
-    "Levin, N., Kidron, G.J., Ben-Dor, E., (2007)\n"+\
-    "Surface properties of stabilizing coastal dunes: combining spectral\n"+\
-    "field analyses. Sedimentology 54, 771–788."
+__gui__ = "Clay Content SWIR Fine particle Index"
+__info__ = "This parameter estimates the clay mineral content:\n\n" + \
+           "           R_2133^2       \n" + \
+           " ind = ------------------\n" + \
+           "        R_2225 . R_2209^3  \n\n" + \
+           "Levin, N., Kidron, G.J., Ben-Dor, E., (2007)\n" + \
+           "Surface properties of stabilizing coastal dunes: combining spectral\n" + \
+           "field analyses. Sedimentology 54, 771–788."
+
 
 def check_bands(ubands, wvl):
     ind1 = int(ubands[0])
@@ -30,11 +29,11 @@ def check_bands(ubands, wvl):
     return True, "Has been calculated!\n"
 
 
-@nb.jit(nb.float32[:,:](nb.float32[:,:,:], nb.float32[:], nb.int32[:], nb.int32[:,:]), nopython=True, fastmath=True)
+@nb.jit(nb.float32[:, :](nb.float32[:, :, :], nb.float32[:], nb.int32[:], nb.int32[:, :]), nopython=True, fastmath=True)
 def process(cube, wvl, ind, mask):
     ny = cube.shape[1]
     nx = cube.shape[2]
-    prod = np.zeros((ny, nx), dtype = np.float32)
+    prod = np.zeros((ny, nx), dtype=np.float32)
     for ky in range(ny):
         for kx in range(nx):
             if mask is not None:

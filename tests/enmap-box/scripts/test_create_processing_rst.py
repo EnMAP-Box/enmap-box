@@ -108,8 +108,8 @@ class CreateProcessingRSTTestCases(TestCase):
 
         algs = EnMAPBoxProcessingProvider.instance().algorithms()
         algs = algs[0:100]
-        t0 = datetime.datetime.now()
-        results1 = collectQgsProcessAlgorithmHelp(algs)
+        datetime.datetime.now()
+        collectQgsProcessAlgorithmHelp(algs)
 
     def test_script(self):
         dir_tmp = self.createTestOutputDirectory()

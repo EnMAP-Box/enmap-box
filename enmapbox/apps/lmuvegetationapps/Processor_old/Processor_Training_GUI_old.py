@@ -36,10 +36,9 @@ import numpy as np
 import lmuvegetationapps.Processor_old.Processor_Inversion_core_old as processor
 from enmapbox.gui.utils import loadUi
 from lmuvegetationapps import APP_DIR
-# ensure to call QGIS before PyQtGraph
-from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox, QApplication
 
-# from _classic.hubflow.core import *
+# ensure to call QGIS before PyQtGraph
 
 pathUI_train = os.path.join(APP_DIR, 'Resources/UserInterfaces/Processor_Train_old.ui')
 pathUI_wavelength = os.path.join(APP_DIR, 'Resources/UserInterfaces/Select_Wavelengths.ui')

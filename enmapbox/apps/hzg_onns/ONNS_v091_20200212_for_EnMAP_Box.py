@@ -674,7 +674,7 @@ def prepare_processor_input_VIIRS(inpath, infile):
 
 
 def sensor_band_adapter(path_to_NN, Rrs_in, sensor, adapt):
-    ###
+    #
     # Transformation of NN input data - must be remote-sensing reflectance
 
     rrs = np.log10(Rrs_in + 0.001)
@@ -806,7 +806,7 @@ def sensor_band_adapter(path_to_NN, Rrs_in, sensor, adapt):
 
         Rrs_ONNS_new[:, :] = 10 ** out1[:, :] - 0.001
 
-        ###
+        #
     # If Adapter NN fails and results in NaNs
 
     ID = np.isnan(Rrs_ONNS_new[:, 0])
@@ -831,7 +831,7 @@ def classify_clustering_fuzzy(
     weights = (0.1, 0.5, 1, 1, 1, 1, 1, 1, 0.8, 0.8, 0.2)  # MH: Wheighting of influence of singel wave bands
     weights = np.array([np.float(x) for x in weights])
 
-    ###
+    #
     # read parameters from log-file of Clustering!
 
     f = open(os.path.join(path_to_classes, "logfile.txt"), 'r')
@@ -860,20 +860,20 @@ def classify_clustering_fuzzy(
     matching = [s for s in test if "Clustering" in s][0]
     Ncluster = [int(s) for s in matching.strip("Clustering N=").split()][0]
 
-    ####
+    ##
     # Special log transformation, in this version, usually addLog = 1 is added to Rrs
 
     if log_transform:
         Rrs_ONNS = np.log10(Rrs_ONNS + addLog)
 
-    ###
+    #
     # Selecting Wavelengths for classification! (might be important to do before scaling! otherwise 'wrong'
     # contributions have still influence.
 
     IDrrs = list(range(Nvar))
     # IDrrs = np.array(range(1,Nvar)) #omits 400nm
 
-    ####
+    ##
     # Brightness-scaling of reflectance data
 
     d_all = np.copy(Rrs_ONNS[:, IDrrs])
@@ -891,7 +891,7 @@ def classify_clustering_fuzzy(
 
         d_all = Rrs_ONNS[:, IDrrs]
 
-    ####
+    ##
     # Read Covariance + Cluster means
 
     filename = os.path.join(path_to_classes, 'class_cov.nc')
@@ -904,7 +904,7 @@ def classify_clustering_fuzzy(
     new_means = np.array(a['cluster_means'])
     a.close()
 
-    ####
+    ##
     # Calculate weighted distances!
 
     dist = np.empty([Rrs_ONNS.shape[0], Ncluster])
@@ -978,7 +978,7 @@ def classify_clustering_fuzzy(
 
 
 def ONNS(path_to_NN, Rrs_ONNS, m2):
-    ###
+    #
     # Transformation of NN input data - must be remote-sensing reflectance
 
     rrs = np.log10(Rrs_ONNS + 0.001)
@@ -1002,7 +1002,7 @@ def ONNS(path_to_NN, Rrs_ONNS, m2):
         nn2 = nnhs.nnhs(os.path.join(path_to_NN, netnames[0]))
         outvar = nn2.outvar
 
-        ###
+        #
         # Calculate NN output per water class
 
         # largest 3D matrix - danger of memory error!
@@ -1030,7 +1030,7 @@ def ONNS(path_to_NN, Rrs_ONNS, m2):
 
             del out1  # MH: clear workspace
 
-        ###
+        #
         # Combine NN results with memberships per water class and write to nc-product.
         # MH: small differences occur depending where the wheighting of results is applied
         # before or after back-logarithmization: after weighting is more logical,
@@ -1120,7 +1120,7 @@ def background_NN(path_to_NN, Rrs_ONNS):  # MH: alternative NNs that are applied
     out2 = np.zeros((rrs.shape[0], 5))
     out3 = np.zeros((rrs.shape[0], 5))
 
-    ###
+    #
     # Case 1 --> maximum of Rrs <490 nm
 
     ID = np.where(Case)[0]  # MH: List with Case 1 cases
@@ -1140,7 +1140,7 @@ def background_NN(path_to_NN, Rrs_ONNS):  # MH: alternative NNs that are applied
         out2[ID[ll], :] = nn2.ff_nnhs(input)
         out3[ID[ll], :] = nn3.ff_nnhs(input)
 
-        ###
+        #
     # Case 2 --> maximum of Rrs >= 490 nm
 
     ID = np.where(Case is False)[0]  # MH: List with Case 2 cases
@@ -1160,7 +1160,7 @@ def background_NN(path_to_NN, Rrs_ONNS):  # MH: alternative NNs that are applied
         out2[ID[ll], :] = nn2.ff_nnhs(input)
         out3[ID[ll], :] = nn3.ff_nnhs(input)
 
-        ###
+        #
     # back-log-transform of total results
 
     for k in range(3):
@@ -1180,7 +1180,7 @@ def background_NN(path_to_NN, Rrs_ONNS):  # MH: alternative NNs that are applied
 
 
 def apply_BIAS_NN(path_to_NN, total_out_weighted, m2):
-    ###
+    #
     # Reading Results of NNs for IOPs, FU, Conc - combined in one file
 
     Variables = ['Chl', 'ISM', 'a_g_440', 'a_p_440', 'a_m_440', 'b_p_440', 'b_m_440', 'FU', 'K_d_490', 'K_u_490',
@@ -1350,7 +1350,7 @@ def save_results(outname, maxMemb, m, m2, total_membership, total_out_weighted, 
     out.band_adaptation_info = ('Option for band shifting: 0 = no band adaptation (default), 1 = only band 400nm '
                                 'is adapted (replaced), 2 = all bands are adapted (replaced) from input')
 
-    ###
+    #
     # Save all masks and L1 and L2 information
 
     out.createDimension('x', valid.shape[0])
@@ -1634,7 +1634,7 @@ def save_results(outname, maxMemb, m, m2, total_membership, total_out_weighted, 
         test.long_name = Dscr_1[i]
         test.coordinates = 'lat lon'
 
-        ###
+        #
     # Save variables for uncertainty, where only a_g_440 is used
     Variables_2 = ['Chl_ONNS_uncertainty', 'ISM_ONNS_uncertainty', 'a_g_440_ONNS_uncertainty',
                    'a_p_440_ONNS_uncertainty', 'a_m_440_ONNS_uncertainty', 'b_p_440_ONNS_uncertainty',
@@ -1670,7 +1670,7 @@ def save_results(outname, maxMemb, m, m2, total_membership, total_out_weighted, 
 
     if (output_size > 0):
 
-        ###
+        #
         # Save all atmospheric corrected remote sensing reflectances at ONNS bands
 
         Variables_3 = ['Rrs_400', 'Rrs_412', 'Rrs_442', 'Rrs_490', 'Rrs_510', 'Rrs_560', 'Rrs_620', 'Rrs_665',
@@ -1820,7 +1820,7 @@ def save_results_txt(outname, outname_1, outname_2, outname_3, maxMemb, m, m2, t
                      total_out_bNN, total_out_merged, total_BIAS_out_weighted, flag_nonclassify, flag_lowmember_01,
                      flag_lowmember_03, flag_lowmember_05, flag_lowmember_09, flag_ONNS_valid, Rrs_ONNS, flag_Case_bNN,
                      version, output_size, lambda_Rrs_max, P_ID):
-    ###
+    #
     # One file with ONNS products - reduced or full output
 
     f = open(outname, 'a')

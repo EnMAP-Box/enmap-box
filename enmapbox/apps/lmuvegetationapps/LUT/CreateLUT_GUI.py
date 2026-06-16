@@ -12,7 +12,7 @@
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
-                                                                                                                                                 *
+
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -31,19 +31,18 @@ import sys
 import numpy as np
 # ensure to call QGIS before PyQtGraph
 import pyqtgraph as pg
-
-from enmapboxprocessing.rasterreader import RasterReader
-from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox, QTableWidgetItem, QHeaderView, QApplication
 from scipy.interpolate import interp1d
 from scipy.stats import norm, uniform
 
 import lmuvegetationapps.Resources.PROSAIL.call_model as mod
 # from _classic.hubflow.core import openRasterDataset
 from enmapbox.gui.utils import loadUi
+from enmapboxprocessing.rasterreader import RasterReader
 from lmuvegetationapps import APP_DIR
 from lmuvegetationapps.Resources.Spec2Sensor.Spec2Sensor_core import Spec2Sensor, BuildTrueSRF, BuildGenericSRF
-from qgis.PyQt.QtWidgets import *
-from qgis.gui import *
+from qgis.PyQt import QtCore
+from qgis.PyQt.QtGui import QColor
 from qgis.gui import QgsMapLayerComboBox
 
 pathUI_LUT = os.path.join(APP_DIR, 'Resources/UserInterfaces/CreateLUT.ui')
@@ -153,9 +152,9 @@ class LUT:
         self.para_flat = [item for sublist in self.para_list for item in sublist]  # flat list of para_list
         self.npara_flat = len(self.para_flat)  # number of parameters in total (independent of chosen Prospect)
 
-        self.N, self.cab, self.cw, self.cm, self.car, self.cbrown, self.anth, self.cp, self.cbc, \
-            self.LAI, self.LIDF, self.hspot, self.tto, self.tts, self.psi, self.psoil, self.LAIu, self.sd, self.h, self.cd \
-            = ([] for _ in range(self.npara_flat))  # all parameters are initialized as empty lists
+        (self.N, self.cab, self.cw, self.cm, self.car, self.cbrown, self.anth, self.cp, self.cbc,
+            self.LAI, self.LIDF, self.hspot, self.tto, self.tts, self.psi, self.psoil, self.LAIu, self.sd, self.h,
+         self.cd) = ([] for _ in range(self.npara_flat))  # all parameters are initialized as empty lists
 
         self.depends = 0  # 0: no dependency of car-cab; 1: dependency is turned on
         self.depends_cp_cbc = 0
@@ -510,7 +509,8 @@ class LUT:
         if para is None:  # if no para is passed (FocusOut-Event)
             for pp in self.dict_objects:  # browse through all parameters
                 if widget in self.dict_objects[pp]:
-                    # when widget (that called the event) is found in the para objects, then cancel the search and keep para
+                    # when widget (that called the event) is found in the para objects, then cancel the search and
+                    # keep para
                     para = pp
                     break
 
@@ -533,7 +533,7 @@ class LUT:
                 xVals = np.arange(vals[0], vals[1], xIncr)
                 self.dict_objects[para][12].plot(xVals, norm.pdf(xVals, loc=vals[2], scale=vals[3]),
                                                  clear=True)
-            except:
+            except Exception:
                 pass
 
         elif self.dict_objects[para][2].isChecked():  # uniform
@@ -543,7 +543,7 @@ class LUT:
                 xVals = np.arange(vals[0], vals[1], xIncr)
                 self.dict_objects[para][12].plot(xVals, uniform.pdf(xVals, loc=vals[0], scale=vals[1]),
                                                  clear=True)
-            except:
+            except Exception:
                 pass
 
         elif self.dict_objects[para][3].isChecked():  # logical
@@ -557,7 +557,7 @@ class LUT:
                 self.dict_objects[para][12].plot(clear=True)
                 if vals[1] < 1.0:
                     self.dict_objects[para][12].setrange(xVals[0] - width * 2, xVals[-1] + width * 2)
-            except:
+            except Exception:
                 pass
 
         # return False so that the widget will also handle the actual event
@@ -576,7 +576,7 @@ class LUT:
             with open(file_choice, 'r') as para_meta:
                 metacontent = para_meta.readlines()
                 metacontent = [line.rstrip('\n') for line in metacontent]
-            name = metacontent[0].split("=")[1]
+            # name = metacontent[0].split("=")[1]
             lop = metacontent[1].split("=")[1]
             canopy_arch = metacontent[2].split("=")[1]
             depends = int(metacontent[3].split("#")[0].split("=")[1])
@@ -599,7 +599,7 @@ class LUT:
                     para_modes.append('gauss')
                 else:
                     raise ValueError
-        except:
+        except Exception:
             self.abort(message="Could not import parameters from file. Please make sure you select an unchanged "
                                "_00paras.txt - file")
             return
@@ -614,8 +614,10 @@ class LUT:
         self.init_dependency(which='car_cab')
 
         # Check if the LOP and Canopy_arch_model are known and set in the GUI accordingly
-        if (lop in ["prospectPro", "prospectD", "prospect5B", "prospect5", "prospect4"]) and \
-                (canopy_arch in ["None", "sail", "inform"]):
+        if (
+            (lop in ["prospectPro", "prospectD", "prospect5B", "prospect5", "prospect4"])
+            and (canopy_arch in ["None", "sail", "inform"])
+        ):
             self.select_model(lop=lop, canopy_arch=canopy_arch)
             if lop == 'prospectPro':
                 self.gui.B_ProspectPro.setChecked(True)
@@ -889,24 +891,32 @@ class LUT:
                 continue  # ignore error of missing values when car is set in dependency to cab
 
             elif len(self.dict_vals[self.para_list[0][i]]) > 3:  # gauss distribution, out of range?
-                if self.dict_vals[self.para_list[0][i]][2] > self.dict_vals[self.para_list[0][i]][1] or \
-                        self.dict_vals[self.para_list[0][i]][2] < self.dict_vals[self.para_list[0][i]][0]:
+                if (
+                    self.dict_vals[self.para_list[0][i]][2] > self.dict_vals[self.para_list[0][i]][1]
+                    or self.dict_vals[self.para_list[0][i]][2] < self.dict_vals[self.para_list[0][i]][0]
+                ):
                     self.abort(message='Parameter %s: mean value must lie between min and max' % self.para_list[0][i])
                     return False
-                elif self.dict_vals[self.para_list[0][i]][0] < self.dict_boundaries[key][0] or \
-                        self.dict_vals[self.para_list[0][i]][1] > self.dict_boundaries[key][1]:
+                elif (
+                    self.dict_vals[self.para_list[0][i]][0] < self.dict_boundaries[key][0]
+                    or self.dict_vals[self.para_list[0][i]][1] > self.dict_boundaries[key][1]
+                ):
                     self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[0][i])
                     return False
 
             elif len(self.dict_vals[self.para_list[0][i]]) > 1:  # uniform distribution, out of range?
-                if self.dict_vals[self.para_list[0][i]][0] < self.dict_boundaries[key][0] or \
-                        self.dict_vals[self.para_list[0][i]][1] > self.dict_boundaries[key][1]:
+                if (
+                    self.dict_vals[self.para_list[0][i]][0] < self.dict_boundaries[key][0]
+                    or self.dict_vals[self.para_list[0][i]][1] > self.dict_boundaries[key][1]
+                ):
                     self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[0][i])
                     return False
 
             elif len(self.dict_vals[self.para_list[0][i]]) > 0:  # fixed value our of range?
-                if self.dict_vals[self.para_list[0][i]][0] < self.dict_boundaries[key][0] or \
-                        self.dict_vals[self.para_list[0][i]][0] > self.dict_boundaries[key][1]:
+                if (
+                    self.dict_vals[self.para_list[0][i]][0] < self.dict_boundaries[key][0]
+                    or self.dict_vals[self.para_list[0][i]][0] > self.dict_boundaries[key][1]
+                ):
                     self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[0][i])
                     return False
 
@@ -916,24 +926,32 @@ class LUT:
                     continue
 
                 elif len(self.dict_vals[self.para_list[1][i]]) > 3:  # gauss distribution, out of range?
-                    if self.dict_vals[self.para_list[1][i]][2] > self.dict_vals[self.para_list[1][i]][1] or \
-                            self.dict_vals[self.para_list[1][i]][2] < self.dict_vals[self.para_list[1][i]][0]:
+                    if (
+                        self.dict_vals[self.para_list[1][i]][2] > self.dict_vals[self.para_list[1][i]][1]
+                        or self.dict_vals[self.para_list[1][i]][2] < self.dict_vals[self.para_list[1][i]][0]
+                    ):
                         self.abort(
                             message='Parameter %s: mean value must lie between min and max' % self.para_list[1][i])
                         return False
-                    elif self.dict_vals[self.para_list[1][i]][0] < self.dict_boundaries[key][0] or \
-                            self.dict_vals[self.para_list[1][i]][1] > self.dict_boundaries[key][1]:
+                    elif (
+                        self.dict_vals[self.para_list[1][i]][0] < self.dict_boundaries[key][0]
+                        or self.dict_vals[self.para_list[1][i]][1] > self.dict_boundaries[key][1]
+                    ):
                         self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[1][i])
                         return False
 
                 elif len(self.dict_vals[self.para_list[1][i]]) > 1:  # uniform distribution, out of range?
-                    if self.dict_vals[self.para_list[1][i]][0] < self.dict_boundaries[key][0] or \
-                            self.dict_vals[self.para_list[1][i]][1] > self.dict_boundaries[key][1]:
+                    if (
+                        self.dict_vals[self.para_list[1][i]][0] < self.dict_boundaries[key][0]
+                        or self.dict_vals[self.para_list[1][i]][1] > self.dict_boundaries[key][1]
+                    ):
                         self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[1][i])
                         return False
                 elif len(self.dict_vals[self.para_list[1][i]]) > 0:  # fixed value our of range?
-                    if self.dict_vals[self.para_list[1][i]][0] < self.dict_boundaries[key][0] or \
-                            self.dict_vals[self.para_list[1][i]][0] > self.dict_boundaries[key][1]:
+                    if (
+                        self.dict_vals[self.para_list[1][i]][0] < self.dict_boundaries[key][0]
+                        or self.dict_vals[self.para_list[1][i]][0] > self.dict_boundaries[key][1]
+                    ):
                         self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[1][i])
                         return False
 
@@ -1286,8 +1304,8 @@ class SensorEditor:
 
     def image_read(self):  # read only necessary info: fwhm and center wavelengths
         inras = self.image
-        #image = openRasterDataset(inras)
-        #meta = image.metadataDict()
+        # image = openRasterDataset(inras)
+        # meta = image.metadataDict()
 
         reader = RasterReader(inras)
         meta = reader.metadata()
@@ -1336,7 +1354,7 @@ class SensorEditor:
 
         try:
             _ = np.loadtxt(file_choice)  # try to open the file
-        except:
+        except Exception:
             self.houston(message="Error loading file with wavelengths. "
                                  "Make sure to provide a single-column file without header")
             self.wl_filename = None
@@ -1402,9 +1420,9 @@ class SensorEditor:
             text = "Create Generic SRF from Imagery OK: " + str(len(self.x[:, 0])) + " Bands."
             self.gui.label.setText(text)
             if len(self.outreach) > 0:
-                text = "Create Generic SRF from Imagery OK with " + str(
-                    len(self.x[:, 0])) + " Bands but Caution! " + str(len(self.outreach)) + \
-                       " wavelengths outside PROSAIL range will be deleted!"
+                text = ("Create Generic SRF from Imagery OK with " + str(len(self.x[:, 0]))
+                        + " Bands but Caution! " + str(len(self.outreach))
+                        + " wavelengths outside PROSAIL range will be deleted!")
                 self.gui.label.setStyleSheet("color: rgb(170, 130, 0);")
                 self.gui.label.setText(text)
             self.gui.cmdOK.setEnabled(True)

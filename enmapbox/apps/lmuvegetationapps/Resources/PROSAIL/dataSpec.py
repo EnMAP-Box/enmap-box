@@ -25,7 +25,7 @@ import numpy as np
 # Lambda:
 lambd = np.arange(400, 2501)
 
-## PROSPECTPro
+# PROSPECTPro
 
 # Refractive Index:
 Ppro_refractive = np.array(
@@ -2216,7 +2216,7 @@ Ppro_tav90n = np.array(
      0.943471735, 0.943455233, 0.943438734, 0.943405738, 0.943389242, 0.943356255, 0.943339763, 0.943306783,
      0.943273809, 0.94324084, 0.943207876, 0.943174917])
 
-## PROSPECT_D
+# PROSPECT_D
 
 # Refractive Index:
 PD_refractive = np.array([1.5115, 1.5115, 1.5115, 1.5115, 1.5115, 1.5115, 1.5108, 1.5101, 1.5095, 1.5088,
@@ -4764,7 +4764,7 @@ PD_tav90n = np.array(
      0.94333976296563704, 0.94330678328559681, 0.94327380887836354, 0.94324083973769379, 0.94320787585724419,
      0.94317491723078739])[np.newaxis, :]
 
-### PROSAIL-5
+# PROSAIL-5
 
 # Refractive Index:
 P5_refractive = np.array(
@@ -6889,8 +6889,7 @@ P5_tav90n = np.array(
      0.94333976296563704, 0.94330678328559681, 0.94327380887836354, 0.94324083973769379, 0.94320787585724419,
      0.94317491723078739])
 
-###### PROSAIL 4
-
+# PROSAIL 4
 # Refractive Index:
 P4_refractive = np.array([1.4963, 1.4970, 1.4976, 1.4984, 1.4995, 1.5006, 1.5017, 1.5029, 1.5044, 1.5057,
                           1.5069, 1.5079, 1.5093, 1.5108, 1.5124, 1.5139, 1.5154, 1.5168, 1.5182, 1.5197,
@@ -7743,7 +7742,7 @@ P4_k_Cm = np.array(
      3.953E+01, 3.960E+01, 3.958E+01, 3.954E+01, 3.940E+01, 3.936E+01, 3.917E+01, 3.926E+01, 3.893E+01, 3.921E+01,
      3.871E+01])
 
-### Direct Energy from the sun
+# Direct Energy from the sun
 
 Es = np.array(
     [5.910E-01, 5.980E-01, 6.050E-01, 6.120E-01, 6.190E-01, 6.260E-01, 6.330E-01, 6.400E-01, 6.470E-01, 6.540E-01,
@@ -9483,4 +9482,3 @@ if __name__ == '__main__':
     plt.legend()
     plt.savefig(r"D:\ECST_III\Papers\2017_ISD\5th submission RS\Figures\refractive_index.png", dpi=700)
     plt.show()
-   

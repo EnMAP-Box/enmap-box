@@ -21,7 +21,6 @@
 
 import os
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu
 from enmapbox.gui.applications import EnMAPBoxApplication
 from lmuvegetationapps import APP_DIR
 
@@ -134,9 +133,3 @@ class LMU_EnMAPBoxApp(EnMAPBoxApplication):
         from lmuvegetationapps.Processor.Processor_Training_GUI import MainUiFunc
         m = MainUiFunc()
         m.show()
-
-
-### Interfaces to use algorithms in algorithms.py within
-### QGIS Processing Framework
-
-

@@ -1,23 +1,19 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright © 2019 Stéphane Guillaso
-# Licensed under the terms of 
+# Licensed under the terms of
 # (see ../../LICENSE.md for details)
 
-import numpy as np
-import hys
-import os # <-- to be removed
 # import importlib
-import numba as nb
 
-__bands__    = [500, 2410, 2390]
+__bands__ = [500, 2410, 2390]
 __filename__ = "_MOISTURE_SMGM"
-__gui__      = "Soil Moisture Gaussian Model (SMGM)"
-__info__     = "Estimate the soil moisture content by using a Gaussian model.\n\n"+\
-    "Whiting, M.L., Li, L., Ustin, S.L., 2004.\n"+\
-    "Predicting water content using Gaussian model on soil spectra.\n"+\
-    "Remote Sens. Environ. 89, 535–552."
-    
+__gui__ = "Soil Moisture Gaussian Model (SMGM)"
+__info__ = "Estimate the soil moisture content by using a Gaussian model.\n\n" + \
+           "Whiting, M.L., Li, L., Ustin, S.L., 2004.\n" + \
+           "Predicting water content using Gaussian model on soil spectra.\n" + \
+           "Remote Sens. Environ. 89, 535–552."
+
 # def check_bands(ubands, wvl):
 #     ind0 = int(ubands[0])
 #     ind1 = int(ubands[1])

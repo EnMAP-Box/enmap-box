@@ -11,8 +11,7 @@
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
-    (at your option) any later version.
-                                                                                                                                                 *
+    (at your option) any later version
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -29,20 +28,19 @@ retrieval of biochemical vegetation traits. International Journal of Applied Ear
 https://doi.org/10.1016/j.jag.2020.102219
 """
 
+import os
 import sys
 
-#import pyqtgraph as pg
-from scipy.interpolate import *
 import numpy as np
-import os
-# from _classic.hubflow.core import openRasterDataset, RasterDataset, EnviDriver
+from qgis.PyQt.QtWidgets import QDialog, QApplication, QFileDialog, QMessageBox
+from scipy.interpolate import interp1d
+
+from arcoop.andreas_rabe.pyqtgraph.examples.ExampleApp import QColor
 from enmapbox.gui.utils import loadUi
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader
 from lmuvegetationapps import APP_DIR
-from lmuvegetationapps.ASI.peakdetect import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
+from lmuvegetationapps.ASI.peakdetect import peakdetect
 from qgis.core import QgsMapLayerProxyModel
 from qgis.gui import QgsMapLayerComboBox
 
@@ -78,7 +76,6 @@ class ASI_GUI(QDialog):
 
         self.btnBackgroundColor.colorChanged.connect(self.setBackgroundColor)
         self.btnAxisColor = QgsColorButton()
-        # self.btnAxisColor.colorChanged.connect([self.setAxisColor(canvas, QColor('white')) for canvas in self.plotItems])
 
         self.rangeView.setBackground(QColor('black'))
         self.crsView.setBackground(QColor('black'))
@@ -224,8 +221,10 @@ class ASI:
         else:
             self.dtype = meta[4]
         if self.dtype == 2 or self.dtype == 3 or self.dtype == 4 or self.dtype == 5:
-            QMessageBox.information(self.gui, "Integer Input",
-                                    "Integer input image:\nTool requires float [0.0-1.0]:\nDivision factor set to 10000")
+            QMessageBox.information(
+                self.gui, "Integer Input",
+                "Integer input image:\nTool requires float [0.0-1.0]:\nDivision factor set to 10000"
+            )
             self.division_factor = 10000
             self.gui.spinDivisionFactor.setText(str(self.division_factor))
         if None in meta:
@@ -238,16 +237,16 @@ class ASI:
             self.nodat[0] = meta[0]
 
     def get_image_meta(self, image, image_type):
-        #try:
+        # try:
         #    dataset: RasterDataset = openRasterDataset(image)
-        #except:
+        # except Exception:
         #    QMessageBox.critical(self.gui, 'Input Image',
         #                         'Image could not be read. Please make sure it is a valid ENVI image')
         #    return
 
         reader = RasterReader(image)
 
-        #ds = dataset.gdalDataset()
+        # ds = dataset.gdalDataset()
 
         ds = reader.gdalDataset
         metadict = reader.metadata()
@@ -260,10 +259,10 @@ class ASI:
         try:
             nodata = int(metadict['ENVI']['data ignore value'])
             return nodata, nbands, nrows, ncols, dtype
-        except:
+        except Exception:
             self.main.nodat_widget.init(image_type=image_type, image=image)
             self.main.nodat_widget.gui.setModal(True)  # parent window is blocked
-            self.main.nodat_widget.gui.exec_()  # unlike .show(), .exec_() waits with execution of the code, until the app is closed
+            self.main.nodat_widget.gui.exec_()  # unlike .show(), .exec_() waits with execution of the code
             return self.main.nodat_widget.nodat, nbands, nrows, ncols, dtype
 
     def reset(self):
@@ -428,7 +427,7 @@ class ASI:
                 return
             try:
                 self.division_factor = float(self.gui.spinDivisionFactor.text())
-            except:
+            except Exception:
                 QMessageBox.critical(self.gui, "Error",
                                      "'%s' is not a valid division factor!" % self.gui.spinDivisionFactor.text())
                 return
@@ -522,13 +521,13 @@ class ASI:
             else:
                 try:
                     self.nodat[1] = int(self.gui.txtNodatOutput.text())
-                except:
+                except Exception:
                     QMessageBox.critical(self.gui, "Error",
                                          "'%s' is not a valid  No Data Value!" % self.gui.txtNodatOutput.text())
                     return
             try:
                 self.division_factor = float(self.gui.spinDivisionFactor.text())
-            except:
+            except Exception:
                 QMessageBox.critical(self.gui, "Error",
                                      "'%s' is not a valid division factor!" % self.gui.spinDivisionFactor.text())
                 return
@@ -538,7 +537,7 @@ class ASI:
                     iASI.in_raster = np.divide(iASI.in_raster, self.division_factor)
 
                 del self.core.in_raster
-            except:
+            except Exception:
                 iASI.in_raster = iASI.read_image_window(image=self.image)
                 if self.division_factor != 1.0:
                     iASI.in_raster = np.divide(iASI.in_raster, self.division_factor)
@@ -547,7 +546,7 @@ class ASI:
             result, crs, res3band = iASI.execute_ASI(in_raster=iASI.in_raster,
                                                      prg_widget=self.main.prg_widget,
                                                      qgis_app=self.main.qgis_app)
-            # except:
+            # except Exception:
             #     QMessageBox.critical(self.gui, 'error', "Calculation cancelled.")
             #     self.main.prg_widget.gui.allow_cancel = True
             #     self.main.prg_widget.gui.close()
@@ -624,8 +623,8 @@ class ASI_core:
         self.valid_bands = [i for i, x in enumerate(self.wl) if x in list(self.valid_wl)]
 
     def read_image(self, image):
-        #dataset = openRasterDataset(image)
-        #raster = dataset.readAsArray()
+        # dataset = openRasterDataset(image)
+        # raster = dataset.readAsArray()
 
         reader = RasterReader(image)
         array = np.array(reader.array())
@@ -634,7 +633,7 @@ class ASI_core:
         if len(self.wl) > 2000:
             try:
                 raster[self.default_exclude, :, :] = 0
-            except:
+            except Exception:
                 pass
         if len(raster) == 242:  # temporary solution for overlapping EnMap-Testdata Bands
             raster = np.delete(raster, self.enmap_exclude, axis=0)  # temporary solution!
@@ -651,7 +650,7 @@ class ASI_core:
         if len(self.wl) > 2000:
             try:
                 raster[self.default_exclude, :, :] = 0
-            except:
+            except Exception:
                 pass
         if len(raster) == 242:  # temporary solution for overlapping EnMap-Testdata Bands
             raster = np.delete(raster, self.enmap_exclude, axis=0)  # temporary solution!
@@ -660,7 +659,7 @@ class ASI_core:
 
     @staticmethod
     def read_image_meta(image):
-        #dataset: RasterDataset = openRasterDataset(image)
+        # dataset: RasterDataset = openRasterDataset(image)
 
         reader = RasterReader(image)
 
@@ -668,9 +667,9 @@ class ASI_core:
 
         ds = reader.gdalDataset
 
-        #if dataset.grid() is not None:
+        # if dataset.grid() is not None:
         #    grid = dataset.grid()
-        #else:
+        # else:
         #    raise Warning('No coordinate system information provided in ENVI header file')
 
         grid = reader.extent(), reader.crs()
@@ -682,22 +681,20 @@ class ASI_core:
 
         try:
             wave_dict = metadict['ENVI']['wavelength']
-        except:
+        except Exception:
             raise ValueError('No wavelength units provided in ENVI header file')
 
         if metadict['ENVI']['wavelength'] is None:
             raise ValueError('No wavelength units provided in ENVI header file')
-        elif metadict['ENVI']['wavelength units'].lower() in \
-                ['nanometers', 'nm', 'nanometer']:
+        elif metadict['ENVI']['wavelength units'].lower() in ['nanometers', 'nm', 'nanometer']:
             wave_convert = 1
-        elif metadict['ENVI']['wavelength units'].lower() in \
-                ['micrometers', 'µm', 'micrometer']:
+        elif metadict['ENVI']['wavelength units'].lower() in ['micrometers', 'µm', 'micrometer']:
             wave_convert = 1000
         else:
             raise ValueError(
                 "Wavelength units must be nanometers or micrometers. Got '%s' instead" %
-                metadict['ENVI'][
-                    'wavelength units'])
+                metadict['ENVI']['wavelength units']
+            )
 
         wl = [float(item) * wave_convert for item in wave_dict]
         wl = [int(i) for i in wl]
@@ -706,7 +703,7 @@ class ASI_core:
 
     def write_integral_image(self, result):
 
-        #output = RasterDataset.fromArray(array=result, filename=self.output, grid=self.grid,
+        # output = RasterDataset.fromArray(array=result, filename=self.output, grid=self.grid,
         #                                 driver=EnviDriver())
 
         array = result
@@ -717,7 +714,7 @@ class ASI_core:
         writer.setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
 
         for bandNo in writer.bandNumbers():
-            writer.setBandName('Spectral Integral: [%i nm - %i nm]' %(self.limits[0], self.limits[1]), bandNo)
+            writer.setBandName('Spectral Integral: [%i nm - %i nm]' % (self.limits[0], self.limits[1]), bandNo)
             writer.setNoDataValue(self.nodat[1], bandNo)
 
         writer.close()
@@ -727,7 +724,7 @@ class ASI_core:
         crs_output = self.output.split(".")
         crs_output = crs_output[0] + "_crs" + "." + crs_output[1]
 
-        #output = RasterDataset.fromArray(array=crs, filename=crs_output, grid=self.grid,
+        # output = RasterDataset.fromArray(array=crs, filename=crs_output, grid=self.grid,
         #                                 driver=EnviDriver())
 
         array = crs
@@ -738,7 +735,7 @@ class ASI_core:
         writer.setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
 
         for bandNo in writer.bandNumbers():
-           writer.setNoDataValue(self.nodat[1], bandNo)
+            writer.setNoDataValue(self.nodat[1], bandNo)
 
         writer.setMetadataItem(key='wavelength', value=self.valid_wl, domain='ENVI')
         writer.setMetadataItem(key='wavelength units', value='Nanometers', domain='ENVI')
@@ -749,7 +746,7 @@ class ASI_core:
         bands_output = self.output.split(".")
         bands_output = bands_output[0] + "_3band_car_cab_h2o" + "." + bands_output[1]
 
-        #output = RasterDataset.fromArray(array=res3band, filename=bands_output, grid=self.grid,
+        # output = RasterDataset.fromArray(array=res3band, filename=bands_output, grid=self.grid,
         #                                 driver=EnviDriver())
 
         array = res3band
@@ -790,7 +787,7 @@ class ASI_core:
         x = np.arange(len(in_matrix))
         try:
             in_matrix[self.default_exclude] = 0
-        except:
+        except Exception:
             pass
         self.res3d = np.empty(shape=np.shape(in_matrix))
         for row in range(in_matrix.shape[1]):
@@ -907,7 +904,7 @@ class ASI_core:
         # in_matrix[in_matrix < 0] = 0
         if len(self.valid_bands) > 2000:
             in_matrix = self.interp_watervapor_3d(in_matrix)
-        if self.calc_crs_flag == True:
+        if self.calc_crs_flag is True:
             cr_spectrum = np.empty(shape=(len(self.valid_wl), np.shape(in_matrix)[1], np.shape(in_matrix)[2]))
         else:
             cr_spectrum = None
@@ -935,7 +932,7 @@ class ASI_core:
                             hull = self.convex_hull(valid_array)
                             try:
                                 hull_x, hull_y = list(zip(*hull))
-                            except:
+                            except Exception:
                                 hull_x = 0
                             full_hull_x = np.append(full_hull_x, hull_x)
                             x = i
@@ -1011,7 +1008,7 @@ class ASI_core:
             closest_bands.insert(0, closest_bands[0])
 
         fixed_end = closest_bands[4]
-        absorb_area_test = 0
+        # absorb_area_test = 0
         for row in range(in_matrix.shape[1]):
             for col in range(in_matrix.shape[2]):
                 if np.mean(in_matrix[:, row, col]) != self.nodat[0]:
@@ -1083,16 +1080,16 @@ class ASI_core:
                     # intercepts between hull and reflectance
                     indices = np.nonzero(np.isin(contiguous_hull_x, window))[0]
                     # check range validity of intercepts
-                    item0 = next((self.valid_wl[indices[l]] for l in range(len(indices)) if
-                                  500 < self.valid_wl[indices[l]] <= 550), None)
-                    item1 = next((self.valid_wl[indices[l]] for l in range(len(indices)) if
-                                  550 < self.valid_wl[indices[l]] <= 700), None)
-                    item2 = next((self.valid_wl[indices[l]] for l in range(len(indices)) if
-                                  700 < self.valid_wl[indices[l]] < 800), None)
-                    item3 = next((self.valid_wl[indices[-l]] for l in range(len(indices)) if
-                                  890 < self.valid_wl[indices[-l]] < 950), None)
-                    item4 = next((self.valid_wl[indices[l]] for l in range(len(indices)) if
-                                  970 < self.valid_wl[indices[l]] <= 1105), None)
+                    item0 = next((self.valid_wl[indices[ll]] for ll in range(len(indices)) if
+                                  500 < self.valid_wl[indices[ll]] <= 550), None)
+                    item1 = next((self.valid_wl[indices[ll]] for ll in range(len(indices)) if
+                                  550 < self.valid_wl[indices[ll]] <= 700), None)
+                    item2 = next((self.valid_wl[indices[ll]] for ll in range(len(indices)) if
+                                  700 < self.valid_wl[indices[ll]] < 800), None)
+                    item3 = next((self.valid_wl[indices[-ll]] for ll in range(len(indices)) if
+                                  890 < self.valid_wl[indices[-ll]] < 950), None)
+                    item4 = next((self.valid_wl[indices[ll]] for ll in range(len(indices)) if
+                                  970 < self.valid_wl[indices[ll]] <= 1105), None)
                     # substitute preset separators with found intercepts
                     if item0:
                         closest_bands[0] = self.valid_wl.index(item0)
@@ -1129,16 +1126,18 @@ class ASI_core:
                     try:
                         if j == 2:
 
-                            absorb_area[j, row, col] = np.nansum(np.log(1 / in_matrix[k:i, row, col]) -
-                                                                 np.log(1 / contiguous_hull_x[
-                                                                     k:i]))  # / np.nansum(contiguous_hull_x[k:i])
+                            absorb_area[j, row, col] = np.nansum(
+                                np.log(1 / in_matrix[k:i, row, col]) - np.log(1 / contiguous_hull_x[k:i])
+                            )
                             # hull_area[j, row, col] = np.nansum(np.log(1 / in_matrix[k:fixed_end, row, col]))
                             hull_area[j, row, col] = np.nansum(np.log(1 / contiguous_hull_x[k:fixed_end]))
                             # res3band[j, row, col] = absorb_area[j, row, col] / hull_area[j, row, col]
                         else:
-                            cr_absorb_area[j, row, col] = np.nansum((np.log(1 / in_matrix[k:i, row, col]) -
-                                                                     np.log(1 / contiguous_hull_x[k:i])) /
-                                                                    np.log(1 / in_matrix[k:i, row, col]))
+                            cr_absorb_area[j, row, col] = np.nansum(
+                                (np.log(1 / in_matrix[k:i, row, col])
+                                 - np.log(1 / contiguous_hull_x[k:i]))
+                                / np.log(1 / in_matrix[k:i, row, col])
+                            )
                             ones_sum[j, row, col] = np.nansum(ones[k:i, row, col])
 
                     except ZeroDivisionError:
@@ -1270,7 +1269,7 @@ class Nodat:
         else:
             try:
                 nodat = int(self.gui.txtNodat.text())
-            except:
+            except Exception:
 
                 QMessageBox.critical(self.gui, "No number", "'%s' is not a valid number" % self.gui.txtNodat.text())
                 self.gui.txtNodat.setText("")
