@@ -1243,10 +1243,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         import enmapbox.algorithmprovider
         return enmapbox.algorithmprovider.instance()
 
-    def loadCursorLocationValueInfo(
-        self,
-        spatialPoint: SpatialPoint,
-        mapCanvas: MapCanvas):
+    def loadCursorLocationValueInfo(self, spatialPoint: SpatialPoint, mapCanvas: MapCanvas):
         """
         Loads the cursor location info.
         :param spatialPoint: SpatialPoint
