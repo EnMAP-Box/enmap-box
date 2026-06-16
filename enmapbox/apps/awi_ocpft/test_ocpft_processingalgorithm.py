@@ -1,9 +1,11 @@
 import sys
+import unittest
 from typing import Tuple
 
 # from enmapboxprocessing.test.algorithm.testcase import TestCase
 from awi_ocpft.processingalgorithm import OCPFTProcessingAlgorithm
 from enmapboxprocessing.testcase import TestCase
+from enmapboxtestdata import sensorProductsRoot, SensorProducts
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback
 
 
@@ -28,6 +30,27 @@ class TestOCPFTProcessingAlgorithm(TestCase):
 
         return context, feedback
 
+    @unittest.skipIf(not sensorProductsRoot(), 'No sensor products root')
+    def test_OCPFTGlobalAlgorithm_new(self):
+        alg = OCPFTProcessingAlgorithm()
+        alg.initAlgorithm()
+
+        folder = self.createTestOutputFolder()
+
+        parameters = {
+            alg.P_FILE: SensorProducts.Sentinel3.S3A_OL_1_EFR,
+            alg.P_SENSOR: 'OLCI',
+            alg.P_MODEL: 'LAKE CONSTANCE',
+            alg.P_AC: 'POLYMER',
+            alg.P_OSIZE: 'Standard output',
+            alg.P_OUTPUT_FOLDER: str(folder)
+
+        }
+        context, feedback = self.createProcessingContextFeedback()
+        results = alg.processAlgorithm(parameters, context, feedback)
+        self.assertTrue(len(results) > 0)
+
+    @unittest.skip("Not working due to local file path")
     def test_OCPFTGlobalAlgorithm(self):
         alg = OCPFTProcessingAlgorithm()
         alg.initAlgorithm()

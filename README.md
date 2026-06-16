@@ -297,6 +297,12 @@ to start the tests defined in `/tests/`.
 You can provide additional arguments to the test runner, e.g., to run the tests in parallel or
 run a specific test directory, -module, -class or -method only
 
+Some tests require data from outside the EnMAP-Box repository, that is stored in access-restricted
+*EnmapBoxExternalSensorProducts* folder.
+See *SensorProducts* in `tests/enmapboxtestdata.py`.
+Set ``export ENMAPBOX_SENSOR_PRODUCT_ROOT=<path to sensor EnmapBoxExternalSensorProducts folder>`` to point
+to the folder containing the sensor products.
+
 ````bash
 scripts/runtests.sh -n auto
 

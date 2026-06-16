@@ -1,11 +1,15 @@
-import os.path
-import subprocess
-import sys
 from os import makedirs
-from os.path import join, dirname, exists, abspath
+from os.path import exists
 
 
-def ocpft(inputfile, outputDirectory, sensor, model, ac, osize):
+def ocpft(
+    inputfile: str,
+    outputDirectory: str,
+    sensor: str,
+    model: int,
+    ac: int,
+    osize: int
+) -> str:
     if not exists(outputDirectory):
         makedirs(outputDirectory)
 
@@ -29,28 +33,33 @@ def ocpft(inputfile, outputDirectory, sensor, model, ac, osize):
     # test_dataset/olci/S3A_OL_1_EFR____20200816T095809_20200816T100109_20200816T120938_0179_061_
     # 350_2160_MAR_O_NR_002.SEN3.nc -od=output/ -sensor=OLCI -adapt=0 -ac=1 -osize=0'
 
-    python = abspath(sys.executable)
+    # python = abspath(sys.executable)
 
-    cmd = r'{python} {script} {input} -od={output} -sensor={sensor} -model={model} -ac={ac} -osize={osize}'
-    script = join(dirname(__file__), 'ocpft_v01_20220526_enmapbox.py')
+    # cmd = r'{python} {script} {input} -od={output} -sensor={sensor} -model={model} -ac={ac} -osize={osize}'
+    # script = join(dirname(__file__), 'ocpft_v01_20220526_enmapbox.py')
 
-    if not os.path.isfile(script):
-        raise FileNotFoundError(script)
+    # if not os.path.isfile(script):
+    #     raise FileNotFoundError(script)
+    # cmd = cmd.format(python=python, script=script, input=inputfile,
+    # output=outputDirectory, sensor=sensor, model=model,
+    #                  ac=ac, osize=osize)
+    from .ocpft_v01_20260616_enmapbox import run_processor
+    cmd = f'{inputfile} -od={outputDirectory} -sensor={sensor} -model={model} -ac={ac} -osize={osize}'
+    print(f'call: ocpft {cmd}')
 
-    cmd = cmd.format(python=python, script=script, input=inputfile, output=outputDirectory, sensor=sensor, model=model,
-                     ac=ac, osize=osize)
-    print(cmd)
-    try:
-        process = subprocess.run(cmd,
-                                 check=True,
-                                 shell=True,
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE,
-                                 universal_newlines=True)
-        output = str(process.stdout)
-    except subprocess.CalledProcessError as ex:
-        output = ex.stderr
-    except Exception as ex2:
-        output = str(ex2)
+    run_processor(cmd)
 
-    return cmd, output
+    # try:
+    #     process = subprocess.run(cmd,
+    #                              check=True,
+    #                              shell=True,
+    #                              stdout=subprocess.PIPE,
+    #                              stderr=subprocess.PIPE,
+    #                              universal_newlines=True)
+    #     output = str(process.stdout)
+    # except subprocess.CalledProcessError as ex:
+    #     output = ex.stderr
+    # except Exception as ex2:
+    #     output = str(ex2)
+    #
+    return cmd

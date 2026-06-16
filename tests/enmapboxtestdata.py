@@ -436,6 +436,13 @@ class SensorProducts(object):
             L2C = join(sensorProductsRoot(), 'prisma', 'PRS_L2C_STD_20201107101404_20201107101408_0001.he5')
             L2D = join(sensorProductsRoot(), 'prisma', 'PRS_L2D_STD_20201107101404_20201107101408_0001.he5')
 
+        class Sentinel3(object):
+            S3A_OL_1_EFR = join(
+                sensorProductsRoot(), 'sentinel3',
+                'S3A_OL_1_EFR____20200816T095809_20200816T100109_20240602T091430_0179_061_350_2160_MAR_R_NT_004.SEN3'
+            )
+            S3A_OL_1_EFR_ZIP = S3A_OL_1_EFR + '.zip'
+
         class Sentinel2(object):
             S2A_L1C = join(
                 sensorProductsRoot(), 'sentinel2', 'S2A_MSIL1C_20220720T101611_N0400_R065_T33UUU_20220720T140828.SAFE'

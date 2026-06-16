@@ -48,23 +48,24 @@ class OCPFTProcessingAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(QgsProcessingParameterEnum(
             name=self.P_SENSOR,
             description='Sensor',
-            options=self.SENSORS_USER,
-            defaultValue=0))
+            # options=self.SENSORS_USER,
+            options=self.SENSORS_ALGO,
+            defaultValue=self.SENSORS_ALGO[0]))
         self.addParameter(QgsProcessingParameterEnum(
             name=self.P_MODEL,
             description='Model',
             options=self.MODEL,
-            defaultValue=0))
+            defaultValue=self.MODEL[0]))
         self.addParameter(QgsProcessingParameterEnum(
             name=self.P_AC,
             description='Atmospheric correction',
             options=self.AC,
-            defaultValue=0))
+            defaultValue=self.AC[0]))
         self.addParameter(QgsProcessingParameterEnum(
             name=self.P_OSIZE,
             description='Processor output size',
             options=self.OSIZE,
-            defaultValue=0))
+            defaultValue=self.OSIZE[0]))
 
         self.addParameter(QgsProcessingParameterFolderDestination(
             name=self.P_OUTPUT_FOLDER, description='Output Folder'))
@@ -74,23 +75,39 @@ class OCPFTProcessingAlgorithm(QgsProcessingAlgorithm):
         self,
         parameters,
         context: QgsProcessingContext,
-        feedback: QgsProcessingFeedback):
-        
+        feedback: QgsProcessingFeedback
+    ):
+
+        inputfile = self.parameterAsFile(parameters, self.P_FILE, context)
+        outputDirectory = self.parameterAsFileOutput(parameters, self.P_OUTPUT_FOLDER, context)
+
+        sensor: str = self.parameterAsEnumString(parameters, self.P_SENSOR, context)
+        # the following line always returned 0 -> 'ENAMP', no matter what sensor was selected!
+        # sensor = self.SENSORS_ALGO[self.parameterAsEnum(parameters, self.P_SENSOR, context)]
+
+        if sensor not in self.SENSORS_ALGO:
+            feedback.pushError(
+                f'Sensor {sensor} not supported. Please choose one of the following: {self.SENSORS_ALGO}')
+            return {}
+
+        model: str = self.parameterAsEnumString(parameters, self.P_MODEL, context)
+        ac: str = self.parameterAsEnumString(parameters, self.P_AC, context)
+        osize: str = self.parameterAsEnumString(parameters, self.P_OSIZE, context)
+
         # try to execute the core algorithm
         try:
-            tmp = self.parameterAsEnum(parameters, self.P_SENSOR, context)
-            print(tmp)
-
-            cmd, output = ocpft(inputfile=self.parameterAsFile(parameters, self.P_FILE, context),
-                                outputDirectory=self.parameterAsFileOutput(parameters, self.P_OUTPUT_FOLDER, context),
-                                sensor=self.SENSORS_ALGO[self.parameterAsEnum(parameters, self.P_SENSOR, context)],
-                                model=self.parameterAsEnum(parameters, self.P_MODEL, context),
-                                ac=self.parameterAsEnum(parameters, self.P_AC, context),
-                                # note only polymer is implemented!!!
-                                osize=self.parameterAsEnum(parameters, self.P_OSIZE, context))
+            cmd = ocpft(
+                inputfile=inputfile,
+                outputDirectory=outputDirectory,
+                sensor=sensor,
+                model=self.MODEL.index(model),
+                ac=self.AC.index(ac),
+                # note only polymer is implemented!!!
+                osize=self.OSIZE.index(osize)
+            )
 
             feedback.pushCommandInfo(cmd)
-            feedback.pushDebugInfo(output)
+            # feedback.pushDebugInfo(odebugInfo)
 
             # return all output parameters
             return {self.P_OUTPUT_FOLDER: self.parameterAsFileOutput(parameters, self.P_OUTPUT_FOLDER, context)}
@@ -100,7 +117,7 @@ class OCPFTProcessingAlgorithm(QgsProcessingAlgorithm):
             # print traceback to console and pass it to the processing feedback object
             import traceback
             traceback.print_exc()
-            msg = f'Error occurred during processing: {ex}'
+            msg = f'Error occurred during processing\n{ex}'
             for line in traceback.format_exc().split('\n'):
                 msg += f'\n{line}'
             feedback.reportError(msg)
