@@ -12,7 +12,6 @@
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
-                                                                                                                                                 *
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -25,13 +24,14 @@
 import os
 import sys
 
+from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox, QApplication
 from osgeo import gdal
 
 import lmuvegetationapps.LUT.InvertLUT_core as Inverse
 from enmapbox.gui.utils import loadUi
 from lmuvegetationapps import APP_DIR
 # ensure to call QGIS before PyQtGraph
-from qgis.PyQt.QtWidgets import *
+
 from qgis.core import QgsMapLayerProxyModel
 from qgis.gui import QgsMapLayerComboBox
 

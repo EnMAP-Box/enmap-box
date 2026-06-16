@@ -12,7 +12,7 @@
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
-                                                                                                                                                 *
+
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -23,6 +23,7 @@
 ***************************************************************************
 """
 
+import csv
 import os
 import sys
 import warnings
@@ -32,6 +33,7 @@ import numpy as np
 import pyqtgraph as pg
 from scipy.interpolate import interp1d
 
+from enmapbox.gui.utils import loadUi
 from enmapboxprocessing.rasterreader import RasterReader
 # from enmapbox.coreapps._classic.hubflow.core import openRasterDataset
 from lmuvegetationapps import APP_DIR
@@ -43,9 +45,6 @@ from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QHeaderView, QTableWidgetI
 from qgis.gui import QgsMapLayerComboBox
 
 warnings.filterwarnings('ignore')  # ignore warnings, like ZeroDivision
-
-import csv
-from enmapbox.gui.utils import loadUi
 
 pathUI_IVVRM = os.path.join(APP_DIR, 'Resources/UserInterfaces/IVVRM_main.ui')
 pathUI_loadtxt = os.path.join(APP_DIR, 'Resources/UserInterfaces/LoadTxtFile.ui')
@@ -78,14 +77,14 @@ class IVVRM_GUI(QDialog):
         self.btnAxisColor = QgsColorButton()
         self.btnAxisColor.colorChanged.connect(self.setAxisColor)
 
-        l = QGridLayout()
-        l.addWidget(QLabel('Background'), 0, 0)
-        l.addWidget(self.btnBackgroundColor, 0, 1)
-        l.addWidget(QLabel('Axes'), 1, 0)
-        l.addWidget(self.btnAxisColor, 1, 1)
+        ll = QGridLayout()
+        ll.addWidget(QLabel('Background'), 0, 0)
+        ll.addWidget(self.btnBackgroundColor, 0, 1)
+        ll.addWidget(QLabel('Axes'), 1, 0)
+        ll.addWidget(self.btnAxisColor, 1, 1)
 
         self.colorWidget = QWidget()
-        self.colorWidget.setLayout(l)
+        self.colorWidget.setLayout(ll)
         self.viewBoxMenu.addSeparator()
         m = self.viewBoxMenu.addMenu('Plot Colors')
         wa = QWidgetAction(m)
@@ -761,31 +760,34 @@ class IVVRM:
                 rmse = np.sqrt(np.nanmean((self.myResult - self.data_mean) ** 2))
 
                 # Nash-Sutcliffe Efficiency Error
-                nse = 1.0 - ((np.nansum((self.data_mean - self.myResult) ** 2)) /
-                             (np.nansum((self.data_mean - (np.nanmean(self.data_mean))) ** 2)))
+                nse = 1.0 - (
+                    (np.nansum((self.data_mean - self.myResult) ** 2))
+                    / (np.nansum((self.data_mean - (np.nanmean(self.data_mean))) ** 2))
+                )
 
                 # Modified Nash-Sutcliffe Efficiency Error
-                mnse = 1.0 - ((np.nansum(abs(self.data_mean - self.myResult))) /
-                              (np.nansum(abs(self.data_mean - (np.nanmean(self.data_mean))))))
+                a = np.nansum(abs(self.data_mean - self.myResult))
+                b = np.nansum(abs(self.data_mean - (np.nanmean(self.data_mean))))
+                mnse = 1.0 - (a / b)
 
                 # R²
-                r_squared = ((np.nansum(
-                    (self.data_mean - np.nanmean(self.data_mean)) * (self.myResult - np.nanmean(self.myResult))))
-                             / ((np.sqrt(np.nansum((self.data_mean - np.nanmean(self.data_mean)) ** 2)))
-                                * (np.sqrt(np.nansum((self.myResult - np.nanmean(self.myResult)) ** 2))))) ** 2
+                a = np.nansum(self.data_mean - np.nanmean(self.data_mean)) * (self.myResult - np.nanmean(self.myResult))
+                b = np.sqrt(np.nansum((self.data_mean - np.nanmean(self.data_mean)) ** 2))
+                c = np.sqrt(np.nansum((self.myResult - np.nanmean(self.myResult)) ** 2))
+                r_squared = (a / (b * c)) ** 2
 
                 # Add the errors to the plot
-                errors = pg.TextItem("RMSE: %.4f" % rmse +
-                                     "\nMAE: %.4f" % mae +
-                                     "\nNSE: %.4f" % nse +
-                                     "\nmNSE: %.2f" % mnse +
-                                     '\n' + u'R²: %.2f' % r_squared, (100, 200, 255),
+                errors = pg.TextItem("RMSE: %.4f" % rmse
+                                     + "\nMAE: %.4f" % mae
+                                     + "\nNSE: %.4f" % nse
+                                     + "\nmNSE: %.2f" % mnse
+                                     + '\n' + u'R²: %.2f' % r_squared, (100, 200, 255),
                                      border="w", anchor=(1, 0))
             except Exception:
-                errors = pg.TextItem("RMSE: sensors mismatch" +
-                                     "\nMAE: sensors mismatch " +
-                                     "\nNSE: sensors mismatch" +
-                                     "\nmNSE: sensors mismatch" +
+                errors = pg.TextItem("RMSE: sensors mismatch"
+                                     "\nMAE: sensors mismatch "
+                                     "\nNSE: sensors mismatch"
+                                     "\nmNSE: sensors mismatch"
                                      '\n' + u'R²: sensors mismatch ', (100, 200, 255),
                                      border="w", anchor=(1, 0))
             errors.setPos(2500, 0.55)
@@ -1023,8 +1025,8 @@ class SensorEditor:
     def image_read(self):  # read only necessary info: fwhm and center wavelengths
         inras = self.image
 
-        #image = openRasterDataset(inras)
-        #meta = image.metadataDict()
+        # image = openRasterDataset(inras)
+        # meta = image.metadataDict()
 
         reader = RasterReader(inras)
         meta = reader.metadata()
@@ -1139,9 +1141,12 @@ class SensorEditor:
             text = "Create Generic SRF from Imagery OK: " + str(len(self.x[:, 0])) + " Bands."
             self.gui.label.setText(text)
             if len(self.outreach) > 0:
-                text = "Create Generic SRF from Imagery OK with " + str(
-                    len(self.x[:, 0])) + " Bands but Caution! " + str(len(self.outreach)) + \
-                       " wavelengths outside PROSAIL range will be deleted!"
+                text = (
+                    "Create Generic SRF from Imagery OK with "
+                    + str(len(self.x[:, 0])) + " Bands but Caution! "
+                    + str(len(self.outreach))
+                    + " wavelengths outside PROSAIL range will be deleted!"
+                )
                 self.gui.label.setStyleSheet("color: rgb(170, 130, 0);")
                 self.gui.label.setText(text)
             self.gui.cmdOK.setEnabled(True)
