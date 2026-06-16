@@ -1,3 +1,4 @@
+import ee
 collection = ee.ImageCollection("COPERNICUS/S3/OLCI")
 
 # default colors for bands and spectral indices

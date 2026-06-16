@@ -6,6 +6,7 @@
 # Furthermore, the cloud displacement index (CDI; https://doi.org/10.1016/j.rse.2018.04.046 for details) is used to
 # improve cloud masking.
 
+import ee
 collection = ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
 
 # filter cloudy images
