@@ -1,3 +1,4 @@
+import ee
 collection = ee.ImageCollection("COPERNICUS/S1_GRD")
 
 # remove HH and HV bands
