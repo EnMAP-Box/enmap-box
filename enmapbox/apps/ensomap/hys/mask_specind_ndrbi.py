@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright © 2019 Stéphane Guillaso
-# Licensed under the terms of 
+# Licensed under the terms of
 # (see ../../LICENSE.md for details)
 
-import numpy as np
-import hys
 import numba as nb
+import numpy as np
 
-__bands__    = [460, 660]
+__bands__ = [460, 660]
 __filename__ = "_water"
 __th_default__ = 1.0
 
@@ -27,8 +26,8 @@ __th_default__ = 1.0
 def process(cube, threshold):
     ny = cube.shape[1]
     nx = cube.shape[2]
-    prod = np.zeros((ny, nx), dtype = np.float32)
-    mask = np.zeros((ny, nx), dtype = np.int32)
+    prod = np.zeros((ny, nx), dtype=np.float32)
+    mask = np.zeros((ny, nx), dtype=np.int32)
     lim1 = 0.0
     lim2 = threshold
     for ky in range(ny):
@@ -36,7 +35,7 @@ def process(cube, threshold):
             B0660 = cube[1, ky, kx]
             B0460 = cube[0, ky, kx]
             diff = B0660 - B0460
-            sum  = B0660 + B0460
+            sum = B0660 + B0460
             res = float(0)
             msk = 0
             if sum != 0:
