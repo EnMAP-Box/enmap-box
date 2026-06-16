@@ -200,7 +200,7 @@ class MapCanvasTests(EnMAPBoxTestCase):
 
         for p in spatialFiles:
             if not Path(p) in layerSources:
-                s = ""
+                pass
             self.assertTrue(Path(p) in layerSources, msg=f'Failed to drop {p}')
 
 
