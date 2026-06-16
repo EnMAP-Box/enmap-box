@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/christian/.qgis2/python/plugins/enmapboxplugin/enmapbox/apps/engeomap/engeomap_base.ui'
+# Form implementation generated from reading ui file
+# '/home/christian/.qgis2/python/plugins/enmapboxplugin/enmapbox/apps/engeomap/engeomap_base.ui'
 #
 # Created by: PyQt5 UI code generator 5.7
 #
@@ -26,6 +27,7 @@
 """
 
 from PyQt5 import QtCore, QtWidgets
+
 
 class Ui_dialog(object):
     def setupUi(self, dialog):
@@ -127,12 +129,12 @@ class Ui_dialog(object):
         self.buttonGroup.addButton(self.enmap_psf)
         self.buttonBox = QtWidgets.QDialogButtonBox(dialog)
         self.buttonBox.setGeometry(QtCore.QRect(560, 290, 166, 28))
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.Ready = QtWidgets.QGraphicsView(dialog)
         self.Ready.setGeometry(QtCore.QRect(950, 150, 181, 161))
         self.Ready.setObjectName("Ready")
-	    # self.Ready.type
+        # self.Ready.type
         self.retranslateUi(dialog)
         QtCore.QMetaObject.connectSlotsByName(dialog)
 
@@ -142,30 +144,60 @@ class Ui_dialog(object):
         self.enmap_data.setText(_translate("dialog", "EnMAP Data"))
         self.choose_lib.setText(_translate("dialog", "Spectral Library"))
         self.choose_csv.setText(_translate("dialog", "Legend Colors"))
-        self.vnir_thresh.setHtml(_translate("dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'Cantarell\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">0.02</p></body></html>"))
-        self.label.setText(_translate("dialog", "VNIR Reflactance Threshold up to 1000 nm"))
-        self.label_2.setText(_translate("dialog", "SWIR Reflactance Threshold from 1000-2500 nm"))
-        self.swir_thresh.setHtml(_translate("dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'Cantarell\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">0.03</p></body></html>"))
-        self.label_3.setText(_translate("dialog", "Minimum Fit Threshold Weighted Fitting"))
-        self.fit_thresh.setHtml(_translate("dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'Cantarell\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">0.5</p></body></html>"))
-        self.label_4.setText(_translate("dialog", "Maximum Number of Endmembers in Unmixing"))
-        self.ixminerals.setHtml(_translate("dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'Cantarell\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">9</p></body></html>"))
+        self.vnir_thresh.setHtml(
+            _translate(
+                "dialog",
+                "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\""
+                " \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+                "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+                "p, li { white-space: pre-wrap; }\n"
+                "</style></head>"
+                "<body style=\" font-family:\'Cantarell\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
+                "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"
+                " -qt-block-indent:0; text-indent:0px;\">0.02</p></body></html>"))
+        self.label.setText(
+            _translate("dialog", "VNIR Reflactance Threshold up to 1000 nm"))
+        self.label_2.setText(
+            _translate("dialog", "SWIR Reflactance Threshold from 1000-2500 nm"))
+        self.swir_thresh.setHtml(
+            _translate(
+                "dialog",
+                "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" "
+                "\"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+                "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+                "p, li { white-space: pre-wrap; }\n"
+                "</style></head><body style=\" font-family:\'Cantarell\'; "
+                "font-size:11pt; font-weight:400; font-style:normal;\">\n"
+                "<p style=\" margin-top:0px; margin-bottom:0px; "
+                "margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">0.03</p></body></html>"))
+        self.label_3.setText(
+            _translate("dialog", "Minimum Fit Threshold Weighted Fitting"))
+        self.fit_thresh.setHtml(
+            _translate(
+                "dialog",
+                "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\""
+                " \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+                "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+                "p, li { white-space: pre-wrap; }\n"
+                "</style></head><body style=\" font-family:\'Cantarell\'; "
+                "font-size:11pt; font-weight:400; font-style:normal;\">\n"
+                "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px;"
+                " margin-right:0px; -qt-block-indent:0; text-indent:0px;\">0.5</p></body></html>"))
+        self.label_4.setText(
+            _translate("dialog", "Maximum Number of Endmembers in Unmixing"))
+        self.ixminerals.setHtml(
+            _translate("dialog",
+                       "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" "
+                       "\"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+                       "<html><head><meta name=\"qrichtext\" content=\"1\" />"
+                       "<style type=\"text/css\">\n"
+                       "p, li { white-space: pre-wrap; }\n"
+                       "</style></head>"
+                       "<body style=\" font-family:\'Cantarell\'; "
+                       "font-size:11pt; font-weight:400; font-style:normal;\">\n"
+                       "<p style=\" margin-top:0px; margin-bottom:0px; "
+                       "margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">9"
+                       "</p></body></html>"))
         self.lab_lib.setText(_translate("dialog", "Lab Library"))
         self.lab_image.setText(_translate("dialog", "Lab Image"))
         self.hyperion_psf.setText(_translate("dialog", "Hyperion PSF"))
@@ -174,10 +206,10 @@ class Ui_dialog(object):
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     dialog = QtWidgets.QDialog()
     ui = Ui_dialog()
     ui.setupUi(dialog)
     dialog.show()
     sys.exit(app.exec_())
-

@@ -5,9 +5,9 @@
    algorithms.py
 
 This is EnGeoMAP further information can be found in the following open acess publication:
-Mielke, C.; Rogass, C.; Boesche, N.; Segl, K.; Altenberger, U. 
-EnGeoMAP 2.0�Automated Hyperspectral Mineral Identification for the German EnMAP Space Mission. 
-Remote Sens. 2016, 8, 127. 
+Mielke, C.; Rogass, C.; Boesche, N.; Segl, K.; Altenberger, U.
+EnGeoMAP 2.0 Automated Hyperspectral Mineral Identification for the German EnMAP Space Mission.
+Remote Sens. 2016, 8, 127.
     ---------------------
     Date                 : Juli 2019
     Copyright            : (C) 2019 by Christian Mielke
@@ -42,6 +42,7 @@ data type: bvlss -> '_bvls_unmixing_scores'
 
 """
 import os
+
 from engeomap import engeomap_aux_funcul as auxfunul
 
 
@@ -49,8 +50,8 @@ def thresholder(guidat):
     try:
         guidat = guidat.strip()
         guidat = float(guidat)
-    except(Exception):
-        print("Threshold Exception: Please use float values between 0 and 1")
+    except Exception as ex:
+        print(f"Threshold Exception: Please use float values between 0 and 1: {ex}")
         return None
     if (guidat >= 0) and (guidat <= 1):
         pass
@@ -64,8 +65,8 @@ def thresholder2(guidat):
     try:
         guidat = guidat.strip()
         guidat = int(guidat)
-    except(Exception):
-        print("Threshold Exception: Only int values greater 1 allowed")
+    except Exception as ex:
+        print(f"Threshold Exception: Only int values greater 1 allowed: {ex}")
         return None
     if (guidat > 1):
         pass
@@ -86,24 +87,24 @@ def brp(path):
 def engeomapp_headless(params):
     # Parameter:
     print('EnGeoMAP: processing user input')
-    print('VNIR threshold: '+params['vnirt'])
-    print('SWIR threshold: '+params['swirt'])
-    print('Minimum fit threshold: '+params['fit_thresh'])
-    print('Max number of endmembers in unmixing: '+params['mixminerals'])
+    print('VNIR threshold: ' + params['vnirt'])
+    print('SWIR threshold: ' + params['swirt'])
+    print('Minimum fit threshold: ' + params['fit_thresh'])
+    print('Max number of endmembers in unmixing: ' + params['mixminerals'])
     # print(params['enmap'])
     # print(params['hyperion'])
     # print(params['laboratory'])
     # print(params['liblab'])
-    print('Path to image data: '+params['image'])
-    print('Path to spectral library: '+params['library'])
-    print('Path to CSV color file: '+params['farbe'])
-    vnirt = thresholder(params['vnirt'])
-    swirt = thresholder(params['swirt'])
-    fit_thr = thresholder(params['fit_thresh'])
-    mix_minerals = thresholder2(params['mixminerals'])
-    imasch = brp(params['image'])  # [0]==data [1]==header
-    lib = brp(params['library'])
-    farb = brp(params['farbe'])
+    print('Path to image data: ' + params['image'])
+    print('Path to spectral library: ' + params['library'])
+    print('Path to CSV color file: ' + params['farbe'])
+    # vnirt = thresholder(params['vnirt'])
+    # swirt = thresholder(params['swirt'])
+    # fit_thr = thresholder(params['fit_thresh'])
+    # mix_minerals = thresholder2(params['mixminerals'])
+    # imasch = brp(params['image'])  # [0]==data [1]==header
+    # lib = brp(params['library'])
+    # farb = brp(params['farbe'])
     # sensor = sensorbuhl(params['enmap'])
     # liblab = float(params['liblab'])
     # lab = float(params['laboratory'])
@@ -164,13 +165,19 @@ def mapper_fullrange(params):
     interpol_wvls = auxfunul.prep_1nm_interpol_intersect(minn, maxx, minflag, maxflag, w1nmlib, w1nmbild)
 
     # Calculations Library:
-    cvxabs_mod, cvxrel_mod, libdat_rel_weighted, libdat_rel_chm_weighted, vnirmax, swirmax = auxfunul.treat_library_cvx_full_range(
-        wlib, libdata, interpol_wvls, vnir_thr, swir_thr)
+    (cvxabs_mod, cvxrel_mod, libdat_rel_weighted,
+     libdat_rel_chm_weighted, vnirmax, swirmax) = auxfunul.treat_library_cvx_full_range(
+        wlib, libdata, interpol_wvls, vnir_thr, swir_thr
+    )
 
     # Claculations Image:
-    correlat, bvlss, bvlserr, vnirposmat, vnirdepthmat, swirposmat, swirdepthmat, astsum, depthsum, flsum, allessum = auxfunul.fitting_cvx_fullrange(
-        wbild, interpol_wvls, bilddata, libdat_rel_weighted, libdat_rel_chm_weighted, cvxabs_mod, vnir_thr,
-        swir_thr, lib_flag, mix_minerals, fit_threshold)
+    (correlat, bvlss, bvlserr, vnirposmat,
+     vnirdepthmat, swirposmat, swirdepthmat,
+     astsum, depthsum, flsum, allessum) = auxfunul.fitting_cvx_fullrange(
+        wbild, interpol_wvls, bilddata,
+        libdat_rel_weighted, libdat_rel_chm_weighted, cvxabs_mod, vnir_thr,
+        swir_thr, lib_flag, mix_minerals, fit_threshold
+    )
 
     # Schreib-Funktionen:
 
@@ -195,14 +202,15 @@ def mapper_fullrange(params):
                                                   [lsh[0], bsh[1], bsh[2]], minerals=lsh[0])
 
     """
-    rgbdurchschn, indexmatdurchschn, rgbmdurchschn = auxfunul.corr_colours(correlat,
-                                                                           colorfile,
-                                                                           basename + '_feature_fitting_highest_correlation',
-                                                                           [lsh[0],
-                                                                            bsh[1],
-                                                                            bsh[2]],
-                                                                           minerals=lsh[
-                                                                               0])
+    rgbdurchschn, indexmatdurchschn, rgbmdurchschn = auxfunul.corr_colours(
+        correlat,
+       colorfile,
+       basename + '_feature_fitting_highest_correlation',
+       [lsh[0],
+        bsh[1],
+        bsh[2]],
+       minerals=lsh[
+           0])
     rgbu, indexmatu, rgbum = auxfunul.corr_colours_unmix(bvlss, colorfile,
                                                          basename + '_abundance_unmix_',
                                                          [lsh[0], bsh[1], bsh[2]], minerals=lsh[0])

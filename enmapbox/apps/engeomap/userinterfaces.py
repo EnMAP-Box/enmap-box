@@ -29,12 +29,12 @@ See algorithms.py and engeomap_aux_funcul.py
 """
 
 import os
-
-from qgis.PyQt.QtCore import QObject, pyqtSignal, QRunnable, pyqtSlot, QThreadPool, Qt
-from qgis.PyQt.QtWidgets import QFileDialog, QDialog, QMessageBox
+from typing import Optional, Dict
 
 from engeomap import APP_DIR
 from enmapbox.qgispluginsupport.qps.utils import loadUi
+from qgis.PyQt.QtCore import QObject, pyqtSignal, QRunnable, pyqtSlot, QThreadPool, Qt
+from qgis.PyQt.QtWidgets import QFileDialog, QDialog, QMessageBox
 
 """"
 Use the QtDesigner to design a GUI and save it as *.ui file
@@ -43,7 +43,6 @@ The example.ui can get compiled and loaded at runtime.
 
 pathUi = os.path.join(APP_DIR, 'engeomap_base.ui')
 pathUi2 = os.path.join(APP_DIR, 'busyqt4.ui')
-p = dict()
 
 
 def checkstatus(objectus):
@@ -55,7 +54,8 @@ def checkstatus(objectus):
 
 
 def button_paths(objectus):
-    path = objectus
+    pass
+    # path = objectus
 
 
 def selectFile(objectt):
@@ -77,6 +77,7 @@ class WorkerSignals(QObject):
     started = pyqtSignal()
     finished = pyqtSignal()
 
+
 # worker class
 class Worker(QRunnable):
     '''
@@ -85,12 +86,19 @@ class Worker(QRunnable):
 
     signals = WorkerSignals()
 
+    def __init__(self):
+        super(Worker, self).__init__()
+        self.params: Optional[Dict] = None
+
+    def setParams(self, params: Dict):
+        self.params = params
+
     @pyqtSlot()
     def run(self):
         # emit started signal:
         self.signals.started.emit()
         # Pass collected parameters from UI elements to algorithms and start calculations
-        params = p
+        params = self.params
         from engeomap.algorithms import engeomapp_headless
         from engeomap.algorithms import mapper_fullrange
 
@@ -102,9 +110,9 @@ class Worker(QRunnable):
         self.signals.finished.emit()
 
 
-
 class EnGeoMAPGUI(QDialog):
     """Constructor."""
+
     def __init__(self, *args, **kwds):
         super().__init__(*args, **kwds)
         loadUi(pathUi, self)
@@ -114,7 +122,7 @@ class EnGeoMAPGUI(QDialog):
         self.threadpool = QThreadPool()
         self.worker = Worker()
         self.worker.setAutoDelete(0)
-        self.buttonBox.accepted.connect(self.Algo_Multi) # Button Box
+        self.buttonBox.accepted.connect(self.Algo_Multi)  # Button Box
         self.buttonBox.rejected.connect(self.close)
         p = self.frame_5.palette()
         p.setColor(self.frame_5.backgroundRole(), Qt.green)
@@ -123,13 +131,15 @@ class EnGeoMAPGUI(QDialog):
         self.frame_5.show()
 
     def Algo_Multi(self):
-        QMessageBox.about(self, "Notice",
-                          "EnGeoMAP will now classify your data. " +
-                          "This might take a few hours depending on the size of your data. " +
-                          "\n" +
-                          "\nPress OK to proceed.")
+        QMessageBox.about(self,
+                          "Notice",
+                          "EnGeoMAP will now classify your data. "
+                          "This might take a few hours depending on the size of your data. "
+                          "\n"
+                          "\nPress OK to proceed."
+                          )
         # Call collection of parameter from UI input
-        self.collectParameters()
+        self.worker.setParams(self.collectParameters())
         # Start the worker process (start calculations via Worker class run function)
         self.threadpool.start(self.worker)
         # Set Status to busy
@@ -143,7 +153,7 @@ class EnGeoMAPGUI(QDialog):
         self.show()
         # Display Ready Message
         self.worker.signals.finished.connect(self.Im_Ready)
-        #self.threadpool.releaseThread()
+        # self.threadpool.releaseThread()
         self.update()
         self.show()
 
@@ -151,8 +161,12 @@ class EnGeoMAPGUI(QDialog):
         # Enable buttonBox after worker thread finished
         self.buttonBox.setEnabled(True)
         # Message to user that processing has finished.
-        QMessageBox.about(self, "Finished Processing", "EnGeoMAP has finished processing your data. " +
-                          "The data Products are now available in your data source folder.")
+        QMessageBox.about(
+            self,
+            "Finished Processing",
+            "EnGeoMAP has finished processing your data. "
+            "The data Products are now available in your data source folder."
+        )
         # Reset Status text to ready
         self.label_5.setText("Status: Ready to process Data")
         # Reset Status indicator (label_5) color to green
@@ -174,8 +188,9 @@ class EnGeoMAPGUI(QDialog):
         Collect the parameterization from the UI elements.
         :return: dictionary (dict) with parameters
         """
-        global p
-        L = []
+
+        # L = []
+        p = dict()
         p['vnirt'] = self.vnir_thresh.toPlainText()
         p['swirt'] = self.swir_thresh.toPlainText()
         p['fit_thresh'] = self.fit_thresh.toPlainText()

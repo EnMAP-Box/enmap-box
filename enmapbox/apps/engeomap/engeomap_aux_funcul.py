@@ -5,9 +5,9 @@
     engeomap.py
 
 This is EnGeoMAP further information can be found in the following open acess publication:
-Mielke, C.; Rogass, C.; Boesche, N.; Segl, K.; Altenberger, U. 
-EnGeoMAP 2.0�Automated Hyperspectral Mineral Identification for the German EnMAP Space Mission. 
-Remote Sens. 2016, 8, 127. 
+Mielke, C.; Rogass, C.; Boesche, N.; Segl, K.; Altenberger, U.
+EnGeoMAP 2.0�Automated Hyperspectral Mineral Identification for the German EnMAP Space Mission.
+Remote Sens. 2016, 8, 127.
     ---------------------
     Date                 : Juli 2019
     Copyright            : (C) 2019 by Christian Mielke
@@ -39,6 +39,7 @@ calculations of EnGeoMAP.
 
 import copy
 import os
+from typing import List
 
 import numpy
 from osgeo import gdal
@@ -46,15 +47,15 @@ from osgeo import gdalnumeric
 from scipy import interpolate
 from scipy import ndimage
 from scipy import optimize
-from scipy import signal
 from scipy import spatial
+
 
 # from engeomap import APP_DIR
 
 
-##### I need this to parse header inforation:
-###########
-def return_header(filename):
+# #### I need this to parse header inforation:
+# ##########
+def return_header(filename) -> List[str]:
     with open(filename, 'r') as file:
         h = file.readlines()
     j = []
@@ -122,7 +123,7 @@ def splitter_hd2(liste):
             prp.append(i[0])
             try:
                 val.append(float(i[1]))
-            except(ValueError):
+            except ValueError:
                 val.append(i[1])
             hd_liste.update({i[0]: i[1]})
     w = hd_liste.keys()
@@ -130,17 +131,19 @@ def splitter_hd2(liste):
 
 
 class read_hdr(object):
-    def __init__(self, filename=None):
-        if type(filename) == str:
-            self.filename = filename
-            self.r_h = return_header(self.filename)
-            self.obj = splitter_hd(self.r_h)
-            self.li = self.obj[1]
-            self.di = self.obj[0]
-            self.prp = self.obj[2]
-            self.val = self.obj[3]
-            for i in self.li:
-                setattr(self, i.replace(' ', '_'), self.di.get(i))
+    def __init__(self, filename: str):
+        if not os.path.isfile(filename):
+            raise FileNotFoundError(filename)
+
+        self.filename = filename
+        self.r_h = return_header(self.filename)
+        self.obj = splitter_hd(self.r_h)
+        self.li = self.obj[1]
+        self.di = self.obj[0]
+        self.prp = self.obj[2]
+        self.val = self.obj[3]
+        for i in self.li:
+            setattr(self, i.replace(' ', '_'), self.di.get(i))
 
     def make_liste_w(self):
         pass
@@ -154,61 +157,48 @@ def str2npar(string):
 
 
 class read_hdr_flt(object):  # Read in Header and give its values back as floats
-    def __init__(self, filename=None):
-        if type(filename) == str:
-            self.filename = filename
-            self.r_h = return_header(self.filename)
-            self.obj = splitter_hd(self.r_h)
-            self.li = self.obj[1]
-            self.di = self.obj[0]
-            self.prp = self.obj[2]
-            self.val = self.obj[3]
-            for i in self.li:
-                try:
-                    setattr(self, i.replace(' ', '_'), float(self.di.get(i)))
-                except(ValueError):
-                    setattr(self, i.replace(' ', '_'), self.di.get(i))
+    def __init__(self, filename: str):
+        if not os.path.isfile(filename):
+            raise FileNotFoundError(filename)
+
+        self.filename = filename
+        self.r_h = return_header(self.filename)
+        self.obj = splitter_hd(self.r_h)
+        self.li = self.obj[1]
+        self.di = self.obj[0]
+        self.prp = self.obj[2]
+        self.val = self.obj[3]
+        for i in self.li:
             try:
-                self.wavelength
-                if type(self.wavelength) == str:
-                    self.wavelength = str2npar(self.wavelength)
-            except(AttributeError):
-                pass
-            try:
-                self.Wavelength
-                if type(self.Wavelength) == str:
-                    self.Wavelength = str2npar(self.Wavelength)
-            except(AttributeError):
-                pass
-            try:
-                self.fwhm
-                if type(self.fwhm) == str:
-                    self.fwhm = str2npar(self.fwhm)
-            except(AttributeError):
-                pass
-            try:
-                self.bbl
-                if type(self.bbl) == str:
-                    self.bbl = str2npar(self.bbl)
-            except(AttributeError):
-                pass
+                setattr(self, i.replace(' ', '_').lower(), float(self.di.get(i)))
+            except ValueError:
+                setattr(self, i.replace(' ', '_').lower(), self.di.get(i))
+
+        if hasattr(self, 'wavelength') and isinstance(self.wavelength, str):
+            self.wavelength = str2npar(self.wavelength)
+
+        if hasattr(self, 'fwhm') and isinstance(self.fwhm, str):
+            self.fwhm = str2npar(self.fwhm)
+
+        if hasattr(self, 'bbl') and isinstance(self.bbl, str):
+            self.bbl = str2npar(self.bbl)
 
     def make_liste_w(self):
         pass
 
 
-########################
-############################
+# #######################
+# ###########################
 # Header Parsing FInished!
-###############################
+# ##############################
 
-#########I need these functions to prepare the data
-################
+# ########I need these functions to prepare the data
+# ###############
 
 
 def check_load_data(bild):
     bildh = os.path.basename(bild)
-    print('...loading '+bildh)
+    print('...loading ' + bildh)
     try:
         data = gdalnumeric.LoadFile(bild)
     except Exception:
@@ -231,6 +221,7 @@ def check_load_data(bild):
     minn = numpy.trunc(numpy.min(wavelength))
     nwav1nm = numpy.arange(minn, maxx, 1)
     return wavelength, nwav1nm, data
+
 
 def compare_wavelengths(wvlib, wvbild):
     print('...comparing wavelengths...')
@@ -276,13 +267,13 @@ def prep_1nm_interpol_intersect(minn, maxx, minflag, maxflag, w1nmlib, w1nmbild)
     return numpy.arange(minimum, maximum, 1)
 
 
-#########
-##########Data Preparation Finished
-##################
+# ########
+# #########Data Preparation Finished
+# #################
 
-###
+# ##
 # misc interpolation functions for the spectra:
-#########
+# ########
 
 def interpolate_generic1nmlib(wv, data):
     neowave = numpy.arange(numpy.trunc(min(wv)), numpy.trunc(max(wv)), 1)
@@ -345,7 +336,7 @@ def interpolate_1nm_spectrum(wvto, wvfrom, data, flag=None):
         output = interpolate.splev(wvto, interpolator, der=0)
         return output  # ,wvto,wv_from_neo
     else:
-        #print("Error expected spectral library data (2d mat)")
+        # print("Error expected spectral library data (2d mat)")
         return None
 
 
@@ -380,13 +371,13 @@ def prephdr(hdrobj):
     return fg
 
 
-########
+# #######
 # End Misc Interpolation Functions
-####
+# ###
 
-####
-######Cvx Hull
-##########
+# ###
+# #####Cvx Hull
+# #########
 
 
 def cvx_uhull2(spc, wv, cont_switch=0):
@@ -428,6 +419,7 @@ def cvx_uhull3(spc, wv):
     hullfinal = numpy.interp(wv, a2, a1)
     return hullfinal
 
+
 def sortierer(wv, wve):
     if wv[0] > wve:
         return 0, 0
@@ -451,6 +443,7 @@ def getrange(wv):
             minima.append(d[1])
     return numpy.asarray([indices, minima])
 
+
 def generic_1nm_data_feat_grabber(lneo, rneo, spec, wave):
     ww = numpy.where((wave >= lneo) & (wave <= rneo))
     return ww, spec[ww], wave[ww]
@@ -459,7 +452,7 @@ def generic_1nm_data_feat_grabber(lneo, rneo, spec, wave):
 def cvx_hull(daten, wv, cont_switch=0):
     wv1 = copy.deepcopy(wv)
     schp = getrange(wv)
-    indices = schp[0, :]
+    # indices = schp[0, :]
     well = schp[1, :]
     if len(well) == 4:
         vnirds = generic_1nm_data_feat_grabber(wv[0], schp[1, 0], daten, wv1)
@@ -487,7 +480,7 @@ def cvx_hull(daten, wv, cont_switch=0):
 def cvx_hull_oclip(wv, daten):
     wv1 = copy.deepcopy(wv)
     schp = getrange(wv)
-    indices = schp[0, :]
+    # indices = schp[0, :]
     well = schp[1, :]
     if len(well) == 4:
         vnirds = generic_1nm_data_feat_grabber(wv[0], schp[1, 0], daten, wv1)
@@ -502,14 +495,14 @@ def cvx_hull_oclip(wv, daten):
     return outp
 
 
-#########
-############
-########
+# ########
+# ###########
+# #######
 
 
-###
-###Calculate Feature Weights for EnGEoMAP
-##########
+# ##
+# ##Calculate Feature Weights for EnGEoMAP
+# #########
 
 def weighting_lib2(rm_rel, wav):
     w = copy.deepcopy(rm_rel)
@@ -535,7 +528,7 @@ def weighting_lib2(rm_rel, wav):
     depthvec = numpy.array(depthvec)
     flvec = numpy.array(flvec)
     ast = depthvec / lenvec
-    lensum = numpy.sum(lenvec)  # neos
+    # lensum = numpy.sum(lenvec)  # neos
     astsum = numpy.sum(ast)
     ast /= astsum
     depthsum = numpy.sum(depthvec)
@@ -606,6 +599,7 @@ def scrut_weigh3(rm_abs, rm_rel, wav, vnir_thr, swir_thr):
         posswirmax = wav[r_abs_mod_swir][swirargmax]
     return r_abs_mod, r_rel, vnirmax, swirmax, posvnirmax, posswirmax
 
+
 def corr(libdat_rel_weighted, w_rel_scale):
     sz = numpy.corrcoef(numpy.concatenate((libdat_rel_weighted, w_rel_scale[numpy.newaxis, :])))
     correlate = sz[-1, :-1]
@@ -622,9 +616,9 @@ def unmixxx(crmlib, spec, corrcoeffs, thresh=0.5):
     return dff, residuum
 
 
-##########End Feature Weights
-#############
-#####
+# # ########End Feature Weights
+# # ###########
+# # ###
 # input wavelength and spectrum in new resolution and abs weighted spectrum
 
 def lo_hull(wv, spc, absolute, thr=0.0001):
@@ -698,7 +692,7 @@ def treat_library_cvx(wv, data, neowave, vnir_thr=0.01, swir_thr=0.02):
                 cvxabs[j, :], cvxrel[j, :], nwv, vnir_thr, swir_thr)
             w_rel_scale[j, :], w_rel_chm_scale[j, :], a, b, c, d = weighting_lib2(cvxrel_mod[j, :], nwv)
         except Exception:
-            #print('treat_library_cvx-->E')
+            # print('treat_library_cvx-->E')
             cvxabs_mod[j, :], cvxrel_mod[j, :], vnirmax[j], swirmax, posvnirmax[j], posswirmax[j] = numpy.zeros_like(
                 arr[j, :]), numpy.ones_like(arr[j, :]), 0, 0, 0, 0
             continue
@@ -723,29 +717,37 @@ def treat_library_cvx_full_range(wv, data, neowave, vnir_thr=0.00, swir_thr=0.00
     for j in numpy.arange(0, arr.shape[0], 1):
         try:
             cvxabs[j, :], cvxrel[j, :], cvxhull[j, :] = cvx_hull(arr[j, :], nwv, cont_switch=1)
-            cvxabs_mod[j, :], cvxrel_mod[j, :], vnirmax[j], swirmax, posvnirmax[j], posswirmax[j] = scrut_weigh3(
+            (cvxabs_mod[j, :], cvxrel_mod[j, :], vnirmax[j],
+             swirmax, posvnirmax[j], posswirmax[j]) = scrut_weigh3(
                 cvxabs[j, :], cvxrel[j, :], nwv, vnir_thr, swir_thr)
             w_rel_scale[j, :], w_rel_chm_scale[j, :], a, b, c, d = weighting_lib2(cvxrel_mod[j, :], nwv)
         except Exception:
-            #print('treat_library_cvx_full_range-->E')
-            cvxabs[j, :], cvxrel[j, :], cvxhull[j, :] = numpy.zeros_like(arr[j, :]), numpy.ones_like(arr[j, :]), arr[j,
-                                                                                                                 :]  # Please mind the colinearity!
+            # print('treat_library_cvx_full_range-->E')
+            cvxabs[j, :], cvxrel[j, :], cvxhull[j, :] = numpy.zeros_like(
+                arr[j, :]), numpy.ones_like(arr[j, :]), arr[j, :]
+            # Please mind the colinearity!
     return cvxabs_mod, cvxrel_mod, w_rel_scale, w_rel_chm_scale, vnirmax, swirmax
 
 
 # hull calculation Only!
 
 
-def treat_library_cvx_full_range_lo(wv, data, neowave, vnir_thr=0.00, swir_thr=0.00):
+def treat_library_cvx_full_range_lo(
+    wv,
+    data,
+    neowave,
+    vnir_thr=0.00,
+    swir_thr=0.00
+):
     arr, nwv = interpolate_generic1nmlib_nwave(wv, data, neowave, flag=0)
     # return arr,nwv
     cvxabs = numpy.zeros_like(arr)
-    cvxabsa = numpy.zeros_like(arr)  #
-    cvxabsb = numpy.zeros_like(arr)  #
+    # cvxabsa = numpy.zeros_like(arr)  #
+    # cvxabsb = numpy.zeros_like(arr)  #
     cvxrel = numpy.zeros_like(arr)
     cvxhull = numpy.zeros_like(arr)
-    cvxhullb = numpy.zeros_like(arr)  #
-    cvxhullc = numpy.zeros_like(arr)  #
+    # cvxhullb = numpy.zeros_like(arr)  #
+    # cvxhullc = numpy.zeros_like(arr)  #
     w_rel_chm_scale = numpy.zeros_like(arr)
     w_rel_scale = numpy.zeros_like(arr)
     cvxrel_mod = numpy.zeros_like(arr)
@@ -754,34 +756,42 @@ def treat_library_cvx_full_range_lo(wv, data, neowave, vnir_thr=0.00, swir_thr=0
     posswirmax = numpy.zeros((arr.shape[0]))
     swirmax = numpy.zeros((arr.shape[0]))
     vnirmax = numpy.zeros((arr.shape[0]))
-    cvx_poshull = numpy.zeros_like(arr)
+    # cvx_poshull = numpy.zeros_like(arr)
     for j in numpy.arange(0, arr.shape[0], 1):
         try:
             cvxabs[j, :], cvxrel[j, :], cvxhull[j, :] = cvx_hull(arr[j, :], nwv, cont_switch=1)
-            cvxabs[j, :], cvxrel_mod[j, :], vnirmax[j], swirmax, posvnirmax[j], posswirmax[j] = scrut_weigh3(
+            (cvxabs[j, :], cvxrel_mod[j, :], vnirmax[j],
+             swirmax, posvnirmax[j], posswirmax[j]) = scrut_weigh3(
                 cvxabs[j, :], cvxrel[j, :], nwv, vnir_thr, swir_thr)  # cvxabsb
-            w_rel_scale[j, :], w_rel_chm_scale[j, :], a, b, c, d = weighting_lib2(cvxrel_mod[j, :], nwv)
-            wv1, spc1, hull1, hulllfin1, feinalpos1, relative1 = lo_hull(nwv, arr[j, :], w_rel_chm_scale[j,
-                                                                                         :])  #####################NEU Reflectance Peaks
+            (w_rel_scale[j, :], w_rel_chm_scale[j, :],
+             a, b, c, d) = weighting_lib2(cvxrel_mod[j, :], nwv)
+            (wv1, spc1, hull1,
+             hulllfin1, feinalpos1, relative1) = lo_hull(nwv, arr[j, :], w_rel_chm_scale[j, :])
+            # # ###################NEU Reflectance Peaks
             # cvxhullb[j,:]=feinalpos1#
             # cvxhullc[j,:]=hulllfin1#
-            cvxabs[j, :], cvxrel_mod[j, :], vnirmax[j], swirmax, posvnirmax[j], posswirmax[j] = scrut_weigh3(feinalpos1,
-                                                                                                             relative1,
-                                                                                                             nwv,
-                                                                                                             vnir_thr,
-                                                                                                             swir_thr)  #####################NEU Reflectance Peaks
-            w_rel_scale[j, :], w_rel_chm_scale[j, :], a, b, c, d = weighting_lib2(cvxrel_mod[j, :],
-                                                                                  nwv)  #####################NEU Reflectance Peaks
+            (cvxabs[j, :], cvxrel_mod[j, :], vnirmax[j],
+             swirmax, posvnirmax[j], posswirmax[j]) = scrut_weigh3(
+                feinalpos1,
+                relative1,
+                nwv,
+                vnir_thr,
+                swir_thr
+            )  # # ##################NEU Reflectance Peaks
+            (w_rel_scale[j, :], w_rel_chm_scale[j, :],
+             a, b, c, d) = weighting_lib2(cvxrel_mod[j, :], nwv)
+            # # ###################NEU Reflectance Peaks
         except Exception:
             print('treat_library_cvx_full_range_lo-->E')
-            cvxabs[j, :], cvxrel[j, :], cvxhull[j, :] = numpy.zeros_like(arr[j, :]), numpy.ones_like(arr[j, :]), arr[j,
-                                                                                                                 :]  # Please mind the colinearity!
-    return cvxabs_mod, cvxrel_mod, w_rel_scale, w_rel_chm_scale, vnirmax, swirmax  # ,cvxhull,cvxabsa,cvxabsb,cvxhullb,cvxhullc
+            cvxabs[j, :], cvxrel[j, :], cvxhull[j, :] = numpy.zeros_like(
+                arr[j, :]), numpy.ones_like(arr[j, :]), arr[j, :]  # Please mind the colinearity!
+    return (cvxabs_mod, cvxrel_mod, w_rel_scale,
+            w_rel_chm_scale, vnirmax, swirmax)  # ,cvxhull,cvxabsa,cvxabsb,cvxhullb,cvxhullc
 
 
-#########
-########Fitting Routines
-###########
+# # #######
+# # ######Fitting Routines
+# # #########
 
 
 def fitting_cvx(wfrom, wto, data, libdat_rel_weighted, libdat_rel_chm_weighted, libdat_abs, vnir_thr=0.01,
@@ -795,10 +805,10 @@ def fitting_cvx(wfrom, wto, data, libdat_rel_weighted, libdat_rel_chm_weighted, 
     swirdepthmat = numpy.zeros([dshape[1]])
     vnirposmat = numpy.zeros([dshape[1]])
     swirposmat = numpy.zeros([dshape[1]])
-    leastsquares = numpy.ones([lshape[0], dshape[1]]) * 0  # *-999
+    # leastsquares = numpy.ones([lshape[0], dshape[1]]) * 0  # *-999
     bvlss = numpy.ones([lshape[0], dshape[1]]) * 0  # *-999
     bvlserr = numpy.ones([dshape[1]])  # *-999
-    lsqerr = numpy.ones([dshape[1]])  # *-999
+    # lsqerr = numpy.ones([dshape[1]])  # *-999
     astsum = numpy.zeros([dshape[1]])
     depthsum = numpy.zeros([dshape[1]])
     flsum = numpy.zeros([dshape[1]])
@@ -833,16 +843,27 @@ def fitting_cvx(wfrom, wto, data, libdat_rel_weighted, libdat_rel_chm_weighted, 
                 correlat[:, j][~numpy.isfinite(correlat[:, j])] = 0
                 numpy.place(correlat[:, j], correlat[:, j] <= 0, 0)
             except Exception:
-                pass
+                bvlserr[j] = 9999
             try:
                 bvlss[:, j], bvlserr[j] = unmixxx(libdat_abs, absolutee, correlat[:, j], thresh=0.5)
             except Exception:
                 bvlserr[j] = 9999
-    return correlat, bvlss, bvlserr, vnirposmat, vnirdepthmat, swirposmat, swirdepthmat, astsum, depthsum, flsum, allessum
+    return (correlat, bvlss, bvlserr, vnirposmat, vnirdepthmat,
+            swirposmat, swirdepthmat, astsum, depthsum, flsum, allessum)
 
 
-def fitting_cvx_fullrange(wfrom, wto, data, libdat_rel_weighted, libdat_rel_chm_weighted, libdat_abs, vnir_thr=0.00,
-                          swir_thr=0.00, lib_flag=0, mix_minerals=6, fit_threshold=0.5):
+def fitting_cvx_fullrange(
+    wfrom,
+    wto,
+    data,
+    libdat_rel_weighted,
+    libdat_rel_chm_weighted,
+    libdat_abs, vnir_thr=0.00,
+    swir_thr=0.00,
+    lib_flag=0,
+    mix_minerals=6,
+    fit_threshold=0.5
+):
     print('...feature fitting and bvls...')
     dshape2 = data.shape
     data = data.reshape(dshape2[0], dshape2[1] * dshape2[2])
@@ -853,10 +874,10 @@ def fitting_cvx_fullrange(wfrom, wto, data, libdat_rel_weighted, libdat_rel_chm_
     swirdepthmat = numpy.zeros([dshape[1]])
     vnirposmat = numpy.zeros([dshape[1]])
     swirposmat = numpy.zeros([dshape[1]])
-    leastsquares = numpy.ones([lshape[0], dshape[1]]) * 0  # *-999
+    # leastsquares = numpy.ones([lshape[0], dshape[1]]) * 0  # *-999
     bvlss = numpy.ones([lshape[0], dshape[1]]) * 0  # *-999
     bvlserr = numpy.ones([dshape[1]])  # *-999
-    lsqerr = numpy.ones([dshape[1]])  # *-999
+    # lsqerr = numpy.ones([dshape[1]])  # *-999
     astsum = numpy.zeros([dshape[1]])
     depthsum = numpy.zeros([dshape[1]])
     flsum = numpy.zeros([dshape[1]])
@@ -891,112 +912,120 @@ def fitting_cvx_fullrange(wfrom, wto, data, libdat_rel_weighted, libdat_rel_chm_
                 correlat[:, j][~numpy.isfinite(correlat[:, j])] = 0
                 numpy.place(correlat[:, j], correlat[:, j] <= 0, 0)
             except Exception:
-                pass
+                bvlserr[j] = 9999
             try:
                 bvlss[:, j], bvlserr[j] = unmixxx(libdat_abs, absolutee, correlat[:, j], thresh=0.5)
             except Exception:
                 bvlserr[j] = 9999
-    return correlat, bvlss, bvlserr, vnirposmat, vnirdepthmat, swirposmat, swirdepthmat, astsum, depthsum, flsum, allessum
+    return (correlat, bvlss, bvlserr, vnirposmat, vnirdepthmat,
+            swirposmat, swirdepthmat, astsum, depthsum, flsum, allessum)
 
 
-def fitting_cvx_fullrange_lo(wfrom, wto, data, libdat_rel_weighted, libdat_rel_chm_weighted, libdat_abs, vnir_thr,
-                             swir_thr, lib_flag, mix_minerals, fit_threshold):
-    dshape2 = data.shape
-    data = data.reshape(dshape2[0], dshape2[1] * dshape2[2])
-    dshape = data.shape
-    lshape = libdat_rel_weighted.shape
-    correlat = numpy.zeros([lshape[0], dshape[1]])
-    vnirdepthmat = numpy.zeros([dshape[1]])
-    swirdepthmat = numpy.zeros([dshape[1]])
-    vnirposmat = numpy.zeros([dshape[1]])
-    swirposmat = numpy.zeros([dshape[1]])
-    leastsquares = numpy.ones([lshape[0], dshape[1]]) * 0  # *-999
-    bvlss = numpy.ones([lshape[0], dshape[1]]) * 0  # *-999
-    bvlserr = numpy.ones([dshape[1]])  # *-999
-    lsqerr = numpy.ones([dshape[1]])  # *-999
-    astsum = numpy.zeros([dshape[1]])
-    depthsum = numpy.zeros([dshape[1]])
-    flsum = numpy.zeros([dshape[1]])
-    allessum = numpy.zeros([dshape[1]])
-    for j in numpy.arange(0, dshape[1], 1):
-        output = interpolate_1nm_spectrum(wto, wfrom, data[:, j], flag=None)
-        if numpy.sum(output == 0):
-            rm_abs_dat = output
-            rm_rel_dat = output
-            hull_dat = output
-            correlat[:, j] = numpy.zeros([lshape[0]])
-            vnirdepthmat[j] = -1
-            swirdepthmat[j] = -1
-            vnirposmat[j] = -1
-            swirposmat[j] = -1
-            astsum[j] = -1
-            depthsum[j] = -1
-            flsum[j] = -1
-            allessum[j] = -1
-        else:
-            try:
-                rm_abs_dat, rm_rel_dat, hull_dat = cvx_hull(output, wto, cont_switch=1)
-                absolutee, relativee, vnirdepthmat[j], swirdepthmat[j], vnirposmat[j], swirposmat[j] = scrut_weigh3(
-                    rm_abs_dat, rm_rel_dat, wto, vnir_thr, swir_thr)
-                w_rel_scale, w_rel_chm_scale, a, b, c, d = weighting_lib2(relativee, wto)
-            except Exception:
-                bvlserr[j] = 9999
-                rm_abs_dat = output
-                rm_rel_dat = output
-                hull_dat = output
-                correlat[:, j] = numpy.zeros([lshape[0]])
-                vnirdepthmat[j] = -1
-                swirdepthmat[j] = -1
-                vnirposmat[j] = -1
-                swirposmat[j] = -1
-                astsum[j] = -1
-                depthsum[j] = -1
-                flsum[j] = -1
-                allessum[j] = -1
-                pass
-            try:
-                wv1_bil, spc1_bil, hull1_bil, hulllfin1_bil, feinalpos1_bil, relative1_bil = lo_hull(wto, output,
-                                                                                                     w_rel_chm_scale)  #####################NEU Reflectance Peaks#
-                cvxabs_mod_bil, cvxrel_mod_bil, vnirmax_bil, swirmax_bil, posvnirmax_bil, posswirmax_bil = scrut_weigh3(
-                    feinalpos1_bil, relative1_bil, wto, vnir_thr, swir_thr)  #####################NEU Reflectance Peaks
-                w_rel_scale_bil, w_rel_chm_scale_bil, a1, b1, c1, d1 = weighting_lib2(cvxrel_mod_bil,
-                                                                                      wto)  #####################NEU Reflectance Peaks
-                astsum[j] = a1
-                depthsum[j] = b1
-                flsum[j] = c1
-                allessum[j] = d1
-                correlat[:, j] = corr(libdat_rel_weighted, w_rel_scale_bil)
-                numpy.nan_to_num(correlat[:, j])
-                correlat[:, j][~numpy.isfinite(correlat[:, j])] = 0
-                numpy.place(correlat[:, j], correlat[:, j] <= 0, 0)
-            except Exception:
-                bvlserr[j] = 9999
-                rm_abs_dat = output
-                rm_rel_dat = output
-                hull_dat = output
-                correlat[:, j] = numpy.zeros([lshape[0]])
-                vnirdepthmat[j] = -1
-                swirdepthmat[j] = -1
-                vnirposmat[j] = -1
-                swirposmat[j] = -1
-                astsum[j] = -1
-                depthsum[j] = -1
-                flsum[j] = -1
-                allessum[j] = -1
-            try:
-                bvlss[:, j], bvlserr[j] = unmixxx(libdat_abs_bil, cvxabs_mod_bil, correlat[:, j], thresh=0.5)
-            except Exception:
-                bvlserr[j] = 9999
-    return correlat, bvlss, bvlserr, vnirposmat, vnirdepthmat, swirposmat, swirdepthmat, astsum, depthsum, flsum, allessum
+# def fitting_cvx_fullrange_lo(wfrom, wto, data, libdat_rel_weighted, libdat_rel_chm_weighted, libdat_abs, vnir_thr,
+#                              swir_thr, lib_flag, mix_minerals, fit_threshold):
+#     dshape2 = data.shape
+#     data = data.reshape(dshape2[0], dshape2[1] * dshape2[2])
+#     dshape = data.shape
+#     lshape = libdat_rel_weighted.shape
+#     correlat = numpy.zeros([lshape[0], dshape[1]])
+#     vnirdepthmat = numpy.zeros([dshape[1]])
+#     swirdepthmat = numpy.zeros([dshape[1]])
+#     vnirposmat = numpy.zeros([dshape[1]])
+#     swirposmat = numpy.zeros([dshape[1]])
+#     # leastsquares = numpy.ones([lshape[0], dshape[1]]) * 0  # *-999
+#     bvlss = numpy.ones([lshape[0], dshape[1]]) * 0  # *-999
+#     bvlserr = numpy.ones([dshape[1]])  # *-999
+#     # lsqerr = numpy.ones([dshape[1]])  # *-999
+#     astsum = numpy.zeros([dshape[1]])
+#     depthsum = numpy.zeros([dshape[1]])
+#     flsum = numpy.zeros([dshape[1]])
+#     allessum = numpy.zeros([dshape[1]])
+#     for j in numpy.arange(0, dshape[1], 1):
+#         output = interpolate_1nm_spectrum(wto, wfrom, data[:, j], flag=None)
+#         if numpy.sum(output == 0):
+#             # rm_abs_dat = output
+#             # rm_rel_dat = output
+#             # hull_dat = output
+#             correlat[:, j] = numpy.zeros([lshape[0]])
+#             vnirdepthmat[j] = -1
+#             swirdepthmat[j] = -1
+#             vnirposmat[j] = -1
+#             swirposmat[j] = -1
+#             astsum[j] = -1
+#             depthsum[j] = -1
+#             flsum[j] = -1
+#             allessum[j] = -1
+#         else:
+#             try:
+#                 rm_abs_dat, rm_rel_dat, hull_dat = cvx_hull(output, wto, cont_switch=1)
+#                 (absolutee, relativee, vnirdepthmat[j],
+#                  swirdepthmat[j], vnirposmat[j], swirposmat[j]) = scrut_weigh3(
+#                     rm_abs_dat, rm_rel_dat, wto, vnir_thr, swir_thr
+#                 )
+#                 w_rel_scale, w_rel_chm_scale, a, b, c, d = weighting_lib2(relativee, wto)
+#             except Exception:
+#                 bvlserr[j] = 9999
+#                 # rm_abs_dat = output
+#                 # rm_rel_dat = output
+#                 # hull_dat = output
+#                 correlat[:, j] = numpy.zeros([lshape[0]])
+#                 vnirdepthmat[j] = -1
+#                 swirdepthmat[j] = -1
+#                 vnirposmat[j] = -1
+#                 swirposmat[j] = -1
+#                 astsum[j] = -1
+#                 depthsum[j] = -1
+#                 flsum[j] = -1
+#                 allessum[j] = -1
+#                 pass
+#             try:
+#                 wv1_bil, spc1_bil, hull1_bil, hulllfin1_bil, feinalpos1_bil, relative1_bil = lo_hull(
+#                     wto, output, w_rel_chm_scale
+#                 )  # # ###################NEU Reflectance Peaks#
+#                 (cvxabs_mod_bil, cvxrel_mod_bil, vnirmax_bil,
+#                  swirmax_bil, posvnirmax_bil, posswirmax_bil) = scrut_weigh3(
+#                     feinalpos1_bil, relative1_bil, wto, vnir_thr, swir_thr
+#                 )  # # ###################NEU Reflectance Peaks
+#                 (w_rel_scale_bil, w_rel_chm_scale_bil,
+#                  a1, b1, c1, d1) = weighting_lib2(cvxrel_mod_bil, wto)
+#                 # # ###################NEU Reflectance Peaks
+#                 astsum[j] = a1
+#                 depthsum[j] = b1
+#                 flsum[j] = c1
+#                 allessum[j] = d1
+#                 correlat[:, j] = corr(libdat_rel_weighted, w_rel_scale_bil)
+#                 numpy.nan_to_num(correlat[:, j])
+#                 correlat[:, j][~numpy.isfinite(correlat[:, j])] = 0
+#                 numpy.place(correlat[:, j], correlat[:, j] <= 0, 0)
+#             except Exception:
+#                 bvlserr[j] = 9999
+#                 # rm_abs_dat = output
+#                 # rm_rel_dat = output
+#                 # hull_dat = output
+#                 correlat[:, j] = numpy.zeros([lshape[0]])
+#                 vnirdepthmat[j] = -1
+#                 swirdepthmat[j] = -1
+#                 vnirposmat[j] = -1
+#                 swirposmat[j] = -1
+#                 astsum[j] = -1
+#                 depthsum[j] = -1
+#                 flsum[j] = -1
+#                 allessum[j] = -1
+#             try:
+#                 bvlss[:, j], bvlserr[j] = unmixxx(libdat_abs_bil, cvxabs_mod_bil, correlat[:, j], thresh=0.5)
+#             except Exception:
+#                 bvlserr[j] = 9999
+#     return (correlat, bvlss, bvlserr, vnirposmat, vnirdepthmat,
+#             swirposmat, swirdepthmat, astsum, depthsum, flsum, allessum)
 
 
-###
-###End Fitting Routines
-############
+# # #
+# # #End Fitting Routines
+# # ##########
 
-########
-###Class color result functions
-##########
+# # ######
+# # #Class color result functions
+# # ########
 
 def writiff(rgb, out):
     format = "GTiff"
@@ -1024,28 +1053,29 @@ def reshreib2d(data, name, shp):
     return None
 
 
-def own_mix_corelation(corelate1, mix_minerals):
-    shp = corelate1.shape
-    corelate1[~numpy.isfinite(corelate1)] = 0
-    # print numpy.max(corelate1)
-    # print numpy.min(corelate1)
-    ws = numpy.ones([mix_minerals, shp[1]]) * -999
-    w_corrcoef = numpy.zeros([mix_minerals, shp[1]])
-    for i in numpy.arange(0, shp[1], 1):
-        zd = copy.deepcopy(corelate1[:, i])
-        for j in numpy.arange(0, mix_minerals, 1):
-            index = numpy.where(zd == numpy.max(zd))
-            if numpy.max(zd) == 0:
-                break
-            else:
-                if len(index[0]) > 1:
-                    ind = index[0][0]
-                else:
-                    ind = index[0]
-                ws[j, i] = ind
-                w_corrcoef[j, i] = zd[ind]
-                zd[ind] = 0
-    return ws, w_corrcoef
+#
+# def own_mix_corelation(corelate1, mix_minerals):
+#     shp = corelate1.shape
+#     corelate1[~numpy.isfinite(corelate1)] = 0
+#     # print numpy.max(corelate1)
+#     # print numpy.min(corelate1)
+#     ws = numpy.ones([mix_minerals, shp[1]]) * -999
+#     w_corrcoef = numpy.zeros([mix_minerals, shp[1]])
+#     for i in numpy.arange(0, shp[1], 1):
+#         zd = copy.deepcopy(corelate1[:, i])
+#         for j in numpy.arange(0, mix_minerals, 1):
+#             index = numpy.where(zd == numpy.max(zd))
+#             if numpy.max(zd) == 0:
+#                 break
+#             else:
+#                 if len(index[0]) > 1:
+#                     ind = index[0][0]
+#                 else:
+#                     ind = index[0]
+#                 ws[j, i] = ind
+#                 w_corrcoef[j, i] = zd[ind]
+#                 zd[ind] = 0
+#     return ws, w_corrcoef
 
 
 def setzus(liste):
@@ -1119,10 +1149,10 @@ def schreibefarbfile7(numpyarray, out, classfilename):
     return rgb
 
 
-##########
-################
-########################
-#############################WRITE cOLORFILE
+# # ########
+# # ##############
+# # ######################
+# # ###########################WRITE cOLORFILE
 def schreibeBSQsingle_band_class_best_matchmat(numpyarray, out, classfilename):
     numpy.place(numpyarray, numpyarray < 0, 255)
     numpyarray = numpyarray.astype('uint8')
@@ -1134,14 +1164,14 @@ def schreibeBSQsingle_band_class_best_matchmat(numpyarray, out, classfilename):
     dst_ds = None
     unik_vals = numpy.unique(numpyarray)
     classes_numbers = len(unik_vals)
-    ####
+    # ###
     obd = loadmineral_colors(classfilename)
-    ####
+    # ###
     len_obd = len(obd[1])
     print('Total number of library entries = ', len_obd)
-    ###
+    # ##
     print('Number of library endmembers present in the EnGeoMAP classification result = ', classes_numbers)
-    ####
+    # ###
     description = []
     class_names = []
     class_lookup = []
@@ -1234,7 +1264,7 @@ def corr_colours(corrmat, colorfile, basename, shape_param, minerals=30, thresh=
     # schreibeBSQ(maxcormat,basename+'_best_matches_')
     # schreibeBSQ(indexmat,basename+'_best_matches_indices')
     rgb = schreibeBSQsingle_band_class_best_matchmat(indexmat[0, :, :], basename + '_result', colorfile)
-    indexmedian = signal.medfilt2d(indexmat[0, :, :], kernel_size=3)
+    # indexmedian = signal.medfilt2d(indexmat[0, :, :], kernel_size=3)
     # schreibeBSQsingle(indexmedian,basename+'_median_filtered_best_match_index')
     # Optional median filtered
     # rgbm=schreibeBSQsingle_band_class_best_matchmat(indexmedian,basename+'_median_filtered_result',colorfile)
@@ -1247,11 +1277,12 @@ def corr_colours_unmix(corrmat, colorfile, basename, shape_param, minerals, thre
     numpy.place(threshold_applied, threshold_applied < thresh, 0)
     indexmat, maxcormat = own_mix_corelation(threshold_applied, minerals)
     indexmat = indexmat.reshape(minerals, shape_param[1], shape_param[2])
-    maxcormat = maxcormat.reshape(minerals, shape_param[1], shape_param[2])
-    rgb = schreibeBSQsingle_band_class_best_matchmat(indexmat[0, :, :], basename + '_highest_abundance_result', colorfile)
+    # maxcormat = maxcormat.reshape(minerals, shape_param[1], shape_param[2])
+    rgb = schreibeBSQsingle_band_class_best_matchmat(indexmat[0, :, :], basename + '_highest_abundance_result',
+                                                     colorfile)
     # schreibeBSQ(maxcormat,basename+'_highest_abundance_unmix_')
     # schreibeBSQ(indexmat,basename+'_highest_abundance_unmix_indices')
-    indexmedian = signal.medfilt2d(indexmat[0, :, :], kernel_size=3)
+    # indexmedian = signal.medfilt2d(indexmat[0, :, :], kernel_size=3)
     # schreibeBSQsingle(indexmedian,basename+'_median_filtered_best_match_index')
     # Optional median filtered
     # rgbm=schreibeBSQsingle_band_class_best_matchmat(indexmedian,basename+'_median_filtered_highest_abundance',colorfile)
@@ -1270,12 +1301,12 @@ def corr_colours_dist(corrmat, colorfile, basename, shape_param, minerals):
     return rgb, indexmat
 
 
-#########
-#############
+# # #######
+# # ###########
 # End Corr Result Color Files
 
-######
-####File IO
+# # ####
+# # ##File IO
 
 
 def schreibeBSQ(numpyarray, out):
@@ -1329,8 +1360,8 @@ def own_mix_corelation(corelate1, mix_minerals):
                     ind = index[0][0]
                 else:
                     ind = index[0]
-                ws[j, i] = ind
-                w_corrcoef[j, i] = zd[ind]
+                ws[j, i] = ind[0]
+                w_corrcoef[j, i] = zd[ind[0]]
                 zd[ind] = 0
     return ws, w_corrcoef
 
@@ -1359,18 +1390,21 @@ def own_mix_corelation2(corelate1, mix_minerals):
     return ws, w_corrcoef
 
 
-####
-####End File IO
-##########
-############
-############
+# # ##
+# # ##End File IO
+# # ########
+# # ##########
+# # ##########
 
 def listing(path):  # listing all files in this directory, which ends with .hdr
     return [os.path.join(path, f) for f in os.listdir(path) if f.endswith(".hdr")]
 
 
 def rewrite_headers(
-        inputbildhdr):  # read orginal header and read map info and crs, create a new list, append map info and crs into empty list (L[]), write L into all hdr files
+    inputbildhdr
+):
+    # read original header and read map info and crs, create a new list, append map info and crs into
+    # empty list (L[]), write L into all hdr files
     pf = inputbildhdr.rfind('/')
     pfad = inputbildhdr[:pf]
     liste = listing(pfad)
@@ -1380,15 +1414,18 @@ def rewrite_headers(
         mapinfo = inputs.map_info
         mapinfo = 'map info={' + mapinfo + '}\n'
         L.append(mapinfo)
-    except(AttributeError):
-        print('No coordinate info was found in the input image data -> No coordinate info will be transferred to the classification results header files.')
+    except AttributeError as ex:
+        print(
+            'No coordinate info was found in the input image data -> '
+            f'No coordinate info will be transferred to the classification results header files.\n {ex}'
+        )
         return -1
     try:
         crs = inputs.coordinate_system_string
         crs = 'coordinate system string={' + crs + '}\n'
         L.append(crs)
-    except(AttributeError):
-        print('No CRS Info was found.')
+    except AttributeError as ex:
+        print(f'No CRS Info was found: {ex}')
     for j in enumerate(liste):
         if j[1] == inputbildhdr:
             continue
