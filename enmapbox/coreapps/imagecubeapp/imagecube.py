@@ -18,8 +18,9 @@ from OpenGL.GL import glEnd, glVertex3f, glColor4f, glLineWidth, GL_LINE_SMOOTH,
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem, GLOptions
 from pyqtgraph.opengl.GLViewWidget import GLViewWidget
 
-from enmapbox.gui import SliderSpinBox, DoubleSliderSpinBox, SpatialExtentMapTool
 from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog, rendererFromXml, rendererToXml
+from enmapbox.qgispluginsupport.qps.maptools import SpatialExtentMapTool
+from enmapbox.qgispluginsupport.qps.simplewidgets import SliderSpinBox, DoubleSliderSpinBox
 from enmapbox.qgispluginsupport.qps.utils import loadUi, SpatialExtent
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtGui import QColor, QVector3D, QMatrix4x4
