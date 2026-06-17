@@ -78,14 +78,15 @@ class LibraryFromRegressionDatasetAlgorithm(EnMAPProcessingAlgorithm):
             assert crs.authid() == writer.library.crs().authid()
             writer.writeToSource(filename)
             library = QgsVectorLayer(filename)
-            assert library.isValid()
+            if not library.isValid():
+                raise RuntimeError(
+                    f'failed to load library: {filename}'
+                )
 
-            if not crs.authid() == library.crs().authid():
-                reader = LibraryReader(writer.library)
-                data = list(reader.data())
-                assert 0
-
-            assert crs.authid() == library.crs().authid()
+            if crs.authid() != library.crs().authid():
+                raise RuntimeError(
+                    f'CRS mismatch: expected {crs.authid()}, got {library.crs().authid()}'
+                )
 
             result = {self.P_OUTPUT_LIBRARY: filename}
             self.toc(feedback, result)

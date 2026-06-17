@@ -2,6 +2,7 @@ import json
 import pickle
 import re
 import uuid
+from contextlib import suppress
 from os import makedirs, mkdir
 from os.path import join, dirname, basename, exists, splitext
 from random import randint
@@ -179,7 +180,9 @@ class Utils(object):
 
     @classmethod
     def numpyArrayToQgsRasterBlock(cls, array: np.ndarray, dataType: int = None) -> QgsRasterBlock:
-        assert array.ndim == 2
+        if array.ndim != 2:
+            raise ValueError('number of array dimensions must be 2')
+
         height, width = array.shape
         if dataType is None:
             dataType = cls.numpyDataTypeToQgisDataType(array.dtype)
@@ -345,7 +348,10 @@ class Utils(object):
         array = reader.array(bandList=[bandNo])
         mask = reader.maskArray(array, bandList=[bandNo], defaultNoDataValue=0)
         values = np.unique(array[0][mask[0]])
+
+        # nosec B311 not security relevant generation of random colors
         categories = [Category(int(v), str(v), QColor(randint(0, 2 ** 24)).name()) for v in values]
+
         return categories
 
     @classmethod
@@ -368,6 +374,7 @@ class Utils(object):
         values = np.unique(values).tolist()
         categories = list()
         for value in values:
+            # nosec B311 not security relevant generation of random colors
             color = colors.get(value, QColor(randint(0, 2 ** 24 - 1)))
             color = cls.parseColor(color).name()
             name = names.get(value, str(value))
@@ -476,24 +483,24 @@ class Utils(object):
             items: List[str] = [v for v in obj.replace(' ', ',').split(',') if len(v) > 1]
             if len(items) == 2:
                 lon, lat = items
-                try:
-                    return SpatialPoint(QgsCoordinateReferenceSystem.fromEpsgId(4326), float(lat), float(lon))
-                except Exception:
-                    pass
-                try:
-                    def conversion(old):
-                        # adopted from https://stackoverflow.com/questions/10852955/
-                        # python-batch-convert-gps-positions-to-lat-lon-decimals
-                        direction = {'N': 1, 'S': -1, 'E': 1, 'W': -1}
-                        new = old.replace(u'°', ' ').replace('\'', ' ').replace('"', ' ')
-                        new = new.split()
-                        new_dir = new.pop()
-                        new.extend([0, 0, 0])
-                        return (int(new[0]) + int(new[1]) / 60.0 + float(new[2]) / 3600.0) * direction[new_dir]
 
+                with suppress(ValueError):
+                    return SpatialPoint(QgsCoordinateReferenceSystem.fromEpsgId(4326), float(lat), float(lon))
+
+                def conversion(old):
+                    # adopted from https://stackoverflow.com/questions/10852955/
+                    # python-batch-convert-gps-positions-to-lat-lon-decimals
+                    # support 53°04'29.2"N 13°53'42.3"E format
+                    direction = {'N': 1, 'S': -1, 'E': 1, 'W': -1}
+                    new = old.replace(u'°', ' ').replace('\'', ' ').replace('"', ' ')
+                    new = new.split()
+                    new_dir = new.pop()
+                    new.extend([0, 0, 0])
+                    return (int(new[0]) + int(new[1]) / 60.0 + float(new[2]) / 3600.0) * direction[new_dir]
+
+                with suppress(Exception):
                     return SpatialPoint(QgsCoordinateReferenceSystem.fromEpsgId(4326), conversion(lat), conversion(lon))
-                except Exception:
-                    pass
+
             if len(items) == 3:
                 lat, lon, epsgId = items
                 if epsgId.upper().startswith('[EPSG:'):

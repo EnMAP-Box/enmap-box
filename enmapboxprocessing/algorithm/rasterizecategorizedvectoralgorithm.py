@@ -212,7 +212,8 @@ class RasterizeCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
             vector, filename, transformContext, options
         )
 
-        assert error == QgsVectorFileWriter.NoError, f'Fail error {error}:{message}'
+        if error != QgsVectorFileWriter.NoError:
+            raise RuntimeError(f'failed to write vector file: {error}: {message}')
 
         # calculate class ids [1..nCategories]
         vector2 = QgsVectorLayer(filename)
