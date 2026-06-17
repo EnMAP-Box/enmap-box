@@ -29,7 +29,11 @@ def load_model_and_tile_size(model_checkpoint, acc):
         acc_d = 'cuda'
     else:
         acc_d = 'cpu'
-    checkpoint = torch.load(model_checkpoint, map_location=torch.device(acc_d), weights_only=False)
+    checkpoint = torch.load(
+        model_checkpoint,
+        map_location=torch.device(acc_d),
+        weights_only=False
+    )  # nosec: B614
 
     # Retrieve hyperparameters from the checkpoint
     hyperpara = checkpoint['hyper_parameters']

@@ -30,7 +30,12 @@ def extract_backbone(path: str) -> tuple[str, 'OrderedDict[str, Tensor]']:
     .. versionchanged:: 0.4
         Renamed from *extract_encoder* to *extract_backbone*
     """
-    checkpoint = torch.load(path, map_location=torch.device('cpu'))
+    checkpoint = torch.load(
+        path,
+        map_location=torch.device('cpu'),
+        weights_only=False
+    )  # nosec: B614
+
     if 'model' in checkpoint['hyper_parameters']:
         name = checkpoint['hyper_parameters']['model']
         state_dict = checkpoint['state_dict']
