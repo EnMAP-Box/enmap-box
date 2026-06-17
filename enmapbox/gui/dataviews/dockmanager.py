@@ -891,9 +891,10 @@ class DockManagerTreeModel(QgsLayerTreeModel):
         results = [n for n in root.findLayers() if n.layerId() == lid]
         return results
 
-    def findDockNode(self,
-                     object: Union[str, Dock, QgsMapCanvas, QgsRasterLayer, QgsVectorLayer, SpectralLibraryWidget]) \
-        -> Optional[DockTreeNode]:
+    def findDockNode(
+        self,
+        object: Union[str, Dock, QgsMapCanvas, QgsRasterLayer, QgsVectorLayer, SpectralLibraryWidget]
+    ) -> Optional[DockTreeNode]:
         """
         Returns a DockTreeNode that contains the given object
         :param object:
@@ -1007,10 +1008,12 @@ class DockManagerTreeModel(QgsLayerTreeModel):
                     node.removeLayerNodesByURI(d.source())
                 else:
                     # close docks linked to this source
-                    if isinstance(node, AttributeTableDockTreeNode) \
-                        and isinstance(node.dock, AttributeTableDock) \
-                        and isinstance(node.dock.vectorLayer(), QgsVectorLayer) \
-                        and node.dock.vectorLayer().source() == d.source():
+                    if (
+                        isinstance(node, AttributeTableDockTreeNode)
+                        and isinstance(node.dock, AttributeTableDock)
+                        and isinstance(node.dock.vectorLayer(), QgsVectorLayer)
+                        and node.dock.vectorLayer().source() == d.source()
+                    ):
                         docks_to_close.append(node.dock)
 
                     elif isinstance(node, SpeclibDockTreeNode):

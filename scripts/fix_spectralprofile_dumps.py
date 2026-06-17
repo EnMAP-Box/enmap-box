@@ -112,7 +112,7 @@ def main():
 
     print("Initializing QGIS Application...")
 
-    qgs = start_app()
+    start_app()
     # Run your processing function
     fix_binary_profile_fields(input_path, fieldnames=args.fieldnames)
 
