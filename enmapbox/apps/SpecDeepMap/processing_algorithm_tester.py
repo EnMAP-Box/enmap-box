@@ -1,10 +1,8 @@
 from qgis.PyQt.QtCore import QCoreApplication
-from qgis._core import QgsProcessingParameterEnum
-from qgis.core import (QgsProcessingAlgorithm,
-                       QgsProcessingParameterFile,
-                       QgsProcessingParameterFolderDestination,
-                       QgsProcessingParameterBoolean,
-                       QgsProcessingParameterFileDestination)
+from qgis.core import (
+    QgsProcessingAlgorithm, QgsProcessingParameterFile, QgsProcessingParameterFolderDestination,
+    QgsProcessingParameterBoolean, QgsProcessingParameterFileDestination, QgsProcessingParameterEnum
+)
 
 
 class DL_Tester(QgsProcessingAlgorithm):

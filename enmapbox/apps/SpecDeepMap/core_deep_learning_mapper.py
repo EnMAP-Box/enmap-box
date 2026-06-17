@@ -10,7 +10,7 @@ import torch
 from osgeo import gdal, ogr, osr
 
 from enmapbox.apps.SpecDeepMap.core_tester import load_model_and_tile_size
-from qgis._core import QgsProcessingFeedback
+from qgis.core import QgsProcessingFeedback
 
 
 def compute_iou_per_class(pred, gt, cls_values):

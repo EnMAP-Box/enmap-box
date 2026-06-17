@@ -26,7 +26,7 @@
 ***************************************************************************
 """
 
-from PyQt5 import QtCore, QtWidgets
+from qgis.PyQt import QtCore, QtWidgets
 
 
 class Ui_dialog(object):

@@ -1,12 +1,9 @@
 from qgis.PyQt.QtCore import QCoreApplication
-from qgis._core import QgsProcessingParameterEnum
-from qgis.core import (QgsProcessingAlgorithm,
-                       QgsProcessingParameterRasterLayer,
-                       QgsProcessingParameterFile,
-                       QgsProcessingParameterNumber,
-                       QgsProcessingParameterRasterDestination,
-                       QgsProcessingParameterVectorDestination,
-                       QgsProcessingParameterFileDestination)
+from qgis.core import (
+    QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer, QgsProcessingParameterFile, QgsProcessingParameterNumber,
+    QgsProcessingParameterRasterDestination, QgsProcessingParameterVectorDestination, QgsProcessingParameterEnum,
+    QgsProcessingParameterFileDestination
+)
 
 
 class DL_Mapper(QgsProcessingAlgorithm):

@@ -21,7 +21,7 @@ from torchvision.models._api import WeightsEnum
 from torchvision.transforms import v2
 
 from enmapbox.apps.SpecDeepMap.utils_resnet import ResNet18_Weights, ResNet50_Weights
-from qgis._core import QgsProcessingFeedback
+from qgis.core import QgsProcessingFeedback
 
 # Data augmentation
 

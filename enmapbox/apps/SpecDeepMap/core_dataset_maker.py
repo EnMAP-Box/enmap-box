@@ -15,7 +15,7 @@ import pandas as pd
 from osgeo import gdal
 from scipy.stats import wasserstein_distance
 
-from qgis._core import QgsProcessingFeedback
+from qgis.core import QgsProcessingFeedback
 
 
 # from tqdm import tqdm

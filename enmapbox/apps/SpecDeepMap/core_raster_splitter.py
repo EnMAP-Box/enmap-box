@@ -3,7 +3,7 @@ import os
 import numpy as np
 from osgeo import gdal
 
-from qgis._core import QgsProcessingFeedback
+from qgis.core import QgsProcessingFeedback
 
 
 def split_raster(raster, ds_mask, output_path, tile_size_x, tile_size_y, step_x, step_y,

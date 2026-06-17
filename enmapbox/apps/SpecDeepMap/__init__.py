@@ -1,8 +1,7 @@
 import webbrowser
 
-from PyQt5.QtWidgets import QMenu
-
 from enmapbox.gui.applications import EnMAPBoxApplication
+from qgis.PyQt.QtWidgets import QMenu
 
 try:
     from enmapbox.apps.SpecDeepMap.processing_algorithm_dataset_maker import DatasetMaker

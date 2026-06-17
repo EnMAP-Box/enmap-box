@@ -3,14 +3,12 @@ import re
 import sys
 
 from qgis.PyQt.QtCore import QCoreApplication
-from qgis._core import QgsProcessingParameterDefinition
-from qgis.core import (QgsProcessingAlgorithm,
-                       QgsProcessingParameterFile,
-                       QgsProcessingParameterNumber,
-                       QgsProcessingParameterFolderDestination,
-                       QgsProcessingParameterBoolean,
-                       QgsProcessingParameterString,
-                       QgsProcessingParameterEnum)
+from qgis.core import (
+    QgsProcessingAlgorithm,
+    QgsProcessingParameterFile, QgsProcessingParameterNumber, QgsProcessingParameterFolderDestination,
+    QgsProcessingParameterBoolean, QgsProcessingParameterString, QgsProcessingParameterDefinition,
+    QgsProcessingParameterEnum
+)
 
 
 def best_ckpt_path(checkpoint_dir):
