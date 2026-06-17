@@ -113,7 +113,7 @@ class Test_Deep_Learning_Mapper(TestCase):
         dataset = None  # Close the dataset
         dataset_com = None
 
-        # 3. Test if Mapper converts prediction to vector file
+        # 3. Test if Mapper converts prediction to a vector file
 
         datasource = ogr.Open(str(folder_path_pred_vector))
         self.assertTrue(
