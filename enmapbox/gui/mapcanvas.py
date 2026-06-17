@@ -22,20 +22,20 @@ import warnings
 from _weakrefset import WeakSet
 from typing import List, Optional, Dict
 
-from qgis.PyQt.QtWidgets import QWidget
-
 from enmapbox import enmapboxSettings
 from enmapbox.enmapboxsettings import EnMAPBoxSettings
-from enmapbox.gui import MapTools, MapToolCenter, PixelScaleExtentMapTool, \
-    CursorLocationMapTool, FullExtentMapTool, QgsMapToolAddFeature, QgsMapToolSelect, \
-    CrosshairStyle, CrosshairMapCanvasItem
 from enmapbox.gui.mimedata import containsMapLayers, extractMapLayers
+from enmapbox.qgispluginsupport.qps.crosshair.crosshair import CrosshairMapCanvasItem, CrosshairStyle
+from enmapbox.qgispluginsupport.qps.maptools import (
+    MapTools, MapToolCenter, PixelScaleExtentMapTool, CursorLocationMapTool,
+    FullExtentMapTool, QgsMapToolAddFeature, QgsMapToolSelect)
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
 from qgis.PyQt.QtCore import Qt, QObject, QCoreApplication, pyqtSignal, QEvent, QPointF, QMimeData, QTimer, QSize, \
     QModelIndex, QAbstractListModel
 from qgis.PyQt.QtGui import QMouseEvent, QIcon, QDragEnterEvent, QDropEvent, QResizeEvent, QKeyEvent, QColor
 from qgis.PyQt.QtWidgets import QAction, QToolButton, QFileDialog, QHBoxLayout, QFrame, QMenu, QLabel, QApplication, \
     QGridLayout, QSpacerItem, QSizePolicy, QDialog, QVBoxLayout, QComboBox
+from qgis.PyQt.QtWidgets import QWidget
 from qgis.core import QgsLayerTree
 from qgis.core import QgsLayerTreeLayer, QgsCoordinateReferenceSystem, QgsRectangle, QgsVectorLayerTools, \
     QgsMapLayer, QgsRasterLayer, QgsPointXY, \
@@ -987,7 +987,7 @@ class MapCanvas(QgsMapCanvas):
         else:
             self.setLayers([])
 
-    def layerTree(self) -> Optional['MapDockTreeNode']:  # noqa: F821
+    def layerTree(self) -> Optional:
         """
         Returns the MapDockTreeNode that is linked to this MapCanvas by a QgsLayerTreeMapCanvasBridge.
         Can be None

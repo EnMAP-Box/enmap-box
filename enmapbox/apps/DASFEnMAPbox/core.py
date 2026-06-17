@@ -2,6 +2,7 @@
 # Author: Msc Lusseau Marion, PhD Student at Trier University under the supervision of Prof. Dr. Hill Joachim
 # Adapted from Dr. Buddenbaum Henning's Matlab script, Post Doc researcher at Trier University
 # Based on the on work of Knyazikhin et al. 10.1073/pnas.1210196109
+import contextlib
 
 # 0
 import numpy as np
@@ -97,12 +98,10 @@ def DASF_retrieval(inputFile, outputName, secondoutputName, thirdoutputName):
         for j in range(len(b)):
             # cov[i, j], cor[i, j], slope[i, j], intercept[i, j], pval[i, j], stderr[i, j] = linregress_3D(
             # x=BRFs[:, i, j], y=ratio[:, i, j])
-            try:
+            with contextlib.suppress(Exception):
                 slope[i, j], intercept[i, j], r_value[i, j], p_value[i, j], std_err[i, j] = stats.linregress(
                     BRFs[:, i, j], ratio[:, i, j]
                 )
-            except Exception:
-                pass
 
     # Step 4 - Ratio estimation of the DASF
     DASF = intercept / (1 - slope)

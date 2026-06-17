@@ -30,12 +30,12 @@ from pyqtgraph.dockarea.Dock import Dock as pgDock
 from pyqtgraph.dockarea.Dock import DockLabel as pgDockLabel
 from pyqtgraph.dockarea.DockArea import TempAreaWindow
 
-from enmapbox.gui import SpectralLibraryWidget
 from enmapbox.gui.mapcanvas import MapCanvas, CanvasLink
 from enmapbox.gui.mimedata import extractMapLayers
 from enmapbox.gui.utils import enmapboxUiPath
 from enmapbox.qgispluginsupport.qps.speclib.core import profile_fields
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
+from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.utils import loadUi
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt import QtCore
@@ -311,11 +311,12 @@ class DockArea(pgDockArea):
         return area
 
     def addDock(
-            self,
-            dock: Union[pgDock, Dock],
-            position: str = 'bottom',
-            relativeTo=None,
-            **kwds) -> Optional[Dock]:
+        self,
+        dock: Union[pgDock, Dock],
+        position: str = 'bottom',
+        relativeTo=None,
+        **kwds
+    ) -> Optional[Dock]:
 
         if hasattr(dock, 'orig_area'):
             dock.label.btnUnFloat.setVisible(dock.orig_area != self)

@@ -24,23 +24,21 @@ import time
 from os.path import basename, dirname
 from typing import Optional, List, Dict, Union, Any
 
-from enmapbox.gui import \
-    SpectralLibraryWidget, SpatialExtent
 from enmapbox.gui.datasources.datasources import DataSource, ModelDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager
 from enmapbox.gui.dataviews.docks import Dock, DockArea, \
     AttributeTableDock, SpectralLibraryDock, TextDock, MimeDataDock, WebViewDock, LUT_DOCKTYPES, MapDock
-from enmapbox.gui.mapcanvas import \
-    MapCanvas, KEY_LAST_CLICKED
-from enmapbox.gui.mimedata import \
-    MDF_QGIS_LAYERTREEMODELDATA, MDF_ENMAPBOX_LAYERTREEMODELDATA, QGIS_URILIST_MIMETYPE, \
-    MDF_TEXT_HTML, MDF_URILIST, MDF_TEXT_PLAIN, MDF_QGIS_LAYER_STYLE, \
-    extractMapLayers, containsMapLayers
+from enmapbox.gui.mapcanvas import MapCanvas, KEY_LAST_CLICKED
+from enmapbox.gui.mimedata import (
+    MDF_QGIS_LAYERTREEMODELDATA, MDF_ENMAPBOX_LAYERTREEMODELDATA, QGIS_URILIST_MIMETYPE,
+    MDF_TEXT_HTML, MDF_URILIST, MDF_TEXT_PLAIN, MDF_QGIS_LAYER_STYLE,
+    extractMapLayers, containsMapLayers)
 from enmapbox.gui.utils import enmapboxUiPath
 from enmapbox.qgispluginsupport.qps.layerproperties import pasteStyleFromClipboard, pasteStyleToClipboard
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibraryplotmodelitems import ProfileVisualizationGroup
-from enmapbox.qgispluginsupport.qps.utils import loadUi
+from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
+from enmapbox.qgispluginsupport.qps.utils import loadUi, SpatialExtent
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtCore import QSize
@@ -210,7 +208,7 @@ class DockTreeNode(LayerTreeNode):
         if isinstance(enmapbox, EnMAPBox):
             self.mEnMAPBoxInstance = enmapbox
 
-    def enmapBoxInstance(self) -> Optional['EnMAPBox']:  # noqa: F821
+    def enmapBoxInstance(self) -> Optional:
         return self.mEnMAPBoxInstance
 
     def writeXML(self, parentElement):
@@ -555,7 +553,7 @@ class DockManager(QObject):
         for d in self.mDocks:
             d.setEnMAPBox(enmapBox)
 
-    def enmapBoxInstance(self) -> Optional['EnMAPBox']:  # noqa: F821
+    def enmapBoxInstance(self) -> Optional:
         return self.mEnMAPBoxInstance
 
     def setMessageBar(self, messageBar: QgsMessageBar):
@@ -895,7 +893,7 @@ class DockManagerTreeModel(QgsLayerTreeModel):
 
     def findDockNode(self,
                      object: Union[str, Dock, QgsMapCanvas, QgsRasterLayer, QgsVectorLayer, SpectralLibraryWidget]) \
-            -> Optional[DockTreeNode]:
+        -> Optional[DockTreeNode]:
         """
         Returns a DockTreeNode that contains the given object
         :param object:
@@ -1010,9 +1008,9 @@ class DockManagerTreeModel(QgsLayerTreeModel):
                 else:
                     # close docks linked to this source
                     if isinstance(node, AttributeTableDockTreeNode) \
-                            and isinstance(node.dock, AttributeTableDock) \
-                            and isinstance(node.dock.vectorLayer(), QgsVectorLayer) \
-                            and node.dock.vectorLayer().source() == d.source():
+                        and isinstance(node.dock, AttributeTableDock) \
+                        and isinstance(node.dock.vectorLayer(), QgsVectorLayer) \
+                        and node.dock.vectorLayer().source() == d.source():
                         docks_to_close.append(node.dock)
 
                     elif isinstance(node, SpeclibDockTreeNode):
