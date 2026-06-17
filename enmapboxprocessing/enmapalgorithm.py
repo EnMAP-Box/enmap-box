@@ -119,7 +119,8 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
 
     def parameterDefinition(self, name: str) -> QgsProcessingParameterDefinition:
         parameter = super().parameterDefinition(name)
-        assert parameter is not None, name
+        if parameter is None:
+            raise ValueError('parameter is undefined: ' + name)
         return parameter
 
     def parameterAsLayer(
@@ -466,7 +467,8 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         if isinstance(filename, QgsProcessingOutputLayerDefinition):
             sink: QgsProperty = filename.sink
             filename = sink.toVariant()['val']
-            assert isinstance(filename, str)
+            if not isinstance(filename, str):
+                raise ValueError(f'filename must be a string, got {type(filename).__name__}')
 
         if filename == '':
             return None
@@ -794,7 +796,6 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             self, name: str, description: str, defaultValue: List[int] = None, parentLayerParameterName: str = None,
             optional=False, advanced=False
     ):
-        assert parentLayerParameterName is not None
         self.addParameterBand(name, description, defaultValue, parentLayerParameterName, optional, True)
         self.flagParameterAsAdvanced(name, advanced)
 

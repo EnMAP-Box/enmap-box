@@ -65,7 +65,7 @@ class PrepareClassificationDatasetFromCategorizedRasterAlgorithm(EnMAPProcessing
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         classification = self.parameterAsRasterLayer(parameters, self.P_CATEGORIZED_RASTER, context)
         raster = self.parameterAsRasterLayer(parameters, self.P_FEATURE_RASTER, context)
@@ -137,6 +137,7 @@ class PrepareClassificationDatasetFromCategorizedRasterAlgorithm(EnMAPProcessing
         cls, raster: QgsRasterLayer, classification: QgsRasterLayer, classBandNo: int, categories: Categories,
         excludeBadBands: bool, feedback: QgsProcessingFeedback = None
     ) -> Tuple[SampleX, SampleY, List[int], np.ndarray]:
+        # assert raster.crs() == classification.crs()
         if raster.extent() != classification.extent():
             raise ValueError(
                 'raster and classification must have the same extent'

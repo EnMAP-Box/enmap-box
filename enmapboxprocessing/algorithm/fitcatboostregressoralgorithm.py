@@ -1,3 +1,4 @@
+from contextlib import suppress
 from io import StringIO
 
 from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
@@ -29,7 +30,7 @@ class FitCatBoostRegressorAlgorithm(FitRegressorAlgorithmBase):
 
 
 # monkey patch for issue #790
-try:
+with suppress(Exception):
     import catboost.core
     stringIO = StringIO()
 
@@ -37,5 +38,3 @@ try:
         return stringIO
 
     catboost.core._get_stream_like_object = _get_stream_like_object_FIXED
-except Exception:
-    pass

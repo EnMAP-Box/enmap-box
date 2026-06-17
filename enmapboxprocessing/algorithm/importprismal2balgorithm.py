@@ -215,8 +215,16 @@ class ImportPrismaL2BAlgorithm(EnMAPProcessingAlgorithm):
         mask = np.all(np.equal(array, 0), axis=0)
         array = np.clip(array, 1, None)
         array[:, mask] = 0
-        assert len(wavelength) == len(array)
-        assert len(fwhm) == len(array)
+        if len(wavelength) != len(array):
+            raise ValueError(
+                f'number of wavelengths ({len(wavelength)}) must match '
+                f'number of spectral values ({len(array)})'
+            )
+        if len(fwhm) != len(array):
+            raise ValueError(
+                f'number of FWHM values ({len(fwhm)}) must match '
+                f'number of spectral values ({len(array)})'
+            )
         driver = Driver(filenameSpectralCube, feedback=feedback)
         writer = driver.createFromArray(array)
         writer.setNoDataValue(0)
@@ -267,7 +275,11 @@ class ImportPrismaL2BAlgorithm(EnMAPProcessingAlgorithm):
             wavelength.extend(wavelengthSwir)
             metadata.update(metadataSwir)
         # - mask no data region
-        assert len(wavelength) == len(array)
+        if len(wavelength) != len(array):
+            raise ValueError(
+                f'number of wavelengths ({len(wavelength)}) must match '
+                f'number of spectral values ({len(array)})'
+            )
         driver = Driver(filenameSpectralError, feedback=feedback)
         writer = driver.createFromArray(array)
         writer.setMetadataDomain(metadata)

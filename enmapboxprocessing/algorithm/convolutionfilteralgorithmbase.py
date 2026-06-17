@@ -83,8 +83,14 @@ class ConvolutionFilterAlgorithmBase(EnMAPProcessingAlgorithm):
         try:
             from astropy.convolution import Kernel
             kernel = self.parameterAsKernel(parameters, self.P_KERNEL, context)
-            assert isinstance(kernel, Kernel)
-            assert 1 <= kernel.dimension <= 3
+            if not isinstance(kernel, Kernel):
+                raise TypeError(
+                    f'expected Kernel, got {type(kernel).__name__}'
+                )
+            if not 1 <= kernel.dimension <= 3:
+                raise ValueError(
+                    f'kernel dimension must be between 1 and 3, got {kernel.dimension}'
+                )
         except Exception:
             return False, traceback.format_exc()
         return True, ''

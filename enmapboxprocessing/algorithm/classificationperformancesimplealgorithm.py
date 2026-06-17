@@ -240,9 +240,21 @@ class AccuracyAssessmentResult(object):
 def accuracyAssessment(
         observed: np.ndarray, predicted: np.ndarray, classNames: List[str], classValues: List[Any]
 ) -> AccuracyAssessmentResult:
-    assert observed.ndim == 1
-    assert predicted.ndim == 1
-    assert observed.shape == predicted.shape
+    if observed.ndim != 1:
+        raise ValueError(
+            f'observed must be a 1-dimensional array, got shape={observed.shape}'
+        )
+
+    if predicted.ndim != 1:
+        raise ValueError(
+            f'predicted must be a 1-dimensional array, got shape={predicted.shape}'
+        )
+
+    if observed.shape != predicted.shape:
+        raise ValueError(
+            f'observed and predicted must have the same shape, '
+            f'got {observed.shape} and {predicted.shape}'
+        )
 
     sampleSize = observed.shape[0]
     report = classification_report(

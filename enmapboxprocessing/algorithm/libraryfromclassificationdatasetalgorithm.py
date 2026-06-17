@@ -76,7 +76,10 @@ class LibraryFromClassificationDatasetAlgorithm(EnMAPProcessingAlgorithm):
             writer = LibraryDriver().createFromData(data, geometries, name, Qgis.WkbType.Point, crs)
             writer.writeToSource(filename)
             library = QgsVectorLayer(filename)
-            assert library.isValid()
+            if not library.isValid():
+                raise RuntimeError(
+                    f'failed to load vector layer: {filename}'
+                )
             renderer = Utils().categorizedSymbolRendererFromCategories('CategoryValue', dump.categories)
             library.setRenderer(renderer)
             library.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)

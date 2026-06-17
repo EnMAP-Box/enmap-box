@@ -61,7 +61,11 @@ class ImportPlanetScopeAlgorithm(EnMAPProcessingAlgorithm):
         for item in data['links']:
             if item['rel'] == 'item':
                 clipFilename = abspath(join(dirname(scFilename), data['links'][1]['href']))
-                assert exists(clipFilename)
+                if not exists(clipFilename):
+                    raise FileNotFoundError(
+                        f'clip file not found: {clipFilename}'
+                    )
+
                 data2 = Utils().jsonLoad(clipFilename)
                 for key in data2['assets']:
                     # if '3B_AnalyticMS' in key:
@@ -151,7 +155,14 @@ class ImportPlanetScopeAlgorithm(EnMAPProcessingAlgorithm):
                     convertedFilenames.append(tifFilename)
                 else:
                     convertedFilenames.append(aFilename)
-            assert len(convertedFilenames) == len(srMetadata['filenames']) + len(qaMetadata['filenames'])
+
+            expected_count = len(srMetadata['filenames']) + len(qaMetadata['filenames'])
+            if len(convertedFilenames) != expected_count:
+                raise RuntimeError(
+                    f'unexpected number of converted files: '
+                    f'expected {expected_count}, got {len(convertedFilenames)}'
+                )
+
             srFilenames = convertedFilenames[0:len(srMetadata['filenames'])]
             qaFilenames = convertedFilenames[len(srMetadata['filenames']):]
 
