@@ -45,7 +45,8 @@ class LibraryWriter(object):
                     feature.setAttribute(fieldName, dump)
                 else:
                     feature.setAttribute(fieldName, value)
-            assert self.library.addFeature(feature)
+            if not self.library.addFeature(feature):
+                raise RuntimeError('failed to add feature to library')
 
     def writeToSource(self, filename: str) -> List[str]:
         return [str(p) for p in SpectralLibraryUtils.writeToSource(self.library, filename)]
