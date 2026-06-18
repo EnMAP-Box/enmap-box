@@ -137,7 +137,6 @@ class PrepareClassificationDatasetFromCategorizedRasterAlgorithm(EnMAPProcessing
         cls, raster: QgsRasterLayer, classification: QgsRasterLayer, classBandNo: int, categories: Categories,
         excludeBadBands: bool, feedback: QgsProcessingFeedback = None
     ) -> Tuple[SampleX, SampleY, List[int], np.ndarray]:
-        # assert raster.crs() == classification.crs()
         if raster.extent() != classification.extent():
             raise ValueError(
                 'raster and classification must have the same extent'

@@ -95,7 +95,9 @@ class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
             skipNoDataPixel: bool, feedback: QgsProcessingFeedback, feedback2: QgsProcessingFeedback,
             context: QgsProcessingContext
     ):
-        assert Utils.isPointGeometry(vector.geometryType())
+        if not Utils.isPointGeometry(vector.geometryType()):
+            raise ValueError('vector layer must contain point geometries')
+
         alg = 'qgis:rastersampling'
         parameters = {
             'COLUMN_PREFIX': 'SAMPLE_',
@@ -120,7 +122,6 @@ class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
                 if feature.geometry().isNull():
                     continue
                 point = QgsPoint(feature.geometry().asPoint())
-                assert isinstance(point, QgsPoint)
                 imagePoint: QgsPoint = rasterProvider.transformCoordinates(
                     point, QgsRasterDataProvider.TransformLayerToImage
                 )
@@ -143,7 +144,8 @@ class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
             coverageMin: int, coverageMax: int, skipNoDataPixel: bool,
             feedback: ProcessingFeedback, feedback2: ProcessingFeedback, context: QgsProcessingContext
     ):
-        assert Utils.isPolygonGeometry(vector.geometryType())
+        if not Utils.isPolygonGeometry(vector.geometryType()):
+            raise ValueError('vector layer must contain polygon geometries')
 
         # create oversampling grid
         alg = CreateGridAlgorithm()

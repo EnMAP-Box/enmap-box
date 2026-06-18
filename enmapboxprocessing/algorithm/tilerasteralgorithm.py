@@ -171,7 +171,12 @@ class TileRasterAlgorithm(EnMAPProcessingAlgorithm):
                         rb: gdal.Band = ds.GetRasterBand(bandNo)
                         arrayNew = rbNew.ReadAsArray()
                         array = rb.ReadAsArray()
-                        assert arrayNew.shape == array.shape
+
+                        if arrayNew.shape != array.shape:
+                            raise ValueError(
+                                f'arrayNew must have the same shape as array, got {arrayNew.shape} and {array.shape}'
+                            )
+
                         arrayUpdated = np.where(arrayNew == rbNew.GetNoDataValue(), array, arrayNew)
                         rb.WriteArray(arrayUpdated)
                     dsNew = None

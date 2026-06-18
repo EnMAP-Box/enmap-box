@@ -451,11 +451,8 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
         for identifier, registryName in self.getSources().items():
             if identifier not in code:
                 continue
-            # from enmapbox.gui.enmapboxgui import EnMAPBox
-            # mp2 = EnMAPBox.instance().project()
-            # assert mp2 == self.mProject, 'project mismatch'
+
             for prj in [self.mProject, QgsProject.instance()]:
-                assert isinstance(prj, QgsProject)
                 layer = prj.mapLayer(registryName)
                 if isinstance(layer, QgsRasterLayer):
                     text += f'# {identifier} := QgsRasterLayer("{layer.source()}")\n'

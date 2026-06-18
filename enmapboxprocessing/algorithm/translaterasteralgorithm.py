@@ -281,7 +281,8 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                 )
 
             gdalDataset = gdal.Open(rasterSource)
-            assert gdalDataset is not None
+            if gdalDataset is None:
+                raise RuntimeError(f'failed to open GDAL dataset: {rasterSource!r}')
 
             callback = Utils.qgisFeedbackToGdalCallback(feedback)
             resampleAlgSupportedByGdalTranslate = resampleAlg not in [gdal.GRA_Min, gdal.GRA_Q1, gdal.GRA_Med,
@@ -304,7 +305,9 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                 outGdalDataset: gdal.Dataset = gdal.Translate(
                     destName=filename, srcDS=gdalDataset, options=translateOptions
                 )
-                assert outGdalDataset is not None
+                if outGdalDataset is None:
+                    raise RuntimeError(f'GDAL Translate failed for output file {filename!r}'
+                    )
 
                 # need to explicitely set the GeoTransform tuple, because gdal.Translate extent may deviate slightly
                 if grid.crs().isValid():
@@ -335,7 +338,9 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                 outGdalDataset: gdal.Dataset = gdal.Warp(
                     filename, tmpGdalDataset, options=warpOptions
                 )
-                assert outGdalDataset is not None
+                if outGdalDataset is None:
+                    raise RuntimeError(f'GDAL Warp failed for output file {filename!r}'
+                    )
 
             del outGdalDataset  # close and reopen to write metadata to aux.xml
             outGdalDataset = gdal.Open(filename, gdal.GA_Update)
