@@ -118,13 +118,9 @@ class GdalUtils(object):
             height: int = None, extent: QgsRectangle = None
     ):
 
-        if bandNumbers is not None and len(filenames) != len(bandNumbers):
-            raise ValueError(
-                f'filenames and bandNumbers must have the same length, '
-                f'got {len(filenames)} and {len(bandNumbers)}'
-            )
-        if len(filenames) == 0:
-            raise ValueError('filenames must not be empty')
+        if bandNumbers is not None:
+            assert len(filenames) == len(bandNumbers)
+        assert len(filenames) > 0
 
         reader0 = RasterReader(filenames[0])
         if width is None:

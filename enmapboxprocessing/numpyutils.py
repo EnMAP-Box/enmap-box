@@ -58,18 +58,12 @@ class NumpyUtils(object):
 
     @staticmethod
     def rebinMean(a: np.ndarray, shape: Tuple[int, int]) -> np.ndarray:
-        if a.ndim != 2:
-            raise ValueError(
-                f'a must be a 2-dimensional array, got shape={a.shape}'
-            )
+        assert a.ndim == 2
         shape_ = shape[0], a.shape[0] // shape[0], shape[1], a.shape[1] // shape[1]
         return a.reshape(shape_).mean(-1).mean(1)
 
     @staticmethod
     def rebinSum(a: np.ndarray, shape: Tuple[int, int]) -> np.ndarray:
-        if a.ndim != 2:
-            raise ValueError(
-                f'a must be a 2-dimensional array, got shape={a.shape}'
-            )
+        assert a.ndim == 2
         shape_ = shape[0], a.shape[0] // shape[0], shape[1], a.shape[1] // shape[1]
         return a.reshape(shape_).sum(-1).sum(1)

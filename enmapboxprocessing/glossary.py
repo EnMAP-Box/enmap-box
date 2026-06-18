@@ -110,9 +110,6 @@ def injectGlossaryLinks(text: str):
 def utilsFindWeblinks(text) -> List[str]:
     starts = [match_.start() for match_ in re.finditer('<a href="', text)]
     ends = [match_.start() + 4 for match_ in re.finditer('</a>', text)]
-    if len(starts) != len(ends):
-        raise ValueError(
-            f'starts and ends must have the same length, got {len(starts)} and {len(ends)}'
-        )
+    assert len(starts) == len(ends)
     links = [text[start:end] for start, end in zip(starts, ends)]
     return links

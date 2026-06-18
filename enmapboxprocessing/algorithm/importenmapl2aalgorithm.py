@@ -124,8 +124,7 @@ class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
 
             # make sure that wavelength are sorted
             values = np.array(wavelength, float)
-            if not np.all(values[:-1] <= values[1:]):
-                raise ValueError('wavelengths must be sorted in ascending order')
+            assert np.all(values[:-1] <= values[1:]), 'wavelength are assumed to be sorted'
 
             spectralImageFilename = ImportEnmapL1BAlgorithm.findSpectralImageFilename(
                 xmlOrZipFilename, '-SPECTRAL_IMAGE'

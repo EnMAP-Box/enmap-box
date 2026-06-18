@@ -59,7 +59,7 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
         elif isinstance(reference, QgsRasterLayer):
             categoriesReference = Utils.categoriesFromPalettedRasterRenderer(reference.renderer())
         else:
-            raise TypeError()
+            assert 0
         categoriesPrediction = Utils().categoriesFromRenderer(classification.renderer(), classification)
         if len(categoriesReference) == len(categoriesPrediction):
             return True, ''  # if the number of categories is equal, we can at leased match by name (see #845)
@@ -200,11 +200,7 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
                 if i_h_all in categoriesStratificationValues:
                     h_all.append(i_h_all)
                     N_h_all.append(i_N_h_all)
-            if len(h_all) != len(categoriesStratification):
-                raise ValueError(
-                    f'number of strata weights ({len(h_all)}) must match '
-                    f'number of stratification categories ({len(categoriesStratification)})'
-                )
+            assert len(h_all) == len(categoriesStratification)
             h = list()
             N_h = list()
             for i, category in enumerate(categoriesStratification):
@@ -406,20 +402,9 @@ def aa_stratified(
     h = np.array(h)
     N_h = np.array(N_h, dtype=np.float64)
 
-    if not (len(stratum) == len(reference) == len(map)):
-        raise ValueError(
-            f'stratum, reference and map must have the same length, '
-            f'got {len(stratum)}, {len(reference)} and {len(map)}'
-        )
-    if len(h) != len(N_h):
-        raise ValueError(
-            f'h and N_h must have the same length, got {len(h)} and {len(N_h)}'
-        )
-    missing_strata = set(h) - set(stratum)
-    if missing_strata:
-        raise ValueError(
-            f'empty strata detected: {sorted(missing_strata)}'
-        )
+    assert len(stratum) == len(reference) == len(map)
+    assert len(h) == len(N_h)
+    assert set(h) == set(stratum), f'empty strata detected: {set(h) - set(stratum)}'
 
     # determine class labels
     if classes is None:

@@ -67,11 +67,7 @@ class PrepareRasterAlgorithm(EnMAPProcessingAlgorithm):
         if isBandwiseScaling:
             scale = None
             scales = parameters.get(self.P_SCALE)
-            if len(scales) != raster.bandCount():
-                raise ValueError(
-                    f'number of scales ({len(scales)}) must match '
-                    f'number of raster bands ({raster.bandCount()})'
-                )
+            assert len(scales) == raster.bandCount()
         else:
             scale = self.parameterAsFloat(parameters, self.P_SCALE, context)
             scales = None

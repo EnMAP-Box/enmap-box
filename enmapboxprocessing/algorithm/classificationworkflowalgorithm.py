@@ -149,11 +149,7 @@ class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
 
             # classification accuracy and area estimation (see #912)
             if filenameReport2 is not None:
-                if filenameReport2 is not None and filenameClassification is None:
-                    raise ValueError(
-                        'Output classification layer must be selected, '
-                        'if output classification accuracy and area report is selected.'
-                    )
+                assert filenameClassification is not None
                 filenameReference = Utils().tmpFilename(filenameReport2, 'reference.gpkg')
                 alg = LibraryFromClassificationDatasetAlgorithm()
                 parameters = {

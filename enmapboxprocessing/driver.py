@@ -1,6 +1,5 @@
 import os
 import warnings
-from contextlib import suppress
 from os import makedirs
 from os.path import splitext, exists, dirname
 from typing import List
@@ -31,6 +30,7 @@ class Driver(object):
             self, filename: str, format: str = None, options: CreationOptions = None,
             feedback: QgsProcessingFeedback = None
     ):
+        assert filename is not None
         if format is None:
             format = self.defaultFormat(filename)
         if options is None:
@@ -63,21 +63,20 @@ class Driver(object):
                 makedirs(dirname(self.filename))
 
             if exists(self.filename + 'stac.json'):
-                with suppress(OSError):
+                try:
                     os.remove(self.filename + 'stac.json')
+                except Exception:
+                    pass
 
         gdalDriver: gdal.Driver = gdal.GetDriverByName(self.format)
         try:
-            gdalDataset: gdal.Dataset = gdalDriver.Create(
-                self.filename, width, height, nBands, gdalDataType, self.options
-            )
+            gdalDataset: gdal.Dataset = gdalDriver.Create(self.filename, width, height, nBands, gdalDataType,
+                                                          self.options)
         except RuntimeError as error:
             warnings.warn(f'Unable to create file: {self.filename}')
             raise error
 
-        if gdalDataset is None:
-            raise RuntimeError("GDAL dataset creation failed")
-
+        assert gdalDataset is not None
         if crs is not None:
             gdalDataset.SetProjection(crs.toWkt())
         if extent is not None:

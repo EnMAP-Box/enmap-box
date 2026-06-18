@@ -69,7 +69,7 @@ class CreateMaskVirtualAlgorithm(CreateMaskAlgorithmBase):
         self.addOutput(QgsProcessingOutputRasterLayer(self.P_OUTPUT_MASK, self._OUTPUT_MASK))
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         bandNo = self.parameterAsBand(parameters, self.P_BAND, context)
@@ -105,14 +105,12 @@ class CreateMaskVirtualAlgorithm(CreateMaskAlgorithmBase):
 
         uri = '?' + urlencode(parameters)
         layer = QgsRasterLayer(uri, layerName, p.NAME)
-        if not layer.isValid():
-            raise RuntimeError(
-                f'failed to create valid raster layer from {uri!r}'
-            )
+        assert layer.isValid()
         context.temporaryLayerStore().addMapLayer(layer)
-        context.addLayerToLoadOnCompletion(
-            layer.id(), QgsProcessingContext.LayerDetails(layerName, context.project(), self.P_OUTPUT_MASK)
-        )
+        context.addLayerToLoadOnCompletion(layer.id(),
+                                           QgsProcessingContext.LayerDetails(layerName,
+                                                                             context.project(),
+                                                                             self.P_OUTPUT_MASK))
         result = {self.P_OUTPUT_MASK: layer.id()}
         return result
 
@@ -139,7 +137,7 @@ class CreateMaskAlgorithm(CreateMaskAlgorithmBase):
         )
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_MASK, context)
         alg = CreateMaskVirtualAlgorithm()

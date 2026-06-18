@@ -2,6 +2,8 @@ from math import ceil
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsPalettedRasterRenderer,
+                       QgsMapLayer)
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.translatecategorizedrasteralgorithm import TranslateCategorizedRasterAlgorithm
@@ -9,8 +11,6 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import SampleX, SampleY, Categories, checkSampleShape, ClassifierDump
 from enmapboxprocessing.utils import Utils
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsPalettedRasterRenderer,
-                       QgsMapLayer)
 
 
 @typechecked
@@ -65,7 +65,7 @@ class PrepareClassificationDatasetFromCategorizedRasterAlgorithm(EnMAPProcessing
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         classification = self.parameterAsRasterLayer(parameters, self.P_CATEGORIZED_RASTER, context)
         raster = self.parameterAsRasterLayer(parameters, self.P_FEATURE_RASTER, context)
@@ -134,20 +134,13 @@ class PrepareClassificationDatasetFromCategorizedRasterAlgorithm(EnMAPProcessing
 
     @classmethod
     def sampleData(
-        cls, raster: QgsRasterLayer, classification: QgsRasterLayer, classBandNo: int, categories: Categories,
-        excludeBadBands: bool, feedback: QgsProcessingFeedback = None
+            cls, raster: QgsRasterLayer, classification: QgsRasterLayer, classBandNo: int, categories: Categories,
+            excludeBadBands: bool, feedback: QgsProcessingFeedback = None
     ) -> Tuple[SampleX, SampleY, List[int], np.ndarray]:
         # assert raster.crs() == classification.crs()
-        if raster.extent() != classification.extent():
-            raise ValueError(
-                'raster and classification must have the same extent'
-            )
+        assert raster.extent() == classification.extent()
+        assert (raster.width(), raster.height()) == (classification.width(), classification.height())
 
-        if (raster.width(), raster.height()) != (classification.width(), classification.height()):
-            raise ValueError(
-                f'raster and classification must have the same dimensions, '
-                f'got ({raster.width()}, {raster.height()}) and ({classification.width()}, {classification.height()})'
-            )
         maximumMemoryUsage = Utils.maximumMemoryUsage()
         reader = RasterReader(raster)
         classificationReader = RasterReader(classification)

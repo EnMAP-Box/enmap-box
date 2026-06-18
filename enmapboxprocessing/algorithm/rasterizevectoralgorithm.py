@@ -102,8 +102,7 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
                 error, message, newFilename, newLayere = QgsVectorFileWriter.writeAsVectorFormatV3(
                     vector, tmpFilename, transformContext, saveVectorOptions
                 )
-                if error != QgsVectorFileWriter.NoError:
-                    raise RuntimeError(f'write failed with error {error}: {message}')
+                assert error == QgsVectorFileWriter.NoError, f'Fail error {error}:{message}'
                 vector = QgsVectorLayer(tmpFilename)
                 burnAttribute = field.name()
                 initValue = -1
@@ -128,8 +127,7 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
                 error, message, newFilename, newLayer = QgsVectorFileWriter.writeAsVectorFormatV3(
                     vector, tmpFilename, transformContext, saveVectorOptions
                 )
-                if error != QgsVectorFileWriter.NoError:
-                    raise RuntimeError(f'failed to write vector file: error {error}: {message}')
+                assert error == QgsVectorFileWriter.NoError, f'Fail error {error}:{message}'
                 vector = QgsVectorLayer(tmpFilename)
 
             extra = ''

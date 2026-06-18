@@ -28,8 +28,7 @@ class LibraryDriver(object):
 
         library = QgsVectorLayer(path, name, provider, options=options)
         library.setCustomProperty('skipMemoryLayerCheck', 1)
-        if not library.isValid():
-            raise ValueError('library is not valid')
+        assert library.isValid()
 
         return LibraryWriter(library)
 

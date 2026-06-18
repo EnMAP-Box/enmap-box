@@ -206,11 +206,7 @@ class HtmlReportWriter(object):
         self.file.writelines(['</tr>'])
 
     def _writeTableColumnMainHeader(self, values: List, spans: List[int]):
-        if len(values) != len(spans):
-            raise ValueError(
-                f'values and spans must have the same length, '
-                f'got {len(values)} and {len(spans)}'
-            )
+        assert len(values) == len(spans)
         self.file.writelines(['<col>'])
         for span in spans:
             self.file.writelines([f'<colgroup span="{span}"></colgroup>'])
@@ -283,11 +279,7 @@ class CsvReportWriter(object):
         self.file.writelines([';'.join(values), '\n'])
 
     def _writeTableColumnMainHeader(self, values: List, spans: List[int], upperLeftCellHeader: str = None):
-        if len(values) != len(spans):
-            raise ValueError(
-                f'values and spans must have the same length, '
-                f'got {len(values)} and {len(spans)}'
-            )
+        assert len(values) == len(spans)
         _values = list()
         if upperLeftCellHeader is not None:
             _values.append(upperLeftCellHeader)

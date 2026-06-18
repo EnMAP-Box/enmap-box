@@ -106,18 +106,8 @@ class PrepareRegressionDatasetFromContinuousRasterAlgorithm(EnMAPProcessingAlgor
             cls, raster: QgsRasterLayer, regression: QgsRasterLayer, excludeBadBands: bool,
             feedback: QgsProcessingFeedback = None
     ) -> Tuple[SampleX, SampleY, List[int], np.ndarray]:
-
-        if raster.extent() != regression.extent():
-            raise ValueError(
-                'raster and regression must have the same extent'
-            )
-
-        if (raster.width(), raster.height()) != (regression.width(), regression.height()):
-            raise ValueError(
-                f'raster and regression must have the same dimensions, '
-                f'got ({raster.width()}, {raster.height()}) and '
-                f'({regression.width()}, {regression.height()})'
-            )
+        assert raster.extent() == regression.extent()
+        assert (raster.width(), raster.height()) == (regression.width(), regression.height())
 
         maximumMemoryUsage = Utils.maximumMemoryUsage()
         reader = RasterReader(raster)

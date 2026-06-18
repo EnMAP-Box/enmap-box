@@ -77,7 +77,7 @@ class CreateGridAlgorithm(EnMAPProcessingAlgorithm):
             yres = self.parameterAsDouble(parameters, self.P_HEIGHT, context)
             height = int(round(extent.height() / yres, 0))
         else:
-            raise ValueError()
+            assert 0
 
         with open(filename + '.log', 'w') as logfile:
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)

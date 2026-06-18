@@ -149,25 +149,14 @@ class ClassifierDump(object):
         check_type('categories', self.categories, Optional[Categories])
         check_type('features', self.features, Optional[List[str]])
         check_type('X', self.X, Optional[SampleX])
-        if self.X is not None and self.X.ndim != 2:
-            raise ValueError(
-                f'X must be a 2-dimensional array, got ndim={self.X.ndim}'
-            )
+        if self.X is not None:
+            assert self.X.ndim == 2
         check_type('y', self.y, Optional[SampleY])
-        if self.y is not None and self.y.ndim != 2:
-            raise ValueError(
-                f'y must be a 2-dimensional array, got ndim={self.y.ndim}'
-            )
+        if self.y is not None:
+            assert self.y.ndim == 2
         if self.locations is not None:
-            if self.locations.ndim != 2:
-                raise ValueError(
-                    f'locations must be a 2-dimensional array, got ndim={self.locations.ndim}'
-                )
-
-            if self.locations.shape[1] != 2:
-                raise ValueError(
-                    f'locations must have shape (n, 2), got shape={self.locations.shape}'
-                )
+            assert self.locations.ndim == 2
+            assert self.locations.shape[1] == 2
         try:
             check_type('classifier', self.classifier, Optional[Union[ClassifierMixin, Pipeline]])
         except Exception:
@@ -231,25 +220,14 @@ class RegressorDump(object):
         check_type('targets', self.targets, Optional[Targets])
         check_type('features', self.features, Optional[List[str]])
         check_type('X', self.X, Optional[SampleX])
-        if self.X is not None and self.X.ndim != 2:
-            raise ValueError(
-                f'X must be a 2-dimensional array, got shape={self.X.shape}'
-            )
+        if self.X is not None:
+            assert self.X.ndim == 2
         check_type('y', self.y, Optional[SampleY])
-        if self.y is not None and self.y.ndim != 2:
-            raise ValueError(
-                f'y must be a 2-dimensional array, got shape={self.y.shape}'
-            )
+        if self.y is not None:
+            assert self.y.ndim == 2
         if self.locations is not None:
-            if self.locations.ndim != 2:
-                raise ValueError(
-                    f'locations must be a 2-dimensional array, got shape={self.locations.shape}'
-                )
-
-            if self.locations.shape[1] != 2:
-                raise ValueError(
-                    f'locations must have shape (n, 2), got shape={self.locations.shape}'
-                )
+            assert self.locations.ndim == 2
+            assert self.locations.shape[1] == 2
         try:
             check_type('regressor', self.regressor, Optional[Union[RegressorMixin, Pipeline]])
         except Exception:

@@ -70,11 +70,7 @@ class EditRasterSourceBandPropertiesAlgorithm(EnMAPProcessingAlgorithm):
 
         source = self.parameterAsFile(parameters, self.P_SOURCE, context)
         ds = gdal.Open(source)
-
-        if ds is None:
-            raise RuntimeError(
-                f'failed to open GDAL dataset: {source!r}'
-            )
+        assert ds is not None
 
         # allow counter variables for band names (see issue #539)
         if self.P_NAMES in parameters:
@@ -111,6 +107,7 @@ class EditRasterSourceBandPropertiesAlgorithm(EnMAPProcessingAlgorithm):
         if names is not None:
             for bandNo, name in enumerate(names, 1):
                 writer.setBandName(name, bandNo)
+                assert name == writer.gdalBand(bandNo).GetDescription()
 
         if wavelengths is not None:
             for bandNo, wavelength in enumerate(wavelengths, 1):

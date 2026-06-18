@@ -76,12 +76,7 @@ class ClassifierPerformanceAlgorithm(EnMAPProcessingAlgorithm):
                 title = 'Classifier out-of-bag performance report'
                 feedback.pushInfo('Evaluate classifier out-of-bag (OOB) performance')
                 classifier.fit(sample.X, sample.y.ravel())
-                expected = list(range(1, len(classifier.classes_) + 1))
-                if classifier.classes_.tolist() != expected:
-                    raise ValueError(
-                        f'classifier classes must be consecutive integers starting at 1, '
-                        f'got {classifier.classes_.tolist()}'
-                    )
+                assert classifier.classes_.tolist() == list(range(1, len(classifier.classes_) + 1))
                 try:
                     y2 = np.argmax(classifier.oob_decision_function_, axis=1) + 1
                 except Exception:

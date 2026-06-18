@@ -164,8 +164,7 @@ class PrepareRegressionDatasetFromSynthMixAlgorithm(EnMAPProcessingAlgorithm):
                 randomWeights.append(weight)
             randomWeights.append(1. - sum(randomWeights))
 
-            if not math.isclose(sum(randomWeights), 1.0):
-                raise ValueError(f'randomWeights must sum to 1.0, got {sum(randomWeights)}')
+            assert math.isclose(sum(randomWeights), 1.0)
             mixtures.append(np.sum(drawnFeatures * randomWeights, axis=1))
             fractions.append(np.sum(drawnFractions * randomWeights, axis=1)[targetIndex])
 

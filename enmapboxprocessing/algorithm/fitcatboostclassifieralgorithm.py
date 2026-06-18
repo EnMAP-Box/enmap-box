@@ -1,4 +1,3 @@
-from contextlib import suppress
 from io import StringIO
 
 from enmapbox.typeguard import typechecked
@@ -28,7 +27,7 @@ class FitCatBoostClassifierAlgorithm(FitClassifierAlgorithmBase):
 
 
 # monkey patch for issue #790
-with suppress(Exception):
+try:
     import catboost.core
 
     stringIO = StringIO()
@@ -37,3 +36,5 @@ with suppress(Exception):
         return stringIO
 
     catboost.core._get_stream_like_object = _get_stream_like_object_FIXED
+except Exception:
+    pass

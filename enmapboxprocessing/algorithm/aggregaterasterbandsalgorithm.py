@@ -136,6 +136,7 @@ class AggregateRasterBandsAlgorithm(EnMAPProcessingAlgorithm):
                         raise ValueError()
 
                     # replace nan values by no data values
+                    assert outarray.dtype == np.float32, self.O_FUNCTION[functionIndex]
                     outarray[np.isnan(outarray)] = noDataValue
 
                     # explicitely mask pixel with all-no-data (see #1424)
