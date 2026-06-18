@@ -39,7 +39,6 @@ class ImageCubeApplication(EnMAPBoxApplication):
 
     def menu(self, appMenu):
         appMenu = self.enmapbox.menu('Tools')
-        assert isinstance(appMenu, QMenu)
 
         self.mActionStartGUI = self.utilsAddActionInAlphanumericOrder(appMenu, self.name)
         self.mActionStartGUI.setIcon(self.icon())

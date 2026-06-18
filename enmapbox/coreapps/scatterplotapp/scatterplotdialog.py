@@ -265,7 +265,6 @@ class ScatterPlotDialog(QMainWindow):
     def onFieldYChanged(self):
         # rasterize if needed
         layerX = self.currentLayerX()
-        assert layerX is not None
         layerY = self.currentLayerY()
         fieldY = self.currentFieldY()
         if layerY is None or fieldY is None:
@@ -332,7 +331,6 @@ class ScatterPlotDialog(QMainWindow):
             if fieldY is None:
                 return
             key = layerX.source(), layerY.source(), fieldY
-            assert key in self.cache
             layerY = self.cache[key]
             bandNoY = 1
             yIsVector = True
@@ -499,8 +497,7 @@ class ScatterPlotDialog(QMainWindow):
 def utilsQgsColorRampToPyQtGraphLookupTable(colorRamp: QgsColorRamp) -> np.ndarray:
     array = np.empty(shape=(256, 4), dtype=np.uint8)
     for i in range(256):
-        color = colorRamp.color(i / 255)
-        assert isinstance(color, QColor)
+        color: QColor = colorRamp.color(i / 255)
         array[i, 0] = color.red()
         array[i, 1] = color.green()
         array[i, 2] = color.blue()

@@ -28,7 +28,6 @@ class BivariateColorRasterRendererApp(EnMAPBoxApplication):
 
     def menu(self, appMenu: QMenu):
         a = self.utilsAddActionInAlphanumericOrder(self.enmapbox.ui.menuToolsRasterVisualizations, self.title())
-        assert isinstance(a, QAction)
         a.triggered.connect(self.startGUI)
 
     def startGUI(self):

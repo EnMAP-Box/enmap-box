@@ -1,11 +1,8 @@
 from typing import Dict, Any, List, Tuple
 
-from enmapbox.qgispluginsupport.qps.speclib.core import profile_field_list
-from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-from enmapboxprocessing.utils import Utils
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsFeature)
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
 
 @typechecked
@@ -35,7 +32,7 @@ class SaveLibraryAsGeoJsonAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFileDestination(self.P_OUTPUT_FILE, self._OUTPUT_FILE, 'GeoJSON (*.geojson)')
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         library = self.parameterAsVectorLayer(parameters, self.P_LIBRARY, context)
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_FILE, context)

@@ -25,13 +25,9 @@ import os
 import uuid
 from typing import Union, List
 
-import qgis.utils
 from osgeo import gdal
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMessageBox, QMainWindow, QMenu
-from qgis.core import QgsRasterLayer, QgsRasterRenderer, QgsLayerTreeNode
-from qgis.gui import QgsMapCanvas, QgisInterface
 
+import qgis.utils
 from enmapbox.gui.applications import EnMAPBoxApplication
 from enmapbox.gui.contextmenuprovider import EnMAPBoxContextMenuProvider
 from enmapbox.gui.contextmenus import EnMAPBoxAbstractContextMenuProvider
@@ -40,6 +36,10 @@ from enmapbox.gui.datasources.datasourcesets import DataSourceSet
 from enmapbox.gui.datasources.manager import DataSourceManagerTreeView, RasterBandTreeNode
 from enmapbox.gui.dataviews.dockmanager import DockTreeView
 from enmapbox.gui.enmapboxgui import EnMAPBox
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QMessageBox, QMainWindow, QMenu
+from qgis.core import QgsRasterLayer, QgsRasterRenderer, QgsLayerTreeNode
+from qgis.gui import QgsMapCanvas, QgisInterface
 
 APP_DIR = os.path.dirname(__file__)
 MIN_VERSION = '0.9'
@@ -150,7 +150,6 @@ class VRTBuilderApp(EnMAPBoxApplication):
         if not self.mIsInstalled:
             return
         from vrtbuilder.widgets import VRTBuilderWidget
-        assert isinstance(w, VRTBuilderWidget)
         canvases = []
 
         if isinstance(self.enmapbox, EnMAPBox):
@@ -160,8 +159,8 @@ class VRTBuilderApp(EnMAPBoxApplication):
             canvases.extend(qgis.utils.iface.mapCanvases())
 
         canvases = set(canvases)
+        mapCanvas: QgsMapCanvas
         for mapCanvas in canvases:
-            assert isinstance(mapCanvas, QgsMapCanvas)
             w.createCurrentMapTool(mapCanvas)
 
 
@@ -212,7 +211,6 @@ class VRTBuilderAppContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
 
         source_bands: List[VRTRasterInputSourceBand] = []
 
-        assert isinstance(inputs, list)
         for src in inputs:
             if isinstance(src, QgsRasterLayer):
                 for b in range(src.bandCount()):

@@ -57,26 +57,10 @@ class MetaDataEditorApp(EnMAPBoxApplication):
         return QIcon(':/enmapbox/gui/ui/icons/enmapbox.svg')
 
     def menu(self, appMenu):
-        """
-        Returns a QMenu that will be added to the parent `appMenu`
-        :param appMenu:
-        :return: QMenu
-        """
-        assert isinstance(appMenu, QMenu)
-        """
-        Specify menu, submenus and actions that become accessible from the EnMAP-Box GUI
-        :return: the QMenu or QAction to be added to the "Applications" menu.
-        """
-
-        # this way you can add your QMenu/QAction to an other menu entry, e.g. 'Tools'
         appMenu = self.enmapbox.menu('Tools')
 
         a = self.utilsAddActionInAlphanumericOrder(appMenu, APP_NAME)
-
-        assert isinstance(a, QAction)
-
         a.triggered.connect(self.startGUI)
-
         return None
 
     def startGUI(self):

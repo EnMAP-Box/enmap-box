@@ -47,7 +47,8 @@ class LandCoverChangeStatisticsDataFilteringDockWidget(QgsDockWidget):
         self.sigStateChanged.emit()
 
     def setRelativeClassSizes(self, values: List[List[float]]):
-        assert len(values) == self.mTableClasses.columnCount() - 1
+        if len(values) != self.mTableClasses.columnCount() - 1:
+            raise ValueError('invalid number of values')
         self.relativeClassSizes = values
 
         # highlight unavailable classes
@@ -68,7 +69,10 @@ class LandCoverChangeStatisticsDataFilteringDockWidget(QgsDockWidget):
                 w.setForeground(QBrush(color))
 
     def initGui(self, layers: List[QgsRasterLayer]):
-        assert len(layers) >= 2
+        if len(layers) < 2:
+            raise ValueError(
+                f'at least 2 layers are required, got {len(layers)}'
+            )
 
         uniqueCategories = OrderedDict()
         categoriess = list()

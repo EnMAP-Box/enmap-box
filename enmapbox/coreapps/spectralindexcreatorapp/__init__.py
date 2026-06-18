@@ -24,7 +24,6 @@ class SpectralIndexCreatorApp(EnMAPBoxApplication):
 
     def menu(self, appMenu: QMenu):
         a = self.utilsAddActionInAlphanumericOrder(appMenu, 'Spectral Index Creator')
-        assert isinstance(a, QAction)
         a.setIcon(self.icon())
         a.triggered.connect(self.startGUI)
         return appMenu

@@ -212,7 +212,6 @@ class ColorSpaceExplorerDialog(QMainWindow):
             renderer = QgsMultiBandColorRenderer(layer.dataProvider(), 1, 1, 1)
             layer.setRenderer(renderer)
 
-        assert isinstance(renderer, QgsMultiBandColorRenderer)
         layer.renderer().setRedBand(self.mRedBand.currentBand())
         layer.renderer().setGreenBand(self.mGreenBand.currentBand())
         layer.renderer().setBlueBand(self.mBlueBand.currentBand())

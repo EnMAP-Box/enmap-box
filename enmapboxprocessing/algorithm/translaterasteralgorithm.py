@@ -306,8 +306,7 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                     destName=filename, srcDS=gdalDataset, options=translateOptions
                 )
                 if outGdalDataset is None:
-                    raise RuntimeError(f'GDAL Translate failed for output file {filename!r}'
-                    )
+                    raise RuntimeError(f'GDAL Translate failed for output file {filename!r}')
 
                 # need to explicitely set the GeoTransform tuple, because gdal.Translate extent may deviate slightly
                 if grid.crs().isValid():
@@ -339,8 +338,7 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                     filename, tmpGdalDataset, options=warpOptions
                 )
                 if outGdalDataset is None:
-                    raise RuntimeError(f'GDAL Warp failed for output file {filename!r}'
-                    )
+                    raise RuntimeError(f'GDAL Warp failed for output file {filename!r}')
 
             del outGdalDataset  # close and reopen to write metadata to aux.xml
             outGdalDataset = gdal.Open(filename, gdal.GA_Update)

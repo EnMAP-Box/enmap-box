@@ -40,9 +40,15 @@ class BivariateColorRasterRenderer(QgsRasterRenderer):
         self.colorPlane = np.zeros((256, 256, 3))
 
     def setColorPlane(self, colorPlane: np.ndarray):
-        assert colorPlane.ndim == 3
-        assert colorPlane.shape[0] == colorPlane.shape[1], 'color plane must be squared'
-        assert colorPlane.shape[2] == 3
+        if colorPlane.ndim != 3:
+            raise ValueError(f'colorPlane must be a 3-dimensional array, got shape={colorPlane.shape}')
+
+        if colorPlane.shape[0] != colorPlane.shape[1]:
+            raise ValueError(f'colorPlane must be square, got shape={colorPlane.shape}')
+
+        if colorPlane.shape[2] != 3:
+            raise ValueError(f'colorPlane must have 3 channels, got shape={colorPlane.shape}')
+
         self.colorPlane = colorPlane
 
     def setRange(self, min1: float, min2: float, max1: float, max2: float):

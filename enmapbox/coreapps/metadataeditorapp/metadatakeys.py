@@ -17,6 +17,7 @@
 """
 import copy
 import re
+from typing import Union, Optional
 
 import numpy as np
 from osgeo import gdal, ogr
@@ -74,7 +75,9 @@ class MDKeyAbstract(object):
         else:
             raise NotImplementedError()
 
-        assert regexIsOLI.search(oli)
+        if not regexIsOLI.search(oli):
+            raise ValueError(f'invalid OLI identifier: {oli!r}')
+
         return oli
 
     @staticmethod
@@ -85,9 +88,15 @@ class MDKeyAbstract(object):
         :param majorObject: gdal.MajorObject | ogr.MajorObject
         :return:
         """
-        assert isinstance(majorObject, gdal.MajorObject) or isinstance(majorObject, ogr.MajorObject)
-        assert isinstance(oli, str)
-        assert regexIsOLI.search(oli)
+        if not isinstance(majorObject, (gdal.MajorObject, ogr.MajorObject)):
+            raise TypeError(
+                f'expected gdal.MajorObject or ogr.MajorObject, got {type(majorObject).__name__}')
+
+        if not isinstance(oli, str):
+            raise TypeError(f'expected str, got {type(oli).__name__}')
+
+        if not regexIsOLI.search(oli):
+            raise ValueError(f'invalid OLI identifier: {oli!r}')
         parts = oli.split('_')
 
         objStr = parts[0]
@@ -115,8 +124,13 @@ class MDKeyAbstract(object):
             b = int(parts[1])
             if isinstance(majorObject, gdal.Band):
                 majorObject = majorObject.GetDataset()
-            assert isinstance(majorObject, gdal.Dataset)
-            assert b <= majorObject.RasterCount
+
+            if not isinstance(majorObject, gdal.Dataset):
+                raise TypeError(f'expected gdal.Dataset, got {type(majorObject).__name__}')
+
+            if not 1 <= b <= majorObject.RasterCount:
+                raise ValueError(f'invalid band number: {b}')
+
             return majorObject.GetRasterBand(b)
 
         elif objStr == 'ogr.Layer':
@@ -243,8 +257,6 @@ class MDKeyDomainString(MDKeyAbstract):
 
     @staticmethod
     def fromDomain(obj, domain: str, name: str, **kwds):
-        assert isinstance(domain, str)
-        assert isinstance(name, str)
 
         if type(obj) in [gdal.Dataset, gdal.Band]:
 
@@ -431,8 +443,11 @@ class MDKeyDomainString(MDKeyAbstract):
             if isinstance(value, np.ndarray):
                 value = list(value)
 
-            assert isinstance(value, list) and len(value) == self.mListLength, \
-                'setValue(value): `value` needs to be a list of {} elements'.format(self.mListLength)
+            if not isinstance(value, list):
+                raise TypeError(f'value must be a list, got {type(value).__name__}')
+
+            if len(value) != self.mListLength:
+                raise ValueError(f'value must contain {self.mListLength} elements, got {len(value)}')
 
             value = [convertOrFail(v) for v in value]
 
@@ -480,15 +495,13 @@ class MDKeyDomainString(MDKeyAbstract):
         else:
             raise NotImplementedError()
 
-    def writeValueToSource(self, obj):
+    def writeValueToSource(self, obj: Union[gdal.MajorObject, ogr.MajorObject]):
         """
         Formats the value `value` into a fitting string and writes it to the gdal/ogr object `obj`
         :param obj: gdal.MajorObject or ogr.MajorObject
         :param value: value of any type
         :return: None (= success) or Exception (= unable to write)
         """
-        assert isinstance(obj, gdal.MajorObject) or isinstance(obj, ogr.MajorObject)
-
         value = self.value()
         if isinstance(value, list):
 
@@ -550,12 +563,10 @@ class MDKeyDescription(MDKeyAbstract):
     def __init__(self, obj, name='Description', **kwds):
         super(MDKeyDescription, self).__init__(obj, name, **kwds)
 
-    def readValueFromSource(self, obj):
-        assert isinstance(obj, gdal.MajorObject) or isinstance(obj, ogr.MajorObject)
+    def readValueFromSource(self, obj: Union[gdal.MajorObject, ogr.MajorObject]):
         self.setValue(obj.GetDescription())
 
-    def writeValueToSource(self, obj):
-        assert isinstance(obj, gdal.MajorObject) or isinstance(obj, ogr.MajorObject)
+    def writeValueToSource(self, obj: Union[gdal.MajorObject, ogr.MajorObject]):
         value = self.value()
         if value is None:
             v = ''
@@ -569,8 +580,7 @@ class MDKeyClassification(MDKeyAbstract):
     def __init__(self, obj):
         super(MDKeyClassification, self).__init__(obj, 'Classification')
 
-    def setValue(self, value):
-        assert value is None or isinstance(value, ClassificationScheme)
+    def setValue(self, value: Optional[ClassificationScheme]):
         if not self.mValue0Initialized:
             self.mValue0 = ClassificationScheme()
             self.mValue = ClassificationScheme()
@@ -596,7 +606,7 @@ class MDKeyClassification(MDKeyAbstract):
         if isinstance(obj, gdal.Dataset):
             self.writeValueToSource(obj.GetRasterBand(1))
         elif isinstance(obj, gdal.Band):
-            assert isinstance(self.mValue, ClassificationScheme)
+            self.mValue: ClassificationScheme
             if len(self.mValue) > 0:
                 ct = self.mValue.gdalColorTable()
                 classNames = self.mValue.classNames()
