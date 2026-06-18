@@ -1,4 +1,4 @@
-import subprocess
+import subprocess  # nosec B404
 import sys
 import webbrowser
 from collections import OrderedDict
@@ -126,15 +126,15 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
         # taken from https://stackoverflow.com/questions/1795111/is-there-a-cross-platform-way-to-open-a-file-
         # browser-in-python
         if sys.platform == 'win32':
-            # subprocess.Popen(['start', root], shell=True)
             webbrowser.open(root)
 
         elif sys.platform == 'darwin':
-            subprocess.Popen(['open', root])
-
+            subprocess.Popen(['open', root], shell=False)  # nosec: root is opened as path, not executed via shell
         else:
             try:
-                subprocess.Popen(['xdg-open', root])
+                subprocess.Popen(  # nosec: root is opened as path, not executed via shell
+                    ['xdg-open', root], shell=False
+                )
             except OSError:
                 pass
                 # error, think of something else to try

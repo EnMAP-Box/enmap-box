@@ -79,7 +79,7 @@ class ProcessingParameterPickleFileClassificationDatasetWidget(QWidget):
                     dump = ClassifierDump(**Utils.pickleLoad(filename))
                     samples, features = dump.X.shape
                     classes = len(dump.categories)
-                except Exception:
+                except Exception:  # nosec Ignore files that are not valid models.
                     continue
 
                 action = self.menu.addAction(alg.displayName())
@@ -147,7 +147,7 @@ class ProcessingParameterPickleFileClassificationDatasetWidget(QWidget):
         self.dialog.exec_()
         filename = self.dialog.mDataset.mFile.filePath()
 
-        QMessageBox.information(self, 'Classification Dataset Manager', f'Update dataset file {basename(filename)}.')
+        QMessageBox.information(self, 'Classification Dataset Manager', f'New dataset file {basename(filename)}.')
         self.mFile.setFilePath(filename)
 
 

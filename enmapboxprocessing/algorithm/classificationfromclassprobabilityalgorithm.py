@@ -54,7 +54,7 @@ class ClassificationFromClassProbabilityAlgorithm(EnMAPProcessingAlgorithm):
             categories = list()
             for bandNo, target in enumerate(targets, 1):
                 if target.color is None:
-                    color = QColor(randint(0, 255), randint(0, 255), randint(0, 255)).name()
+                    color = QColor(randint(0, 255), randint(0, 255), randint(0, 255)).name()  # nosec
                 else:
                     color = target.color
                 categories.append(Category(bandNo, target.name, color))

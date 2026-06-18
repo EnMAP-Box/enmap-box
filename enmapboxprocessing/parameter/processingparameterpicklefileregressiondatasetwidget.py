@@ -79,7 +79,7 @@ class ProcessingParameterPickleFileRegressionDatasetWidget(QWidget):
                     dump = RegressorDump.fromDict(Utils.pickleLoad(filename))
                     samples, features = dump.X.shape
                     targets = len(dump.targets)
-                except Exception:
+                except Exception:  # nosec Ignore files that are not valid models.
                     continue
 
                 action = self.menu.addAction('')
@@ -146,7 +146,7 @@ class ProcessingParameterPickleFileRegressionDatasetWidget(QWidget):
         self.dialog.exec_()
         filename = self.dialog.mDataset.mFile.filePath()
 
-        QMessageBox.information(self, 'Regression Dataset Manager', f'Update dataset file {basename(filename)}.')
+        QMessageBox.information(self, 'Regression Dataset Manager', f'New dataset file {basename(filename)}.')
         self.mFile.setFilePath(filename)
 
 

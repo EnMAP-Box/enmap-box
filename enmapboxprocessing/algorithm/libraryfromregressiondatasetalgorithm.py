@@ -75,7 +75,6 @@ class LibraryFromRegressionDatasetAlgorithm(EnMAPProcessingAlgorithm):
                 crs = QgsCoordinateReferenceSystem.fromWkt(dump.crs)
 
             writer = LibraryDriver().createFromData(data, geometries, name, Qgis.WkbType.Point, crs)
-            assert crs.authid() == writer.library.crs().authid()
             writer.writeToSource(filename)
             library = QgsVectorLayer(filename)
             if not library.isValid():

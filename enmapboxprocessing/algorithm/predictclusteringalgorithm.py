@@ -124,7 +124,7 @@ class PredictClusteringAlgorithm(EnMAPProcessingAlgorithm):
 
             # create default style
             classification = QgsRasterLayer(filename)
-            categories = [Category(i + 1, f'cluster {i + 1}', QColor(randint(0, 2 ** (24) - 1)).name())
+            categories = [Category(i + 1, f'cluster {i + 1}', QColor(randint(0, 2 ** (24) - 1)).name())  # nosec
                           for i in range(dump.clusterCount)]
             renderer = Utils.palettedRasterRendererFromCategories(classification.dataProvider(), 1, categories)
             classification.setRenderer(renderer)
