@@ -149,7 +149,7 @@ class VRTBuilderApp(EnMAPBoxApplication):
 
         if not self.mIsInstalled:
             return
-        from vrtbuilder.widgets import VRTBuilderWidget
+        # from vrtbuilder.widgets import VRTBuilderWidget
         canvases = []
 
         if isinstance(self.enmapbox, EnMAPBox):

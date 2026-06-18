@@ -26,9 +26,9 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtGui import QColor, QVector3D, QMatrix4x4
 from qgis.PyQt.QtWidgets import QMainWindow, QApplication, QCheckBox, QLineEdit
 from qgis.core import QgsRasterLayer, Qgis, QgsRasterRenderer, QgsRectangle, QgsCoordinateReferenceSystem, \
-    QgsTaskManager, QgsApplication, QgsSingleBandGrayRenderer, QgsMultiBandColorRenderer, QgsPalettedRasterRenderer, \
+    QgsApplication, QgsSingleBandGrayRenderer, QgsMultiBandColorRenderer, QgsPalettedRasterRenderer, \
     QgsContrastEnhancement, QgsSingleBandPseudoColorRenderer, QgsRasterMinMaxOrigin, QgsProject, \
-    QgsTask, QgsMapLayerProxyModel, QgsRasterBlock, QgsRasterBlockFeedback, QgsSingleBandColorDataRenderer
+    QgsTask, QgsMapLayerProxyModel, QgsRasterBlockFeedback, QgsSingleBandColorDataRenderer
 from qgis.gui import QgsMapCanvas, QgsMapLayerComboBox
 from . import NAME, VERSION
 

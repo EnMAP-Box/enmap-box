@@ -1,9 +1,8 @@
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QAction
-
 from enmapbox.gui.applications import EnMAPBoxApplication
-from spectralindexcreatorapp.spectralindexcreatordialog import SpectralIndexCreatorDialog
 from enmapbox.typeguard import typechecked
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QMenu
+from spectralindexcreatorapp.spectralindexcreatordialog import SpectralIndexCreatorDialog
 
 
 def enmapboxApplicationFactory(enmapBox):

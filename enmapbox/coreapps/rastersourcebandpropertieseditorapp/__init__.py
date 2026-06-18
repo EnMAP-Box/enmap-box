@@ -1,9 +1,9 @@
 from enmapbox.gui.applications import EnMAPBoxApplication
+from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QAction
+from qgis.PyQt.QtWidgets import QMenu
 from rastersourcebandpropertieseditorapp.rastersourcebandpropertieseditordialog import \
     RasterSourceBandPropertiesEditorDialog
-from enmapbox.typeguard import typechecked
 
 
 def enmapboxApplicationFactory(enmapBox):

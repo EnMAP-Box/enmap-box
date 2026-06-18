@@ -1,12 +1,10 @@
 from os.path import dirname, join
 
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QAction
-
-
 from enmapbox.gui.applications import EnMAPBoxApplication
-from scatterplotapp.scatterplotdialog import ScatterPlotDialog
 from enmapbox.typeguard import typechecked
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QMenu
+from scatterplotapp.scatterplotdialog import ScatterPlotDialog
 
 
 def enmapboxApplicationFactory(enmapBox):

@@ -41,7 +41,6 @@ from qgis.PyQt.QtGui import QColor, QContextMenuEvent, QIcon
 from qgis.PyQt.QtWidgets import QFileDialog, QTableView, QMenu, QStyledItemDelegate, QDialog, QDialogButtonBox
 from qgis.core import QgsProcessing
 from qgis.core import QgsProviderRegistry, QgsRasterLayer, QgsProject, QgsMapLayerProxyModel
-from qgis.gui import QgsMapLayerComboBox
 from . import APP_DIR
 
 SETTINGS_KEY = 'ENMAPBOX_RECLASSIFY_APP'
@@ -448,7 +447,6 @@ class ReclassifyDialog(QDialog):
         super(ReclassifyDialog, self).__init__(parent, Qt.Window)
         path = pathlib.Path(__file__).parent / 'reclassifydialog.ui'
         loadUi(path, self)
-
 
         self.mProject = QgsProject.instance()
         self.mModel = ReclassifyTableModel()

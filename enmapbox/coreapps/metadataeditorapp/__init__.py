@@ -23,7 +23,6 @@ import os
 
 from enmapbox.gui.applications import EnMAPBoxApplication
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QAction
 
 APP_DIR = os.path.dirname(__file__)
 APP_NAME = 'Metadata Viewer'

@@ -3,7 +3,7 @@ import os
 import qgis.utils
 from enmapbox.gui.applications import EnMAPBoxApplication
 from enmapbox.gui.enmapboxgui import EnMAPBox
-from qgis.PyQt.QtWidgets import QAction, QMenu, QMessageBox
+from qgis.PyQt.QtWidgets import QAction, QMessageBox
 from qgis.gui import QgisInterface
 
 NAME = 'Image Cube'
