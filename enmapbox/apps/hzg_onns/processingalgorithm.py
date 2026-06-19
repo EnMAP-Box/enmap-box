@@ -76,7 +76,6 @@ class OnnsProcessingAlgorithm(QgsProcessingAlgorithm):
 
     # 4
     def processAlgorithm(self, parameters, context, feedback):
-        assert isinstance(feedback, QgsProcessingFeedback)
 
         # try to execute the core algorithm
         try:

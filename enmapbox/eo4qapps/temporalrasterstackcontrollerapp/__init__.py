@@ -1,3 +1,4 @@
+from contextlib import suppress
 from typing import Optional
 
 from enmapbox.gui.applications import EnMAPBoxApplication
@@ -66,11 +67,9 @@ class TemporalRasterStackControllerApp(EnMAPBoxApplication):
             end = QDateTime(1, 1, 1, 0, 0)
             layer.temporalProperties().setIsActive(True)
             layer.temporalProperties().setMode(Qgis.RasterTemporalMode.TemporalRangeFromDataProvider)
-            try:
+            with suppress(Exception):
                 begin = min(begin, RasterReader(layer).centerTime(1))
                 end = max(end, RasterReader(layer).centerTime(layer.bandCount()))
-            except Exception:
-                pass
             self.temporalController.setTemporalExtents(QgsDateTimeRange(begin, end, True, True))
 
     def onUpdateTemporalRange(self, dateTimeRange: QgsDateTimeRange):

@@ -522,7 +522,6 @@ class LUT:
                 bar = pg.BarGraphItem(x=vals, height=ns, width=0.01)
                 self.dict_objects[para][12].addItem(bar)
                 self.dict_objects[para][12].plot(clear=True)
-
             except ValueError as e:
                 print(str(e))
 
@@ -533,8 +532,8 @@ class LUT:
                 xVals = np.arange(vals[0], vals[1], xIncr)
                 self.dict_objects[para][12].plot(xVals, norm.pdf(xVals, loc=vals[2], scale=vals[3]),
                                                  clear=True)
-            except Exception:
-                pass
+            except Exception as e:
+                print(str(e))
 
         elif self.dict_objects[para][2].isChecked():  # uniform
             try:
@@ -543,8 +542,8 @@ class LUT:
                 xVals = np.arange(vals[0], vals[1], xIncr)
                 self.dict_objects[para][12].plot(xVals, uniform.pdf(xVals, loc=vals[0], scale=vals[1]),
                                                  clear=True)
-            except Exception:
-                pass
+            except Exception as e:
+                print(str(e))
 
         elif self.dict_objects[para][3].isChecked():  # logical
             try:
@@ -557,8 +556,8 @@ class LUT:
                 self.dict_objects[para][12].plot(clear=True)
                 if vals[1] < 1.0:
                     self.dict_objects[para][12].setrange(xVals[0] - width * 2, xVals[-1] + width * 2)
-            except Exception:
-                pass
+            except Exception as e:
+                print(str(e))
 
         # return False so that the widget will also handle the actual event
         # otherwise it won't focus out

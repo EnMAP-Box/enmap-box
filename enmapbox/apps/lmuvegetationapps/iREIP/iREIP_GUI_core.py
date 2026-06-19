@@ -23,6 +23,7 @@
 """
 import os
 import sys
+from contextlib import suppress
 
 import numpy as np
 import pyqtgraph as pg
@@ -93,7 +94,7 @@ class iREIP_GUI(QDialog):
     def set_background_color(self, color: QColor):
         if not isinstance(color, QColor):
             color = QColor(color)
-        assert isinstance(color, QColor)
+
         if color != self.btnBackgroundColor.color():
             self.btnBackgroundColor.setColor(color)
         else:
@@ -670,10 +671,9 @@ class iREIP_core:
         raster = array
 
         if len(self.wl) > 2000:
-            try:
+            with suppress(Exception):
                 raster[self.default_exclude, :, :] = 0
-            except Exception:
-                pass
+
         if len(raster) == 242:  # temporary solution for overlapping EnMap-Testdata Bands
             raster = np.delete(raster, self.enmap_exclude, axis=0)  # temporary solution!
         return raster
@@ -689,10 +689,8 @@ class iREIP_core:
         raster = array
 
         if len(self.wl) > 2000:
-            try:
+            with suppress(Exception):
                 raster[self.default_exclude, :, :] = 0
-            except Exception:
-                pass
         if len(raster) == 242:  # temporary solution for overlapping EnMap-Testdata Bands
             raster = np.delete(raster, self.enmap_exclude, axis=0)  # temporary solution!
         window = raster[self.valid_bands, :, :]
