@@ -1,4 +1,4 @@
-# EnMAP-Box conda environment (generated 2026-06-12 11:04:07)
+# EnMAP-Box conda environment (generated 2026-06-19 16:34:36)
 # run to install: conda env create -n enmapbox-full --file=enmapbox-full.yml
 # run to update: conda env update -n enmapbox-full --file=enmapbox-full.yml --prune
 # run to delete: conda env remove -n enmapbox-full
@@ -13,6 +13,7 @@ dependencies:
 - bandit
 - catboost
 - colorama
+- defusedxml
 - docutils
 - enfrosp
 - enfrosp_enmapboxapp

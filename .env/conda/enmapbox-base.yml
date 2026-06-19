@@ -1,4 +1,4 @@
-# EnMAP-Box conda environment (generated 2026-06-12 11:04:07)
+# EnMAP-Box conda environment (generated 2026-06-19 16:34:36)
 # run to install: conda env create -n enmapbox-base --file=enmapbox-base.yml
 # run to update: conda env update -n enmapbox-base --file=enmapbox-base.yml --prune
 # run to delete: conda env remove -n enmapbox-base
@@ -11,6 +11,7 @@ channels:
 dependencies:
 - bandit
 - colorama
+- defusedxml
 - docutils
 - flake8
 - git-lfs
