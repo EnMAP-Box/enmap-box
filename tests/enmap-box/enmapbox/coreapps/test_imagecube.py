@@ -8,7 +8,7 @@ from osgeo import gdal, gdal_array
 from enmapbox import initAll
 from enmapbox.exampledata import enmap as pathEnMAP
 from enmapbox.exampledata import hires as pathHyMap
-from enmapbox.testing import EnMAPBoxTestCase, start_app
+from enmapbox.testing import EnMAPBoxTestCase, start_app, TestObjects
 from qgis.core import QgsRasterLayer, QgsProject, QgsRasterRenderer, QgsRectangle, QgsCoordinateReferenceSystem
 
 start_app()
@@ -16,7 +16,7 @@ initAll()
 
 HAS_OPENGL = False
 try:
-    from imagecubeapp.imagecube import samplingGrid, ImageCubeRenderJob, ImageCubeWidget, GLItem
+    from imagecubeapp.imagecube import samplingGrid, ImageCubeWidget, GLItem, ImageCubeRenderTask
 
     HAS_OPENGL = True
 except ModuleNotFoundError as ex:
@@ -26,10 +26,10 @@ except ModuleNotFoundError as ex:
         raise ex
 
 
-@unittest.skipIf(not HAS_OPENGL, 'Missing OpenGL module. Skip all imagecube tests')
+# @unittest.skipIf(not HAS_OPENGL, 'Missing OpenGL module. Skip all imagecube tests')
 class ImageCubeTests(EnMAPBoxTestCase):
 
-    def createImageCube(self, nb=10, ns=20, nl=30, crs='EPSG.32633') -> QgsRasterLayer:
+    def createImageCube(self, nb=10, ns=20, nl=30, crs='EPSG:32633') -> QgsRasterLayer:
 
         path = f'/vsimem/imagecube{uuid.uuid4()}.tiff'
 
@@ -59,6 +59,18 @@ class ImageCubeTests(EnMAPBoxTestCase):
         assert lyr.isValid()
         return lyr
 
+    def test_extent_mini(self):
+        QgsRasterLayer(pathEnMAP)
+        # self.assertTrue(lyrCube.isValid())
+        W = ImageCubeWidget(
+
+        )
+        W.show()
+        # self.showGui(W)
+
+        # del lyrCube
+        return
+
     def test_samplingGrid(self):
 
         from enmapbox.exampledata import enmap as pathEnMAP
@@ -81,36 +93,22 @@ class ImageCubeTests(EnMAPBoxTestCase):
         f2 = nns / nnl
         self.assertAlmostEqual(f1, f2, 1)
 
-    def test_renderJob(self):
-        lyr = self.createImageCube()
-        job = ImageCubeRenderJob(GLItem.TopPlane, lyr, lyr.renderer())
+    def test_widget2(self):
 
-        self.assertEqual(job.id(), GLItem.TopPlane)
-        from enmapbox.qgispluginsupport.qps.layerproperties import rendererToXml
-        xml1 = rendererToXml(lyr.renderer()).toString()
-        xml2 = rendererToXml(job.renderer()).toString()
-        self.assertEqual(xml1, xml2)
-        self.assertEqual(job.extent(), lyr.extent())
-
-        del job
-        src = lyr.source()
-        QgsProject.instance().removeAllMapLayers()
-        gdal.Unlink(src)
-
-    def test_widget(self):
+        project = QgsProject()
 
         W = ImageCubeWidget()
+        W.setProject(project)
         W.show()
 
         lyrCube = self.createImageCube(ns=100, nl=200)
-
         layers = [lyrCube]
         pathes = [pathEnMAP, pathHyMap]
         for p in pathes:
             if os.path.isfile(p):
                 layers.append(QgsRasterLayer(p, os.path.basename(p)))
 
-        QgsProject.instance().addMapLayers(layers)
+        project.addMapLayers(layers)
 
         if True:
             lyr = layers[0]
@@ -158,8 +156,8 @@ class ImageCubeTests(EnMAPBoxTestCase):
         self.showGui(W)
         del W
         src = lyrCube.source()
+        project.removeAllMapLayers()
         gdal.Unlink(src)
-        QgsProject.instance().removeAllMapLayers()
 
     def test_noLayers(self):
 
@@ -168,10 +166,25 @@ class ImageCubeTests(EnMAPBoxTestCase):
         del w
         QgsProject.instance().removeAllMapLayers()
 
-    @unittest.skipIf(os.environ.get('QT_QPA_PLATFORM') == 'offscreen', "missing OpenGL")
+    def test_rendertask(self):
+        layer: QgsRasterLayer = TestObjects.createRasterLayer()
+
+        task = ImageCubeRenderTask(GLItem.TopPlane, layer)
+        self.assertTrue(task.run(), msg=f'Failed to run task: {task.mError}')
+        self.assertIsInstance(task.mRGBA2D, np.ndarray)
+        self.assertTrue(task.mRGBA3D is None)
+
+        task = ImageCubeRenderTask(GLItem.Cube, layer)
+        self.assertTrue(task.run(), msg=f'Failed to run task: {task.mError}')
+        self.assertIsInstance(task.mRGBA3D, np.ndarray)
+        self.assertTrue(task.mRGBA2D is None)
+
     def test_extent(self):
 
+        project = QgsProject()
+
         W = ImageCubeWidget()
+        W.setProject(project)
         W.show()
 
         from enmapbox.exampledata import enmap as pathEnMAP
@@ -184,7 +197,7 @@ class ImageCubeTests(EnMAPBoxTestCase):
             if os.path.isfile(p):
                 layers.append(QgsRasterLayer(p, os.path.basename(p)))
 
-        QgsProject.instance().addMapLayers(layers)
+        project.addMapLayers(layers)
 
         W.cbShowCube.setChecked(False)
         W.cbShowSliceX.setChecked(False)
