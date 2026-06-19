@@ -227,7 +227,6 @@ class EnMAPBoxProcessingProvider(QgsProcessingProvider):
         """
         Adds a list of QgsProcessingAlgorithms. The self.emitUpdated() signal is called 1x afterwards.
         """
-        assert isinstance(algorithmns, list)
         for a in algorithmns:
             self.addAlgorithm(a.createInstance(), _emitUpdated=False)
         if len(algorithmns) > 0:

@@ -10,7 +10,7 @@ from examplecondaapp.exampleapp import AnacondaEnvironmentInfo
 QGIS_APP = start_app()
 
 ANACONDA_ROOT = r'C:\Users\geo_beja\AppData\Local\Continuum\miniconda3'
-assert os.path.isdir(ANACONDA_ROOT), 'This test requires to specify a local Anaconda Environment'
+assert os.path.isdir(ANACONDA_ROOT), 'This test requires to specify a local Anaconda Environment'  # nosec
 
 
 class AnacondaEnvironmentInfoTests(unittest.TestCase):

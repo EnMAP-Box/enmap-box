@@ -1,5 +1,6 @@
 import traceback
 import warnings
+from contextlib import suppress
 from dataclasses import dataclass
 from os.path import exists, join, dirname
 from shutil import copyfile
@@ -182,10 +183,8 @@ class ProfileAnalyticsDockWidget(QDockWidget):
             if layer.id() != self.oldLineLayerId:
                 lyr_old = self.oldLineLayerInstance()
                 if isinstance(lyr_old, QgsVectorLayer):
-                    try:
+                    with suppress(Exception):
                         lyr_old.selectionChanged.disconnect(self.onLayerSelectionChanged)
-                    except Exception:
-                        pass
 
                 layer.selectionChanged.connect(self.onLayerSelectionChanged)
                 self.oldLineLayerId = layer.id()
@@ -523,15 +522,13 @@ class ProfileAnalyticsDockWidget(QDockWidget):
 
                 w: QLineEdit = self.mRasterTable.cellWidget(row, 3)
                 formula = w.text()
-                try:
+                with suppress(Exception):
                     offset, tmp = formula.split('+')
                     scale, _ = tmp.split('*')
                     offset = float(offset)
                     scale = float(scale)
                     if offset != 0 or scale != 1:
                         yValues = [offset + scale * y for y in yValues]
-                except Exception:
-                    pass
 
                 w: QgsFileWidget = self.mRasterTable.cellWidget(row, 4)
                 filename = w.filePath()
@@ -570,15 +567,13 @@ class ProfileAnalyticsDockWidget(QDockWidget):
 
                 w: QLineEdit = self.mGeeRasterTable.cellWidget(row, 2)
                 formula = w.text()
-                try:
+                with suppress(Exception):
                     offset, tmp = formula.split('+')
                     scale, _ = tmp.split('*')
                     offset = float(offset)
                     scale = float(scale)
                     if offset != 0 or scale != 1:
                         yValues = [offset + scale * y for y in yValues]
-                except Exception:
-                    pass
 
                 w: QgsFileWidget = self.mGeeRasterTable.cellWidget(row, 3)
                 filename = w.filePath()
@@ -612,9 +607,13 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                 try:
                     outputProfiles = ufunc(profile, profiles, self.mPlotWidget)
                     if outputProfiles is not None:
-                        assert isinstance(outputProfiles, list)
+                        if not isinstance(outputProfiles, list):
+                            raise TypeError(
+                                f'Expected outputProfiles to be a list or None, got {type(outputProfiles).__name__}'
+                            )
                         for outputProfile in outputProfiles:
-                            assert isinstance(outputProfile, Profile)
+                            if not isinstance(outputProfile, Profile):
+                                raise TypeError(f"Expected Profile, got {type(outputProfile).__name__}")
                             plotDataItem = self.mPlotWidget.plot(
                                 outputProfile.xValues,
                                 outputProfile.yValues,
@@ -628,7 +627,8 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                     msg = traceback.format_exc()
 
                 if dialog is not None:
-                    assert isinstance(dialog, ProfileAnalyticsEditorWidget)
+                    if not isinstance(dialog, ProfileAnalyticsEditorWidget):
+                        raise TypeError(f"Expected ProfileAnalyticsEditorWidget, got {type(dialog).__name__}")
                     dialog.mLog.setText(msg)
 
         # add profiles to library (for potential visualization in a Spectral View)
@@ -706,8 +706,10 @@ class ProfileAnalyticsDockWidget(QDockWidget):
             raise ValueError()
         widgets1 = list(findWidgets(GeeTimeseriesExplorerDockWidget))
         widgets2 = list(findWidgets(GeeTemporalProfileDockWidget))
-        assert len(widgets1) == 1
-        assert len(widgets2) == 1
+        if len(widgets1) != 1:
+            raise RuntimeError(f"Expected exactly one widget, got {len(widgets1)}")
+        if len(widgets2) != 1:
+            raise RuntimeError(f"Expected exactly one widget, got {len(widgets2)}")
         geeTimeseriesExplorerDockWidget: GeeTimeseriesExplorerDockWidget = widgets1[0]
         geeTemporalProfileDockWidget: GeeTemporalProfileDockWidget = widgets2[0]
         return geeTimeseriesExplorerDockWidget, geeTemporalProfileDockWidget
@@ -723,5 +725,9 @@ class Profile(object):
     style: PlotStyle
 
     def __post_init__(self):
-        assert len(self.xValues) == len(self.yValues)
+        if len(self.xValues) != len(self.yValues):
+            raise ValueError(
+                f"xValues and yValues must have the same length "
+                f"({len(self.xValues)} != {len(self.yValues)})"
+            )
         check_type('style', self.style, PlotStyle)

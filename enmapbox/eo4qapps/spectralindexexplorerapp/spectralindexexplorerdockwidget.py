@@ -1,4 +1,5 @@
 import traceback
+from contextlib import suppress
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtGui import QPalette
@@ -278,12 +279,10 @@ class SpectralIndexExplorerDockWidget(QgsDockWidget):
         for row in range(self.mTableConstants.rowCount()):
             name = self.mTableConstants.verticalHeaderItem(row).text()
             value = self.mTableConstants.item(row, 0).text()
-            try:
+            with suppress(Exception):
                 value = float(value)
                 mapping.append(name)
                 mapping.append(value)
-            except Exception:
-                pass
 
         alg = SpectralIndexLayerAlgorithm()
         parameters = {

@@ -12,7 +12,9 @@ subsetX = [275, 285]
 subsetY = [275, 290]
 subsetZ = [1, 20]
 
-assert PATH_SRC.is_file()
+if not PATH_SRC.is_file():
+    raise ValueError('file not found: ' + PATH_SRC.as_posix())
+
 PATH_DST = pathlib.Path(DIR_UNITTESTS) / 'testdata' / 'force' / PATH_SRC.name
 start_app()
 

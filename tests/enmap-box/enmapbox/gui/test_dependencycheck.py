@@ -27,7 +27,7 @@ from enmapbox.testing import EnMAPBoxTestCase, start_app
 from qgis.PyQt.QtCore import QProcess
 from qgis.PyQt.QtGui import QMovie
 from qgis.PyQt.QtWidgets import QApplication, QTableView, QLabel
-from qgis.core import Qgis, QgsTaskManager, QgsTask
+from qgis.core import Qgis, QgsTask
 from qgis.core import QgsApplication
 
 start_app()
@@ -228,7 +228,6 @@ class test_dependencycheck(EnMAPBoxTestCase):
         if False:
             # run with QgsTaskManager
             tm = QgsApplication.taskManager()
-            assert isinstance(tm, QgsTaskManager)
             tm.addTask(task)
             while task.status() != QgsTask.TaskStatus.Complete:
                 QApplication.processEvents()

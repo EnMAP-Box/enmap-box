@@ -198,7 +198,8 @@ class _CallMemo(_TypeCheckMemo):
         if args is not None and kwargs is not None:
             self.arguments = signature.bind(*args, **kwargs).arguments
         else:
-            assert frame_locals is not None, 'frame must be specified if args or kwargs is None'
+            if frame_locals is None:
+                raise ValueError("frame_locals must be specified if args or kwargs is None")
             self.arguments = frame_locals
 
         self.type_hints = _type_hints_map.get(func)
@@ -1136,7 +1137,7 @@ class TypeChecker:
 
     def __init__(self, packages: Union[str, Sequence[str]], *, all_threads: bool = True,
                  forward_refs_policy: ForwardRefPolicy = ForwardRefPolicy.ERROR):
-        assert check_argument_types()
+        check_argument_types()
         warn('TypeChecker has been deprecated and will be removed in v3.0. '
              'Use install_import_hook() or the pytest plugin instead.', DeprecationWarning)
         self.all_threads = all_threads

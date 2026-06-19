@@ -106,7 +106,11 @@ class SpectralIndexOptimizerAlgorithm(EnMAPProcessingAlgorithm):
                     B = X[:, bi]
                     for yi in range(ntargets):
                         S = eval(formula, {'A': A, 'B': B, 'F1': F1, 'F2': F2, 'F3': F3})
-                        assert isinstance(S, np.ndarray)
+
+                        if not isinstance(S, np.ndarray):
+                            raise ValueError(
+                                f'formula must evaluate to a numpy.ndarray, got {type(S).__name__}'
+                            )
                         Y = y[:, yi].flatten()
 
                         # formula may eval to not finite values

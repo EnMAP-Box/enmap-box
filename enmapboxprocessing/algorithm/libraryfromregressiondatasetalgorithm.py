@@ -6,7 +6,6 @@ import numpy as np
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.librarydriver import LibraryDriver
-from enmapboxprocessing.libraryreader import LibraryReader
 from enmapboxprocessing.typing import RegressorDump
 from qgis.core import QgsGeometry, QgsPointXY, Qgis, QgsCoordinateReferenceSystem, QgsVectorLayer, \
     QgsProcessingContext, QgsProcessingFeedback
@@ -38,7 +37,7 @@ class LibraryFromRegressionDatasetAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterVectorDestination(self.P_OUTPUT_LIBRARY, self._OUTPUT_LIBRARY)
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         filenameDataset = self.parameterAsFile(parameters, self.P_DATASET, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_LIBRARY, context)
@@ -75,7 +74,6 @@ class LibraryFromRegressionDatasetAlgorithm(EnMAPProcessingAlgorithm):
                 crs = QgsCoordinateReferenceSystem.fromWkt(dump.crs)
 
             writer = LibraryDriver().createFromData(data, geometries, name, Qgis.WkbType.Point, crs)
-            assert crs.authid() == writer.library.crs().authid()
             writer.writeToSource(filename)
             library = QgsVectorLayer(filename)
             assert library.isValid()

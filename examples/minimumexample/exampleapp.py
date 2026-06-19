@@ -22,8 +22,9 @@
 
 import os
 
+from enmapbox.gui.applications import EnMAPBoxApplication
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMenu, QAction, QWidget, QHBoxLayout, QLabel, QPushButton
+from qgis.PyQt.QtWidgets import QMenu, QWidget, QHBoxLayout, QLabel, QPushButton
 from qgis.core import (
     QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer, QgsProcessingParameterNumber,
     QgsProcessingParameterRasterDestination, QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterBand,
@@ -32,8 +33,6 @@ from qgis.core import (
     QgsProcessingParameterVectorDestination, QgsProcessingParameterFileDestination,
     QgsProcessingParameterFolderDestination
 )
-
-from enmapbox.gui.applications import EnMAPBoxApplication
 
 VERSION = '0.0.1'
 LICENSE = 'GNU GPL-3'
@@ -68,13 +67,12 @@ class ExampleApplication(EnMAPBoxApplication):
         """
         return QIcon(os.path.join(APP_DIR, 'icon.png'))
 
-    def menu(self, appMenu) -> QMenu:
+    def menu(self, appMenu: QMenu) -> QMenu:
         """
         Returns a QMenu that will be added to the parent `appMenu`
         :param appMenu:
         :return: QMenu
         """
-        assert isinstance(appMenu, QMenu)
         """
         Specify menu, submenus and actions that become accessible from the EnMAP-Box GUI
         :return: the QMenu or QAction to be added to the "Applications" menu.
@@ -89,7 +87,6 @@ class ExampleApplication(EnMAPBoxApplication):
         # add a QAction that starts a process of your application.
         # In this case it will open your GUI.
         a = menu.addAction('Show Minimum Example GUI')
-        assert isinstance(a, QAction)
         a.triggered.connect(self.startGUI)
         appMenu.addMenu(menu)
 
@@ -227,10 +224,6 @@ class ExampleProcessingAlgorithm(QgsProcessingAlgorithm):
         :param feedback: QgsProcessingFeedback
         :return: dict
         """
-        assert isinstance(parameters, dict)
-        assert isinstance(context, QgsProcessingContext)
-        assert isinstance(feedback, QgsProcessingFeedback)
-
         args, kwds = exampleAlgorithm(parameters)
 
         outputs = {'args': args, 'kwds': kwds}
@@ -340,11 +333,7 @@ class ExampleProcessingAlgorithmWithManyWidgets(QgsProcessingAlgorithm):
         self.addParameter(QgsProcessingParameterFolderDestination(name=self.P_OUTPUT_FOLDER,
                                                                   description='Output Folder', optional=True))
 
-    def processAlgorithm(self, parameters, context, feedback):
-        assert isinstance(parameters, dict)
-        assert isinstance(context, QgsProcessingContext)
-        assert isinstance(feedback, QgsProcessingFeedback)
-
+    def processAlgorithm(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback):
         # print all parameters to log
         for key in sorted(parameters):
             feedback.pushInfo('{} = {}'.format(key, repr(parameters[key])))

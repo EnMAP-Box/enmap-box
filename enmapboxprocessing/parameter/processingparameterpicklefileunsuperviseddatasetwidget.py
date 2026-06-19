@@ -67,7 +67,7 @@ class ProcessingParameterPickleFileUnsupervisedDatasetWidget(QWidget):
                 try:
                     dump = TransformerDump(**Utils.pickleLoad(filename))
                     samples, features = dump.X.shape
-                except Exception:
+                except Exception:  # nosec Ignore files that are not valid models.
                     continue
 
                 action = self.menu.addAction('')

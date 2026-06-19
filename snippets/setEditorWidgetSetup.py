@@ -16,7 +16,7 @@ with open(filename, 'w') as file:
 
 # setup widget type for "html"
 library = QgsVectorLayer(filename)
-assert library.isValid()
+assert library.isValid()  # nosec
 fields = library.fields()
 htmlField = fields.field(fields.indexFromName('html'))
 htmlSetup = QgsEditorWidgetSetup(

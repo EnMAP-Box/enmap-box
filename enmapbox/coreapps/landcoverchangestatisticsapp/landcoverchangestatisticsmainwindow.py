@@ -1,4 +1,5 @@
 from collections import defaultdict
+from contextlib import suppress
 from typing import Optional, List
 
 import numpy as np
@@ -91,10 +92,8 @@ class LandCoverChangeStatisticsMainWindow(QMainWindow):
 
         # disconnect old map canvas
         if self.mMapCanvas is not None:
-            try:
+            with suppress(Exception):
                 self.mMapCanvas.extentsChanged.disconnect(self.onMapCanvasExtentsChanged)
-            except Exception:
-                pass
 
         # connect new map canvas
         self.mMapCanvas = None
@@ -183,8 +182,11 @@ class LandCoverChangeSankeyPlotBuilder():
         self.locationProfile = [None] * len(layers)
 
     def setClassFilter(self, filter: List[List[str]] = None):
-        if filter is not None:
-            assert len(filter) == len(self.layers)
+        if filter is not None and len(filter) != len(self.layers):
+            raise ValueError(
+                f'filter length must match number of layers, '
+                f'got {len(filter)} and {len(self.layers)}'
+            )
         self.classFilter = filter
 
     def setOptions(self, options: dict):
@@ -256,7 +258,12 @@ class LandCoverChangeSankeyPlotBuilder():
             cls, matrix: np.ndarray, categories1: List[Category], categories2: List[Category], filter1: List[str],
             filter2: List[str]
     ):
-        assert matrix.shape == (len(categories1), len(categories2))
+        expected_shape = (len(categories1), len(categories2))
+        if matrix.shape != expected_shape:
+            raise ValueError(
+                f'expected matrix shape {expected_shape}, got {matrix.shape}'
+            )
+
         newCategories1 = [c for c in categories1 if c.name in filter1]
         newCategories2 = [c for c in categories2 if c.name in filter2]
         newMatrix = np.zeros((len(newCategories1) + 1, len(newCategories2) + 1), matrix.dtype)
@@ -329,7 +336,11 @@ class LandCoverChangeSankeyPlotBuilder():
         if self.classFilter is None:
             return self.categoriess, self.linkSizess, self.categorySizess, self.categoryRelSizess
 
-        assert len(self.classFilter) == len(self.categoriess)
+        if len(self.classFilter) != len(self.categoriess):
+            raise ValueError(
+                f'classFilter length must match number of categories, '
+                f'got {len(self.classFilter)} and {len(self.categoriess)}'
+            )
 
         categoriess = list()
         linkSizess = list()

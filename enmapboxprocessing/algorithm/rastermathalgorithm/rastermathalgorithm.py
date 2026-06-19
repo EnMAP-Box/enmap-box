@@ -178,7 +178,8 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
             rs = self.parameterAsLayerList(parameters, self.P_RS, context)
             if rs is not None:
                 for raster, rasterName in zip(rs, self.inputRasterListNames()):
-                    assert isinstance(raster, QgsRasterLayer)
+                    if not isinstance(raster, QgsRasterLayer):
+                        raise TypeError(f'expected QgsRasterLayer, got {type(raster).__name__}')
                     rasters[rasterName] = raster
 
             # get all hard coded raster layer from comments

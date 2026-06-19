@@ -98,7 +98,7 @@ class IVVRM_GUI(QDialog):
     def setAxisColor(self, color: QColor):
         if not isinstance(color, QColor):
             color = QColor(color)
-        assert isinstance(color, QColor)
+
         if color != self.btnAxisColor.color():
             # changing btnAxisColor.color() will trigger setAxisColor again
             self.btnAxisColor.setColor(color)
@@ -112,7 +112,7 @@ class IVVRM_GUI(QDialog):
     def setBackgroundColor(self, color: QColor):
         if not isinstance(color, QColor):
             color = QColor(color)
-        assert isinstance(color, QColor)
+
         if color != self.btnBackgroundColor.color():
             self.btnBackgroundColor.setColor(color)
         else:

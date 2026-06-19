@@ -30,6 +30,7 @@ https://doi.org/10.1016/j.jag.2020.102219
 
 import os
 import sys
+from contextlib import suppress
 
 import numpy as np
 from qgis.PyQt.QtWidgets import QDialog, QApplication, QFileDialog, QMessageBox
@@ -94,7 +95,7 @@ class ASI_GUI(QDialog):
     def setBackgroundColor(self, color: QColor):
         if not isinstance(color, QColor):
             color = QColor(color)
-        assert isinstance(color, QColor)
+
         if color != self.btnBackgroundColor.color():
             self.btnBackgroundColor.setColor(color)
         else:
@@ -631,10 +632,9 @@ class ASI_core:
         raster = array
 
         if len(self.wl) > 2000:
-            try:
+            with suppress(Exception):
                 raster[self.default_exclude, :, :] = 0
-            except Exception:
-                pass
+
         if len(raster) == 242:  # temporary solution for overlapping EnMap-Testdata Bands
             raster = np.delete(raster, self.enmap_exclude, axis=0)  # temporary solution!
         return raster
@@ -648,10 +648,8 @@ class ASI_core:
         raster = array
 
         if len(self.wl) > 2000:
-            try:
+            with suppress(Exception):
                 raster[self.default_exclude, :, :] = 0
-            except Exception:
-                pass
         if len(raster) == 242:  # temporary solution for overlapping EnMap-Testdata Bands
             raster = np.delete(raster, self.enmap_exclude, axis=0)  # temporary solution!
         window = raster[self.valid_bands, :, :]
@@ -785,10 +783,8 @@ class ASI_core:
 
     def interp_watervapor_3d(self, in_matrix):
         x = np.arange(len(in_matrix))
-        try:
+        with suppress(Exception):
             in_matrix[self.default_exclude] = 0
-        except Exception:
-            pass
         self.res3d = np.empty(shape=np.shape(in_matrix))
         for row in range(in_matrix.shape[1]):
             for col in range(in_matrix.shape[2]):

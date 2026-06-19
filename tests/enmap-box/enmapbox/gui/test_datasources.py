@@ -225,7 +225,7 @@ class DataSourceTests(EnMAPBoxTestCase):
         from enmapbox.exampledata import enmap
 
         testdata = Path(DIR_REPO) / 'enmapbox/qgispluginsupport/qpstestdata/wavelength'
-        assert testdata.is_dir()
+        self.assertTrue(testdata.is_dir())
 
         files = [enmap, hires,
                  testdata / 'envi_wl_fwhm.bsq']

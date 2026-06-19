@@ -1,3 +1,4 @@
+from contextlib import suppress
 from random import randint
 from typing import Optional
 
@@ -95,10 +96,8 @@ class ColorSpaceExplorerDialog(QMainWindow):
 
         # disconnect old map canvas
         if self.mMapCanvas is not None:
-            try:
+            with suppress(Exception):
                 self.mMapCanvas.extentsChanged.disconnect(self.onMapCanvasExtentsChanged)
-            except Exception:
-                pass
 
         # connect new map canvas
         self.mMapCanvas = None
@@ -157,9 +156,9 @@ class ColorSpaceExplorerDialog(QMainWindow):
         if layer is None:
             return
 
-        self.mRedBand.setBand(randint(1, layer.bandCount()))
-        self.mGreenBand.setBand(randint(1, layer.bandCount()))
-        self.mBlueBand.setBand(randint(1, layer.bandCount()))
+        self.mRedBand.setBand(randint(1, layer.bandCount()))  # nosec
+        self.mGreenBand.setBand(randint(1, layer.bandCount()))  # nosec
+        self.mBlueBand.setBand(randint(1, layer.bandCount()))  # nosec
 
     def onRandomDeltaClicked(self):
         layer = self.currentLayer()
@@ -168,7 +167,7 @@ class ColorSpaceExplorerDialog(QMainWindow):
 
         v = min(self.mRandomDeltaMax.value(), layer.bandCount())
         for mDelta in [self.mRedDelta, self.mGreenDelta, self.mBlueDelta]:
-            mDelta.setValue(randint(-v, v))
+            mDelta.setValue(randint(-v, v))  # nosec
 
     def nextBandNo(self, bandNo: int, delta: int, backwards) -> int:
         layer = self.currentLayer()
@@ -212,7 +211,6 @@ class ColorSpaceExplorerDialog(QMainWindow):
             renderer = QgsMultiBandColorRenderer(layer.dataProvider(), 1, 1, 1)
             layer.setRenderer(renderer)
 
-        assert isinstance(renderer, QgsMultiBandColorRenderer)
         layer.renderer().setRedBand(self.mRedBand.currentBand())
         layer.renderer().setGreenBand(self.mGreenBand.currentBand())
         layer.renderer().setBlueBand(self.mBlueBand.currentBand())

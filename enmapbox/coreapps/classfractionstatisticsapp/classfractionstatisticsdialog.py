@@ -1,4 +1,5 @@
 import traceback
+from contextlib import suppress
 from random import randint
 from typing import Optional, List
 
@@ -12,8 +13,9 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QMouseEvent, QColor
-from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QCheckBox, QTableWidget, QSpinBox, QComboBox, QApplication, \
-    QMessageBox
+from qgis.PyQt.QtWidgets import (
+    QToolButton, QMainWindow, QCheckBox, QTableWidget, QSpinBox, QComboBox, QApplication, QMessageBox
+)
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer, QgsRasterDataProvider, QgsRasterHistogram, QgsMapLayerProxyModel, QgsMapSettings
 from qgis.gui import QgsMapCanvas, QgsMapLayerComboBox, QgsColorButton
@@ -61,10 +63,8 @@ class ClassFractionStatisticsDialog(QMainWindow):
 
         # disconnect old map canvas
         if self.mMapCanvas is not None:
-            try:
+            with suppress(Exception):
                 self.mMapCanvas.extentsChanged.disconnect(self.onMapCanvasExtentsChanged)
-            except Exception:
-                pass
 
         # connect new map canvas
         self.mMapCanvas = None
@@ -92,7 +92,7 @@ class ClassFractionStatisticsDialog(QMainWindow):
             for bandNo in reader.bandNumbers():
                 hexcolor = reader.metadataItem('color', '', bandNo)
                 if hexcolor is None:
-                    color = QColor(randint(0, 255), randint(0, 255), randint(0, 255))
+                    color = QColor(randint(0, 255), randint(0, 255), randint(0, 255))  # nosec
                 else:
                     color = QColor(hexcolor)
                 colors.append(color)

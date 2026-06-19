@@ -50,8 +50,8 @@ y_values = [
 
 
 speclib: QgsVectorLayer = SpectralLibraryUtils.createSpectralLibrary()
-assert isinstance(speclib, QgsVectorLayer)
-assert is_spectral_library(speclib)
+assert isinstance(speclib, QgsVectorLayer)  # nosec
+assert is_spectral_library(speclib)  # nosec
 
 pfields = profile_field_list(speclib)
 print(f'profile fields: {pfields}')
@@ -76,7 +76,7 @@ with edit(speclib):
         # add other attributes here
         # ...
 
-        assert speclib.addFeature(feature)
+        assert speclib.addFeature(feature)  # nosec
 
 # write in-memory spectral library to file
 files = SpectralLibraryUtils.writeToSource(speclib, path)

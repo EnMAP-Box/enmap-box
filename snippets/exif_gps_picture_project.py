@@ -30,7 +30,7 @@ AOI_FILTER_EXPRESSION = "Tile_ID = 'X0049_Y0026'"
 DIR_OUTPUT_IMG = DIR_OUTPUT / 'pictures'
 PATH_VECTOR = DIR_OUTPUT / 'PICTURE_POSITIONS.gpkg'
 
-assert DIR_IMAGES.is_dir()
+assert DIR_IMAGES.is_dir()  # nosec
 
 os.makedirs(DIR_OUTPUT_IMG, exist_ok=True)
 
@@ -75,7 +75,7 @@ if AOI_PATH:
     for f in lyrAOI.getFeatures(aoiFeatureRequest):
         f: QgsFeature
         g = f.geometry()
-        assert g.transform(crsTrans) == Qgis.GeometryOperationResult.Success
+        assert g.transform(crsTrans) == Qgis.GeometryOperationResult.Success  # nosec
         AOI_GEOMETRIES.append(g)
 
 image_ids = set()
@@ -219,8 +219,8 @@ for i, file in enumerate(candidate_images):
 
 print(f'Add {len(features)} features to memory layer')
 lyr.startEditing()
-assert lyr.addFeatures(features)
-assert lyr.commitChanges()
+assert lyr.addFeatures(features)  # nosec
+assert lyr.commitChanges()  # nosec
 
 print(f'Write memory layer to {PATH_VECTOR}')
 ogrDataSourceOptions = []

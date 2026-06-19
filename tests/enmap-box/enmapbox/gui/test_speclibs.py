@@ -83,7 +83,7 @@ class TestSpeclibs(EnMAPBoxTestCase):
         enmapBox = EnMAPBox(load_core_apps=False, load_other_apps=False)
         library = TestObjects.createSpectralLibrary(profile_field_names=['profiles'], wlu='nanometers')
         library.setName('MyProfiles1')
-        assert SpectralLibraryUtils.isSpectralLibrary(library)
+        self.assertTrue(SpectralLibraryUtils.isSpectralLibrary(library))
         enmapBox.addSources([library])
         self.showGui(enmapBox.ui)
         enmapBox.close()

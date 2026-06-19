@@ -1,4 +1,4 @@
-from PyQt5.Qsci import QsciScintilla, QsciLexerPython
+from qgis.PyQt.Qsci import QsciScintilla, QsciLexerPython
 from qgis.PyQt.QtGui import QFont, QFontMetrics, QColor
 
 

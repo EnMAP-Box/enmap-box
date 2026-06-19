@@ -22,18 +22,17 @@
 
 import os
 
+from enmapbox.gui.applications import EnMAPBoxApplication
 from qgis.PyQt.QtCore import QProcess, QProcessEnvironment
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import (
-    QMenu, QAction, QWidget, QVBoxLayout, QFrame, QGridLayout, QLineEdit, QLabel, QHBoxLayout, QDialogButtonBox
+    QMenu, QWidget, QVBoxLayout, QFrame, QGridLayout, QLineEdit, QLabel, QHBoxLayout, QDialogButtonBox
 )
 from qgis.core import (
     QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer, QgsProcessingParameterNumber,
     QgsProcessingParameterRasterDestination, QgsProcessingContext, QgsProcessingFeedback
 )
 from qgis.gui import QgsFileWidget
-
-from enmapbox.gui.applications import EnMAPBoxApplication
 
 VERSION = '0.0.1'
 LICENSE = 'GNU GPL-3'
@@ -67,13 +66,7 @@ class AnacondaExampleEnMAPBoxApp(EnMAPBoxApplication):
         """
         return QIcon(os.path.join(APP_DIR, 'icon.png'))
 
-    def menu(self, appMenu):
-        """
-        Returns a QMenu that will be added to the parent `appMenu`
-        :param appMenu:
-        :return: QMenu
-        """
-        assert isinstance(appMenu, QMenu)
+    def menu(self, appMenu: QMenu):
         """
         Specify menu, submenus and actions that become accessible from the EnMAP-Box GUI
         :return: the QMenu or QAction to be added to the "Applications" menu.
@@ -88,7 +81,6 @@ class AnacondaExampleEnMAPBoxApp(EnMAPBoxApplication):
         # add a QAction that starts a process of your application.
         # In this case it will open your GUI.
         a = menu.addAction('Show Anaconda App Parameterization GUI')
-        assert isinstance(a, QAction)
         a.triggered.connect(self.startGUI)
         appMenu.addMenu(menu)
 
@@ -163,7 +155,8 @@ class AnacondaCallingGUI(QWidget):
             self.mProcess.kill()
         self.mProcess = QProcess()
         AI = AnacondaEnvironmentInfo(self.anacondaRoot())
-        assert AI.isValid()
+        if not AI.isValid():
+            raise RuntimeError(f"Invalid Anaconda environment: {self.anacondaRoot()}")
         self.mProcess.setWorkingDirectory(AI.rootFolder())
         self.anacondaRoot()
 
@@ -203,12 +196,12 @@ class AnacondaEnvironmentInfo(object):
 
         return True
 
-    def __init__(self, rootDir):
+    def __init__(self, rootDir: str):
         """
         :param rootDir: str, path to root folder of a local Anaconda / Miniconda installation
         """
-        assert isinstance(rootDir, str)
-        assert os.path.isdir(rootDir)
+        if not os.path.isdir(rootDir):
+            raise NotADirectoryError(rootDir)
         self.mRootDir = rootDir
         self.mIsValid = AnacondaEnvironmentInfo.isAnacondaEnvironment(self.mRootDir)
 
@@ -272,11 +265,7 @@ class AnacondaCallingGeoAlgorithm(QgsProcessingAlgorithm):
                                          999999.99))
         self.addParameter(QgsProcessingParameterRasterDestination('pathOutput', 'The Output Dataset'))
 
-    def processAlgorithm(self, parameters, context, feedback):
-        assert isinstance(parameters, dict)
-        assert isinstance(context, QgsProcessingContext)
-        assert isinstance(feedback, QgsProcessingFeedback)
-
+    def processAlgorithm(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback):
         outputs = {}
         return outputs
 
@@ -295,24 +284,21 @@ if __name__ == '__main__':
 
     p = QProcess()
 
-    def readStdOut(p):
-        assert isinstance(p, QProcess)
-
+    def readStdOut(p: QProcess):
         ba = p.readAllStandardOutput()
         s = str(textFromByteArray(ba)).strip()
 
         print(s)
 
-    def readStdErr(process):
-        assert isinstance(process, QProcess)
-
+    def readStdErr(process: QProcess):
         ba = process.readAllStandardError()
         s = str(textFromByteArray(ba)).strip()
         import sys
         print(s, file=sys.stderr)
 
     pathPythonScript = os.path.join(APP_DIR, *['conda_code', 'condacodeexamples.py'])
-    assert os.path.isfile(pathPythonScript)
+    if not os.path.isfile(pathPythonScript):
+        raise FileNotFoundError(f"Required script not found: {pathPythonScript}")
     startScripts = [
         # 'set path=',
         'set pythonpath=',
@@ -340,7 +326,8 @@ if __name__ == '__main__':
     p.started.connect(lambda: print('started'))
     p.finished.connect(lambda: print('finished'))
     p.start(pathStartScript)
-    assert p.startDetached(pathStartScript)
+    if not p.startDetached(pathStartScript):
+        raise RuntimeError(f"Failed to start process detached: {pathStartScript}")
 
     if True:  # test GUI without EnMAP-Box
         w = AnacondaCallingGUI()

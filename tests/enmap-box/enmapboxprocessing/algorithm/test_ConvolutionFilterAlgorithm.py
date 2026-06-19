@@ -1,3 +1,4 @@
+import importlib
 import unittest
 
 from enmapboxprocessing.algorithm.algorithms import algorithms
@@ -5,13 +6,7 @@ from enmapboxprocessing.algorithm.convolutionfilteralgorithmbase import Convolut
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import hires
 
-try:
-    import astropy.convolution
-
-    assert astropy.convolution is not None
-    has_astropy = True
-except ModuleNotFoundError:
-    has_astropy = False
+has_astropy = importlib.util.find_spec("astropy.convolution") is not None
 
 
 class ConvolutionFilterAlgorithm(ConvolutionFilterAlgorithmBase):

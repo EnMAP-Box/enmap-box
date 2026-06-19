@@ -83,7 +83,7 @@ class TileRasterAlgorithm(EnMAPProcessingAlgorithm):
         baseName = splitext(baseName)[0] + '.tif'
 
         def id_generator(size=40, chars=string.ascii_uppercase + string.digits):
-            return ''.join(random.choice(chars) for _ in range(size))
+            return ''.join(random.choice(chars) for _ in range(size))  # nosec non-security temporary folder identifier
 
         tmpFolderName = join(folderName, '_tmp', id_generator())
         if not exists(tmpFolderName):
@@ -171,7 +171,12 @@ class TileRasterAlgorithm(EnMAPProcessingAlgorithm):
                         rb: gdal.Band = ds.GetRasterBand(bandNo)
                         arrayNew = rbNew.ReadAsArray()
                         array = rb.ReadAsArray()
-                        assert arrayNew.shape == array.shape
+
+                        if arrayNew.shape != array.shape:
+                            raise ValueError(
+                                f'arrayNew must have the same shape as array, got {arrayNew.shape} and {array.shape}'
+                            )
+
                         arrayUpdated = np.where(arrayNew == rbNew.GetNoDataValue(), array, arrayNew)
                         rb.WriteArray(arrayUpdated)
                     dsNew = None

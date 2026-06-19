@@ -23,6 +23,7 @@ import os
 import pathlib
 import re
 import typing
+from contextlib import suppress
 from difflib import SequenceMatcher
 from typing import Optional
 
@@ -41,7 +42,6 @@ from qgis.PyQt.QtGui import QColor, QContextMenuEvent, QIcon
 from qgis.PyQt.QtWidgets import QFileDialog, QTableView, QMenu, QStyledItemDelegate, QDialog, QDialogButtonBox
 from qgis.core import QgsProcessing
 from qgis.core import QgsProviderRegistry, QgsRasterLayer, QgsProject, QgsMapLayerProxyModel
-from qgis.gui import QgsMapLayerComboBox
 from . import APP_DIR
 
 SETTINGS_KEY = 'ENMAPBOX_RECLASSIFY_APP'
@@ -49,25 +49,23 @@ SAVE_DIR_KEY = SETTINGS_KEY + '/SAVE_DIR'
 KEY_DST_RASTER = SETTINGS_KEY + 'DST_RASTER'
 
 
-def setClassInfo(targetDataset, classificationScheme, bandIndex=0):
-    assert isinstance(classificationScheme, ClassificationScheme)
-
+def setClassInfo(targetDataset, classificationScheme: ClassificationScheme, bandIndex=0):
     classNames = classificationScheme.classNames()
     ct = gdal.ColorTable()
-    assert isinstance(ct, gdal.ColorTable)
+
+    color: QColor
     for i, color in enumerate(classificationScheme.classColors()):
-        assert isinstance(color, QColor)
         ct.SetColorEntry(color.toRgb())
 
+    ds: gdal.Dataset
     if isinstance(targetDataset, gdal.Dataset):
         ds = targetDataset
     else:
         ds = gdal.Open(targetDataset, gdal.GA_Update)
 
-    assert isinstance(ds, gdal.Dataset)
-    assert bandIndex >= 0 and ds.RasterCount > bandIndex
+    if not 0 <= bandIndex < ds.RasterCount:
+        raise ValueError(f'bandIndex must be in the range [0, {ds.RasterCount - 1}], got {bandIndex}')
     band = ds.GetRasterBand(bandIndex + 2)
-    assert isinstance(band, gdal.Band)
     band.SetCategoryNames(classNames)
     band.SetColorTable(ct)
 
@@ -120,7 +118,6 @@ class ReclassifyTableModel(QAbstractTableModel):
 
         if not isinstance(path, pathlib.Path):
             path = pathlib.Path(path)
-        assert isinstance(path, pathlib.Path)
 
         lines = ['#Source Class; Destination Class']
         for src, dst in self.mMapping.items():
@@ -142,7 +139,6 @@ class ReclassifyTableModel(QAbstractTableModel):
 
         if not isinstance(path, pathlib.Path):
             path = pathlib.Path(path)
-        assert isinstance(path, pathlib.Path) and path.is_file()
 
         allowedSrcNames = self.mSrc.classNames()
         allowedSrcLabels = [str(label) for label in self.mSrc.classLabels()]
@@ -179,9 +175,6 @@ class ReclassifyTableModel(QAbstractTableModel):
                     else:
                         continue
 
-                    assert isinstance(srcClass, ClassInfo)
-                    assert isinstance(dstClass, ClassInfo)
-
                     idx = self.mSrc.classInfo2index(srcClass)
                     self.mMapping[srcClass] = dstClass
                     idx0 = self.createIndex(idx.row(), 0)
@@ -209,15 +202,12 @@ class ReclassifyTableModel(QAbstractTableModel):
             self.mMapping[self.mSrc[i]] = self.mDst[j]
 
     def setDestination(self, cs: ClassificationScheme):
-        assert isinstance(cs, ClassificationScheme)
 
         self.beginResetModel()
         if isinstance(self.mDst, ClassificationScheme):
-            try:
+            with suppress(Exception):
                 self.mDst.sigClassesRemoved.disconnect(self.onDestinationClassesRemoved)
                 self.mDst.dataChanged.disconnect(self.onDestinationDataChanged)
-            except Exception:
-                pass
 
         self.mDst = cs
         self.mDst.sigClassesRemoved.connect(self.onDestinationClassesRemoved)
@@ -233,7 +223,6 @@ class ReclassifyTableModel(QAbstractTableModel):
         return self.mDst
 
     def setSource(self, cs: ClassificationScheme):
-        assert isinstance(cs, ClassificationScheme)
 
         self.beginResetModel()
 
@@ -242,11 +231,9 @@ class ReclassifyTableModel(QAbstractTableModel):
         self.mMapping.clear()
         if isinstance(oldSrc, ClassificationScheme):
             self.matchClassNames()
-            try:
+            with suppress(Exception):
                 oldSrc.sigClassesRemoved.disconnect(self.onSourceClassesRemoved)
                 self.mSrc.dataChanged.disconnect(self.onSourceDataChanged)
-            except Exception:
-                pass
         self.mSrc.sigClassesRemoved.connect(self.onSourceClassesRemoved)
         self.mSrc.dataChanged.connect(self.onSourceDataChanged)
 
@@ -332,8 +319,8 @@ class ReclassifyTableModel(QAbstractTableModel):
 
         if col == 0:
             # idx0 = self.mSrc.index(row, 0)
-            c = self.mSrc[row]
-            assert isinstance(c, ClassInfo)
+            c: ClassInfo = self.mSrc[row]
+
             if role == Qt.DisplayRole:
                 return self.classDisplayName(c)
             elif role == Qt.ToolTipRole:
@@ -398,7 +385,6 @@ class ReclassifyTableViewDelegate(QStyledItemDelegate):
     """
 
     def __init__(self, tableView: QTableView, parent=None):
-        assert isinstance(tableView, QTableView)
         super(ReclassifyTableViewDelegate, self).__init__(parent=parent)
         self.mTableView = tableView
 
@@ -416,36 +402,31 @@ class ReclassifyTableViewDelegate(QStyledItemDelegate):
         pmodel = self.sortFilterProxyModel()
         tmodel = self.reclassifyModel()
         w = None
-        tIdx = pmodel.mapToSource(index)
-        assert isinstance(tIdx, QModelIndex)
+        tIdx: QModelIndex = pmodel.mapToSource(index)
 
         if index.isValid() and isinstance(tmodel, ReclassifyTableModel):
             if tIdx.column() == 1:
                 w = ClassificationSchemeComboBox(classification=tmodel.destination(), parent=parent)
         return w
 
-    def checkData(self, index, w, value):
-        assert isinstance(index, QModelIndex)
+    def checkData(self, index: QModelIndex, w, value):
         tModel = self.reclassifyModel()
         if index.isValid() and isinstance(tModel, ReclassifyTableModel):
             #  todo: any checks?
             self.commitData.emit(w)
 
-    def setEditorData(self, editor, proxyIndex):
+    def setEditorData(self, editor: ClassificationSchemeComboBox, proxyIndex):
 
         tModel = self.reclassifyModel()
-        index = self.sortFilterProxyModel().mapToSource(proxyIndex)
-        assert isinstance(index, QModelIndex)
+        index: QModelIndex = self.sortFilterProxyModel().mapToSource(proxyIndex)
 
         if index.isValid() and isinstance(tModel, ReclassifyTableModel):
             if index.column() == 1:
-                assert isinstance(editor, ClassificationSchemeComboBox)
                 c = index.data(Qt.UserRole)
                 editor.setCurrentClassInfo(c)
 
     def setModelData(self, w, bridge, proxyIndex):
-        index = self.sortFilterProxyModel().mapToSource(proxyIndex)
-        assert isinstance(index, QModelIndex)
+        index: QModelIndex = self.sortFilterProxyModel().mapToSource(proxyIndex)
         tModel = self.reclassifyModel()
         if index.isValid() and isinstance(tModel, ReclassifyTableModel):
             if index.column() == 1 and isinstance(w, ClassificationSchemeComboBox):
@@ -455,14 +436,15 @@ class ReclassifyTableViewDelegate(QStyledItemDelegate):
 class ReclassifyDialog(QDialog):
     """Constructor."""
 
+    mapLayerComboBox: ClassificationMapLayerComboBox
+    tableView: QTableView
+    dstClassificationSchemeWidget: ClassificationSchemeWidget
+
     def __init__(self, parent=None):
         super(ReclassifyDialog, self).__init__(parent, Qt.Window)
         path = pathlib.Path(__file__).parent / 'reclassifydialog.ui'
         loadUi(path, self)
 
-        assert isinstance(self.mapLayerComboBox, ClassificationMapLayerComboBox)
-        assert isinstance(self.tableView, QTableView)
-        assert isinstance(self.dstClassificationSchemeWidget, ClassificationSchemeWidget)
         self.mProject = QgsProject.instance()
         self.mModel = ReclassifyTableModel()
         self.mProxyModel = QSortFilterProxyModel()
@@ -548,7 +530,6 @@ class ReclassifyDialog(QDialog):
         :param src:
         :return:
         """
-        assert isinstance(self.mapLayerComboBox, QgsMapLayerComboBox)
         for i in [self.mapLayerComboBox.findText(src), self.mapLayerComboBox.findData(src)]:
             if i > -1:
                 self.mapLayerComboBox.setCurrentIndex(i)
@@ -559,9 +540,7 @@ class ReclassifyDialog(QDialog):
         :param src: object
         :return:
         """
-        assert isinstance(src, QgsRasterLayer)
         self.mProject.addMapLayer(src)
-        assert isinstance(self.mapLayerComboBox, QgsMapLayerComboBox)
         for i in range(self.mapLayerComboBox.count()):
             if self.mapLayerComboBox.layer(i) == src:
                 self.mapLayerComboBox.setCurrentIndex(i)
@@ -579,8 +558,7 @@ class ReclassifyDialog(QDialog):
         else:
             return None
 
-    def createClassInfoComboBox(self, classScheme):
-        assert isinstance(classScheme, ClassificationScheme)
+    def createClassInfoComboBox(self, classScheme: ClassificationScheme):
         box = ClassificationSchemeComboBox(classification=classScheme)
         box.setAutoFillBackground(True)
 

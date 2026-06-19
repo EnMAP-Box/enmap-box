@@ -132,11 +132,12 @@ class PrepareRegressionDatasetFromSynthMixAlgorithm(EnMAPProcessingAlgorithm):
         for i in range(self.n):
             complexity = np.random.choice(list(mixingComplexities.keys()), p=list(mixingComplexities.values()))
 
-            isBackground = self.background >= randint(1, 100)
+            # nosec random sampling for synthetic dataset generation
+            isBackground = self.background >= randint(1, 100)  # nosec
 
             if isBackground:
                 drawnLabels = list(
-                    np.random.choice(
+                    np.random.choice(  # nosec
                         list(classProbabilities2.keys()), size=1, replace=False, p=list(classProbabilities2.values())
                     )
                 )
@@ -144,8 +145,12 @@ class PrepareRegressionDatasetFromSynthMixAlgorithm(EnMAPProcessingAlgorithm):
                 drawnLabels = [targetCategory.value]
 
             if self.allowWithinClassMixtures:
-                drawnLabels.extend(np.random.choice(list(classProbabilities.keys()), size=complexity - 1, replace=True,
-                                                    p=list(classProbabilities.values())))
+                drawnLabels.extend(
+                    np.random.choice(  # nosec
+                        list(classProbabilities.keys()), size=complexity - 1, replace=True,
+                        p=list(classProbabilities.values())
+                    )
+                )
             else:
                 drawnLabels.extend(
                     np.random.choice(list(classProbabilities2.keys()), size=complexity - 1, replace=False,

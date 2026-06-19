@@ -1,3 +1,4 @@
+from contextlib import suppress
 from math import ceil, sqrt
 from typing import Optional, List
 
@@ -123,10 +124,8 @@ class ClassificationStatisticsDialog(QMainWindow):
 
         # disconnect old map canvas
         if self.mMapCanvas is not None:
-            try:
+            with suppress(Exception):
                 self.mMapCanvas.extentsChanged.disconnect(self.onMapCanvasExtentsChanged)
-            except Exception:
-                pass
 
         # connect new map canvas
         self.mMapCanvas = None
@@ -365,7 +364,8 @@ class ClassificationStatisticsDialog(QMainWindow):
         ds: gdal.Dataset = gdal.Rasterize(filename2, filename, options=options)
 
         marray = ds.ReadAsArray()
-        assert marray.shape == (height, width)
+        if marray.shape != (height, width):
+            raise RuntimeError(f'unexpected rasterized array shape: expected ({height}, {width}), got {marray.shape}')
         return marray.astype(bool)
 
 

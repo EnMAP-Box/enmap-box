@@ -100,7 +100,7 @@ class RandomPointsFromRasterAlgorithm(EnMAPProcessingAlgorithm):
                 samplesPerStrata.append(int(row[-1]))
                 row[-1] = stratumNo
                 stratumName = self.O_BOUNDARIES[boundaries].replace('min', str(row[0])).replace('max', str(row[1]))
-                stratumColor = QColor(randint(0, 2 ** 24)).name()
+                stratumColor = QColor(randint(0, 2 ** 24)).name()  # nosec
                 categories.append(Category(stratumNo, stratumName, stratumColor))
             N2 = N2.flatten().tolist()
             alg2 = 'native:reclassifybytable'

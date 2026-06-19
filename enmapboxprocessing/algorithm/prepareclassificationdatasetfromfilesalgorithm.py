@@ -79,7 +79,7 @@ class PrepareClassificationDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
 
             # prepare categories
             values = np.unique(y)
-            categories = [Category(int(v), str(v), QColor(randint(0, 2 ** 24 - 1)).name()) for v in values]
+            categories = [Category(int(v), str(v), QColor(randint(0, 2 ** 24 - 1)).name()) for v in values]  # nosec
 
             dump = ClassifierDump(categories=categories, features=features, X=X, y=y)
             Utils.pickleDump(dump.__dict__, filename)

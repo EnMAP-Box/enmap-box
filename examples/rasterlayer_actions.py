@@ -14,7 +14,7 @@ from qgis.gui import QgsMapCanvas
 
 
 def widgetScreenshot(widget, path):
-    assert isinstance(widget, QWidget)
+    assert isinstance(widget, QWidget)  # nosec
 
     rect = widget.rect()
     pixmap = widget.grab(rectangle=rect)
@@ -26,7 +26,7 @@ APP = start_app()
 lyr1 = QgsRasterLayer(enmap)
 
 renderer = lyr1.renderer()
-assert isinstance(renderer, QgsMultiBandColorRenderer)
+assert isinstance(renderer, QgsMultiBandColorRenderer)  # nosec
 renderer.setRedBand(1)
 renderer.setBlueBand(2)
 renderer.setGreenBand(3)
@@ -35,8 +35,8 @@ renderer.redContrastEnhancement().setMinimumValue(0)
 renderer.redContrastEnhancement().setMaximumValue(2000)
 
 lyr2 = QgsVectorLayer(landcover_polygon)
-assert lyr1.isValid()
-assert lyr2.isValid()
+assert lyr1.isValid()  # nosec
+assert lyr2.isValid()  # nosec
 layers = [lyr1, lyr2]
 QgsProject.instance().addMapLayers(layers)
 

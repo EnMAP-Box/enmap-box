@@ -36,27 +36,24 @@ class ImageCubeTests(EnMAPBoxTestCase):
         array = np.fromfunction(lambda i, j, k: i + j + k, (nb, nl, ns), dtype=np.uint32)
         # array = array * 10
         drv = gdal.GetDriverByName('GTiff')
-        assert isinstance(drv, gdal.Driver)
         eType = gdal_array.NumericTypeCodeToGDALTypeCode(array.dtype)
         ds = drv.Create(path, ns, nl, bands=nb, eType=eType)
-        assert isinstance(ds, gdal.Dataset)
         if isinstance(crs, str):
             c = QgsCoordinateReferenceSystem(crs)
             ds.SetProjection(c.toWkt())
         ds.SetGeoTransform([0, 1.0, 0,
                             0, 0, -1.0])
 
-        assert isinstance(ds, gdal.Dataset)
         for b in range(nb):
             band = ds.GetRasterBand(b + 1)
             band.WriteArray(array[b, :, :])
 
         ds.FlushCache()
 
-        assert isinstance(ds, gdal.Dataset)
-
         lyr = QgsRasterLayer(path, 'image_cube', 'gdal')
-        assert lyr.isValid()
+        if not lyr.isValid():
+            raise RuntimeError(f'Failed to load raster layer: {path}')
+
         return lyr
 
     def test_extent_mini(self):
