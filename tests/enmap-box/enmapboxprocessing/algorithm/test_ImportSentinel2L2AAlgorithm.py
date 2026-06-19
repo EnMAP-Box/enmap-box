@@ -1,8 +1,8 @@
 import os.path
 import unittest
-import xml.etree.ElementTree as ET
 from pathlib import Path
 
+import defusedxml.ElementTree as ET
 import numpy as np
 from osgeo import gdal
 

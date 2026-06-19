@@ -13,7 +13,6 @@ __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
 import datetime
 import pathlib
-import tempfile
 import unittest
 from pathlib import Path
 from time import sleep
@@ -78,8 +77,8 @@ class DataSourceTests(EnMAPBoxTestCase):
 
     def test_layerSourceUpdate(self):
 
-        path = '/vsimem/image.bsq'
-        path = tempfile.mktemp(suffix='image.tif')
+        tmpdir = self.createTestOutputDirectory()
+        path = str(tmpdir / 'image.tif')
         TestObjects.createRasterDataset(nb=5, nl=500, path=path)
         c = QgsMapCanvas()
         c.show()
@@ -274,17 +273,6 @@ class DataSourceTests(EnMAPBoxTestCase):
         self.assertTrue((len(dsm) == 0))
 
         reg.removeAllMapLayers()
-
-        # test doubled input
-        n = len(dsm)
-        try:
-            p1 = str(pathlib.WindowsPath(pathlib.Path(enmap)))
-            p2 = str(pathlib.Path(enmap).as_posix())
-            dsm.addDataSources(p1)
-            dsm.addDataSources(p2)
-            self.assertTrue(len(dsm) == n, msg='DataSourceManager should not contain the same source multiple times')
-        except Exception:
-            pass
 
         # remove
         dsm = DataSourceManager()

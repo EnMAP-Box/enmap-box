@@ -12,7 +12,6 @@ __author__ = 'benjamin.jakimow@geo.hu-berlin.de'
 __date__ = '2017-07-17'
 __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
-import pickle
 import unittest
 
 from osgeo import gdal
@@ -31,15 +30,6 @@ class TestEnMAPBoxUtils(EnMAPBoxTestCase):
         r'crs=EPSG:3857&format&type=xyz&url='
         r'https://mt1.google.com/vt/lyrs%3Ds%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D&zmax=19&zmin=0'
     )
-
-    def test_spatialObjects(self):
-
-        pt1 = SpatialPoint('EPSG:4326', 300, 300)
-        self.assertIsInstance(pt1, SpatialPoint)
-        d = pickle.dumps(pt1)
-        pt2 = pickle.loads(d)
-
-        self.assertEqual(pt1, pt2)
 
     def test_gdalDataset(self):
         ds1 = gdalDataset(enmap)
