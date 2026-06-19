@@ -1,3 +1,4 @@
+from contextlib import suppress
 from math import ceil, sqrt
 from typing import Optional, List
 
@@ -123,10 +124,8 @@ class ClassificationStatisticsDialog(QMainWindow):
 
         # disconnect old map canvas
         if self.mMapCanvas is not None:
-            try:
+            with suppress(Exception):
                 self.mMapCanvas.extentsChanged.disconnect(self.onMapCanvasExtentsChanged)
-            except Exception:
-                pass
 
         # connect new map canvas
         self.mMapCanvas = None

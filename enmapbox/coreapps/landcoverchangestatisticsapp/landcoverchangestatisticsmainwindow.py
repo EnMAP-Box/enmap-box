@@ -1,4 +1,5 @@
 from collections import defaultdict
+from contextlib import suppress
 from typing import Optional, List
 
 import numpy as np
@@ -91,10 +92,8 @@ class LandCoverChangeStatisticsMainWindow(QMainWindow):
 
         # disconnect old map canvas
         if self.mMapCanvas is not None:
-            try:
+            with suppress(Exception):
                 self.mMapCanvas.extentsChanged.disconnect(self.onMapCanvasExtentsChanged)
-            except Exception:
-                pass
 
         # connect new map canvas
         self.mMapCanvas = None

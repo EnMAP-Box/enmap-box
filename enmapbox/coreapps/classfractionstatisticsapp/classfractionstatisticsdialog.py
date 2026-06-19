@@ -1,4 +1,5 @@
 import traceback
+from contextlib import suppress
 from random import randint
 from typing import Optional, List
 
@@ -61,10 +62,8 @@ class ClassFractionStatisticsDialog(QMainWindow):
 
         # disconnect old map canvas
         if self.mMapCanvas is not None:
-            try:
+            with suppress(Exception):
                 self.mMapCanvas.extentsChanged.disconnect(self.onMapCanvasExtentsChanged)
-            except Exception:
-                pass
 
         # connect new map canvas
         self.mMapCanvas = None
@@ -92,7 +91,7 @@ class ClassFractionStatisticsDialog(QMainWindow):
             for bandNo in reader.bandNumbers():
                 hexcolor = reader.metadataItem('color', '', bandNo)
                 if hexcolor is None:
-                    color = QColor(randint(0, 255), randint(0, 255), randint(0, 255))
+                    color = QColor(randint(0, 255), randint(0, 255), randint(0, 255))  # nosec
                 else:
                     color = QColor(hexcolor)
                 colors.append(color)

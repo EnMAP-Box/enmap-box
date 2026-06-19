@@ -1,7 +1,8 @@
 import warnings
+from contextlib import suppress
 from math import ceil, sqrt, floor
 from os.path import join, exists
-from random import getrandbits
+from secrets import token_hex
 from typing import Optional, Tuple, Dict
 
 import numpy as np
@@ -228,10 +229,8 @@ class ScatterPlotDialog(QMainWindow):
 
         # disconnect old map canvas
         if self.mMapCanvas is not None:
-            try:
+            with suppress(Exception):
                 self.mMapCanvas.extentsChanged.disconnect(self.onMapCanvasExtentsChanged)
-            except Exception:
-                pass
 
         # connect new map canvas
         self.mMapCanvas = None
@@ -276,7 +275,7 @@ class ScatterPlotDialog(QMainWindow):
         if key not in self.cache:
             noDataValue = -9999
             alg = RasterizeVectorAlgorithm()
-            filename = join(Utils.getTempDirInTempFolder(), str(getrandbits(128))) + '.tif'
+            filename = join(Utils.getTempDirInTempFolder(), str(token_hex(16))) + '.tif'
             parameters = {
                 alg.P_VECTOR: layerY,
                 alg.P_GRID: layerX,

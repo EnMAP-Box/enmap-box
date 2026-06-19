@@ -17,6 +17,7 @@
 """
 import copy
 import re
+from contextlib import suppress
 from typing import Union, Optional
 
 import numpy as np
@@ -374,11 +375,10 @@ class MDKeyDomainString(MDKeyAbstract):
                 pass
             if value is not None and len(value) > 0:
                 for t in [int, float, np.datetime64, str]:
-                    try:
+                    with suppress(Exception):
                         v = t(value)
                         break
-                    except Exception:
-                        pass
+
                 key = MDKeyDomainString(obj, domain, name, valueType=t, **kwds)
                 key.setValue(v)
                 return key
@@ -641,9 +641,7 @@ if __name__ == '__main__':
 
     for d in [dsV.GetLayer(0), dsR, dsR.GetRasterBand(1), dsV]:
         oli = None
-        try:
+        with suppress(Exception):
             oli = MDKeyAbstract.object2oli(d)
-        except Exception:
-            pass
 
     qgsApp.exec_()

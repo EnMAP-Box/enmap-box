@@ -1,3 +1,4 @@
+from contextlib import suppress
 from random import randint
 from typing import Optional, List, Tuple
 
@@ -59,10 +60,8 @@ class EnhancedMultiBandColorDialog(QMainWindow):
 
         # disconnect old map canvas
         if self.mMapCanvas is not None:
-            try:
+            with suppress(Exception):
                 self.mMapCanvas.extentsChanged.disconnect(self.onMapCanvasExtentsChanged)
-            except Exception:
-                pass
 
         # connect new map canvas
         self.mMapCanvas = None
@@ -93,7 +92,7 @@ class EnhancedMultiBandColorDialog(QMainWindow):
         self.mTable.setRowCount(layer.bandCount())
         for row, color in enumerate(colors):
             if color is None:
-                color = QColor(randint(0, 255), randint(0, 255), randint(0, 255))
+                color = QColor(randint(0, 255), randint(0, 255), randint(0, 255))  # nosec
             if color.alpha() == 255:
                 checkState = Qt.Checked
             else:

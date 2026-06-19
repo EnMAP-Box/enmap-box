@@ -1,4 +1,5 @@
 import warnings
+from contextlib import suppress
 from typing import Optional
 
 from pyqtgraph import PlotWidget
@@ -96,10 +97,8 @@ class BandStatisticsDialog(QMainWindow):
 
         # disconnect old map canvas
         if self.mMapCanvas is not None:
-            try:
+            with suppress(Exception):
                 self.mMapCanvas.extentsChanged.disconnect(self.onMapCanvasExtentsChanged)
-            except Exception:
-                pass
 
         # connect new map canvas
         self.mMapCanvas = None

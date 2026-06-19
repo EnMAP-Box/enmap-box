@@ -23,6 +23,7 @@ import os
 import pathlib
 import re
 import typing
+from contextlib import suppress
 from difflib import SequenceMatcher
 from typing import Optional
 
@@ -204,11 +205,9 @@ class ReclassifyTableModel(QAbstractTableModel):
 
         self.beginResetModel()
         if isinstance(self.mDst, ClassificationScheme):
-            try:
+            with suppress(Exception):
                 self.mDst.sigClassesRemoved.disconnect(self.onDestinationClassesRemoved)
                 self.mDst.dataChanged.disconnect(self.onDestinationDataChanged)
-            except Exception:
-                pass
 
         self.mDst = cs
         self.mDst.sigClassesRemoved.connect(self.onDestinationClassesRemoved)
@@ -232,11 +231,9 @@ class ReclassifyTableModel(QAbstractTableModel):
         self.mMapping.clear()
         if isinstance(oldSrc, ClassificationScheme):
             self.matchClassNames()
-            try:
+            with suppress(Exception):
                 oldSrc.sigClassesRemoved.disconnect(self.onSourceClassesRemoved)
                 self.mSrc.dataChanged.disconnect(self.onSourceDataChanged)
-            except Exception:
-                pass
         self.mSrc.sigClassesRemoved.connect(self.onSourceClassesRemoved)
         self.mSrc.dataChanged.connect(self.onSourceDataChanged)
 
