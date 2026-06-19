@@ -638,7 +638,7 @@ def utilsHtmlWeblinkToRstWeblink(htmlText: str) -> str:
     return rstText
 
 
-if __name__ == '__main__':
+def main(args_list=None):
     parser = argparse.ArgumentParser(description='Generates the documentation for EnMAPBox processing algorithms ',
                                      formatter_class=argparse.RawTextHelpFormatter)
 
@@ -655,7 +655,7 @@ if __name__ == '__main__':
                         default=None,
                         help='List of algorithms ids to generate the documentation for')
 
-    args = parser.parse_args()
+    args = parser.parse_args(args_list)
 
     rootRst = Path(args.rst_root)
     if not rootRst.is_absolute():
@@ -681,4 +681,8 @@ if __name__ == '__main__':
         print(f'Files to remove (manually): {len(to_remove)}')
         for f in to_remove:
             print(f)
-    s = ""
+    return 0
+
+
+if __name__ == '__main__':
+    exit(main())
