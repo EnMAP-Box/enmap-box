@@ -1,6 +1,6 @@
 # 0
 from qgis.core import (
-    QgsProcessingParameterEnum, QgsProcessingParameterFolderDestination, QgsProcessingFeedback, QgsProcessingAlgorithm,
+    QgsProcessingParameterEnum, QgsProcessingParameterFolderDestination, QgsProcessingAlgorithm,
     QgsProcessingParameterFile
 )
 from .core import onns

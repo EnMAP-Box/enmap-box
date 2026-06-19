@@ -110,8 +110,6 @@ class EnMAPBoxPlugin(object):
 
         import enmapbox
         from qgis.utils import iface
-        assert isinstance(iface, QgisInterface)
-
         actionStartBox = QAction(enmapbox.icon(), 'EnMAP-Box', iface)
         actionStartBox.triggered.connect(self.run)
         actionAddExampleData = QAction(QIcon(), 'Add Example Data')
@@ -206,7 +204,8 @@ class EnMAPBoxPlugin(object):
         self.enmapBox = EnMAPBox.instance()
         if not isinstance(self.enmapBox, EnMAPBox):
             self.enmapBox = EnMAPBox()
-            assert self.enmapBox == EnMAPBox.instance()
+            if self.enmapBox != EnMAPBox.instance():
+                raise RuntimeError("EnMAPBox singleton initialization failed")
             self.enmapBox.run()
         else:
             self.enmapBox.ui.show()

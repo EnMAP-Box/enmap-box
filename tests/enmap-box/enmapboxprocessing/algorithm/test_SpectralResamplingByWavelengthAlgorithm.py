@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 import numpy as np
 
 from enmapboxprocessing.algorithm.spectralresamplingbywavelengthalgorithm import SpectralResamplingByWavelengthAlgorithm
@@ -78,11 +80,9 @@ class TestSpectralResamplingByWavelengthAlgorithm(TestCase):
             alg.P_WAVELENGTH_FILE: classificationDatasetAsPklFile,  # PKL files aren't valid response files
             alg.P_OUTPUT_RASTER: self.filename('resampled.tif')
         }
-        try:
+        with suppress(Exception):
             self.runalg(alg, parameters)
-            assert 0, 'error not raised, something went wrong'
-        except Exception:
-            pass
+            raise RuntimeError('error not raised, something went wrong')
 
     def test_nearestNeighbourResampleAlg(self):
         with open(self.filename('wavelenght.csv'), 'w') as file:

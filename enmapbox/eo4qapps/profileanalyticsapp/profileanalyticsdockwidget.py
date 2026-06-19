@@ -8,7 +8,6 @@ from typing import Optional, List, Dict
 
 import numpy as np
 import pyqtgraph as pg
-from selenium.webdriver import support
 
 import processing
 from enmapbox.gui.enmapboxgui import EnMAPBox

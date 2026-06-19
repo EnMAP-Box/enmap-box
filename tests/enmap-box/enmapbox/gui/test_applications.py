@@ -302,8 +302,7 @@ class ExampleApplication(EnMAPBoxApplication):
         self.version = '0.8.15'
         self.licence = 'None'
 
-    def menu(self, appMenu):
-        assert isinstance(appMenu, QMenu)
+    def menu(self, appMenu: QMenu):
         a = appMenu.addAction('Call dummy action')
         a.triggered.connect(self.dummySlot)
 

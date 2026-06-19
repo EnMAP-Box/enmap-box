@@ -128,7 +128,7 @@ class TestImportSentinel2L2AAlgorithm(TestCase):
                     band: gdal.Band = ds_box.GetRasterBand(b + 1)
                     name = band.GetDescription()
                     prefix = name.split(',')[0]
-                    assert prefix in SUB_BANDINFO, f'Band {name} not found in sub-dataset {path_sub}'
+                    self.assertTrue(prefix in SUB_BANDINFO)
 
                     band_info = BAND_INFO_XML[prefix]
 

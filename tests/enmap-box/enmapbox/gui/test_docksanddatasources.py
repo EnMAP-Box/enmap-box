@@ -129,7 +129,7 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
 
         QApplication.processEvents()
 
-        assert len(eb.docks()) == 0
+        self.assertEqual(eb.docks(), 0)
         QApplication.processEvents()
 
         gc.collect()

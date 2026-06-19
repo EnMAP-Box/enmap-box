@@ -41,7 +41,7 @@ from enmapbox.testing import start_app
 
 
 APP = start_app()  # this instantiates a QGIS environment.
-assert QgsPythonRunner.isValid()  # this! is important to run QgsAction of type QgsAction.GenericPython
+assert QgsPythonRunner.isValid()    # nosec is important to run QgsAction of type QgsAction.GenericPython
 
 
 def create_vectordataset() -> QgsVectorLayer:
@@ -102,7 +102,7 @@ conf.setActionWidgetStyle(QgsAttributeTableConfig.ButtonList)
 layer.setAttributeTableConfig(conf)
 
 actionManager = layer.actions()
-assert isinstance(actionManager, QgsActionManager)
+assert isinstance(actionManager, QgsActionManager)  # nosec
 
 iconPath = ':/qt-project.org/styles/commonstyle/images/standardbutton-delete-128.png'
 pythonCode = """

@@ -8,7 +8,7 @@ from enmapbox import enmapboxSettings
 
 
 def printSettings(settings: QSettings):
-    assert isinstance(settings, QSettings)
+    assert isinstance(settings, QSettings)  # nosec
     print('# Organisation=' + settings.organizationName())
     print('# Application=' + settings.applicationName())
     for key in sorted(settings.allKeys()):
@@ -26,7 +26,7 @@ printSettings(mySettings)
 app = QApplication([])
 oldText = mySettings.value('My Text', defaultValue='')
 newText, ok = QInputDialog.getText(None, 'Set a text', 'New Text', text=oldText)
-assert isinstance(ok, bool)
+assert isinstance(ok, bool)  # nosec
 if ok:
     mySettings.setValue('My Text', newText)
 

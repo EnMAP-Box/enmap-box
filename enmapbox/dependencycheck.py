@@ -45,7 +45,7 @@ from qgis.PyQt.QtCore import pyqtSignal, QAbstractTableModel, QModelIndex, QProc
 from qgis.PyQt.QtGui import QColor, QContextMenuEvent, QDesktopServices
 from qgis.PyQt.QtWidgets import (QApplication, QDialogButtonBox, QMenu, QMessageBox,
                                  QStyledItemDelegate, QTableView, QWidget)
-from qgis.core import Qgis, QgsAnimatedIcon, QgsApplication, QgsTask, QgsTaskManager
+from qgis.core import Qgis, QgsAnimatedIcon, QgsApplication, QgsTask
 from qgis.gui import QgsFileDownloaderDialog
 
 logger = logging.getLogger(__name__)
@@ -93,7 +93,8 @@ rxPipVersion = re.compile(
 )
 
 for k in PACKAGE_LOOKUP.keys():
-    assert rxPipPackageName.search(k)
+    if not rxPipPackageName.search(k):
+        raise RuntimeError(f"Invalid package name in PACKAGE_LOOKUP: {k!r}")
 
 
 class PIPPackage(object):
@@ -102,13 +103,12 @@ class PIPPackage(object):
     """
 
     @staticmethod
-    def fromDict(info) -> Optional['PIPPackage']:
+    def fromDict(info: dict) -> Optional['PIPPackage']:
         """
         Create a PIPPackage from data stored in a dictionary.
         :param info: dict
         :return: PIPPackage
         """
-        assert isinstance(info, dict)
         for n in ['Name', 'name']:
             if n in info:
                 pip_name = info[n]
@@ -125,8 +125,6 @@ class PIPPackage(object):
                  used_by: List[str] = None,
                  comment: str = None):
 
-        assert isinstance(pip_name, str)
-        assert len(pip_name) > 0
         pip_name = pip_name.strip()
         if py_name is None:
             py_name = PACKAGE_LOOKUP.get(pip_name, pip_name)
@@ -166,8 +164,12 @@ class PIPPackage(object):
 
     def updateFromDict(self, info: dict):
         info = {k.lower(): v for k, v in info.items()}
-        assert 'name' in info
-        assert info['name'] == self.pipPkgName
+
+        if 'name' not in info:
+            raise KeyError("Missing required key 'name'")
+
+        if info['name'] != self.pipPkgName:
+            raise ValueError(f"Expected package name {self.pipPkgName!r}, got {info['name']!r}")
 
         if 'version' in info:
             self.version = info['version']
@@ -351,9 +353,7 @@ def decode_bytes(bytes_str, encodings=None):
     return None
 
 
-def call_pip_command(pipArgs) -> Tuple[bool, Optional[str], Optional[str]]:
-    assert isinstance(pipArgs, list)
-
+def call_pip_command(pipArgs: list) -> Tuple[bool, Optional[str], Optional[str]]:
     success = 0
     msgOut = msgErr = None
     pipexe = localPipExecutable()
@@ -432,7 +432,7 @@ class PIPPackageInfoTask(QgsTask):
     sigPackageInfo = pyqtSignal(list)
 
     def __init__(self, description: str = 'Update PyPI Status',
-                 packages_of_interest=None,
+                 packages_of_interest: List[str] = None,
                  batch_size: int = 20,
                  poi_only: bool = False,
                  search_updates: bool = True,
@@ -442,8 +442,6 @@ class PIPPackageInfoTask(QgsTask):
 
         if packages_of_interest is None:
             packages_of_interest = []
-        for p in packages_of_interest:
-            assert isinstance(p, str)
 
         self._pois: List[str] = packages_of_interest
         self._callback = callback
@@ -602,7 +600,9 @@ def requiredPackages(return_tuples: bool = False) -> List[PIPPackage]:
     # for details of the requirement format
 
     file = REQUIREMENTS_CSV
-    assert file.is_file(), '{} does not exist'.format(file)
+    if not file.is_file():
+        raise FileNotFoundError(f"{file} does not exist")
+
     packages: List[PIPPackage] = []
     # rxPipPkg = re.compile(r'^[a-zA-Z_-][a-zA-Z0-9_-]*')
 
@@ -646,9 +646,6 @@ def missingPackageInfo(missing_packages: List[PIPPackage], html=True) -> str:
     :param html: bool, set True (default) to return HTML output string
     :return: str
     """
-    assert isinstance(missing_packages, list)
-    for p in missing_packages:
-        assert isinstance(p, PIPPackage)
     missing_packages = [p for p in missing_packages if isinstance(p, PIPPackage) and not p.isInstalled()]
     n = len(missing_packages)
     if n == 0:
@@ -657,7 +654,6 @@ def missingPackageInfo(missing_packages: List[PIPPackage], html=True) -> str:
     from enmapbox import URL_INSTALLATION
     info = ['The following {} package(s) are not installed:'.format(n), '<ol>']
     for i, pkg in enumerate(missing_packages):
-        assert isinstance(pkg, PIPPackage)
         info.append(f'\t<li>{pkg.pyPkgName} (pip install {pkg.pipPkgName})</li>')
 
     info.append('</ol>')
@@ -680,7 +676,8 @@ def missingTestData() -> bool:
     """
     try:
         import enmapbox.exampledata
-        assert os.path.isfile(enmapbox.exampledata.enmap)
+        if not os.path.isfile(enmapbox.exampledata.enmap):
+            return True
         return False
     except Exception as ex:
         print(ex, file=sys.stderr)
@@ -743,8 +740,11 @@ def installTestData(overwrite_existing: bool = False, ask: bool = True):
                 if isinstance(m, Match):
                     subPaths.append(Path(m.group(1)))
 
-        assert len(subPaths) > 0, \
-            f'Downloaded zip file does not contain data with sub-paths {examplePkgName}/*:\n\t{pathLocalZip}'
+        if not subPaths:
+            raise ValueError(
+                f"Downloaded zip file does not contain data with sub-paths "
+                f"{examplePkgName}/*:\n\t{pathLocalZip}"
+            )
 
         for pathRel in subPaths:
             pathDst = targetDir.parent / pathRel
@@ -806,16 +806,18 @@ class PIPPackageFilterModel(QSortFilterProxyModel):
         self.mFilter1 = 'required'
 
     def setPrimaryFilter(self, mode: str):
-        assert mode in ['all', 'required', 'missing']
-        self.mFilter1 = mode
-        self.invalidateFilter()
+        allowed_modes = {'all', 'required', 'missing'}
+
+        if mode not in allowed_modes:
+            raise ValueError(
+                f"Invalid mode {mode!r}. Expected one of {sorted(allowed_modes)}"
+            )
 
     def primaryFilter(self):
         return self.mFilter1
 
     def filterAcceptsRow(self, sourceRow: int, sourceParent: QModelIndex):
-        model = self.sourceModel()
-        assert isinstance(model, PIPPackageInstallerTableModel)
+        model: PIPPackageInstallerTableModel = self.sourceModel()
         pkg = model.index(sourceRow, 0, sourceParent).data(Qt.UserRole)
 
         if isinstance(pkg, PIPPackage):
@@ -899,9 +901,8 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
         if not index.isValid():
             return None
 
-        pkg = self.mPackages[index.row()]
+        pkg: PIPPackage = self.mPackages[index.row()]
 
-        assert isinstance(pkg, PIPPackage)
         col = index.column()
         # cn = self.mColumnNames[col]
 
@@ -963,7 +964,6 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
         return len(self.mColumnNames)
 
     def pkg2index(self, pkg: PIPPackage) -> QModelIndex:
-        assert pkg in self.mPackages
         return self.index(self.mPackages.index(pkg), 0)
 
     def headerData(self, col, orientation, role=None):
@@ -982,8 +982,6 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
         return self.createIndex(row, column, pkg)
 
     def htmlToolTip(self, package: PIPPackage) -> str:
-        assert isinstance(package, PIPPackage)
-
         html = f'<b>PyPi Package:</b> {package.pipPkgName}'
         if isinstance(package.pyPkgName, str) and package.pipPkgName != package.pyPkgName:
             html += f'<br> import as: <code>import {package.pyPkgName}</code>'
@@ -1006,9 +1004,8 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
         if not index.isValid():
             return None
 
-        pkg = self.mPackages[index.row()]
+        pkg: PIPPackage = self.mPackages[index.row()]
 
-        assert isinstance(pkg, PIPPackage)
         col = index.column()
         # cn = self.mColumnNames[col]
 
@@ -1073,9 +1070,6 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
 
     def addPackages(self, packages: List[PIPPackage]):
 
-        for p in packages:
-            assert isinstance(p, PIPPackage)
-
         if len(packages) > 0:
             n = self.rowCount()
             self.beginInsertRows(QModelIndex(), n, n + len(packages) - 1)
@@ -1092,7 +1086,6 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
 class TableViewDelegate(QStyledItemDelegate):
 
     def __init__(self, tableView: QTableView, parent=None):
-        assert isinstance(tableView, QTableView)
         super().__init__(parent=parent)
         self.mTableView = tableView
 
@@ -1136,6 +1129,7 @@ class PIPPackageInstallerTableView(QTableView):
 
 
 class PIPPackageInstaller(QWidget):
+    tableView: PIPPackageInstallerTableView
 
     def __init__(self, *args, **kwds):
         super().__init__(*args, flags=Qt.Window, **kwds)
@@ -1164,7 +1158,6 @@ class PIPPackageInstaller(QWidget):
         self.proxyModel.setFilterKeyColumn(-1)
         self.updatePrimaryFilter()
 
-        assert isinstance(self.tableView, PIPPackageInstallerTableView)
         self.tableView.setSortingEnabled(True)
         # self.tableView.sigInstallPackageRequest.connect(self.installPackages)
         self.tableView.sigPackageReloadRequest.connect(self.reloadPythonPackages)
@@ -1217,11 +1210,6 @@ class PIPPackageInstaller(QWidget):
     def loadPIPVersionInfo(self, pipPackages: List[PIPPackage], load_latest_versions: bool = True):
         if len(pipPackages) == 0:
             pipPackages = self.model[:]
-        else:
-            for p in pipPackages:
-                assert isinstance(p, PIPPackage)
-        # get names
-        # pipPackageNames = [p.pipPkgName for p in pipPackages]
 
         task = PIPPackageInfoTask('Get package information', callback=self.onCompleted)
 
@@ -1249,7 +1237,6 @@ class PIPPackageInstaller(QWidget):
         self.mTasks[tid] = qgsTask
         if True:
             tm = QgsApplication.taskManager()
-            assert isinstance(tm, QgsTaskManager)
             tm.addTask(qgsTask)
         else:
             qgsTask.run()

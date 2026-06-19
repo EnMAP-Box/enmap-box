@@ -36,7 +36,8 @@ class MaskRasterDataProvider(QgsRasterDataProvider):
     def __init__(self, uri: str):
         super().__init__()
         self.uri = uri
-        if not uri.startswith('?'): raise ValueError(f"uri must start with '?', got {uri!r}")
+        if not uri.startswith('?'):
+            raise ValueError(f"uri must start with '?', got {uri!r}")
         parameters = dict(parse_qsl(uri[1:]))
         self.bandNo = int(parameters.get('band', 1))
 
@@ -111,8 +112,8 @@ class MaskRasterDataProvider(QgsRasterDataProvider):
         return self.provider.identify(*args, **kwargs)
 
     def block(
-            self, bandNo: int, boundingBox: QgsRectangle, width: int, height: int,
-            feedback: QgsRasterBlockFeedback = None
+        self, bandNo: int, boundingBox: QgsRectangle, width: int, height: int,
+        feedback: QgsRasterBlockFeedback = None
     ) -> Optional[QgsRasterBlock]:
 
         array = self.reader.arrayFromBoundingBoxAndSize(boundingBox, width, height, bandList=[self.bandNo])[0]

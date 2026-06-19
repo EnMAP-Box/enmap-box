@@ -783,10 +783,8 @@ class ASI_core:
 
     def interp_watervapor_3d(self, in_matrix):
         x = np.arange(len(in_matrix))
-        try:
+        with suppress(Exception):
             in_matrix[self.default_exclude] = 0
-        except Exception:
-            pass
         self.res3d = np.empty(shape=np.shape(in_matrix))
         for row in range(in_matrix.shape[1]):
             for col in range(in_matrix.shape[2]):

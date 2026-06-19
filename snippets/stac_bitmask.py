@@ -155,4 +155,4 @@ ds: gdal.Dataset = gdal.Translate(qaFileCopy, qaFile)
 rb: gdal.Band = ds.GetRasterBand(1)
 rb.SetMetadataItem('bitmask_parts', str(bitmask_parts), 'STAC')
 bitmask_parts2 = eval(rb.GetMetadataItem('bitmask_parts', 'STAC'))
-assert bitmask_parts == bitmask_parts2
+assert bitmask_parts == bitmask_parts2  # nosec

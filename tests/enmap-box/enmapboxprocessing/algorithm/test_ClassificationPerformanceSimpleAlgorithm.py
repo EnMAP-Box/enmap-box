@@ -158,4 +158,4 @@ class TestClassificationPerformanceSimpleAlgorithm(TestCase):
         try:
             self.runalg(alg, parameters)
         except QgsProcessingException as error:
-            assert str(error) == 'Predicted values not matching reference classes.'
+            self.assertEqual(str(error), 'Predicted values not matching reference classes.')

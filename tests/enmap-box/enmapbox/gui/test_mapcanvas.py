@@ -142,7 +142,7 @@ class MapCanvasTests(EnMAPBoxTestCase):
 
         # lyrWorld = QgsRasterLayer(TestObjects.uriWMS(), 'Background', 'wms')
         lyrEnMAP = TestObjects.createRasterLayer()
-        assert lyrEnMAP.isValid()
+        self.assertTrue(lyrEnMAP.isValid())
         layers = [lyrEnMAP]
 
         canvas = MapCanvas()

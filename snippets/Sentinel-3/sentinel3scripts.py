@@ -14,7 +14,7 @@ dirS3_L1 = (
 #  ############################################
 
 dirS3_L1 = pathlib.Path(dirS3_L1)
-assert dirS3_L1.is_dir(), f'Ordner existiert nicht: {dirS3_L1}'
+assert dirS3_L1.is_dir(), f'Ordner existiert nicht: {dirS3_L1}'  # nosec
 
 pathXML = dirS3_L1 / 'geo_coordinates.nc'
 
@@ -33,7 +33,7 @@ pathVRT = dirS3_L1 / 'all_radiance_bands.vrt'
 options = gdal.BuildVRTOptions(separate=True)
 dsVRT: gdal.Dataset = gdal.BuildVRT(pathVRT.as_posix(), radiance_bands, options=options)
 
-assert dsVRT.RasterCount == len(S3_OLCI_Wavelengths)
+assert dsVRT.RasterCount == len(S3_OLCI_Wavelengths)  # nosec
 
 dsVRT.SetGeoTransform([0.0, 1.0, 0.0, float(dsVRT.RasterYSize), 0.0, -1.0])  # let the image look north-up
 dsVRT.SetMetadataItem('wavelength', ','.join([f'{v}' for v in S3_OLCI_Wavelengths]))

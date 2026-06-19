@@ -10,7 +10,7 @@ start_app()
 
 
 crs = QgsCoordinateReferenceSystem('EPSG:4326')
-assert crs.isValid()
+assert crs.isValid()  # nosec
 createOptions = []
 DP, v = QgsRasterDataProvider.create('gdal',
                                      'empty',

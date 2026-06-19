@@ -37,7 +37,7 @@ from osgeo import gdal
 
 from qgis.PyQt.QtCore import QSettings, PYQT_VERSION_STR
 from qgis.PyQt.QtGui import QIcon
-from qgis.core import Qgis, QgsApplication, QgsProcessingAlgorithm, QgsProcessingProvider, QgsProcessingRegistry
+from qgis.core import Qgis, QgsApplication, QgsProcessingAlgorithm, QgsProcessingProvider
 from qgis.gui import QgisInterface, QgsMapLayerConfigWidgetFactory
 
 # provide shortcuts
@@ -234,14 +234,10 @@ def registerEnMAPBoxProcessingProvider():
     from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider, ID
 
     registry = QgsApplication.instance().processingRegistry()
-    assert isinstance(registry, QgsProcessingRegistry)
     provider = registry.providerById(ID)
     if not isinstance(provider, QgsProcessingProvider):
         provider = EnMAPBoxProcessingProvider.instance()
         registry.addProvider(provider)
-
-    assert isinstance(provider, EnMAPBoxProcessingProvider)
-    assert id(registry.providerById(ID)) == id(provider)
 
     try:
         existingAlgNames = [a.name() for a in registry.algorithms() if a.groupId() == provider.id()]

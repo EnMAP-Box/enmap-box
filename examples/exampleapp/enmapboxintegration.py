@@ -62,7 +62,7 @@ class ExampleEnMAPBoxApp(EnMAPBoxApplication):
         :param appMenu:
         :return: QMenu
         """
-        assert isinstance(appMenu, QMenu)
+        assert isinstance(appMenu, QMenu)  # nosec
         """
         Specify menu, submenus and actions that become accessible from the EnMAP-Box GUI
         :return: the QMenu or QAction to be added to the "Applications" menu.

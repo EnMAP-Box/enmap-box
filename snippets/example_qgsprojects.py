@@ -24,18 +24,18 @@ c = QgsMapCanvas()
 c.setLayers([lyr])
 c.zoomToFullExtent()
 
-assert lyr.project() is None
+assert lyr.project() is None  # nosec
 A.addMapLayer(lyr, False)
-assert lyr.project() == A
-assert lyr in A.layerStore().mapLayers().values()
-assert lyr not in B.layerStore().mapLayers().values()
+assert lyr.project() == A  # nosec
+assert lyr in A.layerStore().mapLayers().values()  # nosec
+assert lyr not in B.layerStore().mapLayers().values()  # nosec
 
 B.layerStore().addMapLayer(lyr)
 lyr.setParent(A.layerStore())
 
-assert lyr in B.layerStore().mapLayers().values()
-assert lyr in B.mapLayers().values()
-assert lyr.project() == A
+assert lyr in B.layerStore().mapLayers().values()  # nosec
+assert lyr in B.mapLayers().values()  # nosec
+assert lyr.project() == A  # nosec
 B.takeMapLayer(lyr)
 s = ""
 

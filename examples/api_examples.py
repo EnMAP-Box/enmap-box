@@ -138,18 +138,18 @@ class Examples(unittest.TestCase):
         with open(pathFile, 'w', encoding='utf-8') as f:
             f.write('First version')
 
-        assert os.path.isfile(pathFile)
+        assert os.path.isfile(pathFile)  # nosec
         enmapBox.addSource(pathFile)
-        assert len(enmapBox.dataSources()) == 1
+        assert len(enmapBox.dataSources()) == 1  # nosec
 
         time.sleep(2)
 
         with open(pathFile, 'w', encoding='utf-8') as f:
             f.write('Second version')
 
-        assert os.path.exists(pathFile)
+        assert os.path.exists(pathFile)  # nosec
         enmapBox.addSource(pathFile)
-        assert len(enmapBox.dataSources()) == 1
+        assert len(enmapBox.dataSources()) == 1  # nosec
 
     def test_Ex3_Docks(self):
         """
@@ -179,17 +179,17 @@ class Examples(unittest.TestCase):
         # list all docks
         from enmapbox.gui.dataviews.docks import Dock
         for dock in enmapBox.mDockManager.docks():
-            assert isinstance(dock, Dock)
+            assert isinstance(dock, Dock)  # nosec
             print(dock)
 
         # list map docks only
         for dock in enmapBox.mDockManager.docks(dockType='MAP'):
-            assert isinstance(dock, Dock)
+            assert isinstance(dock, Dock)  # nosec
             print(dock)
 
         # list all spectral library docks
         for dock in enmapBox.mDockManager.docks(dockType='SPECLIB'):
-            assert isinstance(dock, Dock)
+            assert isinstance(dock, Dock)  # nosec
             print(dock)
 
         qgsApp.exec_()
@@ -216,9 +216,9 @@ class Examples(unittest.TestCase):
         def printSpectralProfiles(currentSpectra: list):
             print('{} SpectralProfiles collected'.format(len(currentSpectra)))
             for i, p in enumerate(currentSpectra):
-                assert isinstance(p, QgsFeature)
+                assert isinstance(p, QgsFeature)  # nosec
                 p = SpectralProfile.fromSpecLibFeature(p)
-                assert isinstance(p, SpectralProfile)
+                assert isinstance(p, SpectralProfile)  # nosec
                 print('{}: {}'.format(i + 1, p.values()['y']))
 
         enmapBox.sigCurrentSpectraChanged.connect(printSpectralProfiles)
@@ -273,7 +273,7 @@ class Examples(unittest.TestCase):
 
                 if self.mActionGetProfiles.isChecked():
                     for p in spectalProfiles:
-                        assert isinstance(p, QgsFeature)
+                        assert isinstance(p, QgsFeature)  # nosec
                         p = SpectralProfile.fromSpecLibFeature(p)
                         self.mTextBox.append(str(p.yValues()))
 

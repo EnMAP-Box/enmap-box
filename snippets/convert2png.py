@@ -7,7 +7,7 @@ from enmapbox import DIR_REPO, DIR_ICONS
 
 
 def file_search(rootdir, pattern, recursive=False, ignoreCase=False):
-    assert os.path.isdir(rootdir), "Path is not a directory:{}".format(rootdir)
+    assert os.path.isdir(rootdir), "Path is not a directory:{}".format(rootdir)  # nosec
     regType = type(re.compile(r'.*'))
 
     for root, dirs, files in os.walk(rootdir):

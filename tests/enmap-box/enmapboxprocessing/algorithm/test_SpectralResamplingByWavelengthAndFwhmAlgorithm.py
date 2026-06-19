@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 import numpy as np
 
 from enmapboxprocessing.algorithm.spectralresamplingbywavelengthandfwhmalgorithm import \
@@ -91,11 +93,9 @@ class TestSpectralResamplingByWavelengthAndFwhmAlgorithm(TestCase):
             alg.P_OUTPUT_LIBRARY: self.filename('srf.geojson'),
             alg.P_OUTPUT_RASTER: self.filename('resampled.tif')
         }
-        try:
+        with suppress(Exception):
             self.runalg(alg, parameters)
-            assert 0, 'error not raised, something went wrong'
-        except Exception:
-            pass
+            raise RuntimeError('error not raised, something went wrong')
 
     def test_userFwhm(self):
         alg = SpectralResamplingByWavelengthAndFwhmAlgorithm()

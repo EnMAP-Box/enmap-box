@@ -16,7 +16,7 @@ class Issue488Tests(TestCase):
         from qgis.core import QgsMarkerSymbol, QgsSingleSymbolRenderer, QgsFeatureRenderer
         symbol = QgsMarkerSymbol.createSimple({'name': 'square', 'color': 'white'})
         renderer = QgsSingleSymbolRenderer(symbol)
-        assert isinstance(renderer, QgsFeatureRenderer)
+        self.assertIsInstance(renderer, QgsFeatureRenderer)
 
         from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibraryplotwidget import SpectralProfilePlotModel
         SpectralProfilePlotModel()
