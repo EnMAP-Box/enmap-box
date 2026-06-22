@@ -1,6 +1,6 @@
 from os.path import basename
 from typing import Dict, Any, List, Tuple
-from xml.etree import ElementTree
+from defusedxml import ElementTree
 
 from osgeo import gdal
 

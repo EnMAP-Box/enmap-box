@@ -1,7 +1,7 @@
 import zipfile
 from os.path import basename, splitext
 from typing import Dict, Any, List, Tuple
-from xml.etree import ElementTree
+from defusedxml import ElementTree
 
 import numpy as np
 from osgeo import gdal

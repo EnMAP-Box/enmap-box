@@ -350,7 +350,7 @@ class Utils(object):
         values = np.unique(array[0][mask[0]])
 
         # nosec B311 not security relevant generation of random colors
-        categories = [Category(int(v), str(v), QColor(randint(0, 2 ** 24)).name()) for v in values]
+        categories = [Category(int(v), str(v), QColor(randint(0, 2 ** 24)).name()) for v in values]  # nosec
 
         return categories
 
@@ -375,7 +375,7 @@ class Utils(object):
         categories = list()
         for value in values:
             # nosec B311 not security relevant generation of random colors
-            color = colors.get(value, QColor(randint(0, 2 ** 24 - 1)))
+            color = colors.get(value, QColor(randint(0, 2 ** 24 - 1)))  # nosec
             color = cls.parseColor(color).name()
             name = names.get(value, str(value))
             categories.append(Category(value, name, color))
