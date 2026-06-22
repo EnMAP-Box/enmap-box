@@ -77,7 +77,7 @@ def fix_binary_profile_fields(
                 elif needs_conversion:
                     # convert data back to proper Byte Array
                     data_new = QByteArray()
-                    data_new.append(json.dumps(profile_dict).encode())
+                    data_new.append(json.dumps(profile_dict, ensure_ascii=False).encode())
                     lyr.changeAttributeValue(f.id(), i, data_new, data_old)
                     j += 1
 

@@ -113,6 +113,7 @@ def update_splashscreen(version: str = None,
 
     print('Run:\n' + ' '.join(cmd))
     print('to export the svg as png with Inkscape (https://inkscape.org)')
+    # we use nosec B603 here because we need inkscape exe from command line
     subprocess.run(cmd, check=True)  # nosec: B603
     os.remove(PATH_EXPORT_TMP)
 
