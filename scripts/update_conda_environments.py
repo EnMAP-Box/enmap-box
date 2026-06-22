@@ -27,6 +27,7 @@ DEPENDENCIES = {
              'python>=3.12',
              'pip',
              'scikit-learn>=1.4',
+             'skops',
              'matplotlib-base',
              'defusedxml',
              'pyqtgraph',

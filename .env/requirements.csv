@@ -16,6 +16,7 @@ pandas,,,specdeepmap,required by SpecDeepMap
 pyqtgraph,,,core,required by EnMAP-Box GUI
 PyOpenGL,OpenGL,,imagecube,required by imageCube application
 scikit-learn,sklearn,1.0,core,required to run several EnMAP-Box algorithms
+skops,,,core,required to serialize scikit-learn models
 scipy,,,core,required by multiple tools
 segmentation-models-pytorch,segmentation_models_pytorch,,specdeepmap,required by SpecDeepMap
 sympy,,,specdeepmap,required by SpecDeepMap

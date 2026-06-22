@@ -1,4 +1,4 @@
-# EnMAP-Box conda environment (generated 2026-06-19 16:34:36)
+# EnMAP-Box conda environment (generated 2026-06-22 12:03:53)
 # run to install: conda env create -n enmapbox-base --file=enmapbox-base.yml
 # run to update: conda env update -n enmapbox-base --file=enmapbox-base.yml --prune
 # run to delete: conda env remove -n enmapbox-base
@@ -25,6 +25,7 @@ dependencies:
 - python>=3.12
 - qgis<=3.99
 - scikit-learn>=1.4
+- skops
 - pip:
   - flake8-qgis
 name: enmapbox-base
