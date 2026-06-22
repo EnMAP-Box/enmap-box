@@ -28,9 +28,9 @@ class FitTransformerAlgorithmBase(EnMAPProcessingAlgorithm):
             (self._SAMPLE_SIZE, 'Approximate number of samples drawn from raster. '
                                 'If 0, whole raster will be used. '
                                 'Note that this is only a hint for limiting the number of rows and columns.'),
-            (self._DATASET, 'Training dataset pickle file used for fitting the transformer. '
+            (self._DATASET, 'Training dataset skops file used for fitting the transformer. '
                             'Mutually exclusive with parameter: Raster layer with features'),
-            (self._OUTPUT_TRANSFORMER, self.PickleFileDestination)
+            (self._OUTPUT_TRANSFORMER, self.SkopsFileDestination)
         ]
 
     def displayName(self) -> str:
@@ -56,7 +56,7 @@ class FitTransformerAlgorithmBase(EnMAPProcessingAlgorithm):
         self.addParameterRasterLayer(self.P_FEATURE_RASTER, self._FEATURE_RASTER, None, True)
         self.addParameterInt(self.P_SAMPLE_SIZE, self._SAMPLE_SIZE, 1000, True, 0, None)
         self.addParameterUnsupervisedDataset(self.P_DATASET, self._DATASET, None, True, True)
-        self.addParameterFileDestination(self.P_OUTPUT_TRANSFORMER, self._OUTPUT_TRANSFORMER, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_TRANSFORMER, self._OUTPUT_TRANSFORMER, self.SkopsFileFilter)
 
     def defaultCodeAsString(self):
         try:
@@ -106,12 +106,12 @@ class FitTransformerAlgorithmBase(EnMAPProcessingAlgorithm):
                 parameters = {
                     alg.P_FEATURE_RASTER: raster,
                     alg.P_SAMPLE_SIZE: sampleSize,
-                    alg.P_OUTPUT_DATASET: Utils.tmpFilename(filename, 'dataset.pkl')
+                    alg.P_OUTPUT_DATASET: Utils.tmpFilename(filename, 'dataset.skops')
                 }
                 self.runAlg(alg, parameters, None, feedback2, context, True)
                 filenameDataset = parameters[alg.P_OUTPUT_DATASET]
 
-            dump = TransformerDump.fromDict(Utils.pickleLoad(filenameDataset))
+            dump = TransformerDump.fromDict(Utils.modelLoad(filenameDataset))
             feedback.pushInfo(
                 f'Load training dataset: X=array{list(dump.X.shape)}')
             feedback.pushInfo('Fit transformer')

@@ -221,7 +221,7 @@ _This release was tested under QGIS 3.34 (LTR) and 3.36 (latest release)._
 * [SpectralView] GeoJSON library with NaN values not correctly plotted [#887](https://github.com/EnMAP-Box/enmap-box/issues/887)
 * [PyPi Package Info] Latest version not displayed [#890](https://github.com/EnMAP-Box/enmap-box/issues/890)
 * [Classification layer accuracy and area report] issue with unclassified pixel inside map [#900](https://github.com/EnMAP-Box/enmap-box/issues/900)
-* [Data Sources] right-click on nodes inside a model file (*.pkl) gives error [#908](https://github.com/EnMAP-Box/enmap-box/issues/908)
+* [Data Sources] right-click on nodes inside a model file (*.skops) gives error [#908](https://github.com/EnMAP-Box/enmap-box/issues/908)
 * Spectral library axis flipped [#916](https://github.com/EnMAP-Box/enmap-box/issues/916)
 * [SpectralLibraryUtils] SpectralLibraryUtils.writeToSource is creating wrong CRS [#936](https://github.com/EnMAP-Box/enmap-box/issues/936)
 </details>
@@ -309,7 +309,7 @@ _This release was tested under QGIS 3.28 (LTR), 3.32 and 3.34 (latest release)._
 * import L2A EnMAP data - error [#595](https://github.com/EnMAP-Box/enmap-box/issues/595)
 * Raster Math IndexError: list index out of range [#601](https://github.com/EnMAP-Box/enmap-box/issues/601)
 * AttributeError:module 'numpy' has no attribute 'float'. [#604](https://github.com/EnMAP-Box/enmap-box/issues/604)
-* ValueError: node array from the pickle has an incompatible dtype [#614](https://github.com/EnMAP-Box/enmap-box/issues/614)
+* ValueError: node array from the skops has an incompatible dtype [#614](https://github.com/EnMAP-Box/enmap-box/issues/614)
 * [Raster math] make the default output optional [#615](https://github.com/EnMAP-Box/enmap-box/issues/615)
 * [QPS readENVIHeader] reading header file fails if binary file isn't available [#622](https://github.com/EnMAP-Box/enmap-box/issues/622)
 * classificationfromrenderedimagealgorithm.py: TypeError (Python 3.10) [#626](https://github.com/EnMAP-Box/enmap-box/issues/626)

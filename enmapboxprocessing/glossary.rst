@@ -229,11 +229,11 @@ GIS and Remote Sensing
         .. image:: img/mask_vector_layer_2.png
             :width: 24%
 
-    pickle file
-        A binary file ending on `.pkl` that contains a pickled Python object, usually a dictionary or list container.
-        Pickle file content can be browsed via the EnMAP-Box Data Sources panel:
+    skops file
+        A binary file ending on `.skops` that contains a skopsd Python object, usually a dictionary or list container.
+        Skops file content can be browsed via the EnMAP-Box Data Sources panel:
 
-        .. image:: img/pickle_file.png
+        .. image:: img/skops_file.png
 
     pixel profile
         List of :term:`band` values for a single pixel in a :term:`raster layer`.

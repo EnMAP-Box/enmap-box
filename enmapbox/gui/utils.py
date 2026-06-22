@@ -94,8 +94,8 @@ def guessDataProvider(src: str) -> Optional[str]:
         return 'enmapbox_speclib'
     elif re.search(r'\.(shp|gpkg|kml|csv)$', src, re.I):  # probably a vector file
         return 'ogr'
-    elif re.search(r'\.(pkl)$', src, re.I):
-        return 'enmapbox_pkl'
+    elif re.search(r'\.(skops)$', src, re.I):
+        return 'enmapbox_skops'
     elif re.search(r'\.(txt|csv|json)$', src, re.I):  # probably normal text file
         return 'enmapbox_textfile'
 

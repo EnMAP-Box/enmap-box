@@ -31,7 +31,7 @@ class ExportDatasetToFilesAlgorithm(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._DATASET, 'Dataset pickle file to be exported. '),
+            (self._DATASET, 'Dataset skops file to be exported. '),
             (self._OUTPUT_FEATURE_FILE, self.CsvFileDestination),
             (self._OUTPUT_VALUE_FILE, self.CsvFileDestination),
         ]
@@ -40,7 +40,7 @@ class ExportDatasetToFilesAlgorithm(EnMAPProcessingAlgorithm):
         return Group.DatasetCreation.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
-        self.addParameterPickleFile(self.P_DATASET, self._DATASET)
+        self.addParameterSkopsFile(self.P_DATASET, self._DATASET)
         self.addParameterFileDestination(self.P_OUTPUT_FEATURE_FILE, self._OUTPUT_FEATURE_FILE, self.CsvFileFilter)
         self.addParameterFileDestination(self.P_OUTPUT_VALUE_FILE, self._OUTPUT_VALUE_FILE, self.CsvFileFilter)
 
@@ -55,7 +55,7 @@ class ExportDatasetToFilesAlgorithm(EnMAPProcessingAlgorithm):
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)
 
-            dump = Utils().pickleLoad(filenameDataset)
+            dump = Utils().modelLoad(filenameDataset)
             np.savetxt(filenameFeatures, dump['X'])
             np.savetxt(filenameLabels, dump['y'])
 

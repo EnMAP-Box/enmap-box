@@ -27,14 +27,14 @@ from qgis.PyQt.uic import loadUi
 from qgis.gui import QgsFileWidget
 
 
-class ProcessingParameterPickleFileRegressionDatasetWidget(QWidget):
+class ProcessingParameterSkopsFileRegressionDatasetWidget(QWidget):
     mFile: QgsFileWidget
     mCreate: QToolButton
     mEdit: QToolButton
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
-        loadUi(join(dirname(__file__), 'processingparameterpicklefilewidget.ui'), self)
+        loadUi(join(dirname(__file__), 'processingparameterskopsfilewidget.ui'), self)
 
         self.menu = QMenu()
         self.menu.setToolTipsVisible(True)
@@ -73,10 +73,10 @@ class ProcessingParameterPickleFileRegressionDatasetWidget(QWidget):
         if EnMAPBox.instance() is not None:
             self.menu.addSeparator()
             for filename in EnMAPBox.instance().dataSources('MODEL', True):
-                if not filename.endswith('.pkl'):
+                if not filename.endswith('.skops'):
                     continue
                 try:
-                    dump = RegressorDump.fromDict(Utils.pickleLoad(filename))
+                    dump = RegressorDump.fromDict(Utils.modelLoad(filename))
                     samples, features = dump.X.shape
                     targets = len(dump.targets)
                 except Exception:  # nosec Ignore files that are not valid models.
@@ -112,7 +112,7 @@ class ProcessingParameterPickleFileRegressionDatasetWidget(QWidget):
                     filename = result['outputRegressionDataset']
                     self.mFile.setFilePath(filename)
 
-                    dump = RegressorDump.fromDict(Utils.pickleLoad(filename))
+                    dump = RegressorDump.fromDict(Utils.modelLoad(filename))
                     samples, features = dump.X.shape
                     targets = len(dump.targets)
 
@@ -150,11 +150,11 @@ class ProcessingParameterPickleFileRegressionDatasetWidget(QWidget):
         self.mFile.setFilePath(filename)
 
 
-class ProcessingParameterPickleFileRegressionDatasetWidgetWrapper(WidgetWrapper):
-    widget: ProcessingParameterPickleFileRegressionDatasetWidget
+class ProcessingParameterSkopsFileRegressionDatasetWidgetWrapper(WidgetWrapper):
+    widget: ProcessingParameterSkopsFileRegressionDatasetWidget
 
     def createWidget(self):
-        return ProcessingParameterPickleFileRegressionDatasetWidget()
+        return ProcessingParameterSkopsFileRegressionDatasetWidget()
 
     def setValue(self, value):
         self.widget.setValue(value)

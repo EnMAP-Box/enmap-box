@@ -27,14 +27,14 @@ from qgis.PyQt.uic import loadUi
 from qgis.gui import QgsFileWidget
 
 
-class ProcessingParameterPickleFileClassificationDatasetWidget(QWidget):
+class ProcessingParameterSkopsFileClassificationDatasetWidget(QWidget):
     mFile: QgsFileWidget
     mCreate: QToolButton
     mEdit: QToolButton
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
-        loadUi(join(dirname(__file__), 'processingparameterpicklefilewidget.ui'), self)
+        loadUi(join(dirname(__file__), 'processingparameterskopsfilewidget.ui'), self)
 
         self.menu = QMenu()
         self.menu.setToolTipsVisible(True)
@@ -73,10 +73,10 @@ class ProcessingParameterPickleFileClassificationDatasetWidget(QWidget):
         if EnMAPBox.instance() is not None:
             self.menu.addSeparator()
             for filename in EnMAPBox.instance().dataSources('MODEL', True):
-                if not filename.endswith('.pkl'):
+                if not filename.endswith('.skops'):
                     continue
                 try:
-                    dump = ClassifierDump(**Utils.pickleLoad(filename))
+                    dump = ClassifierDump(**Utils.modelLoad(filename))
                     samples, features = dump.X.shape
                     classes = len(dump.categories)
                 except Exception:  # nosec Ignore files that are not valid models.
@@ -113,7 +113,7 @@ class ProcessingParameterPickleFileClassificationDatasetWidget(QWidget):
                     filename = result['outputClassificationDataset']
                     self.mFile.setFilePath(filename)
 
-                    dump = ClassifierDump(**Utils.pickleLoad(filename))
+                    dump = ClassifierDump(**Utils.modelLoad(filename))
                     samples, features = dump.X.shape
                     classes = len(dump.categories)
 
@@ -151,11 +151,11 @@ class ProcessingParameterPickleFileClassificationDatasetWidget(QWidget):
         self.mFile.setFilePath(filename)
 
 
-class ProcessingParameterPickleFileClassificationDatasetWidgetWrapper(WidgetWrapper):
-    widget: ProcessingParameterPickleFileClassificationDatasetWidget
+class ProcessingParameterSkopsFileClassificationDatasetWidgetWrapper(WidgetWrapper):
+    widget: ProcessingParameterSkopsFileClassificationDatasetWidget
 
     def createWidget(self):
-        return ProcessingParameterPickleFileClassificationDatasetWidget()
+        return ProcessingParameterSkopsFileClassificationDatasetWidget()
 
     def setValue(self, value):
         self.widget.setValue(value)

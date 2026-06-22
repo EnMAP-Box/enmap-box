@@ -71,8 +71,8 @@ class TransformerDump(object):
     @classmethod
     def fromFile(cls, filename: str):
         from enmapboxprocessing.utils import Utils
-        if filename.endswith('.pkl'):
-            d = Utils.pickleLoad(filename)
+        if filename.endswith('.skops'):
+            d = Utils.modelLoad(filename)
         elif filename.endswith('.json'):
             d = Utils.jsonLoad(filename)
             d['X'] = np.array(d['X'])
@@ -80,7 +80,7 @@ class TransformerDump(object):
                 d['y'] = np.array(d['y'])
                 d['transformer'] = None
         else:
-            raise ValueError('wrong file extension, only "pkl" or "json" is supported')
+            raise ValueError('wrong file extension, only "skops" or "json" is supported')
 
         return cls.fromDict(d)
 
@@ -89,12 +89,12 @@ class TransformerDump(object):
         d = self.__dict__
         if d['summary'] is None:
             d.pop('summary')
-        if filename.endswith('.pkl'):
-            Utils.pickleDump(d, filename)
+        if filename.endswith('.skops'):
+            Utils.modelDump(d, filename)
         elif filename.endswith('.json'):
             Utils.jsonDump(d, filename)
         else:
-            raise ValueError('wrong file extension, use "pkl" or "json"')
+            raise ValueError('wrong file extension, use "skops" or "json"')
 
 
 @typechecked
@@ -112,26 +112,26 @@ class ClustererDump(object):
     @classmethod
     def fromFile(cls, filename: str):
         from enmapboxprocessing.utils import Utils
-        if filename.endswith('.pkl'):
-            d = Utils.pickleLoad(filename)
+        if filename.endswith('.skops'):
+            d = Utils.modelLoad(filename)
         elif filename.endswith('.json'):
             d = Utils.jsonLoad(filename)
             d['X'] = np.array(d['X'])
             d['y'] = np.array(d['y'])
             d['clusterer'] = None
         else:
-            raise ValueError('wrong file extension, only "pkl" or "json" is supported')
+            raise ValueError('wrong file extension, only "skops" or "json" is supported')
 
         return cls.fromDict(d)
 
     def write(self, filename: str):
         from enmapboxprocessing.utils import Utils
-        if filename.endswith('.pkl'):
-            Utils.pickleDump(self.__dict__, filename)
+        if filename.endswith('.skops'):
+            Utils.modelDump(self.__dict__, filename)
         elif filename.endswith('.json'):
             Utils.jsonDump(self.__dict__, filename)
         else:
-            raise ValueError('wrong file extension, use "pkl" or "json"')
+            raise ValueError('wrong file extension, use "skops" or "json"')
 
 
 @typechecked
@@ -179,12 +179,12 @@ class ClassifierDump(object):
 
     def write(self, filename: str):
         from enmapboxprocessing.utils import Utils
-        if filename.endswith('.pkl'):
-            Utils.pickleDump(self.__dict__, filename)
+        if filename.endswith('.skops'):
+            Utils.modelDump(self.__dict__, filename)
         elif filename.endswith('.json'):
             Utils.jsonDump(self.__dict__, filename)
         else:
-            raise ValueError('wrong file extension, use "pkl" or "json"')
+            raise ValueError('wrong file extension, use "skops" or "json"')
 
     @staticmethod
     def fromDict(d: Dict):
@@ -196,8 +196,8 @@ class ClassifierDump(object):
     @classmethod
     def fromFile(cls, filename: str):
         from enmapboxprocessing.utils import Utils
-        if filename.endswith('.pkl'):
-            d = Utils.pickleLoad(filename)
+        if filename.endswith('.skops'):
+            d = Utils.modelLoad(filename)
         elif filename.endswith('.json'):
             d = Utils.jsonLoad(filename)
             if 'categories' in d:
@@ -211,7 +211,7 @@ class ClassifierDump(object):
                 if d['locations'] is not None:
                     d['locations'] = np.array(d['locations'])
         else:
-            raise ValueError('wrong file extension, only "pkl" or "json" is supported')
+            raise ValueError('wrong file extension, only "skops" or "json" is supported')
 
         return cls.fromDict(d)
 
@@ -260,12 +260,12 @@ class RegressorDump(object):
 
     def write(self, filename: str):
         from enmapboxprocessing.utils import Utils
-        if filename.endswith('.pkl'):
-            Utils.pickleDump(self.__dict__, filename)
+        if filename.endswith('.skops'):
+            Utils.modelDump(self.__dict__, filename)
         elif filename.endswith('.json'):
             Utils.jsonDump(self.__dict__, filename)
         else:
-            raise ValueError('wrong file extension, use "pkl" or "json"')
+            raise ValueError('wrong file extension, use "skops" or "json"')
 
     @staticmethod
     def fromDict(d: Dict):
@@ -277,8 +277,8 @@ class RegressorDump(object):
     @classmethod
     def fromFile(cls, filename: str):
         from enmapboxprocessing.utils import Utils
-        if filename.endswith('.pkl'):
-            d = Utils.pickleLoad(filename)
+        if filename.endswith('.skops'):
+            d = Utils.modelLoad(filename)
         elif filename.endswith('.json'):
             d = Utils.jsonLoad(filename)
             d['targets'] = [Target(**values) for values in d['targets']]
@@ -289,7 +289,7 @@ class RegressorDump(object):
                 if d['locations'] is not None:
                     d['locations'] = np.array(d['locations'])
         else:
-            raise ValueError('wrong file extension, only "pkl" or "json" is supported')
+            raise ValueError('wrong file extension, only "skops" or "json" is supported')
 
         return cls.fromDict(d)
 

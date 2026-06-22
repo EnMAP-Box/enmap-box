@@ -20,12 +20,12 @@ class PrepareRegressionDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
         return 'Create regression dataset (from Python code)'
 
     def shortDescription(self) -> str:
-        return 'Create a regression dataset from Python code and store the result as a pickle file.'
+        return 'Create a regression dataset from Python code and store the result as a skops file.'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
             (self._CODE, 'Python code specifying the regression dataset.'),
-            (self._OUTPUT_DATASET, self.PickleFileDestination)
+            (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
     def code(cls):
@@ -75,7 +75,7 @@ class PrepareRegressionDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterCode(self.P_CODE, self._CODE, self.defaultCodeAsString())
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
@@ -87,7 +87,7 @@ class PrepareRegressionDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
             self.tic(feedback, parameters, context)
 
             regressorDump = self.regressorDump(parameters, context)
-            Utils.pickleDump(regressorDump.__dict__, filename)
+            Utils.modelDump(regressorDump.__dict__, filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)

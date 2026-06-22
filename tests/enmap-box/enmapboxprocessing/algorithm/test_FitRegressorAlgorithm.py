@@ -12,7 +12,7 @@ from enmapboxprocessing.algorithm.fitplsegressionalgorithm import FitPLSRegressi
 from enmapboxprocessing.algorithm.fitrandomforestregressoralgorithm import FitRandomForestRegressorAlgorithm
 from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxtestdata import regressorDumpSingleTargetPkl, regressorDumpPkl, regressorDumpMultiTargetPkl
+from enmapboxtestdata import regressorDumpSingleTargetSkops, regressorDumpSkops, regressorDumpMultiTargetSkops
 
 SKLEARN_VERSION = list(map(int, sklearn.__version__.split('.')))
 SKLEARN_VERSION_NUMBER = SKLEARN_VERSION[0] + SKLEARN_VERSION[1] / 10
@@ -40,18 +40,18 @@ class TestFitRegressorAlgorithm(TestCase):
     def test_fitMultiTarget(self):
         alg = FitTestRegressorAlgorithm()
         parameters = {
-            alg.P_DATASET: regressorDumpPkl,
+            alg.P_DATASET: regressorDumpSkops,
             alg.P_REGRESSOR: alg.defaultCodeAsString(),
-            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.pkl')
+            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.skops')
         }
         self.runalg(alg, parameters)
 
     def test_fitSingleTarget(self):
         alg = FitTestRegressorAlgorithm()
         parameters = {
-            alg.P_DATASET: regressorDumpSingleTargetPkl,
+            alg.P_DATASET: regressorDumpSingleTargetSkops,
             alg.P_REGRESSOR: alg.defaultCodeAsString(),
-            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.pkl')
+            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.skops')
         }
         self.runalg(alg, parameters)
 
@@ -59,7 +59,7 @@ class TestFitRegressorAlgorithm(TestCase):
         alg = FitTestRegressorAlgorithm()
         parameters = {
             alg.P_DATASET: None,
-            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.pkl')
+            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.skops')
         }
         self.runalg(alg, parameters)
 
@@ -77,26 +77,26 @@ class TestFitRegressorAlgorithm(TestCase):
             alg.initAlgorithm()
             alg.shortHelpString()
             parameters = {
-                alg.P_DATASET: regressorDumpPkl,
+                alg.P_DATASET: regressorDumpSkops,
                 alg.P_REGRESSOR: alg.defaultCodeAsString(),
-                alg.P_OUTPUT_REGRESSOR: self.filename('regressor.pkl')
+                alg.P_OUTPUT_REGRESSOR: self.filename('regressor.skops')
             }
             self.runalg(alg, parameters)
 
     def test_debug_issue967(self):
         alg = FitLinearSvrAlgorithm()
         parameters = {
-            alg.P_DATASET: regressorDumpMultiTargetPkl,
+            alg.P_DATASET: regressorDumpMultiTargetSkops,
             alg.P_REGRESSOR: alg.defaultCodeAsString(),
-            alg.P_OUTPUT_REGRESSOR: self.filename('regressor1.pkl')
+            alg.P_OUTPUT_REGRESSOR: self.filename('regressor1.skops')
         }
         self.runalg(alg, parameters)
 
         alg = FitLinearSvrAlgorithm()
         parameters = {
-            alg.P_DATASET: regressorDumpSingleTargetPkl,
+            alg.P_DATASET: regressorDumpSingleTargetSkops,
             alg.P_REGRESSOR: alg.defaultCodeAsString(),
-            alg.P_OUTPUT_REGRESSOR: self.filename('regressor2.pkl')
+            alg.P_OUTPUT_REGRESSOR: self.filename('regressor2.skops')
         }
         self.runalg(alg, parameters)
 
@@ -104,8 +104,8 @@ class TestFitRegressorAlgorithm(TestCase):
     def test_issue790(self):
         alg = FitCatBoostRegressorAlgorithm()
         parameters = {
-            alg.P_DATASET: regressorDumpSingleTargetPkl,
+            alg.P_DATASET: regressorDumpSingleTargetSkops,
             alg.P_REGRESSOR: alg.defaultCodeAsString(),
-            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.pkl')
+            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.skops')
         }
         self.runalg(alg, parameters)

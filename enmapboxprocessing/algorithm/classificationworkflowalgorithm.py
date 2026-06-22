@@ -36,7 +36,7 @@ class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._DATASET, 'Training dataset pickle file used for fitting the classifier.'),
+            (self._DATASET, 'Training dataset skops file used for fitting the classifier.'),
             (self._CLASSIFIER, 'Scikit-Learn Python code specifying a classifier.'),
             (self._RASTER, 'A raster layer used for prediction.'),
             (self._MATCH_BY_NAME, 'Whether to match raster bands and classifier features by name.'),
@@ -46,7 +46,7 @@ class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
                           'Note that OOB estimates are only supported by some classifiers, '
                           'e.g. the Random Forest Classifier.'),
             (self._OPEN_REPORT, self.ReportOpen),
-            (self._OUTPUT_CLASSIFIER, self.PickleFileDestination),
+            (self._OUTPUT_CLASSIFIER, self.SkopsFileDestination),
             (self._OUTPUT_CLASSIFICATION, self.RasterFileDestination),
             (self._OUTPUT_PROBABILITY, self.RasterFileDestination),
             (self._OUTPUT_REPORT, self.ReportFileDestination),
@@ -63,7 +63,7 @@ class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterBoolean(self.P_MATCH_BY_NAME, self._MATCH_BY_NAME, False, True, True)
         self.addParameterInt(self.P_NFOLD, self._NFOLD, 10, True, 1, 100, True)
         self.addParameterBoolean(self.P_OPEN_REPORT, self._OPEN_REPORT, True, True, True)
-        self.addParameterFileDestination(self.P_OUTPUT_CLASSIFIER, self._OUTPUT_CLASSIFIER, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_CLASSIFIER, self._OUTPUT_CLASSIFIER, self.SkopsFileFilter)
         self.addParameterRasterDestination(self.P_OUTPUT_CLASSIFICATION, self._OUTPUT_CLASSIFICATION, None, True, True)
         self.addParameterRasterDestination(self.P_OUTPUT_PROBABILITY, self._OUTPUT_PROBABILITY, None, True, False)
         self.addParameterFileDestination(

@@ -20,10 +20,10 @@ class TestPrepareRegressionDatasetFromContinuousRasterAlgorithm(TestCase):
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
             alg.P_CONTINUOUS_RASTER: fraction_polygon_l3,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = RegressorDump.fromDict(Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = RegressorDump.fromDict(Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((2559, 177), dump.X.shape)
         self.assertEqual((2559, 6), dump.y.shape)
         self.assertEqual(177, len(dump.features))
@@ -41,7 +41,7 @@ class TestPrepareRegressionDatasetFromContinuousRasterAlgorithm(TestCase):
         filename = self.filename('library.gpkg')
         alg = LibraryFromRegressionDatasetAlgorithm()
         parameters = {
-            alg.P_DATASET: self.filename('sample.pkl'),
+            alg.P_DATASET: self.filename('sample.skops'),
             alg.P_OUTPUT_LIBRARY: filename
         }
         self.runalg(alg, parameters)
@@ -57,10 +57,10 @@ class TestPrepareRegressionDatasetFromContinuousRasterAlgorithm(TestCase):
             alg.P_CONTINUOUS_RASTER: enmap_potsdam,  # this makes not much sense, but we allow it anyways
             alg.P_TARGETS: [1],
             alg.P_EXCLUDE_BAD_BANDS: True,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = RegressorDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = RegressorDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual(218, dump.X.shape[1])
         self.assertEqual(218, len(dump.features))
 
@@ -71,9 +71,9 @@ class TestPrepareRegressionDatasetFromContinuousRasterAlgorithm(TestCase):
             alg.P_CONTINUOUS_RASTER: enmap_potsdam,  # this makes not much sense, but we allow it anyways
             alg.P_TARGETS: [1],
             alg.P_EXCLUDE_BAD_BANDS: False,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = RegressorDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = RegressorDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual(224, dump.X.shape[1])
         self.assertEqual(224, len(dump.features))

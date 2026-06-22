@@ -20,10 +20,10 @@ class FitRegressorAlgorithmBase(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._DATASET, 'Training dataset pickle file used for fitting the classifier. '
+            (self._DATASET, 'Training dataset skops file used for fitting the classifier. '
                             'If not specified, an unfitted classifier is created.'),
             (self._REGRESSOR, self.helpParameterCode()),
-            (self._OUTPUT_REGRESSOR, self.PickleFileDestination)
+            (self._OUTPUT_REGRESSOR, self.SkopsFileDestination)
         ]
 
     def displayName(self) -> str:
@@ -44,7 +44,7 @@ class FitRegressorAlgorithmBase(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterCode(self.P_REGRESSOR, self._REGRESSOR, self.defaultCodeAsString())
         self.addParameterRegressionDataset(self.P_DATASET, self._DATASET, None, True)
-        self.addParameterFileDestination(self.P_OUTPUT_REGRESSOR, self._OUTPUT_REGRESSOR, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_REGRESSOR, self._OUTPUT_REGRESSOR, self.SkopsFileFilter)
 
     def defaultCodeAsString(self):
         try:
@@ -105,7 +105,7 @@ class FitRegressorAlgorithmBase(EnMAPProcessingAlgorithm):
                 dump = RegressorDump(None, None, None, None, regressor)
 
             dump.regressor = regressor
-            Utils.pickleDump(dump.__dict__, filename)
+            Utils.modelDump(dump.__dict__, filename)
 
             result = {self.P_OUTPUT_REGRESSOR: filename}
             self.toc(feedback, result)

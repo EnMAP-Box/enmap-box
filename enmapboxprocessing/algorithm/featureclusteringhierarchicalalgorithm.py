@@ -23,7 +23,7 @@ class FeatureClusteringHierarchicalAlgorithm(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._DATASET, 'Dataset pickle file with feature data X to be evaluated.'),
+            (self._DATASET, 'Dataset skops file with feature data X to be evaluated.'),
             (self._NO_PLOT, 'Skip the creation of plots, which can take a lot of time for large features sets.'),
             (self._OPEN_REPORT, self.ReportOpen),
             (self._OUTPUT_REPORT, self.ReportFileDestination)
@@ -48,7 +48,7 @@ class FeatureClusteringHierarchicalAlgorithm(EnMAPProcessingAlgorithm):
         return Group.FeatureSelection.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
-        self.addParameterFile(self.P_DATASET, self._DATASET, extension=self.PickleFileExtension)
+        self.addParameterFile(self.P_DATASET, self._DATASET, extension=self.SkopsFileExtension)
         self.addParameterBoolean(self.P_NO_PLOT, self._NO_PLOT, False, False, True)
         self.addParameterBoolean(self.P_OPEN_REPORT, self._OPEN_REPORT, True)
         self.addParameterFileDestination(self.P_OUTPUT_REPORT, self._OUTPUT_REPORT, self.ReportFileFilter)
@@ -68,7 +68,7 @@ class FeatureClusteringHierarchicalAlgorithm(EnMAPProcessingAlgorithm):
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)
 
-            dump = Utils.pickleLoad(filenameDataset)
+            dump = Utils.modelLoad(filenameDataset)
             X = dump['X']
             features = dump['features']
             feedback.pushInfo(f'Load feature data: X{list(X.shape)}')

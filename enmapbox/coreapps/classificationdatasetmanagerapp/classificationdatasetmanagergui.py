@@ -5,8 +5,8 @@ import numpy as np
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.randomsamplesfromclassificationdatasetalgorithm import \
     RandomSamplesFromClassificationDatasetAlgorithm
-from enmapboxprocessing.parameter.processingparameterpicklefileclassificationdatasetwidget import \
-    ProcessingParameterPickleFileClassificationDatasetWidget
+from enmapboxprocessing.parameter.processingparameterskopsfileclassificationdatasetwidget import \
+    ProcessingParameterSkopsFileClassificationDatasetWidget
 from enmapboxprocessing.typing import ClassifierDump, Category
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtGui import QColor
@@ -19,7 +19,7 @@ from qgis.gui import QgsColorButton, QgsDoubleSpinBox, QgsSpinBox
 
 @typechecked
 class ClassificationDatasetManagerGui(QDialog):
-    mDataset: ProcessingParameterPickleFileClassificationDatasetWidget
+    mDataset: ProcessingParameterSkopsFileClassificationDatasetWidget
     mCategoryTable: QTableWidget
     mFeaturesTable: QTableWidget
     mRestore: QToolButton
@@ -50,7 +50,7 @@ class ClassificationDatasetManagerGui(QDialog):
     def currentEdits(self):
         filename = self.mDataset.mFile.filePath()
         try:
-            dump = ClassifierDump.fromDict(Utils.pickleLoad(filename))
+            dump = ClassifierDump.fromDict(Utils.modelLoad(filename))
         except Exception:
             return
 
@@ -84,7 +84,7 @@ class ClassificationDatasetManagerGui(QDialog):
     def onSaveClicked(self, *args, question=True):
         filename = self.mDataset.mFile.filePath()
         try:
-            dump = ClassifierDump.fromDict(Utils.pickleLoad(filename))
+            dump = ClassifierDump.fromDict(Utils.modelLoad(filename))
         except Exception:
             return
 
@@ -98,14 +98,14 @@ class ClassificationDatasetManagerGui(QDialog):
         categories, features, sizes, sampleSizes = self.currentEdits()
 
         dump = ClassifierDump(categories, features, dump.X, dump.y, dump.classifier)
-        Utils.pickleDump(dump.__dict__, filename)
+        Utils.modelDump(dump.__dict__, filename)
         self.enmapBox.removeSource(filename)
         self.enmapBox.addSource(filename)
 
     def onDatasetChanged(self, *args):
         filename = self.mDataset.mFile.filePath()
         try:
-            dump = ClassifierDump.fromDict(Utils.pickleLoad(filename))
+            dump = ClassifierDump.fromDict(Utils.modelLoad(filename))
         except Exception:
             self.mCategoryTable.setRowCount(0)
             return
@@ -161,7 +161,7 @@ class ClassificationDatasetManagerGui(QDialog):
         self.onSaveClicked(question=False)
         filename = self.mDataset.mFile.filePath()
         try:
-            ClassifierDump.fromDict(Utils.pickleLoad(filename))
+            ClassifierDump.fromDict(Utils.modelLoad(filename))
         except Exception:
             self.mCategoryTable.setRowCount(0)
             return
@@ -173,8 +173,8 @@ class ClassificationDatasetManagerGui(QDialog):
         parameters = {
             alg.P_DATASET: filename,
             alg.P_N: str(sampleSizes),
-            alg.P_OUTPUT_DATASET: tmpfile.replace('.pkl', '.sample.pkl'),
-            alg.P_OUTPUT_COMPLEMENT: tmpfile.replace('.pkl', '.complement.pkl'),
+            alg.P_OUTPUT_DATASET: tmpfile.replace('.skops', '.sample.skops'),
+            alg.P_OUTPUT_COMPLEMENT: tmpfile.replace('.skops', '.complement.skops'),
         }
         dialog = self.enmapBox.showProcessingAlgorithmDialog(alg, parameters, True, True, None, False, self)
         if len(dialog.results()) == 0:

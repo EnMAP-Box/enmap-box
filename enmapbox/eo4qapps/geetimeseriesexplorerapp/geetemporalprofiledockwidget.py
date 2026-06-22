@@ -1,4 +1,4 @@
-import pickle
+import skops
 import traceback
 import warnings
 from math import nan, isnan
@@ -881,13 +881,13 @@ class GeeTemporalProfileDockWidget(QDockWidget):
             text = ''
         QApplication.clipboard().setText(text)
 
-    def _onSaveVectorPointsPreparePkl(self):
+    def _onSaveVectorPointsPrepareSkops(self):
         eeImported, ee = importEarthEngine(False)
 
         canceled = True
-        filenamePkl = join(dirname(__file__), 'cmd', 'parameters.pkl')
-        if exists(filenamePkl):
-            remove(filenamePkl)
+        filenameSkops = join(dirname(__file__), 'cmd', 'parameters.skops')
+        if exists(filenameSkops):
+            remove(filenameSkops)
 
         layer: QgsVectorLayer = self.mPointLayerBrowser.currentLayer()
         if layer is None:
@@ -939,8 +939,8 @@ class GeeTemporalProfileDockWidget(QDockWidget):
 
         dirnameGee = dirname(dirname(ee.__file__))
         numReader = 50
-        with open(filenamePkl, 'wb') as f:
-            pickle.dump((argss, dirnameGee, numReader), f, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(filenameSkops, 'wb') as f:
+            skops.dump((argss, dirnameGee, numReader), f, protocol=skops.HIGHEST_PROTOCOL)
 
         return not canceled
 

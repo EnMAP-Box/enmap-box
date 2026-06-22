@@ -71,7 +71,7 @@ class SpectralIndexOptimizerAlgorithm(EnMAPProcessingAlgorithm):
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)
 
-            dump = RegressorDump.fromDict(Utils.pickleLoad(filenameDataset))
+            dump = RegressorDump.fromDict(Utils.modelLoad(filenameDataset))
             features = np.array(dump.features)
             targets = dump.targets
             X = np.array(dump.X, np.float32)

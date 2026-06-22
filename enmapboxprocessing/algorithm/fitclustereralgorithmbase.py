@@ -21,10 +21,10 @@ class FitClustererAlgorithmBase(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._DATASET, 'Training dataset pickle file used for fitting the clusterer. '
+            (self._DATASET, 'Training dataset skops file used for fitting the clusterer. '
                             'If not specified, an unfitted clusterer is created.'),
             (self._CLUSTERER, self.helpParameterCode()),
-            (self._OUTPUT_CLUSTERER, self.PickleFileDestination)
+            (self._OUTPUT_CLUSTERER, self.SkopsFileDestination)
         ]
 
     def displayName(self) -> str:
@@ -45,7 +45,7 @@ class FitClustererAlgorithmBase(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterCode(self.P_CLUSTERER, self._CLUSTERER, self.defaultCodeAsString())
         self.addParameterUnsupervisedDataset(self.P_DATASET, self._DATASET, None)
-        self.addParameterFileDestination(self.P_OUTPUT_CLUSTERER, self._OUTPUT_CLUSTERER, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_CLUSTERER, self._OUTPUT_CLUSTERER, self.SkopsFileFilter)
 
     def defaultCodeAsString(self):
         try:
@@ -88,12 +88,12 @@ class FitClustererAlgorithmBase(EnMAPProcessingAlgorithm):
                     alg = PrepareUnsupervisedDatasetFromJsonAlgorithm()
                     parameters = {
                         alg.P_JSON_FILE: filenameDataset,
-                        alg.P_OUTPUT_DATASET: Utils.tmpFilename(filename, 'dataset.pkl')
+                        alg.P_OUTPUT_DATASET: Utils.tmpFilename(filename, 'dataset.skops')
                     }
                     self.runAlg(alg, parameters, None, feedback2, context, True)
-                    dump = ClustererDump.fromDict(Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+                    dump = ClustererDump.fromDict(Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
                 else:
-                    dump = ClustererDump.fromDict(Utils.pickleLoad(filenameDataset))
+                    dump = ClustererDump.fromDict(Utils.modelLoad(filenameDataset))
                 feedback.pushInfo(
                     f'Load training dataset: X=array{list(dump.X.shape)}')
                 feedback.pushInfo('Fit clusterer')
@@ -104,7 +104,7 @@ class FitClustererAlgorithmBase(EnMAPProcessingAlgorithm):
                 dump = ClustererDump(None, None, clusterer)
 
             dump = ClustererDump(clusterCount, dump.features, dump.X, clusterer)
-            Utils.pickleDump(dump.__dict__, filename)
+            Utils.modelDump(dump.__dict__, filename)
 
             result = {self.P_OUTPUT_CLUSTERER: filename}
             self.toc(feedback, result)

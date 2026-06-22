@@ -27,7 +27,7 @@ from enmapbox.gui.datasources.manager import DataSourceManager, DataSourceManage
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
 from enmapbox.testing import start_app
-from enmapboxtestdata import classifierDumpPkl, library_berlin, enmap_srf_library
+from enmapboxtestdata import classifierDumpSkops, library_berlin, enmap_srf_library
 from qgis.PyQt import sip
 from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, QgsRasterRenderer, edit, \
     QgsVectorTileLayer
@@ -187,7 +187,7 @@ class DataSourceTests(EnMAPBoxTestCase):
                    enmap_srf_library,
                    enmap_srf_library,
                    library_berlin,
-                   classifierDumpPkl]
+                   classifierDumpSkops]
 
         model = DataSourceManager()
 

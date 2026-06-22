@@ -1,5 +1,4 @@
 import json
-import pickle
 import re
 import uuid
 from contextlib import suppress
@@ -10,6 +9,7 @@ from typing import Tuple, Optional, Callable, Any, Dict, Union, List
 from warnings import warn
 
 import numpy as np
+import skops.io as sio
 from osgeo import gdal
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent, SpatialPoint
@@ -220,7 +220,7 @@ class Utils(object):
 
     @classmethod
     def qgisFeedbackToGdalCallback(
-            cls, feedback: QgsProcessingFeedback = None
+        cls, feedback: QgsProcessingFeedback = None
     ) -> Optional[Callable]:
         if feedback is None:
             callback = None
@@ -234,7 +234,7 @@ class Utils(object):
 
     @classmethod
     def palettedRasterRendererFromCategories(
-            cls, provider: QgsRasterDataProvider, bandNumber: int, categories: Categories
+        cls, provider: QgsRasterDataProvider, bandNumber: int, categories: Categories
     ) -> QgsPalettedRasterRenderer:
         classes = [QgsPalettedRasterRenderer.Class(c.value, QColor(c.color), c.name) for c in categories]
         renderer = QgsPalettedRasterRenderer(provider, bandNumber, classes)
@@ -242,7 +242,7 @@ class Utils(object):
 
     @classmethod
     def multiBandColorRenderer(
-            cls, provider: QgsRasterDataProvider, bandNumbers: List[int], minValues: List[float], maxValues: List[float]
+        cls, provider: QgsRasterDataProvider, bandNumbers: List[int], minValues: List[float], maxValues: List[float]
     ) -> QgsMultiBandColorRenderer:
 
         renderer = QgsMultiBandColorRenderer(provider, *bandNumbers)
@@ -265,7 +265,7 @@ class Utils(object):
 
     @classmethod
     def singleBandGrayRenderer(
-            cls, provider: QgsRasterDataProvider, grayBand: int, minValue: float, maxValue: float
+        cls, provider: QgsRasterDataProvider, grayBand: int, minValue: float, maxValue: float
     ) -> QgsSingleBandGrayRenderer:
 
         renderer = QgsSingleBandGrayRenderer(provider, grayBand)
@@ -278,8 +278,8 @@ class Utils(object):
 
     @classmethod
     def singleBandPseudoColorRenderer(
-            cls, provider: QgsRasterDataProvider, bandNo: int, minValue: float, maxValue: float,
-            colorRamp: Optional[QgsColorRamp] = None, colorRampType=QgsColorRampShader.Type.Interpolated,
+        cls, provider: QgsRasterDataProvider, bandNo: int, minValue: float, maxValue: float,
+        colorRamp: Optional[QgsColorRamp] = None, colorRampType=QgsColorRampShader.Type.Interpolated,
 
     ) -> QgsSingleBandPseudoColorRenderer:
         shader = QgsRasterShader()
@@ -299,7 +299,7 @@ class Utils(object):
 
     @classmethod
     def deriveColorRampShaderRampItems(
-            cls, minValue: float, maxValue: float, ramp: QgsColorRamp
+        cls, minValue: float, maxValue: float, ramp: QgsColorRamp
     ) -> List[QgsColorRampShader.ColorRampItem]:
 
         # derive ramp items
@@ -312,7 +312,7 @@ class Utils(object):
 
     @classmethod
     def categorizedSymbolRendererFromCategories(
-            cls, fieldName: str, categories: Categories
+        cls, fieldName: str, categories: Categories
     ) -> QgsCategorizedSymbolRenderer:
         rendererCategories = list()
         for c in categories:
@@ -356,7 +356,7 @@ class Utils(object):
 
     @classmethod
     def categoriesFromVectorField(
-            cls, vector: QgsVectorLayer, valueField: str, nameField: str = None, colorField: str = None
+        cls, vector: QgsVectorLayer, valueField: str, nameField: str = None, colorField: str = None
     ) -> Categories:
         feature: QgsFeature
         values = list()
@@ -563,7 +563,7 @@ class Utils(object):
 
     @classmethod
     def prepareCategories(
-            cls, categories: Categories, valuesToInt=False, removeLastIfEmpty=False
+        cls, categories: Categories, valuesToInt=False, removeLastIfEmpty=False
     ) -> Tuple[Categories, Dict]:
 
         categoriesOrig = categories
@@ -658,14 +658,18 @@ class Utils(object):
         return filename + extention
 
     @classmethod
-    def pickleDump(cls, obj: Any, filename: str):
-        with open(filename, 'wb') as file:
-            pickle.dump(obj, file)
+    def modelDump(cls, obj: Any, filename: str):
+        sio.dump(obj, filename)
 
     @classmethod
-    def pickleLoad(cls, filename: str) -> Any:
-        with open(filename, 'rb') as file:
-            return pickle.load(file)
+    def modelLoad(cls, filename: str) -> Any:
+        untrusted_types = sio.get_untrusted_types(file=filename)
+        for untrusted_type in sio.get_untrusted_types(file=filename):
+            if untrusted_type.startswith('enmapboxprocessing.typing'):
+                continue
+            raise ValueError(f"Unsupported untrusted type '{untrusted_type}' found in '{filename}'.")
+
+        return sio.load(filename, trusted=untrusted_types)
 
     @classmethod
     def jsonDumps(cls, obj: Any, default=None, indent=2, timeFormat=None) -> str:
@@ -791,7 +795,7 @@ class Utils(object):
 
     @classmethod
     def transformExtent(
-            cls, extent: QgsRectangle, crs: QgsCoordinateReferenceSystem, toCrs: QgsCoordinateReferenceSystem
+        cls, extent: QgsRectangle, crs: QgsCoordinateReferenceSystem, toCrs: QgsCoordinateReferenceSystem
     ) -> QgsRectangle:
 
         if crs == toCrs:

@@ -27,7 +27,7 @@ class RandomSamplesFromClassificationDatasetAlgorithm(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._DATASET, 'Classification dataset pickle file with feature data X and target data y to draw from.'),
+            (self._DATASET, 'Classification dataset skops file with feature data X and target data y to draw from.'),
             (self._N,
              'Number of samples to draw from each category. '
              'Set a single value N to draw N samples for each category. '
@@ -36,8 +36,8 @@ class RandomSamplesFromClassificationDatasetAlgorithm(EnMAPProcessingAlgorithm):
             (self._PROPORTIONAL,
              'Whether to interprete number of samples N or Ni as percentage to be drawn from each category.'),
             (self._SEED, 'The seed for the random generator can be provided.'),
-            (self._OUTPUT_DATASET, self.PickleFileDestination + 'Stores sampled data.'),
-            (self._OUTPUT_COMPLEMENT, self.PickleFileDestination + 'Stores remaining data that was not sampled.')
+            (self._OUTPUT_DATASET, self.SkopsFileDestination + 'Stores sampled data.'),
+            (self._OUTPUT_COMPLEMENT, self.SkopsFileDestination + 'Stores remaining data that was not sampled.')
         ]
 
     def group(self):
@@ -49,9 +49,9 @@ class RandomSamplesFromClassificationDatasetAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterBoolean(self.P_REPLACE, self._REPLACE, False, advanced=True)
         self.addParameterBoolean(self.P_PROPORTIONAL, self._PROPORTIONAL, False, advanced=True)
         self.addParameterInt(self.P_SEED, self._SEED, None, True, 1, advanced=True)
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
         self.addParameterFileDestination(
-            self.P_OUTPUT_COMPLEMENT, self._OUTPUT_COMPLEMENT, self.PickleFileFilter, None, True, False
+            self.P_OUTPUT_COMPLEMENT, self._OUTPUT_COMPLEMENT, self.SkopsFileFilter, None, True, False
         )
 
     def processAlgorithm(
@@ -69,7 +69,7 @@ class RandomSamplesFromClassificationDatasetAlgorithm(EnMAPProcessingAlgorithm):
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)
 
-            dump = ClassifierDump(**Utils.pickleLoad(filenameSample))
+            dump = ClassifierDump(**Utils.modelLoad(filenameSample))
             feedback.pushInfo(
                 f'Load dataset: X=array{list(np.shape(dump.X))} y=array{list(np.shape(dump.y))} '
                 f'categories={[c.name for c in dump.categories]}'
@@ -83,12 +83,12 @@ class RandomSamplesFromClassificationDatasetAlgorithm(EnMAPProcessingAlgorithm):
 
             # store sample
             dump2 = ClassifierDump(dump.categories, dump.features, dump.X[indices], dump.y[indices], None)
-            Utils.pickleDump(dump2.__dict__, filename)
+            Utils.modelDump(dump2.__dict__, filename)
 
             # store conmplement
             if filename2 is not None:
                 dump2 = ClassifierDump(dump.categories, dump.features, dump.X[indices2], dump.y[indices2], None)
-                Utils.pickleDump(dump2.__dict__, filename2)
+                Utils.modelDump(dump2.__dict__, filename2)
 
             result = {self.P_OUTPUT_DATASET: filename, self.P_OUTPUT_COMPLEMENT: filename2}
             self.toc(feedback, result)

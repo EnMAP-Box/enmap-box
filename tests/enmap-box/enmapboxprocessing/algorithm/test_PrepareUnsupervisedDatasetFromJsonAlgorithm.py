@@ -12,10 +12,10 @@ class TestPrepareUnsupervisedDatasetFromJsonAlgorithm(TestCase):
         alg = PrepareUnsupervisedDatasetFromJsonAlgorithm()
         parameters = {
             alg.P_JSON_FILE: regressionDatasetAsJsonFile,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = TransformerDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = TransformerDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((51, 177), dump.X.shape)
         self.assertEqual(177, len(dump.features))
         self.assertIsNone(dump.transformer)

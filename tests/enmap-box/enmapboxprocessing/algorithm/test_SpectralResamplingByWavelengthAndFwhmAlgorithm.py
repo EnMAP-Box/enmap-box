@@ -7,7 +7,7 @@ from enmapboxprocessing.algorithm.spectralresamplingbywavelengthandfwhmalgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import enmap, envi_library_berlin_sli, enmap_berlin_srf_csv, classificationDatasetAsPklFile, \
+from enmapboxtestdata import enmap, envi_library_berlin_sli, enmap_berlin_srf_csv, classificationDatasetAsSkopsFile, \
     enmap_potsdam
 
 
@@ -89,7 +89,7 @@ class TestSpectralResamplingByWavelengthAndFwhmAlgorithm(TestCase):
         alg = SpectralResamplingByWavelengthAndFwhmAlgorithm()
         parameters = {
             alg.P_RASTER: enmap,
-            alg.P_RESPONSE_FILE: classificationDatasetAsPklFile,  # PKL files aren't valid response files
+            alg.P_RESPONSE_FILE: classificationDatasetAsSkopsFile,  # Skops files aren't valid response files
             alg.P_OUTPUT_LIBRARY: self.filename('srf.geojson'),
             alg.P_OUTPUT_RASTER: self.filename('resampled.tif')
         }

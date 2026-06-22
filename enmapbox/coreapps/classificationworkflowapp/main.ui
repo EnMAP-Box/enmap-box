@@ -104,7 +104,7 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="ProcessingParameterPickleFileClassificationDatasetWidget" name="mQuickDataset" native="true"/>
+           <widget class="ProcessingParameterSkopsFileClassificationDatasetWidget" name="mQuickDataset" native="true"/>
           </item>
           <item row="4" column="0">
            <widget class="QCheckBox" name="mQuickCheckPredictedClassification">
@@ -404,7 +404,7 @@
                     <string/>
                    </property>
                    <property name="filter">
-                    <string>*.pkl</string>
+                    <string>*.skops</string>
                    </property>
                    <property name="defaultRoot">
                     <string/>
@@ -958,7 +958,7 @@
                     </sizepolicy>
                    </property>
                    <property name="filter">
-                    <string>*.pkl</string>
+                    <string>*.skops</string>
                    </property>
                    <property name="storageMode">
                     <enum>QgsFileWidget::SaveFile</enum>
@@ -1032,7 +1032,7 @@
                     </sizepolicy>
                    </property>
                    <property name="filter">
-                    <string>*.pkl</string>
+                    <string>*.skops</string>
                    </property>
                    <property name="storageMode">
                     <enum>QgsFileWidget::SaveFile</enum>
@@ -1376,7 +1376,7 @@
                     <bool>true</bool>
                    </property>
                    <property name="filter">
-                    <string>*.pkl</string>
+                    <string>*.skops</string>
                    </property>
                    <property name="storageMode">
                     <enum>QgsFileWidget::SaveFile</enum>
@@ -1456,7 +1456,7 @@
                     <bool>true</bool>
                    </property>
                    <property name="filter">
-                    <string>*.pkl</string>
+                    <string>*.skops</string>
                    </property>
                    <property name="storageMode">
                     <enum>QgsFileWidget::SaveFile</enum>
@@ -1791,7 +1791,7 @@
                     <bool>true</bool>
                    </property>
                    <property name="filter">
-                    <string>*.pkl</string>
+                    <string>*.skops</string>
                    </property>
                    <property name="storageMode">
                     <enum>QgsFileWidget::SaveFile</enum>
@@ -1871,7 +1871,7 @@
                     <bool>true</bool>
                    </property>
                    <property name="filter">
-                    <string>*.pkl</string>
+                    <string>*.skops</string>
                    </property>
                    <property name="storageMode">
                     <enum>QgsFileWidget::SaveFile</enum>
@@ -2032,7 +2032,7 @@
                     </sizepolicy>
                    </property>
                    <property name="filter">
-                    <string>*.pkl</string>
+                    <string>*.skops</string>
                    </property>
                    <property name="storageMode">
                     <enum>QgsFileWidget::SaveFile</enum>
@@ -2368,7 +2368,7 @@
                 </widget>
                </item>
                <item row="0" column="1">
-                <widget class="ProcessingParameterPickleFileWidget" name="mPredictClassifier" native="true"/>
+                <widget class="ProcessingParameterSkopsFileWidget" name="mPredictClassifier" native="true"/>
                </item>
               </layout>
              </widget>
@@ -2885,9 +2885,9 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>ProcessingParameterPickleFileClassificationDatasetWidget</class>
+   <class>ProcessingParameterSkopsFileClassificationDatasetWidget</class>
    <extends>QWidget</extends>
-   <header>enmapboxprocessing.parameter.processingparameterpicklefileclassificationdatasetwidget</header>
+   <header>enmapboxprocessing.parameter.processingparameterskopsfileclassificationdatasetwidget</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -2897,9 +2897,9 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>ProcessingParameterPickleFileWidget</class>
+   <class>ProcessingParameterSkopsFileWidget</class>
    <extends>QWidget</extends>
-   <header>enmapboxprocessing.parameter.processingparameterpicklefilewidget</header>
+   <header>enmapboxprocessing.parameter.processingparameterskopsfilewidget</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

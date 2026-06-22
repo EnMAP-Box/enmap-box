@@ -35,7 +35,7 @@ from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.testing import EnMAPBoxTestCase, TestObjects, start_app
-from enmapboxtestdata import classificationDatasetAsPklFile, library_berlin
+from enmapboxtestdata import classificationDatasetAsSkopsFile, library_berlin
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.PyQt.QtWidgets import QWidget, QHBoxLayout
 from qgis.core import QgsProject, QgsVectorLayer, QgsRasterLayer, QgsLayerTreeModel, QgsLayerTree
@@ -361,7 +361,7 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
 
         enmapBox = EnMAPBox(load_core_apps=False, load_other_apps=False)
 
-        enmapBox.addSource(classificationDatasetAsPklFile)
+        enmapBox.addSource(classificationDatasetAsSkopsFile)
         self.showGui(enmapBox.ui)
 
         enmapBox.close()

@@ -36,7 +36,7 @@ class PrepareRegressionDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
         )
 
         return 'Create a regression dataset from tabulated text files ' \
-               'and store the result as a pickle file. \n' \
+               'and store the result as a skops file. \n' \
                f'The format matches that of the {link}.\n' \
                f'Example files ({link2} and {link3}) can be found in the EnMAP-Box testdata folder).'
 
@@ -48,7 +48,7 @@ class PrepareRegressionDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
             (self._VALUE_FILE,
              'Text file with tabulated target data y (no headers). '
              'Each row represents the target values of a sample.'),
-            (self._OUTPUT_DATASET, self.PickleFileDestination)
+            (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
     def group(self):
@@ -57,7 +57,7 @@ class PrepareRegressionDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterFile(self.P_FEATURE_FILE, self._FEATURE_FILE)
         self.addParameterFile(self.P_VALUE_FILE, self._VALUE_FILE)
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
@@ -88,7 +88,7 @@ class PrepareRegressionDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
             targets = [Target(f'variable {i + 1}', None) for i in range(y.shape[1])]
 
             dump = RegressorDump(targets, features, X, y)
-            Utils.pickleDump(dump.__dict__, filename)
+            Utils.modelDump(dump.__dict__, filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)

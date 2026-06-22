@@ -5,7 +5,7 @@ from enmapboxprocessing.algorithm.prepareregressiondatasetfromfilesalgorithm imp
 from enmapboxprocessing.algorithm.spectralindexoptimizeralgorithm import SpectralIndexOptimizerAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxtestdata import regressionDatasetAsPkl, classificationDatasetAsForceFile
+from enmapboxtestdata import regressionDatasetAsSkops, classificationDatasetAsForceFile
 
 
 class TestSpectralIndexOptimizerAlgorithm(TestCase):
@@ -13,7 +13,7 @@ class TestSpectralIndexOptimizerAlgorithm(TestCase):
     def test(self):
         alg = SpectralIndexOptimizerAlgorithm()
         parameters = {
-            alg.P_DATASET: regressionDatasetAsPkl,
+            alg.P_DATASET: regressionDatasetAsSkops,
             alg.P_MAX_FEATURES: 10,
             alg.P_OUTPUT_MATRIX: self.filename('scores.tif')
         }
@@ -24,7 +24,7 @@ class TestSpectralIndexOptimizerAlgorithm(TestCase):
     def test_withFixedFeatures(self):
         alg = SpectralIndexOptimizerAlgorithm()
         parameters = {
-            alg.P_DATASET: regressionDatasetAsPkl,
+            alg.P_DATASET: regressionDatasetAsSkops,
             alg.P_MAX_FEATURES: 10,
             alg.P_F1: 1,
             alg.P_F2: 1,
@@ -40,13 +40,13 @@ class TestSpectralIndexOptimizerAlgorithm(TestCase):
         parameters = {
             alg.P_FEATURE_FILE: filenameFeatures,
             alg.P_VALUE_FILE: filenameLabels,
-            alg.P_OUTPUT_DATASET: self.filename('dataset.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('dataset.skops')
         }
         self.runalg(alg, parameters)
 
         alg = SpectralIndexOptimizerAlgorithm()
         parameters = {
-            alg.P_DATASET: self.filename('dataset.pkl'),
+            alg.P_DATASET: self.filename('dataset.skops'),
             alg.P_OUTPUT_MATRIX: self.filename('scores.tif')
         }
         self.runalg(alg, parameters)

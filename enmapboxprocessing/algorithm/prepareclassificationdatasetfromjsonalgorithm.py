@@ -16,13 +16,13 @@ class PrepareClassificationDatasetFromJsonAlgorithm(EnMAPProcessingAlgorithm):
         return 'Create classification dataset (from JSON file)'
 
     def shortDescription(self) -> str:
-        return 'Create a classification dataset from a JSON file and store the result as a pickle file. \n' \
-               'Example file (classifier.pkl.json) can be found in the EnMAP-Box testdata folder).'
+        return 'Create a classification dataset from a JSON file and store the result as a skops file. \n' \
+               'Example file (classifier.skops.json) can be found in the EnMAP-Box testdata folder).'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
             (self._JSON_FILE, 'JSON file containing all information.'),
-            (self._OUTPUT_DATASET, self.PickleFileDestination)
+            (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
     def group(self):
@@ -30,7 +30,7 @@ class PrepareClassificationDatasetFromJsonAlgorithm(EnMAPProcessingAlgorithm):
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterFile(self.P_JSON_FILE, self._JSON_FILE, extension=self.JsonFileExtension)
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback

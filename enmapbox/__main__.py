@@ -19,6 +19,7 @@
 import argparse
 import pathlib
 import site
+from contextlib import suppress
 
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import QgsProject, QgsApplication
@@ -62,13 +63,11 @@ def run(
         for source in enmapBox.addSources(sourceList=sources):
             from enmapbox.gui.datasources.datasources import SpatialDataSource
             if isinstance(source, SpatialDataSource):
-                try:
+                with suppress(Exception):
                     # add as map
                     lyr = source.asMapLAyer()
                     dock = enmapBox.createDock('MAP')
                     dock.addLayers([lyr])
-                except Exception:
-                    pass
 
     if not qAppExists:
         print('Execute QgsApplication')

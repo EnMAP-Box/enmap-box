@@ -34,7 +34,7 @@
         <bool>true</bool>
        </property>
        <property name="filter" stdset="0">
-        <string>*.pkl</string>
+        <string>*.skops</string>
        </property>
       </widget>
      </item>

@@ -14,10 +14,10 @@ class TestPrepareUnsupervisedDatasetFromCodeAlgorithm(TestCase):
         alg.initAlgorithm()
         parameters = {
             alg.P_CODE: alg.defaultCodeAsString(),
-            alg.P_OUTPUT_DATASET: self.filename('dataset.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('dataset.skops')
         }
         result = self.runalg(alg, parameters)
-        dump = TransformerDump(**Utils.pickleLoad(result[alg.P_OUTPUT_DATASET]))
+        dump = TransformerDump(**Utils.modelLoad(result[alg.P_OUTPUT_DATASET]))
         self.assertEqual(
             ['Feature 1', 'Feature 2', 'Feature 3'],
             dump.features
