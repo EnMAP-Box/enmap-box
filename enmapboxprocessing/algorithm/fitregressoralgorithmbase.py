@@ -22,7 +22,11 @@ class FitRegressorAlgorithmBase(EnMAPProcessingAlgorithm):
         return [
             (self._DATASET, 'Training dataset skops file used for fitting the classifier. '
                             'If not specified, an unfitted classifier is created.'),
-            (self._REGRESSOR, self.helpParameterCode()),
+            (
+                self._REGRESSOR, self.helpParameterCode()
+                + '\nNote: The Python code provided here is executed locally with the permissions of the current '
+                  'user during algorithm execution.'
+            ),
             (self._OUTPUT_REGRESSOR, self.SkopsFileDestination)
         ]
 
@@ -57,7 +61,10 @@ class FitRegressorAlgorithmBase(EnMAPProcessingAlgorithm):
     def parameterAsRegressor(self, parameters: Dict[str, Any], name, context: QgsProcessingContext):
         namespace = dict()
         code = self.parameterAsString(parameters, name, context)
-        exec(code, namespace)
+
+        # nosec B102 - User-defined scikit-learn model code execution by design; equivalent to the QGIS Python Console.
+        # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
+        exec(code, namespace)  # nosec
         return namespace['regressor']
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:

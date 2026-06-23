@@ -22,7 +22,11 @@ class FitTransformerAlgorithmBase(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._TRANSFORMER, self.helpParameterCode()),
+            (
+                self._TRANSFORMER, self.helpParameterCode()
+                + '\nNote: The Python code provided here is executed locally with the permissions of the current '
+                  'user during algorithm execution.'
+            ),
             (self._FEATURE_RASTER, 'Raster layer with feature data X used for fitting the transformer. '
                                    'Mutually exclusive with parameter: Training dataset'),
             (self._SAMPLE_SIZE, 'Approximate number of samples drawn from raster. '
@@ -69,7 +73,10 @@ class FitTransformerAlgorithmBase(EnMAPProcessingAlgorithm):
     def parameterAsTransformer(self, parameters: Dict[str, Any], name, context: QgsProcessingContext):
         namespace = dict()
         code = self.parameterAsString(parameters, name, context)
-        exec(code, namespace)
+
+        # nosec B102 - User-defined scikit-learn model code execution by design; equivalent to the QGIS Python Console.
+        # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
+        exec(code, namespace)  # nosec
         return namespace['transformer']
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:

@@ -25,7 +25,9 @@ class PrepareUnsupervisedDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._CODE, 'Python code specifying the unsupervised dataset.'),
+            (self._CODE, 'Python code specifying the unsupervised dataset.\n'
+                         'Note: The Python code provided here is executed locally with the permissions of the '
+                         'current user during algorithm execution.'),
             (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
@@ -56,7 +58,10 @@ class PrepareUnsupervisedDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
     ) -> TransformerDump:
         namespace = dict()
         code = self.parameterAsString(parameters, name, context)
-        exec(code, namespace)
+
+        # nosec B102 - User-defined code execution by design; equivalent to the QGIS Python Console.
+        # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
+        exec(code, namespace)  # nosec
         features, X = [namespace[key] for key in ['features', 'X']]
         X = np.array(X)
         transformerDump = TransformerDump(features, X)

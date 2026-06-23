@@ -25,7 +25,9 @@ class PrepareClassificationDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._CODE, 'Python code specifying the classification dataset.'),
+            (self._CODE, 'Python code specifying the classification dataset.\n'
+                         'Note: The Python code provided here is executed locally with the permissions of the '
+                         'current user during algorithm execution.'),
             (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
@@ -64,7 +66,10 @@ class PrepareClassificationDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
     ) -> ClassifierDump:
         namespace = dict()
         code = self.parameterAsString(parameters, self.P_CODE, context)
-        exec(code, namespace)
+
+        # nosec B102 - User-defined code execution by design; equivalent to the QGIS Python Console.
+        # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
+        exec(code, namespace)  # nosec
         categories, features, X, y = [namespace[key] for key in ['categories', 'features', 'X', 'y']]
         X = np.array(X)
         y = np.array(y)

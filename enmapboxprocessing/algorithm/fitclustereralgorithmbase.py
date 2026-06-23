@@ -4,13 +4,13 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromjsonalgorithm import \
     PrepareUnsupervisedDatasetFromJsonAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClustererDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -23,7 +23,11 @@ class FitClustererAlgorithmBase(EnMAPProcessingAlgorithm):
         return [
             (self._DATASET, 'Training dataset skops file used for fitting the clusterer. '
                             'If not specified, an unfitted clusterer is created.'),
-            (self._CLUSTERER, self.helpParameterCode()),
+            (
+                self._CLUSTERER, self.helpParameterCode()
+                + '\nNote: The Python code provided here is executed locally with the permissions of the current user '
+                  'during algorithm execution.'
+            ),
             (self._OUTPUT_CLUSTERER, self.SkopsFileDestination)
         ]
 
@@ -58,7 +62,10 @@ class FitClustererAlgorithmBase(EnMAPProcessingAlgorithm):
     def parameterAsClusterer(self, parameters: Dict[str, Any], name, context: QgsProcessingContext):
         namespace = dict()
         code = self.parameterAsString(parameters, name, context)
-        exec(code, namespace)
+
+        # nosec B102 - User-defined scikit-learn model code execution by design; equivalent to the QGIS Python Console.
+        # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
+        exec(code, namespace)  # nosec
         return namespace['clusterer']
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
@@ -73,7 +80,7 @@ class FitClustererAlgorithmBase(EnMAPProcessingAlgorithm):
         return True, ''
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         filenameDataset = self.parameterAsFile(parameters, self.P_DATASET, context)
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_CLUSTERER, context)
