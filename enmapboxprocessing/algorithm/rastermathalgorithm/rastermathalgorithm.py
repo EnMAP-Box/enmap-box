@@ -190,7 +190,10 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
                 if line.strip().startswith('#') and ':=' in line:
                     layerName, value = line.split(':=')
                     layerName = layerName.strip('# ')
-                    raster = eval(value.strip())
+
+                    # nosec B307 - User-defined code execution by design; equivalent to the QGIS Python Console.
+                    # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
+                    raster = eval(value.strip())  # nosec
                     if isinstance(raster, QgsRasterLayer):
                         rasters[layerName] = raster
 
@@ -216,7 +219,10 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
                 if line.strip().startswith('#') and ':=' in line:
                     layerName, value = line.split(':=')
                     layerName = layerName.strip('# ')
-                    vector = eval(value.strip())
+
+                    # nosec B307 - User-defined code execution by design; equivalent to the QGIS Python Console.
+                    # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
+                    vector = eval(value.strip())  # nosec
                     if isinstance(vector, QgsVectorLayer):
                         vectors[layerName] = vector
 

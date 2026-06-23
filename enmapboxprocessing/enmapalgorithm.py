@@ -1,4 +1,5 @@
 import traceback
+from ast import literal_eval
 from enum import Enum
 from math import nan
 from os import makedirs
@@ -367,7 +368,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
 
         string = string.replace('\n', '')
         try:
-            values = eval(string, {'nan': nan})
+            values = literal_eval(string)
         except Exception:
             raise QgsProcessingException(f'Invalid value list: {self.parameterDefinition(name).description()}')
 
@@ -430,7 +431,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         if string == '':
             return None
         try:
-            value = eval(string, {'nan': nan})
+            value = literal_eval(string)
         except Exception:
             raise QgsProcessingException(f'Invalid value: {self.parameterDefinition(name).description()}')
 

@@ -1,6 +1,7 @@
 import json
 import re
 import uuid
+from ast import literal_eval
 from contextlib import suppress
 from os import makedirs, mkdir
 from os.path import join, dirname, basename, exists, splitext
@@ -458,7 +459,7 @@ class Utils(object):
             if QColor(obj).isValid():
                 return QColor(obj)
             try:  # try to evaluate ...
-                obj = eval(obj)
+                obj = literal_eval(obj)
             except Exception:
                 raise ValueError(f'invalid color: {obj}')
 
