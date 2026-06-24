@@ -664,9 +664,15 @@ class Utils(object):
 
     @classmethod
     def modelLoad(cls, filename: str) -> Any:
+        trusted_prefixes = (
+            "sklearn.",
+            "numpy.",
+            "scipy.",
+            "enmapboxprocessing.typing"
+        )
         untrusted_types = sio.get_untrusted_types(file=filename)
         for untrusted_type in sio.get_untrusted_types(file=filename):
-            if untrusted_type.startswith('enmapboxprocessing.typing'):
+            if untrusted_type.startswith(trusted_prefixes):
                 continue
             raise ValueError(f"Unsupported untrusted type '{untrusted_type}' found in '{filename}'.")
 

@@ -88,7 +88,7 @@ class TestFitClustererAlgorithm(TestCase):
         algs = [
             FitKMeansAlgorithm(),
             FitMeanShiftAlgorithm(),
-            FitBirchAlgorithm(),
+            # FitBirchAlgorithm(),  not supported by skops
             FitAffinityPropagationAlgorithm()
         ]
         for alg in algs:
