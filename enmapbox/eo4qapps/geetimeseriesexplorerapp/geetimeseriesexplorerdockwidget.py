@@ -1,5 +1,4 @@
 import json
-import platform
 import warnings
 import webbrowser
 from collections import OrderedDict
@@ -10,18 +9,19 @@ from traceback import print_exc
 from typing import Optional, Dict, List, Tuple
 from urllib.parse import urlparse
 
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
-from enmapbox.typeguard import typechecked
-from enmapbox.utils import importEarthEngine
-from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
-from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp.codeeditwidget import CodeEditWidget
 from geetimeseriesexplorerapp.collectioninfo import CollectionInfo
 from geetimeseriesexplorerapp.externals.ee_plugin.provider import GeetseEarthEngineRasterDataProvider
 from geetimeseriesexplorerapp.imageinfo import ImageInfo
 from geetimeseriesexplorerapp.tasks.queryavailableimagestask import QueryAvailableImagesTask
 from geetimeseriesexplorerapp.utils import utilsMsecToDateTime
+
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
+from enmapbox.typeguard import typechecked
+from enmapbox.utils import importEarthEngine
+from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
+from enmapboxprocessing.utils import Utils
 from qgis.PyQt import QtGui, uic
 from qgis.PyQt.QtCore import Qt, QLocale, QDate, pyqtSignal, QModelIndex, QDateTime, QUrl
 from qgis.PyQt.QtGui import QPixmap, QColor, QIcon, QDesktopServices
@@ -631,7 +631,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
         self.onLoadCollectionClicked()
 
     def onOpenUserCollectionFolderClicked(self):
-        system = platform.system()
+        # system = platform.system()
         root = join(dirname(__file__), 'user_collections')
         url = QUrl.fromLocalFile(dirname(root))
         QDesktopServices.openUrl(url)
@@ -1062,8 +1062,10 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
             def maskPixel(eeImage: ee.Image) -> ee.Image:
                 masks = list()
                 for item in items:
-                    if isinstance(item, (PixelQualityBitmaskItem, CategoryMaskItem)) and item.checkState(
-                        0) == Qt.Checked:
+                    if (
+                        isinstance(item, (PixelQualityBitmaskItem, CategoryMaskItem))
+                        and item.checkState(0) == Qt.Checked
+                    ):
                         masks.append(item.eeMask(eeImage))
 
                 if len(masks) == 0:

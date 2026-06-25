@@ -3,7 +3,7 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-import processing
+import qgis.processing
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.randompointsfromcategorizedrasteralgorithm import \
     RandomPointsFromCategorizedRasterAlgorithm
@@ -23,9 +23,9 @@ class RandomPointsFromRasterAlgorithm(EnMAPProcessingAlgorithm):
     O_BOUNDARIES = ['min < value <= max', 'min <= value < max', 'min <= value <= max', 'min < value < max']
     LeftOpenBoundary, RightOpenBoundary, ClosedBoundary, OpenBoundary = range(len(O_BOUNDARIES))
     P_DISTANCE_GLOBAL, _DISTANCE_GLOBAL = 'distanceGlobal', \
-                                          'Minimum distance between points (in meters)'
+        'Minimum distance between points (in meters)'
     P_DISTANCE_STRATUM, _DISTANCE_STRATUM = 'distanceStatum', \
-                                            'Minimum distance between points inside category (in meters)'
+        'Minimum distance between points inside category (in meters)'
     P_SEED, _SEED = 'seed', 'Random seed'
     P_OUTPUT_POINTS, _OUTPUT_POINTS = 'outputPoints', 'Output point layer'
 
@@ -114,7 +114,7 @@ class RandomPointsFromRasterAlgorithm(EnMAPProcessingAlgorithm):
                 'DATA_TYPE': 2,  # uint16
                 'OUTPUT': Utils().tmpFilename(filename, 'stratification.tif')
             }
-            processing.run(alg2, parameters2, None, feedback2, context, True)
+            qgis.processing.run(alg2, parameters2, None, feedback2, context, True)
             stratification = QgsRasterLayer(parameters2['OUTPUT'])
             renderer = Utils().palettedRasterRendererFromCategories(stratification.dataProvider(), 1, categories)
             stratification.setRenderer(renderer)
@@ -131,7 +131,7 @@ class RandomPointsFromRasterAlgorithm(EnMAPProcessingAlgorithm):
                 alg3.P_DISTANCE_STRATUM: distanceStratum,
                 alg3.P_OUTPUT_POINTS: filename
             }
-            processing.run(alg3, parameters3, None, feedback, context, True)
+            qgis.processing.run(alg3, parameters3, None, feedback, context, True)
 
             result = {self.P_OUTPUT_POINTS: filename}
             self.toc(feedback, result)

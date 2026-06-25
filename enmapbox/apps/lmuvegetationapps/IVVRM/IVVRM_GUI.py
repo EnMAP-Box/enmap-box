@@ -761,8 +761,8 @@ class IVVRM:
 
                 # Nash-Sutcliffe Efficiency Error
                 nse = 1.0 - (
-                        (np.nansum((self.data_mean - self.myResult) ** 2))
-                        / (np.nansum((self.data_mean - (np.nanmean(self.data_mean))) ** 2))
+                    (np.nansum((self.data_mean - self.myResult) ** 2))
+                    / (np.nansum((self.data_mean - (np.nanmean(self.data_mean))) ** 2))
                 )
 
                 # Modified Nash-Sutcliffe Efficiency Error
@@ -1142,10 +1142,10 @@ class SensorEditor:
             self.gui.label.setText(text)
             if len(self.outreach) > 0:
                 text = (
-                        "Create Generic SRF from Imagery OK with "
-                        + str(len(self.x[:, 0])) + " Bands but Caution! "
-                        + str(len(self.outreach))
-                        + " wavelengths outside PROSAIL range will be deleted!"
+                    "Create Generic SRF from Imagery OK with "
+                    + str(len(self.x[:, 0])) + " Bands but Caution! "
+                    + str(len(self.outreach))
+                    + " wavelengths outside PROSAIL range will be deleted!"
                 )
                 self.gui.label.setStyleSheet("color: rgb(170, 130, 0);")
                 self.gui.label.setText(text)

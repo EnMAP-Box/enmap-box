@@ -2,7 +2,6 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-import processing
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.creategridalgorithm import CreateGridAlgorithm
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
@@ -11,7 +10,8 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group, A
 from enmapboxprocessing.processingfeedback import ProcessingFeedback
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtCore import QVariant
+from qgis import processing
+from qgis.PyQt.QtCore import QMetaType
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsRasterLayer,
                        QgsFeature, QgsField, QgsProcessingFeatureSourceDefinition, QgsApplication,
                        QgsVectorDataProvider, QgsRasterDataProvider, QgsPoint)
@@ -111,7 +111,7 @@ class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
         # add image X, Y coordinates and find no data pixel
         rasterProvider = raster.dataProvider()
         vectorProvider: QgsVectorDataProvider = sample.dataProvider()
-        fields = [QgsField('PIXEL_X', QVariant.LongLong), QgsField('PIXEL_Y', QVariant.LongLong)]
+        fields = [QgsField('PIXEL_X', QMetaType.LongLong), QgsField('PIXEL_Y', QMetaType.LongLong)]
         vectorProvider.addAttributes(fields)
         sample.updateFields()
         noDataPixels = list()

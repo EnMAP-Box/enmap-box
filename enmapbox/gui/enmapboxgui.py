@@ -1381,7 +1381,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         d.setWindowTitle(title)
         d.setFileFilter(filter)
         d.setDefaultRoot(defaultRoot)
-        result = d.exec_()
+        result = d.exec()
 
         if result == QDialog.Accepted:
             subdatasets = d.selectedSublayerDetails()
@@ -1537,7 +1537,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         if layertype == 'speclib':
 
             d = CreateSpectralLibraryDialog(self.ui)
-            if d.exec_() == QDialog.Accepted:
+            if d.exec() == QDialog.Accepted:
                 sl = d.create_speclib()
                 if isinstance(sl, QgsVectorLayer):
                     self.project().addMapLayer(sl, False)
@@ -1547,7 +1547,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             d = QgsNewGeoPackageLayerDialog(self.ui)
             d.setCrs(defaultCrs)
             d.setAddToProject(False)
-            if d.exec_() == QDialog.Accepted:
+            if d.exec() == QDialog.Accepted:
                 layers.append(QgsVectorLayer(d.databasePath()))
 
         elif layertype == 'memory':
@@ -2459,8 +2459,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         f = 0.8
         newSize = QSize(int(f * rect.width()), int(f * rect.height()))
 
-        geom = QStyle.alignedRect(Qt.LeftToRight, Qt.AlignCenter,
-                                  newSize, QApplication.instance().desktop().availableGeometry())
+        geom = QStyle.alignedRect(
+            Qt.LeftToRight, Qt.AlignCenter,
+            newSize, QApplication.primaryScreen().availableGeometry()
+        )
         self.ui.setGeometry(geom)
 
     def closeEvent(self, event: QCloseEvent):
@@ -2688,7 +2690,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         if show and not modal:
             dlg.show()
         if show and modal:
-            dlg.exec_()
+            dlg.exec()
         return dlg
 
     def addLayerMenu(self):

@@ -22,10 +22,10 @@ from typing import Union, Optional
 
 import numpy as np
 from osgeo import gdal, ogr
-from qgis.PyQt.QtCore import QDate
-from qgis.core import QgsCoordinateReferenceSystem
 
 from enmapbox.gui import ClassificationScheme
+from qgis.PyQt.QtCore import QDate
+from qgis.core import QgsCoordinateReferenceSystem
 
 IMMUTABLE_DOMAINS = ['IMAGE_STRUCTURE', 'SUBDATASETS', 'DERIVED_SUBDATASETS']
 
@@ -644,4 +644,4 @@ if __name__ == '__main__':
         with suppress(Exception):
             oli = MDKeyAbstract.object2oli(d)
 
-    qgsApp.exec_()
+    qgsApp.exec()

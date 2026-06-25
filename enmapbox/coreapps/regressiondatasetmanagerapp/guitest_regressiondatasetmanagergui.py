@@ -1,8 +1,9 @@
+from regressiondatasetmanagerapp import RegressionDatasetManagerGui
+
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from enmapboxprocessing.utils import Utils
 from tests.enmapboxtestdata import regressorDumpMultiTargetSkops
-from regressiondatasetmanagerapp import RegressionDatasetManagerGui
 
 qgsApp = start_app()
 enmapBox = EnMAPBox()
@@ -14,4 +15,4 @@ enmapBox.addSource('regressor.skops')
 widget = RegressionDatasetManagerGui(enmapBox.ui)
 widget.show()
 
-qgsApp.exec_()
+qgsApp.exec()

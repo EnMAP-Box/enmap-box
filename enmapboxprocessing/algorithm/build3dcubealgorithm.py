@@ -1,16 +1,16 @@
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-import processing
 from osgeo import gdal
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRectangle
 
+import qgis.processing
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRectangle
 
 
 @typechecked
@@ -78,7 +78,7 @@ class Build3dCubeAlgorithm(EnMAPProcessingAlgorithm):
 
             # build face
             alg = TranslateRasterAlgorithm()
-            processing.run(alg, {alg.P_RASTER: raster, alg.P_OUTPUT_RASTER: filename1, alg.P_COPY_METADATA: True})
+            qgis.processing.run(alg, {alg.P_RASTER: raster, alg.P_OUTPUT_RASTER: filename1, alg.P_COPY_METADATA: True})
             ds = gdal.Open(filename1)
             gdalGeoTransform = (
                 extent0.xMinimum() + xres * (bandCount - 1) * dx, xres, -0.,

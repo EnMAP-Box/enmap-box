@@ -795,7 +795,7 @@ def installTestData(overwrite_existing: bool = False, ask: bool = True):
     dialog.downloadProgress.connect(onDownloadProgress)
 
     dialog.open()
-    dialog.exec_()
+    dialog.exec()
 
 
 class PIPPackageFilterModel(QSortFilterProxyModel):
@@ -1126,7 +1126,7 @@ class PIPPackageInstallerTableView(QTableView):
         a.setToolTip(f'Open the "{pkg.pipPkgName}" homepage')
         a.setEnabled(pkg.homepage != '')
         a.triggered.connect(lambda *args, url=pkg.homepage: QDesktopServices.openUrl(QUrl.fromUserInput(url)))
-        m.exec_(event.globalPos())
+        m.exec(event.globalPos())
 
 
 class PIPPackageInstaller(QWidget):
@@ -1267,7 +1267,7 @@ class PIPPackageInstaller(QWidget):
                               QMessageBox.Abort | QMessageBox.Ignore)
             box.setTextFormat(Qt.RichText)
             box.setDefaultButton(QMessageBox.Abort)
-            result = box.exec_()
+            result = box.exec()
 
             if result == QMessageBox.Abort:
                 return False

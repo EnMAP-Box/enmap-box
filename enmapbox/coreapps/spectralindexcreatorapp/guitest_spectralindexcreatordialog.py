@@ -1,11 +1,10 @@
-from qgis.core import QgsRasterLayer
+from spectralindexcreatorapp.spectralindexcreatordialog import SpectralIndexCreatorDialog
 
 from enmapbox import initAll
-from enmapbox.gui.enmapboxgui import EnMAPBox
-
 from enmapbox.exampledata import enmap
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
-from spectralindexcreatorapp.spectralindexcreatordialog import SpectralIndexCreatorDialog
+from qgis.core import QgsRasterLayer
 
 qgsApp = start_app()
 initAll()
@@ -19,4 +18,4 @@ widget.mLayer.setLayer(layer)
 
 widget.show()
 
-qgsApp.exec_()
+qgsApp.exec()

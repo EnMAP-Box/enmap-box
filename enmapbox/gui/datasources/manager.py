@@ -258,9 +258,9 @@ class DataSourceManager(TreeModel):
                 for ds in allDataSources:
                     dataItem = ds.dataItem()
                     if (
-                        isinstance(ds, SpatialDataSource)
-                        and dataItem.path() == input.source()
-                        and dataItem.providerKey() == input.providerType()
+                            isinstance(ds, SpatialDataSource)
+                            and dataItem.path() == input.source()
+                            and dataItem.providerKey() == input.providerType()
                     ):
                         foundSources.append(ds)
             elif isinstance(input, str):
@@ -441,7 +441,7 @@ class DataSourceManagerTreeView(TreeView):
         m: QMenu = QMenu()
         m.setToolTipsVisible(True)
         self.populateContextMenu(m)
-        m.exec_(self.viewport().mapToGlobal(event.pos()))
+        m.exec(self.viewport().mapToGlobal(event.pos()))
 
     def populateContextMenu(self, menu: QMenu):
         from ..contextmenus import EnMAPBoxContextMenuRegistry
@@ -705,7 +705,7 @@ class DataSourceManagerPanelUI(QgsDockWidget):
     def onSyncToQGIS(self, *args):
         if isinstance(self.mDataSourceManager, DataSourceManager):
             dialog = SelectProjectLayersDialog(project=QgsProject.instance())
-            if dialog.exec_() == QDialog.Accepted:
+            if dialog.exec() == QDialog.Accepted:
                 layers = dialog.selectedLayers()
                 layers = [lyr for lyr in layers if not lyr.dataProvider().name() == 'memory']
 
@@ -885,7 +885,7 @@ class DataSourceFactory(object):
                                 d.setWindowIcon(enmapBoxIcon())
                                 d.showMultiFiles(False)
                                 d.setSubDatasetDetails(sDetails)
-                                if d.exec_() == QDialog.Accepted:
+                                if d.exec() == QDialog.Accepted:
                                     return DataSourceFactory.create(d.selectedSublayerDetails())
                                 else:
                                     return []

@@ -18,4 +18,4 @@ mapDock = enmapBox._dropObject(layer)
 w = ColorSpaceExplorerWidget(layer, mapDock.mapCanvas())
 w.show()
 
-qgsApp.exec_()
+qgsApp.exec()

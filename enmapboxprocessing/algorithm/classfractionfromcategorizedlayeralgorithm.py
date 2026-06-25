@@ -2,7 +2,8 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-import processing
+import qgis.processing
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.creategridalgorithm import CreateGridAlgorithm
 from enmapboxprocessing.algorithm.rasterizecategorizedvectoralgorithm import RasterizeCategorizedVectorAlgorithm
 from enmapboxprocessing.algorithm.translatecategorizedrasteralgorithm import TranslateCategorizedRasterAlgorithm
@@ -12,7 +13,6 @@ from enmapboxprocessing.numpyutils import NumpyUtils
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -79,7 +79,7 @@ class ClassFractionFromCategorizedLayerAlgorithm(EnMAPProcessingAlgorithm):
                 alg.P_UNIT: alg.PixelUnits,
                 alg.P_OUTPUT_GRID: Utils.tmpFilename(filename, 'grid.x10.vrt')
             }
-            gridX10 = processing.run(alg, parameters, None, feedback2, context, True)[alg.P_OUTPUT_GRID]
+            gridX10 = qgis.processing.run(alg, parameters, None, feedback2, context, True)[alg.P_OUTPUT_GRID]
 
             if isinstance(layer, QgsVectorLayer):
                 # burn classes at x10 grid
@@ -92,7 +92,7 @@ class ClassFractionFromCategorizedLayerAlgorithm(EnMAPProcessingAlgorithm):
                     alg.P_MAJORITY_VOTING: False,
                     alg.P_OUTPUT_CATEGORIZED_RASTER: Utils.tmpFilename(filename, 'classification.x10.tif')
                 }
-                processing.run(alg, parameters, None, feedback2, context, True)
+                qgis.processing.run(alg, parameters, None, feedback2, context, True)
                 classificationX10 = QgsRasterLayer(parameters[alg.P_OUTPUT_CATEGORIZED_RASTER])
             elif isinstance(layer, QgsRasterLayer):
                 # burn classes at x10 grid
@@ -104,7 +104,7 @@ class ClassFractionFromCategorizedLayerAlgorithm(EnMAPProcessingAlgorithm):
                     alg.P_MAJORITY_VOTING: False,
                     alg.P_OUTPUT_CATEGORIZED_RASTER: Utils.tmpFilename(filename, 'classification.x10.tif')
                 }
-                processing.run(alg, parameters, None, feedback2, context, True)
+                qgis.processing.run(alg, parameters, None, feedback2, context, True)
                 classificationX10 = QgsRasterLayer(parameters[alg.P_OUTPUT_CATEGORIZED_RASTER])
             else:
                 raise ValueError()

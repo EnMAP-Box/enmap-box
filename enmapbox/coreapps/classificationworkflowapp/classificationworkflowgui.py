@@ -101,7 +101,7 @@ def errorHandled(func=None, *, successMessage: str = None):
 
                 dialog = Dialog()
                 dialog.resize(800, 600)
-                dialog.exec_()
+                dialog.exec()
 
             widget = gui.mMessageBar.createMessage('Unexpected error', str(error))
             button = QPushButton(widget)
@@ -618,7 +618,7 @@ class ClassificationWorkflowGui(QMainWindow):
         return n
 
     def getClassifier(self) -> str:
-        import processing
+        from qgis import processing
         alg = FitGenericClassifierAlgorithm()
         parameters = {alg.P_CLASSIFIER: self.mCodeClassifier.text(),
                       alg.P_OUTPUT_CLASSIFIER: join(Utils.getTempDirInTempFolder(), 'classifier.skops')}

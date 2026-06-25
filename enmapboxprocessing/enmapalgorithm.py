@@ -1,7 +1,6 @@
 import traceback
 from ast import literal_eval
 from enum import Enum
-from math import nan
 from os import makedirs
 from os.path import abspath, dirname, exists, isabs, join, splitext
 from time import time
@@ -10,7 +9,7 @@ from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple
 import numpy as np
 from osgeo import gdal
 
-import processing
+import qgis.processing
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.glossary import injectGlossaryLinks
@@ -1080,7 +1079,8 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
 
     @staticmethod
     def runAlg(algOrName, parameters, onFinish=None, feedback=None, context=None, is_child_algorithm=False) -> Dict:
-        return processing.run(algOrName, parameters, onFinish, feedback, context, is_child_algorithm)
+        return qgis.processing.run(algOrName, parameters, onFinish, feedback, context,
+                                   is_child_algorithm=is_child_algorithm)
 
     @staticmethod
     def runAlgorithm(algOrName, parameters, onFinish=None, feedback=None, context=None) -> Dict:

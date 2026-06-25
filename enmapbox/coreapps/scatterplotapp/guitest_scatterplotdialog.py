@@ -1,11 +1,11 @@
 import numpy as np
+from scatterplotapp.scatterplotdialog import ScatterPlotDialog
 
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from enmapboxprocessing.driver import Driver
 from qgis.core import QgsRasterLayer
-from scatterplotapp.scatterplotdialog import ScatterPlotDialog
 
 qgsApp = start_app()
 initAll()
@@ -34,4 +34,4 @@ widget.mLayerY.setLayer(layer)
 widget.mBandX.setBand(1)
 widget.mBandY.setBand(1)
 
-qgsApp.exec_()
+qgsApp.exec()

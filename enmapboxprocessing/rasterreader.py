@@ -6,7 +6,7 @@ from typing import Iterable, List, Union, Optional, Tuple, Iterator, Dict
 import numpy as np
 from osgeo import gdal
 
-import processing
+import qgis.processing
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.gridwalker import GridWalker
@@ -465,7 +465,7 @@ class RasterReader(object):
             'DATA_TYPE': 5,
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        result = processing.run(alg, parameters)
+        result = qgis.processing.run(alg, parameters)
 
         # read mask and calculate fractions
         maskArray = RasterReader(result['OUTPUT']).array()[0]

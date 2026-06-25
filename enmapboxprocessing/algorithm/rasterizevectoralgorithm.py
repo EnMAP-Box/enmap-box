@@ -1,15 +1,14 @@
 import re
 from typing import Dict, Any, List, Tuple
 
-from qgis.PyQt.QtCore import QVariant
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsProcessingParameterField,
-                       QgsVectorFileWriter,
-                       QgsProject, QgsCoordinateTransform, QgsField)
-
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtCore import QMetaType
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsProcessingParameterField,
+                       QgsVectorFileWriter,
+                       QgsProject, QgsCoordinateTransform, QgsField)
 
 
 @typechecked
@@ -71,7 +70,7 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
         return True, ''
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         grid = self.parameterAsRasterLayer(parameters, self.P_GRID, context)
         vector = self.parameterAsVectorLayer(parameters, self.P_VECTOR, context)
@@ -91,7 +90,7 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
 
             # create fid field if needed
             if burnFid:
-                field = QgsField('temp_fid', QVariant.LongLong)
+                field = QgsField('temp_fid', QMetaType.LongLong)
                 vector.addExpressionField('$id', field)
                 tmpFilename = Utils.tmpFilename(filename, 'fid.gpkg')
                 saveVectorOptions = QgsVectorFileWriter.SaveVectorOptions()

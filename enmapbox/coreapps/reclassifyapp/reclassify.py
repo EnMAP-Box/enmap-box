@@ -376,7 +376,7 @@ class ReclassifyTableView(QTableView):
 
         a = m.addAction('Reset Class Mapping')
         a.triggered.connect(model.resetMapping)
-        m.exec_(event.globalPos())
+        m.exec(event.globalPos())
 
 
 class ReclassifyTableViewDelegate(QStyledItemDelegate):

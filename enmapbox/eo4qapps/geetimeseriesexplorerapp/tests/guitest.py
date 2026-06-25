@@ -1,11 +1,11 @@
 import pyqtgraph.examples
-from tests.testdata import landcover_berlin_point_singlepart_3035_gpkg
+from geetimeseriesexplorerapp import GeeTimeseriesExplorerApp
 
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
-from geetimeseriesexplorerapp import GeeTimeseriesExplorerApp
 from qgis.core import QgsVectorLayer
+from tests.testdata import landcover_berlin_point_singlepart_3035_gpkg
 
 pyqtgraph.examples.run()
 
@@ -31,7 +31,7 @@ app.profileDock.mDownloadFolder.setFilePath(r'C:\Users\Andreas\Downloads\Profile
 # app.dockWidget.mCompositeDateStart.setDate(QDate(2020, 8, 1))
 # app.dockWidget.mCompositeDateEnd.setDate(QDate(2020, 8, 2))
 # app.dockWidget.mCreateComposite.clicked.emit()
-qgsApp.exec_()
+qgsApp.exec()
 
 # use this code for the QGIS version!!!
 """class EventFilter(QObject):

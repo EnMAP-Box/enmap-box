@@ -8,8 +8,9 @@ from typing import Optional, List, Dict
 
 import numpy as np
 import pyqtgraph as pg
+from geetimeseriesexplorerapp import MapTool, GeeTimeseriesExplorerDockWidget, GeeTemporalProfileDockWidget
+from profileanalyticsapp.profileanalyticseditorwidget import ProfileAnalyticsEditorWidget
 
-import processing
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyleButton, PlotStyle
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import prepareProfileValueDict
@@ -20,8 +21,7 @@ from enmapbox.utils import findEnmapBoxGuiWidgets, findQgisGuiWidgets
 from enmapboxprocessing.algorithm.subsetrasterbandsalgorithm import SubsetRasterBandsAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
-from geetimeseriesexplorerapp import MapTool, GeeTimeseriesExplorerDockWidget, GeeTemporalProfileDockWidget
-from profileanalyticsapp.profileanalyticseditorwidget import ProfileAnalyticsEditorWidget
+from qgis import processing
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QComboBox, QTableWidget, QCheckBox, QToolButton, QLineEdit, QWidget, QLabel, QDockWidget
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsVectorLayer, QgsProcessingFeatureSourceDefinition, \

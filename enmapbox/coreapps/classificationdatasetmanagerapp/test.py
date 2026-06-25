@@ -1,4 +1,5 @@
 from classificationdatasetmanagerapp import ClassificationDatasetManagerGui
+
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from enmapboxprocessing.utils import Utils
@@ -14,4 +15,4 @@ enmapBox.addSource('classifier.skops')
 widget = ClassificationDatasetManagerGui(enmapBox.ui)
 widget.show()
 
-qgsApp.exec_()
+qgsApp.exec()

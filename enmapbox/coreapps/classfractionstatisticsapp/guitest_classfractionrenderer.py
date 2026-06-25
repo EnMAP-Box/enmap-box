@@ -1,12 +1,11 @@
-from qgis.core import QgsRasterLayer
+from enmapboxplugins.classfractionrenderer import ClassFractionRenderer, ClassFractionRendererWidget
 
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
-from enmapboxplugins.classfractionrenderer import ClassFractionRenderer, ClassFractionRendererWidget
-
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import landcover_map_l3
+from qgis.core import QgsRasterLayer
 from tests.testdata import fraction_map_l3_tif
 
 renderer = ClassFractionRenderer()
@@ -26,4 +25,4 @@ mapDock = enmapBox._dropObject(layer)
 widget = ClassFractionRendererWidget(layer, mapDock.mapCanvas())
 widget.show()
 
-qgsApp.exec_()
+qgsApp.exec()

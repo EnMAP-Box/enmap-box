@@ -2,11 +2,11 @@ import re
 from os.path import join, dirname
 from typing import Dict, Any, List, Tuple
 
-import processing
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+from qgis import processing
 from qgis.core import QgsProcessingOutputRasterLayer, QgsProcessingException, QgsProcessingContext, \
     QgsProcessingFeedback, QgsRasterLayer
 

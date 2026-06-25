@@ -107,7 +107,7 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
         code = self.mCode.text()
         rasterNames = list(self.getRasterSources().keys())
         dlg = SnippetSaveAsDialog(code, rasterNames, self.parent())
-        if dlg.exec_():
+        if dlg.exec():
             snippet = dlg.values()
             from enmapboxprocessing.algorithm import rastermathalgorithm
             root = join(dirname(rastermathalgorithm.__file__), 'snippet', 'custom')
@@ -191,7 +191,7 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
         rasterNames = list(self.getRasterSources().keys())
 
         dlg = SnippetInsertDialog(snippet, rasterNames, self.parent())
-        if dlg.exec_():
+        if dlg.exec():
             code = dlg.values()
             self.mCode.setText(code)
 
