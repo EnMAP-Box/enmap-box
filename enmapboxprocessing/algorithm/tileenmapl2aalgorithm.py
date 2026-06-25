@@ -89,7 +89,8 @@ class TileEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
             baseName = basename(xmlFilename.replace('-METADATA.XML', ''))
 
         def id_generator(size=40, chars=string.ascii_uppercase + string.digits):
-            return ''.join(random.choice(chars) for _ in range(size))  # nosec non-security temporary folder identifier
+            # non-security temporary folder identifier
+            return ''.join(random.choice(chars) for _ in range(size))  # nosec
 
         tmpFolderName = join(folderName, '_tmp', id_generator())
         if not exists(tmpFolderName):

@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 from typing import Union, List, Optional
 
-import skops  # nosec B403 - we need skops to reconstruct the old data
+import pickle  # nosec B403 # we need pickle to reconstruct the old data
 
 from enmapbox.qgispluginsupport.qps.speclib.core import is_profile_field
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import validateProfileValueDict
@@ -67,9 +67,9 @@ def fix_binary_profile_fields(
                     profile_dict = json.loads(stringFromByteArray(data_old))
                     # everything is fine
                 except UnicodeDecodeError:
-                    # old-style skops format.
-                    # using skops is required here to reconstruct the old data
-                    profile_dict = skops.loads(data_old.data())  # nosec B301
+                    # old-style pickle format.
+                    # using pickle is required here to reconstruct the old data
+                    profile_dict = pickle.loads(data_old.data())  # nosec B301
                     needs_conversion = True
 
                 success, msg, d = validateProfileValueDict(profile_dict)

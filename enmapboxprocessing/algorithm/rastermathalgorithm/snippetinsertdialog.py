@@ -44,7 +44,7 @@ class SnippetInsertDialog(QDialog, DialogUi):
         self.snippet = snippet
         self.rasterNames = rasterNames
         lines = snippet.strip().splitlines()
-        # nosec B307 - User-defined input definition code evaluation by design; equivalent to the QGIS Python Console.
+        # nosec B307 # User-defined input definition code evaluation by design; equivalent to the QGIS Python Console.
         self.inputs = eval(lines[0], {'QgsRasterLayer': QgsRasterLayer})  # nosec
         self.code = '\n'.join(lines[1:]).strip()
         self.sources = list()

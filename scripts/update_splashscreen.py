@@ -8,7 +8,7 @@ import configparser
 import os
 import re
 import shutil
-import subprocess  # nosec B404 - we need inkscape to properly create the splashscreen
+import subprocess  # nosec B404 # we need inkscape to properly create the splashscreen
 from pathlib import Path
 from typing import Match, Union
 

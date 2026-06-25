@@ -371,7 +371,7 @@ def call_pip_command(pipArgs: list) -> Tuple[bool, Optional[str], Optional[str]]
             stderr=subprocess.PIPE,
             text=True,
             **kwargs,
-        )  # nosec B603 - process is checked, and there is simply no other way to call the local pip executable
+        )  # nosec B603 # process is checked, and there is simply no other way to call the local pip executable
         success = result.returncode == 0
         msgOut = result.stdout
         msgErr = result.stderr
