@@ -132,7 +132,7 @@ class PrepareRegressionDatasetFromSynthMixAlgorithm(EnMAPProcessingAlgorithm):
         for i in range(self.n):
             complexity = np.random.choice(list(mixingComplexities.keys()), p=list(mixingComplexities.values()))
 
-            # nosec random sampling for synthetic dataset generation
+            # nosec # random sampling for synthetic dataset generation
             isBackground = self.background >= randint(1, 100)  # nosec
 
             if isBackground:

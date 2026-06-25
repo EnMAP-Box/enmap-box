@@ -59,7 +59,7 @@ class PrepareUnsupervisedDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
         namespace = dict()
         code = self.parameterAsString(parameters, name, context)
 
-        # nosec B102 - User-defined code execution by design; equivalent to the QGIS Python Console.
+        # nosec B102 # User-defined code execution by design; equivalent to the QGIS Python Console.
         # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
         exec(code, namespace)  # nosec
         features, X = [namespace[key] for key in ['features', 'X']]

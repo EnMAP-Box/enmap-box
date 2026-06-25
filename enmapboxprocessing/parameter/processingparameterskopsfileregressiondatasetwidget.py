@@ -79,7 +79,7 @@ class ProcessingParameterSkopsFileRegressionDatasetWidget(QWidget):
                     dump = RegressorDump.fromDict(Utils.modelLoad(filename))
                     samples, features = dump.X.shape
                     targets = len(dump.targets)
-                except Exception:  # nosec Ignore files that are not valid models.
+                except Exception:  # nosec # Ignore files that are not valid models.
                     continue
 
                 action = self.menu.addAction('')

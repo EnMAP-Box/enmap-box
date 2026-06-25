@@ -9,4 +9,4 @@ for bandNo in reader.bandNumbers():
 
 for bandNo in range(1, 100):
     # load 100x the wavelengths for a random band
-    print(reader.wavelength(randint(1, reader.bandCount())))  # nosec B311 - this is not a security purpose
+    print(reader.wavelength(randint(1, reader.bandCount())))  # nosec B311 # this is not a security purpose

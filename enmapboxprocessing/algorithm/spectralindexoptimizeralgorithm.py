@@ -107,7 +107,7 @@ class SpectralIndexOptimizerAlgorithm(EnMAPProcessingAlgorithm):
                 for bi in range(ai + 1, nfeatures):
                     B = X[:, bi]
                     for yi in range(ntargets):
-                        # nosec B307 - User-defined spectral index code evaluation by design;
+                        # nosec B307 # User-defined spectral index code evaluation by design;
                         # equivalent to the QGIS Python Console.
                         # The code execution is transparently documented for users
                         # (e.g. via the Processing algorithm help).

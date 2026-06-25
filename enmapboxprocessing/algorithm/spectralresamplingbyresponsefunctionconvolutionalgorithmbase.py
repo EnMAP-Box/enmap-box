@@ -62,7 +62,7 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
         namespace = dict()
         code = self.parameterAsString(parameters, name, context)
 
-        # nosec B102 - User-defined code execution by design; equivalent to the QGIS Python Console.
+        # nosec B102 # User-defined code execution by design; equivalent to the QGIS Python Console.
         exec(code, namespace)  # nosec
         responses = namespace['responses']
         return responses

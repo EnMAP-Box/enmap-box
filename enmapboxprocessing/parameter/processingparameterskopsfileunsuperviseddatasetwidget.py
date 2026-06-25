@@ -67,7 +67,7 @@ class ProcessingParameterSkopsFileUnsupervisedDatasetWidget(QWidget):
                 try:
                     dump = TransformerDump(**Utils.modelLoad(filename))
                     samples, features = dump.X.shape
-                except Exception:  # nosec Ignore files that are not valid models.
+                except Exception:  # nosec # Ignore files that are not valid models.
                     continue
 
                 action = self.menu.addAction('')

@@ -79,7 +79,7 @@ class ProcessingParameterSkopsFileClassificationDatasetWidget(QWidget):
                     dump = ClassifierDump(**Utils.modelLoad(filename))
                     samples, features = dump.X.shape
                     classes = len(dump.categories)
-                except Exception:  # nosec Ignore files that are not valid models.
+                except Exception:  # nosec # Ignore files that are not valid models.
                     continue
 
                 action = self.menu.addAction(alg.displayName())
