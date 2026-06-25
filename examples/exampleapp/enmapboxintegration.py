@@ -22,9 +22,8 @@
 
 import os
 
-from exampleapp import APP_DIR
-
 from enmapbox.gui.applications import EnMAPBoxApplication
+from exampleapp import APP_DIR
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu
 
@@ -56,13 +55,7 @@ class ExampleEnMAPBoxApp(EnMAPBoxApplication):
         pathIcon = os.path.join(APP_DIR, 'icon.png')
         return QIcon(pathIcon)
 
-    def menu(self, appMenu):
-        """
-        Returns a QMenu that will be added to the parent `appMenu`
-        :param appMenu:
-        :return: QMenu
-        """
-        assert isinstance(appMenu, QMenu)  # nosec
+    def menu(self, appMenu: QMenu):
         """
         Specify menu, submenus and actions that become accessible from the EnMAP-Box GUI
         :return: the QMenu or QAction to be added to the "Applications" menu.

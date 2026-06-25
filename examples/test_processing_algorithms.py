@@ -13,7 +13,6 @@ start_app()
 
 
 class MyExampleAlgorithm(QgsProcessingAlgorithm):
-
     INPUT_PATH = 'pathInput'
 
     def __init__(self):
@@ -45,9 +44,6 @@ class MyExampleAlgorithm(QgsProcessingAlgorithm):
                          context: QgsProcessingContext,
                          feedback: QgsProcessingFeedback) -> Dict[str, Any]:
         # do the processing. This can be done in a parallel process
-        assert isinstance(parameters, dict)  # nosec
-        assert isinstance(context, QgsProcessingContext)  # nosec
-        assert isinstance(feedback, QgsProcessingFeedback)  # nosec
 
         feedback.setProgressText(f'Started {self.name()} processing')
 

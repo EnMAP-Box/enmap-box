@@ -48,10 +48,9 @@ y_values = [
     [0.267, 0.127, 0.051],
 ]
 
-
 speclib: QgsVectorLayer = SpectralLibraryUtils.createSpectralLibrary()
-assert isinstance(speclib, QgsVectorLayer)  # nosec
-assert is_spectral_library(speclib)  # nosec
+if not is_spectral_library(speclib):
+    raise ValueError(f'not a spectral library: {speclib}')
 
 pfields = profile_field_list(speclib)
 print(f'profile fields: {pfields}')
@@ -76,7 +75,8 @@ with edit(speclib):
         # add other attributes here
         # ...
 
-        assert speclib.addFeature(feature)  # nosec
+        if not speclib.addFeature(feature):
+            raise ValueError(f'could not add feature {feature}')
 
 # write in-memory spectral library to file
 files = SpectralLibraryUtils.writeToSource(speclib, path)
@@ -90,7 +90,6 @@ for file in files:
 
 # read the written speclib
 speclib2: QgsVectorLayer = SpectralLibraryUtils.readFromSource(files[0])
-
 
 # print the profiles
 pfield2 = profile_field_list(speclib)[0]

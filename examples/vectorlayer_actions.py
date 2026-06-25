@@ -27,6 +27,7 @@
 *                                                                         *
 ***************************************************************************
 """
+from enmapbox.testing import start_app
 from qgis.PyQt.QtCore import QVariant, QSize
 from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QCheckBox
 from qgis.core import (
@@ -35,13 +36,12 @@ from qgis.core import (
 )
 from qgis.gui import QgsMapCanvas, QgsDualView
 
-from enmapbox.testing import start_app
-
 # read https://github.com/qgis/QGIS/blob/master/tests/src/python/test_qgsactionmanager.py
 
 
 APP = start_app()  # this instantiates a QGIS environment.
-assert QgsPythonRunner.isValid()    # nosec is important to run QgsAction of type QgsAction.GenericPython
+if not QgsPythonRunner.isValid():
+    raise ValueError('QgsPythonRunner is not valid')
 
 
 def create_vectordataset() -> QgsVectorLayer:
@@ -101,8 +101,7 @@ conf.setActionWidgetVisible(True)
 conf.setActionWidgetStyle(QgsAttributeTableConfig.ButtonList)
 layer.setAttributeTableConfig(conf)
 
-actionManager = layer.actions()
-assert isinstance(actionManager, QgsActionManager)  # nosec
+actionManager: QgsActionManager = layer.actions()
 
 iconPath = ':/qt-project.org/styles/commonstyle/images/standardbutton-delete-128.png'
 pythonCode = """

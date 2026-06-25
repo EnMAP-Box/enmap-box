@@ -2,13 +2,12 @@
 # check http://doc.qt.io/qt-5/qsettings.html#details for details
 
 
+from enmapbox import enmapboxSettings
 from qgis.PyQt.QtCore import QSettings
 from qgis.PyQt.QtWidgets import QApplication, QInputDialog
-from enmapbox import enmapboxSettings
 
 
 def printSettings(settings: QSettings):
-    assert isinstance(settings, QSettings)  # nosec
     print('# Organisation=' + settings.organizationName())
     print('# Application=' + settings.applicationName())
     for key in sorted(settings.allKeys()):
@@ -26,8 +25,8 @@ printSettings(mySettings)
 app = QApplication([])
 oldText = mySettings.value('My Text', defaultValue='')
 newText, ok = QInputDialog.getText(None, 'Set a text', 'New Text', text=oldText)
-assert isinstance(ok, bool)  # nosec
 if ok:
     mySettings.setValue('My Text', newText)
-
+else:
+    print('No text set')
 # restart this script to see that 'My Text' was saved permanently.
