@@ -25,13 +25,14 @@
 import unittest
 from typing import List, Dict
 
+from qgispluginsupport.qps.speclib.core import profile_field_names
+from qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
+
 from enmapbox.testing import start_app
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMainWindow, QTextEdit, QToolBar, QAction
 from qgis.core import QgsFeature, QgsRasterLayer, QgsCoordinateReferenceSystem, QgsPointXY, QgsRectangle
 from qgis.gui import QgsMapCanvas
-from qgispluginsupport.qps.speclib.core import profile_field_names
-from qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
 
 qgsApp = start_app()
 
@@ -57,7 +58,7 @@ class Examples(unittest.TestCase):
         enmapBox = EnMAPBox.instance()
         enmapBox.close()
 
-        qgsApp.exec_()
+        qgsApp.exec()
 
     def test_Ex2_DataSources(self):
 
@@ -109,7 +110,7 @@ class Examples(unittest.TestCase):
 
         # pro tip: access the DataSource objects directly
 
-        qgsApp.exec_()
+        qgsApp.exec()
 
     def test_Ex2_UniqueDataSources(self):
 
@@ -189,7 +190,7 @@ class Examples(unittest.TestCase):
         for dock in enmapBox.mDockManager.docks(dockType='SPECLIB'):
             print(dock)
 
-        qgsApp.exec_()
+        qgsApp.exec()
 
     def test_Ex4_MapTools(self):
 
@@ -224,7 +225,7 @@ class Examples(unittest.TestCase):
 
         print(f'Last location: {enmapBox.currentLocation()}')
 
-        qgsApp.exec_()
+        qgsApp.exec()
 
     def test_ActivateMapToolsFromExternalApplication(self):
 
@@ -284,7 +285,7 @@ class Examples(unittest.TestCase):
 
         enmapBox.setMapTool(MapTools.SpectralProfile)
 
-        qgsApp.exec_()
+        qgsApp.exec()
 
     def test_Ex5_PointsAndExtents(self):
 

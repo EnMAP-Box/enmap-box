@@ -33,9 +33,9 @@ import sys
 
 import numpy as np
 
-import lmuvegetationapps.Processor_old.Processor_Inversion_core_old as processor
+import enmapbox.apps.lmuvegetationapps.Processor_old.Processor_Inversion_core_old as processor
+from enmapbox.apps.lmuvegetationapps import APP_DIR
 from enmapbox.gui.utils import loadUi
-from lmuvegetationapps import APP_DIR
 from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox, QApplication
 
 # ensure to call QGIS before PyQtGraph
@@ -409,4 +409,4 @@ if __name__ == '__main__':
     app = start_app()
     m = MainUiFunc()
     m.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

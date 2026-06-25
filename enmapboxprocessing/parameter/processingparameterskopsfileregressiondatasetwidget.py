@@ -143,7 +143,7 @@ class ProcessingParameterSkopsFileRegressionDatasetWidget(QWidget):
         from regressiondatasetmanagerapp import RegressionDatasetManagerGui
         self.dialog = RegressionDatasetManagerGui(self)
         self.dialog.mDataset.mFile.setFilePath(filename)
-        self.dialog.exec_()
+        self.dialog.exec()
         filename = self.dialog.mDataset.mFile.filePath()
 
         QMessageBox.information(self, 'Regression Dataset Manager', f'New dataset file {basename(filename)}.')

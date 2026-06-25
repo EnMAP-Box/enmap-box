@@ -1,7 +1,7 @@
 import time
 from typing import Dict, Any
 
-import processing
+import qgis.processing
 from enmapbox.qgispluginsupport.qps.testing import ExampleAlgorithmProvider
 from enmapbox.testing import start_app, TestCase, TestObjects
 from qgis.core import QgsProject, QgsProcessingAlgorithm, QgsProcessingRegistry, QgsApplication, \
@@ -90,8 +90,8 @@ class MyTestCases(TestCase):
         self.assertIsInstance(results, dict)
 
         # run using the runner from the
-        results = processing.run('testalgorithmprovider:examplealg',
-                                 parameters=params, context=context, feedback=feedback)
+        results = qgis.processing.run('testalgorithmprovider:examplealg',
+                                      parameters=params, context=context, feedback=feedback)
 
         self.assertIsInstance(results, dict)
 
@@ -107,7 +107,7 @@ class MyTestCases(TestCase):
 
         context, feedback = self.createProcessingContextFeedback()
 
-        dialog = processing.createAlgorithmDialog('testalgorithmprovider:examplealg')
+        dialog = qgis.processing.createAlgorithmDialog('testalgorithmprovider:examplealg')
 
         # the next line is equivalent to:
         # import os

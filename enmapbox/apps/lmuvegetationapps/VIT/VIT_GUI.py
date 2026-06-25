@@ -6,9 +6,10 @@ import os
 import sys
 
 import lmuvegetationapps.VIT.VIT_core
+from lmuvegetationapps import APP_DIR
+
 from enmapbox.gui.utils import loadUi
 from enmapboxprocessing.rasterreader import RasterReader
-from lmuvegetationapps import APP_DIR
 from qgis.PyQt.QtWidgets import (QDialog, QCheckBox, QFileDialog, QMessageBox, QApplication)
 from qgis.core import QgsMapLayerProxyModel
 from qgis.gui import QgsMapLayerComboBox
@@ -284,7 +285,7 @@ class VIT:
             except Exception:
                 self.main.nodat_widget.init(image_type=image_type, image=image)
                 self.main.nodat_widget.gui.setModal(True)  # parent window is blocked
-                self.main.nodat_widget.gui.exec_()  # unlike .show(), .exec_() waits with execution of the code,
+                self.main.nodat_widget.gui.exec()  # unlike .show(), .exec_() waits with execution of the code,
                 # until the app is closed
                 return self.main.nodat_widget.nodat, nbands, nrows, ncols, dtype
 
@@ -452,4 +453,4 @@ if __name__ == '__main__':
     app = start_app()
     m = MainUiFunc()
     m.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

@@ -25,10 +25,11 @@
 import os
 import sys
 
-from enmapbox.gui.utils import loadUi
-from enmapboxprocessing.rasterreader import RasterReader
 from lmuvegetationapps import APP_DIR
 from lmuvegetationapps.PWR.PWR_core import PWR_core
+
+from enmapbox.gui.utils import loadUi
+from enmapboxprocessing.rasterreader import RasterReader
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtWidgets import QDialog, QLabel, QFileDialog, QMessageBox, QApplication
@@ -197,7 +198,7 @@ class PWR:
         except Exception:
             self.main.nodat_widget.init(image_type=image_type, image=image)
             self.main.nodat_widget.gui.setModal(True)  # parent window is blocked
-            self.main.nodat_widget.gui.exec_()  # unlike .show(), .exec_() waits with execution of the code
+            self.main.nodat_widget.gui.exec()  # unlike .show(), .exec() waits with execution of the code
             return self.main.nodat_widget.nodat, nbands, nrows, ncols, dtype
 
     def NDWI_th_change(self):
@@ -345,4 +346,4 @@ if __name__ == '__main__':
     app = start_app()
     m = MainUiFunc()
     m.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

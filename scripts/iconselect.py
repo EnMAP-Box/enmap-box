@@ -20,7 +20,7 @@ def run():
     browser.show()
 
     if needApp:
-        app.exec_()
+        app.exec()
 
 
 if __name__ == '__main__':

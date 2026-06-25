@@ -27,6 +27,7 @@ from contextlib import suppress
 
 import numpy as np
 import pyqtgraph as pg
+from lmuvegetationapps import APP_DIR
 from scipy.interpolate import interp1d
 from scipy.signal import savgol_filter
 
@@ -36,7 +37,6 @@ from enmapbox.gui.utils import loadUi
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
-from lmuvegetationapps import APP_DIR
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QDialog, QApplication, QFileDialog, QMessageBox
@@ -256,7 +256,7 @@ class iREIP:
         except Exception:
             self.main.nodat_widget.init(image_type=image_type, image=image)
             self.main.nodat_widget.gui.setModal(True)  # parent window is blocked
-            self.main.nodat_widget.gui.exec_()
+            self.main.nodat_widget.gui.exec()
             # unlike .show(), .exec_() waits with execution of the code, until the app is closed
             return self.main.nodat_widget.nodat, nbands, nrows, ncols, dtype
 
@@ -1121,4 +1121,4 @@ if __name__ == '__main__':
     app = start_app()
     m = MainUiFunc()
     m.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

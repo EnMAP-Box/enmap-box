@@ -27,22 +27,22 @@ import csv
 import os
 import sys
 
+import lmuvegetationapps.Resources.PROSAIL.call_model as mod
 # Fills and handles the GUI for creating LUTs in the EnMAP-Box
 import numpy as np
 # ensure to call QGIS before PyQtGraph
 import pyqtgraph as pg
-from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox, QTableWidgetItem, QHeaderView, QApplication
+from lmuvegetationapps import APP_DIR
+from lmuvegetationapps.Resources.Spec2Sensor.Spec2Sensor_core import Spec2Sensor, BuildTrueSRF, BuildGenericSRF
 from scipy.interpolate import interp1d
 from scipy.stats import norm, uniform
 
-import lmuvegetationapps.Resources.PROSAIL.call_model as mod
 # from _classic.hubflow.core import openRasterDataset
 from enmapbox.gui.utils import loadUi
 from enmapboxprocessing.rasterreader import RasterReader
-from lmuvegetationapps import APP_DIR
-from lmuvegetationapps.Resources.Spec2Sensor.Spec2Sensor_core import Spec2Sensor, BuildTrueSRF, BuildGenericSRF
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox, QTableWidgetItem, QHeaderView, QApplication
 from qgis.gui import QgsMapLayerComboBox
 
 pathUI_LUT = os.path.join(APP_DIR, 'Resources/UserInterfaces/CreateLUT.ui')
@@ -153,7 +153,7 @@ class LUT:
         self.npara_flat = len(self.para_flat)  # number of parameters in total (independent of chosen Prospect)
 
         (self.N, self.cab, self.cw, self.cm, self.car, self.cbrown, self.anth, self.cp, self.cbc,
-            self.LAI, self.LIDF, self.hspot, self.tto, self.tts, self.psi, self.psoil, self.LAIu, self.sd, self.h,
+         self.LAI, self.LIDF, self.hspot, self.tto, self.tts, self.psi, self.psoil, self.LAIu, self.sd, self.h,
          self.cd) = ([] for _ in range(self.npara_flat))  # all parameters are initialized as empty lists
 
         self.depends = 0  # 0: no dependency of car-cab; 1: dependency is turned on
@@ -614,8 +614,8 @@ class LUT:
 
         # Check if the LOP and Canopy_arch_model are known and set in the GUI accordingly
         if (
-            (lop in ["prospectPro", "prospectD", "prospect5B", "prospect5", "prospect4"])
-            and (canopy_arch in ["None", "sail", "inform"])
+                (lop in ["prospectPro", "prospectD", "prospect5B", "prospect5", "prospect4"])
+                and (canopy_arch in ["None", "sail", "inform"])
         ):
             self.select_model(lop=lop, canopy_arch=canopy_arch)
             if lop == 'prospectPro':
@@ -891,30 +891,30 @@ class LUT:
 
             elif len(self.dict_vals[self.para_list[0][i]]) > 3:  # gauss distribution, out of range?
                 if (
-                    self.dict_vals[self.para_list[0][i]][2] > self.dict_vals[self.para_list[0][i]][1]
-                    or self.dict_vals[self.para_list[0][i]][2] < self.dict_vals[self.para_list[0][i]][0]
+                        self.dict_vals[self.para_list[0][i]][2] > self.dict_vals[self.para_list[0][i]][1]
+                        or self.dict_vals[self.para_list[0][i]][2] < self.dict_vals[self.para_list[0][i]][0]
                 ):
                     self.abort(message='Parameter %s: mean value must lie between min and max' % self.para_list[0][i])
                     return False
                 elif (
-                    self.dict_vals[self.para_list[0][i]][0] < self.dict_boundaries[key][0]
-                    or self.dict_vals[self.para_list[0][i]][1] > self.dict_boundaries[key][1]
+                        self.dict_vals[self.para_list[0][i]][0] < self.dict_boundaries[key][0]
+                        or self.dict_vals[self.para_list[0][i]][1] > self.dict_boundaries[key][1]
                 ):
                     self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[0][i])
                     return False
 
             elif len(self.dict_vals[self.para_list[0][i]]) > 1:  # uniform distribution, out of range?
                 if (
-                    self.dict_vals[self.para_list[0][i]][0] < self.dict_boundaries[key][0]
-                    or self.dict_vals[self.para_list[0][i]][1] > self.dict_boundaries[key][1]
+                        self.dict_vals[self.para_list[0][i]][0] < self.dict_boundaries[key][0]
+                        or self.dict_vals[self.para_list[0][i]][1] > self.dict_boundaries[key][1]
                 ):
                     self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[0][i])
                     return False
 
             elif len(self.dict_vals[self.para_list[0][i]]) > 0:  # fixed value our of range?
                 if (
-                    self.dict_vals[self.para_list[0][i]][0] < self.dict_boundaries[key][0]
-                    or self.dict_vals[self.para_list[0][i]][0] > self.dict_boundaries[key][1]
+                        self.dict_vals[self.para_list[0][i]][0] < self.dict_boundaries[key][0]
+                        or self.dict_vals[self.para_list[0][i]][0] > self.dict_boundaries[key][1]
                 ):
                     self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[0][i])
                     return False
@@ -926,30 +926,30 @@ class LUT:
 
                 elif len(self.dict_vals[self.para_list[1][i]]) > 3:  # gauss distribution, out of range?
                     if (
-                        self.dict_vals[self.para_list[1][i]][2] > self.dict_vals[self.para_list[1][i]][1]
-                        or self.dict_vals[self.para_list[1][i]][2] < self.dict_vals[self.para_list[1][i]][0]
+                            self.dict_vals[self.para_list[1][i]][2] > self.dict_vals[self.para_list[1][i]][1]
+                            or self.dict_vals[self.para_list[1][i]][2] < self.dict_vals[self.para_list[1][i]][0]
                     ):
                         self.abort(
                             message='Parameter %s: mean value must lie between min and max' % self.para_list[1][i])
                         return False
                     elif (
-                        self.dict_vals[self.para_list[1][i]][0] < self.dict_boundaries[key][0]
-                        or self.dict_vals[self.para_list[1][i]][1] > self.dict_boundaries[key][1]
+                            self.dict_vals[self.para_list[1][i]][0] < self.dict_boundaries[key][0]
+                            or self.dict_vals[self.para_list[1][i]][1] > self.dict_boundaries[key][1]
                     ):
                         self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[1][i])
                         return False
 
                 elif len(self.dict_vals[self.para_list[1][i]]) > 1:  # uniform distribution, out of range?
                     if (
-                        self.dict_vals[self.para_list[1][i]][0] < self.dict_boundaries[key][0]
-                        or self.dict_vals[self.para_list[1][i]][1] > self.dict_boundaries[key][1]
+                            self.dict_vals[self.para_list[1][i]][0] < self.dict_boundaries[key][0]
+                            or self.dict_vals[self.para_list[1][i]][1] > self.dict_boundaries[key][1]
                     ):
                         self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[1][i])
                         return False
                 elif len(self.dict_vals[self.para_list[1][i]]) > 0:  # fixed value our of range?
                     if (
-                        self.dict_vals[self.para_list[1][i]][0] < self.dict_boundaries[key][0]
-                        or self.dict_vals[self.para_list[1][i]][0] > self.dict_boundaries[key][1]
+                            self.dict_vals[self.para_list[1][i]][0] < self.dict_boundaries[key][0]
+                            or self.dict_vals[self.para_list[1][i]][0] > self.dict_boundaries[key][1]
                     ):
                         self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[1][i])
                         return False
@@ -1823,4 +1823,4 @@ if __name__ == '__main__':
     app = start_app()
     m = MainUiFunc()
     m.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

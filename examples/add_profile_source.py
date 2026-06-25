@@ -1,13 +1,12 @@
 from typing import List, Tuple, Dict
 
-from qgis.PyQt.QtCore import QSize
-
-from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import prepareProfileValueDict
+from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import prepareProfileValueDict
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprofilesources import SpectralProfileSource
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.testing import start_app
-from enmapbox import initAll
+from qgis.PyQt.QtCore import QSize
 from qgis.core import QgsExpressionContext, QgsExpressionContextScope
 
 app = start_app()
@@ -68,4 +67,4 @@ box.spectralProfileSourcePanel().spectralProfileBridge().addSources(source)
 
 box.ui.show()
 
-app.exec_()
+app.exec()

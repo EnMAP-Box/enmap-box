@@ -33,15 +33,15 @@ import sys
 from contextlib import suppress
 
 import numpy as np
-from qgis.PyQt.QtWidgets import QDialog, QApplication, QFileDialog, QMessageBox
+from arcoop.andreas_rabe.pyqtgraph.examples.ExampleApp import QColor
+from lmuvegetationapps import APP_DIR
+from lmuvegetationapps.ASI.peakdetect import peakdetect
 from scipy.interpolate import interp1d
 
-from arcoop.andreas_rabe.pyqtgraph.examples.ExampleApp import QColor
 from enmapbox.gui.utils import loadUi
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader
-from lmuvegetationapps import APP_DIR
-from lmuvegetationapps.ASI.peakdetect import peakdetect
+from qgis.PyQt.QtWidgets import QDialog, QApplication, QFileDialog, QMessageBox
 from qgis.core import QgsMapLayerProxyModel
 from qgis.gui import QgsMapLayerComboBox
 
@@ -263,7 +263,7 @@ class ASI:
         except Exception:
             self.main.nodat_widget.init(image_type=image_type, image=image)
             self.main.nodat_widget.gui.setModal(True)  # parent window is blocked
-            self.main.nodat_widget.gui.exec_()  # unlike .show(), .exec_() waits with execution of the code
+            self.main.nodat_widget.gui.exec()  # unlike .show(), .exec_() waits with execution of the code
             return self.main.nodat_widget.nodat, nbands, nrows, ncols, dtype
 
     def reset(self):
@@ -1309,4 +1309,4 @@ if __name__ == '__main__':
     app = start_app()
     m = MainUiFunc()
     m.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

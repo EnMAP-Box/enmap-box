@@ -1,9 +1,10 @@
 import unittest
 
+from hzg_onns.core import onns
+
 from enmapbox.apps.hzg_onns import OnnsProcessingAlgorithm
 from enmapbox.testing import start_app, TestCase
 from enmapboxtestdata import SensorProducts, sensorProductsRoot
-from hzg_onns.core import onns
 from processing.core.Processing import Processing
 
 start_app()
@@ -41,7 +42,7 @@ class ONNSTestCases(TestCase):
             alg.P_FILE: str(path_s3),
             alg.P_OUTPUT_FOLDER: str(tmp)}
 
-        result = Processing.runAlgorithm(alg, parameters=param)
+        Processing.runAlgorithm(alg, parameters=param)
 
 
 if __name__ == '__main__':

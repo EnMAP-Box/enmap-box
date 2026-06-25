@@ -7,10 +7,10 @@ from qgis.PyQt.QtGui import QImage
 
 
 def file_search(
-    rootdir,
-    pattern,
-    recursive=False,
-    ignoreCase=False
+        rootdir,
+        pattern,
+        recursive=False,
+        ignoreCase=False
 ):
     if not os.path.isdir(rootdir):
         raise ValueError("Path is not a directory:{}".format(rootdir))
@@ -23,8 +23,10 @@ def file_search(
                     path = os.path.join(root, file)
                     yield path
 
-            elif (ignoreCase and fnmatch.fnmatch(file.lower(), pattern.lower())) \
-                or fnmatch.fnmatch(file, pattern):
+            elif (
+                    (ignoreCase and fnmatch.fnmatch(file.lower(), pattern.lower()))
+                    or fnmatch.fnmatch(file, pattern)
+            ):
 
                 path = os.path.join(root, file)
                 yield path

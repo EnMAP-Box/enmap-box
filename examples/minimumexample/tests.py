@@ -21,10 +21,11 @@
 
 from unittest import TestCase
 
-from enmapbox.gui.applications import EnMAPBoxApplication
-from enmapbox.testing import start_app
 from minimumexample.exampleapp import exampleAlgorithm, ExampleProcessingAlgorithm, ExampleApplicationGUI, \
     ExampleApplication
+
+from enmapbox.gui.applications import EnMAPBoxApplication
+from enmapbox.testing import start_app
 from qgis.core import QgsProcessingAlgorithm, QgsProcessingContext, QgsProcessingFeedback, QgsProcessingProvider
 
 # initialize the QGIS API + several background states
@@ -77,7 +78,7 @@ class TestExampleEnMAPBoxApp(TestCase):
         self.assertEqual(g.numberOfClicks(), 1)
 
         if SHOW_GUI:
-            APP.exec_()
+            APP.exec()
 
     def test_with_EnMAPBox(self):
         """
@@ -98,7 +99,7 @@ class TestExampleEnMAPBoxApp(TestCase):
             self.assertTrue(name in algorithmNames)
 
         if SHOW_GUI:
-            APP.exec_()
+            APP.exec()
 
 
 if __name__ == "__main__":
