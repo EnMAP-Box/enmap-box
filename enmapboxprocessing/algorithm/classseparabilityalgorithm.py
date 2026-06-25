@@ -21,7 +21,7 @@ class ClassSeparabilityAlgorithm(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._DATASET, 'Dataset pickle file used for assessing the class separability.'),
+            (self._DATASET, 'Dataset skops file used for assessing the class separability.'),
         ]
 
     def group(self):
@@ -35,7 +35,7 @@ class ClassSeparabilityAlgorithm(EnMAPProcessingAlgorithm):
     ) -> Dict[str, Any]:
         filenameSample = self.parameterAsFile(parameters, self.P_DATASET, context)
 
-        sample = ClassifierDump(**Utils.pickleLoad(filenameSample))
+        sample = ClassifierDump(**Utils.modelLoad(filenameSample))
         feedback.pushInfo(f'Load sample data: X{list(sample.X.shape)} y{list(sample.y.shape)}')
 
         self.calculateStats(sample, feedback)

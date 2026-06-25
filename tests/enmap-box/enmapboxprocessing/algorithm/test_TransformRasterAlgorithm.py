@@ -9,7 +9,7 @@ from enmapboxprocessing.algorithm.inversetransformrasteralgorithm import Inverse
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.algorithm.transformrasteralgorithm import TransformRasterAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxtestdata import classifierDumpPkl
+from enmapboxtestdata import classifierDumpSkops
 
 
 class FitTestTransformerAlgorithm(FitTransformerAlgorithmBase):
@@ -35,9 +35,9 @@ class TestTransformRasterAlgorithm(TestCase):
         algFit = FitTestTransformerAlgorithm()
         algFit.initAlgorithm()
         parametersFit = {
-            algFit.P_DATASET: classifierDumpPkl,
+            algFit.P_DATASET: classifierDumpSkops,
             algFit.P_TRANSFORMER: algFit.defaultCodeAsString(),
-            algFit.P_OUTPUT_TRANSFORMER: self.filename('transformer.pkl'),
+            algFit.P_OUTPUT_TRANSFORMER: self.filename('transformer.skops'),
         }
         self.runalg(algFit, parametersFit)
 
@@ -71,7 +71,7 @@ class TestTransformRasterAlgorithm(TestCase):
             algDataset.P_FEATURE_RASTER: enmap_potsdam,
             algDataset.P_EXCLUDE_BAD_BANDS: True,
             algDataset.P_SAMPLE_SIZE: 100,
-            algDataset.P_OUTPUT_DATASET: self.filename('dataset.pkl'),
+            algDataset.P_OUTPUT_DATASET: self.filename('dataset.skops'),
         }
         self.runalg(algDataset, parametersDataset)
 
@@ -80,7 +80,7 @@ class TestTransformRasterAlgorithm(TestCase):
         parametersFit = {
             algFit.P_DATASET: parametersDataset[algDataset.P_OUTPUT_DATASET],
             algFit.P_TRANSFORMER: algFit.defaultCodeAsString(),
-            algFit.P_OUTPUT_TRANSFORMER: self.filename('transformer.pkl'),
+            algFit.P_OUTPUT_TRANSFORMER: self.filename('transformer.skops'),
         }
         self.runalg(algFit, parametersFit)
 
@@ -103,7 +103,7 @@ class TestTransformRasterAlgorithm(TestCase):
             algDataset.P_FEATURE_RASTER: enmap_potsdam,
             algDataset.P_EXCLUDE_BAD_BANDS: True,
             algDataset.P_SAMPLE_SIZE: 100,
-            algDataset.P_OUTPUT_DATASET: self.filename('dataset.pkl'),
+            algDataset.P_OUTPUT_DATASET: self.filename('dataset.skops'),
         }
         self.runalg(algDataset, parametersDataset)
 
@@ -112,7 +112,7 @@ class TestTransformRasterAlgorithm(TestCase):
         parametersFit = {
             algFit.P_DATASET: parametersDataset[algDataset.P_OUTPUT_DATASET],
             algFit.P_TRANSFORMER: algFit.defaultCodeAsString(),
-            algFit.P_OUTPUT_TRANSFORMER: self.filename('transformer.pkl'),
+            algFit.P_OUTPUT_TRANSFORMER: self.filename('transformer.skops'),
         }
         self.runalg(algFit, parametersFit)
 

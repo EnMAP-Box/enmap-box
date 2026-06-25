@@ -46,13 +46,13 @@ class PredictClusteringAlgorithm(EnMAPProcessingAlgorithm):
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
-        self.addParameterPickleFile(self.P_CLUSTERER, self._CLUSTERER)
+        self.addParameterSkopsFile(self.P_CLUSTERER, self._CLUSTERER)
         self.addParameterBoolean(self.P_MATCH_BY_NAME, self._MATCH_BY_NAME, False, True)
         self.addParameterRasterDestination(self.P_OUTPUT_CLASSIFICATION, self._OUTPUT_CLASSIFICATION)
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
         try:
-            ClustererDump.fromDict(Utils.pickleLoad(self.parameterAsFile(parameters, self.P_CLUSTERER, context)))
+            ClustererDump.fromDict(Utils.modelLoad(self.parameterAsFile(parameters, self.P_CLUSTERER, context)))
         except TypeError:
             return False, 'Invalid clusterer file.'
         return True, ''

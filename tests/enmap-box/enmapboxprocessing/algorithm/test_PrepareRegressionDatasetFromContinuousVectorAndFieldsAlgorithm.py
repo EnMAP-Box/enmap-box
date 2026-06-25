@@ -14,10 +14,10 @@ class TestPrepareRegressionDatasetFromContinuousVectorAndFieldsAlgorithm(TestCas
             alg.P_CONTINUOUS_VECTOR: classificationDatasetAsGpkgVector,
             alg.P_FEATURE_FIELDS: [f'Sample__{i + 1}' for i in range(177)],
             alg.P_TARGET_FIELDS: ['level_1_id', 'level_2_id', 'level_3_id'],
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = RegressorDump.fromDict(Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = RegressorDump.fromDict(Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((299, 177), dump.X.shape)
         self.assertEqual((299, 3), dump.y.shape)
         self.assertEqual(177, len(dump.features))

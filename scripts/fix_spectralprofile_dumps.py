@@ -1,10 +1,10 @@
 """
 Fixes SpectralProfile fields in a vector layer.
-Converts the content of binary SpectralProfile fields from old-style pickle dumps to binary encoded JSON format.
+Converts the content of binary SpectralProfile fields from old-style skops dumps to binary encoded JSON format.
 """
 import argparse
 import json
-import pickle  # nosec: B403 # we need pickle to reconstruct the old data
+import skops  # nosec: B403 # we need skops to reconstruct the old data
 import sys
 from pathlib import Path
 from typing import Union, List, Optional
@@ -66,9 +66,9 @@ def fix_binary_profile_fields(
                     profile_dict = json.loads(stringFromByteArray(data_old))
                     # everything is fine
                 except UnicodeDecodeError:
-                    # old-style pickle format.
-                    # using pickle is required here to reconstruct the old data
-                    profile_dict = pickle.loads(data_old.data())  # nosec 301
+                    # old-style skops format.
+                    # using skops is required here to reconstruct the old data
+                    profile_dict = skops.loads(data_old.data())  # nosec 301
                     needs_conversion = True
 
                 success, msg, d = validateProfileValueDict(profile_dict)

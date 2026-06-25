@@ -1,4 +1,5 @@
 import traceback
+from ast import literal_eval
 from enum import Enum
 from math import nan
 from os import makedirs
@@ -48,9 +49,9 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         MaxResampleAlg = range(12)
     O_DATA_TYPE = 'Byte Int16 UInt16 UInt32 Int32 Float32 Float64'.split()
     Byte, Int16, UInt16, Int32, UInt32, Float32, Float64 = range(len(O_DATA_TYPE))
-    PickleFileFilter = 'Pickle files (*.pkl)'
-    PickleFileExtension = 'pkl'
-    PickleFileDestination = 'Pickle file destination.'
+    SkopsFileFilter = 'Skops files (*.skops)'
+    SkopsFileExtension = 'skops'
+    SkopsFileDestination = 'Skops file destination.'
     JsonFileFilter = 'JSON files (*.json)'
     JsonFileExtension = 'json'
     JsonFileDestination = 'JSON file destination.'
@@ -64,7 +65,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     CsvFileFilter = 'CSV files (*.csv)'
     CsvFileExtension = 'cvs'
     CsvFileDestination = 'CSV file destination.'
-    DatasetFileFilter = PickleFileFilter + ';;' + JsonFileFilter
+    DatasetFileFilter = SkopsFileFilter + ';;' + JsonFileFilter
     DatasetFileDestination = 'Dataset file destination.'
     RasterFileDestination = 'Raster file destination.'
     VectorFileDestination = 'Vector file destination.'
@@ -246,7 +247,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         filename = super().parameterAsFile(parameters, name, context)
         if filename == '':
             return None
-        dump = Utils.pickleLoad(filename)
+        dump = Utils.modelLoad(filename)
         dump = ClassifierDump.fromDict(dump)
         return dump
 
@@ -257,7 +258,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         filename = super().parameterAsFile(parameters, name, context)
         if filename == '':
             return None
-        dump = Utils.pickleLoad(filename)
+        dump = Utils.modelLoad(filename)
         try:
             dump = RegressorDump.fromDict(dump)
         except Exception:
@@ -281,7 +282,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         filename = super().parameterAsFile(parameters, name, context)
         if filename == '':
             return None
-        dump = Utils.pickleLoad(filename)
+        dump = Utils.modelLoad(filename)
         dump = TransformerDump.fromDict(dump)
         return dump
 
@@ -291,7 +292,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         filename = super().parameterAsFile(parameters, name, context)
         if filename == '':
             return None
-        dump = Utils.pickleLoad(filename)
+        dump = Utils.modelLoad(filename)
         dump = ClustererDump.fromDict(dump)
         return dump
 
@@ -367,7 +368,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
 
         string = string.replace('\n', '')
         try:
-            values = eval(string, {'nan': nan})
+            values = literal_eval(string)
         except Exception:
             raise QgsProcessingException(f'Invalid value list: {self.parameterDefinition(name).description()}')
 
@@ -430,7 +431,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         if string == '':
             return None
         try:
-            value = eval(string, {'nan': nan})
+            value = literal_eval(string)
         except Exception:
             raise QgsProcessingException(f'Invalid value: {self.parameterDefinition(name).description()}')
 
@@ -689,16 +690,16 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def addParameterClassificationDataset(
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
-        from enmapboxprocessing.parameter.processingparameterpicklefileclassificationdatasetwidget import \
-            ProcessingParameterPickleFileClassificationDatasetWidgetWrapper
+        from enmapboxprocessing.parameter.processingparameterskopsfileclassificationdatasetwidget import \
+            ProcessingParameterSkopsFileClassificationDatasetWidgetWrapper
         behavior = QgsProcessingParameterFile.Behavior.File
         extension = ''
-        fileFilter = 'Pickle files (*.pkl);;JSON files (*.json)'
+        fileFilter = 'Skops files (*.skops);;JSON files (*.json)'
         param = QgsProcessingParameterFile(name, description, behavior, extension, defaultValue, optional, fileFilter)
 
         if not self.isRunnungInsideModeller():
             param.setMetadata(
-                {'widget_wrapper': {'class': ProcessingParameterPickleFileClassificationDatasetWidgetWrapper}})
+                {'widget_wrapper': {'class': ProcessingParameterSkopsFileClassificationDatasetWidgetWrapper}})
             param.setDefaultValue(defaultValue)
 
         self.addParameter(param)
@@ -718,16 +719,16 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def addParameterRegressionDataset(
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
-        from enmapboxprocessing.parameter.processingparameterpicklefileregressiondatasetwidget import \
-            ProcessingParameterPickleFileRegressionDatasetWidgetWrapper
+        from enmapboxprocessing.parameter.processingparameterskopsfileregressiondatasetwidget import \
+            ProcessingParameterSkopsFileRegressionDatasetWidgetWrapper
         behavior = QgsProcessingParameterFile.Behavior.File
         extension = ''
-        fileFilter = 'Pickle files (*.pkl);;JSON files (*.json)'
+        fileFilter = 'Skops files (*.skops);;JSON files (*.json)'
         param = QgsProcessingParameterFile(name, description, behavior, extension, defaultValue, optional, fileFilter)
 
         if not self.isRunnungInsideModeller():
             param.setMetadata(
-                {'widget_wrapper': {'class': ProcessingParameterPickleFileRegressionDatasetWidgetWrapper}}
+                {'widget_wrapper': {'class': ProcessingParameterSkopsFileRegressionDatasetWidgetWrapper}}
             )
             param.setDefaultValue(defaultValue)
 
@@ -748,16 +749,16 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def addParameterUnsupervisedDataset(
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
-        from enmapboxprocessing.parameter.processingparameterpicklefileunsuperviseddatasetwidget import \
-            ProcessingParameterPickleFileUnsupervisedDatasetWidgetWrapper
+        from enmapboxprocessing.parameter.processingparameterskopsfileunsuperviseddatasetwidget import \
+            ProcessingParameterSkopsFileUnsupervisedDatasetWidgetWrapper
         behavior = QgsProcessingParameterFile.Behavior.File
         extension = ''
-        fileFilter = 'Pickle files (*.pkl);;JSON files (*.json)'
+        fileFilter = 'Skops files (*.skops);;JSON files (*.json)'
         param = QgsProcessingParameterFile(name, description, behavior, extension, defaultValue, optional, fileFilter)
 
         if not self.isRunnungInsideModeller():
             param.setMetadata(
-                {'widget_wrapper': {'class': ProcessingParameterPickleFileUnsupervisedDatasetWidgetWrapper}}
+                {'widget_wrapper': {'class': ProcessingParameterSkopsFileUnsupervisedDatasetWidgetWrapper}}
             )
             param.setDefaultValue(defaultValue)
 
@@ -866,18 +867,18 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         )
         self.flagParameterAsAdvanced(name, advanced)
 
-    def addParameterPickleFile(
+    def addParameterSkopsFile(
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
-        from enmapboxprocessing.parameter.processingparameterpicklefilewidget import \
-            ProcessingParameterPickleFileWidgetWrapper
+        from enmapboxprocessing.parameter.processingparameterskopsfilewidget import \
+            ProcessingParameterSkopsFileWidgetWrapper
 
         param = QgsProcessingParameterFile(
             name, description, QgsProcessingParameterFile.Behavior.File, '', defaultValue, optional,
-            self.PickleFileFilter
+            self.SkopsFileFilter
         )
         if not self.isRunnungInsideModeller():
-            param.setMetadata({'widget_wrapper': {'class': ProcessingParameterPickleFileWidgetWrapper}})
+            param.setMetadata({'widget_wrapper': {'class': ProcessingParameterSkopsFileWidgetWrapper}})
             param.setDefaultValue(defaultValue)
         self.addParameter(param)
         self.flagParameterAsAdvanced(name, advanced)

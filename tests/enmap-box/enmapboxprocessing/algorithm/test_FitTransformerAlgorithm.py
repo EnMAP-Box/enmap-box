@@ -17,7 +17,7 @@ from enmapboxprocessing.algorithm.fittransformeralgorithmbase import FitTransfor
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import classifierDumpPkl
+from enmapboxtestdata import classifierDumpSkops
 from enmapboxtestdata import enmap
 from qgis.core import QgsProcessingException
 
@@ -47,12 +47,12 @@ class TestFitTransformerAlgorithm(TestCase):
     def test_fit_withDataset(self):
         alg = FitTestTransformerAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifierDumpSkops,
             alg.P_TRANSFORMER: alg.defaultCodeAsString(),
-            alg.P_OUTPUT_TRANSFORMER: self.filename('transformer.pkl')
+            alg.P_OUTPUT_TRANSFORMER: self.filename('transformer.skops')
         }
         self.runalg(alg, parameters)
-        dump = TransformerDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_TRANSFORMER]))
+        dump = TransformerDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_TRANSFORMER]))
         self.assertEqual(['band 8 (0.460000 Micrometers)', 'band 9 (0.465000 Micrometers)'], dump.features[:2])
         self.assertEqual((58, 177), dump.X.shape)
         self.assertIsInstance(dump.transformer, TransformerMixin)
@@ -63,10 +63,10 @@ class TestFitTransformerAlgorithm(TestCase):
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
             alg.P_TRANSFORMER: alg.defaultCodeAsString(),
-            alg.P_OUTPUT_TRANSFORMER: self.filename('transformer.pkl')
+            alg.P_OUTPUT_TRANSFORMER: self.filename('transformer.skops')
         }
         self.runalg(alg, parameters)
-        dump = TransformerDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_TRANSFORMER]))
+        dump = TransformerDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_TRANSFORMER]))
         self.assertEqual(['band 8 (0.460000 Micrometers)', 'band 9 (0.465000 Micrometers)'], dump.features[:2])
         self.assertEqual((836, 177), dump.X.shape)
         self.assertIsInstance(dump.transformer, TransformerMixin)
@@ -78,10 +78,10 @@ class TestFitTransformerAlgorithm(TestCase):
             alg.P_FEATURE_RASTER: enmap,
             alg.P_SAMPLE_SIZE: 0,
             alg.P_TRANSFORMER: alg.defaultCodeAsString(),
-            alg.P_OUTPUT_TRANSFORMER: self.filename('transformer.pkl')
+            alg.P_OUTPUT_TRANSFORMER: self.filename('transformer.skops')
         }
         self.runalg(alg, parameters)
-        dump = TransformerDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_TRANSFORMER]))
+        dump = TransformerDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_TRANSFORMER]))
         self.assertEqual(['band 8 (0.460000 Micrometers)', 'band 9 (0.465000 Micrometers)'], dump.features[:2])
         self.assertEqual((71158, 177), dump.X.shape)
         self.assertIsInstance(dump.transformer, TransformerMixin)
@@ -90,9 +90,9 @@ class TestFitTransformerAlgorithm(TestCase):
     def test_error(self):
         alg = FitTestTransformerAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifierDumpSkops,
             alg.P_FEATURE_RASTER: enmap,
-            alg.P_OUTPUT_TRANSFORMER: self.filename('transformer.pkl')
+            alg.P_OUTPUT_TRANSFORMER: self.filename('transformer.skops')
         }
         try:
             self.runalg(alg, parameters)
@@ -121,16 +121,16 @@ class TestFitTransformerAlgorithm(TestCase):
             alg.initAlgorithm()
             alg.shortHelpString()
             parameters = {
-                alg.P_DATASET: classifierDumpPkl,
+                alg.P_DATASET: classifierDumpSkops,
                 alg.P_TRANSFORMER: alg.defaultCodeAsString(),
-                alg.P_OUTPUT_TRANSFORMER: self.filename('transformer.pkl')
+                alg.P_OUTPUT_TRANSFORMER: self.filename('transformer.skops')
             }
             self.runalg(alg, parameters)
 
     def test_createSummary(self):
         alg = FitTestTransformerAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
-            alg.P_OUTPUT_TRANSFORMER: self.filename('transformer.pkl')
+            alg.P_DATASET: classifierDumpSkops,
+            alg.P_OUTPUT_TRANSFORMER: self.filename('transformer.skops')
         }
         self.runalg(alg, parameters)

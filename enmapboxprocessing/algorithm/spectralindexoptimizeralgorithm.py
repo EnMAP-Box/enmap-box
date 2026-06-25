@@ -33,7 +33,9 @@ class SpectralIndexOptimizerAlgorithm(EnMAPProcessingAlgorithm):
         return [
             (self._DATASET, 'The regression dataset.'),
             (self._FORMULA, 'The formula with variable features A and B to be optimized, '
-                            'and up to three fixed features F1, F2 and F3.'),
+                            'and up to three fixed features F1, F2 and F3.\n'
+                            'Note: The Python code provided here is executed locally with the permissions of the '
+                            'current user during algorithm execution.'),
             (self._MAX_FEATURES, 'Limit the number of features to be evaluated. Default is to use all features.'),
             (self._F1, 'Specify to use a fixed feature F1 in the formula.'),
             (self._F2, 'Specify to use a fixed feature F2 in the formula.'),
@@ -71,7 +73,7 @@ class SpectralIndexOptimizerAlgorithm(EnMAPProcessingAlgorithm):
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)
 
-            dump = RegressorDump.fromDict(Utils.pickleLoad(filenameDataset))
+            dump = RegressorDump.fromDict(Utils.modelLoad(filenameDataset))
             features = np.array(dump.features)
             targets = dump.targets
             X = np.array(dump.X, np.float32)
@@ -105,7 +107,11 @@ class SpectralIndexOptimizerAlgorithm(EnMAPProcessingAlgorithm):
                 for bi in range(ai + 1, nfeatures):
                     B = X[:, bi]
                     for yi in range(ntargets):
-                        S = eval(formula, {'A': A, 'B': B, 'F1': F1, 'F2': F2, 'F3': F3})
+                        # nosec B307 - User-defined spectral index code evaluation by design;
+                        # equivalent to the QGIS Python Console.
+                        # The code execution is transparently documented for users
+                        # (e.g. via the Processing algorithm help).
+                        S = eval(formula, {'A': A, 'B': B, 'F1': F1, 'F2': F2, 'F3': F3})  # nosec
 
                         if not isinstance(S, np.ndarray):
                             raise ValueError(

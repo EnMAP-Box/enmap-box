@@ -30,7 +30,7 @@ class PrepareRegressionDatasetFromContinuousVectorAlgorithm(EnMAPProcessingAlgor
         return 'Create regression dataset (from continuous-valued vector layer and feature raster)'
 
     def shortDescription(self) -> str:
-        return 'Create a regression dataset by sampling data and store the result as a pickle file.'
+        return 'Create a regression dataset by sampling data and store the result as a skops file.'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
@@ -43,7 +43,7 @@ class PrepareRegressionDatasetFromContinuousVectorAlgorithm(EnMAPProcessingAlgor
             (self._TARGET_FIELDS, 'Fields used as target data y. '
                                   'If not selected, the fields defined by the renderer are used. '
                                   'If those are also not specified, an error is raised.'),
-            (self._OUTPUT_DATASET, self.PickleFileDestination)
+            (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
     def group(self):
@@ -57,7 +57,7 @@ class PrepareRegressionDatasetFromContinuousVectorAlgorithm(EnMAPProcessingAlgor
             self.P_TARGET_FIELDS, self._TARGET_FIELDS, None, self.P_CONTINUOUS_VECTOR,
             QgsProcessingParameterField.DataType.Numeric, True, True, False, True
         )
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
@@ -120,7 +120,7 @@ class PrepareRegressionDatasetFromContinuousVectorAlgorithm(EnMAPProcessingAlgor
                 targets=targets, features=features, X=X, y=y, locations=locations, crs=raster.crs().toWkt()
             )
             dumpDict = dump.__dict__
-            Utils.pickleDump(dumpDict, filename)
+            Utils.modelDump(dumpDict, filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)

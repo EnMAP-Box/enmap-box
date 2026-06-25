@@ -23,13 +23,13 @@ from qgis.PyQt.uic import loadUi
 from qgis.gui import QgsFileWidget
 
 
-class ProcessingParameterPickleFileUnsupervisedDatasetWidget(QWidget):
+class ProcessingParameterSkopsFileUnsupervisedDatasetWidget(QWidget):
     mFile: QgsFileWidget
     mCreate: QToolButton
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
-        loadUi(join(dirname(__file__), 'processingparameterpicklefilewidget.ui'), self)
+        loadUi(join(dirname(__file__), 'processingparameterskopsfilewidget.ui'), self)
 
         self.menu = QMenu()
         self.menu.setToolTipsVisible(True)
@@ -62,10 +62,10 @@ class ProcessingParameterPickleFileUnsupervisedDatasetWidget(QWidget):
         if EnMAPBox.instance() is not None:
             self.menu.addSeparator()
             for filename in EnMAPBox.instance().dataSources('MODEL', True):
-                if not filename.endswith('.pkl'):
+                if not filename.endswith('.skops'):
                     continue
                 try:
-                    dump = TransformerDump(**Utils.pickleLoad(filename))
+                    dump = TransformerDump(**Utils.modelLoad(filename))
                     samples, features = dump.X.shape
                 except Exception:  # nosec Ignore files that are not valid models.
                     continue
@@ -99,7 +99,7 @@ class ProcessingParameterPickleFileUnsupervisedDatasetWidget(QWidget):
                     filename = result['outputUnsupervisedDataset']
                     self.mFile.setFilePath(filename)
 
-                    dump = TransformerDump(**Utils.pickleLoad(filename))
+                    dump = TransformerDump(**Utils.modelLoad(filename))
                     samples, features = dump.X.shape
 
                     # add to the list!
@@ -124,11 +124,11 @@ class ProcessingParameterPickleFileUnsupervisedDatasetWidget(QWidget):
         self.mFile.setFilePath(filename)
 
 
-class ProcessingParameterPickleFileUnsupervisedDatasetWidgetWrapper(WidgetWrapper):
-    widget: ProcessingParameterPickleFileUnsupervisedDatasetWidget
+class ProcessingParameterSkopsFileUnsupervisedDatasetWidgetWrapper(WidgetWrapper):
+    widget: ProcessingParameterSkopsFileUnsupervisedDatasetWidget
 
     def createWidget(self):
-        return ProcessingParameterPickleFileUnsupervisedDatasetWidget()
+        return ProcessingParameterSkopsFileUnsupervisedDatasetWidget()
 
     def setValue(self, value):
         self.widget.setValue(value)

@@ -2070,7 +2070,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         if missingTestData():
             installTestData()
 
-        rx = re.compile('.*(bsq|bil|bip|tif|gpkg|sli|img|shp|pkl|geojson)$', re.I)
+        rx = re.compile('.*(bsq|bil|bip|tif|gpkg|sli|img|shp|skops|geojson)$', re.I)
         if not missingTestData():
             import enmapbox.exampledata
             dir_exampledata = os.path.dirname(enmapbox.exampledata.__file__)

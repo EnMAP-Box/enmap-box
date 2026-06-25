@@ -31,7 +31,7 @@ class PrepareRegressionDatasetFromSynthMixAlgorithm(EnMAPProcessingAlgorithm):
 
     def shortDescription(self) -> str:
         return 'Create synthetically mixed regression datasets, one for each category. ' \
-               'Results are stored as <category.name>.pkl files inside the destination folder.'
+               'Results are stored as <category.name>.skops files inside the destination folder.'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
@@ -77,7 +77,7 @@ class PrepareRegressionDatasetFromSynthMixAlgorithm(EnMAPProcessingAlgorithm):
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)
 
-            dump = ClassifierDump(**Utils.pickleLoad(filenameDataset))
+            dump = ClassifierDump(**Utils.modelLoad(filenameDataset))
             self.X = dump.X
             self.y = dump.y
             self.categories = dump.categories
@@ -92,14 +92,14 @@ class PrepareRegressionDatasetFromSynthMixAlgorithm(EnMAPProcessingAlgorithm):
                     self.classProbabilities.append(np.average(self.y == category.value))
 
             for category in self.categories:
-                filename = join(foldername, category.name + '.pkl')
+                filename = join(foldername, category.name + '.skops')
                 X, y = self.mixCategory(category)
 
                 checkSampleShape(X, y, raise_=True)
 
                 features = [f'Band {i + 1}' for i in range(X.shape[1])]
                 dump = RegressorDump([Target(category.name, category.color)], features, X, y)
-                Utils.pickleDump(dump.__dict__, filename)
+                Utils.modelDump(dump.__dict__, filename)
 
             result = {self.P_OUTPUT_FOLDER: foldername}
             self.toc(feedback, result)

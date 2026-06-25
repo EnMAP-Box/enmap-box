@@ -9,14 +9,14 @@ from qgis.PyQt.QtWidgets import QWidget, QToolButton, QMenu
 from qgis.gui import QgsFileWidget
 
 
-class ProcessingParameterPickleFileWidget(QWidget):
+class ProcessingParameterSkopsFileWidget(QWidget):
     mFile: QgsFileWidget
     mCreate: QToolButton
     mEdit: QToolButton
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
-        loadUi(join(dirname(__file__), 'processingparameterpicklefilewidget.ui'), self)
+        loadUi(join(dirname(__file__), 'processingparameterskopsfilewidget.ui'), self)
         self.mEdit.hide()
         self.menu = QMenu()
         self.menu.setToolTipsVisible(True)
@@ -24,7 +24,7 @@ class ProcessingParameterPickleFileWidget(QWidget):
         if EnMAPBox.instance() is not None:
             self.menu.addSeparator()
             for filename in EnMAPBox.instance().dataSources('MODEL', True):
-                if not filename.endswith('.pkl'):
+                if not filename.endswith('.skops'):
                     continue
                 action = self.menu.addAction(basename(filename))
                 action.setIcon(QIcon(':/images/themes/default/mIconFile.svg'))
@@ -48,11 +48,11 @@ class ProcessingParameterPickleFileWidget(QWidget):
         self.mFile.setFilePath(filename)
 
 
-class ProcessingParameterPickleFileWidgetWrapper(WidgetWrapper):
-    widget: ProcessingParameterPickleFileWidget
+class ProcessingParameterSkopsFileWidgetWrapper(WidgetWrapper):
+    widget: ProcessingParameterSkopsFileWidget
 
     def createWidget(self):
-        return ProcessingParameterPickleFileWidget()
+        return ProcessingParameterSkopsFileWidget()
 
     def setValue(self, value):
         self.widget.setValue(value)

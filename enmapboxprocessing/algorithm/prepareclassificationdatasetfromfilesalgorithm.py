@@ -28,7 +28,7 @@ class PrepareClassificationDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
         )
         return (
             'Create a classification dataset from tabulated text files '
-            'and store the result as a pickle file. \n'
+            'and store the result as a skops file. \n'
             f'The format matches that of the {link}.\n'
             f'Example files (force_features.csv and force_labels.csv) can be found in the EnMAP-Box testdata folder).'
         )
@@ -41,7 +41,7 @@ class PrepareClassificationDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
             (self._VALUE_FILE,
              'Text file with tabulated target data y (no headers). '
              'Each row represents the class value of a sample.'),
-            (self._OUTPUT_DATASET, self.PickleFileDestination)
+            (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
     def group(self):
@@ -50,7 +50,7 @@ class PrepareClassificationDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterFile(self.P_FEATURE_FILE, self._FEATURE_FILE)
         self.addParameterFile(self.P_VALUE_FILE, self._VALUE_FILE)
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
@@ -82,7 +82,7 @@ class PrepareClassificationDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
             categories = [Category(int(v), str(v), QColor(randint(0, 2 ** 24 - 1)).name()) for v in values]  # nosec
 
             dump = ClassifierDump(categories=categories, features=features, X=X, y=y)
-            Utils.pickleDump(dump.__dict__, filename)
+            Utils.modelDump(dump.__dict__, filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)

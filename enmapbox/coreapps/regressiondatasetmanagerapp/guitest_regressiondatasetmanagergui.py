@@ -1,15 +1,15 @@
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from enmapboxprocessing.utils import Utils
-from tests.enmapboxtestdata import regressorDumpMultiTargetPkl
+from tests.enmapboxtestdata import regressorDumpMultiTargetSkops
 from regressiondatasetmanagerapp import RegressionDatasetManagerGui
 
 qgsApp = start_app()
 enmapBox = EnMAPBox()
 enmapBox.run()
 
-Utils.pickleDump(Utils.pickleLoad(regressorDumpMultiTargetPkl), 'regressor.pkl')
-enmapBox.addSource('regressor.pkl')
+Utils.modelDump(Utils.modelLoad(regressorDumpMultiTargetSkops), 'regressor.skops')
+enmapBox.addSource('regressor.skops')
 
 widget = RegressionDatasetManagerGui(enmapBox.ui)
 widget.show()

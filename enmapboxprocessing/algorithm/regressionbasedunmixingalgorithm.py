@@ -121,7 +121,7 @@ class RegressionBasedUnmixingAlgorithm(EnMAPProcessingAlgorithm):
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)
 
-            categories = ClassifierDump.fromDict(Utils.pickleLoad(filenameClassificationDataset)).categories
+            categories = ClassifierDump.fromDict(Utils.modelLoad(filenameClassificationDataset)).categories
 
             # create ensemble runs
             feedback.pushInfo('Create ensemble')
@@ -149,9 +149,9 @@ class RegressionBasedUnmixingAlgorithm(EnMAPProcessingAlgorithm):
                 self.runAlg(alg, parameters, None, feedback2, context, True)
 
                 for category in categories:
-                    filenameRegressionDatasetRun = join(folderRun, category.name + '.pkl')
-                    filenameRegressorRun = filenameRegressionDatasetRun.replace('.pkl', '.regressor.pkl')
-                    filenameFractionRun = filenameRegressionDatasetRun.replace('.pkl', '.fraction.tif')
+                    filenameRegressionDatasetRun = join(folderRun, category.name + '.skops')
+                    filenameRegressorRun = filenameRegressionDatasetRun.replace('.skops', '.regressor.skops')
+                    filenameFractionRun = filenameRegressionDatasetRun.replace('.skops', '.fraction.tif')
 
                     # create regressor
                     alg = FitGenericRegressorAlgorithm()

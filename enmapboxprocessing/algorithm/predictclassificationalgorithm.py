@@ -49,13 +49,13 @@ class PredictClassificationAlgorithm(EnMAPProcessingAlgorithm):
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
-        self.addParameterPickleFile(self.P_CLASSIFIER, self._CLASSIFIER)
+        self.addParameterSkopsFile(self.P_CLASSIFIER, self._CLASSIFIER)
         self.addParameterBoolean(self.P_MATCH_BY_NAME, self._MATCH_BY_NAME, False, True)
         self.addParameterRasterDestination(self.P_OUTPUT_CLASSIFICATION, self._OUTPUT_CLASSIFICATION)
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
         try:
-            ClassifierDump(**Utils.pickleLoad(self.parameterAsFile(parameters, self.P_CLASSIFIER, context)))
+            ClassifierDump(**Utils.modelLoad(self.parameterAsFile(parameters, self.P_CLASSIFIER, context)))
         except TypeError:
             return False, 'Invalid classifier file.'
         return True, ''

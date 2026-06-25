@@ -30,7 +30,7 @@ class PrepareClassificationDatasetFromCategorizedVectorAlgorithm(EnMAPProcessing
     def shortDescription(self) -> str:
         return (
             'Create a classification dataset by sampling data for pixels that match the given categories '
-            'and store the result as a pickle file.\n'
+            'and store the result as a skops file.\n'
             'If the layer is not categorized, or the field with class values is selected manually, '
             'categories are derived from the sampled target data y. '
             'To be more precise: '

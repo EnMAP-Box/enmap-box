@@ -48,7 +48,7 @@ hubdc/gis/
 *.gpkg-shm
 *.gpkg-wal
 enmapbox/enmapboxexampledata.zip
-*.pkl
+*.skops
 scripts/changelog/fetch_issues.bat
 scripts/changelog/fetch_issues.txt
 scripts/changelog/fetch_releases.txt

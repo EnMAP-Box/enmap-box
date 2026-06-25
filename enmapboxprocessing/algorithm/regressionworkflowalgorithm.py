@@ -31,7 +31,7 @@ class RegressionWorkflowAlgorithm(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._DATASET, 'Training dataset pickle file used for fitting the regressor.'),
+            (self._DATASET, 'Training dataset skops file used for fitting the regressor.'),
             (self._REGRESSOR, 'Scikit-Learn Python code specifying a regressor.'),
             (self._RASTER, 'A raster layer used for prediction.'),
             (self._MATCH_BY_NAME, 'Whether to match raster bands and regressor features by name.'),
@@ -40,7 +40,7 @@ class RegressionWorkflowAlgorithm(EnMAPProcessingAlgorithm):
             (self._OPEN_REPORT, 'Whether to open the cross-validation performance report in the web browser. '
                                 'Will be ignored, if the cross-validation performance assessment is skipped.'),
             (self._OUTPUT_REPORT, 'Output cross-validation performance report file destination.'),
-            (self._OUTPUT_REGRESSOR, self.PickleFileDestination),
+            (self._OUTPUT_REGRESSOR, self.SkopsFileDestination),
             (self._OUTPUT_REGRESSION, 'Predicted map file destination.')
         ]
 
@@ -57,7 +57,7 @@ class RegressionWorkflowAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFileDestination(
             self.P_OUTPUT_REPORT, self._OUTPUT_REPORT, self.ReportFileFilter, None, True, False
         )
-        self.addParameterFileDestination(self.P_OUTPUT_REGRESSOR, self._OUTPUT_REGRESSOR, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_REGRESSOR, self._OUTPUT_REGRESSOR, self.SkopsFileFilter)
         self.addParameterRasterDestination(self.P_OUTPUT_REGRESSION, self._OUTPUT_REGRESSION, None, True, True)
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:

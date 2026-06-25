@@ -21,12 +21,14 @@ class PrepareClassificationDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
 
     def shortDescription(self) -> str:
         return 'Create a classification dataset from Python code ' \
-               'and store the result as a pickle file.'
+               'and store the result as a skops file.'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._CODE, 'Python code specifying the classification dataset.'),
-            (self._OUTPUT_DATASET, self.PickleFileDestination)
+            (self._CODE, 'Python code specifying the classification dataset.\n'
+                         'Note: The Python code provided here is executed locally with the permissions of the '
+                         'current user during algorithm execution.'),
+            (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
     def code(cls):
@@ -64,7 +66,10 @@ class PrepareClassificationDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
     ) -> ClassifierDump:
         namespace = dict()
         code = self.parameterAsString(parameters, self.P_CODE, context)
-        exec(code, namespace)
+
+        # nosec B102 - User-defined code execution by design; equivalent to the QGIS Python Console.
+        # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
+        exec(code, namespace)  # nosec
         categories, features, X, y = [namespace[key] for key in ['categories', 'features', 'X', 'y']]
         X = np.array(X)
         y = np.array(y)
@@ -76,7 +81,7 @@ class PrepareClassificationDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterCode(self.P_CODE, self._CODE, self.defaultCodeAsString())
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
@@ -88,7 +93,7 @@ class PrepareClassificationDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
             self.tic(feedback, parameters, context)
 
             classifierDump = self.classifierDump(parameters, context)
-            Utils.pickleDump(classifierDump.__dict__, filename)
+            Utils.modelDump(classifierDump.__dict__, filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)

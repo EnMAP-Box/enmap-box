@@ -20,12 +20,14 @@ class PrepareRegressionDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
         return 'Create regression dataset (from Python code)'
 
     def shortDescription(self) -> str:
-        return 'Create a regression dataset from Python code and store the result as a pickle file.'
+        return 'Create a regression dataset from Python code and store the result as a skops file.'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._CODE, 'Python code specifying the regression dataset.'),
-            (self._OUTPUT_DATASET, self.PickleFileDestination)
+            (self._CODE, 'Python code specifying the regression dataset.\n'
+                         'Note: The Python code provided here is executed locally with the permissions of the '
+                         'current user during algorithm execution.'),
+            (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
     def code(cls):
@@ -63,7 +65,10 @@ class PrepareRegressionDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
     ) -> RegressorDump:
         namespace = dict()
         code = self.parameterAsString(parameters, self.P_CODE, context)
-        exec(code, namespace)
+
+        # nosec B102 - User-defined code execution by design; equivalent to the QGIS Python Console.
+        # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
+        exec(code, namespace)  # nosec
         targets, features, X, y = [namespace[key] for key in ['targets', 'features', 'X', 'y']]
         X = np.array(X)
         y = np.array(y)
@@ -75,7 +80,7 @@ class PrepareRegressionDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterCode(self.P_CODE, self._CODE, self.defaultCodeAsString())
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
@@ -87,7 +92,7 @@ class PrepareRegressionDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
             self.tic(feedback, parameters, context)
 
             regressorDump = self.regressorDump(parameters, context)
-            Utils.pickleDump(regressorDump.__dict__, filename)
+            Utils.modelDump(regressorDump.__dict__, filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)

@@ -43,11 +43,11 @@ class ClassifierFeatureRankingPermutationImportanceAlgorithm(EnMAPProcessingAlgo
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._CLASSIFIER, 'Classifier pickle file. '
+            (self._CLASSIFIER, 'Classifier skops file. '
                                'In case of an unfitted classifier, also specify a training dataset.'),
-            (self._TRAIN_DATASET, 'Training dataset pickle file used for (re-)fitting the classifier. '
+            (self._TRAIN_DATASET, 'Training dataset skops file used for (re-)fitting the classifier. '
                                   'Can be skipped in case of a fitted classifier.'),
-            (self._TEST_DATASET, 'Test dataset pickle file used for performance evaluation. '
+            (self._TEST_DATASET, 'Test dataset skops file used for performance evaluation. '
                                  'If skipped, the training dataset is used.'),
             (self._EVALUATION_METRIC,
              'An evaluation metric to use. '
@@ -70,12 +70,12 @@ class ClassifierFeatureRankingPermutationImportanceAlgorithm(EnMAPProcessingAlgo
         return Group.FeatureSelection.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
-        self.addParameterFile(self.P_CLASSIFIER, self._CLASSIFIER, extension='pkl')
+        self.addParameterFile(self.P_CLASSIFIER, self._CLASSIFIER, extension='skops')
         self.addParameterFile(
-            self.P_TRAIN_DATASET, self._TRAIN_DATASET, extension=self.PickleFileExtension, optional=True, advanced=True
+            self.P_TRAIN_DATASET, self._TRAIN_DATASET, extension=self.SkopsFileExtension, optional=True, advanced=True
         )
         self.addParameterFile(
-            self.P_TEST_DATASET, self._TEST_DATASET, extension=self.PickleFileExtension, optional=True, advanced=True
+            self.P_TEST_DATASET, self._TEST_DATASET, extension=self.SkopsFileExtension, optional=True, advanced=True
         )
         self.addParameterEnum(
             self.P_EVALUATION_METRIC, self._EVALUATION_METRIC, self.O_EVALUATION_METRIC, False,
@@ -111,18 +111,18 @@ class ClassifierFeatureRankingPermutationImportanceAlgorithm(EnMAPProcessingAlgo
                 filenameTestSample = filenameTrainSample
             refit = filenameTrainSample != filenameClassifier
 
-            classifier = ClassifierDump(**Utils.pickleLoad(filenameClassifier)).classifier
+            classifier = ClassifierDump(**Utils.modelLoad(filenameClassifier)).classifier
             feedback.pushInfo(f'Load classifier: {classifier}')
 
             if refit:
-                dump = ClassifierDump(**Utils.pickleLoad(filenameTrainSample))
+                dump = ClassifierDump(**Utils.modelLoad(filenameTrainSample))
                 X, y, features = dump.X, dump.y, dump.features
                 feedback.pushInfo(f'Load training dataset: X=array{list(X.shape)} y=array{list(dump.y.shape)}')
                 feedback.pushInfo('Fit classifier')
                 classifier.fit(X, y)
 
             # load test sample
-            dump = ClassifierDump(**Utils.pickleLoad(filenameTestSample))
+            dump = ClassifierDump(**Utils.modelLoad(filenameTestSample))
             X, y, features = dump.X, dump.y, dump.features
             feedback.pushInfo(f'Load test dataset: X=array{list(X.shape)} y=array{list(dump.y.shape)}')
 

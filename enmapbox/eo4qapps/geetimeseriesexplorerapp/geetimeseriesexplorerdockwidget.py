@@ -445,7 +445,9 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
         code = self.mCode.text()
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            exec(code, namespace)
+            # nosec B102 - User-defined Google Earth Engine collection code execution by design;
+            # equivalent to the QGIS Python Console.
+            exec(code, namespace)  # nosec
 
         with GeeWaitCursor():
             try:

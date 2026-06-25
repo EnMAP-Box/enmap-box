@@ -1865,15 +1865,17 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
             for modelDataSource in enmapBox.dataSources('MODEL', False):
                 modelDataSource: ModelDataSource
 
-                if not (isinstance(modelDataSource, ModelDataSource) and isinstance(modelDataSource.mPklObject, dict)):
+                if not (
+                    isinstance(modelDataSource, ModelDataSource) and isinstance(modelDataSource.mSkopsObject, dict)
+                ):
                     continue
-                if modelDataSource.mPklObject.get('classifier') is not None:
+                if modelDataSource.mSkopsObject.get('classifier') is not None:
                     classifiers.append(modelDataSource)
-                if modelDataSource.mPklObject.get('regressor') is not None:
+                if modelDataSource.mSkopsObject.get('regressor') is not None:
                     regressors.append(modelDataSource)
-                if modelDataSource.mPklObject.get('transformer') is not None:
+                if modelDataSource.mSkopsObject.get('transformer') is not None:
                     transformers.append(modelDataSource)
-                if modelDataSource.mPklObject.get('clusterer') is not None:
+                if modelDataSource.mSkopsObject.get('clusterer') is not None:
                     clusterers.append(modelDataSource)
 
         if len(classifiers + regressors + transformers + clusterers) > 0:

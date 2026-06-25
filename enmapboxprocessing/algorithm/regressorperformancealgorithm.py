@@ -29,8 +29,8 @@ class RegressorPerformanceAlgorithm(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._REGRESSOR, 'Regressor pickle file.'),
-            (self._DATASET, 'Test dataset pickle file used for assessing the regressor performance.'),
+            (self._REGRESSOR, 'Regressor skops file.'),
+            (self._DATASET, 'Test dataset skops file used for assessing the regressor performance.'),
             (self._NFOLD, 'The number of folds used for assessing cross-validation performance. '
                           'If not specified (default), simple test performance is assessed.'),
             (self._OPEN_REPORT, self.ReportOpen),
@@ -41,7 +41,7 @@ class RegressorPerformanceAlgorithm(EnMAPProcessingAlgorithm):
         return Group.Regression.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
-        self.addParameterPickleFile(self.P_REGRESSOR, self._REGRESSOR)
+        self.addParameterSkopsFile(self.P_REGRESSOR, self._REGRESSOR)
         self.addParameterRegressionDataset(self.P_DATASET, self._DATASET)
         self.addParameterInt(self.P_NFOLD, self._NFOLD, None, True, 2, 100, True)
         self.addParameterBoolean(self.P_OPEN_REPORT, self._OPEN_REPORT, True)
@@ -60,8 +60,8 @@ class RegressorPerformanceAlgorithm(EnMAPProcessingAlgorithm):
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)
 
-            dump = RegressorDump(**Utils.pickleLoad(filenameRegressor))
-            sample = RegressorDump.fromDict(Utils.pickleLoad(filenameSample))
+            dump = RegressorDump(**Utils.modelLoad(filenameRegressor))
+            sample = RegressorDump.fromDict(Utils.modelLoad(filenameSample))
             feedback.pushInfo(f'Load regressor: {dump.regressor}')
             feedback.pushInfo(f'Load sample data: X{list(sample.X.shape)} y{list(sample.y.shape)}')
 

@@ -22,7 +22,7 @@ def update_unittest_init(
     if not overwrite and PATH_TEST_INIT.is_file():
         raise Exception(f'File already exists: {PATH_TEST_INIT}.\nRun with option -o --overwrite')
 
-    rx = re.compile(r'.*\.(tif|gpkg|qml|csv|pkl|json)$')
+    rx = re.compile(r'.*\.(tif|gpkg|qml|csv|skops|json)$')
 
     FILES = dict()
     for file in file_search(DIR_UNITTESTDATA, rx, recursive=True):

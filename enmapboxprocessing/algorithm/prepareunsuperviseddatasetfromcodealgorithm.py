@@ -21,12 +21,14 @@ class PrepareUnsupervisedDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
 
     def shortDescription(self) -> str:
         return 'Create an unsupervised dataset from Python code ' \
-               'and store the result as a pickle file.'
+               'and store the result as a skops file.'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._CODE, 'Python code specifying the unsupervised dataset.'),
-            (self._OUTPUT_DATASET, self.PickleFileDestination)
+            (self._CODE, 'Python code specifying the unsupervised dataset.\n'
+                         'Note: The Python code provided here is executed locally with the permissions of the '
+                         'current user during algorithm execution.'),
+            (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
     def code(cls):
@@ -56,7 +58,10 @@ class PrepareUnsupervisedDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
     ) -> TransformerDump:
         namespace = dict()
         code = self.parameterAsString(parameters, name, context)
-        exec(code, namespace)
+
+        # nosec B102 - User-defined code execution by design; equivalent to the QGIS Python Console.
+        # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
+        exec(code, namespace)  # nosec
         features, X = [namespace[key] for key in ['features', 'X']]
         X = np.array(X)
         transformerDump = TransformerDump(features, X)
@@ -67,7 +72,7 @@ class PrepareUnsupervisedDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterCode(self.P_CODE, self._CODE, self.defaultCodeAsString())
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
@@ -79,7 +84,7 @@ class PrepareUnsupervisedDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
             self.tic(feedback, parameters, context)
 
             transformerDump = self.parameterAsTransformerDump(parameters, self.P_CODE, context)
-            Utils.pickleDump(transformerDump.__dict__, filename)
+            Utils.modelDump(transformerDump.__dict__, filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)

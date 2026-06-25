@@ -24,7 +24,7 @@ class PrepareUnsupervisedDatasetFromFileAlgorithm(EnMAPProcessingAlgorithm):
             "FORCE Higher Level Sampling Submodule"
         )
         return 'Create an unsupervised dataset from a tabulated text file ' \
-               'and store the result as a pickle file. \n' \
+               'and store the result as a skops file. \n' \
                f'The format matches that of the {link}.\n' \
                f'An example file (force_features.csv) can be found in the EnMAP-Box testdata folder).'
 
@@ -33,7 +33,7 @@ class PrepareUnsupervisedDatasetFromFileAlgorithm(EnMAPProcessingAlgorithm):
             (self._FEATURE_FILE,
              'Text file with tabulated feature data X (no headers). '
              'Each row represents the feature vector of a sample.'),
-            (self._OUTPUT_DATASET, self.PickleFileDestination)
+            (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
     def group(self):
@@ -41,7 +41,7 @@ class PrepareUnsupervisedDatasetFromFileAlgorithm(EnMAPProcessingAlgorithm):
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterFile(self.P_FEATURE_FILE, self._FEATURE_FILE)
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
@@ -63,7 +63,7 @@ class PrepareUnsupervisedDatasetFromFileAlgorithm(EnMAPProcessingAlgorithm):
 
             # prepare categories
             dump = TransformerDump(features=features, X=X)
-            Utils.pickleDump(dump.__dict__, filename)
+            Utils.modelDump(dump.__dict__, filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)

@@ -13,10 +13,10 @@ class TestPrepareRegressionDatasetFromFilesAlgorithm(TestCase):
         parameters = {
             alg.P_FEATURE_FILE: classificationDatasetAsForceFile[0],
             alg.P_VALUE_FILE: classificationDatasetAsForceFile[1],
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = RegressorDump.fromDict(Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = RegressorDump.fromDict(Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((15000, 20), dump.X.shape)
         self.assertEqual((15000, 1), dump.y.shape)
         self.assertEqual(20, len(dump.features))

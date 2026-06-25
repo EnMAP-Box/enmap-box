@@ -78,7 +78,9 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
                          'Select inputs in the available data sources section or '
                          'use the raster layer R1, ..., R10 and vector layer V1, ..., V10.\n'
                          'In the code snippets section you can find some prepdefined code snippets ready to use.\n'
-                         f'See the {self.linkRecipe} for detailed usage instructions.'),
+                         f'See the {self.linkRecipe} for detailed usage instructions.\n'
+                         f'Note: The Python code provided here is executed locally with the permissions of the '
+                         f'current user during algorithm execution.'),
             (self._GRID, 'The destination grid. If not specified, the grid of the first raster layer is used.'),
             (self._FLOAT_INPUT, 'Whether to cast inputs to 32-bit floating point.'),
             (self._NO_DATA_VALUE, 'Specified value is used as no data value for all inputs. '
@@ -188,7 +190,10 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
                 if line.strip().startswith('#') and ':=' in line:
                     layerName, value = line.split(':=')
                     layerName = layerName.strip('# ')
-                    raster = eval(value.strip())
+
+                    # nosec B307 - User-defined code execution by design; equivalent to the QGIS Python Console.
+                    # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
+                    raster = eval(value.strip())  # nosec
                     if isinstance(raster, QgsRasterLayer):
                         rasters[layerName] = raster
 
@@ -214,7 +219,10 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
                 if line.strip().startswith('#') and ':=' in line:
                     layerName, value = line.split(':=')
                     layerName = layerName.strip('# ')
-                    vector = eval(value.strip())
+
+                    # nosec B307 - User-defined code execution by design; equivalent to the QGIS Python Console.
+                    # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
+                    vector = eval(value.strip())  # nosec
                     if isinstance(vector, QgsVectorLayer):
                         vectors[layerName] = vector
 
@@ -592,7 +600,9 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
         # execute code
         try:
             code = code.replace(r'\n', '\n')  # convert raw new lines (only required when executed via qgis_process)
-            exec(code, namespace)
+
+            # nosec B102 - User-defined raster math code execution by design; equivalent to the QGIS Python Console.
+            exec(code, namespace)  # nosec
         except Exception as error:
             traceback.print_exc()
             text = traceback.format_exc()

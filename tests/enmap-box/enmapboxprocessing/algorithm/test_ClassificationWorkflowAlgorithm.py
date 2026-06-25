@@ -7,7 +7,7 @@ from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifie
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedvectoralgorithm import \
     PrepareClassificationDatasetFromCategorizedVectorAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxtestdata import classifierDumpPkl, enmap, enmap_potsdam, landcover_berlin_point, landcover_potsdam_point
+from enmapboxtestdata import classifierDumpSkops, enmap, enmap_potsdam, landcover_berlin_point, landcover_potsdam_point
 
 start_app()
 initAll()
@@ -36,12 +36,12 @@ class TestClassificationWorkflowAlgorithm(TestCase):
     def test(self):
         alg = ClassificationWorkflowAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifierDumpSkops,
             alg.P_CLASSIFIER: FitTestClassifierAlgorithm().defaultCodeAsString(),
             alg.P_RASTER: enmap,
             alg.P_NFOLD: 10,
             alg.P_OPEN_REPORT: self.openReport,
-            alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl'),
+            alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.skops'),
             alg.P_OUTPUT_CLASSIFICATION: self.filename('classification.tif'),
             alg.P_OUTPUT_PROBABILITY: self.filename('probability.tif'),
             alg.P_OUTPUT_REPORT: self.filename('report.html')
@@ -51,9 +51,9 @@ class TestClassificationWorkflowAlgorithm(TestCase):
     def test_trainingOnly(self):
         alg = ClassificationWorkflowAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifierDumpSkops,
             alg.P_CLASSIFIER: FitTestClassifierAlgorithm().defaultCodeAsString(),
-            alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl'),
+            alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.skops'),
         }
         self.runalg(alg, parameters)
 
@@ -63,7 +63,7 @@ class TestClassificationWorkflowAlgorithm(TestCase):
             alg1.P_CATEGORIZED_VECTOR: landcover_potsdam_point,
             alg1.P_FEATURE_RASTER: enmap_potsdam,
             alg1.P_EXCLUDE_BAD_BANDS: True,
-            alg1.P_OUTPUT_DATASET: self.filename('dataset.pkl')
+            alg1.P_OUTPUT_DATASET: self.filename('dataset.skops')
         }
         self.runalg(alg1, parameters1)
 
@@ -73,7 +73,7 @@ class TestClassificationWorkflowAlgorithm(TestCase):
             alg2.P_CLASSIFIER: FitTestClassifierAlgorithm().defaultCodeAsString(),
             alg2.P_RASTER: enmap_potsdam,
             alg2.P_MATCH_BY_NAME: True,
-            alg2.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl'),
+            alg2.P_OUTPUT_CLASSIFIER: self.filename('classifier.skops'),
             alg2.P_OUTPUT_CLASSIFICATION: self.filename('classification.tif'),
             alg2.P_OUTPUT_PROBABILITY: self.filename('probability.tif')
         }
@@ -85,7 +85,7 @@ class TestClassificationWorkflowAlgorithm(TestCase):
             alg1.P_CATEGORIZED_VECTOR: landcover_potsdam_point,
             alg1.P_FEATURE_RASTER: enmap_potsdam,
             alg1.P_EXCLUDE_BAD_BANDS: True,
-            alg1.P_OUTPUT_DATASET: self.filename('dataset.pkl')
+            alg1.P_OUTPUT_DATASET: self.filename('dataset.skops')
         }
         self.runalg(alg1, parameters1)
 
@@ -95,7 +95,7 @@ class TestClassificationWorkflowAlgorithm(TestCase):
             alg2.P_CLASSIFIER: FitTestClassifierAlgorithm().defaultCodeAsString(),
             alg2.P_RASTER: enmap_potsdam,
             alg2.P_MATCH_BY_NAME: False,
-            alg2.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl'),
+            alg2.P_OUTPUT_CLASSIFIER: self.filename('classifier.skops'),
             alg2.P_OUTPUT_CLASSIFICATION: self.filename('classification.tif'),
             alg2.P_OUTPUT_PROBABILITY: self.filename('probability.tif')
         }
@@ -106,17 +106,17 @@ class TestClassificationWorkflowAlgorithm(TestCase):
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
             alg.P_CATEGORIZED_VECTOR: landcover_berlin_point,
-            alg.P_OUTPUT_DATASET: self.filename('dataset.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('dataset.skops')
         }
         self.runalg(alg, parameters)
 
         alg = ClassificationWorkflowAlgorithm()
         parameters = {
-            alg.P_DATASET: self.filename('dataset.pkl'),
+            alg.P_DATASET: self.filename('dataset.skops'),
             alg.P_CLASSIFIER: FitTestClassifierAlgorithm().defaultCodeAsString(),
             alg.P_RASTER: enmap,
             alg.P_OPEN_REPORT: self.openReport,
-            alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl'),
+            alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.skops'),
             alg.P_OUTPUT_CLASSIFICATION: self.filename('classification.tif'),
             alg.P_OUTPUT_REPORT2: self.filename('report2.html')
         }

@@ -6,7 +6,7 @@ from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifie
 from enmapboxprocessing.algorithm.predictclassprobabilityalgorithm import PredictClassPropabilityAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxtestdata import classifierDumpPkl
+from enmapboxtestdata import classifierDumpSkops
 
 writeToDisk = True
 
@@ -34,9 +34,9 @@ class TestPredictClassProbabilityAlgorithm(TestCase):
         algFit = FitTestClassifierAlgorithm()
         algFit.initAlgorithm()
         parametersFit = {
-            algFit.P_DATASET: classifierDumpPkl,
+            algFit.P_DATASET: classifierDumpSkops,
             algFit.P_CLASSIFIER: algFit.defaultCodeAsString(),
-            algFit.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl'),
+            algFit.P_OUTPUT_CLASSIFIER: self.filename('classifier.skops'),
         }
         self.runalg(algFit, parametersFit)
 

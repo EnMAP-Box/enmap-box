@@ -1,7 +1,7 @@
 import zipfile
 from os.path import basename, exists, splitext
 from typing import Dict, Any, List, Tuple
-from xml.etree import ElementTree
+from defusedxml import ElementTree
 
 from osgeo import gdal
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)

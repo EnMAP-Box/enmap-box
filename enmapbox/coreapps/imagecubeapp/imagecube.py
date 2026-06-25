@@ -310,7 +310,7 @@ class ImageCubeRenderTask(QgsTask):
 #     :return:
 #     """
 #
-#     # jobs = pickle.loads(dump)
+#     # jobs = skops.loads(dump)
 #
 #     results = []
 #     # n = len(jobs)
@@ -328,7 +328,7 @@ class ImageCubeRenderTask(QgsTask):
 #     for i, job in enumerate(jobs):
 #         t0 = time.time()
 #         if task.isCanceled():
-#             return pickle.dumps(results)
+#             return skops.dumps(results)
 #
 #         assert isinstance(job, ImageCubeRenderJob)
 #         lyr = job.rasterLayer()
@@ -432,7 +432,7 @@ class ImageCubeRenderTask(QgsTask):
 #             results.append(job)
 #
 #     task.setProgress(100)
-#     return pickle.dumps(results)
+#     return skops.dumps(results)
 
 
 class ImageCubeAxisItem(gl.GLAxisItem):

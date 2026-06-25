@@ -331,11 +331,11 @@ class ModelDataSource(DataSource):
 
     def __init__(self, dataItem: QgsDataItem):
         super().__init__(dataItem)
-        if dataItem.providerKey() != 'special:pkl':
+        if dataItem.providerKey() != 'special:skops':
             raise ValueError(f'ModelDataSource can only be '
-                             f'created from a special:pkl data item, not {dataItem}')
+                             f'created from a special:skops data item, not {dataItem}')
 
-        self.mPklObject: object = None
+        self.mSkopsObject: object = None
         self.mObjectNode: PyObjectTreeNode = None
         self.updateNodes()
 
@@ -347,27 +347,27 @@ class ModelDataSource(DataSource):
 
         source = self.source()
         error = None
-        pkl_obj = None
+        skops_obj = None
         try:
-            if source.endswith('.pkl'):
-                pkl_obj = Utils().pickleLoad(source)
+            if source.endswith('.skops'):
+                skops_obj = Utils().modelLoad(source)
             elif source.endswith('.json'):
-                pkl_obj = Utils().jsonLoad(source)
+                skops_obj = Utils().jsonLoad(source)
         except Exception as ex:
             error = f'{self}:: Unable to load {source}: {ex}'
 
         from enmapbox import messageLog, debugLog
 
         if error:
-            if source.endswith('.pkl'):
-                # in case of *.pkl it is very likely that we should be able to open them with pickle.load
+            if source.endswith('.skops'):
+                # in case of *.skops it is very likely that we should be able to open them with skops.load
                 messageLog(error, level=Qgis.Warning)
             else:
                 debugLog(error)
-        self.mPklObject = pkl_obj
+        self.mSkopsObject = skops_obj
 
-        if isinstance(pkl_obj, object):
-            self.mObjectNode = PyObjectTreeNode(obj=self.mPklObject, name='Content')
+        if isinstance(skops_obj, object):
+            self.mObjectNode = PyObjectTreeNode(obj=self.mSkopsObject, name='Content')
             self.appendChildNodes([self.mObjectNode])
 
 

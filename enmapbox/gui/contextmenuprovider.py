@@ -438,7 +438,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
             elif isinstance(node, ModelDataSource):
                 a = menu.addAction('View as JSON')
                 a.setIcon(QIcon(':/images/themes/default/mIconFieldJson.svg'))
-                a.triggered.connect(lambda *args, node=node: treeView.onViewPklAsJson(node))
+                a.triggered.connect(lambda *args, node=node: treeView.onViewSkopsAsJson(node))
 
         elif isinstance(node, RasterBandTreeNode):
             # a = m.addAction('Band statistics')

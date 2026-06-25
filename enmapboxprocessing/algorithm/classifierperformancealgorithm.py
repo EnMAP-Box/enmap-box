@@ -29,8 +29,8 @@ class ClassifierPerformanceAlgorithm(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._CLASSIFIER, 'Classifier pickle file.'),
-            (self._DATASET, 'Test dataset pickle file used for assessing the classifier performance.'),
+            (self._CLASSIFIER, 'Classifier skops file.'),
+            (self._DATASET, 'Test dataset skops file used for assessing the classifier performance.'),
             (self._NFOLD, 'The number of folds (n>=2) used for assessing cross-validation performance.\n'
                           'If not specified (default), simple test performance is assessed.\n'
                           'If set to a value of 1, out-of-bag (OOB) performance is assessed. '
@@ -44,7 +44,7 @@ class ClassifierPerformanceAlgorithm(EnMAPProcessingAlgorithm):
         return Group.Classification.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
-        self.addParameterPickleFile(self.P_CLASSIFIER, self._CLASSIFIER)
+        self.addParameterSkopsFile(self.P_CLASSIFIER, self._CLASSIFIER)
         self.addParameterClassificationDataset(self.P_DATASET, self._DATASET)
         self.addParameterInt(self.P_NFOLD, self._NFOLD, None, True, 1, 100, True)
         self.addParameterBoolean(self.P_OPEN_REPORT, self._OPEN_REPORT, True)
@@ -63,8 +63,8 @@ class ClassifierPerformanceAlgorithm(EnMAPProcessingAlgorithm):
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)
 
-            classifier = ClassifierDump(**Utils.pickleLoad(filenameClassifier)).classifier
-            sample = ClassifierDump(**Utils.pickleLoad(filenameSample))
+            classifier = ClassifierDump(**Utils.modelLoad(filenameClassifier)).classifier
+            sample = ClassifierDump(**Utils.modelLoad(filenameSample))
             feedback.pushInfo(f'Load classifier: {classifier}')
             feedback.pushInfo(f'Load sample data: X{list(sample.X.shape)} y{list(sample.y.shape)}')
 

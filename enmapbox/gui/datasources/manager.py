@@ -612,12 +612,12 @@ class DataSourceManagerTreeView(TreeView):
         QDesktopServices.openUrl(url)
 
     @typechecked
-    def onViewPklAsJson(self, modelDataSource: ModelDataSource):
-        """Convert PKL file to JSON sidecar file and open it in the default browser."""
+    def onViewSkopsAsJson(self, modelDataSource: ModelDataSource):
+        """Convert Skops file to JSON sidecar file and open it in the default browser."""
         from enmapboxprocessing.utils import Utils
-        filenamePkl = modelDataSource.source()
-        filenameJson = filenamePkl + '.json'
-        dump = Utils.pickleLoad(filenamePkl)
+        filenameSkops = modelDataSource.source()
+        filenameJson = filenameSkops + '.json'
+        dump = Utils.modelLoad(filenameSkops)
         Utils.jsonDump(dump, filenameJson)
         webbrowser.open_new_tab(filenameJson)
 
@@ -824,7 +824,7 @@ class DataSourceFactory(object):
                     dtype = QgsLayerItem.VectorTile
                     dataItem = LayerItem(None, source.name, source.uri, source.uri, dtype, source.providerKey)
 
-                elif source.providerKey in ['special:file', 'special:pkl']:
+                elif source.providerKey in ['special:file', 'special:skops']:
                     name = source.name
                     source = source.uri
 
@@ -868,8 +868,8 @@ class DataSourceFactory(object):
                     if name is None:
                         name = Path(source).name
 
-                    if re.search(r'\.(pkl)$', source, re.I):
-                        dataItem = QgsDataItem(Qgis.BrowserItemType.Custom, None, name, source, 'special:pkl')
+                    if re.search(r'\.(skops)$', source, re.I):
+                        dataItem = QgsDataItem(Qgis.BrowserItemType.Custom, None, name, source, 'special:skops')
                     else:
                         providers = ['gdal', 'ogr']
                         providers = QgsProviderRegistry.instance().providerList()
@@ -926,7 +926,7 @@ class DataSourceFactory(object):
                     elif dataItem.mapLayerType() == QgsMapLayer.VectorTileLayer:
                         ds = VectorTileDataSource(dataItem)
 
-                elif dataItem.providerKey() == 'special:pkl':
+                elif dataItem.providerKey() == 'special:skops':
                     ds = ModelDataSource(dataItem)
                 elif dataItem.providerKey() == 'special:file':
                     ds = FileDataSource(dataItem)
