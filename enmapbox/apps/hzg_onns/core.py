@@ -1,7 +1,7 @@
-import os
-import subprocess
 from os import makedirs
-from os.path import join, dirname, exists, abspath
+from os.path import exists
+
+from hzg_onns.ONNS_v091_20260622_for_EnMAP_Box import run_processor
 
 
 def onns(inputfile, outputDirectory, sensor, adapt, ac, osize):
@@ -23,28 +23,34 @@ def onns(inputfile, outputDirectory, sensor, adapt, ac, osize):
     if osize not in [0, 1, 2]:
         raise ValueError(f"Invalid osize: {osize!r}. Expected one of 0, 1, 2.")
 
-    python = abspath(join(dirname(os.__file__), '..', 'python'))
-
-    cmd = (r'{python} {script} {input} -od={output} -sensor={sensor} -adapt={adapt} -ac={ac} -osize={osize} '
-           r'-txt_header=1 -txt_ID=1 -txt_columns 1')
-    script = join(dirname(__file__), 'ONNS_v091_20200212_for_EnMAP_Box.py')
-
-    cmd = cmd.format(python=python, script=script, input=inputfile, output=outputDirectory, sensor=sensor, adapt=adapt,
+    cmd = (r'{iprod} --outdir={output} --sensor={sensor} --adapt={adapt} --ac={ac} --osize={osize} '
+           r'--txt_header=1 --txt_ID=1 --txt_columns 1')
+    cmd = cmd.format(iprod=inputfile, output=outputDirectory, sensor=sensor, adapt=adapt,
                      ac=ac, osize=osize)
+    output = run_processor(cmd)
 
-    try:
-        process = subprocess.run(
-            cmd,
-            check=True,
-            shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            universal_newlines=True
-        )
-        output = str(process.stdout)
-    except subprocess.CalledProcessError as ex:
-        output = ex.stderr
-    except Exception as ex2:
-        output = str(ex2)
+    # python = abspath(join(dirname(os.__file__), '..', 'python'))
+    #
+    # cmd = (r'{python} {script} {input} -od={output} -sensor={sensor} -adapt={adapt} -ac={ac} -osize={osize} '
+    #        r'-txt_header=1 -txt_ID=1 -txt_columns 1')
+    # script = join(dirname(__file__), 'ONNS_v091_20200212_for_EnMAP_Box.py')
+    #
+    # cmd = cmd.format(python=python, script=script, input=inputfile,
+    # output=outputDirectory, sensor=sensor, adapt=adapt,
+    #                  ac=ac, osize=osize)
+    # try:
+    #     process = subprocess.run(
+    #         cmd,
+    #         check=True,
+    #         shell=True,
+    #         stdout=subprocess.PIPE,
+    #         stderr=subprocess.PIPE,
+    #         universal_newlines=True
+    #     )
+    #     output = str(process.stdout)
+    # except subprocess.CalledProcessError as ex:
+    #     output = ex.stderr
+    # except Exception as ex2:
+    #     output = str(ex2)
 
     return cmd, output

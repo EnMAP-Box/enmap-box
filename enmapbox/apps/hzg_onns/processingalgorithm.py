@@ -95,8 +95,9 @@ class OnnsProcessingAlgorithm(QgsProcessingAlgorithm):
             return {self.P_OUTPUT_FOLDER: self.parameterAsFileOutput(parameters, self.P_OUTPUT_FOLDER, context)}
 
         # handle any uncatched exceptions
-        except Exception:
+        except Exception as ex:
             # print traceback to console and pass it to the processing feedback object
+            feedback.reportError(str(ex))
             import traceback
             traceback.print_exc()
             for line in traceback.format_exc().split('\n'):

@@ -443,6 +443,12 @@ class SensorProducts(object):
             )
             S3A_OL_1_EFR_ZIP = S3A_OL_1_EFR + '.zip'
 
+            S3A_OL_2_WFR = join(
+                sensorProductsRoot(), 'sentinel3',
+                'S3A_OL_2_WFR____20160720T093421_20160720T093621_20210706T180354_0119_006_307______MAR_R_NT_003.SEN3'
+            )
+            S3A_OL_2_WFR_ZIP = S3A_OL_2_WFR + '.zip'
+
         class Sentinel2(object):
             S2A_L1C = join(
                 sensorProductsRoot(), 'sentinel2', 'S2A_MSIL1C_20220720T101611_N0400_R065_T33UUU_20220720T140828.SAFE'
