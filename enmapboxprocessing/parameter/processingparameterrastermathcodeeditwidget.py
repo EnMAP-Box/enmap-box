@@ -129,10 +129,10 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
             webbrowser.open(root)
 
         elif sys.platform == 'darwin':
-            subprocess.Popen(['open', root], shell=False)  # nosec: root is opened as path, not executed via shell
+            subprocess.Popen(['open', root], shell=False)  # nosec - root is opened as path, not executed via shell
         else:
             try:
-                subprocess.Popen(  # nosec: root is opened as path, not executed via shell
+                subprocess.Popen(  # nosec - root is opened as path, not executed via shell
                     ['xdg-open', root], shell=False
                 )
             except OSError:

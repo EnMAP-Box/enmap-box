@@ -34,7 +34,7 @@ def extract_backbone(path: str) -> tuple[str, 'OrderedDict[str, Tensor]']:
         path,
         map_location=torch.device('cpu'),
         weights_only=False
-    )  # nosec: B614
+    )  # nosec B614
 
     if 'model' in checkpoint['hyper_parameters']:
         name = checkpoint['hyper_parameters']['model']

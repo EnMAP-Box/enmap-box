@@ -33,7 +33,7 @@ def load_model_and_tile_size(model_checkpoint, acc):
         model_checkpoint,
         map_location=torch.device(acc_d),
         weights_only=False
-    )  # nosec: B614
+    )  # nosec B614
 
     # Retrieve hyperparameters from the checkpoint
     hyperpara = checkpoint['hyper_parameters']

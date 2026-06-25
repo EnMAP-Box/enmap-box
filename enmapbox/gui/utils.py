@@ -113,20 +113,20 @@ def high_contrast_random_color(c1: QColor) -> QColor:
     h1, s1, v1, a1 = c1.getHsv()
 
     # 2. Pick a completely random Hue (0 to 359 degrees)
-    random_hue = random.randint(0, 359)  # nosec: B311
+    random_hue = random.randint(0, 359)  # nosec B311
 
     # 3. Force a high-contrast Saturation and Value
     # If c1 is dark, make the random color bright (and vice versa)
     if v1 > 127:
         # c1 is light -> Make the new color dark
-        random_value = random.randint(30, 80)  # nosec: B311
+        random_value = random.randint(30, 80)  # nosec B311
         # Richer colors stand out better on light
-        random_saturation = random.randint(180, 255)  # nosec: B311
+        random_saturation = random.randint(180, 255)  # nosec B311
     else:
         # c1 is dark -> Make the new color bright
-        random_value = random.randint(200, 255)  # nosec: B311
+        random_value = random.randint(200, 255)  # nosec B311
         # Slightly pastel/vibrant stand out on dark
-        random_saturation = random.randint(50, 150)  # nosec: B311
+        random_saturation = random.randint(50, 150)  # nosec B311
 
     # 4. Return the new QColor
     return QColor.fromHsv(random_hue, random_saturation, random_value)

@@ -8,7 +8,7 @@ import configparser
 import os
 import re
 import shutil
-import subprocess  # nosec: B404 # we need inkscape to properly create the splashscreen
+import subprocess  # nosec B404 - we need inkscape to properly create the splashscreen
 from pathlib import Path
 from typing import Match, Union
 
@@ -114,7 +114,7 @@ def update_splashscreen(version: str = None,
     print('Run:\n' + ' '.join(cmd))
     print('to export the svg as png with Inkscape (https://inkscape.org)')
     # we use nosec B603 here because we need inkscape exe from command line
-    subprocess.run(cmd, check=True)  # nosec: B603
+    subprocess.run(cmd, check=True)  # nosec B603
     os.remove(PATH_EXPORT_TMP)
 
 

@@ -540,7 +540,7 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                     try:
                         # B102 User-defined analytics code execution by design;
                         # equivalent to the QGIS Python Console.
-                        exec(code, namespace)  # nosec: B102
+                        exec(code, namespace)  # nosec B102
                         userFunction = namespace['updatePlot']
                     except Exception:
                         traceback.print_exc()

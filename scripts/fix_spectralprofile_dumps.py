@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 from typing import Union, List, Optional
 
-import skops  # nosec: B403 # we need skops to reconstruct the old data
+import skops  # nosec B403 - we need skops to reconstruct the old data
 
 from enmapbox.qgispluginsupport.qps.speclib.core import is_profile_field
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import validateProfileValueDict
