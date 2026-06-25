@@ -2,7 +2,8 @@ name: Code Check
 
 on:
   push:
-    branches: [master]
+    branches:
+      - '**'
     paths:
       - '**.py'
       - 'tox.ini'
@@ -34,7 +35,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version:  ${{ matrix.python-version }}
+          python-version: ${{ matrix.python-version }}
           cache: 'pip'
       - name: Install linters
         run: pip install flake8 flake8-qgis bandit
