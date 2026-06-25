@@ -633,13 +633,8 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
     def onOpenUserCollectionFolderClicked(self):
         system = platform.system()
         root = join(dirname(__file__), 'user_collections')
-        if system == 'Windows':
-            import subprocess  # nosec
-            cmd = rf'explorer.exe /select,"{root}"'
-            subprocess.Popen(cmd)  # nosec
-        else:
-            url = QUrl.fromLocalFile(dirname(root))
-            QDesktopServices.openUrl(url)
+        url = QUrl.fromLocalFile(dirname(root))
+        QDesktopServices.openUrl(url)
 
     def eeInitialize(self):
         eeImported, ee = importEarthEngine(False)
