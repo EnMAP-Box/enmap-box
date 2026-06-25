@@ -2,7 +2,7 @@ from enmapbox.gui.applications import EnMAPBoxApplication
 from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu
-from ..bandstatisticsapp.bandstatisticsdialog import BandStatisticsDialog
+from .bandstatisticsdialog import BandStatisticsDialog
 
 
 def enmapboxApplicationFactory(enmapBox):

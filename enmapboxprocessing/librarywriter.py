@@ -1,4 +1,6 @@
-from typing import List
+from typing import List, Union
+
+from PyQt5.QtCore import QMetaType
 
 from enmapbox.qgispluginsupport.qps.speclib.core import create_profile_field
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
@@ -22,7 +24,7 @@ class LibraryWriter(object):
             SpectralLibraryUtils.addAttribute(self.library, create_profile_field(name, None, encoding))
             self.library.endEditCommand()
 
-    def addAttribute(self, name: 'str', type_: QVariant.Type):
+    def addAttribute(self, name: 'str', type_: Union[QVariant.Type, QMetaType.Type]):
         self.library.startEditing()
         self.library.addAttribute(QgsField(name, type_))
         self.library.commitChanges()

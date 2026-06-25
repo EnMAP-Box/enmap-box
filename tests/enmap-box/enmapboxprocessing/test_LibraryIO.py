@@ -1,9 +1,12 @@
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import ProfileEncoding
+from enmapbox.testing import start_app
 from enmapboxprocessing.librarydriver import LibraryDriver
 from enmapboxprocessing.libraryreader import LibraryReader
 from enmapboxprocessing.testcase import TestCase
 from qgis.PyQt.QtCore import QMetaType
 from qgis.core import QgsGeometry, QgsPointXY
+
+start_app()
 
 
 class TestLibraryIO(TestCase):
@@ -32,8 +35,8 @@ class TestLibraryIO(TestCase):
         writer = LibraryDriver().create('My Library')
         writer.addProfileAttribute('profile1', ProfileEncoding.Text)
         writer.addProfileAttribute('profile2', ProfileEncoding.Text)
-        writer.addAttribute('name', QMetaType.String)
-        writer.addAttribute('my field', QMetaType.String)
+        writer.addAttribute('name', QMetaType.QString)
+        writer.addAttribute('my field', QMetaType.QString)
 
         # add data
         writer.addFeature(values, geometry)
