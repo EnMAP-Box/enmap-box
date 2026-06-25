@@ -72,6 +72,7 @@ from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsBrowserModel, QgsField
 from qgis.core import QgsExpressionContextGenerator, QgsExpressionContext, QgsProcessingContext, \
     QgsExpressionContextUtils
+from qgis.core import QgsFeature
 from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
     QgsProcessingAlgorithm, Qgis, QgsCoordinateReferenceSystem, QgsWkbTypes, \
     QgsPointXY, QgsLayerTree, QgsLayerTreeLayer, QgsVectorLayerTools, \
@@ -404,7 +405,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
     # should be pyqtSignal([SpatialPoint], [SpatialPoint, QgsMapCanvas])
     sigCurrentLocationChanged = pyqtSignal([object], [object, QgsMapCanvas])
 
-    sigCurrentSpectraChanged = pyqtSignal(list)
+    sigCurrentSpectraChanged = pyqtSignal(dict)
 
     sigMapCanvasRemoved = pyqtSignal(MapCanvas)
     sigMapCanvasAdded = pyqtSignal(MapCanvas)
@@ -1772,10 +1773,12 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         #     self.mapLayerStore().removeMapLayer(lid)
 
     @pyqtSlot(SpatialPoint, QgsMapCanvas)
-    def loadCurrentMapSpectra(self,
-                              spatialPoint: SpatialPoint,
-                              mapCanvas: Optional[QgsMapCanvas] = None,
-                              runAsync: bool = None):
+    def loadCurrentMapSpectra(
+        self,
+        spatialPoint: SpatialPoint,
+        mapCanvas: Optional[QgsMapCanvas] = None,
+        runAsync: bool = None
+    ) -> Dict[str, List[QgsFeature]]:
         """
         Loads SpectralProfiles from a location defined by `spatialPoint`
         :param spatialPoint: SpatialPoint
@@ -1816,7 +1819,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                 node.setSpeclib(sl)
                 bridge.setDefaultSources(node)
 
-        panel.loadCurrentMapSpectra(spatialPoint, mapCanvas=mapCanvas, runAsync=runAsync)
+        return panel.loadCurrentMapSpectra(spatialPoint, mapCanvas=mapCanvas, runAsync=runAsync)
 
     def setMapTool(self,
                    mapToolKey: MapTools,
@@ -2235,7 +2238,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                     mapCanvas.refresh()
 
         if bSP:
-            self.loadCurrentMapSpectra(spatialPoint, mapCanvas)
+            results = self.loadCurrentMapSpectra(spatialPoint, mapCanvas)
+            if not isinstance(results, dict):
+                results = {}
+            self.sigCurrentSpectraChanged.emit(results)
 
     def currentLocation(self) -> Optional[SpatialPoint]:
         """
