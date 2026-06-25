@@ -1,5 +1,6 @@
 from sklearn.base import ClassifierMixin
 
+from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 from enmapboxprocessing.algorithm.fitgaussianprocessclassifieralgorithm import FitGaussianProcessClassifierAlgorithm
 from enmapboxprocessing.algorithm.fitgenericclassifieralgorithm import FitGenericClassifierAlgorithm
@@ -9,6 +10,8 @@ from enmapboxprocessing.algorithm.fitsvcpolyalgorithm import FitSvcPolyAlgorithm
 from enmapboxprocessing.algorithm.fitsvcrbfalgorithm import FitSvcRbfAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import classifierDumpSkops, classificationDatasetAsJsonFile
+
+start_app()
 
 
 class FitTestClassifierAlgorithm(FitClassifierAlgorithmBase):

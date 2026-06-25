@@ -1,17 +1,22 @@
 import unittest
 
-from hzg_onns.core import onns
-
-from enmapbox.apps.hzg_onns import OnnsProcessingAlgorithm
 from enmapbox.testing import start_app, TestCase
 from enmapboxtestdata import SensorProducts, sensorProductsRoot
 from processing.core.Processing import Processing
 
 start_app()
 
+MISSING_MODULE = None
+try:
+    from hzg_onns.core import onns
+    from enmapbox.apps.hzg_onns import OnnsProcessingAlgorithm
+except ModuleNotFoundError as ex:
+    MISSING_MODULE = str(ex)
+
 
 class ONNSTestCases(TestCase):
 
+    @unittest.skipIf(MISSING_MODULE, f'Missing module: {MISSING_MODULE}')
     @unittest.skipIf(not sensorProductsRoot(), 'No sensor products root')
     def test_onns_core(self):
         tmp = self.createTestOutputDirectory()
@@ -30,6 +35,7 @@ class ONNSTestCases(TestCase):
                            # note that we deleted the insitu case!!!
                            osize=1)
 
+    @unittest.skipIf(MISSING_MODULE, f'Missing modules {MISSING_MODULE}')
     @unittest.skipIf(not sensorProductsRoot(), 'No sensor products root')
     def test_processing_algorithms(self):
         alg = OnnsProcessingAlgorithm()
