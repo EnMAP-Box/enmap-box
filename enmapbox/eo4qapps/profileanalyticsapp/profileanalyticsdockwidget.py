@@ -538,9 +538,9 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                     with open(filename) as file:
                         code = file.read()
                     try:
-                        # nosec B102 - User-defined analytics code execution by design;
+                        # B102 User-defined analytics code execution by design;
                         # equivalent to the QGIS Python Console.
-                        exec(code, namespace)  # nosec
+                        exec(code, namespace)  # nosec: B102
                         userFunction = namespace['updatePlot']
                     except Exception:
                         traceback.print_exc()
@@ -585,7 +585,7 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                     with open(filename) as file:
                         code = file.read()
                     try:
-                        # nosec B102 - User-defined analytics code execution by design;
+                        # nosec B102 # User-defined analytics code execution by design;
                         # equivalent to the QGIS Python Console.
                         exec(code, namespace)  # nosec
                         userFunction = namespace['updatePlot']

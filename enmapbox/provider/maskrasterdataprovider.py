@@ -45,8 +45,8 @@ class MaskRasterDataProvider(QgsRasterDataProvider):
             if value is None:
                 return default
             else:
-                # nosec B307 - User-defined code evaluation by design; equivalent to the QGIS Python Console.
-                return eval(value)  # nosec
+                # B307 - User-defined code evaluation by design; equivalent to the QGIS Python Console.
+                return eval(value)  # nosec B307
 
         self.maskNoDataValues = parseValue(parameters.get(self.P_MaskNoDataValues), True)
         self.maskNonFiniteValues = parseValue(parameters.get(self.P_MaskNonFiniteValues), True)

@@ -445,9 +445,9 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
         code = self.mCode.text()
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            # nosec B102 - User-defined Google Earth Engine collection code execution by design;
+            # B102 User-defined Google Earth Engine collection code execution by design;
             # equivalent to the QGIS Python Console.
-            exec(code, namespace)  # nosec
+            exec(code, namespace)  # nosec: B102
 
         with GeeWaitCursor():
             try:
@@ -996,7 +996,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
         return visParams
 
     def eeCollection(
-            self, addIndices=True, filterDate=True, filterProperty=True, filterQuality=True
+        self, addIndices=True, filterDate=True, filterProperty=True, filterQuality=True
     ):
         eeImported, ee = importEarthEngine(False)
 
@@ -1068,7 +1068,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
                 masks = list()
                 for item in items:
                     if isinstance(item, (PixelQualityBitmaskItem, CategoryMaskItem)) and item.checkState(
-                            0) == Qt.Checked:
+                        0) == Qt.Checked:
                         masks.append(item.eeMask(eeImage))
 
                 if len(masks) == 0:

@@ -28,7 +28,7 @@ import logging
 import os
 import platform
 import re
-import subprocess  # nosec: 404
+import subprocess  # nosec: B404
 import sys
 import time
 import traceback

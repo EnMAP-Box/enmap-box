@@ -4,10 +4,11 @@ Converts the content of binary SpectralProfile fields from old-style skops dumps
 """
 import argparse
 import json
-import skops  # nosec: B403 # we need skops to reconstruct the old data
 import sys
 from pathlib import Path
 from typing import Union, List, Optional
+
+import skops  # nosec: B403 # we need skops to reconstruct the old data
 
 from enmapbox.qgispluginsupport.qps.speclib.core import is_profile_field
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import validateProfileValueDict
@@ -68,7 +69,7 @@ def fix_binary_profile_fields(
                 except UnicodeDecodeError:
                     # old-style skops format.
                     # using skops is required here to reconstruct the old data
-                    profile_dict = skops.loads(data_old.data())  # nosec 301
+                    profile_dict = skops.loads(data_old.data())  # nosec B301
                     needs_conversion = True
 
                 success, msg, d = validateProfileValueDict(profile_dict)
