@@ -8,4 +8,4 @@ for bandNo in reader.bandNumbers():
     print(reader.wavelength(bandNo))
 
 for bandNo in range(1, 100):
-    print(reader.wavelength(randint(1, reader.bandCount())))  # nosec
+    print(reader.wavelength(randint(1, reader.bandCount())))
