@@ -6,7 +6,6 @@ from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import ProfileE
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import prepareProfileValueDict, \
     encodeProfileValueDict
 from enmapbox.typeguard import typechecked
-from qgis.PyQt.QtCore import QMetaType
 from qgis.core import QgsVectorLayer, QgsField, QgsFeature, edit, QgsGeometry
 
 
@@ -22,7 +21,7 @@ class LibraryWriter(object):
             SpectralLibraryUtils.addAttribute(self.library, create_profile_field(name, None, encoding))
             self.library.endEditCommand()
 
-    def addAttribute(self, name: 'str', type_: QMetaType.Type):
+    def addAttribute(self, name: 'str', type_):
         self.library.startEditing()
         self.library.addAttribute(QgsField(name, type_))
         self.library.commitChanges()
