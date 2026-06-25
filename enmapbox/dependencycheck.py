@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ***************************************************************************
-    dependencychecker
+    dependencycheck.py
 
     This module contains functionality to check the calling python environment for required packages and return
     user-friendly warning in case of missing dependencies.
@@ -28,7 +28,7 @@ import logging
 import os
 import platform
 import re
-import subprocess
+import subprocess  # nosec: 404
 import sys
 import time
 import traceback
@@ -365,12 +365,13 @@ def call_pip_command(pipArgs: list) -> Tuple[bool, Optional[str], Optional[str]]
             # Prevent opening a console window
             kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
 
-        result = subprocess.run(cmd,
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE,
-                                text=True,
-                                **kwargs,
-                                )
+        result = subprocess.run(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            **kwargs,
+        )  # nosec: B603 # process is checked, and there is simply no other way to call the local pip executable
         success = result.returncode == 0
         msgOut = result.stdout
         msgErr = result.stderr
