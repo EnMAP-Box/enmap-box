@@ -144,7 +144,7 @@ class ProcessingParameterSkopsFileClassificationDatasetWidget(QWidget):
         from classificationdatasetmanagerapp import ClassificationDatasetManagerGui
         self.dialog = ClassificationDatasetManagerGui(self)
         self.dialog.mDataset.mFile.setFilePath(filename)
-        self.dialog.exec_()
+        self.dialog.exec()
         filename = self.dialog.mDataset.mFile.filePath()
 
         QMessageBox.information(self, 'Classification Dataset Manager', f'New dataset file {basename(filename)}.')

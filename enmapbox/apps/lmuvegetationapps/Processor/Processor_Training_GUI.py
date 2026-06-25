@@ -35,7 +35,9 @@ import sys
 import warnings
 
 import joblib
+import lmuvegetationapps.Processor.Processor_Inversion_core as processor
 import numpy as np
+from lmuvegetationapps import APP_DIR
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qtagg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
@@ -43,9 +45,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
 
-import lmuvegetationapps.Processor.Processor_Inversion_core as processor
 from enmapbox.gui.utils import loadUi
-from lmuvegetationapps import APP_DIR
 from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox, QVBoxLayout, QTableWidgetItem, QGridLayout, QLabel, \
     QSpinBox, QAbstractSpinBox, QApplication
 from qgis.core import QgsMapLayerProxyModel
@@ -1460,4 +1460,4 @@ if __name__ == '__main__':
     # m.mlra_training.open_lut(lutpath=lut_path)
     # out_folder = r"C:\Data\Daten\Testdaten\Model_TEST/"
     # m.mlra_training.get_folder(path=out_folder)
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

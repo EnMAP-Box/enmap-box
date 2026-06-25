@@ -258,7 +258,7 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
 
             menu.addAction(action)
 
-        menu.exec_(self.mSourcesTree.viewport().mapToGlobal(pos))
+        menu.exec(self.mSourcesTree.viewport().mapToGlobal(pos))
 
     def onContextMapSourceClicked(self):
         item = self.mSourcesTree.selectedItems()[0]

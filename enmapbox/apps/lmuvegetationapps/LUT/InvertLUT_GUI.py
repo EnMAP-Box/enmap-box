@@ -24,16 +24,16 @@
 import os
 import sys
 
-from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox, QApplication
+import lmuvegetationapps.LUT.InvertLUT_core as Inverse
+from lmuvegetationapps import APP_DIR
 from osgeo import gdal
 
-import lmuvegetationapps.LUT.InvertLUT_core as Inverse
 from enmapbox.gui.utils import loadUi
-from lmuvegetationapps import APP_DIR
-# ensure to call QGIS before PyQtGraph
-
+from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox, QApplication
 from qgis.core import QgsMapLayerProxyModel
 from qgis.gui import QgsMapLayerComboBox
+
+# ensure to call QGIS before PyQtGraph
 
 pathUI_inversion = os.path.join(APP_DIR, 'Resources/UserInterfaces/InvertLUT.ui')
 pathUI_wavelengths = os.path.join(APP_DIR, 'Resources/UserInterfaces/Select_Wavelengths.ui')
@@ -480,7 +480,7 @@ class GlobalInversion:
                 self.main.nodat_widget.init(image_type=image_type, image=image)
                 self.main.nodat_widget.gui.setModal(True)  # parent window is blocked
                 # unlike .show(), .exec_() waits with execution of the code, until the app is closed
-                self.main.nodat_widget.gui.exec_()
+                self.main.nodat_widget.gui.exec()
                 nodata = self.main.nodat_widget.nodat
 
             if image_type == "Geometry Image":
@@ -762,4 +762,4 @@ if __name__ == '__main__':
     app = start_app()
     m = MainUiFunc()
     m.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

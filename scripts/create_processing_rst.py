@@ -16,8 +16,7 @@ from enmapbox.qgispluginsupport.qps.utils import file_search
 from enmapbox.testing import start_app
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.glossary import injectGlossaryLinks
-from qgis.PyQt.QtCore import QVariant
-from qgis.core import Qgis
+from qgis.core import Qgis, NULL
 from qgis.core import QgsApplication, QgsProcessingAlgorithm, QgsProcessingDestinationParameter, \
     QgsProcessingParameterDefinition
 from qgis.core import (QgsProcessingModelAlgorithm, QgsProcessing, QgsProcessingContext, QgsProcessingParameterEnum)
@@ -127,8 +126,8 @@ def create_or_update_rst(file, text: str) -> Path:
 
 
 def generateAlgorithmRSTs(
-    rootRst: Union[Path, str],
-    algorithms: List[QgsProcessingAlgorithm]
+        rootRst: Union[Path, str],
+        algorithms: List[QgsProcessingAlgorithm]
 ) -> List[Path]:
     """
     Create an rst file for each provided QgsProcessingAlgorithm.
@@ -240,8 +239,8 @@ def doc_repo_root() -> Path:
 
 
 def generateRST(
-    rootRst: Union[Path, str],
-    algorithmIds: Optional[List[str]] = None
+        rootRst: Union[Path, str],
+        algorithmIds: Optional[List[str]] = None
 ) -> List[Path]:
     rootRst = Path(rootRst)
     if not rootRst.is_dir():
@@ -316,7 +315,7 @@ def escape_rst(text: str) -> str:
 
 
 def collectQgsProcessAlgorithmHelp(
-    algorithms: List[QgsProcessingAlgorithm]
+        algorithms: List[QgsProcessingAlgorithm]
 ) -> Dict[str, str]:
     """
     Collects help text for QgsProcessingAlgorithm instances
@@ -343,9 +342,9 @@ def rst_label(algorithm: QgsProcessingAlgorithm) -> str:
 
 
 def v3(
-    alg: QgsProcessingAlgorithm,
-    section_adds: Optional[dict] = None,
-    qgis_process_help: Optional[Dict[str, str]] = None
+        alg: QgsProcessingAlgorithm,
+        section_adds: Optional[dict] = None,
+        qgis_process_help: Optional[Dict[str, str]] = None
 ):
     """
 
@@ -525,7 +524,7 @@ def qgisProcessHelp(alg: QgsProcessingAlgorithm, use_json: bool = False) -> str:
                 line += " (optional)"
             output_buffer.append(f"{line}\n")
 
-            if p.defaultValue() is not None and p.defaultValue() != QVariant():
+            if p.defaultValue() is not None and p.defaultValue() != NULL:
                 val_str, ok = p.valueAsString(p.defaultValue(), context)
                 output_buffer.append(f"\tDefault value:\t{val_str}\n")
         else:

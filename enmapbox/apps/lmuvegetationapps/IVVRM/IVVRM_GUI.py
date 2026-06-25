@@ -31,14 +31,14 @@ import warnings
 import numpy as np
 # ensure to call QGIS before PyQtGraph
 import pyqtgraph as pg
-from scipy.interpolate import interp1d
-
-from enmapbox.gui.utils import loadUi
-from enmapboxprocessing.rasterreader import RasterReader
 # from enmapbox.coreapps._classic.hubflow.core import openRasterDataset
 from lmuvegetationapps import APP_DIR
 from lmuvegetationapps.Resources.PROSAIL import call_model as mod
 from lmuvegetationapps.Resources.Spec2Sensor.Spec2Sensor_core import Spec2Sensor, BuildTrueSRF, BuildGenericSRF
+from scipy.interpolate import interp1d
+
+from enmapbox.gui.utils import loadUi
+from enmapboxprocessing.rasterreader import RasterReader
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QHeaderView, QTableWidgetItem, QMessageBox, QApplication, \
     QWidgetAction, QWidget, QLabel, QGridLayout
@@ -761,8 +761,8 @@ class IVVRM:
 
                 # Nash-Sutcliffe Efficiency Error
                 nse = 1.0 - (
-                    (np.nansum((self.data_mean - self.myResult) ** 2))
-                    / (np.nansum((self.data_mean - (np.nanmean(self.data_mean))) ** 2))
+                        (np.nansum((self.data_mean - self.myResult) ** 2))
+                        / (np.nansum((self.data_mean - (np.nanmean(self.data_mean))) ** 2))
                 )
 
                 # Modified Nash-Sutcliffe Efficiency Error
@@ -1142,10 +1142,10 @@ class SensorEditor:
             self.gui.label.setText(text)
             if len(self.outreach) > 0:
                 text = (
-                    "Create Generic SRF from Imagery OK with "
-                    + str(len(self.x[:, 0])) + " Bands but Caution! "
-                    + str(len(self.outreach))
-                    + " wavelengths outside PROSAIL range will be deleted!"
+                        "Create Generic SRF from Imagery OK with "
+                        + str(len(self.x[:, 0])) + " Bands but Caution! "
+                        + str(len(self.outreach))
+                        + " wavelengths outside PROSAIL range will be deleted!"
                 )
                 self.gui.label.setStyleSheet("color: rgb(170, 130, 0);")
                 self.gui.label.setText(text)
@@ -1530,4 +1530,4 @@ if __name__ == '__main__':
     app = start_app()
     m = MainUiFunc()
     m.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
