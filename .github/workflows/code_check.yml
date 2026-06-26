@@ -37,6 +37,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
+          cache-dependency-path: .env/linux/requirements_ubuntu.txt
       - name: Install linters
         run: pip install flake8 flake8-qgis bandit
       - name: Run flake8
