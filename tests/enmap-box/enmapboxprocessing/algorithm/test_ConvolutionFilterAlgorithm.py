@@ -27,6 +27,7 @@ class ConvolutionFilterAlgorithm(ConvolutionFilterAlgorithmBase):
         return ''
 
     def code(self):
+        from astropy.convolution import Box2DKernel
         kernel = Box2DKernel(width=15)
         return kernel
 
