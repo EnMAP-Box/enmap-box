@@ -6,13 +6,13 @@ from enmapboxprocessing.algorithm.convolutionfilteralgorithmbase import Convolut
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import hires
 
-start_app()
-
 MISSING_MODULE = None
 try:
-    from astropy.convolution import Box2DKernel
+    import astropy  # noqa: F401
 except ModuleNotFoundError as ex:
     MISSING_MODULE = str(ex)
+
+start_app()
 
 
 class ConvolutionFilterAlgorithm(ConvolutionFilterAlgorithmBase):
