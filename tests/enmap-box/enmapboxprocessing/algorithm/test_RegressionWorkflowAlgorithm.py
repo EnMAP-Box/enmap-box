@@ -4,6 +4,7 @@ import sklearn
 from osgeo import gdal
 from sklearn.base import RegressorMixin
 
+from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.fitcatboostregressoralgorithm import FitCatBoostRegressorAlgorithm
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 from enmapboxprocessing.algorithm.fitlinearsvralgorithm import FitLinearSvrAlgorithm
@@ -16,6 +17,8 @@ from enmapboxtestdata import regressorDumpMultiTargetSkops
 
 SKLEARN_VERSION = list(map(int, sklearn.__version__.split('.')))
 SKLEARN_VERSION_NUMBER = SKLEARN_VERSION[0] + SKLEARN_VERSION[1] / 10
+
+start_app()
 
 
 class FitTestRegressorAlgorithm(FitClassifierAlgorithmBase):
