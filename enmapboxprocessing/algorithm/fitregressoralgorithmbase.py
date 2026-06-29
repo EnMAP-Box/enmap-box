@@ -5,11 +5,11 @@ from typing import Dict, Any, List, Tuple
 
 from sklearn.multioutput import MultiOutputRegressor
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -63,8 +63,8 @@ class FitRegressorAlgorithmBase(EnMAPProcessingAlgorithm):
         code = self.parameterAsString(parameters, name, context)
 
         # nosec B102 # User-defined scikit-learn model code execution by design; equivalent to the QGIS Python Console.
-        # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
-        exec(code, namespace)  # nosec
+        # The code execution is transparently documented for users (e.g., via the Processing algorithm help).
+        exec(code, namespace)  # nosec B102 # User-defined scikit-learn model code execution by design;
         return namespace['regressor']
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
@@ -79,7 +79,7 @@ class FitRegressorAlgorithmBase(EnMAPProcessingAlgorithm):
         return True, ''
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         dump = self.parameterAsRegressorDump(parameters, self.P_DATASET, context)
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_REGRESSOR, context)

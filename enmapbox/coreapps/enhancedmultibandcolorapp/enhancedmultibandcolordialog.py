@@ -92,7 +92,11 @@ class EnhancedMultiBandColorDialog(QMainWindow):
         self.mTable.setRowCount(layer.bandCount())
         for row, color in enumerate(colors):
             if color is None:
-                color = QColor(randint(0, 255), randint(0, 255), randint(0, 255))  # nosec
+                color = QColor(
+                    randint(0, 255),  # nosec B311 # no-security relevant random sampling
+                    randint(0, 255),  # nosec B311 # no-security relevant random sampling
+                    randint(0, 255)  # nosec B311 # no-security relevant random sampling
+                )
             if color.alpha() == 255:
                 checkState = Qt.Checked
             else:

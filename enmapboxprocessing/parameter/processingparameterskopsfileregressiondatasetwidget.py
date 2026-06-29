@@ -1,3 +1,4 @@
+import sys
 from os.path import basename, join, dirname
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
@@ -79,7 +80,8 @@ class ProcessingParameterSkopsFileRegressionDatasetWidget(QWidget):
                     dump = RegressorDump.fromDict(Utils.modelLoad(filename))
                     samples, features = dump.X.shape
                     targets = len(dump.targets)
-                except Exception:  # nosec # Ignore files that are not valid models.
+                except Exception as ex:
+                    print(f'Unable to open .skops file: {ex}', file=sys.stderr)
                     continue
 
                 action = self.menu.addAction('')

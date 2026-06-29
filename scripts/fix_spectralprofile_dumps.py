@@ -4,11 +4,10 @@ Converts the content of binary SpectralProfile fields from old-style skops dumps
 """
 import argparse
 import json
+import pickle  # nosec B403 # we need pickle to reconstruct the old data before we can save it without pickle
 import sys
 from pathlib import Path
 from typing import Union, List, Optional
-
-import pickle  # nosec B403 # we need pickle to reconstruct the old data
 
 from enmapbox.qgispluginsupport.qps.speclib.core import is_profile_field
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import validateProfileValueDict
@@ -69,7 +68,7 @@ def fix_binary_profile_fields(
                 except UnicodeDecodeError:
                     # old-style pickle format.
                     # using pickle is required here to reconstruct the old data
-                    profile_dict = pickle.loads(data_old.data())  # nosec B301
+                    profile_dict = pickle.loads(data_old.data())  # nosec B301 # pickle is required to reconstruct data
                     needs_conversion = True
 
                 success, msg, d = validateProfileValueDict(profile_dict)

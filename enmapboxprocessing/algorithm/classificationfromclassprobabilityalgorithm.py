@@ -4,6 +4,7 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
@@ -11,7 +12,6 @@ from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, Qgis, QgsMapLayer
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -41,7 +41,7 @@ class ClassificationFromClassProbabilityAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterRasterDestination(self.P_OUTPUT_CLASSIFICATION, self._OUTPUT_CLASSIFICATION)
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         probability = self.parameterAsRasterLayer(parameters, self.P_PROBABILITY, context)
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_CLASSIFICATION, context)
@@ -54,7 +54,11 @@ class ClassificationFromClassProbabilityAlgorithm(EnMAPProcessingAlgorithm):
             categories = list()
             for bandNo, target in enumerate(targets, 1):
                 if target.color is None:
-                    color = QColor(randint(0, 255), randint(0, 255), randint(0, 255)).name()  # nosec
+                    color = QColor(
+                        randint(0, 255),  # nosec B311 # not security relevant random sampling
+                        randint(0, 255),  # nosec B311 # not security relevant random sampling
+                        randint(0, 255),  # nosec B311 # not security relevant random sampling
+                    ).name()  # nosec
                 else:
                     color = target.color
                 categories.append(Category(bandNo, target.name, color))

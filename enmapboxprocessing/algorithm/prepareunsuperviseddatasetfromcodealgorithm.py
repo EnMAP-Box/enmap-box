@@ -3,11 +3,11 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -54,14 +54,14 @@ class PrepareUnsupervisedDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
         return lines
 
     def parameterAsTransformerDump(
-            self, parameters: Dict[str, Any], name, context: QgsProcessingContext
+        self, parameters: Dict[str, Any], name, context: QgsProcessingContext
     ) -> TransformerDump:
         namespace = dict()
         code = self.parameterAsString(parameters, name, context)
 
-        # nosec B102 # User-defined code execution by design; equivalent to the QGIS Python Console.
+        # nosec B102 # User-defined code execution by design; equivalent to calling sklearn in QGIS Python Console.
         # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
-        exec(code, namespace)  # nosec
+        exec(code, namespace)  # nosec B102 # User-defined code execution by design;
         features, X = [namespace[key] for key in ['features', 'X']]
         X = np.array(X)
         transformerDump = TransformerDump(features, X)
@@ -75,7 +75,7 @@ class PrepareUnsupervisedDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_DATASET, context)
 

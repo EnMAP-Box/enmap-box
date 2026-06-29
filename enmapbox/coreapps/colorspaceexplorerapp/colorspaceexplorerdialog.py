@@ -2,15 +2,14 @@ from contextlib import suppress
 from random import randint
 from typing import Optional
 
+from enmapbox.typeguard import typechecked
+from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QCheckBox, QMainWindow, QSpinBox, QGridLayout
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer, QgsMultiBandColorRenderer, QgsContrastEnhancement, QgsRasterMinMaxOrigin, \
     QgsMapLayerProxyModel
 from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsMapLayerComboBox
-
-from enmapbox.typeguard import typechecked
-from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 
 
 @typechecked
@@ -156,9 +155,9 @@ class ColorSpaceExplorerDialog(QMainWindow):
         if layer is None:
             return
 
-        self.mRedBand.setBand(randint(1, layer.bandCount()))  # nosec
-        self.mGreenBand.setBand(randint(1, layer.bandCount()))  # nosec
-        self.mBlueBand.setBand(randint(1, layer.bandCount()))  # nosec
+        self.mRedBand.setBand(randint(1, layer.bandCount()))  # nosec B311 # no-security relevant random sampling
+        self.mGreenBand.setBand(randint(1, layer.bandCount()))  # nosec B311 # no-security relevant random sampling
+        self.mBlueBand.setBand(randint(1, layer.bandCount()))  # nosec B311 # no-security relevant random sampling
 
     def onRandomDeltaClicked(self):
         layer = self.currentLayer()
@@ -167,7 +166,9 @@ class ColorSpaceExplorerDialog(QMainWindow):
 
         v = min(self.mRandomDeltaMax.value(), layer.bandCount())
         for mDelta in [self.mRedDelta, self.mGreenDelta, self.mBlueDelta]:
-            mDelta.setValue(randint(-v, v))  # nosec
+            mDelta.setValue(
+                randint(-v, v)  # nosec B311 # no-security relevant random sampling
+            )
 
     def nextBandNo(self, bandNo: int, delta: int, backwards) -> int:
         layer = self.currentLayer()

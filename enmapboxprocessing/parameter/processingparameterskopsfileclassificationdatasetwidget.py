@@ -1,3 +1,4 @@
+import sys
 from os.path import basename, join, dirname
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
@@ -79,7 +80,8 @@ class ProcessingParameterSkopsFileClassificationDatasetWidget(QWidget):
                     dump = ClassifierDump(**Utils.modelLoad(filename))
                     samples, features = dump.X.shape
                     classes = len(dump.categories)
-                except Exception:  # nosec # Ignore files that are not valid models.
+                except Exception as ex:
+                    print('Unable to open .skops file: ' + str(ex), file=sys.stderr)
                     continue
 
                 action = self.menu.addAction(alg.displayName())

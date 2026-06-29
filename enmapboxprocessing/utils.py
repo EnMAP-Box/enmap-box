@@ -351,7 +351,14 @@ class Utils(object):
         values = np.unique(array[0][mask[0]])
 
         # nosec B311 # not security relevant generation of random colors
-        categories = [Category(int(v), str(v), QColor(randint(0, 2 ** 24)).name()) for v in values]  # nosec
+        categories = [
+            Category(
+                int(v),
+                str(v),
+                QColor(
+                    randint(0, 2 ** 24)  # nosec B311 # not security relevant random sampling
+                ).name()) for v in values
+        ]
 
         return categories
 
@@ -376,7 +383,10 @@ class Utils(object):
         categories = list()
         for value in values:
             # nosec B311 # not security relevant generation of random colors
-            color = colors.get(value, QColor(randint(0, 2 ** 24 - 1)))  # nosec
+            color = colors.get(
+                value,
+                QColor(randint(0, 2 ** 24 - 1))  # nosec B311 # randint not security relevant
+            )
             color = cls.parseColor(color).name()
             name = names.get(value, str(value))
             categories.append(Category(value, name, color))
@@ -668,7 +678,8 @@ class Utils(object):
             "sklearn.",
             "numpy.",
             "scipy.",
-            "enmapboxprocessing.typing"
+            "enmapboxprocessing.typing",
+            "catboost."
         )
         untrusted_types = sio.get_untrusted_types(file=filename)
         for untrusted_type in sio.get_untrusted_types(file=filename):

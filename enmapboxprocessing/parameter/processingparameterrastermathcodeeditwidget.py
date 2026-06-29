@@ -1,6 +1,3 @@
-import subprocess  # nosec B404
-import sys
-import webbrowser
 from collections import OrderedDict
 from functools import partial
 from os import scandir, DirEntry, mkdir
@@ -14,7 +11,9 @@ from enmapboxprocessing.parameter.processingparametercodeeditwidget import CodeE
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from processing.gui.wrappers import WidgetWrapper
+from qgis.PyQt.QtCore import QUrl
 from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QDesktopServices
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QWidget, QTreeWidget, QTreeWidgetItem, QPushButton, \
     QInputDialog, QMenu, QAction, QComboBox, QToolButton, QFileDialog
@@ -123,22 +122,25 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
     def onSnippetOpenFolderClicked(self):
         from enmapboxprocessing.algorithm import rastermathalgorithm
         root = join(dirname(rastermathalgorithm.__file__), 'snippet')
+
+        QDesktopServices.openUrl(QUrl.fromLocalFile(root))
+
         # taken from https://stackoverflow.com/questions/1795111/is-there-a-cross-platform-way-to-open-a-file-
         # browser-in-python
-        if sys.platform == 'win32':
-            webbrowser.open(root)
-
-        elif sys.platform == 'darwin':
-            subprocess.Popen(['open', root], shell=False)  # nosec # root is opened as path, not executed via shell
-        else:
-            try:
-                subprocess.Popen(  # nosec # root is opened as path, not executed via shell
-                    ['xdg-open', root], shell=False
-                )
-            except OSError:
-                pass
-                # error, think of something else to try
-                # xdg-open *should* be supported by recent Gnome, KDE, Xfce
+        # if sys.platform == 'win32':
+        #     webbrowser.open(root)
+        #
+        # elif sys.platform == 'darwin':
+        #     subprocess.Popen(['open', root], shell=False)  # nosec # root is opened as path, not executed via shell
+        # else:
+        #     try:
+        #         subprocess.Popen(  # nosec # root is opened as path, not executed via shell
+        #             ['xdg-open', root], shell=False
+        #         )
+        #     except OSError:
+        #         pass
+        #         # error, think of something else to try
+        #         # xdg-open *should* be supported by recent Gnome, KDE, Xfce
 
     def onSensorBandClicked(self):
         button: QToolButton = self.sender()

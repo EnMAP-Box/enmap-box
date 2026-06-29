@@ -3,13 +3,13 @@ import traceback
 from operator import xor
 from typing import Dict, Any, List, Tuple, Optional
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromrasteralgorithm import \
     PrepareUnsupervisedDatasetFromRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -76,7 +76,7 @@ class FitTransformerAlgorithmBase(EnMAPProcessingAlgorithm):
 
         # nosec B102 # User-defined scikit-learn model code execution by design; equivalent to the QGIS Python Console.
         # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
-        exec(code, namespace)  # nosec
+        exec(code, namespace)  # nosec B102 # User-defined scikit-learn model code execution by design;
         return namespace['transformer']
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
@@ -91,7 +91,7 @@ class FitTransformerAlgorithmBase(EnMAPProcessingAlgorithm):
         return True, ''
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
 
         raster = self.parameterAsRasterLayer(parameters, self.P_FEATURE_RASTER, context)

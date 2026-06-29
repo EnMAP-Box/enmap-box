@@ -2,13 +2,13 @@ from math import nan
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback
 
 
 @typechecked
@@ -56,7 +56,7 @@ class SpectralIndexOptimizerAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterRasterDestination(self.P_OUTPUT_MATRIX, self._OUTPUT_MATRIX)
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         from sklearn.linear_model import LinearRegression
         from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
@@ -111,7 +111,9 @@ class SpectralIndexOptimizerAlgorithm(EnMAPProcessingAlgorithm):
                         # equivalent to the QGIS Python Console.
                         # The code execution is transparently documented for users
                         # (e.g. via the Processing algorithm help).
-                        S = eval(formula, {'A': A, 'B': B, 'F1': F1, 'F2': F2, 'F3': F3})  # nosec
+                        S = eval(formula,
+                                 {'A': A, 'B': B, 'F1': F1, 'F2': F2, 'F3': F3}
+                                 )  # nosec B307 # User-defined spectral index evaluation like in Python Console.
 
                         if not isinstance(S, np.ndarray):
                             raise ValueError(

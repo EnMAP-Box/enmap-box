@@ -1,10 +1,10 @@
-import string
 import random
-import numpy as np
+import string
 from os import makedirs
 from os.path import join, basename, exists, splitext
 from typing import Dict, Any, List, Tuple
 
+import numpy as np
 from osgeo import gdal
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
@@ -67,7 +67,7 @@ class TileRasterAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFolderDestination(self.P_OUTPUT_FOLDER, self._OUTPUT_FOLDER)
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         tilingScheme = self.parameterAsVectorLayer(parameters, self.P_TILING_SCHEME, context)
@@ -84,7 +84,7 @@ class TileRasterAlgorithm(EnMAPProcessingAlgorithm):
 
         def id_generator(size=40, chars=string.ascii_uppercase + string.digits):
             # nosec # non-security temporary folder identifier
-            return ''.join(random.choice(chars) for _ in range(size))  # nosec
+            return ''.join(random.choice(chars) for _ in range(size))  # nosec # non-security random string
 
         tmpFolderName = join(folderName, '_tmp', id_generator())
         if not exists(tmpFolderName):

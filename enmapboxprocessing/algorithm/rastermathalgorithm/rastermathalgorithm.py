@@ -110,7 +110,7 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
         return Group.RasterAnalysis.value
 
     def addParameterMathCode(
-            self, name: str, description: str, defaultValue=None, optional=False, advanced=False
+        self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
         param = QgsProcessingParameterString(name, description, optional=optional)
         param.setMetadata({'widget_wrapper': {'class': ProcessingParameterRasterMathCodeEditWidgetWrapper}})
@@ -147,13 +147,13 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterRasterDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER, None, False, True)
 
     def prepareAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> bool:
         self.mapLayers = {k: v for k, v in QgsProject.instance().mapLayers().items() if k in parameters[self.P_CODE]}
         return True
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         code = self.parameterAsString(parameters, self.P_CODE, context)
         grid = self.parameterAsRasterLayer(parameters, self.P_GRID, context)
@@ -193,7 +193,7 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
 
                     # nosec B307 # User-defined code execution by design; equivalent to the QGIS Python Console.
                     # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
-                    raster = eval(value.strip())  # nosec
+                    raster = eval(value.strip())  # nosec B307 # User-defined code execution by design;
                     if isinstance(raster, QgsRasterLayer):
                         rasters[layerName] = raster
 
@@ -220,9 +220,11 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
                     layerName, value = line.split(':=')
                     layerName = layerName.strip('# ')
 
-                    # nosec B307 # User-defined code execution by design; equivalent to the QGIS Python Console.
-                    # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
-                    vector = eval(value.strip())  # nosec
+                    # nosec B307 # User-defined code execution by design;
+                    # equivalent to the QGIS Python Console.
+                    # The code execution is transparently documented for users
+                    # (e.g., via the Processing algorithm help).
+                    vector = eval(value.strip())  # nosec B307 # User-defined code execution by design;
                     if isinstance(vector, QgsVectorLayer):
                         vectors[layerName] = vector
 
@@ -350,9 +352,9 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
         return result
 
     def makeWriter(
-            self, code: str, filename: str, grid: RasterReader, readers: Dict[str, RasterReader],
-            readers2: Dict[str, RasterReader], floatInput: bool, noDataValue: Optional[float],
-            feedback: ProcessingFeedback
+        self, code: str, filename: str, grid: RasterReader, readers: Dict[str, RasterReader],
+        readers2: Dict[str, RasterReader], floatInput: bool, noDataValue: Optional[float],
+        feedback: ProcessingFeedback
     ) -> Dict[str, Union[RasterWriter, Mock]]:
         # We derive output data types and band counts by executing the code on a minimal extent (i.e. one pixel).
         # We call this a dry-run.
@@ -404,9 +406,9 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
         return writers
 
     def processBlock(
-            self, code: str, block: RasterBlockInfo, readers: Dict[str, RasterReader],
-            readers2: Dict[str, RasterReader], writers: Dict[str, Union[RasterWriter, Mock]],
-            floatInput: bool, noDataValue: Optional[float], overlap: int, feedback: ProcessingFeedback, dryRun=False
+        self, code: str, block: RasterBlockInfo, readers: Dict[str, RasterReader],
+        readers2: Dict[str, RasterReader], writers: Dict[str, Union[RasterWriter, Mock]],
+        floatInput: bool, noDataValue: Optional[float], overlap: int, feedback: ProcessingFeedback, dryRun=False
     ) -> Dict[str, np.ndarray]:
 
         # add modules
@@ -602,7 +604,7 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
             code = code.replace(r'\n', '\n')  # convert raw new lines (only required when executed via qgis_process)
 
             # nosec B102 # User-defined raster math code execution by design; equivalent to the QGIS Python Console.
-            exec(code, namespace)  # nosec
+            exec(code, namespace)  # nosec B102
         except Exception as error:
             traceback.print_exc()
             text = traceback.format_exc()

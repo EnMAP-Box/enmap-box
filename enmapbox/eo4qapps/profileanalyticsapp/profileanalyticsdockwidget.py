@@ -8,8 +8,6 @@ from typing import Optional, List, Dict
 
 import numpy as np
 import pyqtgraph as pg
-from geetimeseriesexplorerapp import MapTool, GeeTimeseriesExplorerDockWidget, GeeTemporalProfileDockWidget
-from profileanalyticsapp.profileanalyticseditorwidget import ProfileAnalyticsEditorWidget
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyleButton, PlotStyle
@@ -21,6 +19,8 @@ from enmapbox.utils import findEnmapBoxGuiWidgets, findQgisGuiWidgets
 from enmapboxprocessing.algorithm.subsetrasterbandsalgorithm import SubsetRasterBandsAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+from geetimeseriesexplorerapp import MapTool, GeeTimeseriesExplorerDockWidget, GeeTemporalProfileDockWidget
+from profileanalyticsapp.profileanalyticseditorwidget import ProfileAnalyticsEditorWidget
 from qgis import processing
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QComboBox, QTableWidget, QCheckBox, QToolButton, QLineEdit, QWidget, QLabel, QDockWidget
@@ -540,7 +540,7 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                     try:
                         # B102 User-defined analytics code execution by design;
                         # equivalent to the QGIS Python Console.
-                        exec(code, namespace)  # nosec B102
+                        exec(code, namespace)  # nosec B102 # B102 User-defined analytics code execution by design
                         userFunction = namespace['updatePlot']
                     except Exception:
                         traceback.print_exc()
@@ -587,7 +587,7 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                     try:
                         # nosec B102 # User-defined analytics code execution by design;
                         # equivalent to the QGIS Python Console.
-                        exec(code, namespace)  # nosec
+                        exec(code, namespace)  # nosec # User-defined analytics code execution by design;
                         userFunction = namespace['updatePlot']
                     except Exception:
                         traceback.print_exc()

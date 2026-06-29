@@ -64,7 +64,7 @@ class FitClassifierAlgorithmBase(EnMAPProcessingAlgorithm):
 
         # nosec B102 # User-defined scikit-learn model code execution by design; equivalent to the QGIS Python Console.
         # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
-        exec(code, namespace)  # nosec
+        exec(code, namespace)  # nosec B102 # User-defined scikit-learn model code execution by design;
         return namespace['classifier']
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
@@ -79,7 +79,7 @@ class FitClassifierAlgorithmBase(EnMAPProcessingAlgorithm):
         return True, ''
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         filenameDataset = self.parameterAsFile(parameters, self.P_DATASET, context)
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_CLASSIFIER, context)

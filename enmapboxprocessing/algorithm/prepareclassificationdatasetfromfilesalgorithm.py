@@ -2,13 +2,13 @@ from random import randint
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.PyQt.QtGui import QColor
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import Category, ClassifierDump
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtGui import QColor
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
 
 @typechecked
@@ -53,7 +53,7 @@ class PrepareClassificationDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         filenameFeatures = self.parameterAsFile(parameters, self.P_FEATURE_FILE, context)
         filenameLabels = self.parameterAsFile(parameters, self.P_VALUE_FILE, context)
@@ -79,7 +79,14 @@ class PrepareClassificationDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
 
             # prepare categories
             values = np.unique(y)
-            categories = [Category(int(v), str(v), QColor(randint(0, 2 ** 24 - 1)).name()) for v in values]  # nosec
+            categories = [
+                Category(
+                    int(v),
+                    str(v),
+                    QColor(
+                        randint(0, 2 ** 24 - 1)  # nosec B311 # randint not security relevant
+                    ).name()) for v in values
+            ]
 
             dump = ClassifierDump(categories=categories, features=features, X=X, y=y)
             Utils.modelDump(dump.__dict__, filename)

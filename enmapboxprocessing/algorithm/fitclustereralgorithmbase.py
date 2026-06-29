@@ -64,8 +64,8 @@ class FitClustererAlgorithmBase(EnMAPProcessingAlgorithm):
         code = self.parameterAsString(parameters, name, context)
 
         # nosec B102 # User-defined scikit-learn model code execution by design; equivalent to the QGIS Python Console.
-        # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
-        exec(code, namespace)  # nosec
+        # The code execution is transparently documented for users (e.g., via the Processing algorithm help).
+        exec(code, namespace)  # nosec B102 # User-defined scikit-learn model code execution by design;
         return namespace['clusterer']
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:

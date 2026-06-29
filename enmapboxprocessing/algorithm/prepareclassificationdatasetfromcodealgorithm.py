@@ -3,11 +3,11 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -62,14 +62,14 @@ class PrepareClassificationDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
         return lines
 
     def classifierDump(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext
+        self, parameters: Dict[str, Any], context: QgsProcessingContext
     ) -> ClassifierDump:
         namespace = dict()
         code = self.parameterAsString(parameters, self.P_CODE, context)
 
         # nosec B102 # User-defined code execution by design; equivalent to the QGIS Python Console.
-        # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
-        exec(code, namespace)  # nosec
+        # The code execution is transparently documented for users (e.g., via the Processing algorithm help).
+        exec(code, namespace)  # nosec B102 # User-defined code execution equivalent to the QGIS Python Console.
         categories, features, X, y = [namespace[key] for key in ['categories', 'features', 'X', 'y']]
         X = np.array(X)
         y = np.array(y)
@@ -84,7 +84,7 @@ class PrepareClassificationDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_DATASET, context)
 

@@ -1,3 +1,4 @@
+import sys
 from os.path import basename, join, dirname
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
@@ -67,7 +68,8 @@ class ProcessingParameterSkopsFileUnsupervisedDatasetWidget(QWidget):
                 try:
                     dump = TransformerDump(**Utils.modelLoad(filename))
                     samples, features = dump.X.shape
-                except Exception:  # nosec # Ignore files that are not valid models.
+                except Exception as ex:
+                    print(f'Unable to open .skop file: {ex}', file=sys.stderr)
                     continue
 
                 action = self.menu.addAction('')

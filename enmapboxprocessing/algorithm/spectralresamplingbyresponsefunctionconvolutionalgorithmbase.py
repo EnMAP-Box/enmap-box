@@ -57,13 +57,12 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
         return lines
 
     def parameterAsResponses(
-            self, parameters: Dict[str, Any], name, context: QgsProcessingContext
+        self, parameters: Dict[str, Any], name, context: QgsProcessingContext
     ) -> Dict[Union[str, float], Union[List[Tuple[int, float]], Number]]:
         namespace = dict()
         code = self.parameterAsString(parameters, name, context)
 
-        # nosec B102 # User-defined code execution by design; equivalent to the QGIS Python Console.
-        exec(code, namespace)  # nosec
+        exec(code, namespace)  # nosec B102 # User-defined code execution by design; like in QGIS Python Console.
         responses = namespace['responses']
         return responses
 
@@ -76,7 +75,7 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
         self.addParameterRasterDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         raster = self.parameterAsSpectralRasterLayer(parameters, self.P_RASTER, context)
         responses = self.parameterAsResponses(parameters, self.P_CODE, context)
@@ -184,8 +183,8 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
 
     @staticmethod
     def resampleData(
-            array: Array3d, marray: Array3d, wavelength: List, responses: Dict[str, List[Tuple[int, float]]],
-            noDataValue: float, feedback: QgsProcessingFeedback, isFirstBlock=True
+        array: Array3d, marray: Array3d, wavelength: List, responses: Dict[str, List[Tuple[int, float]]],
+        noDataValue: float, feedback: QgsProcessingFeedback, isFirstBlock=True
     ) -> Array3d:
         wavelength = [int(round(v)) for v in wavelength]
         outarray = list()

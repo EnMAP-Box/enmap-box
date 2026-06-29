@@ -5,11 +5,11 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClassifierDump, Category, checkSampleShape, RegressorDump, Target
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -62,7 +62,7 @@ class PrepareRegressionDatasetFromSynthMixAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFolderDestination(self.P_OUTPUT_FOLDER, self._OUTPUT_FOLDER)
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         filenameDataset = self.parameterAsFile(parameters, self.P_DATASET, context)
         self.n = self.parameterAsInt(parameters, self.P_N, context)
@@ -133,7 +133,7 @@ class PrepareRegressionDatasetFromSynthMixAlgorithm(EnMAPProcessingAlgorithm):
             complexity = np.random.choice(list(mixingComplexities.keys()), p=list(mixingComplexities.values()))
 
             # nosec # random sampling for synthetic dataset generation
-            isBackground = self.background >= randint(1, 100)  # nosec
+            isBackground = self.background >= randint(1, 100)  # nosec B311 # not security relevant sampling
 
             if isBackground:
                 drawnLabels = list(

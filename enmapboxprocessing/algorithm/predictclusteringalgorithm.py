@@ -4,6 +4,7 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
@@ -12,7 +13,6 @@ from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtGui import QColor
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer,
                        QgsProcessingException, QgsMapLayer)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -58,7 +58,7 @@ class PredictClusteringAlgorithm(EnMAPProcessingAlgorithm):
         return True, ''
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         dump = self.parameterAsClustererDump(parameters, self.P_CLUSTERER, context)
@@ -124,8 +124,14 @@ class PredictClusteringAlgorithm(EnMAPProcessingAlgorithm):
 
             # create default style
             classification = QgsRasterLayer(filename)
-            categories = [Category(i + 1, f'cluster {i + 1}', QColor(randint(0, 2 ** (24) - 1)).name())  # nosec
-                          for i in range(dump.clusterCount)]
+            categories = [
+                Category(
+                    i + 1,
+                    f'cluster {i + 1}',
+                    QColor(
+                        randint(0, 2 ** (24) - 1)  # nosec B311 # randint not security relevant
+                    ).name()) for i in range(dump.clusterCount)
+            ]
             renderer = Utils.palettedRasterRendererFromCategories(classification.dataProvider(), 1, categories)
             classification.setRenderer(renderer)
             classification.saveDefaultStyle(QgsMapLayer.StyleCategory.AllStyleCategories)

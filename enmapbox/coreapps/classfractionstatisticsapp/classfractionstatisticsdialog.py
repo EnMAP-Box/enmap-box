@@ -92,7 +92,11 @@ class ClassFractionStatisticsDialog(QMainWindow):
             for bandNo in reader.bandNumbers():
                 hexcolor = reader.metadataItem('color', '', bandNo)
                 if hexcolor is None:
-                    color = QColor(randint(0, 255), randint(0, 255), randint(0, 255))  # nosec
+                    color = QColor(
+                        randint(0, 255),  # nosec B311 # random sampling is not security relevant
+                        randint(0, 255),  # nosec B311 # random sampling is not security relevant
+                        randint(0, 255)  # nosec B311 # random sampling is not security relevant
+                    )
                 else:
                     color = QColor(hexcolor)
                 colors.append(color)
