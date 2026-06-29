@@ -31,7 +31,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        mamba_env: [ ".env/conda/enmapbox-full.yml" ]
+        mamba_env: [ "enmapbox-full.yml" ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
