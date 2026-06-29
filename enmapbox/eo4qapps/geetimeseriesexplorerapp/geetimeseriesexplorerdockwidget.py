@@ -9,12 +9,7 @@ from traceback import print_exc
 from typing import Optional, Dict, List, Tuple
 from urllib.parse import urlparse
 
-from geetimeseriesexplorerapp.codeeditwidget import CodeEditWidget
-from geetimeseriesexplorerapp.collectioninfo import CollectionInfo
-from geetimeseriesexplorerapp.externals.ee_plugin.provider import GeetseEarthEngineRasterDataProvider
-from geetimeseriesexplorerapp.imageinfo import ImageInfo
-from geetimeseriesexplorerapp.tasks.queryavailableimagestask import QueryAvailableImagesTask
-from geetimeseriesexplorerapp.utils import utilsMsecToDateTime
+import requests
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
@@ -22,6 +17,12 @@ from enmapbox.typeguard import typechecked
 from enmapbox.utils import importEarthEngine
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.utils import Utils
+from geetimeseriesexplorerapp.codeeditwidget import CodeEditWidget
+from geetimeseriesexplorerapp.collectioninfo import CollectionInfo
+from geetimeseriesexplorerapp.externals.ee_plugin.provider import GeetseEarthEngineRasterDataProvider
+from geetimeseriesexplorerapp.imageinfo import ImageInfo
+from geetimeseriesexplorerapp.tasks.queryavailableimagestask import QueryAvailableImagesTask
+from geetimeseriesexplorerapp.utils import utilsMsecToDateTime
 from qgis.PyQt import QtGui, uic
 from qgis.PyQt.QtCore import Qt, QLocale, QDate, pyqtSignal, QModelIndex, QDateTime, QUrl
 from qgis.PyQt.QtGui import QPixmap, QColor, QIcon, QDesktopServices
@@ -552,17 +553,17 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
         else:
             with GeeWaitCursor():
                 try:
-                    import urllib.request
-                    import json
-
                     parsed_url = urlparse(jsonUrl)
                     if parsed_url.scheme != "https":
                         raise ValueError(
                             f"Only HTTPS URLs are allowed, got: {parsed_url.scheme!r}"
                         )
 
-                    with urllib.request.urlopen(jsonUrl, timeout=10) as url:  # nosec
-                        data = json.loads(url.read().decode())
+                    response = requests.get(jsonUrl, timeout=10)
+                    response.raise_for_status()
+                    data = response.json()
+                    # with urllib.request.urlopen(jsonUrl, timeout=10) as url:
+                    #     data = json.loads(url.read().decode())
                 except Exception:
                     data = {
                         "id": splitext(basename(jsonUrl))[0],
