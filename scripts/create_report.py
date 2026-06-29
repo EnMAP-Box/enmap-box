@@ -404,7 +404,7 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
         fr"    {cntA['wontfix']} \\\n"
         fr"    \end{{tabular}}\n"
         fr"    \caption{{Zusammenfassung \EnMAPBox Issue-Tracker\footnote"
-        fr"{{\url{{https://github.com/EnMAP-Box/enmap-box/issues}}}}, Stand {today.strftime("%d.%m.%Y")} }}\n"
+        fr"{{\url{{https://github.com/EnMAP-Box/enmap-box/issues}}}}, Stand {today.strftime('%d.%m.%Y')} }}\n"
         r"    \label{{tab:enmapbox_issues}}\n"
         r"\end{{table}}\n"
     )
