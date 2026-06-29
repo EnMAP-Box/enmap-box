@@ -60,6 +60,7 @@ jobs:
       - name: Conda Environment Info
         shell: bash -el {0}
         run: |
+          conda install openblas -y
           conda info
           conda list
 
