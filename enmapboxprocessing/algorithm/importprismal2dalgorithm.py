@@ -201,7 +201,7 @@ class ImportPrismaL2DAlgorithm(EnMAPProcessingAlgorithm):
     ):
 
         def parseFloatList(text):
-            [float(item) for item in text.split()]
+            return [float(item) for item in text.split()]
 
         array = list()
         metadata = dict()
