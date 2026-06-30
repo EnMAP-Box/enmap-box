@@ -10,7 +10,6 @@ from typing import Tuple, Optional, Callable, Any, Dict, Union, List
 from warnings import warn
 
 import numpy as np
-import skops.io as sio
 from osgeo import gdal
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent, SpatialPoint
@@ -670,10 +669,12 @@ class Utils(object):
 
     @classmethod
     def modelDump(cls, obj: Any, filename: str):
+        import skops.io as sio  # import locally because of slow debugging
         sio.dump(obj, filename)
 
     @classmethod
     def modelLoad(cls, filename: str) -> Any:
+        import skops.io as sio  # import locally because of slow debugging
         trusted_prefixes = (
             "sklearn.",
             "numpy.",
