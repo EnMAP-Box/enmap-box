@@ -4,6 +4,7 @@ import platform
 import sys
 import warnings
 from os.path import join, abspath, exists, basename
+from pathlib import Path
 from typing import Optional
 
 import numpy
@@ -290,8 +291,10 @@ def sensorProductsRoot() -> Optional[str]:
                 }.get(os.getlogin() + '@' + platform.node())
             except OSError as ex:
                 warnings.warn(f'Exception raised in sensorProductsRoot():\n{ex}')
-        if root and os.path.isdir(root):
-            _sensor_products_root = root
+        if root:
+            root = Path(root).expanduser().resolve()
+            if root.is_dir():
+                _sensor_products_root = str(root)
     return _sensor_products_root
 
 
