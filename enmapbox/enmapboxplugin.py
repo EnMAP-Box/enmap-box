@@ -151,6 +151,21 @@ class EnMAPBoxPlugin(object):
         for action in self.pluginToolbarActions:
             iface.addToolBarIcon(action)
 
+    def _remove_actions(self):
+        """
+        Remove actions from QGIS GUI
+        """
+        from qgis.utils import iface
+        if isinstance(iface, QgisInterface):
+            for action in self.pluginToolbarActions:
+                iface.removeToolBarIcon(action)
+
+            for action in self.rasterMenuActions:
+                iface.removePluginRasterMenu('EnMAP-Box', action)
+
+            for dockWidget in self.dockWidgets:
+                iface.removeDockWidget(dockWidget)
+
     @staticmethod
     def missingPackageInfos(missing_packages: List[PIPPackage], cli: bool = False) -> str:
 
@@ -232,21 +247,12 @@ class EnMAPBoxPlugin(object):
             self.enmapBox.ui.show()
 
     def unload(self):
+        self._remove_actions()
+
         if not self.corePackagesAvailable():
             return
 
         from enmapbox.gui.enmapboxgui import EnMAPBox
-        from qgis.utils import iface
-        if isinstance(iface, QgisInterface):
-
-            for action in self.pluginToolbarActions:
-                iface.removeToolBarIcon(action)
-
-            for action in self.rasterMenuActions:
-                iface.removePluginRasterMenu('EnMAP-Box', action)
-
-            for dockWidget in self.dockWidgets:
-                iface.removeDockWidget(dockWidget)
 
         import enmapbox
         enmapbox.unloadAll()

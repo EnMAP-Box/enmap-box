@@ -175,8 +175,7 @@
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">background-color: rgba(0, 0, 0, 0);
-test-align:center;</string>
+          <string notr="true">background-color: rgba(0, 0, 0, 0);</string>
          </property>
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
