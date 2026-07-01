@@ -51,6 +51,7 @@ class EnMAPBoxPlugin(object):
 
         import enmapbox
         enmapbox.initPythonPaths()
+
         # run a minimum dependency check
         missing = self.initialDependencyCheck()
         self.mMissingCoreRequirements.extend(missing)
@@ -98,37 +99,57 @@ class EnMAPBoxPlugin(object):
         return missing
 
     def initGui(self):
+        from qgis.utils import iface
+        import enmapbox
+
+        actionStartBox = QAction(enmapbox.icon(), 'EnMAP-Box', iface)
+        actionAbout = QAction(QIcon(':/enmapbox/gui/ui/icons/metadata.svg'), 'About')
 
         if not self.corePackagesAvailable():
-            mbox = QMessageBox()
-            mbox.setWindowTitle('Missing Packages')
-            mbox.setTextFormat(Qt.TextFormat.RichText)
-            info = self.missingPackageInfos(self.mMissingCoreRequirements)
-            mbox.setText(info)
-            mbox.exec()
+            def show_message_box(*args, **kwargs):
+                mbox = QMessageBox()
+                mbox.setWindowTitle('Missing Packages')
+                mbox.setTextFormat(Qt.TextFormat.RichText)
+                info = self.missingPackageInfos(self.mMissingCoreRequirements)
+                mbox.setText(info)
+                mbox.exec()
+
+            actionStartBox.triggered.connect(show_message_box)
+            actionAbout.triggered.connect(self.showAboutDialog)
+
+            self.rasterMenuActions.append(actionStartBox)
+            self.rasterMenuActions.append(actionAbout)
+            self.pluginToolbarActions.append(actionStartBox)
+
+            self._add_actions()
             return
 
-        import enmapbox
-        from qgis.utils import iface
-        actionStartBox = QAction(enmapbox.icon(), 'EnMAP-Box', iface)
         actionStartBox.triggered.connect(self.run)
+        actionAbout.triggered.connect(self.showAboutDialog)
+
         actionAddExampleData = QAction(QIcon(), 'Add Example Data')
         actionAddExampleData.triggered.connect(self.addExampleData)
-        actionAbout = QAction(QIcon(':/enmapbox/gui/ui/icons/metadata.svg'), 'About')
-        actionAbout.triggered.connect(self.showAboutDialog)
+
         self.rasterMenuActions.append(actionStartBox)
         self.rasterMenuActions.append(actionAddExampleData)
         self.rasterMenuActions.append(actionAbout)
         self.pluginToolbarActions.append(actionStartBox)
 
+        self._add_actions()
+
+        # init stand-alone apps, that can operate in QGIS GUI without EnMAP-Box
+        self.initStandAloneAppGuis()
+
+    def _add_actions(self):
+        """
+        Add actions to QGIS GUI
+        """
+        from qgis.utils import iface
         for action in self.rasterMenuActions:
             iface.addPluginToRasterMenu('EnMAP-Box', action)
 
         for action in self.pluginToolbarActions:
             iface.addToolBarIcon(action)
-
-        # init stand-alone apps, that can operate in QGIS GUI without EnMAP-Box
-        self.initStandAloneAppGuis()
 
     @staticmethod
     def missingPackageInfos(missing_packages: List[PIPPackage], cli: bool = False) -> str:
@@ -151,14 +172,14 @@ class EnMAPBoxPlugin(object):
                 if p.comment and len(p.comment) > 0:
                     info += f' - {p.comment}'
 
-            info += ('<br><br><i>How to fix this:</i>'
-                     '<ol style="margin-left: 0px;"><li>Open your terminal/command prompt and run:'
-                     '<br><code>pip install &lt;missing packages&gt;</code>'
-                     '<br>(or <code>conda install &lt;missing packages&gt;</code>)</li>'
-                     '<li>Restart QGIS</li>'
-                     '</ol>'
-                     'Other EnMAP-Box features may require additional Python packages. '
-                     'For detailed instructions visit the '
+            info += ('<br><br>'  # <i>How to fix this:</i>'
+                     # '<ol style="margin-left: 0px;"><li>Open your terminal/command prompt and run:'
+                     # '<br><code>pip install &lt;missing packages&gt;</code>'
+                     # '<br>(or <code>conda install &lt;missing packages&gt;</code>)</li>'
+                     # '<li>Restart QGIS</li>'
+                     # '</ol>'
+                     # 'Other EnMAP-Box features may require additional Python packages. '
+                     'To fix this, please follow the '
                      '<a href="https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html">'
                      'EnMAP-Box installation guide</a>.'
 
