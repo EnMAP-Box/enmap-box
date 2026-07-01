@@ -23,7 +23,7 @@ class FitCatBoostClassifierAlgorithm(FitClassifierAlgorithmBase):
 
     def code(cls):
         from catboost import CatBoostClassifier
-        classifier = CatBoostClassifier(n_estimators=100)
+        classifier = CatBoostClassifier(n_estimators=100, allow_writing_files=False)
         return classifier
 
 
