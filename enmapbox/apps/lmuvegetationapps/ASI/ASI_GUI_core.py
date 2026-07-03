@@ -33,7 +33,8 @@ import sys
 from contextlib import suppress
 
 import numpy as np
-from arcoop.andreas_rabe.pyqtgraph.examples.ExampleApp import QColor
+from PyQt5.QtGui import QColor
+
 from lmuvegetationapps import APP_DIR
 from lmuvegetationapps.ASI.peakdetect import peakdetect
 from scipy.interpolate import interp1d
