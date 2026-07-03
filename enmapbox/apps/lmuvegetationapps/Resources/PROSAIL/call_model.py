@@ -288,7 +288,8 @@ class SetupMultiple:
         # redistribute Car values according to laplace distribution inside lower/upper cab boundaries
         def truncated_noise(y, lower, upper):
             while True:
-                y_noise = np.random.laplace(loc=0, scale=spread, size=1) + y
+                # y_noise = np.random.laplace(loc=0, scale=spread, size=1) + y
+                y_noise = np.random.laplace(loc=0, scale=spread) + y
                 if upper > y_noise > lower:
                     return y_noise
 
