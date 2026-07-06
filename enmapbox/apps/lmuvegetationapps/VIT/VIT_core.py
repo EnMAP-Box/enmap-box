@@ -101,19 +101,22 @@ class VIT:
             wave_dict = metadict['ENVI']['wavelength']
         except Exception:
             raise ValueError('No wavelengths provided in ENVI header file')
-
+        wl_units = metadict['ENVI'].get('wavelength units', metadict['ENVI'].get('wavelength_units', ''))
         if metadict['ENVI']['wavelength'] is None:
             raise ValueError('No wavelengths provided in ENVI header file')
-        elif metadict['ENVI']['wavelength units'].lower() in \
+        # elif metadict['ENVI']['wavelength units'].lower() in \
+        elif wl_units.lower() in \
                 ['nanometers', 'nm', 'nanometer']:
             wave_convert = 1  # conversion factor to nm
-        elif metadict['ENVI']['wavelength units'].lower() in \
+        # elif metadict['ENVI']['wavelength units'].lower() in \
+        elif wl_units.lower() in \
                 ['micrometers', 'µm', 'micrometer']:
             wave_convert = 1000  # conversion factor to nm
         else:
             raise ValueError(
-                "Wavelength units must be nanometers or micrometers. Got '%s' instead" %
-                metadict['ENVI']['wavelength units'])
+                # "Wavelength units must be nanometers or micrometers. Got '%s' instead" %
+                # metadict['ENVI']['wavelength units'])
+                "Wavelength units must be nanometers or micrometers. Got '%s' instead" % wl_units)
 
         in_matrix = np.array(reader.array())  # read the spectral information into in_matrix
 

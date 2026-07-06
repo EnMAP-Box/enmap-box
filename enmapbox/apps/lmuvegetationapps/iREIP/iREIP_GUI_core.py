@@ -251,7 +251,9 @@ class iREIP:
         if nbands < 2:
             raise ValueError("Input is not a multi-band image")
         try:
-            nodata = int(metadict['ENVI']['data ignore value'])
+            # nodata = int(metadict['ENVI']['data ignore value'])
+            nodata_str = metadict['ENVI'].get('data ignore value', metadict['ENVI'].get('data_ignore_value'))
+            nodata = int(nodata_str)
             return nodata, nbands, nrows, ncols, dtype
         except Exception:
             self.main.nodat_widget.init(image_type=image_type, image=image)
@@ -726,19 +728,33 @@ class iREIP_core:
         except Exception:
             raise ValueError('No wavelength units provided in ENVI header file')
 
+        # if metadict['ENVI']['wavelength'] is None:
+        #     raise ValueError('No wavelength units provided in ENVI header file')
+        # elif metadict['ENVI']['wavelength units'].lower() in \
+        #         ['nanometers', 'nm', 'nanometer']:
+        #     wave_convert = 1
+        # elif metadict['ENVI']['wavelength units'].lower() in \
+        #         ['micrometers', 'µm', 'micrometer']:
+        #     wave_convert = 1000
+        # else:
+        #     raise ValueError(
+        #         "Wavelength units must be nanometers or micrometers. Got '%s' instead" %
+        #         metadict['ENVI'][
+        #             'wavelength units'])
+
+        wl_units = metadict['ENVI'].get('wavelength units', metadict['ENVI'].get('wavelength_units', ''))
+
         if metadict['ENVI']['wavelength'] is None:
             raise ValueError('No wavelength units provided in ENVI header file')
-        elif metadict['ENVI']['wavelength units'].lower() in \
+        elif wl_units.lower() in \
                 ['nanometers', 'nm', 'nanometer']:
             wave_convert = 1
-        elif metadict['ENVI']['wavelength units'].lower() in \
+        elif wl_units.lower() in \
                 ['micrometers', 'µm', 'micrometer']:
             wave_convert = 1000
         else:
             raise ValueError(
-                "Wavelength units must be nanometers or micrometers. Got '%s' instead" %
-                metadict['ENVI'][
-                    'wavelength units'])
+                "Wavelength units must be nanometers or micrometers. Got '%s' instead" % wl_units)
 
         wl = [float(item) * wave_convert for item in wave_dict]
         wl = [int(i) for i in wl]

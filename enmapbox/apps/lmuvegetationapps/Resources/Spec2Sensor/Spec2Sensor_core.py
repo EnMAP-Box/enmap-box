@@ -133,7 +133,8 @@ class Spec2Sensor:
         metadict = reader.metadata()
         print(metadict)
         wavelengths = metadict['ENVI']['wavelength']
-        wl_units = metadict['ENVI']['wavelength units']
+        # wl_units = metadict['ENVI']['wavelength units']
+        wl_units = metadict['ENVI'].get('wavelength units', metadict['ENVI'].get('wavelength_units', ''))
         if wl_units.lower() in ['nanometers', 'nm', 'nanometer']:  # any of these is accepted
             wave_convert = 1  # factor is 1, as the method expects nm anyway
         elif wl_units.lower() in ['micrometers', 'µm', 'micrometer']:

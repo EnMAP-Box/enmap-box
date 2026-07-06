@@ -956,22 +956,34 @@ class LUT:
 
         # Check Prospect properties
         if self.lop == "prospectPro":
-            if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in range(len(self.para_list[0]) - 1)):
+            # if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in range(len(self.para_list[0]) - 1)):
+            indices = [i for i in range(len(self.para_list[0]) - 1)
+                        if not (self.para_list[0][i] == 'car' and self.depends != 0)]
+            if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in indices):
                 self.abort(message='Leaf Optical Properties parameter(s) missing')
                 return False
 
         elif self.lop == "prospectD":
-            if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in range(len(self.para_list[0]) - 2)):
+            # if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in range(len(self.para_list[0]) - 2)):
+            indices = [i for i in range(len(self.para_list[0]) - 2)
+                        if not (self.para_list[0][i] == 'car' and self.depends != 0)]
+            if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in indices):
                 self.abort(message='Leaf Optical Properties parameter(s) missing')
                 return False
 
         elif self.lop == "prospect5B":
-            if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in range(len(self.para_list[0]) - 3)):
+            # if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in range(len(self.para_list[0]) - 3)):
+            indices = [i for i in range(len(self.para_list[0]) - 3)
+                        if not (self.para_list[0][i] == 'car' and self.depends != 0)]
+            if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in indices):
                 self.abort(message='Leaf Optical Properties parameter(s) missing')
                 return False
 
         elif self.lop == "prospect5":
-            if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in range(len(self.para_list[0]) - 4)):
+            # if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in range(len(self.para_list[0]) - 4)):
+            indices = [i for i in range(len(self.para_list[0]) - 4)
+                        if not (self.para_list[0][i] == 'car' and self.depends != 0)]
+            if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in indices):
                 self.abort(message='Leaf Optical Properties parameter(s) missing')
                 return False
 

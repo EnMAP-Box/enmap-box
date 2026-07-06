@@ -184,7 +184,7 @@ class PWR:
         # ds = dataset.gdalDataset()
 
         reader = RasterReader(image)
-        ds = reader.gdalDataset()
+        ds = reader.gdalDataset
         metadict = reader.metadata()
         nrows = ds.RasterYSize
         ncols = ds.RasterXSize
@@ -193,7 +193,9 @@ class PWR:
         if nbands < 2:
             raise ValueError("Input is not a multi-band image")
         try:
-            nodata = int(metadict['ENVI']['data ignore value'])
+            # nodata = int(metadict['ENVI']['data ignore value'])
+            nodata_str = metadict['ENVI'].get('data ignore value', metadict['ENVI'].get('data_ignore_value'))
+            nodata = int(nodata_str)
             return nodata, nbands, nrows, ncols, dtype
         except Exception:
             self.main.nodat_widget.init(image_type=image_type, image=image)

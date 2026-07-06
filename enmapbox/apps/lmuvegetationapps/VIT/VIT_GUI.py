@@ -276,11 +276,14 @@ class VIT:
             nrows = int(metadict['ENVI']['lines'])
             ncols = int(metadict['ENVI']['samples'])
             nbands = int(metadict['ENVI']['bands'])
-            dtype = int(metadict['ENVI']['data type'])
+            # dtype = int(metadict['ENVI']['data type'])
+            dtype = reader.gdalDataset.GetRasterBand(1).DataType
             if nbands < 2:
                 raise ValueError("Input is not a multi-band image")
             try:
-                nodata = int(metadict['ENVI']['data ignore value'])
+                # nodata = int(metadict['ENVI']['data ignore value'])
+                nodata_str = metadict['ENVI'].get('data ignore value', metadict['ENVI'].get('data_ignore_value'))
+                nodata = int(nodata_str)
                 return nodata, nbands, nrows, ncols, dtype
             except Exception:
                 self.main.nodat_widget.init(image_type=image_type, image=image)
