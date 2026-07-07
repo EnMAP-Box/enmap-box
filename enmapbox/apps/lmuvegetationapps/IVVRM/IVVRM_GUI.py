@@ -771,7 +771,9 @@ class IVVRM:
                 mnse = 1.0 - (a / b)
 
                 # R²
-                a = np.nansum((self.data_mean - np.nanmean(self.data_mean)) * (self.myResult - np.nanmean(self.myResult)))
+                a = np.nansum(
+                    (self.data_mean - np.nanmean(self.data_mean)) * (self.myResult - np.nanmean(self.myResult))
+                )
                 b = np.sqrt(np.nansum((self.data_mean - np.nanmean(self.data_mean)) ** 2))
                 c = np.sqrt(np.nansum((self.myResult - np.nanmean(self.myResult)) ** 2))
                 r_squared = (a / (b * c)) ** 2

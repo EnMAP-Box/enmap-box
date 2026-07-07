@@ -7,12 +7,10 @@ import os
 import time
 
 import numpy as np
-from PyQt5.QtGui import QFont
 
+from qgis.PyQt.QtGui import QFont
 from qgis.PyQt.QtWidgets import QMessageBox, QFileDialog, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTextEdit, \
     QDesktopWidget
-
-
 
 
 def display_error(parent, msg):

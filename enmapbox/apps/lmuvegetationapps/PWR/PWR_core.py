@@ -123,8 +123,6 @@ class PWR_core:
                 ['micrometers', 'µm', 'micrometer']:
             wave_convert = 1000
         else:
-            # raise ValueError("Wavelength units must be nanometers or micrometers. Got '%s' instead" % metadict['ENVI'][
-            #     'wavelength units'])
             raise ValueError("Wavelength units must be nanometers or micrometers. Got '%s' instead" % wl_units)
 
         in_matrix = np.array(reader.array())
