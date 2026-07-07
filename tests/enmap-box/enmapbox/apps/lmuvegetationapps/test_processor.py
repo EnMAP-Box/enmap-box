@@ -2,8 +2,9 @@ import os
 import unittest
 from pathlib import Path
 
-from enmapboxprocessing.testcase import TestCase
 from lmuvegetationapps.Processor.Processor_Training_GUI import MainUiFunc, ML_Training, MLTrainingGUI
+
+from enmapboxprocessing.testcase import TestCase
 from qgis.core import QgsApplication
 
 DIR_TESTDATA = Path(__file__).parent / 'data'
@@ -40,4 +41,4 @@ class LMUTests_Processor(TestCase):
         if True:
             training.run_training()
         self.showGui(gui)
-        QgsApplication.exec_()
+        QgsApplication.exec()

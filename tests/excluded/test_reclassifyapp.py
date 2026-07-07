@@ -49,7 +49,7 @@ class TestReclassify(EnMAPBoxTestCase):
             newColors = [QColor('black'), QColor('yellow'), QColor('brown')]
 
             # this works
-            c = Color(QColor('black'))
+            Color(QColor('black'))
 
             # but this doesn't
             # newDef = _classic.hubflow.core.ClassDefinition(names=newNames[1:], colors=newColors[1:])
@@ -96,7 +96,7 @@ class TestReclassify(EnMAPBoxTestCase):
                         print(f'After getColorTable {classnames2}')
                         if classnames != classnames2:
                             classnames = classnames2
-                s = ""
+
             self.assertIsInstance(classnames, list, msg='Failed to set any category names to "{}"'.format(pathDst))
             self.assertEqual(newNames, classnames, msg='Failed to set all category names to "{}"'.format(pathDst))
             print('Success: created {}'.format(pathDst))
@@ -130,7 +130,6 @@ class TestReclassify(EnMAPBoxTestCase):
         self.assertIsInstance(csDst2, ClassificationScheme)
         self.assertEqual(csDst, csDst2)
 
-        enmapBox.close()
         QgsProject.instance().removeAllMapLayers()
 
     def test_transformation_table(self):

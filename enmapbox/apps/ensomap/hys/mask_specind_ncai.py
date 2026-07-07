@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright © 2019 Stéphane Guillaso
-# Licensed under the terms of 
+# Licensed under the terms of
 # (see ../../LICENSE.md for details)
 
-import numpy as np
-import hys
-import os # <-- to be removed
-import importlib
 import numba as nb
+import numpy as np
 
-__bands__    = [2000, 2100, 2200]
+__bands__ = [2000, 2100, 2200]
 __filename__ = "_ncai"
 __th_default__ = 0.03
 
@@ -19,8 +16,8 @@ __th_default__ = 0.03
 def process(cube, threshold):
     ny = cube.shape[1]
     nx = cube.shape[2]
-    prod = np.zeros((ny, nx), dtype = np.float32)
-    mask = np.zeros((ny, nx), dtype = np.int32)
+    prod = np.zeros((ny, nx), dtype=np.float32)
+    mask = np.zeros((ny, nx), dtype=np.int32)
     lim1 = -1.0
     lim2 = threshold
     for ky in range(ny):
@@ -29,7 +26,7 @@ def process(cube, threshold):
             B2100 = cube[1, ky, kx]
             B2200 = cube[2, ky, kx]
             diff = 0.5 * (B2000 + B2200) - B2100
-            sum  = 0.5 * (B2000 + B2200) + B2100
+            sum = 0.5 * (B2000 + B2200) + B2100
             res = float(0)
             msk = 0
             if sum != 0:

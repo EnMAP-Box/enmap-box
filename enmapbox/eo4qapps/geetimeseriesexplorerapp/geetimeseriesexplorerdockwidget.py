@@ -1,5 +1,4 @@
 import json
-import platform
 import warnings
 import webbrowser
 from collections import OrderedDict
@@ -8,6 +7,9 @@ from os import listdir, makedirs
 from os.path import join, exists, dirname, basename, splitext
 from traceback import print_exc
 from typing import Optional, Dict, List, Tuple
+from urllib.parse import urlparse
+
+import requests
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
@@ -255,11 +257,9 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
         return self.interface
 
     def setProfileDock(self, profileDock):
-        from geetimeseriesexplorerapp import GeeTemporalProfileDockWidget
-        assert isinstance(profileDock, GeeTemporalProfileDockWidget)
         self.profileDock = profileDock
 
-    def setInterface(self, interface: QgisInterface):
+    def setInterface(self, interface):
         self.interface = interface
         if isinstance(interface, EnMAPBox):
             self.interfaceType = 0
@@ -446,12 +446,15 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
         code = self.mCode.text()
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            exec(code, namespace)
+            # B102 User-defined Google Earth Engine collection code execution by design;
+            # equivalent to the QGIS Python Console.
+            exec(code, namespace)  # nosec B102
 
         with GeeWaitCursor():
             try:
                 eeCollection = namespace['collection']
-                assert isinstance(eeCollection, ee.ImageCollection)
+                if not isinstance(eeCollection, ee.ImageCollection):
+                    raise Exception()
             except Exception as error:
                 self.mMessageBar.pushCritical('Error', str(error))
                 self.eeFullCollection = None
@@ -536,8 +539,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
         webbrowser.open_new_tab(self.mOpenJson.url)
 
     def onUserCollectionClicked(self):
-        button = self.sender()
-        assert isinstance(button, QToolButton)
+        button: QToolButton = self.sender()
         id = button.objectName()[1:]
         for row in range(self.mUserCollection.rowCount()):
             if self.mUserCollection.cellWidget(row, 0).text() == id:
@@ -551,14 +553,18 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
         else:
             with GeeWaitCursor():
                 try:
-                    import urllib.request
-                    import json
-                    with urllib.request.urlopen(jsonUrl) as url:
-                        data = json.loads(url.read().decode())
-                except Exception as error:
-                    # QgsMessageLog.logMessage(
-                    #    f'url not found: {jsonUrl}', tag="GEE Time Series Explorer", level=Qgis.MessageLevel.Critical
-                    # )
+                    parsed_url = urlparse(jsonUrl)
+                    if parsed_url.scheme != "https":
+                        raise ValueError(
+                            f"Only HTTPS URLs are allowed, got: {parsed_url.scheme!r}"
+                        )
+
+                    response = requests.get(jsonUrl, timeout=10)
+                    response.raise_for_status()
+                    data = response.json()
+                    # with urllib.request.urlopen(jsonUrl, timeout=10) as url:
+                    #     data = json.loads(url.read().decode())
+                except Exception:
                     data = {
                         "id": splitext(basename(jsonUrl))[0],
                         "title": splitext(basename(jsonUrl))[0],
@@ -589,8 +595,8 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
     def onCollectionClicked(self):
 
         # https://earthengine-stac.storage.googleapis.com/catalog/catalog.json  # main catalog
-        #    https://earthengine-stac.storage.googleapis.com/catalog/LANDSAT/catalog.json  # sub catalog
-        #        https://earthengine-stac.storage.googleapis.com/catalog/LANDSAT/LANDSAT_LC08_C02_T1_L2.json  # collection
+        # https://earthengine-stac.storage.googleapis.com/catalog/LANDSAT/catalog.json  # sub catalog
+        # https://earthengine-stac.storage.googleapis.com/catalog/LANDSAT/LANDSAT_LC08_C02_T1_L2.json  # collection
 
         if isinstance(self.sender(), QToolButton):
             self.mUserCollection.clearSelection()
@@ -607,7 +613,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
             jsonUrl = collection.jsonUrl
             pyFilename = collection.pyFilename
         else:
-            assert 0
+            raise ValueError()
 
         data = self.loadJsonUrlData(jsonUrl)
         with open(pyFilename) as file:
@@ -626,15 +632,10 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
         self.onLoadCollectionClicked()
 
     def onOpenUserCollectionFolderClicked(self):
-        system = platform.system()
+        # system = platform.system()
         root = join(dirname(__file__), 'user_collections')
-        if system == 'Windows':
-            import subprocess
-            cmd = rf'explorer.exe /select,"{root}"'
-            subprocess.Popen(cmd)
-        else:
-            url = QUrl.fromLocalFile(dirname(root))
-            QDesktopServices.openUrl(url)
+        url = QUrl.fromLocalFile(dirname(root))
+        QDesktopServices.openUrl(url)
 
     def eeInitialize(self):
         eeImported, ee = importEarthEngine(False)
@@ -936,7 +937,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
             eeCompositeProfile, eeCompositeRgb, visParams = self.eeComposite(limit)
             eeImageRgb = eeCompositeRgb
         else:
-            assert 0
+            raise ValueError()
 
         eeExtent = ee.Geometry.Rectangle(
             [extent.xMinimum(), extent.yMinimum(), extent.xMaximum(), extent.yMaximum()], None, False
@@ -987,11 +988,11 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
                 'palette': [color.name().strip('#') for color in colors]
             }
         else:
-            assert 0
+            raise ValueError()
         return visParams
 
     def eeCollection(
-            self, addIndices=True, filterDate=True, filterProperty=True, filterQuality=True
+        self, addIndices=True, filterDate=True, filterProperty=True, filterQuality=True
     ):
         eeImported, ee = importEarthEngine(False)
 
@@ -1062,8 +1063,10 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
             def maskPixel(eeImage: ee.Image) -> ee.Image:
                 masks = list()
                 for item in items:
-                    if isinstance(item, (PixelQualityBitmaskItem, CategoryMaskItem)) and item.checkState(
-                            0) == Qt.Checked:
+                    if (
+                        isinstance(item, (PixelQualityBitmaskItem, CategoryMaskItem))
+                        and item.checkState(0) == Qt.Checked
+                    ):
                         masks.append(item.eeMask(eeImage))
 
                 if len(masks) == 0:
@@ -1156,7 +1159,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
 
         # composite
         eeReducers = self.eeReducers()
-        bandNames = self.eeFullCollectionInfo.bandNames + self.currentSpectralIndexBandNames()
+        # bandNames = self.eeFullCollectionInfo.bandNames + self.currentSpectralIndexBandNames()
 
         eeCompositeProfile = None
 
@@ -1194,7 +1197,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
                 'palette': [color.name().strip('#') for color in colors]
             }
         else:
-            assert 0
+            raise ValueError()
 
         return eeCompositeProfile, eeCompositeRgb, visParams
 
@@ -1283,7 +1286,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
                 'palette': [color.name().strip('#') for color in colors]
             }
         else:
-            assert 0
+            raise ValueError()
 
         return eeImage, eeImageRgb, visParams, visBands
 
@@ -1333,7 +1336,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
         elif self.mImageExplorerTab.currentIndex() == 1:  # compositing
             return self.currentCompositeLayerName()
         else:
-            assert 0
+            raise ValueError()
 
     def updateLayerNamePreview(self):
         self.mLayerNamePreview.setText(self.currentLayerName())
@@ -1352,7 +1355,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
             return [self.mRedBand.currentText(), self.mGreenBand.currentText(), self.mBlueBand.currentText()]
         elif self.mRendererType.currentIndex() == self.SinglebandPseudocolorRenderer:
             return [self.mPseudoColorBand.currentText()]
-        assert 0
+        raise ValueError()
 
     def currentImageChipBandNames(self) -> Optional[List[str]]:
         allBandNames = self.eeFullCollectionInfo.bandNames + self.currentSpectralIndexBandNames()

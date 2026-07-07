@@ -25,13 +25,11 @@ import sys
 
 from enmapbox.gui.applications import EnMAPBoxApplication
 from ensomap import APP_DIR
+from qgis.PyQt import Qt
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QWidget, QFrame, QDesktopWidget
 
 sys.path.insert(0, APP_DIR)
-# from ensomap_ui import EnSoMAP_UI
-
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
 
 
 class EnSoMAP(EnMAPBoxApplication):

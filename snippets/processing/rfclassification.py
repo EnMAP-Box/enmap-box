@@ -13,7 +13,7 @@ alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
 parameters = {
     alg.P_FEATURE_RASTER: enmap,
     alg.P_CATEGORIZED_VECTOR: landcover_polygon,
-    alg.P_OUTPUT_DATASET: 'c:/test/dataset.pkl'
+    alg.P_OUTPUT_DATASET: 'c:/test/dataset.skops'
 }
 Processing.runAlgorithm(alg, parameters)
 
@@ -38,9 +38,9 @@ class MyRFC(FitClassifierAlgorithmBase):
 
 alg = MyRFC()
 parameters = {
-    alg.P_DATASET: 'c:/test/dataset.pkl',
+    alg.P_DATASET: 'c:/test/dataset.skops',
     alg.P_CLASSIFIER: str(alg.defaultCodeAsString()),
-    alg.P_OUTPUT_CLASSIFIER: 'c:/test/classifier.pkl',
+    alg.P_OUTPUT_CLASSIFIER: 'c:/test/classifier.skops',
 }
 Processing.runAlgorithm(alg, parameters)
 
@@ -49,7 +49,7 @@ alg = PredictClassificationAlgorithm()
 alg.initAlgorithm()
 parameters = {
     alg.P_RASTER: enmap,
-    alg.P_CLASSIFIER: 'c:/test/classifier.pkl',
+    alg.P_CLASSIFIER: 'c:/test/classifier.skops',
     alg.P_OUTPUT_CLASSIFICATION: 'c:/test/classification.tif'
 }
 Processing.runAlgorithm(alg, parameters)

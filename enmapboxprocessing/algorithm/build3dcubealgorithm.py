@@ -3,7 +3,7 @@ from typing import Dict, Any, List, Tuple
 import numpy as np
 from osgeo import gdal
 
-import processing
+import qgis.processing
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.driver import Driver
@@ -57,6 +57,7 @@ class Build3dCubeAlgorithm(EnMAPProcessingAlgorithm):
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         spectralScale = self.parameterAsFloat(parameters, self.P_SPECTRAL_SCALE, context)
+        del spectralScale  # not used
         dx = self.parameterAsInt(parameters, self.P_DX, context)
         dy = self.parameterAsInt(parameters, self.P_DY, context)
         filename1 = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_FACE, context)
@@ -77,7 +78,7 @@ class Build3dCubeAlgorithm(EnMAPProcessingAlgorithm):
 
             # build face
             alg = TranslateRasterAlgorithm()
-            processing.run(alg, {alg.P_RASTER: raster, alg.P_OUTPUT_RASTER: filename1, alg.P_COPY_METADATA: True})
+            qgis.processing.run(alg, {alg.P_RASTER: raster, alg.P_OUTPUT_RASTER: filename1, alg.P_COPY_METADATA: True})
             ds = gdal.Open(filename1)
             gdalGeoTransform = (
                 extent0.xMinimum() + xres * (bandCount - 1) * dx, xres, -0.,

@@ -35,8 +35,10 @@ class PredictClassificationAlgorithm(EnMAPProcessingAlgorithm):
         return [
             (self._RASTER, 'A raster layer with bands used as features. '
                            'Classifier features and raster bands are matched by name to allow for classifiers trained '
-                           'on a subset of the raster bands. If raster bands and classifier features are not matching by name, '
-                           'but overall number of bands and features do match, raster bands are used in original order.'),
+                           'on a subset of the raster bands. '
+                           'If raster bands and classifier features are not matching by name, '
+                           'but overall number of bands and features do match, '
+                           'raster bands are used in original order.'),
             (self._CLASSIFIER, 'A fitted classifier.'),
             (self._MATCH_BY_NAME, 'Whether to match raster bands and classifier features by name.'),
             (self._OUTPUT_CLASSIFICATION, self.RasterFileDestination)
@@ -47,13 +49,13 @@ class PredictClassificationAlgorithm(EnMAPProcessingAlgorithm):
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
-        self.addParameterPickleFile(self.P_CLASSIFIER, self._CLASSIFIER)
+        self.addParameterSkopsFile(self.P_CLASSIFIER, self._CLASSIFIER)
         self.addParameterBoolean(self.P_MATCH_BY_NAME, self._MATCH_BY_NAME, False, True)
         self.addParameterRasterDestination(self.P_OUTPUT_CLASSIFICATION, self._OUTPUT_CLASSIFICATION)
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
         try:
-            ClassifierDump(**Utils.pickleLoad(self.parameterAsFile(parameters, self.P_CLASSIFIER, context)))
+            ClassifierDump(**Utils.modelLoad(self.parameterAsFile(parameters, self.P_CLASSIFIER, context)))
         except TypeError:
             return False, 'Invalid classifier file.'
         return True, ''

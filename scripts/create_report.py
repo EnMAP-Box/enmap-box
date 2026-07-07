@@ -9,10 +9,9 @@ import os
 import pathlib
 import re
 import unittest
-import urllib.request
-import xml.etree.ElementTree as etree
 from typing import Dict, List
 
+import defusedxml.ElementTree as etree
 import pandas as pd
 import requests
 
@@ -22,13 +21,15 @@ from enmapbox.gui.applications import ApplicationWrapper, EnMAPBoxApplication
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from qgis.PyQt.QtWidgets import QMenu
-from qgis.core import QgsProcessing, QgsProcessingAlgorithm, QgsProcessingOutputFile, QgsProcessingOutputFolder, \
-    QgsProcessingOutputHtml, QgsProcessingOutputRasterLayer, QgsProcessingOutputVectorLayer, \
-    QgsProcessingParameterBoolean, QgsProcessingParameterEnum, QgsProcessingParameterFeatureSink, \
-    QgsProcessingParameterFeatureSource, QgsProcessingParameterFile, QgsProcessingParameterFileDestination, \
-    QgsProcessingParameterFolderDestination, QgsProcessingParameterMapLayer, QgsProcessingParameterMultipleLayers, \
-    QgsProcessingParameterRasterDestination, QgsProcessingParameterRasterLayer, QgsProcessingParameterVectorDestination, \
+from qgis.core import (
+    QgsProcessing, QgsProcessingAlgorithm, QgsProcessingOutputFile, QgsProcessingOutputFolder,
+    QgsProcessingOutputHtml, QgsProcessingOutputRasterLayer, QgsProcessingOutputVectorLayer,
+    QgsProcessingParameterBoolean, QgsProcessingParameterEnum, QgsProcessingParameterFeatureSink,
+    QgsProcessingParameterFeatureSource, QgsProcessingParameterFile, QgsProcessingParameterFileDestination,
+    QgsProcessingParameterFolderDestination, QgsProcessingParameterMapLayer, QgsProcessingParameterMultipleLayers,
+    QgsProcessingParameterRasterDestination, QgsProcessingParameterRasterLayer, QgsProcessingParameterVectorDestination,
     QgsProcessingParameterVectorLayer
+)
 
 
 def linesOfCode(path) -> int:
@@ -48,10 +49,10 @@ def report_downloads() -> pd.DataFrame:
     url = r'https://plugins.qgis.org/plugins/enmapboxplugin'
 
     hdr = {'User-agent': 'Mozilla/5.0'}
-    req = urllib.request.Request(url, headers=hdr)
-    response = urllib.request.urlopen(req)
+    response = requests.get(url, headers=hdr, timeout=10)
+    response.raise_for_status()
 
-    html = response.read().decode('utf-8')
+    html = response.text
 
     html = re.search(r'<table .*</table>', re.sub('\n', ' ', html)).group()
     html = re.sub(r'&nbsp;', '', html)
@@ -74,11 +75,12 @@ def report_downloads() -> pd.DataFrame:
         <td class="has-text-centered">3.99.0</td>
         <td class="downloads">3817</td>
         <td class="has-text-centered"><a href="/plugins/user/jakimowb/admin">jakimowb</a></td>
-        <td class="has-text-centered" data-order="2025-08-02T12:57:54.528578"><span class="user-timezone">2025-08-02T17:57:54.528578+00:00</span>
+        <td class="has-text-centered" data-order="2025-08-02T12:57:54.528578">
+        <span class="user-timezone">2025-08-02T17:57:54.528578+00:00</span>
         </td>
     </tr>
         """
-        s = ""
+
         versionEMB = tds[0].find('.//a').text
         versionQGIS = tds[2].text
         experimental = tds[1].text.lower() == 'yes'
@@ -129,9 +131,7 @@ def report_github_issues_QGIS(authors=['jakimowb', 'janzandr'], start_date='2020
     if not PATH_GH_JSON.is_file():
         os.makedirs(PATH_GH_JSON.parent, exist_ok=True)
         # Your GitHub personal access token
-        assert 'GITHUB_TOKEN' in os.environ, 'GITHUB_TOKEN is not set. ' \
-                                             'Read https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens for details.'
-        token = os.environ['GITHUB_TOKEN']
+        token = github_token()
 
         # Create a session and set the authorization header
         session = requests.Session()
@@ -162,7 +162,7 @@ def report_github_issues_QGIS(authors=['jakimowb', 'janzandr'], start_date='2020
             rx = re.compile(r'<(.[^>]+)>; *rel="next"')
 
             # Extract the URL for the next page
-            link = [l.strip() for l in link_header.split(',') if 'rel="next"' in l]
+            link = [elem.strip() for elem in link_header.split(',') if 'rel="next"' in elem]
             if len(link) > 0:
                 link = link[0]
                 issues_url = rx.match(link).group(1)
@@ -179,19 +179,22 @@ def report_github_issues_QGIS(authors=['jakimowb', 'janzandr'], start_date='2020
     # filter by authors
 
     pull_requests = [i for i in all_issues if 'pull_request' in i]
+    print(pull_requests)
     issues = [i for i in all_issues if 'pull_request' not in i]
     if True:
         for i in issues:
             if i['closed_at'] and toDate(i['closed_at']) > end_date:
                 i['closed_at'] = None
             else:
-                s = ""
+                pass
 
     # Filter issues within the date range
 
     created_in_report_period = [i for i in issues if start_date <= toDate(i['created_at']) <= end_date]
-    created_before_but_touched = [i for i in issues if toDate(i['created_at']) < start_date
-                                  and start_date <= toDate(i['updated_at']) <= end_date]
+    created_before_but_touched = [
+        i for i in issues
+        if toDate(i['created_at']) < start_date and start_date <= toDate(i['updated_at']) <= end_date
+    ]
 
     def printInfos(issues: List[dict], labels=['duplicate', 'wontfix']):
         is_closed = []
@@ -231,6 +234,17 @@ def report_github_issues_QGIS(authors=['jakimowb', 'janzandr'], start_date='2020
     return None
 
 
+def github_token() -> str:
+    if 'GITHUB_TOKEN' not in os.environ:
+        raise Exception(
+            'GITHUB_TOKEN is not set. Read '
+            'https://docs.github.com/en/authentication/keeping-your-account-and-data-'
+            'secure/managing-your-personal-access-tokens for details.'
+        )
+
+    return str(os.environ['GITHUB_TOKEN'])
+
+
 def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31') -> pd.DataFrame:
     """
 
@@ -252,10 +266,7 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
 
     if not PATH_GH_JSON.is_file():
         os.makedirs(PATH_GH_JSON.parent, exist_ok=True)
-        # Your GitHub personal access token
-        assert 'GITHUB_TOKEN' in os.environ, 'GITHUB_TOKEN is not set. ' \
-                                             'Read https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens for details.'
-        token = os.environ['GITHUB_TOKEN']
+        token = github_token()
         # Create a session and set the authorization header
         session = requests.Session()
         session.headers.update({'Authorization': f'token {token}'})
@@ -282,7 +293,7 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
             rx = re.compile(r'<(.[^>]+)>; *rel="next"')
 
             # Extract the URL for the next page
-            link = [l.strip() for l in link_header.split(',') if 'rel="next"' in l]
+            link = [elem.strip() for elem in link_header.split(',') if 'rel="next"' in elem]
             if len(link) > 0:
                 link = link[0]
                 issues_url = rx.match(link).group(1)
@@ -295,21 +306,22 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
     with open(PATH_GH_JSON, 'r') as f:
         all_issues = json.load(f)
     pull_requests = [i for i in all_issues if 'pull_request' in i]
+    print(pull_requests)
     issues = [i for i in all_issues if 'pull_request' not in i]
     if True:
         for i in issues:
             if i['closed_at'] and toDate(i['closed_at']) > end_date:
                 i['closed_at'] = None
             else:
-                s = ""
+                pass
 
     # Filter issues within the date range
 
     created_in_report_period = [i for i in issues if start_date <= toDate(i['created_at']) <= end_date]
-    created_before_but_touched = [i for i in issues if toDate(i['created_at']) < start_date
-                                  and start_date <= toDate(i['updated_at']) <= end_date]
-
-    s = ""
+    created_before_but_touched = [
+        i for i in issues
+        if toDate(i['created_at']) < start_date and start_date <= toDate(i['updated_at']) <= end_date
+    ]
 
     def countIssues(issues: List[dict], labels=['duplicate', 'wontfix']) -> Dict[str, int]:
         is_closed = []
@@ -358,7 +370,7 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
             for label in labels:
                 print(f' {label}: {len(issues_by_label.get(label, []))}')
         else:
-            s = ""
+            pass
 
     print(f'By today: {today}')
     print(f'Issues created in reporting period: {start_date} to {end_date}:')
@@ -376,21 +388,26 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
 
     s_start_date = start_date.strftime('%d.%m.%Y')
     s_zeitraum = f"{s_start_date} - {end_date.strftime('%d.%m.%Y')}"
-    LaTeX = fr"""# LaTeX CODE:
-\begin{{table}}[h]
-    \centering
-    \begin{{tabular}}{{rc|cc|cc}}
-         \multicolumn{{2}}{{c|}}{{Erstellung}} & Offen & Geschlossen & Duplikat & Ungültig/nicht behebbar \\
-         \hline
-        {s_zeitraum} & {cntP['total']} & {cntP['open']} & {cntP['closed']} & {cntP['duplicate']} & {cntP['wontfix']} \\
-         vor {s_start_date} & {cntB['total']} & {cntB['open']} & {cntB['closed']} & {cntB['duplicate']} & {cntB['wontfix']} \\
-         \hline
-         Gesamt      & {cntA['total']} & {cntA['open']} & {cntA['closed']} & {cntA['duplicate']} & {cntA['wontfix']} \\
-    \end{{tabular}}
-    \caption{{Zusammenfassung \EnMAPBox Issue-Tracker\footnote{{\url{{https://github.com/EnMAP-Box/enmap-box/issues}}}}, Stand {today.strftime("%d.%m.%Y")} }}
-    \label{{tab:enmapbox_issues}}
-\end{{table}}
-"""
+    LaTeX = (
+        fr"# LaTeX CODE:\n"
+        fr"\begin{{table}}[h]\n"
+        fr"\centering\n"
+        fr"  \begin{{tabular}}{{rc|cc|cc}}\n"
+        fr"    \multicolumn{{2}}{{c|}}{{Erstellung}} & Offen & Geschlossen & Duplikat & Ungültig/nicht behebbar \\\n"
+        fr"    \hline\n"
+        fr"    {s_zeitraum} & {cntP['total']} & {cntP['open']} & {cntP['closed']} & {cntP['duplicate']} & "
+        fr"    {cntP['wontfix']} \\\n"
+        fr"    vor {s_start_date} & {cntB['total']} & {cntB['open']} & {cntB['closed']} & {cntB['duplicate']} & "
+        fr"    {cntB['wontfix']} \\\n"
+        fr"    \hline\n"
+        fr"    Gesamt      & {cntA['total']} & {cntA['open']} & {cntA['closed']} & {cntA['duplicate']} & "
+        fr"    {cntA['wontfix']} \\\n"
+        fr"    \end{{tabular}}\n"
+        fr"    \caption{{Zusammenfassung \EnMAPBox Issue-Tracker\footnote"
+        fr"{{\url{{https://github.com/EnMAP-Box/enmap-box/issues}}}}, Stand {today.strftime('%d.%m.%Y')} }}\n"
+        r"    \label{{tab:enmapbox_issues}}\n"
+        r"\end{{table}}\n"
+    )
     print(LaTeX)
     return None
 
@@ -423,7 +440,8 @@ def report_EnMAPBoxApplications() -> pd.DataFrame:
         # DATA['title'].append(a..title())
 
         menu = app.menu(parentMenu)
-        s = ""
+        print(menu)
+
     df = pd.DataFrame.from_dict(DATA)
     df.sort_values(by=['name'], inplace=True)
     return df

@@ -41,18 +41,27 @@ class EnGeoMAPTests(EnMAPBoxTestCase):
         params = ui.collectParameters()
 
         worker = Worker()
+        worker.setParams(params)
         worker.run()
 
         root = Path(engeomap_cubus_gamsberg_subset).parent
         bn = os.path.basename(Path(engeomap_cubus_gamsberg_subset).name)
 
         to_delete = []
-        for suffix in ['abundance_result',
-                       'abundance_unmix__best_unmix_coleur',
-                       'abundance_unmix__best_unmix_coleur_class_geotiff.tif',
-                       'bestmatches_correlation__best_fit_coleur',
-                       'bestmatches_correlation__best_fit_coleur_class_geotiff.tif',
-                       'correlation_result']:
+        for suffix in [
+            'bvls_unmixing_highest_abundance_result',
+            'bvls_unmixing_highest_abundance_result_geotiff.tif',
+            'bvls_unmixing_scores',
+            'feature_fitting_correlation_scores',
+            'feature_fitting_highest_correlation_result',
+            'feature_fitting_highest_correlation_result_geotiff.tif',
+            # 'abundance_result',
+            # 'abundance_unmix__best_unmix_coleur',
+            # 'abundance_unmix__best_unmix_coleur_class_geotiff.tif',
+            # 'bestmatches_correlation__best_fit_coleur',
+            # 'bestmatches_correlation__best_fit_coleur_class_geotiff.tif',
+            # 'correlation_result'
+        ]:
             path = root / f'{bn}_{suffix}'
             self.assertTrue(path.is_file(), msg=f'{path} does not exist')
 

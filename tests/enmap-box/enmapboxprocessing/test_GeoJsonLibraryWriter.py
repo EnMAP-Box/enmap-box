@@ -24,5 +24,7 @@ class TestGeoJsonLibraryWriter(TestCase):
             writer.writeQml(file2)
 
         lead = str(Utils().jsonLoad(filename))
-        gold = "{'type': 'FeatureCollection', 'name': 'My Library', 'description': '', 'features': [{'type': 'Feature', 'properties': {'name': 'profile 1', 'profiles': {'x': [1, 2, 3], 'xUnit': 'Nanometers', 'y': [10, 20, 30], 'bbl': [0, 1, 1]}, 'field 1': 1}, 'geometry': None}]}"
+        gold = ("{'type': 'FeatureCollection', 'name': 'My Library', 'description': '', "
+                "'features': [{'type': 'Feature', 'properties': {'name': 'profile 1', 'profiles': {'x': [1, 2, 3], "
+                "'xUnit': 'Nanometers', 'y': [10, 20, 30], 'bbl': [0, 1, 1]}, 'field 1': 1}, 'geometry': None}]}")
         self.assertEqual(gold, lead)

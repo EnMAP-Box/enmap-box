@@ -12,7 +12,14 @@ class TestReportWriter(TestCase):
             report.writeHeader('Header 1')
             report.writeSubHeader('Header 2')
             report.writeParagraph(
-                'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.')
+                'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt '
+                'ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo '
+                'dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit '
+                'amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt '
+                'ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo '
+                'dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit '
+                'amet.'
+            )
             values = [[11, 12], [21, 22], [31, 32]]
             report.writeTable(values, caption='Table without Header')
             report.writeTable(values, columnHeaders=['Column 1', 'Column 2'], caption='Table with Column Header')

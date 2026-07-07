@@ -1,3 +1,4 @@
+import ee
 collection = ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
 
 # remove MSK_CLDPRB and MSK_SNWPRB bands, because they aren't available for all images

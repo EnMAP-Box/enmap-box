@@ -44,4 +44,4 @@ class TestAggregateRasterBandsAlgorithm(TestCase):
         }
         result = self.runalg(alg, parameters)
         reader = RasterReader(result[alg.P_OUTPUT_RASTER])
-        array = reader.array()
+        reader.array()

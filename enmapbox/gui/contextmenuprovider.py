@@ -1,10 +1,11 @@
 import logging
+import sys
 from os.path import exists, splitext
 from typing import List, Union, Optional
 
 import numpy as np
+import pyqtgraph as pg
 
-import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
 import qgis.utils
 from enmapbox.gui.contextmenus import EnMAPBoxAbstractContextMenuProvider
 from enmapbox.gui.datasources.datasources import DataSource, RasterDataSource, VectorDataSource, ModelDataSource
@@ -144,12 +145,15 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
         for i in range(model.rowCount()):
             idx = model.index(i, 0)
             lid = model.data(idx, role=Qt.UserRole + 1)
-            name = str(model.data(idx, role=Qt.DisplayRole))
+            name = model.data(idx, role=Qt.DisplayRole)
             if lid is None:
                 continue
+
             if name is None:
-                name = lid
-            assert isinstance(name, str)
+                name = str(lid)
+            else:
+                name = str(name)
+
             icon = model.data(idx, role=Qt.DecorationRole)
             tt = model.data(idx, role=Qt.ToolTipRole)
             if lid not in tt:
@@ -237,7 +241,6 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                             a.setToolTip(tt)
                             a.triggered.connect(lambda *args, sl=sl, n=node: node.insertLayer(0, sl))
         menu.addSeparator()
-        s = ""
 
     def onAddGroup(self, view: DockTreeView):
         """
@@ -283,9 +286,8 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
         if isinstance(enmapbox, EnMAPBox):
             mapDocks = enmapbox.dockManager().docks('MAP')
 
-        aRemove = menu.addAction('Remove')
+        aRemove: QAction = menu.addAction('Remove')
         if isinstance(node, DataSourceSet):
-            assert isinstance(aRemove, QAction)
             aRemove.setToolTip('Removes all datasources from this node')
             aRemove.triggered.connect(lambda *args, n=node, dsm=DSM:
                                       DSM.removeDataSources(n.dataSources()))
@@ -305,7 +307,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
             # todo: implement rename function
 
             def appendRasterActions(subMenu: QMenu, src: RasterDataSource, target):
-                assert isinstance(src, RasterDataSource)
+
                 subAction = subMenu.addAction('Default Colors')
                 subAction.triggered.connect(lambda *args, s=src, t=target:
                                             treeView.openInMap(s, t, rgb='DEFAULT'))
@@ -350,7 +352,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                 self.enmapBox()
                 if len(mapDocks) > 0:
                     for mapDock in mapDocks:
-                        assert isinstance(mapDock, MapDock)
+                        mapDock: MapDock
                         subsub = sub.addMenu(mapDock.title())
                         appendRasterActions(subsub, node, mapDock)
                 else:
@@ -409,7 +411,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                     sub = menu.addMenu('Open in existing map...')
                     if len(mapDocks) > 0:
                         for mapDock in mapDocks:
-                            assert isinstance(mapDock, MapDock)
+                            mapDock: MapDock
                             a = sub.addAction(mapDock.title())
                             a.triggered.connect(
                                 lambda checked, s=node, d=mapDock:
@@ -436,7 +438,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
             elif isinstance(node, ModelDataSource):
                 a = menu.addAction('View as JSON')
                 a.setIcon(QIcon(':/images/themes/default/mIconFieldJson.svg'))
-                a.triggered.connect(lambda *args, node=node: treeView.onViewPklAsJson(node))
+                a.triggered.connect(lambda *args, node=node: treeView.onViewSkopsAsJson(node))
 
         elif isinstance(node, RasterBandTreeNode):
             # a = m.addAction('Band statistics')
@@ -452,7 +454,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
             sub = menu.addMenu('Open in existing map...')
             if len(mapDocks) > 0:
                 for mapDock in mapDocks:
-                    assert isinstance(mapDock, MapDock)
+                    mapDock: MapDock
                     a = sub.addAction(mapDock.title())
                     a.node = node
                     a.mapCanvas = mapDock.mapCanvas()
@@ -470,13 +472,14 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
             try:
                 obj = node.mPyObject
                 array = np.array(obj, dtype=float)
-                assert array.ndim == 1
+                if array.ndim != 1:
+                    raise ValueError(f'Expected array.ndim to be 1, not {array.ndim}')
                 a = menu.addAction('Plot values')
                 a.triggered.connect(
                     lambda *args: pg.plot(range(1, len(array) + 1), array).setWindowTitle(f'Value Plot - {node.name()}')
                 )
-            except Exception as error:
-                pass
+            except Exception as ex:
+                print(ex, file=sys.stderr)
 
         # add the node-specific menu actions
         if isinstance(node, TreeNode):
@@ -487,8 +490,6 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
         a.triggered.connect(treeView.onRemoveAllDataSources)
 
     def populateDataViewMenu(self, menu: QMenu, view: DockTreeView, node: QgsLayerTreeNode):
-
-        assert isinstance(menu, QMenu)
         cidx: QModelIndex = view.currentIndex()
         if isinstance(node, DockTreeNode):
             viewNode: DockTreeNode = node
@@ -518,7 +519,6 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
         lyr: Optional[QgsMapLayer] = None
         canvas: Optional[QgsMapCanvas] = None
         if isinstance(viewNode, MapDockTreeNode):
-            assert isinstance(viewNode.dock, MapDock)
             canvas = viewNode.dock.mCanvas
 
         selectedLayerNodes = list(set(view.selectedLayerNodes()))
@@ -567,7 +567,8 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                     errors.append(ex)
 
         elif isinstance(node, DockTreeNode):
-            assert isinstance(node.dock, Dock)
+            if not isinstance(node.dock, Dock):
+                raise ValueError(f'Expected DockTreeNode.dock to be a Dock, not {node.dock}')
             try:
                 node.dock.populateContextMenu(menu)
             except ModuleNotFoundError as ex:

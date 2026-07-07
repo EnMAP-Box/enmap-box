@@ -25,5 +25,7 @@ class SpatialMedianAlgorithm(SpatialFilterFunctionAlgorithmBase):
     def code(cls):
         from scipy.ndimage.filters import median_filter
 
-        function = lambda array: median_filter(array, size=3)
+        def function(array):
+            return median_filter(array, size=3)
+
         return function

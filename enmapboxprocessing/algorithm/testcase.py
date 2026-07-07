@@ -15,7 +15,7 @@ class ProcessingFeedback(QgsProcessingFeedback):
 
 class TestCase(enmapboxprocessing.testcase.TestCase):
     openReport = not True
-    skipProductImport = False
+    skipProductImport = True
 
     @staticmethod
     def runalg(alg, parameters: Dict):

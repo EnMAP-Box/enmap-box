@@ -6,7 +6,7 @@ from typing import Iterable, List, Union, Optional, Tuple, Iterator, Dict
 import numpy as np
 from osgeo import gdal
 
-import processing
+import qgis.processing
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.gridwalker import GridWalker
@@ -284,7 +284,10 @@ class RasterReader(object):
             height = height + 2 * overlap
         arrays = list()
         for bandNo in bandList:
-            assert 0 < bandNo <= self.bandCount(), f'bandNo is {bandNo}'
+            if not 0 < bandNo <= self.bandCount():
+                raise ValueError(
+                    f'bandNo must be between 1 and {self.bandCount()}, got {bandNo}'
+                )
             block: QgsRasterBlock = self.projector.block(bandNo, boundingBox, width, height, feedback)
             array = Utils.qgsRasterBlockToNumpyArray(block=block)
             arrays.append(array)
@@ -300,10 +303,14 @@ class RasterReader(object):
             p2_ = QgsPoint(xOffset + width, yOffset + height)
             p1 = QgsPointXY(self.provider.transformCoordinates(p1_, QgsRasterDataProvider.TransformImageToLayer))
             p2 = QgsPointXY(self.provider.transformCoordinates(p2_, QgsRasterDataProvider.TransformImageToLayer))
-            assert not p1.isEmpty()
-            assert not p2.isEmpty()
+            if p1.isEmpty() or p2.isEmpty():
+                raise ValueError('p1 and p2 must not be empty')
         else:
-            assert self.rasterUnitsPerPixel() == QSizeF(1, 1)
+            if self.rasterUnitsPerPixel() != QSizeF(1, 1):
+                raise RuntimeError(
+                    f'expected raster units per pixel to be QSizeF(1, 1), '
+                    f'got {self.rasterUnitsPerPixel()}'
+                )
             p1 = QgsPointXY(xOffset, - yOffset)
             p2 = QgsPointXY(xOffset + width, -(yOffset + height))
         boundingBox = QgsRectangle(p1, p2)
@@ -341,7 +348,11 @@ class RasterReader(object):
 
         if bandList is None:
             bandList = range(1, self.provider.bandCount() + 1)
-        assert len(bandList) == len(array)
+        if len(bandList) != len(array):
+            raise ValueError(
+                f'bandList and array must have the same length, '
+                f'got {len(bandList)} and {len(array)}'
+            )
         maskArray = list()
         for i, a in enumerate(array):
             bandNo = i + 1
@@ -420,7 +431,10 @@ class RasterReader(object):
         return extent
 
     def geometryCoverage(self, geometry: QgsGeometry, fractions=True) -> Tuple[np.ndarray, QgsRectangle]:
-        assert geometry.type() == QgsWkbTypes.GeometryType.PolygonGeometry
+        if geometry.type() != QgsWkbTypes.GeometryType.PolygonGeometry:
+            raise ValueError(
+                f'expected polygon geometry, got geometry type {geometry.type()}'
+            )
 
         # make memory layer from geometry
         layer = QgsVectorLayer(f'Polygon?crs={self.crs().authid()}', 'polygon', 'memory')
@@ -451,7 +465,7 @@ class RasterReader(object):
             'DATA_TYPE': 5,
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        result = processing.run(alg, parameters)
+        result = qgis.processing.run(alg, parameters)
 
         # read mask and calculate fractions
         maskArray = RasterReader(result['OUTPUT']).array()[0]
@@ -990,7 +1004,8 @@ class RasterReader(object):
         return self.width() * nBands * dataTypeSize
 
     def _gdalObject(self, bandNo: int = None) -> Union[gdal.Band, gdal.Dataset]:
-        if bandNo is None or bandNo > self.gdalDataset.RasterCount:  # handle case where GDAL band count != QGIS band count
+        if bandNo is None or bandNo > self.gdalDataset.RasterCount:
+            # handle case where GDAL band count != QGIS band count
             gdalObject = self.gdalDataset
         else:
             gdalObject = self.gdalDataset.GetRasterBand(bandNo)

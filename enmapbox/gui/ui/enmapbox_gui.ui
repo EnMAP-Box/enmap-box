@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>867</width>
+    <width>1002</width>
     <height>669</height>
    </rect>
   </property>
@@ -45,7 +45,7 @@
    <property name="styleSheet">
     <string notr="true"/>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,2">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
     <property name="spacing">
      <number>0</number>
     </property>
@@ -61,16 +61,6 @@
     <property name="bottomMargin">
      <number>0</number>
     </property>
-    <item>
-     <widget class="DockArea" name="dockArea" native="true">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>2</horstretch>
-        <verstretch>2</verstretch>
-       </sizepolicy>
-      </property>
-     </widget>
-    </item>
     <item>
      <widget class="QgsMessageBar" name="messageBar">
       <property name="sizePolicy">
@@ -93,6 +83,16 @@
       </property>
      </widget>
     </item>
+    <item>
+     <widget class="DockArea" name="dockArea" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>2</horstretch>
+        <verstretch>2</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -100,8 +100,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>867</width>
-     <height>21</height>
+     <width>1002</width>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuAbout">

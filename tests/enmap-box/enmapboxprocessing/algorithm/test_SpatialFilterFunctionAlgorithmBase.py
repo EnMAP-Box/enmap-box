@@ -62,6 +62,7 @@ class TestSpatialFilterFunctionAlgorithm(TestCase):
             SpatialLaplaceAlgorithm(),
             # SpatialGenericAlgorithm(),
         ]
+
         for alg in algs:
             print(alg.displayName())
             alg.initAlgorithm()
@@ -73,4 +74,4 @@ class TestSpatialFilterFunctionAlgorithm(TestCase):
             }
             self.runalg(alg, parameters)
 
-            break  # comment out to check all filter algos
+            # break  # comment out to check all filter algos

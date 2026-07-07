@@ -29,7 +29,6 @@ class TestCaseIssue418(EnMAPBoxTestCase):
 
         mapDock.addLayers([layer])
         self.showGui(enmapBox.ui)
-        s = ""
         enmapBox.close()
         QgsProject.instance().removeAllMapLayers()
 

@@ -18,10 +18,10 @@ class TestPrepareUnsupervisedDatasetFromRasterAlgorithm(TestCase):
         alg = PrepareUnsupervisedDatasetFromRasterAlgorithm()
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = TransformerDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = TransformerDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((71158, 177), dump.X.shape)
         self.assertEqual(177, len(dump.features))
         self.assertListEqual(['band 8 (0.460000 Micrometers)', 'band 9 (0.465000 Micrometers)'], dump.features[:2])
@@ -31,10 +31,10 @@ class TestPrepareUnsupervisedDatasetFromRasterAlgorithm(TestCase):
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
             alg.P_MASK: landcover_point,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = TransformerDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = TransformerDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((58, 177), dump.X.shape)
         self.assertEqual(177, len(dump.features))
         self.assertListEqual(['band 8 (0.460000 Micrometers)', 'band 9 (0.465000 Micrometers)'], dump.features[:2])
@@ -44,10 +44,10 @@ class TestPrepareUnsupervisedDatasetFromRasterAlgorithm(TestCase):
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
             alg.P_MASK: landcover_polygon_30m,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = TransformerDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = TransformerDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((2028, 177), dump.X.shape)
         self.assertEqual(177, len(dump.features))
         self.assertListEqual(['band 8 (0.460000 Micrometers)', 'band 9 (0.465000 Micrometers)'], dump.features[:2])
@@ -57,10 +57,10 @@ class TestPrepareUnsupervisedDatasetFromRasterAlgorithm(TestCase):
         parameters = {
             alg.P_FEATURE_RASTER: enmap_potsdam,
             alg.P_EXCLUDE_BAD_BANDS: True,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = TransformerDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = TransformerDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual(218, dump.X.shape[1])
         self.assertEqual(218, len(dump.features))
 
@@ -69,9 +69,9 @@ class TestPrepareUnsupervisedDatasetFromRasterAlgorithm(TestCase):
         parameters = {
             alg.P_FEATURE_RASTER: enmap_potsdam,
             alg.P_EXCLUDE_BAD_BANDS: False,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = TransformerDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = TransformerDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual(224, dump.X.shape[1])
         self.assertEqual(224, len(dump.features))

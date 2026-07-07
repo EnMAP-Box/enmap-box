@@ -33,7 +33,9 @@ class RegressionBasedUnmixingAlgorithm(EnMAPProcessingAlgorithm):
     P_BACKGROUND, _BACKGROUND = 'background', 'Proportion of background mixtures (%)'
     P_INCLUDE_ENDMEMBER, _INCLUDE_ENDMEMBER = 'includeEndmember', 'Include original endmembers'
     P_MIXING_PROBABILITIES, _MIXING_PROBABILITIES = 'mixingProbabilities', 'Mixing complexity probabilities'
-    P_ALLOW_WITHINCLASS_MIXTURES, _ALLOW_WITHINCLASS_MIXTURES = 'allowWithinClassMixtures', 'Allow within-class mixtures'
+    P_ALLOW_WITHINCLASS_MIXTURES, _ALLOW_WITHINCLASS_MIXTURES = (
+        'allowWithinClassMixtures', 'Allow within-class mixtures'
+    )
     P_CLASS_PROBABILITIES, _CLASS_PROBABILITIES = 'classProbabilities', 'Class probabilities'
     P_ENSEMBLE_SIZE, _ENSEMBLE_SIZE = 'ensembleSize', 'Ensemble size'
     P_ROBUST_FUSION, _ROBUST_FUSION = 'robustFusion', 'Robust decision fusion'
@@ -119,7 +121,7 @@ class RegressionBasedUnmixingAlgorithm(EnMAPProcessingAlgorithm):
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)
 
-            categories = ClassifierDump.fromDict(Utils.pickleLoad(filenameClassificationDataset)).categories
+            categories = ClassifierDump.fromDict(Utils.modelLoad(filenameClassificationDataset)).categories
 
             # create ensemble runs
             feedback.pushInfo('Create ensemble')
@@ -147,9 +149,9 @@ class RegressionBasedUnmixingAlgorithm(EnMAPProcessingAlgorithm):
                 self.runAlg(alg, parameters, None, feedback2, context, True)
 
                 for category in categories:
-                    filenameRegressionDatasetRun = join(folderRun, category.name + '.pkl')
-                    filenameRegressorRun = filenameRegressionDatasetRun.replace('.pkl', '.regressor.pkl')
-                    filenameFractionRun = filenameRegressionDatasetRun.replace('.pkl', '.fraction.tif')
+                    filenameRegressionDatasetRun = join(folderRun, category.name + '.skops')
+                    filenameRegressorRun = filenameRegressionDatasetRun.replace('.skops', '.regressor.skops')
+                    filenameFractionRun = filenameRegressionDatasetRun.replace('.skops', '.fraction.tif')
 
                     # create regressor
                     alg = FitGenericRegressorAlgorithm()

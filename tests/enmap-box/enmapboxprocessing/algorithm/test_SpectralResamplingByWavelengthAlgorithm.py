@@ -1,9 +1,11 @@
+from contextlib import suppress
+
 import numpy as np
 
 from enmapboxprocessing.algorithm.spectralresamplingbywavelengthalgorithm import SpectralResamplingByWavelengthAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxtestdata import enmap, envi_library_berlin_sli, enmap_berlin_srf_csv, classificationDatasetAsPklFile, \
+from enmapboxtestdata import enmap, envi_library_berlin_sli, enmap_berlin_srf_csv, classificationDatasetAsSkopsFile, \
     enmap_potsdam
 
 
@@ -75,14 +77,12 @@ class TestSpectralResamplingByWavelengthAlgorithm(TestCase):
         alg = SpectralResamplingByWavelengthAlgorithm()
         parameters = {
             alg.P_RASTER: enmap,
-            alg.P_WAVELENGTH_FILE: classificationDatasetAsPklFile,  # PKL files aren't valid response files
+            alg.P_WAVELENGTH_FILE: classificationDatasetAsSkopsFile,  # Skops files aren't valid response files
             alg.P_OUTPUT_RASTER: self.filename('resampled.tif')
         }
-        try:
+        with suppress(Exception):
             self.runalg(alg, parameters)
-            assert 0, 'error not raised, something went wrong'
-        except Exception as error:
-            pass
+            raise RuntimeError('error not raised, something went wrong')
 
     def test_nearestNeighbourResampleAlg(self):
         with open(self.filename('wavelenght.csv'), 'w') as file:

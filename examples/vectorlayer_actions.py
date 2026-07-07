@@ -27,27 +27,30 @@
 *                                                                         *
 ***************************************************************************
 """
-from qgis.PyQt.QtCore import QVariant, QSize
-from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QCheckBox
 
 from enmapbox.testing import start_app
-from qgis.core import QgsPythonRunner, QgsFeature, QgsField, QgsVectorLayer, QgsAttributeTableConfig, QgsActionManager, \
-    QgsAction, QgsProject
+from qgis.PyQt.QtCore import QMetaType, QSize
+from qgis.PyQt.QtWidgets import QWidget, QVBoxLayout, QCheckBox
+from qgis.core import (
+    QgsPythonRunner, QgsFeature, QgsField, QgsVectorLayer, QgsAttributeTableConfig, QgsActionManager, QgsAction,
+    QgsProject
+)
 from qgis.gui import QgsMapCanvas, QgsDualView
 
 # read https://github.com/qgis/QGIS/blob/master/tests/src/python/test_qgsactionmanager.py
 
 
 APP = start_app()  # this instantiates a QGIS environment.
-assert QgsPythonRunner.isValid()  # this! is important to run QgsAction of type QgsAction.GenericPython
+if not QgsPythonRunner.isValid():
+    raise ValueError('QgsPythonRunner is not valid')
 
 
 def create_vectordataset() -> QgsVectorLayer:
     vl = QgsVectorLayer("Point?crs=EPSG:4326", 'test_layer', "memory")
     vl.startEditing()
-    vl.addAttribute(QgsField(name='fString', type=QVariant.String, typeName='varchar', len=50))
-    vl.addAttribute(QgsField(name='fInt', type=QVariant.Int, typeName='int'))
-    vl.addAttribute(QgsField(name='fDouble', type=QVariant.Double))
+    vl.addAttribute(QgsField(name='fString', type=QMetaType.String, typeName='varchar', len=50))
+    vl.addAttribute(QgsField(name='fInt', type=QMetaType.Int, typeName='int'))
+    vl.addAttribute(QgsField(name='fDouble', type=QMetaType.Double))
     vl.addFeature(QgsFeature(vl.fields()))
     vl.commitChanges()
 
@@ -99,8 +102,7 @@ conf.setActionWidgetVisible(True)
 conf.setActionWidgetStyle(QgsAttributeTableConfig.ButtonList)
 layer.setAttributeTableConfig(conf)
 
-actionManager = layer.actions()
-assert isinstance(actionManager, QgsActionManager)
+actionManager: QgsActionManager = layer.actions()
 
 iconPath = ':/qt-project.org/styles/commonstyle/images/standardbutton-delete-128.png'
 pythonCode = """
@@ -128,4 +130,4 @@ dualView.init(layer, canvas)
 dualView.setAttributeTableConfig(layer.attributeTableConfig())
 layer.startEditing()
 
-APP.exec_()
+APP.exec()

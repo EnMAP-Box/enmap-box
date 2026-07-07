@@ -2,11 +2,11 @@ import inspect
 from inspect import signature
 from typing import Dict, Any, List, Tuple, Optional
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -18,7 +18,11 @@ class ApplyBandFunctionAlgorithmBase(EnMAPProcessingAlgorithm):
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
             (self._RASTER, 'Raster layer to be processed band-wise.'),
-            (self._FUNCTION, self.helpParameterCode()),
+            (
+                self._FUNCTION, self.helpParameterCode()
+                + '\nNote: The Python code provided here is executed locally with the permissions of the current user '
+                  'during algorithm execution.'
+            ),
             (self._OUTPUT_RASTER, self.RasterFileDestination)
         ]
 
@@ -53,12 +57,15 @@ class ApplyBandFunctionAlgorithmBase(EnMAPProcessingAlgorithm):
     def parameterAsFunction(self, parameters: Dict[str, Any], name, context: QgsProcessingContext):
         namespace = dict()
         code = self.parameterAsString(parameters, name, context)
-        exec(code, namespace)
+
+        # nosec B102 # User-defined code execution by design; equivalent to the QGIS Python Console.
+        # The code execution is transparently documented for users (e.g., via the Processing algorithm help).
+        exec(code, namespace)  # nosec B102 # User-defined code execution by design;
         function = namespace['function']
         return function
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         function = self.parameterAsFunction(parameters, self.P_FUNCTION, context)

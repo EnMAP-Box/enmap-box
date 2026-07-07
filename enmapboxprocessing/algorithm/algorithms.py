@@ -228,16 +228,15 @@ from enmapboxprocessing.algorithm.spectralresamplingbyresponsefunctionlibraryalg
 from enmapboxprocessing.algorithm.spectralresamplingbywavelengthalgorithm import SpectralResamplingByWavelengthAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingbywavelengthandfwhmalgorithm import \
     SpectralResamplingByWavelengthAndFwhmAlgorithm
-from enmapboxprocessing.algorithm.spectralresamplingtocustomsensoralgorithm import \
-    SpectralResamplingToCustomSensorAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtodesisalgorithm import SpectralResamplingToDesisAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtoemitalgorithm import SpectralResamplingToEmitAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtoenmapalgorithm import SpectralResamplingToEnmapAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtolandsatalgorithm import SpectralResamplingToLandsatTmAlgorithm, \
     SpectralResamplingToLandsatEtmAlgorithm, SpectralResamplingToLandsatOliAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingtoprismaalgorithm import SpectralResamplingToPrismaAlgorithm
-from enmapboxprocessing.algorithm.spectralresamplingtosentinel2algorithm import SpectralResamplingToSentinel2aAlgorithm, \
-    SpectralResamplingToSentinel2bAlgorithm
+from enmapboxprocessing.algorithm.spectralresamplingtosentinel2algorithm import (
+    SpectralResamplingToSentinel2aAlgorithm, SpectralResamplingToSentinel2bAlgorithm
+)
 from enmapboxprocessing.algorithm.stackrasterlayersalgorithm import StackRasterLayersAlgorithm
 from enmapboxprocessing.algorithm.subsetrasterbandsalgorithm import SubsetRasterBandsAlgorithm
 from enmapboxprocessing.algorithm.tileenmapl2aalgorithm import TileEnmapL2AAlgorithm
@@ -427,7 +426,6 @@ def algorithms():
         SpectralResamplingByResponseFunctionLibraryAlgorithm(),
         SpectralResamplingByWavelengthAndFwhmAlgorithm(),
         SpectralResamplingByWavelengthAlgorithm(),
-        SpectralResamplingToCustomSensorAlgorithm(),
         SpectralResamplingToDesisAlgorithm(),
         SpectralResamplingToEmitAlgorithm(),
         SpectralResamplingToEnmapAlgorithm(),

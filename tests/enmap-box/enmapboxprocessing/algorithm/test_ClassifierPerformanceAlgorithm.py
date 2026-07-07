@@ -1,7 +1,7 @@
 from enmapboxprocessing.algorithm.classifierperformancealgorithm import ClassifierPerformanceAlgorithm
 from enmapboxprocessing.algorithm.fitsvcrbfalgorithm import FitSvcRbfAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxtestdata import classifierDumpPkl
+from enmapboxtestdata import classifierDumpSkops
 
 
 class TestClassifierPerformanceAlgorithm(TestCase):
@@ -10,8 +10,8 @@ class TestClassifierPerformanceAlgorithm(TestCase):
         alg = ClassifierPerformanceAlgorithm()
         alg.initAlgorithm()
         parameters = {
-            alg.P_CLASSIFIER: classifierDumpPkl,
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_CLASSIFIER: classifierDumpSkops,
+            alg.P_DATASET: classifierDumpSkops,
             alg.P_OPEN_REPORT: self.openReport,
             alg.P_OUTPUT_REPORT: self.filename('report_train.html')
         }
@@ -22,8 +22,8 @@ class TestClassifierPerformanceAlgorithm(TestCase):
         alg = ClassifierPerformanceAlgorithm()
         alg.initAlgorithm()
         parameters = {
-            alg.P_CLASSIFIER: classifierDumpPkl,
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_CLASSIFIER: classifierDumpSkops,
+            alg.P_DATASET: classifierDumpSkops,
             alg.P_NFOLD: 3,
             alg.P_OPEN_REPORT: self.openReport,
             alg.P_OUTPUT_REPORT: self.filename('report_crossval.html')
@@ -35,8 +35,8 @@ class TestClassifierPerformanceAlgorithm(TestCase):
         alg = ClassifierPerformanceAlgorithm()
         alg.initAlgorithm()
         parameters = {
-            alg.P_CLASSIFIER: classifierDumpPkl,
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_CLASSIFIER: classifierDumpSkops,
+            alg.P_DATASET: classifierDumpSkops,
             alg.P_NFOLD: 1,
             alg.P_OPEN_REPORT: self.openReport,
             alg.P_OUTPUT_REPORT: self.filename('report_oobval.html')
@@ -49,8 +49,8 @@ class TestClassifierPerformanceAlgorithm(TestCase):
         alg0 = FitSvcRbfAlgorithm()
         parameters0 = {
             alg0.P_CLASSIFIER: alg0.defaultCodeAsString(),
-            alg0.P_DATASET: classifierDumpPkl,
-            alg0.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl')
+            alg0.P_DATASET: classifierDumpSkops,
+            alg0.P_OUTPUT_CLASSIFIER: self.filename('classifier.skops')
         }
         self.runalg(alg0, parameters0)
 
@@ -58,7 +58,7 @@ class TestClassifierPerformanceAlgorithm(TestCase):
         alg.initAlgorithm()
         parameters = {
             alg.P_CLASSIFIER: parameters0[alg0.P_OUTPUT_CLASSIFIER],
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifierDumpSkops,
             alg.P_NFOLD: 1,
             alg.P_OPEN_REPORT: not self.openReport,
             alg.P_OUTPUT_REPORT: self.filename('report_oobval.html')

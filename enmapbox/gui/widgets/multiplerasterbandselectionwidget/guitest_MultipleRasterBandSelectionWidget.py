@@ -15,4 +15,4 @@ layer = QgsRasterLayer(enmap)
 widget.mBand.setLayer(layer)
 widget.show()
 
-qgsApp.exec_()
+qgsApp.exec()

@@ -1,6 +1,8 @@
 import unittest
-from enmapbox.testing import start_app, TestCase
+
 from enmapbox import registerEnMAPBoxProcessingProvider
+from enmapbox.apps.DASFEnMAPbox import DASFretrievalApp
+from enmapbox.testing import start_app, TestCase
 
 start_app()
 registerEnMAPBoxProcessingProvider()
@@ -13,7 +15,6 @@ class DASFTests(TestCase):
         enmapBox = EnMAPBox()
         enmapBox.run()
         enmapBox.openExampleData(mapWindows=1)
-        from DASFEnMAPbox import DASFretrievalApp
         enmapBox.addApplication(DASFretrievalApp(enmapBox=enmapBox))
 
         self.showGui(enmapBox.ui)

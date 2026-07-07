@@ -1,17 +1,18 @@
 import unittest
 
+from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.algorithms import algorithms
 from enmapboxprocessing.algorithm.convolutionfilteralgorithmbase import ConvolutionFilterAlgorithmBase
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import hires
 
+MISSING_MODULE = None
 try:
-    import astropy.convolution
+    import astropy  # noqa: F401
+except ModuleNotFoundError as ex:
+    MISSING_MODULE = str(ex)
 
-    assert astropy.convolution is not None
-    has_astropy = True
-except ModuleNotFoundError:
-    has_astropy = False
+start_app()
 
 
 class ConvolutionFilterAlgorithm(ConvolutionFilterAlgorithmBase):
@@ -27,12 +28,11 @@ class ConvolutionFilterAlgorithm(ConvolutionFilterAlgorithmBase):
 
     def code(self):
         from astropy.convolution import Box2DKernel
-
         kernel = Box2DKernel(width=15)
         return kernel
 
 
-@unittest.skipIf(not has_astropy, 'astropy is not installed')
+@unittest.skipIf(MISSING_MODULE, f'Missing module: {MISSING_MODULE}')
 class TestConvolutionFilterAlgorithm(TestCase):
 
     def test_convolutionFilterAlgorithm(self):

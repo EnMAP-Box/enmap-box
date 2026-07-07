@@ -4,14 +4,13 @@ from os import makedirs
 from os.path import join, basename, exists
 from typing import Dict, Any, List, Tuple
 
-from qgis.core import QgsProcessing, QgsProcessingParameterField, QgsProcessingContext, \
-    QgsProcessingFeedback
-
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.importenmapl1balgorithm import ImportEnmapL1BAlgorithm
 from enmapboxprocessing.algorithm.importenmapl2aalgorithm import ImportEnmapL2AAlgorithm
 from enmapboxprocessing.algorithm.tilerasteralgorithm import TileRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from qgis.core import QgsProcessing, QgsProcessingParameterField, QgsProcessingContext, \
+    QgsProcessingFeedback
 
 
 @typechecked
@@ -71,7 +70,7 @@ class TileEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFolderDestination(self.P_OUTPUT_FOLDER, self._OUTPUT_FOLDER)
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
 
         xmlFilename = self.parameterAsFile(parameters, self.P_FILE, context)
@@ -89,7 +88,11 @@ class TileEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
             baseName = basename(xmlFilename.replace('-METADATA.XML', ''))
 
         def id_generator(size=40, chars=string.ascii_uppercase + string.digits):
-            return ''.join(random.choice(chars) for _ in range(size))
+            # non-security temporary folder identifier
+            return ''.join(
+                random.choice(chars)  # nosec B311 # not-security relevant random sampling
+                for _ in range(size)
+            )
 
         tmpFolderName = join(folderName, '_tmp', id_generator())
         if not exists(tmpFolderName):

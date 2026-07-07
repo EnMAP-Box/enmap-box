@@ -1,13 +1,13 @@
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCategorizedSymbolRenderer,
+                       QgsFeature, QgsProcessingParameterField, QgsVectorLayer, QgsProcessingException)
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import checkSampleShape, ClassifierDump, Categories, SampleX, SampleY
 from enmapboxprocessing.utils import Utils
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCategorizedSymbolRenderer,
-                       QgsFeature, QgsProcessingParameterField, QgsVectorLayer, QgsProcessingException)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -22,14 +22,17 @@ class PrepareClassificationDatasetFromCategorizedVectorAndFieldsAlgorithm(EnMAPP
         return 'Create classification dataset (from categorized vector layer with attribute table)'
 
     def shortDescription(self) -> str:
-        return 'Create a classification dataset from attribute table rows that matches the given categories ' \
-               'and store the result as a pickle file. \n' \
-               'If the layer is not categorized, or the field with class values is selected manually, ' \
-               'categories are derived from the target data y. ' \
-               'To be more precise: ' \
-               'i) category values are derived from unique attribute values (after excluding no data or zero data values), ' \
-               'ii) category names are set equal to the category values, ' \
-               'and iii) category colors are picked randomly.'
+        return (
+            'Create a classification dataset from attribute table rows that matches the given categories '
+            'and store the result as a skops file. \n'
+            'If the layer is not categorized, or the field with class values is selected manually, '
+            'categories are derived from the target data y. '
+            'To be more precise: '
+            'i) category values are derived from unique attribute values '
+            '(after excluding no data or zero data values), '
+            'ii) category names are set equal to the category values, '
+            'and iii) category colors are picked randomly.'
+        )
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
@@ -39,7 +42,7 @@ class PrepareClassificationDatasetFromCategorizedVectorAndFieldsAlgorithm(EnMAPP
             (self._CATEGORY_FIELD, 'Field with class values used as target data y. '
                                    'If not selected, the field defined by the renderer is used. '
                                    'If that is also not specified, an error is raised.'),
-            (self._OUTPUT_DATASET, self.PickleFileDestination)
+            (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
     def group(self):
@@ -55,7 +58,7 @@ class PrepareClassificationDatasetFromCategorizedVectorAndFieldsAlgorithm(EnMAPP
             self.P_CATEGORY_FIELD, self._CATEGORY_FIELD, None, self.P_CATEGORIZED_VECTOR,
             QgsProcessingParameterField.Any, False, True, False, True
         )
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
@@ -89,7 +92,7 @@ class PrepareClassificationDatasetFromCategorizedVectorAndFieldsAlgorithm(EnMAPP
 
             dump = ClassifierDump(categories=categories, features=featureFields, X=X, y=y)
             dumpDict = dump.__dict__
-            Utils.pickleDump(dumpDict, filename)
+            Utils.modelDump(dumpDict, filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)

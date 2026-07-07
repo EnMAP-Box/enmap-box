@@ -1,6 +1,3 @@
-import subprocess
-import sys
-import webbrowser
 from collections import OrderedDict
 from functools import partial
 from os import scandir, DirEntry, mkdir
@@ -14,7 +11,9 @@ from enmapboxprocessing.parameter.processingparametercodeeditwidget import CodeE
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from processing.gui.wrappers import WidgetWrapper
+from qgis.PyQt.QtCore import QUrl
 from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QDesktopServices
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QWidget, QTreeWidget, QTreeWidgetItem, QPushButton, \
     QInputDialog, QMenu, QAction, QComboBox, QToolButton, QFileDialog
@@ -40,7 +39,6 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
 
         self.mProject: QgsProject = QgsProject.instance()
         self.updateSources()
-        # QgsProject.instance().layersAdded.connect(self.updateSources)  # better not auto-update sources, because when adding a result layer to a map view, it will be added with the basename equal to the identifier already used in the snippet
         self.mSourcesRefresh.clicked.connect(self.updateSources)
 
         self.parseSnippets()
@@ -108,7 +106,7 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
         code = self.mCode.text()
         rasterNames = list(self.getRasterSources().keys())
         dlg = SnippetSaveAsDialog(code, rasterNames, self.parent())
-        if dlg.exec_():
+        if dlg.exec():
             snippet = dlg.values()
             from enmapboxprocessing.algorithm import rastermathalgorithm
             root = join(dirname(rastermathalgorithm.__file__), 'snippet', 'custom')
@@ -124,21 +122,25 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
     def onSnippetOpenFolderClicked(self):
         from enmapboxprocessing.algorithm import rastermathalgorithm
         root = join(dirname(rastermathalgorithm.__file__), 'snippet')
-        # taken from https://stackoverflow.com/questions/1795111/is-there-a-cross-platform-way-to-open-a-file-browser-in-python
-        if sys.platform == 'win32':
-            # subprocess.Popen(['start', root], shell=True)
-            webbrowser.open(root)
 
-        elif sys.platform == 'darwin':
-            subprocess.Popen(['open', root])
+        QDesktopServices.openUrl(QUrl.fromLocalFile(root))
 
-        else:
-            try:
-                subprocess.Popen(['xdg-open', root])
-            except OSError:
-                pass
-                # error, think of something else to try
-                # xdg-open *should* be supported by recent Gnome, KDE, Xfce
+        # taken from https://stackoverflow.com/questions/1795111/is-there-a-cross-platform-way-to-open-a-file-
+        # browser-in-python
+        # if sys.platform == 'win32':
+        #     webbrowser.open(root)
+        #
+        # elif sys.platform == 'darwin':
+        #     subprocess.Popen(['open', root], shell=False)  # nosec # root is opened as path, not executed via shell
+        # else:
+        #     try:
+        #         subprocess.Popen(  # nosec # root is opened as path, not executed via shell
+        #             ['xdg-open', root], shell=False
+        #         )
+        #     except OSError:
+        #         pass
+        #         # error, think of something else to try
+        #         # xdg-open *should* be supported by recent Gnome, KDE, Xfce
 
     def onSensorBandClicked(self):
         button: QToolButton = self.sender()
@@ -191,7 +193,7 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
         rasterNames = list(self.getRasterSources().keys())
 
         dlg = SnippetInsertDialog(snippet, rasterNames, self.parent())
-        if dlg.exec_():
+        if dlg.exec():
             code = dlg.values()
             self.mCode.setText(code)
 
@@ -258,7 +260,7 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
 
             menu.addAction(action)
 
-        menu.exec_(self.mSourcesTree.viewport().mapToGlobal(pos))
+        menu.exec(self.mSourcesTree.viewport().mapToGlobal(pos))
 
     def onContextMapSourceClicked(self):
         item = self.mSourcesTree.selectedItems()[0]
@@ -451,11 +453,8 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
         for identifier, registryName in self.getSources().items():
             if identifier not in code:
                 continue
-            # from enmapbox.gui.enmapboxgui import EnMAPBox
-            # mp2 = EnMAPBox.instance().project()
-            # assert mp2 == self.mProject, 'project mismatch'
+
             for prj in [self.mProject, QgsProject.instance()]:
-                assert isinstance(prj, QgsProject)
                 layer = prj.mapLayer(registryName)
                 if isinstance(layer, QgsRasterLayer):
                     text += f'# {identifier} := QgsRasterLayer("{layer.source()}")\n'

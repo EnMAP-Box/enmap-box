@@ -40,7 +40,6 @@ HEADER = ['Tag', 'OS', 'Python', 'QGIS', 'Date']
 class QGISSetup(object):
 
     def __init__(self, info: dict):
-        assert isinstance(info, dict)
         info = info.copy()
         self.header = dict()
         for v in HEADER:
@@ -50,8 +49,7 @@ class QGISSetup(object):
                 self.header[v] = None
         self.packages = info
 
-    def equalHeader(self, other) -> bool:
-        assert isinstance(other, QGISSetup)
+    def equalHeader(self, other: 'QGISSetup') -> bool:
         for k in HEADER:
             if k == 'Date':
                 continue

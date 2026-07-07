@@ -80,8 +80,11 @@ class GeetseEarthEngineRasterDataProvider(QgsRasterDataProvider):
     def setInformation(self, collectionJson, imageInfo):
         from geetimeseriesexplorerapp.collectioninfo import CollectionInfo
         from geetimeseriesexplorerapp.imageinfo import ImageInfo
-        assert isinstance(collectionJson, CollectionInfo)
-        assert isinstance(imageInfo, ImageInfo)
+        if not isinstance(collectionJson, CollectionInfo):
+            raise TypeError(f"Expected CollectionInfo, got {type(collectionJson).__name__}")
+
+        if not isinstance(imageInfo, ImageInfo):
+            raise TypeError(f"Expected ImageInfo, got {type(imageInfo).__name__}")
         self.collectionJson = collectionJson
         self.imageInfo = imageInfo
 

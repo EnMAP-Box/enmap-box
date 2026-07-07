@@ -22,7 +22,7 @@ class PrepareRegressionDatasetFromTableAlgorithm(EnMAPProcessingAlgorithm):
 
     def shortDescription(self) -> str:
         return 'Create a regression dataset from attribute table rows ' \
-               'and store the result as a pickle file.'
+               'and store the result as a skops file.'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
@@ -31,7 +31,7 @@ class PrepareRegressionDatasetFromTableAlgorithm(EnMAPProcessingAlgorithm):
                                    'Values may be given as strings, but must be castable to float.'),
             (self._TARGET_FIELDS, 'Fields used as targets. '
                                   'Values may be given as strings, but must be castable to float.'),
-            (self._OUTPUT_DATASET, self.PickleFileDestination)
+            (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
     def group(self):
@@ -45,7 +45,7 @@ class PrepareRegressionDatasetFromTableAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterField(
             self.P_TARGET_FIELDS, self._TARGET_FIELDS, None, self.P_TABLE, QgsProcessingParameterField.Any, True
         )
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
@@ -88,7 +88,7 @@ class PrepareRegressionDatasetFromTableAlgorithm(EnMAPProcessingAlgorithm):
 
             dump = RegressorDump(targets, featureFields, X, y)
             dumpDict = dump.__dict__
-            Utils.pickleDump(dumpDict, filename)
+            Utils.modelDump(dumpDict, filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)

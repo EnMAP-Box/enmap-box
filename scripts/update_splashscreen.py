@@ -8,10 +8,11 @@ import configparser
 import os
 import re
 import shutil
-import subprocess
-import xml.etree.ElementTree as ET
+import subprocess  # nosec B404 # we need inkscape to properly create the splashscreen
 from pathlib import Path
 from typing import Match, Union
+
+import defusedxml.ElementTree as ET
 
 from enmapbox import DIR_REPO
 from enmapbox.gui.splashscreen.splashscreen import PATH_SPLASHSCREEN
@@ -30,17 +31,21 @@ def inkscapeBin() -> Path:
         path = os.environ[ENV_INKSCAPE_BIN]
     else:
         path = shutil.which('inkscape')
-    if path:
+
+    if isinstance(path, str):
         path = Path(path)
 
-    assert path.is_file(), f'Could not find inkscape executable. Set {ENV_INKSCAPE_BIN}=<path to inkscape binary>'
+    if path is None or not path.is_file():
+        raise FileNotFoundError(f'Could not find inkscape executable. '
+                                f'Set {ENV_INKSCAPE_BIN}=<path to inkscape binary>')
     return path
 
 
 def update_splashscreen(version: str = None,
                         pure: bool = False,
                         path_png: Union[str, Path] = None):
-    assert PATH_SVG.is_file()
+    if not PATH_SVG.is_file():
+        raise FileNotFoundError(f'Could not find splashscreen svg file "{PATH_SVG}"')
     PATH_INKSCAPE = inkscapeBin()
 
     if path_png:
@@ -49,7 +54,8 @@ def update_splashscreen(version: str = None,
         path_png = PATH_SVG.parent / PATH_SVG.name.replace('.svg', '.png')
 
     if version is None:
-        assert PATH_CONFIG_FILE.is_file()
+        if not PATH_CONFIG_FILE.is_file():
+            raise FileNotFoundError(f'Could not find config file "{PATH_CONFIG_FILE}"')
         config = configparser.ConfigParser()
         config.read(PATH_CONFIG_FILE)
         version = config['metadata']['version']
@@ -57,7 +63,8 @@ def update_splashscreen(version: str = None,
     rxVersion = re.compile(r'(?P<major>\d+)\.(?P<minor>\d+)(?P<rest>.*)')
 
     match = rxVersion.match(version)
-    assert isinstance(match, Match)
+    if not isinstance(match, Match):
+        raise ValueError(f'Could not parse version string "{version}"')
 
     txt_major = match.group('major')
     txt_minor = '.' + match.group('minor')
@@ -76,8 +83,10 @@ def update_splashscreen(version: str = None,
     # set version number
     node_major = root.find(".//*[@inkscape:label='maj_version']/*", namespaces)
     node_minor = root.find(".//*[@inkscape:label='min_version']/*", namespaces)
-    assert isinstance(node_major, ET.Element), 'SVG misses tspan element below inkscape:label = "maj_version"'
-    assert isinstance(node_minor, ET.Element), 'SVG misses tspan element below inkscape:label = "min_version"'
+    if not isinstance(node_major, ET.Element):
+        raise AssertionError('SVG misses tspan element below inkscape:label = "maj_version"')
+    if not isinstance(node_minor, ET.Element):
+        raise AssertionError('SVG misses tspan element below inkscape:label = "min_version"')
 
     node_major.text = txt_major
     node_minor.text = txt_minor
@@ -104,7 +113,8 @@ def update_splashscreen(version: str = None,
 
     print('Run:\n' + ' '.join(cmd))
     print('to export the svg as png with Inkscape (https://inkscape.org)')
-    subprocess.run(cmd, check=True)
+    # we use nosec B603 here because we need inkscape exe from command line
+    subprocess.run(cmd, check=True)  # nosec B603 # we need inkscape from command line
     os.remove(PATH_EXPORT_TMP)
 
 

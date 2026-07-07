@@ -104,7 +104,7 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
             vis_i = vis[i]
             for k in s.keys():
                 if vis_i[k] != s[k]:
-                    s = ""
+                    pass
                 self.assertEqual(vis_i[k], s[k])
 
         self.showGui(emb.ui)
@@ -155,19 +155,19 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         if True:
             w = QWidget()
             w.setWindowTitle('QProject layers')
-            l = QGridLayout()
-            w.setLayout(l)
+            layout = QGridLayout()
+            w.setLayout(layout)
             cbQGIS = QgsMapLayerComboBox()
-            l.addWidget(QLabel('QGIS Layers'), 0, 0)
-            l.addWidget(cbQGIS, 0, 1)
+            layout.addWidget(QLabel('QGIS Layers'), 0, 0)
+            layout.addWidget(cbQGIS, 0, 1)
 
             if Qgis.versionInt() > 32400:
                 cbEMB = QgsMapLayerComboBox()
                 cbEMB.setWindowTitle('EnMAP-Box Layers')
                 cbEMB.setProject(EMB.project())
 
-                l.addWidget(QLabel('EnMAP-Box Layers'), 1, 0)
-                l.addWidget(cbEMB, 1, 1)
+                layout.addWidget(QLabel('EnMAP-Box Layers'), 1, 0)
+                layout.addWidget(cbEMB, 1, 1)
             windows.append(w)
         self.showGui(windows)
         EMB.close()
@@ -268,8 +268,8 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         lyrNew.setName('MyNewLayer')
         mapDock.addLayers([lyrNew])
 
-        cb1 = QgsMapLayerComboBox()
-        n = cb1.model().rowCount()
+        # cb1 = QgsMapLayerComboBox()
+        # n = cb1.model().rowCount()
         self.assertFalse(lyrNew in list(QgsProject.instance().mapLayers().values()))
         self.assertTrue(lyrNew in list(box.project().mapLayers().values()))
         mapDock.removeLayer(lyrNew)
@@ -313,7 +313,7 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
 
         lastValue = enmapbox.RAISE_ALL_EXCEPTIONS
 
-        reg0 = EnMAPBoxContextMenuRegistry.instance()
+        # reg0 = EnMAPBoxContextMenuRegistry.instance()
         reg = EnMAPBoxContextMenuRegistry()
         reg.addProvider(ErrorProvider())
 

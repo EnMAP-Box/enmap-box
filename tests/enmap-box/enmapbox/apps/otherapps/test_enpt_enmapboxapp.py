@@ -20,15 +20,17 @@ from enmapbox.testing import start_app, EnMAPBoxTestCase
 start_app()
 initAll()
 
+MISSING_MODULE = None
 try:
     from enpt_enmapboxapp.enpt_enmapboxapp import EnPTEnMAPBoxApp
 except ModuleNotFoundError as ex:
     if ex.name == 'enpt_enmapboxapp':
-        raise unittest.SkipTest('Missing enpt_enmapboxapp module. Skip tests')
+        MISSING_MODULE = str(ex)
     else:
         raise ex
 
 
+@unittest.skipIf(MISSING_MODULE, f'Missing module: {MISSING_MODULE}')
 class EnPTTestCases(EnMAPBoxTestCase):
 
     def test_application(self):

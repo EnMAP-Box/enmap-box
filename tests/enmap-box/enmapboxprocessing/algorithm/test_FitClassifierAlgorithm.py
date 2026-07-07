@@ -1,5 +1,6 @@
 from sklearn.base import ClassifierMixin
 
+from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 from enmapboxprocessing.algorithm.fitgaussianprocessclassifieralgorithm import FitGaussianProcessClassifierAlgorithm
 from enmapboxprocessing.algorithm.fitgenericclassifieralgorithm import FitGenericClassifierAlgorithm
@@ -8,7 +9,9 @@ from enmapboxprocessing.algorithm.fitrandomforestclassifieralgorithm import FitR
 from enmapboxprocessing.algorithm.fitsvcpolyalgorithm import FitSvcPolyAlgorithm
 from enmapboxprocessing.algorithm.fitsvcrbfalgorithm import FitSvcRbfAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxtestdata import classifierDumpPkl, classificationDatasetAsJsonFile
+from enmapboxtestdata import classifierDumpSkops, classificationDatasetAsJsonFile
+
+start_app()
 
 
 class FitTestClassifierAlgorithm(FitClassifierAlgorithmBase):
@@ -33,9 +36,9 @@ class TestFitClassifierAlgorithm(TestCase):
     def test_fitted(self):
         alg = FitTestClassifierAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifierDumpSkops,
             alg.P_CLASSIFIER: alg.defaultCodeAsString(),
-            alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl')
+            alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.skops')
         }
         self.runalg(alg, parameters)
 
@@ -43,7 +46,7 @@ class TestFitClassifierAlgorithm(TestCase):
         alg = FitTestClassifierAlgorithm()
         parameters = {
             alg.P_DATASET: None,
-            alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl')
+            alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.skops')
         }
         self.runalg(alg, parameters)
 
@@ -52,8 +55,8 @@ class TestFitClassifierAlgorithm(TestCase):
         parameters = {
             alg.P_CLASSIFIER: 'from sklearn.linear_model import LogisticRegression\n'
                               'classifier = LogisticRegression(max_iter=1000)',
-            alg.P_DATASET: classifierDumpPkl,
-            alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl')
+            alg.P_DATASET: classifierDumpSkops,
+            alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.skops')
         }
         self.runalg(alg, parameters)
 
@@ -62,7 +65,7 @@ class TestFitClassifierAlgorithm(TestCase):
         parameters = {
             alg.P_DATASET: classificationDatasetAsJsonFile,
             alg.P_CLASSIFIER: alg.defaultCodeAsString(),
-            alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl')
+            alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.skops')
         }
         self.runalg(alg, parameters)
 
@@ -76,8 +79,8 @@ class TestFitClassifierAlgorithm(TestCase):
             alg.initAlgorithm()
             alg.shortHelpString()
             parameters = {
-                alg.P_DATASET: classifierDumpPkl,
+                alg.P_DATASET: classifierDumpSkops,
                 alg.P_CLASSIFIER: alg.defaultCodeAsString(),
-                alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.pkl')
+                alg.P_OUTPUT_CLASSIFIER: self.filename('classifier.skops')
             }
             self.runalg(alg, parameters)

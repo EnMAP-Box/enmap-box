@@ -1,5 +1,5 @@
-from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
 from enmapbox.typeguard import typechecked
+from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
 
 
 @typechecked
@@ -12,10 +12,12 @@ class FitGaussianProcessRegressorAlgorithm(FitRegressorAlgorithmBase):
         return 'Gaussian process regression (GPR).'
 
     def helpParameterCode(self) -> str:
-        return 'Scikit-learn python code. ' \
-               'See <a href="' \
-               'https://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.GaussianProcessRegressor.html' \
-               '">GaussianProcessRegressor</a> for information on different parameters.'
+        return (
+            'Scikit-learn python code. '
+            'See <a href="'
+            'https://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.GaussianProcessRegressor.html'
+            '">GaussianProcessRegressor</a> for information on different parameters.'
+        )
 
     def code(cls):
         from sklearn.pipeline import make_pipeline

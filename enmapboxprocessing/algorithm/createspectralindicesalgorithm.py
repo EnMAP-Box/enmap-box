@@ -90,7 +90,8 @@ class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         link = self.htmlLink(
-            'https://raw.githubusercontent.com/EnMAP-Box/enmap-box/refs/heads/main/enmapboxprocessing/algorithm/createspectralindicesalgorithm.other.json',
+            'https://raw.githubusercontent.com/EnMAP-Box/enmap-box/refs/heads/main/enmapboxprocessing/algorithm'
+            '/createspectralindicesalgorithm.other.json',
             'createspectralindicesalgorithm.other.json'
         )
         helpParameters = [

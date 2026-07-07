@@ -24,7 +24,7 @@ class PrepareUnsupervisedDatasetFromLibraryAlgorithm(EnMAPProcessingAlgorithm):
 
     def shortDescription(self) -> str:
         return 'Create an unsupervised dataset from spectral profiles ' \
-               'and store the result as a pickle file.'
+               'and store the result as a skops file.'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
@@ -35,7 +35,7 @@ class PrepareUnsupervisedDatasetFromLibraryAlgorithm(EnMAPProcessingAlgorithm):
             (self._FIELD, 'Field with spectral profiles used as feature data X. '
                           'If not selected, the default field named "profiles" is used. '
                           'If that is also not available, an error is raised.'),
-            (self._OUTPUT_DATASET, self.PickleFileDestination)
+            (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
     def group(self):
@@ -47,7 +47,7 @@ class PrepareUnsupervisedDatasetFromLibraryAlgorithm(EnMAPProcessingAlgorithm):
             self.P_FIELD, self._FIELD, None, self.P_LIBRARY, QgsProcessingParameterField.Any, False, True,
             False, True
         )
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
@@ -89,7 +89,7 @@ class PrepareUnsupervisedDatasetFromLibraryAlgorithm(EnMAPProcessingAlgorithm):
             features = [f'Band {i + 1}' for i in range(X.shape[1])]
             dump = TransformerDump(features=features, X=X)
             dumpDict = dump.__dict__
-            Utils.pickleDump(dumpDict, filename)
+            Utils.modelDump(dumpDict, filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)

@@ -23,10 +23,10 @@ class TestPrepareClassificationDatasetFromCategorizedVectorAlgorithm(TestCase):
             alg.P_FEATURE_RASTER: enmap,
             alg.P_CATEGORIZED_VECTOR: landcover_polygon,
             alg.P_MAJORITY_VOTING: False,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = ClassifierDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((2028, 177), dump.X.shape)
         self.assertEqual((2028, 1), dump.y.shape)
         self.assertEqual(177, len(dump.features))
@@ -39,7 +39,7 @@ class TestPrepareClassificationDatasetFromCategorizedVectorAlgorithm(TestCase):
         # check locations
         alg = LibraryFromClassificationDatasetAlgorithm()
         parameters = {
-            alg.P_DATASET: self.filename('sample.pkl'),
+            alg.P_DATASET: self.filename('sample.skops'),
             alg.P_OUTPUT_LIBRARY: self.filename('library.gpkg')
         }
         self.runalg(alg, parameters)
@@ -53,10 +53,10 @@ class TestPrepareClassificationDatasetFromCategorizedVectorAlgorithm(TestCase):
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
             alg.P_CATEGORIZED_VECTOR: landcover_point,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = ClassifierDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((58, 177), dump.X.shape)
         self.assertEqual((58, 1), dump.y.shape)
         self.assertEqual(177, len(dump.features))
@@ -70,7 +70,7 @@ class TestPrepareClassificationDatasetFromCategorizedVectorAlgorithm(TestCase):
         # check locations
         alg = LibraryFromClassificationDatasetAlgorithm()
         parameters = {
-            alg.P_DATASET: self.filename('sample.pkl'),
+            alg.P_DATASET: self.filename('sample.skops'),
             alg.P_OUTPUT_LIBRARY: self.filename('library.gpkg')
         }
         self.runalg(alg, parameters)
@@ -86,10 +86,10 @@ class TestPrepareClassificationDatasetFromCategorizedVectorAlgorithm(TestCase):
             alg.P_CATEGORIZED_VECTOR: landcover_polygon,
             alg.P_CATEGORY_FIELD: 'level_3',
             alg.P_MAJORITY_VOTING: False,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = ClassifierDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((2028, 177), dump.X.shape)
         self.assertEqual((2028, 1), dump.y.shape)
         self.assertEqual(177, len(dump.features))
@@ -107,10 +107,10 @@ class TestPrepareClassificationDatasetFromCategorizedVectorAlgorithm(TestCase):
             alg.P_CATEGORIZED_VECTOR: landcover_polygon,
             alg.P_COVERAGE: 100,  # pure pixel only
             alg.P_MAJORITY_VOTING: True,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = ClassifierDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((1481, 177), dump.X.shape)
         self.assertEqual((1481, 1), dump.y.shape)
 
@@ -118,8 +118,8 @@ class TestPrepareClassificationDatasetFromCategorizedVectorAlgorithm(TestCase):
         alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
 
         testdir = self.createTestOutputDirectory(max_length=100)
-        # filename0 = self.filename('sample.pkl')
-        filename = testdir / 'sample.pkl'
+        # filename0 = self.filename('sample.skops')
+        filename = testdir / 'sample.skops'
 
         parameters = {
             alg.P_FEATURE_RASTER: enmap,
@@ -127,7 +127,7 @@ class TestPrepareClassificationDatasetFromCategorizedVectorAlgorithm(TestCase):
             alg.P_OUTPUT_DATASET: str(filename)
         }
         self.runalg(alg, parameters)
-        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = ClassifierDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((1, 177), dump.X.shape)
         self.assertEqual((1, 1), dump.y.shape)
 
@@ -156,10 +156,10 @@ class TestPrepareClassificationDatasetFromCategorizedVectorAlgorithm(TestCase):
             alg.P_FEATURE_RASTER: enmap_potsdam,
             alg.P_CATEGORIZED_VECTOR: landcover_potsdam_polygon,
             alg.P_EXCLUDE_BAD_BANDS: True,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = ClassifierDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual(218, dump.X.shape[1])
         self.assertEqual(218, len(dump.features))
 
@@ -169,9 +169,9 @@ class TestPrepareClassificationDatasetFromCategorizedVectorAlgorithm(TestCase):
             alg.P_FEATURE_RASTER: enmap_potsdam,
             alg.P_CATEGORIZED_VECTOR: landcover_potsdam_polygon,
             alg.P_EXCLUDE_BAD_BANDS: False,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = ClassifierDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual(224, dump.X.shape[1])
         self.assertEqual(224, len(dump.features))

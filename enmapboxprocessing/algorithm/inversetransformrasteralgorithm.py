@@ -37,12 +37,12 @@ class InverseTransformRasterAlgorithm(EnMAPProcessingAlgorithm):
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
-        self.addParameterPickleFile(self.P_TRANSFORMER, self._TRANSFORMER)
+        self.addParameterSkopsFile(self.P_TRANSFORMER, self._TRANSFORMER)
         self.addParameterRasterDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
         try:
-            TransformerDump.fromDict(Utils.pickleLoad(self.parameterAsFile(parameters, self.P_TRANSFORMER, context)))
+            TransformerDump.fromDict(Utils.modelLoad(self.parameterAsFile(parameters, self.P_TRANSFORMER, context)))
         except TypeError:
             return False, 'Invalid transformer file.'
         return True, ''

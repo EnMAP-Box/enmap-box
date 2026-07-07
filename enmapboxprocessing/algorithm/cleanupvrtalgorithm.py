@@ -1,4 +1,4 @@
-import xml.etree.ElementTree as ET
+from defusedxml import ElementTree as ET
 from os.path import relpath, dirname
 from typing import Dict, Any, List, Tuple
 

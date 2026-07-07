@@ -19,6 +19,7 @@
 import argparse
 import pathlib
 import site
+from contextlib import suppress
 
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import QgsProject, QgsApplication
@@ -31,7 +32,7 @@ def exitAll(*args):
     QApplication.closeAllWindows()
     QApplication.processEvents()
     print('## Quit QgsApplication')
-    r = QgsApplication.quit()
+    QgsApplication.quit()
     print('## QgsApplication down')
     # sys.exit(0)
 
@@ -62,18 +63,16 @@ def run(
         for source in enmapBox.addSources(sourceList=sources):
             from enmapbox.gui.datasources.datasources import SpatialDataSource
             if isinstance(source, SpatialDataSource):
-                try:
+                with suppress(Exception):
                     # add as map
                     lyr = source.asMapLAyer()
                     dock = enmapBox.createDock('MAP')
                     dock.addLayers([lyr])
-                except Exception as ex:
-                    pass
 
     if not qAppExists:
         print('Execute QgsApplication')
         # enmapBox.sigClosed.connect(exitAll)
-        exit_code = QgsApplication.instance().exec_()
+        exit_code = QgsApplication.instance().exec()
         QgsProject.instance().removeAllMapLayers()
         return exit_code
     else:
@@ -97,4 +96,3 @@ if __name__ == '__main__':
 
     run(debug=args.debug, load_core_apps=load_core_apps, load_other_apps=load_other_apps,
         load_example_data=args.exampledata)
-    s = ""

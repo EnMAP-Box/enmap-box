@@ -5,7 +5,7 @@ from enmapboxprocessing.algorithm.fitrandomforestregressoralgorithm import FitRa
 from enmapboxprocessing.algorithm.regressionbasedunmixingalgorithm import RegressionBasedUnmixingAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxtestdata import classificationDatasetAsPklFile
+from enmapboxtestdata import classificationDatasetAsSkopsFile
 from enmapboxtestdata import enmap
 
 start_app()
@@ -16,7 +16,7 @@ class TestRegressionBasedUnmixingAlgorithm(TestCase):
     def test(self):
         alg = RegressionBasedUnmixingAlgorithm()
         parameters = {
-            alg.P_DATASET: classificationDatasetAsPklFile,
+            alg.P_DATASET: classificationDatasetAsSkopsFile,
             alg.P_RASTER: enmap,
             alg.P_REGRESSOR: FitRandomForestRegressorAlgorithm().defaultCodeAsString(),
             alg.P_N: 10,
@@ -32,7 +32,7 @@ class TestRegressionBasedUnmixingAlgorithm(TestCase):
     def test_sumToOne(self):
         alg = RegressionBasedUnmixingAlgorithm()
         parameters = {
-            alg.P_DATASET: classificationDatasetAsPklFile,
+            alg.P_DATASET: classificationDatasetAsSkopsFile,
             alg.P_RASTER: enmap,
             alg.P_REGRESSOR: FitRandomForestRegressorAlgorithm().defaultCodeAsString(),
             alg.P_N: 100,
@@ -51,7 +51,7 @@ class TestRegressionBasedUnmixingAlgorithm(TestCase):
     def test_issue1441(self):
         alg = RegressionBasedUnmixingAlgorithm()
         parameters = {
-            alg.P_DATASET: classificationDatasetAsPklFile,
+            alg.P_DATASET: classificationDatasetAsSkopsFile,
             alg.P_RASTER: enmap,
             alg.P_REGRESSOR: FitRandomForestRegressorAlgorithm().defaultCodeAsString(),
             alg.P_N: 10,

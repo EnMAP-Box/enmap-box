@@ -87,7 +87,7 @@ class MetadataEditorTests(EnMAPBoxTestCase):
 
         t0 = datetime.datetime.now()
         # d.setLayer(lyr)
-        dt = datetime.datetime.now() - t0
+        datetime.datetime.now() - t0
 
         self.showGui(d)
 

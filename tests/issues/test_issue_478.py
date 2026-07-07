@@ -44,7 +44,7 @@ class TestIssue478(EnMAPBoxTestCase):
             del ds
 
             props = QgsRasterLayerSpectralProperties.fromRasterLayer(path)
-            assert props.wavelengthUnits()[0] == 'nm'
+            self.assertTrue(props.wavelengthUnits()[0] == 'nm')
 
             lyr1 = QgsRasterLayer(path.as_posix())
             dtv = DataSourceManagerTreeView()

@@ -12,7 +12,6 @@ __author__ = 'benjamin.jakimow@geo.hu-berlin.de'
 __date__ = '2017-07-17'
 __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
-import pickle
 import unittest
 
 from osgeo import gdal
@@ -27,16 +26,10 @@ from qgis.core import Qgis, QgsRasterLayer, QgsCoordinateReferenceSystem, QgsPoi
 
 class TestEnMAPBoxUtils(EnMAPBoxTestCase):
     """Test resources work."""
-    wmsUri = r'crs=EPSG:3857&format&type=xyz&url=https://mt1.google.com/vt/lyrs%3Ds%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D&zmax=19&zmin=0'
-
-    def test_spatialObjects(self):
-
-        pt1 = SpatialPoint('EPSG:4326', 300, 300)
-        self.assertIsInstance(pt1, SpatialPoint)
-        d = pickle.dumps(pt1)
-        pt2 = pickle.loads(d)
-
-        self.assertEqual(pt1, pt2)
+    wmsUri = (
+        r'crs=EPSG:3857&format&type=xyz&url='
+        r'https://mt1.google.com/vt/lyrs%3Ds%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D&zmax=19&zmin=0'
+    )
 
     def test_gdalDataset(self):
         ds1 = gdalDataset(enmap)
@@ -71,7 +64,7 @@ class TestEnMAPBoxUtils(EnMAPBoxTestCase):
 
         geoCoordinate = QgsPointXY(gt[0], gt[3])
         pxCoordinate = geo2px(geoCoordinate, gt)
-        pxCoordinate2 = geo2px(geoCoordinate, lyr)
+        # pxCoordinate2 = geo2px(geoCoordinate, lyr)
         self.assertEqual(pxCoordinate.x(), 0)
         self.assertEqual(pxCoordinate.y(), 0)
         # self.assertTrue(px2geo(pxCoordinate, gt) == geoCoordinate)

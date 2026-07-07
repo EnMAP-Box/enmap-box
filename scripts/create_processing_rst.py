@@ -3,13 +3,11 @@ import datetime
 import json
 import os
 import re
-import subprocess
 import sys
 import warnings
-from concurrent.futures.thread import ThreadPoolExecutor
 from os import makedirs
 from pathlib import Path
-from typing import Dict, List, Union, Tuple
+from typing import Dict, List, Union, Optional
 
 import enmapbox
 from enmapbox import DIR_REPO_TMP
@@ -18,8 +16,10 @@ from enmapbox.qgispluginsupport.qps.utils import file_search
 from enmapbox.testing import start_app
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.glossary import injectGlossaryLinks
+from qgis.core import Qgis, NULL
 from qgis.core import QgsApplication, QgsProcessingAlgorithm, QgsProcessingDestinationParameter, \
     QgsProcessingParameterDefinition
+from qgis.core import (QgsProcessingModelAlgorithm, QgsProcessing, QgsProcessingContext, QgsProcessingParameterEnum)
 
 rootCodeRepo = Path(__file__).parent.parent
 path_qgis_process_help = Path(DIR_REPO_TMP) / f'qgis_process_help_{datetime.datetime.now().date()}.json'
@@ -117,7 +117,7 @@ def create_or_update_rst(file, text: str) -> Path:
     text += '\n'  # final newline
 
     if '\t' in text:
-        s = ""
+        pass
 
     with open(file, 'w', encoding='utf-8', newline='') as f:
         f.write(text)
@@ -125,9 +125,10 @@ def create_or_update_rst(file, text: str) -> Path:
     return Path(file)
 
 
-def generateAlgorithmRSTs(rootRst: Union[Path, str],
-                          algorithms: List[QgsProcessingAlgorithm],
-                          load_process_help: bool = True) -> List[Path]:
+def generateAlgorithmRSTs(
+        rootRst: Union[Path, str],
+        algorithms: List[QgsProcessingAlgorithm]
+) -> List[Path]:
     """
     Create an rst file for each provided QgsProcessingAlgorithm.
     """
@@ -136,20 +137,10 @@ def generateAlgorithmRSTs(rootRst: Union[Path, str],
         algorithms = [algorithms]
 
     n = len(algorithms)
-    if load_process_help:
-
-        if path_qgis_process_help.is_file():
-            with open(path_qgis_process_help, 'r') as f:
-                qgis_process_help = json.load(f)
-        else:
-            print(f'Collect qgis_process help strings for {n} algorithms (takes a while)... ', end='')
-            t0 = datetime.datetime.now()
-            qgis_process_help = collectQgsProcessAlgorithmHelp(algorithms, run_async=True)
-            print(f'Done: {datetime.datetime.now() - t0}')
-            with open(path_qgis_process_help, 'w') as f:
-                json.dump(qgis_process_help, f)
-    else:
-        qgis_process_help = dict()
+    print(f'Collect qgis_process help strings for {n} algorithms (takes a while)... ', end='')
+    t0 = datetime.datetime.now()
+    qgis_process_help = collectQgsProcessAlgorithmHelp(algorithms)
+    print(f'Done: {datetime.datetime.now() - t0}')
 
     files = []
     print(f'Create rst files for {n} algorithms...')
@@ -247,15 +238,20 @@ def doc_repo_root() -> Path:
     return rootDocRepo
 
 
-def generateRST(rootRst: Union[Path, str],
-                algorithmIds: List[str] = None,
-                load_process_help: bool = True) -> List[Path]:
+def generateRST(
+        rootRst: Union[Path, str],
+        algorithmIds: Optional[List[str]] = None
+) -> List[Path]:
     rootRst = Path(rootRst)
-    assert rootRst.is_dir()
+    if not rootRst.is_dir():
+        raise NotADirectoryError(f'Not a directory: {rootRst}')
+
     print(rootCodeRepo)
     print(rootRst)
 
-    assert isinstance(EnMAPBoxProcessingProvider.instance(), EnMAPBoxProcessingProvider)
+    if not isinstance(EnMAPBoxProcessingProvider.instance(), EnMAPBoxProcessingProvider):
+        raise RuntimeError('EnMAPBoxProcessingProvider not registered!')
+
     makedirs(rootRst, exist_ok=True)
 
     # filter algorithms
@@ -274,7 +270,7 @@ def generateRST(rootRst: Union[Path, str],
     # create group folders, <group>/index.rst and processing_algorithms.rst
     print(f'Create *.rst files for {len(algs)} algorithms')
     files = generateGroupRSTs(rootRst, algs)
-    files += generateAlgorithmRSTs(rootRst, algs, load_process_help=load_process_help)
+    files += generateAlgorithmRSTs(rootRst, algs)
     return files
 
 
@@ -318,41 +314,21 @@ def escape_rst(text: str) -> str:
     return ''.join(parts)
 
 
-def collectQgsProcessAlgorithmHelp(algorithms: List[QgsProcessingAlgorithm], run_async: bool = False) -> Dict[str, str]:
+def collectQgsProcessAlgorithmHelp(
+        algorithms: List[QgsProcessingAlgorithm]
+) -> Dict[str, str]:
+    """
+    Collects help text for QgsProcessingAlgorithm instances
+    """
     results = dict()
-    n = len(algorithms)
 
-    result = subprocess.run(['qgis_process', 'plugins', 'enable', 'enmapboxplugin'],
-                            env=QGIS_PROCESS_ENV,
-                            stdout=subprocess.PIPE, stderr=subprocess.PIPE
-                            )
-    s = ""
-
-    def process_algorithm_help(alg) -> Tuple[bool, str, str]:
-        aid = alg.id()
+    for alg in algorithms:
+        aid: str = alg.id()
         try:
-            help = qgisProcessHelp(alg)
+            results[aid] = qgisProcessHelp(alg)
         except Exception as ex:
-            return False, aid, str(ex)
-        return True, aid, help
+            print(f'Error collecting help for algorithm {aid}: {ex}', file=sys.stderr)
 
-    if not run_async:
-        for alg in algorithms:
-            success, aid, help_text = process_algorithm_help(alg)
-            if success:
-                results[alg.id()] = qgisProcessHelp(alg)
-            else:
-                print(f'Error processing algorithm {aid}: {help_text}', file=sys.stderr)
-    else:
-
-        with ThreadPoolExecutor(max_workers=min(10, os.cpu_count())) as executor:
-            futures = executor.map(process_algorithm_help, algorithms)
-
-        for success, alg_id, help_text in futures:
-            if success:
-                results[alg_id] = help_text
-            else:
-                print(f'Error processing algorithm {alg_id}: {help_text}', file=sys.stderr)
     return results
 
 
@@ -365,7 +341,11 @@ def rst_label(algorithm: QgsProcessingAlgorithm) -> str:
     return f"alg-{algorithm.id().replace(':', '-')}"
 
 
-def v3(alg: QgsProcessingAlgorithm, section_adds: dict = None, qgis_process_help: dict = None):
+def v3(
+        alg: QgsProcessingAlgorithm,
+        section_adds: Optional[dict] = None,
+        qgis_process_help: Optional[Dict[str, str]] = None
+):
     """
 
     :param alg: QgsProcessingAlgorithm
@@ -402,7 +382,7 @@ def v3(alg: QgsProcessingAlgorithm, section_adds: dict = None, qgis_process_help
     param_text = '**Parameters**\n\n'
     outputsHeadingCreated = False
     for pd in alg.parameterDefinitions():
-        assert isinstance(pd, QgsProcessingParameterDefinition)
+        pd: QgsProcessingParameterDefinition
 
         pdhelp = helpParameters.get(pd.description(), pd.help())
 
@@ -442,16 +422,189 @@ def v3(alg: QgsProcessingAlgorithm, section_adds: dict = None, qgis_process_help
     return text
 
 
-def qgisProcessHelp(algorithm: QgsProcessingAlgorithm) -> str:
-    result = subprocess.run(['qgis_process', 'help', algorithm.id()],
-                            env=QGIS_PROCESS_ENV,
-                            stdout=subprocess.PIPE, stderr=subprocess.PIPE
-                            )
-    if result.returncode != 0:
-        s = ""
-    assert result.returncode == 0, result.stderr.decode()
-    helptext = result.stdout.decode('cp1252')
-    return helptext
+def qgisProcessHelp(alg: QgsProcessingAlgorithm, use_json: bool = False) -> str:
+    output_buffer = []
+    # input_id = str(alg_id)
+    #
+    # model = None
+    # alg = None
+    #
+    # # Check if input is a model file
+    # if QFile.exists(input_id) and QFileInfo(input_id).suffix() == "model3":
+    #     model = QgsProcessingModelAlgorithm()
+    #     if not model.fromFile(input_id):
+    #         return f"File {input_id} is not a valid Processing model!\n"
+    #     alg = model
+    #
+    # # Check if input is a Python script file
+    # elif QFile.exists(input_id) and QFileInfo(input_id).suffix() == "py":
+    #     try:
+    #         import qgis.utils
+    #         res = qgis.utils.import_script_algorithm(input_id)
+    #     except Exception:
+    #         return f"File {input_id} is not a valid Processing script!\n"
+    #
+    #     if not res:
+    #         return f"File {input_id} is not a valid Processing script!\n"
+    #     input_id = res
+
+    # Resolve from Registry if not a file
+    # if not alg:
+    #     alg = QgsApplication.processingRegistry().algorithmById(input_id)
+    #     if not alg:
+    #         return f"Algorithm {input_id} not found!\n"
+    #
+    # if alg.flags() & Qgis.ProcessingAlgorithmFlag.NotAvailableInStandaloneTool:
+    #     return f'The "{input_id}" algorithm is not available for use outside of the QGIS desktop application\n'
+
+    json_data = {}
+
+    if not use_json:
+        output_buffer.append(f"{alg.displayName()} ({alg.id()})\n")
+        output_buffer.append("\n----------------\nDescription\n----------------\n")
+
+        if isinstance(alg, QgsProcessingModelAlgorithm):
+            help_content = alg.helpContent()
+            output_buffer.append(f"{help_content.get('ALG_DESC', '')}\n")
+
+            if help_content.get('ALG_CREATOR') or help_content.get('ALG_VERSION'):
+                output_buffer.append('\n')
+
+            if help_content.get('ALG_CREATOR'):
+                output_buffer.append(f"Algorithm author:\t{help_content.get('ALG_CREATOR')}\n")
+            if help_content.get('ALG_VERSION'):
+                output_buffer.append(f"Algorithm version:\t{help_content.get('ALG_VERSION')}\n")
+
+            if help_content.get('EXAMPLES'):
+                output_buffer.append("\n----------------\nExamples\n----------------\n")
+                output_buffer.append(f"{help_content.get('EXAMPLES')}\n")
+        else:
+            if alg.shortDescription():
+                output_buffer.append(f"{alg.shortDescription()}\n")
+            if alg.shortHelpString() and alg.shortHelpString() != alg.shortDescription():
+                output_buffer.append(f"{alg.shortHelpString()}\n")
+
+        if int(alg.documentationFlags()) != 0:
+            output_buffer.append("\n----------------\nNotes\n----------------\n\n")
+            for flag in Qgis.ProcessingAlgorithmDocumentationFlags:
+                if alg.documentationFlags() & flag:
+                    output_buffer.append(f" - {QgsProcessing.documentationFlagToString(flag)}")
+            output_buffer.append("\n")
+
+        output_buffer.append("\n----------------\nArguments\n----------------\n\n")
+    else:
+        # Inlined Version, Algorithm, and Provider metadata mapping
+        json_data["qgis_version"] = Qgis.version()
+        algorithm_details = {
+            "id": alg.id(),
+            "name": alg.name(),
+            "displayName": alg.displayName()
+        }
+        json_data["algorithm_details"] = algorithm_details
+
+        provider_json = {}
+        if alg.provider():
+            provider_json["id"] = alg.provider().id()
+            provider_json["name"] = alg.provider().name()
+        json_data["provider_details"] = provider_json
+
+    context = QgsProcessingContext()
+    parameters_json = {}
+    defs = alg.parameterDefinitions()
+
+    for p in defs:
+        if p.flags() & Qgis.ProcessingParameterFlag.Hidden:
+            continue
+
+        parameter_json = {}
+
+        if not use_json:
+            line = f"{p.name()}: {p.description()}"
+            if p.flags() & Qgis.ProcessingParameterFlag.Optional:
+                line += " (optional)"
+            output_buffer.append(f"{line}\n")
+
+            if p.defaultValue() is not None and p.defaultValue() != NULL:
+                val_str, ok = p.valueAsString(p.defaultValue(), context)
+                output_buffer.append(f"\tDefault value:\t{val_str}\n")
+        else:
+            parameter_json["name"] = p.name()
+            parameter_json["description"] = p.description()
+
+            p_type = QgsApplication.processingRegistry().parameterType(p.type())
+            if p_type:
+                parameter_json["type"] = {
+                    "id": p_type.id(),
+                    "name": p_type.name(),
+                    "description": p_type.description(),
+                    "metadata": p_type.metadata(),
+                    "acceptable_values": p_type.acceptedStringValues()
+                }
+            else:
+                parameter_json["type"] = p.type()
+
+            parameter_json["is_destination"] = p.isDestination()
+            parameter_json["default_value"] = p.defaultValue()
+            parameter_json["optional"] = bool(p.flags() & Qgis.ProcessingParameterFlag.Optional)
+            parameter_json["is_advanced"] = bool(p.flags() & Qgis.ProcessingParameterFlag.Advanced)
+            parameter_json["raw_definition"] = p.toVariantMap()
+
+        if p.help():
+            if not use_json:
+                output_buffer.append(f"\t{p.help()}\n")
+            else:
+                parameter_json["help"] = p.help()
+
+        if not use_json:
+            output_buffer.append(f"\tArgument type:\t{p.type()}\n")
+
+        if p.type() == QgsProcessingParameterEnum.typeName():
+            options = []
+            json_options = {}
+            for i, option in enumerate(p.options()):
+                options.append(f"\t\t- {i}: {option}")
+                json_options[str(i)] = option
+
+            if not use_json:
+                output_buffer.append(f"\tAvailable values:\n{chr(10).join(options)}\n")
+            else:
+                parameter_json["available_options"] = json_options
+
+        if not use_json:
+            p_type = QgsApplication.processingRegistry().parameterType(p.type())
+            if p_type:
+                values = p_type.acceptedStringValues()
+                if values:
+                    output_buffer.append("\tAcceptable values:\n")
+                    for val in values:
+                        output_buffer.append(f"\t\t- {val}\n")
+
+        parameters_json[p.name()] = parameter_json
+
+    outputs_json = {}
+    if not use_json:
+        output_buffer.append("\n----------------\nOutputs\n----------------\n\n")
+
+    outputs = alg.outputDefinitions()
+    for o in outputs:
+        output_json = {}
+        if not use_json:
+            output_buffer.append(f"{o.name()}: <{o.type()}>\n")
+            if o.description():
+                output_buffer.append(f"\t{o.description()}\n")
+        else:
+            output_json["description"] = o.description()
+            output_json["type"] = o.type()
+            outputs_json[o.name()] = output_json
+
+    if not use_json:
+        output_buffer.append("\n\n")
+    else:
+        json_data["parameters"] = parameters_json
+        json_data["outputs"] = outputs_json
+        output_buffer.append(json.dumps(json_data, indent=2))
+
+    return "".join(output_buffer)
 
 
 def utilsConvertHtmlLinksToRstLinks(text: str) -> str:
@@ -464,23 +617,27 @@ def utilsConvertHtmlLinksToRstLinks(text: str) -> str:
 
 
 def utilsFindHtmlWeblinks(text) -> List[str]:
-    match_: re.Match
     starts = [match_.start() for match_ in re.finditer('<a href="', text)]
     ends = [match_.start() + 4 for match_ in re.finditer('</a>', text)]
-    assert len(starts) == len(ends)
+    if len(starts) != len(ends):
+        raise ValueError(
+            f'Number of HTML links does not match number of HTML link endings: {len(starts)} != {len(ends)}')
     links = [text[start:end] for start, end in zip(starts, ends)]
     return links
 
 
 def utilsHtmlWeblinkToRstWeblink(htmlText: str) -> str:
-    assert htmlText.startswith('<a href="'), htmlText
-    assert htmlText.endswith('</a>'), htmlText
+    if not htmlText.startswith('<a href="'):
+        raise ValueError(f'HTML link does not start with <a href=": {htmlText}')
+    if not htmlText.endswith('</a>'):
+        raise ValueError(f'HTML link does not end with </a>: {htmlText}')
+
     link, name = htmlText[9:-4].split('">')
     rstText = f'`{name} <{link}>`_'
     return rstText
 
 
-if __name__ == '__main__':
+def main(args_list=None):
     parser = argparse.ArgumentParser(description='Generates the documentation for EnMAPBox processing algorithms ',
                                      formatter_class=argparse.RawTextHelpFormatter)
 
@@ -497,24 +654,20 @@ if __name__ == '__main__':
                         default=None,
                         help='List of algorithms ids to generate the documentation for')
 
-    parser.add_argument('-p', '--skip_processing_help',
-                        required=False,
-                        default=False,
-                        help='Skip loading of qgis_process help (as this takes a while)',
-                        action='store_true')
-
-    args = parser.parse_args()
+    args = parser.parse_args(args_list)
 
     rootRst = Path(args.rst_root)
     if not rootRst.is_absolute():
         rootRst = rootCodeRepo / rootRst
 
-    assert rootRst.is_dir(), f'Directory does not exists: {rootRst}. Use --rst_root to specify location.'
+    if not rootRst.is_dir():
+        raise NotADirectoryError(
+            f'Directory does not exists: {rootRst}. Use --rst_root to specify location.')
 
     start_app()
     enmapbox.initAll()
     existing = [Path(p) for p in file_search(rootRst, '*.rst', recursive=True)]
-    files = generateRST(rootRst, args.algs, load_process_help=not args.skip_processing_help)
+    files = generateRST(rootRst, args.algs)
 
     if args.algs is None:
         to_remove = [f for f in existing if f not in files]
@@ -527,4 +680,8 @@ if __name__ == '__main__':
         print(f'Files to remove (manually): {len(to_remove)}')
         for f in to_remove:
             print(f)
-    s = ""
+    return 0
+
+
+if __name__ == '__main__':
+    exit(main())

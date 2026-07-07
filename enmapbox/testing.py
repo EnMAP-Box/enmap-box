@@ -24,13 +24,12 @@ import os
 import pathlib
 import shutil
 import site
-import sys
 
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu, QApplication
 from qgis.core import QgsProcessingParameterRasterDestination, QgsProcessingParameterNumber, \
     QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterRasterLayer, \
-    QgsPythonRunner, QgsProcessingAlgorithm
+    QgsProcessingAlgorithm
 from qgis.gui import QgsPluginManagerInterface
 from .qgispluginsupport.qps.testing import TestObjects, TestCase, start_app
 
@@ -107,18 +106,19 @@ class TestObjects(TestObjects):
 
     @staticmethod
     def uriWMS() -> str:
-        return r'crs=EPSG:3857&format&type=xyz&url=https://mt1.google.com/vt/lyrs%3Ds%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D&zmax=19&zmin=0'
+        return (r'crs=EPSG:3857&format&type=xyz&url='
+                r'https://mt1.google.com/vt/lyrs%3Ds%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D&zmax=19&zmin=0')
 
     @staticmethod
     def uriWFS() -> str:
         raise NotImplementedError()
-        return r'restrictToRequestBBOX=''1'' srsname=''EPSG:25833'' typename=''fis:re_postleit'' url=''https://fbinter.stadt-berlin.de/fb/wfs/geometry/senstadt/re_postleit'' version=''auto'''
 
     @staticmethod
     def enmapboxApplication():
         from enmapbox.gui.applications import EnMAPBoxApplication
         from enmapbox.gui.enmapboxgui import EnMAPBox
-        assert isinstance(EnMAPBox.instance(), EnMAPBox), 'Please initialize an EnMAP-Box instance first'
+        if not isinstance(EnMAPBox.instance(), EnMAPBox):
+            raise AssertionError('Please initialize an EnMAP-Box instance first')
 
         def testAlgorithm(self, *args):
             v = 'Hello World'
@@ -172,8 +172,12 @@ class TestObjects(TestObjects):
                                                  0.00, 999999.99))
                 self.addParameter(QgsProcessingParameterRasterDestination('pathOutput', 'The Output Dataset'))
 
-            def processAlgorithm(self, parameters: dict, context: QgsProcessingContext,
-                                 feedback: QgsProcessingFeedback):
+            def processAlgorithm(
+                self,
+                parameters: dict,
+                context: QgsProcessingContext,
+                feedback: QgsProcessingFeedback
+            ):
                 """
                 Runs the algorithm using the specified parameters.
                 :param parameters: dict
@@ -181,9 +185,6 @@ class TestObjects(TestObjects):
                 :param feedback: QgsProcessingFeedback
                 :return: dict
                 """
-                assert isinstance(parameters, dict)
-                assert isinstance(context, QgsProcessingContext)
-                assert isinstance(feedback, QgsProcessingFeedback)
 
                 results = testAlgorithm(parameters)
                 outputs = {'results': results}
@@ -202,8 +203,7 @@ class TestObjects(TestObjects):
             def icon(self) -> QIcon:
                 return EnMAPBox.icon()
 
-            def menu(self, parentMenu) -> QMenu:
-                assert isinstance(parentMenu, QMenu)
+            def menu(self, parentMenu: QMenu) -> QMenu:
                 action = parentMenu.addAction('Hello')
                 action.triggered.connect(testAlgorithm)
                 return parentMenu
@@ -220,7 +220,6 @@ class TestObjects(TestObjects):
 
             def __init__(self):
                 super(TestProcessingAlgorithm, self).__init__()
-                s = ""
 
             def createInstance(self):
                 return TestProcessingAlgorithm()
@@ -245,9 +244,12 @@ class TestObjects(TestObjects):
                 self.addParameter(QgsProcessingParameterRasterDestination('pathOutput', 'The Output Dataset'))
 
             def processAlgorithm(self, parameters, context, feedback):
-                assert isinstance(parameters, dict)
-                assert isinstance(context, QgsProcessingContext)
-                assert isinstance(feedback, QgsProcessingFeedback)
+                if not isinstance(parameters, dict):
+                    raise AssertionError('parameters must be a dict')
+                if not isinstance(context, QgsProcessingContext):
+                    raise AssertionError('context must be a QgsProcessingContext')
+                if not isinstance(feedback, QgsProcessingFeedback):
+                    raise AssertionError('feedback must be a QgsProcessingFeedback')
 
                 outputs = {}
                 return outputs
@@ -312,31 +314,28 @@ class QgsPluginManagerMockup(QgsPluginManagerInterface):
     def timerEvent(self, *args, **kwargs):
         super().timerEvent(*args, **kwargs)
 
-
-class PythonRunnerImpl(QgsPythonRunner):
-    """
-    A Qgs PythonRunner implementation
-    """
-
-    def __init__(self):
-        super(PythonRunnerImpl, self).__init__()
-
-    def evalCommand(self, cmd: str, result: str):
-        try:
-            o = compile(cmd)
-        except Exception as ex:
-            result = str(ex)
-            return False
-        return True
-
-    def runCommand(self, command, messageOnError=''):
-        try:
-            o = compile(command, 'fakemodule', 'exec')
-            exec(o)
-        except Exception as ex:
-            messageOnError = str(ex)
-            command = ['{}:{}'.format(i + 1, l) for i, l in enumerate(command.splitlines())]
-            print('\n'.join(command), file=sys.stderr)
-            raise ex
-            return False
-        return True
+#
+# class PythonRunnerImpl(QgsPythonRunner):
+#     """
+#     A Qgs PythonRunner implementation
+#     """
+#
+#     def __init__(self):
+#         super(PythonRunnerImpl, self).__init__()
+#
+#     def evalCommand(self, cmd: str, result: str):
+#         try:
+#             compile(cmd)
+#         except Exception:
+#             return False
+#         return True
+#
+#     def runCommand(self, command, messageOnError=''):
+#         try:
+#             o = compile(command, 'fakemodule', 'exec')
+#             exec(o)
+#         except Exception as ex:
+#             command = ['{}:{}'.format(i + 1, l) for i, l in enumerate(command.splitlines())]
+#             print('\n'.join(command), file=sys.stderr)
+#             raise ex
+#         return True

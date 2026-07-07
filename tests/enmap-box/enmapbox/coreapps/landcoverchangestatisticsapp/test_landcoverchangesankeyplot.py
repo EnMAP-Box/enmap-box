@@ -2,43 +2,12 @@ import numpy as np
 
 from enmapboxprocessing.testcase import TestCase
 from enmapboxprocessing.typing import Category
-from enmapboxtestdata import landcover_map_l2, landcover_map_l3
 from landcoverchangestatisticsapp.landcoverchangestatisticsmainwindow import LandCoverChangeSankeyPlotBuilder
-from qgis.core import QgsRasterLayer
 
 
 class TestEnviUtils(TestCase):
 
-    def _test(self):
-
-        if 0:
-            # Case with non-matching classes
-            layers = [QgsRasterLayer(landcover_map_l2, 'landcover_map_l2'),
-                      QgsRasterLayer(landcover_map_l3, 'landcover_map_l3')]
-        if 0:
-            # Case with many classes
-            layers = [QgsRasterLayer(r'D:\data\CORINE\U2000_CLC1990_V2020_20u1.tif', '1990'),
-                      QgsRasterLayer(r'D:\data\CORINE\U2006_CLC2000_V2020_20u1.tif', '2006'),
-                      QgsRasterLayer(r'D:\data\CORINE\U2018_CLC2018_V2020_20u1.tif', '2018')]
-        if 0:
-            # Case with many maps
-            layers = [QgsRasterLayer(rf'D:\data\timeseries\MAP_BLCM_{i}.tif', str(i)) for i in
-                      range(2014, 2017)]  # 2021)]
-
-        if 1:
-            layers = [QgsRasterLayer(landcover_map_l2, 'Level 2'), QgsRasterLayer(landcover_map_l3, 'Level 3')]
-
-        builder = LandCoverChangeSankeyPlotBuilder()
-        builder.setOptions()
-        builder.setGrid(layers[0])
-        builder.setLayers(layers)
-        builder.setClassFilter(classFilter)
-        builder.readData(layers[0].extent(), 250000)
-        fig = builder.sankeyPlot()
-        fig.show()
-
     def test_recodeConfusionMatrix(self):
-
         matrix = np.array(
             [[1, 2, 3, 4, 5],
              [6, 7, 8, 9, 10]]

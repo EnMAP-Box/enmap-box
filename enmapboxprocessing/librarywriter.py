@@ -6,7 +6,6 @@ from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import ProfileE
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import prepareProfileValueDict, \
     encodeProfileValueDict
 from enmapbox.typeguard import typechecked
-from qgis.PyQt.QtCore import QVariant
 from qgis.core import QgsVectorLayer, QgsField, QgsFeature, edit, QgsGeometry
 
 
@@ -22,7 +21,7 @@ class LibraryWriter(object):
             SpectralLibraryUtils.addAttribute(self.library, create_profile_field(name, None, encoding))
             self.library.endEditCommand()
 
-    def addAttribute(self, name: 'str', type_: QVariant.Type):
+    def addAttribute(self, name: 'str', type_):
         self.library.startEditing()
         self.library.addAttribute(QgsField(name, type_))
         self.library.commitChanges()
@@ -45,7 +44,8 @@ class LibraryWriter(object):
                     feature.setAttribute(fieldName, dump)
                 else:
                     feature.setAttribute(fieldName, value)
-            assert self.library.addFeature(feature)
+            if not self.library.addFeature(feature):
+                raise RuntimeError('failed to add feature to library')
 
     def writeToSource(self, filename: str) -> List[str]:
         return [str(p) for p in SpectralLibraryUtils.writeToSource(self.library, filename)]

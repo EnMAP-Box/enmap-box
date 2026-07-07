@@ -1,12 +1,9 @@
 from qgis.PyQt.QtCore import QCoreApplication
-from qgis._core import QgsProcessingParameterEnum
-from qgis.core import (QgsProcessingAlgorithm,
-                       QgsProcessingParameterRasterLayer,
-                       QgsProcessingParameterFile,
-                       QgsProcessingParameterNumber,
-                       QgsProcessingParameterRasterDestination,
-                       QgsProcessingParameterVectorDestination,
-                       QgsProcessingParameterFileDestination)
+from qgis.core import (
+    QgsProcessingAlgorithm, QgsProcessingParameterRasterLayer, QgsProcessingParameterFile, QgsProcessingParameterNumber,
+    QgsProcessingParameterRasterDestination, QgsProcessingParameterVectorDestination, QgsProcessingParameterEnum,
+    QgsProcessingParameterFileDestination
+)
 
 
 class DL_Mapper(QgsProcessingAlgorithm):
@@ -49,9 +46,6 @@ class DL_Mapper(QgsProcessingAlgorithm):
         """
         return QCoreApplication.translate('Processing', string)
 
-    def createInstance(self):
-        return DL_Mapper()
-
     def name(self):
         """
         Returns the algorithm name, used for identifying the algorithm. This
@@ -87,32 +81,44 @@ class DL_Mapper(QgsProcessingAlgorithm):
         return 'SpecDeepMap'
 
     def shortHelpString(self):
-        """
-        Returns a localised short helper string for the algorithm. This string
-        should provide a basic description about what the algorithm does and the
-        parameters and outputs associated with it..
-        """
-        return self.tr("Example algorithm short description")
-
-    def shortHelpString(self):
-        html = '' \
-               '<p>This algorithm loads a trained deep learning model and uses it for prediction. The algorithm can load complete satellite scences and splits it on the fly in small tiles predicts on them and combine them back together. The prediction is saves as a raster and can also be saved as a vector layer. If a ground truth mask is given the performance metric,Intersection over Union (IoU) is calculated per class and a general mean.</p>' \
-               '<h3>Input Raster</h3>' \
-               '<p>Input spectral raster, which should be predicted</p>' \
-               '<h3>Ground truth raster (Optional)</h3>' \
-               '<p>Ground truth label raster, which can be used to asses the model performances. If this is given an Intersection Union metric per class as well as a mean is calculated.</p>' \
-               '<h3>Model checkpoint</h3>' \
-               '<p>The file path from which to load the trained model, if several model were saved during training choose the one with the highest IoU on validation datatset ( value is specified in checkpoint names).</p>' \
-               '<h3>Minimum overlap of tiles in Pixel Unit</h3>' \
-               '<p>As this algorithm loads the input raster in small tiles, an can be defined with this parameter. This overlap is cropped from each predicted tile in directions to other tiles, so that there is no actual overlap in the prediction, but boundary effect are minimized. A good suggestion is 5-10% of image size. If the overlap doesnt lead to full coverage, the overlap is adjusted to next possible solution, to give full coverage of prediction </p>' \
-               '<h3>Device</h3>' \
-               '<p>CPU or GPU can be used, for GPU use Cuda needs to be installed correctly for given python environment</p>' \
-               '<h3>Prediction as Raster </h3>' \
-               '<p> Prediction can be saved as TIFF file with this parameter</p>' \
-               '<h3>Prediction as Vector Output</h3>' \
-               '<p>The prediction can be optionally also exported as Shapefile</p>' \
-               '<h3>IoU CSV</h3>' \
-               '<p>The Algorithm can calculate the Intersection over Union score (IoU) per class and mean IoU if a ground truth raster is provided, the IoU score can be saved as csv file (with this parameter the location can be defined ).</p>'
+        html = (''
+                '<p>This algorithm loads a trained deep learning model and uses it for prediction. '
+                'The algorithm can load complete satellite scenes and splits it on the fly in small tiles predicts on '
+                'them and combine them back together. The prediction is saves as a raster and can also be saved as '
+                'a vector layer. If a ground truth mask is given the performance metric,Intersection over Union (IoU) '
+                'is calculated per class and a general mean.'
+                '</p>'
+                '<h3>Input Raster</h3>'
+                '<p>Input spectral raster, which should be predicted</p>'
+                '<h3>Ground truth raster (Optional)</h3>'
+                '<p>Ground truth label raster, which can be used to asses the model performances. If this is given an '
+                'Intersection Union metric per class as well as a mean is calculated.'
+                '</p>'
+                '<h3>Model checkpoint</h3>'
+                '<p>The file path from which to load the trained model, if several model were saved during training '
+                'choose the one with the highest IoU on validation dataset ( value is specified in checkpoint names).'
+                '</p>'
+                '<h3>Minimum overlap of tiles in Pixel Unit</h3>'
+                '<p>As this algorithm loads the input raster in small tiles, an can be defined with this parameter. '
+                'This overlap is cropped from each predicted tile in directions to other tiles, so that there is no '
+                'actual overlap in the prediction, but boundary effect are minimized. A good suggestion is 5-10% of '
+                'image size. If the overlap doesnt lead to full coverage, the overlap is adjusted to next '
+                'possible solution, to give full coverage of prediction'
+                '</p>'
+                '<h3>Device</h3>'
+                '<p>CPU or GPU can be used, for GPU use Cuda needs to be installed correctly '
+                'for given python environment'
+                '</p>'
+                '<h3>Prediction as Raster </h3>'
+                '<p> Prediction can be saved as TIFF file with this parameter</p>'
+                '<h3>Prediction as Vector Output</h3>'
+                '<p>The prediction can be optionally also exported as Shapefile</p>'
+                '<h3>IoU CSV</h3>'
+                '<p>The Algorithm can calculate the Intersection over Union score (IoU) per class and mean IoU '
+                'if a ground truth raster is provided, the IoU score can be saved as csv file '
+                '(with this parameter the location can be defined ).'
+                '</p>'
+                )
         return html
 
     def initAlgorithm(self, config=None):

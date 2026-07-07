@@ -13,10 +13,10 @@ __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
 import unittest
 from pathlib import Path
+from typing import List
 
 from enmapbox import initAll
 from enmapbox.exampledata import enmap, hires, landcover_polygon
-from enmapbox.gui.dataviews.dockmanager import MapDockTreeNode
 from enmapbox.gui.dataviews.docks import MapDock
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import CanvasLink, MapCanvas, KEY_LAST_CLICKED, LINK_ON_CENTER
@@ -83,11 +83,13 @@ class MapCanvasTests(EnMAPBoxTestCase):
 
     # @unittest.skip("Skipped to check if GH CI finishes")
     def test_canvaslinks(self):
-        canvases = []
+        canvases: List[MapCanvas] = []
+        p = QgsProject()
         for i in range(3):
             c = MapCanvas()
+            c.setProject(p)
             lyr = QgsRasterLayer(enmap)
-            QgsProject.instance().addMapLayer(lyr)
+            p.addMapLayer(lyr)
             c.setLayers([lyr])
             c.setDestinationCrs(lyr.crs())
             c.setExtent(lyr.extent())
@@ -115,8 +117,8 @@ class MapCanvasTests(EnMAPBoxTestCase):
         center3.setX(center1.x() + 400)
 
         c1.extentsChanged.connect(lambda: print('Extent C1 changed'))
-        c2.extentsChanged.connect(lambda: print('Extent C1 changed'))
-        c3.extentsChanged.connect(lambda: print('Extent C1 changed'))
+        c2.extentsChanged.connect(lambda: print('Extent C2 changed'))
+        c3.extentsChanged.connect(lambda: print('Extent C3 changed'))
 
         c1.setCenter(center1)
         self.assertTrue(c1.center() == center1)
@@ -140,7 +142,7 @@ class MapCanvasTests(EnMAPBoxTestCase):
 
         # lyrWorld = QgsRasterLayer(TestObjects.uriWMS(), 'Background', 'wms')
         lyrEnMAP = TestObjects.createRasterLayer()
-        assert lyrEnMAP.isValid()
+        self.assertTrue(lyrEnMAP.isValid())
         layers = [lyrEnMAP]
 
         canvas = MapCanvas()
@@ -173,9 +175,11 @@ class MapCanvasTests(EnMAPBoxTestCase):
     # @unittest.skip("Skipped to check if GH CI finishes")
     def test_dropEvents(self):
 
+        project = QgsProject()
         mapDock = MapDock()
-        node = MapDockTreeNode(mapDock)
+        # node = MapDockTreeNode(mapDock)
         mapCanvas = mapDock.mapCanvas()
+        mapCanvas.setProject(project)
         allFiles = [enmap, hires, landcover_polygon, library_berlin]
         spatialFiles = [enmap, hires, landcover_polygon]
 
@@ -195,7 +199,8 @@ class MapCanvasTests(EnMAPBoxTestCase):
             layerSources.append(p)
 
         for p in spatialFiles:
-            p2 = Path(p)
+            if not Path(p) in layerSources:
+                pass
             self.assertTrue(Path(p) in layerSources, msg=f'Failed to drop {p}')
 
 

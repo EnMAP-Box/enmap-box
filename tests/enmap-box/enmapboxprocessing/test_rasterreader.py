@@ -3,8 +3,6 @@ from os.path import exists
 
 import numpy as np
 from osgeo import gdal
-from qgis.PyQt.QtCore import QDateTime, QSizeF, QPoint
-from qgis.core import QgsRasterRange, QgsRasterLayer, Qgis, QgsRectangle, QgsCoordinateReferenceSystem
 
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.rasterreader import RasterReader, setMetadataCache, metadataCache
@@ -13,6 +11,8 @@ from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import enmap, r_terra_timeseries_days, r_terra_timeseries_seconds, netCDF_timeseries_days, \
     SensorProducts, sensorProductsRoot
 from enmapboxtestdata import fraction_polygon_l3
+from qgis.PyQt.QtCore import QDateTime, QSizeF, QPoint
+from qgis.core import QgsRasterRange, QgsRasterLayer, Qgis, QgsRectangle, QgsCoordinateReferenceSystem
 
 
 class TestRasterReader(TestCase):
@@ -273,11 +273,11 @@ class TestRasterReader(TestCase):
         self.assertEqual('0.460000', reader.metadataItem('wavelength', '', 1))
 
     def test_metadataDomain(self):
-        reader = RasterReader(enmap)
+        RasterReader(enmap)
         # self.assertEqual(20, len(reader.metadataDomain('ENVI')))
 
     def test_metadata(self):
-        reader = RasterReader(enmap)
+        RasterReader(enmap)
 
     def test_metadataDomainKeys(self):
         reader = RasterReader(enmap)
@@ -356,9 +356,8 @@ class TestRasterReader(TestCase):
         self.assertEqual('Micrometers', reader.wavelengthUnits(1))
         self.assertEqual(42 * 1000, reader.wavelength(1))
 
+    @unittest.skipIf(sensorProductsRoot() is None, "ENMAPBOX_SENSOR_PRODUCT_ROOT is not available")
     def test_wavelengthTanager(self):
-        if sensorProductsRoot() is None:
-            return
         reader = RasterReader(SensorProducts.Tanager.basic_radiance_toa_radiance)
         self.assertEqual(376.44, reader.wavelength(1, raw=True))  # raw
 

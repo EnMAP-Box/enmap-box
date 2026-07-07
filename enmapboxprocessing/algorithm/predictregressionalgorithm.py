@@ -40,14 +40,14 @@ class PredictRegressionAlgorithm(EnMAPProcessingAlgorithm):
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
-        self.addParameterPickleFile(self.P_REGRESSOR, self._REGRESSOR)
+        self.addParameterSkopsFile(self.P_REGRESSOR, self._REGRESSOR)
         self.addParameterBoolean(self.P_MATCH_BY_NAME, self._MATCH_BY_NAME, False, True)
         self.addParameterRasterDestination(self.P_OUTPUT_REGRESSION, self._OUTPUT_REGRESSION)
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
         try:
-            dump = RegressorDump.fromDict(
-                Utils.pickleLoad(self.parameterAsFile(parameters, self.P_REGRESSOR, context))
+            RegressorDump.fromDict(
+                Utils.modelLoad(self.parameterAsFile(parameters, self.P_REGRESSOR, context))
             )
         except TypeError:
             return False, 'Invalid regressor file.'

@@ -6,7 +6,7 @@ import os
 import pathlib
 from math import nan
 
-import processing
+import qgis.processing
 from enmapbox import DIR_REPO
 from enmapbox.exampledata import enmap
 from enmapbox.testing import start_app
@@ -57,7 +57,7 @@ params = {
     'outputTranslatedRaster': path_translated.as_posix()
 }
 
-results = processing.run("enmapbox:TranslateRasterLayer".lower(), params, onFinish=onFinish)
+results = qgis.processing.run("enmapbox:TranslateRasterLayer".lower(), params, onFinish=onFinish)
 
 print('Results:')
 print(results)

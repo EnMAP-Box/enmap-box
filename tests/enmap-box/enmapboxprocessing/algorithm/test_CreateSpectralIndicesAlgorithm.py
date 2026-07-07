@@ -81,7 +81,7 @@ class TestCreateSpectralIndicesAlgorithm(TestCase):
             alg.P_INDICES: 'NDVI, EVI',
             alg.P_OUTPUT_RASTER: self.filename('vi.vrt'),
         }
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)
 
     def test_single_custom_narrowband_index(self):
         alg = CreateSpectralIndicesAlgorithm()

@@ -1,8 +1,10 @@
-from enmapbox.gui.applications import EnMAPBoxApplication
 from DASFEnMAPbox.processingalgorithm import DASFretrievalAlgorithm
+from enmapbox.gui.applications import EnMAPBoxApplication
+
 
 def enmapboxApplicationFactory(enmapBox):
     return [DASFretrievalApp(enmapBox)]
+
 
 class DASFretrievalApp(EnMAPBoxApplication):
     def __init__(self, enmapBox, parent=None):

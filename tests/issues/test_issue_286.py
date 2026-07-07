@@ -65,8 +65,7 @@ class EnMAPBoxTestCaseIssue286(EnMAPBoxTestCase):
                 del writer
             else:
                 err, msg, p, geom = QgsVectorFileWriter.writeAsVectorFormatV3(lyr, path.as_posix(), context, options)
-                assert err == QgsVectorFileWriter.WriterError.NoError
-                s = ""
+                self.assertTrue(err == QgsVectorFileWriter.WriterError.NoError)
 
     @unittest.skipIf(TestObjects.repoDirGDAL() is None, 'Test requires GDAL repo testdata')
     @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'Blocking dialog to select sublayer')

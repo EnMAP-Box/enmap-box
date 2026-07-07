@@ -1,7 +1,7 @@
 import zipfile
 from os.path import basename, exists, splitext
 from typing import Dict, Any, List, Tuple
-from xml.etree import ElementTree
+from defusedxml import ElementTree
 
 from osgeo import gdal
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
@@ -131,7 +131,8 @@ class ImportEnmapL1BAlgorithm(EnMAPProcessingAlgorithm):
                 with (zipfile.ZipFile(xmlOrZipFilename) as z):
                     archiveMemberPath = productName + '/' + productName + cubeName + extention
                     if archiveMemberPath in z.namelist():
-                        filename = '/vsizip/' + xmlOrZipFilename + '/' + productName + '/' + productName + cubeName + extention
+                        filename = '/vsizip/' + xmlOrZipFilename + '/' + productName
+                        filename += '/' + productName + cubeName + extention
                         return filename
             else:
                 xmlFilename = xmlOrZipFilename

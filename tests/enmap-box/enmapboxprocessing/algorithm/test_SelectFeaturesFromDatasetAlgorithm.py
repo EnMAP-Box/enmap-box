@@ -2,7 +2,7 @@ from enmapboxprocessing.algorithm.selectfeaturesfromdatasetalgorithm import Sele
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import classifierDumpPkl
+from enmapboxtestdata import classifierDumpSkops
 
 
 class TestSelectFeaturesFromDatasetAlgorithm(TestCase):
@@ -11,12 +11,12 @@ class TestSelectFeaturesFromDatasetAlgorithm(TestCase):
         alg = SelectFeaturesFromDatasetAlgorithm()
         alg.initAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifierDumpSkops,
             alg.P_FEATURE_LIST: "1, 'band 18 (0.508000 Micrometers)', 177",
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = ClassifierDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((58, 3), dump.X.shape)
         self.assertListEqual(
             ['band 8 (0.460000 Micrometers)', 'band 18 (0.508000 Micrometers)', 'band 239 (2.409000 Micrometers)'],

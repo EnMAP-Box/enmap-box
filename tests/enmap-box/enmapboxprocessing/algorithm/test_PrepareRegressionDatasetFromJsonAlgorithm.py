@@ -12,10 +12,10 @@ class TestPrepareRegressionDatasetFromJsonAlgorithm(TestCase):
         alg = PrepareRegressionDatasetFromJsonAlgorithm()
         parameters = {
             alg.P_JSON_FILE: regressionDatasetAsJsonFile,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = RegressorDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = RegressorDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((51, 177), dump.X.shape)
         self.assertEqual((51, 6), dump.y.shape)
         self.assertEqual(177, len(dump.features))

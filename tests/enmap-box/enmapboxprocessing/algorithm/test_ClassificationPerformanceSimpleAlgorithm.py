@@ -92,7 +92,7 @@ class TestClassificationPerformanceSimpleAlgorithm(TestCase):
             alg.P_OPEN_REPORT: self.openReport,
             alg.P_OUTPUT_REPORT: self.filename('report.html'),
         }
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)
 
     def test_twoClass(self):
         Forest = 1
@@ -158,4 +158,4 @@ class TestClassificationPerformanceSimpleAlgorithm(TestCase):
         try:
             self.runalg(alg, parameters)
         except QgsProcessingException as error:
-            assert str(error) == 'Predicted values not matching reference classes.'
+            self.assertEqual(str(error), 'Predicted values not matching reference classes.')

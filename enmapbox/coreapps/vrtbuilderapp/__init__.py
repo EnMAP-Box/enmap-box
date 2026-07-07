@@ -21,25 +21,25 @@
 """
 
 import importlib
-import uuid
 import os
-from typing import Union, List, Optional
+import uuid
+from typing import Union, List
 
 from osgeo import gdal
 
+import qgis.utils
+from enmapbox.gui.applications import EnMAPBoxApplication
 from enmapbox.gui.contextmenuprovider import EnMAPBoxContextMenuProvider
 from enmapbox.gui.contextmenus import EnMAPBoxAbstractContextMenuProvider
 from enmapbox.gui.datasources.datasources import DataSource
 from enmapbox.gui.datasources.datasourcesets import DataSourceSet
-from qgis.PyQt.QtWidgets import QMessageBox, QMainWindow, QMenu
-from qgis.PyQt.QtGui import QIcon
-from qgis.core import QgsRasterLayer, QgsRasterRenderer, QgsLayerTreeNode
-from qgis.gui import QgsMapCanvas, QgisInterface
-import qgis.utils
-from enmapbox.gui.applications import EnMAPBoxApplication
-from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.datasources.manager import DataSourceManagerTreeView, RasterBandTreeNode
 from enmapbox.gui.dataviews.dockmanager import DockTreeView
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QMessageBox, QMainWindow, QMenu
+from qgis.core import QgsRasterLayer, QgsRasterRenderer, QgsLayerTreeNode
+from qgis.gui import QgsMapCanvas, QgisInterface
 
 APP_DIR = os.path.dirname(__file__)
 MIN_VERSION = '0.9'
@@ -110,8 +110,10 @@ class VRTBuilderApp(EnMAPBoxApplication):
         if vrtBuilderPluginInstalled():
 
             if MIN_VERSION > INSTALLED_VERSION:
-                QMessageBox.information(None, 'Outdated Version',
-                                        f'Please update the Virtual Raster Builder QGIS Plugin\nto version >= {MIN_VERSION}')
+                QMessageBox.information(
+                    None, 'Outdated Version',
+                    f'Please update the Virtual Raster Builder QGIS Plugin\nto version >= {MIN_VERSION}'
+                )
                 return None
             else:
                 from vrtbuilder.widgets import VRTBuilderWidget
@@ -147,8 +149,7 @@ class VRTBuilderApp(EnMAPBoxApplication):
 
         if not self.mIsInstalled:
             return
-        from vrtbuilder.widgets import VRTBuilderWidget
-        assert isinstance(w, VRTBuilderWidget)
+        # from vrtbuilder.widgets import VRTBuilderWidget
         canvases = []
 
         if isinstance(self.enmapbox, EnMAPBox):
@@ -158,8 +159,8 @@ class VRTBuilderApp(EnMAPBoxApplication):
             canvases.extend(qgis.utils.iface.mapCanvases())
 
         canvases = set(canvases)
+        mapCanvas: QgsMapCanvas
         for mapCanvas in canvases:
-            assert isinstance(mapCanvas, QgsMapCanvas)
             w.createCurrentMapTool(mapCanvas)
 
 
@@ -167,6 +168,7 @@ class VRTBuilderAppContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
     """
     This class creates EnMAP-Box context menus to interact with the VRTBuilder
     """
+
     def __init__(self, vrtBuilderApp: VRTBuilderApp, *args, **kwds):
         super().__init__(*args, **kwds)
         self.vrtBuilderApp: VRTBuilderApp = vrtBuilderApp
@@ -174,8 +176,7 @@ class VRTBuilderAppContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
     def populateDataViewMenu(self, menu: QMenu, view: DockTreeView, node: QgsLayerTreeNode):
 
         selectedRasterLayers = [lyr for lyr in view.selectedLayers()
-                                if isinstance(lyr, QgsRasterLayer)
-                                and lyr.providerType() == 'gdal']
+                                if isinstance(lyr, QgsRasterLayer) and lyr.providerType() == 'gdal']
 
         self.addMenuForInputs(menu, selectedRasterLayers)
 
@@ -202,7 +203,7 @@ class VRTBuilderAppContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
 
     def openVRT(self,
                 inputs: List[Union[QgsRasterLayer, QgsRasterRenderer, RasterBandTreeNode]],
-                builder: Optional[Union[bool, 'VRTBuilderWidget']],
+                builder,
                 mosaic: bool = False):
 
         from vrtbuilder.widgets import VRTBuilderWidget
@@ -210,7 +211,6 @@ class VRTBuilderAppContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
 
         source_bands: List[VRTRasterInputSourceBand] = []
 
-        assert isinstance(inputs, list)
         for src in inputs:
             if isinstance(src, QgsRasterLayer):
                 for b in range(src.bandCount()):

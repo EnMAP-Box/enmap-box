@@ -93,7 +93,10 @@ class Test_Deep_Learning_Trainer(TestCase):
         # 1. Test saved models as amount of epochs (2)
         ckpt_file = glob.glob(f"{folder_path}/*.ckpt")
         ckpt_len = len(ckpt_file)  # List all .tif files
-        assert ckpt_len == 2, "Error: Expected 2 saved checkpoints, as 2 epochs were trained with every epoch saving"
+        self.assertEqual(
+            ckpt_len, 2,
+            msg="Error: Expected 2 saved checkpoints, as 2 epochs were trained with every epoch saving"
+        )
 
         # test model load
 
@@ -102,21 +105,30 @@ class Test_Deep_Learning_Trainer(TestCase):
 
         model_loaded = MyModel.load_from_checkpoint(best, weights_only=False)
 
-        # 2. Test check if model has subclass, pytorch lightning Module
+        # 2. Test check if the model has subclass, pytorch lightning Module
         is_inherited = isinstance(model_loaded, L.LightningModule)
-        assert is_inherited is True, "Model did not inherit Lightning Module"
+        self.assertTrue(is_inherited, msg="Model did not inherit Lightning Module")
 
         # 3. Test: check if hparams used in training have been passed correctly to class and checkpoint saver
 
         print(model_loaded.hparams)
-        assert 0.001 == model_loaded.hparams.lr, 'learning rate not passed correctly'
-        assert 'JustoUNetSimple' == model_loaded.hparams.architecture, 'Model architecture not passed correctly'
-        assert isinstance(model_loaded.hparams.class_weights,
-                          torch.Tensor), f"class_weights is not a torch.Tensor, it is {type(model_loaded.hparams.class_weights)}"
-        assert isinstance(model_loaded.hparams.transform,
-                          v2.Compose), f'Data augmentation should be torchvision Compose, but is , it is {type(model_loaded.hparams.transform)}'
-        assert isinstance(model_loaded.hparams.preprocess,
-                          transforms.Compose), f'Preprocess should be torchvision Compose, but is , it is {type(model_loaded.hparams.preprocess)}'
+        self.assertEqual(0.001, model_loaded.hparams.lr, msg='learning rate not passed correctly')
+        self.assertEqual(
+            'JustoUNetSimple',
+            model_loaded.hparams.architecture,
+            msg='Model architecture not passed correctly')
+        self.assertIsInstance(
+            model_loaded.hparams.class_weights,
+            torch.Tensor,
+            msg=f"class_weights is not a torch.Tensor, it is {type(model_loaded.hparams.class_weights)}")
+        self.assertIsInstance(
+            model_loaded.hparams.transform,
+            v2.Compose,
+            msg=f'Data augmentation should be torchvision Compose, but is {type(model_loaded.hparams.transform)}')
+        self.assertIsInstance(
+            model_loaded.hparams.preprocess,
+            transforms.Compose,
+            msg=f'Preprocess should be torchvision Compose, but is , it is {type(model_loaded.hparams.preprocess)}')
 
         # delete checkpoint files from previous test
         for filename in os.listdir(folder_path):
@@ -164,7 +176,7 @@ class Test_Deep_Learning_Trainer(TestCase):
               alg.logdirpath_model: folder_path_unet,
               }
 
-        result = Processing.runAlgorithm(alg, parameters=io)
+        Processing.runAlgorithm(alg, parameters=io)
 
         best = best_ckpt_path(folder_path_unet)
 
@@ -172,16 +184,15 @@ class Test_Deep_Learning_Trainer(TestCase):
 
         # 2. Test check if model has subclass, pytorch lightning Module
         is_inherited = isinstance(model_loaded, L.LightningModule)
-        assert is_inherited is True, "Model did not inherite Lightning Module"
+        self.assertTrue(is_inherited, msg="Model did not inherite Lightning Module")
 
         # 3. Test: check if hparams used in training have been passed correctly to class and checkpoint saver
 
         print(model_loaded.hparams)
 
-        assert 'Unet' == model_loaded.hparams.architecture, 'Model architecture not passed correctly'
-        assert 'resnet18' == model_loaded.hparams.backbone, 'Model backbone not passed correctly'
-        assert 'imagenet' == model_loaded.hparams.weights, 'Model backbone not passed correctly'
-        # assert all(not param.requires_grad for param in model_loaded.backbone.parameters()), "Error: The model's backbone is not frozen."
+        self.assertEqual('Unet', model_loaded.hparams.architecture, msg='Model architecture not passed correctly')
+        self.assertEqual('resnet18', model_loaded.hparams.backbone, msg='Model backbone not passed correctly')
+        self.assertEqual('imagenet', model_loaded.hparams.weights, msg='Model backbone not passed correctly')
 
         # actual_backbone = getattr(model_loaded, 'backbone', None)  # Replace 'backbone_model' if needed
         # assert actual_backbone is not None, "Backbone model not found"

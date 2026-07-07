@@ -19,12 +19,12 @@ class PrepareUnsupervisedDatasetFromJsonAlgorithm(EnMAPProcessingAlgorithm):
         return 'Create unsupervised dataset (from JSON file)'
 
     def shortDescription(self) -> str:
-        return 'Create a unsupervised dataset from a JSON file and store the result as a pickle file.'
+        return 'Create a unsupervised dataset from a JSON file and store the result as a skops file.'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
             (self._JSON_FILE, 'JSON file containing all information.'),
-            (self._OUTPUT_DATASET, self.PickleFileDestination)
+            (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
     def group(self):
@@ -32,7 +32,7 @@ class PrepareUnsupervisedDatasetFromJsonAlgorithm(EnMAPProcessingAlgorithm):
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterFile(self.P_JSON_FILE, self._JSON_FILE, extension=self.JsonFileExtension)
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
@@ -49,8 +49,8 @@ class PrepareUnsupervisedDatasetFromJsonAlgorithm(EnMAPProcessingAlgorithm):
             json['y'] = np.array(json['y'])
             dump = TransformerDump.fromDict(json)
 
-            if filename.endswith('.pkl'):
-                Utils.pickleDump(dump.__dict__, filename)
+            if filename.endswith('.skops'):
+                Utils.modelDump(dump.__dict__, filename)
             elif filename.endswith('.json'):
                 Utils.jsonDump(dump.__dict__, filename)
 

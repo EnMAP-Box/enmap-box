@@ -77,7 +77,7 @@ class TestImportUsgsSpeclib07Algorithm(TestCase):
             alg.P_OUTPUT_LIBRARY: self.filename('usgsSplib07.gpkg')
         }
         self.runalg(alg, parameters)
-        library = QgsVectorLayer(parameters[alg.P_OUTPUT_LIBRARY])
+        QgsVectorLayer(parameters[alg.P_OUTPUT_LIBRARY])
 
     def test_all_characteristics(self):
         if speclibProductsRoot() is None or self.skipProductImport:
@@ -98,7 +98,7 @@ class TestImportUsgsSpeclib07Algorithm(TestCase):
                 )
             }
             self.runalg(alg, parameters)
-            library = QgsVectorLayer(parameters[alg.P_OUTPUT_LIBRARY])
+            QgsVectorLayer(parameters[alg.P_OUTPUT_LIBRARY])
 
     def test_child_node_OriginalSamplingPositionsCharacteristic(self):
         if speclibProductsRoot() is None or self.skipProductImport:
@@ -114,4 +114,4 @@ class TestImportUsgsSpeclib07Algorithm(TestCase):
             alg.P_OUTPUT_LIBRARY: self.filename('library.gpkg')
         }
         self.runalg(alg, parameters)
-        library = QgsVectorLayer(parameters[alg.P_OUTPUT_LIBRARY])
+        QgsVectorLayer(parameters[alg.P_OUTPUT_LIBRARY])

@@ -1,26 +1,27 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright © 2019 / Dr. Stéphane Guillaso
-# Licensed under the terms of the 
+# Licensed under the terms of the
 # (see ../LICENSE.md for details)
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-import numpy as np
-import time
-import hys
 import os
+import time
+
+from ensomap import hys
+import numpy as np
+
+from qgis.PyQt import Qt
+
 
 class ui_cal:
 
     def __init__(self, parent=None):
         super(ui_cal, self).__init__(parent=parent)
-    
+
     def insert_cal(self, dname):
-        
+
         # calibration input product
-        self.cal_prod  = None
+        self.cal_prod = None
 
         # calibration output directory pathname
         self.cal_dname = dname
@@ -32,16 +33,14 @@ class ui_cal:
         self.cal_ssl_prod_fname = None
         self.cal_ssl_refs_fname = None
 
-
         # =========================================================================================
         # CREATE THE TAB: SOIL CALIBRATING
-        self.gui.widget_tab_page(title = 'Calibrate')
-
+        self.gui.widget_tab_page(title='Calibrate')
 
         # -----------------------------------------------------------------------------------------
         # GROUP BOX: INPUT
         self.gui.widget_group_box('INPUT')
-        
+
         # first line
         self.gui.widget_row()
         self.gui.widget_label(text="Soil Product File:", width=170)
@@ -61,7 +60,7 @@ class ui_cal:
         # GROUP BOX: OUTPUT
         self.gui.widget_add_spacing(10)
         self.gui.widget_group_box('OUTPUT')
-        
+
         self.gui.widget_row()
         self.gui.widget_label(text='Cal. Product Directory', width=170)
         self.gui.widget_text(text=self.cal_dname, ID='cal_txt_dname')
@@ -81,7 +80,7 @@ class ui_cal:
         self.gui.widget_text(ID='cal_txt_offset', edit=True)
         self.gui.widget_tool_button(text='Reset', action=self.cal_clear_gain_offset)
         self.gui.widget_row_close()
-        
+
         self.gui.widget_group_box_close()
 
         # -----------------------------------------------------------------------------------------
@@ -130,14 +129,9 @@ class ui_cal:
         self.gui.widget_progress(height=10, ID='cal_prog_bar')
         self.gui.widget_group_box_close()
 
-
-
         # =========================================================================================
         # CLOSE THE TAB: SOIL MAPPING
         self.gui.widget_tab_page_close()
-
-
-
 
     ###############################################################################################
     #
@@ -151,14 +145,14 @@ class ui_cal:
         else:
             dname = self.map_dname
         while True:
-            filename = hys.pick_file(self, dname = dname, title=title)
+            filename = hys.pick_file(self, dname=dname, title=title)
             if filename == "":
                 return
             status, soil = hys.data().open(filename)
             if status is False:
                 hys.display_error(self, soil)
                 dname = os.path.dirname(filename)
-            elif type(soil) != hys.product:
+            elif type(soil) is not hys.product:
                 msg = os.path.basename(filename) + "\nis not a valid soil product!"
                 hys.display_error(self, msg)
                 dname = os.path.dirname(filename)
@@ -167,9 +161,6 @@ class ui_cal:
         self.gui.gui['cal_txt_soil_product_file_pathname'].setText(os.path.basename(filename))
         self.cal_prod = soil
         self.gui.gui['cal_lab_soil_product_info'].setText(self.cal_prod.get_info())
-
-
-
 
     ###############################################################################################
     #
@@ -189,9 +180,6 @@ class ui_cal:
         self.cal_dname = dname
         self.gui.gui['cal_txt_dname'].setText(self.cal_dname)
 
-
-
-
     ###############################################################################################
     #
     # CLEAR GAIN/OFFSET FIELDS
@@ -201,28 +189,25 @@ class ui_cal:
         self.gui.gui['cal_txt_gain'].setText("")
         self.gui.gui['cal_txt_offset'].setText("")
 
-
-
-
     ###############################################################################################
     #
     # APPLY CALIBRATION MODEL TO SOIL FEATURE
     #
     ###############################################################################################
     def cal_exe(self):
-        
+
         # check if a soil product has been selected
         if self.cal_prod is None:
             hys.display_error(self, 'Select a soil product first!')
             return
-        
+
         # check if gain and offset has been set
         gain = self.gui.gui['cal_txt_gain'].text()
         offset = self.gui.gui['cal_txt_offset'].text()
-        if gain.replace('-','', 1).replace('.', '', 1).isdigit() is False:
+        if gain.replace('-', '', 1).replace('.', '', 1).isdigit() is False:
             hys.display_error(self, 'Gain is not valid!')
             return
-        if offset.replace('-','', 1).replace('.','',1).isdigit() is False:
+        if offset.replace('-', '', 1).replace('.', '', 1).isdigit() is False:
             hys.display_error(self, 'Offset is not valid!')
             return
         gain = np.float32(gain)
@@ -230,7 +215,7 @@ class ui_cal:
         if gain == 0:
             hys.display_error(self, 'Gain is zero!')
             return
-        
+
         # setup data tiling
         self.cal_prod.tile_data()
 
@@ -243,18 +228,15 @@ class ui_cal:
         self.gui.gui['cal_prog_bar'].setMinimum(0)
         self.gui.gui['cal_prog_bar'].setMaximum(self.cal_prod.bn)
         for k in range(self.cal_prod.bn):
-            self.gui.gui['cal_prog_bar'].setValue(k+1)
+            self.gui.gui['cal_prog_bar'].setValue(k + 1)
             im = self.cal_prod.read(tile=k)
             im = im * gain + offset
             oprod.write(np.asarray(im), tile=k)
-        
+
         # return
-        msg = "Processing complele in %8.2f seconds"%(time.time() - t1)
+        msg = "Processing complele in %8.2f seconds" % (time.time() - t1)
         hys.display_information(self, msg)
         self.gui.gui['cal_prog_bar'].setValue(0)
-
-
-
 
     ###############################################################################################
     #
@@ -267,61 +249,56 @@ class ui_cal:
             dname = os.path.dirname(self.cal_csv_data.fname)
         self.cal_csv = hys.gui.CSV(dname, self, 'cal_but_csv_load', 'cal_lab_csv', self.cal_csv_data)
 
-
-
-
     ###############################################################################################
     #
     # GET SSL PRODUCT FILE PATHNAME
     #
     ###############################################################################################
     def cal_csv_estimate(self):
-        
+
         # check if a soil product has been selected
         if self.cal_prod is None:
             hys.display_error(self, 'Select a soil product first!')
             return
-        
+
         # check if an input csv file is present
         if self.cal_csv_data.rows == []:
             hys.display_error(self, 'Select a csv file')
             return
-        
+
         # check the number of columns of the csv file, should at least 4
-        # only the fourth column will be used, should corresponds to the 
+        # only the fourth column will be used, should corresponds to the
         # desired parameter
         n_cols = self.cal_csv_data.n_cols
         if n_cols < 4:
             hys.display_error(self, 'At least 4 columns for the csv file')
             return
-        
+
         # get map info
         if self.cal_csv_data.coordinates == 1:
             map_info = self.cal_prod.meta['map info']
         else:
             map_info = None
-        
+
         # get the dimensions of the image
         dim = [self.cal_prod.samples, self.cal_prod.lines]
 
         # loop to get the model
         n_rows = self.cal_csv_data.n_rows
-        data = [] # np.zeros((n_rows), dtype=np.float32)
-        model = [] # np.zeros((n_rows), dtype=np.float32)
+        data = []  # np.zeros((n_rows), dtype=np.float32)
+        model = []  # np.zeros((n_rows), dtype=np.float32)
         for k in range(n_rows):
             xpos = np.float32(self.cal_csv_data.rows[k][1])
             ypos = np.float32(self.cal_csv_data.rows[k][2])
             status, box = hys.coord2pts(xpos, ypos, map_info, dim, 1)
-            if status is False: continue
+            if status is False:
+                continue
             im = np.float32(self.cal_prod.read(BLOCK=box))
-            if np.isnan(im): continue
+            if np.isnan(im):
+                continue
             data.append(np.reshape(im, 1)[0])
             model.append(self.cal_csv_data.rows[k][3])
         self.plot_scatter = hys.gui.CAL_EST(self, np.asarray(data), np.asarray(model, dtype=np.float32))
-
-
-
-
 
     ###############################################################################################
     #
@@ -342,9 +319,6 @@ class ui_cal:
         self.cal_ssl_prod_fname = fname
         self.gui.gui['cal_txt_ssl_prod'].setText(os.path.basename(fname))
 
-
-
-
     ###############################################################################################
     #
     # GET SSL REFERENCES FILE PATHNAME
@@ -364,9 +338,6 @@ class ui_cal:
         self.cal_ssl_refs_fname = fname
         self.gui.gui['cal_txt_ssl_prm'].setText(os.path.basename(fname))
 
-
-
-
     ###############################################################################################
     #
     # ESTIMATE GAIN/OFFSET FROM SSL
@@ -383,8 +354,8 @@ class ui_cal:
         if status is False:
             hys.display_error(self, soil)
             return
-        elif type(soil) != hys.product:
-            msg  = os.path.basename(self.cal_ssl_prod_fname)
+        elif type(soil) is not hys.product:
+            msg = os.path.basename(self.cal_ssl_prod_fname)
             msg += "\nis not a valid soil product!"
             hys.display_error(self, msg)
             return
@@ -392,5 +363,3 @@ class ui_cal:
         model = np.asarray(lines, dtype=np.float32)
         data = np.reshape(soil.read(), (soil.lines))
         self.plot_scatter = hys.gui.CAL_EST(self, data, model)
-
-    

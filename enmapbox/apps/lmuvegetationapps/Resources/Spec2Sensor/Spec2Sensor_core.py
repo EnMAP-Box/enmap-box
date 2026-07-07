@@ -13,7 +13,6 @@
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
-                                                                                                                                                 *
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -44,10 +43,14 @@ wavelengths of the target sensors need to be known, as they cannot be extracted 
 be single column (wavelengths) or two columns (wavelengths & FWHM).
 """
 
-import numpy as np
 import csv
 import os
-from enmapbox.coreapps._classic.hubflow.core import *
+
+import numpy as np
+import scipy
+
+from enmapboxprocessing.driver import Driver
+from enmapboxprocessing.rasterreader import RasterReader
 
 
 # Execution of a conversion between two sensors
@@ -120,15 +123,18 @@ class Spec2Sensor:
 
     def convert_image(self, in_file, out_file, nodat):
         # Method to convert a whole image from one sensor to another
-        dataset = openRasterDataset(in_file)
-        in_matrix = dataset.readAsArray()
-        nbands, nrows, ncols = in_matrix.shape
-        grid = dataset.grid()
+        # dataset = openRasterDataset(in_file)
+        reader = RasterReader(in_file)
 
-        metadict = dataset.metadataDict()
+        in_matrix = np.array(reader.array())
+        nbands, nrows, ncols = in_matrix.shape
+        grid = reader.extent(), reader.crs()
+
+        metadict = reader.metadata()
         print(metadict)
         wavelengths = metadict['ENVI']['wavelength']
-        wl_units = metadict['ENVI']['wavelength units']
+        # wl_units = metadict['ENVI']['wavelength units']
+        wl_units = metadict['ENVI'].get('wavelength units', metadict['ENVI'].get('wavelength_units', ''))
         if wl_units.lower() in ['nanometers', 'nm', 'nanometer']:  # any of these is accepted
             wave_convert = 1  # factor is 1, as the method expects nm anyway
         elif wl_units.lower() in ['micrometers', 'µm', 'micrometer']:
@@ -145,17 +151,22 @@ class Spec2Sensor:
         out_matrix = np.reshape(np.swapaxes(result, 0, 1), (self.n_wl_sensor, nrows, ncols))
         out_matrix = out_matrix.astype(np.int16)
 
-        output = RasterDataset.fromArray(array=out_matrix, filename=out_file, grid=grid,
-                                         driver=EnviDriver())
+        # output = RasterDataset.fromArray(array=out_matrix, filename=out_file, grid=grid,
+        #                                 driver=EnviDriver())
+        array = out_matrix
+        filename = out_file
+        extent, crs = grid
+        writer = Driver(filename).createFromArray(array, extent, crs)
 
-        output.setMetadataItem('data ignore value', nodat, 'ENVI')
-        output.setMetadataItem('wavelength', "{" + ", ".join(str(i) for i in self.wl_sensor) + "}", 'ENVI')
-        output.setMetadataItem('wavelength units', "Nanometers", 'ENVI')
-        output.setMetadataItem('fwhm', "{" + ", ".join(str(i) for i in self.fwhm) + "}", 'ENVI')
+        writer.setMetadataItem('wavelength', "{" + ", ".join(str(i) for i in self.wl_sensor) + "}", 'ENVI')
+        writer.setMetadataItem('wavelength units', "Nanometers", 'ENVI')
+        writer.setMetadataItem('fwhm', "{" + ", ".join(str(i) for i in self.fwhm) + "}", 'ENVI')
 
-        for iband, band in enumerate(output.bands()):
-            band.setDescription("Band {:00d}".format(iband))
-            band.setNoDataValue(nodat)
+        for bandNo in writer.bandNumber():
+            writer.setBandName("Band {:00d}".format(bandNo), bandNo)
+            writer.setNoDataValue(nodat, bandNo)
+
+        writer.close()
 
 
 # This class builds new srf-files (numpy) from text files with the ideal structure of K. Segl's files
@@ -264,7 +275,7 @@ class BuildTrueSRF:
         try:
             # Load the information about central wavelengths of the target sensor from the given file
             wavelength = np.loadtxt(self.wl_file) / self.wl_convert
-        except:
+        except Exception:
             return False, "Error reading wavelength file! Expected text-file with one float-value " \
                           "per line (i.e. wavelength)"
 

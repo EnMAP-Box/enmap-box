@@ -28,7 +28,7 @@ from qgis.core import QgsProcessingProvider, QgsProcessingAlgorithm, QgsApplicat
 
 try:
     from processing.core.ProcessingConfig import ProcessingConfig, Setting
-except ModuleNotFoundError as merr:
+except ModuleNotFoundError:
     path = pathlib.Path(qgis.__file__)
     pathPlugins = os.path.abspath(path / '../../plugins')
     site.addsitedir(pathPlugins)
@@ -47,7 +47,8 @@ class EnMAPBoxProcessingProviderKeys(object):
 class EnMAPBoxProcessingProvider(QgsProcessingProvider):
     """
     The EnMAPBoxAlgorithmProvider contains the GeoAlgorithms under the umbrella of the EnMAP-Box.
-    It enhances the "standard" processing.core.AlgorithmProvider by functionality to add and remove GeoAlgorithms during runtime.
+    It enhances the "standard" processing.core.AlgorithmProvider by functionality to add and remove
+    GeoAlgorithms during runtime.
     """
 
     _ENMAPBOX_PROCESSING_PROVIDER = None
@@ -226,7 +227,6 @@ class EnMAPBoxProcessingProvider(QgsProcessingProvider):
         """
         Adds a list of QgsProcessingAlgorithms. The self.emitUpdated() signal is called 1x afterwards.
         """
-        assert isinstance(algorithmns, list)
         for a in algorithmns:
             self.addAlgorithm(a.createInstance(), _emitUpdated=False)
         if len(algorithmns) > 0:

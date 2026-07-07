@@ -25,7 +25,7 @@ class PrepareClassificationDatasetFromTableAlgorithm(EnMAPProcessingAlgorithm):
 
     def shortDescription(self) -> str:
         return 'Create a classification dataset from attribute table rows that match the given categories ' \
-               'and store the result as a pickle file. \n'
+               'and store the result as a skops file. \n'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
@@ -36,7 +36,7 @@ class PrepareClassificationDatasetFromTableAlgorithm(EnMAPProcessingAlgorithm):
             (self._NAME_FIELD, 'Field used as class name. If not specified, class values are used as class names.'),
             (self._COLOR_FIELD, 'Field used as class color. '
                                 'Values may be given as hex-colors, rgb-colors or int-colors.'),
-            (self._OUTPUT_DATASET, self.PickleFileDestination)
+            (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
     def group(self):
@@ -57,7 +57,7 @@ class PrepareClassificationDatasetFromTableAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterField(
             self.P_COLOR_FIELD, self._COLOR_FIELD, None, self.P_TABLE, QgsProcessingParameterField.Any, False, True
         )
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
@@ -97,7 +97,7 @@ class PrepareClassificationDatasetFromTableAlgorithm(EnMAPProcessingAlgorithm):
 
             dump = ClassifierDump(categories=categories, features=featureFields, X=X, y=y)
             dumpDict = dump.__dict__
-            Utils.pickleDump(dumpDict, filename)
+            Utils.modelDump(dumpDict, filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)

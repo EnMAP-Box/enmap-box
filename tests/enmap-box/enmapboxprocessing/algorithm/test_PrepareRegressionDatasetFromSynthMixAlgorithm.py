@@ -5,7 +5,7 @@ from enmapboxprocessing.algorithm.prepareregressiondatasetfromsynthmixalgorithm 
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import ClassifierDump, RegressorDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import classifierDumpPkl
+from enmapboxtestdata import classifierDumpSkops
 
 
 class TestFitClassifierAlgorithm(TestCase):
@@ -13,15 +13,15 @@ class TestFitClassifierAlgorithm(TestCase):
     def test(self):
         alg = PrepareRegressionDatasetFromSynthMixAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifierDumpSkops,
             alg.P_N: 10,
             alg.P_INCLUDE_ENDMEMBER: False,
             alg.P_OUTPUT_FOLDER: self.filename('synthmix')
         }
         self.runalg(alg, parameters)
-        for category in ClassifierDump.fromDict(Utils.pickleLoad(classifierDumpPkl)).categories:
-            filename = join(parameters[alg.P_OUTPUT_FOLDER], category.name + '.pkl')
-            dump = RegressorDump.fromDict(Utils.pickleLoad(filename))
+        for category in ClassifierDump.fromDict(Utils.modelLoad(classifierDumpSkops)).categories:
+            filename = join(parameters[alg.P_OUTPUT_FOLDER], category.name + '.skops')
+            dump = RegressorDump.fromDict(Utils.modelLoad(filename))
             self.assertEqual(1, len(dump.targets))
             self.assertEqual(category.name, dump.targets[0].name)
             self.assertEqual(category.color, dump.targets[0].color)

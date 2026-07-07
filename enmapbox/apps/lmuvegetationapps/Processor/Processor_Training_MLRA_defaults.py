@@ -23,7 +23,6 @@
 ***************************************************************************
 """
 
-from scipy.stats import expon, reciprocal
 from sklearn.gaussian_process import kernels
 
 
@@ -90,11 +89,15 @@ class MLRA_defaults:
             # 'warm_start': True
         },
         'param_dist': {
-            'kernel': [kernels.ConstantKernel(1.0) *
-                       kernels.Matern(length_scale=v, nu=nu)
-                       for v in [0.01, 0.1, 1.0, 10, 100] for nu in [0.5, 1.5, 2.5, float('inf')]],
+            'kernel': [
+                kernels.ConstantKernel(1.0)
+                * kernels.Matern(length_scale=v, nu=nu)
+                for v in [0.01, 0.1, 1.0, 10, 100] for nu in [0.5, 1.5, 2.5, float('inf')]
+            ],
             # **kernels.ConstantKernel(1.0) *
-            # [1.0 * kernels.RBF(length_scale=v) + kernels.WhiteKernel(noise_level=1.0, noise_level_bounds=(1e-5, 1e5)) for v in [0.01, 0.1, 1.0, 10, 100]]
+            # [1.0 * kernels.RBF(length_scale=v)
+            # + kernels.WhiteKernel(noise_level=1.0, noise_level_bounds=(1e-5, 1e5))
+            # for v in [0.01, 0.1, 1.0, 10, 100]]
             "alpha": [0.001, 0.01, 0.1, 1.0],
             # 'random_state': 42
         },
@@ -109,16 +112,18 @@ class MLRA_defaults:
             'n_restarts_optimizer': 10,
         },
         'AGBdry': {
-            'kernel': kernels.ConstantKernel(1.0, constant_value_bounds=(1e-5, 1e7)) *
-                      kernels.Matern(length_scale=10, length_scale_bounds=(1e-5, 1e7), nu=0.5) +
-                      kernels.WhiteKernel(noise_level=1.0, noise_level_bounds=(1e-5, 1e7)),
+            'kernel':
+                kernels.ConstantKernel(1.0, constant_value_bounds=(1e-5, 1e7))
+                * kernels.Matern(length_scale=10, length_scale_bounds=(1e-5, 1e7), nu=0.5)
+                + kernels.WhiteKernel(noise_level=1.0, noise_level_bounds=(1e-5, 1e7)),
             'alpha': 1.0,
             'n_restarts_optimizer': 10,
         },
         'AGBfresh': {
-            'kernel': kernels.ConstantKernel(1.0, constant_value_bounds=(1e-5, 1e7)) *
-                      kernels.Matern(length_scale=10, length_scale_bounds=(1e-5, 1e7), nu=0.5) +
-                      kernels.WhiteKernel(noise_level=1.0, noise_level_bounds=(1e-5, 1e7)),
+            'kernel':
+                kernels.ConstantKernel(1.0, constant_value_bounds=(1e-5, 1e7))
+                * kernels.Matern(length_scale=10, length_scale_bounds=(1e-5, 1e7), nu=0.5)
+                + kernels.WhiteKernel(noise_level=1.0, noise_level_bounds=(1e-5, 1e7)),
             'alpha': 1.0,
             'n_restarts_optimizer': 10,
         },
@@ -128,9 +133,10 @@ class MLRA_defaults:
             'n_restarts_optimizer': 10,
         },
         'Nitrogen': {
-            'kernel': kernels.ConstantKernel(1.0, constant_value_bounds=(1e-5, 1e7)) *
-                      kernels.Matern(length_scale=1, length_scale_bounds=(1e-5, 1e7), nu=2.5) +
-                      kernels.WhiteKernel(noise_level=1.0, noise_level_bounds=(1e-5, 1e7)),
+            'kernel':
+                kernels.ConstantKernel(1.0, constant_value_bounds=(1e-5, 1e7))
+                * kernels.Matern(length_scale=1, length_scale_bounds=(1e-5, 1e7), nu=2.5)
+                + kernels.WhiteKernel(noise_level=1.0, noise_level_bounds=(1e-5, 1e7)),
             'alpha': 1.0,
             'n_restarts_optimizer': 10,
         },

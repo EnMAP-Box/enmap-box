@@ -1,13 +1,18 @@
 import os
 
-import hys
 import matplotlib.pyplot as plt
 import numpy as np
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qtagg import NavigationToolbar2QT as NavigationToolbar
 from scipy import stats
+
+from ensomap import hys
+from qgis.PyQt import Qt
+from qgis.PyQt.QtWidgets import (
+    QVBoxLayout, QLayout, QDesktopWidget, QTabWidget, QWidget, QHBoxLayout, QGroupBox, QFrame, QLabel, QLineEdit,
+    QToolButton, QPushButton, QCheckBox, QRadioButton, QProgressBar, QListWidget, QTableWidget, QSpinBox, QButtonGroup,
+    QTableWidgetItem
+)
 
 
 # class FileEdit(QLineEdit):
@@ -45,7 +50,8 @@ class WIDGET:
         self.level = []
 
         # setup the title of the window
-        if title is None: title = "Define a title!"
+        if title is None:
+            title = "Define a title!"
         self.parent.setWindowTitle(title)
 
         base = QVBoxLayout()
@@ -206,7 +212,9 @@ class WIDGET:
         self.level[-1].addWidget(tmp)
 
     def widget_text_dd(self, ID=None, text=None, width=None, edit=False):
-        tmp = FileEdit()
+        # tmp = FileEdit()
+        tmp = QLineEdit()
+
         if text is not None:
             tmp.setText(text)
         if width is not None:
@@ -318,6 +326,7 @@ class WIDGET:
     def widget_add_widget(self, wid, ID=None):
         self.level[-1].addWidget(wid)
         if ID is not None:
+            tmp = None
             self.gui[ID] = tmp
 
 

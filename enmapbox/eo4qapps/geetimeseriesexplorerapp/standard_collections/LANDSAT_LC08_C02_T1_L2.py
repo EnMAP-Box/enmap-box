@@ -1,3 +1,4 @@
+import ee
 collection = ee.ImageCollection("LANDSAT/LC08/C02/T1_L2")
 
 # default colors for bands and spectral indices

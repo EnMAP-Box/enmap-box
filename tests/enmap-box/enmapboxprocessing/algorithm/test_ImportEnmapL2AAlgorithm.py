@@ -114,7 +114,7 @@ class TestImportEnmapL2AAlgorithm(TestCase):
             alg.P_OUTPUT_RASTER: self.filename('enmapL2A_ARD.vrt'),
         }
         result = self.runalg(alg, parameters)
-        reader = RasterReader(result[alg.P_OUTPUT_RASTER])
+        RasterReader(result[alg.P_OUTPUT_RASTER])
 
     def test_saveAsTif(self):
         if sensorProductsRoot() is None or self.skipProductImport:

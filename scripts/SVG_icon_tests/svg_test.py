@@ -28,14 +28,14 @@ dark_palette.setColor(QPalette.HighlightedText, QColor(255, 255, 255))
 
 
 def addIcons(w: QWidget):
-    l = QGridLayout()
+    layout = QGridLayout()
     for i, size in enumerate([28, 64, 128, 256]):
         label1 = QLabel()
         label1.setPixmap(icon.pixmap(QSize(size, size)))
         label2 = QLabel(f'{size}x{size}px')
-        l.addWidget(label1, 0, i)
-        l.addWidget(label2, 1, i)
-    w.setLayout(l)
+        layout.addWidget(label1, 0, i)
+        layout.addWidget(label2, 1, i)
+    w.setLayout(layout)
 
 
 w_bright = QWidget()
@@ -46,4 +46,4 @@ addIcons(w_bright)
 addIcons(w_dark)
 w_bright.show()
 w_dark.show()
-app.exec_()
+app.exec()

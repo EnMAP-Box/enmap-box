@@ -1,7 +1,8 @@
 import json
-import pickle
 import re
 import uuid
+from ast import literal_eval
+from contextlib import suppress
 from os import makedirs, mkdir
 from os.path import join, dirname, basename, exists, splitext
 from random import randint
@@ -179,7 +180,9 @@ class Utils(object):
 
     @classmethod
     def numpyArrayToQgsRasterBlock(cls, array: np.ndarray, dataType: int = None) -> QgsRasterBlock:
-        assert array.ndim == 2
+        if array.ndim != 2:
+            raise ValueError('number of array dimensions must be 2')
+
         height, width = array.shape
         if dataType is None:
             dataType = cls.numpyDataTypeToQgisDataType(array.dtype)
@@ -217,7 +220,7 @@ class Utils(object):
 
     @classmethod
     def qgisFeedbackToGdalCallback(
-            cls, feedback: QgsProcessingFeedback = None
+        cls, feedback: QgsProcessingFeedback = None
     ) -> Optional[Callable]:
         if feedback is None:
             callback = None
@@ -231,7 +234,7 @@ class Utils(object):
 
     @classmethod
     def palettedRasterRendererFromCategories(
-            cls, provider: QgsRasterDataProvider, bandNumber: int, categories: Categories
+        cls, provider: QgsRasterDataProvider, bandNumber: int, categories: Categories
     ) -> QgsPalettedRasterRenderer:
         classes = [QgsPalettedRasterRenderer.Class(c.value, QColor(c.color), c.name) for c in categories]
         renderer = QgsPalettedRasterRenderer(provider, bandNumber, classes)
@@ -239,7 +242,7 @@ class Utils(object):
 
     @classmethod
     def multiBandColorRenderer(
-            cls, provider: QgsRasterDataProvider, bandNumbers: List[int], minValues: List[float], maxValues: List[float]
+        cls, provider: QgsRasterDataProvider, bandNumbers: List[int], minValues: List[float], maxValues: List[float]
     ) -> QgsMultiBandColorRenderer:
 
         renderer = QgsMultiBandColorRenderer(provider, *bandNumbers)
@@ -262,7 +265,7 @@ class Utils(object):
 
     @classmethod
     def singleBandGrayRenderer(
-            cls, provider: QgsRasterDataProvider, grayBand: int, minValue: float, maxValue: float
+        cls, provider: QgsRasterDataProvider, grayBand: int, minValue: float, maxValue: float
     ) -> QgsSingleBandGrayRenderer:
 
         renderer = QgsSingleBandGrayRenderer(provider, grayBand)
@@ -275,8 +278,8 @@ class Utils(object):
 
     @classmethod
     def singleBandPseudoColorRenderer(
-            cls, provider: QgsRasterDataProvider, bandNo: int, minValue: float, maxValue: float,
-            colorRamp: Optional[QgsColorRamp] = None, colorRampType=QgsColorRampShader.Type.Interpolated,
+        cls, provider: QgsRasterDataProvider, bandNo: int, minValue: float, maxValue: float,
+        colorRamp: Optional[QgsColorRamp] = None, colorRampType=QgsColorRampShader.Type.Interpolated,
 
     ) -> QgsSingleBandPseudoColorRenderer:
         shader = QgsRasterShader()
@@ -296,7 +299,7 @@ class Utils(object):
 
     @classmethod
     def deriveColorRampShaderRampItems(
-            cls, minValue: float, maxValue: float, ramp: QgsColorRamp
+        cls, minValue: float, maxValue: float, ramp: QgsColorRamp
     ) -> List[QgsColorRampShader.ColorRampItem]:
 
         # derive ramp items
@@ -309,7 +312,7 @@ class Utils(object):
 
     @classmethod
     def categorizedSymbolRendererFromCategories(
-            cls, fieldName: str, categories: Categories
+        cls, fieldName: str, categories: Categories
     ) -> QgsCategorizedSymbolRenderer:
         rendererCategories = list()
         for c in categories:
@@ -323,7 +326,6 @@ class Utils(object):
 
     @classmethod
     def categoriesFromCategorizedSymbolRenderer(cls, renderer: QgsCategorizedSymbolRenderer) -> Categories:
-        c: QgsRendererCategory
         categories = [Category(c.value(), c.label(), c.symbol().color().name())
                       for c in renderer.categories()
                       if c.label() != '']
@@ -346,12 +348,22 @@ class Utils(object):
         array = reader.array(bandList=[bandNo])
         mask = reader.maskArray(array, bandList=[bandNo], defaultNoDataValue=0)
         values = np.unique(array[0][mask[0]])
-        categories = [Category(int(v), str(v), QColor(randint(0, 2 ** 24)).name()) for v in values]
+
+        # nosec B311 # not security relevant generation of random colors
+        categories = [
+            Category(
+                int(v),
+                str(v),
+                QColor(
+                    randint(0, 2 ** 24)  # nosec B311 # not security relevant random sampling
+                ).name()) for v in values
+        ]
+
         return categories
 
     @classmethod
     def categoriesFromVectorField(
-            cls, vector: QgsVectorLayer, valueField: str, nameField: str = None, colorField: str = None
+        cls, vector: QgsVectorLayer, valueField: str, nameField: str = None, colorField: str = None
     ) -> Categories:
         feature: QgsFeature
         values = list()
@@ -369,7 +381,11 @@ class Utils(object):
         values = np.unique(values).tolist()
         categories = list()
         for value in values:
-            color = colors.get(value, QColor(randint(0, 2 ** 24 - 1)))
+            # nosec B311 # not security relevant generation of random colors
+            color = colors.get(
+                value,
+                QColor(randint(0, 2 ** 24 - 1))  # nosec B311 # randint not security relevant
+            )
             color = cls.parseColor(color).name()
             name = names.get(value, str(value))
             categories.append(Category(value, name, color))
@@ -452,7 +468,7 @@ class Utils(object):
             if QColor(obj).isValid():
                 return QColor(obj)
             try:  # try to evaluate ...
-                obj = eval(obj)
+                obj = literal_eval(obj)
             except Exception:
                 raise ValueError(f'invalid color: {obj}')
 
@@ -477,23 +493,24 @@ class Utils(object):
             items: List[str] = [v for v in obj.replace(' ', ',').split(',') if len(v) > 1]
             if len(items) == 2:
                 lon, lat = items
-                try:
-                    return SpatialPoint(QgsCoordinateReferenceSystem.fromEpsgId(4326), float(lat), float(lon))
-                except Exception:
-                    pass
-                try:
-                    def conversion(
-                            old):  # adopted from https://stackoverflow.com/questions/10852955/python-batch-convert-gps-positions-to-lat-lon-decimals
-                        direction = {'N': 1, 'S': -1, 'E': 1, 'W': -1}
-                        new = old.replace(u'°', ' ').replace('\'', ' ').replace('"', ' ')
-                        new = new.split()
-                        new_dir = new.pop()
-                        new.extend([0, 0, 0])
-                        return (int(new[0]) + int(new[1]) / 60.0 + float(new[2]) / 3600.0) * direction[new_dir]
 
+                with suppress(ValueError):
+                    return SpatialPoint(QgsCoordinateReferenceSystem.fromEpsgId(4326), float(lat), float(lon))
+
+                def conversion(old):
+                    # adopted from https://stackoverflow.com/questions/10852955/
+                    # python-batch-convert-gps-positions-to-lat-lon-decimals
+                    # support 53°04'29.2"N 13°53'42.3"E format
+                    direction = {'N': 1, 'S': -1, 'E': 1, 'W': -1}
+                    new = old.replace(u'°', ' ').replace('\'', ' ').replace('"', ' ')
+                    new = new.split()
+                    new_dir = new.pop()
+                    new.extend([0, 0, 0])
+                    return (int(new[0]) + int(new[1]) / 60.0 + float(new[2]) / 3600.0) * direction[new_dir]
+
+                with suppress(Exception):
                     return SpatialPoint(QgsCoordinateReferenceSystem.fromEpsgId(4326), conversion(lat), conversion(lon))
-                except Exception:
-                    pass
+
             if len(items) == 3:
                 lat, lon, epsgId = items
                 if epsgId.upper().startswith('[EPSG:'):
@@ -556,7 +573,7 @@ class Utils(object):
 
     @classmethod
     def prepareCategories(
-            cls, categories: Categories, valuesToInt=False, removeLastIfEmpty=False
+        cls, categories: Categories, valuesToInt=False, removeLastIfEmpty=False
     ) -> Tuple[Categories, Dict]:
 
         categoriesOrig = categories
@@ -651,14 +668,27 @@ class Utils(object):
         return filename + extention
 
     @classmethod
-    def pickleDump(cls, obj: Any, filename: str):
-        with open(filename, 'wb') as file:
-            pickle.dump(obj, file)
+    def modelDump(cls, obj: Any, filename: str):
+        import skops.io as sio  # import locally because of slow debugging
+        sio.dump(obj, filename)
 
     @classmethod
-    def pickleLoad(cls, filename: str) -> Any:
-        with open(filename, 'rb') as file:
-            return pickle.load(file)
+    def modelLoad(cls, filename: str) -> Any:
+        import skops.io as sio  # import locally because of slow debugging
+        trusted_prefixes = (
+            "sklearn.",
+            "numpy.",
+            "scipy.",
+            "enmapboxprocessing.typing",
+            "catboost."
+        )
+        untrusted_types = sio.get_untrusted_types(file=filename)
+        for untrusted_type in sio.get_untrusted_types(file=filename):
+            if untrusted_type.startswith(trusted_prefixes):
+                continue
+            raise ValueError(f"Unsupported untrusted type '{untrusted_type}' found in '{filename}'.")
+
+        return sio.load(filename, trusted=untrusted_types)
 
     @classmethod
     def jsonDumps(cls, obj: Any, default=None, indent=2, timeFormat=None) -> str:
@@ -784,7 +814,7 @@ class Utils(object):
 
     @classmethod
     def transformExtent(
-            cls, extent: QgsRectangle, crs: QgsCoordinateReferenceSystem, toCrs: QgsCoordinateReferenceSystem
+        cls, extent: QgsRectangle, crs: QgsCoordinateReferenceSystem, toCrs: QgsCoordinateReferenceSystem
     ) -> QgsRectangle:
 
         if crs == toCrs:

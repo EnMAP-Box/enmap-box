@@ -2,7 +2,8 @@ import os
 
 import numpy as np
 from osgeo import gdal
-from qgis._core import QgsProcessingFeedback
+
+from qgis.core import QgsProcessingFeedback
 
 
 def split_raster(raster, ds_mask, output_path, tile_size_x, tile_size_y, step_x, step_y,
@@ -22,29 +23,30 @@ def split_raster(raster, ds_mask, output_path, tile_size_x, tile_size_y, step_x,
     r_name = os.path.basename(raster)
     r_name = r_name[:-4]
 
-    ## read raster
+    # # read raster
     ds = gdal.Open(raster)
     ds_mask = gdal.Open(ds_mask)
 
     #  get Mask meta data
-    data_type = ds_mask.GetRasterBand(1).DataType
-    projection = ds_mask.GetProjection()
+    # data_type = ds_mask.GetRasterBand(1).DataType
+    # projection = ds_mask.GetProjection()
 
     spec_band = ds.GetRasterBand(1)
     nodata_spec = spec_band.GetNoDataValue()
 
-        # Read data from modified raster
+    # Read data from modified raster
     if nodata_spec is not None:
 
         data_arr = spec_band.ReadAsArray()
-            # data_arr = dataset.ReadAsArray(0)
+
+        # data_arr = dataset.ReadAsArray(0)
 
         mask = (data_arr == nodata_spec)
 
-            # mask label raster with no data mask
+        # mask label raster with no data mask
         band = ds_mask.ReadAsArray()
 
-            # reserved no data label class 0
+        # reserved no data label class 0
         band[mask] = 0  # or use no_data_value from interface to over-burn  ' changed. fixed to 0 for no data label
     else:
         band = ds_mask.ReadAsArray()

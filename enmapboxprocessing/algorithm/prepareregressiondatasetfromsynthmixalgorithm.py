@@ -5,11 +5,11 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClassifierDump, Category, checkSampleShape, RegressorDump, Target
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -19,7 +19,9 @@ class PrepareRegressionDatasetFromSynthMixAlgorithm(EnMAPProcessingAlgorithm):
     P_BACKGROUND, _BACKGROUND = 'background', 'Proportion of background mixtures (%)'
     P_INCLUDE_ENDMEMBER, _INCLUDE_ENDMEMBER = 'includeEndmember', 'Include original endmembers'
     P_MIXING_PROBABILITIES, _MIXING_PROBABILITIES = 'mixingProbabilities', 'Mixing complexity probabilities'
-    P_ALLOW_WITHINCLASS_MIXTURES, _ALLOW_WITHINCLASS_MIXTURES = 'allowWithinClassMixtures', 'Allow within-class mixtures'
+    P_ALLOW_WITHINCLASS_MIXTURES, _ALLOW_WITHINCLASS_MIXTURES = (
+        'allowWithinClassMixtures', 'Allow within-class mixtures'
+    )
     P_CLASS_PROBABILITIES, _CLASS_PROBABILITIES = 'classProbabilities', 'Class probabilities'
     P_OUTPUT_FOLDER, _OUTPUT_FOLDER = 'outputFolder', 'Output folder'
 
@@ -29,7 +31,7 @@ class PrepareRegressionDatasetFromSynthMixAlgorithm(EnMAPProcessingAlgorithm):
 
     def shortDescription(self) -> str:
         return 'Create synthetically mixed regression datasets, one for each category. ' \
-               'Results are stored as <category.name>.pkl files inside the destination folder.'
+               'Results are stored as <category.name>.skops files inside the destination folder.'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
@@ -60,7 +62,7 @@ class PrepareRegressionDatasetFromSynthMixAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFolderDestination(self.P_OUTPUT_FOLDER, self._OUTPUT_FOLDER)
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         filenameDataset = self.parameterAsFile(parameters, self.P_DATASET, context)
         self.n = self.parameterAsInt(parameters, self.P_N, context)
@@ -75,12 +77,14 @@ class PrepareRegressionDatasetFromSynthMixAlgorithm(EnMAPProcessingAlgorithm):
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)
 
-            dump = ClassifierDump(**Utils.pickleLoad(filenameDataset))
+            dump = ClassifierDump(**Utils.modelLoad(filenameDataset))
             self.X = dump.X
             self.y = dump.y
             self.categories = dump.categories
             feedback.pushInfo(
-                f'Load classification dataset: X=array{list(self.X.shape)} y=array{list(self.y.shape)} categories={[c.name for c in self.categories]}')
+                f'Load classification dataset: X=array{list(self.X.shape)} y=array{list(self.y.shape)} '
+                f'categories={[c.name for c in self.categories]}'
+            )
 
             if self.classProbabilities is None:
                 self.classProbabilities = list()
@@ -88,14 +92,14 @@ class PrepareRegressionDatasetFromSynthMixAlgorithm(EnMAPProcessingAlgorithm):
                     self.classProbabilities.append(np.average(self.y == category.value))
 
             for category in self.categories:
-                filename = join(foldername, category.name + '.pkl')
+                filename = join(foldername, category.name + '.skops')
                 X, y = self.mixCategory(category)
 
                 checkSampleShape(X, y, raise_=True)
 
                 features = [f'Band {i + 1}' for i in range(X.shape[1])]
                 dump = RegressorDump([Target(category.name, category.color)], features, X, y)
-                Utils.pickleDump(dump.__dict__, filename)
+                Utils.modelDump(dump.__dict__, filename)
 
             result = {self.P_OUTPUT_FOLDER: foldername}
             self.toc(feedback, result)
@@ -128,11 +132,12 @@ class PrepareRegressionDatasetFromSynthMixAlgorithm(EnMAPProcessingAlgorithm):
         for i in range(self.n):
             complexity = np.random.choice(list(mixingComplexities.keys()), p=list(mixingComplexities.values()))
 
-            isBackground = self.background >= randint(1, 100)
+            # nosec # random sampling for synthetic dataset generation
+            isBackground = self.background >= randint(1, 100)  # nosec B311 # not security relevant sampling
 
             if isBackground:
                 drawnLabels = list(
-                    np.random.choice(
+                    np.random.choice(  # nosec
                         list(classProbabilities2.keys()), size=1, replace=False, p=list(classProbabilities2.values())
                     )
                 )
@@ -140,8 +145,12 @@ class PrepareRegressionDatasetFromSynthMixAlgorithm(EnMAPProcessingAlgorithm):
                 drawnLabels = [targetCategory.value]
 
             if self.allowWithinClassMixtures:
-                drawnLabels.extend(np.random.choice(list(classProbabilities.keys()), size=complexity - 1, replace=True,
-                                                    p=list(classProbabilities.values())))
+                drawnLabels.extend(
+                    np.random.choice(  # nosec
+                        list(classProbabilities.keys()), size=complexity - 1, replace=True,
+                        p=list(classProbabilities.values())
+                    )
+                )
             else:
                 drawnLabels.extend(
                     np.random.choice(list(classProbabilities2.keys()), size=complexity - 1, replace=False,
@@ -160,7 +169,8 @@ class PrepareRegressionDatasetFromSynthMixAlgorithm(EnMAPProcessingAlgorithm):
                 randomWeights.append(weight)
             randomWeights.append(1. - sum(randomWeights))
 
-            assert math.isclose(sum(randomWeights), 1.0)
+            if not math.isclose(sum(randomWeights), 1.0):
+                raise ValueError(f'randomWeights must sum to 1.0, got {sum(randomWeights)}')
             mixtures.append(np.sum(drawnFeatures * randomWeights, axis=1))
             fractions.append(np.sum(drawnFractions * randomWeights, axis=1)[targetIndex])
 
