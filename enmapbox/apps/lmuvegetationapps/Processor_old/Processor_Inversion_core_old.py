@@ -103,7 +103,7 @@ class Functions:
         # in_matrix = dataset.readAsArray().astype(dtype=dtype)
         # grid = dataset.grid()
 
-        reader = RasterReader()
+        reader = RasterReader(image)
         array = np.array(reader.array())
         in_matrix = array
 
@@ -126,7 +126,7 @@ class Functions:
             writer = Driver(filename).createFromArray(array, extent, crs)
             writer.setMetadataItem('data ignore value', nodat, 'ENVI')
 
-            for bandNo in writer.bandNumber():
+            for bandNo in writer.bandNumbers():
                 writer.setBandName(paras_out[bandNo - 1], bandNo)
                 writer.setNoDataValue(nodat, bandNo)
 
