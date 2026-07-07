@@ -27,19 +27,19 @@ import csv
 import os
 import sys
 
-import lmuvegetationapps.Resources.PROSAIL.call_model as mod
 # Fills and handles the GUI for creating LUTs in the EnMAP-Box
 import numpy as np
 # ensure to call QGIS before PyQtGraph
 import pyqtgraph as pg
-from lmuvegetationapps import APP_DIR
-from lmuvegetationapps.Resources.Spec2Sensor.Spec2Sensor_core import Spec2Sensor, BuildTrueSRF, BuildGenericSRF
 from scipy.interpolate import interp1d
 from scipy.stats import norm, uniform
 
+import lmuvegetationapps.Resources.PROSAIL.call_model as mod
 # from _classic.hubflow.core import openRasterDataset
 from enmapbox.gui.utils import loadUi
 from enmapboxprocessing.rasterreader import RasterReader
+from lmuvegetationapps import APP_DIR
+from lmuvegetationapps.Resources.Spec2Sensor.Spec2Sensor_core import Spec2Sensor, BuildTrueSRF, BuildGenericSRF
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox, QTableWidgetItem, QHeaderView, QApplication
@@ -958,7 +958,7 @@ class LUT:
         if self.lop == "prospectPro":
             # if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in range(len(self.para_list[0]) - 1)):
             indices = [i for i in range(len(self.para_list[0]) - 1)
-                        if not (self.para_list[0][i] == 'car' and self.depends != 0)]
+                       if not (self.para_list[0][i] == 'car' and self.depends != 0)]
             if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in indices):
                 self.abort(message='Leaf Optical Properties parameter(s) missing')
                 return False
@@ -966,7 +966,7 @@ class LUT:
         elif self.lop == "prospectD":
             # if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in range(len(self.para_list[0]) - 2)):
             indices = [i for i in range(len(self.para_list[0]) - 2)
-                        if not (self.para_list[0][i] == 'car' and self.depends != 0)]
+                       if not (self.para_list[0][i] == 'car' and self.depends != 0)]
             if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in indices):
                 self.abort(message='Leaf Optical Properties parameter(s) missing')
                 return False
@@ -974,7 +974,7 @@ class LUT:
         elif self.lop == "prospect5B":
             # if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in range(len(self.para_list[0]) - 3)):
             indices = [i for i in range(len(self.para_list[0]) - 3)
-                        if not (self.para_list[0][i] == 'car' and self.depends != 0)]
+                       if not (self.para_list[0][i] == 'car' and self.depends != 0)]
             if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in indices):
                 self.abort(message='Leaf Optical Properties parameter(s) missing')
                 return False
@@ -982,7 +982,7 @@ class LUT:
         elif self.lop == "prospect5":
             # if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in range(len(self.para_list[0]) - 4)):
             indices = [i for i in range(len(self.para_list[0]) - 4)
-                        if not (self.para_list[0][i] == 'car' and self.depends != 0)]
+                       if not (self.para_list[0][i] == 'car' and self.depends != 0)]
             if any(len(self.dict_vals[self.para_list[0][i]]) < 1 for i in indices):
                 self.abort(message='Leaf Optical Properties parameter(s) missing')
                 return False
