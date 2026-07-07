@@ -538,7 +538,9 @@ class MLInversion:
             nbands = int(metadict['ENVI']['bands'])
 
             try:  # try and get no data value and convert it to integer
-                nodata = int(metadict['ENVI']['data ignore value'])
+                # nodata = int(metadict['ENVI']['data ignore value'])
+                nodata_str = metadict['ENVI'].get('data ignore value', metadict['ENVI'].get('data_ignore_value'))
+                nodata = int(nodata_str)
             except Exception:
                 # no dat not found or cannot be interpreted as intereg! No worries, the user can add it manually!
                 self.main.nodat_widget.init(image_type=image_type, image=image)
@@ -552,7 +554,10 @@ class MLInversion:
             if image_type == "Input Image":
                 try:
                     wavelengths = metadict['ENVI']['wavelength']
-                    wl_units = metadict['ENVI']['wavelength units']
+                    # wl_units = metadict['ENVI']['wavelength units']
+                    wl_units = metadict['ENVI'].get('wavelength units', metadict['ENVI'].get('wavelength_units'))
+                    if wl_units is None:
+                        raise KeyError('wavelength_units')
                     if wl_units.lower() in ['nanometers', 'nm', 'nanometer']:  # any of these is accepted
                         wave_convert = 1  # factor is 1, as the method expects nm anyway
                     elif wl_units.lower() in ['micrometers', 'µm', 'micrometer']:
