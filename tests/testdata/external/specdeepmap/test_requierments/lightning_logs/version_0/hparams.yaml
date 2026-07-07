@@ -682,7 +682,7 @@ train_data: !!python/object:pandas.core.frame.DataFrame
   _metadata: &id007 []
   _mgr: !!python/object/apply:pandas.core.internals.managers.BlockManager
   - !!python/tuple
-    - !!python/object/apply:pandas._libs.internals._unpickle_block
+    - !!python/object/apply:pandas._libs.internals._unskops_block
       - !!python/object/apply:numpy.core.multiarray._reconstruct
         args:
         - &id004 !!python/name:numpy.ndarray ''
@@ -776,7 +776,7 @@ val_data: !!python/object:pandas.core.frame.DataFrame
   _metadata: *id007
   _mgr: !!python/object/apply:pandas.core.internals.managers.BlockManager
   - !!python/tuple
-    - !!python/object/apply:pandas._libs.internals._unpickle_block
+    - !!python/object/apply:pandas._libs.internals._unskops_block
       - !!python/object/apply:numpy.core.multiarray._reconstruct
         args:
         - *id004

@@ -111,7 +111,7 @@ class TestClassificationPerformanceStratifiedAlgorithm(TestCase):
             alg.P_OPEN_REPORT: self.openReport,
             alg.P_OUTPUT_REPORT: self.filename('report.html'),
         }
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)
 
     def test_twoClass(self):
         Forest = 1

@@ -20,7 +20,7 @@ class TestRandomPointsFromCategorizedRasterAlgorithm(TestCase):
             alg.P_SEED: 42,
             alg.P_OUTPUT_POINTS: self.filename('points.gpkg')
         }
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)
         self.assertEqual(26317, QgsVectorLayer(parameters[alg.P_OUTPUT_POINTS]).featureCount())
 
     def test_kernel(self):
@@ -45,4 +45,4 @@ class TestRandomPointsFromCategorizedRasterAlgorithm(TestCase):
             alg.P_SEED: 42,
             alg.P_OUTPUT_POINTS: self.filename('points.gpkg')
         }
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)

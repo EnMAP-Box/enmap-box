@@ -24,7 +24,7 @@ class MergeClassificationDatasetsAlgorithm(EnMAPProcessingAlgorithm):
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
             (self._DATASETS, 'Classification datasets to be merged.'),
-            (self._OUTPUT_DATASET, self.PickleFileDestination)
+            (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
     def group(self):
@@ -32,12 +32,12 @@ class MergeClassificationDatasetsAlgorithm(EnMAPProcessingAlgorithm):
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterMultipleLayers(self.P_DATASETS, self._DATASETS, QgsProcessing.TypeFile, None)
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
-        pklFilenames = self.parameterAsFileList(parameters, self.P_DATASETS, context)
+        skopsFilenames = self.parameterAsFileList(parameters, self.P_DATASETS, context)
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_DATASET, context)
 
         with open(filename + '.log', 'w') as logfile:
@@ -46,11 +46,11 @@ class MergeClassificationDatasetsAlgorithm(EnMAPProcessingAlgorithm):
 
             # read all datasets
             dumps = list()
-            for pklFilename in pklFilenames:
+            for skopsFilename in skopsFilenames:
                 try:
-                    dumps.append(ClassifierDump.fromDict(Utils.pickleLoad(pklFilename)))
+                    dumps.append(ClassifierDump.fromDict(Utils.modelLoad(skopsFilename)))
                 except Exception:
-                    raise QgsProcessingException(f'invalid classification dataset: {pklFilename}')
+                    raise QgsProcessingException(f'invalid classification dataset: {skopsFilename}')
 
             # Check if each dataset contains the same category names.
             # If so, the resulting categories will match input categories.
@@ -76,7 +76,7 @@ class MergeClassificationDatasetsAlgorithm(EnMAPProcessingAlgorithm):
             y = np.concatenate([dump.y for dump in dumps])
             dump = ClassifierDump(categories=categories, features=features, X=X, y=y)
             dumpDict = dump.__dict__
-            Utils.pickleDump(dumpDict, filename)
+            Utils.modelDump(dumpDict, filename)
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)
 

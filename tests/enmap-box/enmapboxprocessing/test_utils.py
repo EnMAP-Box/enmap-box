@@ -184,7 +184,7 @@ class TestUtils(TestCase):
 
     def test_categoriesFromCategorizedSymbolRenderer(self):
         layer = QgsVectorLayer(landcover_polygon)
-        fieldName = layer.renderer().classAttribute()
+        # fieldName = layer.renderer().classAttribute()
         categories = Utils.categoriesFromCategorizedSymbolRenderer(layer.renderer())
         self.assertEqual(6, len(categories))
         self.assertListEqual(
@@ -487,11 +487,11 @@ class TestUtils(TestCase):
         self.assertEqual('test.abc', Utils.sidecarFilename('test.tif', '.abc'))
         self.assertEqual('test.tif.abc', Utils.sidecarFilename('test.tif', '.abc', False))
 
-    def test_pickleDump_andLoad(self):
+    def test_modelDump_andLoad(self):
         obj = dict(a=1, b='text')
-        filename = self.filename('dump.pkl')
-        Utils.pickleDump(obj, filename)
-        self.assertDictEqual(obj, Utils.pickleLoad(filename))
+        filename = self.filename('dump.skops')
+        Utils.modelDump(obj, filename)
+        self.assertDictEqual(obj, Utils.modelLoad(filename))
 
     def test_jsonDump_andLoad(self):
         obj = dict(a=1, b='text')

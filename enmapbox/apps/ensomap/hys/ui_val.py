@@ -1,25 +1,26 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright © 2019 / Dr. Stéphane Guillaso
-# Licensed under the terms of the 
+# Licensed under the terms of the
 # (see ../LICENSE.md for details)
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-import numpy as np
-import time
-import hys
 import os
-import csv
+import time
+
+from ensomap import hys
+import numpy as np
+from qgis.PyQt.QtWidgets import QButtonGroup
+
+from qgis.PyQt import Qt
+
 
 class ui_val:
 
     def __init__(self, parent=None):
         super(ui_val, self).__init__(parent=parent)
-    
+
     def insert_val(self, dname):
-        
+
         # self.val_soil_prod = []
         self.val_soil_dname = dname
         self.val_csv_fname = None
@@ -30,8 +31,7 @@ class ui_val:
 
         # =========================================================================================
         # CREATE THE TAB: SOIL CALIBRATING
-        self.gui.widget_tab_page(title = 'Validate')
-
+        self.gui.widget_tab_page(title='Validate')
 
         # -----------------------------------------------------------------------------------------
         # GROUP BOX: INPUT
@@ -43,11 +43,11 @@ class ui_val:
         self.gui.widget_list(ID='val_list_calibrated_soil_product')
         self.gui.widget_column(alignment=Qt.AlignTop)
         width = 50
-        self.gui.widget_tool_button(text='Add'   , width=width, action=self.val_add_soil)
+        self.gui.widget_tool_button(text='Add', width=width, action=self.val_add_soil)
         self.gui.widget_tool_button(text='Remove', width=width, action=self.val_rem_soil)
-        self.gui.widget_tool_button(text='Up',     width=width, action=self.val_up__soil)
-        self.gui.widget_tool_button(text='Down',   width=width, action=self.val_dwn_soil)
-        self.gui.widget_tool_button(text='Clear',  width=width, action=self.val_clr_soil)
+        self.gui.widget_tool_button(text='Up', width=width, action=self.val_up__soil)
+        self.gui.widget_tool_button(text='Down', width=width, action=self.val_dwn_soil)
+        self.gui.widget_tool_button(text='Clear', width=width, action=self.val_clr_soil)
         self.gui.widget_column_close()
         self.gui.widget_row_close()
 
@@ -90,8 +90,8 @@ class ui_val:
         # GROUP BOX: PARAMETER
         self.gui.widget_add_spacing(10)
         self.gui.widget_group_box('PARAMETER')
-        self.gui.widget_row(ID = 'val_group2', alignment=Qt.AlignLeft)
-        self.gui.widget_label(text = 'Average window size')
+        self.gui.widget_row(ID='val_group2', alignment=Qt.AlignLeft)
+        self.gui.widget_label(text='Average window size')
         valGroupPrms = QButtonGroup(self.gui.gui['val_group2'])
         self.gui.widget_radio_button('1x1', group=valGroupPrms, ID='val_1x1')
         self.gui.widget_radio_button('3x3', group=valGroupPrms, ID='val_3x3', default=True)
@@ -109,13 +109,9 @@ class ui_val:
         # self.gui.widget_push_button('Plot results...')
         self.gui.widget_group_box_close()
 
-
         # =========================================================================================
         # CLOSE THE TAB: SOIL MAPPING
         self.gui.widget_tab_page_close()
-
-
-
 
     ###############################################################################################
     #
@@ -132,14 +128,11 @@ class ui_val:
             status, soil = hys.data().open(filename)
             if status is False:
                 continue
-            if type(soil) != hys.product:
+            if type(soil) is not hys.product:
                 continue
             self.gui.gui['val_list_calibrated_soil_product'].addItem(filename)
             dname = os.path.dirname(filename)
         self.val_soil_dname = dname
-
-
-
 
     ###############################################################################################
     #
@@ -152,9 +145,6 @@ class ui_val:
         curRow = self.gui.gui['val_list_calibrated_soil_product'].currentRow()
         self.gui.gui['val_list_calibrated_soil_product'].takeItem(curRow)
 
-
-
-
     ###############################################################################################
     #
     # MOVE SELECTED ITEM UP
@@ -162,11 +152,8 @@ class ui_val:
     ###############################################################################################
     def val_up__soil(self):
         curRow = self.gui.gui['val_list_calibrated_soil_product'].currentRow()
-        item = self.gui.gui['val_list_calibrated_soil_product'].takeItem(curRow-1)
+        item = self.gui.gui['val_list_calibrated_soil_product'].takeItem(curRow - 1)
         self.gui.gui['val_list_calibrated_soil_product'].insertItem(curRow, item)
-
-
-
 
     ###############################################################################################
     #
@@ -175,11 +162,8 @@ class ui_val:
     ###############################################################################################
     def val_dwn_soil(self):
         curRow = self.gui.gui['val_list_calibrated_soil_product'].currentRow()
-        item = self.gui.gui['val_list_calibrated_soil_product'].takeItem(curRow+1)
+        item = self.gui.gui['val_list_calibrated_soil_product'].takeItem(curRow + 1)
         self.gui.gui['val_list_calibrated_soil_product'].insertItem(curRow, item)
-
-
-
 
     ###############################################################################################
     #
@@ -188,9 +172,6 @@ class ui_val:
     ###############################################################################################
     def val_clr_soil(self):
         self.gui.gui['val_list_calibrated_soil_product'].clear()
-
-
-
 
     ###############################################################################################
     #
@@ -202,9 +183,6 @@ class ui_val:
         if self.val_csv_data.fname is not None:
             dname = os.path.dirname(self.val_csv_data.fname)
         self.val_csv = hys.gui.CSV(dname, self, 'val_but_csv_load', 'val_lab_csv', self.val_csv_data)
-
-
-
 
     ###############################################################################################
     #
@@ -223,9 +201,6 @@ class ui_val:
         self.val_csv_out = filename
         self.gui.gui['val_text_out_fname'].setText(filename)
 
-
-
-
     ###############################################################################################
     #
     # VALIDATE DATA
@@ -238,12 +213,12 @@ class ui_val:
         if n_item == 0:
             hys.display_error(self, 'Select one soil product (at least)')
             return
-        
+
         # check if an input csv file is present
         if self.val_csv_data.rows == []:
             hys.display_error(self, 'Select a csv file')
             return
-        
+
         # check if an output file is present
         if self.val_csv_out is None:
             hys.display_error(self, 'Select a output csv file')
@@ -252,7 +227,8 @@ class ui_val:
         # check if number of input file are corresponding to the number of reference element to be calculated
         n_cols = self.val_csv_data.n_cols
         if n_item != (n_cols - 3):
-            hys.display_error(self, 'Number of files ('+str(n_item)+') does not fit with number of element ('+str(n_cols-3)+').')
+            hys.display_error(self, 'Number of files (' + str(n_item) + ') does not fit with number of element (' + str(
+                n_cols - 3) + ').')
             return
 
         # get array with filename
@@ -265,47 +241,52 @@ class ui_val:
             map_info = prods[0].meta['map info']
         else:
             map_info = None
-        
+
         # get the image dimensions
         dim = [prods[0].samples, prods[0].lines]
 
         # get win size
-        if   self.gui.gui['val_1x1'].isChecked(): wsize = 1
-        elif self.gui.gui['val_3x3'].isChecked(): wsize = 3
-        elif self.gui.gui['val_5x5'].isChecked(): wsize = 5
-        else:                                     wsize = 7
+        if self.gui.gui['val_1x1'].isChecked():
+            wsize = 1
+        elif self.gui.gui['val_3x3'].isChecked():
+            wsize = 3
+        elif self.gui.gui['val_5x5'].isChecked():
+            wsize = 5
+        else:
+            wsize = 7
 
         t1 = time.time()
         ofile = open(self.val_csv_out, "w")
 
         # we suppose that we have an header
         first_line = [self.val_csv_data.hrows[0]]
-        for k in range(n_cols-3):
-            first_line.append(self.val_csv_data.hrows[k+3])
-            first_line.append('Estimated ' + self.val_csv_data.hrows[k+3])
+        for k in range(n_cols - 3):
+            first_line.append(self.val_csv_data.hrows[k + 3])
+            first_line.append('Estimated ' + self.val_csv_data.hrows[k + 3])
         s = ", "
         first_line = s.join(first_line)
-        ofile.write(first_line+"\n")
+        ofile.write(first_line + "\n")
         n_rows = np.int64(self.val_csv_data.n_rows)
         self.gui.gui['cal_prog_bar'].setMinimum(0)
         self.gui.gui['cal_prog_bar'].setMaximum(n_rows)
         for k in range(n_rows):
-            self.gui.gui['cal_prog_bar'].setValue(k+1)
+            self.gui.gui['cal_prog_bar'].setValue(k + 1)
             xpos = np.float32(self.val_csv_data.rows[k][1])
             ypos = np.float32(self.val_csv_data.rows[k][2])
             status, box = hys.coord2pts(xpos, ypos, map_info, dim, wsize)
-            if status is False: continue
+            if status is False:
+                continue
             line = [self.val_csv_data.rows[k][0]]
             for n in range(n_item):
                 im = np.mean(prods[n].read(BLOCK=box))
-                line.append(self.val_csv_data.rows[k][n+3])
+                line.append(self.val_csv_data.rows[k][n + 3])
                 line.append(str(im))
             s = ", "
             line = s.join(line) + "\n"
-            ofile.write(line)            
-        
+            ofile.write(line)
+
         ofile.close()
-        
-        msg = "Processing complele in %8.2f seconds"%(time.time() - t1)
+
+        msg = "Processing complele in %8.2f seconds" % (time.time() - t1)
         hys.display_information(self, msg)
         self.gui.gui['cal_prog_bar'].setValue(0)

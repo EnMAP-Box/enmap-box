@@ -1,15 +1,15 @@
-import xml.etree.ElementTree as ET
 from copy import deepcopy
 from os import makedirs
 from os.path import exists, dirname
 from pathlib import Path
 from typing import List
 
+import defusedxml.ElementTree as ET
 from osgeo import gdal
-from qgis.core import QgsRectangle, QgsProcessingFeedback
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
+from qgis.core import QgsRectangle, QgsProcessingFeedback
 
 
 @typechecked
@@ -17,7 +17,7 @@ class GdalUtils(object):
 
     @staticmethod
     def calculateDefaultHistrogram(
-            ds: gdal.Dataset, buckets=256, inMemory=False, feedback: QgsProcessingFeedback = None
+        ds: gdal.Dataset, buckets=256, inMemory=False, feedback: QgsProcessingFeedback = None
     ):
         if feedback is not None:
             feedback.pushInfo('calculate histograms')
@@ -114,13 +114,17 @@ class GdalUtils(object):
 
     @staticmethod
     def stackBands(
-            filename: str, filenames: List[str], bandNumbers: List[List[int]] = None, width: int = None,
-            height: int = None, extent: QgsRectangle = None
+        filename: str, filenames: List[str], bandNumbers: List[List[int]] = None, width: int = None,
+        height: int = None, extent: QgsRectangle = None
     ):
 
-        if bandNumbers is not None:
-            assert len(filenames) == len(bandNumbers)
-        assert len(filenames) > 0
+        if bandNumbers is not None and len(filenames) != len(bandNumbers):
+            raise ValueError(
+                f'filenames and bandNumbers must have the same length, '
+                f'got {len(filenames)} and {len(bandNumbers)}'
+            )
+        if len(filenames) == 0:
+            raise ValueError('filenames must not be empty')
 
         reader0 = RasterReader(filenames[0])
         if width is None:

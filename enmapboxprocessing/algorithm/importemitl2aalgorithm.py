@@ -47,8 +47,7 @@ class ImportEmitL2AAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterRasterDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 
     def isValidFile(self, file: str) -> bool:
-        return basename(file).startswith('EMIT_L2A_RFL') & \
-               basename(file).endswith('.nc')
+        return basename(file).startswith('EMIT_L2A_RFL') & basename(file).endswith('.nc')
 
     def defaultParameters(self, ncFilename: str):
         return {

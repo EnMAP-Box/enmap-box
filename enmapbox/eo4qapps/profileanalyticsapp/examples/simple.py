@@ -1,16 +1,15 @@
 from typing import List
 
 import numpy as np
+import pyqtgraph as pg
+
+from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyle, MarkerSymbol
+from profileanalyticsapp.profileanalyticsdockwidget import Profile
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
 
-import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
-from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyle, MarkerSymbol
-from profileanalyticsapp.profileanalyticsdockwidget import Profile
-
 
 def updatePlot(profile: Profile, profiles: List[Profile], plotWidget: pg.PlotItem):
-
     # plot a point
     x = [np.mean(profile.xValues)]
     y = [np.mean(profile.yValues)]

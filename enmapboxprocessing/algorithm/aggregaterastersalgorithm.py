@@ -189,16 +189,16 @@ class AggregateRastersAlgorithm(EnMAPProcessingAlgorithm):
                         elif functionIndex == self.AllTrueFunction:
                             outarray = np.all(arrayAsBool, axis=0).astype(np.float32)
                         elif functionIndex == self.ArgMinimumFunction:
-                            # Numpy nanargmin will throw an All-NaN slice encountered ValueError, instead of just a warning.
-                            # Append a inf band to prevent this.
+                            # Numpy nanargmin will throw an All-NaN slice encountered ValueError,
+                            # instead of just a warning. Append a inf band to prevent this.
                             array2 = list(array)
                             array2.append(np.full_like(array[0], inf))
                             outarray = np.nanargmin(array2, axis=0).astype(np.float32)
                             # Now, set All-NaN slice pixel to nan.
                             outarray[outarray == len(array)] = nan
                         elif functionIndex == self.ArgMaximumFunction:
-                            # Numpy nanargmax will throw an All-NaN slice encountered ValueError, instead of just a warning.
-                            # Append a -inf band to prevent this.
+                            # Numpy nanargmax will throw an All-NaN slice encountered ValueError,
+                            # instead of just a warning. Append a -inf band to prevent this.
                             array2 = list(array)
                             array2.append(np.full_like(array[0], -inf))
                             outarray = np.nanargmax(array2, axis=0).astype(np.float32)

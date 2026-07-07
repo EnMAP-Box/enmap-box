@@ -17,7 +17,7 @@ class TestImportEmitL2AAlgorithm(TestCase):
             alg.P_OUTPUT_RASTER: self.filename('emitL2A_allBands.tif'),
         }
 
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)
         self.assertEqual(285, RasterReader(parameters[alg.P_OUTPUT_RASTER]).bandCount())
 
     def test_goodBands(self):
@@ -31,5 +31,5 @@ class TestImportEmitL2AAlgorithm(TestCase):
             alg.P_OUTPUT_RASTER: self.filename('emitL2A_goodBands.tif'),
         }
 
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)
         self.assertEqual(244, RasterReader(parameters[alg.P_OUTPUT_RASTER]).bandCount())

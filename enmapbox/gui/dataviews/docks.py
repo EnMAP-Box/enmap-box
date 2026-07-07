@@ -20,27 +20,30 @@
 import codecs
 import os
 import re
+import sys
 from math import ceil
-from typing import List, Optional
+from pathlib import Path
+from typing import List, Optional, Union
 
-from enmapbox.gui import SpectralLibraryWidget
+from pyqtgraph.dockarea import DockArea as pgDockArea
+from pyqtgraph.dockarea.Dock import Dock as pgDock
+from pyqtgraph.dockarea.Dock import DockLabel as pgDockLabel
+from pyqtgraph.dockarea.DockArea import TempAreaWindow
+
 from enmapbox.gui.mapcanvas import MapCanvas, CanvasLink
 from enmapbox.gui.mimedata import extractMapLayers
 from enmapbox.gui.utils import enmapboxUiPath
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea import DockArea as pgDockArea
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.Dock import Dock as pgDock
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.Dock import DockLabel as pgDockLabel
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.DockArea import TempAreaWindow
 from enmapbox.qgispluginsupport.qps.speclib.core import profile_fields
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
+from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.utils import loadUi
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtCore import pyqtSignal, QSettings, Qt, QMimeData, QPoint, QUrl, QObject, QSize, QByteArray, QMetaType
 from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QResizeEvent, \
     QContextMenuEvent, QTextCursor
-from qgis.PyQt.QtWidgets import QToolButton, QMenu, QMainWindow, QFileDialog, QWidget, QMessageBox, QWidgetItem, \
-    QApplication, QStyle, QProgressBar, QTextEdit
+from qgis.PyQt.QtWidgets import QToolButton, QMenu, QMainWindow, QFileDialog, QWidget, QMessageBox, QApplication, \
+    QStyle, QProgressBar, QTextEdit
 from qgis.core import QgsCoordinateReferenceSystem, QgsMapLayer, QgsProject, edit, QgsField, QgsLayerTree, \
     QgsLayerTreeLayer, QgsVectorLayer
 from qgis.gui import QgsMapCanvas
@@ -82,9 +85,8 @@ class Dock(pgDock):
             # self.topLayout.addWidget(self.label, 0, 1)
             newLabel = self._createLabel(title=title)
             oldLabel = self.label
-            widgetItem = self.topLayout.replaceWidget(oldLabel, newLabel)
+            # widgetItem: QWidgetItem = self.topLayout.replaceWidget(oldLabel, newLabel)
             oldLabel.setParent(None)
-            assert isinstance(widgetItem, QWidgetItem)
             self.label = newLabel
             if closable:
                 self.label.sigCloseClicked.connect(self.close)
@@ -172,10 +174,10 @@ class Dock(pgDock):
         self.hStyle += style
         self.vStyle += style
 
-    def setEnMAPBox(self, enmapBox: 'EnMAPBox'):
+    def setEnMAPBox(self, enmapBox):
         self.mEnMAPBox = enmapBox
 
-    def enmapBox(self) -> 'EnMAPBox':
+    def enmapBox(self):
         return self.mEnMAPBox
 
     def addTempArea(self):
@@ -226,8 +228,6 @@ class DockArea(pgDockArea):
         super(DockArea, self).__init__(*args, **kwds)
         self.setAcceptDrops(True)
 
-        s = ""
-
     def makeContainer(self, typ):
         c = super(DockArea, self).makeContainer(typ)
         # c.apoptose = lambda x : DockArea.containerApoptose(c, x)
@@ -257,15 +257,13 @@ class DockArea(pgDockArea):
 
     def fixDock(self, dock):
 
-        s = ""
+        pass
     """
 
-    def floatDock(self, dock):
+    def floatDock(self, dock: Dock):
         """Removes *dock* from this DockArea and places it in a new window."""
-        assert isinstance(dock, Dock)
 
         dockLabel: DockLabel = dock.label
-        assert isinstance(dockLabel, DockLabel)
 
         lastArea = dock.area
         super().floatDock(dock)
@@ -294,8 +292,8 @@ class DockArea(pgDockArea):
                     self.home.removeTempArea(self)
             else:
                 pass
-        except Exception as ex:
-            pass
+        except Exception:
+            self.topContainer = None
 
     sigDockAdded = pyqtSignal(Dock)
     sigDockRemoved = pyqtSignal(Dock)
@@ -312,8 +310,14 @@ class DockArea(pgDockArea):
         #  print "added temp area", area, area.window()
         return area
 
-    def addDock(self, dock: pgDock, position='bottom', relativeTo=None, **kwds) -> Dock:
-        assert isinstance(dock, (Dock, pgDock))
+    def addDock(
+        self,
+        dock: Union[pgDock, Dock],
+        position: str = 'bottom',
+        relativeTo=None,
+        **kwds
+    ) -> Optional[Dock]:
+
         if hasattr(dock, 'orig_area'):
             dock.label.btnUnFloat.setVisible(dock.orig_area != self)
 
@@ -324,7 +328,7 @@ class DockArea(pgDockArea):
             dock.setVisible(visibility)
             self.sigDockAdded.emit(dock)
         except Exception as ex:
-            pass
+            print(f'Failed to add dock:\n{ex}', file=sys.stderr)
         return v
 
     # forward to EnMAPBox
@@ -353,12 +357,12 @@ class DockLabel(pgDockLabel):
     sigContextMenuRequest = pyqtSignal(QContextMenuEvent)
 
     def __init__(self,
-                 dock,
-                 title: str = None,
+                 dock: Dock,
+                 title: Optional[str] = None,
                  allow_floating: bool = True,
                  showClosebutton: bool = True,
                  fontSize: int = 8):
-        assert isinstance(dock, Dock)
+
         if title is None:
             title = dock.title()
 
@@ -395,8 +399,7 @@ class DockLabel(pgDockLabel):
         self.progressBar.hide()
         self.update()
 
-    def contextMenuEvent(self, event):
-        assert isinstance(event, QContextMenuEvent)
+    def contextMenuEvent(self, event: QContextMenuEvent):
         self.sigContextMenuRequest.emit(event)
 
     # def mouseMoveEvent(self, ev):
@@ -455,7 +458,6 @@ class MimeDataTextEdit(QTextEdit):
         Shows the QMimeData information
         :param mimeData: QMimeData
         """
-        assert isinstance(mimeData, QMimeData)
         formats = [str(f) for f in mimeData.formats()]
         self.mCurrentMimeData = mimeData
         self.clear()
@@ -520,7 +522,7 @@ class MimeDataDockWidget(QWidget):
             path, filter = QFileDialog.getSaveFileName(self, 'Save file...',
                                                        directory=self.mFile,
                                                        filter=TextDockWidget.FILTERS)
-            s = ""
+
             if len(path) > 0:
                 self.mFile = path
 
@@ -608,14 +610,14 @@ class TextDockWidget(QWidget):
         else:
             return self.mFile
 
-    def loadFile(self, path, *args):
+    def loadFile(self, path: Union[str, Path], *args):
         """
         Loads a text file from `path`
         :param path: str
         """
-        if os.path.isfile(path):
+        path = Path(path)
+        if path.is_file():
             data = None
-
             statinfo = os.stat(path)
             if statinfo.st_size > self.nMaxBytes:
                 info = 'Files {} is > {} bytes'.format(path, self.nMaxBytes)
@@ -623,15 +625,9 @@ class TextDockWidget(QWidget):
                 result = QMessageBox.warning(self, 'Warning', info, QMessageBox.Yes, QMessageBox.Cancel)
                 if result != QMessageBox.Yes:
                     return
-            try:
-                with open(path, 'r', 'utf-8') as file:
-                    data = ''.join(file.readlines())
-            except Exception as ex:
-                try:
-                    with open(path, 'r') as file:
-                        data = ''.join(file.readlines())
-                except Exception as ex:
-                    pass
+
+            with open(path, 'r') as file:
+                data = ''.join(file.readlines())
 
             ext = os.path.splitext(path)[-1].lower()
             if data is not None:
@@ -692,12 +688,12 @@ class TextDockWidget(QWidget):
             path, filter = QFileDialog.getSaveFileName(self, 'Save file...',
                                                        directory=self.mFile,
                                                        filter=TextDockWidget.FILTERS)
-            s = ""
+
             if len(path) > 0:
                 self.mFile = path
 
         if self.mFile is not None and len(self.mFile) > 0:
-            ext = os.path.splitext(self.mFile)[-1].lower()
+            # ext = os.path.splitext(self.mFile)[-1].lower()
 
             with codecs.open(self.mFile, 'w', 'utf-8') as file:
                 file.write(self.mTextEdit.toPlainText())
@@ -817,7 +813,7 @@ class SpectralLibraryDock(Dock):
         # self.mSpeclibWidget.spectralLibraryPlotWidget().optionShowVisualizationSettings.setChecked(False)
         # self.mSpeclibWidget.sigLoadFromMapRequest.connect(self.sigLoadFromMapRequest)
         self.layout.addWidget(self.mSpeclibWidget)
-        s = ""
+
         # speclib: QgsVectorLayer = self.mSpeclibWidget.speclib()
         # name = kwds.get('name')
         # if isinstance(name, str):
@@ -956,7 +952,7 @@ class MapDock(Dock):
     sigRenderStateChanged = pyqtSignal()  # used by the progress bar
 
     def __init__(self, *args, **kwds):
-        initSrc = kwds.pop('initSrc', None)
+        # initSrc = kwds.pop('initSrc', None)
         super(MapDock, self).__init__(*args, **kwds)
         self.mBaseName = self.title()
 
@@ -969,7 +965,6 @@ class MapDock(Dock):
         self.sigTitleChanged.connect(self.mCanvas.setWindowTitle)
 
         settings = QSettings()
-        assert isinstance(self.mCanvas, QgsMapCanvas)
         self.mCanvas.setCanvasColor(Qt.black)
         self.mCanvas.enableAntiAliasing(settings.value('/qgis/enable_anti_aliasing', False, type=bool))
         self.layout.addWidget(self.mCanvas)
@@ -1026,16 +1021,14 @@ class MapDock(Dock):
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-            s = ""
+            pass
         else:
             super(MapDock, self).mousePressEvent(event)
 
     def linkWithMapDock(self, mapDock: 'MapDock', linkType=CanvasLink.LINK_ON_CENTER_SCALE) -> CanvasLink:
-        assert isinstance(mapDock, MapDock)
         return self.linkWithCanvas(mapDock.mCanvas, linkType)
 
     def linkWithCanvas(self, canvas: QgsMapCanvas, linkType=CanvasLink.LINK_ON_CENTER_SCALE) -> CanvasLink:
-        assert isinstance(canvas, QgsMapCanvas)
         return self.mapCanvas().createCanvasLink(canvas, linkType)
 
     def addLayers(self, layers: List[QgsMapLayer]):

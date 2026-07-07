@@ -1,7 +1,6 @@
 from qgis.core import QgsVectorLayer, QgsProcessingException
 
 from enmapbox import initAll
-from enmapbox.qgispluginsupport.qps.qgsrasterlayerproperties import QgsRasterLayerSpectralProperties
 from enmapboxprocessing.algorithm.libraryfromregressiondatasetalgorithm import LibraryFromRegressionDatasetAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousvectoralgorithm import \
     PrepareRegressionDatasetFromContinuousVectorAlgorithm
@@ -20,9 +19,9 @@ class TestPrepareRegressionDatasetFromContinuousVectorAlgorithm_2(TestCase):
 
         alg = PrepareRegressionDatasetFromContinuousVectorAlgorithm()
         parameters = {alg.P_FEATURE_RASTER: enmap, alg.P_CONTINUOUS_VECTOR: fraction_point_multitarget,
-                      alg.P_OUTPUT_DATASET: self.filename('sample.pkl')}
+                      alg.P_OUTPUT_DATASET: self.filename('sample.skops')}
         self.runalg(alg, parameters)
-        dump = RegressorDump.fromDict(Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = RegressorDump.fromDict(Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((51, 177), dump.X.shape)
         self.assertEqual((51, 6), dump.y.shape)
         self.assertEqual(177, len(dump.features))
@@ -32,7 +31,7 @@ class TestPrepareRegressionDatasetFromContinuousVectorAlgorithm_2(TestCase):
 
         # check locations
         alg = LibraryFromRegressionDatasetAlgorithm()
-        parameters = {alg.P_DATASET: self.filename('sample.pkl'), alg.P_OUTPUT_LIBRARY: self.filename('library.gpkg')}
+        parameters = {alg.P_DATASET: self.filename('sample.skops'), alg.P_OUTPUT_LIBRARY: self.filename('library.gpkg')}
         self.runalg(alg, parameters)
         self.assertEqual(384027,
                          round(QgsVectorLayer(
@@ -41,9 +40,9 @@ class TestPrepareRegressionDatasetFromContinuousVectorAlgorithm_2(TestCase):
     def test_styled_singletarget(self):
         alg = PrepareRegressionDatasetFromContinuousVectorAlgorithm()
         parameters = {alg.P_FEATURE_RASTER: enmap, alg.P_CONTINUOUS_VECTOR: fraction_point_singletarget,
-                      alg.P_OUTPUT_DATASET: self.filename('sample.pkl')}
+                      alg.P_OUTPUT_DATASET: self.filename('sample.skops')}
         self.runalg(alg, parameters)
-        dump = RegressorDump.fromDict(Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = RegressorDump.fromDict(Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((51, 177), dump.X.shape)
         self.assertEqual((51, 1), dump.y.shape)
         self.assertEqual(177, len(dump.features))
@@ -53,7 +52,7 @@ class TestPrepareRegressionDatasetFromContinuousVectorAlgorithm_2(TestCase):
     def test_wrong_style(self):
         alg = PrepareRegressionDatasetFromContinuousVectorAlgorithm()
         parameters = {alg.P_FEATURE_RASTER: enmap, alg.P_CONTINUOUS_VECTOR: landcover_polygon,
-                      alg.P_OUTPUT_DATASET: self.filename('sample.pkl')}
+                      alg.P_OUTPUT_DATASET: self.filename('sample.skops')}
         try:
             self.runalg(alg, parameters)
         except QgsProcessingException as error:
@@ -62,13 +61,11 @@ class TestPrepareRegressionDatasetFromContinuousVectorAlgorithm_2(TestCase):
     def test_excludeBadBands(self):
         alg = PrepareRegressionDatasetFromContinuousVectorAlgorithm()
 
-        props = QgsRasterLayerSpectralProperties.fromRasterLayer(enmap_potsdam)
-        s = ""
         parameters = {alg.P_FEATURE_RASTER: enmap_potsdam, alg.P_CONTINUOUS_VECTOR: veg_cover_fraction_potsdam_point,
                       alg.P_TARGET_FIELDS: ['vegetation_fraction'], alg.P_EXCLUDE_BAD_BANDS: True,
-                      alg.P_OUTPUT_DATASET: self.filename('sample.pkl')}
+                      alg.P_OUTPUT_DATASET: self.filename('sample.skops')}
         self.runalg(alg, parameters)
-        dump = RegressorDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = RegressorDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual(218, dump.X.shape[1])
         self.assertEqual(218, len(dump.features))
 
@@ -76,8 +73,8 @@ class TestPrepareRegressionDatasetFromContinuousVectorAlgorithm_2(TestCase):
         alg = PrepareRegressionDatasetFromContinuousVectorAlgorithm()
         parameters = {alg.P_FEATURE_RASTER: enmap_potsdam, alg.P_CONTINUOUS_VECTOR: landcover_potsdam_point,
                       alg.P_TARGET_FIELDS: ['level_1', 'level_2'], alg.P_EXCLUDE_BAD_BANDS: False,
-                      alg.P_OUTPUT_DATASET: self.filename('sample.pkl')}
+                      alg.P_OUTPUT_DATASET: self.filename('sample.skops')}
         self.runalg(alg, parameters)
-        dump = RegressorDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = RegressorDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual(224, dump.X.shape[1])
         self.assertEqual(224, len(dump.features))

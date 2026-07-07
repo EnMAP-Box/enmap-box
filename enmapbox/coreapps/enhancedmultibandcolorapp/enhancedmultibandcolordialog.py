@@ -1,8 +1,10 @@
+from contextlib import suppress
 from random import randint
 from typing import Optional, List, Tuple
 
+from pyqtgraph import PlotWidget
+
 from enhancedmultibandcolorapp.enhancedmultibandcolorrenderer import EnhancedMultiBandColorRenderer
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
@@ -58,10 +60,8 @@ class EnhancedMultiBandColorDialog(QMainWindow):
 
         # disconnect old map canvas
         if self.mMapCanvas is not None:
-            try:
+            with suppress(Exception):
                 self.mMapCanvas.extentsChanged.disconnect(self.onMapCanvasExtentsChanged)
-            except Exception:
-                pass
 
         # connect new map canvas
         self.mMapCanvas = None
@@ -92,7 +92,11 @@ class EnhancedMultiBandColorDialog(QMainWindow):
         self.mTable.setRowCount(layer.bandCount())
         for row, color in enumerate(colors):
             if color is None:
-                color = QColor(randint(0, 255), randint(0, 255), randint(0, 255))
+                color = QColor(
+                    randint(0, 255),  # nosec B311 # no-security relevant random sampling
+                    randint(0, 255),  # nosec B311 # no-security relevant random sampling
+                    randint(0, 255)  # nosec B311 # no-security relevant random sampling
+                )
             if color.alpha() == 255:
                 checkState = Qt.Checked
             else:

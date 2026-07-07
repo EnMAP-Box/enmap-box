@@ -1,13 +1,11 @@
+from enmapbox.apps.SpecDeepMap.core_dataset_maker import create_train_validation_csv_balance
 from qgis.PyQt.QtCore import QCoreApplication
-from qgis._core import QgsProcessingParameterDefinition
 from qgis.core import (QgsProcessingAlgorithm,
                        QgsProcessingParameterFile,
                        QgsProcessingParameterNumber,
-    # QgsProcessingParameterFolder,
                        QgsProcessingParameterFolderDestination,
                        QgsProcessingParameterBoolean)
-
-from enmapbox.apps.SpecDeepMap.core_dataset_maker import create_train_validation_csv_balance
+from qgis.core import QgsProcessingParameterDefinition
 
 
 class DatasetMaker(QgsProcessingAlgorithm):
@@ -52,9 +50,6 @@ class DatasetMaker(QgsProcessingAlgorithm):
         """
         return QCoreApplication.translate('Processing', string)
 
-    def createInstance(self):
-        return DatasetMaker()
-
     def name(self):
         """
         Returns the algorithm name, used for identifying the algorithm. This
@@ -90,37 +85,56 @@ class DatasetMaker(QgsProcessingAlgorithm):
         return 'SpecDeepMap'
 
     def shortHelpString(self):
-        """
-        Returns a localised short helper string for the algorithm. This string
-        should provide a basic description about what the algorithm does and the
-        parameters and outputs associated with it..
-        """
-        return self.tr("Example algorithm short description")
-
-    def shortHelpString(self):
-        html = '' \
-               '<p>This algorithm creates training, validation and test datasets in CSV format. Each created dataset consists of images and their corresponding labels. The data can be split by default in 80% training, 10 % validation dataset, 10 % test dataset. The algorithm aims to achieve an equal class distribution with a deviation of 1 % per class per dataset, for this a wasserstein distance and the permutatation is used. The algorith further generates a summary of class counts per dataset as well as there percentage and to calculate class weights.Additionaly the algorithm can calculate mean and standard deviation,per channel in the train dataset which can be used for data normalization during training.</p>' \
-               '<h3>Data folder</h3>' \
-               '<p>Folder which contains an image chip folder and corresponding label chip folder.</p>' \
-               '<h3>Percentage of train images</h3>' \
-               '<p>Defines how much percentage of the data is used as train dataset. </p>' \
-               '<h3>Percentage of validation images</h3>' \
-               '<p>Defines how much percentage of the data is used as validation dataset.</p>' \
-               '<h3>Percentage of test images</h3>' \
-               '<p>Defines how much percentage of the data is used as test dataset.</p>' \
-               '<h3>Scaler</h3>' \
-               '<p>Optional parameter, if a scaler is defined, the scaler is used during training and prediction to scale image data between values of 0-1. </p>' \
-               '</p>To scale data in a range of 0-1, the scaler should be the maximum possible value of the image data.</p>' \
-               '<p>If use of pretrained imagenet weight is intended, the data must be scaled to a range 0-1 to be compatibale with the pretrained weights. </p>' \
-               '<h3>Create Normalisation Statistic ( Mean and std. per Channel)</h3>' \
-               '<p>If this parameter is activated, it creates a normalisation statistic in form of a csv file. Listing the mean and std. per Channel for the training dataset. </p>' \
-               '<p>If a scaler was defined it is also taken into account to scale mean and std. accordingly. This normalization statistic can be used to normalize the data during training and prediction. If pretrained Imagenet weights are intended to be used, for more then 3 channels, a computation of normalisation statistic is requiered. </p>' \
-               '<h3>Number of permutation of Wasserstein distance </h3>' \
-               '<p>This parameter defiend how many permutations the Wasserstein distance can use to find an similar datasplit. If any class in the data is not reaching the min value of 0.001 per dataset the algorithm yields an error. As it only make sense to include data which is actually present in the dataset, the algorithm doesnt allow inclusion of barley existing classes. Id this is happening you should think about your classification structure and restructure your input data.</p>' \
-               '<h3>Random seed </h3>' \
-               '<p>Seed ensures that the same random starting point can be used for the data split calculations. </p>' \
-               '<h3>Output folder</h3>' \
-               '<p>Location of output folder. In the output folder the csv-files are generated.  there is one csv file generated for training, validation and test dataset as well as one summary csv and optionally also a normalization csv.</p>'
+        html = (
+            ''
+            '<p>This algorithm creates training, validation and test datasets in CSV format. '
+            'Each created dataset consists of images and their corresponding labels. '
+            'The data can be split by default in 80% training, 10 % validation dataset, 10 % test dataset. '
+            'The algorithm aims to achieve an equal class distribution with a deviation of 1 % per class per dataset, '
+            'for this a wasserstein distance and the permutation is used. The algorith further generates a summary of '
+            'class counts per dataset as well as there percentage and to calculate class weights.Additionaly the '
+            'algorithm can calculate mean and standard deviation,per channel in the train dataset which can be used '
+            'for data normalization during training.'
+            '</p>'
+            '<h3>Data folder</h3>'
+            '<p>Folder which contains an image chip folder and corresponding label chip folder.</p>'
+            '<h3>Percentage of train images</h3>'
+            '<p>Defines how much percentage of the data is used as train dataset. </p>'
+            '<h3>Percentage of validation images</h3>'
+            '<p>Defines how much percentage of the data is used as validation dataset.</p>'
+            '<h3>Percentage of test images</h3>'
+            '<p>Defines how much percentage of the data is used as test dataset.</p>'
+            '<h3>Scaler</h3>'
+            '<p>Optional parameter, if a scaler is defined, the scaler is used during training and prediction to '
+            'scale image data between values of 0-1. '
+            '</p>'
+            '</p>To scale data in a range of 0-1, the scaler should be the maximum possible value of the image data.'
+            '</p>'
+            '<p>If use of pretrained imagenet weight is intended, the data must be scaled to a range 0-1 to be '
+            'compatible with the pretrained weights. '
+            '</p>'
+            '<h3>Create Normalisation Statistic ( Mean and std. per Channel)</h3>'
+            '<p>If this parameter is activated, it creates a normalisation statistic in form of a csv file. '
+            'Listing the mean and std. per Channel for the training dataset. '
+            '</p>'
+            '<p>If a scaler was defined it is also taken into account to scale mean and std. accordingly. '
+            'This normalization statistic can be used to normalize the data during training and prediction. '
+            'If pretrained Imagenet weights are intended to be used, for more then 3 channels, a computation of '
+            'normalisation statistic is requiered. </p>'
+            '<h3>Number of permutation of Wasserstein distance </h3>'
+            '<p>This parameter defiend how many permutations the Wasserstein distance can use to find an similar '
+            'datasplit. If any class in the data is not reaching the min value of 0.001 per dataset the '
+            'algorithm yields an error. As it only make sense to include data which is actually present in the '
+            'dataset, the algorithm doesnt allow inclusion of barley existing classes. Id this is happening you '
+            'should think about your classification structure and restructure your input data.</p>'
+            '<h3>Random seed </h3>'
+            '<p>Seed ensures that the same random starting point can be used for the data split calculations. </p>'
+            '<h3>Output folder</h3>'
+            '<p>Location of output folder. In the output folder the csv-files are generated.  '
+            'There is one csv file generated for training, validation and test dataset as well as one summary '
+            'csv and optionally also a normalization csv.'
+            '</p>'
+        )
         return html
 
     def initAlgorithm(self, config=None):
@@ -164,7 +178,8 @@ class DatasetMaker(QgsProcessingAlgorithm):
         p1.setFlags(p1.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
         self.addParameter(p1)
 
-        # self.addParameter(QgsProcessingParameterVectorDestination(name=self.df_val, description='Data type default : tif'))
+        # self.addParameter(
+        # QgsProcessingParameterVectorDestination(name=self.df_val, description='Data type default : tif'))
 
     def processAlgorithm(self, parameters, context, feedback):
         """

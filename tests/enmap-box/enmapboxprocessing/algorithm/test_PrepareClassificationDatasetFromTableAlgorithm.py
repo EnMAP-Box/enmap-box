@@ -14,10 +14,10 @@ class TestPrepareClassificationDatasetFromTableAlgorithm(TestCase):
             alg.P_TABLE: classificationDatasetAsCsvVector,
             alg.P_FEATURE_FIELDS: [f'Band_{i + 1}' for i in range(177)],
             alg.P_VALUE_FIELD: 'level_1_id',
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = ClassifierDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((58, 177), dump.X.shape)
         self.assertEqual((58, 1), dump.y.shape)
         self.assertEqual(177, len(dump.features))
@@ -32,10 +32,10 @@ class TestPrepareClassificationDatasetFromTableAlgorithm(TestCase):
             alg.P_TABLE: classificationDatasetAsCsvVector,
             alg.P_FEATURE_FIELDS: [f'Band_{i + 1}' for i in range(177)],
             alg.P_VALUE_FIELD: 'level_1',
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = ClassifierDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((58, 177), dump.X.shape)
         self.assertEqual((58, 1), dump.y.shape)
         self.assertEqual(177, len(dump.features))
@@ -52,10 +52,10 @@ class TestPrepareClassificationDatasetFromTableAlgorithm(TestCase):
             alg.P_VALUE_FIELD: 'level_1_id',
             alg.P_NAME_FIELD: 'level_1',
             alg.P_COLOR_FIELD: 'colors',
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = ClassifierDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((58, 177), dump.X.shape)
         self.assertEqual((58, 1), dump.y.shape)
         self.assertEqual(177, len(dump.features))

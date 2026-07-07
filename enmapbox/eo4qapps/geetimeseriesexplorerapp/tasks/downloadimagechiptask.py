@@ -76,7 +76,10 @@ class DownloadImageChipBandTask(QgsTask):
             raster.setBandName(self.bandName, 1)
             del raster
 
-            assert QgsRasterLayer(self.filename).isValid()  # this will also calculate band statistics
+            layer = QgsRasterLayer(self.filename)
+
+            if not layer.isValid():
+                raise RuntimeError(f'Failed to create valid raster layer: {self.filename}')
 
         except Exception as e:
             traceback.print_exc()

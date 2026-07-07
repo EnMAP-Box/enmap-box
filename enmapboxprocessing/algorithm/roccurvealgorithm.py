@@ -7,7 +7,10 @@ from os.path import exists, dirname
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer, \
+    QgsProcessingException
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.rasterizecategorizedvectoralgorithm import RasterizeCategorizedVectorAlgorithm
 from enmapboxprocessing.algorithm.translatecategorizedrasteralgorithm import TranslateCategorizedRasterAlgorithm
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
@@ -16,9 +19,6 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.reportwriter import MultiReportWriter, HtmlReportWriter, CsvReportWriter
 from enmapboxprocessing.typing import Categories
 from enmapboxprocessing.utils import Utils
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer, \
-    QgsProcessingException
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -33,13 +33,16 @@ class RocCurveAlgorithm(EnMAPProcessingAlgorithm):
         return 'Receiver operating characteristic (ROC) and detection error tradeoff (DET) curves'
 
     def shortDescription(self) -> str:
-        return 'Compute receiver operating characteristic (ROC) and detection error tradeoff (DET) curves.\n' \
-               'For more details see the Scikit-Learn user guide: ' \
-               '<a href="https://scikit-learn.org/stable/modules/model_evaluation.html#receiver-operating-characteristic-roc">' \
-               'Receiver operating characteristic (ROC)</a> and ' \
-               '<a href="https://scikit-learn.org/stable/modules/model_evaluation.html#detection-error-tradeoff-det">' \
-               'Detection error tradeoff (DET)</a>.\n' \
-               'Note that observed classes and predicted class probabilities are matched by name.'
+        return (
+            'Compute receiver operating characteristic (ROC) and detection error tradeoff (DET) curves.\n'
+            'For more details see the Scikit-Learn user guide: '
+            '<a href="https://scikit-learn.org/stable/modules/model_evaluation.html'
+            '#receiver-operating-characteristic-roc">'
+            'Receiver operating characteristic (ROC)</a> and '
+            '<a href="https://scikit-learn.org/stable/modules/model_evaluation.html#detection-error-tradeoff-det">'
+            'Detection error tradeoff (DET)</a>.\n'
+            'Note that observed classes and predicted class probabilities are matched by name.'
+        )
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
@@ -271,9 +274,24 @@ class DetCurveResult(object):
 @typechecked
 def rocCurve(yObserved: np.ndarray, yPredicted: np.ndarray):
     from sklearn.metrics import roc_curve, roc_auc_score
-    assert yObserved.ndim == 1
-    assert yPredicted.ndim == 1
-    assert len(yObserved) == len(yPredicted)
+
+    if yObserved.ndim != 1:
+        raise ValueError(
+            f'yObserved must be a 1-dimensional array, '
+            f'got shape={yObserved.shape}'
+        )
+
+    if yPredicted.ndim != 1:
+        raise ValueError(
+            f'yPredicted must be a 1-dimensional array, '
+            f'got shape={yPredicted.shape}'
+        )
+
+    if len(yObserved) != len(yPredicted):
+        raise ValueError(
+            f'yObserved and yPredicted must have the same length, '
+            f'got {len(yObserved)} and {len(yPredicted)}'
+        )
 
     n = len(yObserved)
     fpr, tpr, thresholds = roc_curve(yObserved, yPredicted)
@@ -284,9 +302,24 @@ def rocCurve(yObserved: np.ndarray, yPredicted: np.ndarray):
 @typechecked
 def detCurve(yObserved: np.ndarray, yPredicted: np.ndarray):
     from sklearn.metrics import det_curve
-    assert yObserved.ndim == 1
-    assert yPredicted.ndim == 1
-    assert len(yObserved) == len(yPredicted)
+
+    if yObserved.ndim != 1:
+        raise ValueError(
+            f'yObserved must be a 1-dimensional array, '
+            f'got shape={yObserved.shape}'
+        )
+
+    if yPredicted.ndim != 1:
+        raise ValueError(
+            f'yPredicted must be a 1-dimensional array, '
+            f'got shape={yPredicted.shape}'
+        )
+
+    if len(yObserved) != len(yPredicted):
+        raise ValueError(
+            f'yObserved and yPredicted must have the same length, '
+            f'got {len(yObserved)} and {len(yPredicted)}'
+        )
 
     n = len(yObserved)
     fpr, tpr, thresholds = det_curve(yObserved, yPredicted)

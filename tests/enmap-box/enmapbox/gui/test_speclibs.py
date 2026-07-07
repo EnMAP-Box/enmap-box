@@ -14,9 +14,12 @@ __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
 import unittest
 
+from qgis.core import QgsProject
+from qgis.core import QgsRasterLayer, QgsVectorLayer
+from qgis.gui import QgsMapLayerComboBox
+
 from enmapbox import initAll
 from enmapbox.exampledata import enmap
-from enmapbox.gui.dataviews.docks import SpectralLibraryDock
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import MapCanvas
 from enmapbox.gui.widgets.createspeclibdialog import CreateSpectralLibraryDialog
@@ -25,9 +28,6 @@ from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import Spectral
 from enmapbox.qgispluginsupport.qps.utils import fid2pixelindices, SpatialPoint
 from enmapbox.testing import EnMAPBoxTestCase, start_app
 from enmapboxtestdata import fraction_polygon_l3, fraction_point_singletarget, enmap_srf_library
-from qgis.core import QgsProject
-from qgis.core import QgsRasterLayer, QgsVectorLayer
-from qgis.gui import QgsMapLayerComboBox
 
 start_app()
 initAll()
@@ -83,7 +83,7 @@ class TestSpeclibs(EnMAPBoxTestCase):
         enmapBox = EnMAPBox(load_core_apps=False, load_other_apps=False)
         library = TestObjects.createSpectralLibrary(profile_field_names=['profiles'], wlu='nanometers')
         library.setName('MyProfiles1')
-        assert SpectralLibraryUtils.isSpectralLibrary(library)
+        self.assertTrue(SpectralLibraryUtils.isSpectralLibrary(library))
         enmapBox.addSources([library])
         self.showGui(enmapBox.ui)
         enmapBox.close()
@@ -98,7 +98,7 @@ class TestSpeclibs(EnMAPBoxTestCase):
 
         sl2 = TestObjects.createSpectralLibrary(profile_field_names=['profiles'], wlu='nanometers')
         sl2.setName('MySpeclib2')
-        source = sl.source()
+        sl.source()
         enmapBox.createSpectralLibraryDock(speclib=sl)
         enmapBox.addSources([sl2])
 
@@ -111,7 +111,7 @@ class TestSpeclibs(EnMAPBoxTestCase):
         lyrR = QgsRasterLayer(enmap, 'EnMAP')
         lyrV = QgsVectorLayer(fraction_point_singletarget, 'points')
         canvas: MapCanvas = EB.createNewMapCanvas()
-        sld: SpectralLibraryDock = EB.createNewSpectralLibrary()
+        # sld: SpectralLibraryDock = EB.createNewSpectralLibrary()
         tree = canvas.layerTree()
         tree.addLayers([lyrV, lyrR])
 

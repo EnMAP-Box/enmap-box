@@ -20,10 +20,14 @@ class FitClassifierAlgorithmBase(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._DATASET, 'Training dataset pickle file used for fitting the classifier. '
+            (self._DATASET, 'Training dataset skops file used for fitting the classifier. '
                             'If not specified, an unfitted classifier is created.'),
-            (self._CLASSIFIER, self.helpParameterCode()),
-            (self._OUTPUT_CLASSIFIER, self.PickleFileDestination)
+            (
+                self._CLASSIFIER, self.helpParameterCode()
+                + '\nNote: The Python code provided here is executed locally with the permissions of the current '
+                  'user during algorithm execution.'
+            ),
+            (self._OUTPUT_CLASSIFIER, self.SkopsFileDestination)
         ]
 
     def displayName(self) -> str:
@@ -44,7 +48,7 @@ class FitClassifierAlgorithmBase(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterCode(self.P_CLASSIFIER, self._CLASSIFIER, self.defaultCodeAsString())
         self.addParameterClassificationDataset(self.P_DATASET, self._DATASET, None, True)
-        self.addParameterFileDestination(self.P_OUTPUT_CLASSIFIER, self._OUTPUT_CLASSIFIER, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_CLASSIFIER, self._OUTPUT_CLASSIFIER, self.SkopsFileFilter)
 
     def defaultCodeAsString(self):
         try:
@@ -57,7 +61,10 @@ class FitClassifierAlgorithmBase(EnMAPProcessingAlgorithm):
     def parameterAsClassifier(self, parameters: Dict[str, Any], name, context: QgsProcessingContext):
         namespace = dict()
         code = self.parameterAsString(parameters, name, context)
-        exec(code, namespace)
+
+        # nosec B102 # User-defined scikit-learn model code execution by design; equivalent to the QGIS Python Console.
+        # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
+        exec(code, namespace)  # nosec B102 # User-defined scikit-learn model code execution by design;
         return namespace['classifier']
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
@@ -72,7 +79,7 @@ class FitClassifierAlgorithmBase(EnMAPProcessingAlgorithm):
         return True, ''
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         filenameDataset = self.parameterAsFile(parameters, self.P_DATASET, context)
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_CLASSIFIER, context)
@@ -87,14 +94,16 @@ class FitClassifierAlgorithmBase(EnMAPProcessingAlgorithm):
                     alg = PrepareClassificationDatasetFromJsonAlgorithm()
                     parameters = {
                         alg.P_JSON_FILE: filenameDataset,
-                        alg.P_OUTPUT_DATASET: Utils.tmpFilename(filename, 'dataset.pkl')
+                        alg.P_OUTPUT_DATASET: Utils.tmpFilename(filename, 'dataset.skops')
                     }
                     self.runAlg(alg, parameters, None, feedback2, context, True)
-                    dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+                    dump = ClassifierDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
                 else:
-                    dump = ClassifierDump(**Utils.pickleLoad(filenameDataset))
+                    dump = ClassifierDump(**Utils.modelLoad(filenameDataset))
                 feedback.pushInfo(
-                    f'Load training dataset: X=array{list(dump.X.shape)} y=array{list(dump.y.shape)} categories={[c.name for c in dump.categories]}')
+                    f'Load training dataset: X=array{list(dump.X.shape)} y=array{list(dump.y.shape)} '
+                    f'categories={[c.name for c in dump.categories]}'
+                )
                 feedback.pushInfo('Fit classifier')
 
                 try:
@@ -108,7 +117,7 @@ class FitClassifierAlgorithmBase(EnMAPProcessingAlgorithm):
                 dump = ClassifierDump(None, None, None, None, classifier)
 
             dump = ClassifierDump(dump.categories, dump.features, dump.X, dump.y, classifier)
-            Utils.pickleDump(dump.__dict__, filename)
+            Utils.modelDump(dump.__dict__, filename)
 
             result = {self.P_OUTPUT_CLASSIFIER: filename}
             self.toc(feedback, result)

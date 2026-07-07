@@ -63,7 +63,7 @@ class SpectralResamplingByResponseFunctionLibraryAlgorithm(EnMAPProcessingAlgori
             self.tic(feedback, parameters, context)
 
             try:
-                spectralLibrary = QgsVectorLayer(library.source())
+                QgsVectorLayer(library.source())
             except Exception as error:
                 traceback.print_exc()
                 message = f"failed to open spectral library: {error}"

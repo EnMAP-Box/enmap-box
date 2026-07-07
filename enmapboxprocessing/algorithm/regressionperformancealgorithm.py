@@ -8,7 +8,11 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 from osgeo import gdal
+from qgis.PyQt.QtGui import QColor
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer, \
+    QgsProcessingException
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
@@ -16,10 +20,6 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.reportwriter import MultiReportWriter, HtmlReportWriter, CsvReportWriter
 from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtGui import QColor
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer, \
-    QgsProcessingException
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -34,11 +34,14 @@ class RegressionPerformanceAlgorithm(EnMAPProcessingAlgorithm):
         return 'Regression layer accuracy report'
 
     def shortDescription(self) -> str:
-        return 'Estimates map accuracy.' \
-               'We use the formulas as described in ' \
-               '<a href="https://scikit-learn.org/stable/modules/model_evaluation.html#regression-metrics">Scikit-Learn Regression metrics</a> ' \
-               'user guide. ' \
-               'Observed and predicted target variables are matched by name.'
+        return (
+            'Estimates map accuracy.'
+            'We use the formulas as described in '
+            '<a href="https://scikit-learn.org/stable/modules/model_evaluation.html#regression-metrics">'
+            'Scikit-Learn Regression metrics</a> '
+            'user guide. '
+            'Observed and predicted target variables are matched by name.'
+        )
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
@@ -114,7 +117,8 @@ class RegressionPerformanceAlgorithm(EnMAPProcessingAlgorithm):
                 fieldNames = reference.fields().names()
                 filenames = list()
                 for i, target in enumerate(targetsReference, 1):
-                    assert target.name in fieldNames
+                    if target.name not in fieldNames:
+                        raise ValueError(f'field {target.name!r} not found in available fields: {fieldNames}')
                     alg = RasterizeVectorAlgorithm()
                     alg.initAlgorithm()
                     parameters = {
@@ -347,9 +351,24 @@ def accuracyAssessment(yObserved: np.ndarray, yPredicted: np.ndarray):
     from sklearn.metrics import explained_variance_score, mean_absolute_error, mean_squared_error, \
         median_absolute_error, r2_score
     from scipy.stats import pearsonr
-    assert yObserved.ndim == 1
-    assert yPredicted.ndim == 1
-    assert len(yObserved) == len(yPredicted)
+
+    if yObserved.ndim != 1:
+        raise ValueError(
+            f'yObserved must be a 1-dimensional array, '
+            f'got shape={yObserved.shape}'
+        )
+
+    if yPredicted.ndim != 1:
+        raise ValueError(
+            f'yPredicted must be a 1-dimensional array, '
+            f'got shape={yPredicted.shape}'
+        )
+
+    if len(yObserved) != len(yPredicted):
+        raise ValueError(
+            f'yObserved and yPredicted must have the same length, '
+            f'got {len(yObserved)} and {len(yPredicted)}'
+        )
 
     yO = yObserved
     yP = yPredicted

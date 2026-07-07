@@ -1,16 +1,12 @@
-
-import subprocess
-import time
 import webbrowser
+
+from tensorboard import program
 
 from qgis.PyQt.QtCore import QCoreApplication
 from qgis.core import (QgsProcessingAlgorithm,
                        QgsProcessingParameterNumber,
                        QgsProcessingParameterFile)
 
-import psutil
-from tensorboard import program
-import webbrowser
 
 class Tensorboard_visualizer(QgsProcessingAlgorithm):
     """
@@ -21,7 +17,7 @@ class Tensorboard_visualizer(QgsProcessingAlgorithm):
     """
 
     # Constants used to refer to parameters and outputs. They will be
-    # used when calling the algorithm from another algorithm, or when
+    # used when calling the algorithm from another algorithm or when
     # calling from the QGIS console.
     TENSORBOARD_LOGDIR = 'TENSORBOARD_LOGDIR'
     TENSORBOARD_PORT = 'TENSORBOARD_PORT'
@@ -32,8 +28,8 @@ class Tensorboard_visualizer(QgsProcessingAlgorithm):
         """
         return QCoreApplication.translate('Processing', string)
 
-    def createInstance(self):
-        return Tensorboard_visualizer()
+    # def createInstance(self):
+    #     return Tensorboard_visualizer()
 
     def name(self):
         """
@@ -70,21 +66,27 @@ class Tensorboard_visualizer(QgsProcessingAlgorithm):
         return 'SpecDeepMap'
 
     def shortHelpString(self):
-        """
-        Returns a localised short helper string for the algorithm. This string
-        should provide a basic description about what the algorithm does and the
-        parameters and outputs associated with it..
-        """
-        return self.tr("Example algorithm short description")
-
-    def shortHelpString(self):
-
-        html = '' \
-               '<p>This algorithm launches TensorBoard, an interactive visualization tool for exploring training and validation metrics and losses. More details on TensorBoard you can find here: https://www.tensorflow.org/tensorboard . Once started, TensorBoard runs in the background on your local host until QGIS is closed. Running TensorBoard will not affect the performance of other algorithms. If the chosen port is already in use, please select a different one.</p>' \
-               '<h3>TensorBoard Log Directory</h3>' \
-               '<p> Select the folder that was defined during training to save TensorBoard logs.This directory usually contains a lightning_logs subfolder.However, the algorithm also works if you provide the main training output folder where the logs are stored. </p>'\
-               '<h3>TensorBoard Port (Optional) </h3>' \
-               '<p> You can specify a local port number for launching a TensorBoard.If the chosen port is already in use, please select another port within the range 6006–65535. A new TensorBoard instance will then be started on that port.All TensorBoard ports are automatically released/closed when QGIS is closed.< / p >'
+        html = (
+            ''
+            '<p>This algorithm launches TensorBoard, an interactive visualization tool for exploring training '
+            'and validation metrics and losses. More details on TensorBoard you can find here: '
+            'https://www.tensorflow.org/tensorboard . Once started, TensorBoard runs in the background on '
+            'your local host until QGIS is closed. Running TensorBoard will not affect the performance of '
+            'other algorithms. If the chosen port is already in use, please select a different one.'
+            '</p>'
+            '<h3>TensorBoard Log Directory</h3>'
+            '<p>Select the folder that was defined during training to save TensorBoard logs.'
+            'This directory usually contains a lightning_logs subfolder.'
+            'However, the algorithm also works if you provide the main training output '
+            'folder where the logs are stored. '
+            '</p>'
+            '<h3>TensorBoard Port (Optional) </h3>'
+            '<p>You can specify a local port number for launching a TensorBoard. '
+            'If the chosen port is already in use, please select another port within the range 6006–65535. '
+            'A new TensorBoard instance will then be started on that port.All TensorBoard ports are automatically '
+            'released/closed when QGIS is closed.'
+            '</p>'
+        )
         return html
 
     def initAlgorithm(self, config=None):
@@ -110,31 +112,36 @@ class Tensorboard_visualizer(QgsProcessingAlgorithm):
         )
 
     def processAlgorithm(self, parameters, context, feedback):
-
         logdir = self.parameterAsString(parameters, self.TENSORBOARD_LOGDIR, context)
         port = self.parameterAsInt(parameters, self.TENSORBOARD_PORT, context)
 
         tb_run = False
 
-            # Start TensorBoard
+        # Start TensorBoard
         tb = program.TensorBoard()
         tb.configure(argv=[
-                None,
-                "--logdir", logdir,
-                "--port", str(port),
-                "--host", "127.0.0.1",
-            ])
+            None,
+            "--logdir", logdir,
+            "--port", str(port),
+            "--host", "127.0.0.1",
+        ])
         url = tb.launch()
 
         if url:
             tb_run = True
 
-        feedback.pushInfo(f"TensorBoard running in background at {url}. If not directly opened you can open TensorBoard by copying: {url} in your browser.")
-        feedback.pushInfo(f"TensorBoard will run in background until QGIS is closed, but will not interfere with other algorithms performances and can be ignored.")
-        feedback.pushInfo(f"If you want to initalize a different TensorBoard, just change the port number and run the algorithm again.")
+        feedback.pushInfo(
+            f"TensorBoard running in background at {url}. If not directly opened you can open "
+            f"TensorBoard by copying: {url} in your browser.")
+        feedback.pushInfo(
+            "TensorBoard will run in background until QGIS is closed, but will not "
+            "interfere with other algorithms performances and can be ignored.")
+        feedback.pushInfo(
+            "If you want to initalize a different TensorBoard, "
+            "just change the port number and run the algorithm again.")
         webbrowser.open_new(url)
 
-            # Timer to check cancel periodically
+        # Timer to check cancel periodically
 
         return {"TensorBoard_run": tb_run}
 

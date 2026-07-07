@@ -28,11 +28,16 @@ because the user may not change the important hyperparameters on his own. There 
 models on basis of individual Lookup-Tables.
 
 """
+# from _classic.hubflow.core import EnviSpectralLibrary
 import csv
+import os
 import sys
 import warnings
 
 import joblib
+import lmuvegetationapps.Processor.Processor_Inversion_core as processor
+import numpy as np
+from lmuvegetationapps import APP_DIR
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qtagg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
@@ -40,21 +45,13 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
 
-# from PyQt5.QtGui import QIntValidator
-# from PyQt5.QtCore import QThread, pyqtSignal
-# from PyQt5.QtCore import QTimer
-import lmuvegetationapps.Processor.Processor_Inversion_core as processor
-from _classic.hubflow.core import *
 from enmapbox.gui.utils import loadUi
-# import lmuvegetationapps.LUT.CreateLUT_GUI
-from lmuvegetationapps import APP_DIR
-# import LUT.CreateLUT_GUI
-# ensure to call QGIS before PyQtGraph
-from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox, QVBoxLayout, QTableWidgetItem, QGridLayout, QLabel, \
+    QSpinBox, QAbstractSpinBox, QApplication
 from qgis.core import QgsMapLayerProxyModel
-# from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
 from qgis.core import QgsVectorLayer
-from qgis.gui import QgsMapLayerComboBox
+
+# ensure to call QGIS before PyQtGraph
 
 # import os
 # import logging
@@ -74,7 +71,6 @@ pathUI_Printer = os.path.join(APP_DIR, 'Resources/UserInterfaces/Printer.ui')
 
 class MLTrainingGUI(QDialog):
     def __init__(self, parent=None):
-        mLayerSpeclib: QgsMapLayerComboBox
         super(MLTrainingGUI, self).__init__(parent)
         loadUi(pathUI_train, self)
 
@@ -612,10 +608,12 @@ class ML_Training:
             self.soil_wavelengths = wl_values
             self.soil_specs = [list(row) for row in zip(*all_specs)]
         if os.path.splitext(self.speclib)[1] == ".sli":
-            speclib = EnviSpectralLibrary(filename=self.speclib)
-            raster = speclib.raster()
-            self.soil_wavelengths = raster.dataset().metadataItem(key='wavelength', domain='ENVI', dtype=float)
-            self.soil_specs = raster.dataset().array()[:, :, 0].tolist()
+            # speclib = EnviSpectralLibrary(filename=self.speclib)
+            # raster = speclib.raster()
+            # self.soil_wavelengths = raster.dataset().metadataItem(key='wavelength', domain='ENVI', dtype=float)
+            # self.soil_specs = raster.dataset().array()[:, :, 0].tolist()
+
+            raise NotImplementedError('replace old code with QPS code')
 
     def check_and_assign(self):
         if not self.lut_path:
@@ -846,7 +844,7 @@ class perfView:
         final_pred = np.asarray(predictions).flatten()
         try:
             pred_std = np.asarray(data["stds"]).flatten()
-        except:
+        except Exception:
             pred_std = np.array([np.nan])
 
         max_length = max(len(y_val), len(final_pred), len(pred_std), len(performances))
@@ -864,7 +862,7 @@ class perfView:
         np.savetxt(outpath, structured_array, delimiter='\t', header=r'measured\testimated\test_std\tRMSE', comments='')
 
     def plot_results(self, index):
-
+        import matplotlib.pyplot as plt
         plt.rcParams["savefig.dpi"] = 300
         key = self.gui.modelComboBox.itemText(index)  # Get the text of the selected item
         data = self.all_results_dict.get(key, None)  # Retrieve the data from the dictionary
@@ -885,11 +883,9 @@ class perfView:
         if data is None:
             return
         try:
-            performances, y_val, predictions, al_training_indices = \
-                data["performances"], data["y_val"], data["predictions"], data['al_training_indices'][0]
-        except:
-            performances, y_val, predictions, al_training_indices = \
-                data["performances"], data["y_val"], data["predictions"], data['al_training_indices']
+            performances, y_val, predictions, = data["performances"], data["y_val"], data["predictions"]
+        except Exception:
+            performances, y_val, predictions, = data["performances"], data["y_val"], data["predictions"]
         if isinstance(performances, np.ndarray):
             performances = [performances]
         performances = np.asarray(performances).flatten()
@@ -898,7 +894,7 @@ class perfView:
 
         try:
             pred_std = np.asarray(data["stds"]).flatten()
-        except:
+        except Exception:
             pred_std = np.empty((0,))
 
         r2 = r2_score(y_val, final_pred)
@@ -1067,7 +1063,7 @@ class LoadTxtFile:
                 # if the first row can be converted to int, it most likely does not contain a header
                 _ = int(next(raw)[0])
                 self.header_bool = False
-            except:
+            except Exception:
                 self.header_bool = True
             self.gui.radioHeader.setChecked(self.header_bool)
             self.read_file()  # now read the file for good with the information you have
@@ -1464,4 +1460,4 @@ if __name__ == '__main__':
     # m.mlra_training.open_lut(lutpath=lut_path)
     # out_folder = r"C:\Data\Daten\Testdaten\Model_TEST/"
     # m.mlra_training.get_folder(path=out_folder)
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

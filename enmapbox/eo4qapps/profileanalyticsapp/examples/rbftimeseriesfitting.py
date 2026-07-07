@@ -11,13 +11,25 @@ def rbfEnsemblePrediction(
         X: np.ndarray, Y: np.ndarray, X2: np.ndarray, rbfFwhms: List[float], rbfUserWeights: List[float] = None,
         rbfCutOffValue=0.01
 ) -> np.ndarray:
-    assert X.ndim == 1  # X[ndates]
-    assert X2.ndim == 1  # X[ndates2]
-    assert Y.ndim == 2  # Y[nsamples, ndates]
-    assert X.shape[0] == Y.shape[1]
+    if X.ndim != 1:
+        raise ValueError(f"X must be 1-dimensional, got {X.ndim} dimensions")
+
+    if X2.ndim != 1:
+        raise ValueError(f"X2 must be 1-dimensional, got {X2.ndim} dimensions")
+
+    if Y.ndim != 2:
+        raise ValueError(f"Y must be 2-dimensional, got {Y.ndim} dimensions")
+
+    if X.shape[0] != Y.shape[1]:
+        raise ValueError(f"X length must match Y.shape[1]: {X.shape[0]} != {Y.shape[1]}"
+                         )
     if rbfUserWeights is None:
         rbfUserWeights = [1.] * len(rbfFwhms)
-    assert len(rbfFwhms) == len(rbfUserWeights)
+    if len(rbfFwhms) != len(rbfUserWeights):
+        raise ValueError(
+            f"rbfFwhms and rbfUserWeights must have the same length "
+            f"({len(rbfFwhms)} != {len(rbfUserWeights)})"
+        )
 
     Y2 = list()  # predicted values
     D = list()  # data availability scores
@@ -35,10 +47,17 @@ def rbfEnsemblePrediction(
 def rbfPrediction(
         X: np.ndarray, Y: np.ndarray, X2: np.ndarray, rbfFwhm: float, rbfUserWeight: float, rbfCutOffValue: float
 ) -> Tuple[np.ndarray, np.ndarray]:
-    assert X.ndim == 1  # X[ndates]
-    assert X2.ndim == 1  # X[ndates2]
-    assert Y.ndim == 2  # Y[nsamples, ndates]
-    assert X.shape[0] == Y.shape[1]
+    if X.ndim != 1:
+        raise ValueError(f"X must be 1-dimensional, got {X.ndim} dimensions")
+
+    if X2.ndim != 1:
+        raise ValueError(f"X2 must be 1-dimensional, got {X2.ndim} dimensions")
+
+    if Y.ndim != 2:
+        raise ValueError(f"Y must be 2-dimensional, got {Y.ndim} dimensions")
+
+    if X.shape[0] != Y.shape[1]:
+        raise ValueError(f"X length must match Y.shape[1]: {X.shape[0]} != {Y.shape[1]}")
 
     M = np.isfinite(Y)  # data availability mask
     Y2 = list()  # predicted values
@@ -68,8 +87,11 @@ def rbfPrediction(
     Y2 = np.array(Y2).T
     D = np.array(D).T
 
-    assert Y2.shape[1] == X2.shape[0]
-    assert Y2.shape == D.shape
+    if Y2.shape[1] != X2.shape[0]:
+        raise ValueError(f"Y2.shape[1] must match X2.shape[0]: {Y2.shape[1]} != {X2.shape[0]}")
+
+    if Y2.shape != D.shape:
+        raise ValueError(f"Y2 and D must have the same shape: {Y2.shape} != {D.shape}")
 
     return Y2, D
 

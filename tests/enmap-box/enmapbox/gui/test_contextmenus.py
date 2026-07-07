@@ -121,8 +121,6 @@ class test_applications(EnMAPBoxTestCase):
             m.clear()
             tv.populateContextMenu(m)
 
-            s = ""
-
         # test DockTreeView menus
         tv: DockTreeView = eb.dockTreeView()
         mp: DockManagerLayerTreeModelMenuProvider = tv.menuProvider()

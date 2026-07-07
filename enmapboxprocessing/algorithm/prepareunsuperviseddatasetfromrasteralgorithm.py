@@ -27,7 +27,7 @@ class PrepareUnsupervisedDatasetFromRasterAlgorithm(EnMAPProcessingAlgorithm):
 
     def shortDescription(self) -> str:
         return 'Create an unsupervised dataset by sampling data from valid pixels ' \
-               'and store the result as a pickle file.\n' \
+               'and store the result as a skops file.\n' \
                'A pixel is concidered valid, if the pixel profile is free of no data values, ' \
                'and not excluded by the (optionally) selected mask layer.'
 
@@ -40,7 +40,7 @@ class PrepareUnsupervisedDatasetFromRasterAlgorithm(EnMAPProcessingAlgorithm):
                                 'Note that this is only a hint for limiting the number of rows and columns.'),
             (self._EXCLUDE_BAD_BANDS, 'Whether to exclude bands, that are marked as bad bands, '
                                       'or contain no data, inf or nan values in all samples.'),
-            (self._OUTPUT_DATASET, self.PickleFileDestination)
+            (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
     def group(self):
@@ -51,7 +51,7 @@ class PrepareUnsupervisedDatasetFromRasterAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterMapLayer(self.P_MASK, self._MASK, None, True)
         self.addParameterInt(self.P_SAMPLE_SIZE, self._SAMPLE_SIZE, 0, True, 0)
         self.addParameterBoolean(self.P_EXCLUDE_BAD_BANDS, self._EXCLUDE_BAD_BANDS, True, True)
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
@@ -149,7 +149,7 @@ class PrepareUnsupervisedDatasetFromRasterAlgorithm(EnMAPProcessingAlgorithm):
 
             dump = TransformerDump(features=features, X=X)
             dumpDict = dump.__dict__
-            Utils.pickleDump(dumpDict, filename)
+            Utils.modelDump(dumpDict, filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)

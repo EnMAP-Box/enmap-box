@@ -20,7 +20,7 @@ class TestSampleRasterValuesAlgorithm(TestCase):
             alg.P_VECTOR: landcover_points_singlepart_epsg3035,
             alg.P_OUTPUT_POINTS: self.filename('sample_vectorPoint.gpkg')
         }
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)
 
     def test_sampleFromVectorPolygons(self):
         alg = SampleRasterValuesAlgorithm()
@@ -31,7 +31,7 @@ class TestSampleRasterValuesAlgorithm(TestCase):
             alg.P_OUTPUT_POINTS: self.filename('sample_vectorPolygons.gpkg')
 
         }
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)
 
     def test_coverageRange(self):
         alg = SampleRasterValuesAlgorithm()

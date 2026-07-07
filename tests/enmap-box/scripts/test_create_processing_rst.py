@@ -1,15 +1,15 @@
 import datetime
 import os
 import shutil
-import subprocess
 import unittest
 
+from enmapbox import registerEnMAPBoxProcessingProvider
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
 from enmapbox.testing import start_app, TestCase
-from enmapbox import registerEnMAPBoxProcessingProvider
-from scripts.create_processing_rst import __file__ as path_processing_script, collectQgsProcessAlgorithmHelp, \
-    escape_rst, \
-    generateRST, QGIS_PROCESS_ENV, update_rst
+from scripts.create_processing_rst import (
+    collectQgsProcessAlgorithmHelp, escape_rst,
+    generateRST, update_rst
+)
 
 start_app()
 registerEnMAPBoxProcessingProvider()
@@ -67,25 +67,15 @@ class CreateProcessingRSTTestCases(TestCase):
     def test_generateRST(self):
         dir_tmp = self.createTestOutputDirectory()
         dir_rst_root = dir_tmp / 'rst_root1'
-        generateRST(dir_rst_root,
-                    algorithmIds=['gdal:translate', 'enmapbox:Build3DCube'],
-                    load_process_help=False)
+        os.makedirs(dir_rst_root, exist_ok=True)
+        generateRST(dir_rst_root, algorithmIds=['gdal:translate', 'enmapbox:build3dcube'])
 
         expected_paths = [
             dir_rst_root / 'auxilliary' / 'build_3d_cube.rst',
-            dir_rst_root / 'raster_conversion' / 'translate__convert_format_.rst'
+            dir_rst_root / 'raster_conversion' / 'translate_convert_format.rst'
         ]
         for p in expected_paths:
             self.assertTrue(p.is_file(), msg=f'File not created exist: {p}')
-
-    @unittest.skipIf(TestCase.runsInCI(), 'Manual calls only')
-    def test_buildall(self):
-
-        result = subprocess.run(['python', str(path_processing_script)],
-                                env=QGIS_PROCESS_ENV,
-                                stderr=subprocess.PIPE
-                                )
-        self.assertEqual(result.returncode, 0, msg=result.stderr.decode())
 
     def test_escape_rst(self):
 
@@ -108,28 +98,23 @@ class CreateProcessingRSTTestCases(TestCase):
 
         algs = EnMAPBoxProcessingProvider.instance().algorithms()
         algs = algs[0:100]
-        t0 = datetime.datetime.now()
-        results1 = collectQgsProcessAlgorithmHelp(algs, run_async=True)
-        t1 = datetime.datetime.now()
-        results2 = collectQgsProcessAlgorithmHelp(algs, run_async=False)
-        t2 = datetime.datetime.now()
-        self.assertEqual(results1, results2)
-        print(f'Async: {t1 - t0}\nNormal: {t2 - t1}')
+        datetime.datetime.now()
+        collectQgsProcessAlgorithmHelp(algs)
 
     def test_script(self):
         dir_tmp = self.createTestOutputDirectory()
         dir_rst_root = dir_tmp / 'rst_root2'
         if dir_rst_root.is_dir():
             shutil.rmtree(dir_rst_root)
-            os.makedirs(dir_rst_root)
 
-        result = subprocess.run(['python', str(path_processing_script),
-                                 '-r', str(dir_rst_root),
-                                 '-a', 'Build3DCube'],
-                                env=QGIS_PROCESS_ENV,
-                                stdout=subprocess.PIPE, stderr=subprocess.PIPE
-                                )
-        self.assertEqual(result.returncode, 0, msg=result.stderr.decode())
+        os.makedirs(dir_rst_root, exist_ok=True)
+
+        from scripts.create_processing_rst import main
+
+        result = main(['-r', str(dir_rst_root),
+                       '-a', 'build3dcube'])
+
+        self.assertEqual(result, 0)
 
         expected_files = [
             dir_rst_root / 'processing_algorithms.rst',

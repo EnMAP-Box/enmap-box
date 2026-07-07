@@ -4,6 +4,7 @@ import platform
 import sys
 import warnings
 from os.path import join, abspath, exists, basename
+from pathlib import Path
 from typing import Optional
 
 import numpy
@@ -19,9 +20,9 @@ from enmapboxprocessing.algorithm.regressionworkflowalgorithm import RegressionW
 from enmapboxprocessing.typing import ClassifierDump, RegressorDump
 
 _root = abspath(pathlib.Path(__file__).parent / 'testdata')
-_pklversion = (f"{str(numpy.__version__).replace('.', '')}_"
-               f"{str(sklearn.__version__).replace('.', '')}_"
-               f"{sys.api_version}")
+_skopsversion = (f"{str(numpy.__version__).replace('.', '')}_"
+                 f"{str(sklearn.__version__).replace('.', '')}_"
+                 f"{sys.api_version}")
 
 # Berlin example data
 # ...this is the old example dataset, which we still need for unittests
@@ -33,7 +34,7 @@ landcover_berlin_point = join(_root, _subdir, 'landcover_berlin_point.gpkg')
 landcover_berlin_polygon = join(_root, _subdir, 'landcover_berlin_polygon.gpkg')
 library_berlin = join(_root, _subdir, 'library_berlin.gpkg')
 veg_cover_fraction_berlin_point = join(_root, _subdir, 'veg-cover-fraction_berlin_point.gpkg')
-assert exists(veg_cover_fraction_berlin_point)
+
 # Potsdam example data
 # ...current example dataset is placed under enmapbox.exampledata
 enmap_potsdam = enmapbox.exampledata.enmap
@@ -110,147 +111,147 @@ classificationDatasetAsForceFile = (
     join(_root, _subdir, 'classification_dataset_force_labels.csv')
 )
 
-classificationDatasetAsPklFile = join(_root, _subdir, f'classification_dataset_{_pklversion}.pkl')
-if not exists(classificationDatasetAsPklFile):
-    # we don't store pickle files inside the repo anymore (see issue #614), so we have to create it on-the-fly
+classificationDatasetAsSkopsFile = join(_root, _subdir, f'classification_dataset_{_skopsversion}.skops')
+if not exists(classificationDatasetAsSkopsFile):
+    # we don't store skops files inside the repo anymore (see issue #614), so we have to create it on-the-fly
     from enmapbox.testing import start_app
 
     qgsApp = start_app()
     alg = PrepareClassificationDatasetFromJsonAlgorithm()
     parameters = {
         alg.P_JSON_FILE: classificationDatasetAsJsonFile,
-        alg.P_OUTPUT_DATASET: classificationDatasetAsPklFile
+        alg.P_OUTPUT_DATASET: classificationDatasetAsSkopsFile
     }
     alg.runAlg(alg, parameters)
-    print(f'created {basename(classificationDatasetAsPklFile)}: {classificationDatasetAsPklFile}')
-    ClassifierDump.fromFile(classificationDatasetAsPklFile)  # check result
+    print(f'created {basename(classificationDatasetAsSkopsFile)}: {classificationDatasetAsSkopsFile}')
+    ClassifierDump.fromFile(classificationDatasetAsSkopsFile)  # check result
 
 # - Classifier
-classifierDumpPkl = join(_root, _subdir, f'classifier_{_pklversion}.pkl')
-if not exists(classifierDumpPkl):
-    # we don't store pickle files inside the repo anymore (see issue #614), so we have to create it on-the-fly
+classifierDumpSkops = join(_root, _subdir, f'classifier_{_skopsversion}.skops')
+if not exists(classifierDumpSkops):
+    # we don't store skops files inside the repo anymore (see issue #614), so we have to create it on-the-fly
     from enmapbox.testing import start_app
 
     qgsApp = start_app()
     alg = ClassificationWorkflowAlgorithm()
     parameters = {
-        alg.P_DATASET: classificationDatasetAsPklFile,
+        alg.P_DATASET: classificationDatasetAsSkopsFile,
         alg.P_CLASSIFIER: 'from sklearn.ensemble import RandomForestClassifier\n'
                           'classifier = RandomForestClassifier(n_estimators=100, oob_score=True, random_state=42)\n',
         alg.P_NFOLD: 10,
         alg.P_RASTER: enmap,
-        alg.P_OUTPUT_CLASSIFIER: classifierDumpPkl
+        alg.P_OUTPUT_CLASSIFIER: classifierDumpSkops
     }
     alg.runAlg(alg, parameters)
-    print(f'created {basename(classifierDumpPkl)}: {classifierDumpPkl}')
-    ClassifierDump.fromFile(classifierDumpPkl)  # check result
+    print(f'created {basename(classifierDumpSkops)}: {classifierDumpSkops}')
+    ClassifierDump.fromFile(classifierDumpSkops)  # check result
 
 # - Regression dataset
 regressionDatasetAsJsonFile = join(_root, _subdir, 'regression_dataset.json')
 regressionDatasetSingleTargetAsJsonFile = join(_root, _subdir, 'regression_dataset_singletarget.json')
 regressionDatasetMultiTargetAsJsonFile = join(_root, _subdir, 'regression_dataset_multitarget.json')
 
-regressionDatasetAsPkl = join(_root, _subdir, f'regression_dataset_{_pklversion}.pkl')
-regressionDatasetSingleTargetAsPkl = join(_root, _subdir, f'regression_dataset_singletarget_{_pklversion}.pkl')
-regressionDatasetMultiTargetAsPkl = join(_root, _subdir, f'regression_dataset_multitarget_{_pklversion}.pkl')
+regressionDatasetAsSkops = join(_root, _subdir, f'regression_dataset_{_skopsversion}.skops')
+regressionDatasetSingleTargetAsSkops = join(_root, _subdir, f'regression_dataset_singletarget_{_skopsversion}.skops')
+regressionDatasetMultiTargetAsSkops = join(_root, _subdir, f'regression_dataset_multitarget_{_skopsversion}.skops')
 
-if not exists(regressionDatasetAsPkl):
-    # we don't store pickle files inside the repo anymore (see issue #614), so we have to create it on-the-fly
+if not exists(regressionDatasetAsSkops):
+    # we don't store skops files inside the repo anymore (see issue #614), so we have to create it on-the-fly
     from enmapbox.testing import start_app
 
     qgsApp = start_app()
     alg = PrepareRegressionDatasetFromJsonAlgorithm()
     parameters = {
         alg.P_JSON_FILE: regressionDatasetAsJsonFile,
-        alg.P_OUTPUT_DATASET: regressionDatasetAsPkl
+        alg.P_OUTPUT_DATASET: regressionDatasetAsSkops
     }
     alg.runAlg(alg, parameters)
-    print(f'created {basename(regressionDatasetAsPkl)}: {regressionDatasetAsPkl}')
-    RegressorDump.fromFile(regressionDatasetAsPkl)  # check result
+    print(f'created {basename(regressionDatasetAsSkops)}: {regressionDatasetAsSkops}')
+    RegressorDump.fromFile(regressionDatasetAsSkops)  # check result
 
-if not exists(regressionDatasetSingleTargetAsPkl):
-    # we don't store pickle files inside the repo anymore (see issue #614), so we have to create it on-the-fly
+if not exists(regressionDatasetSingleTargetAsSkops):
+    # we don't store skops files inside the repo anymore (see issue #614), so we have to create it on-the-fly
     from enmapbox.testing import start_app
 
     qgsApp = start_app()
     alg = PrepareRegressionDatasetFromJsonAlgorithm()
     parameters = {
         alg.P_JSON_FILE: regressionDatasetSingleTargetAsJsonFile,
-        alg.P_OUTPUT_DATASET: regressionDatasetSingleTargetAsPkl
+        alg.P_OUTPUT_DATASET: regressionDatasetSingleTargetAsSkops
     }
     alg.runAlg(alg, parameters)
-    print(f'created {basename(regressionDatasetSingleTargetAsPkl)}: {regressionDatasetSingleTargetAsPkl}')
-    RegressorDump.fromFile(regressionDatasetSingleTargetAsPkl)  # check result
+    print(f'created {basename(regressionDatasetSingleTargetAsSkops)}: {regressionDatasetSingleTargetAsSkops}')
+    RegressorDump.fromFile(regressionDatasetSingleTargetAsSkops)  # check result
 
-if not exists(regressionDatasetMultiTargetAsPkl):
-    # we don't store pickle files inside the repo anymore (see issue #614), so we have to create it on-the-fly
+if not exists(regressionDatasetMultiTargetAsSkops):
+    # we don't store skops files inside the repo anymore (see issue #614), so we have to create it on-the-fly
     from enmapbox.testing import start_app
 
     qgsApp = start_app()
     alg = PrepareRegressionDatasetFromJsonAlgorithm()
     parameters = {
         alg.P_JSON_FILE: regressionDatasetMultiTargetAsJsonFile,
-        alg.P_OUTPUT_DATASET: regressionDatasetMultiTargetAsPkl
+        alg.P_OUTPUT_DATASET: regressionDatasetMultiTargetAsSkops
     }
     alg.runAlg(alg, parameters)
-    print(f'created {basename(regressionDatasetMultiTargetAsPkl)}: {regressionDatasetMultiTargetAsPkl}')
-    RegressorDump.fromFile(regressionDatasetMultiTargetAsPkl)  # check result
+    print(f'created {basename(regressionDatasetMultiTargetAsSkops)}: {regressionDatasetMultiTargetAsSkops}')
+    RegressorDump.fromFile(regressionDatasetMultiTargetAsSkops)  # check result
 
 # - Regressor
-regressorDumpPkl = join(_root, _subdir, f'regressor_{_pklversion}.pkl')
-regressorDumpSingleTargetPkl = join(_root, _subdir, f'regressor_singletarget_{_pklversion}.pkl')
-regressorDumpMultiTargetPkl = join(_root, _subdir, f'regressor_multitarget_{_pklversion}.pkl')
+regressorDumpSkops = join(_root, _subdir, f'regressor_{_skopsversion}.skops')
+regressorDumpSingleTargetSkops = join(_root, _subdir, f'regressor_singletarget_{_skopsversion}.skops')
+regressorDumpMultiTargetSkops = join(_root, _subdir, f'regressor_multitarget_{_skopsversion}.skops')
 
-if not exists(regressorDumpPkl):
-    # we don't store pickle files inside the repo anymore (see issue #614), so we have to create it on-the-fly
+if not exists(regressorDumpSkops):
+    # we don't store skops files inside the repo anymore (see issue #614), so we have to create it on-the-fly
     from enmapbox.testing import start_app
 
     qgsApp = start_app()
     alg = RegressionWorkflowAlgorithm()
     parameters = {
-        alg.P_DATASET: regressionDatasetAsPkl,
+        alg.P_DATASET: regressionDatasetAsSkops,
         alg.P_REGRESSOR: 'from sklearn.ensemble import RandomForestRegressor\n'
                          'regressor = RandomForestRegressor(n_estimators=100, oob_score=True, random_state=42)\n',
         alg.P_RASTER: enmap,
-        alg.P_OUTPUT_REGRESSOR: regressorDumpPkl
+        alg.P_OUTPUT_REGRESSOR: regressorDumpSkops
     }
     alg.runAlg(alg, parameters)
-    print(f'created {basename(regressorDumpPkl)}: {regressorDumpPkl}')
-    RegressorDump.fromFile(regressorDumpPkl)  # check result
+    print(f'created {basename(regressorDumpSkops)}: {regressorDumpSkops}')
+    RegressorDump.fromFile(regressorDumpSkops)  # check result
 
-if not exists(regressorDumpSingleTargetPkl):
-    # we don't store pickle files inside the repo anymore (see issue #614), so we have to create it on-the-fly
+if not exists(regressorDumpSingleTargetSkops):
+    # we don't store skops files inside the repo anymore (see issue #614), so we have to create it on-the-fly
     from enmapbox.testing import start_app
 
     qgsApp = start_app()
     alg = RegressionWorkflowAlgorithm()
     parameters = {
-        alg.P_DATASET: regressionDatasetSingleTargetAsPkl,
+        alg.P_DATASET: regressionDatasetSingleTargetAsSkops,
         alg.P_REGRESSOR: 'from sklearn.ensemble import RandomForestRegressor\n'
                          'regressor = RandomForestRegressor(n_estimators=100, oob_score=True, random_state=42)\n',
         alg.P_RASTER: enmap,
-        alg.P_OUTPUT_REGRESSOR: regressorDumpSingleTargetPkl
+        alg.P_OUTPUT_REGRESSOR: regressorDumpSingleTargetSkops
     }
     alg.runAlg(alg, parameters)
-    print(f'created {basename(regressorDumpSingleTargetPkl)}: {regressorDumpSingleTargetPkl}')
-    RegressorDump.fromFile(regressorDumpSingleTargetPkl)  # check result
+    print(f'created {basename(regressorDumpSingleTargetSkops)}: {regressorDumpSingleTargetSkops}')
+    RegressorDump.fromFile(regressorDumpSingleTargetSkops)  # check result
 
-if not exists(regressorDumpMultiTargetPkl):
-    # we don't store pickle files inside the repo anymore (see issue #614), so we have to create it on-the-fly
+if not exists(regressorDumpMultiTargetSkops):
+    # we don't store skops files inside the repo anymore (see issue #614), so we have to create it on-the-fly
     from enmapbox.testing import start_app
 
     qgsApp = start_app()
     alg = RegressionWorkflowAlgorithm()
     parameters = {
-        alg.P_DATASET: regressionDatasetMultiTargetAsPkl,
+        alg.P_DATASET: regressionDatasetMultiTargetAsSkops,
         alg.P_REGRESSOR: 'from sklearn.ensemble import RandomForestRegressor\n'
                          'regressor = RandomForestRegressor(n_estimators=1, random_state=42)\n',
         alg.P_RASTER: enmap,
-        alg.P_OUTPUT_REGRESSOR: regressorDumpMultiTargetPkl
+        alg.P_OUTPUT_REGRESSOR: regressorDumpMultiTargetSkops
     }
     alg.runAlg(alg, parameters)
-    print(f'created {basename(regressorDumpMultiTargetPkl)}: {regressorDumpMultiTargetPkl}')
-    RegressorDump.fromFile(regressorDumpMultiTargetPkl)  # check result
+    print(f'created {basename(regressorDumpMultiTargetSkops)}: {regressorDumpMultiTargetSkops}')
+    RegressorDump.fromFile(regressorDumpMultiTargetSkops)  # check result
 
 # SRF
 _subdir = 'srf'
@@ -271,7 +272,7 @@ r_terra_timeseries_days = join(_root, _subdir, 'r_terra', 'Unevenly_spaced_time_
 r_terra_timeseries_seconds = join(_root, _subdir, 'r_terra', 'Unevenly_spaced_time_series_seconds_R_terra.tif')
 netCDF_timeseries_days = join(_root, _subdir, 'netcdf', 'Unevenly_spaced_time_series.nc')
 
-del _subdir, _root, _pklversion
+del _subdir, _root, _skopsversion
 
 # external products
 _sensor_products_root = None
@@ -290,8 +291,10 @@ def sensorProductsRoot() -> Optional[str]:
                 }.get(os.getlogin() + '@' + platform.node())
             except OSError as ex:
                 warnings.warn(f'Exception raised in sensorProductsRoot():\n{ex}')
-        if root and os.path.isdir(root):
-            _sensor_products_root = root
+        if root:
+            root = Path(root).expanduser().resolve()
+            if root.is_dir():
+                _sensor_products_root = str(root)
     return _sensor_products_root
 
 
@@ -435,6 +438,19 @@ class SensorProducts(object):
             L2B = join(sensorProductsRoot(), 'prisma', 'PRS_L2B_STD_20201107101404_20201107101408_0001.he5')
             L2C = join(sensorProductsRoot(), 'prisma', 'PRS_L2C_STD_20201107101404_20201107101408_0001.he5')
             L2D = join(sensorProductsRoot(), 'prisma', 'PRS_L2D_STD_20201107101404_20201107101408_0001.he5')
+
+        class Sentinel3(object):
+            S3A_OL_1_EFR = join(
+                sensorProductsRoot(), 'sentinel3',
+                'S3A_OL_1_EFR____20200816T095809_20200816T100109_20240602T091430_0179_061_350_2160_MAR_R_NT_004.SEN3'
+            )
+            S3A_OL_1_EFR_ZIP = S3A_OL_1_EFR + '.zip'
+
+            S3A_OL_2_WFR = join(
+                sensorProductsRoot(), 'sentinel3',
+                'S3A_OL_2_WFR____20160720T093421_20160720T093621_20210706T180354_0119_006_307______MAR_R_NT_003.SEN3'
+            )
+            S3A_OL_2_WFR_ZIP = S3A_OL_2_WFR + '.zip'
 
         class Sentinel2(object):
             S2A_L1C = join(

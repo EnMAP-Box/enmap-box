@@ -10,11 +10,13 @@ from qgis.core import QgsRasterLayer, QgsRectangle, QgsRasterDataProvider, QgsRa
 qgsApp = start_app()
 
 layer1 = QgsRasterLayer(
-    r'contextualWMSLegend=0&crs=EPSG:3857&dpiMode=7&featureCount=10&format=image/png&layers=bb_dop20cir&styles&url=https://isk.geobasis-bb.de/mapproxy/dop20cir/service/wms',
+    r'contextualWMSLegend=0&crs=EPSG:3857&dpiMode=7&featureCount=10&format=image/png&layers=bb_dop20cir&styles&'
+    r'url=https://isk.geobasis-bb.de/mapproxy/dop20cir/service/wms',
     'x1', 'wms'
 )
 layer2 = QgsRasterLayer(
-    r'contextualWMSLegend=0&crs=EPSG:3857&dpiMode=7&featureCount=10&format=image/png&layers=bebb_dop20c&styles&url=https://isk.geobasis-bb.de/mapproxy/dop20c_wmts/service',
+    r'contextualWMSLegend=0&crs=EPSG:3857&dpiMode=7&featureCount=10&format=image/png&layers=bebb_dop20c&styles&'
+    r'url=https://isk.geobasis-bb.de/mapproxy/dop20c_wmts/service',
     'x2', 'wms'
 )
 provider1: QgsRasterDataProvider = layer1.dataProvider()

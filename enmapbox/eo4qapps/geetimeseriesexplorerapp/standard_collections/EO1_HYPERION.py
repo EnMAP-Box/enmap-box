@@ -1,3 +1,4 @@
+import ee
 collection = ee.ImageCollection("EO1/HYPERION")
 
 # default colors for bands and spectral indices

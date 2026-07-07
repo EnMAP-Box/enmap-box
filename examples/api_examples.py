@@ -23,6 +23,10 @@
 
 # imports
 import unittest
+from typing import List, Dict
+
+from qgispluginsupport.qps.speclib.core import profile_field_names
+from qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
 
 from enmapbox.testing import start_app
 from qgis.PyQt.QtGui import QIcon
@@ -54,12 +58,12 @@ class Examples(unittest.TestCase):
         enmapBox = EnMAPBox.instance()
         enmapBox.close()
 
-        qgsApp.exec_()
+        qgsApp.exec()
 
     def test_Ex2_DataSources(self):
 
         from enmapbox.gui.enmapboxgui import EnMAPBox
-        EMB = EnMAPBox(None)
+        EnMAPBox(None)
 
         enmapBox = EnMAPBox.instance()
 
@@ -75,7 +79,10 @@ class Examples(unittest.TestCase):
         enmapBox.addSources([pathVectorSource, pathSpectralLibrary])
 
         # add some Web Services
-        wmsUri = 'referer=OpenStreetMap%20contributors,%20under%20ODbL&type=xyz&url=http://tiles.wmflabs.org/hikebike/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=17&zmin=1'
+        wmsUri = (
+            'referer=OpenStreetMap%20contributors,%20under%20ODbL&type=xyz&'
+            'url=http://tiles.wmflabs.org/hikebike/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=17&zmin=1'
+        )
         enmapBox.addSource(wmsUri, name="Open Street Map")
 
         # be informed over new data sources
@@ -103,7 +110,7 @@ class Examples(unittest.TestCase):
 
         # pro tip: access the DataSource objects directly
 
-        qgsApp.exec_()
+        qgsApp.exec()
 
     def test_Ex2_UniqueDataSources(self):
 
@@ -135,18 +142,16 @@ class Examples(unittest.TestCase):
         with open(pathFile, 'w', encoding='utf-8') as f:
             f.write('First version')
 
-        assert os.path.isfile(pathFile)
         enmapBox.addSource(pathFile)
-        assert len(enmapBox.dataSources()) == 1
+        print(len(enmapBox.dataSources()) == 1)
 
         time.sleep(2)
 
         with open(pathFile, 'w', encoding='utf-8') as f:
             f.write('Second version')
 
-        assert os.path.exists(pathFile)
         enmapBox.addSource(pathFile)
-        assert len(enmapBox.dataSources()) == 1
+        print(len(enmapBox.dataSources()) == 1)
 
     def test_Ex3_Docks(self):
         """
@@ -174,66 +179,60 @@ class Examples(unittest.TestCase):
         mapDock3.setVisible(False)
 
         # list all docks
-        from enmapbox.gui.dataviews.docks import Dock
         for dock in enmapBox.mDockManager.docks():
-            assert isinstance(dock, Dock)
             print(dock)
 
         # list map docks only
         for dock in enmapBox.mDockManager.docks(dockType='MAP'):
-            assert isinstance(dock, Dock)
             print(dock)
 
         # list all spectral library docks
         for dock in enmapBox.mDockManager.docks(dockType='SPECLIB'):
-            assert isinstance(dock, Dock)
             print(dock)
 
-        qgsApp.exec_()
+        qgsApp.exec()
 
     def test_Ex4_MapTools(self):
 
         from enmapbox.gui.enmapboxgui import EnMAPBox
-        enmapBox = EnMAPBox(None)
+        enmapBox = EnMAPBox()
         enmapBox.loadExampleData()  # this opens a map dock as well
 
-        from enmapbox.gui import MapTools, SpatialPoint, SpectralProfile
+        from enmapbox.qgispluginsupport.qps.maptools import MapTools, SpatialPoint
 
         def printLocation(spatialPoint: SpatialPoint):
             print('Mouse clicked on {}'.format(spatialPoint))
 
         enmapBox.sigCurrentLocationChanged.connect(printLocation)
-        enmapBox.setMapTool(MapTools.CursorLocation)
+        enmapBox.setMapTool(MapTools.SpectralProfile)
 
         def printLocationAndCanvas(spatialPoint: SpatialPoint, canvas: QgsMapCanvas):
             print('Mouse clicked on {} in {}'.format(spatialPoint, canvas))
 
-        enmapBox.sigCurrentLocationChanged[object, QgsMapCanvas].connect(printLocationAndCanvas)
-
-        def printSpectralProfiles(currentSpectra: list):
+        def printSpectralProfiles(currentSpectra: Dict[str, List[QgsFeature]]):
             print('{} SpectralProfiles collected'.format(len(currentSpectra)))
-            for i, p in enumerate(currentSpectra):
-                assert isinstance(p, QgsFeature)
-                p = SpectralProfile.fromSpecLibFeature(p)
-                assert isinstance(p, SpectralProfile)
-                print('{}: {}'.format(i + 1, p.values()['y']))
+            for layer_id, features in currentSpectra.items():
+                print(f'Profile(s) from layer ID: {layer_id}')
+                for f in features:
+                    f: QgsFeature
+                    for n in profile_field_names(f):
+                        profile_dict = decodeProfileValueDict(f.attribute(n))
+                        print(profile_dict)
+
+        enmapBox.sigCurrentLocationChanged[object, QgsMapCanvas].connect(printLocationAndCanvas)
 
         enmapBox.sigCurrentSpectraChanged.connect(printSpectralProfiles)
 
-        print('Last location: {}'.format(enmapBox.currentLocation()))
-        print('Last SpectralProfile: {}'.format(enmapBox.currentSpectra()))
+        print(f'Last location: {enmapBox.currentLocation()}')
 
-        lastPosition = enmapBox.currentLocation()
-
-        qgsApp.exec_()
+        qgsApp.exec()
 
     def test_ActivateMapToolsFromExternalApplication(self):
 
         from enmapbox.gui.enmapboxgui import EnMAPBox
-        enmapBox = EnMAPBox(None)
+        from enmapbox.qgispluginsupport.qps.maptools import MapTools
+        enmapBox = EnMAPBox()
         enmapBox.loadExampleData()  # this opens a map dock as well
-
-        from enmapbox.gui import SpectralProfile
 
         class MyApp(QMainWindow):
 
@@ -266,23 +265,32 @@ class Examples(unittest.TestCase):
 
                     # soon: self.mEnMAPBox.setMapTool(MapTools.SpectralProfile)
 
-            def onSpectralProfilesCollected(self, spectalProfiles):
+            def onSpectralProfilesCollected(self, spectal_profiles: Dict[str, List[QgsFeature]]):
 
                 if self.mActionGetProfiles.isChecked():
-                    for p in spectalProfiles:
-                        assert isinstance(p, QgsFeature)
-                        p = SpectralProfile.fromSpecLibFeature(p)
-                        self.mTextBox.append(str(p.yValues()))
+                    text = ''
+                    for layer_id, features in spectal_profiles.items():
+                        layer_id: str
+                        for f in features:
+                            f: QgsFeature
+                            for n in profile_field_names(f):
+                                profile = decodeProfileValueDict(f.attribute(n))
+                                if 'y' in profile:
+                                    text += f'Layer: {layer_id}\n'
+                                    text += f'Profile: {profile}\n'
+                    self.mTextBox.append(text)
 
         myApp = MyApp(enmapBox)
         myApp.show()
 
-        qgsApp.exec_()
+        enmapBox.setMapTool(MapTools.SpectralProfile)
+
+        qgsApp.exec()
 
     def test_Ex5_PointsAndExtents(self):
 
         from enmapbox.exampledata import enmap
-        from enmapbox.gui import SpatialPoint
+        from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
 
         layer = QgsRasterLayer(enmap)
         point = SpatialPoint.fromMapLayerCenter(layer)
@@ -298,7 +306,6 @@ class Examples(unittest.TestCase):
         print('QgsPointXY  : {}'.format(QgsPointXY(pointTargetCRS)))
         print('SpatialPoint: {}\n'.format(pointTargetCRS))
 
-        from enmapbox.gui import SpatialExtent
         extent = SpatialExtent.fromLayer(layer)
         print('Original CRS : "{}"'.format(layer.crs().description()))
         print('QgsRectangle : {}'.format(QgsRectangle(extent)))

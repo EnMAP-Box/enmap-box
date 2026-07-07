@@ -101,7 +101,7 @@ class MetadataEditorDialog(QDialog):
         super(MetadataEditorDialog, self).__init__(parent, Qt.Window)
         path = pathlib.Path(__file__).parent / 'metadataeditor.ui'
         loadUi(path, self)
-        assert isinstance(self.cbSource, QgsMapLayerComboBox)
+        self.cbSource: QgsMapLayerComboBox
 
         self.mProject = MetadataEditorDialogProject(project=project)
         self.cbSource: QgsMapLayerComboBox

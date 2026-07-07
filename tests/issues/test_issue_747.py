@@ -52,7 +52,7 @@ from enmapbox.testing import EnMAPBoxTestCase, start_app
 from qgis.PyQt.QtCore import QSize
 from qgis.PyQt.QtWidgets import QTreeView
 from qgis.core import QgsProject
-from enmapboxtestdata import classificationDatasetAsPklFile
+from enmapboxtestdata import classificationDatasetAsSkopsFile
 start_app()
 
 
@@ -63,8 +63,8 @@ class TestIssue747(EnMAPBoxTestCase):
         Collapsing parent nodes crashes TreeView
         How to reproduce
         1. Show Widget
-        2. Expand nodes 'Models', 'classification_dataset.pkl', 'dict', 'X', 'array'
-           (below 'classification_dataset.pkl' will be fetched on demand)
+        2. Expand nodes 'Models', 'classification_dataset.skops', 'dict', 'X', 'array'
+           (below 'classification_dataset.skops' will be fetched on demand)
         3. unexpand 'X'
 
         - happens with TreeView but not QTreeView
@@ -86,7 +86,7 @@ class TestIssue747(EnMAPBoxTestCase):
 
         self.assertIsInstance(tv, QTreeView)
 
-        model.addDataSources(classificationDatasetAsPklFile)
+        model.addDataSources(classificationDatasetAsSkopsFile)
 
         node = model.rootNode().findChildNodes(ModelDataSource, recursive=True)
         self.assertTrue(len(node) == 1)
@@ -105,7 +105,6 @@ class TestIssue747(EnMAPBoxTestCase):
         # tv.expand(model.node2idx(node))
         tv.resize(QSize(600, 600))
         tv.show()
-        s = ""
 
         self.showGui(tv)
 

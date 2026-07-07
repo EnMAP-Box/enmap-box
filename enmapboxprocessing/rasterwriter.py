@@ -26,7 +26,10 @@ class RasterWriter(object):
 
     def writeArray(self, array: Array3d, xOffset=0, yOffset=0, bandList: List[int] = None, overlap: int = None):
         if bandList is None:
-            assert len(array) == self.bandCount()
+            if len(array) != self.bandCount():
+                raise ValueError(
+                    f'expected {self.bandCount()} values (one per band), got {len(array)}'
+                )
             bandList = range(1, self.bandCount() + 1)
         for bandNo, array2d in zip(bandList, array):
             self.writeArray2d(array2d, bandNo, xOffset, yOffset, overlap)
@@ -179,7 +182,10 @@ class RasterWriter(object):
             return self.gdalDataset
         else:
             gdalBand: gdal.Band = self.gdalDataset.GetRasterBand(bandNo)
-            assert gdalBand is not None
+            if gdalBand is None:
+                raise RuntimeError(
+                    f'failed to retrieve GDAL raster band {bandNo}'
+                )
             return gdalBand
 
     def gdalBand(self, bandNo: int = None) -> gdal.Band:

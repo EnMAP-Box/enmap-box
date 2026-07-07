@@ -1,15 +1,14 @@
 import re
 from typing import Dict, Any, List, Tuple
 
-from qgis.PyQt.QtCore import QVariant
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsProcessingParameterField,
-                       QgsVectorFileWriter,
-                       QgsProject, QgsCoordinateTransform, QgsField)
-
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtCore import QMetaType
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsProcessingParameterField,
+                       QgsVectorFileWriter,
+                       QgsProject, QgsCoordinateTransform, QgsField)
 
 
 @typechecked
@@ -71,7 +70,7 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
         return True, ''
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         grid = self.parameterAsRasterLayer(parameters, self.P_GRID, context)
         vector = self.parameterAsVectorLayer(parameters, self.P_VECTOR, context)
@@ -82,7 +81,7 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
         burnFid = self.parameterAsBoolean(parameters, self.P_BURN_FID, context)
         addValue = self.parameterAsBoolean(parameters, self.P_ADD_VALUE, context)
         allTouched = self.parameterAsBoolean(parameters, self.P_ALL_TOUCHED, context)
-        format, options = self.GTiffFormat, self.DefaultGTiffCreationOptions
+        options = self.DefaultGTiffCreationOptions
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_RASTER, context)
 
         with open(filename + '.log', 'w') as logfile:
@@ -91,7 +90,7 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
 
             # create fid field if needed
             if burnFid:
-                field = QgsField('temp_fid', QVariant.LongLong)
+                field = QgsField('temp_fid', QMetaType.LongLong)
                 vector.addExpressionField('$id', field)
                 tmpFilename = Utils.tmpFilename(filename, 'fid.gpkg')
                 saveVectorOptions = QgsVectorFileWriter.SaveVectorOptions()
@@ -102,7 +101,8 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
                 error, message, newFilename, newLayere = QgsVectorFileWriter.writeAsVectorFormatV3(
                     vector, tmpFilename, transformContext, saveVectorOptions
                 )
-                assert error == QgsVectorFileWriter.NoError, f'Fail error {error}:{message}'
+                if error != QgsVectorFileWriter.NoError:
+                    raise RuntimeError(f'write failed with error {error}: {message}')
                 vector = QgsVectorLayer(tmpFilename)
                 burnAttribute = field.name()
                 initValue = -1
@@ -127,7 +127,8 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
                 error, message, newFilename, newLayer = QgsVectorFileWriter.writeAsVectorFormatV3(
                     vector, tmpFilename, transformContext, saveVectorOptions
                 )
-                assert error == QgsVectorFileWriter.NoError, f'Fail error {error}:{message}'
+                if error != QgsVectorFileWriter.NoError:
+                    raise RuntimeError(f'failed to write vector file: error {error}: {message}')
                 vector = QgsVectorLayer(tmpFilename)
 
             extra = ''
@@ -166,8 +167,6 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
                     ts_new = re.sub(r'\.\d+', '', ts_old)
                     cmdArgs = cmdArgs.replace(ts_old, ts_new)
                 GDALPA_Utils.runGdal([cmd, cmdArgs], feedback2)
-
-                s = ""
 
             result = {self.P_OUTPUT_RASTER: filename}
             self.toc(feedback, result)

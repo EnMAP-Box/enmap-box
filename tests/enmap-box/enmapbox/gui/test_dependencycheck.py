@@ -27,7 +27,7 @@ from enmapbox.testing import EnMAPBoxTestCase, start_app
 from qgis.PyQt.QtCore import QProcess
 from qgis.PyQt.QtGui import QMovie
 from qgis.PyQt.QtWidgets import QApplication, QTableView, QLabel
-from qgis.core import Qgis, QgsTaskManager, QgsTask
+from qgis.core import Qgis, QgsTask
 from qgis.core import QgsApplication
 
 start_app()
@@ -56,11 +56,10 @@ class test_dependencycheck(EnMAPBoxTestCase):
         process.start(f'{pip_exe} show numpy')
         process.waitForFinished()
         msgOut = process.readAllStandardOutput().data().decode('utf-8')
-        msgErr = process.readAllStandardError().data().decode('utf-8')
+        process.readAllStandardError().data().decode('utf-8')
         success = process.exitCode() == 0
         self.assertTrue(success)
         self.assertTrue(msgOut.startswith('Name: numpy'))
-        s = ""
 
     def test_required_packages(self):
 
@@ -132,9 +131,6 @@ class test_dependencycheck(EnMAPBoxTestCase):
 
     @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'Skipped, would take too long')
     def test_PIPInstaller(self):
-        pkgs = [PIPPackage(self.nonexistingPackageName(), required_by='core'),
-                PIPPackage(self.nonexistingPackageName()),
-                PIPPackage(self.nonexistingPackageName())]
         pkgs = []
         pkgs += requiredPackages()
         w = PIPPackageInstaller()
@@ -146,10 +142,10 @@ class test_dependencycheck(EnMAPBoxTestCase):
         self.assertEqual(n_total, w.model.rowCount())
 
         w.setPrimaryFilter('required')
-        n_required = w.proxyModel.rowCount()
+        w.proxyModel.rowCount()
 
         w.setPrimaryFilter('missing')
-        n_missing = w.proxyModel.rowCount()
+        w.proxyModel.rowCount()
 
         # self.assertTrue(n_total > n_required > n_missing)
 
@@ -169,8 +165,8 @@ class test_dependencycheck(EnMAPBoxTestCase):
 
     def test_PIPPackageInfoTask(self):
         required = [PIPPackage(self.nonexistingPackageName())] + requiredPackages()
+        print(required)
         ALL_PKG: dict = dict()
-        PKG_UPDATES: dict = dict()
         PKG_INFOS: List[Tuple[str, dict]] = []
         last_progress = -1
         is_completed = False
@@ -192,27 +188,18 @@ class test_dependencycheck(EnMAPBoxTestCase):
 
                 for k in ['Name', 'Version']:
                     if k not in info:
-                        s = ""
+                        pass
                     self.assertTrue(k in info.keys())
                     value = info[k]
                     self.assertIsInstance(value, str)
                     self.assertEqual(value, value.strip())
 
             PKG_INFOS.extend(infoBadge)
-            s = ""
 
         def onProgress(p: int):
             print('Progress {}'.format(p))
             nonlocal last_progress
             last_progress = p
-
-        MESSAGE_LEVEL = {
-            Qgis.MessageLevel.Info: 'INFO',
-            Qgis.MessageLevel.Critical: 'CRITICAL',
-            Qgis.MessageLevel.Warning: 'WARNING',
-            Qgis.MessageLevel.Success: 'SUCCESS',
-            Qgis.MessageLevel.NoLevel: '<no level>',
-        }
 
         def onMessage(msg: str, msg_level: Qgis.MessageLevel):
             self.assertIsInstance(msg, str)
@@ -223,7 +210,6 @@ class test_dependencycheck(EnMAPBoxTestCase):
             nonlocal is_completed
             self.assertTrue(result)
             is_completed = True
-            s = ""
 
         pois = [p.pipPkgName for p in requiredPackages()]
         task = PIPPackageInfoTask('package info',
@@ -242,7 +228,6 @@ class test_dependencycheck(EnMAPBoxTestCase):
         if False:
             # run with QgsTaskManager
             tm = QgsApplication.taskManager()
-            assert isinstance(tm, QgsTaskManager)
             tm.addTask(task)
             while task.status() != QgsTask.TaskStatus.Complete:
                 QApplication.processEvents()
@@ -272,8 +257,6 @@ class test_dependencycheck(EnMAPBoxTestCase):
         self.assertFalse(success)
         self.assertEqual(stdout, sys.stdout)
         self.assertEqual(stderr, sys.stderr)
-
-        s = ""
 
     def test_find_pipexe(self):
 

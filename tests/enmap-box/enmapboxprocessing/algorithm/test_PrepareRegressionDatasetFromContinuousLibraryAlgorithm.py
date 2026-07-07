@@ -16,10 +16,10 @@ class TestPrepareRegressionDatasetFromContinuousLibraryAlgorithm(TestCase):
         parameters = {
             alg.P_CONTINUOUS_LIBRARY: library_gpkg,  # todo use better dataset (wait for #1036)
             alg.P_TARGET_FIELDS: ['fid'],
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = RegressorDump.fromDict(Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = RegressorDump.fromDict(Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((75, 177), dump.X.shape)
         self.assertEqual((75, 1), dump.y.shape)
         self.assertEqual(177, len(dump.features))
@@ -39,10 +39,10 @@ class TestPrepareRegressionDatasetFromContinuousLibraryAlgorithm(TestCase):
         parameters = {
             alg.P_CONTINUOUS_LIBRARY: layer,
             alg.P_TARGET_FIELDS: ['target'],
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = RegressorDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = RegressorDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual(
             QgsCoordinateReferenceSystem.fromEpsgId(4326), QgsCoordinateReferenceSystem.fromWkt(dump.crs)
         )
@@ -54,10 +54,10 @@ class TestPrepareRegressionDatasetFromContinuousLibraryAlgorithm(TestCase):
         parameters = {
             alg.P_CATEGORIZED_LIBRARY: library_gpkg,
             alg.P_FIELD: 'profiles',
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = ClassifierDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((75, 177), dump.X.shape)
         self.assertEqual((75, 1), dump.y.shape)
         self.assertEqual(177, len(dump.features))
@@ -68,7 +68,7 @@ class TestPrepareRegressionDatasetFromContinuousLibraryAlgorithm(TestCase):
             alg.P_CATEGORIZED_LIBRARY: library_gpkg,
             # alg.P_FIELD: 'profiles',
             alg.P_CATEGORY_FIELD: 'profiles',
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         try:
             self.runalg(alg, parameters)
@@ -80,7 +80,7 @@ class TestPrepareRegressionDatasetFromContinuousLibraryAlgorithm(TestCase):
         parameters = {
             alg.P_CATEGORIZED_LIBRARY: library_gpkg,
             alg.P_FIELD: 'level_1',
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         try:
             self.runalg(alg, parameters)

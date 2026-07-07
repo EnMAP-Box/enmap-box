@@ -14,7 +14,7 @@ from qgis.core import QgsProcessingFeedback
 
 # import albumentations as A
 
-### Data augmentation
+# ## Data augmentation
 
 transforms_v2 = v2.Compose([
     v2.RandomRotation(degrees=45),
@@ -29,7 +29,11 @@ def load_model_and_tile_size(model_checkpoint, acc):
         acc_d = 'cuda'
     else:
         acc_d = 'cpu'
-    checkpoint = torch.load(model_checkpoint, map_location=torch.device(acc_d), weights_only=False)
+    checkpoint = torch.load(
+        model_checkpoint,
+        map_location=torch.device(acc_d),
+        weights_only=False
+    )  # nosec B614
 
     # Retrieve hyperparameters from the checkpoint
     hyperpara = checkpoint['hyper_parameters']
@@ -82,7 +86,7 @@ def read_image_with_gdal(image_path):
     dataset = gdal.Open(image_path)
 
     # channel first
-    data_array = dataset.ReadAsArray().astype(np.float32)
+    # data_array = dataset.ReadAsArray().astype(np.float32)
 
     image = dataset.ReadAsArray()  # Automatically reads all bands
     geotransform = dataset.GetGeoTransform()
@@ -117,7 +121,7 @@ def save_prediction_as_geotiff(pred_array, geotransform, projection, output_path
 
     out_band.WriteArray(pred_array)
 
-    if no_data_value != None:
+    if no_data_value is not None:
         out_band.SetNoDataValue(no_data_value)
     out_raster.FlushCache()
     out_raster = None
@@ -176,8 +180,9 @@ def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_
 
     print('remove', remove_c)
 
-    # variables to check zero presence in mask, if yes first class in iou count is skipped and num_classes is extended by 1
-    Zero_in_mask = False
+    # variables to check zero presence in mask, if yes first class in iou count is skipped
+    # and num_classes is extended by 1
+    # Zero_in_mask = False
     # b = 0
 
     for index, row in df.iterrows():
@@ -221,7 +226,7 @@ def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_
         if remove_c == 'Yes':
             full_prediction_iou[mask == 0] = 0
 
-        if no_data_label_mask == True:
+        if no_data_label_mask is True:
             full_prediction[mask == 0] = 0
 
             # full_prediction_iou = full_prediction[mask == 0] = 0  # no_data_value
@@ -252,7 +257,7 @@ def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_
         if export_folder:
 
             if no_data_mask is not None:
-                full_prediction[no_data_mask] = 0  ######no_data_value
+                full_prediction[no_data_mask] = 0  # no_data_value
             # Create the output file path, using the original image filename with '_prediction' added
             original_filename = os.path.basename(image_path)
             output_filename = os.path.splitext(original_filename)[0] + '_prediction.tif'
@@ -269,7 +274,8 @@ def process_images_from_csv(csv_file, model_checkpoint, acc_device=None, export_
     # Calculate the mean IoU across all images for each class
     mean_iou_per_class = np.nanmean(all_ious, axis=0)
     mean_iou = np.nanmean(mean_iou_per_class)
-    # different approach here compared to mapper. if remove = yes meaning automatical 0 in data as otherwise  remove_c no: meaning no class extension needed
+    # different approach here compared to mapper. if remove = yes meaning automatical 0 in data as
+    # otherwise  remove_c no: meaning no class extension needed
     # inmapper
     # if remove_c == 'Yes':
     #   mean_iou = np.nanmean(mean_iou_per_class[1:])  # Skip class 0

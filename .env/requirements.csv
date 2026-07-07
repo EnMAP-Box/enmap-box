@@ -1,9 +1,10 @@
 pip_name,py_name,min_version,required_by,comment
 astropy,,,full,provides concolution filters
 colorama,colorama,,core,required by pyqtgraph
+defusedxml,defusedxml,,core,required for secure xml reading
 enpt,,,enpt,required by EnPT
 enpt-enmapboxapp,enpt_enmapboxapp,,enpt,required by EnPT
-enfrosp-enmapboxapp, enfrosp_enmapboxapp,0.1.1, , EnFROSP
+enfrosp-enmapboxapp,enfrosp_enmapboxapp,0.1.1, , EnFROSP
 GDAL,osgeo.gdal,,core,usually already installed with QGIS
 lightgbm,,,full,required by LGBM estimators
 lightning,,,specdeepmap,required by SpecDeepMap
@@ -12,11 +13,14 @@ netCDF4,,,full,required by ONNS
 numba,,0.57,full,required by EnSoMap
 numpy,,,core,usually already installed with QGIS
 pandas,,,specdeepmap,required by SpecDeepMap
+pyqtgraph,,,core,required by EnMAP-Box GUI
 PyOpenGL,OpenGL,,imagecube,required by imageCube application
 scikit-learn,sklearn,1.0,core,required to run several EnMAP-Box algorithms
+skops,,,core,required to serialize scikit-learn models
 scipy,,,core,required by multiple tools
 segmentation-models-pytorch,segmentation_models_pytorch,,specdeepmap,required by SpecDeepMap
 sympy,,,specdeepmap,required by SpecDeepMap
+setuptools,,81,specdeepmap,required by SpecDeepMap
 tensorboard,,,specdeepmap,required by SpecDeepMap
 torch,,,specdeepmap,required by SpecDeepMap
 torchvision,,,specdeepmap,required by SpecDeepMap

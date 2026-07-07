@@ -12,4 +12,4 @@ enmapBox.loadExampleData()
 widget = MultipleMapLayerSelectionWidget()
 widget.show()
 
-qgsApp.exec_()
+qgsApp.exec()

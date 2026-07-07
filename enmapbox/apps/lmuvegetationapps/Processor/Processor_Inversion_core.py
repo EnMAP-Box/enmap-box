@@ -31,8 +31,34 @@ import os
 import sys
 import warnings
 
-warnings.filterwarnings('ignore', category=DeprecationWarning)
-warnings.filterwarnings('ignore', category=UserWarning)
+import joblib
+# from _classic.hubdc.core import openRasterDataset, RasterDataset, EnviDriver
+import numpy as np
+from joblib import Parallel, delayed
+from sklearn.base import is_classifier
+from sklearn.decomposition import PCA
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.exceptions import ConvergenceWarning
+from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.kernel_ridge import KernelRidge
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import pairwise_distances
+from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import KFold, train_test_split
+from sklearn.model_selection import RandomizedSearchCV
+# from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import check_cv
+from sklearn.model_selection import cross_val_predict
+from sklearn.neural_network import MLPRegressor
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVR
+from sklearn.utils._testing import ignore_warnings
+
+from enmapboxprocessing.driver import Driver
+from enmapboxprocessing.rasterreader import RasterReader
+from lmuvegetationapps.Processor.Processor_Training_MLRA_defaults import MLRA_defaults
+
 # from sklearn.exceptions import ConvergenceWarning
 # warnings.filterwarnings('ignore', category=ConvergenceWarning)
 
@@ -40,36 +66,8 @@ if not sys.warnoptions:
     warnings.simplefilter("ignore")
     os.environ["PYTHONWARNINGS"] = "ignore"  # Also affect subprocesses
 
-from _classic.hubflow.core import *
-import numpy as np
-
-from lmuvegetationapps.Processor.Processor_Training_MLRA_defaults import MLRA_defaults
-
-from sklearn.neural_network import MLPRegressor
-from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.svm import SVR
-from sklearn.kernel_ridge import KernelRidge
-from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import RandomizedSearchCV
-
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import mean_squared_error
-
-from sklearn.metrics import pairwise_distances
-from sklearn.model_selection import KFold, train_test_split
-# from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import check_cv
-from sklearn.model_selection import cross_val_predict
-from sklearn.base import is_classifier
-
-from sklearn.utils._testing import ignore_warnings
-from sklearn.exceptions import ConvergenceWarning
-
-import joblib
-from joblib import Parallel, delayed
+warnings.filterwarnings('ignore', category=DeprecationWarning)
+warnings.filterwarnings('ignore', category=UserWarning)
 
 
 def squeeze_first_dim(arr):
@@ -339,8 +337,6 @@ class MLRATraining:
                     output['loop_counter'] = loop_counter
                     yield output
             loop_counter += 1
-
-        # np.savetxt("C:\Data\Daten\Testdaten\LUT/training_indices_AL_internal.txt", al_training_indices, delimiter="\t")
 
         yield {'type': 'result', 'model': model, 'al_training_indices': al_training_indices,
                'performances': all_performances, 'predictions': all_preds, 'stds': all_stds, 'X_val': X_val,
@@ -656,12 +652,16 @@ class ProcessorTraining:
                                     prg_al_string, self.algorithm, model_no, nmodels_total, para))
                             qgis_app.processEvents()
                         else:
-                            print("Training {} {} Noise {:d}-{:d} | {} | Geo {:d} of {:d}".format(prg_al_string,
-                                                                                                  self.algorithm,
-                                                                                                  self.noisetype,
-                                                                                                  self.sigma, para,
-                                                                                                  geo_ensemble + 1,
-                                                                                                  self.ntts * self.ntto * self.npsi))
+                            print(
+                                "Training {} {} Noise {:d}-{:d} | {} | Geo {:d} of {:d}".format(
+                                    prg_al_string,
+                                    self.algorithm,
+                                    self.noisetype,
+                                    self.sigma, para,
+                                    geo_ensemble + 1,
+                                    self.ntts * self.ntto * self.npsi
+                                )
+                            )
 
                         if self.perf_eval:  # performance evaluation
                             # result_dict is of type key 'result', 'progress', or 'hyperparameters'
@@ -744,7 +744,8 @@ class ProcessorTraining:
 
                         else:  # no performance evaluation means just fitting the model without feedback
                             model = self.ml_model(X=x, y=y[:, ipara], model=self.mlra)
-                            test_indices = []  # make sure 'test_indices' is always defined, even when self.perf_eval is False
+                            test_indices = []
+                            # make sure 'test_indices' is always defined, even when self.perf_eval is False
 
                         if not self.use_al and len(self.para_list) > 1:
                             prgbar_widget.gui.prgBar.setMaximum(100)
@@ -754,7 +755,7 @@ class ProcessorTraining:
                         # The final trained model is saved
                         joblib.dump(model, self.model_base + "_{:d}_{}{}".format(geo_ensemble,
                                                                                  para,
-                                                                                 self.ml_model_ext))  # dump (save) model to file for later use
+                                                                                 self.ml_model_ext))
 
                         # save the AL selection LUT if Checkbox is checked.
                         if self.saveALselection and al_training_indices:
@@ -979,7 +980,8 @@ class ProcessorTraining:
         values = [value.split(';') if ';' in value else value for value in values]
         self.meta_dict = dict(zip(keys, values))  # dictionary for meta-information in the LUT
         # dictionary for the parameters stored in the LUT
-        # ['N', 'cab', 'car', 'anth', 'cbrown', 'cw', 'cm', 'cp', 'cbc', 'LAI', 'typeLIDF', 'LIDF', 'hspot', 'psoil', 'tts', 'tto', 'psi', 'LAIu', 'cd', 'sd', 'h']
+        # ['N', 'cab', 'car', 'anth', 'cbrown', 'cw', 'cm', 'cp', 'cbc', 'LAI', 'typeLIDF', 'LIDF', 'hspot', 'psoil',
+        # 'tts', 'tto', 'psi', 'LAIu', 'cd', 'sd', 'h']
         self.para_dict = dict(zip(self.meta_dict['parameters'], list(range(len(self.meta_dict['parameters'])))))
         for geo in ['tts', 'tto', 'psi']:  # happens when only one angle is provided (no ";"-split)
             if not isinstance(self.meta_dict[geo], list):  # reads as: if meta_dict[geo] is not of type "list"
@@ -995,7 +997,8 @@ class ProcessorTraining:
         y = np.zeros(shape=(lut.shape[1], len(self.para_list)))  # open up a new array for PROSAIL parameters
 
         #  all LUT_params
-        #  ['N', 'cab', 'car', 'anth', 'cbrown', 'cw', 'cm', 'cp', 'cbc', 'LAI', 'typeLIDF', 'LIDF', 'hspot', 'psoil', 'tts', 'tto', 'psi', 'LAIu', 'cd', 'sd', 'h']
+        #  ['N', 'cab', 'car', 'anth', 'cbrown', 'cw', 'cm', 'cp', 'cbc', 'LAI', 'typeLIDF', 'LIDF', 'hspot', 'psoil',
+        #  'tts', 'tto', 'psi', 'LAIu', 'cd', 'sd', 'h']
         for i, para in enumerate(self.para_list):  # extract parameters
             # check if para is *'derived' and calculate:
             if para == 'AGBdry':
@@ -1105,7 +1108,7 @@ class ProcessorPrediction:
         self.all_psi = [float(i) for i in metacontent[8].split("=")[1].split(";")]
         try:
             self.exclude_bands = [int(i) for i in metacontent[9].split("=")[1].split(";")]
-        except:
+        except Exception:
             self.exclude_bands = []
 
         if prg_widget:
@@ -1163,10 +1166,13 @@ class ProcessorPrediction:
         # Find out coordinates for which ALL constraints hold True in each "whichModel"
         # The result is a "map" in which each pixel stores the ID of the model to be used (depending on geometry)
         for iwhichModel in self.whichModel_unique:  # Mask depending on constraints
-            whichModel_coords.append(np.where((whichModel[:, :] == iwhichModel) &  # present Model
-                                              (self.mask[0, :, :] > 0 if self.mask_image else all_true) &  # not masked
-                                              (self.ndvi_mask > 0 if self.mask_ndvi else all_true) &  # NDVI masked
-                                              (~np.all(in_matrix == self.nodat[0], axis=0))))  # not NoDatVal
+            whichModel_coords.append(
+                np.where(
+                    (whichModel[:, :] == iwhichModel)  # present Model
+                    & (self.mask[0, :, :] > 0 if self.mask_image else all_true)  # not masked
+                    & (self.ndvi_mask > 0 if self.mask_ndvi else all_true)  # NDVI masked
+                    & (~np.all(in_matrix == self.nodat[0], axis=0)))  # not NoDatVal
+            )
 
         _, nrows, ncols = in_matrix.shape
         # Prepare output-matrix and will it with nodata
@@ -1245,16 +1251,19 @@ class ProcessorPrediction:
                     continue  # after masking, not all 'imodels' are present in the image_copy
 
                 if isinstance(mod[imodel], GaussianProcessRegressor):
-                    result, result_std = mod[imodel].predict(image_copy[whichModel_coords[i_imodel][0],
-                                                             whichModel_coords[i_imodel][1], :], return_std=True)
+                    result, result_std = mod[imodel].predict(
+                        image_copy[whichModel_coords[i_imodel][0], whichModel_coords[i_imodel][1], :], return_std=True
+                    )
                     out_matrix_std = np.copy(out_matrix)
                     out_matrix_std[ipara, whichModel_coords[i_imodel][0], whichModel_coords[i_imodel][
                         1]] = result_std
 
                 else:
-                    # This is the core "predict" command in which the algorithm is asked to estimate from what it has learnt
-                    result = mod[imodel].predict(image_copy[whichModel_coords[i_imodel][0],
-                                                 whichModel_coords[i_imodel][1], :])
+                    # This is the core "predict" command in which the algorithm is asked to estimate from what it
+                    # has learnt
+                    result = mod[imodel].predict(
+                        image_copy[whichModel_coords[i_imodel][0], whichModel_coords[i_imodel][1], :]
+                    )
 
                 out_matrix[ipara, whichModel_coords[i_imodel][0], whichModel_coords[i_imodel][
                     1]] = result  # / self.m.func.conv[para][2]
@@ -1311,10 +1320,15 @@ class Functions:
     @staticmethod
     def _read_image(image, dtype=np.float32):
         # Method for loading bsq images, no bands are skipped anymore
-        dataset = openRasterDataset(image)
-        in_matrix = dataset.readAsArray().astype(dtype=dtype)
+        # dataset = openRasterDataset(image)
+        # in_matrix = dataset.readAsArray().astype(dtype=dtype)
+
+        reader = RasterReader(image)
+        array = np.array(reader.array(), dtype)
+        in_matrix = array
+
         nbands, nrows, ncols = in_matrix.shape
-        grid = dataset.grid()
+        grid = reader.extent(), reader.crs()
 
         return nrows, ncols, nbands, grid, in_matrix  # return a tuple back to the last function (type "dtype")
 
@@ -1322,25 +1336,44 @@ class Functions:
     def write_image(out_matrix, image_out, grid, paras_out, nodat, out_mode):
         # Method for writing output to binary raster file
         if out_mode == 'single':  # write one single file with multiple bands
-            output = RasterDataset.fromArray(array=out_matrix, filename=image_out, grid=grid,
-                                             driver=EnviDriver())
-            output.setMetadataItem('data ignore value', nodat, 'ENVI')
+            # output = RasterDataset.fromArray(array=out_matrix, filename=image_out, grid=grid,
+            #                                 driver=EnviDriver())
 
-            for iband, band in enumerate(output.bands()):
-                band.setDescription(paras_out[iband])
-                band.setNoDataValue(nodat)
+            array = out_matrix
+            filename = image_out
+            extent, crs = grid
+
+            writer = Driver(filename).createFromArray(array, extent, crs)
+            writer.setMetadataItem('data ignore value', nodat, 'ENVI')
+
+            for bandNo in writer.bandNumbers():
+                writer.setBandName(paras_out[bandNo - 1], bandNo)
+                writer.setNoDataValue(nodat, bandNo)
+
+            writer.close()
 
         else:  # write several files, one per parameters
+
             for ipara in range(len(paras_out)):
                 # naming convention: drop extension, add para name, add extension
                 base, ext = os.path.splitext(image_out)
                 image_out_individual = base + "_" + paras_out[ipara] + ext
-                output = RasterDataset.fromArray(array=out_matrix[ipara, :, :], filename=image_out_individual,
-                                                 grid=grid, driver=EnviDriver())
-                output.setMetadataItem('data ignore value', nodat, 'ENVI')
-                band = next(output.bands())  # output.bands() is a generator; here only one band
-                band.setDescription(paras_out[ipara])
-                band.setNoDataValue(nodat)
+                # output = RasterDataset.fromArray(array=out_matrix[ipara, :, :], filename=image_out_individual,
+                #                                 grid=grid, driver=EnviDriver())
+
+                array = out_matrix[ipara, :, :]
+                filename = image_out_individual
+                extent, crs = grid
+
+                writer = Driver(filename).createFromArray(array, extent, crs)
+                writer.setMetadataItem('data ignore value', nodat, 'ENVI')
+
+                # band = next(output.bands())  # output.bands() is a generator; here only one band
+                bandNo = 1
+                writer.setBandName(paras_out[ipara], bandNo)
+                writer.setNoDataValue(nodat, bandNo)
+
+                writer.close()
 
     def read_geometry(self, geo_in):
         # Read geometry from input file (raster based)

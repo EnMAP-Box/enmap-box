@@ -1,4 +1,4 @@
-import pickle
+import skops
 import traceback
 import warnings
 from math import nan, isnan
@@ -8,8 +8,8 @@ from tempfile import gettempdir
 from typing import Optional, List, Tuple, Dict
 
 import numpy as np
+import pyqtgraph as pg
 
-import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyle, MarkerSymbol
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.typeguard import typechecked
@@ -677,7 +677,7 @@ class GeeTemporalProfileDockWidget(QDockWidget):
                 dateStart = d1.addYears(step)
                 dateEnd = d2.addYears(step)
             else:
-                assert 0
+                raise ValueError()
             self.setComposite(dateStart, dateEnd)
 
     def onPreviousClicked(self):
@@ -707,7 +707,7 @@ class GeeTemporalProfileDockWidget(QDockWidget):
                 dateStart = d1.addYears(-step)
                 dateEnd = d2.addYears(-step)
             else:
-                assert 0
+                raise ValueError()
             self.setComposite(dateStart, dateEnd)
 
     def downloadFilenameProfile(self, feature: QgsFeature, eeCollection):
@@ -739,8 +739,9 @@ class GeeTemporalProfileDockWidget(QDockWidget):
             self.pushInfoMissingLayer()
             return
 
+        feature: QgsFeature
         for feature in layer.getFeatures():
-            assert isinstance(feature, QgsFeature)
+
             point: QgsPointXY = QgsGeometry(feature.geometry()).asPoint()
             point = SpatialPoint(layer.crs(), point).toCrs(self.mainDock.crsEpsg4326)
             # point = self.utilsTransformCrsToWgs84(point, layer.crs())
@@ -835,8 +836,8 @@ class GeeTemporalProfileDockWidget(QDockWidget):
         if n == 0:
             return
 
+        feature: QgsFeature
         for feature in features:
-            assert isinstance(feature, QgsFeature)
             point: QgsPointXY = QgsGeometry(feature.geometry()).asPoint()
             point = self.utilsTransformCrsToWgs84(point, layer.crs())
             eePoint = ee.Geometry.Point([point.x(), point.y()])
@@ -880,13 +881,13 @@ class GeeTemporalProfileDockWidget(QDockWidget):
             text = ''
         QApplication.clipboard().setText(text)
 
-    def _onSaveVectorPointsPreparePkl(self):
+    def _onSaveVectorPointsPrepareSkops(self):
         eeImported, ee = importEarthEngine(False)
 
         canceled = True
-        filenamePkl = join(dirname(__file__), 'cmd', 'parameters.pkl')
-        if exists(filenamePkl):
-            remove(filenamePkl)
+        filenameSkops = join(dirname(__file__), 'cmd', 'parameters.skops')
+        if exists(filenameSkops):
+            remove(filenameSkops)
 
         layer: QgsVectorLayer = self.mPointLayerBrowser.currentLayer()
         if layer is None:
@@ -921,8 +922,8 @@ class GeeTemporalProfileDockWidget(QDockWidget):
         fields: QgsFields = layer.fields()
         fieldNames = fields.names()
         argss = list()
+        feature: QgsFeature
         for feature in layer.getFeatures():
-            assert isinstance(feature, QgsFeature)
             geometry = QgsGeometry(feature.geometry())
             geometry.transform(tr)
             destPoint: QgsPointXY = geometry.asPoint()
@@ -938,8 +939,8 @@ class GeeTemporalProfileDockWidget(QDockWidget):
 
         dirnameGee = dirname(dirname(ee.__file__))
         numReader = 50
-        with open(filenamePkl, 'wb') as f:
-            pickle.dump((argss, dirnameGee, numReader), f, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(filenameSkops, 'wb') as f:
+            skops.dump((argss, dirnameGee, numReader), f, protocol=skops.HIGHEST_PROTOCOL)
 
         return not canceled
 

@@ -12,10 +12,10 @@ class TestPrepareClassificationDatasetFromJsonAlgorithm(TestCase):
         alg = PrepareClassificationDatasetFromJsonAlgorithm()
         parameters = {
             alg.P_JSON_FILE: classificationDatasetAsJsonFile,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = ClassifierDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((58, 177), dump.X.shape)
         self.assertEqual((58, 1), dump.y.shape)
         self.assertEqual(177, len(dump.features))

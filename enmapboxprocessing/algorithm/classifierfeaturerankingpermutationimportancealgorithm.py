@@ -3,13 +3,13 @@ from os.path import basename
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.reportwriter import MultiReportWriter, HtmlReportWriter, CsvReportWriter
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -32,18 +32,22 @@ class ClassifierFeatureRankingPermutationImportanceAlgorithm(EnMAPProcessingAlgo
         return 'Classifier feature ranking (permutation importance)'
 
     def shortDescription(self) -> str:
-        return 'Permutation feature importance is a model inspection technique that is especially useful for non-linear or opaque estimators. ' \
-               'The permutation feature importance is defined to be the decrease in a model score when a single feature value is randomly shuffled. ' \
-               'This procedure breaks the relationship between the feature and the target, thus the drop in the model score is indicative of how much the model depends on the feature. ' \
-               'This technique benefits from being model agnostic and can be calculated many times with different permutations of the feature.'
+        return (
+            'Permutation feature importance is a model inspection technique that is especially useful for non-linear '
+            'or opaque estimators. The permutation feature importance is defined to be the decrease in a model score '
+            'when a single feature value is randomly shuffled. This procedure breaks the relationship between the '
+            'feature and the target, thus the drop in the model score is indicative of how much the model depends on '
+            'the feature. This technique benefits from being model agnostic and can be calculated many times with '
+            'different permutations of the feature.'
+        )
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._CLASSIFIER, 'Classifier pickle file. '
+            (self._CLASSIFIER, 'Classifier skops file. '
                                'In case of an unfitted classifier, also specify a training dataset.'),
-            (self._TRAIN_DATASET, 'Training dataset pickle file used for (re-)fitting the classifier. '
+            (self._TRAIN_DATASET, 'Training dataset skops file used for (re-)fitting the classifier. '
                                   'Can be skipped in case of a fitted classifier.'),
-            (self._TEST_DATASET, 'Test dataset pickle file used for performance evaluation. '
+            (self._TEST_DATASET, 'Test dataset skops file used for performance evaluation. '
                                  'If skipped, the training dataset is used.'),
             (self._EVALUATION_METRIC,
              'An evaluation metric to use. '
@@ -66,12 +70,12 @@ class ClassifierFeatureRankingPermutationImportanceAlgorithm(EnMAPProcessingAlgo
         return Group.FeatureSelection.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
-        self.addParameterFile(self.P_CLASSIFIER, self._CLASSIFIER, extension='pkl')
+        self.addParameterFile(self.P_CLASSIFIER, self._CLASSIFIER, extension='skops')
         self.addParameterFile(
-            self.P_TRAIN_DATASET, self._TRAIN_DATASET, extension=self.PickleFileExtension, optional=True, advanced=True
+            self.P_TRAIN_DATASET, self._TRAIN_DATASET, extension=self.SkopsFileExtension, optional=True, advanced=True
         )
         self.addParameterFile(
-            self.P_TEST_DATASET, self._TEST_DATASET, extension=self.PickleFileExtension, optional=True, advanced=True
+            self.P_TEST_DATASET, self._TEST_DATASET, extension=self.SkopsFileExtension, optional=True, advanced=True
         )
         self.addParameterEnum(
             self.P_EVALUATION_METRIC, self._EVALUATION_METRIC, self.O_EVALUATION_METRIC, False,
@@ -107,18 +111,18 @@ class ClassifierFeatureRankingPermutationImportanceAlgorithm(EnMAPProcessingAlgo
                 filenameTestSample = filenameTrainSample
             refit = filenameTrainSample != filenameClassifier
 
-            classifier = ClassifierDump(**Utils.pickleLoad(filenameClassifier)).classifier
+            classifier = ClassifierDump(**Utils.modelLoad(filenameClassifier)).classifier
             feedback.pushInfo(f'Load classifier: {classifier}')
 
             if refit:
-                dump = ClassifierDump(**Utils.pickleLoad(filenameTrainSample))
+                dump = ClassifierDump(**Utils.modelLoad(filenameTrainSample))
                 X, y, features = dump.X, dump.y, dump.features
                 feedback.pushInfo(f'Load training dataset: X=array{list(X.shape)} y=array{list(dump.y.shape)}')
                 feedback.pushInfo('Fit classifier')
                 classifier.fit(X, y)
 
             # load test sample
-            dump = ClassifierDump(**Utils.pickleLoad(filenameTestSample))
+            dump = ClassifierDump(**Utils.modelLoad(filenameTestSample))
             X, y, features = dump.X, dump.y, dump.features
             feedback.pushInfo(f'Load test dataset: X=array{list(X.shape)} y=array{list(dump.y.shape)}')
 
@@ -159,8 +163,9 @@ class ClassifierFeatureRankingPermutationImportanceAlgorithm(EnMAPProcessingAlgo
                     ['mean', 'standard deviation'],
                     np.array(features)[ordered].tolist(),
                 )
+                link = "https://scikit-learn.org/stable/modules/permutation_importance.html#permutation-importance"
                 report.writeParagraph(
-                    f'See {self.htmlLink("https://scikit-learn.org/stable/modules/permutation_importance.html#permutation-importance", "Permutation feature importance")} for further information.'
+                    f'See {self.htmlLink(link, "Permutation feature importance")} for further information.'
                 )
 
             result = {self.P_OUTPUT_REPORT: filename}

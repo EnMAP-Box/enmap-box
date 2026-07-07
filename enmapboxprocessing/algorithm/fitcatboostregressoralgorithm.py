@@ -1,3 +1,4 @@
+from contextlib import suppress
 from io import StringIO
 
 from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
@@ -24,12 +25,14 @@ class FitCatBoostRegressorAlgorithm(FitRegressorAlgorithmBase):
         from catboost import CatBoostRegressor
         from sklearn.multioutput import MultiOutputRegressor
 
-        regressor = MultiOutputRegressor(CatBoostRegressor(n_estimators=100))
+        regressor = MultiOutputRegressor(
+            CatBoostRegressor(n_estimators=100, allow_writing_files=False)
+        )
         return regressor
 
 
 # monkey patch for issue #790
-try:
+with suppress(Exception):
     import catboost.core
     stringIO = StringIO()
 
@@ -37,5 +40,3 @@ try:
         return stringIO
 
     catboost.core._get_stream_like_object = _get_stream_like_object_FIXED
-except Exception:
-    pass

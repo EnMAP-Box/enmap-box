@@ -40,13 +40,13 @@ class PredictClassPropabilityAlgorithm(EnMAPProcessingAlgorithm):
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
-        self.addParameterPickleFile(self.P_CLASSIFIER, self._CLASSIFIER)
+        self.addParameterSkopsFile(self.P_CLASSIFIER, self._CLASSIFIER)
         self.addParameterBoolean(self.P_MATCH_BY_NAME, self._MATCH_BY_NAME, False, True)
         self.addParameterRasterDestination(self.P_OUTPUT_PROBABILITY, self._OUTPUT_PROBABILITY)
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
         try:
-            dump = ClassifierDump(**Utils.pickleLoad(self.parameterAsFile(parameters, self.P_CLASSIFIER, context)))
+            dump = ClassifierDump(**Utils.modelLoad(self.parameterAsFile(parameters, self.P_CLASSIFIER, context)))
         except TypeError:
             return False, 'Invalid classifier file.'
         if not hasattr(dump.classifier, 'predict_proba'):

@@ -1,14 +1,14 @@
 import traceback
 import warnings
+from contextlib import suppress
 from dataclasses import dataclass
 from os.path import exists, join, dirname
 from shutil import copyfile
 from typing import Optional, List, Dict
 
 import numpy as np
+import pyqtgraph as pg
 
-import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
-import processing
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyleButton, PlotStyle
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import prepareProfileValueDict
@@ -21,6 +21,7 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp import MapTool, GeeTimeseriesExplorerDockWidget, GeeTemporalProfileDockWidget
 from profileanalyticsapp.profileanalyticseditorwidget import ProfileAnalyticsEditorWidget
+from qgis import processing
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QComboBox, QTableWidget, QCheckBox, QToolButton, QLineEdit, QWidget, QLabel, QDockWidget
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsVectorLayer, QgsProcessingFeatureSourceDefinition, \
@@ -182,10 +183,8 @@ class ProfileAnalyticsDockWidget(QDockWidget):
             if layer.id() != self.oldLineLayerId:
                 lyr_old = self.oldLineLayerInstance()
                 if isinstance(lyr_old, QgsVectorLayer):
-                    try:
+                    with suppress(Exception):
                         lyr_old.selectionChanged.disconnect(self.onLayerSelectionChanged)
-                    except Exception as ex:
-                        pass
 
                 layer.selectionChanged.connect(self.onLayerSelectionChanged)
                 self.oldLineLayerId = layer.id()
@@ -523,15 +522,13 @@ class ProfileAnalyticsDockWidget(QDockWidget):
 
                 w: QLineEdit = self.mRasterTable.cellWidget(row, 3)
                 formula = w.text()
-                try:
+                with suppress(Exception):
                     offset, tmp = formula.split('+')
                     scale, _ = tmp.split('*')
                     offset = float(offset)
                     scale = float(scale)
                     if offset != 0 or scale != 1:
                         yValues = [offset + scale * y for y in yValues]
-                except Exception:
-                    pass
 
                 w: QgsFileWidget = self.mRasterTable.cellWidget(row, 4)
                 filename = w.filePath()
@@ -541,7 +538,9 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                     with open(filename) as file:
                         code = file.read()
                     try:
-                        exec(code, namespace)
+                        # B102 User-defined analytics code execution by design;
+                        # equivalent to the QGIS Python Console.
+                        exec(code, namespace)  # nosec B102 # B102 User-defined analytics code execution by design
                         userFunction = namespace['updatePlot']
                     except Exception:
                         traceback.print_exc()
@@ -570,15 +569,13 @@ class ProfileAnalyticsDockWidget(QDockWidget):
 
                 w: QLineEdit = self.mGeeRasterTable.cellWidget(row, 2)
                 formula = w.text()
-                try:
+                with suppress(Exception):
                     offset, tmp = formula.split('+')
                     scale, _ = tmp.split('*')
                     offset = float(offset)
                     scale = float(scale)
                     if offset != 0 or scale != 1:
                         yValues = [offset + scale * y for y in yValues]
-                except Exception:
-                    pass
 
                 w: QgsFileWidget = self.mGeeRasterTable.cellWidget(row, 3)
                 filename = w.filePath()
@@ -588,7 +585,9 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                     with open(filename) as file:
                         code = file.read()
                     try:
-                        exec(code, namespace)
+                        # nosec B102 # User-defined analytics code execution by design;
+                        # equivalent to the QGIS Python Console.
+                        exec(code, namespace)  # nosec # User-defined analytics code execution by design;
                         userFunction = namespace['updatePlot']
                     except Exception:
                         traceback.print_exc()
@@ -612,9 +611,13 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                 try:
                     outputProfiles = ufunc(profile, profiles, self.mPlotWidget)
                     if outputProfiles is not None:
-                        assert isinstance(outputProfiles, list)
+                        if not isinstance(outputProfiles, list):
+                            raise TypeError(
+                                f'Expected outputProfiles to be a list or None, got {type(outputProfiles).__name__}'
+                            )
                         for outputProfile in outputProfiles:
-                            assert isinstance(outputProfile, Profile)
+                            if not isinstance(outputProfile, Profile):
+                                raise TypeError(f"Expected Profile, got {type(outputProfile).__name__}")
                             plotDataItem = self.mPlotWidget.plot(
                                 outputProfile.xValues,
                                 outputProfile.yValues,
@@ -628,7 +631,8 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                     msg = traceback.format_exc()
 
                 if dialog is not None:
-                    assert isinstance(dialog, ProfileAnalyticsEditorWidget)
+                    if not isinstance(dialog, ProfileAnalyticsEditorWidget):
+                        raise TypeError(f"Expected ProfileAnalyticsEditorWidget, got {type(dialog).__name__}")
                     dialog.mLog.setText(msg)
 
         # add profiles to library (for potential visualization in a Spectral View)
@@ -706,8 +710,10 @@ class ProfileAnalyticsDockWidget(QDockWidget):
             raise ValueError()
         widgets1 = list(findWidgets(GeeTimeseriesExplorerDockWidget))
         widgets2 = list(findWidgets(GeeTemporalProfileDockWidget))
-        assert len(widgets1) == 1
-        assert len(widgets2) == 1
+        if len(widgets1) != 1:
+            raise RuntimeError(f"Expected exactly one widget, got {len(widgets1)}")
+        if len(widgets2) != 1:
+            raise RuntimeError(f"Expected exactly one widget, got {len(widgets2)}")
         geeTimeseriesExplorerDockWidget: GeeTimeseriesExplorerDockWidget = widgets1[0]
         geeTemporalProfileDockWidget: GeeTemporalProfileDockWidget = widgets2[0]
         return geeTimeseriesExplorerDockWidget, geeTemporalProfileDockWidget
@@ -723,5 +729,9 @@ class Profile(object):
     style: PlotStyle
 
     def __post_init__(self):
-        assert len(self.xValues) == len(self.yValues)
+        if len(self.xValues) != len(self.yValues):
+            raise ValueError(
+                f"xValues and yValues must have the same length "
+                f"({len(self.xValues)} != {len(self.yValues)})"
+            )
         check_type('style', self.style, PlotStyle)

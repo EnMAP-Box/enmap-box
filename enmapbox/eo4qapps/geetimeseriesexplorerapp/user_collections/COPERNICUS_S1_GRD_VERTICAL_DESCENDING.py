@@ -54,7 +54,7 @@ def getDESCCorners(f):
     crdLons = ee.List(coords.toList().get(0))
     crdLats = ee.List(coords.toList().get(1))
     minLon = crdLons.sort().get(0)
-    maxLon = crdLons.sort().get(-1)
+    # maxLon = crdLons.sort().get(-1)
     minLat = crdLats.sort().get(0)
     maxLat = crdLats.sort().get(-1)
     azimuth = ee.Number(crdLons.get(crdLats.indexOf(minLat))).subtract(minLon) \

@@ -85,7 +85,9 @@ class ImportLandsatL2Algorithm(EnMAPProcessingAlgorithm):
                 raise QgsProcessingException('Landsat collection 1 not supported anymore')
             elif collectionNumber == '02':
                 pattern = 'SR_B{}.TIF'
-                gain = 0.0000275  # see https://www.usgs.gov/core-science-systems/nli/landsat/landsat-collection-2-level-2-science-products
+                # see https://www.usgs.gov/core-science-systems/nli/landsat/
+                # landsat-collection-2-level-2-science-products
+                gain = 0.0000275
                 offset = -0.2
             else:
                 raise QgsProcessingException(f'unknown collection number: {collectionNumber}')

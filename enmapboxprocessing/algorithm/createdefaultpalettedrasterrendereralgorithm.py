@@ -1,10 +1,11 @@
 from typing import Dict, Any, List, Tuple
 
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsMapLayer)
+
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsMapLayer)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -17,8 +18,11 @@ class CreateDefaultPalettedRasterRendererAlgorithm(EnMAPProcessingAlgorithm):
         return 'Create default paletted raster renderer'
 
     def shortDescription(self) -> str:
-        return 'Create a paletted raster renderer from given categories and set it as the default style of the given raster layer.\n' \
-               'This will create/overwrite the QML sidecar file of the given raster layer.'
+        return (
+            'Create a paletted raster renderer from given categories and set it as the default style of the given '
+            'raster layer.\n'
+            'This will create/overwrite the QML sidecar file of the given raster layer.'
+        )
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [

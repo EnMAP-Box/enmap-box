@@ -20,20 +20,22 @@ import os
 import time
 import warnings
 from _weakrefset import WeakSet
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from enmapbox import enmapboxSettings
 from enmapbox.enmapboxsettings import EnMAPBoxSettings
-from enmapbox.gui import MapTools, MapToolCenter, PixelScaleExtentMapTool, \
-    CursorLocationMapTool, FullExtentMapTool, QgsMapToolAddFeature, QgsMapToolSelect, \
-    CrosshairStyle, CrosshairMapCanvasItem
 from enmapbox.gui.mimedata import containsMapLayers, extractMapLayers
+from enmapbox.qgispluginsupport.qps.crosshair.crosshair import CrosshairMapCanvasItem, CrosshairStyle
+from enmapbox.qgispluginsupport.qps.maptools import (
+    MapTools, MapToolCenter, PixelScaleExtentMapTool, CursorLocationMapTool,
+    FullExtentMapTool, QgsMapToolAddFeature, QgsMapToolSelect)
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
 from qgis.PyQt.QtCore import Qt, QObject, QCoreApplication, pyqtSignal, QEvent, QPointF, QMimeData, QTimer, QSize, \
     QModelIndex, QAbstractListModel
 from qgis.PyQt.QtGui import QMouseEvent, QIcon, QDragEnterEvent, QDropEvent, QResizeEvent, QKeyEvent, QColor
 from qgis.PyQt.QtWidgets import QAction, QToolButton, QFileDialog, QHBoxLayout, QFrame, QMenu, QLabel, QApplication, \
     QGridLayout, QSpacerItem, QSizePolicy, QDialog, QVBoxLayout, QComboBox
+from qgis.PyQt.QtWidgets import QWidget
 from qgis.core import QgsLayerTree
 from qgis.core import QgsLayerTreeLayer, QgsCoordinateReferenceSystem, QgsRectangle, QgsVectorLayerTools, \
     QgsMapLayer, QgsRasterLayer, QgsPointXY, \
@@ -72,8 +74,11 @@ class MapCanvasListModel(QAbstractListModel):
     def mapCanvases(self):
         return self.mMapCanvases[:]
 
-    def insertCanvases(self, canvases, i=None):
-        assert isinstance(canvases, list)
+    def insertCanvases(
+        self,
+        canvases: List[QgsMapLayer],
+        i: Optional[int] = None
+    ):
         if i is None:
             i = len(self.mMapCanvases)
         canvases = [c for c in canvases if c not in self.mMapCanvases]
@@ -142,7 +147,10 @@ class CanvasLinkDialog(QDialog):
     LINK_TYPES = [LINK_ON_CENTER_SCALE, LINK_ON_SCALE, LINK_ON_CENTER, UNLINK]
 
     @staticmethod
-    def showDialog(parent=None, canvases=None):
+    def showDialog(
+        parent: Optional[QWidget] = None,
+        canvases: Optional[List[QgsMapCanvas]] = None
+    ):
         """
         Opens a Dialog to specify the map linking
         """
@@ -154,8 +162,6 @@ class CanvasLinkDialog(QDialog):
         if len(canvases) <= 1:
             return
 
-        for c in canvases:
-            assert isinstance(c, QgsMapCanvas)
         d = CanvasLinkDialog(parent=parent)
         d.addCanvas(canvases)
         d.setSourceCanvas(canvases[0])
@@ -199,11 +205,9 @@ class CanvasLinkDialog(QDialog):
     def onSourceCanvasChanged(self):
         pass
         self.setSourceCanvas(self.currentSourceCanvas())
-        s = ""
 
     def onTargetSelectionChanged(self):
-        sender = self.sender()
-        s = ""
+        self.sender()
 
     def addCanvas(self, canvas):
 
@@ -231,9 +235,11 @@ class CanvasLinkDialog(QDialog):
     def currentSourceCanvas(self):
         return self.cbSrcCanvas.itemData(self.cbSrcCanvas.currentIndex(), Qt.UserRole)
 
-    def currentTargetCanvases(self):
+    def currentTargetCanvases(self) -> List[QgsMapCanvas]:
         srcCanvas = self.currentSourceCanvas()
-        return [trgCanvas for trgCanvas in self.mSrcCanvasModel.mapCanvases() if trgCanvas != srcCanvas]
+        return [trgCanvas
+                for trgCanvas in self.mSrcCanvasModel.mapCanvases()
+                if trgCanvas != srcCanvas]
 
     def setSourceCanvas(self, canvas):
 
@@ -280,7 +286,7 @@ class CanvasLinkDialog(QDialog):
         offset = self.grid.rowCount()
         for iRow, trgCanvas in enumerate(trgCanvases):
             iRow += offset
-            assert isinstance(trgCanvas, MapCanvas)
+            trgCanvas: MapCanvas
 
             if isinstance(trgCanvas, MapCanvas):
                 label = QLabel(trgCanvas.name())
@@ -288,8 +294,10 @@ class CanvasLinkDialog(QDialog):
 
             elif isinstance(trgCanvas, QgsMapCanvas):
                 import qgis.utils
-                if isinstance(qgis.utils.iface, QgisInterface) and \
-                        isinstance(qgis.utils.iface.mapCanvas(), QgsMapCanvas):
+                if (
+                    isinstance(qgis.utils.iface, QgisInterface)
+                    and isinstance(qgis.utils.iface.mapCanvas(), QgsMapCanvas)
+                ):
                     label = QLabel('QGIS Map Canvas')
 
             self.grid.addWidget(label, iRow, 0)
@@ -297,8 +305,7 @@ class CanvasLinkDialog(QDialog):
             for iCol, linkType in enumerate(CanvasLinkDialog.LINK_TYPES):
                 btn = QToolButton(self)
                 btn.setObjectName('btn{}{}_{}'.format(srcCanvas.name(), trgCanvas.name(), linkType).replace(' ', '_'))
-                a = CanvasLink.linkAction(srcCanvas, trgCanvas, linkType)
-                assert isinstance(a, QAction)
+                a: QAction = CanvasLink.linkAction(srcCanvas, trgCanvas, linkType)
                 a.setCheckable(True)
                 a.triggered.connect(self.updateLinkSelection)
                 btn.setDefaultAction(a)
@@ -320,8 +327,7 @@ class CanvasLinkDialog(QDialog):
         self.updateLinkSelection()
 
     def updateLinkSelection(self, *args):
-        srcCanvas = self.currentSourceCanvas()
-        assert isinstance(srcCanvas, MapCanvas)
+        srcCanvas: QgsMapCanvas = self.currentSourceCanvas()
 
         targetCanvases = self.mWidgetLUT.keys()
         for targetCanvas in targetCanvases:
@@ -332,10 +338,10 @@ class CanvasLinkDialog(QDialog):
                 linkType = UNLINK
 
             if linkType not in self.mWidgetLUT[targetCanvas].keys():
-                s = ""
+                pass
 
             for btnLinkType, btn in self.mWidgetLUT[targetCanvas].items():
-                assert isinstance(btn, QToolButton)
+                btn: QToolButton
                 a = btn.defaultAction()
                 a.setChecked(linkType == btnLinkType)
 
@@ -344,12 +350,12 @@ class CanvasLinkDialog(QDialog):
         CanvasLink.linkMapCanvases(srcCanvas, targetCanvas, linkType)
 
         for btn in btnList:
-            assert isinstance(btn, QToolButton)
+            btn: QToolButton
             if btn == sender:
-                s = ""
+                pass
                 # todo: highlight activated function
             else:
-                s = ""
+                pass
                 # todo: de-highlight activated function
 
     pass
@@ -357,9 +363,7 @@ class CanvasLinkDialog(QDialog):
 
 class CanvasLinkTargetWidget(QFrame):
 
-    def __init__(self, canvas1, canvas2):
-        assert isinstance(canvas1, QgsMapCanvas)
-        assert isinstance(canvas2, QgsMapCanvas)
+    def __init__(self, canvas1: QgsMapCanvas, canvas2: QgsMapCanvas):
 
         QFrame.__init__(self, parent=canvas2)
         self.canvas1 = canvas1
@@ -422,6 +426,7 @@ class CanvasLinkTargetWidget(QFrame):
         # get map center
         x = int(parentRect.width() / 2 - self.width() / 2)
         y = int(parentRect.height() / 2 - self.height() / 2)
+        del x, y
 
         mw = int(min([self.width(), self.height()]) * 0.9)
         mw = min([mw, 120])
@@ -469,14 +474,13 @@ class CanvasLink(QObject):
     GLOBAL_LINK_LOCK = False
 
     @staticmethod
-    def ShowMapLinkTargets(mapDockOrMapCanvas):
+    def ShowMapLinkTargets(canvas1: QgsMapCanvas):
         from enmapbox.gui.dataviews.docks import MapDock
-        if isinstance(mapDockOrMapCanvas, MapDock):
-            mapDockOrMapCanvas = mapDockOrMapCanvas.mCanvas
-        assert isinstance(mapDockOrMapCanvas, QgsMapCanvas)
+        if isinstance(canvas1, MapDock):
+            canvas1 = canvas1.mCanvas
+        if not isinstance(canvas1, QgsMapCanvas):
+            raise TypeError('canvas1 must be a QgsMapCanvas')
 
-        canvas1 = mapDockOrMapCanvas
-        assert isinstance(canvas1, QgsMapCanvas)
         CanvasLink.RemoveMapLinkTargetWidgets(True)
 
         for canvas_source in MapCanvas.instances():
@@ -486,9 +490,6 @@ class CanvasLink(QObject):
                 w.show()
                 CanvasLink.LINK_TARGET_WIDGETS.add(w)
                 # canvas_source.freeze()
-            s = ""
-
-        s = ""
 
     @staticmethod
     def linkMapCanvases(canvas1, canvas2, linktype):
@@ -540,7 +541,8 @@ class CanvasLink(QObject):
         :param linkType: see [LINK_ON_SCALE, LINK_ON_CENTER, LINK_ON_CENTER_SCALE]
         :return: QAction
         """
-        assert linkType in [LINK_ON_SCALE, LINK_ON_CENTER, LINK_ON_CENTER_SCALE, UNLINK]
+        if linkType not in [LINK_ON_SCALE, LINK_ON_CENTER, LINK_ON_CENTER_SCALE, UNLINK]:
+            raise TypeError(f'Unknown linkType: {linkType}')
 
         if linkType == LINK_ON_CENTER:
             a = QAction('Link map center', None)
@@ -568,12 +570,13 @@ class CanvasLink(QObject):
 
     LINK_TARGET_WIDGETS = set()
 
-    def __init__(self, canvas1, canvas2, linkType):
+    def __init__(self, canvas1: QgsMapCanvas, canvas2: QgsMapCanvas, linkType):
         super(CanvasLink, self).__init__()
-        assert linkType in CanvasLink.LINKTYPES, linkType
-        assert isinstance(canvas1, MapCanvas)
-        assert isinstance(canvas2, MapCanvas)
-        assert canvas1 != canvas2
+        if linkType not in CanvasLink.LINKTYPES:
+            raise ValueError(f'Unknown linkType: {linkType}')
+
+        if canvas1 == canvas2:
+            raise ValueError('Cannot link a canvas to itself')
 
         if linkType == UNLINK:
             CanvasLink.unlinkMapCanvases(canvas1, canvas2)
@@ -638,15 +641,12 @@ class CanvasLink(QObject):
 
             handledCanvases = [initialSrcCanvas]
 
-            def nextLinkGeneration(srcCanvases: list):
+            def nextLinkGeneration(srcCanvases: List[MapCanvas]) -> Dict[MapCanvas, list]:
                 # nonlocal handledCanvases
-
                 generations = dict()
                 for srcCanvas in srcCanvases:
-                    assert isinstance(srcCanvas, MapCanvas)
                     linksToApply = []
                     for link in srcCanvas.mCanvasLinks:
-                        assert isinstance(link, CanvasLink)
                         dstCanvas = link.theOtherCanvas(srcCanvas)
                         if dstCanvas not in handledCanvases:
                             linksToApply.append(link)
@@ -654,20 +654,18 @@ class CanvasLink(QObject):
                         generations[srcCanvas] = linksToApply
                 return generations
 
-            nextGenerations = nextLinkGeneration(handledCanvases)
+            nextGenerations: dict = nextLinkGeneration(handledCanvases)
 
             while len(nextGenerations) > 0:
                 # get the links that have to be set for the next generation
-                assert isinstance(nextGenerations, dict)
                 for srcCanvas, links in nextGenerations.items():
-                    assert isinstance(srcCanvas, MapCanvas)
-                    assert isinstance(links, list)
+                    srcCanvas: MapCanvas
 
                     for link in links:
-                        assert isinstance(link, CanvasLink)
+                        link: CanvasLink
                         dstCanvas = link.theOtherCanvas(srcCanvas)
-                        assert dstCanvas not in handledCanvases
-                        assert dstCanvas == link.apply(srcCanvas, dstCanvas)
+                        # assert dstCanvas not in handledCanvases
+                        link.apply(srcCanvas, dstCanvas)
                         handledCanvases.append(dstCanvas)
                 nextGenerations.clear()
                 nextGenerations.update(nextLinkGeneration(handledCanvases))
@@ -677,9 +675,14 @@ class CanvasLink(QObject):
     def containsCanvas(self, canvas):
         return canvas in self.canvases
 
-    def theOtherCanvas(self, canvas):
-        assert canvas in self.canvases
-        assert len(self.canvases) == 2
+    def theOtherCanvas(self, canvas) -> QgsMapCanvas:
+        """
+        Returns the other canvas in the link
+        """
+        if canvas not in self.canvases:
+            raise ValueError('canvas not in link')
+        if not len(self.canvases) == 2:
+            raise ValueError('link contains more than two canvases')
         return self.canvases[1] if canvas == self.canvases[0] else self.canvases[0]
 
     def unlink(self):
@@ -708,13 +711,8 @@ class CanvasLink(QObject):
         :param dstCanvas: QgsMapCanvas
         :return: dstCanvas QgsMapCanvas
         """
-        assert isinstance(srcCanvas, QgsMapCanvas)
-        assert isinstance(dstCanvas, QgsMapCanvas)
-
         srcCrs = srcCanvas.mapSettings().destinationCrs()
-        srcExt = SpatialExtent.fromMapCanvas(srcCanvas)
-
-        assert isinstance(srcExt, SpatialExtent)
+        srcExt: SpatialExtent = SpatialExtent.fromMapCanvas(srcCanvas)
 
         # original center and extent
         centerSrc = SpatialPoint.fromMapCanvasCenter(srcCanvas)
@@ -731,6 +729,7 @@ class CanvasLink(QObject):
             return dstCanvas
 
         centerT = SpatialPoint(srcExt.crs(), srcExt.center())
+        del centerT
 
         srcWidth, srcHeight = srcCanvas.width(), srcCanvas.height()
         if srcWidth == 0:
@@ -761,17 +760,15 @@ class CanvasLink(QObject):
         return dstCanvas
 
     def applyTo(self, canvasTo: QgsMapCanvas):
-        assert isinstance(canvasTo, QgsMapCanvas)
         canvasFrom = self.theOtherCanvas(canvasTo)
         return self.apply(canvasFrom, canvasTo)
 
-    def isSameCanvasPair(self, canvasLink):
+    def isSameCanvasPair(self, canvasLink: 'CanvasLink'):
         """
         Returns True if canvasLink contains the same canvases
         :param canvasLink:
         :return:
         """
-        assert isinstance(canvasLink, CanvasLink)
         b = self.canvases[0] in canvasLink.canvases and \
             self.canvases[1] in canvasLink.canvases
         return b
@@ -844,11 +841,7 @@ class MapCanvasMapTools(QObject):
             self.mCanvas.setMapTool(self.mtAddFeature)
         elif mapToolKey == MapTools.SelectFeature:
             self.mCanvas.setMapTool(self.mtSelectFeature)
-
-            s = ""
-
         else:
-
             print('Unknown MapTool key: {}'.format(mapToolKey))
 
 
@@ -971,15 +964,13 @@ class MapCanvas(QgsMapCanvas):
             pt = QPointF(self.width() * 0.5, self.height() * 0.5)
             event = QMouseEvent(QEvent.MouseButtonPress, pt, Qt.LeftButton, Qt.LeftButton, Qt.NoModifier)
             event = QgsMapMouseEvent(self, event)
-        assert isinstance(menu, QMenu)
-        assert isinstance(event, QgsMapMouseEvent)
+
         menu.setToolTipsVisible(True)
-        mapSettings = self.mapSettings()
-        assert isinstance(mapSettings, QgsMapSettings)
+        mapSettings: QgsMapSettings = self.mapSettings()
+
         pos: QPointF = event.pos()
 
-        pointGeo = mapSettings.mapToPixel().toMapCoordinates(pos.x(), pos.y())
-        assert isinstance(pointGeo, QgsPointXY)
+        pointGeo: QgsPointXY = mapSettings.mapToPixel().toMapCoordinates(pos.x(), pos.y())
         from enmapbox.gui.contextmenus import EnMAPBoxContextMenuRegistry
         EnMAPBoxContextMenuRegistry.instance().populateMapCanvasMenu(menu, self, pos, pointGeo)
         return menu
@@ -996,7 +987,7 @@ class MapCanvas(QgsMapCanvas):
         else:
             self.setLayers([])
 
-    def layerTree(self) -> Optional['MapDockTreeNode']:  # noqa: F821
+    def layerTree(self) -> Optional:
         """
         Returns the MapDockTreeNode that is linked to this MapCanvas by a QgsLayerTreeMapCanvasBridge.
         Can be None
@@ -1012,6 +1003,7 @@ class MapCanvas(QgsMapCanvas):
         is_panning = bool(QApplication.mouseButtons() & Qt.MiddleButton)
         is_ctrl = bool(QApplication.keyboardModifiers() & Qt.ControlModifier)
         is_shift = bool(QApplication.keyboardModifiers() & Qt.ShiftModifier)
+        del is_shift
 
         if not is_panning and is_ctrl and e.key() in [Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down]:
             # find raster layer with a reference pixel grid
@@ -1124,8 +1116,8 @@ class MapCanvas(QgsMapCanvas):
         self.layerTree().addLayer(backgroundLayer)
 
     def setCanvasBridge(self, bridge: QgsLayerTreeMapCanvasBridge):
-        assert isinstance(bridge, QgsLayerTreeMapCanvasBridge)
-        assert bridge.mapCanvas() == self
+        if not bridge.mapCanvas() == self:
+            raise AssertionError('The given QgsLayerTreeMapCanvasBridge is not linked to this MapCanvas')
         self.mCanvasBridge = bridge
 
     def setCrosshairStyle(self, crosshairStyle: CrosshairStyle):
@@ -1175,11 +1167,18 @@ class MapCanvas(QgsMapCanvas):
         else:
             super().zoomToProjectExtent()
 
-    def zoomToFeatureExtent(self, spatialExtent):
-        assert isinstance(spatialExtent, SpatialExtent)
+    def zoomToFeatureExtent(self, spatialExtent: SpatialExtent):
+        """
+        Zooms to the given spatial extent
+        :param spatialExtent: SpatialExtent
+        """
         self.setExtent(spatialExtent)
 
     def setWindowTitle(self, name: str):
+        """
+        Sets the window title of the map canvas
+        :param name: str
+        """
         b = self.windowTitle() != name
         super(MapCanvas, self).setWindowTitle(name)
         if b:
@@ -1208,12 +1207,10 @@ class MapCanvas(QgsMapCanvas):
         return self._id
 
     # forward to MapDock
-    def dragEnterEvent(self, event):
-        mimeData = event.mimeData()
-        assert isinstance(mimeData, QMimeData)
+    def dragEnterEvent(self, event: QDragEnterEvent):
+        mimeData: QMimeData = event.mimeData()
 
         # check mime types we can handle
-        assert isinstance(event, QDragEnterEvent)
         if containsMapLayers(mimeData):
             event.setDropAction(Qt.CopyAction)  # copy but do not remove
             event.accept()
@@ -1227,8 +1224,7 @@ class MapCanvas(QgsMapCanvas):
         """
 
         if event.dropAction() in [Qt.CopyAction, Qt.MoveAction]:
-            mimeData = event.mimeData()
-            assert isinstance(mimeData, QMimeData)
+            mimeData: QMimeData = event.mimeData()
 
             # add map layers
             mapLayers = extractMapLayers(mimeData, project=self.project())
@@ -1275,11 +1271,20 @@ class MapCanvas(QgsMapCanvas):
         return SpatialPoint.fromMapCanvasCenter(self)
 
     def createCanvasLink(self, otherCanvas: QgsMapCanvas, linkType) -> CanvasLink:
-        assert isinstance(otherCanvas, MapCanvas)
+        """
+        Creates a canvas link to another canvas
+        :param otherCanvas: QgsMapCanvas
+        :param linkType: CanvasLink.LINKTYPES
+        :return: CanvasLink
+        """
         return self.addCanvasLink(CanvasLink(self, otherCanvas, linkType))
 
     def addCanvasLink(self, canvasLink: CanvasLink) -> CanvasLink:
-        assert isinstance(canvasLink, CanvasLink)
+        """
+        Adds a canvas link to another canvas
+        :param canvasLink: CanvasLink
+        :return: CanvasLink
+        """
         toRemove = [cLink for cLink in self.mCanvasLinks if cLink.isSameCanvasPair(canvasLink)]
         for cLink in toRemove:
             self.removeCanvasLink(cLink)
@@ -1323,8 +1328,13 @@ class MapCanvas(QgsMapCanvas):
         super(MapCanvas, self).setLayers(mapLayers)
 
 
-def setMapCanvasCRSfromDialog(mapCanvas, crs: QgsCoordinateReferenceSystem = None):
-    assert isinstance(mapCanvas, QgsMapCanvas)
+def setMapCanvasCRSfromDialog(
+    mapCanvas: QgsMapCanvas,
+    crs: Optional[QgsCoordinateReferenceSystem] = None
+):
+    """
+    Sets the mapCanvas CRS from a dialog
+    """
     w = QgsProjectionSelectionWidget(mapCanvas)
     if crs is None:
         crs = mapCanvas.mapSettings().destinationCrs()

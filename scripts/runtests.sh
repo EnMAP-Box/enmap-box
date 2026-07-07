@@ -20,5 +20,5 @@ export PYTHONPATH="${PYTHONPATH}"\
 echo $PYTHONPATH
 qgis --version
 python3 scripts/systeminfo.py
-pytest "$@"
+python3 -m pytest "$@"
 

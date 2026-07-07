@@ -1,4 +1,5 @@
-colorama # required by PyQtGraph
+pyqtgraph
+skops
 
 # required by parts of EnMAP-Box Core
 astropy # required for convolution
@@ -7,10 +8,4 @@ lightgbm # required by LightGBM classifier/regressor, see #960
 catboost # required by CatBoost classifier/regressor, see #960
 
 # required by parts of EnMAP-Box Applications
-sympy # required by EnSoMAP
-numba>=0.57 # required by EnSoMAP
-netCDF4 # required by ONNS
 enpt-enmapboxapp # required by EnPT
-scikit-learn>=1.0
-PyOpenGL
-

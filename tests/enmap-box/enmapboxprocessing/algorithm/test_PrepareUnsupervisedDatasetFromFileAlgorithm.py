@@ -12,10 +12,10 @@ class TestPrepareUnsupervisedDatasetFromFileAlgorithm(TestCase):
         alg = PrepareUnsupervisedDatasetFromFileAlgorithm()
         parameters = {
             alg.P_FEATURE_FILE: classificationDatasetAsForceFile[0],
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = TransformerDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = TransformerDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((15000, 20), dump.X.shape)
         self.assertEqual(20, len(dump.features))
         self.assertEqual(['feature 1', 'feature 2'], dump.features[:2])

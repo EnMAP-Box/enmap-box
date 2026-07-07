@@ -14,10 +14,10 @@ class TestPrepareClassificationDatasetFromCodeAlgorithm(TestCase):
         alg.initAlgorithm()
         parameters = {
             alg.P_CODE: alg.defaultCodeAsString(),
-            alg.P_OUTPUT_DATASET: self.filename('dataset.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('dataset.skops')
         }
         result = self.runalg(alg, parameters)
-        dump = ClassifierDump(**Utils.pickleLoad(result[alg.P_OUTPUT_DATASET]))
+        dump = ClassifierDump(**Utils.modelLoad(result[alg.P_OUTPUT_DATASET]))
         self.assertEqual(
             [Category(value=1, name='class 1', color='#ff0000'), Category(value=2, name='class 2', color='#00ff00')],
             dump.categories

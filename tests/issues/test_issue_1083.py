@@ -13,7 +13,7 @@ class TestIssue1083(EnMAPBoxTestCase):
 
         from enmapboxtestdata import fraction_point_multitarget, enmap_berlin
         tm_dir = self.createTestOutputDirectory()
-        path_output = tm_dir / 'test_dataset.pkl'
+        path_output = tm_dir / 'test_dataset.skops'
         context, feedback = self.createProcessingContextFeedback()
 
         par = {a.P_CONTINUOUS_VECTOR: fraction_point_multitarget,

@@ -21,7 +21,6 @@ class TestIssue764(EnMAPBoxTestCase):
 
         with edit(speclib):
             SpectralLibraryUtils.addSpectralProfileField(speclib, 'profiles2')
-            s = ""
             slw = SpectralLibraryWidget(speclib=speclib)
 
             spd = SpectralProcessingDialog(speclib=speclib, algorithmId=algorithmId, parameters=parameters)
@@ -32,7 +31,6 @@ class TestIssue764(EnMAPBoxTestCase):
                 w = wrapper.mWrappers[k]
                 self.assertEqual(w.value(), v)
 
-            s = ""
             spd.runButton().animateClick(0)
 
             self.showGui([spd, slw])

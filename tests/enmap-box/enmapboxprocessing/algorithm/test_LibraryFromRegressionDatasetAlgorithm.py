@@ -23,11 +23,11 @@ class TestLibraryFromRegressionDatasetAlgorithm(TestCase):
             locations=np.array([(1, 1), (2, 2), (3, 3)]),
             crs=QgsCoordinateReferenceSystem.fromEpsgId(4326).toWkt()
         )
-        dump.write(self.filename('dataset.pkl'))
+        dump.write(self.filename('dataset.skops'))
 
         alg = LibraryFromRegressionDatasetAlgorithm()
         parameters = {
-            alg.P_DATASET: self.filename('dataset.pkl'),
+            alg.P_DATASET: self.filename('dataset.skops'),
             alg.P_OUTPUT_LIBRARY: self.filename('library.geojson')
         }
         self.runalg(alg, parameters)
@@ -40,11 +40,11 @@ class TestLibraryFromRegressionDatasetAlgorithm(TestCase):
             X=np.array([(1, 2, 3), (10, 11, 12), (20, 21, 22)]),
             y=np.array([[1, 10], [2, 20], [3, 30]])
         )
-        dump.write(self.filename('dataset.pkl'))
+        dump.write(self.filename('dataset.skops'))
 
         alg = LibraryFromRegressionDatasetAlgorithm()
         parameters = {
-            alg.P_DATASET: self.filename('dataset.pkl'),
+            alg.P_DATASET: self.filename('dataset.skops'),
             alg.P_OUTPUT_LIBRARY: self.filename('library.geojson')
         }
         self.runalg(alg, parameters)

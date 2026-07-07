@@ -18,7 +18,9 @@ class ConvexHullAlgorithm(EnMAPProcessingAlgorithm):
     O_X_UNITS = ['Band numbers', 'Nanometers']
     BandNumberUnits, NanometerUnits = range(len(O_X_UNITS))
     P_OUTPUT_CONVEX_HULL, _OUTPUT_CONVEX_HULL = 'outputConvexHull', 'Output convex hull raster layer'
-    P_OUTPUT_CONTINUUM_REMOVED, _OUTPUT_CONTINUUM_REMOVED = 'outputContinuumRemoved', 'Output continuum removed raster layer'
+    P_OUTPUT_CONTINUUM_REMOVED, _OUTPUT_CONTINUUM_REMOVED = (
+        'outputContinuumRemoved', 'Output continuum removed raster layer'
+    )
 
     def displayName(self) -> str:
         return 'Convex hull and continuum-removal'

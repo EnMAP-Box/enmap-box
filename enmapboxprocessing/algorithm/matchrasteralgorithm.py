@@ -124,9 +124,11 @@ class MatchRasterAlgorithm(EnMAPProcessingAlgorithm):
             for i, line in enumerate(lines):
                 raster, mask, date = line.strip().split(',')
                 if i == 0:
-                    assert raster == 'raster'
-                    assert mask == 'mask'
-                    assert date == 'date'
+                    if raster != 'raster' or mask != 'mask' or date != 'date':
+                        raise ValueError(
+                            f"unexpected field names: raster={raster!r}, "
+                            f"mask={mask!r}, date={date!r}"
+                        )
                     continue
                 if mask == '':
                     mask = raster

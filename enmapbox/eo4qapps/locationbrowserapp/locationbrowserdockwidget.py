@@ -1,5 +1,6 @@
 import json
 import urllib.parse
+from contextlib import suppress
 from os.path import join, dirname
 from typing import Optional
 
@@ -89,20 +90,16 @@ class LocationBrowserDockWidget(QDockWidget):
         point = None
         extent = None
 
-        try:
+        with suppress(Exception):
             point = Utils.parseSpatialPoint(text)
             extent = None
-        except Exception:
-            pass
 
         if point is None:
-            try:
+            with suppress(Exception):
                 extent = Utils.parseSpatialExtent(text)
                 point = extent.spatialCenter()
                 if extent.isEmpty():
                     extent = None
-            except Exception:
-                pass
 
         if point is None:
             return
@@ -132,11 +129,11 @@ class LocationBrowserDockWidget(QDockWidget):
               f'{urllib.parse.quote(text)}' \
               '&limit=50&extratags=1&polygon_geojson=1&format=json'
         headers = {'User-Agent': 'EnMAP-Box QGIS Plugin (enmapbox@enmap.org)'}  # Required user agent
-        nominatimResults = requests.get(url, headers=headers).json()
+        nominatimResults = requests.get(url, headers=headers, timeout=10).json()
         # find additional results
         if len(nominatimResults) == 1:
             url += f'&exclude_place_ids={nominatimResults[0]["place_id"]}'
-            nominatimResults.extend(requests.get(url, headers=headers).json())
+            nominatimResults.extend(requests.get(url, headers=headers, timeout=10).json())
 
         self.mResult.mList.clear()
         item = QListWidgetItem('')
@@ -209,7 +206,9 @@ class LocationBrowserDockWidget(QDockWidget):
                 [QgsPointXY(x1, y1), QgsPointXY(x1, y2), QgsPointXY(x2, y2), QgsPointXY(x2, y1), QgsPointXY(x1, y1)]
             ]
             geometry = QgsGeometry.fromMultiPolygonXY([coordinates])
-        assert layer.isValid()
+
+        if not layer.isValid():
+            raise RuntimeError("Failed to create temporary memory layer.")
 
         provider = layer.dataProvider()
         feature = QgsFeature()

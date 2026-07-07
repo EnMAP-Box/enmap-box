@@ -21,7 +21,7 @@
 
 __version__ = '2.1'
 
-from .definitions import *
-from .data import *
-from .tools import *
-from .gui import *
+# from .data import *
+# from .definitions import *
+# from .gui import *
+# from .tools import *

@@ -20,7 +20,7 @@ class TestRepository(TestCase):
         ERRORS: typing.Dict[str, Exception] = dict()
         for uifile in file_search(DIR_REPO, rx, recursive=True):
             try:
-                fmt = loadUi(uifile)
+                loadUi(uifile)
             except Exception as ex:
                 ERRORS[uifile] = ex
         messages = []

@@ -105,5 +105,5 @@ class TestRasterizeVectorAlgorithm(TestCase):
             alg.P_BURN_FID: True,
             alg.P_OUTPUT_RASTER: self.filename('fid.tif')
         }
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)
         # self.assertEqual(-79874, RasterReader(result[alg.P_OUTPUT_RASTER]).array()[0].sum(dtype=float))

@@ -1,3 +1,4 @@
+import ee
 collection = ee.ImageCollection("MODIS/006/MCD43A4")
 
 # default colors for bands and spectral indices

@@ -42,9 +42,9 @@ from enmapboxprocessing.algorithm.randomsamplesfromclassificationdatasetalgorith
 from enmapboxprocessing.algorithm.selectfeaturesfromdatasetalgorithm import SelectFeaturesFromDatasetAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
 from enmapboxprocessing.parameter.processingparametercodeeditwidget import CodeEditWidget
-from enmapboxprocessing.parameter.processingparameterpicklefileclassificationdatasetwidget import \
-    ProcessingParameterPickleFileClassificationDatasetWidget
-from enmapboxprocessing.parameter.processingparameterpicklefilewidget import ProcessingParameterPickleFileWidget
+from enmapboxprocessing.parameter.processingparameterskopsfileclassificationdatasetwidget import \
+    ProcessingParameterSkopsFileClassificationDatasetWidget
+from enmapboxprocessing.parameter.processingparameterskopsfilewidget import ProcessingParameterSkopsFileWidget
 from enmapboxprocessing.typing import ClassifierDump, Category
 from enmapboxprocessing.utils import Utils
 from processing.gui.AlgorithmDialog import AlgorithmDialog
@@ -80,7 +80,7 @@ def errorHandled(func=None, *, successMessage: str = None):
         gui.mMessageBar.clearWidgets()
         try:
             result = func(gui, *argsTail, **kwargs)
-        except MissingParameterError as error:
+        except MissingParameterError:
             return
         except CancelError:
             return
@@ -101,7 +101,7 @@ def errorHandled(func=None, *, successMessage: str = None):
 
                 dialog = Dialog()
                 dialog.resize(800, 600)
-                dialog.exec_()
+                dialog.exec()
 
             widget = gui.mMessageBar.createMessage('Unexpected error', str(error))
             button = QPushButton(widget)
@@ -127,7 +127,7 @@ class ClassificationWorkflowGui(QMainWindow):
     mLogClear: QToolButton
 
     # quick mapping
-    mQuickDataset: ProcessingParameterPickleFileClassificationDatasetWidget
+    mQuickDataset: ProcessingParameterSkopsFileClassificationDatasetWidget
     mQuickFeatures: QgsMapLayerComboBox
     mQuickComboClassifier: QComboBox
     mQuickCodeClassifier: CodeEditWidget
@@ -216,7 +216,7 @@ class ClassificationWorkflowGui(QMainWindow):
 
     # classification
     # - predict
-    mPredictClassifier: ProcessingParameterPickleFileWidget
+    mPredictClassifier: ProcessingParameterSkopsFileWidget
     mPredictFeatures: QgsMapLayerComboBox
     mCheckPredictedClassification: QCheckBox
     mCheckPredictedProbability: QCheckBox
@@ -248,7 +248,9 @@ class ClassificationWorkflowGui(QMainWindow):
         QMainWindow.__init__(self, parent)
         loadUi(join(dirname(__file__), 'main.ui'), self)
         self.url = QUrl(
-            'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/applications.html#classification-workflow')
+            'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/applications.html#'
+            'classification-workflow'
+        )
         self.mMessageBar = QgsMessageBar()
         self.mMessageBar.setMaximumSize(9999999, 50)
         self.centralWidget().layout().addWidget(self.mMessageBar)
@@ -360,14 +362,14 @@ class ClassificationWorkflowGui(QMainWindow):
         self.mWorkingDirectory.setFilePath(join(gettempdir(), 'EnMAPBox', 'ClassificationWorkflow'))
         self.onWorkingDirectoryChanged()
         self.defaultBasenames = {
-            self.mFileDataset.objectName(): 'dataset.pkl',
-            self.mFileTrainingDataset.objectName(): 'training_dataset.pkl',
-            self.mFileTestDataset.objectName(): 'test_dataset.pkl',
-            self.mFileTrainingDatasetClustered.objectName(): 'training_dataset_clustered.pkl',
-            self.mFileTestDatasetClustered.objectName(): 'test_dataset_clustered.pkl',
-            self.mFileTrainingDatasetRanked.objectName(): 'training_dataset_ranked.pkl',
-            self.mFileTestDatasetRanked.objectName(): 'test_dataset_ranked.pkl',
-            self.mFileClassifierFitted.objectName(): 'classifier_fitted.pkl',
+            self.mFileDataset.objectName(): 'dataset.skops',
+            self.mFileTrainingDataset.objectName(): 'training_dataset.skops',
+            self.mFileTestDataset.objectName(): 'test_dataset.skops',
+            self.mFileTrainingDatasetClustered.objectName(): 'training_dataset_clustered.skops',
+            self.mFileTestDatasetClustered.objectName(): 'test_dataset_clustered.skops',
+            self.mFileTrainingDatasetRanked.objectName(): 'training_dataset_ranked.skops',
+            self.mFileTestDatasetRanked.objectName(): 'test_dataset_ranked.skops',
+            self.mFileClassifierFitted.objectName(): 'classifier_fitted.skops',
             self.mFileClusteringReport.objectName(): 'clustering_report.html',
             self.mFileRankingReport.objectName(): 'ranking_report.html',
             self.mFileClassifierPerformanceReport.objectName(): 'classifier_performance_report.html',
@@ -495,7 +497,7 @@ class ClassificationWorkflowGui(QMainWindow):
 
         if parameters is None:
             parameters = dict()
-        parameters[alg.P_OUTPUT_DATASET] = self.createOutputFilename(self.mFileDataset, '.pkl')
+        parameters[alg.P_OUTPUT_DATASET] = self.createOutputFilename(self.mFileDataset, '.skops')
         result = self.showAlgorithmDialog(alg, parameters, autoRun=autoRun)
         self.mFileDataset.setFilePath(result[alg.P_OUTPUT_DATASET])
 
@@ -616,10 +618,10 @@ class ClassificationWorkflowGui(QMainWindow):
         return n
 
     def getClassifier(self) -> str:
-        import processing
+        from qgis import processing
         alg = FitGenericClassifierAlgorithm()
         parameters = {alg.P_CLASSIFIER: self.mCodeClassifier.text(),
-                      alg.P_OUTPUT_CLASSIFIER: join(Utils.getTempDirInTempFolder(), 'classifier.pkl')}
+                      alg.P_OUTPUT_CLASSIFIER: join(Utils.getTempDirInTempFolder(), 'classifier.skops')}
         result = processing.run(alg, parameters)
         filename = result[alg.P_OUTPUT_CLASSIFIER]
         return filename
@@ -659,7 +661,7 @@ class ClassificationWorkflowGui(QMainWindow):
         alg = RandomSamplesFromClassificationDatasetAlgorithm()
         parameters = {alg.P_DATASET: filename,
                       alg.P_N: str(trainNs),
-                      alg.P_OUTPUT_DATASET: self.createOutputFilename(self.mFileTrainingDataset, '.pkl'),
+                      alg.P_OUTPUT_DATASET: self.createOutputFilename(self.mFileTrainingDataset, '.skops'),
                       alg.P_OUTPUT_COMPLEMENT: QgsProcessing.TEMPORARY_OUTPUT,
                       }
         result = self.showAlgorithmDialog(alg, parameters)
@@ -672,7 +674,7 @@ class ClassificationWorkflowGui(QMainWindow):
         else:
             parameters = {alg.P_DATASET: filenameComplement,
                           alg.P_N: str(testNs),
-                          alg.P_OUTPUT_DATASET: self.createOutputFilename(self.mFileTestDataset, '.pkl')}
+                          alg.P_OUTPUT_DATASET: self.createOutputFilename(self.mFileTestDataset, '.skops')}
             result = self.showAlgorithmDialog(alg, parameters)
             self.mFileTestDataset.setFilePath(result[alg.P_OUTPUT_DATASET])
 
@@ -711,7 +713,7 @@ class ClassificationWorkflowGui(QMainWindow):
         alg = SelectFeaturesFromDatasetAlgorithm()
         parameters = {alg.P_DATASET: filenameTrain,
                       alg.P_FEATURE_LIST: str(featureList),
-                      alg.P_OUTPUT_DATASET: self.createOutputFilename(self.mFileTrainingDatasetClustered, '.pkl')}
+                      alg.P_OUTPUT_DATASET: self.createOutputFilename(self.mFileTrainingDatasetClustered, '.skops')}
         result = self.showAlgorithmDialog(alg, parameters)
         self.mFileTrainingDatasetClustered.setFilePath(result[alg.P_OUTPUT_DATASET])
 
@@ -720,7 +722,7 @@ class ClassificationWorkflowGui(QMainWindow):
             alg = SelectFeaturesFromDatasetAlgorithm()
             parameters = {alg.P_DATASET: filenameTest,
                           alg.P_FEATURE_LIST: str(featureList),
-                          alg.P_OUTPUT_DATASET: self.createOutputFilename(self.mFileTestDatasetClustered, '.pkl')}
+                          alg.P_OUTPUT_DATASET: self.createOutputFilename(self.mFileTestDatasetClustered, '.skops')}
             result = self.showAlgorithmDialog(alg, parameters)
             self.mFileTestDatasetClustered.setFilePath(result[alg.P_OUTPUT_DATASET])
 
@@ -770,7 +772,7 @@ class ClassificationWorkflowGui(QMainWindow):
         alg = SelectFeaturesFromDatasetAlgorithm()
         parameters = {alg.P_DATASET: filenameTrain,
                       alg.P_FEATURE_LIST: str(featureList),
-                      alg.P_OUTPUT_DATASET: self.createOutputFilename(self.mFileTrainingDatasetRanked, '.pkl')}
+                      alg.P_OUTPUT_DATASET: self.createOutputFilename(self.mFileTrainingDatasetRanked, '.skops')}
         result = self.showAlgorithmDialog(alg, parameters)
         self.mFileTrainingDatasetRanked.setFilePath(result[alg.P_OUTPUT_DATASET])
 
@@ -779,7 +781,7 @@ class ClassificationWorkflowGui(QMainWindow):
             alg = SelectFeaturesFromDatasetAlgorithm()
             parameters = {alg.P_DATASET: filenameTest,
                           alg.P_FEATURE_LIST: str(featureList),
-                          alg.P_OUTPUT_DATASET: self.createOutputFilename(self.mFileTestDatasetRanked, '.pkl')}
+                          alg.P_OUTPUT_DATASET: self.createOutputFilename(self.mFileTestDatasetRanked, '.skops')}
             result = self.showAlgorithmDialog(alg, parameters)
             self.mFileTestDatasetRanked.setFilePath(result[alg.P_OUTPUT_DATASET])
 
@@ -790,7 +792,7 @@ class ClassificationWorkflowGui(QMainWindow):
         alg = FitGenericClassifierAlgorithm()
         parameters = {alg.P_DATASET: filenameTrain,
                       alg.P_CLASSIFIER: self.mCodeClassifier.text(),
-                      alg.P_OUTPUT_CLASSIFIER: self.createOutputFilename(self.mFileClassifierFitted, '.pkl')
+                      alg.P_OUTPUT_CLASSIFIER: self.createOutputFilename(self.mFileClassifierFitted, '.skops')
                       }
         result = self.showAlgorithmDialog(alg, parameters)
         self.mFileClassifierFitted.setFilePath(result[alg.P_OUTPUT_CLASSIFIER])
@@ -842,7 +844,7 @@ class ClassificationWorkflowGui(QMainWindow):
                 alg.P_RASTER: raster,
                 alg.P_OUTPUT_CLASSIFICATION: filenameClassification
             }
-            result = self.showAlgorithmDialog(alg, parameters)
+            self.showAlgorithmDialog(alg, parameters)
             self.mFilePredictedClassification.setFilePath(filenameClassification)
 
         if self.mCheckPredictedProbability.isChecked():
@@ -855,18 +857,18 @@ class ClassificationWorkflowGui(QMainWindow):
                 alg.P_RASTER: raster,
                 alg.P_OUTPUT_PROBABILITY: filenameProbability
             }
-            result = self.showAlgorithmDialog(alg, parameters)
+            self.showAlgorithmDialog(alg, parameters)
             self.mFilePredictedProbability.setFilePath(filenameProbability)
 
             # probability as RGB
-            colors = str([c.color for c in ClassifierDump(**Utils.pickleLoad(filenameClassifier)).categories])
+            colors = str([c.color for c in ClassifierDump(**Utils.modelLoad(filenameClassifier)).categories])
             alg = CreateRgbImageFromClassProbabilityAlgorithm()
             parameters = {
                 alg.P_PROBABILITY: filenameProbability,
                 alg.P_COLORS: colors,
                 alg.P_OUTPUT_RGB: filenameRgb
             }
-            result = self.showAlgorithmDialog(alg, parameters)
+            self.showAlgorithmDialog(alg, parameters)
 
     @errorHandled(successMessage='predicted maps')
     def runClassificationPerformance(self, *args):
@@ -923,8 +925,8 @@ class ClassificationWorkflowGui(QMainWindow):
 
     def updateDatasetInfo(self, mFile: QgsFileWidget, label: QLabel):
         filename = mFile.filePath()
-        if exists(filename) and filename.endswith('.pkl'):
-            dump = ClassifierDump(**Utils.pickleLoad(filename))
+        if exists(filename) and filename.endswith('.skops'):
+            dump = ClassifierDump(**Utils.modelLoad(filename))
             label.setText(f'{np.array(dump.X).shape[0]} '
                           f'samples {np.array(dump.X).shape[1]} features  {len(dump.categories)} categories')
             label.show()
@@ -954,8 +956,8 @@ class ClassificationWorkflowGui(QMainWindow):
     @errorHandled
     def onDatasetChanged(self, *args):
         filename = self.mFileDataset.filePath()
-        if exists(filename) and filename.endswith('.pkl'):
-            dump = ClassifierDump(**Utils.pickleLoad(filename))
+        if exists(filename) and filename.endswith('.skops'):
+            dump = ClassifierDump(**Utils.modelLoad(filename))
         else:
             dump = ClassifierDump(categories=[], features=[], X=np.zeros((0, 0)), y=np.zeros((0, 1)))
 
@@ -1016,7 +1018,7 @@ class ClassificationWorkflowGui(QMainWindow):
             self.pushParameterMissingSample()
             raise MissingParameterError()
 
-        dump = ClassifierDump(**Utils.pickleLoad(filename))
+        dump = ClassifierDump(**Utils.modelLoad(filename))
 
         categories = list()
         for i, origCategory in enumerate(dump.categories):
@@ -1031,7 +1033,7 @@ class ClassificationWorkflowGui(QMainWindow):
 
         # overwrite sample
         dump = ClassifierDump(categories, features, dump.X, dump.y, dump.classifier)
-        Utils.pickleDump(dump.__dict__, filename)
+        Utils.modelDump(dump.__dict__, filename)
 
     @errorHandled(successMessage=None)
     def onSetTrainSize(self, *args):
@@ -1083,8 +1085,8 @@ class ClassificationWorkflowGui(QMainWindow):
         file: QgsFileWidget = files[self.sender()]
         filename = file.filePath()
 
-        if filename.endswith('.pkl'):
-            dump = Utils.pickleLoad(filename)
+        if filename.endswith('.skops'):
+            dump = Utils.modelLoad(filename)
             filename = filename + '.json'
             Utils.jsonDump(dump, filename)
         self.openWebbrowser(filename)
@@ -1112,12 +1114,17 @@ class ClassificationWorkflowGui(QMainWindow):
             self.mFileDataset.objectName(): 'Dataset/Creation/Output dataset',
             self.mFileTrainingDataset.objectName(): 'Dataset/Style and Split/Output training dataset',
             self.mFileTestDataset.objectName(): 'Dataset/Style and Split/Output test dataset',
-            self.mFileTrainingDatasetClustered.objectName(): 'Feature Selection/Clustering/Selection/Output training dataset (clustered)',
-            self.mFileTestDatasetClustered.objectName(): 'Feature Selection/Clustering/Selection/Output test dataset (clustered)',
-            self.mFileTrainingDatasetRanked.objectName(): 'Feature Selection/Ranking/Selection/Output training dataset (ranked)',
-            self.mFileTestDatasetRanked.objectName(): 'Feature Selection/Ranking/Selection/Output test dataset (ranked)',
+            self.mFileTrainingDatasetClustered.objectName(): 'Feature Selection/Clustering/Selection/Output training '
+                                                             'dataset (clustered)',
+            self.mFileTestDatasetClustered.objectName(): 'Feature Selection/Clustering/Selection/Output test dataset '
+                                                         '(clustered)',
+            self.mFileTrainingDatasetRanked.objectName(): 'Feature Selection/Ranking/Selection/Output training dataset '
+                                                          '(ranked)',
+            self.mFileTestDatasetRanked.objectName(): 'Feature Selection/Ranking/Selection/Output test dataset '
+                                                      '(ranked)',
             self.mFileClassifierFitted.objectName(): 'Model/Output classifier (fitted)',
-            self.mFileClusteringReport.objectName(): 'Feature Selection/Feature Clustering/Cluster Analysis/Output report',
+            self.mFileClusteringReport.objectName(): 'Feature Selection/Feature Clustering/Cluster Analysis/Output '
+                                                     'report',
             self.mFileRankingReport.objectName(): 'Feature Selection/Feature Ranking/Rank Analysis/Output report',
             self.mFilePredictedClassification.objectName(): 'Classification/Predict/Predicted classification layer'
         }

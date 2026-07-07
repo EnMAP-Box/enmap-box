@@ -1,3 +1,4 @@
+from contextlib import suppress
 from math import nan, inf
 from typing import Optional
 
@@ -303,10 +304,8 @@ class RasterLayerStylingPanel(QgsDockWidget):
             cache = buildMetadataCache(layer)
             setMetadataCache(layer, cache)
 
-        try:
+        with suppress(Exception):
             layer.rendererChanged.disconnect(self.onLayerRendererChanged)
-        except Exception:
-            pass
 
         layer.rendererChanged.connect(self.onLayerRendererChanged)
 

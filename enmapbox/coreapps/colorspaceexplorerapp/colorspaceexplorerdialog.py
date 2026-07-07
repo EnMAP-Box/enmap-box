@@ -1,3 +1,4 @@
+from contextlib import suppress
 from random import randint
 from typing import Optional
 
@@ -55,10 +56,14 @@ class ColorSpaceExplorerDialog(QMainWindow):
             text = mRgb.text()
             tmp = text.split(' ')
             bands = tmp[-1][1:-1].split('-')
-            wavelengths = [str(CreateSpectralIndicesAlgorithm.WavebandMapping[
-                                   CreateSpectralIndicesAlgorithm.translateSentinel2Band(band)
-                               ][0]) + 'nm'
-                           for band in bands]
+            wavelengths = [
+                str(
+                    CreateSpectralIndicesAlgorithm.WavebandMapping[
+                        CreateSpectralIndicesAlgorithm.translateSentinel2Band(band)
+                    ][0]
+                ) + 'nm'
+                for band in bands
+            ]
             name = ' '.join(tmp[:-1])
             name += '\n(' + '-'.join(wavelengths) + ')'
             mRgb.setText(name)
@@ -90,10 +95,8 @@ class ColorSpaceExplorerDialog(QMainWindow):
 
         # disconnect old map canvas
         if self.mMapCanvas is not None:
-            try:
+            with suppress(Exception):
                 self.mMapCanvas.extentsChanged.disconnect(self.onMapCanvasExtentsChanged)
-            except Exception:
-                pass
 
         # connect new map canvas
         self.mMapCanvas = None
@@ -152,9 +155,9 @@ class ColorSpaceExplorerDialog(QMainWindow):
         if layer is None:
             return
 
-        self.mRedBand.setBand(randint(1, layer.bandCount()))
-        self.mGreenBand.setBand(randint(1, layer.bandCount()))
-        self.mBlueBand.setBand(randint(1, layer.bandCount()))
+        self.mRedBand.setBand(randint(1, layer.bandCount()))  # nosec B311 # no-security relevant random sampling
+        self.mGreenBand.setBand(randint(1, layer.bandCount()))  # nosec B311 # no-security relevant random sampling
+        self.mBlueBand.setBand(randint(1, layer.bandCount()))  # nosec B311 # no-security relevant random sampling
 
     def onRandomDeltaClicked(self):
         layer = self.currentLayer()
@@ -163,7 +166,9 @@ class ColorSpaceExplorerDialog(QMainWindow):
 
         v = min(self.mRandomDeltaMax.value(), layer.bandCount())
         for mDelta in [self.mRedDelta, self.mGreenDelta, self.mBlueDelta]:
-            mDelta.setValue(randint(-v, v))
+            mDelta.setValue(
+                randint(-v, v)  # nosec B311 # no-security relevant random sampling
+            )
 
     def nextBandNo(self, bandNo: int, delta: int, backwards) -> int:
         layer = self.currentLayer()
@@ -207,7 +212,6 @@ class ColorSpaceExplorerDialog(QMainWindow):
             renderer = QgsMultiBandColorRenderer(layer.dataProvider(), 1, 1, 1)
             layer.setRenderer(renderer)
 
-        assert isinstance(renderer, QgsMultiBandColorRenderer)
         layer.renderer().setRedBand(self.mRedBand.currentBand())
         layer.renderer().setGreenBand(self.mGreenBand.currentBand())
         layer.renderer().setBlueBand(self.mBlueBand.currentBand())

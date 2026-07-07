@@ -26,18 +26,18 @@
 """
 
 import os
-import pathlib
 import site
 import sys
 import traceback
 import typing
 import warnings
+from pathlib import Path
 
 from osgeo import gdal
 
 from qgis.PyQt.QtCore import QSettings, PYQT_VERSION_STR
 from qgis.PyQt.QtGui import QIcon
-from qgis.core import Qgis, QgsApplication, QgsProcessingAlgorithm, QgsProcessingProvider, QgsProcessingRegistry
+from qgis.core import Qgis, QgsApplication, QgsProcessingAlgorithm, QgsProcessingProvider
 from qgis.gui import QgisInterface, QgsMapLayerConfigWidgetFactory
 
 # provide shortcuts
@@ -53,19 +53,21 @@ HOMEPAGE = 'https://github.com/EnMAP-Box/enmap-box'
 REPOSITORY = 'https://github.com/EnMAP-Box/enmap-box.git'
 ISSUE_TRACKER = 'https://github.com/EnMAP-Box/enmap-box/issues'
 CREATE_ISSUE = 'https://github.com/EnMAP-Box/enmap-box/issues/new'
-REQUIREMENTS_CSV = pathlib.Path(__file__).parents[1] / '.env' / 'requirements.csv'
+REQUIREMENTS_CSV = Path(__file__).parents[1] / '.env' / 'requirements.csv'
 DOCUMENTATION = 'https://enmap-box.readthedocs.io/'
 URL_TESTDATA = 'https://github.com/EnMAP-Box/enmap-box-exampledata/releases/download/v1.1.1/exampledata.zip'
-URL_INSTALLATION = r'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html#install-required-python-packages'
-URL_QGIS_RESOURCES = r'https://github.com/EnMAP-Box/qgispluginsupport/releases/download/qgisresources.zip_2025-11-07/qgisresources.zip'
+URL_INSTALLATION = (r'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html'
+                    r'#install-required-python-packages')
+URL_QGIS_RESOURCES = (r'https://github.com/EnMAP-Box/qgispluginsupport/releases/download/qgisresources.zip_2025-11-07/'
+                      r'qgisresources.zip')
 
 DIR_ENMAPBOX = os.path.dirname(__file__)
 DIR_REPO = os.path.dirname(DIR_ENMAPBOX)
 DIR_UIFILES = os.path.join(DIR_ENMAPBOX, *['gui', 'ui'])
 DIR_ICONS = os.path.join(DIR_ENMAPBOX, *['gui', 'ui', 'icons'])
-DIR_EXAMPLEDATA = (pathlib.Path(DIR_REPO) / 'enmapbox' / 'exampledata').as_posix()
-DIR_REPO_TMP = (pathlib.Path(DIR_REPO) / 'tmp').as_posix()
-DIR_UNITTESTS = (pathlib.Path(DIR_REPO) / 'tests').as_posix()
+DIR_EXAMPLEDATA = (Path(DIR_REPO) / 'enmapbox' / 'exampledata').as_posix()
+DIR_REPO_TMP = (Path(DIR_REPO) / 'tmp').as_posix()
+DIR_UNITTESTS = (Path(DIR_REPO) / 'tests').as_posix()
 
 ENMAP_BOX_KEY = 'EnMAP-Box'
 
@@ -75,16 +77,6 @@ gdal.SetConfigOption('GDAL_VRT_ENABLE_PYTHON', 'YES')
 
 # ensure that PyQtGraph uses the same PyQt as QGIS
 os.environ.setdefault('PYQTGRAPH_QT_LIB', f'PyQt{PYQT_VERSION_STR[0]}')
-
-# test if PyQtGraph is available
-try:
-    import pyqtgraph  # noqa
-except ModuleNotFoundError:
-    # use PyQtGraph brought by QPS
-    pSrc = pathlib.Path(DIR_ENMAPBOX) / 'qgispluginsupport' / 'qps' / 'pyqtgraph'
-    assert pSrc.is_dir()
-    site.addsitedir(pSrc)
-    # import pyqtgraph
 
 
 def enmapboxSettings() -> QSettings:
@@ -103,10 +95,10 @@ RAISE_ALL_EXCEPTIONS = str(os.environ.get('RAISE_ALL_EXCEPTIONS', False)).lower(
 def icon() -> QIcon:
     """
     Returns the EnMAP icon.
-    (Requires that the EnMAP resources have been loaded before)
     :return: QIcon
     """
-    return QIcon(':/enmapbox/gui/ui/icons/enmapbox.svg')
+    path = Path(__file__).parent / 'gui' / 'ui' / 'icons' / 'enmapbox.png'
+    return QIcon(str(path))
 
 
 def debugLog(msg: str):
@@ -141,14 +133,14 @@ def messageLog(msg, level=Qgis.Info, notifyUser: bool = True):
             print(msg)
 
 
-def scantree(path, ending: str = '') -> pathlib.Path:
+def scantree(path, ending: str = '') -> Path:
     """Recursively returns file paths in directory"""
     for entry in os.scandir(path):
         if entry.is_dir(follow_symlinks=False):
             yield from scantree(entry.path, ending=ending)
         else:
             if entry.path.endswith(ending):
-                yield pathlib.Path(entry.path)
+                yield Path(entry.path)
 
 
 def initPythonPaths():
@@ -156,7 +148,7 @@ def initPythonPaths():
     Adds EnMAP-Box internal paths to PYTHONPATH
     Can be used e.g. in unit-tests to ensure that sub-packages are imported right
     """
-    ROOT = pathlib.Path(__file__).parent
+    ROOT = Path(__file__).parent
     site.addsitedir(ROOT / 'site-packages')
     site.addsitedir(ROOT / 'apps')
     site.addsitedir(ROOT / 'coreapps')
@@ -242,14 +234,10 @@ def registerEnMAPBoxProcessingProvider():
     from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider, ID
 
     registry = QgsApplication.instance().processingRegistry()
-    assert isinstance(registry, QgsProcessingRegistry)
     provider = registry.providerById(ID)
     if not isinstance(provider, QgsProcessingProvider):
         provider = EnMAPBoxProcessingProvider.instance()
         registry.addProvider(provider)
-
-    assert isinstance(provider, EnMAPBoxProcessingProvider)
-    assert id(registry.providerById(ID)) == id(provider)
 
     try:
         existingAlgNames = [a.name() for a in registry.algorithms() if a.groupId() == provider.id()]

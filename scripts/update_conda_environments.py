@@ -27,7 +27,10 @@ DEPENDENCIES = {
              'python>=3.12',
              'pip',
              'scikit-learn>=1.4',
+             'skops',
              'matplotlib-base',
+             'defusedxml',
+             'pyqtgraph',
              'colorama'],
     # full = all other packages to enjoy the full EnMAP-Box experience (on cost of disk space)
     'full': ['enpt>=1.2.1',
@@ -61,6 +64,7 @@ DEPENDENCIES = {
     # required by developers
     'dev': ['gitpython', 'git-lfs', 'pytest', 'pytest-cov', 'pytest-xdist', 'docutils',
             'flake8',
+            'bandit',
             {'pip': 'flake8-qgis'},
             ]
 }
@@ -69,20 +73,23 @@ DEPENDENCIES = {
 def restructure_dependencies(d: dict) -> Dict[str, List[Dict[str, List[str]]]]:
     restructured = dict()
     for k, packages in d.items():
-        assert isinstance(packages, list)
         packages2: List[Dict[str, List[str]]] = []
         for pkg in packages:
             if isinstance(pkg, str):
                 pkg = {'conda': [pkg]}
-            assert isinstance(pkg, dict)
+            if not isinstance(pkg, dict):
+                raise ValueError(f'Invalid package dict: {pkg}')
             for repo in list(pkg.keys()):
-                assert repo in ['conda', 'pip'], f'Unknown package repo: {repo}'
+                if repo not in ['conda', 'pip']:
+                    raise ValueError(f'Package repo must be conda or pip: {repo}')
                 repoPkgs = pkg[repo]
                 if isinstance(repoPkgs, str):
                     repoPkgs = [repoPkgs]
-                assert isinstance(repoPkgs, list)
+                if not isinstance(repoPkgs, list):
+                    raise ValueError(f'Invalid package list: {repoPkgs}')
                 for v in repoPkgs:
-                    assert isinstance(v, str)
+                    if not isinstance(v, str):
+                        raise ValueError(f'Invalid package: {v}')
                 pkg[repo] = repoPkgs
             packages2.append(pkg)
         restructured[k] = packages2
@@ -97,7 +104,7 @@ def get_current_qgis_versions() -> dict:
     Reads from qgis.org the version numbers of the current LTR and LR releases.
     """
     base_url = 'https://qgis.org/resources/roadmap'
-    response = requests.get(base_url)
+    response = requests.get(base_url, timeout=10)
     if response.status_code != 200:
         raise RuntimeError(f"Failed to fetch data from {base_url}")
 
@@ -119,7 +126,7 @@ def get_conda_qgis_versions() -> List[str]:
         # osx-64
         base_url = 'https://conda.anaconda.org/conda-forge/win-64/repodata.json'
         print(f'Download {base_url}')
-        response = requests.get(base_url)
+        response = requests.get(base_url, timeout=5)
         if response.status_code != 200:
             raise RuntimeError(f"Failed to fetch data from {base_url}")
 
@@ -150,7 +157,8 @@ def update_yaml(dir_yaml,
 # run to install: conda env create -n {name} --file={path_yml.name}
 # run to update: conda env update -n {name} --file={path_yml.name} --prune
 # run to delete: conda env remove -n {name}
-# see https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
+# see https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#
+# creating-an-environment-from-an-environment-yml-file
 # created with scripts/update_conda_environments.py (MANUAL CHANGES WILL BE OVERWRITTEN!)
 """
     DEPS = []
@@ -201,8 +209,7 @@ def update_yaml(dir_yaml,
 def update_yamls():
     current_versions = get_current_qgis_versions()
     conda_versions = get_conda_qgis_versions()
-    s = ""
-
+    print(current_versions, conda_versions)
     update_yaml(DIR_YAML, 'enmapbox-base', dependencies=['base', 'dev'])
     update_yaml(DIR_YAML, 'enmapbox-full', dependencies=['base', 'full', 'dev'])
 
