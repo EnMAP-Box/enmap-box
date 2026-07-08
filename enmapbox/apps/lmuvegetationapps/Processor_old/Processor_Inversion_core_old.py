@@ -572,9 +572,9 @@ class ProcessorPrediction:
             whichModel_coords.append(
                 np.where(
                     (whichModel[:, :] == iwhichModel)  # present Model
-                    & (self.mask[0, :, :] > 0 if self.mask_image else all_true)  # not masked
-                    & (self.ndvi_mask > 0 if self.mask_ndvi else all_true)  # NDVI masked
-                    & (~np.all(in_matrix == self.nodat[0], axis=0))
+                    & (self.mask[0, :, :] > 0 if self.mask_image else all_true)  # noqa # not masked
+                    & (self.ndvi_mask > 0 if self.mask_ndvi else all_true)  # noqa # NDVI masked
+                    & (~np.all(in_matrix == self.nodat[0], axis=0))  # noqa
                 )
             )  # not NoDatVal
 

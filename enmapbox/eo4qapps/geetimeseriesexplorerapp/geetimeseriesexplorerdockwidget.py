@@ -1065,7 +1065,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
                 for item in items:
                     if (
                         isinstance(item, (PixelQualityBitmaskItem, CategoryMaskItem))
-                        and item.checkState(0) == Qt.Checked
+                        and item.checkState(0) == Qt.Checked  # noqa
                     ):
                         masks.append(item.eeMask(eeImage))
 

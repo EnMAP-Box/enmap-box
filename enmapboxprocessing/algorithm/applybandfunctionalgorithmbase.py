@@ -20,8 +20,8 @@ class ApplyBandFunctionAlgorithmBase(EnMAPProcessingAlgorithm):
             (self._RASTER, 'Raster layer to be processed band-wise.'),
             (
                 self._FUNCTION, self.helpParameterCode()
-                + '\nNote: The Python code provided here is executed locally with the permissions of the current user '
-                  'during algorithm execution.'
+                + '\nNote: The Python code provided here is executed locally with the permissions '  # noqa: W503
+                  'of the current user during algorithm execution.'
             ),
             (self._OUTPUT_RASTER, self.RasterFileDestination)
         ]

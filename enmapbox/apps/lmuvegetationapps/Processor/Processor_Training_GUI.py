@@ -454,9 +454,9 @@ class ML_Training:
         # default wavelength ranges to be excluded are defined in __init__ and now with the metadata
         # of the spectral image, the respective "exclude bands" can be found
         self.exclude_bands = [i for i in range(len(self.wl)) if self.wl[i] < 400 or self.wl[i] > 2500
-                              or self.exclude_wavelengths[0][0] <= self.wl[i] <= self.exclude_wavelengths[0][1]
-                              or self.exclude_wavelengths[1][0] <= self.wl[i] <= self.exclude_wavelengths[1][1]
-                              or self.exclude_wavelengths[2][0] <= self.wl[i] <= self.exclude_wavelengths[2][1]]
+                              or self.exclude_wavelengths[0][0] <= self.wl[i] <= self.exclude_wavelengths[0][1]  # noqa
+                              or self.exclude_wavelengths[1][0] <= self.wl[i] <= self.exclude_wavelengths[1][1]  # noqa
+                              or self.exclude_wavelengths[2][0] <= self.wl[i] <= self.exclude_wavelengths[2][1]]  # noqa
         self.gui.txtExclude.setText(" ".join(str(i) for i in self.exclude_bands))  # join to string for lineEdit
         self.gui.txtExclude.setCursorPosition(0)
         self.nbands_valid = self.nbands - len(self.exclude_bands)

@@ -920,7 +920,7 @@ class ProcessorTraining:
 
         # No AL, training on splits
         elif (not self.use_al and self.perf_eval and not self.hyperp_tuning and not self.eval_on_insitu
-              and not self.model_proc_dict):
+              and not self.model_proc_dict):  # noqa
             self.al_paras = {'split_method': self.split_method, 'kfolds': self.kfolds, 'test_size': self.test_size}
             self.ml_model = self.m.mlra_training._fit_split
         # No AL, Training on full Training data with evaluation on insitu data
@@ -1003,10 +1003,10 @@ class ProcessorTraining:
             # check if para is *'derived' and calculate:
             if para == 'AGBdry':
                 y[:, i] = (lut[self.para_dict['cp'], :]
-                           + lut[self.para_dict['cbc'], :]) * lut[self.para_dict['LAI'], :] * 10000
+                           + lut[self.para_dict['cbc'], :]) * lut[self.para_dict['LAI'], :] * 10000  # noqa
             if para == 'AGBfresh':
                 y[:, i] = (lut[self.para_dict['cp'], :] + lut[self.para_dict['cbc'], :]
-                           + lut[self.para_dict['cw'], :]) * lut[self.para_dict['LAI'], :] * 10000
+                           + lut[self.para_dict['cw'], :]) * lut[self.para_dict['LAI'], :] * 10000  # noqa
             if para == 'CWC':
                 y[:, i] = lut[self.para_dict['cw'], :] * lut[self.para_dict['LAI'], :]
             if para == 'Nitrogen':
@@ -1169,9 +1169,9 @@ class ProcessorPrediction:
             whichModel_coords.append(
                 np.where(
                     (whichModel[:, :] == iwhichModel)  # present Model
-                    & (self.mask[0, :, :] > 0 if self.mask_image else all_true)  # not masked
-                    & (self.ndvi_mask > 0 if self.mask_ndvi else all_true)  # NDVI masked
-                    & (~np.all(in_matrix == self.nodat[0], axis=0)))  # not NoDatVal
+                    & (self.mask[0, :, :] > 0 if self.mask_image else all_true)  # noqa # not masked
+                    & (self.ndvi_mask > 0 if self.mask_ndvi else all_true)  # noqa # NDVI masked
+                    & (~np.all(in_matrix == self.nodat[0], axis=0)))  # noqa # not NoDatVal
             )
 
         _, nrows, ncols = in_matrix.shape

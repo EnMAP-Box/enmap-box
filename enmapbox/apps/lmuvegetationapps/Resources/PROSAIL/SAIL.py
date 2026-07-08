@@ -258,10 +258,14 @@ class Sail:
         btran2 = np.pi - np.abs(bts + bto - np.pi)
 
         bt1 = np.where(self.psi[:, np.newaxis] < btran1, self.psi[:, np.newaxis], btran1)
-        bt2 = np.where(self.psi[:, np.newaxis] < btran1, btran1, np.where(self.psi[:, np.newaxis]
-                                                                          <= btran2, self.psi[:, np.newaxis], btran2))
-        bt3 = np.where(self.psi[:, np.newaxis] < btran1, btran2, np.where(self.psi[:, np.newaxis]
-                                                                          <= btran2, btran2, self.psi[:, np.newaxis]))
+        bt2 = np.where(
+            self.psi[:, np.newaxis]
+            < btran1, btran1, np.where(self.psi[:, np.newaxis] <= btran2, self.psi[:, np.newaxis], btran2)  # noqa
+        )
+        bt3 = np.where(
+            self.psi[:, np.newaxis]
+            < btran1, btran2, np.where(self.psi[:, np.newaxis] <= btran2, btran2, self.psi[:, np.newaxis])  # noqa
+        )
 
         t1 = 2 * cs * co + ss * so * self.cospsi[:, np.newaxis]
         t2 = np.where(bt2 > 0, np.sin(bt2) * (2 * ds * doo + ss * so * np.cos(bt1) * np.cos(bt3)), 0)

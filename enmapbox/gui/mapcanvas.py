@@ -296,7 +296,7 @@ class CanvasLinkDialog(QDialog):
                 import qgis.utils
                 if (
                     isinstance(qgis.utils.iface, QgisInterface)
-                    and isinstance(qgis.utils.iface.mapCanvas(), QgsMapCanvas)
+                    and isinstance(qgis.utils.iface.mapCanvas(), QgsMapCanvas)  # noqa
                 ):
                     label = QLabel('QGIS Map Canvas')
 

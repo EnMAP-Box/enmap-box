@@ -24,8 +24,8 @@ class FitClassifierAlgorithmBase(EnMAPProcessingAlgorithm):
                             'If not specified, an unfitted classifier is created.'),
             (
                 self._CLASSIFIER, self.helpParameterCode()
-                + '\nNote: The Python code provided here is executed locally with the permissions of the current '
-                  'user during algorithm execution.'
+                + '\nNote: The Python code provided here is executed locally with the permissions '  # noqa: W503
+                  'of the current user during algorithm execution.'
             ),
             (self._OUTPUT_CLASSIFIER, self.SkopsFileDestination)
         ]

@@ -24,8 +24,8 @@ class FitTransformerAlgorithmBase(EnMAPProcessingAlgorithm):
         return [
             (
                 self._TRANSFORMER, self.helpParameterCode()
-                + '\nNote: The Python code provided here is executed locally with the permissions of the current '
-                  'user during algorithm execution.'
+                + '\nNote: The Python code provided here is executed locally with the permissions of '  # noqa: W503
+                  ' the current user during algorithm execution.'
             ),
             (self._FEATURE_RASTER, 'Raster layer with feature data X used for fitting the transformer. '
                                    'Mutually exclusive with parameter: Training dataset'),

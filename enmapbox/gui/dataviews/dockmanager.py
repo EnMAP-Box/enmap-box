@@ -1010,9 +1010,9 @@ class DockManagerTreeModel(QgsLayerTreeModel):
                     # close docks linked to this source
                     if (
                         isinstance(node, AttributeTableDockTreeNode)
-                        and isinstance(node.dock, AttributeTableDock)
-                        and isinstance(node.dock.vectorLayer(), QgsVectorLayer)
-                        and node.dock.vectorLayer().source() == d.source()
+                        and isinstance(node.dock, AttributeTableDock)  # noqa
+                        and isinstance(node.dock.vectorLayer(), QgsVectorLayer)  # noqa
+                        and node.dock.vectorLayer().source() == d.source()  # noqa
                     ):
                         docks_to_close.append(node.dock)
 
