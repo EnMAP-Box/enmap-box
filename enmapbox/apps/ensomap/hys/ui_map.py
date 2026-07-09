@@ -181,7 +181,7 @@ class ui_map:
                 dname = os.path.dirname(filename)
             elif type(cube) is not hys.cube and type(cube) is not hys.SpectralLibrary:
                 msg = (os.path.basename(filename)
-                       + "\n is not a valid hyperspectral product: \n"
+                       + "\n is not a valid hyperspectral product: \n"  # noqa: W503
                          "  -> Standard hyperspectral image\n"
                          "  -> A spectral library!")
                 hys.display_error(self, msg)

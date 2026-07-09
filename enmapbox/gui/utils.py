@@ -87,7 +87,7 @@ def guessDataProvider(src: str) -> Optional[str]:
     # GDAL / GDAL-subdataset
     if (
         re.search(r'\.(bsq|tiff?|jp2|jp2000|j2k|png)', src, re.I)
-        or re.search(r'^.+:.+:.+', src, re.I)
+        or re.search(r'^.+:.+:.+', src, re.I)  # noqa
     ):
         return 'gdal'
 

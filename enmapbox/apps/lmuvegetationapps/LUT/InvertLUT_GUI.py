@@ -309,9 +309,11 @@ class GlobalInversion:
             self.gui.lblNodatImage.setText(str(meta[0]))
             self.gui.txtNodatOutput.setText(str(meta[0]))
             self.nodat[0] = meta[0]
-            self.exclude_bands = [i for i in range(len(self.wl)) if self.wl[i] < 400 or self.wl[i] > 2500
-                                  or self.exclude_wavelengths[0][0] <= self.wl[i] <= self.exclude_wavelengths[0][1]
-                                  or self.exclude_wavelengths[1][0] <= self.wl[i] <= self.exclude_wavelengths[1][1]]
+            self.exclude_bands = [
+                i for i in range(len(self.wl)) if self.wl[i] < 400 or self.wl[i] > 2500
+                or self.exclude_wavelengths[0][0] <= self.wl[i] <= self.exclude_wavelengths[0][1]  # noqa
+                or self.exclude_wavelengths[1][0] <= self.wl[i] <= self.exclude_wavelengths[1][1]  # noqa
+            ]
             self.gui.txtExclude.setText(" ".join(str(i) for i in self.exclude_bands))  # join to string for lineEdit
             self.gui.txtExclude.setCursorPosition(0)
 

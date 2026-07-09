@@ -136,8 +136,8 @@ def find_best_split(label_histograms, num_permutations, train_perc, test_perc, v
         # Check minimum requirements only for non-empty datasets
         if (
             (num_test > 0 and np.any(test_hist < min_per_class))
-            or (num_val > 0 and np.any(val_hist < min_per_class))
-            or (num_train > 0 and np.any(train_hist < min_per_class))
+            or (num_val > 0 and np.any(val_hist < min_per_class))  # noqa: W503
+            or (num_train > 0 and np.any(train_hist < min_per_class))  # noqa: W503
         ):
             continue
 

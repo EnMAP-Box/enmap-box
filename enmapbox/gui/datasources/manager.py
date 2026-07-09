@@ -259,8 +259,8 @@ class DataSourceManager(TreeModel):
                     dataItem = ds.dataItem()
                     if (
                             isinstance(ds, SpatialDataSource)
-                            and dataItem.path() == input.source()
-                            and dataItem.providerKey() == input.providerType()
+                            and dataItem.path() == input.source()  # noqa
+                            and dataItem.providerKey() == input.providerType()  # noqa
                     ):
                         foundSources.append(ds)
             elif isinstance(input, str):

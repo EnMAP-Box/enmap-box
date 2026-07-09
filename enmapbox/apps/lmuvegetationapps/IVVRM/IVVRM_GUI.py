@@ -762,7 +762,7 @@ class IVVRM:
                 # Nash-Sutcliffe Efficiency Error
                 nse = 1.0 - (
                     (np.nansum((self.data_mean - self.myResult) ** 2))
-                    / (np.nansum((self.data_mean - (np.nanmean(self.data_mean))) ** 2))
+                    / (np.nansum((self.data_mean - (np.nanmean(self.data_mean))) ** 2))  # noqa
                 )
 
                 # Modified Nash-Sutcliffe Efficiency Error
@@ -780,10 +780,10 @@ class IVVRM:
 
                 # Add the errors to the plot
                 errors = pg.TextItem("RMSE: %.4f" % rmse
-                                     + "\nMAE: %.4f" % mae
-                                     + "\nNSE: %.4f" % nse
-                                     + "\nmNSE: %.2f" % mnse
-                                     + '\n' + u'R²: %.2f' % r_squared, (100, 200, 255),
+                                     + "\nMAE: %.4f" % mae  # noqa
+                                     + "\nNSE: %.4f" % nse  # noqa
+                                     + "\nmNSE: %.2f" % mnse  # noqa
+                                     + '\n' + u'R²: %.2f' % r_squared, (100, 200, 255),  # noqa
                                      border="w", anchor=(1, 0))
             except Exception:
                 errors = pg.TextItem("RMSE: sensors mismatch"
@@ -1145,9 +1145,9 @@ class SensorEditor:
             if len(self.outreach) > 0:
                 text = (
                     "Create Generic SRF from Imagery OK with "
-                    + str(len(self.x[:, 0])) + " Bands but Caution! "
-                    + str(len(self.outreach))
-                    + " wavelengths outside PROSAIL range will be deleted!"
+                    + str(len(self.x[:, 0])) + " Bands but Caution! "  # noqa
+                    + str(len(self.outreach))  # noqa
+                    + " wavelengths outside PROSAIL range will be deleted!"  # noqa
                 )
                 self.gui.label.setStyleSheet("color: rgb(170, 130, 0);")
                 self.gui.label.setText(text)

@@ -1102,9 +1102,9 @@ class ImageCubeWidget(QMainWindow):
         rgba = data.mRGBA
         if not (
             isinstance(rgba, np.ndarray)
-            and rgba.ndim == 3
-            and rgba.shape[2] == 4
-            and rgba.dtype == np.uint8
+            and rgba.ndim == 3  # noqa
+            and rgba.shape[2] == 4  # noqa
+            and rgba.dtype == np.uint8  # noqa
         ):
             raise ValueError("Invalid RGBA top plane")
 
@@ -1121,9 +1121,9 @@ class ImageCubeWidget(QMainWindow):
         rgba = self.mRGBATopPlane.mRGBA
         if not (
             isinstance(rgba, np.ndarray)
-            and rgba.ndim == 3
-            and rgba.shape[2] == 4
-            and rgba.dtype == np.uint8
+            and rgba.ndim == 3  # noqa
+            and rgba.shape[2] == 4  # noqa
+            and rgba.dtype == np.uint8  # noqa
         ):
             raise ValueError("Invalid RGBA top plane")
 
@@ -1189,9 +1189,9 @@ class ImageCubeWidget(QMainWindow):
         rgba = self.mRGBACube.mRGBA
         if not (
             isinstance(rgba, np.ndarray)
-            and rgba.ndim == 4
-            and rgba.shape[3] == 4
-            and rgba.dtype == np.uint8
+            and rgba.ndim == 4  # noqa
+            and rgba.shape[3] == 4  # noqa
+            and rgba.dtype == np.uint8  # noqa
 
         ):
             raise ValueError("Invalid RGBA cube")

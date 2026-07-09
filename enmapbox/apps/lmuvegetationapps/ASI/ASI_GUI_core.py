@@ -1147,8 +1147,8 @@ class ASI_core:
                         else:
                             cr_absorb_area[j, row, col] = np.nansum(
                                 (np.log(1 / in_matrix[k:i, row, col])
-                                 - np.log(1 / contiguous_hull_x[k:i]))
-                                / np.log(1 / in_matrix[k:i, row, col])
+                                 - np.log(1 / contiguous_hull_x[k:i]))  # noqa
+                                / np.log(1 / in_matrix[k:i, row, col])  # noqa
                             )
                             ones_sum[j, row, col] = np.nansum(ones[k:i, row, col])
 

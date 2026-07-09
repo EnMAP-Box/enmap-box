@@ -755,8 +755,8 @@ def zero_crossings(y_axis, window_len=11,
         # Possibly bad zero crossing, see if it's offsets
         if (
             (diff[::2].std() / diff[::2].mean()) < 0.1
-            and (diff[1::2].std() / diff[1::2].mean()) < 0.1
-            and not offset_corrected
+            and (diff[1::2].std() / diff[1::2].mean()) < 0.1  # noqa
+            and not offset_corrected  # noqa
         ):
             # offset present attempt to correct by subtracting the average
             offset = np.mean([y_axis.max(), y_axis.min()])

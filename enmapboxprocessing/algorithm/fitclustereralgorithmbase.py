@@ -25,8 +25,8 @@ class FitClustererAlgorithmBase(EnMAPProcessingAlgorithm):
                             'If not specified, an unfitted clusterer is created.'),
             (
                 self._CLUSTERER, self.helpParameterCode()
-                + '\nNote: The Python code provided here is executed locally with the permissions of the current user '
-                  'during algorithm execution.'
+                + '\nNote: The Python code provided here is executed locally with the permissions '  # noqa: W503
+                  'of the current user during algorithm execution.'
             ),
             (self._OUTPUT_CLUSTERER, self.SkopsFileDestination)
         ]

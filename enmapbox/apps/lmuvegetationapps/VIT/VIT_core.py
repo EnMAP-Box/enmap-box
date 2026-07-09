@@ -23,7 +23,7 @@ class VIT:
 
     def norm_diff2(self, a, b):  # Normalized Difference Index: BAND NUMBER as input
         return ((self.ImageIn_matrix[:, :, a] - self.ImageIn_matrix[:, :, b])
-                / (self.ImageIn_matrix[:, :, a] + self.ImageIn_matrix[:, :, b]))
+                / (self.ImageIn_matrix[:, :, a] + self.ImageIn_matrix[:, :, b]))  # noqa: W503
 
     def division(self, a, b):  # Simple Division: BAND NUMBER as input
         return self.ImageIn_matrix[:, :, a] / self.ImageIn_matrix[:, :, b]
@@ -174,7 +174,7 @@ class VIT:
 
                         # Linear interpolation of the band
                         wl_target = ((band_right - band_left) * (wl_in - self.wl[ind_left])
-                                     / (self.wl[ind_right] - self.wl[ind_left]) + band_left)
+                                     / (self.wl[ind_right] - self.wl[ind_left]) + band_left)  # noqa: W503
 
             elif self.interpolation_type == 3:  # IDW
                 if wl_in in self.wl:  # if wl_in is actually available, do not interpolate
@@ -261,9 +261,9 @@ class VIT:
                 self.prgbar_process(index_no)
             if self.StructIndices[5] == 1:
                 temp_val[:, :, 0] = 2.5 * (self.ImageIn_matrix[:, :, self.dict_senswl[800]]
-                                           - self.ImageIn_matrix[:, :, self.dict_senswl[670]])
+                                           - self.ImageIn_matrix[:, :, self.dict_senswl[670]])  # noqa: W503
                 temp_val[:, :, 1] = 1.3 * (self.ImageIn_matrix[:, :, self.dict_senswl[800]]
-                                           - self.ImageIn_matrix[:, :, self.dict_senswl[550]])
+                                           - self.ImageIn_matrix[:, :, self.dict_senswl[550]])  # noqa: W503
                 index_out_matrix[:, :, index_no] = 1.2 * (temp_val[:, :, 0] - temp_val[:, :, 1])
                 index_no += 1
                 self.prgbar_process(index_no)
@@ -273,7 +273,7 @@ class VIT:
                 temp_val[:, :, 2] = self.ImageIn_matrix[:, :, self.dict_senswl[550]]
                 temp_val[:, :, 3] = np.sqrt(self.ImageIn_matrix[:, :, self.dict_senswl[680]])
                 temp_val[:, :, 4] = 1.5 * (2.5 * (temp_val[:, :, 0] - temp_val[:, :, 1])
-                                           - 1.3 * (temp_val[:, :, 0] - temp_val[:, :, 2]))
+                                           - 1.3 * (temp_val[:, :, 0] - temp_val[:, :, 2]))  # noqa: W503
                 temp_val[:, :, 5] = (2 * temp_val[:, :, 0] + 1) ** 2
                 temp_val[:, :, 6] = 6 * temp_val[:, :, 0] - 5 * temp_val[:, :, 3]
                 temp_val[:, :, 7] = np.sqrt(temp_val[:, :, 5] - temp_val[:, :, 6] - 0.5)
@@ -370,8 +370,8 @@ class VIT:
                 temp_val[:, :, 1] = self.ImageIn_matrix[:, :, self.dict_senswl[670]]
                 temp_val[:, :, 2] = self.ImageIn_matrix[:, :, self.dict_senswl[550]]
                 index_out_matrix[:, :, index_no] = (((temp_val[:, :, 0] - temp_val[:, :, 1]) - 0.2
-                                                    * (temp_val[:, :, 0] - temp_val[:, :, 2]))
-                                                    * (temp_val[:, :, 0] / temp_val[:, :, 1]))
+                                                     * (temp_val[:, :, 0] - temp_val[:, :, 2]))  # noqa
+                                                    * (temp_val[:, :, 0] / temp_val[:, :, 1]))  # noqa
                 index_no += 1
                 self.prgbar_process(index_no)
             if self.ChlIndices[7] == 1:
@@ -421,7 +421,7 @@ class VIT:
                 temp_val[:, :, 1] = self.ImageIn_matrix[:, :, self.dict_senswl[670]]
                 temp_val[:, :, 2] = self.ImageIn_matrix[:, :, self.dict_senswl[550]]
                 index_out_matrix[:, :, index_no] = 0.5 * (120 * (temp_val[:, :, 0] - temp_val[:, :, 2])
-                                                          - 200 * (temp_val[:, :, 1] - temp_val[:, :, 2]))
+                                                          - 200 * (temp_val[:, :, 1] - temp_val[:, :, 2]))  # noqa
                 index_no += 1
                 self.prgbar_process(index_no)
             if self.ChlIndices[15] == 1:
@@ -498,25 +498,26 @@ class VIT:
                 self.prgbar_process(index_no)
             if self.CarIndices[4] == 1:
                 temp_val[:, :, 0] = self.ImageIn_matrix[:, :, self.dict_senswl[800]]
-                index_out_matrix[:, :, index_no] = (self.ImageIn_matrix[:, :, self.dict_senswl[445]]
-                                                    - temp_val[:, :, 0]) / \
-                                                   (self.ImageIn_matrix[:, :, self.dict_senswl[680]]
-                                                    - temp_val[:, :, 0])
+                a = (self.ImageIn_matrix[:, :, self.dict_senswl[445]] - temp_val[:, :, 0])
+                b = (self.ImageIn_matrix[:, :, self.dict_senswl[680]] - temp_val[:, :, 0])
+                index_out_matrix[:, :, index_no] = a / b
                 index_no += 1
                 self.prgbar_process(index_no)
         if 1 in self.WatIndices:
             if self.WatIndices[0] == 1:
-                index_out_matrix[:, :, index_no] = (self.ImageIn_matrix[:, :, self.dict_senswl[802]]
-                                                    - self.ImageIn_matrix[:, :, self.dict_senswl[547]]) / \
-                                                   (self.ImageIn_matrix[:, :, self.dict_senswl[1657]]
-                                                    + self.ImageIn_matrix[:, :, self.dict_senswl[682]])
+                a = self.ImageIn_matrix[:, :, self.dict_senswl[802]]
+                b = self.ImageIn_matrix[:, :, self.dict_senswl[547]]
+                c = self.ImageIn_matrix[:, :, self.dict_senswl[1657]]
+                d = self.ImageIn_matrix[:, :, self.dict_senswl[682]]
+                index_out_matrix[:, :, index_no] = (a - b) / (c + d)
                 index_no += 1
                 self.prgbar_process(index_no)
             if self.WatIndices[1] == 1:
-                index_out_matrix[:, :, index_no] = (self.ImageIn_matrix[:, :, self.dict_senswl[800]]
-                                                    + self.ImageIn_matrix[:, :, self.dict_senswl[550]]) / \
-                                                   (self.ImageIn_matrix[:, :, self.dict_senswl[1660]]
-                                                    + self.ImageIn_matrix[:, :, self.dict_senswl[680]])
+                a = self.ImageIn_matrix[:, :, self.dict_senswl[800]]
+                b = self.ImageIn_matrix[:, :, self.dict_senswl[550]]
+                c = self.ImageIn_matrix[:, :, self.dict_senswl[1660]]
+                d = self.ImageIn_matrix[:, :, self.dict_senswl[680]]
+                index_out_matrix[:, :, index_no] = (a + b) / (c + d)
                 index_no += 1
                 self.prgbar_process(index_no)
             if self.WatIndices[2] == 1:
@@ -601,9 +602,10 @@ class VIT:
 
         if 1 in self.FlIndices:
             if self.FlIndices[0] == 1:
-                index_out_matrix[:, :, index_no] = (self.ImageIn_matrix[:, :, self.dict_senswl[675]]
-                                                    * self.ImageIn_matrix[:, :, self.dict_senswl[550]]) / \
-                                                   (self.ImageIn_matrix[:, :, self.dict_senswl[683]] ** 2)
+                a = self.ImageIn_matrix[:, :, self.dict_senswl[675]]
+                b = self.ImageIn_matrix[:, :, self.dict_senswl[550]]
+                c = self.ImageIn_matrix[:, :, self.dict_senswl[683]]
+                index_out_matrix[:, :, index_no] = a * b / c ** 2
                 index_no += 1
                 self.prgbar_process(index_no)
             if self.FlIndices[1] == 1:

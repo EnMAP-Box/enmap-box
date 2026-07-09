@@ -26,8 +26,8 @@ class ConvolutionFilterAlgorithmBase(EnMAPProcessingAlgorithm):
             (self._RASTER, 'Raster layer to be filtered.'),
             (
                 self._KERNEL, self.helpParameterCode()
-                + '\nNote: The Python code provided here is executed locally with the permissions of the current user '
-                  'during algorithm execution.'
+                + '\nNote: The Python code provided here is executed locally with the permissions '  # noqa: W503
+                  'of the current user during algorithm execution.'
             ),
             (self._NORMALIZE, 'Whether to normalize the kernel to have a sum of one.'),
             (self._INTERPOLATE, 'Whether to interpolate no data pixel. '

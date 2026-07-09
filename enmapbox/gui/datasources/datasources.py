@@ -31,8 +31,8 @@ class LayerItem(QgsLayerItem):
     def hasReferenceLayer(self) -> bool:
         result = (
             isinstance(self.mLayerProject, QgsProject)
-            and isinstance(self.mLayerID, str)
-            and self.mLayerID in self.mLayerProject.mapLayers()
+            and isinstance(self.mLayerID, str)  # noqa
+            and self.mLayerID in self.mLayerProject.mapLayers()  # noqa
         )
         return result
 

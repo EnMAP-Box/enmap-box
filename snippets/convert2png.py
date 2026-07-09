@@ -25,7 +25,7 @@ def file_search(
 
             elif (
                     (ignoreCase and fnmatch.fnmatch(file.lower(), pattern.lower()))
-                    or fnmatch.fnmatch(file, pattern)
+                    or fnmatch.fnmatch(file, pattern)  # noqa: W503
             ):
 
                 path = os.path.join(root, file)

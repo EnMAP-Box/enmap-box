@@ -615,7 +615,7 @@ class LUT:
         # Check if the LOP and Canopy_arch_model are known and set in the GUI accordingly
         if (
                 (lop in ["prospectPro", "prospectD", "prospect5B", "prospect5", "prospect4"])
-                and (canopy_arch in ["None", "sail", "inform"])
+                and (canopy_arch in ["None", "sail", "inform"])  # noqa
         ):
             self.select_model(lop=lop, canopy_arch=canopy_arch)
             if lop == 'prospectPro':
@@ -892,13 +892,13 @@ class LUT:
             elif len(self.dict_vals[self.para_list[0][i]]) > 3:  # gauss distribution, out of range?
                 if (
                         self.dict_vals[self.para_list[0][i]][2] > self.dict_vals[self.para_list[0][i]][1]
-                        or self.dict_vals[self.para_list[0][i]][2] < self.dict_vals[self.para_list[0][i]][0]
+                        or self.dict_vals[self.para_list[0][i]][2] < self.dict_vals[self.para_list[0][i]][0]  # noqa
                 ):
                     self.abort(message='Parameter %s: mean value must lie between min and max' % self.para_list[0][i])
                     return False
                 elif (
                         self.dict_vals[self.para_list[0][i]][0] < self.dict_boundaries[key][0]
-                        or self.dict_vals[self.para_list[0][i]][1] > self.dict_boundaries[key][1]
+                        or self.dict_vals[self.para_list[0][i]][1] > self.dict_boundaries[key][1]  # noqa
                 ):
                     self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[0][i])
                     return False
@@ -906,7 +906,7 @@ class LUT:
             elif len(self.dict_vals[self.para_list[0][i]]) > 1:  # uniform distribution, out of range?
                 if (
                         self.dict_vals[self.para_list[0][i]][0] < self.dict_boundaries[key][0]
-                        or self.dict_vals[self.para_list[0][i]][1] > self.dict_boundaries[key][1]
+                        or self.dict_vals[self.para_list[0][i]][1] > self.dict_boundaries[key][1]  # noqa
                 ):
                     self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[0][i])
                     return False
@@ -914,7 +914,7 @@ class LUT:
             elif len(self.dict_vals[self.para_list[0][i]]) > 0:  # fixed value our of range?
                 if (
                         self.dict_vals[self.para_list[0][i]][0] < self.dict_boundaries[key][0]
-                        or self.dict_vals[self.para_list[0][i]][0] > self.dict_boundaries[key][1]
+                        or self.dict_vals[self.para_list[0][i]][0] > self.dict_boundaries[key][1]  # noqa
                 ):
                     self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[0][i])
                     return False
@@ -927,14 +927,14 @@ class LUT:
                 elif len(self.dict_vals[self.para_list[1][i]]) > 3:  # gauss distribution, out of range?
                     if (
                             self.dict_vals[self.para_list[1][i]][2] > self.dict_vals[self.para_list[1][i]][1]
-                            or self.dict_vals[self.para_list[1][i]][2] < self.dict_vals[self.para_list[1][i]][0]
+                            or self.dict_vals[self.para_list[1][i]][2] < self.dict_vals[self.para_list[1][i]][0]  # noqa
                     ):
                         self.abort(
                             message='Parameter %s: mean value must lie between min and max' % self.para_list[1][i])
                         return False
                     elif (
                             self.dict_vals[self.para_list[1][i]][0] < self.dict_boundaries[key][0]
-                            or self.dict_vals[self.para_list[1][i]][1] > self.dict_boundaries[key][1]
+                            or self.dict_vals[self.para_list[1][i]][1] > self.dict_boundaries[key][1]  # noqa
                     ):
                         self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[1][i])
                         return False
@@ -942,14 +942,14 @@ class LUT:
                 elif len(self.dict_vals[self.para_list[1][i]]) > 1:  # uniform distribution, out of range?
                     if (
                             self.dict_vals[self.para_list[1][i]][0] < self.dict_boundaries[key][0]
-                            or self.dict_vals[self.para_list[1][i]][1] > self.dict_boundaries[key][1]
+                            or self.dict_vals[self.para_list[1][i]][1] > self.dict_boundaries[key][1]  # noqa
                     ):
                         self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[1][i])
                         return False
                 elif len(self.dict_vals[self.para_list[1][i]]) > 0:  # fixed value our of range?
                     if (
                             self.dict_vals[self.para_list[1][i]][0] < self.dict_boundaries[key][0]
-                            or self.dict_vals[self.para_list[1][i]][0] > self.dict_boundaries[key][1]
+                            or self.dict_vals[self.para_list[1][i]][0] > self.dict_boundaries[key][1]  # noqa
                     ):
                         self.abort(message='Parameter %s: min / max out of allowed range!' % self.para_list[1][i])
                         return False
@@ -1432,8 +1432,8 @@ class SensorEditor:
             self.gui.label.setText(text)
             if len(self.outreach) > 0:
                 text = ("Create Generic SRF from Imagery OK with " + str(len(self.x[:, 0]))
-                        + " Bands but Caution! " + str(len(self.outreach))
-                        + " wavelengths outside PROSAIL range will be deleted!")
+                        + " Bands but Caution! " + str(len(self.outreach))  # noqa
+                        + " wavelengths outside PROSAIL range will be deleted!")  # noqa
                 self.gui.label.setStyleSheet("color: rgb(170, 130, 0);")
                 self.gui.label.setText(text)
             self.gui.cmdOK.setEnabled(True)

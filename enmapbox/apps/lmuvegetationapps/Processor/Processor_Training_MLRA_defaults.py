@@ -91,7 +91,7 @@ class MLRA_defaults:
         'param_dist': {
             'kernel': [
                 kernels.ConstantKernel(1.0)
-                * kernels.Matern(length_scale=v, nu=nu)
+                * kernels.Matern(length_scale=v, nu=nu)  # noqa
                 for v in [0.01, 0.1, 1.0, 10, 100] for nu in [0.5, 1.5, 2.5, float('inf')]
             ],
             # **kernels.ConstantKernel(1.0) *
@@ -114,16 +114,16 @@ class MLRA_defaults:
         'AGBdry': {
             'kernel':
                 kernels.ConstantKernel(1.0, constant_value_bounds=(1e-5, 1e7))
-                * kernels.Matern(length_scale=10, length_scale_bounds=(1e-5, 1e7), nu=0.5)
-                + kernels.WhiteKernel(noise_level=1.0, noise_level_bounds=(1e-5, 1e7)),
+                * kernels.Matern(length_scale=10, length_scale_bounds=(1e-5, 1e7), nu=0.5)  # noqa
+                + kernels.WhiteKernel(noise_level=1.0, noise_level_bounds=(1e-5, 1e7)),  # noqa
             'alpha': 1.0,
             'n_restarts_optimizer': 10,
         },
         'AGBfresh': {
             'kernel':
                 kernels.ConstantKernel(1.0, constant_value_bounds=(1e-5, 1e7))
-                * kernels.Matern(length_scale=10, length_scale_bounds=(1e-5, 1e7), nu=0.5)
-                + kernels.WhiteKernel(noise_level=1.0, noise_level_bounds=(1e-5, 1e7)),
+                * kernels.Matern(length_scale=10, length_scale_bounds=(1e-5, 1e7), nu=0.5)  # noqa
+                + kernels.WhiteKernel(noise_level=1.0, noise_level_bounds=(1e-5, 1e7)),  # noqa
             'alpha': 1.0,
             'n_restarts_optimizer': 10,
         },
@@ -135,8 +135,8 @@ class MLRA_defaults:
         'Nitrogen': {
             'kernel':
                 kernels.ConstantKernel(1.0, constant_value_bounds=(1e-5, 1e7))
-                * kernels.Matern(length_scale=1, length_scale_bounds=(1e-5, 1e7), nu=2.5)
-                + kernels.WhiteKernel(noise_level=1.0, noise_level_bounds=(1e-5, 1e7)),
+                * kernels.Matern(length_scale=1, length_scale_bounds=(1e-5, 1e7), nu=2.5)  # noqa
+                + kernels.WhiteKernel(noise_level=1.0, noise_level_bounds=(1e-5, 1e7)),  # noqa
             'alpha': 1.0,
             'n_restarts_optimizer': 10,
         },
