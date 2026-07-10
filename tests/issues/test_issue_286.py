@@ -16,9 +16,9 @@ class EnMAPBoxTestCaseIssue286(EnMAPBoxTestCase):
     def createMultiLayerGPKG(self, path) -> pathlib.Path:
 
         path = pathlib.Path(path)
-        lyr1 = TestObjects.createVectorLayer(QgsWkbTypes.Point)
+        lyr1 = TestObjects.createVectorLayer(QgsWkbTypes.Type.Point)
 
-        lyr2 = TestObjects.createVectorLayer(QgsWkbTypes.Polygon)
+        lyr2 = TestObjects.createVectorLayer(QgsWkbTypes.Type.Polygon)
 
         lyr1.setName('Points')
         lyr2.setName('Polygons')
@@ -54,11 +54,11 @@ class EnMAPBoxTestCaseIssue286(EnMAPBoxTestCase):
                                                                          lyr.crs(),
                                                                          transformationContext,
                                                                          options)
-                if writer.hasError() != QgsVectorFileWriter.NoError:
+                if writer.hasError() != QgsVectorFileWriter.WriterError.NoError:
                     raise Exception(f'Error when creating {path}: {writer.errorMessage()}')
 
                 if not writer.addFeatures(list(lyr.getFeatures())):
-                    if writer.errorCode() != QgsVectorFileWriter.NoError:
+                    if writer.errorCode() != QgsVectorFileWriter.WriterError.NoError:
                         raise Exception(f'Error when creating feature: {writer.errorMessage()}')
 
                 # QgsVectorFileWriter.writeAsVectorFormatV2(lyr, path.as_posix(), )

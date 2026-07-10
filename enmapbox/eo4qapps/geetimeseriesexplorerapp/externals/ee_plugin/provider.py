@@ -24,19 +24,19 @@ from qgis.core import (
 from enmapbox.typeguard import typechecked
 
 BAND_TYPES = {
-    'int8': Qgis.Int16,
-    'int16': Qgis.Int16,
-    'int32': Qgis.Int32,
-    'int64': Qgis.Int32,
-    'uint8': Qgis.UInt16,
-    'uint16': Qgis.UInt16,
-    'uint32': Qgis.UInt32,
-    'byte': Qgis.Byte,
-    'short': Qgis.Int16,
-    'int': Qgis.Int16,
-    'long': Qgis.Int32,
-    'float': Qgis.Float32,
-    'double': Qgis.Float64
+    'int8': Qgis.DataType.Int16,
+    'int16': Qgis.DataType.Int16,
+    'int32': Qgis.DataType.Int32,
+    'int64': Qgis.DataType.Int32,
+    'uint8': Qgis.DataType.UInt16,
+    'uint16': Qgis.DataType.UInt16,
+    'uint32': Qgis.DataType.UInt32,
+    'byte': Qgis.DataType.Byte,
+    'short': Qgis.DataType.Int16,
+    'int': Qgis.DataType.Int16,
+    'long': Qgis.DataType.Int32,
+    'float': Qgis.DataType.Float32,
+    'double': Qgis.DataType.Float64
 }
 
 
@@ -95,7 +95,7 @@ class GeetseEarthEngineRasterDataProvider(QgsRasterDataProvider):
         return self.collectionJson.bandWavelength(bandNo)
 
     def capabilities(self):
-        caps = QgsRasterInterface.Size | QgsRasterInterface.Identify | QgsRasterInterface.IdentifyValue
+        caps = QgsRasterInterface.Capability.Size | QgsRasterInterface.Capability.Identify | QgsRasterInterface.Capability.IdentifyValue
         return QgsRasterDataProvider.ProviderCapabilities(caps)
 
     def name(self):
@@ -150,14 +150,14 @@ class GeetseEarthEngineRasterDataProvider(QgsRasterDataProvider):
         try:
             return BAND_TYPES[self.ee_info['bands'][band_no - 1]['data_type']['precision']]
         except Exception:
-            return Qgis.UnknownDataType
+            return Qgis.DataType.UnknownDataType
 
     def identify(self, point, format, boundingBox=None, width=None, height=None, dpi=None) -> QgsRasterIdentifyResult:
         band_indices = range(1, self.bandCount() + 1)
         band_names = [self.generateBandName(band_no) for band_no in band_indices]
         band_values = [None for band_name in band_names]
         results = dict(zip(band_indices, band_values))
-        identifyResult = QgsRasterIdentifyResult(QgsRaster.IdentifyFormatValue, results)
+        identifyResult = QgsRasterIdentifyResult(QgsRaster.IdentifyFormat.IdentifyFormatValue, results)
         return identifyResult
 
     def block(self, bandNo, boundingBox, width, height, feedback=None):

@@ -14,7 +14,7 @@ class QueryAvailableImagesTask(QgsTask):
     data: List[List[str]]
 
     def __init__(self, eeCollection, eePoint, limit: int, messaqeBar: Optional[QgsMessageBar]):
-        QgsTask.__init__(self, 'Query available images at location', QgsTask.CanCancel)
+        QgsTask.__init__(self, 'Query available images at location', QgsTask.Flag.CanCancel)
         self.eeCollection = eeCollection
         self.eePoint = eePoint
         self.limit = limit

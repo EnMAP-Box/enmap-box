@@ -46,7 +46,7 @@ class HsvColorRasterRendererDialog(QMainWindow):
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None
         self.mLayer.setProject(self.enmapBox.project())
-        self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mLayer.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         self.mP1.setClearValue(self.mP1.value())
         self.mP2.setClearValue(self.mP2.value())
 

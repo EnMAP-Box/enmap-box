@@ -46,7 +46,7 @@ class SpectralResamplingByResponseFunctionLibraryAlgorithm(EnMAPProcessingAlgori
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
         self.addParameterVectorLayer(self.P_LIBRARY, self._LIBRARY)
         self.addParameterField(
-            self.P_FIELD, self._FIELD, None, self.P_LIBRARY, QgsProcessingParameterField.Any, False, True, False, True
+            self.P_FIELD, self._FIELD, None, self.P_LIBRARY, QgsProcessingParameterField.DataType.Any, False, True, False, True
         )
         self.addParameterRasterDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 

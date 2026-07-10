@@ -103,7 +103,7 @@ class MimeDataTests(EnMAPBoxTestCase):
         md.setUrls([QUrl.fromLocalFile(path.as_posix())])
         print('Drop {}'.format(path.name))
         self._mdref = md
-        return QDropEvent(QPoint(0, 0), Qt.CopyAction, md, Qt.LeftButton, Qt.NoModifier)
+        return QDropEvent(QPoint(0, 0), Qt.DropAction.CopyAction, md, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier)
 
     @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'Start manually only')
     def test_dropping_files_empty_dockarea(self):

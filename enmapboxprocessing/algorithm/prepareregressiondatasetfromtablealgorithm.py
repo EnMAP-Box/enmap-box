@@ -40,10 +40,10 @@ class PrepareRegressionDatasetFromTableAlgorithm(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterVectorLayer(self.P_TABLE, self._TABLE)
         self.addParameterField(
-            self.P_FEATURE_FIELDS, self._FEATURE_FIELDS, None, self.P_TABLE, QgsProcessingParameterField.Any, True
+            self.P_FEATURE_FIELDS, self._FEATURE_FIELDS, None, self.P_TABLE, QgsProcessingParameterField.DataType.Any, True
         )
         self.addParameterField(
-            self.P_TARGET_FIELDS, self._TARGET_FIELDS, None, self.P_TABLE, QgsProcessingParameterField.Any, True
+            self.P_TARGET_FIELDS, self._TARGET_FIELDS, None, self.P_TABLE, QgsProcessingParameterField.DataType.Any, True
         )
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 

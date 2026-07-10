@@ -52,7 +52,7 @@ class RasterBandStackingApp(EnMAPBoxApplication):
 
         # add main dock and toolbar button
         self.dock = RasterBandStackingDockWidget(self.currentLocationMapTool, parent=self.parent())
-        interface.addDockWidget(Qt.RightDockWidgetArea, self.dock)
+        interface.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.dock)
         self.dock.setWindowIcon(self.icon())
         self.dock.hide()
 

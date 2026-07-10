@@ -53,7 +53,7 @@ class ProfileAnalyticsApp(EnMAPBoxApplication):
         # add main dock and toolbar button
         self.dock = ProfileAnalyticsDockWidget(self.currentLocationMapTool, parent=self.parent())
 
-        interface.addDockWidget(Qt.TopDockWidgetArea, self.dock)
+        interface.addDockWidget(Qt.DockWidgetArea.TopDockWidgetArea, self.dock)
         self.dock.setWindowIcon(self.icon())
         self.dock.hide()
 

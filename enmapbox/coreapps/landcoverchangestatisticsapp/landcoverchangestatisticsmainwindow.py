@@ -51,12 +51,12 @@ class LandCoverChangeStatisticsMainWindow(QMainWindow):
         # add dock widgets and toolbar buttons
         self.mDataFilteringDock = LandCoverChangeStatisticsDataFilteringDockWidget(parent=self)
         self.mDataFilteringDock.sigStateChanged.connect(self.onLiveUpdate)
-        self.addDockWidget(Qt.RightDockWidgetArea, self.mDataFilteringDock)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.mDataFilteringDock)
         self.mSettingsDock = LandCoverChangeStatisticsSettingsDockWidget(parent=self)
         self.mSettingsDock.sigStateChanged.connect(self.onLiveUpdate)
         self.mSettingsDock.sigLayersChanged.connect(self.onLayersChanged)
 
-        self.addDockWidget(Qt.BottomDockWidgetArea, self.mSettingsDock)
+        self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, self.mSettingsDock)
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None
         self.enmapBox.sigCurrentLocationChanged.connect(self.onLiveUpdate)
@@ -303,9 +303,9 @@ class LandCoverChangeSankeyPlotBuilder():
         count = countSampled / nSampled * n
 
         fromUnit: QgsUnitTypes.AreaUnit = QgsUnitTypes.distanceToAreaUnit(self.grid.crs().mapUnits())
-        factorToSquareMeters = QgsUnitTypes.fromUnitToUnitFactor(fromUnit, QgsUnitTypes.AreaSquareMeters)
-        factorToHectares = QgsUnitTypes.fromUnitToUnitFactor(fromUnit, QgsUnitTypes.AreaHectares)
-        factorToSquareKilometers = QgsUnitTypes.fromUnitToUnitFactor(fromUnit, QgsUnitTypes.AreaSquareKilometers)
+        factorToSquareMeters = QgsUnitTypes.fromUnitToUnitFactor(fromUnit, QgsUnitTypes.AreaUnit.AreaSquareMeters)
+        factorToHectares = QgsUnitTypes.fromUnitToUnitFactor(fromUnit, QgsUnitTypes.AreaUnit.AreaHectares)
+        factorToSquareKilometers = QgsUnitTypes.fromUnitToUnitFactor(fromUnit, QgsUnitTypes.AreaUnit.AreaSquareKilometers)
 
         pixelSize = self.grid.rasterUnitsPerPixelX() * self.grid.rasterUnitsPerPixelY()
 

@@ -198,7 +198,7 @@ class ProfileAnalyticsDockWidget(QDockWidget):
         row = self.mRasterTable.rowCount() - 1
         w = QgsMapLayerComboBox(parent=self.mRasterTable)
         w.setProject(self.project())
-        w.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        w.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         w.setAllowEmptyLayer(True)
         w.setLayer(None)
         w.layerChanged.connect(self.onLiveUpdate)

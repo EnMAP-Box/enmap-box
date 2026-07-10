@@ -31,7 +31,7 @@ class MergeClassificationDatasetsAlgorithm(EnMAPProcessingAlgorithm):
         return Group.DatasetCreation.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
-        self.addParameterMultipleLayers(self.P_DATASETS, self._DATASETS, QgsProcessing.TypeFile, None)
+        self.addParameterMultipleLayers(self.P_DATASETS, self._DATASETS, QgsProcessing.SourceType.TypeFile, None)
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(

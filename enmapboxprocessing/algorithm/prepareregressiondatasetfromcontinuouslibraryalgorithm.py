@@ -52,10 +52,10 @@ class PrepareRegressionDatasetFromContinuousLibraryAlgorithm(EnMAPProcessingAlgo
         self.addParameterVectorLayer(self.P_CONTINUOUS_LIBRARY, self._CONTINUOUS_LIBRARY)
         self.addParameterField(
             self.P_TARGET_FIELDS, self._TARGET_FIELDS, None, self.P_CONTINUOUS_LIBRARY,
-            QgsProcessingParameterField.Any, True, True, False, True
+            QgsProcessingParameterField.DataType.Any, True, True, False, True
         )
         self.addParameterField(
-            self.P_FIELD, self._FIELD, None, self.P_CONTINUOUS_LIBRARY, QgsProcessingParameterField.Any, False, True,
+            self.P_FIELD, self._FIELD, None, self.P_CONTINUOUS_LIBRARY, QgsProcessingParameterField.DataType.Any, False, True,
             False, True
         )
         self.addParameterBoolean(self.P_EXCLUDE_BAD_BANDS, self._EXCLUDE_BAD_BANDS, True, True, True)

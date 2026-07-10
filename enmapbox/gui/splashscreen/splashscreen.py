@@ -34,7 +34,7 @@ class EnMAPBoxSplashScreen(QSplashScreen):
         :return:
         """
         if alignment is None:
-            alignment = int(Qt.AlignLeft | Qt.AlignBottom)
+            alignment = int(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignBottom)
         if color is None:
             color = QColor('black')
         super(EnMAPBoxSplashScreen, self).showMessage(text, alignment, color)

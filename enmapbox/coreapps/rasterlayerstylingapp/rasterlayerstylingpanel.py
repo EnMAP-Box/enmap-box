@@ -83,7 +83,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
         self.originalRenderer: Optional[QgsRasterRenderer] = None
         self.originalLayer: Optional[str] = None
         self.mLayer.setProject(self.enmapBox.project())
-        self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mLayer.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         self.mLayer.setExcludedProviders(['wms'])
         self.cache = dict()
 
@@ -163,7 +163,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
         row = self.mLinkedLayers.rowCount() - 1
 
         w = QgsMapLayerComboBox()  # raster layer
-        w.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        w.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         w.setProject(self.project())
 
         cl = self.mLayer.currentLayer()
@@ -899,7 +899,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 ce2 = QgsContrastEnhancement(provider2.dataType(bandNo))
                 ce2.setMinimumValue(redMin)
                 ce2.setMaximumValue(redMax)
-                ce2.setContrastEnhancementAlgorithm(QgsContrastEnhancement.StretchToMinimumMaximum)
+                ce2.setContrastEnhancementAlgorithm(QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum)
                 renderer2.setContrastEnhancement(ce2)
                 layer2.setRenderer(renderer2)
             elif self.mRenderer.currentIndex() == self.PseudoRendererTab:

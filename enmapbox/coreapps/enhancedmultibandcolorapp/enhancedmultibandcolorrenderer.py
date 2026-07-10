@@ -115,7 +115,7 @@ class EnhancedMultiBandColorRenderer(QgsRasterRenderer):
         # convert back to QGIS raster block
         rgba = np.array([r, g, b, a], dtype=np.uint32)
         outarray = (rgba[0] << 16) + (rgba[1] << 8) + rgba[2] + (rgba[3] << 24)
-        return Utils.numpyArrayToQgsRasterBlock(outarray, Qgis.ARGB32_Premultiplied)
+        return Utils.numpyArrayToQgsRasterBlock(outarray, Qgis.DataType.ARGB32_Premultiplied)
 
     def clone(self) -> QgsRasterRenderer:
         renderer = EnhancedMultiBandColorRenderer(self.input())

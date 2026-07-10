@@ -108,7 +108,7 @@ def errorHandled(func=None, *, successMessage: str = None):
             button.setText('Traceback')
             button.pressed.connect(showError)
             widget.layout().addWidget(button)
-            gui.mMessageBar.pushWidget(widget, Qgis.Critical)
+            gui.mMessageBar.pushWidget(widget, Qgis.MessageLevel.Critical)
             return
 
         if successMessage is not None:
@@ -382,9 +382,9 @@ class ClassificationWorkflowGui(QMainWindow):
             getattr(self, objectName).setFilePath(name)
 
     def initLayers(self):
-        self.mPredictFeatures.setFilters(QgsMapLayerProxyModel.RasterLayer)
-        self.mQuickFeatures.setFilters(QgsMapLayerProxyModel.RasterLayer)
-        self.mPredictedClassification.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mPredictFeatures.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
+        self.mQuickFeatures.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
+        self.mPredictedClassification.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
 
     def initClassifier(self):
         self.classifierNames = list()
@@ -423,7 +423,7 @@ class ClassificationWorkflowGui(QMainWindow):
                     if self.mDialogAutoClose.isChecked():
                         self_.close()
                         feedback: QgsProcessingFeedback = self_.feedback
-                        self.mLog.moveCursor(QTextCursor.End)
+                        self.mLog.moveCursor(QTextCursor.MoveOperation.End)
                         self.mLog.insertPlainText(feedback.textLog() + '\n##########\n\n')
                         self.mLog.verticalScrollBar().setValue(self.mLog.verticalScrollBar().maximum())
 

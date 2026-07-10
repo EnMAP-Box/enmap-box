@@ -227,8 +227,8 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
         self.mAvailableImages.horizontalHeader().setSectionsMovable(True)
         self.mImageId.textChanged.connect(self.onImageIdChanged)
         # - compositing and mosaicking
-        self.mCompositeSeasonStart.setLocale(QLocale(QLocale.English, QLocale.UnitedKingdom))
-        self.mCompositeSeasonEnd.setLocale(QLocale(QLocale.English, QLocale.UnitedKingdom))
+        self.mCompositeSeasonStart.setLocale(QLocale(QLocale.Language.English, QLocale.Country.UnitedKingdom))
+        self.mCompositeSeasonEnd.setLocale(QLocale(QLocale.Language.English, QLocale.Country.UnitedKingdom))
 
         # update layer bar
         self.mImageExplorerTab.currentChanged.connect(self.updateLayerNamePreview)
@@ -287,7 +287,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
                 continue
             item = QListWidgetItem(f"{spec['short_name']}: {spec['long_name']}")
             item.setToolTip(f"{spec['formula']}")
-            item.setCheckState(Qt.Unchecked)
+            item.setCheckState(Qt.CheckState.Unchecked)
             item.spec = spec
             mList.addItem(item)
 
@@ -309,18 +309,18 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
 
                 # - check all indices that have a default color specified
                 if spec['short_name'] in self.eeFullCollectionInfo.defaultBandColors:
-                    item.setCheckState(Qt.Checked)
+                    item.setCheckState(Qt.CheckState.Checked)
                 else:
-                    item.setCheckState(Qt.Unchecked)
+                    item.setCheckState(Qt.CheckState.Unchecked)
 
                 # - disable all indices that can't be calculated
                 requiredAsiBands = spec['bands']
                 if len(availableAsiBands.intersection(requiredAsiBands)) < len(requiredAsiBands):
                     item.setForeground(QColor(0, 0, 0, 128))
-                    item.setFlags(item.flags() & ~Qt.ItemIsUserCheckable)
+                    item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsUserCheckable)
                 else:
                     item.setForeground(QColor(0, 0, 0, 255))
-                    item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
+                    item.setFlags(item.flags() | Qt.ItemFlag.ItemIsUserCheckable)
             mList.blockSignals(False)
 
     def onSpectralIndexChecked(self):
@@ -334,7 +334,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
         for mList in mLists:
             for row in range(mList.count()):
                 item = mList.item(row)
-                if item.checkState() == Qt.Checked:
+                if item.checkState() == Qt.CheckState.Checked:
                     specs.append(item.spec)
         return specs
 
@@ -412,7 +412,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
 
         # set last image as current image
         index = indices[-1]
-        imageId = self.mAvailableImages.item(index.row(), 0).data(Qt.DisplayRole)
+        imageId = self.mAvailableImages.item(index.row(), 0).data(Qt.ItemDataRole.DisplayRole)
         self.mImageId.setText(imageId)
 
     def onImageIdChanged(self):
@@ -666,7 +666,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
                 waveband = f' ({lname})'
 
             showInZProfile = QCheckBox()
-            showInZProfile.setCheckState(Qt.Checked)
+            showInZProfile.setCheckState(Qt.CheckState.Checked)
             label = self.eeFullCollectionJson.bandDescription(i + 1)
 
             self.mBandProperty.setCellWidget(i, 0, QLabel(bandName))
@@ -732,11 +732,11 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
                     if len(values) == 0:
 
                         # set default QA flags
-                        partsItem.setCheckState(0, Qt.Unchecked)
+                        partsItem.setCheckState(0, Qt.CheckState.Unchecked)
                         if eo_band['name'] in self.eeFullCollectionInfo.defaultQaFlags:
                             defaultQaFlags = self.eeFullCollectionInfo.defaultQaFlags[eo_band['name']]
                             if partsItem.text(0) in defaultQaFlags:
-                                partsItem.setCheckState(0, Qt.Checked)
+                                partsItem.setCheckState(0, Qt.CheckState.Checked)
                                 bandItem.setExpanded(True)
 
                     for value in values:
@@ -745,11 +745,11 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
                         )
 
                         # set default QA flags
-                        valueItem.setCheckState(0, Qt.Unchecked)
+                        valueItem.setCheckState(0, Qt.CheckState.Unchecked)
                         if eo_band['name'] in self.eeFullCollectionInfo.defaultQaFlags:
                             defaultQaFlags = self.eeFullCollectionInfo.defaultQaFlags[eo_band['name']]
                             if (partsItem.text(0), valueItem.text(0)) in defaultQaFlags:
-                                valueItem.setCheckState(0, Qt.Checked)
+                                valueItem.setCheckState(0, Qt.CheckState.Checked)
                                 bandItem.setExpanded(True)
 
                         partsItem.addChild(valueItem)
@@ -765,11 +765,11 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
                     classItem = CategoryMaskItem(class_['description'], eo_band['name'], class_['value'])
 
                     # set default QA flags
-                    classItem.setCheckState(0, Qt.Unchecked)
+                    classItem.setCheckState(0, Qt.CheckState.Unchecked)
                     if eo_band['name'] in self.eeFullCollectionInfo.defaultQaFlags:
                         defaultQaFlags = self.eeFullCollectionInfo.defaultQaFlags[eo_band['name']]
                         if classItem.text(0) in defaultQaFlags:
-                            classItem.setCheckState(0, Qt.Checked)
+                            classItem.setCheckState(0, Qt.CheckState.Checked)
                             bandItem.setExpanded(True)
 
                     pixmap = QPixmap(16, 16)
@@ -794,7 +794,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
         for mBand in [self.mRedBand, self.mBlueBand, self.mGreenBand, self.mPseudoColorBand]:
             mBand.addItems(bandNames + siNames)
             for i, toolTip in enumerate(bandToolTips + siToolTips):
-                mBand.setItemData(i, toolTip, Qt.ToolTipRole)
+                mBand.setItemData(i, toolTip, Qt.ItemDataRole.ToolTipRole)
 
         self.mVisualization.clear()
 
@@ -1065,7 +1065,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
                 for item in items:
                     if (
                         isinstance(item, (PixelQualityBitmaskItem, CategoryMaskItem))
-                        and item.checkState(0) == Qt.Checked  # noqa
+                        and item.checkState(0) == Qt.CheckState.Checked  # noqa
                     ):
                         masks.append(item.eeMask(eeImage))
 
@@ -1363,13 +1363,13 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
 
         VisualizationBands, ReflectanceBands, PixelQualityBands, SpectralIndexBands, ProfileBands, \
             AllBands = range(6)
-        if self.profileDock.mImageChipBands.itemCheckState(VisualizationBands) == Qt.Checked:
+        if self.profileDock.mImageChipBands.itemCheckState(VisualizationBands) == Qt.CheckState.Checked:
             selectedBandNames.update(self.currentVisualizationBandNames())
-        if self.profileDock.mImageChipBands.itemCheckState(ReflectanceBands) == Qt.Checked:
+        if self.profileDock.mImageChipBands.itemCheckState(ReflectanceBands) == Qt.CheckState.Checked:
             reflectanceBandNames = [bandName for bandNo, bandName in enumerate(self.eeFullCollectionInfo.bandNames, 1)
                                     if isfinite(self.eeFullCollectionJson.bandWavelength(bandNo))]
             selectedBandNames.update(reflectanceBandNames)
-        if self.profileDock.mImageChipBands.itemCheckState(PixelQualityBands) == Qt.Checked:
+        if self.profileDock.mImageChipBands.itemCheckState(PixelQualityBands) == Qt.CheckState.Checked:
             bitmaskBandNames = [bandName for bandNo, bandName in enumerate(self.eeFullCollectionInfo.bandNames, 1)
                                 if self.eeFullCollectionJson.isBitmaskBand(bandNo)]
             classificationBandNames = [bandName for bandNo, bandName in
@@ -1377,13 +1377,13 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
                                        if self.eeFullCollectionJson.isClassificationBand(bandNo)]
             selectedBandNames.update(bitmaskBandNames)
             selectedBandNames.update(classificationBandNames)
-        if self.profileDock.mImageChipBands.itemCheckState(SpectralIndexBands) == Qt.Checked:
+        if self.profileDock.mImageChipBands.itemCheckState(SpectralIndexBands) == Qt.CheckState.Checked:
             selectedBandNames.update(self.currentSpectralIndexBandNames())
-        if self.profileDock.mImageChipBands.itemCheckState(ProfileBands) == Qt.Checked:
+        if self.profileDock.mImageChipBands.itemCheckState(ProfileBands) == Qt.CheckState.Checked:
             profileBandNames = self.profileDock.selectedBandNames()
             if profileBandNames is not None:
                 selectedBandNames.update(profileBandNames)
-        if self.profileDock.mImageChipBands.itemCheckState(AllBands) == Qt.Checked:
+        if self.profileDock.mImageChipBands.itemCheckState(AllBands) == Qt.CheckState.Checked:
             selectedBandNames.update(allBandNames)
 
         bandNames = [bandName for bandName in allBandNames if bandName in selectedBandNames]  # this assures band order
@@ -1536,7 +1536,7 @@ class PixelQualityBitmaskItem(QTreeWidgetItem):
 class GeeWaitCursor(object):
 
     def __enter__(self):
-        QApplication.setOverrideCursor(QtGui.QCursor(Qt.WaitCursor))
+        QApplication.setOverrideCursor(QtGui.QCursor(Qt.CursorShape.WaitCursor))
 
     def __exit__(self, exc_type, exc_value, tb):
         QApplication.restoreOverrideCursor()

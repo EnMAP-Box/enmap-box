@@ -46,7 +46,7 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
         # connect signals
         self.mSourcesTree.clicked.connect(self.onSourceClicked)
         self.mSourcesTree.doubleClicked.connect(self.onSourceDoubleClicked)
-        self.mSourcesTree.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.mSourcesTree.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.mSourcesTree.customContextMenuRequested.connect(self.onContextMenuRequested)
         self.mSnippetsTree.doubleClicked.connect(self.onSnippetDoubleClicked)
 

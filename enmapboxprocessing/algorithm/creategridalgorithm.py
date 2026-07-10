@@ -82,7 +82,7 @@ class CreateGridAlgorithm(EnMAPProcessingAlgorithm):
         with open(filename + '.log', 'w') as logfile:
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)
-            writer = Driver(filename, None, None, feedback).create(Qgis.Byte, width, height, 1, extent, crs)
+            writer = Driver(filename, None, None, feedback).create(Qgis.DataType.Byte, width, height, 1, extent, crs)
             writer.close()
 
             result = {self.P_OUTPUT_GRID: filename}

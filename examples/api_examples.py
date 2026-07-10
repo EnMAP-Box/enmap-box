@@ -246,7 +246,7 @@ class Examples(unittest.TestCase):
                 self.mToolBar = QToolBar()
                 self.addToolBar(self.mToolBar)
                 self.mTextBox = QTextEdit()
-                self.mTextBox.setLineWrapMode(QTextEdit.NoWrap)
+                self.mTextBox.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
                 self.setCentralWidget(self.mTextBox)
 
                 self.mActionGetProfiles = QAction('Collect Profiles')

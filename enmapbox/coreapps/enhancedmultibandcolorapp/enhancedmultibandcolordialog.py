@@ -44,7 +44,7 @@ class EnhancedMultiBandColorDialog(QMainWindow):
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None
         self.mLayer.setProject(self.enmapBox.project())
-        self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mLayer.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
 
         self.mLayer.layerChanged.connect(self.onLayerChanged)
 
@@ -98,9 +98,9 @@ class EnhancedMultiBandColorDialog(QMainWindow):
                     randint(0, 255)  # nosec B311 # no-security relevant random sampling
                 )
             if color.alpha() == 255:
-                checkState = Qt.Checked
+                checkState = Qt.CheckState.Checked
             else:
-                checkState = Qt.Unchecked
+                checkState = Qt.CheckState.Unchecked
                 color.setAlpha(255)
 
             bandNo = row + 1

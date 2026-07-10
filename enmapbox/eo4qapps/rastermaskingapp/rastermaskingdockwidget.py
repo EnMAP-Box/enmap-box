@@ -26,7 +26,7 @@ class RasterMaskingDockWidget(QDockWidget):
         self.interface = None
         self.interfaceType = None
 
-        self.mRaster.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mRaster.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         self.mThresholdingAdd.clicked.connect(self.onThresholdingAddClicked)
         self.mThresholdingRemove.clicked.connect(self.onThresholdingRemoveClicked)
         self.mThresholdingRemoveAll.clicked.connect(self.onThresholdingRemoveAllClicked)
@@ -55,7 +55,7 @@ class RasterMaskingDockWidget(QDockWidget):
         row = self.mThresholdingTable.rowCount() - 1
 
         mRaster = QgsMapLayerComboBox()
-        mRaster.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        mRaster.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         mRaster.setExcludedProviders(['wms'])
         mRaster.setAllowEmptyLayer(True)
         self.mThresholdingTable.setCellWidget(row, 0, mRaster)

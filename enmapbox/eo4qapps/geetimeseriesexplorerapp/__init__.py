@@ -66,7 +66,7 @@ class GeeTimeseriesExplorerApp(EnMAPBoxApplication):
 
         # add main dock and toolbar button
         self.mainDock = GeeTimeseriesExplorerDockWidget(parent=self.parent())
-        interface.addDockWidget(Qt.RightDockWidgetArea, self.mainDock)
+        interface.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.mainDock)
         self.mainDock.setWindowIcon(self.icon())
         self.mainDock.hide()
 
@@ -77,7 +77,7 @@ class GeeTimeseriesExplorerApp(EnMAPBoxApplication):
 
         # add profile dock
         self.profileDock = GeeTemporalProfileDockWidget(self.mainDock)
-        interface.addDockWidget(Qt.TopDockWidgetArea, self.profileDock)
+        interface.addDockWidget(Qt.DockWidgetArea.TopDockWidgetArea, self.profileDock)
         self.profileDock.setWindowIcon(self.icon())
         self.profileDock.hide()
 

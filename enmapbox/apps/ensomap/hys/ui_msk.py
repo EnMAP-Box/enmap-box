@@ -109,19 +109,19 @@ class ui_msk:
         self.gui.widget_label(text='Refine threshold values:', height=15)
         self.gui.widget_row_close()
 
-        self.gui.widget_row(alignment=Qt.AlignLeft)
+        self.gui.widget_row(alignment=Qt.AlignmentFlag.AlignLeft)
         self.gui.widget_label(text=' - NDRBI (common threshold range: around 1.0):',
                               width=270)
         self.gui.widget_text(ID='msk_txt_th_ndrbi', text=str(ndrbi.__th_default__), edit=True, width=40)
         self.gui.widget_row_close()
 
-        self.gui.widget_row(alignment=Qt.AlignLeft)
+        self.gui.widget_row(alignment=Qt.AlignmentFlag.AlignLeft)
         self.gui.widget_label(text=' - NDVI (common threshold range: 0.2 - 0.4):',
                               width=270)
         self.gui.widget_text(ID='msk_txt_th_ndvi', text=str(ndvi.__th_default__), edit=True, width=40)
         self.gui.widget_row_close()
 
-        self.gui.widget_row(alignment=Qt.AlignLeft)
+        self.gui.widget_row(alignment=Qt.AlignmentFlag.AlignLeft)
         self.gui.widget_label(text=' - nCAI (common threshold range: 0.01 - 0.04):',
                               width=270)
         self.gui.widget_text(ID='msk_txt_th_ncai', text=str(ncai.__th_default__), edit=True, width=40)

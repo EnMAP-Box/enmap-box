@@ -46,16 +46,16 @@ class PrepareClassificationDatasetFromTableAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterVectorLayer(self.P_TABLE, self._TABLE, [QgsProcessing.SourceType.TypeVector])
 
         self.addParameterField(
-            self.P_FEATURE_FIELDS, self._FEATURE_FIELDS, None, self.P_TABLE, QgsProcessingParameterField.Any, True
+            self.P_FEATURE_FIELDS, self._FEATURE_FIELDS, None, self.P_TABLE, QgsProcessingParameterField.DataType.Any, True
         )
         self.addParameterField(
-            self.P_VALUE_FIELD, self._VALUE_FIELD, None, self.P_TABLE, QgsProcessingParameterField.Any
+            self.P_VALUE_FIELD, self._VALUE_FIELD, None, self.P_TABLE, QgsProcessingParameterField.DataType.Any
         )
         self.addParameterField(
-            self.P_NAME_FIELD, self._NAME_FIELD, None, self.P_TABLE, QgsProcessingParameterField.Any, False, True
+            self.P_NAME_FIELD, self._NAME_FIELD, None, self.P_TABLE, QgsProcessingParameterField.DataType.Any, False, True
         )
         self.addParameterField(
-            self.P_COLOR_FIELD, self._COLOR_FIELD, None, self.P_TABLE, QgsProcessingParameterField.Any, False, True
+            self.P_COLOR_FIELD, self._COLOR_FIELD, None, self.P_TABLE, QgsProcessingParameterField.DataType.Any, False, True
         )
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 

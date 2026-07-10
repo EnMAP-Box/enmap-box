@@ -55,7 +55,7 @@ class SpectralIndexCreatorDialog(QMainWindow):
         self.initBandMapping()
         self.initAdditionalIndexParameters()
         self.onSelectAllClicked()
-        self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mLayer.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         lineEdit: QgsFilterLineEdit = self.mFilename.lineEdit()
         lineEdit.setShowClearButton(True)
         lineEdit.setNullValue('[Save to temporary file]')
@@ -77,7 +77,7 @@ class SpectralIndexCreatorDialog(QMainWindow):
                 continue
             item = QListWidgetItem(f"{spec['short_name']}: {spec['long_name']}")
             item.setToolTip(f"{spec['formula']}")
-            item.setCheckState(Qt.Unchecked)
+            item.setCheckState(Qt.CheckState.Unchecked)
             item.spec = spec
             mList.addItem(item)
 
@@ -103,7 +103,7 @@ class SpectralIndexCreatorDialog(QMainWindow):
             w.setMinimum(-inf)
             w.setMaximum(inf)
             w.setShowClearButton(True)
-            w.setButtonSymbols(QgsDoubleSpinBox.NoButtons)
+            w.setButtonSymbols(QgsDoubleSpinBox.ButtonSymbols.NoButtons)
             w.setValue(CreateSpectralIndicesAlgorithm.ConstantMapping[identifier])
             w.setClearValue(CreateSpectralIndicesAlgorithm.ConstantMapping[identifier])
 
@@ -163,13 +163,13 @@ class SpectralIndexCreatorDialog(QMainWindow):
         for mList in self.mAsiLists.values():
             for row in range(mList.count()):
                 item: QListWidgetItem = mList.item(row)
-                item.setCheckState(Qt.Checked)
+                item.setCheckState(Qt.CheckState.Checked)
 
     def onClearSelectionClicked(self):
         for mList in self.mAsiLists.values():
             for row in range(mList.count()):
                 item: QListWidgetItem = mList.item(row)
-                item.setCheckState(Qt.Unchecked)
+                item.setCheckState(Qt.CheckState.Unchecked)
 
     def onRunClicked(self):
 
@@ -204,7 +204,7 @@ class SpectralIndexCreatorDialog(QMainWindow):
             for row in range(mList.count()):
                 item: QListWidgetItem = mList.item(row)
 
-                if item.checkState() == Qt.Unchecked:
+                if item.checkState() == Qt.CheckState.Unchecked:
                     continue
 
                 short_name = item.text().split(':')[0]

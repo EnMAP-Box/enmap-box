@@ -44,11 +44,11 @@ class SensorProductImportDockWidget(QDockWidget):
         self.mDropArea.installEventFilter(self)
 
     def eventFilter(self, source, event):
-        if (event.type() == QEvent.DragEnter):
+        if (event.type() == QEvent.Type.DragEnter):
             event.accept()
             return True
 
-        if (event.type() == QEvent.Drop):
+        if (event.type() == QEvent.Type.Drop):
             mimeData = event.mimeData()
 
             if MDF_URILIST in mimeData.formats():

@@ -95,7 +95,7 @@ class EnMAPBoxPlugin(object):
         if len(missing) > 0:
             info = missingPackageInfo(missing, html=False)
             # warnings.warn(info, ImportWarning)
-            messageLog(info, level=Qgis.Warning)
+            messageLog(info, level=Qgis.MessageLevel.Warning)
         return missing
 
     def initGui(self):

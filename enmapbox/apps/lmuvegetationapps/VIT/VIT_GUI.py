@@ -31,7 +31,7 @@ class VIT_GUI(QDialog):
         if isinstance(emb, EnMAPBox):
             self.mLayer.setProject(emb.project())
 
-        self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mLayer.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
 
 
 class NodatGUI(QDialog):
