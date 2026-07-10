@@ -18,8 +18,8 @@ import unittest
 
 import enmapbox.gui.mimedata as mimedata
 from enmapbox import DIR_EXAMPLEDATA
-from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.exampledata import enmap, hires, landcover_polygon
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import EnMAPBoxTestCase
 from enmapboxtestdata import library_berlin
 from qgis.PyQt.QtCore import QMimeData, QByteArray, QUrl, Qt, QPoint
@@ -103,7 +103,9 @@ class MimeDataTests(EnMAPBoxTestCase):
         md.setUrls([QUrl.fromLocalFile(path.as_posix())])
         print('Drop {}'.format(path.name))
         self._mdref = md
-        return QDropEvent(QPoint(0, 0), Qt.DropAction.CopyAction, md, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier)
+        return QDropEvent(
+            QPoint(0, 0), Qt.DropAction.CopyAction, md, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier
+        )
 
     @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'Start manually only')
     def test_dropping_files_empty_dockarea(self):

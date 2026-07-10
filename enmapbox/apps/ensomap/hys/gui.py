@@ -368,7 +368,10 @@ class CAL_EST(QWidget):
         self.gui.widget_text(text=str(r_value ** 2))
         self.gui.widget_row_close()
         self.gui.widget_column_close()
-        self.gui.widget_row_framed(alignment=Qt.AlignmentFlag.AlignLeft, style=QFrame.Shape.StyledPanel | QFrame.Shadow.Raised)
+        self.gui.widget_row_framed(
+            alignment=Qt.AlignmentFlag.AlignLeft,
+            style=QFrame.Shape.StyledPanel | QFrame.Shadow.Raised
+        )
         self.gui.widget_push_button('Select', action=self.select)
         self.gui.widget_push_button('Clear', action=self.clear)
         self.gui.widget_push_button('Close', action=self.cancel)
@@ -483,7 +486,9 @@ class CSV(QWidget):
         self.gui.widget_group_box_close()
 
         self.gui.widget_add_spacing(10)
-        self.gui.widget_row_framed(alignment=Qt.AlignmentFlag.AlignLeft, style=QFrame.Shape.StyledPanel | QFrame.Shadow.Raised)
+        self.gui.widget_row_framed(
+            alignment=Qt.AlignmentFlag.AlignLeft, style=QFrame.Shape.StyledPanel | QFrame.Shadow.Raised
+        )
         self.gui.widget_push_button('OK', action=self.ok)
         self.gui.widget_push_button('Cancel', action=self.cancel)
         self.gui.widget_row_framed_close()

@@ -87,7 +87,9 @@ class EnSoMAP(EnMAPBoxApplication):
                 # =========================================================================================
                 # CREATE THE LINE WITH BUTTON
                 self.gui.widget_add_spacing(10)
-                self.gui.widget_row_framed(alignment=Qt.AlignmentFlag.AlignLeft, style=QFrame.Shape.StyledPanel | QFrame.Shadow.Raised)
+                self.gui.widget_row_framed(
+                    alignment=Qt.AlignmentFlag.AlignLeft, style=QFrame.Shape.StyledPanel | QFrame.Shadow.Raised
+                )
                 self.gui.widget_push_button('Close', action=self.quit)
                 self.gui.widget_row_framed_close()
 

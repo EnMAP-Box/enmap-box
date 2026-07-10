@@ -88,7 +88,10 @@ class test_applications(EnMAPBoxTestCase):
         canvas: MapCanvas = mapDock.mapCanvas()
 
         pt = QPointF(canvas.width() * 0.5, canvas.height() * 0.5)
-        event = QMouseEvent(QEvent.Type.MouseButtonPress, pt, Qt.MouseButton.LeftButton, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier)
+        event = QMouseEvent(
+            QEvent.Type.MouseButtonPress, pt, Qt.MouseButton.LeftButton,
+            Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier
+        )
         event = QgsMapMouseEvent(canvas, event)
 
         canvas.mousePressEvent(event)

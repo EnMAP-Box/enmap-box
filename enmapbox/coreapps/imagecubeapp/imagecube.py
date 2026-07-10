@@ -1466,7 +1466,10 @@ class ImageCubeWidget(QMainWindow):
                 elif isinstance(renderer, QgsMultiBandColorRenderer):
                     l2.setRenderer(QgsRasterLayer(l2.source(), '', l2.dataProvider().name()).renderer())
 
-            l2.setContrastEnhancement(QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum, QgsRasterMinMaxOrigin.Limits.MinMax)
+            l2.setContrastEnhancement(
+                QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum,
+                QgsRasterMinMaxOrigin.Limits.MinMax
+            )
             self.setSliceRenderer(l2.renderer().clone())
 
             w = self.glViewWidget()

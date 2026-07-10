@@ -94,7 +94,7 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
         return True, ''
 
     def parameterAsSourceWindowExtent(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext
+        self, parameters: Dict[str, Any], context: QgsProcessingContext
     ) -> QgsRectangle:
 
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
@@ -115,7 +115,9 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
             xmax = xmin + raster.width() - 1
         if isnan(ymax):
             ymax = ymin + raster.height() - 1
-        p1: QgsPoint = provider.transformCoordinates(QgsPoint(xmin, ymin), QgsRasterDataProvider.TransformType.TransformImageToLayer)
+        p1: QgsPoint = provider.transformCoordinates(
+            QgsPoint(xmin, ymin), QgsRasterDataProvider.TransformType.TransformImageToLayer
+        )
         p2: QgsPoint = provider.transformCoordinates(
             QgsPoint(xmax + 1, ymax + 1), QgsRasterDataProvider.TransformType.TransformImageToLayer
         )
@@ -155,7 +157,7 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterRasterDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER, allowEnvi=True, allowVrt=True)
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         provider: QgsRasterDataProvider = raster.dataProvider()

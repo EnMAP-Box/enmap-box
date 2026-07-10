@@ -1144,7 +1144,10 @@ class DockManagerTreeModel(QgsLayerTreeModel):
                 if column == 0:
 
                     if isinstance(node, DockTreeNode):
-                        flags = flags | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEditable | Qt.ItemFlag.ItemIsDropEnabled
+                        flags = (
+                            flags | Qt.ItemFlag.ItemIsUserCheckable
+                            | Qt.ItemFlag.ItemIsEditable | Qt.ItemFlag.ItemIsDropEnabled  # noqa: W503
+                        )
 
                         if isL1:
                             flags = flags | Qt.ItemFlag.ItemIsDropEnabled
@@ -1389,7 +1392,10 @@ class DockManagerTreeModel(QgsLayerTreeModel):
             if isinstance(node, QgsLayerTreeModelLegendNode):
                 # this does not work:
                 # result = super(QgsLayerTreeModel,self).setData(index, value, role=role)
-                if role == Qt.ItemDataRole.CheckStateRole and not self.testFlag(QgsLayerTreeModel.Flag.AllowLegendChangeState):
+                if (
+                    role == Qt.ItemDataRole.CheckStateRole
+                    and not self.testFlag(QgsLayerTreeModel.Flag.AllowLegendChangeState)  # noqa: W503
+                ):
                     return False
                 result = node.setData(value, role)
                 if result:
@@ -1419,7 +1425,10 @@ class DockManagerTreeModel(QgsLayerTreeModel):
                     vis.mAutoName = True
 
         if isinstance(node, CheckableLayerTreeNode) and role == Qt.ItemDataRole.CheckStateRole:
-            node.setCheckState(Qt.CheckState.Unchecked if value in [False, 0, Qt.CheckState.Unchecked] else Qt.CheckState.Checked)
+            node.setCheckState(
+                Qt.CheckState.Unchecked
+                if value in [False, 0, Qt.CheckState.Unchecked] else Qt.CheckState.Checked
+            )
             return True
 
         if type(node) in [QgsLayerTreeLayer, QgsLayerTreeGroup]:

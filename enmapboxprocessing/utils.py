@@ -249,17 +249,26 @@ class Utils(object):
         ce = QgsContrastEnhancement(provider.dataType(bandNumbers[0]))
         ce.setMinimumValue(minValues[0], False)
         ce.setMaximumValue(maxValues[0], False)
-        ce.setContrastEnhancementAlgorithm(QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum, True)
+        ce.setContrastEnhancementAlgorithm(
+            QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum,
+            True
+        )
         renderer.setRedContrastEnhancement(ce)
         ce = QgsContrastEnhancement(provider.dataType(bandNumbers[1]))
         ce.setMinimumValue(minValues[1], False)
         ce.setMaximumValue(maxValues[1], False)
-        ce.setContrastEnhancementAlgorithm(QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum, True)
+        ce.setContrastEnhancementAlgorithm(
+            QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum,
+            True
+        )
         renderer.setGreenContrastEnhancement(ce)
         ce = QgsContrastEnhancement(provider.dataType(bandNumbers[2]))
         ce.setMinimumValue(minValues[2], False)
         ce.setMaximumValue(maxValues[2], False)
-        ce.setContrastEnhancementAlgorithm(QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum, True)
+        ce.setContrastEnhancementAlgorithm(
+            QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum,
+            True
+        )
         renderer.setBlueContrastEnhancement(ce)
         return renderer
 
@@ -272,7 +281,9 @@ class Utils(object):
         ce = QgsContrastEnhancement(provider.dataType(grayBand))
         ce.setMinimumValue(minValue, False)
         ce.setMaximumValue(maxValue, False)
-        ce.setContrastEnhancementAlgorithm(QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum, True)
+        ce.setContrastEnhancementAlgorithm(
+            QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum, True
+        )
         renderer.setContrastEnhancement(ce)
         return renderer
 
@@ -621,10 +632,12 @@ class Utils(object):
             QgsPoint(extent.xMaximum(), extent.yMinimum()), QgsRasterDataProvider.TransformType.TransformLayerToImage
         )
         ul = provider.transformCoordinates(
-            QgsPoint(round(ulSubPixel.x()), round(ulSubPixel.y())), QgsRasterDataProvider.TransformType.TransformImageToLayer
+            QgsPoint(round(ulSubPixel.x()), round(ulSubPixel.y())),
+            QgsRasterDataProvider.TransformType.TransformImageToLayer
         )
         lr = provider.transformCoordinates(
-            QgsPoint(round(lrSubPixel.x()), round(lrSubPixel.y())), QgsRasterDataProvider.TransformType.TransformImageToLayer
+            QgsPoint(round(lrSubPixel.x()), round(lrSubPixel.y())),
+            QgsRasterDataProvider.TransformType.TransformImageToLayer
         )
         return QgsRectangle(QgsPointXY(ul), QgsPointXY(lr))
 

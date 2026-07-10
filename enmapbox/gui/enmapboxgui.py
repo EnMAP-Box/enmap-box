@@ -754,7 +754,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             pass
         elif mode == 1:
             # open attribute table
-            filterMode = settings.enumValue('qgis/attributeTableBehavior', QgsAttributeTableFilterModel.FilterMode.ShowAll)
+            filterMode = settings.enumValue('qgis/attributeTableBehavior',
+                                            QgsAttributeTableFilterModel.FilterMode.ShowAll)
             self.showAttributeTable(self.currentLayer(), filterMode=filterMode)
             pass
         elif mode == 2:
@@ -1737,7 +1738,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
             if len(self.docks()) == 1:
                 # dirty hack for #488 (zoom to full extent does not work if map dock is the first of all docks)
-                QApplication.processEvents(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents | QEventLoop.ProcessEventsFlag.ExcludeSocketNotifiers)
+                QApplication.processEvents(
+                    QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents
+                    | QEventLoop.ProcessEventsFlag.ExcludeSocketNotifiers  # noqa: W503
+                )
                 # QTimer.singleShot(1000, lambda *args, mc=dock.mapCanvas(): mc.zoomToFullExtent())
 
         if isinstance(dock, AttributeTableDock):

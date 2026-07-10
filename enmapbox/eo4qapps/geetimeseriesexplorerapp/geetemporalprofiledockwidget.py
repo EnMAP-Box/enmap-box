@@ -1,4 +1,3 @@
-import skops
 import traceback
 import warnings
 from math import nan, isnan
@@ -9,6 +8,7 @@ from typing import Optional, List, Tuple, Dict
 
 import numpy as np
 import pyqtgraph as pg
+import skops
 
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyle, MarkerSymbol
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
@@ -21,7 +21,9 @@ from geetimeseriesexplorerapp.tasks.downloadimagechiptask import DownloadImageCh
 from geetimeseriesexplorerapp.tasks.downloadprofiletask import DownloadProfileTask
 from qgis.PyQt import QtGui
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import Qt, QDateTime, QDate, QModelIndex, QRectF, QStandardPaths, pyqtSignal, QCoreApplication, QTime
+from qgis.PyQt.QtCore import (
+    Qt, QDateTime, QDate, QModelIndex, QRectF, QStandardPaths, pyqtSignal, QCoreApplication,
+    QTime)
 from qgis.PyQt.QtGui import QColor, QPen, QBrush, QIcon, QPixmap
 from qgis.PyQt.QtWidgets import QDockWidget
 from qgis.PyQt.QtWidgets import (QToolButton, QListWidget, QApplication, QSpinBox,
@@ -149,7 +151,9 @@ class GeeTemporalProfileDockWidget(QDockWidget):
         self.data = None
 
         # - add info line
-        self.infoLabelLine = pg.InfiniteLine(angle=90, movable=False, pen=pg.mkPen(color='#FF09', style=Qt.PenStyle.DashLine))
+        self.infoLabelLine = pg.InfiniteLine(
+            angle=90, movable=False, pen=pg.mkPen(color='#FF09', style=Qt.PenStyle.DashLine)
+        )
         self.mPlotWidget.addItem(self.infoLabelLine, ignoreBounds=True)
 
         # - add composite selection box

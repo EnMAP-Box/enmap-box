@@ -3,15 +3,6 @@ from math import nan, inf
 from typing import Optional
 
 from osgeo import gdal
-from qgis.PyQt import uic
-from qgis.PyQt.QtWidgets import QDoubleSpinBox, QComboBox, QCheckBox, QToolButton, QLabel, QTabWidget, \
-    QLineEdit, QTableWidget, QSpinBox
-from qgis.core import QgsRasterLayer, QgsSingleBandGrayRenderer, QgsRectangle, QgsMapLayer, \
-    QgsContrastEnhancement, QgsRasterRenderer, QgsMultiBandColorRenderer, QgsSingleBandPseudoColorRenderer, \
-    QgsMapLayerProxyModel, QgsRasterDataProvider, QgsRasterShader, QgsProject, QgsRasterTransparency
-from qgis.gui import (
-    QgsDockWidget, QgsMapLayerComboBox, QgsCollapsibleGroupBox, QgsColorRampButton, QgsRangeSlider
-)
 
 from enmapbox.gui.dataviews.dockmanager import DockPanelUI
 from enmapbox.gui.enmapboxgui import EnMAPBox
@@ -23,6 +14,15 @@ from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSp
 from enmapboxprocessing.rasterreader import RasterReader, metadataCache, setMetadataCache, buildMetadataCache
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt import uic
+from qgis.PyQt.QtWidgets import QDoubleSpinBox, QComboBox, QCheckBox, QToolButton, QLabel, QTabWidget, \
+    QLineEdit, QTableWidget, QSpinBox
+from qgis.core import QgsRasterLayer, QgsSingleBandGrayRenderer, QgsRectangle, QgsMapLayer, \
+    QgsContrastEnhancement, QgsRasterRenderer, QgsMultiBandColorRenderer, QgsSingleBandPseudoColorRenderer, \
+    QgsMapLayerProxyModel, QgsRasterDataProvider, QgsRasterShader, QgsProject, QgsRasterTransparency
+from qgis.gui import (
+    QgsDockWidget, QgsMapLayerComboBox, QgsCollapsibleGroupBox, QgsColorRampButton, QgsRangeSlider
+)
 from rasterlayerstylingapp.rasterlayerstylingbandwidget import RasterLayerStylingBandWidget
 from rasterlayerstylingapp.rasterlayerstylingpercentileswidget import RasterLayerStylingPercentilesWidget
 
@@ -260,7 +260,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
             return
         name, snames = self.mVisualization.currentText().split(' (')
         for sname, mBand in zip(
-                snames.strip(' )').split('-'), [self.mRedBand, self.mGreenBand, self.mBlueBand]
+            snames.strip(' )').split('-'), [self.mRedBand, self.mGreenBand, self.mBlueBand]
         ):
             mWaveband: QToolButton = getattr(mBand, 'mWaveband' + sname)
             mWaveband.click()
@@ -899,7 +899,9 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 ce2 = QgsContrastEnhancement(provider2.dataType(bandNo))
                 ce2.setMinimumValue(redMin)
                 ce2.setMaximumValue(redMax)
-                ce2.setContrastEnhancementAlgorithm(QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum)
+                ce2.setContrastEnhancementAlgorithm(
+                    QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum
+                )
                 renderer2.setContrastEnhancement(ce2)
                 layer2.setRenderer(renderer2)
             elif self.mRenderer.currentIndex() == self.PseudoRendererTab:
@@ -954,8 +956,8 @@ class RasterLayerStylingPanel(QgsDockWidget):
             self.mGroupBoxMinMax.hide()
 
         if all(
-                [self.mRenderer.currentIndex() < self.DefaultRendererTab,
-                 self.mRenderer.currentIndex() != self.RgbRendererTab]
+            [self.mRenderer.currentIndex() < self.DefaultRendererTab,
+             self.mRenderer.currentIndex() != self.RgbRendererTab]
         ):
 
             self.mGroupBoxTransparency.show()
