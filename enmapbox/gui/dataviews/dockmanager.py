@@ -65,7 +65,7 @@ class LayerTreeNode(QgsLayerTree):
     sigValueChanged = pyqtSignal(QObject)
     sigRemoveMe = pyqtSignal()
 
-    def __init__(self, name: str, value=None, checked=Qt.Unchecked, tooltip=None, icon=None):
+    def __init__(self, name: str, value=None, checked=Qt.CheckState.Unchecked, tooltip=None, icon=None):
         # QObject.__init__(self)
         super(LayerTreeNode, self).__init__()
         # assert name is not None and len(str(name)) > 0
@@ -165,7 +165,7 @@ class LayerTreeNode(QgsLayerTree):
 
         elem.setAttribute('name', self.name())
         elem.setAttribute('expanded', '1' if self.isExpanded() else '0')
-        elem.setAttribute('checked', QgsLayerTreeUtils.checkStateToXml(Qt.Checked))
+        elem.setAttribute('checked', QgsLayerTreeUtils.checkStateToXml(Qt.CheckState.Checked))
 
         # custom properties
         self.writeCommonXml(elem)
@@ -452,7 +452,7 @@ class MapDockTreeNode(DockTreeNode):
                 lyrs.extend(MapDockTreeNode.visibleLayers(child))
 
         elif isinstance(node, QgsLayerTreeLayer):
-            if node.isVisible() == Qt.Checked:
+            if node.isVisible() == Qt.CheckState.Checked:
                 lyr = node.layer()
                 if isinstance(lyr, QgsMapLayer):
                     lyrs.append(lyr)
@@ -599,7 +599,7 @@ class DockManager(QObject):
             mimeData: QMimeData = event.mimeData()
 
             if containsMapLayers(mimeData):
-                event.setDropAction(Qt.CopyAction)
+                event.setDropAction(Qt.DropAction.CopyAction)
                 event.accept()
                 return
 
@@ -646,8 +646,8 @@ class DockManager(QObject):
             # exclude vector layers without geometry
             dropped_maplayers = [
                 lyr for lyr in dropped_maplayers
-                if isinstance(lyr, QgsVectorLayer) or lyr.geometryType() in [QgsWkbTypes.UnknownGeometry,
-                                                                             QgsWkbTypes.NullGeometry]
+                if isinstance(lyr, QgsVectorLayer) or lyr.geometryType() in [QgsWkbTypes.GeometryType.UnknownGeometry,
+                                                                             QgsWkbTypes.GeometryType.NullGeometry]
 
             ]
 
@@ -847,18 +847,18 @@ class DockManagerTreeModel(QgsLayerTreeModel):
               AllowNodeChangeVisibility  = 0x4000,  //!< Allow user to set node visibility with a check box
               AllowLegendChangeState     = 0x80
             """
-            self.setFlag(QgsLayerTreeModel.ShowLegend, True)
-            self.setFlag(QgsLayerTreeModel.ShowLegendAsTree, True)
+            self.setFlag(QgsLayerTreeModel.Flag.ShowLegend, True)
+            self.setFlag(QgsLayerTreeModel.Flag.ShowLegendAsTree, True)
             # self.setFlag(QgsLayerTreeModel.ShowRasterPreviewIcon, False)
 
-            self.setFlag(QgsLayerTreeModel.DeferredLegendInvalidation, False)
+            self.setFlag(QgsLayerTreeModel.Flag.DeferredLegendInvalidation, False)
             # self.setFlag(QgsLayerTreeModel.UseEmbeddedWidget, True)
 
             # behavioral
-            self.setFlag(QgsLayerTreeModel.AllowNodeReorder, True)
-            self.setFlag(QgsLayerTreeModel.AllowNodeRename, True)
-            self.setFlag(QgsLayerTreeModel.AllowNodeChangeVisibility, True)
-            self.setFlag(QgsLayerTreeModel.AllowLegendChangeState, True)
+            self.setFlag(QgsLayerTreeModel.Flag.AllowNodeReorder, True)
+            self.setFlag(QgsLayerTreeModel.Flag.AllowNodeRename, True)
+            self.setFlag(QgsLayerTreeModel.Flag.AllowNodeChangeVisibility, True)
+            self.setFlag(QgsLayerTreeModel.Flag.AllowLegendChangeState, True)
             # self.setFlag(QgsLayerTreeModel.ActionHierarchical, False)
 
             self.setAutoCollapseLegendNodes(10)
@@ -937,12 +937,12 @@ class DockManagerTreeModel(QgsLayerTreeModel):
     def supportedDragActions(self):
         """
         """
-        return Qt.CopyAction | Qt.MoveAction
+        return Qt.DropAction.CopyAction | Qt.DropAction.MoveAction
 
     def supportedDropActions(self) -> Qt.DropActions:
         """
         """
-        return Qt.CopyAction | Qt.MoveAction
+        return Qt.DropAction.CopyAction | Qt.DropAction.MoveAction
 
     def addDock(self, dock: Dock) -> Optional[DockTreeNode]:
         """
@@ -971,7 +971,7 @@ class DockManagerTreeModel(QgsLayerTreeModel):
         if self.rowCount() > 0:
             idx0 = self.index(0, 0)
             idx1 = self.index(self.rowCount() - 1, 0)
-            self.dataChanged.emit(idx0, idx1, [Qt.CheckStateRole])
+            self.dataChanged.emit(idx0, idx1, [Qt.ItemDataRole.CheckStateRole])
 
     def canFetchMore(self, index) -> bool:
         node = self.index2node(index)
@@ -1113,7 +1113,7 @@ class DockManagerTreeModel(QgsLayerTreeModel):
 
     def flags(self, index):
         if not index.isValid():
-            return Qt.NoItemFlags
+            return Qt.ItemFlag.NoItemFlags
         node = self.index2node(index)
         if node is None:
             node = self.index2legendNode(index)
@@ -1122,21 +1122,21 @@ class DockManagerTreeModel(QgsLayerTreeModel):
                 # return super(QgsLayerTreeModel,self).flags(index)
                 # return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
             else:
-                return Qt.NoItemFlags
+                return Qt.ItemFlag.NoItemFlags
         else:
             # print('node: {}  {}'.format(node, type(node)))
             dockNode = self.parentNodesFromIndices(index, nodeInstanceType=DockTreeNode)
             if len(dockNode) == 0:
-                return Qt.NoItemFlags
+                return Qt.ItemFlag.NoItemFlags
             elif len(dockNode) > 1:
                 # print('DEBUG: Multiple docknodes selected')
-                return Qt.NoItemFlags
+                return Qt.ItemFlag.NoItemFlags
             else:
                 dockNode = dockNode[0]
 
             column = index.column()
             isL1 = node.parent() == self.rootNode
-            flags = Qt.ItemIsEnabled | Qt.ItemIsSelectable
+            flags = Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable
 
             # normal tree nodes
 
@@ -1144,38 +1144,41 @@ class DockManagerTreeModel(QgsLayerTreeModel):
                 if column == 0:
 
                     if isinstance(node, DockTreeNode):
-                        flags = flags | Qt.ItemIsUserCheckable | Qt.ItemIsEditable | Qt.ItemIsDropEnabled
+                        flags = (
+                            flags | Qt.ItemFlag.ItemIsUserCheckable
+                            | Qt.ItemFlag.ItemIsEditable | Qt.ItemFlag.ItemIsDropEnabled  # noqa: W503
+                        )
 
                         if isL1:
-                            flags = flags | Qt.ItemIsDropEnabled
+                            flags = flags | Qt.ItemFlag.ItemIsDropEnabled
 
                     if node.name() == 'Layers':
-                        flags = flags | Qt.ItemIsUserCheckable | Qt.ItemIsEditable
+                        flags = flags | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEditable
 
                     if isinstance(node, CheckableLayerTreeNode):
-                        flags = flags | Qt.ItemIsUserCheckable
+                        flags = flags | Qt.ItemFlag.ItemIsUserCheckable
                     if isinstance(node, SpeclibProfileVisualizationGroupNode):
-                        flags = flags | Qt.ItemIsEditable
+                        flags = flags | Qt.ItemFlag.ItemIsEditable
                 if column == 1:
                     pass
                     # mapCanvas Layer Tree Nodes
             elif type(node) in [QgsLayerTreeLayer, QgsLayerTreeGroup]:
                 if column == 0:
-                    flags |= Qt.ItemIsUserCheckable
-                    flags |= Qt.ItemIsEditable
-                    flags |= Qt.ItemIsDropEnabled
-                    flags |= Qt.ItemIsDragEnabled
+                    flags |= Qt.ItemFlag.ItemIsUserCheckable
+                    flags |= Qt.ItemFlag.ItemIsEditable
+                    flags |= Qt.ItemFlag.ItemIsDropEnabled
+                    flags |= Qt.ItemFlag.ItemIsDragEnabled
             elif not isinstance(node, QgsLayerTree):
                 pass
             else:
                 pass
 
             if not isinstance(dockNode, MapDockTreeNode):
-                flags = flags & ~Qt.ItemIsDragEnabled
+                flags = flags & ~Qt.ItemFlag.ItemIsDragEnabled
             return flags
 
     def headerData(self, section, orientation, role=None):
-        if role == Qt.DisplayRole:
+        if role == Qt.ItemDataRole.DisplayRole:
             return self.columnNames[section]
         return None
 
@@ -1254,7 +1257,7 @@ class DockManagerTreeModel(QgsLayerTreeModel):
             else:
                 # try other approaches that extract the layer instances
                 mapLayers = extractMapLayers(mimeData, project=self.project())
-                if action == Qt.CopyAction:
+                if action == Qt.DropAction.CopyAction:
                     mapLayers = [lyr.clone() for lyr in mapLayers]
 
                 i = row
@@ -1332,10 +1335,10 @@ class DockManagerTreeModel(QgsLayerTreeModel):
 
         elif type(node) in [QgsLayerTreeLayer, QgsLayerTreeGroup, QgsLayerTree]:
             # print(('QGSNODE', node, column, role))
-            if role == Qt.EditRole:
+            if role == Qt.ItemDataRole.EditRole:
                 pass
 
-            if type(node) is QgsLayerTreeLayer and role == Qt.ToolTipRole:
+            if type(node) is QgsLayerTreeLayer and role == Qt.ItemDataRole.ToolTipRole:
                 tt = super(DockManagerTreeModel, self).data(index, role)
                 tt += f'<br>ID:<i>{node.layerId()}</i>'
                 return tt
@@ -1344,7 +1347,7 @@ class DockManagerTreeModel(QgsLayerTreeModel):
                 return None
 
             if column == 1:
-                if role in [Qt.DisplayRole, Qt.EditRole]:
+                if role in [Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole]:
                     return node.name()
 
             return super(DockManagerTreeModel, self).data(index, role)
@@ -1352,24 +1355,24 @@ class DockManagerTreeModel(QgsLayerTreeModel):
 
             if column == 0:
 
-                if role in [Qt.DisplayRole, Qt.EditRole]:
+                if role in [Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole]:
                     return node.name()
-                if role == Qt.DecorationRole:
+                if role == Qt.ItemDataRole.DecorationRole:
                     return node.icon()
-                if role == Qt.ToolTipRole:
+                if role == Qt.ItemDataRole.ToolTipRole:
                     return node.tooltip()
-                if role == Qt.CheckStateRole:
+                if role == Qt.ItemDataRole.CheckStateRole:
                     if isinstance(node, DockTreeNode):
                         if isinstance(node.dock, Dock):
-                            return Qt.Checked if node.dock.isVisible() else Qt.Unchecked
+                            return Qt.CheckState.Checked if node.dock.isVisible() else Qt.CheckState.Unchecked
                     if isinstance(node, CheckableLayerTreeNode):
                         return node.checkState()
             elif column == 1:
-                if role == Qt.DisplayRole:
+                if role == Qt.ItemDataRole.DisplayRole:
                     # print(node.value())
                     return node.value()
 
-                if role == Qt.EditRole:
+                if role == Qt.ItemDataRole.EditRole:
                     return node.value()
 
             else:
@@ -1389,7 +1392,10 @@ class DockManagerTreeModel(QgsLayerTreeModel):
             if isinstance(node, QgsLayerTreeModelLegendNode):
                 # this does not work:
                 # result = super(QgsLayerTreeModel,self).setData(index, value, role=role)
-                if role == Qt.CheckStateRole and not self.testFlag(QgsLayerTreeModel.AllowLegendChangeState):
+                if (
+                    role == Qt.ItemDataRole.CheckStateRole
+                    and not self.testFlag(QgsLayerTreeModel.Flag.AllowLegendChangeState)  # noqa: W503
+                ):
                     return False
                 result = node.setData(value, role)
                 if result:
@@ -1400,17 +1406,17 @@ class DockManagerTreeModel(QgsLayerTreeModel):
 
         result = False
         if isinstance(node, DockTreeNode) and isinstance(node.dock, Dock):
-            if role == Qt.CheckStateRole:
-                if value == Qt.Unchecked:
+            if role == Qt.ItemDataRole.CheckStateRole:
+                if value == Qt.CheckState.Unchecked:
                     node.dock.setVisible(False)
                 else:
                     node.dock.setVisible(True)
                 result = True
-            if role == Qt.EditRole and len(value) > 0:
+            if role == Qt.ItemDataRole.EditRole and len(value) > 0:
                 node.dock.setTitle(value)
                 result = True
         if isinstance(node, SpeclibProfileVisualizationGroupNode):
-            if role == Qt.EditRole:
+            if role == Qt.ItemDataRole.EditRole:
                 vis: ProfileVisualizationGroup = node.vis()
                 if isinstance(value, str) and len(value.strip()) > 0:
                     vis.mAutoName = False
@@ -1418,13 +1424,16 @@ class DockManagerTreeModel(QgsLayerTreeModel):
                 else:
                     vis.mAutoName = True
 
-        if isinstance(node, CheckableLayerTreeNode) and role == Qt.CheckStateRole:
-            node.setCheckState(Qt.Unchecked if value in [False, 0, Qt.Unchecked] else Qt.Checked)
+        if isinstance(node, CheckableLayerTreeNode) and role == Qt.ItemDataRole.CheckStateRole:
+            node.setCheckState(
+                Qt.CheckState.Unchecked
+                if value in [False, 0, Qt.CheckState.Unchecked] else Qt.CheckState.Checked
+            )
             return True
 
         if type(node) in [QgsLayerTreeLayer, QgsLayerTreeGroup]:
 
-            if role == Qt.CheckStateRole:
+            if role == Qt.ItemDataRole.CheckStateRole:
                 node.setItemVisibilityChecked(value)
                 mapDockNode = node.parent()
                 while mapDockNode is not None and not isinstance(mapDockNode, MapDockTreeNode):
@@ -1433,7 +1442,7 @@ class DockManagerTreeModel(QgsLayerTreeModel):
                 if isinstance(mapDockNode, MapDockTreeNode):
                     mapDockNode.updateCanvas()
                     result = True
-            if role == Qt.EditRole:
+            if role == Qt.ItemDataRole.EditRole:
                 if isinstance(node, QgsLayerTreeLayer):
                     node.setName(value)
                     result = True
@@ -1460,9 +1469,9 @@ class DockTreeView(QgsLayerTreeView):
 
         self.setHeaderHidden(False)
         self.header().setStretchLastSection(True)
-        self.header().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.header().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         self.currentLayerChanged.connect(self.onCurrentLayerChanged)
-        self.setEditTriggers(QAbstractItemView.EditKeyPressed)
+        self.setEditTriggers(QAbstractItemView.EditTrigger.EditKeyPressed)
 
         self.mMenuProvider = DockManagerLayerTreeModelMenuProvider(self)
         self.setMenuProvider(self.mMenuProvider)
@@ -1564,7 +1573,7 @@ class DockTreeView(QgsLayerTreeView):
             parent.setExpanded(True)
 
         # select added layer
-        if self.state() == QAbstractItemView.NoState:
+        if self.state() == QAbstractItemView.State.NoState:
             for child in reversed(parent.children()):
                 if isinstance(child, QgsLayerTreeLayer):
                     idx = self.node2index(child)
@@ -2286,15 +2295,15 @@ class CheckableLayerTreeNode(LayerTreeNode):
 
     def __init__(self, *args, **kwds):
         super(CheckableLayerTreeNode, self).__init__(*args, **kwds)
-        self.mCheckState = Qt.Unchecked
+        self.mCheckState = Qt.CheckState.Unchecked
 
     def setCheckState(self, checkState):
         if isinstance(checkState, bool):
-            checkState = Qt.Checked if checkState else Qt.Unchecked
+            checkState = Qt.CheckState.Checked if checkState else Qt.CheckState.Unchecked
         old = self.mCheckState
         self.mCheckState = checkState
         if old != self.mCheckState:
-            self.setItemVisibilityChecked(checkState == Qt.Checked)
+            self.setItemVisibilityChecked(checkState == Qt.CheckState.Checked)
             # self.sigCheckStateChanged.emit(self.mCheckState)
 
     def checkState(self):
@@ -2325,7 +2334,7 @@ class ActionTreeNode(CheckableLayerTreeNode):
         action.changed.connect(self.onActionChanged)
 
     def onActionToggled(self, checked: bool):
-        state = Qt.Checked if checked else Qt.Unchecked
+        state = Qt.CheckState.Checked if checked else Qt.CheckState.Unchecked
         super().setCheckState(state)
         self.sigCheckStateChanged.emit(state)
 
@@ -2340,12 +2349,12 @@ class ActionTreeNode(CheckableLayerTreeNode):
     def checkState(self):
         a: QAction = self.mAction
         if isinstance(a, QAction) and a.isCheckable() and a.isChecked():
-            return Qt.Checked
-        return Qt.Unchecked
+            return Qt.CheckState.Checked
+        return Qt.CheckState.Unchecked
 
     def setCheckState(self, checkState):
 
-        state: bool = True if checkState == Qt.Checked else False
+        state: bool = True if checkState == Qt.CheckState.Checked else False
         if isinstance(self.mAction, QAction):
             self.mAction.setChecked(state)
             self.mAction.toggled.emit(state)
@@ -2403,4 +2412,4 @@ class SpeclibProfileVisualizationGroupNode(CheckableLayerTreeNode):
         self.vis().setCheckState(checkState)
 
     def checkState(self):
-        return Qt.Checked if self.vis().isVisible() else Qt.Unchecked
+        return Qt.CheckState.Checked if self.vis().isVisible() else Qt.CheckState.Unchecked

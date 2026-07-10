@@ -49,8 +49,8 @@ def create_vectordataset() -> QgsVectorLayer:
     vl = QgsVectorLayer("Point?crs=EPSG:4326", 'test_layer', "memory")
     vl.startEditing()
     vl.addAttribute(QgsField(name='fString', type=QMetaType.String, typeName='varchar', len=50))
-    vl.addAttribute(QgsField(name='fInt', type=QMetaType.Int, typeName='int'))
-    vl.addAttribute(QgsField(name='fDouble', type=QMetaType.Double))
+    vl.addAttribute(QgsField(name='fInt', type=QMetaType.Type.Int, typeName='int'))
+    vl.addAttribute(QgsField(name='fDouble', type=QMetaType.Type.Double))
     vl.addFeature(QgsFeature(vl.fields()))
     vl.commitChanges()
 
@@ -63,7 +63,7 @@ myWidget = QWidget()
 myWidget.setWindowTitle('Layer Action Example')
 myWidget.setLayout(QVBoxLayout())
 dualView = QgsDualView()
-dualView.setView(QgsDualView.AttributeTable)
+dualView.setView(QgsDualView.ViewMode.AttributeTable)
 
 checkBox = QCheckBox()
 checkBox.setText('Show Form View')
@@ -71,9 +71,9 @@ checkBox.setText('Show Form View')
 
 def onClicked(b: bool):
     if b:
-        dualView.setView(QgsDualView.AttributeEditor)
+        dualView.setView(QgsDualView.ViewMode.AttributeEditor)
     else:
-        dualView.setView(QgsDualView.AttributeTable)
+        dualView.setView(QgsDualView.ViewMode.AttributeTable)
 
 
 checkBox.clicked.connect(onClicked)
@@ -99,7 +99,7 @@ columns = [columns[-1]] + columns[:-1]
 conf = QgsAttributeTableConfig()
 conf.setColumns(columns)
 conf.setActionWidgetVisible(True)
-conf.setActionWidgetStyle(QgsAttributeTableConfig.ButtonList)
+conf.setActionWidgetStyle(QgsAttributeTableConfig.ActionWidgetStyle.ButtonList)
 layer.setAttributeTableConfig(conf)
 
 actionManager: QgsActionManager = layer.actions()
@@ -120,7 +120,7 @@ if not b:
     layer.commitChanges()
 """
 
-action = QgsAction(QgsAction.GenericPython, 'Remove this feature', pythonCode, iconPath, True,
+action = QgsAction(QgsAction.ActionType.GenericPython, 'Remove this feature', pythonCode, iconPath, True,
                    notificationMessage='msgDelete',
                    actionScopes={'Feature'})
 actionManager.addAction(action)

@@ -25,7 +25,7 @@ class Issue887Tests(TestCase):
     def test_kill_qgis_layer(self):
         # addresses https://github.com/EnMAP-Box/enmap-box/issues/1081
         fields = QgsFields()
-        fields.append(QgsField('name', QMetaType.QString))
+        fields.append(QgsField('name', QMetaType.Type.QString))
         lyr = TestObjects.createEmptyMemoryLayer(fields, wkbType=Qgis.WkbType.Point)
 
         self.assertTrue(lyr.isValid())

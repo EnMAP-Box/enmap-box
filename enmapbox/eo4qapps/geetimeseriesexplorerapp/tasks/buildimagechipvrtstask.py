@@ -14,7 +14,7 @@ from enmapbox.typeguard import typechecked
 class BuildImageChipVrtsTask(QgsTask):
 
     def __init__(self, root: str):
-        QgsTask.__init__(self, 'Build image chip VRTs task', QgsTask.CanCancel)
+        QgsTask.__init__(self, 'Build image chip VRTs task', QgsTask.Flag.CanCancel)
         self.root = root  # e.g. C:\Users\Andreas\Downloads\GEETSE
         self.exception: Optional[Exception] = None
 
@@ -62,5 +62,5 @@ class BuildImageChipVrtsTask(QgsTask):
             raise self.exception
 
         QgsMessageLog.logMessage(
-            f'All Image Chip VRTs built: {self.root}', tag="GEE Time Series Explorer", level=Qgis.Success
+            f'All Image Chip VRTs built: {self.root}', tag="GEE Time Series Explorer", level=Qgis.MessageLevel.Success
         )

@@ -318,7 +318,7 @@ class RasterDataSource(SpatialDataSource):
             # show more specialized raster icons
             if hasClassInfo is True:
                 icon = QIcon(':/enmapbox/gui/ui/icons/filelist_classification.svg')
-            elif dataType in [Qgis.Byte] and nBands == 1:
+            elif dataType in [Qgis.DataType.Byte] and nBands == 1:
                 icon = QIcon(':/enmapbox/gui/ui/icons/filelist_mask.svg')
             elif nBands == 1:
                 icon = QIcon(':/enmapbox/gui/ui/icons/filelist_regression.svg')
@@ -361,7 +361,7 @@ class ModelDataSource(DataSource):
         if error:
             if source.endswith('.skops'):
                 # in case of *.skops it is very likely that we should be able to open them with skops.load
-                messageLog(error, level=Qgis.Warning)
+                messageLog(error, level=Qgis.MessageLevel.Warning)
             else:
                 debugLog(error)
         self.mSkopsObject = skops_obj

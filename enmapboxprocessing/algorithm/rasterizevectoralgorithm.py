@@ -57,7 +57,7 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFloat(self.P_INIT_VALUE, self._INIT_VALUE, defaultValue=0)
         self.addParameterFloat(self.P_BURN_VALUE, self._BURN_VALUE, defaultValue=1)
         self.addParameterField(
-            self.P_BURN_ATTRIBUTE, self._BURN_ATTRIBUTE, type=QgsProcessingParameterField.Numeric,
+            self.P_BURN_ATTRIBUTE, self._BURN_ATTRIBUTE, type=QgsProcessingParameterField.DataType.Numeric,
             parentLayerParameterName=self.P_VECTOR, optional=True
         )
         self.addParameterBoolean(self.P_BURN_FID, self._BURN_FID, defaultValue=False)
@@ -90,18 +90,18 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
 
             # create fid field if needed
             if burnFid:
-                field = QgsField('temp_fid', QMetaType.LongLong)
+                field = QgsField('temp_fid', QMetaType.Type.LongLong)
                 vector.addExpressionField('$id', field)
                 tmpFilename = Utils.tmpFilename(filename, 'fid.gpkg')
                 saveVectorOptions = QgsVectorFileWriter.SaveVectorOptions()
-                saveVectorOptions.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteFile
+                saveVectorOptions.actionOnExistingFile = QgsVectorFileWriter.ActionOnExistingFile.CreateOrOverwriteFile
                 saveVectorOptions.attributes = [vector.fields().indexFromName(field.name())]
                 saveVectorOptions.feedback = feedback
                 transformContext = QgsProject.instance().transformContext()
                 error, message, newFilename, newLayere = QgsVectorFileWriter.writeAsVectorFormatV3(
                     vector, tmpFilename, transformContext, saveVectorOptions
                 )
-                if error != QgsVectorFileWriter.NoError:
+                if error != QgsVectorFileWriter.WriterError.NoError:
                     raise RuntimeError(f'write failed with error {error}: {message}')
                 vector = QgsVectorLayer(tmpFilename)
                 burnAttribute = field.name()
@@ -116,7 +116,7 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
                 transformContext = QgsProject.instance().transformContext()
                 coordinateTransform = QgsCoordinateTransform(vector.crs(), grid.crs(), QgsProject.instance())
                 saveVectorOptions = QgsVectorFileWriter.SaveVectorOptions()
-                saveVectorOptions.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteFile
+                saveVectorOptions.actionOnExistingFile = QgsVectorFileWriter.ActionOnExistingFile.CreateOrOverwriteFile
                 saveVectorOptions.ct = coordinateTransform
                 saveVectorOptions.filterExtent = grid.extent()
                 if burnAttribute is None:
@@ -127,7 +127,7 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
                 error, message, newFilename, newLayer = QgsVectorFileWriter.writeAsVectorFormatV3(
                     vector, tmpFilename, transformContext, saveVectorOptions
                 )
-                if error != QgsVectorFileWriter.NoError:
+                if error != QgsVectorFileWriter.WriterError.NoError:
                     raise RuntimeError(f'failed to write vector file: error {error}: {message}')
                 vector = QgsVectorLayer(tmpFilename)
 

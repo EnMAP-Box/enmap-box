@@ -14,7 +14,7 @@ from enmapboxprocessing.numpyutils import NumpyUtils
 from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
 from enmapboxprocessing.typing import (RasterSource, Array3d, Metadata, MetadataValue, MetadataDomain, Array2d)
 from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtCore import QSizeF, QDateTime, QDate, QPoint
+from qgis.PyQt.QtCore import QSizeF, QDateTime, QDate, QPoint, QTime
 from qgis.PyQt.QtGui import QColor
 from qgis.core import (QgsRasterLayer, QgsRasterDataProvider, QgsCoordinateReferenceSystem, QgsRectangle,
                        QgsRasterRange, QgsPoint, QgsRasterBlockFeedback, QgsRasterBlock, QgsPointXY,
@@ -31,8 +31,8 @@ class RasterReader(object):
     disableQgisPam = True
 
     def __init__(
-            self, source: RasterSource, openWithGdal: bool = None,
-            crs: QgsCoordinateReferenceSystem = None
+        self, source: RasterSource, openWithGdal: bool = None,
+        crs: QgsCoordinateReferenceSystem = None
     ):
         self.maskReader: Optional[RasterReader] = None
         if isinstance(source, QgsRasterLayer):
@@ -225,7 +225,7 @@ class RasterReader(object):
         return QSizeF(self.rasterUnitsPerPixelX(), self.rasterUnitsPerPixelY())
 
     def walkGrid(
-            self, blockSizeX: int, blockSizeY: int, feedback: QgsProcessingFeedback = None
+        self, blockSizeX: int, blockSizeY: int, feedback: QgsProcessingFeedback = None
     ) -> Iterator[RasterBlockInfo]:
         """Iterate block-wise over the raster."""
         pixelSizeX = self.rasterUnitsPerPixelX()
@@ -256,8 +256,8 @@ class RasterReader(object):
         self.projector = projector
 
     def arrayFromBlock(
-            self, block: RasterBlockInfo, bandList: List[int] = None, overlap: int = None,
-            feedback: QgsRasterBlockFeedback = None
+        self, block: RasterBlockInfo, bandList: List[int] = None, overlap: int = None,
+        feedback: QgsRasterBlockFeedback = None
     ):
         """Return data for given block."""
         return self.arrayFromBoundingBoxAndSize(
@@ -265,8 +265,8 @@ class RasterReader(object):
         )
 
     def arrayFromBoundingBoxAndSize(
-            self, boundingBox: QgsRectangle, width: int, height: int, bandList: List[int] = None,
-            overlap: int = None, feedback: QgsRasterBlockFeedback = None
+        self, boundingBox: QgsRectangle, width: int, height: int, bandList: List[int] = None,
+        overlap: int = None, feedback: QgsRasterBlockFeedback = None
     ) -> Array3d:
         """Return data for given bounding box and size."""
         if bandList is None:
@@ -294,15 +294,19 @@ class RasterReader(object):
         return arrays
 
     def arrayFromPixelOffsetAndSize(
-            self, xOffset: int, yOffset: int, width: int, height: int, bandList: List[int] = None, overlap: int = None,
-            feedback: QgsRasterBlockFeedback = None
+        self, xOffset: int, yOffset: int, width: int, height: int, bandList: List[int] = None, overlap: int = None,
+        feedback: QgsRasterBlockFeedback = None
     ) -> Array3d:
         """Return data for given pixel offset and size."""
         if self.crs().isValid():
             p1_ = QgsPoint(xOffset, yOffset)
             p2_ = QgsPoint(xOffset + width, yOffset + height)
-            p1 = QgsPointXY(self.provider.transformCoordinates(p1_, QgsRasterDataProvider.TransformImageToLayer))
-            p2 = QgsPointXY(self.provider.transformCoordinates(p2_, QgsRasterDataProvider.TransformImageToLayer))
+            p1 = QgsPointXY(
+                self.provider.transformCoordinates(p1_, QgsRasterDataProvider.TransformType.TransformImageToLayer)
+            )
+            p2 = QgsPointXY(
+                self.provider.transformCoordinates(p2_, QgsRasterDataProvider.TransformType.TransformImageToLayer)
+            )
             if p1.isEmpty() or p2.isEmpty():
                 raise ValueError('p1 and p2 must not be empty')
         else:
@@ -317,9 +321,9 @@ class RasterReader(object):
         return self.arrayFromBoundingBoxAndSize(boundingBox, width, height, bandList, overlap, feedback)
 
     def array(
-            self, xOffset: int = None, yOffset: int = None, width: int = None, height: int = None,
-            bandList: List[int] = None, boundingBox: QgsRectangle = None, overlap: int = None,
-            feedback: QgsRasterBlockFeedback = None
+        self, xOffset: int = None, yOffset: int = None, width: int = None, height: int = None,
+        bandList: List[int] = None, boundingBox: QgsRectangle = None, overlap: int = None,
+        feedback: QgsRasterBlockFeedback = None
     ) -> Array3d:
         """Return data."""
         if boundingBox is None:
@@ -341,8 +345,8 @@ class RasterReader(object):
         return array
 
     def maskArray(
-            self, array: Array3d, bandList: List[int] = None, maskNotFinite=True, defaultNoDataValue: float = None,
-            maskNoDataValue=True
+        self, array: Array3d, bandList: List[int] = None, maskNotFinite=True, defaultNoDataValue: float = None,
+        maskNoDataValue=True
     ) -> Array3d:
         """Return mask for given data. No data values evaluate to False, all other to True."""
 
@@ -474,7 +478,7 @@ class RasterReader(object):
         return fractionArray, extent
 
     def sampleWeightedValues(
-            self, extent: QgsRectangle, weightsArray: Array2d, bandNo: int
+        self, extent: QgsRectangle, weightsArray: Array2d, bandNo: int
     ) -> Tuple[np.ndarray, np.ndarray]:
         height, width = weightsArray.shape
         array = self.arrayFromBoundingBoxAndSize(extent, width, height, [bandNo])[0]
@@ -499,9 +503,9 @@ class RasterReader(object):
         return width, height
 
     def sampleValues(
-            self, bandNo: int, extent=None, sampleSize: int = 0,
-            excludeNoDataValues=True, excludeNotFinite=True, defaultNoDataValue: float = None,
-            feedback: QgsRasterBlockFeedback = None
+        self, bandNo: int, extent=None, sampleSize: int = 0,
+        excludeNoDataValues=True, excludeNotFinite=True, defaultNoDataValue: float = None,
+        feedback: QgsRasterBlockFeedback = None
     ) -> np.ndarray:
         """Return sample data."""
         if extent is None:
@@ -516,8 +520,8 @@ class RasterReader(object):
         return values
 
     def uniqueValueCounts(
-            self, bandNo: int, extent=None, sampleSize: int = 0, excludeNoDataValues=True, excludeNotFinite=True,
-            defaultNoDataValue: float = None, feedback: QgsRasterBlockFeedback = None
+        self, bandNo: int, extent=None, sampleSize: int = 0, excludeNoDataValues=True, excludeNotFinite=True,
+        defaultNoDataValue: float = None, feedback: QgsRasterBlockFeedback = None
     ) -> Tuple[List[float], List[int]]:
         """Return unique value counts."""
         values = self.sampleValues(
@@ -527,7 +531,7 @@ class RasterReader(object):
         return list(map(float, uniqueValues)), list(map(int, counts))
 
     def metadataItem(
-            self, key: str, domain: str = '', bandNo: int = None, checkCustomProperties=True
+        self, key: str, domain: str = '', bandNo: int = None, checkCustomProperties=True
     ) -> Optional[MetadataValue]:
         """Return metadata item."""
 
@@ -903,7 +907,7 @@ class RasterReader(object):
                 if 'time' in self.terraMetadata and 'timestep' in self.terraMetadata:
                     if self.terraMetadata['timestep'] == 'days':
                         year, month, day = self.terraMetadata['time'][bandNo - 1].split('-')
-                        return QDateTime(QDate(int(year), int(month), int(day)))
+                        return QDateTime(QDate(int(year), int(month), int(day)), QTime(0, 0, 0))
                     elif self.terraMetadata['timestep'] == 'seconds':
                         tmp1, tmp2 = self.terraMetadata['time'][bandNo - 1].split(' ')
                         year, month, day = tmp1.split('-')
@@ -1015,8 +1019,8 @@ class RasterReader(object):
         return self._gdalObject(bandNo)
 
     def saveAs(
-            self, filename: str, format: str = None, options=None, copyStyle=False, copyMetadata=False,
-            feedback: QgsProcessingFeedback = None
+        self, filename: str, format: str = None, options=None, copyStyle=False, copyMetadata=False,
+        feedback: QgsProcessingFeedback = None
     ):
         from enmapboxprocessing.driver import Driver
 

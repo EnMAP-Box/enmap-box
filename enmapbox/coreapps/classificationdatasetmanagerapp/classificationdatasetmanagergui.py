@@ -92,7 +92,7 @@ class ClassificationDatasetManagerGui(QDialog):
             button = QMessageBox.question(
                 self, 'Save Edits', f'Do you want to save the changes to file {basename(filename)}?'
             )
-            if button == QMessageBox.No:
+            if button == QMessageBox.StandardButton.No:
                 return
 
         categories, features, sizes, sampleSizes = self.currentEdits()

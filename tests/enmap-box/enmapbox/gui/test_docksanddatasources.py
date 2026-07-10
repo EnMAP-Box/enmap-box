@@ -187,10 +187,10 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         if False:
             treeRoot = QgsLayerTree()
             model = QgsLayerTreeModel(treeRoot)
-            model.setFlag(QgsLayerTreeModel.AllowNodeReorder, True)
-            model.setFlag(QgsLayerTreeModel.AllowNodeRename, True)
-            model.setFlag(QgsLayerTreeModel.AllowNodeChangeVisibility, True)
-            model.setFlag(QgsLayerTreeModel.AllowLegendChangeState, True)
+            model.setFlag(QgsLayerTreeModel.Flag.AllowNodeReorder, True)
+            model.setFlag(QgsLayerTreeModel.Flag.AllowNodeRename, True)
+            model.setFlag(QgsLayerTreeModel.Flag.AllowNodeChangeVisibility, True)
+            model.setFlag(QgsLayerTreeModel.Flag.AllowLegendChangeState, True)
             model.setAutoCollapseLegendNodes(0)
 
             tree1 = QgsLayerTree()

@@ -16,7 +16,7 @@ from enmapbox.qgispluginsupport.qps.utils import SpatialExtent, SpatialPoint
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.typing import (NumpyDataType, MetadataValue, GdalDataType,
                                        GdalResamplingAlgorithm, Categories, Category, Targets, Target)
-from qgis.PyQt.QtCore import QDateTime, QDate
+from qgis.PyQt.QtCore import QDateTime, QDate, QTime
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import (QgsRasterBlock, QgsProcessingFeedback, QgsPalettedRasterRenderer,
@@ -249,17 +249,26 @@ class Utils(object):
         ce = QgsContrastEnhancement(provider.dataType(bandNumbers[0]))
         ce.setMinimumValue(minValues[0], False)
         ce.setMaximumValue(maxValues[0], False)
-        ce.setContrastEnhancementAlgorithm(QgsContrastEnhancement.StretchToMinimumMaximum, True)
+        ce.setContrastEnhancementAlgorithm(
+            QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum,
+            True
+        )
         renderer.setRedContrastEnhancement(ce)
         ce = QgsContrastEnhancement(provider.dataType(bandNumbers[1]))
         ce.setMinimumValue(minValues[1], False)
         ce.setMaximumValue(maxValues[1], False)
-        ce.setContrastEnhancementAlgorithm(QgsContrastEnhancement.StretchToMinimumMaximum, True)
+        ce.setContrastEnhancementAlgorithm(
+            QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum,
+            True
+        )
         renderer.setGreenContrastEnhancement(ce)
         ce = QgsContrastEnhancement(provider.dataType(bandNumbers[2]))
         ce.setMinimumValue(minValues[2], False)
         ce.setMaximumValue(maxValues[2], False)
-        ce.setContrastEnhancementAlgorithm(QgsContrastEnhancement.StretchToMinimumMaximum, True)
+        ce.setContrastEnhancementAlgorithm(
+            QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum,
+            True
+        )
         renderer.setBlueContrastEnhancement(ce)
         return renderer
 
@@ -272,7 +281,9 @@ class Utils(object):
         ce = QgsContrastEnhancement(provider.dataType(grayBand))
         ce.setMinimumValue(minValue, False)
         ce.setMaximumValue(maxValue, False)
-        ce.setContrastEnhancementAlgorithm(QgsContrastEnhancement.StretchToMinimumMaximum, True)
+        ce.setContrastEnhancementAlgorithm(
+            QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum, True
+        )
         renderer.setContrastEnhancement(ce)
         return renderer
 
@@ -316,7 +327,7 @@ class Utils(object):
     ) -> QgsCategorizedSymbolRenderer:
         rendererCategories = list()
         for c in categories:
-            symbol = QgsSymbol.defaultSymbol(QgsWkbTypes.geometryType(QgsWkbTypes.Point))
+            symbol = QgsSymbol.defaultSymbol(QgsWkbTypes.geometryType(QgsWkbTypes.Type.Point))
             symbol.setColor(QColor(c.color))
             category = QgsRendererCategory(c.value, symbol, c.name)
             rendererCategories.append(category)
@@ -569,7 +580,7 @@ class Utils(object):
 
     @classmethod
     def msecToDateTime(cls, msec: int) -> QDateTime:
-        return QDateTime(QDate(1970, 1, 1)).addMSecs(int(msec))
+        return QDateTime(QDate(1970, 1, 1), QTime(0, 0, 0)).addMSecs(int(msec))
 
     @classmethod
     def prepareCategories(
@@ -615,16 +626,18 @@ class Utils(object):
     def snapExtentToRaster(cls, extent: QgsRectangle, raster: QgsRasterLayer) -> QgsRectangle:
         provider: QgsRasterDataProvider = raster.dataProvider()
         ulSubPixel: QgsPoint = provider.transformCoordinates(
-            QgsPoint(extent.xMinimum(), extent.yMaximum()), QgsRasterDataProvider.TransformLayerToImage
+            QgsPoint(extent.xMinimum(), extent.yMaximum()), QgsRasterDataProvider.TransformType.TransformLayerToImage
         )
         lrSubPixel: QgsPoint = provider.transformCoordinates(
-            QgsPoint(extent.xMaximum(), extent.yMinimum()), QgsRasterDataProvider.TransformLayerToImage
+            QgsPoint(extent.xMaximum(), extent.yMinimum()), QgsRasterDataProvider.TransformType.TransformLayerToImage
         )
         ul = provider.transformCoordinates(
-            QgsPoint(round(ulSubPixel.x()), round(ulSubPixel.y())), QgsRasterDataProvider.TransformImageToLayer
+            QgsPoint(round(ulSubPixel.x()), round(ulSubPixel.y())),
+            QgsRasterDataProvider.TransformType.TransformImageToLayer
         )
         lr = provider.transformCoordinates(
-            QgsPoint(round(lrSubPixel.x()), round(lrSubPixel.y())), QgsRasterDataProvider.TransformImageToLayer
+            QgsPoint(round(lrSubPixel.x()), round(lrSubPixel.y())),
+            QgsRasterDataProvider.TransformType.TransformImageToLayer
         )
         return QgsRectangle(QgsPointXY(ul), QgsPointXY(lr))
 
@@ -798,7 +811,7 @@ class Utils(object):
         if dateTime is None:
             return None
         date = dateTime.date()
-        secOfYear = QDateTime(QDate(date.year(), 1, 1)).secsTo(dateTime)
+        secOfYear = QDateTime(QDate(date.year(), 1, 1), QTime(0, 0, 0)).secsTo(dateTime)
         secsInYear = date.daysInYear() * 24 * 60 * 60
         return date.year() + secOfYear / secsInYear
 
@@ -809,7 +822,7 @@ class Utils(object):
         year = int(decimalYear)
         secsInYear = QDate(year, 1, 1).daysInYear() * 24 * 60 * 60
         secOfYear = int((decimalYear - year) * secsInYear)
-        dateTime = QDateTime(QDate(year, 1, 1)).addSecs(secOfYear)
+        dateTime = QDateTime(QDate(year, 1, 1), QTime(0, 0, 0)).addSecs(secOfYear)
         return dateTime
 
     @classmethod

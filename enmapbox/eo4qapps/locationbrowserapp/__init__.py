@@ -51,7 +51,7 @@ class LocationBrowserApp(EnMAPBoxApplication):
 
         # add main dock and toolbar button
         self.dock = LocationBrowserDockWidget(self.currentLocationMapTool, parent=self.parent())
-        interface.addDockWidget(Qt.LeftDockWidgetArea, self.dock)
+        interface.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.dock)
         self.dock.setWindowIcon(self.icon())
         self.dock.hide()
 

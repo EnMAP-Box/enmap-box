@@ -82,9 +82,9 @@ class CreateRgbImageFromClassProbabilityAlgorithm(EnMAPProcessingAlgorithm):
 
         reader = RasterReader(probability)
         driver = Driver(filename, feedback=feedback)
-        writer = driver.createLike(reader, Qgis.Byte, 3)
+        writer = driver.createLike(reader, Qgis.DataType.Byte, 3)
         lineMemoryUsage = reader.lineMemoryUsage()
-        lineMemoryUsage += reader.lineMemoryUsage(3, Qgis.Float32)
+        lineMemoryUsage += reader.lineMemoryUsage(3, Qgis.DataType.Float32)
         blockSizeY = min(reader.height(), ceil(maximumMemoryUsage / lineMemoryUsage))
         blockSizeX = reader.width()
         for block in reader.walkGrid(blockSizeX, blockSizeY, feedback):

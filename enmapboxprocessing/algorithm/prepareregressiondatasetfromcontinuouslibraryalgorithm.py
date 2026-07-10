@@ -3,13 +3,13 @@ from typing import Dict, Any, List, Tuple
 import numpy as np
 
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import FIELD_VALUES
+from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import checkSampleShape, Target, RegressorDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterField,
                        QgsProcessingException)
-from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
 
 
 @typechecked
@@ -52,17 +52,18 @@ class PrepareRegressionDatasetFromContinuousLibraryAlgorithm(EnMAPProcessingAlgo
         self.addParameterVectorLayer(self.P_CONTINUOUS_LIBRARY, self._CONTINUOUS_LIBRARY)
         self.addParameterField(
             self.P_TARGET_FIELDS, self._TARGET_FIELDS, None, self.P_CONTINUOUS_LIBRARY,
-            QgsProcessingParameterField.Any, True, True, False, True
+            QgsProcessingParameterField.DataType.Any, True, True, False, True
         )
         self.addParameterField(
-            self.P_FIELD, self._FIELD, None, self.P_CONTINUOUS_LIBRARY, QgsProcessingParameterField.Any, False, True,
+            self.P_FIELD, self._FIELD, None,
+            self.P_CONTINUOUS_LIBRARY, QgsProcessingParameterField.DataType.Any, False, True,
             False, True
         )
         self.addParameterBoolean(self.P_EXCLUDE_BAD_BANDS, self._EXCLUDE_BAD_BANDS, True, True, True)
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         library = self.parameterAsLayer(parameters, self.P_CONTINUOUS_LIBRARY, context)
         binaryField = self.parameterAsField(parameters, self.P_FIELD, context)

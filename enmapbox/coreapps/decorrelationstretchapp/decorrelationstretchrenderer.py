@@ -71,7 +71,7 @@ class DecorrelationStretchRenderer(QgsRasterRenderer):
 
         # convert back to QGIS raster block
         outarray = (r << 16) + (g << 8) + b + (a << 24)
-        return Utils.numpyArrayToQgsRasterBlock(outarray, Qgis.ARGB32_Premultiplied)
+        return Utils.numpyArrayToQgsRasterBlock(outarray, Qgis.DataType.ARGB32_Premultiplied)
 
     def clone(self) -> QgsRasterRenderer:
         renderer = DecorrelationStretchRenderer()

@@ -93,7 +93,7 @@ class LandCoverChangeStatisticsDataFilteringDockWidget(QgsDockWidget):
             pixmap.fill(color)
             icon = QIcon(pixmap)
             w = QCheckBox(c.name)
-            w.setCheckState(Qt.Checked)
+            w.setCheckState(Qt.CheckState.Checked)
             w.setIcon(icon)
             w.color = color
             w.stateChanged.connect(self.onClassToggled)
@@ -105,7 +105,7 @@ class LandCoverChangeStatisticsDataFilteringDockWidget(QgsDockWidget):
                 pixmap.fill(color)
                 icon = QIcon(pixmap)
                 w = QTableWidgetItem(c.name)
-                w.setCheckState(Qt.Checked)
+                w.setCheckState(Qt.CheckState.Checked)
                 w.setIcon(icon)
                 w.color = color
                 self.mTableClasses.setItem(row, column, w)
@@ -126,7 +126,7 @@ class LandCoverChangeStatisticsDataFilteringDockWidget(QgsDockWidget):
             for row in range(self.mTableClasses.rowCount()):
                 size = self.relativeClassSizes[column - 1][row]
                 w: QTableWidgetItem = self.mTableClasses.item(row, column)
-                if w.checkState() != Qt.Checked:  # filtered by local checkbox
+                if w.checkState() != Qt.CheckState.Checked:  # filtered by local checkbox
                     continue
                 if size < vmin or size > vmax:  # filtered by size
                     continue

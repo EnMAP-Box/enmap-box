@@ -51,12 +51,12 @@ class LandCoverChangeStatisticsMainWindow(QMainWindow):
         # add dock widgets and toolbar buttons
         self.mDataFilteringDock = LandCoverChangeStatisticsDataFilteringDockWidget(parent=self)
         self.mDataFilteringDock.sigStateChanged.connect(self.onLiveUpdate)
-        self.addDockWidget(Qt.RightDockWidgetArea, self.mDataFilteringDock)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.mDataFilteringDock)
         self.mSettingsDock = LandCoverChangeStatisticsSettingsDockWidget(parent=self)
         self.mSettingsDock.sigStateChanged.connect(self.onLiveUpdate)
         self.mSettingsDock.sigLayersChanged.connect(self.onLayersChanged)
 
-        self.addDockWidget(Qt.BottomDockWidgetArea, self.mSettingsDock)
+        self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, self.mSettingsDock)
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None
         self.enmapBox.sigCurrentLocationChanged.connect(self.onLiveUpdate)
@@ -255,8 +255,8 @@ class LandCoverChangeSankeyPlotBuilder():
 
     @classmethod
     def recodeConfusionMatrix(
-            cls, matrix: np.ndarray, categories1: List[Category], categories2: List[Category], filter1: List[str],
-            filter2: List[str]
+        cls, matrix: np.ndarray, categories1: List[Category], categories2: List[Category], filter1: List[str],
+        filter2: List[str]
     ):
         expected_shape = (len(categories1), len(categories2))
         if matrix.shape != expected_shape:
@@ -303,9 +303,11 @@ class LandCoverChangeSankeyPlotBuilder():
         count = countSampled / nSampled * n
 
         fromUnit: QgsUnitTypes.AreaUnit = QgsUnitTypes.distanceToAreaUnit(self.grid.crs().mapUnits())
-        factorToSquareMeters = QgsUnitTypes.fromUnitToUnitFactor(fromUnit, QgsUnitTypes.AreaSquareMeters)
-        factorToHectares = QgsUnitTypes.fromUnitToUnitFactor(fromUnit, QgsUnitTypes.AreaHectares)
-        factorToSquareKilometers = QgsUnitTypes.fromUnitToUnitFactor(fromUnit, QgsUnitTypes.AreaSquareKilometers)
+        factorToSquareMeters = QgsUnitTypes.fromUnitToUnitFactor(fromUnit, QgsUnitTypes.AreaUnit.AreaSquareMeters)
+        factorToHectares = QgsUnitTypes.fromUnitToUnitFactor(fromUnit, QgsUnitTypes.AreaUnit.AreaHectares)
+        factorToSquareKilometers = QgsUnitTypes.fromUnitToUnitFactor(
+            fromUnit, QgsUnitTypes.AreaUnit.AreaSquareKilometers
+        )
 
         pixelSize = self.grid.rasterUnitsPerPixelX() * self.grid.rasterUnitsPerPixelY()
 
@@ -400,7 +402,7 @@ class LandCoverChangeSankeyPlotBuilder():
         off1 = 0
         off2 = len(categoriess[0])
         for linkSizes, categories1, categories2, locationValue1, locationValue2 in zip(
-                linkSizess, categoriess, categoriess[1:], self.locationProfile, self.locationProfile[1:]
+            linkSizess, categoriess, categoriess[1:], self.locationProfile, self.locationProfile[1:]
         ):
             levels = [[c.value for c in categories1], [c.value for c in categories2]]
             count = linkSizes / np.sum(linkSizes) * 100

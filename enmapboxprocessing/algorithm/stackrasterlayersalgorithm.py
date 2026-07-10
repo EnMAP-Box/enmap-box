@@ -42,7 +42,7 @@ class StackRasterLayersAlgorithm(EnMAPProcessingAlgorithm):
         return Group.RasterMiscellaneous.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
-        self.addParameterMultipleLayers(self.P_RASTERS, self._RASTERS, QgsProcessing.TypeRaster)
+        self.addParameterMultipleLayers(self.P_RASTERS, self._RASTERS, QgsProcessing.SourceType.TypeRaster)
         self.addParameterRasterLayer(self.P_GRID, self._GRID, None, True, True)
         self.addParameterInt(self.P_BAND, self._BAND, None, True, 1, None, advanced=True)
         self.addParameterVrtDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)

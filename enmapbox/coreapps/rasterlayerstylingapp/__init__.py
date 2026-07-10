@@ -28,7 +28,7 @@ class RasterLayerStylingApp(EnMAPBoxApplication):
 
     def initGui(self):
         RasterLayerStylingApp._panel = RasterLayerStylingPanel(self.enmapbox, self.enmapbox.ui)
-        self.enmapbox.addPanel(Qt.RightDockWidgetArea, self._panel, False)
+        self.enmapbox.addPanel(Qt.DockWidgetArea.RightDockWidgetArea, self._panel, False)
 
     @classmethod
     def panel(cls) -> Optional[RasterLayerStylingPanel]:

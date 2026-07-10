@@ -27,10 +27,10 @@ class DialogUi(object):
         vbox.addWidget(self.mCode)
 
         self.buttonBox = QDialogButtonBox()
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
-        self.buttonBox.button(QDialogButtonBox.Ok).clicked.connect(dialog.accept)
-        self.buttonBox.button(QDialogButtonBox.Cancel).clicked.connect(dialog.close)
-        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel | QDialogButtonBox.StandardButton.Ok)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).clicked.connect(dialog.accept)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).clicked.connect(dialog.close)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
         vbox.addWidget(self.buttonBox)
 
 
@@ -69,9 +69,9 @@ class SnippetInsertDialog(QDialog, DialogUi):
     def updateOkButton(self):
         for comboBox, identifier in self.sources:
             if comboBox.currentText() == '':
-                self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+                self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
                 return
-        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(True)
 
     def values(self):
         return self.mCode.text()

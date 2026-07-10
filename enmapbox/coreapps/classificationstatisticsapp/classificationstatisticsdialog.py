@@ -58,12 +58,12 @@ class ClassificationStatisticsDialog(QMainWindow):
         self.mMapCanvas: Optional[QgsMapCanvas] = None
         self.mProject = self.enmapBox.project()
         self.mLayer.setProject(self.mProject)
-        self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mLayer.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         exceptedLayers = [layer for layer in self.mProject.mapLayers().values()
                           if not isinstance(layer.renderer(), QgsPalettedRasterRenderer)]
         self.mLayer.setExceptedLayerList(exceptedLayers)
         self.mTable.horizontalHeader().setSectionsMovable(True)
-        self.mRoiLayer.setFilters(QgsMapLayerProxyModel.VectorLayer)
+        self.mRoiLayer.setFilters(QgsMapLayerProxyModel.Filter.VectorLayer)
 
         self.mLayer.layerChanged.connect(self.onLayerChanged)
         self.mAreaUnits.currentIndexChanged.connect(self.onLiveUpdate)
@@ -141,7 +141,7 @@ class ClassificationStatisticsDialog(QMainWindow):
         self.mTable.setRowCount(len(categories))
         for row, category in enumerate(categories):
             w = QCheckBox('')
-            w.setCheckState(Qt.Checked)
+            w.setCheckState(Qt.CheckState.Checked)
             w.setDisabled(True)
             w.toggled.connect(self.onCategoryToogled)
             self.mTable.setCellWidget(row, 0, w)
@@ -248,14 +248,14 @@ class ClassificationStatisticsDialog(QMainWindow):
 
         fromUnit: QgsUnitTypes.AreaUnit = QgsUnitTypes.distanceToAreaUnit(layer.crs().mapUnits())
         if self.mAreaUnits.currentIndex() == self.SquareMeters:
-            toUnit = QgsUnitTypes.AreaSquareMeters
+            toUnit = QgsUnitTypes.AreaUnit.AreaSquareMeters
         elif self.mAreaUnits.currentIndex() == self.Hectares:
-            toUnit = QgsUnitTypes.AreaHectares
+            toUnit = QgsUnitTypes.AreaUnit.AreaHectares
         elif self.mAreaUnits.currentIndex() == self.SquareKilometers:
-            toUnit = QgsUnitTypes.AreaSquareKilometers
+            toUnit = QgsUnitTypes.AreaUnit.AreaSquareKilometers
         else:
             raise ValueError()
-        if fromUnit in [QgsUnitTypes.AreaUnknownUnit, QgsUnitTypes.AreaSquareDegrees]:
+        if fromUnit in [QgsUnitTypes.AreaUnit.AreaUnknownUnit, QgsUnitTypes.AreaUnit.AreaSquareDegrees]:
             areas = [None] * len(counts)
         else:
             factor = QgsUnitTypes.fromUnitToUnitFactor(fromUnit, toUnit)
@@ -341,7 +341,7 @@ class ClassificationStatisticsDialog(QMainWindow):
         filename = '/vsimem/ClassificationStatistics/roi.gpkg'
         transformContext = self.mProject.transformContext()
         saveVectorOptions = QgsVectorFileWriter.SaveVectorOptions()
-        saveVectorOptions.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteFile
+        saveVectorOptions.actionOnExistingFile = QgsVectorFileWriter.ActionOnExistingFile.CreateOrOverwriteFile
         saveVectorOptions.ct = QgsCoordinateTransform(roiLayer.crs(), layer.crs(), self.mProject)
         saveVectorOptions.onlySelectedFeatures = True
         saveVectorOptions.skipAttributeCreation = True
@@ -349,7 +349,7 @@ class ClassificationStatisticsDialog(QMainWindow):
         error, message, newFilename, newLayer = QgsVectorFileWriter.writeAsVectorFormatV3(
             roiLayer, filename, transformContext, saveVectorOptions
         )
-        if not error == QgsVectorFileWriter.NoError:
+        if not error == QgsVectorFileWriter.WriterError.NoError:
             raise RuntimeError(f'Fail error {error}:{message}')
 
         options = gdal.RasterizeOptions(
