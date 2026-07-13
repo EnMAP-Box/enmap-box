@@ -315,8 +315,10 @@ class CanvasLinkDialog(QDialog):
             self.mWidgetLUT[trgCanvas] = btnDict
 
             if iRow == 0:
-                self.grid.addItem(QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum), iRow, iCol + 1)
-        self.grid.addItem(QSpacerItem(0, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding), self.grid.rowCount(), 0)
+                self.grid.addItem(QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum), iRow,
+                                  iCol + 1)
+        self.grid.addItem(QSpacerItem(0, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding),
+                          self.grid.rowCount(), 0)
 
         self.updateLinkSelection()
 
@@ -905,9 +907,10 @@ class MapCanvas(QgsMapCanvas):
     def mousePressEvent(self, event: QMouseEvent):
 
         self.setProperty(KEY_LAST_CLICKED, time.time())
-        set_cursor_location: bool = (event.button() == Qt.MouseButton.LeftButton and isinstance(self.mapTool(),
-                                                                                    (QgsMapToolIdentify,
-                                                                                     CursorLocationMapTool)))
+        set_cursor_location: bool = (
+            event.button() == Qt.MouseButton.LeftButton
+            and isinstance(self.mapTool(), (QgsMapToolIdentify, CursorLocationMapTool))  # noqa: W503
+        )
 
         super(MapCanvas, self).mousePressEvent(event)
 
@@ -962,7 +965,8 @@ class MapCanvas(QgsMapCanvas):
         """
         if event is None:
             pt = QPointF(self.width() * 0.5, self.height() * 0.5)
-            event = QMouseEvent(QEvent.Type.MouseButtonPress, pt, Qt.MouseButton.LeftButton, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier)
+            event = QMouseEvent(QEvent.Type.MouseButtonPress, pt, Qt.MouseButton.LeftButton, Qt.MouseButton.LeftButton,
+                                Qt.KeyboardModifier.NoModifier)
             event = QgsMapMouseEvent(self, event)
 
         menu.setToolTipsVisible(True)
@@ -1005,7 +1009,10 @@ class MapCanvas(QgsMapCanvas):
         is_shift = bool(QApplication.keyboardModifiers() & Qt.KeyboardModifier.ShiftModifier)
         del is_shift
 
-        if not is_panning and is_ctrl and e.key() in [Qt.Key.Key_Left, Qt.Key.Key_Right, Qt.Key.Key_Up, Qt.Key.Key_Down]:
+        if not is_panning and is_ctrl and e.key() in [
+            Qt.Key.Key_Left, Qt.Key.Key_Right, Qt.Key.Key_Up,
+            Qt.Key.Key_Down
+        ]:
             # find raster layer with a reference pixel grid
             rasterLayer: QgsRasterLayer = self.mCrosshairItem.rasterGridLayer()
             if not isinstance(rasterLayer, QgsRasterLayer):
@@ -1054,8 +1061,11 @@ class MapCanvas(QgsMapCanvas):
                     localPos = m2p.transform(ptR)
 
                     # simulate a left-button mouse-click
-                    event = QMouseEvent(QEvent.Type.MouseButtonPress, localPos.toQPointF(), Qt.MouseButton.LeftButton, Qt.MouseButton.LeftButton,
-                                        Qt.KeyboardModifier.NoModifier)
+                    event = QMouseEvent(
+                        QEvent.Type.MouseButtonPress, localPos.toQPointF(),
+                        Qt.MouseButton.LeftButton, Qt.MouseButton.LeftButton,
+                        Qt.KeyboardModifier.NoModifier
+                    )
                     self.mousePressEvent(event)
 
                     event = QMouseEvent(QEvent.Type.MouseButtonRelease, localPos.toQPointF(), Qt.MouseButton.LeftButton,

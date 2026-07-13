@@ -404,7 +404,10 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
 
             elif isinstance(node, VectorDataSource):
 
-                if node.geometryType() not in [QgsWkbTypes.GeometryType.NullGeometry, QgsWkbTypes.GeometryType.UnknownGeometry]:
+                if node.geometryType() not in [
+                    QgsWkbTypes.GeometryType.NullGeometry,
+                    QgsWkbTypes.GeometryType.UnknownGeometry
+                ]:
                     a = menu.addAction('Open in new map')
                     a.triggered.connect(lambda *args, s=node: treeView.openInMap(s, None))
 
@@ -528,8 +531,11 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
             actionEdit.setShortcut(Qt.Key.Key_F2)
             actionEdit.triggered.connect(lambda *args, idx=cidx: view.edit(idx))
 
-        if isinstance(node, MapDockTreeNode) or isinstance(viewNode, MapDockTreeNode) \
-                and isinstance(node, (QgsLayerTreeGroup, QgsLayerTreeLayer)):
+        if (
+            isinstance(node, MapDockTreeNode)
+            or isinstance(viewNode, MapDockTreeNode)  # noqa: W503
+            and isinstance(node, (QgsLayerTreeGroup, QgsLayerTreeLayer))  # noqa: W503
+        ):
             action = menu.addAction('Add Group')
             action.setIcon(QIcon(':/images/themes/default/mActionAddGroup.svg'))
             action.triggered.connect(lambda tv=view: self.onAddGroup(view))

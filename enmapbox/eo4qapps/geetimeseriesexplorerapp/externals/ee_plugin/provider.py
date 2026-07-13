@@ -13,15 +13,15 @@ from typing import Optional
 
 import numpy as np
 
+from enmapbox.typeguard import typechecked
 from enmapbox.utils import importEarthEngine
 from enmapboxprocessing.utils import Utils
-from qgis.core import QgsRectangle
 from qgis.core import (
     QgsRasterDataProvider, QgsRasterIdentifyResult, QgsProviderRegistry,
     QgsProviderMetadata, QgsMessageLog, Qgis, QgsRaster, QgsRasterInterface,
     QgsVectorDataProvider, QgsDataProvider
 )
-from enmapbox.typeguard import typechecked
+from qgis.core import QgsRectangle
 
 BAND_TYPES = {
     'int8': Qgis.DataType.Int16,
@@ -95,7 +95,11 @@ class GeetseEarthEngineRasterDataProvider(QgsRasterDataProvider):
         return self.collectionJson.bandWavelength(bandNo)
 
     def capabilities(self):
-        caps = QgsRasterInterface.Capability.Size | QgsRasterInterface.Capability.Identify | QgsRasterInterface.Capability.IdentifyValue
+        caps = (
+            QgsRasterInterface.Capability.Size
+            | QgsRasterInterface.Capability.Identify  # noqa: W503
+            | QgsRasterInterface.Capability.IdentifyValue  # noqa: W503
+        )
         return QgsRasterDataProvider.ProviderCapabilities(caps)
 
     def name(self):

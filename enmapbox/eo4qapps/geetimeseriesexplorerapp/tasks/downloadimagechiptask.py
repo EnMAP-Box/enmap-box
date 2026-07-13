@@ -5,6 +5,7 @@ import numpy as np
 from osgeo import gdal
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
+from enmapbox.typeguard import typechecked
 from enmapbox.utils import importEarthEngine
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader
@@ -12,7 +13,6 @@ from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp.imageinfo import ImageInfo
 from qgis.core import QgsTask, QgsRasterLayer, QgsCoordinateReferenceSystem, QgsRectangle, QgsMessageLog, Qgis
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -95,10 +95,17 @@ class DownloadImageChipBandTask(QgsTask):
             raise self.exception
 
         if self.alreadyExists:
-            QgsMessageLog.logMessage(f'already exists: {self.filename}', tag="GEE Time Series Explorer",
-                                     level=Qgis.MessageLevel.Success)
+            QgsMessageLog.logMessage(
+                f'already exists: {self.filename}',
+                tag="GEE Time Series Explorer",
+                level=Qgis.MessageLevel.Success
+            )
         else:
-            QgsMessageLog.logMessage(f'downloaded: {self.filename}', tag="GEE Time Series Explorer", level=Qgis.MessageLevel.Success)
+            QgsMessageLog.logMessage(
+                f'downloaded: {self.filename}',
+                tag="GEE Time Series Explorer",
+                level=Qgis.MessageLevel.Success
+            )
 
 
 @typechecked

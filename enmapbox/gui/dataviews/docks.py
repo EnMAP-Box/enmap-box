@@ -622,7 +622,10 @@ class TextDockWidget(QWidget):
             if statinfo.st_size > self.nMaxBytes:
                 info = 'Files {} is > {} bytes'.format(path, self.nMaxBytes)
                 info += '\nDo you really want to load it into this text editor?'
-                result = QMessageBox.warning(self, 'Warning', info, QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.Cancel)
+                result = QMessageBox.warning(
+                    self, 'Warning', info,
+                    QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.Cancel
+                )
                 if result != QMessageBox.StandardButton.Yes:
                     return
 

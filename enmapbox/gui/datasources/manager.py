@@ -258,9 +258,9 @@ class DataSourceManager(TreeModel):
                 for ds in allDataSources:
                     dataItem = ds.dataItem()
                     if (
-                            isinstance(ds, SpatialDataSource)
-                            and dataItem.path() == input.source()  # noqa
-                            and dataItem.providerKey() == input.providerType()  # noqa
+                        isinstance(ds, SpatialDataSource)
+                        and dataItem.path() == input.source()  # noqa
+                        and dataItem.providerKey() == input.providerType()  # noqa
                     ):
                         foundSources.append(ds)
             elif isinstance(input, str):
@@ -845,7 +845,9 @@ class DataSourceFactory(object):
                 if isinstance(source, Path):
                     source = source.as_posix()
                 elif isinstance(source, QUrl):
-                    source = source.toString(QUrl.UrlFormattingOption.PreferLocalFile | QUrl.UrlFormattingOption.RemoveQuery)
+                    source = source.toString(
+                        QUrl.UrlFormattingOption.PreferLocalFile | QUrl.UrlFormattingOption.RemoveQuery
+                    )
 
                 if isinstance(source, str):
                     # try to find a source as layer in the current project
