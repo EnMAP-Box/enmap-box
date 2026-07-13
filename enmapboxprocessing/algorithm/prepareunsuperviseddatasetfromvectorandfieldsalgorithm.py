@@ -37,7 +37,7 @@ class PrepareUnsupervisedDatasetFromVectorAndFieldsAlgorithm(EnMAPProcessingAlgo
         self.addParameterVectorLayer(self.P_VECTOR, self._VECTOR)
         self.addParameterField(
             self.P_FEATURE_FIELDS, self._FEATURE_FIELDS, None, self.P_VECTOR,
-            QgsProcessingParameterField.Numeric, True
+            QgsProcessingParameterField.DataType.Numeric, True
         )
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 

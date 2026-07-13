@@ -143,7 +143,7 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
             self.addParameterRasterLayer(name, description, None, True, True)
         for name, description in self.inputVectorNames():
             self.addParameterVectorLayer(name, description, None, None, True, True)
-        self.addParameterMultipleLayers(self.P_RS, self._RS, QgsProcessing.TypeRaster, None, True, True)
+        self.addParameterMultipleLayers(self.P_RS, self._RS, QgsProcessing.SourceType.TypeRaster, None, True, True)
         self.addParameterRasterDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER, None, False, True)
 
     def prepareAlgorithm(

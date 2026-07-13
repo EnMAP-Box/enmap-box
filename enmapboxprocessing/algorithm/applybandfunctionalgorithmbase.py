@@ -103,7 +103,7 @@ class ApplyBandFunctionAlgorithmBase(EnMAPProcessingAlgorithm):
         return result
 
     def outputDataType(self) -> Qgis.DataType:
-        return Qgis.Float32
+        return Qgis.DataType.Float32
 
     def outputNoDataValue(self) -> Optional[float]:
         return None

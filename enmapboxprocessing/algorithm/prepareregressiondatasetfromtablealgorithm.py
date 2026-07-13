@@ -2,11 +2,11 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import checkSampleShape, Target, RegressorDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsFeature, QgsProcessingParameterField)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -40,15 +40,18 @@ class PrepareRegressionDatasetFromTableAlgorithm(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterVectorLayer(self.P_TABLE, self._TABLE)
         self.addParameterField(
-            self.P_FEATURE_FIELDS, self._FEATURE_FIELDS, None, self.P_TABLE, QgsProcessingParameterField.Any, True
+            self.P_FEATURE_FIELDS, self._FEATURE_FIELDS, None,
+            self.P_TABLE, QgsProcessingParameterField.DataType.Any,
+            True
         )
         self.addParameterField(
-            self.P_TARGET_FIELDS, self._TARGET_FIELDS, None, self.P_TABLE, QgsProcessingParameterField.Any, True
+            self.P_TARGET_FIELDS, self._TARGET_FIELDS, None,
+            self.P_TABLE, QgsProcessingParameterField.DataType.Any, True
         )
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         table = self.parameterAsLayer(parameters, self.P_TABLE, context)
         featureFields = self.parameterAsFields(parameters, self.P_FEATURE_FIELDS, context)

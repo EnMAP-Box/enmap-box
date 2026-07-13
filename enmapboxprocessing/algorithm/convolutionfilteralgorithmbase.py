@@ -133,8 +133,8 @@ class ConvolutionFilterAlgorithmBase(EnMAPProcessingAlgorithm):
 
             feedback.pushInfo('Convolve raster')
             rasterReader = RasterReader(raster)
-            writer = Driver(filename, feedback=feedback).createLike(rasterReader, Qgis.Float32)
-            lineMemoryUsage = rasterReader.lineMemoryUsage(dataTypeSize=Qgis.Float32)
+            writer = Driver(filename, feedback=feedback).createLike(rasterReader, Qgis.DataType.Float32)
+            lineMemoryUsage = rasterReader.lineMemoryUsage(dataTypeSize=Qgis.DataType.Float32)
             lineMemoryUsage *= 2  # output has same size
             blockSizeY = min(raster.height(), ceil(maximumMemoryUsage / lineMemoryUsage))
             blockSizeX = raster.width()

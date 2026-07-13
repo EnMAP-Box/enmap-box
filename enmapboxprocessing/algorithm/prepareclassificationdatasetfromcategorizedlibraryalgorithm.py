@@ -1,8 +1,6 @@
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCategorizedSymbolRenderer,
-                       QgsProcessingParameterField, QgsProcessingException, QgsFeature)
 
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import FIELD_VALUES
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
@@ -10,6 +8,8 @@ from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import checkSampleShape, ClassifierDump
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCategorizedSymbolRenderer,
+                       QgsProcessingParameterField, QgsProcessingException, QgsFeature)
 
 
 @typechecked
@@ -61,17 +61,18 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
         self.addParameterVectorLayer(self.P_CATEGORIZED_LIBRARY, self._CATEGORIZED_LIBRARY)
         self.addParameterField(
             self.P_CATEGORY_FIELD, self._CATEGORY_FIELD, None, self.P_CATEGORIZED_LIBRARY,
-            QgsProcessingParameterField.Any, False, True, False, True
+            QgsProcessingParameterField.DataType.Any, False, True, False, True
         )
         self.addParameterField(
-            self.P_FIELD, self._FIELD, None, self.P_CATEGORIZED_LIBRARY, QgsProcessingParameterField.Any, False, True,
+            self.P_FIELD, self._FIELD, None,
+            self.P_CATEGORIZED_LIBRARY, QgsProcessingParameterField.DataType.Any, False, True,
             False, True
         )
         self.addParameterBoolean(self.P_EXCLUDE_BAD_BANDS, self._EXCLUDE_BAD_BANDS, True, True, True)
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         library = self.parameterAsVectorLayer(parameters, self.P_CATEGORIZED_LIBRARY, context)
         binaryField = self.parameterAsField(parameters, self.P_FIELD, context)

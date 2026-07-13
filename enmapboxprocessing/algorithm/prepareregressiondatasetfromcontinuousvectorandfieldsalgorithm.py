@@ -44,11 +44,11 @@ class PrepareRegressionDatasetFromContinuousVectorAndFieldsAlgorithm(EnMAPProces
         self.addParameterVectorLayer(self.P_CONTINUOUS_VECTOR, self._CONTINUOUS_VECTOR)
         self.addParameterField(
             self.P_FEATURE_FIELDS, self._FEATURE_FIELDS, None, self.P_CONTINUOUS_VECTOR,
-            QgsProcessingParameterField.Numeric, True
+            QgsProcessingParameterField.DataType.Numeric, True
         )
         self.addParameterField(
             self.P_TARGET_FIELDS, self._TARGET_FIELDS, None, self.P_CONTINUOUS_VECTOR,
-            QgsProcessingParameterField.Numeric, True, True, False, True
+            QgsProcessingParameterField.DataType.Numeric, True, True, False, True
         )
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 

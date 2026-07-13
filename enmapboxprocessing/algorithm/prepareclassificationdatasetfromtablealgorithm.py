@@ -2,12 +2,12 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import checkSampleShape, ClassifierDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsFeature, QgsProcessingParameterField,
                        QgsProcessing)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -46,21 +46,26 @@ class PrepareClassificationDatasetFromTableAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterVectorLayer(self.P_TABLE, self._TABLE, [QgsProcessing.SourceType.TypeVector])
 
         self.addParameterField(
-            self.P_FEATURE_FIELDS, self._FEATURE_FIELDS, None, self.P_TABLE, QgsProcessingParameterField.Any, True
+            self.P_FEATURE_FIELDS, self._FEATURE_FIELDS, None,
+            self.P_TABLE, QgsProcessingParameterField.DataType.Any,
+            True
         )
         self.addParameterField(
-            self.P_VALUE_FIELD, self._VALUE_FIELD, None, self.P_TABLE, QgsProcessingParameterField.Any
+            self.P_VALUE_FIELD, self._VALUE_FIELD, None,
+            self.P_TABLE, QgsProcessingParameterField.DataType.Any
         )
         self.addParameterField(
-            self.P_NAME_FIELD, self._NAME_FIELD, None, self.P_TABLE, QgsProcessingParameterField.Any, False, True
+            self.P_NAME_FIELD, self._NAME_FIELD, None,
+            self.P_TABLE, QgsProcessingParameterField.DataType.Any, False, True
         )
         self.addParameterField(
-            self.P_COLOR_FIELD, self._COLOR_FIELD, None, self.P_TABLE, QgsProcessingParameterField.Any, False, True
+            self.P_COLOR_FIELD, self._COLOR_FIELD, None,
+            self.P_TABLE, QgsProcessingParameterField.DataType.Any, False, True
         )
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         table = self.parameterAsLayer(parameters, self.P_TABLE, context)
         featureFields = self.parameterAsFields(parameters, self.P_FEATURE_FIELDS, context)

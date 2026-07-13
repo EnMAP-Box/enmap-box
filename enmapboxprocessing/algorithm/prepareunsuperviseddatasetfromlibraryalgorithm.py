@@ -44,7 +44,7 @@ class PrepareUnsupervisedDatasetFromLibraryAlgorithm(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterVectorLayer(self.P_LIBRARY, self._LIBRARY)
         self.addParameterField(
-            self.P_FIELD, self._FIELD, None, self.P_LIBRARY, QgsProcessingParameterField.Any, False, True,
+            self.P_FIELD, self._FIELD, None, self.P_LIBRARY, QgsProcessingParameterField.DataType.Any, False, True,
             False, True
         )
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)

@@ -91,7 +91,7 @@ class ConvexHullAlgorithm(EnMAPProcessingAlgorithm):
             if filenameContinuumRemoved is not None:
                 writerContinuumRemoved = Driver(
                     filenameContinuumRemoved, feedback=feedback
-                ).createLike(reader, Qgis.Float32)
+                ).createLike(reader, Qgis.DataType.Float32)
 
             lineMemoryUsage = reader.lineMemoryUsage(dataTypeSize=4) * 3
             blockSizeY = min(raster.height(), ceil(Utils.maximumMemoryUsage() / lineMemoryUsage))

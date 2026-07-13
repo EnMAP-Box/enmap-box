@@ -38,8 +38,8 @@ class TestEnMAPBoxUtils(EnMAPBoxTestCase):
         self.assertEqual(ds1, ds2)
 
     def test_dataTypeName(self):
-        self.assertEqual(dataTypeName(Qgis.Byte), 'Byte')
-        self.assertEqual(dataTypeName(Qgis.ARGB32_Premultiplied), 'ARGB32_Premultiplied')
+        self.assertEqual(dataTypeName(Qgis.DataType.Byte), 'Byte')
+        self.assertEqual(dataTypeName(Qgis.DataType.ARGB32_Premultiplied), 'ARGB32_Premultiplied')
 
     def test_bandNames(self):
         validSources = [enmap, QgsRasterLayer(enmap), gdal.Open(enmap)]

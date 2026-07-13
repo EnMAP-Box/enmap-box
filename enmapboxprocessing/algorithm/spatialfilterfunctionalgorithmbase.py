@@ -9,7 +9,7 @@ from enmapbox.typeguard import typechecked
 class SpatialFilterFunctionAlgorithmBase(ApplyBandFunctionAlgorithmBase):
 
     def outputDataType(self) -> Qgis.DataType:
-        return Qgis.Float32
+        return Qgis.DataType.Float32
 
     def outputNoDataValue(self) -> float:
         return float(np.finfo(np.float32).min)

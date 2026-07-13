@@ -3,6 +3,8 @@ from collections import OrderedDict
 from typing import Dict, Any, List, Tuple
 
 from enmapbox.qgispluginsupport.qps.speclib import FIELD_VALUES
+from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.spectralresamplingbyresponsefunctionconvolutionalgorithmbase import \
     RESPONSE_CUTOFF_VALUE, RESPONSE_CUTOFF_DIGITS
 from enmapboxprocessing.algorithm.spectralresamplingtocustomsensoralgorithm import \
@@ -10,8 +12,6 @@ from enmapboxprocessing.algorithm.spectralresamplingtocustomsensoralgorithm impo
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from qgis.core import (QgsProcessingContext, QgsVectorLayer, QgsProcessingFeedback, QgsProcessingException,
                        QgsProcessingParameterField)
-from enmapbox.typeguard import typechecked
-from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
 
 
 @typechecked
@@ -46,12 +46,14 @@ class SpectralResamplingByResponseFunctionLibraryAlgorithm(EnMAPProcessingAlgori
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
         self.addParameterVectorLayer(self.P_LIBRARY, self._LIBRARY)
         self.addParameterField(
-            self.P_FIELD, self._FIELD, None, self.P_LIBRARY, QgsProcessingParameterField.Any, False, True, False, True
+            self.P_FIELD, self._FIELD, None,
+            self.P_LIBRARY, QgsProcessingParameterField.DataType.Any,
+            False, True, False, True
         )
         self.addParameterRasterDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         raster = self.parameterAsSpectralRasterLayer(parameters, self.P_RASTER, context)
         library = self.parameterAsVectorLayer(parameters, self.P_LIBRARY, context)
