@@ -99,8 +99,8 @@ class ScatterPlotDialog(QMainWindow):
         self.mMapCanvas: Optional[QgsMapCanvas] = None
         self.mLayerX.setProject(self.enmapBox.project())
         self.mLayerY.setProject(self.enmapBox.project())
-        self.mLayerX.setFilters(QgsMapLayerProxyModel.RasterLayer)
-        self.mFieldY.setFilters(QgsFieldProxyModel.Numeric)
+        self.mLayerX.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
+        self.mFieldY.setFilters(QgsFieldProxyModel.Filter.Numeric)
 
         self.mMinimumX.clearValue()
         self.mMaximumX.clearValue()
@@ -468,7 +468,7 @@ class ScatterPlotDialog(QMainWindow):
         # analytics
         if self.mOneToOneLine.isChecked():
             plotItem = self.mScatterPlot.plot([xmin, xmax], [xmin, xmax])
-            plotItem.setPen(mkPen(color=self.mOneToOneLineColor.color(), style=Qt.SolidLine))
+            plotItem.setPen(mkPen(color=self.mOneToOneLineColor.color(), style=Qt.PenStyle.SolidLine))
 
         if self.mFittedLine.isChecked():
             z = np.polyfit(x, y, 1)
@@ -476,7 +476,7 @@ class ScatterPlotDialog(QMainWindow):
             x_ = range[0]
             y_ = p(x_)
             plotItem = self.mScatterPlot.plot(x_, y_)
-            plotItem.setPen(mkPen(color=self.mFittedLineColor.color(), style=Qt.SolidLine))
+            plotItem.setPen(mkPen(color=self.mFittedLineColor.color(), style=Qt.PenStyle.SolidLine))
 
             r2 = round(pearsonr(x, y)[0] ** 2, 4)
             rmse = round(np.sqrt(np.mean((x - y) ** 2)), 4)

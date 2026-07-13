@@ -97,9 +97,9 @@ class MultipleMapLayerSelectionDialog(QDialog):
             item = QListWidgetItem(f'{layer.name()} [{crs.authid()}]')
             item.layer = layer
             if selection is not None and layer in selection:
-                item.setCheckState(Qt.Checked)
+                item.setCheckState(Qt.CheckState.Checked)
             else:
-                item.setCheckState(Qt.Unchecked)
+                item.setCheckState(Qt.CheckState.Unchecked)
             self.mList.addItem(item)
             # self.mLayers.append(layer)
 
@@ -113,7 +113,7 @@ class MultipleMapLayerSelectionDialog(QDialog):
         layers = list()
         for row in range(self.mList.count()):
             item = self.mList.item(row)
-            if item.checkState() == Qt.Checked:
+            if item.checkState() == Qt.CheckState.Checked:
                 layers.append(item.layer)
         return layers
 
@@ -124,20 +124,20 @@ class MultipleMapLayerSelectionDialog(QDialog):
     def onSelectAllClicked(self):
         for row in range(self.mList.count()):
             item = self.mList.item(row)
-            item.setCheckState(Qt.Checked)
+            item.setCheckState(Qt.CheckState.Checked)
 
     def onClearSelectionClicked(self):
         for row in range(self.mList.count()):
             item = self.mList.item(row)
-            item.setCheckState(Qt.Unchecked)
+            item.setCheckState(Qt.CheckState.Unchecked)
 
     def onToggleSelectionClicked(self):
         for row in range(self.mList.count()):
             item = self.mList.item(row)
-            if item.checkState() == Qt.Checked:
-                item.setCheckState(Qt.Unchecked)
+            if item.checkState() == Qt.CheckState.Checked:
+                item.setCheckState(Qt.CheckState.Unchecked)
             else:
-                item.setCheckState(Qt.Checked)
+                item.setCheckState(Qt.CheckState.Checked)
 
     @staticmethod
     def getLayers(

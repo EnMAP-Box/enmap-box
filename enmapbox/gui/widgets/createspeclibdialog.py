@@ -109,7 +109,7 @@ class CreateSpectralLibraryDialog(QDialog):
         self.radio_file.toggled.connect(self._on_storage_type_changed)
 
         # Dialog buttons
-        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        button_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
         button_box.accepted.connect(self.accept)
         button_box.rejected.connect(self.reject)
         layout.addWidget(button_box)
@@ -124,7 +124,7 @@ class CreateSpectralLibraryDialog(QDialog):
         path = self.destinationPath()
         v &= path is None or (isinstance(path, str) and len(path) > 0)
 
-        self.button_box.button(QDialogButtonBox.Ok).setEnabled(v)
+        self.button_box.button(QDialogButtonBox.StandardButton.Ok).setEnabled(v)
 
     def _on_storage_type_changed(self):
         """Enable/disable file selection based on storage type."""
@@ -143,7 +143,7 @@ class CreateSpectralLibraryDialog(QDialog):
         w = QgsFileWidget(self)
         w.setDialogTitle('Create empty spectral library')
         w.setFilter('GeoPackage (*.gpkg);;GeoJSON (*.geojson)')
-        if w.exec() == QDialog.Accepted:
+        if w.exec() == QDialog.DialogCode.Accepted:
             pass
         file_path, tmp = QFileDialog.getSaveFileName(
             self,
@@ -221,7 +221,7 @@ class CreateSpectralLibraryDialog(QDialog):
                 options
             )
 
-            if not r == QgsVectorFileWriter.NoError:
+            if not r == QgsVectorFileWriter.WriterError.NoError:
                 raise Exception(f'Unable to create {path}\n{errMsg}')
 
             slNew = QgsVectorLayer(newPath, layer_name)

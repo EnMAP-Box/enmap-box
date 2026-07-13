@@ -123,7 +123,7 @@ class MapCanvasListModel(QAbstractListModel):
     def canvas2idx(self, canvas):
         return self.createIndex(self.mMapCanvases.index(canvas), 0)
 
-    def data(self, index, role=Qt.DisplayRole):
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
         if not index.isValid():
             return None
 
@@ -134,11 +134,11 @@ class MapCanvasListModel(QAbstractListModel):
 
         value = None
         if isinstance(mapCanvas, MapCanvas):
-            if role == Qt.DisplayRole:
+            if role == Qt.ItemDataRole.DisplayRole:
                 value = '{}'.format(mapCanvas.name())
-            if role == Qt.DecorationRole:
+            if role == Qt.ItemDataRole.DecorationRole:
                 value = QIcon()
-            if role == Qt.UserRole:
+            if role == Qt.ItemDataRole.UserRole:
                 value = mapCanvas
         return value
 
@@ -191,13 +191,13 @@ class CanvasLinkDialog(QDialog):
         hb.addWidget(QLabel('Link '))
         hb.addWidget(self.cbSrcCanvas)
         hb.addWidget(QLabel('with...'))
-        hb.addSpacerItem(QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum))
+        hb.addSpacerItem(QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
 
         self.mWidgetLUT = dict()
         self.layout().addLayout(hb)
         hline = QFrame()
-        hline.setFrameShape(QFrame.HLine)
-        hline.setFrameShadow(QFrame.Sunken)
+        hline.setFrameShape(QFrame.Shape.HLine)
+        hline.setFrameShadow(QFrame.Shadow.Sunken)
         self.layout().addWidget(hline)
         self.layout().addLayout(self.grid)
         self.layout().addSpacing(0)
@@ -233,7 +233,7 @@ class CanvasLinkDialog(QDialog):
             self.setSourceCanvas(src)
 
     def currentSourceCanvas(self):
-        return self.cbSrcCanvas.itemData(self.cbSrcCanvas.currentIndex(), Qt.UserRole)
+        return self.cbSrcCanvas.itemData(self.cbSrcCanvas.currentIndex(), Qt.ItemDataRole.UserRole)
 
     def currentTargetCanvases(self) -> List[QgsMapCanvas]:
         srcCanvas = self.currentSourceCanvas()
@@ -315,8 +315,8 @@ class CanvasLinkDialog(QDialog):
             self.mWidgetLUT[trgCanvas] = btnDict
 
             if iRow == 0:
-                self.grid.addItem(QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum), iRow, iCol + 1)
-        self.grid.addItem(QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Expanding), self.grid.rowCount(), 0)
+                self.grid.addItem(QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum), iRow, iCol + 1)
+        self.grid.addItem(QSpacerItem(0, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding), self.grid.rowCount(), 0)
 
         self.updateLinkSelection()
 
@@ -372,7 +372,7 @@ class CanvasLinkTargetWidget(QFrame):
         self.canvas2.installEventFilter(self)
         self.layout = QGridLayout(self)
         self.setLayout(self.layout)
-        self.setCursor(Qt.ArrowCursor)
+        self.setCursor(Qt.CursorShape.ArrowCursor)
 
         ly = QHBoxLayout()
         # add buttons with link functions
@@ -401,7 +401,7 @@ class CanvasLinkTargetWidget(QFrame):
         }"""
 
         for bt in self.buttons:
-            bt.setAttribute(Qt.WA_PaintOnScreen)
+            bt.setAttribute(Qt.WidgetAttribute.WA_PaintOnScreen)
             bt.setStyleSheet(btStyle)
             bt.setIconSize(QSize(100, 100))
             bt.setAutoRaise(True)
@@ -409,7 +409,7 @@ class CanvasLinkTargetWidget(QFrame):
 
         self.layout.addLayout(ly, 0, 0)
         self.setStyleSheet('background-color:rgba(125, 125, 125, 125);')
-        self.setAttribute(Qt.WA_PaintOnScreen)
+        self.setAttribute(Qt.WidgetAttribute.WA_PaintOnScreen)
 
         self.updatePosition()
 
@@ -450,13 +450,13 @@ class CanvasLinkTargetWidget(QFrame):
 
     def eventFilter(self, obj, event):
 
-        if event.type() == QEvent.Resize:
+        if event.type() == QEvent.Type.Resize:
             self.updatePosition()
         return False
 
     def mousePressEvent(self, ev):
 
-        if ev.button() == Qt.RightButton:
+        if ev.button() == Qt.MouseButton.RightButton:
             # no choice, remove Widgets
             CanvasLink.RemoveMapLinkTargetWidgets(True)
             ev.accept()
@@ -801,7 +801,7 @@ class MapCanvasMapTools(QObject):
         self.mtPixelScaleExtent = PixelScaleExtentMapTool(canvas)
         self.mtFullExtentMapTool = FullExtentMapTool(canvas)
         self.mtCursorLocation = CursorLocationMapTool(canvas, True)
-        self.mtAddFeature = QgsMapToolAddFeature(canvas, cadDock, mode=QgsMapToolCapture.CaptureNone)
+        self.mtAddFeature = QgsMapToolAddFeature(canvas, cadDock, mode=QgsMapToolCapture.CaptureMode.CaptureNone)
         self.mtSelectFeature = QgsMapToolSelect(canvas)
 
     def mapTools(self) -> List[QgsMapTool]:
@@ -905,7 +905,7 @@ class MapCanvas(QgsMapCanvas):
     def mousePressEvent(self, event: QMouseEvent):
 
         self.setProperty(KEY_LAST_CLICKED, time.time())
-        set_cursor_location: bool = (event.button() == Qt.LeftButton and isinstance(self.mapTool(),
+        set_cursor_location: bool = (event.button() == Qt.MouseButton.LeftButton and isinstance(self.mapTool(),
                                                                                     (QgsMapToolIdentify,
                                                                                      CursorLocationMapTool)))
 
@@ -962,7 +962,7 @@ class MapCanvas(QgsMapCanvas):
         """
         if event is None:
             pt = QPointF(self.width() * 0.5, self.height() * 0.5)
-            event = QMouseEvent(QEvent.MouseButtonPress, pt, Qt.LeftButton, Qt.LeftButton, Qt.NoModifier)
+            event = QMouseEvent(QEvent.Type.MouseButtonPress, pt, Qt.MouseButton.LeftButton, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier)
             event = QgsMapMouseEvent(self, event)
 
         menu.setToolTipsVisible(True)
@@ -1000,12 +1000,12 @@ class MapCanvas(QgsMapCanvas):
 
     def keyPressEvent(self, e: QKeyEvent):
 
-        is_panning = bool(QApplication.mouseButtons() & Qt.MiddleButton)
-        is_ctrl = bool(QApplication.keyboardModifiers() & Qt.ControlModifier)
-        is_shift = bool(QApplication.keyboardModifiers() & Qt.ShiftModifier)
+        is_panning = bool(QApplication.mouseButtons() & Qt.MouseButton.MiddleButton)
+        is_ctrl = bool(QApplication.keyboardModifiers() & Qt.KeyboardModifier.ControlModifier)
+        is_shift = bool(QApplication.keyboardModifiers() & Qt.KeyboardModifier.ShiftModifier)
         del is_shift
 
-        if not is_panning and is_ctrl and e.key() in [Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down]:
+        if not is_panning and is_ctrl and e.key() in [Qt.Key.Key_Left, Qt.Key.Key_Right, Qt.Key.Key_Up, Qt.Key.Key_Down]:
             # find raster layer with a reference pixel grid
             rasterLayer: QgsRasterLayer = self.mCrosshairItem.rasterGridLayer()
             if not isinstance(rasterLayer, QgsRasterLayer):
@@ -1030,13 +1030,13 @@ class MapCanvas(QgsMapCanvas):
                 dy = rasterLayer.rasterUnitsPerPixelY()
 
                 ptB: SpatialPoint = None
-                if e.key() == Qt.Key_Left:
+                if e.key() == Qt.Key.Key_Left:
                     ptB = SpatialPoint(canvasCrs, ptA.x() - dx, ptA.y())
-                elif e.key() == Qt.Key_Right:
+                elif e.key() == Qt.Key.Key_Right:
                     ptB = SpatialPoint(canvasCrs, ptA.x() + dx, ptA.y())
-                elif e.key() == Qt.Key_Up:
+                elif e.key() == Qt.Key.Key_Up:
                     ptB = SpatialPoint(canvasCrs, ptA.x(), ptA.y() + dy)
-                elif e.key() == Qt.Key_Down:
+                elif e.key() == Qt.Key.Key_Down:
                     ptB = SpatialPoint(canvasCrs, ptA.x(), ptA.y() - dy)
                 else:
                     raise NotImplementedError()
@@ -1054,12 +1054,12 @@ class MapCanvas(QgsMapCanvas):
                     localPos = m2p.transform(ptR)
 
                     # simulate a left-button mouse-click
-                    event = QMouseEvent(QEvent.MouseButtonPress, localPos.toQPointF(), Qt.LeftButton, Qt.LeftButton,
-                                        Qt.NoModifier)
+                    event = QMouseEvent(QEvent.Type.MouseButtonPress, localPos.toQPointF(), Qt.MouseButton.LeftButton, Qt.MouseButton.LeftButton,
+                                        Qt.KeyboardModifier.NoModifier)
                     self.mousePressEvent(event)
 
-                    event = QMouseEvent(QEvent.MouseButtonRelease, localPos.toQPointF(), Qt.LeftButton,
-                                        Qt.LeftButton, Qt.NoModifier)
+                    event = QMouseEvent(QEvent.Type.MouseButtonRelease, localPos.toQPointF(), Qt.MouseButton.LeftButton,
+                                        Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier)
                     self.mouseReleaseEvent(event)
                     self.keyPressed.emit(e)
 
@@ -1212,7 +1212,7 @@ class MapCanvas(QgsMapCanvas):
 
         # check mime types we can handle
         if containsMapLayers(mimeData):
-            event.setDropAction(Qt.CopyAction)  # copy but do not remove
+            event.setDropAction(Qt.DropAction.CopyAction)  # copy but do not remove
             event.accept()
         else:
             event.ignore()
@@ -1223,7 +1223,7 @@ class MapCanvas(QgsMapCanvas):
         :param event: QDropEvent
         """
 
-        if event.dropAction() in [Qt.CopyAction, Qt.MoveAction]:
+        if event.dropAction() in [Qt.DropAction.CopyAction, Qt.DropAction.MoveAction]:
             mimeData: QMimeData = event.mimeData()
 
             # add map layers
@@ -1354,5 +1354,5 @@ def setMapCanvasCRSfromDialog(
 def setMapCanvasBackgroundColorFromDialog(mapCanvas: QgsMapCanvas, color: QColor = None):
     dialog = QgsColorDialog(mapCanvas)
     dialog.setColor(color)
-    if dialog.exec() == QgsColorDialog.Accepted:
+    if dialog.exec() == QgsColorDialog.DialogCode.Accepted:
         mapCanvas.setCanvasColor(dialog.color())

@@ -49,7 +49,7 @@ class SpectralIndexExplorerApp(EnMAPBoxApplication):
 
         # add main dock and toolbar button
         self.dock = SpectralIndexExplorerDockWidget(parent=self.parent())
-        interface.addDockWidget(Qt.RightDockWidgetArea, self.dock)
+        interface.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.dock)
         self.dock.setWindowIcon(self.icon())
         self.dock.hide()
 

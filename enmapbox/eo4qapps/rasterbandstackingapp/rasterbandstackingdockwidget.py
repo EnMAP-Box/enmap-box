@@ -54,7 +54,7 @@ class RasterBandStackingDockWidget(QDockWidget):
 
         self.currentLocationMapTool = currentLocationMapTool
         self.mFile.setFilePath('bandStack.vrt')
-        self.mGridRaster.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mGridRaster.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
 
         # set from outside
         self.interface = None
@@ -71,10 +71,10 @@ class RasterBandStackingDockWidget(QDockWidget):
         self.mRasterTable.installEventFilter(self)
 
     def eventFilter(self, source, event):
-        if (event.type() == QEvent.DragEnter):
+        if (event.type() == QEvent.Type.DragEnter):
             event.accept()
             return True
-        if (event.type() == QEvent.Drop):
+        if (event.type() == QEvent.Type.Drop):
             mimeData = event.mimeData()
 
             is_QGIS_LAYERTREE_FORMAT = any(
@@ -138,7 +138,7 @@ class RasterBandStackingDockWidget(QDockWidget):
         self.mRasterTable.setRowCount(self.mRasterTable.rowCount() + 1)
         row = self.mRasterTable.rowCount() - 1
         mRaster = QgsMapLayerComboBox()
-        mRaster.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        mRaster.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         mRaster.setExcludedProviders(['wms'])
         mRaster.setAllowEmptyLayer(True)
 

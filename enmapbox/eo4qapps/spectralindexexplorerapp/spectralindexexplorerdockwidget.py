@@ -44,7 +44,7 @@ class SpectralIndexExplorerDockWidget(QgsDockWidget):
         self.interface = None
         self.interfaceType = None
 
-        self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mLayer.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         self.loadIndices()
         self.loadBands()
         self.loadConstants()
@@ -76,7 +76,7 @@ class SpectralIndexExplorerDockWidget(QgsDockWidget):
     def setRowDisabled(self, row: int, disable: bool):
 
         item = self.mTableIndices.verticalHeaderItem(row)
-        color = QApplication.palette().color(QPalette.Text)
+        color = QApplication.palette().color(QPalette.ColorRole.Text)
 
         if disable:
             italic = True

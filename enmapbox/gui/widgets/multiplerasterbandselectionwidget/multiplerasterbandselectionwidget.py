@@ -94,9 +94,9 @@ class MultipleRasterBandSelectionDialog(QDialog):
             item = QListWidgetItem(bandName)
             item.bandNo = bandNo
             if bandNo in selection:
-                item.setCheckState(Qt.Checked)
+                item.setCheckState(Qt.CheckState.Checked)
             else:
-                item.setCheckState(Qt.Unchecked)
+                item.setCheckState(Qt.CheckState.Unchecked)
             self.mList.addItem(item)
 
         self.mOk.clicked.connect(self.onOkClicked)
@@ -109,7 +109,7 @@ class MultipleRasterBandSelectionDialog(QDialog):
         bandNumbers = list()
         for row in range(self.mList.count()):
             item = self.mList.item(row)
-            if item.checkState() == Qt.Checked:
+            if item.checkState() == Qt.CheckState.Checked:
                 bandNumbers.append(item.bandNo)
         return bandNumbers
 
@@ -120,22 +120,22 @@ class MultipleRasterBandSelectionDialog(QDialog):
     def onSelectAllClicked(self):
         for row in range(self.mList.count()):
             item = self.mList.item(row)
-            item.setCheckState(Qt.Checked)
+            item.setCheckState(Qt.CheckState.Checked)
 
     def onClearSelectionClicked(self):
         for row in range(self.mList.count()):
             item = self.mList.item(row)
-            item.setCheckState(Qt.Unchecked)
+            item.setCheckState(Qt.CheckState.Unchecked)
 
     def onToggleSelectionClicked(self):
         for row in range(self.mList.count()):
             item = self.mList.item(row)
             if not item.isSelected():
                 continue
-            if item.checkState() == Qt.Checked:
-                item.setCheckState(Qt.Unchecked)
+            if item.checkState() == Qt.CheckState.Checked:
+                item.setCheckState(Qt.CheckState.Unchecked)
             else:
-                item.setCheckState(Qt.Checked)
+                item.setCheckState(Qt.CheckState.Checked)
 
     @staticmethod
     def getBands(parent=None, selection: List[int] = None, bandNames: List[str] = None) -> Optional[List[int]]:

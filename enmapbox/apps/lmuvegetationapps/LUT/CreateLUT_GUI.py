@@ -1267,7 +1267,7 @@ class SensorEditor:
                 self.gui.tablePreview.setItem(row, col, item_wl)  # place wavelength item
                 self.gui.tablePreview.setItem(row, col + 1, item_weigh)  # place weight item
 
-        self.gui.tablePreview.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.gui.tablePreview.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         self.flag_srf = True
         self.flag_image = False
         self.check_flags()  # check if the app is ready to be run
@@ -1348,7 +1348,7 @@ class SensorEditor:
         for i in self.outreach:
             self.gui.tablePreview.item(i, 0).setBackground(QColor(200, 0, 0))
         self.gui.tablePreview.setHorizontalHeaderLabels(header_items)
-        self.gui.tablePreview.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.gui.tablePreview.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         wavelength_srf = np.delete(wavelength, self.outreach)
         fwhm_srf = np.delete(fwhm, self.outreach)
         self.x = np.array(list(zip(wavelength_srf, fwhm_srf)))

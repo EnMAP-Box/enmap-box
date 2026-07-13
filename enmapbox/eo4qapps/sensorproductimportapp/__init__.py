@@ -48,7 +48,7 @@ class SensorProductImportApp(EnMAPBoxApplication):
 
         # add main dock and toolbar button
         self.dock = SensorProductImportDockWidget(parent=self.parent())
-        interface.addDockWidget(Qt.LeftDockWidgetArea, self.dock)
+        interface.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.dock)
         self.dock.setWindowIcon(self.icon())
         self.dock.hide()
 

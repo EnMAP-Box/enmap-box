@@ -47,7 +47,7 @@ class ColorSpaceExplorerDialog(QMainWindow):
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None
         self.mLayer.setProject(self.enmapBox.project())
-        self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mLayer.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
 
         self.mLayer.layerChanged.connect(self.onLayerChanged)
 
@@ -218,8 +218,8 @@ class ColorSpaceExplorerDialog(QMainWindow):
         if hasattr(layer, 'setCacheImage'):
             layer.setCacheImage(None)
 
-        algorithm = QgsContrastEnhancement.StretchToMinimumMaximum
-        limits = QgsRasterMinMaxOrigin.CumulativeCut
+        algorithm = QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum
+        limits = QgsRasterMinMaxOrigin.Limits.CumulativeCut
         layer.setContrastEnhancement(algorithm, limits)  # rest is defined by the layer style
 
     def onLiveUpdate(self):
