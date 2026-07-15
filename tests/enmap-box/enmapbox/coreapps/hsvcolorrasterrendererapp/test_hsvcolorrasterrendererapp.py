@@ -1,23 +1,23 @@
-from bivariatecolorrasterrendererapp import BivariateColorRasterRendererDialog
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
 from enmapboxtestdata import enmap
+from hsvcolorrasterrendererapp import HsvColorRasterRendererDialog
 from qgis.core import QgsRasterLayer
 
 qgsApp = start_app()
 initAll()
 
 
-class TestBandStatisticsApp(TestCase):
+class TestHsvColorRasterRendererApp(TestCase):
 
     def test(self):
         enmapBox = EnMAPBox(None)
-        layer = QgsRasterLayer(enmap, 'enmap_berlin.bsq')
+        layer = QgsRasterLayer(enmap, 'enmap_berlin')
         enmapBox.onDataDropped([layer])
 
-        widget = BivariateColorRasterRendererDialog()
+        widget = HsvColorRasterRendererDialog()
         widget.show()
         widget.mLayer.setLayer(layer)
 

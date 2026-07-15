@@ -1,4 +1,5 @@
-from bivariatecolorrasterrendererapp import BivariateColorRasterRendererDialog
+from colorspaceexplorerapp import ColorSpaceExplorerDialog
+from decorrelationstretchapp import DecorrelationStretchDialog
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
@@ -10,14 +11,14 @@ qgsApp = start_app()
 initAll()
 
 
-class TestBandStatisticsApp(TestCase):
+class TestDecorrelationStretchApp(TestCase):
 
     def test(self):
         enmapBox = EnMAPBox(None)
-        layer = QgsRasterLayer(enmap, 'enmap_berlin.bsq')
+        layer = QgsRasterLayer(enmap, 'enmap_berlin')
         enmapBox.onDataDropped([layer])
 
-        widget = BivariateColorRasterRendererDialog()
+        widget = DecorrelationStretchDialog()
         widget.show()
         widget.mLayer.setLayer(layer)
 

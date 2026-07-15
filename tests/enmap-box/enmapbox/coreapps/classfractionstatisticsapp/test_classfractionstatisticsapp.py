@@ -1,23 +1,22 @@
-from bivariatecolorrasterrendererapp import BivariateColorRasterRendererDialog
-from enmapbox import initAll
+from classfractionstatisticsapp import ClassFractionStatisticsDialog
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
-from enmapboxtestdata import enmap
+from enmapboxtestdata import fraction_map_l3
 from qgis.core import QgsRasterLayer
 
 qgsApp = start_app()
-initAll()
+start_app()
 
 
-class TestBandStatisticsApp(TestCase):
+class TestClassFractionStatisticsApp(TestCase):
 
     def test(self):
         enmapBox = EnMAPBox(None)
-        layer = QgsRasterLayer(enmap, 'enmap_berlin.bsq')
+        layer = QgsRasterLayer(fraction_map_l3, 'fraction_map_l3')
         enmapBox.onDataDropped([layer])
 
-        widget = BivariateColorRasterRendererDialog()
+        widget = ClassFractionStatisticsDialog()
         widget.show()
         widget.mLayer.setLayer(layer)
 

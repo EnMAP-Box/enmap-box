@@ -1,4 +1,4 @@
-from bivariatecolorrasterrendererapp import BivariateColorRasterRendererDialog
+from bandstatisticsapp import BandStatisticsDialog
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
@@ -17,11 +17,12 @@ class TestBandStatisticsApp(TestCase):
         layer = QgsRasterLayer(enmap, 'enmap_berlin.bsq')
         enmapBox.onDataDropped([layer])
 
-        widget = BivariateColorRasterRendererDialog()
+        widget = BandStatisticsDialog()
         widget.show()
         widget.mLayer.setLayer(layer)
+        widget.onAddRendererBandsClicked()
 
-        if not False:
+        if False:
             qgsApp.exec()
 
         self.dispose_widget(widget)

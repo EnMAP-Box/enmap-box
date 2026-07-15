@@ -2,13 +2,14 @@ from os.path import join
 from typing import Union
 
 import numpy as np
-from qgis.core import QgsCoordinateReferenceSystem, QgsRectangle
 
 import enmapbox.testing
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import Array2d, Array3d, Number
+from qgis.PyQt.QtCore import QCoreApplication, QEvent
+from qgis.core import QgsCoordinateReferenceSystem, QgsRectangle
 
 enmapbox.testing.start_app()
 
@@ -49,3 +50,8 @@ class TestCase(enmapbox.testing.TestCase):
     ) -> RasterWriter:
         array = np.full(shape, value)
         return self.rasterFromArray(array, basename, extent, crs)
+
+    def dispose_widget(self, widget):
+        widget.close()
+        widget.deleteLater()
+        QCoreApplication.sendPostedEvents(None, QEvent.DeferredDelete)

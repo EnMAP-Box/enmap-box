@@ -1,4 +1,4 @@
-from bivariatecolorrasterrendererapp import BivariateColorRasterRendererDialog
+from enhancedmultibandcolorapp import EnhancedMultiBandColorDialog
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
@@ -10,14 +10,14 @@ qgsApp = start_app()
 initAll()
 
 
-class TestBandStatisticsApp(TestCase):
+class TestEnhancedMultiBandColorApp(TestCase):
 
     def test(self):
         enmapBox = EnMAPBox(None)
-        layer = QgsRasterLayer(enmap, 'enmap_berlin.bsq')
+        layer = QgsRasterLayer(enmap, 'enmap_berlin')
         enmapBox.onDataDropped([layer])
 
-        widget = BivariateColorRasterRendererDialog()
+        widget = EnhancedMultiBandColorDialog()
         widget.show()
         widget.mLayer.setLayer(layer)
 

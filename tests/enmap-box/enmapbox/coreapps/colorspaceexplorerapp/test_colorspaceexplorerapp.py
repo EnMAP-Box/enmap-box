@@ -1,4 +1,4 @@
-from bivariatecolorrasterrendererapp import BivariateColorRasterRendererDialog
+from colorspaceexplorerapp import ColorSpaceExplorerDialog
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
@@ -10,18 +10,18 @@ qgsApp = start_app()
 initAll()
 
 
-class TestBandStatisticsApp(TestCase):
+class TestColorSpaceExplorerApp(TestCase):
 
     def test(self):
         enmapBox = EnMAPBox(None)
         layer = QgsRasterLayer(enmap, 'enmap_berlin.bsq')
         enmapBox.onDataDropped([layer])
 
-        widget = BivariateColorRasterRendererDialog()
+        widget = ColorSpaceExplorerDialog()
         widget.show()
         widget.mLayer.setLayer(layer)
 
-        if not False:
+        if False:
             qgsApp.exec()
 
         self.dispose_widget(widget)
