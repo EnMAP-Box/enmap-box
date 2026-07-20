@@ -107,7 +107,7 @@ class EniccsCloudMaskAlgorithm(EnMAPProcessingAlgorithm):
         if run_eniccs is None:
             raise QgsProcessingException(
                 'The eniccs package is not installed. '
-                'Install it with: pip install eniccs'
+                'Install it with: pip install eniccs or conda install -c conda-forge eniccs'
             )
 
         folder = self.parameterAsFile(parameters, self.P_PRODUCT, context) # fallback for out_dir
