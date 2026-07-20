@@ -13,7 +13,7 @@ qgsApp = start_app()
 initAll()
 
 
-class TestMultiSourceMultiBandColorRendererDialog(TestCase):
+class TestRasterLayerStylingPanel(TestCase):
 
     def test(self):
         enmapBox = EnMAPBox(None)
@@ -25,11 +25,8 @@ class TestMultiSourceMultiBandColorRendererDialog(TestCase):
                 break
 
         self.assertIsInstance(widget, RasterLayerStylingPanel)
-        print('DONE')
 
-        widget.show()
-
-        if not False:
+        if False:
             qgsApp.exec()
 
         self.dispose_widget(widget)
