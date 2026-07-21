@@ -1,4 +1,3 @@
-from colorspaceexplorerapp import ColorSpaceExplorerDialog
 from decorrelationstretchapp import DecorrelationStretchDialog
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
@@ -22,7 +21,7 @@ class TestDecorrelationStretchApp(TestCase):
         widget.show()
         widget.mLayer.setLayer(layer)
 
-        if not False:
+        if False:
             qgsApp.exec()
 
         self.dispose_widget(widget)
