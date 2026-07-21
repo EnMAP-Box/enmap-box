@@ -413,7 +413,11 @@ class ScatterPlotDialog(QMainWindow):
         background = counts == 0
 
         # stretch counts
-        lower, upper = np.percentile(counts[counts != 0], [self.mDensityP1.value(), self.mDensityP2.value()])
+        validCounts = counts[counts != 0]
+        if len(validCounts) > 0:
+            lower, upper = np.percentile(validCounts, [self.mDensityP1.value(), self.mDensityP2.value()])
+        else:
+            return
         span = upper - lower
         span = max(span, 1)  # avoid devision by zero
         counts = np.round((counts - lower) * (254 / span))
