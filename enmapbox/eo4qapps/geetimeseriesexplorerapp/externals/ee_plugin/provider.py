@@ -13,7 +13,6 @@ from typing import Optional
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapbox.utils import importEarthEngine
 from enmapboxprocessing.utils import Utils
 from qgis.core import (
@@ -40,7 +39,6 @@ BAND_TYPES = {
 }
 
 
-@typechecked
 class GeetseEarthEngineRasterDataProvider(QgsRasterDataProvider):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -96,9 +94,9 @@ class GeetseEarthEngineRasterDataProvider(QgsRasterDataProvider):
 
     def capabilities(self):
         caps = (
-            QgsRasterInterface.Capability.Size
-            | QgsRasterInterface.Capability.Identify  # noqa: W503
-            | QgsRasterInterface.Capability.IdentifyValue  # noqa: W503
+                QgsRasterInterface.Capability.Size
+                | QgsRasterInterface.Capability.Identify  # noqa: W503
+                | QgsRasterInterface.Capability.IdentifyValue  # noqa: W503
         )
         return QgsRasterDataProvider.ProviderCapabilities(caps)
 

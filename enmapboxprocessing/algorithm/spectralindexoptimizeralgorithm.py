@@ -3,7 +3,6 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import RegressorDump
@@ -11,7 +10,6 @@ from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback
 
 
-@typechecked
 class SpectralIndexOptimizerAlgorithm(EnMAPProcessingAlgorithm):
     P_DATASET, _DATASET = 'dataset', 'Training dataset'
     P_FORMULA, _FORMULA = 'formula', 'Formula'
@@ -56,7 +54,7 @@ class SpectralIndexOptimizerAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterRasterDestination(self.P_OUTPUT_MATRIX, self._OUTPUT_MATRIX)
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         from sklearn.linear_model import LinearRegression
         from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error

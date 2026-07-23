@@ -1,6 +1,5 @@
 from typing import List, Optional
 
-from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QListWidget, QListWidgetItem, QDialog
 from qgis.PyQt.uic import loadUi
@@ -8,7 +7,6 @@ from qgis.core import QgsRasterLayer
 from qgis.gui import QgsRasterBandComboBox
 
 
-@typechecked
 class MultipleRasterBandSelectionWidget(QWidget):
     mBand: QgsRasterBandComboBox
     mButton: QToolButton
@@ -71,7 +69,6 @@ class MultipleRasterBandSelectionWidget(QWidget):
             self.updateInfo()
 
 
-@typechecked
 class MultipleRasterBandSelectionDialog(QDialog):
     mList: QListWidget
     mSelectAll: QToolButton

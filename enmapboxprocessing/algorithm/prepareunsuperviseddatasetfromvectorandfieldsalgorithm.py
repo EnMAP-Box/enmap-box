@@ -6,10 +6,8 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsFeature, QgsProcessingParameterField)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class PrepareUnsupervisedDatasetFromVectorAndFieldsAlgorithm(EnMAPProcessingAlgorithm):
     P_VECTOR, _VECTOR = 'vector', 'Vector layer'
     P_FEATURE_FIELDS, _FEATURE_FIELDS = 'featureFields', 'Fields with features'

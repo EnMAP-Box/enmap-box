@@ -1,18 +1,16 @@
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.PyQt.QtCore import QDateTime
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent, SpatialPoint
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.librarydriver import LibraryDriver
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtCore import QDateTime
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 
 
-@typechecked
 class MatchRasterAlgorithm(EnMAPProcessingAlgorithm):
     P_TIMESERIES, _TIMESERIES = 'timeSeries', 'Time series'
     P_POI, _POI = 'poi', 'Points of interest'

@@ -4,10 +4,8 @@ from typing import Optional, List
 
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsTask, QgsMessageLog, Qgis
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class DownloadProfileTask(QgsTask):
 
     def __init__(

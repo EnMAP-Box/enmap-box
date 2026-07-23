@@ -5,7 +5,6 @@ import numpy as np
 
 from decorrelationstretchapp.decorrelationstretchrenderer import DecorrelationStretchRenderer
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QCheckBox, \
     QMainWindow, QComboBox
@@ -14,7 +13,6 @@ from qgis.core import QgsRasterLayer, QgsMultiBandColorRenderer, QgsMapLayerProx
 from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsDoubleSpinBox, QgsMapLayerComboBox
 
 
-@typechecked
 class DecorrelationStretchDialog(QMainWindow):
     mLayer: QgsMapLayerComboBox
     mRed: QgsRasterBandComboBox

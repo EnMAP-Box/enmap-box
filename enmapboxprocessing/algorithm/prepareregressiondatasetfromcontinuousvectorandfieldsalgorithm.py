@@ -8,10 +8,8 @@ from enmapboxprocessing.typing import checkSampleShape, SampleX, SampleY, Target
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsFeature, QgsProcessingParameterField,
                        QgsVectorLayer, QgsProcessingException)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class PrepareRegressionDatasetFromContinuousVectorAndFieldsAlgorithm(EnMAPProcessingAlgorithm):
     P_CONTINUOUS_VECTOR, _CONTINUOUS_VECTOR = 'continuousVector', 'Continuous-valued vector layer'
     P_FEATURE_FIELDS, _FEATURE_FIELDS = 'featureFields', 'Fields with features'

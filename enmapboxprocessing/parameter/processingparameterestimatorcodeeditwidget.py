@@ -1,5 +1,3 @@
-from qgis.PyQt.uic import loadUi
-
 from enmapboxprocessing.algorithm.algorithms import algorithms
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 from enmapboxprocessing.algorithm.fitrandomforestclassifieralgorithm import FitRandomForestClassifierAlgorithm
@@ -8,10 +6,9 @@ from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorA
 from enmapboxprocessing.parameter.processingparametercodeeditwidget import CodeEditWidget
 from processing.gui.wrappers import WidgetWrapper
 from qgis.PyQt.QtWidgets import QWidget, QComboBox, QTextBrowser
-from enmapbox.typeguard import typechecked
+from qgis.PyQt.uic import loadUi
 
 
-@typechecked
 class ProcessingParameterEstimatorCodeEdit(QWidget):
     mEstimator: QComboBox
     mCode: CodeEditWidget
@@ -57,7 +54,6 @@ class ProcessingParameterEstimatorCodeEdit(QWidget):
         return self.mCode.value()
 
 
-@typechecked
 class ProcessingParameterEstimatorCodeEditWrapper(WidgetWrapper):
     widget: ProcessingParameterEstimatorCodeEdit
 
@@ -71,14 +67,12 @@ class ProcessingParameterEstimatorCodeEditWrapper(WidgetWrapper):
         return self.widget.value()
 
 
-@typechecked
 class ProcessingParameterClassifierCodeEditWrapper(ProcessingParameterEstimatorCodeEditWrapper):
 
     def createWidget(self):
         return ProcessingParameterEstimatorCodeEdit(ProcessingParameterEstimatorCodeEdit.Classifier)
 
 
-@typechecked
 class ProcessingParameterRegressorCodeEditWrapper(ProcessingParameterEstimatorCodeEditWrapper):
 
     def createWidget(self):

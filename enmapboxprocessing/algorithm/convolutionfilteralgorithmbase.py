@@ -5,7 +5,6 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
@@ -13,7 +12,6 @@ from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
 
 
-@typechecked
 class ConvolutionFilterAlgorithmBase(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_KERNEL, _KERNEL = 'kernel', 'Kernel'
@@ -103,7 +101,7 @@ class ConvolutionFilterAlgorithmBase(EnMAPProcessingAlgorithm):
         return True, ''
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         kernel = self.parameterAsKernel(parameters, self.P_KERNEL, context)

@@ -7,7 +7,6 @@ from osgeo import gdal
 from pyqtgraph import PlotWidget, GraphicsObject, mkBrush, mkPen
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import Category
@@ -24,7 +23,6 @@ from qgis.core import (
 from qgis.gui import QgsMapLayerComboBox, QgsMapCanvas, QgsFieldComboBox, QgsFeaturePickerWidget
 
 
-@typechecked
 class ClassificationStatisticsDialog(QMainWindow):
     mLayer: QgsMapLayerComboBox
     mTable: QTableWidget
@@ -369,7 +367,6 @@ class ClassificationStatisticsDialog(QMainWindow):
         return marray.astype(bool)
 
 
-@typechecked
 class HistogramPlotWidget(PlotWidget):
     def __init__(self):
         PlotWidget.__init__(self, parent=None, background='#ffffff')

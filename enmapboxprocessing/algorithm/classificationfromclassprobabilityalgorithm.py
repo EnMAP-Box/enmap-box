@@ -4,7 +4,6 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
@@ -14,7 +13,6 @@ from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, Qgis, QgsMapLayer
 
 
-@typechecked
 class ClassificationFromClassProbabilityAlgorithm(EnMAPProcessingAlgorithm):
     P_PROBABILITY, _PROBABILITY = 'probability', 'Class probability layer'
     P_OUTPUT_CLASSIFICATION, _OUTPUT_CLASSIFICATION = 'outputClassification', 'Output classification layer'
@@ -41,7 +39,7 @@ class ClassificationFromClassProbabilityAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterRasterDestination(self.P_OUTPUT_CLASSIFICATION, self._OUTPUT_CLASSIFICATION)
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         probability = self.parameterAsRasterLayer(parameters, self.P_PROBABILITY, context)
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_CLASSIFICATION, context)

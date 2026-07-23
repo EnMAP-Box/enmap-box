@@ -5,7 +5,6 @@ from typing import Dict, Any, List, Tuple, Optional
 
 from osgeo import gdal
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.vrtbandmathalgorithm import VrtBandMathAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.gdalutils import GdalUtils
@@ -16,7 +15,6 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessin
                        QgsRasterLayer, QgsProcessingParameterFile)
 
 
-@typechecked
 class CreateSpectralIndicesAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_INDICES, _INDICES = 'indices', 'Indices'

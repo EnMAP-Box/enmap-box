@@ -1,9 +1,5 @@
 from typing import Dict, Any, List, Tuple
 
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessingParameterField,
-                       QgsCategorizedSymbolRenderer, QgsProcessingException)
-
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedrasteralgorithm import \
     PrepareClassificationDatasetFromCategorizedRasterAlgorithm
 from enmapboxprocessing.algorithm.rasterizecategorizedvectoralgorithm import RasterizeCategorizedVectorAlgorithm
@@ -11,9 +7,10 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessingParameterField,
+                       QgsCategorizedSymbolRenderer, QgsProcessingException)
 
 
-@typechecked
 class PrepareClassificationDatasetFromCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
     P_CATEGORIZED_VECTOR, _CATEGORIZED_VECTOR = 'categorizedVector', 'Categorized vector layer'
     P_FEATURE_RASTER, _FEATURE_RASTER = 'featureRaster', 'Raster layer with features'

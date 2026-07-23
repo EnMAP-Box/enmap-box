@@ -4,7 +4,6 @@ import numpy as np
 
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import FIELD_VALUES
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import checkSampleShape, ClassifierDump
 from enmapboxprocessing.utils import Utils
@@ -12,7 +11,6 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCategoriz
                        QgsProcessingParameterField, QgsProcessingException, QgsFeature)
 
 
-@typechecked
 class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessingAlgorithm):
     P_CATEGORIZED_LIBRARY, _CATEGORIZED_LIBRARY = 'categorizedLibrary', 'Categorized spectral library'
     P_FIELD, _FIELD = 'field', 'Field with spectral profiles used as features'
@@ -72,7 +70,7 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         library = self.parameterAsVectorLayer(parameters, self.P_CATEGORIZED_LIBRARY, context)
         binaryField = self.parameterAsField(parameters, self.P_FIELD, context)

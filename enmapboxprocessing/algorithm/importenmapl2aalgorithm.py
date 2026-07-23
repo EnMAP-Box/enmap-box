@@ -1,13 +1,11 @@
 import zipfile
 from os.path import basename, splitext
 from typing import Dict, Any, List, Tuple
-from defusedxml import ElementTree
 
 import numpy as np
+from defusedxml import ElementTree
 from osgeo import gdal
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer, QgsMapLayer
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.algorithm.importenmapl1balgorithm import ImportEnmapL1BAlgorithm
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
@@ -15,9 +13,9 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer, QgsMapLayer
 
 
-@typechecked
 class ImportEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
     P_FILE, _FILE = 'file', 'Metadata file or ZIP file'
     P_EXCLUDE_NO_DATA_BANDS, _EXCLUDE_NO_DATA_BANDS, = 'excludeNoDataBands', 'Exclude no data bands'

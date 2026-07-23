@@ -1,13 +1,12 @@
 import unittest
 
-from qgis.PyQt.QtCore import QMetaType
-from qgis.PyQt.QtWidgets import QApplication
-from qgis.core import QgsFields, QgsField, Qgis, QgsProject
-
 from enmapbox import initAll
 from enmapbox.exampledata import landcover_polygon
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import TestCase, start_app, TestObjects
+from qgis.PyQt.QtCore import QMetaType
+from qgis.PyQt.QtWidgets import QApplication
+from qgis.core import QgsFields, QgsField, Qgis, QgsProject
 
 start_app()
 initAll()

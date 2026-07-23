@@ -3,7 +3,6 @@ from typing import List, Tuple
 from enmapboxprocessing.parameter.processingparametercodeeditwidget import CodeEditWidget
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QLabel, QVBoxLayout, QLineEdit
-from enmapbox.typeguard import typechecked
 
 
 class DialogUi(object):
@@ -33,7 +32,6 @@ class DialogUi(object):
         vbox.addWidget(self.buttonBox)
 
 
-@typechecked
 class SnippetSaveAsDialog(QDialog, DialogUi):
     mSnippet: CodeEditWidget
     placeholders: List[Tuple[QLineEdit, str]]

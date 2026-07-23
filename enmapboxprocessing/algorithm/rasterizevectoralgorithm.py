@@ -1,7 +1,6 @@
 import re
 from typing import Dict, Any, List, Tuple
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.utils import Utils
@@ -11,7 +10,6 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLay
                        QgsProject, QgsCoordinateTransform, QgsField)
 
 
-@typechecked
 class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
     P_VECTOR, _VECTOR = 'vector', 'Vector layer'
     P_GRID, _GRID = 'grid', 'Grid'
@@ -70,7 +68,7 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
         return True, ''
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         grid = self.parameterAsRasterLayer(parameters, self.P_GRID, context)
         vector = self.parameterAsVectorLayer(parameters, self.P_VECTOR, context)

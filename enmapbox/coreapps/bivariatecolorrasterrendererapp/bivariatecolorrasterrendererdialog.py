@@ -6,7 +6,6 @@ from scipy.interpolate import LinearNDInterpolator
 
 from bivariatecolorrasterrendererapp.bivariatecolorrasterrenderer import BivariateColorRasterRenderer
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QCheckBox, QMainWindow, QComboBox, QMenu, QAction, QPushButton, \
@@ -17,14 +16,12 @@ from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsDoubleSpinBox, QgsM
     QgsSpinBox
 
 
-@typechecked
 class ColorPlanePlotWidget(PlotWidget):
     def __init__(self, *args):
         PlotWidget.__init__(self, parent=None, background='#f0f0f0')
         self.setDefaultPadding(padding=0.02)
 
 
-@typechecked
 class BivariateColorRasterRendererDialog(QMainWindow):
     mLayer: QgsMapLayerComboBox
     mBand1: QgsRasterBandComboBox
@@ -305,7 +302,6 @@ class BivariateColorRasterRendererDialog(QMainWindow):
             self.onApplyClicked()
 
 
-@typechecked
 def smartRound(value: float) -> str:
     if abs(value) < 0.1:
         return str(round(value, 4))

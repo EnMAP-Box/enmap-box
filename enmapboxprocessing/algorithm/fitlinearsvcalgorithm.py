@@ -1,8 +1,6 @@
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 
 
-@typechecked
 class FitLinearSvcAlgorithm(FitClassifierAlgorithmBase):
 
     def displayName(self) -> str:

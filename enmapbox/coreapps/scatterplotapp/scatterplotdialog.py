@@ -13,7 +13,6 @@ from scipy.stats import binned_statistic_2d, pearsonr
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import MarkerSymbolComboBox, MarkerSymbol
 from enmapbox.qgispluginsupport.qps.processing.algorithmdialog import AlgorithmDialog
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
@@ -28,7 +27,6 @@ from qgis.gui import QgsMapLayerComboBox, QgsMapCanvas, QgsRasterBandComboBox, Q
     QgsFilterLineEdit, QgsFieldComboBox
 
 
-@typechecked
 class ScatterPlotWidget(PlotWidget):
 
     def __init__(self, *args, **kwargs):
@@ -48,7 +46,6 @@ class ScatterPlotWidget(PlotWidget):
         self.autoRange()
 
 
-@typechecked
 class ScatterPlotDialog(QMainWindow):
     mLayerX: QgsMapLayerComboBox
     mLayerY: QgsMapLayerComboBox
@@ -496,7 +493,6 @@ class ScatterPlotDialog(QMainWindow):
         self.onApplyClicked()
 
 
-@typechecked
 def utilsQgsColorRampToPyQtGraphLookupTable(colorRamp: QgsColorRamp) -> np.ndarray:
     array = np.empty(shape=(256, 4), dtype=np.uint8)
     for i in range(256):

@@ -13,7 +13,6 @@ import numpy as np
 from osgeo import gdal
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent, SpatialPoint
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.typing import (NumpyDataType, MetadataValue, GdalDataType,
                                        GdalResamplingAlgorithm, Categories, Category, Targets, Target)
 from qgis.PyQt.QtCore import QDateTime, QDate, QTime
@@ -32,7 +31,6 @@ from qgis.core import (QgsRasterBlock, QgsProcessingFeedback, QgsPalettedRasterR
 from qgis.gui import QgsMapCanvas
 
 
-@typechecked
 class Utils(object):
 
     @staticmethod
@@ -220,7 +218,7 @@ class Utils(object):
 
     @classmethod
     def qgisFeedbackToGdalCallback(
-        cls, feedback: QgsProcessingFeedback = None
+            cls, feedback: QgsProcessingFeedback = None
     ) -> Optional[Callable]:
         if feedback is None:
             callback = None
@@ -234,7 +232,7 @@ class Utils(object):
 
     @classmethod
     def palettedRasterRendererFromCategories(
-        cls, provider: QgsRasterDataProvider, bandNumber: int, categories: Categories
+            cls, provider: QgsRasterDataProvider, bandNumber: int, categories: Categories
     ) -> QgsPalettedRasterRenderer:
         classes = [QgsPalettedRasterRenderer.Class(c.value, QColor(c.color), c.name) for c in categories]
         renderer = QgsPalettedRasterRenderer(provider, bandNumber, classes)
@@ -242,7 +240,7 @@ class Utils(object):
 
     @classmethod
     def multiBandColorRenderer(
-        cls, provider: QgsRasterDataProvider, bandNumbers: List[int], minValues: List[float], maxValues: List[float]
+            cls, provider: QgsRasterDataProvider, bandNumbers: List[int], minValues: List[float], maxValues: List[float]
     ) -> QgsMultiBandColorRenderer:
 
         renderer = QgsMultiBandColorRenderer(provider, *bandNumbers)
@@ -272,7 +270,7 @@ class Utils(object):
 
     @classmethod
     def singleBandGrayRenderer(
-        cls, provider: QgsRasterDataProvider, grayBand: int, minValue: float, maxValue: float
+            cls, provider: QgsRasterDataProvider, grayBand: int, minValue: float, maxValue: float
     ) -> QgsSingleBandGrayRenderer:
 
         renderer = QgsSingleBandGrayRenderer(provider, grayBand)
@@ -286,8 +284,8 @@ class Utils(object):
 
     @classmethod
     def singleBandPseudoColorRenderer(
-        cls, provider: QgsRasterDataProvider, bandNo: int, minValue: float, maxValue: float,
-        colorRamp: Optional[QgsColorRamp] = None, colorRampType=QgsColorRampShader.Type.Interpolated,
+            cls, provider: QgsRasterDataProvider, bandNo: int, minValue: float, maxValue: float,
+            colorRamp: Optional[QgsColorRamp] = None, colorRampType=QgsColorRampShader.Type.Interpolated,
 
     ) -> QgsSingleBandPseudoColorRenderer:
         shader = QgsRasterShader()
@@ -307,7 +305,7 @@ class Utils(object):
 
     @classmethod
     def deriveColorRampShaderRampItems(
-        cls, minValue: float, maxValue: float, ramp: QgsColorRamp
+            cls, minValue: float, maxValue: float, ramp: QgsColorRamp
     ) -> List[QgsColorRampShader.ColorRampItem]:
 
         # derive ramp items
@@ -320,7 +318,7 @@ class Utils(object):
 
     @classmethod
     def categorizedSymbolRendererFromCategories(
-        cls, fieldName: str, categories: Categories
+            cls, fieldName: str, categories: Categories
     ) -> QgsCategorizedSymbolRenderer:
         rendererCategories = list()
         for c in categories:
@@ -371,7 +369,7 @@ class Utils(object):
 
     @classmethod
     def categoriesFromVectorField(
-        cls, vector: QgsVectorLayer, valueField: str, nameField: str = None, colorField: str = None
+            cls, vector: QgsVectorLayer, valueField: str, nameField: str = None, colorField: str = None
     ) -> Categories:
         feature: QgsFeature
         values = list()
@@ -581,7 +579,7 @@ class Utils(object):
 
     @classmethod
     def prepareCategories(
-        cls, categories: Categories, valuesToInt=False, removeLastIfEmpty=False
+            cls, categories: Categories, valuesToInt=False, removeLastIfEmpty=False
     ) -> Tuple[Categories, Dict]:
 
         categoriesOrig = categories
@@ -828,7 +826,7 @@ class Utils(object):
 
     @classmethod
     def transformExtent(
-        cls, extent: QgsRectangle, crs: QgsCoordinateReferenceSystem, toCrs: QgsCoordinateReferenceSystem
+            cls, extent: QgsRectangle, crs: QgsCoordinateReferenceSystem, toCrs: QgsCoordinateReferenceSystem
     ) -> QgsRectangle:
 
         if crs == toCrs:

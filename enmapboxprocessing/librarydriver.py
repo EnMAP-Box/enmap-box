@@ -1,12 +1,10 @@
 from typing import List
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.librarywriter import LibraryWriter
 from qgis.PyQt.QtCore import QVariant
 from qgis.core import QgsCoordinateReferenceSystem, QgsGeometry, QgsVectorLayer, Qgis, QgsWkbTypes
 
 
-@typechecked
 class LibraryDriver(object):
 
     def create(

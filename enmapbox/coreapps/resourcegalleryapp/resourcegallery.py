@@ -5,10 +5,8 @@ from qgis.PyQt.QtCore import QSize
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMainWindow, QListWidget, QListWidgetItem, QLineEdit, QComboBox
 from qgis.PyQt.uic import loadUi
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class ResourceGalleryDialog(QMainWindow):
     mList: QListWidget
     mPath: QLineEdit

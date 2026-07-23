@@ -1,6 +1,5 @@
 from typing import List
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.parameter.processingparametercodeeditwidget import CodeEditWidget
 from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QComboBox, QLabel, QVBoxLayout
 from qgis.core import QgsRasterLayer
@@ -34,7 +33,6 @@ class DialogUi(object):
         vbox.addWidget(self.buttonBox)
 
 
-@typechecked
 class SnippetInsertDialog(QDialog, DialogUi):
     sources: List
     mCode: CodeEditWidget

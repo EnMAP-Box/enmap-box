@@ -1,10 +1,9 @@
-from defusedxml import ElementTree as ET
 from os.path import basename, dirname, join
 from typing import Dict, Any, List, Tuple
 
+from defusedxml import ElementTree as ET
 from osgeo import gdal
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.gdalutils import GdalUtils
@@ -13,7 +12,6 @@ from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer, QgsMapLayer
 
 
-@typechecked
 class ImportSentinel2L2AAlgorithm(EnMAPProcessingAlgorithm):
     P_FILE, _FILE = 'file', 'Metadata file or ZIP file'
     P_BAND_LIST, _BAND_LIST = 'bandList', 'Band list'

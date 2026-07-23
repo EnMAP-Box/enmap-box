@@ -6,16 +6,14 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.utils import Utils
 from processing.core.Processing import Processing
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class TranslateCategorizedRasterAlgorithm(EnMAPProcessingAlgorithm):
     P_CATEGORIZED_RASTER, _CATEGORIZED_RASTER = 'categorizedRaster', 'Categorized raster layer'
     P_GRID, _GRID = 'grid', 'Grid'
     P_MAJORITY_VOTING, _MAJORITY_VOTING = 'majorityVoting', 'Majority voting'
     P_OUTPUT_CATEGORIZED_RASTER, _OUTPUT_CATEGORIZED_RASTER = 'outputTranslatedCategorizedRaster', \
-                                                              'Output categorized raster layer'
+        'Output categorized raster layer'
 
     def displayName(self):
         return 'Translate categorized raster layer'

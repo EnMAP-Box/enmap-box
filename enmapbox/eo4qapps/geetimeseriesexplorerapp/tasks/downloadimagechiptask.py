@@ -5,7 +5,6 @@ import numpy as np
 from osgeo import gdal
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
-from enmapbox.typeguard import typechecked
 from enmapbox.utils import importEarthEngine
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterreader import RasterReader
@@ -15,7 +14,6 @@ from geetimeseriesexplorerapp.imageinfo import ImageInfo
 from qgis.core import QgsTask, QgsRasterLayer, QgsCoordinateReferenceSystem, QgsRectangle, QgsMessageLog, Qgis
 
 
-@typechecked
 class DownloadImageChipBandTask(QgsTask):
 
     def __init__(self, filename: str, location: SpatialPoint, eeImage, bandName: str):
@@ -108,7 +106,6 @@ class DownloadImageChipBandTask(QgsTask):
             )
 
 
-@typechecked
 class DownloadImageChipTask(QgsTask):
     """Build image chip VRT."""
 

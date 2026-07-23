@@ -1,9 +1,7 @@
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.spatialfilterfunctionalgorithmbase import SpatialFilterFunctionAlgorithmBase
 from enmapboxprocessing.enmapalgorithm import Group
 
 
-@typechecked
 class SpatialPrewittAlgorithm(SpatialFilterFunctionAlgorithmBase):
 
     def displayName(self) -> str:

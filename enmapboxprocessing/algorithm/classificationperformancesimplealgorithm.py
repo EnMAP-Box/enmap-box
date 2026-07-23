@@ -9,7 +9,6 @@ from typing import Dict, Any, List, Tuple
 import numpy as np
 from sklearn.metrics import classification_report, confusion_matrix
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.rasterizecategorizedvectoralgorithm import RasterizeCategorizedVectorAlgorithm
 from enmapboxprocessing.algorithm.translatecategorizedrasteralgorithm import TranslateCategorizedRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
@@ -20,7 +19,6 @@ from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLaye
     QgsProcessingException
 
 
-@typechecked
 class ClassificationPerformanceSimpleAlgorithm(EnMAPProcessingAlgorithm):
     P_CLASSIFICATION, _CLASSIFICATION = 'classification', 'Predicted classification layer'
     P_REFERENCE, _REFERENCE = 'reference', 'Observed categorized layer'
@@ -220,7 +218,9 @@ class ClassificationPerformanceSimpleAlgorithm(EnMAPProcessingAlgorithm):
             )
 
 
-@typechecked()
+()
+
+
 @dataclass
 class AccuracyAssessmentResult(object):
     sampleSize: int
@@ -236,7 +236,6 @@ class AccuracyAssessmentResult(object):
     f1Se: List[float]
 
 
-@typechecked
 def accuracyAssessment(
         observed: np.ndarray, predicted: np.ndarray, classNames: List[str], classValues: List[Any]
 ) -> AccuracyAssessmentResult:

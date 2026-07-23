@@ -7,10 +7,7 @@ from os.path import exists, dirname
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer, \
-    QgsProcessingException
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.rasterizecategorizedvectoralgorithm import RasterizeCategorizedVectorAlgorithm
 from enmapboxprocessing.algorithm.translatecategorizedrasteralgorithm import TranslateCategorizedRasterAlgorithm
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
@@ -19,9 +16,10 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.reportwriter import MultiReportWriter, HtmlReportWriter, CsvReportWriter
 from enmapboxprocessing.typing import Categories
 from enmapboxprocessing.utils import Utils
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer, \
+    QgsProcessingException
 
 
-@typechecked
 class RocCurveAlgorithm(EnMAPProcessingAlgorithm):
     P_PROBABILITY, _PROBABILITY = 'regression', 'Class probability layer'
     P_REFERENCE, _REFERENCE = 'reference', 'Observed categorized layer'
@@ -252,7 +250,6 @@ class RocCurveAlgorithm(EnMAPProcessingAlgorithm):
             report.writeImage(filenameFig)
 
 
-@typechecked
 @dataclass
 class RocCurveResult(object):
     n: int
@@ -262,7 +259,6 @@ class RocCurveResult(object):
     rocAucScore: float
 
 
-@typechecked
 @dataclass
 class DetCurveResult(object):
     n: int
@@ -271,7 +267,6 @@ class DetCurveResult(object):
     thresholds: np.ndarray
 
 
-@typechecked
 def rocCurve(yObserved: np.ndarray, yPredicted: np.ndarray):
     from sklearn.metrics import roc_curve, roc_auc_score
 
@@ -299,7 +294,6 @@ def rocCurve(yObserved: np.ndarray, yPredicted: np.ndarray):
     return RocCurveResult(n, fpr, tpr, thresholds, float(rocAucScore))
 
 
-@typechecked
 def detCurve(yObserved: np.ndarray, yPredicted: np.ndarray):
     from sklearn.metrics import det_curve
 

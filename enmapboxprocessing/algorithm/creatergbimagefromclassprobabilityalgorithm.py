@@ -12,10 +12,8 @@ from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtGui import QColor
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsRasterLayer, Qgis,
                        QgsProcessingException)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class CreateRgbImageFromClassProbabilityAlgorithm(EnMAPProcessingAlgorithm):
     P_PROBABILITY, _PROBABILITY = 'probability', 'Class probability/fraction layer'
     P_COLORS, _COLORS = 'colors', 'Colors'

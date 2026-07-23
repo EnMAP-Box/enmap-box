@@ -1,8 +1,6 @@
 from enmapboxprocessing.algorithm.convolutionfilteralgorithmbase import ConvolutionFilterAlgorithmBase
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class SpatialConvolutionCustom2DAlgorithm(ConvolutionFilterAlgorithmBase):
 
     def displayName(self) -> str:

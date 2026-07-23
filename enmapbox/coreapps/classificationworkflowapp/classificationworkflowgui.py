@@ -8,7 +8,6 @@ from typing import Tuple, Dict, Optional
 import numpy as np
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.algorithms import algorithms
 from enmapboxprocessing.algorithm.classificationperformancesimplealgorithm import \
     ClassificationPerformanceSimpleAlgorithm
@@ -119,7 +118,6 @@ def errorHandled(func=None, *, successMessage: str = None):
     return wrapper
 
 
-@typechecked
 class ClassificationWorkflowGui(QMainWindow):
     mProgress: QProgressBar
     mCancel: QToolButton

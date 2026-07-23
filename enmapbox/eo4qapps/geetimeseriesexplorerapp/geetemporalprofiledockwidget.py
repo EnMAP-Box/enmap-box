@@ -12,7 +12,6 @@ import skops
 
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyle, MarkerSymbol
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
-from enmapbox.typeguard import typechecked
 from enmapbox.utils import importEarthEngine
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from geetimeseriesexplorerapp.geetimeseriesexplorerdockwidget import GeeTimeseriesExplorerDockWidget
@@ -43,7 +42,6 @@ from qgis.gui import (
 )
 
 
-@typechecked
 class GeeTemporalProfileDockWidget(QDockWidget):
     mMessageBar: QgsMessageBar
     mIdentify: QToolButton

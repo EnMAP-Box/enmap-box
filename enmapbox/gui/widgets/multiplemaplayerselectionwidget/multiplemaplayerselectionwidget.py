@@ -1,13 +1,11 @@
 from typing import List, Optional
 
-from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtWidgets import QWidget, QLineEdit, QToolButton, QListWidget, QListWidgetItem, QDialog
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsMapLayer, QgsProject, QgsCoordinateReferenceSystem, QgsRasterLayer, QgsVectorLayer
 
 
-@typechecked
 class MultipleMapLayerSelectionWidget(QWidget):
     mInfo: QLineEdit
     mButton: QToolButton
@@ -70,7 +68,6 @@ class MultipleMapLayerSelectionWidget(QWidget):
         self.updateInfo()
 
 
-@typechecked
 class MultipleMapLayerSelectionDialog(QDialog):
     mList: QListWidget
     mSelectAll: QToolButton

@@ -3,14 +3,12 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
 
-@typechecked
 class PrepareUnsupervisedDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
     P_CODE, _CODE = 'code', 'Code'
     P_OUTPUT_DATASET, _OUTPUT_DATASET = 'outputUnsupervisedDataset', 'Output dataset'
@@ -54,7 +52,7 @@ class PrepareUnsupervisedDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
         return lines
 
     def parameterAsTransformerDump(
-        self, parameters: Dict[str, Any], name, context: QgsProcessingContext
+            self, parameters: Dict[str, Any], name, context: QgsProcessingContext
     ) -> TransformerDump:
         namespace = dict()
         code = self.parameterAsString(parameters, name, context)
@@ -75,7 +73,7 @@ class PrepareUnsupervisedDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_DATASET, context)
 

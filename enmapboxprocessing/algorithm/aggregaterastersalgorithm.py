@@ -5,19 +5,17 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 from osgeo import gdal
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsProcessing, \
-    QgsRasterLayer, Qgis
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.numpyutils import NumpyUtils
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsProcessing, \
+    QgsRasterLayer, Qgis
 
 
-@typechecked
 class AggregateRastersAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTERS, _RASTERS = 'rasters', 'Raster layers'
     P_MASKS, _MASKS = 'masks', 'Mask layers'

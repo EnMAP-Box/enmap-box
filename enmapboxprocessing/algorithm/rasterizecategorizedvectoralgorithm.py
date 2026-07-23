@@ -3,7 +3,6 @@ from typing import Dict, Any, List, Tuple
 from osgeo import gdal
 
 import qgis.processing
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.creategridalgorithm import CreateGridAlgorithm
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import RasterMathAlgorithm
@@ -20,7 +19,6 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLay
 from qgis.core import edit
 
 
-@typechecked
 class RasterizeCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
     P_CATEGORIZED_VECTOR, _CATEGORIZED_VECTOR = 'categorizedVector', 'Categorized vector layer'
     P_GRID, _GRID = 'grid', 'Grid'

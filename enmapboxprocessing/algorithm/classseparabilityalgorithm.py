@@ -2,14 +2,12 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
 
-@typechecked
 class ClassSeparabilityAlgorithm(EnMAPProcessingAlgorithm):
     P_DATASET, _DATASET = 'dataset', 'Test dataset'
 

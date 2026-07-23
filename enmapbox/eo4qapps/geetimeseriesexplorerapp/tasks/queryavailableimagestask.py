@@ -4,10 +4,8 @@ from enmapbox.utils import importEarthEngine
 from geetimeseriesexplorerapp.utils import utilsMsecToDateTime
 from qgis.core import QgsTask
 from qgis.gui import QgsMessageBar
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class QueryAvailableImagesTask(QgsTask):
     """Query available images at location."""
     header: List[str]

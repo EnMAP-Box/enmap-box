@@ -8,7 +8,6 @@ from warnings import warn
 import numpy as np
 from osgeo import gdal
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.geojsonlibrarywriter import GeoJsonLibraryWriter
@@ -20,7 +19,6 @@ RESPONSE_CUTOFF_VALUE = 0.001
 RESPONSE_CUTOFF_DIGITS = 3
 
 
-@typechecked
 class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Spectral raster layer'
     P_CODE, _CODE = 'response', 'Spectral response function'
@@ -57,7 +55,7 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
         return lines
 
     def parameterAsResponses(
-        self, parameters: Dict[str, Any], name, context: QgsProcessingContext
+            self, parameters: Dict[str, Any], name, context: QgsProcessingContext
     ) -> Dict[Union[str, float], Union[List[Tuple[int, float]], Number]]:
         namespace = dict()
         code = self.parameterAsString(parameters, name, context)
@@ -75,7 +73,7 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
         self.addParameterRasterDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         raster = self.parameterAsSpectralRasterLayer(parameters, self.P_RASTER, context)
         responses = self.parameterAsResponses(parameters, self.P_CODE, context)
@@ -183,8 +181,8 @@ class SpectralResamplingByResponseFunctionConvolutionAlgorithmBase(EnMAPProcessi
 
     @staticmethod
     def resampleData(
-        array: Array3d, marray: Array3d, wavelength: List, responses: Dict[str, List[Tuple[int, float]]],
-        noDataValue: float, feedback: QgsProcessingFeedback, isFirstBlock=True
+            array: Array3d, marray: Array3d, wavelength: List, responses: Dict[str, List[Tuple[int, float]]],
+            noDataValue: float, feedback: QgsProcessingFeedback, isFirstBlock=True
     ) -> Array3d:
         wavelength = [int(round(v)) for v in wavelength]
         outarray = list()

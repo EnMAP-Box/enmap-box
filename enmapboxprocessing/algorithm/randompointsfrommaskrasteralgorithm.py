@@ -8,10 +8,8 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsMapLayer
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class RandomPointsFromMaskRasterAlgorithm(EnMAPProcessingAlgorithm):
     P_MASK, _MASK = 'mask', 'Mask raster layer'
     P_N, _N = 'n', 'Number of points'

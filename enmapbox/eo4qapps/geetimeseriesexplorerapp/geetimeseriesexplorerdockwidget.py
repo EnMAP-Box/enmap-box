@@ -10,10 +10,8 @@ from typing import Optional, Dict, List, Tuple
 from urllib.parse import urlparse
 
 import requests
-
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
-from enmapbox.typeguard import typechecked
 from enmapbox.utils import importEarthEngine
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.utils import Utils
@@ -35,7 +33,6 @@ from qgis.core import QgsRasterLayer, QgsCoordinateReferenceSystem, QgsMapLayer,
 from qgis.gui import (QgsMessageBar, QgsColorRampButton, QgsSpinBox, QgsMapCanvas, QgisInterface)
 
 
-@typechecked
 class GeeTimeseriesExplorerDockWidget(QDockWidget):
     mMessageBar: QgsMessageBar
     mIconList: QListWidget
@@ -362,7 +359,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
         self.mLANDSAT_COMBINED_C02_T1_L2.clicked.connect(self.onUserCollectionClicked)
 
         # load user defined collections
-        @typechecked
+
         class UserCollection():
 
             def __init__(self, pyFilename: str):
@@ -992,7 +989,7 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
         return visParams
 
     def eeCollection(
-        self, addIndices=True, filterDate=True, filterProperty=True, filterQuality=True
+            self, addIndices=True, filterDate=True, filterProperty=True, filterQuality=True
     ):
         eeImported, ee = importEarthEngine(False)
 
@@ -1064,8 +1061,8 @@ class GeeTimeseriesExplorerDockWidget(QDockWidget):
                 masks = list()
                 for item in items:
                     if (
-                        isinstance(item, (PixelQualityBitmaskItem, CategoryMaskItem))
-                        and item.checkState(0) == Qt.CheckState.Checked  # noqa
+                            isinstance(item, (PixelQualityBitmaskItem, CategoryMaskItem))
+                            and item.checkState(0) == Qt.CheckState.Checked  # noqa
                     ):
                         masks.append(item.eeMask(eeImage))
 
@@ -1506,7 +1503,6 @@ def tofloat(obj, default=0, ndigits=None):
     return value
 
 
-@typechecked
 class CategoryMaskItem(QTreeWidgetItem):
 
     def __init__(self, text: str, bandName: str, value: int):
@@ -1518,7 +1514,6 @@ class CategoryMaskItem(QTreeWidgetItem):
         return eeImage.select(self.bandName).neq(self.value)
 
 
-@typechecked
 class PixelQualityBitmaskItem(QTreeWidgetItem):
 
     def __init__(self, text: str, bandName: str, firstBit: int, bitCount: int, value: int):

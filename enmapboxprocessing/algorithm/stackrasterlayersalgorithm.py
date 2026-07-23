@@ -9,10 +9,8 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessing)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class StackRasterLayersAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTERS, _RASTERS = 'rasters', 'Raster layers'
     P_GRID, _GRID = 'grid', 'Grid'

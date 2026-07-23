@@ -3,16 +3,14 @@ from typing import Dict, Any, List, Tuple
 import numpy as np
 
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import FIELD_VALUES
-from enmapbox.typeguard import typechecked
+from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterField,
                        QgsProcessingException)
-from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
 
 
-@typechecked
 class PrepareUnsupervisedDatasetFromLibraryAlgorithm(EnMAPProcessingAlgorithm):
     P_LIBRARY, _LIBRARY = 'library', 'Spectral library'
     P_FIELD, _FIELD = 'field', 'Field with spectral profiles used as features'

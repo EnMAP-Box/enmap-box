@@ -1,19 +1,16 @@
 from collections import OrderedDict
 from typing import List
 
+from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtGui import QColor, QPixmap, QIcon, QBrush, QFont
 from qgis.PyQt.QtWidgets import QTableWidget, QTableWidgetItem, QCheckBox
-
-from enmapbox.typeguard import typechecked
-from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer
 from qgis.gui import QgsDoubleSpinBox, QgsDockWidget
 
 
-@typechecked
 class LandCoverChangeStatisticsDataFilteringDockWidget(QgsDockWidget):
     mTableClasses: QTableWidget
     mFilterBySize: QCheckBox

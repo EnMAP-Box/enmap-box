@@ -41,7 +41,6 @@ from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprofilesources import Sp
     ProfileSamplingMode, SpectralProfileGeneratorNode
 from enmapbox.qgispluginsupport.qps.subdatasets import SubDatasetSelectionDialog
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, loadUi, SpatialExtent, file_search
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.importdesisl1balgorithm import ImportDesisL1BAlgorithm
 from enmapboxprocessing.algorithm.importdesisl1calgorithm import ImportDesisL1CAlgorithm
 from enmapboxprocessing.algorithm.importdesisl2aalgorithm import ImportDesisL2AAlgorithm
@@ -241,7 +240,6 @@ def getIcon() -> QIcon:
     return enmapbox.icon()
 
 
-@typechecked
 class EnMAPBoxMapCanvasRenderProgressBar(QProgressBar):
 
     def __init__(self, parent=None):
@@ -1155,8 +1153,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         layers = [
             lyr for lyr in layers
             if (
-                isinstance(lyr, QgsMapLayer)
-                and not lyr.customProperty(TemporaryGlobalLayerContext.LAYER_PROPERTY_KEY, False)  # noqa
+                    isinstance(lyr, QgsMapLayer)
+                    and not lyr.customProperty(TemporaryGlobalLayerContext.LAYER_PROPERTY_KEY, False)  # noqa
             )
         ]
         self.removeMapLayers(layers)
@@ -1780,10 +1778,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     @pyqtSlot(SpatialPoint, QgsMapCanvas)
     def loadCurrentMapSpectra(
-        self,
-        spatialPoint: SpatialPoint,
-        mapCanvas: Optional[QgsMapCanvas] = None,
-        runAsync: bool = None
+            self,
+            spatialPoint: SpatialPoint,
+            mapCanvas: Optional[QgsMapCanvas] = None,
+            runAsync: bool = None
     ) -> Dict[str, List[QgsFeature]]:
         """
         Loads SpectralProfiles from a location defined by `spatialPoint`

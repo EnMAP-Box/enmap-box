@@ -2,8 +2,6 @@ import os
 
 from qgis.PyQt.QtCore import QDateTime, QDate, QTime
 
-from enmapbox.typeguard import typechecked
-
 
 def version():
     metadata = os.path.abspath(os.path.join(__file__, '..', 'metadata.txt'))
@@ -13,6 +11,5 @@ def version():
                 return line.split('=')[1].strip()
 
 
-@typechecked
 def utilsMsecToDateTime(msec: int) -> QDateTime:
     return QDateTime(QDate(1970, 1, 1), QTime(0, 0, 0)).addMSecs(int(msec))

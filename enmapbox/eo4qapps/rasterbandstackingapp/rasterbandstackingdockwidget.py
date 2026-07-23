@@ -2,7 +2,6 @@ import json
 from os.path import join, basename, isabs
 from typing import Optional
 
-from geetimeseriesexplorerapp import MapTool
 from osgeo import gdal
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
@@ -11,11 +10,11 @@ from enmapbox.gui.mimedata import MDF_RASTERBANDS, QGIS_URILIST_MIMETYPE, MDF_EN
 from enmapbox.gui.widgets.multiplerasterbandselectionwidget.multiplerasterbandselectionwidget import \
     MultipleRasterBandSelectionWidget
 from enmapbox.qgispluginsupport.qps.utils import stringFromByteArray
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
+from geetimeseriesexplorerapp import MapTool
 from qgis import processing
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QEvent
@@ -26,7 +25,6 @@ from qgis.core import QgsMimeDataUtils, QgsReadWriteContext, QgsLayerTree, QgsPr
 from qgis.gui import QgsMapLayerComboBox, QgisInterface, QgsFileWidget
 
 
-@typechecked
 class RasterBandStackingDockWidget(QDockWidget):
     mRasterTable: QTableWidget
     mAddRaster: QToolButton

@@ -4,7 +4,6 @@ from typing import Dict, Any, List, Tuple, Optional
 import numpy as np
 from osgeo import gdal
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.algorithm.importprismal1algorithm import utilsReadAsArray, utilsDeleteCopy
 from enmapboxprocessing.driver import Driver
@@ -16,7 +15,6 @@ from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessing
     QgsCoordinateReferenceSystem, QgsRasterLayer, QgsMapLayer
 
 
-@typechecked
 class ImportPrismaL2DAlgorithm(EnMAPProcessingAlgorithm):
     P_FILE, _FILE = 'file', 'File'
     P_SPECTRAL_REGION, _SPECTRAL_REGION = 'spectralRegion', 'Spectral region'
@@ -31,15 +29,15 @@ class ImportPrismaL2DAlgorithm(EnMAPProcessingAlgorithm):
     P_OUTPUT_PAN_CUBE, _OUTPUT_PAN_CUBE = 'outputPrismaL2D_panCube', 'Output PAN raster layer'
 
     P_OUTPUT_SPECTRAL_GEOLOCATION, _OUTPUT_SPECTRAL_GEOLOCATION = 'outputPrismaL2D_spectralGeolocationFields', \
-                                                                  'Output VNIR/SWIR Geolocation Fields raster layer'
+        'Output VNIR/SWIR Geolocation Fields raster layer'
     P_OUTPUT_SPECTRAL_GEOMETRIC, _OUTPUT_SPECTRAL_GEOMETRIC = 'outputPrismaL2D_spectralGeometricFields', \
-                                                              'Output VNIR/SWIR Geometric Fields raster layer'
+        'Output VNIR/SWIR Geometric Fields raster layer'
     P_OUTPUT_SPECTRAL_ERROR, _OUTPUT_SPECTRAL_ERROR = 'outputPrismaL2D_spectralErrorMatrix', \
-                                                      'Output VNIR/SWIR Error Matrix raster layer'
+        'Output VNIR/SWIR Error Matrix raster layer'
     P_OUTPUT_PAN_GEOLOCATION, _OUTPUT_PAN_GEOLOCATION = 'outputPrismaL2D_panGeolocationFields', \
-                                                        'Output PAN Geolocation Fields raster layer'
+        'Output PAN Geolocation Fields raster layer'
     P_OUTPUT_PAN_ERROR, _OUTPUT_PAN_ERROR = 'outputPrismaL2D_panErrorMatrix', \
-                                            'Output PAN Error Matrix raster layer'
+        'Output PAN Error Matrix raster layer'
 
     def displayName(self):
         return 'Import PRISMA L2D product'

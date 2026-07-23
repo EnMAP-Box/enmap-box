@@ -4,7 +4,6 @@ from typing import Union
 import numpy as np
 
 import enmapbox.testing
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import Array2d, Array3d, Number
@@ -14,7 +13,6 @@ from qgis.core import QgsCoordinateReferenceSystem, QgsRectangle
 enmapbox.testing.start_app()
 
 
-@typechecked
 class TestCase(enmapbox.testing.TestCase):
 
     def assertArrayEqual(self, array1: Union[Number, Array2d, Array3d], array2: Union[Array2d, Array3d]):

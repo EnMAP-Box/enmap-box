@@ -2,12 +2,10 @@ from typing import Dict, Any, List, Tuple
 
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
 
-@typechecked
 class SaveRasterAsAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_MODE, _MODE = 'mode', 'Raster I/O mode'

@@ -35,7 +35,6 @@ from enmapbox.qgispluginsupport.qps.classification.classificationscheme import \
     ClassificationMapLayerComboBox, ClassInfo, ClassificationScheme, ClassificationSchemeComboBox, \
     ClassificationSchemeWidget
 from enmapbox.qgispluginsupport.qps.utils import loadUi
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.reclassifyrasteralgorithm import ReclassifyRasterAlgorithm
 from qgis.PyQt.QtCore import QAbstractTableModel, Qt, QModelIndex, QSortFilterProxyModel
 from qgis.PyQt.QtGui import QColor, QContextMenuEvent, QIcon
@@ -70,7 +69,6 @@ def setClassInfo(targetDataset, classificationScheme: ClassificationScheme, band
     band.SetColorTable(ct)
 
 
-@typechecked
 def reclassify(layerSrc: QgsRasterLayer, dstClassScheme: ClassificationScheme, labelLookup: dict,
                output_classification=QgsProcessing.TEMPORARY_OUTPUT):
     mapping = str(labelLookup)

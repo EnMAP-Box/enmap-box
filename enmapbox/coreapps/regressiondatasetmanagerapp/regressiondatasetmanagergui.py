@@ -12,10 +12,8 @@ from qgis.PyQt.QtWidgets import (QMainWindow, QTableWidget, QTableWidgetItem, QL
                                  QDialog)
 from qgis.PyQt.uic import loadUi
 from qgis.gui import QgsColorButton
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class RegressionDatasetManagerGui(QDialog):
     mDataset: ProcessingParameterSkopsFileRegressionDatasetWidget
     mTargetTable: QTableWidget

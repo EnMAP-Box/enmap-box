@@ -6,10 +6,8 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QCursor, QColor
 from qgis.PyQt.QtWidgets import QAction
 from qgis.gui import QgsMapTool, QgsMapMouseEvent, QgsMapCanvas, QgsVertexMarker
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class MapTool(QgsMapTool):
     sigClicked = pyqtSignal(QgsMapMouseEvent)
 

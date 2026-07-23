@@ -3,10 +3,8 @@ from typing import Dict, Any, List, Tuple
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, Qgis
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class CreateGridAlgorithm(EnMAPProcessingAlgorithm):
     P_CRS, _CRS = 'crs', 'CRS'
     P_EXTENT, _EXTENT = 'extent', 'Extent'

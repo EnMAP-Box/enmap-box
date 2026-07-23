@@ -2,14 +2,12 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import checkSampleShape, Target, RegressorDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsFeature, QgsProcessingParameterField)
 
 
-@typechecked
 class PrepareRegressionDatasetFromTableAlgorithm(EnMAPProcessingAlgorithm):
     P_TABLE, _TABLE = 'table', 'Table'
     P_FEATURE_FIELDS, _FEATURE_FIELDS = 'featureFields', 'Fields with features'
@@ -51,7 +49,7 @@ class PrepareRegressionDatasetFromTableAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         table = self.parameterAsLayer(parameters, self.P_TABLE, context)
         featureFields = self.parameterAsFields(parameters, self.P_FEATURE_FIELDS, context)

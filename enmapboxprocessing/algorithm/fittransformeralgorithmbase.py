@@ -3,7 +3,6 @@ import traceback
 from operator import xor
 from typing import Dict, Any, List, Tuple, Optional
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromrasteralgorithm import \
     PrepareUnsupervisedDatasetFromRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
@@ -12,7 +11,6 @@ from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException
 
 
-@typechecked
 class FitTransformerAlgorithmBase(EnMAPProcessingAlgorithm):
     P_FEATURE_RASTER, _FEATURE_RASTER = 'featureRaster', 'Raster layer with features'
     P_SAMPLE_SIZE, _SAMPLE_SIZE = 'sampleSize', 'Sample size'
@@ -91,7 +89,7 @@ class FitTransformerAlgorithmBase(EnMAPProcessingAlgorithm):
         return True, ''
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
 
         raster = self.parameterAsRasterLayer(parameters, self.P_FEATURE_RASTER, context)

@@ -7,10 +7,8 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCoordinateReferenceSystem)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class GeolocateRasterAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_X_RASTER, _X_RASTER = 'xRaster', 'X locations raster layer'

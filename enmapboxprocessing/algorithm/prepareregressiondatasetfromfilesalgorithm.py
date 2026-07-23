@@ -6,10 +6,8 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import Target, RegressorDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class PrepareRegressionDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
     P_FEATURE_FILE, _FEATURE_FILE = 'featureFile', 'File with features'
     P_VALUE_FILE, _VALUE_FILE = 'valueFile', 'File with target values'

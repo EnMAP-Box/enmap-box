@@ -2,13 +2,11 @@ from typing import Dict, Any, List, Tuple
 from urllib.parse import urlencode
 
 from enmapbox.provider.maskrasterdataprovider import MaskRasterDataProvider
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessingOutputRasterLayer
 
 
-@typechecked
 class CreateMaskAlgorithmBase(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_BAND, _BAND = 'band', 'Band'
@@ -47,7 +45,6 @@ class CreateMaskAlgorithmBase(EnMAPProcessingAlgorithm):
         )
 
 
-@typechecked
 class CreateMaskVirtualAlgorithm(CreateMaskAlgorithmBase):
     P_LAYER_NAME, _LAYER_NAME = 'layerName', 'Layer name'
     P_OUTPUT_MASK, _OUTPUT_MASK = 'outputMask', 'Output mask raster layer'
@@ -69,7 +66,7 @@ class CreateMaskVirtualAlgorithm(CreateMaskAlgorithmBase):
         self.addOutput(QgsProcessingOutputRasterLayer(self.P_OUTPUT_MASK, self._OUTPUT_MASK))
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         bandNo = self.parameterAsBand(parameters, self.P_BAND, context)
@@ -117,7 +114,6 @@ class CreateMaskVirtualAlgorithm(CreateMaskAlgorithmBase):
         return result
 
 
-@typechecked
 class CreateMaskAlgorithm(CreateMaskAlgorithmBase):
     P_OUTPUT_MASK, _OUTPUT_MASK = 'outputMask', 'Output mask raster layer'
 
@@ -139,7 +135,7 @@ class CreateMaskAlgorithm(CreateMaskAlgorithmBase):
         )
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_MASK, context)
         alg = CreateMaskVirtualAlgorithm()

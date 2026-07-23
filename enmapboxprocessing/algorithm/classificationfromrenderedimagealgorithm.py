@@ -2,7 +2,6 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import Category
@@ -11,7 +10,6 @@ from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsMapLayer
 
 
-@typechecked
 class ClassificationFromRenderedImageAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_OUTPUT_CLASSIFICATION, _OUTPUT_CLASSIFICATION = 'outputClassification', 'Output classification layer'

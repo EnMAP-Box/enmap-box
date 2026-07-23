@@ -7,10 +7,8 @@ from osgeo import gdal
 
 from enmapboxprocessing.rasterwriter import RasterWriter
 from qgis.core import QgsTask, QgsMessageLog, Qgis
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class BuildImageChipVrtsTask(QgsTask):
 
     def __init__(self, root: str):

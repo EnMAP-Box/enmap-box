@@ -2,7 +2,6 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.creategridalgorithm import CreateGridAlgorithm
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.driver import Driver
@@ -18,7 +17,6 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLay
 from qgis.core.additions.edit import edit
 
 
-@typechecked
 class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_VECTOR, _VECTOR = 'vector', 'Vector layer'

@@ -39,7 +39,6 @@ from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibraryplotmodelitems import ProfileVisualizationGroup
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.utils import loadUi, SpatialExtent
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtCore import QSize
 from qgis.PyQt.QtCore import Qt, QMimeData, QModelIndex, QObject, QTimer, pyqtSignal, QEvent, \
@@ -892,8 +891,8 @@ class DockManagerTreeModel(QgsLayerTreeModel):
         return results
 
     def findDockNode(
-        self,
-        object: Union[str, Dock, QgsMapCanvas, QgsRasterLayer, QgsVectorLayer, SpectralLibraryWidget]
+            self,
+            object: Union[str, Dock, QgsMapCanvas, QgsRasterLayer, QgsVectorLayer, SpectralLibraryWidget]
     ) -> Optional[DockTreeNode]:
         """
         Returns a DockTreeNode that contains the given object
@@ -1009,10 +1008,10 @@ class DockManagerTreeModel(QgsLayerTreeModel):
                 else:
                     # close docks linked to this source
                     if (
-                        isinstance(node, AttributeTableDockTreeNode)
-                        and isinstance(node.dock, AttributeTableDock)  # noqa
-                        and isinstance(node.dock.vectorLayer(), QgsVectorLayer)  # noqa
-                        and node.dock.vectorLayer().source() == d.source()  # noqa
+                            isinstance(node, AttributeTableDockTreeNode)
+                            and isinstance(node.dock, AttributeTableDock)  # noqa
+                            and isinstance(node.dock.vectorLayer(), QgsVectorLayer)  # noqa
+                            and node.dock.vectorLayer().source() == d.source()  # noqa
                     ):
                         docks_to_close.append(node.dock)
 
@@ -1145,10 +1144,10 @@ class DockManagerTreeModel(QgsLayerTreeModel):
 
                     if isinstance(node, DockTreeNode):
                         flags = (
-                            flags
-                            | Qt.ItemFlag.ItemIsUserCheckable  # noqa: W503
-                            | Qt.ItemFlag.ItemIsEditable  # noqa: W503
-                            | Qt.ItemFlag.ItemIsDropEnabled  # noqa: W503
+                                flags
+                                | Qt.ItemFlag.ItemIsUserCheckable  # noqa: W503
+                                | Qt.ItemFlag.ItemIsEditable  # noqa: W503
+                                | Qt.ItemFlag.ItemIsDropEnabled  # noqa: W503
                         )
 
                         if isL1:
@@ -1395,7 +1394,7 @@ class DockManagerTreeModel(QgsLayerTreeModel):
                 # this does not work:
                 # result = super(QgsLayerTreeModel,self).setData(index, value, role=role)
                 if role == Qt.ItemDataRole.CheckStateRole and not self.testFlag(
-                    QgsLayerTreeModel.Flag.AllowLegendChangeState
+                        QgsLayerTreeModel.Flag.AllowLegendChangeState
                 ):
                     return False
                 result = node.setData(value, role)
@@ -1876,7 +1875,7 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
                 modelDataSource: ModelDataSource
 
                 if not (
-                    isinstance(modelDataSource, ModelDataSource) and isinstance(modelDataSource.mSkopsObject, dict)
+                        isinstance(modelDataSource, ModelDataSource) and isinstance(modelDataSource.mSkopsObject, dict)
                 ):
                     continue
                 if modelDataSource.mSkopsObject.get('classifier') is not None:
@@ -2053,7 +2052,6 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
                 index = parent.children().index(node) + 1
                 parent.insertChildNode(index, newNode)
 
-    @typechecked
     def onBandStatisticsClicked(self, layer: QgsRasterLayer):
         from bandstatisticsapp import BandStatisticsDialog
         self.bandStatisticsDialog = BandStatisticsDialog(parent=self.mDockTreeView)
@@ -2061,7 +2059,6 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         self.bandStatisticsDialog.mLayer.setLayer(layer)
         self.bandStatisticsDialog.mAddRendererBands.click()
 
-    @typechecked
     def onScatterPlotClicked(self, layer: QgsRasterLayer):
         from scatterplotapp import ScatterPlotDialog
         self.scatterPlotDialog = ScatterPlotDialog(parent=self.mDockTreeView)
@@ -2071,56 +2068,48 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         self.scatterPlotDialog.mBandX.setBand(1)
         self.scatterPlotDialog.mBandY.setBand(2)
 
-    @typechecked
     def onClassificationStatisticsClicked(self, layer: QgsRasterLayer):
         from classificationstatisticsapp import ClassificationStatisticsDialog
         self.classificationStatisticsDialog = ClassificationStatisticsDialog(parent=self.mDockTreeView)
         self.classificationStatisticsDialog.show()
         self.classificationStatisticsDialog.mLayer.setLayer(layer)
 
-    @typechecked
     def onClassFractionStatisticsClicked(self, layer: QgsRasterLayer):
         from classfractionstatisticsapp import ClassFractionStatisticsDialog
         self.classFractionStatisticsDialog = ClassFractionStatisticsDialog(parent=self.mDockTreeView)
         self.classFractionStatisticsDialog.show()
         self.classFractionStatisticsDialog.mLayer.setLayer(layer)
 
-    @typechecked
     def onColorSpaceExplorerClicked(self, layer: QgsRasterLayer):
         from colorspaceexplorerapp import ColorSpaceExplorerDialog
         self.colorSpaceExplorerDialog = ColorSpaceExplorerDialog(parent=self.mDockTreeView)
         self.colorSpaceExplorerDialog.show()
         self.colorSpaceExplorerDialog.mLayer.setLayer(layer)
 
-    @typechecked
     def onDecorrelationStretchClicked(self, layer: QgsRasterLayer):
         from decorrelationstretchapp import DecorrelationStretchDialog
         self.decorrelationStretchDialog = DecorrelationStretchDialog(parent=self.mDockTreeView)
         self.decorrelationStretchDialog.show()
         self.decorrelationStretchDialog.mLayer.setLayer(layer)
 
-    @typechecked
     def onBivariateColorRasterRendererClicked(self, layer: QgsRasterLayer):
         from bivariatecolorrasterrendererapp import BivariateColorRasterRendererDialog
         self.bivariateColorRasterRendererDialog = BivariateColorRasterRendererDialog(parent=self.mDockTreeView)
         self.bivariateColorRasterRendererDialog.show()
         self.bivariateColorRasterRendererDialog.mLayer.setLayer(layer)
 
-    @typechecked
     def onCmykColorRasterRendererClicked(self, layer: QgsRasterLayer):
         from cmykcolorrasterrendererapp import CmykColorRasterRendererDialog
         self.cmykColorRasterRendererDialog = CmykColorRasterRendererDialog(parent=self.mDockTreeView)
         self.cmykColorRasterRendererDialog.show()
         self.cmykColorRasterRendererDialog.mLayer.setLayer(layer)
 
-    @typechecked
     def onHsvColorRasterRendererClicked(self, layer: QgsRasterLayer):
         from hsvcolorrasterrendererapp import HsvColorRasterRendererDialog
         self.hsvColorRasterRendererDialog = HsvColorRasterRendererDialog(parent=self.mDockTreeView)
         self.hsvColorRasterRendererDialog.show()
         self.hsvColorRasterRendererDialog.mLayer.setLayer(layer)
 
-    @typechecked
     def onMultiSourceMultiBandColorRendererClicked(self, layer: QgsRasterLayer):
         from multisourcemultibandcolorrendererapp import MultiSourceMultiBandColorRendererDialog
         self.multiSourceMultiBandColorRendererDialog = MultiSourceMultiBandColorRendererDialog(
@@ -2131,7 +2120,6 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         self.multiSourceMultiBandColorRendererDialog.mLayer3.setLayer(layer)
         self.multiSourceMultiBandColorRendererDialog.onApplyClicked()
 
-    @typechecked
     def onCopyLayerToQgisClicked(self, layer: QgsMapLayer):
         layer2 = layer.clone()
         QgsProject.instance().addMapLayer(layer2, True)
@@ -2146,7 +2134,6 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         parameters: Dict = action.parameters
         enmapBox.showProcessingAlgorithmDialog(alg, parameters, True, True, parent=self.mDockTreeView)
 
-    @typechecked
     def onRasterLayerStylingClicked(self, layer: QgsRasterLayer):
         from rasterlayerstylingapp import RasterLayerStylingApp
         dockPanel: DockPanelUI = self.enmapboxInstance().ui.dockPanel

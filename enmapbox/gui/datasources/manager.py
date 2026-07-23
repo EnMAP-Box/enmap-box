@@ -17,7 +17,6 @@ from enmapbox.qgispluginsupport.qps.layerproperties import defaultRasterRenderer
 from enmapbox.qgispluginsupport.qps.models import PyObjectTreeNode, TreeModel, TreeNode, TreeView
 from enmapbox.qgispluginsupport.qps.utils import bandClosestToWavelength, defaultBands, loadUi
 from enmapbox.qgispluginsupport.qps.utils import stringToByteArray
-from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtCore import pyqtSignal, QAbstractItemModel, QItemSelectionModel, QMimeData, \
     QModelIndex, QSortFilterProxyModel, Qt, QTimer, QUrl
 from qgis.PyQt.QtGui import QContextMenuEvent, QDesktopServices
@@ -258,9 +257,9 @@ class DataSourceManager(TreeModel):
                 for ds in allDataSources:
                     dataItem = ds.dataItem()
                     if (
-                        isinstance(ds, SpatialDataSource)
-                        and dataItem.path() == input.source()  # noqa
-                        and dataItem.providerKey() == input.providerType()  # noqa
+                            isinstance(ds, SpatialDataSource)
+                            and dataItem.path() == input.source()  # noqa
+                            and dataItem.providerKey() == input.providerType()  # noqa
                     ):
                         foundSources.append(ds)
             elif isinstance(input, str):
@@ -589,7 +588,6 @@ class DataSourceManagerTreeView(TreeView):
             parameters = dict(INPUT=dataSource.source())
             emb.showProcessingAlgorithmDialog('native:savefeatures', parameters, parent=self)
 
-    @typechecked
     def onOpenInExplorer(self, dataSource: DataSource):
         """Open source in system file explorer."""
         filename = dataSource.source()
@@ -611,7 +609,6 @@ class DataSourceManagerTreeView(TreeView):
         url = QUrl.fromLocalFile(dirname(filename))
         QDesktopServices.openUrl(url)
 
-    @typechecked
     def onViewSkopsAsJson(self, modelDataSource: ModelDataSource):
         """Convert Skops file to JSON sidecar file and open it in the default browser."""
         from enmapboxprocessing.utils import Utils

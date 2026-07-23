@@ -3,7 +3,6 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.librarydriver import LibraryDriver
 from enmapboxprocessing.typing import ClassifierDump
@@ -12,7 +11,6 @@ from qgis.core import QgsGeometry, QgsPointXY, Qgis, QgsCoordinateReferenceSyste
     QgsProcessingContext, QgsProcessingFeedback
 
 
-@typechecked
 class LibraryFromClassificationDatasetAlgorithm(EnMAPProcessingAlgorithm):
     P_DATASET, _DATASET = 'dataset', 'Dataset'
     P_OUTPUT_LIBRARY, _OUTPUT_LIBRARY = 'outputLibrary', 'Output spectral library'

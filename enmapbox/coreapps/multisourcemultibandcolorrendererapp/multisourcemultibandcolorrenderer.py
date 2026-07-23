@@ -2,13 +2,11 @@ from typing import List
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsRasterRenderer, QgsRasterInterface, QgsRectangle, QgsRasterBlockFeedback, Qgis, QgsRasterLayer
 
 
-@typechecked
 class MultiSourceMultiBandColorRenderer(QgsRasterRenderer):
     min1: float
     min2: float

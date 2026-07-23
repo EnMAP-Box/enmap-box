@@ -3,17 +3,14 @@ from os import listdir
 from os.path import join, isdir, isfile
 from typing import Dict, Any, List, Tuple
 
-from processing.core.Processing import Processing
-from qgis.core import QgsProcessingParameterFile, QgsProcessingContext, QgsProcessingFeedback
-
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.aggregaterasterbandsalgorithm import AggregateRasterBandsAlgorithm
 from enmapboxprocessing.algorithm.aggregaterastersalgorithm import AggregateRastersAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
+from processing.core.Processing import Processing
+from qgis.core import QgsProcessingParameterFile, QgsProcessingContext, QgsProcessingFeedback
 
 
-@typechecked
 class AggregateArdRastersAlgorithm(EnMAPProcessingAlgorithm):
     P_DATA_CUBE, _DATA_CUBE = 'dataCube', 'Data cube'
     P_TILE_FILTER, _TILE_FILTER = 'tileFilter', 'Tile filter'

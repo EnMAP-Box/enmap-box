@@ -2,14 +2,12 @@ import inspect
 from inspect import signature
 from typing import Dict, Any, List, Tuple, Optional
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
 
 
-@typechecked
 class ApplyBandFunctionAlgorithmBase(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_FUNCTION, _FUNCTION = 'function', 'Function'
@@ -65,7 +63,7 @@ class ApplyBandFunctionAlgorithmBase(EnMAPProcessingAlgorithm):
         return function
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         function = self.parameterAsFunction(parameters, self.P_FUNCTION, context)

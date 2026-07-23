@@ -4,7 +4,6 @@ from typing import Dict, Any, List, Tuple
 import numpy as np
 from osgeo import gdal
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.writeenviheaderalgorithm import WriteEnviHeaderAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
@@ -14,7 +13,6 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRectangle
                        QgsRasterDataProvider, QgsPoint, QgsPointXY, QgsMapLayer)
 
 
-@typechecked
 class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_BAND_LIST, _BAND_LIST = 'bandList', 'Selected bands'
@@ -94,7 +92,7 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
         return True, ''
 
     def parameterAsSourceWindowExtent(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext
+            self, parameters: Dict[str, Any], context: QgsProcessingContext
     ) -> QgsRectangle:
 
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
@@ -157,7 +155,7 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterRasterDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER, allowEnvi=True, allowVrt=True)
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         provider: QgsRasterDataProvider = raster.dataProvider()

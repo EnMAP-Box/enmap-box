@@ -8,7 +8,6 @@ from pyqtgraph import PlotWidget
 from classfractionstatisticsapp.classfractionrenderer import ClassFractionRenderer
 from enmapbox.qgispluginsupport.qps.layerproperties import rendererFromXml
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtCore import Qt
@@ -21,7 +20,6 @@ from qgis.core import QgsRasterLayer, QgsRasterDataProvider, QgsRasterHistogram,
 from qgis.gui import QgsMapCanvas, QgsMapLayerComboBox, QgsColorButton
 
 
-@typechecked
 class ClassFractionStatisticsDialog(QMainWindow):
     mLayer: QgsMapLayerComboBox
     mTable: QTableWidget
@@ -246,7 +244,6 @@ class ClassFractionStatisticsDialog(QMainWindow):
                 plotWidget.autoRange()
 
 
-@typechecked
 class HistogramPlotWidget(PlotWidget):
     def __init__(self):
         PlotWidget.__init__(self, parent=None, background='#ffffff')

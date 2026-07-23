@@ -3,7 +3,6 @@ from os.path import join, dirname, exists, basename, isdir, isfile
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mimedata import MDF_URILIST
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.importdesisl1balgorithm import ImportDesisL1BAlgorithm
 from enmapboxprocessing.algorithm.importdesisl1calgorithm import ImportDesisL1CAlgorithm
 from enmapboxprocessing.algorithm.importdesisl2aalgorithm import ImportDesisL2AAlgorithm
@@ -26,7 +25,6 @@ from qgis.core import QgsRasterLayer, QgsProject
 from qgis.gui import QgisInterface
 
 
-@typechecked
 class SensorProductImportDockWidget(QDockWidget):
     mDropArea: QLabel
 

@@ -2,10 +2,8 @@ import numpy as np
 
 from enmapboxprocessing.algorithm.applybandfunctionalgorithmbase import ApplyBandFunctionAlgorithmBase
 from qgis.core import (Qgis)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class SpatialFilterFunctionAlgorithmBase(ApplyBandFunctionAlgorithmBase):
 
     def outputDataType(self) -> Qgis.DataType:

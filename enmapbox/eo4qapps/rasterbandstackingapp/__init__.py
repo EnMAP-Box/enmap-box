@@ -1,22 +1,19 @@
 from typing import Optional
 
-from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.applications import EnMAPBoxApplication
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from geetimeseriesexplorerapp.maptool import MapTool
-
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from qgis.gui import QgisInterface
 from rasterbandstackingapp.rasterbandstackingdockwidget import RasterBandStackingDockWidget
-from enmapbox.typeguard import typechecked
 
 
 def enmapboxApplicationFactory(enmapBox: EnMAPBox):
     return [RasterBandStackingApp(enmapBox, None, None)]
 
 
-@typechecked
 class RasterBandStackingApp(EnMAPBoxApplication):
 
     def __init__(

@@ -10,10 +10,8 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class PrepareUnsupervisedDatasetFromRasterAlgorithm(EnMAPProcessingAlgorithm):
     P_FEATURE_RASTER, _FEATURE_RASTER = 'featureRaster', 'Raster layer with features'
     P_MASK, _MASK = 'mask', 'Mask layer'

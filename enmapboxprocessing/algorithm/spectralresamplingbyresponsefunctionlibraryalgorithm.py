@@ -4,7 +4,6 @@ from typing import Dict, Any, List, Tuple
 
 from enmapbox.qgispluginsupport.qps.speclib import FIELD_VALUES
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.spectralresamplingbyresponsefunctionconvolutionalgorithmbase import \
     RESPONSE_CUTOFF_VALUE, RESPONSE_CUTOFF_DIGITS
 from enmapboxprocessing.algorithm.spectralresamplingtocustomsensoralgorithm import \
@@ -14,7 +13,6 @@ from qgis.core import (QgsProcessingContext, QgsVectorLayer, QgsProcessingFeedba
                        QgsProcessingParameterField)
 
 
-@typechecked
 class SpectralResamplingByResponseFunctionLibraryAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Spectral raster layer'
     P_LIBRARY, _LIBRARY = 'library', 'Spectral response function library'
@@ -53,7 +51,7 @@ class SpectralResamplingByResponseFunctionLibraryAlgorithm(EnMAPProcessingAlgori
         self.addParameterRasterDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         raster = self.parameterAsSpectralRasterLayer(parameters, self.P_RASTER, context)
         library = self.parameterAsVectorLayer(parameters, self.P_LIBRARY, context)

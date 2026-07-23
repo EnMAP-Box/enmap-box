@@ -15,10 +15,8 @@ except ModuleNotFoundError:
 
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class DecorrelationStretchRenderer(QgsRasterRenderer):
     pca: PCA
     scaler1: RobustScaler

@@ -4,7 +4,6 @@ import numpy as np
 
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import FIELD_VALUES
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import checkSampleShape, Target, RegressorDump
 from enmapboxprocessing.utils import Utils
@@ -12,7 +11,6 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessin
                        QgsProcessingException)
 
 
-@typechecked
 class PrepareRegressionDatasetFromContinuousLibraryAlgorithm(EnMAPProcessingAlgorithm):
     P_CONTINUOUS_LIBRARY, _CONTINUOUS_LIBRARY = 'continuousLibrary', 'Continuous-valued spectral library'
     P_FIELD, _FIELD = 'field', 'Field with spectral profiles used as features'
@@ -63,7 +61,7 @@ class PrepareRegressionDatasetFromContinuousLibraryAlgorithm(EnMAPProcessingAlgo
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         library = self.parameterAsLayer(parameters, self.P_CONTINUOUS_LIBRARY, context)
         binaryField = self.parameterAsField(parameters, self.P_FIELD, context)

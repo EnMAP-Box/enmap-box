@@ -6,10 +6,8 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class RandomSamplesFromClassificationDatasetAlgorithm(EnMAPProcessingAlgorithm):
     P_DATASET, _DATASET = 'dataset', 'Classification dataset'
     P_N, _N = 'n', 'Number of samples per category'

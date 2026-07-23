@@ -1,10 +1,8 @@
 from typing import Optional
 
-from qgis.PyQt.QtCore import Qt
-
-from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.applications import EnMAPBoxApplication
-from enmapbox.typeguard import typechecked
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from qgis.PyQt.QtCore import Qt
 from rasterlayerstylingapp.rasterlayerstylingpanel import RasterLayerStylingPanel
 
 
@@ -12,9 +10,7 @@ def enmapboxApplicationFactory(enmapBox: EnMAPBox):
     return [RasterLayerStylingApp(enmapBox)]
 
 
-@typechecked
 class RasterLayerStylingApp(EnMAPBoxApplication):
-
     _panel = None
 
     def __init__(self, enmapBox: EnMAPBox, parent=None):

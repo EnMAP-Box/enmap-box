@@ -1,17 +1,15 @@
 import zipfile
 from os.path import basename, exists, splitext
 from typing import Dict, Any, List, Tuple
+
 from defusedxml import ElementTree
-
 from osgeo import gdal
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.gdalutils import GdalUtils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 
 
-@typechecked
 class ImportEnmapL1BAlgorithm(EnMAPProcessingAlgorithm):
     P_FILE, _FILE = 'file', 'Metadata file'
     P_OUTPUT_VNIR_RASTER, _OUTPUT_VNIR_RASTER = 'outputEnmapL1BRasterVnir', 'Output VNIR raster layer'

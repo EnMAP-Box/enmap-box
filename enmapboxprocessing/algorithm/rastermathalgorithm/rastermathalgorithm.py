@@ -11,7 +11,6 @@ import numpy
 import numpy as np
 from osgeo import gdal
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.driver import Driver
@@ -27,7 +26,6 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessin
                        QgsProcessingParameterString, QgsProject, QgsRasterLayer, Qgis, QgsVectorLayer, QgsFields)
 
 
-@typechecked
 class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
     P_CODE, _CODE = 'code', 'Code'
     P_GRID, _GRID = 'grid', 'Grid'
@@ -110,7 +108,7 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
         return Group.RasterAnalysis.value
 
     def addParameterMathCode(
-        self, name: str, description: str, defaultValue=None, optional=False, advanced=False
+            self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
         param = QgsProcessingParameterString(name, description, optional=optional)
         param.setMetadata({'widget_wrapper': {'class': ProcessingParameterRasterMathCodeEditWidgetWrapper}})
@@ -147,13 +145,13 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterRasterDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER, None, False, True)
 
     def prepareAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> bool:
         self.mapLayers = {k: v for k, v in QgsProject.instance().mapLayers().items() if k in parameters[self.P_CODE]}
         return True
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         code = self.parameterAsString(parameters, self.P_CODE, context)
         grid = self.parameterAsRasterLayer(parameters, self.P_GRID, context)
@@ -352,9 +350,9 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
         return result
 
     def makeWriter(
-        self, code: str, filename: str, grid: RasterReader, readers: Dict[str, RasterReader],
-        readers2: Dict[str, RasterReader], floatInput: bool, noDataValue: Optional[float],
-        feedback: ProcessingFeedback
+            self, code: str, filename: str, grid: RasterReader, readers: Dict[str, RasterReader],
+            readers2: Dict[str, RasterReader], floatInput: bool, noDataValue: Optional[float],
+            feedback: ProcessingFeedback
     ) -> Dict[str, Union[RasterWriter, Mock]]:
         # We derive output data types and band counts by executing the code on a minimal extent (i.e. one pixel).
         # We call this a dry-run.
@@ -406,9 +404,9 @@ class RasterMathAlgorithm(EnMAPProcessingAlgorithm):
         return writers
 
     def processBlock(
-        self, code: str, block: RasterBlockInfo, readers: Dict[str, RasterReader],
-        readers2: Dict[str, RasterReader], writers: Dict[str, Union[RasterWriter, Mock]],
-        floatInput: bool, noDataValue: Optional[float], overlap: int, feedback: ProcessingFeedback, dryRun=False
+            self, code: str, block: RasterBlockInfo, readers: Dict[str, RasterReader],
+            readers2: Dict[str, RasterReader], writers: Dict[str, Union[RasterWriter, Mock]],
+            floatInput: bool, noDataValue: Optional[float], overlap: int, feedback: ProcessingFeedback, dryRun=False
     ) -> Dict[str, np.ndarray]:
 
         # add modules

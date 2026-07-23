@@ -1,6 +1,5 @@
 from typing import Dict, Any, List, Tuple
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.classificationperformancestratifiedalgorithm import \
     ClassificationPerformanceStratifiedAlgorithm
 from enmapboxprocessing.algorithm.classifierperformancealgorithm import ClassifierPerformanceAlgorithm
@@ -14,7 +13,6 @@ from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer
 
 
-@typechecked
 class ClassificationWorkflowAlgorithm(EnMAPProcessingAlgorithm):
     P_DATASET, _DATASET = 'dataset', 'Training dataset'
     P_CLASSIFIER, _CLASSIFIER = 'classifier', 'Classifier'

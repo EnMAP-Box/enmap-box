@@ -1,6 +1,5 @@
 from classificationstatisticsapp.classificationstatisticsdialog import ClassificationStatisticsDialog
 from enmapbox.gui.applications import EnMAPBoxApplication
-from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu
 
@@ -9,7 +8,6 @@ def enmapboxApplicationFactory(enmapBox):
     return [ClassificationStatisticsApp(enmapBox)]
 
 
-@typechecked
 class ClassificationStatisticsApp(EnMAPBoxApplication):
     def __init__(self, enmapBox, parent=None):
         super().__init__(enmapBox, parent=parent)

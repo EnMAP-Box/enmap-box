@@ -1,14 +1,12 @@
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
 
-@typechecked
 class ExportDatasetToFilesAlgorithm(EnMAPProcessingAlgorithm):
     P_DATASET, _DATASET = 'dataset', 'Classification/Regression dataset'
     P_OUTPUT_FEATURE_FILE, _OUTPUT_FEATURE_FILE = 'outputFeatureFile', 'Output features file'

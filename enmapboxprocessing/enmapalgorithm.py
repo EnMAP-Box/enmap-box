@@ -10,7 +10,6 @@ import numpy as np
 from osgeo import gdal
 
 import qgis.processing
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.glossary import injectGlossaryLinks
 from enmapboxprocessing.parameter.processingparameterrasterdestination import ProcessingParameterRasterDestination
@@ -40,7 +39,6 @@ class AlgorithmCanceledException(Exception):
     pass
 
 
-@typechecked
 class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     O_RESAMPLE_ALG = 'NearestNeighbour Bilinear Cubic CubicSpline Lanczos Average Mode Min Q1 Med Q3 Max'.split()
     NearestNeighbourResampleAlg, BilinearResampleAlg, CubicResampleAlg, CubicSplineResampleAlg, LanczosResampleAlg, \

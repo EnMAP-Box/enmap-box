@@ -2,7 +2,6 @@ import re
 from os.path import join, dirname
 from typing import Dict, Any, List, Tuple
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
@@ -11,7 +10,6 @@ from qgis.core import QgsProcessingOutputRasterLayer, QgsProcessingException, Qg
     QgsProcessingFeedback, QgsRasterLayer
 
 
-@typechecked
 class SpectralIndexLayerAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_FORMULA, _FORMULA = 'formula', 'Formula'

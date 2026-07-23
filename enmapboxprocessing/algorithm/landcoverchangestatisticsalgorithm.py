@@ -3,12 +3,10 @@ from typing import Dict, Any, List, Tuple
 
 import plotly.io as pio
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessing, QgsProcessingException
 
 
-@typechecked
 class LandCoverChangeStatisticsAlgorithm(EnMAPProcessingAlgorithm):
     P_CLASSIFICATIONS, _CLASSIFICATIONS = 'classifications', 'Classification layers'
     P_NODE_PADDING, _NODE_PADDING = 'nodePadding', 'Node padding'

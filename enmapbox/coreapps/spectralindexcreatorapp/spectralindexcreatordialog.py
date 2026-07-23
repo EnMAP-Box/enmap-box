@@ -1,7 +1,6 @@
 from math import inf
 from typing import Optional
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from qgis import processing
@@ -13,7 +12,6 @@ from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsProcessing, QgsR
 from qgis.gui import QgsRasterBandComboBox, QgsMapLayerComboBox, QgsFilterLineEdit, QgsDoubleSpinBox, QgsFileWidget
 
 
-@typechecked
 class SpectralIndexCreatorDialog(QMainWindow):
     mLayer: QgsMapLayerComboBox
     mUseReflectanceScaleFactor: QCheckBox

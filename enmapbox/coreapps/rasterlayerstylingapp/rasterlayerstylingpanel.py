@@ -8,7 +8,6 @@ from enmapbox.gui.dataviews.dockmanager import DockPanelUI
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import MapCanvas
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapbox.typeguard import typechecked
 from enmapbox.utils import BlockSignals
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader, metadataCache, setMetadataCache, buildMetadataCache
@@ -27,7 +26,6 @@ from rasterlayerstylingapp.rasterlayerstylingbandwidget import RasterLayerStylin
 from rasterlayerstylingapp.rasterlayerstylingpercentileswidget import RasterLayerStylingPercentilesWidget
 
 
-@typechecked
 class RasterLayerStylingPanel(QgsDockWidget):
     # main layer
     mInfo: QLabel
@@ -260,7 +258,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
             return
         name, snames = self.mVisualization.currentText().split(' (')
         for sname, mBand in zip(
-            snames.strip(' )').split('-'), [self.mRedBand, self.mGreenBand, self.mBlueBand]
+                snames.strip(' )').split('-'), [self.mRedBand, self.mGreenBand, self.mBlueBand]
         ):
             mWaveband: QToolButton = getattr(mBand, 'mWaveband' + sname)
             mWaveband.click()
@@ -956,8 +954,8 @@ class RasterLayerStylingPanel(QgsDockWidget):
             self.mGroupBoxMinMax.hide()
 
         if all(
-            [self.mRenderer.currentIndex() < self.DefaultRendererTab,
-             self.mRenderer.currentIndex() != self.RgbRendererTab]
+                [self.mRenderer.currentIndex() < self.DefaultRendererTab,
+                 self.mRenderer.currentIndex() != self.RgbRendererTab]
         ):
 
             self.mGroupBoxTransparency.show()

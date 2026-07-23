@@ -1,14 +1,12 @@
 from bandstatisticsapp.bandstatisticsdialog import BandStatisticsDialog
 from enmapbox.gui.applications import EnMAPBoxApplication
 from qgis.PyQt.QtGui import QIcon
-from enmapbox.typeguard import typechecked
 
 
 def enmapboxApplicationFactory(enmapBox):
     return [BandStatisticsApp(enmapBox)]
 
 
-@typechecked
 class BandStatisticsApp(EnMAPBoxApplication):
     def __init__(self, enmapBox, parent=None):
         super().__init__(enmapBox, parent=parent)

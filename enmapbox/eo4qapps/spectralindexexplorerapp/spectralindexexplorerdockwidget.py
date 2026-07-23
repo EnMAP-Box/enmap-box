@@ -1,6 +1,8 @@
 import traceback
 from contextlib import suppress
 
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapboxprocessing.rasterreader import RasterReader
 from qgis.PyQt import uic
 from qgis.PyQt.QtGui import QPalette
 from qgis.PyQt.QtWidgets import QApplication
@@ -11,12 +13,7 @@ from qgis.gui import (
     QgsMessageBar
 )
 
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.typeguard import typechecked
-from enmapboxprocessing.rasterreader import RasterReader
 
-
-@typechecked
 class SpectralIndexExplorerDockWidget(QgsDockWidget):
     mLayer: QgsMapLayerComboBox
     mFilterText: QgsFilterLineEdit

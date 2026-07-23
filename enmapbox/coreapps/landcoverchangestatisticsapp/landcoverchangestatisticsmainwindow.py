@@ -7,7 +7,6 @@ import plotly.graph_objects as go
 from scipy.stats._crosstab import crosstab
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent, SpatialPoint
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
@@ -26,7 +25,6 @@ from qgis.core import QgsRectangle, QgsPalettedRasterRenderer, QgsRasterLayer, Q
 from qgis.gui import QgsMapCanvas
 
 
-@typechecked
 class LandCoverChangeStatisticsMainWindow(QMainWindow):
     # mWebView: QWebView
     mStatusBar: QStatusBar
@@ -159,7 +157,6 @@ class LandCoverChangeStatisticsMainWindow(QMainWindow):
         self.onApplyClicked()
 
 
-@typechecked
 class LandCoverChangeSankeyPlotBuilder():
     DiscardedCategory = Category(-0.1, 'Discarded', '#ff0000')
 
@@ -255,8 +252,8 @@ class LandCoverChangeSankeyPlotBuilder():
 
     @classmethod
     def recodeConfusionMatrix(
-        cls, matrix: np.ndarray, categories1: List[Category], categories2: List[Category], filter1: List[str],
-        filter2: List[str]
+            cls, matrix: np.ndarray, categories1: List[Category], categories2: List[Category], filter1: List[str],
+            filter2: List[str]
     ):
         expected_shape = (len(categories1), len(categories2))
         if matrix.shape != expected_shape:
@@ -406,7 +403,7 @@ class LandCoverChangeSankeyPlotBuilder():
         off1 = 0
         off2 = len(categoriess[0])
         for linkSizes, categories1, categories2, locationValue1, locationValue2 in zip(
-            linkSizess, categoriess, categoriess[1:], self.locationProfile, self.locationProfile[1:]
+                linkSizess, categoriess, categoriess[1:], self.locationProfile, self.locationProfile[1:]
         ):
             levels = [[c.value for c in categories1], [c.value for c in categories2]]
             count = linkSizes / np.sum(linkSizes) * 100
