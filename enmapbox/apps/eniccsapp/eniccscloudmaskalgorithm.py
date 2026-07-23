@@ -2,13 +2,14 @@ import contextlib
 import os
 from typing import Any, Dict, List, Tuple
 
-from qgis._core import QgsProcessingParameterFile
 from qgis.core import (
     QgsProcessingContext,
     QgsProcessingException,
     QgsProcessingFeedback,
     QgsProcessingOutputRasterLayer
 )
+from qgis.core import QgsProcessingParameterFile
+
 try:
     from eniccs import run_eniccs
 except ImportError:
@@ -16,6 +17,7 @@ except ImportError:
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
+
 
 # for routing eniccs prints back to gui if verbose=True
 class _FeedbackStream:
@@ -102,7 +104,7 @@ class EniccsCloudMaskAlgorithm(EnMAPProcessingAlgorithm):
         self.addOutput(QgsProcessingOutputRasterLayer(self.P_OUTPUT_SHADOW, self._OUTPUT_SHADOW))
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         if run_eniccs is None:
             raise QgsProcessingException(
@@ -110,7 +112,7 @@ class EniccsCloudMaskAlgorithm(EnMAPProcessingAlgorithm):
                 'Install it with: pip install eniccs or conda install -c conda-forge eniccs'
             )
 
-        folder = self.parameterAsFile(parameters, self.P_PRODUCT, context) # fallback for out_dir
+        folder = self.parameterAsFile(parameters, self.P_PRODUCT, context)  # fallback for out_dir
         output_dir = self.parameterAsFile(parameters, self.P_OUTPUT_DIR, context) or folder
         auto_optimize = self.parameterAsBoolean(parameters, self.P_AUTO_OPTIMIZE, context)
         smooth = self.parameterAsBoolean(parameters, self.P_SMOOTH, context)
@@ -135,7 +137,7 @@ class EniccsCloudMaskAlgorithm(EnMAPProcessingAlgorithm):
                     return_mask_obj=True,
                     auto_optimize=auto_optimize,
                     verbose=verbose,
-                    plot=False, # hardcoded. unavaiable in enmapbox.
+                    plot=False,  # hardcoded. unavaiable in enmapbox.
                     smooth_output=smooth,
                     contamination=contamination,
                     percentile=percentile,
@@ -146,7 +148,7 @@ class EniccsCloudMaskAlgorithm(EnMAPProcessingAlgorithm):
         except (FileNotFoundError, ValueError) as e:  # user-actionable errors have clean
             # messages in eniccs.
             raise QgsProcessingException(str(e))
-        except Exception as e: # all others
+        except Exception as e:  # all others
             import traceback
             for line in traceback.format_exc().splitlines():
                 feedback.reportError(line)
