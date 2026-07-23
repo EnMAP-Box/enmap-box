@@ -1,9 +1,9 @@
 from typing import List
 
 import numpy as np
+import pyqtgraph as pg
 from sklearn.svm import SVR
 
-import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyle, MarkerSymbol
 from profileanalyticsapp.profileanalyticsdockwidget import Profile
 from qgis.PyQt.QtCore import Qt

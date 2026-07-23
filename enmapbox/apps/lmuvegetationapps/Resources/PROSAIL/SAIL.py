@@ -14,9 +14,11 @@ Verhoef W. (1984), Light scattering by leaf layers with application to canopy re
 Remote Sensing of Environment, 16, 125-141. Article.
 '''
 
-from lmuvegetationapps.Resources.PROSAIL.dataSpec import *
-from lmuvegetationapps.Resources.PROSAIL.SAILdata import *
 import numpy as np
+
+from lmuvegetationapps.Resources.PROSAIL.SAILdata import cos_tl1, cos_tl2, tan_tl1, tan_tl2, beta_dict
+from lmuvegetationapps.Resources.PROSAIL.dataSpec import Rsoil1, Rsoil2, Es, Ed
+
 
 class Sail:
 
@@ -51,13 +53,13 @@ class Sail:
         if type(understory) is np.ndarray:
             soil = understory
         elif not isinstance(soil, np.ndarray):  # "soil" is not supplied as np.array, but is "None" instead
-            soil = np.outer(psoil, Rsoil1) + np.outer((1-psoil), Rsoil2)  # np.outer = outer product (vectorized)
+            soil = np.outer(psoil, Rsoil1) + np.outer((1 - psoil), Rsoil2)  # np.outer = outer product (vectorized)
 
         # Generate Leaf Angle Distribution From Average Leaf Angle (ellipsoidal) or (a, b) parameters
         lidf = self.lidf_calc(LIDF, TypeLIDF)
 
         # Weighted Sums of LIDF
-        litab = np.concatenate((np.arange(5, 85, 10), np.arange(81, 91, 2)), axis=0) 
+        litab = np.concatenate((np.arange(5, 85, 10), np.arange(81, 91, 2)), axis=0)
         # litab -> 5, 15, 25, 35, 45, ... , 75, 81, 83, ... 89
         litab = np.radians(litab)
 
@@ -95,11 +97,11 @@ class Sail:
         m2[m2 < 0] = 0.0
         m = np.sqrt(m2)
 
-        sb = sdb*rho + sdf*tau
-        sf = sdf*rho + sdb*tau
-        vb = dob*rho + dof*tau
-        vf = dof*rho + dob*tau
-        w = sob*rho + sof*tau
+        sb = sdb * rho + sdf * tau
+        sf = sdf * rho + sdb * tau
+        vb = dob * rho + dof * tau
+        vf = dof * rho + dob * tau
+        w = sob * rho + sof * tau
 
         # Include LAI (make sure, LAI is > 0!)
         e1 = np.exp(-m * LAI)
@@ -163,7 +165,7 @@ class Sail:
 
         # Bidirectional reflectance
         rsos = w * LAI * sumint  # Single scattering contribution
-        dn = 1.0 - soil * rdd    # Soil interaction
+        dn = 1.0 - soil * rdd  # Soil interaction
         tdd_dn = tdd / dn
         rdot = rdo + soil * (tdo + too) * tdd_dn  # hemispherical-directional reflectance factor in viewing direction
         rsodt = rsod + ((tss + tsd) * tdo + (tsd + tss * soil * rdd) * too) * soil / dn
@@ -222,8 +224,9 @@ class Sail:
         dumm = x1 * almx1 + alpha2 * np.arcsin(x1 / alpha[:, np.newaxis])
 
         freq[excent > 1.0, :] = np.abs(dump - (x2 * alpx2 + alpha2 * np.log(x2 + alpx2)))[excent > 1.0, :]
-        freq[excent < 1.0, :] = np.abs(dumm - (x2 * almx2 + alpha2 *
-                                               np.arcsin(x2 / alpha[:, np.newaxis])))[excent < 1.0, :]
+        freq[excent < 1.0, :] = np.abs(
+            dumm - (x2 * almx2 + alpha2 * np.arcsin(x2 / alpha[:, np.newaxis]))
+        )[excent < 1.0, :]
         freq[excent == 1.0, :] = np.abs(cos_tl1 - cos_tl2)
 
         return freq / freq.sum(axis=1)[:, np.newaxis]  # Normalize
@@ -237,28 +240,32 @@ class Sail:
         ss = np.outer(self.sintts, sinttl)
         so = np.outer(self.sintto, sinttl)
 
-        cosbts = np.where(np.abs(ss) > 1e-6, -cs/ss, 5.0)
-        cosbto = np.where(np.abs(so) > 1e-6, -co/so, 5.0)
+        cosbts = np.where(np.abs(ss) > 1e-6, -cs / ss, 5.0)
+        cosbto = np.where(np.abs(so) > 1e-6, -co / so, 5.0)
         bts = np.where(np.abs(cosbts) < 1, np.arccos(cosbts), np.pi)
         ds = np.where(np.abs(cosbts) < 1, ss, cs)
 
-        chi_s = 2.0 / np.pi*((bts - np.pi*0.5)*cs + np.sin(bts)*ss)
+        chi_s = 2.0 / np.pi * ((bts - np.pi * 0.5) * cs + np.sin(bts) * ss)
 
         bto = np.where(np.abs(cosbto) < 1,
                        np.arccos(cosbto),
                        np.where(self.tto[:, np.newaxis] < np.pi * 0.5, np.pi, 0.0))
         doo = np.where(np.abs(cosbto) < 1, so, np.where(self.tto[:, np.newaxis] < np.pi * 0.5, co, -co))
 
-        chi_o = 2.0 / np.pi * ((bto - np.pi * 0.5)*co + np.sin(bto) * so)
+        chi_o = 2.0 / np.pi * ((bto - np.pi * 0.5) * co + np.sin(bto) * so)
 
         btran1 = np.abs(bts - bto)
         btran2 = np.pi - np.abs(bts + bto - np.pi)
 
         bt1 = np.where(self.psi[:, np.newaxis] < btran1, self.psi[:, np.newaxis], btran1)
-        bt2 = np.where(self.psi[:, np.newaxis] < btran1, btran1, np.where(self.psi[:, np.newaxis]
-                                                                          <= btran2, self.psi[:, np.newaxis], btran2))
-        bt3 = np.where(self.psi[:, np.newaxis] < btran1, btran2, np.where(self.psi[:, np.newaxis]
-                                                                          <= btran2, btran2, self.psi[:, np.newaxis]))
+        bt2 = np.where(
+            self.psi[:, np.newaxis]
+            < btran1, btran1, np.where(self.psi[:, np.newaxis] <= btran2, self.psi[:, np.newaxis], btran2)  # noqa
+        )
+        bt3 = np.where(
+            self.psi[:, np.newaxis]
+            < btran1, btran2, np.where(self.psi[:, np.newaxis] <= btran2, btran2, self.psi[:, np.newaxis])  # noqa
+        )
 
         t1 = 2 * cs * co + ss * so * self.cospsi[:, np.newaxis]
         t2 = np.where(bt2 > 0, np.sin(bt2) * (2 * ds * doo + ss * so * np.cos(bt1) * np.cos(bt3)), 0)

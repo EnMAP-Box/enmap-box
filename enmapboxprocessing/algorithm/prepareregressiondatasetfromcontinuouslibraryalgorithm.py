@@ -26,7 +26,7 @@ class PrepareRegressionDatasetFromContinuousLibraryAlgorithm(EnMAPProcessingAlgo
 
     def shortDescription(self) -> str:
         return 'Create a regression dataset from spectral profiles that matches the given target variables ' \
-               'and store the result as a pickle file.'
+               'and store the result as a skops file.'
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
@@ -42,7 +42,7 @@ class PrepareRegressionDatasetFromContinuousLibraryAlgorithm(EnMAPProcessingAlgo
                           'If that is also not available, an error is raised.'),
             (self._EXCLUDE_BAD_BANDS, 'Whether to exclude bands, that are marked as bad bands, '
                                       'or contain no data, inf or nan values in all samples.'),
-            (self._OUTPUT_DATASET, self.PickleFileDestination)
+            (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
     def group(self):
@@ -59,7 +59,7 @@ class PrepareRegressionDatasetFromContinuousLibraryAlgorithm(EnMAPProcessingAlgo
             False, True
         )
         self.addParameterBoolean(self.P_EXCLUDE_BAD_BANDS, self._EXCLUDE_BAD_BANDS, True, True, True)
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
@@ -159,7 +159,7 @@ class PrepareRegressionDatasetFromContinuousLibraryAlgorithm(EnMAPProcessingAlgo
 
             dump = RegressorDump(targets=targets, features=features, X=X, y=y, locations=locations, crs=crs)
             dumpDict = dump.__dict__
-            Utils.pickleDump(dumpDict, filename)
+            Utils.modelDump(dumpDict, filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)

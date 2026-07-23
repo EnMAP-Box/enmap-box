@@ -10,7 +10,7 @@ channels:
   - conda-forge
 dependencies:
   - python>=3.10
-  - qgis
+  - qgis<3.44.3
   - docutils
   - flake8
   - git-lfs
@@ -32,7 +32,7 @@ dependencies:
       - torch==2.6.0
       - lightning==2.5.0.post0
       - tensorboard==2.19.0
-      - torchvision==0.21.0 
+      - torchvision==0.21.0
       - segmentation-models-pytorch==0.5.0
       - pandas==2.2.3
 

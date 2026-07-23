@@ -94,7 +94,7 @@ class TestRasterizeCategorizedVectorAlgorithm(TestCase):
         # change categories
         vector = QgsVectorLayer(landcover_polygon)
         renderer = vector.renderer()
-        assert isinstance(renderer, QgsCategorizedSymbolRenderer)
+        self.assertIsInstance(renderer, QgsCategorizedSymbolRenderer)
         categories = Utils.categoriesFromRenderer(vector.renderer())
         categories = categories[:2]
         renderer = Utils.categorizedSymbolRendererFromCategories(renderer.classAttribute(), categories)

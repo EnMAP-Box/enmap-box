@@ -15,7 +15,8 @@ class SpectralConvolutionSavitskyGolay1DAlgorithm(ConvolutionFilterAlgorithmBase
 
     def helpParameterCode(self) -> str:
         link = self.htmlLink(
-            'https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_coeffs.html#scipy-signal-savgol-coeffs',
+            'https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_coeffs.html'
+            '#scipy-signal-savgol-coeffs',
             'scipy.signal.savgol_coeffs')
         return f'Python code. See {link} for information on different parameters.'
 

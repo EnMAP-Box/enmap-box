@@ -30,7 +30,6 @@ def enmapboxApplicationFactory(enmapBox):
     :param enmapBox: the EnMAP-Box instance.
     :return: [list-of-EnMAPBoxApplications]
     """
-    s = ""
 
     # from reclassifyapp.reclassify import ReclassifyTool
     # returns a list of EnMAPBoxApplications

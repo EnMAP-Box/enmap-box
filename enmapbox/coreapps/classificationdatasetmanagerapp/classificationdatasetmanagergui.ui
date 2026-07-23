@@ -36,7 +36,7 @@
                         </widget>
                     </item>
                     <item>
-                        <widget class="ProcessingParameterPickleFileClassificationDatasetWidget" name="mDataset"
+                        <widget class="ProcessingParameterSkopsFileClassificationDatasetWidget" name="mDataset"
                                 native="true"/>
                     </item>
                 </layout>
@@ -415,9 +415,9 @@
             <header>qgsspinbox.h</header>
         </customwidget>
         <customwidget>
-            <class>ProcessingParameterPickleFileClassificationDatasetWidget</class>
+            <class>ProcessingParameterSkopsFileClassificationDatasetWidget</class>
             <extends>QWidget</extends>
-            <header>enmapboxprocessing.parameter.processingparameterpicklefileclassificationdatasetwidget</header>
+            <header>enmapboxprocessing.parameter.processingparameterskopsfileclassificationdatasetwidget</header>
             <container>1</container>
         </customwidget>
     </customwidgets>

@@ -134,7 +134,7 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterBoolean(self.P_COPY_STYLE, self._COPY_STYLE, False)
         self.addParameterBoolean(self.P_EXCLUDE_BAD_BANDS, self._EXCLUDE_BAD_BANDS, False)
         self.addParameterBoolean(self.P_EXCLUDE_DERIVED_BAD_BANDS, self._EXCLUDE_DERIVED_BAD_BANDS, False)
-        self.addParameterBoolean(self.P_WRITE_ENVI_HEADER, self._WRITE_ENVI_HEADER, True)
+        self.addParameterBoolean(self.P_WRITE_ENVI_HEADER, self._WRITE_ENVI_HEADER, False)
         self.addParameterRasterLayer(self.P_SPECTRAL_RASTER, self._SPECTRAL_RASTER, None, True, True)
         self.addParameterBandList(
             self.P_SPECTRAL_BAND_LIST, self._SPECTRAL_BAND_LIST, None, self.P_SPECTRAL_RASTER, True, True
@@ -281,7 +281,8 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                 )
 
             gdalDataset = gdal.Open(rasterSource)
-            assert gdalDataset is not None
+            if gdalDataset is None:
+                raise RuntimeError(f'failed to open GDAL dataset: {rasterSource!r}')
 
             callback = Utils.qgisFeedbackToGdalCallback(feedback)
             resampleAlgSupportedByGdalTranslate = resampleAlg not in [gdal.GRA_Min, gdal.GRA_Q1, gdal.GRA_Med,
@@ -304,7 +305,8 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                 outGdalDataset: gdal.Dataset = gdal.Translate(
                     destName=filename, srcDS=gdalDataset, options=translateOptions
                 )
-                assert outGdalDataset is not None
+                if outGdalDataset is None:
+                    raise RuntimeError(f'GDAL Translate failed for output file {filename!r}')
 
                 # need to explicitely set the GeoTransform tuple, because gdal.Translate extent may deviate slightly
                 if grid.crs().isValid():
@@ -335,7 +337,8 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                 outGdalDataset: gdal.Dataset = gdal.Warp(
                     filename, tmpGdalDataset, options=warpOptions
                 )
-                assert outGdalDataset is not None
+                if outGdalDataset is None:
+                    raise RuntimeError(f'GDAL Warp failed for output file {filename!r}')
 
             del outGdalDataset  # close and reopen to write metadata to aux.xml
             outGdalDataset = gdal.Open(filename, gdal.GA_Update)
@@ -398,8 +401,8 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
             writer.close()
             del writer, outGdalDataset
 
-            # need to re-open the raster before setting the scal/offset (issue #501)
-            outGdalDataset = gdal.Open(filename)
+            # need to re-open the raster before setting the scale/offset (issue #501)
+            outGdalDataset = gdal.Open(filename, gdal.GA_Update)
             writer = RasterWriter(outGdalDataset)
             for dstBandNo, srcBandNo in enumerate(bandList, 1):
                 if offset is None:
@@ -410,8 +413,10 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
                     writer.setScale(reader.scale(srcBandNo), dstBandNo)
                 else:
                     writer.setScale(scale, dstBandNo)
+
             writer.close()
-            del writer, outGdalDataset
+            del writer
+            del outGdalDataset
 
             if writeEnviHeader:
                 if driverShortName in ['GTiff', 'ENVI']:

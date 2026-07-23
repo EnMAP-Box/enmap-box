@@ -9,7 +9,7 @@ class TestCasesVectorLayerTools(EnMAPBoxTestCase):
         lyr0 = TestObjects.createVectorLayer()
         lyr = TestObjects.createVectorLayer()
 
-        f0 = lyr0.getFeature(0)
+        lyr0.getFeature(0)
         tools = VectorLayerTools()
 
         tools.startEditing(lyr)

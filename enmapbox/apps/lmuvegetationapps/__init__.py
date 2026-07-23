@@ -38,5 +38,5 @@ def enmapboxApplicationFactory(enmapBox):
     """
 
     from lmuvegetationapps.enmapboxintegration import LMU_EnMAPBoxApp
-    #returns a list of EnMAPBoxApplications
+    # returns a list of EnMAPBoxApplications
     return [LMU_EnMAPBoxApp(enmapBox)]

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ***************************************************************************
-    dependencychecker
+    dependencycheck.py
 
     This module contains functionality to check the calling python environment for required packages and return
     user-friendly warning in case of missing dependencies.
@@ -28,7 +28,7 @@ import logging
 import os
 import platform
 import re
-import subprocess
+import subprocess  # nosec B404
 import sys
 import time
 import traceback
@@ -40,18 +40,18 @@ from typing import Any, Dict, Iterator, List, Match, Optional, Tuple
 
 from enmapbox import REQUIREMENTS_CSV
 from enmapbox.enmapboxsettings import EnMAPBoxSettings
-from enmapbox.qgispluginsupport.qps.utils import qgisAppQgisInterface
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import pyqtSignal, QAbstractTableModel, QModelIndex, QProcess, QSortFilterProxyModel, Qt, QUrl
 from qgis.PyQt.QtGui import QColor, QContextMenuEvent, QDesktopServices
-from qgis.PyQt.QtWidgets import QApplication, QDialogButtonBox, QMenu, QMessageBox, QStyledItemDelegate, QTableView, \
-    QWidget
-from qgis.core import Qgis, QgsAnimatedIcon, QgsApplication, QgsTask, QgsTaskManager
+from qgis.PyQt.QtWidgets import (QApplication, QDialogButtonBox, QMenu, QMessageBox,
+                                 QStyledItemDelegate, QTableView, QWidget)
+from qgis.core import Qgis, QgsAnimatedIcon, QgsApplication, QgsTask
 from qgis.gui import QgsFileDownloaderDialog
 
 logger = logging.getLogger(__name__)
 
-URL_PACKAGE_HELP = r"https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html#install-required-python-packages"
+URL_PACKAGE_HELP = (r"https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html#"
+                    r"install-required-python-packages")
 
 INFO_MESSAGE_BEFORE_PACKAGE_INSTALLATION = f"""
 <b>It might be necessary to install missing package(s) with your local package manager!</b>
@@ -79,30 +79,36 @@ INSTALLATION_BLOCK = {  # 'numba': 'should to be installed manually using the lo
     #         'https://numba.pydata.org/numba-doc/dev/user/installing.html</a> for details',
     'numpy': 'needs to be installed/updated manually with local package manager (e.g. OSGeo4W Setup under Windows)',
     'GDAL': 'needs to be installed/updated manually with local package manager (e.g. OSGeo4W Setup under Windows)',
-    'h5py': 'needs to be installed/updated manually with local package manager (e.g. OSGeo4W Setup under Windows); also see issue #868'
+    'h5py': 'needs to be installed/updated manually with local package manager (e.g. OSGeo4W Setup under Windows); '
+            'also see issue #868'
 }
 
 # https://packaging.python.org/tutorials/packaging-projects/#uploading-your-project-to-pypi
 # pip package names: "name is the distribution name of your package.
 # This can be any name as long as only contains letters, numbers, _ , and -."
 rxPipPackageName = re.compile(r'^[a-zA-Z]+[a-zA-Z0-9-_]*')
-rxPipVersion = re.compile(r'([1-9][0-9]*!)?(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*((a|b|rc)(0|[1-9][0-9]*))?'
-                          + r'(\.post(0|[1-9][0-9]*))?(\.dev(0|[1-9][0-9]*))?')
+rxPipVersion = re.compile(
+    r'([1-9][0-9]*!)?(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*((a|b|rc)(0|[1-9][0-9]*))?'
+    r'(\.post(0|[1-9][0-9]*))?(\.dev(0|[1-9][0-9]*))?'
+)
 
 for k in PACKAGE_LOOKUP.keys():
-    assert rxPipPackageName.search(k)
+    if not rxPipPackageName.search(k):
+        raise RuntimeError(f"Invalid package name in PACKAGE_LOOKUP: {k!r}")
 
 
 class PIPPackage(object):
+    """
+    Describes a single python package that can be installed via pip.
+    """
 
     @staticmethod
-    def fromDict(info) -> Optional['PIPPackage']:
+    def fromDict(info: dict) -> Optional['PIPPackage']:
         """
         Create a PIPPackage from data stored in a dictionary.
         :param info: dict
         :return: PIPPackage
         """
-        assert isinstance(info, dict)
         for n in ['Name', 'name']:
             if n in info:
                 pip_name = info[n]
@@ -114,24 +120,26 @@ class PIPPackage(object):
     def __init__(self,
                  pip_name: str,
                  py_name: str = None,
+                 required_by: Optional[str] = None,
                  min_version: str = None,
                  used_by: List[str] = None,
                  comment: str = None):
 
-        assert isinstance(pip_name, str)
-        assert len(pip_name) > 0
         pip_name = pip_name.strip()
         if py_name is None:
-            py_name = PACKAGE_LOOKUP.get(pip_name)
+            py_name = PACKAGE_LOOKUP.get(pip_name, pip_name)
 
+        if py_name is None:
+            pass
         self.pyPkgName: str = py_name
         self.pipPkgName = pip_name
-
+        self.required_by: Optional[str] = required_by
         self.mIsInstalled: Optional[bool] = None
         self.installer: str = ''
         self.location: str = ''
         self.stderrMsg: str = ''
         self.stdoutMsg: str = ''
+        self.comment: Optional[str] = comment
 
         self.version_latest: str = ''
         self.version: str = ''
@@ -148,18 +156,28 @@ class PIPPackage(object):
         else:
             self.version = '<not installed>'
 
+    def isCoreRequirement(self) -> bool:
+        return self.required_by == 'core'
+
     def __repr__(self):
         return super().__repr__() + f'"{self.pipPkgName}"'
 
     def updateFromDict(self, info: dict):
         info = {k.lower(): v for k, v in info.items()}
-        assert 'name' in info
-        assert info['name'] == self.pipPkgName
+
+        if 'name' not in info:
+            raise KeyError("Missing required key 'name'")
+
+        if info['name'] != self.pipPkgName:
+            raise ValueError(f"Expected package name {self.pipPkgName!r}, got {info['name']!r}")
 
         if 'version' in info:
             self.version = info['version']
             if self.version_latest == '':
                 self.version_latest = self.version
+
+        if 'required_by' in info:
+            self.required_by = info['required_by']
 
         if 'summary' in info:
             self.summary = info['summary']
@@ -183,7 +201,8 @@ class PIPPackage(object):
 
         if 'latest_version' in info:
             self.version_latest = info['latest_version']
-        s = ""
+
+        self.mIsInstalled = None
 
     def isMissing(self) -> bool:
         return not self.isInstalled()
@@ -244,15 +263,21 @@ class PIPPackage(object):
         :return:
         :rtype:
         """
-        if not isinstance(self.mIsInstalled, bool) and isinstance(self.pyPkgName, str):
-            try:
-                spam_spec = importlib.util.find_spec(self.pyPkgName)
-                if isinstance(spam_spec, ModuleSpec) and spam_spec.has_location:
-                    self.location = os.path.dirname(spam_spec.origin)
-                self.mIsInstalled = spam_spec is not None
-            except Exception as ex:
-                # https://github.com/EnMAP-Box/enmap-box/issues/215
-                self.mError = str(ex)
+
+        if not isinstance(self.mIsInstalled, bool):
+            if self.location != '':
+                # the pip package name was found by pip
+                self.mIsInstalled = True
+            elif isinstance(self.pyPkgName, str):
+                # we can import it with python
+                try:
+                    spam_spec = importlib.util.find_spec(self.pyPkgName)
+                    if isinstance(spam_spec, ModuleSpec) and spam_spec.has_location:
+                        self.location = os.path.dirname(spam_spec.origin)
+                    self.mIsInstalled = spam_spec is not None
+                except Exception as ex:
+                    # https://github.com/EnMAP-Box/enmap-box/issues/215
+                    self.mError = str(ex)
 
         return self.mIsInstalled is True
 
@@ -272,8 +297,9 @@ def get_prog() -> str:
     return "pip"
 
 
-def localPipExecutable() -> Path:
+def localPipExecutable() -> Optional[Path]:
     global _LOCAL_PIPEXE
+
     if _LOCAL_PIPEXE is None:
 
         pipexe = Path(get_prog())
@@ -302,7 +328,7 @@ def localPipExecutable() -> Path:
                     process.start(c)
                     process.waitForFinished()
                     msgOut = decode_bytes(process.readAllStandardOutput().data())
-                    msgErr = decode_bytes(process.readAllStandardError().data())
+                    # msgErr = decode_bytes(process.readAllStandardError().data())
                     success = process.exitCode() == 0
                     if success and len(msgOut) > 0:
                         lines = msgOut.splitlines()
@@ -313,32 +339,6 @@ def localPipExecutable() -> Path:
             if isinstance(pipexe, Path) and pipexe.is_file():
                 _LOCAL_PIPEXE = pipexe
     return _LOCAL_PIPEXE
-
-
-def localPythonExecutable() -> Optional[Path]:
-    """
-    Searches for the local python executable
-    :return:
-    """
-    candidates = [Path(sys.executable)]
-    pythonhome = os.environ.get('PYTHONHOME', None)
-    if pythonhome:
-        pythonhome = Path(pythonhome)
-        ext = ''
-        if 'windows' in platform.uname().system.lower():
-            ext = '.exe'
-        for n in ['python3', 'python']:
-            candidates.extend([
-                pythonhome / f'{n}{ext}',
-                pythonhome / 'bin' / f'{n}{ext}'
-            ])
-
-    for c in candidates:
-        c = Path(c.resolve())
-        if c.is_file() and 'python' in c.name.lower():
-            return c
-
-    return None
 
 
 def decode_bytes(bytes_str, encodings=None):
@@ -353,13 +353,11 @@ def decode_bytes(bytes_str, encodings=None):
     return None
 
 
-def call_pip_command(pipArgs) -> Tuple[bool, Optional[str], Optional[str]]:
-    assert isinstance(pipArgs, list)
-
+def call_pip_command(pipArgs: list) -> Tuple[bool, Optional[str], Optional[str]]:
     success = 0
     msgOut = msgErr = None
-    if True:
-        pipexe = localPipExecutable()
+    pipexe = localPipExecutable()
+    if pipexe:
         cmd = [str(pipexe)] + pipArgs
 
         kwargs = {}
@@ -367,12 +365,13 @@ def call_pip_command(pipArgs) -> Tuple[bool, Optional[str], Optional[str]]:
             # Prevent opening a console window
             kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
 
-        result = subprocess.run(cmd,
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE,
-                                text=True,
-                                **kwargs,
-                                )
+        result = subprocess.run(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            **kwargs,
+        )  # nosec B603 # process is checked, and there is simply no other way to call the local pip executable
         success = result.returncode == 0
         msgOut = result.stdout
         msgErr = result.stderr
@@ -434,7 +433,7 @@ class PIPPackageInfoTask(QgsTask):
     sigPackageInfo = pyqtSignal(list)
 
     def __init__(self, description: str = 'Update PyPI Status',
-                 packages_of_interest=None,
+                 packages_of_interest: List[str] = None,
                  batch_size: int = 20,
                  poi_only: bool = False,
                  search_updates: bool = True,
@@ -444,8 +443,6 @@ class PIPPackageInfoTask(QgsTask):
 
         if packages_of_interest is None:
             packages_of_interest = []
-        for p in packages_of_interest:
-            assert isinstance(p, str)
 
         self._pois: List[str] = packages_of_interest
         self._callback = callback
@@ -532,7 +529,7 @@ class PIPPackageInfoTask(QgsTask):
                     j = min(n, i + batch_size)
                     batch = pkg_all[i:j]
                     success, msg, err = call_pip_command(['show'] + [p['name'] for p in batch])
-                    if success:
+                    if success and msg not in ['', None]:
                         infoLinesAll = rxBlock.split(msg)
                         infoBatch = []
                         for infoLines in infoLinesAll:
@@ -595,22 +592,24 @@ def checkGDALIssues() -> List[str]:
 
 def requiredPackages(return_tuples: bool = False) -> List[PIPPackage]:
     """
-    Returns a list of pip packages that should be installable according to the `requirements.csv` file
+    Returns a list of pip packages that should be installable, according to the `requirements.csv` file
     :return: [list of strings]
     :rtype: list
     """
 
     # see https://pip.pypa.io/en/stable/reference/pip_install/#requirements-file-format
-    # for details of the requirements format
+    # for details of the requirement format
 
     file = REQUIREMENTS_CSV
-    assert file.is_file(), '{} does not exist'.format(file)
+    if not file.is_file():
+        raise FileNotFoundError(f"{file} does not exist")
+
     packages: List[PIPPackage] = []
     # rxPipPkg = re.compile(r'^[a-zA-Z_-][a-zA-Z0-9_-]*')
 
     with open(file, 'r', newline='') as csv_file:
-        lines = [l.strip() for l in csv_file.read().splitlines()]
-        lines = [l for l in lines if not l.startswith('#')]
+        lines = [line.strip() for line in csv_file.read().splitlines()]
+        lines = [line for line in lines if not line.startswith('#')]
         reader = csv.DictReader(lines, delimiter=',', quotechar='"')
         for row in reader:
             for k in list(row.keys()):
@@ -618,13 +617,15 @@ def requiredPackages(return_tuples: bool = False) -> List[PIPPackage]:
                     del row[k]
 
             pip_name = row['pip_name']
-
+            required_by = row.get('required_by', None)
+            if required_by:
+                pass
             pkg = PIPPackage(pip_name,
+                             required_by=required_by,
                              py_name=row.get('py_name', pip_name),
                              min_version=row.get('min_version'),
                              comment=row.get('comment'),
                              )
-
             packages.append(pkg)
 
     return packages
@@ -646,9 +647,6 @@ def missingPackageInfo(missing_packages: List[PIPPackage], html=True) -> str:
     :param html: bool, set True (default) to return HTML output string
     :return: str
     """
-    assert isinstance(missing_packages, list)
-    for p in missing_packages:
-        assert isinstance(p, PIPPackage)
     missing_packages = [p for p in missing_packages if isinstance(p, PIPPackage) and not p.isInstalled()]
     n = len(missing_packages)
     if n == 0:
@@ -657,7 +655,6 @@ def missingPackageInfo(missing_packages: List[PIPPackage], html=True) -> str:
     from enmapbox import URL_INSTALLATION
     info = ['The following {} package(s) are not installed:'.format(n), '<ol>']
     for i, pkg in enumerate(missing_packages):
-        assert isinstance(pkg, PIPPackage)
         info.append(f'\t<li>{pkg.pyPkgName} (pip install {pkg.pipPkgName})</li>')
 
     info.append('</ol>')
@@ -680,7 +677,8 @@ def missingTestData() -> bool:
     """
     try:
         import enmapbox.exampledata
-        assert os.path.isfile(enmapbox.exampledata.enmap)
+        if not os.path.isfile(enmapbox.exampledata.enmap):
+            return True
         return False
     except Exception as ex:
         print(ex, file=sys.stderr)
@@ -689,7 +687,10 @@ def missingTestData() -> bool:
 
 def installTestData(overwrite_existing: bool = False, ask: bool = True):
     """
-    Downloads and installs the EnMAP-Box Example Data
+    Downloads and installs the EnMAP-Box Example Data.
+    :param overwrite_existing: Set True to overwrite existing testdata
+    :param ask: Opens a dialog to confirm download
+    :return:
     """
     if not missingTestData() and not overwrite_existing:
         print('Testdata already installed and up to date.')
@@ -712,7 +713,8 @@ def installTestData(overwrite_existing: bool = False, ask: bool = True):
     pathLocalZip = os.path.join(os.path.dirname(DIR_EXAMPLEDATA), 'enmapboxexampledata.zip')
     url = QUrl(URL_TESTDATA)
     dialog = QgsFileDownloaderDialog(url, pathLocalZip, 'Download enmapboxexampledata.zip')
-    qgisMainApp = qgisAppQgisInterface()
+
+    # qgisMainApp = qgisAppQgisInterface()
 
     def onCanceled():
         print('Download canceled')
@@ -739,8 +741,11 @@ def installTestData(overwrite_existing: bool = False, ask: bool = True):
                 if isinstance(m, Match):
                     subPaths.append(Path(m.group(1)))
 
-        assert len(subPaths) > 0, \
-            f'Downloaded zip file does not contain data with sub-paths {examplePkgName}/*:\n\t{pathLocalZip}'
+        if not subPaths:
+            raise ValueError(
+                f"Downloaded zip file does not contain data with sub-paths "
+                f"{examplePkgName}/*:\n\t{pathLocalZip}"
+            )
 
         for pathRel in subPaths:
             pathDst = targetDir.parent / pathRel
@@ -779,7 +784,7 @@ def installTestData(overwrite_existing: bool = False, ask: bool = True):
         QTimer.singleShot(5000, deleteFileDownloadedFile)
 
     def onDownloadProgress(received, total):
-        if not qgisMainApp and total > 0:
+        if not ask and total > 0:
             print('\r{:0.2f} %'.format(100. * received / total), end=' ', flush=True)
             time.sleep(0.1)
 
@@ -790,7 +795,7 @@ def installTestData(overwrite_existing: bool = False, ask: bool = True):
     dialog.downloadProgress.connect(onDownloadProgress)
 
     dialog.open()
-    dialog.exec_()
+    dialog.exec()
 
 
 class PIPPackageFilterModel(QSortFilterProxyModel):
@@ -802,39 +807,47 @@ class PIPPackageFilterModel(QSortFilterProxyModel):
         self.mFilter1 = 'required'
 
     def setPrimaryFilter(self, mode: str):
-        assert mode in ['all', 'required', 'missing']
-        self.mFilter1 = mode
-        self.invalidateFilter()
+        allowed_modes = {'all', 'required', 'missing'}
+
+        if mode not in allowed_modes:
+            raise ValueError(
+                f"Invalid mode {mode!r}. Expected one of {sorted(allowed_modes)}"
+            )
 
     def primaryFilter(self):
         return self.mFilter1
 
     def filterAcceptsRow(self, sourceRow: int, sourceParent: QModelIndex):
-        model = self.sourceModel()
-        assert isinstance(model, PIPPackageInstallerTableModel)
+        model: PIPPackageInstallerTableModel = self.sourceModel()
         pkg = model.index(sourceRow, 0, sourceParent).data(Qt.UserRole)
 
         if isinstance(pkg, PIPPackage):
-            is_required = pkg.pipPkgName in model.mIsEnMAPBoxRequirement
-            is_missing = not pkg.isInstalled()
-            if self.mFilter1 == 'required' and not is_required:
-                return False
-            elif self.mFilter1 == 'missing' and not (is_required and is_missing):
-                return False
+            if self.mFilter1 == 'required':
+                if pkg.required_by is None:
+                    return False
+                else:
+                    pass
+            elif self.mFilter1 == 'missing':
+                if pkg.required_by is None:
+                    return False
+                if pkg.isInstalled():
+                    return False
 
-        return super().filterAcceptsRow(sourceRow, sourceParent)
+        result = super().filterAcceptsRow(sourceRow, sourceParent)
+        return result
 
 
 class PIPPackageInstallerTableModel(QAbstractTableModel):
     CN_PIP = 0
     CN_VERSION = 1
     CN_LATEST_VERSION = 2
-    CN_SUMMARY = 3
-    CN_LOCATION = 4
-    CN_INSTALLER = 5
-    CN_LICENSE = 6
-    CN_HOMEPAGE = 7
-    CN_REQUIRES = 8
+    CN_COMMENT = 3
+    CN_SUMMARY = 4
+    CN_LOCATION = 5
+    CN_INSTALLER = 6
+    CN_LICENSE = 7
+    CN_HOMEPAGE = 8
+    CN_REQUIRES = 9
 
     def __init__(self, *args, **kwds):
         super().__init__(*args, **kwds)
@@ -843,6 +856,7 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
             self.CN_PIP: 'Package',
             self.CN_VERSION: 'Version',
             self.CN_LATEST_VERSION: 'Latest',
+            self.CN_COMMENT: 'Comment',
             self.CN_SUMMARY: 'Summary',
             self.CN_LOCATION: 'Location',
             self.CN_INSTALLER: 'Installer',
@@ -855,7 +869,8 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
             self.CN_PIP: 'PyPI package name. <br>Uncheck to skip a "missing package" warning at EnMAP-Box startup.',
             self.CN_VERSION: 'Installed Version',
             self.CN_LATEST_VERSION: 'Latest Version',
-            self.CN_SUMMARY: 'Package Summary',
+            self.CN_COMMENT: 'Comment',
+            self.CN_SUMMARY: 'PyPi Package Summary',
             self.CN_LOCATION: 'Install Location',
             self.CN_INSTALLER: 'The installer that installed the package',
             self.CN_LICENSE: 'Package License',
@@ -869,7 +884,7 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
 
         self.mAnimatedIcon = QgsAnimatedIcon(QgsApplication.iconPath("/mIconLoading.gif"), self)
 
-        self.mIsEnMAPBoxRequirement = set()
+        # self.mIsEnMAPBoxRequirement = set()
 
     def flags(self, index: QModelIndex):
         if not index.isValid():
@@ -878,7 +893,8 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
         flags = Qt.ItemIsEnabled | Qt.ItemIsSelectable
         if index.column() == self.CN_PIP:
             pkg = self.mPackages[index.row()]
-            if pkg.pipPkgName in self.mIsEnMAPBoxRequirement and pkg.isMissing():
+            # if pkg.isCoreRequirement():  # and pkg.isMissing():
+            if pkg.required_by == 'core':
                 flags = flags | Qt.ItemIsUserCheckable
         return flags
 
@@ -886,11 +902,10 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
         if not index.isValid():
             return None
 
-        pkg = self.mPackages[index.row()]
+        pkg: PIPPackage = self.mPackages[index.row()]
 
-        assert isinstance(pkg, PIPPackage)
         col = index.column()
-        cn = self.mColumnNames[col]
+        # cn = self.mColumnNames[col]
 
         changed = False
         if role == Qt.CheckStateRole:
@@ -904,7 +919,7 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
             self.dataChanged.emit(idx0, idx1, [role, Qt.ForegroundRole])
         return changed
 
-    def updatePackages(self, updates: List[Dict[str, Any]]) -> Tuple[List[PIPPackage], Tuple[List[PIPPackage]]]:
+    def updatePackages(self, updates: List[Dict[str, Any]]) -> Tuple[List[PIPPackage], List[PIPPackage]]:
 
         updated_packages = []
         new_packages = []
@@ -950,7 +965,6 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
         return len(self.mColumnNames)
 
     def pkg2index(self, pkg: PIPPackage) -> QModelIndex:
-        assert pkg in self.mPackages
         return self.index(self.mPackages.index(pkg), 0)
 
     def headerData(self, col, orientation, role=None):
@@ -969,8 +983,6 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
         return self.createIndex(row, column, pkg)
 
     def htmlToolTip(self, package: PIPPackage) -> str:
-        assert isinstance(package, PIPPackage)
-
         html = f'<b>PyPi Package:</b> {package.pipPkgName}'
         if isinstance(package.pyPkgName, str) and package.pipPkgName != package.pyPkgName:
             html += f'<br> import as: <code>import {package.pyPkgName}</code>'
@@ -978,7 +990,8 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
         pkg_license = package.license.splitlines()[0] if len(package.license) > 0 else ''
 
         html += f"""<br>
-        <b>Summary:</b>{package.summary}<br>
+        <b>Comment:</b> {package.comment}<br>
+        <b>Summary:</b> {package.summary}<br>
         <b>Installed Version:</b> {package.version}<br>
         <b>Latest Version:</b> {package.version_latest}<br>
         <b>Homepage:</b> <a href="{package.homepage}">{package.homepage}</a><br>
@@ -992,11 +1005,10 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
         if not index.isValid():
             return None
 
-        pkg = self.mPackages[index.row()]
+        pkg: PIPPackage = self.mPackages[index.row()]
 
-        assert isinstance(pkg, PIPPackage)
         col = index.column()
-        cn = self.mColumnNames[col]
+        # cn = self.mColumnNames[col]
 
         if role == Qt.DisplayRole:
             if col == self.CN_PIP:
@@ -1007,6 +1019,9 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
 
             if col == self.CN_LATEST_VERSION:
                 return pkg.version_latest
+
+            if col == self.CN_COMMENT:
+                return pkg.comment
 
             if col == self.CN_SUMMARY:
                 return pkg.summary
@@ -1034,7 +1049,7 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
             #        return cmd
 
         if role == Qt.BackgroundRole:
-            if pkg.pipPkgName in self.mIsEnMAPBoxRequirement and not pkg.skipStartupWarning() and pkg.isMissing():
+            if pkg.isCoreRequirement() and not pkg.skipStartupWarning() and pkg.isMissing():
                 # #FFC800 = color used for warnings in QgsMessageBar
                 return QColor('#FFC800')
 
@@ -1054,10 +1069,7 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
         if role == Qt.UserRole:
             return pkg
 
-    def addPackages(self, packages: List[PIPPackage], required: bool = False):
-
-        for p in packages:
-            assert isinstance(p, PIPPackage)
+    def addPackages(self, packages: List[PIPPackage]):
 
         if len(packages) > 0:
             n = self.rowCount()
@@ -1066,8 +1078,6 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
                 self.mPIP2Pkg[pkg.pipPkgName] = pkg
                 self.mPy2Pkg[pkg.pyPkgName] = pkg
             self.mPackages.extend(packages)
-            if required:
-                self.mIsEnMAPBoxRequirement.update([pkg.pipPkgName for pkg in packages])
             self.endInsertRows()
 
     def removePackages(self):
@@ -1077,7 +1087,6 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
 class TableViewDelegate(QStyledItemDelegate):
 
     def __init__(self, tableView: QTableView, parent=None):
-        assert isinstance(tableView, QTableView)
         super().__init__(parent=parent)
         self.mTableView = tableView
 
@@ -1117,13 +1126,14 @@ class PIPPackageInstallerTableView(QTableView):
         a.setToolTip(f'Open the "{pkg.pipPkgName}" homepage')
         a.setEnabled(pkg.homepage != '')
         a.triggered.connect(lambda *args, url=pkg.homepage: QDesktopServices.openUrl(QUrl.fromUserInput(url)))
-        m.exec_(event.globalPos())
+        m.exec(event.globalPos())
 
 
 class PIPPackageInstaller(QWidget):
+    tableView: PIPPackageInstallerTableView
 
     def __init__(self, *args, **kwds):
-        super().__init__(*args, **kwds)
+        super().__init__(*args, flags=Qt.Window, **kwds)
         from enmapbox.gui.utils import loadUi
         from enmapbox import DIR_UIFILES
         path = Path(DIR_UIFILES) / 'pippackageinstaller.ui'
@@ -1149,7 +1159,6 @@ class PIPPackageInstaller(QWidget):
         self.proxyModel.setFilterKeyColumn(-1)
         self.updatePrimaryFilter()
 
-        assert isinstance(self.tableView, PIPPackageInstallerTableView)
         self.tableView.setSortingEnabled(True)
         # self.tableView.sigInstallPackageRequest.connect(self.installPackages)
         self.tableView.sigPackageReloadRequest.connect(self.reloadPythonPackages)
@@ -1198,16 +1207,10 @@ class PIPPackageInstaller(QWidget):
                 self.addText(info, True)
             except Exception as ex:
                 self.addText(str(ex), True)
-        s = ""
 
     def loadPIPVersionInfo(self, pipPackages: List[PIPPackage], load_latest_versions: bool = True):
         if len(pipPackages) == 0:
             pipPackages = self.model[:]
-        else:
-            for p in pipPackages:
-                assert isinstance(p, PIPPackage)
-        # get names
-        pipPackageNames = [p.pipPkgName for p in pipPackages]
 
         task = PIPPackageInfoTask('Get package information', callback=self.onCompleted)
 
@@ -1235,7 +1238,6 @@ class PIPPackageInstaller(QWidget):
         self.mTasks[tid] = qgsTask
         if True:
             tm = QgsApplication.taskManager()
-            assert isinstance(tm, QgsTaskManager)
             tm.addTask(qgsTask)
         else:
             qgsTask.run()
@@ -1243,6 +1245,7 @@ class PIPPackageInstaller(QWidget):
     def onTaskMessage(self, msg: str, msg_type: Qgis.MessageLevel):
         if msg_type in [Qgis.MessageLevel.Critical]:
             self.addText(msg, QColor('red'))
+            self.tabWidget.setCurrentWidget(self.tabLog)
         else:
             self.addText(msg)
 
@@ -1264,7 +1267,7 @@ class PIPPackageInstaller(QWidget):
                               QMessageBox.Abort | QMessageBox.Ignore)
             box.setTextFormat(Qt.RichText)
             box.setDefaultButton(QMessageBox.Abort)
-            result = box.exec_()
+            result = box.exec()
 
             if result == QMessageBox.Abort:
                 return False
@@ -1276,8 +1279,9 @@ class PIPPackageInstaller(QWidget):
 
     def setPrimaryFilter(self, mode: str):
         self.proxyModel.setPrimaryFilter(mode)
+        # n = self.proxyModel.rowCount()
 
-    def addText(self, text: str, color: QColor = None):
+    def addText(self, text: str, color: Optional[QColor] = None):
 
         c = self.tbLog.textColor()
         if isinstance(color, QColor):
@@ -1285,6 +1289,16 @@ class PIPPackageInstaller(QWidget):
         self.tbLog.append(f'{datetime.datetime.now().strftime("%H:%M:%S")}: {text}')
         self.tbLog.setTextColor(c)
 
-    def addPackages(self, packages: List[PIPPackage], required: bool = False):
-        self.model.addPackages(packages, required=required)
+    def addPackages(self, packages: List[PIPPackage]):
+        self.model.addPackages(packages)
         self.loadPIPVersionInfo(packages)
+
+
+if __name__ == '__main__':
+
+    missing = [p for p in requiredPackages() if p.isCoreRequirement() and not p.isInstalled()]
+    if len(missing) > 0:
+        info = missingPackageInfo(missing, html=False)
+        print(info)
+    else:
+        print('All required packages are installed')

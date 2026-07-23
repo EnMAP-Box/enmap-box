@@ -53,7 +53,7 @@ class TestIssue1089(EnMAPBoxTestCase):
                   alg.P_OUTPUT_FILE: path.as_posix(),
                   }
 
-        results = alg.processAlgorithm(params, context, feedback)
+        alg.processAlgorithm(params, context, feedback)
 
         # cleanup
         QgsProject.instance().removeAllMapLayers()

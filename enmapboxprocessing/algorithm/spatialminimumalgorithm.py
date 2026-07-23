@@ -25,5 +25,7 @@ class SpatialMinimumAlgorithm(SpatialFilterFunctionAlgorithmBase):
     def code(cls):
         from scipy.ndimage.filters import minimum_filter
 
-        function = lambda array: minimum_filter(array, size=3)
+        def function(array):
+            return minimum_filter(array, size=3)
+
         return function

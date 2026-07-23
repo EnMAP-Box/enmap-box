@@ -27,13 +27,14 @@ class ProcessingParameterRasterDestination(QgsProcessingParameterRasterDestinati
     def defaultFileExtension(self):
         if self.defaultFileExtension_ is not None:
             return self.defaultFileExtension_
-        if self.allowTif:
+        elif self.allowTif:
             return 'tif'
-        if self.allowEnvi:
+        elif self.allowEnvi:
             return 'bsq'
-        if self.allowVrt:
+        elif self.allowVrt:
             return 'vrt'
-        assert 0
+        else:
+            raise ValueError('unable to determine default file extension')
 
     def createFileFilter(self):
         fileFilter = list()

@@ -1,5 +1,5 @@
-from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
 from enmapbox.typeguard import typechecked
+from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
 
 
 @typechecked
@@ -13,10 +13,13 @@ class FitXGBRegressorAlgorithm(FitRegressorAlgorithmBase):
                '<a href="https://xgboost.readthedocs.io/en/stable/">XGBoost</a> regression.'
 
     def helpParameterCode(self) -> str:
-        return 'Scikit-learn python code. ' \
-               'See <a href="' \
-               'https://xgboost.readthedocs.io/en/latest/python/python_api.html?highlight=XGBRegressor#xgboost.XGBRegressor' \
-               '">XGBRegressor</a> for information on different parameters.'
+        return (
+            'Scikit-learn python code. '
+            'See <a href="'
+            'https://xgboost.readthedocs.io/en/latest/python/python_api.html?'
+            'highlight=XGBRegressor#xgboost.XGBRegressor'
+            '">XGBRegressor</a> for information on different parameters.'
+        )
 
     def code(cls):
         from xgboost import XGBRegressor

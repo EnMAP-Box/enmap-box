@@ -33,11 +33,11 @@ class MaskRasterDataProvider(QgsRasterDataProvider):
     #     for k in to_delete:
     #         MaskRasterDataProvider.ALL_INSTANCES.pop(k)
 
-    def __init__(self, uri):
+    def __init__(self, uri: str):
         super().__init__()
         self.uri = uri
-        print(uri)
-        assert uri.startswith('?')
+        if not uri.startswith('?'):
+            raise ValueError(f"uri must start with '?', got {uri!r}")
         parameters = dict(parse_qsl(uri[1:]))
         self.bandNo = int(parameters.get('band', 1))
 
@@ -45,7 +45,8 @@ class MaskRasterDataProvider(QgsRasterDataProvider):
             if value is None:
                 return default
             else:
-                return eval(value)
+                # B307 -
+                return eval(value)  # nosec B307 # User-defined code evaluation by design
 
         self.maskNoDataValues = parseValue(parameters.get(self.P_MaskNoDataValues), True)
         self.maskNonFiniteValues = parseValue(parameters.get(self.P_MaskNonFiniteValues), True)
@@ -53,7 +54,8 @@ class MaskRasterDataProvider(QgsRasterDataProvider):
         self.maskValueRanges = parseValue(parameters.get(self.P_MaskValueRanges))
         self.maskBits = parseValue(parameters.get(self.P_MaskBits))
         self.layer = QgsRasterLayer(parameters[self.P_Uri], '', parameters.get(self.P_Provider, 'gdal'))
-        assert self.layer.isValid()
+        if not self.layer.isValid():
+            raise ValueError(f"Failed to create raster layer from URI: {parameters[self.P_Uri]!r}")
         self.provider = self.layer.dataProvider()
         self.reader = RasterReader(self.layer)
 
@@ -111,8 +113,8 @@ class MaskRasterDataProvider(QgsRasterDataProvider):
         return self.provider.identify(*args, **kwargs)
 
     def block(
-            self, bandNo: int, boundingBox: QgsRectangle, width: int, height: int,
-            feedback: QgsRasterBlockFeedback = None
+        self, bandNo: int, boundingBox: QgsRectangle, width: int, height: int,
+        feedback: QgsRasterBlockFeedback = None
     ) -> Optional[QgsRasterBlock]:
 
         array = self.reader.arrayFromBoundingBoxAndSize(boundingBox, width, height, bandList=[self.bandNo])[0]

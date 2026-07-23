@@ -2,7 +2,7 @@ from enmapboxtestdata import enmap
 from enmapboxprocessing.algorithm.predictregressionalgorithm import PredictRegressionAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxtestdata import regressorDumpPkl, regressorDumpSingleTargetPkl
+from enmapboxtestdata import regressorDumpSkops, regressorDumpSingleTargetSkops
 
 
 class TestPredictRegressionAlgorithm(TestCase):
@@ -10,7 +10,7 @@ class TestPredictRegressionAlgorithm(TestCase):
     def test_predict_multiTarget(self):
         alg = PredictRegressionAlgorithm()
         parameters = {
-            alg.P_REGRESSOR: regressorDumpPkl,
+            alg.P_REGRESSOR: regressorDumpSkops,
             alg.P_RASTER: enmap,
             alg.P_OUTPUT_REGRESSION: self.filename('regression.tif')
         }
@@ -28,7 +28,7 @@ class TestPredictRegressionAlgorithm(TestCase):
     def test_predict_singleTarget(self):
         alg = PredictRegressionAlgorithm()
         parameters = {
-            alg.P_REGRESSOR: regressorDumpSingleTargetPkl,
+            alg.P_REGRESSOR: regressorDumpSingleTargetSkops,
             alg.P_RASTER: enmap,
             alg.P_OUTPUT_REGRESSION: self.filename('regression.tif')
         }

@@ -37,45 +37,45 @@ The EnMAP-Box is a QGIS Plugin that can be installed from the QGIS Plugin Manage
 However, the following steps show you how to run the EnMAP-Box from python without starting the QGIS Desktop
 application.
 
-## 1. Install QGIS
+## 1. Install QGIS + Python dependencies
 
-### conda / mamba (all OS)
+### conda (all OS)
 
 1. Install conda / conda mini-forge (preferred), as described [here](https://github.com/conda-forge/miniforge)
 
 2. Install one of the QGIS + EnMAP-Box environments listed
    in https://github.com/EnMAP-Box/enmap-box/tree/main/.env/conda
 
-   `latest` = the most-recent QGIS version available in the [conda-forge](https://conda-forge.org/) channel.
 
-   `light` = basic QGIS installation only. No additional packages. In this environment the EnMAP-Box provides basic
-   visualization features only.
+* `enmapbox-base.yml` basic QGIS installation only and minimal python requirements to start
+  EnMAP-Box GUI and Processing Framework.
+* `enmapbox-full.yml` QGIS + all other python requirements that allow to run all EnMAP-Box features.
 
-   `full` = QGIS + all other python requirements that allow to run all EnMAP-Box features
-
-   Examples:
-   ````bash
-   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.env/conda/enmapbox_full_latest.yml
-   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.env/conda/enmapbox_full_3.28.yml
-   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.env/conda/enmapbox_light_latest.yml
-   mamba env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.env/conda/enmapbox_light_3.28.yml
-   ````
-
-   The environment name corresponds to the `*.yml` basename. You can change it with  `-n`, e.g. `-n myenvironmennane`.
-
-
-* You can update an existing environment with `mamba update`, e.g:
+Examples:
 
    ````bash
-   mamba env update --prune -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.env/conda/enmapbox_full_3.28.yml
+   conda env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.env/conda/enmapbox_base.yml
+   conda env create -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.env/conda/enmapbox_full.yml
    ````
-    * `-n myenvironmentname` allows to overwrite environments with names different to that specified in the `*.yml`
-      file.
-    * `--prune` causes conda to remove any dependencies that are no longer required from the environment.
+
+Use:
+
+* `-n` to set your own environment name, e.g. `-n myenmapbox`.
+* `-y` to accept all prompts.
+
+Run `conda update` to update the environment to the latest version:
+
+````bash
+conda env update --prune -f https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/.env/conda/enmapbox-full.yml
+````
+
+* `-n myenvironmentname` allows to overwrite environments with names different to that specified in the `*.yml`
+  file.
+* `--prune` causes conda to remove any dependencies that are no longer required from the environment.
 
 ### Windows / Linux / MacOS
 
-Either use mamba (see above), or follow the OS-specific instructions
+Either use conda (see above), or follow the OS-specific instructions
 here: https://qgis.org/en/site/forusers/download.html
 
 ## 2. Test the QGIS environment
@@ -172,7 +172,7 @@ Replace it with your own EnMAP-Box fork from which you can create pull requests.
 
 1. Ensure that your environment has git available and starts QGIS by calling `qgis`
    (see[1.](#1-install-qgis) and [2.](#2-test-the-qgis-environment)).
-   You copy a bootstrap script like [.env/OSGeo4W/qgis_env.bat](.env/osgeo4w/qgis_env.bat) (windows) or
+   You copy a bootstrap script like [.env/OSGeo4W/qgis_env.bat](scripts/startup/qgis_env.bat) (windows) or
    [scripts/qgis_env.sh](scripts/qgis_env.sh) (linux) and adjust to your local settings for.
 
 2. Clone the EnMAP-Box repository.
@@ -276,8 +276,10 @@ you can support the development of the EnMAP-Box.
 
 Please keep the code in a good shape.
 
-You might use flake8 to check if the EnMAP-Box code applies to the rules defined in
-``.flake8``:
+# Coding style
+
+Use flake8 to check if the EnMAP-Box code applies to the rules defined in
+``tox.ini``:
 
 ````bash
 flake8 
@@ -289,10 +291,62 @@ To check staged files only, run:
 flake8 $(git status -s | grep -E '\.py$' | cut -c 4-)
 ````
 
+Use bandit to check for security issues:
+
+````bash
+# check for issues in the entire repository
+bandit -r .
+
+# show issues marked with the nosec tag
+bandit -r . --ignore-nosec 
+
+# check for issues in a specific directory only
+bandit  -r enmapbos/apps/SpecDeepMap
+
+
+````
+
 # Testing
 
 Run `scripts/runtests.sh` (Linux/macOS) or `scripts\runtests.bat` (Win)
-to start the tests defined in `/tests/`.
+to start the tests defined in `/tests`.
+
+Provide additional arguments to the test runner, e.g., to run tests in parallel
+or from a specific directory, module, -class or -method only:
+
+````bash
+# run the map canvas tests only, verbose outputs
+scripts/runtests.sh -vvv tests/enmap-box/enmapbox/gui/test_mapcanvas.py
+
+# run all tests in parallel
+scripts/runtests.sh -n auto
+
+scripts/runtests.sh -n auto tests/enmap-box/enmapbox/gui/test_mapcanvas.py::MapCanvasTests::test_mapCrosshairDistance
+````
+
+Some tests use the *SensorProducts* class in `tests/enmapboxtestdata.py` to load data from
+the*EnmapBoxExternalSensorProducts* folder. This folder is *access-restricted*, because it contains exemplary
+data from different sensors (e.g., Sentinel-2, Sentinel-3, EnMAP, PRISMA), which we are not allowed to share publicly.
+If you have access to it, `ENMAPBOX_SENSOR_PRODUCT_ROOT` environment variable to point to
+the folder containing the sensor products. This will allow you to run additional tests.
+
+````bash
+export ENMAPBOX_SENSOR_PRODUCT_ROOT=~/MyMountedDrives/EnmapBoxExternalSensorProducts
+````
+
+To test with docker, run:
+
+````bash
+QGIS_TEST_VERSION=3.44 docker compose \
+  -f .env/docker/docker-compose.gh.yml \
+  run --rm --build --user $(id -u):$(id -g) qgis \
+  /usr/src/.env/docker/run_docker_tests.sh -n auto
+````
+
+* `--rm` removes the container after the tests are finished.
+* `--build` forces a rebuild of the container
+* `--user` sets the user id and group id of the container to the current user
+* `-n auto` runs the tests in parallel (using pytest xdist)`
 
 # License
 

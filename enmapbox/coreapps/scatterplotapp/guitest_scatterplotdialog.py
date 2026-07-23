@@ -1,11 +1,11 @@
 import numpy as np
+from scatterplotapp.scatterplotdialog import ScatterPlotDialog
 
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from enmapboxprocessing.driver import Driver
 from qgis.core import QgsRasterLayer
-from scatterplotapp.scatterplotdialog import ScatterPlotDialog
 
 qgsApp = start_app()
 initAll()
@@ -13,7 +13,8 @@ initAll()
 enmapBox = EnMAPBox(None)
 
 layer = QgsRasterLayer(
-    r'D:\data\sensors\landsat\C2L2\LC08_L2SP_192023_20210724_20210730_02_T1\LC08_L2SP_192023_20210724_20210730_02_T1_SR.vrt',
+    r'D:\data\sensors\landsat\C2L2\LC08_L2SP_192023_20210724_20210730_02_T1'
+    r'\LC08_L2SP_192023_20210724_20210730_02_T1_SR.vrt',
     'LC08_L2SP_192023_20210724_20210730_02_T1_SR.vrt'
 )
 
@@ -33,4 +34,4 @@ widget.mLayerY.setLayer(layer)
 widget.mBandX.setBand(1)
 widget.mBandY.setBand(1)
 
-qgsApp.exec_()
+qgsApp.exec()

@@ -63,5 +63,5 @@ wavebandMapping = {'B': 'BLUE', 'G': 'GREEN', 'R': 'RED', 'N': 'NIR', 'S1': 'SWI
 
 # set default QA flags
 qaFlags = {
-        "QA_PIXEL": ["Fill", "Dilated Cloud", "Cirrus (high confidence)", "Cloud", "Cloud Shadow", "Snow"]
+    "QA_PIXEL": ["Fill", "Dilated Cloud", "Cirrus (high confidence)", "Cloud", "Cloud Shadow", "Snow"]
 }

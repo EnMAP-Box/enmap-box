@@ -3,13 +3,13 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-import processing
+import qgis.processing
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -17,9 +17,9 @@ class RandomPointsFromCategorizedRasterAlgorithm(EnMAPProcessingAlgorithm):
     P_STRATIFICATION, _STRATIFICATION = 'stratification', 'Categorized raster layer'
     P_N, _N = 'n', 'Number of points per category'
     P_DISTANCE_GLOBAL, _DISTANCE_GLOBAL = 'distanceGlobal', \
-                                          'Minimum distance between points (in meters)'
+        'Minimum distance between points (in meters)'
     P_DISTANCE_STRATUM, _DISTANCE_STRATUM = 'distanceStatum', \
-                                            'Minimum distance between points inside category (in meters)'
+        'Minimum distance between points inside category (in meters)'
     P_SEED, _SEED = 'seed', 'Random seed'
     P_OUTPUT_POINTS, _OUTPUT_POINTS = 'outputPoints', 'Output point layer'
 
@@ -172,7 +172,7 @@ class RandomPointsFromCategorizedRasterAlgorithm(EnMAPProcessingAlgorithm):
                 'OUTPUT': filename,
                 'RASTER_BAND': 1
             }
-            processing.run('native:pixelstopoints', parameters, None, feedback2, context, True)
+            qgis.processing.run('native:pixelstopoints', parameters, None, feedback2, context, True)
             result = {self.P_OUTPUT_POINTS: filename}
             self.toc(feedback, result)
         return result

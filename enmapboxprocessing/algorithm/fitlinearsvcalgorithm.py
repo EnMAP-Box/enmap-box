@@ -1,5 +1,5 @@
-from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 from enmapbox.typeguard import typechecked
+from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 
 
 @typechecked
@@ -17,13 +17,16 @@ class FitLinearSvcAlgorithm(FitClassifierAlgorithmBase):
                'a one-vs-the-rest scheme.'
 
     def helpParameterCode(self) -> str:
-        return 'Scikit-learn python code. ' \
-               'See ' \
-               '<a href="http://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html">LinearSVC</a>, ' \
-               '<a href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html">GridSearchCV</a>, ' \
-               '<a href="' \
-               'http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html' \
-               '">StandardScaler</a> for information on different parameters.'
+        return (
+            'Scikit-learn python code. '
+            'See '
+            '<a href="http://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html">LinearSVC</a>, '
+            '<a href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html">'
+            'GridSearchCV</a>, '
+            '<a href="'
+            'http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html'
+            '">StandardScaler</a> for information on different parameters.'
+        )
 
     def code(cls):
         from sklearn.pipeline import make_pipeline

@@ -13,10 +13,10 @@ class TestPrepareUnsupervisedDatasetFromVectorAndFieldsAlgorithm(TestCase):
         parameters = {
             alg.P_VECTOR: classificationDatasetAsGpkgVector,
             alg.P_FEATURE_FIELDS: [f'Sample__{i + 1}' for i in range(177)],
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = TransformerDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = TransformerDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((299, 177), dump.X.shape)
         self.assertEqual(177, len(dump.features))
         self.assertListEqual(parameters[alg.P_FEATURE_FIELDS], dump.features)

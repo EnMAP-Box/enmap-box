@@ -1703,7 +1703,7 @@ Bands</string>
   <customwidget>
    <class>GraphicsLayoutWidget</class>
    <extends>QGraphicsView</extends>
-   <header>enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph</header>
+   <header>pyqtgraph</header>
   </customwidget>
  </customwidgets>
  <resources>

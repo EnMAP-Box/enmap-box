@@ -5,7 +5,7 @@ from enmapboxprocessing.algorithm.fitrandomforestregressoralgorithm import FitRa
 from enmapboxprocessing.algorithm.regressionbasedunmixingalgorithm import RegressionBasedUnmixingAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxtestdata import classificationDatasetAsPklFile
+from enmapboxtestdata import classificationDatasetAsSkopsFile
 from enmapboxtestdata import enmap
 
 start_app()
@@ -16,7 +16,7 @@ class TestRegressionBasedUnmixingAlgorithm(TestCase):
     def test(self):
         alg = RegressionBasedUnmixingAlgorithm()
         parameters = {
-            alg.P_DATASET: classificationDatasetAsPklFile,
+            alg.P_DATASET: classificationDatasetAsSkopsFile,
             alg.P_RASTER: enmap,
             alg.P_REGRESSOR: FitRandomForestRegressorAlgorithm().defaultCodeAsString(),
             alg.P_N: 10,
@@ -32,7 +32,7 @@ class TestRegressionBasedUnmixingAlgorithm(TestCase):
     def test_sumToOne(self):
         alg = RegressionBasedUnmixingAlgorithm()
         parameters = {
-            alg.P_DATASET: classificationDatasetAsPklFile,
+            alg.P_DATASET: classificationDatasetAsSkopsFile,
             alg.P_RASTER: enmap,
             alg.P_REGRESSOR: FitRandomForestRegressorAlgorithm().defaultCodeAsString(),
             alg.P_N: 100,
@@ -48,18 +48,20 @@ class TestRegressionBasedUnmixingAlgorithm(TestCase):
         array = RasterReader(parameters[alg.P_OUTPUT_FRACTION]).array()
         self.assertListEqual([-5, 1], list(np.unique(np.round(np.sum(array, axis=0), 1))))
 
-    def test_debug(self):
+    def test_issue1441(self):
         alg = RegressionBasedUnmixingAlgorithm()
         parameters = {
-            alg.P_DATASET: classificationDatasetAsPklFile,
+            alg.P_DATASET: classificationDatasetAsSkopsFile,
             alg.P_RASTER: enmap,
             alg.P_REGRESSOR: FitRandomForestRegressorAlgorithm().defaultCodeAsString(),
             alg.P_N: 10,
             alg.P_BACKGROUND: 0,
             alg.P_INCLUDE_ENDMEMBER: False,
             alg.P_ENSEMBLE_SIZE: 1,
-            alg.P_OUTPUT_FRACTION: self.filename('fraction.bsq'),
-            alg.P_OUTPUT_VARIATION: self.filename('variation.bsq'),
-            alg.P_OUTPUT_CLASSIFICATION: self.filename('classification.bsq')
+            alg.P_OUTPUT_FRACTION: self.filename('fraction.bsq')
         }
         self.runalg(alg, parameters)
+        reader = RasterReader(parameters[alg.P_OUTPUT_FRACTION])
+        gold = ['impervious', 'low vegetation', 'tree', 'soil', 'water']
+        for bandNo, bandName in zip(reader.bandNumbers(), gold):
+            self.assertNotEqual(reader.bandName(bandNo), 'arithmetic mean')

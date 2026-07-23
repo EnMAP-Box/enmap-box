@@ -13,10 +13,10 @@ class TestPrepareUnsupervisedDatasetFromLibraryAlgorithm(TestCase):
         alg = PrepareUnsupervisedDatasetFromLibraryAlgorithm()
         parameters = {
             alg.P_LIBRARY: library_gpkg,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = TransformerDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = TransformerDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((75, 177), dump.X.shape)
         self.assertEqual(177, len(dump.features))
 
@@ -25,10 +25,10 @@ class TestPrepareUnsupervisedDatasetFromLibraryAlgorithm(TestCase):
         parameters = {
             alg.P_LIBRARY: library_gpkg,
             alg.P_FIELD: 'profiles',
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = TransformerDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = TransformerDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((75, 177), dump.X.shape)
         self.assertEqual(177, len(dump.features))
 
@@ -37,7 +37,7 @@ class TestPrepareUnsupervisedDatasetFromLibraryAlgorithm(TestCase):
         parameters = {
             alg.P_LIBRARY: library_gpkg,
             alg.P_FIELD: 'level_1',
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         try:
             self.runalg(alg, parameters)

@@ -16,22 +16,26 @@ import os
 import tempfile
 import unittest
 
+from pyqtgraph.dockarea.Dock import Dock as pgDock
+
 from enmapbox import initEnMAPBoxResources
 from enmapbox.exampledata import landcover_polygon, enmap, hires
 from enmapbox.gui.datasources.datasources import VectorDataSource, RasterDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager
-from enmapbox.gui.dataviews.dockmanager import DockManager, SpeclibDockTreeNode, MapDockTreeNode, \
-    DockTreeView, DockManagerTreeModel, createDockTreeNode, DockTreeNode
-from enmapbox.gui.dataviews.docks import MapDock, DockArea, MimeDataDock, TextDock, SpectralLibraryDock, TextDockWidget, \
-    Dock
+from enmapbox.gui.dataviews.dockmanager import (
+    DockManager, SpeclibDockTreeNode, MapDockTreeNode, DockTreeView, DockManagerTreeModel, createDockTreeNode,
+    DockTreeNode
+)
+from enmapbox.gui.dataviews.docks import (
+    MapDock, DockArea, MimeDataDock, TextDock, SpectralLibraryDock, TextDockWidget, Dock
+)
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.maptools import MapTools
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph.dockarea.Dock import Dock as pgDock
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.testing import EnMAPBoxTestCase, TestObjects, start_app
-from enmapboxtestdata import classificationDatasetAsPklFile, library_berlin
+from enmapboxtestdata import classificationDatasetAsSkopsFile, library_berlin
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.PyQt.QtWidgets import QWidget, QHBoxLayout
 from qgis.core import QgsProject, QgsVectorLayer, QgsRasterLayer, QgsLayerTreeModel, QgsLayerTree
@@ -42,8 +46,14 @@ initEnMAPBoxResources()
 
 
 class TestDocksAndDataSources(EnMAPBoxTestCase):
-    wmsUri = r'crs=EPSG:3857&format&type=xyz&url=https://mt1.google.com/vt/lyrs%3Ds%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D&zmax=19&zmin=0'
-    wmsUri = 'referer=OpenStreetMap%20contributors,%20under%20ODbL&type=xyz&url=http://tiles.wmflabs.org/hikebike/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=17&zmin=1'
+    wmsUri = (
+        r'crs=EPSG:3857&format&type=xyz&url='
+        r'https://mt1.google.com/vt/lyrs%3Ds%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D&zmax=19&zmin=0'
+    )
+    wmsUri = (
+        'referer=OpenStreetMap%20contributors,%20under%20ODbL&type=xyz&url='
+        'http://tiles.wmflabs.org/hikebike/%7Bz%7D/%7Bx%7D/%7By%7D.png&zmax=17&zmin=1'
+    )
 
     def test_dataSourceManager(self):
 
@@ -119,7 +129,7 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
 
         QApplication.processEvents()
 
-        assert len(eb.docks()) == 0
+        self.assertEqual(eb.docks(), 0)
         QApplication.processEvents()
 
         gc.collect()
@@ -128,7 +138,7 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
             for r in gc.get_referrers(d):
                 for r2 in gc.get_referrers(r):
                     for r3 in gc.get_referrers(r2):
-                        s = ""
+                        pass
 
             raise Exception(f'Instance not garbage collected: {type(d)} = {d}')
 
@@ -148,14 +158,14 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         self.assertIsInstance(TV, QgsLayerTreeView)
         speclibDock: SpectralLibraryDock = dm.createDock(SpectralLibraryDock)
 
-        node1: SpeclibDockTreeNode = model.findDockNode(speclibDock)
-        node2: SpeclibDockTreeNode = model.findDockNode(speclibDock.speclibWidget())
+        model.findDockNode(speclibDock)
+        model.findDockNode(speclibDock.speclibWidget())
 
         w = QWidget()
-        l = QHBoxLayout()
-        l.addWidget(TV)
-        l.addWidget(dockArea)
-        w.setLayout(l)
+        layout = QHBoxLayout()
+        layout.addWidget(TV)
+        layout.addWidget(dockArea)
+        w.setLayout(layout)
         self.showGui(w)
         QgsProject.instance().removeAllMapLayers()
 
@@ -199,7 +209,7 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
             dock2 = manager.createDock('MAP', name='Tree2')
             widgets.extend([dock1, dock2])
         root = model.rootGroup().children()[0]
-        canvas = QgsMapCanvas()
+        QgsMapCanvas()
         # bridge = QgsLayerTreeMapCanvasBridge(root, canvas)
 
         # view = QgsLayerTreeView()
@@ -297,8 +307,8 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
 
     def test_SpeclibDockTreeNode(self):
 
-        sl1 = TestObjects.createSpectralLibrary(name='speclib1')
-        sl2 = TestObjects.createSpectralLibrary(name='speclib2')
+        TestObjects.createSpectralLibrary(name='speclib1')
+        TestObjects.createSpectralLibrary(name='speclib2')
 
         dock = SpectralLibraryDock()
         node = createDockTreeNode(dock)
@@ -306,7 +316,6 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         slw = node.speclibWidget()
         slw.plotModel()
         self.assertIsInstance(slw, SpectralLibraryWidget)
-        s = ""
 
     def test_MapDockLayerHandling(self):
 
@@ -314,7 +323,7 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         self.assertIsInstance(EnMAPBox.instance(), EnMAPBox)
         self.assertEqual(EMB, EnMAPBox.instance())
 
-        canvas1 = EMB.createNewMapCanvas('Canvas1')
+        EMB.createNewMapCanvas('Canvas1')
         canvas2 = EMB.createNewMapCanvas('Canvas2')
 
         mapNode = EMB.findDockTreeNode(canvas2)
@@ -352,7 +361,7 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
 
         enmapBox = EnMAPBox(load_core_apps=False, load_other_apps=False)
 
-        enmapBox.addSource(classificationDatasetAsPklFile)
+        enmapBox.addSource(classificationDatasetAsSkopsFile)
         self.showGui(enmapBox.ui)
 
         enmapBox.close()
@@ -371,7 +380,7 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         mapDock2 = eb.createDock('MAP')
         self.assertIsInstance(mapDock2, MapDock)
         eb.setCurrentMapCanvas(mapDock2.mapCanvas())
-        mapDocks = eb.dockManager().docks(MapDock)
+        eb.dockManager().docks(MapDock)
 
         self.assertIsInstance(tv, DockTreeView)
 

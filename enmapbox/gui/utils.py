@@ -18,10 +18,16 @@
 ***************************************************************************
 """
 import pathlib
+import random
 import re
+from pathlib import Path
+from typing import Optional
 
+from enmapbox.qgispluginsupport.qps.utils import loadUi
+from qgis.PyQt.QtGui import QColor
 from qgis.core import Qgis
-from ..qgispluginsupport.qps.utils import loadUi
+
+loadUi = loadUi
 
 QGIS_DATATYPE_INFO = {
     Qgis.UnknownDataType: ('UnknownDataType', 'Unknown or unspecified type'),
@@ -37,16 +43,17 @@ QGIS_DATATYPE_INFO = {
     Qgis.CFloat32: ('CFloat32', 'Complex Float32.'),
     Qgis.CFloat64: ('CFloat64', 'Complex Float64.'),
     Qgis.ARGB32: ('ARGB32', 'Color, alpha, red, green, blue, 4 bytes the same as QImage::Format_ARGB32.'),
-    Qgis.ARGB32_Premultiplied: ('ARGB32_Premultiplied',
-                                'Color, alpha, red, green, blue, 4 bytes the same as QImage::Format_ARGB32_Premultiplied.')
+    Qgis.ARGB32_Premultiplied: (
+        'ARGB32_Premultiplied',
+        'Color, alpha, red, green, blue, 4 bytes the same as QImage::Format_ARGB32_Premultiplied.'
+    )
 }
 
 
-def dataTypeName(dataType: Qgis.DataType, verbose: bool = False):
+def dataTypeName(dataType: Qgis.DataType, verbose: bool = False) -> str:
     """
     Returns a description for a Qgis.DataType
     """
-    assert isinstance(dataType, Qgis.DataType)
     if dataType in QGIS_DATATYPE_INFO.keys():
         if verbose:
             return QGIS_DATATYPE_INFO[dataType][1]
@@ -56,7 +63,7 @@ def dataTypeName(dataType: Qgis.DataType, verbose: bool = False):
         return 'Unknown'
 
 
-def enmapboxUiPath(name: str) -> pathlib.Path:
+def enmapboxUiPath(name: str) -> Path:
     """
     Translate a base name `name` into the absolute path of an ui-file
     :param name: str
@@ -66,19 +73,22 @@ def enmapboxUiPath(name: str) -> pathlib.Path:
     """
     from enmapbox import DIR_UIFILES
     path = pathlib.Path(DIR_UIFILES) / name
-    assert path.is_file()
+    if not path.is_file():
+        raise FileNotFoundError(f'Could not find ui-file {path}')
     return path
 
 
-def guessDataProvider(src: str) -> str:
+def guessDataProvider(src: str) -> Optional[str]:
     """
     Get an str and guesses the QgsDataProvider for
     :param str: str
     :return: str, provider key like 'gdal', 'ogr' or None
     """
     # GDAL / GDAL-subdataset
-    if re.search(r'\.(bsq|tiff?|jp2|jp2000|j2k|png)', src, re.I) or \
-            re.search(r'^.+:.+:.+', src, re.I):
+    if (
+        re.search(r'\.(bsq|tiff?|jp2|jp2000|j2k|png)', src, re.I)
+        or re.search(r'^.+:.+:.+', src, re.I)  # noqa
+    ):
         return 'gdal'
 
     # probably a spectral library
@@ -86,11 +96,39 @@ def guessDataProvider(src: str) -> str:
         return 'enmapbox_speclib'
     elif re.search(r'\.(shp|gpkg|kml|csv)$', src, re.I):  # probably a vector file
         return 'ogr'
-    elif re.search(r'\.(pkl)$', src, re.I):
-        return 'enmapbox_pkl'
+    elif re.search(r'\.(skops)$', src, re.I):
+        return 'enmapbox_skops'
     elif re.search(r'\.(txt|csv|json)$', src, re.I):  # probably normal text file
         return 'enmapbox_textfile'
 
     elif re.search(r'url=https?.*wfs', src, re.I):
         return 'WFS'
     return None
+
+
+def high_contrast_random_color(c1: QColor) -> QColor:
+    """
+    Generates a random QColor that guarantees high contrast against c1
+    by ensuring opposite brightness (Value) levels.
+    """
+    # 1. Get the Hue, Saturation, and Value of the base color
+    h1, s1, v1, a1 = c1.getHsv()
+
+    # 2. Pick a completely random Hue (0 to 359 degrees)
+    random_hue = random.randint(0, 359)  # nosec B311 # no-security relevant random sampling
+
+    # 3. Force a high-contrast Saturation and Value
+    # If c1 is dark, make the random color bright (and vice versa)
+    if v1 > 127:
+        # c1 is light -> Make the new color dark
+        random_value = random.randint(30, 80)  # nosec B311 # no-security relevant random sampling
+        # Richer colors stand out better on light
+        random_saturation = random.randint(180, 255)  # nosec B311 # no-security relevant random sampling
+    else:
+        # c1 is dark -> Make the new color bright
+        random_value = random.randint(200, 255)  # nosec B311 # no-security relevant random sampling
+        # Slightly pastel/vibrant stand out on dark
+        random_saturation = random.randint(50, 150)  # nosec B311 # no-security relevant random sampling
+
+    # 4. Return the new QColor
+    return QColor.fromHsv(random_hue, random_saturation, random_value)

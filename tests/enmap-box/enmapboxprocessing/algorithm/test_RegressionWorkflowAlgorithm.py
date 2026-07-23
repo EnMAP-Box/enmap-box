@@ -1,8 +1,10 @@
 import unittest
 
+import sklearn
 from osgeo import gdal
 from sklearn.base import RegressorMixin
 
+from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.fitcatboostregressoralgorithm import FitCatBoostRegressorAlgorithm
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 from enmapboxprocessing.algorithm.fitlinearsvralgorithm import FitLinearSvrAlgorithm
@@ -10,8 +12,13 @@ from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousvectoral
     PrepareRegressionDatasetFromContinuousVectorAlgorithm
 from enmapboxprocessing.algorithm.regressionworkflowalgorithm import RegressionWorkflowAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxtestdata import enmap, enmap_potsdam, veg_cover_fraction_potsdam_point, regressorDumpSingleTargetPkl
-from enmapboxtestdata import regressorDumpMultiTargetPkl
+from enmapboxtestdata import enmap, enmap_potsdam, veg_cover_fraction_potsdam_point, regressorDumpSingleTargetSkops
+from enmapboxtestdata import regressorDumpMultiTargetSkops
+
+SKLEARN_VERSION = list(map(int, sklearn.__version__.split('.')))
+SKLEARN_VERSION_NUMBER = SKLEARN_VERSION[0] + SKLEARN_VERSION[1] / 10
+
+start_app()
 
 
 class FitTestRegressorAlgorithm(FitClassifierAlgorithmBase):
@@ -37,17 +44,18 @@ class TestRegressionWorkflowAlgorithm(TestCase):
     def test(self):
         alg = RegressionWorkflowAlgorithm()
         parameters = {
-            alg.P_DATASET: regressorDumpMultiTargetPkl,
+            alg.P_DATASET: regressorDumpMultiTargetSkops,
             alg.P_REGRESSOR: FitTestRegressorAlgorithm().defaultCodeAsString(),
             alg.P_RASTER: enmap,
             alg.P_NFOLD: 10,
             alg.P_OPEN_REPORT: self.openReport,
-            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.pkl'),
+            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.skops'),
             alg.P_OUTPUT_REGRESSION: self.filename('regression.tif'),
             alg.P_OUTPUT_REPORT: self.filename('report.html')
         }
         self.runalg(alg, parameters)
 
+    @unittest.skipIf(SKLEARN_VERSION_NUMBER >= 1.8, 'CatBoost not compatible with sklearn >= 1.8')
     def test_catBoost_singleTarget(self):
 
         try:
@@ -59,17 +67,18 @@ class TestRegressionWorkflowAlgorithm(TestCase):
 
         alg = RegressionWorkflowAlgorithm()
         parameters = {
-            alg.P_DATASET: regressorDumpSingleTargetPkl,
+            alg.P_DATASET: regressorDumpSingleTargetSkops,
             alg.P_REGRESSOR: FitCatBoostRegressorAlgorithm().defaultCodeAsString(),
             alg.P_RASTER: enmap,
             alg.P_NFOLD: 3,
             alg.P_OPEN_REPORT: self.openReport,
-            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.pkl'),
+            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.skops'),
             alg.P_OUTPUT_REGRESSION: self.filename('regression.tif'),
             alg.P_OUTPUT_REPORT: self.filename('report.html')
         }
         self.runalg(alg, parameters)
 
+    @unittest.skipIf(SKLEARN_VERSION_NUMBER >= 1.8, 'CatBoost not compatible with sklearn >= 1.8')
     def test_catBoost_multiTarget(self):
         try:
             import catboost
@@ -80,10 +89,10 @@ class TestRegressionWorkflowAlgorithm(TestCase):
 
         alg = RegressionWorkflowAlgorithm()
         parameters = {
-            alg.P_DATASET: regressorDumpMultiTargetPkl,
+            alg.P_DATASET: regressorDumpMultiTargetSkops,
             alg.P_REGRESSOR: FitCatBoostRegressorAlgorithm().defaultCodeAsString(),
             alg.P_RASTER: enmap,
-            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.pkl'),
+            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.skops'),
             alg.P_OUTPUT_REGRESSION: self.filename('regression.tif'),
         }
         self.runalg(alg, parameters)
@@ -91,10 +100,10 @@ class TestRegressionWorkflowAlgorithm(TestCase):
     def test_linearSvrAlgorithm(self):
         alg = RegressionWorkflowAlgorithm()
         parameters = {
-            alg.P_DATASET: regressorDumpMultiTargetPkl,
+            alg.P_DATASET: regressorDumpMultiTargetSkops,
             alg.P_REGRESSOR: FitLinearSvrAlgorithm().defaultCodeAsString(),
             alg.P_RASTER: enmap,
-            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.pkl'),
+            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.skops'),
             alg.P_OUTPUT_REGRESSION: self.filename('regression.tif'),
         }
         self.runalg(alg, parameters)
@@ -102,9 +111,9 @@ class TestRegressionWorkflowAlgorithm(TestCase):
     def _DISABLED_test_trainingOnly(self):
         alg = RegressionWorkflowAlgorithm()
         parameters = {
-            alg.P_DATASET: regressorDumpMultiTargetPkl,
+            alg.P_DATASET: regressorDumpMultiTargetSkops,
             alg.P_REGRESSOR: FitTestRegressorAlgorithm().defaultCodeAsString(),
-            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.pkl'),
+            alg.P_OUTPUT_REGRESSOR: self.filename('regressor.skops'),
         }
         self.runalg(alg, parameters)
 
@@ -114,7 +123,7 @@ class TestRegressionWorkflowAlgorithm(TestCase):
             alg1.P_CONTINUOUS_VECTOR: veg_cover_fraction_potsdam_point,
             alg1.P_FEATURE_RASTER: enmap_potsdam,
             alg1.P_EXCLUDE_BAD_BANDS: True,
-            alg1.P_OUTPUT_DATASET: self.filename('dataset.pkl')
+            alg1.P_OUTPUT_DATASET: self.filename('dataset.skops')
         }
         self.runalg(alg1, parameters1)
 
@@ -124,7 +133,7 @@ class TestRegressionWorkflowAlgorithm(TestCase):
             alg2.P_REGRESSOR: FitTestRegressorAlgorithm().defaultCodeAsString(),
             alg2.P_RASTER: enmap_potsdam,
             alg2.P_MATCH_BY_NAME: True,
-            alg2.P_OUTPUT_REGRESSOR: self.filename('regressor.pkl'),
+            alg2.P_OUTPUT_REGRESSOR: self.filename('regressor.skops'),
             alg2.P_OUTPUT_REGRESSION: self.filename('regression.tif')
         }
         self.runalg(alg2, parameters2)
@@ -135,7 +144,7 @@ class TestRegressionWorkflowAlgorithm(TestCase):
             alg1.P_CONTINUOUS_VECTOR: veg_cover_fraction_potsdam_point,
             alg1.P_FEATURE_RASTER: enmap_potsdam,
             alg1.P_EXCLUDE_BAD_BANDS: True,
-            alg1.P_OUTPUT_DATASET: self.filename('dataset.pkl')
+            alg1.P_OUTPUT_DATASET: self.filename('dataset.skops')
         }
         self.runalg(alg1, parameters1)
 
@@ -145,7 +154,7 @@ class TestRegressionWorkflowAlgorithm(TestCase):
             alg2.P_REGRESSOR: FitTestRegressorAlgorithm().defaultCodeAsString(),
             alg2.P_RASTER: enmap_potsdam,
             alg2.P_MATCH_BY_NAME: False,
-            alg2.P_OUTPUT_REGRESSOR: self.filename('regressor.pkl'),
+            alg2.P_OUTPUT_REGRESSOR: self.filename('regressor.skops'),
             alg2.P_OUTPUT_REGRESSION: self.filename('regression.tif')
         }
         self.runalg(alg2, parameters2)

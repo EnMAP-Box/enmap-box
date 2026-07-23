@@ -63,6 +63,9 @@ class SpectralResamplingByWavelengthAlgorithm(EnMAPProcessingAlgorithm):
         resampleAlg = self.parameterAsEnum(parameters, self.P_RESAMPLE_ALG, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_RASTER, context)
 
+        if resampleAlg is None:
+            resampleAlg = self.LinearResampleAlg
+
         with open(filename + '.log', 'w') as logfile:
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)

@@ -1,7 +1,6 @@
 from sklearn.base import ClusterMixin, TransformerMixin
 
 from enmapboxprocessing.algorithm.fitaffinitypropagationalgorithm import FitAffinityPropagationAlgorithm
-from enmapboxprocessing.algorithm.fitbirchalgorithm import FitBirchAlgorithm
 from enmapboxprocessing.algorithm.fitclustereralgorithmbase import FitClustererAlgorithmBase
 from enmapboxprocessing.algorithm.fitkmeansalgorithm import FitKMeansAlgorithm
 from enmapboxprocessing.algorithm.fitmeanshiftalgorithm import FitMeanShiftAlgorithm
@@ -12,7 +11,7 @@ from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import ClustererDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import classifierDumpPkl, classificationDatasetAsJsonFile
+from enmapboxtestdata import classifierDumpSkops, classificationDatasetAsJsonFile
 from enmapboxtestdata import enmap, enmap_potsdam
 from qgis.core import Qgis
 
@@ -39,12 +38,12 @@ class TestFitClustererAlgorithm(TestCase):
     def test_fitted(self):
         alg = FitTestClustererAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifierDumpSkops,
             alg.P_CLUSTERER: alg.defaultCodeAsString(),
-            alg.P_OUTPUT_CLUSTERER: self.filename('clusterer.pkl')
+            alg.P_OUTPUT_CLUSTERER: self.filename('clusterer.skops')
         }
         self.runalg(alg, parameters)
-        dump = ClustererDump.fromDict(Utils.pickleLoad(parameters[alg.P_OUTPUT_CLUSTERER]))
+        dump = ClustererDump.fromDict(Utils.modelLoad(parameters[alg.P_OUTPUT_CLUSTERER]))
         self.assertEqual(['band 8 (0.460000 Micrometers)', 'band 9 (0.465000 Micrometers)'], dump.features[:2])
         self.assertEqual((58, 177), dump.X.shape)
         self.assertIsInstance(dump.clusterer, TransformerMixin)
@@ -55,10 +54,10 @@ class TestFitClustererAlgorithm(TestCase):
         parameters = {
             alg.P_DATASET: classificationDatasetAsJsonFile,
             alg.P_CLUSTERER: alg.defaultCodeAsString(),
-            alg.P_OUTPUT_CLUSTERER: self.filename('clusterer.pkl')
+            alg.P_OUTPUT_CLUSTERER: self.filename('clusterer.skops')
         }
         self.runalg(alg, parameters)
-        dump = ClustererDump.fromDict(Utils.pickleLoad(parameters[alg.P_OUTPUT_CLUSTERER]))
+        dump = ClustererDump.fromDict(Utils.modelLoad(parameters[alg.P_OUTPUT_CLUSTERER]))
         self.assertEqual(['band 8 (0.460000 Micrometers)', 'band 9 (0.465000 Micrometers)'], dump.features[:2])
         self.assertEqual((58, 177), dump.X.shape)
         self.assertIsInstance(dump.clusterer, TransformerMixin)
@@ -67,15 +66,15 @@ class TestFitClustererAlgorithm(TestCase):
     def test_fit_and_predict(self):
         alg = FitKMeansAlgorithm()
         parameters = {
-            alg.P_DATASET: classifierDumpPkl,
+            alg.P_DATASET: classifierDumpSkops,
             alg.P_CLUSTERER: alg.defaultCodeAsString(),
-            alg.P_OUTPUT_CLUSTERER: self.filename('clusterer.pkl')
+            alg.P_OUTPUT_CLUSTERER: self.filename('clusterer.skops')
         }
         self.runalg(alg, parameters)
 
         alg = PredictClusteringAlgorithm()
         parameters = {
-            alg.P_CLUSTERER: self.filename('clusterer.pkl'),
+            alg.P_CLUSTERER: self.filename('clusterer.skops'),
             alg.P_RASTER: enmap,
             alg.P_OUTPUT_CLASSIFICATION: self.filename('classification2.tif')
         }
@@ -88,7 +87,7 @@ class TestFitClustererAlgorithm(TestCase):
         algs = [
             FitKMeansAlgorithm(),
             FitMeanShiftAlgorithm(),
-            FitBirchAlgorithm(),
+            # FitBirchAlgorithm(),  not supported by skops
             FitAffinityPropagationAlgorithm()
         ]
         for alg in algs:
@@ -96,9 +95,9 @@ class TestFitClustererAlgorithm(TestCase):
             alg.initAlgorithm()
             alg.shortHelpString()
             parameters = {
-                alg.P_DATASET: classifierDumpPkl,
+                alg.P_DATASET: classifierDumpSkops,
                 alg.P_CLUSTERER: alg.defaultCodeAsString(),
-                alg.P_OUTPUT_CLUSTERER: self.filename('clusterer.pkl')
+                alg.P_OUTPUT_CLUSTERER: self.filename('clusterer.skops')
             }
             self.runalg(alg, parameters)
 
@@ -109,7 +108,7 @@ class TestFitClustererAlgorithm(TestCase):
             algDataset.P_FEATURE_RASTER: enmap_potsdam,
             algDataset.P_EXCLUDE_BAD_BANDS: True,
             algDataset.P_SAMPLE_SIZE: 100,
-            algDataset.P_OUTPUT_DATASET: self.filename('dataset.pkl'),
+            algDataset.P_OUTPUT_DATASET: self.filename('dataset.skops'),
         }
         self.runalg(algDataset, parametersDataset)
 
@@ -117,13 +116,13 @@ class TestFitClustererAlgorithm(TestCase):
         parameters = {
             alg.P_DATASET: parametersDataset[algDataset.P_OUTPUT_DATASET],
             alg.P_CLUSTERER: alg.defaultCodeAsString(),
-            alg.P_OUTPUT_CLUSTERER: self.filename('clusterer.pkl')
+            alg.P_OUTPUT_CLUSTERER: self.filename('clusterer.skops')
         }
         self.runalg(alg, parameters)
 
         alg = PredictClusteringAlgorithm()
         parameters = {
-            alg.P_CLUSTERER: self.filename('clusterer.pkl'),
+            alg.P_CLUSTERER: self.filename('clusterer.skops'),
             alg.P_RASTER: enmap_potsdam,
             alg.P_OUTPUT_CLASSIFICATION: self.filename('classification2.tif')
         }
@@ -139,7 +138,7 @@ class TestFitClustererAlgorithm(TestCase):
             algDataset.P_FEATURE_RASTER: enmap_potsdam,
             algDataset.P_EXCLUDE_BAD_BANDS: True,
             algDataset.P_SAMPLE_SIZE: 100,
-            algDataset.P_OUTPUT_DATASET: self.filename('dataset.pkl'),
+            algDataset.P_OUTPUT_DATASET: self.filename('dataset.skops'),
         }
         self.runalg(algDataset, parametersDataset)
 
@@ -147,13 +146,13 @@ class TestFitClustererAlgorithm(TestCase):
         parameters = {
             alg.P_DATASET: parametersDataset[algDataset.P_OUTPUT_DATASET],
             alg.P_CLUSTERER: alg.defaultCodeAsString(),
-            alg.P_OUTPUT_CLUSTERER: self.filename('clusterer.pkl')
+            alg.P_OUTPUT_CLUSTERER: self.filename('clusterer.skops')
         }
         self.runalg(alg, parameters)
 
         alg = PredictClusteringAlgorithm()
         parameters = {
-            alg.P_CLUSTERER: self.filename('clusterer.pkl'),
+            alg.P_CLUSTERER: self.filename('clusterer.skops'),
             alg.P_RASTER: enmap_potsdam,
             alg.P_MATCH_BY_NAME: False,
             alg.P_OUTPUT_CLASSIFICATION: self.filename('classification2.tif')

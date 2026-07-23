@@ -14,10 +14,10 @@ class TestPrepareRegressionDatasetFromTableAlgorithm(TestCase):
             alg.P_TABLE: classificationDatasetAsCsvVector,
             alg.P_FEATURE_FIELDS: [f'Band_{i + 1}' for i in range(177)],
             alg.P_TARGET_FIELDS: ['level_1_id', 'level_2_id'],
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = RegressorDump.fromDict(Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = RegressorDump.fromDict(Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((58, 177), dump.X.shape)
         self.assertEqual((58, 2), dump.y.shape)
         self.assertEqual(177, len(dump.features))

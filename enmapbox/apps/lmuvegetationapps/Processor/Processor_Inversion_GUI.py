@@ -13,7 +13,7 @@
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
-                                                                                                                                                 *
+
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -28,16 +28,20 @@ ANNs are implemented, but the structure is flexible so that new algorithms can a
 add a model selection frame to the GUI in QtDesigner then.
 
 """
+import os
 import sys
 
 import lmuvegetationapps.Processor.Processor_Inversion_core as processor
-from _classic.hubflow.core import *
-from enmapbox.gui.utils import loadUi
+import numpy as np
 from lmuvegetationapps import APP_DIR
-# ensure to call QGIS before PyQtGraph
-from qgis.PyQt.QtWidgets import *
+
+# from _classic.hubdc.core import openRasterDataset
+from enmapbox.gui.utils import loadUi
+from enmapboxprocessing.rasterreader import RasterReader
+from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox, QApplication
 from qgis.core import QgsMapLayerProxyModel
-from qgis.gui import QgsMapLayerComboBox
+
+# ensure to call QGIS before PyQtGraph
 
 pathUI_processor = os.path.join(APP_DIR, 'Resources/UserInterfaces/Processor_Inversion.ui')
 pathUI_nodat = os.path.join(APP_DIR, 'Resources/UserInterfaces/Nodat.ui')
@@ -47,9 +51,6 @@ pathUI_prgbar = os.path.join(APP_DIR, 'Resources/UserInterfaces/ProgressBar.ui')
 class MLInversionGUI(QDialog):
 
     def __init__(self, parent=None):
-        mLayerImage: QgsMapLayerComboBox
-        mLayerGeometry: QgsMapLayerComboBox
-        mLayerMask: QgsMapLayerComboBox
         super(MLInversionGUI, self).__init__(parent)
         loadUi(pathUI_processor, self)
 
@@ -537,24 +538,30 @@ class MLInversion:
 
     def get_image_meta(self, image, image_type):
         # extracts meta information from the spectral image
-        dataset = openRasterDataset(image)
-        if dataset is None:
-            raise ValueError(
-                '{} could not be read. Please make sure it is a valid ENVI image'.format(image_type))
-        else:
-            metadict = dataset.metadataDict()
+        # dataset = openRasterDataset(image)
+        # if dataset is None:
+        #    raise ValueError(
+        #        '{} could not be read. Please make sure it is a valid ENVI image'.format(image_type))
+        # else:
+        #    metadict = dataset.metadataDict()
 
+        reader = RasterReader(image)
+        metadict = reader.metadata()
+
+        if True:
             nrows = int(metadict['ENVI']['lines'])
             ncols = int(metadict['ENVI']['samples'])
             nbands = int(metadict['ENVI']['bands'])
 
             try:  # try and get no data value and convert it to integer
-                nodata = int(metadict['ENVI']['data ignore value'])
-            except:
+                # nodata = int(metadict['ENVI']['data ignore value'])
+                nodata_str = metadict['ENVI'].get('data ignore value', metadict['ENVI'].get('data_ignore_value'))
+                nodata = int(nodata_str)
+            except Exception:
                 # no dat not found or cannot be interpreted as intereg! No worries, the user can add it manually!
                 self.main.nodat_widget.init(image_type=image_type, image=image)
                 self.main.nodat_widget.gui.setModal(True)  # parent window is blocked
-                self.main.nodat_widget.gui.exec_()  # unlike .show(), .exec_() waits with execution of the code,
+                self.main.nodat_widget.gui.exec()  # unlike .show(), .exec_() waits with execution of the code,
                 # until the app is closed
                 nodata = self.main.nodat_widget.nodat
 
@@ -563,7 +570,11 @@ class MLInversion:
             if image_type == "Input Image":
                 try:
                     wavelengths = metadict['ENVI']['wavelength']
-                    wl_units = metadict['ENVI']['wavelength units']
+                    # wl_units = metadict['ENVI']['wavelength units']
+                    wl_units = metadict['ENVI'].get('wavelength units', metadict['ENVI'].get('wavelength_units'))
+                    if wl_units is None:
+                        raise KeyError('wavelength_units')
+                    # wl_units = metadict['ENVI']['wavelength units']
                     if wl_units.lower() in ['nanometers', 'nm', 'nanometer']:  # any of these is accepted
                         wave_convert = 1  # factor is 1, as the method expects nm anyway
                     elif wl_units.lower() in ['micrometers', 'µm', 'micrometer']:
@@ -609,7 +620,7 @@ class MLInversion:
             values = [value.split(';') if ';' in value else value for value in values]
             meta_dict = dict(zip(keys, values))  # dictionary for they keys and values of the ML-meta file
             return meta_dict
-        except:
+        except Exception:
             return False
 
     def run_inversion(self):
@@ -751,4 +762,4 @@ if __name__ == '__main__':
     app = start_app()
     m = MainUiFunc()
     m.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

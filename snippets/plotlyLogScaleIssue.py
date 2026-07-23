@@ -29,6 +29,6 @@ fig.update_layout(
         tickvals=[-1, 0, 1],
         ticktext=['Minus One', 'Zero', 'One']
     )
-                  )
+)
 
 fig.show()

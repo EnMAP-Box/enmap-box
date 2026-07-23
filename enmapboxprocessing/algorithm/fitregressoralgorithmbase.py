@@ -5,11 +5,11 @@ from typing import Dict, Any, List, Tuple
 
 from sklearn.multioutput import MultiOutputRegressor
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -20,10 +20,14 @@ class FitRegressorAlgorithmBase(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._DATASET, 'Training dataset pickle file used for fitting the classifier. '
+            (self._DATASET, 'Training dataset skops file used for fitting the classifier. '
                             'If not specified, an unfitted classifier is created.'),
-            (self._REGRESSOR, self.helpParameterCode()),
-            (self._OUTPUT_REGRESSOR, self.PickleFileDestination)
+            (
+                self._REGRESSOR, self.helpParameterCode()
+                + '\nNote: The Python code provided here is executed locally with the permissions '  # noqa: W503
+                  ' of the current user during algorithm execution.'
+            ),
+            (self._OUTPUT_REGRESSOR, self.SkopsFileDestination)
         ]
 
     def displayName(self) -> str:
@@ -44,7 +48,7 @@ class FitRegressorAlgorithmBase(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterCode(self.P_REGRESSOR, self._REGRESSOR, self.defaultCodeAsString())
         self.addParameterRegressionDataset(self.P_DATASET, self._DATASET, None, True)
-        self.addParameterFileDestination(self.P_OUTPUT_REGRESSOR, self._OUTPUT_REGRESSOR, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_REGRESSOR, self._OUTPUT_REGRESSOR, self.SkopsFileFilter)
 
     def defaultCodeAsString(self):
         try:
@@ -57,7 +61,10 @@ class FitRegressorAlgorithmBase(EnMAPProcessingAlgorithm):
     def parameterAsRegressor(self, parameters: Dict[str, Any], name, context: QgsProcessingContext):
         namespace = dict()
         code = self.parameterAsString(parameters, name, context)
-        exec(code, namespace)
+
+        # nosec B102 # User-defined scikit-learn model code execution by design; equivalent to the QGIS Python Console.
+        # The code execution is transparently documented for users (e.g., via the Processing algorithm help).
+        exec(code, namespace)  # nosec B102 # User-defined scikit-learn model code execution by design;
         return namespace['regressor']
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
@@ -72,7 +79,7 @@ class FitRegressorAlgorithmBase(EnMAPProcessingAlgorithm):
         return True, ''
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         dump = self.parameterAsRegressorDump(parameters, self.P_DATASET, context)
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_REGRESSOR, context)
@@ -105,7 +112,7 @@ class FitRegressorAlgorithmBase(EnMAPProcessingAlgorithm):
                 dump = RegressorDump(None, None, None, None, regressor)
 
             dump.regressor = regressor
-            Utils.pickleDump(dump.__dict__, filename)
+            Utils.modelDump(dump.__dict__, filename)
 
             result = {self.P_OUTPUT_REGRESSOR: filename}
             self.toc(feedback, result)

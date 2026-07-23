@@ -31,7 +31,6 @@ from qgis.PyQt.QtWidgets import QDialog, QTextBrowser
 
 def anchorClicked(url: QUrl):
     """Opens a URL in local browser / mail client"""
-    assert isinstance(url, QUrl)
     webbrowser.open(url.url())
 
 
@@ -74,7 +73,7 @@ class AboutDialog(QDialog):
         self.labelVersion.setText(info)
         self.setAboutTitle()
 
-        def loadChangelogMD(p: Union[str, Path]):  # see issue #990
+        def loadChangelogMD(p: Union[str, Path]) -> str:  # see issue #990
             with open(p, 'r', encoding='utf-8') as f:
                 md = f.read()
 
@@ -89,17 +88,13 @@ class AboutDialog(QDialog):
             # md = [l for l in md if 'details>' not in l]
             return ''.join(md)
 
-        def loadMD(p: Union[str, Path]):
+        def loadMD(p: Union[str, Path]) -> str:
             p = Path(p)
-
-            try:
-                assert p.is_file()
-                assert p.name.endswith('.md')
+            if p.is_file() and p.name.endswith('.md'):
                 with open(p, 'r', encoding='utf-8') as f:
                     md = f.read()
-
-            except (AssertionError, FileNotFoundError) as ex:
-                md = f'Unable to load "{p}"\n{ex}'
+            else:
+                md = f'Unable to load "{p}"'
             return md
 
         r = Path(DIR_REPO)
@@ -132,4 +127,4 @@ if __name__ == '__main__':
     app = start_app()
     d = AboutDialog()
     d.show()
-    app.exec_()
+    app.exec()

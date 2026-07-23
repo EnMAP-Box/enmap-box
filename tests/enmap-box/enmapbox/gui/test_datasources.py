@@ -13,25 +13,28 @@ __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
 import datetime
 import pathlib
-import tempfile
 import unittest
 from pathlib import Path
 from time import sleep
 
 from osgeo import ogr
 
+from enmapbox import initAll, DIR_REPO
 from enmapbox.exampledata import enmap, hires, landcover_polygon
 from enmapbox.gui.datasources.datasources import SpatialDataSource, DataSource, RasterDataSource, VectorDataSource, \
     FileDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager, DataSourceManagerPanelUI, DataSourceFactory
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
 from enmapbox.testing import start_app
-from enmapboxtestdata import classifierDumpPkl, library_berlin, enmap_srf_library
+from enmapboxtestdata import classifierDumpSkops, library_berlin, enmap_srf_library
 from qgis.PyQt import sip
-from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, QgsRasterRenderer, edit
+from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, QgsRasterRenderer, edit, \
+    QgsVectorTileLayer
 from qgis.gui import QgsMapCanvas
 
 start_app()
+initAll()
 
 
 class DataSourceTests(EnMAPBoxTestCase):
@@ -49,6 +52,23 @@ class DataSourceTests(EnMAPBoxTestCase):
                 TestObjects.createVectorLayer(ogr.wkbPolygon),
                 TestObjects.createSpectralLibrary(10)]
 
+    def test_vectortilelayer(self):
+        uri = (
+            'styleUrl=https://sgx.geodatenzentrum.de/gdz_basemapde_vektor/styles/bm_web_col.json&type=xyz&'
+            'url=https://sgx.geodatenzentrum.de/gdz_basemapde_vektor/tiles/'
+            'v2/bm_web_de_3857/%7Bz%7D/%7Bx%7D/%7By%7D.pbf&zmax=15&zmin=0&http-header:referer='
+        )
+        lyr = QgsVectorTileLayer(uri)
+        lyr.setName('Basemap.de')
+        self.assertTrue(lyr.isValid())
+
+        emb = EnMAPBox(load_core_apps=False, load_other_apps=False)
+        emb.addSource(lyr)
+
+        self.assertTrue(len(emb.dataSources()) == 1)
+
+        self.showGui(emb.ui)
+
     def test_testSources(self):
 
         for lyr in self.createTestSourceLayers():
@@ -57,8 +77,8 @@ class DataSourceTests(EnMAPBoxTestCase):
 
     def test_layerSourceUpdate(self):
 
-        path = '/vsimem/image.bsq'
-        path = tempfile.mktemp(suffix='image.tif')
+        tmpdir = self.createTestOutputDirectory()
+        path = str(tmpdir / 'image.tif')
         TestObjects.createRasterDataset(nb=5, nl=500, path=path)
         c = QgsMapCanvas()
         c.show()
@@ -167,7 +187,7 @@ class DataSourceTests(EnMAPBoxTestCase):
                    enmap_srf_library,
                    enmap_srf_library,
                    library_berlin,
-                   classifierDumpPkl]
+                   classifierDumpSkops]
 
         model = DataSourceManager()
 
@@ -196,6 +216,27 @@ class DataSourceTests(EnMAPBoxTestCase):
         lyr2 = ds1.asMapLayer(project=project)
 
         self.assertEqual(lyr1, lyr2)
+
+    def test_file_types(self):
+        # can we drag & drop ENVI BSQ images?
+        # see https://github.com/EnMAP-Box/enmap-box/issues/1382
+
+        from enmapbox.exampledata import enmap
+
+        testdata = Path(DIR_REPO) / 'enmapbox/qgispluginsupport/qpstestdata/wavelength'
+        self.assertTrue(testdata.is_dir())
+
+        files = [enmap, hires,
+                 testdata / 'envi_wl_fwhm.bsq']
+
+        EMB = EnMAPBox(load_core_apps=False, load_other_apps=False)
+
+        for i, file in enumerate(files):
+            self.assertTrue(Path(file).is_file())
+            EMB.addSource(file)
+            self.assertEqual(i + 1, len(EMB.dataSources('RASTER')))
+        self.showGui(EMB.ui)
+        EMB.close()
 
     def test_datasourcemanager(self):
         reg = QgsProject.instance()
@@ -233,17 +274,6 @@ class DataSourceTests(EnMAPBoxTestCase):
 
         reg.removeAllMapLayers()
 
-        # test doubled input
-        n = len(dsm)
-        try:
-            p1 = str(pathlib.WindowsPath(pathlib.Path(enmap)))
-            p2 = str(pathlib.Path(enmap).as_posix())
-            dsm.addDataSources(p1)
-            dsm.addDataSources(p2)
-            self.assertTrue(len(dsm) == n, msg='DataSourceManager should not contain the same source multiple times')
-        except Exception as ex:
-            pass
-
         # remove
         dsm = DataSourceManager()
         lyr = TestObjects.createVectorLayer()
@@ -277,7 +307,10 @@ class DataSourceTests(EnMAPBoxTestCase):
                 reg.removeAllMapLayers()
                 self.assertTrue(len(mapCanvas.layers()) == 0)
 
-    sublayer_raster_file = r'R:/Rohdaten/EnMAP-Box external Sensor Products/sentinel2/S2A_MSIL2A_20200816T101031_N0214_R022_T32UQD_20200816T130108.SAFE/MTD_MSIL2A.xml'
+    sublayer_raster_file = (
+        r'R:/Rohdaten/EnMAP-Box external Sensor Products/sentinel2'
+        r'/S2A_MSIL2A_20200816T101031_N0214_R022_T32UQD_20200816T130108.SAFE/MTD_MSIL2A.xml'
+    )
 
     @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'Blocking Dialog')
     @unittest.skipIf(not pathlib.Path(sublayer_raster_file).is_file(), 'blocking dialog/Missing test file')

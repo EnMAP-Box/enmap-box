@@ -1,5 +1,5 @@
-from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 from enmapbox.typeguard import typechecked
+from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 
 
 @typechecked
@@ -13,10 +13,12 @@ class FitLGBMClassifierAlgorithm(FitClassifierAlgorithmBase):
                '<a href="https://lightgbm.readthedocs.io/">LightGBM</a> classifier.'
 
     def helpParameterCode(self) -> str:
-        return 'Scikit-learn python code. ' \
-               'See <a href="' \
-               'https://lightgbm.readthedocs.io/en/latest/pythonapi/lightgbm.LGBMClassifier.html#lightgbm-lgbmclassifier' \
-               '">LGBMClassifier</a> for information on different parameters.'
+        return (
+            'Scikit-learn python code. '
+            'See <a href="'
+            'https://lightgbm.readthedocs.io/en/latest/pythonapi/lightgbm.LGBMClassifier.html#lightgbm-lgbmclassifier'
+            '">LGBMClassifier</a> for information on different parameters.'
+        )
 
     def code(cls):
         from lightgbm import LGBMClassifier

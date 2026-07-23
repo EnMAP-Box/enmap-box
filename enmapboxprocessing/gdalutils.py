@@ -1,12 +1,15 @@
+from copy import deepcopy
 from os import makedirs
 from os.path import exists, dirname
+from pathlib import Path
 from typing import List
 
+import defusedxml.ElementTree as ET
 from osgeo import gdal
 
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
-from qgis.core import QgsProcessingFeedback
+from qgis.core import QgsRectangle, QgsProcessingFeedback
 
 
 @typechecked
@@ -14,7 +17,7 @@ class GdalUtils(object):
 
     @staticmethod
     def calculateDefaultHistrogram(
-            ds: gdal.Dataset, buckets=256, inMemory=False, feedback: QgsProcessingFeedback = None
+        ds: gdal.Dataset, buckets=256, inMemory=False, feedback: QgsProcessingFeedback = None
     ):
         if feedback is not None:
             feedback.pushInfo('calculate histograms')
@@ -108,3 +111,68 @@ class GdalUtils(object):
                 file.write(text)
 
             file.writelines(['\n</VRTDataset>'])
+
+    @staticmethod
+    def stackBands(
+        filename: str, filenames: List[str], bandNumbers: List[List[int]] = None, width: int = None,
+        height: int = None, extent: QgsRectangle = None
+    ):
+
+        if bandNumbers is not None and len(filenames) != len(bandNumbers):
+            raise ValueError(
+                f'filenames and bandNumbers must have the same length, '
+                f'got {len(filenames)} and {len(bandNumbers)}'
+            )
+        if len(filenames) == 0:
+            raise ValueError('filenames must not be empty')
+
+        reader0 = RasterReader(filenames[0])
+        if width is None:
+            width = reader0.width()
+        if height is None:
+            height = reader0.height()
+        if extent is None:
+            extent = reader0.extent()
+
+        projWin = (extent.xMinimum(), extent.yMaximum(), extent.xMaximum(), extent.yMinimum())
+        xRes = extent.width() / width
+        yRes = extent.height() / height
+
+        # fetch band definitions for each raster
+        bandTemplates = list()
+        bandNo = 1
+        for fname, bandList in zip(filenames, bandNumbers):
+            options = gdal.TranslateOptions(
+                bandList=bandList, xRes=xRes, yRes=yRes, format='VRT', projWin=projWin
+            )
+
+            vrt_path = '/vsimem/temp.vrt'
+            gdal.Translate(vrt_path, fname, options=options)
+            buf = gdal.VSIGetMemFileBuffer_unsafe(vrt_path)
+            xml = buf.tobytes().decode("utf-8")
+            root = ET.fromstring(xml)
+            for md in list(root.findall("Metadata")):
+                root.remove(md)
+
+            for band in list(root.findall("VRTRasterBand")):
+                tagsToRemove = ["Metadata", "ColorInterp"]
+                for child in list(band):
+                    if child.tag in tagsToRemove:
+                        band.remove(child)
+                band.set('band', str(bandNo))
+                bandNo += 1
+                bandTemplates.append(band)
+
+        # prepare empty VRTDataset root from last raster
+        for band in list(root.findall("VRTRasterBand")):
+            root.remove(band)
+
+        # add bands
+        for bandTemplate in bandTemplates:
+            bandNode = deepcopy(bandTemplate)
+            root.append(bandNode)
+
+        # write result VRT
+        new_xml = ET.tostring(root, encoding="utf-8", xml_declaration=True)
+        out_path = Path(filename).resolve()
+        out_path.write_bytes(new_xml)

@@ -12,7 +12,7 @@
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
-                                                                                                                                                 *
+
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -28,9 +28,13 @@
 # The idea is to browse through all spectra of the LUT, treating it as a library, and detect the spectra with closest
 # relation to the measured reflectances; The median of the n-best fits is considered the valid result
 
-from enmapbox.coreapps._classic.hubflow.core import *
-from matplotlib import pyplot as plt
+import os
+
 import numpy as np
+from matplotlib import pyplot as plt
+
+from enmapboxprocessing.driver import Driver
+from enmapboxprocessing.rasterreader import RasterReader
 
 
 # class RTMInversion is the core class of the inversion
@@ -114,13 +118,16 @@ class RTMInversion:
 
     def read_image(self, image, dtype=np.float16, exclude_bands=None):
         # read spectral image (can also be geometry image or mask image!)
-        dataset = openRasterDataset(image)
-        in_matrix = dataset.readAsArray().astype(dtype=dtype)  # read the data
+        # dataset = openRasterDataset(image)
+        reader = RasterReader(image)
+
+        # in_matrix = dataset.readAsArray().astype(dtype=dtype)  # read the data
+        in_matrix = np.arry(reader.array())
+
         if exclude_bands is not None:  # if bands are to be excluded from the input image, do so now
             in_matrix = np.delete(in_matrix, exclude_bands, 0)
         nbands, nrows, ncols = in_matrix.shape
-        grid = dataset.grid()  # store the grid of the input image for later use
-
+        grid = reader.extent, reader.crs  # store the grid of the input image for later use
         return nrows, ncols, nbands, grid, in_matrix  # return a tuple back to the last function (type "dtype")
 
     def get_geometry(self, geo_fixed, geo_image=None, spatial_geo=False):
@@ -178,9 +185,9 @@ class RTMInversion:
                     # tts0 tts0 tts0 ... tts0 tts0 ... ... tts0 tts1  ...  ttsn     -> n = self.nangles_LUT[0]
                     # tto0 tto0 tto0 ... tto0 tto1 ... ... tton tto0  ...  tton     -> n = self.nangles_LUT[1]
                     # psi0 psi1 psi2 ... psin psi0 ... ... psin psi0  ...  psin     -> n = self.nangles_LUT[2]
-                    self.whichLUT[row, col] = angles[2] * self.nangles_LUT[1] * self.nangles_LUT[0] + \
-                                              angles[1] * self.nangles_LUT[0] + \
-                                              angles[0]
+                    self.whichLUT[row, col] = angles[2] * self.nangles_LUT[1] * self.nangles_LUT[0]
+                    self.whichLUT[row, col] += angles[1] * self.nangles_LUT[0] + angles[0]
+
         else:  # LUT contains only one fixed value
             self.whichLUT[:, :] = 0  # there should only be ONE geo-ensemble for the LUTs and this is #0 then
             self.geometry_matrix[:, :, :] = 911  # a value that is unlikely to be chosen for "no data"
@@ -222,8 +229,8 @@ class RTMInversion:
         elif ctype == 2:  # MAE
             delta = np.sum(np.abs(image_ref - model_ref), axis=0)
         elif ctype == 3:  # mNSE
-            delta = 1.0 - ((np.sum(np.abs(image_ref - model_ref), axis=0)) /
-                           (np.sum(np.abs(image_ref - (np.mean(image_ref))))))
+            delta = 1.0 - ((np.sum(np.abs(image_ref - model_ref), axis=0))
+                           / (np.sum(np.abs(image_ref - (np.mean(image_ref))))))  # noqa
         else:
             delta = None
             exit("wrong cost function type. Expected 1, 2 or 3; got %i instead" % ctype)
@@ -298,10 +305,13 @@ class RTMInversion:
 
         # Find out coordinates for which ALL constraints hold True in each "whichLUT"
         for iwhichLUT in self.whichLUT_unique:
-            whichLUT_coords.append(np.where((self.whichLUT[:, :] == iwhichLUT) &  # 1: where to find current ensemble
-                                            # 2: not masked
-                                            (self.mask[0, :, :] > 0 if self.mask is not None else all_true) &
-                                            (~np.all(self.image == self.nodat[0], axis=0))))  # 3: not NoDatVal
+            whichLUT_coords.append(
+                np.where(
+                    (self.whichLUT[:, :] == iwhichLUT)  # 1: where to find current ensemble
+                    & (self.mask[0, :, :] > 0 if self.mask is not None else all_true)  # noqa # 2: not masked
+                    & (~np.all(self.image == self.nodat[0], axis=0))  # noqa # 3: not NoDatVal
+                )
+            )
         pix_current = 0
         # How many pixels are to be inverted at all?
         npixel_valid = sum([len(whichLUT_coords[i][0]) for i in range(len(self.whichLUT_unique))])
@@ -362,17 +372,25 @@ class RTMInversion:
     def write_image(self):
         # write output to file(s), use the same grid as the input image
         if self.out_mode == "single":
-            output = Raster.fromArray(array=self.out_matrix, filename=self.image_out, grid=self.grid)
-            output.dataset().setMetadataItem('data ignore value', self.nodat[2], 'ENVI')
-            for i, band in enumerate(output.dataset().bands()):
-                band.setDescription(self.whichpara[i])
-                band.setNoDataValue(self.nodat[2])
+            # output = Raster.fromArray(array=self.out_matrix, filename=self.image_out, grid=self.grid)
+            array = self.out_matrix
+            filename = self.image_out
+            extent, crs = self.grid
+            writer = Driver(filename).createFromArray(array, extent, crs)
+            for bandNo in writer.bandNumbers():
+                writer.setBandName(self.whichpara[bandNo - 1], bandNo)
+                writer.setNoDataValue(self.nodat[2], bandNo)
 
         elif self.out_mode == "individual":
             for i, para_key in enumerate(self.whichpara):
-                output = Raster.fromArray(array=self.out_matrix[i, :, :][np.newaxis, :, :], filename=os.path.splitext(
-                    self.image_out)[0] + "_" + para_key + os.path.splitext(self.image_out)[1])
-                output.dataset().setMetadataItem('data ignore value', self.nodat[2], 'ENVI')
-                for band in output.dataset().bands():
-                    band.setDescription(para_key)
-                    band.setNoDataValue(self.nodat[2])
+                # output = Raster.fromArray(array=self.out_matrix[i, :, :][np.newaxis, :, :], filename=os.path.splitext(
+                #    self.image_out)[0] + "_" + para_key + os.path.splitext(self.image_out)[1])
+
+                array = self.out_matrix[i, :, :][np.newaxis, :, :]
+                filename = os.path.splitext(self.image_out)[0] + "_" + para_key + os.path.splitext(self.image_out)[1]
+                extent, crs = self.grid
+                writer = Driver(filename).createFromArray(array, extent, crs)
+
+                for bandNo in writer.bandNumbers():
+                    writer.setBandName(para_key, bandNo)
+                    writer.setNoDataValue(self.nodat[2], bandNo)

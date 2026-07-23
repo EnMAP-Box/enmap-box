@@ -1,6 +1,8 @@
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCategorizedSymbolRenderer,
+                       QgsProcessingParameterField, QgsProcessingException, QgsFeature)
 
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import FIELD_VALUES
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
@@ -8,8 +10,6 @@ from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import checkSampleShape, ClassifierDump
 from enmapboxprocessing.utils import Utils
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsCategorizedSymbolRenderer,
-                       QgsProcessingParameterField, QgsProcessingException, QgsFeature)
 
 
 @typechecked
@@ -25,14 +25,17 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
         return 'Create classification dataset (from categorized spectral library)'
 
     def shortDescription(self) -> str:
-        return 'Create a classification dataset from spectral profiles that matches the given categories ' \
-               'and store the result as a pickle file.\n' \
-               'If the spectral library is not categorized, or the field with class values is selected manually, ' \
-               'categories are derived from target data y. ' \
-               'To be more precise: ' \
-               'i) category values are derived from unique attribute values (after excluding no data or zero data values), ' \
-               'ii) category names are set equal to the category values, ' \
-               'and iii) category colors are picked randomly.'
+        return (
+            'Create a classification dataset from spectral profiles that matches the given categories '
+            'and store the result as a skops file.\n'
+            'If the spectral library is not categorized, or the field with class values is selected manually, '
+            'categories are derived from target data y. '
+            'To be more precise: '
+            'i) category values are derived from unique attribute values '
+            '(after excluding no data or zero data values), '
+            'ii) category names are set equal to the category values, '
+            'and iii) category colors are picked randomly.'
+        )
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
@@ -48,7 +51,7 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
                           'If that is also not available, an error is raised.'),
             (self._EXCLUDE_BAD_BANDS, 'Whether to exclude bands, that are marked as bad bands, '
                                       'or contain no data, inf or nan values in all samples.'),
-            (self._OUTPUT_DATASET, self.PickleFileDestination)
+            (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
     def group(self):
@@ -65,7 +68,7 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
             False, True
         )
         self.addParameterBoolean(self.P_EXCLUDE_BAD_BANDS, self._EXCLUDE_BAD_BANDS, True, True, True)
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
@@ -135,8 +138,12 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
                 y.append(yi)
                 X.append(Xi)
 
-                point = feature.geometry().asPoint()
-                locations.append((point.x(), point.y()))
+                geometry = feature.geometry()
+                if geometry.isEmpty():
+                    locations.append((None, None))
+                else:
+                    point = geometry.asPoint()
+                    locations.append((point.x(), point.y()))
 
             if len(set(map(len, X))) != 1:
                 raise QgsProcessingException('Number of features do not match across all spectral profiles.')
@@ -178,7 +185,7 @@ class PrepareClassificationDatasetFromCategorizedLibraryAlgorithm(EnMAPProcessin
 
             dump = ClassifierDump(categories=categories, features=features, X=X, y=y, locations=locations, crs=crs)
             dumpDict = dump.__dict__
-            Utils.pickleDump(dumpDict, filename)
+            Utils.modelDump(dumpDict, filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)

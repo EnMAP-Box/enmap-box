@@ -15,11 +15,11 @@ class SelectFeaturesFromDatasetAlgorithm(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._DATASET, 'Dataset pickle file to select features from.'),
+            (self._DATASET, 'Dataset skops file to select features from.'),
             (self._FEATURE_LIST,
              'Comma separated list of feature names or positions. '
              "E.g. use <code>1, 'Feature 2', 3</code> to select the first three features."),
-            (self._OUTPUT_DATASET, self.PickleFileDestination)
+            (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
     def displayName(self) -> str:
@@ -32,9 +32,9 @@ class SelectFeaturesFromDatasetAlgorithm(EnMAPProcessingAlgorithm):
         return Group.DatasetCreation.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
-        self.addParameterFile(self.P_DATASET, self._DATASET, extension=self.PickleFileExtension)
+        self.addParameterFile(self.P_DATASET, self._DATASET, extension=self.SkopsFileExtension)
         self.addParameterString(self.P_FEATURE_LIST, self._FEATURE_LIST)
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
@@ -47,7 +47,7 @@ class SelectFeaturesFromDatasetAlgorithm(EnMAPProcessingAlgorithm):
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)
 
-            dump = ClassifierDump(**Utils.pickleLoad(filenameDataset))
+            dump = ClassifierDump(**Utils.modelLoad(filenameDataset))
             feedback.pushInfo(
                 f'Load feature data: X=array{list(dump.X.shape)}')
 
@@ -71,7 +71,7 @@ class SelectFeaturesFromDatasetAlgorithm(EnMAPProcessingAlgorithm):
             dumpDict = dump.__dict__.copy()
             dumpDict['X'] = dump.X[:, indices]
             dumpDict['features'] = [dump.features[index] for index in indices]
-            Utils.pickleDump(dumpDict, filename)
+            Utils.modelDump(dumpDict, filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)

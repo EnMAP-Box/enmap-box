@@ -1,16 +1,17 @@
 import warnings
+from contextlib import suppress
 from math import ceil, sqrt, floor
 from os.path import join, exists
-from random import getrandbits
+from secrets import token_hex
 from typing import Optional, Tuple, Dict
 
 import numpy as np
 from osgeo import gdal
+from pyqtgraph import PlotWidget, ImageItem, mkPen
 from scipy.stats import binned_statistic_2d, pearsonr
 
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import MarkerSymbolComboBox, MarkerSymbol
 from enmapbox.qgispluginsupport.qps.processing.algorithmdialog import AlgorithmDialog
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget, ImageItem, mkPen
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
@@ -228,10 +229,8 @@ class ScatterPlotDialog(QMainWindow):
 
         # disconnect old map canvas
         if self.mMapCanvas is not None:
-            try:
+            with suppress(Exception):
                 self.mMapCanvas.extentsChanged.disconnect(self.onMapCanvasExtentsChanged)
-            except Exception:
-                pass
 
         # connect new map canvas
         self.mMapCanvas = None
@@ -265,7 +264,6 @@ class ScatterPlotDialog(QMainWindow):
     def onFieldYChanged(self):
         # rasterize if needed
         layerX = self.currentLayerX()
-        assert layerX is not None
         layerY = self.currentLayerY()
         fieldY = self.currentFieldY()
         if layerY is None or fieldY is None:
@@ -277,7 +275,7 @@ class ScatterPlotDialog(QMainWindow):
         if key not in self.cache:
             noDataValue = -9999
             alg = RasterizeVectorAlgorithm()
-            filename = join(Utils.getTempDirInTempFolder(), str(getrandbits(128))) + '.tif'
+            filename = join(Utils.getTempDirInTempFolder(), str(token_hex(16))) + '.tif'
             parameters = {
                 alg.P_VECTOR: layerY,
                 alg.P_GRID: layerX,
@@ -332,7 +330,6 @@ class ScatterPlotDialog(QMainWindow):
             if fieldY is None:
                 return
             key = layerX.source(), layerY.source(), fieldY
-            assert key in self.cache
             layerY = self.cache[key]
             bandNoY = 1
             yIsVector = True
@@ -499,8 +496,7 @@ class ScatterPlotDialog(QMainWindow):
 def utilsQgsColorRampToPyQtGraphLookupTable(colorRamp: QgsColorRamp) -> np.ndarray:
     array = np.empty(shape=(256, 4), dtype=np.uint8)
     for i in range(256):
-        color = colorRamp.color(i / 255)
-        assert isinstance(color, QColor)
+        color: QColor = colorRamp.color(i / 255)
         array[i, 0] = color.red()
         array[i, 1] = color.green()
         array[i, 2] = color.blue()

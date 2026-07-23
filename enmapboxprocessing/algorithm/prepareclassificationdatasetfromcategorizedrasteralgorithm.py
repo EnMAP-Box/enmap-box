@@ -26,14 +26,17 @@ class PrepareClassificationDatasetFromCategorizedRasterAlgorithm(EnMAPProcessing
         return 'Create classification dataset (from categorized raster layer and feature raster)'
 
     def shortDescription(self) -> str:
-        return 'Create a classification dataset by sampling data for pixels that match the given categories ' \
-               'and store the result as a pickle file. \n' \
-               'If the layer is not categorized, or the band with class values is selected manually, ' \
-               'categories are derived from sampled data itself. ' \
-               'To be more precise: ' \
-               'i) category values are derived from unique raster band values (after excluding no data or zero data pixel), ' \
-               'ii) category names are set equal to the category values, ' \
-               'and iii) category colors are picked randomly.'
+        return (
+            'Create a classification dataset by sampling data for pixels that match the given categories '
+            'and store the result as a skops file. \n'
+            'If the layer is not categorized, or the band with class values is selected manually, '
+            'categories are derived from sampled data itself. '
+            'To be more precise: '
+            'i) category values are derived from unique raster band values '
+            '(after excluding no data or zero data pixel), '
+            'ii) category names are set equal to the category values, '
+            'and iii) category colors are picked randomly.'
+        )
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
@@ -46,7 +49,7 @@ class PrepareClassificationDatasetFromCategorizedRasterAlgorithm(EnMAPProcessing
             (self._CATEGORY_BAND, 'Band with class values. '
                                   'If not selected, the band defined by the renderer is used. '
                                   'If that is also not specified, the first band is used.'),
-            (self._OUTPUT_DATASET, self.PickleFileDestination)
+            (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
     def group(self):
@@ -59,7 +62,7 @@ class PrepareClassificationDatasetFromCategorizedRasterAlgorithm(EnMAPProcessing
         self.addParameterBand(
             self.P_CATEGORY_BAND, self._CATEGORY_BAND, None, self.P_CATEGORIZED_RASTER, True, False, True
         )
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
             self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
@@ -123,7 +126,7 @@ class PrepareClassificationDatasetFromCategorizedRasterAlgorithm(EnMAPProcessing
                 crs=classification.crs().toWkt()
             )
             dumpDict = dump.__dict__
-            Utils.pickleDump(dumpDict, filename)
+            Utils.modelDump(dumpDict, filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)
@@ -131,13 +134,20 @@ class PrepareClassificationDatasetFromCategorizedRasterAlgorithm(EnMAPProcessing
 
     @classmethod
     def sampleData(
-            cls, raster: QgsRasterLayer, classification: QgsRasterLayer, classBandNo: int, categories: Categories,
-            excludeBadBands: bool, feedback: QgsProcessingFeedback = None
+        cls, raster: QgsRasterLayer, classification: QgsRasterLayer, classBandNo: int, categories: Categories,
+        excludeBadBands: bool, feedback: QgsProcessingFeedback = None
     ) -> Tuple[SampleX, SampleY, List[int], np.ndarray]:
         # assert raster.crs() == classification.crs()
-        assert raster.extent() == classification.extent()
-        assert (raster.width(), raster.height()) == (classification.width(), classification.height())
+        if raster.extent() != classification.extent():
+            raise ValueError(
+                'raster and classification must have the same extent'
+            )
 
+        if (raster.width(), raster.height()) != (classification.width(), classification.height()):
+            raise ValueError(
+                f'raster and classification must have the same dimensions, '
+                f'got ({raster.width()}, {raster.height()}) and ({classification.width()}, {classification.height()})'
+            )
         maximumMemoryUsage = Utils.maximumMemoryUsage()
         reader = RasterReader(raster)
         classificationReader = RasterReader(classification)

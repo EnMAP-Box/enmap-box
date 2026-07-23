@@ -1,14 +1,14 @@
 import traceback
 import warnings
+from contextlib import suppress
 from dataclasses import dataclass
 from os.path import exists, join, dirname
 from shutil import copyfile
 from typing import Optional, List, Dict
 
 import numpy as np
+import pyqtgraph as pg
 
-import enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph as pg
-import processing
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyleButton, PlotStyle
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import prepareProfileValueDict
@@ -21,10 +21,11 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp import MapTool, GeeTimeseriesExplorerDockWidget, GeeTemporalProfileDockWidget
 from profileanalyticsapp.profileanalyticseditorwidget import ProfileAnalyticsEditorWidget
+from qgis import processing
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QComboBox, QTableWidget, QCheckBox, QToolButton, QLineEdit, QWidget, QLabel, QDockWidget
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsVectorLayer, QgsProcessingFeatureSourceDefinition, \
-    QgsFeatureRequest, QgsWkbTypes, QgsFeature, QgsProject
+    QgsFeatureRequest, QgsWkbTypes, QgsFeature, QgsProject, QgsProcessing
 from qgis.gui import QgsMapLayerComboBox, QgsFileWidget, QgsRasterBandComboBox, QgisInterface
 
 
@@ -63,11 +64,10 @@ class ProfileAnalyticsDockWidget(QDockWidget):
 
     def __init__(self, currentLocationMapTool: Optional[MapTool], parent=None):
         super().__init__(parent)
-        # QgsDockWidget.__init__(self, parent)
         uic.loadUi(__file__.replace('.py', '.ui'), self)
 
         self.currentLocationMapTool = currentLocationMapTool
-        self.oldLineLayer: Optional[QgsVectorLayer] = None
+        self.oldLineLayerId: str = ''
 
         # set from outside
         self.interface = None
@@ -98,6 +98,9 @@ class ProfileAnalyticsDockWidget(QDockWidget):
         self.mGeeCollectionTitle.setVisible(False)
         self.mGeeCollectionTitleLabel.setVisible(False)
         self.mGeeRasterTable.setVisible(False)
+
+    def oldLineLayerInstance(self) -> Optional[QgsVectorLayer]:
+        return self.project().mapLayer(self.oldLineLayerId)
 
     def project(self) -> QgsProject:
         return self.mProject
@@ -164,29 +167,36 @@ class ProfileAnalyticsDockWidget(QDockWidget):
 
         self.onLiveUpdate()
 
+    def close(self):
+
+        oLyr = self.oldLineLayerInstance()
+        if isinstance(oLyr, QgsVectorLayer):
+            oLyr.disconnect(self.onLayerSelectionChanged)
+
+        for row in reversed(range(self.mRasterTable.rowCount())):
+            self.mRasterTable.removeRow(row)
+
     def onCurrentLayerChanged(self):
-
-        # disconnect old layer
-        try:
-            self.oldLineLayer.selectionChanged.disconnect(self.onLayerSelectionChanged)
-        except Exception:
-            pass
-
-        # connect new layer
         layer = self.currentLayer()
-        if layer is None:
-            return
-        layer.selectionChanged.connect(self.onLayerSelectionChanged)
 
-        self.oldLineLayer = layer
+        if isinstance(layer, QgsVectorLayer) and layer.isValid():
+            if layer.id() != self.oldLineLayerId:
+                lyr_old = self.oldLineLayerInstance()
+                if isinstance(lyr_old, QgsVectorLayer):
+                    with suppress(Exception):
+                        lyr_old.selectionChanged.disconnect(self.onLayerSelectionChanged)
+
+                layer.selectionChanged.connect(self.onLayerSelectionChanged)
+                self.oldLineLayerId = layer.id()
 
     def onLayerSelectionChanged(self):
         self.onLiveUpdate()
 
     def onAddRasterClicked(self):
+        # return
         self.mRasterTable.setRowCount(self.mRasterTable.rowCount() + 1)
         row = self.mRasterTable.rowCount() - 1
-        w = QgsMapLayerComboBox()
+        w = QgsMapLayerComboBox(parent=self.mRasterTable)
         w.setProject(self.project())
         w.setFilters(QgsMapLayerProxyModel.RasterLayer)
         w.setAllowEmptyLayer(True)
@@ -194,25 +204,25 @@ class ProfileAnalyticsDockWidget(QDockWidget):
         w.layerChanged.connect(self.onLiveUpdate)
         self.mRasterTable.setCellWidget(row, 0, w)
 
-        w2 = QgsRasterBandComboBox()
+        w2 = QgsRasterBandComboBox(parent=self.mRasterTable)
         w.layerChanged.connect(w2.setLayer)
         w2.bandChanged.connect(self.onLiveUpdate)
         self.mRasterTable.setCellWidget(row, 1, w2)
 
-        w = PlotStyleButton()
+        w = PlotStyleButton(parent=self.mRasterTable)
         w.setMinimumSize(5, 5)
         w.mDialog.sigPlotStyleChanged.connect(self.onLiveUpdate)
         self.mRasterTable.setCellWidget(row, 2, w)
 
-        w = QLineEdit('0. + 1. * y')
+        w = QLineEdit('0. + 1. * y', parent=self.mRasterTable)
         w.editingFinished.connect(self.onLiveUpdate)
         self.mRasterTable.setCellWidget(row, 3, w)
 
-        w = QgsFileWidget()
+        w = QgsFileWidget(parent=self.mRasterTable)
         w.setFilter('*.py')
         w.setDefaultRoot(join(dirname(__file__), 'examples'))
         w.fileChanged.connect(self.onLiveUpdate)
-        w.dialog = None
+        # w.dialog = None
         self.mRasterTable.setCellWidget(row, 4, w)
 
         self.onLiveUpdate()
@@ -409,7 +419,7 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                             lineLayer.source(), selectedFeaturesOnly=True, featureLimit=-1,
                             geometryCheck=QgsFeatureRequest.InvalidGeometryCheck.GeometryAbortOnInvalid),
                         'TARGET_CRS': reader.crs(),
-                        'OUTPUT': 'TEMPORARY_OUTPUT'
+                        'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
                     }
                     lineLayer2: QgsVectorLayer = processing.run(alg, parameters)['OUTPUT']
 
@@ -421,8 +431,7 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                         'DISTANCE': samplingDistance,
                         'START_OFFSET': 0,
                         'END_OFFSET': 0,
-                        # 'OUTPUT': r'C:\Users\Andreas\Downloads\points.gpkg'  # 'TEMPORARY_OUTPUT'
-                        'OUTPUT': 'TEMPORARY_OUTPUT'
+                        'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
                     }
                     pointLayer = processing.run(alg, parameters)['OUTPUT']
 
@@ -432,7 +441,7 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                     parameters = {
                         'raster': layer,
                         'bandList': [bandNo],
-                        'outputRaster': 'TEMPORARY_OUTPUT'
+                        'outputRaster': QgsProcessing.TEMPORARY_OUTPUT
                     }
                     rasterLayer = processing.run(alg, parameters)['outputRaster']
                     # b) sample values
@@ -441,8 +450,7 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                         'INPUT': pointLayer,
                         'RASTERCOPY': rasterLayer,
                         'COLUMN_PREFIX': 'SAMPLE_',
-                        'OUTPUT': 'TEMPORARY_OUTPUT'
-                        # 'OUTPUT': r'C:\Users\Andreas\Downloads\sample.gpkg' # 'TEMPORARY_OUTPUT'
+                        'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
                     }
                     pointLayer2: QgsVectorLayer = processing.run(alg, parameters)['OUTPUT']
                     xValues = [feature['distance'] for feature in pointLayer2.getFeatures()]
@@ -463,7 +471,6 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                         return
 
                     polygonId = polygonLayer.selectedFeatureIds()[0]
-                    name = f'{layer.name()} [band {bandNo}, polygon ID {polygonId}]'
 
                     # 1. extract region of interest from raster
                     alg = 'gdal:cliprasterbymasklayer'
@@ -473,8 +480,9 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                             polygonLayer.source(), selectedFeaturesOnly=True, featureLimit=-1,
                             geometryCheck=QgsFeatureRequest.InvalidGeometryCheck.GeometryAbortOnInvalid),
                         'TARGET_CRS': layer.crs(),
+                        "DATA_TYPE": 6,
                         'NODATA': np.nan,
-                        'OUTPUT': 'TEMPORARY_OUTPUT'
+                        'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
                     }
                     raster2: QgsVectorLayer = processing.run(alg, parameters)['OUTPUT']
 
@@ -514,15 +522,13 @@ class ProfileAnalyticsDockWidget(QDockWidget):
 
                 w: QLineEdit = self.mRasterTable.cellWidget(row, 3)
                 formula = w.text()
-                try:
+                with suppress(Exception):
                     offset, tmp = formula.split('+')
                     scale, _ = tmp.split('*')
                     offset = float(offset)
                     scale = float(scale)
                     if offset != 0 or scale != 1:
                         yValues = [offset + scale * y for y in yValues]
-                except Exception:
-                    pass
 
                 w: QgsFileWidget = self.mRasterTable.cellWidget(row, 4)
                 filename = w.filePath()
@@ -532,12 +538,14 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                     with open(filename) as file:
                         code = file.read()
                     try:
-                        exec(code, namespace)
+                        # B102 User-defined analytics code execution by design;
+                        # equivalent to the QGIS Python Console.
+                        exec(code, namespace)  # nosec B102 # B102 User-defined analytics code execution by design
                         userFunction = namespace['updatePlot']
                     except Exception:
                         traceback.print_exc()
 
-                userFunctionEditor = w.dialog
+                userFunctionEditor = getattr(w, 'dialog', None)
                 xValues = [float(v) for v in xValues]
                 yValues = [float(v) for v in yValues]
                 profile = Profile(xValues, yValues, xUnit, name, style)
@@ -561,15 +569,13 @@ class ProfileAnalyticsDockWidget(QDockWidget):
 
                 w: QLineEdit = self.mGeeRasterTable.cellWidget(row, 2)
                 formula = w.text()
-                try:
+                with suppress(Exception):
                     offset, tmp = formula.split('+')
                     scale, _ = tmp.split('*')
                     offset = float(offset)
                     scale = float(scale)
                     if offset != 0 or scale != 1:
                         yValues = [offset + scale * y for y in yValues]
-                except Exception:
-                    pass
 
                 w: QgsFileWidget = self.mGeeRasterTable.cellWidget(row, 3)
                 filename = w.filePath()
@@ -579,7 +585,9 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                     with open(filename) as file:
                         code = file.read()
                     try:
-                        exec(code, namespace)
+                        # nosec B102 # User-defined analytics code execution by design;
+                        # equivalent to the QGIS Python Console.
+                        exec(code, namespace)  # nosec # User-defined analytics code execution by design;
                         userFunction = namespace['updatePlot']
                     except Exception:
                         traceback.print_exc()
@@ -603,9 +611,13 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                 try:
                     outputProfiles = ufunc(profile, profiles, self.mPlotWidget)
                     if outputProfiles is not None:
-                        assert isinstance(outputProfiles, list)
+                        if not isinstance(outputProfiles, list):
+                            raise TypeError(
+                                f'Expected outputProfiles to be a list or None, got {type(outputProfiles).__name__}'
+                            )
                         for outputProfile in outputProfiles:
-                            assert isinstance(outputProfile, Profile)
+                            if not isinstance(outputProfile, Profile):
+                                raise TypeError(f"Expected Profile, got {type(outputProfile).__name__}")
                             plotDataItem = self.mPlotWidget.plot(
                                 outputProfile.xValues,
                                 outputProfile.yValues,
@@ -619,23 +631,25 @@ class ProfileAnalyticsDockWidget(QDockWidget):
                     msg = traceback.format_exc()
 
                 if dialog is not None:
-                    assert isinstance(dialog, ProfileAnalyticsEditorWidget)
+                    if not isinstance(dialog, ProfileAnalyticsEditorWidget):
+                        raise TypeError(f"Expected ProfileAnalyticsEditorWidget, got {type(dialog).__name__}")
                     dialog.mLog.setText(msg)
 
         # add profiles to library (for potential visualization in a Spectral View)
-        allProfiles = profiles + ufuncProfiles
-        self.mLibrary.dataProvider().truncate()  # delete all features
-        self.mLibrary.startEditing()
-        for id, profile in enumerate(allProfiles):
-            profileValueDict = prepareProfileValueDict(
-                profile.xValues, profile.yValues, profile.xUnit)
-            feature = QgsFeature()
-            feature.setId(id)
-            feature.setFields(self.mLibrary.fields())
-            feature.setAttribute('name', profile.name)
-            feature.setAttribute('profiles', profileValueDict)
-            self.mLibrary.addFeatures([feature])
-        self.mLibrary.commitChanges()
+        if self.mLibrary is not None:
+            allProfiles = profiles + ufuncProfiles
+            self.mLibrary.dataProvider().truncate()  # delete all features
+            self.mLibrary.startEditing()
+            for id, profile in enumerate(allProfiles):
+                profileValueDict = prepareProfileValueDict(
+                    profile.xValues, profile.yValues, profile.xUnit)
+                feature = QgsFeature()
+                feature.setId(id)
+                feature.setFields(self.mLibrary.fields())
+                feature.setAttribute('name', profile.name)
+                feature.setAttribute('profiles', profileValueDict)
+                self.mLibrary.addFeatures([feature])
+            self.mLibrary.commitChanges()
 
         # set x axis title
         if self.mSourceType.currentIndex() == self.RasterLayerSource:
@@ -696,8 +710,10 @@ class ProfileAnalyticsDockWidget(QDockWidget):
             raise ValueError()
         widgets1 = list(findWidgets(GeeTimeseriesExplorerDockWidget))
         widgets2 = list(findWidgets(GeeTemporalProfileDockWidget))
-        assert len(widgets1) == 1
-        assert len(widgets2) == 1
+        if len(widgets1) != 1:
+            raise RuntimeError(f"Expected exactly one widget, got {len(widgets1)}")
+        if len(widgets2) != 1:
+            raise RuntimeError(f"Expected exactly one widget, got {len(widgets2)}")
         geeTimeseriesExplorerDockWidget: GeeTimeseriesExplorerDockWidget = widgets1[0]
         geeTemporalProfileDockWidget: GeeTemporalProfileDockWidget = widgets2[0]
         return geeTimeseriesExplorerDockWidget, geeTemporalProfileDockWidget
@@ -713,5 +729,9 @@ class Profile(object):
     style: PlotStyle
 
     def __post_init__(self):
-        assert len(self.xValues) == len(self.yValues)
+        if len(self.xValues) != len(self.yValues):
+            raise ValueError(
+                f"xValues and yValues must have the same length "
+                f"({len(self.xValues)} != {len(self.yValues)})"
+            )
         check_type('style', self.style, PlotStyle)

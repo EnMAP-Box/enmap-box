@@ -1,4 +1,5 @@
 from cmykcolorrasterrendererapp import CmykColorRasterRendererDialog
+
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
@@ -20,4 +21,4 @@ widget.mBand2.setBand(2)
 widget.mBand3.setBand(3)
 widget.mBand4.setBand(4)
 
-qgsApp.exec_()
+qgsApp.exec()

@@ -17,7 +17,7 @@ class EnMAPBoxAbstractContextMenuProvider(QObject):
     def __init__(self, parent: QObject = None):
         super().__init__(parent)
 
-    def enmapBox(self) -> 'EnMAPBox':
+    def enmapBox(self):
         from enmapbox.gui.enmapboxgui import EnMAPBox
         return EnMAPBox.instance()
 
@@ -76,12 +76,10 @@ class EnMAPBoxContextMenuRegistry(QObject):
         return iter(self.mProviders)
 
     def addProvider(self, provider: EnMAPBoxAbstractContextMenuProvider):
-        assert isinstance(provider, EnMAPBoxAbstractContextMenuProvider)
         provider.setParent(self)
         self.mProviders.append(provider)
 
     def removeProvider(self, provider: EnMAPBoxAbstractContextMenuProvider) -> bool:
-        assert isinstance(provider, EnMAPBoxAbstractContextMenuProvider)
         if provider in self.mProviders:
             provider.setParent(None)
             self.mProviders.remove(provider)
@@ -111,6 +109,7 @@ class EnMAPBoxContextMenuRegistry(QObject):
                 self.logError(ex)
                 if enmapbox.RAISE_ALL_EXCEPTIONS:
                     raise ex
+
         return len(self.mErrorList) == 0
 
     def populateDataViewMenu(self,

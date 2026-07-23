@@ -1,10 +1,12 @@
-import numpy as np
-import os, sys, argparse
-import pyproj
-
-from netCDF4 import Dataset as nc
+import argparse
+import os
+import sys
 from datetime import datetime as dt
 from fnmatch import filter
+
+import numpy as np
+import pyproj
+from netCDF4 import Dataset as nc
 from osgeo import gdal
 
 np.seterr(divide='ignore', invalid='ignore')  # MH: Ignore RuntimeWarnings
@@ -12,9 +14,11 @@ np.seterr(divide='ignore', invalid='ignore')  # MH: Ignore RuntimeWarnings
 release = '20230322'  # Date of release
 version = 'v01'  # OCPFT Version
 
-#inpath_enmap = '/home/alvarado/projects/typsynsat/data/enpt/ENMAP01-____L2A-DT0000001567_20220709T105740Z_032_V010111_20230223T123718Z'
-#inpath = '/home/alvarado/projects/typsynsat/data/sentinel3/bodensee/2020/08/16'
-#infile = 'S3A_OL_1_EFR____20200816T095809_20200816T100109_20200816T120938_0179_061_350_2160_MAR_O_NR_002.SEN3.nc'
+
+# inpath_enmap = '/home/alvarado/projects/typsynsat/data/enpt/
+# ENMAP01-____L2A-DT0000001567_20220709T105740Z_032_V010111_20230223T123718Z'
+# inpath = '/home/alvarado/projects/typsynsat/data/sentinel3/bodensee/2020/08/16'
+# infile = 'S3A_OL_1_EFR____20200816T095809_20200816T100109_20200816T120938_0179_061_350_2160_MAR_O_NR_002.SEN3.nc'
 
 
 def enpt_rootdir(rootdir_l2b):
@@ -116,7 +120,9 @@ def prepare_processor_input(inpath, infile=None):
             l1_flags = np.ma.getdata(l1_flags)
 
         # MH: valid water pixel according Polymer settings = 0, "Case-2" = 1024, "Inconsistency" = 2048
-        # "bitmask" description = LAND:1, CLOUD_BASE:2, L1_INVALID:4, NEGATIVE_BB:8, OUT_OF_BOUNDS:16, EXCEPTION:32, THICK_AEROSOL:64, HIGH_AIR_MASS:128, EXTERNAL_MASK:512, CASE2:1024, INCONSISTENCY:2048
+        # "bitmask" description = LAND:1, CLOUD_BASE:2, L1_INVALID:4, NEGATIVE_BB:8,
+        # OUT_OF_BOUNDS:16, EXCEPTION:32, THICK_AEROSOL:64, HIGH_AIR_MASS:128,
+        # EXTERNAL_MASK:512, CASE2:1024, INCONSISTENCY:2048
 
         land = (l1_flags == 1)
         cloud = (l1_flags == 2)
@@ -129,7 +135,8 @@ def prepare_processor_input(inpath, infile=None):
         external_mask = (l1_flags == 512)
         case2 = (l1_flags == 1024)
         inconsistancy = (l1_flags == 2028)
-        # land_cloud     = (l1_flags == 3)                                       # MH: not defined mask, but labeled with "3" - likely adjacency pixel
+        # land_cloud = (l1_flags == 3)
+        # MH: not defined mask, but labeled with "3" - likely adjacency pixel
 
         gerade = (l1_flags % 2 == 0)  # MH: mask all even numbers
         ungerade = np.logical_not(gerade)  # MH: finds everything related to "land"
@@ -139,7 +146,10 @@ def prepare_processor_input(inpath, infile=None):
         flag_ac_risk = (water & ungerade) | case2
 
         # MH: in the current version without inland waters (some rivers - not more)!
-        invalid_mask = cloud + l1_invalid + negative_BB + out_of_bonds + land + exception + high_air_mass + external_mask + inconsistancy + thick_aerosol
+        invalid_mask = (
+            cloud + l1_invalid + negative_BB + out_of_bonds + land
+            + exception + high_air_mass + external_mask + inconsistancy + thick_aerosol  # noqa: W503
+        )
 
         flag_negative = np.full(land.shape, False, dtype=bool)
         flag_strange = np.full(land.shape, False, dtype=bool)
@@ -170,12 +180,14 @@ def prepare_processor_input(inpath, infile=None):
 
         ncfile = nc(os.path.join(inpath, infile), 'r')
 
-        try:
+        if 'longitude' in ncfile.variables:
             lon = ncfile.variables['longitude'][:]
             lat = ncfile.variables['latitude'][:]
-        except:
+        elif 'lon' in ncfile.variables:
             lon = ncfile.variables['lon'][:]
             lat = ncfile.variables['lat'][:]
+        else:
+            raise ValueError('No longitude/latitude or lon/lat variables found in the netCDF file.')
 
         qflags = ncfile['bitmask']
         l1_flags = qflags[:]
@@ -184,7 +196,8 @@ def prepare_processor_input(inpath, infile=None):
             l1_flags = np.ma.getdata(l1_flags)
 
         # MH: valid water pixel according Polymer settings = 0, "Case-2" = 1024, "Inconsistency" = 2048
-        # "bitmask" description = LAND:1, CLOUD_BASE:2, L1_INVALID:4, NEGATIVE_BB:8, OUT_OF_BOUNDS:16, EXCEPTION:32, THICK_AEROSOL:64, HIGH_AIR_MASS:128, EXTERNAL_MASK:512, CASE2:1024, INCONSISTENCY:2048
+        # "bitmask" description = LAND:1, CLOUD_BASE:2, L1_INVALID:4, NEGATIVE_BB:8, OUT_OF_BOUNDS:16,
+        # EXCEPTION:32, THICK_AEROSOL:64, HIGH_AIR_MASS:128, EXTERNAL_MASK:512, CASE2:1024, INCONSISTENCY:2048
 
         land = (l1_flags == 1)
         cloud = (l1_flags == 2)
@@ -197,7 +210,8 @@ def prepare_processor_input(inpath, infile=None):
         external_mask = (l1_flags == 512)
         case2 = (l1_flags == 1024)
         inconsistancy = (l1_flags == 2028)
-        # land_cloud     = (l1_flags == 3)                                       # MH: not defined mask, but labeled with "3" - likely adjacency pixel
+        # land_cloud = (l1_flags == 3)
+        # MH: not defined mask, but labeled with "3" - likely adjacency pixel
 
         gerade = (l1_flags % 2 == 0)  # MH: mask all even numbers
         ungerade = np.logical_not(gerade)  # MH: finds everything related to "land"
@@ -207,7 +221,10 @@ def prepare_processor_input(inpath, infile=None):
         flag_ac_risk = (water & ungerade) | case2
 
         # MH: in the current version without inland waters (some rivers - not more)!
-        invalid_mask = cloud + l1_invalid + negative_BB + out_of_bonds + land + exception + high_air_mass + external_mask + inconsistancy + thick_aerosol
+        invalid_mask = (
+            cloud + l1_invalid + negative_BB + out_of_bonds + land
+            + exception + high_air_mass + external_mask + inconsistancy + thick_aerosol  # noqa: W503
+        )
 
         flag_negative = np.full(land.shape, False, dtype=bool)
         flag_strange = np.full(land.shape, False, dtype=bool)
@@ -234,7 +251,7 @@ def prepare_processor_input(inpath, infile=None):
 
 
 def model(data, model):
-    ### Define all model functions used in the optimization
+    # ## Define all model functions used in the optimization
     def func_sin(X, a0, a1, a2, a3):  # sigmoidal curve fitting function
         return a0 + a1 * np.sin(a2 * (X + a3))
 
@@ -352,7 +369,8 @@ def save_results(PFT, outname):
 
     out.product_name = os.path.basename(outname)
 
-    out.info = 'OC-PFT (Ocean Color Phytoplankton Functional Type) is a water algorithm for retrieve phytoplankton groups chl-a concentration.'
+    out.info = ('OC-PFT (Ocean Color Phytoplankton Functional Type) is a '
+                'water algorithm for retrieve phytoplankton groups chl-a concentration.')
     out.version = version
     out.version_release = release
 
@@ -480,9 +498,9 @@ def save_results(PFT, outname):
     out.close()
 
 
-### -------------------------------------------------------------------
+# ## -------------------------------------------------------------------
 # MAIN
-### -------------------------------------------------------------------
+# ## -------------------------------------------------------------------
 
 if __name__ == '__main__':
     # print('Usage: ')
@@ -493,11 +511,18 @@ if __name__ == '__main__':
     # Command line parsing # For future applications use CLI
     parser = argparse.ArgumentParser(description='OC-PFT processor')
 
-    parser.add_argument('iprod', action='store', help='Input EnPT-ACwater/Polymer/L2 Chlorophyll-a product')
-    parser.add_argument('-od', '--outdir', action='store', help='Output directory, default current directory')
+    parser.add_argument(
+        'iprod', action='store', help='Input EnPT-ACwater/Polymer/L2 Chlorophyll-a product'
+    )
+    parser.add_argument(
+        '-od', '--outdir', action='store', help='Output directory, default current directory'
+    )
     parser.add_argument('-ofile', '--outfile', action='store', help='Define name of output file')
-    parser.add_argument('-sensor', action='store',
-                        help='Define used sensor - currently atmospheric corrected data processing of: "EnPT-ACwater" (default; Pol), "OLCI" (Pol), "MSI" (Pol), or "DESIS" (Pol)')
+    parser.add_argument(
+        '-sensor', action='store',
+        help='Define used sensor - currently atmospheric corrected data processing of: '
+             '"EnPT-ACwater" (default; Pol), "OLCI" (Pol), "MSI" (Pol), or "DESIS" (Pol)'
+    )
     parser.add_argument('-model', action='store',
                         help='Option for model to use: 0 = lake constance (default), 1 = global (replaced)')
     parser.add_argument('-ac', action='store',
@@ -569,7 +594,6 @@ if __name__ == '__main__':
 
             print('Warning: Input file name is not according to EnMAP convention.')
 
-
     if args.sensor == 'OLCI':
 
         # Sensor specification
@@ -615,9 +639,9 @@ if __name__ == '__main__':
 
             print('Warning: Input file name is not according to OLCI convention.')
 
-    ### -------------------------------------------------------------------
+    # ## -------------------------------------------------------------------
     # Start executing OC-PFT
-    ### -------------------------------------------------------------------
+    # ## -------------------------------------------------------------------
 
     print('Start: ', str(dt.now()))
     print('Processing of: ', infile)

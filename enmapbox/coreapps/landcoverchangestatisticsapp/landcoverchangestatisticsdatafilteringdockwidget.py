@@ -47,7 +47,8 @@ class LandCoverChangeStatisticsDataFilteringDockWidget(QgsDockWidget):
         self.sigStateChanged.emit()
 
     def setRelativeClassSizes(self, values: List[List[float]]):
-        assert len(values) == self.mTableClasses.columnCount() - 1
+        if len(values) != self.mTableClasses.columnCount() - 1:
+            raise ValueError('invalid number of values')
         self.relativeClassSizes = values
 
         # highlight unavailable classes
@@ -68,7 +69,10 @@ class LandCoverChangeStatisticsDataFilteringDockWidget(QgsDockWidget):
                 w.setForeground(QBrush(color))
 
     def initGui(self, layers: List[QgsRasterLayer]):
-        assert len(layers) >= 2
+        if len(layers) < 2:
+            raise ValueError(
+                f'at least 2 layers are required, got {len(layers)}'
+            )
 
         uniqueCategories = OrderedDict()
         categoriess = list()
@@ -82,7 +86,7 @@ class LandCoverChangeStatisticsDataFilteringDockWidget(QgsDockWidget):
 
         self.mTableClasses.setColumnCount(len(layers) + 1)
         self.mTableClasses.setRowCount(len(uniqueCategories))
-        self.mTableClasses.setHorizontalHeaderLabels(['All'] + [l.name() for l in layers])
+        self.mTableClasses.setHorizontalHeaderLabels(['All'] + [layer.name() for layer in layers])
         for row, c in enumerate(uniqueCategories.values()):
             color = QColor(c.color)
             pixmap = QPixmap(16, 16)

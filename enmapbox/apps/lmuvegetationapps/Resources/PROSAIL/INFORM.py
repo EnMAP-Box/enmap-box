@@ -89,15 +89,15 @@ Coupling INFORM with Prospect4/5: Henning Buddenbaum, 2012
 _________________________________________________________________________
 """
 
-from lmuvegetationapps.Resources.PROSAIL.dataSpec import *
+import numpy as np
+
+from lmuvegetationapps.Resources.PROSAIL.dataSpec import lambd
 
 
 class INFORM:
-
     lambd = len(lambd)
 
     def __init__(self, tts, tto, psi):
-
         self.tts = tts
         self.tto = tto
         self.psi = psi
@@ -111,19 +111,19 @@ class INFORM:
         self.cospsi = np.cos(psi)
 
     def inform(self, cd, sd, h, sail_u, sail_inf, sail_tts_trans, sail_tto_trans):
-
         adapt = 1
         # adapt = 0.6
         k = adapt * (np.pi * np.power((cd / 2), 2)) / 10000
 
         # Observed ground coverage  by crowns (co) under observation zenith angle theta_o
-        co = 1-np.exp(-k*sd/self.costto)
+        co = 1 - np.exp(-k * sd / self.costto)
         # Ground coverage by shadow (cs) under a solar zenith angle theta_s
-        cs = 1-np.exp(-k*sd/self.costts)
+        cs = 1 - np.exp(-k * sd / self.costts)
         # Geometrical factor (g) depending on the illumination and viewing geometry
-        g = np.power((np.power(self.tantto, 2) + np.power(self.tantts, 2) - 2*self.tantto*self.tantts*self.cospsi), 0.5)
+        g = np.power(
+            (np.power(self.tantto, 2) + np.power(self.tantts, 2) - 2 * self.tantto * self.tantts * self.cospsi), 0.5)
         # Correlation coefficient (p)
-        p = np.exp(-g*h/cd)
+        p = np.exp(-g * h / cd)
 
         # Ground surface fractions (FLIM model)
 
@@ -136,11 +136,10 @@ class INFORM:
         # Sunlit open space (Fos)
         Fos = (1 - co) * (1 - cs) + p * np.power((co * (1 - co) * cs * (1 - cs)), 0.5)
 
-
         # Forest reflectance (FLIM model)
         # Ground factor (G), that is ground contribution to scene reflectance
-        G = Fcd[:, np.newaxis] * sail_tts_trans * sail_tto_trans + Fcs[:, np.newaxis] * sail_tto_trans + \
-            Fod[:, np.newaxis] * sail_tts_trans + Fos[:, np.newaxis]
+        G = (Fcd[:, np.newaxis] * sail_tts_trans * sail_tto_trans + Fcs[:, np.newaxis] * sail_tto_trans
+             + Fod[:, np.newaxis] * sail_tts_trans + Fos[:, np.newaxis])  # noqa
 
         C = Fcd[:, np.newaxis] * (1 - sail_tts_trans * sail_tto_trans)
 

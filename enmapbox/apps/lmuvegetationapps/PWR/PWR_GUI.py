@@ -22,14 +22,17 @@
     along with this software. If not, see <https://www.gnu.org/licenses/>.
 ***************************************************************************
 """
+import os
 import sys
 
-from _classic.hubflow.core import *
 from lmuvegetationapps import APP_DIR
 from lmuvegetationapps.PWR.PWR_core import PWR_core
+
+from enmapbox.gui.utils import loadUi
+from enmapboxprocessing.rasterreader import RasterReader
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QPixmap
-from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.QtWidgets import QDialog, QLabel, QFileDialog, QMessageBox, QApplication
 from qgis.core import QgsMapLayerProxyModel
 from qgis.gui import QgsMapLayerComboBox
 
@@ -37,8 +40,6 @@ pathUI_pwr = os.path.join(APP_DIR, 'Resources/UserInterfaces/PWR.ui')
 pathUI_nodat = os.path.join(APP_DIR, 'Resources/UserInterfaces/Nodat.ui')
 pathUI_prgbar = os.path.join(APP_DIR, 'Resources/UserInterfaces/ProgressBar.ui')
 pathIMG = os.path.join(APP_DIR, "Resources/PWR_showImg.PNG")
-
-from enmapbox.gui.utils import loadUi
 
 
 class PWR_GUI(QDialog):
@@ -159,7 +160,8 @@ class PWR:
             self.dtype = meta[4]
         if self.dtype == 2 or self.dtype == 3 or self.dtype == 4 or self.dtype == 5:
             QMessageBox.information(self.gui, "Integer Input",
-                                    "Integer input image:\nTool requires float [0.0-1.0]:\nDivision factor set to 10000")
+                                    "Integer input image:\nTool requires float [0.0-1.0]:\n"
+                                    "Division factor set to 10000")
             self.division_factor = 10000
             self.gui.spinDivisionFactor.setText(str(self.division_factor))
         if None in meta:
@@ -172,14 +174,18 @@ class PWR:
             self.nodat[0] = meta[0]
 
     def get_image_meta(self, image, image_type):
-        try:
-            dataset: RasterDataset = openRasterDataset(image)
-        except:
-            QMessageBox.critical(self.gui, 'Input Image',
-                                 'Image could not be read. Please make sure it is a valid ENVI image')
-            return
-        ds = dataset.gdalDataset()
-        metadict = dataset.metadataDict()
+        # try:
+        #    dataset: RasterDataset = openRasterDataset(image)
+        # except Exception:
+        #    QMessageBox.critical(self.gui, 'Input Image',
+        #                         'Image could not be read. Please make sure it is a valid ENVI image')
+        #    return
+
+        # ds = dataset.gdalDataset()
+
+        reader = RasterReader(image)
+        ds = reader.gdalDataset
+        metadict = reader.metadata()
         nrows = ds.RasterYSize
         ncols = ds.RasterXSize
         nbands = ds.RasterCount
@@ -187,12 +193,14 @@ class PWR:
         if nbands < 2:
             raise ValueError("Input is not a multi-band image")
         try:
-            nodata = int(metadict['ENVI']['data ignore value'])
+            # nodata = int(metadict['ENVI']['data ignore value'])
+            nodata_str = metadict['ENVI'].get('data ignore value', metadict['ENVI'].get('data_ignore_value'))
+            nodata = int(nodata_str)
             return nodata, nbands, nrows, ncols, dtype
-        except:
+        except Exception:
             self.main.nodat_widget.init(image_type=image_type, image=image)
             self.main.nodat_widget.gui.setModal(True)  # parent window is blocked
-            self.main.nodat_widget.gui.exec_()  # unlike .show(), .exec_() waits with execution of the code, until the app is closed
+            self.main.nodat_widget.gui.exec()  # unlike .show(), .exec() waits with execution of the code
             return self.main.nodat_widget.nodat, nbands, nrows, ncols, dtype
 
     def NDWI_th_change(self):
@@ -211,13 +219,13 @@ class PWR:
         else:
             try:
                 self.nodat[1] = int(self.gui.txtNodatOutput.text())
-            except:
+            except Exception:
                 QMessageBox.critical(self.gui, "Error",
                                      "'%s' is not a valid  No Data Value!" % self.gui.txtNodatOutput.text())
                 return
         try:
             self.division_factor = float(self.gui.spinDivisionFactor.text())
-        except:
+        except Exception:
             QMessageBox.critical(self.gui, "Error",
                                  "'%s' is not a valid division factor!" % self.gui.spinDivisionFactor.text())
             return
@@ -246,7 +254,7 @@ class PWR:
         try:  # give it a shot
             result = iPWR.execute_PWR(prg_widget=self.main.prg_widget, qgis_app=self.main.qgis_app)
 
-        except:
+        except Exception:
             QMessageBox.critical(self.gui, 'error', "Calculation cancelled.")
             self.main.prg_widget.gui.allow_cancel = True
             self.main.prg_widget.gui.close()
@@ -258,7 +266,7 @@ class PWR:
         iPWR.write_image(result=result)
         # try:
         #
-        # except:
+        # except Exception:
         #     #QMessageBox.critical(self.gui, 'error', "An unspecific error occured while trying to write image data")
         #     self.main.prg_widget.gui.allow_cancel = True
         #     self.main.prg_widget.gui.close()
@@ -299,7 +307,7 @@ class Nodat:
         else:
             try:
                 nodat = int(self.gui.txtNodat.text())
-            except:
+            except Exception:
                 QMessageBox.critical(self.gui, "No number", "'%s' is not a valid number" % self.gui.txtNodat.text())
                 self.gui.txtNodat.setText("")
                 return
@@ -340,4 +348,4 @@ if __name__ == '__main__':
     app = start_app()
     m = MainUiFunc()
     m.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

@@ -1,27 +1,26 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright © 2019 Stéphane Guillaso
-# Licensed under the terms of 
+# Licensed under the terms of
 # (see ../../LICENSE.md for details)
 
-import numpy as np
-import hys
-import os # <-- to be removed
 # import importlib
 import numba as nb
+import numpy as np
 
-__bands__    = [477, 556, 693]
+__bands__ = [477, 556, 693]
 __filename__ = "_IRON_RI"
-__gui__      = "Iron Oxyde Content Redness Index"
-__info__     = "This parameter estimates the Hematite content:\n\n" + \
-    "           R_693^2       \n" + \
-    " ind = ------------------\n" + \
-    "        R_447 . R_556^3  \n\n" + \
-    "Madeira, J., Bedidi, A., Cervelle, B., Pouget, M. and Flay, N. (1997)\n"+\
-    "Visible spectrometric indices of hematite (Hm) and goethite (Gt)\n"+\
-    "content in lateritic soils: the application of a Thematic Mapper (TM)\n"+\
-    "image for soil-mapping in Brasilia, Brazil. Int. J. Remote Sens., \n"+\
-    "18(13):2835-2852"
+__gui__ = "Iron Oxyde Content Redness Index"
+__info__ = "This parameter estimates the Hematite content:\n\n" + \
+           "           R_693^2       \n" + \
+           " ind = ------------------\n" + \
+           "        R_447 . R_556^3  \n\n" + \
+           "Madeira, J., Bedidi, A., Cervelle, B., Pouget, M. and Flay, N. (1997)\n" + \
+           "Visible spectrometric indices of hematite (Hm) and goethite (Gt)\n" + \
+           "content in lateritic soils: the application of a Thematic Mapper (TM)\n" + \
+           "image for soil-mapping in Brasilia, Brazil. Int. J. Remote Sens., \n" + \
+           "18(13):2835-2852"
+
 
 def check_bands(ubands, wvl):
     ind1 = int(ubands[0])
@@ -32,12 +31,11 @@ def check_bands(ubands, wvl):
     return True, "Has been calculated!\n"
 
 
-
-@nb.jit(nb.float32[:,:](nb.float32[:,:,:], nb.float32[:], nb.int32[:], nb.int32[:,:]), nopython=True, fastmath=True)
+@nb.jit(nb.float32[:, :](nb.float32[:, :, :], nb.float32[:], nb.int32[:], nb.int32[:, :]), nopython=True, fastmath=True)
 def process(cube, wvl, ind, mask):
     ny = cube.shape[1]
     nx = cube.shape[2]
-    prod = np.zeros((ny, nx), dtype = np.float32)
+    prod = np.zeros((ny, nx), dtype=np.float32)
     for ky in range(ny):
         for kx in range(nx):
             if mask is not None:

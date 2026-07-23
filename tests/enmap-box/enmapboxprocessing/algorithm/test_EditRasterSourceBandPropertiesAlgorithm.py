@@ -1,18 +1,18 @@
 import os.path
+import unittest
 from time import sleep
-from unittest import SkipTest
 
 from osgeo import gdal
+from qgis.PyQt.QtCore import QDateTime
 
 from enmapboxprocessing.algorithm.editrastersourcebandpropertiesalgorithm import EditRasterSourceBandPropertiesAlgorithm
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxprocessing.testcase import TestCase
 from enmapboxtestdata import enmap
-from qgis.PyQt.QtCore import QDateTime
-
-raise SkipTest('EditRasterSourceBandPropertiesAlgorithm disabled, wait for STAC edit functionality')
 
 
+@unittest.skip('EditRasterSourceBandPropertiesAlgorithm disabled, wait for STAC edit functionality')
 class TestEditRasterSourceBandPropertiesAlgorithm(TestCase):
 
     def copyEnmap(self, gtiff=False):

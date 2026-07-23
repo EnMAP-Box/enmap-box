@@ -101,8 +101,7 @@ class ImportPrismaL2BAlgorithm(EnMAPProcessingAlgorithm):
         }
 
     def isValidFile(self, file: str) -> bool:
-        return basename(file).startswith('PRS_L2B') & \
-               basename(file).endswith('.he5')
+        return basename(file).startswith('PRS_L2B') & basename(file).endswith('.he5')
 
     def openDataset(self, he5Filename: str, key: str) -> gdal.Dataset:
         key = key.replace(' ', '_')
@@ -164,7 +163,10 @@ class ImportPrismaL2BAlgorithm(EnMAPProcessingAlgorithm):
         return result
 
     def writeSpectralCube(self, filenameSpectralCube, he5Filename, spectralRegion, feedback):
-        parseFloatList = lambda text: [float(item) for item in text.split()]
+
+        def parseFloatList(text):
+            return [float(item) for item in text.split()]
+
         array = list()
         metadata = dict()
         wavelength = list()
@@ -213,8 +215,16 @@ class ImportPrismaL2BAlgorithm(EnMAPProcessingAlgorithm):
         mask = np.all(np.equal(array, 0), axis=0)
         array = np.clip(array, 1, None)
         array[:, mask] = 0
-        assert len(wavelength) == len(array)
-        assert len(fwhm) == len(array)
+        if len(wavelength) != len(array):
+            raise ValueError(
+                f'number of wavelengths ({len(wavelength)}) must match '
+                f'number of spectral values ({len(array)})'
+            )
+        if len(fwhm) != len(array):
+            raise ValueError(
+                f'number of FWHM values ({len(fwhm)}) must match '
+                f'number of spectral values ({len(array)})'
+            )
         driver = Driver(filenameSpectralCube, feedback=feedback)
         writer = driver.createFromArray(array)
         writer.setNoDataValue(0)
@@ -229,7 +239,10 @@ class ImportPrismaL2BAlgorithm(EnMAPProcessingAlgorithm):
     def writeSpectralErrorMatrix(self, filenameSpectralError, he5Filename, spectralRegion, feedback):
         if filenameSpectralError is None:
             return None
-        parseFloatList = lambda text: [float(item) for item in text.split()]
+
+        def parseFloatList(text):
+            return [float(item) for item in text.split()]
+
         array = list()
         metadata = dict()
         wavelength = list()
@@ -262,7 +275,11 @@ class ImportPrismaL2BAlgorithm(EnMAPProcessingAlgorithm):
             wavelength.extend(wavelengthSwir)
             metadata.update(metadataSwir)
         # - mask no data region
-        assert len(wavelength) == len(array)
+        if len(wavelength) != len(array):
+            raise ValueError(
+                f'number of wavelengths ({len(wavelength)}) must match '
+                f'number of spectral values ({len(array)})'
+            )
         driver = Driver(filenameSpectralError, feedback=feedback)
         writer = driver.createFromArray(array)
         writer.setMetadataDomain(metadata)

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>867</width>
+    <width>1002</width>
     <height>669</height>
    </rect>
   </property>
@@ -45,7 +45,7 @@
    <property name="styleSheet">
     <string notr="true"/>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="2,0">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
     <property name="spacing">
      <number>0</number>
     </property>
@@ -100,7 +100,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>867</width>
+     <width>1002</width>
      <height>24</height>
     </rect>
    </property>
@@ -261,6 +261,7 @@
    <addaction name="mActionZoomFullExtent"/>
    <addaction name="mActionIdentify"/>
    <addaction name="separator"/>
+   <addaction name="optionShowCrosshair"/>
    <addaction name="optionIdentifyCursorLocation"/>
    <addaction name="optionIdentifyProfile"/>
    <addaction name="optionMoveCenter"/>
@@ -758,7 +759,10 @@
   </action>
   <action name="mActionShowPackageInstaller">
    <property name="text">
-    <string>PiPI Package Info</string>
+    <string>PyPI Package Info</string>
+   </property>
+   <property name="iconText">
+    <string>PyPI Package Info</string>
    </property>
    <property name="toolTip">
     <string>Opens an installer for required python packages</string>
@@ -844,6 +848,21 @@
    </property>
    <property name="toolTip">
     <string>Create a new spectral library</string>
+   </property>
+  </action>
+  <action name="optionShowCrosshair">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../../qgispluginsupport/qps/qpsresources.qrc">
+     <normaloff>:/qps/ui/icons/crosshair.svg</normaloff>:/qps/ui/icons/crosshair.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Show Crosshair</string>
+   </property>
+   <property name="toolTip">
+    <string>Show the crosshair</string>
    </property>
   </action>
  </widget>

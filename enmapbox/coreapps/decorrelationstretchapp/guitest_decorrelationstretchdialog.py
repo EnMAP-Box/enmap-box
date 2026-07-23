@@ -1,4 +1,5 @@
 from decorrelationstretchapp import DecorrelationStretchDialog
+
 from enmapbox import initAll
 from enmapbox.exampledata import enmap
 from enmapbox.gui.enmapboxgui import EnMAPBox
@@ -16,4 +17,4 @@ widget = DecorrelationStretchDialog()
 widget.show()
 widget.mLayer.setLayer(layer)
 
-qgsApp.exec_()
+qgsApp.exec()

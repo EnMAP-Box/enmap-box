@@ -18,18 +18,18 @@
 """
 import os
 import sys
-import typing
 from os.path import basename, splitext
+from typing import List
 
-from qgis.PyQt.QtCore import QOperatingSystemVersion
+from enmapbox.dependencycheck import missingTestData, installTestData, PIPPackage
+from enmapbox.enmapboxprojectsettings import EnMAPBoxProjectSettings
+from qgis.PyQt.QtCore import QOperatingSystemVersion, Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
+from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsRasterLayer, QgsVectorLayer, QgsProject, Qgis
 from qgis.gui import QgisInterface, QgsDockWidget
-
-from enmapbox.dependencycheck import missingTestData, installTestData
-from enmapbox.enmapboxprojectsettings import EnMAPBoxProjectSettings
 
 
 class EnMAPBoxPlugin(object):
@@ -37,9 +37,10 @@ class EnMAPBoxPlugin(object):
     def __init__(self, *args, **kwds):
         # make site-packages available to python
         self.enmapBox = None
-        self.pluginToolbarActions: typing.List[QAction] = []
-        self.rasterMenuActions: typing.List[QAction] = []
-        self.dockWidgets: typing.List[QgsDockWidget] = []
+        self.pluginToolbarActions: List[QAction] = []
+        self.rasterMenuActions: List[QAction] = []
+        self.dockWidgets: List[QgsDockWidget] = []
+        self.mMissingCoreRequirements: List[PIPPackage] = []
 
         if QOperatingSystemVersion.current().name() == 'macOS':
             # os.environ['SKLEARN_SITE_JOBLIB']='True'
@@ -50,18 +51,28 @@ class EnMAPBoxPlugin(object):
 
         import enmapbox
         enmapbox.initPythonPaths()
+
         # run a minimum dependency check
-        self.initialDependencyCheck()
+        missing = self.initialDependencyCheck()
+        self.mMissingCoreRequirements.extend(missing)
 
         # initialize resources, processing provider etc.
-        enmapbox.initAll()
+        if self.corePackagesAvailable():
+            enmapbox.initAll()
+            self.mAddedSysPaths = [p for p in sys.path if p not in pathes]
 
-        self.mAddedSysPaths = [p for p in sys.path if p not in pathes]
+            # listen out for project save/restore, and update our state accordingly
+            # (adopted from Data Plotly plugin)
+            QgsProject.instance().writeProject.connect(self.writeProject)
+            QgsProject.instance().readProject.connect(self.readProject)
 
-        # listen out for project save/restore, and update our state accordingly
-        # (adopted from Data Plotly plugin)
-        QgsProject.instance().writeProject.connect(self.writeProject)
-        QgsProject.instance().readProject.connect(self.readProject)
+    def corePackagesAvailable(self) -> bool:
+        """
+        Returns True if all core packages are available
+        to provide basic EnMAP-Box functionality
+        :return: bool
+        """
+        return len(self.mMissingCoreRequirements) == 0
 
     def writeProject(self, document: QDomDocument):
         settings = EnMAPBoxProjectSettings()
@@ -71,44 +82,124 @@ class EnMAPBoxPlugin(object):
         settings = EnMAPBoxProjectSettings()
         settings.readFromProject(document)
 
-    def initialDependencyCheck(self):
+    def initialDependencyCheck(self) -> List[PIPPackage]:
         """
         Runs a check for availability of package dependencies and summarized error messages
+        Returns a list of missing core requirements without which the EnMAP-Box
+        cannot function properly.
         :return:
         """
         from enmapbox import messageLog
         from enmapbox.dependencycheck import missingPackageInfo, requiredPackages
-        missing = [p for p in requiredPackages() if not p.isInstalled()]
+        missing = [p for p in requiredPackages() if p.isCoreRequirement() and not p.isInstalled()]
         if len(missing) > 0:
             info = missingPackageInfo(missing, html=False)
             # warnings.warn(info, ImportWarning)
             messageLog(info, level=Qgis.Warning)
+        return missing
 
     def initGui(self):
-
-        import enmapbox
         from qgis.utils import iface
-        assert isinstance(iface, QgisInterface)
+        import enmapbox
 
         actionStartBox = QAction(enmapbox.icon(), 'EnMAP-Box', iface)
+        actionAbout = QAction(QIcon(':/enmapbox/gui/ui/icons/metadata.svg'), 'About')
+
+        if not self.corePackagesAvailable():
+            def show_message_box(*args, **kwargs):
+                mbox = QMessageBox()
+                mbox.setWindowTitle('Missing Packages')
+                mbox.setTextFormat(Qt.TextFormat.RichText)
+                info = self.missingPackageInfos(self.mMissingCoreRequirements)
+                mbox.setText(info)
+                mbox.exec()
+
+            actionStartBox.triggered.connect(show_message_box)
+            actionAbout.triggered.connect(self.showAboutDialog)
+
+            self.rasterMenuActions.append(actionStartBox)
+            self.rasterMenuActions.append(actionAbout)
+            self.pluginToolbarActions.append(actionStartBox)
+
+            self._add_actions()
+            return
+
         actionStartBox.triggered.connect(self.run)
+        actionAbout.triggered.connect(self.showAboutDialog)
+
         actionAddExampleData = QAction(QIcon(), 'Add Example Data')
         actionAddExampleData.triggered.connect(self.addExampleData)
-        actionAbout = QAction(QIcon(':/enmapbox/gui/ui/icons/metadata.svg'), 'About')
-        actionAbout.triggered.connect(self.showAboutDialog)
+
         self.rasterMenuActions.append(actionStartBox)
         self.rasterMenuActions.append(actionAddExampleData)
         self.rasterMenuActions.append(actionAbout)
         self.pluginToolbarActions.append(actionStartBox)
 
+        self._add_actions()
+
+        # init stand-alone apps, that can operate in QGIS GUI without EnMAP-Box
+        self.initStandAloneAppGuis()
+
+    def _add_actions(self):
+        """
+        Add actions to QGIS GUI
+        """
+        from qgis.utils import iface
         for action in self.rasterMenuActions:
             iface.addPluginToRasterMenu('EnMAP-Box', action)
 
         for action in self.pluginToolbarActions:
             iface.addToolBarIcon(action)
 
-        # init stand-alone apps, that can operate in QGIS GUI without EnMAP-Box
-        self.initStandAloneAppGuis()
+    def _remove_actions(self):
+        """
+        Remove actions from QGIS GUI
+        """
+        from qgis.utils import iface
+        if isinstance(iface, QgisInterface):
+            for action in self.pluginToolbarActions:
+                iface.removeToolBarIcon(action)
+
+            for action in self.rasterMenuActions:
+                iface.removePluginRasterMenu('EnMAP-Box', action)
+
+            for dockWidget in self.dockWidgets:
+                iface.removeDockWidget(dockWidget)
+
+    @staticmethod
+    def missingPackageInfos(missing_packages: List[PIPPackage], cli: bool = False) -> str:
+
+        if cli:
+            info = 'Missing python package(s).\nPlease install: '
+            for i, p in enumerate(missing_packages):
+                info += f'\n{i + 1}: {p.pipPkgName}'
+                if p.comment:
+                    info += f' - {p.comment}'
+
+            info += '\n Please visit https://enmap-box.readthedocs.io for advice.'
+        else:
+            # for GUI message dialog
+            info = ('<b>The EnMAP-Box is installed! &#x1F389;</b><br>'
+                    'To launch the basic EnMAP-Box, you just need to install a few remaining Python dependencies:<br>')
+
+            for i, p in enumerate(missing_packages):
+                info += f'<br>{i + 1}: {p.pipPkgName}'
+                if p.comment and len(p.comment) > 0:
+                    info += f' - {p.comment}'
+
+            info += ('<br><br>'  # <i>How to fix this:</i>'
+                     # '<ol style="margin-left: 0px;"><li>Open your terminal/command prompt and run:'
+                     # '<br><code>pip install &lt;missing packages&gt;</code>'
+                     # '<br>(or <code>conda install &lt;missing packages&gt;</code>)</li>'
+                     # '<li>Restart QGIS</li>'
+                     # '</ol>'
+                     # 'Other EnMAP-Box features may require additional Python packages. '
+                     'To fix this, please follow the '
+                     '<a href="https://enmap-box.readthedocs.io/en/latest/usr_section/usr_installation.html">'
+                     'EnMAP-Box installation guide</a>.'
+
+                     )
+        return info
 
     def showAboutDialog(self):
         from enmapbox.gui.about import AboutDialog
@@ -137,6 +228,10 @@ class EnMAPBoxPlugin(object):
         :return:
         :rtype:
         """
+        if not self.corePackagesAvailable():
+            info = self.missingPackageInfos(self.mMissingCoreRequirements, cli=True)
+            raise ModuleNotFoundError(info)
+
         import enmapbox
         enmapbox.initPythonPaths()
 
@@ -145,24 +240,19 @@ class EnMAPBoxPlugin(object):
         self.enmapBox = EnMAPBox.instance()
         if not isinstance(self.enmapBox, EnMAPBox):
             self.enmapBox = EnMAPBox()
-            assert self.enmapBox == EnMAPBox.instance()
+            if self.enmapBox != EnMAPBox.instance():
+                raise RuntimeError("EnMAPBox singleton initialization failed")
             self.enmapBox.run()
         else:
             self.enmapBox.ui.show()
 
     def unload(self):
+        self._remove_actions()
+
+        if not self.corePackagesAvailable():
+            return
+
         from enmapbox.gui.enmapboxgui import EnMAPBox
-        from qgis.utils import iface
-        if isinstance(iface, QgisInterface):
-
-            for action in self.pluginToolbarActions:
-                iface.removeToolBarIcon(action)
-
-            for action in self.rasterMenuActions:
-                iface.removePluginRasterMenu('EnMAP-Box', action)
-
-            for dockWidget in self.dockWidgets:
-                iface.removeDockWidget(dockWidget)
 
         import enmapbox
         enmapbox.unloadAll()

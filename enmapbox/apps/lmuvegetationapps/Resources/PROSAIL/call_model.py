@@ -12,7 +12,7 @@
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
-                                                                                                                                                 *
+
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -28,15 +28,17 @@
 """
 
 import os
+import time
+import warnings
+
 import numpy as np
 from scipy.stats import truncnorm
-import lmuvegetationapps.Resources.PROSAIL.SAIL as SAIL_v
+
 import lmuvegetationapps.Resources.PROSAIL.INFORM as INFORM_v
+import lmuvegetationapps.Resources.PROSAIL.SAIL as SAIL_v
 import lmuvegetationapps.Resources.PROSAIL.prospect as prospect_v
 from lmuvegetationapps.Resources.PROSAIL.dataSpec import lambd
 from lmuvegetationapps.Resources.Spec2Sensor.Spec2Sensor_core import Spec2Sensor
-import warnings
-import time
 
 warnings.filterwarnings('ignore')  # do not show warnings (set to 'all' if you want to see warnings, too)
 
@@ -84,7 +86,7 @@ class CallModel:
                                                        self.par["cw"])
         return self.prospect
 
-    ## All returns from "self.prospects" are in the following shape:
+    # All returns from "self.prospects" are in the following shape:
     # dim one: number of runs for vectorized version
     # dim two: number of wavebands (2101)
     # dim three: [0] wavelengths;[1] reflectances; [2] transmittances
@@ -104,7 +106,7 @@ class CallModel:
 
         # # SAIL with "skyl" as additional parameter -> temporarily disabled
         # self.sail = sail_instance.Pro4sail(self.prospect[:, :, 1], self.prospect[:, :, 2], self.par["LIDF"],
-        #                                    self.par["typeLIDF"], self.par["LAI"], self.par["hspot"], self.par["psoil"],
+        #                                  self.par["typeLIDF"], self.par["LAI"], self.par["hspot"], self.par["psoil"],
         #                                    self.soil, self.par["skyl"])  # call 4SAIL from the SAIL instance
 
         return self.sail
@@ -236,14 +238,11 @@ class SetupMultiple:
                 self.repeat_accum *= self.nruns_logic[para_key]  # how often do all ns-distributed parameters need to be
                 # repeated? Once for each parameter with logical dist.
                 multiply = self.nruns_total // self.repeat_accum
-                self.para_grid[:, self.para_nums[para_key]] = self.logical_distribution(para_name=para_key,
-                                                                                        min=self.paras[para_key][0],
-                                                                                        max=self.paras[para_key][1],
-                                                                                        repeat=self.repeat_accum /
-                                                                                               self.nruns_logic[
-                                                                                                   para_key],
-                                                                                        multiply=multiply,
-                                                                                        nsteps=self.paras[para_key][2])
+                self.para_grid[:, self.para_nums[para_key]] = self.logical_distribution(
+                    para_name=para_key, min=self.paras[para_key][0], max=self.paras[para_key][1],
+                    repeat=self.repeat_accum / self.nruns_logic[para_key], multiply=multiply,
+                    nsteps=self.paras[para_key][2]
+                )
 
             if self.depends == 1 and para_key == 'car':
                 self.para_grid[:, self.para_nums[para_key]] = \
@@ -274,14 +273,14 @@ class SetupMultiple:
         try:
             return_list = np.tile(truncnorm((min - mean) / sigma, (max - mean) / sigma, loc=mean, scale=sigma).
                                   rvs(self.ns), multiply)
-        except:
-            raise ValueError("Cannot create gaussian distribution for parameter {}}. Check values!".format(para_name))
+        except Exception:
+            raise ValueError("Cannot create gaussian distribution for parameter {}. Check values!".format(para_name))
         return return_list
 
     def uniform_distribution(self, para_name, min, max, multiply):
         try:
             return_list = np.tile(np.random.uniform(low=min, high=max, size=self.ns), multiply)
-        except:
+        except Exception:
             raise ValueError("Cannot create uniform distribution for parameter %s. Check values!" % para_name)
         return return_list
 
@@ -289,7 +288,8 @@ class SetupMultiple:
         # redistribute Car values according to laplace distribution inside lower/upper cab boundaries
         def truncated_noise(y, lower, upper):
             while True:
-                y_noise = np.random.laplace(loc=0, scale=spread, size=1) + y
+                # y_noise = np.random.laplace(loc=0, scale=spread, size=1) + y
+                y_noise = np.random.laplace(loc=0, scale=spread) + y
                 if upper > y_noise > lower:
                     return y_noise
 
@@ -393,7 +393,7 @@ class InitModel:
             wl_sensor = lambd
 
         # for debugging or time estimation
-        if testmode == True:
+        if testmode is True:
             start = time.time()
             _ = self.run_model(paras=dict(zip(self.para_names, para_grid.T))).T  # simplistic form of running PROSAIL
             return time.time() - start
@@ -402,7 +402,7 @@ class InitModel:
         struct_ensemble = 0
         n_struct_ensembles = 1
 
-        ##  Prepare content for .lut-metafile:
+        #  Prepare content for .lut-metafile:
         # Geometries are either logical (len == 3) or fixed (len == 1) or not supplied
         if len(paras["tts"]) == 3:
             tts_fl = np.linspace(start=setup.paras["tts"][0], stop=setup.paras["tts"][1],
@@ -516,8 +516,9 @@ class InitModel:
                 # The double transpose of the matrix (.T) fits the paras in the necessary shape run_model expects
                 # The first "npara" rows are reserved for the parameter-values
                 # The rest is reserved for the spectral results of PROSAIL
-                save_array[npara:, :] = self.run_model(paras=
-                                                       dict(zip(self.para_names, para_grid[run:run + nruns, :].T))).T
+                save_array[npara:, :] = self.run_model(
+                    paras=dict(zip(self.para_names, para_grid[run:run + nruns, :].T))
+                ).T
                 save_array[:npara, :] = para_grid[run:run + nruns, :].T
                 if mask is not None:
                     save_array = save_array[:, mask]

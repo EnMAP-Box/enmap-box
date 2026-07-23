@@ -1,7 +1,7 @@
 from enmapbox.gui.widgets.codeeditwidget import CodeEditWidget
-from qgis.PyQt.QtWidgets import QWidget, QMainWindow, QToolButton, QLabel, QTextEdit
-from qgis.PyQt.uic import loadUi
 from enmapbox.typeguard import typechecked
+from qgis.PyQt.QtWidgets import QMainWindow, QToolButton, QLabel, QTextEdit
+from qgis.PyQt.uic import loadUi
 
 
 @typechecked
@@ -12,7 +12,7 @@ class ProfileAnalyticsEditorWidget(QMainWindow):
     mSave: QToolButton
 
     def __init__(self, parent=None):
-        QWidget.__init__(self, parent)
+        super().__init__(parent)
         loadUi(__file__.replace('.py', '.ui'), self)
 
         self.mSave.clicked.connect(self.onSaveClicked)

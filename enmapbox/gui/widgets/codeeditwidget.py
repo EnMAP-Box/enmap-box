@@ -1,4 +1,4 @@
-from PyQt5.Qsci import QsciScintilla, QsciLexerPython
+from qgis.PyQt.Qsci import QsciScintilla, QsciLexerPython
 from qgis.PyQt.QtGui import QFont, QFontMetrics, QColor
 
 
@@ -19,6 +19,6 @@ class CodeEditWidget(QsciScintilla):
         # Margin 0 is used for line numbers
         fontmetrics = QFontMetrics(font)
         self.setMarginsFont(font)
-        self.setMarginWidth(0, fontmetrics.width("000") + 6)
+        self.setMarginWidth(0, fontmetrics.boundingRect('000').width() + 6)
         self.setMarginLineNumbers(0, True)
         self.setMarginsBackgroundColor(QColor("#e3e3e3"))

@@ -12,7 +12,6 @@
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
-                                                                                                                                                 *
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -24,18 +23,23 @@
 """
 import os
 import sys
+from contextlib import suppress
 
 import numpy as np
-from scipy.interpolate import *
+import pyqtgraph as pg
+from lmuvegetationapps import APP_DIR
+from scipy.interpolate import interp1d
 from scipy.signal import savgol_filter
 
-from _classic.hubflow.core import *
+# from _classic.hubdc.core import openRasterDataset, RasterDataset
+# from _classic.hubflow.core import Raster
 from enmapbox.gui.utils import loadUi
-from enmapbox.qgispluginsupport.qps.pyqtgraph import pyqtgraph as pg
-from lmuvegetationapps import APP_DIR
+from enmapboxprocessing.driver import Driver
+from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxprocessing.rasterwriter import RasterWriter
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWidgets import QDialog, QApplication, QFileDialog, QMessageBox
 from qgis.core import QgsMapLayerProxyModel
 from qgis.gui import QgsMapLayerComboBox
 
@@ -72,8 +76,6 @@ class iREIP_GUI(QDialog):
 
         self.btnBackgroundColor.colorChanged.connect(self.set_background_color)
         self.btnAxisColor = QgsColorButton()
-        # self.btnAxisColor.colorChanged.connect([self.setAxisColor(canvas, QColor('white')) for canvas in self.plotItems])
-
         self.rangeView.setBackground(QColor('black'))
         self.firstDerivView.setBackground(QColor('black'))
         self.secondDerivView.setBackground(QColor('black'))
@@ -92,7 +94,7 @@ class iREIP_GUI(QDialog):
     def set_background_color(self, color: QColor):
         if not isinstance(color, QColor):
             color = QColor(color)
-        assert isinstance(color, QColor)
+
         if color != self.btnBackgroundColor.color():
             self.btnBackgroundColor.setColor(color)
         else:
@@ -223,8 +225,10 @@ class iREIP:
         else:
             self.dtype = meta[4]
         if self.dtype == 2 or self.dtype == 3 or self.dtype == 4 or self.dtype == 5:
-            QMessageBox.information(self.gui, "Integer Input",
-                                    "Integer input image:\nTool requires float [0.0-1.0]:\nDivision factor set to 10000")
+            QMessageBox.information(
+                self.gui, "Integer Input",
+                "Integer input image:\nTool requires float [0.0-1.0]:\nDivision factor set to 10000"
+            )
             self.division_factor = 10000
             self.gui.spinDivisionFactor.setText(str(self.division_factor))
         if None in meta:
@@ -237,14 +241,9 @@ class iREIP:
             self.nodat[0] = meta[0]
 
     def get_image_meta(self, image, image_type):
-        try:
-            dataset: RasterDataset = openRasterDataset(image)
-        except:
-            QMessageBox.critical(self.gui, 'Input Image',
-                                 'Image could not be read. Please make sure it is a valid ENVI image')
-            return
-        ds = dataset.gdalDataset()
-        metadict = dataset.metadataDict()
+        reader = RasterReader(image)
+        metadict = reader.metadata()
+        ds = reader.gdalDataset
         nrows = ds.RasterYSize
         ncols = ds.RasterXSize
         nbands = ds.RasterCount
@@ -252,12 +251,15 @@ class iREIP:
         if nbands < 2:
             raise ValueError("Input is not a multi-band image")
         try:
-            nodata = int(metadict['ENVI']['data ignore value'])
+            # nodata = int(metadict['ENVI']['data ignore value'])
+            nodata_str = metadict['ENVI'].get('data ignore value', metadict['ENVI'].get('data_ignore_value'))
+            nodata = int(nodata_str)
             return nodata, nbands, nrows, ncols, dtype
-        except:
+        except Exception:
             self.main.nodat_widget.init(image_type=image_type, image=image)
             self.main.nodat_widget.gui.setModal(True)  # parent window is blocked
-            self.main.nodat_widget.gui.exec_()  # unlike .show(), .exec_() waits with execution of the code, until the app is closed
+            self.main.nodat_widget.gui.exec()
+            # unlike .show(), .exec_() waits with execution of the code, until the app is closed
             return self.main.nodat_widget.nodat, nbands, nrows, ncols, dtype
 
     def reset(self):
@@ -293,7 +295,7 @@ class iREIP:
                 self.limits[1] = int(str(self.gui.upWaveEdit.text()))
                 self.limits[0] = int(str(self.gui.lowWaveEdit.text()))
 
-            if self.max_ndvi_pos == None:
+            if self.max_ndvi_pos is None:
                 self.init_plot()
             else:
                 self.plot_example(self.max_ndvi_pos)
@@ -460,7 +462,7 @@ class iREIP:
                 return
             try:
                 self.division_factor = float(self.gui.spinDivisionFactor.text())
-            except:
+            except Exception:
                 QMessageBox.critical(self.gui, "Error",
                                      "'%s' is not a valid division factor!" % self.gui.spinDivisionFactor.text())
                 return
@@ -555,13 +557,13 @@ class iREIP:
             else:
                 try:
                     self.nodat[1] = int(self.gui.txtNodatOutput.text())
-                except:
+                except Exception:
                     QMessageBox.critical(self.gui, "Error",
                                          "'%s' is not a valid  No Data Value!" % self.gui.txtNodatOutput.text())
                     return
             try:
                 self.division_factor = float(self.gui.spinDivisionFactor.text())
-            except:
+            except Exception:
                 QMessageBox.critical(self.gui, "Error",
                                      "'%s' is not a valid division factor!" % self.gui.spinDivisionFactor.text())
                 return
@@ -571,7 +573,7 @@ class iREIP:
                 del self.core.in_raster
                 if self.division_factor != 1.0:
                     self.iiREIP.in_raster = np.divide(self.iiREIP.in_raster, self.division_factor)
-            except:
+            except Exception:
                 self.iiREIP.in_raster = self.iiREIP.read_image(image=self.image)
                 if self.division_factor != 1.0:
                     self.iiREIP.in_raster = np.divide(self.iiREIP.in_raster, self.division_factor)
@@ -580,7 +582,7 @@ class iREIP:
             result, first_deriv, second_deriv = self.iiREIP.execute_iREIP(
                 in_raster=self.iiREIP.in_raster,
                 prg_widget=self.main.prg_widget, qgis_app=self.main.qgis_app)
-            # except:
+            # except Exception:
             # QMessageBox.critical(self.gui, 'error', "Calculation cancelled.")
             # self.main.prg_widget.gui.allow_cancel = True
             # self.main.prg_widget.gui.close()
@@ -602,14 +604,6 @@ class iREIP:
                 self.main.qgis_app.processEvents()
 
                 self.iiREIP.write_deriv_image(deriv=second_deriv, mode="second")
-
-            # try:
-            #
-            # except:
-            #     #QMessageBox.critical(self.gui, 'error', "An unspecific error occured while trying to write image data")
-            #     self.main.prg_widget.gui.allow_cancel = True
-            #     self.main.prg_widget.gui.close()
-            #     return
 
             self.main.prg_widget.gui.allow_cancel = True
             self.main.prg_widget.gui.close()
@@ -669,25 +663,36 @@ class iREIP_core:
         self.valid_bands = [i for i, x in enumerate(self.wl) if x in list(self.valid_wl)]
 
     def read_image(self, image):
-        dataset = openRasterDataset(image)
-        raster = dataset.readAsArray()
+
+        # old code...
+        # dataset = openRasterDataset(image)
+        # raster = dataset.readAsArray()
+
+        reader = RasterReader(image)
+        array = np.array(reader.array())
+        raster = array
+
         if len(self.wl) > 2000:
-            try:
+            with suppress(Exception):
                 raster[self.default_exclude, :, :] = 0
-            except:
-                pass
+
         if len(raster) == 242:  # temporary solution for overlapping EnMap-Testdata Bands
             raster = np.delete(raster, self.enmap_exclude, axis=0)  # temporary solution!
         return raster
 
     def read_image_window(self, image):
-        dataset = openRasterDataset(image)
-        raster = dataset.readAsArray()
+
+        # old code...
+        # dataset = openRasterDataset(image)
+        # raster = dataset.readAsArray()
+
+        reader = RasterReader(image)
+        array = np.array(reader.array())
+        raster = array
+
         if len(self.wl) > 2000:
-            try:
+            with suppress(Exception):
                 raster[self.default_exclude, :, :] = 0
-            except:
-                pass
         if len(raster) == 242:  # temporary solution for overlapping EnMap-Testdata Bands
             raster = np.delete(raster, self.enmap_exclude, axis=0)  # temporary solution!
         window = raster[self.valid_bands, :, :]
@@ -695,13 +700,24 @@ class iREIP_core:
 
     @staticmethod
     def read_image_meta(image):
-        dataset: RasterDataset = openRasterDataset(image)
-        ds = dataset.gdalDataset()
-        if dataset.grid() is not None:
-            grid = dataset.grid()
-        else:
-            raise Warning('No coordinate system information provided in ENVI header file')
-        metadict = dataset.metadataDict()
+
+        # dataset: RasterDataset = openRasterDataset(image)
+        # ds = dataset.gdalDataset()
+
+        reader = RasterReader(image)
+        ds = reader.gdalDataset
+
+        # if dataset.grid() is not None:
+        #    grid = dataset.grid()
+        # else:
+        #    raise Warning('No coordinate system information provided in ENVI header file')
+
+        grid = reader.extent(), reader.crs()
+
+        # metadict = dataset.metadataDict()
+
+        metadict = reader.metadata()
+
         nrows = ds.RasterYSize
         ncols = ds.RasterXSize
         nbands = ds.RasterCount
@@ -709,22 +725,36 @@ class iREIP_core:
 
         try:
             wave_dict = metadict['ENVI']['wavelength']
-        except:
+        except Exception:
             raise ValueError('No wavelength units provided in ENVI header file')
+
+        # if metadict['ENVI']['wavelength'] is None:
+        #     raise ValueError('No wavelength units provided in ENVI header file')
+        # elif metadict['ENVI']['wavelength units'].lower() in \
+        #         ['nanometers', 'nm', 'nanometer']:
+        #     wave_convert = 1
+        # elif metadict['ENVI']['wavelength units'].lower() in \
+        #         ['micrometers', 'µm', 'micrometer']:
+        #     wave_convert = 1000
+        # else:
+        #     raise ValueError(
+        #         "Wavelength units must be nanometers or micrometers. Got '%s' instead" %
+        #         metadict['ENVI'][
+        #             'wavelength units'])
+
+        wl_units = metadict['ENVI'].get('wavelength units', metadict['ENVI'].get('wavelength_units', ''))
 
         if metadict['ENVI']['wavelength'] is None:
             raise ValueError('No wavelength units provided in ENVI header file')
-        elif metadict['ENVI']['wavelength units'].lower() in \
+        elif wl_units.lower() in \
                 ['nanometers', 'nm', 'nanometer']:
             wave_convert = 1
-        elif metadict['ENVI']['wavelength units'].lower() in \
+        elif wl_units.lower() in \
                 ['micrometers', 'µm', 'micrometer']:
             wave_convert = 1000
         else:
             raise ValueError(
-                "Wavelength units must be nanometers or micrometers. Got '%s' instead" %
-                metadict['ENVI'][
-                    'wavelength units'])
+                "Wavelength units must be nanometers or micrometers. Got '%s' instead" % wl_units)
 
         wl = [float(item) * wave_convert for item in wave_dict]
         wl = [int(i) for i in wl]
@@ -732,14 +762,22 @@ class iREIP_core:
         return grid, wl, nbands, nrows, ncols, dtype
 
     def write_ireip_image(self, result):
-        output = Raster.fromArray(array=result, filename=self.output, grid=self.grid)
 
-        output.dataset().setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
+        # output = Raster.fromArray(array=result, filename=self.output, grid=self.grid)
 
-        for band in output.dataset().bands():
-            band.setDescription(
-                'Inflection point between %i and %i nm' % (self.limits[0], self.limits[1]))
-            band.setNoDataValue(self.nodat[1])
+        extent, crs = self.grid
+        array = result
+        filename = self.output
+        writer: RasterWriter = Driver(filename).createFromArray(array, extent, crs)
+
+        writer.setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
+        for bandNo in writer.bandNumbers():
+            writer.setBandName(
+                'Inflection point between %i and %i nm' % (self.limits[0], self.limits[1]), bandNo
+            )
+            writer.setNoDataValue(self.nodat[1], bandNo)
+
+        writer.close()
 
     def write_deriv_image(self, deriv, mode):  #
 
@@ -755,17 +793,22 @@ class iREIP_core:
                         continue
 
             deriv_output = deriv_output[0] + "_1st_deriv" + "." + deriv_output[1]
-            output = Raster.fromArray(array=deriv, filename=deriv_output, grid=self.grid)
 
-            output.dataset().setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
+            # output = Raster.fromArray(array=deriv, filename=deriv_output, grid=self.grid)
 
-            for i, band in enumerate(output.dataset().bands()):
-                band.setDescription(band_string_nr[i])
-                band.setNoDataValue(self.nodat[1])
+            filename = deriv_output
+            array = deriv
+            extent, crs = self.grid
+            writer = Driver(filename).createFromArray(array, extent, crs)
+            writer.setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
 
-            output.dataset().setMetadataItem(key='wavelength', value=self.valid_wl,
-                                             domain='ENVI')
-            output.dataset().setMetadataItem(key='wavelength units', value='Nanometers', domain='ENVI')
+            for bandNo in writer.bandNumbers():
+                writer.setBandName(band_string_nr[bandNo - 1], bandNo)
+                writer.setNoDataValue(self.nodat[1], bandNo)
+
+            writer.setMetadataItem(key='wavelength', value=self.valid_wl, domain='ENVI')
+            writer.setMetadataItem(key='wavelength units', value='Nanometers', domain='ENVI')
+            writer.close()
 
         if mode == "second":
             band_string_nr = ['band ' + str(x + 1) for x, i in enumerate(self.valid_bands)]
@@ -779,16 +822,22 @@ class iREIP_core:
                     else:
                         continue
 
-            output = Raster.fromArray(array=deriv, filename=deriv_output, grid=self.grid)
+            # output = Raster.fromArray(array=deriv, filename=deriv_output, grid=self.grid)
 
-            output.dataset().setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
+            filename = deriv_output
+            array = deriv
+            extent, crs = self.grid
+            writer = Driver(filename).createFromArray(array, extent, crs)
+            writer.setMetadataItem('data ignore value', self.nodat[1], 'ENVI')
 
-            for i, band in enumerate(output.dataset().bands()):
-                band.setDescription(band_string_nr[i])
-                band.setNoDataValue(self.nodat[1])
+            for bandNo in writer.bandNumbers():
+                writer.setBandName(band_string_nr[bandNo - 1], bandNo)
+                writer.setNoDataValue(self.nodat[1], bandNo)
 
-            output.dataset().setMetadataItem(key='wavelength', value=self.valid_wl, domain='ENVI')
-            output.dataset().setMetadataItem(key='wavelength units', value='Nanometers', domain='ENVI')
+            writer.setMetadataItem(key='wavelength', value=self.valid_wl, domain='ENVI')
+            writer.setMetadataItem(key='wavelength units', value='Nanometers', domain='ENVI')
+
+            writer.close()
 
     def find_closest(self, lambd):
         distances = [abs(lambd - self.wl[i]) for i in range(self.n_wl)]
@@ -811,10 +860,8 @@ class iREIP_core:
 
     def interp_watervapor_3d(self, in_matrix):
         x = np.arange(len(in_matrix))
-        try:
+        with suppress(Exception):
             in_matrix[self.default_exclude] = 0
-        except:
-            pass
         self.res3d = np.empty(shape=np.shape(in_matrix))
         for row in range(in_matrix.shape[1]):
             for col in range(in_matrix.shape[2]):
@@ -852,9 +899,11 @@ class iREIP_core:
             reip_pos_index = (np.abs(list(tracker))).argmin()
             reip_pos = pos_wl[reip_pos_index]
 
-        except:
-            QMessageBox.information(self.prg.gui, "Warning",
-                                    "Inflection Point is not unique.\nUse Savitzky-Golay filter or decrease the range width.")
+        except Exception:
+            QMessageBox.information(
+                self.prg.gui, "Warning",
+                "Inflection Point is not unique.\nUse Savitzky-Golay filter or decrease the range width."
+            )
             reip_pos = None
 
         return smooth_array, first_deriv, second_deriv, reip_pos
@@ -870,19 +919,21 @@ class iREIP_core:
             try:
                 smooth_matrix = savgol_filter(in_matrix,
                                               window_length=self.neighbors, polyorder=2, axis=0)
-            except:
+            except Exception:
                 QMessageBox.information(self.prg.gui, "Warning",
                                         "Savitzky-Golay-Filter Error. Neighbors have been set -2.")
                 try:
                     smooth_matrix = savgol_filter(in_matrix,
                                                   window_length=self.neighbors - 2, polyorder=2, axis=0)
-                except:
+                except Exception:
                     try:
-                        QMessageBox.information(self.prg.gui, "Warning",
-                                                "Savitzky-Golay-Filter Error. Last try: Neighbors have been set -2 once more.")
+                        QMessageBox.information(
+                            self.prg.gui, "Warning", "Savitzky-Golay-Filter Error. Last try: Neighbors have been set "
+                                                     "-2 once more."
+                        )
                         smooth_matrix = savgol_filter(in_matrix,
                                                       window_length=self.neighbors - 2, polyorder=2, axis=0)
-                    except:
+                    except Exception:
                         ValueError("Savitzky-Golay-Filter could not be applied. Try to uncheck filtering.")
 
         else:
@@ -907,7 +958,7 @@ class iREIP_core:
                         try:
                             reip_index_1 = int(reip_index_1)
                             reip_index_2 = int(reip_index_2)
-                        except:
+                        except Exception:
                             reip_pos[:, row, col] = self.nodat[1]
                             continue
 
@@ -1041,7 +1092,7 @@ class Nodat:
         else:
             try:
                 nodat = int(float(self.gui.txtNodat.text()))
-            except:
+            except Exception:
                 QMessageBox.critical(self.gui, "No number",
                                      "'%s' is not a valid number" % self.gui.txtNodat.text())
                 self.gui.txtNodat.setText("")
@@ -1086,4 +1137,4 @@ if __name__ == '__main__':
     app = start_app()
     m = MainUiFunc()
     m.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

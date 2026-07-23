@@ -1,34 +1,34 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright © 2019 Stéphane Guillaso
-# Licensed under the terms of 
+# Licensed under the terms of
 # (see ../../LICENSE.md for details)
 
-import numpy as np
-import hys
-import os # <-- to be removed
+
 # import importlib
 import numba as nb
-from hys.tools import get_crad
-import sys # <-- to be removed
+import numpy as np
 
-__bands__    = [2120, 2250]
+from ensomap.hys.tools import get_crad
+
+__bands__ = [2120, 2250]
 __filename__ = "_CLAY_CRAD_2120_2250"
-__gui__      = "Clay CRAD: 2120 -> 2250"
-__info__     = "Perform a continuum removal absorption depth\n" + \
-    "between 2120 nm and 2250 nm."
+__gui__ = "Clay CRAD: 2120 -> 2250"
+__info__ = "Perform a continuum removal absorption depth\n" + \
+           "between 2120 nm and 2250 nm."
+
 
 def check_bands(ubands, wvl):
     ind0 = int(ubands[0])
     ind1 = int(ubands[1])
     if ind0 == ind1:
         return False, 'Identical band found!\n'
-    if (ind1-ind0) < 2:
+    if (ind1 - ind0) < 2:
         return False, 'Not enough points to calculate crad!\n'
     return True, "Has been calculated!\n"
 
 
-@nb.jit(nb.float32[:,:](nb.float32[:,:,:], nb.float32[:], nb.int32[:], nb.int32[:,:]), nopython=True, fastmath=True)
+@nb.jit(nb.float32[:, :](nb.float32[:, :, :], nb.float32[:], nb.int32[:], nb.int32[:, :]), nopython=True, fastmath=True)
 def process(cube, wvl, ind, mask):
     ny = cube.shape[1]
     nx = cube.shape[2]
@@ -45,6 +45,6 @@ def process(cube, wvl, ind, mask):
                     out[ky, kx] = np.nan
                     continue
             for kc in range(nc):
-                y[kc] = cube[kc+ind[0], ky, kx]
+                y[kc] = cube[kc + ind[0], ky, kx]
             out[ky, kx] = get_crad(x, y)
     return out

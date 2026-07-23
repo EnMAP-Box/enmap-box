@@ -1,10 +1,8 @@
 from qgis.PyQt.QtCore import QCoreApplication
-from qgis._core import QgsProcessingParameterEnum
-from qgis.core import (QgsProcessingAlgorithm,
-                       QgsProcessingParameterFile,
-                       QgsProcessingParameterFolderDestination,
-                       QgsProcessingParameterBoolean,
-                       QgsProcessingParameterFileDestination)
+from qgis.core import (
+    QgsProcessingAlgorithm, QgsProcessingParameterFile, QgsProcessingParameterFolderDestination,
+    QgsProcessingParameterBoolean, QgsProcessingParameterFileDestination, QgsProcessingParameterEnum
+)
 
 
 class DL_Tester(QgsProcessingAlgorithm):
@@ -38,8 +36,8 @@ class DL_Tester(QgsProcessingAlgorithm):
         """
         return QCoreApplication.translate('Processing', string)
 
-    def createInstance(self):
-        return DL_Tester()
+    # def createInstance(self):
+    #     return DL_Tester()
 
     def name(self):
         """
@@ -76,28 +74,27 @@ class DL_Tester(QgsProcessingAlgorithm):
         return 'SpecDeepMap'
 
     def shortHelpString(self):
-        """
-        Returns a localised short helper string for the algorithm. This string
-        should provide a basic description about what the algorithm does and the
-        parameters and outputs associated with it..
-        """
-        return self.tr("Example algorithm short description")
-
-    def shortHelpString(self):
-        html = '' \
-               '<p>This algorithm loads a trained deep learning model and uses it for prediction on the test dataset. The Intersection over Union (IoU) score per class as well as overall mean is saved as csv-file. Optionally all predicted chips can be exported and saved as tiff files.</p>' \
-               '<h3>Test dataset</h3>' \
-               '<p>Load the test_files.csv created by the Dataset Maker</p>' \
-               '<h3>Model Checkpoint</h3>' \
-               '<p>Load the model checkpoint file of saved model during training (choose the one with highest IoU on val dataset - is written in checkpoint name) </p>' \
-               '<h3>Device </h3>' \
-               '<p>Can be run on CPU or GPU, if GPU available and correctly installed</p>' \
-               '<h3>Crop unclassified-labels from prediction</h3>' \
-               '<p>If this is true, unclassified values indicated by 0 are cropped from prediction before the image chips are exported. Unclassified labels with value 0 are always ignore in score calculation. So this is just relevant if you want to export tiles intersecting image boundaries or have sparse labels.  </p>' \
-               '<h3>IoU CSV</h3>' \
-               '<p>Location where IoU score csv-file will be created</p>' \
-               '<h3>Save and export prediction image to folder (optional)</h3>' \
-               '<p>If a folder location is specified all prediction images will be saved in given folder</p>'
+        html = (
+            ''
+            '<p>This algorithm loads a trained deep learning model and uses it for prediction on the test dataset. '
+            'The Intersection over Union (IoU) score per class as well as overall mean is saved as csv-file. '
+            'Optionally all predicted chips can be exported and saved as tiff files.</p>'
+            '<h3>Test dataset</h3>'
+            '<p>Load the test_files.csv created by the Dataset Maker</p>'
+            '<h3>Model Checkpoint</h3>'
+            '<p>Load the model checkpoint file of saved model during training (choose the one with highest '
+            'IoU on val dataset - is written in checkpoint name) </p>'
+            '<h3>Device </h3>'
+            '<p>Can be run on CPU or GPU, if GPU available and correctly installed</p>'
+            '<h3>Crop unclassified-labels from prediction</h3>'
+            '<p>If this is true, unclassified values indicated by 0 are cropped from prediction '
+            'before the image chips are exported. Unclassified labels with value 0 are always ignore in score '
+            'calculation. So this is just relevant if you want to export tiles intersecting '
+            'image boundaries or have sparse labels.  </p>'
+            '<h3>IoU CSV</h3>'
+            '<p>Location where IoU score csv-file will be created</p>'
+            '<h3>Save and export prediction image to folder (optional)</h3>'
+            '<p>If a folder location is specified all prediction images will be saved in given folder</p>')
         return html
 
     def initAlgorithm(self, config=None):

@@ -16,9 +16,9 @@
 
 import logging
 from math import pi, log
+
 import numpy as np
-import pylab
-from scipy import fft, ifft
+from scipy.fft import fft, ifft
 from scipy.optimize import curve_fit
 from scipy.signal import cspline1d_eval, cspline1d
 
@@ -59,11 +59,11 @@ def _pad(fft_data, pad_len):
 
     return: padded list
     """
-    l = len(fft_data)
-    n = _n(l * pad_len)
+    ll = len(fft_data)
+    n = _n(ll * pad_len)
     fft_data = list(fft_data)
 
-    return fft_data[:l // 2] + [0] * (2 ** n - l) + fft_data[l // 2:]
+    return fft_data[:ll // 2] + [0] * (2 ** n - ll) + fft_data[ll // 2:]
 
 
 def _n(x):
@@ -98,7 +98,10 @@ def _peakdetect_parabola_fitter(raw_peaks, x_axis, y_axis, points):
         [[x, y, [fitted_x, fitted_y]]]
 
     """
-    func = lambda x, a, tau, c: a * ((x - tau) ** 2) + c
+
+    def func(x, a, tau, c):
+        return a * ((x - tau) ** 2) + c
+
     fitted_peaks = []
     distance = abs(x_axis[raw_peaks[1][0]] - x_axis[raw_peaks[0][0]]) / 4
     for peak in raw_peaks:
@@ -136,6 +139,7 @@ def peakdetect_parabole(*args, **kwargs):
     logging.warn("peakdetect_parabole is deprecated due to misspelling use: peakdetect_parabola")
 
     return peakdetect_parabola(*args, **kwargs)
+
 
 def peakdetect(y_axis, x_axis=None, lookahead=200, delta=0):
     """
@@ -204,7 +208,7 @@ def peakdetect(y_axis, x_axis=None, lookahead=200, delta=0):
             mn = y
             mnpos = x
 
-        ####look for max####
+        # #look for max##
         if y < mx - delta and mx != np.inf:
             # Maxima peak candidate found
             # look ahead in signal to ensure that this is a peak and not jitter
@@ -222,7 +226,7 @@ def peakdetect(y_axis, x_axis=None, lookahead=200, delta=0):
                 #    mx = ahead
                 #    mxpos = x_axis[np.where(y_axis[index:index+lookahead]==mx)]
 
-        ####look for min####
+        # #look for min# #
         if y > mn + delta and mn != -np.inf:
             # Minima peak candidate found
             # look ahead in signal to ensure that this is a peak and not jitter
@@ -301,20 +305,24 @@ def peakdetect_fft(y_axis, x_axis, pad_len=20):
     zero_indices = zero_crossings(y_axis, window_len=11)
     # select a n amount of periods
     last_indice = - 1 - (1 - len(zero_indices) & 1)
-    ###
+    #
     # Calculate the fft between the first and last zero crossing
     # this method could be ignored if the beginning and the end of the signal
     # are unnecessary as any errors induced from not using whole periods
     # should mainly manifest in the beginning and the end of the signal, but
     # not in the rest of the signal
     # this is also unnecessary if the given data is an amount of whole periods
-    ###
+    #
     fft_data = fft(y_axis[zero_indices[0]:zero_indices[last_indice]])
-    padd = lambda x, c: x[:len(x) // 2] + [0] * c + x[len(x) // 2:]
-    n = lambda x: int(log(x) / log(2)) + 1
+
+    def padd(x, c):
+        return x[:len(x) // 2] + [0] * c + x[len(x) // 2:]
+
+    def n(x):
+        return int(log(x) / log(2)) + 1
+
     # pads to 2**n amount of samples
-    fft_padded = padd(list(fft_data), 2 **
-                      n(len(fft_data) * pad_len) - len(fft_data))
+    fft_padded = padd(list(fft_data), 2 ** n(len(fft_data) * pad_len) - len(fft_data))
 
     # There is amplitude decrease directly proportional to the sample increase
     sf = len(fft_padded) / float(len(fft_data))
@@ -376,16 +384,16 @@ def peakdetect_parabola(y_axis, x_axis, points=31):
     max_raw, min_raw = peakdetect_zero_crossing(y_axis)
 
     # define output variable
-    max_peaks = []
-    min_peaks = []
+    # max_peaks = []
+    # min_peaks = []
 
     max_ = _peakdetect_parabola_fitter(max_raw, x_axis, y_axis, points)
     min_ = _peakdetect_parabola_fitter(min_raw, x_axis, y_axis, points)
 
     max_peaks = map(lambda x: [x[0], x[1]], max_)
-    max_fitted = map(lambda x: x[-1], max_)
+    # max_fitted = map(lambda x: x[-1], max_)
     min_peaks = map(lambda x: [x[0], x[1]], min_)
-    min_fitted = map(lambda x: x[-1], min_)
+    # min_fitted = map(lambda x: x[-1], min_)
 
     return [max_peaks, min_peaks]
 
@@ -457,13 +465,12 @@ def peakdetect_sine(y_axis, x_axis, points=31, lock_frequency=False):
     # if cosine is used then tau could equal the x position of the peak
     # if sine were to be used then tau would be the first zero crossing
     if lock_frequency:
-        func = lambda x_ax, A, tau: A * np.sin(
-            2 * pi * Hz * (x_ax - tau) + pi / 2)
+        def func(x_ax, A, tau):
+            return A * np.sin(2 * pi * Hz * (x_ax - tau) + pi / 2)
     else:
-        func = lambda x_ax, A, Hz, tau: A * np.sin(
-            2 * pi * Hz * (x_ax - tau) + pi / 2)
+        def func(x_ax, A, Hz, tau):
+            return A * np.sin(2 * pi * Hz * (x_ax - tau) + pi / 2)
     # func = lambda x_ax, A, Hz, tau: A * np.cos(2 * pi * Hz * (x_ax - tau))
-
 
     # get peaks
     fitted_peaks = []
@@ -506,9 +513,9 @@ def peakdetect_sine(y_axis, x_axis, points=31, lock_frequency=False):
 
     # structure date for output
     max_peaks = map(lambda x: [x[0], x[1]], fitted_peaks[0])
-    max_fitted = map(lambda x: x[-1], fitted_peaks[0])
+    # max_fitted = map(lambda x: x[-1], fitted_peaks[0])
     min_peaks = map(lambda x: [x[0], x[1]], fitted_peaks[1])
-    min_fitted = map(lambda x: x[-1], fitted_peaks[1])
+    # min_fitted = map(lambda x: x[-1], fitted_peaks[1])
 
     return [max_peaks, min_peaks]
 
@@ -746,9 +753,11 @@ def zero_crossings(y_axis, window_len=11,
     diff = np.diff(indices)
     if diff.std() / diff.mean() > 0.1:
         # Possibly bad zero crossing, see if it's offsets
-        if ((diff[::2].std() / diff[::2].mean()) < 0.1 and
-                    (diff[1::2].std() / diff[1::2].mean()) < 0.1 and
-                not offset_corrected):
+        if (
+            (diff[::2].std() / diff[::2].mean()) < 0.1
+            and (diff[1::2].std() / diff[1::2].mean()) < 0.1  # noqa
+            and not offset_corrected  # noqa
+        ):
             # offset present attempt to correct by subtracting the average
             offset = np.mean([y_axis.max(), y_axis.min()])
             return zero_crossings(y_axis - offset, window_len, window_f, True)
@@ -767,7 +776,7 @@ def zero_crossings(y_axis, window_len=11,
     # return indices + np.asarray(30 * np.random.randn(len(indices)), int)
 
 
-############################Frequency calculation#############################
+# ########Frequency calculation###########
 #    diff = np.diff(indices)
 #    time_p_period = diff.mean()
 #
@@ -777,7 +786,7 @@ def zero_crossings(y_axis, window_len=11,
 #
 #    #return frequency
 #    return 1.0 / time_p_period
-##############################################################################
+# ########################
 
 
 def zero_crossings_sine_fit(y_axis, x_axis, fit_window=None, smooth_window=11):
@@ -822,7 +831,7 @@ def zero_crossings_sine_fit(y_axis, x_axis, fit_window=None, smooth_window=11):
     # get first guess
     zero_indices = zero_crossings(y_axis, window_len=smooth_window)
     # modify fit_window to show distance per direction
-    if fit_window == None:
+    if fit_window is None:
         fit_window = np.diff(zero_indices).mean() // 3
     else:
         fit_window = fit_window // 2
@@ -832,16 +841,21 @@ def zero_crossings_sine_fit(y_axis, x_axis, fit_window=None, smooth_window=11):
 
     # get raw peaks for calculation of offsets and frequency
     raw_peaks = peakdetect_zero_crossing(y_axis, x_axis)
+
     # Use mean time between peaks for frequency
-    ext = lambda x: list(zip(*x)[0])
+    def ext(x):
+        return list(zip(*x)[0])
+
     _diff = map(np.diff, map(ext, raw_peaks))
 
     Hz = 1 / np.mean(map(np.mean, _diff))
+
     # Hz = 1 / np.diff(approx_crossings).mean() #probably bad precision
 
-
     # offset model function
-    offset_func = lambda x, k, m: k * x + m
+    def offset_func(x, k, m):
+        return k * x + m
+
     k = []
     m = []
     amplitude = []
@@ -863,9 +877,12 @@ def zero_crossings_sine_fit(y_axis, x_axis, fit_window=None, smooth_window=11):
     # store offset constants
     p_offset = (np.mean(k), np.mean(m))
     A = m[0] - m[1]
+
     # define model function to fit to zero crossing
     # y = A * sin(2*pi * Hz * (x - tau)) + k * x + m
-    func = lambda x, tau: A * np.sin(2 * pi * Hz * (x - tau)) + offset_func(x, *p_offset)
+
+    def func(x, tau):
+        return A * np.sin(2 * pi * Hz * (x - tau)) + offset_func(x, *p_offset)
 
     # get true crossings
     true_crossings = []
@@ -882,11 +899,9 @@ def zero_crossings_sine_fit(y_axis, x_axis, fit_window=None, smooth_window=11):
 
     return true_crossings
 
+# def _test_zero():
+#    _max, _min = peakdetect_zero_crossing(y, x)
 
-def _test_zero():
-    _max, _min = peakdetect_zero_crossing(y, x)
 
-
-def _test():
-    _max, _min = peakdetect(y, x, delta=0.30)
-
+# def _test():
+#    _max, _min = peakdetect(y, x, delta=0.30)

@@ -2,8 +2,8 @@ from os.path import basename, join
 
 from enmapboxprocessing.algorithm.randomsamplesfromregressiondatasetalgorithm import \
     RandomSamplesFromRegressionDatasetAlgorithm
-from enmapboxprocessing.parameter.processingparameterpicklefileregressiondatasetwidget import \
-    ProcessingParameterPickleFileRegressionDatasetWidget
+from enmapboxprocessing.parameter.processingparameterskopsfileregressiondatasetwidget import \
+    ProcessingParameterSkopsFileRegressionDatasetWidget
 from enmapboxprocessing.typing import RegressorDump, Target
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtGui import QColor
@@ -17,7 +17,7 @@ from enmapbox.typeguard import typechecked
 
 @typechecked
 class RegressionDatasetManagerGui(QDialog):
-    mDataset: ProcessingParameterPickleFileRegressionDatasetWidget
+    mDataset: ProcessingParameterSkopsFileRegressionDatasetWidget
     mTargetTable: QTableWidget
     mFeaturesTable: QTableWidget
     mRestore: QToolButton
@@ -44,7 +44,7 @@ class RegressionDatasetManagerGui(QDialog):
     def currentEdits(self):
         filename = self.mDataset.mFile.filePath()
         try:
-            dump = RegressorDump.fromDict(Utils.pickleLoad(filename))
+            RegressorDump.fromDict(Utils.modelLoad(filename))
         except Exception:
             return
 
@@ -74,7 +74,7 @@ class RegressionDatasetManagerGui(QDialog):
     def onSaveClicked(self, *args, question=True):
         filename = self.mDataset.mFile.filePath()
         try:
-            dump = RegressorDump.fromDict(Utils.pickleLoad(filename))
+            dump = RegressorDump.fromDict(Utils.modelLoad(filename))
         except Exception:
             return
 
@@ -88,14 +88,14 @@ class RegressionDatasetManagerGui(QDialog):
         targets, features, sizes = self.currentEdits()
 
         dump = RegressorDump(targets, features, dump.X, dump.y, dump.regressor)
-        Utils.pickleDump(dump.__dict__, filename)
+        Utils.modelDump(dump.__dict__, filename)
         self.enmapBox.removeSource(filename)
         self.enmapBox.addSource(filename)
 
     def onDatasetChanged(self, *args):
         filename = self.mDataset.mFile.filePath()
         try:
-            dump = RegressorDump.fromDict(Utils.pickleLoad(filename))
+            dump = RegressorDump.fromDict(Utils.modelLoad(filename))
         except Exception:
             self.mTargetTable.setRowCount(0)
             return
@@ -129,7 +129,7 @@ class RegressionDatasetManagerGui(QDialog):
         self.onSaveClicked(question=False)
         filename = self.mDataset.mFile.filePath()
         try:
-            dump = RegressorDump.fromDict(Utils.pickleLoad(filename))
+            RegressorDump.fromDict(Utils.modelLoad(filename))
         except Exception:
             self.mTargetTable.setRowCount(0)
             return
@@ -139,8 +139,8 @@ class RegressionDatasetManagerGui(QDialog):
         parameters = {
             alg.P_DATASET: filename,
             alg.P_BINS: 1,
-            alg.P_OUTPUT_DATASET: tmpfile.replace('.pkl', '.sample.pkl'),
-            alg.P_OUTPUT_COMPLEMENT: tmpfile.replace('.pkl', '.complement.pkl'),
+            alg.P_OUTPUT_DATASET: tmpfile.replace('.skops', '.sample.skops'),
+            alg.P_OUTPUT_COMPLEMENT: tmpfile.replace('.skops', '.complement.skops'),
         }
         dialog = self.enmapBox.showProcessingAlgorithmDialog(alg, parameters, True, True, None, False, self)
         if len(dialog.results()) == 0:

@@ -1,37 +1,36 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright © 2019 / Dr. Stéphane Guillaso
-# Licensed under the terms of the 
-# (see ../LICENSE.md for details)
+# Licensed under the terms of the
+# (see ../LICENSE.md for details
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-import numpy as np
-import time
-import hys
 import os
+import time
 
-import hys.mask_specind_ndrbi as ndrbi
-import hys.mask_specind_ndvi  as ndvi
-import hys.mask_specind_ncai  as ncai
+import numpy as np
+
+from ensomap import hys
+from ensomap.hys import mask_specind_ncai as ncai
+from ensomap.hys import mask_specind_ndrbi as ndrbi
+from ensomap.hys import mask_specind_ndvi as ndvi
+from qgis.PyQt import Qt
 
 
 class ui_msk:
 
     def __init__(self, parent=None):
         super(ui_msk, self).__init__(parent=parent)
-    
+
     def insert_msk(self, dname):
 
-        self.msk_dname = self.map_dname # directory to store soil product files
-        self.msk_cube  = None  # input cube data object
-        self.msk_mask  = None  # input mask data object
+        self.msk_dname = self.map_dname  # directory to store soil product files
+        self.msk_cube = None  # input cube data object
+        self.msk_mask = None  # input mask data object
         self.msk_rname = ""
-        
+
         # =========================================================================================
         # CREATE THE TAB: SOIL MASKING
-        self.gui.widget_tab_page(title = 'Masking')
+        self.gui.widget_tab_page(title='Masking')
 
         # -----------------------------------------------------------------------------------------
         # GROUP BOX: INPUT
@@ -39,7 +38,7 @@ class ui_msk:
 
         # First line
         self.gui.widget_row()
-        self.gui.widget_label(text = 'Hyperspectral Data:', width = 170)
+        self.gui.widget_label(text='Hyperspectral Data:', width=170)
         self.gui.widget_text(ID="msk_txt_file_pathname")
         self.gui.widget_tool_button(text='...', action=self.msk_set_data_pathname)
         self.gui.widget_tool_button(text='Get it from Mapping', action=self.msk_get_data_pathname)
@@ -58,7 +57,7 @@ class ui_msk:
         self.gui.widget_add_spacing(10)
         self.gui.widget_group_box("OUTPUT")
         self.gui.widget_row()
-        self.gui.widget_label(text = 'Soil Mask Directory:', width = 170)
+        self.gui.widget_label(text='Soil Mask Directory:', width=170)
         self.gui.widget_text(ID='msk_txt_mask_dir_pathname', text=self.msk_dname)
         self.gui.widget_tool_button(text='...', action=self.msk_set_mask_dir_pathname)
         self.gui.widget_tool_button(text='Get it to Mapping', action=self.msk_get_mask_dir_pathname)
@@ -73,22 +72,22 @@ class ui_msk:
         # NDRBI
         self.gui.widget_row()
         self.gui.widget_check_button('Mask water areas using NDRBI*:',
-                                     ID='msk_set_ndrbi', width = 270, action=self.msk_select_ndrbi)
+                                     ID='msk_set_ndrbi', width=270, action=self.msk_select_ndrbi)
         self.gui.widget_text(ID='msk_ndrbi')
         self.gui.widget_row_close()
 
         # NDVI
         self.gui.widget_row()
         self.gui.widget_check_button('Mask green vegetated areas using NDVI*:',
-                                     ID='msk_set_ndvi', width = 270, action=self.msk_select_ndvi)
-        self.gui.widget_text(ID = 'msk_ndvi')
+                                     ID='msk_set_ndvi', width=270, action=self.msk_select_ndvi)
+        self.gui.widget_text(ID='msk_ndvi')
         self.gui.widget_row_close()
 
         # NCAI
         self.gui.widget_row()
         self.gui.widget_check_button('Mask dry vegetated areas using nCAI*:',
-                                     ID='msk_set_ncai', width = 270, action=self.msk_select_ncai)
-        self.gui.widget_text(ID = 'msk_ncai')
+                                     ID='msk_set_ncai', width=270, action=self.msk_select_ncai)
+        self.gui.widget_text(ID='msk_ncai')
         self.gui.widget_row_close()
 
         self.gui.widget_add_spacing(5)
@@ -149,7 +148,6 @@ class ui_msk:
         self.gui.widget_push_button("Export", action=self.msk_export)
         self.gui.widget_group_box_close()
 
-
         # =========================================================================================
         # CLOSE THE TAB: SOIL MAPPING
         self.gui.widget_tab_page_close()
@@ -161,12 +159,12 @@ class ui_msk:
     #     self.gui.widget_check_button(prod.__gui__, ID=name)
     #     self.gui.widget_row_close()
     #     self.map_soil[prod_name] = _get_prop(prod, self.gui.gui[name])
-    
+
     # def make_display_info(self, msg):
     #     def display_info():
     #         hys.display_information(self, msg)
     #     return display_info
-    
+
     def msk_update_rname(self):
         if self.msk_cube is None:
             return
@@ -175,9 +173,6 @@ class ui_msk:
         self.msk_select_ndvi()
         self.msk_select_ncai()
 
-
-
-
     ###############################################################################################
     #
     # OPEN TO SET A HYPERSPECTRAL DATA FILE PATHNAME
@@ -185,17 +180,20 @@ class ui_msk:
     ###############################################################################################
     def msk_set_data_pathname(self):
         title = self.app_name + " - Select a hyperspectral image/spectral library file pathname"
-        if self.msk_cube is None: dname = os.path.expanduser('~')
-        else: dname = os.path.dirname(self.msk_cube.fname)
+        if self.msk_cube is None:
+            dname = os.path.expanduser('~')
+        else:
+            dname = os.path.dirname(self.msk_cube.fname)
         while True:
             filename = hys.pick_file(self, dname=dname, title=title)
-            if filename == "": return # operation canceled
+            if filename == "":
+                return  # operation canceled
             status, cube = hys.data().open(filename)
             if status is False:
                 hys.display_error(self, cube)
                 dname = os.path.dirname(filename)
-            elif type(cube) != hys.cube:
-                msg = os.path.basename(filename) + "\n is not a hyperspectral image " 
+            elif type(cube) is hys.cube:
+                msg = os.path.basename(filename) + "\n is not a hyperspectral image "
                 hys.display_error(self, msg)
                 dname = os.path.dirname(filename)
             else:
@@ -204,9 +202,6 @@ class ui_msk:
         self.msk_cube = cube
         self.gui.gui['msk_lab_file_info'].setText(self.msk_cube.get_info())
         self.msk_update_rname()
-
-
-
 
     ###############################################################################################
     #
@@ -218,7 +213,7 @@ class ui_msk:
             msg = "No hyperspectral product has been loaded!"
             hys.display_error(self, msg)
             return
-        if type(self.map_cube) == hys.SpectralLibrary:
+        if type(self.map_cube) is hys.SpectralLibrary:
             msg = self.map_cube.fname + "\n is a spectral library!"
             hys.display_information(self, msg)
             return
@@ -226,9 +221,6 @@ class ui_msk:
         self.gui.gui['msk_txt_file_pathname'].setText(os.path.basename(self.msk_cube.fname))
         self.gui.gui['msk_lab_file_info'].setText(self.msk_cube.get_info())
         self.msk_update_rname()
-
-
-
 
     ###############################################################################################
     #
@@ -238,16 +230,14 @@ class ui_msk:
     def msk_set_mask_dir_pathname(self):
         title = self.app_name + " - Select a soil mask directory pathname"
         dname = hys.pick_file(self, title=title, dname=self.map_dname, directory=True)
-        if dname == "": return
+        if dname == "":
+            return
         if not os.access(dname, os.W_OK):
             msg = dname + "\n is not writable"
             hys.display_error(self, msg)
             return
         self.msk_dname = dname
         self.gui.gui['msk_txt_mask_dir_pathname'].setText(dname)
-
-
-
 
     ###############################################################################################
     #
@@ -257,9 +247,6 @@ class ui_msk:
     def msk_get_mask_dir_pathname(self):
         self.msk_dname = self.map_dname
         self.gui.gui['msk_txt_mask_dir_pathname'].setText(self.msk_dname)
-
-
-
 
     ###############################################################################################
     #
@@ -277,9 +264,6 @@ class ui_msk:
         self.gui.gui['msk_ndrbi'].setText(msg)
         self.msk_display_information()
 
-
-
-
     ###############################################################################################
     #
     # SELECT NDVI
@@ -295,9 +279,6 @@ class ui_msk:
             msg = self.msk_rname + "_NDVI.dat; " + self.msk_rname + "_NDVI_mask.dat;"
         self.gui.gui['msk_ndvi'].setText(msg)
         self.msk_display_information()
-
-
-
 
     ###############################################################################################
     #
@@ -315,9 +296,6 @@ class ui_msk:
         self.gui.gui['msk_ncai'].setText(msg)
         self.msk_display_information()
 
-
-
-
     ###############################################################################################
     #
     # DISPLAY INFORMATION
@@ -325,9 +303,12 @@ class ui_msk:
     ###############################################################################################
     def msk_display_information(self):
         sm = np.zeros(3, dtype='i2')
-        if self.gui.gui['msk_set_ndrbi'].isChecked(): sm[0] = 1
-        if self.gui.gui['msk_set_ndvi'].isChecked():  sm[1] = 1
-        if self.gui.gui['msk_set_ncai'].isChecked():  sm[2] = 1
+        if self.gui.gui['msk_set_ndrbi'].isChecked():
+            sm[0] = 1
+        if self.gui.gui['msk_set_ndvi'].isChecked():
+            sm[1] = 1
+        if self.gui.gui['msk_set_ncai'].isChecked():
+            sm[2] = 1
         ind = np.where(sm == 1)
         msg = ""
         if np.size(ind[0]) > 0:
@@ -339,19 +320,22 @@ class ui_msk:
         if np.size(ind[0]) > 1:
             msg = "It will consist of the logical sum of masks provided by "
         if np.size(ind[0]) == 1:
-            if sm[0] == 1: msg += 'NDRBI'
-            if sm[1] == 1: msg += 'NDVI'
-            if sm[2] == 1: msg += 'NCAI'
+            if sm[0] == 1:
+                msg += 'NDRBI'
+            if sm[1] == 1:
+                msg += 'NDVI'
+            if sm[2] == 1:
+                msg += 'NCAI'
         if np.size(ind[0]) == 2:
-            if sm[0]==1 and sm[1] == 1: msg += 'NDRBI + NDVI'
-            if sm[0]==1 and sm[2] == 1: msg += 'NDRBI + NCAI'
-            if sm[1]==1 and sm[2] == 1: msg += 'NDVI + NCAI'
+            if sm[0] == 1 and sm[1] == 1:
+                msg += 'NDRBI + NDVI'
+            if sm[0] == 1 and sm[2] == 1:
+                msg += 'NDRBI + NCAI'
+            if sm[1] == 1 and sm[2] == 1:
+                msg += 'NDVI + NCAI'
         if np.size(ind[0]) == 3:
             msg += 'NDRBI + NDVI + NCAI'
         self.gui.gui['msk_info_line_2'].setText(msg)
-
-
-
 
     ###############################################################################################
     #
@@ -364,11 +348,11 @@ class ui_msk:
             msg = "Select a hyperspectral image file first"
             hys.display_error(self, msg)
             return
-        
-        nmask = 0
+
+        # nmask = 0
         vWater = self.gui.gui['msk_set_ndrbi'].isChecked()
-        vNDVI  = self.gui.gui['msk_set_ndvi'].isChecked()
-        vNCAI  = self.gui.gui['msk_set_ncai'].isChecked()
+        vNDVI = self.gui.gui['msk_set_ndvi'].isChecked()
+        vNCAI = self.gui.gui['msk_set_ncai'].isChecked()
         if not vWater and not vNDVI and not vNCAI:
             msg = "Select at least a soil mask"
             hys.display_error(self, msg)
@@ -427,21 +411,21 @@ class ui_msk:
                 m_ncai = hys.mask(fname=mname, src=self.msk_cube, tile=True)
             else:
                 vNCAI = False
-        
+
         # if all test failed
         if not vWater and not vNDVI and not vNCAI:
-            msg  = "There is a problem extracting bands for all products\n"
+            msg = "There is a problem extracting bands for all products\n"
             msg += "Check you product!"
             hys.display_error(self, msg)
             return
-        
+
         # define the soil dominant mask
         mname = dname + self.msk_rname + "_soildom_mask.dat"
         self.msk_mask = hys.mask(fname=mname, src=self.msk_cube, tile=True)
 
         # loop over the data tiles
         for k in range(self.msk_cube.bn):
-            self.gui.gui['msk_prog_bar'].setValue(k+1)
+            self.gui.gui['msk_prog_bar'].setValue(k + 1)
             im = self.msk_cube.read(tile=k)
             omsk = np.ones((im.shape[1], im.shape[2]), dtype=np.int16)
             if vWater:
@@ -460,20 +444,18 @@ class ui_msk:
                 m_ncai.write(np.asarray(mask).astype(np.int16), tile=k)
                 omsk *= np.asarray(mask).astype(np.int16)
             self.msk_mask.write(omsk, tile=k)
-        
+
         # update information
-        msg = "Processing complete in %8.2f seconds"%(time.time() - t1)
+        msg = "Processing complete in %8.2f seconds" % (time.time() - t1)
         hys.display_information(self, msg)
         self.gui.gui['msk_prog_bar'].setValue(0)
-
-
-
 
     ###############################################################################################
     #
     # EXPORT SOIL MASK TO MAP TAB
     #
     ###############################################################################################
+
     def msk_export(self):
         if self.msk_mask is None:
             msg = "Create a soil dominant mask first"

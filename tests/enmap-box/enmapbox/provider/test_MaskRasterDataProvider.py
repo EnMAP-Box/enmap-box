@@ -30,7 +30,7 @@ class TestMaskRasterDataProvider(TestCase):
         print(uri)
         layer = QgsRasterLayer(uri, 'mask', p.NAME)
 
-        assert layer.isValid()
+        self.assertTrue(layer.isValid())
         reader = RasterReader(layer)
         array = reader.array()
         self.assertListEqual([0, 0, 0, 0, 0], array[0][0].tolist())
@@ -49,7 +49,7 @@ class TestMaskRasterDataProvider(TestCase):
         uri = '?' + urlencode(parameters)
         layer = QgsRasterLayer(uri, 'mask', p.NAME)
 
-        assert layer.isValid()
+        self.assertTrue(layer.isValid())
         reader = RasterReader(layer)
         array = reader.array()
         self.assertListEqual([1, 1, 1, 1, 1], array[0][0].tolist())
@@ -66,7 +66,7 @@ class TestMaskRasterDataProvider(TestCase):
         uri = '?' + urlencode(parameters)
         layer = QgsRasterLayer(uri, 'mask', p.NAME)
 
-        assert layer.isValid()
+        self.assertTrue(layer.isValid())
         reader = RasterReader(layer)
         array = reader.array()
         self.assertListEqual([1, 0, 0, 1], array[0][0].tolist())
@@ -83,7 +83,7 @@ class TestMaskRasterDataProvider(TestCase):
         uri = '?' + urlencode(parameters)
         layer = QgsRasterLayer(uri, 'mask', p.NAME)
 
-        assert layer.isValid()
+        self.assertTrue(layer.isValid())
         reader = RasterReader(layer)
         array = reader.array()
         self.assertListEqual([0, 1, 1, 0], array[0][0].tolist())
@@ -109,7 +109,7 @@ class TestMaskRasterDataProvider(TestCase):
         uri = '?' + urlencode(parameters)
         layer = QgsRasterLayer(uri, 'mask', p.NAME)
 
-        assert layer.isValid()
+        self.assertTrue(layer.isValid())
         reader = RasterReader(layer)
         array = reader.array()
         self.assertListEqual([0, 0, 1, 1, 1, 1, 0, 0], array[0][0].tolist())

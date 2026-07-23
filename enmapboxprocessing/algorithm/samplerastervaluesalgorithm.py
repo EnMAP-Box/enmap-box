@@ -2,7 +2,6 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-import processing
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.creategridalgorithm import CreateGridAlgorithm
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
@@ -11,7 +10,8 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group, A
 from enmapboxprocessing.processingfeedback import ProcessingFeedback
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtCore import QVariant
+from qgis import processing
+from qgis.PyQt.QtCore import QMetaType
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsRasterLayer,
                        QgsFeature, QgsField, QgsProcessingFeatureSourceDefinition, QgsApplication,
                        QgsVectorDataProvider, QgsRasterDataProvider, QgsPoint)
@@ -95,7 +95,9 @@ class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
             skipNoDataPixel: bool, feedback: QgsProcessingFeedback, feedback2: QgsProcessingFeedback,
             context: QgsProcessingContext
     ):
-        assert Utils.isPointGeometry(vector.geometryType())
+        if not Utils.isPointGeometry(vector.geometryType()):
+            raise ValueError('vector layer must contain point geometries')
+
         alg = 'qgis:rastersampling'
         parameters = {
             'COLUMN_PREFIX': 'SAMPLE_',
@@ -109,7 +111,7 @@ class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
         # add image X, Y coordinates and find no data pixel
         rasterProvider = raster.dataProvider()
         vectorProvider: QgsVectorDataProvider = sample.dataProvider()
-        fields = [QgsField('PIXEL_X', QVariant.LongLong), QgsField('PIXEL_Y', QVariant.LongLong)]
+        fields = [QgsField('PIXEL_X', QMetaType.LongLong), QgsField('PIXEL_Y', QMetaType.LongLong)]
         vectorProvider.addAttributes(fields)
         sample.updateFields()
         noDataPixels = list()
@@ -120,7 +122,6 @@ class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
                 if feature.geometry().isNull():
                     continue
                 point = QgsPoint(feature.geometry().asPoint())
-                assert isinstance(point, QgsPoint)
                 imagePoint: QgsPoint = rasterProvider.transformCoordinates(
                     point, QgsRasterDataProvider.TransformLayerToImage
                 )
@@ -143,7 +144,8 @@ class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
             coverageMin: int, coverageMax: int, skipNoDataPixel: bool,
             feedback: ProcessingFeedback, feedback2: ProcessingFeedback, context: QgsProcessingContext
     ):
-        assert Utils.isPolygonGeometry(vector.geometryType())
+        if not Utils.isPolygonGeometry(vector.geometryType()):
+            raise ValueError('vector layer must contain polygon geometries')
 
         # create oversampling grid
         alg = CreateGridAlgorithm()

@@ -1,5 +1,5 @@
-from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
 from enmapbox.typeguard import typechecked
+from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
 
 
 @typechecked
@@ -13,10 +13,12 @@ class FitLGBMRegressorAlgorithm(FitRegressorAlgorithmBase):
                '<a href="https://lightgbm.readthedocs.io/">LightGBM </a> regressor.'
 
     def helpParameterCode(self) -> str:
-        return 'Scikit-learn python code. ' \
-               'See <a href="' \
-               'https://lightgbm.readthedocs.io/en/latest/pythonapi/lightgbm.LGBMRegressor.html#lightgbm-lgbmregressor' \
-               '">LGBMRegressor</a> for information on different parameters.'
+        return (
+            'Scikit-learn python code. '
+            'See <a href="'
+            'https://lightgbm.readthedocs.io/en/latest/pythonapi/lightgbm.LGBMRegressor.html#lightgbm-lgbmregressor'
+            '">LGBMRegressor</a> for information on different parameters.'
+        )
 
     def code(cls):
         from lightgbm import LGBMRegressor

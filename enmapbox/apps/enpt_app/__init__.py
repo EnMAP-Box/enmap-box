@@ -11,4 +11,3 @@ def enmapboxApplicationFactory(enmapBox):
             return []
 
     return [EnPTEnMAPBoxApp(enmapBox)]
-

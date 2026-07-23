@@ -21,21 +21,25 @@ Jacquemoud S., & Baret F. (1990): PROSPECT: a model of leaf optical properties s
 34, 75-91. Article.
 '''
 
-
-from scipy.special import exp1
-from lmuvegetationapps.Resources.PROSAIL.dataSpec import *
 import numpy as np
+from scipy.special import exp1
+
+from lmuvegetationapps.Resources.PROSAIL.dataSpec import (
+    lambd, Ppro_refractive, Ppro_k_Cab, Ppro_k_Ccx, Ppro_k_Canth,
+    Ppro_k_Cbrown, Ppro_k_Cw, Ppro_k_Cp, Ppro_k_Cbc, Ppro_tav90n, Ppro_t12, PD_refractive, PD_k_Cab, PD_k_Brown,
+    PD_k_Anth, PD_k_Cm, PD_k_Cw, PD_k_Car, PD_t12, PD_tav90n, P5_k_Cab, P5_refractive, P5_k_Car, P5_k_Cw, P5_k_Cm,
+    P5_t12, P4_refractive, P4_k_Cab, P4_k_Cw, P4_k_Cm, P4_tav90n, P4_t12, P5_tav90n, P5_k_Brown)
+
 
 class Prospect:
-
     nlambd = len(lambd)
 
     def prospect_Pro(self, N, Cab, Car, Anth, Cp, Cbc, Cbrown, Cw):  # Does not contain Cm
 
         n = Ppro_refractive
-        k = (np.outer(Cab, Ppro_k_Cab) + np.outer(Car, Ppro_k_Ccx) + np.outer(Anth, Ppro_k_Canth) +
-             np.outer(Cbrown, Ppro_k_Cbrown) + np.outer(Cw, Ppro_k_Cw) +  # np.outer(Cm, Ppro_k_Cm)
-             np.outer(Cp, Ppro_k_Cp) + np.outer(Cbc, Ppro_k_Cbc)) / N[:, np.newaxis]
+        k = (np.outer(Cab, Ppro_k_Cab) + np.outer(Car, Ppro_k_Ccx) + np.outer(Anth, Ppro_k_Canth)
+             + np.outer(Cbrown, Ppro_k_Cbrown) + np.outer(Cw, Ppro_k_Cw)  # np.outer(Cm, Ppro_k_Cm)  # noqa
+             + np.outer(Cp, Ppro_k_Cp) + np.outer(Cbc, Ppro_k_Cbc)) / N[:, np.newaxis]  # noqa
 
         ind_k0_row, ind_k0_col = np.where(k == 0)  # Vectorize = 2D
 
@@ -71,15 +75,17 @@ class Prospect:
 
         ind_vb_le_row, ind_vb_le_col = np.where(va * (beta - r90) <= 1e-14)
         ind_vb_gt_row, ind_vb_gt_col = np.where(va * (beta - r90) > 1e-14)
-        vb[ind_vb_le_row, ind_vb_le_col] = np.sqrt(beta[ind_vb_le_row, ind_vb_le_col] *
-                                                   (va[ind_vb_le_row, ind_vb_le_col] - r90[
-                                                       ind_vb_le_row, ind_vb_le_col]) / (1e-14))
-        vb[ind_vb_gt_row, ind_vb_gt_col] = np.sqrt(beta[ind_vb_gt_row, ind_vb_gt_col] *
-                                                   (va[ind_vb_gt_row, ind_vb_gt_col] - r90[
-                                                       ind_vb_gt_row, ind_vb_gt_col]) /
-                                                   (va[ind_vb_gt_row, ind_vb_gt_col] *
-                                                    (beta[ind_vb_gt_row, ind_vb_gt_col] - r90[
-                                                        ind_vb_gt_row, ind_vb_gt_col])))
+        vb[ind_vb_le_row, ind_vb_le_col] = np.sqrt(
+            beta[ind_vb_le_row, ind_vb_le_col]
+            * (va[ind_vb_le_row, ind_vb_le_col] - r90[ind_vb_le_row, ind_vb_le_col]) / (1e-14)  # noqa
+        )
+        vb[ind_vb_gt_row, ind_vb_gt_col] = np.sqrt(
+            beta[ind_vb_gt_row, ind_vb_gt_col]
+            * (va[ind_vb_gt_row, ind_vb_gt_col] - r90[ind_vb_gt_row, ind_vb_gt_col])  # noqa
+            / (va[ind_vb_gt_row, ind_vb_gt_col]  # noqa
+               * (beta[ind_vb_gt_row, ind_vb_gt_col] - r90[ind_vb_gt_row, ind_vb_gt_col])  # noqa
+               )
+        )
 
         vbNN = vb ** ((N - 1)[:, np.newaxis])
         vbNNinv = 1 / vbNN
@@ -99,12 +105,17 @@ class Prospect:
 
     def prospect_D(self, N, Cab, Car, Anth, Cbrown, Cw, Cm):
         n = PD_refractive
-        k = (np.outer(Cab, PD_k_Cab) + np.outer(Car, PD_k_Car) + np.outer(Anth, PD_k_Anth) +
-             np.outer(Cbrown, PD_k_Brown) + np.outer(Cw, PD_k_Cw) + np.outer(Cm, PD_k_Cm)) / N[:, np.newaxis]
+        k = (np.outer(Cab, PD_k_Cab)
+             + np.outer(Car, PD_k_Car)  # noqa
+             + np.outer(Anth, PD_k_Anth)  # noqa
+             + np.outer(Cbrown, PD_k_Brown)  # noqa
+             + np.outer(Cw, PD_k_Cw)  # noqa
+             + np.outer(Cm, PD_k_Cm)  # noqa
+             ) / N[:, np.newaxis]
 
         ind_k0_row, ind_k0_col = np.where(k == 0)  # Vectorize = 2D
 
-        if len(ind_k0_row) > 0: 
+        if len(ind_k0_row) > 0:
             k[ind_k0_row, ind_k0_col] = np.finfo(float).eps
         trans = (1 - k) * np.exp(-k) + (k ** 2) * exp1(k)
         trans2 = trans ** 2
@@ -134,14 +145,19 @@ class Prospect:
 
         vb = np.zeros((Cab.shape[0], self.nlambd))
 
-        ind_vb_le_row, ind_vb_le_col = np.where(va * (beta-r90) <= 1e-14)
-        ind_vb_gt_row, ind_vb_gt_col = np.where(va * (beta-r90) > 1e-14)
-        vb[ind_vb_le_row, ind_vb_le_col] = np.sqrt(beta[ind_vb_le_row, ind_vb_le_col] * 
-                                                   (va[ind_vb_le_row, ind_vb_le_col] - r90[ind_vb_le_row, ind_vb_le_col]) / (1e-14))
-        vb[ind_vb_gt_row, ind_vb_gt_col] = np.sqrt(beta[ind_vb_gt_row, ind_vb_gt_col] * 
-                                                   (va[ind_vb_gt_row, ind_vb_gt_col] - r90[ind_vb_gt_row, ind_vb_gt_col]) / 
-                                                   (va[ind_vb_gt_row, ind_vb_gt_col] * 
-                                                    (beta[ind_vb_gt_row, ind_vb_gt_col] - r90[ind_vb_gt_row, ind_vb_gt_col])))
+        ind_vb_le_row, ind_vb_le_col = np.where(va * (beta - r90) <= 1e-14)
+        ind_vb_gt_row, ind_vb_gt_col = np.where(va * (beta - r90) > 1e-14)
+        vb[ind_vb_le_row, ind_vb_le_col] = np.sqrt(
+            beta[ind_vb_le_row, ind_vb_le_col]
+            * (va[ind_vb_le_row, ind_vb_le_col] - r90[ind_vb_le_row, ind_vb_le_col]) / (1e-14)  # noqa
+        )
+        vb[ind_vb_gt_row, ind_vb_gt_col] = np.sqrt(
+            beta[ind_vb_gt_row, ind_vb_gt_col]
+            * (va[ind_vb_gt_row, ind_vb_gt_col] - r90[ind_vb_gt_row, ind_vb_gt_col])  # noqa
+            / (va[ind_vb_gt_row, ind_vb_gt_col]  # noqa
+               * (beta[ind_vb_gt_row, ind_vb_gt_col] - r90[ind_vb_gt_row, ind_vb_gt_col])  # noqa
+               )
+        )
 
         vbNN = vb ** ((N - 1)[:, np.newaxis])
         vbNNinv = 1 / vbNN
@@ -159,10 +175,11 @@ class Prospect:
 
         return LRT
 
-    def prospect_5(self,N,Cab,Car,Cw,Cm):
+    def prospect_5(self, N, Cab, Car, Cw, Cm):
 
         n = P5_refractive
-        k = (np.outer(Cab, P5_k_Cab) + np.outer(Car, P5_k_Car) + np.outer(Cw, P5_k_Cw) + np.outer(Cm, P5_k_Cm)) / N[:, np.newaxis]
+        k = (np.outer(Cab, P5_k_Cab) + np.outer(Car, P5_k_Car) + np.outer(Cw, P5_k_Cw) + np.outer(Cm, P5_k_Cm)) / N[
+            :, np.newaxis]
 
         ind_k0_row, ind_k0_col = np.where(k == 0)  # Vectorize = 2D
 
@@ -198,15 +215,17 @@ class Prospect:
 
         ind_vb_le_row, ind_vb_le_col = np.where(va * (beta - r90) <= 1e-14)
         ind_vb_gt_row, ind_vb_gt_col = np.where(va * (beta - r90) > 1e-14)
-        vb[ind_vb_le_row, ind_vb_le_col] = np.sqrt(beta[ind_vb_le_row, ind_vb_le_col] *
-                                                   (va[ind_vb_le_row, ind_vb_le_col] - r90[
-                                                       ind_vb_le_row, ind_vb_le_col]) / (1e-14))
-        vb[ind_vb_gt_row, ind_vb_gt_col] = np.sqrt(beta[ind_vb_gt_row, ind_vb_gt_col] *
-                                                   (va[ind_vb_gt_row, ind_vb_gt_col] - r90[
-                                                       ind_vb_gt_row, ind_vb_gt_col]) /
-                                                   (va[ind_vb_gt_row, ind_vb_gt_col] *
-                                                    (beta[ind_vb_gt_row, ind_vb_gt_col] - r90[
-                                                        ind_vb_gt_row, ind_vb_gt_col])))
+        vb[ind_vb_le_row, ind_vb_le_col] = np.sqrt(
+            beta[ind_vb_le_row, ind_vb_le_col]
+            * (va[ind_vb_le_row, ind_vb_le_col] - r90[ind_vb_le_row, ind_vb_le_col]) / (1e-14)  # noqa
+        )
+        vb[ind_vb_gt_row, ind_vb_gt_col] = np.sqrt(
+            beta[ind_vb_gt_row, ind_vb_gt_col]
+            * (va[ind_vb_gt_row, ind_vb_gt_col] - r90[ind_vb_gt_row, ind_vb_gt_col])  # noqa
+            / (va[ind_vb_gt_row, ind_vb_gt_col]  # noqa
+               * (beta[ind_vb_gt_row, ind_vb_gt_col] - r90[ind_vb_gt_row, ind_vb_gt_col])  # noqa
+               )
+        )
 
         vbNN = vb ** ((N - 1)[:, np.newaxis])
         vbNNinv = 1 / vbNN
@@ -227,8 +246,8 @@ class Prospect:
     def prospect_5B(self, N, Cab, Car, Cbrown, Cw, Cm):
 
         n = P5_refractive
-        k = (np.outer(Cab, P5_k_Cab) + np.outer(Car, P5_k_Car) + 
-             np.outer(Cbrown, P5_k_Brown) + np.outer(Cw, P5_k_Cw) + np.outer(Cm, P5_k_Cm)) / N[:, np.newaxis]
+        k = (np.outer(Cab, P5_k_Cab) + np.outer(Car, P5_k_Car)
+             + np.outer(Cbrown, P5_k_Brown) + np.outer(Cw, P5_k_Cw) + np.outer(Cm, P5_k_Cm)) / N[:, np.newaxis]  # noqa
 
         ind_k0_row, ind_k0_col = np.where(k == 0)  # Vectorize = 2D
 
@@ -264,15 +283,18 @@ class Prospect:
 
         ind_vb_le_row, ind_vb_le_col = np.where(va * (beta - r90) <= 1e-14)
         ind_vb_gt_row, ind_vb_gt_col = np.where(va * (beta - r90) > 1e-14)
-        vb[ind_vb_le_row, ind_vb_le_col] = np.sqrt(beta[ind_vb_le_row, ind_vb_le_col] *
-                                                   (va[ind_vb_le_row, ind_vb_le_col] - r90[
-                                                       ind_vb_le_row, ind_vb_le_col]) / (1e-14))
-        vb[ind_vb_gt_row, ind_vb_gt_col] = np.sqrt(beta[ind_vb_gt_row, ind_vb_gt_col] *
-                                                   (va[ind_vb_gt_row, ind_vb_gt_col] - r90[
-                                                       ind_vb_gt_row, ind_vb_gt_col]) /
-                                                   (va[ind_vb_gt_row, ind_vb_gt_col] *
-                                                    (beta[ind_vb_gt_row, ind_vb_gt_col] - r90[
-                                                        ind_vb_gt_row, ind_vb_gt_col])))
+        vb[ind_vb_le_row, ind_vb_le_col] = np.sqrt(
+            beta[ind_vb_le_row, ind_vb_le_col]
+            * (va[ind_vb_le_row, ind_vb_le_col]  # noqa
+               - r90[ind_vb_le_row, ind_vb_le_col]) / (1e-14)  # noqa
+        )
+        vb[ind_vb_gt_row, ind_vb_gt_col] = np.sqrt(
+            beta[ind_vb_gt_row, ind_vb_gt_col]
+            * (va[ind_vb_gt_row, ind_vb_gt_col] - r90[ind_vb_gt_row, ind_vb_gt_col])  # noqa
+            / (va[ind_vb_gt_row, ind_vb_gt_col]  # noqa
+               * (beta[ind_vb_gt_row, ind_vb_gt_col] - r90[ind_vb_gt_row, ind_vb_gt_col])  # noqa
+               )
+        )
 
         vbNN = vb ** ((N - 1)[:, np.newaxis])
         vbNNinv = 1 / vbNN
@@ -328,15 +350,17 @@ class Prospect:
 
         ind_vb_le_row, ind_vb_le_col = np.where(va * (beta - r90) <= 1e-14)
         ind_vb_gt_row, ind_vb_gt_col = np.where(va * (beta - r90) > 1e-14)
-        vb[ind_vb_le_row, ind_vb_le_col] = np.sqrt(beta[ind_vb_le_row, ind_vb_le_col] *
-                                                   (va[ind_vb_le_row, ind_vb_le_col] - r90[
-                                                       ind_vb_le_row, ind_vb_le_col]) / (1e-14))
-        vb[ind_vb_gt_row, ind_vb_gt_col] = np.sqrt(beta[ind_vb_gt_row, ind_vb_gt_col] *
-                                                   (va[ind_vb_gt_row, ind_vb_gt_col] - r90[
-                                                       ind_vb_gt_row, ind_vb_gt_col]) /
-                                                   (va[ind_vb_gt_row, ind_vb_gt_col] *
-                                                    (beta[ind_vb_gt_row, ind_vb_gt_col] - r90[
-                                                        ind_vb_gt_row, ind_vb_gt_col])))
+        vb[ind_vb_le_row, ind_vb_le_col] = np.sqrt(
+            beta[ind_vb_le_row, ind_vb_le_col]
+            * (va[ind_vb_le_row, ind_vb_le_col] - r90[ind_vb_le_row, ind_vb_le_col]) / (1e-14)  # noqa
+        )
+        vb[ind_vb_gt_row, ind_vb_gt_col] = np.sqrt(
+            beta[ind_vb_gt_row, ind_vb_gt_col]
+            * (va[ind_vb_gt_row, ind_vb_gt_col] - r90[ind_vb_gt_row, ind_vb_gt_col])  # noqa
+            / (va[ind_vb_gt_row, ind_vb_gt_col]  # noqa
+               * (beta[ind_vb_gt_row, ind_vb_gt_col] - r90[ind_vb_gt_row, ind_vb_gt_col])  # noqa
+               )
+        )
 
         vbNN = vb ** ((N - 1)[:, np.newaxis])
         vbNNinv = 1 / vbNN

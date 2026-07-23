@@ -13,7 +13,7 @@
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
-                                                                                                                                                 *
+
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -31,13 +31,17 @@ but new algorithms can always be created manually by updating the values in this
 can do both training and prediction, the GUIs are split into different scripts.
 
 """
+import os
 
-from _classic.hubflow.core import *
+import joblib
+# from _classic.hubdc.core import openRasterDataset, RasterDataset, EnviDriver
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.neural_network import MLPRegressor
 from sklearn.preprocessing import StandardScaler
-import joblib
+
+from enmapboxprocessing.driver import Driver
+from enmapboxprocessing.rasterreader import RasterReader
 
 
 # Class MLRATraining will only be used for training new models, not for predictions!
@@ -95,10 +99,17 @@ class Functions:
     @staticmethod
     def _read_image(image, dtype=np.float16):
         # Method for loading bsq images, no bands are skipped anymore
-        dataset = openRasterDataset(image)
-        in_matrix = dataset.readAsArray().astype(dtype=dtype)
+        # dataset = openRasterDataset(image)
+        # in_matrix = dataset.readAsArray().astype(dtype=dtype)
+        # grid = dataset.grid()
+
+        reader = RasterReader(image)
+        array = np.array(reader.array())
+        in_matrix = array
+
         nbands, nrows, ncols = in_matrix.shape
-        grid = dataset.grid()
+
+        grid = reader.extent(), reader.crs()
 
         return nrows, ncols, nbands, grid, in_matrix  # return a tuple back to the last function (type "dtype")
 
@@ -106,25 +117,39 @@ class Functions:
     def write_image(out_matrix, image_out, grid, paras_out, nodat, out_mode):
         # Method for writing output to binary raster file
         if out_mode == 'single':  # write one single file with multiple bands
-            output = RasterDataset.fromArray(array=out_matrix, filename=image_out, grid=grid,
-                                             driver=EnviDriver())
-            output.setMetadataItem('data ignore value', nodat, 'ENVI')
+            # output = RasterDataset.fromArray(array=out_matrix, filename=image_out, grid=grid,
+            #                                 driver=EnviDriver())
 
-            for iband, band in enumerate(output.bands()):
-                band.setDescription(paras_out[iband])
-                band.setNoDataValue(nodat)
+            array = out_matrix
+            filename = image_out
+            extent, crs = grid
+            writer = Driver(filename).createFromArray(array, extent, crs)
+            writer.setMetadataItem('data ignore value', nodat, 'ENVI')
+
+            for bandNo in writer.bandNumbers():
+                writer.setBandName(paras_out[bandNo - 1], bandNo)
+                writer.setNoDataValue(nodat, bandNo)
+
+            writer.close()
 
         else:  # write several files, one per parameters
             for ipara in range(len(paras_out)):
                 # naming convention: drop extension, add para name, add extension
                 base, ext = os.path.splitext(image_out)
                 image_out_individual = base + "_" + paras_out[ipara] + ext
-                output = RasterDataset.fromArray(array=out_matrix[ipara, :, :], filename=image_out_individual,
-                                                 grid=grid, driver=EnviDriver())
-                output.setMetadataItem('data ignore value', nodat, 'ENVI')
-                band = next(output.bands())  # output.bands() is a generator; here only one band
-                band.setDescription(paras_out[ipara])
-                band.setNoDataValue(nodat)
+                # output = RasterDataset.fromArray(array=out_matrix[ipara, :, :], filename=image_out_individual,
+                #                                 grid=grid, driver=EnviDriver())
+
+                array = out_matrix[ipara, :, :]
+                filename = image_out_individual
+                extent, crs = grid
+                writer = Driver(filename).createFromArray(array, extent, crs)
+                writer.setMetadataItem('data ignore value', nodat, 'ENVI')
+                bandNo = 1
+                writer.setBandName(paras_out[ipara], bandNo)
+                writer.setNoDataValue(nodat, bandNo)
+
+                writer.close()
 
     def read_geometry(self, geo_in):
         # Read geometry from input file (raster based)
@@ -284,9 +309,12 @@ class ProcessorTraining:
                                                                                                         nmodels_total))
                             qgis_app.processEvents()
                         else:  # if no progress bar exists, e.g. code is run from _exec.py
-                            print("Training {} Noise {:d}-{:d} | {} | Geo {:d} of {:d}".format(
-                                self.algorithm, self.noise_type, self.sigma, para, geo_ensemble + 1,
-                                                                                   self.ntts * self.ntto * self.npsi))
+                            print(
+                                "Training {} Noise {:d}-{:d} | {} | Geo {:d} of {:d}".format(
+                                    self.algorithm, self.noise_type, self.sigma, para, geo_ensemble + 1,
+                                    self.ntts * self.ntto * self.npsi
+                                )
+                            )
 
                         self.init_model(var=para)  # initialize the model with the given settings
 
@@ -423,14 +451,20 @@ class ProcessorPrediction:
         self.m = main
 
         # Some basic information about the algorithm; svr is added just for the sake of demonstration
-        self.mlra_meta = {'ann':
-                              {'name': 'ann',
-                               'file_ext': '.ann',
-                               'file_name': 'ann_mlp'},
-                          'svr':
-                              {'name': 'svr',
-                               'file_ext': '.svr',
-                               'file_name': 'svr'}}
+        self.mlra_meta = {
+            'ann':
+                {
+                    'name': 'ann',
+                    'file_ext': '.ann',
+                    'file_name': 'ann_mlp'
+                },
+            'svr':
+                {
+                    'name': 'svr',
+                    'file_ext': '.svr',
+                    'file_name': 'svr'
+                }
+        }
 
     def prediction_setup(self, model_meta, img_in, res_out, out_mode, mask_ndvi, ndvi_thr, ndvi_bands, mask_image,
                          geo_in, spatial_geo, paras, algorithm='ann', fixed_geos=None, nodat=None):
@@ -535,10 +569,14 @@ class ProcessorPrediction:
         # Find out coordinates for which ALL constraints hold True in each "whichModel"
         # The result is a "map" in which each pixel stores the ID of the model to be used (depending on geometry)
         for iwhichModel in self.whichModel_unique:  # Mask depending on constraints
-            whichModel_coords.append(np.where((whichModel[:, :] == iwhichModel) &  # present Model
-                                              (self.mask[0, :, :] > 0 if self.mask_image else all_true) &  # not masked
-                                              (self.ndvi_mask > 0 if self.mask_ndvi else all_true) &  # NDVI masked
-                                              (~np.all(in_matrix == self.nodat[0], axis=0))))  # not NoDatVal
+            whichModel_coords.append(
+                np.where(
+                    (whichModel[:, :] == iwhichModel)  # present Model
+                    & (self.mask[0, :, :] > 0 if self.mask_image else all_true)  # noqa # not masked
+                    & (self.ndvi_mask > 0 if self.mask_ndvi else all_true)  # noqa # NDVI masked
+                    & (~np.all(in_matrix == self.nodat[0], axis=0))  # noqa
+                )
+            )  # not NoDatVal
 
         _, nrows, ncols = in_matrix.shape
         # Prepare output-matrix and will it with nodata
@@ -606,8 +644,9 @@ class ProcessorPrediction:
                     continue  # after masking, not all 'imodels' are present in the image_copy
 
                 # This is the core "predict" command in which the algorithm is asked to estimate from what it has learnt
-                result = mod[imodel].predict(image_copy[whichModel_coords[i_imodel][0],
-                                             whichModel_coords[i_imodel][1], :])
+                result = mod[imodel].predict(
+                    image_copy[whichModel_coords[i_imodel][0], whichModel_coords[i_imodel][1], :]
+                )
 
                 # Convert the results and put it into the right position
                 # out_matrix[parameter, row, col], row and col is stored in the coordinates of whichModel

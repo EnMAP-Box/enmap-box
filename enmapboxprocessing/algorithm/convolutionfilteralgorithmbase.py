@@ -5,12 +5,12 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -24,7 +24,11 @@ class ConvolutionFilterAlgorithmBase(EnMAPProcessingAlgorithm):
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
             (self._RASTER, 'Raster layer to be filtered.'),
-            (self._KERNEL, self.helpParameterCode()),
+            (
+                self._KERNEL, self.helpParameterCode()
+                + '\nNote: The Python code provided here is executed locally with the permissions '  # noqa: W503
+                  'of the current user during algorithm execution.'
+            ),
             (self._NORMALIZE, 'Whether to normalize the kernel to have a sum of one.'),
             (self._INTERPOLATE, 'Whether to interpolate no data pixel. '
                                 'Will result in renormalization of the kernel at each position ignoring '
@@ -71,7 +75,10 @@ class ConvolutionFilterAlgorithmBase(EnMAPProcessingAlgorithm):
     def parameterAsKernel(self, parameters: Dict[str, Any], name, context: QgsProcessingContext):
         namespace = dict()
         code = self.parameterAsString(parameters, name, context)
-        exec(code, namespace)
+
+        # nosec B102 # User-defined scipy/numpy code execution by design; equivalent to the QGIS Python Console.
+        # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
+        exec(code, namespace)  # nosec B102 # User-defined scipy/numpy code execution by design;
         kernel = namespace['kernel']
         return kernel
 
@@ -83,14 +90,20 @@ class ConvolutionFilterAlgorithmBase(EnMAPProcessingAlgorithm):
         try:
             from astropy.convolution import Kernel
             kernel = self.parameterAsKernel(parameters, self.P_KERNEL, context)
-            assert isinstance(kernel, Kernel)
-            assert 1 <= kernel.dimension <= 3
+            if not isinstance(kernel, Kernel):
+                raise TypeError(
+                    f'expected Kernel, got {type(kernel).__name__}'
+                )
+            if not 1 <= kernel.dimension <= 3:
+                raise ValueError(
+                    f'kernel dimension must be between 1 and 3, got {kernel.dimension}'
+                )
         except Exception:
             return False, traceback.format_exc()
         return True, ''
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         kernel = self.parameterAsKernel(parameters, self.P_KERNEL, context)

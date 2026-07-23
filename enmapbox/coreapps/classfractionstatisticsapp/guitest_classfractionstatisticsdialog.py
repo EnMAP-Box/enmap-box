@@ -1,10 +1,10 @@
-from qgis.core import QgsRasterLayer
-
 from classfractionstatisticsapp.classfractionstatisticsdialog import ClassFractionStatisticsDialog
+
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from enmapboxtestdata import fraction_map_l3, landcover_map_l3
+from qgis.core import QgsRasterLayer
 
 qgsApp = start_app()
 initAll()
@@ -18,4 +18,4 @@ widget = ClassFractionStatisticsDialog()
 widget.show()
 widget.mLayer.setLayer(layer)
 
-qgsApp.exec_()
+qgsApp.exec()

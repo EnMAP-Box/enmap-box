@@ -1,17 +1,18 @@
 from classificationdatasetmanagerapp import ClassificationDatasetManagerGui
+
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from enmapboxprocessing.utils import Utils
-from tests.enmapboxtestdata import classifierDumpPkl
+from tests.enmapboxtestdata import classifierDumpSkops
 
 qgsApp = start_app()
 enmapBox = EnMAPBox()
 enmapBox.run()
 
-Utils.pickleDump(Utils.pickleLoad(classifierDumpPkl), 'classifier.pkl')
-enmapBox.addSource('classifier.pkl')
+Utils.modelDump(Utils.modelLoad(classifierDumpSkops), 'classifier.skops')
+enmapBox.addSource('classifier.skops')
 
 widget = ClassificationDatasetManagerGui(enmapBox.ui)
 widget.show()
 
-qgsApp.exec_()
+qgsApp.exec()

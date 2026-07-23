@@ -34,5 +34,8 @@ class SpatialMorphologicalGradientAlgorithm(SpatialFilterFunctionAlgorithmBase):
 
         structure = generate_binary_structure(rank=2, connectivity=1)
         structure = iterate_structure(structure=structure, iterations=1)
-        function = lambda array: morphological_gradient(array, structure=structure)
+
+        def function(array):
+            return morphological_gradient(array, structure=structure)
+
         return function

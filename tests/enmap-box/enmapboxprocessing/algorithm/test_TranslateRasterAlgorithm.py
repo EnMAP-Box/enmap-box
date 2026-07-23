@@ -197,7 +197,7 @@ class TestTranslateAlgorithm(TestCase):
             alg.P_CREATION_PROFILE: alg.DefaultGTiffCreationProfile,
             alg.P_OUTPUT_RASTER: self.filename('enmap.tif')
         }
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)
 
     def test_clipSourceGrid_byFullExtent(self):
         raster = QgsRasterLayer(enmap)
@@ -331,7 +331,6 @@ class TestTranslateAlgorithm(TestCase):
         }
         result = self.runalg(alg, parameters)
         reader = RasterReader(result[alg.P_OUTPUT_RASTER])
-        array = reader.array()[0]
         self.assertEqual(-1356439.5, reader.array()[0].sum())
 
     def test_unsetScrNoData(self):
@@ -479,14 +478,14 @@ class TestTranslateAlgorithm(TestCase):
         gdal.Translate(filename2, filename)
         ds2: gdal.Dataset = gdal.Open(filename2)
         rb2: gdal.Band = ds2.GetRasterBand(1)
-        assert rb2.GetScale() == 0.01
+        self.assertEqual(rb2.GetScale(), 0.01)
 
         # After setting a metadata item, the scale factor is still correct.
         # rb2.SetMetadataItem('myKey', '42', '')
-        assert rb2.GetScale() == 0.01
+        self.assertEqual(rb2.GetScale(), 0.01)
         del ds2, rb2
 
         # But after re-opening the raster, the scale factor is missing (i.e. set to 1 -> no scaling).
         ds3 = gdal.Open(filename2)
         rb3 = ds3.GetRasterBand(1)
-        assert rb3.GetScale() == 0.01  # THIS WILL FAIL
+        self.assertEqual(rb3.GetScale(), 0.01)  # THIS WILL FAIL

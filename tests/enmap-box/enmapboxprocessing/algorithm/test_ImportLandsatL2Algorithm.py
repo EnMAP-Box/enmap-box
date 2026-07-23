@@ -17,8 +17,7 @@ class TestImportLandsatL2Algorithm(TestCase):
         }
 
         result = self.runalg(alg, parameters)
-        array = RasterReader(result[alg.P_OUTPUT_RASTER]).array(bandList=[1])
-        # self.assertEqual(25984874883, round(np.sum(array, dtype=float)))
+        RasterReader(result[alg.P_OUTPUT_RASTER]).array(bandList=[1])
 
     def test_L8_C2(self):
         if sensorProductsRoot() is None or self.skipProductImport:
@@ -31,8 +30,7 @@ class TestImportLandsatL2Algorithm(TestCase):
         }
 
         result = self.runalg(alg, parameters)
-        array = RasterReader(result[alg.P_OUTPUT_RASTER]).array(bandList=[1])
-        # self.assertEqual(25984874883, round(np.sum(array, dtype=float)))
+        RasterReader(result[alg.P_OUTPUT_RASTER]).array(bandList=[1])
 
     def test_L7_C2(self):
         if sensorProductsRoot() is None or self.skipProductImport:
@@ -45,8 +43,7 @@ class TestImportLandsatL2Algorithm(TestCase):
         }
 
         result = self.runalg(alg, parameters)
-        array = RasterReader(result[alg.P_OUTPUT_RASTER]).array(bandList=[1])
-        # self.assertEqual(14003330657, round(np.sum(array, dtype=float)))
+        RasterReader(result[alg.P_OUTPUT_RASTER]).array(bandList=[1])
 
     def test_L5_C2(self):
         if sensorProductsRoot() is None or self.skipProductImport:
@@ -59,8 +56,7 @@ class TestImportLandsatL2Algorithm(TestCase):
         }
 
         result = self.runalg(alg, parameters)
-        array = RasterReader(result[alg.P_OUTPUT_RASTER]).array(bandList=[1])
-        # self.assertEqual(31240899446, round(np.sum(array, dtype=float)))
+        RasterReader(result[alg.P_OUTPUT_RASTER]).array(bandList=[1])
 
     def test_saveAsTif(self):
         if sensorProductsRoot() is None or self.skipProductImport:
@@ -72,4 +68,4 @@ class TestImportLandsatL2Algorithm(TestCase):
             alg.P_OUTPUT_RASTER: self.filename('landsat9L2C2.tif')
         }
 
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)

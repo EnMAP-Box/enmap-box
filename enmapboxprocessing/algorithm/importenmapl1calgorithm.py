@@ -1,6 +1,6 @@
 from os.path import basename
 from typing import Dict, Any, List, Tuple
-from xml.etree import ElementTree
+from defusedxml import ElementTree
 
 from osgeo import gdal
 
@@ -42,9 +42,7 @@ class ImportEnmapL1CAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterVrtDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 
     def isValidFile(self, file: str) -> bool:
-        return basename(file).startswith('ENMAP') & \
-               basename(file).endswith('METADATA.XML') & \
-               ('L1C' in basename(file))
+        return basename(file).startswith('ENMAP') & basename(file).endswith('METADATA.XML') & ('L1C' in basename(file))
 
     def defaultParameters(self, xmlFilename: str):
         return {
@@ -78,9 +76,7 @@ class ImportEnmapL1CAlgorithm(EnMAPProcessingAlgorithm):
             offsets = [item.text for item in root.findall('specific/bandCharacterisation/bandID/OffsetOfBand')]
 
             # create VRTs
-            ds = gdal.Open(ImportEnmapL1BAlgorithm.findFilename(
-                xmlFilename.replace('-METADATA.XML', '-SPECTRAL_IMAGE'))
-            )
+            ds = gdal.Open(ImportEnmapL1BAlgorithm.findSpectralImageFilename(xmlFilename, '-SPECTRAL_IMAGE'))
             ds: gdal.Dataset = gdal.Translate(filename, ds)
             ds.SetMetadataItem('wavelength', '{' + ', '.join(wavelength[:ds.RasterCount]) + '}', 'ENVI')
             ds.SetMetadataItem('wavelength_units', 'nanometers', 'ENVI')

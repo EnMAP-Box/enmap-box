@@ -21,10 +21,10 @@ class TestPrepareClassificationDatasetFromCategorizedLibrary(TestCase):
         alg = PrepareClassificationDatasetFromCategorizedLibraryAlgorithm()
         parameters = {
             alg.P_CATEGORIZED_LIBRARY: library_gpkg,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = ClassifierDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((75, 177), dump.X.shape)
         self.assertEqual((75, 1), dump.y.shape)
         self.assertEqual(177, len(dump.features))
@@ -34,10 +34,10 @@ class TestPrepareClassificationDatasetFromCategorizedLibrary(TestCase):
         parameters = {
             alg.P_CATEGORIZED_LIBRARY: library_gpkg,
             alg.P_FIELD: 'profiles',
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = ClassifierDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((75, 177), dump.X.shape)
         self.assertEqual((75, 1), dump.y.shape)
         self.assertEqual(177, len(dump.features))
@@ -48,7 +48,7 @@ class TestPrepareClassificationDatasetFromCategorizedLibrary(TestCase):
             alg.P_CATEGORIZED_LIBRARY: library_gpkg,
             # alg.P_FIELD: 'profiles',
             alg.P_CATEGORY_FIELD: 'profiles',
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         try:
             self.runalg(alg, parameters)
@@ -60,7 +60,7 @@ class TestPrepareClassificationDatasetFromCategorizedLibrary(TestCase):
         parameters = {
             alg.P_CATEGORIZED_LIBRARY: library_gpkg,
             alg.P_FIELD: 'level_1',
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         try:
             self.runalg(alg, parameters)
@@ -73,10 +73,10 @@ class TestPrepareClassificationDatasetFromCategorizedLibrary(TestCase):
         parameters = {
             alg.P_CATEGORIZED_LIBRARY: libraryWithBadBands,
             alg.P_EXCLUDE_BAD_BANDS: True,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = ClassifierDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((1, 2), dump.X.shape)
         self.assertEqual(2, len(dump.features))
 
@@ -86,10 +86,10 @@ class TestPrepareClassificationDatasetFromCategorizedLibrary(TestCase):
         parameters = {
             alg.P_CATEGORIZED_LIBRARY: libraryWithBadBands,
             alg.P_EXCLUDE_BAD_BANDS: False,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = ClassifierDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual((2, 4), dump.X.shape)
         self.assertEqual(4, len(dump.features))
 
@@ -109,10 +109,10 @@ class TestPrepareClassificationDatasetFromCategorizedLibrary(TestCase):
         alg = PrepareClassificationDatasetFromCategorizedLibraryAlgorithm()
         parameters = {
             alg.P_CATEGORIZED_LIBRARY: layer,
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
+        dump = ClassifierDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
         self.assertEqual(
             QgsCoordinateReferenceSystem.fromEpsgId(4326), QgsCoordinateReferenceSystem.fromWkt(dump.crs)
         )
@@ -121,12 +121,11 @@ class TestPrepareClassificationDatasetFromCategorizedLibrary(TestCase):
     def _test_BUG(self):
         alg = PrepareClassificationDatasetFromCategorizedLibraryAlgorithm()
         parameters = {
-            alg.P_CATEGORIZED_LIBRARY: r'C:\Users\Andreas\Downloads\data_austausch_unmixing\endm_w_gv_npv_2023_06_library.gpkg',
-            alg.P_OUTPUT_DATASET: self.filename('sample.pkl')
+            alg.P_CATEGORIZED_LIBRARY: r'C:\Users\janzandr\Downloads\library.geojson',
+            alg.P_FIELD: 'profiles',
+            alg.P_CATEGORY_FIELD: 'name',
+            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
-        dump = ClassifierDump(**Utils.pickleLoad(parameters[alg.P_OUTPUT_DATASET]))
-        self.assertEqual(
-            QgsCoordinateReferenceSystem.fromEpsgId(4326), QgsCoordinateReferenceSystem.fromWkt(dump.crs)
-        )
-        self.assertEqual((1, 2), tuple(dump.locations[0]))
+        dump = ClassifierDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
+        print(dump)

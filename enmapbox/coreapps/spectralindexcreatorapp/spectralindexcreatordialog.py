@@ -1,10 +1,10 @@
 from math import inf
 from typing import Optional
 
-import processing
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
+from qgis import processing
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QTableWidget, QListWidget, \
     QListWidgetItem, QLabel, QCheckBox, QLineEdit

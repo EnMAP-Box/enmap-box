@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>ImageCube</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../../gui/ui/icons/enmapbox.png</normaloff>../../gui/ui/icons/enmapbox.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
@@ -48,9 +52,9 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>0</y>
-          <width>330</width>
-          <height>618</height>
+          <y>-51</y>
+          <width>325</width>
+          <height>662</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -475,7 +479,7 @@
      <x>0</x>
      <y>0</y>
      <width>816</width>
-     <height>26</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>
@@ -507,7 +511,7 @@
   </action>
   <action name="actionSetExtent">
    <property name="icon">
-    <iconset resource="../../../../QGIS/images/images.qrc">
+    <iconset>
      <normaloff>:/images/themes/default/mActionSelectRectangle.svg</normaloff>:/images/themes/default/mActionSelectRectangle.svg</iconset>
    </property>
    <property name="text">
@@ -539,19 +543,16 @@
   <customwidget>
    <class>SliderSpinBox</class>
    <extends>QWidget</extends>
-   <header>enmapbox.gui</header>
+   <header>enmapbox.qgispluginsupport.qps.simplewidgets</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>DoubleSliderSpinBox</class>
    <extends>QWidget</extends>
-   <header>enmapbox.gui</header>
+   <header>enmapbox.qgispluginsupport.qps.simplewidgets</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../../enmapboxresources.qrc"/>
-  <include location="../../../../QGIS/images/images.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

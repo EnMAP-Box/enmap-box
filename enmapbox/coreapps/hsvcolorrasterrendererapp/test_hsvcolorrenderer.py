@@ -8,7 +8,8 @@ class TestHsvColorRenderer(TestCase):
 
     def test(self):
         layer = QgsRasterLayer(
-            r'D:\data\matthias_wocher\Irlbach_20210530_AVIRIS_NG_simulated_EnMAP_233Bands\ang20210530t101445_rfl_wlCut_ASI_3band_car_cab_h2o.bsq')
+            r'D:\data\matthias_wocher\Irlbach_20210530_AVIRIS_NG_simulated_EnMAP_233Bands'
+            r'\ang20210530t101445_rfl_wlCut_ASI_3band_car_cab_h2o.bsq')
 
         if self.fileExists(layer.source()):
             return

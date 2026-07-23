@@ -97,7 +97,7 @@ class TestRasterMathAlgorithm(TestCase):
                         '    feedback.pushInfo(reader.noDataValue())',
             alg.P_OUTPUT_RASTER: self.filename('dummy.tif')
         }
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)
 
     def test_vector(self):
         alg = RasterMathAlgorithm()
@@ -135,7 +135,7 @@ class TestRasterMathAlgorithm(TestCase):
             alg.P_OUTPUT_RASTER: self.filename('raster.tif'),
             alg.P_OVERLAP: 15
         }
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)
         # self.assertEqual(631209052, np.sum(RasterReader(result[alg.P_OUTPUT_RASTER]).array(), dtype=float))
 
     def test_stats(self):
@@ -197,7 +197,7 @@ class TestRasterMathAlgorithm(TestCase):
 
             alg.P_OUTPUT_RASTER: self.filename('dummy.tif')
         }
-        result = self.runalg(alg, parameters)
+        self.runalg(alg, parameters)
         # self.assertEqual(47481925, np.sum(RasterReader(result['raster1']).array()))
         # self.assertEqual(71158, np.sum(RasterReader(result['raster2']).array()))
         # self.assertEqual(47481925, np.sum(RasterReader(result['raster3']).array()))

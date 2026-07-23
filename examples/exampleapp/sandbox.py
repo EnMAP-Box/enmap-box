@@ -67,4 +67,4 @@ if __name__ == '__main__':
         sandboxShowAppInEnMapBox(True)
 
     # start the GUI thread
-    qgsApp.exec_()
+    qgsApp.exec()

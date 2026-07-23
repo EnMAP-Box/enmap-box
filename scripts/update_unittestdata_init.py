@@ -1,29 +1,32 @@
 import argparse
-import pathlib
 import re
 import site
+from pathlib import Path
 
-DIR_REPO = pathlib.Path(__file__).parents[1]
+from enmapbox.qgispluginsupport.qps.utils import file_search
+
+DIR_REPO = Path(__file__).parents[1]
 DIR_TESTS = DIR_REPO / 'tests'
 DIR_UNITTESTDATA = DIR_TESTS / 'testdata'
 PATH_TEST_INIT = DIR_UNITTESTDATA / '__init__.py'
-assert DIR_UNITTESTDATA.is_dir()
+if not DIR_UNITTESTDATA.is_dir():
+    raise Exception(f'Directory not found: {DIR_UNITTESTDATA}')
 
 
 def update_unittest_init(
-        use_pathlib: bool = True,
-        overwrite: bool = False):
-    site.addsitedir(pathlib.Path(__file__).parents[1])
-    from enmapbox.gui.utils import file_search
+    use_pathlib: bool = True,
+    overwrite: bool = False
+):
+    site.addsitedir(str(Path(__file__).parents[1]))
 
     if not overwrite and PATH_TEST_INIT.is_file():
         raise Exception(f'File already exists: {PATH_TEST_INIT}.\nRun with option -o --overwrite')
 
-    rx = re.compile(r'.*\.(tif|gpkg|qml|csv|pkl|json)$')
+    rx = re.compile(r'.*\.(tif|gpkg|qml|csv|skops|json)$')
 
     FILES = dict()
     for file in file_search(DIR_UNITTESTDATA, rx, recursive=True):
-        path = pathlib.Path(file)
+        path = Path(file)
         part = path.relative_to(DIR_UNITTESTDATA).as_posix()
         varname = re.sub(r'[/\-*?.]', '_', part)
         part = "' / '".join(part.split('/'))
@@ -39,16 +42,16 @@ def update_unittest_init(
              'root = pathlib.Path(__file__).parent',
              '']
     for file in FILES.values():
-
         lines.append(file)
 
     with open(PATH_TEST_INIT, 'w', encoding='utf-8') as f:
         f.write('\n'.join(lines))
 
-    site.addsitedir(PATH_TEST_INIT.parents[1])
+    site.addsitedir(str(PATH_TEST_INIT.parents[1]))
+
     from testdata import root
-    assert isinstance(root, pathlib.Path)
-    assert root.is_dir()
+    if not (isinstance(root, Path) and root.is_dir()):
+        raise AssertionError(f'testdata.root is not a directory: {root}')
 
 
 if __name__ == "__main__":

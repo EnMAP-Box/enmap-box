@@ -72,7 +72,8 @@ except (ImportError, ModuleNotFoundError) as ex:
 DIR_REPO = Path(DIR_REPO)
 
 PATH_CONFIG_FILE = DIR_REPO / 'tox.ini'
-assert PATH_CONFIG_FILE.is_file()
+if not PATH_CONFIG_FILE.is_file():
+    raise FileNotFoundError(f'Config file not found: {PATH_CONFIG_FILE}')
 
 
 def scanfiles(root: typing.Union[str, Path]) -> typing.Iterator[Path]:
@@ -119,7 +120,9 @@ def create_enmapbox_plugin(include_testdata: bool = False,
                            create_zip: bool = True,
                            copy_to_profile: bool = False,
                            build_name: str = None) -> typing.Optional[Path]:
-    assert (DIR_REPO / '.git').is_dir()
+    if not (DIR_REPO / '.git').is_dir():
+        raise NotADirectoryError(f'Not a git repository! {DIR_REPO}')
+
     config = configparser.ConfigParser()
     config.read(PATH_CONFIG_FILE)
 
@@ -129,13 +132,15 @@ def create_enmapbox_plugin(include_testdata: bool = False,
 
     if copy_to_profile:
         profileManager: QgsUserProfileManager = userProfileManager()
-        assert len(profileManager.allProfiles()) > 0
+        if len(profileManager.allProfiles()) == 0:
+            raise ValueError(f'No existing QGIS profiles found: {profileManager.allProfiles()}')
+
         if isinstance(copy_to_profile, str):
             profileName = copy_to_profile
         else:
             profileName = profileManager.defaultProfileName()
-        assert profileManager.profileExists(profileName), \
-            f'QGIS profiles "{profileName}" does not exist in {profileManager.allProfiles()}'
+        if not profileManager.profileExists(profileName):
+            raise ValueError(f'QGIS profile "{profileName}" does not exist in {profileManager.allProfiles()}')
 
         profileManager.setActiveUserProfile(profileName)
         profile: QgsUserProfile = profileManager.userProfile()
@@ -165,7 +170,7 @@ def create_enmapbox_plugin(include_testdata: bool = False,
         BUILD_NAME = build_name
 
     if REPO.is_dirty():
-        if BUILD_NAME == VERSION:
+        if BUILD_NAME == VERSION and build_name is None:
             raise Exception('Repository has uncommitted changes!\n'
                             'Commit / rollback them first to ensure a valid VERSION_SHA for release builds!')
         else:
@@ -181,6 +186,7 @@ def create_enmapbox_plugin(include_testdata: bool = False,
     PATH_METADATAFILE = PLUGIN_DIR / 'metadata.txt'
 
     pathAbout = DIR_REPO / 'ABOUT.md'
+    print(pathAbout)
 
     # set QGIS Metadata file values
     MD = QGISMetadataFileWriter()
@@ -195,9 +201,9 @@ def create_enmapbox_plugin(include_testdata: bool = False,
     MD.mTracker = enmapbox.ISSUE_TRACKER
     MD.mRepository = enmapbox.REPOSITORY
     MD.mQgisMinimumVersion = config['enmapbox:metadata']['qgisMinimumVersion']
+    MD.mQgisMaximumVersion = config['enmapbox:metadata'].get('qgisMaximumVersion', '3.99')
     MD.mEmail = config['enmapbox:metadata']['email']
     MD.mHasProcessingProvider = True
-    MD.mPlugin_dependencies = ['Google Earth Engine']  # the best way to make sure that the 'ee' module is available
 
     MD.mVersion = VERSION
     MD.writeMetadataTxt(PATH_METADATAFILE)
@@ -209,7 +215,9 @@ def create_enmapbox_plugin(include_testdata: bool = False,
     # copy EnMAP-Box icon source
     path_icon_source = DIR_REPO / config['enmapbox:files']['icon']
     path_icon_plugin = PLUGIN_DIR / config['enmapbox:metadata']['icon']
-    assert path_icon_source.is_file(), f'Icon source does not exists: {path_icon_source}'
+    if not path_icon_source.is_file():
+        raise FileNotFoundError(f'Icon source does not exists: {path_icon_source}')
+
     shutil.copy(path_icon_source, path_icon_plugin)
 
     # copy python and other resource files
@@ -234,7 +242,8 @@ def create_enmapbox_plugin(include_testdata: bool = False,
                 break
 
     for fileSrc in files:
-        assert fileSrc.is_file()
+        if not fileSrc.is_file():
+            raise FileNotFoundError(f'File not found: {fileSrc}')
         fileDst = PLUGIN_DIR / fileSrc.relative_to(DIR_REPO)
         os.makedirs(fileDst.parent, exist_ok=True)
         shutil.copy(fileSrc, fileDst.parent)
@@ -331,7 +340,9 @@ def markdownToHTML(path_md: Union[str, Path]) -> str:
 
     if path_md.name.endswith('.rst'):
 
-        assert path_md.is_file(), path_md
+        if not path_md.is_file():
+            raise FileNotFoundError(path_md)
+
         overrides = {'stylesheet': None,
                      'embed_stylesheet': False,
                      'output_encoding': 'utf-8',
@@ -372,29 +383,10 @@ def createCHANGELOG(dirPlugin: Path) -> str:
     pathCL = dirPlugin / 'CHANGELOG'
 
     os.makedirs(os.path.dirname(pathCL), exist_ok=True)
-    assert os.path.isfile(pathMD)
-    #    import sphinx.transforms
+    if not os.path.isfile(pathMD):
+        raise FileNotFoundError(f'File not found: {pathMD}')
 
     html = markdownToHTML(pathMD)
-    if False:
-        from xml.dom import minidom
-        xml = minidom.parseString(html)
-        #  remove headline
-        for i, node in enumerate(xml.getElementsByTagName('h1')):
-            if i == 0:
-                node.parentNode.removeChild(node)
-            else:
-                node.tagName = 'h4'
-
-        for node in xml.getElementsByTagName('link'):
-            node.parentNode.removeChild(node)
-
-        for node in xml.getElementsByTagName('meta'):
-            if node.getAttribute('name') == 'generator':
-                node.parentNode.removeChild(node)
-
-        xml = xml.getElementsByTagName('body')[0]
-        html = xml.toxml()
 
     if True:
         html_cleaned = html

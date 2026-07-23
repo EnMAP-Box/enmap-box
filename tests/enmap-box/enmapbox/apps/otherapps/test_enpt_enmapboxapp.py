@@ -12,21 +12,25 @@ __date__ = '2017-07-17'
 __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
 import unittest
-from enmapbox import initPythonPaths
+
+from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.testing import EnMAPBoxTestCase
+from enmapbox.testing import start_app, EnMAPBoxTestCase
 
-initPythonPaths()
+start_app()
+initAll()
 
+MISSING_MODULE = None
 try:
     from enpt_enmapboxapp.enpt_enmapboxapp import EnPTEnMAPBoxApp
 except ModuleNotFoundError as ex:
     if ex.name == 'enpt_enmapboxapp':
-        raise unittest.SkipTest('Missing enpt_enmapboxapp module. Skip tests')
+        MISSING_MODULE = str(ex)
     else:
         raise ex
 
 
+@unittest.skipIf(MISSING_MODULE, f'Missing module: {MISSING_MODULE}')
 class EnPTTestCases(EnMAPBoxTestCase):
 
     def test_application(self):
@@ -39,6 +43,7 @@ class EnPTTestCases(EnMAPBoxTestCase):
         self.assertIsInstance(app, EnPTEnMAPBoxApp)
         # app.startGUI()
         self.showGui(EB.ui)
+        EB.close()
 
 
 if __name__ == "__main__":

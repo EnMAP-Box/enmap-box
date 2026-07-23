@@ -12,7 +12,7 @@
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
-                                                                                                                                                 *
+
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -23,29 +23,28 @@
 ***************************************************************************
 """
 
-import sys
+import csv
 import os
-import numpy as np
-from scipy.interpolate import interp1d
-# from qgis.gui import *
-
-# ensure to call QGIS before PyQtGraph
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
-from enmapbox.qgispluginsupport.qps.pyqtgraph import pyqtgraph as pg
-from lmuvegetationapps.Resources.PROSAIL import call_model as mod
-from lmuvegetationapps.Resources.Spec2Sensor.Spec2Sensor_core import Spec2Sensor, BuildTrueSRF, BuildGenericSRF
-from lmuvegetationapps import APP_DIR
-
-from qgis.gui import QgsMapLayerComboBox
-from _classic.hubflow.core import *
-
+import sys
 import warnings
 
-warnings.filterwarnings('ignore')  # ignore warnings, like ZeroDivision
+import numpy as np
+# ensure to call QGIS before PyQtGraph
+import pyqtgraph as pg
+# from enmapbox.coreapps._classic.hubflow.core import openRasterDataset
+from lmuvegetationapps import APP_DIR
+from lmuvegetationapps.Resources.PROSAIL import call_model as mod
+from lmuvegetationapps.Resources.Spec2Sensor.Spec2Sensor_core import Spec2Sensor, BuildTrueSRF, BuildGenericSRF
+from scipy.interpolate import interp1d
 
-import csv
 from enmapbox.gui.utils import loadUi
+from enmapboxprocessing.rasterreader import RasterReader
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QHeaderView, QTableWidgetItem, QMessageBox, QApplication, \
+    QWidgetAction, QWidget, QLabel, QGridLayout
+from qgis.gui import QgsMapLayerComboBox
+
+warnings.filterwarnings('ignore')  # ignore warnings, like ZeroDivision
 
 pathUI_IVVRM = os.path.join(APP_DIR, 'Resources/UserInterfaces/IVVRM_main.ui')
 pathUI_loadtxt = os.path.join(APP_DIR, 'Resources/UserInterfaces/LoadTxtFile.ui')
@@ -78,14 +77,14 @@ class IVVRM_GUI(QDialog):
         self.btnAxisColor = QgsColorButton()
         self.btnAxisColor.colorChanged.connect(self.setAxisColor)
 
-        l = QGridLayout()
-        l.addWidget(QLabel('Background'), 0, 0)
-        l.addWidget(self.btnBackgroundColor, 0, 1)
-        l.addWidget(QLabel('Axes'), 1, 0)
-        l.addWidget(self.btnAxisColor, 1, 1)
+        ll = QGridLayout()
+        ll.addWidget(QLabel('Background'), 0, 0)
+        ll.addWidget(self.btnBackgroundColor, 0, 1)
+        ll.addWidget(QLabel('Axes'), 1, 0)
+        ll.addWidget(self.btnAxisColor, 1, 1)
 
         self.colorWidget = QWidget()
-        self.colorWidget.setLayout(l)
+        self.colorWidget.setLayout(ll)
         self.viewBoxMenu.addSeparator()
         m = self.viewBoxMenu.addMenu('Plot Colors')
         wa = QWidgetAction(m)
@@ -99,7 +98,7 @@ class IVVRM_GUI(QDialog):
     def setAxisColor(self, color: QColor):
         if not isinstance(color, QColor):
             color = QColor(color)
-        assert isinstance(color, QColor)
+
         if color != self.btnAxisColor.color():
             # changing btnAxisColor.color() will trigger setAxisColor again
             self.btnAxisColor.setColor(color)
@@ -113,7 +112,7 @@ class IVVRM_GUI(QDialog):
     def setBackgroundColor(self, color: QColor):
         if not isinstance(color, QColor):
             color = QColor(color)
-        assert isinstance(color, QColor)
+
         if color != self.btnBackgroundColor.color():
             self.btnBackgroundColor.setColor(color)
         else:
@@ -761,31 +760,36 @@ class IVVRM:
                 rmse = np.sqrt(np.nanmean((self.myResult - self.data_mean) ** 2))
 
                 # Nash-Sutcliffe Efficiency Error
-                nse = 1.0 - ((np.nansum((self.data_mean - self.myResult) ** 2)) /
-                             (np.nansum((self.data_mean - (np.nanmean(self.data_mean))) ** 2)))
+                nse = 1.0 - (
+                    (np.nansum((self.data_mean - self.myResult) ** 2))
+                    / (np.nansum((self.data_mean - (np.nanmean(self.data_mean))) ** 2))  # noqa
+                )
 
                 # Modified Nash-Sutcliffe Efficiency Error
-                mnse = 1.0 - ((np.nansum(abs(self.data_mean - self.myResult))) /
-                              (np.nansum(abs(self.data_mean - (np.nanmean(self.data_mean))))))
+                a = np.nansum(abs(self.data_mean - self.myResult))
+                b = np.nansum(abs(self.data_mean - (np.nanmean(self.data_mean))))
+                mnse = 1.0 - (a / b)
 
                 # R²
-                r_squared = ((np.nansum(
-                    (self.data_mean - np.nanmean(self.data_mean)) * (self.myResult - np.nanmean(self.myResult))))
-                             / ((np.sqrt(np.nansum((self.data_mean - np.nanmean(self.data_mean)) ** 2)))
-                                * (np.sqrt(np.nansum((self.myResult - np.nanmean(self.myResult)) ** 2))))) ** 2
+                a = np.nansum(
+                    (self.data_mean - np.nanmean(self.data_mean)) * (self.myResult - np.nanmean(self.myResult))
+                )
+                b = np.sqrt(np.nansum((self.data_mean - np.nanmean(self.data_mean)) ** 2))
+                c = np.sqrt(np.nansum((self.myResult - np.nanmean(self.myResult)) ** 2))
+                r_squared = (a / (b * c)) ** 2
 
                 # Add the errors to the plot
-                errors = pg.TextItem("RMSE: %.4f" % rmse +
-                                     "\nMAE: %.4f" % mae +
-                                     "\nNSE: %.4f" % nse +
-                                     "\nmNSE: %.2f" % mnse +
-                                     '\n' + u'R²: %.2f' % r_squared, (100, 200, 255),
+                errors = pg.TextItem("RMSE: %.4f" % rmse
+                                     + "\nMAE: %.4f" % mae  # noqa
+                                     + "\nNSE: %.4f" % nse  # noqa
+                                     + "\nmNSE: %.2f" % mnse  # noqa
+                                     + '\n' + u'R²: %.2f' % r_squared, (100, 200, 255),  # noqa
                                      border="w", anchor=(1, 0))
-            except:
-                errors = pg.TextItem("RMSE: sensors mismatch" +
-                                     "\nMAE: sensors mismatch " +
-                                     "\nNSE: sensors mismatch" +
-                                     "\nmNSE: sensors mismatch" +
+            except Exception:
+                errors = pg.TextItem("RMSE: sensors mismatch"
+                                     "\nMAE: sensors mismatch "
+                                     "\nNSE: sensors mismatch"
+                                     "\nmNSE: sensors mismatch"
                                      '\n' + u'R²: sensors mismatch ', (100, 200, 255),
                                      border="w", anchor=(1, 0))
             errors.setPos(2500, 0.55)
@@ -1022,8 +1026,13 @@ class SensorEditor:
 
     def image_read(self):  # read only necessary info: fwhm and center wavelengths
         inras = self.image
-        image = openRasterDataset(inras)
-        meta = image.metadataDict()
+
+        # image = openRasterDataset(inras)
+        # meta = image.metadataDict()
+
+        reader = RasterReader(inras)
+        meta = reader.metadata()
+
         try:
             fwhm = meta['ENVI']['fwhm']
             wavelength = meta['ENVI']['wavelength']
@@ -1068,7 +1077,7 @@ class SensorEditor:
 
         try:
             _ = np.loadtxt(file_choice)  # try to open the file
-        except:
+        except Exception:
             self.houston(message="Error loading file with wavelengths. "
                                  "Make sure to provide a single-column file without header")
             self.wl_filename = None
@@ -1134,9 +1143,12 @@ class SensorEditor:
             text = "Create Generic SRF from Imagery OK: " + str(len(self.x[:, 0])) + " Bands."
             self.gui.label.setText(text)
             if len(self.outreach) > 0:
-                text = "Create Generic SRF from Imagery OK with " + str(
-                    len(self.x[:, 0])) + " Bands but Caution! " + str(len(self.outreach)) + \
-                       " wavelengths outside PROSAIL range will be deleted!"
+                text = (
+                    "Create Generic SRF from Imagery OK with "
+                    + str(len(self.x[:, 0])) + " Bands but Caution! "  # noqa
+                    + str(len(self.outreach))  # noqa
+                    + " wavelengths outside PROSAIL range will be deleted!"  # noqa
+                )
                 self.gui.label.setStyleSheet("color: rgb(170, 130, 0);")
                 self.gui.label.setText(text)
             self.gui.cmdOK.setEnabled(True)
@@ -1262,7 +1274,7 @@ class LoadTxtFile:
                 # if the first row can be converted to int, it most likely does not contain a header
                 _ = int(next(raw)[0])
                 self.header_bool = False
-            except:
+            except Exception:
                 self.header_bool = True
             self.gui.radioHeader.setChecked(self.header_bool)
             self.read_file()  # now read the file for good with the information you have
@@ -1520,4 +1532,4 @@ if __name__ == '__main__':
     app = start_app()
     m = MainUiFunc()
     m.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

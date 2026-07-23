@@ -21,11 +21,12 @@ import unittest
 
 import qgis
 from enmapbox import DIR_REPO
+from enmapbox import initAll
 from enmapbox.gui.contextmenus import EnMAPBoxContextMenuRegistry, EnMAPBoxAbstractContextMenuProvider
 from enmapbox.gui.dataviews.docks import SpectralLibraryDock, MapDock, Dock
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import MapCanvas
-from enmapbox.qgispluginsupport.qps.maptools import MapTools
+from enmapbox.qgispluginsupport.qps.maptools import MapTools, CursorLocationMapTool
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase, start_app
@@ -38,6 +39,7 @@ from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, \
 from qgis.gui import QgsMapLayerComboBox, QgisInterface, QgsProcessingContextGenerator, QgsMapCanvas
 
 start_app()
+initAll()
 
 
 class EnMAPBoxTests(EnMAPBoxTestCase):
@@ -51,6 +53,62 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
             for p in results:
                 print(p)
         self.assertTrue(len(results) > 0)
+
+    def test_show_spectral_profiles(self):
+
+        lyr1 = TestObjects.createRasterLayer(name='Layer1', nb=20, nl=10, ns=10)
+        lyr2 = TestObjects.createRasterLayer(name='Layer2', nb=10, nl=20, ns=15)
+        lyr3 = TestObjects.createRasterLayer(name='Layer3', nb=3, nl=4, ns=3)
+        pt = SpatialPoint.fromMapLayerCenter(lyr2)
+
+        emb = EnMAPBox(load_core_apps=True, load_other_apps=False)
+
+        dock = emb.createMapDock(name='MyMap')
+        dock.addLayers([lyr1, lyr2, lyr3])
+        emb.setCurrentLocation(pt)
+
+        emb.showSpectralProfiles(lyr1)
+        emb.showSpectralProfiles(lyr2)
+        emb.showSpectralProfiles(lyr3, label_expression=f'\'{lyr3.name()}\'')
+
+        sl_dock = emb.docks(SpectralLibraryDock)
+        self.assertEqual(len(sl_dock), 1)
+        sl_dock = sl_dock[0]
+        self.assertIsInstance(sl_dock, SpectralLibraryDock)
+        sl = sl_dock.defaultSpeclib()
+
+        self.assertTrue(isinstance(emb.currentMapTool(), CursorLocationMapTool))
+        self.assertEqual(len(emb.spectralLibraryWidgets()), 1)
+        w = emb.spectralLibraryWidgets()[0]
+
+        w: SpectralLibraryWidget
+
+        settings = w.plotControl().settingsMap()
+
+        vis = settings['visualizations']
+        self.assertEqual(3, len(vis))
+
+        expected_settings = [
+            {'layer_id': sl.id(), 'field_name': 'profiles',
+             'label_expression': '"profiles_name"'
+             },
+            {'layer_id': sl.id(), 'field_name': 'profiles1',
+             'label_expression': '"profiles1_name"'
+             },
+            {'layer_id': sl.id(), 'field_name': 'profiles2',
+             'label_expression': f'\'{lyr3.name()}\''
+             }
+        ]
+
+        for i, s in enumerate(expected_settings):
+            vis_i = vis[i]
+            for k in s.keys():
+                if vis_i[k] != s[k]:
+                    pass
+                self.assertEqual(vis_i[k], s[k])
+
+        self.showGui(emb.ui)
+        emb.close()
 
     def test_qgis_project_lists(self):
 
@@ -97,19 +155,19 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         if True:
             w = QWidget()
             w.setWindowTitle('QProject layers')
-            l = QGridLayout()
-            w.setLayout(l)
+            layout = QGridLayout()
+            w.setLayout(layout)
             cbQGIS = QgsMapLayerComboBox()
-            l.addWidget(QLabel('QGIS Layers'), 0, 0)
-            l.addWidget(cbQGIS, 0, 1)
+            layout.addWidget(QLabel('QGIS Layers'), 0, 0)
+            layout.addWidget(cbQGIS, 0, 1)
 
             if Qgis.versionInt() > 32400:
                 cbEMB = QgsMapLayerComboBox()
                 cbEMB.setWindowTitle('EnMAP-Box Layers')
                 cbEMB.setProject(EMB.project())
 
-                l.addWidget(QLabel('EnMAP-Box Layers'), 1, 0)
-                l.addWidget(cbEMB, 1, 1)
+                layout.addWidget(QLabel('EnMAP-Box Layers'), 1, 0)
+                layout.addWidget(cbEMB, 1, 1)
             windows.append(w)
         self.showGui(windows)
         EMB.close()
@@ -210,8 +268,8 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         lyrNew.setName('MyNewLayer')
         mapDock.addLayers([lyrNew])
 
-        cb1 = QgsMapLayerComboBox()
-        n = cb1.model().rowCount()
+        # cb1 = QgsMapLayerComboBox()
+        # n = cb1.model().rowCount()
         self.assertFalse(lyrNew in list(QgsProject.instance().mapLayers().values()))
         self.assertTrue(lyrNew in list(box.project().mapLayers().values()))
         mapDock.removeLayer(lyrNew)
@@ -255,7 +313,7 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
 
         lastValue = enmapbox.RAISE_ALL_EXCEPTIONS
 
-        reg0 = EnMAPBoxContextMenuRegistry.instance()
+        # reg0 = EnMAPBoxContextMenuRegistry.instance()
         reg = EnMAPBoxContextMenuRegistry()
         reg.addProvider(ErrorProvider())
 

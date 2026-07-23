@@ -1,15 +1,18 @@
+import warnings
+from contextlib import suppress
 from typing import Optional
 
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget
+from pyqtgraph import PlotWidget
+
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
+from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtGui import QMouseEvent, QColor
 from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QTableWidget, QComboBox, QCheckBox, \
     QLabel
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsRasterDataProvider, QgsRasterBandStats, \
-    QgsRasterHistogram, QgsMapSettings, QgsRasterRenderer
+    QgsRasterHistogram, QgsMapSettings, QgsRasterRenderer, Qgis
 from qgis.gui import QgsRasterBandComboBox, QgsMapLayerComboBox, QgsFilterLineEdit, QgsSpinBox, QgsMapCanvas
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -94,10 +97,8 @@ class BandStatisticsDialog(QMainWindow):
 
         # disconnect old map canvas
         if self.mMapCanvas is not None:
-            try:
+            with suppress(Exception):
                 self.mMapCanvas.extentsChanged.disconnect(self.onMapCanvasExtentsChanged)
-            except Exception:
-                pass
 
         # connect new map canvas
         self.mMapCanvas = None
@@ -199,8 +200,15 @@ class BandStatisticsDialog(QMainWindow):
                 continue
 
             # calculate stats
-            stats: QgsRasterBandStats = provider.bandStatistics(bandNo, Qgis.RasterBandStatistic.All, extent,
-                                                                sampleSize)
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    'ignore',
+                    message=r'QgsRasterInterface\.bandStatistics\(\) is deprecated',
+                    category=DeprecationWarning,
+                )
+                stats: QgsRasterBandStats = provider.bandStatistics(bandNo, Qgis.RasterBandStatistic.All,
+                                                                    extent,
+                                                                    sampleSize)
 
             if self.mHistogramMinimum.isNull():
                 minimum = stats.minimumValue
@@ -241,7 +249,7 @@ class BandStatisticsDialog(QMainWindow):
             plotWidget.getAxis('bottom').setPen('#000000')
             plotWidget.getAxis('left').setPen('#000000')
             y = histogram.histogramVector
-            x = range(binCount + 1)
+            x = list(range(binCount + 1))
             color = QColor(0, 153, 255)
             plot = plotWidget.plot(x, y, stepMode='center', fillLevel=0, brush=color)
             plot.setPen(color=color, width=1)

@@ -2,7 +2,7 @@ from typing import Dict, Any, List, Tuple
 
 from osgeo import gdal
 
-import processing
+import qgis.processing
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.creategridalgorithm import CreateGridAlgorithm
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
@@ -108,7 +108,7 @@ class RasterizeCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
                     alg.P_UNIT: alg.PixelUnits,
                     alg.P_OUTPUT_GRID: Utils.tmpFilename(filename, 'grid.x10.vrt')
                 }
-                gridX10 = processing.run(alg, parameters, None, feedback2, context, True)[alg.P_OUTPUT_GRID]
+                gridX10 = qgis.processing.run(alg, parameters, None, feedback2, context, True)[alg.P_OUTPUT_GRID]
 
                 # burn classes at x10 grid
                 feedback.pushInfo('Burn classes at x10 finer resolution')
@@ -120,7 +120,8 @@ class RasterizeCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
                     alg.P_BURN_ATTRIBUTE: fieldName,
                     alg.P_OUTPUT_RASTER: Utils.tmpFilename(filename, 'classification.x10.tif')
                 }
-                classificationX10 = processing.run(alg, parameters, None, feedback2, context, True)[alg.P_OUTPUT_RASTER]
+                classificationX10 = qgis.processing.run(alg, parameters, None, feedback2, context, True)[
+                    alg.P_OUTPUT_RASTER]
                 ds = gdal.Open(classificationX10, gdal.OF_UPDATE)
                 writer = RasterWriter(ds)
                 writer.setNoDataValue(0)
@@ -136,7 +137,8 @@ class RasterizeCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
                     alg.P_RESAMPLE_ALG: alg.ModeResampleAlg,
                     alg.P_OUTPUT_RASTER: Utils.tmpFilename(filename, 'classification.vrt')
                 }
-                classification = processing.run(alg, parameters, None, feedback2, context, True)[alg.P_OUTPUT_RASTER]
+                classification = qgis.processing.run(alg, parameters, None, feedback2, context, True)[
+                    alg.P_OUTPUT_RASTER]
 
                 # calculate pixel coverage
                 # - mask at x10 grid
@@ -147,7 +149,7 @@ class RasterizeCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
                     alg.P_CODE: 'R1 != 0',
                     alg.P_OUTPUT_RASTER: Utils.tmpFilename(filename, 'mask.x10.tif')
                 }
-                maskX10 = processing.run(alg, parameters, None, feedback2, context, True)[alg.P_OUTPUT_RASTER]
+                maskX10 = qgis.processing.run(alg, parameters, None, feedback2, context, True)[alg.P_OUTPUT_RASTER]
                 # - aggregate mask to coverage fraction
                 feedback.pushInfo('Aggregate pixel mask to coverage fraction at final resolution')
                 alg = TranslateRasterAlgorithm()
@@ -158,7 +160,7 @@ class RasterizeCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
                     alg.P_DATA_TYPE: alg.Float32,
                     alg.P_OUTPUT_RASTER: Utils.tmpFilename(filename, 'coverage.vrt')
                 }
-                coverage = processing.run(alg, parameters, None, feedback2, context, True)[alg.P_OUTPUT_RASTER]
+                coverage = qgis.processing.run(alg, parameters, None, feedback2, context, True)[alg.P_OUTPUT_RASTER]
 
                 # mask classification pixel with low coverage
                 # - mask at x10 grid
@@ -170,7 +172,8 @@ class RasterizeCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
                     alg.P_CODE: f'R1 * (R2 >= {minCoverage})',
                     alg.P_OUTPUT_RASTER: filename
                 }
-                classification = processing.run(alg, parameters, None, feedback2, context, True)[alg.P_OUTPUT_RASTER]
+                classification = qgis.processing.run(alg, parameters, None, feedback2, context, True)[
+                    alg.P_OUTPUT_RASTER]
 
             # setup renderer
             layer = QgsRasterLayer(filename)
@@ -212,7 +215,8 @@ class RasterizeCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
             vector, filename, transformContext, options
         )
 
-        assert error == QgsVectorFileWriter.NoError, f'Fail error {error}:{message}'
+        if error != QgsVectorFileWriter.NoError:
+            raise RuntimeError(f'failed to write vector file: {error}: {message}')
 
         # calculate class ids [1..nCategories]
         vector2 = QgsVectorLayer(filename)

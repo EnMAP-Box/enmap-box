@@ -1,19 +1,29 @@
 import traceback
+from ast import literal_eval
 from enum import Enum
-from math import nan
 from os import makedirs
 from os.path import abspath, dirname, exists, isabs, join, splitext
 from time import time
 from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple
 
 import numpy as np
-import processing
 from osgeo import gdal
-from qgis.PyQt.QtCore import QVariant, QDateTime, QDate
+
+import qgis.processing
+from enmapbox.typeguard import typechecked
+from enmapboxprocessing.driver import Driver
+from enmapboxprocessing.glossary import injectGlossaryLinks
+from enmapboxprocessing.parameter.processingparameterrasterdestination import ProcessingParameterRasterDestination
+from enmapboxprocessing.processingfeedback import ProcessingFeedback
+from enmapboxprocessing.typing import ClassifierDump, ClustererDump, CreationOptions, GdalResamplingAlgorithm, \
+    RegressorDump, TransformerDump
+from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtCore import QDateTime, QDate
 from qgis.PyQt.QtGui import QTextDocument, QIcon
 from qgis.PyQt.QtWidgets import QApplication
+from qgis.core import NULL
 from qgis.core import (Qgis, QgsCategorizedSymbolRenderer, QgsCoordinateReferenceSystem, QgsMapLayer,
-                       QgsPalettedRasterRenderer, QgsProcessing, QgsProcessingAlgorithm, QgsProcessingContext,
+                       QgsPalettedRasterRenderer, QgsProcessingAlgorithm, QgsProcessingContext,
                        QgsProcessingException, QgsProcessingFeedback, QgsProcessingOutputLayerDefinition,
                        QgsProcessingParameterBand, QgsProcessingParameterBoolean, QgsProcessingParameterCrs,
                        QgsProcessingParameterDefinition, QgsProcessingParameterEnum, QgsProcessingParameterExtent,
@@ -23,16 +33,7 @@ from qgis.core import (Qgis, QgsCategorizedSymbolRenderer, QgsCoordinateReferenc
                        QgsProcessingParameterRange, QgsProcessingParameterRasterLayer, QgsProcessingParameterString,
                        QgsProcessingParameterVectorDestination, QgsProcessingParameterVectorLayer, QgsProcessingUtils,
                        QgsProject, QgsProperty, QgsRasterLayer, QgsRectangle, QgsVectorLayer,
-                       QgsProcessingParameterDateTime)
-
-from enmapbox.typeguard import typechecked
-from enmapboxprocessing.driver import Driver
-from enmapboxprocessing.glossary import injectGlossaryLinks
-from enmapboxprocessing.parameter.processingparameterrasterdestination import ProcessingParameterRasterDestination
-from enmapboxprocessing.processingfeedback import ProcessingFeedback
-from enmapboxprocessing.typing import ClassifierDump, ClustererDump, CreationOptions, GdalResamplingAlgorithm, \
-    RegressorDump, TransformerDump
-from enmapboxprocessing.utils import Utils
+                       QgsProcessingParameterDateTime, QgsProcessing)
 
 
 class AlgorithmCanceledException(Exception):
@@ -47,22 +48,23 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         MaxResampleAlg = range(12)
     O_DATA_TYPE = 'Byte Int16 UInt16 UInt32 Int32 Float32 Float64'.split()
     Byte, Int16, UInt16, Int32, UInt32, Float32, Float64 = range(len(O_DATA_TYPE))
-    PickleFileFilter = 'Pickle files (*.pkl)'
-    PickleFileExtension = 'pkl'
-    PickleFileDestination = 'Pickle file destination.'
+    SkopsFileFilter = 'Skops files (*.skops)'
+    SkopsFileExtension = 'skops'
+    SkopsFileDestination = 'Skops file destination.'
     JsonFileFilter = 'JSON files (*.json)'
     JsonFileExtension = 'json'
     JsonFileDestination = 'JSON file destination.'
-    GeoJsonFileFilter = 'GEOJSON files (*.geojson)'
+    GeoJsonFileFilter = 'GeoJSON files (*.geojson)'
     GeoJsonFileExtension = 'geojson'
-    GeoJsonFileDestination = 'GEOJSON file destination.'
+    GeoJsonFileDestination = 'GeoJSON file destination.'
     GpkgFileFilter = 'GeoPackage files (*.gpkg)'
     GpkgFileExtension = 'gpkg'
     GpkgFileDestination = 'GeoPackage file destination.'
+    SpeclibFileFilter = GeoJsonFileFilter + ';;' + GpkgFileFilter
     CsvFileFilter = 'CSV files (*.csv)'
     CsvFileExtension = 'cvs'
     CsvFileDestination = 'CSV file destination.'
-    DatasetFileFilter = PickleFileFilter + ';;' + JsonFileFilter
+    DatasetFileFilter = SkopsFileFilter + ';;' + JsonFileFilter
     DatasetFileDestination = 'Dataset file destination.'
     RasterFileDestination = 'Raster file destination.'
     VectorFileDestination = 'Vector file destination.'
@@ -117,7 +119,8 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
 
     def parameterDefinition(self, name: str) -> QgsProcessingParameterDefinition:
         parameter = super().parameterDefinition(name)
-        assert parameter is not None, name
+        if parameter is None:
+            raise ValueError('parameter is undefined: ' + name)
         return parameter
 
     def parameterAsLayer(
@@ -194,7 +197,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         # convert temporary scratch layer to OGR layer
         if layer.dataProvider().name() == 'memory' and convertFromMemoryToOgr:
             renderer = layer.renderer().clone()
-            parameters = {'INPUT': layer, 'OUTPUT': 'TEMPORARY_OUTPUT'}
+            parameters = {'INPUT': layer, 'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT}
             feedback = None
             result = self.runAlg('native:savefeatures', parameters, None, feedback, context, True)
             layer = QgsVectorLayer(result['OUTPUT'], layer.name())
@@ -243,7 +246,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         filename = super().parameterAsFile(parameters, name, context)
         if filename == '':
             return None
-        dump = Utils.pickleLoad(filename)
+        dump = Utils.modelLoad(filename)
         dump = ClassifierDump.fromDict(dump)
         return dump
 
@@ -254,7 +257,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         filename = super().parameterAsFile(parameters, name, context)
         if filename == '':
             return None
-        dump = Utils.pickleLoad(filename)
+        dump = Utils.modelLoad(filename)
         try:
             dump = RegressorDump.fromDict(dump)
         except Exception:
@@ -278,7 +281,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         filename = super().parameterAsFile(parameters, name, context)
         if filename == '':
             return None
-        dump = Utils.pickleLoad(filename)
+        dump = Utils.modelLoad(filename)
         dump = TransformerDump.fromDict(dump)
         return dump
 
@@ -288,11 +291,13 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         filename = super().parameterAsFile(parameters, name, context)
         if filename == '':
             return None
-        dump = Utils.pickleLoad(filename)
+        dump = Utils.modelLoad(filename)
         dump = ClustererDump.fromDict(dump)
         return dump
 
-    def parameterAsEnum(self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext) -> int:
+    def parameterAsEnum(self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext) -> Optional[int]:
+        if name not in parameters:
+            return self.parameterDefinition(name).defaultValue()
         return super().parameterAsEnum(parameters, name, context)
 
     def parameterAsEnums(self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext) -> List[int]:
@@ -301,8 +306,9 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def parameterAsString(self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext) -> Optional[str]:
         string = super().parameterAsString(parameters, name, context)
         if string == '':
-            if isinstance(parameters.get(name),
-                          str):  # workaround a QGIS bug, where super().parameterAsString would return an empty string instead of the actual string
+            if isinstance(parameters.get(name), str):
+                # workaround a QGIS bug, where super().parameterAsString would return an empty string instead of
+                # the actual string
                 return parameters.get(name)
             return None
         return string
@@ -361,8 +367,8 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
 
         string = string.replace('\n', '')
         try:
-            values = eval(string, {'nan': nan})
-        except Exception as error:
+            values = literal_eval(string)
+        except Exception:
             raise QgsProcessingException(f'Invalid value list: {self.parameterDefinition(name).description()}')
 
         if not isinstance(values, (tuple, list)):
@@ -424,7 +430,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         if string == '':
             return None
         try:
-            value = eval(string, {'nan': nan})
+            value = literal_eval(string)
         except Exception:
             raise QgsProcessingException(f'Invalid value: {self.parameterDefinition(name).description()}')
 
@@ -461,7 +467,8 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         if isinstance(filename, QgsProcessingOutputLayerDefinition):
             sink: QgsProperty = filename.sink
             filename = sink.toVariant()['val']
-            assert isinstance(filename, str)
+            if not isinstance(filename, str):
+                raise ValueError(f'filename must be a string, got {type(filename).__name__}')
 
         if filename == '':
             return None
@@ -545,7 +552,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         if value is None:
             value = super().parameterAsMatrix(parameters, name, context)
 
-        if value == [QVariant()]:
+        if value == [NULL]:
             value = None
 
         return value
@@ -666,7 +673,10 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         return self.shortHelpString()
 
     def helpUrl(self, *args, **kwargs):
-        return 'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/processing_algorithms/processing_algorithms.html'
+        return (
+            'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/processing_algorithms'
+            '/processing_algorithms.html'
+        )
 
     def isRunnungInsideModeller(self):
         # hacky way to figure out if this algorithm is currently running inside the modeller
@@ -679,16 +689,16 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def addParameterClassificationDataset(
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
-        from enmapboxprocessing.parameter.processingparameterpicklefileclassificationdatasetwidget import \
-            ProcessingParameterPickleFileClassificationDatasetWidgetWrapper
+        from enmapboxprocessing.parameter.processingparameterskopsfileclassificationdatasetwidget import \
+            ProcessingParameterSkopsFileClassificationDatasetWidgetWrapper
         behavior = QgsProcessingParameterFile.Behavior.File
         extension = ''
-        fileFilter = 'Pickle files (*.pkl);;JSON files (*.json)'
+        fileFilter = 'Skops files (*.skops);;JSON files (*.json)'
         param = QgsProcessingParameterFile(name, description, behavior, extension, defaultValue, optional, fileFilter)
 
         if not self.isRunnungInsideModeller():
             param.setMetadata(
-                {'widget_wrapper': {'class': ProcessingParameterPickleFileClassificationDatasetWidgetWrapper}})
+                {'widget_wrapper': {'class': ProcessingParameterSkopsFileClassificationDatasetWidgetWrapper}})
             param.setDefaultValue(defaultValue)
 
         self.addParameter(param)
@@ -708,16 +718,16 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def addParameterRegressionDataset(
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
-        from enmapboxprocessing.parameter.processingparameterpicklefileregressiondatasetwidget import \
-            ProcessingParameterPickleFileRegressionDatasetWidgetWrapper
+        from enmapboxprocessing.parameter.processingparameterskopsfileregressiondatasetwidget import \
+            ProcessingParameterSkopsFileRegressionDatasetWidgetWrapper
         behavior = QgsProcessingParameterFile.Behavior.File
         extension = ''
-        fileFilter = 'Pickle files (*.pkl);;JSON files (*.json)'
+        fileFilter = 'Skops files (*.skops);;JSON files (*.json)'
         param = QgsProcessingParameterFile(name, description, behavior, extension, defaultValue, optional, fileFilter)
 
         if not self.isRunnungInsideModeller():
             param.setMetadata(
-                {'widget_wrapper': {'class': ProcessingParameterPickleFileRegressionDatasetWidgetWrapper}}
+                {'widget_wrapper': {'class': ProcessingParameterSkopsFileRegressionDatasetWidgetWrapper}}
             )
             param.setDefaultValue(defaultValue)
 
@@ -738,16 +748,16 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def addParameterUnsupervisedDataset(
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
-        from enmapboxprocessing.parameter.processingparameterpicklefileunsuperviseddatasetwidget import \
-            ProcessingParameterPickleFileUnsupervisedDatasetWidgetWrapper
+        from enmapboxprocessing.parameter.processingparameterskopsfileunsuperviseddatasetwidget import \
+            ProcessingParameterSkopsFileUnsupervisedDatasetWidgetWrapper
         behavior = QgsProcessingParameterFile.Behavior.File
         extension = ''
-        fileFilter = 'Pickle files (*.pkl);;JSON files (*.json)'
+        fileFilter = 'Skops files (*.skops);;JSON files (*.json)'
         param = QgsProcessingParameterFile(name, description, behavior, extension, defaultValue, optional, fileFilter)
 
         if not self.isRunnungInsideModeller():
             param.setMetadata(
-                {'widget_wrapper': {'class': ProcessingParameterPickleFileUnsupervisedDatasetWidgetWrapper}}
+                {'widget_wrapper': {'class': ProcessingParameterSkopsFileUnsupervisedDatasetWidgetWrapper}}
             )
             param.setDefaultValue(defaultValue)
 
@@ -786,12 +796,11 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             self, name: str, description: str, defaultValue: List[int] = None, parentLayerParameterName: str = None,
             optional=False, advanced=False
     ):
-        assert parentLayerParameterName is not None
         self.addParameterBand(name, description, defaultValue, parentLayerParameterName, optional, True)
         self.flagParameterAsAdvanced(name, advanced)
 
     def addParameterVectorLayer(
-            self, name: str, description: str, types=(QgsProcessing.SourceType.TypeVectorAnyGeometry,),
+            self, name: str, description: str, types=(QgsProcessing.SourceType.TypeVector,),
             defaultValue=None, optional=False, advanced=False
     ):
         if types is None:
@@ -857,18 +866,18 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
         )
         self.flagParameterAsAdvanced(name, advanced)
 
-    def addParameterPickleFile(
+    def addParameterSkopsFile(
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
-        from enmapboxprocessing.parameter.processingparameterpicklefilewidget import \
-            ProcessingParameterPickleFileWidgetWrapper
+        from enmapboxprocessing.parameter.processingparameterskopsfilewidget import \
+            ProcessingParameterSkopsFileWidgetWrapper
 
         param = QgsProcessingParameterFile(
             name, description, QgsProcessingParameterFile.Behavior.File, '', defaultValue, optional,
-            self.PickleFileFilter
+            self.SkopsFileFilter
         )
         if not self.isRunnungInsideModeller():
-            param.setMetadata({'widget_wrapper': {'class': ProcessingParameterPickleFileWidgetWrapper}})
+            param.setMetadata({'widget_wrapper': {'class': ProcessingParameterSkopsFileWidgetWrapper}})
             param.setDefaultValue(defaultValue)
         self.addParameter(param)
         self.flagParameterAsAdvanced(name, advanced)
@@ -1070,7 +1079,8 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
 
     @staticmethod
     def runAlg(algOrName, parameters, onFinish=None, feedback=None, context=None, is_child_algorithm=False) -> Dict:
-        return processing.run(algOrName, parameters, onFinish, feedback, context, is_child_algorithm)
+        return qgis.processing.run(algOrName, parameters, onFinish, feedback, context,
+                                   is_child_algorithm=is_child_algorithm)
 
     @staticmethod
     def runAlgorithm(algOrName, parameters, onFinish=None, feedback=None, context=None) -> Dict:

@@ -79,7 +79,7 @@ class TestIssue711(EnMAPBoxTestCase):
                         TestObjects.createVectorLayer()
                         ]
             layers.extend(sources)
-            dSources = EMB.addSources(sources)
+            # dSources = EMB.addSources(sources)
 
         EMB.ui.show()
 

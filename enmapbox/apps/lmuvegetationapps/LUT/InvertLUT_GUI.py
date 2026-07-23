@@ -12,7 +12,6 @@
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
-                                                                                                                                                 *
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -25,15 +24,16 @@
 import os
 import sys
 
+import lmuvegetationapps.LUT.InvertLUT_core as Inverse
+from lmuvegetationapps import APP_DIR
 from osgeo import gdal
 
-import lmuvegetationapps.LUT.InvertLUT_core as Inverse
 from enmapbox.gui.utils import loadUi
-from lmuvegetationapps import APP_DIR
-# ensure to call QGIS before PyQtGraph
-from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox, QApplication
 from qgis.core import QgsMapLayerProxyModel
 from qgis.gui import QgsMapLayerComboBox
+
+# ensure to call QGIS before PyQtGraph
 
 pathUI_inversion = os.path.join(APP_DIR, 'Resources/UserInterfaces/InvertLUT.ui')
 pathUI_wavelengths = os.path.join(APP_DIR, 'Resources/UserInterfaces/Select_Wavelengths.ui')
@@ -89,7 +89,7 @@ class PRG_GUI(QDialog):
             event.ignore()
 
 
-# class GlobalInversion manages the GUI for the inversion tool ###
+# class GlobalInversion manages the GUI for the inversion tool #
 class GlobalInversion:
 
     def __init__(self, main):
@@ -309,9 +309,11 @@ class GlobalInversion:
             self.gui.lblNodatImage.setText(str(meta[0]))
             self.gui.txtNodatOutput.setText(str(meta[0]))
             self.nodat[0] = meta[0]
-            self.exclude_bands = [i for i in range(len(self.wl)) if self.wl[i] < 400 or self.wl[i] > 2500
-                                  or self.exclude_wavelengths[0][0] <= self.wl[i] <= self.exclude_wavelengths[0][1]
-                                  or self.exclude_wavelengths[1][0] <= self.wl[i] <= self.exclude_wavelengths[1][1]]
+            self.exclude_bands = [
+                i for i in range(len(self.wl)) if self.wl[i] < 400 or self.wl[i] > 2500
+                or self.exclude_wavelengths[0][0] <= self.wl[i] <= self.exclude_wavelengths[0][1]  # noqa
+                or self.exclude_wavelengths[1][0] <= self.wl[i] <= self.exclude_wavelengths[1][1]  # noqa
+            ]
             self.gui.txtExclude.setText(" ".join(str(i) for i in self.exclude_bands))  # join to string for lineEdit
             self.gui.txtExclude.setCursorPosition(0)
 
@@ -480,7 +482,7 @@ class GlobalInversion:
                 self.main.nodat_widget.init(image_type=image_type, image=image)
                 self.main.nodat_widget.gui.setModal(True)  # parent window is blocked
                 # unlike .show(), .exec_() waits with execution of the code, until the app is closed
-                self.main.nodat_widget.gui.exec_()
+                self.main.nodat_widget.gui.exec()
                 nodata = self.main.nodat_widget.nodat
 
             if image_type == "Geometry Image":
@@ -762,4 +764,4 @@ if __name__ == '__main__':
     app = start_app()
     m = MainUiFunc()
     m.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

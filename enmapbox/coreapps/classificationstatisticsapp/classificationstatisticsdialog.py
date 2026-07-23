@@ -1,10 +1,11 @@
+from contextlib import suppress
 from math import ceil, sqrt
 from typing import Optional, List
 
 import numpy as np
 from osgeo import gdal
+from pyqtgraph import PlotWidget, GraphicsObject, mkBrush, mkPen
 
-from enmapbox.qgispluginsupport.qps.pyqtgraph.pyqtgraph import PlotWidget, GraphicsObject, mkBrush, mkPen
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
@@ -16,9 +17,10 @@ from qgis.PyQt.QtGui import QMouseEvent, QColor, QPicture, QPainter
 from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QTableWidget, QComboBox, QCheckBox, \
     QTableWidgetItem
 from qgis.PyQt.uic import loadUi
-from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsMapSettings, QgsPalettedRasterRenderer, QgsRasterRange, \
-    QgsRectangle, QgsFeature, QgsCoordinateTransform, \
-    QgsVectorLayer, QgsVectorFileWriter, QgsUnitTypes
+from qgis.core import (
+    QgsMapLayerProxyModel, QgsRasterLayer, QgsMapSettings, QgsPalettedRasterRenderer, QgsRasterRange, QgsRectangle,
+    QgsFeature, QgsCoordinateTransform, QgsVectorLayer, QgsVectorFileWriter, QgsUnitTypes
+)
 from qgis.gui import QgsMapLayerComboBox, QgsMapCanvas, QgsFieldComboBox, QgsFeaturePickerWidget
 
 
@@ -122,10 +124,8 @@ class ClassificationStatisticsDialog(QMainWindow):
 
         # disconnect old map canvas
         if self.mMapCanvas is not None:
-            try:
+            with suppress(Exception):
                 self.mMapCanvas.extentsChanged.disconnect(self.onMapCanvasExtentsChanged)
-            except Exception:
-                pass
 
         # connect new map canvas
         self.mMapCanvas = None
@@ -364,7 +364,8 @@ class ClassificationStatisticsDialog(QMainWindow):
         ds: gdal.Dataset = gdal.Rasterize(filename2, filename, options=options)
 
         marray = ds.ReadAsArray()
-        assert marray.shape == (height, width)
+        if marray.shape != (height, width):
+            raise RuntimeError(f'unexpected rasterized array shape: expected ({height}, {width}), got {marray.shape}')
         return marray.astype(bool)
 
 

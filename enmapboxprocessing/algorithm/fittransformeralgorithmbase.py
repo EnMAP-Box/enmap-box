@@ -3,13 +3,13 @@ import traceback
 from operator import xor
 from typing import Dict, Any, List, Tuple, Optional
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromrasteralgorithm import \
     PrepareUnsupervisedDatasetFromRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -22,15 +22,19 @@ class FitTransformerAlgorithmBase(EnMAPProcessingAlgorithm):
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
-            (self._TRANSFORMER, self.helpParameterCode()),
+            (
+                self._TRANSFORMER, self.helpParameterCode()
+                + '\nNote: The Python code provided here is executed locally with the permissions of '  # noqa: W503
+                  ' the current user during algorithm execution.'
+            ),
             (self._FEATURE_RASTER, 'Raster layer with feature data X used for fitting the transformer. '
                                    'Mutually exclusive with parameter: Training dataset'),
             (self._SAMPLE_SIZE, 'Approximate number of samples drawn from raster. '
                                 'If 0, whole raster will be used. '
                                 'Note that this is only a hint for limiting the number of rows and columns.'),
-            (self._DATASET, 'Training dataset pickle file used for fitting the transformer. '
+            (self._DATASET, 'Training dataset skops file used for fitting the transformer. '
                             'Mutually exclusive with parameter: Raster layer with features'),
-            (self._OUTPUT_TRANSFORMER, self.PickleFileDestination)
+            (self._OUTPUT_TRANSFORMER, self.SkopsFileDestination)
         ]
 
     def displayName(self) -> str:
@@ -56,7 +60,7 @@ class FitTransformerAlgorithmBase(EnMAPProcessingAlgorithm):
         self.addParameterRasterLayer(self.P_FEATURE_RASTER, self._FEATURE_RASTER, None, True)
         self.addParameterInt(self.P_SAMPLE_SIZE, self._SAMPLE_SIZE, 1000, True, 0, None)
         self.addParameterUnsupervisedDataset(self.P_DATASET, self._DATASET, None, True, True)
-        self.addParameterFileDestination(self.P_OUTPUT_TRANSFORMER, self._OUTPUT_TRANSFORMER, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_TRANSFORMER, self._OUTPUT_TRANSFORMER, self.SkopsFileFilter)
 
     def defaultCodeAsString(self):
         try:
@@ -69,7 +73,10 @@ class FitTransformerAlgorithmBase(EnMAPProcessingAlgorithm):
     def parameterAsTransformer(self, parameters: Dict[str, Any], name, context: QgsProcessingContext):
         namespace = dict()
         code = self.parameterAsString(parameters, name, context)
-        exec(code, namespace)
+
+        # nosec B102 # User-defined scikit-learn model code execution by design; equivalent to the QGIS Python Console.
+        # The code execution is transparently documented for users (e.g. via the Processing algorithm help).
+        exec(code, namespace)  # nosec B102 # User-defined scikit-learn model code execution by design;
         return namespace['transformer']
 
     def checkParameterValues(self, parameters: Dict[str, Any], context: QgsProcessingContext) -> Tuple[bool, str]:
@@ -84,7 +91,7 @@ class FitTransformerAlgorithmBase(EnMAPProcessingAlgorithm):
         return True, ''
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
 
         raster = self.parameterAsRasterLayer(parameters, self.P_FEATURE_RASTER, context)
@@ -106,12 +113,12 @@ class FitTransformerAlgorithmBase(EnMAPProcessingAlgorithm):
                 parameters = {
                     alg.P_FEATURE_RASTER: raster,
                     alg.P_SAMPLE_SIZE: sampleSize,
-                    alg.P_OUTPUT_DATASET: Utils.tmpFilename(filename, 'dataset.pkl')
+                    alg.P_OUTPUT_DATASET: Utils.tmpFilename(filename, 'dataset.skops')
                 }
                 self.runAlg(alg, parameters, None, feedback2, context, True)
                 filenameDataset = parameters[alg.P_OUTPUT_DATASET]
 
-            dump = TransformerDump.fromDict(Utils.pickleLoad(filenameDataset))
+            dump = TransformerDump.fromDict(Utils.modelLoad(filenameDataset))
             feedback.pushInfo(
                 f'Load training dataset: X=array{list(dump.X.shape)}')
             feedback.pushInfo('Fit transformer')

@@ -20,7 +20,8 @@ class SpatialConvolutionSavitskyGolay2DAlgorithm(ConvolutionFilterAlgorithmBase)
 
     def helpParameterCode(self) -> str:
         link = self.htmlLink(
-            'https://scipy-cookbook.readthedocs.io/items/SavitzkyGolay.html#Two-dimensional-data-smoothing-and-least-square-gradient-estimate',
+            'https://scipy-cookbook.readthedocs.io/items/SavitzkyGolay.html'
+            '#Two-dimensional-data-smoothing-and-least-square-gradient-estimate',
             'sgolay2d')
         return f'Python code. See {link} from the SciPy cookbook for information on different parameters.'
 

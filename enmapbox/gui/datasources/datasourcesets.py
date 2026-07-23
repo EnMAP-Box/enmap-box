@@ -4,7 +4,7 @@ from enmapbox.qgispluginsupport.qps.models import TreeNode
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import QgsApplication
 from .datasources import DataSource, VectorDataSource, RasterDataSource, ModelDataSource, \
-    FileDataSource
+    FileDataSource, VectorTileDataSource
 
 
 class DataSourceSet(TreeNode):
@@ -57,8 +57,9 @@ class DataSourceSet(TreeNode):
         existing = [ds.source() for ds in self.dataSources()]
 
         for s in dataSources:
-            assert isinstance(s, DataSource)
-            assert self.isValidSource(s)
+            if not isinstance(s, DataSource) and self.isValidSource(s):
+                raise ValueError(f'Invalid source type: {s}')
+
         # ensure unique source names
         newSources = [s for s in dataSources if s.source() not in existing]
         if len(newSources) > 0:
@@ -90,7 +91,7 @@ class VectorDataSourceSet(DataSourceSet):
                          )
 
     def isValidSource(self, source) -> bool:
-        return isinstance(source, VectorDataSource)
+        return isinstance(source, (VectorDataSource, VectorTileDataSource))
 
 
 class FileDataSourceSet(DataSourceSet):

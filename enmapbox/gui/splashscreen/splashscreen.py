@@ -23,6 +23,7 @@ class EnMAPBoxSplashScreen(QSplashScreen):
 
         css = "" \
               ""
+        del css
 
     def showMessage(self, text: str, alignment: Qt.Alignment = None, color: QColor = None):
         """

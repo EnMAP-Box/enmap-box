@@ -3,12 +3,12 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
+from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import Category, ClassifierDump
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtGui import QColor
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -26,10 +26,12 @@ class PrepareClassificationDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
             "https://force-eo.readthedocs.io/en/latest/components/higher-level/smp/index.html",
             "FORCE Higher Level Sampling Submodule"
         )
-        return 'Create a classification dataset from tabulated text files ' \
-               'and store the result as a pickle file. \n' \
-               f'The format matches that of the {link}.\n' \
-               f'Example files (force_features.csv and force_labels.csv) can be found in the EnMAP-Box testdata folder).'
+        return (
+            'Create a classification dataset from tabulated text files '
+            'and store the result as a skops file. \n'
+            f'The format matches that of the {link}.\n'
+            f'Example files (force_features.csv and force_labels.csv) can be found in the EnMAP-Box testdata folder).'
+        )
 
     def helpParameters(self) -> List[Tuple[str, str]]:
         return [
@@ -39,7 +41,7 @@ class PrepareClassificationDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
             (self._VALUE_FILE,
              'Text file with tabulated target data y (no headers). '
              'Each row represents the class value of a sample.'),
-            (self._OUTPUT_DATASET, self.PickleFileDestination)
+            (self._OUTPUT_DATASET, self.SkopsFileDestination)
         ]
 
     def group(self):
@@ -48,10 +50,10 @@ class PrepareClassificationDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterFile(self.P_FEATURE_FILE, self._FEATURE_FILE)
         self.addParameterFile(self.P_VALUE_FILE, self._VALUE_FILE)
-        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.PickleFileFilter)
+        self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         filenameFeatures = self.parameterAsFile(parameters, self.P_FEATURE_FILE, context)
         filenameLabels = self.parameterAsFile(parameters, self.P_VALUE_FILE, context)
@@ -77,10 +79,17 @@ class PrepareClassificationDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
 
             # prepare categories
             values = np.unique(y)
-            categories = [Category(int(v), str(v), QColor(randint(0, 2 ** 24 - 1)).name()) for v in values]
+            categories = [
+                Category(
+                    int(v),
+                    str(v),
+                    QColor(
+                        randint(0, 2 ** 24 - 1)  # nosec B311 # randint not security relevant
+                    ).name()) for v in values
+            ]
 
             dump = ClassifierDump(categories=categories, features=features, X=X, y=y)
-            Utils.pickleDump(dump.__dict__, filename)
+            Utils.modelDump(dump.__dict__, filename)
 
             result = {self.P_OUTPUT_DATASET: filename}
             self.toc(feedback, result)

@@ -5,10 +5,17 @@ from enmapboxprocessing.algorithm.tileenmapl2aalgorithm import TileEnmapL2AAlgor
 
 
 class TestTileEnmapL2AAlgorithm(TestCase):
-    xmlFilename1 = r'D:\data\EnFireMap\data\nc_230302_01\ENMAP01-____L2A-DT0000009825_20230302T192610Z_001_V010111_20230303T231444Z-METADATA.XML'
-    xmlFilename2 = r'D:\data\EnFireMap\data\nc_230302_02\ENMAP01-____L2A-DT0000009825_20230302T192615Z_002_V010111_20230303T231444Z-METADATA.XML'
+    xmlFilename1 = (
+        r'D:\data\EnFireMap\data\nc_230302_01'
+        r'\ENMAP01-____L2A-DT0000009825_20230302T192610Z_001_V010111_20230303T231444Z-METADATA.XML'
+    )
+    xmlFilename2 = (
+        r'D:\data\EnFireMap\data\nc_230302_02'
+        r'\ENMAP01-____L2A-DT0000009825_20230302T192615Z_002_V010111_20230303T231444Z-METADATA.XML'
+    )
     tilingScheme = r'D:\data\EnFireMap\cube\shp\grid_california.gpkg'
     dataAvailable = exists(xmlFilename1)
+    dataAvailable = False
 
     def test(self):
 

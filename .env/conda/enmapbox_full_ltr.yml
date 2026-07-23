@@ -1,81 +1,49 @@
-# EnMAP-Box conda environment (generated 2025-07-11 12:17:27)
+# EnMAP-Box conda environment (generated 2026-05-13 07:22:01)
 # run to install: conda env create -n enmapbox_full_ltr --file=enmapbox_full_ltr.yml
 # run to update : conda env update -n enmapbox_full_ltr --file=enmapbox_full_ltr.yml --prune
 # run to delete : conda env remove -n enmapbox_full_ltr
 # see https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
-# created with scripts/update_conda_environments.py (MANUAL CHANGES WILL BE OVERWRITTEN!) 
+# created with scripts/update_conda_environments.py (MANUAL CHANGES WILL BE OVERWRITTEN!)
 
 channels:
 - conda-forge
 dependencies:
-- qgis=3.40
-- python>=3.10
-- pip
-- scikit-learn>=1
-- matplotlib
-- enpt
-- enpt
-- xgboost
-- lightgbm
-- cdsapi
-- cython
-- netcdf4
-- pygrib
-- pyhdf
-- xarray
-- astropy
+- qgis=3.44
+- astropy-base
 - catboost
-- matplotlib
-- astropy
-- numba>=0.56.4
-- sympy
-- pyopengl
-- h5py
-- opencv[build=headless*]
-- pandas=2.2.3
-- gitpython
-- git-lfs
-- pytest
-- pytest-cov
-- pytest-xdist
+- colorama
 - docutils
-- flake8
-- astropy
-- catboost
-- cdsapi
-- cython
-- docutils
-- enpt
+- enfrosp
+- enfrosp_enmapboxapp
+- enpt>=1.2.1
+- enpt_enmapboxapp>=1.0.2
 - flake8
 - git-lfs
 - gitpython
 - h5py
 - lightgbm
-- matplotlib
+- lightning
+- matplotlib-base
 - netcdf4
 - numba>=0.56.4
 - opencv[build=headless*]
-- pandas=2.2.3
+- pandas
 - pip
-- pygrib
-- pyhdf
 - pyopengl
 - pytest
 - pytest-cov
 - pytest-xdist
-- python>=3.10
-- scikit-learn>=1
+- python
+- pytorch
+- scikit-learn>=1.4
+- segmentation-models-pytorch
+- setuptools<=81
 - sympy
-- xarray
+- tensorboard
+- torchvision
 - xgboost
 - pip:
-  - enpt-enmapboxapp
   - flake8-qgis
-  - lightning==2.5.0.post0
-  - segmentation-models-pytorch==0.5.0
-  - tensorboard==2.19.0
-  - torch==2.6.0
-  - torchvision==0.21.0
 name: enmapbox_full_ltr
 variables:
   PYQTGRAPH_QT_LIB: PyQt5

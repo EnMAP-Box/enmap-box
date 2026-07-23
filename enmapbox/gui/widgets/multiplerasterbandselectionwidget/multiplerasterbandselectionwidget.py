@@ -1,11 +1,11 @@
 from typing import List, Optional
 
+from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QListWidget, QListWidgetItem, QDialog
 from qgis.PyQt.uic import loadUi
-from qgis.core import QgsRasterLayer, QgsMapLayer
+from qgis.core import QgsRasterLayer
 from qgis.gui import QgsRasterBandComboBox
-from enmapbox.typeguard import typechecked
 
 
 @typechecked
@@ -80,15 +80,16 @@ class MultipleRasterBandSelectionDialog(QDialog):
     mOk: QToolButton
     mCancel: QToolButton
 
-    def __init__(self, parent=None, selection: List[int] = None, bandNames: List[str] = None):
+    def __init__(self, parent: Optional[QWidget] = None, selection: List[int] = [], bandNames: List[str] = []):
         QWidget.__init__(self, parent)
         loadUi(__file__.replace('widget.py', 'dialog.ui'), self)
-        assert selection is not None
-        assert bandNames is not None
+        if not isinstance(selection, list):
+            raise AssertionError('selection is not a list')
+        if not isinstance(bandNames, list):
+            raise AssertionError('bandnames is not a list')
 
         self.accepted = False
 
-        layer: QgsMapLayer
         for bandNo, bandName in enumerate(bandNames, 1):
             item = QListWidgetItem(bandName)
             item.bandNo = bandNo

@@ -1,15 +1,7 @@
 name: ✅ Check URLs
 
 on:
-  push:
-    branches:
-      - main
-      - 'release_**'
-      - urlcheck
-  pull_request:
-    branches:
-      - main
-      - 'release_**'
+  workflow_dispatch:
 
 jobs:
   build:

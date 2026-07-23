@@ -1,4 +1,5 @@
 from collections import defaultdict
+from contextlib import suppress
 from typing import Optional, List
 
 import numpy as np
@@ -17,7 +18,7 @@ from landcoverchangestatisticsapp.landcoverchangestatisticssettingsdockwidget im
     LandCoverChangeStatisticsSettingsDockWidget
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWebKitWidgets import QWebView
+# from qgis.PyQt.QtWebKitWidgets import QWebView
 from qgis.PyQt.QtWidgets import QStatusBar
 from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QCheckBox
 from qgis.PyQt.uic import loadUi
@@ -27,7 +28,7 @@ from qgis.gui import QgsMapCanvas
 
 @typechecked
 class LandCoverChangeStatisticsMainWindow(QMainWindow):
-    mWebView: QWebView
+    # mWebView: QWebView
     mStatusBar: QStatusBar
 
     def __init__(self, *args, **kwds):
@@ -91,10 +92,8 @@ class LandCoverChangeStatisticsMainWindow(QMainWindow):
 
         # disconnect old map canvas
         if self.mMapCanvas is not None:
-            try:
+            with suppress(Exception):
                 self.mMapCanvas.extentsChanged.disconnect(self.onMapCanvasExtentsChanged)
-            except Exception:
-                pass
 
         # connect new map canvas
         self.mMapCanvas = None
@@ -183,8 +182,11 @@ class LandCoverChangeSankeyPlotBuilder():
         self.locationProfile = [None] * len(layers)
 
     def setClassFilter(self, filter: List[List[str]] = None):
-        if filter is not None:
-            assert len(filter) == len(self.layers)
+        if filter is not None and len(filter) != len(self.layers):
+            raise ValueError(
+                f'filter length must match number of layers, '
+                f'got {len(filter)} and {len(self.layers)}'
+            )
         self.classFilter = filter
 
     def setOptions(self, options: dict):
@@ -219,12 +221,14 @@ class LandCoverChangeSankeyPlotBuilder():
             categoryRelSizes = categorySizes / np.sum(categorySizes)
             return array, categories, categorySizes, categoryRelSizes
 
+        array2 = categories2 = categorySizes2 = categoryRelSizes2 = None
         for i, (layer, nextLayer) in enumerate(zip(self.layers, self.layers[1:])):
             if i == 0:
                 array, categories, categorySizes, categoryRelSizes = readLayer(layer)
             else:
-                array, categories, categorySizes, categoryRelSizes = array2, categories2, categorySizes2, \
-                                                                     categoryRelSizes2
+                array, categories, categorySizes, categoryRelSizes = (
+                    array2, categories2, categorySizes2, categoryRelSizes2
+                )
             array2, categories2, categorySizes2, categoryRelSizes2 = readLayer(nextLayer)
 
             levels = [[c.value for c in categories], [c.value for c in categories2]]
@@ -254,7 +258,12 @@ class LandCoverChangeSankeyPlotBuilder():
             cls, matrix: np.ndarray, categories1: List[Category], categories2: List[Category], filter1: List[str],
             filter2: List[str]
     ):
-        assert matrix.shape == (len(categories1), len(categories2))
+        expected_shape = (len(categories1), len(categories2))
+        if matrix.shape != expected_shape:
+            raise ValueError(
+                f'expected matrix shape {expected_shape}, got {matrix.shape}'
+            )
+
         newCategories1 = [c for c in categories1 if c.name in filter1]
         newCategories2 = [c for c in categories2 if c.name in filter2]
         newMatrix = np.zeros((len(newCategories1) + 1, len(newCategories2) + 1), matrix.dtype)
@@ -327,7 +336,11 @@ class LandCoverChangeSankeyPlotBuilder():
         if self.classFilter is None:
             return self.categoriess, self.linkSizess, self.categorySizess, self.categoryRelSizess
 
-        assert len(self.classFilter) == len(self.categoriess)
+        if len(self.classFilter) != len(self.categoriess):
+            raise ValueError(
+                f'classFilter length must match number of categories, '
+                f'got {len(self.classFilter)} and {len(self.categoriess)}'
+            )
 
         categoriess = list()
         linkSizess = list()
@@ -416,7 +429,8 @@ class LandCoverChangeSankeyPlotBuilder():
                         links['target'].append(i2 + off2)
                         links['value'].append(p)
                         if locationValue1 == l1 and locationValue2 == l2:
-                            links['color'].append(makeRgba(highlightColor))
+                            links['color'].append(color)
+                            # links['color'].append(makeRgba(highlightColor))
                         else:
                             links['color'].append(color)
             off1 += len(categories1)

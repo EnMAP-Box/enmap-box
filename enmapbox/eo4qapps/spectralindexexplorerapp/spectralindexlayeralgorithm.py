@@ -2,11 +2,11 @@ import re
 from os.path import join, dirname
 from typing import Dict, Any, List, Tuple
 
-import processing
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+from qgis import processing
 from qgis.core import QgsProcessingOutputRasterLayer, QgsProcessingException, QgsProcessingContext, \
     QgsProcessingFeedback, QgsRasterLayer
 
@@ -128,7 +128,7 @@ class SpectralIndexLayerAlgorithm(EnMAPProcessingAlgorithm):
 
         expression = self.asiFormulaToRasterCalcFormula(formula, raster, mapping)
         if formula in self.Indices:
-            feedback.pushInfo(f'ASI formula: {self.Indices[formula]['formula']}')
+            feedback.pushInfo(f'ASI formula: {self.Indices[formula]["formula"]}')
         else:
             feedback.pushInfo('ASI formula: ' + formula)
         feedback.pushInfo('Virtual raster expression: ' + expression)

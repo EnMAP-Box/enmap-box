@@ -1,6 +1,6 @@
 from enmapboxprocessing.algorithm.classseparabilityalgorithm import ClassSeparabilityAlgorithm
 from enmapboxprocessing.algorithm.testcase import TestCase
-from enmapboxtestdata import classificationDatasetAsPklFile
+from enmapboxtestdata import classificationDatasetAsSkopsFile
 
 
 class TestClassSeparabilityAlgorithm(TestCase):
@@ -9,6 +9,6 @@ class TestClassSeparabilityAlgorithm(TestCase):
         alg = ClassSeparabilityAlgorithm()
         alg.initAlgorithm()
         parameters = {
-            alg.P_DATASET: classificationDatasetAsPklFile,
+            alg.P_DATASET: classificationDatasetAsSkopsFile,
         }
         self.runalg(alg, parameters)

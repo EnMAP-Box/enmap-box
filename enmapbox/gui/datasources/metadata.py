@@ -1,26 +1,25 @@
 import os
+from typing import Optional
 
 import numpy as np
+
+from enmapbox.gui.utils import dataTypeName
+from enmapbox.qgispluginsupport.qps.models import TreeNode, PyObjectTreeNode
+from enmapbox.qgispluginsupport.qps.utils import fileSizeString, SpatialExtent, QGIS_DATATYPE_NAMES
 from qgis.PyQt.QtCore import QSize
 from qgis.PyQt.QtGui import QIcon, QColor, QPixmap
 from qgis.PyQt.QtWidgets import QMenu, QApplication
 from qgis.core import QgsCoordinateReferenceSystem, QgsUnitTypes, QgsRasterLayer, QgsDataItem, QgsLayerItem, \
     QgsMapLayerType, QgsVectorLayer, QgsMapLayer, QgsRasterDataProvider
 
-from enmapbox.gui.utils import dataTypeName
-from enmapbox.qgispluginsupport.qps.classification.classificationscheme import ClassInfo, ClassificationScheme
-from enmapbox.qgispluginsupport.qps.models import TreeNode, PyObjectTreeNode
-from enmapbox.qgispluginsupport.qps.utils import fileSizeString, SpatialExtent, QGIS_DATATYPE_NAMES
-
 
 class CRSLayerTreeNode(TreeNode):
     def __init__(self, crs: QgsCoordinateReferenceSystem):
-        assert isinstance(crs, QgsCoordinateReferenceSystem)
         super().__init__(crs.description())
         self.setName('CRS')
         self.setIcon(QIcon(':/images/themes/default/propertyicons/CRS.svg'))
         self.setToolTip('Coordinate Reference System')
-        self.mCrs = None
+        self.mCrs: Optional[QgsCoordinateReferenceSystem] = None
         self.nodeDescription = TreeNode('Name', toolTip='Description')
         self.nodeAuthID = TreeNode('AuthID', toolTip='Authority ID')
         self.nodeAcronym = TreeNode('Acronym', toolTip='Projection Acronym')
@@ -29,8 +28,8 @@ class CRSLayerTreeNode(TreeNode):
 
         self.appendChildNodes([self.nodeDescription, self.nodeAuthID, self.nodeAcronym, self.nodeMapUnits])
 
-    def setCrs(self, crs):
-        assert isinstance(crs, QgsCoordinateReferenceSystem)
+    def setCrs(self, crs: QgsCoordinateReferenceSystem):
+
         self.mCrs = crs
         if self.mCrs.isValid():
             self.setValues(crs.description())
@@ -64,26 +63,25 @@ class CRSLayerTreeNode(TreeNode):
 
 class RasterBandTreeNode(TreeNode):
 
-    def __init__(self, rasterLayer: QgsRasterLayer, bandIndex, *args, **kwds):
+    def __init__(self, rasterLayer: QgsRasterLayer, bandIndex: int, *args, **kwds):
         super().__init__(*args, **kwds)
-        assert isinstance(rasterLayer, QgsRasterLayer)
-        assert bandIndex >= 0
-        assert bandIndex < rasterLayer.bandCount()
-        # self.mDataSource = dataSource
+        if not (0 <= bandIndex < rasterLayer.bandCount()):
+            raise ValueError('Band index out of range')
+
         self.mBandIndex: int = bandIndex
 
-        if False:
-            md = self.mDataSource.mBandMetadata[bandIndex]
-            classScheme = md.get('__ClassificationScheme__')
-            if isinstance(classScheme, ClassificationScheme):
-                to_add = []
-                for ci in classScheme:
-                    assert isinstance(ci, ClassInfo)
-                    classNode = TreeNode(name=str(ci.label()))
-                    classNode.setValue(ci.name())
-                    classNode.setIcon(ci.icon())
-                    to_add.append(classNode)
-                self.appendChildNodes(to_add)
+        # if False:
+        #     md = self.mDataSource.mBandMetadata[bandIndex]
+        #     classScheme = md.get('__ClassificationScheme__')
+        #     if isinstance(classScheme, ClassificationScheme):
+        #         to_add = []
+        #         for ci in classScheme:
+        #             assert isinstance(ci, ClassInfo)
+        #             classNode = TreeNode(name=str(ci.label()))
+        #             classNode.setValue(ci.name())
+        #             classNode.setIcon(ci.icon())
+        #             to_add.append(classNode)
+        #         self.appendChildNodes(to_add)
 
     def bandIndex(self) -> int:
         return self.mBandIndex
@@ -107,8 +105,6 @@ class ClassificationNodeLayer(TreeNode):
 class ColorTreeNode(TreeNode):
 
     def __init__(self, color: QColor):
-        assert isinstance(color, QColor)
-
         pm = QPixmap(QSize(20, 20))
         pm.fill(color)
         icon = QIcon(pm)
@@ -143,10 +139,10 @@ class DataSourceSizesTreeNode(TreeNode):
             try:
                 size = os.path.getsize(dataItem.path())
                 size = fileSizeString(size)
-                value.append(size)
-                childs += [TreeNode('File', size)]
-            except Exception as ex:
-                pass
+            except Exception:
+                size = 'N/A'
+            value.append(size)
+            childs += [TreeNode('File', size)]
 
         lyr = None
 

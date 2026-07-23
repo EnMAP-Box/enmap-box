@@ -1,10 +1,10 @@
-import string
 import random
-import numpy as np
+import string
 from os import makedirs
 from os.path import join, basename, exists, splitext
 from typing import Dict, Any, List, Tuple
 
+import numpy as np
 from osgeo import gdal
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
@@ -67,7 +67,7 @@ class TileRasterAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFolderDestination(self.P_OUTPUT_FOLDER, self._OUTPUT_FOLDER)
 
     def processAlgorithm(
-            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         tilingScheme = self.parameterAsVectorLayer(parameters, self.P_TILING_SCHEME, context)
@@ -83,7 +83,8 @@ class TileRasterAlgorithm(EnMAPProcessingAlgorithm):
         baseName = splitext(baseName)[0] + '.tif'
 
         def id_generator(size=40, chars=string.ascii_uppercase + string.digits):
-            return ''.join(random.choice(chars) for _ in range(size))
+            # nosec # non-security temporary folder identifier
+            return ''.join(random.choice(chars) for _ in range(size))  # nosec # non-security random string
 
         tmpFolderName = join(folderName, '_tmp', id_generator())
         if not exists(tmpFolderName):
@@ -171,7 +172,12 @@ class TileRasterAlgorithm(EnMAPProcessingAlgorithm):
                         rb: gdal.Band = ds.GetRasterBand(bandNo)
                         arrayNew = rbNew.ReadAsArray()
                         array = rb.ReadAsArray()
-                        assert arrayNew.shape == array.shape
+
+                        if arrayNew.shape != array.shape:
+                            raise ValueError(
+                                f'arrayNew must have the same shape as array, got {arrayNew.shape} and {array.shape}'
+                            )
+
                         arrayUpdated = np.where(arrayNew == rbNew.GetNoDataValue(), array, arrayNew)
                         rb.WriteArray(arrayUpdated)
                     dsNew = None
