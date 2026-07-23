@@ -10,6 +10,7 @@ numba,,0.57
 netCDF4,,,required by ONNS
 GDAL,osgeo.gdal,,Installed with QGIS
 numpy,,,Installed with QGIS
+eniccs,,0.2.4,Required by EnICCS application
 # torch,,,Required by SpecDeepMap application
 # lightning,,,Required by SpecDeepMap application
 # tensorboard,,,Required by SpecDeepMap application

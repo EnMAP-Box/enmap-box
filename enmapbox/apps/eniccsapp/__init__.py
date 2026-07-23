@@ -25,7 +25,7 @@ class EniccsApp(EnMAPBoxApplication):
 
     @classmethod
     def title(cls):
-        return 'EnICCS - EnMAP L2A cloud and cloud shadow mask'
+        return ('EnICCS - EnMAPs Improved Cloud and Cloud Shadows (L2A)')
 
     def menu(self, appMenu: QMenu):
         pass
