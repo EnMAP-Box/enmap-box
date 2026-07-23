@@ -11,7 +11,7 @@ qgsApp = start_app()
 initAll()
 
 
-class TestLocationBrowserDockWidget(TestCase):
+class TestProfileAnalyticsDockWidget(TestCase):
 
     def test(self):
         enmapBox = EnMAPBox(None)
