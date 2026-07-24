@@ -10,7 +10,7 @@ qgsApp = start_app()
 initAll()
 
 
-class TestBandStatisticsApp(TestCase):
+class TestBivariateColorRasterRendererApp(TestCase):
 
     def test(self):
         enmapBox = EnMAPBox(None)

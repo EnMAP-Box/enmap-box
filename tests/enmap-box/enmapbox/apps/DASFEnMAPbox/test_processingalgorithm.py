@@ -3,7 +3,7 @@ from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import enmap_potsdam
 
 
-class TestArdAggregateRastersAlgorithm(TestCase):
+class TestDASFretrievalAlgorithm(TestCase):
 
     def test(self):
         alg = DASFretrievalAlgorithm()
