@@ -26,7 +26,7 @@ class TestLocationBrowserDockWidget(TestCase):
         widget.show()
         widget.onRequestNominatimClicked()
 
-        if not False:
+        if False:
             qgsApp.exec()
 
         self.dispose_widget(widget)

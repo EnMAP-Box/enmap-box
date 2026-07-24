@@ -25,7 +25,7 @@ class TestSensorProductImportApp(TestCase):
         self.assertIsInstance(widget, SensorProductImportDockWidget)
         widget.show()
 
-        if not False:
+        if False:
             qgsApp.exec()
 
         self.dispose_widget(widget)

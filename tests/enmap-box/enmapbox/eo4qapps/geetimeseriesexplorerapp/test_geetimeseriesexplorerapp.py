@@ -33,7 +33,7 @@ class TestGeeTimeseriesExplorerApp(TestCase):
         self.assertIsInstance(widget2, GeeTemporalProfileDockWidget)
         widget2.show()
 
-        if not False:
+        if False:
             qgsApp.exec()
 
         self.dispose_widget(widget1)

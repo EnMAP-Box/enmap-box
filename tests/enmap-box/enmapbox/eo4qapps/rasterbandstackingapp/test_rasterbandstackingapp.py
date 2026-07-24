@@ -25,7 +25,7 @@ class TestRasterBandStackingApp(TestCase):
         self.assertIsInstance(widget, RasterBandStackingDockWidget)
         widget.show()
 
-        if not False:
+        if False:
             qgsApp.exec()
 
         self.dispose_widget(widget)

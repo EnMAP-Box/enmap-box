@@ -24,7 +24,7 @@ class TestScatterPlotDialogApp(TestCase):
         widget.mBandX.setBand(1)
         widget.mBandY.setBand(100)
 
-        if not False:
+        if False:
             qgsApp.exec()
 
         self.dispose_widget(widget)

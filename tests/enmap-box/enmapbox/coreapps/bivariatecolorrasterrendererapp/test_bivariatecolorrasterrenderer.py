@@ -21,7 +21,7 @@ class TestBivariateColorRasterRendererApp(TestCase):
         widget.show()
         widget.mLayer.setLayer(layer)
 
-        if not False:
+        if False:
             qgsApp.exec()
 
         self.dispose_widget(widget)

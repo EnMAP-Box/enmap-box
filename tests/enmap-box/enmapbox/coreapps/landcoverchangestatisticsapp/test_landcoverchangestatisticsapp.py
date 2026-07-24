@@ -20,7 +20,7 @@ class TestHsvColorRasterRendererApp(TestCase):
         widget = LandCoverChangeStatisticsMainWindow()
         widget.show()
 
-        if not False:
+        if False:
             qgsApp.exec()
 
         self.dispose_widget(widget)
