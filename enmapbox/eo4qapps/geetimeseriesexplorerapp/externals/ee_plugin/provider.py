@@ -94,9 +94,9 @@ class GeetseEarthEngineRasterDataProvider(QgsRasterDataProvider):
 
     def capabilities(self):
         caps = (
-                QgsRasterInterface.Capability.Size
-                | QgsRasterInterface.Capability.Identify  # noqa: W503
-                | QgsRasterInterface.Capability.IdentifyValue  # noqa: W503
+            QgsRasterInterface.Capability.Size
+            | QgsRasterInterface.Capability.Identify  # noqa: W503
+            | QgsRasterInterface.Capability.IdentifyValue  # noqa: W503
         )
         return QgsRasterDataProvider.ProviderCapabilities(caps)
 

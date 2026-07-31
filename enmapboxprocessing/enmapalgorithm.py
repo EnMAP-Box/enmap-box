@@ -12,6 +12,7 @@ from osgeo import gdal
 import qgis.processing
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.glossary import injectGlossaryLinks
+from enmapboxprocessing.parameter.processingparametercodeeditwidget import ProcessingParameterCodeEditWidgetFactory
 from enmapboxprocessing.parameter.processingparameterrasterdestination import ProcessingParameterRasterDestination
 from enmapboxprocessing.processingfeedback import ProcessingFeedback
 from enmapboxprocessing.typing import ClassifierDump, ClustererDump, CreationOptions, GdalResamplingAlgorithm, \
@@ -995,10 +996,16 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def addParameterCode(
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
-        from enmapboxprocessing.parameter.processingparametercodeeditwidget import \
-            ProcessingParameterCodeEditWidgetWrapper
         param = QgsProcessingParameterString(name, description, optional=optional)
-        param.setMetadata({'widget_wrapper': {'class': ProcessingParameterCodeEditWidgetWrapper}})
+
+        metadata = param.metadata()
+        metadata["widget_wrapper"] = {
+            "widget_type": (
+                ProcessingParameterCodeEditWidgetFactory.WIDGET_TYPE
+            )
+        }
+        param.setMetadata(metadata)
+
         param.setDefaultValue(defaultValue)
         self.addParameter(param)
         self.flagParameterAsAdvanced(name, advanced)

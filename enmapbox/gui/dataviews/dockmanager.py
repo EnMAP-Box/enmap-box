@@ -1144,10 +1144,10 @@ class DockManagerTreeModel(QgsLayerTreeModel):
 
                     if isinstance(node, DockTreeNode):
                         flags = (
-                                flags
-                                | Qt.ItemFlag.ItemIsUserCheckable  # noqa: W503
-                                | Qt.ItemFlag.ItemIsEditable  # noqa: W503
-                                | Qt.ItemFlag.ItemIsDropEnabled  # noqa: W503
+                            flags
+                            | Qt.ItemFlag.ItemIsUserCheckable  # noqa: W503
+                            | Qt.ItemFlag.ItemIsEditable  # noqa: W503
+                            | Qt.ItemFlag.ItemIsDropEnabled  # noqa: W503
                         )
 
                         if isL1:

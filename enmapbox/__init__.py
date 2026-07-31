@@ -326,6 +326,9 @@ def initAll():
     from enmapbox.provider.maskrasterdataprovider import register_data_provider
     register_data_provider()
 
+    from enmapboxprocessing.parameter.processingparametercodeeditwidget import ProcessingParameterCodeEditWidgetFactory
+    ProcessingParameterCodeEditWidgetFactory.register()
+
     registerEditorWidgets()
     registerExpressionFunctions()
     registerEnMAPBoxProcessingProvider()
