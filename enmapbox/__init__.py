@@ -329,6 +329,10 @@ def initAll():
     from enmapboxprocessing.parameter.processingparametercodeeditwidget import ProcessingParameterCodeEditWidgetFactory
     ProcessingParameterCodeEditWidgetFactory.register()
 
+    from enmapboxprocessing.parameter.processingparametercreationprofilewidget import (
+        ProcessingParameterCreationProfileWidgetFactory)
+    ProcessingParameterCreationProfileWidgetFactory.register()
+
     registerEditorWidgets()
     registerExpressionFunctions()
     registerEnMAPBoxProcessingProvider()
