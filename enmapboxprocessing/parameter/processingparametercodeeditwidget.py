@@ -1,3 +1,5 @@
+from qgis.core import QgsMessageLog, Qgis
+
 from qgis.gui import QgsAbstractProcessingParameterWidgetWrapper, QgsProcessingParameterWidgetFactoryInterface, QgsGui
 
 from qgis.PyQt.Qsci import QsciScintilla, QsciLexerPython
@@ -72,4 +74,8 @@ class ProcessingParameterCodeEditWidgetFactory(QgsProcessingParameterWidgetFacto
 
     @classmethod
     def register(cls):
-        QgsGui.processingGuiRegistry().addParameterWidgetFactory(cls())
+        success = QgsGui.processingGuiRegistry().addParameterWidgetFactory(cls())
+        if success:
+            QgsMessageLog.logMessage(f'{cls.WIDGET_TYPE} registered', level=Qgis.MessageLevel.Info)
+        else:
+            QgsMessageLog.logMessage(f'{cls.WIDGET_TYPE} could not be registered', level=Qgis.MessageLevel.Critical)

@@ -333,6 +333,11 @@ def initAll():
         ProcessingParameterCreationProfileWidgetFactory)
     ProcessingParameterCreationProfileWidgetFactory.register()
 
+    from enmapboxprocessing.parameter.processingparameterestimatorcodeeditwidget import (
+        ProcessingParameterClassifierCodeEditFactory, ProcessingParameterRegressorCodeEditFactory)
+    ProcessingParameterClassifierCodeEditFactory.register()
+    ProcessingParameterRegressorCodeEditFactory.register()
+
     registerEditorWidgets()
     registerExpressionFunctions()
     registerEnMAPBoxProcessingProvider()

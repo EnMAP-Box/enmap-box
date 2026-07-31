@@ -1,10 +1,12 @@
+from qgis.core import QgsMessageLog, Qgis
+from qgis.gui import QgsAbstractProcessingParameterWidgetWrapper, QgsProcessingParameterWidgetFactoryInterface, QgsGui
+
 from enmapboxprocessing.algorithm.algorithms import algorithms
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 from enmapboxprocessing.algorithm.fitrandomforestclassifieralgorithm import FitRandomForestClassifierAlgorithm
 from enmapboxprocessing.algorithm.fitrandomforestregressoralgorithm import FitRandomForestRegressorAlgorithm
 from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
 from enmapboxprocessing.parameter.processingparametercodeeditwidget import CodeEditWidget
-from processing.gui.wrappers import WidgetWrapper
 from qgis.PyQt.QtWidgets import QWidget, QComboBox, QTextBrowser
 from qgis.PyQt.uic import loadUi
 
@@ -54,26 +56,66 @@ class ProcessingParameterEstimatorCodeEdit(QWidget):
         return self.mCode.value()
 
 
-class ProcessingParameterEstimatorCodeEditWrapper(WidgetWrapper):
+class ProcessingParameterEstimatorCodeEditWrapper(QgsAbstractProcessingParameterWidgetWrapper):
     widget: ProcessingParameterEstimatorCodeEdit
 
     def createWidget(self):
         raise NotImplementedError()
 
-    def setValue(self, value):
-        self.widget.mCode.setText(value)
+    def setWidgetValue(self, value, context):
+        widget = self.wrappedWidget()
+        widget.mCode.setText(value)
 
-    def value(self):
-        return self.widget.value()
+    def widgetValue(self):
+        widget = self.wrappedWidget()
+        return widget.value()
 
 
 class ProcessingParameterClassifierCodeEditWrapper(ProcessingParameterEstimatorCodeEditWrapper):
 
     def createWidget(self):
-        return ProcessingParameterEstimatorCodeEdit(ProcessingParameterEstimatorCodeEdit.Classifier)
+        widget = ProcessingParameterEstimatorCodeEdit(ProcessingParameterEstimatorCodeEdit.Classifier)
+        return widget
 
 
 class ProcessingParameterRegressorCodeEditWrapper(ProcessingParameterEstimatorCodeEditWrapper):
 
     def createWidget(self):
-        return ProcessingParameterEstimatorCodeEdit(ProcessingParameterEstimatorCodeEdit.Regressor)
+        widget = ProcessingParameterEstimatorCodeEdit(ProcessingParameterEstimatorCodeEdit.Regressor)
+        return widget
+
+
+class ProcessingParameterClassifierCodeEditFactory(QgsProcessingParameterWidgetFactoryInterface):
+    WIDGET_TYPE = 'enmapbox:ProcessingParameterClassifierCodeEdit'
+
+    def parameterType(self):
+        return self.WIDGET_TYPE
+
+    def createWidgetWrapper(self, parameter, widget_type):
+        return ProcessingParameterClassifierCodeEditWrapper(parameter, widget_type)
+
+    @classmethod
+    def register(cls):
+        success = QgsGui.processingGuiRegistry().addParameterWidgetFactory(cls())
+        if success:
+            QgsMessageLog.logMessage(f'{cls.WIDGET_TYPE} registered', level=Qgis.MessageLevel.Info)
+        else:
+            QgsMessageLog.logMessage(f'{cls.WIDGET_TYPE} could not be registered', level=Qgis.MessageLevel.Critical)
+
+
+class ProcessingParameterRegressorCodeEditFactory(QgsProcessingParameterWidgetFactoryInterface):
+    WIDGET_TYPE = 'enmapbox:ProcessingParameterRegressorCodeEdit'
+
+    def parameterType(self):
+        return self.WIDGET_TYPE
+
+    def createWidgetWrapper(self, parameter, widget_type):
+        return ProcessingParameterRegressorCodeEditWrapper(parameter, widget_type)
+
+    @classmethod
+    def register(cls):
+        success = QgsGui.processingGuiRegistry().addParameterWidgetFactory(cls())
+        if success:
+            QgsMessageLog.logMessage(f'{cls.WIDGET_TYPE} registered', level=Qgis.MessageLevel.Info)
+        else:
+            QgsMessageLog.logMessage(f'{cls.WIDGET_TYPE} could not be registered', level=Qgis.MessageLevel.Critical)

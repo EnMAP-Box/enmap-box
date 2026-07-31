@@ -709,9 +709,18 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
         from enmapboxprocessing.parameter.processingparameterestimatorcodeeditwidget import \
-            ProcessingParameterClassifierCodeEditWrapper
+            ProcessingParameterRegressorCodeEditFactory
+
         param = QgsProcessingParameterString(name, description, defaultValue, True, optional)
-        param.setMetadata({'widget_wrapper': {'class': ProcessingParameterClassifierCodeEditWrapper}})
+
+        metadata = param.metadata()
+        metadata["widget_wrapper"] = {
+            "widget_type": (
+                ProcessingParameterRegressorCodeEditFactory.WIDGET_TYPE
+            )
+        }
+        param.setMetadata(metadata)
+
         param.setDefaultValue(defaultValue)
         self.addParameter(param)
         self.flagParameterAsAdvanced(name, advanced)
@@ -739,9 +748,17 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
         from enmapboxprocessing.parameter.processingparameterestimatorcodeeditwidget import \
-            ProcessingParameterRegressorCodeEditWrapper
+            ProcessingParameterRegressorCodeEditFactory
         param = QgsProcessingParameterString(name, description, defaultValue, True, optional)
-        param.setMetadata({'widget_wrapper': {'class': ProcessingParameterRegressorCodeEditWrapper}})
+
+        metadata = param.metadata()
+        metadata["widget_wrapper"] = {
+            "widget_type": (
+                ProcessingParameterRegressorCodeEditFactory.WIDGET_TYPE
+            )
+        }
+        param.setMetadata(metadata)
+
         param.setDefaultValue(defaultValue)
         self.addParameter(param)
         self.flagParameterAsAdvanced(name, advanced)
