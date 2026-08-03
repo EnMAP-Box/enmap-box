@@ -1,9 +1,14 @@
 # CHANGELOG
 
+## Version 3.17.8 (2026-08-03)
+
+* fixes the 'RasterInterfaceCapabilities' has no attribute 'Size'
+  error [qps #225](https://github.com/EnMAP-Box/qgispluginsupport/issues/223)
+
 ## Version 3.17.7 (2026-05-29)
 
-* added short-cuts to visualize raster layer profiles in spectral
-  views ([#1534](https://github.com/EnMAP-Box/enmap-box/issues/1534))
+* added short-cuts to visualize raster layer profiles in spectral views
+  ([#1534](https://github.com/EnMAP-Box/enmap-box/issues/1534))
 * fixed band statistics dialog ([#1513](https://github.com/EnMAP-Box/enmap-box/issues/1513))
 * tooltips related to map layers show the layer id ([#1505](https://github.com/EnMAP-Box/enmap-box/issues/1505))
 * fixed text color in spectral profile source panel
@@ -20,24 +25,24 @@ _This release was tested under QGIS 3.40 (LTR) and 3.44 (latest release)._
 * EnMAP-Box opens Tanager \*.h5 files and reads wavelength information
 * separate QgsProjects: EnMAP-Box widgets now show layers that are opened in EnMAP-Box only
 * revisited start of processing algorithms
-* if started from EnMAP-Box, the results returned from QGIS Processing Algorithms are
-  added directly to the EnMAP-Box, keeping the QGIS Project clean
-* a new dialog allows selecting layers from the main QGIS to be added as data
-  sources ([#1487](https://github.com/EnMAP-Box/enmap-box/pull/1487))
+* if started from EnMAP-Box, the results returned from QGIS Processing Algorithms are added directly to the EnMAP-Box,
+  keeping the QGIS Project clean
+* a new dialog allows selecting layers from the main QGIS to be added as data sources
+  ([#1487](https://github.com/EnMAP-Box/enmap-box/pull/1487))
 * added support for vector tile layers ([#860](https://github.com/EnMAP-Box/enmap-box/issues/860))
 
 #### Spectral Library Viewer
 
-The Spectral Library Viewer and the I/O for external spectral library formats
-have been completely redesigned (qps issues [100](https://github.com/EnMAP-Box/qgispluginsupport/issues/100) and
+The Spectral Library Viewer and the I/O for external spectral library formats have been completely redesigned (qps
+issues [100](https://github.com/EnMAP-Box/qgispluginsupport/issues/100) and
 [113](https://github.com/EnMAP-Box/qgispluginsupport/issues/113):
 
 * faster reading and visualization of spectral profiles
 * a single viewer can visualize profiles from different vector layers
 * added interactive legend that allows hiding / showing single profiles
 * added profile statistics, e.g. mean and stddev profiles
-* import and export of spectral profiles has been completely revised and
-  is now implemented as QGIS Processing Algorithms (see below)
+* import and export of spectral profiles has been completely revised and is now implemented as QGIS Processing
+  Algorithms (see below)
 * supports import of ECOSTRESS data
 * new "Data" field allows modifying x and y values, e.g., to scale profile
   values [#1459](https://github.com/EnMAP-Box/enmap-box/issues/1459)
@@ -53,7 +58,7 @@ have been completely redesigned (qps issues [100](https://github.com/EnMAP-Box/q
 
 * [Spectral Index Explorer] overhaul the Spectral Index Creator and make it an EO4Q
   app [#1199](https://github.com/EnMAP-Box/enmap-box/issues/1199)
-* [EnSoMAP] Add new “SOC Index: R478/(R659*R546)” [#1250](https://github.com/EnMAP-Box/enmap-box/issues/1250)
+* [EnSoMAP] Add new “SOC Index: R478/ (R659*R546)” [#1250](https://github.com/EnMAP-Box/enmap-box/issues/1250)
 
 #### Processing Algorithms
 
@@ -82,7 +87,7 @@ have been completely redesigned (qps issues [100](https://github.com/EnMAP-Box/q
 * [Testdata] add support for testdata management in stand-alone
   QGIS [#1227](https://github.com/EnMAP-Box/enmap-box/issues/1227)
 * Update HTML report style [#1247](https://github.com/EnMAP-Box/enmap-box/issues/1247)
-* Use EnMAPBox.project() [#1272](https://github.com/EnMAP-Box/enmap-box/issues/1272)
+* Use EnMAPBox.project () [#1272](https://github.com/EnMAP-Box/enmap-box/issues/1272)
 * [Spectral View] can't create a new and empty spectral view [#1310](https://github.com/EnMAP-Box/enmap-box/issues/1310)
 * [Spectral View] deactivated candidate profile is still
   displayed [#1330](https://github.com/EnMAP-Box/enmap-box/issues/1330)
@@ -133,8 +138,8 @@ have been completely redesigned (qps issues [100](https://github.com/EnMAP-Box/q
 * ImportEnmapL2AAlgorithm can't deal with "_COG.TIF" for Level2A EnMap Data from DLR Geoservice
   STAC [#1260](https://github.com/EnMAP-Box/enmap-box/issues/1260)
 * Import EnMAP L2A product [#1262](https://github.com/EnMAP-Box/enmap-box/issues/1262)
-* [CI] test_SpectralResamplingByWavelengthAndFwhmAlgorithm: AssertionError: -36108144.0 != np.float32(
-  -3.610814e+07) [#1266](https://github.com/EnMAP-Box/enmap-box/issues/1266)
+* [CI] test_SpectralResamplingByWavelengthAndFwhmAlgorithm: AssertionError: -36108144.0 != np.float32
+  (-3.610814e+07) [#1266](https://github.com/EnMAP-Box/enmap-box/issues/1266)
 * test_ConvexHullAlgorithm fail [#1267](https://github.com/EnMAP-Box/enmap-box/issues/1267)
 * MaskRasterDataProvider causes SegFaults [#1268](https://github.com/EnMAP-Box/enmap-box/issues/1268)
 * RasterLayerStyling Panel causes QGIS crash by segfault [#1271](https://github.com/EnMAP-Box/enmap-box/issues/1271)
@@ -170,8 +175,8 @@ have been completely redesigned (qps issues [100](https://github.com/EnMAP-Box/q
 * ENVI BSQ files can be opened by drag and drop [#1382](https://github.com/EnMAP-Box/enmap-box/issues/1382)
 * [Spectral View] fixed extraction of profiles from raster
   image [#1383](https://github.com/EnMAP-Box/enmap-box/issues/1383)
-* [Spectral View] export spectral profiles uses current speclib and field
-  as default input [#1401](https://github.com/EnMAP-Box/enmap-box/issues/1401)
+* [Spectral View] export spectral profiles uses current speclib and field as default
+  input [#1401](https://github.com/EnMAP-Box/enmap-box/issues/1401)
 * [Spectral View] profile candidates get also shown when selected-features-only mode is activated
 * Vector layer properties dialag: activated the button to start / stop the editing
   mode [#1489](https://github.com/EnMAP-Box/enmap-box/issues/1489)
@@ -263,8 +268,8 @@ _This release was tested under QGIS 3.34 (LTR) and 3.38 (latest release)._
   available [#911](https://github.com/EnMAP-Box/enmap-box/issues/911)
 * [Classification workflow] add "classification layer accuracy and area report"
   output [#912](https://github.com/EnMAP-Box/enmap-box/issues/912)
-* implement "Create spectral library (from classification
-  dataset)" [#917](https://github.com/EnMAP-Box/enmap-box/issues/917)
+* implement "Create spectral library (from classification dataset)
+  " [#917](https://github.com/EnMAP-Box/enmap-box/issues/917)
 * add algorithm and interactive tool for plotting trajectories of land cover change over time via Sankey
   plot [#924](https://github.com/EnMAP-Box/enmap-box/issues/924)
 * add algorithms for creating spectral library from classification/regression
@@ -406,12 +411,12 @@ _This release was tested under QGIS 3.34 (LTR) and 3.36 (latest release)._
 * QGIS v.3-36 problem when enabling EnMap-Box [#818](https://github.com/EnMAP-Box/enmap-box/issues/818)
 * SaveLibraryAsGeoJsonAlgorithm fails to save Speclibs with MAP
   field [#823](https://github.com/EnMAP-Box/enmap-box/issues/823)
-* Select Features, AsdsertionError isinstance(mode,
+* Select Features, AsdsertionError isinstance (mode,
   QgsMapToolSelectionHandler.SelectionMode) [#827](https://github.com/EnMAP-Box/enmap-box/issues/827)
-* ensomap:  ImportError:cannot import name 'docstring' from 'matplotlib' (
-  /home/alobo/.local/lib/python3.10/site-packages/matplotlib/__init__
+* ensomap:  ImportError:cannot import name 'docstring' from 'matplotlib'
+  (/home/alobo/.local/lib/python3.10/site-packages/matplotlib/ __init__
   .py) [#836](https://github.com/EnMAP-Box/enmap-box/issues/836)
-* Missing Python Package(s) message is displayed at every
+* Missing Python Package (s) message is displayed at every
   start [#837](https://github.com/EnMAP-Box/enmap-box/issues/837)
 * enpt is missing and cannot be installed [#839](https://github.com/EnMAP-Box/enmap-box/issues/839)
 * [EnmapBoxSettings] boolean values are not correctly handled [#851](https://github.com/EnMAP-Box/enmap-box/issues/851)
@@ -423,7 +428,7 @@ _This release was tested under QGIS 3.34 (LTR) and 3.36 (latest release)._
 * EnMAP L2A data isn't scaled correctly between 0 and 1 [#879](https://github.com/EnMAP-Box/enmap-box/issues/879)
 * [Scale/truncate/convert raster layer] algo is placed in the wrong algo
   group [#885](https://github.com/EnMAP-Box/enmap-box/issues/885)
-* Couldn't load plugin 'enmapboxplugin' due to an error when calling its classFactory()
+* Couldn't load plugin 'enmapboxplugin' due to an error when calling its classFactory ()
   method  [#886](https://github.com/EnMAP-Box/enmap-box/issues/886)
 * [SpectralView] GeoJSON library with NaN values not correctly
   plotted [#887](https://github.com/EnMAP-Box/enmap-box/issues/887)
@@ -548,7 +553,7 @@ _This release was tested under QGIS 3.28 (LTR), 3.32 and 3.34 (latest release)._
 * Ubuntu 22.04: No module named 'PyQt5.pyrcc_main' [#466](https://github.com/EnMAP-Box/enmap-box/issues/466)
 * [Classification workflow] temp files are written into the QGIS installation
   folder [#477](https://github.com/EnMAP-Box/enmap-box/issues/477)
-* ValueError: Input contains NaN, infinity or a value too large for dtype('
+* ValueError: Input contains NaN, infinity or a value too large for dtype ('
   float32'). [#495](https://github.com/EnMAP-Box/enmap-box/issues/495)
 * [Translate raster layer] data gain/offset is getting lost, when translation an EnMAP L2A VRT to GTiff
   format [#501](https://github.com/EnMAP-Box/enmap-box/issues/501)
@@ -790,7 +795,7 @@ _This release was tested under QGIS 3.28 (LTR)._
   param_validation.InvalidParameterError  [#440](https://github.com/EnMAP-Box/enmap-box/issues/440)
 * TypeError: type of argument "value" must be one of (int, str); got numpy.int64
   instead [#448](https://github.com/EnMAP-Box/enmap-box/issues/448)
-* Couldn't load plugin 'enmapboxplugin' due to an error when calling its classFactory()
+* Couldn't load plugin 'enmapboxplugin' due to an error when calling its classFactory ()
   method  [#453](https://github.com/EnMAP-Box/enmap-box/issues/453)
 * Import Spectral Profiles -> from Raster Layer dialog [#454](https://github.com/EnMAP-Box/enmap-box/issues/454)
 * Incorrect geocoding of PRISMA L2D data imported via Import
@@ -800,7 +805,7 @@ _This release was tested under QGIS 3.28 (LTR)._
   correctly [#490](https://github.com/EnMAP-Box/enmap-box/issues/490)
 * IndexError when trying to import PRISMA L2D data [#497](https://github.com/EnMAP-Box/enmap-box/issues/497)
 * AttributeError: module 'numpy' has no attribute 'float' [#510](https://github.com/EnMAP-Box/enmap-box/issues/510)
-* TypeError: QgsMapToolAddFeature.__init__() got multiple values for argument '
+* TypeError: QgsMapToolAddFeature. __init__() got multiple values for argument '
   mode' [#516](https://github.com/EnMAP-Box/enmap-box/issues/516)
 
 </details>
@@ -856,8 +861,8 @@ _This release was tested under QGIS 3.26._
 * temporal pixel profile from FORCE TSI raster not correctly displayed in
   SpectralView [#5](https://github.com/EnMAP-Box/enmap-box/issues/5)
 * several exampledata files are missing [#7](https://github.com/EnMAP-Box/enmap-box/issues/7)
-* fix DeprecationWarning: QgsMapLayer.saveDefaultStyle() is deprecated message, success =
-  layer.saveDefaultStyle() [#8](https://github.com/EnMAP-Box/enmap-box/issues/8)
+* fix DeprecationWarning: QgsMapLayer.saveDefaultStyle () is deprecated message, success = layer.saveDefaultStyle
+  () [#8](https://github.com/EnMAP-Box/enmap-box/issues/8)
 * 'there is no matching overloaded signal' error on identify cursor location
   value [#12](https://github.com/EnMAP-Box/enmap-box/issues/12)
 * SVR errors [#18](https://github.com/EnMAP-Box/enmap-box/issues/18)
@@ -896,8 +901,8 @@ _This release was tested under QGIS 3.26._
 * [EnGeoMAP] GUI does not start [#101](https://github.com/EnMAP-Box/enmap-box/issues/101)
 * ModuleNotFoundError: No module named '
   geetimeseriesexplorerapp'  [#105](https://github.com/EnMAP-Box/enmap-box/issues/105)
-* Blank red band when adding multiband raster layer in default colors (
-  RGB) [#106](https://github.com/EnMAP-Box/enmap-box/issues/106)
+* Blank red band when adding multiband raster layer in default colors
+  (RGB) [#106](https://github.com/EnMAP-Box/enmap-box/issues/106)
 * Missing test or example files [#110](https://github.com/EnMAP-Box/enmap-box/issues/110)
 * [Processing] scipy ndimage filters "layers were not correctly
   generated" [#116](https://github.com/EnMAP-Box/enmap-box/issues/116)

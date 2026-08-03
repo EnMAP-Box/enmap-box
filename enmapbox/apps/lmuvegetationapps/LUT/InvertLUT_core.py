@@ -230,7 +230,7 @@ class RTMInversion:
             delta = np.sum(np.abs(image_ref - model_ref), axis=0)
         elif ctype == 3:  # mNSE
             delta = 1.0 - ((np.sum(np.abs(image_ref - model_ref), axis=0))
-                           / (np.sum(np.abs(image_ref - (np.mean(image_ref))))))
+                           / (np.sum(np.abs(image_ref - (np.mean(image_ref))))))  # noqa
         else:
             delta = None
             exit("wrong cost function type. Expected 1, 2 or 3; got %i instead" % ctype)
@@ -308,8 +308,8 @@ class RTMInversion:
             whichLUT_coords.append(
                 np.where(
                     (self.whichLUT[:, :] == iwhichLUT)  # 1: where to find current ensemble
-                    & (self.mask[0, :, :] > 0 if self.mask is not None else all_true)  # 2: not masked
-                    & (~np.all(self.image == self.nodat[0], axis=0))  # 3: not NoDatVal
+                    & (self.mask[0, :, :] > 0 if self.mask is not None else all_true)  # noqa # 2: not masked
+                    & (~np.all(self.image == self.nodat[0], axis=0))  # noqa # 3: not NoDatVal
                 )
             )
         pix_current = 0

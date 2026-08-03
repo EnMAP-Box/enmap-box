@@ -1153,7 +1153,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             lyr for lyr in layers
             if (
                 isinstance(lyr, QgsMapLayer)
-                and not lyr.customProperty(TemporaryGlobalLayerContext.LAYER_PROPERTY_KEY, False)
+                and not lyr.customProperty(TemporaryGlobalLayerContext.LAYER_PROPERTY_KEY, False)  # noqa
             )
         ]
         self.removeMapLayers(layers)

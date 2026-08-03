@@ -139,7 +139,7 @@ class INFORM:
         # Forest reflectance (FLIM model)
         # Ground factor (G), that is ground contribution to scene reflectance
         G = (Fcd[:, np.newaxis] * sail_tts_trans * sail_tto_trans + Fcs[:, np.newaxis] * sail_tto_trans
-             + Fod[:, np.newaxis] * sail_tts_trans + Fos[:, np.newaxis])
+             + Fod[:, np.newaxis] * sail_tts_trans + Fos[:, np.newaxis])  # noqa
 
         C = Fcd[:, np.newaxis] * (1 - sail_tts_trans * sail_tto_trans)
 

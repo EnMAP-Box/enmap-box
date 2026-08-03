@@ -275,7 +275,7 @@ def resolve_forwardref(maybe_ref, memo: _TypeCheckMemo):
 
 def get_type_name(type_):
     name = (getattr(type_, '__name__', None) or getattr(type_, '_name', None)
-            or getattr(type_, '__forward_arg__', None))
+            or getattr(type_, '__forward_arg__', None))  # noqa
     if name is None:
         origin = getattr(type_, '__origin__', None)
         name = getattr(origin, '_name', None)
@@ -416,7 +416,7 @@ def check_dict(argname: str, value, expected_type, memo: _TypeCheckMemo) -> None
     if expected_type is not dict:
         if (
                 hasattr(expected_type, "__args__")
-                and expected_type.__args__ not in (None, expected_type.__parameters__)
+                and expected_type.__args__ not in (None, expected_type.__parameters__)  # noqa
         ):
             key_type, value_type = expected_type.__args__
             if key_type is not Any or value_type is not Any:
@@ -802,9 +802,9 @@ def check_type(argname: str, value, expected_type, memo: Optional[_TypeCheckMemo
         return check_type(argname, value, expected_type.__supertype__, memo)
     elif (
         isfunction(expected_type)
-        and getattr(expected_type, "__module__", None) == "typing"
-        and getattr(expected_type, "__qualname__", None).startswith("NewType.")
-        and hasattr(expected_type, "__supertype__")
+        and getattr(expected_type, "__module__", None) == "typing"  # noqa
+        and getattr(expected_type, "__qualname__", None).startswith("NewType.")  # noqa
+        and hasattr(expected_type, "__supertype__")  # noqa
     ):
         # typing.NewType on Python 3.9 and below
         return check_type(argname, value, expected_type.__supertype__, memo)

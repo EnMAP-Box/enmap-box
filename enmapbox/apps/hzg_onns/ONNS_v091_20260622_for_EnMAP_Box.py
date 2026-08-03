@@ -213,7 +213,7 @@ def prepare_processor_input_OLCI(
 
         # MH: in the current version without inland waters (some rivers - not more)!
         invalid_mask = (cloud + l1_invalid + negative_BB + out_of_bonds + land + exception + high_air_mass
-                        + external_mask + inconsistancy + thick_aerosol)
+                        + external_mask + inconsistancy + thick_aerosol)  # noqa
 
         flag_negative = np.full(land.shape, False, dtype=bool)
         flag_strange = np.full(land.shape, False, dtype=bool)
@@ -453,7 +453,7 @@ def prepare_processor_input_MERIS(
 
         # MH: in the current version without inland waters (some rivers - not more)!
         invalid_mask = (cloud + l1_invalid + negative_BB + out_of_bonds + land + exception + high_air_mass
-                        + external_mask + inconsistancy + thick_aerosol)
+                        + external_mask + inconsistancy + thick_aerosol)  # noqa: W503
 
         flag_negative = np.full(land.shape, False, dtype=bool)
         flag_strange = np.full(land.shape, False, dtype=bool)
@@ -555,7 +555,7 @@ def prepare_processor_input_MODIS(
 
         # MH: in the current version without inland waters (some rivers - not more)!
         invalid_mask = (cloud + l1_invalid + negative_BB + out_of_bonds + land + exception + high_air_mass
-                        + external_mask + inconsistancy + thick_aerosol)
+                        + external_mask + inconsistancy + thick_aerosol)  # noqa
 
         flag_negative = np.full(land.shape, False, dtype=bool)
         flag_strange = np.full(land.shape, False, dtype=bool)
@@ -660,7 +660,7 @@ def prepare_processor_input_VIIRS(
 
         # MH: in the current version without inland waters (some rivers - not more)!
         invalid_mask = (cloud + l1_invalid + negative_BB + out_of_bonds + land + exception + high_air_mass
-                        + external_mask + inconsistancy + thick_aerosol)
+                        + external_mask + inconsistancy + thick_aerosol)  # noqa
 
         flag_negative = np.full(land.shape, False, dtype=bool)
         flag_strange = np.full(land.shape, False, dtype=bool)
