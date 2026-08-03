@@ -4,6 +4,7 @@ from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.classificationworkflowalgorithm import ClassificationWorkflowAlgorithm
 from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromcodealgorithm import \
     PrepareUnsupervisedDatasetFromCodeAlgorithm
+from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import RasterMathAlgorithm
 from enmapboxprocessing.algorithm.regressionworkflowalgorithm import RegressionWorkflowAlgorithm
 from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
 
@@ -31,14 +32,18 @@ if 0:
     enmapBox.showProcessingAlgorithmDialog(
         RegressionWorkflowAlgorithm(), parameters=None
     )
-if 1:
+if 0:
     # Classifier
     enmapBox.showProcessingAlgorithmDialog(
         ClassificationWorkflowAlgorithm(), parameters=None
     )
 
-# ProcessingParameterRasterMathCodeEditWidgetWrapper
-#
+if 1:
+    # ProcessingParameterRasterMathCodeEditWidgetWrapper
+    enmapBox.showProcessingAlgorithmDialog(
+        RasterMathAlgorithm(), parameters=None
+    )
+
 # ProcessingParameterSkopsFileClassificationDatasetWidgetWrapper
 #
 # ProcessingParameterSkopsFileRegressionDatasetWidgetWrapper

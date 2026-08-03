@@ -338,6 +338,11 @@ def initAll():
     ProcessingParameterClassifierCodeEditFactory.register()
     ProcessingParameterRegressorCodeEditFactory.register()
 
+    from enmapboxprocessing.parameter.processingparameterrastermathcodeeditwidget import (
+        ProcessingParameterRasterMathCodeEditWidgetFactory)
+    ProcessingParameterRasterMathCodeEditWidgetFactory.register()
+
+
     registerEditorWidgets()
     registerExpressionFunctions()
     registerEnMAPBoxProcessingProvider()
