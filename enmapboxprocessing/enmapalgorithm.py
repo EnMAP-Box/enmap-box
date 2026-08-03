@@ -691,15 +691,20 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
         from enmapboxprocessing.parameter.processingparameterskopsfileclassificationdatasetwidget import \
-            ProcessingParameterSkopsFileClassificationDatasetWidgetWrapper
+            ProcessingParameterSkopsFileClassificationDatasetWidgetFactory
         behavior = QgsProcessingParameterFile.Behavior.File
         extension = ''
         fileFilter = 'Skops files (*.skops);;JSON files (*.json)'
         param = QgsProcessingParameterFile(name, description, behavior, extension, defaultValue, optional, fileFilter)
 
         if not self.isRunnungInsideModeller():
-            param.setMetadata(
-                {'widget_wrapper': {'class': ProcessingParameterSkopsFileClassificationDatasetWidgetWrapper}})
+            metadata = param.metadata()
+            metadata["widget_wrapper"] = {
+                "widget_type": (
+                    ProcessingParameterSkopsFileClassificationDatasetWidgetFactory.WIDGET_TYPE
+                )
+            }
+            param.setMetadata(metadata)
             param.setDefaultValue(defaultValue)
 
         self.addParameter(param)
@@ -891,15 +896,23 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
         from enmapboxprocessing.parameter.processingparameterskopsfilewidget import \
-            ProcessingParameterSkopsFileWidgetWrapper
+            ProcessingParameterSkopsFileWidgetFactory
 
         param = QgsProcessingParameterFile(
             name, description, QgsProcessingParameterFile.Behavior.File, '', defaultValue, optional,
             self.SkopsFileFilter
         )
+
         if not self.isRunnungInsideModeller():
-            param.setMetadata({'widget_wrapper': {'class': ProcessingParameterSkopsFileWidgetWrapper}})
+            metadata = param.metadata()
+            metadata["widget_wrapper"] = {
+                "widget_type": (
+                    ProcessingParameterSkopsFileWidgetFactory.WIDGET_TYPE
+                )
+            }
+            param.setMetadata(metadata)
             param.setDefaultValue(defaultValue)
+
         self.addParameter(param)
         self.flagParameterAsAdvanced(name, advanced)
 

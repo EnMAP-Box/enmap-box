@@ -2,6 +2,7 @@ from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.classificationworkflowalgorithm import ClassificationWorkflowAlgorithm
+from enmapboxprocessing.algorithm.exportdatasettofilesalgorithm import ExportDatasetToFilesAlgorithm
 from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromcodealgorithm import \
     PrepareUnsupervisedDatasetFromCodeAlgorithm
 from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import RasterMathAlgorithm
@@ -38,17 +39,26 @@ if 0:
         ClassificationWorkflowAlgorithm(), parameters=None
     )
 
-if 1:
     # ProcessingParameterRasterMathCodeEditWidgetWrapper
+if 0:
     enmapBox.showProcessingAlgorithmDialog(
         RasterMathAlgorithm(), parameters=None
     )
 
+# ProcessingParameterSkopsFileWidgetWrapper
+if 0:
+    enmapBox.showProcessingAlgorithmDialog(
+        ExportDatasetToFilesAlgorithm(), parameters=None
+    )
+
 # ProcessingParameterSkopsFileClassificationDatasetWidgetWrapper
-#
+if 1:
+    enmapBox.showProcessingAlgorithmDialog(
+        ClassificationWorkflowAlgorithm(), parameters=None
+    )
+
 # ProcessingParameterSkopsFileRegressionDatasetWidgetWrapper
 #
 # ProcessingParameterSkopsFileUnsupervisedDatasetWidgetWrapper
 #
-# ProcessingParameterSkopsFileWidgetWrapper
 qgsApp.exec()

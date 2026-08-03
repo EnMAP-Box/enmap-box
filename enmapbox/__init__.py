@@ -342,6 +342,13 @@ def initAll():
         ProcessingParameterRasterMathCodeEditWidgetFactory)
     ProcessingParameterRasterMathCodeEditWidgetFactory.register()
 
+    from enmapboxprocessing.parameter.processingparameterskopsfilewidget import (
+        ProcessingParameterSkopsFileWidgetFactory)
+    ProcessingParameterSkopsFileWidgetFactory.register()
+
+    from enmapboxprocessing.parameter.processingparameterskopsfileclassificationdatasetwidget import (
+        ProcessingParameterSkopsFileClassificationDatasetWidgetFactory)
+    ProcessingParameterSkopsFileClassificationDatasetWidgetFactory.register()
 
     registerEditorWidgets()
     registerExpressionFunctions()
