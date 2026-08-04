@@ -350,6 +350,10 @@ def initAll():
         ProcessingParameterSkopsFileClassificationDatasetWidgetFactory)
     ProcessingParameterSkopsFileClassificationDatasetWidgetFactory.register()
 
+    from enmapboxprocessing.parameter.processingparameterskopsfileregressiondatasetwidget import (
+        ProcessingParameterSkopsFileRegressionDatasetWidgetFactory)
+    ProcessingParameterSkopsFileRegressionDatasetWidgetFactory.register()
+
     registerEditorWidgets()
     registerExpressionFunctions()
     registerEnMAPBoxProcessingProvider()

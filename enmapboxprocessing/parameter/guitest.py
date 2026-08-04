@@ -52,13 +52,17 @@ if 0:
     )
 
 # ProcessingParameterSkopsFileClassificationDatasetWidgetWrapper
-if 1:
+if 0:
     enmapBox.showProcessingAlgorithmDialog(
         ClassificationWorkflowAlgorithm(), parameters=None
     )
 
 # ProcessingParameterSkopsFileRegressionDatasetWidgetWrapper
-#
+if 1:
+    enmapBox.showProcessingAlgorithmDialog(
+        RegressionWorkflowAlgorithm(), parameters=None
+    )
 # ProcessingParameterSkopsFileUnsupervisedDatasetWidgetWrapper
-#
+
+
 qgsApp.exec()

@@ -705,6 +705,7 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
                 )
             }
             param.setMetadata(metadata)
+
             param.setDefaultValue(defaultValue)
 
         self.addParameter(param)
@@ -734,16 +735,21 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
         from enmapboxprocessing.parameter.processingparameterskopsfileregressiondatasetwidget import \
-            ProcessingParameterSkopsFileRegressionDatasetWidgetWrapper
+            ProcessingParameterSkopsFileRegressionDatasetWidgetFactory
         behavior = QgsProcessingParameterFile.Behavior.File
         extension = ''
         fileFilter = 'Skops files (*.skops);;JSON files (*.json)'
         param = QgsProcessingParameterFile(name, description, behavior, extension, defaultValue, optional, fileFilter)
 
         if not self.isRunnungInsideModeller():
-            param.setMetadata(
-                {'widget_wrapper': {'class': ProcessingParameterSkopsFileRegressionDatasetWidgetWrapper}}
-            )
+            metadata = param.metadata()
+            metadata["widget_wrapper"] = {
+                "widget_type": (
+                    ProcessingParameterSkopsFileRegressionDatasetWidgetFactory.WIDGET_TYPE
+                )
+            }
+            param.setMetadata(metadata)
+
             param.setDefaultValue(defaultValue)
 
         self.addParameter(param)
