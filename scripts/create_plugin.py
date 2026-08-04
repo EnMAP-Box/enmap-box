@@ -204,9 +204,14 @@ def create_enmapbox_plugin(include_testdata: bool = False,
     MD.mQgisMaximumVersion = config['enmapbox:metadata'].get('qgisMaximumVersion', '3.99')
     MD.mEmail = config['enmapbox:metadata']['email']
     MD.mHasProcessingProvider = True
+    MD.supportsQt6 = True
 
     MD.mVersion = VERSION
     MD.writeMetadataTxt(PATH_METADATAFILE)
+
+    # WORKAROUND: set 'supportsQt6 = True' manually (needs to be done in QPS)
+    with open(PATH_METADATAFILE, 'a') as file:
+        file.write(f'\nsupportsQt6={MD.supportsQt6}')
 
     # (re)-compile all enmapbox resource files
     from scripts.compile_resourcefiles import compileEnMAPBoxResources
