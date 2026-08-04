@@ -3,6 +3,7 @@ from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.classificationworkflowalgorithm import ClassificationWorkflowAlgorithm
 from enmapboxprocessing.algorithm.exportdatasettofilesalgorithm import ExportDatasetToFilesAlgorithm
+from enmapboxprocessing.algorithm.fitpcaalgorithm import FitPcaAlgorithm
 from enmapboxprocessing.algorithm.prepareunsuperviseddatasetfromcodealgorithm import \
     PrepareUnsupervisedDatasetFromCodeAlgorithm
 from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import RasterMathAlgorithm
@@ -58,11 +59,16 @@ if 0:
     )
 
 # ProcessingParameterSkopsFileRegressionDatasetWidgetWrapper
-if 1:
+if 0:
     enmapBox.showProcessingAlgorithmDialog(
         RegressionWorkflowAlgorithm(), parameters=None
     )
-# ProcessingParameterSkopsFileUnsupervisedDatasetWidgetWrapper
 
+# ProcessingParameterSkopsFileUnsupervisedDatasetWidgetWrapper
+if 1:
+    enmapBox.showProcessingAlgorithmDialog(
+        FitPcaAlgorithm(), parameters=None
+    )
 
 qgsApp.exec()
+qgsApp = None
