@@ -81,7 +81,7 @@ from qgis.core import QgsRectangle, edit
 from qgis.gui import QgsMapCanvas, QgsMapTool, QgisInterface, QgsMessageBar, QgsMessageViewer, QgsMessageBarItem, \
     QgsMapLayerConfigWidgetFactory, QgsAttributeTableFilterModel, QgsSymbolSelectorDialog, \
     QgsSymbolWidgetContext
-from qgis.gui import QgsProcessingAlgorithmDialogBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog, \
+from qgis.gui import QgsProcessingAlgorithmWidgetBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog, \
     QgsNewVectorLayerDialog, QgsProcessingContextGenerator
 from .contextmenuprovider import EnMAPBoxContextMenuProvider
 from .contextmenus import EnMAPBoxContextMenuRegistry
@@ -2679,8 +2679,8 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             # assert wrapper is None
             pass
 
-        if not isinstance(dlg, QgsProcessingAlgorithmDialogBase):
-            raise AssertionError('Failed to create QgsProcessingAlgorithmDialogBase')
+        if not isinstance(dlg, QgsProcessingAlgorithmWidgetBase):
+            raise AssertionError('Failed to create QgsProcessingAlgorithmWidgetBase')
 
         dlg.setModal(modal)
 
