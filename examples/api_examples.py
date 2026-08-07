@@ -25,8 +25,8 @@
 import unittest
 from typing import List, Dict
 
-from qgispluginsupport.qps.speclib.core import profile_field_names
-from qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
+from enmapbox.qgispluginsupport.qps.speclib.core import profile_field_names
+from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
 
 from enmapbox.testing import start_app
 from qgis.PyQt.QtGui import QIcon
