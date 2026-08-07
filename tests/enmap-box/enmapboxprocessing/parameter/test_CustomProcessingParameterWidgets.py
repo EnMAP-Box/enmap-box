@@ -9,7 +9,7 @@ from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import
 from enmapboxprocessing.algorithm.regressionworkflowalgorithm import RegressionWorkflowAlgorithm
 from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
 from enmapboxprocessing.testcase import TestCase
-from qgispluginsupport.qps import initAll
+from enmapbox import initAll
 
 qgsApp = start_app()
 initAll()
