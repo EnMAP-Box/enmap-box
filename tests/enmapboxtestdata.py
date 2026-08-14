@@ -99,6 +99,12 @@ library = join(_root, _subdir, 'library.gpkg')
 landsat8_srf = join(_root, _subdir, 'landsat8_srf.gpkg')
 libraryWithBadBands = join(_root, _subdir, 'libraryWithBadBands.geojson')
 
+# Spectral Surface Plotting data
+_subdir = 'surfacedata'
+surfaceLongFormat = join(_root, _subdir, 'surface_long_format.csv')
+surfaceLibrary = join(_root, _subdir, 'surface_library.geojson')
+
+
 # DATASET
 _subdir = 'ml'
 
