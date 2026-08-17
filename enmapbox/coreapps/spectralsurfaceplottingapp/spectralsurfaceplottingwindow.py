@@ -1,16 +1,14 @@
 import numpy as np
 import pyvista as pv
-from PyQt6.QtWidgets import QSlider
 from pyvistaqt import QtInteractor
 from qgis.PyQt.QtWidgets import QSizePolicy
+from qgis.PyQt.QtWidgets import QSlider
 from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QComboBox, QCheckBox
 from qgis.PyQt.QtWidgets import QVBoxLayout
 from qgis.PyQt.QtWidgets import QWidget
 from qgis.PyQt.uic import loadUi
-from qgis._core import QgsMessageLog
-from qgis._gui import QgsFieldComboBox
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer
-from qgis.gui import QgsMapLayerComboBox
+from qgis.gui import QgsMapLayerComboBox, QgsFieldComboBox
 
 from enmapboxprocessing.libraryreader import LibraryReader
 from spectralsurfaceplottingapp.exampledata import getRandomData
@@ -77,7 +75,6 @@ class SpectralSurfacePlottingWindow(QMainWindow):
 
         self.mLoadData.clicked.connect(self.onLoadData)
 
-
     def readData(self):
 
         layer: QgsRasterLayer = self.mLayer.currentLayer()
@@ -98,12 +95,12 @@ class SpectralSurfacePlottingWindow(QMainWindow):
             fieldProfile = self.mFieldLibraryProfiles.currentField()
             fieldY = self.mFieldLibraryY.currentField()
 
-            for i, (values, geometry)  in enumerate(reader.data(), 1):
+            for i, (values, geometry) in enumerate(reader.data(), 1):
                 xs = values[fieldProfile]['x']
                 zs = values[fieldProfile]['y']
-                for xi, zi in zip(xs,zs):
+                for xi, zi in zip(xs, zs):
                     yi = values.get(fieldY, i)
-                    if not np.isfinite([xi,yi,zi]).all():
+                    if not np.isfinite([xi, yi, zi]).all():
                         continue
                     x.append(xi)
                     y.append(yi)
@@ -199,7 +196,7 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         self.plotter.render()
 
     def onScaleChanged(self):
-        self.setScale(2**self.mScaleX.value(), 2**self.mScaleY.value(), 2**self.mScaleZ.value())
+        self.setScale(2 ** self.mScaleX.value(), 2 ** self.mScaleY.value(), 2 ** self.mScaleZ.value())
         self.plotter.render()
 
     def onAutoScale(self):

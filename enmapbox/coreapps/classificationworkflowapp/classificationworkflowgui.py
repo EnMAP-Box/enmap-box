@@ -6,6 +6,17 @@ from tempfile import gettempdir
 from typing import Tuple, Dict, Optional
 
 import numpy as np
+#  from processing.gui.AlgorithmDialog import AlgorithmDialog
+from qgis.PyQt.QtCore import QUrl
+from qgis.PyQt.QtGui import QFont, QColor, QTextCursor
+#  from qgis.PyQt.QtWebKitWidgets import QWebView
+from qgis.PyQt.QtWidgets import (
+    QMainWindow, QToolButton, QProgressBar, QComboBox, QPlainTextEdit, QCheckBox, QDialog, QHBoxLayout, QPushButton,
+    QTableWidget, QTableWidgetItem, QLabel, QRadioButton, QTextEdit, QWidget
+)
+from qgis.PyQt.uic import loadUi
+from qgis.core import QgsMapLayerProxyModel, Qgis, QgsProcessingFeedback, QgsRasterLayer, QgsProcessing
+from qgis.gui import QgsFileWidget, QgsMapLayerComboBox, QgsSpinBox, QgsMessageBar, QgsColorButton, QgsDoubleSpinBox
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapboxprocessing.algorithm.algorithms import algorithms
@@ -46,17 +57,6 @@ from enmapboxprocessing.parameter.processingparameterskopsfileclassificationdata
 from enmapboxprocessing.parameter.processingparameterskopsfilewidget import ProcessingParameterSkopsFileWidget
 from enmapboxprocessing.typing import ClassifierDump, Category
 from enmapboxprocessing.utils import Utils
-from processing.gui.AlgorithmDialog import AlgorithmDialog
-from qgis.PyQt.QtCore import QUrl
-from qgis.PyQt.QtGui import QFont, QColor, QTextCursor
-from qgis.PyQt.QtWebKitWidgets import QWebView
-from qgis.PyQt.QtWidgets import (
-    QMainWindow, QToolButton, QProgressBar, QComboBox, QPlainTextEdit, QCheckBox, QDialog, QHBoxLayout, QPushButton,
-    QTableWidget, QTableWidgetItem, QLabel, QRadioButton, QTextEdit, QWidget
-)
-from qgis.PyQt.uic import loadUi
-from qgis.core import QgsMapLayerProxyModel, Qgis, QgsProcessingFeedback, QgsRasterLayer, QgsProcessing
-from qgis.gui import QgsFileWidget, QgsMapLayerComboBox, QgsSpinBox, QgsMessageBar, QgsColorButton, QgsDoubleSpinBox
 
 
 class MissingParameterError(Exception):
@@ -236,7 +236,7 @@ class ClassificationWorkflowGui(QMainWindow):
     mDialogAutoOpen: QCheckBox
 
     # help
-    mWebView: QWebView
+    # mWebView: QWebView
     mWebHome: QToolButton
     mWebBack: QToolButton
     mWebForward: QToolButton
@@ -407,6 +407,8 @@ class ClassificationWorkflowGui(QMainWindow):
         self.mComboClassifier.setCurrentIndex(index)
 
     def _createAlgorithmDialogWrapper(self):
+        AlgorithmDialog = None
+
         class AlgorithmDialogWrapper(AlgorithmDialog):
             def __init__(self_, *args, **kwargs):
                 AlgorithmDialog.__init__(self_, *args, **kwargs)

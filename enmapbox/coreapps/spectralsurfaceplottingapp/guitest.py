@@ -1,5 +1,4 @@
-import numpy as np
-from qgis._core import QgsVectorLayer
+from qgis.core import QgsVectorLayer
 
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
@@ -18,7 +17,7 @@ enmapBox.onDataDropped(
 )
 # enmapBox.ui.setFixedSize(1920 - 2, 1080 - 32)  # for recording 1080p videos with ScreenToGif
 
-#x, y, z = getLmuWeizen()
+# x, y, z = getLmuWeizen()
 
 widget = SpectralSurfacePlottingWindow()
 widget.show()

@@ -1,4 +1,5 @@
-from qgis._core import QgsVectorLayer
+import numpy as np
+from qgis.core import QgsVectorLayer
 
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
@@ -6,7 +7,6 @@ from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
 from enmapboxtestdata import surfaceLongFormat
 from spectralsurfaceplottingapp.spectralsurfaceplottingwindow import SpectralSurfacePlottingWindow
-import numpy as np
 
 qgsApp = start_app()
 initAll()
@@ -36,8 +36,8 @@ class TestSpectralSurfacePlottingApp(TestCase):
         widget = SpectralSurfacePlottingWindow()
         widget.setData(y, x, z)
         widget.plotData()
-        #widget.autoScale()
-        #widget.setScale(100, 100, 100)
+        # widget.autoScale()
+        # widget.setScale(100, 100, 100)
         widget.show()
         if False:
             qgsApp.exec()
@@ -50,6 +50,7 @@ class TestSpectralSurfacePlottingApp(TestCase):
         self.dispose_widget(enmapBox.ui)
         self.dispose_widget(widget)
 
+
 def getRandomData():
     rng = np.random.default_rng(seed=42)
     number_of_points = 500
@@ -58,12 +59,12 @@ def getRandomData():
     z = np.sinc((x - 20) / 100 * np.pi) + np.sinc((y - 50) / 100 * np.pi)
     return x, y, z
 
-def getLmuWeizen():
 
+def getLmuWeizen():
     data = np.genfromtxt(r'C:\Users\janzandr\Downloads\STS_Weizen_2017_orig.csv', delimiter=';')
-    wavelength = data[0,3:]
-    doys = data[2:,0]
-    values = data[2:,3:]
+    wavelength = data[0, 3:]
+    doys = data[2:, 0]
+    values = data[2:, 3:]
     x = list()
     y = list()
     z = list()
