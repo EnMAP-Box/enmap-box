@@ -9,6 +9,7 @@ from qgis.PyQt.QtWidgets import QWidget
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer
 from qgis.gui import QgsMapLayerComboBox, QgsFieldComboBox
+from vtkmodules.vtkCommonCore import vtkStringArray
 
 from enmapboxprocessing.libraryreader import LibraryReader
 from spectralsurfaceplottingapp.exampledata import getRandomData
@@ -33,6 +34,7 @@ class SpectralSurfacePlottingWindow(QMainWindow):
     mFieldLibraryProfiles: QgsFieldComboBox
     mFieldLibraryY: QgsFieldComboBox
 
+    scaleBase = 2
     mScaleX: QSlider
     mScaleY: QSlider
     mScaleZ: QSlider
@@ -78,6 +80,10 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         self.mAutoScale.clicked.connect(self.onAutoScale)
 
         self.mLoadData.clicked.connect(self.onLoadData)
+
+        self.scaleX = 1
+        self.scaleY = 1
+        self.scaleZ = 1
 
     def readData(self):
 
@@ -136,13 +142,29 @@ class SpectralSurfacePlottingWindow(QMainWindow):
 
         self.gridActor = self.plotter.show_grid(
             bounds=bounds,
-            xtitle="X",
-            ytitle="Y",
-            ztitle="Z",
+            xtitle='',
+            ytitle='',
+            ztitle='',
             show_xaxis=True,
             show_yaxis=True,
             show_zaxis=True
         )
+        self.onShowGridChanged()
+
+        # scale tick values
+        xlabels = self.gridActor.x_labels
+        ylabels = self.gridActor.y_labels
+        # zlabels = self.gridActor.z_labels
+        xlabels2 = vtkStringArray()
+        ylabels2 = vtkStringArray()
+        # zlabels2 = vtkStringArray()
+        for i, (vx, vy) in enumerate(zip(xlabels, ylabels)):
+            xlabels2.InsertNextValue(str(float(vx) / self.scaleX))
+            ylabels2.InsertNextValue(str(float(vy) / self.scaleY))
+            # zlabels2.InsertNextValue(str(float(vz) / self.scaleZ))
+        self.gridActor.SetAxisLabels(0, xlabels2)
+        self.gridActor.SetAxisLabels(1, ylabels2)
+        # self.gridActor.SetAxisLabels(2, zlabels2)
 
     def plotData(self):
 
@@ -180,7 +202,7 @@ class SpectralSurfacePlottingWindow(QMainWindow):
 
         self.updateGrid()
 
-        self.plotter.enable_parallel_projection()
+        # self.plotter.enable_parallel_projection()
 
     def autoScaleFactors(self):
         x_range = np.ptp(self.x)
@@ -201,11 +223,8 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         return xscale, yscale, zscale
 
     def setScale(self, xscale, yscale, zscale):
-
         self.plotter.remove_bounds_axes()
-
         self.plotter.set_scale(xscale, yscale, zscale, reset_camera=True)
-
         self.updateGrid()
 
     def onShowSurfaceChanged(self):
@@ -227,16 +246,17 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         self.plotter.render()
 
     def onScaleChanged(self):
-        b = 2
-        self.setScale(b ** self.mScaleX.value(), b ** self.mScaleY.value(), 2 ** self.mScaleZ.value())
+        self.scaleX = self.scaleBase ** self.mScaleX.value()
+        self.scaleY = self.scaleBase ** self.mScaleY.value()
+        self.scaleZ = self.scaleBase ** self.mScaleZ.value()
+        self.setScale(self.scaleX, self.scaleY, self.scaleZ)
         self.plotter.render()
 
     def onAutoScale(self):
         xscale, yscale, zscale = self.autoScaleFactors()
-
-        self.mScaleX.setValue(int(np.log2(xscale)))
-        self.mScaleY.setValue(int(np.log2(yscale)))
-        self.mScaleZ.setValue(int(np.log2(zscale)))
+        self.mScaleX.setValue(int(np.log(xscale) / np.log(self.scaleBase)))
+        self.mScaleY.setValue(int(np.log(yscale) / np.log(self.scaleBase)))
+        self.mScaleZ.setValue(int(np.log(zscale) / np.log(self.scaleBase)))
 
     def onLoadData(self):
 
