@@ -48,7 +48,7 @@
               <x>0</x>
               <y>0</y>
               <width>620</width>
-              <height>455</height>
+              <height>474</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -267,7 +267,7 @@
               <x>0</x>
               <y>0</y>
               <width>620</width>
-              <height>455</height>
+              <height>474</height>
              </rect>
             </property>
             <layout class="QFormLayout" name="formLayout_2">
@@ -301,6 +301,26 @@
                 <widget class="QCheckBox" name="mShowPoints">
                  <property name="text">
                   <string>Points</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="mShowGrid">
+                 <property name="text">
+                  <string>Grid</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="mShowAxes">
+                 <property name="text">
+                  <string>Axes</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>

@@ -23,6 +23,8 @@ class SpectralSurfacePlottingWindow(QMainWindow):
     mShowSurface: QCheckBox
     mShowPoints: QCheckBox
     mShowEdges: QCheckBox
+    mShowGrid: QCheckBox
+    mShowAxes: QCheckBox
 
     mFieldLfX: QgsFieldComboBox
     mFieldLfY: QgsFieldComboBox
@@ -67,6 +69,8 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         self.mShowSurface.checkStateChanged.connect(self.onShowSurfaceChanged)
         self.mShowPoints.checkStateChanged.connect(self.onShowPointsChanged)
         self.mShowEdges.checkStateChanged.connect(self.onShowEdgesChanged)
+        self.mShowGrid.checkStateChanged.connect(self.onShowGridChanged)
+        self.mShowAxes.checkStateChanged.connect(self.onShowAxesChanged)
 
         self.mScaleX.valueChanged.connect(self.onScaleChanged)
         self.mScaleY.valueChanged.connect(self.onScaleChanged)
@@ -122,6 +126,24 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         self.mesh = self.point_cloud.delaunay_2d()
         self.mesh.point_data["Z"] = self.mesh.points[:, 2]
 
+    def updateGrid(self):
+
+        # remove previous CubeAxesActor
+        self.plotter.remove_bounds_axes()
+
+        # use the current transformed bounds of the surface actor
+        bounds = self.meshActorSurface.GetBounds()
+
+        self.gridActor = self.plotter.show_grid(
+            bounds=bounds,
+            xtitle="X",
+            ytitle="Y",
+            ztitle="Z",
+            show_xaxis=True,
+            show_yaxis=True,
+            show_zaxis=True
+        )
+
     def plotData(self):
 
         self.meshActorSurface = self.plotter.add_mesh(
@@ -149,18 +171,14 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         )
         self.onShowPointsChanged()
 
-        self.plotter.add_axes(
+        self.axesActor = self.plotter.add_axes(
             xlabel="X",
             ylabel="Y",
             zlabel="Z",
         )
+        self.onShowAxesChanged()
 
-        if False:  # need to fix problem with tick values
-            self.plotter.show_grid(
-                xtitle="X",
-                ytitle="Y",
-                ztitle="Z",
-            )
+        self.updateGrid()
 
         self.plotter.enable_parallel_projection()
 
@@ -183,7 +201,12 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         return xscale, yscale, zscale
 
     def setScale(self, xscale, yscale, zscale):
+
+        self.plotter.remove_bounds_axes()
+
         self.plotter.set_scale(xscale, yscale, zscale, reset_camera=True)
+
+        self.updateGrid()
 
     def onShowSurfaceChanged(self):
         self.meshActorSurface.SetVisibility(self.mShowSurface.isChecked())
@@ -195,8 +218,17 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         self.meshActorSurface.prop.show_edges = self.mShowEdges.isChecked()
         self.plotter.render()
 
+    def onShowGridChanged(self):
+        self.gridActor.SetVisibility(self.mShowGrid.isChecked())
+        self.plotter.render()
+
+    def onShowAxesChanged(self):
+        self.axesActor.SetVisibility(self.mShowAxes.isChecked())
+        self.plotter.render()
+
     def onScaleChanged(self):
-        self.setScale(2 ** self.mScaleX.value(), 2 ** self.mScaleY.value(), 2 ** self.mScaleZ.value())
+        b = 2
+        self.setScale(b ** self.mScaleX.value(), b ** self.mScaleY.value(), 2 ** self.mScaleZ.value())
         self.plotter.render()
 
     def onAutoScale(self):
