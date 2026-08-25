@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## Version 3.17.9 (2026-08-25)
+
+* fixes drag and drop of raster layers onto an empty EnMAP-Box
+  ([#1562](https://github.com/EnMAP-Box/enmap-box/issues/1562))
+
 ## Version 3.17.8 (2026-08-03)
 
 * fixes the 'RasterInterfaceCapabilities' has no attribute 'Size'
