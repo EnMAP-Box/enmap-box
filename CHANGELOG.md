@@ -4,6 +4,8 @@
 
 * fixes drag and drop of raster layers onto an empty EnMAP-Box
   ([#1562](https://github.com/EnMAP-Box/enmap-box/issues/1562))
+* fixes import of Spectral Evolution *.sed files ([qps #227](https://github.com/EnMAP-Box/qgispluginsupport/issues/227))
+* improved reading of time stamps in SED and SVC files
 
 ## Version 3.17.8 (2026-08-03)
 
