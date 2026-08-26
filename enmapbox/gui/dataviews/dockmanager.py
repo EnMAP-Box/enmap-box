@@ -24,6 +24,22 @@ import time
 from os.path import basename, dirname
 from typing import Optional, List, Dict, Union, Any
 
+from qgis.PyQt.QtCore import QSize
+from qgis.PyQt.QtCore import Qt, QMimeData, QModelIndex, QObject, QTimer, pyqtSignal, QEvent, \
+    QSortFilterProxyModel, QCoreApplication
+from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDropEvent, QDragLeaveEvent
+from qgis.PyQt.QtWidgets import QHeaderView, QMenu, QAbstractItemView, QApplication, QWidget, QToolButton, QAction
+from qgis.PyQt.QtXml import QDomDocument, QDomElement
+from qgis.core import Qgis, QgsCoordinateReferenceSystem, QgsMapLayer, QgsVectorLayer, QgsRasterLayer, \
+    QgsProject, QgsReadWriteContext, \
+    QgsLayerTreeLayer, QgsLayerTreeNode, QgsLayerTreeGroup, \
+    QgsLayerTreeModelLegendNode, QgsLayerTree, QgsLayerTreeModel, QgsLayerTreeUtils, \
+    QgsPalettedRasterRenderer
+from qgis.core import QgsWkbTypes
+from qgis.gui import QgsLayerTreeProxyModel
+from qgis.gui import QgsLayerTreeView, \
+    QgsMapCanvas, QgsLayerTreeViewMenuProvider, QgsLayerTreeMapCanvasBridge, QgsDockWidget, QgsMessageBar
+
 from enmapbox.gui.datasources.datasources import DataSource, ModelDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager
 from enmapbox.gui.dataviews.docks import Dock, DockArea, \
@@ -41,21 +57,6 @@ from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import Spe
 from enmapbox.qgispluginsupport.qps.utils import loadUi, SpatialExtent
 from enmapbox.typeguard import typechecked
 from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtCore import QSize
-from qgis.PyQt.QtCore import Qt, QMimeData, QModelIndex, QObject, QTimer, pyqtSignal, QEvent, \
-    QSortFilterProxyModel, QCoreApplication
-from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDropEvent, QDragLeaveEvent
-from qgis.PyQt.QtWidgets import QHeaderView, QMenu, QAbstractItemView, QApplication, QWidget, QToolButton, QAction
-from qgis.PyQt.QtXml import QDomDocument, QDomElement
-from qgis.core import Qgis, QgsCoordinateReferenceSystem, QgsMapLayer, QgsVectorLayer, QgsRasterLayer, \
-    QgsProject, QgsReadWriteContext, \
-    QgsLayerTreeLayer, QgsLayerTreeNode, QgsLayerTreeGroup, \
-    QgsLayerTreeModelLegendNode, QgsLayerTree, QgsLayerTreeModel, QgsLayerTreeUtils, \
-    QgsPalettedRasterRenderer
-from qgis.core import QgsWkbTypes
-from qgis.gui import QgsLayerTreeProxyModel
-from qgis.gui import QgsLayerTreeView, \
-    QgsMapCanvas, QgsLayerTreeViewMenuProvider, QgsLayerTreeMapCanvasBridge, QgsDockWidget, QgsMessageBar
 
 logger = logging.getLogger(__name__)
 
@@ -646,9 +647,10 @@ class DockManager(QObject):
             # exclude vector layers without geometry
             dropped_maplayers = [
                 lyr for lyr in dropped_maplayers
-                if isinstance(lyr, QgsVectorLayer) or lyr.geometryType() in [QgsWkbTypes.UnknownGeometry,
-                                                                             QgsWkbTypes.NullGeometry]
-
+                if not (
+                    isinstance(lyr, QgsVectorLayer) and lyr.geometryType()
+                    in [QgsWkbTypes.UnknownGeometry, QgsWkbTypes.NullGeometry]
+                )
             ]
 
             if len(dropped_maplayers) > 0:
