@@ -25,9 +25,9 @@ import sys
 
 from enmapbox.gui.applications import EnMAPBoxApplication
 from ensomap import APP_DIR
-from qgis.PyQt import Qt
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QWidget, QFrame, QDesktopWidget
+from qgis.PyQt.QtWidgets import QWidget, QFrame
 
 sys.path.insert(0, APP_DIR)
 
@@ -96,7 +96,7 @@ class EnSoMAP(EnMAPBoxApplication):
 
             def center(self):
                 qr = self.frameGeometry()
-                cp = QDesktopWidget().availableGeometry().center()
+                cp = self.screen().availableGeometry().center()
                 qr.moveCenter(cp)
                 self.move(qr.topLeft())
 

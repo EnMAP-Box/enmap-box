@@ -7,16 +7,9 @@ from time import time
 from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple
 
 import numpy as np
-from osgeo import gdal
-
 import qgis.processing
-from enmapboxprocessing.driver import Driver
-from enmapboxprocessing.glossary import injectGlossaryLinks
-from enmapboxprocessing.processingfeedback import ProcessingFeedback
-from enmapboxprocessing.typing import ClassifierDump, ClustererDump, CreationOptions, GdalResamplingAlgorithm, \
-    RegressorDump, TransformerDump
-from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtCore import QDateTime, QDate
+from osgeo import gdal
+from qgis.PyQt.QtCore import QDateTime, QDate, QTime
 from qgis.PyQt.QtGui import QTextDocument, QIcon
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import NULL
@@ -32,6 +25,13 @@ from qgis.core import (Qgis, QgsCategorizedSymbolRenderer, QgsCoordinateReferenc
                        QgsProcessingParameterVectorDestination, QgsProcessingParameterVectorLayer, QgsProcessingUtils,
                        QgsProject, QgsProperty, QgsRasterLayer, QgsRectangle, QgsVectorLayer,
                        QgsProcessingParameterDateTime, QgsProcessing)
+
+from enmapboxprocessing.driver import Driver
+from enmapboxprocessing.glossary import injectGlossaryLinks
+from enmapboxprocessing.processingfeedback import ProcessingFeedback
+from enmapboxprocessing.typing import ClassifierDump, ClustererDump, CreationOptions, GdalResamplingAlgorithm, \
+    RegressorDump, TransformerDump
+from enmapboxprocessing.utils import Utils
 
 
 class AlgorithmCanceledException(Exception):
@@ -1032,8 +1032,8 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             maxValue=QDate(), advanced=False
     ):
         type = Qgis.ProcessingDateTimeParameterDataType.Date
-        minValue = QDateTime(minValue)
-        maxValue = QDateTime(maxValue)
+        minValue = QDateTime(minValue, QTime(0, 0))
+        maxValue = QDateTime(maxValue, QTime(0, 0))
         self.addParameter(
             QgsProcessingParameterDateTime(name, description, type, defaultValue, optional, minValue, maxValue)
         )
