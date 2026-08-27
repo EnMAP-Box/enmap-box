@@ -420,8 +420,12 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
                  load_core_apps: bool = True,
                  load_other_apps: bool = True):
         if not EnMAPBox.instance() is None:
-            raise AssertionError('EnMAPBox already started. '
-                                 'Call EnMAPBox.instance() to get a handle to.')
+            raise AssertionError(
+                'EnMAPBox already started. '
+                'Call EnMAPBox.instance() to get a handle to existing EnMAPBox instance.'
+                'If used in unit-tests, ensure that created EnMAP-Box instances'
+                'are closed with enmapbox.close()'
+            )
 
         settings: EnMAPBoxSettings = self.settings()
 
