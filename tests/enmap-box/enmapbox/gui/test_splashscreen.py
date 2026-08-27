@@ -1,5 +1,6 @@
-import unittest
 import time
+import unittest
+
 from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QWidget
 
@@ -14,7 +15,8 @@ class TestEnMAPBoxSplashScreen(EnMAPBoxTestCase):
     def test_splashScreen(self):
         w = QWidget()
 
-        splash = EnMAPBoxSplashScreen(parent=w)
+        splash = EnMAPBoxSplashScreen()
+
         self.assertIsInstance(splash, EnMAPBoxSplashScreen)
         i = 0
         splash.showMessage('Message {} {}'.format(i, str(time.time())))
@@ -34,5 +36,4 @@ class TestEnMAPBoxSplashScreen(EnMAPBoxTestCase):
 
 
 if __name__ == '__main__':
-
     unittest.main(buffer=False)

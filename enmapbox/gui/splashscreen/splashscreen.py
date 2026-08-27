@@ -14,7 +14,7 @@ class EnMAPBoxSplashScreen(QSplashScreen):
 
     def __init__(self, parent=None):
         pm = QPixmap(PATH_SPLASHSCREEN.as_posix())
-        super(EnMAPBoxSplashScreen, self).__init__(parent, pixmap=pm)
+        super(EnMAPBoxSplashScreen, self).__init__(pixmap=pm)
 
         effect = QGraphicsDropShadowEffect()
         effect.setBlurRadius(5)
