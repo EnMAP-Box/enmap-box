@@ -43,6 +43,7 @@ class EnFROSPTestCases(EnMAPBoxTestCase):
         self.assertIsInstance(app, EnFROSPEnMAPBoxApp)
         # app.startGUI()
         self.showGui(EB.ui)
+        EB.close()
 
 
 if __name__ == "__main__":

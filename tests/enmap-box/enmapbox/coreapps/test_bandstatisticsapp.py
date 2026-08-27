@@ -1,13 +1,14 @@
 import unittest
 
-from enmapbox.coreapps.bandstatisticsapp.bandstatisticsdialog import BandStatisticsDialog
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapbox.testing import EnMAPBoxTestCase, TestObjects, start_app
 from qgis.PyQt.QtWidgets import QApplication, QLabel
 from qgis.core import QgsMapLayer
 from qgis.core import QgsProject
 from qgis.gui import QgsMapLayerComboBox
+
+from enmapbox.coreapps.bandstatisticsapp.bandstatisticsdialog import BandStatisticsDialog
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
+from enmapbox.testing import EnMAPBoxTestCase, TestObjects, start_app
 
 start_app()
 
@@ -98,8 +99,6 @@ class BandStatisticsAppTests(EnMAPBoxTestCase):
 
         finally:
             eb.close()
-            EnMAPBox._instance = None
-            QApplication.processEvents()
 
 
 if __name__ == '__main__':

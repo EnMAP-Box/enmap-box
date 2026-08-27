@@ -15,7 +15,7 @@ initAll()
 class TestSpectralIndexExplorerDockWidget(TestCase):
 
     def test(self):
-        enmapBox = EnMAPBox(None)
+        enmapBox = EnMAPBox()
         layer = QgsRasterLayer(enmap, 'enmap_berlin')
         enmapBox.onDataDropped([layer])
 
@@ -31,8 +31,3 @@ class TestSpectralIndexExplorerDockWidget(TestCase):
         widget.apply()
         self.showGui([enmapBox.ui, widget])
         enmapBox.close()
-        # if False:
-        #     qgsApp.exec()
-
-        # self.dispose_widget(widget)
-        # self.dispose_widget(enmapBox.ui)

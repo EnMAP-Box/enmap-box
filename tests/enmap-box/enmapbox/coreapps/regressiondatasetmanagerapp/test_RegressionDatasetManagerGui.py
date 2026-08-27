@@ -11,15 +11,12 @@ start_app()
 class TestRegressionDatasetManagerGui(TestCase):
 
     def test(self):
-        enmapBox = EnMAPBox(None)
+        enmapBox = EnMAPBox()
         enmapBox.addSource(regressorDumpSkops)
 
         widget = RegressionDatasetManagerGui(enmapBox.ui)
         widget.show()
         widget.mDataset.mFile.setFilePath(regressorDumpSkops)
 
-        if False:
-            qgsApp.exec()
-
-        self.dispose_widget(widget)
-        self.dispose_widget(enmapBox.ui)
+        self.showGui([enmapBox.ui, widget])
+        enmapBox.close()

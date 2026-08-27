@@ -11,15 +11,13 @@ start_app()
 class TestClassificationDatasetManagerApp(TestCase):
 
     def test(self):
-        enmapBox = EnMAPBox(None)
+        enmapBox = EnMAPBox()
         enmapBox.addSource(classifierDumpSkops)
 
         widget = ClassificationDatasetManagerGui(enmapBox.ui)
         widget.show()
         widget.mDataset.mFile.setFilePath(classifierDumpSkops)
 
-        if False:
-            qgsApp.exec()
+        self.showGui([enmapBox.ui, widget])
 
-        self.dispose_widget(widget)
-        self.dispose_widget(enmapBox.ui)
+        enmapBox.close()

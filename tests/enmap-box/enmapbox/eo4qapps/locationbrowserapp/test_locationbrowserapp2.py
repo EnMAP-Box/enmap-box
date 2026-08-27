@@ -1,11 +1,12 @@
+from qgis.PyQt.QtWidgets import QDockWidget
+from qgis.core import QgsRasterLayer
+
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
 from enmapboxtestdata import enmap
 from locationbrowserapp import LocationBrowserDockWidget
-from qgis.PyQt.QtWidgets import QDockWidget
-from qgis.core import QgsRasterLayer
 
 qgsApp = start_app()
 initAll()
@@ -14,7 +15,7 @@ initAll()
 class TestLocationBrowserDockWidget(TestCase):
 
     def test(self):
-        enmapBox = EnMAPBox(None)
+        enmapBox = EnMAPBox()
         layer = QgsRasterLayer(enmap, 'enmap_berlin')
         enmapBox.onDataDropped([layer])
 
@@ -26,8 +27,6 @@ class TestLocationBrowserDockWidget(TestCase):
         widget.show()
         widget.onRequestNominatimClicked()
 
-        if False:
-            qgsApp.exec()
+        self.showGui([enmapBox, widget])
 
-        self.dispose_widget(widget)
-        self.dispose_widget(enmapBox.ui)
+        enmapBox.close()

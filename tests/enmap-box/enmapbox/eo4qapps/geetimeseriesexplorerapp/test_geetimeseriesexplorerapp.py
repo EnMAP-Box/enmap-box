@@ -1,11 +1,12 @@
+from qgis.PyQt.QtWidgets import QDockWidget
+from qgis.core import QgsRasterLayer
+
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
 from enmapboxtestdata import enmap
 from geetimeseriesexplorerapp import GeeTimeseriesExplorerDockWidget, GeeTemporalProfileDockWidget
-from qgis.PyQt.QtWidgets import QDockWidget
-from qgis.core import QgsRasterLayer
 
 qgsApp = start_app()
 initAll()
@@ -14,7 +15,7 @@ initAll()
 class TestGeeTimeseriesExplorerApp(TestCase):
 
     def test(self):
-        enmapBox = EnMAPBox(None)
+        enmapBox = EnMAPBox()
         layer = QgsRasterLayer(enmap, 'enmap_berlin')
         enmapBox.onDataDropped([layer])
 
@@ -38,4 +39,4 @@ class TestGeeTimeseriesExplorerApp(TestCase):
 
         self.dispose_widget(widget1)
         self.dispose_widget(widget2)
-        self.dispose_widget(enmapBox.ui)
+        enmapBox.close()

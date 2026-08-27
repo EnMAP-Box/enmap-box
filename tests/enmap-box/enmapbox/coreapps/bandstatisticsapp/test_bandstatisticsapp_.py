@@ -14,7 +14,7 @@ initAll()
 class TestBandStatisticsApp(TestCase):
 
     def test(self):
-        enmapBox = EnMAPBox(None)
+        enmapBox = EnMAPBox()
         layer = QgsRasterLayer(enmap, 'enmap_berlin.bsq')
         enmapBox.onDataDropped([layer])
 

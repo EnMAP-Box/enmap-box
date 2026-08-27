@@ -10,13 +10,15 @@ start_app()
 class TestClassificationWorkflowApp(TestCase):
 
     def test(self):
-        enmapBox = EnMAPBox(None)
+        enmapBox = EnMAPBox()
 
         widget = ClassificationWorkflowGui()
         widget.show()
 
-        if False:
-            qgsApp.exec()
+        self.showGui([enmapBox.ui, widget])
 
-        self.dispose_widget(widget)
-        self.dispose_widget(enmapBox.ui)
+        # if False:
+        #    qgsApp.exec()
+
+        # self.dispose_widget(widget)
+        # self.dispose_widget(enmapBox.ui)
