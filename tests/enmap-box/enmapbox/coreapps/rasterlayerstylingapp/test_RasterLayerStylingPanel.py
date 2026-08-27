@@ -26,8 +26,5 @@ class TestRasterLayerStylingPanel(TestCase):
         self.assertIsInstance(widget, RasterLayerStylingPanel)
         widget.show()
 
-        if False:
-            qgsApp.exec()
-
-        self.dispose_widget(widget)
-        self.dispose_widget(enmapBox.ui)
+        self.showGui([enmapBox.ui, widget])
+        enmapBox.close()

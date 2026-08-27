@@ -1,10 +1,11 @@
+from qgis.core import QgsRasterLayer
+
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
 from enmapboxtestdata import enmap
 from multisourcemultibandcolorrendererapp import MultiSourceMultiBandColorRendererDialog
-from qgis.core import QgsRasterLayer
 
 qgsApp = start_app()
 initAll()
@@ -32,8 +33,11 @@ class TestMultiSourceMultiBandColorRendererDialog(TestCase):
         widget.mMax3.setText('1')
         widget.show()
 
-        if False:
-            qgsApp.exec()
+        self.showGui([enmapBox.ui, widget])
+        enmapBox.close()
 
-        self.dispose_widget(widget)
-        self.dispose_widget(enmapBox.ui)
+        # if False:
+        #    qgsApp.exec()
+
+        # self.dispose_widget(widget)
+        # self.dispose_widget(enmapBox.ui)

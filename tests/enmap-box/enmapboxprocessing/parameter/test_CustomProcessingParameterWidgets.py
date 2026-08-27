@@ -1,3 +1,4 @@
+from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.classificationworkflowalgorithm import ClassificationWorkflowAlgorithm
@@ -9,7 +10,6 @@ from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import
 from enmapboxprocessing.algorithm.regressionworkflowalgorithm import RegressionWorkflowAlgorithm
 from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
 from enmapboxprocessing.testcase import TestCase
-from enmapbox import initAll
 
 qgsApp = start_app()
 initAll()
@@ -76,7 +76,6 @@ class TestCustomProcessingParameterWidgets(TestCase):
                 FitPcaAlgorithm(), parameters=None
             )
 
-        if not False:
-            qgsApp.exec()
-
-        self.dispose_widget(enmapBox.ui)
+        self.showGui(enmapBox.ui)
+        enmapBox.close()
+        # self.dispose_widget(enmapBox.ui)
