@@ -2612,14 +2612,16 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
     def actionZoomOut(self):
         return self.ui.mActionZoomOut
 
-    def showProcessingAlgorithmDialog(self,
-                                      algorithmName: Union[str, QgsProcessingAlgorithm],
-                                      parameters: Dict = None,
-                                      show: bool = True,
-                                      modal: bool = False, wrapper: type = None,
-                                      autoRun: bool = False,
-                                      parent: QWidget = None
-                                      ) -> AlgorithmDialog:
+    def showProcessingAlgorithmDialog(
+        self,
+        algorithmName: Union[str, QgsProcessingAlgorithm],
+        parameters: Dict = None,
+        show: bool = True,
+        modal: bool = False,
+        wrapper: type = None,
+        autoRun: bool = False,
+        parent: QWidget = None
+    ) -> AlgorithmDialog:
         """
         Create an algorithm dialog that uses the EnMAP-Box to set the context in which
         processing algorithms are executed.
@@ -2684,7 +2686,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         if not isinstance(dlg, QgsProcessingAlgorithmWidgetBase):
             raise AssertionError('Failed to create QgsProcessingAlgorithmWidgetBase')
 
-        dlg.setModal(modal)
+        # dlg.setModal(modal)
 
         if parameters is not None:
             dlg.setParameters(parameters)
