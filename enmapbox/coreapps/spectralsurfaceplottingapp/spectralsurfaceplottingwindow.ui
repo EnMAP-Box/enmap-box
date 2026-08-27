@@ -14,7 +14,7 @@
    <string>Spectral Surface Plotting</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
     <item>
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
@@ -48,7 +48,7 @@
               <x>0</x>
               <y>0</y>
               <width>620</width>
-              <height>474</height>
+              <height>463</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -174,6 +174,9 @@
                        </property>
                       </widget>
                      </item>
+                     <item row="0" column="1">
+                      <widget class="QgsFieldComboBox" name="mFieldLibraryProfiles"/>
+                     </item>
                      <item row="1" column="0">
                       <widget class="QLabel" name="label_43">
                        <property name="sizePolicy">
@@ -188,6 +191,19 @@
                        </property>
                       </widget>
                      </item>
+                     <item row="2" column="0">
+                      <widget class="QLabel" name="label_42">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string>colors</string>
+                       </property>
+                      </widget>
+                     </item>
                      <item row="1" column="1">
                       <widget class="QgsFieldComboBox" name="mFieldLibraryY">
                        <property name="allowEmptyFieldName">
@@ -195,8 +211,12 @@
                        </property>
                       </widget>
                      </item>
-                     <item row="0" column="1">
-                      <widget class="QgsFieldComboBox" name="mFieldLibraryProfiles"/>
+                     <item row="2" column="1">
+                      <widget class="QgsFieldComboBox" name="mFieldLibraryC">
+                       <property name="allowEmptyFieldName">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
                      </item>
                     </layout>
                    </item>
@@ -267,7 +287,7 @@
               <x>0</x>
               <y>0</y>
               <width>620</width>
-              <height>474</height>
+              <height>463</height>
              </rect>
             </property>
             <layout class="QFormLayout" name="formLayout_2">
@@ -339,14 +359,14 @@
                </item>
               </layout>
              </item>
-             <item row="1" column="0">
+             <item row="2" column="0">
               <widget class="QLabel" name="label">
                <property name="text">
                 <string>Scale exponent</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
+             <item row="2" column="1">
               <layout class="QHBoxLayout" name="horizontalLayout_3">
                <item>
                 <widget class="QLabel" name="label_2">
@@ -442,6 +462,26 @@
                </item>
               </layout>
              </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_6">
+               <property name="text">
+                <string>Coloring</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QgsColorRampButton" name="mColorRamp">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>1</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </widget>
@@ -449,6 +489,16 @@
         </layout>
        </widget>
       </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QgsMessageBar" name="mMessageBar">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
      </widget>
     </item>
    </layout>
@@ -465,6 +515,17 @@
    <extends>QComboBox</extends>
    <header>qgsmaplayercombobox.h</header>
   </customwidget>
+  <customwidget>
+   <class>QgsColorRampButton</class>
+   <extends>QToolButton</extends>
+   <header>qgis.gui</header>
+  </customwidget>
+  <customwidget>
+   <class>QgsMessageBar</class>
+   <extends>QFrame</extends>
+   <header>qgis.gui</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <resources/>
  <connections>
@@ -475,12 +536,12 @@
    <slot>setCurrentIndex(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>167</x>
-     <y>313</y>
+     <x>173</x>
+     <y>304</y>
     </hint>
     <hint type="destinationlabel">
-     <x>371</x>
-     <y>528</y>
+     <x>531</x>
+     <y>518</y>
     </hint>
    </hints>
   </connection>
@@ -491,8 +552,8 @@
    <slot>setLayer(QgsMapLayer*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>405</x>
-     <y>313</y>
+     <x>565</x>
+     <y>304</y>
     </hint>
     <hint type="destinationlabel">
      <x>306</x>
@@ -507,12 +568,12 @@
    <slot>setLayer(QgsMapLayer*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>488</x>
-     <y>313</y>
+     <x>631</x>
+     <y>304</y>
     </hint>
     <hint type="destinationlabel">
-     <x>537</x>
-     <y>419</y>
+     <x>269</x>
+     <y>331</y>
     </hint>
    </hints>
   </connection>
@@ -523,12 +584,12 @@
    <slot>setLayer(QgsMapLayer*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>454</x>
-     <y>313</y>
+     <x>614</x>
+     <y>304</y>
     </hint>
     <hint type="destinationlabel">
-     <x>495</x>
-     <y>387</y>
+     <x>269</x>
+     <y>326</y>
     </hint>
    </hints>
   </connection>
@@ -539,12 +600,12 @@
    <slot>setLayer(QgsMapLayer*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>434</x>
-     <y>313</y>
+     <x>594</x>
+     <y>304</y>
     </hint>
     <hint type="destinationlabel">
-     <x>459</x>
-     <y>355</y>
+     <x>269</x>
+     <y>320</y>
     </hint>
    </hints>
   </connection>
@@ -555,12 +616,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>167</x>
-     <y>307</y>
+     <x>179</x>
+     <y>302</y>
     </hint>
     <hint type="destinationlabel">
-     <x>222</x>
-     <y>306</y>
+     <x>259</x>
+     <y>302</y>
     </hint>
    </hints>
   </connection>
@@ -571,12 +632,28 @@
    <slot>setLayer(QgsMapLayer*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>398</x>
-     <y>313</y>
+     <x>558</x>
+     <y>304</y>
     </hint>
     <hint type="destinationlabel">
-     <x>410</x>
-     <y>357</y>
+     <x>621</x>
+     <y>346</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mLayer</sender>
+   <signal>layerChanged(QgsMapLayer*)</signal>
+   <receiver>mFieldLibraryC</receiver>
+   <slot>setLayer(QgsMapLayer*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>224</x>
+     <y>293</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>267</x>
+     <y>411</y>
     </hint>
    </hints>
   </connection>
