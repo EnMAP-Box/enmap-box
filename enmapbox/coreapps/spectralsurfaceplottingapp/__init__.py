@@ -1,7 +1,11 @@
-from enmapbox.gui.applications import EnMAPBoxApplication
+import importlib.util
+
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu
-from spectralsurfaceplottingapp.spectralsurfaceplottingwindow import SpectralSurfacePlottingWindow
+
+from enmapbox.gui.applications import EnMAPBoxApplication
+
+has_pyvista = importlib.util.find_spec('pyvista') is not None
 
 
 def enmapboxApplicationFactory(enmapBox):
@@ -28,6 +32,12 @@ class SpectralSurfacePlottingApp(EnMAPBoxApplication):
         a = self.utilsAddActionInAlphanumericOrder(self.enmapbox.ui.menuTools, self.title())
         a.triggered.connect(self.startGUI)
 
+        if not has_pyvista:
+            a.setEnabled(False)
+            a.setToolTip('Requires to install pyvista')
+
     def startGUI(self):
-        w = SpectralSurfacePlottingWindow(parent=self.enmapbox.ui)
-        w.show()
+        if has_pyvista:
+            from spectralsurfaceplottingapp.spectralsurfaceplottingwindow import SpectralSurfacePlottingWindow
+            w = SpectralSurfacePlottingWindow(parent=self.enmapbox.ui)
+            w.show()
