@@ -1,5 +1,12 @@
 from typing import List, Union
 
+from qgis.PyQt.QtCore import QEvent, Qt, QPointF, QPoint, QAbstractItemModel, QRect, QModelIndex
+from qgis.PyQt.QtGui import QMouseEvent, QContextMenuEvent, QAction
+from qgis.PyQt.QtWidgets import QMenu, QComboBox
+from qgis.PyQt.QtWidgets import QWidgetAction
+from qgis.core import QgsPointXY, QgsLayerTreeNode, QgsRasterLayer, QgsProject
+from qgis.gui import QgsMapMouseEvent
+
 from enmapbox.gui.contextmenuprovider import EnMAPBoxContextMenuProvider
 from enmapbox.gui.contextmenus import EnMAPBoxAbstractContextMenuProvider, EnMAPBoxContextMenuRegistry
 from enmapbox.gui.datasources.manager import DataSourceManagerTreeView
@@ -9,12 +16,6 @@ from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import MapCanvas
 from enmapbox.qgispluginsupport.qps.models import TreeNode
 from enmapbox.testing import EnMAPBoxTestCase, start_app
-from qgis.PyQt.QtCore import QEvent, Qt, QPointF, QPoint, QAbstractItemModel, QRect, QModelIndex
-from qgis.PyQt.QtGui import QMouseEvent, QContextMenuEvent, QAction
-from qgis.PyQt.QtWidgets import QMenu, QComboBox
-from qgis.PyQt.QtWidgets import QWidgetAction
-from qgis.core import QgsPointXY, QgsLayerTreeNode, QgsRasterLayer, QgsProject
-from qgis.gui import QgsMapMouseEvent
 
 start_app()
 
@@ -92,8 +93,8 @@ class test_applications(EnMAPBoxTestCase):
             QEvent.Type.MouseButtonPress, pt, Qt.MouseButton.LeftButton,
             Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier
         )
-        event = QgsMapMouseEvent(canvas, event)
 
+        event = QgsMapMouseEvent(canvas, event)
         canvas.mousePressEvent(event)
         canvas.populateContextMenu(m, event)
         mapDock.populateContextMenu(m)

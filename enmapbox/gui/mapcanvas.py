@@ -22,14 +22,6 @@ import warnings
 from _weakrefset import WeakSet
 from typing import List, Optional, Dict
 
-from enmapbox import enmapboxSettings
-from enmapbox.enmapboxsettings import EnMAPBoxSettings
-from enmapbox.gui.mimedata import containsMapLayers, extractMapLayers
-from enmapbox.qgispluginsupport.qps.crosshair.crosshair import CrosshairMapCanvasItem, CrosshairStyle
-from enmapbox.qgispluginsupport.qps.maptools import (
-    MapTools, MapToolCenter, PixelScaleExtentMapTool, CursorLocationMapTool,
-    FullExtentMapTool, QgsMapToolAddFeature, QgsMapToolSelect)
-from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
 from qgis.PyQt.QtCore import Qt, QObject, QCoreApplication, pyqtSignal, QEvent, QPointF, QMimeData, QTimer, QSize, \
     QModelIndex, QAbstractListModel
 from qgis.PyQt.QtGui import QMouseEvent, QIcon, QDragEnterEvent, QDropEvent, QResizeEvent, QKeyEvent, QColor
@@ -43,6 +35,15 @@ from qgis.core import QgsLayerTreeLayer, QgsCoordinateReferenceSystem, QgsRectan
 from qgis.gui import QgsColorDialog, QgsLayerTreeMapCanvasBridge, QgsMapTool
 from qgis.gui import QgsMapCanvas, QgisInterface, QgsMapToolZoom, QgsAdvancedDigitizingDockWidget, \
     QgsProjectionSelectionWidget, QgsMapToolIdentify, QgsMapToolPan, QgsMapToolCapture, QgsMapMouseEvent
+
+from enmapbox import enmapboxSettings
+from enmapbox.enmapboxsettings import EnMAPBoxSettings
+from enmapbox.gui.mimedata import containsMapLayers, extractMapLayers
+from enmapbox.qgispluginsupport.qps.crosshair.crosshair import CrosshairMapCanvasItem, CrosshairStyle
+from enmapbox.qgispluginsupport.qps.maptools import (
+    MapTools, MapToolCenter, PixelScaleExtentMapTool, CursorLocationMapTool,
+    FullExtentMapTool, QgsMapToolAddFeature, QgsMapToolSelect)
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
 
 LINK_ON_SCALE = 'SCALE'
 LINK_ON_CENTER = 'CENTER'
@@ -904,7 +905,7 @@ class MapCanvas(QgsMapCanvas):
     def canvasLinks(self) -> List[CanvasLink]:
         return self.mCanvasLinks[:]
 
-    def mousePressEvent(self, event: QMouseEvent):
+    def mousePressEvent(self, event: QgsMapMouseEvent):
 
         self.setProperty(KEY_LAST_CLICKED, time.time())
         set_cursor_location: bool = (
@@ -915,11 +916,11 @@ class MapCanvas(QgsMapCanvas):
         super(MapCanvas, self).mousePressEvent(event)
 
         if set_cursor_location:
-            ms = self.mapSettings()
-            pointXY = ms.mapToPixel().toMapCoordinates(event.x(), event.y())
-            spatialPoint = SpatialPoint(ms.destinationCrs(), pointXY)
+            spatialPoint = SpatialPoint(
+                self.mapSettings().destinationCrs(),
+                event.mapPoint()
+            )
             self.sigCrosshairPositionChanged[object].emit(spatialPoint)
-            # self.setCrosshairPosition(spatialPoint)
 
     def setCrosshairPosition(self, spatialPoint: SpatialPoint, emitSignal: bool = True):
         """
