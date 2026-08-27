@@ -1,3 +1,5 @@
+import unittest
+import importlib.util
 import numpy as np
 from qgis.core import QgsVectorLayer
 
@@ -6,12 +8,16 @@ from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
 from enmapboxtestdata import surfaceLongFormat
-from spectralsurfaceplottingapp.spectralsurfaceplottingwindow import SpectralSurfacePlottingWindow
+
+
+has_pyvista = importlib.util.find_spec('pyvista') is not None
+if has_pyvista:
+    from spectralsurfaceplottingapp.spectralsurfaceplottingwindow import SpectralSurfacePlottingWindow
 
 qgsApp = start_app()
 initAll()
 
-
+@unittest.skipIf(not has_pyvista, 'pyvista not installed')
 class TestSpectralSurfacePlottingApp(TestCase):
 
     def testGui(self):
