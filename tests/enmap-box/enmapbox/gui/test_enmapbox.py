@@ -20,6 +20,14 @@ import pathlib
 import unittest
 
 import qgis
+from qgis.PyQt.QtCore import QPoint
+from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel
+from qgis.PyQt.QtWidgets import QMenu
+from qgis.core import Qgis, QgsExpressionContextGenerator, QgsProcessingContext, QgsExpressionContext
+from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, \
+    QgsLayerTree, QgsApplication
+from qgis.gui import QgsMapLayerComboBox, QgisInterface, QgsProcessingContextGenerator, QgsMapCanvas
+
 from enmapbox import DIR_REPO
 from enmapbox import initAll
 from enmapbox.gui.contextmenus import EnMAPBoxContextMenuRegistry, EnMAPBoxAbstractContextMenuProvider
@@ -30,13 +38,6 @@ from enmapbox.qgispluginsupport.qps.maptools import MapTools, CursorLocationMapT
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase, start_app
-from qgis.PyQt.QtCore import QPoint
-from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel
-from qgis.PyQt.QtWidgets import QMenu
-from qgis.core import Qgis, QgsExpressionContextGenerator, QgsProcessingContext, QgsExpressionContext
-from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, \
-    QgsLayerTree, QgsApplication
-from qgis.gui import QgsMapLayerComboBox, QgisInterface, QgsProcessingContextGenerator, QgsMapCanvas
 
 start_app()
 initAll()
