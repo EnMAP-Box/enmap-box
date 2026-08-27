@@ -1,14 +1,15 @@
 from typing import List
 
-from enmapboxprocessing.librarywriter import LibraryWriter
 from qgis.PyQt.QtCore import QVariant
 from qgis.core import QgsCoordinateReferenceSystem, QgsGeometry, QgsVectorLayer, Qgis, QgsWkbTypes
+
+from enmapboxprocessing.librarywriter import LibraryWriter
 
 
 class LibraryDriver(object):
 
     def create(
-            self, name: str = None, wkbType: Qgis.WkbType = None, crs: QgsCoordinateReferenceSystem = None
+        self, name: str = None, wkbType: Qgis.WkbType = None, crs: QgsCoordinateReferenceSystem = None
     ) -> LibraryWriter:
 
         if name is None:
@@ -32,8 +33,8 @@ class LibraryDriver(object):
         return LibraryWriter(library)
 
     def createFromData(
-            self, data: List[dict], geometries: List[QgsGeometry] = None, name: str = None,
-            wkbType: Qgis.WkbType = None, crs: QgsCoordinateReferenceSystem = None
+        self, data: List[dict], geometries: List[QgsGeometry] = None, name: str = None,
+        wkbType: Qgis.WkbType = None, crs: QgsCoordinateReferenceSystem = None
     ) -> LibraryWriter:
 
         if geometries is None:
@@ -51,7 +52,7 @@ class LibraryDriver(object):
             if isinstance(value, dict):
                 writer.addProfileAttribute(fieldName)
             else:
-                writer.addAttribute(fieldName, QVariant(value).type())
+                writer.addAttribute(fieldName, QVariant(value).userType())
 
         # add data
         for values, geometry in zip(data, geometries):
