@@ -12,6 +12,7 @@ __author__ = 'benjamin.jakimow@geo.hu-berlin.de'
 __date__ = '2017-07-17'
 __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
+import subprocess  # nosec B404
 import sys
 import unittest
 import uuid
@@ -50,12 +51,11 @@ class test_dependencycheck(EnMAPBoxTestCase):
 
         pip_exe = localPipExecutable()
         self.assertTrue(pip_exe and Path(pip_exe).is_file())
-        import subprocess
         result = subprocess.run(
-            ['pip', 'show', 'numpy'],
+            [str(pip_exe), 'show', 'numpy'],
             capture_output=True,
             text=True
-        )
+        ) # nosec B603
         self.assertTrue(result.returncode == 0)
 
         # Access standard output (stdout)
