@@ -11,7 +11,7 @@ qgsApp = start_app()
 initAll()
 
 
-class TestHsvColorRasterRendererApp(TestCase):
+class LandCoverChangeStatisticsApp(TestCase):
 
     def test(self):
         enmapBox = EnMAPBox()
