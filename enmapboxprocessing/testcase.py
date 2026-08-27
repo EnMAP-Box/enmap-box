@@ -2,13 +2,13 @@ from os.path import join
 from typing import Union
 
 import numpy as np
+from qgis.PyQt.QtCore import QCoreApplication, QEvent
+from qgis.core import QgsCoordinateReferenceSystem, QgsRectangle
 
 import enmapbox.testing
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import Array2d, Array3d, Number
-from qgis.PyQt.QtCore import QCoreApplication, QEvent
-from qgis.core import QgsCoordinateReferenceSystem, QgsRectangle
 
 enmapbox.testing.start_app()
 
@@ -50,6 +50,7 @@ class TestCase(enmapbox.testing.TestCase):
         return self.rasterFromArray(array, basename, extent, crs)
 
     def dispose_widget(self, widget):
+        return  # check if the code below is necessary anymore
         widget.close()
         widget.deleteLater()
-        QCoreApplication.sendPostedEvents(None, QEvent.DeferredDelete)
+        QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
