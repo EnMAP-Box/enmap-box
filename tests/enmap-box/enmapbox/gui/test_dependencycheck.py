@@ -55,7 +55,8 @@ class test_dependencycheck(EnMAPBoxTestCase):
             [str(pip_exe), 'show', 'numpy'],
             capture_output=True,
             text=True
-        ) # nosec B603
+        )  # nosec B603
+
         self.assertTrue(result.returncode == 0)
 
         # Access standard output (stdout)

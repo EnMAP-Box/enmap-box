@@ -29,15 +29,6 @@ from pyqtgraph.dockarea import DockArea as pgDockArea
 from pyqtgraph.dockarea.Dock import Dock as pgDock
 from pyqtgraph.dockarea.Dock import DockLabel as pgDockLabel
 from pyqtgraph.dockarea.DockArea import TempAreaWindow
-
-from enmapbox.gui.mapcanvas import MapCanvas, CanvasLink
-from enmapbox.gui.mimedata import extractMapLayers
-from enmapbox.gui.utils import enmapboxUiPath
-from enmapbox.qgispluginsupport.qps.speclib.core import profile_fields
-from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
-from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
-from enmapbox.qgispluginsupport.qps.utils import loadUi
-from enmapboxprocessing.utils import Utils
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtCore import pyqtSignal, QSettings, Qt, QMimeData, QPoint, QUrl, QObject, QSize, QByteArray, QMetaType
 from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QResizeEvent, \
@@ -47,6 +38,15 @@ from qgis.PyQt.QtWidgets import QToolButton, QMenu, QMainWindow, QFileDialog, QW
 from qgis.core import QgsCoordinateReferenceSystem, QgsMapLayer, QgsProject, edit, QgsField, QgsLayerTree, \
     QgsLayerTreeLayer, QgsVectorLayer
 from qgis.gui import QgsMapCanvas
+
+from enmapbox.gui.mapcanvas import MapCanvas, CanvasLink
+from enmapbox.gui.mimedata import extractMapLayers
+from enmapbox.gui.utils import enmapboxUiPath
+from enmapbox.qgispluginsupport.qps.speclib.core import profile_fields
+from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
+from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
+from enmapbox.qgispluginsupport.qps.utils import loadUi
+from enmapboxprocessing.utils import Utils
 
 RX_HTML_FILE = re.compile(r'\.(html|html|xhtml)$', re.I)
 
@@ -736,8 +736,8 @@ class WebViewDock(Dock):
         super(WebViewDock, self).__init__(*args, **kwargs)
         # self.setLineWrapMode(QTextEdit.FixedColumnWidth)
 
-        from qgis.PyQt.QtWebKitWidgets import QWebView
-        self.webView = QWebView(self)
+        from qgis.PyQt.QtWebEngineWidgets import QWebEngineView
+        self.webView = QWebEngineView(self)
         self.layout.addWidget(self.webView)
 
         if uri is not None:
@@ -745,18 +745,25 @@ class WebViewDock(Dock):
         elif url is not None:
             self.load(url)
 
+    def showHtml(self, html: str):
+        self.webView.setHtml(html)
+
     def load(self, uri):
         if os.path.isfile(uri):
             url = QUrl.fromLocalFile(uri)
         else:
             url = QUrl(uri)
         self.webView.load(url)
-        settings = self.webView.page().settings()
-        from qgis.PyQt.QtWebKit import QWebSettings
-        settings.setAttribute(QWebSettings.LocalContentCanAccessRemoteUrls, True)
-        settings.setAttribute(QWebSettings.LocalContentCanAccessFileUrls, True)
-        settings.setAttribute(QWebSettings.LocalStorageEnabled, True)
-        settings.setAttribute(QWebSettings.AutoLoadImages, True)
+
+        if False:
+            settings = self.webView.page().settings()
+            # from qgis.PyQt.QtWebEngineWidgets import QWebEngineView
+            from qgis.PyQt.QtWebEngineCore import QWebEngineSettings
+            WA = QWebEngineSettings.WebAttribute
+            settings.setAttribute(WA.LocalContentCanAccessRemoteUrls, True)
+            settings.setAttribute(WA.LocalContentCanAccessFileUrls, True)
+            settings.setAttribute(WA.LocalStorageEnabled, True)
+            settings.setAttribute(WA.AutoLoadImages, True)
 
 
 class AttributeTableDock(Dock):
