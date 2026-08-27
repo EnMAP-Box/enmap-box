@@ -3,8 +3,6 @@ from typing import Union
 
 import numpy as np
 from qgis.core import QgsCoordinateReferenceSystem, QgsRectangle
-from qgis.PyQt.QtCore import QCoreApplication, QEvent
-from qgis.core import QgsCoordinateReferenceSystem, QgsRectangle
 
 import enmapbox.testing
 from enmapboxprocessing.driver import Driver
