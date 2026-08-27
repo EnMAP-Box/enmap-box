@@ -6,7 +6,6 @@ from qgis.PyQt.QtWidgets import QSizePolicy, QSlider, QToolButton, QMainWindow, 
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsColorRamp, QgsStyle, QgsMapLayerProxyModel, QgsRasterLayer
 from qgis.gui import QgsColorRampButton, QgsMessageBar, QgsMapLayerComboBox, QgsFieldComboBox
-from vtkmodules.vtkCommonCore import vtkStringArray
 
 from enmapboxprocessing.libraryreader import LibraryReader
 
@@ -169,20 +168,8 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         )
         self.onShowGridChanged()
 
-        # scale tick values
-        xlabels = self.gridActor.x_labels
-        ylabels = self.gridActor.y_labels
-        # zlabels = self.gridActor.z_labels
-        xlabels2 = vtkStringArray()
-        ylabels2 = vtkStringArray()
-        # zlabels2 = vtkStringArray()
-        for i, (vx, vy) in enumerate(zip(xlabels, ylabels)):
-            xlabels2.InsertNextValue(str(float(vx) / self.scaleX))
-            ylabels2.InsertNextValue(str(float(vy) / self.scaleY))
-            # zlabels2.InsertNextValue(str(float(vz) / self.scaleZ))
-        self.gridActor.SetAxisLabels(0, xlabels2)
-        self.gridActor.SetAxisLabels(1, ylabels2)
-        # self.gridActor.SetAxisLabels(2, zlabels2)
+        self.gridActor.x_axis_range = (bounds[0] / self.scaleX, bounds[1] / self.scaleX)
+        self.gridActor.y_axis_range = (bounds[2] / self.scaleY, bounds[3] / self.scaleY)
 
     def plotData(self):
 
@@ -210,6 +197,8 @@ class SpectralSurfacePlottingWindow(QMainWindow):
             name='points'
         )
         self.onShowPointsChanged()
+
+        self.onColorRampChanged()
 
         self.axesActor = self.plotter.add_axes(
             xlabel="X",

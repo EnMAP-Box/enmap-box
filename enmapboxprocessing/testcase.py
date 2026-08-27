@@ -3,6 +3,8 @@ from typing import Union
 
 import numpy as np
 from qgis.core import QgsCoordinateReferenceSystem, QgsRectangle
+from qgis.PyQt.QtCore import QCoreApplication, QEvent
+from qgis.core import QgsCoordinateReferenceSystem, QgsRectangle
 
 import enmapbox.testing
 from enmapboxprocessing.driver import Driver
@@ -49,6 +51,7 @@ class TestCase(enmapbox.testing.TestCase):
         return self.rasterFromArray(array, basename, extent, crs)
 
     def dispose_widget(self, widget):
+        return  # check if the code below is necessary anymore
         widget.close()
         widget.deleteLater()
         # QCoreApplication.sendPostedEvents(None, QEvent.DeferredDelete)

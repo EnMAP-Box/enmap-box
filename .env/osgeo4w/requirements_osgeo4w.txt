@@ -6,6 +6,8 @@ astropy # required for convolution
 xgboost # required by XGBoost classifier/regressor, see #960
 lightgbm # required by LightGBM classifier/regressor, see #960
 catboost # required by CatBoost classifier/regressor, see #960
+pyvista # required by Spectral Surface Plotting
+pyvistaqt # required by Spectral Surface Plotting
 
 # required by parts of EnMAP-Box Applications
 enpt-enmapboxapp # required by EnPT

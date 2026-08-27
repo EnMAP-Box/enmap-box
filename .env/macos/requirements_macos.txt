@@ -15,3 +15,5 @@ sympy # required by EnSoMAP
 numba>=0.57 # required by EnSoMAP
 enpt-enmapboxapp # required by EnPT
 scikit-learn>=1.0
+pyvista # required by Spectral Surface Plotting
+pyvistaqt # required by Spectral Surface Plotting

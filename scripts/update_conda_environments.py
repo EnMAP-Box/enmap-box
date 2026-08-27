@@ -55,6 +55,9 @@ DEPENDENCIES = {
              'torchvision',
              'segmentation-models-pytorch',
              'setuptools<=81',  # due to https://github.com/tensorflow/tensorboard/issues/7003
+             'pyvista',  # required by Spectral Surface Plotting
+             'pyvistaqt'  # required by Spectral Surface Plotting
+
              # {'pip': ['torch==2.6.0',
              #         'lightning==2.5.0.post0',
              #         'tensorboard==2.19.0',
