@@ -28,6 +28,7 @@ import logging
 import os
 import platform
 import re
+import shutil
 import subprocess  # nosec B404
 import sys
 import time
@@ -38,8 +39,6 @@ from io import StringIO
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Match, Optional, Tuple
 
-from enmapbox import REQUIREMENTS_CSV
-from enmapbox.enmapboxsettings import EnMAPBoxSettings
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import pyqtSignal, QAbstractTableModel, QModelIndex, QProcess, QSortFilterProxyModel, Qt, QUrl
 from qgis.PyQt.QtGui import QColor, QContextMenuEvent, QDesktopServices
@@ -47,6 +46,9 @@ from qgis.PyQt.QtWidgets import (QApplication, QDialogButtonBox, QMenu, QMessage
                                  QStyledItemDelegate, QTableView, QWidget)
 from qgis.core import Qgis, QgsAnimatedIcon, QgsApplication, QgsTask
 from qgis.gui import QgsFileDownloaderDialog
+
+from enmapbox import REQUIREMENTS_CSV
+from enmapbox.enmapboxsettings import EnMAPBoxSettings
 
 logger = logging.getLogger(__name__)
 
@@ -302,6 +304,13 @@ def localPipExecutable() -> Optional[Path]:
 
     if _LOCAL_PIPEXE is None:
 
+        pipexe = shutil.which('pip')
+        if pipexe:
+            return Path(pipexe)
+        pipexe = shutil.which('pip3')
+        if pipexe:
+            return Path(pipexe)
+
         pipexe = Path(get_prog())
         if not pipexe.is_file():
             pipexe = None
@@ -354,9 +363,8 @@ def decode_bytes(bytes_str, encodings=None):
 
 
 def call_pip_command(pipArgs: list) -> Tuple[bool, Optional[str], Optional[str]]:
-    success = 0
-    msgOut = msgErr = None
     pipexe = localPipExecutable()
+
     if pipexe:
         cmd = [str(pipexe)] + pipArgs
 
@@ -375,46 +383,39 @@ def call_pip_command(pipArgs: list) -> Tuple[bool, Optional[str], Optional[str]]
         success = result.returncode == 0
         msgOut = result.stdout
         msgErr = result.stderr
+
+        # Normalize line endings
+        if msgOut:
+            msgOut = msgOut.replace('\r\n', '\n')
+        if msgErr:
+            msgErr = msgErr.replace('\r\n', '\n')
+
         if success:
             return success, msgOut, msgErr
 
-    if False:
-        pipexe = localPipExecutable()
-        process = QProcess()
-        process.readyRead()
-        process.start(f'{pipexe}' + ' '.join(pipArgs))
-        process.waitForFinished()
+    # Fallback: try to use pip._internal directly
+    _std_out = sys.stdout
+    _std_err = sys.stderr
+    sys.stdout = StringIO()
+    sys.stderr = StringIO()
+    msgOut = None
 
-        msgOut = decode_bytes(process.readAllStandardOutput().data())
-        msgErr = decode_bytes(process.readAllStandardError().data())
-        success = process.exitCode() == 0
-        if success or msgErr != '':
-            return success, msgOut.replace('\r\n', '\n'), msgErr.replace('\r\n', '\n')
+    try:
+        from pip._internal.cli.main_parser import parse_command
+        from pip._internal.commands import create_command
 
-    if True:
-        _std_out = sys.stdout
-        _std_err = sys.stderr
-        sys.stdout = StringIO()
-        sys.stderr = StringIO()
-        msgOut = None
-        msgErr = None
+        cmd_name, cmd_args = parse_command(pipArgs)
+        cmd = create_command(cmd_name, isolated=("--isolated" in cmd_args))
+        result = cmd.main(cmd_args)
+        msgOut = sys.stdout.getvalue()
+        msgErr = sys.stderr.getvalue()
+        success = result == 0
+    except Exception as ex:
         success = False
-        try:
-            from pip._internal.cli.main_parser import parse_command
-            from pip._internal.commands import create_command
-
-            cmd_name, cmd_args = parse_command(pipArgs)
-            cmd = create_command(cmd_name, isolated=("--isolated" in cmd_args))
-            result = cmd.main(cmd_args)
-            msgOut = sys.stdout.getvalue()
-            msgErr = sys.stderr.getvalue()
-            success = result == 0
-        except Exception as ex:
-            success = False
-            msgErr = str(ex)
-        finally:
-            sys.stdout = _std_out
-            sys.stderr = _std_err
+        msgErr = str(ex)
+    finally:
+        sys.stdout = _std_out
+        sys.stderr = _std_err
 
     if msgOut:
         msgOut.replace('\r\n', '\n')
@@ -813,6 +814,8 @@ class PIPPackageFilterModel(QSortFilterProxyModel):
             raise ValueError(
                 f"Invalid mode {mode!r}. Expected one of {sorted(allowed_modes)}"
             )
+        self.mFilter1 = mode
+        self.invalidate()
 
     def primaryFilter(self):
         return self.mFilter1
@@ -821,19 +824,19 @@ class PIPPackageFilterModel(QSortFilterProxyModel):
         model: PIPPackageInstallerTableModel = self.sourceModel()
         pkg = model.index(sourceRow, 0, sourceParent).data(Qt.ItemDataRole.UserRole)
 
-        if isinstance(pkg, PIPPackage):
+        result = super().filterAcceptsRow(sourceRow, sourceParent)
+
+        # filter on-top of wildcard matching
+        if result is True and isinstance(pkg, PIPPackage):
             if self.mFilter1 == 'required':
                 if pkg.required_by is None:
                     return False
-                else:
-                    pass
             elif self.mFilter1 == 'missing':
-                if pkg.required_by is None:
-                    return False
-                if pkg.isInstalled():
+                if pkg.required_by:
+                    return not pkg.isInstalled()
+                else:
                     return False
 
-        result = super().filterAcceptsRow(sourceRow, sourceParent)
         return result
 
 
