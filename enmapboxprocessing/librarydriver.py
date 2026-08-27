@@ -1,6 +1,6 @@
 from typing import List
 
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QVariant, QMetaType
 from qgis.core import QgsCoordinateReferenceSystem, QgsGeometry, QgsVectorLayer, Qgis, QgsWkbTypes
 
 from enmapboxprocessing.librarywriter import LibraryWriter
@@ -52,7 +52,7 @@ class LibraryDriver(object):
             if isinstance(value, dict):
                 writer.addProfileAttribute(fieldName)
             else:
-                writer.addAttribute(fieldName, QVariant(value).userType())
+                writer.addAttribute(fieldName, QMetaType.Type(QVariant(value).typeId()))
 
         # add data
         for values, geometry in zip(data, geometries):
