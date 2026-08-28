@@ -119,7 +119,11 @@
                       </widget>
                      </item>
                      <item row="0" column="1">
-                      <widget class="QgsFieldComboBox" name="mFieldLfX"/>
+                      <widget class="QgsFieldComboBox" name="mFieldLfX">
+                       <property name="toolTip">
+                        <string>Values used as x-coordinates.</string>
+                       </property>
+                      </widget>
                      </item>
                      <item row="1" column="0">
                       <widget class="QLabel" name="label_37">
@@ -135,7 +139,11 @@
                       </widget>
                      </item>
                      <item row="1" column="1">
-                      <widget class="QgsFieldComboBox" name="mFieldLfY"/>
+                      <widget class="QgsFieldComboBox" name="mFieldLfY">
+                       <property name="toolTip">
+                        <string>Values used as y-coordinates.</string>
+                       </property>
+                      </widget>
                      </item>
                      <item row="2" column="0">
                       <widget class="QLabel" name="label_40">
@@ -151,7 +159,11 @@
                       </widget>
                      </item>
                      <item row="2" column="1">
-                      <widget class="QgsFieldComboBox" name="mFieldLfZ"/>
+                      <widget class="QgsFieldComboBox" name="mFieldLfZ">
+                       <property name="toolTip">
+                        <string>Values used as z-coordinates.</string>
+                       </property>
+                      </widget>
                      </item>
                     </layout>
                    </item>
@@ -175,7 +187,12 @@
                       </widget>
                      </item>
                      <item row="0" column="1">
-                      <widget class="QgsFieldComboBox" name="mFieldLibraryProfiles"/>
+                      <widget class="QgsFieldComboBox" name="mFieldLibraryProfiles">
+                       <property name="toolTip">
+                        <string>Wavelength is used as x-coordinates.
+ Reflectance is used as z-coordinates.</string>
+                       </property>
+                      </widget>
                      </item>
                      <item row="1" column="0">
                       <widget class="QLabel" name="label_43">
@@ -200,12 +217,16 @@
                         </sizepolicy>
                        </property>
                        <property name="text">
-                        <string>colors</string>
+                        <string>colors
+(optional)</string>
                        </property>
                       </widget>
                      </item>
                      <item row="1" column="1">
                       <widget class="QgsFieldComboBox" name="mFieldLibraryY">
+                       <property name="toolTip">
+                        <string>Values used as y-coordinates.</string>
+                       </property>
                        <property name="allowEmptyFieldName">
                         <bool>true</bool>
                        </property>
@@ -213,6 +234,9 @@
                      </item>
                      <item row="2" column="1">
                       <widget class="QgsFieldComboBox" name="mFieldLibraryC">
+                       <property name="toolTip">
+                        <string>Values used for coloring.</string>
+                       </property>
                        <property name="allowEmptyFieldName">
                         <bool>true</bool>
                        </property>
