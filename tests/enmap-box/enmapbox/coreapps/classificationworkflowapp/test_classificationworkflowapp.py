@@ -17,6 +17,8 @@ class TestClassificationWorkflowApp(TestCase):
 
         self.showGui([enmapBox.ui, widget])
 
+        enmapBox.close()
+
         # if False:
         #    qgsApp.exec()
 

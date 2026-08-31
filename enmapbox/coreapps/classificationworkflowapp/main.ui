@@ -33,7 +33,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="documentMode">
        <bool>true</bool>
@@ -2833,12 +2833,23 @@ li.checked::marker { content: &quot;\2612&quot;; }
          </layout>
         </item>
         <item>
-         <widget class="QWebView" name="mWebView" native="true">
+         <widget class="QWebEngineView" name="mWebView">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>1</verstretch>
            </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>50</height>
+           </size>
+          </property>
+          <property name="url">
+           <url>
+            <string>about:blank</string>
+           </url>
           </property>
          </widget>
         </item>
@@ -2881,6 +2892,11 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <header>qgsspinbox.h</header>
   </customwidget>
   <customwidget>
+   <class>QWebEngineView</class>
+   <extends>QWidget</extends>
+   <header location="global">QtWebEngineWidgets/QWebEngineView</header>
+  </customwidget>
+  <customwidget>
    <class>CodeEditWidget</class>
    <extends>QWidget</extends>
    <header>enmapboxprocessing.parameter.processingparametercodeeditwidget</header>
@@ -2890,12 +2906,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <class>ProcessingParameterSkopsFileClassificationDatasetWidget</class>
    <extends>QWidget</extends>
    <header>enmapboxprocessing.parameter.processingparameterskopsfileclassificationdatasetwidget</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QWebView</class>
-   <extends>QWidget</extends>
-   <header>PyQt5.QtWebKitWidgets</header>
    <container>1</container>
   </customwidget>
   <customwidget>
