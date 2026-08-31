@@ -645,9 +645,10 @@ class DockManager(QObject):
             # exclude vector layers without geometry
             dropped_maplayers = [
                 lyr for lyr in dropped_maplayers
-                if isinstance(lyr, QgsVectorLayer) or lyr.geometryType() in [QgsWkbTypes.GeometryType.UnknownGeometry,
-                                                                             QgsWkbTypes.GeometryType.NullGeometry]
-
+                if not (
+                    isinstance(lyr, QgsVectorLayer) and lyr.geometryType()
+                    in [QgsWkbTypes.UnknownGeometry, QgsWkbTypes.NullGeometry]
+                )
             ]
 
             if len(dropped_maplayers) > 0:
