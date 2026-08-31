@@ -34,6 +34,6 @@ GDAL>=3.0.4
 joblib>=1.1.0
 colorama>=0.4.3
 Pillow>=7.0.0
-sip>=4.19.21
+sip>=6.0
 setuptools>=45.2.0
 urllib3>=1.25.8

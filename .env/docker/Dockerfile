@@ -12,12 +12,13 @@ ENV VIRTUAL_ENV=/opt/virtualenvs/enmapbox
 RUN apt update \
     &&  apt install -y \
           # pyqt6-dev-tools \
-     	 python3-pip \
-     	 python3-venv \
-     	 python3-h5py \
-        # python3-pyqt6.qtopengl \
-      	 python3-netcdf4 \
-       	 python3-astropy \
+          python3-pip \
+          python3-venv \
+          python3-h5py \
+          python3-pyqt6.qtopengl \
+          qt6-base-dev \
+          python3-netcdf4 \
+          python3-astropy \
     && apt autoremove -y \
     && apt clean
 
