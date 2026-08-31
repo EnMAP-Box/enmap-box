@@ -21,7 +21,8 @@ RUN apt update \
           python3-netcdf4 \
           python3-astropy \
     && apt autoremove -y \
-    && apt clean
+    && apt clean \
+    && ln -sf /usr/lib/qt6/bin/rcc /usr/bin/rcc
 
 COPY ./.env/linux/requirements_ubuntu.txt /tmp/
 COPY ./requirements_developer.txt /tmp/
