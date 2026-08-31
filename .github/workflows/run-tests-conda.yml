@@ -1,17 +1,34 @@
 name: 🐍 Conda Environments
 
 on:
+  workflow_dispatch:
+
+  # push:
+  #   branches:
+  #     - main
+  #     - release-**
+  #     - release_**
+
+  # pull_request:
+  #   branches:
+  #     - main
+  #     - release-**
+  #     - release_**
+
+  # release:
+  #   types: [ published ]
+
   push:
     branches:
       - main
       - release-**
       - release_**
 
-  pull_request:
-    branches:
-      - main
-      - release-**
-      - release_**
+    # pull_request:
+    #  branches:
+    #  - main
+    #   - release-**
+    #  - release_**
 
   release:
     types: [ published ]
