@@ -83,9 +83,13 @@ class MultipleMapLayerSelectionDialog(QDialog):
         loadUi(__file__.replace('widget.py', 'dialog.ui'), self)
         self.accepted = False
 
-        # self.mLayers = list()
+        from enmapbox.gui.enmapboxgui import EnMAPBox
+        self.enmapBox = EnMAPBox.instance()
+
         layer: QgsMapLayer
-        for layer in QgsProject.instance().mapLayers().values():
+        # for layer in QgsProject.instance().mapLayers().values():
+        for layer in self.enmapBox.mapLayers():
+
             if isinstance(layer, QgsRasterLayer) and not allowRaster:
                 continue
             if isinstance(layer, QgsVectorLayer) and not allowVector:
@@ -98,7 +102,6 @@ class MultipleMapLayerSelectionDialog(QDialog):
             else:
                 item.setCheckState(Qt.CheckState.Unchecked)
             self.mList.addItem(item)
-            # self.mLayers.append(layer)
 
         self.mOk.clicked.connect(self.onOkClicked)
         self.mCancel.clicked.connect(self.close)

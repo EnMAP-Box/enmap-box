@@ -4,6 +4,13 @@ from typing import Optional, List
 
 import numpy as np
 import plotly.graph_objects as go
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWebEngineWidgets import QWebEngineView
+from qgis.PyQt.QtWidgets import QStatusBar, QToolButton, QMainWindow, QCheckBox
+from qgis.PyQt.uic import loadUi
+from qgis.core import QgsRectangle, QgsPalettedRasterRenderer, QgsRasterLayer, QgsMapSettings, QgsUnitTypes
+from qgis.gui import QgsMapCanvas
 from scipy.stats._crosstab import crosstab
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent, SpatialPoint
@@ -15,18 +22,10 @@ from landcoverchangestatisticsapp.landcoverchangestatisticsdatafilteringdockwidg
     LandCoverChangeStatisticsDataFilteringDockWidget
 from landcoverchangestatisticsapp.landcoverchangestatisticssettingsdockwidget import \
     LandCoverChangeStatisticsSettingsDockWidget
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import QColor
-# from qgis.PyQt.QtWebKitWidgets import QWebView
-from qgis.PyQt.QtWidgets import QStatusBar
-from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QCheckBox
-from qgis.PyQt.uic import loadUi
-from qgis.core import QgsRectangle, QgsPalettedRasterRenderer, QgsRasterLayer, QgsMapSettings, QgsUnitTypes
-from qgis.gui import QgsMapCanvas
 
 
 class LandCoverChangeStatisticsMainWindow(QMainWindow):
-    # mWebView: QWebView
+    mWebView: QWebEngineView
     mStatusBar: QStatusBar
 
     def __init__(self, *args, **kwds):
@@ -37,6 +36,7 @@ class LandCoverChangeStatisticsMainWindow(QMainWindow):
         self.enmapBox = EnMAPBox.instance()
         self.builder = LandCoverChangeSankeyPlotBuilder()
 
+        self.mWebView.loadFinished.connect(self.onWebViewLoaded)
         # add status bar
         self.mLiveUpdate = QCheckBox('Live update')
         self.mLiveUpdate.setChecked(True)
