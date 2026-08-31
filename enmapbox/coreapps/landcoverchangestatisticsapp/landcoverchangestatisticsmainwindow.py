@@ -36,7 +36,6 @@ class LandCoverChangeStatisticsMainWindow(QMainWindow):
         self.enmapBox = EnMAPBox.instance()
         self.builder = LandCoverChangeSankeyPlotBuilder()
 
-        self.mWebView.loadFinished.connect(self.onWebViewLoaded)
         # add status bar
         self.mLiveUpdate = QCheckBox('Live update')
         self.mLiveUpdate.setChecked(True)
