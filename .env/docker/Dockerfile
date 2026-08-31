@@ -15,7 +15,8 @@ RUN apt update \
           python3-pip \
           python3-venv \
           python3-h5py \
-          python3-pyqt6.qtopengl \
+          python3-pyqt6 \
+          python3-opengl \
           qt6-base-dev \
           python3-netcdf4 \
           python3-astropy \
