@@ -174,7 +174,7 @@ class ClassificationDatasetManagerGui(QDialog):
             alg.P_OUTPUT_DATASET: tmpfile.replace('.skops', '.sample.skops'),
             alg.P_OUTPUT_COMPLEMENT: tmpfile.replace('.skops', '.complement.skops'),
         }
-        dialog = self.enmapBox.showProcessingAlgorithmDialog(alg, parameters, True, True, None, False, self)
+        dialog = self.enmapBox.showProcessingAlgorithmDialog(alg, parameters, True, True, None, False)
         if len(dialog.results()) == 0:
             return
         filename = dialog.results()[alg.P_OUTPUT_DATASET]

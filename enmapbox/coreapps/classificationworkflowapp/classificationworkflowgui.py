@@ -434,7 +434,7 @@ class ClassificationWorkflowGui(QMainWindow):
             autoRun = self.mDialogAutoRun.isChecked()
         wrapper = self._createAlgorithmDialogWrapper()
         dialog = self.enmapBox.showProcessingAlgorithmDialog(
-            alg, parameters=parameters, show=True, modal=True, parent=self, wrapper=wrapper, autoRun=autoRun
+            alg, parameters=parameters, show=True, modal=True, wrapper=wrapper, autoRun=autoRun
         )
 
         if dialog.finishedSuccessful:

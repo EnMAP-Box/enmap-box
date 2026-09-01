@@ -288,7 +288,7 @@ class ScatterPlotDialog(QMainWindow):
                     if successful:
                         self.close()
 
-            self.enmapBox.showProcessingAlgorithmDialog(alg, parameters, True, True, Wrapper, True, self)
+            self.enmapBox.showProcessingAlgorithmDialog(alg, parameters, True, True, Wrapper, True)
             if not exists(filename):
                 self.mFieldY.setField('')
                 return

@@ -582,11 +582,11 @@ class DataSourceManagerTreeView(TreeView):
 
         if isinstance(dataSource, RasterDataSource):
             parameters = {SaveRasterAsAlgorithm.P_RASTER: dataSource.source()}
-            emb.showProcessingAlgorithmDialog(SaveRasterAsAlgorithm(), parameters, parent=self)
+            emb.showProcessingAlgorithmDialog(SaveRasterAsAlgorithm(), parameters)
 
         elif isinstance(dataSource, VectorDataSource):
             parameters = dict(INPUT=dataSource.source())
-            emb.showProcessingAlgorithmDialog('native:savefeatures', parameters, parent=self)
+            emb.showProcessingAlgorithmDialog('native:savefeatures', parameters)
 
     def onOpenInExplorer(self, dataSource: DataSource):
         """Open source in system file explorer."""

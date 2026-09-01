@@ -1988,13 +1988,11 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
             from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
             parameters = {SaveRasterAsAlgorithm.P_RASTER: layer}
             dlg = enmapBox.showProcessingAlgorithmDialog(
-                SaveRasterAsAlgorithm(), parameters, modal=True, parent=None
+                SaveRasterAsAlgorithm(), parameters, modal=True
             )
         elif isinstance(layer, QgsVectorLayer):
             parameters = {'INPUT': layer}
-            dlg = enmapBox.showProcessingAlgorithmDialog(
-                'native:savefeatures', parameters, modal=True, parent=enmapBox.ui
-            )
+            dlg = enmapBox.showProcessingAlgorithmDialog('native:savefeatures', parameters, modal=True)
         else:
             raise ValueError()
 
@@ -2133,7 +2131,7 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         action = self.mDockTreeView.sender()
         alg: EnMAPProcessingAlgorithm = action.alg
         parameters: Dict = action.parameters
-        enmapBox.showProcessingAlgorithmDialog(alg, parameters, True, True, parent=self.mDockTreeView)
+        enmapBox.showProcessingAlgorithmDialog(alg, parameters, True, True)
 
     def onRasterLayerStylingClicked(self, layer: QgsRasterLayer):
         from rasterlayerstylingapp import RasterLayerStylingApp

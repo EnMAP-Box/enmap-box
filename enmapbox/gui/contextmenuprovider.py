@@ -379,7 +379,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                 a.setIcon(QIcon(':/images/themes/default/mActionFileSaveAs.svg'))
                 a.triggered.connect(
                     lambda src: EnMAPBox.instance().showProcessingAlgorithmDialog(
-                        TranslateRasterAlgorithm(), parameters, parent=treeView
+                        TranslateRasterAlgorithm(), parameters
                     )
                 )
 
@@ -388,7 +388,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                 a.setIcon(QIcon(':/images/themes/default/mActionFileSaveAs.svg'))
                 a.triggered.connect(
                     lambda src: EnMAPBox.instance().showProcessingAlgorithmDialog(
-                        SubsetRasterBandsAlgorithm(), parameters, parent=treeView
+                        SubsetRasterBandsAlgorithm(), parameters
                     )
                 )
 
@@ -398,7 +398,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
                     a.setIcon(QIcon(':/images/themes/default/mActionFileSaveAs.svg'))
                     a.triggered.connect(
                         lambda src: EnMAPBox.instance().showProcessingAlgorithmDialog(
-                            WriteEnviHeaderAlgorithm(), parameters, parent=treeView
+                            WriteEnviHeaderAlgorithm(), parameters
                         )
                     )
 

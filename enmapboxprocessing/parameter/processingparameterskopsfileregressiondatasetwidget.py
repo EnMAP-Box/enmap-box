@@ -136,7 +136,7 @@ class ProcessingParameterSkopsFileRegressionDatasetWidget(QWidget):
             QMessageBox.information(self, 'Information', 'EnMAP-Box not running.')
             return
 
-        enmapBox.showProcessingAlgorithmDialog(alg, modal=True, wrapper=AlgorithmDialogWrapper, parent=self)
+        enmapBox.showProcessingAlgorithmDialog(alg, modal=True, wrapper=AlgorithmDialogWrapper)
 
     def onFilenameClicked(self):
         filename = self.sender().filename

@@ -44,4 +44,4 @@ class ProcessingApps(EnMAPBoxApplication):
 
     def startAlgorithm(self, *args):
         a: QAction = self.sender()
-        self.enmapbox.showProcessingAlgorithmDialog(a.algorithm, parent=self.enmapbox.ui)
+        self.enmapbox.showProcessingAlgorithmDialog(a.algorithm)
