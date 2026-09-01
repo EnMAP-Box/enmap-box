@@ -5,11 +5,9 @@ from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import Spectral
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import ProfileEncoding
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import prepareProfileValueDict, \
     encodeProfileValueDict
-from enmapbox.typeguard import typechecked
 from qgis.core import QgsVectorLayer, QgsField, QgsFeature, edit, QgsGeometry
 
 
-@typechecked
 class LibraryWriter(object):
 
     def __init__(self, library: QgsVectorLayer):

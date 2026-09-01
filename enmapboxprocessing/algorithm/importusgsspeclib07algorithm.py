@@ -4,15 +4,13 @@ from os.path import join, exists, basename
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
+
+from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
+from enmapboxprocessing.librarydriver import LibraryDriver
 from qgis.core import QgsVectorLayer, QgsMapLayer, QgsProcessingContext, QgsProcessingFeedback, \
     QgsProcessingParameterFile, QgsProcessingException
 
-from enmapbox.typeguard import typechecked
-from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-from enmapboxprocessing.librarydriver import LibraryDriver
 
-
-@typechecked
 class ImportUsgsSpeclib07Algorithm(EnMAPProcessingAlgorithm):
     P_FOLDER, _FOLDER = 'folder', 'USGS Speclib Library Version 7 folder'
     P_CHAPTER, _CHAPTER = 'chapter', 'Selected chapters'

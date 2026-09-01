@@ -12,11 +12,16 @@ __author__ = 'benjamin.jakimow@geo.hu-berlin.de'
 __date__ = '2017-07-17'
 __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
+import importlib
 import os
 import tempfile
 import unittest
 
 from pyqtgraph.dockarea.Dock import Dock as pgDock
+from qgis.PyQt.QtWidgets import QApplication
+from qgis.PyQt.QtWidgets import QWidget, QHBoxLayout
+from qgis.core import QgsProject, QgsVectorLayer, QgsRasterLayer, QgsLayerTreeModel, QgsLayerTree
+from qgis.gui import QgsMapCanvas, QgsLayerTreeView
 
 from enmapbox import initEnMAPBoxResources
 from enmapbox.exampledata import landcover_polygon, enmap, hires
@@ -27,7 +32,7 @@ from enmapbox.gui.dataviews.dockmanager import (
     DockTreeNode
 )
 from enmapbox.gui.dataviews.docks import (
-    MapDock, DockArea, MimeDataDock, TextDock, SpectralLibraryDock, TextDockWidget, Dock
+    MapDock, DockArea, MimeDataDock, TextDock, SpectralLibraryDock, TextDockWidget, Dock, WebViewDock
 )
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.maptools import MapTools
@@ -36,10 +41,6 @@ from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import Spe
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.testing import EnMAPBoxTestCase, TestObjects, start_app
 from enmapboxtestdata import classificationDatasetAsSkopsFile, library_berlin
-from qgis.PyQt.QtWidgets import QApplication
-from qgis.PyQt.QtWidgets import QWidget, QHBoxLayout
-from qgis.core import QgsProject, QgsVectorLayer, QgsRasterLayer, QgsLayerTreeModel, QgsLayerTree
-from qgis.gui import QgsMapCanvas, QgsLayerTreeView
 
 start_app()
 initEnMAPBoxResources()
@@ -187,10 +188,10 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         if False:
             treeRoot = QgsLayerTree()
             model = QgsLayerTreeModel(treeRoot)
-            model.setFlag(QgsLayerTreeModel.AllowNodeReorder, True)
-            model.setFlag(QgsLayerTreeModel.AllowNodeRename, True)
-            model.setFlag(QgsLayerTreeModel.AllowNodeChangeVisibility, True)
-            model.setFlag(QgsLayerTreeModel.AllowLegendChangeState, True)
+            model.setFlag(QgsLayerTreeModel.Flag.AllowNodeReorder, True)
+            model.setFlag(QgsLayerTreeModel.Flag.AllowNodeRename, True)
+            model.setFlag(QgsLayerTreeModel.Flag.AllowNodeChangeVisibility, True)
+            model.setFlag(QgsLayerTreeModel.Flag.AllowLegendChangeState, True)
             model.setAutoCollapseLegendNodes(0)
 
             tree1 = QgsLayerTree()
@@ -244,6 +245,37 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         self.showGui(da)
 
         QgsProject.instance().removeAllMapLayers()
+
+    has_QtWebEngineWidgets = importlib.util.find_spec('qgis.PyQt.QtWebEngineWidgets') is not None
+
+    @unittest.skipIf(not has_QtWebEngineWidgets, 'qgis.PyQt.QtWebEngineWidgets not available')
+    def test_WebViewDock(self):
+        html = """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Home page</title>
+        </head>
+        <body>
+            <p>
+                This is a simple HTML page.
+            </p>
+        </body>
+        </html>
+        """
+
+        # from qgis.PyQt.QtWebEngineWidgets import QWebEngineView
+        # view = QWebEngineView()
+        # view.setWindowTitle('Test')
+
+        # view.setHtml(html)
+        # self.showGui(view)
+
+        dock = WebViewDock()
+        dock.showHtml(html)
+        self.showGui(dock)
 
     def test_TextDock(self):
         da = DockArea()

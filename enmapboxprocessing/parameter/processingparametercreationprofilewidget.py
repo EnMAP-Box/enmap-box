@@ -1,9 +1,10 @@
 import webbrowser
 
-from qgis.PyQt.uic import loadUi
+from qgis.core import QgsMessageLog, Qgis
 
-from processing.gui.wrappers import WidgetWrapper
 from qgis.PyQt.QtWidgets import QWidget, QLineEdit, QComboBox, QToolButton
+from qgis.PyQt.uic import loadUi
+from qgis.gui import QgsAbstractProcessingParameterWidgetWrapper, QgsProcessingParameterWidgetFactoryInterface, QgsGui
 
 
 class ProcessingParameterCreationProfileWidget(QWidget):
@@ -45,31 +46,34 @@ class ProcessingParameterCreationProfileWidget(QWidget):
             webbrowser.open_new_tab('https://gdal.org/drivers/raster/vrt.html')
 
 
-class ProcessingParameterCreationProfileWidgetWrapper(WidgetWrapper):
-    # adopted from C:\source\QGIS3-master\python\plugins\processing\algs\gdal\ui\RasterOptionsWidget.py
-
-    widget: ProcessingParameterCreationProfileWidget
+class ProcessingParameterCreationProfileWidgetWrapper(QgsAbstractProcessingParameterWidgetWrapper):
 
     def createWidget(self):
-        # if self.dialogType == DIALOG_MODELER:
-        #    raise NotImplementedError()
-        # elif self.dialogType == DIALOG_BATCH:
-        #    raise NotImplementedError()
-        # else:
-        return ProcessingParameterCreationProfileWidget()
+        widget = ProcessingParameterCreationProfileWidget()
+        return widget
 
-    def setValue(self, value: str):
-        # if self.dialogType == DIALOG_MODELER:
-        #    raise NotImplementedError()
-        # elif self.dialogType == DIALOG_BATCH:
-        #    raise NotImplementedError()
-        # else:
-        self.widget.mOptions.setText(value)
+    def setWidgetValue(self, value, context):
+        widget = self.wrappedWidget()
+        widget.mOptions.setText(value)
 
-    def value(self):
-        # if self.dialogType == DIALOG_MODELER:
-        #    raise NotImplementedError()
-        # elif self.dialogType == DIALOG_BATCH:
-        #    raise NotImplementedError()
-        # else:
-        return self.widget.mOptions.text()
+    def widgetValue(self):
+        widget = self.wrappedWidget()
+        return widget.mOptions.text()
+
+
+class ProcessingParameterCreationProfileWidgetFactory(QgsProcessingParameterWidgetFactoryInterface):
+    WIDGET_TYPE = 'enmapbox:ProcessingParameterCreationProfileWidget'
+
+    def parameterType(self):
+        return self.WIDGET_TYPE
+
+    def createWidgetWrapper(self, parameter, widget_type):
+        return ProcessingParameterCreationProfileWidgetWrapper(parameter, widget_type)
+
+    @classmethod
+    def register(cls):
+        success = QgsGui.processingGuiRegistry().addParameterWidgetFactory(cls())
+        if success:
+            QgsMessageLog.logMessage(f'{cls.WIDGET_TYPE} registered', level=Qgis.MessageLevel.Info)
+        else:
+            QgsMessageLog.logMessage(f'{cls.WIDGET_TYPE} could not be registered', level=Qgis.MessageLevel.Critical)

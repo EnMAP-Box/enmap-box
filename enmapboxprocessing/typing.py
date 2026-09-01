@@ -16,8 +16,6 @@ except Exception:
     ClusterMixin = Any
     Pipeline = Any
 
-from enmapbox.typeguard import typechecked, check_type
-
 GdalDataType = int
 GdalResamplingAlgorithm = int
 NumpyDataType = Union[type, np.dtype]
@@ -35,7 +33,6 @@ CreationOptions = List[str]
 HexColor = str
 
 
-@typechecked
 @dataclass
 class Category(object):
     value: Union[int, float, str]
@@ -43,7 +40,6 @@ class Category(object):
     color: HexColor
 
 
-@typechecked
 @dataclass
 class Target(object):
     name: str
@@ -56,7 +52,6 @@ SampleX = np.ndarray
 SampleY = np.ndarray
 
 
-@typechecked
 @dataclass
 class TransformerDump(object):
     features: Optional[List[str]]
@@ -97,7 +92,6 @@ class TransformerDump(object):
             raise ValueError('wrong file extension, use "skops" or "json"')
 
 
-@typechecked
 @dataclass
 class ClustererDump(object):
     clusterCount: Optional[int]
@@ -134,7 +128,6 @@ class ClustererDump(object):
             raise ValueError('wrong file extension, use "skops" or "json"')
 
 
-@typechecked
 @dataclass
 class ClassifierDump(object):
     categories: Optional[Categories]
@@ -146,14 +139,10 @@ class ClassifierDump(object):
     crs: Optional[str] = None
 
     def __post_init__(self):
-        check_type('categories', self.categories, Optional[Categories])
-        check_type('features', self.features, Optional[List[str]])
-        check_type('X', self.X, Optional[SampleX])
         if self.X is not None and self.X.ndim != 2:
             raise ValueError(
                 f'X must be a 2-dimensional array, got ndim={self.X.ndim}'
             )
-        check_type('y', self.y, Optional[SampleY])
         if self.y is not None and self.y.ndim != 2:
             raise ValueError(
                 f'y must be a 2-dimensional array, got ndim={self.y.ndim}'
@@ -168,14 +157,6 @@ class ClassifierDump(object):
                 raise ValueError(
                     f'locations must have shape (n, 2), got shape={self.locations.shape}'
                 )
-        try:
-            check_type('classifier', self.classifier, Optional[Union[ClassifierMixin, Pipeline]])
-        except Exception:
-            from sklearn.base import is_classifier
-            if not is_classifier(self.classifier):
-                raise TypeError('classifier is not a valid scikit-learn classifier')
-        check_type('locations', self.locations, Optional[np.ndarray])
-        check_type('crs', self.crs, Optional[str])
 
     def write(self, filename: str):
         from enmapboxprocessing.utils import Utils
@@ -216,7 +197,6 @@ class ClassifierDump(object):
         return cls.fromDict(d)
 
 
-@typechecked
 @dataclass
 class RegressorDump(object):
     targets: Optional[Targets]
@@ -228,14 +208,6 @@ class RegressorDump(object):
     crs: Optional[str] = None
 
     def __post_init__(self):
-        check_type('targets', self.targets, Optional[Targets])
-        check_type('features', self.features, Optional[List[str]])
-        check_type('X', self.X, Optional[SampleX])
-        if self.X is not None and self.X.ndim != 2:
-            raise ValueError(
-                f'X must be a 2-dimensional array, got shape={self.X.shape}'
-            )
-        check_type('y', self.y, Optional[SampleY])
         if self.y is not None and self.y.ndim != 2:
             raise ValueError(
                 f'y must be a 2-dimensional array, got shape={self.y.shape}'
@@ -250,13 +222,6 @@ class RegressorDump(object):
                 raise ValueError(
                     f'locations must have shape (n, 2), got shape={self.locations.shape}'
                 )
-        try:
-            check_type('regressor', self.regressor, Optional[Union[RegressorMixin, Pipeline]])
-        except Exception:
-            from sklearn.base import is_regressor
-            if not is_regressor(self.regressor):
-                raise TypeError('regressor is not a valid scikit-learn regressor')
-        check_type('crs', self.crs, Optional[str])
 
     def write(self, filename: str):
         from enmapboxprocessing.utils import Utils
@@ -294,7 +259,6 @@ class RegressorDump(object):
         return cls.fromDict(d)
 
 
-@typechecked
 def checkSampleShape(X: SampleX, Y: SampleY, raise_=False) -> bool:
     if not (X.ndim == Y.ndim == 2) and (X.shape[0] == Y.shape[0]):
         if raise_:

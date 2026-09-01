@@ -4,10 +4,16 @@ from typing import Optional, List
 
 import numpy as np
 import plotly.graph_objects as go
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWebEngineWidgets import QWebEngineView
+from qgis.PyQt.QtWidgets import QStatusBar, QToolButton, QMainWindow, QCheckBox
+from qgis.PyQt.uic import loadUi
+from qgis.core import QgsRectangle, QgsPalettedRasterRenderer, QgsRasterLayer, QgsMapSettings, QgsUnitTypes
+from qgis.gui import QgsMapCanvas
 from scipy.stats._crosstab import crosstab
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent, SpatialPoint
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
@@ -16,19 +22,10 @@ from landcoverchangestatisticsapp.landcoverchangestatisticsdatafilteringdockwidg
     LandCoverChangeStatisticsDataFilteringDockWidget
 from landcoverchangestatisticsapp.landcoverchangestatisticssettingsdockwidget import \
     LandCoverChangeStatisticsSettingsDockWidget
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import QColor
-# from qgis.PyQt.QtWebKitWidgets import QWebView
-from qgis.PyQt.QtWidgets import QStatusBar
-from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QCheckBox
-from qgis.PyQt.uic import loadUi
-from qgis.core import QgsRectangle, QgsPalettedRasterRenderer, QgsRasterLayer, QgsMapSettings, QgsUnitTypes
-from qgis.gui import QgsMapCanvas
 
 
-@typechecked
 class LandCoverChangeStatisticsMainWindow(QMainWindow):
-    # mWebView: QWebView
+    mWebView: QWebEngineView
     mStatusBar: QStatusBar
 
     def __init__(self, *args, **kwds):
@@ -51,12 +48,12 @@ class LandCoverChangeStatisticsMainWindow(QMainWindow):
         # add dock widgets and toolbar buttons
         self.mDataFilteringDock = LandCoverChangeStatisticsDataFilteringDockWidget(parent=self)
         self.mDataFilteringDock.sigStateChanged.connect(self.onLiveUpdate)
-        self.addDockWidget(Qt.RightDockWidgetArea, self.mDataFilteringDock)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.mDataFilteringDock)
         self.mSettingsDock = LandCoverChangeStatisticsSettingsDockWidget(parent=self)
         self.mSettingsDock.sigStateChanged.connect(self.onLiveUpdate)
         self.mSettingsDock.sigLayersChanged.connect(self.onLayersChanged)
 
-        self.addDockWidget(Qt.BottomDockWidgetArea, self.mSettingsDock)
+        self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, self.mSettingsDock)
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None
         self.enmapBox.sigCurrentLocationChanged.connect(self.onLiveUpdate)
@@ -159,7 +156,6 @@ class LandCoverChangeStatisticsMainWindow(QMainWindow):
         self.onApplyClicked()
 
 
-@typechecked
 class LandCoverChangeSankeyPlotBuilder():
     DiscardedCategory = Category(-0.1, 'Discarded', '#ff0000')
 
@@ -303,9 +299,15 @@ class LandCoverChangeSankeyPlotBuilder():
         count = countSampled / nSampled * n
 
         fromUnit: QgsUnitTypes.AreaUnit = QgsUnitTypes.distanceToAreaUnit(self.grid.crs().mapUnits())
-        factorToSquareMeters = QgsUnitTypes.fromUnitToUnitFactor(fromUnit, QgsUnitTypes.AreaSquareMeters)
-        factorToHectares = QgsUnitTypes.fromUnitToUnitFactor(fromUnit, QgsUnitTypes.AreaHectares)
-        factorToSquareKilometers = QgsUnitTypes.fromUnitToUnitFactor(fromUnit, QgsUnitTypes.AreaSquareKilometers)
+        factorToSquareMeters = QgsUnitTypes.fromUnitToUnitFactor(
+            fromUnit, QgsUnitTypes.AreaUnit.AreaSquareMeters
+        )
+        factorToHectares = QgsUnitTypes.fromUnitToUnitFactor(
+            fromUnit, QgsUnitTypes.AreaUnit.AreaHectares
+        )
+        factorToSquareKilometers = QgsUnitTypes.fromUnitToUnitFactor(
+            fromUnit, QgsUnitTypes.AreaUnit.AreaSquareKilometers
+        )
 
         pixelSize = self.grid.rasterUnitsPerPixelX() * self.grid.rasterUnitsPerPixelY()
 

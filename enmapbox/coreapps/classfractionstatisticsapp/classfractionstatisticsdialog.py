@@ -8,7 +8,6 @@ from pyqtgraph import PlotWidget
 from classfractionstatisticsapp.classfractionrenderer import ClassFractionRenderer
 from enmapbox.qgispluginsupport.qps.layerproperties import rendererFromXml
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtCore import Qt
@@ -21,7 +20,6 @@ from qgis.core import QgsRasterLayer, QgsRasterDataProvider, QgsRasterHistogram,
 from qgis.gui import QgsMapCanvas, QgsMapLayerComboBox, QgsColorButton
 
 
-@typechecked
 class ClassFractionStatisticsDialog(QMainWindow):
     mLayer: QgsMapLayerComboBox
     mTable: QTableWidget
@@ -48,7 +46,7 @@ class ClassFractionStatisticsDialog(QMainWindow):
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None
         self.mLayer.setProject(self.enmapBox.project())
-        self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mLayer.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
 
         self.mLayer.layerChanged.connect(self.onLayerChanged)
 
@@ -104,9 +102,9 @@ class ClassFractionStatisticsDialog(QMainWindow):
         self.mTable.setRowCount(layer.bandCount())
         for row, color in enumerate(colors):
             if color.alpha() == 255:
-                checkState = Qt.Checked
+                checkState = Qt.CheckState.Checked
             else:
-                checkState = Qt.Unchecked
+                checkState = Qt.CheckState.Unchecked
                 color.setAlpha(255)
 
             bandNo = row + 1
@@ -246,7 +244,6 @@ class ClassFractionStatisticsDialog(QMainWindow):
                 plotWidget.autoRange()
 
 
-@typechecked
 class HistogramPlotWidget(PlotWidget):
     def __init__(self):
         PlotWidget.__init__(self, parent=None, background='#ffffff')

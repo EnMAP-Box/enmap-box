@@ -37,7 +37,7 @@ class TestCaseIssue1386(EnMAPBoxTestCase):
 
         tBtn.setMenu(menu)
 
-        tBtn.setPopupMode(QToolButton.MenuButtonPopup)
+        tBtn.setPopupMode(QToolButton.ToolButtonPopupMode.MenuButtonPopup)
 
         # tb.clicked.connect(lambda: self.activateWindow())
         self.showGui(tBtn)

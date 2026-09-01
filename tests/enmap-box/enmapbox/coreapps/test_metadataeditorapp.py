@@ -22,14 +22,14 @@ import datetime
 import unittest
 
 from osgeo import gdal
+from qgis.core import QgsRasterLayer, QgsVectorLayer, QgsProject
 
 from enmapbox import initPythonPaths
 from enmapbox.exampledata import enmap
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase
-from metadataeditorapp.metadataeditor import MetadataEditorDialog
-from qgis.core import QgsRasterLayer, QgsVectorLayer, QgsProject
 from enmapbox.testing import start_app
+from metadataeditorapp.metadataeditor import MetadataEditorDialog
 
 start_app()
 
@@ -101,6 +101,7 @@ class MetadataEditorTests(EnMAPBoxTestCase):
         d.setEnMAPBox(emb)
 
         self.showGui(d)
+        emb.close()
 
 
 if __name__ == "__main__":

@@ -2,11 +2,9 @@ from typing import Tuple, Iterable, Dict, Optional
 
 from enmapbox.qgispluginsupport.qps.speclib.core import is_profile_field
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
-from enmapbox.typeguard import typechecked
 from qgis.core import QgsGeometry, QgsVectorLayer
 
 
-@typechecked
 class LibraryReader(object):
 
     def __init__(self, library: QgsVectorLayer):

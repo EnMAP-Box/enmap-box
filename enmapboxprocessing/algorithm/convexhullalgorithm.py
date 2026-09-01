@@ -3,7 +3,6 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
@@ -11,7 +10,6 @@ from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
 
 
-@typechecked
 class ConvexHullAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_X_UNITS, _X_UNITS = 'xUnits', 'X units'
@@ -91,7 +89,7 @@ class ConvexHullAlgorithm(EnMAPProcessingAlgorithm):
             if filenameContinuumRemoved is not None:
                 writerContinuumRemoved = Driver(
                     filenameContinuumRemoved, feedback=feedback
-                ).createLike(reader, Qgis.Float32)
+                ).createLike(reader, Qgis.DataType.Float32)
 
             lineMemoryUsage = reader.lineMemoryUsage(dataTypeSize=4) * 3
             blockSizeY = min(raster.height(), ceil(Utils.maximumMemoryUsage() / lineMemoryUsage))

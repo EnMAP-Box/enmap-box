@@ -10,10 +10,8 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis, QgsProcessingException)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class PredictClassPropabilityAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer with features'
     P_CLASSIFIER, _CLASSIFIER = 'classifier', 'Classifier'

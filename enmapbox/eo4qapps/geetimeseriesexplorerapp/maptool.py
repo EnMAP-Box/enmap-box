@@ -6,10 +6,8 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QCursor, QColor
 from qgis.PyQt.QtWidgets import QAction
 from qgis.gui import QgsMapTool, QgsMapMouseEvent, QgsMapCanvas, QgsVertexMarker
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class MapTool(QgsMapTool):
     sigClicked = pyqtSignal(QgsMapMouseEvent)
 
@@ -23,13 +21,13 @@ class MapTool(QgsMapTool):
         self.crosshairItem = QgsVertexMarker(mapCanvas=mapCanvas)
         self.crosshairItem.setColor(QColor(255, 0, 0))
         self.crosshairItem.setIconSize(9999999)
-        self.crosshairItem.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.crosshairItem.setIconType(QgsVertexMarker.IconType.ICON_CROSS)
         self.crosshairItem.setPenWidth(0)
         self.crosshairItem.setVisible(self.toolBarIcon.isChecked())
 
     def activate(self):
         QgsMapTool.activate(self)
-        self.canvas().setCursor(QCursor(Qt.CrossCursor))
+        self.canvas().setCursor(QCursor(Qt.CursorShape.CrossCursor))
         self.toolBarIcon.setChecked(True)
         self.crosshairItem.setVisible(True)
 

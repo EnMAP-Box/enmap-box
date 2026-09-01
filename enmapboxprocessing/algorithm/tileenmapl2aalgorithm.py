@@ -4,7 +4,6 @@ from os import makedirs
 from os.path import join, basename, exists
 from typing import Dict, Any, List, Tuple
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.importenmapl1balgorithm import ImportEnmapL1BAlgorithm
 from enmapboxprocessing.algorithm.importenmapl2aalgorithm import ImportEnmapL2AAlgorithm
 from enmapboxprocessing.algorithm.tilerasteralgorithm import TileRasterAlgorithm
@@ -13,7 +12,6 @@ from qgis.core import QgsProcessing, QgsProcessingParameterField, QgsProcessingC
     QgsProcessingFeedback
 
 
-@typechecked
 class TileEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
     P_FILE, _FILE = 'file', 'Metadata file'
     P_TILING_SCHEME, _TILING_SCHEME = 'tilingScheme', 'Tiling scheme'
@@ -70,7 +68,7 @@ class TileEnmapL2AAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFolderDestination(self.P_OUTPUT_FOLDER, self._OUTPUT_FOLDER)
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
 
         xmlFilename = self.parameterAsFile(parameters, self.P_FILE, context)

@@ -9,7 +9,6 @@ from typing import Dict, Any, List, Tuple, Iterable
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.rasterizecategorizedvectoralgorithm import RasterizeCategorizedVectorAlgorithm
 from enmapboxprocessing.algorithm.translatecategorizedrasteralgorithm import TranslateCategorizedRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
@@ -19,7 +18,6 @@ from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsRasterLayer, QgsUnitTypes)
 
 
-@typechecked
 class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
     P_CLASSIFICATION, _CLASSIFICATION = 'classification', 'Predicted classification layer'
     P_REFERENCE, _REFERENCE = 'reference', 'Observed categorized layer'
@@ -358,7 +356,9 @@ class ClassificationPerformanceStratifiedAlgorithm(EnMAPProcessingAlgorithm):
             )
 
 
-@typechecked()
+()
+
+
 @dataclass
 class StratifiedAccuracyAssessmentResult(object):
     N: float  # total area sum(N_h)
@@ -379,7 +379,6 @@ class StratifiedAccuracyAssessmentResult(object):
     f1_se: List[float]
 
 
-@typechecked
 def stratifiedAccuracyAssessment(
         stratum: Iterable, reference: Iterable, map: Iterable, h: Iterable, N_h: Iterable, classValues, classNames
 ):
@@ -396,7 +395,7 @@ def stratifiedAccuracyAssessment(
 # Function naming and signatures are inspired by an R implementation provided by Dirk Pflugmacher:
 #    https://scm.cms.hu-berlin.de/pflugmad/mapac/-/tree/master/R
 
-@typechecked
+
 def aa_stratified(
         stratum: Iterable, reference: Iterable, map: Iterable, h: Iterable, N_h: Iterable, classes=None
 ):
@@ -475,7 +474,6 @@ def aa_stratified(
     return stats
 
 
-@typechecked
 def aa_estimator_stratified(
         stratum: np.ndarray, y_u: np.ndarray, h: np.ndarray, N_h: np.ndarray
 ) -> Tuple[float, float]:
@@ -499,7 +497,6 @@ def aa_estimator_stratified(
     return R, R_SE
 
 
-@typechecked
 def aa_estimator_stratified_ratio(
         stratum: np.ndarray, x_u: np.ndarray, y_u: np.ndarray, h: np.ndarray, N_h: np.ndarray
 ) -> Tuple[float, float]:

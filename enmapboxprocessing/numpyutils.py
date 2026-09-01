@@ -2,10 +2,7 @@ from typing import List, Tuple
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 
-
-@typechecked
 class NumpyUtils(object):
 
     @staticmethod

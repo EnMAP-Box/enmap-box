@@ -1,4 +1,3 @@
-import skops
 import traceback
 import warnings
 from math import nan, isnan
@@ -9,10 +8,10 @@ from typing import Optional, List, Tuple, Dict
 
 import numpy as np
 import pyqtgraph as pg
+import skops
 
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyle, MarkerSymbol
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
-from enmapbox.typeguard import typechecked
 from enmapbox.utils import importEarthEngine
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from geetimeseriesexplorerapp.geetimeseriesexplorerdockwidget import GeeTimeseriesExplorerDockWidget
@@ -21,13 +20,18 @@ from geetimeseriesexplorerapp.tasks.downloadimagechiptask import DownloadImageCh
 from geetimeseriesexplorerapp.tasks.downloadprofiletask import DownloadProfileTask
 from qgis.PyQt import QtGui
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import Qt, QDateTime, QDate, QModelIndex, QRectF, QStandardPaths, pyqtSignal, QCoreApplication
+from qgis.PyQt.QtCore import (
+    Qt, QDateTime, QDate, QModelIndex, QRectF, QStandardPaths, pyqtSignal, QCoreApplication,
+    QTime
+)
 from qgis.PyQt.QtGui import QColor, QPen, QBrush, QIcon, QPixmap
 from qgis.PyQt.QtWidgets import QDockWidget
-from qgis.PyQt.QtWidgets import (QToolButton, QListWidget, QApplication, QSpinBox,
-                                 QColorDialog, QComboBox, QCheckBox, QLineEdit,
-                                 QFileDialog, QListWidgetItem, QSlider, QTableWidget, QProgressBar,
-                                 QTableWidgetItem, QMessageBox)
+from qgis.PyQt.QtWidgets import (
+    QToolButton, QListWidget, QApplication, QSpinBox,
+    QColorDialog, QComboBox, QCheckBox, QLineEdit,
+    QFileDialog, QListWidgetItem, QSlider, QTableWidget, QProgressBar,
+    QTableWidgetItem, QMessageBox
+)
 from qgis.core import (
     QgsProject, QgsCoordinateReferenceSystem, QgsPointXY, QgsCoordinateTransform, QgsGeometry, QgsFeature,
     QgsVectorLayer, QgsMapLayerProxyModel, QgsFields, QgsApplication
@@ -38,7 +42,6 @@ from qgis.gui import (
 )
 
 
-@typechecked
 class GeeTemporalProfileDockWidget(QDockWidget):
     mMessageBar: QgsMessageBar
     mIdentify: QToolButton
@@ -149,11 +152,13 @@ class GeeTemporalProfileDockWidget(QDockWidget):
         self.data = None
 
         # - add info line
-        self.infoLabelLine = pg.InfiniteLine(angle=90, movable=False, pen=pg.mkPen(color='#FF09', style=Qt.DashLine))
+        self.infoLabelLine = pg.InfiniteLine(
+            angle=90, movable=False, pen=pg.mkPen(color='#FF09', style=Qt.PenStyle.DashLine)
+        )
         self.mPlotWidget.addItem(self.infoLabelLine, ignoreBounds=True)
 
         # - add composite selection box
-        pen = pg.mkPen(color='#FF0', style=Qt.SolidLine)
+        pen = pg.mkPen(color='#FF0', style=Qt.PenStyle.SolidLine)
         brush = pg.mkBrush(color='#00F5')
         self.compositeBox = pg.LinearRegionItem(values=[nan, nan], pen=pen, brush=brush)
         self.mPlotWidget.addItem(self.compositeBox, ignoreBounds=True)
@@ -174,7 +179,7 @@ class GeeTemporalProfileDockWidget(QDockWidget):
 
         # - add image selection line
         self.imageLine = pg.InfiniteLine(
-            movable=True, angle=90, label='', pen=pg.mkPen(color='#FF0', style=Qt.SolidLine),
+            movable=True, angle=90, label='', pen=pg.mkPen(color='#FF0', style=Qt.PenStyle.SolidLine),
             labelOpts={'position': 0.95, 'color': '#FF0', 'fill': '#FF00', 'movable': False}
         )
         self.mPlotWidget.addItem(self.imageLine, ignoreBounds=True)
@@ -183,7 +188,7 @@ class GeeTemporalProfileDockWidget(QDockWidget):
         self.mLayer.setLayer(None)
         self.mLayer.setFilters(QgsMapLayerProxyModel.Filter.PointLayer)
         self.mDownloadFolder.setFilePath(
-            join(QStandardPaths.writableLocation(QStandardPaths.DownloadLocation), 'GEETSE')
+            join(QStandardPaths.writableLocation(QStandardPaths.StandardLocation.DownloadLocation), 'GEETSE')
         )
 
         # data
@@ -371,7 +376,7 @@ class GeeTemporalProfileDockWidget(QDockWidget):
         bandNames = list()
         for i in range(self.mLegend.count()):
             item = self.mLegend.item(i)
-            if item.checkState() == Qt.Checked:
+            if item.checkState() == Qt.CheckState.Checked:
                 bandNames.append(item.text())
         if len(bandNames) == 0:
             # self.pushInfoMissingBand()
@@ -382,7 +387,7 @@ class GeeTemporalProfileDockWidget(QDockWidget):
         bandNumbers = list()
         for i in range(self.mLegend.count()):
             item = self.mLegend.item(i)
-            if item.checkState() == Qt.Checked:
+            if item.checkState() == Qt.CheckState.Checked:
                 bandNumbers.append(i + 1)
         if len(bandNumbers) == 0:
             return None
@@ -397,7 +402,7 @@ class GeeTemporalProfileDockWidget(QDockWidget):
         if skipNan:
             for i in range(self.mLegend.count()):
                 item: QListWidgetItem = self.mLegend.item(i)
-                if item.checkState() == Qt.Checked:
+                if item.checkState() == Qt.CheckState.Checked:
                     bandName = item.text()
                     ys = self.dataProfile(bandName)
                     if ys is None:
@@ -465,7 +470,7 @@ class GeeTemporalProfileDockWidget(QDockWidget):
 
         for i in range(self.mLegend.count()):
             item: QListWidgetItem = self.mLegend.item(i)
-            if item.checkState() == Qt.Checked:
+            if item.checkState() == Qt.CheckState.Checked:
                 bandName = item.text()
                 if bandName not in self._dataProfile:
                     continue
@@ -597,7 +602,7 @@ class GeeTemporalProfileDockWidget(QDockWidget):
             color = QColor(colors.get(name, defaultColor))
             item = self.legendItemTemplate.clone()
             item.setText(name)
-            item.setCheckState(Qt.Unchecked)
+            item.setCheckState(Qt.CheckState.Unchecked)
             item.color = color
             pixmap = QPixmap(16, 16)
             pixmap.fill(color)
@@ -971,11 +976,11 @@ class GeeTemporalProfileDockWidget(QDockWidget):
         return geometry.asPoint()
 
     def utilsMsecToDateTime(self, msec: int) -> QDateTime:
-        return QDateTime(QDate(1970, 1, 1)).addMSecs(int(msec))
+        return QDateTime(QDate(1970, 1, 1), QTime(0, 0, 0)).addMSecs(int(msec))
 
     def utilsDateTimeToDecimalYear(self, dateTime: QDateTime) -> float:
         date = dateTime.date()
-        secOfYear = QDateTime(QDate(date.year(), 1, 1)).secsTo(dateTime)
+        secOfYear = QDateTime(QDate(date.year(), 1, 1), QTime(0, 0, 0)).secsTo(dateTime)
         secsInYear = date.daysInYear() * 24 * 60 * 60
         return date.year() + secOfYear / secsInYear
 
@@ -983,7 +988,7 @@ class GeeTemporalProfileDockWidget(QDockWidget):
         year = int(decimalYear)
         secsInYear = QDate(year, 1, 1).daysInYear() * 24 * 60 * 60
         secOfYear = int((decimalYear - year) * secsInYear)
-        dateTime = QDateTime(QDate(year, 1, 1)).addSecs(secOfYear)
+        dateTime = QDateTime(QDate(year, 1, 1), QTime(0, 0, 0)).addSecs(secOfYear)
         return dateTime
 
     def onPanClicked(self):
@@ -1266,7 +1271,7 @@ class GeeTemporalProfileDockWidget(QDockWidget):
         for i in range(self.mLegend.count()):
             item: QListWidgetItem = self.mLegend.item(i)
             bandName = item.text()
-            if item.checkState() == Qt.Checked:
+            if item.checkState() == Qt.CheckState.Checked:
                 color = item.color
                 y = self.dataProfile(bandName)
                 if y is None:
@@ -1361,7 +1366,7 @@ class GeeTemporalProfileDockWidget(QDockWidget):
 class GeeWaitCursor(object):
 
     def __enter__(self):
-        QApplication.setOverrideCursor(QtGui.QCursor(Qt.WaitCursor))
+        QApplication.setOverrideCursor(QtGui.QCursor(Qt.CursorShape.WaitCursor))
 
     def __exit__(self, exc_type, exc_value, tb):
         QApplication.restoreOverrideCursor()

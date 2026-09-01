@@ -1,13 +1,12 @@
 import unittest
 
-from qgis.PyQt.QtCore import QMetaType
-from qgis.PyQt.QtWidgets import QApplication
-from qgis.core import QgsFields, QgsField, Qgis, QgsProject
-
 from enmapbox import initAll
 from enmapbox.exampledata import landcover_polygon
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import TestCase, start_app, TestObjects
+from qgis.PyQt.QtCore import QMetaType
+from qgis.PyQt.QtWidgets import QApplication
+from qgis.core import QgsFields, QgsField, Qgis, QgsProject
 
 start_app()
 initAll()
@@ -25,7 +24,7 @@ class Issue887Tests(TestCase):
     def test_kill_qgis_layer(self):
         # addresses https://github.com/EnMAP-Box/enmap-box/issues/1081
         fields = QgsFields()
-        fields.append(QgsField('name', QMetaType.QString))
+        fields.append(QgsField('name', QMetaType.Type.QString))
         lyr = TestObjects.createEmptyMemoryLayer(fields, wkbType=Qgis.WkbType.Point)
 
         self.assertTrue(lyr.isValid())

@@ -3,7 +3,6 @@ from typing import Dict, Any, List, Tuple
 import numpy as np
 
 import qgis.processing
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.creategridalgorithm import CreateGridAlgorithm
 from enmapboxprocessing.algorithm.rasterizecategorizedvectoralgorithm import RasterizeCategorizedVectorAlgorithm
 from enmapboxprocessing.algorithm.translatecategorizedrasteralgorithm import TranslateCategorizedRasterAlgorithm
@@ -15,7 +14,6 @@ from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer
 
 
-@typechecked
 class ClassFractionFromCategorizedLayerAlgorithm(EnMAPProcessingAlgorithm):
     P_CATEGORIZED_LAYER, _CATEGORIZED_LAYER = 'categorizedLayer', 'Categorized layer'
     P_GRID, _GRID = 'grid', 'Grid'

@@ -1,20 +1,18 @@
 from typing import Optional
 
-from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.applications import EnMAPBoxApplication
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from qgis.gui import QgisInterface
 from sensorproductimportapp.sensorproductimportdockwidget import SensorProductImportDockWidget
-from enmapbox.typeguard import typechecked
 
 
 def enmapboxApplicationFactory(enmapBox: EnMAPBox):
     return [SensorProductImportApp(enmapBox, None, None)]
 
 
-@typechecked
 class SensorProductImportApp(EnMAPBoxApplication):
 
     def __init__(
@@ -48,7 +46,7 @@ class SensorProductImportApp(EnMAPBoxApplication):
 
         # add main dock and toolbar button
         self.dock = SensorProductImportDockWidget(parent=self.parent())
-        interface.addDockWidget(Qt.LeftDockWidgetArea, self.dock)
+        interface.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.dock)
         self.dock.setWindowIcon(self.icon())
         self.dock.hide()
 

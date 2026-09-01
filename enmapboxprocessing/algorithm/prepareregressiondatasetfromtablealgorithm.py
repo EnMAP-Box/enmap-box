@@ -6,10 +6,8 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import checkSampleShape, Target, RegressorDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsFeature, QgsProcessingParameterField)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class PrepareRegressionDatasetFromTableAlgorithm(EnMAPProcessingAlgorithm):
     P_TABLE, _TABLE = 'table', 'Table'
     P_FEATURE_FIELDS, _FEATURE_FIELDS = 'featureFields', 'Fields with features'
@@ -40,10 +38,13 @@ class PrepareRegressionDatasetFromTableAlgorithm(EnMAPProcessingAlgorithm):
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
         self.addParameterVectorLayer(self.P_TABLE, self._TABLE)
         self.addParameterField(
-            self.P_FEATURE_FIELDS, self._FEATURE_FIELDS, None, self.P_TABLE, QgsProcessingParameterField.Any, True
+            self.P_FEATURE_FIELDS, self._FEATURE_FIELDS, None,
+            self.P_TABLE, QgsProcessingParameterField.DataType.Any,
+            True
         )
         self.addParameterField(
-            self.P_TARGET_FIELDS, self._TARGET_FIELDS, None, self.P_TABLE, QgsProcessingParameterField.Any, True
+            self.P_TARGET_FIELDS, self._TARGET_FIELDS, None,
+            self.P_TABLE, QgsProcessingParameterField.DataType.Any, True
         )
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 

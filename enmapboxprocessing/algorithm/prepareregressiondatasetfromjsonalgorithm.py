@@ -3,10 +3,8 @@ from typing import Dict, Any, List, Tuple
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import RegressorDump
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class PrepareRegressionDatasetFromJsonAlgorithm(EnMAPProcessingAlgorithm):
     P_JSON_FILE, _JSON_FILE = 'jsonFile', 'JSON file'
     P_OUTPUT_DATASET, _OUTPUT_DATASET = 'outputRegressionDataset', 'Output dataset'

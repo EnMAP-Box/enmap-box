@@ -14,7 +14,6 @@ from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import PlotStyleButt
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import prepareProfileValueDict
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.testing import TestObjects
-from enmapbox.typeguard import typechecked, check_type
 from enmapbox.utils import findEnmapBoxGuiWidgets, findQgisGuiWidgets
 from enmapboxprocessing.algorithm.subsetrasterbandsalgorithm import SubsetRasterBandsAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
@@ -29,7 +28,6 @@ from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsVectorLayer, Qgs
 from qgis.gui import QgsMapLayerComboBox, QgsFileWidget, QgsRasterBandComboBox, QgisInterface
 
 
-@typechecked
 class ProfileAnalyticsDockWidget(QDockWidget):
     mGraphicsLayoutWidget: pg.GraphicsLayoutWidget
 
@@ -198,7 +196,7 @@ class ProfileAnalyticsDockWidget(QDockWidget):
         row = self.mRasterTable.rowCount() - 1
         w = QgsMapLayerComboBox(parent=self.mRasterTable)
         w.setProject(self.project())
-        w.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        w.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         w.setAllowEmptyLayer(True)
         w.setLayer(None)
         w.layerChanged.connect(self.onLiveUpdate)
@@ -719,7 +717,6 @@ class ProfileAnalyticsDockWidget(QDockWidget):
         return geeTimeseriesExplorerDockWidget, geeTemporalProfileDockWidget
 
 
-@typechecked
 @dataclass
 class Profile(object):
     xValues: List[float]
@@ -734,4 +731,3 @@ class Profile(object):
                 f"xValues and yValues must have the same length "
                 f"({len(self.xValues)} != {len(self.yValues)})"
             )
-        check_type('style', self.style, PlotStyle)

@@ -28,6 +28,7 @@ import logging
 import os
 import platform
 import re
+import shutil
 import subprocess  # nosec B404
 import sys
 import time
@@ -38,8 +39,6 @@ from io import StringIO
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Match, Optional, Tuple
 
-from enmapbox import REQUIREMENTS_CSV
-from enmapbox.enmapboxsettings import EnMAPBoxSettings
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import pyqtSignal, QAbstractTableModel, QModelIndex, QProcess, QSortFilterProxyModel, Qt, QUrl
 from qgis.PyQt.QtGui import QColor, QContextMenuEvent, QDesktopServices
@@ -47,6 +46,9 @@ from qgis.PyQt.QtWidgets import (QApplication, QDialogButtonBox, QMenu, QMessage
                                  QStyledItemDelegate, QTableView, QWidget)
 from qgis.core import Qgis, QgsAnimatedIcon, QgsApplication, QgsTask
 from qgis.gui import QgsFileDownloaderDialog
+
+from enmapbox import REQUIREMENTS_CSV
+from enmapbox.enmapboxsettings import EnMAPBoxSettings
 
 logger = logging.getLogger(__name__)
 
@@ -302,6 +304,13 @@ def localPipExecutable() -> Optional[Path]:
 
     if _LOCAL_PIPEXE is None:
 
+        pipexe = shutil.which('pip')
+        if pipexe:
+            return Path(pipexe)
+        pipexe = shutil.which('pip3')
+        if pipexe:
+            return Path(pipexe)
+
         pipexe = Path(get_prog())
         if not pipexe.is_file():
             pipexe = None
@@ -354,9 +363,8 @@ def decode_bytes(bytes_str, encodings=None):
 
 
 def call_pip_command(pipArgs: list) -> Tuple[bool, Optional[str], Optional[str]]:
-    success = 0
-    msgOut = msgErr = None
     pipexe = localPipExecutable()
+
     if pipexe:
         cmd = [str(pipexe)] + pipArgs
 
@@ -375,46 +383,39 @@ def call_pip_command(pipArgs: list) -> Tuple[bool, Optional[str], Optional[str]]
         success = result.returncode == 0
         msgOut = result.stdout
         msgErr = result.stderr
+
+        # Normalize line endings
+        if msgOut:
+            msgOut = msgOut.replace('\r\n', '\n')
+        if msgErr:
+            msgErr = msgErr.replace('\r\n', '\n')
+
         if success:
             return success, msgOut, msgErr
 
-    if False:
-        pipexe = localPipExecutable()
-        process = QProcess()
-        process.readyRead()
-        process.start(f'{pipexe}' + ' '.join(pipArgs))
-        process.waitForFinished()
+    # Fallback: try to use pip._internal directly
+    _std_out = sys.stdout
+    _std_err = sys.stderr
+    sys.stdout = StringIO()
+    sys.stderr = StringIO()
+    msgOut = None
 
-        msgOut = decode_bytes(process.readAllStandardOutput().data())
-        msgErr = decode_bytes(process.readAllStandardError().data())
-        success = process.exitCode() == 0
-        if success or msgErr != '':
-            return success, msgOut.replace('\r\n', '\n'), msgErr.replace('\r\n', '\n')
+    try:
+        from pip._internal.cli.main_parser import parse_command
+        from pip._internal.commands import create_command
 
-    if True:
-        _std_out = sys.stdout
-        _std_err = sys.stderr
-        sys.stdout = StringIO()
-        sys.stderr = StringIO()
-        msgOut = None
-        msgErr = None
+        cmd_name, cmd_args = parse_command(pipArgs)
+        cmd = create_command(cmd_name, isolated=("--isolated" in cmd_args))
+        result = cmd.main(cmd_args)
+        msgOut = sys.stdout.getvalue()
+        msgErr = sys.stderr.getvalue()
+        success = result == 0
+    except Exception as ex:
         success = False
-        try:
-            from pip._internal.cli.main_parser import parse_command
-            from pip._internal.commands import create_command
-
-            cmd_name, cmd_args = parse_command(pipArgs)
-            cmd = create_command(cmd_name, isolated=("--isolated" in cmd_args))
-            result = cmd.main(cmd_args)
-            msgOut = sys.stdout.getvalue()
-            msgErr = sys.stderr.getvalue()
-            success = result == 0
-        except Exception as ex:
-            success = False
-            msgErr = str(ex)
-        finally:
-            sys.stdout = _std_out
-            sys.stderr = _std_err
+        msgErr = str(ex)
+    finally:
+        sys.stdout = _std_out
+        sys.stderr = _std_err
 
     if msgOut:
         msgOut.replace('\r\n', '\n')
@@ -439,7 +440,7 @@ class PIPPackageInfoTask(QgsTask):
                  search_updates: bool = True,
                  search_info: bool = True,
                  callback=None):
-        super().__init__(description, QgsTask.CanCancel)
+        super().__init__(description, QgsTask.Flag.CanCancel)
 
         if packages_of_interest is None:
             packages_of_interest = []
@@ -706,7 +707,7 @@ def installTestData(overwrite_existing: bool = False, ask: bool = True):
         btn = QMessageBox.question(None,
                                    'Testdata is missing or outdated',
                                    'Download testdata from \n{}\n?'.format(URL_TESTDATA))
-        if btn != QMessageBox.Yes:
+        if btn != QMessageBox.StandardButton.Yes:
             print('Canceled')
             return
 
@@ -813,27 +814,29 @@ class PIPPackageFilterModel(QSortFilterProxyModel):
             raise ValueError(
                 f"Invalid mode {mode!r}. Expected one of {sorted(allowed_modes)}"
             )
+        self.mFilter1 = mode
+        self.invalidate()
 
     def primaryFilter(self):
         return self.mFilter1
 
     def filterAcceptsRow(self, sourceRow: int, sourceParent: QModelIndex):
         model: PIPPackageInstallerTableModel = self.sourceModel()
-        pkg = model.index(sourceRow, 0, sourceParent).data(Qt.UserRole)
+        pkg = model.index(sourceRow, 0, sourceParent).data(Qt.ItemDataRole.UserRole)
 
-        if isinstance(pkg, PIPPackage):
+        result = super().filterAcceptsRow(sourceRow, sourceParent)
+
+        # filter on-top of wildcard matching
+        if result is True and isinstance(pkg, PIPPackage):
             if self.mFilter1 == 'required':
                 if pkg.required_by is None:
                     return False
-                else:
-                    pass
             elif self.mFilter1 == 'missing':
-                if pkg.required_by is None:
-                    return False
-                if pkg.isInstalled():
+                if pkg.required_by:
+                    return not pkg.isInstalled()
+                else:
                     return False
 
-        result = super().filterAcceptsRow(sourceRow, sourceParent)
         return result
 
 
@@ -888,14 +891,14 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
 
     def flags(self, index: QModelIndex):
         if not index.isValid():
-            return Qt.NoItemFlags
+            return Qt.ItemFlag.NoItemFlags
 
-        flags = Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        flags = Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable
         if index.column() == self.CN_PIP:
             pkg = self.mPackages[index.row()]
             # if pkg.isCoreRequirement():  # and pkg.isMissing():
             if pkg.required_by == 'core':
-                flags = flags | Qt.ItemIsUserCheckable
+                flags = flags | Qt.ItemFlag.ItemIsUserCheckable
         return flags
 
     def setData(self, index: QModelIndex, value, role=None):
@@ -908,15 +911,15 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
         # cn = self.mColumnNames[col]
 
         changed = False
-        if role == Qt.CheckStateRole:
+        if role == Qt.ItemDataRole.CheckStateRole:
             if col == self.CN_PIP:
-                pkg.setWarnIfNotInstalled(value == Qt.Checked)
+                pkg.setWarnIfNotInstalled(value == Qt.CheckState.Checked)
                 changed = True
 
         if changed:
             idx0 = self.index(index.row(), 0, index.parent())
             idx1 = self.index(index.row(), self.columnCount() - 1, index.parent())
-            self.dataChanged.emit(idx0, idx1, [role, Qt.ForegroundRole])
+            self.dataChanged.emit(idx0, idx1, [role, Qt.ItemDataRole.ForegroundRole])
         return changed
 
     def updatePackages(self, updates: List[Dict[str, Any]]) -> Tuple[List[PIPPackage], List[PIPPackage]]:
@@ -968,13 +971,13 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
         return self.index(self.mPackages.index(pkg), 0)
 
     def headerData(self, col, orientation, role=None):
-        if orientation == Qt.Horizontal:
-            if role == Qt.DisplayRole:
+        if orientation == Qt.Orientation.Horizontal:
+            if role == Qt.ItemDataRole.DisplayRole:
                 return self.mColumnNames[col]
-            if role == Qt.ToolTipRole:
+            if role == Qt.ItemDataRole.ToolTipRole:
                 return self.mColumnToolTips[col]
 
-        elif orientation == Qt.Vertical and role == Qt.DisplayRole:
+        elif orientation == Qt.Orientation.Vertical and role == Qt.ItemDataRole.DisplayRole:
             return col
         return None
 
@@ -1010,7 +1013,7 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
         col = index.column()
         # cn = self.mColumnNames[col]
 
-        if role == Qt.DisplayRole:
+        if role == Qt.ItemDataRole.DisplayRole:
             if col == self.CN_PIP:
                 return pkg.pipPkgName
 
@@ -1048,25 +1051,25 @@ class PIPPackageInstallerTableModel(QAbstractTableModel):
             #    else:
             #        return cmd
 
-        if role == Qt.BackgroundRole:
+        if role == Qt.ItemDataRole.BackgroundRole:
             if pkg.isCoreRequirement() and not pkg.skipStartupWarning() and pkg.isMissing():
                 # #FFC800 = color used for warnings in QgsMessageBar
                 return QColor('#FFC800')
 
-        if role == Qt.ToolTipRole:
+        if role == Qt.ItemDataRole.ToolTipRole:
             if col in [self.CN_PIP, self.CN_VERSION, self.CN_LATEST_VERSION]:
                 return self.htmlToolTip(pkg)
             elif col == self.CN_HOMEPAGE:
                 if len(pkg.homepage) > 0:
                     return f'<a href="{pkg.homepage}">{pkg.homepage}</a>'
             else:
-                return self.data(index, Qt.DisplayRole)
+                return self.data(index, Qt.ItemDataRole.DisplayRole)
 
-        if role == Qt.CheckStateRole:
-            if col == self.CN_PIP and bool(self.flags(index) & Qt.ItemIsUserCheckable):
-                return Qt.Unchecked if pkg.skipStartupWarning() else Qt.Checked
+        if role == Qt.ItemDataRole.CheckStateRole:
+            if col == self.CN_PIP and bool(self.flags(index) & Qt.ItemFlag.ItemIsUserCheckable):
+                return Qt.CheckState.Unchecked if pkg.skipStartupWarning() else Qt.CheckState.Checked
 
-        if role == Qt.UserRole:
+        if role == Qt.ItemDataRole.UserRole:
             return pkg
 
     def addPackages(self, packages: List[PIPPackage]):
@@ -1107,8 +1110,8 @@ class PIPPackageInstallerTableView(QTableView):
         if not index.isValid():
             return
 
-        pkg = index.data(Qt.UserRole)
-        txt = index.data(Qt.DisplayRole)
+        pkg = index.data(Qt.ItemDataRole.UserRole)
+        txt = index.data(Qt.ItemDataRole.DisplayRole)
         if not isinstance(pkg, PIPPackage):
             return
 
@@ -1133,7 +1136,7 @@ class PIPPackageInstaller(QWidget):
     tableView: PIPPackageInstallerTableView
 
     def __init__(self, *args, **kwds):
-        super().__init__(*args, flags=Qt.Window, **kwds)
+        super().__init__(*args, flags=Qt.WindowType.Window, **kwds)
         from enmapbox.gui.utils import loadUi
         from enmapbox import DIR_UIFILES
         path = Path(DIR_UIFILES) / 'pippackageinstaller.ui'
@@ -1162,9 +1165,9 @@ class PIPPackageInstaller(QWidget):
         self.tableView.setSortingEnabled(True)
         # self.tableView.sigInstallPackageRequest.connect(self.installPackages)
         self.tableView.sigPackageReloadRequest.connect(self.reloadPythonPackages)
-        self.tableView.sortByColumn(1, Qt.DescendingOrder)
+        self.tableView.sortByColumn(1, Qt.SortOrder.DescendingOrder)
         # self.buttonBox.button(QDialogButtonBox.YesToAll).clicked.connect(self.installAll)
-        self.buttonBox.button(QDialogButtonBox.Close).clicked.connect(self.close)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Close).clicked.connect(self.close)
 
         self.actionClearConsole.triggered.connect(self.tbLog.clear)
         self.actionCopyConsole.triggered.connect(
@@ -1261,15 +1264,15 @@ class PIPPackageInstaller(QWidget):
         """
         if not self.mWarned:
 
-            box = QMessageBox(QMessageBox.Information,
+            box = QMessageBox(QMessageBox.Icon.Information,
                               'Package Installation',
                               INFO_MESSAGE_BEFORE_PACKAGE_INSTALLATION,
-                              QMessageBox.Abort | QMessageBox.Ignore)
-            box.setTextFormat(Qt.RichText)
-            box.setDefaultButton(QMessageBox.Abort)
+                              QMessageBox.StandardButton.Abort | QMessageBox.StandardButton.Ignore)
+            box.setTextFormat(Qt.TextFormat.RichText)
+            box.setDefaultButton(QMessageBox.StandardButton.Abort)
             result = box.exec()
 
-            if result == QMessageBox.Abort:
+            if result == QMessageBox.StandardButton.Abort:
                 return False
             else:
                 self.mWarned = True

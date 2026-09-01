@@ -1,8 +1,6 @@
 from enmapboxprocessing.algorithm.fitclustereralgorithmbase import FitClustererAlgorithmBase
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class FitAffinityPropagationAlgorithm(FitClustererAlgorithmBase):
 
     def displayName(self) -> str:

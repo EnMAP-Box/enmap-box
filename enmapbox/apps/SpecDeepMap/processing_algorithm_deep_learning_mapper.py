@@ -139,7 +139,7 @@ class DL_Mapper(QgsProcessingAlgorithm):
 
         self.addParameter(QgsProcessingParameterNumber(
             name=self.P_overlap, description='Minimum overlap of tiles in Percentage',
-            type=QgsProcessingParameterNumber.Integer,
+            type=QgsProcessingParameterNumber.Type.Integer,
             defaultValue=10))
         self.addParameter(QgsProcessingParameterEnum(
             name=self.P_acc, description='Device', options=['cpu', 'gpu'], defaultValue=0))

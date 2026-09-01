@@ -1,9 +1,7 @@
 from qgis.PyQt.QtWidgets import QWidget, QMainWindow, QListWidget, QTextEdit, QCheckBox, QToolButton
 from qgis.PyQt.uic import loadUi
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class LocationBrowserResultWidget(QMainWindow):
     mList: QListWidget
     mDetails: QTextEdit

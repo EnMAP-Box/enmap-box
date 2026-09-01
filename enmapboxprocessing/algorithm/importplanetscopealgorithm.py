@@ -3,12 +3,7 @@ from os.path import basename, join, dirname, abspath, exists, splitext
 from typing import Dict, Any, List, Tuple
 
 from osgeo import gdal
-from qgis.core import (
-    QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer, QgsMapLayer, QgsRasterPipe,
-    QgsRasterFileWriter
-)
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.algorithm.preparerasteralgorithm import PrepareRasterAlgorithm
 from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
@@ -17,9 +12,12 @@ from enmapboxprocessing.gdalutils import GdalUtils
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
+from qgis.core import (
+    QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsRasterLayer, QgsMapLayer, QgsRasterPipe,
+    QgsRasterFileWriter
+)
 
 
-@typechecked
 class ImportPlanetScopeAlgorithm(EnMAPProcessingAlgorithm):
     P_FILE, _FILE = 'file', 'Scene collection file'
     P_OUTPUT_RASTER_SR, _OUTPUT_RASTER_SR = 'outputPlanetScopeL3BRasterSR', 'Output SR raster layer'

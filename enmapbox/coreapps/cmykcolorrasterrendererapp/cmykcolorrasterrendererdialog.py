@@ -4,7 +4,6 @@ import numpy as np
 
 from cmykcolorrasterrendererapp.cmykcolorrasterrenderer import CmykColorRasterRenderer
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QCheckBox, QMainWindow, QComboBox, QLineEdit, QRadioButton
 from qgis.PyQt.uic import loadUi
@@ -12,7 +11,6 @@ from qgis.core import QgsRasterLayer, QgsMapLayerProxyModel, QgsMapSettings
 from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsDoubleSpinBox, QgsMapLayerComboBox
 
 
-@typechecked
 class CmykColorRasterRendererDialog(QMainWindow):
     mLayer: QgsMapLayerComboBox
     mBand1: QgsRasterBandComboBox
@@ -49,7 +47,7 @@ class CmykColorRasterRendererDialog(QMainWindow):
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None
         self.mLayer.setProject(self.enmapBox.project())
-        self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mLayer.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         self.mP1.setClearValue(self.mP1.value())
         self.mP2.setClearValue(self.mP2.value())
 

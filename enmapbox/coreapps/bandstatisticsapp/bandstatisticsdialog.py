@@ -5,7 +5,6 @@ from typing import Optional
 from pyqtgraph import PlotWidget
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtGui import QMouseEvent, QColor
 from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QTableWidget, QComboBox, QCheckBox, \
     QLabel
@@ -15,7 +14,6 @@ from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsRasterDataProvid
 from qgis.gui import QgsRasterBandComboBox, QgsMapLayerComboBox, QgsFilterLineEdit, QgsSpinBox, QgsMapCanvas
 
 
-@typechecked
 class BandStatisticsDialog(QMainWindow):
     mLayer: QgsMapLayerComboBox
     mTable: QTableWidget
@@ -47,7 +45,7 @@ class BandStatisticsDialog(QMainWindow):
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None
         self.mLayer.setProject(self.enmapBox.project())
-        self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mLayer.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         self.mHistogramBinCount.setClearValue(self.mHistogramBinCount.value())
         self.mHistogramMinimum.clearValue()
         self.mHistogramMaximum.clearValue()
@@ -262,7 +260,6 @@ class BandStatisticsDialog(QMainWindow):
         self.onApplyClicked()
 
 
-@typechecked
 class HistogramPlotWidget(PlotWidget):
     def __init__(self):
         PlotWidget.__init__(self, parent=None, background='#ffffff')

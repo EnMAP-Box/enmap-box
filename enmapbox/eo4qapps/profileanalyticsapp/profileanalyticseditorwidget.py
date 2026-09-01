@@ -1,10 +1,8 @@
 from enmapbox.gui.widgets.codeeditwidget import CodeEditWidget
-from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtWidgets import QMainWindow, QToolButton, QLabel, QTextEdit
 from qgis.PyQt.uic import loadUi
 
 
-@typechecked
 class ProfileAnalyticsEditorWidget(QMainWindow):
     mFilename: QLabel
     mCode: CodeEditWidget

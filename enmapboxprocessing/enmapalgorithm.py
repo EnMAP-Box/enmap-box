@@ -7,18 +7,9 @@ from time import time
 from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple
 
 import numpy as np
-from osgeo import gdal
-
 import qgis.processing
-from enmapbox.typeguard import typechecked
-from enmapboxprocessing.driver import Driver
-from enmapboxprocessing.glossary import injectGlossaryLinks
-from enmapboxprocessing.parameter.processingparameterrasterdestination import ProcessingParameterRasterDestination
-from enmapboxprocessing.processingfeedback import ProcessingFeedback
-from enmapboxprocessing.typing import ClassifierDump, ClustererDump, CreationOptions, GdalResamplingAlgorithm, \
-    RegressorDump, TransformerDump
-from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtCore import QDateTime, QDate
+from osgeo import gdal
+from qgis.PyQt.QtCore import QDateTime, QDate, QTime
 from qgis.PyQt.QtGui import QTextDocument, QIcon
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import NULL
@@ -35,12 +26,18 @@ from qgis.core import (Qgis, QgsCategorizedSymbolRenderer, QgsCoordinateReferenc
                        QgsProject, QgsProperty, QgsRasterLayer, QgsRectangle, QgsVectorLayer,
                        QgsProcessingParameterDateTime, QgsProcessing)
 
+from enmapboxprocessing.driver import Driver
+from enmapboxprocessing.glossary import injectGlossaryLinks
+from enmapboxprocessing.processingfeedback import ProcessingFeedback
+from enmapboxprocessing.typing import ClassifierDump, ClustererDump, CreationOptions, GdalResamplingAlgorithm, \
+    RegressorDump, TransformerDump
+from enmapboxprocessing.utils import Utils
+
 
 class AlgorithmCanceledException(Exception):
     pass
 
 
-@typechecked
 class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     O_RESAMPLE_ALG = 'NearestNeighbour Bilinear Cubic CubicSpline Lanczos Average Mode Min Q1 Med Q3 Max'.split()
     NearestNeighbourResampleAlg, BilinearResampleAlg, CubicResampleAlg, CubicSplineResampleAlg, LanczosResampleAlg, \
@@ -459,6 +456,10 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
     def parameterAsOutputLayer(
             self, parameters: Dict[str, Any], name: str, context: QgsProcessingContext
     ) -> Optional[str]:
+
+        from enmapboxprocessing.parameter.processingparameterrasterdestination import \
+            ProcessingParameterRasterDestination
+
         filename = super().parameterAsOutputLayer(parameters, name, context)
 
         if filename == '':
@@ -690,15 +691,21 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
         from enmapboxprocessing.parameter.processingparameterskopsfileclassificationdatasetwidget import \
-            ProcessingParameterSkopsFileClassificationDatasetWidgetWrapper
+            ProcessingParameterSkopsFileClassificationDatasetWidgetFactory
         behavior = QgsProcessingParameterFile.Behavior.File
         extension = ''
         fileFilter = 'Skops files (*.skops);;JSON files (*.json)'
         param = QgsProcessingParameterFile(name, description, behavior, extension, defaultValue, optional, fileFilter)
 
         if not self.isRunnungInsideModeller():
-            param.setMetadata(
-                {'widget_wrapper': {'class': ProcessingParameterSkopsFileClassificationDatasetWidgetWrapper}})
+            metadata = param.metadata()
+            metadata["widget_wrapper"] = {
+                "widget_type": (
+                    ProcessingParameterSkopsFileClassificationDatasetWidgetFactory.WIDGET_TYPE
+                )
+            }
+            param.setMetadata(metadata)
+
             param.setDefaultValue(defaultValue)
 
         self.addParameter(param)
@@ -708,9 +715,18 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
         from enmapboxprocessing.parameter.processingparameterestimatorcodeeditwidget import \
-            ProcessingParameterClassifierCodeEditWrapper
+            ProcessingParameterRegressorCodeEditFactory
+
         param = QgsProcessingParameterString(name, description, defaultValue, True, optional)
-        param.setMetadata({'widget_wrapper': {'class': ProcessingParameterClassifierCodeEditWrapper}})
+
+        metadata = param.metadata()
+        metadata["widget_wrapper"] = {
+            "widget_type": (
+                ProcessingParameterRegressorCodeEditFactory.WIDGET_TYPE
+            )
+        }
+        param.setMetadata(metadata)
+
         param.setDefaultValue(defaultValue)
         self.addParameter(param)
         self.flagParameterAsAdvanced(name, advanced)
@@ -719,16 +735,21 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
         from enmapboxprocessing.parameter.processingparameterskopsfileregressiondatasetwidget import \
-            ProcessingParameterSkopsFileRegressionDatasetWidgetWrapper
+            ProcessingParameterSkopsFileRegressionDatasetWidgetFactory
         behavior = QgsProcessingParameterFile.Behavior.File
         extension = ''
         fileFilter = 'Skops files (*.skops);;JSON files (*.json)'
         param = QgsProcessingParameterFile(name, description, behavior, extension, defaultValue, optional, fileFilter)
 
         if not self.isRunnungInsideModeller():
-            param.setMetadata(
-                {'widget_wrapper': {'class': ProcessingParameterSkopsFileRegressionDatasetWidgetWrapper}}
-            )
+            metadata = param.metadata()
+            metadata["widget_wrapper"] = {
+                "widget_type": (
+                    ProcessingParameterSkopsFileRegressionDatasetWidgetFactory.WIDGET_TYPE
+                )
+            }
+            param.setMetadata(metadata)
+
             param.setDefaultValue(defaultValue)
 
         self.addParameter(param)
@@ -738,9 +759,17 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
         from enmapboxprocessing.parameter.processingparameterestimatorcodeeditwidget import \
-            ProcessingParameterRegressorCodeEditWrapper
+            ProcessingParameterRegressorCodeEditFactory
         param = QgsProcessingParameterString(name, description, defaultValue, True, optional)
-        param.setMetadata({'widget_wrapper': {'class': ProcessingParameterRegressorCodeEditWrapper}})
+
+        metadata = param.metadata()
+        metadata["widget_wrapper"] = {
+            "widget_type": (
+                ProcessingParameterRegressorCodeEditFactory.WIDGET_TYPE
+            )
+        }
+        param.setMetadata(metadata)
+
         param.setDefaultValue(defaultValue)
         self.addParameter(param)
         self.flagParameterAsAdvanced(name, advanced)
@@ -749,16 +778,21 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
         from enmapboxprocessing.parameter.processingparameterskopsfileunsuperviseddatasetwidget import \
-            ProcessingParameterSkopsFileUnsupervisedDatasetWidgetWrapper
+            ProcessingParameterSkopsFileUnsupervisedDatasetWidgetFactory
         behavior = QgsProcessingParameterFile.Behavior.File
         extension = ''
         fileFilter = 'Skops files (*.skops);;JSON files (*.json)'
         param = QgsProcessingParameterFile(name, description, behavior, extension, defaultValue, optional, fileFilter)
 
         if not self.isRunnungInsideModeller():
-            param.setMetadata(
-                {'widget_wrapper': {'class': ProcessingParameterSkopsFileUnsupervisedDatasetWidgetWrapper}}
-            )
+            metadata = param.metadata()
+            metadata["widget_wrapper"] = {
+                "widget_type": (
+                    ProcessingParameterSkopsFileUnsupervisedDatasetWidgetFactory.WIDGET_TYPE
+                )
+            }
+            param.setMetadata(metadata)
+
             param.setDefaultValue(defaultValue)
 
         self.addParameter(param)
@@ -824,6 +858,9 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             self, name: str, description: str, defaultValue=None, optional=False, createByDefault=True,
             allowTif=True, allowEnvi=True, allowVrt=False, defaultFileExtension: str = None, advanced=False
     ):
+        from enmapboxprocessing.parameter.processingparameterrasterdestination import \
+            ProcessingParameterRasterDestination
+
         self.addParameter(
             ProcessingParameterRasterDestination(
                 name, description, defaultValue, optional, createByDefault, allowTif, allowEnvi, allowVrt,
@@ -870,15 +907,23 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
         from enmapboxprocessing.parameter.processingparameterskopsfilewidget import \
-            ProcessingParameterSkopsFileWidgetWrapper
+            ProcessingParameterSkopsFileWidgetFactory
 
         param = QgsProcessingParameterFile(
             name, description, QgsProcessingParameterFile.Behavior.File, '', defaultValue, optional,
             self.SkopsFileFilter
         )
+
         if not self.isRunnungInsideModeller():
-            param.setMetadata({'widget_wrapper': {'class': ProcessingParameterSkopsFileWidgetWrapper}})
+            metadata = param.metadata()
+            metadata["widget_wrapper"] = {
+                "widget_type": (
+                    ProcessingParameterSkopsFileWidgetFactory.WIDGET_TYPE
+                )
+            }
+            param.setMetadata(metadata)
             param.setDefaultValue(defaultValue)
+
         self.addParameter(param)
         self.flagParameterAsAdvanced(name, advanced)
 
@@ -987,8 +1032,8 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             maxValue=QDate(), advanced=False
     ):
         type = Qgis.ProcessingDateTimeParameterDataType.Date
-        minValue = QDateTime(minValue)
-        maxValue = QDateTime(maxValue)
+        minValue = QDateTime(minValue, QTime(0, 0))
+        maxValue = QDateTime(maxValue, QTime(0, 0))
         self.addParameter(
             QgsProcessingParameterDateTime(name, description, type, defaultValue, optional, minValue, maxValue)
         )
@@ -998,9 +1043,18 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
         from enmapboxprocessing.parameter.processingparametercodeeditwidget import \
-            ProcessingParameterCodeEditWidgetWrapper
+            ProcessingParameterCodeEditWidgetFactory
+
         param = QgsProcessingParameterString(name, description, optional=optional)
-        param.setMetadata({'widget_wrapper': {'class': ProcessingParameterCodeEditWidgetWrapper}})
+
+        metadata = param.metadata()
+        metadata["widget_wrapper"] = {
+            "widget_type": (
+                ProcessingParameterCodeEditWidgetFactory.WIDGET_TYPE
+            )
+        }
+        param.setMetadata(metadata)
+
         param.setDefaultValue(defaultValue)
         self.addParameter(param)
         self.flagParameterAsAdvanced(name, advanced)
@@ -1016,9 +1070,18 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             self, name: str, description='Output options', defaultValue: str = None, optional=False, advanced=False
     ):
         from enmapboxprocessing.parameter.processingparametercreationprofilewidget import \
-            ProcessingParameterCreationProfileWidgetWrapper
+            ProcessingParameterCreationProfileWidgetFactory
+
         param = QgsProcessingParameterString(name, description, optional=optional)
-        param.setMetadata({'widget_wrapper': {'class': ProcessingParameterCreationProfileWidgetWrapper}})
+
+        metadata = param.metadata()
+        metadata["widget_wrapper"] = {
+            "widget_type": (
+                ProcessingParameterCreationProfileWidgetFactory.WIDGET_TYPE
+            )
+        }
+        param.setMetadata(metadata)
+
         param.setDefaultValue(defaultValue)
         self.addParameter(param)
         self.flagParameterAsAdvanced(name, advanced)

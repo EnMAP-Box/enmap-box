@@ -1,19 +1,16 @@
 from collections import OrderedDict
 from typing import List
 
+from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtGui import QColor, QPixmap, QIcon, QBrush, QFont
 from qgis.PyQt.QtWidgets import QTableWidget, QTableWidgetItem, QCheckBox
-
-from enmapbox.typeguard import typechecked
-from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer
 from qgis.gui import QgsDoubleSpinBox, QgsDockWidget
 
 
-@typechecked
 class LandCoverChangeStatisticsDataFilteringDockWidget(QgsDockWidget):
     mTableClasses: QTableWidget
     mFilterBySize: QCheckBox
@@ -93,7 +90,7 @@ class LandCoverChangeStatisticsDataFilteringDockWidget(QgsDockWidget):
             pixmap.fill(color)
             icon = QIcon(pixmap)
             w = QCheckBox(c.name)
-            w.setCheckState(Qt.Checked)
+            w.setCheckState(Qt.CheckState.Checked)
             w.setIcon(icon)
             w.color = color
             w.stateChanged.connect(self.onClassToggled)
@@ -105,7 +102,7 @@ class LandCoverChangeStatisticsDataFilteringDockWidget(QgsDockWidget):
                 pixmap.fill(color)
                 icon = QIcon(pixmap)
                 w = QTableWidgetItem(c.name)
-                w.setCheckState(Qt.Checked)
+                w.setCheckState(Qt.CheckState.Checked)
                 w.setIcon(icon)
                 w.color = color
                 self.mTableClasses.setItem(row, column, w)
@@ -126,7 +123,7 @@ class LandCoverChangeStatisticsDataFilteringDockWidget(QgsDockWidget):
             for row in range(self.mTableClasses.rowCount()):
                 size = self.relativeClassSizes[column - 1][row]
                 w: QTableWidgetItem = self.mTableClasses.item(row, column)
-                if w.checkState() != Qt.Checked:  # filtered by local checkbox
+                if w.checkState() != Qt.CheckState.Checked:  # filtered by local checkbox
                     continue
                 if size < vmin or size > vmax:  # filtered by size
                     continue

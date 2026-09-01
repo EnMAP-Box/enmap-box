@@ -1,8 +1,8 @@
 from typing import Optional
 
-from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.applications import EnMAPBoxApplication
 from enmapbox.gui.dataviews.docks import DockTypes, MapDock
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import CanvasLink
 from enmapbox.utils import isEarthEngineModuleInstalled
 from geetimeseriesexplorerapp.externals.ee_plugin.provider import register_data_provider
@@ -14,7 +14,6 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from qgis.core import QgsRasterLayer, QgsRectangle, QgsProject, QgsMessageLog, Qgis
 from qgis.gui import QgisInterface
-from enmapbox.typeguard import typechecked
 
 
 def enmapboxApplicationFactory(enmapBox: EnMAPBox):
@@ -22,7 +21,6 @@ def enmapboxApplicationFactory(enmapBox: EnMAPBox):
     return [app]
 
 
-@typechecked
 class GeeTimeseriesExplorerApp(EnMAPBoxApplication):
 
     def __init__(
@@ -66,7 +64,7 @@ class GeeTimeseriesExplorerApp(EnMAPBoxApplication):
 
         # add main dock and toolbar button
         self.mainDock = GeeTimeseriesExplorerDockWidget(parent=self.parent())
-        interface.addDockWidget(Qt.RightDockWidgetArea, self.mainDock)
+        interface.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.mainDock)
         self.mainDock.setWindowIcon(self.icon())
         self.mainDock.hide()
 
@@ -77,7 +75,7 @@ class GeeTimeseriesExplorerApp(EnMAPBoxApplication):
 
         # add profile dock
         self.profileDock = GeeTemporalProfileDockWidget(self.mainDock)
-        interface.addDockWidget(Qt.TopDockWidgetArea, self.profileDock)
+        interface.addDockWidget(Qt.DockWidgetArea.TopDockWidgetArea, self.profileDock)
         self.profileDock.setWindowIcon(self.icon())
         self.profileDock.hide()
 

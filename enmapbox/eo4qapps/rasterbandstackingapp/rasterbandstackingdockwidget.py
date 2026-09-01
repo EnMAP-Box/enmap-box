@@ -2,7 +2,6 @@ import json
 from os.path import join, basename, isabs
 from typing import Optional
 
-from geetimeseriesexplorerapp import MapTool
 from osgeo import gdal
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
@@ -11,11 +10,11 @@ from enmapbox.gui.mimedata import MDF_RASTERBANDS, QGIS_URILIST_MIMETYPE, MDF_EN
 from enmapbox.gui.widgets.multiplerasterbandselectionwidget.multiplerasterbandselectionwidget import \
     MultipleRasterBandSelectionWidget
 from enmapbox.qgispluginsupport.qps.utils import stringFromByteArray
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
+from geetimeseriesexplorerapp import MapTool
 from qgis import processing
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QEvent
@@ -26,7 +25,6 @@ from qgis.core import QgsMimeDataUtils, QgsReadWriteContext, QgsLayerTree, QgsPr
 from qgis.gui import QgsMapLayerComboBox, QgisInterface, QgsFileWidget
 
 
-@typechecked
 class RasterBandStackingDockWidget(QDockWidget):
     mRasterTable: QTableWidget
     mAddRaster: QToolButton
@@ -54,7 +52,7 @@ class RasterBandStackingDockWidget(QDockWidget):
 
         self.currentLocationMapTool = currentLocationMapTool
         self.mFile.setFilePath('bandStack.vrt')
-        self.mGridRaster.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mGridRaster.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
 
         # set from outside
         self.interface = None
@@ -71,10 +69,10 @@ class RasterBandStackingDockWidget(QDockWidget):
         self.mRasterTable.installEventFilter(self)
 
     def eventFilter(self, source, event):
-        if (event.type() == QEvent.DragEnter):
+        if (event.type() == QEvent.Type.DragEnter):
             event.accept()
             return True
-        if (event.type() == QEvent.Drop):
+        if (event.type() == QEvent.Type.Drop):
             mimeData = event.mimeData()
 
             is_QGIS_LAYERTREE_FORMAT = any(
@@ -138,7 +136,7 @@ class RasterBandStackingDockWidget(QDockWidget):
         self.mRasterTable.setRowCount(self.mRasterTable.rowCount() + 1)
         row = self.mRasterTable.rowCount() - 1
         mRaster = QgsMapLayerComboBox()
-        mRaster.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        mRaster.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         mRaster.setExcludedProviders(['wms'])
         mRaster.setAllowEmptyLayer(True)
 

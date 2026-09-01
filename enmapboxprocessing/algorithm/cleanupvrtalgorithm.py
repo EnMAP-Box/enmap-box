@@ -1,14 +1,12 @@
-from defusedxml import ElementTree as ET
 from os.path import relpath, dirname
 from typing import Dict, Any, List, Tuple
 
+from defusedxml import ElementTree as ET
+
+from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
-from enmapbox.typeguard import typechecked
-from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 
-
-@typechecked
 class CleanupVrtAlgorithm(EnMAPProcessingAlgorithm):
     P_VRT, _VRT = 'vrt', 'VRT file'
 

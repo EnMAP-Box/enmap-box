@@ -7,10 +7,8 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsProcessing)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class MergeClassificationDatasetsAlgorithm(EnMAPProcessingAlgorithm):
     P_DATASETS, _DATASETS = 'datasets', 'Datasets'
     P_OUTPUT_DATASET, _OUTPUT_DATASET = 'outputClassificationDataset', 'Output dataset'
@@ -31,7 +29,7 @@ class MergeClassificationDatasetsAlgorithm(EnMAPProcessingAlgorithm):
         return Group.DatasetCreation.value
 
     def initAlgorithm(self, configuration: Dict[str, Any] = None):
-        self.addParameterMultipleLayers(self.P_DATASETS, self._DATASETS, QgsProcessing.TypeFile, None)
+        self.addParameterMultipleLayers(self.P_DATASETS, self._DATASETS, QgsProcessing.SourceType.TypeFile, None)
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(

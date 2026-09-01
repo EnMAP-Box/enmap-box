@@ -10,10 +10,8 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class InverseTransformRasterAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer with features'
     P_TRANSFORMER, _TRANSFORMER = 'transformer', 'Transformer'
@@ -68,7 +66,7 @@ class InverseTransformRasterAlgorithm(EnMAPProcessingAlgorithm):
 
             # init result raster
             noDataValue = Utils.defaultNoDataValue(np.float32)
-            writer = Driver(filename, feedback=feedback).createLike(reader, Qgis.Float32, bandCount)
+            writer = Driver(filename, feedback=feedback).createLike(reader, Qgis.DataType.Float32, bandCount)
             lineMemoryUsage = reader.lineMemoryUsage() + reader.lineMemoryUsage(bandCount, 4)
             blockSizeY = min(raster.height(), ceil(maximumMemoryUsage / lineMemoryUsage))
             blockSizeX = raster.width()

@@ -2,18 +2,16 @@ import webbrowser
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsMapLayer, QgsProcessingException)
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.classificationperformancesimplealgorithm import \
     ClassificationPerformanceSimpleAlgorithm
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsMapLayer, QgsProcessingException)
 
 
-@typechecked
 class ClassifierPerformanceAlgorithm(EnMAPProcessingAlgorithm):
     P_CLASSIFIER, _CLASSIFIER = 'classifier', 'Classifier'
     P_DATASET, _DATASET = 'dataset', 'Test dataset'

@@ -57,7 +57,7 @@ class WIDGET:
         base = QVBoxLayout()
 
         self.parent.setLayout(base)
-        base.setSizeConstraint(QLayout.SetFixedSize)
+        base.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
 
         self.gui['base'] = base
         self.level.append(base)
@@ -92,7 +92,7 @@ class WIDGET:
         self.level_up()
 
     # create a tab page
-    def widget_tab_page(self, title, layout="V", alignment=Qt.AlignTop, ID=None):
+    def widget_tab_page(self, title, layout="V", alignment=Qt.AlignmentFlag.AlignTop, ID=None):
         page = QWidget()
         if layout == "H":
             page.layout = QHBoxLayout()
@@ -141,7 +141,7 @@ class WIDGET:
     def widget_row(self, ID=None, single=False, frame=False, alignment=None, enable=True):
         if frame is True:
             frame = QFrame()
-            frame.setFrameStyle(QFrame.StyledPanel | QFrame.Raised)
+            frame.setFrameStyle(QFrame.Shape.StyledPanel | QFrame.Shadow.Raised)
         tmp = QHBoxLayout()
         if frame is True:
             frame.setLayout(tmp)
@@ -355,7 +355,7 @@ class CAL_EST(QWidget):
         self.gui.widget_add_widget(canvas)
 
         self.gui.widget_column()
-        self.gui.widget_row(alignment=Qt.AlignLeft)
+        self.gui.widget_row(alignment=Qt.AlignmentFlag.AlignLeft)
         self.gui.widget_label(text="Gain = ", width=80)
         self.gui.widget_text(text=str(gain))
         self.gui.widget_row_close()
@@ -368,7 +368,10 @@ class CAL_EST(QWidget):
         self.gui.widget_text(text=str(r_value ** 2))
         self.gui.widget_row_close()
         self.gui.widget_column_close()
-        self.gui.widget_row_framed(alignment=Qt.AlignLeft, style=QFrame.StyledPanel | QFrame.Raised)
+        self.gui.widget_row_framed(
+            alignment=Qt.AlignmentFlag.AlignLeft,
+            style=QFrame.Shape.StyledPanel | QFrame.Shadow.Raised
+        )
         self.gui.widget_push_button('Select', action=self.select)
         self.gui.widget_push_button('Clear', action=self.clear)
         self.gui.widget_push_button('Close', action=self.cancel)
@@ -461,7 +464,7 @@ class CSV(QWidget):
         self.gui.widget_column_close()
         self.gui.widget_column()
         self.gui.widget_group_box('HEADER')
-        self.gui.widget_row(alignment=Qt.AlignLeft)
+        self.gui.widget_row(alignment=Qt.AlignmentFlag.AlignLeft)
         self.gui.widget_label(text='Starting row:')
         self.gui.widget_spinbox(min=0, default=0, ID='n_head_line')
         self.gui.widget_row_close()
@@ -483,7 +486,10 @@ class CSV(QWidget):
         self.gui.widget_group_box_close()
 
         self.gui.widget_add_spacing(10)
-        self.gui.widget_row_framed(alignment=Qt.AlignLeft, style=QFrame.StyledPanel | QFrame.Raised)
+        self.gui.widget_row_framed(
+            alignment=Qt.AlignmentFlag.AlignLeft,
+            style=QFrame.Shape.StyledPanel | QFrame.Shadow.Raised
+        )
         self.gui.widget_push_button('OK', action=self.ok)
         self.gui.widget_push_button('Cancel', action=self.cancel)
         self.gui.widget_row_framed_close()
@@ -532,7 +538,7 @@ class CSV(QWidget):
         for kr in range(self.csv_data.n_rows):
             for kl in range(self.csv_data.n_cols):
                 item = QTableWidgetItem()
-                item.setFlags(Qt.ItemIsEnabled)
+                item.setFlags(Qt.ItemFlag.ItemIsEnabled)
                 item.setText((self.csv_data.rows[kr])[kl])
                 self.gui.gui['wid_tab'].setItem(kr, kl, item)
 

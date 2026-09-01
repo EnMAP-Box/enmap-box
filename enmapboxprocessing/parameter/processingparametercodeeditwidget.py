@@ -1,4 +1,7 @@
-from processing.gui.wrappers import WidgetWrapper
+from qgis.core import QgsMessageLog, Qgis
+
+from qgis.gui import QgsAbstractProcessingParameterWidgetWrapper, QgsProcessingParameterWidgetFactoryInterface, QgsGui
+
 from qgis.PyQt.Qsci import QsciScintilla, QsciLexerPython
 from qgis.PyQt.QtGui import QFont, QFontMetrics, QColor
 from qgis.PyQt.QtWidgets import QWidget
@@ -26,8 +29,6 @@ class CodeEditWidget(QsciScintilla):
         self.setMarginLineNumbers(0, True)
         self.setMarginsBackgroundColor(QColor("#e3e3e3"))
 
-    #        self.setMinimumSize(0, 300)
-
     def setToolTip(self, *args, **kwargs):
         pass
 
@@ -44,31 +45,37 @@ class ProcessingParameterCodeEdit(QWidget):
         self.codeEdit.setMinimumSize(0, 300)
 
 
-class ProcessingParameterCodeEditWidgetWrapper(WidgetWrapper):
-    # adopted from C:\source\QGIS3-master\python\plugins\processing\algs\gdal\ui\RasterOptionsWidget.py
+class ProcessingParameterCodeEditWidgetWrapper(QgsAbstractProcessingParameterWidgetWrapper):
 
-    widget: ProcessingParameterCodeEdit
+    def __init__(self, parameter, widget_type, parent=None):
+        super().__init__(parameter, widget_type, parent)
 
     def createWidget(self):
-        # if self.dialogType == DIALOG_MODELER:
-        #    return ProcessingParameterCodeEdit()
-        # elif self.dialogType == DIALOG_BATCH:
-        #    raise NotImplementedError()
-        # else:
-        return ProcessingParameterCodeEdit()
+        widget = ProcessingParameterCodeEdit()
+        return widget
 
-    def setValue(self, value):
-        # if self.dialogType == DIALOG_MODELER:
-        #    raise NotImplementedError()
-        # elif self.dialogType == DIALOG_BATCH:
-        #    raise NotImplementedError()
-        # else:
-        self.widget.codeEdit.setText(value)
+    def setWidgetValue(self, value, context):
+        widget = self.wrappedWidget()
+        widget.codeEdit.setText(value)
 
-    def value(self):
-        # if self.dialogType == DIALOG_MODELER:
-        #    raise NotImplementedError()
-        # elif self.dialogType == DIALOG_BATCH:
-        #    raise NotImplementedError()
-        # else:
-        return self.widget.codeEdit.value()
+    def widgetValue(self):
+        widget = self.wrappedWidget()
+        return widget.codeEdit.value()
+
+
+class ProcessingParameterCodeEditWidgetFactory(QgsProcessingParameterWidgetFactoryInterface):
+    WIDGET_TYPE = 'enmapbox:ProcessingParameterCodeEditWidget'
+
+    def parameterType(self):
+        return self.WIDGET_TYPE
+
+    def createWidgetWrapper(self, parameter, widget_type):
+        return ProcessingParameterCodeEditWidgetWrapper(parameter, widget_type)
+
+    @classmethod
+    def register(cls):
+        success = QgsGui.processingGuiRegistry().addParameterWidgetFactory(cls())
+        if success:
+            QgsMessageLog.logMessage(f'{cls.WIDGET_TYPE} registered', level=Qgis.MessageLevel.Info)
+        else:
+            QgsMessageLog.logMessage(f'{cls.WIDGET_TYPE} could not be registered', level=Qgis.MessageLevel.Critical)

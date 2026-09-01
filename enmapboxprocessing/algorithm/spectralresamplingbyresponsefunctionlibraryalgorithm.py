@@ -3,6 +3,7 @@ from collections import OrderedDict
 from typing import Dict, Any, List, Tuple
 
 from enmapbox.qgispluginsupport.qps.speclib import FIELD_VALUES
+from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
 from enmapboxprocessing.algorithm.spectralresamplingbyresponsefunctionconvolutionalgorithmbase import \
     RESPONSE_CUTOFF_VALUE, RESPONSE_CUTOFF_DIGITS
 from enmapboxprocessing.algorithm.spectralresamplingtocustomsensoralgorithm import \
@@ -10,11 +11,8 @@ from enmapboxprocessing.algorithm.spectralresamplingtocustomsensoralgorithm impo
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from qgis.core import (QgsProcessingContext, QgsVectorLayer, QgsProcessingFeedback, QgsProcessingException,
                        QgsProcessingParameterField)
-from enmapbox.typeguard import typechecked
-from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
 
 
-@typechecked
 class SpectralResamplingByResponseFunctionLibraryAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Spectral raster layer'
     P_LIBRARY, _LIBRARY = 'library', 'Spectral response function library'
@@ -46,7 +44,9 @@ class SpectralResamplingByResponseFunctionLibraryAlgorithm(EnMAPProcessingAlgori
         self.addParameterRasterLayer(self.P_RASTER, self._RASTER)
         self.addParameterVectorLayer(self.P_LIBRARY, self._LIBRARY)
         self.addParameterField(
-            self.P_FIELD, self._FIELD, None, self.P_LIBRARY, QgsProcessingParameterField.Any, False, True, False, True
+            self.P_FIELD, self._FIELD, None,
+            self.P_LIBRARY, QgsProcessingParameterField.DataType.Any,
+            False, True, False, True
         )
         self.addParameterRasterDestination(self.P_OUTPUT_RASTER, self._OUTPUT_RASTER)
 

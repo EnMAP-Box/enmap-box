@@ -3,10 +3,8 @@ from typing import Dict, Any, List, Tuple
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, Qgis
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class CreateGridAlgorithm(EnMAPProcessingAlgorithm):
     P_CRS, _CRS = 'crs', 'CRS'
     P_EXTENT, _EXTENT = 'extent', 'Extent'
@@ -82,7 +80,7 @@ class CreateGridAlgorithm(EnMAPProcessingAlgorithm):
         with open(filename + '.log', 'w') as logfile:
             feedback, feedback2 = self.createLoggingFeedback(feedback, logfile)
             self.tic(feedback, parameters, context)
-            writer = Driver(filename, None, None, feedback).create(Qgis.Byte, width, height, 1, extent, crs)
+            writer = Driver(filename, None, None, feedback).create(Qgis.DataType.Byte, width, height, 1, extent, crs)
             writer.close()
 
             result = {self.P_OUTPUT_GRID: filename}

@@ -29,15 +29,6 @@ from pyqtgraph.dockarea import DockArea as pgDockArea
 from pyqtgraph.dockarea.Dock import Dock as pgDock
 from pyqtgraph.dockarea.Dock import DockLabel as pgDockLabel
 from pyqtgraph.dockarea.DockArea import TempAreaWindow
-
-from enmapbox.gui.mapcanvas import MapCanvas, CanvasLink
-from enmapbox.gui.mimedata import extractMapLayers
-from enmapbox.gui.utils import enmapboxUiPath
-from enmapbox.qgispluginsupport.qps.speclib.core import profile_fields
-from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
-from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
-from enmapbox.qgispluginsupport.qps.utils import loadUi
-from enmapboxprocessing.utils import Utils
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtCore import pyqtSignal, QSettings, Qt, QMimeData, QPoint, QUrl, QObject, QSize, QByteArray, QMetaType
 from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QResizeEvent, \
@@ -47,6 +38,15 @@ from qgis.PyQt.QtWidgets import QToolButton, QMenu, QMainWindow, QFileDialog, QW
 from qgis.core import QgsCoordinateReferenceSystem, QgsMapLayer, QgsProject, edit, QgsField, QgsLayerTree, \
     QgsLayerTreeLayer, QgsVectorLayer
 from qgis.gui import QgsMapCanvas
+
+from enmapbox.gui.mapcanvas import MapCanvas, CanvasLink
+from enmapbox.gui.mimedata import extractMapLayers
+from enmapbox.gui.utils import enmapboxUiPath
+from enmapbox.qgispluginsupport.qps.speclib.core import profile_fields
+from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
+from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
+from enmapbox.qgispluginsupport.qps.utils import loadUi
+from enmapboxprocessing.utils import Utils
 
 RX_HTML_FILE = re.compile(r'\.(html|html|xhtml)$', re.I)
 
@@ -374,12 +374,12 @@ class DockLabel(pgDockLabel):
 
         self.closeButton: QToolButton
         self.closeButton.setToolTip('Close window')
-        self.closeButton.setIcon(QApplication.style().standardIcon(QStyle.SP_TitleBarCloseButton))
+        self.closeButton.setIcon(QApplication.style().standardIcon(QStyle.StandardPixmap.SP_TitleBarCloseButton))
 
         self.btnFloat = QToolButton(self)
         self.btnFloat.setToolTip('Float window')
         self.btnFloat.clicked.connect(dock.float)
-        self.btnFloat.setIcon(QApplication.style().standardIcon(QStyle.SP_TitleBarNormalButton))
+        self.btnFloat.setIcon(QApplication.style().standardIcon(QStyle.StandardPixmap.SP_TitleBarNormalButton))
         self.btnFloat.setVisible(allow_floating)
 
         self.btnUnFloat = QToolButton(self)
@@ -416,14 +416,14 @@ class DockLabel(pgDockLabel):
         if self.orientation == 'vertical':
             small_size = ev.size().width()
             long_size = ev.size().height()
-            self.progressBar.setOrientation(Qt.Vertical)
+            self.progressBar.setOrientation(Qt.Orientation.Vertical)
             self.progressBar.setFixedHeight(min(ceil(long_size * relSize), maxSize))
             self.progressBar.setFixedWidth(small_size - 2 * border)
             self.progressBar.move(QPoint(border, long_size - self.progressBar.height() - border))
         else:
             small_size = ev.size().height()
             long_size = ev.size().width()
-            self.progressBar.setOrientation(Qt.Horizontal)
+            self.progressBar.setOrientation(Qt.Orientation.Horizontal)
             self.progressBar.setFixedWidth(min(ceil(long_size * relSize), maxSize))
             self.progressBar.setFixedHeight(small_size - 2 * border)
             self.progressBar.move(QPoint(border, border))
@@ -463,9 +463,9 @@ class MimeDataTextEdit(QTextEdit):
         self.clear()
 
         def append(txt):
-            self.moveCursor(QTextCursor.End)
+            self.moveCursor(QTextCursor.MoveOperation.End)
             self.insertPlainText(txt + '\n')
-            self.moveCursor(QTextCursor.End)
+            self.moveCursor(QTextCursor.MoveOperation.End)
 
         for format in formats:
             append('####{}####'.format(format))
@@ -483,12 +483,12 @@ class MimeDataTextEdit(QTextEdit):
             append('\n')
 
     def dragEnterEvent(self, event):
-        event.setDropAction(Qt.CopyAction)  # copy but do not remove
+        event.setDropAction(Qt.DropAction.CopyAction)  # copy but do not remove
         event.accept()
 
     def dropEvent(self, event):
         self.insertFromMimeData(event.mimeData())
-        event.setDropAction(Qt.CopyAction)
+        event.setDropAction(Qt.DropAction.CopyAction)
         event.accept()
 
 
@@ -583,7 +583,7 @@ class TextDockWidget(QWidget):
         :param event: QDragEnterEvent
         """
         if event.mimeData().hasUrls():
-            event.setDropAction(Qt.CopyAction)
+            event.setDropAction(Qt.DropAction.CopyAction)
 
             event.accept()
 
@@ -596,7 +596,7 @@ class TextDockWidget(QWidget):
             for url in mimeData.urls():
                 if isinstance(url, QUrl) and url.isLocalFile():
                     self.loadFile(url.toLocalFile())
-                    event.setDropAction(Qt.CopyAction)
+                    event.setDropAction(Qt.DropAction.CopyAction)
                     event.accept()
                     return
 
@@ -622,8 +622,11 @@ class TextDockWidget(QWidget):
             if statinfo.st_size > self.nMaxBytes:
                 info = 'Files {} is > {} bytes'.format(path, self.nMaxBytes)
                 info += '\nDo you really want to load it into this text editor?'
-                result = QMessageBox.warning(self, 'Warning', info, QMessageBox.Yes, QMessageBox.Cancel)
-                if result != QMessageBox.Yes:
+                result = QMessageBox.warning(
+                    self, 'Warning', info,
+                    QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.Cancel
+                )
+                if result != QMessageBox.StandardButton.Yes:
                     return
 
             with open(path, 'r') as file:
@@ -733,8 +736,8 @@ class WebViewDock(Dock):
         super(WebViewDock, self).__init__(*args, **kwargs)
         # self.setLineWrapMode(QTextEdit.FixedColumnWidth)
 
-        from qgis.PyQt.QtWebKitWidgets import QWebView
-        self.webView = QWebView(self)
+        from qgis.PyQt.QtWebEngineWidgets import QWebEngineView
+        self.webView = QWebEngineView(self)
         self.layout.addWidget(self.webView)
 
         if uri is not None:
@@ -742,18 +745,25 @@ class WebViewDock(Dock):
         elif url is not None:
             self.load(url)
 
+    def showHtml(self, html: str):
+        self.webView.setHtml(html)
+
     def load(self, uri):
         if os.path.isfile(uri):
             url = QUrl.fromLocalFile(uri)
         else:
             url = QUrl(uri)
         self.webView.load(url)
-        settings = self.webView.page().settings()
-        from qgis.PyQt.QtWebKit import QWebSettings
-        settings.setAttribute(QWebSettings.LocalContentCanAccessRemoteUrls, True)
-        settings.setAttribute(QWebSettings.LocalContentCanAccessFileUrls, True)
-        settings.setAttribute(QWebSettings.LocalStorageEnabled, True)
-        settings.setAttribute(QWebSettings.AutoLoadImages, True)
+
+        if False:
+            settings = self.webView.page().settings()
+            # from qgis.PyQt.QtWebEngineWidgets import QWebEngineView
+            from qgis.PyQt.QtWebEngineCore import QWebEngineSettings
+            WA = QWebEngineSettings.WebAttribute
+            settings.setAttribute(WA.LocalContentCanAccessRemoteUrls, True)
+            settings.setAttribute(WA.LocalContentCanAccessFileUrls, True)
+            settings.setAttribute(WA.LocalStorageEnabled, True)
+            settings.setAttribute(WA.AutoLoadImages, True)
 
 
 class AttributeTableDock(Dock):
@@ -858,7 +868,7 @@ class SpectralLibraryDock(Dock):
         sl = SpectralLibraryUtils.createSpectralLibrary(profile_fields=profile_fields)
         sl.setName(f'{self.title()}')
         with edit(sl):
-            sl.addAttribute(QgsField('name', QMetaType.QString))
+            sl.addAttribute(QgsField('name', QMetaType.Type.QString))
         self.speclibWidget().project().addMapLayer(sl)
         # self.dataSourceManager().addDataSources([sl])
         self.mDefaultSpeclibId = sl.id()
@@ -965,7 +975,7 @@ class MapDock(Dock):
         self.sigTitleChanged.connect(self.mCanvas.setWindowTitle)
 
         settings = QSettings()
-        self.mCanvas.setCanvasColor(Qt.black)
+        self.mCanvas.setCanvasColor(Qt.GlobalColor.black)
         self.mCanvas.enableAntiAliasing(settings.value('/qgis/enable_anti_aliasing', False, type=bool))
         self.layout.addWidget(self.mCanvas)
 
@@ -1020,7 +1030,7 @@ class MapDock(Dock):
         return menu
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             pass
         else:
             super(MapDock, self).mousePressEvent(event)

@@ -3,12 +3,13 @@ import logging
 from os.path import basename
 from typing import List, Optional, Iterable, Dict
 
-from enmapbox.qgispluginsupport.qps.utils import stringFromByteArray
-from qgis.PyQt.QtCore import QMimeData, QUrl, QByteArray
+from qgis.PyQt.QtCore import QMimeData, QUrl
 from qgis.PyQt.QtXml import QDomNamedNodeMap, QDomDocument
 from qgis.core import QgsLayerItem
 from qgis.core import QgsMapLayer, QgsRasterLayer, QgsProject, QgsReadWriteContext, \
     QgsMimeDataUtils, QgsLayerTree
+
+from enmapbox.qgispluginsupport.qps.utils import stringFromByteArray
 from .datasources.datasources import DataSource
 from ..qgispluginsupport.qps.layerproperties import defaultRasterRenderer
 
@@ -224,27 +225,3 @@ def extractMapLayers(mimeData: QMimeData,
     logger.debug('\n'.join(info))
 
     return newMapLayers
-
-
-def textToByteArray(text):
-    """
-    Converts input into a QByteArray
-    :param text: bytes or str
-    :return: QByteArray
-    """
-
-    if isinstance(text, QDomDocument):
-        return textToByteArray(text.toString())
-    else:
-        data = QByteArray()
-        data.append(text)
-        return data
-
-
-def textFromByteArray(data: QByteArray):
-    """
-    Decodes a QByteArray into a str
-    :param data: QByteArray
-    :return: str
-    """
-    return stringFromByteArray(data)

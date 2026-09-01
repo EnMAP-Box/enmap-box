@@ -1,10 +1,7 @@
+from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QDoubleSpinBox, QWidget
 
-from qgis.PyQt import uic
-from enmapbox.typeguard import typechecked
 
-
-@typechecked
 class RasterLayerStylingPercentilesWidget(QWidget):
     mP1: QDoubleSpinBox
     mP2: QDoubleSpinBox

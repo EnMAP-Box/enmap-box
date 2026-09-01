@@ -1,11 +1,12 @@
 import unittest
 
+from qgis.core import QgsProject, edit
+
 from enmapbox import initAll
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprocessingdialog import SpectralProcessingDialog
 from enmapbox.testing import EnMAPBoxTestCase, start_app, TestObjects
-from qgis.core import QgsProject, edit
 
 start_app()
 initAll()
@@ -29,9 +30,9 @@ class TestIssue764(EnMAPBoxTestCase):
 
             for k, v in parameters.items():
                 w = wrapper.mWrappers[k]
-                self.assertEqual(w.value(), v)
+                self.assertEqual(w.parameterValue(), v)
 
-            spd.runButton().animateClick(0)
+            spd.runButton().animateClick()
 
             self.showGui([spd, slw])
 

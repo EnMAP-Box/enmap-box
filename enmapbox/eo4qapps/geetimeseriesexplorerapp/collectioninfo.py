@@ -3,10 +3,7 @@ from typing import Dict, List, Tuple, Optional
 
 from qgis.PyQt.QtCore import QDate, QDateTime
 
-from enmapbox.typeguard import typechecked
 
-
-@typechecked
 class CollectionInfo():
     def __init__(self, data: dict):
         self.data = data

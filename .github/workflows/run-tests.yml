@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        qgis_version: [ '3.44', '3.42', '3.40' ]
+        qgis_version: [ 'latest', 'stable' ]
       fail-fast: true
 
     env:

@@ -5,10 +5,8 @@ from enmapboxprocessing.algorithm.predictregressionalgorithm import PredictRegre
 from enmapboxprocessing.algorithm.regressorperformancealgorithm import RegressorPerformanceAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class RegressionWorkflowAlgorithm(EnMAPProcessingAlgorithm):
     P_DATASET, _DATASET = 'dataset', 'Training dataset'
     P_REGRESSOR, _REGRESSOR = 'regressor', 'Regressor'

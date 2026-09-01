@@ -2,10 +2,7 @@ import re
 from collections import OrderedDict
 from typing import Dict, Any
 
-from enmapbox.typeguard import typechecked
 
-
-@typechecked
 class EnviUtils(object):
 
     @staticmethod

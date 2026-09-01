@@ -4,10 +4,8 @@ from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp.externals.ee_plugin.provider import BAND_TYPES
 from qgis.PyQt.QtGui import QColor
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class ImageInfo():
     def __init__(self, info: dict):
         self.info = info  # ee.Image.getInfo() of first image in collection

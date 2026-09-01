@@ -1,8 +1,6 @@
 from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class FitKernelRidgeAlgorithm(FitRegressorAlgorithmBase):
 
     def displayName(self) -> str:

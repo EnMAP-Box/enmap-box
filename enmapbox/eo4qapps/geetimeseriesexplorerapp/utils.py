@@ -1,8 +1,6 @@
 import os
 
-from qgis.PyQt.QtCore import QDateTime, QDate
-
-from enmapbox.typeguard import typechecked
+from qgis.PyQt.QtCore import QDateTime, QDate, QTime
 
 
 def version():
@@ -13,6 +11,5 @@ def version():
                 return line.split('=')[1].strip()
 
 
-@typechecked
 def utilsMsecToDateTime(msec: int) -> QDateTime:
-    return QDateTime(QDate(1970, 1, 1)).addMSecs(int(msec))
+    return QDateTime(QDate(1970, 1, 1), QTime(0, 0, 0)).addMSecs(int(msec))

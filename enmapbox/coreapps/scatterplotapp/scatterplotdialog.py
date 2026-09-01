@@ -13,7 +13,6 @@ from scipy.stats import binned_statistic_2d, pearsonr
 from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import MarkerSymbolComboBox, MarkerSymbol
 from enmapbox.qgispluginsupport.qps.processing.algorithmdialog import AlgorithmDialog
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
@@ -28,7 +27,6 @@ from qgis.gui import QgsMapLayerComboBox, QgsMapCanvas, QgsRasterBandComboBox, Q
     QgsFilterLineEdit, QgsFieldComboBox
 
 
-@typechecked
 class ScatterPlotWidget(PlotWidget):
 
     def __init__(self, *args, **kwargs):
@@ -48,7 +46,6 @@ class ScatterPlotWidget(PlotWidget):
         self.autoRange()
 
 
-@typechecked
 class ScatterPlotDialog(QMainWindow):
     mLayerX: QgsMapLayerComboBox
     mLayerY: QgsMapLayerComboBox
@@ -99,8 +96,8 @@ class ScatterPlotDialog(QMainWindow):
         self.mMapCanvas: Optional[QgsMapCanvas] = None
         self.mLayerX.setProject(self.enmapBox.project())
         self.mLayerY.setProject(self.enmapBox.project())
-        self.mLayerX.setFilters(QgsMapLayerProxyModel.RasterLayer)
-        self.mFieldY.setFilters(QgsFieldProxyModel.Numeric)
+        self.mLayerX.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
+        self.mFieldY.setFilters(QgsFieldProxyModel.Filter.Numeric)
 
         self.mMinimumX.clearValue()
         self.mMaximumX.clearValue()
@@ -291,7 +288,7 @@ class ScatterPlotDialog(QMainWindow):
                     if successful:
                         self.close()
 
-            self.enmapBox.showProcessingAlgorithmDialog(alg, parameters, True, True, Wrapper, True, self)
+            self.enmapBox.showProcessingAlgorithmDialog(alg, parameters, True, True, Wrapper, True)
             if not exists(filename):
                 self.mFieldY.setField('')
                 return
@@ -413,7 +410,11 @@ class ScatterPlotDialog(QMainWindow):
         background = counts == 0
 
         # stretch counts
-        lower, upper = np.percentile(counts[counts != 0], [self.mDensityP1.value(), self.mDensityP2.value()])
+        validCounts = counts[counts != 0]
+        if len(validCounts) > 0:
+            lower, upper = np.percentile(validCounts, [self.mDensityP1.value(), self.mDensityP2.value()])
+        else:
+            return
         span = upper - lower
         span = max(span, 1)  # avoid devision by zero
         counts = np.round((counts - lower) * (254 / span))
@@ -468,7 +469,7 @@ class ScatterPlotDialog(QMainWindow):
         # analytics
         if self.mOneToOneLine.isChecked():
             plotItem = self.mScatterPlot.plot([xmin, xmax], [xmin, xmax])
-            plotItem.setPen(mkPen(color=self.mOneToOneLineColor.color(), style=Qt.SolidLine))
+            plotItem.setPen(mkPen(color=self.mOneToOneLineColor.color(), style=Qt.PenStyle.SolidLine))
 
         if self.mFittedLine.isChecked():
             z = np.polyfit(x, y, 1)
@@ -476,7 +477,7 @@ class ScatterPlotDialog(QMainWindow):
             x_ = range[0]
             y_ = p(x_)
             plotItem = self.mScatterPlot.plot(x_, y_)
-            plotItem.setPen(mkPen(color=self.mFittedLineColor.color(), style=Qt.SolidLine))
+            plotItem.setPen(mkPen(color=self.mFittedLineColor.color(), style=Qt.PenStyle.SolidLine))
 
             r2 = round(pearsonr(x, y)[0] ** 2, 4)
             rmse = round(np.sqrt(np.mean((x - y) ** 2)), 4)
@@ -492,7 +493,6 @@ class ScatterPlotDialog(QMainWindow):
         self.onApplyClicked()
 
 
-@typechecked
 def utilsQgsColorRampToPyQtGraphLookupTable(colorRamp: QgsColorRamp) -> np.ndarray:
     array = np.empty(shape=(256, 4), dtype=np.uint8)
     for i in range(256):

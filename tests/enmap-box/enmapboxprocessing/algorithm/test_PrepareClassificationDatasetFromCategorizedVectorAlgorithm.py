@@ -1,6 +1,7 @@
 import unittest
 
 from osgeo import gdal
+from qgis.core import QgsVectorLayer
 
 from enmapboxprocessing.algorithm.libraryfromclassificationdatasetalgorithm import \
     LibraryFromClassificationDatasetAlgorithm
@@ -11,7 +12,6 @@ from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
 from enmapboxtestdata import points_in_no_data_region, enmap, landcover_polygon, landcover_point, enmap_potsdam, \
     landcover_potsdam_polygon
-from qgis.core import QgsVectorLayer
 
 
 @unittest.skipIf(gdal.VersionInfo().startswith('310'), 'Rasterize decimal error')
@@ -165,11 +165,16 @@ class TestPrepareClassificationDatasetFromCategorizedVectorAlgorithm(TestCase):
 
     def test_notExcludeBadBands(self):
         alg = PrepareClassificationDatasetFromCategorizedVectorAlgorithm()
+
+        p = self.createTestOutputDirectory(max_length=100)
+
+        path_out = str(p / 'sample.skops')
+
         parameters = {
             alg.P_FEATURE_RASTER: enmap_potsdam,
             alg.P_CATEGORIZED_VECTOR: landcover_potsdam_polygon,
             alg.P_EXCLUDE_BAD_BANDS: False,
-            alg.P_OUTPUT_DATASET: self.filename('sample.skops')
+            alg.P_OUTPUT_DATASET: str(path_out)
         }
         self.runalg(alg, parameters)
         dump = ClassifierDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))

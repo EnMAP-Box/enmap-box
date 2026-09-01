@@ -2,11 +2,12 @@ import pathlib
 import site
 import unittest
 
-from enmapbox import DIR_ENMAPBOX
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.gui.applications import EnMAPBoxApplication
-from enmapbox.testing import EnMAPBoxTestCase
 from qgis.PyQt.QtWidgets import QWidget
+
+from enmapbox import DIR_ENMAPBOX
+from enmapbox.gui.applications import EnMAPBoxApplication
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.testing import EnMAPBoxTestCase
 
 site.addsitedir(pathlib.Path(DIR_ENMAPBOX) / 'coreapps')
 
@@ -37,6 +38,7 @@ class TestVRTBuilderApp(EnMAPBoxTestCase):
             self.showGui([enmapbox, w])
         else:
             self.assertTrue(w is None)
+        enmapbox.close()
 
 
 if __name__ == "__main__":

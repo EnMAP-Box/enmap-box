@@ -35,7 +35,6 @@ from enmapbox.qgispluginsupport.qps.classification.classificationscheme import \
     ClassificationMapLayerComboBox, ClassInfo, ClassificationScheme, ClassificationSchemeComboBox, \
     ClassificationSchemeWidget
 from enmapbox.qgispluginsupport.qps.utils import loadUi
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.reclassifyrasteralgorithm import ReclassifyRasterAlgorithm
 from qgis.PyQt.QtCore import QAbstractTableModel, Qt, QModelIndex, QSortFilterProxyModel
 from qgis.PyQt.QtGui import QColor, QContextMenuEvent, QIcon
@@ -70,7 +69,6 @@ def setClassInfo(targetDataset, classificationScheme: ClassificationScheme, band
     band.SetColorTable(ct)
 
 
-@typechecked
 def reclassify(layerSrc: QgsRasterLayer, dstClassScheme: ClassificationScheme, labelLookup: dict,
                output_classification=QgsProcessing.TEMPORARY_OUTPUT):
     mapping = str(labelLookup)
@@ -287,19 +285,19 @@ class ReclassifyTableModel(QAbstractTableModel):
     def columnCount(self, parent=None, *args, **kwargs):
         return len(self.mColumNames)
 
-    def headerData(self, section: int, orientation: Qt.Orientation, role: int = Qt.DisplayRole):
-        if role == Qt.DisplayRole:
-            if orientation == Qt.Horizontal:
+    def headerData(self, section: int, orientation: Qt.Orientation, role: int = Qt.ItemDataRole.DisplayRole):
+        if role == Qt.ItemDataRole.DisplayRole:
+            if orientation == Qt.Orientation.Horizontal:
                 return self.mColumNames[section]
         return super(ReclassifyTableModel, self).headerData(section, orientation, role)
 
     def flags(self, index: QModelIndex):
         if not index.isValid():
-            return Qt.NoItemFlags
+            return Qt.ItemFlag.NoItemFlags
         col = index.column()
-        flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
+        flags = Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled
         if col == 1:
-            flags |= Qt.ItemIsEditable
+            flags |= Qt.ItemFlag.ItemIsEditable
         return flags
 
     def classDisplayName(self, c: ClassInfo) -> str:
@@ -321,23 +319,23 @@ class ReclassifyTableModel(QAbstractTableModel):
             # idx0 = self.mSrc.index(row, 0)
             c: ClassInfo = self.mSrc[row]
 
-            if role == Qt.DisplayRole:
+            if role == Qt.ItemDataRole.DisplayRole:
                 return self.classDisplayName(c)
-            elif role == Qt.ToolTipRole:
+            elif role == Qt.ItemDataRole.ToolTipRole:
                 return 'Source Class\n' + self.classToolTip(c)
-            elif role == Qt.DecorationRole:
+            elif role == Qt.ItemDataRole.DecorationRole:
                 return c.icon()
 
         if col == 1:
             srcClass: ClassInfo = self.mSrc[row]
             dstClass: ClassInfo = self.mMapping.get(srcClass, None)
             if isinstance(dstClass, ClassInfo):
-                if role == Qt.DisplayRole:
+                if role == Qt.ItemDataRole.DisplayRole:
                     return self.classDisplayName(dstClass)
-                elif role == Qt.ToolTipRole:
+                elif role == Qt.ItemDataRole.ToolTipRole:
                     return 'Destination Class\n' + self.classToolTip(dstClass)
 
-                elif role == Qt.DecorationRole:
+                elif role == Qt.ItemDataRole.DecorationRole:
                     return dstClass.icon()
 
         return None
@@ -352,7 +350,7 @@ class ReclassifyTableModel(QAbstractTableModel):
         srcClass = self.mSrc[row]
 
         b = False
-        if col == 1 and role == Qt.EditRole and isinstance(value, ClassInfo):
+        if col == 1 and role == Qt.ItemDataRole.EditRole and isinstance(value, ClassInfo):
             if value in self.mDst[:]:
                 self.mMapping[srcClass] = value
         if b:
@@ -422,7 +420,7 @@ class ReclassifyTableViewDelegate(QStyledItemDelegate):
 
         if index.isValid() and isinstance(tModel, ReclassifyTableModel):
             if index.column() == 1:
-                c = index.data(Qt.UserRole)
+                c = index.data(Qt.ItemDataRole.UserRole)
                 editor.setCurrentClassInfo(c)
 
     def setModelData(self, w, bridge, proxyIndex):
@@ -430,7 +428,7 @@ class ReclassifyTableViewDelegate(QStyledItemDelegate):
         tModel = self.reclassifyModel()
         if index.isValid() and isinstance(tModel, ReclassifyTableModel):
             if index.column() == 1 and isinstance(w, ClassificationSchemeComboBox):
-                tModel.setData(index, w.currentClassInfo(), Qt.EditRole)
+                tModel.setData(index, w.currentClassInfo(), Qt.ItemDataRole.EditRole)
 
 
 class ReclassifyDialog(QDialog):
@@ -441,7 +439,7 @@ class ReclassifyDialog(QDialog):
     dstClassificationSchemeWidget: ClassificationSchemeWidget
 
     def __init__(self, parent=None):
-        super(ReclassifyDialog, self).__init__(parent, Qt.Window)
+        super(ReclassifyDialog, self).__init__(parent, Qt.WindowType.Window)
         path = pathlib.Path(__file__).parent / 'reclassifydialog.ui'
         loadUi(path, self)
 
@@ -454,7 +452,7 @@ class ReclassifyDialog(QDialog):
         self.mTableViewDelegate.setItemDelegates(self.tableView)
 
         self.mapLayerComboBox.setAllowEmptyLayer(True)
-        self.mapLayerComboBox.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mapLayerComboBox.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         excluded = [p for p in QgsProviderRegistry.instance().providerList() if p not in ['gdal']]
         self.mapLayerComboBox.setExcludedProviders(excluded)
         self.mapLayerComboBox.setShowCrs(False)
@@ -573,7 +571,7 @@ class ReclassifyDialog(QDialog):
         isOk &= len(self.dstClassificationSchemeWidget.classificationScheme()) > 0
         isOk &= self.mModel.rowCount() > 0
 
-        btnAccept = self.buttonBox.button(QDialogButtonBox.Ok)
+        btnAccept = self.buttonBox.button(QDialogButtonBox.StandardButton.Ok)
         btnAccept.setEnabled(isOk)
 
     def reclassificationSettings(self) -> dict:

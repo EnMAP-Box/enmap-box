@@ -1,5 +1,4 @@
 from enmapbox.gui.applications import EnMAPBoxApplication
-from enmapbox.typeguard import typechecked
 from landcoverchangestatisticsapp.landcoverchangestatisticsmainwindow import LandCoverChangeStatisticsMainWindow
 
 from qgis.PyQt.QtGui import QIcon
@@ -10,7 +9,6 @@ def enmapboxApplicationFactory(enmapBox):
     return [LandCoverChangeStatisticsApp(enmapBox)]
 
 
-@typechecked
 class LandCoverChangeStatisticsApp(EnMAPBoxApplication):
     def __init__(self, enmapBox, parent=None):
         super().__init__(enmapBox, parent=parent)

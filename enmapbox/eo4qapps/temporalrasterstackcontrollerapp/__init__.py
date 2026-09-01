@@ -3,7 +3,6 @@ from typing import Optional
 
 from enmapbox.gui.applications import EnMAPBoxApplication
 from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp import GeeTimeseriesExplorerDockWidget
@@ -20,7 +19,6 @@ def enmapboxApplicationFactory(enmapBox: EnMAPBox):
     return [TemporalRasterStackControllerApp(enmapBox)]
 
 
-@typechecked
 class TemporalRasterStackControllerApp(EnMAPBoxApplication):
 
     def __init__(self, enmapBox: Optional[EnMAPBox], parent=None

@@ -5,14 +5,12 @@ from typing import Dict, Any, List, Tuple
 
 from sklearn.multioutput import MultiOutputRegressor
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback
 
 
-@typechecked
 class FitRegressorAlgorithmBase(EnMAPProcessingAlgorithm):
     P_DATASET, _DATASET = 'dataset', 'Training dataset'
     P_REGRESSOR, _REGRESSOR = 'regressor', 'Regressor'
@@ -79,7 +77,7 @@ class FitRegressorAlgorithmBase(EnMAPProcessingAlgorithm):
         return True, ''
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         dump = self.parameterAsRegressorDump(parameters, self.P_DATASET, context)
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_REGRESSOR, context)

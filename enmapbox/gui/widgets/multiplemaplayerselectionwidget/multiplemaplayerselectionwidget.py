@@ -1,13 +1,11 @@
 from typing import List, Optional
 
-from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtWidgets import QWidget, QLineEdit, QToolButton, QListWidget, QListWidgetItem, QDialog
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsMapLayer, QgsProject, QgsCoordinateReferenceSystem, QgsRasterLayer, QgsVectorLayer
 
 
-@typechecked
 class MultipleMapLayerSelectionWidget(QWidget):
     mInfo: QLineEdit
     mButton: QToolButton
@@ -70,7 +68,6 @@ class MultipleMapLayerSelectionWidget(QWidget):
         self.updateInfo()
 
 
-@typechecked
 class MultipleMapLayerSelectionDialog(QDialog):
     mList: QListWidget
     mSelectAll: QToolButton
@@ -86,9 +83,13 @@ class MultipleMapLayerSelectionDialog(QDialog):
         loadUi(__file__.replace('widget.py', 'dialog.ui'), self)
         self.accepted = False
 
-        # self.mLayers = list()
+        from enmapbox.gui.enmapboxgui import EnMAPBox
+        self.enmapBox = EnMAPBox.instance()
+
         layer: QgsMapLayer
-        for layer in QgsProject.instance().mapLayers().values():
+        # for layer in QgsProject.instance().mapLayers().values():
+        for layer in self.enmapBox.mapLayers():
+
             if isinstance(layer, QgsRasterLayer) and not allowRaster:
                 continue
             if isinstance(layer, QgsVectorLayer) and not allowVector:
@@ -97,11 +98,10 @@ class MultipleMapLayerSelectionDialog(QDialog):
             item = QListWidgetItem(f'{layer.name()} [{crs.authid()}]')
             item.layer = layer
             if selection is not None and layer in selection:
-                item.setCheckState(Qt.Checked)
+                item.setCheckState(Qt.CheckState.Checked)
             else:
-                item.setCheckState(Qt.Unchecked)
+                item.setCheckState(Qt.CheckState.Unchecked)
             self.mList.addItem(item)
-            # self.mLayers.append(layer)
 
         self.mOk.clicked.connect(self.onOkClicked)
         self.mCancel.clicked.connect(self.close)
@@ -113,7 +113,7 @@ class MultipleMapLayerSelectionDialog(QDialog):
         layers = list()
         for row in range(self.mList.count()):
             item = self.mList.item(row)
-            if item.checkState() == Qt.Checked:
+            if item.checkState() == Qt.CheckState.Checked:
                 layers.append(item.layer)
         return layers
 
@@ -124,20 +124,20 @@ class MultipleMapLayerSelectionDialog(QDialog):
     def onSelectAllClicked(self):
         for row in range(self.mList.count()):
             item = self.mList.item(row)
-            item.setCheckState(Qt.Checked)
+            item.setCheckState(Qt.CheckState.Checked)
 
     def onClearSelectionClicked(self):
         for row in range(self.mList.count()):
             item = self.mList.item(row)
-            item.setCheckState(Qt.Unchecked)
+            item.setCheckState(Qt.CheckState.Unchecked)
 
     def onToggleSelectionClicked(self):
         for row in range(self.mList.count()):
             item = self.mList.item(row)
-            if item.checkState() == Qt.Checked:
-                item.setCheckState(Qt.Unchecked)
+            if item.checkState() == Qt.CheckState.Checked:
+                item.setCheckState(Qt.CheckState.Unchecked)
             else:
-                item.setCheckState(Qt.Checked)
+                item.setCheckState(Qt.CheckState.Checked)
 
     @staticmethod
     def getLayers(

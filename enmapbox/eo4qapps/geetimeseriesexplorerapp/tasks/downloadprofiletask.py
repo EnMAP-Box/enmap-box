@@ -4,17 +4,15 @@ from typing import Optional, List
 
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsTask, QgsMessageLog, Qgis
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class DownloadProfileTask(QgsTask):
 
     def __init__(
             self, filename: Optional[str], eePoint, eeCollection, scale: float, offsets: List[float],
             scales: List[float], limit: Optional[int]
     ):
-        QgsTask.__init__(self, 'Download profile task', QgsTask.CanCancel)
+        QgsTask.__init__(self, 'Download profile task', QgsTask.Flag.CanCancel)
         self.filename = filename
         self.eePoint = eePoint
         self.eeCollection = eeCollection
@@ -77,11 +75,11 @@ class DownloadProfileTask(QgsTask):
         if self.filename is not None:
             if self.alreadyExists:
                 QgsMessageLog.logMessage(
-                    f'already exists: {self.filename}', tag="GEE Time Series Explorer", level=Qgis.Success
+                    f'already exists: {self.filename}', tag="GEE Time Series Explorer", level=Qgis.MessageLevel.Success
                 )
             else:
                 QgsMessageLog.logMessage(
-                    f'downloaded: {self.filename}', tag="GEE Time Series Explorer", level=Qgis.Success
+                    f'downloaded: {self.filename}', tag="GEE Time Series Explorer", level=Qgis.MessageLevel.Success
                 )
 
     def data(self) -> Optional[List]:

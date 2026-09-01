@@ -11,8 +11,7 @@ from enmapbox.gui.mapcanvas import MapCanvas
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.testing import EnMAPBoxTestCase
 from enmapbox.testing import start_app
-from qgis.PyQt import Qt
-from qgis.PyQt.QtCore import QObject, pyqtSignal
+from qgis.PyQt.QtCore import QObject, pyqtSignal, PYQT_VERSION_STR, QT_VERSION_STR
 from qgis.core import Qgis, QgsProject
 
 start_app()
@@ -31,10 +30,9 @@ class ExampleClass(QObject):
 class TestIssue243Examples(EnMAPBoxTestCase):
 
     def test_print_system_info(self):
-        Qgis.QGIS_DEV_VERSION
         print(f'QGIS: {Qgis.version()}')
-        print(f'Qt: {Qt.QT_VERSION_STR}')
-        print(f'PyQt: {Qt.PYQT_VERSION_STR}')
+        print(f'Qt: {QT_VERSION_STR}')
+        print(f'PyQt: {PYQT_VERSION_STR}')
         print(f'Python: {sys.version}')
         print(f'Platform: {platform.platform()}')
 

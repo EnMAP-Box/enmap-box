@@ -5,7 +5,6 @@ import numpy as np
 from osgeo import gdal
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QCheckBox, QMainWindow, QComboBox, QLineEdit, QRadioButton
@@ -14,7 +13,6 @@ from qgis.core import QgsMultiBandColorRenderer, QgsRasterLayer, QgsMapLayerProx
 from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsDoubleSpinBox, QgsMapLayerComboBox
 
 
-@typechecked
 class MultiSourceMultiBandColorRendererDialog(QMainWindow):
     mLayerRgbName: QLineEdit
     mLayerRgb: QgsMapLayerComboBox
@@ -53,8 +51,8 @@ class MultiSourceMultiBandColorRendererDialog(QMainWindow):
         self.enmapBox = EnMAPBox.instance()
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None
-        for mLayer in [self.mLayer1, self.mLayer2, self.mLayer3]:
-            mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        for mLayer in [self.mLayer1, self.mLayer2, self.mLayer3, self.mLayerRgb]:
+            mLayer.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
             mLayer.setExcludedProviders(['wms'])
             mLayer.setProject(self.enmapBox.project())
 

@@ -2,7 +2,6 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.creategridalgorithm import CreateGridAlgorithm
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.driver import Driver
@@ -18,7 +17,6 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLay
 from qgis.core.additions.edit import edit
 
 
-@typechecked
 class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_VECTOR, _VECTOR = 'vector', 'Vector layer'
@@ -111,7 +109,7 @@ class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
         # add image X, Y coordinates and find no data pixel
         rasterProvider = raster.dataProvider()
         vectorProvider: QgsVectorDataProvider = sample.dataProvider()
-        fields = [QgsField('PIXEL_X', QMetaType.LongLong), QgsField('PIXEL_Y', QMetaType.LongLong)]
+        fields = [QgsField('PIXEL_X', QMetaType.Type.LongLong), QgsField('PIXEL_Y', QMetaType.Type.LongLong)]
         vectorProvider.addAttributes(fields)
         sample.updateFields()
         noDataPixels = list()
@@ -123,7 +121,7 @@ class SampleRasterValuesAlgorithm(EnMAPProcessingAlgorithm):
                     continue
                 point = QgsPoint(feature.geometry().asPoint())
                 imagePoint: QgsPoint = rasterProvider.transformCoordinates(
-                    point, QgsRasterDataProvider.TransformLayerToImage
+                    point, QgsRasterDataProvider.TransformType.TransformLayerToImage
                 )
                 feature.setAttribute('PIXEL_X', imagePoint.x())
                 feature.setAttribute('PIXEL_Y', imagePoint.y())

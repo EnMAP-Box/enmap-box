@@ -1,11 +1,9 @@
 import json
 from typing import List, TextIO
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.typing import Number
 
 
-@typechecked
 class GeoJsonLibraryWriter(object):
     """A simple spectral library writer (GeoJSON format), that doesn't require QGIS API."""
 

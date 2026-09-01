@@ -1,6 +1,8 @@
 import traceback
 from contextlib import suppress
 
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapboxprocessing.rasterreader import RasterReader
 from qgis.PyQt import uic
 from qgis.PyQt.QtGui import QPalette
 from qgis.PyQt.QtWidgets import QApplication
@@ -11,12 +13,7 @@ from qgis.gui import (
     QgsMessageBar
 )
 
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.typeguard import typechecked
-from enmapboxprocessing.rasterreader import RasterReader
 
-
-@typechecked
 class SpectralIndexExplorerDockWidget(QgsDockWidget):
     mLayer: QgsMapLayerComboBox
     mFilterText: QgsFilterLineEdit
@@ -44,7 +41,7 @@ class SpectralIndexExplorerDockWidget(QgsDockWidget):
         self.interface = None
         self.interfaceType = None
 
-        self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mLayer.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         self.loadIndices()
         self.loadBands()
         self.loadConstants()
@@ -76,7 +73,7 @@ class SpectralIndexExplorerDockWidget(QgsDockWidget):
     def setRowDisabled(self, row: int, disable: bool):
 
         item = self.mTableIndices.verticalHeaderItem(row)
-        color = QApplication.palette().color(QPalette.Text)
+        color = QApplication.palette().color(QPalette.ColorRole.Text)
 
         if disable:
             italic = True

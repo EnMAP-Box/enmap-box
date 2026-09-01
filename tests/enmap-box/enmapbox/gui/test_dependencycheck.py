@@ -12,7 +12,7 @@ __author__ = 'benjamin.jakimow@geo.hu-berlin.de'
 __date__ = '2017-07-17'
 __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
-import os
+import subprocess  # nosec B404
 import sys
 import unittest
 import uuid
@@ -20,15 +20,15 @@ from pathlib import Path
 from time import sleep
 from typing import List, Tuple
 
-from enmapbox.dependencycheck import PIPPackage, requiredPackages, PIPPackageInstaller, PIPPackageInfoTask, \
-    missingPackageInfo, checkGDALIssues, PIPPackageInstallerTableModel, \
-    call_pip_command, localPipExecutable, installTestData
-from enmapbox.testing import EnMAPBoxTestCase, start_app
-from qgis.PyQt.QtCore import QProcess
 from qgis.PyQt.QtGui import QMovie
 from qgis.PyQt.QtWidgets import QApplication, QTableView, QLabel
 from qgis.core import Qgis, QgsTask
 from qgis.core import QgsApplication
+
+from enmapbox.dependencycheck import PIPPackage, requiredPackages, PIPPackageInstaller, PIPPackageInfoTask, \
+    missingPackageInfo, checkGDALIssues, PIPPackageInstallerTableModel, \
+    call_pip_command, localPipExecutable, installTestData
+from enmapbox.testing import EnMAPBoxTestCase, start_app
 
 start_app()
 
@@ -50,16 +50,18 @@ class test_dependencycheck(EnMAPBoxTestCase):
     def test_pip_call(self):
 
         pip_exe = localPipExecutable()
-        self.assertTrue(os.path.isfile(pip_exe))
+        self.assertTrue(pip_exe and Path(pip_exe).is_file())
+        result = subprocess.run(
+            [str(pip_exe), 'show', 'numpy'],
+            capture_output=True,
+            text=True
+        )  # nosec B603
 
-        process = QProcess()
-        process.start(f'{pip_exe} show numpy')
-        process.waitForFinished()
-        msgOut = process.readAllStandardOutput().data().decode('utf-8')
-        process.readAllStandardError().data().decode('utf-8')
-        success = process.exitCode() == 0
-        self.assertTrue(success)
-        self.assertTrue(msgOut.startswith('Name: numpy'))
+        self.assertTrue(result.returncode == 0)
+
+        # Access standard output (stdout)
+        stdout_output = result.stdout
+        self.assertTrue(stdout_output.startswith('Name: numpy'))
 
     def test_required_packages(self):
 

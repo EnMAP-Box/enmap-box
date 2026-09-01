@@ -10,10 +10,8 @@ from enmapboxprocessing.typing import SampleX, SampleY, checkSampleShape, Regres
     Target
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class PrepareRegressionDatasetFromContinuousRasterAlgorithm(EnMAPProcessingAlgorithm):
     P_CONTINUOUS_RASTER, _CONTINUOUS_RASTER = 'continuousRaster', 'Continuous-valued raster layer'
     P_FEATURE_RASTER, _FEATURE_RASTER = 'featureRaster', 'Raster layer with features'

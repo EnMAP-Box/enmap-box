@@ -4,7 +4,6 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
@@ -15,7 +14,6 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLay
                        QgsProcessingException, QgsMapLayer)
 
 
-@typechecked
 class PredictClusteringAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer with features'
     P_CLUSTERER, _CLUSTERER = 'clusterer', 'Clusterer'
@@ -58,7 +56,7 @@ class PredictClusteringAlgorithm(EnMAPProcessingAlgorithm):
         return True, ''
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         dump = self.parameterAsClustererDump(parameters, self.P_CLUSTERER, context)

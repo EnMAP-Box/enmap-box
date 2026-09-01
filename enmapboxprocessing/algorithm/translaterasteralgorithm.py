@@ -4,7 +4,6 @@ from typing import Dict, Any, List, Tuple
 import numpy as np
 from osgeo import gdal
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.writeenviheaderalgorithm import WriteEnviHeaderAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
@@ -14,7 +13,6 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRectangle
                        QgsRasterDataProvider, QgsPoint, QgsPointXY, QgsMapLayer)
 
 
-@typechecked
 class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_BAND_LIST, _BAND_LIST = 'bandList', 'Selected bands'
@@ -115,9 +113,11 @@ class TranslateRasterAlgorithm(EnMAPProcessingAlgorithm):
             xmax = xmin + raster.width() - 1
         if isnan(ymax):
             ymax = ymin + raster.height() - 1
-        p1: QgsPoint = provider.transformCoordinates(QgsPoint(xmin, ymin), QgsRasterDataProvider.TransformImageToLayer)
+        p1: QgsPoint = provider.transformCoordinates(
+            QgsPoint(xmin, ymin), QgsRasterDataProvider.TransformType.TransformImageToLayer
+        )
         p2: QgsPoint = provider.transformCoordinates(
-            QgsPoint(xmax + 1, ymax + 1), QgsRasterDataProvider.TransformImageToLayer
+            QgsPoint(xmax + 1, ymax + 1), QgsRasterDataProvider.TransformType.TransformImageToLayer
         )
         return QgsRectangle(QgsPointXY(p1), QgsPointXY(p2))
 

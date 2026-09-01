@@ -10,10 +10,8 @@ from enmapboxprocessing.numpyutils import NumpyUtils
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class AggregateRasterBandsAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_FUNCTION, _FUNCTION = 'function', 'Aggregation functions'

@@ -5,7 +5,6 @@ import numpy as np
 from qgis.core import QgsCoordinateReferenceSystem, QgsRectangle
 
 import enmapbox.testing
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.typing import Array2d, Array3d, Number
@@ -13,7 +12,6 @@ from enmapboxprocessing.typing import Array2d, Array3d, Number
 enmapbox.testing.start_app()
 
 
-@typechecked
 class TestCase(enmapbox.testing.TestCase):
 
     def assertArrayEqual(self, array1: Union[Number, Array2d, Array3d], array2: Union[Array2d, Array3d]):
@@ -28,7 +26,7 @@ class TestCase(enmapbox.testing.TestCase):
         return join(self.createTestOutputFolder(), basename)
 
     def rasterFromArray(
-            self, array, basename: str = None, extent: QgsRectangle = None, crs: QgsCoordinateReferenceSystem = None
+        self, array, basename: str = None, extent: QgsRectangle = None, crs: QgsCoordinateReferenceSystem = None
     ) -> RasterWriter:
         if basename is None:
             basename = f'temp/{np.random.randint(0, 999999999)}.tif'
@@ -38,14 +36,20 @@ class TestCase(enmapbox.testing.TestCase):
         return writer
 
     def rasterFromRange(
-            self, shape, basename: str = None, extent: QgsRectangle = None, crs: QgsCoordinateReferenceSystem = None
+        self, shape, basename: str = None, extent: QgsRectangle = None, crs: QgsCoordinateReferenceSystem = None
     ) -> RasterWriter:
         array = np.reshape(range(np.prod(shape)), shape)
         return self.rasterFromArray(array, basename, extent, crs)
 
     def rasterFromValue(
-            self, shape, value, basename: str = None, extent: QgsRectangle = None,
-            crs: QgsCoordinateReferenceSystem = None
+        self, shape, value, basename: str = None, extent: QgsRectangle = None,
+        crs: QgsCoordinateReferenceSystem = None
     ) -> RasterWriter:
         array = np.full(shape, value)
         return self.rasterFromArray(array, basename, extent, crs)
+
+    def dispose_widget(self, widget):
+        return  # check if the code below is necessary anymore
+        widget.close()
+        widget.deleteLater()
+        # QCoreApplication.sendPostedEvents(None, QEvent.DeferredDelete)

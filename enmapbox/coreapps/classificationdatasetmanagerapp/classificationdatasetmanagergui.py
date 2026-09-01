@@ -2,7 +2,6 @@ from os.path import basename, join
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.randomsamplesfromclassificationdatasetalgorithm import \
     RandomSamplesFromClassificationDatasetAlgorithm
 from enmapboxprocessing.parameter.processingparameterskopsfileclassificationdatasetwidget import \
@@ -17,7 +16,6 @@ from qgis.PyQt.uic import loadUi
 from qgis.gui import QgsColorButton, QgsDoubleSpinBox, QgsSpinBox
 
 
-@typechecked
 class ClassificationDatasetManagerGui(QDialog):
     mDataset: ProcessingParameterSkopsFileClassificationDatasetWidget
     mCategoryTable: QTableWidget
@@ -92,7 +90,7 @@ class ClassificationDatasetManagerGui(QDialog):
             button = QMessageBox.question(
                 self, 'Save Edits', f'Do you want to save the changes to file {basename(filename)}?'
             )
-            if button == QMessageBox.No:
+            if button == QMessageBox.StandardButton.No:
                 return
 
         categories, features, sizes, sampleSizes = self.currentEdits()
@@ -176,7 +174,7 @@ class ClassificationDatasetManagerGui(QDialog):
             alg.P_OUTPUT_DATASET: tmpfile.replace('.skops', '.sample.skops'),
             alg.P_OUTPUT_COMPLEMENT: tmpfile.replace('.skops', '.complement.skops'),
         }
-        dialog = self.enmapBox.showProcessingAlgorithmDialog(alg, parameters, True, True, None, False, self)
+        dialog = self.enmapBox.showProcessingAlgorithmDialog(alg, parameters, True, True, None, False)
         if len(dialog.results()) == 0:
             return
         filename = dialog.results()[alg.P_OUTPUT_DATASET]

@@ -148,7 +148,7 @@ class ui_map:
 
     # add soil
     def add_soil(self, name, prod, prod_name):
-        self.gui.widget_row(alignment=Qt.AlignLeft)
+        self.gui.widget_row(alignment=Qt.AlignmentFlag.AlignLeft)
         self.gui.widget_push_button('Info', action=self.make_display_info(prod.__info__))
         self.gui.widget_check_button(prod.__gui__, ID=name)
         self.gui.widget_row_close()
@@ -253,10 +253,10 @@ class ui_map:
             self,
             self.app_name,
             "Do you want to reset the mask field?",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
         )
-        if do_it == QMessageBox.No:
+        if do_it == QMessageBox.StandardButton.No:
             return
         self.map_mask = None
         self.gui.gui['map_txt_mask_pathname'].setText("")

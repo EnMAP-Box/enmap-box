@@ -5,12 +5,14 @@ from os.path import splitext, basename, exists, join, dirname
 from time import time
 from typing import Dict, Union
 
+from qgis.core import QgsMessageLog, Qgis
+from qgis.gui import QgsAbstractProcessingParameterWidgetWrapper, QgsProcessingParameterWidgetFactoryInterface, QgsGui
+
 from enmapboxprocessing.algorithm.rastermathalgorithm.snippetinsertdialog import SnippetInsertDialog
 from enmapboxprocessing.algorithm.rastermathalgorithm.snippetsaveasdialog import SnippetSaveAsDialog
 from enmapboxprocessing.parameter.processingparametercodeeditwidget import CodeEditWidget
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
-from processing.gui.wrappers import WidgetWrapper
 from qgis.PyQt.QtCore import QUrl
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDesktopServices
@@ -46,7 +48,7 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
         # connect signals
         self.mSourcesTree.clicked.connect(self.onSourceClicked)
         self.mSourcesTree.doubleClicked.connect(self.onSourceDoubleClicked)
-        self.mSourcesTree.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.mSourcesTree.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.mSourcesTree.customContextMenuRequested.connect(self.onContextMenuRequested)
         self.mSnippetsTree.doubleClicked.connect(self.onSnippetDoubleClicked)
 
@@ -467,37 +469,22 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
         return text
 
 
-class ProcessingParameterRasterMathCodeEditWidgetWrapper(WidgetWrapper):
-    # adopted from C:\source\QGIS3-master\python\plugins\processing\algs\gdal\ui\RasterOptionsWidget.py
-
-    widget: ProcessingParameterRasterMathCodeEdit
+class ProcessingParameterRasterMathCodeEditWidgetWrapper(QgsAbstractProcessingParameterWidgetWrapper):
 
     def createWidget(self):
-        # if self.dialogType == DIALOG_MODELER:
-        #    raise NotImplementedError()
-        # elif self.dialogType == DIALOG_BATCH:
-        #    raise NotImplementedError()
-        # else:
         return ProcessingParameterRasterMathCodeEdit()
 
-    def setWidgetContext(self, context):
-        self.widget.setProject(context.project())
+    def setWidgetValue(self, value, context):
+        widget = self.wrappedWidget()
+        widget.mCode.setText(value)
 
-    def setValue(self, value):
-        # if self.dialogType == DIALOG_MODELER:
-        #    raise NotImplementedError()
-        # elif self.dialogType == DIALOG_BATCH:
-        #    raise NotImplementedError()
-        # else:
-        self.widget.mCode.setText(value)
+    def widgetValue(self):
+        widget = self.wrappedWidget()
+        return widget.value()
 
-    def value(self):
-        # if self.dialogType == DIALOG_MODELER:
-        #    raise NotImplementedError()
-        # elif self.dialogType == DIALOG_BATCH:
-        #    raise NotImplementedError()
-        # else:
-        return self.widget.value()
+    # def setWidgetContext(self, context):
+        # widget = self.wrappedWidget()
+        # widget.setProject(context.project())
 
 
 class LayerItem(QTreeWidgetItem):
@@ -533,3 +520,21 @@ class FolderItem(QTreeWidgetItem):
 
 class DerivedRasterBandItem(RasterBandItem):
     pass
+
+
+class ProcessingParameterRasterMathCodeEditWidgetFactory(QgsProcessingParameterWidgetFactoryInterface):
+    WIDGET_TYPE = 'enmapbox:ProcessingParameterRasterMathCodeEditWidget'
+
+    def parameterType(self):
+        return self.WIDGET_TYPE
+
+    def createWidgetWrapper(self, parameter, widget_type):
+        return ProcessingParameterRasterMathCodeEditWidgetWrapper(parameter, widget_type)
+
+    @classmethod
+    def register(cls):
+        success = QgsGui.processingGuiRegistry().addParameterWidgetFactory(cls())
+        if success:
+            QgsMessageLog.logMessage(f'{cls.WIDGET_TYPE} registered', level=Qgis.MessageLevel.Info)
+        else:
+            QgsMessageLog.logMessage(f'{cls.WIDGET_TYPE} could not be registered', level=Qgis.MessageLevel.Critical)

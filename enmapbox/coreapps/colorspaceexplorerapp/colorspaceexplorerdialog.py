@@ -2,7 +2,6 @@ from contextlib import suppress
 from random import randint
 from typing import Optional
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QCheckBox, QMainWindow, QSpinBox, QGridLayout
@@ -12,7 +11,6 @@ from qgis.core import QgsRasterLayer, QgsMultiBandColorRenderer, QgsContrastEnha
 from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsMapLayerComboBox
 
 
-@typechecked
 class ColorSpaceExplorerDialog(QMainWindow):
     mLayer: QgsMapLayerComboBox
     mRedBand: QgsRasterBandComboBox
@@ -47,7 +45,7 @@ class ColorSpaceExplorerDialog(QMainWindow):
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None
         self.mLayer.setProject(self.enmapBox.project())
-        self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mLayer.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
 
         self.mLayer.layerChanged.connect(self.onLayerChanged)
 
@@ -218,8 +216,8 @@ class ColorSpaceExplorerDialog(QMainWindow):
         if hasattr(layer, 'setCacheImage'):
             layer.setCacheImage(None)
 
-        algorithm = QgsContrastEnhancement.StretchToMinimumMaximum
-        limits = QgsRasterMinMaxOrigin.CumulativeCut
+        algorithm = QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum
+        limits = QgsRasterMinMaxOrigin.Limits.CumulativeCut
         layer.setContrastEnhancement(algorithm, limits)  # rest is defined by the layer style
 
     def onLiveUpdate(self):

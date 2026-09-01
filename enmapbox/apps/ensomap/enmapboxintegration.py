@@ -25,9 +25,9 @@ import sys
 
 from enmapbox.gui.applications import EnMAPBoxApplication
 from ensomap import APP_DIR
-from qgis.PyQt import Qt
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QWidget, QFrame, QDesktopWidget
+from qgis.PyQt.QtWidgets import QWidget, QFrame
 
 sys.path.insert(0, APP_DIR)
 
@@ -87,13 +87,16 @@ class EnSoMAP(EnMAPBoxApplication):
                 # =========================================================================================
                 # CREATE THE LINE WITH BUTTON
                 self.gui.widget_add_spacing(10)
-                self.gui.widget_row_framed(alignment=Qt.AlignLeft, style=QFrame.StyledPanel | QFrame.Raised)
+                self.gui.widget_row_framed(
+                    alignment=Qt.AlignmentFlag.AlignLeft,
+                    style=QFrame.Shape.StyledPanel | QFrame.Shadow.Raised
+                )
                 self.gui.widget_push_button('Close', action=self.quit)
                 self.gui.widget_row_framed_close()
 
             def center(self):
                 qr = self.frameGeometry()
-                cp = QDesktopWidget().availableGeometry().center()
+                cp = self.screen().availableGeometry().center()
                 qr.moveCenter(cp)
                 self.move(qr.topLeft())
 

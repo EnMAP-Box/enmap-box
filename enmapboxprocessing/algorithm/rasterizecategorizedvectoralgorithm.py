@@ -3,7 +3,6 @@ from typing import Dict, Any, List, Tuple
 from osgeo import gdal
 
 import qgis.processing
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.creategridalgorithm import CreateGridAlgorithm
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import RasterMathAlgorithm
@@ -20,7 +19,6 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLay
 from qgis.core import edit
 
 
-@typechecked
 class RasterizeCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
     P_CATEGORIZED_VECTOR, _CATEGORIZED_VECTOR = 'categorizedVector', 'Categorized vector layer'
     P_GRID, _GRID = 'grid', 'Grid'
@@ -204,7 +202,7 @@ class RasterizeCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
         classFieldName = vector.renderer().classAttribute()
         fieldIndex = vector.fields().indexOf(classFieldName)
         options = QgsVectorFileWriter.SaveVectorOptions()
-        options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteFile
+        options.actionOnExistingFile = QgsVectorFileWriter.ActionOnExistingFile.CreateOrOverwriteFile
         options.attributes = [fieldIndex]
         if vector.crs() != crs:
             options.ct = QgsCoordinateTransform(vector.crs(), crs, QgsProject().instance())
@@ -215,7 +213,7 @@ class RasterizeCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
             vector, filename, transformContext, options
         )
 
-        if error != QgsVectorFileWriter.NoError:
+        if error != QgsVectorFileWriter.WriterError.NoError:
             raise RuntimeError(f'failed to write vector file: {error}: {message}')
 
         # calculate class ids [1..nCategories]
@@ -229,7 +227,7 @@ class RasterizeCategorizedVectorAlgorithm(EnMAPProcessingAlgorithm):
 
         n = vector2.featureCount()
         with edit(vector2):
-            vector2.addAttribute(QgsField(fieldName, QMetaType.Int))
+            vector2.addAttribute(QgsField(fieldName, QMetaType.Type.Int))
             vector2.updateFields()
             for i, feature in enumerate(vector2.getFeatures(), 1):
                 feedback.setProgress(i / n * 100)

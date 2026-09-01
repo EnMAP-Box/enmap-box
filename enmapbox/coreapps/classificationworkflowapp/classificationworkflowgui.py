@@ -6,9 +6,19 @@ from tempfile import gettempdir
 from typing import Tuple, Dict, Optional
 
 import numpy as np
+#  from processing.gui.AlgorithmDialog import AlgorithmDialog
+from qgis.PyQt.QtCore import QUrl
+from qgis.PyQt.QtGui import QFont, QColor, QTextCursor
+#  from qgis.PyQt.QtWebKitWidgets import QWebView
+from qgis.PyQt.QtWidgets import (
+    QMainWindow, QToolButton, QProgressBar, QComboBox, QPlainTextEdit, QCheckBox, QDialog, QHBoxLayout, QPushButton,
+    QTableWidget, QTableWidgetItem, QLabel, QRadioButton, QTextEdit, QWidget
+)
+from qgis.PyQt.uic import loadUi
+from qgis.core import QgsMapLayerProxyModel, Qgis, QgsProcessingFeedback, QgsRasterLayer, QgsProcessing
+from qgis.gui import QgsFileWidget, QgsMapLayerComboBox, QgsSpinBox, QgsMessageBar, QgsColorButton, QgsDoubleSpinBox
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.algorithms import algorithms
 from enmapboxprocessing.algorithm.classificationperformancesimplealgorithm import \
     ClassificationPerformanceSimpleAlgorithm
@@ -47,17 +57,6 @@ from enmapboxprocessing.parameter.processingparameterskopsfileclassificationdata
 from enmapboxprocessing.parameter.processingparameterskopsfilewidget import ProcessingParameterSkopsFileWidget
 from enmapboxprocessing.typing import ClassifierDump, Category
 from enmapboxprocessing.utils import Utils
-from processing.gui.AlgorithmDialog import AlgorithmDialog
-from qgis.PyQt.QtCore import QUrl
-from qgis.PyQt.QtGui import QFont, QColor, QTextCursor
-from qgis.PyQt.QtWebKitWidgets import QWebView
-from qgis.PyQt.QtWidgets import (
-    QMainWindow, QToolButton, QProgressBar, QComboBox, QPlainTextEdit, QCheckBox, QDialog, QHBoxLayout, QPushButton,
-    QTableWidget, QTableWidgetItem, QLabel, QRadioButton, QTextEdit, QWidget
-)
-from qgis.PyQt.uic import loadUi
-from qgis.core import QgsMapLayerProxyModel, Qgis, QgsProcessingFeedback, QgsRasterLayer, QgsProcessing
-from qgis.gui import QgsFileWidget, QgsMapLayerComboBox, QgsSpinBox, QgsMessageBar, QgsColorButton, QgsDoubleSpinBox
 
 
 class MissingParameterError(Exception):
@@ -108,7 +107,7 @@ def errorHandled(func=None, *, successMessage: str = None):
             button.setText('Traceback')
             button.pressed.connect(showError)
             widget.layout().addWidget(button)
-            gui.mMessageBar.pushWidget(widget, Qgis.Critical)
+            gui.mMessageBar.pushWidget(widget, Qgis.MessageLevel.Critical)
             return
 
         if successMessage is not None:
@@ -119,7 +118,6 @@ def errorHandled(func=None, *, successMessage: str = None):
     return wrapper
 
 
-@typechecked
 class ClassificationWorkflowGui(QMainWindow):
     mProgress: QProgressBar
     mCancel: QToolButton
@@ -238,7 +236,7 @@ class ClassificationWorkflowGui(QMainWindow):
     mDialogAutoOpen: QCheckBox
 
     # help
-    mWebView: QWebView
+    # mWebView: QWebView
     mWebHome: QToolButton
     mWebBack: QToolButton
     mWebForward: QToolButton
@@ -382,9 +380,9 @@ class ClassificationWorkflowGui(QMainWindow):
             getattr(self, objectName).setFilePath(name)
 
     def initLayers(self):
-        self.mPredictFeatures.setFilters(QgsMapLayerProxyModel.RasterLayer)
-        self.mQuickFeatures.setFilters(QgsMapLayerProxyModel.RasterLayer)
-        self.mPredictedClassification.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mPredictFeatures.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
+        self.mQuickFeatures.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
+        self.mPredictedClassification.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
 
     def initClassifier(self):
         self.classifierNames = list()
@@ -409,6 +407,8 @@ class ClassificationWorkflowGui(QMainWindow):
         self.mComboClassifier.setCurrentIndex(index)
 
     def _createAlgorithmDialogWrapper(self):
+        AlgorithmDialog = None
+
         class AlgorithmDialogWrapper(AlgorithmDialog):
             def __init__(self_, *args, **kwargs):
                 AlgorithmDialog.__init__(self_, *args, **kwargs)
@@ -423,7 +423,7 @@ class ClassificationWorkflowGui(QMainWindow):
                     if self.mDialogAutoClose.isChecked():
                         self_.close()
                         feedback: QgsProcessingFeedback = self_.feedback
-                        self.mLog.moveCursor(QTextCursor.End)
+                        self.mLog.moveCursor(QTextCursor.MoveOperation.End)
                         self.mLog.insertPlainText(feedback.textLog() + '\n##########\n\n')
                         self.mLog.verticalScrollBar().setValue(self.mLog.verticalScrollBar().maximum())
 
@@ -434,7 +434,7 @@ class ClassificationWorkflowGui(QMainWindow):
             autoRun = self.mDialogAutoRun.isChecked()
         wrapper = self._createAlgorithmDialogWrapper()
         dialog = self.enmapBox.showProcessingAlgorithmDialog(
-            alg, parameters=parameters, show=True, modal=True, parent=self, wrapper=wrapper, autoRun=autoRun
+            alg, parameters=parameters, show=True, modal=True, wrapper=wrapper, autoRun=autoRun
         )
 
         if dialog.finishedSuccessful:
