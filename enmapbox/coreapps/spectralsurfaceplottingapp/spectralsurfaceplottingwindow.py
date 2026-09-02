@@ -106,6 +106,7 @@ class SpectralSurfacePlottingWindow(QMainWindow):
                 x.append(feature[fieldX])
                 y.append(feature[fieldY])
                 z.append(feature[fieldZ])
+                c.append(float(feature[fieldZ]))
 
         elif self.mDataFormat.currentIndex() == self.LibraryFormat:
             reader = LibraryReader(layer)
