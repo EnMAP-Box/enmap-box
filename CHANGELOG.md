@@ -6,6 +6,8 @@
   ([#1562](https://github.com/EnMAP-Box/enmap-box/issues/1562))
 * fixes import of Spectral Evolution *.sed files ([qps #227](https://github.com/EnMAP-Box/qgispluginsupport/issues/227))
 * improved reading of time stamps in SED and SVC files
+* Spectral Processing dialog can read virtual layers. This allows, for example, using the `Create Spectral Indices`
+  algorithm on spectral libraries.
 
 ## Version 3.17.8 (2026-08-03)
 
