@@ -4,7 +4,7 @@ from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from enmapboxtestdata import surfaceLongFormat, surfaceLibrary
-from spectralsurfaceplottingapp import SpectralSurfacePlottingWindow
+from spectralsurfaceplottingapp.spectralsurfaceplottingwindow import SpectralSurfacePlottingWindow
 
 qgsApp = start_app()
 initAll()
