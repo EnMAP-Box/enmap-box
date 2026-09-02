@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Version 3.17.9 (2026-08-25)
+## Version 3.17.9 (2026-09-02)
 
 * fixes drag and drop of raster layers onto an empty EnMAP-Box
   ([#1562](https://github.com/EnMAP-Box/enmap-box/issues/1562))
