@@ -1,9 +1,13 @@
+from math import inf
+
 import numpy as np
 import pyvista as pv
 from pyvistaqt import QtInteractor
 from qgis.PyQt.QtWidgets import QSizePolicy, QSlider, QToolButton, QMainWindow, QComboBox, QCheckBox, QVBoxLayout, \
     QWidget
 from qgis.PyQt.uic import loadUi
+from qgis._core import QgsMapLayer
+from qgis._gui import QgsFilterLineEdit
 from qgis.core import QgsColorRamp, QgsStyle, QgsMapLayerProxyModel, QgsRasterLayer
 from qgis.gui import QgsColorRampButton, QgsMessageBar, QgsMapLayerComboBox, QgsFieldComboBox
 
@@ -15,7 +19,15 @@ class SpectralSurfacePlottingWindow(QMainWindow):
     mPlot: QWidget
 
     mDataFormat: QComboBox
-    mLayer: QgsMapLayerComboBox
+    mTable: QgsMapLayerComboBox
+    mLibrary: QgsMapLayerComboBox
+    mCollection: QgsMapLayerComboBox
+    mXMin: QgsFilterLineEdit
+    mXMax: QgsFilterLineEdit
+    mYMin: QgsFilterLineEdit
+    mYMax: QgsFilterLineEdit
+    mZMin: QgsFilterLineEdit
+    mZMax: QgsFilterLineEdit
 
     mShowSurface: QCheckBox
     mShowPoints: QCheckBox
@@ -38,7 +50,7 @@ class SpectralSurfacePlottingWindow(QMainWindow):
     mScaleZ: QSlider
     mAutoScale: QToolButton
 
-    LongFormat, LibraryFormat = 0, 1
+    LongFormat, LibraryFormat, CollectionFormat = 0, 1, 2
 
     def __init__(self, *args, **kwds):
         QMainWindow.__init__(self, *args, **kwds)
@@ -66,8 +78,9 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         from enmapbox.gui.enmapboxgui import EnMAPBox
         self.enmapBox = EnMAPBox.instance()
 
-        self.mLayer.setProject(self.enmapBox.project())
-        self.mLayer.setFilters(QgsMapLayerProxyModel.Filter.VectorLayer)
+        for w in [self.mTable, self.mLibrary, self.mCollection]:
+            w.setProject(self.enmapBox.project())
+            w.setFilters(QgsMapLayerProxyModel.Filter.VectorLayer)
 
         self.mShowSurface.checkStateChanged.connect(self.onShowSurfaceChanged)
         self.mShowPoints.checkStateChanged.connect(self.onShowPointsChanged)
@@ -92,23 +105,49 @@ class SpectralSurfacePlottingWindow(QMainWindow):
 
     def readData(self):
 
-        layer: QgsRasterLayer = self.mLayer.currentLayer()
+        # get value ranges
+        def parseFloat(w: QgsFilterLineEdit, default):
+            text = w.text().strip()
+            try:
+                return float(text)
+            except (ValueError, TypeError):
+                w.setValue('')  # clear wrong inputs
+                return default
+
+        xmin = parseFloat(self.mXMin, -inf)
+        ymin = parseFloat(self.mYMin, -inf)
+        zmin = parseFloat(self.mZMin, -inf)
+        xmax = parseFloat(self.mXMax, inf)
+        ymax = parseFloat(self.mYMax, inf)
+        zmax = parseFloat(self.mZMax, inf)
+
+        # read and filter data
         x = list()
         y = list()
         z = list()
         c = list()
 
         if self.mDataFormat.currentIndex() == self.LongFormat:
+            layer = self.mTable.currentLayer()
             fieldX = self.mFieldLfX.currentField()
             fieldY = self.mFieldLfY.currentField()
             fieldZ = self.mFieldLfZ.currentField()
             for feature in layer.getFeatures():
-                x.append(feature[fieldX])
-                y.append(feature[fieldY])
-                z.append(feature[fieldZ])
-                c.append(float(feature[fieldZ]))
+                xi = feature[fieldX]
+                yi = feature[fieldY]
+                zi = feature[fieldZ]
+                ci = float(feature[fieldZ])
+                valid = xi >= xmin and xi <= xmax
+                valid &= yi >= ymin and yi <= ymax
+                valid &= zi >= zmin and zi <= zmax
+                if valid:
+                    x.append(xi)
+                    y.append(yi)
+                    z.append(zi)
+                    c.append(ci)
 
         elif self.mDataFormat.currentIndex() == self.LibraryFormat:
+            layer = self.mLibrary.currentLayer()
             reader = LibraryReader(layer)
             fieldProfile = self.mFieldLibraryProfiles.currentField()
             fieldY = self.mFieldLibraryY.currentField()
@@ -123,19 +162,25 @@ class SpectralSurfacePlottingWindow(QMainWindow):
                         if not np.isfinite([xi, yi, zi]).all():
                             continue
                         ci = values.get(fieldC, zi)  # default color is zi
-                        x.append(xi)
-                        y.append(yi)
-                        z.append(zi)
-                        c.append(ci)
+                        valid = xi >= xmin and xi <= xmax
+                        valid &= yi >= ymin and yi <= ymax
+                        valid &= zi >= zmin and zi <= zmax
+                        if valid:
+                            x.append(xi)
+                            y.append(yi)
+                            z.append(zi)
+                            c.append(ci)
             except Exception:
                 self.mMessageBar.pushWarning('Load data', 'select a spectral profile attribute')
-
+        elif self.mDataFormat.currentIndex() == self.CollectionFormat:
+            raise NotImplementedError()
         else:
             raise ValueError()
 
         return x, y, z, c
 
     def setData(self, x, y, z, c):
+        x, y = y, x  # swap data for plotting
         self.x = np.array(x, dtype=float)
         self.y = np.array(y, dtype=float)
         self.z = np.array(z, dtype=float)
@@ -311,9 +356,13 @@ class SpectralSurfacePlottingWindow(QMainWindow):
 
     def onLoadData(self):
 
-        layer: QgsRasterLayer = self.mLayer.currentLayer()
-        if layer is None:
+        if self.mDataFormat.currentIndex() == self.LongFormat and self.mTable.currentLayer() is None:
             return
+        if self.mDataFormat.currentIndex() == self.LibraryFormat and self.mLibrary.currentLayer() is None:
+            return
+        if self.mDataFormat.currentIndex() == self.LibraryFormat and self.mLibrary.currentLayer() is None:
+            return
+
         x, y, z, c = self.readData()
         self.setData(y, x, z, c)
         self.plotData()
