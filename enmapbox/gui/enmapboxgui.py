@@ -93,7 +93,7 @@ from .splashscreen.splashscreen import EnMAPBoxSplashScreen
 from .utils import enmapboxUiPath, high_contrast_random_color
 from .widgets.createspeclibdialog import CreateSpectralLibraryDialog
 from ..enmapboxsettings import EnMAPBoxSettings
-from ..qgispluginsupport.qps.processing.algorithmdialog import executeAlgorithm, AlgorithmDialog
+from ..qgispluginsupport.qps.processing.algorithmwidget import executeAlgorithm, AlgorithmWidget
 from ..qgispluginsupport.qps.speclib.core import profile_fields
 from ..qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
 from ..qgispluginsupport.qps.speclib.core.spectralprofile import ProfileEncoding
@@ -2625,7 +2625,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         wrapper: type = None,
         autoRun: bool = False,
         parent: QWidget = None
-    ) -> AlgorithmDialog:
+    ) -> AlgorithmWidget:
         """
         Create an algorithm dialog that uses the EnMAP-Box to set the context in which
         processing algorithms are executed.
@@ -2635,7 +2635,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         .. code-block:: python
 
-            class Wrapper(AlgorithmDialog):
+            class Wrapper(AlgorithmWidget):
                 def finish(self, successful, result, context, feedback, in_place=False):
                     super().finish(successful, result, context, feedback, in_place=False)
                     if successful:
@@ -2680,7 +2680,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         if not dlg:
             context = self.processingContext()
             if wrapper is None:
-                dlg = AlgorithmDialog(algorithm.create(), parent=parent, context=context, iface=self)
+                dlg = AlgorithmWidget(algorithm.create(), parent=parent, context=context, iface=self)
             else:
                 dlg = wrapper(algorithm.create(), parent=parent, context=context, iface=self)
         else:
