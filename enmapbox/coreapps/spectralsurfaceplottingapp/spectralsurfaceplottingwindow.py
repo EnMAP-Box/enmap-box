@@ -6,10 +6,8 @@ from pyvistaqt import QtInteractor
 from qgis.PyQt.QtWidgets import QSizePolicy, QSlider, QToolButton, QMainWindow, QComboBox, QCheckBox, QVBoxLayout, \
     QWidget
 from qgis.PyQt.uic import loadUi
-from qgis._core import QgsMapLayer
-from qgis._gui import QgsFilterLineEdit
-from qgis.core import QgsColorRamp, QgsStyle, QgsMapLayerProxyModel, QgsRasterLayer
-from qgis.gui import QgsColorRampButton, QgsMessageBar, QgsMapLayerComboBox, QgsFieldComboBox
+from qgis.core import QgsColorRamp, QgsStyle, QgsMapLayerProxyModel
+from qgis.gui import QgsColorRampButton, QgsMessageBar, QgsMapLayerComboBox, QgsFieldComboBox, QgsFilterLineEdit
 
 from enmapboxprocessing.libraryreader import LibraryReader
 
