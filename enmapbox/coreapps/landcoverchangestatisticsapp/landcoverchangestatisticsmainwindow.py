@@ -3,7 +3,6 @@ from contextlib import suppress
 from typing import Optional, List
 
 import numpy as np
-import plotly.graph_objects as go
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWebEngineWidgets import QWebEngineView
@@ -443,6 +442,7 @@ class LandCoverChangeSankeyPlotBuilder():
             pad = 15
         else:
             pad = 0
+        import plotly.graph_objects as go
         fig = go.Figure(
             data=[
                 go.Sankey(

@@ -3,13 +3,13 @@ name: 🧪 EnMAP-Box Tests
 on:
   push:
     branches:
-      - main
+      - main**
       - release-**
       - release_**
 
   pull_request:
     branches:
-      - main
+      - main**
       - release-**
       - release_**
 

@@ -17,3 +17,4 @@ enpt-enmapboxapp # required by EnPT
 scikit-learn>=1.0
 pyvista # required by Spectral Surface Plotting
 pyvistaqt # required by Spectral Surface Plotting
+plotly # required by Land Cover Change Statistics

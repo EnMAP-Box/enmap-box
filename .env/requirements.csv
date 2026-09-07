@@ -1,6 +1,7 @@
 pip_name,py_name,min_version,required_by,comment
 astropy,,,full,provides concolution filters
 colorama,colorama,,core,required by pyqtgraph
+plotly,,,full,required by Land Cover Change Statistics app
 defusedxml,defusedxml,,core,required for secure xml reading
 enpt,,,enpt,required by EnPT
 enpt-enmapboxapp,enpt_enmapboxapp,,enpt,required by EnPT

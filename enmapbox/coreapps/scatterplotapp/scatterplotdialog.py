@@ -8,15 +8,6 @@ from typing import Optional, Tuple, Dict
 import numpy as np
 from osgeo import gdal
 from pyqtgraph import PlotWidget, ImageItem, mkPen
-from scipy.stats import binned_statistic_2d, pearsonr
-
-from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import MarkerSymbolComboBox, MarkerSymbol
-from enmapbox.qgispluginsupport.qps.processing.algorithmdialog import AlgorithmDialog
-from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
-from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxprocessing.rasterwriter import RasterWriter
-from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtCore import QRectF, QPointF, Qt
 from qgis.PyQt.QtGui import QMouseEvent, QColor
 from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QComboBox, QCheckBox, QDoubleSpinBox, QPlainTextEdit, QSpinBox
@@ -25,6 +16,15 @@ from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsMapSettings, Qgs
     QgsFieldProxyModel, QgsMapLayer
 from qgis.gui import QgsMapLayerComboBox, QgsMapCanvas, QgsRasterBandComboBox, QgsColorButton, QgsColorRampButton, \
     QgsFilterLineEdit, QgsFieldComboBox
+from scipy.stats import binned_statistic_2d, pearsonr
+
+from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import MarkerSymbolComboBox, MarkerSymbol
+from enmapbox.qgispluginsupport.qps.processing.algorithmwidget import AlgorithmWidget
+from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
+from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
+from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxprocessing.rasterwriter import RasterWriter
+from enmapboxprocessing.utils import Utils
 
 
 class ScatterPlotWidget(PlotWidget):
@@ -282,7 +282,7 @@ class ScatterPlotDialog(QMainWindow):
                 alg.P_OUTPUT_RASTER: filename
             }
 
-            class Wrapper(AlgorithmDialog):
+            class Wrapper(AlgorithmWidget):
                 def finish(self, successful, result, context, feedback, in_place=False):
                     super().finish(successful, result, context, feedback, in_place=False)
                     if successful:
