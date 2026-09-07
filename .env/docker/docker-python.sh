@@ -39,7 +39,7 @@ COMPOSE_PROJECT="$(printf '%s' "${COMPOSE_PROJECT}" | tr '[:upper:]' '[:lower:]'
 export QGIS_VERSION
 export GITHUB_WORKSPACE="${GITHUB_WORKSPACE:-${REPO}}"
 
-xhost +local:docker 2>/dev/null || true
+xhost +local:docker >/dev/null 2>&1 || true
 
 if [[ -n "${DISPLAY:-}" ]]; then
     DOCKER_DISPLAY=1
