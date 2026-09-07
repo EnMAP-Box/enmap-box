@@ -1,10 +1,9 @@
 from copy import deepcopy
 from typing import Dict, Any, List, Tuple
 
-import plotly.io as pio
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessing, QgsProcessingException
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessing, QgsProcessingException
 
 
 class LandCoverChangeStatisticsAlgorithm(EnMAPProcessingAlgorithm):
@@ -105,6 +104,8 @@ class LandCoverChangeStatisticsAlgorithm(EnMAPProcessingAlgorithm):
                     categories[i] = c.name
             builder.setClassFilter(classFilter)
             fig = builder.sankeyPlot()
+
+            import plotly.io as pio
             pio.write_html(fig, file=filename, auto_open=openReport)
 
             result = {self.P_OUTPUT_REPORT: filename}
