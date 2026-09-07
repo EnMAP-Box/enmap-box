@@ -5,7 +5,7 @@ services:
       context: ../..
       dockerfile: .env/docker/Dockerfile
       args:
-        QGIS_VERSION: ${QGIS_VERSION:-stable}
+        QGIS_VERSION: ${QGIS_VERSION:-latest}
     tty: true
     volumes:
       # - ${GITHUB_WORKSPACE}:/usr/src
