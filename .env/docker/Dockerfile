@@ -1,5 +1,5 @@
 ARG QGIS_VERSION=stable
-FROM --platform=linux/amd64 qgis/qgis:${QGIS_VERSION}
+FROM qgis/qgis:${QGIS_VERSION}
 LABEL maintainer="Benjamin Jakimow <benjamin.jakimow@geo.hu-berlin.de>"
 LABEL description="container to test qgispluginsupport"
 SHELL ["/bin/bash", "-c"]
@@ -22,6 +22,7 @@ RUN apt update && apt install -y \
     libxcb-cursor0 \
     python3-netcdf4 \
     python3-opengl \
+    python3-pyqt6.qtwebengine \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --break-system-packages --no-cache-dir \
@@ -35,8 +36,7 @@ RUN pip install --break-system-packages --no-cache-dir \
     skops \
     scikit-learn \
     lightgbm \
-    xgboost \
-    tensorboard
+    xgboost
 
 # COPY ./.docker/qgis_setup.sh /tmp/
 COPY . /usr/src/
