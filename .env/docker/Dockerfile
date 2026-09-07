@@ -1,61 +1,56 @@
-ARG QGIS_TEST_VERSION=latest
-FROM  qgis/qgis:${QGIS_TEST_VERSION}
-
+ARG QGIS_VERSION=stable
+FROM --platform=linux/amd64 qgis/qgis:${QGIS_VERSION}
+LABEL maintainer="Benjamin Jakimow <benjamin.jakimow@geo.hu-berlin.de>"
+LABEL description="container to test qgispluginsupport"
 SHELL ["/bin/bash", "-c"]
 
-LABEL org.opencontainers.image.authors="benjamin.jakimow@geo.hu-berlin.de"
+RUN apt update && apt install -y \
+    python3-flake8 \
+    python3-pytest-xdist \
+    python3-pytest-cov \
+    python3-pyqtgraph \
+    python3-scipy \
+    python3-matplotlib \
+    python3-defusedxml \
+    python3-colorama \
+    python3-numpy \
+    python3-pandas \
+    python3-sympy \
+    pyqt6-dev-tools \
+    qt6-base-dev \
+    qt6-base-dev-tools \
+    libxcb-cursor0 \
+    python3-netcdf4 \
+    python3-opengl \
+    && rm -rf /var/lib/apt/lists/*
 
-LABEL Description="Docker container with QGIS + EnMAP-Box" Vendor="enmap.org"
+RUN pip install --break-system-packages --no-cache-dir \
+    enpt \
+    enpt-enmapboxapp \
+    enfrosp-enmapboxapp \
+    pyvista \
+    pyvistaqt \
+    astropy \
+    numba \
+    skops \
+    scikit-learn \
+    lightgbm \
+    xgboost \
+    tensorboard
 
-ENV VIRTUAL_ENV=/opt/virtualenvs/enmapbox
+# COPY ./.docker/qgis_setup.sh /tmp/
+COPY . /usr/src/
 
-RUN apt update \
-    &&  apt install -y \
-          pyqt6-dev-tools \
-          python3-pip \
-          python3-venv \
-          python3-h5py \
-          python3-pyqt6 \
-          python3-opengl \
-          qt6-base-dev \
-          python3-netcdf4 \
-          python3-astropy \
-    && apt autoremove -y \
-    && apt clean \
-    && ln -sf /usr/lib/qt6/bin/rcc /usr/bin/rcc
+ENV PYTHONPATH=\
+/usr/share/qgis/python/:\
+/usr/share/qgis/python/plugins:\
+/usr/lib/python3/dist-packages/qgis:\
+$PYTHONPATH
 
-COPY ./.env/linux/requirements_ubuntu.txt /tmp/
-COPY ./requirements_developer.txt /tmp/
+ENV PATH=/usr/lib/qt6/bin:/usr/lib/qt6/libexec:$PATH
 
-
-
-RUN python3 -m venv --system-site-packages $VIRTUAL_ENV \
-     && source $VIRTUAL_ENV/bin/activate \
-     && python3 -m pip install --upgrade pip \
-     && python3 -m pip install --no-cache-dir -r tmp/requirements_ubuntu.txt \
-     && python3 -m pip install --no-cache-dir -r tmp/requirements_developer.txt
-
-
-# RUN python3 -m venv --upgrade-deps --system-site-packages venv/enmapbox
-# ENV PATH="/venv/enmapbox/bin:/usr/local/bin:${PATH}"
-
-# RUN echo "Basic python environment:"
-# RUN python3 --version
-# RUN pip list
-
-ENV PYTHONPATH="${PYTHONPATH}:/usr/share/qgis/python/plugins"
-
-# Avoid sqlcmd termination due to locale -- see https://github.com/Microsoft/mssql-docker/issues/163
-# RUN echo "nb_NO.UTF-8 UTF-8" > /etc/locale.gen
-# RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
-# RUN locale-gen
-# ENV PATH="/venv/enmapbox/bin:/usr/local/bin:${PATH}"
-
-# ENV LANG=C.UTF-8
+RUN cd /usr/src
+RUN ls -l /usr/src
+RUN ls -la /usr/lib/qt6/bin
 
 WORKDIR /
-
-# Set the entrypoint
-ENTRYPOINT ["/bin/bash", "-c", "source ${VIRTUAL_ENV}/bin/activate && exec \"$@\"", "--"]
-
-
