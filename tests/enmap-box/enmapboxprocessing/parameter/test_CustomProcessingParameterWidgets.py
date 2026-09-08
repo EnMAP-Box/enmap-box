@@ -1,4 +1,5 @@
 from qgis.PyQt.QtWidgets import QWidget
+from qgis.core import QgsProject
 
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
@@ -22,11 +23,11 @@ class TestCustomProcessingParameterWidgets(TestCase):
     def test_standard(self):
         from processing import createAlgorithmDialog
         a = PrepareUnsupervisedDatasetFromCodeAlgorithm()
-        d = createAlgorithmDialog(a, parameters=None)
+        d = createAlgorithmDialog(a)
         self.assertIsInstance(d, QWidget)
 
         # add the other algos here to check if they can be displayer in the standard dialog.
-
+        QgsProject.instance().removeAllMapLayers()
         # self.dispose_widget(enmapBox.ui)
 
     def test_enmapbox(self):
