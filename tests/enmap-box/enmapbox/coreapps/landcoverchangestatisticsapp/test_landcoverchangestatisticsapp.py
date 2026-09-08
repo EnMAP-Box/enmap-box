@@ -1,3 +1,6 @@
+import os
+import unittest
+
 from qgis.core import QgsRasterLayer
 
 from enmapbox import initAll
@@ -10,7 +13,10 @@ from landcoverchangestatisticsapp import LandCoverChangeStatisticsMainWindow
 qgsApp = start_app()
 initAll()
 
+runs_offscreen = os.environ.get('QT_QPA_PLATFORM', '').lower() in ['offscreen']
 
+
+@unittest.skipIf(runs_offscreen, 'QT_QPA_PLATFORM=offscreen. QWebEngineView requires a screen device')
 class LandCoverChangeStatisticsApp(TestCase):
 
     def test(self):

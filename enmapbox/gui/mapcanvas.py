@@ -20,7 +20,7 @@ import os
 import time
 import warnings
 from _weakrefset import WeakSet
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Union
 
 from qgis.PyQt.QtCore import Qt, QObject, QCoreApplication, pyqtSignal, QEvent, QPointF, QMimeData, QTimer, QSize, \
     QModelIndex, QAbstractListModel
@@ -905,13 +905,16 @@ class MapCanvas(QgsMapCanvas):
     def canvasLinks(self) -> List[CanvasLink]:
         return self.mCanvasLinks[:]
 
-    def mousePressEvent(self, event: QgsMapMouseEvent):
+    def mousePressEvent(self, event: Union[QMouseEvent, QgsMapMouseEvent]):
 
         self.setProperty(KEY_LAST_CLICKED, time.time())
         set_cursor_location: bool = (
             event.button() == Qt.MouseButton.LeftButton
             and isinstance(self.mapTool(), (QgsMapToolIdentify, CursorLocationMapTool))  # noqa: W503
         )
+
+        if isinstance(event, QMouseEvent):
+            event = QgsMapMouseEvent(self, event)
 
         super(MapCanvas, self).mousePressEvent(event)
 

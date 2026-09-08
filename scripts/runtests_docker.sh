@@ -11,23 +11,7 @@
 #*                                                                         *
 #***************************************************************************
 
-set -e
-
-pushd /usr/src
-DEFAULT_PARAMS='-x -v'
-cd /usr/src
-
-ls -l
-echo "Set environment to run QGIS"
-export QT_QPA_PLATFORM=offscreen
-export CI=True
-export PYTHONPATH="${PYTHONPATH}:$(pwd):/usr/share/qgis/python/plugins"
-# python3 -m coverage run -m unittest discover -s tests
-# xvfb-run pytest ${@:-`echo $DEFAULT_PARAMS`}
-# python3 scripts/create_runtests.py
-# xvfb-run scripts/runtests.sh
-python3 scripts/setup_repository.py -r
-chmod +x scripts/runtests.sh
-echo "Start Tests"
-source scripts/runtests.sh "$@"
-popd
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR/.."
+export DOCKER_OPTS="-e CI=1 -e QT_QPA_PLATFORM=offscreen"
+.env/docker/docker-python.sh -m pytest "$@"

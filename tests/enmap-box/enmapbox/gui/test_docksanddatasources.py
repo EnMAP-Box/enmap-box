@@ -247,7 +247,9 @@ class TestDocksAndDataSources(EnMAPBoxTestCase):
         QgsProject.instance().removeAllMapLayers()
 
     has_QtWebEngineWidgets = importlib.util.find_spec('qgis.PyQt.QtWebEngineWidgets') is not None
+    runs_offscreen = os.environ.get('QT_QPA_PLATFORM', '').lower() in ['offscreen']
 
+    @unittest.skipIf(runs_offscreen, 'QT_QPA_PLATFORM=offscreen. QWebEngineView requires a screen device')
     @unittest.skipIf(not has_QtWebEngineWidgets, 'qgis.PyQt.QtWebEngineWidgets not available')
     def test_WebViewDock(self):
         html = """
