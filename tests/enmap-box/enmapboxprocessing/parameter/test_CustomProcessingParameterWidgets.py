@@ -1,5 +1,4 @@
 from qgis.PyQt.QtWidgets import QWidget
-from qgis.PyQt.QtWidgets import QWidget
 
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
