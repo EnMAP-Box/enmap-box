@@ -26,7 +26,7 @@ jobs:
       fail-fast: true
 
     env:
-      QGIS_TEST_VERSION: ${{ matrix.qgis_version}}
+      QGIS_VERSION: ${{ matrix.qgis_version}}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -41,10 +41,15 @@ jobs:
           # ls -la /usr/bin
           docker --version
           lsb_release -a
-      - name: Python Packages Info
+      - name: System Info
         run: |
-          python3 --version
-          pip list
+          chmod +x .env/docker/docker-python.sh
+          .env/docker/docker-python.sh scripts/systeinfo.py
+
+      - name: Setup Repository
+        run: |
+          .env/docker/docker-python.sh scripts/setup_repository.py
+
       - name: Test EnMAP-Box on QGIS
         run: |
           chmod +x scripts/runtests_docker.sh
