@@ -44,7 +44,7 @@ jobs:
       - name: System Info
         run: |
           chmod +x .env/docker/docker-python.sh
-          .env/docker/docker-python.sh scripts/systeinfo.py
+          .env/docker/docker-python.sh scripts/systeMinfo.py
 
       - name: Setup Repository
         run: |

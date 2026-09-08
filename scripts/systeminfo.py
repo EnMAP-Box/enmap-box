@@ -5,15 +5,14 @@ from pathlib import Path
 
 from qgis.core import Qgis
 
+print('# Python:')
 print(platform.platform())
 print(platform.processor())
 print(platform.python_implementation())
 print(platform.python_version())
-print(f'Sys exe: {sys.executable}')
-
-print(f'QGIS: {Qgis.version()} {Qgis.devVersion()}')
-
-print('Package locations:')
+print(sys.executable)
+print(f'\n# QGIS: {Qgis.version()} {Qgis.devVersion()}')
+print('\n# Package locations:')
 
 packageinfo = Path(__file__).parents[1] / '.env' / 'requirements.csv'
 if packageinfo.is_file():
