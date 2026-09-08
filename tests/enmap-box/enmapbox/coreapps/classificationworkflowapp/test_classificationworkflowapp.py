@@ -1,3 +1,6 @@
+import os
+import unittest
+
 from classificationworkflowapp import ClassificationWorkflowGui
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
@@ -6,7 +9,10 @@ from enmapboxprocessing.testcase import TestCase
 qgsApp = start_app()
 start_app()
 
+runs_offscreen = os.environ.get('QT_QPA_PLATFORM', '').lower() in ['offscreen']
 
+
+@unittest.skipIf(runs_offscreen, 'QT_QPA_PLATFORM=offscreen. QWebEngineView requires a screen device')
 class TestClassificationWorkflowApp(TestCase):
 
     def test_workflowapp(self):
