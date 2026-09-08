@@ -47,8 +47,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>620</width>
-              <height>489</height>
+              <width>624</width>
+              <height>493</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -165,7 +165,7 @@
                      </item>
                      <item row="0" column="1">
                       <widget class="QgsMapLayerComboBox" name="mTable">
-                       <property name="allowEmptyLayer">
+                       <property name="allowEmptyLayer" stdset="0">
                         <bool>true</bool>
                        </property>
                       </widget>
@@ -245,7 +245,7 @@
                        <property name="toolTip">
                         <string>Values used as y-coordinates.</string>
                        </property>
-                       <property name="allowEmptyFieldName">
+                       <property name="allowEmptyFieldName" stdset="0">
                         <bool>true</bool>
                        </property>
                       </widget>
@@ -255,14 +255,14 @@
                        <property name="toolTip">
                         <string>Values used for coloring.</string>
                        </property>
-                       <property name="allowEmptyFieldName">
+                       <property name="allowEmptyFieldName" stdset="0">
                         <bool>true</bool>
                        </property>
                       </widget>
                      </item>
                      <item row="0" column="1">
                       <widget class="QgsMapLayerComboBox" name="mLibrary">
-                       <property name="allowEmptyLayer">
+                       <property name="allowEmptyLayer" stdset="0">
                         <bool>true</bool>
                        </property>
                       </widget>
@@ -301,7 +301,7 @@
                    </item>
                    <item row="0" column="1">
                     <widget class="QgsMapLayerComboBox" name="mCollection">
-                     <property name="allowEmptyLayer">
+                     <property name="allowEmptyLayer" stdset="0">
                       <bool>true</bool>
                      </property>
                     </widget>
@@ -347,7 +347,7 @@
                      <property name="toolTip">
                       <string>Values used for coloring.</string>
                      </property>
-                     <property name="allowEmptyFieldName">
+                     <property name="allowEmptyFieldName" stdset="0">
                       <bool>true</bool>
                      </property>
                     </widget>
@@ -568,8 +568,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>620</width>
-              <height>517</height>
+              <width>624</width>
+              <height>528</height>
              </rect>
             </property>
             <layout class="QFormLayout" name="formLayout_2">
