@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1095</width>
-    <height>770</height>
+    <width>1397</width>
+    <height>863</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -98,7 +98,7 @@
             <property name="currentIndex">
              <number>-1</number>
             </property>
-            <property name="allowEmptyLayer">
+            <property name="allowEmptyLayer" stdset="0">
              <bool>true</bool>
             </property>
            </widget>
@@ -124,40 +124,28 @@
            </widget>
           </item>
           <item row="4" column="1">
-           <widget class="QgsFileWidget" name="mQuickFilePredictedClassification">
+           <widget class="QgsFileWidget" name="mQuickFilePredictedClassification" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="filter">
+            <property name="filter" stdset="0">
              <string>*.tif</string>
-            </property>
-            <property name="storageMode">
-             <enum>QgsFileWidget::StorageMode::SaveFile</enum>
-            </property>
-            <property name="relativeStorage">
-             <enum>QgsFileWidget::RelativeStorage::RelativeDefaultPath</enum>
             </property>
            </widget>
           </item>
           <item row="5" column="1">
-           <widget class="QgsFileWidget" name="mQuickFilePredictedProbability">
+           <widget class="QgsFileWidget" name="mQuickFilePredictedProbability" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="filter">
+            <property name="filter" stdset="0">
              <string>*.tif</string>
-            </property>
-            <property name="storageMode">
-             <enum>QgsFileWidget::StorageMode::SaveFile</enum>
-            </property>
-            <property name="relativeStorage">
-             <enum>QgsFileWidget::RelativeStorage::RelativeDefaultPath</enum>
             </property>
            </widget>
           </item>
@@ -392,27 +380,21 @@
                <item row="1" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_27">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileDataset">
+                  <widget class="QgsFileWidget" name="mFileDataset" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>2</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="dialogTitle">
+                   <property name="dialogTitle" stdset="0">
                     <string/>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.skops</string>
                    </property>
-                   <property name="defaultRoot">
+                   <property name="defaultRoot" stdset="0">
                     <string/>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::StorageMode::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::RelativeStorage::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -536,7 +518,7 @@
                    <property name="value">
                     <double>70.000000000000000</double>
                    </property>
-                   <property name="showClearButton">
+                   <property name="showClearButton" stdset="0">
                     <bool>false</bool>
                    </property>
                   </widget>
@@ -562,7 +544,7 @@
                    <property name="maximum">
                     <number>999999999</number>
                    </property>
-                   <property name="showClearButton">
+                   <property name="showClearButton" stdset="0">
                     <bool>false</bool>
                    </property>
                   </widget>
@@ -949,21 +931,15 @@
                <item row="3" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_31">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileTrainingDataset">
+                  <widget class="QgsFileWidget" name="mFileTrainingDataset" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>2</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.skops</string>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::StorageMode::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::RelativeStorage::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -1023,21 +999,15 @@
                <item row="5" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_32">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileTestDataset">
+                  <widget class="QgsFileWidget" name="mFileTestDataset" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>2</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.skops</string>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::StorageMode::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::RelativeStorage::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -1239,21 +1209,15 @@
                <item row="2" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_36">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileClusteringReport">
+                  <widget class="QgsFileWidget" name="mFileClusteringReport" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>2</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.html</string>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::StorageMode::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::RelativeStorage::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -1361,7 +1325,7 @@
                <item row="1" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_40">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileTrainingDatasetClustered">
+                  <widget class="QgsFileWidget" name="mFileTrainingDatasetClustered" native="true">
                    <property name="enabled">
                     <bool>true</bool>
                    </property>
@@ -1371,17 +1335,11 @@
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="fileWidgetButtonVisible">
+                   <property name="fileWidgetButtonVisible" stdset="0">
                     <bool>true</bool>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.skops</string>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::StorageMode::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::RelativeStorage::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -1441,7 +1399,7 @@
                <item row="3" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_41">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileTestDatasetClustered">
+                  <widget class="QgsFileWidget" name="mFileTestDatasetClustered" native="true">
                    <property name="enabled">
                     <bool>true</bool>
                    </property>
@@ -1451,17 +1409,11 @@
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="fileWidgetButtonVisible">
+                   <property name="fileWidgetButtonVisible" stdset="0">
                     <bool>true</bool>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.skops</string>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::StorageMode::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::RelativeStorage::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -1654,21 +1606,15 @@
                <item row="2" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_39">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileRankingReport">
+                  <widget class="QgsFileWidget" name="mFileRankingReport" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>2</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.html</string>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::StorageMode::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::RelativeStorage::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -1776,7 +1722,7 @@
                <item row="1" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_58">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileTrainingDatasetRanked">
+                  <widget class="QgsFileWidget" name="mFileTrainingDatasetRanked" native="true">
                    <property name="enabled">
                     <bool>true</bool>
                    </property>
@@ -1786,17 +1732,11 @@
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="fileWidgetButtonVisible">
+                   <property name="fileWidgetButtonVisible" stdset="0">
                     <bool>true</bool>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.skops</string>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::StorageMode::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::RelativeStorage::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -1856,7 +1796,7 @@
                <item row="3" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_59">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileTestDatasetRanked">
+                  <widget class="QgsFileWidget" name="mFileTestDatasetRanked" native="true">
                    <property name="enabled">
                     <bool>true</bool>
                    </property>
@@ -1866,17 +1806,11 @@
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="fileWidgetButtonVisible">
+                   <property name="fileWidgetButtonVisible" stdset="0">
                     <bool>true</bool>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.skops</string>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::StorageMode::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::RelativeStorage::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -2023,21 +1957,15 @@
                <item row="1" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_43">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileClassifierFitted">
+                  <widget class="QgsFileWidget" name="mFileClassifierFitted" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>2</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.skops</string>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::StorageMode::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::RelativeStorage::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -2148,7 +2076,7 @@
                <item row="1" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_45">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileClassifierPerformanceReport">
+                  <widget class="QgsFileWidget" name="mFileClassifierPerformanceReport" native="true">
                    <property name="enabled">
                     <bool>true</bool>
                    </property>
@@ -2158,17 +2086,11 @@
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="fileWidgetButtonVisible">
+                   <property name="fileWidgetButtonVisible" stdset="0">
                     <bool>true</bool>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.html</string>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::StorageMode::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::RelativeStorage::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -2271,7 +2193,7 @@
                  <property name="currentIndex">
                   <number>-1</number>
                  </property>
-                 <property name="allowEmptyLayer">
+                 <property name="allowEmptyLayer" stdset="0">
                   <bool>true</bool>
                  </property>
                 </widget>
@@ -2287,21 +2209,15 @@
                 </widget>
                </item>
                <item row="2" column="1">
-                <widget class="QgsFileWidget" name="mFilePredictedClassification">
+                <widget class="QgsFileWidget" name="mFilePredictedClassification" native="true">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
-                 <property name="filter">
+                 <property name="filter" stdset="0">
                   <string>*.tif</string>
-                 </property>
-                 <property name="storageMode">
-                  <enum>QgsFileWidget::StorageMode::SaveFile</enum>
-                 </property>
-                 <property name="relativeStorage">
-                  <enum>QgsFileWidget::RelativeStorage::RelativeDefaultPath</enum>
                  </property>
                 </widget>
                </item>
@@ -2313,21 +2229,15 @@
                 </widget>
                </item>
                <item row="3" column="1">
-                <widget class="QgsFileWidget" name="mFilePredictedProbability">
+                <widget class="QgsFileWidget" name="mFilePredictedProbability" native="true">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
-                 <property name="filter">
+                 <property name="filter" stdset="0">
                   <string>*.tif</string>
-                 </property>
-                 <property name="storageMode">
-                  <enum>QgsFileWidget::StorageMode::SaveFile</enum>
-                 </property>
-                 <property name="relativeStorage">
-                  <enum>QgsFileWidget::RelativeStorage::RelativeDefaultPath</enum>
                  </property>
                 </widget>
                </item>
@@ -2402,7 +2312,7 @@
                  <property name="currentIndex">
                   <number>-1</number>
                  </property>
-                 <property name="allowEmptyLayer">
+                 <property name="allowEmptyLayer" stdset="0">
                   <bool>true</bool>
                  </property>
                 </widget>
@@ -2417,7 +2327,7 @@
                <item row="2" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_51">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileClassificationPerformanceReport">
+                  <widget class="QgsFileWidget" name="mFileClassificationPerformanceReport" native="true">
                    <property name="enabled">
                     <bool>true</bool>
                    </property>
@@ -2427,17 +2337,11 @@
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="fileWidgetButtonVisible">
+                   <property name="fileWidgetButtonVisible" stdset="0">
                     <bool>true</bool>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.tif</string>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::StorageMode::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::RelativeStorage::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -2505,7 +2409,7 @@
                  <property name="currentIndex">
                   <number>-1</number>
                  </property>
-                 <property name="allowEmptyLayer">
+                 <property name="allowEmptyLayer" stdset="0">
                   <bool>true</bool>
                  </property>
                 </widget>
@@ -2599,11 +2503,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QgsFileWidget" name="mWorkingDirectory">
-            <property name="storageMode">
-             <enum>QgsFileWidget::StorageMode::GetDirectory</enum>
-            </property>
-           </widget>
+           <widget class="QgsFileWidget" name="mWorkingDirectory" native="true"/>
           </item>
           <item>
            <widget class="QToolButton" name="mOpenWorkingDirectory">
@@ -2651,7 +2551,7 @@ p, li { white-space: pre-wrap; }
 hr { height: 1px; border-width: 0; }
 li.unchecked::marker { content: &quot;\2610&quot;; }
 li.checked::marker { content: &quot;\2612&quot;; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'B612'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt;&quot;&gt;                                                &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt;&quot;&gt;                                            &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
@@ -2864,13 +2764,18 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1095</width>
-     <height>33</height>
+     <width>1397</width>
+     <height>25</height>
     </rect>
    </property>
   </widget>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QWebEngineView</class>
+   <extends>QWidget</extends>
+   <header location="global">QtWebEngineWidgets/QWebEngineView</header>
+  </customwidget>
   <customwidget>
    <class>QgsDoubleSpinBox</class>
    <extends>QDoubleSpinBox</extends>
@@ -2890,11 +2795,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <class>QgsSpinBox</class>
    <extends>QSpinBox</extends>
    <header>qgsspinbox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QWebEngineView</class>
-   <extends>QWidget</extends>
-   <header location="global">QtWebEngineWidgets/QWebEngineView</header>
   </customwidget>
   <customwidget>
    <class>CodeEditWidget</class>
