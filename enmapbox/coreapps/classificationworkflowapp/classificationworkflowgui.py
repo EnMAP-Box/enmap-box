@@ -243,7 +243,7 @@ class ClassificationWorkflowGui(QMainWindow):
     mWebReadTheDocs: QToolButton
 
     def __init__(self, parent=None):
-        QMainWindow.__init__(self, parent)
+        super().__init__(parent=parent)
         loadUi(join(dirname(__file__), 'main.ui'), self)
         self.url = QUrl(
             'https://enmap-box.readthedocs.io/en/latest/usr_section/usr_manual/applications.html#'

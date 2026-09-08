@@ -9,8 +9,8 @@ start_app()
 
 class TestClassificationWorkflowApp(TestCase):
 
-    def test(self):
-        enmapBox = EnMAPBox()
+    def test_workflowapp(self):
+        enmapBox = EnMAPBox(load_core_apps=False, load_other_apps=False)
 
         widget = ClassificationWorkflowGui()
         widget.show()
