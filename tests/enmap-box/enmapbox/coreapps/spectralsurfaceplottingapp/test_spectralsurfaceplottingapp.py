@@ -27,7 +27,7 @@ class TestSpectralSurfacePlottingApp(TestCase):
         enmapBox.onDataDropped([table])
 
         widget = SpectralSurfacePlottingWindow()
-        self.showGui([enmapBox.ui, widget])
+        # self.showGui([enmapBox.ui, widget])
         enmapBox.close()
 
     def testPlotter(self):
@@ -35,11 +35,11 @@ class TestSpectralSurfacePlottingApp(TestCase):
         x, y, z = getRandomData()
 
         widget = SpectralSurfacePlottingWindow()
-        widget.setData(y, x, z)
+        widget.setData(y, x, z, z)
         widget.plotData()
         # widget.autoScale()
         # widget.setScale(100, 100, 100)
-        self.showGui([enmapBox.ui, widget])
+        # self.showGui([enmapBox.ui, widget])
         enmapBox.close()
 
 
