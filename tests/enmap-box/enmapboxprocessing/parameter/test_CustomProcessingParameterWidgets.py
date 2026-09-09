@@ -1,3 +1,4 @@
+from processing import createAlgorithmDialog
 from qgis.PyQt.QtWidgets import QWidget
 from qgis.core import QgsProject
 
@@ -21,10 +22,14 @@ initAll()
 class TestCustomProcessingParameterWidgets(TestCase):
 
     def test_standard(self):
-        from processing import createAlgorithmDialog
+
         a = PrepareUnsupervisedDatasetFromCodeAlgorithm()
+
         d = createAlgorithmDialog(a)
         self.assertIsInstance(d, QWidget)
+
+        d.show()
+        d.close()
 
         # add the other algos here to check if they can be displayer in the standard dialog.
         QgsProject.instance().removeAllMapLayers()
