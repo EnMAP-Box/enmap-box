@@ -3,14 +3,25 @@ from math import inf
 import numpy as np
 import pyvista as pv
 from pyvistaqt import QtInteractor
+from qgis.PyQt.QtCore import QDateTime
 from qgis.PyQt.QtWidgets import QSizePolicy, QSlider, QToolButton, QMainWindow, QComboBox, QCheckBox, QVBoxLayout, \
     QWidget
 from qgis.PyQt.uic import loadUi
-from qgis.core import QgsColorRamp, QgsStyle, QgsMapLayerProxyModel
+from qgis.core import QgsRasterLayer, QgsColorRamp, QgsStyle, QgsMapLayerProxyModel
 from qgis.gui import QgsColorRampButton, QgsMessageBar, QgsMapLayerComboBox, QgsFieldComboBox, QgsFilterLineEdit
 
 from enmapboxprocessing.libraryreader import LibraryReader
+from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxprocessing.utils import Utils
 
+
+def parseFloat(w: QgsFilterLineEdit, default):
+    text = w.text().strip()
+    try:
+        return float(text)
+    except (ValueError, TypeError):
+        w.setValue('')  # clear wrong inputs
+        return default
 
 class SpectralSurfacePlottingWindow(QMainWindow):
     mMessageBar: QgsMessageBar
@@ -26,6 +37,9 @@ class SpectralSurfacePlottingWindow(QMainWindow):
     mYMax: QgsFilterLineEdit
     mZMin: QgsFilterLineEdit
     mZMax: QgsFilterLineEdit
+    mXScale: QgsFilterLineEdit
+    mYScale: QgsFilterLineEdit
+    mZScale: QgsFilterLineEdit
 
     mShowSurface: QCheckBox
     mShowPoints: QCheckBox
@@ -40,6 +54,8 @@ class SpectralSurfacePlottingWindow(QMainWindow):
     mFieldLibraryProfiles: QgsFieldComboBox
     mFieldLibraryY: QgsFieldComboBox
     mFieldLibraryC: QgsFieldComboBox
+    mFieldCollectionY: QgsFieldComboBox
+    mFieldCollectionC: QgsFieldComboBox
     mLoadData: QToolButton
 
     scaleBase = 2
@@ -102,16 +118,6 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         self.scaleZ = 1
 
     def readData(self):
-
-        # get value ranges
-        def parseFloat(w: QgsFilterLineEdit, default):
-            text = w.text().strip()
-            try:
-                return float(text)
-            except (ValueError, TypeError):
-                w.setValue('')  # clear wrong inputs
-                return default
-
         xmin = parseFloat(self.mXMin, -inf)
         ymin = parseFloat(self.mYMin, -inf)
         zmin = parseFloat(self.mZMin, -inf)
@@ -119,11 +125,15 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         ymax = parseFloat(self.mYMax, inf)
         zmax = parseFloat(self.mZMax, inf)
 
-        # read and filter data
+        # read, filter and scale data
         x = list()
         y = list()
         z = list()
         c = list()
+
+        fx = parseFloat(self.mXScale, 1)
+        fy = parseFloat(self.mYScale, 1)
+        fz = parseFloat(self.mZScale, 1)
 
         if self.mDataFormat.currentIndex() == self.LongFormat:
             layer = self.mTable.currentLayer()
@@ -139,9 +149,9 @@ class SpectralSurfacePlottingWindow(QMainWindow):
                 valid &= yi >= ymin and yi <= ymax
                 valid &= zi >= zmin and zi <= zmax
                 if valid:
-                    x.append(xi)
-                    y.append(yi)
-                    z.append(zi)
+                    x.append(xi / fx)
+                    y.append(yi / fy)
+                    z.append(zi / fz)
                     c.append(ci)
 
         elif self.mDataFormat.currentIndex() == self.LibraryFormat:
@@ -159,19 +169,57 @@ class SpectralSurfacePlottingWindow(QMainWindow):
                     for xi, zi in zip(xs, zs):
                         if not np.isfinite([xi, yi, zi]).all():
                             continue
-                        ci = values.get(fieldC, zi)  # default color is zi
+                        ci = values.get(fieldC, zi / fz)  # default color is zi
                         valid = xi >= xmin and xi <= xmax
                         valid &= yi >= ymin and yi <= ymax
                         valid &= zi >= zmin and zi <= zmax
                         if valid:
-                            x.append(xi)
-                            y.append(yi)
-                            z.append(zi)
+                            x.append(xi / fx)
+                            y.append(yi / fy)
+                            z.append(zi / fz)
                             c.append(ci)
             except Exception:
-                self.mMessageBar.pushWarning('Load data', 'select a spectral profile attribute')
+                self.mMessageBar.pushWarning('Load data', 'select required inputs')
+                return
         elif self.mDataFormat.currentIndex() == self.CollectionFormat:
-            raise NotImplementedError()
+            collectionLayer = self.mCollection.currentLayer()
+            collectionReader = LibraryReader(collectionLayer)
+            fieldSource = 'source'
+            fieldProvider = 'provider'
+            fieldY = self.mFieldCollectionY.currentField()
+            fieldC = self.mFieldCollectionC.currentField()
+
+            point = self.enmapBox.currentLocation()
+            if point is None:
+                self.mMessageBar.pushWarning('Load data', 'select a map location')
+                return
+
+            for i, (values, geometry) in enumerate(collectionReader.data(), 1):
+                # if i==5:
+                #    break
+                yi = values.get(fieldY, i)
+                if isinstance(yi, QDateTime):
+                    yi = Utils.dateTimeToDecimalYear(yi)
+
+                source = values.get(fieldSource, i)
+                provider = values.get(fieldProvider, i)
+                rasterLayer = QgsRasterLayer(source, '', provider)
+                rasterReader = RasterReader(rasterLayer)
+                pixel = point.toPixel(rasterReader)
+                zs = np.array(rasterReader.arrayFromPixelOffsetAndSize(pixel.x(), pixel.y(), 1, 1)).flatten()  # / 10000
+                xs = [rasterReader.wavelength(bandNo) for bandNo in rasterReader.bandNumbers()]
+                for xi, zi in zip(xs, zs):
+                    if not np.isfinite([xi, yi, zi]).all():
+                        continue
+                    ci = values.get(fieldC, zi / fz)  # default color is zi
+                    valid = xi >= xmin and xi <= xmax
+                    valid &= yi >= ymin and yi <= ymax
+                    valid &= zi >= zmin and zi <= zmax
+                    if valid:
+                        x.append(xi / fx)
+                        y.append(yi / fy)
+                        z.append(zi / fz)
+                        c.append(ci)
         else:
             raise ValueError()
 
@@ -214,6 +262,13 @@ class SpectralSurfacePlottingWindow(QMainWindow):
 
         self.gridActor.x_axis_range = (bounds[0] / self.scaleX, bounds[1] / self.scaleX)
         self.gridActor.y_axis_range = (bounds[2] / self.scaleY, bounds[3] / self.scaleY)
+        # number of decimal places
+        self.gridActor.x_label_format = '{0:.2f}'
+        self.gridActor.y_label_format = '{0:.2f}'
+
+        print('BOUNDS')
+        print(bounds[0] / self.scaleX, bounds[1] / self.scaleX)
+        print(bounds[2] / self.scaleY, bounds[3] / self.scaleY)
 
     def plotData(self):
 
@@ -358,7 +413,7 @@ class SpectralSurfacePlottingWindow(QMainWindow):
             return
         if self.mDataFormat.currentIndex() == self.LibraryFormat and self.mLibrary.currentLayer() is None:
             return
-        if self.mDataFormat.currentIndex() == self.LibraryFormat and self.mLibrary.currentLayer() is None:
+        if self.mDataFormat.currentIndex() == self.CollectionFormat and self.mCollection.currentLayer() is None:
             return
 
         x, y, z, c = self.readData()
