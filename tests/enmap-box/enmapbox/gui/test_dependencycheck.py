@@ -16,7 +16,7 @@ import subprocess  # nosec B404
 import sys
 import unittest
 import uuid
-from pathlib import Path
+from subprocess import CompletedProcess  # nosec B404
 from time import sleep
 from typing import List, Tuple
 
@@ -25,9 +25,10 @@ from qgis.PyQt.QtWidgets import QApplication, QTableView, QLabel
 from qgis.core import Qgis, QgsTask
 from qgis.core import QgsApplication
 
-from enmapbox.dependencycheck import PIPPackage, requiredPackages, PIPPackageInstaller, PIPPackageInfoTask, \
-    missingPackageInfo, checkGDALIssues, PIPPackageInstallerTableModel, \
-    call_pip_command, localPipExecutable, installTestData
+from enmapbox.dependencycheck import (
+    PIPPackage, requiredPackages, PIPPackageInstaller, PIPPackageInfoTask,
+    missingPackageInfo, checkGDALIssues, PIPPackageInstallerTableModel,
+    call_pip_command, installTestData, local_python_exe)
 from enmapbox.testing import EnMAPBoxTestCase, start_app
 
 start_app()
@@ -47,21 +48,14 @@ class test_dependencycheck(EnMAPBoxTestCase):
         installTestData(overwrite_existing=True, ask=False)
         installTestData(overwrite_existing=True, ask=True)
 
-    def test_pip_call(self):
+    def test_local_pip_call(self):
 
-        pip_exe = localPipExecutable()
-        self.assertTrue(pip_exe and Path(pip_exe).is_file())
-        result = subprocess.run(
-            [str(pip_exe), 'show', 'numpy'],
-            capture_output=True,
-            text=True
-        )  # nosec B603
+        cmd = [local_python_exe(), '-m', 'pip', 'show', 'numpy']
 
-        self.assertTrue(result.returncode == 0)
-
-        # Access standard output (stdout)
-        stdout_output = result.stdout
-        self.assertTrue(stdout_output.startswith('Name: numpy'))
+        result = subprocess.run(cmd, capture_output=True, text=True)  # nosec B603
+        self.assertIsInstance(result, CompletedProcess)
+        self.assertEqual(result.returncode, 0)
+        self.assertTrue(result.stdout.startswith('Name: numpy'))
 
     def test_required_packages(self):
 
@@ -259,12 +253,6 @@ class test_dependencycheck(EnMAPBoxTestCase):
         self.assertFalse(success)
         self.assertEqual(stdout, sys.stdout)
         self.assertEqual(stderr, sys.stderr)
-
-    def test_find_pipexe(self):
-
-        p = localPipExecutable()
-        self.assertIsInstance(p, Path)
-        self.assertTrue(p.is_file())
 
 
 if __name__ == "__main__":

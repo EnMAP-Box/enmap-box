@@ -28,19 +28,17 @@ import logging
 import os
 import platform
 import re
-import shutil
 import subprocess  # nosec B404
 import sys
 import time
 import traceback
 import typing
 from importlib.machinery import ModuleSpec
-from io import StringIO
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Match, Optional, Tuple
 
 from qgis.PyQt import sip
-from qgis.PyQt.QtCore import pyqtSignal, QAbstractTableModel, QModelIndex, QProcess, QSortFilterProxyModel, Qt, QUrl
+from qgis.PyQt.QtCore import pyqtSignal, QAbstractTableModel, QModelIndex, QSortFilterProxyModel, Qt, QUrl
 from qgis.PyQt.QtGui import QColor, QContextMenuEvent, QDesktopServices
 from qgis.PyQt.QtWidgets import (QApplication, QDialogButtonBox, QMenu, QMessageBox,
                                  QStyledItemDelegate, QTableView, QWidget)
@@ -284,9 +282,6 @@ class PIPPackage(object):
         return self.mIsInstalled is True
 
 
-_LOCAL_PIPEXE: Optional[Path] = None
-
-
 def get_prog() -> str:
     try:
         prog = os.path.basename(sys.argv[0])
@@ -299,55 +294,36 @@ def get_prog() -> str:
     return "pip"
 
 
-def localPipExecutable() -> Optional[Path]:
-    global _LOCAL_PIPEXE
+def local_python_exe() -> str:
+    """
+    Returns the path to the currently used python executable.
+    On macOS QGIS app bundles, returns the embedded Python interpreter path.
+    Works across all platforms (Windows, macOS, Linux).
+    """
+    exe = sys.executable
+    if not exe:
+        return sys.executable
 
-    if _LOCAL_PIPEXE is None:
+    p = platform.uname().system
 
-        pipexe = shutil.which('pip')
-        if pipexe:
-            return Path(pipexe)
-        pipexe = shutil.which('pip3')
-        if pipexe:
-            return Path(pipexe)
+    if p == 'Darwin' and '.app/Contents/MacOS' in exe:
+        path = Path(exe)
+        while path.name != 'MacOS':
+            path = path.parent
+        pythonexe = path / 'python'
+        if pythonexe.is_file():
+            return str(pythonexe)
 
-        pipexe = Path(get_prog())
-        if not pipexe.is_file():
-            pipexe = None
+    return exe
 
-            p = platform.uname().system
-            sysexe = Path(sys.executable)
 
-            if p == 'Darwin' and '.app/Contents/MacOS' in sysexe.as_posix():
-                path = sysexe
-                while path.name != 'MacOS':
-                    path = path.parent
-                path = path / 'bin/pip'
-                if path.is_file():
-                    pipexe = path
-            else:
-
-                if p == 'Windows':
-                    candidates = ['where pip', 'where pip3']
-                else:
-                    candidates = ['which pip', 'which pip3']
-
-                for c in candidates:
-                    process = QProcess()
-                    process.start(c)
-                    process.waitForFinished()
-                    msgOut = decode_bytes(process.readAllStandardOutput().data())
-                    # msgErr = decode_bytes(process.readAllStandardError().data())
-                    success = process.exitCode() == 0
-                    if success and len(msgOut) > 0:
-                        lines = msgOut.splitlines()
-                        path = Path(lines[0])
-                        if path.is_file():
-                            pipexe = path
-                            break
-            if isinstance(pipexe, Path) and pipexe.is_file():
-                _LOCAL_PIPEXE = pipexe
-    return _LOCAL_PIPEXE
+def local_pip_call() -> str:
+    """
+    Returns the command string to call pip for the current python executable.
+    Works across all platforms (Windows, macOS, Linux).
+    """
+    pyexe = local_python_exe()
+    return f'"{pyexe}" -m pip'
 
 
 def decode_bytes(bytes_str, encodings=None):
@@ -363,65 +339,31 @@ def decode_bytes(bytes_str, encodings=None):
 
 
 def call_pip_command(pipArgs: list) -> Tuple[bool, Optional[str], Optional[str]]:
-    pipexe = localPipExecutable()
+    pyexe = local_python_exe()
 
-    if pipexe:
-        cmd = [str(pipexe)] + pipArgs
+    cmd = [pyexe, '-m', 'pip'] + pipArgs
 
-        kwargs = {}
-        if sys.platform == "win32":
-            # Prevent opening a console window
-            kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
+    kwargs = {}
+    if sys.platform == "win32":
+        # Prevent opening a console window
+        kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
 
-        result = subprocess.run(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            **kwargs,
-        )  # nosec B603 # process is checked, and there is simply no other way to call the local pip executable
-        success = result.returncode == 0
-        msgOut = result.stdout
-        msgErr = result.stderr
+    result = subprocess.run(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        **kwargs,
+    )  # nosec B603 # process is checked, and there is simply no other way to call the local pip executable
+    success = result.returncode == 0
+    msgOut = result.stdout
+    msgErr = result.stderr
 
-        # Normalize line endings
-        if msgOut:
-            msgOut = msgOut.replace('\r\n', '\n')
-        if msgErr:
-            msgErr = msgErr.replace('\r\n', '\n')
-
-        if success:
-            return success, msgOut, msgErr
-
-    # Fallback: try to use pip._internal directly
-    _std_out = sys.stdout
-    _std_err = sys.stderr
-    sys.stdout = StringIO()
-    sys.stderr = StringIO()
-    msgOut = None
-
-    try:
-        from pip._internal.cli.main_parser import parse_command
-        from pip._internal.commands import create_command
-
-        cmd_name, cmd_args = parse_command(pipArgs)
-        cmd = create_command(cmd_name, isolated=("--isolated" in cmd_args))
-        result = cmd.main(cmd_args)
-        msgOut = sys.stdout.getvalue()
-        msgErr = sys.stderr.getvalue()
-        success = result == 0
-    except Exception as ex:
-        success = False
-        msgErr = str(ex)
-    finally:
-        sys.stdout = _std_out
-        sys.stderr = _std_err
-
+    # Normalize line endings
     if msgOut:
-        msgOut.replace('\r\n', '\n')
-
+        msgOut = msgOut.replace('\r\n', '\n')
     if msgErr:
-        msgErr.replace('\r\n', '\n')
+        msgErr = msgErr.replace('\r\n', '\n')
 
     return success, msgOut, msgErr
 
