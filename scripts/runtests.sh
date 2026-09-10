@@ -18,7 +18,6 @@ export PYTHONPATH="${PYTHONPATH}"\
 ":$(pwd)/tests"
 
 echo $PYTHONPATH
-qgis --version
-python3 scripts/systeminfo.py
-python3 -m pytest "$@"
+${PYTHON_EXECUTABLE:-python3} scripts/systeminfo.py
+${PYTHON_EXECUTABLE:-python3} -m pytest "$@"
 
