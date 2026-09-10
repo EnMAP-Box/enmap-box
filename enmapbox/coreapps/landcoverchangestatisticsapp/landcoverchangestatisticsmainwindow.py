@@ -5,7 +5,6 @@ from typing import Optional, List
 import numpy as np
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWebEngineWidgets import QWebEngineView
 from qgis.PyQt.QtWidgets import QStatusBar, QToolButton, QMainWindow, QCheckBox
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRectangle, QgsPalettedRasterRenderer, QgsRasterLayer, QgsMapSettings, QgsUnitTypes
@@ -24,7 +23,7 @@ from landcoverchangestatisticsapp.landcoverchangestatisticssettingsdockwidget im
 
 
 class LandCoverChangeStatisticsMainWindow(QMainWindow):
-    mWebView: QWebEngineView
+    # mWebView: QWebEngineView
     mStatusBar: QStatusBar
 
     def __init__(self, *args, **kwds):
