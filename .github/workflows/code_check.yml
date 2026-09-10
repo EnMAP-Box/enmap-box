@@ -1,4 +1,4 @@
-name: Code Check
+name: Code Checks
 
 on:
   push:
@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   code_checks:
-    name: Code Checks (py${{ matrix.python-version }})
+    name: Flake8 and Bandit (py${{ matrix.python-version }})
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:

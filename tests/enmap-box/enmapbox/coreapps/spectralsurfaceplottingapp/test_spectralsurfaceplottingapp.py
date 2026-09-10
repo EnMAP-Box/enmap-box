@@ -27,7 +27,8 @@ class TestSpectralSurfacePlottingApp(TestCase):
         enmapBox.onDataDropped([table])
 
         widget = SpectralSurfacePlottingWindow()
-        # self.showGui([enmapBox.ui, widget])
+        self.showGui([enmapBox.ui, widget])
+        widget.close()
         enmapBox.close()
 
     def testPlotter(self):
