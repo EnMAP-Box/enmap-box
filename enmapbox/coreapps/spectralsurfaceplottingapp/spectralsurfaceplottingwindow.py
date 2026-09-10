@@ -23,6 +23,7 @@ def parseFloat(w: QgsFilterLineEdit, default):
         w.setValue('')  # clear wrong inputs
         return default
 
+
 class SpectralSurfacePlottingWindow(QMainWindow):
     mMessageBar: QgsMessageBar
     mPlot: QWidget
