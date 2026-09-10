@@ -18,3 +18,8 @@ scikit-learn>=1.0
 pyvista # required by Spectral Surface Plotting
 pyvistaqt # required by Spectral Surface Plotting
 plotly # required by Land Cover Change Statistics
+
+# development
+flake8
+flake8-qgis
+bandit
