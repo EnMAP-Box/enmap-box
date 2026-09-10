@@ -31,7 +31,7 @@ class FitSvcRbfAlgorithm(FitClassifierAlgorithmBase):
         from sklearn.preprocessing import StandardScaler
         from sklearn.svm import SVC
 
-        svc = SVC(probability=False)
+        svc = SVC()
         param_grid = {'kernel': ['rbf'],
                       'gamma': [0.001, 0.01, 0.1, 1, 10, 100, 1000],
                       'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000]}

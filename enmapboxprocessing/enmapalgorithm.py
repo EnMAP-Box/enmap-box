@@ -715,14 +715,14 @@ class EnMAPProcessingAlgorithm(QgsProcessingAlgorithm):
             self, name: str, description: str, defaultValue=None, optional=False, advanced=False
     ):
         from enmapboxprocessing.parameter.processingparameterestimatorcodeeditwidget import \
-            ProcessingParameterRegressorCodeEditFactory
+            ProcessingParameterClassifierCodeEditFactory
 
         param = QgsProcessingParameterString(name, description, defaultValue, True, optional)
 
         metadata = param.metadata()
         metadata["widget_wrapper"] = {
             "widget_type": (
-                ProcessingParameterRegressorCodeEditFactory.WIDGET_TYPE
+                ProcessingParameterClassifierCodeEditFactory.WIDGET_TYPE
             )
         }
         param.setMetadata(metadata)

@@ -31,7 +31,7 @@ class FitSvcPolyAlgorithm(FitClassifierAlgorithmBase):
         from sklearn.preprocessing import StandardScaler
         from sklearn.svm import SVC
 
-        svc = SVC(probability=False)
+        svc = SVC()
         param_grid = {'kernel': ['poly'],
                       'coef0': [0],
                       'degree': [3],
