@@ -5,6 +5,7 @@ from os.path import splitext, basename, exists, join, dirname
 from time import time
 from typing import Dict, Union
 
+from qgis.PyQt import sip
 from qgis.core import QgsMessageLog, Qgis
 from qgis.gui import QgsAbstractProcessingParameterWidgetWrapper, QgsProcessingParameterWidgetFactoryInterface, QgsGui
 
@@ -471,16 +472,29 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
 
 class ProcessingParameterRasterMathCodeEditWidgetWrapper(QgsAbstractProcessingParameterWidgetWrapper):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._widget = None
+
     def createWidget(self):
-        return ProcessingParameterRasterMathCodeEdit()
+        self._widget = ProcessingParameterRasterMathCodeEdit()
+        return self._widget
 
     def setWidgetValue(self, value, context):
-        widget = self.wrappedWidget()
-        widget.mCode.setText(value)
+        if self._widget is not None:
+            self._widget.mCode.setText(value)
+        else:
+            widget = self.wrappedWidget()
+            if widget is not None:
+                widget.mCode.setText(value)
 
     def widgetValue(self):
+        if self._widget is not None:
+            return self._widget.value()
         widget = self.wrappedWidget()
-        return widget.value()
+        if widget is not None:
+            return widget.value()
+        return None
 
     # def setWidgetContext(self, context):
         # widget = self.wrappedWidget()
@@ -524,12 +538,16 @@ class DerivedRasterBandItem(RasterBandItem):
 
 class ProcessingParameterRasterMathCodeEditWidgetFactory(QgsProcessingParameterWidgetFactoryInterface):
     WIDGET_TYPE = 'enmapbox:ProcessingParameterRasterMathCodeEditWidget'
+    _wrappers = []
 
     def parameterType(self):
         return self.WIDGET_TYPE
 
     def createWidgetWrapper(self, parameter, widget_type):
-        return ProcessingParameterRasterMathCodeEditWidgetWrapper(parameter, widget_type)
+        wrapper = ProcessingParameterRasterMathCodeEditWidgetWrapper(parameter, widget_type)
+        sip.transferto(wrapper, None)
+        self._wrappers.append(wrapper)
+        return wrapper
 
     @classmethod
     def register(cls):

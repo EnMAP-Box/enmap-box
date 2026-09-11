@@ -23,17 +23,23 @@ class TestCustomProcessingParameterWidgets(TestCase):
 
     def test_standard(self):
 
-        a = PrepareUnsupervisedDatasetFromCodeAlgorithm()
+        algos = [
+            PrepareUnsupervisedDatasetFromCodeAlgorithm(),
+            SaveRasterAsAlgorithm(),
+            RegressionWorkflowAlgorithm(),
+            ClassificationWorkflowAlgorithm(),
+            RasterMathAlgorithm(),
+            ExportDatasetToFilesAlgorithm(),
+            FitPcaAlgorithm()
+        ]
 
-        d = createAlgorithmDialog(a)
-        self.assertIsInstance(d, QWidget)
+        for a in algos:
+            d = createAlgorithmDialog(a)
+            self.assertIsInstance(d, QWidget)
+            d.show()
+            d.close()
 
-        d.show()
-        d.close()
-
-        # add the other algos here to check if they can be displayer in the standard dialog.
         QgsProject.instance().removeAllMapLayers()
-        # self.dispose_widget(enmapBox.ui)
 
     def test_enmapbox(self):
         enmapBox = EnMAPBox()

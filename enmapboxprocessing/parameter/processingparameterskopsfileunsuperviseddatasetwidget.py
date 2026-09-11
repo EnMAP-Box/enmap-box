@@ -1,6 +1,7 @@
 import sys
 from os.path import basename, join, dirname
 
+from qgis.PyQt import sip
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QMenu, QMessageBox
 from qgis.PyQt.uic import loadUi
@@ -131,26 +132,43 @@ class ProcessingParameterSkopsFileUnsupervisedDatasetWidget(QWidget):
 
 class ProcessingParameterSkopsFileUnsupervisedDatasetWidgetWrapper(QgsAbstractProcessingParameterWidgetWrapper):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._widget = None
+
     def createWidget(self):
-        return ProcessingParameterSkopsFileUnsupervisedDatasetWidget()
+        self._widget = ProcessingParameterSkopsFileUnsupervisedDatasetWidget()
+        return self._widget
 
     def setWidgetValue(self, value, context):
-        widget = self.wrappedWidget()
-        widget.setValue(value)
+        if self._widget is not None:
+            self._widget.setValue(value)
+        else:
+            widget = self.wrappedWidget()
+            if widget is not None:
+                widget.setValue(value)
 
     def widgetValue(self):
+        if self._widget is not None:
+            return self._widget.value()
         widget = self.wrappedWidget()
-        return widget.value()
+        if widget is not None:
+            return widget.value()
+        return None
 
 
 class ProcessingParameterSkopsFileUnsupervisedDatasetWidgetFactory(QgsProcessingParameterWidgetFactoryInterface):
     WIDGET_TYPE = 'enmapbox:ProcessingParameterSkopsFileUnsupervisedDatasetWidget'
+    _wrappers = []
 
     def parameterType(self):
         return self.WIDGET_TYPE
 
     def createWidgetWrapper(self, parameter, widget_type):
-        return ProcessingParameterSkopsFileUnsupervisedDatasetWidgetWrapper(parameter, widget_type)
+        wrapper = ProcessingParameterSkopsFileUnsupervisedDatasetWidgetWrapper(parameter, widget_type)
+        sip.transferto(wrapper, None)
+        self._wrappers.append(wrapper)
+        return wrapper
 
     @classmethod
     def register(cls):

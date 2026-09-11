@@ -1,3 +1,6 @@
+from qgis.PyQt import sip
+from qgis.PyQt.QtWidgets import QWidget, QComboBox, QTextBrowser
+from qgis.PyQt.uic import loadUi
 from qgis.core import QgsMessageLog, Qgis
 from qgis.gui import QgsAbstractProcessingParameterWidgetWrapper, QgsProcessingParameterWidgetFactoryInterface, QgsGui
 
@@ -7,8 +10,6 @@ from enmapboxprocessing.algorithm.fitrandomforestclassifieralgorithm import FitR
 from enmapboxprocessing.algorithm.fitrandomforestregressoralgorithm import FitRandomForestRegressorAlgorithm
 from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
 from enmapboxprocessing.parameter.processingparametercodeeditwidget import CodeEditWidget
-from qgis.PyQt.QtWidgets import QWidget, QComboBox, QTextBrowser
-from qgis.PyQt.uic import loadUi
 
 
 class ProcessingParameterEstimatorCodeEdit(QWidget):
@@ -59,40 +60,56 @@ class ProcessingParameterEstimatorCodeEdit(QWidget):
 class ProcessingParameterEstimatorCodeEditWrapper(QgsAbstractProcessingParameterWidgetWrapper):
     widget: ProcessingParameterEstimatorCodeEdit
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._widget = None
+
     def createWidget(self):
         raise NotImplementedError()
 
     def setWidgetValue(self, value, context):
-        widget = self.wrappedWidget()
-        widget.mCode.setText(value)
+        if self._widget is not None:
+            self._widget.mCode.setText(value)
+        else:
+            widget = self.wrappedWidget()
+            if widget is not None:
+                widget.mCode.setText(value)
 
     def widgetValue(self):
+        if self._widget is not None:
+            return self._widget.value()
         widget = self.wrappedWidget()
-        return widget.value()
+        if widget is not None:
+            return widget.value()
+        return None
 
 
 class ProcessingParameterClassifierCodeEditWrapper(ProcessingParameterEstimatorCodeEditWrapper):
 
     def createWidget(self):
-        widget = ProcessingParameterEstimatorCodeEdit(ProcessingParameterEstimatorCodeEdit.Classifier)
-        return widget
+        self._widget = ProcessingParameterEstimatorCodeEdit(ProcessingParameterEstimatorCodeEdit.Classifier)
+        return self._widget
 
 
 class ProcessingParameterRegressorCodeEditWrapper(ProcessingParameterEstimatorCodeEditWrapper):
 
     def createWidget(self):
-        widget = ProcessingParameterEstimatorCodeEdit(ProcessingParameterEstimatorCodeEdit.Regressor)
-        return widget
+        self._widget = ProcessingParameterEstimatorCodeEdit(ProcessingParameterEstimatorCodeEdit.Regressor)
+        return self._widget
 
 
 class ProcessingParameterClassifierCodeEditFactory(QgsProcessingParameterWidgetFactoryInterface):
     WIDGET_TYPE = 'enmapbox:ProcessingParameterClassifierCodeEdit'
+    _wrappers = []
 
     def parameterType(self):
         return self.WIDGET_TYPE
 
     def createWidgetWrapper(self, parameter, widget_type):
-        return ProcessingParameterClassifierCodeEditWrapper(parameter, widget_type)
+        wrapper = ProcessingParameterClassifierCodeEditWrapper(parameter, widget_type)
+        sip.transferto(wrapper, None)
+        self._wrappers.append(wrapper)
+        return wrapper
 
     @classmethod
     def register(cls):
@@ -105,12 +122,16 @@ class ProcessingParameterClassifierCodeEditFactory(QgsProcessingParameterWidgetF
 
 class ProcessingParameterRegressorCodeEditFactory(QgsProcessingParameterWidgetFactoryInterface):
     WIDGET_TYPE = 'enmapbox:ProcessingParameterRegressorCodeEdit'
+    _wrappers = []
 
     def parameterType(self):
         return self.WIDGET_TYPE
 
     def createWidgetWrapper(self, parameter, widget_type):
-        return ProcessingParameterRegressorCodeEditWrapper(parameter, widget_type)
+        wrapper = ProcessingParameterRegressorCodeEditWrapper(parameter, widget_type)
+        sip.transferto(wrapper, None)
+        self._wrappers.append(wrapper)
+        return wrapper
 
     @classmethod
     def register(cls):

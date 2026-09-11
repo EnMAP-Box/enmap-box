@@ -1,6 +1,7 @@
 from os.path import basename, join, dirname
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
+from qgis.PyQt import sip
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QMenu
 from qgis.PyQt.uic import loadUi
@@ -50,26 +51,43 @@ class ProcessingParameterSkopsFileWidget(QWidget):
 
 class ProcessingParameterSkopsFileWidgetWrapper(QgsAbstractProcessingParameterWidgetWrapper):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._widget = None
+
     def createWidget(self):
-        return ProcessingParameterSkopsFileWidget()
+        self._widget = ProcessingParameterSkopsFileWidget()
+        return self._widget
 
     def setWidgetValue(self, value, context):
-        widget = self.wrappedWidget()
-        widget.setValue(value)
+        if self._widget is not None:
+            self._widget.setValue(value)
+        else:
+            widget = self.wrappedWidget()
+            if widget is not None:
+                widget.setValue(value)
 
     def widgetValue(self):
+        if self._widget is not None:
+            return self._widget.value()
         widget = self.wrappedWidget()
-        return widget.value()
+        if widget is not None:
+            return widget.value()
+        return None
 
 
 class ProcessingParameterSkopsFileWidgetFactory(QgsProcessingParameterWidgetFactoryInterface):
     WIDGET_TYPE = 'enmapbox:ProcessingParameterSkopsFileWidget'
+    _wrappers = []
 
     def parameterType(self):
         return self.WIDGET_TYPE
 
     def createWidgetWrapper(self, parameter, widget_type):
-        return ProcessingParameterSkopsFileWidgetWrapper(parameter, widget_type)
+        wrapper = ProcessingParameterSkopsFileWidgetWrapper(parameter, widget_type)
+        sip.transferto(wrapper, None)
+        self._wrappers.append(wrapper)
+        return wrapper
 
     @classmethod
     def register(cls):

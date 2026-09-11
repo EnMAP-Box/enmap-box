@@ -1,11 +1,10 @@
-from qgis.core import QgsMessageLog, Qgis
-
-from qgis.gui import QgsAbstractProcessingParameterWidgetWrapper, QgsProcessingParameterWidgetFactoryInterface, QgsGui
-
+from qgis.PyQt import sip
 from qgis.PyQt.Qsci import QsciScintilla, QsciLexerPython
 from qgis.PyQt.QtGui import QFont, QFontMetrics, QColor
 from qgis.PyQt.QtWidgets import QWidget
 from qgis.PyQt.uic import loadUi
+from qgis.core import QgsMessageLog, Qgis
+from qgis.gui import QgsAbstractProcessingParameterWidgetWrapper, QgsProcessingParameterWidgetFactoryInterface, QgsGui
 
 
 class CodeEditWidget(QsciScintilla):
@@ -47,30 +46,43 @@ class ProcessingParameterCodeEdit(QWidget):
 
 class ProcessingParameterCodeEditWidgetWrapper(QgsAbstractProcessingParameterWidgetWrapper):
 
-    def __init__(self, parameter, widget_type, parent=None):
-        super().__init__(parameter, widget_type, parent)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._widget = None
 
     def createWidget(self):
-        widget = ProcessingParameterCodeEdit()
-        return widget
+        self._widget = ProcessingParameterCodeEdit()
+        return self._widget
 
     def setWidgetValue(self, value, context):
-        widget = self.wrappedWidget()
-        widget.codeEdit.setText(value)
+        if self._widget is not None:
+            self._widget.codeEdit.setText(value)
+        else:
+            widget = self.wrappedWidget()
+            if widget is not None:
+                widget.codeEdit.setText(value)
 
     def widgetValue(self):
+        if self._widget is not None:
+            return self._widget.codeEdit.value()
         widget = self.wrappedWidget()
-        return widget.codeEdit.value()
+        if widget is not None:
+            return widget.codeEdit.value()
+        return None
 
 
 class ProcessingParameterCodeEditWidgetFactory(QgsProcessingParameterWidgetFactoryInterface):
     WIDGET_TYPE = 'enmapbox:ProcessingParameterCodeEditWidget'
+    _wrappers = []
 
     def parameterType(self):
         return self.WIDGET_TYPE
 
     def createWidgetWrapper(self, parameter, widget_type):
-        return ProcessingParameterCodeEditWidgetWrapper(parameter, widget_type)
+        wrapper = ProcessingParameterCodeEditWidgetWrapper(parameter, widget_type)
+        sip.transferto(wrapper, None)
+        self._wrappers.append(wrapper)
+        return wrapper
 
     @classmethod
     def register(cls):

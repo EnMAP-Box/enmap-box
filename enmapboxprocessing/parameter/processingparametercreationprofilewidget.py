@@ -1,9 +1,9 @@
 import webbrowser
 
-from qgis.core import QgsMessageLog, Qgis
-
+from qgis.PyQt import sip
 from qgis.PyQt.QtWidgets import QWidget, QLineEdit, QComboBox, QToolButton
 from qgis.PyQt.uic import loadUi
+from qgis.core import QgsMessageLog, Qgis
 from qgis.gui import QgsAbstractProcessingParameterWidgetWrapper, QgsProcessingParameterWidgetFactoryInterface, QgsGui
 
 
@@ -48,27 +48,43 @@ class ProcessingParameterCreationProfileWidget(QWidget):
 
 class ProcessingParameterCreationProfileWidgetWrapper(QgsAbstractProcessingParameterWidgetWrapper):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._widget = None
+
     def createWidget(self):
-        widget = ProcessingParameterCreationProfileWidget()
-        return widget
+        self._widget = ProcessingParameterCreationProfileWidget()
+        return self._widget
 
     def setWidgetValue(self, value, context):
-        widget = self.wrappedWidget()
-        widget.mOptions.setText(value)
+        if self._widget is not None:
+            self._widget.mOptions.setText(value)
+        else:
+            widget = self.wrappedWidget()
+            if widget is not None:
+                widget.mOptions.setText(value)
 
     def widgetValue(self):
+        if self._widget is not None:
+            return self._widget.mOptions.text()
         widget = self.wrappedWidget()
-        return widget.mOptions.text()
+        if widget is not None:
+            return widget.mOptions.text()
+        return None
 
 
 class ProcessingParameterCreationProfileWidgetFactory(QgsProcessingParameterWidgetFactoryInterface):
     WIDGET_TYPE = 'enmapbox:ProcessingParameterCreationProfileWidget'
+    _wrappers = []
 
     def parameterType(self):
         return self.WIDGET_TYPE
 
     def createWidgetWrapper(self, parameter, widget_type):
-        return ProcessingParameterCreationProfileWidgetWrapper(parameter, widget_type)
+        wrapper = ProcessingParameterCreationProfileWidgetWrapper(parameter, widget_type)
+        sip.transferto(wrapper, None)
+        self._wrappers.append(wrapper)
+        return wrapper
 
     @classmethod
     def register(cls):
