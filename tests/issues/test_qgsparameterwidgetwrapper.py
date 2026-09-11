@@ -1,21 +1,9 @@
 import unittest
 
-from processing.gui.algorithm_widget import AlgorithmWidget
-from qgis.PyQt.QtCore import QObject
-from qgis.PyQt.QtWidgets import QMainWindow, QLineEdit
-from qgis.core import (
-    Qgis,
-    QgsApplication,
-    QgsProcessingAlgorithm,
-    QgsProcessingProvider,
-    QgsProcessingParameterDefinition,
-    QgsProcessingParameterString,
-    QgsProcessingContext,
-    QgsProcessingFeedback,
-    QgsProject,
-)
-from qgis.gui import QgsPanelWidget, QgsProcessingParameterWidgetFactoryInterface, \
-    QgsAbstractProcessingParameterWidgetWrapper, QgsGui
+from qgis.PyQt.QtWidgets import QLineEdit
+from qgis.core import Qgis, QgsProcessingParameterString
+from qgis.gui import QgsProcessingGuiRegistry
+from qgis.gui import QgsProcessingParameterWidgetFactoryInterface, QgsAbstractProcessingParameterWidgetWrapper, QgsGui
 from qgis.testing import start_app
 
 start_app()
@@ -26,7 +14,7 @@ class CustomStringParameterWidgetWrapper(QgsAbstractProcessingParameterWidgetWra
     def __init__(self, *args, **kwds):
         super().__init__(*args, **kwds)
         self._widget = None
-        self.setObjectName(f'CustomWrapper')
+        self.setObjectName('CustomWrapper')
 
     def createWidget(self):
         self._widget = QLineEdit()
