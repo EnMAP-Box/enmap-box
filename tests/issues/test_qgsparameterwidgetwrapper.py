@@ -1,8 +1,3 @@
-"""
-Test demonstrating custom QgsProcessingParameterWidgetFactoryInterface usage
-with QgsAbstractProcessingParameterWidgetWrapper.
-"""
-
 import unittest
 
 from processing.gui.algorithm_widget import AlgorithmWidget
@@ -21,14 +16,12 @@ from qgis.core import (
 )
 from qgis.gui import QgsPanelWidget, QgsProcessingParameterWidgetFactoryInterface, \
     QgsAbstractProcessingParameterWidgetWrapper, QgsGui
-# from qgis.testing import start_app
 from qgis.testing import start_app
 
 start_app()
 
 
 class CustomStringParameterWidgetWrapper(QgsAbstractProcessingParameterWidgetWrapper):
-    """Custom widget wrapper for the custom string parameter."""
 
     def __init__(self, *args, **kwds):
         super().__init__(*args, **kwds)
@@ -50,14 +43,13 @@ class CustomStringParameterWidgetWrapper(QgsAbstractProcessingParameterWidgetWra
 
 
 class CustomStringParameterWidgetFactory(QgsProcessingParameterWidgetFactoryInterface):
-    """Factory for creating the custom parameter widget."""
     NAME = 'MyParameterWidget'
 
-    CREATE_WIDGET_WRAPPER = 0
+    CREATED_WIDGET_WRAPPERS = 0
 
     def createWidgetWrapper(self, *args, **kwds):
         w = CustomStringParameterWidgetWrapper(*args, **kwds)
-        CustomStringParameterWidgetFactory.CREATE_WIDGET_WRAPPER += 1
+        CustomStringParameterWidgetFactory.CREATED_WIDGET_WRAPPERS += 1
         return w
 
     def clone(self):
@@ -68,19 +60,14 @@ class CustomStringParameterWidgetFactory(QgsProcessingParameterWidgetFactoryInte
 
 
 class TestCustomParameterWidget(unittest.TestCase):
-    """Test cases for custom parameter widget."""
 
     @classmethod
     def setUpClass(cls):
-        """Set up QGIS application for testing."""
-
-        # Register custom widget factory
         cls._factory = CustomStringParameterWidgetFactory()
         QgsGui.processingGuiRegistry().addParameterWidgetFactory(cls._factory)
 
     @classmethod
     def tearDownClass(cls):
-        """Clean up after tests."""
         QgsGui.processingGuiRegistry().removeParameterWidgetFactory(cls._factory)
 
     def test_widget_wrapper_creation(self):
@@ -98,17 +85,20 @@ class TestCustomParameterWidget(unittest.TestCase):
         param.setMetadata(metadata)
         wrapper_type = Qgis.ProcessingMode.Standard
 
-        self.assertEqual(CustomStringParameterWidgetFactory.CREATE_WIDGET_WRAPPER, 0)
+        # use CustomStringParameterWidgetFactory directly
+        self.assertEqual(CustomStringParameterWidgetFactory.CREATED_WIDGET_WRAPPERS, 0)
         wrapper1 = self._factory.createWidgetWrapper(param, wrapper_type)
-        self.assertEqual(CustomStringParameterWidgetFactory.CREATE_WIDGET_WRAPPER, 1)
+        self.assertEqual(CustomStringParameterWidgetFactory.CREATED_WIDGET_WRAPPERS, 1)
         self.assertEqual(wrapper1.objectName(), "CustomWrapper")
         self.assertIsInstance(wrapper1, QgsAbstractProcessingParameterWidgetWrapper)
         self.assertIsInstance(wrapper1, CustomStringParameterWidgetWrapper)
 
+        # use the CustomStringParameterWidgetFactory, where we have registered the CustomStringParameterWidgetFactory
+        # to
         reg: QgsProcessingGuiRegistry = QgsGui.processingGuiRegistry()
 
         wrapper2 = reg.createParameterWidgetWrapper(param, wrapper_type)
-        self.assertEqual(CustomStringParameterWidgetFactory.CREATE_WIDGET_WRAPPER, 2)
+        self.assertEqual(CustomStringParameterWidgetFactory.CREATED_WIDGET_WRAPPERS, 2)
         self.assertEqual(wrapper2.objectName(), "CustomWrapper")
         self.assertIsInstance(wrapper2, QgsAbstractProcessingParameterWidgetWrapper)
 
