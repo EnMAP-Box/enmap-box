@@ -142,9 +142,9 @@ class SpectralSurfacePlottingWindow(QMainWindow):
             fieldY = self.mFieldLfY.currentField()
             fieldZ = self.mFieldLfZ.currentField()
             for feature in layer.getFeatures():
-                xi = feature[fieldX]
-                yi = feature[fieldY]
-                zi = feature[fieldZ]
+                xi = float(feature[fieldX])
+                yi = float(feature[fieldY])
+                zi = float(feature[fieldZ])
                 ci = float(feature[fieldZ])
                 valid = xi >= xmin and xi <= xmax
                 valid &= yi >= ymin and yi <= ymax
