@@ -5,8 +5,15 @@ from typing import List, Union, Optional
 
 import numpy as np
 import pyqtgraph as pg
-
 import qgis.utils
+from qgis.PyQt.QtCore import Qt, QObject, QPoint, QModelIndex
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QComboBox
+from qgis.PyQt.QtWidgets import QMenu, QWidgetAction, QApplication, QAction
+from qgis.core import QgsWkbTypes, QgsPointXY, QgsRasterLayer, QgsMapLayerProxyModel, QgsProject, QgsLayerTree, \
+    QgsVectorLayer, QgsLayerTreeNode, QgsMapLayer, QgsLayerTreeLayer, QgsLayerTreeGroup
+from qgis.gui import QgsMapCanvas, QgisInterface
+
 from enmapbox.gui.contextmenus import EnMAPBoxAbstractContextMenuProvider
 from enmapbox.gui.datasources.datasources import DataSource, RasterDataSource, VectorDataSource, ModelDataSource
 from enmapbox.gui.datasources.datasourcesets import DataSourceSet
@@ -21,13 +28,6 @@ from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDi
 from enmapbox.qgispluginsupport.qps.models import TreeNode
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibraryplotwidget import SpectralProfilePlotModel
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent, findParent
-from qgis.PyQt.QtCore import Qt, QObject, QPoint, QModelIndex
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QComboBox
-from qgis.PyQt.QtWidgets import QMenu, QWidgetAction, QApplication, QAction
-from qgis.core import QgsWkbTypes, QgsPointXY, QgsRasterLayer, QgsMapLayerProxyModel, QgsProject, QgsLayerTree, \
-    QgsVectorLayer, QgsLayerTreeNode, QgsMapLayer, QgsLayerTreeLayer, QgsLayerTreeGroup
-from qgis.gui import QgsMapCanvas, QgisInterface
 
 logger = logging.getLogger(__name__)
 
@@ -123,7 +123,7 @@ class EnMAPBoxContextMenuProvider(EnMAPBoxAbstractContextMenuProvider):
         mPxGrid.addSeparator()
         wa = QWidgetAction(mPxGrid)
 
-        model = QgsMapLayerProxyModel()
+        model = QgsMapLayerProxyModel(self.enmapBox().project())
         model.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         model.setProject(mapCanvas.project())
 
