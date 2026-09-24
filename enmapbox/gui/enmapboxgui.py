@@ -629,17 +629,23 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         self.onReloadProject()
 
-    def executeAlgorithm(self, alg_id, parent, in_place=False, as_batch=False):
-        if True:
-            context = self.processingContext()
-            if parent is None:
-                parent = self.ui
-            executeAlgorithm(alg_id, parent,
-                             in_place=in_place,
-                             as_batch=as_batch,
-                             iface=self,
-                             context=context,
-                             on_results=self.onProcessingAlgTaskCompleted)
+    def executeAlgorithm(
+        self,
+        alg_id,
+        parent: Optional[QMainWindow] = None,
+        in_place=False,
+        as_batch=False
+    ):
+        context = self.processingContext()
+        if not isinstance(parent, QMainWindow):
+            parent = self.ui
+
+        executeAlgorithm(alg_id, parent,
+                         in_place=in_place,
+                         as_batch=as_batch,
+                         iface=self,
+                         context=context,
+                         on_results=self.onProcessingAlgTaskCompleted)
 
     def createExpressionContext(self) -> QgsExpressionContext:
         """

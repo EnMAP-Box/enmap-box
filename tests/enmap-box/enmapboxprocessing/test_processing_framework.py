@@ -1,9 +1,10 @@
 import unittest
 
+from qgis.core import QgsProject
+
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import TestCase, start_app
-from qgis.core import QgsProject
 
 start_app()
 initAll()
@@ -15,7 +16,7 @@ class TestProcessingFramework(TestCase):
     def test_gdal_translate(self):
         EMB = EnMAPBox(load_core_apps=False, load_other_apps=False)
         EMB.loadExampleData()
-        EMB.executeAlgorithm('gdal:translate', EMB.ui)
+        EMB.executeAlgorithm('gdal:translate')
         self.showGui(EMB.ui)
         QgsProject.instance().removeAllMapLayers()
 
