@@ -30,7 +30,7 @@
       </widget>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tab">
         <attribute name="title">
@@ -47,8 +47,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>727</width>
-              <height>716</height>
+              <width>731</width>
+              <height>761</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -171,7 +171,7 @@
                         </item>
                         <item row="0" column="1">
                          <widget class="QgsMapLayerComboBox" name="mTable">
-                          <property name="allowEmptyLayer">
+                          <property name="allowEmptyLayer" stdset="0">
                            <bool>true</bool>
                           </property>
                          </widget>
@@ -251,7 +251,7 @@
                           <property name="toolTip">
                            <string>Values used as y-coordinates.</string>
                           </property>
-                          <property name="allowEmptyFieldName">
+                          <property name="allowEmptyFieldName" stdset="0">
                            <bool>true</bool>
                           </property>
                          </widget>
@@ -261,14 +261,14 @@
                           <property name="toolTip">
                            <string>Values used for coloring.</string>
                           </property>
-                          <property name="allowEmptyFieldName">
+                          <property name="allowEmptyFieldName" stdset="0">
                            <bool>true</bool>
                           </property>
                          </widget>
                         </item>
                         <item row="0" column="1">
                          <widget class="QgsMapLayerComboBox" name="mLibrary">
-                          <property name="allowEmptyLayer">
+                          <property name="allowEmptyLayer" stdset="0">
                            <bool>true</bool>
                           </property>
                          </widget>
@@ -314,7 +314,7 @@
                       </item>
                       <item row="0" column="1">
                        <widget class="QgsMapLayerComboBox" name="mCollection">
-                        <property name="allowEmptyLayer">
+                        <property name="allowEmptyLayer" stdset="0">
                          <bool>true</bool>
                         </property>
                        </widget>
@@ -339,7 +339,7 @@
                          <string>Wavelength is used as x-coordinates.
  Reflectance is used as z-coordinates.</string>
                         </property>
-                        <property name="allowEmptyFieldName">
+                        <property name="allowEmptyFieldName" stdset="0">
                          <bool>true</bool>
                         </property>
                        </widget>
@@ -363,7 +363,7 @@
                         <property name="toolTip">
                          <string>Values used for coloring.</string>
                         </property>
-                        <property name="allowEmptyFieldName">
+                        <property name="allowEmptyFieldName" stdset="0">
                          <bool>true</bool>
                         </property>
                        </widget>
@@ -626,10 +626,10 @@
                   <property name="text">
                    <string/>
                   </property>
-                  <property name="defaultValue">
+                  <property name="defaultValue" stdset="0">
                    <string/>
                   </property>
-                  <property name="value">
+                  <property name="value" stdset="0">
                    <string/>
                   </property>
                   <property name="qgisRelation" stdset="0">
@@ -642,7 +642,7 @@
                   <property name="text">
                    <string/>
                   </property>
-                  <property name="value">
+                  <property name="value" stdset="0">
                    <string/>
                   </property>
                   <property name="qgisRelation" stdset="0">
@@ -655,7 +655,7 @@
                   <property name="text">
                    <string/>
                   </property>
-                  <property name="value">
+                  <property name="value" stdset="0">
                    <string/>
                   </property>
                   <property name="qgisRelation" stdset="0">
@@ -739,8 +739,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>727</width>
-              <height>744</height>
+              <width>731</width>
+              <height>796</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -853,127 +853,8 @@
                <layout class="QVBoxLayout" name="verticalLayout_9">
                 <item>
                  <layout class="QGridLayout" name="gridLayout_2">
-                  <item row="0" column="3">
-                   <layout class="QHBoxLayout" name="horizontalLayout_9">
-                    <item>
-                     <spacer name="horizontalSpacer_7">
-                      <property name="orientation">
-                       <enum>Qt::Orientation::Horizontal</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>5</width>
-                        <height>5</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                    <item>
-                     <widget class="QCheckBox" name="mShowAxisZ">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="checked">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="label_5">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="layoutDirection">
-                       <enum>Qt::LayoutDirection::LeftToRight</enum>
-                      </property>
-                      <property name="text">
-                       <string>Z</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <spacer name="horizontalSpacer_8">
-                      <property name="orientation">
-                       <enum>Qt::Orientation::Horizontal</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>5</width>
-                        <height>5</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                   </layout>
-                  </item>
-                  <item row="0" column="1">
-                   <layout class="QHBoxLayout" name="horizontalLayout_7">
-                    <item>
-                     <spacer name="horizontalSpacer">
-                      <property name="orientation">
-                       <enum>Qt::Orientation::Horizontal</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>5</width>
-                        <height>5</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                    <item>
-                     <widget class="QCheckBox" name="mShowAxisX">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="checked">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="label_2">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="layoutDirection">
-                       <enum>Qt::LayoutDirection::LeftToRight</enum>
-                      </property>
-                      <property name="text">
-                       <string>X</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <spacer name="horizontalSpacer_2">
-                      <property name="orientation">
-                       <enum>Qt::Orientation::Horizontal</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>5</width>
-                        <height>5</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                   </layout>
-                  </item>
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="label_9">
-                    <property name="text">
-                     <string>Show</string>
-                    </property>
-                   </widget>
-                  </item>
                   <item row="2" column="2">
-                   <widget class="QSpinBox" name="mScaleY">
+                   <widget class="QSpinBox" name="mScaleX">
                     <property name="minimum">
                      <number>-100</number>
                     </property>
@@ -982,7 +863,17 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="0" column="2">
+                  <item row="1" column="1">
+                   <widget class="QCheckBox" name="mShowAxisLabelX">
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="4">
                    <layout class="QHBoxLayout" name="horizontalLayout_8">
                     <item>
                      <spacer name="horizontalSpacer_5">
@@ -1019,7 +910,7 @@
                        <enum>Qt::LayoutDirection::LeftToRight</enum>
                       </property>
                       <property name="text">
-                       <string>Y</string>
+                       <string>Y-Axis</string>
                       </property>
                      </widget>
                     </item>
@@ -1038,65 +929,8 @@
                     </item>
                    </layout>
                   </item>
-                  <item row="1" column="1">
-                   <layout class="QHBoxLayout" name="horizontalLayout_3">
-                    <item>
-                     <layout class="QHBoxLayout" name="horizontalLayout_13">
-                      <item>
-                       <widget class="QCheckBox" name="mShowAxisLabelX">
-                        <property name="text">
-                         <string/>
-                        </property>
-                        <property name="checked">
-                         <bool>true</bool>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QLineEdit" name="mAxisLabelX">
-                        <property name="text">
-                         <string/>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
-                    </item>
-                   </layout>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QLabel" name="label_10">
-                    <property name="text">
-                     <string>Show label</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="2">
-                   <layout class="QHBoxLayout" name="horizontalLayout_4">
-                    <item>
-                     <layout class="QHBoxLayout" name="horizontalLayout_14">
-                      <item>
-                       <widget class="QCheckBox" name="mShowAxisLabelY">
-                        <property name="text">
-                         <string/>
-                        </property>
-                        <property name="checked">
-                         <bool>true</bool>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QLineEdit" name="mAxisLabelY">
-                        <property name="text">
-                         <string/>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
-                    </item>
-                   </layout>
-                  </item>
-                  <item row="2" column="1">
-                   <widget class="QSpinBox" name="mScaleX">
+                  <item row="2" column="5">
+                   <widget class="QSpinBox" name="mScaleZ">
                     <property name="minimum">
                      <number>-100</number>
                     </property>
@@ -1105,17 +939,171 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="2" column="4">
-                   <widget class="QToolButton" name="mAutoScale">
+                  <item row="0" column="2">
+                   <layout class="QHBoxLayout" name="horizontalLayout_7">
+                    <item>
+                     <spacer name="horizontalSpacer">
+                      <property name="orientation">
+                       <enum>Qt::Orientation::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>5</width>
+                        <height>5</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="mShowAxisX">
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="checked">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_2">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="layoutDirection">
+                       <enum>Qt::LayoutDirection::LeftToRight</enum>
+                      </property>
+                      <property name="text">
+                       <string>X-Axis</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer name="horizontalSpacer_2">
+                      <property name="orientation">
+                       <enum>Qt::Orientation::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>5</width>
+                        <height>5</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                   </layout>
+                  </item>
+                  <item row="1" column="3">
+                   <widget class="QCheckBox" name="mShowAxisLabelY">
                     <property name="text">
-                     <string>auto-scale</string>
+                     <string/>
                     </property>
-                    <property name="autoRaise">
+                    <property name="checked">
                      <bool>true</bool>
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="3">
+                  <item row="1" column="2">
+                   <layout class="QHBoxLayout" name="horizontalLayout_3">
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_13">
+                      <item>
+                       <widget class="QLineEdit" name="mAxisLabelX">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="placeholderText">
+                         <string>X</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
+                   </layout>
+                  </item>
+                  <item row="0" column="5">
+                   <layout class="QHBoxLayout" name="horizontalLayout_9">
+                    <item>
+                     <spacer name="horizontalSpacer_7">
+                      <property name="orientation">
+                       <enum>Qt::Orientation::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>5</width>
+                        <height>5</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="mShowAxisZ">
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="checked">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_5">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="layoutDirection">
+                       <enum>Qt::LayoutDirection::LeftToRight</enum>
+                      </property>
+                      <property name="text">
+                       <string>Z-Axis</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer name="horizontalSpacer_8">
+                      <property name="orientation">
+                       <enum>Qt::Orientation::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>5</width>
+                        <height>5</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                   </layout>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="label_8">
+                    <property name="text">
+                     <string>Aspect scale</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="4">
+                   <widget class="QSpinBox" name="mScaleY">
+                    <property name="minimum">
+                     <number>-100</number>
+                    </property>
+                    <property name="maximum">
+                     <number>100</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="label_10">
+                    <property name="text">
+                     <string>Show label</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="5">
                    <layout class="QHBoxLayout" name="horizontalLayout_6">
                     <item>
                      <layout class="QHBoxLayout" name="horizontalLayout_15">
@@ -1134,26 +1122,40 @@
                         <property name="text">
                          <string/>
                         </property>
+                        <property name="placeholderText">
+                         <string>Z</string>
+                        </property>
                        </widget>
                       </item>
                      </layout>
                     </item>
                    </layout>
                   </item>
-                  <item row="2" column="0">
-                   <widget class="QLabel" name="label_8">
-                    <property name="text">
-                     <string>Aspect scale</string>
-                    </property>
-                   </widget>
+                  <item row="1" column="4">
+                   <layout class="QHBoxLayout" name="horizontalLayout_4">
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_14">
+                      <item>
+                       <widget class="QLineEdit" name="mAxisLabelY">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="placeholderText">
+                         <string>Y</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
+                   </layout>
                   </item>
-                  <item row="2" column="3">
-                   <widget class="QSpinBox" name="mScaleZ">
-                    <property name="minimum">
-                     <number>-100</number>
+                  <item row="2" column="6">
+                   <widget class="QToolButton" name="mAutoScale">
+                    <property name="text">
+                     <string>auto-scale</string>
                     </property>
-                    <property name="maximum">
-                     <number>100</number>
+                    <property name="autoRaise">
+                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>
@@ -1234,8 +1236,8 @@
    <slot>setCurrentIndex(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>184</x>
-     <y>337</y>
+     <x>202</x>
+     <y>289</y>
     </hint>
     <hint type="destinationlabel">
      <x>631</x>
@@ -1250,12 +1252,12 @@
    <slot>setLayer(QgsMapLayer*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>718</x>
-     <y>346</y>
+     <x>299</x>
+     <y>270</y>
     </hint>
     <hint type="destinationlabel">
-     <x>718</x>
-     <y>378</y>
+     <x>299</x>
+     <y>276</y>
     </hint>
    </hints>
   </connection>
@@ -1266,12 +1268,12 @@
    <slot>setLayer(QgsMapLayer*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>718</x>
-     <y>346</y>
+     <x>299</x>
+     <y>270</y>
     </hint>
     <hint type="destinationlabel">
-     <x>718</x>
-     <y>416</y>
+     <x>299</x>
+     <y>282</y>
     </hint>
    </hints>
   </connection>
@@ -1282,12 +1284,12 @@
    <slot>setLayer(QgsMapLayer*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>536</x>
-     <y>347</y>
+     <x>719</x>
+     <y>299</y>
     </hint>
     <hint type="destinationlabel">
-     <x>536</x>
-     <y>409</y>
+     <x>719</x>
+     <y>364</y>
     </hint>
    </hints>
   </connection>
@@ -1298,12 +1300,12 @@
    <slot>setLayer(QgsMapLayer*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>609</x>
-     <y>347</y>
+     <x>719</x>
+     <y>299</y>
     </hint>
     <hint type="destinationlabel">
-     <x>612</x>
-     <y>441</y>
+     <x>719</x>
+     <y>398</y>
     </hint>
    </hints>
   </connection>
@@ -1314,12 +1316,12 @@
    <slot>setLayer(QgsMapLayer*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>693</x>
-     <y>347</y>
+     <x>719</x>
+     <y>299</y>
     </hint>
     <hint type="destinationlabel">
-     <x>705</x>
-     <y>479</y>
+     <x>719</x>
+     <y>444</y>
     </hint>
    </hints>
   </connection>
@@ -1330,12 +1332,12 @@
    <slot>setLayer(QgsMapLayer*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>477</x>
-     <y>347</y>
+     <x>298</x>
+     <y>270</y>
     </hint>
     <hint type="destinationlabel">
-     <x>510</x>
-     <y>379</y>
+     <x>298</x>
+     <y>275</y>
     </hint>
    </hints>
   </connection>
@@ -1346,12 +1348,12 @@
    <slot>setLayer(QgsMapLayer*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>501</x>
-     <y>347</y>
+     <x>298</x>
+     <y>270</y>
     </hint>
     <hint type="destinationlabel">
-     <x>510</x>
-     <y>411</y>
+     <x>298</x>
+     <y>280</y>
     </hint>
    </hints>
   </connection>
@@ -1362,12 +1364,12 @@
    <slot>setLayer(QgsMapLayer*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>510</x>
-     <y>347</y>
+     <x>298</x>
+     <y>270</y>
     </hint>
     <hint type="destinationlabel">
-     <x>510</x>
-     <y>443</y>
+     <x>298</x>
+     <y>285</y>
     </hint>
    </hints>
   </connection>
@@ -1378,12 +1380,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>195</x>
-     <y>406</y>
+     <x>208</x>
+     <y>377</y>
     </hint>
     <hint type="destinationlabel">
-     <x>132</x>
-     <y>430</y>
+     <x>150</x>
+     <y>410</y>
     </hint>
    </hints>
   </connection>
@@ -1394,12 +1396,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>195</x>
-     <y>401</y>
+     <x>208</x>
+     <y>377</y>
     </hint>
     <hint type="destinationlabel">
-     <x>195</x>
-     <y>426</y>
+     <x>295</x>
+     <y>417</y>
     </hint>
    </hints>
   </connection>
@@ -1411,11 +1413,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>375</x>
-     <y>402</y>
+     <y>377</y>
     </hint>
     <hint type="destinationlabel">
-     <x>315</x>
-     <y>434</y>
+     <x>317</x>
+     <y>410</y>
     </hint>
    </hints>
   </connection>
@@ -1426,12 +1428,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>379</x>
-     <y>409</y>
+     <x>375</x>
+     <y>377</y>
     </hint>
     <hint type="destinationlabel">
-     <x>379</x>
-     <y>436</y>
+     <x>461</x>
+     <y>417</y>
     </hint>
    </hints>
   </connection>
@@ -1442,12 +1444,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>554</x>
-     <y>416</y>
+     <x>531</x>
+     <y>377</y>
     </hint>
     <hint type="destinationlabel">
-     <x>492</x>
-     <y>436</y>
+     <x>483</x>
+     <y>410</y>
     </hint>
    </hints>
   </connection>
@@ -1458,12 +1460,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>562</x>
-     <y>397</y>
+     <x>531</x>
+     <y>377</y>
     </hint>
     <hint type="destinationlabel">
-     <x>551</x>
-     <y>434</y>
+     <x>628</x>
+     <y>417</y>
     </hint>
    </hints>
   </connection>
