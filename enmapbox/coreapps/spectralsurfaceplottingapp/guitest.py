@@ -3,7 +3,7 @@ from qgis.core import QgsRasterLayer, QgsVectorLayer
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
-from enmapboxtestdata import surfaceLongFormat
+from enmapboxtestdata import surfaceLongFormat, surfaceLibrary
 from spectralsurfaceplottingapp.spectralsurfaceplottingwindow import SpectralSurfacePlottingWindow
 
 qgsApp = start_app()
@@ -14,7 +14,7 @@ filenameExampleRaster = r'D:\data\timeseries\EnMAP_Namibia_TS\X0080_Y0317\ENMAPL
 enmapBox.onDataDropped(
     [
         QgsVectorLayer(surfaceLongFormat, 'surface_long_format.csv'),
-        # QgsVectorLayer(surfaceLibrary, 'surface_library.geojson'),
+        QgsVectorLayer(surfaceLibrary, 'surface_library.geojson'),
         QgsVectorLayer(filenameCollection, 'raster_collection.geojson'),
         #        QgsRasterLayer(filenameExampleRaster, 'ENMAPL2A_20250124_SPECTRAL_IMAGE_MASKED.TIF')
     ]

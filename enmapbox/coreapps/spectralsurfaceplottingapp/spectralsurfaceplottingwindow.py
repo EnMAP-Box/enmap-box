@@ -5,7 +5,7 @@ import pyvista as pv
 from pyvistaqt import QtInteractor
 from qgis.PyQt.QtCore import QDateTime
 from qgis.PyQt.QtWidgets import QSizePolicy, QSlider, QToolButton, QMainWindow, QComboBox, QCheckBox, QVBoxLayout, \
-    QWidget
+    QWidget, QLineEdit
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer, QgsColorRamp, QgsStyle, QgsMapLayerProxyModel
 from qgis.gui import QgsColorRampButton, QgsMessageBar, QgsMapLayerComboBox, QgsFieldComboBox, QgsFilterLineEdit
@@ -31,6 +31,7 @@ class SpectralSurfacePlottingWindow(QMainWindow):
     mDataFormat: QComboBox
     mTable: QgsMapLayerComboBox
     mLibrary: QgsMapLayerComboBox
+    mLibrarySelectedOnly: QCheckBox
     mCollection: QgsMapLayerComboBox
     mXMin: QgsFilterLineEdit
     mXMax: QgsFilterLineEdit
@@ -47,6 +48,15 @@ class SpectralSurfacePlottingWindow(QMainWindow):
     mShowEdges: QCheckBox
     mShowGrid: QCheckBox
     mShowAxes: QCheckBox
+    mShowAxisX: QCheckBox
+    mShowAxisY: QCheckBox
+    mShowAxisZ: QCheckBox
+    mShowAxisLabelX: QCheckBox
+    mShowAxisLabelY: QCheckBox
+    mShowAxisLabelZ: QCheckBox
+    mAxisLabelX: QLineEdit
+    mAxisLabelY: QLineEdit
+    mAxisLabelZ: QLineEdit
     mColorRamp: QgsColorRampButton
 
     mFieldLfX: QgsFieldComboBox
@@ -109,6 +119,16 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         self.mScaleZ.valueChanged.connect(self.onScaleChanged)
         self.mAutoScale.clicked.connect(self.onAutoScale)
 
+        for w in [
+            self.mShowAxisX, self.mShowAxisY, self.mShowAxisZ,
+            self.mShowAxisLabelX, self.mShowAxisLabelY, self.mShowAxisLabelZ
+        ]:
+            w.checkStateChanged.connect(self.updateGrid)
+
+        self.mAxisLabelX.textChanged.connect(self.updateGrid)
+        self.mAxisLabelY.textChanged.connect(self.updateGrid)
+        self.mAxisLabelZ.textChanged.connect(self.updateGrid)
+
         self.mLoadData.clicked.connect(self.onLoadData)
 
         colorRamp: QgsColorRamp = QgsStyle().defaultStyle().colorRamp('Turbo')
@@ -161,8 +181,9 @@ class SpectralSurfacePlottingWindow(QMainWindow):
             fieldProfile = self.mFieldLibraryProfiles.currentField()
             fieldY = self.mFieldLibraryY.currentField()
             fieldC = self.mFieldLibraryC.currentField()
+            selectedOnly = self.mLibrarySelectedOnly.isChecked()
             try:
-                for i, (values, geometry) in enumerate(reader.data(), 1):
+                for i, (values, geometry) in enumerate(reader.data(selectedOnly), 1):
                     xs = values[fieldProfile]['x']
                     zs = values[fieldProfile]['y']
                     yi = values.get(fieldY, i)
@@ -252,12 +273,12 @@ class SpectralSurfacePlottingWindow(QMainWindow):
 
         self.gridActor = self.plotter.show_grid(
             bounds=bounds,
-            xtitle='',
-            ytitle='',
-            ztitle='',
-            show_xaxis=True,
-            show_yaxis=True,
-            show_zaxis=True
+            xtitle=self.mAxisLabelX.text() if self.mShowAxisLabelX.isChecked() else '',
+            ytitle=self.mAxisLabelY.text() if self.mShowAxisLabelY.isChecked() else '',
+            ztitle=self.mAxisLabelZ.text() if self.mShowAxisLabelZ.isChecked() else '',
+            show_xaxis=self.mShowAxisX.isChecked(),
+            show_yaxis=self.mShowAxisY.isChecked(),
+            show_zaxis=self.mShowAxisZ.isChecked()
         )
         self.onShowGridChanged()
 
@@ -266,10 +287,6 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         # number of decimal places
         self.gridActor.x_label_format = '{0:.2f}'
         self.gridActor.y_label_format = '{0:.2f}'
-
-        print('BOUNDS')
-        print(bounds[0] / self.scaleX, bounds[1] / self.scaleX)
-        print(bounds[2] / self.scaleY, bounds[3] / self.scaleY)
 
     def plotData(self):
 
@@ -418,6 +435,11 @@ class SpectralSurfacePlottingWindow(QMainWindow):
             return
 
         x, y, z, c = self.readData()
+
+        if len(x) == 0:
+            self.mMessageBar.pushWarning('Load data', 'empty data set')
+            return
+
         self.setData(y, x, z, c)
         self.plotData()
         self.onAutoScale()
