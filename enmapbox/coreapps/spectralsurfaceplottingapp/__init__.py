@@ -29,7 +29,6 @@ class SpectralSurfacePlottingApp(EnMAPBoxApplication):
         return 'Spectral Surface Plotting'
 
     def menu(self, appMenu: QMenu):
-        has_pyvista=False
         name = self.title()
         if not has_pyvista:
             name += ' (requires to install pyvista)'
