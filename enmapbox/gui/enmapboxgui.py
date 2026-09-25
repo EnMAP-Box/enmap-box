@@ -1313,7 +1313,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.ui.cursorLocationValuePanel.mLocationInfoModel.setCountFromZero(False)
 
         self.ui.spectralProfileSourcePanel: SpectralProfileSourcePanel = \
-            self.addPanel(area, SpectralProfileSourcePanel(self.ui), False)
+            self.addPanel(area, SpectralProfileSourcePanel(self.ui, project=self.project()), False)
 
         sources = [
             MapCanvasLayerProfileSource(mode=MapCanvasLayerProfileSource.MODE_FIRST_LAYER),

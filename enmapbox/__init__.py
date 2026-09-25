@@ -34,7 +34,6 @@ import warnings
 from pathlib import Path
 
 from osgeo import gdal
-
 from qgis.PyQt.QtCore import QSettings, PYQT_VERSION_STR
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import Qgis, QgsApplication, QgsProcessingAlgorithm, QgsProcessingProvider
@@ -303,16 +302,16 @@ def registerExpressionFunctions():
     """
     Adds Expression functions for the QGIS expression editor
     """
-    from .qgispluginsupport.qps.qgsfunctions import registerQgsExpressionFunctions
-    registerQgsExpressionFunctions()
+    from .qgispluginsupport.qps import registerExpressionFunctions
+    registerExpressionFunctions()
 
 
 def unregisterExpressionFunctions():
     """
     Removes added expression functions
     """
-    from .qgispluginsupport.qps.qgsfunctions import unregisterQgsExpressionFunctions
-    unregisterQgsExpressionFunctions()
+    from .qgispluginsupport.qps import unregisterExpressionFunctions
+    unregisterExpressionFunctions()
 
 
 def initAll():
