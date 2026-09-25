@@ -1,3 +1,4 @@
+import logging
 from math import inf
 
 import numpy as np
@@ -13,6 +14,18 @@ from qgis.gui import QgsColorRampButton, QgsMessageBar, QgsMapLayerComboBox, Qgs
 from enmapboxprocessing.libraryreader import LibraryReader
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+
+pv.vtk_verbosity("off")
+
+
+class VtkLogFilter(logging.Filter):
+
+    def filter(self, record):
+        message = record.getMessage()
+        return "vtkVectorText" not in message
+
+
+logging.getLogger().addFilter(VtkLogFilter())
 
 
 def parseFloat(w: QgsFilterLineEdit, default):
