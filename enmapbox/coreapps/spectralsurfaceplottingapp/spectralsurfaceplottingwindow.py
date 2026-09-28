@@ -4,6 +4,7 @@ from math import inf
 import numpy as np
 import pyvista as pv
 from pyvistaqt import QtInteractor
+import vtk
 from qgis.PyQt.QtCore import QDateTime
 from qgis.PyQt.QtWidgets import QSizePolicy, QSlider, QToolButton, QMainWindow, QComboBox, QCheckBox, QVBoxLayout, \
     QWidget, QLineEdit
@@ -271,7 +272,12 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         self.point_cloud = pv.PolyData(xyz)
         self.point_cloud.point_data["C"] = c
 
-        self.mesh = self.point_cloud.delaunay_2d()
+        delaunay = vtk.vtkDelaunay2D()
+        delaunay.SetInputData(self.point_cloud)
+        delaunay.SetProjectionPlaneMode(vtk.VTK_DELAUNAY_XY_PLANE)
+        delaunay.Update()
+        self.mesh = pv.wrap(delaunay.GetOutput())
+
         self.mesh.point_data["C"] = c
 
     def updateGrid(self):
@@ -312,7 +318,7 @@ class SpectralSurfacePlottingWindow(QMainWindow):
             line_width=0.4,
             smooth_shading=True,
             opacity=0.8 + 0.2,
-            scalar_bar_args={"title": "C"},
+            scalar_bar_args={"title": ""},
             name='surface'
         )
         self.onShowSurfaceChanged()
