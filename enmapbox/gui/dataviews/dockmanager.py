@@ -1664,8 +1664,12 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
             action.triggered.connect(lambda: canvas.setDestinationCrs(lyr.crs()))
 
             def setLayerNameAsMapName(node, lyr):
-                node.parent().setName(lyr.name())
-                node.parent().dock.setTitle(lyr.name())
+                print(node.parent())
+                mapDock = node
+                while not isinstance(mapDock, MapDockTreeNode):
+                    mapDock = mapDock.parent()  # step up potential group nodes
+                mapDock.setName(lyr.name())
+                mapDock.dock.setTitle(lyr.name())
 
             action = menu.addAction('Set layer name as view name')
             action.triggered.connect(lambda: setLayerNameAsMapName(node, lyr))
