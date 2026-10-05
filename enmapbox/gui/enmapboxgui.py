@@ -1485,7 +1485,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         self.ui.mActionToggleEditing.toggled.connect(onEditingToggled)
 
-        m = QMenu()
+        m = QMenu(parent=self.ui)
         m.addAction(self.ui.optionSelectFeaturesRectangle)
         m.addAction(self.ui.optionSelectFeaturesPolygon)
         m.addAction(self.ui.optionSelectFeaturesFreehand)
