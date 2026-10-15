@@ -14,12 +14,6 @@ from typing import Dict, List
 import defusedxml.ElementTree as etree
 import pandas as pd
 import requests
-
-from enmapbox import DIR_REPO_TMP, initAll
-from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
-from enmapbox.gui.applications import ApplicationWrapper, EnMAPBoxApplication
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.testing import start_app
 from qgis.PyQt.QtWidgets import QMenu
 from qgis.core import (
     QgsProcessing, QgsProcessingAlgorithm, QgsProcessingOutputFile, QgsProcessingOutputFolder,
@@ -30,6 +24,12 @@ from qgis.core import (
     QgsProcessingParameterRasterDestination, QgsProcessingParameterRasterLayer, QgsProcessingParameterVectorDestination,
     QgsProcessingParameterVectorLayer
 )
+
+from enmapbox import DIR_REPO_TMP, initAll
+from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
+from enmapbox.gui.applications import ApplicationWrapper, EnMAPBoxApplication
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.testing import start_app
 
 
 def linesOfCode(path) -> int:
@@ -222,6 +222,61 @@ def report_github_issues_QGIS(authors=['jakimowb', 'janzandr'], start_date='2020
             for label in labels:
                 print(f' {label}: {len(issues_by_label.get(label, []))}')
 
+    def format_printInfos(issues: List[dict], labels=['duplicate', 'wontfix']) -> List[str]:
+        lines = []
+        is_closed = []
+        is_open = []
+
+        issues_by_label: Dict[str, List[dict]] = dict()
+        for i in issues:
+            if i['closed_at'] is None:
+                is_open.append(i)
+            else:
+                is_closed.append(i)
+
+            for label in i['labels']:
+                n = label['name']
+                issues_by_label[n] = issues_by_label.get(n, []) + [i]
+
+        n_t = len(issues)
+        n_o = len(is_open)
+        n_c = len(is_closed)
+        lines.append(' Total: {:3}'.format(n_t))
+        if n_t > 0:
+            lines.append('  Open: {:3} {:0.2f}%'.format(n_o, n_o / n_t * 100))
+            lines.append('Closed: {:3} {:0.2f}%'.format(n_c, n_c / n_t * 100))
+            for label in labels:
+                lines.append(f' {label}: {len(issues_by_label.get(label, []))}')
+        else:
+            pass
+        return lines
+
+    def countIssues(issues: List[dict], labels=['duplicate', 'wontfix']) -> Dict[str, int]:
+        is_closed = []
+        is_open = []
+
+        issues_by_label: Dict[str, List[dict]] = dict()
+        for i in issues:
+            if i['closed_at'] is None:
+                is_open.append(i)
+            else:
+                is_closed.append(i)
+
+            for label in i['labels']:
+                n = label['name']
+                issues_by_label[n] = issues_by_label.get(n, []) + [i]
+
+        infos = {'total': len(issues),
+                 'open': len(is_open),
+                 'closed': len(is_closed)}
+        for label in labels:
+            infos[label] = len(issues_by_label.get(label, []))
+        return infos
+
+    # cntP = countIssues(created_in_report_period)
+    # cntB = countIssues(created_before_but_touched)
+    # cntA = countIssues(created_in_report_period + created_before_but_touched)
+
     print(f'By today: {today}')
     print(f'Issues created in reporting period: {start_date} to {end_date}:')
     printInfos(created_in_report_period)
@@ -231,6 +286,22 @@ def report_github_issues_QGIS(authors=['jakimowb', 'janzandr'], start_date='2020
 
     print('Total:')
     printInfos(created_before_but_touched + created_in_report_period)
+
+    report_lines = []
+    report_lines.append(f'By today: {today}')
+    report_lines.append(f'Issues created in reporting period: {start_date} to {end_date}:')
+    report_lines.extend(format_printInfos(created_in_report_period))
+    report_lines.append('')
+    report_lines.append(f'Issues created before {start_date} but handled in reporting period:')
+    report_lines.extend(format_printInfos(created_before_but_touched))
+    report_lines.append('')
+    report_lines.append('Total:')
+    report_lines.extend(format_printInfos(created_before_but_touched + created_in_report_period))
+
+    path_report = pathlib.Path(DIR_REPO_TMP) / f'github_issues_report.{today}.QGIS.txt'
+    with open(path_report, 'w', encoding='utf-8') as f:
+        f.write('\n'.join(report_lines))
+
     return None
 
 
@@ -306,7 +377,6 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
     with open(PATH_GH_JSON, 'r') as f:
         all_issues = json.load(f)
     pull_requests = [i for i in all_issues if 'pull_request' in i]
-    print(pull_requests)
     issues = [i for i in all_issues if 'pull_request' not in i]
     if True:
         for i in issues:
@@ -346,6 +416,10 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
         return infos
 
     def printInfos(issues: List[dict], labels=['duplicate', 'wontfix']):
+        pass
+
+    def format_printInfos(issues: List[dict], labels=['duplicate', 'wontfix']) -> List[str]:
+        lines = []
         is_closed = []
         is_open = []
 
@@ -363,24 +437,15 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
         n_t = len(issues)
         n_o = len(is_open)
         n_c = len(is_closed)
-        print(' Total: {:3}'.format(n_t))
+        lines.append(' Total: {:3}'.format(n_t))
         if n_t > 0:
-            print('  Open: {:3} {:0.2f}%'.format(n_o, n_o / n_t * 100))
-            print('Closed: {:3} {:0.2f}%'.format(n_c, n_c / n_t * 100))
+            lines.append('  Open: {:3} {:0.2f}%'.format(n_o, n_o / n_t * 100))
+            lines.append('Closed: {:3} {:0.2f}%'.format(n_c, n_c / n_t * 100))
             for label in labels:
-                print(f' {label}: {len(issues_by_label.get(label, []))}')
+                lines.append(f' {label}: {len(issues_by_label.get(label, []))}')
         else:
             pass
-
-    print(f'By today: {today}')
-    print(f'Issues created in reporting period: {start_date} to {end_date}:')
-    printInfos(created_in_report_period)
-
-    print(f'Issues created before {start_date} but handled in reporting period:')
-    printInfos(created_before_but_touched)
-
-    print('Total:')
-    printInfos(created_before_but_touched + created_in_report_period)
+        return lines
 
     cntP = countIssues(created_in_report_period)
     cntB = countIssues(created_before_but_touched)
@@ -408,7 +473,34 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
         r"    \label{{tab:enmapbox_issues}}\n"
         r"\end{{table}}\n"
     )
-    print(LaTeX)
+
+    print(f'By today: {today}')
+    print(f'Issues created in reporting period: {start_date} to {end_date}:')
+    printInfos(created_in_report_period)
+
+    print(f'Issues created before {start_date} but handled in reporting period:')
+    printInfos(created_before_but_touched)
+
+    print('Total:')
+    printInfos(created_before_but_touched + created_in_report_period)
+
+    report_lines = []
+    report_lines.append(f'By today: {today}')
+    report_lines.append(f'Issues created in reporting period: {start_date} to {end_date}:')
+    report_lines.extend(format_printInfos(created_in_report_period))
+    report_lines.append('')
+    report_lines.append(f'Issues created before {start_date} but handled in reporting period:')
+    report_lines.extend(format_printInfos(created_before_but_touched))
+    report_lines.append('')
+    report_lines.append('Total:')
+    report_lines.extend(format_printInfos(created_before_but_touched + created_in_report_period))
+    report_lines.append('')
+    report_lines.append(LaTeX)
+
+    path_report = pathlib.Path(DIR_REPO_TMP) / f'github_issues_report.{today.isoformat()}.txt'
+    with open(path_report, 'w', encoding='utf-8') as f:
+        f.write('\n'.join(report_lines))
+
     return None
 
 
@@ -516,8 +608,8 @@ def report_processingalgorithms() -> pd.DataFrame:
 
 
 class TestCases(unittest.TestCase):
-    start_date = '2025-04-01'
-    end_date = '2025-10-30'
+    start_date = '2026-05-01'
+    end_date = '2026-10-30'
 
     def test_github_EnMAPBox(self):
         report_github_issues_EnMAPBox(start_date=self.start_date, end_date=self.end_date)
