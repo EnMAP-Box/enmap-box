@@ -76,6 +76,7 @@ from enmapboxprocessing.algorithm.importemitl2aalgorithm import ImportEmitL2AAlg
 from enmapboxprocessing.algorithm.importenmapl1balgorithm import ImportEnmapL1BAlgorithm
 from enmapboxprocessing.algorithm.importenmapl1calgorithm import ImportEnmapL1CAlgorithm
 from enmapboxprocessing.algorithm.importenmapl2aalgorithm import ImportEnmapL2AAlgorithm
+from enmapboxprocessing.algorithm.importiperlitel1calgorithm import ImportIperliteL1CAlgorithm
 from enmapboxprocessing.algorithm.importlandsatl2algorithm import ImportLandsatL2Algorithm
 from enmapboxprocessing.algorithm.importplanetscopealgorithm import ImportPlanetScopeAlgorithm
 from enmapboxprocessing.algorithm.importprismal1algorithm import ImportPrismaL1Algorithm
@@ -1599,6 +1600,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             ImportEnmapL1BAlgorithm(),
             ImportEnmapL1CAlgorithm(),
             ImportEnmapL2AAlgorithm(),
+            ImportIperliteL1CAlgorithm(),
             ImportLandsatL2Algorithm(),
             ImportPlanetScopeAlgorithm(),
             ImportPrismaL1Algorithm(),

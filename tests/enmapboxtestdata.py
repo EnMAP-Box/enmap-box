@@ -104,7 +104,6 @@ _subdir = 'surfacedata'
 surfaceLongFormat = join(_root, _subdir, 'surface_long_format.csv')
 surfaceLibrary = join(_root, _subdir, 'surface_library.geojson')
 
-
 # DATASET
 _subdir = 'ml'
 
@@ -377,6 +376,16 @@ class SensorProducts(object):
                 sensorProductsRoot(), 'enmap', 'raw',
                 'ENMAP01-____L2A-DT0000001867_20220724T104526Z_008_V010111_20230213T084607Z.ZIP'
             )
+
+        class Iperlite(object):
+            L1C = join(
+                sensorProductsRoot(), 'iperlite',
+                'IPERLITE_LEVEL1C_20260915T140722Z_20260915T140737Z_WGS84_20M_V001'
+            )
+            L1C_MetadataXml = join(
+                L1C, 'IPERLITE_LEVEL1C_20260915T140722Z_20260915T140737Z_WGS84_20M_V001.xml'
+            )
+            L1C_Zip = L1C + '.zip'
 
         class Landsat(object):  # collection 2 only
 
