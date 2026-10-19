@@ -232,7 +232,7 @@
                           </property>
                          </widget>
                         </item>
-                        <item row="4" column="0">
+                        <item row="5" column="0">
                          <widget class="QLabel" name="label_42">
                           <property name="sizePolicy">
                            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -256,7 +256,7 @@
                           </property>
                          </widget>
                         </item>
-                        <item row="4" column="1">
+                        <item row="5" column="1">
                          <widget class="QgsFieldComboBox" name="mFieldLibraryC">
                           <property name="toolTip">
                            <string>Values used for coloring.</string>
@@ -290,6 +290,13 @@
                          <widget class="QCheckBox" name="mLibrarySelectedOnly">
                           <property name="text">
                            <string>Selected profiles only</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="4" column="1">
+                         <widget class="QCheckBox" name="mFieldLibraryYSorted">
+                          <property name="text">
+                           <string>Sort by y-values, plot by index</string>
                           </property>
                          </widget>
                         </item>

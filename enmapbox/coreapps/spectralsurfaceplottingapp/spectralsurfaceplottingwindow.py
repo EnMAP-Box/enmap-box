@@ -1,10 +1,11 @@
 import logging
+import traceback
 from math import inf
 
 import numpy as np
 import pyvista as pv
-from pyvistaqt import QtInteractor
 import vtk
+from pyvistaqt import QtInteractor
 from qgis.PyQt.QtCore import QDateTime
 from qgis.PyQt.QtWidgets import QSizePolicy, QSlider, QToolButton, QMainWindow, QComboBox, QCheckBox, QVBoxLayout, \
     QWidget, QLineEdit
@@ -78,6 +79,7 @@ class SpectralSurfacePlottingWindow(QMainWindow):
     mFieldLfZ: QgsFieldComboBox
     mFieldLibraryProfiles: QgsFieldComboBox
     mFieldLibraryY: QgsFieldComboBox
+    mFieldLibraryYSorted: QCheckBox
     mFieldLibraryC: QgsFieldComboBox
     mFieldCollectionY: QgsFieldComboBox
     mFieldCollectionC: QgsFieldComboBox
@@ -113,6 +115,11 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         )
         self.plotter.set_background('white')
         self.plotLayout.addWidget(self.plotter)
+
+        self.plotter.add_text(
+            "Select input data", position=(50., 50.), font_size=16, color="gray", name="startup_message"
+        )
+        self.plotter.show()
 
         from enmapbox.gui.enmapboxgui import EnMAPBox
         self.enmapBox = EnMAPBox.instance()
@@ -175,19 +182,25 @@ class SpectralSurfacePlottingWindow(QMainWindow):
             fieldX = self.mFieldLfX.currentField()
             fieldY = self.mFieldLfY.currentField()
             fieldZ = self.mFieldLfZ.currentField()
-            for feature in layer.getFeatures():
-                xi = float(feature[fieldX])
-                yi = float(feature[fieldY])
-                zi = float(feature[fieldZ])
-                ci = float(feature[fieldZ])
-                valid = xi >= xmin and xi <= xmax
-                valid &= yi >= ymin and yi <= ymax
-                valid &= zi >= zmin and zi <= zmax
-                if valid:
-                    x.append(xi / fx)
-                    y.append(yi / fy)
-                    z.append(zi / fz)
-                    c.append(ci)
+
+            try:
+                for feature in layer.getFeatures():
+                    xi = float(feature[fieldX])
+                    yi = float(feature[fieldY])
+                    zi = float(feature[fieldZ])
+                    ci = float(feature[fieldZ])
+                    valid = xi >= xmin and xi <= xmax
+                    valid &= yi >= ymin and yi <= ymax
+                    valid &= zi >= zmin and zi <= zmax
+                    if valid:
+                        x.append(xi / fx)
+                        y.append(yi / fy)
+                        z.append(zi / fz)
+                        c.append(ci)
+            except Exception:
+                traceback.print_exc()
+                self.mMessageBar.pushWarning('Load data', 'inputs missing/incorrect')
+                return
 
         elif self.mDataFormat.currentIndex() == self.LibraryFormat:
             layer = self.mLibrary.currentLayer()
@@ -197,10 +210,20 @@ class SpectralSurfacePlottingWindow(QMainWindow):
             fieldC = self.mFieldLibraryC.currentField()
             selectedOnly = self.mLibrarySelectedOnly.isChecked()
             try:
-                for i, (values, geometry) in enumerate(reader.data(selectedOnly), 1):
+
+                # read y-values
+                ys = list()
+                for i, (values, geometry) in enumerate(reader.data(selectedOnly)):
+                    yi = values.get(fieldY, i)
+                    ys.append(yi / fy)
+                if self.mFieldLibraryYSorted.isChecked():
+                    ys = np.argsort(ys)
+
+                # read profiles
+                for i, (values, geometry) in enumerate(reader.data(selectedOnly)):
                     xs = values[fieldProfile]['x']
                     zs = values[fieldProfile]['y']
-                    yi = values.get(fieldY, i)
+                    yi = ys[i]
 
                     for xi, zi in zip(xs, zs):
                         if not np.isfinite([xi, yi, zi]).all():
@@ -215,7 +238,8 @@ class SpectralSurfacePlottingWindow(QMainWindow):
                             z.append(zi / fz)
                             c.append(ci)
             except Exception:
-                self.mMessageBar.pushWarning('Load data', 'select required inputs')
+                traceback.print_exc()
+                self.mMessageBar.pushWarning('Load data', 'inputs missing/incorrect')
                 return
         elif self.mDataFormat.currentIndex() == self.CollectionFormat:
             collectionLayer = self.mCollection.currentLayer()
@@ -230,32 +254,36 @@ class SpectralSurfacePlottingWindow(QMainWindow):
                 self.mMessageBar.pushWarning('Load data', 'select a map location')
                 return
 
-            for i, (values, geometry) in enumerate(collectionReader.data(), 1):
-                # if i==5:
-                #    break
-                yi = values.get(fieldY, i)
-                if isinstance(yi, QDateTime):
-                    yi = Utils.dateTimeToDecimalYear(yi)
+            try:
+                for i, (values, geometry) in enumerate(collectionReader.data(), 1):
+                    yi = values.get(fieldY, i)
+                    if isinstance(yi, QDateTime):
+                        yi = Utils.dateTimeToDecimalYear(yi)
 
-                source = values.get(fieldSource, i)
-                provider = values.get(fieldProvider, i)
-                rasterLayer = QgsRasterLayer(source, '', provider)
-                rasterReader = RasterReader(rasterLayer)
-                pixel = point.toPixel(rasterReader)
-                zs = np.array(rasterReader.arrayFromPixelOffsetAndSize(pixel.x(), pixel.y(), 1, 1)).flatten()  # / 10000
-                xs = [rasterReader.wavelength(bandNo) for bandNo in rasterReader.bandNumbers()]
-                for xi, zi in zip(xs, zs):
-                    if not np.isfinite([xi, yi, zi]).all():
-                        continue
-                    ci = values.get(fieldC, zi / fz)  # default color is zi
-                    valid = xi >= xmin and xi <= xmax
-                    valid &= yi >= ymin and yi <= ymax
-                    valid &= zi >= zmin and zi <= zmax
-                    if valid:
-                        x.append(xi / fx)
-                        y.append(yi / fy)
-                        z.append(zi / fz)
-                        c.append(ci)
+                    source = values.get(fieldSource, i)
+                    provider = values.get(fieldProvider, i)
+                    rasterLayer = QgsRasterLayer(source, '', provider)
+                    rasterReader = RasterReader(rasterLayer)
+                    pixel = point.toPixel(rasterReader)
+                    zs = np.array(rasterReader.arrayFromPixelOffsetAndSize(pixel.x(), pixel.y(), 1, 1)).flatten()
+                    xs = [rasterReader.wavelength(bandNo) for bandNo in rasterReader.bandNumbers()]
+                    for xi, zi in zip(xs, zs):
+                        if not np.isfinite([xi, yi, zi]).all():
+                            continue
+                        ci = values.get(fieldC, zi / fz)  # default color is zi
+                        valid = xi >= xmin and xi <= xmax
+                        valid &= yi >= ymin and yi <= ymax
+                        valid &= zi >= zmin and zi <= zmax
+                        if valid:
+                            x.append(xi / fx)
+                            y.append(yi / fy)
+                            z.append(zi / fz)
+                            c.append(ci)
+            except Exception:
+                traceback.print_exc()
+                self.mMessageBar.pushWarning('Load data', 'inputs missing/incorrect')
+                return
+
         else:
             raise ValueError()
 
@@ -309,6 +337,7 @@ class SpectralSurfacePlottingWindow(QMainWindow):
 
     def plotData(self):
 
+        self.plotter.remove_actor("startup_message")
         self.meshActorSurface = self.plotter.add_mesh(
             self.mesh,
             scalars="C",
@@ -453,7 +482,11 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         if self.mDataFormat.currentIndex() == self.CollectionFormat and self.mCollection.currentLayer() is None:
             return
 
-        x, y, z, c = self.readData()
+        xyzc = self.readData()
+        if xyzc is None:
+            return
+
+        x, y, z, c = xyzc
 
         if len(x) == 0:
             self.mMessageBar.pushWarning('Load data', 'empty data set')
