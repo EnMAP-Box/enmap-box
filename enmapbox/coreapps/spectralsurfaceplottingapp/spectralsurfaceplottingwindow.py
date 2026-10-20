@@ -331,9 +331,12 @@ class SpectralSurfacePlottingWindow(QMainWindow):
 
         self.gridActor.x_axis_range = (bounds[0] / self.scaleX, bounds[1] / self.scaleX)
         self.gridActor.y_axis_range = (bounds[2] / self.scaleY, bounds[3] / self.scaleY)
+        self.gridActor.z_axis_range = (bounds[4] / self.scaleZ, bounds[5] / self.scaleZ)
+
         # number of decimal places
         self.gridActor.x_label_format = '{0:.2f}'
         self.gridActor.y_label_format = '{0:.2f}'
+        self.gridActor.z_label_format = '{0:.2f}'
 
     def plotData(self):
 
@@ -495,6 +498,15 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         self.setData(y, x, z, c)
         self.plotData()
         self.onAutoScale()
+
+        # set default camera
+        self.plotter.camera_position = [
+            (1, -1, 1),  # Camera position
+            (0, 0, 0),  # Focal point
+            (0, 0, 1),  # Z points upward
+        ]
+        self.plotter.reset_camera()
+        self.plotter.render()
 
     def closeEvent(self, event):
         try:
