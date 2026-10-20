@@ -312,14 +312,55 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         if self.meshActorSurface is None:
             return
 
-        # remove previous CubeAxesActor
+        def niceAxis(minValue, maxValue, targetTicks=5):
+            span = maxValue - minValue
+            if span <= 0:
+                return minValue, maxValue, 2
+
+            rawStep = span / (targetTicks - 1)
+            magnitude = 10 ** np.floor(np.log10(rawStep))
+
+            for factor in [1, 2, 5, 10]:
+                step = factor * magnitude
+                if step >= rawStep:
+                    break
+
+            niceMin = np.floor(minValue / step) * step
+            niceMax = np.ceil(maxValue / step) * step
+            nTicks = int(round((niceMax - niceMin) / step)) + 1
+
+            return niceMin, niceMax, nTicks
+
+        # Remove previous CubeAxesActor
         self.plotter.remove_bounds_axes()
 
-        # use the current transformed bounds of the surface actor
+        # Current transformed bounds of the surface actor
         bounds = self.meshActorSurface.GetBounds()
 
+        # Convert bounds back to original axis coordinates
+        xmin, xmax, nx = niceAxis(
+            bounds[0] / self.scaleX,
+            bounds[1] / self.scaleX
+        )
+        ymin, ymax, ny = niceAxis(
+            bounds[2] / self.scaleY,
+            bounds[3] / self.scaleY
+        )
+        zmin, zmax, nz = niceAxis(
+            bounds[4] / self.scaleZ,
+            bounds[5] / self.scaleZ
+        )
+
+        # Convert rounded bounds to scaled plot coordinates
+        niceBounds = (
+            xmin * self.scaleX, xmax * self.scaleX,
+            ymin * self.scaleY, ymax * self.scaleY,
+            zmin * self.scaleZ, zmax * self.scaleZ
+        )
+
+        # Create grid
         self.gridActor = self.plotter.show_grid(
-            bounds=bounds,
+            bounds=niceBounds,
             xtitle=self.mAxisLabelX.text() if self.mShowAxisLabelX.isChecked() else '',
             ytitle=self.mAxisLabelY.text() if self.mShowAxisLabelY.isChecked() else '',
             ztitle=self.mAxisLabelZ.text() if self.mShowAxisLabelZ.isChecked() else '',
@@ -327,16 +368,24 @@ class SpectralSurfacePlottingWindow(QMainWindow):
             show_yaxis=self.mShowAxisY.isChecked(),
             show_zaxis=self.mShowAxisZ.isChecked()
         )
+
+        # Display original (unscaled) values
+        self.gridActor.x_axis_range = (xmin, xmax)
+        self.gridActor.y_axis_range = (ymin, ymax)
+        self.gridActor.z_axis_range = (zmin, zmax)
+
+        # Number of labels
+        self.gridActor.n_xlabels = nx
+        self.gridActor.n_ylabels = ny
+        self.gridActor.n_zlabels = nz
+
+        # Clean number formatting
+        self.gridActor.x_label_format = '{0:g}'
+        self.gridActor.y_label_format = '{0:g}'
+        self.gridActor.z_label_format = '{0:g}'
+
+        # Apply grid visibility
         self.onShowGridChanged()
-
-        self.gridActor.x_axis_range = (bounds[0] / self.scaleX, bounds[1] / self.scaleX)
-        self.gridActor.y_axis_range = (bounds[2] / self.scaleY, bounds[3] / self.scaleY)
-        self.gridActor.z_axis_range = (bounds[4] / self.scaleZ, bounds[5] / self.scaleZ)
-
-        # number of decimal places
-        self.gridActor.x_label_format = '{0:.2f}'
-        self.gridActor.y_label_format = '{0:.2f}'
-        self.gridActor.z_label_format = '{0:.2f}'
 
     def plotData(self):
 
@@ -516,3 +565,23 @@ class SpectralSurfacePlottingWindow(QMainWindow):
                 self.plotter = None
         finally:
             super().closeEvent(event)
+
+
+def niceAxis(minValue, maxValue, targetTicks=5):
+    span = maxValue - minValue
+    if span <= 0:
+        return minValue, maxValue, 2
+
+    rawStep = span / (targetTicks - 1)
+    magnitude = 10 ** np.floor(np.log10(rawStep))
+
+    for factor in [1, 2, 5, 10]:
+        step = factor * magnitude
+        if step >= rawStep:
+            break
+
+    niceMin = np.floor(minValue / step) * step
+    niceMax = np.ceil(maxValue / step) * step
+    nTicks = int(round((niceMax - niceMin) / step)) + 1
+
+    return niceMin, niceMax, nTicks
