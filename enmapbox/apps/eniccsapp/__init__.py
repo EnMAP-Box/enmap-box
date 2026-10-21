@@ -3,7 +3,7 @@ from qgis.PyQt.QtWidgets import QMenu
 
 from eniccsapp.eniccscloudmaskalgorithm import EniccsCloudMaskAlgorithm
 from enmapbox.gui.applications import EnMAPBoxApplication
-from enmapbox.typeguard import typechecked
+from typeguard import typechecked
 
 
 def enmapboxApplicationFactory(enmapBox):

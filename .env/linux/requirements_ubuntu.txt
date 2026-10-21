@@ -18,3 +18,4 @@ scikit-learn>=1.0
 skops
 pyvista # required by Spectral Surface Plotting
 pyvistaqt # required by Spectral Surface Plotting
+eniccs #  required by EnICCS

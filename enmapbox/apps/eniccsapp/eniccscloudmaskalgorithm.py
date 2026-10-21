@@ -15,7 +15,7 @@ try:
 except ImportError:
     run_eniccs = None
 
-from enmapbox.typeguard import typechecked
+from typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
 
 

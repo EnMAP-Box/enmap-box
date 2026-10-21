@@ -36,7 +36,8 @@ RUN pip install --break-system-packages --no-cache-dir \
     skops \
     scikit-learn \
     lightgbm \
-    xgboost
+    xgboost \
+    eniccs
 
 # COPY ./.docker/qgis_setup.sh /tmp/
 COPY . /usr/src/
