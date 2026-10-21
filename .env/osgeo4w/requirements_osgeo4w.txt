@@ -11,3 +11,4 @@ pyvistaqt # required by Spectral Surface Plotting
 
 # required by parts of EnMAP-Box Applications
 enpt-enmapboxapp # required by EnPT
+eniccs #  required by EnICCS

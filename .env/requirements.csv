@@ -28,3 +28,4 @@ tensorboard,,,specdeepmap,required by SpecDeepMap
 torch,,,specdeepmap,required by SpecDeepMap
 torchvision,,,specdeepmap,required by SpecDeepMap
 xgboost,,,full,required by CatBoost estimator
+eniccs,,,full,required by EnICCS algoritm

@@ -56,7 +56,8 @@ DEPENDENCIES = {
              'segmentation-models-pytorch',
              'setuptools<=81',  # due to https://github.com/tensorflow/tensorboard/issues/7003
              'pyvista',  # required by Spectral Surface Plotting
-             'pyvistaqt'  # required by Spectral Surface Plotting
+             'pyvistaqt',  # required by Spectral Surface Plotting
+             'eniccs',  # required ny EnICCS algorithm
 
              # {'pip': ['torch==2.6.0',
              #         'lightning==2.5.0.post0',
