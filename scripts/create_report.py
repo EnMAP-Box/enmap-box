@@ -376,7 +376,7 @@ def report_github_issues_EnMAPBox(start_date='2020-01-01', end_date='2023-12-31'
 
     with open(PATH_GH_JSON, 'r') as f:
         all_issues = json.load(f)
-    pull_requests = [i for i in all_issues if 'pull_request' in i]
+    # pull_requests = [i for i in all_issues if 'pull_request' in i]
     issues = [i for i in all_issues if 'pull_request' not in i]
     if True:
         for i in issues:

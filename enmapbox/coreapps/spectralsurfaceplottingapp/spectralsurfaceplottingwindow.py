@@ -7,15 +7,18 @@ import pyvista as pv
 import vtk
 from pyvistaqt import QtInteractor
 from qgis.PyQt.QtCore import QDateTime
-from qgis.PyQt.QtWidgets import QSizePolicy, QSlider, QToolButton, QMainWindow, QComboBox, QCheckBox, QVBoxLayout, \
-    QWidget, QLineEdit
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QSizePolicy, QMainWindow, QVBoxLayout, QWidget
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer, QgsColorRamp, QgsStyle, QgsMapLayerProxyModel
-from qgis.gui import QgsColorRampButton, QgsMessageBar, QgsMapLayerComboBox, QgsFieldComboBox, QgsFilterLineEdit
+from qgis.gui import QgsMessageBar, QgsFilterLineEdit
 
 from enmapboxprocessing.libraryreader import LibraryReader
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
+from spectralsurfaceplottingapp.spectralsurfaceplottingdatadockwidget import SpectralSurfacePlottingDataDockWidget
+from spectralsurfaceplottingapp.spectralsurfaceplottingsettingsdockwidget import \
+    SpectralSurfacePlottingSettingsDockWidget
 
 pv.vtk_verbosity("off")
 
@@ -42,56 +45,6 @@ def parseFloat(w: QgsFilterLineEdit, default):
 class SpectralSurfacePlottingWindow(QMainWindow):
     mMessageBar: QgsMessageBar
     mPlot: QWidget
-
-    mDataFormat: QComboBox
-    mTable: QgsMapLayerComboBox
-    mLibrary: QgsMapLayerComboBox
-    mLibrarySelectedOnly: QCheckBox
-    mCollection: QgsMapLayerComboBox
-    mXMin: QgsFilterLineEdit
-    mXMax: QgsFilterLineEdit
-    mYMin: QgsFilterLineEdit
-    mYMax: QgsFilterLineEdit
-    mZMin: QgsFilterLineEdit
-    mZMax: QgsFilterLineEdit
-    mXScale: QgsFilterLineEdit
-    mYScale: QgsFilterLineEdit
-    mZScale: QgsFilterLineEdit
-
-    mShowSurface: QCheckBox
-    mShowPoints: QCheckBox
-    mShowEdges: QCheckBox
-    mShowGrid: QCheckBox
-    mShowAxes: QCheckBox
-    mShowAxisX: QCheckBox
-    mShowAxisY: QCheckBox
-    mShowAxisZ: QCheckBox
-    mShowAxisLabelX: QCheckBox
-    mShowAxisLabelY: QCheckBox
-    mShowAxisLabelZ: QCheckBox
-    mAxisLabelX: QLineEdit
-    mAxisLabelY: QLineEdit
-    mAxisLabelZ: QLineEdit
-    mColorRamp: QgsColorRampButton
-
-    mFieldLfX: QgsFieldComboBox
-    mFieldLfY: QgsFieldComboBox
-    mFieldLfZ: QgsFieldComboBox
-    mFieldLibraryProfiles: QgsFieldComboBox
-    mFieldLibraryY: QgsFieldComboBox
-    mFieldLibraryYSorted: QCheckBox
-    mFieldLibraryC: QgsFieldComboBox
-    mFieldCollectionY: QgsFieldComboBox
-    mFieldCollectionC: QgsFieldComboBox
-    mLoadData: QToolButton
-
-    scaleBase = 2
-    mScaleX: QSlider
-    mScaleY: QSlider
-    mScaleZ: QSlider
-    mAutoScale: QToolButton
-
-    LongFormat, LibraryFormat, CollectionFormat = 0, 1, 2
 
     def __init__(self, *args, **kwds):
         QMainWindow.__init__(self, *args, **kwds)
@@ -124,48 +77,54 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         from enmapbox.gui.enmapboxgui import EnMAPBox
         self.enmapBox = EnMAPBox.instance()
 
-        for w in [self.mTable, self.mLibrary, self.mCollection]:
+        # add dock widgets
+        self.mDataDock = SpectralSurfacePlottingDataDockWidget(parent=self)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.mDataDock)
+        self.mSettingsDock = SpectralSurfacePlottingSettingsDockWidget(parent=self)
+        self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, self.mSettingsDock)
+
+        for w in [self.mDataDock.mTable, self.mDataDock.mLibrary, self.mDataDock.mCollection]:
             w.setProject(self.enmapBox.project())
             w.setFilters(QgsMapLayerProxyModel.Filter.VectorLayer)
 
-        self.mShowSurface.checkStateChanged.connect(self.onShowSurfaceChanged)
-        self.mShowPoints.checkStateChanged.connect(self.onShowPointsChanged)
-        self.mShowEdges.checkStateChanged.connect(self.onShowEdgesChanged)
-        self.mShowGrid.checkStateChanged.connect(self.onShowGridChanged)
-        self.mShowAxes.checkStateChanged.connect(self.onShowAxesChanged)
-        self.mColorRamp.colorRampChanged.connect(self.onColorRampChanged)
+        self.mSettingsDock.mShowSurface.checkStateChanged.connect(self.onShowSurfaceChanged)
+        self.mSettingsDock.mShowPoints.checkStateChanged.connect(self.onShowPointsChanged)
+        self.mSettingsDock.mShowEdges.checkStateChanged.connect(self.onShowEdgesChanged)
+        self.mSettingsDock.mShowGrid.checkStateChanged.connect(self.onShowGridChanged)
+        self.mSettingsDock.mShowAxes.checkStateChanged.connect(self.onShowAxesChanged)
+        self.mSettingsDock.mColorRamp.colorRampChanged.connect(self.onColorRampChanged)
 
-        self.mScaleX.valueChanged.connect(self.onScaleChanged)
-        self.mScaleY.valueChanged.connect(self.onScaleChanged)
-        self.mScaleZ.valueChanged.connect(self.onScaleChanged)
-        self.mAutoScale.clicked.connect(self.onAutoScale)
+        self.mSettingsDock.mScaleX.valueChanged.connect(self.onScaleChanged)
+        self.mSettingsDock.mScaleY.valueChanged.connect(self.onScaleChanged)
+        self.mSettingsDock.mScaleZ.valueChanged.connect(self.onScaleChanged)
+        self.mSettingsDock.mAutoScale.clicked.connect(self.onAutoScale)
 
         for w in [
-            self.mShowAxisX, self.mShowAxisY, self.mShowAxisZ,
-            self.mShowAxisLabelX, self.mShowAxisLabelY, self.mShowAxisLabelZ
+            self.mSettingsDock.mShowAxisX, self.mSettingsDock.mShowAxisY, self.mSettingsDock.mShowAxisZ,
+            self.mSettingsDock.mShowAxisLabelX, self.mSettingsDock.mShowAxisLabelY, self.mSettingsDock.mShowAxisLabelZ
         ]:
             w.checkStateChanged.connect(self.updateGrid)
 
-        self.mAxisLabelX.textChanged.connect(self.updateGrid)
-        self.mAxisLabelY.textChanged.connect(self.updateGrid)
-        self.mAxisLabelZ.textChanged.connect(self.updateGrid)
+        self.mSettingsDock.mAxisLabelX.textChanged.connect(self.updateGrid)
+        self.mSettingsDock.mAxisLabelY.textChanged.connect(self.updateGrid)
+        self.mSettingsDock.mAxisLabelZ.textChanged.connect(self.updateGrid)
 
-        self.mLoadData.clicked.connect(self.onLoadData)
+        self.mDataDock.mLoadData.clicked.connect(self.onLoadData)
 
         colorRamp: QgsColorRamp = QgsStyle().defaultStyle().colorRamp('Turbo')
-        self.mColorRamp.setColorRamp(colorRamp)
+        self.mSettingsDock.mColorRamp.setColorRamp(colorRamp)
 
         self.scaleX = 1
         self.scaleY = 1
         self.scaleZ = 1
 
     def readData(self):
-        xmin = parseFloat(self.mXMin, -inf)
-        ymin = parseFloat(self.mYMin, -inf)
-        zmin = parseFloat(self.mZMin, -inf)
-        xmax = parseFloat(self.mXMax, inf)
-        ymax = parseFloat(self.mYMax, inf)
-        zmax = parseFloat(self.mZMax, inf)
+        xmin = parseFloat(self.mDataDock.mXMin, -inf)
+        ymin = parseFloat(self.mDataDock.mYMin, -inf)
+        zmin = parseFloat(self.mDataDock.mZMin, -inf)
+        xmax = parseFloat(self.mDataDock.mXMax, inf)
+        ymax = parseFloat(self.mDataDock.mYMax, inf)
+        zmax = parseFloat(self.mDataDock.mZMax, inf)
 
         # read, filter and scale data
         x = list()
@@ -173,15 +132,15 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         z = list()
         c = list()
 
-        fx = parseFloat(self.mXScale, 1)
-        fy = parseFloat(self.mYScale, 1)
-        fz = parseFloat(self.mZScale, 1)
+        fx = parseFloat(self.mDataDock.mXScale, 1)
+        fy = parseFloat(self.mDataDock.mYScale, 1)
+        fz = parseFloat(self.mDataDock.mZScale, 1)
 
-        if self.mDataFormat.currentIndex() == self.LongFormat:
-            layer = self.mTable.currentLayer()
-            fieldX = self.mFieldLfX.currentField()
-            fieldY = self.mFieldLfY.currentField()
-            fieldZ = self.mFieldLfZ.currentField()
+        if self.mDataDock.mDataFormat.currentIndex() == self.mDataDock.LongFormat:
+            layer = self.mDataDock.mTable.currentLayer()
+            fieldX = self.mDataDock.mFieldLfX.currentField()
+            fieldY = self.mDataDock.mFieldLfY.currentField()
+            fieldZ = self.mDataDock.mFieldLfZ.currentField()
 
             try:
                 for feature in layer.getFeatures():
@@ -202,13 +161,13 @@ class SpectralSurfacePlottingWindow(QMainWindow):
                 self.mMessageBar.pushWarning('Load data', 'inputs missing/incorrect')
                 return
 
-        elif self.mDataFormat.currentIndex() == self.LibraryFormat:
-            layer = self.mLibrary.currentLayer()
+        elif self.mDataDock.mDataFormat.currentIndex() == self.mDataDock.LibraryFormat:
+            layer = self.mDataDock.mLibrary.currentLayer()
             reader = LibraryReader(layer)
-            fieldProfile = self.mFieldLibraryProfiles.currentField()
-            fieldY = self.mFieldLibraryY.currentField()
-            fieldC = self.mFieldLibraryC.currentField()
-            selectedOnly = self.mLibrarySelectedOnly.isChecked()
+            fieldProfile = self.mDataDock.mFieldLibraryProfiles.currentField()
+            fieldY = self.mDataDock.mFieldLibraryY.currentField()
+            fieldC = self.mDataDock.mFieldLibraryC.currentField()
+            selectedOnly = self.mDataDock.mLibrarySelectedOnly.isChecked()
             try:
 
                 # read y-values
@@ -216,7 +175,7 @@ class SpectralSurfacePlottingWindow(QMainWindow):
                 for i, (values, geometry) in enumerate(reader.data(selectedOnly)):
                     yi = values.get(fieldY, i)
                     ys.append(yi / fy)
-                if self.mFieldLibraryYSorted.isChecked():
+                if self.mDataDock.mFieldLibraryYSorted.isChecked():
                     ys = np.argsort(ys)
 
                 # read profiles
@@ -241,13 +200,13 @@ class SpectralSurfacePlottingWindow(QMainWindow):
                 traceback.print_exc()
                 self.mMessageBar.pushWarning('Load data', 'inputs missing/incorrect')
                 return
-        elif self.mDataFormat.currentIndex() == self.CollectionFormat:
-            collectionLayer = self.mCollection.currentLayer()
+        elif self.mDataDock.mDataFormat.currentIndex() == self.mDataDock.CollectionFormat:
+            collectionLayer = self.mDataDock.mCollection.currentLayer()
             collectionReader = LibraryReader(collectionLayer)
             fieldSource = 'source'
             fieldProvider = 'provider'
-            fieldY = self.mFieldCollectionY.currentField()
-            fieldC = self.mFieldCollectionC.currentField()
+            fieldY = self.mDataDock.mFieldCollectionY.currentField()
+            fieldC = self.mDataDock.mFieldCollectionC.currentField()
 
             point = self.enmapBox.currentLocation()
             if point is None:
@@ -361,12 +320,12 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         # Create grid
         self.gridActor = self.plotter.show_grid(
             bounds=niceBounds,
-            xtitle=self.mAxisLabelX.text() if self.mShowAxisLabelX.isChecked() else '',
-            ytitle=self.mAxisLabelY.text() if self.mShowAxisLabelY.isChecked() else '',
-            ztitle=self.mAxisLabelZ.text() if self.mShowAxisLabelZ.isChecked() else '',
-            show_xaxis=self.mShowAxisX.isChecked(),
-            show_yaxis=self.mShowAxisY.isChecked(),
-            show_zaxis=self.mShowAxisZ.isChecked()
+            xtitle=self.mSettingsDock.mAxisLabelX.text() if self.mSettingsDock.mShowAxisLabelX.isChecked() else '',
+            ytitle=self.mSettingsDock.mAxisLabelY.text() if self.mSettingsDock.mShowAxisLabelY.isChecked() else '',
+            ztitle=self.mSettingsDock.mAxisLabelZ.text() if self.mSettingsDock.mShowAxisLabelZ.isChecked() else '',
+            show_xaxis=self.mSettingsDock.mShowAxisX.isChecked(),
+            show_yaxis=self.mSettingsDock.mShowAxisY.isChecked(),
+            show_zaxis=self.mSettingsDock.mShowAxisZ.isChecked()
         )
 
         # Display original (unscaled) values
@@ -394,7 +353,7 @@ class SpectralSurfacePlottingWindow(QMainWindow):
             self.mesh,
             scalars="C",
             cmap="viridis",
-            show_edges=self.mShowEdges.isChecked(),
+            show_edges=self.mSettingsDock.mShowEdges.isChecked(),
             edge_color="black",
             line_width=0.4,
             smooth_shading=True,
@@ -461,40 +420,40 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         if self.meshActorSurface is None:
             return
 
-        self.meshActorSurface.SetVisibility(self.mShowSurface.isChecked())
+        self.meshActorSurface.SetVisibility(self.mSettingsDock.mShowSurface.isChecked())
 
     def onShowPointsChanged(self):
         if self.meshActorSurface is None:
             return
 
-        self.meshActorPoints.SetVisibility(self.mShowPoints.isChecked())
+        self.meshActorPoints.SetVisibility(self.mSettingsDock.mShowPoints.isChecked())
 
     def onShowEdgesChanged(self):
         if self.meshActorSurface is None:
             return
 
-        self.meshActorSurface.prop.show_edges = self.mShowEdges.isChecked()
+        self.meshActorSurface.prop.show_edges = self.mSettingsDock.mShowEdges.isChecked()
         self.plotter.render()
 
     def onShowGridChanged(self):
         if self.meshActorSurface is None:
             return
 
-        self.gridActor.SetVisibility(self.mShowGrid.isChecked())
+        self.gridActor.SetVisibility(self.mSettingsDock.mShowGrid.isChecked())
         self.plotter.render()
 
     def onShowAxesChanged(self):
         if self.meshActorSurface is None:
             return
 
-        self.axesActor.SetVisibility(self.mShowAxes.isChecked())
+        self.axesActor.SetVisibility(self.mSettingsDock.mShowAxes.isChecked())
         self.plotter.render()
 
     def onColorRampChanged(self):
         if self.meshActorSurface is None:
             return
 
-        ramp = self.mColorRamp.colorRamp()
+        ramp = self.mSettingsDock.mColorRamp.colorRamp()
         n = 256
         cmap = []
         for i in range(n):
@@ -510,9 +469,9 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         if self.meshActorSurface is None:
             return
 
-        self.scaleX = self.scaleBase ** self.mScaleX.value()
-        self.scaleY = self.scaleBase ** self.mScaleY.value()
-        self.scaleZ = self.scaleBase ** self.mScaleZ.value()
+        self.scaleX = self.mSettingsDock.scaleBase ** self.mSettingsDock.mScaleX.value()
+        self.scaleY = self.mSettingsDock.scaleBase ** self.mSettingsDock.mScaleY.value()
+        self.scaleZ = self.mSettingsDock.scaleBase ** self.mSettingsDock.mScaleZ.value()
         self.setScale(self.scaleX, self.scaleY, self.scaleZ)
         self.plotter.render()
 
@@ -521,18 +480,21 @@ class SpectralSurfacePlottingWindow(QMainWindow):
             return
 
         xscale, yscale, zscale = self.autoScaleFactors()
-        self.mScaleX.setValue(int(np.log(xscale) / np.log(self.scaleBase)))
-        self.mScaleY.setValue(int(np.log(yscale) / np.log(self.scaleBase)))
-        self.mScaleZ.setValue(int(np.log(zscale) / np.log(self.scaleBase)))
+        self.mSettingsDock.mScaleX.setValue(int(np.log(xscale) / np.log(self.mSettingsDock.scaleBase)))
+        self.mSettingsDock.mScaleY.setValue(int(np.log(yscale) / np.log(self.mSettingsDock.scaleBase)))
+        self.mSettingsDock.mScaleZ.setValue(int(np.log(zscale) / np.log(self.mSettingsDock.scaleBase)))
 
     def onLoadData(self):
 
-        if self.mDataFormat.currentIndex() == self.LongFormat and self.mTable.currentLayer() is None:
-            return
-        if self.mDataFormat.currentIndex() == self.LibraryFormat and self.mLibrary.currentLayer() is None:
-            return
-        if self.mDataFormat.currentIndex() == self.CollectionFormat and self.mCollection.currentLayer() is None:
-            return
+        if self.mDataDock.mDataFormat.currentIndex() == self.mDataDock.LongFormat:
+            if self.mDataDock.mTable.currentLayer() is None:
+                return
+        if self.mDataDock.mDataFormat.currentIndex() == self.mDataDock.LibraryFormat:
+            if self.mDataDock.mLibrary.currentLayer() is None:
+                return
+        if self.mDataDock.mDataFormat.currentIndex() == self.mDataDock.CollectionFormat:
+            if self.mDataDock.mCollection.currentLayer() is None:
+                return
 
         xyzc = self.readData()
         if xyzc is None:
