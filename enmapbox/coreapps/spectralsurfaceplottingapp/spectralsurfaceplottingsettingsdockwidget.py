@@ -24,6 +24,7 @@ class SpectralSurfacePlottingSettingsDockWidget(QgsDockWidget):
     mScaleY: QSlider
     mScaleZ: QSlider
     mAutoScale: QToolButton
+    mResetCamera: QToolButton
 
     def __init__(self, *args, **kwds):
         QgsDockWidget.__init__(self, *args, **kwds)

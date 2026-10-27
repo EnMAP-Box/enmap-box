@@ -99,6 +99,8 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         self.mSettingsDock.mScaleZ.valueChanged.connect(self.onScaleChanged)
         self.mSettingsDock.mAutoScale.clicked.connect(self.onAutoScale)
 
+        self.mSettingsDock.mResetCamera.clicked.connect(self.onResetCamera)
+
         for w in [
             self.mSettingsDock.mShowAxisX, self.mSettingsDock.mShowAxisY, self.mSettingsDock.mShowAxisZ,
             self.mSettingsDock.mShowAxisLabelX, self.mSettingsDock.mShowAxisLabelY, self.mSettingsDock.mShowAxisLabelZ
@@ -484,6 +486,19 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         self.mSettingsDock.mScaleY.setValue(int(np.log(yscale) / np.log(self.mSettingsDock.scaleBase)))
         self.mSettingsDock.mScaleZ.setValue(int(np.log(zscale) / np.log(self.mSettingsDock.scaleBase)))
 
+    def onResetCamera(self):
+        if self.meshActorSurface is None:
+            return
+
+        # set default camera
+        self.plotter.camera_position = [
+            (1, -1, 1),  # Camera position
+            (0, 0, 0),  # Focal point
+            (0, 0, 1),  # Z points upward
+        ]
+        self.plotter.reset_camera()
+        self.plotter.render()
+
     def onLoadData(self):
 
         if self.mDataDock.mDataFormat.currentIndex() == self.mDataDock.LongFormat:
@@ -509,15 +524,6 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         self.setData(y, x, z, c)
         self.plotData()
         self.onAutoScale()
-
-        # set default camera
-        self.plotter.camera_position = [
-            (1, -1, 1),  # Camera position
-            (0, 0, 0),  # Focal point
-            (0, 0, 1),  # Z points upward
-        ]
-        self.plotter.reset_camera()
-        self.plotter.render()
 
     def closeEvent(self, event):
         try:

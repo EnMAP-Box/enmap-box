@@ -438,17 +438,49 @@
                </item>
               </layout>
              </item>
-             <item row="3" column="2">
+             <item row="3" column="6">
               <widget class="QToolButton" name="mAutoScale">
                <property name="text">
-                <string>auto-scale</string>
+                <string>Auto-scale</string>
                </property>
                <property name="autoRaise">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
               </widget>
              </item>
             </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_3">
+          <property name="title">
+           <string>Camera</string>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <item>
+            <spacer name="horizontalSpacer_9">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QToolButton" name="mResetCamera">
+             <property name="text">
+              <string>Reset camera</string>
+             </property>
+             <property name="autoRaise">
+              <bool>false</bool>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
