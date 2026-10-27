@@ -295,8 +295,11 @@
                         </item>
                         <item row="4" column="1">
                          <widget class="QCheckBox" name="mFieldLibraryYSorted">
+                          <property name="toolTip">
+                           <string>Sort profiles by their Y values, but plot them at consecutive positions (1, 2, 3, ...) instead of using the actual Y values.</string>
+                          </property>
                           <property name="text">
-                           <string>Sort by y-values, plot by index</string>
+                           <string>Use profile order</string>
                           </property>
                          </widget>
                         </item>
