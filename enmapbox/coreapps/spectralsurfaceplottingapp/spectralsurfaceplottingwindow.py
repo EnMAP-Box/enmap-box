@@ -52,6 +52,8 @@ class SpectralSurfacePlottingWindow(QMainWindow):
 
         self.meshActorSurface = None
         self.meshActorPoints = None
+        self.selectedProfileId = None
+        self.profile_ids = None
 
         self.plotLayout = QVBoxLayout(self.mPlot)
         self.plotLayout.setContentsMargins(0, 0, 0, 0)
@@ -133,6 +135,7 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         y = list()
         z = list()
         c = list()
+        profile_ids = list()
 
         fx = parseFloat(self.mDataDock.mXScale, 1)
         fy = parseFloat(self.mDataDock.mYScale, 1)
@@ -158,6 +161,7 @@ class SpectralSurfacePlottingWindow(QMainWindow):
                         y.append(yi / fy)
                         z.append(zi / fz)
                         c.append(ci)
+                        profile_ids.append(xi)
             except Exception:
                 traceback.print_exc()
                 self.mMessageBar.pushWarning('Load data', 'inputs missing/incorrect')
@@ -198,6 +202,7 @@ class SpectralSurfacePlottingWindow(QMainWindow):
                             y.append(yi / fy)
                             z.append(zi / fz)
                             c.append(ci)
+                            profile_ids.append(i)
             except Exception:
                 traceback.print_exc()
                 self.mMessageBar.pushWarning('Load data', 'inputs missing/incorrect')
@@ -240,6 +245,7 @@ class SpectralSurfacePlottingWindow(QMainWindow):
                             y.append(yi / fy)
                             z.append(zi / fz)
                             c.append(ci)
+                            profile_ids.append(i)
             except Exception:
                 traceback.print_exc()
                 self.mMessageBar.pushWarning('Load data', 'inputs missing/incorrect')
@@ -248,9 +254,9 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         else:
             raise ValueError()
 
-        return x, y, z, c
+        return x, y, z, c, profile_ids
 
-    def setData(self, x, y, z, c):
+    def setData(self, x, y, z, c, profile_ids):
         x, y = y, x  # swap data for plotting
         self.x = np.array(x, dtype=float)
         self.y = np.array(y, dtype=float)
@@ -260,6 +266,8 @@ class SpectralSurfacePlottingWindow(QMainWindow):
             raise ValueError('Spectral Surface Plotting: data includes non-finite values')
         self.point_cloud = pv.PolyData(xyz)
         self.point_cloud.point_data["C"] = c
+        self.profile_ids = np.asarray(profile_ids)
+        self.point_cloud.point_data["profile_id"] = self.profile_ids
 
         delaunay = vtk.vtkDelaunay2D()
         delaunay.SetInputData(self.point_cloud)
@@ -351,6 +359,7 @@ class SpectralSurfacePlottingWindow(QMainWindow):
     def plotData(self):
 
         self.plotter.remove_actor("startup_message")
+        self.clearSelectedProfile()
         self.meshActorSurface = self.plotter.add_mesh(
             self.mesh,
             scalars="C",
@@ -361,7 +370,8 @@ class SpectralSurfacePlottingWindow(QMainWindow):
             smooth_shading=True,
             opacity=0.8 + 0.2,
             scalar_bar_args={"title": ""},
-            name='surface'
+            name='surface',
+            pickable=False,  # only select original data points, not Delaunay vertices
         )
         self.onShowSurfaceChanged()
 
@@ -372,9 +382,11 @@ class SpectralSurfacePlottingWindow(QMainWindow):
             render_points_as_spheres=True,
             point_size=8,
             show_scalar_bar=False,
-            name='points'
+            name='points',
+            pickable=True,
         )
         self.onShowPointsChanged()
+        self.enableProfilePicking()
 
         self.onColorRampChanged()
 
@@ -388,6 +400,63 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         self.updateGrid()
 
         # self.plotter.enable_parallel_projection()
+
+    def enableProfilePicking(self):
+        # Right-click selects a profile; left-drag remains available to rotate.
+        # Re-enable only once, to avoid accumulating mouse observers on reload.
+        if getattr(self, "_profilePickingEnabled", False):
+            return
+        self.plotter.enable_point_picking(
+            callback=self.onPointPicked,
+            picker="point",
+            use_picker=True,
+            left_clicking=True,
+            show_point=False,
+            show_message=False,
+            tolerance=0.02,
+        )
+        self._profilePickingEnabled = True
+
+    def clearSelectedProfile(self):
+        self.selectedProfileId = None
+        self.plotter.remove_actor("selected_profile", render=False)
+
+    def onPointPicked(self, point, picker):
+        point_id = picker.GetPointId()
+        if point_id < 0 or self.profile_ids is None:
+            return
+
+        # The surface is non-pickable, so the point ID refers to the point cloud.
+        if point_id >= len(self.profile_ids):
+            return
+        profile_id = self.profile_ids[point_id]
+        indices = np.flatnonzero(self.profile_ids == profile_id)
+        if len(indices) == 0:
+            return
+
+        # Profile samples are ordered by the spectral/wavelength axis (plot X).
+        indices = indices[np.argsort(self.x[indices], kind="stable")]
+        coords = self.point_cloud.points[indices]
+
+        if len(coords) >= 2:
+            line = pv.lines_from_points(coords)
+        else:
+            line = pv.PolyData(coords)
+
+        self.plotter.add_mesh(
+            line,
+            color="yellow",
+            style="surface" if len(coords) >= 2 else "points",
+            line_width=5,
+            point_size=14,
+            render_lines_as_tubes=True if len(coords) >= 2 else False,
+            render_points_as_spheres=True,
+            pickable=False,
+            reset_camera=False,
+            name="selected_profile",  # replaces previous yellow selection
+        )
+        self.selectedProfileId = profile_id
+        self.plotter.render()
 
     def autoScaleFactors(self):
         if self.meshActorSurface is None:
@@ -515,13 +584,13 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         if xyzc is None:
             return
 
-        x, y, z, c = xyzc
+        x, y, z, c, profile_ids = xyzc
 
         if len(x) == 0:
             self.mMessageBar.pushWarning('Load data', 'empty data set')
             return
 
-        self.setData(y, x, z, c)
+        self.setData(y, x, z, c, profile_ids)
         self.plotData()
         self.onAutoScale()
 
