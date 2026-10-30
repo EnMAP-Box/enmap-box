@@ -1,24 +1,24 @@
 import json
-from math import isnan, ceil
+from math import isnan, ceil, inf
 from os.path import exists
 from typing import Iterable, List, Union, Optional, Tuple, Iterator, Dict
 
 import numpy as np
-from osgeo import gdal
-
 import qgis.processing
-from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
-from enmapboxprocessing.gridwalker import GridWalker
-from enmapboxprocessing.numpyutils import NumpyUtils
-from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
-from enmapboxprocessing.typing import (RasterSource, Array3d, Metadata, MetadataValue, MetadataDomain, Array2d)
-from enmapboxprocessing.utils import Utils
+from osgeo import gdal
 from qgis.PyQt.QtCore import QSizeF, QDateTime, QDate, QPoint, QTime
 from qgis.PyQt.QtGui import QColor
 from qgis.core import (QgsRasterLayer, QgsRasterDataProvider, QgsCoordinateReferenceSystem, QgsRectangle,
                        QgsRasterRange, QgsPoint, QgsRasterBlockFeedback, QgsRasterBlock, QgsPointXY,
                        QgsProcessingFeedback, QgsRasterBandStats, Qgis, QgsGeometry, QgsVectorLayer, QgsWkbTypes,
                        QgsFeature, QgsRasterPipe, QgsRasterProjector, QgsMapLayer, QgsProcessing)
+
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
+from enmapboxprocessing.gridwalker import GridWalker
+from enmapboxprocessing.numpyutils import NumpyUtils
+from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
+from enmapboxprocessing.typing import (RasterSource, Array3d, Metadata, MetadataValue, MetadataDomain, Array2d)
+from enmapboxprocessing.utils import Utils
 
 
 class RasterReader(object):
@@ -741,12 +741,24 @@ class RasterReader(object):
 
         return None
 
-    def findWavelength(self, wavelength: Optional[float], units: str = None) -> Optional[int]:
+    def findWavelength(
+            self, wavelength: Optional[Union[float, Tuple[float, float]]], units: str = None
+    ) -> Optional[int]:
         """Find band number by wavelength."""
         if wavelength is None:
             return None
+
+        if isinstance(wavelength, tuple):
+            vmin, vmax = wavelength
+            wavelength = (vmin + vmax) / 2.
+        else:
+            vmin, vmax = -inf, inf
+
         if units is not None:
-            wavelength = wavelength * Utils.wavelengthUnitsConversionFactor(units, 'nm')
+            f = Utils.wavelengthUnitsConversionFactor(units, 'nm')
+            wavelength *= f
+            vmin *= f
+            vmax *= f
 
         bandNos = list()
         distances = list()
@@ -759,7 +771,12 @@ class RasterReader(object):
         if len(bandNos) == 0:
             return None
 
-        return bandNos[np.argmin(distances)]
+        bandNo = bandNos[np.argmin(distances)]
+        foundWavelength = self.wavelength(bandNo)
+        if foundWavelength < vmin or foundWavelength > vmax:
+            return None
+
+        return bandNo
 
     def fwhm(self, bandNo: int, units: str = None) -> Optional[float]:
         """Return band FWHM in nanometers. Optionally, specify destination units."""
