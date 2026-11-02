@@ -114,6 +114,9 @@ class PrepareRegressionDatasetFromContinuousVectorAlgorithm(EnMAPProcessingAlgor
             features = [reader.bandName(bandNo) for bandNo in goodBandNumbers]
             feedback.pushInfo(f'Sampled data: X=array{list(X.shape)} y=array{list(y.shape)}')
 
+            if len(X) == 0:
+                raise QgsProcessingException('empty dataset not allowed')
+
             dump = RegressorDump(
                 targets=targets, features=features, X=X, y=y, locations=locations, crs=raster.crs().toWkt()
             )

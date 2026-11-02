@@ -95,6 +95,7 @@ class PrepareRegressionDatasetFromContinuousVectorAndFieldsAlgorithm(EnMAPProces
         X = list()
         y = list()
         feature: QgsFeature
+        n1 = vector.featureCount()
         for i, feature in enumerate(vector.getFeatures()):
             feedback.setProgress(i / n * 100)
             for field in targetFields:
@@ -122,4 +123,10 @@ class PrepareRegressionDatasetFromContinuousVectorAndFieldsAlgorithm(EnMAPProces
             raise ValueError(f'invalid target data: {error}')
 
         checkSampleShape(X, y, raise_=True)
+
+        n2 = len(X)
+        if n1 != n2:
+            feedback.pushInfo(f'Skipped {n1 - n2}/{n1} samples')
+        if n2 == 0:
+            raise QgsProcessingException('empty dataset not allowed')
         return X, y

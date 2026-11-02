@@ -1,11 +1,12 @@
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsFeature, QgsProcessingParameterField,
+                       QgsProcessingException)
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsFeature, QgsProcessingParameterField)
 
 
 class PrepareUnsupervisedDatasetFromVectorAndFieldsAlgorithm(EnMAPProcessingAlgorithm):
@@ -67,6 +68,9 @@ class PrepareUnsupervisedDatasetFromVectorAndFieldsAlgorithm(EnMAPProcessingAlgo
                 X = X.reshape(-1, len(featureFields))
             except Exception as error:
                 raise ValueError(f'invalid feature data: {error}')
+
+            if len(X) == 0:
+                raise QgsProcessingException('empty dataset not allowed')
 
             dump = TransformerDump(features=featureFields, X=X)
             dumpDict = dump.__dict__

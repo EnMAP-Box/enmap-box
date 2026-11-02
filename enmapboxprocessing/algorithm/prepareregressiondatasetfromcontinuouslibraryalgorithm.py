@@ -1,14 +1,14 @@
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterField,
+                       QgsProcessingException)
 
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import FIELD_VALUES
 from enmapbox.qgispluginsupport.qps.speclib.core.spectralprofile import decodeProfileValueDict
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import checkSampleShape, Target, RegressorDump
 from enmapboxprocessing.utils import Utils
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterField,
-                       QgsProcessingException)
 
 
 class PrepareRegressionDatasetFromContinuousLibraryAlgorithm(EnMAPProcessingAlgorithm):
@@ -93,6 +93,8 @@ class PrepareRegressionDatasetFromContinuousLibraryAlgorithm(EnMAPProcessingAlgo
             X = list()
             y = list()
             locations = list()
+
+            n1 = library.featureCount()
             for i, feature in enumerate(library.getFeatures()):
                 feedback.setProgress(i / n * 100)
 
@@ -155,6 +157,12 @@ class PrepareRegressionDatasetFromContinuousLibraryAlgorithm(EnMAPProcessingAlgo
                 crs = library.crs().toWkt()
             else:
                 locations = crs = None
+
+            n2 = len(X)
+            if n1 != n2:
+                feedback.pushInfo(f'Skipped {n1 - n2}/{n1} samples')
+            if n2 == 0:
+                raise QgsProcessingException('empty dataset not allowed')
 
             dump = RegressorDump(targets=targets, features=features, X=X, y=y, locations=locations, crs=crs)
             dumpDict = dump.__dict__

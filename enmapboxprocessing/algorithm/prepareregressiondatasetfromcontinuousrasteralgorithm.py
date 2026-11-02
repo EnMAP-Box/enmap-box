@@ -2,6 +2,7 @@ from math import ceil
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessingException)
 
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
@@ -9,7 +10,6 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import SampleX, SampleY, checkSampleShape, RegressorDump, \
     Target
 from enmapboxprocessing.utils import Utils
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer)
 
 
 class PrepareRegressionDatasetFromContinuousRasterAlgorithm(EnMAPProcessingAlgorithm):
@@ -164,6 +164,7 @@ class PrepareRegressionDatasetFromContinuousRasterAlgorithm(EnMAPProcessingAlgor
             goodBandNumbers = list(reader.bandNumbers())
 
         # skip samples that contain a no data value
+        n1 = len(X)
         noDataValues = np.array([reader.noDataValue(bandNo) for bandNo in goodBandNumbers])
         valid1 = np.all(np.not_equal(X, noDataValues.T), axis=1)
         valid2 = np.all(np.isfinite(X), axis=1)
@@ -172,4 +173,11 @@ class PrepareRegressionDatasetFromContinuousRasterAlgorithm(EnMAPProcessingAlgor
         Y = Y[valid]
         locations = locations[valid]
         checkSampleShape(X, Y)
+
+        n2 = len(X)
+        if n1 != n2:
+            feedback.pushInfo(f'Skipped {n1 - n2}/{n1} samples')
+        if n2 == 0:
+            raise QgsProcessingException('empty dataset not allowed')
+
         return X, Y, goodBandNumbers, locations
