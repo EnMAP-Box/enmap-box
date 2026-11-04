@@ -21,8 +21,6 @@ import sys
 from os.path import basename, splitext
 from typing import List
 
-from enmapbox.dependencycheck import missingTestData, installTestData, PIPPackage
-from enmapbox.enmapboxprojectsettings import EnMAPBoxProjectSettings
 from qgis.PyQt.QtCore import QOperatingSystemVersion, Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
@@ -30,6 +28,9 @@ from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsRasterLayer, QgsVectorLayer, QgsProject, Qgis
 from qgis.gui import QgisInterface, QgsDockWidget
+
+from enmapbox.dependencycheck import missingTestData, installTestData, PIPPackage
+from enmapbox.enmapboxprojectsettings import EnMAPBoxProjectSettings
 
 
 class EnMAPBoxPlugin(object):
@@ -101,6 +102,10 @@ class EnMAPBoxPlugin(object):
     def initGui(self):
         from qgis.utils import iface
         import enmapbox
+        from enmapbox.gui.options import EnMAPBoxOptionsFactory
+
+        self.optionsFactory = EnMAPBoxOptionsFactory()
+        iface.registerOptionsWidgetFactory(self.optionsFactory)
 
         actionStartBox = QAction(enmapbox.icon(), 'EnMAP-Box', iface)
         actionAbout = QAction(QIcon(':/enmapbox/gui/ui/icons/metadata.svg'), 'About')
@@ -247,6 +252,11 @@ class EnMAPBoxPlugin(object):
             self.enmapBox.ui.show()
 
     def unload(self):
+        from qgis.utils import iface
+
+        iface.unregisterOptionsWidgetFactory(self.optionsFactory)
+        self.optionsFactory = None
+
         self._remove_actions()
 
         if not self.corePackagesAvailable():

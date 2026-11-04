@@ -570,6 +570,8 @@ class SpectralSurfacePlottingWindow(QMainWindow):
 
     def onLoadData(self):
 
+        firstDataLoad = self.meshActorSurface is None
+
         if self.mDataDock.mDataFormat.currentIndex() == self.mDataDock.LongFormat:
             if self.mDataDock.mTable.currentLayer() is None:
                 return
@@ -593,6 +595,9 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         self.setData(y, x, z, c, profile_ids)
         self.plotData()
         self.onAutoScale()
+
+        if firstDataLoad:
+            self.onResetCamera()
 
     def closeEvent(self, event):
         try:
