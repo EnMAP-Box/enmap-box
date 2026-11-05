@@ -20,6 +20,9 @@
       <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <widget class="QListWidget" name="listWidget">
+      <property name="currentRow">
+       <number>0</number>
+      </property>
       <item>
        <property name="text">
         <string>General</string>
