@@ -307,18 +307,10 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         bounds = self.meshActorSurface.GetBounds()
 
         # Convert bounds back to original axis coordinates
-        xmin, xmax, nx = niceAxis(
-            bounds[0] / self.scaleX,
-            bounds[1] / self.scaleX
-        )
-        ymin, ymax, ny = niceAxis(
-            bounds[2] / self.scaleY,
-            bounds[3] / self.scaleY
-        )
-        zmin, zmax, nz = niceAxis(
-            bounds[4] / self.scaleZ,
-            bounds[5] / self.scaleZ
-        )
+        nTicks = self.mSettingsDock.mNTicks.value()
+        xmin, xmax, nx = niceAxis(bounds[0] / self.scaleX, bounds[1] / self.scaleX, nTicks)
+        ymin, ymax, ny = niceAxis(bounds[2] / self.scaleY, bounds[3] / self.scaleY, nTicks)
+        zmin, zmax, nz = niceAxis(bounds[4] / self.scaleZ, bounds[5] / self.scaleZ, nTicks)
 
         # Convert rounded bounds to scaled plot coordinates
         niceBounds = (
@@ -608,22 +600,21 @@ class SpectralSurfacePlottingWindow(QMainWindow):
         finally:
             super().closeEvent(event)
 
+# def niceAxis(minValue, maxValue, targetTicks=5):
+#    span = maxValue - minValue
+#    if span <= 0:
+#        return minValue, maxValue, 2##
 
-def niceAxis(minValue, maxValue, targetTicks=5):
-    span = maxValue - minValue
-    if span <= 0:
-        return minValue, maxValue, 2
+#    rawStep = span / (targetTicks - 1)
+#    magnitude = 10 ** np.floor(np.log10(rawStep))
 
-    rawStep = span / (targetTicks - 1)
-    magnitude = 10 ** np.floor(np.log10(rawStep))
+#    for factor in [1, 2, 5, 10]:
+#        step = factor * magnitude
+#        if step >= rawStep:
+#            break
 
-    for factor in [1, 2, 5, 10]:
-        step = factor * magnitude
-        if step >= rawStep:
-            break
+#    niceMin = np.floor(minValue / step) * step
+#    niceMax = np.ceil(maxValue / step) * step
+#    nTicks = int(round((niceMax - niceMin) / step)) + 1
 
-    niceMin = np.floor(minValue / step) * step
-    niceMax = np.ceil(maxValue / step) * step
-    nTicks = int(round((niceMax - niceMin) / step)) + 1
-
-    return niceMin, niceMax, nTicks
+#    return niceMin, niceMax, nTicks

@@ -1,4 +1,4 @@
-from qgis.PyQt.QtWidgets import QLineEdit, QSlider, QToolButton, QCheckBox
+from qgis.PyQt.QtWidgets import QLineEdit, QToolButton, QCheckBox, QSpinBox
 from qgis.PyQt.uic import loadUi
 from qgis.gui import QgsColorRampButton, QgsDockWidget
 
@@ -20,10 +20,11 @@ class SpectralSurfacePlottingSettingsDockWidget(QgsDockWidget):
     mAxisLabelZ: QLineEdit
     mColorRamp: QgsColorRampButton
     scaleBase = 2
-    mScaleX: QSlider
-    mScaleY: QSlider
-    mScaleZ: QSlider
+    mScaleX: QSpinBox
+    mScaleY: QSpinBox
+    mScaleZ: QSpinBox
     mAutoScale: QToolButton
+    mNTicks: QSpinBox
     mResetCamera: QToolButton
 
     def __init__(self, *args, **kwds):
