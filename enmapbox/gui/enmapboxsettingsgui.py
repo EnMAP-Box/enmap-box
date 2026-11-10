@@ -8,10 +8,13 @@ from enmapbox import icon
 from enmapbox.enmapboxsettings import EnMAPBoxSettings
 
 
-class EnMAPBoxOptionsPage(QgsOptionsPageWidget):
+class EnMAPBoxSettingsPageWidget(QgsOptionsPageWidget):
+
+    PAGE_NAME = "EnMAPBoxSettingsPageWidget"
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setObjectName(self.PAGE_NAME)
 
         settings = EnMAPBoxSettings()
         self.w = EnMAPBoxOptionsWidget()
@@ -32,13 +35,13 @@ class EnMAPBoxOptionsPage(QgsOptionsPageWidget):
         settings.setValue(EnMAPBoxSettings.MAP_BACKGROUND, self.w.mMapBackground.color())
 
 
-class EnMAPBoxOptionsFactory(QgsOptionsWidgetFactory):
+class EnMAPBoxSettingsPageWidgetFactory(QgsOptionsWidgetFactory):
 
     def __init__(self):
         super().__init__("EnMAP-Box", icon())
 
     def createWidget(self, parent=None):
-        return EnMAPBoxOptionsPage(parent)
+        return EnMAPBoxSettingsPageWidget(parent)
 
 
 class EnMAPBoxOptionsWidget(QWidget):

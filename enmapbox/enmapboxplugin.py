@@ -102,9 +102,9 @@ class EnMAPBoxPlugin(object):
     def initGui(self):
         from qgis.utils import iface
         import enmapbox
-        from enmapbox.gui.options import EnMAPBoxOptionsFactory
+        from enmapbox.gui.enmapboxsettingsgui import EnMAPBoxSettingsPageWidgetFactory
 
-        self.optionsFactory = EnMAPBoxOptionsFactory()
+        self.optionsFactory = EnMAPBoxSettingsPageWidgetFactory()
         iface.registerOptionsWidgetFactory(self.optionsFactory)
 
         actionStartBox = QAction(enmapbox.icon(), 'EnMAP-Box', iface)

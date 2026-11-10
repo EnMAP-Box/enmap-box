@@ -89,6 +89,7 @@ from .contextmenuprovider import EnMAPBoxContextMenuProvider
 from .contextmenus import EnMAPBoxContextMenuRegistry
 from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
 from .dataviews.docks import DockTypes
+from .enmapboxsettingsgui import EnMAPBoxSettingsPageWidget
 from .mapcanvas import MapCanvas
 from .splashscreen.splashscreen import EnMAPBoxSplashScreen
 from .utils import enmapboxUiPath, high_contrast_random_color
@@ -147,7 +148,8 @@ class EnMAPBoxUI(QMainWindow):
     menuApplicationsClassification: QMenu
     menuApplicationsRegression: QMenu
     menuApplicationsUnmixing: QMenu
-
+    menuSettings: QMenu
+    mActionShowOptions: QAction
     menuAbout: QMenu
 
     def __init__(self, *args, **kwds):
@@ -1525,6 +1527,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.ui.mActionOpenOnlineDocumentation.triggered.connect(lambda: webbrowser.open(enmapbox.DOCUMENTATION))
 
         self.ui.mActionShowPackageInstaller.triggered.connect(self.showPackageInstaller)
+
+        self.ui.mActionShowOptions.triggered.connect(
+            lambda: iface.showOptionsDialog(currentPage=EnMAPBoxSettingsPageWidget.PAGE_NAME)
+        )
 
         # finally, fix the popup mode of menus
         for toolBar in self.ui.findChildren(QToolBar):
