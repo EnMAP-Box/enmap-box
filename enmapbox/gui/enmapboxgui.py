@@ -633,11 +633,11 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.onReloadProject()
 
     def executeAlgorithm(
-        self,
-        alg_id,
-        parent: Optional[QMainWindow] = None,
-        in_place=False,
-        as_batch=False
+            self,
+            alg_id,
+            parent: Optional[QMainWindow] = None,
+            in_place=False,
+            as_batch=False
     ):
         context = self.processingContext()
         if not isinstance(parent, QMainWindow):
@@ -1065,6 +1065,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             QgsVectorLayer(landcover_potsdam_point, basename(landcover_potsdam_point))
         ]
         self.onDataDropped(reversed(layers))
+
+    def onShowOptionsDialog(self):
+        from qgis.utils import iface
+        self.optionsDialog = iface.showOptionsDialog(currentPage=EnMAPBoxSettingsPageWidget.PAGE_NAME)
 
     def disconnectQGISSignals(self):
         try:
@@ -1528,9 +1532,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
         self.ui.mActionShowPackageInstaller.triggered.connect(self.showPackageInstaller)
 
-        self.ui.mActionShowOptions.triggered.connect(
-            lambda: iface.showOptionsDialog(currentPage=EnMAPBoxSettingsPageWidget.PAGE_NAME)
-        )
+        self.ui.mActionShowOptions.triggered.connect(self.onShowOptionsDialog)
 
         # finally, fix the popup mode of menus
         for toolBar in self.ui.findChildren(QToolBar):
@@ -1798,10 +1800,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     @pyqtSlot(SpatialPoint, QgsMapCanvas)
     def loadCurrentMapSpectra(
-        self,
-        spatialPoint: SpatialPoint,
-        mapCanvas: Optional[QgsMapCanvas] = None,
-        runAsync: bool = None
+            self,
+            spatialPoint: SpatialPoint,
+            mapCanvas: Optional[QgsMapCanvas] = None,
+            runAsync: bool = None
     ) -> Dict[str, List[QgsFeature]]:
         """
         Loads SpectralProfiles from a location defined by `spatialPoint`
@@ -2631,14 +2633,14 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         return self.ui.mActionZoomOut
 
     def showProcessingAlgorithmDialog(
-        self,
-        algorithmName: Union[str, QgsProcessingAlgorithm],
-        parameters: Dict = None,
-        show: bool = True,
-        modal: bool = False,
-        wrapper: type = None,
-        autoRun: bool = False,
-        parent: QWidget = None
+            self,
+            algorithmName: Union[str, QgsProcessingAlgorithm],
+            parameters: Dict = None,
+            show: bool = True,
+            modal: bool = False,
+            wrapper: type = None,
+            autoRun: bool = False,
+            parent: QWidget = None
     ) -> AlgorithmWidget:
         """
         Create an algorithm dialog that uses the EnMAP-Box to set the context in which

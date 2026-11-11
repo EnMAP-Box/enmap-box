@@ -102,10 +102,6 @@ class EnMAPBoxPlugin(object):
     def initGui(self):
         from qgis.utils import iface
         import enmapbox
-        from enmapbox.gui.enmapboxsettingsgui import EnMAPBoxSettingsPageWidgetFactory
-
-        self.optionsFactory = EnMAPBoxSettingsPageWidgetFactory()
-        iface.registerOptionsWidgetFactory(self.optionsFactory)
 
         actionStartBox = QAction(enmapbox.icon(), 'EnMAP-Box', iface)
         actionAbout = QAction(QIcon(':/enmapbox/gui/ui/icons/metadata.svg'), 'About')
@@ -252,11 +248,6 @@ class EnMAPBoxPlugin(object):
             self.enmapBox.ui.show()
 
     def unload(self):
-        from qgis.utils import iface
-
-        iface.unregisterOptionsWidgetFactory(self.optionsFactory)
-        self.optionsFactory = None
-
         self._remove_actions()
 
         if not self.corePackagesAvailable():

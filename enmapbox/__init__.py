@@ -318,6 +318,12 @@ def initAll():
     """
     Calls other init routines required to run the EnMAP-Box properly
     """
+
+    from qgis.utils import iface
+    from enmapbox.gui.enmapboxsettingsgui import EnMAPBoxSettingsPageWidgetFactory
+    optionsFactory = EnMAPBoxSettingsPageWidgetFactory()
+    iface.registerOptionsWidgetFactory(optionsFactory)
+
     initEnMAPBoxResources()
     from enmapbox.qgispluginsupport.qps import registerDataProviders
     registerDataProviders()
@@ -371,6 +377,11 @@ def unloadAll():
     unregisterExpressionFunctions()
     unregisterMapLayerConfigWidgetFactories()
     unregisterEnMAPBoxProcessingProvider()
+
+    from qgis.utils import iface
+    from enmapbox.gui.enmapboxsettingsgui import EnMAPBoxSettingsPageWidgetFactory
+    optionsFactory = EnMAPBoxSettingsPageWidgetFactory()
+    iface.unregisterOptionsWidgetFactory(optionsFactory)
 
 
 def tr(text: str) -> str:
