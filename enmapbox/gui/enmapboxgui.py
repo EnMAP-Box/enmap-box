@@ -24,37 +24,9 @@ import warnings
 from os.path import basename, dirname
 from typing import Optional, Dict, Union, Any, List, Sequence
 
-import qgis.utils
-from processing.gui.ProcessingToolbox import ProcessingToolbox
-from qgis.PyQt.QtCore import QMetaType
-from qgis.PyQt.QtCore import QUrl
-from qgis.PyQt.QtCore import pyqtSignal, Qt, QObject, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
-from qgis.PyQt.QtGui import QDesktopServices
-from qgis.PyQt.QtGui import QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QColor, QIcon, \
-    QKeyEvent, \
-    QCloseEvent, QGuiApplication
-from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, QMainWindow, QApplication, QSizePolicy, \
-    QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
-    QProgressBar, QMessageBox
-from qgis.PyQt.QtXml import QDomDocument
-from qgis.core import QgsBrowserModel, QgsField
-from qgis.core import QgsExpressionContextGenerator, QgsExpressionContext, QgsProcessingContext, \
-    QgsExpressionContextUtils
-from qgis.core import QgsFeature
-from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
-    QgsProcessingAlgorithm, Qgis, QgsCoordinateReferenceSystem, QgsWkbTypes, \
-    QgsPointXY, QgsLayerTree, QgsLayerTreeLayer, QgsVectorLayerTools, \
-    QgsZipUtils, QgsProjectArchive, QgsSettings, \
-    QgsStyle, QgsSymbolLegendNode, QgsSymbol, QgsTaskManager, QgsApplication, QgsProcessingAlgRunnerTask
-from qgis.core import QgsRectangle, edit
-from qgis.gui import QgsMapCanvas, QgsMapTool, QgisInterface, QgsMessageBar, QgsMessageViewer, QgsMessageBarItem, \
-    QgsMapLayerConfigWidgetFactory, QgsAttributeTableFilterModel, QgsSymbolSelectorDialog, \
-    QgsSymbolWidgetContext
-from qgis.gui import QgsProcessingAlgorithmWidgetBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog, \
-    QgsNewVectorLayerDialog, QgsProcessingContextGenerator
-
 import enmapbox
 import enmapbox.gui.datasources.manager
+import qgis.utils
 from enmapbox import messageLog, debugLog, DEBUG
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
 from enmapbox.gui.dataviews.dockmanager import DockManagerTreeModel, MapDockTreeNode
@@ -85,6 +57,33 @@ from enmapboxprocessing.algorithm.importprismal2calgorithm import ImportPrismaL2
 from enmapboxprocessing.algorithm.importprismal2dalgorithm import ImportPrismaL2DAlgorithm
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
+from processing.gui.ProcessingToolbox import ProcessingToolbox
+from qgis.PyQt.QtCore import QMetaType
+from qgis.PyQt.QtCore import QUrl
+from qgis.PyQt.QtCore import pyqtSignal, Qt, QObject, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
+from qgis.PyQt.QtGui import QDesktopServices
+from qgis.PyQt.QtGui import QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QColor, QIcon, \
+    QKeyEvent, \
+    QCloseEvent, QGuiApplication
+from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, QMainWindow, QApplication, QSizePolicy, \
+    QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
+    QProgressBar, QMessageBox
+from qgis.PyQt.QtXml import QDomDocument
+from qgis.core import QgsBrowserModel, QgsField
+from qgis.core import QgsExpressionContextGenerator, QgsExpressionContext, QgsProcessingContext, \
+    QgsExpressionContextUtils
+from qgis.core import QgsFeature
+from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
+    QgsProcessingAlgorithm, Qgis, QgsCoordinateReferenceSystem, QgsWkbTypes, \
+    QgsPointXY, QgsLayerTree, QgsLayerTreeLayer, QgsVectorLayerTools, \
+    QgsZipUtils, QgsProjectArchive, QgsSettings, \
+    QgsStyle, QgsSymbolLegendNode, QgsSymbol, QgsTaskManager, QgsApplication, QgsProcessingAlgRunnerTask
+from qgis.core import QgsRectangle, edit
+from qgis.gui import QgsMapCanvas, QgsMapTool, QgisInterface, QgsMessageBar, QgsMessageViewer, QgsMessageBarItem, \
+    QgsMapLayerConfigWidgetFactory, QgsAttributeTableFilterModel, QgsSymbolSelectorDialog, \
+    QgsSymbolWidgetContext
+from qgis.gui import QgsProcessingAlgorithmWidgetBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog, \
+    QgsNewVectorLayerDialog, QgsProcessingContextGenerator
 from .contextmenuprovider import EnMAPBoxContextMenuProvider
 from .contextmenus import EnMAPBoxContextMenuRegistry
 from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
@@ -95,7 +94,7 @@ from .splashscreen.splashscreen import EnMAPBoxSplashScreen
 from .utils import enmapboxUiPath, high_contrast_random_color
 from .widgets.createspeclibdialog import CreateSpectralLibraryDialog
 from ..enmapboxsettings import EnMAPBoxSettings
-from ..qgispluginsupport.qps.processing.algorithmwidget import executeAlgorithm, AlgorithmWidget
+from ..qgispluginsupport.qps.reimplementation.algorithmwidget import AlgorithmWidget
 from ..qgispluginsupport.qps.speclib.core import profile_fields
 from ..qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
 from ..qgispluginsupport.qps.speclib.core.spectralprofile import ProfileEncoding
@@ -633,11 +632,11 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         self.onReloadProject()
 
     def executeAlgorithm(
-            self,
-            alg_id,
-            parent: Optional[QMainWindow] = None,
-            in_place=False,
-            as_batch=False
+        self,
+        alg_id,
+        parent: Optional[QMainWindow] = None,
+        in_place=False,
+        as_batch=False
     ):
         context = self.processingContext()
         if not isinstance(parent, QMainWindow):
@@ -1800,10 +1799,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     @pyqtSlot(SpatialPoint, QgsMapCanvas)
     def loadCurrentMapSpectra(
-            self,
-            spatialPoint: SpatialPoint,
-            mapCanvas: Optional[QgsMapCanvas] = None,
-            runAsync: bool = None
+        self,
+        spatialPoint: SpatialPoint,
+        mapCanvas: Optional[QgsMapCanvas] = None,
+        runAsync: bool = None
     ) -> Dict[str, List[QgsFeature]]:
         """
         Loads SpectralProfiles from a location defined by `spatialPoint`
@@ -2633,14 +2632,14 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         return self.ui.mActionZoomOut
 
     def showProcessingAlgorithmDialog(
-            self,
-            algorithmName: Union[str, QgsProcessingAlgorithm],
-            parameters: Dict = None,
-            show: bool = True,
-            modal: bool = False,
-            wrapper: type = None,
-            autoRun: bool = False,
-            parent: QWidget = None
+        self,
+        algorithmName: Union[str, QgsProcessingAlgorithm],
+        parameters: Dict = None,
+        show: bool = True,
+        modal: bool = False,
+        wrapper: type = None,
+        autoRun: bool = False,
+        parent: QWidget = None
     ) -> AlgorithmWidget:
         """
         Create an algorithm dialog that uses the EnMAP-Box to set the context in which

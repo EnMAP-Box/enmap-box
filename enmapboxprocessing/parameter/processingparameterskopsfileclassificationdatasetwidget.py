@@ -1,15 +1,8 @@
 import sys
 from os.path import basename, join, dirname
 
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QWidget, QToolButton, QMenu, QMessageBox
-from qgis.PyQt.uic import loadUi
-from qgis.core import QgsMessageLog, Qgis
-from qgis.gui import QgsAbstractProcessingParameterWidgetWrapper, QgsProcessingParameterWidgetFactoryInterface, QgsGui
-from qgis.gui import QgsFileWidget
-
 from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.qgispluginsupport.qps.processing.algorithmwidget import AlgorithmWidget
+from enmapbox.qgispluginsupport.qps.reimplementation.algorithmwidget import AlgorithmWidget
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedlibraryalgorithm import \
     PrepareClassificationDatasetFromCategorizedLibraryAlgorithm
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedrasteralgorithm import \
@@ -28,6 +21,12 @@ from enmapboxprocessing.algorithm.prepareclassificationdatasetfromtablealgorithm
     PrepareClassificationDatasetFromTableAlgorithm
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QWidget, QToolButton, QMenu, QMessageBox
+from qgis.PyQt.uic import loadUi
+from qgis.core import QgsMessageLog, Qgis
+from qgis.gui import QgsAbstractProcessingParameterWidgetWrapper, QgsProcessingParameterWidgetFactoryInterface, QgsGui
+from qgis.gui import QgsFileWidget
 
 
 class ProcessingParameterSkopsFileClassificationDatasetWidget(QWidget):

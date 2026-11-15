@@ -1,9 +1,8 @@
-from qgis.core import QgsProject, QgsRasterLayer, QgsVectorLayer, QgsApplication, QgsTaskManager
-
 from enmapbox import initAll
-from enmapbox.qgispluginsupport.qps.processing.algorithmwidget import AlgorithmWidget
+from enmapbox.qgispluginsupport.qps.reimplementation.algorithmwidget import AlgorithmWidget
 from enmapbox.qgispluginsupport.qps.speclib.processing.extractspectralprofiles import ExtractSpectralProfiles
 from enmapbox.testing import EnMAPBoxTestCase, start_app
+from qgis.core import QgsProject, QgsRasterLayer, QgsVectorLayer, QgsApplication, QgsTaskManager
 
 start_app()
 initAll()

@@ -1,16 +1,8 @@
 import sys
 from os.path import basename, join, dirname
 
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QWidget, QToolButton, QMenu, QMessageBox
-from qgis.PyQt.uic import loadUi
-from qgis.core import QgsMessageLog, Qgis
-from qgis.gui import (
-    QgsAbstractProcessingParameterWidgetWrapper, QgsProcessingParameterWidgetFactoryInterface, QgsGui, QgsFileWidget
-)
-
 from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.qgispluginsupport.qps.processing.algorithmwidget import AlgorithmWidget
+from enmapbox.qgispluginsupport.qps.reimplementation.algorithmwidget import AlgorithmWidget
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcodealgorithm import \
     PrepareRegressionDatasetFromCodeAlgorithm
 from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuouslibraryalgorithm import \
@@ -29,6 +21,13 @@ from enmapboxprocessing.algorithm.prepareregressiondatasetfromtablealgorithm imp
     PrepareRegressionDatasetFromTableAlgorithm
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QWidget, QToolButton, QMenu, QMessageBox
+from qgis.PyQt.uic import loadUi
+from qgis.core import QgsMessageLog, Qgis
+from qgis.gui import (
+    QgsAbstractProcessingParameterWidgetWrapper, QgsProcessingParameterWidgetFactoryInterface, QgsGui, QgsFileWidget
+)
 
 
 class ProcessingParameterSkopsFileRegressionDatasetWidget(QWidget):
