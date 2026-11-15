@@ -1,12 +1,5 @@
 from typing import List, Union
 
-from qgis.PyQt.QtCore import QEvent, Qt, QPointF, QPoint, QAbstractItemModel, QRect, QModelIndex
-from qgis.PyQt.QtGui import QMouseEvent, QContextMenuEvent, QAction
-from qgis.PyQt.QtWidgets import QMenu, QComboBox
-from qgis.PyQt.QtWidgets import QWidgetAction
-from qgis.core import QgsPointXY, QgsLayerTreeNode, QgsRasterLayer, QgsProject
-from qgis.gui import QgsMapMouseEvent
-
 from enmapbox.gui.contextmenuprovider import EnMAPBoxContextMenuProvider
 from enmapbox.gui.contextmenus import EnMAPBoxAbstractContextMenuProvider, EnMAPBoxContextMenuRegistry
 from enmapbox.gui.datasources.manager import DataSourceManagerTreeView
@@ -16,6 +9,12 @@ from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import MapCanvas
 from enmapbox.qgispluginsupport.qps.models import TreeNode
 from enmapbox.testing import EnMAPBoxTestCase, start_app
+from qgis.PyQt.QtCore import QEvent, Qt, QPointF, QPoint, QAbstractItemModel, QRect, QModelIndex
+from qgis.PyQt.QtGui import QMouseEvent, QContextMenuEvent, QAction
+from qgis.PyQt.QtWidgets import QMenu, QComboBox
+from qgis.PyQt.QtWidgets import QWidgetAction
+from qgis.core import QgsPointXY, QgsLayerTreeNode, QgsRasterLayer, QgsProject
+from qgis.gui import QgsMapMouseEvent
 
 start_app()
 
@@ -145,7 +144,8 @@ class test_applications(EnMAPBoxTestCase):
         canvas = MapCanvas()
         project = QgsProject()
         canvas.setProject(project)
-
+        eb = EnMAPBox(load_core_apps=False, load_other_apps=False)
+        self.assertIsInstance(eb, EnMAPBox)
         # Add some dummy raster layers
         l1 = QgsRasterLayer("None", "Layer 1", "gdal")
         l2 = QgsRasterLayer("None", "Layer 2", "gdal")
@@ -155,6 +155,7 @@ class test_applications(EnMAPBoxTestCase):
         LAYERS = {lyr.id(): lyr for lyr in project.mapLayers().values()}
 
         provider = EnMAPBoxContextMenuProvider()
+
         menu = QMenu()
         provider.populateMapCanvasMenu(menu, canvas, QPoint(0, 0), QgsPointXY(0, 0))
 
