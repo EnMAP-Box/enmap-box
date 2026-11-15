@@ -8,6 +8,15 @@ from typing import Optional, Tuple, Dict
 import numpy as np
 from osgeo import gdal
 from pyqtgraph import PlotWidget, ImageItem, mkPen
+from scipy.stats import binned_statistic_2d, pearsonr
+
+from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import MarkerSymbolComboBox, MarkerSymbol
+from enmapbox.qgispluginsupport.qps.reimplementation.algorithmwidget import AlgorithmWidget
+from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
+from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
+from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxprocessing.rasterwriter import RasterWriter
+from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtCore import QRectF, QPointF, Qt
 from qgis.PyQt.QtGui import QMouseEvent, QColor
 from qgis.PyQt.QtWidgets import QToolButton, QMainWindow, QComboBox, QCheckBox, QDoubleSpinBox, QPlainTextEdit, QSpinBox
@@ -16,15 +25,6 @@ from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsMapSettings, Qgs
     QgsFieldProxyModel, QgsMapLayer
 from qgis.gui import QgsMapLayerComboBox, QgsMapCanvas, QgsRasterBandComboBox, QgsColorButton, QgsColorRampButton, \
     QgsFilterLineEdit, QgsFieldComboBox
-from scipy.stats import binned_statistic_2d, pearsonr
-
-from enmapbox.qgispluginsupport.qps.plotstyling.plotstyling import MarkerSymbolComboBox, MarkerSymbol
-from enmapbox.qgispluginsupport.qps.processing.algorithmwidget import AlgorithmWidget
-from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
-from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxprocessing.rasterwriter import RasterWriter
-from enmapboxprocessing.utils import Utils
 
 
 class ScatterPlotWidget(PlotWidget):
