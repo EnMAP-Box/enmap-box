@@ -4,7 +4,7 @@ from typing import List
 
 from qgis.core import QgsRasterLayer, QgsMapLayer
 
-from enmapbox.qgispluginsupport.qps.processing.algorithmwidget import AlgorithmWidget
+from enmapbox.qgispluginsupport.qps.reimplementation.algorithmwidget import AlgorithmWidget
 from enmapboxprocessing.algorithm.importdesisl1balgorithm import ImportDesisL1BAlgorithm
 from enmapboxprocessing.algorithm.importdesisl1calgorithm import ImportDesisL1CAlgorithm
 from enmapboxprocessing.algorithm.importdesisl2aalgorithm import ImportDesisL2AAlgorithm
