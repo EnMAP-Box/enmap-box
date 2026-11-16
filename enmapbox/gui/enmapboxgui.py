@@ -69,21 +69,23 @@ from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, Q
     QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
     QProgressBar, QMessageBox
 from qgis.PyQt.QtXml import QDomDocument
-from qgis.core import QgsBrowserModel, QgsField
-from qgis.core import QgsExpressionContextGenerator, QgsExpressionContext, QgsProcessingContext, \
-    QgsExpressionContextUtils
-from qgis.core import QgsFeature
-from qgis.core import QgsMapLayer, QgsVectorLayer, QgsRasterLayer, QgsProject, \
-    QgsProcessingAlgorithm, Qgis, QgsCoordinateReferenceSystem, QgsWkbTypes, \
-    QgsPointXY, QgsLayerTree, QgsLayerTreeLayer, QgsVectorLayerTools, \
-    QgsZipUtils, QgsProjectArchive, QgsSettings, \
-    QgsStyle, QgsSymbolLegendNode, QgsSymbol, QgsTaskManager, QgsApplication, QgsProcessingAlgRunnerTask
-from qgis.core import QgsRectangle, edit
-from qgis.gui import QgsMapCanvas, QgsMapTool, QgisInterface, QgsMessageBar, QgsMessageViewer, QgsMessageBarItem, \
-    QgsMapLayerConfigWidgetFactory, QgsAttributeTableFilterModel, QgsSymbolSelectorDialog, \
-    QgsSymbolWidgetContext
-from qgis.gui import QgsProcessingAlgorithmWidgetBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog, \
-    QgsNewVectorLayerDialog, QgsProcessingContextGenerator
+from qgis.core import (
+    QgsBrowserModel, QgsField, QgsExpressionContextGenerator, QgsExpressionContext,
+    QgsProcessingContext,
+    QgsExpressionContextUtils, QgsFeature, QgsProcessingException, QgsMapLayer, QgsVectorLayer, QgsRasterLayer,
+    QgsProject,
+    QgsProcessingAlgorithm, Qgis, QgsCoordinateReferenceSystem, QgsWkbTypes,
+    QgsPointXY, QgsLayerTree, QgsLayerTreeLayer, QgsVectorLayerTools,
+    QgsZipUtils, QgsProjectArchive, QgsSettings,
+    QgsStyle, QgsSymbolLegendNode, QgsSymbol, QgsTaskManager, QgsApplication,
+    QgsProcessingAlgRunnerTask, QgsRectangle, edit
+)
+from qgis.gui import (
+    QgsMapCanvas, QgsMapTool, QgisInterface, QgsMessageBar, QgsMessageViewer, QgsMessageBarItem,
+    QgsMapLayerConfigWidgetFactory, QgsAttributeTableFilterModel, QgsSymbolSelectorDialog,
+    QgsSymbolWidgetContext, QgsProcessingAlgorithmWidgetBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog,
+    QgsNewVectorLayerDialog, QgsProcessingContextGenerator, QgsProcessingParameterWidgetContext
+)
 from .contextmenuprovider import EnMAPBoxContextMenuProvider
 from .contextmenus import EnMAPBoxContextMenuRegistry
 from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
@@ -376,7 +378,7 @@ class EnMAPBoxProject(QgsProject):
         print(info, flush=True)
 
 
-class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcessingContextGenerator):
+class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator):
     _instance = None
 
     @staticmethod
@@ -440,6 +442,17 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         # QApplication.processEvents()
 
         QgisInterface.__init__(self)
+
+        class ProcessingContextGenerator(QgsProcessingContextGenerator):
+
+            def __init__(self, enmapbox):
+                super().__init__()
+                self._enmapbox = enmapbox
+
+            def processingContext(self) -> QgsProcessingContext | None:
+                return self._enmapbox.processingContext()
+
+        self._mProcessingContextGenerator = ProcessingContextGenerator(self)
 
         self.mProject: EnMAPBoxProject = EnMAPBoxProject()
 
@@ -638,16 +651,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         in_place=False,
         as_batch=False
     ):
-        context = self.processingContext()
-        if not isinstance(parent, QMainWindow):
-            parent = self.ui
 
-        executeAlgorithm(alg_id, parent,
-                         in_place=in_place,
-                         as_batch=as_batch,
-                         iface=self,
-                         context=context,
-                         on_results=self.onProcessingAlgTaskCompleted)
+        d = self.showProcessingAlgorithmDialog(alg_id)
+        d.algorithmFinished.connect(self.onProcessingAlgTaskCompleted)
+        d.exec()
 
     def createExpressionContext(self) -> QgsExpressionContext:
         """
@@ -673,6 +680,17 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     def processingToolbox(self) -> ProcessingToolbox:
         return self.ui.processingPanel
+
+    def createWidgetContext(self) -> QgsProcessingParameterWidgetContext:
+
+        wc = QgsProcessingParameterWidgetContext()
+        wc.registerProcessingContextGenerator(self._mProcessingContextGenerator)
+        wc.setProject(self.project())
+        lyr = self.currentLayer()
+        if isinstance(lyr, QgsMapLayer):
+            wc.setActiveLayer(lyr)
+
+        return wc
 
     def processingContext(self) -> QgsProcessingContext:
         """
@@ -2633,19 +2651,22 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
 
     def showProcessingAlgorithmDialog(
         self,
-        algorithmName: Union[str, QgsProcessingAlgorithm],
-        parameters: Dict = None,
+        algorithm: Union[str, QgsProcessingAlgorithm],
+        parameters: Dict | None = None,
         show: bool = True,
         modal: bool = False,
-        wrapper: type = None,
-        autoRun: bool = False,
-        parent: QWidget = None
+        wrapper: QgsProcessingAlgorithmWidgetBase | None = None,
+        auto_run: bool = False,
+        parent: QMainWindow | None = None
     ) -> AlgorithmWidget:
         """
-        Create an algorithm dialog that uses the EnMAP-Box to set the context in which
-        processing algorithms are executed.
+        Creates an algorithm dialog that uses the EnMAP-Box to set the context in which
+        processing algorithms are executed AlgorithmWidget
 
-        Optionally, provide a wrapper class to get full control over individual components like the feedback or results.
+        Caller is responsible to keep a reference on the returned
+
+        Optionally, provides a wrapper class to get full control over individual components
+        like the feedback or results.
         E.g. to get a handle on the results do something like that:
 
         .. code-block:: python
@@ -2659,45 +2680,44 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
         """
 
         if parent is None:
-            from enmapbox.gui.enmapboxgui import EnMAPBox
-            if EnMAPBox.instance() is not None:
-                parent = EnMAPBox.instance().ui
+            parent = EnMAPBox.instance().ui
 
-        if parent is None:
-            from qgis.utils import iface
-            if iface is not None:
-                parent = iface.mapCanvas()
+        if not isinstance(parent, QMainWindow):
+            raise ValueError(f'parent is not a QMainWindow: {parent}')
 
-        if parent is None:
-            raise ValueError()
-
-        algorithm = None
-        all_names = []
-        for alg in QgsApplication.processingRegistry().algorithms():
-            alg: QgsProcessingAlgorithm
-            all_names.append(alg.id())
-            if isinstance(algorithmName, QgsProcessingAlgorithm):
-                algorithmId = algorithmName.id()
-            elif isinstance(algorithmName, str):
-                algorithmId = algorithmName
+        if isinstance(algorithm, str):
+            a = QgsApplication.processingRegistry().createAlgorithmById(algorithm)
+            if a is None:
+                for alg in QgsApplication.processingRegistry().algorithms():
+                    if alg.id().endswith(algorithm):
+                        a = alg
+                        break
+            if isinstance(a, QgsProcessingAlgorithm):
+                algorithm = a
             else:
-                raise ValueError(algorithmName)
-
-            algId = alg.id().split(':')[1]  # remove provider prefix
-            if algorithmId == alg.id() or algorithmId == algId:
-                algorithm = alg
-                break
+                raise QgsProcessingException(f'Algorithm {algorithm} not found in QGIS Processing Registry')
 
         if not isinstance(algorithm, QgsProcessingAlgorithm):
-            raise Exception('Algorithm {} not found in QGIS Processing Registry'.format(algorithmName))
+            raise QgsProcessingException(f'Not a QgsProcessingAlgorithm: {algorithm}')
 
         dlg = algorithm.createCustomParametersWidget(parent)
         if not dlg:
-            context = self.processingContext()
+            processing_context = self.processingContext()
+            widget_context = self.createWidgetContext()
             if wrapper is None:
-                dlg = AlgorithmWidget(algorithm.create(), parent=parent, context=context, iface=self)
+                dlg = AlgorithmWidget(
+                    algorithm,
+                    parent=parent,
+                    processing_context=processing_context,
+                    widget_context=widget_context
+                )
             else:
-                dlg = wrapper(algorithm.create(), parent=parent, context=context, iface=self)
+                dlg = wrapper(
+                    algorithm,
+                    parent=parent,
+                    processing_context=processing_context,
+                    widget_context=widget_context
+                )
         else:
             # assert wrapper is None
             pass
@@ -2711,7 +2731,7 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator, QgsProcess
             dlg.setParameters(parameters)
 
         # auto-running the algorithm is useful, if all required parameters are filled in
-        if autoRun:
+        if auto_run:
             dlg.runButton().animateClick(500)
 
         if show and not modal:
