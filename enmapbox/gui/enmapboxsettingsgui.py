@@ -9,7 +9,6 @@ from enmapbox.enmapboxsettings import EnMAPBoxSettings
 
 
 class EnMAPBoxSettingsPageWidget(QgsOptionsPageWidget):
-
     PAGE_NAME = "EnMAPBoxSettingsPageWidget"
 
     def __init__(self, parent=None):
@@ -36,12 +35,19 @@ class EnMAPBoxSettingsPageWidget(QgsOptionsPageWidget):
 
 
 class EnMAPBoxSettingsPageWidgetFactory(QgsOptionsWidgetFactory):
+    _instance = None
 
     def __init__(self):
         super().__init__("EnMAP-Box", icon())
 
     def createWidget(self, parent=None):
         return EnMAPBoxSettingsPageWidget(parent)
+
+    @classmethod
+    def instance(cls):
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
 
 
 class EnMAPBoxOptionsWidget(QWidget):

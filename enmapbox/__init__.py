@@ -321,8 +321,7 @@ def initAll():
 
     from qgis.utils import iface
     from enmapbox.gui.enmapboxsettingsgui import EnMAPBoxSettingsPageWidgetFactory
-    optionsFactory = EnMAPBoxSettingsPageWidgetFactory()
-    iface.registerOptionsWidgetFactory(optionsFactory)
+    iface.registerOptionsWidgetFactory(EnMAPBoxSettingsPageWidgetFactory.instance())
 
     initEnMAPBoxResources()
     from enmapbox.qgispluginsupport.qps import registerDataProviders
@@ -380,8 +379,7 @@ def unloadAll():
 
     from qgis.utils import iface
     from enmapbox.gui.enmapboxsettingsgui import EnMAPBoxSettingsPageWidgetFactory
-    optionsFactory = EnMAPBoxSettingsPageWidgetFactory()
-    iface.unregisterOptionsWidgetFactory(optionsFactory)
+    iface.unregisterOptionsWidgetFactory(EnMAPBoxSettingsPageWidgetFactory.instance())
 
 
 def tr(text: str) -> str:
