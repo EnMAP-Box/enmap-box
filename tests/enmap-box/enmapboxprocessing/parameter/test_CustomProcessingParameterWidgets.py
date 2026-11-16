@@ -1,7 +1,3 @@
-from processing import createAlgorithmDialog
-from qgis.PyQt.QtWidgets import QWidget
-from qgis.core import QgsProject
-
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
@@ -14,6 +10,9 @@ from enmapboxprocessing.algorithm.rastermathalgorithm.rastermathalgorithm import
 from enmapboxprocessing.algorithm.regressionworkflowalgorithm import RegressionWorkflowAlgorithm
 from enmapboxprocessing.algorithm.saverasterlayerasalgorithm import SaveRasterAsAlgorithm
 from enmapboxprocessing.testcase import TestCase
+from processing import createAlgorithmDialog
+from qgis.PyQt.QtWidgets import QWidget
+from qgis.core import QgsProject
 
 qgsApp = start_app()
 initAll()
@@ -39,61 +38,63 @@ class TestCustomProcessingParameterWidgets(TestCase):
         enmapBox = EnMAPBox()
 
         # we create several algos, which are using those widgets
-
+        dialogs = []
         if 1:
             # ProcessingParameterCodeEditWidgetWrapper
-            enmapBox.showProcessingAlgorithmDialog(
+            dialogs.append(enmapBox.showProcessingAlgorithmDialog(
                 PrepareUnsupervisedDatasetFromCodeAlgorithm(), parameters=None
-            )
+            ))
 
         if 1:
             # ProcessingParameterCreationProfileWidgetWrapper
-            enmapBox.showProcessingAlgorithmDialog(
+            dialogs.append(enmapBox.showProcessingAlgorithmDialog(
                 SaveRasterAsAlgorithm(), parameters=None
-            )
+            ))
 
         # ProcessingParameterEstimatorCodeEditWrapper
         if 1:
             # Regressor
-            enmapBox.showProcessingAlgorithmDialog(
+            dialogs.append(enmapBox.showProcessingAlgorithmDialog(
                 RegressionWorkflowAlgorithm(), parameters=None
-            )
+            ))
         if 1:
             # Classifier
-            enmapBox.showProcessingAlgorithmDialog(
+            dialogs.append(enmapBox.showProcessingAlgorithmDialog(
                 ClassificationWorkflowAlgorithm(), parameters=None
-            )
+            ))
 
             # ProcessingParameterRasterMathCodeEditWidgetWrapper
         if 1:
-            enmapBox.showProcessingAlgorithmDialog(
+            dialogs.append(enmapBox.showProcessingAlgorithmDialog(
                 RasterMathAlgorithm(), parameters=None
-            )
+            ))
 
         # ProcessingParameterSkopsFileWidgetWrapper
         if 1:
-            enmapBox.showProcessingAlgorithmDialog(
+            dialogs.append(enmapBox.showProcessingAlgorithmDialog(
                 ExportDatasetToFilesAlgorithm(), parameters=None
-            )
+            ))
 
         # ProcessingParameterSkopsFileClassificationDatasetWidgetWrapper
         if 1:
-            enmapBox.showProcessingAlgorithmDialog(
+            dialogs.append(enmapBox.showProcessingAlgorithmDialog(
                 ClassificationWorkflowAlgorithm(), parameters=None
-            )
+            ))
 
         # ProcessingParameterSkopsFileRegressionDatasetWidgetWrapper
         if 1:
-            enmapBox.showProcessingAlgorithmDialog(
+            dialogs.append(enmapBox.showProcessingAlgorithmDialog(
                 RegressionWorkflowAlgorithm(), parameters=None
-            )
+            ))
 
         # ProcessingParameterSkopsFileUnsupervisedDatasetWidgetWrapper
         if 1:
-            enmapBox.showProcessingAlgorithmDialog(
+            dialogs.append(enmapBox.showProcessingAlgorithmDialog(
                 FitPcaAlgorithm(), parameters=None
-            )
+            ))
 
         self.showGui(enmapBox.ui)
+        # for d in dialogs:
+        #    d.close()
         enmapBox.close()
         # self.dispose_widget(enmapBox.ui)

@@ -6,17 +6,6 @@ from tempfile import gettempdir
 from typing import Tuple, Dict, Optional
 
 import numpy as np
-#  from processing.gui.AlgorithmDialog import AlgorithmDialog
-from qgis.PyQt.QtCore import QUrl
-from qgis.PyQt.QtGui import QFont, QColor, QTextCursor
-#  from qgis.PyQt.QtWebKitWidgets import QWebView
-from qgis.PyQt.QtWidgets import (
-    QMainWindow, QToolButton, QProgressBar, QComboBox, QPlainTextEdit, QCheckBox, QDialog, QHBoxLayout, QPushButton,
-    QTableWidget, QTableWidgetItem, QLabel, QRadioButton, QTextEdit, QWidget
-)
-from qgis.PyQt.uic import loadUi
-from qgis.core import QgsMapLayerProxyModel, Qgis, QgsProcessingFeedback, QgsRasterLayer, QgsProcessing
-from qgis.gui import QgsFileWidget, QgsMapLayerComboBox, QgsSpinBox, QgsMessageBar, QgsColorButton, QgsDoubleSpinBox
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapboxprocessing.algorithm.algorithms import algorithms
@@ -57,6 +46,17 @@ from enmapboxprocessing.parameter.processingparameterskopsfileclassificationdata
 from enmapboxprocessing.parameter.processingparameterskopsfilewidget import ProcessingParameterSkopsFileWidget
 from enmapboxprocessing.typing import ClassifierDump, Category
 from enmapboxprocessing.utils import Utils
+#  from processing.gui.AlgorithmDialog import AlgorithmDialog
+from qgis.PyQt.QtCore import QUrl
+from qgis.PyQt.QtGui import QFont, QColor, QTextCursor
+#  from qgis.PyQt.QtWebKitWidgets import QWebView
+from qgis.PyQt.QtWidgets import (
+    QMainWindow, QToolButton, QProgressBar, QComboBox, QPlainTextEdit, QCheckBox, QDialog, QHBoxLayout, QPushButton,
+    QTableWidget, QTableWidgetItem, QLabel, QRadioButton, QTextEdit, QWidget
+)
+from qgis.PyQt.uic import loadUi
+from qgis.core import QgsMapLayerProxyModel, Qgis, QgsProcessingFeedback, QgsRasterLayer, QgsProcessing
+from qgis.gui import QgsFileWidget, QgsMapLayerComboBox, QgsSpinBox, QgsMessageBar, QgsColorButton, QgsDoubleSpinBox
 
 
 class MissingParameterError(Exception):
@@ -434,7 +434,7 @@ class ClassificationWorkflowGui(QMainWindow):
             autoRun = self.mDialogAutoRun.isChecked()
         wrapper = self._createAlgorithmDialogWrapper()
         dialog = self.enmapBox.showProcessingAlgorithmDialog(
-            alg, parameters=parameters, show=True, modal=True, wrapper=wrapper, autoRun=autoRun
+            alg, parameters=parameters, show=True, modal=True, wrapper=wrapper, auto_run=autoRun
         )
 
         if dialog.finishedSuccessful:
