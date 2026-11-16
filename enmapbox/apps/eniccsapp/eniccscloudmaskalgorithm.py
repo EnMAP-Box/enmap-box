@@ -15,7 +15,6 @@ try:
 except ImportError:
     run_eniccs = None
 
-from typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
 
 
@@ -33,7 +32,6 @@ class _FeedbackStream:
         pass
 
 
-@typechecked
 class EniccsCloudMaskAlgorithm(EnMAPProcessingAlgorithm):
     P_PRODUCT, _PRODUCT = 'product', 'EnMAP L2A product folder (single tile)'
     P_OUTPUT_DIR, _OUTPUT_DIR = 'outputDir', 'Output folder'

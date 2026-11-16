@@ -3,14 +3,12 @@ from qgis.PyQt.QtWidgets import QMenu
 
 from eniccsapp.eniccscloudmaskalgorithm import EniccsCloudMaskAlgorithm
 from enmapbox.gui.applications import EnMAPBoxApplication
-from typeguard import typechecked
 
 
 def enmapboxApplicationFactory(enmapBox):
     return [EniccsApp(enmapBox)]
 
 
-@typechecked
 class EniccsApp(EnMAPBoxApplication):
     def __init__(self, enmapBox, parent=None):
         super().__init__(enmapBox, parent=parent)
