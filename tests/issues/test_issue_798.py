@@ -4,7 +4,8 @@ from qgis.core import QgsProject, edit
 
 from enmapbox import initAll
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
-from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprocessingwidget import SpectralProcessingWidget
+from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprocessingalgorithmwidget import \
+    SpectralProcessingAlgorithmWidget
 from enmapbox.testing import EnMAPBoxTestCase, start_app, TestObjects
 from enmapboxprocessing.algorithm.fitpcaalgorithm import FitPcaAlgorithm
 
@@ -29,8 +30,10 @@ class TestIssue764(EnMAPBoxTestCase):
 
         with edit(speclib):
             slw = SpectralLibraryWidget(speclib=speclib)
-            spd = SpectralProcessingWidget(speclib=speclib, algorithmId=algorithmId, parameters=parameters)
-            spd.sigOutputsCreated.connect(checkOutputs)
+            spd = SpectralProcessingAlgorithmWidget(speclib)
+            spd.setAlgorithm(algorithmId)
+            spd.setParameters(parameters)
+            spd.algExecuted.connect(checkOutputs)
             spd.runAlgorithm(fail_fast=True)
 
             logText = spd.processingFeedback().htmlLog()

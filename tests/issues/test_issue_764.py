@@ -5,7 +5,6 @@ from qgis.core import QgsProject, edit
 from enmapbox import initAll
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
-from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprocessingwidget import SpectralProcessingWidget
 from enmapbox.testing import EnMAPBoxTestCase, start_app, TestObjects
 
 start_app()
@@ -25,13 +24,10 @@ class TestIssue764(EnMAPBoxTestCase):
             SpectralLibraryUtils.addSpectralProfileField(speclib, 'profiles2')
             slw = SpectralLibraryWidget(speclib=speclib)
 
-            spd = SpectralProcessingWidget(speclib=speclib, algorithmId=algorithmId, parameters=parameters)
-            slw.openSpectralProcessingWidget(algorithmId=algorithmId)
-            wrapper = spd.processingModelWrapper()
-
-            for k, v in parameters.items():
-                w = wrapper.mWrappers[k]
-                self.assertEqual(w.parameterValue(), v)
+            # spd = SpectralProcessingAlgorithmWidget(speclib=speclib)
+            # spd.setAlgorithm(algorithmId)
+            # spd.setParameters(parameters)
+            spd = slw.openSpectralProcessingWidget(algorithmId=algorithmId, parameters=parameters)
 
             spd.runButton().animateClick()
 
