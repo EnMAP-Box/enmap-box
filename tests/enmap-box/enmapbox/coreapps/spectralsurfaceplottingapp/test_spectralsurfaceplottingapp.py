@@ -1,13 +1,13 @@
 import unittest
 
 import numpy as np
+from qgis.core import QgsVectorLayer
 
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
 from enmapboxtestdata import surfaceLongFormat
-from qgis.core import QgsVectorLayer
 
 pyvista_error = None
 try:
@@ -38,14 +38,15 @@ class TestSpectralSurfacePlottingApp(TestCase):
 
     def testPlotter(self):
         enmapBox = EnMAPBox()
-        x, y, z = getRandomData()
+        x, y, z, profile_ids = getRandomData()
 
         widget = SpectralSurfacePlottingWindow()
-        widget.setData(y, x, z, z)
+        widget.setData(y, x, z, z, profile_ids)
         widget.plotData()
         # widget.autoScale()
         # widget.setScale(100, 100, 100)
         # self.showGui([enmapBox.ui, widget])
+        widget.close()
         enmapBox.close()
 
 
@@ -55,4 +56,5 @@ def getRandomData():
     x = rng.random(number_of_points) * 100
     y = rng.random(number_of_points) * 100
     z = np.sinc((x - 20) / 100 * np.pi) + np.sinc((y - 50) / 100 * np.pi)
-    return x, y, z
+    ids = np.arange(number_of_points)
+    return x, y, z, ids

@@ -1,6 +1,9 @@
 from DASFEnMAPbox import DASFretrievalAlgorithm
+from enmapbox.testing import start_app
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxtestdata import enmap_potsdam
+
+start_app()
 
 
 class TestDASFretrievalAlgorithm(TestCase):
