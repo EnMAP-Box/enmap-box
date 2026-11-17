@@ -499,7 +499,10 @@ class RasterReader(object):
             width = ceil((extent.xMaximum() - extent.xMinimum()) / self.rasterUnitsPerPixelX())
             height = ceil((extent.yMaximum() - extent.yMinimum()) / self.rasterUnitsPerPixelY())
         else:
-            bandStats: QgsRasterBandStats = self.provider.bandStatistics(bandNo, 0, extent, sampleSize)
+            bandStats: QgsRasterBandStats = self.provider.bandStatistics(
+                bandNo, Qgis.RasterBandStatistic.NoStatistic, extent, sampleSize
+            )
+
             width, height = bandStats.width, bandStats.height
 
         return width, height
