@@ -7,7 +7,7 @@ from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousvectoral
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import enmap_potsdam, landcover_potsdam_point, veg_cover_fraction_potsdam_point
+from enmapboxtestdata import enmap_potsdam, veg_cover_fraction_potsdam_point, landcover_berlin_point
 from enmapboxtestdata import fraction_point_multitarget, fraction_point_singletarget, enmap, landcover_polygon
 
 initAll()
@@ -71,10 +71,10 @@ class TestPrepareRegressionDatasetFromContinuousVectorAlgorithm_2(TestCase):
 
     def test_notExcludeBadBands(self):
         alg = PrepareRegressionDatasetFromContinuousVectorAlgorithm()
-        parameters = {alg.P_FEATURE_RASTER: enmap_potsdam, alg.P_CONTINUOUS_VECTOR: landcover_potsdam_point,
+        parameters = {alg.P_FEATURE_RASTER: enmap, alg.P_CONTINUOUS_VECTOR: landcover_berlin_point,
                       alg.P_TARGET_FIELDS: ['level_1', 'level_2'], alg.P_EXCLUDE_BAD_BANDS: False,
                       alg.P_OUTPUT_DATASET: self.filename('sample.skops')}
         self.runalg(alg, parameters)
         dump = RegressorDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
-        self.assertEqual(224, dump.X.shape[1])
-        self.assertEqual(224, len(dump.features))
+        self.assertEqual(177, dump.X.shape[1])
+        self.assertEqual(177, len(dump.features))
