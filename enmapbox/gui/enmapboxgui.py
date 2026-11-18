@@ -26,7 +26,6 @@ from typing import Optional, Dict, Union, Any, List, Sequence
 
 import enmapbox
 import enmapbox.gui.datasources.manager
-import qgis.utils
 from enmapbox import messageLog, debugLog, DEBUG
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
 from enmapbox.gui.dataviews.dockmanager import DockManagerTreeModel, MapDockTreeNode
@@ -34,6 +33,7 @@ from enmapbox.gui.dataviews.docks import SpectralLibraryDock, Dock, AttributeTab
 from enmapbox.qgispluginsupport.qps.cursorlocationvalue import CursorLocationInfoDock
 from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog
 from enmapbox.qgispluginsupport.qps.maptools import QgsMapToolSelectionHandler, MapTools
+from enmapbox.qgispluginsupport.qps.reimplementation.processingtoolboxdockwidget import ProcessingToolboxDockWidget
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprofilesources import SpectralProfileSourcePanel, \
@@ -57,7 +57,6 @@ from enmapboxprocessing.algorithm.importprismal2calgorithm import ImportPrismaL2
 from enmapboxprocessing.algorithm.importprismal2dalgorithm import ImportPrismaL2DAlgorithm
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
-from processing.gui.ProcessingToolbox import ProcessingToolbox
 from qgis.PyQt.QtCore import QMetaType
 from qgis.PyQt.QtCore import QUrl
 from qgis.PyQt.QtCore import pyqtSignal, Qt, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
@@ -231,18 +230,6 @@ class EnMAPBoxUI(QMainWindow):
             QIcon(':/qps/ui/icons/raster_multispectral.svg'),
             'Unmixing'
         )
-
-
-#        self.menuAdd_Product.addMenu(self.menuToolsRasterVisualizations)
-# separator = self.ui.mActionAddSentinel2  # outdated
-
-def getIcon() -> QIcon:
-    """
-    Returns the EnMAP icon
-    :return: QIcon
-    """
-    warnings.warn(DeprecationWarning('Use enmapbox.icon() instead to return the EnMAP-Box icon'), stacklevel=2)
-    return enmapbox.icon()
 
 
 class EnMAPBoxMapCanvasRenderProgressBar(QProgressBar):
@@ -582,7 +569,7 @@ class EnMAPBox(QgisInterface):
         self.ui.cursorLocationValuePanel.sigLocationRequest.connect(lambda: self.setMapTool(MapTools.CursorLocation))
 
         # Processing Toolbox
-        self.processingToolbox().executeWithGui.connect(self.executeAlgorithm)
+        self.processingToolbox().executeAlgorithm.connect(self.executeAlgorithm)
 
         # load EnMAP-Box applications
         splash.showMessage('Load EnMAPBoxApplications...')
@@ -686,7 +673,7 @@ class EnMAPBox(QgisInterface):
 
         d = self.showProcessingAlgorithmDialog(alg_id)
         d.algorithmFinished.connect(self.onProcessingAlgTaskCompleted)
-        d.exec()
+        d.show()
 
     def createExpressionContext(self) -> QgsExpressionContext:
         """
@@ -697,7 +684,7 @@ class EnMAPBox(QgisInterface):
         """
         return self.mContextGenerator.createExpressionContext()
 
-    def processingToolbox(self) -> ProcessingToolbox:
+    def processingToolbox(self) -> ProcessingToolboxDockWidget:
         return self.ui.processingPanel
 
     def createWidgetContext(self) -> QgsProcessingParameterWidgetContext:
@@ -1356,10 +1343,7 @@ class EnMAPBox(QgisInterface):
         self.ui.spectralProfileSourcePanel.spectralProfileBridge().setProject(self.project())
         self.sigMapCanvasKeyPressed.connect(self.onMapCanvasKeyPressed)
 
-        import processing.gui.ProcessingToolbox
-        if processing.gui.ProcessingToolbox.iface is None:
-            processing.gui.ProcessingToolbox.iface = qgis.utils.iface
-        self.ui.processingPanel = self.addPanel(area, ProcessingToolbox(), False)
+        self.ui.processingPanel = self.addPanel(area, ProcessingToolboxDockWidget(), False)
 
         self.ui.resizeDocks([self.ui.dataSourcePanel, self.ui.dockPanel, self.ui.spectralProfileSourcePanel],
                             [40, 50, 10], Qt.Orientation.Vertical)
