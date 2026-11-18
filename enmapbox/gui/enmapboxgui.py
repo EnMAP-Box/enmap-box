@@ -60,7 +60,7 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
 from processing.gui.ProcessingToolbox import ProcessingToolbox
 from qgis.PyQt.QtCore import QMetaType
 from qgis.PyQt.QtCore import QUrl
-from qgis.PyQt.QtCore import pyqtSignal, Qt, QObject, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
+from qgis.PyQt.QtCore import pyqtSignal, Qt, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
 from qgis.PyQt.QtGui import QDesktopServices
 from qgis.PyQt.QtGui import QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QColor, QIcon, \
     QKeyEvent, \
@@ -378,7 +378,7 @@ class EnMAPBoxProject(QgsProject):
         print(info, flush=True)
 
 
-class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator):
+class EnMAPBox(QgisInterface):
     _instance = None
 
     @staticmethod
@@ -418,6 +418,48 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator):
 
     sigDockAdded = pyqtSignal(Dock)
 
+    class ContextGenerator(QgsProcessingContextGenerator, QgsExpressionContextGenerator):
+
+        def __init__(self, enmapbox):
+            super().__init__()
+            self._enmapbox = enmapbox
+
+        def processingContext(self) -> QgsProcessingContext:
+            processingContext = QgsProcessingContext()
+            processingContext.setExpressionContext(self.createExpressionContext())
+            project = self._enmapbox.project()
+            processingContext.setProject(project)
+            processingContext.setTransformContext(project.transformContext())
+            return processingContext
+
+        def createExpressionContext(self) -> QgsExpressionContext:
+
+            project = self._enmapbox.project()
+            context = QgsExpressionContext()
+            context.appendScope(QgsExpressionContextUtils.globalScope())
+            context.appendScope(QgsExpressionContextUtils.projectScope(project))
+            context.appendScope(project.createExpressionContextScope())
+
+            canvas = self._enmapbox.currentMapCanvas()
+            if isinstance(canvas, QgsMapCanvas):
+                context.appendScope(QgsExpressionContextUtils.mapSettingsScope(canvas.mapSettings()))
+
+            lyr = self._enmapbox.currentLayer()
+            if isinstance(lyr, QgsMapLayer):
+                context.appendScopes(QgsExpressionContextUtils.globalProjectLayerScopes(lyr))
+            return context
+
+        def createWidgetContext(self) -> QgsProcessingParameterWidgetContext:
+
+            wc = QgsProcessingParameterWidgetContext()
+            wc.registerProcessingContextGenerator(self)
+            wc.setProject(self._enmapbox.project())
+            lyr = self._enmapbox.currentLayer()
+            if isinstance(lyr, QgsMapLayer):
+                wc.setActiveLayer(lyr)
+
+            return wc
+
     """Main class that drives the EnMAPBox_GUI and all the magic behind"""
 
     def __init__(self, *args,
@@ -441,20 +483,10 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator):
         splash.showMessage('Load UI')
         # QApplication.processEvents()
 
-        QgisInterface.__init__(self)
-
-        class ProcessingContextGenerator(QgsProcessingContextGenerator):
-
-            def __init__(self, enmapbox):
-                super().__init__()
-                self._enmapbox = enmapbox
-
-            def processingContext(self) -> QgsProcessingContext | None:
-                return self._enmapbox.processingContext()
-
-        self._mProcessingContextGenerator = ProcessingContextGenerator(self)
+        super().__init__()
 
         self.mProject: EnMAPBoxProject = EnMAPBoxProject()
+        self.mContextGenerator = self.ContextGenerator(self)
 
         cmReg = EnMAPBoxContextMenuRegistry.instance()
         if len(cmReg) == 0:
@@ -663,45 +695,20 @@ class EnMAPBox(QgisInterface, QObject, QgsExpressionContextGenerator):
 
         :return: QgsExpressionContext
         """
-        context = QgsExpressionContext()
-        context.appendScope(QgsExpressionContextUtils.globalScope())
-        context.appendScope(QgsExpressionContextUtils.projectScope(self.project()))
-        context.appendScope(self.project().createExpressionContextScope())
-
-        canvas = self.currentMapCanvas()
-        if isinstance(canvas, QgsMapCanvas):
-            context.appendScope(QgsExpressionContextUtils.mapSettingsScope(canvas.mapSettings()))
-
-        lyr = self.currentLayer()
-        if isinstance(lyr, QgsMapLayer):
-            context.appendScopes(QgsExpressionContextUtils.globalProjectLayerScopes(lyr))
-
-        return context
+        return self.mContextGenerator.createExpressionContext()
 
     def processingToolbox(self) -> ProcessingToolbox:
         return self.ui.processingPanel
 
     def createWidgetContext(self) -> QgsProcessingParameterWidgetContext:
-
-        wc = QgsProcessingParameterWidgetContext()
-        wc.registerProcessingContextGenerator(self._mProcessingContextGenerator)
-        wc.setProject(self.project())
-        lyr = self.currentLayer()
-        if isinstance(lyr, QgsMapLayer):
-            wc.setActiveLayer(lyr)
-
-        return wc
+        return self.mContextGenerator.createWidgetContext()
 
     def processingContext(self) -> QgsProcessingContext:
         """
         Creates a QgsProcessingContext that considers the current state of the EnMAP-Box GUI
         :return: QgsProcessingContext
         """
-        processingContext = QgsProcessingContext()
-        processingContext.setExpressionContext(self.createExpressionContext())
-        processingContext.setProject(self.project())
-        processingContext.setTransformContext(self.project().transformContext())
-        return processingContext
+        return self.mContextGenerator.processingContext()
 
     def project(self) -> EnMAPBoxProject:
         return self.mProject

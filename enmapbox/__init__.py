@@ -34,6 +34,7 @@ import warnings
 from pathlib import Path
 
 from osgeo import gdal
+
 from qgis.PyQt.QtCore import QSettings, PYQT_VERSION_STR
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import Qgis, QgsApplication, QgsProcessingAlgorithm, QgsProcessingProvider
@@ -76,6 +77,14 @@ gdal.SetConfigOption('GDAL_VRT_ENABLE_PYTHON', 'YES')
 
 # ensure that PyQtGraph uses the same PyQt as QGIS
 os.environ.setdefault('PYQTGRAPH_QT_LIB', f'PyQt{PYQT_VERSION_STR[0]}')
+
+try:
+    from processing.core.ProcessingConfig import ProcessingConfig, Setting  # noqa: F401
+except ModuleNotFoundError:
+    import qgis
+
+    path_plugins = Path(qgis.__file__).parents[1] / 'plugins'
+    site.addsitedir(str(path_plugins))
 
 
 def enmapboxSettings() -> QSettings:

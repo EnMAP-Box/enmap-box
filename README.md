@@ -334,7 +334,20 @@ the folder containing the sensor products. This will allow you to run additional
 export ENMAPBOX_SENSOR_PRODUCT_ROOT=~/MyMountedDrives/EnmapBoxExternalSensorProducts
 ````
 
-To test with docker, run:
+To test with docker with [`qgis/qgis:latest`](https://hub.docker.com/layers/qgis/qgis/latest), run:
+
+````bash
+./scripts/runtests_docker.sh -n auto
+````
+
+To run the tests with another qgis/qgis tag, e.g. [
+`qgis/qgis:nightly`](https://hub.docker.com/layers/qgis/qgis/nightly/), call:
+
+````bash
+QGIS_VERSION="nightly" ./scripts/runtests_docker.sh -n auto
+````
+
+More in detail:
 
 ````bash
 QGIS_TEST_VERSION=3.44 docker compose \

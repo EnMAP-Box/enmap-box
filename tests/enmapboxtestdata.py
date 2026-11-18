@@ -295,7 +295,7 @@ def sensorProductsRoot() -> Optional[str]:
                     'janzandr@PC-25-0201': r'd:\data\sensors'
                 }.get(os.getlogin() + '@' + platform.node())
             except OSError as ex:
-                warnings.warn(f'Exception raised in sensorProductsRoot():\n{ex}')
+                warnings.warn('ENMAPBOX_SENSOR_PRODUCT_ROOT for enhanced product testing is undefined')
         if root:
             root = Path(root).expanduser().resolve()
             if root.is_dir():

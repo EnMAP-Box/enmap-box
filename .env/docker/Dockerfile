@@ -33,6 +33,7 @@ RUN pip install --break-system-packages --no-cache-dir \
     pyvistaqt \
     astropy \
     numba \
+    spyndex \
     skops \
     scikit-learn \
     lightgbm \
