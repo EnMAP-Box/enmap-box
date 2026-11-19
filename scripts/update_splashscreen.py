@@ -9,16 +9,15 @@ import os
 import re
 import shutil
 import subprocess  # nosec B404 # we need inkscape to properly create the splashscreen
+import xml.etree.ElementTree as ET  # nosec B314 deserializ
 from pathlib import Path
 from typing import Match, Union
-
-import defusedxml.ElementTree as ET
 
 from enmapbox import DIR_REPO
 from enmapbox.gui.splashscreen.splashscreen import PATH_SPLASHSCREEN
 
 DIR_REPO = Path(DIR_REPO)
-PATH_CONFIG_FILE = DIR_REPO / '.plugin.ini'
+PATH_CONFIG_FILE = DIR_REPO / 'tox.ini'
 PATH_SVG = DIR_REPO / 'enmapbox/gui/splashscreen/splashscreen.svg'
 ENV_INKSCAPE_BIN = 'INKSCAPE_BIN'
 
@@ -58,7 +57,7 @@ def update_splashscreen(version: str = None,
             raise FileNotFoundError(f'Could not find config file "{PATH_CONFIG_FILE}"')
         config = configparser.ConfigParser()
         config.read(PATH_CONFIG_FILE)
-        version = config['metadata']['version']
+        version = config['enmapbox:metadata']['version']
 
     rxVersion = re.compile(r'(?P<major>\d+)\.(?P<minor>\d+)(?P<rest>.*)')
 
