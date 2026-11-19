@@ -1,4 +1,3 @@
-import re
 from typing import Dict, Any, List, Tuple
 
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
