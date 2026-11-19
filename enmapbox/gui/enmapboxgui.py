@@ -1095,6 +1095,10 @@ class EnMAPBox(QgisInterface):
             QgsProject.instance().layersWillBeRemoved.disconnect(self.onLayersWillBeRemoved)
         except TypeError:
             pass
+        try:
+            QgsApplication.instance().messageLog().messageReceived.disconnect(self.onLogMessage)
+        except TypeError:
+            pass
 
     def contextMenuRegistry(self) -> EnMAPBoxContextMenuRegistry:
         return EnMAPBoxContextMenuRegistry.instance()
@@ -2058,12 +2062,19 @@ class EnMAPBox(QgisInterface):
         :return:
         :rtype:
         """
-        msgLines = message.split('\n')
-        if '' in message.split('\n'):
-            msgLines = msgLines[0:msgLines.index('')]
+        if not isinstance(message, str):
+            message = str(message)
 
         # use only messages relevant to "EnMAP-Box"
-        if not re.search(r'enmap-?box', tag, re.I):
+        if not isinstance(tag, str) or not re.search(r'enmap-?box', tag, re.I):
+            return
+
+        msgLines = message.split('\n')
+        if '' in msgLines:
+            msgLines = msgLines[0:msgLines.index('')]
+
+        if len(msgLines) == 0:
+            # nothing to show, e.g. in case of an empty message
             return
 
         # mbar: QgsMessageBar = self.ui.messageBar
