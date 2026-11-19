@@ -9,7 +9,7 @@ import os
 import re
 import shutil
 import subprocess  # nosec B404 # we need inkscape to properly create the splashscreen
-import xml.etree.ElementTree as ET  # nosec B314 deserializ
+import xml.etree.ElementTree as ET  # nosec B405 # we need ElementTree with register_namespace to modify the svg
 from pathlib import Path
 from typing import Match, Union
 
@@ -69,7 +69,7 @@ def update_splashscreen(version: str = None,
     txt_minor = '.' + match.group('minor')
 
     with open(PATH_SVG, encoding='utf-8') as f:
-        tree = ET.parse(f)
+        tree = ET.parse(f)  # nosec B314
     root = tree.getroot()
     # namespaces = dict([node for _, node in ET.iterparse(PATH_SVG, events=['start-ns'])])
     namespaces = {'inkscape': "http://www.inkscape.org/namespaces/inkscape",
