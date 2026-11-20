@@ -12,10 +12,8 @@ from qgis.PyQt.QtWidgets import (QMainWindow, QTableWidget, QTableWidgetItem, QL
                                  QDialog)
 from qgis.PyQt.uic import loadUi
 from qgis.gui import QgsColorButton
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class RegressionDatasetManagerGui(QDialog):
     mDataset: ProcessingParameterSkopsFileRegressionDatasetWidget
     mTargetTable: QTableWidget
@@ -82,7 +80,7 @@ class RegressionDatasetManagerGui(QDialog):
             button = QMessageBox.question(
                 self, 'Save Edits', f'Do you want to save the changes to file {basename(filename)}?'
             )
-            if button == QMessageBox.No:
+            if button == QMessageBox.StandardButton.No:
                 return
 
         targets, features, sizes = self.currentEdits()
@@ -142,7 +140,7 @@ class RegressionDatasetManagerGui(QDialog):
             alg.P_OUTPUT_DATASET: tmpfile.replace('.skops', '.sample.skops'),
             alg.P_OUTPUT_COMPLEMENT: tmpfile.replace('.skops', '.complement.skops'),
         }
-        dialog = self.enmapBox.showProcessingAlgorithmDialog(alg, parameters, True, True, None, False, self)
+        dialog = self.enmapBox.showProcessingAlgorithmDialog(alg, parameters, True, True, None, False)
         if len(dialog.results()) == 0:
             return
         filename = dialog.results()[alg.P_OUTPUT_DATASET]

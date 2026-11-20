@@ -1,11 +1,9 @@
 from typing import Optional
 
-from geetimeseriesexplorerapp.maptool import MapTool
-from profileanalyticsapp.profileanalyticsdockwidget import ProfileAnalyticsDockWidget
-
 from enmapbox.gui.applications import EnMAPBoxApplication
 from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.typeguard import typechecked
+from geetimeseriesexplorerapp.maptool import MapTool
+from profileanalyticsapp.profileanalyticsdockwidget import ProfileAnalyticsDockWidget
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
@@ -16,7 +14,6 @@ def enmapboxApplicationFactory(enmapBox: EnMAPBox):
     return [ProfileAnalyticsApp(enmapBox, None, None)]
 
 
-@typechecked
 class ProfileAnalyticsApp(EnMAPBoxApplication):
 
     def __init__(
@@ -53,7 +50,7 @@ class ProfileAnalyticsApp(EnMAPBoxApplication):
         # add main dock and toolbar button
         self.dock = ProfileAnalyticsDockWidget(self.currentLocationMapTool, parent=self.parent())
 
-        interface.addDockWidget(Qt.TopDockWidgetArea, self.dock)
+        interface.addDockWidget(Qt.DockWidgetArea.TopDockWidgetArea, self.dock)
         self.dock.setWindowIcon(self.icon())
         self.dock.hide()
 

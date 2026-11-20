@@ -1,8 +1,6 @@
 from enmapboxprocessing.algorithm.convolutionfilteralgorithmbase import ConvolutionFilterAlgorithmBase
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class SpectralConvolutionBox1DAlgorithm(ConvolutionFilterAlgorithmBase):
 
     def displayName(self) -> str:

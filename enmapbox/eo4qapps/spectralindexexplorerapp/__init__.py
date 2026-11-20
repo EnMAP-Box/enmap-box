@@ -1,14 +1,12 @@
 from typing import Optional, List
 
+from enmapbox.gui.applications import EnMAPBoxApplication
+from enmapbox.gui.enmapboxgui import EnMAPBox
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from qgis.core import QgsProcessingAlgorithm
 from qgis.gui import QgisInterface
-
-from enmapbox.gui.applications import EnMAPBoxApplication
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.typeguard import typechecked
 from spectralindexexplorerapp.spectralindexexplorerdockwidget import SpectralIndexExplorerDockWidget
 from spectralindexexplorerapp.spectralindexlayeralgorithm import SpectralIndexLayerAlgorithm
 
@@ -17,7 +15,6 @@ def enmapboxApplicationFactory(enmapBox: EnMAPBox):
     return [SpectralIndexExplorerApp(enmapBox, None, None)]
 
 
-@typechecked
 class SpectralIndexExplorerApp(EnMAPBoxApplication):
 
     def __init__(
@@ -49,7 +46,7 @@ class SpectralIndexExplorerApp(EnMAPBoxApplication):
 
         # add main dock and toolbar button
         self.dock = SpectralIndexExplorerDockWidget(parent=self.parent())
-        interface.addDockWidget(Qt.RightDockWidgetArea, self.dock)
+        interface.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.dock)
         self.dock.setWindowIcon(self.icon())
         self.dock.hide()
 

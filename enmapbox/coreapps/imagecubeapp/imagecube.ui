@@ -28,7 +28,7 @@
        </sizepolicy>
       </property>
       <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+       <enum>Qt::Orientation::Horizontal</enum>
       </property>
       <widget class="ImageCubeGLWidget" name="openglWidget" native="true">
        <property name="sizePolicy">
@@ -52,9 +52,9 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>-51</y>
-          <width>325</width>
-          <height>662</height>
+          <y>0</y>
+          <width>302</width>
+          <height>617</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -136,7 +136,7 @@
               <item>
                <spacer name="horizontalSpacer">
                 <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
+                 <enum>Qt::Orientation::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -156,7 +156,7 @@
               <item>
                <widget class="QLineEdit" name="tbExtent">
                 <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
                 </property>
                 <property name="readOnly">
                  <bool>true</bool>
@@ -309,13 +309,13 @@
             <item row="7" column="0">
              <widget class="QLabel" name="label_2">
               <property name="layoutDirection">
-               <enum>Qt::LeftToRight</enum>
+               <enum>Qt::LayoutDirection::LeftToRight</enum>
               </property>
               <property name="text">
                <string>Z Scale</string>
               </property>
               <property name="alignment">
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+               <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -456,7 +456,7 @@
          <item>
           <spacer name="verticalSpacer">
            <property name="orientation">
-            <enum>Qt::Vertical</enum>
+            <enum>Qt::Orientation::Vertical</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -479,7 +479,7 @@
      <x>0</x>
      <y>0</y>
      <width>816</width>
-     <height>24</height>
+     <height>33</height>
     </rect>
    </property>
   </widget>

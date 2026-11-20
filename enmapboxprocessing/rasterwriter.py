@@ -2,7 +2,6 @@ from typing import List, Union, Optional, Iterator
 
 from osgeo import gdal
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.typing import Array3d, Array2d, MetadataValue, MetadataDomain, Metadata, Number
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtCore import QDateTime
@@ -10,7 +9,6 @@ from qgis.PyQt.QtGui import QColor
 from qgis.core import Qgis
 
 
-@typechecked
 class RasterWriter(object):
 
     def __init__(self, gdalDataset: gdal.Dataset):

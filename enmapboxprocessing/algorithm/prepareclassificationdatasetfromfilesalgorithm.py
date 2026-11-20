@@ -3,7 +3,6 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import Category, ClassifierDump
 from enmapboxprocessing.utils import Utils
@@ -11,7 +10,6 @@ from qgis.PyQt.QtGui import QColor
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
 
-@typechecked
 class PrepareClassificationDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
     P_FEATURE_FILE, _FEATURE_FILE = 'featureFile', 'File with features'
     P_VALUE_FILE, _VALUE_FILE = 'valueFile', 'File with class values'
@@ -53,7 +51,7 @@ class PrepareClassificationDatasetFromFilesAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         filenameFeatures = self.parameterAsFile(parameters, self.P_FEATURE_FILE, context)
         filenameLabels = self.parameterAsFile(parameters, self.P_VALUE_FILE, context)

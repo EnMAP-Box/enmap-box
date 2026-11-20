@@ -8,7 +8,7 @@ from enmapbox import DIR_UNITTESTS
 from enmapbox.apps.SpecDeepMap import import_error
 from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
-from processing import Processing
+from qgis.processing import run
 
 if import_error is None:
     try:
@@ -86,7 +86,7 @@ class Test_Deep_Learning_Trainer(TestCase):
               alg.logdirpath_model: folder_path,
               }
 
-        result = Processing.runAlgorithm(alg, parameters=io)
+        result = run(alg, parameters=io)
 
         print(result)
 
@@ -176,7 +176,7 @@ class Test_Deep_Learning_Trainer(TestCase):
               alg.logdirpath_model: folder_path_unet,
               }
 
-        Processing.runAlgorithm(alg, parameters=io)
+        run(alg, parameters=io)
 
         best = best_ckpt_path(folder_path_unet)
 

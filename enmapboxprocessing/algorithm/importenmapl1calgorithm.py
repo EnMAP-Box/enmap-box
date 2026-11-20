@@ -1,17 +1,15 @@
 from os.path import basename
 from typing import Dict, Any, List, Tuple
-from defusedxml import ElementTree
 
+from defusedxml import ElementTree
 from osgeo import gdal
 
 from enmapboxprocessing.algorithm.importenmapl1balgorithm import ImportEnmapL1BAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.gdalutils import GdalUtils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class ImportEnmapL1CAlgorithm(EnMAPProcessingAlgorithm):
     P_FILE, _FILE = 'file', 'Metadata file'
     P_OUTPUT_RASTER, _OUTPUT_RASTER = 'outputEnmapL1CRaster', 'Output raster layer'

@@ -42,7 +42,7 @@ class AboutDialog(QDialog):
         pathUi = Path(DIR_UIFILES) / 'aboutdialog.ui'
 
         loadUi(pathUi, self)
-        self.setWindowFlag(Qt.WindowContextHelpButtonHint, False)
+        self.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
         self.tbAbout: QTextBrowser
         self.tbLicense: QTextBrowser
         self.tbCredits: QTextBrowser

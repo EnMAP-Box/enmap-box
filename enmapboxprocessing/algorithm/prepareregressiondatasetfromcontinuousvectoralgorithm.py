@@ -14,10 +14,8 @@ from enmapboxprocessing.typing import RegressorDump, \
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessingParameterField,
                        QgsProcessingException)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class PrepareRegressionDatasetFromContinuousVectorAlgorithm(EnMAPProcessingAlgorithm):
     P_CONTINUOUS_VECTOR, _CONTINUOUS_VECTOR = 'continuousVector', 'Continuous-valued vector layer'
     P_FEATURE_RASTER, _FEATURE_RASTER = 'featureRaster', 'Raster layer with features'
@@ -115,6 +113,9 @@ class PrepareRegressionDatasetFromContinuousVectorAlgorithm(EnMAPProcessingAlgor
             reader = RasterReader(raster)
             features = [reader.bandName(bandNo) for bandNo in goodBandNumbers]
             feedback.pushInfo(f'Sampled data: X=array{list(X.shape)} y=array{list(y.shape)}')
+
+            if len(X) == 0:
+                raise QgsProcessingException('empty dataset not allowed')
 
             dump = RegressorDump(
                 targets=targets, features=features, X=X, y=y, locations=locations, crs=raster.crs().toWkt()

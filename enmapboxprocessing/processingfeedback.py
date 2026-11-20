@@ -1,10 +1,8 @@
 from typing import TextIO
 
 from qgis.core import QgsProcessingFeedback
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class ProcessingFeedback(QgsProcessingFeedback):
 
     def __init__(self,

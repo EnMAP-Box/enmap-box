@@ -1,6 +1,5 @@
 from enhancedmultibandcolorapp.enhancedmultibandcolordialog import EnhancedMultiBandColorDialog
 from enmapbox.gui.applications import EnMAPBoxApplication
-from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu
 
@@ -9,7 +8,6 @@ def enmapboxApplicationFactory(enmapBox):
     return [EnhancedMultiBandColorApp(enmapBox)]
 
 
-@typechecked
 class EnhancedMultiBandColorApp(EnMAPBoxApplication):
 
     def __init__(self, enmapBox, parent=None):

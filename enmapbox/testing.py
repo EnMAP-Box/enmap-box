@@ -168,8 +168,12 @@ class TestObjects(TestObjects):
                 """
                 self.addParameter(QgsProcessingParameterRasterLayer('pathInput', 'The Input Dataset'))
                 self.addParameter(
-                    QgsProcessingParameterNumber('value', 'The value', QgsProcessingParameterNumber.Double, 1, False,
-                                                 0.00, 999999.99))
+                    QgsProcessingParameterNumber(
+                        'value', 'The value', QgsProcessingParameterNumber.Type.Double, 1,
+                        False,
+                        0.00, 999999.99
+                    )
+                )
                 self.addParameter(QgsProcessingParameterRasterDestination('pathOutput', 'The Output Dataset'))
 
             def processAlgorithm(
@@ -239,8 +243,11 @@ class TestObjects(TestObjects):
             def initAlgorithm(self, configuration=None):
                 self.addParameter(QgsProcessingParameterRasterLayer('pathInput', 'The Input Dataset'))
                 self.addParameter(
-                    QgsProcessingParameterNumber('value', 'The value', QgsProcessingParameterNumber.Double, 1, False,
-                                                 0.00, 999999.99))
+                    QgsProcessingParameterNumber(
+                        'value', 'The value',
+                        QgsProcessingParameterNumber.Type.Double, 1, False,
+                        0.00, 999999.99)
+                )
                 self.addParameter(QgsProcessingParameterRasterDestination('pathOutput', 'The Output Dataset'))
 
             def processAlgorithm(self, parameters, context, feedback):

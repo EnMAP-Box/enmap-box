@@ -3,7 +3,6 @@ import traceback
 from io import StringIO
 from typing import Dict, Any, List, Tuple
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromjsonalgorithm import \
     PrepareClassificationDatasetFromJsonAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
@@ -12,7 +11,6 @@ from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback
 
 
-@typechecked
 class FitClassifierAlgorithmBase(EnMAPProcessingAlgorithm):
     P_DATASET, _DATASET = 'dataset', 'Training dataset'
     P_CLASSIFIER, _CLASSIFIER = 'classifier', 'Classifier'
@@ -79,7 +77,7 @@ class FitClassifierAlgorithmBase(EnMAPProcessingAlgorithm):
         return True, ''
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         filenameDataset = self.parameterAsFile(parameters, self.P_DATASET, context)
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_CLASSIFIER, context)

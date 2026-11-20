@@ -4,7 +4,6 @@ from typing import Dict, Any, List, Tuple
 import numpy as np
 from osgeo import gdal
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
@@ -13,7 +12,6 @@ from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis, QgsProcessingException)
 
 
-@typechecked
 class TransformRasterAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer with features'
     P_TRANSFORMER, _TRANSFORMER = 'transformer', 'Transformer'
@@ -105,7 +103,7 @@ class TransformRasterAlgorithm(EnMAPProcessingAlgorithm):
 
             # init result raster
             noDataValue = Utils.defaultNoDataValue(np.float32)
-            writer = Driver(filename, feedback=feedback).createLike(reader, Qgis.Float32, bandCount)
+            writer = Driver(filename, feedback=feedback).createLike(reader, Qgis.DataType.Float32, bandCount)
             lineMemoryUsage = reader.lineMemoryUsage() + reader.lineMemoryUsage(bandCount, 4)
             blockSizeY = min(raster.height(), ceil(maximumMemoryUsage / lineMemoryUsage))
             blockSizeX = raster.width()

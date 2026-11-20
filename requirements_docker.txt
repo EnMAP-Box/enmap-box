@@ -25,7 +25,8 @@ enpt-enmapboxapp # required by EnPT
 
 # automatically flagged as missing imports form IDE
 mock>=4.0.3
-PyQt5>=5.10
+# PyQt5>=5.10
+PyQt6>=6.0
 xmlrunner>=1.7.7
 urlchecker>=0.0.22
 requests>=2.22.0
@@ -33,6 +34,6 @@ GDAL>=3.0.4
 joblib>=1.1.0
 colorama>=0.4.3
 Pillow>=7.0.0
-sip>=4.19.21
+sip>=6.0
 setuptools>=45.2.0
 urllib3>=1.25.8

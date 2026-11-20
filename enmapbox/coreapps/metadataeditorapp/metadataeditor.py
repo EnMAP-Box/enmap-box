@@ -98,7 +98,7 @@ class MetadataEditorDialog(QDialog):
     """Constructor."""
 
     def __init__(self, parent=None, project: Optional[QgsProject] = None):
-        super(MetadataEditorDialog, self).__init__(parent, Qt.Window)
+        super(MetadataEditorDialog, self).__init__(parent, Qt.WindowType.Window)
         path = pathlib.Path(__file__).parent / 'metadataeditor.ui'
         loadUi(path, self)
         self.cbSource: QgsMapLayerComboBox
@@ -113,13 +113,13 @@ class MetadataEditorDialog(QDialog):
 
         self.frame.setLayout(QVBoxLayout())
         self.frame.layout().addWidget(self.mdWidget)
-        self.buttonBox.button(QDialogButtonBox.Close).clicked.connect(self.close)
-        self.buttonBox.button(QDialogButtonBox.Save).clicked.connect(self.mdWidget.apply)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Close).clicked.connect(self.close)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Save).clicked.connect(self.mdWidget.apply)
 
         # so far, disable editing, viewer only
         self.setWindowTitle('Metadata Viewer')
         self.mdWidget.setEditable(False)
-        self.buttonBox.button(QDialogButtonBox.Save).setVisible(False)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Save).setVisible(False)
 
     def setEnMAPBox(self, enmapBox):
         self.mProject.setEnMAPBox(enmapBox)

@@ -3,16 +3,14 @@ from os.path import basename
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.reportwriter import MultiReportWriter, HtmlReportWriter, CsvReportWriter
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
 
-@typechecked
 class ClassifierFeatureRankingPermutationImportanceAlgorithm(EnMAPProcessingAlgorithm):
     P_CLASSIFIER, _CLASSIFIER = 'classifier', 'Classifier'
     P_TRAIN_DATASET, _TRAIN_DATASET = 'trainDataset', 'Training dataset'

@@ -3,13 +3,11 @@ from typing import List
 import numpy as np
 from matplotlib.colors import hsv_to_rgb
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsRasterRenderer, QgsRasterInterface, QgsRectangle, QgsRasterBlockFeedback, Qgis
 
 
-@typechecked
 class HsvColorRasterRenderer(QgsRasterRenderer):
     min1: float
     min2: float
@@ -90,7 +88,7 @@ class HsvColorRasterRenderer(QgsRasterRenderer):
 
         # convert back to QGIS raster block
         outarray = (r << 16) + (g << 8) + b + (a << 24)
-        return Utils.numpyArrayToQgsRasterBlock(outarray, Qgis.ARGB32_Premultiplied)
+        return Utils.numpyArrayToQgsRasterBlock(outarray, Qgis.DataType.ARGB32_Premultiplied)
 
     def clone(self) -> QgsRasterRenderer:
         renderer = HsvColorRasterRenderer()

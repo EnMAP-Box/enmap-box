@@ -29,6 +29,6 @@ def updatePlot(profile: Profile, profiles: List[Profile], plotWidget: pg.PlotIte
     style.markerSize = 15
     style.linePen.setColor(QColor('#ff0000'))
     style.linePen.setWidth(2)
-    style.linePen.setStyle(Qt.SolidLine)
+    style.linePen.setStyle(Qt.PenStyle.SolidLine)
     plotDataItem = plotWidget.plot(X2.flatten(), Y2.flatten(), name='RBF Ensemble Fit')
     style.apply(plotDataItem)

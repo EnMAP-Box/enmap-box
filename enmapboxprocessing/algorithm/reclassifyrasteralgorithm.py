@@ -7,12 +7,10 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
-from qgis.core import QgsRasterLayer, QgsMapLayer
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, Qgis)
-from enmapbox.typeguard import typechecked
+from qgis.core import QgsRasterLayer, QgsMapLayer
 
 
-@typechecked
 class ReclassifyRasterAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_MAPPING, _MAPPING = 'mapping', 'Class mapping'

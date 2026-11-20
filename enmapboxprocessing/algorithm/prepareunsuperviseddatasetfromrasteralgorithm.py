@@ -2,6 +2,8 @@ from math import ceil
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer,
+                       QgsProcessingException)
 
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
@@ -9,11 +11,8 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class PrepareUnsupervisedDatasetFromRasterAlgorithm(EnMAPProcessingAlgorithm):
     P_FEATURE_RASTER, _FEATURE_RASTER = 'featureRaster', 'Raster layer with features'
     P_MASK, _MASK = 'mask', 'Mask layer'
@@ -146,6 +145,9 @@ class PrepareUnsupervisedDatasetFromRasterAlgorithm(EnMAPProcessingAlgorithm):
             reader = RasterReader(raster)
             features = [reader.bandName(bandNo) for bandNo in goodBandNumbers]
             feedback.pushInfo(f'Sampled data: X=array{list(X.shape)}')
+
+            if len(X) == 0:
+                raise QgsProcessingException('empty dataset not allowed')
 
             dump = TransformerDump(features=features, X=X)
             dumpDict = dump.__dict__

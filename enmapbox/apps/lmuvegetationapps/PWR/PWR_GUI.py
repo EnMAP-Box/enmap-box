@@ -48,7 +48,7 @@ class PWR_GUI(QDialog):
     def __init__(self, parent=None):
         super(PWR_GUI, self).__init__(parent)
         loadUi(pathUI_pwr, self)
-        self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mLayer.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
 
 
 class Nodat_GUI(QDialog):
@@ -82,8 +82,8 @@ class PWR:
         size = pixelmap.size()
         width = size.width()
         height = size.height()
-        pixelmap = pixelmap.scaled(width, height, transformMode=Qt.SmoothTransformation,
-                                   aspectRatioMode=Qt.KeepAspectRatio)
+        pixelmap = pixelmap.scaled(width, height, transformMode=Qt.TransformationMode.SmoothTransformation,
+                                   aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio)
         label.setScaledContents(True)
         label.setPixmap(pixelmap)
         self.gui.pwrImage.show()

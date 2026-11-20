@@ -7,10 +7,8 @@ from enmapbox.qgispluginsupport.qps.speclib.io.envi import findENVIHeader, readE
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class WriteEnviHeaderAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
 

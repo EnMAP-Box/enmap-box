@@ -4,7 +4,6 @@ from typing import Dict, Any, List, Tuple
 import numpy as np
 
 import qgis.processing
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
@@ -12,7 +11,6 @@ from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback
 
 
-@typechecked
 class RandomPointsFromCategorizedRasterAlgorithm(EnMAPProcessingAlgorithm):
     P_STRATIFICATION, _STRATIFICATION = 'stratification', 'Categorized raster layer'
     P_N, _N = 'n', 'Number of points per category'

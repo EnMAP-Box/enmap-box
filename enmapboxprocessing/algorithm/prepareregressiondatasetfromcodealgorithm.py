@@ -3,14 +3,12 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
 
-@typechecked
 class PrepareRegressionDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
     P_CODE, _CODE = 'code', 'Code'
     P_OUTPUT_DATASET, _OUTPUT_DATASET = 'outputRegressionDataset', 'Output dataset'
@@ -61,7 +59,7 @@ class PrepareRegressionDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
         return lines
 
     def regressorDump(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext
+            self, parameters: Dict[str, Any], context: QgsProcessingContext
     ) -> RegressorDump:
         namespace = dict()
         code = self.parameterAsString(parameters, self.P_CODE, context)
@@ -83,7 +81,7 @@ class PrepareRegressionDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_DATASET, context)
 

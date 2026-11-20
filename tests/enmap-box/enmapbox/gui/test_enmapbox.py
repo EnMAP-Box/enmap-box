@@ -36,7 +36,10 @@ from qgis.PyQt.QtWidgets import QMenu
 from qgis.core import Qgis, QgsExpressionContextGenerator, QgsProcessingContext, QgsExpressionContext
 from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, \
     QgsLayerTree, QgsApplication
-from qgis.gui import QgsMapLayerComboBox, QgisInterface, QgsProcessingContextGenerator, QgsMapCanvas
+from qgis.gui import (
+    QgsMapLayerComboBox, QgisInterface, QgsProcessingContextGenerator,
+    QgsMapCanvas, QgsProcessingParameterWidgetContext
+)
 
 start_app()
 initAll()
@@ -173,11 +176,50 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
         EMB.close()
         QgsProject.instance().removeAllMapLayers()
 
-    def test_context_interfaces(self):
+    def test_context_generator(self):
+
+        class ContextGenerator(QgsProcessingContextGenerator, QgsExpressionContextGenerator, QgisInterface):
+
+            def __init__(self):
+                super().__init__()
+                QgsProcessingContextGenerator.__init__(self)
+                QgisInterface.__init__(self)
+                QgsExpressionContextGenerator.__init__(self)
+
+                self._expression_context = QgsExpressionContext()
+                self.processing_context = QgsProcessingContext()
+
+            def processingContext(self):
+                return self.processing_context
+
+            def createExpressionContext(self) -> 'QgsExpressionContext':
+                return self._expression_context
+
+            def createWidgetContext(self) -> QgsProcessingParameterWidgetContext:
+                w = QgsProcessingParameterWidgetContext()
+                w.registerProcessingContextGenerator(self)
+                return w
+
+        c = ContextGenerator()
+        self.assertIsInstance(c, QgsProcessingContextGenerator)
+        self.assertIsInstance(c, QgsExpressionContextGenerator)
+        self.assertIsInstance(c, QgisInterface)
+        wc = c.createWidgetContext()
+        pc = c.processingContext()
+        ec = c.createExpressionContext()
+        self.assertIsInstance(ec, QgsExpressionContext)
+        self.assertIsInstance(pc, QgsProcessingContext)
+        self.assertIsInstance(wc, QgsProcessingParameterWidgetContext)
+
+    def test_interfaces(self):
 
         EMB = EnMAPBox(load_core_apps=False, load_other_apps=False)
-        self.assertIsInstance(EMB, QgsExpressionContextGenerator)
-        self.assertIsInstance(EMB, QgsProcessingContextGenerator)
+        cgen = EMB.mContextGenerator
+        self.assertIsInstance(EMB, QgisInterface)
+        self.assertIsInstance(cgen, QgsExpressionContextGenerator)
+        self.assertIsInstance(cgen, QgsProcessingContextGenerator)
+        # self.assertIsInstance(EMB, QgsProcessingWidgetContextGenerator)
+
         EMB.loadExampleData()
         QgsApplication.processEvents()
         canvas1 = EMB.currentMapCanvas()
@@ -198,6 +240,10 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
             self.assertEqual(processing_context.project(), EMB.project())
             self.assertEqual(lyr, processing_context.getMapLayer(lyr.id()))
             self.assertEqual(processing_context.transformContext(), EMB.project().transformContext())
+
+            widget_context = EMB.createWidgetContext()
+            self.assertIsInstance(widget_context, QgsProcessingParameterWidgetContext)
+            self.assertEqual(widget_context.project(), EMB.project())
 
         self.assertIsInstance(canvas2, QgsMapCanvas)
         self.assertTrue(canvas2.name(), 'MyNewMapDock')

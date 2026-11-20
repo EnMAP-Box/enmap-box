@@ -49,10 +49,11 @@ from enmapbox.gui.datasources.datasources import ModelDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager
 from enmapbox.qgispluginsupport.qps.models import PyObjectTreeNode
 from enmapbox.testing import EnMAPBoxTestCase, start_app
+from enmapboxtestdata import classificationDatasetAsSkopsFile
 from qgis.PyQt.QtCore import QSize
 from qgis.PyQt.QtWidgets import QTreeView
 from qgis.core import QgsProject
-from enmapboxtestdata import classificationDatasetAsSkopsFile
+
 start_app()
 
 

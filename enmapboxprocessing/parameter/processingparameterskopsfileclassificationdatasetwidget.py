@@ -2,7 +2,7 @@ import sys
 from os.path import basename, join, dirname
 
 from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.qgispluginsupport.qps.processing.algorithmdialog import AlgorithmDialog
+from enmapbox.qgispluginsupport.qps.reimplementation.algorithmwidget import AlgorithmWidget
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedlibraryalgorithm import \
     PrepareClassificationDatasetFromCategorizedLibraryAlgorithm
 from enmapboxprocessing.algorithm.prepareclassificationdatasetfromcategorizedrasteralgorithm import \
@@ -21,10 +21,11 @@ from enmapboxprocessing.algorithm.prepareclassificationdatasetfromtablealgorithm
     PrepareClassificationDatasetFromTableAlgorithm
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
-from processing.gui.wrappers import WidgetWrapper
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QWidget, QToolButton, QMenu, QMessageBox
 from qgis.PyQt.uic import loadUi
+from qgis.core import QgsMessageLog, Qgis
+from qgis.gui import QgsAbstractProcessingParameterWidgetWrapper, QgsProcessingParameterWidgetFactoryInterface, QgsGui
 from qgis.gui import QgsFileWidget
 
 
@@ -108,7 +109,7 @@ class ProcessingParameterSkopsFileClassificationDatasetWidget(QWidget):
         from enmapbox.gui.enmapboxgui import EnMAPBox
         enmapBox = EnMAPBox.instance()
 
-        class AlgorithmDialogWrapper(AlgorithmDialog):
+        class AlgorithmDialogWrapper(AlgorithmWidget):
             def finish(self_, successful, result, context, feedback, in_place=False):
                 super().finish(successful, result, context, feedback, in_place)
                 if successful:
@@ -135,7 +136,7 @@ class ProcessingParameterSkopsFileClassificationDatasetWidget(QWidget):
             QMessageBox.information(self, 'Information', 'EnMAP-Box not running.')
             return
 
-        enmapBox.showProcessingAlgorithmDialog(alg, modal=True, wrapper=AlgorithmDialogWrapper, parent=self)
+        enmapBox.showProcessingAlgorithmDialog(alg, modal=True, wrapper=AlgorithmDialogWrapper)
 
     def onFilenameClicked(self):
         filename = self.sender().filename
@@ -153,14 +154,33 @@ class ProcessingParameterSkopsFileClassificationDatasetWidget(QWidget):
         self.mFile.setFilePath(filename)
 
 
-class ProcessingParameterSkopsFileClassificationDatasetWidgetWrapper(WidgetWrapper):
-    widget: ProcessingParameterSkopsFileClassificationDatasetWidget
+class ProcessingParameterSkopsFileClassificationDatasetWidgetWrapper(QgsAbstractProcessingParameterWidgetWrapper):
 
     def createWidget(self):
         return ProcessingParameterSkopsFileClassificationDatasetWidget()
 
-    def setValue(self, value):
-        self.widget.setValue(value)
+    def setWidgetValue(self, value, context):
+        widget = self.wrappedWidget()
+        widget.setValue(value)
 
-    def value(self):
-        return self.widget.value()
+    def widgetValue(self):
+        widget = self.wrappedWidget()
+        return widget.value()
+
+
+class ProcessingParameterSkopsFileClassificationDatasetWidgetFactory(QgsProcessingParameterWidgetFactoryInterface):
+    WIDGET_TYPE = 'enmapbox:ProcessingParameterSkopsFileClassificationDatasetWidget'
+
+    def parameterType(self):
+        return self.WIDGET_TYPE
+
+    def createWidgetWrapper(self, parameter, widget_type):
+        return ProcessingParameterSkopsFileClassificationDatasetWidgetWrapper(parameter, widget_type)
+
+    @classmethod
+    def register(cls):
+        success = QgsGui.processingGuiRegistry().addParameterWidgetFactory(cls())
+        if success:
+            QgsMessageLog.logMessage(f'{cls.WIDGET_TYPE} registered', level=Qgis.MessageLevel.Info)
+        else:
+            QgsMessageLog.logMessage(f'{cls.WIDGET_TYPE} could not be registered', level=Qgis.MessageLevel.Critical)

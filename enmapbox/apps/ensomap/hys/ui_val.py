@@ -38,10 +38,10 @@ class ui_val:
         self.gui.widget_group_box('INPUT')
 
         # first line
-        self.gui.widget_row(alignment=Qt.AlignLeft)
+        self.gui.widget_row(alignment=Qt.AlignmentFlag.AlignLeft)
         self.gui.widget_label(text='Calibrated soil product[s]', width=170)
         self.gui.widget_list(ID='val_list_calibrated_soil_product')
-        self.gui.widget_column(alignment=Qt.AlignTop)
+        self.gui.widget_column(alignment=Qt.AlignmentFlag.AlignTop)
         width = 50
         self.gui.widget_tool_button(text='Add', width=width, action=self.val_add_soil)
         self.gui.widget_tool_button(text='Remove', width=width, action=self.val_rem_soil)
@@ -52,7 +52,7 @@ class ui_val:
         self.gui.widget_row_close()
 
         # second line
-        self.gui.widget_row(alignment=Qt.AlignLeft)
+        self.gui.widget_row(alignment=Qt.AlignmentFlag.AlignLeft)
         self.gui.widget_label(text='Reference points [CSV]', width=170)
         self.gui.widget_push_button('Load', action=self.val_load_csv, width=50, ID='val_but_csv_load')
         # self.gui.widget_push_button('View')
@@ -90,7 +90,7 @@ class ui_val:
         # GROUP BOX: PARAMETER
         self.gui.widget_add_spacing(10)
         self.gui.widget_group_box('PARAMETER')
-        self.gui.widget_row(ID='val_group2', alignment=Qt.AlignLeft)
+        self.gui.widget_row(ID='val_group2', alignment=Qt.AlignmentFlag.AlignLeft)
         self.gui.widget_label(text='Average window size')
         valGroupPrms = QButtonGroup(self.gui.gui['val_group2'])
         self.gui.widget_radio_button('1x1', group=valGroupPrms, ID='val_1x1')

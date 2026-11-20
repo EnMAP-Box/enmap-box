@@ -7,7 +7,7 @@ from enmapboxprocessing.algorithm.prepareregressiondatasetfromcontinuousrasteral
 from enmapboxprocessing.algorithm.testcase import TestCase
 from enmapboxprocessing.typing import RegressorDump
 from enmapboxprocessing.utils import Utils
-from enmapboxtestdata import enmap_potsdam
+from enmapboxtestdata import enmap_potsdam, enmap_berlin
 from enmapboxtestdata import fraction_polygon_l3, enmap
 
 start_app()
@@ -67,13 +67,13 @@ class TestPrepareRegressionDatasetFromContinuousRasterAlgorithm(TestCase):
     def test_notExcludeBadBands(self):
         alg = PrepareRegressionDatasetFromContinuousRasterAlgorithm()
         parameters = {
-            alg.P_FEATURE_RASTER: enmap_potsdam,
-            alg.P_CONTINUOUS_RASTER: enmap_potsdam,  # this makes not much sense, but we allow it anyways
+            alg.P_FEATURE_RASTER: enmap_berlin,
+            alg.P_CONTINUOUS_RASTER: enmap_berlin,  # this makes not much sense, but we allow it anyways
             alg.P_TARGETS: [1],
             alg.P_EXCLUDE_BAD_BANDS: False,
             alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
         dump = RegressorDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
-        self.assertEqual(224, dump.X.shape[1])
-        self.assertEqual(224, len(dump.features))
+        self.assertEqual(177, dump.X.shape[1])
+        self.assertEqual(177, len(dump.features))

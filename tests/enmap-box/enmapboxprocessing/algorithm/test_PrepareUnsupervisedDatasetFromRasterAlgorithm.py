@@ -67,11 +67,11 @@ class TestPrepareUnsupervisedDatasetFromRasterAlgorithm(TestCase):
     def test_notExcludeBadBands(self):
         alg = PrepareUnsupervisedDatasetFromRasterAlgorithm()
         parameters = {
-            alg.P_FEATURE_RASTER: enmap_potsdam,
+            alg.P_FEATURE_RASTER: enmap,
             alg.P_EXCLUDE_BAD_BANDS: False,
             alg.P_OUTPUT_DATASET: self.filename('sample.skops')
         }
         self.runalg(alg, parameters)
         dump = TransformerDump(**Utils.modelLoad(parameters[alg.P_OUTPUT_DATASET]))
-        self.assertEqual(224, dump.X.shape[1])
-        self.assertEqual(224, len(dump.features))
+        self.assertEqual(177, dump.X.shape[1])
+        self.assertEqual(177, len(dump.features))

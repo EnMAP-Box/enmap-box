@@ -17,14 +17,14 @@
 **************************************************************************
 """
 import argparse
-import pathlib
 import site
 from contextlib import suppress
+from pathlib import Path
 
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import QgsProject, QgsApplication
 
-site.addsitedir(pathlib.Path(__file__).parents[1])
+site.addsitedir(str(Path(__file__).parents[1]))
 
 
 def exitAll(*args):
@@ -38,19 +38,27 @@ def exitAll(*args):
 
 
 def run(
-        debug: bool = False,
-        sources: list = None,
-        load_core_apps=False,
-        load_other_apps=False,
-        load_example_data: bool = False,
+    debug: bool = False,
+    sources: list = None,
+    load_core_apps=False,
+    load_other_apps=False,
+    load_example_data: bool = False,
+    ui_theme: str = None,
 ):
     """
     Starts the EnMAP-Box GUI.
     """
-    qAppExists = isinstance(QgsApplication.instance(), QgsApplication)
-    if not qAppExists:
+    qgs_app = QgsApplication.instance()
+    if not isinstance(qgs_app, QgsApplication):
+        qAppExists = False
         from enmapbox.testing import start_app
-        start_app()
+        qgs_app = start_app()
+    else:
+        qAppExists = True
+
+    if ui_theme:
+        qgs_app.setUITheme(ui_theme)
+
     from enmapbox import initAll
     initAll()
     from enmapbox.gui.enmapboxgui import EnMAPBox
@@ -86,6 +94,10 @@ if __name__ == '__main__':
     #                    action='store_true')
     parser.add_argument('-c', '--core', required=False, help='Load core GUI only', action='store_true')
     parser.add_argument('-e', '--exampledata', required=False, help='Load example data', action='store_true')
+    parser.add_argument(
+        '--uitheme', required=False,
+        help='Set UI theme. Available themes: {}'.format(', '.join(QgsApplication.uiThemes().keys()))
+    )
     args = parser.parse_args()
 
     load_core_apps = True
@@ -95,4 +107,4 @@ if __name__ == '__main__':
         load_other_apps = False
 
     run(debug=args.debug, load_core_apps=load_core_apps, load_other_apps=load_other_apps,
-        load_example_data=args.exampledata)
+        load_example_data=args.exampledata, ui_theme=args.uitheme)

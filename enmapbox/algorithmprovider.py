@@ -17,22 +17,12 @@
 ***************************************************************************
 """
 
-import os
 import pathlib
-import site
 
-import qgis
 from enmapbox import __version__
+from processing.core.ProcessingConfig import ProcessingConfig, Setting
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import QgsProcessingProvider, QgsProcessingAlgorithm, QgsApplication, QgsRuntimeProfiler
-
-try:
-    from processing.core.ProcessingConfig import ProcessingConfig, Setting
-except ModuleNotFoundError:
-    path = pathlib.Path(qgis.__file__)
-    pathPlugins = os.path.abspath(path / '../../plugins')
-    site.addsitedir(pathPlugins)
-    from processing.core.ProcessingConfig import ProcessingConfig, Setting
 
 ID = 'enmapbox'
 NAME = 'EnMAP-Box'

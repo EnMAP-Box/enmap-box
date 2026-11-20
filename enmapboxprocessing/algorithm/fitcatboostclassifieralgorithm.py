@@ -1,11 +1,9 @@
 from contextlib import suppress
 from io import StringIO
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 
 
-@typechecked
 class FitCatBoostClassifierAlgorithm(FitClassifierAlgorithmBase):
 
     def displayName(self) -> str:

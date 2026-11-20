@@ -8,11 +8,7 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 from osgeo import gdal
-from qgis.PyQt.QtGui import QColor
-from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer, \
-    QgsProcessingException
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.rasterizevectoralgorithm import RasterizeVectorAlgorithm
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
@@ -20,9 +16,11 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.reportwriter import MultiReportWriter, HtmlReportWriter, CsvReportWriter
 from enmapboxprocessing.utils import Utils
+from qgis.PyQt.QtGui import QColor
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsVectorLayer, \
+    QgsProcessingException
 
 
-@typechecked
 class RegressionPerformanceAlgorithm(EnMAPProcessingAlgorithm):
     P_REGRESSION, _REGRESSION = 'regression', 'Regression layer'
     P_REFERENCE, _REFERENCE = 'reference', 'Observed continuous-valued layer'
@@ -327,7 +325,6 @@ class RegressionPerformanceAlgorithm(EnMAPProcessingAlgorithm):
                 report.writeImage(basename(filenameFig))
 
 
-@typechecked()
 @dataclass
 class AccuracyAssessmentResult(object):
     n: int
@@ -346,7 +343,6 @@ class AccuracyAssessmentResult(object):
     fittedLineCoeffs: Any
 
 
-@typechecked
 def accuracyAssessment(yObserved: np.ndarray, yPredicted: np.ndarray):
     from sklearn.metrics import explained_variance_score, mean_absolute_error, mean_squared_error, \
         median_absolute_error, r2_score

@@ -30,20 +30,20 @@ from qgis.core import Qgis
 loadUi = loadUi
 
 QGIS_DATATYPE_INFO = {
-    Qgis.UnknownDataType: ('UnknownDataType', 'Unknown or unspecified type'),
-    Qgis.Byte: ('Byte', 'Eight bit unsigned integer (quint8)'),
-    Qgis.UInt16: ('UInt16', 'Sixteen bit unsigned integer (quint16)'),
-    Qgis.Int16: ('Int16', 'Sixteen bit signed integer (qint16)'),
-    Qgis.UInt32: ('UInt32', 'Thirty two bit unsigned integer (quint32)'),
-    Qgis.Int32: ('Int32', 'Thirty two bit signed integer (qint32)'),
-    Qgis.Float32: ('Float32', 'Thirty two bit floating point (float)'),
-    Qgis.Float64: ('Float64', 'Sixty four bit floating point (double)'),
-    Qgis.CInt16: ('CInt16', 'Complex Int16.'),
-    Qgis.CInt32: ('CInt32', 'Complex Int32.'),
-    Qgis.CFloat32: ('CFloat32', 'Complex Float32.'),
-    Qgis.CFloat64: ('CFloat64', 'Complex Float64.'),
-    Qgis.ARGB32: ('ARGB32', 'Color, alpha, red, green, blue, 4 bytes the same as QImage::Format_ARGB32.'),
-    Qgis.ARGB32_Premultiplied: (
+    Qgis.DataType.UnknownDataType: ('UnknownDataType', 'Unknown or unspecified type'),
+    Qgis.DataType.Byte: ('Byte', 'Eight bit unsigned integer (quint8)'),
+    Qgis.DataType.UInt16: ('UInt16', 'Sixteen bit unsigned integer (quint16)'),
+    Qgis.DataType.Int16: ('Int16', 'Sixteen bit signed integer (qint16)'),
+    Qgis.DataType.UInt32: ('UInt32', 'Thirty two bit unsigned integer (quint32)'),
+    Qgis.DataType.Int32: ('Int32', 'Thirty two bit signed integer (qint32)'),
+    Qgis.DataType.Float32: ('Float32', 'Thirty two bit floating point (float)'),
+    Qgis.DataType.Float64: ('Float64', 'Sixty four bit floating point (double)'),
+    Qgis.DataType.CInt16: ('CInt16', 'Complex Int16.'),
+    Qgis.DataType.CInt32: ('CInt32', 'Complex Int32.'),
+    Qgis.DataType.CFloat32: ('CFloat32', 'Complex Float32.'),
+    Qgis.DataType.CFloat64: ('CFloat64', 'Complex Float64.'),
+    Qgis.DataType.ARGB32: ('ARGB32', 'Color, alpha, red, green, blue, 4 bytes the same as QImage::Format_ARGB32.'),
+    Qgis.DataType.ARGB32_Premultiplied: (
         'ARGB32_Premultiplied',
         'Color, alpha, red, green, blue, 4 bytes the same as QImage::Format_ARGB32_Premultiplied.'
     )

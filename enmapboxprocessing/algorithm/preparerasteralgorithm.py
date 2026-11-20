@@ -2,7 +2,6 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
@@ -10,7 +9,6 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLay
                        QgsMapLayer)
 
 
-@typechecked
 class PrepareRasterAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_OFFSET, _OFFSET = 'offset', 'Data offset value'

@@ -25,7 +25,7 @@ def updatePlot(profile: Profile, profiles: List[Profile], plotWidget: pg.PlotIte
     style = PlotStyle()
     name = f'fitted {profile.name}'
     style.setMarkerSymbol(MarkerSymbol.No_Symbol)
-    style.linePen.setStyle(Qt.SolidLine)
+    style.linePen.setStyle(Qt.PenStyle.SolidLine)
     style.linePen.setColor(QColor('#ff0000'))
     style.linePen.setWidth(1)
 

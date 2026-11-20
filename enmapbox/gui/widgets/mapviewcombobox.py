@@ -1,12 +1,9 @@
 from typing import Optional
 
+from enmapbox.gui.dataviews.docks import MapDock, DockTypes
 from qgis.PyQt.QtWidgets import QComboBox
 
-from enmapbox.gui.dataviews.docks import MapDock, DockTypes
-from enmapbox.typeguard import typechecked
 
-
-@typechecked
 class MapViewComboBox(QComboBox):
 
     def __init__(self, parent=None):

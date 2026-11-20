@@ -1,14 +1,12 @@
 from typing import Optional, Tuple, Iterator
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QMessageBox, QWidget
-from qgis.gui import QgisInterface
 from qgis.core import QgsRasterLayer
+from qgis.gui import QgisInterface
 
 
-@typechecked
 def findBroadBand(raster: QgsRasterLayer, name: str, strict=False) -> Optional[int]:
     """
     Return raster band that best matches the given broad-band.
@@ -18,7 +16,6 @@ def findBroadBand(raster: QgsRasterLayer, name: str, strict=False) -> Optional[i
     return CreateSpectralIndicesAlgorithm.findBroadBand(raster, name, strict)
 
 
-@typechecked
 class BlockSignals(object):
     """Context manager for blocking QObject signals."""
 
@@ -35,7 +32,6 @@ class BlockSignals(object):
             object.blockSignals(signalsBlocked)
 
 
-@typechecked
 def isEarthEngineModuleInstalled() -> bool:
     import importlib
     spec = importlib.util.find_spec('ee')
@@ -43,14 +39,12 @@ def isEarthEngineModuleInstalled() -> bool:
     return found
 
 
-@typechecked
 def isEarthEnginePluginInstalled() -> bool:
     from pyplugin_installer.installer_data import plugins
     ee_plugin = plugins.all()['ee_plugin']
     return ee_plugin['installed']
 
 
-@typechecked
 def importEarthEngine(showMessage=True, parent=None) -> Tuple[bool, object]:
     if isEarthEngineModuleInstalled():
         import ee

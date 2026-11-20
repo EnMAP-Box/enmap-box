@@ -4,7 +4,7 @@ from qgis.PyQt.QtGui import QIcon
 
 
 def enmapboxApplicationFactory(enmapBox):
-    return [ClassificationWorkflowApp(enmapBox)]
+    return []  # [ClassificationWorkflowApp(enmapBox)] app is deprecated
 
 
 class ClassificationWorkflowApp(EnMAPBoxApplication):

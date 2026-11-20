@@ -1,9 +1,8 @@
-from qgis.core import QgsProject
-
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibraryplotunitmodels import SpectralProfilePlotXAxisUnitModel
 from enmapbox.qgispluginsupport.qps.unitmodel import UnitConverterFunctionModel
 from enmapbox.testing import start_app, EnMAPBoxTestCase
+from qgis.core import QgsProject
 
 start_app()
 

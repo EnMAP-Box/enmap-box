@@ -4,13 +4,13 @@ import unittest
 from pathlib import Path
 
 from osgeo import gdal
-from qgis.core import QgsProject
-from qgis.core import QgsRasterLayer
 
 from enmapbox import initAll
 from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog
 from enmapbox.testing import TestCase, start_app
 from enmapboxprocessing.rasterreader import RasterReader
+from qgis.core import QgsProject
+from qgis.core import QgsRasterLayer
 
 start_app()
 initAll()

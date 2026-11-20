@@ -2,10 +2,8 @@ from contextlib import suppress
 from io import StringIO
 
 from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class FitCatBoostRegressorAlgorithm(FitRegressorAlgorithmBase):
 
     def displayName(self) -> str:
@@ -34,6 +32,7 @@ class FitCatBoostRegressorAlgorithm(FitRegressorAlgorithmBase):
 # monkey patch for issue #790
 with suppress(Exception):
     import catboost.core
+
     stringIO = StringIO()
 
     def _get_stream_like_object_FIXED(obj):

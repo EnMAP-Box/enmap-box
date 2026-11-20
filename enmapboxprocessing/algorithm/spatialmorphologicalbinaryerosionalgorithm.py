@@ -1,9 +1,7 @@
 from enmapboxprocessing.algorithm.spatialfilterfunctionalgorithmbase import SpatialFilterFunctionAlgorithmBase
 from enmapboxprocessing.enmapalgorithm import Group
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class SpatialMorphologicalBinaryErosionAlgorithm(SpatialFilterFunctionAlgorithmBase):
 
     def displayName(self) -> str:

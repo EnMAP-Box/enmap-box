@@ -1,8 +1,6 @@
 from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class FitRandomForestRegressorAlgorithm(FitRegressorAlgorithmBase):
 
     def displayName(self) -> str:

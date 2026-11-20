@@ -125,7 +125,7 @@ class EnGeoMAPGUI(QDialog):
         self.buttonBox.accepted.connect(self.Algo_Multi)  # Button Box
         self.buttonBox.rejected.connect(self.close)
         p = self.frame_5.palette()
-        p.setColor(self.frame_5.backgroundRole(), Qt.green)
+        p.setColor(self.frame_5.backgroundRole(), Qt.GlobalColor.green)
         self.frame_5.setPalette(p)
         self.frame_5.update()
         self.frame_5.show()
@@ -171,14 +171,14 @@ class EnGeoMAPGUI(QDialog):
         self.label_5.setText("Status: Ready to process Data")
         # Reset Status indicator (label_5) color to green
         p = self.frame_5.palette()
-        p.setColor(self.frame_5.backgroundRole(), Qt.green)
+        p.setColor(self.frame_5.backgroundRole(), Qt.GlobalColor.green)
         self.frame_5.setPalette(p)
         self.frame_5.update()
         self.frame_5.show()
 
     def Im_Busy(self):
         p = self.frame_5.palette()
-        p.setColor(self.frame_5.backgroundRole(), Qt.red)
+        p.setColor(self.frame_5.backgroundRole(), Qt.GlobalColor.red)
         self.frame_5.setPalette(p)
         self.frame_5.update()
         self.frame_5.show()

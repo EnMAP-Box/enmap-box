@@ -8,10 +8,8 @@ from enmapboxprocessing.typing import checkSampleShape, SampleX, SampleY, Target
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsFeature, QgsProcessingParameterField,
                        QgsVectorLayer, QgsProcessingException)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class PrepareRegressionDatasetFromContinuousVectorAndFieldsAlgorithm(EnMAPProcessingAlgorithm):
     P_CONTINUOUS_VECTOR, _CONTINUOUS_VECTOR = 'continuousVector', 'Continuous-valued vector layer'
     P_FEATURE_FIELDS, _FEATURE_FIELDS = 'featureFields', 'Fields with features'
@@ -44,11 +42,11 @@ class PrepareRegressionDatasetFromContinuousVectorAndFieldsAlgorithm(EnMAPProces
         self.addParameterVectorLayer(self.P_CONTINUOUS_VECTOR, self._CONTINUOUS_VECTOR)
         self.addParameterField(
             self.P_FEATURE_FIELDS, self._FEATURE_FIELDS, None, self.P_CONTINUOUS_VECTOR,
-            QgsProcessingParameterField.Numeric, True
+            QgsProcessingParameterField.DataType.Numeric, True
         )
         self.addParameterField(
             self.P_TARGET_FIELDS, self._TARGET_FIELDS, None, self.P_CONTINUOUS_VECTOR,
-            QgsProcessingParameterField.Numeric, True, True, False, True
+            QgsProcessingParameterField.DataType.Numeric, True, True, False, True
         )
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
@@ -97,6 +95,7 @@ class PrepareRegressionDatasetFromContinuousVectorAndFieldsAlgorithm(EnMAPProces
         X = list()
         y = list()
         feature: QgsFeature
+        n1 = vector.featureCount()
         for i, feature in enumerate(vector.getFeatures()):
             feedback.setProgress(i / n * 100)
             for field in targetFields:
@@ -124,4 +123,10 @@ class PrepareRegressionDatasetFromContinuousVectorAndFieldsAlgorithm(EnMAPProces
             raise ValueError(f'invalid target data: {error}')
 
         checkSampleShape(X, y, raise_=True)
+
+        n2 = len(X)
+        if n1 != n2:
+            feedback.pushInfo(f'Skipped {n1 - n2}/{n1} samples')
+        if n2 == 0:
+            raise QgsProcessingException('empty dataset not allowed')
         return X, y

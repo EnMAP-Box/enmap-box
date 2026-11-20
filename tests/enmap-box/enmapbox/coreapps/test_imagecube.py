@@ -4,19 +4,21 @@ import uuid
 
 import numpy as np
 from osgeo import gdal, gdal_array
+from qgis.core import QgsRasterLayer, QgsProject, QgsRasterRenderer, QgsRectangle, QgsCoordinateReferenceSystem
 
 from enmapbox import initAll
 from enmapbox.exampledata import enmap as pathEnMAP
 from enmapbox.exampledata import hires as pathHyMap
 from enmapbox.testing import EnMAPBoxTestCase, start_app, TestObjects
-from qgis.core import QgsRasterLayer, QgsProject, QgsRasterRenderer, QgsRectangle, QgsCoordinateReferenceSystem
 
 start_app()
 initAll()
 
 HAS_OPENGL = False
 try:
-    from imagecubeapp.imagecube import samplingGrid, ImageCubeWidget, GLItem, ImageCubeRenderTask
+    from imagecubeapp.imagecube import (
+        samplingGrid, ImageCubeWidget, GLItem, ImageCubeRenderTask
+    )
 
     HAS_OPENGL = True
 except ModuleNotFoundError as ex:

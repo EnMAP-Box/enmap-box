@@ -4,7 +4,6 @@ from typing import Dict, Any, List, Tuple
 import numpy as np
 
 from enmapbox.qgispluginsupport.qps.speclib.io.envi import readENVIHeader
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.spectralresamplingtocustomsensoralgorithm import \
     SpectralResamplingToCustomSensorAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
@@ -14,7 +13,6 @@ from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException
 
 
-@typechecked
 class SpectralResamplingByWavelengthAndFwhmAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Spectral raster layer'
     P_RESPONSE_FILE, _RESPONSE_FILE = 'responseFile', 'File with wavelength and FWHM'

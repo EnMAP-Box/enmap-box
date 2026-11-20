@@ -4,7 +4,6 @@ from typing import Dict, Any, List, Tuple
 import numpy as np
 from sklearn.multioutput import MultiOutputRegressor
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.regressionperformancealgorithm import RegressionPerformanceAlgorithm
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
@@ -13,7 +12,6 @@ from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer)
 
 
-@typechecked
 class RegressorPerformanceAlgorithm(EnMAPProcessingAlgorithm):
     P_REGRESSOR, _REGRESSOR = 'regressor', 'Regressor'
     P_DATASET, _DATASET = 'dataset', 'Test dataset'

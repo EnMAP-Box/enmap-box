@@ -4,7 +4,6 @@ from typing import Dict, Any, List, Tuple
 import numpy as np
 
 import qgis.processing
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.randompointsfromcategorizedrasteralgorithm import \
     RandomPointsFromCategorizedRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
@@ -14,7 +13,6 @@ from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsMapLayer, QgsRasterLayer, QgsProcessingException
 
 
-@typechecked
 class RandomPointsFromRasterAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_BAND, _BAND = 'band', 'Band'
@@ -68,7 +66,7 @@ class RandomPointsFromRasterAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterVectorDestination(self.P_OUTPUT_POINTS, self._OUTPUT_POINTS)
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         layer = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         bandNo = self.parameterAsBand(parameters, self.P_BAND, context)

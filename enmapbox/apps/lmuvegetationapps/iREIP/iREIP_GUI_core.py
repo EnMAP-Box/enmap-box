@@ -61,7 +61,7 @@ class iREIP_GUI(QDialog):
         if isinstance(emb, EnMAPBox):
             self.mLayer.setProject(emb.project())
 
-        self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mLayer.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         # fix the sendHoverEvent crash by replacing the slot function
         self.rangeView.scene().sendHoverEvents = self.onHoverEvent
         self.firstDerivView.scene().sendHoverEvents = self.onHoverEvent
@@ -427,7 +427,7 @@ class iREIP:
         if self.reip is not None:
             self.gui.secondDerivView.addItem(
                 pg.InfiniteLine(self.reip,
-                                pen=pg.mkPen(color=(255, 255, 255), style=Qt.DashLine)))
+                                pen=pg.mkPen(color=(255, 255, 255), style=Qt.PenStyle.DashLine)))
 
             self.gui.ipLabel.setText("Inflection point found at")
             self.gui.ipLabel.setStyleSheet('color: green')

@@ -78,6 +78,14 @@ gdal.SetConfigOption('GDAL_VRT_ENABLE_PYTHON', 'YES')
 # ensure that PyQtGraph uses the same PyQt as QGIS
 os.environ.setdefault('PYQTGRAPH_QT_LIB', f'PyQt{PYQT_VERSION_STR[0]}')
 
+try:
+    from processing.core.ProcessingConfig import ProcessingConfig, Setting  # noqa: F401
+except ModuleNotFoundError:
+    import qgis
+
+    path_plugins = Path(qgis.__file__).parents[1] / 'plugins'
+    site.addsitedir(str(path_plugins))
+
 
 def enmapboxSettings() -> QSettings:
     """
@@ -106,7 +114,7 @@ def debugLog(msg: str):
         print('DEBUG:' + msg, flush=True)
 
 
-def messageLog(msg, level=Qgis.Info, notifyUser: bool = True):
+def messageLog(msg, level=Qgis.MessageLevel.Info, notifyUser: bool = True):
     """
     Writes a log message to the QGIS EnMAP-Box Log
     :param msg: log message string
@@ -120,14 +128,14 @@ def messageLog(msg, level=Qgis.Info, notifyUser: bool = True):
                                     level=level,
                                     notifyUser=notifyUser)
         from qgis.utils import iface
-        if isinstance(iface, QgisInterface) and level == Qgis.Critical:
+        if isinstance(iface, QgisInterface) and level == Qgis.MessageLevel.Critical:
             iface.openMessageLog()
             title = msg.split('\n')[0]
             iface.messageBar().pushMessage(title, msg, msg, level=level)
     else:
-        if level == Qgis.Critical:
+        if level == Qgis.MessageLevel.Critical:
             print(msg, file=sys.stderr)
-        elif level == Qgis.Warning:
+        elif level == Qgis.MessageLevel.Warning:
             warnings.warn(msg, stacklevel=2)
         else:
             print(msg)
@@ -199,12 +207,12 @@ def collectEnMAPBoxAlgorithms() -> typing.List[QgsProcessingAlgorithm]:
                 algs.append(alg.create())
             except Exception as ex2:
                 traceback.print_stack()
-                messageLog(str(ex2), Qgis.Warning)
+                messageLog(str(ex2), Qgis.MessageLevel.Warning)
     except Exception as ex:
         traceback.print_exc()
         info = 'Unable to load enmapboxprocessing.algorithm.algorithms'
         info += '\n' + str(ex)
-        messageLog(info, Qgis.Critical)
+        messageLog(info, Qgis.MessageLevel.Critical)
 
     try:
         from enmapbox.qgispluginsupport.qps.speclib.processing.aggregateprofiles import AggregateProfiles
@@ -221,7 +229,7 @@ def collectEnMAPBoxAlgorithms() -> typing.List[QgsProcessingAlgorithm]:
         traceback.print_exc()
         info = f'Unable to load processing algorithms: {ex}'
         info += '\n' + str(ex)
-        messageLog(info, Qgis.Critical)
+        messageLog(info, Qgis.MessageLevel.Critical)
 
     return algs
 
@@ -249,7 +257,7 @@ def registerEnMAPBoxProcessingProvider():
                 'PYTHONPATH:']
         for p in sorted(sys.path):
             info.append(p)
-        messageLog(info, Qgis.Warning)
+        messageLog(info, Qgis.MessageLevel.Warning)
         print('\n'.join(info), file=sys.stderr)
 
     debugLog('started initEnMAPBoxProcessingProvider')
@@ -303,28 +311,65 @@ def registerExpressionFunctions():
     """
     Adds Expression functions for the QGIS expression editor
     """
-    from .qgispluginsupport.qps.qgsfunctions import registerQgsExpressionFunctions
-    registerQgsExpressionFunctions()
+    from .qgispluginsupport.qps import registerExpressionFunctions
+    registerExpressionFunctions()
 
 
 def unregisterExpressionFunctions():
     """
     Removes added expression functions
     """
-    from .qgispluginsupport.qps.qgsfunctions import unregisterQgsExpressionFunctions
-    unregisterQgsExpressionFunctions()
+    from .qgispluginsupport.qps import unregisterExpressionFunctions
+    unregisterExpressionFunctions()
 
 
 def initAll():
     """
     Calls other init routines required to run the EnMAP-Box properly
     """
+
+    from qgis.utils import iface
+    from enmapbox.gui.enmapboxsettingsgui import EnMAPBoxSettingsPageWidgetFactory
+    iface.registerOptionsWidgetFactory(EnMAPBoxSettingsPageWidgetFactory.instance())
+
     initEnMAPBoxResources()
     from enmapbox.qgispluginsupport.qps import registerDataProviders
     registerDataProviders()
 
     from enmapbox.provider.maskrasterdataprovider import register_data_provider
     register_data_provider()
+
+    from enmapboxprocessing.parameter.processingparametercodeeditwidget import ProcessingParameterCodeEditWidgetFactory
+    ProcessingParameterCodeEditWidgetFactory.register()
+
+    from enmapboxprocessing.parameter.processingparametercreationprofilewidget import (
+        ProcessingParameterCreationProfileWidgetFactory)
+    ProcessingParameterCreationProfileWidgetFactory.register()
+
+    from enmapboxprocessing.parameter.processingparameterestimatorcodeeditwidget import (
+        ProcessingParameterClassifierCodeEditFactory, ProcessingParameterRegressorCodeEditFactory)
+    ProcessingParameterClassifierCodeEditFactory.register()
+    ProcessingParameterRegressorCodeEditFactory.register()
+
+    from enmapboxprocessing.parameter.processingparameterrastermathcodeeditwidget import (
+        ProcessingParameterRasterMathCodeEditWidgetFactory)
+    ProcessingParameterRasterMathCodeEditWidgetFactory.register()
+
+    from enmapboxprocessing.parameter.processingparameterskopsfilewidget import (
+        ProcessingParameterSkopsFileWidgetFactory)
+    ProcessingParameterSkopsFileWidgetFactory.register()
+
+    from enmapboxprocessing.parameter.processingparameterskopsfileclassificationdatasetwidget import (
+        ProcessingParameterSkopsFileClassificationDatasetWidgetFactory)
+    ProcessingParameterSkopsFileClassificationDatasetWidgetFactory.register()
+
+    from enmapboxprocessing.parameter.processingparameterskopsfileregressiondatasetwidget import (
+        ProcessingParameterSkopsFileRegressionDatasetWidgetFactory)
+    ProcessingParameterSkopsFileRegressionDatasetWidgetFactory.register()
+
+    from enmapboxprocessing.parameter.processingparameterskopsfileunsuperviseddatasetwidget import (
+        ProcessingParameterSkopsFileUnsupervisedDatasetWidgetFactory)
+    ProcessingParameterSkopsFileUnsupervisedDatasetWidgetFactory.register()
 
     registerEditorWidgets()
     registerExpressionFunctions()
@@ -340,6 +385,10 @@ def unloadAll():
     unregisterExpressionFunctions()
     unregisterMapLayerConfigWidgetFactories()
     unregisterEnMAPBoxProcessingProvider()
+
+    from qgis.utils import iface
+    from enmapbox.gui.enmapboxsettingsgui import EnMAPBoxSettingsPageWidgetFactory
+    iface.unregisterOptionsWidgetFactory(EnMAPBoxSettingsPageWidgetFactory.instance())
 
 
 def tr(text: str) -> str:

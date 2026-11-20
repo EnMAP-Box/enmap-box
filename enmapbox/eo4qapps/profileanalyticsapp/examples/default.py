@@ -19,6 +19,6 @@ def updatePlot(profile: Profile, profiles: List[Profile], plotWidget: pg.PlotIte
     style.markerSize = 15
     style.linePen.setColor(QColor('#0000ff'))
     style.linePen.setWidth(2)
-    style.linePen.setStyle(Qt.DashLine)
+    style.linePen.setStyle(Qt.PenStyle.DashLine)
     plotDataItem = plotWidget.plot(xValues, yValues, name='My Line')
     style.apply(plotDataItem)

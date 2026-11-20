@@ -19,7 +19,7 @@ class TestRasterizeVectorAlgorithm(TestCase):
             alg.P_OUTPUT_RASTER: self.filename('mask.tif')
         }
         result = self.runalg(alg, parameters)
-        self.assertEqual(Qgis.Float32, RasterReader(result[alg.P_OUTPUT_RASTER]).dataType())
+        self.assertEqual(Qgis.DataType.Float32, RasterReader(result[alg.P_OUTPUT_RASTER]).dataType())
         self.assertEqual(2028, RasterReader(result[alg.P_OUTPUT_RASTER]).array()[0].sum())
 
     def test_differentCrs(self):
@@ -84,7 +84,7 @@ class TestRasterizeVectorAlgorithm(TestCase):
         }
         result = self.runalg(alg, parameters)
         # self.assertEqual(2721, RasterReader(result[alg.P_OUTPUT_RASTER]).array()[0].sum())
-        self.assertEqual(Qgis.Byte, RasterReader(result[alg.P_OUTPUT_RASTER]).dataType())
+        self.assertEqual(Qgis.DataType.Byte, RasterReader(result[alg.P_OUTPUT_RASTER]).dataType())
 
     def test_addValue(self):
         alg = RasterizeVectorAlgorithm()

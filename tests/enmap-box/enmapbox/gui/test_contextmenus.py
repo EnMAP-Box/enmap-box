@@ -88,9 +88,12 @@ class test_applications(EnMAPBoxTestCase):
         canvas: MapCanvas = mapDock.mapCanvas()
 
         pt = QPointF(canvas.width() * 0.5, canvas.height() * 0.5)
-        event = QMouseEvent(QEvent.MouseButtonPress, pt, Qt.LeftButton, Qt.LeftButton, Qt.NoModifier)
-        event = QgsMapMouseEvent(canvas, event)
+        event = QMouseEvent(
+            QEvent.Type.MouseButtonPress, pt, Qt.MouseButton.LeftButton,
+            Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier
+        )
 
+        event = QgsMapMouseEvent(canvas, event)
         canvas.mousePressEvent(event)
         canvas.populateContextMenu(m, event)
         mapDock.populateContextMenu(m)
@@ -116,7 +119,7 @@ class test_applications(EnMAPBoxTestCase):
             rect: QRect = tv.visualRect(idx)
             pt: QPoint = rect.topLeft() + QPoint(int(rect.width() * 0.5), int(rect.height() * 0.5))
 
-            event = QContextMenuEvent(QContextMenuEvent.Mouse, pt)
+            event = QContextMenuEvent(QContextMenuEvent.Reason.Mouse, pt)
             # QApplication.sendEvent(tv, event)
             m.clear()
             tv.populateContextMenu(m)
@@ -141,7 +144,8 @@ class test_applications(EnMAPBoxTestCase):
         canvas = MapCanvas()
         project = QgsProject()
         canvas.setProject(project)
-
+        eb = EnMAPBox(load_core_apps=False, load_other_apps=False)
+        self.assertIsInstance(eb, EnMAPBox)
         # Add some dummy raster layers
         l1 = QgsRasterLayer("None", "Layer 1", "gdal")
         l2 = QgsRasterLayer("None", "Layer 2", "gdal")
@@ -151,6 +155,7 @@ class test_applications(EnMAPBoxTestCase):
         LAYERS = {lyr.id(): lyr for lyr in project.mapLayers().values()}
 
         provider = EnMAPBoxContextMenuProvider()
+
         menu = QMenu()
         provider.populateMapCanvasMenu(menu, canvas, QPoint(0, 0), QgsPointXY(0, 0))
 
@@ -181,7 +186,7 @@ class test_applications(EnMAPBoxTestCase):
 
         self.assertIsInstance(cb, QComboBox)
         for i in range(1, cb.count()):
-            lid = cb.itemData(i, Qt.UserRole)
-            tt = cb.itemData(i, Qt.ToolTipRole)
+            lid = cb.itemData(i, Qt.ItemDataRole.UserRole)
+            tt = cb.itemData(i, Qt.ItemDataRole.ToolTipRole)
             self.assertTrue(lid in LAYERS)
             self.assertTrue(lid in tt)

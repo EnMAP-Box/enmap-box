@@ -31,7 +31,7 @@ def currentComboBoxValue(comboBox: QComboBox):
     Returns the currentData values of a QComboBox
     """
     if isinstance(comboBox.model(), OptionListModel):
-        o = comboBox.currentData(Qt.UserRole)
+        o = comboBox.currentData(Qt.ItemDataRole.UserRole)
         o: Option
         return o.mValue
     else:
@@ -47,9 +47,9 @@ def setCurrentComboBoxValue(comboBox: QComboBox, value):
     """
     model = comboBox.model()
     if not isinstance(model, OptionListModel):
-        i = comboBox.findData(value, role=Qt.DisplayRole)
+        i = comboBox.findData(value, role=Qt.ItemDataRole.DisplayRole)
         if i == -1:
-            i = comboBox.findData(value, role=Qt.UserRole)
+            i = comboBox.findData(value, role=Qt.ItemDataRole.UserRole)
 
         if i != -1:
             comboBox.setCurrentIndex(i)
@@ -58,7 +58,7 @@ def setCurrentComboBoxValue(comboBox: QComboBox, value):
         if not isinstance(value, Option):
             value = Option(value)
         for i in range(comboBox.count()):
-            option = comboBox.itemData(i, role=Qt.UserRole)
+            option = comboBox.itemData(i, role=Qt.ItemDataRole.UserRole)
             if option == value:
                 comboBox.setCurrentIndex(i)
                 return True
@@ -207,7 +207,7 @@ class OptionListModel(QAbstractListModel):
     def optionNames(self):
         return [o.mName for o in self.mOptions]
 
-    def data(self, index, role=Qt.DisplayRole):
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
         if not index.isValid():
             return None
 
@@ -217,13 +217,13 @@ class OptionListModel(QAbstractListModel):
         if not isinstance(option, Option):
             pass
         result = None
-        if role == Qt.DisplayRole:
+        if role == Qt.ItemDataRole.DisplayRole:
             result = '{}'.format(option.mName)
-        elif role == Qt.ToolTipRole:
+        elif role == Qt.ItemDataRole.ToolTipRole:
             result = '{}'.format(option.mName if option.mTooltip is None else option.mTooltip)
-        elif role == Qt.DecorationRole:
+        elif role == Qt.ItemDataRole.DecorationRole:
             result = option.mIcon
-        elif role == Qt.UserRole:
+        elif role == Qt.ItemDataRole.UserRole:
             result = option
         return result
 
@@ -435,7 +435,7 @@ class TreeModel(QAbstractItemModel):
 
     def headerData(self, section: int, orientation, role):
 
-        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+        if orientation == Qt.Orientation.Horizontal and role == Qt.ItemDataRole.DisplayRole:
 
             if len(self.mColumnNames) > section:
                 return self.mColumnNames[section]
@@ -563,26 +563,26 @@ class TreeModel(QAbstractItemModel):
     def data(self, index, role):
         node = self.idx2node(index)
         col = index.column()
-        if role == Qt.UserRole:
+        if role == Qt.ItemDataRole.UserRole:
             return node
 
         if col == 0:
-            if role in [Qt.DisplayRole, Qt.EditRole]:
+            if role in [Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole]:
                 return node.name()
-            if role == Qt.DecorationRole:
+            if role == Qt.ItemDataRole.DecorationRole:
                 return node.icon()
-            if role == Qt.ToolTipRole:
+            if role == Qt.ItemDataRole.ToolTipRole:
                 return node.toolTip()
         if col > 0:
             i = col - 1
-            if role in [Qt.DisplayRole, Qt.EditRole] and len(node.values()) > i:
+            if role in [Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole] and len(node.values()) > i:
                 return str(node.values()[i])
 
     def flags(self, index: QModelIndex):
         if not index.isValid():
-            return Qt.NoItemFlags
+            return Qt.ItemFlag.NoItemFlags
         self.idx2node(index)
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable
 
 
 class TreeView(QTreeView):

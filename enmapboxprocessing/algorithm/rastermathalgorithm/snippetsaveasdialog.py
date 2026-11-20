@@ -3,7 +3,6 @@ from typing import List, Tuple
 from enmapboxprocessing.parameter.processingparametercodeeditwidget import CodeEditWidget
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QLabel, QVBoxLayout, QLineEdit
-from enmapbox.typeguard import typechecked
 
 
 class DialogUi(object):
@@ -27,13 +26,12 @@ class DialogUi(object):
         vbox.addWidget(self.mSnippet)
 
         self.buttonBox = QDialogButtonBox()
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
-        self.buttonBox.button(QDialogButtonBox.Ok).clicked.connect(dialog.accept)
-        self.buttonBox.button(QDialogButtonBox.Cancel).clicked.connect(dialog.close)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel | QDialogButtonBox.StandardButton.Ok)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).clicked.connect(dialog.accept)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).clicked.connect(dialog.close)
         vbox.addWidget(self.buttonBox)
 
 
-@typechecked
 class SnippetSaveAsDialog(QDialog, DialogUi):
     mSnippet: CodeEditWidget
     placeholders: List[Tuple[QLineEdit, str]]
