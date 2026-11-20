@@ -24,6 +24,22 @@ import time
 from os.path import basename, dirname
 from typing import Optional, List, Dict, Union, Any
 
+from qgis.PyQt.QtCore import QSize
+from qgis.PyQt.QtCore import Qt, QMimeData, QModelIndex, QObject, QTimer, pyqtSignal, QEvent, \
+    QSortFilterProxyModel, QCoreApplication
+from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDropEvent, QDragLeaveEvent
+from qgis.PyQt.QtWidgets import QHeaderView, QMenu, QAbstractItemView, QApplication, QWidget, QToolButton, QAction
+from qgis.PyQt.QtXml import QDomDocument, QDomElement
+from qgis.core import Qgis, QgsCoordinateReferenceSystem, QgsMapLayer, QgsVectorLayer, QgsRasterLayer, \
+    QgsProject, QgsReadWriteContext, \
+    QgsLayerTreeLayer, QgsLayerTreeNode, QgsLayerTreeGroup, \
+    QgsLayerTreeModelLegendNode, QgsLayerTree, QgsLayerTreeModel, QgsLayerTreeUtils, \
+    QgsPalettedRasterRenderer
+from qgis.core import QgsWkbTypes
+from qgis.gui import QgsLayerTreeProxyModel
+from qgis.gui import QgsLayerTreeView, \
+    QgsMapCanvas, QgsLayerTreeViewMenuProvider, QgsLayerTreeMapCanvasBridge, QgsDockWidget, QgsMessageBar
+
 from enmapbox.gui.datasources.datasources import DataSource, ModelDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager
 from enmapbox.gui.dataviews.docks import Dock, DockArea, \
@@ -40,21 +56,6 @@ from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibraryplotmodelitems im
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.utils import loadUi, SpatialExtent
 from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtCore import QSize
-from qgis.PyQt.QtCore import Qt, QMimeData, QModelIndex, QObject, QTimer, pyqtSignal, QEvent, \
-    QSortFilterProxyModel, QCoreApplication
-from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDropEvent, QDragLeaveEvent
-from qgis.PyQt.QtWidgets import QHeaderView, QMenu, QAbstractItemView, QApplication, QWidget, QToolButton, QAction
-from qgis.PyQt.QtXml import QDomDocument, QDomElement
-from qgis.core import Qgis, QgsCoordinateReferenceSystem, QgsMapLayer, QgsVectorLayer, QgsRasterLayer, \
-    QgsProject, QgsReadWriteContext, \
-    QgsLayerTreeLayer, QgsLayerTreeNode, QgsLayerTreeGroup, \
-    QgsLayerTreeModelLegendNode, QgsLayerTree, QgsLayerTreeModel, QgsLayerTreeUtils, \
-    QgsPalettedRasterRenderer
-from qgis.core import QgsWkbTypes
-from qgis.gui import QgsLayerTreeProxyModel
-from qgis.gui import QgsLayerTreeView, \
-    QgsMapCanvas, QgsLayerTreeViewMenuProvider, QgsLayerTreeMapCanvasBridge, QgsDockWidget, QgsMessageBar
 
 logger = logging.getLogger(__name__)
 
@@ -892,8 +893,8 @@ class DockManagerTreeModel(QgsLayerTreeModel):
         return results
 
     def findDockNode(
-            self,
-            object: Union[str, Dock, QgsMapCanvas, QgsRasterLayer, QgsVectorLayer, SpectralLibraryWidget]
+        self,
+        object: Union[str, Dock, QgsMapCanvas, QgsRasterLayer, QgsVectorLayer, SpectralLibraryWidget]
     ) -> Optional[DockTreeNode]:
         """
         Returns a DockTreeNode that contains the given object
@@ -1009,10 +1010,10 @@ class DockManagerTreeModel(QgsLayerTreeModel):
                 else:
                     # close docks linked to this source
                     if (
-                            isinstance(node, AttributeTableDockTreeNode)
-                            and isinstance(node.dock, AttributeTableDock)  # noqa
-                            and isinstance(node.dock.vectorLayer(), QgsVectorLayer)  # noqa
-                            and node.dock.vectorLayer().source() == d.source()  # noqa
+                        isinstance(node, AttributeTableDockTreeNode)
+                        and isinstance(node.dock, AttributeTableDock)  # noqa
+                        and isinstance(node.dock.vectorLayer(), QgsVectorLayer)  # noqa
+                        and node.dock.vectorLayer().source() == d.source()  # noqa
                     ):
                         docks_to_close.append(node.dock)
 
@@ -1395,7 +1396,7 @@ class DockManagerTreeModel(QgsLayerTreeModel):
                 # this does not work:
                 # result = super(QgsLayerTreeModel,self).setData(index, value, role=role)
                 if role == Qt.ItemDataRole.CheckStateRole and not self.testFlag(
-                        QgsLayerTreeModel.Flag.AllowLegendChangeState
+                    QgsLayerTreeModel.Flag.AllowLegendChangeState
                 ):
                     return False
                 result = node.setData(value, role)
@@ -1879,7 +1880,7 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
                 modelDataSource: ModelDataSource
 
                 if not (
-                        isinstance(modelDataSource, ModelDataSource) and isinstance(modelDataSource.mSkopsObject, dict)
+                    isinstance(modelDataSource, ModelDataSource) and isinstance(modelDataSource.mSkopsObject, dict)
                 ):
                     continue
                 if modelDataSource.mSkopsObject.get('classifier') is not None:
