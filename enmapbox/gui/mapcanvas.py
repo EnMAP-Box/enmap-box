@@ -22,6 +22,14 @@ import warnings
 from _weakrefset import WeakSet
 from typing import List, Optional, Dict, Union
 
+from enmapbox import enmapboxSettings
+from enmapbox.enmapboxsettings import EnMAPBoxSettings
+from enmapbox.gui.mimedata import containsMapLayers, extractMapLayers
+from enmapbox.qgispluginsupport.qps.crosshair.crosshair import CrosshairMapCanvasItem, CrosshairStyle
+from enmapbox.qgispluginsupport.qps.maptools import (
+    MapTools, MapToolCenter, PixelScaleExtentMapTool, CursorLocationMapTool,
+    FullExtentMapTool, QgsMapToolAddFeature, QgsMapToolSelect)
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
 from qgis.PyQt.QtCore import Qt, QObject, QCoreApplication, pyqtSignal, QEvent, QPointF, QMimeData, QTimer, QSize, \
     QModelIndex, QAbstractListModel
 from qgis.PyQt.QtGui import QMouseEvent, QIcon, QDragEnterEvent, QDropEvent, QResizeEvent, QKeyEvent, QColor
@@ -35,15 +43,6 @@ from qgis.core import QgsLayerTreeLayer, QgsCoordinateReferenceSystem, QgsRectan
 from qgis.gui import QgsColorDialog, QgsLayerTreeMapCanvasBridge, QgsMapTool
 from qgis.gui import QgsMapCanvas, QgisInterface, QgsMapToolZoom, QgsAdvancedDigitizingDockWidget, \
     QgsProjectionSelectionWidget, QgsMapToolIdentify, QgsMapToolPan, QgsMapToolCapture, QgsMapMouseEvent
-
-from enmapbox import enmapboxSettings
-from enmapbox.enmapboxsettings import EnMAPBoxSettings
-from enmapbox.gui.mimedata import containsMapLayers, extractMapLayers
-from enmapbox.qgispluginsupport.qps.crosshair.crosshair import CrosshairMapCanvasItem, CrosshairStyle
-from enmapbox.qgispluginsupport.qps.maptools import (
-    MapTools, MapToolCenter, PixelScaleExtentMapTool, CursorLocationMapTool,
-    FullExtentMapTool, QgsMapToolAddFeature, QgsMapToolSelect)
-from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
 
 LINK_ON_SCALE = 'SCALE'
 LINK_ON_CENTER = 'CENTER'
@@ -478,7 +477,7 @@ class CanvasLink(QObject):
 
     @staticmethod
     def ShowMapLinkTargets(canvas1: QgsMapCanvas):
-        from enmapbox.gui.dataviews.docks import MapDock
+        from enmapbox.gui.dataviews.mapdock import MapDock
         if isinstance(canvas1, MapDock):
             canvas1 = canvas1.mCanvas
         if not isinstance(canvas1, QgsMapCanvas):

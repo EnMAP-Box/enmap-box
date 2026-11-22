@@ -12,9 +12,12 @@ from enmapbox.gui.datasources.datasources import DataSource, RasterDataSource, V
 from enmapbox.gui.datasources.datasourcesets import DataSourceSet
 from enmapbox.gui.datasources.manager import DataSourceManager, DataSourceManagerTreeView
 from enmapbox.gui.datasources.metadata import RasterBandTreeNode
+from enmapbox.gui.dataviews.attributetabledock import AttributeTableDock
 from enmapbox.gui.dataviews.dockmanager import DockTreeNode, MapDockTreeNode, DockManagerLayerTreeModelMenuProvider, \
     DockTreeView, LayerTreeNode, SpeclibProfileVisualizationGroupNode
-from enmapbox.gui.dataviews.docks import Dock, MapDock, AttributeTableDock, SpectralLibraryDock
+from enmapbox.gui.dataviews.docks import Dock
+from enmapbox.gui.dataviews.mapdock import MapDock
+from enmapbox.gui.dataviews.spectrallibrarydock import SpectralLibraryDock
 from enmapbox.gui.mapcanvas import MapCanvas, CanvasLink
 from enmapbox.qgispluginsupport.qps.crosshair.crosshair import CrosshairDialog
 from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog

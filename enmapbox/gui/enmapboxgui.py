@@ -28,8 +28,8 @@ import enmapbox
 import enmapbox.gui.datasources.manager
 from enmapbox import messageLog, debugLog, DEBUG
 from enmapbox.algorithmprovider import EnMAPBoxProcessingProvider
-from enmapbox.gui.dataviews.dockmanager import DockManagerTreeModel, MapDockTreeNode
-from enmapbox.gui.dataviews.docks import SpectralLibraryDock, Dock, AttributeTableDock, MapDock
+from enmapbox.gui.dataviews.dockmanager import DockManagerTreeModel, MapDockTreeNode, DockTypes
+from enmapbox.gui.dataviews.docks import Dock
 from enmapbox.qgispluginsupport.qps.cursorlocationvalue import CursorLocationInfoDock
 from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog
 from enmapbox.qgispluginsupport.qps.maptools import QgsMapToolSelectionHandler, MapTools
@@ -88,7 +88,9 @@ from qgis.gui import (
 from .contextmenuprovider import EnMAPBoxContextMenuProvider
 from .contextmenus import EnMAPBoxContextMenuRegistry
 from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
-from .dataviews.docks import DockTypes
+from .dataviews.attributetabledock import AttributeTableDock
+from .dataviews.mapdock import MapDock
+from .dataviews.spectrallibrarydock import SpectralLibraryDock
 from .enmapboxsettingsgui import EnMAPBoxSettingsPageWidget
 from .mapcanvas import MapCanvas
 from .splashscreen.splashscreen import EnMAPBoxSplashScreen

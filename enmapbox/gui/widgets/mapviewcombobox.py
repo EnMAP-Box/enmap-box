@@ -1,6 +1,7 @@
 from typing import Optional
 
-from enmapbox.gui.dataviews.docks import MapDock, DockTypes
+from enmapbox.gui.dataviews.dockmanager import DockTypes
+from enmapbox.gui.dataviews.mapdock import MapDock
 from qgis.PyQt.QtWidgets import QComboBox
 
 
