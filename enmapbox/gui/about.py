@@ -27,6 +27,7 @@ from enmapbox.gui.utils import loadUi
 from qgis.PyQt.QtCore import Qt, QUrl
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtWidgets import QDialog, QTextBrowser
+from qgis.core import Qgis
 
 
 def anchorClicked(url: QUrl):
@@ -70,6 +71,11 @@ class AboutDialog(QDialog):
         if len(__version_sha__) > 10:
             info += f'\t Code ' \
                     f'<a href="{REPOSITORY.replace(".git", "")}/commit/{__version_sha__}">{__version_sha__[0:11]}</a>'
+        info += f'<br>QGIS {Qgis.version()}'
+
+        # import sys
+        # info += f'<br>{sys.version}'
+
         self.labelVersion.setText(info)
         self.setAboutTitle()
 
