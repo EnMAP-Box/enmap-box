@@ -334,6 +334,8 @@ the folder containing the sensor products. This will allow you to run additional
 export ENMAPBOX_SENSOR_PRODUCT_ROOT=~/MyMountedDrives/EnmapBoxExternalSensorProducts
 ````
 
+## Docker
+
 To test with docker with [`qgis/qgis:latest`](https://hub.docker.com/layers/qgis/qgis/latest), run:
 
 ````bash
@@ -360,6 +362,27 @@ QGIS_TEST_VERSION=3.44 docker compose \
 * `--build` forces a rebuild of the container
 * `--user` sets the user id and group id of the container to the current user
 * `-n auto` runs the tests in parallel (using pytest xdist)`
+
+## Local QGIS compilation (Linux)
+
+With a customized QGIS installation, you can run the tests against it by setting the following environmental
+variables:
+
+````bash
+QGIS_PREFIX_PATH=~/repositories/QGIS/build/output
+PYTHONPATH=~/repositories/QGIS/build/output/python:/home/jakimowb/repositories/QGIS/build/output/python/plugins
+# Linux/macOS:
+LD_LIBRARY_PATH=~/repositories/QGIS/build/output/lib
+````
+
+You may store them in a `qgis-local.env` file and call the tests like in:
+
+````bash
+set -a
+source qgis-local.env
+set +a
+./scripts/runtests.sh -n auto
+````
 
 # License
 

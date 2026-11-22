@@ -1,4 +1,3 @@
-import re
 from typing import Dict, Any, List, Tuple
 
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
@@ -148,23 +147,8 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
                 'EXTRA': extra,
                 'OPTIONS': '|'.join(options),
                 'OUTPUT': filename}
-            if False:
-                self.runAlg(alg, parameters, None, feedback2, context, True)
-            else:
-                # workaround to https://github.com/qgis/QGIS/issues/60524
-                from processing.algs.gdal.rasterize import rasterize as GDALPA_Rasterize
-                from processing.algs.gdal.GdalUtils import GdalUtils as GDALPA_Utils
-                alg = GDALPA_Rasterize()
-                alg.initAlgorithm({})
-                cmd, cmdArgs = alg.getConsoleCommands(parameters, context, feedback2, executing=True)
 
-                # fix -ts string
-                match = re.search(r'-ts[^-]+', cmdArgs)
-                if match:
-                    ts_old = match.group()
-                    ts_new = re.sub(r'\.\d+', '', ts_old)
-                    cmdArgs = cmdArgs.replace(ts_old, ts_new)
-                GDALPA_Utils.runGdal([cmd, cmdArgs], feedback2)
+            self.runAlg(alg, parameters, None, feedback2, context, True)
 
             result = {self.P_OUTPUT_RASTER: filename}
             self.toc(feedback, result)

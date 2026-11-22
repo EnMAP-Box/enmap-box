@@ -1,5 +1,5 @@
 """
-Updates the version number in enmapbox/gui/ui/logo/splashscreen.png
+Updates the version number in artwork/splashscreen.svg (master) -> enmapbox/gui/splashscreen/splashscreen.png (output)
 Requires that Inkscape (https://inkscape.org) is installed an can be used from shell
 Does not update the version number in splashscreen.svg (!), but create a temporary svg only.
 """
@@ -9,17 +9,14 @@ import os
 import re
 import shutil
 import subprocess  # nosec B404 # we need inkscape to properly create the splashscreen
+import xml.etree.ElementTree as ET  # nosec B405 # we need ElementTree with register_namespace to modify the svg
 from pathlib import Path
 from typing import Match, Union
 
-import defusedxml.ElementTree as ET
-
-from enmapbox import DIR_REPO
-from enmapbox.gui.splashscreen.splashscreen import PATH_SPLASHSCREEN
-
-DIR_REPO = Path(DIR_REPO)
-PATH_CONFIG_FILE = DIR_REPO / '.plugin.ini'
-PATH_SVG = DIR_REPO / 'enmapbox/gui/splashscreen/splashscreen.svg'
+DIR_REPO = Path(__file__).parents[1]
+PATH_CONFIG_FILE = DIR_REPO / 'tox.ini'
+PATH_SVG = DIR_REPO / 'artwork' / 'splashscreen.svg'
+PATH_PNG = DIR_REPO / 'enmapbox' / 'gui' / 'splashscreen' / 'splashscreen.png'
 ENV_INKSCAPE_BIN = 'INKSCAPE_BIN'
 
 
@@ -41,24 +38,34 @@ def inkscapeBin() -> Path:
     return path
 
 
-def update_splashscreen(version: str = None,
+def update_splashscreen(version: str | None = None,
                         pure: bool = False,
-                        path_png: Union[str, Path] = None):
-    if not PATH_SVG.is_file():
-        raise FileNotFoundError(f'Could not find splashscreen svg file "{PATH_SVG}"')
+                        path_png: Union[str, Path, None] = None,
+                        path_svg: Union[str, Path, None] = None,
+                        keep_tmp: bool = False):
+    """
+    Updates the splashscreen png file from the svg file.
+    """
+    if path_svg:
+        path_svg = Path(path_svg)
+    else:
+        path_svg = PATH_SVG
+
+    if not path_svg.is_file():
+        raise FileNotFoundError(f'Could not find splashscreen svg file "{path_svg}"')
     PATH_INKSCAPE = inkscapeBin()
 
     if path_png:
         path_png = Path(path_png)
     else:
-        path_png = PATH_SVG.parent / PATH_SVG.name.replace('.svg', '.png')
+        path_png = PATH_PNG
 
     if version is None:
         if not PATH_CONFIG_FILE.is_file():
             raise FileNotFoundError(f'Could not find config file "{PATH_CONFIG_FILE}"')
         config = configparser.ConfigParser()
         config.read(PATH_CONFIG_FILE)
-        version = config['metadata']['version']
+        version = config['enmapbox:metadata']['version']
 
     rxVersion = re.compile(r'(?P<major>\d+)\.(?P<minor>\d+)(?P<rest>.*)')
 
@@ -67,10 +74,10 @@ def update_splashscreen(version: str = None,
         raise ValueError(f'Could not parse version string "{version}"')
 
     txt_major = match.group('major')
-    txt_minor = '.' + match.group('minor')
+    txt_minor = match.group('minor')
 
-    with open(PATH_SVG, encoding='utf-8') as f:
-        tree = ET.parse(f)
+    with open(path_svg, encoding='utf-8') as f:
+        tree = ET.parse(f)  # nosec B314
     root = tree.getroot()
     # namespaces = dict([node for _, node in ET.iterparse(PATH_SVG, events=['start-ns'])])
     namespaces = {'inkscape': "http://www.inkscape.org/namespaces/inkscape",
@@ -96,7 +103,7 @@ def update_splashscreen(version: str = None,
         node_bar = root.find(".//*[@inkscape:label='LowerBar']", namespaces)
         node_bar.attrib['style'] = 'display:none'
 
-    PATH_EXPORT_TMP = PATH_SVG.parent / 'splashscreen_tmp.svg'
+    PATH_EXPORT_TMP = path_svg.parent / 'splashscreen_tmp.svg'
 
     # PATH_EXPORT = PATH_SVG
     tree.write(PATH_EXPORT_TMP, encoding='utf8')
@@ -115,7 +122,8 @@ def update_splashscreen(version: str = None,
     print('to export the svg as png with Inkscape (https://inkscape.org)')
     # we use nosec B603 here because we need inkscape exe from command line
     subprocess.run(cmd, check=True)  # nosec B603 # we need inkscape from command line
-    os.remove(PATH_EXPORT_TMP)
+    if not keep_tmp:
+        os.remove(PATH_EXPORT_TMP)
 
 
 if __name__ == "__main__":
@@ -124,7 +132,8 @@ if __name__ == "__main__":
     parser.add_argument('-v', '--version',
                         required=False,
                         default=None,
-                        help='A version string with major and minor version, like "3.12"')
+                        help='A version string with major and minor version, like "3.12". '
+                             'Defaults to the version in tox.ini')
 
     parser.add_argument('-p', '--pure',
                         required=False,
@@ -132,10 +141,22 @@ if __name__ == "__main__":
                         action='store_true',
                         help='Pure splashscreen, without the lower bar to show the loading status.')
 
+    parser.add_argument('--svg',
+                        required=False,
+                        default=PATH_SVG,
+                        help=f'Path of SVG master file. Defaults to {PATH_SVG}')
+
     parser.add_argument('--png',
                         required=False,
-                        default=PATH_SPLASHSCREEN,
-                        help=f'Path of PNG file to create. Defaults to {PATH_SPLASHSCREEN}')
+                        default=PATH_PNG,
+                        help=f'Path of PNG file to create. Defaults to {PATH_PNG}')
+
+    parser.add_argument('-t', '--keep-tmp',
+                        required=False,
+                        default=False,
+                        action='store_true',
+                        help='Keep the temporary SVG file (splashscreen_tmp.svg) and do not delete it.')
 
     args = parser.parse_args()
-    update_splashscreen(version=args.version, pure=args.pure)
+    update_splashscreen(version=args.version, pure=args.pure, path_png=args.png, path_svg=args.svg,
+                        keep_tmp=args.keep_tmp)

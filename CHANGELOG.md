@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## Version 4.0 (2026-11-20)
+
+* converted EnMAP-Box to QGIS 4 and Qt 6 API
+* improved support for raster datasets with spectral information
+
 ## Version 3.17.9 (2026-09-02)
 
 * fixes drag and drop of raster layers onto an empty EnMAP-Box
