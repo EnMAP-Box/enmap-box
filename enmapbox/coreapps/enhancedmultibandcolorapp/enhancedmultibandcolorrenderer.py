@@ -3,14 +3,12 @@ from typing import List, Optional, Tuple
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsRasterRenderer, QgsRasterInterface, QgsRectangle, QgsRasterBlockFeedback, QgsRasterBlock, \
     Qgis
 
 
-@typechecked
 class EnhancedMultiBandColorRenderer(QgsRasterRenderer):
     colors: Optional[List[QColor]]
     minMaxValues: Optional[List[Tuple[float, float]]]
@@ -115,7 +113,7 @@ class EnhancedMultiBandColorRenderer(QgsRasterRenderer):
         # convert back to QGIS raster block
         rgba = np.array([r, g, b, a], dtype=np.uint32)
         outarray = (rgba[0] << 16) + (rgba[1] << 8) + rgba[2] + (rgba[3] << 24)
-        return Utils.numpyArrayToQgsRasterBlock(outarray, Qgis.ARGB32_Premultiplied)
+        return Utils.numpyArrayToQgsRasterBlock(outarray, Qgis.DataType.ARGB32_Premultiplied)
 
     def clone(self) -> QgsRasterRenderer:
         renderer = EnhancedMultiBandColorRenderer(self.input())

@@ -18,8 +18,8 @@ def display_error(parent, msg):
         parent,
         "EnSoMAP - Error",
         msg,
-        QMessageBox.Ok,
-        QMessageBox.Ok
+        QMessageBox.StandardButton.Ok,
+        QMessageBox.StandardButton.Ok
     )
 
 
@@ -28,8 +28,8 @@ def display_information(parent, msg):
         parent,
         "EnSoMAP - Information",
         msg,
-        QMessageBox.Ok,
-        QMessageBox.Ok
+        QMessageBox.StandardButton.Ok,
+        QMessageBox.StandardButton.Ok
     )
 
 

@@ -1,9 +1,6 @@
 from typing import TextIO, List, Tuple, Union
 
-from enmapbox.typeguard import typechecked
 
-
-@typechecked
 class HtmlReportWriter(object):
 
     def __init__(self, file: TextIO):
@@ -227,7 +224,6 @@ class HtmlReportWriter(object):
         self.file.writelines(['</tr>'])
 
 
-@typechecked
 class CsvReportWriter(object):
 
     def __init__(self, file: TextIO):
@@ -306,7 +302,6 @@ class CsvReportWriter(object):
         self.file.writelines([self._formatRow(values, header)])
 
 
-@typechecked
 class MultiReportWriter(object):
 
     def __init__(self, reports: List[Union[HtmlReportWriter, CsvReportWriter]]):

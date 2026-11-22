@@ -6,10 +6,8 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.parameter.processingparametercodeeditwidget import ProcessingParameterCodeEditWidgetWrapper
 from enmapboxprocessing.rasterwriter import RasterWriter
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterString)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class VrtBandMathAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_BAND_LIST, _BAND_LIST = 'bandList', 'Selected bands'

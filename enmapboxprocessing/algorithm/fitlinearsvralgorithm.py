@@ -1,8 +1,6 @@
 from enmapboxprocessing.algorithm.fitregressoralgorithmbase import FitRegressorAlgorithmBase
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class FitLinearSvrAlgorithm(FitRegressorAlgorithmBase):
 
     def displayName(self) -> str:

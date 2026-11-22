@@ -3,14 +3,12 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
 
 
-@typechecked
 class PrepareClassificationDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
     P_CODE, _CODE = 'code', 'Code'
     P_OUTPUT_DATASET, _OUTPUT_DATASET = 'outputClassificationDataset', 'Output dataset'
@@ -62,7 +60,7 @@ class PrepareClassificationDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
         return lines
 
     def classifierDump(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext
+            self, parameters: Dict[str, Any], context: QgsProcessingContext
     ) -> ClassifierDump:
         namespace = dict()
         code = self.parameterAsString(parameters, self.P_CODE, context)
@@ -84,7 +82,7 @@ class PrepareClassificationDatasetFromCodeAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         filename = self.parameterAsFileOutput(parameters, self.P_OUTPUT_DATASET, context)
 

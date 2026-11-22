@@ -27,11 +27,10 @@ import re
 import shutil
 import sys
 import textwrap
-import typing
 import warnings
 from os.path import exists
 from pathlib import Path
-from typing import Union
+from typing import Union, Optional, Iterator, Pattern
 
 import docutils.core
 import markdown
@@ -76,7 +75,7 @@ if not PATH_CONFIG_FILE.is_file():
     raise FileNotFoundError(f'Config file not found: {PATH_CONFIG_FILE}')
 
 
-def scanfiles(root: typing.Union[str, Path]) -> typing.Iterator[Path]:
+def scanfiles(root: Union[str, Path]) -> Iterator[Path]:
     """
     Recursively returns file paths in directory
     :param root: root directory to search in
@@ -93,7 +92,7 @@ def scanfiles(root: typing.Union[str, Path]) -> typing.Iterator[Path]:
                 yield path
 
 
-def fileRegex(root: typing.Optional[str], pattern: str) -> typing.Pattern:
+def fileRegex(root: Optional[str], pattern: str) -> Pattern:
     """
     Create a regex to match a file pattern
     :param root:
@@ -119,7 +118,7 @@ def create_enmapbox_plugin(include_testdata: bool = False,
                            include_qgisresources: bool = False,
                            create_zip: bool = True,
                            copy_to_profile: bool = False,
-                           build_name: str = None) -> typing.Optional[Path]:
+                           build_name: str | None = None) -> Optional[Path]:
     if not (DIR_REPO / '.git').is_dir():
         raise NotADirectoryError(f'Not a git repository! {DIR_REPO}')
 
@@ -204,13 +203,21 @@ def create_enmapbox_plugin(include_testdata: bool = False,
     MD.mQgisMaximumVersion = config['enmapbox:metadata'].get('qgisMaximumVersion', '3.99')
     MD.mEmail = config['enmapbox:metadata']['email']
     MD.mHasProcessingProvider = True
+    MD.supportsQt6 = True
 
     MD.mVersion = VERSION
     MD.writeMetadataTxt(PATH_METADATAFILE)
 
+    # WORKAROUND: set 'supportsQt6 = True' manually (needs to be done in QPS)
+    with open(PATH_METADATAFILE, 'a') as file:
+        file.write(f'\nsupportsQt6={MD.supportsQt6}')
+
     # (re)-compile all enmapbox resource files
     from scripts.compile_resourcefiles import compileEnMAPBoxResources
-    compileEnMAPBoxResources()
+    try:
+        compileEnMAPBoxResources()
+    except FileNotFoundError as ex:
+        warnings.warn(str(ex))
 
     # copy EnMAP-Box icon source
     path_icon_source = DIR_REPO / config['enmapbox:files']['icon']

@@ -7,10 +7,8 @@ from enmapboxprocessing.enmapalgorithm import Group, EnMAPProcessingAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from qgis.core import Qgis, QgsProcessingContext, QgsProcessingFeedback
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class RasterLayerZonalAggregationAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_CATEGORIZED_RASTER, _CATEGORIZED_RASTER = 'categorizedRaster', 'Categorized raster layer'
@@ -59,7 +57,7 @@ class RasterLayerZonalAggregationAlgorithm(EnMAPProcessingAlgorithm):
 
             rasterReader = RasterReader(raster)
             zoneReader = RasterReader(zoneRaster)
-            lineMemoryUsage = rasterReader.lineMemoryUsage(1, Qgis.Float32)
+            lineMemoryUsage = rasterReader.lineMemoryUsage(1, Qgis.DataType.Float32)
             blockSizeY = min(raster.height(), ceil(Utils.maximumMemoryUsage() / lineMemoryUsage))
             blockSizeX = raster.width()
             for block in rasterReader.walkGrid(blockSizeX, blockSizeY, feedback):

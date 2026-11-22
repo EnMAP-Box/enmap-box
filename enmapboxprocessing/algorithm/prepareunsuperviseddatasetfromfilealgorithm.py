@@ -6,10 +6,8 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class PrepareUnsupervisedDatasetFromFileAlgorithm(EnMAPProcessingAlgorithm):
     P_FEATURE_FILE, _FEATURE_FILE = 'featureFile', 'File with features'
     P_OUTPUT_DATASET, _OUTPUT_DATASET = 'outputUnsupervisedDataset', 'Output dataset'

@@ -1,9 +1,7 @@
 from enmapboxprocessing.extentwalker import ExtentWalker
 from qgis.core import QgsRectangle, QgsProcessingFeedback
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class GridWalker(ExtentWalker):
 
     def __init__(

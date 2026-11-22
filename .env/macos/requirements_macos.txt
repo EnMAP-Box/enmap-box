@@ -1,5 +1,6 @@
 colorama # required by PyQtGraph
 pyqtgraph
+spyndex
 
 # required by parts of EnMAP-Box Core
 astropy # required for convolution
@@ -15,3 +16,12 @@ sympy # required by EnSoMAP
 numba>=0.57 # required by EnSoMAP
 enpt-enmapboxapp # required by EnPT
 scikit-learn>=1.0
+pyvista # required by Spectral Surface Plotting
+pyvistaqt # required by Spectral Surface Plotting
+plotly # required by Land Cover Change Statistics
+eniccs #  required by EnICCS
+
+# development
+flake8
+flake8-qgis
+bandit

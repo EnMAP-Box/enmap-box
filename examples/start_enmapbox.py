@@ -1,6 +1,10 @@
 from enmapbox import initAll
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.testing import start_app
+import os
+
+os.environ["QTWEBENGINE_DISABLE_SANDBOX"] = "1"
+os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--disable-gpu-compositing"
 
 qgsApp = start_app()
 

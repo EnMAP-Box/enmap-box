@@ -105,7 +105,7 @@ class Tensorboard_visualizer(QgsProcessingAlgorithm):
             QgsProcessingParameterNumber(
                 self.TENSORBOARD_PORT,
                 self.tr("TensorBoard Port"),
-                QgsProcessingParameterNumber.Integer,
+                QgsProcessingParameterNumber.Type.Integer,
                 defaultValue=6006,
                 optional=True
             )

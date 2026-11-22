@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1095</width>
-    <height>696</height>
+    <width>1397</width>
+    <height>863</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -33,14 +33,14 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="documentMode">
        <bool>true</bool>
       </property>
       <widget class="QWidget" name="tab_13">
        <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
+        <enum>Qt::LayoutDirection::LeftToRight</enum>
        </property>
        <attribute name="title">
         <string>Quick Mapping</string>
@@ -98,7 +98,7 @@
             <property name="currentIndex">
              <number>-1</number>
             </property>
-            <property name="allowEmptyLayer">
+            <property name="allowEmptyLayer" stdset="0">
              <bool>true</bool>
             </property>
            </widget>
@@ -124,40 +124,28 @@
            </widget>
           </item>
           <item row="4" column="1">
-           <widget class="QgsFileWidget" name="mQuickFilePredictedClassification">
+           <widget class="QgsFileWidget" name="mQuickFilePredictedClassification" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="filter">
+            <property name="filter" stdset="0">
              <string>*.tif</string>
-            </property>
-            <property name="storageMode">
-             <enum>QgsFileWidget::SaveFile</enum>
-            </property>
-            <property name="relativeStorage">
-             <enum>QgsFileWidget::RelativeDefaultPath</enum>
             </property>
            </widget>
           </item>
           <item row="5" column="1">
-           <widget class="QgsFileWidget" name="mQuickFilePredictedProbability">
+           <widget class="QgsFileWidget" name="mQuickFilePredictedProbability" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="filter">
+            <property name="filter" stdset="0">
              <string>*.tif</string>
-            </property>
-            <property name="storageMode">
-             <enum>QgsFileWidget::SaveFile</enum>
-            </property>
-            <property name="relativeStorage">
-             <enum>QgsFileWidget::RelativeDefaultPath</enum>
             </property>
            </widget>
           </item>
@@ -193,7 +181,7 @@
            <item row="0" column="2">
             <spacer name="horizontalSpacer_8">
              <property name="orientation">
-              <enum>Qt::Horizontal</enum>
+              <enum>Qt::Orientation::Horizontal</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -220,7 +208,6 @@
              <property name="font">
               <font>
                <pointsize>10</pointsize>
-               <weight>75</weight>
                <bold>true</bold>
               </font>
              </property>
@@ -240,7 +227,7 @@
               </size>
              </property>
              <property name="toolButtonStyle">
-              <enum>Qt::ToolButtonTextUnderIcon</enum>
+              <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -250,7 +237,7 @@
            <item row="0" column="0">
             <spacer name="horizontalSpacer_7">
              <property name="orientation">
-              <enum>Qt::Horizontal</enum>
+              <enum>Qt::Orientation::Horizontal</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -266,7 +253,7 @@
         <item>
          <spacer name="verticalSpacer_2">
           <property name="orientation">
-           <enum>Qt::Vertical</enum>
+           <enum>Qt::Orientation::Vertical</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -393,27 +380,21 @@
                <item row="1" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_27">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileDataset">
+                  <widget class="QgsFileWidget" name="mFileDataset" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>2</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="dialogTitle">
+                   <property name="dialogTitle" stdset="0">
                     <string/>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.skops</string>
                    </property>
-                   <property name="defaultRoot">
+                   <property name="defaultRoot" stdset="0">
                     <string/>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -438,7 +419,7 @@
                     </size>
                    </property>
                    <property name="toolButtonStyle">
-                    <enum>Qt::ToolButtonIconOnly</enum>
+                    <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
                    </property>
                    <property name="autoRaise">
                     <bool>true</bool>
@@ -453,7 +434,7 @@
                   <bool>false</bool>
                  </property>
                  <property name="layoutDirection">
-                  <enum>Qt::LeftToRight</enum>
+                  <enum>Qt::LayoutDirection::LeftToRight</enum>
                  </property>
                  <property name="text">
                   <string>0 samples 0 features 0 categories
@@ -479,7 +460,7 @@
                   </size>
                  </property>
                  <property name="toolButtonStyle">
-                  <enum>Qt::ToolButtonTextBesideIcon</enum>
+                  <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
                  </property>
                  <property name="autoRaise">
                   <bool>false</bool>
@@ -523,7 +504,7 @@
                  <item>
                   <widget class="QgsDoubleSpinBox" name="mRelativeSizeValue">
                    <property name="buttonSymbols">
-                    <enum>QAbstractSpinBox::NoButtons</enum>
+                    <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                    </property>
                    <property name="prefix">
                     <string/>
@@ -537,7 +518,7 @@
                    <property name="value">
                     <double>70.000000000000000</double>
                    </property>
-                   <property name="showClearButton">
+                   <property name="showClearButton" stdset="0">
                     <bool>false</bool>
                    </property>
                   </widget>
@@ -552,7 +533,7 @@
                  <item>
                   <widget class="QgsSpinBox" name="mAbsoluteSizeValue">
                    <property name="buttonSymbols">
-                    <enum>QAbstractSpinBox::NoButtons</enum>
+                    <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                    </property>
                    <property name="suffix">
                     <string/>
@@ -563,7 +544,7 @@
                    <property name="maximum">
                     <number>999999999</number>
                    </property>
-                   <property name="showClearButton">
+                   <property name="showClearButton" stdset="0">
                     <bool>false</bool>
                    </property>
                   </widget>
@@ -571,7 +552,7 @@
                  <item>
                   <spacer name="horizontalSpacer_11">
                    <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
+                    <enum>Qt::Orientation::Horizontal</enum>
                    </property>
                    <property name="sizeHint" stdset="0">
                     <size>
@@ -609,7 +590,7 @@
                     </size>
                    </property>
                    <property name="toolButtonStyle">
-                    <enum>Qt::ToolButtonIconOnly</enum>
+                    <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
                    </property>
                    <property name="autoRaise">
                     <bool>true</bool>
@@ -640,7 +621,7 @@
                     </size>
                    </property>
                    <property name="toolButtonStyle">
-                    <enum>Qt::ToolButtonIconOnly</enum>
+                    <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
                    </property>
                    <property name="autoRaise">
                     <bool>true</bool>
@@ -672,7 +653,7 @@
                     </size>
                    </property>
                    <property name="toolButtonStyle">
-                    <enum>Qt::ToolButtonIconOnly</enum>
+                    <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
                    </property>
                    <property name="autoRaise">
                     <bool>true</bool>
@@ -682,7 +663,7 @@
                  <item>
                   <spacer name="horizontalSpacer_16">
                    <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
+                    <enum>Qt::Orientation::Horizontal</enum>
                    </property>
                    <property name="sizeHint" stdset="0">
                     <size>
@@ -725,10 +706,10 @@
                   <item>
                    <widget class="QTabWidget" name="tab_18">
                     <property name="tabPosition">
-                     <enum>QTabWidget::West</enum>
+                     <enum>QTabWidget::TabPosition::West</enum>
                     </property>
                     <property name="tabShape">
-                     <enum>QTabWidget::Rounded</enum>
+                     <enum>QTabWidget::TabShape::Rounded</enum>
                     </property>
                     <property name="currentIndex">
                      <number>0</number>
@@ -874,7 +855,7 @@
                        </size>
                       </property>
                       <property name="toolButtonStyle">
-                       <enum>Qt::ToolButtonIconOnly</enum>
+                       <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
                       </property>
                       <property name="autoRaise">
                        <bool>true</bool>
@@ -895,7 +876,7 @@
                                                                                             </string>
                       </property>
                       <property name="layoutDirection">
-                       <enum>Qt::LeftToRight</enum>
+                       <enum>Qt::LayoutDirection::LeftToRight</enum>
                       </property>
                       <property name="text">
                        <string>Save</string>
@@ -913,7 +894,7 @@
                        </size>
                       </property>
                       <property name="toolButtonStyle">
-                       <enum>Qt::ToolButtonIconOnly</enum>
+                       <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
                       </property>
                       <property name="autoRaise">
                        <bool>true</bool>
@@ -923,7 +904,7 @@
                     <item>
                      <spacer name="verticalSpacer_4">
                       <property name="orientation">
-                       <enum>Qt::Vertical</enum>
+                       <enum>Qt::Orientation::Vertical</enum>
                       </property>
                       <property name="sizeHint" stdset="0">
                        <size>
@@ -950,21 +931,15 @@
                <item row="3" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_31">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileTrainingDataset">
+                  <widget class="QgsFileWidget" name="mFileTrainingDataset" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>2</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.skops</string>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -989,7 +964,7 @@
                     </size>
                    </property>
                    <property name="toolButtonStyle">
-                    <enum>Qt::ToolButtonIconOnly</enum>
+                    <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
                    </property>
                    <property name="autoRaise">
                     <bool>true</bool>
@@ -1004,7 +979,7 @@
                   <bool>false</bool>
                  </property>
                  <property name="layoutDirection">
-                  <enum>Qt::LeftToRight</enum>
+                  <enum>Qt::LayoutDirection::LeftToRight</enum>
                  </property>
                  <property name="text">
                   <string>0 samples 0 features 0 categories
@@ -1024,21 +999,15 @@
                <item row="5" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_32">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileTestDataset">
+                  <widget class="QgsFileWidget" name="mFileTestDataset" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>2</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.skops</string>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -1063,7 +1032,7 @@
                     </size>
                    </property>
                    <property name="toolButtonStyle">
-                    <enum>Qt::ToolButtonIconOnly</enum>
+                    <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
                    </property>
                    <property name="autoRaise">
                     <bool>true</bool>
@@ -1078,7 +1047,7 @@
                   <bool>false</bool>
                  </property>
                  <property name="layoutDirection">
-                  <enum>Qt::LeftToRight</enum>
+                  <enum>Qt::LayoutDirection::LeftToRight</enum>
                  </property>
                  <property name="text">
                   <string>0 samples 0 features 0 categories
@@ -1107,7 +1076,7 @@
                   </size>
                  </property>
                  <property name="toolButtonStyle">
-                  <enum>Qt::ToolButtonTextBesideIcon</enum>
+                  <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
                  </property>
                  <property name="autoRaise">
                   <bool>false</bool>
@@ -1240,21 +1209,15 @@
                <item row="2" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_36">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileClusteringReport">
+                  <widget class="QgsFileWidget" name="mFileClusteringReport" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>2</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.html</string>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -1279,7 +1242,7 @@
                     </size>
                    </property>
                    <property name="toolButtonStyle">
-                    <enum>Qt::ToolButtonIconOnly</enum>
+                    <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
                    </property>
                    <property name="autoRaise">
                     <bool>true</bool>
@@ -1300,7 +1263,7 @@
                                                                                 :/images/themes/default/processingAlgorithm.svg</iconset>
                  </property>
                  <property name="toolButtonStyle">
-                  <enum>Qt::ToolButtonTextBesideIcon</enum>
+                  <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
                  </property>
                 </widget>
                </item>
@@ -1338,7 +1301,7 @@
                  <item>
                   <spacer name="horizontalSpacer_13">
                    <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
+                    <enum>Qt::Orientation::Horizontal</enum>
                    </property>
                    <property name="sizeHint" stdset="0">
                     <size>
@@ -1362,7 +1325,7 @@
                <item row="1" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_40">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileTrainingDatasetClustered">
+                  <widget class="QgsFileWidget" name="mFileTrainingDatasetClustered" native="true">
                    <property name="enabled">
                     <bool>true</bool>
                    </property>
@@ -1372,17 +1335,11 @@
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="fileWidgetButtonVisible">
+                   <property name="fileWidgetButtonVisible" stdset="0">
                     <bool>true</bool>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.skops</string>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -1407,7 +1364,7 @@
                     </size>
                    </property>
                    <property name="toolButtonStyle">
-                    <enum>Qt::ToolButtonIconOnly</enum>
+                    <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
                    </property>
                    <property name="autoRaise">
                     <bool>true</bool>
@@ -1422,7 +1379,7 @@
                   <bool>false</bool>
                  </property>
                  <property name="layoutDirection">
-                  <enum>Qt::LeftToRight</enum>
+                  <enum>Qt::LayoutDirection::LeftToRight</enum>
                  </property>
                  <property name="text">
                   <string>0 samples 0 features 0 categories
@@ -1442,7 +1399,7 @@
                <item row="3" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_41">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileTestDatasetClustered">
+                  <widget class="QgsFileWidget" name="mFileTestDatasetClustered" native="true">
                    <property name="enabled">
                     <bool>true</bool>
                    </property>
@@ -1452,17 +1409,11 @@
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="fileWidgetButtonVisible">
+                   <property name="fileWidgetButtonVisible" stdset="0">
                     <bool>true</bool>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.skops</string>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -1487,7 +1438,7 @@
                     </size>
                    </property>
                    <property name="toolButtonStyle">
-                    <enum>Qt::ToolButtonIconOnly</enum>
+                    <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
                    </property>
                    <property name="autoRaise">
                     <bool>true</bool>
@@ -1502,7 +1453,7 @@
                   <bool>false</bool>
                  </property>
                  <property name="layoutDirection">
-                  <enum>Qt::LeftToRight</enum>
+                  <enum>Qt::LayoutDirection::LeftToRight</enum>
                  </property>
                  <property name="text">
                   <string>0 samples 0 features 0 categories
@@ -1522,7 +1473,7 @@
                                                                                 :/images/themes/default/processingAlgorithm.svg</iconset>
                  </property>
                  <property name="toolButtonStyle">
-                  <enum>Qt::ToolButtonTextBesideIcon</enum>
+                  <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
                  </property>
                 </widget>
                </item>
@@ -1532,7 +1483,7 @@
             <item>
              <spacer name="verticalSpacer_3">
               <property name="orientation">
-               <enum>Qt::Vertical</enum>
+               <enum>Qt::Orientation::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -1655,21 +1606,15 @@
                <item row="2" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_39">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileRankingReport">
+                  <widget class="QgsFileWidget" name="mFileRankingReport" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>2</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.html</string>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -1694,7 +1639,7 @@
                     </size>
                    </property>
                    <property name="toolButtonStyle">
-                    <enum>Qt::ToolButtonIconOnly</enum>
+                    <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
                    </property>
                    <property name="autoRaise">
                     <bool>true</bool>
@@ -1715,7 +1660,7 @@
                                                                                 :/images/themes/default/processingAlgorithm.svg</iconset>
                  </property>
                  <property name="toolButtonStyle">
-                  <enum>Qt::ToolButtonTextBesideIcon</enum>
+                  <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
                  </property>
                 </widget>
                </item>
@@ -1753,7 +1698,7 @@
                  <item>
                   <spacer name="horizontalSpacer_17">
                    <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
+                    <enum>Qt::Orientation::Horizontal</enum>
                    </property>
                    <property name="sizeHint" stdset="0">
                     <size>
@@ -1777,7 +1722,7 @@
                <item row="1" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_58">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileTrainingDatasetRanked">
+                  <widget class="QgsFileWidget" name="mFileTrainingDatasetRanked" native="true">
                    <property name="enabled">
                     <bool>true</bool>
                    </property>
@@ -1787,17 +1732,11 @@
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="fileWidgetButtonVisible">
+                   <property name="fileWidgetButtonVisible" stdset="0">
                     <bool>true</bool>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.skops</string>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -1822,7 +1761,7 @@
                     </size>
                    </property>
                    <property name="toolButtonStyle">
-                    <enum>Qt::ToolButtonIconOnly</enum>
+                    <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
                    </property>
                    <property name="autoRaise">
                     <bool>true</bool>
@@ -1837,7 +1776,7 @@
                   <bool>false</bool>
                  </property>
                  <property name="layoutDirection">
-                  <enum>Qt::LeftToRight</enum>
+                  <enum>Qt::LayoutDirection::LeftToRight</enum>
                  </property>
                  <property name="text">
                   <string>0 samples 0 features 0 categories
@@ -1857,7 +1796,7 @@
                <item row="3" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_59">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileTestDatasetRanked">
+                  <widget class="QgsFileWidget" name="mFileTestDatasetRanked" native="true">
                    <property name="enabled">
                     <bool>true</bool>
                    </property>
@@ -1867,17 +1806,11 @@
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="fileWidgetButtonVisible">
+                   <property name="fileWidgetButtonVisible" stdset="0">
                     <bool>true</bool>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.skops</string>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -1902,7 +1835,7 @@
                     </size>
                    </property>
                    <property name="toolButtonStyle">
-                    <enum>Qt::ToolButtonIconOnly</enum>
+                    <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
                    </property>
                    <property name="autoRaise">
                     <bool>true</bool>
@@ -1917,7 +1850,7 @@
                   <bool>false</bool>
                  </property>
                  <property name="layoutDirection">
-                  <enum>Qt::LeftToRight</enum>
+                  <enum>Qt::LayoutDirection::LeftToRight</enum>
                  </property>
                  <property name="text">
                   <string>0 samples 0 features 0 categories
@@ -1937,7 +1870,7 @@
                                                                                 :/images/themes/default/processingAlgorithm.svg</iconset>
                  </property>
                  <property name="toolButtonStyle">
-                  <enum>Qt::ToolButtonTextBesideIcon</enum>
+                  <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
                  </property>
                 </widget>
                </item>
@@ -1947,7 +1880,7 @@
             <item>
              <spacer name="verticalSpacer_6">
               <property name="orientation">
-               <enum>Qt::Vertical</enum>
+               <enum>Qt::Orientation::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -2024,21 +1957,15 @@
                <item row="1" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_43">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileClassifierFitted">
+                  <widget class="QgsFileWidget" name="mFileClassifierFitted" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>2</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.skops</string>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -2063,7 +1990,7 @@
                     </size>
                    </property>
                    <property name="toolButtonStyle">
-                    <enum>Qt::ToolButtonIconOnly</enum>
+                    <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
                    </property>
                    <property name="autoRaise">
                     <bool>true</bool>
@@ -2084,7 +2011,7 @@
                                                                                 :/images/themes/default/processingAlgorithm.svg</iconset>
                  </property>
                  <property name="toolButtonStyle">
-                  <enum>Qt::ToolButtonTextBesideIcon</enum>
+                  <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
                  </property>
                 </widget>
                </item>
@@ -2149,7 +2076,7 @@
                <item row="1" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_45">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileClassifierPerformanceReport">
+                  <widget class="QgsFileWidget" name="mFileClassifierPerformanceReport" native="true">
                    <property name="enabled">
                     <bool>true</bool>
                    </property>
@@ -2159,17 +2086,11 @@
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="fileWidgetButtonVisible">
+                   <property name="fileWidgetButtonVisible" stdset="0">
                     <bool>true</bool>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.html</string>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -2194,7 +2115,7 @@
                     </size>
                    </property>
                    <property name="toolButtonStyle">
-                    <enum>Qt::ToolButtonIconOnly</enum>
+                    <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
                    </property>
                    <property name="autoRaise">
                     <bool>true</bool>
@@ -2215,7 +2136,7 @@
                                                                                 :/images/themes/default/processingAlgorithm.svg</iconset>
                  </property>
                  <property name="toolButtonStyle">
-                  <enum>Qt::ToolButtonTextBesideIcon</enum>
+                  <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
                  </property>
                 </widget>
                </item>
@@ -2225,7 +2146,7 @@
             <item>
              <spacer name="verticalSpacer">
               <property name="orientation">
-               <enum>Qt::Vertical</enum>
+               <enum>Qt::Orientation::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -2272,7 +2193,7 @@
                  <property name="currentIndex">
                   <number>-1</number>
                  </property>
-                 <property name="allowEmptyLayer">
+                 <property name="allowEmptyLayer" stdset="0">
                   <bool>true</bool>
                  </property>
                 </widget>
@@ -2288,21 +2209,15 @@
                 </widget>
                </item>
                <item row="2" column="1">
-                <widget class="QgsFileWidget" name="mFilePredictedClassification">
+                <widget class="QgsFileWidget" name="mFilePredictedClassification" native="true">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
-                 <property name="filter">
+                 <property name="filter" stdset="0">
                   <string>*.tif</string>
-                 </property>
-                 <property name="storageMode">
-                  <enum>QgsFileWidget::SaveFile</enum>
-                 </property>
-                 <property name="relativeStorage">
-                  <enum>QgsFileWidget::RelativeDefaultPath</enum>
                  </property>
                 </widget>
                </item>
@@ -2314,21 +2229,15 @@
                 </widget>
                </item>
                <item row="3" column="1">
-                <widget class="QgsFileWidget" name="mFilePredictedProbability">
+                <widget class="QgsFileWidget" name="mFilePredictedProbability" native="true">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
-                 <property name="filter">
+                 <property name="filter" stdset="0">
                   <string>*.tif</string>
-                 </property>
-                 <property name="storageMode">
-                  <enum>QgsFileWidget::SaveFile</enum>
-                 </property>
-                 <property name="relativeStorage">
-                  <enum>QgsFileWidget::RelativeDefaultPath</enum>
                  </property>
                 </widget>
                </item>
@@ -2356,7 +2265,7 @@
                                                                                 :/images/themes/default/processingAlgorithm.svg</iconset>
                  </property>
                  <property name="toolButtonStyle">
-                  <enum>Qt::ToolButtonTextBesideIcon</enum>
+                  <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
                  </property>
                 </widget>
                </item>
@@ -2403,7 +2312,7 @@
                  <property name="currentIndex">
                   <number>-1</number>
                  </property>
-                 <property name="allowEmptyLayer">
+                 <property name="allowEmptyLayer" stdset="0">
                   <bool>true</bool>
                  </property>
                 </widget>
@@ -2418,7 +2327,7 @@
                <item row="2" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_51">
                  <item>
-                  <widget class="QgsFileWidget" name="mFileClassificationPerformanceReport">
+                  <widget class="QgsFileWidget" name="mFileClassificationPerformanceReport" native="true">
                    <property name="enabled">
                     <bool>true</bool>
                    </property>
@@ -2428,17 +2337,11 @@
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="fileWidgetButtonVisible">
+                   <property name="fileWidgetButtonVisible" stdset="0">
                     <bool>true</bool>
                    </property>
-                   <property name="filter">
+                   <property name="filter" stdset="0">
                     <string>*.tif</string>
-                   </property>
-                   <property name="storageMode">
-                    <enum>QgsFileWidget::SaveFile</enum>
-                   </property>
-                   <property name="relativeStorage">
-                    <enum>QgsFileWidget::Absolute</enum>
                    </property>
                   </widget>
                  </item>
@@ -2463,7 +2366,7 @@
                     </size>
                    </property>
                    <property name="toolButtonStyle">
-                    <enum>Qt::ToolButtonIconOnly</enum>
+                    <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
                    </property>
                    <property name="autoRaise">
                     <bool>true</bool>
@@ -2484,7 +2387,7 @@
                                                                                 :/images/themes/default/processingAlgorithm.svg</iconset>
                  </property>
                  <property name="toolButtonStyle">
-                  <enum>Qt::ToolButtonTextBesideIcon</enum>
+                  <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
                  </property>
                 </widget>
                </item>
@@ -2506,7 +2409,7 @@
                  <property name="currentIndex">
                   <number>-1</number>
                  </property>
-                 <property name="allowEmptyLayer">
+                 <property name="allowEmptyLayer" stdset="0">
                   <bool>true</bool>
                  </property>
                 </widget>
@@ -2517,7 +2420,7 @@
             <item>
              <spacer name="verticalSpacer_7">
               <property name="orientation">
-               <enum>Qt::Vertical</enum>
+               <enum>Qt::Orientation::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -2550,7 +2453,7 @@
            <string>Output directory</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
           </property>
          </widget>
         </item>
@@ -2600,11 +2503,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QgsFileWidget" name="mWorkingDirectory">
-            <property name="storageMode">
-             <enum>QgsFileWidget::GetDirectory</enum>
-            </property>
-           </widget>
+           <widget class="QgsFileWidget" name="mWorkingDirectory" native="true"/>
           </item>
           <item>
            <widget class="QToolButton" name="mOpenWorkingDirectory">
@@ -2637,24 +2536,27 @@
         <item>
          <widget class="QTextEdit" name="mLog">
           <property name="layoutDirection">
-           <enum>Qt::LeftToRight</enum>
+           <enum>Qt::LayoutDirection::LeftToRight</enum>
           </property>
           <property name="lineWrapMode">
-           <enum>QTextEdit::NoWrap</enum>
+           <enum>QTextEdit::LineWrapMode::NoWrap</enum>
           </property>
           <property name="readOnly">
            <bool>true</bool>
           </property>
           <property name="html">
            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;                                                &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;                                            &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: &quot;\2610&quot;; }
+li.checked::marker { content: &quot;\2612&quot;; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'B612'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt;&quot;&gt;                                                &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt;&quot;&gt;                                            &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="textInteractionFlags">
-           <set>Qt::TextSelectableByMouse</set>
+           <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
           </property>
          </widget>
         </item>
@@ -2687,7 +2589,7 @@ p, li { white-space: pre-wrap; }
              </size>
             </property>
             <property name="toolButtonStyle">
-             <enum>Qt::ToolButtonIconOnly</enum>
+             <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
             </property>
             <property name="autoRaise">
              <bool>true</bool>
@@ -2697,7 +2599,7 @@ p, li { white-space: pre-wrap; }
           <item>
            <spacer name="verticalSpacer_5">
             <property name="orientation">
-             <enum>Qt::Vertical</enum>
+             <enum>Qt::Orientation::Vertical</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -2793,7 +2695,7 @@ p, li { white-space: pre-wrap; }
           <item>
            <spacer name="horizontalSpacer">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -2821,7 +2723,7 @@ p, li { white-space: pre-wrap; }
              </size>
             </property>
             <property name="toolButtonStyle">
-             <enum>Qt::ToolButtonIconOnly</enum>
+             <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
             </property>
             <property name="autoRaise">
              <bool>true</bool>
@@ -2831,12 +2733,23 @@ p, li { white-space: pre-wrap; }
          </layout>
         </item>
         <item>
-         <widget class="QWebView" name="mWebView" native="true">
+         <widget class="QWebEngineView" name="mWebView">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>1</verstretch>
            </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>50</height>
+           </size>
+          </property>
+          <property name="url">
+           <url>
+            <string>about:blank</string>
+           </url>
           </property>
          </widget>
         </item>
@@ -2851,13 +2764,18 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1095</width>
-     <height>21</height>
+     <width>1397</width>
+     <height>25</height>
     </rect>
    </property>
   </widget>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QWebEngineView</class>
+   <extends>QWidget</extends>
+   <header location="global">QtWebEngineWidgets/QWebEngineView</header>
+  </customwidget>
   <customwidget>
    <class>QgsDoubleSpinBox</class>
    <extends>QDoubleSpinBox</extends>
@@ -2888,12 +2806,6 @@ p, li { white-space: pre-wrap; }
    <class>ProcessingParameterSkopsFileClassificationDatasetWidget</class>
    <extends>QWidget</extends>
    <header>enmapboxprocessing.parameter.processingparameterskopsfileclassificationdatasetwidget</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QWebView</class>
-   <extends>QWidget</extends>
-   <header>PyQt5.QtWebKitWidgets</header>
    <container>1</container>
   </customwidget>
   <customwidget>

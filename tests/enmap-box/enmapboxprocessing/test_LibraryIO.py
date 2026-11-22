@@ -35,8 +35,8 @@ class TestLibraryIO(TestCase):
         writer = LibraryDriver().create('My Library')
         writer.addProfileAttribute('profile1', ProfileEncoding.Text)
         writer.addProfileAttribute('profile2', ProfileEncoding.Text)
-        writer.addAttribute('name', QMetaType.QString)
-        writer.addAttribute('my field', QMetaType.QString)
+        writer.addAttribute('name', QMetaType.Type.QString)
+        writer.addAttribute('my field', QMetaType.Type.QString)
 
         # add data
         writer.addFeature(values, geometry)

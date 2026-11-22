@@ -212,7 +212,7 @@ class ExampleProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         self.addParameter(QgsProcessingParameterRasterLayer('pathInput', 'The Input Dataset'))
         self.addParameter(
-            QgsProcessingParameterNumber('value', 'The value', QgsProcessingParameterNumber.Double, 1, False, 0.00,
+            QgsProcessingParameterNumber('value', 'The value', QgsProcessingParameterNumber.Type.Double, 1, False, 0.00,
                                          999999.99))
         self.addParameter(QgsProcessingParameterRasterDestination('pathOutput', 'The Output Dataset'))
 
@@ -287,26 +287,26 @@ class ExampleProcessingAlgorithmWithManyWidgets(QgsProcessingAlgorithm):
 
         self.addParameter(QgsProcessingParameterField(name=self.P_VECTOR_FIELD, description='Vector Layer Field',
                                                       parentLayerParameterName=self.P_VECTOR,
-                                                      type=QgsProcessingParameterField.Any,
+                                                      type=QgsProcessingParameterField.DataType.Any,
                                                       allowMultiple=False, defaultValue=None, optional=True))
 
         self.addParameter(QgsProcessingParameterMapLayer(name=self.P_MAP, description='Map Layer',
                                                          defaultValue=None, optional=True))
 
         self.addParameter(QgsProcessingParameterFile(name=self.P_FILE, description='File',
-                                                     behavior=QgsProcessingParameterFile.File, extension='',
+                                                     behavior=QgsProcessingParameterFile.Behavior.File, extension='',
                                                      defaultValue=None, optional=True))
 
         self.addParameter(QgsProcessingParameterFile(name=self.P_FOLDER, description='Folder',
-                                                     behavior=QgsProcessingParameterFile.Folder,
+                                                     behavior=QgsProcessingParameterFile.Behavior.Folder,
                                                      defaultValue=None, optional=True))
 
         self.addParameter(QgsProcessingParameterNumber(name=self.P_INTEGER, description='Integer',
-                                                       type=QgsProcessingParameterNumber.Integer,
+                                                       type=QgsProcessingParameterNumber.Type.Integer,
                                                        defaultValue=0, optional=False, minValue=0, maxValue=10))
 
         self.addParameter(QgsProcessingParameterNumber(name=self.P_FLOAT, description='Float',
-                                                       type=QgsProcessingParameterNumber.Double,
+                                                       type=QgsProcessingParameterNumber.Type.Double,
                                                        defaultValue=0.0, optional=False, minValue=0, maxValue=10))
 
         self.addParameter(QgsProcessingParameterString(name=self.P_STRING, description='String',

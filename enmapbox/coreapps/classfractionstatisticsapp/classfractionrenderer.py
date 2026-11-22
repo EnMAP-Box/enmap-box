@@ -2,15 +2,13 @@ from copy import deepcopy
 from typing import List, Optional
 
 import numpy as np
+
+from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtGui import QColor
 from qgis.core import QgsRasterRenderer, QgsRasterInterface, QgsRectangle, QgsRasterBlockFeedback, QgsRasterBlock, \
     Qgis
 
-from enmapboxprocessing.utils import Utils
-from enmapbox.typeguard import typechecked
 
-
-@typechecked
 class ClassFractionRenderer(QgsRasterRenderer):
 
     def __init__(self, input: QgsRasterInterface, type: str = ''):
@@ -49,7 +47,7 @@ class ClassFractionRenderer(QgsRasterRenderer):
                 r += color.red() * weight
                 g += color.green() * weight
                 b += color.blue() * weight
-                a[weight > 0] = 255   # every used pixel gets full opacity
+                a[weight > 0] = 255  # every used pixel gets full opacity
 
         # clip RGBs to 0-255, in case the assumptions where violated
         np.clip(r, 0, 255, r)
@@ -59,7 +57,7 @@ class ClassFractionRenderer(QgsRasterRenderer):
         # convert back to QGIS raster block
         rgba = np.array([r, g, b, a], dtype=np.uint32)
         outarray = (rgba[0] << 16) + (rgba[1] << 8) + rgba[2] + (rgba[3] << 24)
-        return Utils.numpyArrayToQgsRasterBlock(outarray, Qgis.ARGB32_Premultiplied)
+        return Utils.numpyArrayToQgsRasterBlock(outarray, Qgis.DataType.ARGB32_Premultiplied)
 
     def clone(self) -> QgsRasterRenderer:
         renderer = ClassFractionRenderer(self.input())

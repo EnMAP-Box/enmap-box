@@ -3,7 +3,6 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
@@ -13,7 +12,6 @@ from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessing
     QgsCoordinateReferenceSystem, QgsRasterLayer, QgsMapLayer
 
 
-@typechecked
 class ImportEmitL2AAlgorithm(EnMAPProcessingAlgorithm):
     P_FILE, _FILE = 'file', 'NetCDF file'
     P_SKIP_BAD_BANDS, _SKIP_BAD_BANDS = 'skipBadBands', 'Skip bad bands'

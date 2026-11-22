@@ -3,10 +3,8 @@ from typing import Dict, Any, List, Tuple
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class SubsetRasterBandsAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_BAND_LIST, _BAND_LIST = 'bandList', 'Selected bands'

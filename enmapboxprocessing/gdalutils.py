@@ -7,17 +7,15 @@ from typing import List
 import defusedxml.ElementTree as ET
 from osgeo import gdal
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
 from qgis.core import QgsRectangle, QgsProcessingFeedback
 
 
-@typechecked
 class GdalUtils(object):
 
     @staticmethod
     def calculateDefaultHistrogram(
-        ds: gdal.Dataset, buckets=256, inMemory=False, feedback: QgsProcessingFeedback = None
+            ds: gdal.Dataset, buckets=256, inMemory=False, feedback: QgsProcessingFeedback = None
     ):
         if feedback is not None:
             feedback.pushInfo('calculate histograms')
@@ -114,8 +112,8 @@ class GdalUtils(object):
 
     @staticmethod
     def stackBands(
-        filename: str, filenames: List[str], bandNumbers: List[List[int]] = None, width: int = None,
-        height: int = None, extent: QgsRectangle = None
+            filename: str, filenames: List[str], bandNumbers: List[List[int]] = None, width: int = None,
+            height: int = None, extent: QgsRectangle = None
     ):
 
         if bandNumbers is not None and len(filenames) != len(bandNumbers):

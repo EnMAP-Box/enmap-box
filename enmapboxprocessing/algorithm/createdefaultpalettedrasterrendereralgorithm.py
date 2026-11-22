@@ -1,14 +1,11 @@
 from typing import Dict, Any, List, Tuple
 
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsMapLayer)
-
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import Category
 from enmapboxprocessing.utils import Utils
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsMapLayer)
 
 
-@typechecked
 class CreateDefaultPalettedRasterRendererAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_BAND, _BAND = 'band', 'Band'

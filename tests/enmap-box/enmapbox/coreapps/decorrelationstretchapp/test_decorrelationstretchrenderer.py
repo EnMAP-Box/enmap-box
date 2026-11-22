@@ -41,5 +41,5 @@ class TestClassFractionRenderer(TestCase):
         layer.setRenderer(renderer)
 
         block = renderer.block(1, layer.extent(), layer.width(), layer.height())
-        self.assertEqual(Qgis.ARGB32_Premultiplied, block.dataType())
+        self.assertEqual(Qgis.DataType.ARGB32_Premultiplied, block.dataType())
         self.assertEqual(304813346210224, np.sum(Utils.qgsRasterBlockToNumpyArray(block), dtype=float))

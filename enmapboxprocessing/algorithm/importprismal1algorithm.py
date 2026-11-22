@@ -6,7 +6,6 @@ from typing import Dict, Any, List, Tuple
 import numpy as np
 from osgeo import gdal
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
@@ -16,7 +15,6 @@ from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException, QgsMapLayer)
 
 
-@typechecked
 class ImportPrismaL1Algorithm(EnMAPProcessingAlgorithm):
     P_FILE, _FILE = 'file', 'File'
     P_SPECTRAL_REGION, _SPECTRAL_REGION = 'spectralRegion', 'Spectral region'
@@ -26,17 +24,17 @@ class ImportPrismaL1Algorithm(EnMAPProcessingAlgorithm):
     P_OUTPUT_PAN_CUBE, _OUTPUT_PAN_CUBE = 'outputPrismaL1_panCube', 'Output PAN raster layer'
     P_OUTPUT_CLOUD_MASK, _OUTPUT_CLOUD_MASK = 'outputPrismaL1_cloudMask', 'Output Cloud Mask raster layer'
     P_OUTPUT_LANDCOVER_MASK, _OUTPUT_LANDCOVER_MASK = 'outputPrismaL1_landCoverMask', \
-                                                      'Output Land Cover Mask raster layer'
+        'Output Land Cover Mask raster layer'
     P_OUTPUT_SUN_GLINT_MASK, _OUTPUT_SUN_GLINT_MASK = 'outputPrismaL1_sunGlintMask', \
-                                                      'Output Sun Glint Mask raster layer'
+        'Output Sun Glint Mask raster layer'
     P_OUTPUT_SPECTRAL_ERROR, _OUTPUT_SPECTRAL_ERROR = 'outputPrisma1_spectralErrorMatrix', \
-                                                      'Output VNIR/SWIR Error Matrix raster layer'
+        'Output VNIR/SWIR Error Matrix raster layer'
     P_OUTPUT_SPECTRAL_GEOLOCATION, _OUTPUT_SPECTRAL_GEOLOCATION = 'outputPrismaL1_spectralGeolocationFields', \
-                                                                  'Output VNIR/SWIR Geolocation Fields raster layer'
+        'Output VNIR/SWIR Geolocation Fields raster layer'
     P_OUTPUT_PAN_GEOLOCATION, _OUTPUT_PAN_GEOLOCATION = 'outputPrismaL1_panGeolocationFields', \
-                                                        'Output PAN Geolocation Fields raster layer'
+        'Output PAN Geolocation Fields raster layer'
     P_OUTPUT_PAN_ERROR, _OUTPUT_PAN_ERROR = 'outputPrismaL1_panErrorMatrix', \
-                                            'Output PAN Error Matrix raster layer'
+        'Output PAN Error Matrix raster layer'
 
     def displayName(self):
         return 'Import PRISMA L1 product'

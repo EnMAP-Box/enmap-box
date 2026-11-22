@@ -17,7 +17,6 @@ from enmapbox.qgispluginsupport.qps.layerproperties import defaultRasterRenderer
 from enmapbox.qgispluginsupport.qps.models import PyObjectTreeNode, TreeModel, TreeNode, TreeView
 from enmapbox.qgispluginsupport.qps.utils import bandClosestToWavelength, defaultBands, loadUi
 from enmapbox.qgispluginsupport.qps.utils import stringToByteArray
-from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtCore import pyqtSignal, QAbstractItemModel, QItemSelectionModel, QMimeData, \
     QModelIndex, QSortFilterProxyModel, Qt, QTimer, QUrl
 from qgis.PyQt.QtGui import QContextMenuEvent, QDesktopServices
@@ -91,7 +90,7 @@ class DataSourceManager(TreeModel):
 
         # result = False
         toAdd = []
-        if action in [Qt.MoveAction, Qt.CopyAction]:
+        if action in [Qt.DropAction.MoveAction, Qt.DropAction.CopyAction]:
             # collect nodes
             # nodes = []
 
@@ -342,14 +341,14 @@ class DataSourceManager(TreeModel):
 
     def flags(self, index: QModelIndex):
         if not index.isValid():
-            return Qt.ItemIsDropEnabled
+            return Qt.ItemFlag.ItemIsDropEnabled
 
         flags = super(DataSourceManager, self).flags(index)
-        node = index.data(Qt.UserRole)
+        node = index.data(Qt.ItemDataRole.UserRole)
         if isinstance(node, RasterBandTreeNode):
             pass
         if isinstance(node, (DataSource, RasterBandTreeNode)):
-            flags = flags | Qt.ItemIsDragEnabled
+            flags = flags | Qt.ItemFlag.ItemIsDragEnabled
         return flags
 
     def addSources(self, *args, **kwds):
@@ -391,7 +390,7 @@ class DataSourceManagerProxyModel(QSortFilterProxyModel):
     def __init__(self, *args, **kwds):
         super().__init__(*args, **kwds)
         self.setRecursiveFilteringEnabled(True)
-        self.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self.setFilterCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
 
 
 class DataSourceManagerTreeView(TreeView):
@@ -411,7 +410,7 @@ class DataSourceManagerTreeView(TreeView):
     def onRowsInserted(self, parent: QModelIndex, first: int, last: int):
         super().onRowsInserted(parent, first, last)
 
-        node = parent.data(Qt.UserRole)
+        node = parent.data(Qt.ItemDataRole.UserRole)
         n = last - first + 1
         # expand if this was the first added datasource
         if isinstance(node, DataSourceSet) and node.childCount() - n <= 0:
@@ -419,7 +418,7 @@ class DataSourceManagerTreeView(TreeView):
 
         # select added row
         idx = self.model().index(last, 0, parent=parent)
-        self.selectionModel().select(idx, QItemSelectionModel.ClearAndSelect)
+        self.selectionModel().select(idx, QItemSelectionModel.SelectionFlag.ClearAndSelect)
 
     def dataSourceManager(self) -> DataSourceManager:
         model = self.model()
@@ -583,13 +582,12 @@ class DataSourceManagerTreeView(TreeView):
 
         if isinstance(dataSource, RasterDataSource):
             parameters = {SaveRasterAsAlgorithm.P_RASTER: dataSource.source()}
-            emb.showProcessingAlgorithmDialog(SaveRasterAsAlgorithm(), parameters, parent=self)
+            emb.showProcessingAlgorithmDialog(SaveRasterAsAlgorithm(), parameters)
 
         elif isinstance(dataSource, VectorDataSource):
             parameters = dict(INPUT=dataSource.source())
-            emb.showProcessingAlgorithmDialog('native:savefeatures', parameters, parent=self)
+            emb.showProcessingAlgorithmDialog('native:savefeatures', parameters)
 
-    @typechecked
     def onOpenInExplorer(self, dataSource: DataSource):
         """Open source in system file explorer."""
         filename = dataSource.source()
@@ -611,7 +609,6 @@ class DataSourceManagerTreeView(TreeView):
         url = QUrl.fromLocalFile(dirname(filename))
         QDesktopServices.openUrl(url)
 
-    @typechecked
     def onViewSkopsAsJson(self, modelDataSource: ModelDataSource):
         """Convert Skops file to JSON sidecar file and open it in the default browser."""
         from enmapboxprocessing.utils import Utils
@@ -672,7 +669,7 @@ class DataSourceManagerPanelUI(QgsDockWidget):
         self.mDataSourceManagerProxyModel: DataSourceManagerProxyModel = DataSourceManagerProxyModel()
         self.mDataSourceManagerTreeView: DataSourceManagerTreeView
         self.mDataSourceManagerTreeView.setUniformRowHeights(True)
-        self.mDataSourceManagerTreeView.setDragDropMode(QAbstractItemView.DragDrop)
+        self.mDataSourceManagerTreeView.setDragDropMode(QAbstractItemView.DragDropMode.DragDrop)
 
         self.btnCollapse.clicked.connect(lambda: self.mDataSourceManagerTreeView.expandSelectedNodes(False))
         self.btnExpand.clicked.connect(lambda: self.mDataSourceManagerTreeView.expandSelectedNodes(True))
@@ -705,7 +702,7 @@ class DataSourceManagerPanelUI(QgsDockWidget):
     def onSyncToQGIS(self, *args):
         if isinstance(self.mDataSourceManager, DataSourceManager):
             dialog = SelectProjectLayersDialog(project=QgsProject.instance())
-            if dialog.exec() == QDialog.Accepted:
+            if dialog.exec() == QDialog.DialogCode.Accepted:
                 layers = dialog.selectedLayers()
                 layers = [lyr for lyr in layers if not lyr.dataProvider().name() == 'memory']
 
@@ -764,7 +761,7 @@ class DataSourceManagerPanelUI(QgsDockWidget):
 
         for idx in self.dataSourceManagerTreeView().selectionModel().selectedIndexes():
             idx: QModelIndex
-            node = idx.data(Qt.UserRole)
+            node = idx.data(Qt.ItemDataRole.UserRole)
             if isinstance(node, DataSource):
                 sources.add(node)
             elif isinstance(node, DataSourceSet):
@@ -813,15 +810,15 @@ class DataSourceFactory(object):
 
             if isinstance(source, QgsMimeDataUtils.Uri):
                 if source.layerType == 'raster':
-                    dtype = QgsLayerItem.Raster
+                    dtype = QgsLayerItem.LayerType.Raster
                     dataItem = LayerItem(None, source.name, source.uri, source.uri, dtype, source.providerKey)
 
                 elif source.layerType == 'vector':
-                    dtype = QgsLayerItem.Vector
+                    dtype = QgsLayerItem.LayerType.Vector
                     dataItem = LayerItem(None, source.name, source.uri, source.uri, dtype, source.providerKey)
 
                 elif source.layerType == 'vector-tile':
-                    dtype = QgsLayerItem.VectorTile
+                    dtype = QgsLayerItem.LayerType.VectorTile
                     dataItem = LayerItem(None, source.name, source.uri, source.uri, dtype, source.providerKey)
 
                 elif source.providerKey in ['special:file', 'special:skops']:
@@ -845,7 +842,9 @@ class DataSourceFactory(object):
                 if isinstance(source, Path):
                     source = source.as_posix()
                 elif isinstance(source, QUrl):
-                    source = source.toString(QUrl.PreferLocalFile | QUrl.RemoveQuery)
+                    source = source.toString(
+                        QUrl.UrlFormattingOption.PreferLocalFile | QUrl.UrlFormattingOption.RemoveQuery
+                    )
 
                 if isinstance(source, str):
                     # try to find a source as layer in the current project
@@ -885,7 +884,7 @@ class DataSourceFactory(object):
                                 d.setWindowIcon(enmapBoxIcon())
                                 d.showMultiFiles(False)
                                 d.setSubDatasetDetails(sDetails)
-                                if d.exec() == QDialog.Accepted:
+                                if d.exec() == QDialog.DialogCode.Accepted:
                                     return DataSourceFactory.create(d.selectedSublayerDetails())
                                 else:
                                     return []
@@ -919,11 +918,11 @@ class DataSourceFactory(object):
                                         dataItem.setReferenceLayer(p.mapLayer(layer_id))
                                         break
 
-                    if dataItem.mapLayerType() == QgsMapLayer.RasterLayer:
+                    if dataItem.mapLayerType() == QgsMapLayer.LayerType.RasterLayer:
                         ds = RasterDataSource(dataItem)
-                    elif dataItem.mapLayerType() == QgsMapLayer.VectorLayer:
+                    elif dataItem.mapLayerType() == QgsMapLayer.LayerType.VectorLayer:
                         ds = VectorDataSource(dataItem)
-                    elif dataItem.mapLayerType() == QgsMapLayer.VectorTileLayer:
+                    elif dataItem.mapLayerType() == QgsMapLayer.LayerType.VectorTileLayer:
                         ds = VectorTileDataSource(dataItem)
 
                 elif dataItem.providerKey() == 'special:skops':
@@ -944,7 +943,7 @@ class DataSourceFactory(object):
         :return: str
         """
         if isinstance(src, QUrl):
-            src = src.toString(QUrl.PreferLocalFile | QUrl.RemoveQuery)
+            src = src.toString(QUrl.UrlFormattingOption.PreferLocalFile | QUrl.UrlFormattingOption.RemoveQuery)
         if isinstance(src, str):
             # identify GDAL subdataset strings
             if re.search('(HDF|SENTINEL).*:.*:.*', src):

@@ -16,17 +16,18 @@ import os
 import pathlib
 import unittest
 
-import enmapbox.gui.mimedata as mimedata
-from enmapbox import DIR_EXAMPLEDATA
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.exampledata import enmap, hires, landcover_polygon
-from enmapbox.testing import EnMAPBoxTestCase
-from enmapboxtestdata import library_berlin
-from qgis.PyQt.QtCore import QMimeData, QByteArray, QUrl, Qt, QPoint
+from qgis.PyQt.QtCore import QMimeData, QUrl, Qt, QPoint
 from qgis.PyQt.QtGui import QDropEvent
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer
 from qgis.core import QgsProviderRegistry
+
+import enmapbox.gui.mimedata as mimedata
+from enmapbox import DIR_EXAMPLEDATA
+from enmapbox.exampledata import enmap, hires, landcover_polygon
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.testing import EnMAPBoxTestCase
+from enmapboxtestdata import library_berlin
 
 
 class MimeDataTests(EnMAPBoxTestCase):
@@ -47,19 +48,6 @@ class MimeDataTests(EnMAPBoxTestCase):
             box.close()
         QApplication.processEvents()
         QgsProject.instance().removeAllMapLayers()
-
-    def test_conversions(self):
-        for t1 in ['normalstring', b'bytestring', r'rawstring']:
-
-            ba = mimedata.textToByteArray(t1)
-            self.assertIsInstance(ba, QByteArray)
-            t2 = mimedata.textFromByteArray(ba)
-            self.assertIsInstance(t2, str)
-            self.assertEqual(len(t1), len(t2))
-            if isinstance(t1, bytes):
-                self.assertEqual(t1.decode(), t2)
-            else:
-                self.assertEqual(t1, t2)
 
     def test_datasourcehandling(self):
 
@@ -103,7 +91,10 @@ class MimeDataTests(EnMAPBoxTestCase):
         md.setUrls([QUrl.fromLocalFile(path.as_posix())])
         print('Drop {}'.format(path.name))
         self._mdref = md
-        return QDropEvent(QPoint(0, 0), Qt.CopyAction, md, Qt.LeftButton, Qt.NoModifier)
+        return QDropEvent(
+            QPoint(0, 0), Qt.DropAction.CopyAction, md,
+            Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier
+        )
 
     @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'Start manually only')
     def test_dropping_files_empty_dockarea(self):

@@ -8,10 +8,8 @@ from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRasterLayer, QgsProcessingException, \
     QgsVectorLayer
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class LayerToMaskAlgorithm(EnMAPProcessingAlgorithm):
     P_LAYER, _LAYER = 'raster', 'Layer'
     P_GRID, _GRID = 'grid', 'Grid'

@@ -1,16 +1,15 @@
 from typing import List
 
-from enmapbox.typeguard import typechecked
-from enmapboxprocessing.librarywriter import LibraryWriter
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QVariant, QMetaType
 from qgis.core import QgsCoordinateReferenceSystem, QgsGeometry, QgsVectorLayer, Qgis, QgsWkbTypes
 
+from enmapboxprocessing.librarywriter import LibraryWriter
 
-@typechecked
+
 class LibraryDriver(object):
 
     def create(
-            self, name: str = None, wkbType: Qgis.WkbType = None, crs: QgsCoordinateReferenceSystem = None
+        self, name: str = None, wkbType: Qgis.WkbType = None, crs: QgsCoordinateReferenceSystem = None
     ) -> LibraryWriter:
 
         if name is None:
@@ -34,8 +33,8 @@ class LibraryDriver(object):
         return LibraryWriter(library)
 
     def createFromData(
-            self, data: List[dict], geometries: List[QgsGeometry] = None, name: str = None,
-            wkbType: Qgis.WkbType = None, crs: QgsCoordinateReferenceSystem = None
+        self, data: List[dict], geometries: List[QgsGeometry] = None, name: str = None,
+        wkbType: Qgis.WkbType = None, crs: QgsCoordinateReferenceSystem = None
     ) -> LibraryWriter:
 
         if geometries is None:
@@ -53,7 +52,7 @@ class LibraryDriver(object):
             if isinstance(value, dict):
                 writer.addProfileAttribute(fieldName)
             else:
-                writer.addAttribute(fieldName, QVariant(value).type())
+                writer.addAttribute(fieldName, QMetaType.Type(QVariant(value).typeId()))
 
         # add data
         for values, geometry in zip(data, geometries):

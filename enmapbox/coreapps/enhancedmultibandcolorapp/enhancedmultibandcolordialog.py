@@ -6,7 +6,6 @@ from pyqtgraph import PlotWidget
 
 from enhancedmultibandcolorapp.enhancedmultibandcolorrenderer import EnhancedMultiBandColorRenderer
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.rasterreader import RasterReader
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QMouseEvent, QColor
@@ -16,7 +15,6 @@ from qgis.core import QgsRasterLayer, QgsRasterDataProvider, QgsRasterHistogram,
 from qgis.gui import QgsMapCanvas, QgsMapLayerComboBox, QgsColorButton, QgsDoubleSpinBox
 
 
-@typechecked
 class EnhancedMultiBandColorDialog(QMainWindow):
     mLayer: QgsMapLayerComboBox
     mTable: QTableWidget
@@ -44,7 +42,7 @@ class EnhancedMultiBandColorDialog(QMainWindow):
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None
         self.mLayer.setProject(self.enmapBox.project())
-        self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mLayer.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
 
         self.mLayer.layerChanged.connect(self.onLayerChanged)
 
@@ -98,9 +96,9 @@ class EnhancedMultiBandColorDialog(QMainWindow):
                     randint(0, 255)  # nosec B311 # no-security relevant random sampling
                 )
             if color.alpha() == 255:
-                checkState = Qt.Checked
+                checkState = Qt.CheckState.Checked
             else:
-                checkState = Qt.Unchecked
+                checkState = Qt.CheckState.Unchecked
                 color.setAlpha(255)
 
             bandNo = row + 1
@@ -245,7 +243,6 @@ class EnhancedMultiBandColorDialog(QMainWindow):
                 plotWidget.autoRange()
 
 
-@typechecked
 class HistogramPlotWidget(PlotWidget):
     def __init__(self):
         PlotWidget.__init__(self, parent=None, background='#ffffff')

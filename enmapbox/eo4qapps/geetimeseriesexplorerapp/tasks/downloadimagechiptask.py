@@ -12,14 +12,12 @@ from enmapboxprocessing.rasterwriter import RasterWriter
 from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp.imageinfo import ImageInfo
 from qgis.core import QgsTask, QgsRasterLayer, QgsCoordinateReferenceSystem, QgsRectangle, QgsMessageLog, Qgis
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class DownloadImageChipBandTask(QgsTask):
 
     def __init__(self, filename: str, location: SpatialPoint, eeImage, bandName: str):
-        QgsTask.__init__(self, 'Download image chip band task', QgsTask.CanCancel)
+        QgsTask.__init__(self, 'Download image chip band task', QgsTask.Flag.CanCancel)
         self.filename = filename
         self.location = location
         self.eeImage = eeImage
@@ -95,18 +93,24 @@ class DownloadImageChipBandTask(QgsTask):
             raise self.exception
 
         if self.alreadyExists:
-            QgsMessageLog.logMessage(f'already exists: {self.filename}', tag="GEE Time Series Explorer",
-                                     level=Qgis.Success)
+            QgsMessageLog.logMessage(
+                f'already exists: {self.filename}',
+                tag="GEE Time Series Explorer",
+                level=Qgis.MessageLevel.Success
+            )
         else:
-            QgsMessageLog.logMessage(f'downloaded: {self.filename}', tag="GEE Time Series Explorer", level=Qgis.Success)
+            QgsMessageLog.logMessage(
+                f'downloaded: {self.filename}',
+                tag="GEE Time Series Explorer",
+                level=Qgis.MessageLevel.Success
+            )
 
 
-@typechecked
 class DownloadImageChipTask(QgsTask):
     """Build image chip VRT."""
 
     def __init__(self, filename: str, filenames: List[str], location: SpatialPoint):
-        QgsTask.__init__(self, 'Create image chip task', QgsTask.CanCancel)
+        QgsTask.__init__(self, 'Create image chip task', QgsTask.Flag.CanCancel)
         self.filename = filename
         self.filenames = filenames
         self.location = location
@@ -141,7 +145,7 @@ class DownloadImageChipTask(QgsTask):
 
         if self.alreadyExists:
             QgsMessageLog.logMessage(f'already exists: {self.filename}', tag="GEE Time Series Explorer",
-                                     level=Qgis.Success)
+                                     level=Qgis.MessageLevel.Success)
         else:
             QgsMessageLog.logMessage(f'downloaded: {self.filename}', tag="GEE Time Series Explorer",
-                                     level=Qgis.Success)
+                                     level=Qgis.MessageLevel.Success)

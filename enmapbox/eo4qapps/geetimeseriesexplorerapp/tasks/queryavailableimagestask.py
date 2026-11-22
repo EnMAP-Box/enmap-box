@@ -4,17 +4,15 @@ from enmapbox.utils import importEarthEngine
 from geetimeseriesexplorerapp.utils import utilsMsecToDateTime
 from qgis.core import QgsTask
 from qgis.gui import QgsMessageBar
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class QueryAvailableImagesTask(QgsTask):
     """Query available images at location."""
     header: List[str]
     data: List[List[str]]
 
     def __init__(self, eeCollection, eePoint, limit: int, messaqeBar: Optional[QgsMessageBar]):
-        QgsTask.__init__(self, 'Query available images at location', QgsTask.CanCancel)
+        QgsTask.__init__(self, 'Query available images at location', QgsTask.Flag.CanCancel)
         self.eeCollection = eeCollection
         self.eePoint = eePoint
         self.limit = limit

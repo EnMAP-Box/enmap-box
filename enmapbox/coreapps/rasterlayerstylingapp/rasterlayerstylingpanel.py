@@ -3,6 +3,16 @@ from math import nan, inf
 from typing import Optional
 
 from osgeo import gdal
+
+from enmapbox.gui.dataviews.dockmanager import DockPanelUI
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.gui.mapcanvas import MapCanvas
+from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
+from enmapbox.utils import BlockSignals
+from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
+from enmapboxprocessing.rasterreader import RasterReader, metadataCache, setMetadataCache, buildMetadataCache
+from enmapboxprocessing.rasterwriter import RasterWriter
+from enmapboxprocessing.utils import Utils
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QDoubleSpinBox, QComboBox, QCheckBox, QToolButton, QLabel, QTabWidget, \
     QLineEdit, QTableWidget, QSpinBox
@@ -12,22 +22,10 @@ from qgis.core import QgsRasterLayer, QgsSingleBandGrayRenderer, QgsRectangle, Q
 from qgis.gui import (
     QgsDockWidget, QgsMapLayerComboBox, QgsCollapsibleGroupBox, QgsColorRampButton, QgsRangeSlider
 )
-
-from enmapbox.gui.dataviews.dockmanager import DockPanelUI
-from enmapbox.gui.enmapboxgui import EnMAPBox
-from enmapbox.gui.mapcanvas import MapCanvas
-from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapbox.typeguard import typechecked
-from enmapbox.utils import BlockSignals
-from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
-from enmapboxprocessing.rasterreader import RasterReader, metadataCache, setMetadataCache, buildMetadataCache
-from enmapboxprocessing.rasterwriter import RasterWriter
-from enmapboxprocessing.utils import Utils
 from rasterlayerstylingapp.rasterlayerstylingbandwidget import RasterLayerStylingBandWidget
 from rasterlayerstylingapp.rasterlayerstylingpercentileswidget import RasterLayerStylingPercentilesWidget
 
 
-@typechecked
 class RasterLayerStylingPanel(QgsDockWidget):
     # main layer
     mInfo: QLabel
@@ -83,7 +81,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
         self.originalRenderer: Optional[QgsRasterRenderer] = None
         self.originalLayer: Optional[str] = None
         self.mLayer.setProject(self.enmapBox.project())
-        self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mLayer.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         self.mLayer.setExcludedProviders(['wms'])
         self.cache = dict()
 
@@ -163,7 +161,7 @@ class RasterLayerStylingPanel(QgsDockWidget):
         row = self.mLinkedLayers.rowCount() - 1
 
         w = QgsMapLayerComboBox()  # raster layer
-        w.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        w.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         w.setProject(self.project())
 
         cl = self.mLayer.currentLayer()
@@ -899,7 +897,9 @@ class RasterLayerStylingPanel(QgsDockWidget):
                 ce2 = QgsContrastEnhancement(provider2.dataType(bandNo))
                 ce2.setMinimumValue(redMin)
                 ce2.setMaximumValue(redMax)
-                ce2.setContrastEnhancementAlgorithm(QgsContrastEnhancement.StretchToMinimumMaximum)
+                ce2.setContrastEnhancementAlgorithm(
+                    QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum
+                )
                 renderer2.setContrastEnhancement(ce2)
                 layer2.setRenderer(renderer2)
             elif self.mRenderer.currentIndex() == self.PseudoRendererTab:

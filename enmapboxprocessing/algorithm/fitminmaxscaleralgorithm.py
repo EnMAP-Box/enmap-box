@@ -1,8 +1,6 @@
 from enmapboxprocessing.algorithm.fittransformeralgorithmbase import FitTransformerAlgorithmBase
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class FitMinMaxScalerAlgorithm(FitTransformerAlgorithmBase):
 
     def displayName(self) -> str:

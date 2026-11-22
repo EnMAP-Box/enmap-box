@@ -6,10 +6,8 @@ from osgeo import gdal
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.gdalutils import GdalUtils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class ImportDesisL1BAlgorithm(EnMAPProcessingAlgorithm):
     P_FILE, _FILE = 'file', 'Metadata file'
     P_OUTPUT_RASTER, _OUTPUT_RASTER = 'outputDesisL1CRaster', 'Output raster layer'

@@ -1,8 +1,6 @@
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
 
 
-@typechecked
 class FitLGBMClassifierAlgorithm(FitClassifierAlgorithmBase):
 
     def displayName(self) -> str:

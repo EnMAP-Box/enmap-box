@@ -1,28 +1,26 @@
 import json
-from math import isnan, ceil
+from math import isnan, ceil, inf
 from os.path import exists
 from typing import Iterable, List, Union, Optional, Tuple, Iterator, Dict
 
 import numpy as np
-from osgeo import gdal
-
 import qgis.processing
-from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
-from enmapbox.typeguard import typechecked
-from enmapboxprocessing.gridwalker import GridWalker
-from enmapboxprocessing.numpyutils import NumpyUtils
-from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
-from enmapboxprocessing.typing import (RasterSource, Array3d, Metadata, MetadataValue, MetadataDomain, Array2d)
-from enmapboxprocessing.utils import Utils
-from qgis.PyQt.QtCore import QSizeF, QDateTime, QDate, QPoint
+from osgeo import gdal
+from qgis.PyQt.QtCore import QSizeF, QDateTime, QDate, QPoint, QTime
 from qgis.PyQt.QtGui import QColor
 from qgis.core import (QgsRasterLayer, QgsRasterDataProvider, QgsCoordinateReferenceSystem, QgsRectangle,
                        QgsRasterRange, QgsPoint, QgsRasterBlockFeedback, QgsRasterBlock, QgsPointXY,
                        QgsProcessingFeedback, QgsRasterBandStats, Qgis, QgsGeometry, QgsVectorLayer, QgsWkbTypes,
                        QgsFeature, QgsRasterPipe, QgsRasterProjector, QgsMapLayer, QgsProcessing)
 
+from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
+from enmapboxprocessing.gridwalker import GridWalker
+from enmapboxprocessing.numpyutils import NumpyUtils
+from enmapboxprocessing.rasterblockinfo import RasterBlockInfo
+from enmapboxprocessing.typing import (RasterSource, Array3d, Metadata, MetadataValue, MetadataDomain, Array2d)
+from enmapboxprocessing.utils import Utils
 
-@typechecked
+
 class RasterReader(object):
     Nanometers = 'Nanometers'
     Micrometers = 'Micrometers'
@@ -301,8 +299,16 @@ class RasterReader(object):
         if self.crs().isValid():
             p1_ = QgsPoint(xOffset, yOffset)
             p2_ = QgsPoint(xOffset + width, yOffset + height)
-            p1 = QgsPointXY(self.provider.transformCoordinates(p1_, QgsRasterDataProvider.TransformImageToLayer))
-            p2 = QgsPointXY(self.provider.transformCoordinates(p2_, QgsRasterDataProvider.TransformImageToLayer))
+            p1 = QgsPointXY(
+                self.provider.transformCoordinates(
+                    p1_, QgsRasterDataProvider.TransformType.TransformImageToLayer
+                )
+            )
+            p2 = QgsPointXY(
+                self.provider.transformCoordinates(
+                    p2_, QgsRasterDataProvider.TransformType.TransformImageToLayer
+                )
+            )
             if p1.isEmpty() or p2.isEmpty():
                 raise ValueError('p1 and p2 must not be empty')
         else:
@@ -493,7 +499,10 @@ class RasterReader(object):
             width = ceil((extent.xMaximum() - extent.xMinimum()) / self.rasterUnitsPerPixelX())
             height = ceil((extent.yMaximum() - extent.yMinimum()) / self.rasterUnitsPerPixelY())
         else:
-            bandStats: QgsRasterBandStats = self.provider.bandStatistics(bandNo, 0, extent, sampleSize)
+            bandStats: QgsRasterBandStats = self.provider.bandStatistics(
+                bandNo, Qgis.RasterBandStatistic.NoStatistic, extent, sampleSize
+            )
+
             width, height = bandStats.width, bandStats.height
 
         return width, height
@@ -735,12 +744,24 @@ class RasterReader(object):
 
         return None
 
-    def findWavelength(self, wavelength: Optional[float], units: str = None) -> Optional[int]:
+    def findWavelength(
+            self, wavelength: Optional[Union[float, Tuple[float, float]]], units: str = None
+    ) -> Optional[int]:
         """Find band number by wavelength."""
         if wavelength is None:
             return None
+
+        if isinstance(wavelength, tuple):
+            vmin, vmax = wavelength
+            wavelength = (vmin + vmax) / 2.
+        else:
+            vmin, vmax = -inf, inf
+
         if units is not None:
-            wavelength = wavelength * Utils.wavelengthUnitsConversionFactor(units, 'nm')
+            f = Utils.wavelengthUnitsConversionFactor(units, 'nm')
+            wavelength *= f
+            vmin *= f
+            vmax *= f
 
         bandNos = list()
         distances = list()
@@ -753,7 +774,12 @@ class RasterReader(object):
         if len(bandNos) == 0:
             return None
 
-        return bandNos[np.argmin(distances)]
+        bandNo = bandNos[np.argmin(distances)]
+        foundWavelength = self.wavelength(bandNo)
+        if foundWavelength < vmin or foundWavelength > vmax:
+            return None
+
+        return bandNo
 
     def fwhm(self, bandNo: int, units: str = None) -> Optional[float]:
         """Return band FWHM in nanometers. Optionally, specify destination units."""
@@ -903,7 +929,7 @@ class RasterReader(object):
                 if 'time' in self.terraMetadata and 'timestep' in self.terraMetadata:
                     if self.terraMetadata['timestep'] == 'days':
                         year, month, day = self.terraMetadata['time'][bandNo - 1].split('-')
-                        return QDateTime(QDate(int(year), int(month), int(day)))
+                        return QDateTime(QDate(int(year), int(month), int(day)), QTime(0, 0, 0))
                     elif self.terraMetadata['timestep'] == 'seconds':
                         tmp1, tmp2 = self.terraMetadata['time'][bandNo - 1].split(' ')
                         year, month, day = tmp1.split('-')

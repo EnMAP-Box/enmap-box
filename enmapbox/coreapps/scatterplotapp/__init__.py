@@ -1,7 +1,6 @@
 from os.path import dirname, join
 
 from enmapbox.gui.applications import EnMAPBoxApplication
-from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu
 from scatterplotapp.scatterplotdialog import ScatterPlotDialog
@@ -11,7 +10,6 @@ def enmapboxApplicationFactory(enmapBox):
     return [ScatterPlotApp(enmapBox)]
 
 
-@typechecked
 class ScatterPlotApp(EnMAPBoxApplication):
     def __init__(self, enmapBox, parent=None):
         super().__init__(enmapBox, parent=parent)

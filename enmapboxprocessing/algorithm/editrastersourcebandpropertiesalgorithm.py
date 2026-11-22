@@ -2,7 +2,6 @@ from typing import Dict, Any, List, Tuple
 
 from osgeo import gdal
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
 from enmapboxprocessing.rasterwriter import RasterWriter
@@ -10,7 +9,6 @@ from enmapboxprocessing.utils import Utils
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
 
 
-@typechecked
 class EditRasterSourceBandPropertiesAlgorithm(EnMAPProcessingAlgorithm):
     P_SOURCE, _SOURCE = 'source', 'GDAL raster source'
     P_NAMES, _NAMES = 'names', 'Band names'

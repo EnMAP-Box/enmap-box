@@ -4,7 +4,6 @@ import numpy as np
 from osgeo import gdal
 
 import qgis.processing
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
@@ -13,7 +12,6 @@ from enmapboxprocessing.utils import Utils
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsRectangle
 
 
-@typechecked
 class Build3dCubeAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer with features'
     P_SPECTRAL_SCALE, _SPECTRAL_SCALE = 'spectralScale', 'Spectral Scale'

@@ -1,6 +1,5 @@
 from enmapbox.gui.widgets.multiplemaplayerselectionwidget.multiplemaplayerselectionwidget import \
     MultipleMapLayerSelectionWidget
-from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtWidgets import QCheckBox, QComboBox
 from qgis.PyQt.QtWidgets import QToolButton
@@ -8,7 +7,6 @@ from qgis.PyQt.uic import loadUi
 from qgis.gui import QgsDockWidget, QgsSpinBox, QgsColorButton
 
 
-@typechecked
 class LandCoverChangeStatisticsSettingsDockWidget(QgsDockWidget):
     mLayers: MultipleMapLayerSelectionWidget
     mExtent: QComboBox

@@ -1,7 +1,5 @@
-import re
 from typing import Dict, Any, List, Tuple
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.translaterasteralgorithm import TranslateRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.utils import Utils
@@ -11,7 +9,6 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLay
                        QgsProject, QgsCoordinateTransform, QgsField)
 
 
-@typechecked
 class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
     P_VECTOR, _VECTOR = 'vector', 'Vector layer'
     P_GRID, _GRID = 'grid', 'Grid'
@@ -57,7 +54,7 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFloat(self.P_INIT_VALUE, self._INIT_VALUE, defaultValue=0)
         self.addParameterFloat(self.P_BURN_VALUE, self._BURN_VALUE, defaultValue=1)
         self.addParameterField(
-            self.P_BURN_ATTRIBUTE, self._BURN_ATTRIBUTE, type=QgsProcessingParameterField.Numeric,
+            self.P_BURN_ATTRIBUTE, self._BURN_ATTRIBUTE, type=QgsProcessingParameterField.DataType.Numeric,
             parentLayerParameterName=self.P_VECTOR, optional=True
         )
         self.addParameterBoolean(self.P_BURN_FID, self._BURN_FID, defaultValue=False)
@@ -70,7 +67,7 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
         return True, ''
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         grid = self.parameterAsRasterLayer(parameters, self.P_GRID, context)
         vector = self.parameterAsVectorLayer(parameters, self.P_VECTOR, context)
@@ -90,18 +87,18 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
 
             # create fid field if needed
             if burnFid:
-                field = QgsField('temp_fid', QMetaType.LongLong)
+                field = QgsField('temp_fid', QMetaType.Type.LongLong)
                 vector.addExpressionField('$id', field)
                 tmpFilename = Utils.tmpFilename(filename, 'fid.gpkg')
                 saveVectorOptions = QgsVectorFileWriter.SaveVectorOptions()
-                saveVectorOptions.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteFile
+                saveVectorOptions.actionOnExistingFile = QgsVectorFileWriter.ActionOnExistingFile.CreateOrOverwriteFile
                 saveVectorOptions.attributes = [vector.fields().indexFromName(field.name())]
                 saveVectorOptions.feedback = feedback
                 transformContext = QgsProject.instance().transformContext()
                 error, message, newFilename, newLayere = QgsVectorFileWriter.writeAsVectorFormatV3(
                     vector, tmpFilename, transformContext, saveVectorOptions
                 )
-                if error != QgsVectorFileWriter.NoError:
+                if error != QgsVectorFileWriter.WriterError.NoError:
                     raise RuntimeError(f'write failed with error {error}: {message}')
                 vector = QgsVectorLayer(tmpFilename)
                 burnAttribute = field.name()
@@ -116,7 +113,7 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
                 transformContext = QgsProject.instance().transformContext()
                 coordinateTransform = QgsCoordinateTransform(vector.crs(), grid.crs(), QgsProject.instance())
                 saveVectorOptions = QgsVectorFileWriter.SaveVectorOptions()
-                saveVectorOptions.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteFile
+                saveVectorOptions.actionOnExistingFile = QgsVectorFileWriter.ActionOnExistingFile.CreateOrOverwriteFile
                 saveVectorOptions.ct = coordinateTransform
                 saveVectorOptions.filterExtent = grid.extent()
                 if burnAttribute is None:
@@ -127,7 +124,7 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
                 error, message, newFilename, newLayer = QgsVectorFileWriter.writeAsVectorFormatV3(
                     vector, tmpFilename, transformContext, saveVectorOptions
                 )
-                if error != QgsVectorFileWriter.NoError:
+                if error != QgsVectorFileWriter.WriterError.NoError:
                     raise RuntimeError(f'failed to write vector file: error {error}: {message}')
                 vector = QgsVectorLayer(tmpFilename)
 
@@ -150,23 +147,8 @@ class RasterizeVectorAlgorithm(EnMAPProcessingAlgorithm):
                 'EXTRA': extra,
                 'OPTIONS': '|'.join(options),
                 'OUTPUT': filename}
-            if False:
-                self.runAlg(alg, parameters, None, feedback2, context, True)
-            else:
-                # workaround to https://github.com/qgis/QGIS/issues/60524
-                from processing.algs.gdal.rasterize import rasterize as GDALPA_Rasterize
-                from processing.algs.gdal.GdalUtils import GdalUtils as GDALPA_Utils
-                alg = GDALPA_Rasterize()
-                alg.initAlgorithm({})
-                cmd, cmdArgs = alg.getConsoleCommands(parameters, context, feedback2, executing=True)
 
-                # fix -ts string
-                match = re.search(r'-ts[^-]+', cmdArgs)
-                if match:
-                    ts_old = match.group()
-                    ts_new = re.sub(r'\.\d+', '', ts_old)
-                    cmdArgs = cmdArgs.replace(ts_old, ts_new)
-                GDALPA_Utils.runGdal([cmd, cmdArgs], feedback2)
+            self.runAlg(alg, parameters, None, feedback2, context, True)
 
             result = {self.P_OUTPUT_RASTER: filename}
             self.toc(feedback, result)

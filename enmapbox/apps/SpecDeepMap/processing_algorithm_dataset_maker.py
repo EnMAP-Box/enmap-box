@@ -158,7 +158,7 @@ class DatasetMaker(QgsProcessingAlgorithm):
             name=self.N_val, description='Percentage of validation images',
             defaultValue=10))
         self.addParameter(QgsProcessingParameterNumber(
-            name=self.scaler, description='Scaler', type=QgsProcessingParameterNumber.Integer,
+            name=self.scaler, description='Scaler', type=QgsProcessingParameterNumber.Type.Integer,
             defaultValue=None, optional=True))
         self.addParameter(QgsProcessingParameterBoolean(
             name=self.normalize, description='Create Normalization Statistic (Mean and Std. per Channel)',
@@ -173,7 +173,7 @@ class DatasetMaker(QgsProcessingAlgorithm):
         self.addParameter(p)
 
         p1 = QgsProcessingParameterNumber(
-            name=self.Seed, description='Random seed', type=QgsProcessingParameterNumber.Integer,
+            name=self.Seed, description='Random seed', type=QgsProcessingParameterNumber.Type.Integer,
             defaultValue=42, minValue=0)
         p1.setFlags(p1.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
         self.addParameter(p1)

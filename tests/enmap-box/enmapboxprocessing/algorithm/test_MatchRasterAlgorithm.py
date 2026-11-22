@@ -9,7 +9,7 @@ from enmapboxtestdata import enmap_potsdam, hires_potsdom
 class TestMatchRasterAlgorithm(TestCase):
 
     def test(self):
-        timeseries = self.filename('timeseries.txt')
+        timeseries = self.filename('timeseries.csv')
         with open(timeseries, 'w') as file:
             file.write(
                 'raster,mask,date\n'

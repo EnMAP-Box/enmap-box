@@ -21,8 +21,6 @@ import sys
 from os.path import basename, splitext
 from typing import List
 
-from enmapbox.dependencycheck import missingTestData, installTestData, PIPPackage
-from enmapbox.enmapboxprojectsettings import EnMAPBoxProjectSettings
 from qgis.PyQt.QtCore import QOperatingSystemVersion, Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
@@ -30,6 +28,9 @@ from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsRasterLayer, QgsVectorLayer, QgsProject, Qgis
 from qgis.gui import QgisInterface, QgsDockWidget
+
+from enmapbox.dependencycheck import missingTestData, installTestData, PIPPackage
+from enmapbox.enmapboxprojectsettings import EnMAPBoxProjectSettings
 
 
 class EnMAPBoxPlugin(object):
@@ -95,7 +96,7 @@ class EnMAPBoxPlugin(object):
         if len(missing) > 0:
             info = missingPackageInfo(missing, html=False)
             # warnings.warn(info, ImportWarning)
-            messageLog(info, level=Qgis.Warning)
+            messageLog(info, level=Qgis.MessageLevel.Warning)
         return missing
 
     def initGui(self):

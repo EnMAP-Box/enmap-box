@@ -1,8 +1,6 @@
 from enmapboxprocessing.algorithm.fitclassifieralgorithmbase import FitClassifierAlgorithmBase
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class FitSamAlgorithm(FitClassifierAlgorithmBase):
 
     def displayName(self) -> str:

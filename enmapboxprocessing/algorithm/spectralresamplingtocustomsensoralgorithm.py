@@ -1,9 +1,7 @@
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.spectralresamplingbyresponsefunctionconvolutionalgorithmbase import \
     SpectralResamplingByResponseFunctionConvolutionAlgorithmBase
 
 
-@typechecked
 class SpectralResamplingToCustomSensorAlgorithm(SpectralResamplingByResponseFunctionConvolutionAlgorithmBase):
 
     def displayName(self) -> str:

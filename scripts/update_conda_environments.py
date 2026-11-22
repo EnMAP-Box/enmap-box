@@ -2,11 +2,10 @@ import datetime
 import json
 import os
 import re
-from pathlib import Path
-from typing import Dict, List
-
 import requests
 import yaml
+from pathlib import Path
+from typing import Dict, List
 
 REPO_ROOT = Path(__file__).parents[1]
 DIR_TMP = REPO_ROOT / 'tmp'
@@ -23,7 +22,7 @@ EXCLUDED_QGIS_VERSIONS = []
 DEPENDENCIES = {
     # define dependencies as: [<conda package name> | {<'conda'|'pip'>:<package name>, ...}, ...]
     # light = minimum requirements
-    'base': ['qgis<=3.99',
+    'base': ['qgis>=4.2',
              'python>=3.12',
              'pip',
              'scikit-learn>=1.4',
@@ -31,6 +30,7 @@ DEPENDENCIES = {
              'matplotlib-base',
              'defusedxml',
              'pyqtgraph',
+             'spyndex',
              'colorama'],
     # full = all other packages to enjoy the full EnMAP-Box experience (on cost of disk space)
     'full': ['enpt>=1.2.1',
@@ -55,6 +55,10 @@ DEPENDENCIES = {
              'torchvision',
              'segmentation-models-pytorch',
              'setuptools<=81',  # due to https://github.com/tensorflow/tensorboard/issues/7003
+             'pyvista',  # required by Spectral Surface Plotting
+             'pyvistaqt',  # required by Spectral Surface Plotting
+             'eniccs',  # required ny EnICCS algorithm
+
              # {'pip': ['torch==2.6.0',
              #         'lightning==2.5.0.post0',
              #         'tensorboard==2.19.0',

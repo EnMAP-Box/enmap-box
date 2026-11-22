@@ -1,6 +1,5 @@
 from classfractionstatisticsapp.classfractionstatisticsdialog import ClassFractionStatisticsDialog
 from enmapbox.gui.applications import EnMAPBoxApplication
-from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu
 
@@ -9,7 +8,6 @@ def enmapboxApplicationFactory(enmapBox):
     return [ClassFractionStatisticsApp(enmapBox)]
 
 
-@typechecked
 class ClassFractionStatisticsApp(EnMAPBoxApplication):
 
     def __init__(self, enmapBox, parent=None):

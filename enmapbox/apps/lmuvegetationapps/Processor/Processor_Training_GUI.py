@@ -79,7 +79,7 @@ class MLTrainingGUI(QDialog):
         if isinstance(emb, EnMAPBox):
             self.mLayerSpeclib.setProject(emb.project())
 
-        self.mLayerSpeclib.setFilters(QgsMapLayerProxyModel.PointLayer)
+        self.mLayerSpeclib.setFilters(QgsMapLayerProxyModel.Filter.PointLayer)
 
 
 class LoadTxtFileGUI(QDialog):
@@ -1207,7 +1207,7 @@ class LoadTxtFile:
             label = QLabel(f"Row for {param}:")
             spinbox = QSpinBox()
             spinbox.setRange(0, 99)
-            spinbox.setButtonSymbols(QAbstractSpinBox.NoButtons)
+            spinbox.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
             self.spinboxes.append(spinbox)
 
             # Add to the grid layout
@@ -1223,7 +1223,7 @@ class LoadTxtFile:
         reflectance_label = QLabel("Reflectance start row:")
         reflectance_spinbox = QSpinBox()
         reflectance_spinbox.setRange(0, 99)
-        reflectance_spinbox.setButtonSymbols(QAbstractSpinBox.NoButtons)
+        reflectance_spinbox.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.ref_spinbox = reflectance_spinbox
 
         dynamic_layout.addWidget(reflectance_label, row_counter, col_counter)

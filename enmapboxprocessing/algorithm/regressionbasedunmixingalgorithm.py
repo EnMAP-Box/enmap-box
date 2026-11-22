@@ -21,10 +21,8 @@ from enmapboxprocessing.typing import ClassifierDump
 from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtGui import QColor
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class RegressionBasedUnmixingAlgorithm(EnMAPProcessingAlgorithm):
     P_DATASET, _DATASET = 'dataset', 'Endmember dataset'
     P_RASTER, _RASTER = 'raster', 'Raster layer'

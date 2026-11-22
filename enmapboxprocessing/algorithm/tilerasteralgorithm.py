@@ -8,7 +8,6 @@ import numpy as np
 from osgeo import gdal
 
 from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.rasterboundingpolygonalgorithm import RasterBoundingPolygonAlgorithm
 from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
@@ -18,7 +17,6 @@ from qgis.core import QgsProcessing, QgsProcessingParameterField, QgsGeometry, Q
     QgsProcessingFeedback, QgsProcessingException
 
 
-@typechecked
 class TileRasterAlgorithm(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Raster layer'
     P_TILING_SCHEME, _TILING_SCHEME = 'tilingScheme', 'Tiling scheme'
@@ -67,7 +65,7 @@ class TileRasterAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterFolderDestination(self.P_OUTPUT_FOLDER, self._OUTPUT_FOLDER)
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         raster = self.parameterAsRasterLayer(parameters, self.P_RASTER, context)
         tilingScheme = self.parameterAsVectorLayer(parameters, self.P_TILING_SCHEME, context)

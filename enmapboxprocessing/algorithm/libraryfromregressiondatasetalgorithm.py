@@ -3,7 +3,6 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.librarydriver import LibraryDriver
 from enmapboxprocessing.typing import RegressorDump
@@ -11,7 +10,6 @@ from qgis.core import QgsGeometry, QgsPointXY, Qgis, QgsCoordinateReferenceSyste
     QgsProcessingContext, QgsProcessingFeedback
 
 
-@typechecked
 class LibraryFromRegressionDatasetAlgorithm(EnMAPProcessingAlgorithm):
     P_DATASET, _DATASET = 'dataset', 'Dataset'
     P_OUTPUT_LIBRARY, _OUTPUT_LIBRARY = 'outputLibrary', 'Output spectral library'
@@ -37,7 +35,7 @@ class LibraryFromRegressionDatasetAlgorithm(EnMAPProcessingAlgorithm):
         self.addParameterVectorDestination(self.P_OUTPUT_LIBRARY, self._OUTPUT_LIBRARY)
 
     def processAlgorithm(
-        self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
+            self, parameters: Dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ) -> Dict[str, Any]:
         filenameDataset = self.parameterAsFile(parameters, self.P_DATASET, context)
         filename = self.parameterAsOutputLayer(parameters, self.P_OUTPUT_LIBRARY, context)

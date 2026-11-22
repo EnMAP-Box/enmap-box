@@ -9,10 +9,8 @@ from enmapboxprocessing.driver import Driver
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterwriter import RasterWriter
 from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsProcessingException)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class ImportPrismaL2BAlgorithm(EnMAPProcessingAlgorithm):
     P_FILE, _FILE = 'file', 'File'
     P_SPECTRAL_REGION, _SPECTRAL_REGION = 'spectralRegion', 'Spectral region'
@@ -21,15 +19,15 @@ class ImportPrismaL2BAlgorithm(EnMAPProcessingAlgorithm):
     P_OUTPUT_SPECTRAL_CUBE, _OUTPUT_SPECTRAL_CUBE = 'outputPrismaL2B_spectralCube', 'Output VNIR/SWIR Cube raster layer'
     P_OUTPUT_PAN_CUBE, _OUTPUT_PAN_CUBE = 'outputPrismaL2B_panCube', 'Output PAN raster layer'
     P_OUTPUT_SPECTRAL_ERROR, _OUTPUT_SPECTRAL_ERROR = 'outputPrisma2B_spectralErrorMatrix', \
-                                                      'Output VNIR/SWIR Error Matrix raster layer'
+        'Output VNIR/SWIR Error Matrix raster layer'
     P_OUTPUT_SPECTRAL_GEOLOCATION, _OUTPUT_SPECTRAL_GEOLOCATION = 'outputPrismaL2B_spectralGeolocationFields', \
-                                                                  'Output VNIR/SWIR Geolocation Fields raster layer'
+        'Output VNIR/SWIR Geolocation Fields raster layer'
     P_OUTPUT_SPECTRAL_GEOMETRIC, _OUTPUT_SPECTRAL_GEOMETRIC = 'outputPrismaL2B_spectralGeometricFields', \
-                                                              'Output VNIR/SWIR Geometric Fields raster layer'
+        'Output VNIR/SWIR Geometric Fields raster layer'
     P_OUTPUT_PAN_GEOLOCATION, _OUTPUT_PAN_GEOLOCATION = 'outputPrismaL2B_panGeolocationFields', \
-                                                        'Output PAN Geolocation Fields raster layer'
+        'Output PAN Geolocation Fields raster layer'
     P_OUTPUT_PAN_ERROR, _OUTPUT_PAN_ERROR = 'outputPrismaL2B_panErrorMatrix', \
-                                            'Output PAN Error Matrix raster layer'
+        'Output PAN Error Matrix raster layer'
 
     def displayName(self):
         return 'Import PRISMA L2B product'

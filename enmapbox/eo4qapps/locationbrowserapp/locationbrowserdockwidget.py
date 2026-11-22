@@ -5,10 +5,8 @@ from os.path import join, dirname
 from typing import Optional
 
 import requests
-
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint, SpatialExtent
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.utils import Utils
 from geetimeseriesexplorerapp import MapTool
 from locationbrowserapp.locationbrowserresultwidget import LocationBrowserResultWidget
@@ -18,7 +16,6 @@ from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer, QgsFeature, 
 from qgis.gui import QgsFilterLineEdit, QgisInterface
 
 
-@typechecked
 class LocationBrowserDockWidget(QDockWidget):
     mSearch: QgsFilterLineEdit
     mGoToLocation: QToolButton

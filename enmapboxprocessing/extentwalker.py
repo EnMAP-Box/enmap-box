@@ -1,10 +1,8 @@
 import math
 
 from qgis.core import QgsRectangle, QgsProcessingFeedback, QgsProcessingException
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class ExtentWalker(object):
 
     def __init__(

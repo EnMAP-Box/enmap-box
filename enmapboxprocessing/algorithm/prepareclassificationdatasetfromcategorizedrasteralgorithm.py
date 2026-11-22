@@ -3,7 +3,6 @@ from typing import Dict, Any, List, Tuple
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.translatecategorizedrasteralgorithm import TranslateCategorizedRasterAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.rasterreader import RasterReader
@@ -13,7 +12,6 @@ from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsRasterLay
                        QgsMapLayer)
 
 
-@typechecked
 class PrepareClassificationDatasetFromCategorizedRasterAlgorithm(EnMAPProcessingAlgorithm):
     P_CATEGORIZED_RASTER, _CATEGORIZED_RASTER = 'categorizedRaster', 'Categorized raster layer'
     P_FEATURE_RASTER, _FEATURE_RASTER = 'featureRaster', 'Raster layer with features'
@@ -134,8 +132,8 @@ class PrepareClassificationDatasetFromCategorizedRasterAlgorithm(EnMAPProcessing
 
     @classmethod
     def sampleData(
-        cls, raster: QgsRasterLayer, classification: QgsRasterLayer, classBandNo: int, categories: Categories,
-        excludeBadBands: bool, feedback: QgsProcessingFeedback = None
+            cls, raster: QgsRasterLayer, classification: QgsRasterLayer, classBandNo: int, categories: Categories,
+            excludeBadBands: bool, feedback: QgsProcessingFeedback = None
     ) -> Tuple[SampleX, SampleY, List[int], np.ndarray]:
         # assert raster.crs() == classification.crs()
         if raster.extent() != classification.extent():

@@ -16,11 +16,6 @@ from OpenGL.GL import glEnd, glVertex3f, glColor4f, glLineWidth, GL_LINE_SMOOTH,
     glEnable, glHint, glBegin, GL_LINES
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem, GLOptions
 from pyqtgraph.opengl.GLViewWidget import GLViewWidget
-
-from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog
-from enmapbox.qgispluginsupport.qps.maptools import SpatialExtentMapTool
-from enmapbox.qgispluginsupport.qps.simplewidgets import SliderSpinBox, DoubleSliderSpinBox
-from enmapbox.qgispluginsupport.qps.utils import loadUi, SpatialExtent
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtGui import QColor, QVector3D, QMatrix4x4
 from qgis.PyQt.QtWidgets import QMainWindow, QCheckBox, QLineEdit
@@ -29,21 +24,27 @@ from qgis.core import QgsRasterLayer, Qgis, QgsRasterRenderer, QgsRectangle, Qgs
     QgsContrastEnhancement, QgsSingleBandPseudoColorRenderer, QgsRasterMinMaxOrigin, QgsProject, \
     QgsTask, QgsMapLayerProxyModel, QgsRasterBlock, QgsRasterBlockFeedback, QgsSingleBandColorDataRenderer
 from qgis.gui import QgsMapCanvas, QgsMapLayerComboBox
+
+from enmapbox.qgispluginsupport.qps.layerproperties import showLayerPropertiesDialog
+from enmapbox.qgispluginsupport.qps.maptools import SpatialExtentMapTool
+from enmapbox.qgispluginsupport.qps.simplewidgets import SliderSpinBox, DoubleSliderSpinBox
+from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
+from enmapbox.qgispluginsupport.qps.utils import loadUi
 from . import NAME, VERSION
 
 KEY_GL_ITEM_GROUP = 'CUBEVIEW/GL_ITEM_GROUP'
 KEY_DEFAULT_TRANSFORM = 'CUBEVIEW/DEFAULT_TRANSFORM'
-QGIS2NUMPY_DATA_TYPES = {Qgis.Byte: np.byte,
-                         Qgis.UInt16: np.uint16,
-                         Qgis.Int16: np.int16,
-                         Qgis.UInt32: np.uint32,
-                         Qgis.Int32: np.int32,
-                         Qgis.Float32: np.float32,
-                         Qgis.Float64: np.float64,
-                         Qgis.CFloat32: complex,
-                         Qgis.CFloat64: np.complex64,
-                         Qgis.ARGB32: np.uint32,
-                         Qgis.ARGB32_Premultiplied: np.uint32}
+QGIS2NUMPY_DATA_TYPES = {Qgis.DataType.Byte: np.byte,
+                         Qgis.DataType.UInt16: np.uint16,
+                         Qgis.DataType.Int16: np.int16,
+                         Qgis.DataType.UInt32: np.uint32,
+                         Qgis.DataType.Int32: np.int32,
+                         Qgis.DataType.Float32: np.float32,
+                         Qgis.DataType.Float64: np.float64,
+                         Qgis.DataType.CFloat32: complex,
+                         Qgis.DataType.CFloat64: np.complex64,
+                         Qgis.DataType.ARGB32: np.uint32,
+                         Qgis.DataType.ARGB32_Premultiplied: np.uint32}
 
 
 class TaskMock(QgsTask):
@@ -82,7 +83,7 @@ class GLItem(enum.Enum):
 class ImageCubeGLWidget(GLViewWidget):
 
     def __init__(self, *args, **kwds):
-        super(ImageCubeGLWidget, self).__init__(*args, *kwds)
+        super().__init__(*args, **kwds)
 
         self.mTextLabels = []
 
@@ -185,7 +186,7 @@ class ImageCubeRenderTask(QgsTask):
     ):
 
         super().__init__(description='Render image cube',
-                         flags=QgsTask.Silent | QgsTask.CanCancel | QgsTask.CancelWithoutPrompt)
+                         flags=QgsTask.Flag.Silent | QgsTask.Flag.CanCancel | QgsTask.Flag.CancelWithoutPrompt)
 
         self.mLayer: QgsRasterLayer = layer.clone()
         if not isinstance(self.mLayer, QgsRasterLayer):
@@ -259,7 +260,7 @@ class ImageCubeRenderTask(QgsTask):
             for iB, b in enumerate(range(nb)):
                 setBandFunc(b + 1)
                 block: QgsRasterBlock = renderer.block(0, extent, w, h, feedback=feedback)
-                if not (block.isValid() and block.dataType() != Qgis.UnknownDataType):
+                if not (block.isValid() and block.dataType() != Qgis.DataType.UnknownDataType):
                     feedback.appendError('band {} is invalid'.format(b))
                     continue
 
@@ -701,7 +702,7 @@ class ImageCubeWidget(QMainWindow):
 
         self.mMapLayerComboBox: QgsMapLayerComboBox
         self.mMapLayerComboBox.setAllowEmptyLayer(True)
-        self.mMapLayerComboBox.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mMapLayerComboBox.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         self.mMapLayerComboBox.layerChanged.connect(self.onLayerChanged)
 
         self.mLastJobs = dict()
@@ -1466,7 +1467,10 @@ class ImageCubeWidget(QMainWindow):
                 elif isinstance(renderer, QgsMultiBandColorRenderer):
                     l2.setRenderer(QgsRasterLayer(l2.source(), '', l2.dataProvider().name()).renderer())
 
-            l2.setContrastEnhancement(QgsContrastEnhancement.StretchToMinimumMaximum, QgsRasterMinMaxOrigin.MinMax)
+            l2.setContrastEnhancement(
+                QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum,
+                QgsRasterMinMaxOrigin.Limits.MinMax
+            )
             self.setSliceRenderer(l2.renderer().clone())
 
             w = self.glViewWidget()

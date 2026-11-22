@@ -1,7 +1,6 @@
 from math import inf
 from typing import Optional
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.createspectralindicesalgorithm import CreateSpectralIndicesAlgorithm
 from enmapboxprocessing.rasterreader import RasterReader
 from qgis import processing
@@ -13,7 +12,6 @@ from qgis.core import QgsMapLayerProxyModel, QgsRasterLayer, QgsProcessing, QgsR
 from qgis.gui import QgsRasterBandComboBox, QgsMapLayerComboBox, QgsFilterLineEdit, QgsDoubleSpinBox, QgsFileWidget
 
 
-@typechecked
 class SpectralIndexCreatorDialog(QMainWindow):
     mLayer: QgsMapLayerComboBox
     mUseReflectanceScaleFactor: QCheckBox
@@ -55,7 +53,7 @@ class SpectralIndexCreatorDialog(QMainWindow):
         self.initBandMapping()
         self.initAdditionalIndexParameters()
         self.onSelectAllClicked()
-        self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mLayer.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         lineEdit: QgsFilterLineEdit = self.mFilename.lineEdit()
         lineEdit.setShowClearButton(True)
         lineEdit.setNullValue('[Save to temporary file]')
@@ -77,7 +75,7 @@ class SpectralIndexCreatorDialog(QMainWindow):
                 continue
             item = QListWidgetItem(f"{spec['short_name']}: {spec['long_name']}")
             item.setToolTip(f"{spec['formula']}")
-            item.setCheckState(Qt.Unchecked)
+            item.setCheckState(Qt.CheckState.Unchecked)
             item.spec = spec
             mList.addItem(item)
 
@@ -103,7 +101,7 @@ class SpectralIndexCreatorDialog(QMainWindow):
             w.setMinimum(-inf)
             w.setMaximum(inf)
             w.setShowClearButton(True)
-            w.setButtonSymbols(QgsDoubleSpinBox.NoButtons)
+            w.setButtonSymbols(QgsDoubleSpinBox.ButtonSymbols.NoButtons)
             w.setValue(CreateSpectralIndicesAlgorithm.ConstantMapping[identifier])
             w.setClearValue(CreateSpectralIndicesAlgorithm.ConstantMapping[identifier])
 
@@ -163,13 +161,13 @@ class SpectralIndexCreatorDialog(QMainWindow):
         for mList in self.mAsiLists.values():
             for row in range(mList.count()):
                 item: QListWidgetItem = mList.item(row)
-                item.setCheckState(Qt.Checked)
+                item.setCheckState(Qt.CheckState.Checked)
 
     def onClearSelectionClicked(self):
         for mList in self.mAsiLists.values():
             for row in range(mList.count()):
                 item: QListWidgetItem = mList.item(row)
-                item.setCheckState(Qt.Unchecked)
+                item.setCheckState(Qt.CheckState.Unchecked)
 
     def onRunClicked(self):
 
@@ -204,7 +202,7 @@ class SpectralIndexCreatorDialog(QMainWindow):
             for row in range(mList.count()):
                 item: QListWidgetItem = mList.item(row)
 
-                if item.checkState() == Qt.Unchecked:
+                if item.checkState() == Qt.CheckState.Unchecked:
                     continue
 
                 short_name = item.text().split(':')[0]

@@ -1,8 +1,6 @@
 from enmapboxprocessing.algorithm.fittransformeralgorithmbase import FitTransformerAlgorithmBase
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class FitNormalizerAlgorithm(FitTransformerAlgorithmBase):
 
     def displayName(self) -> str:

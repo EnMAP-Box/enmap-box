@@ -245,14 +245,14 @@ class DL_Trainer(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterBoolean(self.normalization_flag, self.tr('Data Normalization'), defaultValue=False))
         self.addParameter(QgsProcessingParameterNumber(
-            name=self.batch_size, description='Batch size', type=QgsProcessingParameterNumber.Integer,
+            name=self.batch_size, description='Batch size', type=QgsProcessingParameterNumber.Type.Integer,
             defaultValue=2, minValue=1))
         self.addParameter(QgsProcessingParameterNumber(
-            name=self.n_epochs, description='Epochs', type=QgsProcessingParameterNumber.Integer,
+            name=self.n_epochs, description='Epochs', type=QgsProcessingParameterNumber.Type.Integer,
             defaultValue=1, minValue=1))
 
         self.addParameter(QgsProcessingParameterNumber(
-            name=self.lr, description='Learning rate', type=QgsProcessingParameterNumber.Double,
+            name=self.lr, description='Learning rate', type=QgsProcessingParameterNumber.Type.Double,
             defaultValue=0.001, minValue=0.0000001))
         self.addParameter(QgsProcessingParameterBoolean(
             name=self.lr_finder, description='Automatic learning rate finder',
@@ -265,21 +265,21 @@ class DL_Trainer(QgsProcessingAlgorithm):
 
         p = QgsProcessingParameterNumber(
             name=self.num_workers, description='Number of workers (CPUs used for data loading and augumenation)',
-            type=QgsProcessingParameterNumber.Integer,
+            type=QgsProcessingParameterNumber.Type.Integer,
             defaultValue=0)
         p.setFlags(p.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
         self.addParameter(p)
 
         p1 = QgsProcessingParameterNumber(
             name=self.device_numbers, description='Number of devices (GPU/CPU)', optional=True,
-            type=QgsProcessingParameterNumber.Integer,
+            type=QgsProcessingParameterNumber.Type.Integer,
             defaultValue=1, minValue=0)
         p1.setFlags(p1.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
         self.addParameter(p1)
 
         p2 = QgsProcessingParameterNumber(
             name=self.num_models, description='Number of Models', optional=True,
-            type=QgsProcessingParameterNumber.Integer,
+            type=QgsProcessingParameterNumber.Type.Integer,
             defaultValue=-1)
         p2.setFlags(p2.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
         self.addParameter(p2)

@@ -1,10 +1,8 @@
 import numpy as np
 
 from enmapboxprocessing.algorithm.convolutionfilteralgorithmbase import ConvolutionFilterAlgorithmBase
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class SpatialConvolutionSavitskyGolay2DAlgorithm(ConvolutionFilterAlgorithmBase):
 
     def displayName(self) -> str:

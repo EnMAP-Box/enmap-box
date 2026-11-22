@@ -3,10 +3,7 @@ from typing import List, Tuple
 
 import numpy as np
 
-from enmapbox.typeguard import typechecked
 
-
-@typechecked
 def rbfEnsemblePrediction(
         X: np.ndarray, Y: np.ndarray, X2: np.ndarray, rbfFwhms: List[float], rbfUserWeights: List[float] = None,
         rbfCutOffValue=0.01
@@ -43,7 +40,6 @@ def rbfEnsemblePrediction(
     return Y2
 
 
-@typechecked
 def rbfPrediction(
         X: np.ndarray, Y: np.ndarray, X2: np.ndarray, rbfFwhm: float, rbfUserWeight: float, rbfCutOffValue: float
 ) -> Tuple[np.ndarray, np.ndarray]:
@@ -96,7 +92,6 @@ def rbfPrediction(
     return Y2, D
 
 
-@typechecked
 def rbfWeights(decimalYears: np.ndarray, rbfCenter: float, rbfFwhm: float):
     """Returns RBF kernel weights (values between 0 and 1) for given decimalYears."""
 

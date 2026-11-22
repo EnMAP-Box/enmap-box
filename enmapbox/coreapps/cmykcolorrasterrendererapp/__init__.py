@@ -1,6 +1,5 @@
 from cmykcolorrasterrendererapp.cmykcolorrasterrendererdialog import CmykColorRasterRendererDialog
 from enmapbox.gui.applications import EnMAPBoxApplication
-from enmapbox.typeguard import typechecked
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMenu
 
@@ -9,7 +8,6 @@ def enmapboxApplicationFactory(enmapBox):
     return [CmykColorRasterRendererApp(enmapBox)]
 
 
-@typechecked
 class CmykColorRasterRendererApp(EnMAPBoxApplication):
     def __init__(self, enmapBox, parent=None):
         super().__init__(enmapBox, parent=parent)

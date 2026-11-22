@@ -127,20 +127,20 @@ class RasterSplitter(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterRasterLayer(self.INPUT_L, self.tr('Input raster labels')))
         self.addParameter(QgsProcessingParameterNumber(
-            name=self.P_tile_x, description='Tile size X', type=QgsProcessingParameterNumber.Integer,
+            name=self.P_tile_x, description='Tile size X', type=QgsProcessingParameterNumber.Type.Integer,
             defaultValue=256, minValue=1))
         self.addParameter(QgsProcessingParameterNumber(
-            name=self.P_tile_y, description='Tile size Y', type=QgsProcessingParameterNumber.Integer,
+            name=self.P_tile_y, description='Tile size Y', type=QgsProcessingParameterNumber.Type.Integer,
             defaultValue=256, minValue=1))
         self.addParameter(QgsProcessingParameterNumber(
-            name=self.P_step_x, description='Step size X', type=QgsProcessingParameterNumber.Integer,
+            name=self.P_step_x, description='Step size X', type=QgsProcessingParameterNumber.Type.Integer,
             defaultValue=256, minValue=1))
         self.addParameter(QgsProcessingParameterNumber(
-            name=self.P_step_y, description='Step size Y', type=QgsProcessingParameterNumber.Integer,
+            name=self.P_step_y, description='Step size Y', type=QgsProcessingParameterNumber.Type.Integer,
             defaultValue=256, minValue=1))
         self.addParameter(QgsProcessingParameterNumber(
             name=self.Percent_null, description='Minimum Class-Label Coverage per Tile (%): ',
-            type=QgsProcessingParameterNumber.Integer,
+            type=QgsProcessingParameterNumber.Type.Integer,
             defaultValue=50, minValue=0, maxValue=100))
 
         self.addParameter(QgsProcessingParameterFolderDestination(

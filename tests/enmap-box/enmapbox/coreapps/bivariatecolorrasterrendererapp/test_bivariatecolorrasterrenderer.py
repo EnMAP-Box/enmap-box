@@ -1,16 +1,31 @@
+from qgis.core import QgsRasterLayer
+
+from bivariatecolorrasterrendererapp import BivariateColorRasterRendererDialog
+from enmapbox import initAll
+from enmapbox.gui.enmapboxgui import EnMAPBox
+from enmapbox.testing import start_app
 from enmapboxprocessing.testcase import TestCase
+from enmapboxtestdata import enmap
+
+qgsApp = start_app()
+initAll()
 
 
-class TestDualbandPseudocolorRenderer(TestCase):
+class TestBivariateColorRasterRendererApp(TestCase):
 
     def test(self):
-        return  # just a local test
-        # layer = QgsRasterLayer(r'D:\data\katja_kowalski\NDFI.vrt', 'NDFI')
-        # renderer = BivariateColorRasterRenderer(layer.dataProvider())
-        # renderer.setRange(12, 618, 187, 8087)
-        # renderer.setBands(1, 2)
-        # with open('colorplane.txt') as file:
-        #     colorPlane = np.array(eval(file.read()))
-        # renderer.setColorPlane(colorPlane)
-        # layer.setRenderer(renderer)
-        # layer.renderer().block(0, layer.extent(), 100, 100)
+        enmapBox = EnMAPBox()
+        layer = QgsRasterLayer(enmap, 'enmap_berlin.bsq')
+        enmapBox.onDataDropped([layer])
+
+        widget = BivariateColorRasterRendererDialog()
+        widget.show()
+        widget.mLayer.setLayer(layer)
+
+        self.showGui([enmapBox.ui, widget])
+        enmapBox.close()
+        # if False:
+        #    qgsApp.exec()
+
+        # self.dispose_widget(widget)
+        # self.dispose_widget(enmapBox.ui)

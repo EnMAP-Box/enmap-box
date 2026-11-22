@@ -2,29 +2,28 @@ from typing import Optional
 
 import numpy as np
 from pyqtgraph import PlotWidget, ImageItem
-from scipy.interpolate import LinearNDInterpolator
-
-from bivariatecolorrasterrendererapp.bivariatecolorrasterrenderer import BivariateColorRasterRenderer
-from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
-from enmapbox.typeguard import typechecked
-from enmapboxprocessing.rasterreader import RasterReader
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QWidget, QToolButton, QCheckBox, QMainWindow, QComboBox, QMenu, QAction, QPushButton, \
+from qgis.PyQt.QtWidgets import QToolButton, QCheckBox, QMainWindow, QComboBox, QMenu, QAction, QPushButton, \
     QLineEdit, QRadioButton
 from qgis.PyQt.uic import loadUi
 from qgis.core import QgsRasterLayer, QgsMapLayerProxyModel, QgsMapSettings
 from qgis.gui import QgsMapCanvas, QgsRasterBandComboBox, QgsDoubleSpinBox, QgsMapLayerComboBox, QgsColorButton, \
     QgsSpinBox
+from scipy.interpolate import LinearNDInterpolator
+
+from bivariatecolorrasterrendererapp.bivariatecolorrasterrenderer import BivariateColorRasterRenderer
+from enmapbox.qgispluginsupport.qps.utils import SpatialExtent
+from enmapboxprocessing.rasterreader import RasterReader
 
 
-@typechecked
 class ColorPlanePlotWidget(PlotWidget):
-    def __init__(self, *args):
-        PlotWidget.__init__(self, parent=None, background='#f0f0f0')
+    def __init__(self, *args, **kwds):
+        if 'background' not in kwds:
+            kwds['background'] = '#f0f0f0'
+        super().__init__(*args, **kwds)
         self.setDefaultPadding(padding=0.02)
 
 
-@typechecked
 class BivariateColorRasterRendererDialog(QMainWindow):
     mLayer: QgsMapLayerComboBox
     mBand1: QgsRasterBandComboBox
@@ -56,8 +55,8 @@ class BivariateColorRasterRendererDialog(QMainWindow):
     EstimatedAccuracy, ActualAccuracy = 0, 1
     WholeRasterExtent, CurrentCanvasExtent = 0, 1
 
-    def __init__(self, parent=None):
-        QWidget.__init__(self, parent)
+    def __init__(self, *args, **kwds):
+        super().__init__(*args, **kwds)
         loadUi(__file__.replace('.py', '.ui'), self)
 
         from enmapbox.gui.enmapboxgui import EnMAPBox
@@ -66,7 +65,7 @@ class BivariateColorRasterRendererDialog(QMainWindow):
 
         self.mMapCanvas: Optional[QgsMapCanvas] = None
         self.mLayer.setProject(self.enmapBox.project())
-        self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mLayer.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         self.mP1.setClearValue(self.mP1.value())
         self.mP2.setClearValue(self.mP2.value())
 
@@ -305,7 +304,6 @@ class BivariateColorRasterRendererDialog(QMainWindow):
             self.onApplyClicked()
 
 
-@typechecked
 def smartRound(value: float) -> str:
     if abs(value) < 0.1:
         return str(round(value, 4))

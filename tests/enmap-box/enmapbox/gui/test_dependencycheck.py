@@ -12,23 +12,24 @@ __author__ = 'benjamin.jakimow@geo.hu-berlin.de'
 __date__ = '2017-07-17'
 __copyright__ = 'Copyright 2017, Benjamin Jakimow'
 
-import os
+import subprocess  # nosec B404
 import sys
 import unittest
 import uuid
-from pathlib import Path
+from subprocess import CompletedProcess  # nosec B404
 from time import sleep
 from typing import List, Tuple
 
-from enmapbox.dependencycheck import PIPPackage, requiredPackages, PIPPackageInstaller, PIPPackageInfoTask, \
-    missingPackageInfo, checkGDALIssues, PIPPackageInstallerTableModel, \
-    call_pip_command, localPipExecutable, installTestData
-from enmapbox.testing import EnMAPBoxTestCase, start_app
-from qgis.PyQt.QtCore import QProcess
 from qgis.PyQt.QtGui import QMovie
 from qgis.PyQt.QtWidgets import QApplication, QTableView, QLabel
 from qgis.core import Qgis, QgsTask
 from qgis.core import QgsApplication
+
+from enmapbox.dependencycheck import (
+    PIPPackage, requiredPackages, PIPPackageInstaller, PIPPackageInfoTask,
+    missingPackageInfo, checkGDALIssues, PIPPackageInstallerTableModel,
+    call_pip_command, installTestData, local_python_exe)
+from enmapbox.testing import EnMAPBoxTestCase, start_app
 
 start_app()
 
@@ -47,19 +48,14 @@ class test_dependencycheck(EnMAPBoxTestCase):
         installTestData(overwrite_existing=True, ask=False)
         installTestData(overwrite_existing=True, ask=True)
 
-    def test_pip_call(self):
+    def test_local_pip_call(self):
 
-        pip_exe = localPipExecutable()
-        self.assertTrue(os.path.isfile(pip_exe))
+        cmd = [local_python_exe(), '-m', 'pip', 'show', 'numpy']
 
-        process = QProcess()
-        process.start(f'{pip_exe} show numpy')
-        process.waitForFinished()
-        msgOut = process.readAllStandardOutput().data().decode('utf-8')
-        process.readAllStandardError().data().decode('utf-8')
-        success = process.exitCode() == 0
-        self.assertTrue(success)
-        self.assertTrue(msgOut.startswith('Name: numpy'))
+        result = subprocess.run(cmd, capture_output=True, text=True)  # nosec B603
+        self.assertIsInstance(result, CompletedProcess)
+        self.assertEqual(result.returncode, 0)
+        self.assertTrue(result.stdout.startswith('Name: numpy'))
 
     def test_required_packages(self):
 
@@ -257,12 +253,6 @@ class test_dependencycheck(EnMAPBoxTestCase):
         self.assertFalse(success)
         self.assertEqual(stdout, sys.stdout)
         self.assertEqual(stderr, sys.stderr)
-
-    def test_find_pipexe(self):
-
-        p = localPipExecutable()
-        self.assertIsInstance(p, Path)
-        self.assertTrue(p.is_file())
 
 
 if __name__ == "__main__":

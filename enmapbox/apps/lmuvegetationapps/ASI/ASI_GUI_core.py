@@ -63,7 +63,7 @@ class ASI_GUI(QDialog):
         if isinstance(emb, EnMAPBox):
             self.mLayer.setProject(emb.project())
 
-        self.mLayer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mLayer.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
 
         # fix the sendHoverEvent crash by replacing the slot function
         self.rangeView.scene().sendHoverEvents = self.onHoverEvent

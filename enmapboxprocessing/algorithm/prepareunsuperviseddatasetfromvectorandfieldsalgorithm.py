@@ -1,15 +1,14 @@
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsFeature, QgsProcessingParameterField,
+                       QgsProcessingException)
 
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from enmapboxprocessing.typing import TransformerDump
 from enmapboxprocessing.utils import Utils
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsFeature, QgsProcessingParameterField)
-from enmapbox.typeguard import typechecked
 
 
-@typechecked
 class PrepareUnsupervisedDatasetFromVectorAndFieldsAlgorithm(EnMAPProcessingAlgorithm):
     P_VECTOR, _VECTOR = 'vector', 'Vector layer'
     P_FEATURE_FIELDS, _FEATURE_FIELDS = 'featureFields', 'Fields with features'
@@ -37,7 +36,7 @@ class PrepareUnsupervisedDatasetFromVectorAndFieldsAlgorithm(EnMAPProcessingAlgo
         self.addParameterVectorLayer(self.P_VECTOR, self._VECTOR)
         self.addParameterField(
             self.P_FEATURE_FIELDS, self._FEATURE_FIELDS, None, self.P_VECTOR,
-            QgsProcessingParameterField.Numeric, True
+            QgsProcessingParameterField.DataType.Numeric, True
         )
         self.addParameterFileDestination(self.P_OUTPUT_DATASET, self._OUTPUT_DATASET, self.SkopsFileFilter)
 
@@ -69,6 +68,9 @@ class PrepareUnsupervisedDatasetFromVectorAndFieldsAlgorithm(EnMAPProcessingAlgo
                 X = X.reshape(-1, len(featureFields))
             except Exception as error:
                 raise ValueError(f'invalid feature data: {error}')
+
+            if len(X) == 0:
+                raise QgsProcessingException('empty dataset not allowed')
 
             dump = TransformerDump(features=featureFields, X=X)
             dumpDict = dump.__dict__

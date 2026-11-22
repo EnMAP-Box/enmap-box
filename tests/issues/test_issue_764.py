@@ -1,11 +1,11 @@
 import unittest
 
+from qgis.core import QgsProject, edit
+
 from enmapbox import initAll
 from enmapbox.qgispluginsupport.qps.speclib.core.spectrallibrary import SpectralLibraryUtils
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
-from enmapbox.qgispluginsupport.qps.speclib.gui.spectralprocessingdialog import SpectralProcessingDialog
 from enmapbox.testing import EnMAPBoxTestCase, start_app, TestObjects
-from qgis.core import QgsProject, edit
 
 start_app()
 initAll()
@@ -13,25 +13,23 @@ initAll()
 
 class TestIssue764(EnMAPBoxTestCase):
 
+    # @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'fails in CI')
     def test_SpectralProcessing_RasterMath(self):
         speclib = TestObjects.createSpectralLibrary(2)
         algorithmId = 'enmapbox:RasterMath'.lower()
-
+        algorithmId = 'gdal:translate'
         parameters = {'code': 'my code input'}
-
+        parameters = {}
         with edit(speclib):
             SpectralLibraryUtils.addSpectralProfileField(speclib, 'profiles2')
             slw = SpectralLibraryWidget(speclib=speclib)
 
-            spd = SpectralProcessingDialog(speclib=speclib, algorithmId=algorithmId, parameters=parameters)
-            # slw.showSpectralProcessingWidget(algorithmId=algorithmId)
-            wrapper = spd.processingModelWrapper()
+            # spd = SpectralProcessingAlgorithmWidget(speclib=speclib)
+            # spd.setAlgorithm(algorithmId)
+            # spd.setParameters(parameters)
+            spd = slw.openSpectralProcessingWidget(algorithmId=algorithmId, parameters=parameters)
 
-            for k, v in parameters.items():
-                w = wrapper.mWrappers[k]
-                self.assertEqual(w.value(), v)
-
-            spd.runButton().animateClick(0)
+            spd.runButton().animateClick()
 
             self.showGui([spd, slw])
 

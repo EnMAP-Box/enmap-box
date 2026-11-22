@@ -60,9 +60,9 @@ class MLInversionGUI(QDialog):
             for cb in [self.mLayerImage, self.mLayerGeometry, self.mLayerMask]:
                 cb.setProject(emb.project())
 
-        self.mLayerImage.setFilters(QgsMapLayerProxyModel.RasterLayer)
-        self.mLayerGeometry.setFilters(QgsMapLayerProxyModel.RasterLayer)
-        self.mLayerMask.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.mLayerImage.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
+        self.mLayerGeometry.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
+        self.mLayerMask.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
 
 
 class NodatGUI(QDialog):

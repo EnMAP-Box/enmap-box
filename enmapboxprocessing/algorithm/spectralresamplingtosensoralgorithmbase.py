@@ -1,6 +1,5 @@
 from typing import List, Tuple, Dict, Any
 
-from enmapbox.typeguard import typechecked
 from enmapboxprocessing.algorithm.spectralresamplingbyresponsefunctionlibraryalgorithm import \
     SpectralResamplingByResponseFunctionLibraryAlgorithm
 from enmapboxprocessing.algorithm.spectralresamplingbywavelengthandfwhmalgorithm import \
@@ -9,7 +8,6 @@ from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm, Group
 from qgis.core import QgsProcessingContext, QgsProcessingFeedback
 
 
-@typechecked
 class SpectralResamplingToSensorAlgorithmBase(EnMAPProcessingAlgorithm):
     P_RASTER, _RASTER = 'raster', 'Spectral raster layer'
     P_OUTPUT_RASTER, _OUTPUT_RASTER = 'outputResampledRaster', 'Output raster layer'

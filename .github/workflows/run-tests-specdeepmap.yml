@@ -1,20 +1,22 @@
 name: SpecDeepMap Tests
 
 on:
-  push:
-    branches:
-      - main
-      - release-**
-      - release_**
+  workflow_dispatch:
 
-  pull_request:
-    branches:
-      - main
-      - release-**
-      - release_**
+  # push:
+  #   branches:
+  #     - main
+  #     - release-**
+  #     - release_**
 
-  release:
-    types: [ published ]
+  # pull_request:
+  #   branches:
+  #     - main
+  #     - release-**
+  #     - release_**
+
+  # release:
+  #   types: [ published ]
 
 jobs:
   # Run EnMAP-Box tests
