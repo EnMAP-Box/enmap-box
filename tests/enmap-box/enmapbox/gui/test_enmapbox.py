@@ -23,7 +23,9 @@ import qgis
 from enmapbox import DIR_REPO
 from enmapbox import initAll
 from enmapbox.gui.contextmenus import EnMAPBoxContextMenuRegistry, EnMAPBoxAbstractContextMenuProvider
-from enmapbox.gui.dataviews.docks import SpectralLibraryDock, MapDock, Dock
+from enmapbox.gui.dataviews.docks import Dock
+from enmapbox.gui.dataviews.mapdock import MapDock
+from enmapbox.gui.dataviews.spectrallibrarydock import SpectralLibraryDock
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import MapCanvas
 from enmapbox.qgispluginsupport.qps.maptools import MapTools, CursorLocationMapTool
