@@ -1,7 +1,5 @@
 import unittest
 
-from qgis.PyQt.QtWidgets import QWidget
-
 from enmapbox import initAll
 from enmapbox.gui.dataviews.docks import DockArea
 from enmapbox.gui.dataviews.textdock import TextDock, TextDockWidget
@@ -13,11 +11,27 @@ initAll()
 
 class TextDockTextCases(TestCase):
 
-    def test_widgets(self):
-        w = QWidget()
-        w.show()
+    def test_widget_title(self):
+        dock = TextDock()
+        dock.setTitle('MyDock')
+        self.assertEqual(dock.title(), 'MyDock')
 
-        app.exec()
+        tmp = self.createTestOutputDirectory()
+        path1 = tmp / 'testfile1.txt'
+        path2 = tmp / 'testfile2.txt'
+
+        with open(path1, 'w', encoding='utf-8') as f:
+            f.write('foo')
+        with open(path2, 'w', encoding='utf-8') as f:
+            f.write('bar')
+
+        dock.textDockWidget().setFile(path1)
+        self.assertEqual(dock.title(), path1.name)
+
+        dock.textDockWidget().setFile(path2)
+        self.assertEqual(dock.title(), path2.name)
+
+        self.showGui(dock)
 
     def test_TextDock(self):
         da = DockArea()

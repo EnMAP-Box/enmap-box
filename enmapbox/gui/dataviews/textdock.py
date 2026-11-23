@@ -3,12 +3,13 @@ import warnings
 from pathlib import Path
 from typing import Union
 
-from enmapbox.gui.dataviews.docks import Dock
-from enmapbox.gui.utils import enmapboxUiPath
-from enmapbox.qgispluginsupport.qps.utils import loadUi
 from qgis.PyQt.QtCore import pyqtSignal, Qt, QMimeData, QUrl
 from qgis.PyQt.QtGui import QDragEnterEvent, QDropEvent
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QMessageBox
+
+from enmapbox.gui.dataviews.docks import Dock
+from enmapbox.gui.utils import enmapboxUiPath
+from enmapbox.qgispluginsupport.qps.utils import loadUi
 
 
 class TextDockWidget(QWidget):
