@@ -888,7 +888,7 @@
   <customwidget>
    <class>DockArea</class>
    <extends>QWidget</extends>
-   <header>enmapbox.gui.dataviews.docks</header>
+   <header>enmapbox.gui.dataviews.dockarea</header>
    <container>1</container>
   </customwidget>
   <customwidget>

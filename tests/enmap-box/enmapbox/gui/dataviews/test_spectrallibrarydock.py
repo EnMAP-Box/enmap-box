@@ -6,9 +6,9 @@ from qgis.gui import QgsLayerTreeView
 
 from enmapbox import initAll
 from enmapbox.gui.datasources.manager import DataSourceManager
+from enmapbox.gui.dataviews.dockarea import DockArea
 from enmapbox.gui.dataviews.dockmanager import DockTreeView, DockManager, DockManagerTreeModel, SpeclibDockTreeNode, \
     createDockTreeNode
-from enmapbox.gui.dataviews.docks import DockArea
 from enmapbox.gui.dataviews.mimedatadock import MimeDataDock
 from enmapbox.gui.dataviews.spectrallibrarydock import SpectralLibraryDock
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget

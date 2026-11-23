@@ -17,23 +17,17 @@
 ***************************************************************************
 """
 
-import re
-import sys
 from math import ceil
-from typing import Optional, Union
+from typing import Optional
 
-from pyqtgraph.dockarea import DockArea as pgDockArea
 from pyqtgraph.dockarea.Dock import Dock as pgDock
 from pyqtgraph.dockarea.Dock import DockLabel as pgDockLabel
-from pyqtgraph.dockarea.DockArea import TempAreaWindow
 from qgis.PyQt import QtCore
-from qgis.PyQt.QtCore import pyqtSignal, Qt, QPoint, QObject, QSize
-from qgis.PyQt.QtGui import QIcon, QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QResizeEvent, \
+from qgis.PyQt.QtCore import pyqtSignal, Qt, QPoint
+from qgis.PyQt.QtGui import QResizeEvent, \
     QContextMenuEvent
 from qgis.PyQt.QtWidgets import QToolButton, QMenu, QMainWindow, QApplication, \
     QStyle, QProgressBar
-
-RX_HTML_FILE = re.compile(r'\.(html|html|xhtml)$', re.I)
 
 
 class DockWindow(QMainWindow):
@@ -78,43 +72,8 @@ class Dock(pgDock):
 
         else:
             pass
-
+        self._float_area_0 = None
         self.progressBar = self.label.progressBar
-        # self.uuid = uuid.uuid4()
-
-        # self.raiseOverlay()
-
-        if False:
-            self.hStyle = """
-            Dock > QWidget {
-                border: 1px solid #000;
-                border-radius: 1px;
-                border-top-left-radius: 0px;
-                border-top-right-radius: 0px;
-                border-top-width: 0px;
-            }
-            """
-            self.vStyle = """
-            Dock > QWidget {
-                border: 1px solid #000;
-                border-radius: 1px;
-                border-top-left-radius: 0px;
-                border-bottom-left-radius: 0px;
-                border-left-width: 0px;
-            }
-            """
-            self.nStyle = """
-            Dock > QWidget {
-                border: 1px solid #000;
-                border-radius: 1px;
-            }"""
-            self.dragStyle = """
-            Dock > QWidget {
-                border: 4px solid #00F;
-                border-radius: 1px;
-            }"""
-
-            self.widgetArea.setStyleSheet(self.hStyle)
         self.topLayout.update()
 
     def populateContextMenu(self, menu: QMenu) -> QMenu:
@@ -167,6 +126,7 @@ class Dock(pgDock):
 
     def addTempArea(self):
         if self.home is None:
+            from .dockarea import DockArea
             area = DockArea(temporary=True, home=self)
             self.tempAreas.append(area)
             win = DockWindow(area)
@@ -202,137 +162,22 @@ class Dock(pgDock):
             self.setVisible(True)
             self.orig_area.moveDock(self, 'left', None)
 
+            self._float_area_0 = None
+        self.label.updateStyle()
+        self.label.btnFloat.setToolTip('Float window')
 
-class DockArea(pgDockArea):
-    sigDragEnterEvent = pyqtSignal(QDragEnterEvent)
-    sigDragMoveEvent = pyqtSignal(QDragMoveEvent)
-    sigDragLeaveEvent = pyqtSignal(QDragLeaveEvent)
-    sigDropEvent = pyqtSignal(QDropEvent)
+    def float(self):
+        if self._float_area_0 is None:
+            self._float_area_0 = getattr(self, 'orig_area')
+        super().float()
+        self.label.updateStyle()
+        self.label.btnFloat.setToolTip('Move back to main window')
 
-    def __init__(self, *args, **kwds):
-        super(DockArea, self).__init__(*args, **kwds)
-        self.setAcceptDrops(True)
-
-    def makeContainer(self, typ):
-        c = super(DockArea, self).makeContainer(typ)
-        # c.apoptose = lambda x : DockArea.containerApoptose(c, x)
-        # c.apoptose = lambda p : DockArea.containerApoptose(c,p)
-        # c.apoptose(True)
-        return c
-
-    """
-    #todo: somehow manipulate this to solve issue #21
-    #ask user to really close DockArea if more than one dock is opened
-    #"Do you really want to close this window and all contents?"
-    @staticmethod
-    def containerApoptose(self, propagate):
-        ##if there is only one (or zero) item in this container, disappear.
-        cont = self._container
-        c = self.count()
-        if c > 1:
-            return
-        if self.count() == 1:  ## if there is one item, give it to the parent container (unless this is the top)
-            if self is self.area.topContainer:
-                return
-            self.container().insert(self.widget(0), 'before', self)
-        # print "apoptose:", self
-        self.close()
-        if propagate and cont is not None:
-            cont.apoptose()
-
-    def fixDock(self, dock):
-
-        pass
-    """
-
-    def floatDock(self, dock: Dock):
-        """Removes *dock* from this DockArea and places it in a new window."""
-
-        dockLabel: DockLabel = dock.label
-
-        lastArea = dock.area
-        super().floatDock(dock)
-
-        if isinstance(lastArea, DockArea):
-            lastArea.sigDockRemoved.emit(dock)
-
-        parentWindow = dock.parent()
-        while isinstance(parentWindow, QObject) and parentWindow.parent():
-            parentWindow = parentWindow.parent()
-
-        if isinstance(parentWindow, TempAreaWindow):
-            dockLabel.btnUnFloat.setVisible(True)
-            parentWindow.setWindowTitle('EnMAP-Box')
-            parentWindow.setWindowIcon(QIcon(':/enmapbox/gui/ui/icons/enmapbox.svg'))
-            # fix for https://bitbucket.org/hu-geomatics/enmap-box/issues/
-            parentWindow.resize(QSize(300, 300))
-
-    def apoptose(self):
-        try:
-            if self.topContainer is not None and self.topContainer.count() == 0:
-                self.topContainer = None
-
-            if self.topContainer is None:
-                if self.temporary and self.home is not None:
-                    self.home.removeTempArea(self)
-            else:
-                pass
-        except Exception:
-            self.topContainer = None
-
-    sigDockAdded = pyqtSignal(Dock)
-    sigDockRemoved = pyqtSignal(Dock)
-
-    def addTempArea(self):
-        if self.home is None:
-            area = DockArea(temporary=True, home=self)
-            self.tempAreas.append(area)
-            win = TempAreaWindow(area)
-            area.win = win
-            win.show()
+    def toggleFloat(self):
+        if self._float_area_0:
+            self.unfloat()
         else:
-            area = self.home.addTempArea()
-        #  print "added temp area", area, area.window()
-        return area
-
-    def addDock(
-        self,
-        dock: Union[pgDock, Dock],
-        position: str = 'bottom',
-        relativeTo=None,
-        **kwds
-    ) -> Optional[Dock]:
-
-        if hasattr(dock, 'orig_area'):
-            dock.label.btnUnFloat.setVisible(dock.orig_area != self)
-
-        v = None
-        try:
-            visibility = dock.isVisible()
-            v = super(DockArea, self).addDock(dock=dock, position=position, relativeTo=relativeTo, **kwds)
-            dock.setVisible(visibility)
-            self.sigDockAdded.emit(dock)
-        except Exception as ex:
-            print(f'Failed to add dock:\n{ex}', file=sys.stderr)
-        return v
-
-    # forward to EnMAPBox
-    def dragEnterEvent(self, event):
-        self.sigDragEnterEvent.emit(event)
-
-    # forward to EnMAPBox
-    def dragMoveEvent(self, event):
-
-        self.sigDragMoveEvent.emit(event)
-
-    # forward to EnMAPBox
-    def dragLeaveEvent(self, event):
-
-        self.sigDragLeaveEvent.emit(event)
-
-    # forward to EnMAPBox
-    def dropEvent(self, event):
-        self.sigDropEvent.emit(event)
+            self.float()
 
 
 class DockLabel(pgDockLabel):
@@ -360,20 +205,27 @@ class DockLabel(pgDockLabel):
         self.closeButton: QToolButton
         self.closeButton.setToolTip('Close window')
         self.closeButton.setIcon(QApplication.style().standardIcon(QStyle.StandardPixmap.SP_TitleBarCloseButton))
+        # self.closeButton.setIcon(QApplication.style().standardIcon(QStyle.StandardPixmap.SP_TabCloseButton))
+        # self.closeButton.setIcon(QApplication.style().standardIcon(QStyle.StandardPixmap.SP_DialogCloseButton))
+        # self.closeButton.setIcon(QIcon(r':/qt-project.org/styles/commonstyle/images/closedock-64.png'))
+        # self.closeButton.setIcon() SP_TabCloseButton
 
         self.btnFloat = QToolButton(self)
         self.btnFloat.setToolTip('Float window')
-        self.btnFloat.clicked.connect(dock.float)
+        self.btnFloat.clicked.connect(dock.toggleFloat)
         self.btnFloat.setIcon(QApplication.style().standardIcon(QStyle.StandardPixmap.SP_TitleBarNormalButton))
+        # self.btnFloat.setIcon(QIcon(':/qt-project.org/styles/commonstyle/images/normalizedockup-32.png'))
         self.btnFloat.setVisible(allow_floating)
 
-        self.btnUnFloat = QToolButton(self)
-        self.btnUnFloat.setText('U')
-        self.btnUnFloat.setToolTip('Unfloat window')
-        self.btnUnFloat.clicked.connect(dock.unfloat)
-        self.btnUnFloat.setVisible(not allow_floating)
+        # self.btnUnFloat = QToolButton(self)
+        # self.btnUnFloat.setText('U')
+        # self.btnUnFloat.setToolTip('Unfloat window')
+        # self.btnUnFloat.clicked.connect(dock.unfloat)
+        # self.btnUnFloat.setVisible(not allow_floating)
 
-        self.mButtons.extend([self.closeButton, self.btnFloat, self.btnUnFloat])
+        self.mButtons.extend([self.closeButton, self.btnFloat,
+                              # self.btnUnFloat
+                              ])
 
         # add progress bar
         self.progressBar = QProgressBar(self)
@@ -383,6 +235,54 @@ class DockLabel(pgDockLabel):
         self.progressBar.setTextVisible(False)
         self.progressBar.hide()
         self.update()
+
+    def updateStyle(self):
+        r = '3px'
+        if self.dim:
+            # tabbed, in background
+            fg = '#aaa'
+            # bg = '#44a'
+            bg = '#666'
+            # border = '#339'
+            border = '#333'
+
+        else:
+            fg = '#fff'
+            bg = '#66c'
+            border = '#55B'
+
+        # remove bor
+        border = bg
+        if self.orientation == 'vertical':
+            self.vStyle = """DockLabel {
+                background-color : %s;
+                color : %s;
+                border-top-right-radius: 0px;
+                border-top-left-radius: %s;
+                border-bottom-right-radius: 0px;
+                border-bottom-left-radius: %s;
+                border-width: 0px;
+                border-right: 2px solid %s;
+                padding-top: 3px;
+                padding-bottom: 3px;
+                font-size: %s;
+            }""" % (bg, fg, r, r, border, self.fontSize)
+            self.setStyleSheet(self.vStyle)
+        else:
+            self.hStyle = """DockLabel {
+                background-color : %s;
+                color : %s;
+                border-top-right-radius: %s;
+                border-top-left-radius: %s;
+                border-bottom-right-radius: 0px;
+                border-bottom-left-radius: 0px;
+                border-width: 0px;
+                border-bottom: 2px solid %s;
+                padding-left: 3px;
+                padding-right: 3px;
+                font-size: %s;
+            }""" % (bg, fg, r, r, border, self.fontSize)
+            self.setStyleSheet(self.hStyle)
 
     def contextMenuEvent(self, event: QContextMenuEvent):
         self.sigContextMenuRequest.emit(event)

@@ -4,11 +4,11 @@ from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import QgsVectorLayer, QgsProject, QgsRasterLayer
 
 from enmapbox import initAll
+from enmapbox.gui.dataviews.dockarea import DockArea
 from enmapbox.gui.dataviews.dockmanager import (
     MapDockTreeNode, SpeclibDockTreeNode, DockManager, DockManagerTreeModel,
     DockTreeView
 )
-from enmapbox.gui.dataviews.docks import DockArea
 from enmapbox.gui.dataviews.mapdock import MapDock
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.speclib.core import is_spectral_library

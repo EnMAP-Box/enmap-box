@@ -3,7 +3,8 @@ import warnings
 from pathlib import Path
 from typing import Union
 
-from qgis.PyQt.QtCore import pyqtSignal, Qt, QMimeData, QUrl
+from qgis.PyQt.QtCore import Qt, QMimeData, QUrl
+from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtGui import QDragEnterEvent, QDropEvent
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QMessageBox
 
@@ -188,6 +189,8 @@ class TextDockWidget(QWidget):
                 with open(path, 'w', encoding='utf-8') as file:
                     file.write(self.mTextEdit.toPlainText())
                 self.mFile = path
+
+        self.updateTitle()
 
 
 class TextDock(Dock):

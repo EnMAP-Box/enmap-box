@@ -1,13 +1,15 @@
 import codecs
 import os
+import re
 
-from enmapbox.gui.dataviews.docks import RX_HTML_FILE, Dock
-from enmapbox.gui.dataviews.textdock import TextDockWidget
-from enmapbox.gui.utils import enmapboxUiPath
-from enmapbox.qgispluginsupport.qps.utils import loadUi
 from qgis.PyQt.QtCore import QMimeData, QByteArray, Qt
 from qgis.PyQt.QtGui import QTextCursor
 from qgis.PyQt.QtWidgets import QTextEdit, QWidget, QFileDialog
+
+from enmapbox.gui.dataviews.docks import Dock
+from enmapbox.gui.dataviews.textdock import TextDockWidget
+from enmapbox.gui.utils import enmapboxUiPath
+from enmapbox.qgispluginsupport.qps.utils import loadUi
 
 
 class MimeDataTextEdit(QTextEdit):
@@ -117,3 +119,6 @@ class MimeDataDock(Dock):
 
         self.mimeDataWidget = MimeDataDockWidget(self)
         self.addWidget(self.mimeDataWidget, 0, 0)
+
+
+RX_HTML_FILE = re.compile(r'\.(html|html|xhtml)$', re.I)
