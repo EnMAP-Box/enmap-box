@@ -10,7 +10,7 @@ import time
 from ensomap import hys
 import numpy as np
 
-from qgis.PyQt import Qt
+from qgis.PyQt.QtCore import Qt
 
 
 class ui_cal:
