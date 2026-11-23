@@ -4,7 +4,7 @@ from enmapbox.gui.contextmenuprovider import EnMAPBoxContextMenuProvider
 from enmapbox.gui.contextmenus import EnMAPBoxAbstractContextMenuProvider, EnMAPBoxContextMenuRegistry
 from enmapbox.gui.datasources.manager import DataSourceManagerTreeView
 from enmapbox.gui.dataviews.dockmanager import DockTreeView, DockManagerLayerTreeModelMenuProvider
-from enmapbox.gui.dataviews.docks import MapDock
+from enmapbox.gui.dataviews.mapdock import MapDock
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import MapCanvas
 from enmapbox.qgispluginsupport.qps.models import TreeNode

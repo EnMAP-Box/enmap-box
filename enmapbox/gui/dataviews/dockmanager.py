@@ -42,8 +42,14 @@ from qgis.gui import QgsLayerTreeView, \
 
 from enmapbox.gui.datasources.datasources import DataSource, ModelDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager
-from enmapbox.gui.dataviews.docks import Dock, DockArea, \
-    AttributeTableDock, SpectralLibraryDock, TextDock, MimeDataDock, WebViewDock, LUT_DOCKTYPES, MapDock
+from enmapbox.gui.dataviews.attributetabledock import AttributeTableDock
+from enmapbox.gui.dataviews.dockarea import DockArea
+from enmapbox.gui.dataviews.docks import Dock
+from enmapbox.gui.dataviews.mapdock import MapDock
+from enmapbox.gui.dataviews.mimedatadock import MimeDataDock
+from enmapbox.gui.dataviews.spectrallibrarydock import SpectralLibraryDock
+from enmapbox.gui.dataviews.textdock import TextDock
+from enmapbox.gui.dataviews.webviewdock import WebViewDock
 from enmapbox.gui.mapcanvas import MapCanvas, KEY_LAST_CLICKED
 from enmapbox.gui.mimedata import (
     MDF_QGIS_LAYERTREEMODELDATA, MDF_ENMAPBOX_LAYERTREEMODELDATA, QGIS_URILIST_MIMETYPE,
@@ -2404,3 +2410,27 @@ class SpeclibProfileVisualizationGroupNode(CheckableLayerTreeNode):
 
     def checkState(self):
         return Qt.CheckState.Checked if self.vis().isVisible() else Qt.CheckState.Unchecked
+
+
+class DockTypes(object):
+    """
+    Enumeration that defines the standard dock types.
+    """
+    MapDock = 'MAP'
+    TextDock = 'TEXT'
+    MimeDataDock = 'MIME'
+    WebViewDock = 'WEBVIEW'
+    SpectralLibraryDock = 'SPECLIB'
+    AttributeTableDock = 'ATTRIBUTES'
+
+
+LUT_DOCKTYPES = {DockTypes.MapDock: MapDock,
+                 DockTypes.TextDock: TextDock,
+                 DockTypes.MimeDataDock: MimeDataDock,
+                 DockTypes.WebViewDock: WebViewDock,
+                 DockTypes.SpectralLibraryDock: SpectralLibraryDock,
+                 DockTypes.AttributeTableDock: AttributeTableDock
+                 }
+
+for cls in set(LUT_DOCKTYPES.values()):
+    LUT_DOCKTYPES[cls] = cls

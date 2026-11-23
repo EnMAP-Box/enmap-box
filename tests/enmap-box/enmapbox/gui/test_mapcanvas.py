@@ -17,7 +17,7 @@ from typing import List
 
 from enmapbox import initAll
 from enmapbox.exampledata import enmap, hires, landcover_polygon
-from enmapbox.gui.dataviews.docks import MapDock
+from enmapbox.gui.dataviews.mapdock import MapDock
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import CanvasLink, MapCanvas, KEY_LAST_CLICKED, LINK_ON_CENTER
 from enmapbox.qgispluginsupport.qps.maptools import CursorLocationMapTool, MapTools
