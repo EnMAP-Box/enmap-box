@@ -58,7 +58,7 @@ class Dock(pgDock):
 
         self.mEnMAPBox = None
 
-        # replace PyQtGraph Label by EnmapBox labels (could be done by inheritances as well)
+        # replace PyQtGraph Label by EnMAP-Box labels (could be done by inheritances as well)
         title = self.title()
         if True:
             # self.topLayout.addWidget(self.label, 0, 1)

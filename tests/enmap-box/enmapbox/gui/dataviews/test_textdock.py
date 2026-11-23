@@ -13,7 +13,7 @@ initAll()
 
 class TextDockTestCases(TestCase):
 
-    def test_widget_title(self):
+    def test_textdock_title(self):
         da = DockArea()
         w = QMainWindow()
         w.setCentralWidget(da)
@@ -22,6 +22,7 @@ class TextDockTestCases(TestCase):
 
         dock.setTitle('MyDock')
         self.assertEqual(dock.title(), 'MyDock')
+        dock.textDockWidget().setText('Foobar')
 
         tmp = self.createTestOutputDirectory()
         path1 = tmp / 'testfile1.txt'
@@ -41,36 +42,24 @@ class TextDockTestCases(TestCase):
         da.addDock(dock)
         self.showGui(w)
 
-    def test_TextDock(self):
-        da = DockArea()
-        self.showGui(da)
-        dock = TextDock()
-        self.assertIsInstance(dock, TextDock)
-        tw = dock.textDockWidget()
-        self.assertIsInstance(tw, TextDockWidget)
-
-        testText = """
-        foo
-        bar
-        """
-        tw.setText(testText)
-        self.assertEqual(testText, tw.text())
+    def test_textdockwidget(self):
+        tw = TextDockWidget()
+        tw.setText('Foobar')
+        self.assertTrue(tw.btnLoadFile.isEnabled())
+        self.assertFalse(tw.btnSaveFile.isEnabled())
+        self.assertTrue(tw.btnSaveFileAs.isEnabled())
 
         tmp = self.createTestOutputDirectory()
-        pathTxt = tmp / 'testfile.txt'
-        tw.saveFile(pathTxt)
+        path1 = tmp / 'testfile1.txt'
+        tw.saveFile(path1)
 
-        with open(pathTxt, encoding='utf-8') as f:
-            checkTxt = f.read()
-        self.assertEqual(checkTxt, testText)
+        self.assertEqual(tw.windowTitle(), path1.name)
 
-        tw.setText('')
-        self.assertEqual(tw.text(), '')
-        tw.setFile(pathTxt)
-        self.assertEqual(checkTxt, tw.text())
+        self.assertTrue(tw.btnLoadFile.isEnabled())
+        self.assertTrue(tw.btnSaveFile.isEnabled())
+        self.assertTrue(tw.btnSaveFileAs.isEnabled())
 
-        da.addDock(dock)
-        self.showGui(da)
+        self.showGui(tw)
 
 
 if __name__ == '__main__':

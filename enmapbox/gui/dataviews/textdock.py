@@ -46,7 +46,7 @@ class TextDockWidget(QWidget):
         self.actionSaveFile.triggered.connect(lambda: self.saveFile(saveAs=False))
         self.actionSaveFileAs.triggered.connect(lambda: self.saveFile(saveAs=True))
         self.actionSaveFile.setEnabled(False)
-        self.updateTitle()
+        self.updateGui()
 
     def onOpenFile(self):
 
@@ -124,11 +124,11 @@ class TextDockWidget(QWidget):
 
         else:
             self.mFile = None
-        self.updateTitle()
-        self.actionSaveFile.setEnabled(os.path.isfile(self.file()))
+        self.updateGui()
+
         self.sigSourceChanged.emit(str(path))
 
-    def updateTitle(self):
+    def updateGui(self):
         """
         Updates the widget title
         """
@@ -138,6 +138,8 @@ class TextDockWidget(QWidget):
             # title += ' | {}'.format(os.path.basename(self.mFile))
             title = os.path.basename(self.mFile)
         self.setWindowTitle(title)
+
+        self.actionSaveFile.setEnabled(os.path.isfile(self.file()))
 
     def setText(self, *args, **kwds):
         """
@@ -190,7 +192,7 @@ class TextDockWidget(QWidget):
                     file.write(self.mTextEdit.toPlainText())
                 self.mFile = path
 
-        self.updateTitle()
+        self.updateGui()
 
 
 class TextDock(Dock):
