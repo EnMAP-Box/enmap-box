@@ -96,7 +96,8 @@ if __name__ == '__main__':
     parser.add_argument('-e', '--exampledata', required=False, help='Load example data', action='store_true')
     parser.add_argument(
         '--uitheme', required=False,
-        help='Set UI theme. Available themes: {}'.format(', '.join(QgsApplication.uiThemes().keys()))
+        help="Set UI theme, e.g. 'Night Mapping', 'Blend of Gray', 'default'. "
+             "Run QgsApplication.uiThemes().keys() to explore available themes."
     )
     args = parser.parse_args()
 

@@ -26,9 +26,7 @@ from enmapbox.gui.datasources.manager import DataSourceManager
 from enmapbox.gui.dataviews.dockmanager import (
     DockTreeView, DockTreeNode
 )
-from enmapbox.gui.dataviews.docks import (
-    Dock
-)
+from enmapbox.gui.dataviews.docks import Dock
 from enmapbox.gui.dataviews.mapdock import MapDock
 from enmapbox.gui.dataviews.webviewdock import WebViewDock
 from enmapbox.gui.enmapboxgui import EnMAPBox

@@ -642,7 +642,7 @@ class DockManager(QObject):
 
             if len(dropped_speclibs) > 0:
                 # show 1st speclib
-                from enmapbox.gui.dataviews.docks import SpectralLibraryDock
+                from enmapbox.gui.dataviews.spectrallibrarydock import SpectralLibraryDock
                 NEW_DOCK = self.createDock(SpectralLibraryDock, speclib=dropped_speclibs[0])
                 if not isinstance(NEW_DOCK, SpectralLibraryDock):
                     raise ValueError('Unable to create SpectralLibraryDock')
@@ -659,7 +659,7 @@ class DockManager(QObject):
             ]
 
             if len(dropped_maplayers) > 0:
-                from enmapbox.gui.dataviews.docks import MapDock
+                from enmapbox.gui.dataviews.mapdock import MapDock
                 NEW_DOCK = self.createDock(MapDock)
                 if not isinstance(NEW_DOCK, MapDock):
                     raise ValueError('Unable to create MapDock')
@@ -2036,14 +2036,14 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         from enmapbox.gui.enmapboxgui import EnMAPBox
         emb = EnMAPBox.instance()
         if isinstance(emb, EnMAPBox) and isinstance(layer, QgsVectorLayer):
-            from enmapbox.gui.dataviews.docks import AttributeTableDock
+            from enmapbox.gui.dataviews.attributetabledock import AttributeTableDock
             emb.createDock(AttributeTableDock, layer=layer)
 
     def openSpectralLibraryView(self, layer: QgsVectorLayer):
         from enmapbox.gui.enmapboxgui import EnMAPBox
         emb = EnMAPBox.instance()
         if isinstance(emb, EnMAPBox) and isinstance(layer, QgsVectorLayer):
-            from enmapbox.gui.dataviews.docks import SpectralLibraryDock
+            from enmapbox.gui.dataviews.spectrallibrarydock import SpectralLibraryDock
             emb.createDock(SpectralLibraryDock, speclib=layer)
 
     def onAddGroup(self):
