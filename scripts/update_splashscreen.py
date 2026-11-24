@@ -160,3 +160,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     update_splashscreen(version=args.version, pure=args.pure, path_png=args.png, path_svg=args.svg,
                         keep_tmp=args.keep_tmp)
+    exit(0)
