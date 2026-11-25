@@ -27,10 +27,10 @@ from typing import Optional, Dict, Union, Any, List, Sequence
 from qgis.PyQt.QtCore import QMetaType
 from qgis.PyQt.QtCore import QUrl
 from qgis.PyQt.QtCore import pyqtSignal, Qt, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
-from qgis.PyQt.QtGui import (
-    QDesktopServices, QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QColor, QIcon,
-    QKeyEvent, QCloseEvent, QGuiApplication
-)
+from qgis.PyQt.QtGui import QDesktopServices
+from qgis.PyQt.QtGui import QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QColor, QIcon, \
+    QKeyEvent, \
+    QCloseEvent, QGuiApplication
 from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, QMainWindow, QApplication, QSizePolicy, \
     QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
     QProgressBar, QMessageBox
@@ -87,34 +87,6 @@ from enmapboxprocessing.algorithm.importprismal2calgorithm import ImportPrismaL2
 from enmapboxprocessing.algorithm.importprismal2dalgorithm import ImportPrismaL2DAlgorithm
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
-from qgis.PyQt.QtCore import QMetaType
-from qgis.PyQt.QtCore import QUrl
-from qgis.PyQt.QtCore import pyqtSignal, Qt, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
-from qgis.PyQt.QtGui import QDesktopServices
-from qgis.PyQt.QtGui import QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QColor, QIcon, \
-    QKeyEvent, \
-    QCloseEvent, QGuiApplication
-from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, QMainWindow, QApplication, QSizePolicy, \
-    QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
-    QProgressBar, QMessageBox
-from qgis.PyQt.QtXml import QDomDocument
-from qgis.core import (
-    QgsBrowserModel, QgsField, QgsExpressionContextGenerator, QgsExpressionContext,
-    QgsProcessingContext,
-    QgsExpressionContextUtils, QgsFeature, QgsProcessingException, QgsMapLayer, QgsVectorLayer, QgsRasterLayer,
-    QgsProject,
-    QgsProcessingAlgorithm, Qgis, QgsCoordinateReferenceSystem, QgsWkbTypes,
-    QgsPointXY, QgsLayerTree, QgsLayerTreeLayer, QgsVectorLayerTools,
-    QgsZipUtils, QgsProjectArchive, QgsSettings,
-    QgsStyle, QgsSymbolLegendNode, QgsSymbol, QgsTaskManager, QgsApplication,
-    QgsProcessingAlgRunnerTask, QgsRectangle, edit
-)
-from qgis.gui import (
-    QgsMapCanvas, QgsMapTool, QgisInterface, QgsMessageBar, QgsMessageViewer, QgsMessageBarItem,
-    QgsMapLayerConfigWidgetFactory, QgsAttributeTableFilterModel, QgsSymbolSelectorDialog,
-    QgsSymbolWidgetContext, QgsProcessingAlgorithmWidgetBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog,
-    QgsNewVectorLayerDialog, QgsProcessingContextGenerator, QgsProcessingParameterWidgetContext
-)
 from .contextmenuprovider import EnMAPBoxContextMenuProvider
 from .contextmenus import EnMAPBoxContextMenuRegistry
 from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
