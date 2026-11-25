@@ -2,6 +2,15 @@
 
 ![Logo](enmapbox/gui/ui/icons/enmapbox.svg)
 
+[![Code Checks](https://github.com/EnMAP-Box/enmap-box/actions/workflows/code_check.yml/badge.svg)](https://github.com/EnMAP-Box/enmap-box/actions/workflows/code_check.yml)
+[![EnMAP-Box Tests](https://github.com/EnMAP-Box/enmap-box/actions/workflows/run-tests.yml/badge.svg)](https://github.com/EnMAP-Box/enmap-box/actions/workflows/run-tests.yml)
+[![Conda Environments](https://github.com/EnMAP-Box/enmap-box/actions/workflows/run-tests-conda.yml/badge.svg)](https://github.com/EnMAP-Box/enmap-box/actions/workflows/run-tests-conda.yml)
+
+# [![Test All Environments](https://github.com/EnMAP-Box/enmap-box/actions/workflows/test-all-environments.yml/badge.svg)](https://github.com/EnMAP-Box/enmap-box/actions/workflows/test-all-environments.yml)
+
+[![URL Check](https://github.com/EnMAP-Box/enmap-box/actions/workflows/urlcheck.yml/badge.svg)](https://github.com/EnMAP-Box/enmap-box/actions/workflows/urlcheck.yml)
+[![Dependency Updates](https://github.com/EnMAP-Box/enmap-box/actions/workflows/dependency-updates.yml/badge.svg)](https://github.com/EnMAP-Box/enmap-box/actions/workflows/dependency-updates.yml)
+
 The EnMAP-Box is free and open source [QGIS Plugin ](https://www.qgis.org) to visualize and process remote sensing
 raster data.
 It is particularly developed to handle imaging spectroscopy data, as from the upcoming EnMAP sensor.

@@ -1,22 +1,22 @@
 name: SpecDeepMap Tests
 
 on:
+  push:
+    branches:
+      - main
+      - release-**
+      - release_**
+
+  pull_request:
+    branches:
+      - main
+      - release-**
+      - release_**
+
+  release:
+    types: [ published ]
+
   workflow_dispatch:
-
-  # push:
-  #   branches:
-  #     - main
-  #     - release-**
-  #     - release_**
-
-  # pull_request:
-  #   branches:
-  #     - main
-  #     - release-**
-  #     - release_**
-
-  # release:
-  #   types: [ published ]
 
 jobs:
   # Run EnMAP-Box tests
@@ -31,14 +31,16 @@ jobs:
       CI: true
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         mamba_env: [ "enmapbox-full" ]
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: recursive
+          fetch-depth: 1
 
       - name: Runner Info
         run: |
@@ -62,7 +64,6 @@ jobs:
       - name: Conda Environment Info
         shell: bash -el {0}
         run: |
-          conda install openblas -y
           conda info
           conda list
 
@@ -74,4 +75,4 @@ jobs:
         run: |
           pwd
           ls -la
-          python3 -m unittest discover -s tests/enmap-box/enmapbox/apps/SpecDeepMap -t tests/enmap-box/enmapbox/apps/SpecDeepMap
+          python3 -m unittest discover -s tests/enmap-box/enmapbox/apps/SpecDeepMap -t tests/enmap-box/enmapbox/apps/SpecDeepMap -v

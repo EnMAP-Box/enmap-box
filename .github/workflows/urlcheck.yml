@@ -1,16 +1,34 @@
 name: ✅ Check URLs
 
 on:
+  push:
+    branches:
+      - main
+      - release-**
+      - release_**
+
+  pull_request:
+    branches:
+      - main
+      - release-**
+      - release_**
+
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sundays
+
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
       - name: urls-checker
-        uses: urlstechie/urlchecker-action@master
+        uses: urlstechie/urlchecker-action@v2
         with:
           file_types: .md,.py,.rst
 
