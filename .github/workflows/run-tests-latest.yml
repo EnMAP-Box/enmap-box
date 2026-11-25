@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        qgis_version: [ latest ]
+        qgis_version: [ "latest", "stable" ]
       fail-fast: false
 
     env:
