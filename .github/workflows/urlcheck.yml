@@ -1,21 +1,6 @@
 name: ✅ Check URLs
 
 on:
-  push:
-    branches:
-      - main
-      - release-**
-      - release_**
-
-  pull_request:
-    branches:
-      - main
-      - release-**
-      - release_**
-
-  schedule:
-    - cron: '0 0 * * 0'  # Weekly on Sundays
-
   workflow_dispatch:
 
 jobs:
