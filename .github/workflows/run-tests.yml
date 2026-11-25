@@ -21,6 +21,7 @@ on:
 jobs:
   # Run EnMAP-Box tests
   test:
+    name: QGIS ${{ matrix.qgis_version }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
