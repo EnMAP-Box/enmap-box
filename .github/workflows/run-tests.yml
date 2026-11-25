@@ -1,4 +1,4 @@
-name: 🧪 EnMAP-Box Tests
+name: 🧪 Tests (Docker)
 
 on:
   push:
