@@ -24,6 +24,35 @@ import warnings
 from os.path import basename, dirname
 from typing import Optional, Dict, Union, Any, List, Sequence
 
+from qgis.PyQt.QtCore import QMetaType
+from qgis.PyQt.QtCore import QUrl
+from qgis.PyQt.QtCore import pyqtSignal, Qt, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
+from qgis.PyQt.QtGui import QDesktopServices
+from qgis.PyQt.QtGui import QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QColor, QIcon, \
+    QKeyEvent, \
+    QCloseEvent, QGuiApplication
+from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, QMainWindow, QApplication, QSizePolicy, \
+    QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
+    QProgressBar, QMessageBox
+from qgis.PyQt.QtXml import QDomDocument
+from qgis.core import (
+    QgsBrowserModel, QgsField, QgsExpressionContextGenerator, QgsExpressionContext,
+    QgsProcessingContext,
+    QgsExpressionContextUtils, QgsFeature, QgsProcessingException, QgsMapLayer, QgsVectorLayer, QgsRasterLayer,
+    QgsProject,
+    QgsProcessingAlgorithm, Qgis, QgsCoordinateReferenceSystem, QgsWkbTypes,
+    QgsPointXY, QgsLayerTree, QgsLayerTreeLayer, QgsVectorLayerTools,
+    QgsZipUtils, QgsProjectArchive, QgsSettings,
+    QgsStyle, QgsSymbolLegendNode, QgsSymbol, QgsTaskManager, QgsApplication,
+    QgsProcessingAlgRunnerTask, QgsRectangle, edit
+)
+from qgis.gui import (
+    QgsMapCanvas, QgsMapTool, QgisInterface, QgsMessageBar, QgsMessageViewer, QgsMessageBarItem,
+    QgsMapLayerConfigWidgetFactory, QgsAttributeTableFilterModel, QgsSymbolSelectorDialog,
+    QgsSymbolWidgetContext, QgsProcessingAlgorithmWidgetBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog,
+    QgsNewVectorLayerDialog, QgsProcessingContextGenerator, QgsProcessingParameterWidgetContext
+)
+
 import enmapbox
 import enmapbox.gui.datasources.manager
 from enmapbox import messageLog, debugLog, DEBUG
@@ -57,34 +86,6 @@ from enmapboxprocessing.algorithm.importprismal2calgorithm import ImportPrismaL2
 from enmapboxprocessing.algorithm.importprismal2dalgorithm import ImportPrismaL2DAlgorithm
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
-from qgis.PyQt.QtCore import QMetaType
-from qgis.PyQt.QtCore import QUrl
-from qgis.PyQt.QtCore import pyqtSignal, Qt, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
-from qgis.PyQt.QtGui import QDesktopServices
-from qgis.PyQt.QtGui import QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QColor, QIcon, \
-    QKeyEvent, \
-    QCloseEvent, QGuiApplication
-from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, QMainWindow, QApplication, QSizePolicy, \
-    QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
-    QProgressBar, QMessageBox
-from qgis.PyQt.QtXml import QDomDocument
-from qgis.core import (
-    QgsBrowserModel, QgsField, QgsExpressionContextGenerator, QgsExpressionContext,
-    QgsProcessingContext,
-    QgsExpressionContextUtils, QgsFeature, QgsProcessingException, QgsMapLayer, QgsVectorLayer, QgsRasterLayer,
-    QgsProject,
-    QgsProcessingAlgorithm, Qgis, QgsCoordinateReferenceSystem, QgsWkbTypes,
-    QgsPointXY, QgsLayerTree, QgsLayerTreeLayer, QgsVectorLayerTools,
-    QgsZipUtils, QgsProjectArchive, QgsSettings,
-    QgsStyle, QgsSymbolLegendNode, QgsSymbol, QgsTaskManager, QgsApplication,
-    QgsProcessingAlgRunnerTask, QgsRectangle, edit
-)
-from qgis.gui import (
-    QgsMapCanvas, QgsMapTool, QgisInterface, QgsMessageBar, QgsMessageViewer, QgsMessageBarItem,
-    QgsMapLayerConfigWidgetFactory, QgsAttributeTableFilterModel, QgsSymbolSelectorDialog,
-    QgsSymbolWidgetContext, QgsProcessingAlgorithmWidgetBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog,
-    QgsNewVectorLayerDialog, QgsProcessingContextGenerator, QgsProcessingParameterWidgetContext
-)
 from .contextmenuprovider import EnMAPBoxContextMenuProvider
 from .contextmenus import EnMAPBoxContextMenuRegistry
 from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
@@ -96,6 +97,7 @@ from .mapcanvas import MapCanvas
 from .splashscreen.splashscreen import EnMAPBoxSplashScreen
 from .utils import enmapboxUiPath, high_contrast_random_color
 from .widgets.createspeclibdialog import CreateSpectralLibraryDialog
+from ..enmapboxproject import EnMAPBoxProject
 from ..enmapboxsettings import EnMAPBoxSettings
 from ..qgispluginsupport.qps.reimplementation.algorithmwidget import AlgorithmWidget
 from ..qgispluginsupport.qps.speclib.core import profile_fields
@@ -304,69 +306,6 @@ class EnMAPBoxLayerTreeLayer(QgsLayerTreeLayer):
         self.updateLayerTitle()
 
 
-class EnMAPBoxProject(QgsProject):
-
-    def __init__(self, *args, **kwds):
-        super().__init__(*args, **kwds)
-        self.setTitle('EnMAP-Box')
-        self.mLayerRefs: list[QgsMapLayer] = []
-
-    def __repr__(self):
-        return f'<{self.__class__.__name__}: "{self.title()}">'
-
-    def removeAllMapLayers(self):
-        self.mLayerRefs.clear()
-        super().removeAllMapLayers()
-        self.mLayerRefs.clear()
-
-    def addMapLayer(self, mapLayer: QgsMapLayer, *args, **kwds) -> QgsMapLayer:
-        # self.debugPrint('addMapLayer')
-        lyr = super().addMapLayer(mapLayer, *args, **kwds)
-        if isinstance(lyr, QgsMapLayer) and lyr not in self.mLayerRefs:
-            self.mLayerRefs.append(lyr)
-        return lyr
-
-    def addMapLayers(self, mapLayers: QgsMapLayer, *args, **kwargs):
-        # self.debugPrint(f'addMapLayers {mapLayers}')
-        added_layers = super().addMapLayers(mapLayers)
-        for lyr in added_layers:
-            if lyr not in self.mLayerRefs:
-                self.mLayerRefs.append(lyr)
-        return added_layers
-
-    def removeMapLayers(self, layers):
-        # self.debugPrint(f'removeMapLayers {layers}')
-        result = super().removeMapLayers(layers)
-
-        for lyr in layers:
-            if isinstance(lyr, str):
-                lyr = self.mapLayer(lyr)
-            if lyr in self.mLayerRefs:
-                self.mLayerRefs.remove(lyr)
-        # self.debugPrint('removeMapLayers')
-        return result
-
-    def takeMapLayer(self, layer: QgsMapLayer) -> QgsMapLayer:
-        if layer in self.mLayerRefs:
-            self.mLayerRefs.remove(layer)
-        return super().takeMapLayer(layer)
-
-    def debugPrint(self, msg: str = ''):
-
-        keysE = list(self.mapLayers().keys())
-        if len(keysE) != len(self.mLayerRefs):
-            print('Warning: differing layer refs')
-        keysQ = list(QgsProject.instance().mapLayers().keys())
-
-        rows = [['EnMAPBox', 'QGIS', 'Layer ID']]
-        for k in sorted(set(keysE + keysQ)):
-            rows.append([str(k in keysE), str(k in keysQ), k])
-        info = '\n'.join(['{:<8}\t{:<4}\t{}'.format(*row) for row in rows])
-        if len(rows) == 1:
-            info += '\t - no map layers -'
-        print(info, flush=True)
-
-
 class EnMAPBox(QgisInterface):
     _instance = None
 
@@ -475,6 +414,7 @@ class EnMAPBox(QgisInterface):
         super().__init__()
 
         self.mProject: EnMAPBoxProject = EnMAPBoxProject()
+        self.mProject.sigSelectionChanged.connect(self.updateCurrentLayerActions)
         self.mContextGenerator = self.ContextGenerator(self)
 
         cmReg = EnMAPBoxContextMenuRegistry.instance()
@@ -1238,12 +1178,7 @@ class EnMAPBox(QgisInterface):
         layer = self.currentLayer()
         isVector = isinstance(layer, QgsVectorLayer)
 
-        hasSelectedFeatures = False
-
-        for lyr in self.dockTreeView().layerTreeModel().mapLayers():
-            if isinstance(lyr, QgsVectorLayer) and lyr.selectedFeatureCount() > 0:
-                hasSelectedFeatures = True
-                break
+        hasSelectedFeatures = isVector and layer.selectedFeatureCount() > 0
 
         self.ui.mActionDeselectFeatures.setEnabled(hasSelectedFeatures)
         self.ui.mActionSelectFeatures.setEnabled(isVector)
@@ -1672,6 +1607,7 @@ class EnMAPBox(QgisInterface):
                     self.ui.mActionSelectFeatures.setToolTip(a.toolTip())
                 ca.setChecked(ca == a)
         self.setMapTool(MapTools.SelectFeature)
+        self.updateCurrentLayerActions()
 
     def deselectFeatures(self):
         """
@@ -2565,7 +2501,6 @@ class EnMAPBox(QgisInterface):
 
     initializationCompleted = pyqtSignal()
     layerSavedAs = pyqtSignal(QgsMapLayer, str)
-    currentLayerChanged = pyqtSignal(QgsMapLayer)
 
     def actionAddSubDatasets(self) -> QAction:
         return self.ui.mActionAddSubDatasets
