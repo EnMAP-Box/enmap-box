@@ -14,4 +14,5 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR/.."
 export DOCKER_OPTS="-e CI=1 -e QT_QPA_PLATFORM=offscreen"
+.env/docker/docker-python.sh scripts/systeminfo.py
 .env/docker/docker-python.sh -m pytest "$@"

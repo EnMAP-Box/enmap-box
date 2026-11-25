@@ -1,4 +1,4 @@
-name: 🧪 Test on QGIS DEV
+name: 🧪 Test (QGIS DEV)
 
 on:
   workflow_dispatch:

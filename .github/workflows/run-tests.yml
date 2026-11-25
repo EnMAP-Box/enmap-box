@@ -1,4 +1,4 @@
-name: 🧪 EnMAP-Box Tests
+name: 🧪 Tests (Docker)
 
 on:
   push:
@@ -16,42 +16,40 @@ on:
   release:
     types: [ published ]
 
+  workflow_dispatch:
+
 jobs:
   # Run EnMAP-Box tests
   test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         qgis_version: [ '4.2', '4.4' ]
-      fail-fast: true
+      fail-fast: false
 
     env:
       QGIS_VERSION: ${{ matrix.qgis_version}}
+    
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
+          fetch-depth: 1
 
       - name: Docker Environment Info
         run: |
-          # ls -la .docker/
-          # ls -la
-          # ls -la ~
-          # ls -la /usr/bin
           docker --version
           lsb_release -a
-      - name: System Info
-        run: |
-          chmod +x .env/docker/docker-python.sh
-          .env/docker/docker-python.sh scripts/systeminfo.py
 
       - name: Setup Repository
         run: |
+          chmod +x .env/docker/docker-python.sh
           .env/docker/docker-python.sh scripts/setup_repository.py
 
       - name: Test EnMAP-Box on QGIS
         run: |
           chmod +x scripts/runtests_docker.sh
-          ./scripts/runtests_docker.sh -n auto
-        # docker compose -f .env/docker/docker-compose.gh.yml run qgis /usr/src/.env/docker/run_docker_tests.sh -n auto
+          ./scripts/runtests_docker.sh -n auto --cov=enmapbox --cov-report=xml
+        env:
+          QGIS_VERSION: ${{ matrix.qgis_version }}
