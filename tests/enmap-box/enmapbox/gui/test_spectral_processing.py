@@ -1,7 +1,8 @@
 import unittest
 
 from enmapbox import initAll
-from enmapbox.gui.dataviews.docks import DockTypes, SpectralLibraryDock
+from enmapbox.gui.dataviews.dockmanager import DockTypes
+from enmapbox.gui.dataviews.spectrallibrarydock import SpectralLibraryDock
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.testing import EnMAPBoxTestCase, start_app

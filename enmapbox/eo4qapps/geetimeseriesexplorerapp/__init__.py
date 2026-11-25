@@ -1,7 +1,8 @@
 from typing import Optional
 
 from enmapbox.gui.applications import EnMAPBoxApplication
-from enmapbox.gui.dataviews.docks import DockTypes, MapDock
+from enmapbox.gui.dataviews.dockmanager import DockTypes
+from enmapbox.gui.dataviews.mapdock import MapDock
 from enmapbox.gui.enmapboxgui import EnMAPBox
 from enmapbox.gui.mapcanvas import CanvasLink
 from enmapbox.utils import isEarthEngineModuleInstalled
@@ -24,8 +25,8 @@ def enmapboxApplicationFactory(enmapBox: EnMAPBox):
 class GeeTimeseriesExplorerApp(EnMAPBoxApplication):
 
     def __init__(
-            self, enmapBox: Optional[EnMAPBox], interface: Optional[QgisInterface],
-            currentLocationMapTool: Optional[MapTool], parent=None
+        self, enmapBox: Optional[EnMAPBox], interface: Optional[QgisInterface],
+        currentLocationMapTool: Optional[MapTool], parent=None
     ):
         super().__init__(enmapBox, parent=parent)
 

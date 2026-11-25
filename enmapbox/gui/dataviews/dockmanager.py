@@ -42,8 +42,14 @@ from qgis.gui import QgsLayerTreeView, \
 
 from enmapbox.gui.datasources.datasources import DataSource, ModelDataSource
 from enmapbox.gui.datasources.manager import DataSourceManager
-from enmapbox.gui.dataviews.docks import Dock, DockArea, \
-    AttributeTableDock, SpectralLibraryDock, TextDock, MimeDataDock, WebViewDock, LUT_DOCKTYPES, MapDock
+from enmapbox.gui.dataviews.attributetabledock import AttributeTableDock
+from enmapbox.gui.dataviews.dockarea import DockArea
+from enmapbox.gui.dataviews.docks import Dock
+from enmapbox.gui.dataviews.mapdock import MapDock
+from enmapbox.gui.dataviews.mimedatadock import MimeDataDock
+from enmapbox.gui.dataviews.spectrallibrarydock import SpectralLibraryDock
+from enmapbox.gui.dataviews.textdock import TextDock
+from enmapbox.gui.dataviews.webviewdock import WebViewDock
 from enmapbox.gui.mapcanvas import MapCanvas, KEY_LAST_CLICKED
 from enmapbox.gui.mimedata import (
     MDF_QGIS_LAYERTREEMODELDATA, MDF_ENMAPBOX_LAYERTREEMODELDATA, QGIS_URILIST_MIMETYPE,
@@ -636,7 +642,7 @@ class DockManager(QObject):
 
             if len(dropped_speclibs) > 0:
                 # show 1st speclib
-                from enmapbox.gui.dataviews.docks import SpectralLibraryDock
+                from enmapbox.gui.dataviews.spectrallibrarydock import SpectralLibraryDock
                 NEW_DOCK = self.createDock(SpectralLibraryDock, speclib=dropped_speclibs[0])
                 if not isinstance(NEW_DOCK, SpectralLibraryDock):
                     raise ValueError('Unable to create SpectralLibraryDock')
@@ -653,7 +659,7 @@ class DockManager(QObject):
             ]
 
             if len(dropped_maplayers) > 0:
-                from enmapbox.gui.dataviews.docks import MapDock
+                from enmapbox.gui.dataviews.mapdock import MapDock
                 NEW_DOCK = self.createDock(MapDock)
                 if not isinstance(NEW_DOCK, MapDock):
                     raise ValueError('Unable to create MapDock')
@@ -2030,14 +2036,14 @@ class DockManagerLayerTreeModelMenuProvider(QgsLayerTreeViewMenuProvider):
         from enmapbox.gui.enmapboxgui import EnMAPBox
         emb = EnMAPBox.instance()
         if isinstance(emb, EnMAPBox) and isinstance(layer, QgsVectorLayer):
-            from enmapbox.gui.dataviews.docks import AttributeTableDock
+            from enmapbox.gui.dataviews.attributetabledock import AttributeTableDock
             emb.createDock(AttributeTableDock, layer=layer)
 
     def openSpectralLibraryView(self, layer: QgsVectorLayer):
         from enmapbox.gui.enmapboxgui import EnMAPBox
         emb = EnMAPBox.instance()
         if isinstance(emb, EnMAPBox) and isinstance(layer, QgsVectorLayer):
-            from enmapbox.gui.dataviews.docks import SpectralLibraryDock
+            from enmapbox.gui.dataviews.spectrallibrarydock import SpectralLibraryDock
             emb.createDock(SpectralLibraryDock, speclib=layer)
 
     def onAddGroup(self):
@@ -2404,3 +2410,27 @@ class SpeclibProfileVisualizationGroupNode(CheckableLayerTreeNode):
 
     def checkState(self):
         return Qt.CheckState.Checked if self.vis().isVisible() else Qt.CheckState.Unchecked
+
+
+class DockTypes(object):
+    """
+    Enumeration that defines the standard dock types.
+    """
+    MapDock = 'MAP'
+    TextDock = 'TEXT'
+    MimeDataDock = 'MIME'
+    WebViewDock = 'WEBVIEW'
+    SpectralLibraryDock = 'SPECLIB'
+    AttributeTableDock = 'ATTRIBUTES'
+
+
+LUT_DOCKTYPES = {DockTypes.MapDock: MapDock,
+                 DockTypes.TextDock: TextDock,
+                 DockTypes.MimeDataDock: MimeDataDock,
+                 DockTypes.WebViewDock: WebViewDock,
+                 DockTypes.SpectralLibraryDock: SpectralLibraryDock,
+                 DockTypes.AttributeTableDock: AttributeTableDock
+                 }
+
+for cls in set(LUT_DOCKTYPES.values()):
+    LUT_DOCKTYPES[cls] = cls

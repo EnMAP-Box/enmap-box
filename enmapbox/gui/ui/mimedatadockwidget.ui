@@ -72,7 +72,7 @@
   <customwidget>
    <class>MimeDataTextEdit</class>
    <extends>QTextEdit</extends>
-   <header>enmapbox.gui.dataviews.docks</header>
+   <header>enmapbox.gui.dataviews.mimedatadock</header>
   </customwidget>
  </customwidgets>
  <resources>

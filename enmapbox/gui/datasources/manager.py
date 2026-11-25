@@ -257,9 +257,9 @@ class DataSourceManager(TreeModel):
                 for ds in allDataSources:
                     dataItem = ds.dataItem()
                     if (
-                            isinstance(ds, SpatialDataSource)
-                            and dataItem.path() == input.source()  # noqa
-                            and dataItem.providerKey() == input.providerType()  # noqa
+                        isinstance(ds, SpatialDataSource)
+                        and dataItem.path() == input.source()  # noqa
+                        and dataItem.providerKey() == input.providerType()  # noqa
                     ):
                         foundSources.append(ds)
             elif isinstance(input, str):
@@ -506,7 +506,7 @@ class DataSourceManagerTreeView(TreeView):
         if not isinstance(lyr, QgsMapLayer):
             return None
 
-        from ..dataviews.docks import MapDock
+        from ..dataviews.mapdock import MapDock
         LOAD_DEFAULT_STYLE: bool = isinstance(rgb, str) and re.search('DEFAULT', rgb, re.I)
 
         if target is None:
@@ -647,14 +647,14 @@ class DataSourceManagerTreeView(TreeView):
 
         """
         from enmapbox.gui.enmapboxgui import EnMAPBox
-        from enmapbox.gui.dataviews.docks import SpectralLibraryDock
+        from ..dataviews.spectrallibrarydock import SpectralLibraryDock
 
         emb = self.enmapboxInstance()
         if isinstance(emb, EnMAPBox):
             emb.createDock(SpectralLibraryDock, speclib=speclib)
 
     def openInAttributeEditor(self, vectorLayer: QgsVectorLayer):
-        from enmapbox.gui.dataviews.docks import AttributeTableDock
+        from ..dataviews.attributetabledock import AttributeTableDock
         from enmapbox.gui.enmapboxgui import EnMAPBox
         emb = self.enmapboxInstance()
         if isinstance(emb, EnMAPBox) and isinstance(vectorLayer, QgsVectorLayer):
