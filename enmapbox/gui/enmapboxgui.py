@@ -2950,6 +2950,7 @@ class EnMAPBox(QgisInterface):
         :return: bool. True, if mapLayer exists, False otherwise.
         """
         self.dockTreeView().setCurrentLayer(mapLayer)
+        self.updateCurrentLayerActions()
         return isinstance(mapLayer, QgsMapLayer)
 
     def currentLayer(self) -> QgsMapLayer:
