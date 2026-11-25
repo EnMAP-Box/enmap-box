@@ -689,11 +689,11 @@ def run_processor(cmd_string: Optional[str] = None):
         chl_a, valid, lat, lon, cloud, land, AC, flag_negative, flag_suspect = prepare_processor_input(inpath, ac,
                                                                                                        infile)
 
-    PFT = model(chl_a, pftmodel)
+    PFT = model(chl_a, pftmodel, chl_a)
 
     print('Saving results in: ', outname)
 
-    save_results(PFT, outname)
+    save_results(PFT, sensor, AC, outname, valid, lon, lat, land, cloud)
 
     print('Ready ', str(dt.now()), ' after ', str(dt.now() - start_time))
 
