@@ -20,6 +20,17 @@ import pathlib
 import unittest
 
 import qgis
+from qgis.PyQt.QtCore import QPoint
+from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel
+from qgis.PyQt.QtWidgets import QMenu
+from qgis.core import Qgis, QgsExpressionContextGenerator, QgsProcessingContext, QgsExpressionContext
+from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, \
+    QgsLayerTree, QgsApplication
+from qgis.gui import (
+    QgsMapLayerComboBox, QgisInterface, QgsProcessingContextGenerator,
+    QgsMapCanvas, QgsProcessingParameterWidgetContext
+)
+
 from enmapbox import DIR_REPO
 from enmapbox import initAll
 from enmapbox.gui.contextmenus import EnMAPBoxContextMenuRegistry, EnMAPBoxAbstractContextMenuProvider
@@ -32,16 +43,6 @@ from enmapbox.qgispluginsupport.qps.maptools import MapTools, CursorLocationMapT
 from enmapbox.qgispluginsupport.qps.speclib.gui.spectrallibrarywidget import SpectralLibraryWidget
 from enmapbox.qgispluginsupport.qps.utils import SpatialPoint
 from enmapbox.testing import TestObjects, EnMAPBoxTestCase, start_app
-from qgis.PyQt.QtCore import QPoint
-from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel
-from qgis.PyQt.QtWidgets import QMenu
-from qgis.core import Qgis, QgsExpressionContextGenerator, QgsProcessingContext, QgsExpressionContext
-from qgis.core import QgsProject, QgsMapLayer, QgsRasterLayer, QgsVectorLayer, \
-    QgsLayerTree, QgsApplication
-from qgis.gui import (
-    QgsMapLayerComboBox, QgisInterface, QgsProcessingContextGenerator,
-    QgsMapCanvas, QgsProcessingParameterWidgetContext
-)
 
 start_app()
 initAll()
@@ -416,6 +417,39 @@ class EnMAPBoxTests(EnMAPBoxTestCase):
 
         E.close()
         QgsProject.instance().removeAllMapLayers()
+
+    def test_selecttion_button(self):
+        # addresses #1589
+
+        box = EnMAPBox(load_core_apps=False, load_other_apps=False)
+        l1 = TestObjects.createVectorLayer(name='layer1', wkbType=Qgis.WkbType.Point)
+        l2 = TestObjects.createVectorLayer(name='layer2', wkbType=Qgis.WkbType.Polygon)
+
+        mapdock = box.createMapDock('Map')
+        mapdock.addLayers([l1, l2])
+        action = box.ui.mActionDeselectFeatures
+        self.assertFalse(action.isEnabled())
+        box.setCurrentLayer(l1)
+        self.assertEqual(box.currentLayer(), l1)
+        self.assertFalse(action.isEnabled())
+
+        # select a layer feature
+        l1.selectByIds(l1.allFeatureIds()[0:3])
+        self.assertTrue(action.isEnabled())
+        # change active layer
+        box.setCurrentLayer(l2)
+        self.assertEqual(box.currentLayer(), l2)
+
+        self.assertFalse(action.isEnabled())
+        box.setCurrentLayer(l1)
+
+        self.assertEqual(box.currentLayer(), l1)
+        self.assertTrue(action.isEnabled())
+
+        l1.removeSelection()
+        self.assertFalse(action.isEnabled())
+
+        self.showGui(box.ui)
 
     @unittest.skipIf(EnMAPBoxTestCase.runsInCI(), 'blocking dialogs')
     def test_createNewLayers(self):
