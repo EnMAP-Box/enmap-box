@@ -9,6 +9,8 @@ on:
       - 'tox.ini'
       - '.github/workflows/code_check.yml'
   pull_request:
+    branches:
+      - '**'
     paths:
       - '**.py'
       - 'tox.ini'
@@ -28,7 +30,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ '3.11', '3.12' ]
+        python-version: [ '3.11', '3.12', '3.13', '3.14' ]
     steps:
       - name: Checkout
         uses: actions/checkout@v6
