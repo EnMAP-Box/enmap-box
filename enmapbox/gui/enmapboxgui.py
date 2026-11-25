@@ -17,12 +17,42 @@
 ***************************************************************************
 """
 import os
-import pathlib
 import re
 import sys
 import warnings
 from os.path import basename, dirname
+from pathlib import Path
 from typing import Optional, Dict, Union, Any, List, Sequence
+
+from qgis.PyQt.QtCore import QMetaType
+from qgis.PyQt.QtCore import QUrl
+from qgis.PyQt.QtCore import pyqtSignal, Qt, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
+from qgis.PyQt.QtGui import (
+    QDesktopServices, QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QColor, QIcon,
+    QKeyEvent, QCloseEvent, QGuiApplication
+)
+from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, QMainWindow, QApplication, QSizePolicy, \
+    QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
+    QProgressBar, QMessageBox
+from qgis.PyQt.QtXml import QDomDocument
+from qgis.core import (
+    QgsBrowserModel, QgsField, QgsExpressionContextGenerator, QgsExpressionContext,
+    QgsProcessingContext,
+    QgsExpressionContextUtils, QgsFeature, QgsProcessingException, QgsMapLayer, QgsVectorLayer, QgsRasterLayer,
+    QgsProject,
+    QgsProcessingAlgorithm, Qgis, QgsCoordinateReferenceSystem, QgsWkbTypes,
+    QgsPointXY, QgsLayerTree, QgsLayerTreeLayer, QgsVectorLayerTools,
+    QgsZipUtils, QgsProjectArchive, QgsSettings,
+    QgsStyle, QgsSymbolLegendNode, QgsSymbol, QgsTaskManager, QgsApplication,
+    QgsProcessingAlgRunnerTask, QgsRectangle, edit
+)
+from qgis.core import QgsProviderSublayerDetails
+from qgis.gui import (
+    QgsMapCanvas, QgsMapTool, QgisInterface, QgsMessageBar, QgsMessageViewer, QgsMessageBarItem,
+    QgsMapLayerConfigWidgetFactory, QgsAttributeTableFilterModel, QgsSymbolSelectorDialog,
+    QgsSymbolWidgetContext, QgsProcessingAlgorithmWidgetBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog,
+    QgsNewVectorLayerDialog, QgsProcessingContextGenerator, QgsProcessingParameterWidgetContext
+)
 
 import enmapbox
 import enmapbox.gui.datasources.manager
@@ -57,34 +87,6 @@ from enmapboxprocessing.algorithm.importprismal2calgorithm import ImportPrismaL2
 from enmapboxprocessing.algorithm.importprismal2dalgorithm import ImportPrismaL2DAlgorithm
 from enmapboxprocessing.algorithm.importsentinel2l2aalgorithm import ImportSentinel2L2AAlgorithm
 from enmapboxprocessing.enmapalgorithm import EnMAPProcessingAlgorithm
-from qgis.PyQt.QtCore import QMetaType
-from qgis.PyQt.QtCore import QUrl
-from qgis.PyQt.QtCore import pyqtSignal, Qt, QModelIndex, pyqtSlot, QEventLoop, QRect, QSize, QFile
-from qgis.PyQt.QtGui import QDesktopServices
-from qgis.PyQt.QtGui import QDragEnterEvent, QDragMoveEvent, QDragLeaveEvent, QDropEvent, QColor, QIcon, \
-    QKeyEvent, \
-    QCloseEvent, QGuiApplication
-from qgis.PyQt.QtWidgets import QFrame, QToolBar, QToolButton, QAction, QMenu, QMainWindow, QApplication, QSizePolicy, \
-    QWidget, QDockWidget, QStyle, QFileDialog, QDialog, QStatusBar, \
-    QProgressBar, QMessageBox
-from qgis.PyQt.QtXml import QDomDocument
-from qgis.core import (
-    QgsBrowserModel, QgsField, QgsExpressionContextGenerator, QgsExpressionContext,
-    QgsProcessingContext,
-    QgsExpressionContextUtils, QgsFeature, QgsProcessingException, QgsMapLayer, QgsVectorLayer, QgsRasterLayer,
-    QgsProject,
-    QgsProcessingAlgorithm, Qgis, QgsCoordinateReferenceSystem, QgsWkbTypes,
-    QgsPointXY, QgsLayerTree, QgsLayerTreeLayer, QgsVectorLayerTools,
-    QgsZipUtils, QgsProjectArchive, QgsSettings,
-    QgsStyle, QgsSymbolLegendNode, QgsSymbol, QgsTaskManager, QgsApplication,
-    QgsProcessingAlgRunnerTask, QgsRectangle, edit
-)
-from qgis.gui import (
-    QgsMapCanvas, QgsMapTool, QgisInterface, QgsMessageBar, QgsMessageViewer, QgsMessageBarItem,
-    QgsMapLayerConfigWidgetFactory, QgsAttributeTableFilterModel, QgsSymbolSelectorDialog,
-    QgsSymbolWidgetContext, QgsProcessingAlgorithmWidgetBase, QgsNewGeoPackageLayerDialog, QgsNewMemoryLayerDialog,
-    QgsNewVectorLayerDialog, QgsProcessingContextGenerator, QgsProcessingParameterWidgetContext
-)
 from .contextmenuprovider import EnMAPBoxContextMenuProvider
 from .contextmenus import EnMAPBoxContextMenuRegistry
 from .datasources.datasources import DataSource, RasterDataSource, VectorDataSource, SpatialDataSource
@@ -1422,9 +1424,12 @@ class EnMAPBox(QgisInterface):
             layers = []
             loptions = QgsRasterLayer.LayerOptions(loadDefaultStyle=False)
             for i, s in enumerate(subdatasets):
-                path = pathlib.Path(s)
-                name = f'{path.parent.name}/{path.name}'
-                lyr = QgsRasterLayer(s, name=name, options=loptions)
+                if isinstance(s, str):
+                    path = Path(s)
+                    name = f'{path.parent.name}/{path.name}'
+                    lyr = QgsRasterLayer(s, name=name, options=loptions)
+                elif isinstance(s, QgsProviderSublayerDetails):
+                    lyr = QgsRasterLayer(s.uri(), name=s.name(), options=loptions)
                 if i == 0:
                     paths = d.fileWidget.splitFilePaths(d.fileWidget.filePath())
                     SETTINGS.setValue('lastsourcedir', os.path.dirname(paths[0]))
@@ -1956,7 +1961,7 @@ class EnMAPBox(QgisInterface):
         """
         listingBasename = 'enmapboxapplications.txt'
 
-        DIR_ENMAPBOX = pathlib.Path(enmapbox.DIR_ENMAPBOX)
+        DIR_ENMAPBOX = Path(enmapbox.DIR_ENMAPBOX)
         INTERNAL_APPS = DIR_ENMAPBOX / 'coreapps'
         EO4Q_APPS = DIR_ENMAPBOX / 'eo4qapps'
         EXTERNAL_APPS = DIR_ENMAPBOX / 'apps'
@@ -2124,7 +2129,7 @@ class EnMAPBox(QgisInterface):
         if not missingTestData():
             import enmapbox.exampledata
             dir_exampledata = os.path.dirname(enmapbox.exampledata.__file__)
-            files = list(pathlib.Path(f).as_posix() for f in file_search(dir_exampledata, rx, recursive=True))
+            files = list(Path(f).as_posix() for f in file_search(dir_exampledata, rx, recursive=True))
 
             exampleSources = self.addSources(files)
             exampleSources = [s for s in exampleSources if isinstance(s, SpatialDataSource)]
@@ -2181,10 +2186,10 @@ class EnMAPBox(QgisInterface):
 
         if testData:
             from enmapbox import DIR_REPO
-            dir_testdata = pathlib.Path(DIR_REPO) / 'tests' / 'testdata'
+            dir_testdata = Path(DIR_REPO) / 'tests' / 'testdata'
 
             if dir_testdata.is_dir():
-                files = list(pathlib.Path(f).as_posix() for f in file_search(dir_testdata, rx, recursive=True))
+                files = list(Path(f).as_posix() for f in file_search(dir_testdata, rx, recursive=True))
                 self.addSources(files)
 
     def onDataSourcesRemoved(self, dataSources: List[DataSource]):
@@ -2592,12 +2597,12 @@ class EnMAPBox(QgisInterface):
     def actionAddPgLayer(self):
         return self.ui.mActionAddDataSource
 
-    def addProject(self, project: str):
+    def addProject(self, project: str | Path | QgsProject):
         # 1- clear everything
         # restore
         if isinstance(project, str):
-            self.addProject(pathlib.Path(project))
-        elif isinstance(project, pathlib.Path) and project.is_file():
+            self.addProject(Path(project))
+        elif isinstance(project, Path) and project.is_file():
             p = QgsProject()
             p.read(project.as_posix())
             self.addProject(p)
@@ -2624,8 +2629,8 @@ class EnMAPBox(QgisInterface):
 
     def openProject(self, project):
         if isinstance(project, str):
-            project = pathlib.Path(project)
-        if isinstance(project, pathlib.Path):
+            project = Path(project)
+        if isinstance(project, Path):
             p = QgsProject()
             p.read(project.as_posix())
             self.openProject(project)
