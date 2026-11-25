@@ -28,7 +28,7 @@ jobs:
           fetch-depth: 1
 
       - name: urls-checker
-        uses: urlstechie/urlchecker-action@v2
+        uses: urlstechie/urlchecker-action@master
         with:
           file_types: .md,.py,.rst
 
