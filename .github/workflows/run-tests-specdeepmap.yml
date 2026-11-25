@@ -1,17 +1,20 @@
 name: SpecDeepMap Tests
 
 on:
-  push:
-    branches:
-      - main
-      - release-**
-      - release_**
+  on:
+    workflow_dispatch:
 
-  pull_request:
-    branches:
-      - main
-      - release-**
-      - release_**
+  #  push:
+  #    branches:
+  #      - main
+  #      - release-**
+  #      - release_**
+  #
+  #  pull_request:
+  #    branches:
+  #      - main
+  #      - release-**
+  #      - release_**
 
   release:
     types: [ published ]
