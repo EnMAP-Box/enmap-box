@@ -712,7 +712,7 @@ class DockManager(QObject):
 
     def createDock(self, dockType: Union[str, type, Any], *args,
                    cls=None,
-                   position='right',
+                   position: str | None = None,
                    relativeTo=None,
                    **kwds) -> Dock:
         """
@@ -803,6 +803,12 @@ class DockManager(QObject):
             raise Exception('Unknown dock type: {}'.format(dockType))
         # dock.setParent(dockArea)
         dock.setEnMAPBox(self.enmapBoxInstance())
+        if position is None:
+            if isinstance(dock, SpectralLibraryDock):
+                position = 'bottom'
+            else:
+                position = 'right'
+
         dockArea.addDock(dock, *args, position=position, relativeTo=relativeTo, **kwds)
         dock.setVisible(True)
 
