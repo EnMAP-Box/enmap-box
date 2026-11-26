@@ -5,14 +5,6 @@ from os.path import splitext, basename, exists, join, dirname
 from time import time
 from typing import Dict, Union
 
-from qgis.core import QgsMessageLog, Qgis
-from qgis.gui import QgsAbstractProcessingParameterWidgetWrapper, QgsProcessingParameterWidgetFactoryInterface, QgsGui
-
-from enmapboxprocessing.algorithm.rastermathalgorithm.snippetinsertdialog import SnippetInsertDialog
-from enmapboxprocessing.algorithm.rastermathalgorithm.snippetsaveasdialog import SnippetSaveAsDialog
-from enmapboxprocessing.parameter.processingparametercodeeditwidget import CodeEditWidget
-from enmapboxprocessing.rasterreader import RasterReader
-from enmapboxprocessing.utils import Utils
 from qgis.PyQt.QtCore import QUrl
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDesktopServices
@@ -20,7 +12,15 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QWidget, QTreeWidget, QTreeWidgetItem, QPushButton, \
     QInputDialog, QMenu, QAction, QComboBox, QToolButton, QFileDialog
 from qgis.PyQt.uic import loadUi
+from qgis.core import QgsMessageLog, Qgis
 from qgis.core import QgsProject, QgsRasterLayer, QgsVectorLayer, QgsFields, QgsField, QgsCoordinateReferenceSystem
+from qgis.gui import QgsAbstractProcessingParameterWidgetWrapper, QgsProcessingParameterWidgetFactoryInterface, QgsGui
+
+from enmapboxprocessing.algorithm.rastermathalgorithm.snippetinsertdialog import SnippetInsertDialog
+from enmapboxprocessing.algorithm.rastermathalgorithm.snippetsaveasdialog import SnippetSaveAsDialog
+from enmapboxprocessing.parameter.processingparametercodeeditwidget import CodeEditWidget
+from enmapboxprocessing.rasterreader import RasterReader
+from enmapboxprocessing.utils import Utils
 
 
 class ProcessingParameterRasterMathCodeEdit(QWidget):
@@ -472,7 +472,9 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
 class ProcessingParameterRasterMathCodeEditWidgetWrapper(QgsAbstractProcessingParameterWidgetWrapper):
 
     def createWidget(self):
-        return ProcessingParameterRasterMathCodeEdit()
+        widget = ProcessingParameterRasterMathCodeEdit()
+        widget.setProject(self.widgetContext().project())  # todo setProject
+        return widget
 
     def setWidgetValue(self, value, context):
         widget = self.wrappedWidget()
@@ -481,10 +483,6 @@ class ProcessingParameterRasterMathCodeEditWidgetWrapper(QgsAbstractProcessingPa
     def widgetValue(self):
         widget = self.wrappedWidget()
         return widget.value()
-
-    # def setWidgetContext(self, context):
-        # widget = self.wrappedWidget()
-        # widget.setProject(context.project())
 
 
 class LayerItem(QTreeWidgetItem):
