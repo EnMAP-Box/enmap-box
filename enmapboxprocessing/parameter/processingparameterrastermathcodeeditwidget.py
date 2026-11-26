@@ -35,11 +35,11 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
     mInput: QComboBox
     mOutput: QComboBox
 
-    def __init__(self, parent=None):
+    def __init__(self, project: QgsProject, parent=None):
         QWidget.__init__(self, parent)
         loadUi(__file__.replace('.py', '.ui'), self)
 
-        self.mProject: QgsProject = QgsProject.instance()
+        self.mProject = project
         self.updateSources()
         self.mSourcesRefresh.clicked.connect(self.updateSources)
 
@@ -389,7 +389,7 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
             if not crs.isValid():
                 continue
 
-            if layer.dataProvider().name() not in ['gdal', 'ogr']:
+            if layer.dataProvider().name() not in ['gdal', 'ogr', 'VectorLayerFieldRasterDataProvider']:
                 continue
 
             crsid = f' [{crs.authid()}]'
@@ -472,8 +472,7 @@ class ProcessingParameterRasterMathCodeEdit(QWidget):
 class ProcessingParameterRasterMathCodeEditWidgetWrapper(QgsAbstractProcessingParameterWidgetWrapper):
 
     def createWidget(self):
-        widget = ProcessingParameterRasterMathCodeEdit()
-        widget.setProject(self.widgetContext().project())  # todo setProject
+        widget = ProcessingParameterRasterMathCodeEdit(self.widgetContext().project())
         return widget
 
     def setWidgetValue(self, value, context):
