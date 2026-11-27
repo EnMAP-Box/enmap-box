@@ -13,7 +13,7 @@ from ensomap import hys
 from ensomap.hys import mask_specind_ncai as ncai
 from ensomap.hys import mask_specind_ndrbi as ndrbi
 from ensomap.hys import mask_specind_ndvi as ndvi
-from qgis.PyQt import Qt
+from qgis.PyQt.QtCore import Qt
 
 
 class ui_msk:

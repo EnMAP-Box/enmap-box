@@ -23,7 +23,7 @@ from ensomap.hys import feat_specind_fe1 as fe1
 # import hys.feat_specan_smgm   as smgm
 from ensomap.hys import feat_specind_ndgi as ndgi
 from ensomap.hys import feat_specind_nsmi as nsmi
-from qgis.PyQt import Qt
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QMessageBox
 
 

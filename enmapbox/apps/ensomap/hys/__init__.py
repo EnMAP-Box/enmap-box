@@ -21,7 +21,37 @@
 
 __version__ = '2.1'
 
-# from .data import *
-# from .definitions import *
-# from .gui import *
-# from .tools import *
+from .data import (
+    data,
+    SpectralLibrary,
+    mask,
+    cube,
+    product,
+    CSV_DATA
+)
+from .definitions import (
+    pick_file,
+    display_error,
+    display_information,
+    displayText,
+    coord2pts,
+    report
+)
+from .gui import WIDGET
+
+
+__all__ = [
+    'data',
+    'SpectralLibrary',
+    'mask',
+    'cube',
+    'product',
+    'CSV_DATA',
+    'pick_file',
+    'display_error',
+    'display_information',
+    'displayText',
+    'coord2pts',
+    'report',
+    'WIDGET',
+]

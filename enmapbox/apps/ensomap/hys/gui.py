@@ -7,7 +7,7 @@ from matplotlib.backends.backend_qtagg import NavigationToolbar2QT as Navigation
 from scipy import stats
 
 from ensomap import hys
-from qgis.PyQt import Qt
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import (
     QVBoxLayout, QLayout, QDesktopWidget, QTabWidget, QWidget, QHBoxLayout, QGroupBox, QFrame, QLabel, QLineEdit,
     QToolButton, QPushButton, QCheckBox, QRadioButton, QProgressBar, QListWidget, QTableWidget, QSpinBox, QButtonGroup,

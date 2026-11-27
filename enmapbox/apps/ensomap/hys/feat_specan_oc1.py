@@ -4,7 +4,6 @@
 # Licensed under the terms of
 # (see ../../LICENSE.md for details)
 
-# import importlib
 import numba as nb
 import numpy as np
 from ensomap.hys.tools import get_continuum_line
