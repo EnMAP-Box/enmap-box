@@ -38,3 +38,20 @@ from .definitions import (
     report
 )
 from .gui import WIDGET
+
+
+__all__ = [
+    'data',
+    'SpectralLibrary',
+    'mask',
+    'cube',
+    'product',
+    'CSV_DATA',
+    'pick_file',
+    'display_error',
+    'display_information',
+    'displayText',
+    'coord2pts',
+    'report',
+    'WIDGET',
+]
