@@ -4,8 +4,6 @@
 # Licensed under the terms of
 # (see ../../LICENSE.md for details)
 
-# import importlib
-
 __bands__ = [500, 2410, 2390]
 __filename__ = "_MOISTURE_SMGM"
 __gui__ = "Soil Moisture Gaussian Model (SMGM)"
